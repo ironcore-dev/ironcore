@@ -1,0 +1,20 @@
+# permissions to do viewer networks.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: network-viewer-role
+rules:
+- apiGroups:
+  - core.api.onmetal.de
+  resources:
+  - networks
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - core.api.onmetal.de
+  resources:
+  - networks/status
+  verbs:
+  - get

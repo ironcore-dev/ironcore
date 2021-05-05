@@ -1,0 +1,28 @@
+domain: api.onmetal.de
+repo: github.com/onmetal/onmetal-api
+resources:
+- group: core
+  kind: Machine
+  version: v1alpha1
+- group: core
+  kind: Gateway
+  version: v1alpha1
+- group: core
+  kind: SecurityGroup
+  version: v1alpha1
+- group: core
+  kind: KeyPair
+  version: v1alpha1
+- group: core
+  kind: Network
+  version: v1alpha1
+- group: core
+  kind: Subnet
+  version: v1alpha1
+- group: core
+  kind: LoadBalancer
+  version: v1alpha1
+- group: core
+  kind: Disk
+  version: v1alpha1
+version: "2"

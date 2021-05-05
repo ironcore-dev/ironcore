@@ -1,0 +1,26 @@
+# permissions to do edit keypairs.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: keypair-editor-role
+rules:
+- apiGroups:
+  - core.api.onmetal.de
+  resources:
+  - keypairs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.api.onmetal.de
+  resources:
+  - keypairs/status
+  verbs:
+  - get
+  - patch
+  - update
