@@ -24,9 +24,6 @@ import (
 
 // LoadBalancerSpec defines the desired state of LoadBalancer
 type LoadBalancerSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-
 	// Foo is an example field of LoadBalancer. Edit LoadBalancer_types.go to remove/update
 	Foo string `json:"foo,omitempty"`
 }
@@ -41,8 +38,10 @@ type LoadBalancerStatus struct {
 
 // LoadBalancer is the Schema for the loadbalancers API
 type LoadBalancer struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.TypeMeta `json:",inline"`
+	// Standard object metadata.
+	// +optional
+	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
 	Spec   LoadBalancerSpec   `json:"spec,omitempty"`
 	Status LoadBalancerStatus `json:"status,omitempty"`

@@ -24,9 +24,6 @@ import (
 
 // NetworkSpec defines the desired state of Network
 type NetworkSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-
 	// Foo is an example field of Network. Edit Network_types.go to remove/update
 	Foo string `json:"foo,omitempty"`
 }
@@ -41,8 +38,10 @@ type NetworkStatus struct {
 
 // Network is the Schema for the networks API
 type Network struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.TypeMeta `json:",inline"`
+	// Standard object metadata.
+	// +optional
+	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
 	Spec   NetworkSpec   `json:"spec,omitempty"`
 	Status NetworkStatus `json:"status,omitempty"`

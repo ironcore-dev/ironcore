@@ -24,9 +24,6 @@ import (
 
 // MachineSpec defines the desired state of Machine
 type MachineSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-
 	// Foo is an example field of Machine. Edit Machine_types.go to remove/update
 	Foo string `json:"foo,omitempty"`
 }
@@ -41,8 +38,10 @@ type MachineStatus struct {
 
 // Machine is the Schema for the machines API
 type Machine struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.TypeMeta `json:",inline"`
+	// Standard object metadata.
+	// +optional
+	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
 	Spec   MachineSpec   `json:"spec,omitempty"`
 	Status MachineStatus `json:"status,omitempty"`
