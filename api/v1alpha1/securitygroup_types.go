@@ -24,9 +24,6 @@ import (
 
 // SecurityGroupSpec defines the desired state of SecurityGroup
 type SecurityGroupSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-
 	// Foo is an example field of SecurityGroup. Edit SecurityGroup_types.go to remove/update
 	Foo string `json:"foo,omitempty"`
 }
@@ -41,8 +38,10 @@ type SecurityGroupStatus struct {
 
 // SecurityGroup is the Schema for the securitygroups API
 type SecurityGroup struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.TypeMeta `json:",inline"`
+	// Standard object metadata.
+	// +optional
+	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
 	Spec   SecurityGroupSpec   `json:"spec,omitempty"`
 	Status SecurityGroupStatus `json:"status,omitempty"`

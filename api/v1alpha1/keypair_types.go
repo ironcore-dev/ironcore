@@ -24,9 +24,6 @@ import (
 
 // KeyPairSpec defines the desired state of KeyPair
 type KeyPairSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-
 	// Foo is an example field of KeyPair. Edit KeyPair_types.go to remove/update
 	Foo string `json:"foo,omitempty"`
 }
@@ -41,8 +38,10 @@ type KeyPairStatus struct {
 
 // KeyPair is the Schema for the keypairs API
 type KeyPair struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.TypeMeta `json:",inline"`
+	// Standard object metadata.
+	// +optional
+	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
 	Spec   KeyPairSpec   `json:"spec,omitempty"`
 	Status KeyPairStatus `json:"status,omitempty"`

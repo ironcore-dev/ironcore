@@ -24,9 +24,6 @@ import (
 
 // DiskSpec defines the desired state of Disk
 type DiskSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-
 	// Foo is an example field of Disk. Edit Disk_types.go to remove/update
 	Foo string `json:"foo,omitempty"`
 }
@@ -41,8 +38,10 @@ type DiskStatus struct {
 
 // Disk is the Schema for the disks API
 type Disk struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.TypeMeta `json:",inline"`
+	// Standard object metadata.
+	// +optional
+	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
 	Spec   DiskSpec   `json:"spec,omitempty"`
 	Status DiskStatus `json:"status,omitempty"`

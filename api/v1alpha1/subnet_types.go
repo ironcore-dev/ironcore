@@ -24,9 +24,6 @@ import (
 
 // SubnetSpec defines the desired state of Subnet
 type SubnetSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-
 	// Foo is an example field of Subnet. Edit Subnet_types.go to remove/update
 	Foo string `json:"foo,omitempty"`
 }
@@ -41,8 +38,10 @@ type SubnetStatus struct {
 
 // Subnet is the Schema for the subnets API
 type Subnet struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.TypeMeta `json:",inline"`
+	// Standard object metadata.
+	// +optional
+	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
 	Spec   SubnetSpec   `json:"spec,omitempty"`
 	Status SubnetStatus `json:"status,omitempty"`
