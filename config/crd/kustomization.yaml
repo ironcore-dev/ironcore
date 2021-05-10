@@ -2,40 +2,61 @@
 # since it depends on service name and namespace that are out of this kustomize package.
 # It should be run by config/default
 resources:
-- bases/core.api.onmetal.de_machines.yaml
-- bases/core.api.onmetal.de_gateways.yaml
-- bases/core.api.onmetal.de_securitygroups.yaml
-- bases/core.api.onmetal.de_keypairs.yaml
-- bases/core.api.onmetal.de_networks.yaml
-- bases/core.api.onmetal.de_subnets.yaml
-- bases/core.api.onmetal.de_loadbalancers.yaml
-- bases/core.api.onmetal.de_disks.yaml
-# +kubebuilder:scaffold:crdkustomizeresource
+- bases/storage.onmetal.de_disks.yaml
+- bases/storage.onmetal.de_diskattachments.yaml
+- bases/compute.onmetal.de_machines.yaml
+- bases/network.onmetal.de_networks.yaml
+- bases/network.onmetal.de_subnets.yaml
+- bases/network.onmetal.de_securitygroups.yaml
+- bases/network.onmetal.de_gateways.yaml
+- bases/network.onmetal.de_networkinterfaces.yaml
+- bases/network.onmetal.de_routetables.yaml
+- bases/compute.onmetal.de_keypairs.yaml
+- bases/storage.onmetal.de_storageclasses.yaml
+- bases/compute.onmetal.de_computepools.yaml
+- bases/storage.onmetal.de_snapshots.yaml
+- bases/compute.onmetal.de_images.yaml
+- bases/compute.onmetal.de_flavors.yaml
+#+kubebuilder:scaffold:crdkustomizeresource
 
 patchesStrategicMerge:
 # [WEBHOOK] To enable webhook, uncomment all the sections with [WEBHOOK] prefix.
 # patches here are for enabling the conversion webhook for each CRD
+#- patches/webhook_in_disks.yaml
+#- patches/webhook_in_diskattachments.yaml
 #- patches/webhook_in_machines.yaml
-#- patches/webhook_in_gateways.yaml
-#- patches/webhook_in_securitygroups.yaml
-#- patches/webhook_in_keypairs.yaml
 #- patches/webhook_in_networks.yaml
 #- patches/webhook_in_subnets.yaml
-#- patches/webhook_in_loadbalancers.yaml
-#- patches/webhook_in_disks.yaml
-# +kubebuilder:scaffold:crdkustomizewebhookpatch
+#- patches/webhook_in_securitygroups.yaml
+#- patches/webhook_in_gateways.yaml
+#- patches/webhook_in_networkinterfaces.yaml
+#- patches/webhook_in_routetables.yaml
+#- patches/webhook_in_keypairs.yaml
+#- patches/webhook_in_storageclasses.yaml
+#- patches/webhook_in_computepools.yaml
+#- patches/webhook_in_snapshots.yaml
+#- patches/webhook_in_images.yaml
+#- patches/webhook_in_flavors.yaml
+#+kubebuilder:scaffold:crdkustomizewebhookpatch
 
 # [CERTMANAGER] To enable webhook, uncomment all the sections with [CERTMANAGER] prefix.
 # patches here are for enabling the CA injection for each CRD
+#- patches/cainjection_in_disks.yaml
+#- patches/cainjection_in_diskattachments.yaml
 #- patches/cainjection_in_machines.yaml
-#- patches/cainjection_in_gateways.yaml
-#- patches/cainjection_in_securitygroups.yaml
-#- patches/cainjection_in_keypairs.yaml
 #- patches/cainjection_in_networks.yaml
 #- patches/cainjection_in_subnets.yaml
-#- patches/cainjection_in_loadbalancers.yaml
-#- patches/cainjection_in_disks.yaml
-# +kubebuilder:scaffold:crdkustomizecainjectionpatch
+#- patches/cainjection_in_securitygroups.yaml
+#- patches/cainjection_in_gateways.yaml
+#- patches/cainjection_in_networkinterfaces.yaml
+#- patches/cainjection_in_routetables.yaml
+#- patches/cainjection_in_keypairs.yaml
+#- patches/cainjection_in_storageclasses.yaml
+#- patches/cainjection_in_computepools.yaml
+#- patches/cainjection_in_snapshots.yaml
+#- patches/cainjection_in_images.yaml
+#- patches/cainjection_in_flavors.yaml
+#+kubebuilder:scaffold:crdkustomizecainjectionpatch
 
 # the following config is for teaching kustomize how to do kustomization for CRDs.
 configurations:

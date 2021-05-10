@@ -1,10 +1,10 @@
-# onmetal-api
+# onmetal
 
 This is a bleeding edge API POC.
 
 ## Installation
 
-To install the CRDs into your cluster 
+To install the CRDs into your cluster
 
 ```shell
 make install

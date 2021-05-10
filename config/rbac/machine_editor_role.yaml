@@ -1,11 +1,11 @@
-# permissions to do edit machines.
+# permissions for end users to edit machines.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: machine-editor-role
 rules:
 - apiGroups:
-  - core.api.onmetal.de
+  - compute.onmetal.de
   resources:
   - machines
   verbs:
@@ -17,10 +17,8 @@ rules:
   - update
   - watch
 - apiGroups:
-  - core.api.onmetal.de
+  - compute.onmetal.de
   resources:
   - machines/status
   verbs:
   - get
-  - patch
-  - update

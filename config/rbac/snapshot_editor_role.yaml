@@ -1,0 +1,24 @@
+# permissions for end users to edit snapshots.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: snapshot-editor-role
+rules:
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - snapshots
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - snapshots/status
+  verbs:
+  - get

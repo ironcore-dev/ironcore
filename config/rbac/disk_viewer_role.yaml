@@ -1,11 +1,11 @@
-# permissions to do viewer disks.
+# permissions for end users to view disks.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: disk-viewer-role
 rules:
 - apiGroups:
-  - core.api.onmetal.de
+  - storage.onmetal.de
   resources:
   - disks
   verbs:
@@ -13,7 +13,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - core.api.onmetal.de
+  - storage.onmetal.de
   resources:
   - disks/status
   verbs:

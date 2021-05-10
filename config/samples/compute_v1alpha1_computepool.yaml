@@ -1,0 +1,7 @@
+apiVersion: compute.onmetal.de/v1alpha1
+kind: ComputePool
+metadata:
+  name: computepool-sample
+spec:
+  # Add fields here
+  foo: bar

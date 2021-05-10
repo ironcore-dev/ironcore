@@ -1,28 +1,143 @@
-domain: api.onmetal.de
-repo: github.com/onmetal/onmetal-api
+domain: onmetal.de
+layout:
+- go.kubebuilder.io/v3
+multigroup: true
+projectName: onmetal
+repo: github.com/onmetal
 resources:
-- group: core
-  kind: Machine
-  version: v1alpha1
-- group: core
-  kind: Gateway
-  version: v1alpha1
-- group: core
-  kind: SecurityGroup
-  version: v1alpha1
-- group: core
-  kind: KeyPair
-  version: v1alpha1
-- group: core
-  kind: Network
-  version: v1alpha1
-- group: core
-  kind: Subnet
-  version: v1alpha1
-- group: core
-  kind: LoadBalancer
-  version: v1alpha1
-- group: core
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: onmetal.de
+  group: storage
   kind: Disk
+  path: github.com/onmetal/apis/storage/v1alpha1
   version: v1alpha1
-version: "2"
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: onmetal.de
+  group: storage
+  kind: DiskAttachment
+  path: github.com/onmetal/apis/storage/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: onmetal.de
+  group: compute
+  kind: Machine
+  path: github.com/onmetal/apis/compute/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: onmetal.de
+  group: network
+  kind: Network
+  path: github.com/onmetal/apis/network/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: onmetal.de
+  group: network
+  kind: Subnet
+  path: github.com/onmetal/apis/network/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: onmetal.de
+  group: network
+  kind: SecurityGroup
+  path: github.com/onmetal/apis/network/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: onmetal.de
+  group: network
+  kind: Gateway
+  path: github.com/onmetal/apis/network/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: onmetal.de
+  group: network
+  kind: NetworkInterface
+  path: github.com/onmetal/apis/network/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: onmetal.de
+  group: network
+  kind: RouteTable
+  path: github.com/onmetal/apis/network/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: onmetal.de
+  group: compute
+  kind: KeyPair
+  path: github.com/onmetal/apis/compute/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: onmetal.de
+  group: storage
+  kind: StorageClass
+  path: github.com/onmetal/apis/storage/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: onmetal.de
+  group: compute
+  kind: ComputePool
+  path: github.com/onmetal/apis/compute/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: onmetal.de
+  group: storage
+  kind: Snapshot
+  path: github.com/onmetal/apis/storage/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: onmetal.de
+  group: compute
+  kind: Image
+  path: github.com/onmetal/apis/compute/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: onmetal.de
+  group: compute
+  kind: Flavor
+  path: github.com/onmetal/apis/compute/v1alpha1
+  version: v1alpha1
+version: "3"
