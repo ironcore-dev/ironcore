@@ -1,0 +1,24 @@
+# permissions for end users to edit computepools.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: computepool-editor-role
+rules:
+- apiGroups:
+  - compute.onmetal.de
+  resources:
+  - computepools
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - compute.onmetal.de
+  resources:
+  - computepools/status
+  verbs:
+  - get

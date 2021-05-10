@@ -1,0 +1,24 @@
+# permissions for end users to edit images.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: image-editor-role
+rules:
+- apiGroups:
+  - compute.onmetal.de
+  resources:
+  - images
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - compute.onmetal.de
+  resources:
+  - images/status
+  verbs:
+  - get

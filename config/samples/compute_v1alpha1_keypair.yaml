@@ -1,0 +1,7 @@
+apiVersion: compute.onmetal.de/v1alpha1
+kind: KeyPair
+metadata:
+  name: keypair-sample
+spec:
+  # Add fields here
+  foo: bar

@@ -1,11 +1,11 @@
-# permissions to do viewer securitygroups.
+# permissions for end users to view securitygroups.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: securitygroup-viewer-role
 rules:
 - apiGroups:
-  - core.api.onmetal.de
+  - network.onmetal.de
   resources:
   - securitygroups
   verbs:
@@ -13,7 +13,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - core.api.onmetal.de
+  - network.onmetal.de
   resources:
   - securitygroups/status
   verbs:

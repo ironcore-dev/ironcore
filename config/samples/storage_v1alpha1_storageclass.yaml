@@ -1,0 +1,7 @@
+apiVersion: storage.onmetal.de/v1alpha1
+kind: StorageClass
+metadata:
+  name: storageclass-sample
+spec:
+  # Add fields here
+  foo: bar

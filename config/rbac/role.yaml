@@ -1,0 +1,398 @@
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: manager-role
+rules:
+- apiGroups:
+  - compute.onmetal.de
+  resources:
+  - computepools
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - compute.onmetal.de
+  resources:
+  - computepools/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - compute.onmetal.de
+  resources:
+  - computepools/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - compute.onmetal.de
+  resources:
+  - flavors
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - compute.onmetal.de
+  resources:
+  - flavors/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - compute.onmetal.de
+  resources:
+  - flavors/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - compute.onmetal.de
+  resources:
+  - images
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - compute.onmetal.de
+  resources:
+  - images/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - compute.onmetal.de
+  resources:
+  - images/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - compute.onmetal.de
+  resources:
+  - keypairs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - compute.onmetal.de
+  resources:
+  - keypairs/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - compute.onmetal.de
+  resources:
+  - keypairs/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - compute.onmetal.de
+  resources:
+  - machines
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - compute.onmetal.de
+  resources:
+  - machines/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - compute.onmetal.de
+  resources:
+  - machines/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - gateways
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - gateways/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - gateways/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - networkinterfaces
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - networkinterfaces/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - networkinterfaces/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - networks
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - networks/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - networks/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - routetables
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - routetables/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - routetables/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - securitygroups
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - securitygroups/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - securitygroups/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - subnets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - subnets/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - subnets/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - diskattachments
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - diskattachments/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - diskattachments/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - disks
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - disks/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - disks/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - snapshots
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - snapshots/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - snapshots/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - storageclasses
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - storageclasses/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - storageclasses/status
+  verbs:
+  - get
+  - patch
+  - update
