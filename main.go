@@ -84,20 +84,20 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = (&storagecontrollers.DiskReconciler{
+	if err = (&storagecontrollers.VolumeReconciler{
 		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("storage").WithName("Disk"),
+		Log:    ctrl.Log.WithName("controllers").WithName("storage").WithName("Volume"),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "Disk")
+		setupLog.Error(err, "unable to create controller", "controller", "Volume")
 		os.Exit(1)
 	}
-	if err = (&storagecontrollers.DiskAttachmentReconciler{
+	if err = (&storagecontrollers.VolumeAttachmentReconciler{
 		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("storage").WithName("DiskAttachment"),
+		Log:    ctrl.Log.WithName("controllers").WithName("storage").WithName("VolumeAttachment"),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "DiskAttachment")
+		setupLog.Error(err, "unable to create controller", "controller", "VolumeAttachment")
 		os.Exit(1)
 	}
 	if err = (&computecontrollers.MachineReconciler{

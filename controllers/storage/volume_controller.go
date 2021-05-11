@@ -27,28 +27,28 @@ import (
 	storagev1alpha1 "github.com/onmetal/apis/storage/v1alpha1"
 )
 
-// DiskReconciler reconciles a Disk object
-type DiskReconciler struct {
+// VolumeReconciler reconciles a Volume object
+type VolumeReconciler struct {
 	client.Client
 	Log    logr.Logger
 	Scheme *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=storage.onmetal.de,resources=disks,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=storage.onmetal.de,resources=disks/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=storage.onmetal.de,resources=disks/finalizers,verbs=update
+//+kubebuilder:rbac:groups=storage.onmetal.de,resources=volumes,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=storage.onmetal.de,resources=volumes/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=storage.onmetal.de,resources=volumes/finalizers,verbs=update
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
 // TODO(user): Modify the Reconcile function to compare the state specified by
-// the Disk object against the actual cluster state, and then
+// the Volume object against the actual cluster state, and then
 // perform operations to make the cluster state reflect the state specified by
 // the user.
 //
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.7.2/pkg/reconcile
-func (r *DiskReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = r.Log.WithValues("disk", req.NamespacedName)
+func (r *VolumeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+	_ = r.Log.WithValues("volume", req.NamespacedName)
 
 	// your logic here
 
@@ -56,8 +56,8 @@ func (r *DiskReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 }
 
 // SetupWithManager sets up the controller with the Manager.
-func (r *DiskReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *VolumeReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&storagev1alpha1.Disk{}).
+		For(&storagev1alpha1.Volume{}).
 		Complete(r)
 }

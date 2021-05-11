@@ -1,7 +1,7 @@
 apiVersion: storage.onmetal.de/v1alpha1
-kind: Disk
+kind: VolumeAttachment
 metadata:
-  name: disk-sample
+  name: volumeattachment-sample
 spec:
   # Add fields here
   foo: bar

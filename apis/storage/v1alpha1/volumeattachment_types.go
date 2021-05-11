@@ -23,17 +23,17 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
-// DiskAttachmentSpec defines the desired state of DiskAttachment
-type DiskAttachmentSpec struct {
+// VolumeAttachmentSpec defines the desired state of VolumeAttachment
+type VolumeAttachmentSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// Foo is an example field of DiskAttachment. Edit diskattachment_types.go to remove/update
+	// Foo is an example field of VolumeAttachment. Edit volumeattachment_types.go to remove/update
 	Foo string `json:"foo,omitempty"`
 }
 
-// DiskAttachmentStatus defines the observed state of DiskAttachment
-type DiskAttachmentStatus struct {
+// VolumeAttachmentStatus defines the observed state of VolumeAttachment
+type VolumeAttachmentStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 }
@@ -41,24 +41,24 @@ type DiskAttachmentStatus struct {
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 
-// DiskAttachment is the Schema for the diskattachments API
-type DiskAttachment struct {
+// VolumeAttachment is the Schema for the volumeattachments API
+type VolumeAttachment struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   DiskAttachmentSpec   `json:"spec,omitempty"`
-	Status DiskAttachmentStatus `json:"status,omitempty"`
+	Spec   VolumeAttachmentSpec   `json:"spec,omitempty"`
+	Status VolumeAttachmentStatus `json:"status,omitempty"`
 }
 
 //+kubebuilder:object:root=true
 
-// DiskAttachmentList contains a list of DiskAttachment
-type DiskAttachmentList struct {
+// VolumeAttachmentList contains a list of VolumeAttachment
+type VolumeAttachmentList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []DiskAttachment `json:"items"`
+	Items           []VolumeAttachment `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&DiskAttachment{}, &DiskAttachmentList{})
+	SchemeBuilder.Register(&VolumeAttachment{}, &VolumeAttachmentList{})
 }
