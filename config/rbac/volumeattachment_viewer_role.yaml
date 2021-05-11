@@ -1,13 +1,13 @@
-# permissions for end users to view diskattachments.
+# permissions for end users to view volumeattachments.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: diskattachment-viewer-role
+  name: volumeattachment-viewer-role
 rules:
 - apiGroups:
   - storage.onmetal.de
   resources:
-  - diskattachments
+  - volumeattachments
   verbs:
   - get
   - list
@@ -15,6 +15,6 @@ rules:
 - apiGroups:
   - storage.onmetal.de
   resources:
-  - diskattachments/status
+  - volumeattachments/status
   verbs:
   - get

@@ -295,58 +295,6 @@ rules:
 - apiGroups:
   - storage.onmetal.de
   resources:
-  - diskattachments
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - storage.onmetal.de
-  resources:
-  - diskattachments/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - storage.onmetal.de
-  resources:
-  - diskattachments/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - storage.onmetal.de
-  resources:
-  - disks
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - storage.onmetal.de
-  resources:
-  - disks/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - storage.onmetal.de
-  resources:
-  - disks/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - storage.onmetal.de
-  resources:
   - snapshots
   verbs:
   - create
@@ -392,6 +340,58 @@ rules:
   - storage.onmetal.de
   resources:
   - storageclasses/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - volumeattachments
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - volumeattachments/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - volumeattachments/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - volumes
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - volumes/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - volumes/status
   verbs:
   - get
   - patch

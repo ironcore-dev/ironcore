@@ -11,7 +11,7 @@ resources:
   controller: true
   domain: onmetal.de
   group: storage
-  kind: Disk
+  kind: Volume
   path: github.com/onmetal/apis/storage/v1alpha1
   version: v1alpha1
 - api:
@@ -20,7 +20,7 @@ resources:
   controller: true
   domain: onmetal.de
   group: storage
-  kind: DiskAttachment
+  kind: VolumeAttachment
   path: github.com/onmetal/apis/storage/v1alpha1
   version: v1alpha1
 - api:

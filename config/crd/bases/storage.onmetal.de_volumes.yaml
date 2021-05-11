@@ -37,8 +37,8 @@ spec:
             description: VolumeSpec defines the desired state of Volume
             properties:
               foo:
-                description: Foo is an example field of Volume. Edit volume_types.go to
-                  remove/update
+                description: Foo is an example field of Volume. Edit volume_types.go
+                  to remove/update
                 type: string
             type: object
           status:

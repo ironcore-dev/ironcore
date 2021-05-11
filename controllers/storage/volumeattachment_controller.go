@@ -27,28 +27,28 @@ import (
 	storagev1alpha1 "github.com/onmetal/apis/storage/v1alpha1"
 )
 
-// DiskAttachmentReconciler reconciles a DiskAttachment object
-type DiskAttachmentReconciler struct {
+// VolumeAttachmentReconciler reconciles a VolumeAttachment object
+type VolumeAttachmentReconciler struct {
 	client.Client
 	Log    logr.Logger
 	Scheme *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=storage.onmetal.de,resources=diskattachments,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=storage.onmetal.de,resources=diskattachments/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=storage.onmetal.de,resources=diskattachments/finalizers,verbs=update
+//+kubebuilder:rbac:groups=storage.onmetal.de,resources=volumeattachments,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=storage.onmetal.de,resources=volumeattachments/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=storage.onmetal.de,resources=volumeattachments/finalizers,verbs=update
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
 // TODO(user): Modify the Reconcile function to compare the state specified by
-// the DiskAttachment object against the actual cluster state, and then
+// the VolumeAttachment object against the actual cluster state, and then
 // perform operations to make the cluster state reflect the state specified by
 // the user.
 //
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.7.2/pkg/reconcile
-func (r *DiskAttachmentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = r.Log.WithValues("diskattachment", req.NamespacedName)
+func (r *VolumeAttachmentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+	_ = r.Log.WithValues("volumeattachment", req.NamespacedName)
 
 	// your logic here
 
@@ -56,8 +56,8 @@ func (r *DiskAttachmentReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 }
 
 // SetupWithManager sets up the controller with the Manager.
-func (r *DiskAttachmentReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *VolumeAttachmentReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&storagev1alpha1.DiskAttachment{}).
+		For(&storagev1alpha1.VolumeAttachment{}).
 		Complete(r)
 }
