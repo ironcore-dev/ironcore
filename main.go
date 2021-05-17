@@ -31,12 +31,12 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	computev1alpha1 "github.com/onmetal/apis/compute/v1alpha1"
-	networkv1alpha1 "github.com/onmetal/apis/network/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/apis/storage/v1alpha1"
-	computecontrollers "github.com/onmetal/controllers/compute"
-	networkcontrollers "github.com/onmetal/controllers/network"
-	storagecontrollers "github.com/onmetal/controllers/storage"
+	computev1alpha1 "github.com/onmetal-api/apis/compute/v1alpha1"
+	networkv1alpha1 "github.com/onmetal-api/apis/network/v1alpha1"
+	storagev1alpha1 "github.com/onmetal-api/apis/storage/v1alpha1"
+	computecontrollers "github.com/onmetal-api/controllers/compute"
+	networkcontrollers "github.com/onmetal-api/controllers/network"
+	storagecontrollers "github.com/onmetal-api/controllers/storage"
 	//+kubebuilder:scaffold:imports
 )
 
