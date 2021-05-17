@@ -24,7 +24,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	networkv1alpha1 "github.com/onmetal/apis/network/v1alpha1"
+	networkv1alpha1 "github.com/onmetal-api/apis/network/v1alpha1"
 )
 
 // SubnetReconciler reconciles a Subnet object

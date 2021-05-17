@@ -24,7 +24,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	storagev1alpha1 "github.com/onmetal/apis/storage/v1alpha1"
+	storagev1alpha1 "github.com/onmetal-api/apis/storage/v1alpha1"
 )
 
 // SnapshotReconciler reconciles a Snapshot object

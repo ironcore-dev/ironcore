@@ -24,7 +24,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	computev1alpha1 "github.com/onmetal/apis/compute/v1alpha1"
+	computev1alpha1 "github.com/onmetal-api/apis/compute/v1alpha1"
 )
 
 // KeyPairReconciler reconciles a KeyPair object

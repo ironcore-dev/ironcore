@@ -3,7 +3,7 @@ layout:
 - go.kubebuilder.io/v3
 multigroup: true
 projectName: onmetal
-repo: github.com/onmetal
+repo: github.com/onmetal-api
 resources:
 - api:
     crdVersion: v1
@@ -12,7 +12,7 @@ resources:
   domain: onmetal.de
   group: storage
   kind: Volume
-  path: github.com/onmetal/apis/storage/v1alpha1
+  path: github.com/onmetal-api/apis/storage/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
@@ -21,7 +21,7 @@ resources:
   domain: onmetal.de
   group: storage
   kind: VolumeAttachment
-  path: github.com/onmetal/apis/storage/v1alpha1
+  path: github.com/onmetal-api/apis/storage/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
@@ -30,7 +30,7 @@ resources:
   domain: onmetal.de
   group: compute
   kind: Machine
-  path: github.com/onmetal/apis/compute/v1alpha1
+  path: github.com/onmetal-api/apis/compute/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
@@ -39,7 +39,7 @@ resources:
   domain: onmetal.de
   group: network
   kind: Network
-  path: github.com/onmetal/apis/network/v1alpha1
+  path: github.com/onmetal-api/apis/network/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
@@ -48,7 +48,7 @@ resources:
   domain: onmetal.de
   group: network
   kind: Subnet
-  path: github.com/onmetal/apis/network/v1alpha1
+  path: github.com/onmetal-api/apis/network/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
@@ -57,7 +57,7 @@ resources:
   domain: onmetal.de
   group: network
   kind: SecurityGroup
-  path: github.com/onmetal/apis/network/v1alpha1
+  path: github.com/onmetal-api/apis/network/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
@@ -66,7 +66,7 @@ resources:
   domain: onmetal.de
   group: network
   kind: Gateway
-  path: github.com/onmetal/apis/network/v1alpha1
+  path: github.com/onmetal-api/apis/network/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
@@ -75,7 +75,7 @@ resources:
   domain: onmetal.de
   group: network
   kind: NetworkInterface
-  path: github.com/onmetal/apis/network/v1alpha1
+  path: github.com/onmetal-api/apis/network/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
@@ -84,7 +84,7 @@ resources:
   domain: onmetal.de
   group: network
   kind: RouteTable
-  path: github.com/onmetal/apis/network/v1alpha1
+  path: github.com/onmetal-api/apis/network/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
@@ -93,7 +93,7 @@ resources:
   domain: onmetal.de
   group: compute
   kind: KeyPair
-  path: github.com/onmetal/apis/compute/v1alpha1
+  path: github.com/onmetal-api/apis/compute/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
@@ -102,7 +102,7 @@ resources:
   domain: onmetal.de
   group: storage
   kind: StorageClass
-  path: github.com/onmetal/apis/storage/v1alpha1
+  path: github.com/onmetal-api/apis/storage/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
@@ -111,7 +111,7 @@ resources:
   domain: onmetal.de
   group: compute
   kind: ComputePool
-  path: github.com/onmetal/apis/compute/v1alpha1
+  path: github.com/onmetal-api/apis/compute/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
@@ -120,7 +120,7 @@ resources:
   domain: onmetal.de
   group: storage
   kind: Snapshot
-  path: github.com/onmetal/apis/storage/v1alpha1
+  path: github.com/onmetal-api/apis/storage/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
@@ -129,7 +129,7 @@ resources:
   domain: onmetal.de
   group: compute
   kind: Image
-  path: github.com/onmetal/apis/compute/v1alpha1
+  path: github.com/onmetal-api/apis/compute/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
@@ -138,6 +138,6 @@ resources:
   domain: onmetal.de
   group: compute
   kind: Flavor
-  path: github.com/onmetal/apis/compute/v1alpha1
+  path: github.com/onmetal-api/apis/compute/v1alpha1
   version: v1alpha1
 version: "3"

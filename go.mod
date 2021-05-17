@@ -1,4 +1,4 @@
-module github.com/onmetal
+module github.com/onmetal-api
 
 go 1.15
 
