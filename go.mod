@@ -8,7 +8,7 @@ require (
 	github.com/muesli/reflow v0.1.0
 	github.com/onsi/ginkgo v1.16.2
 	github.com/onsi/gomega v1.12.0
-	github.com/spf13/cobra v1.1.1
+	github.com/spf13/cobra v1.1.3
 	github.com/wayneashleyberry/terminal-dimensions v1.0.0
 	k8s.io/apiextensions-apiserver v0.20.1
 	k8s.io/apimachinery v0.20.2
