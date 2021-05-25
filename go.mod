@@ -5,7 +5,7 @@ go 1.16
 require (
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/go-logr/logr v0.4.0
-	github.com/muesli/reflow v0.1.0
+	github.com/muesli/reflow v0.3.0
 	github.com/onsi/ginkgo v1.16.2
 	github.com/onsi/gomega v1.12.0
 	github.com/spf13/cobra v1.1.1
