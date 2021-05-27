@@ -7,7 +7,7 @@ require (
 	github.com/go-logr/logr v0.4.0
 	github.com/muesli/reflow v0.3.0
 	github.com/onsi/ginkgo v1.16.2
-	github.com/onsi/gomega v1.12.0
+	github.com/onsi/gomega v1.13.0
 	github.com/spf13/cobra v1.1.3
 	github.com/wayneashleyberry/terminal-dimensions v1.0.0
 	k8s.io/apiextensions-apiserver v0.20.1
