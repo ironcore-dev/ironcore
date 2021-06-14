@@ -24,3 +24,5 @@ bin
 *~
 .vscode/
 testbin/
+dev/
+charts/

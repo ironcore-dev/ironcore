@@ -18,6 +18,7 @@ package network
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -50,7 +51,7 @@ type RouteTableReconciler struct {
 func (r *RouteTableReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = r.Log.WithValues("routetable", req.NamespacedName)
 
-	// your logic here
+	r.Log.Info(fmt.Sprintf("reconcile routetable %s/%s", req.Namespace, req.Name))
 
 	return ctrl.Result{}, nil
 }

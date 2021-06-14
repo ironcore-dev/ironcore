@@ -18,6 +18,7 @@ package compute
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -50,7 +51,7 @@ type KeyPairReconciler struct {
 func (r *KeyPairReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = r.Log.WithValues("keypair", req.NamespacedName)
 
-	// your logic here
+	r.Log.Info(fmt.Sprintf("reconcile keypair %s/%s", req.Namespace, req.Name))
 
 	return ctrl.Result{}, nil
 }
