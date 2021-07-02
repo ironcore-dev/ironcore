@@ -1,7 +1,0 @@
-apiVersion: network.onmetal.de/v1alpha1
-kind: NetworkInterface
-metadata:
-  name: networkinterface-sample
-spec:
-  # Add fields here
-  foo: bar

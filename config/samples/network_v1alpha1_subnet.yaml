@@ -1,7 +1,0 @@
-apiVersion: network.onmetal.de/v1alpha1
-kind: Subnet
-metadata:
-  name: subnet-sample
-spec:
-  # Add fields here
-  foo: bar

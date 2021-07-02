@@ -1,7 +1,0 @@
-apiVersion: compute.onmetal.de/v1alpha1
-kind: Flavor
-metadata:
-  name: flavor-sample
-spec:
-  # Add fields here
-  foo: bar
