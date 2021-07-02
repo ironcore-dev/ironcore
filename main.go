@@ -31,12 +31,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
-	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
-	computecontrollers "github.com/onmetal/onmetal-api/controllers/compute"
-	networkcontrollers "github.com/onmetal/onmetal-api/controllers/network"
-	storagecontrollers "github.com/onmetal/onmetal-api/controllers/storage"
+	corev1alpha1 "github.com/onmetal/onmetal-api/apis/core/v1alpha1"
+	"github.com/onmetal/onmetal-api/controllers/core"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -47,10 +43,7 @@ var (
 
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
-
-	utilruntime.Must(storagev1alpha1.AddToScheme(scheme))
-	utilruntime.Must(computev1alpha1.AddToScheme(scheme))
-	utilruntime.Must(networkv1alpha1.AddToScheme(scheme))
+	utilruntime.Must(corev1alpha1.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 
@@ -79,129 +72,18 @@ func main() {
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       "d0ae00be.onmetal.de",
 	})
-	if err != nil {
-		setupLog.Error(err, "unable to start manager")
+
+	if err = (&core.AccountReconciler{
+		Client: mgr.GetClient(),
+		Log:    ctrl.Log.WithName("controllers").WithName("Account"),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "Account")
 		os.Exit(1)
 	}
 
-	if err = (&storagecontrollers.VolumeReconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("storage").WithName("Volume"),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "Volume")
-		os.Exit(1)
-	}
-	if err = (&storagecontrollers.VolumeAttachmentReconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("storage").WithName("VolumeAttachment"),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "VolumeAttachment")
-		os.Exit(1)
-	}
-	if err = (&computecontrollers.MachineReconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("compute").WithName("Machine"),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "Machine")
-		os.Exit(1)
-	}
-	if err = (&networkcontrollers.NetworkReconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("network").WithName("Network"),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "Network")
-		os.Exit(1)
-	}
-	if err = (&networkcontrollers.SubnetReconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("network").WithName("Subnet"),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "Subnet")
-		os.Exit(1)
-	}
-	if err = (&networkcontrollers.SecurityGroupReconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("network").WithName("SecurityGroup"),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "SecurityGroup")
-		os.Exit(1)
-	}
-	if err = (&networkcontrollers.GatewayReconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("network").WithName("Gateway"),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "Gateway")
-		os.Exit(1)
-	}
-	if err = (&networkcontrollers.NetworkInterfaceReconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("network").WithName("NetworkInterface"),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "NetworkInterface")
-		os.Exit(1)
-	}
-	if err = (&networkcontrollers.RouteTableReconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("network").WithName("RouteTable"),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "RouteTable")
-		os.Exit(1)
-	}
-	if err = (&computecontrollers.KeyPairReconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("compute").WithName("KeyPair"),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "KeyPair")
-		os.Exit(1)
-	}
-	if err = (&storagecontrollers.StorageClassReconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("storage").WithName("StorageClass"),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "StorageClass")
-		os.Exit(1)
-	}
-	if err = (&computecontrollers.ComputePoolReconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("compute").WithName("ComputePool"),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "ComputePool")
-		os.Exit(1)
-	}
-	if err = (&storagecontrollers.SnapshotReconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("storage").WithName("Snapshot"),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "Snapshot")
-		os.Exit(1)
-	}
-	if err = (&computecontrollers.ImageReconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("compute").WithName("Image"),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "Image")
-		os.Exit(1)
-	}
-	if err = (&computecontrollers.FlavorReconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("compute").WithName("Flavor"),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "Flavor")
+	if err != nil {
+		setupLog.Error(err, "unable to start manager")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder

@@ -1,7 +1,0 @@
-apiVersion: storage.onmetal.de/v1alpha1
-kind: VolumeAttachment
-metadata:
-  name: volumeattachment-sample
-spec:
-  # Add fields here
-  foo: bar
