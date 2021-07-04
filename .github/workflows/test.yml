@@ -2,7 +2,7 @@ on:
   pull_request:
     types: [ assigned, opened, synchronize, reopened ]
 
-name: Pull Request Code build
+name: Pull Request Code test
 
 jobs:
   checks:
