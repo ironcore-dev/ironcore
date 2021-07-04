@@ -19,8 +19,8 @@ package core
 import (
 	"context"
 
-	"github.com/go-logr/logr"
 	v1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -28,47 +28,48 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
+	"github.com/go-logr/logr"
 	corev1alpha1 "github.com/onmetal/onmetal-api/apis/core/v1alpha1"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
 const (
-	accountFinilizerName = "account.core.onmetal.de/finalizer"
+	scopeFinilizerName = "scope.core.onmetal.de/finalizer"
 )
 
-// AccountReconciler reconciles a Account object
-type AccountReconciler struct {
+// ScopeReconciler reconciles a Scope object
+type ScopeReconciler struct {
 	client.Client
 	Log    logr.Logger
 	Scheme *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=core.onmetal.de,resources=accounts,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=core.onmetal.de,resources=accounts/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=core.onmetal.de,resources=accounts/finalizers,verbs=update
+//+kubebuilder:rbac:groups=core.onmetal.de,resources=scopes,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=core.onmetal.de,resources=scopes/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=core.onmetal.de,resources=scopes/finalizers,verbs=update
 
-func (r *AccountReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+func (r *ScopeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
-	log := r.Log.WithValues("account", req.NamespacedName)
 
-	var account corev1alpha1.Account
-	if err := r.Get(ctx, req.NamespacedName, &account); err != nil {
+	log := r.Log.WithValues("scope", req.NamespacedName)
+
+	var scope corev1alpha1.Scope
+	if err := r.Get(ctx, req.NamespacedName, &scope); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	if account.ObjectMeta.DeletionTimestamp.IsZero() {
-		// Add account finalizer if it does not exist
-		if !containsString(account.GetFinalizers(), accountFinilizerName) {
-			controllerutil.AddFinalizer(&account, accountFinilizerName)
-			if err := r.Update(ctx, &account); err != nil {
+	if scope.ObjectMeta.DeletionTimestamp.IsZero() {
+		// Add scope finalizer if it does not exist
+		if !containsString(scope.GetFinalizers(), scopeFinilizerName) {
+			controllerutil.AddFinalizer(&scope, scopeFinilizerName)
+			if err := r.Update(ctx, &scope); err != nil {
 				return ctrl.Result{}, err
 			}
 		}
-		if account.Status.Namespace == "" {
-			// Create account namespace
+		if scope.Status.Namespace == "" {
+			// Create scope namespace
 			namespace := v1.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
-					GenerateName: "account-",
+					GenerateName: "scope-",
 				},
 			}
 			if err := r.Create(ctx, &namespace, &client.CreateOptions{}); err != nil {
@@ -76,21 +77,21 @@ func (r *AccountReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				return ctrl.Result{}, err
 			}
 			// Update state with generated namespace name
-			account.Status.Namespace = namespace.Name
-			if err := r.Status().Update(ctx, &account); err != nil {
+			scope.Status.Namespace = namespace.Name
+			if err := r.Status().Update(ctx, &scope); err != nil {
 				return ctrl.Result{}, err
 			}
 			// TODO: Add state if namespace is ready
-			log.V(0).Info("created namespace for account", "namespace", namespace, "account", account)
+			log.V(0).Info("created namespace for scope", "namespace", namespace, "scope", scope)
 		}
 	} else {
-		log.V(0).Info("deleting account", "account", account)
-		if containsString(account.GetFinalizers(), accountFinilizerName) {
+		log.V(0).Info("deleting scope", "scope", scope)
+		if containsString(scope.GetFinalizers(), scopeFinilizerName) {
 			// Remove external dependencies
-			if account.Status.Namespace != "" {
+			if scope.Status.Namespace != "" {
 				namespace := v1.Namespace{
 					ObjectMeta: metav1.ObjectMeta{
-						Name: account.Status.Namespace,
+						Name: scope.Status.Namespace,
 					},
 				}
 				if err := r.Delete(ctx, &namespace, client.PropagationPolicy(metav1.DeletePropagationBackground)); client.IgnoreNotFound(err) != nil {
@@ -103,29 +104,20 @@ func (r *AccountReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				}
 			}
 			// Remove finalizer
-			controllerutil.RemoveFinalizer(&account, accountFinilizerName)
-			if err := r.Update(ctx, &account); err != nil {
+			controllerutil.RemoveFinalizer(&scope, scopeFinilizerName)
+			if err := r.Update(ctx, &scope); err != nil {
 				return ctrl.Result{}, err
 			}
 		}
 		return ctrl.Result{}, nil
 	}
+
 	return ctrl.Result{}, nil
 }
 
-// Helper functions to check and remove string from a slice of strings.
-func containsString(slice []string, s string) bool {
-	for _, item := range slice {
-		if item == s {
-			return true
-		}
-	}
-	return false
-}
-
 // SetupWithManager sets up the controller with the Manager.
-func (r *AccountReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *ScopeReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&corev1alpha1.Account{}).
+		For(&corev1alpha1.Scope{}).
 		Complete(r)
 }

@@ -32,3 +32,29 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - core.onmetal.de
+  resources:
+  - scopes
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.onmetal.de
+  resources:
+  - scopes/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - core.onmetal.de
+  resources:
+  - scopes/status
+  verbs:
+  - get
+  - patch
+  - update
