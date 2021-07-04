@@ -1,0 +1,6 @@
+apiVersion: core.onmetal.de/v1alpha1
+kind: Scope
+metadata:
+  name: scope-sample
+spec:
+  description: yolo

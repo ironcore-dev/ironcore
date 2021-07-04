@@ -38,7 +38,7 @@ spec:
             properties:
               createdBy:
                 description: CreatedBy is a subject representing a user name, an email
-                  address, or any other identifier of a user who created the project.
+                  address, or any other identifier of a user who created the account.
                 properties:
                   apiGroup:
                     description: APIGroup holds the API group of the referenced subject.
@@ -65,11 +65,11 @@ spec:
                 type: object
               description:
                 description: Description is a human-readable description of what the
-                  project is used for.
+                  account is used for.
                 type: string
               owner:
                 description: Owner is a subject representing a user name, an email
-                  address, or any other identifier of a user owning the project.
+                  address, or any other identifier of a user owning the account.
                 properties:
                   apiGroup:
                     description: APIGroup holds the API group of the referenced subject.
@@ -95,7 +95,7 @@ spec:
                 - name
                 type: object
               purpose:
-                description: Purpose is a human-readable explanation of the project's
+                description: Purpose is a human-readable explanation of the account's
                   purpose.
                 type: string
             type: object
@@ -106,7 +106,7 @@ spec:
                 description: Namespace references the namespace of the account
                 type: string
               state:
-                description: State represents the state of the account
+                description: AccountState represents the state of the account
                 type: string
             type: object
         type: object

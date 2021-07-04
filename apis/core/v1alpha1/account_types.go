@@ -24,37 +24,37 @@ import (
 // AccountSpec defines the desired state of Account
 type AccountSpec struct {
 	// CreatedBy is a subject representing a user name, an email address, or any other identifier of a user
-	// who created the project.
+	// who created the account.
 	CreatedBy *rbacv1.Subject `json:"createdBy,omitempty"`
-	// Description is a human-readable description of what the project is used for.
+	// Description is a human-readable description of what the account is used for.
 	Description *string `json:"description,omitempty"`
 	// Owner is a subject representing a user name, an email address, or any other identifier of a user owning
-	// the project.
+	// the account.
 	Owner *rbacv1.Subject `json:"owner,omitempty"`
-	// Purpose is a human-readable explanation of the project's purpose.
+	// Purpose is a human-readable explanation of the account's purpose.
 	Purpose *string `json:"purpose,omitempty"`
 }
 
 // AccountStatus defines the observed state of Account
 type AccountStatus struct {
-	// State represents the state of the account
-	State State `json:"state,omitempty"`
+	// AccountState represents the state of the account
+	State AccountState `json:"state,omitempty"`
 	// Namespace references the namespace of the account
 	Namespace string `json:"namespace,omitempty"`
 }
 
-// State is a label for the condition of a project at the current time.
-type State string
+// AccountState is a label for the condition of a account at the current time.
+type AccountState string
 
 const (
 	// AccountPending indicates that the account reconciliation is pending.
-	AccountPending State = "Pending"
+	AccountPending AccountState = "Pending"
 	// AccountReady indicates that the account reconciliation was successful.
-	AccountReady State = "Ready"
+	AccountReady AccountState = "Ready"
 	// AccountFailed indicates that the account reconciliation failed.
-	AccountFailed State = "Failed"
+	AccountFailed AccountState = "Failed"
 	// AccountTerminating indicates that the account is in termination process.
-	AccountTerminating State = "Terminating"
+	AccountTerminating AccountState = "Terminating"
 )
 
 //+kubebuilder:object:root=true
