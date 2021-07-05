@@ -61,6 +61,32 @@ rules:
 - apiGroups:
   - core.onmetal.de
   resources:
+  - regions
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.onmetal.de
+  resources:
+  - regions/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - core.onmetal.de
+  resources:
+  - regions/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - core.onmetal.de
+  resources:
   - scopes
   verbs:
   - create

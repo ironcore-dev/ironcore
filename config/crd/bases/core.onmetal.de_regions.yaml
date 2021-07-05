@@ -1,0 +1,66 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.4.1
+  creationTimestamp: null
+  name: regions.core.onmetal.de
+spec:
+  group: core.onmetal.de
+  names:
+    kind: Region
+    listKind: RegionList
+    plural: regions
+    singular: region
+  scope: Cluster
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: Region is the Schema for the regions API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: RegionSpec defines the desired state of Region
+            properties:
+              availabiltyZone:
+                description: AvailabilityZones represents the availability zones in
+                  a given region
+                items:
+                  type: string
+                type: array
+            required:
+            - availabiltyZone
+            type: object
+          status:
+            description: RegionStatus defines the observed state of Region
+            properties:
+              state:
+                description: RegionState represents the state of the region object
+                  at a given point in time
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
