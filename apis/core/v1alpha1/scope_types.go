@@ -22,9 +22,6 @@ import (
 
 // ScopeSpec defines the desired state of Scope
 type ScopeSpec struct {
-	// ParentScope describes the parent scope, if empty the account
-	// should be used as the top reference
-	ParentScope *string `json:"parentScope,omitempty"`
 	// Description is a human-readable description of what the scope is used for.
 	Description *string `json:"description,omitempty"`
 }
@@ -35,6 +32,13 @@ type ScopeStatus struct {
 	State ScopeState `json:"state,omitempty"`
 	// Namespace references the namespace of the scope
 	Namespace string `json:"namespace,omitempty"`
+	// ParentScope describes the parent scope, if empty the account
+	// should be used as the top reference
+	ParentScope string `json:"parentScope"`
+	// ParentNamespace represents the namespace of the parent scope
+	ParentNamespace string `json:"parentNamespace"`
+	// Account descibes the account this scope belongs to
+	Account string `json:"account"`
 }
 
 // ScopeState is a label for the condition of a scope at the current time.
@@ -54,7 +58,9 @@ const (
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 //+kubebuilder:printcolumn:name="Namespace",type=string,JSONPath=`.status.namespace`
-//+kubebuilder:printcolumn:name="ParentScope",type=string,JSONPath=`.spec.parentScope`
+//+kubebuilder:printcolumn:name="Account",type=string,JSONPath=`.status.account`
+//+kubebuilder:printcolumn:name="ParentScope",type=string,JSONPath=`.status.parentScope`
+//+kubebuilder:printcolumn:name="ParentNamespace",type=string,JSONPath=`.status.parentNamespace`
 //+kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.state`
 //+kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
 

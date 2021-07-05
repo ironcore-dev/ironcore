@@ -20,8 +20,14 @@ spec:
     - jsonPath: .status.namespace
       name: Namespace
       type: string
-    - jsonPath: .spec.parentScope
+    - jsonPath: .status.account
+      name: Account
+      type: string
+    - jsonPath: .status.parentScope
       name: ParentScope
+      type: string
+    - jsonPath: .status.parentNamespace
+      name: ParentNamespace
       type: string
     - jsonPath: .status.state
       name: State
@@ -53,20 +59,31 @@ spec:
                 description: Description is a human-readable description of what the
                   scope is used for.
                 type: string
-              parentScope:
-                description: ParentScope describes the parent scope, if empty the
-                  account should be used as the top reference
-                type: string
             type: object
           status:
             description: ScopeStatus defines the observed state of Scope
             properties:
+              account:
+                description: Account descibes the account this scope belongs to
+                type: string
               namespace:
                 description: Namespace references the namespace of the scope
+                type: string
+              parentNamespace:
+                description: ParentNamespace represents the namespace of the parent
+                  scope
+                type: string
+              parentScope:
+                description: ParentScope describes the parent scope, if empty the
+                  account should be used as the top reference
                 type: string
               state:
                 description: State represents the state of the scope
                 type: string
+            required:
+            - account
+            - parentNamespace
+            - parentScope
             type: object
         type: object
     served: true

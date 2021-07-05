@@ -1,6 +1,6 @@
-# onmetal
+# onmetal-api
 
-This is a bleeding edge API POC.
+This project contains the types and controllers of the user facing OnMetal API.
 
 ## Installation
 

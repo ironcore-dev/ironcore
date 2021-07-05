@@ -19,5 +19,9 @@ package core
 import "github.com/onmetal/onmetal-api/controllers"
 
 const (
-	LabelDomain = "core." + controllers.LabelDomain
+	LabelDomain     = "core." + controllers.LabelDomain
+	AccountLabel    = LabelDomain + "/account"
+	ScopeLabel      = LabelDomain + "/scope"
+	ParentNamespace = LabelDomain + "/parentNamespace"
+	ParentScope     = LabelDomain + "/parentScope"
 )
