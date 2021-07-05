@@ -21,6 +21,7 @@ import (
 	"os"
 
 	"github.com/onmetal/onmetal-api/controllers/core/accounts"
+	"github.com/onmetal/onmetal-api/controllers/core/regions"
 	"github.com/onmetal/onmetal-api/controllers/core/scopes"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
@@ -105,6 +106,13 @@ func main() {
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "MachineClass")
+		os.Exit(1)
+	}
+	if err = (&regions.RegionReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "Region")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder
