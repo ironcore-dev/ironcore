@@ -16,7 +16,20 @@ spec:
     singular: scope
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .status.namespace
+      name: Namespace
+      type: string
+    - jsonPath: .spec.parentScope
+      name: ParentScope
+      type: string
+    - jsonPath: .status.state
+      name: State
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: Scope is the Schema for the scopes API

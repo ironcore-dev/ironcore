@@ -18,6 +18,8 @@ package main
 
 import (
 	"flag"
+	"github.com/onmetal/onmetal-api/controllers/core/accounts"
+	"github.com/onmetal/onmetal-api/controllers/core/scopes"
 	"os"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
@@ -32,7 +34,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	corev1alpha1 "github.com/onmetal/onmetal-api/apis/core/v1alpha1"
-	"github.com/onmetal/onmetal-api/controllers/core"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -73,7 +74,7 @@ func main() {
 		LeaderElectionID:       "d0ae00be.onmetal.de",
 	})
 
-	if err = (&core.AccountReconciler{
+	if err = (&accounts.AccountReconciler{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("Account"),
 		Scheme: mgr.GetScheme(),
@@ -87,7 +88,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = (&core.ScopeReconciler{
+	if err = (&scopes.ScopeReconciler{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("Scope"),
 		Scheme: mgr.GetScheme(),
