@@ -36,7 +36,6 @@ import (
 
 const (
 	accountFinilizerName = core.LabelDomain + "/account"
-	accountLabel         = core.LabelDomain + "/account"
 )
 
 // AccountReconciler reconciles a Account object
@@ -64,74 +63,65 @@ func (r *AccountReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		if err := utils.AssureFinalizer(ctx, r.Client, accountFinilizerName, &account); err != nil {
 			return utils.Requeue(err)
 		}
-		if account.Status.Namespace == "" {
-			var namespaces v1.NamespaceList
-			req, _ := labels.NewRequirement(accountLabel, selection.DoubleEquals, []string{account.Name})
-			err := r.List(ctx, &namespaces, &client.ListOptions{
-				LabelSelector: labels.NewSelector().Add(*req),
-			})
-			if err != nil {
-				return utils.Requeue(err)
-			}
-			var namespace *v1.Namespace
-			for _, n := range namespaces.Items {
-				if namespace == nil {
-					namespace = &n
-				} else {
-					if namespace.CreationTimestamp.After(n.CreationTimestamp.Time) {
-						if err := utils.AssureFinalizerRemoved(ctx, r.Client, accountFinilizerName, namespace); client.IgnoreNotFound(err) != nil {
-							return utils.Requeue(err)
-						}
-						if err := utils.AssureDeleting(ctx, r.Client, namespace); err != nil {
-							return utils.Requeue(err)
-						}
-						namespace = &n
-					}
-				}
-			}
-
-			if namespace != nil {
-				if err := utils.AssureFinalizer(ctx, r.Client, accountFinilizerName, namespace); err != nil {
-					return utils.Requeue(err)
-				}
-			} else {
-				// Create account namespace
-				log.V(0).Info("creating namespace for account", "account", account.Name)
-				namespace = &v1.Namespace{
-					ObjectMeta: metav1.ObjectMeta{
-						Finalizers:   []string{accountFinilizerName},
-						GenerateName: "account-",
-						Labels: map[string]string{
-							accountLabel: account.Name,
-						},
-					},
-				}
-				if err := r.Create(ctx, namespace, &client.CreateOptions{}); err != nil {
-					log.Error(err, "failed to create namespace for account", "account", account.Name)
-					return utils.Requeue(err)
-				}
-			}
-			// Update state with generated namespace name
-			account.Status.Namespace = namespace.Name
-			account.Status.State = corev1alpha1.AccountReady
-			if err := r.Status().Update(ctx, &account); err != nil {
-				return utils.Requeue(err)
-			}
-			log.V(0).Info("using namespace for account", "namespace", namespace.Name, "account", account.Name)
-		}
-	} else {
-		log.V(0).Info("deleting account", "account", account.Name)
-		// Remove external dependencies
-		var namespaces v1.NamespaceList
-		req, _ := labels.NewRequirement(accountLabel, selection.DoubleEquals, []string{account.Name})
-		err := r.List(ctx, &namespaces, &client.ListOptions{
-			LabelSelector: labels.NewSelector().Add(*req),
-		})
+		namespaces, err := r.listNamespacesForAccount(ctx, req)
 		if err != nil {
 			return utils.Requeue(err)
 		}
 		var namespace *v1.Namespace
-		for _, n := range namespaces.Items {
+		for _, n := range namespaces {
+			if namespace == nil {
+				namespace = &n
+			} else {
+				if namespace.CreationTimestamp.After(n.CreationTimestamp.Time) {
+					if err := utils.AssureFinalizerRemoved(ctx, r.Client, accountFinilizerName, namespace); client.IgnoreNotFound(err) != nil {
+						return utils.Requeue(err)
+					}
+					if err := utils.AssureDeleting(ctx, r.Client, namespace); err != nil {
+						return utils.Requeue(err)
+					}
+					namespace = &n
+				}
+			}
+		}
+		if namespace == nil {
+			// Create account namespace
+			log.V(0).Info("creating namespace for account", "account", account.Name)
+			namespace = &v1.Namespace{
+				ObjectMeta: metav1.ObjectMeta{
+					Finalizers:   []string{accountFinilizerName},
+					GenerateName: "account-",
+					Labels: map[string]string{
+						core.AccountLabel: account.Name,
+						core.ScopeLabel:   account.Name,
+					},
+				},
+			}
+			if err := r.Create(ctx, namespace, &client.CreateOptions{}); err != nil {
+				log.Error(err, "failed to create namespace for account", "account", account.Name)
+				return utils.Requeue(err)
+			}
+			log.V(0).Info("using namespace for account", "namespace", namespace.Name, "account", account.Name)
+		} else {
+			if err := utils.AssureFinalizer(ctx, r.Client, accountFinilizerName, namespace); err != nil {
+				return utils.Requeue(err)
+			}
+		}
+		// TODO: update on change only
+		// Update state with generated namespace name
+		account.Status.Namespace = namespace.Name
+		account.Status.State = corev1alpha1.AccountReady
+		if err := r.Status().Update(ctx, &account); err != nil {
+			return utils.Requeue(err)
+		}
+	} else {
+		log.V(0).Info("deleting account", "account", account.Name)
+		// Remove external dependencies
+		namespaces, err := r.listNamespacesForAccount(ctx, req)
+		if err != nil {
+			return utils.Requeue(err)
+		}
+		var namespace *v1.Namespace
+		for _, n := range namespaces {
 			if n.Name != account.Status.Namespace {
 				if err := utils.AssureFinalizerRemoved(ctx, r.Client, accountFinilizerName, &n); client.IgnoreNotFound(err) != nil {
 					return utils.Requeue(err)
@@ -165,6 +155,19 @@ func (r *AccountReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		}
 	}
 	return utils.Succeeded()
+}
+
+func (r *AccountReconciler) listNamespacesForAccount(ctx context.Context, req ctrl.Request) ([]v1.Namespace, error) {
+	var namespaces v1.NamespaceList
+	requirementScope, _ := labels.NewRequirement(core.ParentNamespace, selection.DoesNotExist, nil)
+	requirementAccount, _ := labels.NewRequirement(core.AccountLabel, selection.DoubleEquals, []string{req.Name})
+	err := r.List(ctx, &namespaces, &client.ListOptions{
+		LabelSelector: labels.NewSelector().Add(*requirementScope).Add(*requirementAccount),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return namespaces.Items, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.

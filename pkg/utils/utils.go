@@ -58,3 +58,17 @@ func ContainsString(slice []string, s string) bool {
 	}
 	return false
 }
+
+// GetLabel returns the value of a given object and label name
+func GetLabel(object client.Object, name string, defs ...string) string {
+	def := ""
+	if len(defs) > 0 {
+		def = defs[0]
+	}
+	if object != nil && object.GetLabels() != nil {
+		if found := object.GetLabels()[name]; found != "" {
+			return found
+		}
+	}
+	return def
+}
