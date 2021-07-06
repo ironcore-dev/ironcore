@@ -33,6 +33,32 @@ rules:
   - patch
   - update
 - apiGroups:
+  - compute.onmetal.de
+  resources:
+  - machinepools
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - compute.onmetal.de
+  resources:
+  - machinepools/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - compute.onmetal.de
+  resources:
+  - machinepools/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
   - core.onmetal.de
   resources:
   - accounts
@@ -106,6 +132,58 @@ rules:
   - core.onmetal.de
   resources:
   - scopes/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - storageclasses
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - storageclasses/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - storageclasses/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - storagepools
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - storagepools/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - storagepools/status
   verbs:
   - get
   - patch

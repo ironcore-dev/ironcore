@@ -1,0 +1,20 @@
+# permissions for end users to view storagepools.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: storagepool-viewer-role
+rules:
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - storagepools
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - storagepools/status
+  verbs:
+  - get

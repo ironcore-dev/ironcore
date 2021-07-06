@@ -1,0 +1,15 @@
+apiVersion: compute.onmetal.de/v1alpha1
+kind: MachinePool
+metadata:
+  name: machinepool-sample
+  namespace: scope-98723498
+spec:
+  capacity:
+    classes:
+    - name: myMachineClass
+      quantity: 100
+# status:
+#   used:
+#     classes:
+#     - name: myMachineClass
+#       quantity: 10

@@ -1,0 +1,15 @@
+apiVersion: storage.onmetal.de/v1alpha1
+kind: StoragePool
+metadata:
+  name: storagepool-sample
+  namespace: scope-1234324
+spec:
+  privacy: shared
+  replication: 3
+  reservations:
+    - name: fast
+      capacity: 100Gi
+# status:
+#   used: # optional: only for private pools with reservations
+#     - name: fast
+#       capacity: 1Gi

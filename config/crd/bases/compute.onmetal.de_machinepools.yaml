@@ -1,0 +1,111 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.4.1
+  creationTimestamp: null
+  name: machinepools.compute.onmetal.de
+spec:
+  group: compute.onmetal.de
+  names:
+    kind: MachinePool
+    listKind: MachinePoolList
+    plural: machinepools
+    singular: machinepool
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: MachinePool is the Schema for the machinepools API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: MachinePoolSpec defines the desired state of MachinePool
+            properties:
+              capacity:
+                items:
+                  description: AvailabilityZoneQuantity defines the quantity of available
+                    MachineClasses in a given AZ
+                  properties:
+                    classes:
+                      items:
+                        description: MachineClassQuantity defines the quantity of
+                          a given MachineClass
+                        properties:
+                          name:
+                            type: string
+                          quantity:
+                            type: integer
+                        required:
+                        - name
+                        - quantity
+                        type: object
+                      type: array
+                    name:
+                      type: string
+                  required:
+                  - classes
+                  - name
+                  type: object
+                type: array
+              region:
+                type: string
+            required:
+            - capacity
+            - region
+            type: object
+          status:
+            description: MachinePoolStatus defines the observed state of MachinePool
+            properties:
+              used:
+                description: AvailabilityZoneQuantity defines the quantity of available
+                  MachineClasses in a given AZ
+                properties:
+                  classes:
+                    items:
+                      description: MachineClassQuantity defines the quantity of a
+                        given MachineClass
+                      properties:
+                        name:
+                          type: string
+                        quantity:
+                          type: integer
+                      required:
+                      - name
+                      - quantity
+                      type: object
+                    type: array
+                  name:
+                    type: string
+                required:
+                - classes
+                - name
+                type: object
+            required:
+            - used
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
