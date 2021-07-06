@@ -37,7 +37,9 @@ import (
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	corev1alpha1 "github.com/onmetal/onmetal-api/apis/core/v1alpha1"
+	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 	computecontrollers "github.com/onmetal/onmetal-api/controllers/compute"
+	storagecontrollers "github.com/onmetal/onmetal-api/controllers/storage"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -50,6 +52,7 @@ func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 	utilruntime.Must(corev1alpha1.AddToScheme(scheme))
 	utilruntime.Must(computev1alpha1.AddToScheme(scheme))
+	utilruntime.Must(storagev1alpha1.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 
@@ -113,6 +116,27 @@ func main() {
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Region")
+		os.Exit(1)
+	}
+	if err = (&computecontrollers.MachinePoolReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "MachinePool")
+		os.Exit(1)
+	}
+	if err = (&storagecontrollers.StoragePoolReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "StoragePool")
+		os.Exit(1)
+	}
+	if err = (&storagecontrollers.StorageClassReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "StorageClass")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder

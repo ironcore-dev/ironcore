@@ -6,20 +6,20 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.1
   creationTimestamp: null
-  name: regions.core.onmetal.de
+  name: storageclasses.storage.onmetal.de
 spec:
-  group: core.onmetal.de
+  group: storage.onmetal.de
   names:
-    kind: Region
-    listKind: RegionList
-    plural: regions
-    singular: region
-  scope: Cluster
+    kind: StorageClass
+    listKind: StorageClassList
+    plural: storageclasses
+    singular: storageclass
+  scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Region is the Schema for the regions API
+        description: StorageClass is the Schema for the storageclasses API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -34,44 +34,55 @@ spec:
           metadata:
             type: object
           spec:
-            description: RegionSpec defines the desired state of Region
+            description: StorageClassSpec defines the desired state of StorageClass
             properties:
-              availabiltyZone:
-                description: AvailabilityZones represents the availability zones in
-                  a given region
+              capabilities:
                 items:
-                  type: string
-                type: array
-              location:
-                description: Location describes the physical location of the region
-                type: string
-            required:
-            - availabiltyZone
-            type: object
-          status:
-            description: RegionStatus defines the observed state of Region
-            properties:
-              availabilityZones:
-                items:
-                  description: ZoneState describes the state of an AvailabilityZone
-                    within a region
+                  description: StorageClassCapability describes one attribute of the
+                    StorageClass
                   properties:
-                    message:
-                      type: string
                     name:
                       type: string
-                    state:
-                      description: ZoneState represents the state of the zone at a
-                        given point in time
-                      type: string
+                    value:
+                      anyOf:
+                      - type: integer
+                      - type: string
+                      x-kubernetes-int-or-string: true
+                  required:
+                  - name
+                  - value
                   type: object
                 type: array
-              message:
+              description:
                 type: string
-              state:
-                description: RegionState represents the state of the region object
-                  at a given point in time
-                type: string
+            required:
+            - capabilities
+            - description
+            type: object
+          status:
+            description: StorageClassStatus defines the observed state of StorageClass
+            properties:
+              availability:
+                description: Availability describes the regions and zones where this
+                  MachineClass is available
+                items:
+                  properties:
+                    availabilityZone:
+                      items:
+                        properties:
+                          name:
+                            type: string
+                        required:
+                        - name
+                        type: object
+                      type: array
+                    region:
+                      type: string
+                  required:
+                  - availabilityZone
+                  - region
+                  type: object
+                type: array
             type: object
         type: object
     served: true

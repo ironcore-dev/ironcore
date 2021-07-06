@@ -1,0 +1,16 @@
+apiVersion: storage.onmetal.de/v1alpha1
+kind: StorageClass
+metadata:
+  name: storageclass-sample
+  namespace: scope-98723897
+spec:
+  capabilities:
+  - name: iops
+    value: 1000
+  #- name: encryption
+  #  value: true
+#status:
+#  availability:
+#    - region: eu-central
+#      availabilityZones:
+#        - az1

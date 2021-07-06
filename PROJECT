@@ -38,4 +38,31 @@ resources:
   kind: Region
   path: github.com/onmetal/onmetal-api/apis/core/v1alpha1
   version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: onmetal.de
+  group: compute
+  kind: MachinePool
+  path: github.com/onmetal/onmetal-api/apis/compute/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: onmetal.de
+  group: storage
+  kind: StoragePool
+  path: github.com/onmetal/onmetal-api/apis/storage/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: onmetal.de
+  group: storage
+  kind: StorageClass
+  path: github.com/onmetal/onmetal-api/apis/storage/v1alpha1
+  version: v1alpha1
 version: "3"
