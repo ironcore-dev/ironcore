@@ -21,7 +21,7 @@ spec:
       name: Namespace
       type: string
     - jsonPath: .status.state
-      name: State
+      name: StateFields
       type: string
     - jsonPath: .metadata.creationTimestamp
       name: Age
@@ -112,11 +112,12 @@ spec:
           status:
             description: AccountStatus defines the observed state of Account
             properties:
+              message:
+                type: string
               namespace:
                 description: Namespace references the namespace of the account
                 type: string
               state:
-                description: AccountState represents the state of the account
                 type: string
             type: object
         type: object

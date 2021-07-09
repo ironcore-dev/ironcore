@@ -16,7 +16,11 @@ spec:
     singular: machineclass
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .metadata.CreationTimestamp
+      name: Age
+      type: string
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: MachineClass is the Schema for the machineclasses API

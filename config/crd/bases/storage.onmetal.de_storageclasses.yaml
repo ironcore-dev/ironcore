@@ -16,7 +16,11 @@ spec:
     singular: storageclass
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .metadata.CreationTimestamp
+      name: Age
+      type: string
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: StorageClass is the Schema for the storageclasses API

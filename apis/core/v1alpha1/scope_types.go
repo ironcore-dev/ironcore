@@ -17,19 +17,19 @@ limitations under the License.
 package v1alpha1
 
 import (
+	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // ScopeSpec defines the desired state of Scope
 type ScopeSpec struct {
 	// Description is a human-readable description of what the scope is used for.
-	Description *string `json:"description,omitempty"`
+	Description string `json:"description,omitempty"`
 }
 
 // ScopeStatus defines the observed state of Scope
 type ScopeStatus struct {
-	// State represents the state of the scope
-	State ScopeState `json:"state,omitempty"`
+	common.StateFields `json:",inline"`
 	// Namespace references the namespace of the scope
 	Namespace string `json:"namespace,omitempty"`
 	// ParentScope describes the parent scope, if empty the account
@@ -41,18 +41,15 @@ type ScopeStatus struct {
 	Account string `json:"account"`
 }
 
-// ScopeState is a label for the condition of a scope at the current time.
-type ScopeState string
-
 const (
 	// ScopePending indicates that the scope reconciliation is pending.
-	ScopePending ScopeState = "Pending"
+	ScopePending = "Pending"
 	// ScopeReady indicates that the scope reconciliation was successful.
-	ScopeReady ScopeState = "Ready"
+	ScopeReady = "Ready"
 	// ScopeFailed indicates that the scope reconciliation failed.
-	ScopeFailed ScopeState = "Failed"
+	ScopeFailed = "Failed"
 	// ScopeTerminating indicates that the scope is in termination process.
-	ScopeTerminating ScopeState = "Terminating"
+	ScopeTerminating = "Terminating"
 )
 
 //+kubebuilder:object:root=true
@@ -61,7 +58,7 @@ const (
 //+kubebuilder:printcolumn:name="Account",type=string,JSONPath=`.status.account`
 //+kubebuilder:printcolumn:name="ParentScope",type=string,JSONPath=`.status.parentScope`
 //+kubebuilder:printcolumn:name="ParentNamespace",type=string,JSONPath=`.status.parentNamespace`
-//+kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.state`
+//+kubebuilder:printcolumn:name="StateFields",type=string,JSONPath=`.status.state`
 //+kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
 
 // Scope is the Schema for the scopes API

@@ -16,7 +16,14 @@ spec:
     singular: storagepool
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .status.state
+      name: StateFields
+      type: string
+    - jsonPath: .metadata.CreationTimestamp
+      name: Age
+      type: string
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: StoragePool is the Schema for the storagepools API
@@ -67,8 +74,6 @@ spec:
               message:
                 type: string
               state:
-                description: StoragePoolState represents the provisioning state of
-                  a StoragePool
                 type: string
               used:
                 items:

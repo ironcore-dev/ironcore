@@ -1,0 +1,151 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.4.1
+  creationTimestamp: null
+  name: images.compute.onmetal.de
+spec:
+  group: compute.onmetal.de
+  names:
+    kind: Image
+    listKind: ImageList
+    plural: images
+    singular: image
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.os
+      name: OS
+      type: string
+    - jsonPath: .spec.version
+      name: Version
+      type: string
+    - jsonPath: .spec.maturity
+      name: Maturity
+      type: string
+    - jsonPath: .spec.expirationTime
+      name: Expiration
+      type: date
+    - jsonPath: .spec.type
+      name: Type
+      priority: 100
+      type: string
+    - jsonPath: .status.state
+      name: StateFields
+      type: string
+    - jsonPath: .metadata.CreationTimestamp
+      name: Age
+      type: string
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: Image is the Schema for the images API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: ImageSpec defines the desired state of Image
+            properties:
+              expirationTime:
+                format: date-time
+                type: string
+              maturity:
+                type: string
+              os:
+                type: string
+              source:
+                items:
+                  description: SourceAttribute describes the source components of
+                    an Image
+                  properties:
+                    cmdLine:
+                      type: string
+                    hash:
+                      description: Hash describes a hash value and it's corresponding
+                        algorithm
+                      properties:
+                        algorithm:
+                          type: string
+                        value:
+                          type: string
+                      required:
+                      - algorithm
+                      - value
+                      type: object
+                    imageName:
+                      type: string
+                    name:
+                      type: string
+                    url:
+                      type: string
+                  required:
+                  - name
+                  type: object
+                type: array
+              type:
+                type: string
+              version:
+                type: string
+            required:
+            - maturity
+            - os
+            - source
+            - version
+            type: object
+          status:
+            description: ImageStatus defines the observed state of Image
+            properties:
+              hashes:
+                items:
+                  properties:
+                    hash:
+                      type: string
+                    name:
+                      type: string
+                  required:
+                  - hash
+                  - name
+                  type: object
+                type: array
+              message:
+                type: string
+              regions:
+                items:
+                  properties:
+                    message:
+                      type: string
+                    name:
+                      type: string
+                    state:
+                      type: string
+                  required:
+                  - name
+                  type: object
+                type: array
+              state:
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

@@ -25,7 +25,7 @@ import (
 // StorageClassSpec defines the desired state of StorageClass
 type StorageClassSpec struct {
 	Capabilities []StorageClassCapability `json:"capabilities"`
-	Description  *string                  `json:"description"`
+	Description  string                   `json:"description"`
 }
 
 // StorageClassCapability describes one attribute of the StorageClass
@@ -42,6 +42,7 @@ type StorageClassStatus struct {
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:printcolumn:name="Age",type=string,JSONPath=`.metadata.CreationTimestamp`
 
 // StorageClass is the Schema for the storageclasses API
 type StorageClass struct {

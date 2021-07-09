@@ -16,7 +16,14 @@ spec:
     singular: region
   scope: Cluster
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .status.state
+      name: StateFields
+      type: string
+    - jsonPath: .metadata.CreationTimestamp
+      name: Age
+      type: string
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: Region is the Schema for the regions API
@@ -61,16 +68,12 @@ spec:
                     name:
                       type: string
                     state:
-                      description: ZoneState represents the state of the zone at a
-                        given point in time
                       type: string
                   type: object
                 type: array
               message:
                 type: string
               state:
-                description: RegionState represents the state of the region object
-                  at a given point in time
                 type: string
             type: object
         type: object

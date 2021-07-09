@@ -17,13 +17,14 @@ limitations under the License.
 package v1alpha1
 
 import (
+	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // StoragePoolSpec defines the desired state of StoragePool
 type StoragePoolSpec struct {
-	Region      *string                `json:"region,omitempty"`
+	Region      string                 `json:"region,omitempty"`
 	Privacy     PrivacyType            `json:"privacy"`
 	Replication uint                   `json:"replication"`
 	Capacity    []StorageClassCapacity `json:"capacity,omitempty"`
@@ -44,13 +45,9 @@ type StorageClassCapacity struct {
 
 // StoragePoolStatus defines the observed state of StoragePool
 type StoragePoolStatus struct {
-	State   *StoragePoolState      `json:"state,omitempty"`
-	Message *string                `json:"message,omitempty"`
-	Used    []StorageClassCapacity `json:"used,omitempty"`
+	common.StateFields `json:",inline"`
+	Used               []StorageClassCapacity `json:"used,omitempty"`
 }
-
-// StoragePoolState represents the provisioning state of a StoragePool
-type StoragePoolState string
 
 const (
 	StoragePoolStateAvailable    = "Available"
@@ -60,6 +57,8 @@ const (
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:printcolumn:name="StateFields",type=string,JSONPath=`.status.state`
+//+kubebuilder:printcolumn:name="Age",type=string,JSONPath=`.metadata.CreationTimestamp`
 
 // StoragePool is the Schema for the storagepools API
 type StoragePool struct {
