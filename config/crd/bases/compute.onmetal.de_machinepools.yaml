@@ -16,7 +16,14 @@ spec:
     singular: machinepool
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .status.state
+      name: StateFields
+      type: string
+    - jsonPath: .metadata.CreationTimestamp
+      name: Age
+      type: string
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: MachinePool is the Schema for the machinepools API
@@ -75,6 +82,10 @@ spec:
           status:
             description: MachinePoolStatus defines the observed state of MachinePool
             properties:
+              message:
+                type: string
+              state:
+                type: string
               used:
                 description: AvailabilityZoneQuantity defines the quantity of available
                   MachineClasses in a given AZ

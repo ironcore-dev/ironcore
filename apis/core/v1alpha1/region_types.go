@@ -17,54 +17,46 @@ limitations under the License.
 package v1alpha1
 
 import (
+	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // RegionSpec defines the desired state of Region
 type RegionSpec struct {
 	// Location describes the physical location of the region
-	Location *string `json:"location,omitempty"`
+	Location string `json:"location,omitempty"`
 	// AvailabilityZones represents the availability zones in a given region
 	AvailabilityZones []string `json:"availabiltyZone"`
 }
 
 // RegionStatus defines the observed state of Region
 type RegionStatus struct {
-	State             RegionState `json:"state,omitempty"`
-	Message           *string     `json:"message,omitempty"`
-	AvailabilityZones []AZState   `json:"availabilityZones,omitempty"`
+	common.StateFields `json:",inline"`
+	AvailabilityZones  []AZState `json:"availabilityZones,omitempty"`
 }
 
 // ZoneState describes the state of an AvailabilityZone within a region
 type AZState struct {
-	Name    string    `json:"name,omitempty"`
-	State   ZoneState `json:"state,omitempty"`
-	Message *string   `json:"message,omitempty"`
+	Name               string `json:"name,omitempty"`
+	common.StateFields `json:",inline"`
 }
-
-// ZoneState represents the state of the zone at a given point in time
-type ZoneState string
 
 const (
 	// ZoneStateActive represents the active state of an AZ
-	ZoneStateActive ZoneState = "Active"
+	ZoneStateActive = "Active"
 	// ZoneStateOffline represents the offline state of an AZ
-	ZoneStateOffline ZoneState = "Offline"
-)
-
-// RegionState represents the state of the region object at a given point in time
-type RegionState string
-
-const (
+	ZoneStateOffline = "Offline"
 	// RegionStateActive represents the active state of a region
-	RegionStateActive RegionState = "Active"
+	RegionStateActive = "Active"
 	// RegionStateOffline represents the offline state of a region
-	RegionStateOffline RegionState = "Offline"
+	RegionStateOffline = "Offline"
 )
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 //+kubebuilder:resource:scope=Cluster
+//+kubebuilder:printcolumn:name="StateFields",type=string,JSONPath=`.status.state`
+//+kubebuilder:printcolumn:name="Age",type=string,JSONPath=`.metadata.CreationTimestamp`
 
 // Region is the Schema for the regions API
 type Region struct {

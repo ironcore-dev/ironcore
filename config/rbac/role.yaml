@@ -9,6 +9,32 @@ rules:
 - apiGroups:
   - compute.onmetal.de
   resources:
+  - images
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - compute.onmetal.de
+  resources:
+  - images/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - compute.onmetal.de
+  resources:
+  - images/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - compute.onmetal.de
+  resources:
   - machineclasses
   verbs:
   - create

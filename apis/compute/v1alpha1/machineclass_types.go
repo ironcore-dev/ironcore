@@ -29,9 +29,9 @@ type MachineClassSpec struct {
 
 // Capability describes a single feature of a MachineClass
 type Capability struct {
-	Name  *string `json:"name,omitempty"`
-	Type  *string `json:"type,omitempty"`
-	Value *string `json:"value,omitempty"`
+	Name  string `json:"name,omitempty"`
+	Type  string `json:"type,omitempty"`
+	Value string `json:"value,omitempty"`
 }
 
 // MachineClassStatus defines the observed state of MachineClass
@@ -42,6 +42,7 @@ type MachineClassStatus struct {
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:printcolumn:name="Age",type=string,JSONPath=`.metadata.CreationTimestamp`
 
 // MachineClass is the Schema for the machineclasses API
 type MachineClass struct {

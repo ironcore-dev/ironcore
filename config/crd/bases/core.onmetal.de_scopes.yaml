@@ -30,7 +30,7 @@ spec:
       name: ParentNamespace
       type: string
     - jsonPath: .status.state
-      name: State
+      name: StateFields
       type: string
     - jsonPath: .metadata.creationTimestamp
       name: Age
@@ -66,6 +66,8 @@ spec:
               account:
                 description: Account descibes the account this scope belongs to
                 type: string
+              message:
+                type: string
               namespace:
                 description: Namespace references the namespace of the scope
                 type: string
@@ -78,7 +80,6 @@ spec:
                   account should be used as the top reference
                 type: string
               state:
-                description: State represents the state of the scope
                 type: string
             required:
             - account

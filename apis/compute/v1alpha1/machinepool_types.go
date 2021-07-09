@@ -17,12 +17,13 @@ limitations under the License.
 package v1alpha1
 
 import (
+	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // MachinePoolSpec defines the desired state of MachinePool
 type MachinePoolSpec struct {
-	Region   *string                    `json:"region,omitempty"`
+	Region   string                     `json:"region,omitempty"`
 	Privacy  PrivacyType                `json:"privacy"`
 	Capacity []AvailabilityZoneQuantity `json:"capacity"`
 }
@@ -50,11 +51,21 @@ type MachineClassQuantity struct {
 
 // MachinePoolStatus defines the observed state of MachinePool
 type MachinePoolStatus struct {
-	Used AvailabilityZoneQuantity `json:"used"`
+	common.StateFields `json:",inline"`
+	Used               AvailabilityZoneQuantity `json:"used"`
 }
+
+const (
+	MachinePoolStateReady   = "Ready"
+	MachinePoolStatePending = "Pending"
+	MachinePoolStateError   = "Error"
+	MachinePoolStateOffline = "Offline"
+)
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:printcolumn:name="StateFields",type=string,JSONPath=`.status.state`
+//+kubebuilder:printcolumn:name="Age",type=string,JSONPath=`.metadata.CreationTimestamp`
 
 // MachinePool is the Schema for the machinepools API
 type MachinePool struct {

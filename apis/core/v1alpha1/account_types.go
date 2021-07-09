@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -27,41 +28,37 @@ type AccountSpec struct {
 	// who created the account.
 	CreatedBy *rbacv1.Subject `json:"createdBy,omitempty"`
 	// Description is a human-readable description of what the account is used for.
-	Description *string `json:"description,omitempty"`
+	Description string `json:"description,omitempty"`
 	// Owner is a subject representing a user name, an email address, or any other identifier of a user owning
 	// the account.
 	Owner *rbacv1.Subject `json:"owner,omitempty"`
 	// Purpose is a human-readable explanation of the account's purpose.
-	Purpose *string `json:"purpose,omitempty"`
+	Purpose string `json:"purpose,omitempty"`
 }
 
 // AccountStatus defines the observed state of Account
 type AccountStatus struct {
-	// AccountState represents the state of the account
-	State AccountState `json:"state,omitempty"`
+	common.StateFields `json:",inline"`
 	// Namespace references the namespace of the account
 	Namespace string `json:"namespace,omitempty"`
 }
 
-// AccountState is a label for the condition of a account at the current time.
-type AccountState string
-
 const (
 	// AccountPending indicates that the account reconciliation is pending.
-	AccountPending AccountState = "Pending"
+	AccountPending = "Pending"
 	// AccountReady indicates that the account reconciliation was successful.
-	AccountReady AccountState = "Ready"
+	AccountReady = "Ready"
 	// AccountFailed indicates that the account reconciliation failed.
-	AccountFailed AccountState = "Failed"
+	AccountFailed = "Failed"
 	// AccountTerminating indicates that the account is in termination process.
-	AccountTerminating AccountState = "Terminating"
+	AccountTerminating = "Terminating"
 )
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 //+kubebuilder:resource:scope=Cluster
 //+kubebuilder:printcolumn:name="Namespace",type=string,JSONPath=`.status.namespace`
-//+kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.state`
+//+kubebuilder:printcolumn:name="StateFields",type=string,JSONPath=`.status.state`
 //+kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
 
 // Account is the Schema for the accounts API
