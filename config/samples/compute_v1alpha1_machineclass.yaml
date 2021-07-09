@@ -2,6 +2,7 @@ apiVersion: compute.onmetal.de/v1alpha1
 kind: MachineClass
 metadata:
   name: machineclass-sample
+  namespace: scope-8928374932
 spec:
   capabilities:
   - name: cpu

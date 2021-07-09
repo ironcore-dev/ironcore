@@ -22,14 +22,24 @@ import (
 
 // MachinePoolSpec defines the desired state of MachinePool
 type MachinePoolSpec struct {
-	Region   string                     `json:"region"`
+	Region   *string                    `json:"region,omitempty"`
+	Privacy  PrivacyType                `json:"privacy"`
 	Capacity []AvailabilityZoneQuantity `json:"capacity"`
 }
 
+// PrivacyType describes the isolation requirements of a MachinePool
+type PrivacyType string
+
+const (
+	PrivacyShared     = "shared"
+	PrivacyHypervisor = "hypervisor"
+	PrivacyCluster    = "cluster"
+)
+
 // AvailabilityZoneQuantity defines the quantity of available MachineClasses in a given AZ
 type AvailabilityZoneQuantity struct {
-	Name    string                 `json:"name"`
-	Classes []MachineClassQuantity `json:"classes"`
+	AvailabilityZone string                 `json:"availabilityZone"`
+	Classes          []MachineClassQuantity `json:"classes"`
 }
 
 // MachineClassQuantity defines the quantity of a given MachineClass

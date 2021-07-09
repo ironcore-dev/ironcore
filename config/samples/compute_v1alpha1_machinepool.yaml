@@ -4,10 +4,13 @@ metadata:
   name: machinepool-sample
   namespace: scope-98723498
 spec:
+  region: eu-central
+  privacy: shared # hypervisor/cluster
   capacity:
+  - availabilityZone: az1
     classes:
     - name: myMachineClass
-      quantity: 100
+      quantity: 100 # optional in shared case
 # status:
 #   used:
 #     classes:

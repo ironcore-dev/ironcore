@@ -4,12 +4,15 @@ metadata:
   name: storagepool-sample
   namespace: scope-1234324
 spec:
+  region: eu-central
   privacy: shared
   replication: 3
-  reservations:
-    - name: fast
-      capacity: 100Gi
+  capacity:
+    - name: fast-class
+      capacity: 100Gi # optional
 # status:
+#   state: Available/Pending/NotAvailable
+#   message: "All good"
 #   used: # optional: only for private pools with reservations
-#     - name: fast
-#       capacity: 1Gi
+#   - name: fast-class
+#     capacity: 1Gi

@@ -36,11 +36,7 @@ spec:
           spec:
             description: StoragePoolSpec defines the desired state of StoragePool
             properties:
-              privacy:
-                type: string
-              replication:
-                type: integer
-              reservations:
+              capacity:
                 items:
                   properties:
                     capacity:
@@ -51,13 +47,16 @@ spec:
                       x-kubernetes-int-or-string: true
                     name:
                       type: string
-                    scope:
-                      type: string
                   required:
-                  - capacity
                   - name
                   type: object
                 type: array
+              privacy:
+                type: string
+              region:
+                type: string
+              replication:
+                type: integer
             required:
             - privacy
             - replication
@@ -68,6 +67,8 @@ spec:
               message:
                 type: string
               state:
+                description: StoragePoolState represents the provisioning state of
+                  a StoragePool
                 type: string
               used:
                 items:
@@ -80,10 +81,7 @@ spec:
                       x-kubernetes-int-or-string: true
                     name:
                       type: string
-                    scope:
-                      type: string
                   required:
-                  - capacity
                   - name
                   type: object
                 type: array
