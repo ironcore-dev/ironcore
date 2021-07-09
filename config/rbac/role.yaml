@@ -85,6 +85,32 @@ rules:
   - patch
   - update
 - apiGroups:
+  - compute.onmetal.de
+  resources:
+  - sshpublickeys
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - compute.onmetal.de
+  resources:
+  - sshpublickeys/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - compute.onmetal.de
+  resources:
+  - sshpublickeys/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
   - core.onmetal.de
   resources:
   - accounts

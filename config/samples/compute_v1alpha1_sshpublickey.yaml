@@ -1,0 +1,16 @@
+apiVersion: compute.onmetal.de/v1alpha1
+kind: SSHPublicKey
+metadata:
+  name: sshpublickey-sample
+  namespace: scope-23423424
+spec:
+  sshPublicKey: ssh-rsa jksdlkjadljasldjaldjasljdlasjdl
+  description: "my awesome key"
+  expirationDate: 03/14/2017
+#status:
+#  state: Vailid/Expired
+#  message: "All good"
+#  fingerPrint: 08:92:43:34:32
+#  keyLength: 2048
+#  algorithm: RSA/ECDSA ...
+#  publicKey: kjlkjsldjsaldjsldjlj # PEM encoded public key
