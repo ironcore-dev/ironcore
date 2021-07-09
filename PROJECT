@@ -75,4 +75,13 @@ resources:
   kind: Image
   path: github.com/onmetal/onmetal-api/apis/compute/v1alpha1
   version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: onmetal.de
+  group: compute
+  kind: SSHPublicKey
+  path: github.com/onmetal/onmetal-api/apis/compute/v1alpha1
+  version: v1alpha1
 version: "3"
