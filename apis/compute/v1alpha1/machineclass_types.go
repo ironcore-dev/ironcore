@@ -42,7 +42,6 @@ type MachineClassStatus struct {
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
-//+kubebuilder:resource:scope=Cluster
 
 // MachineClass is the Schema for the machineclasses API
 type MachineClass struct {

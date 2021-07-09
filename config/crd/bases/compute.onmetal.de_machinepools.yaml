@@ -41,6 +41,8 @@ spec:
                   description: AvailabilityZoneQuantity defines the quantity of available
                     MachineClasses in a given AZ
                   properties:
+                    availabilityZone:
+                      type: string
                     classes:
                       items:
                         description: MachineClassQuantity defines the quantity of
@@ -55,18 +57,20 @@ spec:
                         - quantity
                         type: object
                       type: array
-                    name:
-                      type: string
                   required:
+                  - availabilityZone
                   - classes
-                  - name
                   type: object
                 type: array
+              privacy:
+                description: PrivacyType describes the isolation requirements of a
+                  MachinePool
+                type: string
               region:
                 type: string
             required:
             - capacity
-            - region
+            - privacy
             type: object
           status:
             description: MachinePoolStatus defines the observed state of MachinePool
@@ -75,6 +79,8 @@ spec:
                 description: AvailabilityZoneQuantity defines the quantity of available
                   MachineClasses in a given AZ
                 properties:
+                  availabilityZone:
+                    type: string
                   classes:
                     items:
                       description: MachineClassQuantity defines the quantity of a
@@ -89,11 +95,9 @@ spec:
                       - quantity
                       type: object
                     type: array
-                  name:
-                    type: string
                 required:
+                - availabilityZone
                 - classes
-                - name
                 type: object
             required:
             - used

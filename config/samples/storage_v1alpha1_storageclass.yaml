@@ -7,6 +7,10 @@ spec:
   capabilities:
   - name: iops
     value: 1000
+  #- name: iops/GB
+  #  value: 500
+  #- name: throughput
+  #  value: 100
   #- name: encryption
   #  value: true
 #status:

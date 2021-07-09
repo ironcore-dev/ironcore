@@ -23,9 +23,10 @@ import (
 
 // StoragePoolSpec defines the desired state of StoragePool
 type StoragePoolSpec struct {
-	Privacy      PrivacyType            `json:"privacy"`
-	Replication  int                    `json:"replication"`
-	Reservations []StorageClassCapacity `json:"reservations,omitempty"`
+	Region      *string                `json:"region,omitempty"`
+	Privacy     PrivacyType            `json:"privacy"`
+	Replication uint                   `json:"replication"`
+	Capacity    []StorageClassCapacity `json:"capacity,omitempty"`
 }
 
 type PrivacyType string
@@ -37,17 +38,25 @@ const (
 )
 
 type StorageClassCapacity struct {
-	Name     string            `json:"name"`
-	Scope    *string           `json:"scope,omitempty"`
-	Capacity resource.Quantity `json:"capacity"`
+	Name     string             `json:"name"`
+	Capacity *resource.Quantity `json:"capacity,omitempty"`
 }
 
 // StoragePoolStatus defines the observed state of StoragePool
 type StoragePoolStatus struct {
-	State   *string                `json:"state,omitempty"`
+	State   *StoragePoolState      `json:"state,omitempty"`
 	Message *string                `json:"message,omitempty"`
 	Used    []StorageClassCapacity `json:"used,omitempty"`
 }
+
+// StoragePoolState represents the provisioning state of a StoragePool
+type StoragePoolState string
+
+const (
+	StoragePoolStateAvailable    = "Available"
+	StoragePoolStatePending      = "Pending"
+	StoragePoolStateNotAvailable = "NotAvailable"
+)
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
