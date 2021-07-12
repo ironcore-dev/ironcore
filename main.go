@@ -153,6 +153,13 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "SSHPublicKey")
 		os.Exit(1)
 	}
+	if err = (&storagecontrollers.VolumeReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "Volume")
+		os.Exit(1)
+	}
 	//+kubebuilder:scaffold:builder
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {

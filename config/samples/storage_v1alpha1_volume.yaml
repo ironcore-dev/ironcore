@@ -1,0 +1,12 @@
+apiVersion: storage.onmetal.de/v1alpha1
+kind: Volume
+metadata:
+  name: volume-sample
+  namespace: scope-798794298
+spec:
+  storageClass: fast-ssd
+  storagePool: onmetal/default
+  size: 100Gi
+#status:
+#  state: Available/Pending/Attached/Error
+#  message: "All good."
