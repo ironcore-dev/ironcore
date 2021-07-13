@@ -1,0 +1,19 @@
+apiVersion: network.onmetal.de/v1alpha1
+kind: ReservedIP
+metadata:
+  name: myReservedIP
+  namespace: scope-8739274932
+spec:
+  subnet:
+    name: my-subnet
+    scope: my-scope
+# ip: 1.2.3.4
+# assignment:
+#   kind: Machine/LoadBalancer/Gateway
+#   apiGroup: compute.onmetal.de
+#   name: myMachine/etc.
+#   scope: myScope
+#status:
+#  ip: 1.2.3.4
+#  state: Assigned/Error/Available/Invalid
+#  message: "All good"

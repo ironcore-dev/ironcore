@@ -189,6 +189,32 @@ rules:
   - patch
   - update
 - apiGroups:
+  - network.onmetal.de
+  resources:
+  - reservedips
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - reservedips/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - reservedips/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
   - storage.onmetal.de
   resources:
   - storageclasses
