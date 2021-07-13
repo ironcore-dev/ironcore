@@ -32,3 +32,10 @@ type RegionAvailability struct {
 type ZoneAvailability struct {
 	Name string `json:"name"`
 }
+
+//+kubebuilder:object:generate=true
+
+type ScopeReference struct {
+	Name  string `json:"name"`
+	Scope string `json:"scope"`
+}

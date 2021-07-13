@@ -1,0 +1,21 @@
+apiVersion: storage.onmetal.de/v1alpha1
+kind: VolumeAttachment
+metadata:
+  name: myVolumeAttachment
+  namespace: scope-8739274932
+spec:
+  volume:
+    name: myVolume
+    scope: myscope
+  machine:
+    name: myMachine
+    scope: myscope
+  # device: /dev/sda
+  # source:
+  #  image: myImage
+  #  snapshot: mysnapshot
+  reclaimPolicy: retain # delete
+#status:
+#  state: Attached/Invalid/Error
+#  message: "All good"
+#  device: /dev/sda
