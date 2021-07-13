@@ -37,8 +37,10 @@ import (
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	corev1alpha1 "github.com/onmetal/onmetal-api/apis/core/v1alpha1"
+	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 	computecontrollers "github.com/onmetal/onmetal-api/controllers/compute"
+	networkcontrollers "github.com/onmetal/onmetal-api/controllers/network"
 	storagecontrollers "github.com/onmetal/onmetal-api/controllers/storage"
 	//+kubebuilder:scaffold:imports
 )
@@ -53,6 +55,7 @@ func init() {
 	utilruntime.Must(corev1alpha1.AddToScheme(scheme))
 	utilruntime.Must(computev1alpha1.AddToScheme(scheme))
 	utilruntime.Must(storagev1alpha1.AddToScheme(scheme))
+	utilruntime.Must(networkv1alpha1.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 
@@ -165,6 +168,13 @@ func main() {
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "VolumeAttachment")
+		os.Exit(1)
+	}
+	if err = (&networkcontrollers.ReservedIPReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "ReservedIP")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder
