@@ -47,10 +47,14 @@ spec:
             description: ReservedIPSpec defines the desired state of ReservedIP
             properties:
               assignment:
+                description: Assignment indicates to which resource this IP address
+                  should be assigned
                 properties:
                   apigroup:
+                    description: APIGroup is the API group of the assigned resource
                     type: string
                   kind:
+                    description: Kind is the object kind of the assigned resource
                     type: string
                   name:
                     type: string
@@ -63,8 +67,13 @@ spec:
                 - scope
                 type: object
               ip:
+                description: IP specifies an IP address which should be reserved.
+                  Must be in the CIDR of the associated Subnet
+                format: byte
                 type: string
               subnet:
+                description: Subnet references the subnet where an IP address should
+                  be reserved
                 properties:
                   name:
                     type: string
@@ -81,6 +90,7 @@ spec:
             description: ReservedIPStatus defines the observed state of ReservedIP
             properties:
               ip:
+                description: IP indicates the effective reserved IP address
                 type: string
               message:
                 type: string
