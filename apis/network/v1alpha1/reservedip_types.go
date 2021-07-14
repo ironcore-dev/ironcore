@@ -19,24 +19,42 @@ package v1alpha1
 import (
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"net"
 )
 
 // ReservedIPSpec defines the desired state of ReservedIP
 type ReservedIPSpec struct {
-	Subnet     common.ScopeReference `json:"subnet"`
-	IP         string                `json:"ip,omitempty"`
-	Assignment Assignment            `json:"assignment,omitempty"`
+	// Subnet references the subnet where an IP address should be reserved
+	// +kubebuilder:validation:Required
+	Subnet common.ScopeReference `json:"subnet"`
+	// IP specifies an IP address which should be reserved. Must be in the CIDR of the
+	// associated Subnet
+	// +kubebuilder:validation:Optional
+	// +kubebuilder:validation:Type:=string
+	IP net.IP `json:"ip,omitempty"`
+	// Assignment indicates to which resource this IP address should be assigned
+	// +kubebuilder:validation:Optional
+	Assignment Assignment `json:"assignment,omitempty"`
 }
 
+// Assignment defines the Assignment type to which an IP address can be bind
 type Assignment struct {
-	Kind                  string `json:"kind"`
-	APIGroup              string `json:"apigroup"`
+	// Kind is the object kind of the assigned resource
+	// +kubebuilder:validation:Required
+	Kind string `json:"kind"`
+	// APIGroup is the API group of the assigned resource
+	// +kubebuilder:validation:Required
+	APIGroup string `json:"apigroup"`
+	// +kubebuilder:validation:Required
 	common.ScopeReference `json:",inline"`
 }
 
 // ReservedIPStatus defines the observed state of ReservedIP
 type ReservedIPStatus struct {
-	IP                 string `json:"ip,omitempty"`
+	// IP indicates the effective reserved IP address
+	// +kubebuilder:validation:Optional
+	IP string `json:"ip,omitempty"`
+	// +kubebuilder:validation:Optional
 	common.StateFields `json:",inline"`
 }
 
