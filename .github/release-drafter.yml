@@ -31,6 +31,22 @@ version-resolver:
 exclude-labels:
   - 'skip-changelog'
 autolabeler:
+  - label: 'core'
+    files:
+      - '/apis/core/*'
+      - '/controllers/core/*'
+  - label: 'storage'
+    files:
+      - '/apis/storage/*'
+      - '/controllers/storage/*'
+  - label: 'network'
+    files:
+      - '/apis/network/*'
+      - '/controllers/network/*'
+  - label: 'compute'
+    files:
+      - '/apis/compute/*'
+      - '/controllers/compute/*'
   - label: 'chore'
     files:
       - '*.md'
