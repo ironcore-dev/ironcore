@@ -64,16 +64,21 @@ spec:
                     within a region
                   properties:
                     message:
+                      description: Message contains a message for the corresponding
+                        state
                       type: string
                     name:
                       type: string
                     state:
+                      description: State indicates the state of a resource
                       type: string
                   type: object
                 type: array
               message:
+                description: Message contains a message for the corresponding state
                 type: string
               state:
+                description: State indicates the state of a resource
                 type: string
             type: object
         type: object

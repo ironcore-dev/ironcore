@@ -67,6 +67,7 @@ spec:
                 description: Account descibes the account this scope belongs to
                 type: string
               message:
+                description: Message contains a message for the corresponding state
                 type: string
               namespace:
                 description: Namespace references the namespace of the scope
@@ -80,6 +81,7 @@ spec:
                   account should be used as the top reference
                 type: string
               state:
+                description: State indicates the state of a resource
                 type: string
             required:
             - account

@@ -24,13 +24,17 @@ import (
 
 // StorageClassSpec defines the desired state of StorageClass
 type StorageClassSpec struct {
+	// Capabilities describes the capabilities of a storage class
 	Capabilities []StorageClassCapability `json:"capabilities"`
-	Description  string                   `json:"description"`
+	// Description is a human readable description of a storage class
+	Description string `json:"description,omitempty"`
 }
 
 // StorageClassCapability describes one attribute of the StorageClass
 type StorageClassCapability struct {
-	Name  string             `json:"name"`
+	// Name is the name of a capability
+	Name string `json:"name"`
+	// Value is the value of a capability
 	Value intstr.IntOrString `json:"value"`
 }
 

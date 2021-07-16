@@ -59,29 +59,61 @@ spec:
             description: VolumeAttachmentSpec defines the desired state of VolumeAttachment
             properties:
               device:
+                description: Device defines the device on the host for a volume
                 type: string
               machine:
+                description: Machine is a reference of the machine object which the
+                  volume should be attached to
                 properties:
                   name:
+                    description: Name is the name of the scope
                     type: string
                   scope:
+                    description: Scope is the absolute scope path
                     type: string
                 required:
                 - name
                 - scope
                 type: object
               source:
+                description: Source references either an image or a snapshot
                 properties:
                   image:
-                    type: string
+                    description: Image defines the image name of the referenced image
+                    properties:
+                      name:
+                        description: Name is the name of the scope
+                        type: string
+                      scope:
+                        description: Scope is the absolute scope path
+                        type: string
+                    required:
+                    - name
+                    - scope
+                    type: object
                   snapshot:
-                    type: string
+                    description: Snapshot defines the snapshot which should be used
+                    properties:
+                      name:
+                        description: Name is the name of the scope
+                        type: string
+                      scope:
+                        description: Scope is the absolute scope path
+                        type: string
+                    required:
+                    - name
+                    - scope
+                    type: object
                 type: object
               volume:
+                description: Volume is a reference of the volume object which should
+                  be attached
                 properties:
                   name:
+                    description: Name is the name of the scope
                     type: string
                   scope:
+                    description: Scope is the absolute scope path
                     type: string
                 required:
                 - name
@@ -94,10 +126,13 @@ spec:
             description: VolumeAttachmentStatus defines the observed state of VolumeAttachment
             properties:
               device:
+                description: Device describes the device of the volume on the host
                 type: string
               message:
+                description: Message contains a message for the corresponding state
                 type: string
               state:
+                description: State indicates the state of a resource
                 type: string
             type: object
         type: object

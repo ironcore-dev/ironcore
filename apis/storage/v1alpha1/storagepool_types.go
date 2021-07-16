@@ -24,29 +24,36 @@ import (
 
 // StoragePoolSpec defines the desired state of StoragePool
 type StoragePoolSpec struct {
-	Region      string                 `json:"region,omitempty"`
-	Privacy     PrivacyType            `json:"privacy"`
-	Replication uint                   `json:"replication"`
-	Capacity    []StorageClassCapacity `json:"capacity,omitempty"`
+	// Region defines the region of the storage pool
+	Region string `json:"region,omitempty"`
+	// Privacy defines the privacy scope of the storage pool
+	Privacy string `json:"privacy"`
+	// Replication indicates the replication factor in the storage pool
+	// +kubebuilder:validation:Minimum:=0
+	Replication int `json:"replication,omitempty"`
+	// Capacity list the available capacity of a storage pool
+	Capacity []StorageClassCapacity `json:"capacity,omitempty"`
 }
 
-type PrivacyType string
-
 const (
-	PrivacyShared  PrivacyType = "shared"
-	PrivacyDisk    PrivacyType = "disk"
-	PrivacyCluster PrivacyType = "cluster"
+	PrivacyShared  = "shared"
+	PrivacyDisk    = "disk"
+	PrivacyCluster = "cluster"
 )
 
+// StorageClassCapacity defines capacity attribute of a storage class
 type StorageClassCapacity struct {
-	Name     string             `json:"name"`
+	// Name is the name of a storage class capacity
+	Name string `json:"name"`
+	// Capacity is the quantity of a capacity
 	Capacity *resource.Quantity `json:"capacity,omitempty"`
 }
 
 // StoragePoolStatus defines the observed state of StoragePool
 type StoragePoolStatus struct {
 	common.StateFields `json:",inline"`
-	Used               []StorageClassCapacity `json:"used,omitempty"`
+	// Used indicates how much capacity has been used in a storage pool
+	Used []StorageClassCapacity `json:"used,omitempty"`
 }
 
 const (

@@ -46,11 +46,18 @@ spec:
                   description: Capability describes a single feature of a MachineClass
                   properties:
                     name:
+                      description: Name is the name of the capability
                       type: string
                     type:
+                      description: Type defines the type of the capability
                       type: string
                     value:
+                      description: Value is the effective value of the capability
                       type: string
+                  required:
+                  - name
+                  - type
+                  - value
                   type: object
                 type: array
             required:
@@ -63,17 +70,23 @@ spec:
                 description: Availability describes the regions and zones where this
                   MachineClass is available
                 items:
+                  description: RegionAvailability defines a region with its availability
+                    zones
                   properties:
                     availabilityZone:
+                      description: Zones is a list of zones in this region
                       items:
+                        description: ZoneAvailability defines the name of a zone
                         properties:
                           name:
+                            description: Name is the name of the availability zone
                             type: string
                         required:
                         - name
                         type: object
                       type: array
                     region:
+                      description: Region is the name of the region
                       type: string
                   required:
                   - availabilityZone

@@ -23,17 +23,24 @@ import (
 
 // SSHPublicKeySpec defines the desired state of SSHPublicKey
 type SSHPublicKeySpec struct {
-	SSHPublicKey   string      `json:"sshPublicKey"`
-	Description    string      `json:"description,omitempty"`
+	// SSHPublicKey is the SSH public key string
+	SSHPublicKey string `json:"sshPublicKey"`
+	// Description describes the purpose of the ssh key
+	Description string `json:"description,omitempty"`
+	// ExpirationDate indicates until when this public key is valid
 	ExpirationDate metav1.Time `json:"expirationDate,omitempty"`
 }
 
 // SSHPublicKeyStatus defines the observed state of SSHPublicKey
 type SSHPublicKeyStatus struct {
 	common.StateFields `json:",inline"`
-	FingerPrint        string `json:"fingerPrint,omitempty"`
-	KeyLength          uint   `json:"keyLength,omitempty"`
-	Algorithm          string `json:"algorithm,omitempty"`
+	// FingerPrint is the finger print of the ssh public key
+	FingerPrint string `json:"fingerPrint,omitempty"`
+	// KeyLength is the byte length of the ssh key
+	// +kubebuilder:validation:Minimum:=0
+	KeyLength int `json:"keyLength,omitempty"`
+	// Algorithm is the algorithm used to generate the ssh key
+	Algorithm string `json:"algorithm,omitempty"`
 	// PublicKey is the PEM encoded public key
 	PublicKey string `json:"publicKey,omitempty"`
 }

@@ -44,47 +44,64 @@ spec:
             description: StoragePoolSpec defines the desired state of StoragePool
             properties:
               capacity:
+                description: Capacity list the available capacity of a storage pool
                 items:
+                  description: StorageClassCapacity defines capacity attribute of
+                    a storage class
                   properties:
                     capacity:
                       anyOf:
                       - type: integer
                       - type: string
+                      description: Capacity is the quantity of a capacity
                       pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                       x-kubernetes-int-or-string: true
                     name:
+                      description: Name is the name of a storage class capacity
                       type: string
                   required:
                   - name
                   type: object
                 type: array
               privacy:
+                description: Privacy defines the privacy scope of the storage pool
                 type: string
               region:
+                description: Region defines the region of the storage pool
                 type: string
               replication:
+                description: Replication indicates the replication factor in the storage
+                  pool
+                minimum: 0
                 type: integer
             required:
             - privacy
-            - replication
             type: object
           status:
             description: StoragePoolStatus defines the observed state of StoragePool
             properties:
               message:
+                description: Message contains a message for the corresponding state
                 type: string
               state:
+                description: State indicates the state of a resource
                 type: string
               used:
+                description: Used indicates how much capacity has been used in a storage
+                  pool
                 items:
+                  description: StorageClassCapacity defines capacity attribute of
+                    a storage class
                   properties:
                     capacity:
                       anyOf:
                       - type: integer
                       - type: string
+                      description: Capacity is the quantity of a capacity
                       pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                       x-kubernetes-int-or-string: true
                     name:
+                      description: Name is the name of a storage class capacity
                       type: string
                   required:
                   - name
