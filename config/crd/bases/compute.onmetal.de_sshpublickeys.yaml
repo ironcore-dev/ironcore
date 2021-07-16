@@ -53,11 +53,15 @@ spec:
             description: SSHPublicKeySpec defines the desired state of SSHPublicKey
             properties:
               description:
+                description: Description describes the purpose of the ssh key
                 type: string
               expirationDate:
+                description: ExpirationDate indicates until when this public key is
+                  valid
                 format: date-time
                 type: string
               sshPublicKey:
+                description: SSHPublicKey is the SSH public key string
                 type: string
             required:
             - sshPublicKey
@@ -66,17 +70,23 @@ spec:
             description: SSHPublicKeyStatus defines the observed state of SSHPublicKey
             properties:
               algorithm:
+                description: Algorithm is the algorithm used to generate the ssh key
                 type: string
               fingerPrint:
+                description: FingerPrint is the finger print of the ssh public key
                 type: string
               keyLength:
+                description: KeyLength is the byte length of the ssh key
+                minimum: 0
                 type: integer
               message:
+                description: Message contains a message for the corresponding state
                 type: string
               publicKey:
                 description: PublicKey is the PEM encoded public key
                 type: string
               state:
+                description: State indicates the state of a resource
                 type: string
             type: object
         type: object

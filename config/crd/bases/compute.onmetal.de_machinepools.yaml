@@ -44,20 +44,30 @@ spec:
             description: MachinePoolSpec defines the desired state of MachinePool
             properties:
               capacity:
+                description: Capacity defines the quantity of this machine pool per
+                  availability zone
                 items:
                   description: AvailabilityZoneQuantity defines the quantity of available
                     MachineClasses in a given AZ
                   properties:
                     availabilityZone:
+                      description: AvailabilityZone is the name of the availability
+                        zone
                       type: string
                     classes:
+                      description: Classes defines a list of machine classes and their
+                        corresponding quantities
                       items:
                         description: MachineClassQuantity defines the quantity of
                           a given MachineClass
                         properties:
                           name:
+                            description: Name is the name of the machine class quantity
                             type: string
                           quantity:
+                            description: Quantity is an absolut number of the available
+                              machine class
+                            minimum: 0
                             type: integer
                         required:
                         - name
@@ -70,10 +80,11 @@ spec:
                   type: object
                 type: array
               privacy:
-                description: PrivacyType describes the isolation requirements of a
-                  MachinePool
+                description: Privacy indicates the privacy scope of the machine pool
                 type: string
               region:
+                description: Region defines the region where this machine pool is
+                  available
                 type: string
             required:
             - capacity
@@ -83,23 +94,33 @@ spec:
             description: MachinePoolStatus defines the observed state of MachinePool
             properties:
               message:
+                description: Message contains a message for the corresponding state
                 type: string
               state:
+                description: State indicates the state of a resource
                 type: string
               used:
                 description: AvailabilityZoneQuantity defines the quantity of available
                   MachineClasses in a given AZ
                 properties:
                   availabilityZone:
+                    description: AvailabilityZone is the name of the availability
+                      zone
                     type: string
                   classes:
+                    description: Classes defines a list of machine classes and their
+                      corresponding quantities
                     items:
                       description: MachineClassQuantity defines the quantity of a
                         given MachineClass
                       properties:
                         name:
+                          description: Name is the name of the machine class quantity
                           type: string
                         quantity:
+                          description: Quantity is an absolut number of the available
+                            machine class
+                          minimum: 0
                           type: integer
                       required:
                       - name

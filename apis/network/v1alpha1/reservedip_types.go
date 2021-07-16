@@ -25,36 +25,28 @@ import (
 // ReservedIPSpec defines the desired state of ReservedIP
 type ReservedIPSpec struct {
 	// Subnet references the subnet where an IP address should be reserved
-	// +kubebuilder:validation:Required
 	Subnet common.ScopeReference `json:"subnet"`
 	// IP specifies an IP address which should be reserved. Must be in the CIDR of the
 	// associated Subnet
-	// +kubebuilder:validation:Optional
 	// +kubebuilder:validation:Type:=string
 	IP net.IP `json:"ip,omitempty"`
 	// Assignment indicates to which resource this IP address should be assigned
-	// +kubebuilder:validation:Optional
 	Assignment Assignment `json:"assignment,omitempty"`
 }
 
 // Assignment defines the Assignment type to which an IP address can be bind
 type Assignment struct {
 	// Kind is the object kind of the assigned resource
-	// +kubebuilder:validation:Required
 	Kind string `json:"kind"`
 	// APIGroup is the API group of the assigned resource
-	// +kubebuilder:validation:Required
-	APIGroup string `json:"apigroup"`
-	// +kubebuilder:validation:Required
+	APIGroup              string `json:"apigroup"`
 	common.ScopeReference `json:",inline"`
 }
 
 // ReservedIPStatus defines the observed state of ReservedIP
 type ReservedIPStatus struct {
 	// IP indicates the effective reserved IP address
-	// +kubebuilder:validation:Optional
-	IP string `json:"ip,omitempty"`
-	// +kubebuilder:validation:Optional
+	IP                 string `json:"ip,omitempty"`
 	common.StateFields `json:",inline"`
 }
 

@@ -60,44 +60,60 @@ spec:
             description: ImageSpec defines the desired state of Image
             properties:
               expirationTime:
+                description: ExpirationTime defines when the support for this image
+                  will expire
                 format: date-time
                 type: string
               maturity:
+                description: Maturity defines the manutiry of an image. It indicates
+                  whether this image is e.g. a stable or preview version.
                 type: string
               os:
+                description: OS defines the operating system name of the image
                 type: string
               source:
+                description: Source defines the source artefacts and their corresponding
+                  location
                 items:
                   description: SourceAttribute describes the source components of
                     an Image
                   properties:
                     cmdLine:
+                      description: CmdLine defines a Kernel boot command
                       type: string
                     hash:
-                      description: Hash describes a hash value and it's corresponding
-                        algorithm
+                      description: Hash is the computed hash value of the artefacts
+                        content
                       properties:
                         algorithm:
+                          description: Algorithm indicates the algorithm with which
+                            the hash should be computed
                           type: string
                         value:
+                          description: Value is the computed hash value
                           type: string
                       required:
                       - algorithm
                       - value
                       type: object
                     imageName:
+                      description: ImageName defines the name of a referred image
                       type: string
                     name:
+                      description: Name defines the name of a source element
                       type: string
                     url:
+                      description: URL defines the location of the image artefact
                       type: string
                   required:
                   - name
                   type: object
                 type: array
               type:
+                description: Type specifies the type of the image
                 type: string
               version:
+                description: Version defines the operating system version
                 type: string
             required:
             - maturity
@@ -109,6 +125,7 @@ spec:
             description: ImageStatus defines the observed state of Image
             properties:
               hashes:
+                description: Hashes lists all hashes for all included artefacts
                 items:
                   properties:
                     hash:
@@ -121,21 +138,28 @@ spec:
                   type: object
                 type: array
               message:
+                description: Message contains a message for the corresponding state
                 type: string
               regions:
+                description: Regions indicates the availability of the image in the
+                  corresponding regions
                 items:
                   properties:
                     message:
+                      description: Message contains a message for the corresponding
+                        state
                       type: string
                     name:
                       type: string
                     state:
+                      description: State indicates the state of a resource
                       type: string
                   required:
                   - name
                   type: object
                 type: array
               state:
+                description: State indicates the state of a resource
                 type: string
             type: object
         type: object

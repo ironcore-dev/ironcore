@@ -24,9 +24,12 @@ import (
 
 // VolumeSpec defines the desired state of Volume
 type VolumeSpec struct {
-	StorageClass string             `json:"storage_class"`
-	StoragePool  string             `json:"storage_pool"`
-	Size         *resource.Quantity `json:"size"`
+	// StorageClass is the storage class of a volume
+	StorageClass string `json:"storage_class"`
+	// StoragePool indicates which storage pool to use for a volume
+	StoragePool common.ScopeReference `json:"storagepool"`
+	// Size defines the size of the volume
+	Size *resource.Quantity `json:"size"`
 }
 
 // VolumeStatus defines the observed state of Volume

@@ -29,9 +29,12 @@ type MachineClassSpec struct {
 
 // Capability describes a single feature of a MachineClass
 type Capability struct {
-	Name  string `json:"name,omitempty"`
-	Type  string `json:"type,omitempty"`
-	Value string `json:"value,omitempty"`
+	// Name is the name of the capability
+	Name string `json:"name"`
+	// Type defines the type of the capability
+	Type string `json:"type"`
+	// Value is the effective value of the capability
+	Value string `json:"value"`
 }
 
 // MachineClassStatus defines the observed state of MachineClass

@@ -23,13 +23,13 @@ import (
 
 // MachinePoolSpec defines the desired state of MachinePool
 type MachinePoolSpec struct {
-	Region   string                     `json:"region,omitempty"`
-	Privacy  PrivacyType                `json:"privacy"`
+	// Region defines the region where this machine pool is available
+	Region string `json:"region,omitempty"`
+	// Privacy indicates the privacy scope of the machine pool
+	Privacy string `json:"privacy"`
+	// Capacity defines the quantity of this machine pool per availability zone
 	Capacity []AvailabilityZoneQuantity `json:"capacity"`
 }
-
-// PrivacyType describes the isolation requirements of a MachinePool
-type PrivacyType string
 
 const (
 	PrivacyShared     = "shared"
@@ -39,14 +39,19 @@ const (
 
 // AvailabilityZoneQuantity defines the quantity of available MachineClasses in a given AZ
 type AvailabilityZoneQuantity struct {
-	AvailabilityZone string                 `json:"availabilityZone"`
-	Classes          []MachineClassQuantity `json:"classes"`
+	// AvailabilityZone is the name of the availability zone
+	AvailabilityZone string `json:"availabilityZone"`
+	// Classes defines a list of machine classes and their corresponding quantities
+	Classes []MachineClassQuantity `json:"classes"`
 }
 
 // MachineClassQuantity defines the quantity of a given MachineClass
 type MachineClassQuantity struct {
-	Name     string `json:"name"`
-	Quantity uint   `json:"quantity"`
+	// Name is the name of the machine class quantity
+	Name string `json:"name"`
+	// Quantity is an absolut number of the available machine class
+	// +kubebuilder:validation:Minimum:=0
+	Quantity int `json:"quantity"`
 }
 
 // MachinePoolStatus defines the observed state of MachinePool

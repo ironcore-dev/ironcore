@@ -41,16 +41,20 @@ spec:
             description: StorageClassSpec defines the desired state of StorageClass
             properties:
               capabilities:
+                description: Capabilities describes the capabilities of a storage
+                  class
                 items:
                   description: StorageClassCapability describes one attribute of the
                     StorageClass
                   properties:
                     name:
+                      description: Name is the name of a capability
                       type: string
                     value:
                       anyOf:
                       - type: integer
                       - type: string
+                      description: Value is the value of a capability
                       x-kubernetes-int-or-string: true
                   required:
                   - name
@@ -58,10 +62,11 @@ spec:
                   type: object
                 type: array
               description:
+                description: Description is a human readable description of a storage
+                  class
                 type: string
             required:
             - capabilities
-            - description
             type: object
           status:
             description: StorageClassStatus defines the observed state of StorageClass
@@ -70,17 +75,23 @@ spec:
                 description: Availability describes the regions and zones where this
                   MachineClass is available
                 items:
+                  description: RegionAvailability defines a region with its availability
+                    zones
                   properties:
                     availabilityZone:
+                      description: Zones is a list of zones in this region
                       items:
+                        description: ZoneAvailability defines the name of a zone
                         properties:
                           name:
+                            description: Name is the name of the availability zone
                             type: string
                         required:
                         - name
                         type: object
                       type: array
                     region:
+                      description: Region is the name of the region
                       type: string
                   required:
                   - availabilityZone

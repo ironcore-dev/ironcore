@@ -23,34 +23,49 @@ import (
 
 // ImageSpec defines the desired state of Image
 type ImageSpec struct {
-	Type           string            `json:"type,omitempty"`
-	Maturity       string            `json:"maturity"`
-	ExpirationTime metav1.Time       `json:"expirationTime,omitempty"`
-	OS             string            `json:"os"`
-	Version        string            `json:"version"`
-	Source         []SourceAttribute `json:"source"`
+	// Type specifies the type of the image
+	Type string `json:"type,omitempty"`
+	// Maturity defines the manutiry of an image. It indicates whether this image is e.g. a stable or preview version.
+	Maturity string `json:"maturity"`
+	// ExpirationTime defines when the support for this image will expire
+	ExpirationTime metav1.Time `json:"expirationTime,omitempty"`
+	// OS defines the operating system name of the image
+	OS string `json:"os"`
+	// Version defines the operating system version
+	Version string `json:"version"`
+	// Source defines the source artefacts and their corresponding location
+	Source []SourceAttribute `json:"source"`
 }
 
 // SourceAttribute describes the source components of an Image
 type SourceAttribute struct {
-	Name      string `json:"name"`
+	// Name defines the name of a source element
+	Name string `json:"name"`
+	// ImageName defines the name of a referred image
 	ImageName string `json:"imageName,omitempty"`
-	URL       string `json:"url,omitempty"`
-	CmdLine   string `json:"cmdLine,omitempty"`
-	Hash      *Hash  `json:"hash,omitempty"`
+	// URL defines the location of the image artefact
+	URL string `json:"url,omitempty"`
+	// CmdLine defines a Kernel boot command
+	CmdLine string `json:"cmdLine,omitempty"`
+	// Hash is the computed hash value of the artefacts content
+	Hash *Hash `json:"hash,omitempty"`
 }
 
 // Hash describes a hash value and it's corresponding algorithm
 type Hash struct {
+	// Algorithm indicates the algorithm with which the hash should be computed
 	Algorithm string `json:"algorithm"`
-	Value     string `json:"value"`
+	// Value is the computed hash value
+	Value string `json:"value"`
 }
 
 // ImageStatus defines the observed state of Image
 type ImageStatus struct {
 	common.StateFields `json:",inline"`
-	Hashes             []HashStatus  `json:"hashes,omitempty"`
-	Regions            []RegionState `json:"regions,omitempty"`
+	// Hashes lists all hashes for all included artefacts
+	Hashes []HashStatus `json:"hashes,omitempty"`
+	// Regions indicates the availability of the image in the corresponding regions
+	Regions []RegionState `json:"regions,omitempty"`
 }
 
 type RegionState struct {

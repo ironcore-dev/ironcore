@@ -57,8 +57,10 @@ spec:
                     description: Kind is the object kind of the assigned resource
                     type: string
                   name:
+                    description: Name is the name of the scope
                     type: string
                   scope:
+                    description: Scope is the absolute scope path
                     type: string
                 required:
                 - apigroup
@@ -76,8 +78,10 @@ spec:
                   be reserved
                 properties:
                   name:
+                    description: Name is the name of the scope
                     type: string
                   scope:
+                    description: Scope is the absolute scope path
                     type: string
                 required:
                 - name
@@ -93,8 +97,10 @@ spec:
                 description: IP indicates the effective reserved IP address
                 type: string
               message:
+                description: Message contains a message for the corresponding state
                 type: string
               state:
+                description: State indicates the state of a resource
                 type: string
             type: object
         type: object

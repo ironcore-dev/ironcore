@@ -113,11 +113,13 @@ spec:
             description: AccountStatus defines the observed state of Account
             properties:
               message:
+                description: Message contains a message for the corresponding state
                 type: string
               namespace:
                 description: Namespace references the namespace of the account
                 type: string
               state:
+                description: State indicates the state of a resource
                 type: string
             type: object
         type: object

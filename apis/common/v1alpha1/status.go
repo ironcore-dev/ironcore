@@ -18,6 +18,8 @@ package v1alpha1
 
 // StateFields defines the observed state of an object
 type StateFields struct {
-	State   string `json:"state,omitempty"`
+	// State indicates the state of a resource
+	State string `json:"state,omitempty"`
+	// Message contains a message for the corresponding state
 	Message string `json:"message,omitempty"`
 }
