@@ -1,0 +1,20 @@
+# permissions for end users to view subnetips.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: subnetip-viewer-role
+rules:
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - subnetips
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - subnetips/status
+  verbs:
+  - get
