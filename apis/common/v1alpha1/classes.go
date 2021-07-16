@@ -47,3 +47,12 @@ type ScopeReference struct {
 	// Scope is the absolute scope path
 	Scope string `json:"scope"`
 }
+
+// KindReference defines an object with its kind and API group and its scope reference
+type KindReference struct {
+	// Kind is the kind of the object
+	Kind string `json:"kind"`
+	// APIGroup is the API group of the object
+	APIGroup       string `json:"apigroup"`
+	ScopeReference `json:",inline"`
+}

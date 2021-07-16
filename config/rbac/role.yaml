@@ -215,6 +215,32 @@ rules:
   - patch
   - update
 - apiGroups:
+  - network.onmetal.de
+  resources:
+  - subnetips
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - subnetips/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - subnetips/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
   - storage.onmetal.de
   resources:
   - storageclasses

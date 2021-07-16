@@ -1,0 +1,18 @@
+apiVersion: network.onmetal.de/v1alpha1
+kind: SubnetIP
+metadata:
+  name: subnetip-sample
+  namespace: scope-23423423
+spec:
+  ip: 1.1.1.1
+  source:
+    name: mySubnet
+    scope: myScope
+  target:
+    kind: Machine
+    apiGroup: compute.onmetal.de
+    name: myVM
+    scope: myScope
+#status:
+#  state: Assigned/Unassigned/Invalid
+#  message: "All good"
