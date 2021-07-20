@@ -217,6 +217,32 @@ rules:
 - apiGroups:
   - network.onmetal.de
   resources:
+  - securitygroups
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - securitygroups/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - securitygroups/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
   - subnetips
   verbs:
   - create

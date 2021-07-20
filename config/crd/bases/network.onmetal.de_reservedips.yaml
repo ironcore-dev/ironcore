@@ -71,7 +71,6 @@ spec:
               ip:
                 description: IP specifies an IP address which should be reserved.
                   Must be in the CIDR of the associated Subnet
-                format: byte
                 type: string
               subnet:
                 description: Subnet references the subnet where an IP address should

@@ -56,3 +56,9 @@ type KindReference struct {
 	APIGroup       string `json:"apigroup"`
 	ScopeReference `json:",inline"`
 }
+
+// TODO: create marshal/unmarshal functions
+type IPAddr string
+
+// TODO: create marshal/unmarshal functions
+type Cidr string
