@@ -19,7 +19,6 @@ package v1alpha1
 import (
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"net"
 )
 
 // ReservedIPSpec defines the desired state of ReservedIP
@@ -28,8 +27,7 @@ type ReservedIPSpec struct {
 	Subnet common.ScopeReference `json:"subnet"`
 	// IP specifies an IP address which should be reserved. Must be in the CIDR of the
 	// associated Subnet
-	// +kubebuilder:validation:Type:=string
-	IP net.IP `json:"ip,omitempty"`
+	IP common.IPAddr `json:"ip,omitempty"`
 	// Assignment indicates to which resource this IP address should be assigned
 	Assignment Assignment `json:"assignment,omitempty"`
 }
@@ -46,7 +44,7 @@ type Assignment struct {
 // ReservedIPStatus defines the observed state of ReservedIP
 type ReservedIPStatus struct {
 	// IP indicates the effective reserved IP address
-	IP                 string `json:"ip,omitempty"`
+	IP                 common.IPAddr `json:"ip,omitempty"`
 	common.StateFields `json:",inline"`
 }
 

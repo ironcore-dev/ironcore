@@ -19,13 +19,12 @@ package v1alpha1
 import (
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"net"
 )
 
 // SubnetIPSpec defines the desired state of SubnetIP
 type SubnetIPSpec struct {
 	// IP is the used IP in a given subnet
-	IP net.IP `json:"ip"`
+	IP string `json:"ip"`
 	// Subnet is the subnet of the IP
 	Subnet common.ScopeReference `json:"subnet"`
 	// Target is the resource the IP is assigned to

@@ -1,0 +1,24 @@
+# permissions for end users to edit securitygroups.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: securitygroup-editor-role
+rules:
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - securitygroups
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - securitygroups/status
+  verbs:
+  - get

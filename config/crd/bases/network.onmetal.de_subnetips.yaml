@@ -60,7 +60,6 @@ spec:
             properties:
               ip:
                 description: IP is the used IP in a given subnet
-                format: byte
                 type: string
               subnet:
                 description: Subnet is the subnet of the IP
