@@ -1,0 +1,135 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.4.1
+  creationTimestamp: null
+  name: subnets.network.onmetal.de
+spec:
+  group: network.onmetal.de
+  names:
+    kind: Subnet
+    listKind: SubnetList
+    plural: subnets
+    singular: subnet
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.state
+      name: StateFields
+      type: string
+    - jsonPath: .metadata.CreationTimestamp
+      name: Age
+      type: string
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: Subnet is the Schema for the subnets API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: SubnetSpec defines the desired state of Subnet
+            properties:
+              locations:
+                description: Locations defines in which regions and availability zone
+                  this subnet should be available
+                items:
+                  description: RegionAvailability defines a region with its availability
+                    zones
+                  properties:
+                    availabilityZone:
+                      description: Zones is a list of zones in this region
+                      items:
+                        description: ZoneAvailability defines the name of a zone
+                        properties:
+                          name:
+                            description: Name is the name of the availability zone
+                            type: string
+                        required:
+                        - name
+                        type: object
+                      type: array
+                    region:
+                      description: Region is the name of the region
+                      type: string
+                  required:
+                  - availabilityZone
+                  - region
+                  type: object
+                type: array
+              parentsubnet:
+                description: ParentSubnet is a reference to the parent of a subnet
+                properties:
+                  name:
+                    description: Name is the name of the scope
+                    type: string
+                  scope:
+                    description: Scope is the absolute scope path
+                    type: string
+                required:
+                - name
+                - scope
+                type: object
+              ranges:
+                description: Ranges defines the size of the subnet
+                items:
+                  description: RangeType defines the range/size of a subnet
+                  properties:
+                    blockedranges:
+                      description: BlockedRanges specifies which part of the subnet
+                        should be used for static IP assignment
+                      items:
+                        description: 'TODO: create marshal/unmarshal functions'
+                        type: string
+                      type: array
+                    capacity:
+                      description: Capacity defines the absolute number of IPs in
+                        a given subnet
+                      minimum: 0
+                      type: integer
+                    cidr:
+                      description: CIDR is the CIDR block
+                      type: string
+                    size:
+                      description: Size defines the size of a subnet e.g. "/12"
+                      type: string
+                  type: object
+                minItems: 1
+                type: array
+            required:
+            - ranges
+            type: object
+          status:
+            description: SubnetStatus defines the observed state of Subnet
+            properties:
+              message:
+                description: Message contains a message for the corresponding state
+                type: string
+              state:
+                description: State indicates the state of a resource
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

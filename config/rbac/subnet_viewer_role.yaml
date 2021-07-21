@@ -1,0 +1,20 @@
+# permissions for end users to view subnets.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: subnet-viewer-role
+rules:
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - subnets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - subnets/status
+  verbs:
+  - get

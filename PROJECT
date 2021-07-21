@@ -129,4 +129,13 @@ resources:
   kind: SecurityGroup
   path: github.com/onmetal/onmetal-api/apis/network/v1alpha1
   version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: onmetal.de
+  group: network
+  kind: Subnet
+  path: github.com/onmetal/onmetal-api/apis/network/v1alpha1
+  version: v1alpha1
 version: "3"
