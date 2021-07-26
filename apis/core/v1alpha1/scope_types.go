@@ -25,6 +25,8 @@ import (
 type ScopeSpec struct {
 	// Description is a human-readable description of what the scope is used for.
 	Description string `json:"description,omitempty"`
+	// Region describes the region scope
+	Region string `json:"region,omitempty"`
 }
 
 // ScopeStatus defines the observed state of Scope
@@ -37,7 +39,7 @@ type ScopeStatus struct {
 	ParentScope string `json:"parentScope"`
 	// ParentNamespace represents the namespace of the parent scope
 	ParentNamespace string `json:"parentNamespace"`
-	// Account descibes the account this scope belongs to
+	// Account describes the account this scope belongs to
 	Account string `json:"account"`
 }
 
