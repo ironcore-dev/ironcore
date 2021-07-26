@@ -3,4 +3,5 @@ kind: Scope
 metadata:
   name: scope-sample
 spec:
+  #region: frankfurt1
   description: yolo

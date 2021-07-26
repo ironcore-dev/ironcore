@@ -59,12 +59,15 @@ spec:
                 description: Description is a human-readable description of what the
                   scope is used for.
                 type: string
+              region:
+                description: Region describes the region scope
+                type: string
             type: object
           status:
             description: ScopeStatus defines the observed state of Scope
             properties:
               account:
-                description: Account descibes the account this scope belongs to
+                description: Account describes the account this scope belongs to
                 type: string
               message:
                 description: Message contains a message for the corresponding state
