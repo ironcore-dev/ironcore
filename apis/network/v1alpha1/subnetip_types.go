@@ -50,7 +50,7 @@ const (
 //+kubebuilder:printcolumn:name="Target",type=string,JSONPath=`.spec.target.name`
 //+kubebuilder:printcolumn:name="TargetKind",type=string,JSONPath=`.spec.target.kind`
 //+kubebuilder:printcolumn:name="StateFields",type=string,JSONPath=`.status.state`
-//+kubebuilder:printcolumn:name="Age",type=string,JSONPath=`.metadata.CreationTimestamp`
+//+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
 // SubnetIP is the Schema for the subnetips API
 type SubnetIP struct {

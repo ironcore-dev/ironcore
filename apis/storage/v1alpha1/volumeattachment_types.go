@@ -62,7 +62,7 @@ const (
 //+kubebuilder:printcolumn:name="Image",type=string,JSONPath=`.spec.source.image`
 //+kubebuilder:printcolumn:name="Snapshot",type=string,JSONPath=`.spec.source.snapshot`
 //+kubebuilder:printcolumn:name="StateFields",type=string,JSONPath=`.status.state`
-//+kubebuilder:printcolumn:name="Age",type=string,JSONPath=`.metadata.CreationTimestamp`
+//+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
 // VolumeAttachment is the Schema for the volumeattachments API
 type VolumeAttachment struct {

@@ -52,7 +52,7 @@ type ReservedIPStatus struct {
 //+kubebuilder:subresource:status
 //+kubebuilder:printcolumn:name="IP",type=string,JSONPath=`.status.ip`
 //+kubebuilder:printcolumn:name="StateFields",type=string,JSONPath=`.status.state`
-//+kubebuilder:printcolumn:name="Age",type=string,JSONPath=`.metadata.CreationTimestamp`
+//+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
 // ReservedIP is the Schema for the reservedips API
 type ReservedIP struct {

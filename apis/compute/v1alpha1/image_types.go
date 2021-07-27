@@ -94,7 +94,7 @@ const (
 //+kubebuilder:printcolumn:name="Expiration",type=date,JSONPath=`.spec.expirationTime`
 //+kubebuilder:printcolumn:name="Type",type=string,JSONPath=`.spec.type`,priority=100
 //+kubebuilder:printcolumn:name="StateFields",type=string,JSONPath=`.status.state`
-//+kubebuilder:printcolumn:name="Age",type=string,JSONPath=`.metadata.CreationTimestamp`
+//+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
 // Image is the Schema for the images API
 type Image struct {

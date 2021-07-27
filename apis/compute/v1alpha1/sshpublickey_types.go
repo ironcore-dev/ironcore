@@ -51,7 +51,7 @@ type SSHPublicKeyStatus struct {
 //+kubebuilder:printcolumn:name="Algorithm",type=string,JSONPath=`.status.algorithm`
 //+kubebuilder:printcolumn:name="KeyLength",type=integer,JSONPath=`.status.keyLength`
 //+kubebuilder:printcolumn:name="StateFields",type=string,JSONPath=`.status.state`
-//+kubebuilder:printcolumn:name="Age",type=string,JSONPath=`.metadata.CreationTimestamp`
+//+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
 // SSHPublicKey is the Schema for the sshpublickeys API
 type SSHPublicKey struct {
