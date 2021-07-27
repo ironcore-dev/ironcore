@@ -87,6 +87,32 @@ rules:
 - apiGroups:
   - compute.onmetal.de
   resources:
+  - machines
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - compute.onmetal.de
+  resources:
+  - machines/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - compute.onmetal.de
+  resources:
+  - machines/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - compute.onmetal.de
+  resources:
   - sshpublickeys
   verbs:
   - create

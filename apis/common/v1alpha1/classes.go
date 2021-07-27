@@ -32,6 +32,16 @@ type RegionAvailability struct {
 
 //+kubebuilder:object:generate=true
 
+// Location describes the location of a resource
+type Location struct {
+	// Region defines the region of a resource
+	Region string `json:"region"`
+	// AvailabilityZone is the availability zone of a resource
+	AvailabilityZone string `json:"availabilityZone"`
+}
+
+//+kubebuilder:object:generate=true
+
 // ZoneAvailability defines the name of a zone
 type ZoneAvailability struct {
 	// Name is the name of the availability zone

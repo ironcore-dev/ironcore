@@ -1,0 +1,275 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.4.1
+  creationTimestamp: null
+  name: machines.compute.onmetal.de
+spec:
+  group: compute.onmetal.de
+  names:
+    kind: Machine
+    listKind: MachineList
+    plural: machines
+    singular: machine
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.hostname
+      name: Hostname
+      type: string
+    - jsonPath: .spec.machineClass.name
+      name: MachineClass
+      type: string
+    - jsonPath: .spec.image.name
+      name: Image
+      type: string
+    - jsonPath: .status.state
+      name: State
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: Machine is the Schema for the machines API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: MachineSpec defines the desired state of Machine
+            properties:
+              hostname:
+                description: Hostname is the hostname of the machine
+                type: string
+              image:
+                description: Image is the operating system image of the machine
+                properties:
+                  name:
+                    description: Name is the name of the scope
+                    type: string
+                  scope:
+                    description: Scope is the absolute scope path
+                    type: string
+                required:
+                - name
+                - scope
+                type: object
+              location:
+                description: Location is the physical location of the machine
+                properties:
+                  availabilityZone:
+                    description: AvailabilityZone is the availability zone of a resource
+                    type: string
+                  region:
+                    description: Region defines the region of a resource
+                    type: string
+                required:
+                - availabilityZone
+                - region
+                type: object
+              machine_pool:
+                description: MachinePool defines the compute pool of the machine
+                properties:
+                  name:
+                    description: Name is the name of the scope
+                    type: string
+                  scope:
+                    description: Scope is the absolute scope path
+                    type: string
+                required:
+                - name
+                - scope
+                type: object
+              machineClass:
+                description: MachineClass is the machine class/flavor of the machine
+                properties:
+                  name:
+                    description: Name is the name of the scope
+                    type: string
+                  scope:
+                    description: Scope is the absolute scope path
+                    type: string
+                required:
+                - name
+                - scope
+                type: object
+              securityGroups:
+                description: 'Interfaces define a list of network interfaces present
+                  on the machine TODO: define interfaces/network references SecurityGroups
+                  is a list of security groups of a machine'
+                items:
+                  description: ScopeReference refers to a scope and the scopes name
+                  properties:
+                    name:
+                      description: Name is the name of the scope
+                      type: string
+                    scope:
+                      description: Scope is the absolute scope path
+                      type: string
+                  required:
+                  - name
+                  - scope
+                  type: object
+                type: array
+              sshPublicKeys:
+                description: SSHPublicKeys is a list of SSH public keys of a machine
+                items:
+                  description: SSHPublicKeyEntry describes either a reference to a
+                    SSH public key or a selector to filter for a public key
+                  properties:
+                    name:
+                      description: Name is the name of the SSH public key
+                      type: string
+                    scope:
+                      description: Scope is the scope of a SSH public key
+                      type: string
+                    selector:
+                      description: Selector defines a LabelSelector to filter for
+                        a public key
+                      properties:
+                        matchExpressions:
+                          description: matchExpressions is a list of label selector
+                            requirements. The requirements are ANDed.
+                          items:
+                            description: A label selector requirement is a selector
+                              that contains values, a key, and an operator that relates
+                              the key and values.
+                            properties:
+                              key:
+                                description: key is the label key that the selector
+                                  applies to.
+                                type: string
+                              operator:
+                                description: operator represents a key's relationship
+                                  to a set of values. Valid operators are In, NotIn,
+                                  Exists and DoesNotExist.
+                                type: string
+                              values:
+                                description: values is an array of string values.
+                                  If the operator is In or NotIn, the values array
+                                  must be non-empty. If the operator is Exists or
+                                  DoesNotExist, the values array must be empty. This
+                                  array is replaced during a strategic merge patch.
+                                items:
+                                  type: string
+                                type: array
+                            required:
+                            - key
+                            - operator
+                            type: object
+                          type: array
+                        matchLabels:
+                          additionalProperties:
+                            type: string
+                          description: matchLabels is a map of {key,value} pairs.
+                            A single {key,value} in the matchLabels map is equivalent
+                            to an element of matchExpressions, whose key field is
+                            "key", the operator is "In", and the values array contains
+                            only "value". The requirements are ANDed.
+                          type: object
+                      type: object
+                  type: object
+                type: array
+              userData:
+                description: UserData defines the ignition file
+                type: string
+              volumeClaims:
+                description: VolumeClaims
+                items:
+                  description: VolumeClaim defines a volume claim of a machine
+                  properties:
+                    device:
+                      description: Device defines the device for a volume on the machine
+                      type: string
+                    name:
+                      description: Name is the name of the VolumeClaim
+                      type: string
+                    retainPolicy:
+                      description: RetainPolicy defines what should happen when the
+                        machine is being deleted
+                      type: string
+                    size:
+                      anyOf:
+                      - type: integer
+                      - type: string
+                      description: Size defines the size of the volume
+                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                      x-kubernetes-int-or-string: true
+                    storageClass:
+                      description: StorageClass describes the storage class of the
+                        volumes
+                      properties:
+                        name:
+                          description: Name is the name of the scope
+                          type: string
+                        scope:
+                          description: Scope is the absolute scope path
+                          type: string
+                      required:
+                      - name
+                      - scope
+                      type: object
+                    volume:
+                      description: Volume is a reference to an existing volume
+                      properties:
+                        name:
+                          description: Name is the name of the scope
+                          type: string
+                        scope:
+                          description: Scope is the absolute scope path
+                          type: string
+                      required:
+                      - name
+                      - scope
+                      type: object
+                  required:
+                  - device
+                  - name
+                  - retainPolicy
+                  - storageClass
+                  type: object
+                type: array
+            required:
+            - hostname
+            - image
+            - location
+            - machineClass
+            - securityGroups
+            - sshPublicKeys
+            - volumeClaims
+            type: object
+          status:
+            description: MachineStatus defines the observed state of Machine
+            properties:
+              message:
+                description: Message contains a message for the corresponding state
+                type: string
+              state:
+                description: State indicates the state of a resource
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

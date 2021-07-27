@@ -1,0 +1,82 @@
+apiVersion: compute.onmetal.de/v1alpha1
+kind: Machine
+metadata:
+  name: machine-sample
+spec:
+  hostname: myhost
+  machineClass:
+    name: x3.xlarge
+    scope: global
+  #machinePool:
+  #  name: default
+  #  scope: global
+  location:
+    region: eu-central
+    availabilityZone: f1
+  image:
+    name: ubuntu
+    scope: global
+  sshPublicKeys:
+  - scope: myScope
+    name: mykey # name or selector
+#    selector: # optional: either selector for current scope or all parent scopes
+#      matchLabels:
+#        username: myuser
+#  interfaces:
+#    - subnet:
+#        name: mySubnetName
+#        scope: someScopeNamespace
+#      #name: eth0
+#      #ip:
+#    - reservedIP:
+#        name: myReservedIP
+#        scope: myscope
+#      #name: eth3
+#    - reservedIP:
+#        name: mySecondReservedIP
+#        scope: myscope2
+#      #name: eth4
+#    - subnet:
+#        name: mycompanynet
+#        scope: accountNamespace
+#      #name: eth1
+#      #ip:
+  securityGroups:
+  - name: mysecgroup1
+    scope: myscope
+  - name: mysecgroup2
+    scope: myscope
+  volumeClaims:
+  - name: rootdisk # first disk is root disk
+    retainPolicy: DeleteOnTermination
+    device: /dev/sda
+    storageClass:
+      name: slow
+      scope: global
+    size: 100Gi
+  - name: tmpDisk
+    retainPolicy: DeleteOnTermination
+    storageClass:
+      name: slow
+      scope: global
+    device: /dev/sdb
+    size: 10Gi
+  - name: data
+    retainPolicy: Persistent
+    storageClass:
+      name: slow
+      scope: global
+    device: /dev/sdc
+    size: 100Gi
+#    - name: reusedisk
+#      retainPolicy: Persistent
+#      device: /dev/sdx
+#      volume:
+#        name: blubbber0234324
+#        scope: scope-87973947
+  userData: |
+    myIgnitionJson
+#status:
+#  state: Running
+#  message: "All good"
+# TODO: list other status fields as an example
