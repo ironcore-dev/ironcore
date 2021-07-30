@@ -70,7 +70,6 @@ spec:
                               type: string
                           required:
                           - name
-                          - scope
                           type: object
                       type: object
                     name:
@@ -104,7 +103,6 @@ spec:
                           type: string
                       required:
                       - name
-                      - scope
                       type: object
                   required:
                   - name
@@ -150,7 +148,6 @@ spec:
                           type: string
                       required:
                       - name
-                      - scope
                       type: object
                     source:
                       description: Source is either the cird or a reference to another
@@ -170,7 +167,6 @@ spec:
                               type: string
                           required:
                           - name
-                          - scope
                           type: object
                       type: object
                   required:
@@ -257,8 +253,6 @@ spec:
               state:
                 description: State indicates the state of a resource
                 type: string
-            required:
-            - conditions
             type: object
         type: object
     served: true

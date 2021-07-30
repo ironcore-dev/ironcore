@@ -33,8 +33,8 @@ type IPAMRangeSpec struct {
 	CIDR string `json:"cidr,omitempty"`
 }
 
-// IPRangeStatus defines the observed state of IPAMRange
-type IPRangeStatus struct {
+// IPAMRangeStatus defines the observed state of IPAMRange
+type IPAMRangeStatus struct {
 	common.StateFields `json:",inline"`
 	CIDR               string   `json:"cidr,omitempty"`
 	FreeBlocks         []string `json:"freeBlocks,omitempty"`
@@ -50,8 +50,8 @@ type IPAMRange struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   IPAMRangeSpec `json:"spec,omitempty"`
-	Status IPRangeStatus `json:"status,omitempty"`
+	Spec   IPAMRangeSpec   `json:"spec,omitempty"`
+	Status IPAMRangeStatus `json:"status,omitempty"`
 }
 
 //+kubebuilder:object:root=true

@@ -13,6 +13,8 @@ spec:
     kind: ReservedIP
     listKind: ReservedIPList
     plural: reservedips
+    shortNames:
+    - rip
     singular: reservedip
   scope: Namespaced
   versions:
@@ -20,8 +22,15 @@ spec:
     - jsonPath: .status.ip
       name: IP
       type: string
+    - jsonPath: .status.bound.mode
+      name: Mode
+      type: string
+    - jsonPath: .status.bound.assignment
+      name: Assignment
+      priority: 100
+      type: string
     - jsonPath: .status.state
-      name: StateFields
+      name: State
       type: string
     - jsonPath: .metadata.creationTimestamp
       name: Age
@@ -50,11 +59,11 @@ spec:
                 description: Assignment indicates to which resource this IP address
                   should be assigned
                 properties:
-                  apigroup:
-                    description: APIGroup is the API group of the assigned resource
+                  apiGroup:
+                    description: APIGroup is the API group of the object
                     type: string
                   kind:
-                    description: Kind is the object kind of the assigned resource
+                    description: Kind is the kind of the object
                     type: string
                   name:
                     description: Name is the name of the scope
@@ -63,10 +72,9 @@ spec:
                     description: Scope is the absolute scope path
                     type: string
                 required:
-                - apigroup
+                - apiGroup
                 - kind
                 - name
-                - scope
                 type: object
               ip:
                 description: IP specifies an IP address which should be reserved.
@@ -84,7 +92,6 @@ spec:
                     type: string
                 required:
                 - name
-                - scope
                 type: object
             required:
             - subnet
@@ -92,6 +99,35 @@ spec:
           status:
             description: ReservedIPStatus defines the observed state of ReservedIP
             properties:
+              bound:
+                description: ReservedIPBound describes the binding state of a ReservedIP
+                properties:
+                  assignment:
+                    description: KindReference defines an object with its kind and
+                      API group and its scope reference
+                    properties:
+                      apiGroup:
+                        description: APIGroup is the API group of the object
+                        type: string
+                      kind:
+                        description: Kind is the kind of the object
+                        type: string
+                      name:
+                        description: Name is the name of the scope
+                        type: string
+                      scope:
+                        description: Scope is the absolute scope path
+                        type: string
+                    required:
+                    - apiGroup
+                    - kind
+                    - name
+                    type: object
+                  mode:
+                    type: string
+                required:
+                - mode
+                type: object
               conditions:
                 description: Conditions represents the status for individual operators
                 items:
@@ -171,8 +207,6 @@ spec:
               state:
                 description: State indicates the state of a resource
                 type: string
-            required:
-            - conditions
             type: object
         type: object
     served: true

@@ -23,13 +23,16 @@ import (
 
 // SubnetSpec defines the desired state of Subnet
 type SubnetSpec struct {
+	// Parent is a reference to a public parent Subnet without regional manifestation. The direct children
+	// then represent the regional incarnations of this public subnet.
+	Parent common.ScopeReference `json:"parent,omitempty"`
 	// Locations defines in which regions and availability zone this subnet should be available
 	Locations []common.RegionAvailability `json:"locations,omitempty"`
-	// RouteTable is the reference to the routing table this SubNet should be associated with
-	RouteTable common.ScopeReference `json:"routeTable"`
+	// RoutingDomain is the reference to the routing domain this SubNet should be associated with
+	RoutingDomain common.ScopeReference `json:"routingDomain"`
 	// Ranges defines the size of the subnet
 	// +kubebuilder:validation:MinItems:=1
-	Ranges []RangeType `json:"ranges"`
+	Ranges []RangeType `json:"ranges,omitempty"`
 }
 
 // RangeType defines the range/size of a subnet
@@ -57,7 +60,7 @@ type CIDRStatus struct {
 	// CIDR defines the cidr
 	CIDR common.Cidr `json:"cidr"`
 	// BlockedRanges is a list of blocked cidr ranges
-	BlockedRanges []common.Cidr `json:"blockedRanges"`
+	BlockedRanges []common.Cidr `json:"blockedRanges,omitempty"`
 }
 
 const (
@@ -69,7 +72,10 @@ const (
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
-//+kubebuilder:printcolumn:name="StateFields",type=string,JSONPath=`.status.state`
+//+kubebuilder:resource:shortName=sn
+//+kubebuilder:printcolumn:name="RoutingDomain",type=string,JSONPath=`.spec.routingDomain.name`
+//+kubebuilder:printcolumn:name="Ranges",type=string,JSONPath=`.spec.ranges`,priority=100
+//+kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.state`
 //+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
 // Subnet is the Schema for the subnets API

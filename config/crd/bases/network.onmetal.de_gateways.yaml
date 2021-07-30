@@ -13,12 +13,32 @@ spec:
     kind: Gateway
     listKind: GatewayList
     plural: gateways
+    shortNames:
+    - gw
     singular: gateway
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
+    - jsonPath: .spec.mode
+      name: Mode
+      type: string
+    - jsonPath: .spec.regions
+      name: Regions
+      type: string
+    - jsonPath: .spec.uplink
+      name: Uplink
+      priority: 100
+      type: string
+    - jsonPath: .status.ips
+      name: IPs
+      priority: 100
+      type: string
+    - jsonPath: .spec.filterRules
+      name: FilterRules
+      priority: 100
+      type: string
     - jsonPath: .status.state
-      name: StateFields
+      name: State
       type: string
     - jsonPath: .metadata.creationTimestamp
       name: Age
@@ -43,16 +63,36 @@ spec:
           spec:
             description: GatewaySpec defines the desired state of Gateway
             properties:
-              locations:
+              filterRules:
                 items:
-                  type: string
+                  properties:
+                    securityGroup:
+                      description: ScopeReference refers to a scope and the scopes
+                        name
+                      properties:
+                        name:
+                          description: Name is the name of the scope
+                          type: string
+                        scope:
+                          description: Scope is the absolute scope path
+                          type: string
+                      required:
+                      - name
+                      type: object
+                  type: object
                 type: array
               mode:
                 type: string
+              regions:
+                description: Regions is a list of regions where this Gateway should
+                  be available
+                items:
+                  type: string
+                type: array
               uplink:
                 description: Uplink is either a ReservedIP or a Subnet
                 properties:
-                  apigroup:
+                  apiGroup:
                     description: APIGroup is the API group of the object
                     type: string
                   kind:
@@ -65,10 +105,9 @@ spec:
                     description: Scope is the absolute scope path
                     type: string
                 required:
-                - apigroup
+                - apiGroup
                 - kind
                 - name
-                - scope
                 type: object
             required:
             - mode
@@ -147,17 +186,17 @@ spec:
                   - type
                   type: object
                 type: array
-              ip:
-                description: 'TODO: create marshal/unmarshal functions'
-                type: string
+              ips:
+                items:
+                  description: 'TODO: create marshal/unmarshal functions'
+                  type: string
+                type: array
               message:
                 description: Message contains a message for the corresponding state
                 type: string
               state:
                 description: State indicates the state of a resource
                 type: string
-            required:
-            - conditions
             type: object
         type: object
     served: true

@@ -1,13 +1,13 @@
-# permissions for end users to edit routetables.
+# permissions for end users to edit routingdomains.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: routetable-editor-role
+  name: routingdomain-editor-role
 rules:
 - apiGroups:
   - network.onmetal.de
   resources:
-  - routetables
+  - routingdomains
   verbs:
   - create
   - delete
@@ -19,6 +19,6 @@ rules:
 - apiGroups:
   - network.onmetal.de
   resources:
-  - routetables/status
+  - routingdomains/status
   verbs:
   - get

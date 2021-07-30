@@ -61,13 +61,12 @@ spec:
                     type: string
                 required:
                 - name
-                - scope
                 type: object
               size:
                 type: string
             type: object
           status:
-            description: IPRangeStatus defines the observed state of IPAMRange
+            description: IPAMRangeStatus defines the observed state of IPAMRange
             properties:
               cidr:
                 type: string
@@ -151,8 +150,6 @@ spec:
               state:
                 description: State indicates the state of a resource
                 type: string
-            required:
-            - conditions
             type: object
         type: object
     served: true

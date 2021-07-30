@@ -73,7 +73,6 @@ spec:
                     type: string
                 required:
                 - name
-                - scope
                 type: object
               source:
                 description: Source references either an image or a snapshot
@@ -89,7 +88,6 @@ spec:
                         type: string
                     required:
                     - name
-                    - scope
                     type: object
                   snapshot:
                     description: Snapshot defines the snapshot which should be used
@@ -102,7 +100,6 @@ spec:
                         type: string
                     required:
                     - name
-                    - scope
                     type: object
                 type: object
               volume:
@@ -117,7 +114,6 @@ spec:
                     type: string
                 required:
                 - name
-                - scope
                 type: object
             required:
             - machine
@@ -204,8 +200,6 @@ spec:
               state:
                 description: State indicates the state of a resource
                 type: string
-            required:
-            - conditions
             type: object
         type: object
     served: true

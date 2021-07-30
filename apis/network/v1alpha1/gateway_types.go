@@ -30,21 +30,33 @@ const (
 
 // GatewaySpec defines the desired state of Gateway
 type GatewaySpec struct {
-	Mode      string   `json:"mode"`
-	Locations []string `json:"locations,omitempty"`
+	Mode string `json:"mode"`
+	// Regions is a list of regions where this Gateway should be available
+	Regions     []string     `json:"regions,omitempty"`
+	FilterRules []FilterRule `json:"filterRules,omitempty"`
 	// Uplink is either a ReservedIP or a Subnet
 	Uplink common.KindReference `json:"uplink"`
+}
+
+type FilterRule struct {
+	SecurityGroup common.ScopeReference `json:"securityGroup,omitempty"`
 }
 
 // GatewayStatus defines the observed state of Gateway
 type GatewayStatus struct {
 	common.StateFields `json:",inline"`
-	IP                 common.IPAddr `json:"ip,omitempty"`
+	IPs                []common.IPAddr `json:"ips,omitempty"`
 }
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
-//+kubebuilder:printcolumn:name="StateFields",type=string,JSONPath=`.status.state`
+//+kubebuilder:resource:shortName=gw
+//+kubebuilder:printcolumn:name="Mode",type=string,JSONPath=`.spec.mode`
+//+kubebuilder:printcolumn:name="Regions",type=string,JSONPath=`.spec.regions`
+//+kubebuilder:printcolumn:name="Uplink",type=string,JSONPath=`.spec.uplink`,priority=100
+//+kubebuilder:printcolumn:name="IPs",type=string,JSONPath=`.status.ips`,priority=100
+//+kubebuilder:printcolumn:name="FilterRules",type=string,JSONPath=`.spec.filterRules`,priority=100
+//+kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.state`
 //+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
 // Gateway is the Schema for the gateways API

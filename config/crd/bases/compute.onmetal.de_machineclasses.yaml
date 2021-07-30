@@ -73,7 +73,7 @@ spec:
                   description: RegionAvailability defines a region with its availability
                     zones
                   properties:
-                    availabilityZone:
+                    availabilityZones:
                       description: Zones is a list of zones in this region
                       items:
                         description: ZoneAvailability defines the name of a zone
@@ -89,7 +89,6 @@ spec:
                       description: Region is the name of the region
                       type: string
                   required:
-                  - availabilityZone
                   - region
                   type: object
                 type: array

@@ -205,11 +205,11 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "Machine")
 		os.Exit(1)
 	}
-	if err = (&networkcontrollers.RouteTableReconciler{
+	if err = (&networkcontrollers.RoutingDomainReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "RouteTable")
+		setupLog.Error(err, "unable to create controller", "controller", "RoutingDomain")
 		os.Exit(1)
 	}
 	if err = (&networkcontrollers.IPRangeReconciler{

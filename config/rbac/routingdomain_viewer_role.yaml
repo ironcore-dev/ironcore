@@ -1,13 +1,13 @@
-# permissions for end users to view routetables.
+# permissions for end users to view routingdomains.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: routetable-viewer-role
+  name: routingdomain-viewer-role
 rules:
 - apiGroups:
   - network.onmetal.de
   resources:
-  - routetables
+  - routingdomains
   verbs:
   - get
   - list
@@ -15,6 +15,6 @@ rules:
 - apiGroups:
   - network.onmetal.de
   resources:
-  - routetables/status
+  - routingdomains/status
   verbs:
   - get

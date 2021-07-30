@@ -72,12 +72,11 @@ spec:
                     type: string
                 required:
                 - name
-                - scope
                 type: object
               target:
                 description: Target is the resource the IP is assigned to
                 properties:
-                  apigroup:
+                  apiGroup:
                     description: APIGroup is the API group of the object
                     type: string
                   kind:
@@ -90,10 +89,9 @@ spec:
                     description: Scope is the absolute scope path
                     type: string
                 required:
-                - apigroup
+                - apiGroup
                 - kind
                 - name
-                - scope
                 type: object
             required:
             - ip
@@ -179,8 +177,6 @@ spec:
               state:
                 description: State indicates the state of a resource
                 type: string
-            required:
-            - conditions
             type: object
         type: object
     served: true

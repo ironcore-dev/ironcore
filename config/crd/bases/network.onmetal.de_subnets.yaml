@@ -13,12 +13,21 @@ spec:
     kind: Subnet
     listKind: SubnetList
     plural: subnets
+    shortNames:
+    - sn
     singular: subnet
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
+    - jsonPath: .spec.routingDomain.name
+      name: RoutingDomain
+      type: string
+    - jsonPath: .spec.ranges
+      name: Ranges
+      priority: 100
+      type: string
     - jsonPath: .status.state
-      name: StateFields
+      name: State
       type: string
     - jsonPath: .metadata.creationTimestamp
       name: Age
@@ -50,7 +59,7 @@ spec:
                   description: RegionAvailability defines a region with its availability
                     zones
                   properties:
-                    availabilityZone:
+                    availabilityZones:
                       description: Zones is a list of zones in this region
                       items:
                         description: ZoneAvailability defines the name of a zone
@@ -66,10 +75,23 @@ spec:
                       description: Region is the name of the region
                       type: string
                   required:
-                  - availabilityZone
                   - region
                   type: object
                 type: array
+              parent:
+                description: Parent is a reference to a public parent Subnet without
+                  regional manifestation. The direct children then represent the regional
+                  incarnations of this public subnet.
+                properties:
+                  name:
+                    description: Name is the name of the scope
+                    type: string
+                  scope:
+                    description: Scope is the absolute scope path
+                    type: string
+                required:
+                - name
+                type: object
               ranges:
                 description: Ranges defines the size of the subnet
                 items:
@@ -97,7 +119,6 @@ spec:
                           type: string
                       required:
                       - name
-                      - scope
                       type: object
                     size:
                       description: Size defines the size of a subnet e.g. "/12"
@@ -105,9 +126,9 @@ spec:
                   type: object
                 minItems: 1
                 type: array
-              routeTable:
-                description: RouteTable is the reference to the routing table this
-                  SubNet should be associated with
+              routingDomain:
+                description: RoutingDomain is the reference to the routing domain
+                  this SubNet should be associated with
                 properties:
                   name:
                     description: Name is the name of the scope
@@ -117,11 +138,9 @@ spec:
                     type: string
                 required:
                 - name
-                - scope
                 type: object
             required:
-            - ranges
-            - routeTable
+            - routingDomain
             type: object
           status:
             description: SubnetStatus defines the observed state of Subnet
@@ -141,7 +160,6 @@ spec:
                       description: CIDR defines the cidr
                       type: string
                   required:
-                  - blockedRanges
                   - cidr
                   type: object
                 type: array
@@ -221,8 +239,6 @@ spec:
               state:
                 description: State indicates the state of a resource
                 type: string
-            required:
-            - conditions
             type: object
         type: object
     served: true

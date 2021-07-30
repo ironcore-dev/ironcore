@@ -1,0 +1,15 @@
+apiVersion: network.onmetal.de/v1alpha1
+kind: RoutingDomain
+metadata:
+  name: public-access
+  namespace: external-access
+spec:
+  routes:
+    - cidr: 0.0.0.0/0
+      target:
+        kind: Gateway
+        apiGroup: network.onmetal.de
+        name: gateway
+status:
+  state: Up
+  message: "All good"

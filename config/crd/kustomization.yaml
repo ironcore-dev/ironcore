@@ -18,8 +18,8 @@ resources:
 - bases/network.onmetal.de_securitygroups.yaml
 - bases/network.onmetal.de_subnets.yaml
 - bases/compute.onmetal.de_machines.yaml
-- bases/network.onmetal.de_routetables.yaml
-- bases/network.onmetal.de_ipranges.yaml
+- bases/network.onmetal.de_routingdomains.yaml
+- bases/network.onmetal.de_ipamranges.yaml
 - bases/network.onmetal.de_gateways.yaml
 #+kubebuilder:scaffold:crdkustomizeresource
 
@@ -42,7 +42,7 @@ patchesStrategicMerge:
 #- patches/webhook_in_securitygroups.yaml
 #- patches/webhook_in_subnets.yaml
 #- patches/webhook_in_machines.yaml
-#- patches/webhook_in_routetables.yaml
+#- patches/webhook_in_routingdomain.yaml
 #- patches/webhook_in_ipranges.yaml
 #- patches/webhook_in_gateways.yaml
 #+kubebuilder:scaffold:crdkustomizewebhookpatch
@@ -65,7 +65,7 @@ patchesStrategicMerge:
 #- patches/cainjection_in_securitygroups.yaml
 #- patches/cainjection_in_subnets.yaml
 #- patches/cainjection_in_machines.yaml
-#- patches/cainjection_in_routetables.yaml
+#- patches/cainjection_in_routingdomain.yaml
 #- patches/cainjection_in_ipranges.yaml
 #- patches/cainjection_in_gateways.yaml
 #+kubebuilder:scaffold:crdkustomizecainjectionpatch

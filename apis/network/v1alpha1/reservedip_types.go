@@ -29,16 +29,7 @@ type ReservedIPSpec struct {
 	// associated Subnet
 	IP common.IPAddr `json:"ip,omitempty"`
 	// Assignment indicates to which resource this IP address should be assigned
-	Assignment Assignment `json:"assignment,omitempty"`
-}
-
-// Assignment defines the Assignment type to which an IP address can be bind
-type Assignment struct {
-	// Kind is the object kind of the assigned resource
-	Kind string `json:"kind"`
-	// APIGroup is the API group of the assigned resource
-	APIGroup              string `json:"apigroup"`
-	common.ScopeReference `json:",inline"`
+	Assignment common.KindReference `json:"assignment,omitempty"`
 }
 
 // ReservedIPStatus defines the observed state of ReservedIP
@@ -46,12 +37,32 @@ type ReservedIPStatus struct {
 	// IP indicates the effective reserved IP address
 	IP                 common.IPAddr `json:"ip,omitempty"`
 	common.StateFields `json:",inline"`
+	Bound              *ReservedIPBound `json:"bound,omitempty"`
 }
+
+// ReservedIPBound describes the binding state of a ReservedIP
+type ReservedIPBound struct {
+	Mode       string               `json:"mode"`
+	Assignment common.KindReference `json:"assignment,omitempty"`
+}
+
+const (
+	// BoundModeFloating defines a ReservedIP which is dynamically assigned
+	// as additional DNAT-ed IP for the target resource.
+	BoundModeFloating = "Floating"
+	// BoundModeStatic defines a ReservedIP which is directly assigned to an interface
+	// of the target resource. This means the target is directly connected to the Subnet
+	// of the reserved IP.
+	BoundModeStatic = "Static"
+)
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:resource:shortName=rip
 //+kubebuilder:printcolumn:name="IP",type=string,JSONPath=`.status.ip`
-//+kubebuilder:printcolumn:name="StateFields",type=string,JSONPath=`.status.state`
+//+kubebuilder:printcolumn:name="Mode",type=string,JSONPath=`.status.bound.mode`
+//+kubebuilder:printcolumn:name="Assignment",type=string,JSONPath=`.status.bound.assignment`,priority=100
+//+kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.state`
 //+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
 // ReservedIP is the Schema for the reservedips API

@@ -295,7 +295,7 @@ rules:
 - apiGroups:
   - network.onmetal.de
   resources:
-  - routetables
+  - routingdomains
   verbs:
   - create
   - delete
@@ -307,13 +307,13 @@ rules:
 - apiGroups:
   - network.onmetal.de
   resources:
-  - routetables/finalizers
+  - routingdomains/finalizers
   verbs:
   - update
 - apiGroups:
   - network.onmetal.de
   resources:
-  - routetables/status
+  - routingdomains/status
   verbs:
   - get
   - patch

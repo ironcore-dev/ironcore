@@ -158,7 +158,6 @@ spec:
                 type: string
             required:
             - account
-            - conditions
             - parentNamespace
             - parentScope
             type: object

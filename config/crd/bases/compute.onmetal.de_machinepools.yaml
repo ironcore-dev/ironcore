@@ -202,7 +202,6 @@ spec:
                 - classes
                 type: object
             required:
-            - conditions
             - used
             type: object
         type: object

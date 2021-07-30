@@ -18,6 +18,7 @@ package network
 
 import (
 	"context"
+	"github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -27,36 +28,47 @@ import (
 	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 )
 
-// RouteTableReconciler reconciles a RouteTable object
-type RouteTableReconciler struct {
+// RoutingDomainReconciler reconciles a RoutingDomain object
+type RoutingDomainReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=network.onmetal.de,resources=routetables,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=network.onmetal.de,resources=routetables/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=network.onmetal.de,resources=routetables/finalizers,verbs=update
+//+kubebuilder:rbac:groups=network.onmetal.de,resources=routingdomains,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=network.onmetal.de,resources=routingdomains/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=network.onmetal.de,resources=routingdomains/finalizers,verbs=update
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
 // TODO(user): Modify the Reconcile function to compare the state specified by
-// the RouteTable object against the actual cluster state, and then
+// the RoutingDomain object against the actual cluster state, and then
 // perform operations to make the cluster state reflect the state specified by
 // the user.
 //
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.8.3/pkg/reconcile
-func (r *RouteTableReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+func (r *RoutingDomainReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
 
-	// your logic here
+	var routingDomain networkv1alpha1.RoutingDomain
+
+	if err := r.Get(ctx, req.NamespacedName, &routingDomain); err != nil {
+		return ctrl.Result{}, err
+	}
+
+	newRoutingDomain := routingDomain.DeepCopy()
+	newRoutingDomain.Status.State = v1alpha1.StateReady
+
+	if err := r.Status().Patch(ctx, newRoutingDomain, client.MergeFrom(&routingDomain)); err != nil {
+		return ctrl.Result{}, err
+	}
 
 	return ctrl.Result{}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
-func (r *RouteTableReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *RoutingDomainReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&networkv1alpha1.RouteTable{}).
+		For(&networkv1alpha1.RoutingDomain{}).
 		Complete(r)
 }

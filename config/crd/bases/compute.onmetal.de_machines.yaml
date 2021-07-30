@@ -26,6 +26,12 @@ spec:
     - jsonPath: .spec.image.name
       name: Image
       type: string
+    - jsonPath: .spec.location.region
+      name: Region
+      type: string
+    - jsonPath: .spec.location.availabilityZone
+      name: AZ
+      type: string
     - jsonPath: .status.state
       name: State
       type: string
@@ -66,7 +72,6 @@ spec:
                     type: string
                 required:
                 - name
-                - scope
                 type: object
               location:
                 description: Location is the physical location of the machine
@@ -78,21 +83,7 @@ spec:
                     description: Region defines the region of a resource
                     type: string
                 required:
-                - availabilityZone
                 - region
-                type: object
-              machine_pool:
-                description: MachinePool defines the compute pool of the machine
-                properties:
-                  name:
-                    description: Name is the name of the scope
-                    type: string
-                  scope:
-                    description: Scope is the absolute scope path
-                    type: string
-                required:
-                - name
-                - scope
                 type: object
               machineClass:
                 description: MachineClass is the machine class/flavor of the machine
@@ -105,7 +96,18 @@ spec:
                     type: string
                 required:
                 - name
-                - scope
+                type: object
+              machinePool:
+                description: MachinePool defines the compute pool of the machine
+                properties:
+                  name:
+                    description: Name is the name of the scope
+                    type: string
+                  scope:
+                    description: Scope is the absolute scope path
+                    type: string
+                required:
+                - name
                 type: object
               securityGroups:
                 description: 'Interfaces define a list of network interfaces present
@@ -122,7 +124,6 @@ spec:
                       type: string
                   required:
                   - name
-                  - scope
                   type: object
                 type: array
               sshPublicKeys:
@@ -221,7 +222,6 @@ spec:
                           type: string
                       required:
                       - name
-                      - scope
                       type: object
                     volume:
                       description: Volume is a reference to an existing volume
@@ -234,7 +234,6 @@ spec:
                           type: string
                       required:
                       - name
-                      - scope
                       type: object
                   required:
                   - device
@@ -331,8 +330,6 @@ spec:
               state:
                 description: State indicates the state of a resource
                 type: string
-            required:
-            - conditions
             type: object
         type: object
     served: true

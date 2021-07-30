@@ -21,46 +21,54 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// RouteTableSpec defines the desired state of RouteTable
-type RouteTableSpec struct {
+// RoutingDomainSpec defines the desired state of RoutingDomain
+// Subnets associated with a RoutingDomain are routed implicitly and don't
+// need explicit routing instructions.
+type RoutingDomainSpec struct {
+	// Routes is a list of routing instructions
 	Routes []Route `json:"routes"`
 }
 
-// Route
+// Route describes a single route definition
 type Route struct {
+	// SubnetRef is a reference to Subnet
 	SubnetRef common.ScopeReference `json:"subnetRef,omitempty"`
-	CIDR      string                `json:"cidr,omitempty"`
-	Target    common.ScopeReference `json:"target,omitempty"`
+	// CIDR is the matching CIDR of a Route
+	CIDR string `json:"cidr,omitempty"`
+	// Target is the target object of a Route
+	Target common.KindReference `json:"target,omitempty"`
 }
 
-// RouteTableStatus defines the observed state of RouteTable
-type RouteTableStatus struct {
+// RoutingDomainStatus defines the observed state of RoutingDomain
+type RoutingDomainStatus struct {
 	common.StateFields `json:",inline"`
 }
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
-//+kubebuilder:printcolumn:name="StateFields",type=string,JSONPath=`.status.state`
+//+kubebuilder:resource:shortName=rd
+//+kubebuilder:printcolumn:name="Routes",type=string,JSONPath=`.spec.routes`,priority=100
+//+kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.state`
 //+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
-// RouteTable is the Schema for the routetables API
-type RouteTable struct {
+// RoutingDomain is the Schema for the RoutingDomain API
+type RoutingDomain struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   RouteTableSpec   `json:"spec,omitempty"`
-	Status RouteTableStatus `json:"status,omitempty"`
+	Spec   RoutingDomainSpec   `json:"spec,omitempty"`
+	Status RoutingDomainStatus `json:"status,omitempty"`
 }
 
 //+kubebuilder:object:root=true
 
-// RouteTableList contains a list of RouteTable
-type RouteTableList struct {
+// RoutingDomainList contains a list of RoutingDomain
+type RoutingDomainList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []RouteTable `json:"items"`
+	Items           []RoutingDomain `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&RouteTable{}, &RouteTableList{})
+	SchemeBuilder.Register(&RoutingDomain{}, &RoutingDomainList{})
 }
