@@ -6,14 +6,14 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.1
   creationTimestamp: null
-  name: machinepools.compute.onmetal.de
+  name: routetables.network.onmetal.de
 spec:
-  group: compute.onmetal.de
+  group: network.onmetal.de
   names:
-    kind: MachinePool
-    listKind: MachinePoolList
-    plural: machinepools
-    singular: machinepool
+    kind: RouteTable
+    listKind: RouteTableList
+    plural: routetables
+    singular: routetable
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
@@ -26,7 +26,7 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: MachinePool is the Schema for the machinepools API
+        description: RouteTable is the Schema for the routetables API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -41,57 +41,49 @@ spec:
           metadata:
             type: object
           spec:
-            description: MachinePoolSpec defines the desired state of MachinePool
+            description: RouteTableSpec defines the desired state of RouteTable
             properties:
-              capacity:
-                description: Capacity defines the quantity of this machine pool per
-                  availability zone
+              routes:
                 items:
-                  description: AvailabilityZoneQuantity defines the quantity of available
-                    MachineClasses in a given AZ
+                  description: Route
                   properties:
-                    availabilityZone:
-                      description: AvailabilityZone is the name of the availability
-                        zone
+                    cidr:
                       type: string
-                    classes:
-                      description: Classes defines a list of machine classes and their
-                        corresponding quantities
-                      items:
-                        description: MachineClassQuantity defines the quantity of
-                          a given MachineClass
-                        properties:
-                          name:
-                            description: Name is the name of the machine class quantity
-                            type: string
-                          quantity:
-                            description: Quantity is an absolut number of the available
-                              machine class
-                            minimum: 0
-                            type: integer
-                        required:
-                        - name
-                        - quantity
-                        type: object
-                      type: array
-                  required:
-                  - availabilityZone
-                  - classes
+                    subnetRef:
+                      description: ScopeReference refers to a scope and the scopes
+                        name
+                      properties:
+                        name:
+                          description: Name is the name of the scope
+                          type: string
+                        scope:
+                          description: Scope is the absolute scope path
+                          type: string
+                      required:
+                      - name
+                      - scope
+                      type: object
+                    target:
+                      description: ScopeReference refers to a scope and the scopes
+                        name
+                      properties:
+                        name:
+                          description: Name is the name of the scope
+                          type: string
+                        scope:
+                          description: Scope is the absolute scope path
+                          type: string
+                      required:
+                      - name
+                      - scope
+                      type: object
                   type: object
                 type: array
-              privacy:
-                description: Privacy indicates the privacy scope of the machine pool
-                type: string
-              region:
-                description: Region defines the region where this machine pool is
-                  available
-                type: string
             required:
-            - capacity
-            - privacy
+            - routes
             type: object
           status:
-            description: MachinePoolStatus defines the observed state of MachinePool
+            description: RouteTableStatus defines the observed state of RouteTable
             properties:
               conditions:
                 description: Conditions represents the status for individual operators
@@ -169,41 +161,8 @@ spec:
               state:
                 description: State indicates the state of a resource
                 type: string
-              used:
-                description: AvailabilityZoneQuantity defines the quantity of available
-                  MachineClasses in a given AZ
-                properties:
-                  availabilityZone:
-                    description: AvailabilityZone is the name of the availability
-                      zone
-                    type: string
-                  classes:
-                    description: Classes defines a list of machine classes and their
-                      corresponding quantities
-                    items:
-                      description: MachineClassQuantity defines the quantity of a
-                        given MachineClass
-                      properties:
-                        name:
-                          description: Name is the name of the machine class quantity
-                          type: string
-                        quantity:
-                          description: Quantity is an absolut number of the available
-                            machine class
-                          minimum: 0
-                          type: integer
-                      required:
-                      - name
-                      - quantity
-                      type: object
-                    type: array
-                required:
-                - availabilityZone
-                - classes
-                type: object
             required:
             - conditions
-            - used
             type: object
         type: object
     served: true

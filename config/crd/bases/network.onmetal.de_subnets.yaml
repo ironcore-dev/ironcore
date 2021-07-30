@@ -70,8 +70,44 @@ spec:
                   - region
                   type: object
                 type: array
-              parentsubnet:
-                description: ParentSubnet is a reference to the parent of a subnet
+              ranges:
+                description: Ranges defines the size of the subnet
+                items:
+                  description: RangeType defines the range/size of a subnet
+                  properties:
+                    blockedRanges:
+                      description: BlockedRanges specifies which part of the subnet
+                        should be used for static IP assignment e.g. 0/14 means the
+                        first /14 subnet is blocked in the allocated /12 subnet
+                      items:
+                        type: string
+                      type: array
+                    cidr:
+                      description: CIDR is the CIDR block
+                      type: string
+                    ipam:
+                      description: IPAM is a reference to the an range block of a
+                        subnet
+                      properties:
+                        name:
+                          description: Name is the name of the scope
+                          type: string
+                        scope:
+                          description: Scope is the absolute scope path
+                          type: string
+                      required:
+                      - name
+                      - scope
+                      type: object
+                    size:
+                      description: Size defines the size of a subnet e.g. "/12"
+                      type: string
+                  type: object
+                minItems: 1
+                type: array
+              routeTable:
+                description: RouteTable is the reference to the routing table this
+                  SubNet should be associated with
                 properties:
                   name:
                     description: Name is the name of the scope
@@ -83,44 +119,110 @@ spec:
                 - name
                 - scope
                 type: object
-              ranges:
-                description: Ranges defines the size of the subnet
-                items:
-                  description: RangeType defines the range/size of a subnet
-                  properties:
-                    blockedranges:
-                      description: BlockedRanges specifies which part of the subnet
-                        should be used for static IP assignment
-                      items:
-                        description: 'TODO: create marshal/unmarshal functions'
-                        type: string
-                      type: array
-                    capacity:
-                      description: Capacity defines the absolute number of IPs in
-                        a given subnet
-                      minimum: 0
-                      type: integer
-                    cidr:
-                      description: CIDR is the CIDR block
-                      type: string
-                    size:
-                      description: Size defines the size of a subnet e.g. "/12"
-                      type: string
-                  type: object
-                minItems: 1
-                type: array
             required:
             - ranges
+            - routeTable
             type: object
           status:
             description: SubnetStatus defines the observed state of Subnet
             properties:
+              cidrs:
+                description: CIDRs is a list of CIDR status
+                items:
+                  description: CIDRStatus is the status of a CIDR
+                  properties:
+                    blockedRanges:
+                      description: BlockedRanges is a list of blocked cidr ranges
+                      items:
+                        description: 'TODO: create marshal/unmarshal functions'
+                        type: string
+                      type: array
+                    cidr:
+                      description: CIDR defines the cidr
+                      type: string
+                  required:
+                  - blockedRanges
+                  - cidr
+                  type: object
+                type: array
+              conditions:
+                description: Conditions represents the status for individual operators
+                items:
+                  description: "Condition contains details for one aspect of the current
+                    state of this API Resource. --- This struct is intended for direct
+                    use as an array at the field path .status.conditions.  For example,
+                    type FooStatus struct{     // Represents the observations of a
+                    foo's current state.     // Known .status.conditions.type are:
+                    \"Available\", \"Progressing\", and \"Degraded\"     // +patchMergeKey=type
+                    \    // +patchStrategy=merge     // +listType=map     // +listMapKey=type
+                    \    Conditions []metav1.Condition `json:\"conditions,omitempty\"
+                    patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"`
+                    \n     // other fields }"
+                  properties:
+                    lastTransitionTime:
+                      description: lastTransitionTime is the last time the condition
+                        transitioned from one status to another. This should be when
+                        the underlying condition changed.  If that is not known, then
+                        using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: message is a human readable message indicating
+                        details about the transition. This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: observedGeneration represents the .metadata.generation
+                        that the condition was set based upon. For instance, if .metadata.generation
+                        is currently 12, but the .status.conditions[x].observedGeneration
+                        is 9, the condition is out of date with respect to the current
+                        state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: reason contains a programmatic identifier indicating
+                        the reason for the condition's last transition. Producers
+                        of specific condition types may define expected values and
+                        meanings for this field, and whether the values are considered
+                        a guaranteed API. The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                        --- Many .condition.type values are consistent across resources
+                        like Available, but because arbitrary conditions can be useful
+                        (see .node.status.conditions), the ability to deconflict is
+                        important. The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
               message:
                 description: Message contains a message for the corresponding state
                 type: string
               state:
                 description: State indicates the state of a resource
                 type: string
+            required:
+            - conditions
             type: object
         type: object
     served: true

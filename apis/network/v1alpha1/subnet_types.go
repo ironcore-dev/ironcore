@@ -23,10 +23,10 @@ import (
 
 // SubnetSpec defines the desired state of Subnet
 type SubnetSpec struct {
-	// ParentSubnet is a reference to the parent of a subnet
-	ParentSubnet common.ScopeReference `json:"parentsubnet,omitempty"`
 	// Locations defines in which regions and availability zone this subnet should be available
 	Locations []common.RegionAvailability `json:"locations,omitempty"`
+	// RouteTable is the reference to the routing table this SubNet should be associated with
+	RouteTable common.ScopeReference `json:"routeTable"`
 	// Ranges defines the size of the subnet
 	// +kubebuilder:validation:MinItems:=1
 	Ranges []RangeType `json:"ranges"`
@@ -34,20 +34,30 @@ type SubnetSpec struct {
 
 // RangeType defines the range/size of a subnet
 type RangeType struct {
+	// IPAM is a reference to the an range block of a subnet
+	IPAM common.ScopeReference `json:"ipam,omitempty"`
+	// Size defines the size of a subnet e.g. "/12"
+	Size string `json:"size,omitempty"`
 	// CIDR is the CIDR block
 	CIDR common.Cidr `json:"cidr,omitempty"`
 	// BlockedRanges specifies which part of the subnet should be used for static IP assignment
-	BlockedRanges []common.Cidr `json:"blockedranges,omitempty"`
-	// Size defines the size of a subnet e.g. "/12"
-	Size string `json:"size,omitempty"`
-	// Capacity defines the absolute number of IPs in a given subnet
-	// +kubebuilder:validation:Minimum:=0
-	Capacity int `json:"capacity,omitempty"`
+	// e.g. 0/14 means the first /14 subnet is blocked in the allocated /12 subnet
+	BlockedRanges []string `json:"blockedRanges,omitempty"`
 }
 
 // SubnetStatus defines the observed state of Subnet
 type SubnetStatus struct {
 	common.StateFields `json:",inline"`
+	// CIDRs is a list of CIDR status
+	CIDRs []CIDRStatus `json:"cidrs,omitempty"`
+}
+
+// CIDRStatus is the status of a CIDR
+type CIDRStatus struct {
+	// CIDR defines the cidr
+	CIDR common.Cidr `json:"cidr"`
+	// BlockedRanges is a list of blocked cidr ranges
+	BlockedRanges []common.Cidr `json:"blockedRanges"`
 }
 
 const (

@@ -1,0 +1,7 @@
+apiVersion: network.onmetal.de/v1alpha1
+kind: IPRange
+metadata:
+  name: iprange-sample
+spec:
+  # Add fields here
+  foo: bar

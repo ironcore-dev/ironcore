@@ -16,10 +16,14 @@
 
 package v1alpha1
 
+import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 // StateFields defines the observed state of an object
 type StateFields struct {
 	// State indicates the state of a resource
 	State string `json:"state,omitempty"`
 	// Message contains a message for the corresponding state
 	Message string `json:"message,omitempty"`
+	// Conditions represents the status for individual operators
+	Conditions []metav1.Condition `json:"conditions"`
 }

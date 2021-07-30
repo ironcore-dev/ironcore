@@ -6,14 +6,14 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.1
   creationTimestamp: null
-  name: machinepools.compute.onmetal.de
+  name: gateways.network.onmetal.de
 spec:
-  group: compute.onmetal.de
+  group: network.onmetal.de
   names:
-    kind: MachinePool
-    listKind: MachinePoolList
-    plural: machinepools
-    singular: machinepool
+    kind: Gateway
+    listKind: GatewayList
+    plural: gateways
+    singular: gateway
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
@@ -26,7 +26,7 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: MachinePool is the Schema for the machinepools API
+        description: Gateway is the Schema for the gateways API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -41,57 +41,41 @@ spec:
           metadata:
             type: object
           spec:
-            description: MachinePoolSpec defines the desired state of MachinePool
+            description: GatewaySpec defines the desired state of Gateway
             properties:
-              capacity:
-                description: Capacity defines the quantity of this machine pool per
-                  availability zone
+              locations:
                 items:
-                  description: AvailabilityZoneQuantity defines the quantity of available
-                    MachineClasses in a given AZ
-                  properties:
-                    availabilityZone:
-                      description: AvailabilityZone is the name of the availability
-                        zone
-                      type: string
-                    classes:
-                      description: Classes defines a list of machine classes and their
-                        corresponding quantities
-                      items:
-                        description: MachineClassQuantity defines the quantity of
-                          a given MachineClass
-                        properties:
-                          name:
-                            description: Name is the name of the machine class quantity
-                            type: string
-                          quantity:
-                            description: Quantity is an absolut number of the available
-                              machine class
-                            minimum: 0
-                            type: integer
-                        required:
-                        - name
-                        - quantity
-                        type: object
-                      type: array
-                  required:
-                  - availabilityZone
-                  - classes
-                  type: object
+                  type: string
                 type: array
-              privacy:
-                description: Privacy indicates the privacy scope of the machine pool
+              mode:
                 type: string
-              region:
-                description: Region defines the region where this machine pool is
-                  available
-                type: string
+              uplink:
+                description: Uplink is either a ReservedIP or a Subnet
+                properties:
+                  apigroup:
+                    description: APIGroup is the API group of the object
+                    type: string
+                  kind:
+                    description: Kind is the kind of the object
+                    type: string
+                  name:
+                    description: Name is the name of the scope
+                    type: string
+                  scope:
+                    description: Scope is the absolute scope path
+                    type: string
+                required:
+                - apigroup
+                - kind
+                - name
+                - scope
+                type: object
             required:
-            - capacity
-            - privacy
+            - mode
+            - uplink
             type: object
           status:
-            description: MachinePoolStatus defines the observed state of MachinePool
+            description: GatewayStatus defines the observed state of Gateway
             properties:
               conditions:
                 description: Conditions represents the status for individual operators
@@ -163,47 +147,17 @@ spec:
                   - type
                   type: object
                 type: array
+              ip:
+                description: 'TODO: create marshal/unmarshal functions'
+                type: string
               message:
                 description: Message contains a message for the corresponding state
                 type: string
               state:
                 description: State indicates the state of a resource
                 type: string
-              used:
-                description: AvailabilityZoneQuantity defines the quantity of available
-                  MachineClasses in a given AZ
-                properties:
-                  availabilityZone:
-                    description: AvailabilityZone is the name of the availability
-                      zone
-                    type: string
-                  classes:
-                    description: Classes defines a list of machine classes and their
-                      corresponding quantities
-                    items:
-                      description: MachineClassQuantity defines the quantity of a
-                        given MachineClass
-                      properties:
-                        name:
-                          description: Name is the name of the machine class quantity
-                          type: string
-                        quantity:
-                          description: Quantity is an absolut number of the available
-                            machine class
-                          minimum: 0
-                          type: integer
-                      required:
-                      - name
-                      - quantity
-                      type: object
-                    type: array
-                required:
-                - availabilityZone
-                - classes
-                type: object
             required:
             - conditions
-            - used
             type: object
         type: object
     served: true
