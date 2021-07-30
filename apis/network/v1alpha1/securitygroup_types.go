@@ -48,13 +48,13 @@ type SecurityGroupRule struct {
 	// Name is the name of the SecurityGroupRule
 	Name string `json:"name"`
 	// SecurityGroupRef is a scoped reference to an existing SecurityGroup
-	SecurityGroupRef common.ScopeReference `json:"securitygroupref,omitempty"`
+	SecurityGroupRef common.ScopeReference `json:"securityGroupRef,omitempty"`
 	// Action defines the action type of a SecurityGroupRule
 	Action ActionType `json:"action,omitempty"`
 	// Protocol defines the protocol of a SecurityGroupRule
 	Protocol string `json:"protocol,omitempty"`
 	// PortRange is the port range of the SecurityGroupRule
-	PortRange PortRange `json:"portrange,omitempty"`
+	PortRange *PortRange `json:"portRange,omitempty"`
 }
 
 // IPSetSpec defines either a cidr or a security group reference
@@ -62,15 +62,15 @@ type IPSetSpec struct {
 	// CIDR block for source/destination
 	CIDR common.Cidr `json:"cidr,omitempty"`
 	// SecurityGroupRef references a security group
-	SecurityGroupRef common.ScopeReference `json:"securitygroupref,omitempty"`
+	SecurityGroupRef common.ScopeReference `json:"securityGroupref,omitempty"`
 }
 
 // PortRange defines the start and end of a port range
 type PortRange struct {
 	// StartPort is the start port of the port range
-	StartPort int `json:"startport"`
+	StartPort int `json:"startPort"`
 	// EndPort is the end port of the port range
-	EndPort int `json:"endport"`
+	EndPort int `json:"endPort,omitempty"`
 }
 
 // ActionType describes the action type of a SecurityGroupRule
@@ -91,7 +91,8 @@ const (
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
-//+kubebuilder:printcolumn:name="StateFields",type=string,JSONPath=`.status.state`
+//+kubebuilder:resource:shortName=sg
+//+kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.state`
 //+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
 // SecurityGroup is the Schema for the securitygroups API

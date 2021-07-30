@@ -13,12 +13,14 @@ spec:
     kind: SecurityGroup
     listKind: SecurityGroupList
     plural: securitygroups
+    shortNames:
+    - sg
     singular: securitygroup
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
     - jsonPath: .status.state
-      name: StateFields
+      name: State
       type: string
     - jsonPath: .metadata.creationTimestamp
       name: Age
@@ -59,7 +61,7 @@ spec:
                         cidr:
                           description: CIDR block for source/destination
                           type: string
-                        securitygroupref:
+                        securityGroupref:
                           description: SecurityGroupRef references a security group
                           properties:
                             name:
@@ -75,23 +77,22 @@ spec:
                     name:
                       description: Name is the name of the SecurityGroupRule
                       type: string
-                    portrange:
+                    portRange:
                       description: PortRange is the port range of the SecurityGroupRule
                       properties:
-                        endport:
+                        endPort:
                           description: EndPort is the end port of the port range
                           type: integer
-                        startport:
+                        startPort:
                           description: StartPort is the start port of the port range
                           type: integer
                       required:
-                      - endport
-                      - startport
+                      - startPort
                       type: object
                     protocol:
                       description: Protocol defines the protocol of a SecurityGroupRule
                       type: string
-                    securitygroupref:
+                    securityGroupRef:
                       description: SecurityGroupRef is a scoped reference to an existing
                         SecurityGroup
                       properties:
@@ -120,23 +121,22 @@ spec:
                     name:
                       description: Name is the name of the SecurityGroupRule
                       type: string
-                    portrange:
+                    portRange:
                       description: PortRange is the port range of the SecurityGroupRule
                       properties:
-                        endport:
+                        endPort:
                           description: EndPort is the end port of the port range
                           type: integer
-                        startport:
+                        startPort:
                           description: StartPort is the start port of the port range
                           type: integer
                       required:
-                      - endport
-                      - startport
+                      - startPort
                       type: object
                     protocol:
                       description: Protocol defines the protocol of a SecurityGroupRule
                       type: string
-                    securitygroupref:
+                    securityGroupRef:
                       description: SecurityGroupRef is a scoped reference to an existing
                         SecurityGroup
                       properties:
@@ -156,7 +156,7 @@ spec:
                         cidr:
                           description: CIDR block for source/destination
                           type: string
-                        securitygroupref:
+                        securityGroupref:
                           description: SecurityGroupRef references a security group
                           properties:
                             name:
