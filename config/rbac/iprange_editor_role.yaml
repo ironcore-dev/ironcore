@@ -1,13 +1,13 @@
-# permissions for end users to edit ipranges.
+# permissions for end users to edit ipamranges.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: iprange-editor-role
+  name: ipamrange-editor-role
 rules:
 - apiGroups:
   - network.onmetal.de
   resources:
-  - ipranges
+  - ipamranges
   verbs:
   - create
   - delete
@@ -19,6 +19,6 @@ rules:
 - apiGroups:
   - network.onmetal.de
   resources:
-  - ipranges/status
+  - ipamranges/status
   verbs:
   - get

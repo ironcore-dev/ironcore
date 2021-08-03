@@ -13,12 +13,32 @@ spec:
     kind: IPAMRange
     listKind: IPAMRangeList
     plural: ipamranges
+    shortNames:
+    - ipr
     singular: ipamrange
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
+    - jsonPath: .spec.cidr
+      name: RequestedCIDR
+      type: string
+    - jsonPath: .spec.size
+      name: RequestedSize
+      type: string
+    - jsonPath: .status.cidr
+      name: EffectiveCIDR
+      type: string
+    - jsonPath: .spec.parent.name
+      name: Parent
+      type: string
+    - jsonPath: .status.bound.kind
+      name: BoundKind
+      type: string
+    - jsonPath: .status.bound.kind
+      name: BoundName
+      type: string
     - jsonPath: .status.state
-      name: StateFields
+      name: State
       type: string
     - jsonPath: .metadata.creationTimestamp
       name: Age
@@ -26,7 +46,7 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: IPAMRange is the Schema for the ipranges API
+        description: IPAMRange is the Schema for the ipamranges API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -68,6 +88,27 @@ spec:
           status:
             description: IPAMRangeStatus defines the observed state of IPAMRange
             properties:
+              bound:
+                description: KindReference defines an object with its kind and API
+                  group and its scope reference
+                properties:
+                  apiGroup:
+                    description: APIGroup is the API group of the object
+                    type: string
+                  kind:
+                    description: Kind is the kind of the object
+                    type: string
+                  name:
+                    description: Name is the name of the scope
+                    type: string
+                  scope:
+                    description: Scope is the absolute scope path
+                    type: string
+                required:
+                - apiGroup
+                - kind
+                - name
+                type: object
               cidr:
                 type: string
               conditions:

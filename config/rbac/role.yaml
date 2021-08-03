@@ -243,7 +243,7 @@ rules:
 - apiGroups:
   - network.onmetal.de
   resources:
-  - ipranges
+  - ipamranges
   verbs:
   - create
   - delete
@@ -255,13 +255,13 @@ rules:
 - apiGroups:
   - network.onmetal.de
   resources:
-  - ipranges/finalizers
+  - ipamranges/finalizers
   verbs:
   - update
 - apiGroups:
   - network.onmetal.de
   resources:
-  - ipranges/status
+  - ipamranges/status
   verbs:
   - get
   - patch
@@ -340,32 +340,6 @@ rules:
   - network.onmetal.de
   resources:
   - securitygroups/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - subnetips
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - subnetips/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - subnetips/status
   verbs:
   - get
   - patch

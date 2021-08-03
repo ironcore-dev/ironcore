@@ -36,16 +36,24 @@ type IPAMRangeSpec struct {
 // IPAMRangeStatus defines the observed state of IPAMRange
 type IPAMRangeStatus struct {
 	common.StateFields `json:",inline"`
-	CIDR               string   `json:"cidr,omitempty"`
-	FreeBlocks         []string `json:"freeBlocks,omitempty"`
+	Bound              common.KindReference `json:"bound,omitempty"`
+	CIDR               string               `json:"cidr,omitempty"`
+	FreeBlocks         []string             `json:"freeBlocks,omitempty"`
 }
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
-//+kubebuilder:printcolumn:name="StateFields",type=string,JSONPath=`.status.state`
+//+kubebuilder:resource:shortName=ipr
+//+kubebuilder:printcolumn:name="RequestedCIDR",type=string,JSONPath=`.spec.cidr`
+//+kubebuilder:printcolumn:name="RequestedSize",type=string,JSONPath=`.spec.size`
+//+kubebuilder:printcolumn:name="EffectiveCIDR",type=string,JSONPath=`.status.cidr`
+//+kubebuilder:printcolumn:name="Parent",type=string,JSONPath=`.spec.parent.name`
+//+kubebuilder:printcolumn:name="BoundKind",type=string,JSONPath=`.status.bound.kind`
+//+kubebuilder:printcolumn:name="BoundName",type=string,JSONPath=`.status.bound.kind`
+//+kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.state`
 //+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
-// IPAMRange is the Schema for the ipranges API
+// IPAMRange is the Schema for the ipamranges API
 type IPAMRange struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
