@@ -29,7 +29,7 @@ type MachineSpec struct {
 	// MachineClass is the machine class/flavor of the machine
 	MachineClass common.ScopeReference `json:"machineClass"`
 	// MachinePool defines the compute pool of the machine
-	MachinePool common.ScopeReference `json:"machine_pool,omitempty"`
+	MachinePool common.ScopeReference `json:"machinePool,omitempty"`
 	// Location is the physical location of the machine
 	Location common.Location `json:"location"`
 	// Image is the operating system image of the machine
@@ -95,6 +95,8 @@ type MachineStatus struct {
 //+kubebuilder:printcolumn:name="Hostname",type=string,JSONPath=`.spec.hostname`
 //+kubebuilder:printcolumn:name="MachineClass",type=string,JSONPath=`.spec.machineClass.name`
 //+kubebuilder:printcolumn:name="Image",type=string,JSONPath=`.spec.image.name`
+//+kubebuilder:printcolumn:name="Region",type=string,JSONPath=`.spec.location.region`
+//+kubebuilder:printcolumn:name="AZ",type=string,JSONPath=`.spec.location.availabilityZone`
 //+kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.state`
 //+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 

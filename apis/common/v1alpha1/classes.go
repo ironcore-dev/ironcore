@@ -27,7 +27,8 @@ type RegionAvailability struct {
 	// Region is the name of the region
 	Region string `json:"region"`
 	// Zones is a list of zones in this region
-	Zones []ZoneAvailability `json:"availabilityZone"`
+	//+optional
+	Zones []ZoneAvailability `json:"availabilityZones,omitempty"`
 }
 
 //+kubebuilder:object:generate=true
@@ -37,7 +38,8 @@ type Location struct {
 	// Region defines the region of a resource
 	Region string `json:"region"`
 	// AvailabilityZone is the availability zone of a resource
-	AvailabilityZone string `json:"availabilityZone"`
+	//+optional
+	AvailabilityZone string `json:"availabilityZone,omitempty"`
 }
 
 //+kubebuilder:object:generate=true
@@ -55,7 +57,8 @@ type ScopeReference struct {
 	// Name is the name of the scope
 	Name string `json:"name"`
 	// Scope is the absolute scope path
-	Scope string `json:"scope"`
+	//+optional
+	Scope string `json:"scope,omitempty"`
 }
 
 // KindReference defines an object with its kind and API group and its scope reference
@@ -63,7 +66,7 @@ type KindReference struct {
 	// Kind is the kind of the object
 	Kind string `json:"kind"`
 	// APIGroup is the API group of the object
-	APIGroup       string `json:"apigroup"`
+	APIGroup       string `json:"apiGroup"`
 	ScopeReference `json:",inline"`
 }
 

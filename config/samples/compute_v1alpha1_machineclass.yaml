@@ -14,8 +14,8 @@ spec:
   #- name: gpu
   #  type: nvidia_v100
   #  value: 2
-#status:
-#  availability:
-#    - region: eu-central
-#      availabilityZones:
-#        - az1
+status:
+  availability:
+    - region: eu-central
+      availabilityZones:
+        - az1

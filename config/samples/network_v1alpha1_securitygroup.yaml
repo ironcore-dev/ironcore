@@ -1,33 +1,23 @@
 apiVersion: network.onmetal.de/v1alpha1
 kind: SecurityGroup
 metadata:
-  name: mySecGroup
-  namespace: scope-8739274932
+  name: sshaccess
+  namespace: external-access
 spec:
   ingress:
-    - name: webserver
-      securityGroupRef:
-        name: mySecGroup
-        scope: scope-324342
     - name: ssh
       action: allow # deny
       protocol: TCP # optional "*" if not set
-      portRange: 22 # optional same as protocol
-      source:
-        cidr: 1.1.1.1/16
-        #secGroupRef: # if cidr not set
-        #  name: mySecGroup2
-        #  scope: scope-1342345345
-  egress:
-    - name:
-      action: allow/deny
-      protocol:
       portRange:
+        startPort: 22 # optional same as protocol
+      source:
+        cidr: 0.0.0.0/0
+  egress:
+    - name: externalaccess
+      action: allow
+      protocol: "*"
       destination:
-        #cidr:
-        secGroupRef: # if cidr not set
-          name: mySecGroup2
-          scope: scope-1342345345
-#status:
-#  state: Used/Unused/Invalid
-#  message: "All good"
+        cidr: 0.0.0.0/0
+status:
+  state: Used
+  message: "All good"

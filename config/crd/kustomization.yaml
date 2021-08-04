@@ -14,10 +14,12 @@ resources:
 - bases/storage.onmetal.de_volumes.yaml
 - bases/storage.onmetal.de_volumeattachments.yaml
 - bases/network.onmetal.de_reservedips.yaml
-- bases/network.onmetal.de_subnetips.yaml
 - bases/network.onmetal.de_securitygroups.yaml
 - bases/network.onmetal.de_subnets.yaml
 - bases/compute.onmetal.de_machines.yaml
+- bases/network.onmetal.de_routingdomains.yaml
+- bases/network.onmetal.de_ipamranges.yaml
+- bases/network.onmetal.de_gateways.yaml
 #+kubebuilder:scaffold:crdkustomizeresource
 
 patchesStrategicMerge:
@@ -35,10 +37,12 @@ patchesStrategicMerge:
 #- patches/webhook_in_volumes.yaml
 #- patches/webhook_in_volumeattachments.yaml
 #- patches/webhook_in_reservedips.yaml
-#- patches/webhook_in_subnetips.yaml
 #- patches/webhook_in_securitygroups.yaml
 #- patches/webhook_in_subnets.yaml
 #- patches/webhook_in_machines.yaml
+#- patches/webhook_in_routingdomain.yaml
+#- patches/webhook_in_ipamranges.yaml
+#- patches/webhook_in_gateways.yaml
 #+kubebuilder:scaffold:crdkustomizewebhookpatch
 
 # [CERTMANAGER] To enable webhook, uncomment all the sections with [CERTMANAGER] prefix.
@@ -55,10 +59,12 @@ patchesStrategicMerge:
 #- patches/cainjection_in_volumes.yaml
 #- patches/cainjection_in_volumeattachments.yaml
 #- patches/cainjection_in_reservedips.yaml
-#- patches/cainjection_in_subnetips.yaml
 #- patches/cainjection_in_securitygroups.yaml
 #- patches/cainjection_in_subnets.yaml
 #- patches/cainjection_in_machines.yaml
+#- patches/cainjection_in_routingdomain.yaml
+#- patches/cainjection_in_ipamranges.yaml
+#- patches/cainjection_in_gateways.yaml
 #+kubebuilder:scaffold:crdkustomizecainjectionpatch
 
 # the following config is for teaching kustomize how to do kustomization for CRDs.

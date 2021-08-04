@@ -16,10 +16,27 @@
 
 package v1alpha1
 
+import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+//+kubebuilder:object:generate=true
+
 // StateFields defines the observed state of an object
 type StateFields struct {
 	// State indicates the state of a resource
+	//+optional
 	State string `json:"state,omitempty"`
 	// Message contains a message for the corresponding state
+	//+optional
 	Message string `json:"message,omitempty"`
+	// Conditions represents the status for individual operators
+	//+optional
+	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }
+
+const (
+	StateAvailable = "Available"
+	StateReady     = "Ready"
+	StateUp        = "Up"
+	StateError     = "Error"
+	StateInvalid   = "Invalid"
+)

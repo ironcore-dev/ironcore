@@ -117,15 +117,6 @@ resources:
   controller: true
   domain: onmetal.de
   group: network
-  kind: SubnetIP
-  path: github.com/onmetal/onmetal-api/apis/network/v1alpha1
-  version: v1alpha1
-- api:
-    crdVersion: v1
-    namespaced: true
-  controller: true
-  domain: onmetal.de
-  group: network
   kind: SecurityGroup
   path: github.com/onmetal/onmetal-api/apis/network/v1alpha1
   version: v1alpha1
@@ -146,5 +137,32 @@ resources:
   group: compute
   kind: Machine
   path: github.com/onmetal/onmetal-api/apis/compute/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: onmetal.de
+  group: network
+  kind: RoutingDomain
+  path: github.com/onmetal/onmetal-api/apis/network/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: onmetal.de
+  group: network
+  kind: IPAMRange
+  path: github.com/onmetal/onmetal-api/apis/network/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: onmetal.de
+  group: network
+  kind: Gateway
+  path: github.com/onmetal/onmetal-api/apis/network/v1alpha1
   version: v1alpha1
 version: "3"

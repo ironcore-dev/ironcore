@@ -217,6 +217,58 @@ rules:
 - apiGroups:
   - network.onmetal.de
   resources:
+  - gateways
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - gateways/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - gateways/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - ipamranges
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - ipamranges/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - ipamranges/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
   - reservedips
   verbs:
   - create
@@ -243,6 +295,32 @@ rules:
 - apiGroups:
   - network.onmetal.de
   resources:
+  - routingdomains
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - routingdomains/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - routingdomains/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
   - securitygroups
   verbs:
   - create
@@ -262,32 +340,6 @@ rules:
   - network.onmetal.de
   resources:
   - securitygroups/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - subnetips
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - subnetips/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - subnetips/status
   verbs:
   - get
   - patch

@@ -6,24 +6,21 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.1
   creationTimestamp: null
-  name: subnets.network.onmetal.de
+  name: routingdomains.network.onmetal.de
 spec:
   group: network.onmetal.de
   names:
-    kind: Subnet
-    listKind: SubnetList
-    plural: subnets
+    kind: RoutingDomain
+    listKind: RoutingDomainList
+    plural: routingdomains
     shortNames:
-    - sn
-    singular: subnet
+    - rd
+    singular: routingdomain
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .spec.routingDomain.name
-      name: RoutingDomain
-      type: string
-    - jsonPath: .spec.ranges
-      name: Ranges
+    - jsonPath: .spec.routes
+      name: Routes
       priority: 100
       type: string
     - jsonPath: .status.state
@@ -35,7 +32,7 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Subnet is the Schema for the subnets API
+        description: RoutingDomain is the Schema for the RoutingDomain API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -50,66 +47,20 @@ spec:
           metadata:
             type: object
           spec:
-            description: SubnetSpec defines the desired state of Subnet
+            description: RoutingDomainSpec defines the desired state of RoutingDomain
+              Subnets associated with a RoutingDomain are routed implicitly and don't
+              need explicit routing instructions.
             properties:
-              locations:
-                description: Locations defines in which regions and availability zone
-                  this subnet should be available
+              routes:
+                description: Routes is a list of routing instructions
                 items:
-                  description: RegionAvailability defines a region with its availability
-                    zones
+                  description: Route describes a single route definition
                   properties:
-                    availabilityZones:
-                      description: Zones is a list of zones in this region
-                      items:
-                        description: ZoneAvailability defines the name of a zone
-                        properties:
-                          name:
-                            description: Name is the name of the availability zone
-                            type: string
-                        required:
-                        - name
-                        type: object
-                      type: array
-                    region:
-                      description: Region is the name of the region
-                      type: string
-                  required:
-                  - region
-                  type: object
-                type: array
-              parent:
-                description: Parent is a reference to a public parent Subnet without
-                  regional manifestation. The direct children then represent the regional
-                  incarnations of this public subnet.
-                properties:
-                  name:
-                    description: Name is the name of the scope
-                    type: string
-                  scope:
-                    description: Scope is the absolute scope path
-                    type: string
-                required:
-                - name
-                type: object
-              ranges:
-                description: Ranges defines the size of the subnet
-                items:
-                  description: RangeType defines the range/size of a subnet
-                  properties:
-                    blockedRanges:
-                      description: BlockedRanges specifies which part of the subnet
-                        should be used for static IP assignment e.g. 0/14 means the
-                        first /14 subnet is blocked in the allocated /12 subnet
-                      items:
-                        type: string
-                      type: array
                     cidr:
-                      description: CIDR is the CIDR block
+                      description: CIDR is the matching CIDR of a Route
                       type: string
-                    ipam:
-                      description: IPAM is a reference to the an range block of a
-                        subnet
+                    subnetRef:
+                      description: SubnetRef is a reference to Subnet
                       properties:
                         name:
                           description: Name is the name of the scope
@@ -120,49 +71,34 @@ spec:
                       required:
                       - name
                       type: object
-                    size:
-                      description: Size defines the size of a subnet e.g. "/12"
-                      type: string
+                    target:
+                      description: Target is the target object of a Route
+                      properties:
+                        apiGroup:
+                          description: APIGroup is the API group of the object
+                          type: string
+                        kind:
+                          description: Kind is the kind of the object
+                          type: string
+                        name:
+                          description: Name is the name of the scope
+                          type: string
+                        scope:
+                          description: Scope is the absolute scope path
+                          type: string
+                      required:
+                      - apiGroup
+                      - kind
+                      - name
+                      type: object
                   type: object
-                minItems: 1
                 type: array
-              routingDomain:
-                description: RoutingDomain is the reference to the routing domain
-                  this SubNet should be associated with
-                properties:
-                  name:
-                    description: Name is the name of the scope
-                    type: string
-                  scope:
-                    description: Scope is the absolute scope path
-                    type: string
-                required:
-                - name
-                type: object
             required:
-            - routingDomain
+            - routes
             type: object
           status:
-            description: SubnetStatus defines the observed state of Subnet
+            description: RoutingDomainStatus defines the observed state of RoutingDomain
             properties:
-              cidrs:
-                description: CIDRs is a list of CIDR status
-                items:
-                  description: CIDRStatus is the status of a CIDR
-                  properties:
-                    blockedRanges:
-                      description: BlockedRanges is a list of blocked cidr ranges
-                      items:
-                        description: 'TODO: create marshal/unmarshal functions'
-                        type: string
-                      type: array
-                    cidr:
-                      description: CIDR defines the cidr
-                      type: string
-                  required:
-                  - cidr
-                  type: object
-                type: array
               conditions:
                 description: Conditions represents the status for individual operators
                 items:

@@ -1,0 +1,14 @@
+apiVersion: network.onmetal.de/v1alpha1
+kind: IPAMRange
+metadata:
+  name: ipamrange-sample
+spec:
+  parent:
+    - name: mysubnet
+      scope: myscope
+#  size: "/16"
+  cidr: 10.0.0.0/16
+#status:
+#  state: Assigned
+#  message: "All good"
+#  ip: 10.0.0.0/16
