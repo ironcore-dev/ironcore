@@ -31,6 +31,9 @@ version-resolver:
 exclude-labels:
   - 'skip-changelog'
 autolabeler:
+  - label: 'api-change'
+    files:
+      - '/apis/*'
   - label: 'core'
     files:
       - '/apis/core/*'
