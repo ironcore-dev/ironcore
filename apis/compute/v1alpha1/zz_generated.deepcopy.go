@@ -489,7 +489,7 @@ func (in *MachineSpec) DeepCopyInto(out *MachineSpec) {
 	}
 	if in.SecurityGroups != nil {
 		in, out := &in.SecurityGroups, &out.SecurityGroups
-		*out = make([]commonv1alpha1.ScopeReference, len(*in))
+		*out = make([]commonv1alpha1.ScopedReference, len(*in))
 		copy(*out, *in)
 	}
 	if in.VolumeClaims != nil {

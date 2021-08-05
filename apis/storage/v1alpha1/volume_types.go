@@ -27,7 +27,7 @@ type VolumeSpec struct {
 	// StorageClass is the storage class of a volume
 	StorageClass string `json:"storage_class"`
 	// StoragePool indicates which storage pool to use for a volume
-	StoragePool common.ScopeReference `json:"storagepool"`
+	StoragePool common.ScopedReference `json:"storagepool"`
 	// Size defines the size of the volume
 	Size *resource.Quantity `json:"size"`
 }

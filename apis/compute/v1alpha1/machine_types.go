@@ -27,19 +27,19 @@ type MachineSpec struct {
 	// Hostname is the hostname of the machine
 	Hostname string `json:"hostname"`
 	// MachineClass is the machine class/flavor of the machine
-	MachineClass common.ScopeReference `json:"machineClass"`
+	MachineClass common.ScopedReference `json:"machineClass"`
 	// MachinePool defines the compute pool of the machine
-	MachinePool common.ScopeReference `json:"machinePool,omitempty"`
+	MachinePool common.ScopedReference `json:"machinePool,omitempty"`
 	// Location is the physical location of the machine
 	Location common.Location `json:"location"`
 	// Image is the operating system image of the machine
-	Image common.ScopeReference `json:"image"`
+	Image common.ScopedReference `json:"image"`
 	// SSHPublicKeys is a list of SSH public keys of a machine
 	SSHPublicKeys []SSHPublicKeyEntry `json:"sshPublicKeys"`
 	// Interfaces define a list of network interfaces present on the machine
 	// TODO: define interfaces/network references
 	// SecurityGroups is a list of security groups of a machine
-	SecurityGroups []common.ScopeReference `json:"securityGroups"`
+	SecurityGroups []common.ScopedReference `json:"securityGroups"`
 	// VolumeClaims
 	VolumeClaims []VolumeClaim `json:"volumeClaims"`
 	// UserData defines the ignition file
@@ -55,11 +55,11 @@ type VolumeClaim struct {
 	// Device defines the device for a volume on the machine
 	Device string `json:"device"`
 	// StorageClass describes the storage class of the volumes
-	StorageClass common.ScopeReference `json:"storageClass"`
+	StorageClass common.ScopedReference `json:"storageClass"`
 	// Size defines the size of the volume
 	Size *resource.Quantity `json:"size,omitempty"`
 	// Volume is a reference to an existing volume
-	Volume common.ScopeReference `json:"volume,omitempty"`
+	Volume common.ScopedReference `json:"volume,omitempty"`
 }
 
 type RetainPolicy string

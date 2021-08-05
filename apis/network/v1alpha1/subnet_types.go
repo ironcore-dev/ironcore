@@ -25,11 +25,11 @@ import (
 type SubnetSpec struct {
 	// Parent is a reference to a public parent Subnet without regional manifestation. The direct children
 	// then represent the regional incarnations of this public subnet.
-	Parent common.ScopeReference `json:"parent,omitempty"`
+	Parent common.ScopedReference `json:"parent,omitempty"`
 	// Locations defines in which regions and availability zone this subnet should be available
 	Locations []common.RegionAvailability `json:"locations,omitempty"`
 	// RoutingDomain is the reference to the routing domain this SubNet should be associated with
-	RoutingDomain common.ScopeReference `json:"routingDomain"`
+	RoutingDomain common.ScopedReference `json:"routingDomain"`
 	// Ranges defines the size of the subnet
 	// +kubebuilder:validation:MinItems:=1
 	Ranges []RangeType `json:"ranges,omitempty"`
@@ -38,7 +38,7 @@ type SubnetSpec struct {
 // RangeType defines the range/size of a subnet
 type RangeType struct {
 	// IPAM is a reference to the an range block of a subnet
-	IPAM common.ScopeReference `json:"ipam,omitempty"`
+	IPAM common.ScopedReference `json:"ipam,omitempty"`
 	// Size defines the size of a subnet e.g. "/12"
 	Size string `json:"size,omitempty"`
 	// CIDR is the CIDR block

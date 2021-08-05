@@ -103,8 +103,8 @@ spec:
                 description: ReservedIPBound describes the binding state of a ReservedIP
                 properties:
                   assignment:
-                    description: KindReference defines an object with its kind and
-                      API group and its scope reference
+                    description: ScopedKindReference defines an object with its kind
+                      and API group and its scope reference
                     properties:
                       apiGroup:
                         description: APIGroup is the API group of the object

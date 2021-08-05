@@ -18,18 +18,22 @@ package network
 
 import (
 	"context"
-
+	"github.com/go-logr/logr"
+	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	"github.com/onmetal/onmetal-api/pkg/utils"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
+	api "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 )
 
 // IPAMRangeReconciler reconciles a IPAMRange object
 type IPAMRangeReconciler struct {
+	utils.ScopeEvaluator
 	client.Client
+	Log    logr.Logger
 	Scheme *runtime.Scheme
 }
 
@@ -37,26 +41,60 @@ type IPAMRangeReconciler struct {
 //+kubebuilder:rbac:groups=network.onmetal.de,resources=ipamranges/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=network.onmetal.de,resources=ipamranges/finalizers,verbs=update
 
-// Reconcile is part of the main kubernetes reconciliation loop which aims to
-// move the current state of the cluster closer to the desired state.
-// TODO(user): Modify the Reconcile function to compare the state specified by
-// the IPAMRange object against the actual cluster state, and then
-// perform operations to make the cluster state reflect the state specified by
-// the user.
-//
-// For more details, check Reconcile and its Result here:
-// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.8.3/pkg/reconcile
+// Reconcile
+// if parent -> handle request part and set range
+// handle range
 func (r *IPAMRangeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
+	log := r.Log.WithValues("ipamrange", req.NamespacedName)
 
-	// your logic here
+	log.Info("reconcile")
+	var ipamrange api.IPAMRange
+	if err := r.Get(ctx, req.NamespacedName, &ipamrange); err != nil {
+		return utils.SucceededIfNotFound(err)
+	}
 
-	return ctrl.Result{}, nil
+	if ipamrange.ObjectMeta.DeletionTimestamp.IsZero() {
+		return r.HandleReconcile(ctx, log, &ipamrange)
+	} else {
+		return r.HandleDelete(ctx, log, &ipamrange)
+	}
 }
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *IPAMRangeReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&networkv1alpha1.IPAMRange{}).
+		For(&api.IPAMRange{}).
 		Complete(r)
+}
+
+func (r *IPAMRangeReconciler) HandleReconcile(ctx context.Context, log logr.Logger, ipamrange *api.IPAMRange) (ctrl.Result, error) {
+	log.Info("handle reconcile")
+	if ipamrange.Spec.Parent != nil {
+		// handle IPAMRange as request first
+		var parent api.IPAMRange
+		namespace, fail, err := r.EvaluateScopedReference(ctx, ipamrange.Namespace, ipamrange.Spec.Parent, &parent)
+		if err != nil {
+			log.Error(err, "")
+			if fail {
+				newipamrange := ipamrange.DeepCopy()
+				newipamrange.Status.Message = err.Error()
+				newipamrange.Status.State = common.StateInvalid
+				if err := r.Status().Patch(ctx, newipamrange, client.MergeFrom(ipamrange)); err != nil {
+					return utils.Requeue(err)
+				} else {
+					return ctrl.Result{}, err
+				}
+			} else {
+				return utils.Requeue(err)
+			}
+		}
+		log.Info("found namespace for scope", "namespace", namespace, "scope", ipamrange.Spec.Parent.Scope)
+	}
+	return ctrl.Result{}, nil
+}
+
+func (r *IPAMRangeReconciler) HandleDelete(ctx context.Context, log logr.Logger, ipamrange *api.IPAMRange) (ctrl.Result, error) {
+	return ctrl.Result{}, nil
+
 }

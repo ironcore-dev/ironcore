@@ -35,11 +35,11 @@ type GatewaySpec struct {
 	Regions     []string     `json:"regions,omitempty"`
 	FilterRules []FilterRule `json:"filterRules,omitempty"`
 	// Uplink is either a ReservedIP or a Subnet
-	Uplink common.KindReference `json:"uplink"`
+	Uplink common.ScopedKindReference `json:"uplink"`
 }
 
 type FilterRule struct {
-	SecurityGroup common.ScopeReference `json:"securityGroup,omitempty"`
+	SecurityGroup common.ScopedReference `json:"securityGroup,omitempty"`
 }
 
 // GatewayStatus defines the observed state of Gateway

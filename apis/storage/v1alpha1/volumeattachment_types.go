@@ -24,9 +24,9 @@ import (
 // VolumeAttachmentSpec defines the desired state of VolumeAttachment
 type VolumeAttachmentSpec struct {
 	// Volume is a reference of the volume object which should be attached
-	Volume common.ScopeReference `json:"volume,omitempty"`
+	Volume common.ScopedReference `json:"volume,omitempty"`
 	// Machine is a reference of the machine object which the volume should be attached to
-	Machine common.ScopeReference `json:"machine"`
+	Machine common.ScopedReference `json:"machine"`
 	// Device defines the device on the host for a volume
 	Device string `json:"device,omitempty"`
 	// Source references either an image or a snapshot
@@ -36,9 +36,9 @@ type VolumeAttachmentSpec struct {
 // VolumeSource defines the source of a volume which can be either an image or a snapshot
 type VolumeSource struct {
 	// Image defines the image name of the referenced image
-	Image common.ScopeReference `json:"image,omitempty"`
+	Image common.ScopedReference `json:"image,omitempty"`
 	// Snapshot defines the snapshot which should be used
-	Snapshot common.ScopeReference `json:"snapshot,omitempty"`
+	Snapshot common.ScopedReference `json:"snapshot,omitempty"`
 }
 
 // VolumeAttachmentStatus defines the observed state of VolumeAttachment
