@@ -18,6 +18,7 @@ package utils
 
 import (
 	"context"
+	"fmt"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"reflect"
@@ -87,4 +88,71 @@ func GetObjectForGroupKind(clt client.Client, gk schema.GroupKind) client.Object
 		}
 	}
 	return nil
+}
+
+func GetObjectListForGroupKind(clt client.Client, gk schema.GroupKind) client.ObjectList {
+	list := clt.Scheme().VersionsForGroupKind(gk)
+	if len(list) == 0 {
+		return nil
+	}
+	kind := gk.Kind + "List"
+	for _, gv := range clt.Scheme().PreferredVersionAllGroups() {
+		if gv.Group == gk.Group {
+			t := clt.Scheme().KnownTypes(gv)[kind]
+			return reflect.New(t).Interface().(client.ObjectList)
+		}
+	}
+	return nil
+}
+
+type ItemListIterator struct {
+	list  client.ObjectList
+	index int
+	size  int
+	value reflect.Value
+}
+
+func MustItemListIterator(list client.ObjectList) *ItemListIterator {
+	it, err := NewItemListIterator(list)
+	if err != nil {
+		panic(err.Error())
+	}
+	return it
+}
+
+func NewItemListIterator(list client.ObjectList) (*ItemListIterator, error) {
+	value := reflect.ValueOf(list)
+	for value.Kind() == reflect.Ptr {
+		value = value.Elem()
+	}
+	value = value.FieldByName("Items")
+	if value.IsZero() {
+		return nil, fmt.Errorf("%T: no list object", list)
+	}
+	if value.Kind() != reflect.Slice {
+		return nil, fmt.Errorf("%T: no list object", list)
+	}
+	return &ItemListIterator{
+		list:  list,
+		index: -1,
+		size:  value.Len(),
+		value: value,
+	}, nil
+}
+
+func (i *ItemListIterator) HasNext() bool {
+	return i.index < i.size-1
+}
+
+func (i *ItemListIterator) Next() client.Object {
+	if !i.HasNext() {
+		return nil
+	}
+	i.index++
+	return i.Current()
+}
+
+func (i *ItemListIterator) Current() client.Object {
+	value := i.value.Index(i.index)
+	return value.Addr().Interface().(client.Object)
 }
