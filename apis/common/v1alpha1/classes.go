@@ -52,8 +52,8 @@ type ZoneAvailability struct {
 
 //+kubebuilder:object:generate=true
 
-// ScopeReference refers to a scope and the scopes name
-type ScopeReference struct {
+// ScopedReference refers to a scope and the scopes name
+type ScopedReference struct {
 	// Name is the name of the scope
 	Name string `json:"name"`
 	// Scope is the absolute scope path
@@ -61,13 +61,13 @@ type ScopeReference struct {
 	Scope string `json:"scope,omitempty"`
 }
 
-// KindReference defines an object with its kind and API group and its scope reference
-type KindReference struct {
+// ScopedKindReference defines an object with its kind and API group and its scope reference
+type ScopedKindReference struct {
 	// Kind is the kind of the object
 	Kind string `json:"kind"`
 	// APIGroup is the API group of the object
-	APIGroup       string `json:"apiGroup"`
-	ScopeReference `json:",inline"`
+	APIGroup        string `json:"apiGroup"`
+	ScopedReference `json:",inline"`
 }
 
 // TODO: create marshal/unmarshal functions

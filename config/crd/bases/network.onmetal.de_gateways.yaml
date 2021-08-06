@@ -67,7 +67,7 @@ spec:
                 items:
                   properties:
                     securityGroup:
-                      description: ScopeReference refers to a scope and the scopes
+                      description: ScopedReference refers to a scope and the scopes
                         name
                       properties:
                         name:

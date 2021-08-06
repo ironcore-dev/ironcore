@@ -114,7 +114,7 @@ spec:
                   on the machine TODO: define interfaces/network references SecurityGroups
                   is a list of security groups of a machine'
                 items:
-                  description: ScopeReference refers to a scope and the scopes name
+                  description: ScopedReference refers to a scope and the scopes name
                   properties:
                     name:
                       description: Name is the name of the scope

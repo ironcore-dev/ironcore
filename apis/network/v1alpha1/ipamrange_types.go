@@ -27,8 +27,8 @@ import (
 // is defined, the given CIDR must be in the parent range and unused. It will be allocated if possible.
 // Otherwise the status of the object will be set to "Failed".
 type IPAMRangeSpec struct {
-	Parent common.ScopeReference `json:"parent,omitempty"`
-	Size   string                `json:"size,omitempty"`
+	Parent *common.ScopedReference `json:"parent,omitempty"`
+	Size   string                  `json:"size,omitempty"`
 
 	CIDR string `json:"cidr,omitempty"`
 }
@@ -36,9 +36,9 @@ type IPAMRangeSpec struct {
 // IPAMRangeStatus defines the observed state of IPAMRange
 type IPAMRangeStatus struct {
 	common.StateFields `json:",inline"`
-	Bound              common.KindReference `json:"bound,omitempty"`
-	CIDR               string               `json:"cidr,omitempty"`
-	FreeBlocks         []string             `json:"freeBlocks,omitempty"`
+	Bound              *common.ScopedKindReference `json:"bound,omitempty"`
+	CIDR               string                      `json:"cidr,omitempty"`
+	FreeBlocks         []string                    `json:"freeBlocks,omitempty"`
 }
 
 //+kubebuilder:object:root=true

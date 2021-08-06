@@ -44,6 +44,7 @@ type AccountStatus struct {
 }
 
 const (
+	MyAccountKey = "account"
 	// AccountPending indicates that the account reconciliation is pending.
 	AccountPending = "Pending"
 	// AccountReady indicates that the account reconciliation was successful.

@@ -48,7 +48,7 @@ type SecurityGroupRule struct {
 	// Name is the name of the SecurityGroupRule
 	Name string `json:"name"`
 	// SecurityGroupRef is a scoped reference to an existing SecurityGroup
-	SecurityGroupRef common.ScopeReference `json:"securityGroupRef,omitempty"`
+	SecurityGroupRef common.ScopedReference `json:"securityGroupRef,omitempty"`
 	// Action defines the action type of a SecurityGroupRule
 	Action ActionType `json:"action,omitempty"`
 	// Protocol defines the protocol of a SecurityGroupRule
@@ -62,7 +62,7 @@ type IPSetSpec struct {
 	// CIDR block for source/destination
 	CIDR common.Cidr `json:"cidr,omitempty"`
 	// SecurityGroupRef references a security group
-	SecurityGroupRef common.ScopeReference `json:"securityGroupref,omitempty"`
+	SecurityGroupRef common.ScopedReference `json:"securityGroupref,omitempty"`
 }
 
 // PortRange defines the start and end of a port range

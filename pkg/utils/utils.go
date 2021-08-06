@@ -19,6 +19,8 @@ package utils
 import (
 	"context"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"reflect"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
@@ -71,4 +73,18 @@ func GetLabel(object client.Object, name string, defs ...string) string {
 		}
 	}
 	return def
+}
+
+func GetObjectForGroupKind(clt client.Client, gk schema.GroupKind) client.Object {
+	list := clt.Scheme().VersionsForGroupKind(gk)
+	if len(list) == 0 {
+		return nil
+	}
+	for _, gv := range clt.Scheme().PreferredVersionAllGroups() {
+		if gv.Group == gk.Group {
+			t := clt.Scheme().KnownTypes(gv)[gk.Kind]
+			return reflect.New(t).Interface().(client.Object)
+		}
+	}
+	return nil
 }

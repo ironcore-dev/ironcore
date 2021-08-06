@@ -24,12 +24,12 @@ import (
 // ReservedIPSpec defines the desired state of ReservedIP
 type ReservedIPSpec struct {
 	// Subnet references the subnet where an IP address should be reserved
-	Subnet common.ScopeReference `json:"subnet"`
+	Subnet common.ScopedReference `json:"subnet"`
 	// IP specifies an IP address which should be reserved. Must be in the CIDR of the
 	// associated Subnet
 	IP common.IPAddr `json:"ip,omitempty"`
 	// Assignment indicates to which resource this IP address should be assigned
-	Assignment common.KindReference `json:"assignment,omitempty"`
+	Assignment common.ScopedKindReference `json:"assignment,omitempty"`
 }
 
 // ReservedIPStatus defines the observed state of ReservedIP
@@ -42,8 +42,8 @@ type ReservedIPStatus struct {
 
 // ReservedIPBound describes the binding state of a ReservedIP
 type ReservedIPBound struct {
-	Mode       string               `json:"mode"`
-	Assignment common.KindReference `json:"assignment,omitempty"`
+	Mode       string                     `json:"mode"`
+	Assignment common.ScopedKindReference `json:"assignment,omitempty"`
 }
 
 const (
