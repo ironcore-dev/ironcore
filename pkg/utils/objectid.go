@@ -18,6 +18,7 @@ package utils
 
 import (
 	"fmt"
+	"strings"
 
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -37,6 +38,37 @@ func NewObjectIdForRequest(req ctrl.Request, gk schema.GroupKind) ObjectId {
 		},
 		GroupKind: gk,
 	}
+}
+
+func MustParseObjectId(s string) ObjectId {
+	id, err := ParseObjectId(s)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
+func ParseObjectId(s string) (ObjectId, error) {
+	elems := strings.Split(s, "/")
+	if len(elems) != 3 {
+		return ObjectId{}, fmt.Errorf("invalid object id, required 3 elements got %d", len(elems))
+	}
+	key := client.ObjectKey{
+		Namespace: elems[1],
+		Name:      elems[2],
+	}
+	i := strings.Index(elems[0], ".")
+	gk := schema.GroupKind{}
+	if i < 0 {
+		gk.Kind = elems[0]
+	} else {
+		gk.Kind = elems[0][0:i]
+		gk.Group = elems[0][i:]
+	}
+	return ObjectId{
+		ObjectKey: key,
+		GroupKind: gk,
+	}, nil
 }
 
 func NewObjectId(object client.Object) ObjectId {
@@ -79,8 +111,22 @@ func (o ObjectId) String() string {
 
 type ObjectIds map[ObjectId]struct{}
 
+func NewObjectIds(ids ...ObjectId) ObjectIds {
+	set := ObjectIds{}
+	for _, id := range ids {
+		set.Add(id)
+	}
+	return set
+}
+
 func (o ObjectIds) Add(id ObjectId) {
 	o[id] = struct{}{}
+}
+
+func (o ObjectIds) AddAll(ids ObjectIds) {
+	for id := range ids {
+		o.Add(id)
+	}
 }
 
 func (o ObjectIds) Remove(id ObjectId) {
@@ -131,4 +177,12 @@ func (o ObjectIds) Join(ids ObjectIds) ObjectIds {
 		new.Add(id)
 	}
 	return new
+}
+
+func (o ObjectIds) Contains(id ObjectId) bool {
+	if o == nil {
+		return false
+	}
+	_, ok := o[id]
+	return ok
 }

@@ -33,7 +33,7 @@ type OwnerCache struct {
 	manager       manager.Manager
 	trigger       ReconcilationTrigger
 	client        client.Client
-	registrations map[schema.GroupKind]*Reconciler
+	registrations map[schema.GroupKind]*ownerReconciler
 	lock          sync.RWMutex
 	owners        map[utils.ObjectId]utils.ObjectIds
 	serfs         map[utils.ObjectId]utils.ObjectIds
@@ -45,7 +45,7 @@ func NewOwnerCache(manager manager.Manager, trig ReconcilationTrigger) *OwnerCac
 		manager:       manager,
 		trigger:       trig,
 		client:        manager.GetClient(),
-		registrations: map[schema.GroupKind]*Reconciler{},
+		registrations: map[schema.GroupKind]*ownerReconciler{},
 		owners:        map[utils.ObjectId]utils.ObjectIds{},
 		serfs:         map[utils.ObjectId]utils.ObjectIds{},
 	}
@@ -62,7 +62,8 @@ func (o *OwnerCache) RegisterGroupKind(ctx context.Context, gk schema.GroupKind)
 	if o.registrations[gk] != nil {
 		return nil
 	}
-	r := NewReconciler(gk)
+	r := newOwnerReconciler(gk)
+	o.registrations[gk] = r
 	r.SetupWithCache(ctx, o)
 	return nil
 }
