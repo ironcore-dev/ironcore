@@ -18,45 +18,76 @@ package network
 
 import (
 	"context"
-
+	"fmt"
+	"github.com/onmetal/onmetal-api/pkg/manager"
+	"github.com/onmetal/onmetal-api/pkg/utils"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
+	api "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 )
 
 // SubnetReconciler reconciles a Subnet object
 type SubnetReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	Scheme  *runtime.Scheme
+	manager *manager.Manager
 }
 
 //+kubebuilder:rbac:groups=network.onmetal.de,resources=subnets,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=network.onmetal.de,resources=subnets/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=network.onmetal.de,resources=subnets/finalizers,verbs=update
 
-// Reconcile is part of the main kubernetes reconciliation loop which aims to
-// move the current state of the cluster closer to the desired state.
-// TODO(user): Modify the Reconcile function to compare the state specified by
-// the Subnet object against the actual cluster state, and then
-// perform operations to make the cluster state reflect the state specified by
-// the user.
-//
-// For more details, check Reconcile and its Result here:
-// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.8.3/pkg/reconcile
+// Reconcile
 func (r *SubnetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	log := log.FromContext(ctx)
 
-	// your logic here
+	log.Info(fmt.Sprintf("reconcile subnet %s", req))
+
+	// wait until ownercache is built
+	r.manager.GetOwnerCache().Wait()
+
+	id := utils.NewObjectIdForRequest(req, api.SubnetGK)
+	var subnet api.Subnet
+	if err := r.Get(ctx, id.ObjectKey, &subnet); err != nil {
+		return utils.SucceededIfNotFound(err)
+	}
+	if len(r.manager.GetOwnerCache().GetSerfsFor(id)) == 0 {
+		ipam := api.IPAMRange{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "IPAMRange",
+				APIVersion: api.GroupVersion.String(),
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				GenerateName: req.Name + "-",
+				Namespace:    req.Namespace,
+			},
+			Spec: api.IPAMRangeSpec{
+				Parent: nil,
+				Size:   "",
+				CIDR:   "10.0.0.0/24",
+			},
+			Status: api.IPAMRangeStatus{},
+		}
+		r.manager.GetOwnerCache().CreateSerf(ctx, &subnet, &ipam)
+	}
 
 	return ctrl.Result{}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
-func (r *SubnetReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewControllerManagedBy(mgr).
-		For(&networkv1alpha1.Subnet{}).
-		Complete(r)
+func (r *SubnetReconciler) SetupWithManager(mgr *manager.Manager) error {
+	r.manager = mgr
+	mgr.GetOwnerCache().RegisterGroupKind(context.Background(), api.IPAMRangeGK)
+	c, err := ctrl.NewControllerManagedBy(mgr).
+		For(&api.Subnet{}).
+		Build(r)
+	if err == nil {
+		mgr.RegisterControllerFor(api.SubnetGK, c)
+	}
+	return err
+
 }

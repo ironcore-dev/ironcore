@@ -48,11 +48,12 @@ func (r *IPAMRangeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	_ = log.FromContext(ctx)
 	log := r.Log.WithValues("ipamrange", req.NamespacedName)
 
-	log.Info("reconcile")
 	var ipamrange api.IPAMRange
 	if err := r.Get(ctx, req.NamespacedName, &ipamrange); err != nil {
 		return utils.SucceededIfNotFound(err)
 	}
+
+	//log.Info(fmt.Sprintf("reconcile %s/%s/%s/%s", ipamrange.APIVersion, ipamrange.Kind, ipamrange.Namespace, ipamrange.Name))
 
 	if ipamrange.ObjectMeta.DeletionTimestamp.IsZero() {
 		return r.HandleReconcile(ctx, log, &ipamrange)

@@ -19,7 +19,13 @@ package v1alpha1
 import (
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
+
+var IPAMRangeGK = schema.GroupKind{
+	Group: GroupVersion.Group,
+	Kind:  "IPAMRange",
+}
 
 // IPAMRangeSpec defines the desired state of IPAMRange
 // Either parent and size or a give CIDR must be specified. If parent is specified,

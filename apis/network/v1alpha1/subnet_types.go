@@ -19,7 +19,13 @@ package v1alpha1
 import (
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
+
+var SubnetGK = schema.GroupKind{
+	Group: GroupVersion.Group,
+	Kind:  "Subnet",
+}
 
 // SubnetSpec defines the desired state of Subnet
 type SubnetSpec struct {
