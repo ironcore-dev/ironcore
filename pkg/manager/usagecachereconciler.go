@@ -30,23 +30,23 @@ import (
 	"sync"
 )
 
-type ownerReconciler struct {
+type usageReconciler struct {
 	client    client.Client
 	gk        schema.GroupKind
 	Log       logr.Logger
-	cache     *OwnerCache
+	cache     *UsageCache
 	setupOnce sync.Once
 	objType   reflect.Type
 }
 
-func newOwnerReconciler(gk schema.GroupKind) *ownerReconciler {
-	return &ownerReconciler{
+func newUsageReconciler(gk schema.GroupKind) *usageReconciler {
+	return &usageReconciler{
 		gk:  gk,
-		Log: ctrl.Log.WithName("controllers").WithName("Ownercache").WithName(gk.String()),
+		Log: ctrl.Log.WithName("controllers").WithName("Usagecache").WithName(gk.String()),
 	}
 }
 
-func (r *ownerReconciler) setup(ctx context.Context) {
+func (r *usageReconciler) setup(ctx context.Context) {
 	list := utils.GetObjectListForGroupKind(r.client, r.gk)
 	defer r.cache.ready.Remove()
 	err := r.client.List(ctx, list)
@@ -62,7 +62,7 @@ func (r *ownerReconciler) setup(ctx context.Context) {
 	}
 }
 
-func (r *ownerReconciler) SetupWithCache(ctx context.Context, cache *OwnerCache) error {
+func (r *usageReconciler) SetupWithCache(ctx context.Context, cache *UsageCache) error {
 	r.client = cache.client
 	r.cache = cache
 	obj := utils.GetObjectForGroupKind(r.client, r.gk)
@@ -83,7 +83,7 @@ func (r *ownerReconciler) SetupWithCache(ctx context.Context, cache *OwnerCache)
 	return nil
 }
 
-func (r *ownerReconciler) Reconcile(ctx context.Context, request reconcile.Request) (reconcile.Result, error) {
+func (r *usageReconciler) Reconcile(ctx context.Context, request reconcile.Request) (reconcile.Result, error) {
 	r.setupOnce.Do(func() { r.setup(ctx) })
 	obj := reflect.New(r.objType).Interface().(client.Object)
 	key := client.ObjectKey{Namespace: request.Namespace, Name: request.Name}
@@ -103,9 +103,11 @@ func (r *ownerReconciler) Reconcile(ctx context.Context, request reconcile.Reque
 		r.Log.Info(fmt.Sprintf("updating %s in ownercache", id))
 		_, oids = r.cache.ReplaceObject(obj)
 	}
-	for id := range oids {
-		r.Log.Info(fmt.Sprintf("enqueue %s", id))
-		r.cache.trigger.Trigger(id)
+	if r.cache.trigger != nil {
+		for id := range oids {
+			r.Log.Info(fmt.Sprintf("enqueue %s", id))
+			r.cache.trigger.Trigger(id)
+		}
 	}
 	return ctrl.Result{}, nil
 }
