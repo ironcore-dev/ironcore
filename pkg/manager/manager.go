@@ -17,12 +17,15 @@
 package manager
 
 import (
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/rest"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 )
 
 type Manager struct {
 	manager.Manager
+	triggers   ReconcilationTrigger
 	ownerCache *OwnerCache
 }
 
@@ -31,13 +34,19 @@ func NewManager(config *rest.Config, options manager.Options) (*Manager, error) 
 	if err != nil {
 		return nil, err
 	}
-	oc := NewOwnerCache(mgr)
+	trig := NewReconcilationTrigger()
+	oc := NewOwnerCache(mgr, trig)
 	return &Manager{
 		Manager:    mgr,
 		ownerCache: oc,
+		triggers:   trig,
 	}, nil
 }
 
 func (m *Manager) GetOwnerCache() *OwnerCache {
 	return m.ownerCache
+}
+
+func (m *Manager) RegisterControllerFor(gk schema.GroupKind, controller controller.Controller) {
+	m.triggers.RegisterControllerFor(gk, controller)
 }

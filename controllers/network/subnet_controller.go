@@ -18,6 +18,7 @@ package network
 
 import (
 	"context"
+	"fmt"
 	"github.com/onmetal/onmetal-api/pkg/manager"
 	"github.com/onmetal/onmetal-api/pkg/utils"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -42,7 +43,12 @@ type SubnetReconciler struct {
 
 // Reconcile
 func (r *SubnetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	log := log.FromContext(ctx)
+
+	log.Info(fmt.Sprintf("reconcile subnet %s", req))
+
+	// wait until ownercache is built
+	r.manager.GetOwnerCache().Wait()
 
 	id := utils.NewObjectIdForRequest(req, api.SubnetGK)
 	var subnet api.Subnet
@@ -76,7 +82,12 @@ func (r *SubnetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 func (r *SubnetReconciler) SetupWithManager(mgr *manager.Manager) error {
 	r.manager = mgr
 	mgr.GetOwnerCache().RegisterGroupKind(context.Background(), api.IPAMRangeGK)
-	return ctrl.NewControllerManagedBy(mgr).
+	c, err := ctrl.NewControllerManagedBy(mgr).
 		For(&api.Subnet{}).
-		Complete(r)
+		Build(r)
+	if err == nil {
+		mgr.RegisterControllerFor(api.SubnetGK, c)
+	}
+	return err
+
 }

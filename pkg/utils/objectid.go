@@ -18,6 +18,7 @@ package utils
 
 import (
 	"fmt"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -105,4 +106,29 @@ func (o ObjectIds) String() string {
 		sep = ","
 	}
 	return s + "]"
+}
+
+func (o ObjectIds) Equal(ids ObjectIds) bool {
+	if o == nil && ids == nil {
+		return true
+	}
+
+	if len(o) != len(ids) {
+		return false
+	}
+
+	for id := range ids {
+		if _, ok := o[id]; !ok {
+			return false
+		}
+	}
+	return true
+}
+
+func (o ObjectIds) Join(ids ObjectIds) ObjectIds {
+	new := o.Copy()
+	for id := range ids {
+		new.Add(id)
+	}
+	return new
 }

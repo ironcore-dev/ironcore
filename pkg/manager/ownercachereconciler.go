@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"github.com/go-logr/logr"
 	"github.com/onmetal/onmetal-api/pkg/utils"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -85,7 +86,26 @@ func (r *Reconciler) SetupWithCache(ctx context.Context, cache *OwnerCache) erro
 func (r *Reconciler) Reconcile(ctx context.Context, request reconcile.Request) (reconcile.Result, error) {
 	r.setupOnce.Do(func() { r.setup(ctx) })
 	obj := reflect.New(r.objType).Interface().(client.Object)
-	r.client.Get(ctx, client.ObjectKey{Namespace: request.Namespace, Name: request.Name}, obj)
-	r.cache.ReplaceObject(obj)
+	key := client.ObjectKey{Namespace: request.Namespace, Name: request.Name}
+	var oids utils.ObjectIds
+	id := utils.ObjectId{
+		ObjectKey: key,
+		GroupKind: r.gk,
+	}
+	if err := r.client.Get(ctx, key, obj); err != nil {
+		if errors.IsNotFound(err) {
+			r.Log.Info(fmt.Sprintf("deleting %s from ownercache", id))
+			oids = r.cache.DeleteObject(id)
+		} else {
+			return utils.Requeue(err)
+		}
+	} else {
+		r.Log.Info(fmt.Sprintf("updating %s in ownercache", id))
+		_, oids = r.cache.ReplaceObject(obj)
+	}
+	for id := range oids {
+		r.Log.Info(fmt.Sprintf("enqueue %s", id))
+		r.cache.trigger.Trigger(id)
+	}
 	return ctrl.Result{}, nil
 }

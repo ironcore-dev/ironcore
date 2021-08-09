@@ -19,16 +19,19 @@ package manager
 import (
 	"context"
 	"fmt"
-	"github.com/onmetal/onmetal-api/pkg/utils"
+	"sync"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
-	"sync"
+
+	"github.com/onmetal/onmetal-api/pkg/utils"
 )
 
 type OwnerCache struct {
 	manager       manager.Manager
+	trigger       ReconcilationTrigger
 	client        client.Client
 	registrations map[schema.GroupKind]*Reconciler
 	lock          sync.RWMutex
@@ -37,9 +40,10 @@ type OwnerCache struct {
 	ready         Ready
 }
 
-func NewOwnerCache(manager manager.Manager) *OwnerCache {
+func NewOwnerCache(manager manager.Manager, trig ReconcilationTrigger) *OwnerCache {
 	return &OwnerCache{
 		manager:       manager,
+		trigger:       trig,
 		client:        manager.GetClient(),
 		registrations: map[schema.GroupKind]*Reconciler{},
 		owners:        map[utils.ObjectId]utils.ObjectIds{},
@@ -63,31 +67,59 @@ func (o *OwnerCache) RegisterGroupKind(ctx context.Context, gk schema.GroupKind)
 	return nil
 }
 
-func (o *OwnerCache) ReplaceObject(object client.Object) {
+func (o *OwnerCache) ReplaceObject(object client.Object) (utils.ObjectId, utils.ObjectIds) {
 	o.lock.Lock()
 	defer o.lock.Unlock()
-	o.replaceObject(object)
+	return o.replaceObject(object)
 }
 
-func (o *OwnerCache) replaceObject(object client.Object) {
+func (o *OwnerCache) DeleteObject(id utils.ObjectId) utils.ObjectIds {
+	o.lock.Lock()
+	defer o.lock.Unlock()
+	old := o.serfs[id]
+	if old != nil {
+		for owner := range old {
+			delete(o.owners[owner], id)
+			if len(o.owners[owner]) == 0 {
+				delete(o.owners, owner)
+			}
+		}
+		delete(o.serfs, id)
+	}
+	return old
+}
+
+func (o *OwnerCache) replaceObject(object client.Object) (utils.ObjectId, utils.ObjectIds) {
 	id := utils.NewObjectId(object)
 	oids := utils.GetOwnerIdsFor(object)
-	for owner := range o.serfs[id] {
-		delete(o.owners[owner], id)
-		if len(o.owners[owner]) == 0 {
-			delete(o.owners, owner)
+	old := o.serfs[id]
+	if !oids.Equal(old) {
+		for owner := range old {
+			if _, ok := oids[owner]; !ok {
+				delete(o.owners[owner], id)
+				if len(o.owners[owner]) == 0 {
+					delete(o.owners, owner)
+				}
+			}
+		}
+		for owner := range oids {
+			if _, ok := old[owner]; !ok {
+				m := o.owners[owner]
+				if m == nil {
+					m = utils.ObjectIds{}
+					o.owners[owner] = m
+				}
+				m[id] = struct{}{}
+			}
+		}
+		fmt.Printf("owners of: %s:%s\n", id, oids)
+		if len(oids) > 0 {
+			o.serfs[id] = oids
+		} else {
+			delete(o.serfs, id)
 		}
 	}
-	for owner := range oids {
-		m := o.owners[owner]
-		if m == nil {
-			m = utils.ObjectIds{}
-			o.owners[owner] = m
-		}
-		m[id] = struct{}{}
-	}
-	fmt.Printf("owners of: %s:%s\n", id, oids)
-	o.serfs[id] = oids
+	return id, oids.Join(old)
 }
 
 func (o *OwnerCache) GetOwnersFor(id utils.ObjectId) utils.ObjectIds {
