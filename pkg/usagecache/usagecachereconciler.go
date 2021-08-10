@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package manager
+package usagecache
 
 import (
 	"context"
@@ -34,7 +34,7 @@ type usageReconciler struct {
 	client    client.Client
 	gk        schema.GroupKind
 	Log       logr.Logger
-	cache     *UsageCache
+	cache     *usageCache
 	setupOnce sync.Once
 	objType   reflect.Type
 }
@@ -62,7 +62,7 @@ func (r *usageReconciler) setup(ctx context.Context) {
 	}
 }
 
-func (r *usageReconciler) SetupWithCache(ctx context.Context, cache *UsageCache) error {
+func (r *usageReconciler) SetupWithCache(ctx context.Context, cache *usageCache) error {
 	r.client = cache.client
 	r.cache = cache
 	obj := utils.GetObjectForGroupKind(r.client, r.gk)
