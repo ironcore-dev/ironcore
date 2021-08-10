@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package manager
+package ownercache
 
 import (
 	"context"
 	"fmt"
+	"github.com/onmetal/onmetal-api/pkg/trigger"
 	"sync"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -29,33 +30,22 @@ import (
 	"github.com/onmetal/onmetal-api/pkg/utils"
 )
 
-type OwnerCache struct {
+type ownerCache struct {
 	manager       manager.Manager
-	trigger       ReconcilationTrigger
+	trigger       Trigger
 	client        client.Client
 	registrations map[schema.GroupKind]*ownerReconciler
 	lock          sync.RWMutex
 	owners        map[utils.ObjectId]utils.ObjectIds
 	serfs         map[utils.ObjectId]utils.ObjectIds
-	ready         Ready
+	ready         trigger.Ready
 }
 
-func NewOwnerCache(manager manager.Manager, trig ReconcilationTrigger) *OwnerCache {
-	return &OwnerCache{
-		manager:       manager,
-		trigger:       trig,
-		client:        manager.GetClient(),
-		registrations: map[schema.GroupKind]*ownerReconciler{},
-		owners:        map[utils.ObjectId]utils.ObjectIds{},
-		serfs:         map[utils.ObjectId]utils.ObjectIds{},
-	}
-}
-
-func (o *OwnerCache) Wait() {
+func (o *ownerCache) Wait() {
 	o.ready.Wait()
 }
 
-func (o *OwnerCache) RegisterGroupKind(ctx context.Context, gk schema.GroupKind) error {
+func (o *ownerCache) RegisterGroupKind(ctx context.Context, gk schema.GroupKind) error {
 	o.lock.Lock()
 	defer o.lock.Unlock()
 
@@ -68,13 +58,13 @@ func (o *OwnerCache) RegisterGroupKind(ctx context.Context, gk schema.GroupKind)
 	return nil
 }
 
-func (o *OwnerCache) ReplaceObject(object client.Object) (utils.ObjectId, utils.ObjectIds) {
+func (o *ownerCache) ReplaceObject(object client.Object) (utils.ObjectId, utils.ObjectIds) {
 	o.lock.Lock()
 	defer o.lock.Unlock()
 	return o.replaceObject(object)
 }
 
-func (o *OwnerCache) DeleteObject(id utils.ObjectId) utils.ObjectIds {
+func (o *ownerCache) DeleteObject(id utils.ObjectId) utils.ObjectIds {
 	o.lock.Lock()
 	defer o.lock.Unlock()
 	old := o.serfs[id]
@@ -90,7 +80,7 @@ func (o *OwnerCache) DeleteObject(id utils.ObjectId) utils.ObjectIds {
 	return old
 }
 
-func (o *OwnerCache) replaceObject(object client.Object) (utils.ObjectId, utils.ObjectIds) {
+func (o *ownerCache) replaceObject(object client.Object) (utils.ObjectId, utils.ObjectIds) {
 	id := utils.NewObjectId(object)
 	oids := utils.GetOwnerIdsFor(object)
 	old := o.serfs[id]
@@ -123,13 +113,13 @@ func (o *OwnerCache) replaceObject(object client.Object) (utils.ObjectId, utils.
 	return id, oids.Join(old)
 }
 
-func (o *OwnerCache) GetOwnersFor(id utils.ObjectId) utils.ObjectIds {
+func (o *ownerCache) GetOwnersFor(id utils.ObjectId) utils.ObjectIds {
 	o.lock.RLock()
 	defer o.lock.RUnlock()
 	return o.serfs[id].Copy()
 }
 
-func (o *OwnerCache) GetOwnersByTypeFor(id utils.ObjectId, gk schema.GroupKind) utils.ObjectIds {
+func (o *ownerCache) GetOwnersByTypeFor(id utils.ObjectId, gk schema.GroupKind) utils.ObjectIds {
 	o.lock.RLock()
 	defer o.lock.RUnlock()
 	ids := utils.ObjectIds{}
@@ -141,13 +131,13 @@ func (o *OwnerCache) GetOwnersByTypeFor(id utils.ObjectId, gk schema.GroupKind) 
 	return ids
 }
 
-func (o *OwnerCache) GetSerfsFor(id utils.ObjectId) utils.ObjectIds {
+func (o *ownerCache) GetSerfsFor(id utils.ObjectId) utils.ObjectIds {
 	o.lock.RLock()
 	defer o.lock.RUnlock()
 	return o.owners[id].Copy()
 }
 
-func (o *OwnerCache) GetSerfsWithTypeFor(id utils.ObjectId, gk schema.GroupKind) utils.ObjectIds {
+func (o *ownerCache) GetSerfsWithTypeFor(id utils.ObjectId, gk schema.GroupKind) utils.ObjectIds {
 	o.lock.RLock()
 	defer o.lock.RUnlock()
 	ids := utils.ObjectIds{}
@@ -159,15 +149,15 @@ func (o *OwnerCache) GetSerfsWithTypeFor(id utils.ObjectId, gk schema.GroupKind)
 	return ids
 }
 
-func (o *OwnerCache) GetSerfsForObject(obj client.Object) utils.ObjectIds {
+func (o *ownerCache) GetSerfsForObject(obj client.Object) utils.ObjectIds {
 	return o.GetSerfsFor(utils.NewObjectId(obj))
 }
 
-func (o *OwnerCache) GetSerfsWithTypeForObject(obj client.Object, gk schema.GroupKind) utils.ObjectIds {
+func (o *ownerCache) GetSerfsWithTypeForObject(obj client.Object, gk schema.GroupKind) utils.ObjectIds {
 	return o.GetSerfsWithTypeFor(utils.NewObjectId(obj), gk)
 }
 
-func (o *OwnerCache) CreateSerf(ctx context.Context, owner, serf client.Object, opts ...client.CreateOption) error {
+func (o *ownerCache) CreateSerf(ctx context.Context, owner, serf client.Object, opts ...client.CreateOption) error {
 	serf.SetOwnerReferences([]metav1.OwnerReference{OwnerRefForObject(owner)})
 	o.lock.Lock()
 	defer o.lock.Unlock()

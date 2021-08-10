@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package manager
+package ownercache
 
 import (
 	"context"
@@ -34,7 +34,7 @@ type ownerReconciler struct {
 	client    client.Client
 	gk        schema.GroupKind
 	Log       logr.Logger
-	cache     *OwnerCache
+	cache     *ownerCache
 	setupOnce sync.Once
 	objType   reflect.Type
 }
@@ -62,7 +62,7 @@ func (r *ownerReconciler) setup(ctx context.Context) {
 	}
 }
 
-func (r *ownerReconciler) SetupWithCache(ctx context.Context, cache *OwnerCache) error {
+func (r *ownerReconciler) SetupWithCache(ctx context.Context, cache *ownerCache) error {
 	r.client = cache.client
 	r.cache = cache
 	obj := utils.GetObjectForGroupKind(r.client, r.gk)
