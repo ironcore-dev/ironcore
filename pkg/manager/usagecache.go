@@ -98,6 +98,9 @@ func (i ObjectUsageInfo) Equal(other ObjectUsageInfo) bool {
 }
 
 func (i ObjectUsageInfo) GetObjectIdsForGK(gk schema.GroupKind) utils.ObjectIds {
+	if len(i) == 0 {
+		return nil
+	}
 	oids := utils.ObjectIds{}
 	for _, ids := range i {
 		for id := range ids {
@@ -106,15 +109,21 @@ func (i ObjectUsageInfo) GetObjectIdsForGK(gk schema.GroupKind) utils.ObjectIds 
 			}
 		}
 	}
+	if len(oids) == 0 {
+		return nil
+	}
 	return oids
 }
 
 func (i ObjectUsageInfo) GetObjectIdsForRelationToGK(relation string, gk schema.GroupKind) utils.ObjectIds {
-	if i == nil {
+	if len(i) == 0 {
 		return nil
 	}
 	oids := utils.ObjectIds{}
 	ids := i[relation]
+	if len(ids) == 0 {
+		return nil
+	}
 	for id := range ids {
 		if id.GroupKind == gk {
 			oids.Add(id)
@@ -124,16 +133,22 @@ func (i ObjectUsageInfo) GetObjectIdsForRelationToGK(relation string, gk schema.
 }
 
 func (i ObjectUsageInfo) GetObjectIdsForRelation(relation string) utils.ObjectIds {
-	if i == nil {
+	if len(i) == 0 {
 		return nil
 	}
 	return i[relation].Copy()
 }
 
 func (i ObjectUsageInfo) GetObjectIds() utils.ObjectIds {
+	if len(i) == 0 {
+		return nil
+	}
 	oids := utils.ObjectIds{}
 	for _, ids := range i {
 		oids.AddAll(ids)
+	}
+	if len(oids) == 0 {
+		return nil
 	}
 	return oids
 }
@@ -216,7 +231,7 @@ func (u *UsageCache) DeleteObject(id utils.ObjectId) utils.ObjectIds {
 	u.lock.Lock()
 	defer u.lock.Unlock()
 	u.cleanUp(id, u.sources, u.targets)
-	return u.cleanUp(id, u.targets, u.sources)
+	return u.getUsersFor(id)
 }
 
 func (u *UsageCache) cleanUp(id utils.ObjectId, src, dst map[utils.ObjectId]ObjectUsageInfo) utils.ObjectIds {
@@ -248,7 +263,7 @@ func (u *UsageCache) addRelation(targets map[utils.ObjectId]ObjectUsageInfo, id 
 	oldRelation.Add(target)
 }
 
-func (u *UsageCache) removeRelation(targets map[utils.ObjectId]ObjectUsageInfo, target utils.ObjectId, relation string, id utils.ObjectId) {
+func (u *UsageCache) removeRelation(targets map[utils.ObjectId]ObjectUsageInfo, id utils.ObjectId, relation string, target utils.ObjectId) {
 	old := targets[id]
 	if len(old) == 0 {
 		return
@@ -302,6 +317,12 @@ func (u *UsageCache) replaceObjectUsageInfo(id utils.ObjectId, usages ObjectUsag
 			for target := range oldRel {
 				if !targets.Contains(target) {
 					delete(oldRel, target)
+					if len(oldRel) == 0 {
+						delete(old, relation)
+						if len(old) == 0 {
+							delete(u.sources, id)
+						}
+					}
 					u.removeRelation(u.targets, target, relation, id)
 				}
 			}
@@ -311,6 +332,12 @@ func (u *UsageCache) replaceObjectUsageInfo(id utils.ObjectId, usages ObjectUsag
 			if len(newRel) == 0 {
 				for target := range targets {
 					delete(targets, target)
+					if len(targets) == 0 {
+						delete(old, relation)
+						if len(old) == 0 {
+							delete(u.sources, id)
+						}
+					}
 					u.removeRelation(u.targets, target, relation, id)
 				}
 			}
@@ -322,6 +349,10 @@ func (u *UsageCache) replaceObjectUsageInfo(id utils.ObjectId, usages ObjectUsag
 func (u *UsageCache) GetUsersFor(id utils.ObjectId) utils.ObjectIds {
 	u.lock.RLock()
 	defer u.lock.RUnlock()
+	return u.getUsersFor(id)
+}
+
+func (u *UsageCache) getUsersFor(id utils.ObjectId) utils.ObjectIds {
 	return u.targets[id].GetObjectIds()
 }
 
