@@ -14,22 +14,34 @@
  * limitations under the License.
  */
 
-package manager
+package usagecache
 
 import (
 	"github.com/onmetal/onmetal-api/pkg/utils"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 var _ = Describe("UsageCache", func() {
 
-	var cache *UsageCache
+	var cache *usageCache
 	objectk10 := utils.MustParseObjectId("k1.g1/default/object0")
 	objectk11 := utils.MustParseObjectId("k1.g1/default/object1")
 	objectk12 := utils.MustParseObjectId("k1.g1/default/object2")
 	//objectk20 := utils.MustParseObjectId("k2.g1/default/object0")
 	objectk21 := utils.MustParseObjectId("k2.g1/default/object1")
+
+	gk1 := schema.GroupKind{
+		Group: "g1",
+		Kind:  "k1",
+	}
+	gk2 := schema.GroupKind{
+		Group: "g1",
+		Kind:  "k2",
+	}
+	_ = gk1
+	_ = gk2
 
 	BeforeEach(func() {
 		cache = NewUsageCache(nil, nil)
@@ -121,6 +133,26 @@ var _ = Describe("UsageCache", func() {
 			Expect(cache.GetUsedObjectsFor(objectk10)).To(Equal(utils.NewObjectIds(objectk11, objectk21)))
 			Expect(cache.GetUsersFor(objectk11)).To(Equal(utils.NewObjectIds(objectk10)))
 			Expect(cache.GetUsersFor(objectk12)).To(BeNil())
+			Expect(cache.GetUsersFor(objectk21)).To(Equal(utils.NewObjectIds(objectk10)))
+		})
+	})
+
+	Context("GroupKind update", func() {
+		It("simple usage", func() {
+			info := NewObjectUsageInfo("uses", objectk11)
+			cache.ReplaceObjectUsageInfo(objectk10, info)
+			cache.ReplaceObjectUsageInfoForGKs(objectk10, utils.NewGroupKinds(gk2), NewObjectUsageInfo("uses", objectk21))
+			Expect(cache.GetUsedObjectsFor(objectk10)).To(Equal(utils.NewObjectIds(objectk11, objectk21)))
+			Expect(cache.GetUsersFor(objectk11)).To(Equal(utils.NewObjectIds(objectk10)))
+			Expect(cache.GetUsersFor(objectk21)).To(Equal(utils.NewObjectIds(objectk10)))
+		})
+		It("two relations", func() {
+			info := NewObjectUsageInfo("uses", objectk11, "owner", objectk12)
+			cache.ReplaceObjectUsageInfo(objectk10, info)
+			cache.ReplaceObjectUsageInfoForGKs(objectk10, utils.NewGroupKinds(gk2), NewObjectUsageInfo("owner", objectk21))
+			Expect(cache.GetUsedObjectsFor(objectk10)).To(Equal(utils.NewObjectIds(objectk11, objectk21, objectk12)))
+			Expect(cache.GetUsersFor(objectk11)).To(Equal(utils.NewObjectIds(objectk10)))
+			Expect(cache.GetUsersFor(objectk12)).To(Equal(utils.NewObjectIds(objectk10)))
 			Expect(cache.GetUsersFor(objectk21)).To(Equal(utils.NewObjectIds(objectk10)))
 		})
 	})

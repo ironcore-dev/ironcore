@@ -63,7 +63,7 @@ func ParseObjectId(s string) (ObjectId, error) {
 		gk.Kind = elems[0]
 	} else {
 		gk.Kind = elems[0][0:i]
-		gk.Group = elems[0][i:]
+		gk.Group = elems[0][i+1:]
 	}
 	return ObjectId{
 		ObjectKey: key,
