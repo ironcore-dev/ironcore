@@ -20,8 +20,10 @@ import (
 	"context"
 	"github.com/go-logr/logr"
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	"github.com/onmetal/onmetal-api/pkg/cache/usagecache"
+	"github.com/onmetal/onmetal-api/pkg/manager"
+	"github.com/onmetal/onmetal-api/pkg/scopes"
 	"github.com/onmetal/onmetal-api/pkg/utils"
-	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -31,10 +33,10 @@ import (
 
 // IPAMRangeReconciler reconciles a IPAMRange object
 type IPAMRangeReconciler struct {
-	utils.ScopeEvaluator
+	manager *manager.Manager
+	scopes.ScopeEvaluator
 	client.Client
-	Log    logr.Logger
-	Scheme *runtime.Scheme
+	Log logr.Logger
 }
 
 //+kubebuilder:rbac:groups=network.onmetal.de,resources=ipamranges,verbs=get;list;watch;create;update;patch;delete
@@ -45,6 +47,7 @@ type IPAMRangeReconciler struct {
 // if parent -> handle request part and set range
 // handle range
 func (r *IPAMRangeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+	r.manager.Wait() // wait until all caches are initialized
 	_ = log.FromContext(ctx)
 	log := r.Log.WithValues("ipamrange", req.NamespacedName)
 
@@ -63,10 +66,31 @@ func (r *IPAMRangeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 }
 
 // SetupWithManager sets up the controller with the Manager.
-func (r *IPAMRangeReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewControllerManagedBy(mgr).
+func (r *IPAMRangeReconciler) SetupWithManager(mgr *manager.Manager) error {
+	r.manager = mgr
+	r.Client = mgr.GetClient()
+	r.ScopeEvaluator = mgr.GetScopeEvaluator()
+	c, err := ctrl.NewControllerManagedBy(mgr).
 		For(&api.IPAMRange{}).
-		Complete(r)
+		Build(r)
+	if err == nil {
+		mgr.RegisterControllerFor(api.IPAMRangeGK, c)
+		mgr.GetUsageCache().RegisterExtractor(context.Background(), api.IPAMRangeGK, usagecache.RelationUses, api.IPAMRangeGK, &IPAMUsageExtractor{mgr.GetScopeEvaluator()})
+	}
+	return err
+}
+
+type IPAMUsageExtractor struct {
+	scopeEvaluator scopes.ScopeEvaluator
+}
+
+func (e *IPAMUsageExtractor) ExtractUsage(object client.Object) utils.ObjectIds {
+	ipam := object.(*api.IPAMRange)
+	id, _, err := e.scopeEvaluator.EvaluateScopedReferenceToObjectId(context.Background(), object.GetNamespace(), api.IPAMRangeGK, ipam.Spec.Parent)
+	if err != nil {
+		return nil
+	}
+	return utils.NewObjectIds(id)
 }
 
 func (r *IPAMRangeReconciler) HandleReconcile(ctx context.Context, log logr.Logger, ipamrange *api.IPAMRange) (ctrl.Result, error) {
@@ -74,7 +98,7 @@ func (r *IPAMRangeReconciler) HandleReconcile(ctx context.Context, log logr.Logg
 	if ipamrange.Spec.Parent != nil {
 		// handle IPAMRange as request first
 		var parent api.IPAMRange
-		namespace, fail, err := r.EvaluateScopedReference(ctx, ipamrange.Namespace, ipamrange.Spec.Parent, &parent)
+		namespace, fail, err := r.EvaluateScopedReferenceToObject(ctx, ipamrange.Namespace, ipamrange.Spec.Parent, &parent)
 		if err != nil {
 			log.Error(err, "")
 			if fail {
@@ -97,5 +121,4 @@ func (r *IPAMRangeReconciler) HandleReconcile(ctx context.Context, log logr.Logg
 
 func (r *IPAMRangeReconciler) HandleDelete(ctx context.Context, log logr.Logger, ipamrange *api.IPAMRange) (ctrl.Result, error) {
 	return ctrl.Result{}, nil
-
 }

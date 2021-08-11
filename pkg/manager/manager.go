@@ -17,9 +17,10 @@
 package manager
 
 import (
-	"github.com/onmetal/onmetal-api/pkg/ownercache"
+	"github.com/onmetal/onmetal-api/pkg/cache/ownercache"
+	"github.com/onmetal/onmetal-api/pkg/cache/usagecache"
+	"github.com/onmetal/onmetal-api/pkg/scopes"
 	"github.com/onmetal/onmetal-api/pkg/trigger"
-	"github.com/onmetal/onmetal-api/pkg/usagecache"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
@@ -28,9 +29,10 @@ import (
 
 type Manager struct {
 	manager.Manager
-	triggers   trigger.ReconcilationTrigger
-	ownerCache ownercache.OwnerCache
-	usageCache usagecache.UsageCache
+	triggers       trigger.ReconcilationTrigger
+	ownerCache     ownercache.OwnerCache
+	usageCache     usagecache.UsageCache
+	scopeEvaluator scopes.ScopeEvaluator
 }
 
 func NewManager(config *rest.Config, options manager.Options) (*Manager, error) {
@@ -41,11 +43,13 @@ func NewManager(config *rest.Config, options manager.Options) (*Manager, error) 
 	trig := trigger.NewReconcilationTrigger()
 	oc := ownercache.NewOwnerCache(mgr, trig)
 	uc := usagecache.NewUsageCache(mgr, trig)
+	se := scopes.NewScopeEvaluator(mgr.GetClient())
 	return &Manager{
-		Manager:    mgr,
-		ownerCache: oc,
-		usageCache: uc,
-		triggers:   trig,
+		Manager:        mgr,
+		ownerCache:     oc,
+		usageCache:     uc,
+		scopeEvaluator: se,
+		triggers:       trig,
 	}, nil
 }
 
@@ -57,6 +61,15 @@ func (m *Manager) GetUsageCache() usagecache.UsageCache {
 	return m.usageCache
 }
 
+func (m *Manager) GetScopeEvaluator() scopes.ScopeEvaluator {
+	return m.scopeEvaluator
+}
+
 func (m *Manager) RegisterControllerFor(gk schema.GroupKind, controller controller.Controller) {
 	m.triggers.RegisterControllerFor(gk, controller)
+}
+
+func (m *Manager) Wait() {
+	m.usageCache.Wait()
+	m.ownerCache.Wait()
 }

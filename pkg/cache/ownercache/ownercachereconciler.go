@@ -103,9 +103,11 @@ func (r *ownerReconciler) Reconcile(ctx context.Context, request reconcile.Reque
 		r.Log.Info(fmt.Sprintf("updating %s in ownercache", id))
 		_, oids = r.cache.ReplaceObject(obj)
 	}
-	for id := range oids {
-		r.Log.Info(fmt.Sprintf("enqueue %s", id))
-		r.cache.trigger.Trigger(id)
+	if r.cache.trigger != nil {
+		for id := range oids {
+			r.Log.Info(fmt.Sprintf("enqueue %s", id))
+			r.cache.trigger.Trigger(id)
+		}
 	}
 	return ctrl.Result{}, nil
 }

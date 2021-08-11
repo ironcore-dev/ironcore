@@ -58,7 +58,7 @@ func (r *usageReconciler) setup(ctx context.Context) {
 			r.cache.ReplaceObject(o)
 		}
 	} else {
-		panic(fmt.Sprintf("failed to setup %s ownercache", r.gk))
+		panic(fmt.Sprintf("failed to setup %s usagecache", r.gk))
 	}
 }
 
@@ -94,14 +94,16 @@ func (r *usageReconciler) Reconcile(ctx context.Context, request reconcile.Reque
 	}
 	if err := r.client.Get(ctx, key, obj); err != nil {
 		if errors.IsNotFound(err) {
-			r.Log.Info(fmt.Sprintf("deleting %s from ownercache", id))
+			r.Log.Info(fmt.Sprintf("deleting %s from usagecache", id))
 			oids = r.cache.DeleteObject(id)
 		} else {
 			return utils.Requeue(err)
 		}
 	} else {
-		r.Log.Info(fmt.Sprintf("updating %s in ownercache", id))
+		r.Log.Info(fmt.Sprintf("updating %s in usagecache", id))
 		_, oids = r.cache.ReplaceObject(obj)
+		usages := r.cache.GetUsedObjectsFor(id)
+		r.Log.Info(fmt.Sprintf("%s uses %s", id, usages))
 	}
 	if r.cache.trigger != nil {
 		for id := range oids {

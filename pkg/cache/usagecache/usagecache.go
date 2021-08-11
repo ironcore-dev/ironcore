@@ -19,7 +19,6 @@ package usagecache
 import (
 	"context"
 	"fmt"
-	"github.com/onmetal/onmetal-api/pkg/trigger"
 	"sync"
 
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -38,7 +37,7 @@ type usageCache struct {
 	lock          sync.RWMutex
 	targets       map[utils.ObjectId]ObjectUsageInfo
 	sources       map[utils.ObjectId]ObjectUsageInfo
-	ready         trigger.Ready
+	ready         *utils.Ready
 }
 
 type usageGKInfo struct {

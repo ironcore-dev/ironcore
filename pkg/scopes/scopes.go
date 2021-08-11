@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package utils
+package scopes
 
 import (
 	"context"
@@ -22,6 +22,7 @@ import (
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	api "github.com/onmetal/onmetal-api/apis/core/v1alpha1"
 	"github.com/onmetal/onmetal-api/controllers/core"
+	"github.com/onmetal/onmetal-api/pkg/utils"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -32,14 +33,8 @@ import (
 	"strings"
 )
 
-type ScopeEvaluator struct {
+type scopeEvaluator struct {
 	client.Client
-}
-
-func NewScopeEvaluator(client client.Client) *ScopeEvaluator {
-	return &ScopeEvaluator{
-		Client: client,
-	}
 }
 
 var pathSpec *regexp.Regexp = regexp.MustCompile("/?[a-zA-Z0-9]+(/[a-zA-Z0-9]+)*")
@@ -49,7 +44,7 @@ var pathSpec *regexp.Regexp = regexp.MustCompile("/?[a-zA-Z0-9]+(/[a-zA-Z0-9]+)*
 // if error occurs:
 // false = temporary error, needs requeue
 // true = final error no requeue, propage error to status
-func (s *ScopeEvaluator) GetNamespace(ctx context.Context, currentNamespace string, scope string) (string, bool, error) {
+func (s *scopeEvaluator) GetNamespace(ctx context.Context, currentNamespace string, scope string) (string, bool, error) {
 	scope = path.Clean(scope)
 	if strings.HasPrefix(scope, "../") || scope == ".." {
 		return "", true, fmt.Errorf("invalid scope path. no parent path allowed")
@@ -97,7 +92,7 @@ func (s *ScopeEvaluator) GetNamespace(ctx context.Context, currentNamespace stri
 	return currentNamespace, false, nil
 }
 
-func (s *ScopeEvaluator) EvaluateScopedReference(ctx context.Context, currentNamespace string, scopeRef *common.ScopedReference, obj client.Object) (string, bool, error) {
+func (s *scopeEvaluator) EvaluateScopedReferenceToObject(ctx context.Context, currentNamespace string, scopeRef *common.ScopedReference, obj client.Object) (string, bool, error) {
 	namespace := currentNamespace
 	if scopeRef.Name == "" {
 		return "", true, fmt.Errorf("name missing in scope reference")
@@ -116,7 +111,32 @@ func (s *ScopeEvaluator) EvaluateScopedReference(ctx context.Context, currentNam
 	return namespace, false, nil
 }
 
-func (s *ScopeEvaluator) EvaluateScopedKindReference(ctx context.Context, currentNamespace string, kindRef *common.ScopedKindReference) (runtime.Object, string, bool, error) {
+func (s *scopeEvaluator) EvaluateScopedReferenceToObjectId(ctx context.Context, currentNamespace string, gk schema.GroupKind, scopeRef *common.ScopedReference) (utils.ObjectId, bool, error) {
+	namespace := currentNamespace
+	if scopeRef == nil {
+		return utils.ObjectId{}, true, fmt.Errorf("no scope reference provided")
+	}
+	if scopeRef.Name == "" {
+		return utils.ObjectId{}, true, fmt.Errorf("name missing in scope reference")
+	}
+	if scopeRef.Scope != "" {
+		var failed bool
+		var err error
+		namespace, failed, err = s.GetNamespace(ctx, currentNamespace, scopeRef.Scope)
+		if err != nil {
+			return utils.ObjectId{}, failed, err
+		}
+	}
+	return utils.ObjectId{
+		ObjectKey: client.ObjectKey{
+			Namespace: namespace,
+			Name:      scopeRef.Name,
+		},
+		GroupKind: gk,
+	}, false, nil
+}
+
+func (s *scopeEvaluator) EvaluateScopedKindReferenceToObject(ctx context.Context, currentNamespace string, kindRef *common.ScopedKindReference) (runtime.Object, string, bool, error) {
 	namespace := currentNamespace
 	if kindRef.Name == "" {
 		return nil, "", true, fmt.Errorf("name missing in scoped kind reference")
@@ -136,7 +156,7 @@ func (s *ScopeEvaluator) EvaluateScopedKindReference(ctx context.Context, curren
 		}
 	}
 	gk := schema.GroupKind{Group: kindRef.APIGroup, Kind: kindRef.Kind}
-	obj := GetObjectForGroupKind(s.Client, gk)
+	obj := utils.GetObjectForGroupKind(s.Client, gk)
 	if obj == nil {
 		return nil, "", true, fmt.Errorf("invalid group kind for %s", gk)
 	}
@@ -144,4 +164,29 @@ func (s *ScopeEvaluator) EvaluateScopedKindReference(ctx context.Context, curren
 		return nil, namespace, errors.IsNotFound(err), fmt.Errorf("can not get %s/%s: %s", namespace, kindRef.Name, err)
 	}
 	return obj, namespace, false, nil
+}
+
+func (s *scopeEvaluator) EvaluateScopedKindReferenceToObjectId(ctx context.Context, currentNamespace string, kindRef *common.ScopedKindReference) (utils.ObjectId, bool, error) {
+	namespace := currentNamespace
+	if kindRef.Name == "" {
+		return utils.ObjectId{}, true, fmt.Errorf("name missing in scoped kind reference")
+	}
+	if kindRef.Kind == "" {
+		return utils.ObjectId{}, true, fmt.Errorf("kind missing in scoped kind reference")
+	}
+	if kindRef.APIGroup == "" {
+		return utils.ObjectId{}, true, fmt.Errorf("apiGroup missing in scoped kind reference")
+	}
+	if kindRef.Scope != "" {
+		var failed bool
+		var err error
+		namespace, failed, err = s.GetNamespace(ctx, currentNamespace, kindRef.Scope)
+		if err != nil {
+			return utils.ObjectId{}, failed, err
+		}
+	}
+	return utils.ObjectId{
+		ObjectKey: client.ObjectKey{Name: kindRef.Name, Namespace: namespace},
+		GroupKind: schema.GroupKind{Group: kindRef.APIGroup, Kind: kindRef.Kind},
+	}, false, nil
 }
