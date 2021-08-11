@@ -17,6 +17,9 @@
 package manager
 
 import (
+	"github.com/onmetal/onmetal-api/pkg/ownercache"
+	"github.com/onmetal/onmetal-api/pkg/trigger"
+	"github.com/onmetal/onmetal-api/pkg/usagecache"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
@@ -25,8 +28,9 @@ import (
 
 type Manager struct {
 	manager.Manager
-	triggers   ReconcilationTrigger
-	ownerCache *OwnerCache
+	triggers   trigger.ReconcilationTrigger
+	ownerCache ownercache.OwnerCache
+	usageCache usagecache.UsageCache
 }
 
 func NewManager(config *rest.Config, options manager.Options) (*Manager, error) {
@@ -34,17 +38,23 @@ func NewManager(config *rest.Config, options manager.Options) (*Manager, error) 
 	if err != nil {
 		return nil, err
 	}
-	trig := NewReconcilationTrigger()
-	oc := NewOwnerCache(mgr, trig)
+	trig := trigger.NewReconcilationTrigger()
+	oc := ownercache.NewOwnerCache(mgr, trig)
+	uc := usagecache.NewUsageCache(mgr, trig)
 	return &Manager{
 		Manager:    mgr,
 		ownerCache: oc,
+		usageCache: uc,
 		triggers:   trig,
 	}, nil
 }
 
-func (m *Manager) GetOwnerCache() *OwnerCache {
+func (m *Manager) GetOwnerCache() ownercache.OwnerCache {
 	return m.ownerCache
+}
+
+func (m *Manager) GetUsageCache() usagecache.UsageCache {
+	return m.usageCache
 }
 
 func (m *Manager) RegisterControllerFor(gk schema.GroupKind, controller controller.Controller) {

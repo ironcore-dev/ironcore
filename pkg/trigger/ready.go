@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package manager
+package trigger
 
 import "sync"
 
