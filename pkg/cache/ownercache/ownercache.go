@@ -127,6 +127,9 @@ func (o *ownerCache) GetOwnersByTypeFor(id utils.ObjectId, gk schema.GroupKind) 
 			ids.Add(i)
 		}
 	}
+	if len(ids) == 0 {
+		return nil
+	}
 	return ids
 }
 

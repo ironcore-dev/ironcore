@@ -50,7 +50,6 @@ func NewOwnerCache(manager manager.Manager, trigger Trigger) *ownerCache {
 	mgr := &ownerCache{
 		manager:       manager,
 		trigger:       trigger,
-		client:        manager.GetClient(),
 		registrations: map[schema.GroupKind]*ownerReconciler{},
 		owners:        map[utils.ObjectId]utils.ObjectIds{},
 		serfs:         map[utils.ObjectId]utils.ObjectIds{},
