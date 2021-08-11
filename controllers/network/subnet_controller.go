@@ -48,7 +48,7 @@ func (r *SubnetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 	log.Info(fmt.Sprintf("reconcile subnet %s", req))
 
 	// wait until ownercache is built
-	r.manager.GetOwnerCache().Wait()
+	r.manager.Wait()
 
 	id := utils.NewObjectIdForRequest(req, api.SubnetGK)
 	var subnet api.Subnet

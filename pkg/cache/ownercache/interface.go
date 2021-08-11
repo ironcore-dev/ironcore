@@ -20,6 +20,7 @@ import (
 	"context"
 	"github.com/onmetal/onmetal-api/pkg/utils"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 )
@@ -53,6 +54,7 @@ func NewOwnerCache(manager manager.Manager, trigger Trigger) *ownerCache {
 		registrations: map[schema.GroupKind]*ownerReconciler{},
 		owners:        map[utils.ObjectId]utils.ObjectIds{},
 		serfs:         map[utils.ObjectId]utils.ObjectIds{},
+		ready:         utils.NewReady(ctrl.Log.WithName("Ownercache"), "setup ownercache"),
 	}
 	if mgr.manager != nil {
 		mgr.client = manager.GetClient()

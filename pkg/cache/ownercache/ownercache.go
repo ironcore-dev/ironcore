@@ -19,7 +19,6 @@ package ownercache
 import (
 	"context"
 	"fmt"
-	"github.com/onmetal/onmetal-api/pkg/trigger"
 	"sync"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -38,7 +37,7 @@ type ownerCache struct {
 	lock          sync.RWMutex
 	owners        map[utils.ObjectId]utils.ObjectIds
 	serfs         map[utils.ObjectId]utils.ObjectIds
-	ready         trigger.Ready
+	ready         *utils.Ready
 }
 
 func (o *ownerCache) Wait() {

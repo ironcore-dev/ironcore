@@ -14,14 +14,27 @@
  * limitations under the License.
  */
 
-package trigger
+package utils
 
-import "sync"
+import (
+	"fmt"
+	"github.com/go-logr/logr"
+	"sync"
+)
 
 type Ready struct {
+	log     logr.Logger
+	name    string
 	count   int
 	lock    sync.Mutex
 	waiters []*sync.Mutex
+}
+
+func NewReady(log logr.Logger, name string) *Ready {
+	return &Ready{
+		log:  log,
+		name: name,
+	}
 }
 
 func (r *Ready) Add() {
@@ -42,6 +55,9 @@ func (r *Ready) Wait() {
 		r.lock.Unlock()
 		return
 	}
+	if r.log != nil {
+		r.log.Info(fmt.Sprintf("waiting for %s to be finished (%d resources pending)", r.name, r.count))
+	}
 	lock := &sync.Mutex{}
 	lock.Lock()
 	r.waiters = append(r.waiters, lock)
@@ -58,6 +74,9 @@ func (r *Ready) Remove() {
 		panic("too many removes")
 	}
 	if r.count == 0 {
+		if r.log != nil {
+			r.log.Info(fmt.Sprintf("%s done -> wakeup %d waiters", r.name, len(r.waiters)))
+		}
 		for _, l := range r.waiters {
 			l.Unlock()
 		}

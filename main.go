@@ -19,7 +19,6 @@ package main
 import (
 	"flag"
 	"github.com/onmetal/onmetal-api/pkg/manager"
-	"github.com/onmetal/onmetal-api/pkg/utils"
 	"os"
 
 	"github.com/onmetal/onmetal-api/controllers/core/accounts"
@@ -208,10 +207,7 @@ func main() {
 		os.Exit(1)
 	}
 	if err = (&networkcontrollers.IPAMRangeReconciler{
-		ScopeEvaluator: *utils.NewScopeEvaluator(mgr.GetClient()),
-		Client:         mgr.GetClient(),
-		Log:            ctrl.Log.WithName("iprange").WithName("Account"),
-		Scheme:         mgr.GetScheme(),
+		Log: ctrl.Log.WithName("iprange").WithName("Account"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "IPAMRange")
 		os.Exit(1)

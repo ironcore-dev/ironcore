@@ -20,8 +20,13 @@ import (
 	"context"
 	"github.com/onmetal/onmetal-api/pkg/utils"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
+)
+
+const (
+	RelationUses = "uses"
 )
 
 type Extractor interface {
@@ -64,6 +69,7 @@ func NewUsageCache(manager manager.Manager, trigger Trigger) *usageCache {
 		extractors: map[schema.GroupKind]*usageGKInfo{},
 		targets:    map[utils.ObjectId]ObjectUsageInfo{},
 		sources:    map[utils.ObjectId]ObjectUsageInfo{},
+		ready:      utils.NewReady(ctrl.Log.WithName("Usagecache"), "setup usagecache"),
 	}
 	if mgr.manager != nil {
 		mgr.client = manager.GetClient()

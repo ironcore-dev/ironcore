@@ -50,7 +50,7 @@ func (i ObjectUsageInfo) Add(relation string, ids utils.ObjectIds) {
 		return
 	}
 	old := i[relation]
-	if old != nil {
+	if old == nil {
 		old = utils.ObjectIds{}
 		i[relation] = old
 	}
