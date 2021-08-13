@@ -19,7 +19,7 @@ package scopes
 import (
 	"context"
 	"fmt"
-	"github.com/onmetal/onmetal-api/controllers/core"
+	"github.com/onmetal/onmetal-api/apis/core"
 	"github.com/onmetal/onmetal-api/pkg/utils"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/selection"

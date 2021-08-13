@@ -16,10 +16,12 @@
 
 package core
 
-import "github.com/onmetal/onmetal-api/controllers"
+import (
+	"github.com/onmetal/onmetal-api/apis"
+)
 
 const (
-	LabelDomain     = "core." + controllers.LabelDomain
+	LabelDomain     = "core." + apis.LabelDomain
 	AccountLabel    = LabelDomain + "/account"
 	ScopeLabel      = LabelDomain + "/scope"
 	ParentNamespace = LabelDomain + "/parentNamespace"

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package regions
+package core
 
 import (
 	"context"

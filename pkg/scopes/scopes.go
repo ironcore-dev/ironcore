@@ -20,8 +20,8 @@ import (
 	"context"
 	"fmt"
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	coredoc "github.com/onmetal/onmetal-api/apis/core"
 	api "github.com/onmetal/onmetal-api/apis/core/v1alpha1"
-	"github.com/onmetal/onmetal-api/controllers/core"
 	"github.com/onmetal/onmetal-api/pkg/utils"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -66,7 +66,7 @@ func (s *scopeEvaluator) GetNamespace(ctx context.Context, currentNamespace stri
 				}
 			}
 			if accountNamespace.GetLabels() != nil {
-				accountName = accountNamespace.GetLabels()[core.AccountLabel]
+				accountName = accountNamespace.GetLabels()[coredoc.AccountLabel]
 			}
 		} else {
 			accountName = comps[1]

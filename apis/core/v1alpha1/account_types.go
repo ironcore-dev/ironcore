@@ -20,7 +20,13 @@ import (
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
+
+var AccountGK = schema.GroupKind{
+	Group: GroupVersion.Group,
+	Kind:  "Account",
+}
 
 // AccountSpec defines the desired state of Account
 type AccountSpec struct {

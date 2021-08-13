@@ -18,7 +18,8 @@ package accounts
 
 import (
 	"context"
-	"github.com/onmetal/onmetal-api/controllers/core"
+	"github.com/onmetal/onmetal-api/apis/core"
+	"github.com/onmetal/onmetal-api/pkg/manager"
 	"github.com/onmetal/onmetal-api/pkg/utils"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/selection"
@@ -114,7 +115,7 @@ func (r *AccountReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			return utils.Requeue(err)
 		}
 	} else {
-		log.V(0).Info("deleting account", "account", account.Name)
+		log.Info("deleting account", "account", account.Name)
 		// Remove external dependencies
 		namespaces, err := r.listNamespacesForAccount(ctx, req)
 		if err != nil {
@@ -142,6 +143,7 @@ func (r *AccountReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			if err := utils.AssureFinalizerRemoved(ctx, r.Client, accountFinilizerName, namespace); client.IgnoreNotFound(err) != nil {
 				return utils.Requeue(err)
 			}
+			log.Info("deleting account namespace", "account", account.Name, "namespace", namespace.Name)
 			if err := utils.AssureDeleting(ctx, r.Client, namespace); err != nil {
 				return utils.Requeue(err)
 			}
@@ -171,7 +173,7 @@ func (r *AccountReconciler) listNamespacesForAccount(ctx context.Context, req ct
 }
 
 // SetupWithManager sets up the controller with the Manager.
-func (r *AccountReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *AccountReconciler) SetupWithManager(mgr *manager.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&corev1alpha1.Account{}).
 		Complete(r)

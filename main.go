@@ -18,12 +18,11 @@ package main
 
 import (
 	"flag"
+	"github.com/onmetal/onmetal-api/controllers/core"
+	"github.com/onmetal/onmetal-api/controllers/core/accounts"
+	"github.com/onmetal/onmetal-api/controllers/core/scopes"
 	"github.com/onmetal/onmetal-api/pkg/manager"
 	"os"
-
-	"github.com/onmetal/onmetal-api/controllers/core/accounts"
-	"github.com/onmetal/onmetal-api/controllers/core/regions"
-	"github.com/onmetal/onmetal-api/controllers/core/scopes"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
@@ -115,7 +114,7 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "MachineClass")
 		os.Exit(1)
 	}
-	if err = (&regions.RegionReconciler{
+	if err = (&core.RegionReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers
+package apis
 
 const (
 	LabelDomain = "onmetal.de"
