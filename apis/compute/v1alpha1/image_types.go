@@ -22,12 +22,16 @@ import (
 )
 
 // ImageSpec defines the desired state of Image
+//
+// Either a Source or an ImageRef should be defined to describe the content of an Image
 type ImageSpec struct {
-	// Type specifies the type of the image
-	Type string `json:"type,omitempty"`
-	// Maturity defines the manutiry of an image. It indicates whether this image is e.g. a stable or preview version.
+	// Arch describes the architecture the Image is built for
+	Arch string `json:"arch"`
+	// Maturity defines the maturity of an Image. It indicates whether this Image is e.g. a stable or preview version.
 	Maturity string `json:"maturity"`
 	// ExpirationTime defines when the support for this image will expire
+	//+kubebuilder:validation:Format:=date-time
+	//+kubebuilder:validation:Type:=string
 	ExpirationTime metav1.Time `json:"expirationTime,omitempty"`
 	// OS defines the operating system name of the image
 	OS string `json:"os"`
@@ -35,18 +39,26 @@ type ImageSpec struct {
 	Version string `json:"version"`
 	// Source defines the source artefacts and their corresponding location
 	Source []SourceAttribute `json:"source"`
+	// ImageRef is a scoped reference to an existing Image
+	ImageRef common.ScopedReference `json:"imageRef,omitempty"`
+	// Flags is a generic key value pair used for defining Image hints
+	Flags []Flag `json:"flags,omitempty"`
+}
+
+// Flag is a single value pair
+type Flag struct {
+	// Key is the key name
+	Key string `json:"key"`
+	// Value contains the value for a key
+	Value string `json:"value"`
 }
 
 // SourceAttribute describes the source components of an Image
 type SourceAttribute struct {
 	// Name defines the name of a source element
 	Name string `json:"name"`
-	// ImageName defines the name of a referred image
-	ImageName string `json:"imageName,omitempty"`
 	// URL defines the location of the image artefact
 	URL string `json:"url,omitempty"`
-	// CmdLine defines a Kernel boot command
-	CmdLine string `json:"cmdLine,omitempty"`
 	// Hash is the computed hash value of the artefacts content
 	Hash *Hash `json:"hash,omitempty"`
 }
@@ -91,9 +103,10 @@ const (
 //+kubebuilder:printcolumn:name="OS",type=string,JSONPath=`.spec.os`
 //+kubebuilder:printcolumn:name="Version",type=string,JSONPath=`.spec.version`
 //+kubebuilder:printcolumn:name="Maturity",type=string,JSONPath=`.spec.maturity`
-//+kubebuilder:printcolumn:name="Expiration",type=date,JSONPath=`.spec.expirationTime`
-//+kubebuilder:printcolumn:name="Type",type=string,JSONPath=`.spec.type`,priority=100
-//+kubebuilder:printcolumn:name="StateFields",type=string,JSONPath=`.status.state`
+//+kubebuilder:printcolumn:name="Expiration",type=string,JSONPath=`.spec.expirationTime`
+//+kubebuilder:printcolumn:name="Source",type=string,JSONPath=`.spec.source`,priority=100
+//+kubebuilder:printcolumn:name="Flags",type=string,JSONPath=`.spec.flags`,priority=100
+//+kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.state`
 //+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
 // Image is the Schema for the images API

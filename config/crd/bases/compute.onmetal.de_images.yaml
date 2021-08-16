@@ -28,13 +28,17 @@ spec:
       type: string
     - jsonPath: .spec.expirationTime
       name: Expiration
-      type: date
-    - jsonPath: .spec.type
-      name: Type
+      type: string
+    - jsonPath: .spec.source
+      name: Source
+      priority: 100
+      type: string
+    - jsonPath: .spec.flags
+      name: Flags
       priority: 100
       type: string
     - jsonPath: .status.state
-      name: StateFields
+      name: State
       type: string
     - jsonPath: .metadata.creationTimestamp
       name: Age
@@ -57,16 +61,50 @@ spec:
           metadata:
             type: object
           spec:
-            description: ImageSpec defines the desired state of Image
+            description: "ImageSpec defines the desired state of Image \n Either a
+              Source or an ImageRef should be defined to describe the content of an
+              Image"
             properties:
+              arch:
+                description: Arch describes the architecture the Image is built for
+                type: string
               expirationTime:
                 description: ExpirationTime defines when the support for this image
                   will expire
                 format: date-time
                 type: string
+              flags:
+                description: Flags is a generic key value pair used for defining Image
+                  hints
+                items:
+                  description: Flag is a single value pair
+                  properties:
+                    key:
+                      description: Key is the key name
+                      type: string
+                    value:
+                      description: Value contains the value for a key
+                      type: string
+                  required:
+                  - key
+                  - value
+                  type: object
+                type: array
+              imageRef:
+                description: ImageRef is a scoped reference to an existing Image
+                properties:
+                  name:
+                    description: Name is the name of the scope
+                    type: string
+                  scope:
+                    description: Scope is the absolute scope path
+                    type: string
+                required:
+                - name
+                type: object
               maturity:
-                description: Maturity defines the manutiry of an image. It indicates
-                  whether this image is e.g. a stable or preview version.
+                description: Maturity defines the maturity of an Image. It indicates
+                  whether this Image is e.g. a stable or preview version.
                 type: string
               os:
                 description: OS defines the operating system name of the image
@@ -78,9 +116,6 @@ spec:
                   description: SourceAttribute describes the source components of
                     an Image
                   properties:
-                    cmdLine:
-                      description: CmdLine defines a Kernel boot command
-                      type: string
                     hash:
                       description: Hash is the computed hash value of the artefacts
                         content
@@ -96,9 +131,6 @@ spec:
                       - algorithm
                       - value
                       type: object
-                    imageName:
-                      description: ImageName defines the name of a referred image
-                      type: string
                     name:
                       description: Name defines the name of a source element
                       type: string
@@ -109,13 +141,11 @@ spec:
                   - name
                   type: object
                 type: array
-              type:
-                description: Type specifies the type of the image
-                type: string
               version:
                 description: Version defines the operating system version
                 type: string
             required:
+            - arch
             - maturity
             - os
             - source
