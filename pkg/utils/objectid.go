@@ -84,6 +84,12 @@ func NewObjectId(object client.Object) ObjectId {
 	}
 }
 
+func (o ObjectId) String() string {
+	return fmt.Sprintf("%s/%s", o.GroupKind, o.ObjectKey)
+}
+
+type ObjectIds map[ObjectId]struct{}
+
 func GetOwnerIdsFor(object client.Object) ObjectIds {
 	ids := ObjectIds{}
 	for _, o := range object.GetOwnerReferences() {
@@ -104,12 +110,6 @@ func GetOwnerIdsFor(object client.Object) ObjectIds {
 	}
 	return ids
 }
-
-func (o ObjectId) String() string {
-	return fmt.Sprintf("%s/%s", o.GroupKind, o.ObjectKey)
-}
-
-type ObjectIds map[ObjectId]struct{}
 
 func NewObjectIds(ids ...ObjectId) ObjectIds {
 	set := ObjectIds{}
@@ -137,11 +137,11 @@ func (o ObjectIds) Copy() ObjectIds {
 	if o == nil {
 		return nil
 	}
-	new := ObjectIds{}
+	newObjectId := ObjectIds{}
 	for id := range o {
-		new.Add(id)
+		newObjectId.Add(id)
 	}
-	return new
+	return newObjectId
 }
 
 func (o ObjectIds) String() string {
@@ -172,11 +172,11 @@ func (o ObjectIds) Equal(ids ObjectIds) bool {
 }
 
 func (o ObjectIds) Join(ids ObjectIds) ObjectIds {
-	new := o.Copy()
+	newObjectIds := o.Copy()
 	for id := range ids {
-		new.Add(id)
+		newObjectIds.Add(id)
 	}
-	return new
+	return newObjectIds
 }
 
 func (o ObjectIds) Contains(id ObjectId) bool {
