@@ -44,7 +44,7 @@ func AssureFinalizerRemoved(ctx context.Context, client client.Client, finalizer
 	return nil
 }
 
-// AssureDeleting ensures that the object is in deletion mode
+// AssureDeleting ensures that an object is being deleted
 func AssureDeleting(ctx context.Context, clt client.Client, object client.Object) error {
 	if !object.GetDeletionTimestamp().IsZero() {
 		return nil
