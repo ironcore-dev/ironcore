@@ -72,7 +72,9 @@ func (r *SubnetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 			},
 			Status: api.IPAMRangeStatus{},
 		}
-		r.manager.GetOwnerCache().CreateSerf(ctx, &subnet, &ipam)
+		if err := r.manager.GetOwnerCache().CreateSerf(ctx, &subnet, &ipam); err != nil {
+			return utils.SucceededIfNotFound(err)
+		}
 	}
 
 	return ctrl.Result{}, nil
@@ -81,7 +83,9 @@ func (r *SubnetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 // SetupWithManager sets up the controller with the Manager.
 func (r *SubnetReconciler) SetupWithManager(mgr *manager.Manager) error {
 	r.manager = mgr
-	mgr.GetOwnerCache().RegisterGroupKind(context.Background(), api.IPAMRangeGK)
+	if err := mgr.GetOwnerCache().RegisterGroupKind(context.Background(), api.IPAMRangeGK); err != nil {
+		return err
+	}
 	c, err := ctrl.NewControllerManagedBy(mgr).
 		For(&api.Subnet{}).
 		Build(r)

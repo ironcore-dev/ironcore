@@ -31,7 +31,8 @@ import (
 	"github.com/onmetal/onmetal-api/pkg/utils"
 )
 
-type triggersources map[schema.GroupKind]*triggerSource
+//TODO: check removal
+//type triggersources map[schema.GroupKind]*triggerSource
 
 // triggerSource is a fake source to catch watch start calls from controllers
 // to get access to the queue to feed with reconcilation requests.
@@ -83,7 +84,9 @@ func (t *reconcilationTrigger) RegisterControllerFor(gk schema.GroupKind, c cont
 		}
 		t.sources[gk] = s
 	}
-	c.Watch(s, nil)
+	if err := c.Watch(s, nil); err != nil {
+		panic("watch failed while registering trigger controller")
+	}
 }
 
 func (t *reconcilationTrigger) Trigger(id utils.ObjectId) {

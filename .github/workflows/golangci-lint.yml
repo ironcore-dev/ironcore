@@ -1,0 +1,16 @@
+name: Lint Golang Codebase
+
+on:
+  pull_request:
+
+jobs:
+  golangci:
+    name: lint
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v2
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.41.1
+          args: --skip-dirs pkg/ipam

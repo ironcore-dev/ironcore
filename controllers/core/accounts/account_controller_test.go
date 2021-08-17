@@ -75,8 +75,7 @@ var _ = Describe("Account controller", func() {
 			By("Expecting created")
 			Eventually(func() bool {
 				a := &api.Account{}
-				err := k8sClient.Get(context.Background(), accountLookUpKey, a)
-				if err != nil {
+				if err := k8sClient.Get(context.Background(), accountLookUpKey, a); err != nil {
 					return false
 				}
 				return true
@@ -85,44 +84,50 @@ var _ = Describe("Account controller", func() {
 			By("Expecting finalizer")
 			Eventually(func() []string {
 				a := &api.Account{}
-				k8sClient.Get(context.Background(), accountLookUpKey, a)
+				if err := k8sClient.Get(context.Background(), accountLookUpKey, a); err != nil {
+					return []string{}
+				}
 				return a.GetFinalizers()
 			}, timeout, interval).Should(ContainElements(accountFinilizerName))
 
 			By("Expecting description")
 			Eventually(func() string {
 				a := &api.Account{}
-				k8sClient.Get(context.Background(), accountLookUpKey, a)
+				if err := k8sClient.Get(context.Background(), accountLookUpKey, a); err != nil {
+					return ""
+				}
 				return a.Spec.Description
 			}, timeout, interval).Should(Equal(accountDescription))
 
 			By("Expecting purpose")
 			Eventually(func() string {
 				a := &api.Account{}
-				k8sClient.Get(context.Background(), accountLookUpKey, a)
+				if err := k8sClient.Get(context.Background(), accountLookUpKey, a); err != nil {
+					return ""
+				}
 				return a.Spec.Purpose
 			}, timeout, interval).Should(Equal(accountPurpose))
 
 			By("Expecting Namespace in Status not to be empty")
 			Eventually(func() string {
 				a := &api.Account{}
-				k8sClient.Get(context.Background(), accountLookUpKey, a)
+				if err := k8sClient.Get(context.Background(), accountLookUpKey, a); err != nil {
+					return ""
+				}
 				return a.Status.Namespace
 			}, timeout, interval).Should(Not(BeEmpty()))
 
 			By("Expecting Account Namespace to be created")
 			Eventually(func() bool {
 				a := &api.Account{}
-				err := k8sClient.Get(context.Background(), accountLookUpKey, a)
-				if err != nil {
+				if err := k8sClient.Get(context.Background(), accountLookUpKey, a); err != nil {
 					return false
 				}
 				accountNamespace = a.Status.Namespace
 				n := &v1.Namespace{}
-				err = k8sClient.Get(context.Background(), client.ObjectKey{
+				if err := k8sClient.Get(context.Background(), client.ObjectKey{
 					Name: accountNamespace,
-				}, n)
-				if err != nil {
+				}, n); err != nil {
 					return false
 				}
 				return true
@@ -131,7 +136,9 @@ var _ = Describe("Account controller", func() {
 			By("Expecting the State to be Ready")
 			Eventually(func() string {
 				a := &api.Account{}
-				k8sClient.Get(context.Background(), accountLookUpKey, a)
+				if err := k8sClient.Get(context.Background(), accountLookUpKey, a); err != nil {
+					return ""
+				}
 				return a.Status.State
 			}, timeout, interval).Should(Equal(api.AccountReady))
 		})

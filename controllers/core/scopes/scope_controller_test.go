@@ -39,9 +39,8 @@ var _ = Describe("Scope controller", func() {
 		accountDescription = "myaccount description"
 		accountPurpose     = "development"
 
-		timeout         = time.Second * 30
-		deletionTimeout = time.Second * 30
-		interval        = time.Second * 1
+		timeout  = time.Second * 30
+		interval = time.Second * 1
 	)
 
 	var scope *api.Scope
@@ -82,16 +81,14 @@ var _ = Describe("Scope controller", func() {
 			By("Expecting Account Namespace to be created")
 			Eventually(func() bool {
 				a := &api.Account{}
-				err := k8sClient.Get(context.Background(), accountLookUpKey, a)
-				if err != nil {
+				if err := k8sClient.Get(context.Background(), accountLookUpKey, a); err != nil {
 					return false
 				}
 				accountNamespace = a.Status.Namespace
 				n := &v1.Namespace{}
-				err = k8sClient.Get(context.Background(), client.ObjectKey{
+				if err := k8sClient.Get(context.Background(), client.ObjectKey{
 					Name: accountNamespace,
-				}, n)
-				if err != nil {
+				}, n); err != nil {
 					return false
 				}
 				return true
@@ -121,8 +118,7 @@ var _ = Describe("Scope controller", func() {
 			By("Expecting created")
 			Eventually(func() bool {
 				s := &api.Scope{}
-				err := k8sClient.Get(context.Background(), scopeLookUpKey, s)
-				if err != nil {
+				if err := k8sClient.Get(context.Background(), scopeLookUpKey, s); err != nil {
 					return false
 				}
 				return true
@@ -131,37 +127,41 @@ var _ = Describe("Scope controller", func() {
 			By("Expecting description")
 			Eventually(func() string {
 				s := &api.Scope{}
-				k8sClient.Get(context.Background(), scopeLookUpKey, s)
+				if err := k8sClient.Get(context.Background(), scopeLookUpKey, s); err != nil {
+					return ""
+				}
 				return s.Spec.Description
 			}, timeout, interval).Should(Equal(scopeDescription))
 
 			By("Expecting region")
 			Eventually(func() string {
 				s := &api.Scope{}
-				k8sClient.Get(context.Background(), scopeLookUpKey, s)
+				if err := k8sClient.Get(context.Background(), scopeLookUpKey, s); err != nil {
+					return ""
+				}
 				return s.Spec.Region
 			}, timeout, interval).Should(Equal(scopeRegion))
 
 			By("Expecting Namespace in Status not to be empty")
 			Eventually(func() string {
 				s := &api.Scope{}
-				k8sClient.Get(context.Background(), scopeLookUpKey, s)
+				if err := k8sClient.Get(context.Background(), scopeLookUpKey, s); err != nil {
+					return ""
+				}
 				return s.Status.Namespace
 			}, timeout, interval).Should(Not(BeEmpty()))
 
 			By("Expecting Scope Namespace to be created")
 			Eventually(func() bool {
 				s := &api.Scope{}
-				err := k8sClient.Get(context.Background(), scopeLookUpKey, s)
-				if err != nil {
+				if err := k8sClient.Get(context.Background(), scopeLookUpKey, s); err != nil {
 					return false
 				}
 				scopeNamespace = s.Status.Namespace
 				n := &v1.Namespace{}
-				err = k8sClient.Get(context.Background(), client.ObjectKey{
+				if err := k8sClient.Get(context.Background(), client.ObjectKey{
 					Name: scopeNamespace,
-				}, n)
-				if err != nil {
+				}, n); err != nil {
 					return false
 				}
 				return true
@@ -170,35 +170,45 @@ var _ = Describe("Scope controller", func() {
 			By("Expecting the State to be Ready")
 			Eventually(func() string {
 				s := &api.Scope{}
-				k8sClient.Get(context.Background(), scopeLookUpKey, s)
+				if err := k8sClient.Get(context.Background(), scopeLookUpKey, s); err != nil {
+					return ""
+				}
 				return s.Status.State
 			}, timeout, interval).Should(Equal(api.AccountReady))
 
 			By("Expecting the Account name in State to be set")
 			Eventually(func() string {
 				s := &api.Scope{}
-				k8sClient.Get(context.Background(), scopeLookUpKey, s)
+				if err := k8sClient.Get(context.Background(), scopeLookUpKey, s); err != nil {
+					return ""
+				}
 				return s.Status.Account
 			}, timeout, interval).Should(Equal(accountName))
 
 			By("Expecting the ParentScope in State to be set")
 			Eventually(func() string {
 				s := &api.Scope{}
-				k8sClient.Get(context.Background(), scopeLookUpKey, s)
+				if err := k8sClient.Get(context.Background(), scopeLookUpKey, s); err != nil {
+					return ""
+				}
 				return s.Status.ParentScope
 			}, timeout, interval).Should(Equal(accountName))
 
 			By("Expecting the ParentNamespace in State to be set")
 			Eventually(func() string {
 				s := &api.Scope{}
-				k8sClient.Get(context.Background(), scopeLookUpKey, s)
+				if err := k8sClient.Get(context.Background(), scopeLookUpKey, s); err != nil {
+					return ""
+				}
 				return s.Status.ParentNamespace
 			}, timeout, interval).Should(Equal(accountNamespace))
 
 			By("Expecting finalizer")
 			Eventually(func() []string {
 				s := &api.Scope{}
-				k8sClient.Get(context.Background(), scopeLookUpKey, s)
+				if err := k8sClient.Get(context.Background(), scopeLookUpKey, s); err != nil {
+					return []string{}
+				}
 				return s.GetFinalizers()
 			}, timeout, interval).Should(ContainElements(scopeFinilizerName))
 		})
