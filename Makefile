@@ -4,6 +4,9 @@ IMG ?= controller:latest
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true,preserveUnknownFields=false"
 
+# Docker image name for the mkdocs based local development setup
+IMAGE=onmetal-api/documentation
+
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
 GOBIN=$(shell go env GOPATH)/bin
@@ -55,6 +58,13 @@ dep: ## Run go get to fetch all necessary dependencies.
 
 docs: dep ## Run go generate to generate API reference documentation.
 	go generate ./...
+
+start-docs: ## Start the local mkdocs based development environment.
+	docker build -t $(IMAGE) -f docs/Dockerfile .
+	docker run -p 8000:8000 -v `pwd`/:/docs $(IMAGE)
+
+clean-docs: ## Remove all local mkdocs Docker images (cleanup).
+	docker container prune --force --filter "label=project=onmetal_api_documentation"
 
 ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
 test: manifests generate fmt vet ## Run tests.

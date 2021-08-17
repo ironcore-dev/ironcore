@@ -1,16 +1,16 @@
 <p>Packages:</p>
 <ul>
 <li>
-<a href="#compute.onmetal.de%2fv1alpha1">compute.onmetal.de/v1alpha1</a>
+<a href="#network.onmetal.de%2fv1alpha1">network.onmetal.de/v1alpha1</a>
 </li>
 </ul>
-<h2 id="compute.onmetal.de/v1alpha1">compute.onmetal.de/v1alpha1</h2>
+<h2 id="network.onmetal.de/v1alpha1">network.onmetal.de/v1alpha1</h2>
 Resource Types:
 <ul></ul>
-<h3 id="compute.onmetal.de/v1alpha1.ActionType">ActionType
+<h3 id="network.onmetal.de/v1alpha1.ActionType">ActionType
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.SecurityGroupRule">SecurityGroupRule</a>)
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SecurityGroupRule">SecurityGroupRule</a>)
 </p>
 <div>
 <p>ActionType describes the action type of a SecurityGroupRule</p>
@@ -28,10 +28,10 @@ Resource Types:
 <td></td>
 </tr></tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.CIDRStatus">CIDRStatus
+<h3 id="network.onmetal.de/v1alpha1.CIDRStatus">CIDRStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.SubnetStatus">SubnetStatus</a>)
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SubnetStatus">SubnetStatus</a>)
 </p>
 <div>
 <p>CIDRStatus is the status of a CIDR</p>
@@ -48,7 +48,7 @@ Resource Types:
 <td>
 <code>cidr</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#Cidr">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Cidr">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.Cidr
 </a>
 </em>
@@ -61,7 +61,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.Cidr
 <td>
 <code>blockedRanges</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#Cidr">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Cidr">
 []github.com/onmetal/onmetal-api/apis/common/v1alpha1.Cidr
 </a>
 </em>
@@ -72,10 +72,10 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.Cidr
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.EgressSecurityGroupRule">EgressSecurityGroupRule
+<h3 id="network.onmetal.de/v1alpha1.EgressSecurityGroupRule">EgressSecurityGroupRule
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.SecurityGroupSpec">SecurityGroupSpec</a>)
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SecurityGroupSpec">SecurityGroupSpec</a>)
 </p>
 <div>
 <p>EgressSecurityGroupRule is an egress rule of a security group</p>
@@ -92,7 +92,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.Cidr
 <td>
 <code>SecurityGroupRule</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.SecurityGroupRule">
+<a href="#network.onmetal.de/v1alpha1.SecurityGroupRule">
 SecurityGroupRule
 </a>
 </em>
@@ -107,7 +107,7 @@ SecurityGroupRule
 <td>
 <code>destination</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.IPSetSpec">
+<a href="#network.onmetal.de/v1alpha1.IPSetSpec">
 IPSetSpec
 </a>
 </em>
@@ -118,10 +118,10 @@ IPSetSpec
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.FilterRule">FilterRule
+<h3 id="network.onmetal.de/v1alpha1.FilterRule">FilterRule
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.GatewaySpec">GatewaySpec</a>)
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.GatewaySpec">GatewaySpec</a>)
 </p>
 <div>
 </div>
@@ -137,7 +137,7 @@ IPSetSpec
 <td>
 <code>securityGroup</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -147,7 +147,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.Gateway">Gateway
+<h3 id="network.onmetal.de/v1alpha1.Gateway">Gateway
 </h3>
 <div>
 <p>Gateway is the Schema for the gateways API</p>
@@ -164,7 +164,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -178,7 +178,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.GatewaySpec">
+<a href="#network.onmetal.de/v1alpha1.GatewaySpec">
 GatewaySpec
 </a>
 </em>
@@ -212,7 +212,7 @@ string
 <td>
 <code>filterRules</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.FilterRule">
+<a href="#network.onmetal.de/v1alpha1.FilterRule">
 []FilterRule
 </a>
 </em>
@@ -224,7 +224,7 @@ string
 <td>
 <code>uplink</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedKindReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedKindReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
 </a>
 </em>
@@ -240,7 +240,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
 <td>
 <code>status</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.GatewayStatus">
+<a href="#network.onmetal.de/v1alpha1.GatewayStatus">
 GatewayStatus
 </a>
 </em>
@@ -250,10 +250,10 @@ GatewayStatus
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.GatewaySpec">GatewaySpec
+<h3 id="network.onmetal.de/v1alpha1.GatewaySpec">GatewaySpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.Gateway">Gateway</a>)
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.Gateway">Gateway</a>)
 </p>
 <div>
 <p>GatewaySpec defines the desired state of Gateway</p>
@@ -291,7 +291,7 @@ string
 <td>
 <code>filterRules</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.FilterRule">
+<a href="#network.onmetal.de/v1alpha1.FilterRule">
 []FilterRule
 </a>
 </em>
@@ -303,7 +303,7 @@ string
 <td>
 <code>uplink</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedKindReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedKindReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
 </a>
 </em>
@@ -314,10 +314,10 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.GatewayStatus">GatewayStatus
+<h3 id="network.onmetal.de/v1alpha1.GatewayStatus">GatewayStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.Gateway">Gateway</a>)
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.Gateway">Gateway</a>)
 </p>
 <div>
 <p>GatewayStatus defines the observed state of Gateway</p>
@@ -334,7 +334,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
 <td>
 <code>StateFields</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#StateFields">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.StateFields">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 </a>
 </em>
@@ -349,7 +349,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 <td>
 <code>ips</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#IPAddr">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IPAddr">
 []github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPAddr
 </a>
 </em>
@@ -359,7 +359,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.IPAMRange">IPAMRange
+<h3 id="network.onmetal.de/v1alpha1.IPAMRange">IPAMRange
 </h3>
 <div>
 <p>IPAMRange is the Schema for the ipamranges API</p>
@@ -376,7 +376,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -390,7 +390,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.IPAMRangeSpec">
+<a href="#network.onmetal.de/v1alpha1.IPAMRangeSpec">
 IPAMRangeSpec
 </a>
 </em>
@@ -403,7 +403,7 @@ IPAMRangeSpec
 <td>
 <code>parent</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -438,7 +438,7 @@ string
 <td>
 <code>status</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.IPAMRangeStatus">
+<a href="#network.onmetal.de/v1alpha1.IPAMRangeStatus">
 IPAMRangeStatus
 </a>
 </em>
@@ -448,10 +448,10 @@ IPAMRangeStatus
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.IPAMRangeSpec">IPAMRangeSpec
+<h3 id="network.onmetal.de/v1alpha1.IPAMRangeSpec">IPAMRangeSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.IPAMRange">IPAMRange</a>)
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.IPAMRange">IPAMRange</a>)
 </p>
 <div>
 <p>IPAMRangeSpec defines the desired state of IPAMRange
@@ -472,7 +472,7 @@ Otherwise the status of the object will be set to &ldquo;Failed&rdquo;.</p>
 <td>
 <code>parent</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -502,10 +502,10 @@ string
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.IPAMRangeStatus">IPAMRangeStatus
+<h3 id="network.onmetal.de/v1alpha1.IPAMRangeStatus">IPAMRangeStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.IPAMRange">IPAMRange</a>)
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.IPAMRange">IPAMRange</a>)
 </p>
 <div>
 <p>IPAMRangeStatus defines the observed state of IPAMRange</p>
@@ -522,7 +522,7 @@ string
 <td>
 <code>StateFields</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#StateFields">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.StateFields">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 </a>
 </em>
@@ -537,7 +537,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 <td>
 <code>bound</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedKindReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedKindReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
 </a>
 </em>
@@ -567,10 +567,10 @@ string
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.IPSetSpec">IPSetSpec
+<h3 id="network.onmetal.de/v1alpha1.IPSetSpec">IPSetSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.EgressSecurityGroupRule">EgressSecurityGroupRule</a>, <a href="#compute.onmetal.de/v1alpha1.IngressSecurityGroupRule">IngressSecurityGroupRule</a>)
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.EgressSecurityGroupRule">EgressSecurityGroupRule</a>, <a href="#network.onmetal.de/v1alpha1.IngressSecurityGroupRule">IngressSecurityGroupRule</a>)
 </p>
 <div>
 <p>IPSetSpec defines either a cidr or a security group reference</p>
@@ -587,7 +587,7 @@ string
 <td>
 <code>cidr</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#Cidr">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Cidr">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.Cidr
 </a>
 </em>
@@ -600,7 +600,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.Cidr
 <td>
 <code>securityGroupref</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -611,10 +611,10 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.IngressSecurityGroupRule">IngressSecurityGroupRule
+<h3 id="network.onmetal.de/v1alpha1.IngressSecurityGroupRule">IngressSecurityGroupRule
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.SecurityGroupSpec">SecurityGroupSpec</a>)
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SecurityGroupSpec">SecurityGroupSpec</a>)
 </p>
 <div>
 <p>IngressSecurityGroupRule is an ingress rule of a security group</p>
@@ -631,7 +631,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 <td>
 <code>SecurityGroupRule</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.SecurityGroupRule">
+<a href="#network.onmetal.de/v1alpha1.SecurityGroupRule">
 SecurityGroupRule
 </a>
 </em>
@@ -646,7 +646,7 @@ SecurityGroupRule
 <td>
 <code>source</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.IPSetSpec">
+<a href="#network.onmetal.de/v1alpha1.IPSetSpec">
 IPSetSpec
 </a>
 </em>
@@ -657,10 +657,10 @@ IPSetSpec
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.PortRange">PortRange
+<h3 id="network.onmetal.de/v1alpha1.PortRange">PortRange
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.SecurityGroupRule">SecurityGroupRule</a>)
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SecurityGroupRule">SecurityGroupRule</a>)
 </p>
 <div>
 <p>PortRange defines the start and end of a port range</p>
@@ -697,10 +697,10 @@ int
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.RangeType">RangeType
+<h3 id="network.onmetal.de/v1alpha1.RangeType">RangeType
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.SubnetSpec">SubnetSpec</a>)
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SubnetSpec">SubnetSpec</a>)
 </p>
 <div>
 <p>RangeType defines the range/size of a subnet</p>
@@ -717,7 +717,7 @@ int
 <td>
 <code>ipam</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -741,7 +741,7 @@ string
 <td>
 <code>cidr</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#Cidr">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Cidr">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.Cidr
 </a>
 </em>
@@ -764,7 +764,7 @@ e.g. 0/14 means the first /14 subnet is blocked in the allocated /12 subnet</p>
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.ReservedIP">ReservedIP
+<h3 id="network.onmetal.de/v1alpha1.ReservedIP">ReservedIP
 </h3>
 <div>
 <p>ReservedIP is the Schema for the reservedips API</p>
@@ -781,7 +781,7 @@ e.g. 0/14 means the first /14 subnet is blocked in the allocated /12 subnet</p>
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -795,7 +795,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.ReservedIPSpec">
+<a href="#network.onmetal.de/v1alpha1.ReservedIPSpec">
 ReservedIPSpec
 </a>
 </em>
@@ -808,7 +808,7 @@ ReservedIPSpec
 <td>
 <code>subnet</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -821,7 +821,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 <td>
 <code>ip</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#IPAddr">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IPAddr">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPAddr
 </a>
 </em>
@@ -835,7 +835,7 @@ associated Subnet</p>
 <td>
 <code>assignment</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedKindReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedKindReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
 </a>
 </em>
@@ -851,7 +851,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
 <td>
 <code>status</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.ReservedIPStatus">
+<a href="#network.onmetal.de/v1alpha1.ReservedIPStatus">
 ReservedIPStatus
 </a>
 </em>
@@ -861,10 +861,10 @@ ReservedIPStatus
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.ReservedIPBound">ReservedIPBound
+<h3 id="network.onmetal.de/v1alpha1.ReservedIPBound">ReservedIPBound
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.ReservedIPStatus">ReservedIPStatus</a>)
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.ReservedIPStatus">ReservedIPStatus</a>)
 </p>
 <div>
 <p>ReservedIPBound describes the binding state of a ReservedIP</p>
@@ -891,7 +891,7 @@ string
 <td>
 <code>assignment</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedKindReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedKindReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
 </a>
 </em>
@@ -901,10 +901,10 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.ReservedIPSpec">ReservedIPSpec
+<h3 id="network.onmetal.de/v1alpha1.ReservedIPSpec">ReservedIPSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.ReservedIP">ReservedIP</a>)
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.ReservedIP">ReservedIP</a>)
 </p>
 <div>
 <p>ReservedIPSpec defines the desired state of ReservedIP</p>
@@ -921,7 +921,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
 <td>
 <code>subnet</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -934,7 +934,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 <td>
 <code>ip</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#IPAddr">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IPAddr">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPAddr
 </a>
 </em>
@@ -948,7 +948,7 @@ associated Subnet</p>
 <td>
 <code>assignment</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedKindReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedKindReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
 </a>
 </em>
@@ -959,10 +959,10 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.ReservedIPStatus">ReservedIPStatus
+<h3 id="network.onmetal.de/v1alpha1.ReservedIPStatus">ReservedIPStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.ReservedIP">ReservedIP</a>)
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.ReservedIP">ReservedIP</a>)
 </p>
 <div>
 <p>ReservedIPStatus defines the observed state of ReservedIP</p>
@@ -979,7 +979,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
 <td>
 <code>ip</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#IPAddr">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IPAddr">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPAddr
 </a>
 </em>
@@ -992,7 +992,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPAddr
 <td>
 <code>StateFields</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#StateFields">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.StateFields">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 </a>
 </em>
@@ -1007,7 +1007,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 <td>
 <code>bound</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.ReservedIPBound">
+<a href="#network.onmetal.de/v1alpha1.ReservedIPBound">
 ReservedIPBound
 </a>
 </em>
@@ -1017,10 +1017,10 @@ ReservedIPBound
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.Route">Route
+<h3 id="network.onmetal.de/v1alpha1.Route">Route
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.RoutingDomainSpec">RoutingDomainSpec</a>)
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.RoutingDomainSpec">RoutingDomainSpec</a>)
 </p>
 <div>
 <p>Route describes a single route definition</p>
@@ -1037,7 +1037,7 @@ ReservedIPBound
 <td>
 <code>subnetRef</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -1061,7 +1061,7 @@ string
 <td>
 <code>target</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedKindReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedKindReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
 </a>
 </em>
@@ -1072,7 +1072,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.RoutingDomain">RoutingDomain
+<h3 id="network.onmetal.de/v1alpha1.RoutingDomain">RoutingDomain
 </h3>
 <div>
 <p>RoutingDomain is the Schema for the RoutingDomain API</p>
@@ -1089,7 +1089,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -1103,7 +1103,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.RoutingDomainSpec">
+<a href="#network.onmetal.de/v1alpha1.RoutingDomainSpec">
 RoutingDomainSpec
 </a>
 </em>
@@ -1116,7 +1116,7 @@ RoutingDomainSpec
 <td>
 <code>routes</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.Route">
+<a href="#network.onmetal.de/v1alpha1.Route">
 []Route
 </a>
 </em>
@@ -1132,7 +1132,7 @@ RoutingDomainSpec
 <td>
 <code>status</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.RoutingDomainStatus">
+<a href="#network.onmetal.de/v1alpha1.RoutingDomainStatus">
 RoutingDomainStatus
 </a>
 </em>
@@ -1142,10 +1142,10 @@ RoutingDomainStatus
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.RoutingDomainSpec">RoutingDomainSpec
+<h3 id="network.onmetal.de/v1alpha1.RoutingDomainSpec">RoutingDomainSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.RoutingDomain">RoutingDomain</a>)
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.RoutingDomain">RoutingDomain</a>)
 </p>
 <div>
 <p>RoutingDomainSpec defines the desired state of RoutingDomain
@@ -1164,7 +1164,7 @@ need explicit routing instructions.</p>
 <td>
 <code>routes</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.Route">
+<a href="#network.onmetal.de/v1alpha1.Route">
 []Route
 </a>
 </em>
@@ -1175,10 +1175,10 @@ need explicit routing instructions.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.RoutingDomainStatus">RoutingDomainStatus
+<h3 id="network.onmetal.de/v1alpha1.RoutingDomainStatus">RoutingDomainStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.RoutingDomain">RoutingDomain</a>)
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.RoutingDomain">RoutingDomain</a>)
 </p>
 <div>
 <p>RoutingDomainStatus defines the observed state of RoutingDomain</p>
@@ -1195,7 +1195,7 @@ need explicit routing instructions.</p>
 <td>
 <code>StateFields</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#StateFields">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.StateFields">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 </a>
 </em>
@@ -1208,7 +1208,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.SecurityGroup">SecurityGroup
+<h3 id="network.onmetal.de/v1alpha1.SecurityGroup">SecurityGroup
 </h3>
 <div>
 <p>SecurityGroup is the Schema for the securitygroups API</p>
@@ -1225,7 +1225,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -1239,7 +1239,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.SecurityGroupSpec">
+<a href="#network.onmetal.de/v1alpha1.SecurityGroupSpec">
 SecurityGroupSpec
 </a>
 </em>
@@ -1252,7 +1252,7 @@ SecurityGroupSpec
 <td>
 <code>ingress</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.IngressSecurityGroupRule">
+<a href="#network.onmetal.de/v1alpha1.IngressSecurityGroupRule">
 []IngressSecurityGroupRule
 </a>
 </em>
@@ -1265,7 +1265,7 @@ SecurityGroupSpec
 <td>
 <code>egress</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.EgressSecurityGroupRule">
+<a href="#network.onmetal.de/v1alpha1.EgressSecurityGroupRule">
 []EgressSecurityGroupRule
 </a>
 </em>
@@ -1281,7 +1281,7 @@ SecurityGroupSpec
 <td>
 <code>status</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.SecurityGroupStatus">
+<a href="#network.onmetal.de/v1alpha1.SecurityGroupStatus">
 SecurityGroupStatus
 </a>
 </em>
@@ -1291,10 +1291,10 @@ SecurityGroupStatus
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.SecurityGroupRule">SecurityGroupRule
+<h3 id="network.onmetal.de/v1alpha1.SecurityGroupRule">SecurityGroupRule
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.EgressSecurityGroupRule">EgressSecurityGroupRule</a>, <a href="#compute.onmetal.de/v1alpha1.IngressSecurityGroupRule">IngressSecurityGroupRule</a>)
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.EgressSecurityGroupRule">EgressSecurityGroupRule</a>, <a href="#network.onmetal.de/v1alpha1.IngressSecurityGroupRule">IngressSecurityGroupRule</a>)
 </p>
 <div>
 <p>SecurityGroupRule is a single access rule</p>
@@ -1322,7 +1322,7 @@ string
 <td>
 <code>securityGroupRef</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -1335,7 +1335,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 <td>
 <code>action</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.ActionType">
+<a href="#network.onmetal.de/v1alpha1.ActionType">
 ActionType
 </a>
 </em>
@@ -1359,7 +1359,7 @@ string
 <td>
 <code>portRange</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.PortRange">
+<a href="#network.onmetal.de/v1alpha1.PortRange">
 PortRange
 </a>
 </em>
@@ -1370,10 +1370,10 @@ PortRange
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.SecurityGroupSpec">SecurityGroupSpec
+<h3 id="network.onmetal.de/v1alpha1.SecurityGroupSpec">SecurityGroupSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.SecurityGroup">SecurityGroup</a>)
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SecurityGroup">SecurityGroup</a>)
 </p>
 <div>
 <p>SecurityGroupSpec defines the desired state of SecurityGroup</p>
@@ -1390,7 +1390,7 @@ PortRange
 <td>
 <code>ingress</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.IngressSecurityGroupRule">
+<a href="#network.onmetal.de/v1alpha1.IngressSecurityGroupRule">
 []IngressSecurityGroupRule
 </a>
 </em>
@@ -1403,7 +1403,7 @@ PortRange
 <td>
 <code>egress</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.EgressSecurityGroupRule">
+<a href="#network.onmetal.de/v1alpha1.EgressSecurityGroupRule">
 []EgressSecurityGroupRule
 </a>
 </em>
@@ -1414,10 +1414,10 @@ PortRange
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.SecurityGroupStatus">SecurityGroupStatus
+<h3 id="network.onmetal.de/v1alpha1.SecurityGroupStatus">SecurityGroupStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.SecurityGroup">SecurityGroup</a>)
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SecurityGroup">SecurityGroup</a>)
 </p>
 <div>
 <p>SecurityGroupStatus defines the observed state of SecurityGroup</p>
@@ -1434,7 +1434,7 @@ PortRange
 <td>
 <code>StateFields</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#StateFields">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.StateFields">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 </a>
 </em>
@@ -1447,7 +1447,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.Subnet">Subnet
+<h3 id="network.onmetal.de/v1alpha1.Subnet">Subnet
 </h3>
 <div>
 <p>Subnet is the Schema for the subnets API</p>
@@ -1464,7 +1464,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -1478,7 +1478,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.SubnetSpec">
+<a href="#network.onmetal.de/v1alpha1.SubnetSpec">
 SubnetSpec
 </a>
 </em>
@@ -1491,7 +1491,7 @@ SubnetSpec
 <td>
 <code>parent</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -1505,7 +1505,7 @@ then represent the regional incarnations of this public subnet.</p>
 <td>
 <code>locations</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#RegionAvailability">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.RegionAvailability">
 []github.com/onmetal/onmetal-api/apis/common/v1alpha1.RegionAvailability
 </a>
 </em>
@@ -1518,7 +1518,7 @@ then represent the regional incarnations of this public subnet.</p>
 <td>
 <code>routingDomain</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -1531,7 +1531,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 <td>
 <code>ranges</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.RangeType">
+<a href="#network.onmetal.de/v1alpha1.RangeType">
 []RangeType
 </a>
 </em>
@@ -1547,7 +1547,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 <td>
 <code>status</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.SubnetStatus">
+<a href="#network.onmetal.de/v1alpha1.SubnetStatus">
 SubnetStatus
 </a>
 </em>
@@ -1557,10 +1557,10 @@ SubnetStatus
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.SubnetSpec">SubnetSpec
+<h3 id="network.onmetal.de/v1alpha1.SubnetSpec">SubnetSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.Subnet">Subnet</a>)
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.Subnet">Subnet</a>)
 </p>
 <div>
 <p>SubnetSpec defines the desired state of Subnet</p>
@@ -1577,7 +1577,7 @@ SubnetStatus
 <td>
 <code>parent</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -1591,7 +1591,7 @@ then represent the regional incarnations of this public subnet.</p>
 <td>
 <code>locations</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#RegionAvailability">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.RegionAvailability">
 []github.com/onmetal/onmetal-api/apis/common/v1alpha1.RegionAvailability
 </a>
 </em>
@@ -1604,7 +1604,7 @@ then represent the regional incarnations of this public subnet.</p>
 <td>
 <code>routingDomain</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -1617,7 +1617,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 <td>
 <code>ranges</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.RangeType">
+<a href="#network.onmetal.de/v1alpha1.RangeType">
 []RangeType
 </a>
 </em>
@@ -1628,10 +1628,10 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.SubnetStatus">SubnetStatus
+<h3 id="network.onmetal.de/v1alpha1.SubnetStatus">SubnetStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.Subnet">Subnet</a>)
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.Subnet">Subnet</a>)
 </p>
 <div>
 <p>SubnetStatus defines the observed state of Subnet</p>
@@ -1648,7 +1648,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 <td>
 <code>StateFields</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#StateFields">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.StateFields">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 </a>
 </em>
@@ -1663,7 +1663,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 <td>
 <code>cidrs</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.CIDRStatus">
+<a href="#network.onmetal.de/v1alpha1.CIDRStatus">
 []CIDRStatus
 </a>
 </em>
@@ -1677,5 +1677,5 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 <hr/>
 <p><em>
 Generated with <code>gen-crd-api-reference-docs</code>
-on git commit <code>1b71fc0</code>.
+on git commit <code>fbe0128</code>.
 </em></p>

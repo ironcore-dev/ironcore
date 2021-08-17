@@ -23,6 +23,6 @@
 //go:generate gen-crd-api-reference-docs -api-dir . -config ../../../hack/api-reference/network-config.json -template-dir ../../../hack/api-reference/template -out-file ../../../docs/api-reference/network.md
 
 // Package v1beta1 is a version of the API.
-// +groupName=compute.onmetal.de
+// +groupName=network.onmetal.de
 
 package v1alpha1

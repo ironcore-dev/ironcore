@@ -20,9 +20,9 @@
 // +k8s:defaulter-gen=TypeMeta
 // +k8s:protobuf-gen=package
 
-//go:generate gen-crd-api-reference-docs -api-dir . -config ../../../hack/api-reference/storage-config.json -template-dir ../../../hack/api-reference/template -out-file ../../../docs/api-reference/storage.md
+//go:generate gen-crd-api-reference-docs -api-dir . -config ../../../hack/api-reference/common-config.json -template-dir ../../../hack/api-reference/template -out-file ../../../docs/api-reference/common.md
 
 // Package v1beta1 is a version of the API.
-// +groupName=storage.onmetal.de
+// +groupName=common.onmetal.de
 
 package v1alpha1
