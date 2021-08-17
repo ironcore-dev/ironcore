@@ -13,39 +13,31 @@
         },
         {
             "typeMatchPrefix": "^k8s\\.io/(api|apimachinery/pkg/apis)/",
-            "docsURLTemplate": "https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#{{lower .TypeIdentifier}}-{{arrIndex .PackageSegments -1}}-{{arrIndex .PackageSegments -2}}"
+            "docsURLTemplate": "https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#{{lower .TypeIdentifier}}-{{arrIndex .PackageSegments -1}}-{{arrIndex .PackageSegments -2}}"
         },
         {
             "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.ScopedReference$",
-            "docsURLTemplate": "https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference"
+            "docsURLTemplate": "/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference"
         },
         {
             "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.StateFields",
-            "docsURLTemplate": "https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#StateFields"
-        },
-        {
-            "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.Location",
-            "docsURLTemplate": "https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#Location"
-        },
-        {
-            "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.Availability",
-            "docsURLTemplate": "https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#Availability"
-        },
-        {
-            "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.RegionAvailability",
-            "docsURLTemplate": "https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#RegionAvailability"
-        },
-        {
-            "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.IPAddr",
-            "docsURLTemplate": "https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#IPAddr"
+            "docsURLTemplate": "/api-reference/common/#common.onmetal.de/v1alpha1.StateFields"
         },
         {
             "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.Cidr",
-            "docsURLTemplate": "https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#Cidr"
+            "docsURLTemplate": "/api-reference/common/#common.onmetal.de/v1alpha1.Cidr"
         },
         {
             "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.ScopedKindReference",
-            "docsURLTemplate": "https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedKindReference"
+            "docsURLTemplate": "/api-reference/common/#common.onmetal.de/v1alpha1.ScopedKindReference"
+        },
+        {
+            "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.IPAddr",
+            "docsURLTemplate": "/api-reference/common/#common.onmetal.de/v1alpha1.IPAddr"
+        },
+        {
+            "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.RegionAvailability",
+            "docsURLTemplate": "/api-reference/common/#common.onmetal.de/v1alpha1.RegionAvailability"
         }
     ],
     "typeDisplayNamePrefixOverrides": {

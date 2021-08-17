@@ -234,7 +234,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -283,7 +283,7 @@ string
 <td>
 <code>expirationTime</code><br/>
 <em>
-<a href="https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -331,7 +331,7 @@ string
 <td>
 <code>imageRef</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -413,7 +413,7 @@ string
 <td>
 <code>expirationTime</code><br/>
 <em>
-<a href="https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -461,7 +461,7 @@ string
 <td>
 <code>imageRef</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -505,7 +505,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 <td>
 <code>StateFields</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#StateFields">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.StateFields">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 </a>
 </em>
@@ -561,7 +561,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -599,7 +599,7 @@ string
 <td>
 <code>machineClass</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -612,7 +612,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 <td>
 <code>machinePool</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -625,7 +625,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 <td>
 <code>location</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#Location">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Location">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.Location
 </a>
 </em>
@@ -638,7 +638,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.Location
 <td>
 <code>image</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -664,7 +664,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 <td>
 <code>securityGroups</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 []github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -733,7 +733,7 @@ MachineStatus
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -877,7 +877,7 @@ int
 <td>
 <code>availability</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#Availability">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Availability">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.Availability
 </a>
 </em>
@@ -905,7 +905,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.Availability
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -1053,7 +1053,7 @@ string
 <td>
 <code>StateFields</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#StateFields">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.StateFields">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 </a>
 </em>
@@ -1109,7 +1109,7 @@ string
 <td>
 <code>machineClass</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -1122,7 +1122,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 <td>
 <code>machinePool</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -1135,7 +1135,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 <td>
 <code>location</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#Location">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Location">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.Location
 </a>
 </em>
@@ -1148,7 +1148,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.Location
 <td>
 <code>image</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -1174,7 +1174,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 <td>
 <code>securityGroups</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 []github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -1231,7 +1231,7 @@ string
 <td>
 <code>StateFields</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#StateFields">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.StateFields">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 </a>
 </em>
@@ -1273,7 +1273,7 @@ string
 <td>
 <code>StateFields</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#StateFields">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.StateFields">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 </a>
 </em>
@@ -1323,7 +1323,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -1372,7 +1372,7 @@ string
 <td>
 <code>expirationDate</code><br/>
 <em>
-<a href="https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -1441,7 +1441,7 @@ string
 <td>
 <code>selector</code><br/>
 <em>
-<a href="https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#labelselector-v1-meta">
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#labelselector-v1-meta">
 Kubernetes meta/v1.LabelSelector
 </a>
 </em>
@@ -1494,7 +1494,7 @@ string
 <td>
 <code>expirationDate</code><br/>
 <em>
-<a href="https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -1525,7 +1525,7 @@ Kubernetes meta/v1.Time
 <td>
 <code>StateFields</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#StateFields">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.StateFields">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 </a>
 </em>
@@ -1690,7 +1690,7 @@ string
 <td>
 <code>storageClass</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -1716,7 +1716,7 @@ k8s.io/apimachinery/pkg/api/resource.Quantity
 <td>
 <code>volume</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -1730,5 +1730,5 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 <hr/>
 <p><em>
 Generated with <code>gen-crd-api-reference-docs</code>
-on git commit <code>1b71fc0</code>.
+on git commit <code>fbe0128</code>.
 </em></p>

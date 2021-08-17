@@ -1,0 +1,31 @@
+site_name: OnMetal API
+repo_url: https://github.com/onmetal/onmetal-api/
+edit_uri: edit/main/docs/
+theme:
+  name: material
+  palette:
+    primary: teal
+  font:
+    text: 'Work Sans'
+
+plugins:
+  - search
+
+markdown_extensions:
+  - codehilite
+  - admonition
+  - toc:
+      permalink: true
+
+nav:
+  - Home: README.md
+  - Concepts: README.md
+  - Architecture: README.md
+  - Usage: README.md
+  - Development: README.md
+  - API Reference:
+      - Core: api-reference/core.md
+      - Network: api-reference/network.md
+      - Compute: api-reference/compute.md
+      - Storage: api-reference/storage.md
+      - Common: api-reference/common.md

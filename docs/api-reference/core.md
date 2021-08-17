@@ -1,16 +1,16 @@
 <p>Packages:</p>
 <ul>
 <li>
-<a href="#compute.onmetal.de%2fv1alpha1">compute.onmetal.de/v1alpha1</a>
+<a href="#core.onmetal.de%2fv1alpha1">core.onmetal.de/v1alpha1</a>
 </li>
 </ul>
-<h2 id="compute.onmetal.de/v1alpha1">compute.onmetal.de/v1alpha1</h2>
+<h2 id="core.onmetal.de/v1alpha1">core.onmetal.de/v1alpha1</h2>
 Resource Types:
 <ul></ul>
-<h3 id="compute.onmetal.de/v1alpha1.AZState">AZState
+<h3 id="core.onmetal.de/v1alpha1.AZState">AZState
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.RegionStatus">RegionStatus</a>)
+(<em>Appears on:</em><a href="#core.onmetal.de/v1alpha1.RegionStatus">RegionStatus</a>)
 </p>
 <div>
 <p>ZoneState describes the state of an AvailabilityZone within a region</p>
@@ -37,7 +37,7 @@ string
 <td>
 <code>StateFields</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#StateFields">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.StateFields">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 </a>
 </em>
@@ -50,7 +50,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.Account">Account
+<h3 id="core.onmetal.de/v1alpha1.Account">Account
 </h3>
 <div>
 <p>Account is the Schema for the accounts API</p>
@@ -67,7 +67,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -81,7 +81,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.AccountSpec">
+<a href="#core.onmetal.de/v1alpha1.AccountSpec">
 AccountSpec
 </a>
 </em>
@@ -94,7 +94,7 @@ AccountSpec
 <td>
 <code>createdBy</code><br/>
 <em>
-<a href="https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#subject-v1-rbac">
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#subject-v1-rbac">
 Kubernetes rbac/v1.Subject
 </a>
 </em>
@@ -119,7 +119,7 @@ string
 <td>
 <code>owner</code><br/>
 <em>
-<a href="https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#subject-v1-rbac">
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#subject-v1-rbac">
 Kubernetes rbac/v1.Subject
 </a>
 </em>
@@ -147,7 +147,7 @@ string
 <td>
 <code>status</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.AccountStatus">
+<a href="#core.onmetal.de/v1alpha1.AccountStatus">
 AccountStatus
 </a>
 </em>
@@ -157,10 +157,10 @@ AccountStatus
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.AccountSpec">AccountSpec
+<h3 id="core.onmetal.de/v1alpha1.AccountSpec">AccountSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.Account">Account</a>)
+(<em>Appears on:</em><a href="#core.onmetal.de/v1alpha1.Account">Account</a>)
 </p>
 <div>
 <p>AccountSpec defines the desired state of Account</p>
@@ -177,7 +177,7 @@ AccountStatus
 <td>
 <code>createdBy</code><br/>
 <em>
-<a href="https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#subject-v1-rbac">
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#subject-v1-rbac">
 Kubernetes rbac/v1.Subject
 </a>
 </em>
@@ -202,7 +202,7 @@ string
 <td>
 <code>owner</code><br/>
 <em>
-<a href="https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#subject-v1-rbac">
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#subject-v1-rbac">
 Kubernetes rbac/v1.Subject
 </a>
 </em>
@@ -225,10 +225,10 @@ string
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.AccountStatus">AccountStatus
+<h3 id="core.onmetal.de/v1alpha1.AccountStatus">AccountStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.Account">Account</a>)
+(<em>Appears on:</em><a href="#core.onmetal.de/v1alpha1.Account">Account</a>)
 </p>
 <div>
 <p>AccountStatus defines the observed state of Account</p>
@@ -245,7 +245,7 @@ string
 <td>
 <code>StateFields</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#StateFields">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.StateFields">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 </a>
 </em>
@@ -269,7 +269,7 @@ string
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.Region">Region
+<h3 id="core.onmetal.de/v1alpha1.Region">Region
 </h3>
 <div>
 <p>Region is the Schema for the regions API</p>
@@ -286,7 +286,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -300,7 +300,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.RegionSpec">
+<a href="#core.onmetal.de/v1alpha1.RegionSpec">
 RegionSpec
 </a>
 </em>
@@ -338,7 +338,7 @@ string
 <td>
 <code>status</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.RegionStatus">
+<a href="#core.onmetal.de/v1alpha1.RegionStatus">
 RegionStatus
 </a>
 </em>
@@ -348,10 +348,10 @@ RegionStatus
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.RegionSpec">RegionSpec
+<h3 id="core.onmetal.de/v1alpha1.RegionSpec">RegionSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.Region">Region</a>)
+(<em>Appears on:</em><a href="#core.onmetal.de/v1alpha1.Region">Region</a>)
 </p>
 <div>
 <p>RegionSpec defines the desired state of Region</p>
@@ -388,10 +388,10 @@ string
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.RegionStatus">RegionStatus
+<h3 id="core.onmetal.de/v1alpha1.RegionStatus">RegionStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.Region">Region</a>)
+(<em>Appears on:</em><a href="#core.onmetal.de/v1alpha1.Region">Region</a>)
 </p>
 <div>
 <p>RegionStatus defines the observed state of Region</p>
@@ -408,7 +408,7 @@ string
 <td>
 <code>StateFields</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#StateFields">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.StateFields">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 </a>
 </em>
@@ -423,7 +423,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 <td>
 <code>availabilityZones</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.AZState">
+<a href="#core.onmetal.de/v1alpha1.AZState">
 []AZState
 </a>
 </em>
@@ -433,7 +433,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.Scope">Scope
+<h3 id="core.onmetal.de/v1alpha1.Scope">Scope
 </h3>
 <div>
 <p>Scope is the Schema for the scopes API</p>
@@ -450,7 +450,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -464,7 +464,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.ScopeSpec">
+<a href="#core.onmetal.de/v1alpha1.ScopeSpec">
 ScopeSpec
 </a>
 </em>
@@ -502,7 +502,7 @@ string
 <td>
 <code>status</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.ScopeStatus">
+<a href="#core.onmetal.de/v1alpha1.ScopeStatus">
 ScopeStatus
 </a>
 </em>
@@ -512,10 +512,10 @@ ScopeStatus
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.ScopeSpec">ScopeSpec
+<h3 id="core.onmetal.de/v1alpha1.ScopeSpec">ScopeSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.Scope">Scope</a>)
+(<em>Appears on:</em><a href="#core.onmetal.de/v1alpha1.Scope">Scope</a>)
 </p>
 <div>
 <p>ScopeSpec defines the desired state of Scope</p>
@@ -552,10 +552,10 @@ string
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.ScopeStatus">ScopeStatus
+<h3 id="core.onmetal.de/v1alpha1.ScopeStatus">ScopeStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.Scope">Scope</a>)
+(<em>Appears on:</em><a href="#core.onmetal.de/v1alpha1.Scope">Scope</a>)
 </p>
 <div>
 <p>ScopeStatus defines the observed state of Scope</p>
@@ -572,7 +572,7 @@ string
 <td>
 <code>StateFields</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#StateFields">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.StateFields">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 </a>
 </em>
@@ -633,5 +633,5 @@ string
 <hr/>
 <p><em>
 Generated with <code>gen-crd-api-reference-docs</code>
-on git commit <code>1b71fc0</code>.
+on git commit <code>fbe0128</code>.
 </em></p>

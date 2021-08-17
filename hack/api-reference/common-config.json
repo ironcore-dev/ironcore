@@ -14,18 +14,6 @@
         {
             "typeMatchPrefix": "^k8s\\.io/(api|apimachinery/pkg/apis)/",
             "docsURLTemplate": "https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#{{lower .TypeIdentifier}}-{{arrIndex .PackageSegments -1}}-{{arrIndex .PackageSegments -2}}"
-        },
-        {
-            "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.ScopedReference$",
-            "docsURLTemplate": "/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference"
-        },
-        {
-            "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.StateFields",
-            "docsURLTemplate": "/api-reference/common/#common.onmetal.de/v1alpha1.StateFields"
-        },
-        {
-            "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.Availability",
-            "docsURLTemplate": "/api-reference/common/#common.onmetal.de/v1alpha1.Availability"
         }
     ],
     "typeDisplayNamePrefixOverrides": {

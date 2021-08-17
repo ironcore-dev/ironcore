@@ -1,13 +1,13 @@
 <p>Packages:</p>
 <ul>
 <li>
-<a href="#compute.onmetal.de%2fv1alpha1">compute.onmetal.de/v1alpha1</a>
+<a href="#storage.onmetal.de%2fv1alpha1">storage.onmetal.de/v1alpha1</a>
 </li>
 </ul>
-<h2 id="compute.onmetal.de/v1alpha1">compute.onmetal.de/v1alpha1</h2>
+<h2 id="storage.onmetal.de/v1alpha1">storage.onmetal.de/v1alpha1</h2>
 Resource Types:
 <ul></ul>
-<h3 id="compute.onmetal.de/v1alpha1.StorageClass">StorageClass
+<h3 id="storage.onmetal.de/v1alpha1.StorageClass">StorageClass
 </h3>
 <div>
 <p>StorageClass is the Schema for the storageclasses API</p>
@@ -24,7 +24,7 @@ Resource Types:
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -38,7 +38,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.StorageClassSpec">
+<a href="#storage.onmetal.de/v1alpha1.StorageClassSpec">
 StorageClassSpec
 </a>
 </em>
@@ -51,7 +51,7 @@ StorageClassSpec
 <td>
 <code>capabilities</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.StorageClassCapability">
+<a href="#storage.onmetal.de/v1alpha1.StorageClassCapability">
 []StorageClassCapability
 </a>
 </em>
@@ -78,7 +78,7 @@ string
 <td>
 <code>status</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.StorageClassStatus">
+<a href="#storage.onmetal.de/v1alpha1.StorageClassStatus">
 StorageClassStatus
 </a>
 </em>
@@ -88,10 +88,10 @@ StorageClassStatus
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.StorageClassCapability">StorageClassCapability
+<h3 id="storage.onmetal.de/v1alpha1.StorageClassCapability">StorageClassCapability
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.StorageClassSpec">StorageClassSpec</a>)
+(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.StorageClassSpec">StorageClassSpec</a>)
 </p>
 <div>
 <p>StorageClassCapability describes one attribute of the StorageClass</p>
@@ -128,10 +128,10 @@ k8s.io/apimachinery/pkg/util/intstr.IntOrString
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.StorageClassCapacity">StorageClassCapacity
+<h3 id="storage.onmetal.de/v1alpha1.StorageClassCapacity">StorageClassCapacity
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.StoragePoolSpec">StoragePoolSpec</a>, <a href="#compute.onmetal.de/v1alpha1.StoragePoolStatus">StoragePoolStatus</a>)
+(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.StoragePoolSpec">StoragePoolSpec</a>, <a href="#storage.onmetal.de/v1alpha1.StoragePoolStatus">StoragePoolStatus</a>)
 </p>
 <div>
 <p>StorageClassCapacity defines capacity attribute of a storage class</p>
@@ -170,10 +170,10 @@ k8s.io/apimachinery/pkg/api/resource.Quantity
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.StorageClassSpec">StorageClassSpec
+<h3 id="storage.onmetal.de/v1alpha1.StorageClassSpec">StorageClassSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.StorageClass">StorageClass</a>)
+(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.StorageClass">StorageClass</a>)
 </p>
 <div>
 <p>StorageClassSpec defines the desired state of StorageClass</p>
@@ -190,7 +190,7 @@ k8s.io/apimachinery/pkg/api/resource.Quantity
 <td>
 <code>capabilities</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.StorageClassCapability">
+<a href="#storage.onmetal.de/v1alpha1.StorageClassCapability">
 []StorageClassCapability
 </a>
 </em>
@@ -212,10 +212,10 @@ string
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.StorageClassStatus">StorageClassStatus
+<h3 id="storage.onmetal.de/v1alpha1.StorageClassStatus">StorageClassStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.StorageClass">StorageClass</a>)
+(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.StorageClass">StorageClass</a>)
 </p>
 <div>
 <p>StorageClassStatus defines the observed state of StorageClass</p>
@@ -232,7 +232,7 @@ string
 <td>
 <code>availability</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#Availability">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Availability">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.Availability
 </a>
 </em>
@@ -243,7 +243,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.Availability
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.StoragePool">StoragePool
+<h3 id="storage.onmetal.de/v1alpha1.StoragePool">StoragePool
 </h3>
 <div>
 <p>StoragePool is the Schema for the storagepools API</p>
@@ -260,7 +260,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.Availability
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -274,7 +274,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.StoragePoolSpec">
+<a href="#storage.onmetal.de/v1alpha1.StoragePoolSpec">
 StoragePoolSpec
 </a>
 </em>
@@ -320,7 +320,7 @@ int
 <td>
 <code>capacity</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.StorageClassCapacity">
+<a href="#storage.onmetal.de/v1alpha1.StorageClassCapacity">
 []StorageClassCapacity
 </a>
 </em>
@@ -336,7 +336,7 @@ int
 <td>
 <code>status</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.StoragePoolStatus">
+<a href="#storage.onmetal.de/v1alpha1.StoragePoolStatus">
 StoragePoolStatus
 </a>
 </em>
@@ -346,10 +346,10 @@ StoragePoolStatus
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.StoragePoolSpec">StoragePoolSpec
+<h3 id="storage.onmetal.de/v1alpha1.StoragePoolSpec">StoragePoolSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.StoragePool">StoragePool</a>)
+(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.StoragePool">StoragePool</a>)
 </p>
 <div>
 <p>StoragePoolSpec defines the desired state of StoragePool</p>
@@ -399,7 +399,7 @@ int
 <td>
 <code>capacity</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.StorageClassCapacity">
+<a href="#storage.onmetal.de/v1alpha1.StorageClassCapacity">
 []StorageClassCapacity
 </a>
 </em>
@@ -410,10 +410,10 @@ int
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.StoragePoolStatus">StoragePoolStatus
+<h3 id="storage.onmetal.de/v1alpha1.StoragePoolStatus">StoragePoolStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.StoragePool">StoragePool</a>)
+(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.StoragePool">StoragePool</a>)
 </p>
 <div>
 <p>StoragePoolStatus defines the observed state of StoragePool</p>
@@ -430,7 +430,7 @@ int
 <td>
 <code>StateFields</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#StateFields">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.StateFields">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 </a>
 </em>
@@ -445,7 +445,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 <td>
 <code>used</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.StorageClassCapacity">
+<a href="#storage.onmetal.de/v1alpha1.StorageClassCapacity">
 []StorageClassCapacity
 </a>
 </em>
@@ -456,7 +456,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.Volume">Volume
+<h3 id="storage.onmetal.de/v1alpha1.Volume">Volume
 </h3>
 <div>
 <p>Volume is the Schema for the volumes API</p>
@@ -473,7 +473,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -487,7 +487,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.VolumeSpec">
+<a href="#storage.onmetal.de/v1alpha1.VolumeSpec">
 VolumeSpec
 </a>
 </em>
@@ -511,7 +511,7 @@ string
 <td>
 <code>storagepool</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -540,7 +540,7 @@ k8s.io/apimachinery/pkg/api/resource.Quantity
 <td>
 <code>status</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.VolumeStatus">
+<a href="#storage.onmetal.de/v1alpha1.VolumeStatus">
 VolumeStatus
 </a>
 </em>
@@ -550,7 +550,7 @@ VolumeStatus
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.VolumeAttachment">VolumeAttachment
+<h3 id="storage.onmetal.de/v1alpha1.VolumeAttachment">VolumeAttachment
 </h3>
 <div>
 <p>VolumeAttachment is the Schema for the volumeattachments API</p>
@@ -567,7 +567,7 @@ VolumeStatus
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -581,7 +581,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.VolumeAttachmentSpec">
+<a href="#storage.onmetal.de/v1alpha1.VolumeAttachmentSpec">
 VolumeAttachmentSpec
 </a>
 </em>
@@ -594,7 +594,7 @@ VolumeAttachmentSpec
 <td>
 <code>volume</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -607,7 +607,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 <td>
 <code>machine</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -631,7 +631,7 @@ string
 <td>
 <code>source</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.VolumeSource">
+<a href="#storage.onmetal.de/v1alpha1.VolumeSource">
 VolumeSource
 </a>
 </em>
@@ -647,7 +647,7 @@ VolumeSource
 <td>
 <code>status</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.VolumeAttachmentStatus">
+<a href="#storage.onmetal.de/v1alpha1.VolumeAttachmentStatus">
 VolumeAttachmentStatus
 </a>
 </em>
@@ -657,10 +657,10 @@ VolumeAttachmentStatus
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.VolumeAttachmentSpec">VolumeAttachmentSpec
+<h3 id="storage.onmetal.de/v1alpha1.VolumeAttachmentSpec">VolumeAttachmentSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.VolumeAttachment">VolumeAttachment</a>)
+(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.VolumeAttachment">VolumeAttachment</a>)
 </p>
 <div>
 <p>VolumeAttachmentSpec defines the desired state of VolumeAttachment</p>
@@ -677,7 +677,7 @@ VolumeAttachmentStatus
 <td>
 <code>volume</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -690,7 +690,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 <td>
 <code>machine</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -714,7 +714,7 @@ string
 <td>
 <code>source</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.VolumeSource">
+<a href="#storage.onmetal.de/v1alpha1.VolumeSource">
 VolumeSource
 </a>
 </em>
@@ -725,10 +725,10 @@ VolumeSource
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.VolumeAttachmentStatus">VolumeAttachmentStatus
+<h3 id="storage.onmetal.de/v1alpha1.VolumeAttachmentStatus">VolumeAttachmentStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.VolumeAttachment">VolumeAttachment</a>)
+(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.VolumeAttachment">VolumeAttachment</a>)
 </p>
 <div>
 <p>VolumeAttachmentStatus defines the observed state of VolumeAttachment</p>
@@ -745,7 +745,7 @@ VolumeSource
 <td>
 <code>StateFields</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#StateFields">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.StateFields">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 </a>
 </em>
@@ -769,10 +769,10 @@ string
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.VolumeSource">VolumeSource
+<h3 id="storage.onmetal.de/v1alpha1.VolumeSource">VolumeSource
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.VolumeAttachmentSpec">VolumeAttachmentSpec</a>)
+(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.VolumeAttachmentSpec">VolumeAttachmentSpec</a>)
 </p>
 <div>
 <p>VolumeSource defines the source of a volume which can be either an image or a snapshot</p>
@@ -789,7 +789,7 @@ string
 <td>
 <code>image</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -802,7 +802,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 <td>
 <code>snapshot</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -813,10 +813,10 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.VolumeSpec">VolumeSpec
+<h3 id="storage.onmetal.de/v1alpha1.VolumeSpec">VolumeSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.Volume">Volume</a>)
+(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.Volume">Volume</a>)
 </p>
 <div>
 <p>VolumeSpec defines the desired state of Volume</p>
@@ -844,7 +844,7 @@ string
 <td>
 <code>storagepool</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#ScopedReference">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </a>
 </em>
@@ -868,10 +868,10 @@ k8s.io/apimachinery/pkg/api/resource.Quantity
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.VolumeStatus">VolumeStatus
+<h3 id="storage.onmetal.de/v1alpha1.VolumeStatus">VolumeStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.Volume">Volume</a>)
+(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.Volume">Volume</a>)
 </p>
 <div>
 <p>VolumeStatus defines the observed state of Volume</p>
@@ -888,7 +888,7 @@ k8s.io/apimachinery/pkg/api/resource.Quantity
 <td>
 <code>StateFields</code><br/>
 <em>
-<a href="https://github.com/onmetal/onmetal-api/apis/common/v1alpha1#StateFields">
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.StateFields">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 </a>
 </em>
@@ -904,5 +904,5 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 <hr/>
 <p><em>
 Generated with <code>gen-crd-api-reference-docs</code>
-on git commit <code>1b71fc0</code>.
+on git commit <code>fbe0128</code>.
 </em></p>
