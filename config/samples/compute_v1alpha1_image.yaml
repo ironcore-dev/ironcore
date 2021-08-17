@@ -3,5 +3,33 @@ kind: Image
 metadata:
   name: image-sample
 spec:
-  # Add fields here
-  foo: bar
+  arch: x86_64
+  maturity: production
+  os: Ubuntu
+  version: "20.04"
+  expirationTime: "2025-08-05T13:12:51Z"
+  # either source or imageRef should be provided
+  source:
+    - name: kernel
+      url: https://urltoartefact
+      hash:
+        algorithm: SHA1
+        value: lkjl4j5l34j5l43kj534lj5l
+    - name: initrd
+      url: https://urltoartefact
+      hash:
+        algorithm: SHA1
+        value: lkjl4j5l34j5l43kj534lj5l
+    - name: rootfs
+      url: https://urltoartefact
+      hash:
+        algorithm: SHA1
+        value: lkjl4j5l34j5l43kj534lj5l
+#  imageRef:
+#  - name: myimage
+#    scope: myscope
+#  flags:
+#    - key: cmdLine
+#      value: mitigations=off
+#    - key: type
+#      value: standard/firewall
