@@ -53,7 +53,9 @@ func (o *ownerCache) RegisterGroupKind(ctx context.Context, gk schema.GroupKind)
 	}
 	r := newOwnerReconciler(gk)
 	o.registrations[gk] = r
-	r.SetupWithCache(ctx, o)
+	if err := r.SetupWithCache(ctx, o); err != nil {
+		return err
+	}
 	return nil
 }
 

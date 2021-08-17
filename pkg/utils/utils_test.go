@@ -57,8 +57,7 @@ var _ = Describe("Utils", func() {
 			By("Expecting created")
 			Eventually(func() bool {
 				n := &v1.Namespace{}
-				err := k8sClient.Get(context.Background(), namespaceLookupKey, n)
-				if err != nil {
+				if err := k8sClient.Get(context.Background(), namespaceLookupKey, n); err != nil {
 					return false
 				}
 				return true

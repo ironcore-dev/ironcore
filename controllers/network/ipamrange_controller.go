@@ -75,7 +75,9 @@ func (r *IPAMRangeReconciler) SetupWithManager(mgr *manager.Manager) error {
 		Build(r)
 	if err == nil {
 		mgr.RegisterControllerFor(api.IPAMRangeGK, c)
-		mgr.GetUsageCache().RegisterExtractor(context.Background(), api.IPAMRangeGK, usagecache.RelationUses, api.IPAMRangeGK, &IPAMUsageExtractor{mgr.GetScopeEvaluator()})
+		if err := mgr.GetUsageCache().RegisterExtractor(context.Background(), api.IPAMRangeGK, usagecache.RelationUses, api.IPAMRangeGK, &IPAMUsageExtractor{mgr.GetScopeEvaluator()}); err != nil {
+			return err
+		}
 	}
 	return err
 }

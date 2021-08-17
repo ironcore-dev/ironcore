@@ -85,6 +85,10 @@ func main() {
 		LeaderElectionID:       "d0ae00be.onmetal.de",
 	})
 
+	if err != nil {
+		panic("failed to create manager")
+	}
+
 	if err = (&accounts.AccountReconciler{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("Account"),

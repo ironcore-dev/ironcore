@@ -29,15 +29,16 @@ import (
 )
 
 type usageCache struct {
-	manager       manager.Manager
-	trigger       Trigger
-	client        client.Client
-	registrations map[schema.GroupKind]*usageReconciler
-	extractors    map[schema.GroupKind]*usageGKInfo
-	lock          sync.RWMutex
-	targets       map[utils.ObjectId]ObjectUsageInfo
-	sources       map[utils.ObjectId]ObjectUsageInfo
-	ready         *utils.Ready
+	manager manager.Manager
+	trigger Trigger
+	client  client.Client
+	//TODO: check removal
+	//registrations map[schema.GroupKind]*usageReconciler
+	extractors map[schema.GroupKind]*usageGKInfo
+	lock       sync.RWMutex
+	targets    map[utils.ObjectId]ObjectUsageInfo
+	sources    map[utils.ObjectId]ObjectUsageInfo
+	ready      *utils.Ready
 }
 
 type usageGKInfo struct {
@@ -60,7 +61,9 @@ func (u *usageCache) RegisterExtractor(ctx context.Context, source schema.GroupK
 			relations:  map[string]map[schema.GroupKind]Extractor{},
 		}
 		u.extractors[source] = info
-		info.reconciler.SetupWithCache(ctx, u)
+		if err := info.reconciler.SetupWithCache(ctx, u); err != nil {
+			return err
+		}
 	}
 
 	targets := info.relations[relation]
