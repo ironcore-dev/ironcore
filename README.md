@@ -1,5 +1,7 @@
 # onmetal-api
 
+![Gardener on Metal Logo](docs/assets/logo.png)
+
 This project contains the types and controllers of the user facing OnMetal API.
 
 ## Installation

@@ -46,13 +46,13 @@ The example below shows the instructions needed to generate the documentation fo
 ```
 
 Together with the comments in the corresponding type files `go generate` will call the `gen-crd-api-reference-doc` command
-to genereate the output in the `/docs/api-reference` folder.
+to generate the output in the `/docs/api-reference` folder.
 
-This project contians a `Makefile` routine to generate the reference documentation for all types. So in case you change 
+This project contains a `Makefile` routine to generate the reference documentation for all types. So in case you change 
 any of the types in the `apis` folder just run
 
 ```shell
 make docs
 ```
 
-The generated output should be part of your Pull Request.
+The generated output should be part of your pull request.
