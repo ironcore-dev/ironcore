@@ -30,8 +30,7 @@ make clean-docs
 
 ## API Reference Documentation
 
-The [API reference documentation](/api-reference/overview/) contains the description generated from the CRD
-definition of the [onmetal-api](https://github.com/onmetal/onmetal-api) project.
+The [API reference documentation](/api-reference/overview/) contains auto-generated description from the CRD definition of the [onmetal-api](https://github.com/onmetal/onmetal-api) project.
 
 We are using the [gen-crd-api-reference-docs](https://github.com/ahmetb/gen-crd-api-reference-docs) project
 to generate the content. Under the hood we are using `go generate` instructions defined in each version type
