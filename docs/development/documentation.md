@@ -4,9 +4,10 @@ The documentation of the [onmetal-api](https://github.com/onmetal/onmetal-api) p
 All documentation related content can be found in the `/docs` folder. New content  also should be added there. 
 [MkDocs](https://www.mkdocs.org/) and [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) are then used to  render the contents of the `/docs` folder to have a more user-friendly experience when browsing the projects' documentation.
 
-> Note:  One exception to the [common contribution process](/development/contribution/#steps-to-contribute) builds  the `docs/api-reference` folder. 
-The folder contains auto-generated CRD reference documentation of the project,  no _manual_ contributions should be applied as they will be overwritten in the next generation step.
-To read more:  [Updating API Reference Documentation](#api-reference-documentation) section.
+!!!note  
+    One exception to the [common contribution process](/development/contribution/#steps-to-contribute) builds  the `docs/api-reference` folder. 
+    The folder contains auto-generated CRD reference documentation of the project,  no _manual_ contributions should be applied as they will be overwritten in the next generation step.
+    To read more:  [Updating API Reference Documentation](#api-reference-documentation) section.
 
 ## Local Development Setup
 
@@ -53,8 +54,8 @@ The needed instructions to generate documentation for the `core/v1alpha1` types 
 Together with the comments in the corresponding type files `go generate` will call the `gen-crd-api-reference-doc` command
 to generate the output in the `/docs/api-reference` folder.
 
-This project contains a `Makefile` routine to generate the reference documentation for all types. So in case you change 
-any of the types in the `apis` folder just run
+This project contains a `Makefile` routine to generate the reference documentation for all types. In case you change any
+of the types in the `apis` folder just run
 
 ```shell
 make docs

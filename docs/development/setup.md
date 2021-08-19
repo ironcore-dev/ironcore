@@ -3,7 +3,7 @@
 ## Prerequisites 
 
 * `go` >= 1.12
-* `git` and `make`
+* `git`, `make` and `kubectl`
 * [Kustomize](https://kustomize.io/)
 * Access to a Kubernetes cluster ([Minikube](https://minikube.sigs.k8s.io/docs/), [kind](https://kind.sigs.k8s.io/) or a real cluster)
 
@@ -27,18 +27,34 @@ make install
 
 ## Start the Controller Manager
 
+The controller manager can be started via the following command
+
 ```shell
 make run
 ```
 
 ## Apply Sample Manifests
 
+The `config/samples` folder contains samples for all CRDs supported by this project. You can apply any of the samples by
+running
+
+```shell
+kubectl apply -f config/samples/SOME_RESOURCE.yaml
+```
+
 ## Rebuilding API Type and Manifests
+
+Everytime a change has been done to any of the types definitions of a CRD, the corresponding manifests and code artefacts
+have to be rebuild.
 
 ```shell
 make generate
 make manifests
 ```
+
+!!! note
+    Make sure you install all new versions of the CRDs into your cluster by running `make install` after new manifests 
+    have been generated.
 
 ## Cleanup
 
