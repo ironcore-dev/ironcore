@@ -21,8 +21,9 @@ Formatting and style section of Peter Bourgon’s Go: Go: Best Practices for Pro
 
 ## Steps to Contribute
 
-Should you wish to work on an issue, please claim it first by commenting on the GitHub issue that you want to work on it. 
-This is to prevent duplicated efforts from contributors on the same issue.
+Do you want to work on an issue?  You are welcome to claim an existing one by commenting on it in GitHub. 
+>Note: perform a cursory search to see if the issue has already been taken by someone else. 
+This will prevent misunderstanding and duplication of  effort from contributors on the same issue.
 
 If you have questions about one of the issues please comment on them and one of the 
 maintainers will clarify it.
