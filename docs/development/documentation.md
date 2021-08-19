@@ -22,7 +22,7 @@ in the projects root folder and access the output in your browser under <http://
 The environment will hot-rebuild your documentation  so there is no need to restart it while you make your changes.
 If you want to add a new chapter (basically a new file/folder to `docs` directory) you should also add it to the `nav` section in the `mkdocs.yml` file in the projects root folder.
 
-To clean up old and stopped container instances you can use this helper Makefile directive 
+Use this helper Makefile directive to clean up old and stopped container instances 
 
 ```shell
 make clean-docs
