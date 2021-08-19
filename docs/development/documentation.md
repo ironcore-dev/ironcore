@@ -1,9 +1,8 @@
 # Documentation Setup
 
 The documentation of the [onmetal-api](https://github.com/onmetal/onmetal-api) project is written primarily using Markdown. 
-All documentation related content can be found in the `/docs` folder and new content should also be added there. 
-[MkDocs](https://www.mkdocs.org/) and [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) is then used to 
-render the contents of the `/docs` folder to have a more user-friendly experience when browsing the projects' documentation.
+All documentation related content can be found in the `/docs` folder. New content  also should be added there. 
+[MkDocs](https://www.mkdocs.org/) and [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) are then used to  render the contents of the `/docs` folder to have a more user-friendly experience when browsing the projects' documentation.
 
 > Note:  One exception to the [common contribution process](/development/contribution/#steps-to-contribute) builds  the `docs/api-reference` folder. 
 The folder contains auto-generated CRD reference documentation of the project,  no _manual_ contributions should be applied as they will be overwritten in the next generation step.
