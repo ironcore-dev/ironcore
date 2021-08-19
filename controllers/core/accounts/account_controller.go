@@ -110,7 +110,7 @@ func (r *AccountReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		// TODO: update on change only
 		// Update state with generated namespace name
 		account.Status.Namespace = namespace.Name
-		account.Status.State = corev1alpha1.AccountReady
+		account.Status.State = corev1alpha1.AccountStateReady
 		if err := r.Status().Update(ctx, &account); err != nil {
 			return utils.Requeue(err)
 		}
@@ -136,7 +136,7 @@ func (r *AccountReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		}
 
 		if namespace != nil {
-			account.Status.State = corev1alpha1.AccountTerminating
+			account.Status.State = corev1alpha1.AccountStateTerminating
 			if err := r.Status().Update(ctx, &account); err != nil {
 				return utils.Requeue(err)
 			}

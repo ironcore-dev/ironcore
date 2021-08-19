@@ -18,11 +18,15 @@ package main
 
 import (
 	"flag"
+	"os"
+
+	accountwebhook "github.com/onmetal/onmetal-api/pkg/webhooks/account"
+	scopewebhook "github.com/onmetal/onmetal-api/pkg/webhooks/scope"
+
 	"github.com/onmetal/onmetal-api/controllers/core"
 	"github.com/onmetal/onmetal-api/controllers/core/accounts"
 	"github.com/onmetal/onmetal-api/controllers/core/scopes"
 	"github.com/onmetal/onmetal-api/pkg/manager"
-	"os"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
@@ -89,6 +93,7 @@ func main() {
 		panic("failed to create manager")
 	}
 
+	// Account resource
 	if err = (&accounts.AccountReconciler{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("Account"),
@@ -97,12 +102,13 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "Account")
 		os.Exit(1)
 	}
-
-	if err != nil {
-		setupLog.Error(err, "unable to start manager")
+	// Account webhook
+	if err = (&accountwebhook.AccountWebhook{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "Account")
 		os.Exit(1)
 	}
 
+	// Scope resource
 	if err = (&scopes.ScopeReconciler{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("Scope"),
@@ -111,6 +117,12 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "Scope")
 		os.Exit(1)
 	}
+	// Scope webhook
+	if err = (&scopewebhook.ScopeWebhook{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "Scope")
+		os.Exit(1)
+	}
+
 	if err = (&computecontrollers.MachineClassReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
@@ -222,7 +234,13 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "Gateway")
 		os.Exit(1)
 	}
+
 	//+kubebuilder:scaffold:builder
+
+	if err != nil {
+		setupLog.Error(err, "unable to start manager")
+		os.Exit(1)
+	}
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to set up health check")

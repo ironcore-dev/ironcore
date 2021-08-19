@@ -50,22 +50,25 @@ type AccountStatus struct {
 }
 
 const (
-	MyAccountKey = "account"
-	// AccountPending indicates that the account reconciliation is pending.
-	AccountPending = "Pending"
-	// AccountReady indicates that the account reconciliation was successful.
-	AccountReady = "Ready"
-	// AccountFailed indicates that the account reconciliation failed.
-	AccountFailed = "Failed"
-	// AccountTerminating indicates that the account is in termination process.
-	AccountTerminating = "Terminating"
+	// AccountKey is the Account lookup key
+	AccountKey = "account"
+	// AccountStatePending indicates that the Account reconciliation is pending.
+	AccountStatePending = "Pending"
+	// AccountStateReady indicates that the Account reconciliation was successful.
+	AccountStateReady = "Ready"
+	// AccountStateFailed indicates that the Account reconciliation failed.
+	AccountStateFailed = "Failed"
+	// AccountStateTerminating indicates that the Account is in termination process.
+	AccountStateTerminating = "Terminating"
+	// AccountStateInitial indicates that the Account is in an initial state
+	AccountStateInitial = "Initial"
 )
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 //+kubebuilder:resource:scope=Cluster
 //+kubebuilder:printcolumn:name="Namespace",type=string,JSONPath=`.status.namespace`
-//+kubebuilder:printcolumn:name="StateFields",type=string,JSONPath=`.status.state`
+//+kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.state`
 //+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
 // Account is the Schema for the accounts API
