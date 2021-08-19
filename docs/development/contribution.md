@@ -104,8 +104,7 @@ for a review in the pull request or a comment.
 
 ## Issues and Planning
 
-We use GitHub issues to track bugs and enhancement requests. Please provide as much context as possible when you open 
-an issue. The information you provide must be comprehensive enough to reproduce that issue for the assignee. 
+We use GitHub issues to track bugs and enhancement requests. Please provide as much context as possible when you open  an issue. The information you provide must be comprehensive enough to understand, reproduce the behavior and find related reports of  that issue for the assignee. 
 Therefore, contributors may use but aren't restricted to the issue template provided by the Gardener on Metal maintainers.
 
 Issues and pull requests are tracked in the [backlog](https://github.com/onmetal/onmetal-api/projects/1) for this project.
