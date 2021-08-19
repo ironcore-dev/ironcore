@@ -4,7 +4,7 @@
 
 The Gardener on Metal project uses Github to manage reviews of pull requests.
 
-1. If you are a new contributor see: [Steps to Contribute](#steps-to-contribute)
+1. If you are looking to make your first contribution, follow [Steps to Contribute](#steps-to-contribute)
 
 2. If you have a trivial fix or improvement, go ahead and create a pull request and
 address (with @...) a suitable maintainer of this repository 
