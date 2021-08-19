@@ -78,7 +78,7 @@ git rebase upstream/main
 * Commits should be as small as possible, while ensuring that each commit is correct independently 
 (i.e. each commit should compile and pass tests).
 
-* Test your changes as thoroughly as possible before you commit them. Preferably, automate your test by unit / integration tests. 
+*  Create your patch and test your changes  before you commit them. Automated test by unit / integration tests are preferred. 
 If tested manually, provide information about the test scope in the PR description. Now you can commit
 your changes to your feature branch and push it to your fork.
 
