@@ -65,8 +65,8 @@ cd onmetal-api
 git remote add upstream git@github.com:onmetal/onmetal-api.git
 ```
 
-* Create a feature branch from the `main` branch and, if needed, rebase to the current `main` branch before submitting 
-your pull request. If it doesn't merge cleanly with `main` you may be asked to rebase your changes.
+* Create a branch from the `main`  using 'git checkout' command. 
+> Note:  If needed, rebase to the current `main` branch before submitting  your pull request. If it doesn't merge properly  with `main` you may be asked to rebase your changes.
 
 ```shell
 git checkout -b my_feature
