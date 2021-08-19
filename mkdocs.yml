@@ -24,8 +24,12 @@ plugins:
   - search
 
 markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.snippets
   - codehilite
   - admonition
+  - abbr
   - toc:
       permalink: true
 

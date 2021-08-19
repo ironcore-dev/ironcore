@@ -27,6 +27,15 @@ Use this helper Makefile directive to clean up old and stopped container instanc
 make clean-docs
 ```
 
+## Writing Content
+
+### Abbreviations
+
+Abbreviations are defined centrally in the following file `/hack/docs/abbreviations.md`. So in case you introduce any 
+new abbreviation to your content please make sure to also add a corresponding entry there. At the end of each Markdown
+file you also need to include the statement `--8<-- "hack/docs/abbreviations.md"`. This will ensure that the abbreviation
+highlighting will work correctly.
+
 ## API Reference Documentation
 
 The [API reference documentation](/api-reference/overview/) contains auto-generated description from the CRD definition of the [onmetal-api](https://github.com/onmetal/onmetal-api) project.
@@ -52,3 +61,5 @@ make docs
 ```
 
 The generated output should be part of your pull request.
+
+--8<-- "hack/docs/abbreviations.md"

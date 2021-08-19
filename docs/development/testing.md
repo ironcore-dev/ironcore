@@ -151,3 +151,5 @@ KUBEBUILDER_ASSETS=/PATH_TO_MY_WORKSPACE/onmetal/onmetal-api/testbin/bin
 ```
 
 This is typically the location of the Kubernetes control plane binaries on your machine.
+
+--8<-- "hack/docs/abbreviations.md"

@@ -4,26 +4,29 @@
 
 The Gardener on Metal project uses Github to manage reviews of pull requests.
 
-1. If you are looking to make your first contribution, follow [Steps to Contribute](#steps-to-contribute)
+* If you are looking to make your first contribution, follow [Steps to Contribute](#steps-to-contribute)
 
-2. If you have a trivial fix or improvement, go ahead and create a pull request and
+* If you have a trivial fix or improvement, go ahead and create a pull request and
 address (with @...) a suitable maintainer of this repository 
 (see [CODEOWNERS](https://raw.githubusercontent.com/onmetal/onmetal-api/main/CODEOWNERS) 
 of this repository) in the description of the pull request.
 
-3. If you plan to do something more involved, first discuss your ideas by creating an 
+* If you plan to do something more involved, first discuss your ideas by creating an 
 [issue](https://github.com/onmetal/onmetal-api/issues) for this repository. This will avoid unnecessary work and surely give you 
 and us a good deal of inspiration.
 
-> Note: please follow these style guidelines to have your contribution considered by the maintainers:
-Coding style guidelines Go Code Review Comments (https://github.com/golang/go/wiki/CodeReviewComments)
-Formatting and style section of Peter Bourgon’s Go: Go: Best Practices for Production Environments. (http://peter.bourgon.org/go-in-production/#formatting-and-style).
+!!! note 
+    Please follow these style guidelines to have your contribution considered by the maintainers:
+    Coding style guidelines [Go Code Review Comments](https://github.com/golang/go/wiki/CodeReviewComments),
+    Formatting and style section of Peter Bourgon’s [Go: Best Practices for Production Environments](http://peter.bourgon.org/go-in-production/#formatting-and-style).
 
 ## Steps to Contribute
 
 Do you want to work on an issue?  You are welcome to claim an existing one by commenting on it in GitHub. 
->Note: perform a cursory search to see if the issue has already been taken by someone else. 
-This will prevent misunderstanding and duplication of  effort from contributors on the same issue.
+
+!!! note
+    Perform a cursory search to see if the issue has already been taken by someone else. 
+    This will prevent misunderstanding and duplication of  effort from contributors on the same issue.
 
 If you have questions about one of the issues please comment on them and one of the 
 maintainers will clarify it.
@@ -61,19 +64,19 @@ process. We use [the standard DCO text of the Linux Foundation](https://develope
 ```shell
 git clone git@github.com:YOUR_GITHUB_USER/onmetal-api.git
 cd onmetal-api
-# add an upstream remote to fetch new changes
-git remote add upstream git@github.com:onmetal/onmetal-api.git
 ```
 
 * Create a branch from the `main`  using 'git checkout' command. 
-> Note:  If needed, rebase to the current `main` branch before submitting  your pull request. If it doesn't merge properly  with `main` you may be asked to rebase your changes.
+!!! note 
+    If needed, rebase to the current `main` branch before submitting  your pull request. If it doesn't merge properly
+    with `main` you may be asked to rebase your changes.
 
-```shell
-git checkout -b my_feature
-# rebase if necessary
-git fetch upstream main
-git rebase upstream/main
-```
+    ```shell
+    git checkout -b my_feature
+    # rebase if necessary
+    git fetch upstream main
+    git rebase upstream/main
+    ```
 
 * Commits should be as small as possible, while ensuring that each commit is correct independently 
 (i.e. each commit should compile and pass tests).
@@ -86,9 +89,10 @@ your changes to your feature branch and push it to your fork.
 git add .
 git commit -m "Something meaningful"
 git push origin my_feature
-# alternatively you can amend your commit before pushing if you forgot something
-git commit --amend
 ```
+
+!!! note
+    Alternatively you can amend your commit before pushing if you forgot something by using `git commit --amend`
 
 * Create _Work In Progress [WIP]_ pull requests only if you need a clarification or an explicit review before you can 
 continue your work item.
@@ -108,3 +112,5 @@ We use GitHub issues to track bugs and enhancement requests. Please provide as m
 Therefore, contributors may use but aren't restricted to the issue template provided by the Gardener on Metal maintainers.
 
 Issues and pull requests are tracked in the [backlog](https://github.com/onmetal/onmetal-api/projects/1) for this project.
+
+--8<-- "hack/docs/abbreviations.md"
