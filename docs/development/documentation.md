@@ -37,7 +37,7 @@ We are using the [gen-crd-api-reference-docs](https://github.com/ahmetb/gen-crd-
 to generate the content. Under the hood we are using `go generate` instructions defined in each version type
 `doc.go`.
 
-The example below shows the instructions needed to generate the documentation for the `core/v1alpha1` types.
+The needed instructions to generate documentation for the `core/v1alpha1` types are  in the example below 
 
 ```go
 //go:generate gen-crd-api-reference-docs -api-dir . -config ../../../hack/api-reference/core-config.json -template-dir ../../../hack/api-reference/template -out-file ../../../docs/api-reference/core.md
