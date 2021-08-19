@@ -19,7 +19,13 @@ package v1alpha1
 import (
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
+
+var ScopeGK = schema.GroupKind{
+	Group: GroupVersion.Group,
+	Kind:  "Scope",
+}
 
 // ScopeSpec defines the desired state of Scope
 type ScopeSpec struct {
@@ -44,14 +50,16 @@ type ScopeStatus struct {
 }
 
 const (
-	// ScopePending indicates that the scope reconciliation is pending.
-	ScopePending = "Pending"
-	// ScopeReady indicates that the scope reconciliation was successful.
-	ScopeReady = "Ready"
-	// ScopeFailed indicates that the scope reconciliation failed.
-	ScopeFailed = "Failed"
-	// ScopeTerminating indicates that the scope is in termination process.
-	ScopeTerminating = "Terminating"
+	// ScopeStatePending indicates that the scope reconciliation is pending.
+	ScopeStatePending = "Pending"
+	// ScopeStateReady indicates that the scope reconciliation was successful.
+	ScopeStateReady = "Ready"
+	// ScopeStateFailed indicates that the scope reconciliation failed.
+	ScopeStateFailed = "Failed"
+	// ScopeStateTerminating indicates that the scope is in termination process.
+	ScopeStateTerminating = "Terminating"
+	// ScopeStateInitial indicates that the Scope is in an initial state
+	ScopeStateInitial = "Initial"
 )
 
 //+kubebuilder:object:root=true

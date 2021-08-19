@@ -120,7 +120,7 @@ func (r *ScopeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		// TODO: update on change only
 		// Update state with generated namespace name
 		scope.Status.Namespace = namespace.Name
-		scope.Status.State = corev1alpha1.ScopeReady
+		scope.Status.State = corev1alpha1.ScopeStateReady
 		scope.Status.Account = accountName
 		scope.Status.ParentScope = scopeName
 		scope.Status.ParentNamespace = req.Namespace
@@ -149,7 +149,7 @@ func (r *ScopeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		}
 
 		if namespace != nil {
-			scope.Status.State = corev1alpha1.ScopeTerminating
+			scope.Status.State = corev1alpha1.ScopeStateTerminating
 			if err := r.Status().Update(ctx, &scope); err != nil {
 				return utils.Requeue(err)
 			}

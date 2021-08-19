@@ -174,7 +174,7 @@ var _ = Describe("Scope controller", func() {
 					return ""
 				}
 				return s.Status.State
-			}, timeout, interval).Should(Equal(api.AccountReady))
+			}, timeout, interval).Should(Equal(api.AccountStateReady))
 
 			By("Expecting the Account name in State to be set")
 			Eventually(func() string {

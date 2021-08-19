@@ -140,7 +140,7 @@ var _ = Describe("Account controller", func() {
 					return ""
 				}
 				return a.Status.State
-			}, timeout, interval).Should(Equal(api.AccountReady))
+			}, timeout, interval).Should(Equal(api.AccountStateReady))
 		})
 	})
 

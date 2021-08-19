@@ -57,7 +57,7 @@ func (s *scopeEvaluator) GetNamespace(ctx context.Context, currentNamespace stri
 	next := 0
 	if path.IsAbs(scope) {
 		var accountName string
-		if comps[1] == api.MyAccountKey {
+		if comps[1] == api.AccountKey {
 			if err := s.Get(ctx, client.ObjectKey{Name: currentNamespace}, &accountNamespace); err != nil {
 				if errors.IsNotFound(err) {
 					return "", true, fmt.Errorf("current namespace %q not found: %s", currentNamespace, err)
