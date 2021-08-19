@@ -5,10 +5,9 @@ All documentation related content can be found in the `/docs` folder and new con
 [MkDocs](https://www.mkdocs.org/) and [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) is then used to 
 render the contents of the `/docs` folder to have a more user-friendly experience when browsing the projects' documentation.
 
-One exception to the [common contribution process](/development/contribution/#steps-to-contribute) builds 
-the `docs/api-reference` folder. As it contains the automatically generated CRD reference documentation of the project, 
-no _manual_ contributions should be done there as they will be overwritten in the next generation step. You can find 
-more details in the [Updating API Reference Documentation](#api-reference-documentation) section.
+> Note:  One exception to the [common contribution process](/development/contribution/#steps-to-contribute) builds  the `docs/api-reference` folder. 
+The folder contains auto-generated CRD reference documentation of the project,  no _manual_ contributions should be applied as they will be overwritten in the next generation step.
+To read more:  [Updating API Reference Documentation](#api-reference-documentation) section.
 
 ## Local Development Setup
 
