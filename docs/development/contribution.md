@@ -15,8 +15,9 @@ of this repository) in the description of the pull request.
 [issue](https://github.com/onmetal/onmetal-api/issues) for this repository. This will avoid unnecessary work and surely give you 
 and us a good deal of inspiration.
 
-4. Relevant coding style guidelines are the [Go Code Review Comments](https://github.com/golang/go/wiki/CodeReviewComments)
-and the Formatting and style section of Peter Bourgon’s [Go: Best Practices for Production Environments](http://peter.bourgon.org/go-in-production/#formatting-and-style).
+> Note: please follow these style guidelines to have your contribution considered by the maintainers:
+Coding style guidelines Go Code Review Comments (https://github.com/golang/go/wiki/CodeReviewComments)
+Formatting and style section of Peter Bourgon’s Go: Go: Best Practices for Production Environments. (http://peter.bourgon.org/go-in-production/#formatting-and-style).
 
 ## Steps to Contribute
 
