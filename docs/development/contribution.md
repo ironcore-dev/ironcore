@@ -56,7 +56,7 @@ process. We use [the standard DCO text of the Linux Foundation](https://develope
 
 ## Pull Request Checklist
 
-* Step one is to fork this repository and clone it to you local machine.
+* Fork and clone the repository to you local machine.
 
 ```shell
 git clone git@github.com:YOUR_GITHUB_USER/onmetal-api.git
