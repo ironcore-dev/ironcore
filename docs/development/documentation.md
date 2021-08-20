@@ -54,13 +54,14 @@ The needed instructions to generate documentation for the `core/v1alpha1` types 
 Together with the comments in the corresponding type files `go generate` will call the `gen-crd-api-reference-doc` command
 to generate the output in the `/docs/api-reference` folder.
 
-This project contains a `Makefile` routine to generate the reference documentation for all types. In case you change any
-of the types in the `apis` folder just run
+The project contains a `Makefile` routine to generate the reference documentation for all types.
+In case you change any of the types in the `apis` folder just run
 
 ```shell
 make docs
 ```
 
-The generated output should be part of your pull request.
+!!! note
+    The generated output should be part of your pull request.
 
 --8<-- "hack/docs/abbreviations.md"

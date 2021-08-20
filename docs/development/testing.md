@@ -1,13 +1,13 @@
 # Testing
 
-This project is using [Ginkgo](https://onsi.github.io/ginkgo/) as it's primary testing framework in conjunctions with 
-the [Gomega](https://onsi.github.io/gomega/) matcher/assertion library.
+This project is using [Ginkgo](https://onsi.github.io/ginkgo/) as it's primary testing framework in conjunction with 
+[Gomega](https://onsi.github.io/gomega/) matcher/assertion library.
 
 ## Unit Tests
 
-Each package should come with its own `suite_test` setup and the corresponding test cases for each component.
+Each package should consist of its own `suite_test` setup and the corresponding test cases for each component.
 
-The test suite setup typically looks like the following 
+Example of test suite setup is below:
 
 ```go
 package mypackage
@@ -24,7 +24,7 @@ func Test(t *testing.T) {
 }
 ```
 
-The testing code is self is should be in the common [Ginkgo](https://onsi.github.io/ginkgo/) format
+The testing code should meet the requirements of be common [Ginkgo](https://onsi.github.io/ginkgo/) format
 
 ```go
 package mypackage
@@ -34,7 +34,7 @@ import ...
 var _ = Describe("MyComponent", func() {
 
 	BeforeEach(func() {
-		// code which should run before each Context
+		// Code to run before each Context
 	})
 
 	Context("When doing x", func() {
@@ -46,15 +46,16 @@ var _ = Describe("MyComponent", func() {
 })
 ```
 
-More information on how to structure your tests can be found in the [Ginkgo documentation](https://onsi.github.io/ginkgo/#structuring-your-specs).
-Assertion examples can be found in the the [Gomega documentation](https://onsi.github.io/gomega/#making-assertions).
+!!! note
+    More information on how to structure your tests can be found here: [Ginkgo documentation](https://onsi.github.io/ginkgo/#structuring-your-specs).
+    Assertion examples can be found here: [Gomega documentation](https://onsi.github.io/gomega/#making-assertions).
 
 ## Controller Tests
 
-Writing controller tests is a little more involved as we first need to setup a local Kubernetes control plane.
-Here we are using `envtest` which is part of the [controller-runtime](https://github.com/kubernetes-sigs/controller-runtime) project.
+Setup a local Kubernetes control plane in order to write controller tests.
+Use `envtest` as a part of the [controller-runtime](https://github.com/kubernetes-sigs/controller-runtime) project.
 
-The `suite_test.go` inside a controller package looks like the following
+Example of `suite_test.go` inside a controller package is below:
 
 ```go
 package my_controller_package
@@ -76,34 +77,34 @@ func TestAPIs(t *testing.T) {
 
 var _ = BeforeSuite(func() {
 	...
-	// Here the actual envtest setup is happening. Make sure that the 
-	// path to your generated CRDs is correct as we will inject them 
+	// Here is the actual envtest setup. Make sure that the path
+	// to your generated CRDs is correct, as it will be injected
 	// directly into the API server once the envtest environment comes up.
 	testEnv = &envtest.Environment{
 		CRDDirectoryPaths:     []string{filepath.Join("..", "..", "..", "config", "crd", "bases")},
 		ErrorIfCRDPathMissing: true,
 	}
 	...
-	// Now we need to define our scheme ...
+	// Define scheme
 	err = api.AddToScheme(scheme.Scheme)
 	...
-	// ... and can create a corresponding Kubernetes client.
+	// Create a corresponding Kubernetes client.
 	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
 	...
 	k8sManager, err := manager.NewManager(cfg, ctrl.Options{
 		Scheme:             scheme.Scheme,
-		// On MacOS it can happen, that the firewall will popup you 
-		// a waring if you open a port on your machine. This is 
-		// typically due to the metrics endpoint of the controller-manager.
-		// To be on the safe side you can disable it in the local setup 
-		// and also set the Host parameter to localhost.
+		// On MacOS it might happen, that the firewall warnings will
+		// popup if you open a port on your machine. It typically
+		// happens due to the metrics endpoint of the controller-manager.
+		// To prevent it, disable it in the local setup
+		// and set the Host parameter to localhost.
 		Host:               "127.0.0.1",
 		MetricsBindAddress: "0",
 	})
     ...
-	// Register our reconciler with the manager. In case you want to test 
-	// multiple reconciler at once you have to register them one after 
-	// another in the same fashion as shown below.
+	// Register our reconciler with the manager. In case if you want to test
+	// multiple reconcilers at once you have to register them one by
+	// one in the same fashion as is shown below.
 	err = (&MyObjectReconciler{
 		Client: k8sManager.GetClient(),
 		Scheme: k8sManager.GetScheme(),
@@ -130,12 +131,11 @@ The Ginkgo style tests can be now written in the same manner as described in the
 difference now is, that you have a working controller manager in the background which is reacting on changes in the
 Kubernetes API which you can access via the `k8sClient` to create or modify your resources.
 
-For more information on the `envtest` setup please consult the [Kubebuilder](https://book.kubebuilder.io/reference/envtest.html) 
-documentation on CRD testing.
+More information on the envtest setup you can find in the CRD testing section here: [Kubebuilder](https://book.kubebuilder.io/reference/envtest.html) 
 
 ## Running Tests
 
-A test run can be executed via
+Test run can be executed via:
 
 ```shell
 make test
