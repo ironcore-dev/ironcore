@@ -29,3 +29,10 @@ updates:
     open-pull-requests-limit: 10
     reviewers:
       - "onmetal/onmetal-api-maintainers"
+  - package-ecosystem: "docker"
+    directory: "/docs"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "onmetal/onmetal-api-maintainers"
