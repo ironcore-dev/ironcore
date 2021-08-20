@@ -50,7 +50,7 @@ autolabeler:
     files:
       - '/apis/compute/*'
       - '/controllers/compute/*'
-  - label: 'chore'
+  - label: 'documentation'
     files:
       - '*.md'
     branch:
