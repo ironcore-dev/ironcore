@@ -31,49 +31,42 @@ var _ = Describe("Scope webhook", func() {
 		scopeDescription = "myaccount description"
 		scopeRegion      = "myregion"
 		scopeNameSpace   = "default"
-
-		//timeout  = time.Second * 10
-		//interval = time.Second * 1
 	)
 
-	var scope *api.Scope
-	//var scopeLookUpKey types.NamespacedName
+	scope := &api.Scope{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       api.ScopeGK.Kind,
+			APIVersion: api.ScopeGK.Group,
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      scopeName,
+			Namespace: scopeNameSpace,
+		},
+		Spec: api.ScopeSpec{
+			Description: scopeDescription,
+			Region:      scopeRegion,
+		},
+	}
 
 	Context("When creating a Scope", func() {
 		It("Should accept a Scope creation", func() {
 			ctx := context.Background()
 			By("Creating a new Scope")
-			scope = &api.Scope{
-				TypeMeta: metav1.TypeMeta{
-					Kind:       api.ScopeGK.Kind,
-					APIVersion: api.ScopeGK.Group,
-				},
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      scopeName,
-					Namespace: scopeNameSpace,
-				},
-				Spec: api.ScopeSpec{
-					Description: scopeDescription,
-					Region:      scopeRegion,
-				},
-			}
-			//scopeLookUpKey = types.NamespacedName{
-			//	Name:      scopeName,
-			//	Namespace: scopeNameSpace,
-			//}
 			Expect(k8sClient.Create(ctx, scope)).Should(Succeed())
+		})
+	})
 
-			//By(fmt.Sprintf("Expecting created and State %s", v1alpha1.ScopeStateInitial))
-			//Eventually(func() bool {
-			//	s := &api.Scope{}
-			//	if err := k8sClient.Get(context.Background(), scopeLookUpKey, s); err != nil {
-			//		return false
-			//	}
-			//	if s.Status.State == api.ScopeStateInitial {
-			//		return true
-			//	}
-			//	return false
-			//}, timeout, interval).Should(BeTrue())
+	Context("When updating a Scope", func() {
+		It("Should accept an update if the Region field is unchanged", func() {
+			ctx := context.Background()
+			By("Updating the Scope object")
+			Expect(k8sClient.Update(ctx, scope)).Should(Succeed())
+		})
+		It("Should reject an update if the Region field is changed", func() {
+			ctx := context.Background()
+			By("Updating the Scope object with different Region")
+			scope.Spec.Region = "myregion2"
+			Expect(k8sClient.Update(ctx, scope)).Should(Not(Succeed()))
 		})
 	})
 

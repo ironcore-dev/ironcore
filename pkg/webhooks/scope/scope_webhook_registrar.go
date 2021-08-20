@@ -27,8 +27,7 @@ type ScopeWebhook struct {
 }
 
 func (r *ScopeWebhook) SetupWebhookWithManager(mgr *manager.Manager) error {
-	scope := &api.Scope{}
 	return ctrl.NewWebhookManagedBy(mgr).
-		For(scope).
+		For(&api.Scope{}).
 		Complete()
 }

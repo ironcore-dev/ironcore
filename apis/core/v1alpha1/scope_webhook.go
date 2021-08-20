@@ -32,10 +32,7 @@ var _ webhook.Defaulter = &Scope{}
 // Default implements webhook.Defaulter so a webhook will be registered for the type
 func (r *Scope) Default() {
 	scopelog.Info("default", "name", r.Name)
-
-	if r.Status.State == "" {
-		r.Status.State = ScopeStateInitial
-	}
+	// Defaulting code goes here
 }
 
 //+kubebuilder:webhook:path=/validate-core-onmetal-de-v1alpha1-scope,mutating=false,failurePolicy=fail,sideEffects=None,groups=core.onmetal.de,resources=scopes,verbs=create;update;delete,versions=v1alpha1,name=vscope.kb.io,admissionReviewVersions={v1,v1beta1}
@@ -51,7 +48,7 @@ func (r *Scope) ValidateCreate() error {
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
 func (r *Scope) ValidateUpdate(old runtime.Object) error {
 	scopelog.Info("validate update", "name", r.Name)
-	return r.validateScopeUpdate(old)
+	return r.validateScopeUpdate(old.(*Scope))
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type

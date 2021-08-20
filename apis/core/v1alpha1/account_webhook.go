@@ -32,9 +32,7 @@ var _ webhook.Defaulter = &Account{}
 // Default implements webhook.Defaulter so a webhook will be registered for the type
 func (r *Account) Default() {
 	accountlog.Info("default", "name", r.Name)
-	if r.Status.State == "" {
-		r.Status.State = AccountStateInitial
-	}
+	// Defaulting code goes here
 }
 
 //+kubebuilder:webhook:path=/validate-core-onmetal-de-v1alpha1-account,mutating=false,failurePolicy=fail,sideEffects=None,groups=core.onmetal.de,resources=accounts,verbs=create;update;delete,versions=v1alpha1,name=vaccount.kb.io,admissionReviewVersions={v1,v1beta1}
@@ -44,10 +42,6 @@ var _ webhook.Validator = &Account{}
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
 func (r *Account) ValidateCreate() error {
 	accountlog.Info("validate create", "name", r.Name)
-	if r.validateAccount() == nil {
-		accountlog.Info("validate account", "account state", r.Status.State)
-		return nil
-	}
 	return r.validateAccount()
 }
 

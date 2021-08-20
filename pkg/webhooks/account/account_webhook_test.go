@@ -30,50 +30,30 @@ var _ = Describe("Account webhook", func() {
 		accountName        = "myaccount"
 		accountDescription = "myaccount description"
 		accountPurpose     = "development"
-
-		//timeout  = time.Second * 10
-		//interval = time.Second * 1
 	)
 
-	var account *api.Account
-	//var accountLookUpKey types.NamespacedName
+	account := &api.Account{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       api.AccountGK.Kind,
+			APIVersion: api.AccountGK.Group,
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name: accountName,
+		},
+		Spec: api.AccountSpec{
+			CreatedBy:   nil,
+			Description: accountDescription,
+			Owner:       nil,
+			Purpose:     accountPurpose,
+		},
+		Status: api.AccountStatus{},
+	}
 
 	Context("When creating an Account", func() {
 		It("Should accept the Account creation", func() {
 			ctx := context.Background()
 			By("Creating a new Account")
-			account = &api.Account{
-				TypeMeta: metav1.TypeMeta{
-					Kind:       api.AccountGK.Kind,
-					APIVersion: api.AccountGK.Group,
-				},
-				ObjectMeta: metav1.ObjectMeta{
-					Name: accountName,
-				},
-				Spec: api.AccountSpec{
-					CreatedBy:   nil,
-					Description: accountDescription,
-					Owner:       nil,
-					Purpose:     accountPurpose,
-				},
-			}
-			//accountLookUpKey = types.NamespacedName{
-			//	Name: accountName,
-			//}
 			Expect(k8sClient.Create(ctx, account)).Should(Succeed())
-
-			//By(fmt.Sprintf("Expecting created and State set to %s", api.AccountStateInitial))
-			//Eventually(func() bool {
-			//	a := &api.Account{}
-			//	if err := k8sClient.Get(context.Background(), accountLookUpKey, a); err != nil {
-			//		return false
-			//	}
-			//	log.Info("account", "account status", a.Status)
-			//	if a.Status.State == api.AccountStateInitial {
-			//		return true
-			//	}
-			//	return false
-			//}, timeout, interval).Should(BeTrue())
 		})
 	})
 })

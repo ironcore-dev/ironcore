@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-package account
+package utils
 
-import (
-	api "github.com/onmetal/onmetal-api/apis/core/v1alpha1"
-	"github.com/onmetal/onmetal-api/pkg/manager"
-	ctrl "sigs.k8s.io/controller-runtime"
-)
+import "k8s.io/apimachinery/pkg/util/validation/field"
 
-type AccountWebhook struct {
-	api.Account
-}
+const FieldIsImmutable = "field is immutable"
 
-func (r *AccountWebhook) SetupWebhookWithManager(mgr *manager.Manager) error {
-	return ctrl.NewWebhookManagedBy(mgr).
-		For(&api.Account{}).
-		Complete()
+// ValidateFieldIsImmutatable validates if a value should be changed and returns a field.Error if that is the case.
+func ValidateFieldIsImmutatable(new, old string, fldPath *field.Path) *field.Error {
+	if new != old {
+		return field.Invalid(fldPath, new, FieldIsImmutable)
+	}
+	return nil
 }

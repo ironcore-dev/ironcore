@@ -17,43 +17,44 @@
 package v1alpha1
 
 import (
+	"github.com/onmetal/onmetal-api/pkg/utils"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
 // validateScope validates the Scope spec for errors
 func (s *Scope) validateScope() error {
 	var allErrs field.ErrorList
-
 	// TODO: validation code goes here
 	if len(allErrs) == 0 {
 		return nil
 	}
-
 	return apierrors.NewInvalid(ScopeGK, s.Name, allErrs)
 }
 
 // validateScopeUpdate validates an update of a Scope
-func (s *Scope) validateScopeUpdate(old runtime.Object) error {
+func (s *Scope) validateScopeUpdate(old *Scope) error {
 	var allErrs field.ErrorList
-
-	// TODO: validation code goes here
+	if err := s.validateRegionIsImmutable(old); err != nil {
+		allErrs = append(allErrs, err)
+	}
 	if len(allErrs) == 0 {
 		return nil
 	}
-
 	return apierrors.NewInvalid(ScopeGK, s.Name, allErrs)
 }
 
 // validateScopeDelete validates the deletion of a Scope
 func (s *Scope) validateScopeDelete() error {
 	var allErrs field.ErrorList
-
 	// TODO: validation code goes here
 	if len(allErrs) == 0 {
 		return nil
 	}
-
 	return apierrors.NewInvalid(ScopeGK, s.Name, allErrs)
+}
+
+// validateRegionIsImmutable checks whether the Region field should be changed
+func (s *Scope) validateRegionIsImmutable(old *Scope) *field.Error {
+	return utils.ValidateFieldIsImmutatable(s.Spec.Region, old.Spec.Region, field.NewPath("spec").Child("region"))
 }
