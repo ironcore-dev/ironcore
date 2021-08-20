@@ -1,31 +1,17 @@
 # onmetal-api
 
-This project contains the types and controllers of the user facing OnMetal API.
+![Gardener on Metal Logo](docs/assets/logo.png)
 
-## Installation
+This project contains the _CustomResourceDefinitions_ and controller for the user-facing API of the Gardener 
+on Metal project. It is meant to be a Kubernetes based Infrastructure-as-a-Service front-end of the OnMetal 
+project.
 
-To install the CRDs into your cluster
+## Start using or developing onmetal-api locally
 
-```shell
-make install
-```
+Please see our documentation in the `/docs` folder for more details.
 
-## Install sample Custom Resources
+## Feedback and Support
 
-```shell
-kubectl apply -f config/samples/
-```
+Feedback and contributions are always welcome!
 
-## Regenerate Manifests
-
-```shell
-make manifests
-```
-
-## Cleanup
-
-Remove the CRDs from your cluster
-
-```shell
-make uninstall
-```
+Please report bugs, suggestions or post questions by opening a [Github issue](https://github.com/onmetal/onmetal-api/issues).
