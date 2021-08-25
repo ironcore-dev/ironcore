@@ -23,32 +23,14 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"reflect"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
-// AssureFinalizer ensures that a finalizer is on a given runtime object
-func AssureFinalizer(ctx context.Context, client client.Client, finalizerName string, object client.Object) error {
-	if !ContainsString(object.GetFinalizers(), finalizerName) {
-		controllerutil.AddFinalizer(object, finalizerName)
-		return client.Update(ctx, object)
-	}
-	return nil
-}
-
-// AssureFinalizerRemoved ensures that a finalizer does not exist anymore for a given runtime object
-func AssureFinalizerRemoved(ctx context.Context, client client.Client, finalizerName string, object client.Object) error {
-	if ContainsString(object.GetFinalizers(), finalizerName) {
-		controllerutil.RemoveFinalizer(object, finalizerName)
-		return client.Update(ctx, object)
-	}
-	return nil
-}
-
 // AssureDeleting ensures that an object is being deleted
-func AssureDeleting(ctx context.Context, clt client.Client, object client.Object) error {
+func AssureDeleting(ctx context.Context, log *Logger, clt client.Client, object client.Object) error {
 	if !object.GetDeletionTimestamp().IsZero() {
 		return nil
 	}
+	log.Infof("deleting object %s", NewObjectId(object))
 	return client.IgnoreNotFound(clt.Delete(ctx, object, client.PropagationPolicy(metav1.DeletePropagationBackground)))
 }
 

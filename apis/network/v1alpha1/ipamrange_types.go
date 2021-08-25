@@ -22,6 +22,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
+// IPAMRangeGK is a helper to easily access the GroupKind information of an IPAMRange
 var IPAMRangeGK = schema.GroupKind{
 	Group: GroupVersion.Group,
 	Kind:  "IPAMRange",
@@ -31,20 +32,35 @@ var IPAMRangeGK = schema.GroupKind{
 // Either parent and size or a give CIDR must be specified. If parent is specified,
 // the effective range of the given size is allocated from the parent IP range. If parent and CIDR
 // is defined, the given CIDR must be in the parent range and unused. It will be allocated if possible.
-// Otherwise the status of the object will be set to "Failed".
+// Otherwise, the status of the object will be set to "Invalid".
 type IPAMRangeSpec struct {
+	// Parent is the reference of the Parent IPAMRange from which the Cidr or size should be derived
 	Parent *common.ScopedReference `json:"parent,omitempty"`
-	Size   string                  `json:"size,omitempty"`
-
-	CIDR string `json:"cidr,omitempty"`
+	// CIDRs is a list of CIDR specs which are defined for this IPAMRange
+	CIDRs []string `json:"cidrs,omitempty"`
+	// Mode
+	Mode string `json:"mode,omitempty"`
 }
+
+const (
+	ModeRoundRobin = "RoundRobin"
+	ModeFirstMatch = "FirstMatch"
+)
 
 // IPAMRangeStatus defines the observed state of IPAMRange
 type IPAMRangeStatus struct {
 	common.StateFields `json:",inline"`
-	Bound              *common.ScopedKindReference `json:"bound,omitempty"`
-	CIDR               string                      `json:"cidr,omitempty"`
-	FreeBlocks         []string                    `json:"freeBlocks,omitempty"`
+	// CIDRs is a list of effective cidrs which belong to this IPAMRange
+	CIDRs           []string            `json:"cidr,omitempty"`
+	AllocationState []string            `json:"allocationState,omitempty"`
+	RoundRobinState []string            `json:"roundRobinState,omitempty"`
+	PendingRequest  *IPAMPendingRequest `json:"pendingRequests,omitempty"`
+}
+
+type IPAMPendingRequest struct {
+	Name      string   `json:"name"`
+	Namespace string   `json:"namespace"`
+	CIDRs     []string `json:"cidrs,omitempty"`
 }
 
 //+kubebuilder:object:root=true

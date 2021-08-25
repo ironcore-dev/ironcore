@@ -40,6 +40,16 @@ func NewObjectUsageInfo(config ...interface{}) ObjectUsageInfo {
 				info[relation] = old
 			}
 			old.Add(v)
+		case utils.ObjectIds:
+			if relation == "" {
+				panic("invalid UsageInfo spec")
+			}
+			old := info[relation]
+			if old == nil {
+				info[relation] = v
+			} else {
+				old.AddAll(v)
+			}
 		}
 	}
 	return info

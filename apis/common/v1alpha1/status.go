@@ -39,4 +39,5 @@ const (
 	StateUp        = "Up"
 	StateError     = "Error"
 	StateInvalid   = "Invalid"
+	StateBusy      = "Busy"
 )

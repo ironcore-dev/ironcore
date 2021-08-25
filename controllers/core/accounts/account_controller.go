@@ -36,11 +36,11 @@ import (
 )
 
 const (
-	accountFinilizerName = core.LabelDomain + "/account"
+	finilizerName = core.LabelDomain + "/account"
 )
 
-// AccountReconciler reconciles a Account object
-type AccountReconciler struct {
+// Reconciler reconciles a Account object
+type Reconciler struct {
 	client.Client
 	Log    logr.Logger
 	Scheme *runtime.Scheme
@@ -50,9 +50,9 @@ type AccountReconciler struct {
 //+kubebuilder:rbac:groups=core.onmetal.de,resources=accounts/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=core.onmetal.de,resources=accounts/finalizers,verbs=update
 
-func (r *AccountReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
-	log := r.Log.WithValues("account", req.NamespacedName)
+	log := utils.NewLogger(r.Log, "account", req.NamespacedName)
 
 	var account corev1alpha1.Account
 	if err := r.Get(ctx, req.NamespacedName, &account); err != nil {
@@ -61,7 +61,7 @@ func (r *AccountReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 
 	if account.ObjectMeta.DeletionTimestamp.IsZero() {
 		// Add account finalizer if it does not exist
-		if err := utils.AssureFinalizer(ctx, r.Client, accountFinilizerName, &account); err != nil {
+		if err := utils.AssureFinalizer(ctx, log, r.Client, finilizerName, &account); err != nil {
 			return utils.Requeue(err)
 		}
 		namespaces, err := r.listNamespacesForAccount(ctx, req)
@@ -74,10 +74,10 @@ func (r *AccountReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				namespace = &n
 			} else {
 				if namespace.CreationTimestamp.After(n.CreationTimestamp.Time) {
-					if err := utils.AssureFinalizerRemoved(ctx, r.Client, accountFinilizerName, namespace); client.IgnoreNotFound(err) != nil {
+					if err := utils.AssureFinalizerRemoved(ctx, log, r.Client, finilizerName, namespace); client.IgnoreNotFound(err) != nil {
 						return utils.Requeue(err)
 					}
-					if err := utils.AssureDeleting(ctx, r.Client, namespace); err != nil {
+					if err := utils.AssureDeleting(ctx, log, r.Client, namespace); err != nil {
 						return utils.Requeue(err)
 					}
 					namespace = &n
@@ -86,10 +86,10 @@ func (r *AccountReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		}
 		if namespace == nil {
 			// Create account namespace
-			log.V(0).Info("creating namespace for account", "account", account.Name)
+			log.Infof("creating namespace for account %s", account.Name)
 			namespace = &v1.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
-					Finalizers:   []string{accountFinilizerName},
+					Finalizers:   []string{finilizerName},
 					GenerateName: "account-",
 					Labels: map[string]string{
 						core.AccountLabel: account.Name,
@@ -98,12 +98,12 @@ func (r *AccountReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				},
 			}
 			if err := r.Create(ctx, namespace, &client.CreateOptions{}); err != nil {
-				log.Error(err, "failed to create namespace for account", "account", account.Name)
+				log.Errorf(err, "failed to create namespace for account %s", account.Name)
 				return utils.Requeue(err)
 			}
-			log.V(0).Info("using namespace for account", "namespace", namespace.Name, "account", account.Name)
+			log.Infof("using namespace %s for account %s", namespace.Name, account.Name)
 		} else {
-			if err := utils.AssureFinalizer(ctx, r.Client, accountFinilizerName, namespace); err != nil {
+			if err := utils.AssureFinalizer(ctx, log, r.Client, finilizerName, namespace); err != nil {
 				return utils.Requeue(err)
 			}
 		}
@@ -115,7 +115,7 @@ func (r *AccountReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			return utils.Requeue(err)
 		}
 	} else {
-		log.Info("deleting account", "account", account.Name)
+		log.Infof("deleting account %s", account.Name)
 		// Remove external dependencies
 		namespaces, err := r.listNamespacesForAccount(ctx, req)
 		if err != nil {
@@ -124,10 +124,10 @@ func (r *AccountReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		var namespace *v1.Namespace
 		for _, n := range namespaces {
 			if n.Name != account.Status.Namespace {
-				if err := utils.AssureFinalizerRemoved(ctx, r.Client, accountFinilizerName, &n); client.IgnoreNotFound(err) != nil {
+				if err := utils.AssureFinalizerRemoved(ctx, log, r.Client, finilizerName, &n); client.IgnoreNotFound(err) != nil {
 					return utils.Requeue(err)
 				}
-				if err := utils.AssureDeleting(ctx, r.Client, &n); err != nil {
+				if err := utils.AssureDeleting(ctx, log, r.Client, &n); err != nil {
 					return utils.Requeue(err)
 				}
 			} else {
@@ -140,11 +140,11 @@ func (r *AccountReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			if err := r.Status().Update(ctx, &account); err != nil {
 				return utils.Requeue(err)
 			}
-			if err := utils.AssureFinalizerRemoved(ctx, r.Client, accountFinilizerName, namespace); client.IgnoreNotFound(err) != nil {
+			if err := utils.AssureFinalizerRemoved(ctx, log, r.Client, finilizerName, namespace); client.IgnoreNotFound(err) != nil {
 				return utils.Requeue(err)
 			}
-			log.Info("deleting account namespace", "account", account.Name, "namespace", namespace.Name)
-			if err := utils.AssureDeleting(ctx, r.Client, namespace); err != nil {
+			log.Infof("deleting account %s namespace %s", account.Name, namespace.Name)
+			if err := utils.AssureDeleting(ctx, log, r.Client, namespace); err != nil {
 				return utils.Requeue(err)
 			}
 			if err := r.Get(ctx, client.ObjectKey{Name: namespace.Name}, namespace); err == nil || client.IgnoreNotFound(err) != nil {
@@ -152,14 +152,14 @@ func (r *AccountReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			}
 		}
 		// Remove finalizer
-		if err := utils.AssureFinalizerRemoved(ctx, r.Client, accountFinilizerName, &account); err != nil {
+		if err := utils.AssureFinalizerRemoved(ctx, log, r.Client, finilizerName, &account); err != nil {
 			return utils.Requeue(err)
 		}
 	}
 	return utils.Succeeded()
 }
 
-func (r *AccountReconciler) listNamespacesForAccount(ctx context.Context, req ctrl.Request) ([]v1.Namespace, error) {
+func (r *Reconciler) listNamespacesForAccount(ctx context.Context, req ctrl.Request) ([]v1.Namespace, error) {
 	var namespaces v1.NamespaceList
 	requirementScope, _ := labels.NewRequirement(core.ParentNamespace, selection.DoesNotExist, nil)
 	requirementAccount, _ := labels.NewRequirement(core.AccountLabel, selection.DoubleEquals, []string{req.Name})
@@ -173,7 +173,7 @@ func (r *AccountReconciler) listNamespacesForAccount(ctx context.Context, req ct
 }
 
 // SetupWithManager sets up the controller with the Manager.
-func (r *AccountReconciler) SetupWithManager(mgr *manager.Manager) error {
+func (r *Reconciler) SetupWithManager(mgr *manager.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&corev1alpha1.Account{}).
 		Complete(r)

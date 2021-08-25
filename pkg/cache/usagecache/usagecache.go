@@ -275,3 +275,24 @@ func (u *usageCache) GetUsedObjectsForRelation(id utils.ObjectId, relation strin
 	defer u.lock.RUnlock()
 	return u.sources[id].GetObjectIdsForRelation(relation)
 }
+
+func (u *usageCache) IsCyclicForRelationForGK(id utils.ObjectId, relation string, gk schema.GroupKind) []utils.ObjectId {
+	u.lock.RLock()
+	defer u.lock.RUnlock()
+	return u.followRelation(id, relation, gk, nil)
+}
+
+func (u *usageCache) followRelation(id utils.ObjectId, relation string, gk schema.GroupKind, seen []utils.ObjectId) []utils.ObjectId {
+	for i, o := range seen {
+		if o == id {
+			return append(seen[i:], id)
+		}
+	}
+	seen = append(seen, id)
+	for rel := range u.sources[id].GetObjectIdsForRelation(relation) {
+		if cycle := u.followRelation(rel, relation, gk, seen); cycle != nil {
+			return cycle
+		}
+	}
+	return nil
+}

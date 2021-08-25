@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package accounts
+package ipamrange
 
 import (
+	api "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	"github.com/onmetal/onmetal-api/pkg/manager"
 	"path/filepath"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -31,8 +32,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/envtest/printer"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
-
-	api "github.com/onmetal/onmetal-api/apis/core/v1alpha1"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -82,12 +81,12 @@ var _ = BeforeSuite(func() {
 	err = (&Reconciler{
 		Client: k8sManager.GetClient(),
 		Scheme: k8sManager.GetScheme(),
-		Log:    ctrl.Log.WithName("controllers").WithName("Account"),
+		Log:    ctrl.Log.WithName("controllers").WithName("IPAMRange"),
 	}).SetupWithManager(k8sManager)
 	Expect(err).ToNot(HaveOccurred())
 
 	go func() {
-		err = k8sManager.Start(ctrl.SetupSignalHandler())
+		err = k8sManager.Manager.Start(ctrl.SetupSignalHandler())
 		Expect(err).ToNot(HaveOccurred())
 	}()
 

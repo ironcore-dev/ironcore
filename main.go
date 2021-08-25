@@ -18,6 +18,7 @@ package main
 
 import (
 	"flag"
+	"github.com/onmetal/onmetal-api/controllers/network/ipamrange"
 	"os"
 
 	accountwebhook "github.com/onmetal/onmetal-api/pkg/webhooks/account"
@@ -67,6 +68,8 @@ func main() {
 	var metricsAddr string
 	var enableLeaderElection bool
 	var probeAddr string
+	var enableWebhook bool
+	flag.BoolVar(&enableWebhook, "enable-webhooks", true, "Enable webhooks.")
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
@@ -93,8 +96,8 @@ func main() {
 		panic("failed to create manager")
 	}
 
-	// Account resource
-	if err = (&accounts.AccountReconciler{
+	// Account controller
+	if err = (&accounts.Reconciler{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("Account"),
 		Scheme: mgr.GetScheme(),
@@ -103,13 +106,15 @@ func main() {
 		os.Exit(1)
 	}
 	// Account webhook
-	if err = (&accountwebhook.AccountWebhook{}).SetupWebhookWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create webhook", "webhook", "Account")
-		os.Exit(1)
+	if enableWebhook {
+		if err = (&accountwebhook.AccountWebhook{}).SetupWebhookWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create webhook", "webhook", "Account")
+			os.Exit(1)
+		}
 	}
 
-	// Scope resource
-	if err = (&scopes.ScopeReconciler{
+	// Scope controller
+	if err = (&scopes.Reconciler{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("Scope"),
 		Scheme: mgr.GetScheme(),
@@ -118,9 +123,11 @@ func main() {
 		os.Exit(1)
 	}
 	// Scope webhook
-	if err = (&scopewebhook.ScopeWebhook{}).SetupWebhookWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create webhook", "webhook", "Scope")
-		os.Exit(1)
+	if enableWebhook {
+		if err = (&scopewebhook.ScopeWebhook{}).SetupWebhookWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create webhook", "webhook", "Scope")
+			os.Exit(1)
+		}
 	}
 
 	if err = (&computecontrollers.MachineClassReconciler{
@@ -221,12 +228,22 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "RoutingDomain")
 		os.Exit(1)
 	}
-	if err = (&networkcontrollers.IPAMRangeReconciler{
+
+	// IPAMRange controller
+	if err = (&ipamrange.Reconciler{
 		Log: ctrl.Log.WithName("iprange").WithName("Account"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "IPAMRange")
 		os.Exit(1)
 	}
+	// IPAMRange webhook
+	if enableWebhook {
+		if err = (&networkv1alpha1.IPAMRange{}).SetupWebhookWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create webhook", "webhook", "IPAMRange")
+			os.Exit(1)
+		}
+	}
+
 	if err = (&networkcontrollers.GatewayReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
@@ -242,17 +259,17 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
+	if err := mgr.Manager.AddHealthzCheck("healthz", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to set up health check")
 		os.Exit(1)
 	}
-	if err := mgr.AddReadyzCheck("readyz", healthz.Ping); err != nil {
+	if err := mgr.Manager.AddReadyzCheck("readyz", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to set up ready check")
 		os.Exit(1)
 	}
 
 	setupLog.Info("starting manager")
-	if err := mgr.Manager.Start(ctrl.SetupSignalHandler()); err != nil {
+	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}

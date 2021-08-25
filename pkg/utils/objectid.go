@@ -25,6 +25,13 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
+func NewObjectKey(object client.Object) client.ObjectKey {
+	return client.ObjectKey{
+		Namespace: object.GetNamespace(),
+		Name:      object.GetName(),
+	}
+}
+
 type ObjectId struct {
 	client.ObjectKey
 	schema.GroupKind

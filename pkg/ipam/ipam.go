@@ -22,6 +22,7 @@ import (
 )
 
 type IPAM struct {
+	ranges     CIDRList
 	block      *Block
 	nextAlloc  []net.IP
 	roundRobin bool
@@ -43,6 +44,7 @@ func NewIPAM(cidr *net.IPNet, ranges ...*IPRange) (*IPAM, error) {
 
 	_ = nextAlloc
 	ipam := &IPAM{
+		ranges:    []*net.IPNet{&copy},
 		block:     block,
 		nextAlloc: nextAlloc,
 	}
@@ -100,6 +102,7 @@ func NewIPAMForRanges(ranges IPRanges) (*IPAM, error) {
 	}
 	_ = nextAlloc
 	ipam := &IPAM{
+		ranges:    cidrs,
 		nextAlloc: nextAlloc,
 	}
 
@@ -143,15 +146,29 @@ func (this *IPAM) SetRoundRobin(b bool) {
 	this.roundRobin = b
 }
 
-func (this *IPAM) State() []net.IP {
-	return this.nextAlloc
+func (this *IPAM) Ranges() CIDRList {
+	return this.ranges.Copy()
+}
+
+func (this *IPAM) State() ([]string, []net.IP) {
+	state := []string{}
+	b := this.block
+	for b != nil {
+		state = append(state, b.String())
+		b = b.next
+	}
+	if this.IsRoundRobin() {
+		return state, this.nextAlloc
+	} else {
+		return state, nil
+	}
 }
 
 func (this *IPAM) IsRoundRobin() bool {
 	return this.roundRobin
 }
 
-func (this *IPAM) SetState(next []net.IP) error {
+func (this *IPAM) SetState(blocks []string, next []net.IP) error {
 	if len(next) > len(this.nextAlloc) {
 		return fmt.Errorf("invalid state")
 	}
@@ -166,6 +183,26 @@ func (this *IPAM) SetState(next []net.IP) error {
 		} else {
 			this.nextAlloc[i] = nil
 		}
+	}
+
+	if blocks != nil {
+		var block *Block
+		var last *Block
+
+		for _, s := range blocks {
+			b := ParseBlock(s)
+			if b == nil {
+				return fmt.Errorf("invalid block state")
+			}
+			b.prev = last
+			if last == nil {
+				block = b
+			} else {
+				last.next = b
+			}
+			last = b
+		}
+		this.block = block
 	}
 	return nil
 }

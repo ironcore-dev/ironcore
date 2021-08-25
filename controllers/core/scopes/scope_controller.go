@@ -39,8 +39,8 @@ const (
 	scopeFinilizerName = core.LabelDomain + "/scope"
 )
 
-// ScopeReconciler reconciles a Scope object
-type ScopeReconciler struct {
+// Reconciler reconciles a Scope object
+type Reconciler struct {
 	client.Client
 	Log    logr.Logger
 	Scheme *runtime.Scheme
@@ -50,10 +50,10 @@ type ScopeReconciler struct {
 //+kubebuilder:rbac:groups=core.onmetal.de,resources=scopes/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=core.onmetal.de,resources=scopes/finalizers,verbs=update
 
-func (r *ScopeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
 
-	log := r.Log.WithValues("scope", req.NamespacedName)
+	log := utils.NewLogger(r.Log, "scope", req.NamespacedName)
 
 	var scope corev1alpha1.Scope
 	if err := r.Get(ctx, req.NamespacedName, &scope); err != nil {
@@ -69,7 +69,7 @@ func (r *ScopeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		scopeName := utils.GetLabel(&parentNamespace, core.ScopeLabel, accountName)
 
 		// Add scope finalizer if it does not exist
-		if err := utils.AssureFinalizer(ctx, r.Client, scopeFinilizerName, &scope); err != nil {
+		if err := utils.AssureFinalizer(ctx, log, r.Client, scopeFinilizerName, &scope); err != nil {
 			return utils.Requeue(err)
 		}
 		namespaces, err := r.listNamespacesForScopes(ctx, req)
@@ -82,10 +82,10 @@ func (r *ScopeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 				namespace = &n
 			} else {
 				if namespace.CreationTimestamp.After(n.CreationTimestamp.Time) {
-					if err := utils.AssureFinalizerRemoved(ctx, r.Client, scopeFinilizerName, namespace); client.IgnoreNotFound(err) != nil {
+					if err := utils.AssureFinalizerRemoved(ctx, log, r.Client, scopeFinilizerName, namespace); client.IgnoreNotFound(err) != nil {
 						return utils.Requeue(err)
 					}
-					if err := utils.AssureDeleting(ctx, r.Client, namespace); err != nil {
+					if err := utils.AssureDeleting(ctx, log, r.Client, namespace); err != nil {
 						return utils.Requeue(err)
 					}
 					namespace = &n
@@ -94,7 +94,7 @@ func (r *ScopeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		}
 		if namespace == nil {
 			// Create scope namespace
-			log.V(0).Info("creating namespace for scope", "scope", scope.Name)
+			log.Infof("creating namespace for scope %s", scope.Name)
 			namespace = &v1.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
 					Finalizers:   []string{scopeFinilizerName},
@@ -108,12 +108,12 @@ func (r *ScopeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 				},
 			}
 			if err := r.Create(ctx, namespace, &client.CreateOptions{}); err != nil {
-				log.Error(err, "failed to create namespace for scope", "scope", scope.Name)
+				log.Errorf(err, "failed to create namespace for scope %s", scope.Name)
 				return utils.Requeue(err)
 			}
-			log.V(0).Info("using namespace for scope", "namespace", namespace.Name, "scope", scope.Name)
+			log.Infof("using namespace %s for scope %s", namespace.Name, scope.Name)
 		} else {
-			if err := utils.AssureFinalizer(ctx, r.Client, scopeFinilizerName, namespace); err != nil {
+			if err := utils.AssureFinalizer(ctx, log, r.Client, scopeFinilizerName, namespace); err != nil {
 				return utils.Requeue(err)
 			}
 		}
@@ -128,7 +128,7 @@ func (r *ScopeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 			return utils.Requeue(err)
 		}
 	} else {
-		log.V(0).Info("deleting scope", "scope", scope.Name)
+		log.Infof("deleting scope %s", scope.Name)
 		// Remove external dependencies
 		namespaces, err := r.listNamespacesForScopes(ctx, req)
 		if err != nil {
@@ -137,10 +137,10 @@ func (r *ScopeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		var namespace *v1.Namespace
 		for _, n := range namespaces {
 			if n.Name != scope.Status.Namespace {
-				if err := utils.AssureFinalizerRemoved(ctx, r.Client, scopeFinilizerName, &n); client.IgnoreNotFound(err) != nil {
+				if err := utils.AssureFinalizerRemoved(ctx, log, r.Client, scopeFinilizerName, &n); client.IgnoreNotFound(err) != nil {
 					return utils.Requeue(err)
 				}
-				if err := utils.AssureDeleting(ctx, r.Client, &n); err != nil {
+				if err := utils.AssureDeleting(ctx, log, r.Client, &n); err != nil {
 					return utils.Requeue(err)
 				}
 			} else {
@@ -153,10 +153,10 @@ func (r *ScopeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 			if err := r.Status().Update(ctx, &scope); err != nil {
 				return utils.Requeue(err)
 			}
-			if err := utils.AssureFinalizerRemoved(ctx, r.Client, scopeFinilizerName, namespace); client.IgnoreNotFound(err) != nil {
+			if err := utils.AssureFinalizerRemoved(ctx, log, r.Client, scopeFinilizerName, namespace); client.IgnoreNotFound(err) != nil {
 				return utils.Requeue(err)
 			}
-			if err := utils.AssureDeleting(ctx, r.Client, namespace); err != nil {
+			if err := utils.AssureDeleting(ctx, log, r.Client, namespace); err != nil {
 				return utils.Requeue(err)
 			}
 			if err := r.Get(ctx, client.ObjectKey{Name: namespace.Name}, namespace); err == nil || client.IgnoreNotFound(err) != nil {
@@ -164,14 +164,14 @@ func (r *ScopeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 			}
 		}
 		// Remove finalizer
-		if err := utils.AssureFinalizerRemoved(ctx, r.Client, scopeFinilizerName, &scope); err != nil {
+		if err := utils.AssureFinalizerRemoved(ctx, log, r.Client, scopeFinilizerName, &scope); err != nil {
 			return utils.Requeue(err)
 		}
 	}
 	return utils.Succeeded()
 }
 
-func (r *ScopeReconciler) listNamespacesForScopes(ctx context.Context, req ctrl.Request) ([]v1.Namespace, error) {
+func (r *Reconciler) listNamespacesForScopes(ctx context.Context, req ctrl.Request) ([]v1.Namespace, error) {
 	var namespaces v1.NamespaceList
 	requirementScope, _ := labels.NewRequirement(core.ScopeLabel, selection.DoubleEquals, []string{req.Name})
 	requirementParentNamespace, _ := labels.NewRequirement(core.ParentNamespace, selection.DoubleEquals, []string{req.Namespace})
@@ -185,7 +185,7 @@ func (r *ScopeReconciler) listNamespacesForScopes(ctx context.Context, req ctrl.
 }
 
 // SetupWithManager sets up the controller with the Manager.
-func (r *ScopeReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *Reconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&corev1alpha1.Scope{}).
 		Complete(r)

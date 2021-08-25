@@ -48,6 +48,27 @@ webhooks:
     resources:
     - scopes
   sideEffects: None
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /mutate-network-onmetal-de-v1alpha1-ipamrange
+  failurePolicy: Fail
+  name: mipamrange.kb.io
+  rules:
+  - apiGroups:
+    - network.onmetal.de
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - ipamranges
+  sideEffects: None
 
 ---
 apiVersion: admissionregistration.k8s.io/v1
@@ -99,4 +120,26 @@ webhooks:
     - DELETE
     resources:
     - scopes
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-network-onmetal-de-v1alpha1-ipamrange
+  failurePolicy: Fail
+  name: vipamrange.kb.io
+  rules:
+  - apiGroups:
+    - network.onmetal.de
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    - DELETE
+    resources:
+    - ipamranges
   sideEffects: None

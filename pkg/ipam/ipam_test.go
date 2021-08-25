@@ -17,6 +17,7 @@
 package ipam
 
 import (
+	"fmt"
 	"net"
 
 	. "github.com/onsi/ginkgo"
@@ -403,4 +404,88 @@ var _ = Describe("IPAM", func() {
 		})
 	})
 
+	Context("serialize blocks", func() {
+		_, cidr, _ := net.ParseCIDR("10.0.0.0/8")
+		_, bitmap, _ := net.ParseCIDR("10.0.0.0/26")
+
+		It("serializes free block", func() {
+			b := &Block{
+				busy: 0,
+				cidr: cidr,
+			}
+			Expect(b.String()).To(Equal("10.0.0.0/8[free]"))
+			Expect(ParseBlock(b.String())).To(Equal(b))
+		})
+		It("serializes busy block", func() {
+			b := &Block{
+				busy: BITMAP_BUSY,
+				cidr: cidr,
+			}
+			Expect(b.String()).To(Equal("10.0.0.0/8[busy]"))
+			Expect(ParseBlock(b.String())).To(Equal(b))
+		})
+		It("serializes bitmap block", func() {
+			b := &Block{
+				busy: 255,
+				cidr: bitmap,
+			}
+			Expect(b.String()).To(Equal("10.0.0.0/26[00000000 00000000 00000000 00000000 00000000 00000000 00000000 11111111]"))
+			Expect(ParseBlock(b.String())).To(Equal(b))
+		})
+		It("serializes bitmap block", func() {
+			b := &Block{
+				busy: 255 +
+					254*256 +
+					253*256*256 +
+					252*256*256*256 +
+					251*256*256*256*256 +
+					256*256*256*256*256*256*256,
+				cidr: bitmap,
+			}
+			Expect(b.String()).To(Equal("10.0.0.0/26[00000001 00000000 00000000 11111011 11111100 11111101 11111110 11111111]"))
+			Expect(ParseBlock(b.String())).To(Equal(b))
+		})
+	})
+
+	Context("serialize state", func() {
+		_, cidr, _ := net.ParseCIDR("10.0.0.0/8")
+
+		It("serializes empty ipam", func() {
+			ipam, _ := NewIPAM(cidr)
+			ipam.SetRoundRobin(true)
+			blocks, round := ipam.State()
+			fmt.Printf("%v\n", blocks)
+
+			nipam, _ := NewIPAM(cidr)
+			nipam.SetRoundRobin(true)
+			nipam.SetState(blocks, round)
+			Expect(nipam).To(Equal(ipam))
+		})
+		It("serializes busy ipam", func() {
+			ipam, _ := NewIPAM(cidr)
+			ipam.SetRoundRobin(true)
+			ipam.Alloc(30)
+			blocks, round := ipam.State()
+			fmt.Printf("%v\n", blocks)
+
+			nipam, _ := NewIPAM(cidr)
+			nipam.SetRoundRobin(true)
+			nipam.SetState(blocks, round)
+			Expect(nipam).To(Equal(ipam))
+		})
+		It("serializes busy 2 ipam", func() {
+			ipam, _ := NewIPAM(cidr)
+			ipam.SetRoundRobin(true)
+			ipam.Alloc(30)
+			ipam.Alloc(20)
+			blocks, round := ipam.State()
+			fmt.Printf("%v\n", blocks)
+
+			nipam, _ := NewIPAM(cidr)
+			nipam.SetRoundRobin(true)
+			nipam.SetState(blocks, round)
+			Expect(nipam).To(Equal(ipam))
+		})
+
+	})
 })

@@ -359,6 +359,53 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 </tr>
 </tbody>
 </table>
+<h3 id="network.onmetal.de/v1alpha1.IPAMPendingRequest">IPAMPendingRequest
+</h3>
+<p>
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.IPAMRangeStatus">IPAMRangeStatus</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>namespace</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>cidrs</code><br/>
+<em>
+[]string
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="network.onmetal.de/v1alpha1.IPAMRange">IPAMRange
 </h3>
 <div>
@@ -409,26 +456,29 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </em>
 </td>
 <td>
+<p>Parent is the reference of the Parent IPAMRange from which the Cidr or size should be derived</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>size</code><br/>
+<code>cidrs</code><br/>
+<em>
+[]string
+</em>
+</td>
+<td>
+<p>CIDRs is a list of CIDR specs which are defined for this IPAMRange</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>mode</code><br/>
 <em>
 string
 </em>
 </td>
 <td>
-</td>
-</tr>
-<tr>
-<td>
-<code>cidr</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
+<p>Mode</p>
 </td>
 </tr>
 </table>
@@ -458,7 +508,7 @@ IPAMRangeStatus
 Either parent and size or a give CIDR must be specified. If parent is specified,
 the effective range of the given size is allocated from the parent IP range. If parent and CIDR
 is defined, the given CIDR must be in the parent range and unused. It will be allocated if possible.
-Otherwise the status of the object will be set to &ldquo;Failed&rdquo;.</p>
+Otherwise, the status of the object will be set to &ldquo;Invalid&rdquo;.</p>
 </div>
 <table>
 <thead>
@@ -478,26 +528,29 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </em>
 </td>
 <td>
+<p>Parent is the reference of the Parent IPAMRange from which the Cidr or size should be derived</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>size</code><br/>
+<code>cidrs</code><br/>
+<em>
+[]string
+</em>
+</td>
+<td>
+<p>CIDRs is a list of CIDR specs which are defined for this IPAMRange</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>mode</code><br/>
 <em>
 string
 </em>
 </td>
 <td>
-</td>
-</tr>
-<tr>
-<td>
-<code>cidr</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
+<p>Mode</p>
 </td>
 </tr>
 </tbody>
@@ -535,21 +588,20 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 </tr>
 <tr>
 <td>
-<code>bound</code><br/>
-<em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedKindReference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
-</a>
-</em>
-</td>
-<td>
-</td>
-</tr>
-<tr>
-<td>
 <code>cidr</code><br/>
 <em>
-string
+[]string
+</em>
+</td>
+<td>
+<p>CIDRs is a list of effective cidrs which belong to this IPAMRange</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>allocationState</code><br/>
+<em>
+[]string
 </em>
 </td>
 <td>
@@ -557,9 +609,21 @@ string
 </tr>
 <tr>
 <td>
-<code>freeBlocks</code><br/>
+<code>roundRobinState</code><br/>
 <em>
 []string
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>pendingRequests</code><br/>
+<em>
+<a href="#network.onmetal.de/v1alpha1.IPAMPendingRequest">
+IPAMPendingRequest
+</a>
 </em>
 </td>
 <td>
