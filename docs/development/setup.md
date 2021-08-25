@@ -1,6 +1,6 @@
 # Local Development Setup
 
-## Prerequisites 
+## Requirements 
 
 * `go` >= 1.12
 * `git`, `make` and `kubectl`

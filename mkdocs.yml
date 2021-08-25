@@ -38,8 +38,8 @@ nav:
   - Concepts: README.md
   - Architecture: README.md
   - Usage: README.md
-  - Development:
-      - Local Development Setup: development/setup.md
+  - Developer Guide:
+      - Local Setup: development/setup.md
       - Documentation: development/documentation.md
       - Testing: development/testing.md
       - Contribution Guide: development/contribution.md
