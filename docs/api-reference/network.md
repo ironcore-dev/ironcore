@@ -588,7 +588,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 </tr>
 <tr>
 <td>
-<code>cidr</code><br/>
+<code>cidrs</code><br/>
 <em>
 []string
 </em>
