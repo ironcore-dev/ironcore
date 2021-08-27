@@ -19,17 +19,15 @@ package ipamrange
 import (
 	"context"
 	"fmt"
-	"github.com/go-logr/logr"
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	"github.com/onmetal/onmetal-api/apis/core"
 	api "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	"github.com/onmetal/onmetal-api/pkg/cache/usagecache"
+	"github.com/onmetal/onmetal-api/pkg/controllerutils"
 	"github.com/onmetal/onmetal-api/pkg/ipam"
 	"github.com/onmetal/onmetal-api/pkg/manager"
-	"github.com/onmetal/onmetal-api/pkg/scopes"
 	"github.com/onmetal/onmetal-api/pkg/utils"
 	"k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/runtime"
 	"net"
 	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -43,12 +41,15 @@ const (
 
 // Reconciler reconciles a IPAMRange object
 type Reconciler struct {
-	manager *manager.Manager
-	scopes.ScopeEvaluator
-	client.Client
-	Log    logr.Logger
-	Scheme *runtime.Scheme
-	cache  *IPAMCache
+	controllerutils.Reconciler
+	cache *IPAMCache
+}
+
+func NewReconciler() *Reconciler {
+	return &Reconciler{
+		Reconciler: controllerutils.NewReconciler("ipamrange", finalizerName),
+		cache:      nil,
+	}
 }
 
 //+kubebuilder:rbac:groups=network.onmetal.de,resources=ipamranges,verbs=get;list;watch;create;update;patch;delete
@@ -58,9 +59,9 @@ type Reconciler struct {
 // Reconcile
 // if parent -> handle request part and set range
 func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	r.manager.Wait() // wait until all caches are initialized
+	r.Wait() // wait until all caches are initialized
 	_ = log.FromContext(ctx)
-	log := utils.NewLogger(r.Log, "ipamrange", req.NamespacedName)
+	log := r.GetLog(req.NamespacedName)
 	var obj api.IPAMRange
 	if err := r.Get(ctx, req.NamespacedName, &obj); err != nil {
 		if errors.IsNotFound(err) {
@@ -80,9 +81,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *Reconciler) SetupWithManager(mgr *manager.Manager) error {
-	r.manager = mgr
-	r.Client = mgr.GetClient()
-	r.ScopeEvaluator = mgr.GetScopeEvaluator()
+	r.Reconciler.SetupWithManager(mgr)
 	r.cache = NewIPAMCache(r.Client)
 	c, err := ctrl.NewControllerManagedBy(mgr).
 		For(&api.IPAMRange{}).
@@ -138,8 +137,8 @@ func (r *Reconciler) HandleReconcile(ctx context.Context, log *utils.Logger, obj
 				}
 				// trigger all users of this ipamrange
 				log.Infof("trigger all users of %s", current.objectId.ObjectKey)
-				users := r.manager.GetUsageCache().GetUsersForRelationToGK(current.objectId, "uses", api.IPAMRangeGK)
-				r.manager.TriggerAll(users)
+				users := r.GetUsageCache().GetUsersForRelationToGK(current.objectId, "uses", api.IPAMRangeGK)
+				r.TriggerAll(users)
 			}
 			return utils.Succeeded()
 		}
@@ -188,8 +187,8 @@ func (r *Reconciler) HandleDeleted(ctx context.Context, log *utils.Logger, key c
 		ObjectKey: key,
 		GroupKind: api.IPAMRangeGK,
 	}
-	users := r.manager.GetUsageCache().GetUsersFor(objectId)
-	r.manager.GetUsageCache().DeleteObject(objectId)
-	r.manager.TriggerAll(users)
+	users := r.GetUsageCache().GetUsersFor(objectId)
+	r.GetUsageCache().DeleteObject(objectId)
+	r.TriggerAll(users)
 	return utils.Succeeded()
 }

@@ -230,9 +230,7 @@ func main() {
 	}
 
 	// IPAMRange controller
-	if err = (&ipamrange.Reconciler{
-		Log: ctrl.Log.WithName("iprange").WithName("Account"),
-	}).SetupWithManager(mgr); err != nil {
+	if err = ipamrange.NewReconciler().SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "IPAMRange")
 		os.Exit(1)
 	}

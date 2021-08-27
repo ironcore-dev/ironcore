@@ -78,11 +78,7 @@ var _ = BeforeSuite(func() {
 	})
 	Expect(err).ToNot(HaveOccurred())
 
-	err = (&Reconciler{
-		Client: k8sManager.GetClient(),
-		Scheme: k8sManager.GetScheme(),
-		Log:    ctrl.Log.WithName("controllers").WithName("IPAMRange"),
-	}).SetupWithManager(k8sManager)
+	err = NewReconciler().SetupWithManager(k8sManager)
 	Expect(err).ToNot(HaveOccurred())
 
 	go func() {

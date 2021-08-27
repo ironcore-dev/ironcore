@@ -43,10 +43,10 @@ func (r *Reconciler) reconcileRequest(ctx context.Context, log *utils.Logger, cu
 	}
 
 	requestId := utils.NewObjectId(current.object)
-	r.manager.GetUsageCache().ReplaceObjectUsageInfo(requestId, usagecache.NewObjectUsageInfo("uses", rangeId))
+	r.GetUsageCache().ReplaceObjectUsageInfo(requestId, usagecache.NewObjectUsageInfo("uses", rangeId))
 
 	// check for cycles and self reference
-	if cycle := r.manager.GetUsageCache().IsCyclicForRelationForGK(requestId, "uses", api.IPAMRangeGK); len(cycle) > 0 {
+	if cycle := r.GetUsageCache().IsCyclicForRelationForGK(requestId, "uses", api.IPAMRangeGK); len(cycle) > 0 {
 		return r.invalid(ctx, log, current.object, "reference cycle not allowed: %v", cycle)
 	}
 
@@ -77,11 +77,11 @@ func (r *Reconciler) reconcileRequest(ctx context.Context, log *utils.Logger, cu
 			}
 		}
 		// set finalizer current object
-		if err := utils.AssureFinalizer(ctx, log, r.Client, finalizerName, current.object); err != nil {
+		if err := r.AssureFinalizer(ctx, log, current.object); err != nil {
 			return utils.Requeue(err)
 		}
 		// set finalizer on parent
-		if found, err := utils.CheckAndAssureFinalizer(ctx, log, r.Client, finalizerName, ipr.object); err != nil || !found {
+		if found, err := r.CheckAndAssureFinalizer(ctx, log, ipr.object); err != nil || !found {
 			return utils.Requeue(err)
 		}
 
@@ -116,7 +116,7 @@ func (r *Reconciler) reconcileRequest(ctx context.Context, log *utils.Logger, cu
 			log.Infof("allocation finished. trigger range %s", ipr.objectId.ObjectKey)
 			// make sure to update cache with new object
 			current.object = newObj
-			r.manager.Trigger(ipr.objectId)
+			r.Trigger(ipr.objectId)
 		} else {
 			if err != nil {
 				return r.setStatus(ctx, log, current.object, v1alpha1.StateError, err.Error())
@@ -136,7 +136,7 @@ func (r *Reconciler) deleteRequest(ctx context.Context, log *utils.Logger, curre
 		}
 	}
 
-	if len(r.manager.GetUsageCache().GetUsersForRelationToGK(requestId, "uses", api.IPAMRangeGK)) > 0 {
+	if len(r.GetUsageCache().GetUsersForRelationToGK(requestId, "uses", api.IPAMRangeGK)) > 0 {
 		// TODO: reject deletion in validation webhook if there still users of this object
 		return utils.Succeeded()
 	}
@@ -182,11 +182,11 @@ func (r *Reconciler) deleteRequest(ctx context.Context, log *utils.Logger, curre
 					return utils.Requeue(err)
 				}
 				current.object = newObj
-				r.manager.Trigger(ipr.objectId)
+				r.Trigger(ipr.objectId)
 			}
 		}
 	}
-	if err := utils.AssureFinalizerRemoved(ctx, log, r.Client, finalizerName, current.object); err != nil {
+	if err := r.AssureFinalizerRemoved(ctx, log, current.object); err != nil {
 		return utils.Requeue(err)
 	}
 	return utils.Succeeded()

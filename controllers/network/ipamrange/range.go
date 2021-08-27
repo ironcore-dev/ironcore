@@ -27,8 +27,8 @@ import (
 )
 
 func (r *Reconciler) reconcileRange(ctx context.Context, log *utils.Logger, current *IPAM) (ctrl.Result, error) {
-	if len(r.manager.GetUsageCache().GetUsersForRelationToGK(utils.NewObjectId(current.object), "uses", api.IPAMRangeGK)) > 0 {
-		if err := utils.AssureFinalizer(ctx, log, r.Client, finalizerName, current.object); err != nil {
+	if len(r.GetUsageCache().GetUsersForRelationToGK(utils.NewObjectId(current.object), "uses", api.IPAMRangeGK)) > 0 {
+		if err := r.AssureFinalizer(ctx, log, current.object); err != nil {
 			return utils.Requeue(err)
 		}
 	}
@@ -79,8 +79,8 @@ func (r *Reconciler) reconcileRange(ctx context.Context, log *utils.Logger, curr
 		current.pendingRequest = nil
 		// trigger all users of this ipamrange
 		log.Infof("trigger all users of %s", current.objectId.ObjectKey)
-		users := r.manager.GetUsageCache().GetUsersForRelationToGK(current.objectId, "uses", api.IPAMRangeGK)
-		r.manager.TriggerAll(users)
+		users := r.GetUsageCache().GetUsersForRelationToGK(current.objectId, "uses", api.IPAMRangeGK)
+		r.TriggerAll(users)
 	}
 	return r.setStatus(ctx, log, current.object, common.StateReady, "")
 }
