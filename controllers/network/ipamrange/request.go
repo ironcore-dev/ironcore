@@ -90,7 +90,7 @@ func (r *Reconciler) reconcileRequest(ctx context.Context, log *utils.Logger, cu
 			return utils.Succeeded()
 		}
 
-		allocated := []*net.IPNet{}
+		var allocated []*net.IPNet
 		if ipr.pendingRequest != nil {
 			if ipr.pendingRequest.key != requestId.ObjectKey {
 				return utils.Succeeded()
@@ -154,8 +154,7 @@ func (r *Reconciler) deleteRequest(ctx context.Context, log *utils.Logger, curre
 			}
 			if ipr != nil {
 				defer r.cache.release(rangeId.ObjectKey)
-				allocated := []*net.IPNet{}
-
+				var allocated []*net.IPNet
 				if ipr.pendingRequest != nil {
 					if ipr.pendingRequest.key != requestId.ObjectKey {
 						log.Infof("operation on ipamrange still pending -> delay delete")

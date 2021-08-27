@@ -30,6 +30,14 @@ import (
 var _ = Describe("IPAMRange controller", func() {
 	ctx := context.Background()
 
+	type IPAMStatus struct {
+		State           string
+		CIDRs           []string
+		AllocationState []string
+		RoundRobinState []string
+		PendingRequest  *api.IPAMPendingRequest
+	}
+
 	const (
 		validIPAMRangeName      = "valid-ipamrange"
 		validIPAMRangeNamespace = "default"
@@ -114,11 +122,31 @@ var _ = Describe("IPAMRange controller", func() {
 				},
 				CIDRs: []string{"10.0.1.0/24"},
 			}))
-			Eventually(func() []string {
+			Eventually(func() *api.IPAMRangeStatus {
 				obj := &api.IPAMRange{}
 				Expect(k8sClient.Get(ctx, validIPAMRangeLookupKey, obj)).Should(Succeed())
-				return obj.Status.AllocationState
-			}, timeout, interval).Should(ContainElements("10.0.1.0/24[busy]"))
+				return &obj.Status
+			}, timeout, interval).Should(Equal(&api.IPAMRangeStatus{
+				StateFields: common.StateFields{
+					State:      common.StateReady,
+					Message:    "",
+					Conditions: nil,
+				},
+				CIDRs: []string{"10.0.0.0/16"},
+				AllocationState: []string{
+					"10.0.0.0/24[free]",
+					"10.0.1.0/24[busy]",
+					"10.0.2.0/23[free]",
+					"10.0.4.0/22[free]",
+					"10.0.8.0/21[free]",
+					"10.0.16.0/20[free]",
+					"10.0.32.0/19[free]",
+					"10.0.64.0/18[free]",
+					"10.0.128.0/17[free]",
+				},
+				RoundRobinState: nil,
+				PendingRequest:  nil,
+			}))
 		})
 
 		It("Should release the allocated CIDR block on request deletion", func() {
@@ -127,11 +155,21 @@ var _ = Describe("IPAMRange controller", func() {
 			Expect(k8sClient.Get(ctx, subrangeLookupKey, obj)).Should(Succeed())
 			Expect(k8sClient.Delete(ctx, obj)).Should(Succeed())
 			By("Checking whether the allocation state is not containing the reserved range")
-			Eventually(func() []string {
+			Eventually(func() *api.IPAMRangeStatus {
 				obj := &api.IPAMRange{}
 				Expect(k8sClient.Get(ctx, validIPAMRangeLookupKey, obj)).Should(Succeed())
-				return obj.Status.AllocationState
-			}, timeout, interval).Should(Not(ContainElements("10.0.1.0/24[busy]")))
+				return &obj.Status
+			}, timeout, interval).Should(Equal(&api.IPAMRangeStatus{
+				StateFields: common.StateFields{
+					State:      common.StateReady,
+					Message:    "",
+					Conditions: nil,
+				},
+				CIDRs:           []string{"10.0.0.0/16"},
+				AllocationState: []string{"10.0.0.0/16[free]"},
+				RoundRobinState: nil,
+				PendingRequest:  nil,
+			}))
 		})
 	})
 
@@ -149,11 +187,19 @@ var _ = Describe("IPAMRange controller", func() {
 			})).Should(Succeed())
 		})
 		It("Should set the State to Invalid", func() {
-			Eventually(func() string {
+			Eventually(func() *IPAMStatus {
 				obj := &api.IPAMRange{}
 				Expect(k8sClient.Get(ctx, invalidIPAMRangeLookupKey, obj)).Should(Succeed())
-				return obj.Status.State
-			}, timeout, interval).Should(Equal(common.StateInvalid))
+				return &IPAMStatus{
+					State:           obj.Status.State,
+					CIDRs:           obj.Status.CIDRs,
+					AllocationState: obj.Status.AllocationState,
+					RoundRobinState: obj.Status.RoundRobinState,
+					PendingRequest:  obj.Status.PendingRequest,
+				}
+			}, timeout, interval).Should(Equal(&IPAMStatus{
+				State: common.StateInvalid,
+			}))
 		})
 	})
 })
