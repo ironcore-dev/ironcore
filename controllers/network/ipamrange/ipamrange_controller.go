@@ -28,8 +28,10 @@ import (
 	"github.com/onmetal/onmetal-api/pkg/manager"
 	"github.com/onmetal/onmetal-api/pkg/scopes"
 	"github.com/onmetal/onmetal-api/pkg/utils"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"net"
+	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -61,7 +63,13 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 	log := utils.NewLogger(r.Log, "ipamrange", req.NamespacedName)
 	var obj api.IPAMRange
 	if err := r.Get(ctx, req.NamespacedName, &obj); err != nil {
-		return utils.SucceededIfNotFound(err)
+		if errors.IsNotFound(err) {
+			return r.HandleDeleted(ctx, log, client.ObjectKey{
+				Namespace: req.Namespace,
+				Name:      req.Name,
+			})
+		}
+		return utils.Requeue(err)
 	}
 	if obj.ObjectMeta.DeletionTimestamp.IsZero() {
 		return r.HandleReconcile(ctx, log, &obj)
@@ -123,8 +131,15 @@ func (r *Reconciler) HandleReconcile(ctx context.Context, log *utils.Logger, obj
 			}
 			newObj := current.object.DeepCopy()
 			newObj.Status.CIDRs = cidrs
-			if err := r.Status().Patch(ctx, newObj, client.MergeFrom(obj)); err != nil {
-				return utils.Requeue(err)
+			if !reflect.DeepEqual(newObj, obj) {
+				log.Infof("setting range status: %s", current.requestSpecs)
+				if err := r.Status().Patch(ctx, newObj, client.MergeFrom(obj)); err != nil {
+					return utils.Requeue(err)
+				}
+				// trigger all users of this ipamrange
+				log.Infof("trigger all users of %s", current.objectId.ObjectKey)
+				users := r.manager.GetUsageCache().GetUsersForRelationToGK(current.objectId, "uses", api.IPAMRangeGK)
+				r.manager.TriggerAll(users)
 			}
 			return utils.Succeeded()
 		}
@@ -163,5 +178,18 @@ func (r *Reconciler) setStatus(ctx context.Context, log *utils.Logger, obj *api.
 	if err := r.Status().Patch(ctx, newIpamRange, client.MergeFrom(obj)); err != nil {
 		return utils.Requeue(err)
 	}
+	return utils.Succeeded()
+}
+
+func (r *Reconciler) HandleDeleted(ctx context.Context, log *utils.Logger, key client.ObjectKey) (ctrl.Result, error) {
+	log.Infof("%s has been deleted", key)
+	r.cache.removeRange(key)
+	objectId := utils.ObjectId{
+		ObjectKey: key,
+		GroupKind: api.IPAMRangeGK,
+	}
+	users := r.manager.GetUsageCache().GetUsersFor(objectId)
+	r.manager.GetUsageCache().DeleteObject(objectId)
+	r.manager.TriggerAll(users)
 	return utils.Succeeded()
 }

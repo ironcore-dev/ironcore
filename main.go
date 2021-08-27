@@ -68,8 +68,8 @@ func main() {
 	var metricsAddr string
 	var enableLeaderElection bool
 	var probeAddr string
-	var enableWebhook bool
-	flag.BoolVar(&enableWebhook, "enable-webhooks", true, "Enable webhooks.")
+	var enableWebhooks bool
+	flag.BoolVar(&enableWebhooks, "enable-webhooks", true, "Enable webhooks.")
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
@@ -106,7 +106,7 @@ func main() {
 		os.Exit(1)
 	}
 	// Account webhook
-	if enableWebhook {
+	if enableWebhooks {
 		if err = (&accountwebhook.AccountWebhook{}).SetupWebhookWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create webhook", "webhook", "Account")
 			os.Exit(1)
@@ -123,7 +123,7 @@ func main() {
 		os.Exit(1)
 	}
 	// Scope webhook
-	if enableWebhook {
+	if enableWebhooks {
 		if err = (&scopewebhook.ScopeWebhook{}).SetupWebhookWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create webhook", "webhook", "Scope")
 			os.Exit(1)
@@ -237,7 +237,7 @@ func main() {
 		os.Exit(1)
 	}
 	// IPAMRange webhook
-	if enableWebhook {
+	if enableWebhooks {
 		if err = (&networkv1alpha1.IPAMRange{}).SetupWebhookWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create webhook", "webhook", "IPAMRange")
 			os.Exit(1)

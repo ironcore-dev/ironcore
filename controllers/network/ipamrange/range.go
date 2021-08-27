@@ -53,14 +53,14 @@ func (r *Reconciler) reconcileRange(ctx context.Context, log *utils.Logger, curr
 		if req != nil {
 			log.Infof("found status for pending request:    %v", req.object.Status.CIDRs)
 			defer r.cache.release(current.pendingRequest.key)
-			list := []string{}
+			var list []string
 			for _, c := range current.pendingRequest.CIDRs {
 				list = append(list, c.String())
 			}
 			log.Infof("expected status for pending request: %v", list)
 			if !reflect.DeepEqual(req.object.Status.CIDRs, list) {
 				log.Infof("expected status not yet set in pending request")
-				return utils.Requeue(nil)
+				return utils.Succeeded()
 			}
 		} else {
 			log.Infof("pending request already deleted")
@@ -70,7 +70,6 @@ func (r *Reconciler) reconcileRange(ctx context.Context, log *utils.Logger, curr
 			for _, c := range current.pendingRequest.CIDRs {
 				current.ipam.Free(c)
 			}
-			r.setIPAMState(current, newCurrent)
 		}
 		newCurrent.Status.PendingRequest = nil
 		log.Infof("finalizing pending request for %s", current.pendingRequest.key)
@@ -79,9 +78,8 @@ func (r *Reconciler) reconcileRange(ctx context.Context, log *utils.Logger, curr
 		}
 		current.pendingRequest = nil
 		// trigger all users of this ipamrange
-		id := utils.NewObjectId(current.object)
-		log.Infof("trigger all users of %s", id.ObjectKey)
-		users := r.manager.GetUsageCache().GetUsersForRelationToGK(id, "uses", api.IPAMRangeGK)
+		log.Infof("trigger all users of %s", current.objectId.ObjectKey)
+		users := r.manager.GetUsageCache().GetUsersForRelationToGK(current.objectId, "uses", api.IPAMRangeGK)
 		r.manager.TriggerAll(users)
 	}
 	return r.setStatus(ctx, log, current.object, common.StateReady, "")

@@ -51,7 +51,7 @@ const (
 type IPAMRangeStatus struct {
 	common.StateFields `json:",inline"`
 	// CIDRs is a list of effective cidrs which belong to this IPAMRange
-	CIDRs           []string            `json:"cidr,omitempty"`
+	CIDRs           []string            `json:"cidrs,omitempty"`
 	AllocationState []string            `json:"allocationState,omitempty"`
 	RoundRobinState []string            `json:"roundRobinState,omitempty"`
 	PendingRequest  *IPAMPendingRequest `json:"pendingRequests,omitempty"`
@@ -66,12 +66,9 @@ type IPAMPendingRequest struct {
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 //+kubebuilder:resource:shortName=ipr
-//+kubebuilder:printcolumn:name="RequestedCIDR",type=string,JSONPath=`.spec.cidr`
-//+kubebuilder:printcolumn:name="RequestedSize",type=string,JSONPath=`.spec.size`
-//+kubebuilder:printcolumn:name="EffectiveCIDR",type=string,JSONPath=`.status.cidr`
+//+kubebuilder:printcolumn:name="RequestSpec",type=string,JSONPath=`.spec.cidrs`
+//+kubebuilder:printcolumn:name="EffectiveCIDRs",type=string,JSONPath=`.status.cidrs`
 //+kubebuilder:printcolumn:name="Parent",type=string,JSONPath=`.spec.parent.name`
-//+kubebuilder:printcolumn:name="BoundKind",type=string,JSONPath=`.status.bound.kind`
-//+kubebuilder:printcolumn:name="BoundName",type=string,JSONPath=`.status.bound.kind`
 //+kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.state`
 //+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 

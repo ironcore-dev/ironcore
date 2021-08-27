@@ -19,23 +19,14 @@ spec:
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .spec.cidr
-      name: RequestedCIDR
+    - jsonPath: .spec.cidrs
+      name: RequestSpec
       type: string
-    - jsonPath: .spec.size
-      name: RequestedSize
-      type: string
-    - jsonPath: .status.cidr
-      name: EffectiveCIDR
+    - jsonPath: .status.cidrs
+      name: EffectiveCIDRs
       type: string
     - jsonPath: .spec.parent.name
       name: Parent
-      type: string
-    - jsonPath: .status.bound.kind
-      name: BoundKind
-      type: string
-    - jsonPath: .status.bound.kind
-      name: BoundName
       type: string
     - jsonPath: .status.state
       name: State
@@ -98,7 +89,7 @@ spec:
                 items:
                   type: string
                 type: array
-              cidr:
+              cidrs:
                 description: CIDRs is a list of effective cidrs which belong to this
                   IPAMRange
                 items:

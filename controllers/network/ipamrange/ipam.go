@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	"github.com/onmetal/onmetal-api/pkg/ipam"
+	"github.com/onmetal/onmetal-api/pkg/utils"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"net"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -32,12 +33,13 @@ type IPAM struct {
 	lock           sync.Mutex
 	lockCount      int
 	object         *v1alpha1.IPAMRange
+	objectId       utils.ObjectId
 	ipam           *ipam.IPAM
 	error          string
 	deleted        bool
 	pendingRequest *PendingRequest
 	lastUsage      time.Time
-	requestSpecs   []ipam.RequestSpec
+	requestSpecs   ipam.RequestSpecList
 }
 
 type IPAMCache struct {
@@ -73,12 +75,14 @@ func (i *IPAMCache) release(key client.ObjectKey) {
 		ipr.lockCount--
 		if ipr.lockCount == 0 {
 			delete(i.lockedIpams, key)
-			if ipr.pendingRequest != nil {
-				i.pendingIpams[key] = ipr
-			} else {
-				i.ipams[key] = ipr
+			if !ipr.deleted {
+				if ipr.pendingRequest != nil {
+					i.pendingIpams[key] = ipr
+				} else {
+					i.ipams[key] = ipr
+				}
+				ipr.lastUsage = time.Now()
 			}
-			ipr.lastUsage = time.Now()
 		}
 		ipr.lock.Unlock()
 	} else {
@@ -122,13 +126,10 @@ func (i *IPAMCache) getRange(ctx context.Context, name client.ObjectKey, obj *v1
 		delete(i.pendingIpams, name)
 	}
 	if obj != nil {
-		tempIpr := newIPAM(obj)
-		if ipr == nil {
-			ipr = tempIpr
+		if ipr == nil || ipr.ipam == nil {
+			ipr = newIPAM(obj)
 		} else {
 			ipr.object = obj
-			ipr.pendingRequest = tempIpr.pendingRequest
-			ipr.ipam = tempIpr.ipam
 		}
 	}
 	ipr.lockCount++
@@ -136,6 +137,18 @@ func (i *IPAMCache) getRange(ctx context.Context, name client.ObjectKey, obj *v1
 	i.lock.Unlock()
 	ipr.lock.Lock()
 	return ipr, nil
+}
+
+func (i *IPAMCache) removeRange(key client.ObjectKey) {
+	i.lock.Lock()
+	defer i.lock.Unlock()
+	old := i.lockedIpams[key]
+	if old != nil {
+		old.deleted = true
+	}
+	delete(i.pendingIpams, key)
+	delete(i.ipams, key)
+	delete(i.lockedIpams, key)
 }
 
 func newIPAM(obj *v1alpha1.IPAMRange) *IPAM {
@@ -209,6 +222,7 @@ func newIPAM(obj *v1alpha1.IPAMRange) *IPAM {
 	result := &IPAM{
 		requestSpecs:   specs,
 		object:         obj,
+		objectId:       utils.NewObjectId(obj),
 		ipam:           ipr,
 		deleted:        false,
 		pendingRequest: pending,
@@ -217,4 +231,87 @@ func newIPAM(obj *v1alpha1.IPAMRange) *IPAM {
 		result.error = err.Error()
 	}
 	return result
+}
+
+func (i *IPAM) Alloc(ctx context.Context, log *utils.Logger, clt client.Client, reqSpecs ipam.RequestSpecList, requestKey client.ObjectKey) (ipam.CIDRList, error) {
+	var allocated ipam.CIDRList
+	log.Infof("allocating %s", reqSpecs)
+	if len(reqSpecs) > 0 {
+		for _, c := range reqSpecs {
+			cidr, err := c.Alloc(i.ipam)
+			if cidr == nil || err != nil {
+				for _, a := range allocated {
+					i.ipam.Free(a)
+				}
+				allocated = nil
+				break
+			} else {
+				allocated = append(allocated, cidr)
+			}
+		}
+	}
+	if len(allocated) != 0 {
+		log.Infof("allocated %s", allocated)
+		if err := i.updateRange(ctx, clt, allocated, requestKey); err != nil {
+			for _, a := range allocated {
+				i.ipam.Free(a)
+			}
+			log.Infof("range update failed: %s (allocation reverted)", err)
+			return nil, err
+		}
+	}
+	log.Infof("%s allocated in range", allocated)
+	return allocated, nil
+}
+
+func (i *IPAM) Free(ctx context.Context, log *utils.Logger, ctl client.Client, allocated ipam.CIDRList, requestKey client.ObjectKey) error {
+	log.Infof("releasing %s", allocated)
+	if len(allocated) != 0 {
+		for _, a := range allocated {
+			i.ipam.Free(a)
+		}
+		if err := i.updateRange(ctx, ctl, nil, requestKey); err != nil {
+			for _, a := range allocated {
+				i.ipam.Busy(a)
+			}
+			log.Infof("range update failed: %s (free reverted)", err)
+			return err
+		}
+	}
+	log.Infof("%s released in range", allocated)
+	return nil
+}
+
+func (i *IPAM) setIPAMState(newIpr *v1alpha1.IPAMRange) {
+	blocks, round := i.ipam.State()
+	var state []string
+	for i := 0; i < len(round); i++ {
+		state = append(state, fmt.Sprintf("%s/%d", round[i], i))
+	}
+	newIpr.Status.RoundRobinState = state
+	newIpr.Status.AllocationState = blocks
+}
+
+func (i *IPAM) updateRange(ctx context.Context, clt client.Client, allocated []*net.IPNet, requestKey client.ObjectKey) error {
+	newIpr := i.object.DeepCopy()
+	i.setIPAMState(newIpr)
+
+	newIpr.Status.PendingRequest = &v1alpha1.IPAMPendingRequest{
+		Name:      requestKey.Name,
+		Namespace: requestKey.Namespace,
+		CIDRs:     nil,
+	}
+
+	for _, a := range allocated {
+		newIpr.Status.PendingRequest.CIDRs = append(newIpr.Status.PendingRequest.CIDRs, a.String())
+	}
+	err := clt.Status().Patch(ctx, newIpr, client.MergeFrom(i.object))
+	if err == nil {
+		i.object = newIpr
+		i.pendingRequest = &PendingRequest{
+			key:   requestKey,
+			CIDRs: allocated,
+		}
+	}
+	return err
 }
