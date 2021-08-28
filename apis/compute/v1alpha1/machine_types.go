@@ -37,13 +37,27 @@ type MachineSpec struct {
 	// SSHPublicKeys is a list of SSH public keys of a machine
 	SSHPublicKeys []SSHPublicKeyEntry `json:"sshPublicKeys"`
 	// Interfaces define a list of network interfaces present on the machine
-	// TODO: define interfaces/network references
+	Interfaces []Interface `json:"interfaces,omitempty"`
 	// SecurityGroups is a list of security groups of a machine
 	SecurityGroups []common.ScopedReference `json:"securityGroups"`
 	// VolumeClaims
 	VolumeClaims []VolumeClaim `json:"volumeClaims"`
 	// UserData defines the ignition file
 	UserData string `json:"userData,omitempty"`
+}
+
+// Interface is the definition of a single interface
+type Interface struct {
+	// Name is the name of the interface
+	Name string `json:"name"`
+	// Target is the referenced resource of this interface
+	Target common.ScopedKindReference `json:"target"`
+	// Priority is the priority level of this interface
+	Priority int `json:"priority,omitempty"`
+	// IP specifies a concrete IP address which should be allocated from a Subnet
+	IP string `json:"ip,omitempty"`
+	// RoutingOnly is a routing hint for this interface
+	RoutingOnly bool `json:"routingOnly,omitempty"`
 }
 
 // VolumeClaim defines a volume claim of a machine
