@@ -18,7 +18,7 @@ spec:
   versions:
   - additionalPrinterColumns:
     - jsonPath: .status.state
-      name: StateFields
+      name: State
       type: string
     - jsonPath: .metadata.creationTimestamp
       name: Age

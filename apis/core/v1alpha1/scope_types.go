@@ -68,7 +68,7 @@ const (
 //+kubebuilder:printcolumn:name="Account",type=string,JSONPath=`.status.account`
 //+kubebuilder:printcolumn:name="ParentScope",type=string,JSONPath=`.status.parentScope`
 //+kubebuilder:printcolumn:name="ParentNamespace",type=string,JSONPath=`.status.parentNamespace`
-//+kubebuilder:printcolumn:name="StateFields",type=string,JSONPath=`.status.state`
+//+kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.state`
 //+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
 // Scope is the Schema for the scopes API
