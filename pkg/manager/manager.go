@@ -17,10 +17,12 @@
 package manager
 
 import (
+	"context"
 	"github.com/onmetal/onmetal-api/pkg/cache/ownercache"
 	"github.com/onmetal/onmetal-api/pkg/cache/usagecache"
 	"github.com/onmetal/onmetal-api/pkg/scopes"
 	"github.com/onmetal/onmetal-api/pkg/trigger"
+	"github.com/onmetal/onmetal-api/pkg/utils"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
@@ -53,6 +55,10 @@ func NewManager(config *rest.Config, options manager.Options) (*Manager, error) 
 	}, nil
 }
 
+func (m *Manager) Start(ctx context.Context) (err error) {
+	return m.Manager.Start(ctx)
+}
+
 func (m *Manager) GetOwnerCache() ownercache.OwnerCache {
 	return m.ownerCache
 }
@@ -63,6 +69,14 @@ func (m *Manager) GetUsageCache() usagecache.UsageCache {
 
 func (m *Manager) GetScopeEvaluator() scopes.ScopeEvaluator {
 	return m.scopeEvaluator
+}
+
+func (m *Manager) TriggerAll(ids utils.ObjectIds) {
+	m.triggers.TriggerAll(ids)
+}
+
+func (m *Manager) Trigger(id utils.ObjectId) {
+	m.triggers.Trigger(id)
 }
 
 func (m *Manager) RegisterControllerFor(gk schema.GroupKind, controller controller.Controller) {

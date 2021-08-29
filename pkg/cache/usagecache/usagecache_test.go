@@ -29,6 +29,7 @@ var _ = Describe("UsageCache", func() {
 	objectk10 := utils.MustParseObjectId("k1.g1/default/object0")
 	objectk11 := utils.MustParseObjectId("k1.g1/default/object1")
 	objectk12 := utils.MustParseObjectId("k1.g1/default/object2")
+	objectk13 := utils.MustParseObjectId("k1.g1/default/object3")
 	//objectk20 := utils.MustParseObjectId("k2.g1/default/object0")
 	objectk21 := utils.MustParseObjectId("k2.g1/default/object1")
 
@@ -154,6 +155,28 @@ var _ = Describe("UsageCache", func() {
 			Expect(cache.GetUsersFor(objectk11)).To(Equal(utils.NewObjectIds(objectk10)))
 			Expect(cache.GetUsersFor(objectk12)).To(Equal(utils.NewObjectIds(objectk10)))
 			Expect(cache.GetUsersFor(objectk21)).To(Equal(utils.NewObjectIds(objectk10)))
+		})
+	})
+
+	Context("Detecting cycles", func() {
+		It("Should pass when no cycle", func() {
+			cache.ReplaceObjectUsageInfo(objectk10, NewObjectUsageInfo("uses", objectk11))
+			cache.ReplaceObjectUsageInfo(objectk11, NewObjectUsageInfo("uses", objectk12))
+			Expect(cache.IsCyclicForRelationForGK(objectk11, "uses", gk1)).Should(BeNil())
+		})
+		It("Should detect simple cycle", func() {
+			cache.ReplaceObjectUsageInfo(objectk10, NewObjectUsageInfo("uses", objectk11))
+			cache.ReplaceObjectUsageInfo(objectk11, NewObjectUsageInfo("uses", objectk12))
+			cache.ReplaceObjectUsageInfo(objectk12, NewObjectUsageInfo("uses", objectk10))
+			Expect(cache.IsCyclicForRelationForGK(objectk10, "uses", gk1)).Should(Equal([]utils.ObjectId{
+				objectk10, objectk11, objectk12, objectk10,
+			}))
+		})
+		It("Should not detect cycle", func() {
+			cache.ReplaceObjectUsageInfo(objectk10, NewObjectUsageInfo("uses", objectk11))
+			cache.ReplaceObjectUsageInfo(objectk11, NewObjectUsageInfo("uses", objectk12))
+			cache.ReplaceObjectUsageInfo(objectk11, NewObjectUsageInfo("uses", objectk13))
+			Expect(cache.IsCyclicForRelationForGK(objectk10, "uses", gk1)).Should(BeNil())
 		})
 	})
 })

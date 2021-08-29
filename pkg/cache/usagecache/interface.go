@@ -60,6 +60,8 @@ type UsageCache interface {
 	GetUsedObjectsForGK(id utils.ObjectId, gk schema.GroupKind) utils.ObjectIds
 	GetUsedObjectsForRelationToGK(id utils.ObjectId, relation string, gk schema.GroupKind) utils.ObjectIds
 	GetUsedObjectsForRelation(id utils.ObjectId, relation string) utils.ObjectIds
+
+	IsCyclicForRelationForGK(id utils.ObjectId, relation string, gk schema.GroupKind) []utils.ObjectId
 }
 
 func NewUsageCache(manager manager.Manager, trigger Trigger) *usageCache {

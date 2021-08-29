@@ -39,4 +39,6 @@ type ReconcilationTrigger interface {
 
 	// Trigger triggers all controllers registered for the GroupKind of the given id
 	Trigger(id utils.ObjectId)
+	// TriggerAll triggers all controllers registered for the GroupKind of the given ids
+	TriggerAll(ids utils.ObjectIds)
 }

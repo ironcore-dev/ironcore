@@ -89,6 +89,18 @@ func (t *reconcilationTrigger) RegisterControllerFor(gk schema.GroupKind, c cont
 	}
 }
 
+func (t *reconcilationTrigger) TriggerAll(ids utils.ObjectIds) {
+	t.lock.RLock()
+	defer t.lock.RUnlock()
+
+	for id := range ids {
+		s := t.sources[id.GroupKind]
+		if s != nil {
+			s.Trigger(id.ObjectKey)
+		}
+	}
+}
+
 func (t *reconcilationTrigger) Trigger(id utils.ObjectId) {
 	t.lock.RLock()
 	defer t.lock.RUnlock()

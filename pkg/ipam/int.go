@@ -17,6 +17,7 @@
 package ipam
 
 import (
+	"fmt"
 	"math/big"
 )
 
@@ -25,6 +26,15 @@ type Int big.Int
 var IntOne = Int64(1)
 var IntZero = Int64(0)
 var IntTwoFiveFive = Int64(255)
+
+func ParseInt(s string) (Int, error) {
+	n := new(big.Int)
+	n, ok := n.SetString(s, 10)
+	if !ok {
+		return IntZero, fmt.Errorf("invalid number")
+	}
+	return Int(*n), nil
+}
 
 func Int64(i int64) Int {
 	return Int(*big.NewInt(i))

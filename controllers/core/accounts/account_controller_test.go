@@ -88,7 +88,7 @@ var _ = Describe("Account controller", func() {
 					return []string{}
 				}
 				return a.GetFinalizers()
-			}, timeout, interval).Should(ContainElements(accountFinilizerName))
+			}, timeout, interval).Should(ContainElements(finilizerName))
 
 			By("Expecting description")
 			Eventually(func() string {

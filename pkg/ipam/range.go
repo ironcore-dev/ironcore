@@ -189,6 +189,14 @@ func (this CIDRList) Contains(ip net.IP) bool {
 	return false
 }
 
+func (this CIDRList) Copy() CIDRList {
+	var result CIDRList
+	for _, c := range this {
+		result = append(result, c)
+	}
+	return result
+}
+
 func addExcludes(excls *CIDRList, cidr *net.IPNet, lower bool, border net.IP) bool {
 	found := false
 	for {

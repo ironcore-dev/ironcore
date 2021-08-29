@@ -67,8 +67,7 @@ func (r *SubnetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 			},
 			Spec: api.IPAMRangeSpec{
 				Parent: nil,
-				Size:   "",
-				CIDR:   "10.0.0.0/24",
+				CIDRs:  []string{"10.0.0.0/24"},
 			},
 			Status: api.IPAMRangeStatus{},
 		}

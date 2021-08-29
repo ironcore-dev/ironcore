@@ -19,9 +19,51 @@ package ipam
 import (
 	"fmt"
 	"net"
+	"strings"
 )
 
 ////////////////////////////////////////////////////////////////////////////////
+
+func ParseBlock(s string) *Block {
+	idx := strings.Index(s, "[")
+	if idx <= 0 || !strings.HasSuffix(s, "]") {
+		return nil
+	}
+
+	cidr, err := ParseCIDR(s[:idx])
+	if err != nil {
+		return nil
+	}
+
+	switch state := s[idx+1 : len(s)-1]; state {
+	case "free":
+		return &Block{
+			busy: 0,
+			cidr: cidr,
+		}
+	case "busy":
+		return &Block{
+			busy: BITMAP_BUSY,
+			cidr: cidr,
+		}
+	default:
+		mask := uint64(0)
+		for _, c := range state {
+			switch c {
+			case ' ':
+			case '1', '0':
+				mask = (mask << 1) + uint64(c-'0')
+			default:
+				return nil
+			}
+		}
+		return &Block{
+			busy: Bitmap(mask),
+			cidr: cidr,
+		}
+	}
+
+}
 
 type Block struct {
 	busy Bitmap
