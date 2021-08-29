@@ -544,6 +544,79 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 </tr>
 </tbody>
 </table>
+<h3 id="compute.onmetal.de/v1alpha1.Interface">Interface
+</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.MachineSpec">MachineSpec</a>)
+</p>
+<div>
+<p>Interface is the definition of a single interface</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the interface</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>target</code><br/>
+<em>
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
+</em>
+</td>
+<td>
+<p>Target is the referenced resource of this interface</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>priority</code><br/>
+<em>
+int
+</em>
+</td>
+<td>
+<p>Priority is the priority level of this interface</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ip</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>IP specifies a concrete IP address which should be allocated from a Subnet</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>routingOnly</code><br/>
+<em>
+bool
+</em>
+</td>
+<td>
+<p>RoutingOnly is a routing hint for this interface</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="compute.onmetal.de/v1alpha1.Machine">Machine
 </h3>
 <div>
@@ -662,6 +735,19 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </tr>
 <tr>
 <td>
+<code>interfaces</code><br/>
+<em>
+<a href="#compute.onmetal.de/v1alpha1.Interface">
+[]Interface
+</a>
+</em>
+</td>
+<td>
+<p>Interfaces define a list of network interfaces present on the machine</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>securityGroups</code><br/>
 <em>
 <a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
@@ -670,9 +756,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </em>
 </td>
 <td>
-<p>Interfaces define a list of network interfaces present on the machine
-TODO: define interfaces/network references
-SecurityGroups is a list of security groups of a machine</p>
+<p>SecurityGroups is a list of security groups of a machine</p>
 </td>
 </tr>
 <tr>
@@ -1172,6 +1256,19 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </tr>
 <tr>
 <td>
+<code>interfaces</code><br/>
+<em>
+<a href="#compute.onmetal.de/v1alpha1.Interface">
+[]Interface
+</a>
+</em>
+</td>
+<td>
+<p>Interfaces define a list of network interfaces present on the machine</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>securityGroups</code><br/>
 <em>
 <a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
@@ -1180,9 +1277,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </em>
 </td>
 <td>
-<p>Interfaces define a list of network interfaces present on the machine
-TODO: define interfaces/network references
-SecurityGroups is a list of security groups of a machine</p>
+<p>SecurityGroups is a list of security groups of a machine</p>
 </td>
 </tr>
 <tr>
@@ -1730,5 +1825,5 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 <hr/>
 <p><em>
 Generated with <code>gen-crd-api-reference-docs</code>
-on git commit <code>a959698</code>.
+on git commit <code>aa5aba9</code>.
 </em></p>

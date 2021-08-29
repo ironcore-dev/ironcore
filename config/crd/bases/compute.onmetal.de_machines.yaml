@@ -73,6 +73,50 @@ spec:
                 required:
                 - name
                 type: object
+              interfaces:
+                description: Interfaces define a list of network interfaces present
+                  on the machine
+                items:
+                  description: Interface is the definition of a single interface
+                  properties:
+                    ip:
+                      description: IP specifies a concrete IP address which should
+                        be allocated from a Subnet
+                      type: string
+                    name:
+                      description: Name is the name of the interface
+                      type: string
+                    priority:
+                      description: Priority is the priority level of this interface
+                      type: integer
+                    routingOnly:
+                      description: RoutingOnly is a routing hint for this interface
+                      type: boolean
+                    target:
+                      description: Target is the referenced resource of this interface
+                      properties:
+                        apiGroup:
+                          description: APIGroup is the API group of the object
+                          type: string
+                        kind:
+                          description: Kind is the kind of the object
+                          type: string
+                        name:
+                          description: Name is the name of the scope
+                          type: string
+                        scope:
+                          description: Scope is the absolute scope path
+                          type: string
+                      required:
+                      - apiGroup
+                      - kind
+                      - name
+                      type: object
+                  required:
+                  - name
+                  - target
+                  type: object
+                type: array
               location:
                 description: Location is the physical location of the machine
                 properties:
@@ -110,9 +154,7 @@ spec:
                 - name
                 type: object
               securityGroups:
-                description: 'Interfaces define a list of network interfaces present
-                  on the machine TODO: define interfaces/network references SecurityGroups
-                  is a list of security groups of a machine'
+                description: SecurityGroups is a list of security groups of a machine
                 items:
                   description: ScopedReference refers to a scope and the scopes name
                   properties:

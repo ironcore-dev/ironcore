@@ -904,5 +904,5 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 <hr/>
 <p><em>
 Generated with <code>gen-crd-api-reference-docs</code>
-on git commit <code>a959698</code>.
+on git commit <code>aa5aba9</code>.
 </em></p>
