@@ -19,8 +19,10 @@ package ipamrange
 import (
 	"context"
 	"fmt"
+	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	"github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	"github.com/onmetal/onmetal-api/pkg/ipam"
+	"github.com/onmetal/onmetal-api/pkg/logging"
 	"github.com/onmetal/onmetal-api/pkg/utils"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"net"
@@ -64,7 +66,7 @@ func NewIPAMCache(clt client.Client) *IPAMCache {
 	}
 }
 
-func (i *IPAMCache) release(key client.ObjectKey) {
+func (i *IPAMCache) release(log *logging.Logger, key client.ObjectKey) {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 	ipr := i.lockedIpams[key]
@@ -84,6 +86,7 @@ func (i *IPAMCache) release(key client.ObjectKey) {
 				ipr.lastUsage = time.Now()
 			}
 		}
+		log.Infof("unlocking %s", key)
 		ipr.lock.Unlock()
 	} else {
 		panic("corrupted ipam cache locks")
@@ -101,7 +104,7 @@ func (i *IPAMCache) release(key client.ObjectKey) {
 	}
 }
 
-func (i *IPAMCache) getRange(ctx context.Context, name client.ObjectKey, obj *v1alpha1.IPAMRange) (*IPAM, error) {
+func (i *IPAMCache) getRange(ctx context.Context, log *logging.Logger, name client.ObjectKey, obj *v1alpha1.IPAMRange) (*IPAM, error) {
 	i.lock.Lock()
 	ipr := i.lockedIpams[name]
 	if ipr == nil {
@@ -127,14 +130,20 @@ func (i *IPAMCache) getRange(ctx context.Context, name client.ObjectKey, obj *v1
 	}
 	if obj != nil {
 		if ipr == nil || ipr.ipam == nil {
-			ipr = newIPAM(obj)
+			ipr = newIPAM(log, obj)
 		} else {
 			ipr.object = obj
+			if obj.Status.State != common.StateReady {
+				ipr.error = obj.Status.Message
+			} else {
+				ipr.error = ""
+			}
 		}
 	}
 	ipr.lockCount++
 	i.lockedIpams[name] = ipr
 	i.lock.Unlock()
+	log.Infof("locking %s", name)
 	ipr.lock.Lock()
 	return ipr, nil
 }
@@ -151,7 +160,15 @@ func (i *IPAMCache) removeRange(key client.ObjectKey) {
 	delete(i.lockedIpams, key)
 }
 
-func newIPAM(obj *v1alpha1.IPAMRange) *IPAM {
+func newIPAM(log *logging.Logger, obj *v1alpha1.IPAMRange) *IPAM {
+	found := true
+	for _, c := range obj.Status.CIDRs {
+		_, cidr, err := net.ParseCIDR(c)
+		if err != nil || ipam.CIDRHostSize(cidr).Cmp(ipam.Int64(2)) < 0 {
+			found = false
+			break
+		}
+	}
 	ranges, err := ipam.ParseIPRanges(obj.Status.CIDRs...)
 
 	roundRobin := false
@@ -167,7 +184,8 @@ func newIPAM(obj *v1alpha1.IPAMRange) *IPAM {
 	}
 
 	var ipr *ipam.IPAM
-	if err == nil {
+	if err == nil && found {
+		log.Infof("ranges: %s", ranges)
 		if len(ranges) > 0 {
 			ipr, err = ipam.NewIPAMForRanges(ranges)
 		}
@@ -233,7 +251,7 @@ func newIPAM(obj *v1alpha1.IPAMRange) *IPAM {
 	return result
 }
 
-func (i *IPAM) Alloc(ctx context.Context, log *utils.Logger, clt client.Client, reqSpecs ipam.RequestSpecList, requestKey client.ObjectKey) (ipam.CIDRList, error) {
+func (i *IPAM) Alloc(ctx context.Context, log *logging.Logger, clt client.Client, reqSpecs ipam.RequestSpecList, requestKey client.ObjectKey) (ipam.CIDRList, error) {
 	var allocated ipam.CIDRList
 	log.Infof("allocating %s", reqSpecs)
 	if len(reqSpecs) > 0 {
@@ -264,7 +282,7 @@ func (i *IPAM) Alloc(ctx context.Context, log *utils.Logger, clt client.Client, 
 	return allocated, nil
 }
 
-func (i *IPAM) Free(ctx context.Context, log *utils.Logger, ctl client.Client, allocated ipam.CIDRList, requestKey client.ObjectKey) error {
+func (i *IPAM) Free(ctx context.Context, log *logging.Logger, ctl client.Client, allocated ipam.CIDRList, requestKey client.ObjectKey) error {
 	log.Infof("releasing %s", allocated)
 	if len(allocated) != 0 {
 		for _, a := range allocated {

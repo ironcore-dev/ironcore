@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/onmetal/onmetal-api/apis/core"
+	"github.com/onmetal/onmetal-api/pkg/logging"
 	"github.com/onmetal/onmetal-api/pkg/utils"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/selection"
@@ -53,7 +54,7 @@ type Reconciler struct {
 func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
 
-	log := utils.NewLogger(r.Log, "scope", req.NamespacedName)
+	log := logging.NewLogger(r.Log, "scope", req.NamespacedName)
 
 	var scope corev1alpha1.Scope
 	if err := r.Get(ctx, req.NamespacedName, &scope); err != nil {

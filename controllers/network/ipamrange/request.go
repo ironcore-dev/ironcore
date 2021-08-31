@@ -22,13 +22,14 @@ import (
 	api "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	"github.com/onmetal/onmetal-api/pkg/cache/usagecache"
 	"github.com/onmetal/onmetal-api/pkg/ipam"
+	"github.com/onmetal/onmetal-api/pkg/logging"
 	"github.com/onmetal/onmetal-api/pkg/utils"
 	"net"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func (r *Reconciler) reconcileRequest(ctx context.Context, log *utils.Logger, current *IPAM) (ctrl.Result, error) {
+func (r *Reconciler) reconcileRequest(ctx context.Context, log *logging.Logger, current *IPAM) (ctrl.Result, error) {
 	log.Infof("reconcile request for %s/%s", current.object.Namespace, current.object.Name)
 	rangeId, failed, err := r.ScopeEvaluator.EvaluateScopedReferenceToObjectId(ctx, current.object.Namespace, api.IPAMRangeGK, current.object.Spec.Parent)
 	if err != nil {
@@ -42,7 +43,10 @@ func (r *Reconciler) reconcileRequest(ctx context.Context, log *utils.Logger, cu
 		return utils.Succeeded()
 	}
 
+	log.Infof("found parent %s", rangeId.ObjectKey)
+
 	requestId := utils.NewObjectId(current.object)
+	// Update usage cache
 	r.GetUsageCache().ReplaceObjectUsageInfo(requestId, usagecache.NewObjectUsageInfo("uses", rangeId))
 
 	// check for cycles and self reference
@@ -50,11 +54,11 @@ func (r *Reconciler) reconcileRequest(ctx context.Context, log *utils.Logger, cu
 		return r.invalid(ctx, log, current.object, "reference cycle not allowed: %v", cycle)
 	}
 
-	ipr, err := r.cache.getRange(ctx, rangeId.ObjectKey, nil)
+	ipr, err := r.cache.getRange(ctx, log, rangeId.ObjectKey, nil)
 	if ipr == nil {
 		return r.setStatus(ctx, log, current.object, v1alpha1.StateError, "IPAMRange %s not found", rangeId.ObjectKey)
 	}
-	defer r.cache.release(rangeId.ObjectKey)
+	defer r.cache.release(log, rangeId.ObjectKey)
 	if ipr.error != "" {
 		return r.setStatus(ctx, log, current.object, v1alpha1.StateError, "IPAMRange %s not valid: %s", rangeId.ObjectKey, ipr.error)
 	}
@@ -127,7 +131,7 @@ func (r *Reconciler) reconcileRequest(ctx context.Context, log *utils.Logger, cu
 	return r.ready(ctx, log, current.object, "")
 }
 
-func (r *Reconciler) deleteRequest(ctx context.Context, log *utils.Logger, current *IPAM) (ctrl.Result, error) {
+func (r *Reconciler) deleteRequest(ctx context.Context, log *logging.Logger, current *IPAM) (ctrl.Result, error) {
 	requestId := utils.NewObjectId(current.object)
 	for _, f := range current.object.GetFinalizers() {
 		if f != finalizerName {
@@ -148,12 +152,12 @@ func (r *Reconciler) deleteRequest(ctx context.Context, log *utils.Logger, curre
 			}
 		}
 		if rangeId.Name != "" {
-			ipr, err := r.cache.getRange(ctx, rangeId.ObjectKey, nil)
+			ipr, err := r.cache.getRange(ctx, log, rangeId.ObjectKey, nil)
 			if err != nil {
 				return utils.Requeue(err)
 			}
 			if ipr != nil {
-				defer r.cache.release(rangeId.ObjectKey)
+				defer r.cache.release(log, rangeId.ObjectKey)
 				var allocated []*net.IPNet
 				if ipr.pendingRequest != nil {
 					if ipr.pendingRequest.key != requestId.ObjectKey {

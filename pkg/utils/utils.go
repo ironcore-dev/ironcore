@@ -19,6 +19,7 @@ package utils
 import (
 	"context"
 	"fmt"
+	"github.com/onmetal/onmetal-api/pkg/logging"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"reflect"
@@ -26,7 +27,7 @@ import (
 )
 
 // AssureDeleting ensures that an object is being deleted
-func AssureDeleting(ctx context.Context, log *Logger, clt client.Client, object client.Object) error {
+func AssureDeleting(ctx context.Context, log *logging.Logger, clt client.Client, object client.Object) error {
 	if !object.GetDeletionTimestamp().IsZero() {
 		return nil
 	}
