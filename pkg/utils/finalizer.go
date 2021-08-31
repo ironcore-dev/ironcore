@@ -18,6 +18,7 @@ package utils
 
 import (
 	"context"
+	"github.com/onmetal/onmetal-api/pkg/logging"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
@@ -28,7 +29,7 @@ func HasFinalizer(object client.Object, finalizerName string) bool {
 
 // CheckAndAssureFinalizer ensures that a finalizer is on a given runtime object
 // Returns false if the finalizer has been added.
-func CheckAndAssureFinalizer(ctx context.Context, log *Logger, client client.Client, finalizerName string, object client.Object) (bool, error) {
+func CheckAndAssureFinalizer(ctx context.Context, log *logging.Logger, client client.Client, finalizerName string, object client.Object) (bool, error) {
 	if !ContainsString(object.GetFinalizers(), finalizerName) {
 		log.Infof("setting finalizer %s", finalizerName)
 		controllerutil.AddFinalizer(object, finalizerName)
@@ -38,13 +39,13 @@ func CheckAndAssureFinalizer(ctx context.Context, log *Logger, client client.Cli
 }
 
 // AssureFinalizer ensures that a finalizer is on a given runtime object
-func AssureFinalizer(ctx context.Context, log *Logger, client client.Client, finalizerName string, object client.Object) error {
+func AssureFinalizer(ctx context.Context, log *logging.Logger, client client.Client, finalizerName string, object client.Object) error {
 	_, err := CheckAndAssureFinalizer(ctx, log, client, finalizerName, object)
 	return err
 }
 
 // AssureFinalizerRemoved ensures that a finalizer does not exist anymore for a given runtime object
-func AssureFinalizerRemoved(ctx context.Context, log *Logger, client client.Client, finalizerName string, object client.Object) error {
+func AssureFinalizerRemoved(ctx context.Context, log *logging.Logger, client client.Client, finalizerName string, object client.Object) error {
 	if ContainsString(object.GetFinalizers(), finalizerName) {
 		log.Infof("removing finalizer %s", finalizerName)
 		controllerutil.RemoveFinalizer(object, finalizerName)

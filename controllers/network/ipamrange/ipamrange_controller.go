@@ -25,6 +25,7 @@ import (
 	"github.com/onmetal/onmetal-api/pkg/cache/usagecache"
 	"github.com/onmetal/onmetal-api/pkg/controllerutils"
 	"github.com/onmetal/onmetal-api/pkg/ipam"
+	"github.com/onmetal/onmetal-api/pkg/logging"
 	"github.com/onmetal/onmetal-api/pkg/manager"
 	"github.com/onmetal/onmetal-api/pkg/utils"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -61,7 +62,7 @@ func NewReconciler() *Reconciler {
 func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	r.Wait() // wait until all caches are initialized
 	_ = log.FromContext(ctx)
-	log := r.GetLog(req.NamespacedName)
+	ctx, log := r.GetLogContext(ctx, req.NamespacedName)
 	var obj api.IPAMRange
 	if err := r.Get(ctx, req.NamespacedName, &obj); err != nil {
 		if errors.IsNotFound(err) {
@@ -95,17 +96,17 @@ func (r *Reconciler) SetupWithManager(mgr *manager.Manager) error {
 	return err
 }
 
-func (r *Reconciler) HandleReconcile(ctx context.Context, log *utils.Logger, obj *api.IPAMRange) (ctrl.Result, error) {
+func (r *Reconciler) HandleReconcile(ctx context.Context, log *logging.Logger, obj *api.IPAMRange) (ctrl.Result, error) {
 	log.Infof("handle reconcile")
 	newObjectKey := utils.NewObjectKey(obj)
-	current, err := r.cache.getRange(ctx, newObjectKey, obj)
-	if current.error != "" {
-		return r.invalid(ctx, log, obj, current.error)
-	}
+	current, err := r.cache.getRange(ctx, log, newObjectKey, obj)
 	if err != nil {
 		return utils.Requeue(err)
 	}
-	defer r.cache.release(newObjectKey)
+	defer r.cache.release(log, newObjectKey)
+	if current.error != "" {
+		return r.invalid(ctx, log, obj, current.error)
+	}
 	if obj.Spec.Parent != nil {
 		// handle IPAMRange as request first
 		result, err := r.reconcileRequest(ctx, log, current)
@@ -149,27 +150,27 @@ func (r *Reconciler) HandleReconcile(ctx context.Context, log *utils.Logger, obj
 	return ctrl.Result{}, nil
 }
 
-func (r *Reconciler) HandleDelete(ctx context.Context, log *utils.Logger, obj *api.IPAMRange) (ctrl.Result, error) {
+func (r *Reconciler) HandleDelete(ctx context.Context, log *logging.Logger, obj *api.IPAMRange) (ctrl.Result, error) {
 	log.Infof("handle deletion")
 	newObjectKey := utils.NewObjectKey(obj)
-	current, err := r.cache.getRange(ctx, newObjectKey, obj)
+	current, err := r.cache.getRange(ctx, log, newObjectKey, obj)
 	if err != nil {
 		return utils.Requeue(err)
 	}
-	defer r.cache.release(newObjectKey)
+	defer r.cache.release(log, newObjectKey)
 	return r.deleteRequest(ctx, log, current)
 }
 
 // TODO: generalize state handling
-func (r *Reconciler) invalid(ctx context.Context, log *utils.Logger, obj *api.IPAMRange, message string, args ...interface{}) (ctrl.Result, error) {
+func (r *Reconciler) invalid(ctx context.Context, log *logging.Logger, obj *api.IPAMRange, message string, args ...interface{}) (ctrl.Result, error) {
 	return r.setStatus(ctx, log, obj, common.StateInvalid, message, args...)
 }
 
-func (r *Reconciler) ready(ctx context.Context, log *utils.Logger, obj *api.IPAMRange, message string, args ...interface{}) (ctrl.Result, error) {
+func (r *Reconciler) ready(ctx context.Context, log *logging.Logger, obj *api.IPAMRange, message string, args ...interface{}) (ctrl.Result, error) {
 	return r.setStatus(ctx, log, obj, common.StateReady, message, args...)
 }
 
-func (r *Reconciler) setStatus(ctx context.Context, log *utils.Logger, obj *api.IPAMRange, state string, msg string, args ...interface{}) (ctrl.Result, error) {
+func (r *Reconciler) setStatus(ctx context.Context, log *logging.Logger, obj *api.IPAMRange, state string, msg string, args ...interface{}) (ctrl.Result, error) {
 	newIpamRange := obj.DeepCopy()
 	newIpamRange.Status.State = state
 	newIpamRange.Status.Message = fmt.Sprintf(msg, args...)
@@ -180,7 +181,7 @@ func (r *Reconciler) setStatus(ctx context.Context, log *utils.Logger, obj *api.
 	return utils.Succeeded()
 }
 
-func (r *Reconciler) HandleDeleted(ctx context.Context, log *utils.Logger, key client.ObjectKey) (ctrl.Result, error) {
+func (r *Reconciler) HandleDeleted(ctx context.Context, log *logging.Logger, key client.ObjectKey) (ctrl.Result, error) {
 	log.Infof("%s has been deleted", key)
 	r.cache.removeRange(key)
 	objectId := utils.ObjectId{

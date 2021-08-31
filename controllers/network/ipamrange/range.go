@@ -20,13 +20,14 @@ import (
 	"context"
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	api "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
+	"github.com/onmetal/onmetal-api/pkg/logging"
 	"github.com/onmetal/onmetal-api/pkg/utils"
 	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func (r *Reconciler) reconcileRange(ctx context.Context, log *utils.Logger, current *IPAM) (ctrl.Result, error) {
+func (r *Reconciler) reconcileRange(ctx context.Context, log *logging.Logger, current *IPAM) (ctrl.Result, error) {
 	if len(r.GetUsageCache().GetUsersForRelationToGK(utils.NewObjectId(current.object), "uses", api.IPAMRangeGK)) > 0 {
 		if err := r.AssureFinalizer(ctx, log, current.object); err != nil {
 			return utils.Requeue(err)
@@ -45,14 +46,14 @@ func (r *Reconciler) reconcileRange(ctx context.Context, log *utils.Logger, curr
 	}
 	if current.pendingRequest != nil {
 		log.Infof("found pending request for %s", current.pendingRequest.key)
-		req, err := r.cache.getRange(ctx, current.pendingRequest.key, nil)
+		req, err := r.cache.getRange(ctx, log, current.pendingRequest.key, nil)
 		if err != nil {
 			return utils.Requeue(err)
 		}
 		newCurrent := current.object.DeepCopy()
 		if req != nil {
 			log.Infof("found status for pending request:    %v", req.object.Status.CIDRs)
-			defer r.cache.release(current.pendingRequest.key)
+			defer r.cache.release(log, current.pendingRequest.key)
 			var list []string
 			for _, c := range current.pendingRequest.CIDRs {
 				list = append(list, c.String())

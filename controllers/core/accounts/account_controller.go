@@ -19,6 +19,7 @@ package accounts
 import (
 	"context"
 	"github.com/onmetal/onmetal-api/apis/core"
+	"github.com/onmetal/onmetal-api/pkg/logging"
 	"github.com/onmetal/onmetal-api/pkg/manager"
 	"github.com/onmetal/onmetal-api/pkg/utils"
 	"k8s.io/apimachinery/pkg/labels"
@@ -52,7 +53,7 @@ type Reconciler struct {
 
 func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
-	log := utils.NewLogger(r.Log, "account", req.NamespacedName)
+	log := logging.NewLogger(r.Log, "account", req.NamespacedName)
 
 	var account corev1alpha1.Account
 	if err := r.Get(ctx, req.NamespacedName, &account); err != nil {
