@@ -19,10 +19,10 @@ package ipamrange
 import (
 	"context"
 	"fmt"
+	"github.com/go-logr/logr"
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	"github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	"github.com/onmetal/onmetal-api/pkg/ipam"
-	"github.com/onmetal/onmetal-api/pkg/logging"
 	"github.com/onmetal/onmetal-api/pkg/utils"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"net"
@@ -66,7 +66,7 @@ func NewIPAMCache(clt client.Client) *IPAMCache {
 	}
 }
 
-func (i *IPAMCache) release(log *logging.Logger, key client.ObjectKey) {
+func (i *IPAMCache) release(log logr.Logger, key client.ObjectKey) {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 	ipr := i.lockedIpams[key]
@@ -86,7 +86,7 @@ func (i *IPAMCache) release(log *logging.Logger, key client.ObjectKey) {
 				ipr.lastUsage = time.Now()
 			}
 		}
-		log.Infof("unlocking %s", key)
+		log.Info("unlocking", "name", key)
 		ipr.lock.Unlock()
 	} else {
 		panic("corrupted ipam cache locks")
@@ -104,7 +104,7 @@ func (i *IPAMCache) release(log *logging.Logger, key client.ObjectKey) {
 	}
 }
 
-func (i *IPAMCache) getRange(ctx context.Context, log *logging.Logger, name client.ObjectKey, obj *v1alpha1.IPAMRange) (*IPAM, error) {
+func (i *IPAMCache) getRange(ctx context.Context, log logr.Logger, name client.ObjectKey, obj *v1alpha1.IPAMRange) (*IPAM, error) {
 	i.lock.Lock()
 	ipr := i.lockedIpams[name]
 	if ipr == nil {
@@ -143,7 +143,7 @@ func (i *IPAMCache) getRange(ctx context.Context, log *logging.Logger, name clie
 	ipr.lockCount++
 	i.lockedIpams[name] = ipr
 	i.lock.Unlock()
-	log.Infof("locking %s", name)
+	log.Info("locking", "name", name)
 	ipr.lock.Lock()
 	return ipr, nil
 }
@@ -160,7 +160,7 @@ func (i *IPAMCache) removeRange(key client.ObjectKey) {
 	delete(i.lockedIpams, key)
 }
 
-func newIPAM(log *logging.Logger, obj *v1alpha1.IPAMRange) *IPAM {
+func newIPAM(log logr.Logger, obj *v1alpha1.IPAMRange) *IPAM {
 	found := true
 	for _, c := range obj.Status.CIDRs {
 		_, cidr, err := net.ParseCIDR(c)
@@ -185,7 +185,7 @@ func newIPAM(log *logging.Logger, obj *v1alpha1.IPAMRange) *IPAM {
 
 	var ipr *ipam.IPAM
 	if err == nil && found {
-		log.Infof("ranges: %s", ranges)
+		log.Info("ranges found", "ranges", ranges)
 		if len(ranges) > 0 {
 			ipr, err = ipam.NewIPAMForRanges(ranges)
 		}
@@ -251,9 +251,9 @@ func newIPAM(log *logging.Logger, obj *v1alpha1.IPAMRange) *IPAM {
 	return result
 }
 
-func (i *IPAM) Alloc(ctx context.Context, log *logging.Logger, clt client.Client, reqSpecs ipam.RequestSpecList, requestKey client.ObjectKey) (ipam.CIDRList, error) {
+func (i *IPAM) Alloc(ctx context.Context, log logr.Logger, clt client.Client, reqSpecs ipam.RequestSpecList, requestKey client.ObjectKey) (ipam.CIDRList, error) {
 	var allocated ipam.CIDRList
-	log.Infof("allocating %s", reqSpecs)
+	log.Info("allocating", "requests", reqSpecs)
 	if len(reqSpecs) > 0 {
 		for _, c := range reqSpecs {
 			cidr, err := c.Alloc(i.ipam)
@@ -269,21 +269,21 @@ func (i *IPAM) Alloc(ctx context.Context, log *logging.Logger, clt client.Client
 		}
 	}
 	if len(allocated) != 0 {
-		log.Infof("allocated %s", allocated)
+		log.Info("allocated", "cidrs", allocated)
 		if err := i.updateRange(ctx, clt, allocated, requestKey); err != nil {
 			for _, a := range allocated {
 				i.ipam.Free(a)
 			}
-			log.Infof("range update failed: %s (allocation reverted)", err)
+			log.Error(err, "range update failed, allocation reverted")
 			return nil, err
 		}
 	}
-	log.Infof("%s allocated in range", allocated)
+	log.Info("allocated in range", "cidrs", allocated)
 	return allocated, nil
 }
 
-func (i *IPAM) Free(ctx context.Context, log *logging.Logger, ctl client.Client, allocated ipam.CIDRList, requestKey client.ObjectKey) error {
-	log.Infof("releasing %s", allocated)
+func (i *IPAM) Free(ctx context.Context, log logr.Logger, ctl client.Client, allocated ipam.CIDRList, requestKey client.ObjectKey) error {
+	log.Info("releasing", "cidrs", allocated)
 	if len(allocated) != 0 {
 		for _, a := range allocated {
 			i.ipam.Free(a)
@@ -292,11 +292,11 @@ func (i *IPAM) Free(ctx context.Context, log *logging.Logger, ctl client.Client,
 			for _, a := range allocated {
 				i.ipam.Busy(a)
 			}
-			log.Infof("range update failed: %s (free reverted)", err)
+			log.Error(err, "range update failed (free reverted)")
 			return err
 		}
 	}
-	log.Infof("%s released in range", allocated)
+	log.Info("released in range", "cidrs", allocated)
 	return nil
 }
 

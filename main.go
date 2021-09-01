@@ -19,7 +19,6 @@ package main
 import (
 	"flag"
 	"github.com/onmetal/onmetal-api/controllers/network/ipamrange"
-	"github.com/onmetal/onmetal-api/pkg/logging"
 	"os"
 
 	accountwebhook "github.com/onmetal/onmetal-api/pkg/webhooks/account"
@@ -86,6 +85,7 @@ func main() {
 	ctrl.SetLogger(logger)
 
 	mgr, err := manager.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
+		Logger:                 logger,
 		Scheme:                 scheme,
 		MetricsBindAddress:     metricsAddr,
 		Port:                   9443,
@@ -269,9 +269,7 @@ func main() {
 	}
 
 	setupLog.Info("starting manager")
-	// inject our logger into context
-	ctx := logging.ContextWithLogger(ctrl.SetupSignalHandler(), logging.NewLogger(logger))
-	if err := mgr.Start(ctx); err != nil {
+	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}

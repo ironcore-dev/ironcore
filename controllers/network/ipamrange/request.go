@@ -18,19 +18,19 @@ package ipamrange
 
 import (
 	"context"
+	"github.com/go-logr/logr"
 	"github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	api "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	"github.com/onmetal/onmetal-api/pkg/cache/usagecache"
 	"github.com/onmetal/onmetal-api/pkg/ipam"
-	"github.com/onmetal/onmetal-api/pkg/logging"
 	"github.com/onmetal/onmetal-api/pkg/utils"
 	"net"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func (r *Reconciler) reconcileRequest(ctx context.Context, log *logging.Logger, current *IPAM) (ctrl.Result, error) {
-	log.Infof("reconcile request for %s/%s", current.object.Namespace, current.object.Name)
+func (r *Reconciler) reconcileRequest(ctx context.Context, log logr.Logger, current *IPAM) (ctrl.Result, error) {
+	log.Info("reconcile request", "namespace", current.object.Namespace, "name", current.object.Name)
 	rangeId, failed, err := r.ScopeEvaluator.EvaluateScopedReferenceToObjectId(ctx, current.object.Namespace, api.IPAMRangeGK, current.object.Spec.Parent)
 	if err != nil {
 		if !failed {
@@ -43,7 +43,7 @@ func (r *Reconciler) reconcileRequest(ctx context.Context, log *logging.Logger, 
 		return utils.Succeeded()
 	}
 
-	log.Infof("found parent %s", rangeId.ObjectKey)
+	log.Info("found parent", "key", rangeId.ObjectKey)
 
 	requestId := utils.NewObjectId(current.object)
 	// Update usage cache
@@ -69,7 +69,7 @@ func (r *Reconciler) reconcileRequest(ctx context.Context, log *logging.Logger, 
 
 	if ipr.ipam == nil {
 		if len(ipr.object.Status.CIDRs) == 0 {
-			log.Infof("parent %s is not yet ready", ipr.objectId)
+			log.Info("parent is not yet ready", "parentID", ipr.objectId)
 			return utils.Succeeded()
 		}
 	}
@@ -90,7 +90,7 @@ func (r *Reconciler) reconcileRequest(ctx context.Context, log *logging.Logger, 
 		}
 
 		if len(current.object.Status.CIDRs) > 0 {
-			log.Infof("already allocated")
+			log.Info("already allocated")
 			return utils.Succeeded()
 		}
 
@@ -99,7 +99,7 @@ func (r *Reconciler) reconcileRequest(ctx context.Context, log *logging.Logger, 
 			if ipr.pendingRequest.key != requestId.ObjectKey {
 				return utils.Succeeded()
 			}
-			log.Infof("found pending request: %s", ipr.pendingRequest.key)
+			log.Info("found pending request", "key", ipr.pendingRequest.key)
 			allocated = ipr.pendingRequest.CIDRs
 		} else {
 			allocated, err = ipr.Alloc(ctx, log, r.Client, current.requestSpecs, current.objectId.ObjectKey)
@@ -108,7 +108,7 @@ func (r *Reconciler) reconcileRequest(ctx context.Context, log *logging.Logger, 
 			}
 		}
 		if len(allocated) != 0 {
-			log.Infof("allocated %v", allocated)
+			log.Info("allocated", "cidrs", allocated)
 			newObj := current.object.DeepCopy()
 			newObj.Status.CIDRs = nil
 			for _, a := range allocated {
@@ -117,7 +117,7 @@ func (r *Reconciler) reconcileRequest(ctx context.Context, log *logging.Logger, 
 			if err := r.Client.Status().Patch(ctx, newObj, client.MergeFrom(current.object)); err != nil {
 				return utils.Requeue(err)
 			}
-			log.Infof("allocation finished. trigger range %s", ipr.objectId.ObjectKey)
+			log.Info("allocation finished. triggering range", "key", ipr.objectId.ObjectKey)
 			// make sure to update cache with new object
 			current.object = newObj
 			r.Trigger(ipr.objectId)
@@ -131,11 +131,11 @@ func (r *Reconciler) reconcileRequest(ctx context.Context, log *logging.Logger, 
 	return r.ready(ctx, log, current.object, "")
 }
 
-func (r *Reconciler) deleteRequest(ctx context.Context, log *logging.Logger, current *IPAM) (ctrl.Result, error) {
+func (r *Reconciler) deleteRequest(ctx context.Context, log logr.Logger, current *IPAM) (ctrl.Result, error) {
 	requestId := utils.NewObjectId(current.object)
 	for _, f := range current.object.GetFinalizers() {
 		if f != finalizerName {
-			log.Infof("object %s still in use by others -> delay deletion", requestId.ObjectKey)
+			log.Info("object still in use by others, delaying deletion", "key", requestId.ObjectKey)
 			return utils.Succeeded()
 		}
 	}
@@ -161,11 +161,11 @@ func (r *Reconciler) deleteRequest(ctx context.Context, log *logging.Logger, cur
 				var allocated []*net.IPNet
 				if ipr.pendingRequest != nil {
 					if ipr.pendingRequest.key != requestId.ObjectKey {
-						log.Infof("operation on ipamrange still pending -> delay delete")
+						log.Info("operation on ipamrange still pending, delaying deletion")
 						return utils.Succeeded()
 					}
 					allocated = ipr.pendingRequest.CIDRs
-					log.Infof("continuing release %s", allocated)
+					log.Info("continuing releasing", "cidrs", allocated)
 				} else {
 					var allocated ipam.CIDRList
 					for _, c := range current.object.Status.CIDRs {

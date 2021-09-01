@@ -52,7 +52,7 @@ var _ = Describe("Utils", func() {
 				Name: namespaceName,
 			}
 			Expect(k8sClient.Create(ctx, namespace)).Should(Succeed())
-			Expect(AssureFinalizer(ctx, nil, k8sClient, finalizerName, namespace)).Should(BeNil())
+			Expect(AssureFinalizer(ctx, k8sClient, finalizerName, namespace)).Should(BeNil())
 
 			By("Expecting created")
 			Eventually(func() bool {
@@ -64,10 +64,10 @@ var _ = Describe("Utils", func() {
 			}, timeout, interval).Should(BeTrue())
 
 			By("Expecting Finalizer being created")
-			Expect(AssureFinalizer(ctx, nil, k8sClient, finalizerName, namespace)).Should(BeNil())
+			Expect(AssureFinalizer(ctx, k8sClient, finalizerName, namespace)).Should(BeNil())
 
 			By("Expecting Finalizer being removed")
-			Expect(AssureFinalizerRemoved(ctx, nil, k8sClient, finalizerName, namespace)).Should(BeNil())
+			Expect(AssureFinalizerRemoved(ctx, k8sClient, finalizerName, namespace)).Should(BeNil())
 		})
 	})
 })
