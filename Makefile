@@ -52,11 +52,7 @@ fmt: ## Run go fmt against code.
 vet: ## Run go vet against code.
 	go vet ./...
 
-dep: ## Run go get to fetch all necessary dependencies.
-	# Run go get in /tmp folder to prevent adding go tools into go.mod
-	cd /tmp; go get github.com/ahmetb/gen-crd-api-reference-docs
-
-docs: dep ## Run go generate to generate API reference documentation.
+docs: ## Run go generate to generate API reference documentation.
 	go generate ./...
 
 start-docs: ## Start the local mkdocs based development environment.

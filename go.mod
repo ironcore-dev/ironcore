@@ -3,6 +3,7 @@ module github.com/onmetal/onmetal-api
 go 1.16
 
 require (
+	github.com/ahmetb/gen-crd-api-reference-docs v0.3.0
 	github.com/go-logr/logr v0.4.0
 	github.com/onsi/ginkgo v1.16.4
 	github.com/onsi/gomega v1.16.0
