@@ -18,7 +18,7 @@ package utils
 
 import (
 	"context"
-	"github.com/onmetal/onmetal-api/pkg/logging"
+	"github.com/go-logr/logr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
@@ -29,9 +29,10 @@ func HasFinalizer(object client.Object, finalizerName string) bool {
 
 // CheckAndAssureFinalizer ensures that a finalizer is on a given runtime object
 // Returns false if the finalizer has been added.
-func CheckAndAssureFinalizer(ctx context.Context, log *logging.Logger, client client.Client, finalizerName string, object client.Object) (bool, error) {
+func CheckAndAssureFinalizer(ctx context.Context, client client.Client, finalizerName string, object client.Object) (bool, error) {
+	log := logr.FromContextOrDiscard(ctx)
 	if !ContainsString(object.GetFinalizers(), finalizerName) {
-		log.Infof("setting finalizer %s", finalizerName)
+		log.Info("setting finalizer", "finalizer", finalizerName)
 		controllerutil.AddFinalizer(object, finalizerName)
 		return false, client.Update(ctx, object)
 	}
@@ -39,15 +40,16 @@ func CheckAndAssureFinalizer(ctx context.Context, log *logging.Logger, client cl
 }
 
 // AssureFinalizer ensures that a finalizer is on a given runtime object
-func AssureFinalizer(ctx context.Context, log *logging.Logger, client client.Client, finalizerName string, object client.Object) error {
-	_, err := CheckAndAssureFinalizer(ctx, log, client, finalizerName, object)
+func AssureFinalizer(ctx context.Context, client client.Client, finalizerName string, object client.Object) error {
+	_, err := CheckAndAssureFinalizer(ctx, client, finalizerName, object)
 	return err
 }
 
 // AssureFinalizerRemoved ensures that a finalizer does not exist anymore for a given runtime object
-func AssureFinalizerRemoved(ctx context.Context, log *logging.Logger, client client.Client, finalizerName string, object client.Object) error {
+func AssureFinalizerRemoved(ctx context.Context, client client.Client, finalizerName string, object client.Object) error {
+	log := logr.FromContextOrDiscard(ctx)
 	if ContainsString(object.GetFinalizers(), finalizerName) {
-		log.Infof("removing finalizer %s", finalizerName)
+		log.Info("removing finalizer", "finalizer", finalizerName)
 		controllerutil.RemoveFinalizer(object, finalizerName)
 		return client.Update(ctx, object)
 	}

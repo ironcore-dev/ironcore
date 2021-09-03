@@ -18,14 +18,12 @@ package controllerutils
 
 import (
 	"context"
+	"github.com/go-logr/logr"
 	"github.com/onmetal/onmetal-api/pkg/cache/ownercache"
 	"github.com/onmetal/onmetal-api/pkg/cache/usagecache"
-	"github.com/onmetal/onmetal-api/pkg/logging"
 	"github.com/onmetal/onmetal-api/pkg/manager"
 	"github.com/onmetal/onmetal-api/pkg/scopes"
 	"github.com/onmetal/onmetal-api/pkg/utils"
-	"k8s.io/apimachinery/pkg/types"
-	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
@@ -36,14 +34,12 @@ type Reconciler struct {
 	manager       *manager.Manager
 	finalizerName string
 	scopes.ScopeEvaluator
-	log *logging.Logger
 }
 
 func NewReconciler(name, finalizerName string) Reconciler {
 	return Reconciler{
 		finalizerName: finalizerName,
 		name:          name,
-		log:           logging.NewLogger(ctrl.Log.WithName(name)),
 	}
 }
 
@@ -73,15 +69,6 @@ func (r *Reconciler) GetManager() *manager.Manager {
 	return r.manager
 }
 
-func (r *Reconciler) GetLog(key types.NamespacedName) *logging.Logger {
-	return r.log.WithValues(r.name, key)
-}
-
-func (r *Reconciler) GetLogContext(ctx context.Context, key types.NamespacedName) (context.Context, *logging.Logger) {
-	log := r.log.WithValues(r.name, key)
-	return logging.ContextWithLogger(ctx, log), log
-}
-
 func (r *Reconciler) TriggerAll(ids utils.ObjectIds) {
 	r.manager.TriggerAll(ids)
 }
@@ -109,13 +96,13 @@ func (r *Reconciler) HasFinalizer(object client.Object, finalizerName ...string)
 
 // CheckAndAssureFinalizer ensures that a finalizer is on a given runtime object
 // Returns false if the finalizer has been added.
-func (r *Reconciler) CheckAndAssureFinalizer(ctx context.Context, log *logging.Logger, object client.Object, finalizerName ...string) (bool, error) {
+func (r *Reconciler) CheckAndAssureFinalizer(ctx context.Context, log logr.Logger, object client.Object, finalizerName ...string) (bool, error) {
 	fn := r.finalizerName
 	if len(finalizerName) > 0 {
 		fn = finalizerName[0]
 	}
 	if !utils.ContainsString(object.GetFinalizers(), fn) {
-		log.Infof("setting finalizer %s", fn)
+		log.Info("setting finalizer", "finalizer", fn)
 		controllerutil.AddFinalizer(object, fn)
 		return false, r.Client.Update(ctx, object)
 	}
@@ -123,19 +110,19 @@ func (r *Reconciler) CheckAndAssureFinalizer(ctx context.Context, log *logging.L
 }
 
 // AssureFinalizer ensures that a finalizer is on a given runtime object
-func (r *Reconciler) AssureFinalizer(ctx context.Context, log *logging.Logger, object client.Object, finalizerName ...string) error {
+func (r *Reconciler) AssureFinalizer(ctx context.Context, log logr.Logger, object client.Object, finalizerName ...string) error {
 	_, err := r.CheckAndAssureFinalizer(ctx, log, object, finalizerName...)
 	return err
 }
 
 // AssureFinalizerRemoved ensures that a finalizer does not exist anymore for a given runtime object
-func (r *Reconciler) AssureFinalizerRemoved(ctx context.Context, log *logging.Logger, object client.Object, finalizerName ...string) error {
+func (r *Reconciler) AssureFinalizerRemoved(ctx context.Context, log logr.Logger, object client.Object, finalizerName ...string) error {
 	fn := r.finalizerName
 	if len(finalizerName) > 0 {
 		fn = finalizerName[0]
 	}
 	if utils.ContainsString(object.GetFinalizers(), fn) {
-		log.Infof("removing finalizer %s", fn)
+		log.Info("removing finalizer", "finalizer", fn)
 		controllerutil.RemoveFinalizer(object, fn)
 		return r.Client.Update(ctx, object)
 	}

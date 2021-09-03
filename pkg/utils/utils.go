@@ -19,7 +19,7 @@ package utils
 import (
 	"context"
 	"fmt"
-	"github.com/onmetal/onmetal-api/pkg/logging"
+	"github.com/go-logr/logr"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"reflect"
@@ -27,11 +27,12 @@ import (
 )
 
 // AssureDeleting ensures that an object is being deleted
-func AssureDeleting(ctx context.Context, log *logging.Logger, clt client.Client, object client.Object) error {
+func AssureDeleting(ctx context.Context, clt client.Client, object client.Object) error {
+	log := logr.FromContextOrDiscard(ctx)
 	if !object.GetDeletionTimestamp().IsZero() {
 		return nil
 	}
-	log.Infof("deleting object %s", NewObjectId(object))
+	log.Info("deleting object", "objectID", NewObjectId(object))
 	return client.IgnoreNotFound(clt.Delete(ctx, object, client.PropagationPolicy(metav1.DeletePropagationBackground)))
 }
 

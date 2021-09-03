@@ -20,20 +20,17 @@ import (
 	"context"
 	"fmt"
 	"github.com/onmetal/onmetal-api/apis/core"
-	"github.com/onmetal/onmetal-api/pkg/logging"
 	"github.com/onmetal/onmetal-api/pkg/utils"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/selection"
 
+	"github.com/go-logr/logr"
+	corev1alpha1 "github.com/onmetal/onmetal-api/apis/core/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/log"
-
-	"github.com/go-logr/logr"
-	corev1alpha1 "github.com/onmetal/onmetal-api/apis/core/v1alpha1"
 )
 
 const (
@@ -52,9 +49,7 @@ type Reconciler struct {
 //+kubebuilder:rbac:groups=core.onmetal.de,resources=scopes/finalizers,verbs=update
 
 func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
-
-	log := logging.NewLogger(r.Log, "scope", req.NamespacedName)
+	log := logr.FromContextOrDiscard(ctx)
 
 	var scope corev1alpha1.Scope
 	if err := r.Get(ctx, req.NamespacedName, &scope); err != nil {
@@ -70,7 +65,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 		scopeName := utils.GetLabel(&parentNamespace, core.ScopeLabel, accountName)
 
 		// Add scope finalizer if it does not exist
-		if err := utils.AssureFinalizer(ctx, log, r.Client, scopeFinilizerName, &scope); err != nil {
+		if err := utils.AssureFinalizer(ctx, r.Client, scopeFinilizerName, &scope); err != nil {
 			return utils.Requeue(err)
 		}
 		namespaces, err := r.listNamespacesForScopes(ctx, req)
@@ -83,10 +78,10 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 				namespace = &n
 			} else {
 				if namespace.CreationTimestamp.After(n.CreationTimestamp.Time) {
-					if err := utils.AssureFinalizerRemoved(ctx, log, r.Client, scopeFinilizerName, namespace); client.IgnoreNotFound(err) != nil {
+					if err := utils.AssureFinalizerRemoved(ctx, r.Client, scopeFinilizerName, namespace); client.IgnoreNotFound(err) != nil {
 						return utils.Requeue(err)
 					}
-					if err := utils.AssureDeleting(ctx, log, r.Client, namespace); err != nil {
+					if err := utils.AssureDeleting(ctx, r.Client, namespace); err != nil {
 						return utils.Requeue(err)
 					}
 					namespace = &n
@@ -95,7 +90,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 		}
 		if namespace == nil {
 			// Create scope namespace
-			log.Infof("creating namespace for scope %s", scope.Name)
+			log.Info("creating scope namespace", "scope", scope.Name)
 			namespace = &v1.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
 					Finalizers:   []string{scopeFinilizerName},
@@ -109,12 +104,12 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 				},
 			}
 			if err := r.Create(ctx, namespace, &client.CreateOptions{}); err != nil {
-				log.Errorf(err, "failed to create namespace for scope %s", scope.Name)
+				log.Error(err, "failed to create scope namespace", "scope", scope.Name)
 				return utils.Requeue(err)
 			}
-			log.Infof("using namespace %s for scope %s", namespace.Name, scope.Name)
+			log.Info("created scope namespace", "scope", scope.Name, "namespace", namespace.Name)
 		} else {
-			if err := utils.AssureFinalizer(ctx, log, r.Client, scopeFinilizerName, namespace); err != nil {
+			if err := utils.AssureFinalizer(ctx, r.Client, scopeFinilizerName, namespace); err != nil {
 				return utils.Requeue(err)
 			}
 		}
@@ -129,7 +124,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 			return utils.Requeue(err)
 		}
 	} else {
-		log.Infof("deleting scope %s", scope.Name)
+		log.Info("deleting scope", "scope", scope.Name)
 		// Remove external dependencies
 		namespaces, err := r.listNamespacesForScopes(ctx, req)
 		if err != nil {
@@ -138,10 +133,10 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 		var namespace *v1.Namespace
 		for _, n := range namespaces {
 			if n.Name != scope.Status.Namespace {
-				if err := utils.AssureFinalizerRemoved(ctx, log, r.Client, scopeFinilizerName, &n); client.IgnoreNotFound(err) != nil {
+				if err := utils.AssureFinalizerRemoved(ctx, r.Client, scopeFinilizerName, &n); client.IgnoreNotFound(err) != nil {
 					return utils.Requeue(err)
 				}
-				if err := utils.AssureDeleting(ctx, log, r.Client, &n); err != nil {
+				if err := utils.AssureDeleting(ctx, r.Client, &n); err != nil {
 					return utils.Requeue(err)
 				}
 			} else {
@@ -154,10 +149,10 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 			if err := r.Status().Update(ctx, &scope); err != nil {
 				return utils.Requeue(err)
 			}
-			if err := utils.AssureFinalizerRemoved(ctx, log, r.Client, scopeFinilizerName, namespace); client.IgnoreNotFound(err) != nil {
+			if err := utils.AssureFinalizerRemoved(ctx, r.Client, scopeFinilizerName, namespace); client.IgnoreNotFound(err) != nil {
 				return utils.Requeue(err)
 			}
-			if err := utils.AssureDeleting(ctx, log, r.Client, namespace); err != nil {
+			if err := utils.AssureDeleting(ctx, r.Client, namespace); err != nil {
 				return utils.Requeue(err)
 			}
 			if err := r.Get(ctx, client.ObjectKey{Name: namespace.Name}, namespace); err == nil || client.IgnoreNotFound(err) != nil {
@@ -165,7 +160,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 			}
 		}
 		// Remove finalizer
-		if err := utils.AssureFinalizerRemoved(ctx, log, r.Client, scopeFinilizerName, &scope); err != nil {
+		if err := utils.AssureFinalizerRemoved(ctx, r.Client, scopeFinilizerName, &scope); err != nil {
 			return utils.Requeue(err)
 		}
 	}
