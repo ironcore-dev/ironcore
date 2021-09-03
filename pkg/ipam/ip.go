@@ -37,7 +37,7 @@ func IPClone(ip net.IP) net.IP {
 
 func IPAdd(ip net.IP, n int64) net.IP {
 	ip = IPClone(ip)
-	for i := len(ip) - 1; n > 0; i-- {
+	for i := len(ip) - 1; n != 0; i-- {
 		n += int64(ip[i])
 		ip[i] = uint8(n & 0xff)
 		n >>= 8

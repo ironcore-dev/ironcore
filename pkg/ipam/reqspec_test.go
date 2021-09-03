@@ -56,12 +56,33 @@ var _ = Describe("Request Spec", func() {
 
 		It("invalid size", func() {
 			_, err := ParseRequestSpec("129")
-			Expect(err).To(Equal(fmt.Errorf("invalid request spec: size must be between 0 and 128")))
+			Expect(err).To(Equal(fmt.Errorf("<netmasksize>: invalid request spec: size must be between 0 and 128")))
+		})
+		It("invalid hostsize", func() {
+			_, err := ParseRequestSpec("%129")
+			Expect(err).To(Equal(fmt.Errorf("%%<hostmasksize>: invalid request spec: size must be between 0 and 128")))
 		})
 		It("invalid size", func() {
 			_, err := ParseRequestSpec("/129")
-			Expect(err).To(Equal(fmt.Errorf("invalid request spec: size must be between 0 and 128")))
+			Expect(err).To(Equal(fmt.Errorf("[<n>]/[%%]<masksize>: invalid request spec: size must be between 0 and 128")))
 		})
+		It("invalid hostsize", func() {
+			_, err := ParseRequestSpec("/%129")
+			Expect(err).To(Equal(fmt.Errorf("[<n>]/[%%]<masksize>: invalid request spec: size must be between 0 and 128")))
+		})
+		It("unknown", func() {
+			_, err := ParseRequestSpec("bla")
+			Expect(err).To(Equal(fmt.Errorf("invalid request spec: use one of #<amount>, %%<hostmasksize>, <cidr>, <ip>, <netmasksize>, [<n>]/[%%]<masksize>")))
+		})
+		It("invalid cidr", func() {
+			_, err := ParseRequestSpec("1.1.1/24")
+			Expect(err.Error()).To(Equal("<cidr>: invalid CIDR address: 1.1.1/24"))
+		})
+		It("invalid ip", func() {
+			_, err := ParseRequestSpec("1.1.1")
+			Expect(err.Error()).To(Equal("<ip>: invalid IP address: 1.1.1"))
+		})
+
 	})
 
 	Context("alloc", func() {
@@ -98,6 +119,17 @@ var _ = Describe("Request Spec", func() {
 			req, err := ParseRequestSpec("24")
 			Expect(err).To(BeNil())
 			Expect(req.Bits()).To(Equal(24))
+			Expect(req.IsCIDR()).To(BeFalse())
+			cidr, err := req.Alloc(ipam)
+			Expect(err).To(BeNil())
+			Expect(cidr).NotTo(BeNil())
+			Expect(cidr.String()).To(Equal("10.1.0.0/24"))
+		})
+
+		It("%8", func() {
+			req, err := ParseRequestSpec("%8")
+			Expect(err).To(BeNil())
+			Expect(req.Bits()).To(Equal(8))
 			Expect(req.IsCIDR()).To(BeFalse())
 			cidr, err := req.Alloc(ipam)
 			Expect(err).To(BeNil())

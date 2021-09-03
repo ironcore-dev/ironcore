@@ -19,9 +19,44 @@ package ipam
 import (
 	"fmt"
 	"net"
+	"sort"
 	"strconv"
 	"strings"
+	"sync"
 )
+
+type RequestSpecType func(s string) (RequestSpec, bool, error)
+
+var lock sync.RWMutex
+var requesttypes map[string]RequestSpecType = map[string]RequestSpecType{}
+var reqsyntax string
+
+func RegisterRequestType(name string, t RequestSpecType) {
+	lock.Lock()
+	defer lock.Unlock()
+	requesttypes[name] = t
+
+	var list []string
+	reqsyntax = ""
+	sep := ""
+	for n := range requesttypes {
+		list = append(list, n)
+	}
+	sort.Strings(list)
+	for _, n := range list {
+		reqsyntax = fmt.Sprintf("%s%s%s", reqsyntax, sep, n)
+		sep = ", "
+	}
+}
+
+func init() {
+	RegisterRequestType("#<amount>", amountSpecType)
+	RegisterRequestType("<cidr>", cidrSpecType)
+	RegisterRequestType("<ip>", ipSpecType)
+	RegisterRequestType("<netmasksize>", netmasksizeSpecType)
+	RegisterRequestType("%<hostmasksize>", hostmasksizeSpecType)
+	RegisterRequestType("[<n>]/[%]<masksize>", subSpecType)
+}
 
 // RequestSpec represents a dedicate allocation type for a cidr from an IPAM.
 type RequestSpec interface {
@@ -33,89 +68,97 @@ type RequestSpec interface {
 
 type RequestSpecList []RequestSpec
 
-func (r RequestSpecList) String() string {
-	s := "["
+func (list RequestSpecList) String() string {
 	sep := ""
-	for _, spec := range r {
+	s := "["
+	for _, spec := range list {
 		s = fmt.Sprintf("%s%s%s", s, sep, spec)
-		sep = ","
+		sep = ", "
 	}
 	return s + "]"
 }
 
 func ParseRequestSpec(s string) (RequestSpec, error) {
-	if strings.HasPrefix(s, "#") {
-		n, err := ParseInt(s[1:])
-		if err != nil {
-			return nil, err
+	var err error
+	for syn, parser := range requesttypes {
+		spec, final, perr := parser(s)
+		if spec != nil {
+			return spec, err
 		}
-		return &amountSpec{size: n}, nil
+		if perr != nil {
+			err = fmt.Errorf("%s: %s", syn, perr)
+			if final {
+				break
+			}
+		}
 	}
-	_, cidr, err := net.ParseCIDR(s)
 	if err == nil {
-		return &cidrSpec{cidr: cidr}, nil
+		lock.RLock()
+		defer lock.RUnlock()
+		err = fmt.Errorf("invalid request spec: use one of %s", reqsyntax)
 	}
-
-	ip := ParseIP(s)
-	if ip != nil {
-		return &cidrSpec{cidr: IPtoCIDR(ip)}, nil
-	}
-
-	size, err := strconv.ParseInt(s, 10, 32)
-	if err == nil {
-		if size < 0 || size > 128 {
-			return nil, fmt.Errorf("invalid request spec: size must be between 0 and 128")
-		}
-		return &sizeSpec{size: int(size)}, nil
-	}
-	if ip != nil {
-		return &cidrSpec{cidr: IPtoCIDR(ip)}, nil
-	}
-
-	idx := strings.Index(s, "/")
-	if idx >= 0 {
-		size, err := strconv.ParseInt(s[idx+1:], 10, 32)
-		if err == nil {
-			if size < 0 || size > 128 {
-				return nil, fmt.Errorf("invalid request spec: size must be between 0 and 128")
-			}
-			if idx == 0 {
-				return &sizeSpec{size: int(size)}, nil
-			}
-			i, err := strconv.ParseInt(s[:idx], 10, 32)
-			if err == nil {
-				if size < 0 {
-					return nil, fmt.Errorf("invalid request spec: index must not be negative")
-				}
-				return &subSpec{size: int(size), index: int(i)}, nil
-			}
-		}
-	}
-	return nil, fmt.Errorf("invalid request spec: must be CIDR, IP, size or sub cidr (n/size)")
+	return nil, err
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// sizeSpec is a RequestSpec based of a netmask size
+// netmasksizeSpec is a RequestSpec based of a netmask size
 
-type sizeSpec struct {
+type netmasksizeSpec struct {
 	specsupport
 	size int
 }
 
-func (this *sizeSpec) String() string {
+func netmasksizeSpecType(s string) (RequestSpec, bool, error) {
+	size, err := strconv.ParseInt(s, 10, 32)
+	if err == nil {
+		if size < 0 || size > 128 {
+			return nil, true, fmt.Errorf("invalid request spec: size must be between 0 and 128")
+		}
+		return &netmasksizeSpec{size: int(size)}, true, nil
+	}
+	return nil, false, nil
+}
+
+func (this *netmasksizeSpec) String() string {
 	return strconv.Itoa(this.size)
 }
 
-func (this *sizeSpec) IsCIDR() bool {
+func (this *netmasksizeSpec) IsCIDR() bool {
 	return false
 }
 
-func (this *sizeSpec) Bits() int {
+func (this *netmasksizeSpec) Bits() int {
 	return this.size
 }
 
-func (this *sizeSpec) Alloc(ipam *IPAM) (*net.IPNet, error) {
+func (this *netmasksizeSpec) Alloc(ipam *IPAM) (*net.IPNet, error) {
 	return this.alloc(ipam, this.size)
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// netmasksizeSpec is a RequestSpec based of a netmask size
+
+type hostmasksizeSpec struct {
+	netmasksizeSpec
+}
+
+func hostmasksizeSpecType(s string) (RequestSpec, bool, error) {
+	if !strings.HasPrefix(s, "%") {
+		return nil, false, nil
+	}
+	spec, _, err := netmasksizeSpecType(s[1:])
+	if spec == nil || err != nil {
+		return spec, true, err
+	}
+	return &hostmasksizeSpec{*(spec.(*netmasksizeSpec))}, false, nil
+}
+
+func (this *hostmasksizeSpec) String() string {
+	return "%" + this.netmasksizeSpec.String()
+}
+
+func (this *hostmasksizeSpec) Alloc(ipam *IPAM) (*net.IPNet, error) {
+	return this.alloc(ipam, ipam.Bits()-this.size)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -124,6 +167,17 @@ func (this *sizeSpec) Alloc(ipam *IPAM) (*net.IPNet, error) {
 type amountSpec struct {
 	specsupport
 	size Int
+}
+
+func amountSpecType(s string) (RequestSpec, bool, error) {
+	if strings.HasPrefix(s, "#") {
+		n, err := ParseInt(s[1:])
+		if err != nil {
+			return nil, true, err
+		}
+		return &amountSpec{size: n}, true, nil
+	}
+	return nil, false, nil
 }
 
 func (this *amountSpec) String() string {
@@ -160,6 +214,29 @@ type cidrSpec struct {
 	cidr *net.IPNet
 }
 
+func cidrSpecType(s string) (RequestSpec, bool, error) {
+	_, cidr, err := net.ParseCIDR(s)
+	if err == nil {
+		return &cidrSpec{cidr: cidr}, true, nil
+	}
+	if !strings.Contains(s, "/") || !strings.ContainsAny(s, ".:") {
+		err = nil
+	}
+	return nil, false, err
+}
+
+func ipSpecType(s string) (RequestSpec, bool, error) {
+	ip := ParseIP(s)
+	if ip != nil {
+		return &cidrSpec{cidr: IPtoCIDR(ip)}, true, nil
+	}
+	var err error
+	if !strings.Contains(s, "/") && strings.ContainsAny(s, ".:") {
+		err = fmt.Errorf("invalid IP address: %s", s)
+	}
+	return nil, false, err
+}
+
 func (this *cidrSpec) String() string {
 	return this.cidr.String()
 }
@@ -191,11 +268,47 @@ func (this *cidrSpec) Alloc(ipam *IPAM) (*net.IPNet, error) {
 
 type subSpec struct {
 	specsupport
+	host  bool
 	size  int
 	index int
 }
 
+func subSpecType(s string) (RequestSpec, bool, error) {
+	idx := strings.Index(s, "/")
+	if idx >= 0 {
+		start := idx + 1
+		host := false
+		if s[start] == '%' {
+			host = true
+			start++
+		}
+		size, err := strconv.ParseInt(s[start:], 10, 32)
+		if err == nil {
+			if size < 0 || size > 128 {
+				return nil, true, fmt.Errorf("invalid request spec: size must be between 0 and 128")
+			}
+			if idx == 0 {
+				if host {
+					return &hostmasksizeSpec{netmasksizeSpec{size: int(size)}}, true, nil
+				}
+				return &netmasksizeSpec{size: int(size)}, true, nil
+			}
+			i, err := strconv.ParseInt(s[:idx], 10, 32)
+			if err == nil {
+				if size < 0 {
+					return nil, true, fmt.Errorf("invalid request spec: index must not be negative")
+				}
+				return &subSpec{host: host, size: int(size), index: int(i)}, true, nil
+			}
+		}
+	}
+	return nil, false, nil
+}
+
 func (this *subSpec) String() string {
+	if this.host {
+		return fmt.Sprintf("%d/%%%d", this.index, this.size)
+	}
 	return fmt.Sprintf("%d/%d", this.index, this.size)
 }
 
@@ -210,17 +323,21 @@ func (this *subSpec) Bits() int {
 func (this *subSpec) Alloc(ipam *IPAM) (*net.IPNet, error) {
 	index := this.index
 	var cidr *net.IPNet
+	size := this.size
+	if this.host {
+		size = ipam.Bits() - size
+	}
 	for _, r := range ipam.ranges {
-		if CIDRNetMaskSize(r) > this.size {
-			return nil, fmt.Errorf("invalid rquest spec %s for ipam ranges", this)
+		if CIDRNetMaskSize(r) > size {
+			return nil, fmt.Errorf("invalid request spec %s for ipam ranges", this)
 		}
-		num := 1 << (this.size - CIDRNetMaskSize(r))
+		num := 1 << (size - CIDRNetMaskSize(r))
 		if index < num {
 			_, bits := r.Mask.Size()
-			size := IntOne.LShift(uint(bits - this.size)).Mul(Int64(int64(index)))
+			hostsize := IntOne.LShift(uint(bits - size)).Mul(Int64(int64(index)))
 			cidr = &net.IPNet{
-				IP:   IPAddInt(r.IP, size),
-				Mask: net.CIDRMask(this.size, bits),
+				IP:   IPAddInt(r.IP, hostsize),
+				Mask: net.CIDRMask(size, bits),
 			}
 			break
 		}

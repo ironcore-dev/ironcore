@@ -117,16 +117,35 @@ func (r *Reconciler) HandleReconcile(ctx context.Context, log logr.Logger, obj *
 			if len(current.requestSpecs) == 0 {
 				return r.invalid(ctx, log, obj, "at least one cidr must be specified for root (no parent) ipam range")
 			}
-			cidrs := []string{}
+			var cidrs []api.CIDRAllocationStatus
 			for i, c := range current.requestSpecs {
-				if !c.IsCIDR() {
+				if !c.IsValid() {
+					cidrs = append(cidrs, api.CIDRAllocationStatus{
+						CIDRAllocation: api.CIDRAllocation{
+							Request: c.Request,
+							CIDR:    "",
+						},
+						Status:  api.AllocationStateFailed,
+						Message: c.Error,
+					})
+					continue
+				}
+				if !c.Spec.IsCIDR() {
 					return r.invalid(ctx, log, obj, "request spec %d does is not a valid cidr %s for a root ipam range", i, c)
 				}
-				_, cidr, _ := net.ParseCIDR(c.String())
+				_, cidr, _ := net.ParseCIDR(c.Request)
 				if ipam.CIDRHostMaskSize(cidr) == 0 {
+					// TODO: rethink IP delegation
 					return r.invalid(ctx, log, obj, "root cidr must have more than one ip address")
 				}
-				cidrs = append(cidrs, c.String())
+				cidrs = append(cidrs, api.CIDRAllocationStatus{
+					CIDRAllocation: api.CIDRAllocation{
+						Request: c.Request,
+						CIDR:    c.Request,
+					},
+					Status:  api.AllocationStateAllocated,
+					Message: SuccessfulUsageMessage,
+				})
 			}
 			newObj := current.object.DeepCopy()
 			newObj.Status.CIDRs = cidrs
@@ -135,12 +154,13 @@ func (r *Reconciler) HandleReconcile(ctx context.Context, log logr.Logger, obj *
 				if err := r.Status().Patch(ctx, newObj, client.MergeFrom(obj)); err != nil {
 					return utils.Requeue(err)
 				}
+				// update self in cache
+				current.updateFrom(log, newObj)
 				// trigger all users of this ipamrange
 				log.Info("trigger all users of range", "key", current.objectId.ObjectKey)
 				users := r.GetUsageCache().GetUsersForRelationToGK(current.objectId, "uses", api.IPAMRangeGK)
 				r.TriggerAll(users)
 			}
-			return utils.Succeeded()
 		}
 	}
 	if current.ipam != nil {

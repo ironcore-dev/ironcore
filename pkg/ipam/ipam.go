@@ -22,10 +22,11 @@ import (
 )
 
 type IPAM struct {
-	ranges     CIDRList
-	block      *Block
-	nextAlloc  []net.IP
-	roundRobin bool
+	ranges        CIDRList
+	block         *Block
+	nextAlloc     []net.IP
+	roundRobin    bool
+	deletePending CIDRList
 }
 
 func NewIPAM(cidr *net.IPNet, ranges ...*IPRange) (*IPAM, error) {
@@ -57,19 +58,22 @@ func NewIPAM(cidr *net.IPNet, ranges ...*IPRange) (*IPAM, error) {
 			ipam.Busy(c)
 		}
 
-		for b := ipam.block; b != nil; b = b.next {
-			if b.isCompletelyBusy() {
-				if b.prev != nil {
-					b.prev.next = b.next
-				}
-				if b.next != nil {
-					b.next.prev = b.prev
-				}
-				if b == ipam.block {
-					ipam.block = b.next
+		/*
+			for b := ipam.block; b != nil; b = b.next {
+				if b.isCompletelyBusy() {
+					if b.prev != nil {
+						b.prev.next = b.next
+					}
+					if b.next != nil {
+						b.next.prev = b.prev
+					}
+					if b == ipam.block {
+						ipam.block = b.next
+					}
 				}
 			}
-		}
+		*/
+
 		if ipam.block == nil {
 			return nil, fmt.Errorf("no available IP addresses")
 		}
@@ -86,6 +90,7 @@ func NewIPAMForRanges(ranges IPRanges) (*IPAM, error) {
 	if err != nil {
 		return nil, err
 	}
+	cidrs.Sort()
 
 	ipv4 := true
 	for _, cidr := range cidrs {
@@ -106,7 +111,12 @@ func NewIPAMForRanges(ranges IPRanges) (*IPAM, error) {
 		nextAlloc: nextAlloc,
 	}
 
-	last := ipam.block
+	ipam.setupFor(ipv4, cidrs...)
+	return ipam, nil
+}
+
+func (this *IPAM) setupFor(ipv4 bool, cidrs ...*net.IPNet) {
+	last := this.block
 	for _, cidr := range cidrs {
 		var b *Block
 		if ipv4 {
@@ -114,29 +124,82 @@ func NewIPAMForRanges(ranges IPRanges) (*IPAM, error) {
 		} else {
 			cidr = CIDRto16(cidr)
 		}
-		if CIDRHostMaskSize(cidr) < MAX_BITMAP_NET {
-			n := cidr
-			for CIDRHostMaskSize(n) < MAX_BITMAP_NET {
-				n = CIDRExtend(n)
-			}
-			if last != nil && CIDREqual(n, last.cidr) {
-				last.set(cidr, false)
-				continue
-			}
-			b = &Block{cidr: n, busy: BITMAP_BUSY}
-			b.set(cidr, false)
-		} else {
-			b = &Block{cidr: cidr}
-		}
+
+		b = &Block{cidr: cidr}
 		b.prev = last
 		if last != nil {
 			last.next = b
 		} else {
-			ipam.block = b
+			this.block = b
 		}
 		last = b
 	}
-	return ipam, nil
+}
+
+func (this *IPAM) AddCIDRs(list CIDRList) {
+	this.insert(this.ranges.AddNormalized(list))
+}
+
+func (this *IPAM) DeleteCIDRs(list CIDRList) {
+	this.delete(this.ranges.DeleteNormalized(list))
+}
+
+func (this *IPAM) insert(cidrs CIDRList) {
+	for _, a := range cidrs {
+		b := &Block{
+			cidr: a,
+		}
+
+		var prev *Block = nil
+		c := this.block
+		for c != nil {
+			if IPCmp(b.cidr.IP, c.cidr.IP) < 0 {
+				break
+			}
+			prev = c
+			c = c.next
+		}
+		this.insertBlock(prev, b)
+	}
+}
+
+func (this *IPAM) delete(cidrs CIDRList) {
+	i := 0
+	for i < len(cidrs) {
+		cidr := cidrs[i]
+		b := this.block
+		for b != nil {
+			match, deleted := this.deletePart(b, cidr)
+			if match {
+				if deleted {
+					cidrs.DeleteIndex(i)
+				} else {
+					i++
+				}
+				break
+			}
+			b = b.next
+		}
+		i++
+	}
+	this.deletePending = cidrs
+}
+
+func (this *IPAM) deletePart(b *Block, cidr *net.IPNet) (bool, bool) {
+	if CIDRContains(b.cidr, cidr) {
+		if !b.isCIDRBusy(cidr) {
+			for b.Size() < CIDRNetMaskSize(cidr) {
+				b.split()
+				if !b.cidr.IP.Equal(cidr.IP) {
+					b = b.next
+				}
+			}
+			this.removeBlock(b)
+			return true, true
+		}
+		return true, false
+	}
+	return false, false
 }
 
 func (this *IPAM) SetRoundRobin(b bool) {
@@ -150,6 +213,19 @@ func (this *IPAM) Ranges() CIDRList {
 	return this.ranges.Copy()
 }
 
+func (this *IPAM) PendingDeleted() CIDRList {
+	return this.deletePending.Copy()
+}
+
+func (this *IPAM) IsCoveredCIDR(cidr *net.IPNet) bool {
+	for _, r := range this.ranges {
+		if CIDRContains(r, cidr) {
+			return true
+		}
+	}
+	return false
+}
+
 func (this *IPAM) State() ([]string, []net.IP) {
 	state := []string{}
 	b := this.block
@@ -157,20 +233,18 @@ func (this *IPAM) State() ([]string, []net.IP) {
 		state = append(state, b.String())
 		b = b.next
 	}
-	if this.IsRoundRobin() {
-		return state, this.nextAlloc
-	} else {
-		return state, nil
-	}
+	return state, this.nextAlloc
 }
 
 func (this *IPAM) IsRoundRobin() bool {
 	return this.roundRobin
 }
 
-func (this *IPAM) SetState(blocks []string, next []net.IP) error {
+func (this *IPAM) SetState(blocks []string, next []net.IP) (CIDRList, error) {
+	var additional CIDRList
+
 	if len(next) > len(this.nextAlloc) {
-		return fmt.Errorf("invalid state")
+		return nil, fmt.Errorf("invalid state")
 	}
 	ipv4 := this.Bits() == net.IPv4len*8
 	for i := 0; i < len(this.nextAlloc); i++ {
@@ -188,12 +262,13 @@ func (this *IPAM) SetState(blocks []string, next []net.IP) error {
 	if blocks != nil {
 		var block *Block
 		var last *Block
-
+		var ranges CIDRList
 		for _, s := range blocks {
 			b := ParseBlock(s)
 			if b == nil {
-				return fmt.Errorf("invalid block state")
+				return nil, fmt.Errorf("invalid block state")
 			}
+			ranges.Add(b.cidr)
 			b.prev = last
 			if last == nil {
 				block = b
@@ -203,8 +278,18 @@ func (this *IPAM) SetState(blocks []string, next []net.IP) error {
 			last = b
 		}
 		this.block = block
+
+		ranges.Normalize()
+		required := this.ranges.Copy()
+		required.Normalize()
+
+		additional = ranges.additional(required)
+		this.insert(additional)
+
+		deleted := required.additional(ranges)
+		this.delete(deleted)
 	}
-	return nil
+	return additional, nil
 }
 
 func (this *IPAM) Bits() int {
@@ -254,7 +339,7 @@ func (this *IPAM) Alloc(reqsize int) *net.IPNet {
 				}
 			}
 
-			if b.canAlloc(next, reqsize) {
+			if b.canAlloc(next, reqsize) && (len(this.deletePending) == 0 || this.IsCoveredCIDR(b.cidr)) {
 				if found == nil || s > found.Size() {
 					found = b
 					if found.matchSize(reqsize) {
@@ -297,13 +382,81 @@ func (this *IPAM) split(b *Block, reqsize int) *Block {
 
 func (this *IPAM) join(b *Block) {
 	for b != nil {
+		if len(this.deletePending) != 0 {
+			if CIDRHostMaskSize(b.cidr) <= MAX_BITMAP_NET {
+				// remember check block area: [b.prev.next...b.next]
+				// removing might create multiple splitted blocks in this area
+				p := &this.block
+				if b.prev != nil {
+					p = &b.prev.next
+				}
+				n := b.next
+				i := 0
+			nextPending:
+				for i < len(this.deletePending) {
+					// always check complete splitted area
+					b := *p
+					for b != nil && b != n {
+						_, deleted := this.deletePart(b, this.deletePending[i])
+						if deleted {
+							this.deletePending.DeleteIndex(i)
+							continue nextPending
+						}
+						b = b.next
+					}
+					i++
+				}
+			} else {
+				if !b.isBusy() {
+					for i, d := range this.deletePending {
+						if CIDREqual(d, b.cidr) {
+							this.removeBlock(b)
+							this.deletePending.DeleteIndex(i)
+							return
+						}
+					}
+				}
+			}
+		}
 		b = b.join()
 	}
+}
+
+func (this *IPAM) removeBlock(b *Block) {
+	if b.prev == nil {
+		this.block = b.next
+	} else {
+		b.prev.next = b.next
+	}
+	if b.next != nil {
+		b.next.prev = b.prev
+	}
+}
+
+func (this *IPAM) insertBlock(previous, b *Block) {
+	b.prev = previous
+	if previous == nil {
+		b.next = this.block
+		if this.block != nil {
+			this.block.prev = b
+		}
+		this.block = b
+	} else {
+		b.next = previous.next
+		if previous.next != nil {
+			previous.next.prev = b
+		}
+		previous.next = b
+	}
+	this.join(b)
 }
 
 func (this *IPAM) Busy(cidr *net.IPNet) bool {
 	cidr = CIDRAlign(cidr, this.Bits())
 	if cidr == nil {
+		return false
+	}
+	if len(this.deletePending) != 0 && !this.IsCoveredCIDR(cidr) {
 		return false
 	}
 	return this.set(cidr, true)

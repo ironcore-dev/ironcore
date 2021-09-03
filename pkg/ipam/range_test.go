@@ -25,6 +25,17 @@ import (
 
 var _ = Describe("Range", func() {
 
+	Context("other", func() {
+		cidr, _ := ParseCIDR("10.0.1.1/32")
+		It("cidr", func() {
+			Expect(cidr.Contains(cidr.IP)).To(BeTrue())
+		})
+		It("single ip", func() {
+			r, err := ParseIPRange("10.0.1.1/32")
+			Expect(err).To(Succeed())
+			Expect(Includes(r)).To(Equal(CIDRList{cidr}))
+		})
+	})
 	Context("parse", func() {
 		ip1 := ParseIP("10.0.1.0")
 		ip2 := ParseIP("10.1.0.0")

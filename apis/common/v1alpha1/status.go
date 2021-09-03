@@ -40,4 +40,5 @@ const (
 	StateError     = "Error"
 	StateInvalid   = "Invalid"
 	StateBusy      = "Busy"
+	StatePending   = "Pending"
 )

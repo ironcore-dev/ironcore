@@ -18,13 +18,12 @@ package ipamrange
 
 import (
 	"context"
+
 	"github.com/go-logr/logr"
 	"github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	api "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	"github.com/onmetal/onmetal-api/pkg/cache/usagecache"
-	"github.com/onmetal/onmetal-api/pkg/ipam"
 	"github.com/onmetal/onmetal-api/pkg/utils"
-	"net"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -68,15 +67,16 @@ func (r *Reconciler) reconcileRequest(ctx context.Context, log logr.Logger, curr
 	}
 
 	if ipr.ipam == nil {
-		if len(ipr.object.Status.CIDRs) == 0 {
-			log.Info("parent is not yet ready", "parentID", ipr.objectId)
+		if len(ipr.allocations) == 0 {
+			log.Info("parent is not yet ready", "parent", ipr.objectId)
 			return utils.Succeeded()
 		}
+		_ = ipr
 	}
 
 	if len(current.requestSpecs) > 0 {
 		for i, c := range current.requestSpecs {
-			if c.Bits() > ipr.ipam.Bits() {
+			if c.Spec != nil && c.Spec.Bits() > ipr.ipam.Bits() {
 				return r.setStatus(ctx, log, current.object, v1alpha1.StateInvalid, "size (entry %d) %d bits too large", i, ipr.ipam.Bits())
 			}
 		}
@@ -89,44 +89,34 @@ func (r *Reconciler) reconcileRequest(ctx context.Context, log logr.Logger, curr
 			return utils.Requeue(err)
 		}
 
-		if len(current.object.Status.CIDRs) > 0 {
+		if len(current.requestSpecs) == len(current.object.Status.CIDRs) && !current.allocations.HasBusy() {
 			log.Info("already allocated")
 			return utils.Succeeded()
 		}
 
-		var allocated []*net.IPNet
+		var allocated AllocationStatusList
 		if ipr.pendingRequest != nil {
 			if ipr.pendingRequest.key != requestId.ObjectKey {
 				return utils.Succeeded()
 			}
-			log.Info("found pending request", "key", ipr.pendingRequest.key)
-			allocated = ipr.pendingRequest.CIDRs
+			log.Info("found pending request", "request", ipr.pendingRequest.key)
+			allocated = NewAllocationStatusListFromAllocations(ipr.pendingRequest.CIDRs)
 		} else {
-			allocated, err = ipr.Alloc(ctx, log, r.Client, current.requestSpecs, current.objectId.ObjectKey)
+			allocated, err = ipr.Alloc(ctx, log, r.Client, current)
 			if err != nil {
 				return utils.Requeue(err)
 			}
 		}
-		if len(allocated) != 0 {
-			log.Info("allocated", "cidrs", allocated)
-			newObj := current.object.DeepCopy()
-			newObj.Status.CIDRs = nil
-			for _, a := range allocated {
-				newObj.Status.CIDRs = append(newObj.Status.CIDRs, a.String())
-			}
-			if err := r.Client.Status().Patch(ctx, newObj, client.MergeFrom(current.object)); err != nil {
-				return utils.Requeue(err)
-			}
-			log.Info("allocation finished. triggering range", "key", ipr.objectId.ObjectKey)
-			// make sure to update cache with new object
-			current.object = newObj
-			r.Trigger(ipr.objectId)
-		} else {
-			if err != nil {
-				return r.setStatus(ctx, log, current.object, v1alpha1.StateError, err.Error())
-			}
-			return r.setStatus(ctx, log, current.object, v1alpha1.StateBusy, "requested range is busy")
+		log.Info("allocated", "allocated", allocated)
+		newObj := current.object.DeepCopy()
+		newObj.Status.CIDRs = allocated.GetAllocationStatusList()
+		if err := r.Client.Status().Patch(ctx, newObj, client.MergeFrom(current.object)); err != nil {
+			return utils.Requeue(err)
 		}
+		log.Info("allocation finished. trigger range", "objectkey", ipr.objectId.ObjectKey)
+		// make sure to update cache with new object -> trigger range object -> triggers its users
+		current.object = newObj
+		r.Trigger(ipr.objectId)
 	}
 	return r.ready(ctx, log, current.object, "")
 }
@@ -158,23 +148,16 @@ func (r *Reconciler) deleteRequest(ctx context.Context, log logr.Logger, current
 			}
 			if ipr != nil {
 				defer r.cache.release(log, rangeId.ObjectKey)
-				var allocated []*net.IPNet
+				var allocated AllocationStatusList
 				if ipr.pendingRequest != nil {
 					if ipr.pendingRequest.key != requestId.ObjectKey {
 						log.Info("operation on ipamrange still pending, delaying deletion")
 						return utils.Succeeded()
 					}
-					allocated = ipr.pendingRequest.CIDRs
-					log.Info("continuing releasing", "cidrs", allocated)
+					allocated = NewAllocationStatusListFromAllocations(ipr.pendingRequest.CIDRs)
+					log.Info("continuing release", "allocated", allocated)
 				} else {
-					var allocated ipam.CIDRList
-					for _, c := range current.object.Status.CIDRs {
-						_, cidr, err := net.ParseCIDR(c)
-						if err == nil {
-							allocated = append(allocated, cidr)
-						}
-					}
-					err = ipr.Free(ctx, log, r.Client, allocated, current.objectId.ObjectKey)
+					err = ipr.Free(ctx, log, r.Client, current)
 					if err != nil {
 						return utils.Requeue(err)
 					}

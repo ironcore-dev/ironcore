@@ -17,8 +17,10 @@
 package ipam
 
 import (
+	"fmt"
 	"math/big"
 	"net"
+	"sort"
 )
 
 var intOne = big.NewInt(1)
@@ -134,6 +136,18 @@ func CIDRto16(cidr *net.IPNet) *net.IPNet {
 	}
 }
 
+func CIDRContains(a, b *net.IPNet) bool {
+	if len(a.IP) != len(b.IP) {
+		return false
+	}
+	sa := CIDRNetMaskSize(a)
+	sb := CIDRNetMaskSize(b)
+	if sa > sb {
+		return false
+	}
+	return a.IP.Mask(a.Mask).Equal(b.IP.Mask(a.Mask))
+}
+
 func CIDRNet(cidr *net.IPNet) *net.IPNet {
 	net := *cidr
 	net.IP = CIDRFirstIP(cidr)
@@ -195,8 +209,215 @@ func CIDRExtend(cidr *net.IPNet) *net.IPNet {
 	}
 }
 
+func CIDRIsUpper(cidr *net.IPNet) bool {
+	ones, bits := cidr.Mask.Size()
+	delta := sub(cidr.Mask, net.CIDRMask(ones-1, bits))
+	return !isZero(and(delta, cidr.IP))
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 func IPMaskClone(mask net.IPMask) net.IPMask {
 	return append(mask[:0:0], mask...)
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+type CIDRList []*net.IPNet
+
+func CIDRLess(a, b *net.IPNet) bool {
+	d := IPCmp(a.IP, b.IP)
+	switch {
+	case d < 0:
+		return true
+	case d > 0:
+		return false
+	default:
+		return CIDRNetMaskSize(a) > CIDRNetMaskSize(b)
+	}
+}
+
+func (p CIDRList) Len() int           { return len(p) }
+func (p CIDRList) Less(i, j int) bool { return CIDRLess(p[i], p[j]) }
+func (p CIDRList) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+
+func (this *CIDRList) String() string {
+	sep := "["
+	end := ""
+	s := ""
+	for _, c := range *this {
+		s = fmt.Sprintf("%s%s%s", s, sep, c)
+		sep = ","
+		end = "]"
+	}
+	return s + end
+}
+
+func (this *CIDRList) Add(cidrs ...*net.IPNet) {
+	*this = append(*this, cidrs...)
+}
+
+func (this *CIDRList) DeleteIndex(i int) {
+	(*this) = append((*this)[:i], (*this)[i+1:]...)
+}
+
+func (this CIDRList) IsEmpty() bool {
+	return len(this) == 0
+}
+
+func (this CIDRList) Contains(ip net.IP) bool {
+	for _, c := range this {
+		if c.Contains(ip) {
+			return true
+		}
+	}
+	return false
+}
+
+func (this CIDRList) ContainsCIDR(cidr *net.IPNet) bool {
+	for _, c := range this {
+		if CIDRContains(c, cidr) {
+			return true
+		}
+	}
+	return false
+}
+
+func (this CIDRList) Copy() CIDRList {
+	var result CIDRList
+	for _, c := range this {
+		result = append(result, c)
+	}
+	return result
+}
+
+func (this CIDRList) Additional(b CIDRList) CIDRList {
+	a := this.Copy()
+	b = b.Copy()
+	a.Normalize()
+	b.Normalize()
+	return a.additional(b)
+}
+
+func (this *CIDRList) AddNormalized(list CIDRList) CIDRList {
+	toAdd := this.Additional(list)
+	this.Add(toAdd...)
+	this.Normalize()
+	return toAdd
+}
+
+func (this *CIDRList) DeleteNormalized(list CIDRList) CIDRList {
+	cur := *this
+	*this = list.Additional(*this)
+	toDel := this.Additional(cur)
+	return toDel
+}
+
+func (this CIDRList) additional(b CIDRList) CIDRList {
+	var result CIDRList
+
+	for _, o := range this {
+		fo := CIDRFirstIP(o)
+		lo := CIDRLastIP(o)
+
+		for len(b) > 0 {
+			n := b[0]
+			fn := CIDRFirstIP(n)
+
+			if IPCmp(fn, lo) > 0 {
+				break
+			}
+
+			b = b[1:]
+			if CIDRContains(o, n) {
+				continue
+			}
+
+			if CIDRContains(n, o) {
+				var rest CIDRList
+				addIncludes(&result, n, true, IPAdd(fo, -1))
+				addIncludes(&rest, n, false, IPAdd(CIDRLastIP(o), 1))
+				b = append(rest, b...)
+				continue
+			}
+			result = append(result, n)
+		}
+	}
+	result = append(result, b...)
+	sort.Sort(result)
+	return result
+}
+
+func (this CIDRList) Sort() {
+	sort.Sort(this)
+}
+
+func (this *CIDRList) Normalize() {
+	this.Sort()
+
+	i := 0
+	for i := range *this {
+		(*this)[i] = CIDRNet((*this)[i])
+	}
+	for i < len(*this) {
+		n, j := this.join(i)
+		if n != nil {
+			*this = append(append((*this)[:j], n), (*this)[j+2:]...)
+			i = j
+		} else {
+			i++
+		}
+	}
+}
+
+func (this CIDRList) join(index int) (*net.IPNet, int) {
+	cidr := this[index]
+	ones, bits := cidr.Mask.Size()
+	var upper int
+	var lower int
+	var oones int
+	if index < len(this)-1 {
+		if CIDRContains(this[index+1], this[index]) {
+			return this[index+1], index
+		}
+	}
+	if index > 0 {
+		if CIDRContains(this[index-1], this[index]) {
+			return this[index-1], index - 1
+		}
+	}
+	if CIDRIsUpper(cidr) {
+		if index == 0 {
+			return nil, -1
+		}
+		upper = index
+		lower = index - 1
+		oones, _ = this[lower].Mask.Size()
+	} else {
+		if index == len(this)-1 {
+			return nil, -1
+		}
+		lower = index
+		upper = index + 1
+		oones, _ = this[upper].Mask.Size()
+	}
+	if ones != oones {
+		return nil, -1
+	}
+	if IPAdd(this[lower].IP, 1<<(bits-ones)).Equal(this[upper].IP) {
+		return CIDRExtend(this[lower]), lower
+	}
+	return nil, -1
+}
+
+func (this CIDRList) Equal(list CIDRList) bool {
+	if len(this) != len(list) {
+		return false
+	}
+	for i, e := range this {
+		if !CIDREqual(e, list[i]) {
+			return false
+		}
+	}
+	return true
 }

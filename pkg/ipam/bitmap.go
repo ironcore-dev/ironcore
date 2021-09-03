@@ -98,6 +98,11 @@ func (this *Bitmap) busy(addr, reqsize int) bool {
 	return true
 }
 
+func (this *Bitmap) get(addr, reqsize int) Bitmap {
+	m := bitmapHostMask(reqsize) << addr
+	return (*this) & m
+}
+
 func (this *Bitmap) free(addr, reqsize int) bool {
 	m := bitmapHostMask(reqsize) << addr
 

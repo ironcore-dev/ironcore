@@ -18,11 +18,12 @@ package ipamrange
 
 import (
 	"context"
+	"reflect"
+
 	"github.com/go-logr/logr"
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	api "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	"github.com/onmetal/onmetal-api/pkg/utils"
-	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -54,12 +55,19 @@ func (r *Reconciler) reconcileRange(ctx context.Context, log logr.Logger, curren
 		if req != nil {
 			log.Info("found status for pending request", "cidrs", req.object.Status.CIDRs)
 			defer r.cache.release(log, current.pendingRequest.key)
-			var list []string
-			for _, c := range current.pendingRequest.CIDRs {
-				list = append(list, c.String())
+			var list AllocationList
+			for _, c := range req.object.Status.CIDRs {
+				if c.Status != api.AllocationStateAllocated {
+					continue
+				}
+				a, err := ParseAllocation(&c.CIDRAllocation)
+				if err != nil {
+					continue
+				}
+				list.Add(a)
 			}
-			log.Info("expected status for pending request", "cidrs", list)
-			if !reflect.DeepEqual(req.object.Status.CIDRs, list) {
+			log.Info("expected status for pending request", "request", list)
+			if !reflect.DeepEqual(current.pendingRequest.CIDRs, list) {
 				log.Info("expected status not yet set in pending request")
 				return utils.Succeeded()
 			}
@@ -69,7 +77,7 @@ func (r *Reconciler) reconcileRange(ctx context.Context, log logr.Logger, curren
 				log.Info("releasing pending allocations", "cidrs", current.pendingRequest.CIDRs)
 			}
 			for _, c := range current.pendingRequest.CIDRs {
-				current.ipam.Free(c)
+				current.ipam.Free(c.CIDR)
 			}
 		}
 		newCurrent.Status.PendingRequest = nil

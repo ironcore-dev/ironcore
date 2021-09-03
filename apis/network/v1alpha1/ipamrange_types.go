@@ -43,24 +43,39 @@ type IPAMRangeSpec struct {
 }
 
 const (
-	ModeRoundRobin = "RoundRobin"
-	ModeFirstMatch = "FirstMatch"
+	ModeRoundRobin           = "RoundRobin"
+	ModeFirstMatch           = "FirstMatch"
+	AllocationStateAllocated = "Allocated"
+	AllocationStateBusy      = "Busy"
+	AllocationStateFailed    = "Failed"
 )
 
 // IPAMRangeStatus defines the observed state of IPAMRange
 type IPAMRangeStatus struct {
 	common.StateFields `json:",inline"`
 	// CIDRs is a list of effective cidrs which belong to this IPAMRange
-	CIDRs           []string            `json:"cidrs,omitempty"`
-	AllocationState []string            `json:"allocationState,omitempty"`
-	RoundRobinState []string            `json:"roundRobinState,omitempty"`
-	PendingRequest  *IPAMPendingRequest `json:"pendingRequests,omitempty"`
+	CIDRs           []CIDRAllocationStatus `json:"cidrs,omitempty"`
+	AllocationState []string               `json:"allocationState,omitempty"`
+	RoundRobinState []string               `json:"roundRobinState,omitempty"`
+	PendingRequest  *IPAMPendingRequest    `json:"pendingRequests,omitempty"`
+}
+
+type CIDRAllocation struct {
+	Request string `json:"request"`
+	CIDR    string `json:"cidr"`
+}
+
+// CIDRAllocationStatus is the result of a CIDR allocation request
+type CIDRAllocationStatus struct {
+	CIDRAllocation `json:",inline"`
+	Status         string `json:"status"`
+	Message        string `json:"message,omitempty"`
 }
 
 type IPAMPendingRequest struct {
-	Name      string   `json:"name"`
-	Namespace string   `json:"namespace"`
-	CIDRs     []string `json:"cidrs,omitempty"`
+	Name      string           `json:"name"`
+	Namespace string           `json:"namespace"`
+	CIDRs     []CIDRAllocation `json:"cidrs,omitempty"`
 }
 
 //+kubebuilder:object:root=true

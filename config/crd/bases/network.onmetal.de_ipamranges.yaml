@@ -93,7 +93,22 @@ spec:
                 description: CIDRs is a list of effective cidrs which belong to this
                   IPAMRange
                 items:
-                  type: string
+                  description: CIDRAllocationStatus is the result of a CIDR allocation
+                    request
+                  properties:
+                    cidr:
+                      type: string
+                    message:
+                      type: string
+                    request:
+                      type: string
+                    status:
+                      type: string
+                  required:
+                  - cidr
+                  - request
+                  - status
+                  type: object
                 type: array
               conditions:
                 description: Conditions represents the status for individual operators
@@ -172,7 +187,15 @@ spec:
                 properties:
                   cidrs:
                     items:
-                      type: string
+                      properties:
+                        cidr:
+                          type: string
+                        request:
+                          type: string
+                      required:
+                      - cidr
+                      - request
+                      type: object
                     type: array
                   name:
                     type: string

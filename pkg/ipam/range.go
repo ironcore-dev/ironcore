@@ -23,6 +23,13 @@ import (
 	"strings"
 )
 
+func CIDRRange(cidr *net.IPNet) *IPRange {
+	return &IPRange{
+		Start: CIDRFirstIP(cidr),
+		End:   CIDRLastIP(cidr),
+	}
+}
+
 type IPRange struct {
 	Start net.IP
 	End   net.IP
@@ -112,9 +119,19 @@ func MustParseIPRanges(str ...string) IPRanges {
 // IPRanges attaches the methods of Interface to []string, sorting in increasing order.
 type IPRanges []*IPRange
 
-func (p IPRanges) Len() int           { return len(p) }
-func (p IPRanges) Less(i, j int) bool { return IPCmp(p[i].Start, p[j].Start) < 0 }
-func (p IPRanges) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+func (p IPRanges) Len() int { return len(p) }
+func (p IPRanges) Less(i, j int) bool {
+	d := IPCmp(p[i].Start, p[j].Start)
+	switch {
+	case d < 0:
+		return true
+	case d > 0:
+		return false
+	default:
+		return IPCmp(p[i].End, p[j].End) < 0
+	}
+}
+func (p IPRanges) Swap(i, j int) { p[i], p[j] = p[j], p[i] }
 
 func (this IPRanges) String() string {
 	if len(this) == 0 {
@@ -150,51 +167,6 @@ func NormalizeIPRanges(ranges ...*IPRange) IPRanges {
 		}
 	}
 	return ranges
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-type CIDRList []*net.IPNet
-
-func (p CIDRList) Len() int           { return len(p) }
-func (p CIDRList) Less(i, j int) bool { return IPCmp(p[i].IP, p[j].IP) < 0 }
-func (p CIDRList) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
-
-func (this *CIDRList) String() string {
-	sep := "["
-	end := ""
-	s := ""
-	for _, c := range *this {
-		s = fmt.Sprintf("%s%s%s", s, sep, c)
-		sep = ","
-		end = "]"
-	}
-	return s + end
-}
-
-func (this *CIDRList) Add(cidrs ...*net.IPNet) {
-	*this = append(*this, cidrs...)
-}
-
-func (this CIDRList) IsEmpty() bool {
-	return len(this) == 0
-}
-
-func (this CIDRList) Contains(ip net.IP) bool {
-	for _, c := range this {
-		if c.Contains(ip) {
-			return true
-		}
-	}
-	return false
-}
-
-func (this CIDRList) Copy() CIDRList {
-	var result CIDRList
-	for _, c := range this {
-		result = append(result, c)
-	}
-	return result
 }
 
 func addExcludes(excls *CIDRList, cidr *net.IPNet, lower bool, border net.IP) bool {
@@ -325,8 +297,12 @@ func Includes(ranges ...*IPRange) (CIDRList, error) {
 				cidr = CIDRExtend(cidr)
 			}
 			l, u := CIDRSplit(cidr)
-			addIncludes(&incl, l, false, r.Start)
-			addIncludes(&incl, u, true, r.End)
+			if l == nil {
+				incl.Add(cidr)
+			} else {
+				addIncludes(&incl, l, false, r.Start)
+				addIncludes(&incl, u, true, r.End)
+			}
 		}
 
 		if len(incl) > 1 {
