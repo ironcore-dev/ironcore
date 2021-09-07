@@ -52,6 +52,9 @@ fmt: ## Run go fmt against code.
 vet: ## Run go vet against code.
 	go vet ./...
 
+lint:
+	golangci-lint run --skip-dirs pkg/ipam
+
 docs: ## Run go generate to generate API reference documentation.
 	go generate ./...
 
