@@ -25,6 +25,8 @@ const (
 	DefaultReasonField = "Reason"
 	// DefaultMessageField field is the default name for a condition's message field.
 	DefaultMessageField = "Message"
+	// DefaultObservedGenerationField field is the default name for a condition's observed generation field.
+	DefaultObservedGenerationField = "ObservedGeneration"
 )
 
 func enforceStruct(cond interface{}) (reflect.Value, error) {
@@ -121,7 +123,7 @@ func direct(v reflect.Value) reflect.Value {
 // setFieldConverted sets the specified field to the given value, potentially converting it before.
 func setFieldConverted(v reflect.Value, name string, newValue interface{}) error {
 	f := v.FieldByName(name)
-	if !v.IsValid() {
+	if f == (reflect.Value{}) {
 		return fmt.Errorf("type %T has no field %q", v.Interface(), name)
 	}
 
@@ -146,6 +148,10 @@ func setFieldConverted(v reflect.Value, name string, newValue interface{}) error
 	return nil
 }
 
+func valueHasField(v reflect.Value, name string) bool {
+	return v.FieldByName(name) != (reflect.Value{})
+}
+
 type Accessor struct {
 	typeField               string
 	statusField             string
@@ -153,6 +159,7 @@ type Accessor struct {
 	lastTransitionTimeField string
 	reasonField             string
 	messageField            string
+	observedGenerationField string
 	clock                   clock.Clock
 }
 
@@ -261,7 +268,7 @@ func (a *Accessor) HasLastUpdateTime(cond interface{}) (bool, error) {
 		return false, err
 	}
 
-	return v.FieldByName(a.lastUpdateTimeField).IsValid(), nil
+	return valueHasField(v, a.lastUpdateTimeField), nil
 }
 
 // MustHasLastUpdateTime checks if the given condition has a 'LastUpdateTime' field.
@@ -356,7 +363,7 @@ func (a *Accessor) HasLastTransitionTime(cond interface{}) (bool, error) {
 		return false, err
 	}
 
-	return v.FieldByName(a.lastTransitionTimeField).IsValid(), nil
+	return valueHasField(v, a.lastTransitionTimeField), nil
 }
 
 // MustHasLastTransitionTime checks if the given condition has a 'LastTransitionTime' field.
@@ -538,6 +545,76 @@ func (a *Accessor) MustSetMessage(condPtr interface{}, message string) {
 	utilruntime.Must(a.SetMessage(condPtr, message))
 }
 
+// HasObservedGeneration checks if the given condition has a observed generation field.
+//
+// It errors if the given value is not a struct.
+func (a *Accessor) HasObservedGeneration(cond interface{}) (bool, error) {
+	v, err := enforceStruct(cond)
+	if err != nil {
+		return false, err
+	}
+
+	return valueHasField(v, a.observedGenerationField), nil
+}
+
+// MustHasObservedGeneration checks if the given condition has a observed generation field.
+//
+// It panics if the given value is not a struct.
+func (a *Accessor) MustHasObservedGeneration(cond interface{}) bool {
+	ok, err := a.HasObservedGeneration(cond)
+	utilruntime.Must(err)
+	return ok
+}
+
+// ObservedGeneration gets the observed generation of the given condition.
+//
+// It errors if the given value is not a struct or does not have a field
+// that can be converted to the input format.
+func (a *Accessor) ObservedGeneration(cond interface{}) (int64, error) {
+	v, err := enforceStruct(cond)
+	if err != nil {
+		return 0, err
+	}
+
+	var gen int64
+	if err := getAndConvertField(v, a.observedGenerationField, &gen); err != nil {
+		return 0, err
+	}
+
+	return gen, nil
+}
+
+// MustObservedGeneration gets the observed generation of the given condition.
+//
+// It panics if the given value is not a struct or does not have a field
+// that can be converted to the input format.
+func (a *Accessor) MustObservedGeneration(cond interface{}) int64 {
+	gen, err := a.ObservedGeneration(cond)
+	utilruntime.Must(err)
+	return gen
+}
+
+// SetObservedGeneration sets the observed generation of the given condition.
+//
+// It errors if the given value is not a pointer to a struct or does not have a field
+// that can be converted to the given format.
+func (a *Accessor) SetObservedGeneration(condPtr interface{}, gen int64) error {
+	v, err := enforcePtrToStruct(condPtr)
+	if err != nil {
+		return err
+	}
+
+	return setFieldConverted(v, a.observedGenerationField, gen)
+}
+
+// MustSetObservedGeneration sets the observed generation of the given condition.
+//
+// It panics if the given value is not a pointer to a struct or does not have a field
+// that can be converted to the given format.
+func (a *Accessor) MustSetObservedGeneration(condPtr interface{}, gen int64) {
+	utilruntime.Must(a.SetObservedGeneration(condPtr, gen))
+}
+
 // MustSetMessage sets the message of the given condition.
 //
 // It panics if the given value is not a struct or does not have a field
@@ -675,7 +752,7 @@ func (a *Accessor) Update(condPtr interface{}, opts ...UpdateOption) error {
 		}
 	}
 
-	if err := a.SetLastUpdateTime(condPtr, now); err != nil {
+	if err := a.SetLastUpdateTimeIfExists(condPtr, now); err != nil {
 		return err
 	}
 
@@ -780,6 +857,19 @@ func (u UpdateReason) ApplyUpdate(a *Accessor, condPtr interface{}) error {
 	return a.SetReason(condPtr, string(u))
 }
 
+// UpdateObservedGeneration implements UpdateOption to set the observed generation.
+type UpdateObservedGeneration int64
+
+// ApplyUpdate implements UpdateOption.
+func (u UpdateObservedGeneration) ApplyUpdate(a *Accessor, condPtr interface{}) error {
+	return a.SetObservedGeneration(condPtr, int64(u))
+}
+
+// UpdateObserved is a shorthand for updating the observed generation from a metav1.Object's generation.
+func UpdateObserved(obj metav1.Object) UpdateObservedGeneration {
+	return UpdateObservedGeneration(obj.GetGeneration())
+}
+
 // AccessorOptions are options to create an Accessor.
 //
 // If left blank, defaults are being used via AccessorOptions.SetDefaults.
@@ -790,6 +880,7 @@ type AccessorOptions struct {
 	LastTransitionTimeField string
 	ReasonField             string
 	MessageField            string
+	ObservedGenerationField string
 
 	Clock clock.Clock
 }
@@ -814,6 +905,9 @@ func (o *AccessorOptions) SetDefaults() {
 	if o.MessageField == "" {
 		o.MessageField = DefaultMessageField
 	}
+	if o.ObservedGenerationField == "" {
+		o.ObservedGenerationField = DefaultObservedGenerationField
+	}
 	if o.Clock == nil {
 		o.Clock = clock.RealClock{}
 	}
@@ -829,6 +923,7 @@ func NewAccessor(opts AccessorOptions) *Accessor {
 		lastTransitionTimeField: opts.LastTransitionTimeField,
 		reasonField:             opts.ReasonField,
 		messageField:            opts.MessageField,
+		observedGenerationField: opts.ObservedGenerationField,
 		clock:                   opts.Clock,
 	}
 }

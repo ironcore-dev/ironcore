@@ -18,31 +18,56 @@ package v1alpha1
 
 import (
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// DefaultSSHPublicKeyDataKey is the default data key for the common.ConfigMapKeySelector in an SSHPublicKeySpec.
+const DefaultSSHPublicKeyDataKey = "id_rsa.pub"
+
 // SSHPublicKeySpec defines the desired state of SSHPublicKey
 type SSHPublicKeySpec struct {
-	// SSHPublicKey is the SSH public key string
-	SSHPublicKey string `json:"sshPublicKey"`
-	// Description describes the purpose of the ssh key
-	Description string `json:"description,omitempty"`
-	// ExpirationDate indicates until when this public key is valid
-	ExpirationDate metav1.Time `json:"expirationDate,omitempty"`
+	// ConfigMapRef is the reference to a key in a ConfigMap resource
+	// containing the public key data. If key is not specified, it defaults to 'id_rsa.pub'.
+	ConfigMapRef common.ConfigMapKeySelector `json:"configMapRef"`
 }
 
 // SSHPublicKeyStatus defines the observed state of SSHPublicKey
 type SSHPublicKeyStatus struct {
-	common.StateFields `json:",inline"`
-	// FingerPrint is the finger print of the ssh public key
-	FingerPrint string `json:"fingerPrint,omitempty"`
-	// KeyLength is the byte length of the ssh key
+	// Conditions are a list of elements indicating the status of various properties of an SSHPublicKey.
+	Conditions []SSHPublicKeyCondition `json:"conditions,omitempty"`
+	// Algorithm is the algorithm used for the public key.
+	Algorithm string `json:"algorithm,omitempty"`
+	// Fingerprint is the fingerprint of the ssh public key.
+	Fingerprint string `json:"fingerprint,omitempty"`
+	// KeyLength is the byte length of the ssh key.
 	// +kubebuilder:validation:Minimum:=0
 	KeyLength int `json:"keyLength,omitempty"`
-	// Algorithm is the algorithm used to generate the ssh key
-	Algorithm string `json:"algorithm,omitempty"`
-	// PublicKey is the PEM encoded public key
-	PublicKey string `json:"publicKey,omitempty"`
+}
+
+// SSHPublicKeyConditionType is a possible type of SSHPublicKeyCondition.
+type SSHPublicKeyConditionType string
+
+const (
+	SSHPublicKeyAvailable SSHPublicKeyConditionType = "Available"
+)
+
+// SSHPublicKeyCondition is a condition of an SSHPublicKey.
+type SSHPublicKeyCondition struct {
+	// Type is the SSHPublicKeyConditionType of the condition.
+	Type SSHPublicKeyConditionType `json:"type"`
+	// Status is the corev1.ConditionStatus of the condition.
+	Status corev1.ConditionStatus `json:"status"`
+	// Reason is a machine-readable indication of why the condition is in a certain state.
+	Reason string `json:"reason"`
+	// Message is a human-readable explanation of why the condition has a certain reason / state.
+	Message string `json:"message"`
+	// ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
+	// LastUpdateTime is the last time a condition has been updated.
+	LastUpdateTime metav1.Time `json:"lastUpdateTime,omitempty"`
+	// LastTransitionTime is the last time the status of a condition has transitioned from one state to another.
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
 }
 
 //+kubebuilder:object:root=true

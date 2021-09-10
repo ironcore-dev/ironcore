@@ -4,13 +4,18 @@ metadata:
   name: sshpublickey-sample
   namespace: scope-23423424
 spec:
-  sshPublicKey: ssh-rsa jksdlkjadljasldjaldjasljdlasjdl
-  description: "my awesome key"
-  expirationDate: 03/14/2017
+  configMapRef:
+    name: my-cm
+    ## It is possible to specify custom keys in a config map
+    ## where the public key data is located at.
+    #key: my-custom-key
 #status:
-#  state: Vailid/Expired
-#  message: "All good"
-#  fingerPrint: 08:92:43:34:32
-#  keyLength: 2048
-#  algorithm: RSA/ECDSA ...
-#  publicKey: kjlkjsldjsaldjsldjlj # PEM encoded public key
+#  algorithm: ssh-rsa
+#  # An md5 fingerprint of the key.
+#  fingerprint: c0ffee
+#  keyLength: 100
+#  conditions:
+#    - type: Available
+#      reason: Valid
+#      message: "The key is well-formed."
+#      observedGeneration: 1
