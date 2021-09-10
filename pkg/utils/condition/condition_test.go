@@ -36,6 +36,7 @@ var _ = Describe("Condition", func() {
 			metaNow metav1.Time
 			acc     *condition.Accessor
 
+			metaCond    metav1.Condition
 			deployCond  appsv1.DeploymentCondition
 			deployConds []appsv1.DeploymentCondition
 			custCond    TimePtrCondition
@@ -47,6 +48,14 @@ var _ = Describe("Condition", func() {
 			acc = condition.NewAccessor(condition.AccessorOptions{
 				Clock: clock.NewFakeClock(now),
 			})
+			metaCond = metav1.Condition{
+				Type:               "TimePtr",
+				Status:             metav1.ConditionTrue,
+				LastTransitionTime: metav1.Unix(1, 0),
+				ObservedGeneration: 1,
+				Reason:             "MinimumReplicasAvailable",
+				Message:            "ReplicaSet \"foo\" has successfully progressed.",
+			}
 			deployCond = appsv1.DeploymentCondition{
 				Type:               appsv1.DeploymentAvailable,
 				Status:             corev1.ConditionTrue,
@@ -232,6 +241,26 @@ var _ = Describe("Condition", func() {
 			It("should set the message on a custom condition", func() {
 				Expect(acc.SetMessage(&custCond, "OtherMessage")).To(Succeed())
 				Expect(custCond.Message).To(Equal("OtherMessage"))
+			})
+		})
+
+		Describe("ObservedGeneration", func() {
+			It("should retrieve the observed generation", func() {
+				Expect(acc.ObservedGeneration(metaCond)).To(Equal(metaCond.ObservedGeneration))
+			})
+		})
+
+		Describe("SetObservedGeneration", func() {
+			It("should set the observed generation", func() {
+				Expect(acc.SetObservedGeneration(&metaCond, 2)).To(Succeed())
+				Expect(metaCond.ObservedGeneration).To(Equal(int64(2)))
+			})
+		})
+
+		Describe("HasObservedGeneration", func() {
+			It("should report whether the condition has an observed generation field", func() {
+				Expect(acc.HasObservedGeneration(metaCond)).To(BeTrue())
+				Expect(acc.HasObservedGeneration(custCond)).To(BeFalse())
 			})
 		})
 

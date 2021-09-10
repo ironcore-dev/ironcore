@@ -16,6 +16,8 @@
 
 package v1alpha1
 
+import corev1 "k8s.io/api/core/v1"
+
 //+kubebuilder:object:generate=true
 
 type Availability []RegionAvailability
@@ -68,6 +70,18 @@ type ScopedKindReference struct {
 	// APIGroup is the API group of the object
 	APIGroup        string `json:"apiGroup"`
 	ScopedReference `json:",inline"`
+}
+
+// ConfigMapKeySelector is a reference to a specific 'key' within a ConfigMap resource.
+// In some instances, `key` is a required field.
+type ConfigMapKeySelector struct {
+	// The name of the ConfigMap resource being referred to.
+	corev1.LocalObjectReference `json:",inline"`
+	// The key of the entry in the ConfigMap resource's `data` field to be used.
+	// Some instances of this field may be defaulted, in others it may be
+	// required.
+	// +optional
+	Key string `json:"key,omitempty"`
 }
 
 // TODO: create marshal/unmarshal functions

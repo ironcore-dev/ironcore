@@ -18,6 +18,7 @@ package main
 
 import (
 	"flag"
+	"github.com/onmetal/onmetal-api/controllers/compute/sshpublickey"
 	"github.com/onmetal/onmetal-api/controllers/network/ipamrange"
 	"os"
 
@@ -174,7 +175,7 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "Image")
 		os.Exit(1)
 	}
-	if err = (&computecontrollers.SSHPublicKeyReconciler{
+	if err = (&sshpublickey.Reconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
