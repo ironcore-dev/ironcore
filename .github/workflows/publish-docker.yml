@@ -32,7 +32,7 @@ jobs:
             type=ref,event=pr
             type=sha
           flavor: |
-            latest=auto
+            latest=${{ github.ref == 'refs/heads/main' }}
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
         with:
