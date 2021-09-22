@@ -34,20 +34,28 @@ import (
 const (
 	SuccessfulAllocationMessage = "allocation successful"
 	SuccessfulUsageMessage      = "used as specified"
+	failBusyAllocationMessage   = "allocation %s not possible in given range"
 )
 
+func FailBusyAllocationMessage(allocation string) string {
+	return fmt.Sprintf(failBusyAllocationMessage, allocation)
+}
+
 type IPAM struct {
-	lock           sync.Mutex
-	lockCount      int
-	object         *api.IPAMRange
-	objectId       utils.ObjectId
-	ipam           *ipam.IPAM
-	error          string
-	deleted        bool
+	lock      sync.Mutex
+	lockCount int
+	object    *api.IPAMRange
+	objectId  utils.ObjectId
+	ipam      *ipam.IPAM
+	error     string
+	deleted   bool
+	lastUsage time.Time
+	// two phase commit for range allocation
 	pendingRequest *PendingRequest
-	lastUsage      time.Time
-	requestSpecs   RequestSpecList
-	allocations    AllocationStatusList
+	// requested ranges
+	requestSpecs RequestSpecList
+	// currently assigned ranges
+	allocations AllocationStatusList
 }
 
 type PendingRequest struct {
@@ -63,9 +71,12 @@ func newIPAM(log logr.Logger, obj *api.IPAMRange) *IPAM {
 	return result
 }
 
-func (i *IPAM) Alloc(ctx context.Context, log logr.Logger, clt client.Client, request *IPAM) (AllocationStatusList, error) {
+func (i *IPAM) Alloc(ctx context.Context, log logr.Logger, clt client.Client, request *IPAM, reqSpecs RequestSpecList) (AllocationStatusList, error) {
+	if len(reqSpecs) == 0 {
+		log.Info("no outstanding allocations pending")
+		return nil, nil
+	}
 	var allocated AllocationStatusList
-	reqSpecs := request.requestSpecs.PendingSpecs(request.allocations)
 	log.Info("allocating", "reqSpecs", reqSpecs)
 	for _, c := range reqSpecs {
 		if !c.IsValid() {
@@ -77,7 +88,7 @@ func (i *IPAM) Alloc(ctx context.Context, log logr.Logger, clt client.Client, re
 			if cidr != nil {
 				state = api.AllocationStateFailed
 			} else {
-				err = fmt.Errorf("allocation %s not possible in given range", c.Request)
+				err = fmt.Errorf(failBusyAllocationMessage, c.Request)
 			}
 			c.Error = err.Error()
 			allocated = append(allocated, &AllocationStatus{
@@ -109,8 +120,10 @@ func (i *IPAM) Alloc(ctx context.Context, log logr.Logger, clt client.Client, re
 			}
 			return nil, err
 		}
+		log.Info("allocated in range", "allocated", allocated)
+	} else {
+		log.Info("no new allocations")
 	}
-	log.Info("allocated in range", "allocated", allocated)
 	return allocated, nil
 }
 
@@ -182,14 +195,16 @@ func (i *IPAM) updateRange(ctx context.Context, clt client.Client, allocated All
 // at least one ready -> state = ready
 // all busy -> state = busy
 // none ready + at least one failed -> state = failed
-func (i *IPAM) determineState() *api.IPAMRange {
+func (i *IPAM) determineState(allocations AllocationStatusList) *api.IPAMRange {
 	newObj := i.object.DeepCopy()
-	state := common.StatePending
+	newObj.Status.CIDRs = allocations.GetAllocationStatusList()
+	state := ""
 	msg := ""
-	for _, a := range i.object.Status.CIDRs {
+	for _, a := range allocations {
 		switch a.Status {
 		case api.AllocationStateAllocated:
 			state = common.StateReady
+			msg = "request is ready for allocation"
 		case api.AllocationStateBusy:
 			msg = fmt.Sprintf("%s, %s: %s", msg, a.Request, a.Message)
 			if state == "" {
@@ -202,19 +217,17 @@ func (i *IPAM) determineState() *api.IPAMRange {
 			msg = fmt.Sprintf("%s, %s: %s", msg, a.Request, a.Message)
 		}
 	}
+	if state == "" {
+		if len(allocations) == 0 {
+			state = common.StateReady
+			msg = "empty request"
+		} else {
+			state = common.StatePending
+			msg = "request is pending"
+		}
+	}
 	if msg != "" {
 		msg = msg[2:]
-	}
-	if len(i.object.Status.CIDRs) != len(i.object.Spec.CIDRs) {
-		state = common.StatePending
-	}
-	if msg == "" {
-		switch state {
-		case common.StatePending:
-			msg = "request is pending"
-		case common.StateReady:
-			msg = "request is ready for allocation"
-		}
 	}
 	newObj.Status.State = state
 	newObj.Status.Message = msg
@@ -233,7 +246,6 @@ func (i *IPAM) updateFrom(log logr.Logger, obj *api.IPAMRange) {
 			break
 		}
 	}
-	ranges := allocations.AsRanges()
 	roundRobin := false
 	switch obj.Spec.Mode {
 	case "", api.ModeFirstMatch:
@@ -246,6 +258,7 @@ func (i *IPAM) updateFrom(log logr.Logger, obj *api.IPAMRange) {
 
 	var ipr *ipam.IPAM
 	if err == nil && found {
+		ranges := allocations.AsRanges()
 		log.Info("ranges found", "ranges", ranges)
 		if len(ranges) > 0 {
 			ipr, err = ipam.NewIPAMForRanges(ranges)
@@ -307,4 +320,37 @@ func (i *IPAM) updateFrom(log logr.Logger, obj *api.IPAMRange) {
 	if err != nil {
 		i.error = err.Error()
 	}
+}
+
+func (i *IPAM) updateSpecFrom(obj *api.IPAMRange) {
+	var specs RequestSpecList
+	var err error
+	for _, c := range obj.Spec.CIDRs {
+		spec := ParseRequestSpec(c)
+		specs = append(specs, spec)
+	}
+	if len(specs.InValidSpecs()) != 0 && len(specs.ValidSpecs()) == 0 {
+		err = specs.Error()
+	}
+	i.requestSpecs = specs
+	if err != nil {
+		i.error = err.Error()
+	}
+}
+
+func (i *IPAM) updateAllocations(allocations AllocationStatusList) {
+	if i.ipam == nil {
+		ranges := allocations.AsRanges()
+		if len(ranges) > 0 {
+			i.ipam, _ = ipam.NewIPAMForRanges(ranges)
+		}
+	} else {
+		//newRanges := allocations.AsCIDRList()
+		//currentRanges := i.ipam.Ranges()
+		//toAdd := currentRanges.Additional(newRanges)
+		//toDel := newRanges.Additional(currentRanges)
+		i.ipam.AddCIDRs(allocations.AsCIDRList())
+		//i.ipam.DeleteCIDRs(toDel)
+	}
+	i.allocations = allocations
 }

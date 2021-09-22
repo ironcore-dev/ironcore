@@ -41,22 +41,23 @@ func (r *RequestSpecList) Add(element ...*RequestSpec) {
 	(*r) = append(*r, element...)
 }
 
-func (r RequestSpecList) PendingSpecs(list AllocationStatusList) RequestSpecList {
-	newList := list.Copy()
-	var result RequestSpecList
+func (r RequestSpecList) PendingActions(list AllocationStatusList) (allocationList RequestSpecList, deletionList, otherList AllocationStatusList) {
+	deletionList = list.Copy()
 	for _, spec := range r {
 		if spec.IsValid() {
-			if index := list.LookUp(spec.Request); index >= 0 {
-				newList = append(newList[0:index], newList[index+1:]...)
-				if list[index].CIDR == nil {
-					result = append(result, spec)
+			if index := deletionList.LookUp(spec.Request); index >= 0 {
+				if deletionList[index].CIDR == nil {
+					allocationList = append(allocationList, spec)
+				} else {
+					otherList = append(otherList, deletionList[index])
 				}
+				deletionList = append(deletionList[0:index], deletionList[index+1:]...)
 			} else {
-				result = append(result, spec)
+				allocationList = append(allocationList, spec)
 			}
 		}
 	}
-	return result
+	return
 }
 
 func (r RequestSpecList) ValidSpecs() RequestSpecList {

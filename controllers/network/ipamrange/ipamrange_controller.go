@@ -113,54 +113,56 @@ func (r *Reconciler) HandleReconcile(ctx context.Context, log logr.Logger, obj *
 			return result, err
 		}
 	} else {
-		if current.ipam == nil {
-			if len(current.requestSpecs) == 0 {
-				return r.invalid(ctx, log, obj, "at least one cidr must be specified for root (no parent) ipam range")
-			}
-			var cidrs []api.CIDRAllocationStatus
-			for i, c := range current.requestSpecs {
-				if !c.IsValid() {
-					cidrs = append(cidrs, api.CIDRAllocationStatus{
-						CIDRAllocation: api.CIDRAllocation{
-							Request: c.Request,
-							CIDR:    "",
-						},
-						Status:  api.AllocationStateFailed,
-						Message: c.Error,
-					})
-					continue
-				}
-				if !c.Spec.IsCIDR() {
-					return r.invalid(ctx, log, obj, "request spec %d does is not a valid cidr %s for a root ipam range", i, c)
-				}
-				_, cidr, _ := net.ParseCIDR(c.Request)
-				if ipam.CIDRHostMaskSize(cidr) == 0 {
-					// TODO: rethink IP delegation
-					return r.invalid(ctx, log, obj, "root cidr must have more than one ip address")
-				}
-				cidrs = append(cidrs, api.CIDRAllocationStatus{
-					CIDRAllocation: api.CIDRAllocation{
+		if len(current.requestSpecs) == 0 {
+			return r.invalid(ctx, log, obj, "at least one cidr must be specified for root (no parent) ipam range")
+		}
+		var cidrs AllocationStatusList
+		for i, c := range current.requestSpecs {
+			if !c.IsValid() {
+				cidrs = append(cidrs, &AllocationStatus{
+					Allocation: Allocation{
 						Request: c.Request,
-						CIDR:    c.Request,
+						CIDR:    nil,
 					},
-					Status:  api.AllocationStateAllocated,
-					Message: SuccessfulUsageMessage,
+					Status:  api.AllocationStateFailed,
+					Message: c.Error,
 				})
+				continue
 			}
-			newObj := current.object.DeepCopy()
-			newObj.Status.CIDRs = cidrs
-			if !reflect.DeepEqual(newObj, obj) {
-				log.Info("setting range status", "requests", current.requestSpecs)
-				if err := r.Status().Patch(ctx, newObj, client.MergeFrom(obj)); err != nil {
-					return utils.Requeue(err)
-				}
+			if !c.Spec.IsCIDR() {
+				return r.invalid(ctx, log, obj, "request spec %d does is not a valid cidr %s for a root ipam range", i, c)
+			}
+			_, cidr, _ := net.ParseCIDR(c.Request)
+			if ipam.CIDRHostMaskSize(cidr) == 0 {
+				// TODO: rethink IP delegation
+				return r.invalid(ctx, log, obj, "root cidr must have more than one ip address")
+			}
+			cidrs = append(cidrs, &AllocationStatus{
+				Allocation: Allocation{
+					Request: c.Request,
+					CIDR:    cidr,
+				},
+				Status:  api.AllocationStateAllocated,
+				Message: SuccessfulUsageMessage,
+			})
+		}
+		newObj := current.object.DeepCopy()
+		newObj.Status.CIDRs = cidrs.GetAllocationStatusList()
+		if !reflect.DeepEqual(newObj, obj) {
+			log.Info("setting range status", "requests", current.requestSpecs)
+			if err := r.Status().Patch(ctx, newObj, client.MergeFrom(obj)); err != nil {
+				return utils.Requeue(err)
+			}
+			if current.ipam == nil {
 				// update self in cache
 				current.updateFrom(log, newObj)
-				// trigger all users of this ipamrange
-				log.Info("trigger all users of range", "key", current.objectId.ObjectKey)
-				users := r.GetUsageCache().GetUsersForRelationToGK(current.objectId, "uses", api.IPAMRangeGK)
-				r.TriggerAll(users)
+			} else {
+				current.updateAllocations(cidrs)
 			}
+			// trigger all users of this ipamrange
+			log.Info("trigger all users of range", "key", current.objectId.ObjectKey)
+			users := r.GetUsageCache().GetUsersForRelationToGK(current.objectId, "uses", api.IPAMRangeGK)
+			r.TriggerAll(users)
 		}
 	}
 	if current.ipam != nil {

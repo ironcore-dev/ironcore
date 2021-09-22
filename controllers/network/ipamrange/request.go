@@ -55,6 +55,9 @@ func (r *Reconciler) reconcileRequest(ctx context.Context, log logr.Logger, curr
 
 	ipr, err := r.cache.getRange(ctx, log, rangeId.ObjectKey, nil)
 	if ipr == nil {
+		if err != nil {
+			return utils.Requeue(err)
+		}
 		return r.setStatus(ctx, log, current.object, v1alpha1.StateError, "IPAMRange %s not found", rangeId.ObjectKey)
 	}
 	defer r.cache.release(log, rangeId.ObjectKey)
@@ -71,7 +74,6 @@ func (r *Reconciler) reconcileRequest(ctx context.Context, log logr.Logger, curr
 			log.Info("parent is not yet ready", "parent", ipr.objectId)
 			return utils.Succeeded()
 		}
-		_ = ipr
 	}
 
 	if len(current.requestSpecs) > 0 {
@@ -89,34 +91,37 @@ func (r *Reconciler) reconcileRequest(ctx context.Context, log logr.Logger, curr
 			return utils.Requeue(err)
 		}
 
-		if len(current.requestSpecs) == len(current.object.Status.CIDRs) && !current.allocations.HasBusy() {
-			log.Info("already allocated")
-			return utils.Succeeded()
-		}
-
 		var allocated AllocationStatusList
+		var allocations AllocationStatusList
 		if ipr.pendingRequest != nil {
 			if ipr.pendingRequest.key != requestId.ObjectKey {
 				return utils.Succeeded()
 			}
 			log.Info("found pending request", "request", ipr.pendingRequest.key)
-			allocated = NewAllocationStatusListFromAllocations(ipr.pendingRequest.CIDRs)
+			allocations = NewAllocationStatusListFromAllocations(ipr.pendingRequest.CIDRs)
 		} else {
-			allocated, err = ipr.Alloc(ctx, log, r.Client, current)
+			reqSpecs, _, oldAllocs := current.requestSpecs.PendingActions(current.allocations)
+			allocated, err = ipr.Alloc(ctx, log, r.Client, current, reqSpecs)
 			if err != nil {
 				return utils.Requeue(err)
 			}
+			allocations = append(oldAllocs, allocated...)
+		}
+		if len(allocated) == 0 && ipr.pendingRequest == nil {
+			log.Info("nothing new to allocate")
+			return utils.Succeeded()
 		}
 		log.Info("allocated", "allocated", allocated)
-		newObj := current.object.DeepCopy()
-		newObj.Status.CIDRs = allocated.GetAllocationStatusList()
+		newObj := current.determineState(allocations)
 		if err := r.Client.Status().Patch(ctx, newObj, client.MergeFrom(current.object)); err != nil {
 			return utils.Requeue(err)
 		}
 		log.Info("allocation finished. trigger range", "objectkey", ipr.objectId.ObjectKey)
 		// make sure to update cache with new object -> trigger range object -> triggers its users
 		current.object = newObj
+		current.updateAllocations(allocations)
 		r.Trigger(ipr.objectId)
+		return utils.Succeeded()
 	}
 	return r.ready(ctx, log, current.object, "")
 }

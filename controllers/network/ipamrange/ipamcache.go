@@ -64,7 +64,7 @@ func (i *IPAMCache) release(log logr.Logger, key client.ObjectKey) {
 				ipr.lastUsage = time.Now()
 			}
 		}
-		log.Info("unlocking", "name", key)
+		log.V(2).Info("unlocking", "name", key)
 		ipr.lock.Unlock()
 	} else {
 		panic("corrupted ipam cache locks")
@@ -111,6 +111,7 @@ func (i *IPAMCache) getRange(ctx context.Context, log logr.Logger, name client.O
 			ipr = newIPAM(log, obj)
 		} else {
 			ipr.object = obj
+			ipr.updateSpecFrom(obj)
 			if obj.Status.State != common.StateReady {
 				ipr.error = obj.Status.Message
 			} else {
@@ -121,7 +122,7 @@ func (i *IPAMCache) getRange(ctx context.Context, log logr.Logger, name client.O
 	ipr.lockCount++
 	i.lockedIpams[name] = ipr
 	i.lock.Unlock()
-	log.Info("locking", "name", name)
+	log.V(2).Info("locking", "name", name)
 	ipr.lock.Lock()
 	return ipr, nil
 }

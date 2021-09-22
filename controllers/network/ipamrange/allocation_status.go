@@ -163,3 +163,13 @@ func (l AllocationStatusList) GetAllocationStatusList() []api.CIDRAllocationStat
 	}
 	return status
 }
+
+func (l AllocationStatusList) AsCIDRList() ipam.CIDRList {
+	var list ipam.CIDRList
+	for _, a := range l {
+		if a.CIDR != nil {
+			list = append(list, a.CIDR)
+		}
+	}
+	return list
+}
