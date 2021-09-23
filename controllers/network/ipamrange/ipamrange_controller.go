@@ -188,10 +188,6 @@ func (r *Reconciler) invalid(ctx context.Context, log logr.Logger, obj *api.IPAM
 	return r.setStatus(ctx, log, obj, common.StateInvalid, message, args...)
 }
 
-func (r *Reconciler) ready(ctx context.Context, log logr.Logger, obj *api.IPAMRange, message string, args ...interface{}) (ctrl.Result, error) {
-	return r.setStatus(ctx, log, obj, common.StateReady, message, args...)
-}
-
 func (r *Reconciler) setStatus(ctx context.Context, log logr.Logger, obj *api.IPAMRange, state string, msg string, args ...interface{}) (ctrl.Result, error) {
 	newIpamRange := obj.DeepCopy()
 	newIpamRange.Status.State = state
