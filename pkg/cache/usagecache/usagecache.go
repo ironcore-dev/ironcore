@@ -102,8 +102,14 @@ func (u *usageCache) ReplaceObjectUsageInfoForGKs(id utils.ObjectId, gks utils.G
 func (u *usageCache) DeleteObject(id utils.ObjectId) utils.ObjectIds {
 	u.lock.Lock()
 	defer u.lock.Unlock()
+	users := u.getUsersFor(id)
+	used := u.getUsedObjectFor(id)
 	u.cleanUp(id, u.sources, u.targets)
-	return u.getUsersFor(id)
+	if users == nil {
+		return used
+	}
+	users.AddAll(used)
+	return users
 }
 
 func (u *usageCache) cleanUp(id utils.ObjectId, src, dst map[utils.ObjectId]ObjectUsageInfo) utils.ObjectIds {
@@ -255,6 +261,10 @@ func (u *usageCache) GetUsersForRelation(id utils.ObjectId, relation string) uti
 func (u *usageCache) GetUsedObjectsFor(id utils.ObjectId) utils.ObjectIds {
 	u.lock.RLock()
 	defer u.lock.RUnlock()
+	return u.getUsedObjectFor(id)
+}
+
+func (u *usageCache) getUsedObjectFor(id utils.ObjectId) utils.ObjectIds {
 	return u.sources[id].GetObjectIds()
 }
 

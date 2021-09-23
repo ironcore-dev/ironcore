@@ -76,54 +76,51 @@ func (r *Reconciler) reconcileRequest(ctx context.Context, log logr.Logger, curr
 		}
 	}
 
-	if len(current.requestSpecs) > 0 {
-		for i, c := range current.requestSpecs {
-			if c.Spec != nil && c.Spec.Bits() > ipr.ipam.Bits() {
-				return r.setStatus(ctx, log, current.object, v1alpha1.StateInvalid, "size (entry %d) %d bits too large", i, ipr.ipam.Bits())
-			}
+	for i, c := range current.requestSpecs {
+		if c.Spec != nil && c.Spec.Bits() > ipr.ipam.Bits() {
+			return r.setStatus(ctx, log, current.object, v1alpha1.StateInvalid, "size (entry %d) %d bits too large", i, ipr.ipam.Bits())
 		}
-		// set finalizer current object
-		if err := r.AssureFinalizer(ctx, log, current.object); err != nil {
-			return utils.Requeue(err)
-		}
-		// set finalizer on parent
-		if found, err := r.CheckAndAssureFinalizer(ctx, log, ipr.object); err != nil || !found {
-			return utils.Requeue(err)
-		}
+	}
+	// set finalizer current object
+	if err := r.AssureFinalizer(ctx, log, current.object); err != nil {
+		return utils.Requeue(err)
+	}
+	// set finalizer on parent
+	if found, err := r.CheckAndAssureFinalizer(ctx, log, ipr.object); err != nil || !found {
+		return utils.Requeue(err)
+	}
 
-		var allocated AllocationStatusList
-		var allocations AllocationStatusList
-		if ipr.pendingRequest != nil {
-			if ipr.pendingRequest.key != requestId.ObjectKey {
-				return utils.Succeeded()
-			}
-			log.Info("found pending request", "request", ipr.pendingRequest.key)
-			allocations = NewAllocationStatusListFromAllocations(ipr.pendingRequest.CIDRs)
-		} else {
-			reqSpecs, _, oldAllocs := current.requestSpecs.PendingActions(current.allocations)
-			allocated, err = ipr.Alloc(ctx, log, r.Client, current, reqSpecs)
-			if err != nil {
-				return utils.Requeue(err)
-			}
-			allocations = append(oldAllocs, allocated...)
-		}
-		if len(allocated) == 0 && ipr.pendingRequest == nil {
-			log.Info("nothing new to allocate")
+	var allocated AllocationStatusList
+	var allocations AllocationStatusList
+	if ipr.pendingRequest != nil {
+		if ipr.pendingRequest.key != requestId.ObjectKey {
 			return utils.Succeeded()
 		}
-		log.Info("allocated", "allocated", allocated)
-		newObj := current.determineState(allocations)
-		if err := r.Client.Status().Patch(ctx, newObj, client.MergeFrom(current.object)); err != nil {
+		log.Info("found pending request", "request", ipr.pendingRequest.key)
+		allocations = NewAllocationStatusListFromAllocations(ipr.pendingRequest.CIDRs)
+	} else {
+		reqSpecs, _, oldAllocs := current.requestSpecs.PendingActions(current.allocations)
+		allocated, err = ipr.Alloc(ctx, log, r.Client, current, reqSpecs)
+		if err != nil {
 			return utils.Requeue(err)
 		}
-		log.Info("allocation finished. trigger range", "objectkey", ipr.objectId.ObjectKey)
-		// make sure to update cache with new object -> trigger range object -> triggers its users
-		current.object = newObj
-		current.updateAllocations(allocations)
-		r.Trigger(ipr.objectId)
+		allocations = append(oldAllocs, allocated...)
+	}
+	if len(allocated) == 0 && ipr.pendingRequest == nil {
+		log.Info("nothing new to allocate")
 		return utils.Succeeded()
 	}
-	return r.ready(ctx, log, current.object, "")
+	log.Info("allocated", "allocated", allocated)
+	newObj := current.determineState(allocations)
+	if err := r.Client.Status().Patch(ctx, newObj, client.MergeFrom(current.object)); err != nil {
+		return utils.Requeue(err)
+	}
+	log.Info("allocation finished. trigger range", "objectkey", ipr.objectId.ObjectKey)
+	// make sure to update cache with new object -> trigger range object -> triggers its users
+	current.object = newObj
+	current.updateAllocations(allocations)
+	r.Trigger(ipr.objectId)
+	return utils.Succeeded()
 }
 
 func (r *Reconciler) deleteRequest(ctx context.Context, log logr.Logger, current *IPAM) (ctrl.Result, error) {
@@ -134,7 +131,7 @@ func (r *Reconciler) deleteRequest(ctx context.Context, log logr.Logger, current
 			return utils.Succeeded()
 		}
 	}
-
+	var ipr *IPAM
 	if len(r.GetUsageCache().GetUsersForRelationToGK(requestId, "uses", api.IPAMRangeGK)) > 0 {
 		// TODO: reject deletion in validation webhook if there still users of this object
 		return utils.Succeeded()
@@ -147,7 +144,7 @@ func (r *Reconciler) deleteRequest(ctx context.Context, log logr.Logger, current
 			}
 		}
 		if rangeId.Name != "" {
-			ipr, err := r.cache.getRange(ctx, log, rangeId.ObjectKey, nil)
+			ipr, err = r.cache.getRange(ctx, log, rangeId.ObjectKey, nil)
 			if err != nil {
 				return utils.Requeue(err)
 			}
@@ -162,23 +159,30 @@ func (r *Reconciler) deleteRequest(ctx context.Context, log logr.Logger, current
 					allocated = NewAllocationStatusListFromAllocations(ipr.pendingRequest.CIDRs)
 					log.Info("continuing release", "allocated", allocated)
 				} else {
-					err = ipr.Free(ctx, log, r.Client, current)
+					err = ipr.FreeAll(ctx, log, r.Client, current)
 					if err != nil {
 						return utils.Requeue(err)
 					}
 				}
 				newObj := current.object.DeepCopy()
 				newObj.Status.CIDRs = nil
+				newObj.Status.PendingDeletions = nil
+				log.Info("updating status for", "object", current.objectId)
 				if err := r.Client.Status().Patch(ctx, newObj, client.MergeFrom(current.object)); err != nil {
 					return utils.Requeue(err)
 				}
 				current.object = newObj
-				r.Trigger(ipr.objectId)
+				current.allocations = nil
+				current.deletions = nil
 			}
 		}
 	}
 	if err := r.AssureFinalizerRemoved(ctx, log, current.object); err != nil {
 		return utils.Requeue(err)
+	}
+	if ipr != nil {
+		log.Info("trigger range update", "range", ipr.objectId)
+		r.Trigger(ipr.objectId)
 	}
 	return utils.Succeeded()
 }

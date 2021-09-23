@@ -183,6 +183,25 @@ spec:
               message:
                 description: Message contains a message for the corresponding state
                 type: string
+              pendingDeletions:
+                items:
+                  description: CIDRAllocationStatus is the result of a CIDR allocation
+                    request
+                  properties:
+                    cidr:
+                      type: string
+                    message:
+                      type: string
+                    request:
+                      type: string
+                    status:
+                      type: string
+                  required:
+                  - cidr
+                  - request
+                  - status
+                  type: object
+                type: array
               pendingRequests:
                 properties:
                   cidrs:

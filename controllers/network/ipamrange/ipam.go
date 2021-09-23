@@ -24,9 +24,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/mandelsoft/kubipam/pkg/ipam"
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	api "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
-	"github.com/onmetal/onmetal-api/pkg/ipam"
 	"github.com/onmetal/onmetal-api/pkg/utils"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -56,11 +56,9 @@ type IPAM struct {
 	requestSpecs RequestSpecList
 	// currently assigned ranges
 	allocations AllocationStatusList
-}
-
-type PendingRequest struct {
-	key   client.ObjectKey
-	CIDRs AllocationList
+	// inflight deletions:
+	// allocations of deleted requests which are not yet released in IPAM
+	deletions AllocationStatusList
 }
 
 func newIPAM(log logr.Logger, obj *api.IPAMRange) *IPAM {
@@ -111,7 +109,7 @@ func (i *IPAM) Alloc(ctx context.Context, log logr.Logger, clt client.Client, re
 	}
 	if len(allocated) != 0 {
 		log.Info("allocated", "allocated", allocated)
-		if err := i.updateRange(ctx, clt, append(request.allocations, allocated...), request.objectId.ObjectKey); err != nil {
+		if err := i.updateRange(ctx, clt, append(request.allocations, allocated...), request.deletions, request.objectId.ObjectKey); err != nil {
 			log.Info("range update failed (allocation reverted)", "error", err)
 			for _, a := range allocated {
 				if a.IsValid() {
@@ -127,14 +125,75 @@ func (i *IPAM) Alloc(ctx context.Context, log logr.Logger, clt client.Client, re
 	return allocated, nil
 }
 
-func (i *IPAM) Free(ctx context.Context, log logr.Logger, ctl client.Client, request *IPAM) error {
+// HandleRelease
+// - find reqSpecs in allocations
+// - move from allocations to deletions
+// - free found reqSpecs
+func (i *IPAM) HandleRelease(ctx context.Context, log logr.Logger, clt client.Client, request *IPAM, deleteList AllocationStatusList) error {
+	if len(deleteList) == 0 {
+		log.Info("no outstanding deletions pending")
+		return nil
+	}
+
+	log.Info("releasing", "deleteList", deleteList)
+	var cidrList ipam.CIDRList
+	var deletions AllocationStatusList
+	allocations := i.allocations.Copy()
+	for _, d := range deleteList {
+		for index := 0; index < len(allocations); index++ {
+			if allocations[index] == d {
+				allocations.RemoveIndex(index)
+				index--
+				break
+			}
+		}
+		if !d.IsValid() {
+			continue
+		}
+		deletions = append(deletions, d)
+		cidrList = append(cidrList, d.CIDR)
+	}
+
+	if len(cidrList) != 0 {
+		newObj := i.object.DeepCopy()
+		newObj.Status.PendingDeletions = deletions.AsCIDRAllocationStatusList()
+		newObj.Status.CIDRs = allocations.AsCIDRAllocationStatusList()
+		if err := clt.Status().Patch(ctx, newObj, client.MergeFrom(i.object)); err != nil {
+			return err
+		}
+		i.ipam.DeleteCIDRs(cidrList)
+		i.deletions = deletions
+		i.allocations = allocations
+		log.Info("released from ipam", "deletions", cidrList)
+
+	} else {
+		log.Info("no new deletions")
+	}
+
+	pending := i.ipam.PendingDeleted()
+	var freeCidrs ipam.CIDRList
+outer:
+	for index := 0; index < len(deletions); index++ {
+		for _, p := range pending {
+			if ipam.CIDROverlap(p, deletions[index].CIDR) {
+				continue outer
+			}
+		}
+		freeCidrs.Add(deletions[index].CIDR)
+		deletions.RemoveIndex(index)
+		index--
+	}
+	return nil
+}
+
+func (i *IPAM) FreeAll(ctx context.Context, log logr.Logger, ctl client.Client, request *IPAM) error {
 	log.Info("releasing", "allocations", request.allocations)
 	allocations := request.allocations.Allocations()
 	if len(allocations) != 0 {
 		for _, a := range allocations {
 			i.ipam.Free(a.CIDR)
 		}
-		if err := i.updateRange(ctx, ctl, nil, request.objectId.ObjectKey); err != nil {
+		if err := i.updateRange(ctx, ctl, nil, nil, request.objectId.ObjectKey); err != nil {
 			for _, a := range allocations {
 				i.ipam.Busy(a.CIDR)
 			}
@@ -156,22 +215,22 @@ func (i *IPAM) setIPAMState(newIpr *api.IPAMRange) {
 	newIpr.Status.AllocationState = blocks
 }
 
-func (i *IPAM) updateRange(ctx context.Context, clt client.Client, allocated AllocationStatusList, requestKey client.ObjectKey) error {
+func (i *IPAM) updateRange(ctx context.Context, clt client.Client, allocated, pending AllocationStatusList, requestKey client.ObjectKey) error {
 	newIpr := i.object.DeepCopy()
 	i.setIPAMState(newIpr)
 
 	newIpr.Status.PendingRequest = &api.IPAMPendingRequest{
 		Name:      requestKey.Name,
 		Namespace: requestKey.Namespace,
-		CIDRs:     nil,
 	}
 
-	var internalPending AllocationList
+	var internalAllocations AllocationList
+	var internalDeletions AllocationList
 	for _, a := range allocated {
 		if !a.IsValid() {
 			continue
 		}
-		internalPending.Add(&Allocation{
+		internalAllocations.Add(&Allocation{
 			Request: a.Request,
 			CIDR:    a.CIDR,
 		})
@@ -179,13 +238,29 @@ func (i *IPAM) updateRange(ctx context.Context, clt client.Client, allocated All
 			Request: a.Request,
 			CIDR:    a.CIDR.String(),
 		})
+
+	}
+	for _, a := range pending {
+		if !a.IsValid() {
+			continue
+		}
+		internalDeletions.Add(&Allocation{
+			Request: a.Request,
+			CIDR:    a.CIDR,
+		})
+		newIpr.Status.PendingRequest.Deletions = append(newIpr.Status.PendingRequest.Deletions, api.CIDRAllocation{
+			Request: a.Request,
+			CIDR:    a.CIDR.String(),
+		})
+
 	}
 	err := clt.Status().Patch(ctx, newIpr, client.MergeFrom(i.object))
 	if err == nil {
 		i.object = newIpr
 		i.pendingRequest = &PendingRequest{
-			key:   requestKey,
-			CIDRs: internalPending,
+			key:       requestKey,
+			CIDRs:     internalAllocations,
+			Deletions: internalDeletions,
 		}
 	}
 	return err
@@ -197,7 +272,7 @@ func (i *IPAM) updateRange(ctx context.Context, clt client.Client, allocated All
 // none ready + at least one failed -> state = failed
 func (i *IPAM) determineState(allocations AllocationStatusList) *api.IPAMRange {
 	newObj := i.object.DeepCopy()
-	newObj.Status.CIDRs = allocations.GetAllocationStatusList()
+	newObj.Status.CIDRs = allocations.AsCIDRAllocationStatusList()
 	state := ""
 	msg := ""
 	for _, a := range allocations {
@@ -235,17 +310,9 @@ func (i *IPAM) determineState(allocations AllocationStatusList) *api.IPAMRange {
 }
 
 func (i *IPAM) updateFrom(log logr.Logger, obj *api.IPAMRange) {
-	found := true
-	var allocations AllocationStatusList
 	var err error
-	for _, a := range obj.Status.CIDRs {
-		allocation := ParseAllocationStatus(&a)
-		allocations = append(allocations, allocation)
-		if allocation.CIDR != nil && ipam.CIDRHostSize(allocation.CIDR).Cmp(ipam.Int64(2)) < 0 {
-			found = false
-			break
-		}
-	}
+	allocations, found := parseAllocations(obj.Status.CIDRs)
+	deletions, _ := parseAllocations(obj.Status.PendingDeletions)
 	roundRobin := false
 	switch obj.Spec.Mode {
 	case "", api.ModeFirstMatch:
@@ -265,22 +332,7 @@ func (i *IPAM) updateFrom(log logr.Logger, obj *api.IPAMRange) {
 		}
 	}
 
-	var pending *PendingRequest
-	if obj.Status.PendingRequest != nil && obj.Status.PendingRequest.Name != "" {
-		pending = &PendingRequest{
-			key: client.ObjectKey{
-				Namespace: obj.Status.PendingRequest.Namespace,
-				Name:      obj.Status.PendingRequest.Name,
-			},
-		}
-		for _, c := range obj.Status.PendingRequest.CIDRs {
-			cidr, err := ParseAllocation(&c)
-			if err != nil {
-				continue
-			}
-			pending.CIDRs = append(pending.CIDRs, cidr)
-		}
-	}
+	pending := ParsePendingRequest(obj)
 
 	if ipr != nil {
 		var roundRobinIPs []net.IP
@@ -316,10 +368,23 @@ func (i *IPAM) updateFrom(log logr.Logger, obj *api.IPAMRange) {
 	i.deleted = false
 	i.pendingRequest = pending
 	i.allocations = allocations
-
+	i.deletions = deletions
 	if err != nil {
 		i.error = err.Error()
 	}
+}
+
+func parseAllocations(list []api.CIDRAllocationStatus) (AllocationStatusList, bool) {
+	var allocations AllocationStatusList
+	found := false
+	for _, a := range list {
+		allocation := ParseAllocationStatus(&a)
+		allocations = append(allocations, allocation)
+		if allocation.CIDR != nil {
+			found = true
+		}
+	}
+	return allocations, found
 }
 
 func (i *IPAM) updateSpecFrom(obj *api.IPAMRange) {

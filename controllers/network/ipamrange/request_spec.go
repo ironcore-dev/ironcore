@@ -18,7 +18,7 @@ package ipamrange
 
 import (
 	"fmt"
-	"github.com/onmetal/onmetal-api/pkg/ipam"
+	"github.com/mandelsoft/kubipam/pkg/ipam"
 )
 
 type RequestSpec struct {

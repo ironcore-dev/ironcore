@@ -18,8 +18,8 @@ package ipamrange
 
 import (
 	"fmt"
+	"github.com/mandelsoft/kubipam/pkg/ipam"
 	api "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
-	"github.com/onmetal/onmetal-api/pkg/ipam"
 	"net"
 )
 
@@ -70,6 +70,10 @@ func NewAllocationStatusListFromAllocations(allocations AllocationList) Allocati
 
 func (l *AllocationStatusList) Add(allocation ...*AllocationStatus) {
 	(*l) = append(*l, allocation...)
+}
+
+func (l *AllocationStatusList) RemoveIndex(index int) {
+	*l = append((*l)[0:index], (*l)[index+1:]...)
 }
 
 func (l AllocationStatusList) HasBusy() bool {
@@ -149,7 +153,7 @@ func OptinalCIDRToString(cidr *net.IPNet) string {
 	return cidr.String()
 }
 
-func (l AllocationStatusList) GetAllocationStatusList() []api.CIDRAllocationStatus {
+func (l AllocationStatusList) AsCIDRAllocationStatusList() []api.CIDRAllocationStatus {
 	status := make([]api.CIDRAllocationStatus, len(l))
 	for i, a := range l {
 		status[i] = api.CIDRAllocationStatus{
@@ -170,6 +174,17 @@ func (l AllocationStatusList) AsCIDRList() ipam.CIDRList {
 		if a.CIDR != nil {
 			list = append(list, a.CIDR)
 		}
+	}
+	return list
+}
+
+func (l AllocationStatusList) Allocated() AllocationStatusList {
+	var list AllocationStatusList
+	for _, a := range l {
+		if a.Status != api.AllocationStateAllocated {
+			continue
+		}
+		list = append(list, a)
 	}
 	return list
 }

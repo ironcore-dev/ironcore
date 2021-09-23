@@ -54,10 +54,11 @@ const (
 type IPAMRangeStatus struct {
 	common.StateFields `json:",inline"`
 	// CIDRs is a list of effective cidrs which belong to this IPAMRange
-	CIDRs           []CIDRAllocationStatus `json:"cidrs,omitempty"`
-	AllocationState []string               `json:"allocationState,omitempty"`
-	RoundRobinState []string               `json:"roundRobinState,omitempty"`
-	PendingRequest  *IPAMPendingRequest    `json:"pendingRequests,omitempty"`
+	CIDRs            []CIDRAllocationStatus `json:"cidrs,omitempty"`
+	AllocationState  []string               `json:"allocationState,omitempty"`
+	RoundRobinState  []string               `json:"roundRobinState,omitempty"`
+	PendingRequest   *IPAMPendingRequest    `json:"pendingRequests,omitempty"`
+	PendingDeletions []CIDRAllocationStatus `json:"pendingDeletions,omitempty"`
 }
 
 type CIDRAllocation struct {
@@ -76,6 +77,7 @@ type IPAMPendingRequest struct {
 	Name      string           `json:"name"`
 	Namespace string           `json:"namespace"`
 	CIDRs     []CIDRAllocation `json:"cidrs,omitempty"`
+	Deletions []CIDRAllocation `json:"deletions,omitempty"`
 }
 
 //+kubebuilder:object:root=true

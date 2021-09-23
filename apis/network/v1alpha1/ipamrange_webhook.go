@@ -18,7 +18,7 @@ package v1alpha1
 
 import (
 	"fmt"
-	"github.com/onmetal/onmetal-api/pkg/ipam"
+	"github.com/mandelsoft/kubipam/pkg/ipam"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"

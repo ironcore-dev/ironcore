@@ -18,8 +18,8 @@ package ipamrange
 
 import (
 	"fmt"
+	"github.com/mandelsoft/kubipam/pkg/ipam"
 	api "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
-	"github.com/onmetal/onmetal-api/pkg/ipam"
 	"net"
 )
 

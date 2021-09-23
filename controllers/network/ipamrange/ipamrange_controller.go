@@ -20,12 +20,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-logr/logr"
+	"github.com/mandelsoft/kubipam/pkg/ipam"
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	"github.com/onmetal/onmetal-api/apis/core"
 	api "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	"github.com/onmetal/onmetal-api/pkg/cache/usagecache"
 	"github.com/onmetal/onmetal-api/pkg/controllerutils"
-	"github.com/onmetal/onmetal-api/pkg/ipam"
 	"github.com/onmetal/onmetal-api/pkg/manager"
 	"github.com/onmetal/onmetal-api/pkg/utils"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -62,6 +62,7 @@ func NewReconciler() *Reconciler {
 func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	r.Wait() // wait until all caches are initialized
 	log := log.FromContext(ctx)
+	log.Info("reconciling", "object", req.NamespacedName)
 	var obj api.IPAMRange
 	if err := r.Get(ctx, req.NamespacedName, &obj); err != nil {
 		if errors.IsNotFound(err) {
@@ -147,7 +148,7 @@ func (r *Reconciler) HandleReconcile(ctx context.Context, log logr.Logger, obj *
 			})
 		}
 		newObj := current.object.DeepCopy()
-		newObj.Status.CIDRs = cidrs.GetAllocationStatusList()
+		newObj.Status.CIDRs = cidrs.AsCIDRAllocationStatusList()
 		if !reflect.DeepEqual(newObj, obj) {
 			log.Info("setting range status", "requests", current.requestSpecs)
 			if err := r.Status().Patch(ctx, newObj, client.MergeFrom(obj)); err != nil {
@@ -209,8 +210,6 @@ func (r *Reconciler) HandleDeleted(ctx context.Context, log logr.Logger, key cli
 		ObjectKey: key,
 		GroupKind: api.IPAMRangeGK,
 	}
-	users := r.GetUsageCache().GetUsersFor(objectId)
 	r.GetUsageCache().DeleteObject(objectId)
-	r.TriggerAll(users)
 	return utils.Succeeded()
 }
