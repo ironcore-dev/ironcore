@@ -92,34 +92,52 @@ func (r *Reconciler) reconcileRequest(ctx context.Context, log logr.Logger, curr
 
 	var allocated AllocationStatusList
 	var allocations AllocationStatusList
+	var deleted AllocationStatusList
+	var deletions AllocationStatusList
+	requeue := false
 	if ipr.pendingRequest != nil {
 		if ipr.pendingRequest.key != requestId.ObjectKey {
 			return utils.Succeeded()
 		}
 		log.Info("found pending request", "request", ipr.pendingRequest.key)
 		allocations = NewAllocationStatusListFromAllocations(ipr.pendingRequest.CIDRs)
+		deletions = NewAllocationStatusListFromAllocations(ipr.pendingRequest.Deletions)
 	} else {
-		reqSpecs, _, oldAllocs := current.requestSpecs.PendingActions(current.allocations)
-		allocated, err = ipr.Alloc(ctx, log, r.Client, current, reqSpecs)
+		reqSpecs, delAllocs, oldAllocs := current.requestSpecs.PendingActions(current.allocations)
+		if err := current.HandleRelease(ctx, log, r.Client, current, delAllocs); err != nil {
+			return utils.Requeue(err)
+		}
+		deletions, deleted, err = ipr.Free(ctx, log, r.Client, current)
 		if err != nil {
 			return utils.Requeue(err)
 		}
-		allocations = append(oldAllocs, allocated...)
+		if len(deleted) == 0 {
+			allocated, err = ipr.Alloc(ctx, log, r.Client, current, reqSpecs)
+			if err != nil {
+				return utils.Requeue(err)
+			}
+			allocations = append(oldAllocs, allocated...)
+		} else {
+			requeue = true
+		}
 	}
-	if len(allocated) == 0 && ipr.pendingRequest == nil {
-		log.Info("nothing new to allocate")
+	if len(allocated) == 0 && ipr.pendingRequest == nil && len(deleted) == 0 {
+		log.Info("nothing new to allocate or free")
 		return utils.Succeeded()
 	}
-	log.Info("allocated", "allocated", allocated)
-	newObj := current.determineState(allocations)
+	log.Info("allocation changes", "allocated", allocated, "deleted", deleted)
+	newObj := current.determineState(allocations, deletions)
 	if err := r.Client.Status().Patch(ctx, newObj, client.MergeFrom(current.object)); err != nil {
 		return utils.Requeue(err)
 	}
 	log.Info("allocation finished. trigger range", "objectkey", ipr.objectId.ObjectKey)
 	// make sure to update cache with new object -> trigger range object -> triggers its users
 	current.object = newObj
-	current.updateAllocations(allocations)
+	current.updateAllocations(allocations, deletions)
 	r.Trigger(ipr.objectId)
+	if requeue {
+		return utils.Requeue(nil)
+	}
 	return utils.Succeeded()
 }
 

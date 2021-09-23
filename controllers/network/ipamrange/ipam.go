@@ -134,7 +134,6 @@ func (i *IPAM) HandleRelease(ctx context.Context, log logr.Logger, clt client.Cl
 		log.Info("no outstanding deletions pending")
 		return nil
 	}
-
 	log.Info("releasing", "deleteList", deleteList)
 	var cidrList ipam.CIDRList
 	var deletions AllocationStatusList
@@ -165,13 +164,19 @@ func (i *IPAM) HandleRelease(ctx context.Context, log logr.Logger, clt client.Cl
 		i.deletions = deletions
 		i.allocations = allocations
 		log.Info("released from ipam", "deletions", cidrList)
-
 	} else {
 		log.Info("no new deletions")
 	}
+	return nil
+}
 
-	pending := i.ipam.PendingDeleted()
-	var freeCidrs ipam.CIDRList
+func (i *IPAM) Free(ctx context.Context, log logr.Logger, ctl client.Client, request *IPAM) (AllocationStatusList, AllocationStatusList, error) {
+	if len(request.deletions) == 0 {
+		return nil, request.deletions, nil
+	}
+	pending := request.ipam.PendingDeleted()
+	var deleted AllocationStatusList
+	deletions := request.deletions.Copy()
 outer:
 	for index := 0; index < len(deletions); index++ {
 		for _, p := range pending {
@@ -179,16 +184,29 @@ outer:
 				continue outer
 			}
 		}
-		freeCidrs.Add(deletions[index].CIDR)
+		deleted.Add(request.deletions[index])
 		deletions.RemoveIndex(index)
 		index--
 	}
-	return nil
+	if len(deleted) != 0 {
+		for _, d := range deleted {
+			i.ipam.Free(d.CIDR)
+		}
+		if err := i.updateRange(ctx, ctl, request.allocations, deletions, request.objectId.ObjectKey); err != nil {
+			for _, d := range deleted {
+				i.ipam.Busy(d.CIDR)
+			}
+			log.Info("range update failed (free reverted)", "error", err)
+			return request.deletions, deleted, err
+		}
+		return deletions, deleted, nil
+	}
+	return request.deletions, deleted, nil
 }
 
 func (i *IPAM) FreeAll(ctx context.Context, log logr.Logger, ctl client.Client, request *IPAM) error {
 	log.Info("releasing", "allocations", request.allocations)
-	allocations := request.allocations.Allocations()
+	allocations := append(request.allocations.Allocations(), request.deletions.Allocations()...)
 	if len(allocations) != 0 {
 		for _, a := range allocations {
 			i.ipam.Free(a.CIDR)
@@ -270,9 +288,10 @@ func (i *IPAM) updateRange(ctx context.Context, clt client.Client, allocated, pe
 // at least one ready -> state = ready
 // all busy -> state = busy
 // none ready + at least one failed -> state = failed
-func (i *IPAM) determineState(allocations AllocationStatusList) *api.IPAMRange {
+func (i *IPAM) determineState(allocations, deletions AllocationStatusList) *api.IPAMRange {
 	newObj := i.object.DeepCopy()
 	newObj.Status.CIDRs = allocations.AsCIDRAllocationStatusList()
+	newObj.Status.PendingDeletions = deletions.AsCIDRAllocationStatusList()
 	state := ""
 	msg := ""
 	for _, a := range allocations {
@@ -403,19 +422,15 @@ func (i *IPAM) updateSpecFrom(obj *api.IPAMRange) {
 	}
 }
 
-func (i *IPAM) updateAllocations(allocations AllocationStatusList) {
+func (i *IPAM) updateAllocations(allocations, deletions AllocationStatusList) {
 	if i.ipam == nil {
 		ranges := allocations.AsRanges()
 		if len(ranges) > 0 {
 			i.ipam, _ = ipam.NewIPAMForRanges(ranges)
 		}
 	} else {
-		//newRanges := allocations.AsCIDRList()
-		//currentRanges := i.ipam.Ranges()
-		//toAdd := currentRanges.Additional(newRanges)
-		//toDel := newRanges.Additional(currentRanges)
 		i.ipam.AddCIDRs(allocations.AsCIDRList())
-		//i.ipam.DeleteCIDRs(toDel)
 	}
 	i.allocations = allocations
+	i.deletions = deletions
 }

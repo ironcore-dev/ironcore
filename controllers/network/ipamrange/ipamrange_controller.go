@@ -158,7 +158,7 @@ func (r *Reconciler) HandleReconcile(ctx context.Context, log logr.Logger, obj *
 				// update self in cache
 				current.updateFrom(log, newObj)
 			} else {
-				current.updateAllocations(cidrs)
+				current.updateAllocations(cidrs, current.deletions)
 			}
 			// trigger all users of this ipamrange
 			log.Info("trigger all users of range", "key", current.objectId.ObjectKey)
