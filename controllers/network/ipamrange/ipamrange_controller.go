@@ -130,7 +130,7 @@ func (r *Reconciler) HandleReconcile(ctx context.Context, log logr.Logger, obj *
 				continue
 			}
 			if !c.Spec.IsCIDR() {
-				return r.invalid(ctx, log, obj, "request spec %d does is not a valid cidr %s for a root ipam range", i, c)
+				return r.invalid(ctx, log, obj, "request spec %d is not a valid cidr %s for a root ipam range", i, c)
 			}
 			_, cidr, _ := net.ParseCIDR(c.Request)
 			if ipam.CIDRHostMaskSize(cidr) == 0 {

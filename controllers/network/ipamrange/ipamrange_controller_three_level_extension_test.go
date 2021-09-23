@@ -24,55 +24,71 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-var _ = OptionalDescribe("IPAMRange extension", func() {
+var _ = OptionalDescribe("IPAMRange three level extension", func() {
 	Context("When extending a valid IPAMRange", func() {
 
+		validRootRangeLookupKey := types.NamespacedName{
+			Namespace: "default",
+			Name:      "ctx33-valid-root",
+		}
 		validParentRangeLookupKey := types.NamespacedName{
 			Namespace: "default",
-			Name:      "ctx22-valid-parent",
+			Name:      "ctx33-valid-parent",
 		}
 		validSubRangeLookupKey1 := types.NamespacedName{
 			Namespace: "default",
-			Name:      "ctx22-valid-subrange1",
+			Name:      "ctx33-valid-subrange1",
 		}
 		validSubRangeLookupKey2 := types.NamespacedName{
 			Namespace: "default",
-			Name:      "ctx22-valid-subrange2",
+			Name:      "ctx33-valid-subrange2",
 		}
 		validSubRangeLookupKey3 := types.NamespacedName{
 			Namespace: "default",
-			Name:      "ctx22-valid-subrange3",
+			Name:      "ctx33-valid-subrange3",
 		}
-		validParentCidr1 := "10.0.0.0/16"
-		validParentCidr2 := "10.1.0.0/16"
+		validRootCidr := "10.0.0.0/8"
+		validParentRequestCidr := "/16"
+		allocatedParentCidr1 := "10.0.0.0/16"
+		allocatedParentCidr2 := "10.1.0.0/16"
 		validSubRangeCidr := "/17"
 
-		configuredCIDRStatus := []api.CIDRAllocationStatus{
+		configuredRootCIDRStatus := []api.CIDRAllocationStatus{
 			api.CIDRAllocationStatus{
 				CIDRAllocation: api.CIDRAllocation{
-					Request: validParentCidr1,
-					CIDR:    validParentCidr1,
+					Request: validRootCidr,
+					CIDR:    validRootCidr,
 				},
 				Status:  api.AllocationStateAllocated,
 				Message: SuccessfulUsageMessage,
 			},
 		}
-		configuredCIDRStatus2 := []api.CIDRAllocationStatus{
+		allocatedCIDRParentStatus := []api.CIDRAllocationStatus{
 			api.CIDRAllocationStatus{
 				CIDRAllocation: api.CIDRAllocation{
-					Request: validParentCidr1,
-					CIDR:    validParentCidr1,
+					Request: validParentRequestCidr,
+					CIDR:    allocatedParentCidr1,
 				},
 				Status:  api.AllocationStateAllocated,
-				Message: SuccessfulUsageMessage,
+				Message: SuccessfulAllocationMessage,
+			},
+		}
+		allocatedCIDRParentStatus2 := []api.CIDRAllocationStatus{
+			api.CIDRAllocationStatus{
+				CIDRAllocation: api.CIDRAllocation{
+					Request: validParentRequestCidr,
+					CIDR:    allocatedParentCidr1,
+				},
+				Status:  api.AllocationStateAllocated,
+				Message: SuccessfulAllocationMessage,
 			},
 			api.CIDRAllocationStatus{
 				CIDRAllocation: api.CIDRAllocation{
-					Request: validParentCidr2,
-					CIDR:    validParentCidr2,
+					Request: validParentRequestCidr,
+					CIDR:    allocatedParentCidr2,
 				},
 				Status:  api.AllocationStateAllocated,
-				Message: SuccessfulUsageMessage,
+				Message: SuccessfulAllocationMessage,
 			},
 		}
 
@@ -117,9 +133,25 @@ var _ = OptionalDescribe("IPAMRange extension", func() {
 			},
 		}
 
-		It("Should clean and create base objects", func() {
-			cleanUp(validParentRangeLookupKey, validSubRangeLookupKey1, validSubRangeLookupKey2, validSubRangeLookupKey3)
-			createObject(validParentRangeLookupKey, nil, validParentCidr1)
+		It("Should clean and create root range object", func() {
+			cleanUp(validRootRangeLookupKey, validParentRangeLookupKey, validSubRangeLookupKey1, validSubRangeLookupKey2, validSubRangeLookupKey3)
+			createObject(validRootRangeLookupKey, nil, validRootCidr)
+			Eventually(func() *api.IPAMRangeStatus {
+				obj := &api.IPAMRange{}
+				Expect(k8sClient.Get(ctx, validRootRangeLookupKey, obj)).Should(Succeed())
+				return &obj.Status
+			}, timeout, interval).Should(Equal(&api.IPAMRangeStatus{
+				StateFields: common.StateFields{
+					State: common.StateReady,
+				},
+				CIDRs: configuredRootCIDRStatus,
+			}))
+		})
+
+		It("Should create parent range", func() {
+			createObject(validParentRangeLookupKey, &common.ScopedReference{
+				Name: validRootRangeLookupKey.Name,
+			}, validParentRequestCidr)
 			Eventually(func() *api.IPAMRangeStatus {
 				obj := &api.IPAMRange{}
 				Expect(k8sClient.Get(ctx, validParentRangeLookupKey, obj)).Should(Succeed())
@@ -128,7 +160,7 @@ var _ = OptionalDescribe("IPAMRange extension", func() {
 				StateFields: common.StateFields{
 					State: common.StateReady,
 				},
-				CIDRs: configuredCIDRStatus,
+				CIDRs: allocatedCIDRParentStatus,
 			}))
 		})
 
@@ -140,7 +172,7 @@ var _ = OptionalDescribe("IPAMRange extension", func() {
 				return projectStatus(ctx, validParentRangeLookupKey)
 			}, timeout, interval).Should(Equal(&IPAMStatus{
 				State: common.StateReady,
-				CIDRs: configuredCIDRStatus,
+				CIDRs: allocatedCIDRParentStatus,
 				AllocationState: []string{
 					"10.0.0.0/17[busy]",
 					"10.0.128.0/17[free]",
@@ -163,7 +195,7 @@ var _ = OptionalDescribe("IPAMRange extension", func() {
 				return projectStatus(ctx, validParentRangeLookupKey)
 			}, timeout, interval).Should(Equal(&IPAMStatus{
 				State: common.StateReady,
-				CIDRs: configuredCIDRStatus,
+				CIDRs: allocatedCIDRParentStatus,
 				AllocationState: []string{
 					"10.0.0.0/16[busy]",
 				},
@@ -185,7 +217,7 @@ var _ = OptionalDescribe("IPAMRange extension", func() {
 				return projectStatus(ctx, validParentRangeLookupKey)
 			}, timeout, interval).Should(Equal(&IPAMStatus{
 				State: common.StateReady,
-				CIDRs: configuredCIDRStatus,
+				CIDRs: allocatedCIDRParentStatus,
 				AllocationState: []string{
 					"10.0.0.0/16[busy]",
 				},
@@ -200,12 +232,14 @@ var _ = OptionalDescribe("IPAMRange extension", func() {
 		})
 
 		It("Should extend parent with new CIDR range", func() {
-			updateObject(validParentRangeLookupKey, nil, validParentCidr1, validParentCidr2)
+			updateObject(validParentRangeLookupKey, &common.ScopedReference{
+				Name: validRootRangeLookupKey.Name,
+			}, validParentRequestCidr, validParentRequestCidr)
 			Eventually(func() *IPAMStatus {
 				return projectStatus(ctx, validParentRangeLookupKey)
 			}, timeout, interval).Should(Equal(&IPAMStatus{
 				State: common.StateReady,
-				CIDRs: configuredCIDRStatus2,
+				CIDRs: allocatedCIDRParentStatus2,
 				AllocationState: []string{
 					"10.0.0.0/16[busy]",
 					"10.1.0.0/17[busy]",

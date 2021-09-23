@@ -38,7 +38,7 @@ type IPAMStatus struct {
 }
 
 const (
-	timeout  = time.Second * 20
+	timeout  = time.Second * 30
 	interval = time.Second * 1
 )
 
@@ -47,6 +47,7 @@ var ctx = context.Background()
 var activeTest = sets.NewString(
 	"IPAMRange controller",
 	"IPAMRange extension",
+	"IPAMRange three level extension",
 )
 
 func OptionalDescribe(n string, f func()) bool {
@@ -92,11 +93,12 @@ var createObject = func(key client.ObjectKey, parent *common.ScopedReference, ci
 var updateObject = func(key client.ObjectKey, parent *common.ScopedReference, cidrs ...string) {
 	obj := &api.IPAMRange{}
 	Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
-	obj.Spec = api.IPAMRangeSpec{
+	newObj := obj.DeepCopy()
+	newObj.Spec = api.IPAMRangeSpec{
 		Parent: parent,
 		CIDRs:  cidrs,
 	}
-	Expect(k8sClient.Update(ctx, obj)).Should(Succeed())
+	Expect(k8sClient.Patch(ctx, newObj, client.MergeFrom(obj))).Should(Succeed())
 }
 
 func projectStatus(ctx context.Context, lookupKey types.NamespacedName) *IPAMStatus {
