@@ -216,6 +216,18 @@ spec:
                       - request
                       type: object
                     type: array
+                  deletions:
+                    items:
+                      properties:
+                        cidr:
+                          type: string
+                        request:
+                          type: string
+                      required:
+                      - cidr
+                      - request
+                      type: object
+                    type: array
                   name:
                     type: string
                   namespace:
