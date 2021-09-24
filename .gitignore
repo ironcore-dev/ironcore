@@ -26,3 +26,4 @@ bin
 testbin/
 dev/
 charts/
+/local

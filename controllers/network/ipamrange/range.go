@@ -18,16 +18,17 @@ package ipamrange
 
 import (
 	"context"
+
 	"github.com/go-logr/logr"
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	api "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	"github.com/onmetal/onmetal-api/pkg/utils"
-	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func (r *Reconciler) reconcileRange(ctx context.Context, log logr.Logger, current *IPAM) (ctrl.Result, error) {
+	log.Info("reconcile range")
 	if len(r.GetUsageCache().GetUsersForRelationToGK(utils.NewObjectId(current.object), "uses", api.IPAMRangeGK)) > 0 {
 		if err := r.AssureFinalizer(ctx, log, current.object); err != nil {
 			return utils.Requeue(err)
@@ -52,15 +53,8 @@ func (r *Reconciler) reconcileRange(ctx context.Context, log logr.Logger, curren
 		}
 		newCurrent := current.object.DeepCopy()
 		if req != nil {
-			log.Info("found status for pending request", "cidrs", req.object.Status.CIDRs)
 			defer r.cache.release(log, current.pendingRequest.key)
-			var list []string
-			for _, c := range current.pendingRequest.CIDRs {
-				list = append(list, c.String())
-			}
-			log.Info("expected status for pending request", "cidrs", list)
-			if !reflect.DeepEqual(req.object.Status.CIDRs, list) {
-				log.Info("expected status not yet set in pending request")
+			if !current.pendingRequest.MatchState(log, req) {
 				return utils.Succeeded()
 			}
 		} else {
@@ -69,7 +63,7 @@ func (r *Reconciler) reconcileRange(ctx context.Context, log logr.Logger, curren
 				log.Info("releasing pending allocations", "cidrs", current.pendingRequest.CIDRs)
 			}
 			for _, c := range current.pendingRequest.CIDRs {
-				current.ipam.Free(c)
+				current.ipam.Free(c.CIDR)
 			}
 		}
 		newCurrent.Status.PendingRequest = nil
@@ -83,5 +77,5 @@ func (r *Reconciler) reconcileRange(ctx context.Context, log logr.Logger, curren
 		users := r.GetUsageCache().GetUsersForRelationToGK(current.objectId, "uses", api.IPAMRangeGK)
 		r.TriggerAll(users)
 	}
-	return r.setStatus(ctx, log, current.object, common.StateReady, "")
+	return r.setStatus(ctx, log, current, common.StateReady, "")
 }

@@ -19,18 +19,17 @@ package ipamrange
 import (
 	"context"
 	"fmt"
+	"reflect"
+
 	"github.com/go-logr/logr"
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	"github.com/onmetal/onmetal-api/apis/core"
 	api "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	"github.com/onmetal/onmetal-api/pkg/cache/usagecache"
 	"github.com/onmetal/onmetal-api/pkg/controllerutils"
-	"github.com/onmetal/onmetal-api/pkg/ipam"
 	"github.com/onmetal/onmetal-api/pkg/manager"
 	"github.com/onmetal/onmetal-api/pkg/utils"
 	"k8s.io/apimachinery/pkg/api/errors"
-	"net"
-	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -65,6 +64,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 	var obj api.IPAMRange
 	if err := r.Get(ctx, req.NamespacedName, &obj); err != nil {
 		if errors.IsNotFound(err) {
+			log.Info("deleted")
 			return r.HandleDeleted(ctx, log, client.ObjectKey{
 				Namespace: req.Namespace,
 				Name:      req.Name,
@@ -73,8 +73,10 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 		return utils.Requeue(err)
 	}
 	if obj.ObjectMeta.DeletionTimestamp.IsZero() {
+		log.Info("reconciling")
 		return r.HandleReconcile(ctx, log, &obj)
 	} else {
+		log.Info("deleting")
 		return r.HandleDelete(ctx, log, &obj)
 	}
 }
@@ -96,7 +98,6 @@ func (r *Reconciler) SetupWithManager(mgr *manager.Manager) error {
 }
 
 func (r *Reconciler) HandleReconcile(ctx context.Context, log logr.Logger, obj *api.IPAMRange) (ctrl.Result, error) {
-	log.Info("handle reconcile")
 	newObjectKey := utils.NewObjectKey(obj)
 	current, err := r.cache.getRange(ctx, log, newObjectKey, obj)
 	if err != nil {
@@ -104,7 +105,7 @@ func (r *Reconciler) HandleReconcile(ctx context.Context, log logr.Logger, obj *
 	}
 	defer r.cache.release(log, newObjectKey)
 	if current.error != "" {
-		return r.invalid(ctx, log, obj, current.error)
+		return r.invalid(ctx, log, current, current.error)
 	}
 	if obj.Spec.Parent != nil {
 		// handle IPAMRange as request first
@@ -113,34 +114,9 @@ func (r *Reconciler) HandleReconcile(ctx context.Context, log logr.Logger, obj *
 			return result, err
 		}
 	} else {
-		if current.ipam == nil {
-			if len(current.requestSpecs) == 0 {
-				return r.invalid(ctx, log, obj, "at least one cidr must be specified for root (no parent) ipam range")
-			}
-			cidrs := []string{}
-			for i, c := range current.requestSpecs {
-				if !c.IsCIDR() {
-					return r.invalid(ctx, log, obj, "request spec %d does is not a valid cidr %s for a root ipam range", i, c)
-				}
-				_, cidr, _ := net.ParseCIDR(c.String())
-				if ipam.CIDRHostMaskSize(cidr) == 0 {
-					return r.invalid(ctx, log, obj, "root cidr must have more than one ip address")
-				}
-				cidrs = append(cidrs, c.String())
-			}
-			newObj := current.object.DeepCopy()
-			newObj.Status.CIDRs = cidrs
-			if !reflect.DeepEqual(newObj, obj) {
-				log.Info("setting range status", "requests", current.requestSpecs)
-				if err := r.Status().Patch(ctx, newObj, client.MergeFrom(obj)); err != nil {
-					return utils.Requeue(err)
-				}
-				// trigger all users of this ipamrange
-				log.Info("trigger all users of range", "key", current.objectId.ObjectKey)
-				users := r.GetUsageCache().GetUsersForRelationToGK(current.objectId, "uses", api.IPAMRangeGK)
-				r.TriggerAll(users)
-			}
-			return utils.Succeeded()
+		result, err := r.reconcileRootRequest(ctx, log, current)
+		if err != nil || !result.IsZero() {
+			return result, err
 		}
 	}
 	if current.ipam != nil {
@@ -150,7 +126,6 @@ func (r *Reconciler) HandleReconcile(ctx context.Context, log logr.Logger, obj *
 }
 
 func (r *Reconciler) HandleDelete(ctx context.Context, log logr.Logger, obj *api.IPAMRange) (ctrl.Result, error) {
-	log.Info("handle deletion")
 	newObjectKey := utils.NewObjectKey(obj)
 	current, err := r.cache.getRange(ctx, log, newObjectKey, obj)
 	if err != nil {
@@ -161,34 +136,48 @@ func (r *Reconciler) HandleDelete(ctx context.Context, log logr.Logger, obj *api
 }
 
 // TODO: generalize state handling
-func (r *Reconciler) invalid(ctx context.Context, log logr.Logger, obj *api.IPAMRange, message string, args ...interface{}) (ctrl.Result, error) {
-	return r.setStatus(ctx, log, obj, common.StateInvalid, message, args...)
+func (r *Reconciler) invalid(ctx context.Context, log logr.Logger, ipr *IPAM, message string, args ...interface{}) (ctrl.Result, error) {
+	return r.setStatus(ctx, log, ipr, common.StateInvalid, message, args...)
 }
 
-func (r *Reconciler) ready(ctx context.Context, log logr.Logger, obj *api.IPAMRange, message string, args ...interface{}) (ctrl.Result, error) {
-	return r.setStatus(ctx, log, obj, common.StateReady, message, args...)
-}
-
-func (r *Reconciler) setStatus(ctx context.Context, log logr.Logger, obj *api.IPAMRange, state string, msg string, args ...interface{}) (ctrl.Result, error) {
-	newIpamRange := obj.DeepCopy()
-	newIpamRange.Status.State = state
-	newIpamRange.Status.Message = fmt.Sprintf(msg, args...)
-	log.Info("updating status", "state", state, "message", newIpamRange.Status.Message)
-	if err := r.Status().Patch(ctx, newIpamRange, client.MergeFrom(obj)); err != nil {
+func (r *Reconciler) setStatus(ctx context.Context, log logr.Logger, ipr *IPAM, state string, msg string, args ...interface{}) (ctrl.Result, error) {
+	if err := updateStatus(ctx, log, r, ipr, func(obj *api.IPAMRange) {
+		obj.Status.State = state
+		obj.Status.Message = fmt.Sprintf(msg, args...)
+	}, nil); err != nil {
 		return utils.Requeue(err)
 	}
 	return utils.Succeeded()
 }
 
+func updateStatus(ctx context.Context, log logr.Logger, clt client.Client, ipr *IPAM, update func(ipamRange *api.IPAMRange), cache func()) error {
+	newObj := ipr.object.DeepCopy()
+	update(newObj)
+	if !reflect.DeepEqual(newObj, ipr.object) {
+		log.Info("updating status", "state", newObj.Status.State, "message", newObj.Status.Message)
+		if err := clt.Status().Patch(ctx, newObj, client.MergeFrom(ipr.object)); err != nil {
+			return err
+		}
+		// update self in cache
+		if ipr.ipam == nil {
+			ipr.updateFrom(log, newObj)
+		} else {
+			// attention; cache updated need to be done externally
+			ipr.object = newObj
+			if cache != nil {
+				cache()
+			}
+		}
+	}
+	return nil
+}
+
 func (r *Reconciler) HandleDeleted(ctx context.Context, log logr.Logger, key client.ObjectKey) (ctrl.Result, error) {
-	log.Info("deleted", "key", key)
 	r.cache.removeRange(key)
 	objectId := utils.ObjectId{
 		ObjectKey: key,
 		GroupKind: api.IPAMRangeGK,
 	}
-	users := r.GetUsageCache().GetUsersFor(objectId)
 	r.GetUsageCache().DeleteObject(objectId)
-	r.TriggerAll(users)
 	return utils.Succeeded()
 }
