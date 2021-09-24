@@ -111,40 +111,6 @@ var _ = OptionalDescribe("IPAMRange three level deletion", func() {
 				Message: SuccessfulAllocationMessage,
 			},
 		}
-		allocatedCIDRStatus2 := []api.CIDRAllocationStatus{
-			api.CIDRAllocationStatus{
-				CIDRAllocation: api.CIDRAllocation{
-					Request: validSubRangeCidr,
-					CIDR:    "10.0.128.0/17",
-				},
-				Status:  api.AllocationStateAllocated,
-				Message: SuccessfulAllocationMessage,
-			},
-		}
-		_ = allocatedCIDRStatus2
-		allocatedCIDRStatus3 := []api.CIDRAllocationStatus{
-			api.CIDRAllocationStatus{
-				CIDRAllocation: api.CIDRAllocation{
-					Request: validSubRangeCidr,
-					CIDR:    "10.1.0.0/17",
-				},
-				Status:  api.AllocationStateAllocated,
-				Message: SuccessfulAllocationMessage,
-			},
-		}
-		_ = allocatedCIDRStatus3
-
-		failedCIDRStatus3 := []api.CIDRAllocationStatus{
-			api.CIDRAllocationStatus{
-				CIDRAllocation: api.CIDRAllocation{
-					Request: validSubRangeCidr,
-					CIDR:    "",
-				},
-				Status:  api.AllocationStateBusy,
-				Message: FailBusyAllocationMessage(validSubRangeCidr),
-			},
-		}
-		_ = failedCIDRStatus3
 
 		It("Should clean and create root range object", func() {
 			cleanUp(validRootRangeLookupKey, validParentRangeLookupKey, validSubRangeLookupKey1, validSubRangeLookupKey2, validSubRangeLookupKey3)
