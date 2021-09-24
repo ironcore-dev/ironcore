@@ -1,4 +1,4 @@
-FROM ghcr.io/afritzler/mkdocs-material:7.2.8
+FROM ghcr.io/afritzler/mkdocs-material:7.3.0
 
 LABEL project=onmetal_api_documentation
 
