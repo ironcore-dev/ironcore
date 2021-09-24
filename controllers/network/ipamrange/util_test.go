@@ -31,10 +31,11 @@ import (
 )
 
 type IPAMStatus struct {
-	State           string
-	CIDRs           []api.CIDRAllocationStatus
-	AllocationState []string
-	PendingRequest  *api.IPAMPendingRequest
+	State            string
+	CIDRs            []api.CIDRAllocationStatus
+	AllocationState  []string
+	PendingRequest   *api.IPAMPendingRequest
+	PendingDeletions []api.CIDRAllocationStatus
 }
 
 const (
@@ -48,6 +49,7 @@ var activeTest = sets.NewString(
 	"IPAMRange controller",
 	"IPAMRange extension",
 	"IPAMRange three level extension",
+	"IPAMRange three level deletion",
 )
 
 func OptionalDescribe(n string, f func()) bool {
@@ -105,9 +107,10 @@ func projectStatus(ctx context.Context, lookupKey types.NamespacedName) *IPAMSta
 	obj := &api.IPAMRange{}
 	Expect(k8sClient.Get(ctx, lookupKey, obj)).Should(Succeed())
 	return &IPAMStatus{
-		State:           obj.Status.State,
-		CIDRs:           obj.Status.CIDRs,
-		AllocationState: obj.Status.AllocationState,
-		PendingRequest:  obj.Status.PendingRequest,
+		State:            obj.Status.State,
+		CIDRs:            obj.Status.CIDRs,
+		PendingDeletions: obj.Status.PendingDeletions,
+		AllocationState:  obj.Status.AllocationState,
+		PendingRequest:   obj.Status.PendingRequest,
 	}
 }
