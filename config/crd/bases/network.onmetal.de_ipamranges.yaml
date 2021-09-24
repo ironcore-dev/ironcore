@@ -20,7 +20,7 @@ spec:
   versions:
   - additionalPrinterColumns:
     - jsonPath: .spec.cidrs
-      name: RequestSpec
+      name: CIDRS
       type: string
     - jsonPath: .status.cidrs
       name: EffectiveCIDRs

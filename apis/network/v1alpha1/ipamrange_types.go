@@ -83,7 +83,7 @@ type IPAMPendingRequest struct {
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 //+kubebuilder:resource:shortName=ipr
-//+kubebuilder:printcolumn:name="RequestSpec",type=string,JSONPath=`.spec.cidrs`
+//+kubebuilder:printcolumn:name="CIDRS",type=string,JSONPath=`.spec.cidrs`
 //+kubebuilder:printcolumn:name="EffectiveCIDRs",type=string,JSONPath=`.status.cidrs`
 //+kubebuilder:printcolumn:name="Parent",type=string,JSONPath=`.spec.parent.name`
 //+kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.state`

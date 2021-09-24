@@ -18,6 +18,7 @@ package ipamrange
 
 import (
 	"context"
+
 	"github.com/go-logr/logr"
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	api "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
@@ -27,6 +28,7 @@ import (
 )
 
 func (r *Reconciler) reconcileRange(ctx context.Context, log logr.Logger, current *IPAM) (ctrl.Result, error) {
+	log.Info("reconcile range")
 	if len(r.GetUsageCache().GetUsersForRelationToGK(utils.NewObjectId(current.object), "uses", api.IPAMRangeGK)) > 0 {
 		if err := r.AssureFinalizer(ctx, log, current.object); err != nil {
 			return utils.Requeue(err)
@@ -75,5 +77,5 @@ func (r *Reconciler) reconcileRange(ctx context.Context, log logr.Logger, curren
 		users := r.GetUsageCache().GetUsersForRelationToGK(current.objectId, "uses", api.IPAMRangeGK)
 		r.TriggerAll(users)
 	}
-	return r.setStatus(ctx, log, current.object, common.StateReady, "")
+	return r.setStatus(ctx, log, current, common.StateReady, "")
 }

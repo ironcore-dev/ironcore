@@ -18,8 +18,11 @@ package ipamrange
 
 import (
 	"context"
+	"net"
+	"reflect"
 
 	"github.com/go-logr/logr"
+	"github.com/mandelsoft/kubipam/pkg/ipam"
 	"github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	api "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	"github.com/onmetal/onmetal-api/pkg/cache/usagecache"
@@ -28,14 +31,65 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
+func (r *Reconciler) reconcileRootRequest(ctx context.Context, log logr.Logger, current *IPAM) (ctrl.Result, error) {
+	log.Info("reconcile root request")
+	if len(current.requestSpecs) == 0 {
+		return r.invalid(ctx, log, current, "at least one cidr must be specified for root (no parent) ipam range")
+	}
+	var cidrs AllocationStatusList
+	for i, c := range current.requestSpecs {
+		if !c.IsValid() {
+			cidrs = append(cidrs, &AllocationStatus{
+				Allocation: Allocation{
+					Request: c.Request,
+					CIDR:    nil,
+				},
+				Status:  api.AllocationStateFailed,
+				Message: c.Error,
+			})
+			continue
+		}
+		if !c.Spec.IsCIDR() {
+			return r.invalid(ctx, log, current, "request spec %d is not a valid cidr %s for a root ipam range", i, c)
+		}
+		_, cidr, _ := net.ParseCIDR(c.Request)
+		if ipam.CIDRHostMaskSize(cidr) == 0 {
+			// TODO: rethink IP delegation
+			return r.invalid(ctx, log, current, "root cidr must have more than one ip address")
+		}
+		cidrs = append(cidrs, &AllocationStatus{
+			Allocation: Allocation{
+				Request: c.Request,
+				CIDR:    cidr,
+			},
+			Status:  api.AllocationStateAllocated,
+			Message: SuccessfulUsageMessage,
+		})
+	}
+
+	if err := updateStatus(ctx, log, r, current, func(obj *api.IPAMRange) {
+		obj.Status.CIDRs = cidrs.AsCIDRAllocationStatusList()
+	},
+		func() {
+			current.updateAllocations(cidrs, current.deletions)
+			// trigger all users of this ipamrange
+			log.Info("trigger all users of range", "key", current.objectId.ObjectKey)
+			users := r.GetUsageCache().GetUsersForRelationToGK(current.objectId, "uses", api.IPAMRangeGK)
+			r.TriggerAll(users)
+		}); err != nil {
+		return utils.Requeue(err)
+	}
+	return utils.Succeeded()
+}
+
 func (r *Reconciler) reconcileRequest(ctx context.Context, log logr.Logger, current *IPAM) (ctrl.Result, error) {
-	log.Info("reconcile request", "namespace", current.object.Namespace, "name", current.object.Name)
+	log.Info("reconcile request")
 	rangeId, failed, err := r.ScopeEvaluator.EvaluateScopedReferenceToObjectId(ctx, current.object.Namespace, api.IPAMRangeGK, current.object.Spec.Parent)
 	if err != nil {
 		if !failed {
 			return utils.Requeue(err)
 		}
-		return r.setStatus(ctx, log, current.object, v1alpha1.StateError, err.Error())
+		return r.setStatus(ctx, log, current, v1alpha1.StateError, err.Error())
 	}
 
 	if rangeId.Name == "" {
@@ -50,7 +104,7 @@ func (r *Reconciler) reconcileRequest(ctx context.Context, log logr.Logger, curr
 
 	// check for cycles and self reference
 	if cycle := r.GetUsageCache().IsCyclicForRelationForGK(requestId, "uses", api.IPAMRangeGK); len(cycle) > 0 {
-		return r.invalid(ctx, log, current.object, "reference cycle not allowed: %v", cycle)
+		return r.invalid(ctx, log, current, "reference cycle not allowed: %v", cycle)
 	}
 
 	ipr, err := r.cache.getRange(ctx, log, rangeId.ObjectKey, nil)
@@ -58,15 +112,15 @@ func (r *Reconciler) reconcileRequest(ctx context.Context, log logr.Logger, curr
 		if err != nil {
 			return utils.Requeue(err)
 		}
-		return r.setStatus(ctx, log, current.object, v1alpha1.StateError, "IPAMRange %s not found", rangeId.ObjectKey)
+		return r.setStatus(ctx, log, current, v1alpha1.StateError, "IPAMRange %s not found", rangeId.ObjectKey)
 	}
 	defer r.cache.release(log, rangeId.ObjectKey)
 	if ipr.error != "" {
-		return r.setStatus(ctx, log, current.object, v1alpha1.StateError, "IPAMRange %s not valid: %s", rangeId.ObjectKey, ipr.error)
+		return r.setStatus(ctx, log, current, v1alpha1.StateError, "IPAMRange %s not valid: %s", rangeId.ObjectKey, ipr.error)
 	}
 
 	if !ipr.object.DeletionTimestamp.IsZero() {
-		return r.setStatus(ctx, log, current.object, v1alpha1.StateError, "IPAMRange %s is already deleting", rangeId.ObjectKey)
+		return r.setStatus(ctx, log, current, v1alpha1.StateError, "IPAMRange %s is already deleting", rangeId.ObjectKey)
 	}
 
 	if ipr.ipam == nil {
@@ -78,7 +132,7 @@ func (r *Reconciler) reconcileRequest(ctx context.Context, log logr.Logger, curr
 
 	for i, c := range current.requestSpecs {
 		if c.Spec != nil && c.Spec.Bits() > ipr.ipam.Bits() {
-			return r.setStatus(ctx, log, current.object, v1alpha1.StateInvalid, "size (entry %d) %d bits too large", i, ipr.ipam.Bits())
+			return r.setStatus(ctx, log, current, v1alpha1.StateInvalid, "size (entry %d) %d bits too large", i, ipr.ipam.Bits())
 		}
 	}
 	// set finalizer current object
@@ -118,6 +172,8 @@ func (r *Reconciler) reconcileRequest(ctx context.Context, log logr.Logger, curr
 			}
 			allocations = append(oldAllocs, allocated...)
 		} else {
+			// check for additional allocation after successful deletion
+			log.Info("requeue for check for new allocations requests after a deletion")
 			requeue = true
 		}
 	}
@@ -127,10 +183,12 @@ func (r *Reconciler) reconcileRequest(ctx context.Context, log logr.Logger, curr
 	}
 	log.Info("allocation changes", "allocated", allocated, "deleted", deleted)
 	newObj := current.determineState(allocations, deletions)
-	if err := r.Client.Status().Patch(ctx, newObj, client.MergeFrom(current.object)); err != nil {
-		return utils.Requeue(err)
+	if !reflect.DeepEqual(newObj, current.object) {
+		if err := r.Client.Status().Patch(ctx, newObj, client.MergeFrom(current.object)); err != nil {
+			return utils.Requeue(err)
+		}
+		log.Info("allocation changes successfully updated. trigger range", "objectkey", ipr.objectId.ObjectKey)
 	}
-	log.Info("allocation finished. trigger range", "objectkey", ipr.objectId.ObjectKey)
 	// make sure to update cache with new object -> trigger range object -> triggers its users
 	current.object = newObj
 	current.updateAllocations(allocations, deletions)
@@ -185,9 +243,11 @@ func (r *Reconciler) deleteRequest(ctx context.Context, log logr.Logger, current
 				newObj := current.object.DeepCopy()
 				newObj.Status.CIDRs = nil
 				newObj.Status.PendingDeletions = nil
-				log.Info("updating status for", "object", current.objectId)
-				if err := r.Client.Status().Patch(ctx, newObj, client.MergeFrom(current.object)); err != nil {
-					return utils.Requeue(err)
+				if !reflect.DeepEqual(newObj, current.object) {
+					log.Info("updating status for", "object", current.objectId)
+					if err := r.Client.Status().Patch(ctx, newObj, client.MergeFrom(current.object)); err != nil {
+						return utils.Requeue(err)
+					}
 				}
 				current.object = newObj
 				current.allocations = nil

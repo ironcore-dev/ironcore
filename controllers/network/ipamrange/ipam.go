@@ -19,10 +19,11 @@ package ipamrange
 import (
 	"context"
 	"fmt"
-	"github.com/go-logr/logr"
 	"net"
 	"sync"
 	"time"
+
+	"github.com/go-logr/logr"
 
 	"github.com/mandelsoft/kubipam/pkg/ipam"
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
@@ -154,16 +155,19 @@ func (i *IPAM) HandleRelease(ctx context.Context, log logr.Logger, clt client.Cl
 	}
 
 	if len(cidrList) != 0 {
-		newObj := i.object.DeepCopy()
-		newObj.Status.PendingDeletions = deletions.AsCIDRAllocationStatusList()
-		newObj.Status.CIDRs = allocations.AsCIDRAllocationStatusList()
-		if err := clt.Status().Patch(ctx, newObj, client.MergeFrom(i.object)); err != nil {
+		if err := updateStatus(ctx, log, clt, i,
+			func(obj *api.IPAMRange) {
+				obj.Status.PendingDeletions = deletions.AsCIDRAllocationStatusList()
+				obj.Status.CIDRs = allocations.AsCIDRAllocationStatusList()
+			},
+			func() {
+				i.ipam.DeleteCIDRs(cidrList)
+				i.deletions = deletions
+				i.allocations = allocations
+				log.Info("released from ipam", "deletions", cidrList)
+			}); err != nil {
 			return err
 		}
-		i.ipam.DeleteCIDRs(cidrList)
-		i.deletions = deletions
-		i.allocations = allocations
-		log.Info("released from ipam", "deletions", cidrList)
 	} else {
 		log.Info("no new deletions")
 	}
