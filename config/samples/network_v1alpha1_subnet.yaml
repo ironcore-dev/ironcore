@@ -1,24 +1,14 @@
 apiVersion: network.onmetal.de/v1alpha1
 kind: Subnet
 metadata:
-  name: mySubnet
-  namespace: scope-8739274932
+  name: subnet-sample
 spec:
 #  parentSubnet:
 #    name: mySubnet1
-#    scope: scope-3424233
-#  locations:
-#    - regions: frankfurt
-#        availabilitzZones:
-#          - az1
-#          - az2
+  routingDomain:
+    name: routingdomain-sample
   ranges:
-    - cidr: 1.1.1.1/12
-      blockedRanges:
-        - 1.1.1.1/24
-    - cidr: 2.2.2.2/12
-  # size: "/12" # derived from the parent subnet - future settings
-  # or capacity: 12 == 12 ip addresses from parent subnet
-status:
-  state: Up/Down/Invalid
-  message: "All good"
+    - cidr: 10.0.0.0/16
+  # size: "/12" # derived from the parent subnet
+#status:
+#  state: Up

@@ -17,7 +17,6 @@
 package v1alpha1
 
 import (
-	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -28,31 +27,47 @@ type VolumeAttachmentSpec struct {
 	Volume corev1.LocalObjectReference `json:"volume,omitempty"`
 	// Machine is a reference of the machine object which the volume should be attached to
 	Machine corev1.LocalObjectReference `json:"machine"`
-	// Device defines the device on the host for a volume
-	Device string `json:"device,omitempty"`
-	// Source references either an image or a snapshot
-	Source VolumeSource `json:"source,omitempty"`
-}
-
-// VolumeSource defines the source of a volume which can be either an image or a snapshot
-type VolumeSource struct {
-	// Image defines the image name of the referenced image
-	Image corev1.LocalObjectReference `json:"image,omitempty"`
-	// Snapshot defines the snapshot which should be used
-	Snapshot corev1.LocalObjectReference `json:"snapshot,omitempty"`
 }
 
 // VolumeAttachmentStatus defines the observed state of VolumeAttachment
 type VolumeAttachmentStatus struct {
-	common.StateFields `json:",inline"`
-	// Device describes the device of the volume on the host
-	Device string `json:"device,omitempty"`
+	// State reports a VolumeAttachmentState a VolumeAttachment is in.
+	State VolumeAttachmentState `json:"state,omitempty"`
+	// Conditions reports the conditions a VolumeAttachment may have.
+	Conditions []VolumeAttachmentCondition `json:"conditions,omitempty"`
 }
 
+// VolumeAttachmentConditionType is a type a VolumeAttachmentCondition can have.
+type VolumeAttachmentConditionType string
+
+// VolumeAttachmentCondition is one of the conditions of a volume.
+type VolumeAttachmentCondition struct {
+	// Type is the type of the condition.
+	Type VolumeAttachmentConditionType `json:"type"`
+	// Status is the status of the condition.
+	Status corev1.ConditionStatus `json:"status"`
+	// Reason is a machine-readable indication of why the condition is in a certain state.
+	Reason string `json:"reason"`
+	// Message is a human-readable explanation of why the condition has a certain reason / state.
+	Message string `json:"message"`
+	// ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
+	// LastUpdateTime is the last time a condition has been updated.
+	LastUpdateTime metav1.Time `json:"lastUpdateTime,omitempty"`
+	// LastTransitionTime is the last time the status of a condition has transitioned from one state to another.
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
+}
+
+// VolumeAttachmentState is a state a VolumeAttachment can be int.
+type VolumeAttachmentState string
+
 const (
-	VolumeAttachmentStateAttachde = "Attached"
-	VolumeAttachmentStateInvalid  = "Invalid"
-	VolumeAttachmentStateError    = "Error"
+	// VolumeAttachmentStateAttached reports that the VolumeAttachment has been attached.
+	VolumeAttachmentStateAttached = "Attached"
+	// VolumeAttachmentStateInvalid reports that the VolumeAttachment is invalid.
+	VolumeAttachmentStateInvalid = "Invalid"
+	// VolumeAttachmentStateError reports that the VolumeAttachment is in an error state.
+	VolumeAttachmentStateError = "Error"
 )
 
 //+kubebuilder:object:root=true

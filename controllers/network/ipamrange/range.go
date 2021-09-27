@@ -22,16 +22,14 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
 	"github.com/go-logr/logr"
-	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
-	api "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
-	"github.com/onmetal/onmetal-api/pkg/utils"
+	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func (r *Reconciler) reconcileRange(ctx context.Context, log logr.Logger, current *IPAM) (ctrl.Result, error) {
 	log.Info("reconcile range")
-	if !utils.HasFinalizer(current.object, finalizerName) {
+	if !controllerutil.ContainsFinalizer(current.object, finalizerName) {
 		controllerutil.AddFinalizer(current.object, finalizerName)
 		if err := r.Update(ctx, current.object, fieldOwner); err != nil {
 			return ctrl.Result{}, fmt.Errorf("could not add finalizer: %w", err)
@@ -39,27 +37,27 @@ func (r *Reconciler) reconcileRange(ctx context.Context, log logr.Logger, curren
 		return ctrl.Result{}, nil
 	}
 	if current.object.Spec.Mode == "" && current.ipam != nil {
-		mode := api.ModeFirstMatch
+		mode := networkv1alpha1.ModeFirstMatch
 		if current.ipam.IsRoundRobin() {
-			mode = api.ModeRoundRobin
+			mode = networkv1alpha1.ModeRoundRobin
 		}
 		newObj := current.object.DeepCopy()
 		newObj.Spec.Mode = mode
 		if err := r.Patch(ctx, newObj, client.MergeFrom(current.object)); err != nil {
-			return utils.Requeue(err)
+			return ctrl.Result{}, fmt.Errorf("could not patch range: %w", err)
 		}
 	}
 	if current.pendingRequest != nil {
 		log.Info("found pending request", "key", current.pendingRequest.key)
 		req, err := r.cache.getRange(ctx, log, current.pendingRequest.key, nil)
 		if err != nil {
-			return utils.Requeue(err)
+			return ctrl.Result{}, fmt.Errorf("could not get range: %w", err)
 		}
 		newCurrent := current.object.DeepCopy()
 		if req != nil {
 			defer r.cache.release(log, current.pendingRequest.key)
 			if !current.pendingRequest.MatchState(log, req) {
-				return utils.Succeeded()
+				return ctrl.Result{}, nil
 			}
 		} else {
 			log.Info("pending request already deleted")
@@ -73,11 +71,11 @@ func (r *Reconciler) reconcileRange(ctx context.Context, log logr.Logger, curren
 		newCurrent.Status.PendingRequest = nil
 		log.Info("finalizing pending request", "key", current.pendingRequest.key)
 		if err := r.Status().Patch(ctx, newCurrent, client.MergeFrom(current.object)); err != nil {
-			return utils.Requeue(err)
+			return ctrl.Result{}, fmt.Errorf("could not finalize pending request: %w", err)
 		}
 		current.pendingRequest = nil
 		// trigger all users of this ipamrange
-		log.Info("trigger all users of range", "key", current.objectId.ObjectKey)
+		log.Info("trigger all users of range", "key", client.ObjectKeyFromObject(current.object))
 	}
-	return r.setStatus(ctx, log, current, common.StateReady, "")
+	return r.setStatus(ctx, log, current, networkv1alpha1.IPAMRangeReady, "")
 }

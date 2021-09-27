@@ -13,48 +13,6 @@ webhooks:
     service:
       name: webhook-service
       namespace: system
-      path: /mutate-core-onmetal-de-v1alpha1-account
-  failurePolicy: Fail
-  name: maccount.kb.io
-  rules:
-  - apiGroups:
-    - core.onmetal.de
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - accounts
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  - v1beta1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
-      path: /mutate-core-onmetal-de-v1alpha1-scope
-  failurePolicy: Fail
-  name: mscope.kb.io
-  rules:
-  - apiGroups:
-    - core.onmetal.de
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - scopes
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  - v1beta1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
       path: /mutate-network-onmetal-de-v1alpha1-ipamrange
   failurePolicy: Fail
   name: mipamrange.kb.io
@@ -77,50 +35,6 @@ metadata:
   creationTimestamp: null
   name: validating-webhook-configuration
 webhooks:
-- admissionReviewVersions:
-  - v1
-  - v1beta1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
-      path: /validate-core-onmetal-de-v1alpha1-account
-  failurePolicy: Fail
-  name: vaccount.kb.io
-  rules:
-  - apiGroups:
-    - core.onmetal.de
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    - DELETE
-    resources:
-    - accounts
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  - v1beta1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
-      path: /validate-core-onmetal-de-v1alpha1-scope
-  failurePolicy: Fail
-  name: vscope.kb.io
-  rules:
-  - apiGroups:
-    - core.onmetal.de
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    - DELETE
-    resources:
-    - scopes
-  sideEffects: None
 - admissionReviewVersions:
   - v1
   - v1beta1

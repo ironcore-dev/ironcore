@@ -17,33 +17,60 @@
 package v1alpha1
 
 import (
-	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // VolumeSpec defines the desired state of Volume
 type VolumeSpec struct {
 	// StorageClass is the storage class of a volume
-	StorageClass string `json:"storage_class"`
+	StorageClass corev1.LocalObjectReference `json:"storageClass"`
 	// StoragePool indicates which storage pool to use for a volume
-	StoragePool corev1.LocalObjectReference `json:"storagepool"`
-	// Size defines the size of the volume
-	Size *resource.Quantity `json:"size"`
+	StoragePool corev1.LocalObjectReference `json:"storagePool"`
+	// Resources is a description of the volume's resources and capacity.
+	Resources corev1.ResourceList `json:"resources,omitempty"`
 }
 
 // VolumeStatus defines the observed state of Volume
 type VolumeStatus struct {
-	common.StateFields `json:",inline"`
+	State      VolumeState       `json:"state,omitempty"`
+	Conditions []VolumeCondition `json:"conditions,omitempty"`
 }
 
+// VolumeState is a possible state a volume can be in.
+type VolumeState string
+
 const (
-	VolumeStateAvailable = "Available"
-	VolumeStatePending   = "Pending"
-	VolumeStateAttached  = "Attached"
-	VolumeStateError     = "Error"
+	// VolumeStateAvailable reports whether the volume is available to be used.
+	VolumeStateAvailable VolumeState = "Available"
+	// VolumeStatePending reports whether the volume is about to be ready.
+	VolumeStatePending VolumeState = "Pending"
+	// VolumeStateAttached reports that the volume is attached and in-use.
+	VolumeStateAttached VolumeState = "Attached"
+	// VolumeStateError reports that the volume is in an error state.
+	VolumeStateError VolumeState = "Error"
 )
+
+// VolumeConditionType is a type a VolumeCondition can have.
+type VolumeConditionType string
+
+// VolumeCondition is one of the conditions of a volume.
+type VolumeCondition struct {
+	// Type is the type of the condition.
+	Type VolumeConditionType `json:"type"`
+	// Status is the status of the condition.
+	Status corev1.ConditionStatus `json:"status"`
+	// Reason is a machine-readable indication of why the condition is in a certain state.
+	Reason string `json:"reason"`
+	// Message is a human-readable explanation of why the condition has a certain reason / state.
+	Message string `json:"message"`
+	// ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
+	// LastUpdateTime is the last time a condition has been updated.
+	LastUpdateTime metav1.Time `json:"lastUpdateTime,omitempty"`
+	// LastTransitionTime is the last time the status of a condition has transitioned from one state to another.
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
+}
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status

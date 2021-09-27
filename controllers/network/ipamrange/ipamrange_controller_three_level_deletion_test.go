@@ -17,8 +17,7 @@
 package ipamrange
 
 import (
-	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
-	api "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
+	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -54,61 +53,61 @@ var _ = Describe("IPAMRange three level deletion", func() {
 		allocatedParentCidr2 := "10.1.0.0/16"
 		validSubRangeCidr := "2/17"
 
-		configuredRootCIDRStatus := []api.CIDRAllocationStatus{
-			api.CIDRAllocationStatus{
-				CIDRAllocation: api.CIDRAllocation{
+		configuredRootCIDRStatus := []networkv1alpha1.CIDRAllocationStatus{
+			{
+				CIDRAllocation: networkv1alpha1.CIDRAllocation{
 					Request: validRootCidr,
 					CIDR:    validRootCidr,
 				},
-				Status:  api.AllocationStateAllocated,
+				Status:  networkv1alpha1.AllocationStateAllocated,
 				Message: SuccessfulUsageMessage,
 			},
 		}
-		allocatedCIDRParentStatus := []api.CIDRAllocationStatus{
-			api.CIDRAllocationStatus{
-				CIDRAllocation: api.CIDRAllocation{
+		allocatedCIDRParentStatus := []networkv1alpha1.CIDRAllocationStatus{
+			{
+				CIDRAllocation: networkv1alpha1.CIDRAllocation{
 					Request: validParentRequestCidr,
 					CIDR:    allocatedParentCidr1,
 				},
-				Status:  api.AllocationStateAllocated,
+				Status:  networkv1alpha1.AllocationStateAllocated,
 				Message: SuccessfulAllocationMessage,
 			},
-			api.CIDRAllocationStatus{
-				CIDRAllocation: api.CIDRAllocation{
+			{
+				CIDRAllocation: networkv1alpha1.CIDRAllocation{
 					Request: validParentRequestCidr,
 					CIDR:    allocatedParentCidr2,
 				},
-				Status:  api.AllocationStateAllocated,
+				Status:  networkv1alpha1.AllocationStateAllocated,
 				Message: SuccessfulAllocationMessage,
 			},
 		}
-		allocatedCIDRParentStatus2 := []api.CIDRAllocationStatus{
-			api.CIDRAllocationStatus{
-				CIDRAllocation: api.CIDRAllocation{
+		allocatedCIDRParentStatus2 := []networkv1alpha1.CIDRAllocationStatus{
+			{
+				CIDRAllocation: networkv1alpha1.CIDRAllocation{
 					Request: validParentRequestCidr,
 					CIDR:    allocatedParentCidr1,
 				},
-				Status:  api.AllocationStateAllocated,
+				Status:  networkv1alpha1.AllocationStateAllocated,
 				Message: SuccessfulAllocationMessage,
 			},
 		}
-		pendingDeletionCIDRParentStatus2 := []api.CIDRAllocationStatus{
-			api.CIDRAllocationStatus{
-				CIDRAllocation: api.CIDRAllocation{
+		pendingDeletionCIDRParentStatus2 := []networkv1alpha1.CIDRAllocationStatus{
+			{
+				CIDRAllocation: networkv1alpha1.CIDRAllocation{
 					Request: validParentRequestCidr,
 					CIDR:    allocatedParentCidr2,
 				},
-				Status:  api.AllocationStateAllocated,
+				Status:  networkv1alpha1.AllocationStateAllocated,
 				Message: SuccessfulAllocationMessage,
 			},
 		}
-		allocatedCIDRStatus1 := []api.CIDRAllocationStatus{
-			api.CIDRAllocationStatus{
-				CIDRAllocation: api.CIDRAllocation{
+		allocatedCIDRStatus1 := []networkv1alpha1.CIDRAllocationStatus{
+			{
+				CIDRAllocation: networkv1alpha1.CIDRAllocation{
 					Request: validSubRangeCidr,
 					CIDR:    "10.1.0.0/17",
 				},
-				Status:  api.AllocationStateAllocated,
+				Status:  networkv1alpha1.AllocationStateAllocated,
 				Message: SuccessfulAllocationMessage,
 			},
 		}
@@ -116,14 +115,12 @@ var _ = Describe("IPAMRange three level deletion", func() {
 		It("Should clean and create root range object", func() {
 			cleanUp(validRootRangeLookupKey, validParentRangeLookupKey, validSubRangeLookupKey1, validSubRangeLookupKey2, validSubRangeLookupKey3)
 			createObject(validRootRangeLookupKey, nil, validRootCidr)
-			Eventually(func() *api.IPAMRangeStatus {
-				obj := &api.IPAMRange{}
+			Eventually(func() *networkv1alpha1.IPAMRangeStatus {
+				obj := &networkv1alpha1.IPAMRange{}
 				Expect(k8sClient.Get(ctx, validRootRangeLookupKey, obj)).Should(Succeed())
 				return &obj.Status
-			}, timeout, interval).Should(Equal(&api.IPAMRangeStatus{
-				StateFields: common.StateFields{
-					State: common.StateReady,
-				},
+			}, timeout, interval).Should(Equal(&networkv1alpha1.IPAMRangeStatus{
+				State: networkv1alpha1.IPAMRangeReady,
 				CIDRs: configuredRootCIDRStatus,
 			}))
 		})
@@ -132,22 +129,20 @@ var _ = Describe("IPAMRange three level deletion", func() {
 			createObject(validParentRangeLookupKey, &corev1.LocalObjectReference{
 				Name: validRootRangeLookupKey.Name,
 			}, validParentRequestCidr, validParentRequestCidr)
-			Eventually(func() *api.IPAMRangeStatus {
-				obj := &api.IPAMRange{}
+			Eventually(func() *networkv1alpha1.IPAMRangeStatus {
+				obj := &networkv1alpha1.IPAMRange{}
 				Expect(k8sClient.Get(ctx, validParentRangeLookupKey, obj)).Should(Succeed())
 				return &obj.Status
-			}, timeout, interval).Should(Equal(&api.IPAMRangeStatus{
-				StateFields: common.StateFields{
-					State: common.StateReady,
-				},
+			}, timeout, interval).Should(Equal(&networkv1alpha1.IPAMRangeStatus{
+				State: networkv1alpha1.IPAMRangeReady,
 				CIDRs: allocatedCIDRParentStatus,
 			}))
 			Eventually(func() *IPAMStatus {
-				obj := &api.IPAMRange{}
+				obj := &networkv1alpha1.IPAMRange{}
 				Expect(k8sClient.Get(ctx, validRootRangeLookupKey, obj)).Should(Succeed())
 				return projectStatus(ctx, validRootRangeLookupKey)
 			}, timeout, interval).Should(Equal(&IPAMStatus{
-				State: common.StateReady,
+				State: networkv1alpha1.IPAMRangeReady,
 				CIDRs: configuredRootCIDRStatus,
 				AllocationState: []string{
 					"10.0.0.0/15[busy]",
@@ -169,7 +164,7 @@ var _ = Describe("IPAMRange three level deletion", func() {
 			Eventually(func() *IPAMStatus {
 				return projectStatus(ctx, validParentRangeLookupKey)
 			}, timeout, interval).Should(Equal(&IPAMStatus{
-				State: common.StateReady,
+				State: networkv1alpha1.IPAMRangeReady,
 				CIDRs: allocatedCIDRParentStatus,
 				AllocationState: []string{
 					"10.0.0.0/16[free]",
@@ -181,7 +176,7 @@ var _ = Describe("IPAMRange three level deletion", func() {
 			Eventually(func() *IPAMStatus {
 				return projectStatus(ctx, validSubRangeLookupKey1)
 			}, timeout, interval).Should(Equal(&IPAMStatus{
-				State: common.StateReady,
+				State: networkv1alpha1.IPAMRangeReady,
 				CIDRs: allocatedCIDRStatus1,
 			}))
 		})
@@ -193,7 +188,7 @@ var _ = Describe("IPAMRange three level deletion", func() {
 			Eventually(func() *IPAMStatus {
 				return projectStatus(ctx, validParentRangeLookupKey)
 			}, timeout, interval).Should(Equal(&IPAMStatus{
-				State:            common.StateReady,
+				State:            networkv1alpha1.IPAMRangeReady,
 				CIDRs:            allocatedCIDRParentStatus2,
 				PendingDeletions: pendingDeletionCIDRParentStatus2,
 				AllocationState: []string{
@@ -204,11 +199,11 @@ var _ = Describe("IPAMRange three level deletion", func() {
 				PendingRequest: nil,
 			}))
 			Eventually(func() *IPAMStatus {
-				obj := &api.IPAMRange{}
+				obj := &networkv1alpha1.IPAMRange{}
 				Expect(k8sClient.Get(ctx, validRootRangeLookupKey, obj)).Should(Succeed())
 				return projectStatus(ctx, validRootRangeLookupKey)
 			}, timeout, interval).Should(Equal(&IPAMStatus{
-				State: common.StateReady,
+				State: networkv1alpha1.IPAMRangeReady,
 				CIDRs: configuredRootCIDRStatus,
 				AllocationState: []string{
 					"10.0.0.0/15[busy]",
@@ -224,24 +219,24 @@ var _ = Describe("IPAMRange three level deletion", func() {
 		})
 
 		PIt("Should remove subrange request", func() {
-			var obj = &api.IPAMRange{}
+			var obj = &networkv1alpha1.IPAMRange{}
 			Expect(k8sClient.Get(ctx, validSubRangeLookupKey1, obj)).Should(Succeed())
 			Expect(k8sClient.Delete(ctx, obj)).Should(Succeed())
 			Eventually(func() *IPAMStatus {
 				return projectStatus(ctx, validParentRangeLookupKey)
 			}, timeout, interval).Should(Equal(&IPAMStatus{
-				State: common.StateReady,
+				State: networkv1alpha1.IPAMRangeReady,
 				CIDRs: allocatedCIDRParentStatus2,
 				AllocationState: []string{
 					"10.0.0.0/16[free]",
 				},
 			}))
 			Eventually(func() *IPAMStatus {
-				obj := &api.IPAMRange{}
+				obj := &networkv1alpha1.IPAMRange{}
 				Expect(k8sClient.Get(ctx, validRootRangeLookupKey, obj)).Should(Succeed())
 				return projectStatus(ctx, validRootRangeLookupKey)
 			}, timeout, interval).Should(Equal(&IPAMStatus{
-				State: common.StateReady,
+				State: networkv1alpha1.IPAMRangeReady,
 				CIDRs: configuredRootCIDRStatus,
 				AllocationState: []string{
 					"10.0.0.0/16[busy]",

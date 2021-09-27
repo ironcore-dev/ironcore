@@ -19,8 +19,7 @@ package ipamrange
 import (
 	"context"
 	"github.com/go-logr/logr"
-	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
-	api "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
+	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sync"
@@ -82,7 +81,7 @@ func (i *IPAMCache) release(log logr.Logger, key client.ObjectKey) {
 	}
 }
 
-func (i *IPAMCache) getRange(ctx context.Context, log logr.Logger, name client.ObjectKey, obj *api.IPAMRange) (*IPAM, error) {
+func (i *IPAMCache) getRange(ctx context.Context, log logr.Logger, name client.ObjectKey, obj *networkv1alpha1.IPAMRange) (*IPAM, error) {
 	i.lock.Lock()
 	ipr := i.lockedIpams[name]
 	if ipr == nil {
@@ -92,7 +91,7 @@ func (i *IPAMCache) getRange(ctx context.Context, log logr.Logger, name client.O
 		}
 		if ipr == nil {
 			if obj == nil {
-				var tempObj api.IPAMRange
+				var tempObj networkv1alpha1.IPAMRange
 				if err := i.Client.Get(ctx, name, &tempObj); err != nil {
 					i.lock.Unlock()
 					if errors.IsNotFound(err) {
@@ -112,7 +111,7 @@ func (i *IPAMCache) getRange(ctx context.Context, log logr.Logger, name client.O
 		} else {
 			ipr.object = obj
 			ipr.updateSpecFrom(obj)
-			if obj.Status.State != common.StateReady {
+			if obj.Status.State != networkv1alpha1.IPAMRangeReady {
 				ipr.error = obj.Status.Message
 			} else {
 				ipr.error = ""

@@ -18,16 +18,9 @@ package main
 
 import (
 	"flag"
-	"github.com/onmetal/onmetal-api/controllers/compute/sshpublickey"
 	"github.com/onmetal/onmetal-api/controllers/network/ipamrange"
 	"os"
 
-	accountwebhook "github.com/onmetal/onmetal-api/pkg/webhooks/account"
-	scopewebhook "github.com/onmetal/onmetal-api/pkg/webhooks/scope"
-
-	"github.com/onmetal/onmetal-api/controllers/core"
-	"github.com/onmetal/onmetal-api/controllers/core/accounts"
-	"github.com/onmetal/onmetal-api/controllers/core/scopes"
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -40,7 +33,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
-	corev1alpha1 "github.com/onmetal/onmetal-api/apis/core/v1alpha1"
 	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 	computecontrollers "github.com/onmetal/onmetal-api/controllers/compute"
@@ -56,7 +48,6 @@ var (
 
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
-	utilruntime.Must(corev1alpha1.AddToScheme(scheme))
 	utilruntime.Must(computev1alpha1.AddToScheme(scheme))
 	utilruntime.Must(storagev1alpha1.AddToScheme(scheme))
 	utilruntime.Must(networkv1alpha1.AddToScheme(scheme))
@@ -92,43 +83,9 @@ func main() {
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       "d0ae00be.onmetal.de",
 	})
-
 	if err != nil {
-		panic("failed to create manager")
-	}
-
-	// Account controller
-	if err = (&accounts.Reconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("Account"),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "Account")
+		setupLog.Error(err, "unable to create manager")
 		os.Exit(1)
-	}
-	// Account webhook
-	if enableWebhooks {
-		if err = (&accountwebhook.AccountWebhook{}).SetupWebhookWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create webhook", "webhook", "Account")
-			os.Exit(1)
-		}
-	}
-
-	// Scope controller
-	if err = (&scopes.Reconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("Scope"),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "Scope")
-		os.Exit(1)
-	}
-	// Scope webhook
-	if enableWebhooks {
-		if err = (&scopewebhook.ScopeWebhook{}).SetupWebhookWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create webhook", "webhook", "Scope")
-			os.Exit(1)
-		}
 	}
 
 	if err = (&computecontrollers.MachineClassReconciler{
@@ -136,13 +93,6 @@ func main() {
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "MachineClass")
-		os.Exit(1)
-	}
-	if err = (&core.RegionReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "Region")
 		os.Exit(1)
 	}
 	if err = (&computecontrollers.MachinePoolReconciler{
@@ -164,20 +114,6 @@ func main() {
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "StorageClass")
-		os.Exit(1)
-	}
-	if err = (&computecontrollers.ImageReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "Image")
-		os.Exit(1)
-	}
-	if err = (&sshpublickey.Reconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "SSHPublicKey")
 		os.Exit(1)
 	}
 	if err = (&storagecontrollers.VolumeReconciler{

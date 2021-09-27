@@ -1,20 +1,14 @@
 apiVersion: network.onmetal.de/v1alpha1
 kind: Gateway
 metadata:
-  name: gateway
-  namespace: external-access
+  name: gateway-sample
 spec:
   mode: SNAT
   uplink:
-    kind: Subnet
-    apiGroup: network.onmetal.de
-    name: public-subnet
-    scope: global
-  regions:
-    - Frankfurt
-status:
-  state: Up
-  message: "All good"
-  ips:
-    - 35.0.0.1
+    subnet:
+      name: subnet-sample
+#status:
+#  state: Up
+#  ips:
+#    - 35.0.0.1
 

@@ -18,8 +18,6 @@ package network
 
 import (
 	"context"
-	"github.com/onmetal/onmetal-api/apis/common/v1alpha1"
-
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -49,20 +47,6 @@ type RoutingDomainReconciler struct {
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.8.3/pkg/reconcile
 func (r *RoutingDomainReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
-
-	var routingDomain networkv1alpha1.RoutingDomain
-
-	if err := r.Get(ctx, req.NamespacedName, &routingDomain); err != nil {
-		return ctrl.Result{}, err
-	}
-
-	newRoutingDomain := routingDomain.DeepCopy()
-	newRoutingDomain.Status.State = v1alpha1.StateReady
-
-	if err := r.Status().Patch(ctx, newRoutingDomain, client.MergeFrom(&routingDomain)); err != nil {
-		return ctrl.Result{}, err
-	}
-
 	return ctrl.Result{}, nil
 }
 

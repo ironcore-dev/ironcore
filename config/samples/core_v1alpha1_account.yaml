@@ -1,8 +1,0 @@
-apiVersion: core.onmetal.de/v1alpha1
-kind: Account
-metadata:
-  name: account-sample
-spec:
-  description: yolo
-  createdBy:
-

@@ -17,33 +17,22 @@
 package v1alpha1
 
 import (
-	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // MachineClassSpec defines the desired state of MachineClass
 type MachineClassSpec struct {
-	// Capabilities describes the features of the MachineClass
-	Capabilities []Capability `json:"capabilities"`
-}
-
-// Capability describes a single feature of a MachineClass
-type Capability struct {
-	// Name is the name of the capability
-	Name string `json:"name"`
-	// Type defines the type of the capability
-	Type string `json:"type"`
-	// Value is the effective value of the capability
-	Value string `json:"value"`
+	// Capabilities describes the resources a machine class can provide.
+	Capabilities corev1.ResourceList `json:"capabilities,omitempty"`
 }
 
 // MachineClassStatus defines the observed state of MachineClass
 type MachineClassStatus struct {
-	// Availability describes the regions and zones where this MachineClass is available
-	Availability common.Availability `json:"availability,omitempty"`
 }
 
 //+kubebuilder:object:root=true
+//+kubebuilder:resource:scope=Cluster
 //+kubebuilder:subresource:status
 //+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 

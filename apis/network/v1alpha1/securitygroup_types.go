@@ -48,10 +48,10 @@ type EgressSecurityGroupRule struct {
 type SecurityGroupRule struct {
 	// Name is the name of the SecurityGroupRule
 	Name string `json:"name"`
-	// SecurityGroupRef is a scoped reference to an existing SecurityGroup
+	// SecurityGroupRef is a reference to an existing SecurityGroup
 	SecurityGroupRef corev1.LocalObjectReference `json:"securityGroupRef,omitempty"`
 	// Action defines the action type of a SecurityGroupRule
-	Action ActionType `json:"action,omitempty"`
+	Action SecurityGroupAction `json:"action,omitempty"`
 	// Protocol defines the protocol of a SecurityGroupRule
 	Protocol string `json:"protocol,omitempty"`
 	// PortRange is the port range of the SecurityGroupRule
@@ -61,7 +61,7 @@ type SecurityGroupRule struct {
 // IPSetSpec defines either a cidr or a security group reference
 type IPSetSpec struct {
 	// CIDR block for source/destination
-	CIDR common.Cidr `json:"cidr,omitempty"`
+	CIDR common.CIDR `json:"cidr,omitempty"`
 	// SecurityGroupRef references a security group
 	SecurityGroupRef corev1.LocalObjectReference `json:"securityGroupref,omitempty"`
 }
@@ -74,20 +74,48 @@ type PortRange struct {
 	EndPort int `json:"endPort,omitempty"`
 }
 
-// ActionType describes the action type of a SecurityGroupRule
-type ActionType string
-
 // SecurityGroupStatus defines the observed state of SecurityGroup
 type SecurityGroupStatus struct {
-	common.StateFields `json:",inline"`
+	State      SecurityGroupState       `json:"state,omitempty"`
+	Conditions []SecurityGroupCondition `json:"conditions,omitempty"`
 }
 
+// SecurityGroupConditionType is a type a SecurityGroupCondition can have.
+type SecurityGroupConditionType string
+
+// SecurityGroupCondition is one of the conditions of a volume.
+type SecurityGroupCondition struct {
+	// Type is the type of the condition.
+	Type SecurityGroupConditionType `json:"type"`
+	// Status is the status of the condition.
+	Status corev1.ConditionStatus `json:"status"`
+	// Reason is a machine-readable indication of why the condition is in a certain state.
+	Reason string `json:"reason"`
+	// Message is a human-readable explanation of why the condition has a certain reason / state.
+	Message string `json:"message"`
+	// ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
+	// LastUpdateTime is the last time a condition has been updated.
+	LastUpdateTime metav1.Time `json:"lastUpdateTime,omitempty"`
+	// LastTransitionTime is the last time the status of a condition has transitioned from one state to another.
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
+}
+
+// SecurityGroupAction describes the action of a SecurityGroupRule.
+type SecurityGroupAction string
+
 const (
-	SecurityGroupActionTypeAllowed ActionType = "allowed"
-	SecurityGroupActionTypeDeny    ActionType = "deny"
-	SecurityGroupStateUsed                    = "Used"
-	SecurityGroupStateUnused                  = "Unused"
-	SecurityGroupStateInvalid                 = "Invalid"
+	SecurityGroupActionTypeAllow SecurityGroupAction = "Allow"
+	SecurityGroupActionTypeDeny  SecurityGroupAction = "Deny"
+)
+
+// SecurityGroupState is the state of a SecurityGroup.
+type SecurityGroupState string
+
+const (
+	SecurityGroupStateUsed    SecurityGroupState = "Used"
+	SecurityGroupStateUnused  SecurityGroupState = "Unused"
+	SecurityGroupStateInvalid SecurityGroupState = "Invalid"
 )
 
 //+kubebuilder:object:root=true

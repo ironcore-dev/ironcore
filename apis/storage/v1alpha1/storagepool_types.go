@@ -17,52 +17,57 @@
 package v1alpha1
 
 import (
-	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
-	"k8s.io/apimachinery/pkg/api/resource"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // StoragePoolSpec defines the desired state of StoragePool
 type StoragePoolSpec struct {
-	// Region defines the region of the storage pool
-	Region string `json:"region,omitempty"`
-	// Privacy defines the privacy scope of the storage pool
-	Privacy string `json:"privacy"`
-	// Replication indicates the replication factor in the storage pool
-	// +kubebuilder:validation:Minimum:=0
-	Replication int `json:"replication,omitempty"`
-	// Capacity list the available capacity of a storage pool
-	Capacity []StorageClassCapacity `json:"capacity,omitempty"`
-}
-
-const (
-	PrivacyShared  = "shared"
-	PrivacyDisk    = "disk"
-	PrivacyCluster = "cluster"
-)
-
-// StorageClassCapacity defines capacity attribute of a storage class
-type StorageClassCapacity struct {
-	// Name is the name of a storage class capacity
-	Name string `json:"name"`
-	// Capacity is the quantity of a capacity
-	Capacity *resource.Quantity `json:"capacity,omitempty"`
+	// ProviderID identifies the StoragePool on provider side.
+	ProviderID string `json:"providerID"`
 }
 
 // StoragePoolStatus defines the observed state of StoragePool
 type StoragePoolStatus struct {
-	common.StateFields `json:",inline"`
+	State      StoragePoolState       `json:"state,omitempty"`
+	Conditions []StoragePoolCondition `json:"conditions,omitempty"`
+	// Available list the available capacity of a storage pool
+	Available corev1.ResourceList `json:"available,omitempty"`
 	// Used indicates how much capacity has been used in a storage pool
-	Used []StorageClassCapacity `json:"used,omitempty"`
+	Used corev1.ResourceList `json:"used,omitempty"`
 }
 
+type StoragePoolState string
+
 const (
-	StoragePoolStateAvailable    = "Available"
-	StoragePoolStatePending      = "Pending"
-	StoragePoolStateNotAvailable = "NotAvailable"
+	StoragePoolStateAvailable    StoragePoolState = "Available"
+	StoragePoolStatePending      StoragePoolState = "Pending"
+	StoragePoolStateNotAvailable StoragePoolState = "NotAvailable"
 )
 
+// StoragePoolConditionType is a type a StoragePoolCondition can have.
+type StoragePoolConditionType string
+
+// StoragePoolCondition is one of the conditions of a volume.
+type StoragePoolCondition struct {
+	// Type is the type of the condition.
+	Type StoragePoolConditionType `json:"type"`
+	// Status is the status of the condition.
+	Status corev1.ConditionStatus `json:"status"`
+	// Reason is a machine-readable indication of why the condition is in a certain state.
+	Reason string `json:"reason"`
+	// Message is a human-readable explanation of why the condition has a certain reason / state.
+	Message string `json:"message"`
+	// ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
+	// LastUpdateTime is the last time a condition has been updated.
+	LastUpdateTime metav1.Time `json:"lastUpdateTime,omitempty"`
+	// LastTransitionTime is the last time the status of a condition has transitioned from one state to another.
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
+}
+
 //+kubebuilder:object:root=true
+//+kubebuilder:resource:scope=Cluster
 //+kubebuilder:subresource:status
 //+kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.state`
 //+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`

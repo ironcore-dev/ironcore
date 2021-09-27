@@ -2,7 +2,6 @@ apiVersion: network.onmetal.de/v1alpha1
 kind: SecurityGroup
 metadata:
   name: sshaccess
-  namespace: external-access
 spec:
   ingress:
     - name: ssh
@@ -18,6 +17,5 @@ spec:
       protocol: "*"
       destination:
         cidr: 0.0.0.0/0
-status:
-  state: Used
-  message: "All good"
+#status:
+#  state: Used
