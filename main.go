@@ -28,8 +28,6 @@ import (
 	"github.com/onmetal/onmetal-api/controllers/core"
 	"github.com/onmetal/onmetal-api/controllers/core/accounts"
 	"github.com/onmetal/onmetal-api/controllers/core/scopes"
-	"github.com/onmetal/onmetal-api/pkg/manager"
-
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -85,7 +83,7 @@ func main() {
 	logger := zap.New(zap.UseFlagOptions(&opts))
 	ctrl.SetLogger(logger)
 
-	mgr, err := manager.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
+	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Logger:                 logger,
 		Scheme:                 scheme,
 		MetricsBindAddress:     metricsAddr,
@@ -233,7 +231,9 @@ func main() {
 	}
 
 	// IPAMRange controller
-	if err = ipamrange.NewReconciler().SetupWithManager(mgr); err != nil {
+	if err = (&ipamrange.Reconciler{
+		Client: mgr.GetClient(),
+	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "IPAMRange")
 		os.Exit(1)
 	}
@@ -260,11 +260,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := mgr.Manager.AddHealthzCheck("healthz", healthz.Ping); err != nil {
+	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to set up health check")
 		os.Exit(1)
 	}
-	if err := mgr.Manager.AddReadyzCheck("readyz", healthz.Ping); err != nil {
+	if err := mgr.AddReadyzCheck("readyz", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to set up ready check")
 		os.Exit(1)
 	}

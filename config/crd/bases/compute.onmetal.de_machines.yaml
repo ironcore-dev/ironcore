@@ -65,13 +65,9 @@ spec:
                 description: Image is the operating system image of the machine
                 properties:
                   name:
-                    description: Name is the name of the scope
+                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                      TODO: Add other useful fields. apiVersion, kind, uid?'
                     type: string
-                  scope:
-                    description: Scope is the absolute scope path
-                    type: string
-                required:
-                - name
                 type: object
               interfaces:
                 description: Interfaces define a list of network interfaces present
@@ -95,22 +91,10 @@ spec:
                     target:
                       description: Target is the referenced resource of this interface
                       properties:
-                        apiGroup:
-                          description: APIGroup is the API group of the object
-                          type: string
-                        kind:
-                          description: Kind is the kind of the object
-                          type: string
                         name:
-                          description: Name is the name of the scope
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                            TODO: Add other useful fields. apiVersion, kind, uid?'
                           type: string
-                        scope:
-                          description: Scope is the absolute scope path
-                          type: string
-                      required:
-                      - apiGroup
-                      - kind
-                      - name
                       type: object
                   required:
                   - name
@@ -133,39 +117,28 @@ spec:
                 description: MachineClass is the machine class/flavor of the machine
                 properties:
                   name:
-                    description: Name is the name of the scope
+                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                      TODO: Add other useful fields. apiVersion, kind, uid?'
                     type: string
-                  scope:
-                    description: Scope is the absolute scope path
-                    type: string
-                required:
-                - name
                 type: object
               machinePool:
                 description: MachinePool defines the compute pool of the machine
                 properties:
                   name:
-                    description: Name is the name of the scope
+                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                      TODO: Add other useful fields. apiVersion, kind, uid?'
                     type: string
-                  scope:
-                    description: Scope is the absolute scope path
-                    type: string
-                required:
-                - name
                 type: object
               securityGroups:
                 description: SecurityGroups is a list of security groups of a machine
                 items:
-                  description: ScopedReference refers to a scope and the scopes name
+                  description: LocalObjectReference contains enough information to
+                    let you locate the referenced object inside the same namespace.
                   properties:
                     name:
-                      description: Name is the name of the scope
+                      description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                        TODO: Add other useful fields. apiVersion, kind, uid?'
                       type: string
-                    scope:
-                      description: Scope is the absolute scope path
-                      type: string
-                  required:
-                  - name
                   type: object
                 type: array
               sshPublicKeys:
@@ -257,25 +230,17 @@ spec:
                         volumes
                       properties:
                         name:
-                          description: Name is the name of the scope
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                            TODO: Add other useful fields. apiVersion, kind, uid?'
                           type: string
-                        scope:
-                          description: Scope is the absolute scope path
-                          type: string
-                      required:
-                      - name
                       type: object
                     volume:
                       description: Volume is a reference to an existing volume
                       properties:
                         name:
-                          description: Name is the name of the scope
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                            TODO: Add other useful fields. apiVersion, kind, uid?'
                           type: string
-                        scope:
-                          description: Scope is the absolute scope path
-                          type: string
-                      required:
-                      - name
                       type: object
                   required:
                   - device

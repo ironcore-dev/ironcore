@@ -18,6 +18,7 @@ package v1alpha1
 
 import (
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -32,11 +33,11 @@ type RoutingDomainSpec struct {
 // Route describes a single route definition
 type Route struct {
 	// SubnetRef is a reference to Subnet
-	SubnetRef common.ScopedReference `json:"subnetRef,omitempty"`
+	SubnetRef corev1.LocalObjectReference `json:"subnetRef,omitempty"`
 	// CIDR is the matching CIDR of a Route
 	CIDR string `json:"cidr,omitempty"`
 	// Target is the target object of a Route
-	Target common.ScopedKindReference `json:"target,omitempty"`
+	Target corev1.LocalObjectReference `json:"target,omitempty"`
 }
 
 // RoutingDomainStatus defines the observed state of RoutingDomain

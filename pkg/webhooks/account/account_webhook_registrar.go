@@ -17,17 +17,17 @@
 package account
 
 import (
-	api "github.com/onmetal/onmetal-api/apis/core/v1alpha1"
-	"github.com/onmetal/onmetal-api/pkg/manager"
+	corev1alpha1 "github.com/onmetal/onmetal-api/apis/core/v1alpha1"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
 )
 
 type AccountWebhook struct {
-	api.Account
+	corev1alpha1.Account
 }
 
-func (r *AccountWebhook) SetupWebhookWithManager(mgr *manager.Manager) error {
+func (r *AccountWebhook) SetupWebhookWithManager(mgr manager.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr).
-		For(&api.Account{}).
+		For(&corev1alpha1.Account{}).
 		Complete()
 }

@@ -18,6 +18,7 @@ package v1alpha1
 
 import (
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
@@ -31,11 +32,11 @@ var SubnetGK = schema.GroupKind{
 type SubnetSpec struct {
 	// Parent is a reference to a public parent Subnet without regional manifestation. The direct children
 	// then represent the regional incarnations of this public subnet.
-	Parent common.ScopedReference `json:"parent,omitempty"`
+	Parent corev1.LocalObjectReference `json:"parent,omitempty"`
 	// Locations defines in which regions and availability zone this subnet should be available
 	Locations []common.RegionAvailability `json:"locations,omitempty"`
 	// RoutingDomain is the reference to the routing domain this SubNet should be associated with
-	RoutingDomain common.ScopedReference `json:"routingDomain"`
+	RoutingDomain corev1.LocalObjectReference `json:"routingDomain"`
 	// Ranges defines the size of the subnet
 	// +kubebuilder:validation:MinItems:=1
 	Ranges []RangeType `json:"ranges,omitempty"`
@@ -44,7 +45,7 @@ type SubnetSpec struct {
 // RangeType defines the range/size of a subnet
 type RangeType struct {
 	// IPAM is a reference to the an range block of a subnet
-	IPAM common.ScopedReference `json:"ipam,omitempty"`
+	IPAM corev1.LocalObjectReference `json:"ipam,omitempty"`
 	// Size defines the size of a subnet e.g. "/12"
 	Size string `json:"size,omitempty"`
 	// CIDR is the CIDR block

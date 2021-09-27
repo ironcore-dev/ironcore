@@ -18,6 +18,7 @@ package v1alpha1
 
 import (
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -48,7 +49,7 @@ type SecurityGroupRule struct {
 	// Name is the name of the SecurityGroupRule
 	Name string `json:"name"`
 	// SecurityGroupRef is a scoped reference to an existing SecurityGroup
-	SecurityGroupRef common.ScopedReference `json:"securityGroupRef,omitempty"`
+	SecurityGroupRef corev1.LocalObjectReference `json:"securityGroupRef,omitempty"`
 	// Action defines the action type of a SecurityGroupRule
 	Action ActionType `json:"action,omitempty"`
 	// Protocol defines the protocol of a SecurityGroupRule
@@ -62,7 +63,7 @@ type IPSetSpec struct {
 	// CIDR block for source/destination
 	CIDR common.Cidr `json:"cidr,omitempty"`
 	// SecurityGroupRef references a security group
-	SecurityGroupRef common.ScopedReference `json:"securityGroupref,omitempty"`
+	SecurityGroupRef corev1.LocalObjectReference `json:"securityGroupref,omitempty"`
 }
 
 // PortRange defines the start and end of a port range

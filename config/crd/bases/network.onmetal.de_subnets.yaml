@@ -84,13 +84,9 @@ spec:
                   incarnations of this public subnet.
                 properties:
                   name:
-                    description: Name is the name of the scope
+                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                      TODO: Add other useful fields. apiVersion, kind, uid?'
                     type: string
-                  scope:
-                    description: Scope is the absolute scope path
-                    type: string
-                required:
-                - name
                 type: object
               ranges:
                 description: Ranges defines the size of the subnet
@@ -112,13 +108,9 @@ spec:
                         subnet
                       properties:
                         name:
-                          description: Name is the name of the scope
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                            TODO: Add other useful fields. apiVersion, kind, uid?'
                           type: string
-                        scope:
-                          description: Scope is the absolute scope path
-                          type: string
-                      required:
-                      - name
                       type: object
                     size:
                       description: Size defines the size of a subnet e.g. "/12"
@@ -131,13 +123,9 @@ spec:
                   this SubNet should be associated with
                 properties:
                   name:
-                    description: Name is the name of the scope
+                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                      TODO: Add other useful fields. apiVersion, kind, uid?'
                     type: string
-                  scope:
-                    description: Scope is the absolute scope path
-                    type: string
-                required:
-                - name
                 type: object
             required:
             - routingDomain

@@ -18,6 +18,7 @@ package v1alpha1
 
 import (
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -27,19 +28,19 @@ type MachineSpec struct {
 	// Hostname is the hostname of the machine
 	Hostname string `json:"hostname"`
 	// MachineClass is the machine class/flavor of the machine
-	MachineClass common.ScopedReference `json:"machineClass"`
+	MachineClass corev1.LocalObjectReference `json:"machineClass"`
 	// MachinePool defines the compute pool of the machine
-	MachinePool common.ScopedReference `json:"machinePool,omitempty"`
+	MachinePool corev1.LocalObjectReference `json:"machinePool,omitempty"`
 	// Location is the physical location of the machine
 	Location common.Location `json:"location"`
 	// Image is the operating system image of the machine
-	Image common.ScopedReference `json:"image"`
+	Image corev1.LocalObjectReference `json:"image"`
 	// SSHPublicKeys is a list of SSH public keys of a machine
 	SSHPublicKeys []SSHPublicKeyEntry `json:"sshPublicKeys"`
 	// Interfaces define a list of network interfaces present on the machine
 	Interfaces []Interface `json:"interfaces,omitempty"`
 	// SecurityGroups is a list of security groups of a machine
-	SecurityGroups []common.ScopedReference `json:"securityGroups"`
+	SecurityGroups []corev1.LocalObjectReference `json:"securityGroups"`
 	// VolumeClaims
 	VolumeClaims []VolumeClaim `json:"volumeClaims"`
 	// UserData defines the ignition file
@@ -51,7 +52,7 @@ type Interface struct {
 	// Name is the name of the interface
 	Name string `json:"name"`
 	// Target is the referenced resource of this interface
-	Target common.ScopedKindReference `json:"target"`
+	Target corev1.LocalObjectReference `json:"target"`
 	// Priority is the priority level of this interface
 	Priority int `json:"priority,omitempty"`
 	// IP specifies a concrete IP address which should be allocated from a Subnet
@@ -69,11 +70,11 @@ type VolumeClaim struct {
 	// Device defines the device for a volume on the machine
 	Device string `json:"device"`
 	// StorageClass describes the storage class of the volumes
-	StorageClass common.ScopedReference `json:"storageClass"`
+	StorageClass corev1.LocalObjectReference `json:"storageClass"`
 	// Size defines the size of the volume
 	Size *resource.Quantity `json:"size,omitempty"`
 	// Volume is a reference to an existing volume
-	Volume common.ScopedReference `json:"volume,omitempty"`
+	Volume corev1.LocalObjectReference `json:"volume,omitempty"`
 }
 
 type RetainPolicy string

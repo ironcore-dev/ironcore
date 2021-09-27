@@ -63,33 +63,17 @@ spec:
                       description: SubnetRef is a reference to Subnet
                       properties:
                         name:
-                          description: Name is the name of the scope
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                            TODO: Add other useful fields. apiVersion, kind, uid?'
                           type: string
-                        scope:
-                          description: Scope is the absolute scope path
-                          type: string
-                      required:
-                      - name
                       type: object
                     target:
                       description: Target is the target object of a Route
                       properties:
-                        apiGroup:
-                          description: APIGroup is the API group of the object
-                          type: string
-                        kind:
-                          description: Kind is the kind of the object
-                          type: string
                         name:
-                          description: Name is the name of the scope
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                            TODO: Add other useful fields. apiVersion, kind, uid?'
                           type: string
-                        scope:
-                          description: Scope is the absolute scope path
-                          type: string
-                      required:
-                      - apiGroup
-                      - kind
-                      - name
                       type: object
                   type: object
                 type: array

@@ -19,10 +19,10 @@ package accounts
 import (
 	"context"
 	"github.com/onmetal/onmetal-api/apis/core"
-	"github.com/onmetal/onmetal-api/pkg/manager"
 	"github.com/onmetal/onmetal-api/pkg/utils"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/selection"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
 
 	"github.com/go-logr/logr"
 	corev1alpha1 "github.com/onmetal/onmetal-api/apis/core/v1alpha1"
@@ -170,7 +170,7 @@ func (r *Reconciler) listNamespacesForAccount(ctx context.Context, req ctrl.Requ
 }
 
 // SetupWithManager sets up the controller with the Manager.
-func (r *Reconciler) SetupWithManager(mgr *manager.Manager) error {
+func (r *Reconciler) SetupWithManager(mgr manager.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&corev1alpha1.Account{}).
 		Complete(r)

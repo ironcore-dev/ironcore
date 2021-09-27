@@ -18,6 +18,8 @@ package ipamrange
 
 import (
 	"context"
+	"fmt"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
 	"github.com/go-logr/logr"
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
@@ -29,10 +31,12 @@ import (
 
 func (r *Reconciler) reconcileRange(ctx context.Context, log logr.Logger, current *IPAM) (ctrl.Result, error) {
 	log.Info("reconcile range")
-	if len(r.GetUsageCache().GetUsersForRelationToGK(utils.NewObjectId(current.object), "uses", api.IPAMRangeGK)) > 0 {
-		if err := r.AssureFinalizer(ctx, log, current.object); err != nil {
-			return utils.Requeue(err)
+	if !utils.HasFinalizer(current.object, finalizerName) {
+		controllerutil.AddFinalizer(current.object, finalizerName)
+		if err := r.Update(ctx, current.object, fieldOwner); err != nil {
+			return ctrl.Result{}, fmt.Errorf("could not add finalizer: %w", err)
 		}
+		return ctrl.Result{}, nil
 	}
 	if current.object.Spec.Mode == "" && current.ipam != nil {
 		mode := api.ModeFirstMatch
@@ -74,8 +78,6 @@ func (r *Reconciler) reconcileRange(ctx context.Context, log logr.Logger, curren
 		current.pendingRequest = nil
 		// trigger all users of this ipamrange
 		log.Info("trigger all users of range", "key", current.objectId.ObjectKey)
-		users := r.GetUsageCache().GetUsersForRelationToGK(current.objectId, "uses", api.IPAMRangeGK)
-		r.TriggerAll(users)
 	}
 	return r.setStatus(ctx, log, current, common.StateReady, "")
 }

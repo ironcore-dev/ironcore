@@ -76,8 +76,8 @@ func (r *IPAMRange) ValidateCreate() error {
 	}
 
 	if r.Spec.Parent != nil {
-		if r.Spec.Parent.Name == "" && r.Spec.Parent.Scope != "" {
-			allErrs = append(allErrs, field.Invalid(path.Child("parent").Child("name"), r.Spec.Parent.Name, "parent name must be set"))
+		if r.Spec.Parent.Name == "" {
+			allErrs = append(allErrs, field.Required(path.Child("parent").Child("name"), r.Spec.Parent.Name))
 		}
 	}
 

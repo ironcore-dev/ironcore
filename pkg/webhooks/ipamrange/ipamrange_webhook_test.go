@@ -18,10 +18,10 @@ package ipamrange
 
 import (
 	"context"
-	"github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	api "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -46,9 +46,8 @@ var _ = Describe("IPAMRange webhook", func() {
 
 	ipamRangeWithParent := ipamRangeNoParent.DeepCopy()
 	ipamRangeWithParent.Name = myIpamRangeWithParent
-	ipamRangeWithParent.Spec.Parent = &v1alpha1.ScopedReference{
-		Name:  "a",
-		Scope: "b",
+	ipamRangeWithParent.Spec.Parent = &corev1.LocalObjectReference{
+		Name: "a",
 	}
 
 	Context("When creating an IPAMRange object", func() {
@@ -63,18 +62,16 @@ var _ = Describe("IPAMRange webhook", func() {
 
 		It("It should reject a change from no parent to a parent", func() {
 			ipamRangeWithNewParent := ipamRangeNoParent.DeepCopy()
-			ipamRangeWithNewParent.Spec.Parent = &v1alpha1.ScopedReference{
-				Name:  "a",
-				Scope: "b",
+			ipamRangeWithNewParent.Spec.Parent = &corev1.LocalObjectReference{
+				Name: "a",
 			}
 			Expect(k8sClient.Update(ctx, ipamRangeWithNewParent)).Should(Not(Succeed()))
 		})
 
 		It("It should reject a change from a parent to a new parent", func() {
 			ipamRangeWithNewParent := ipamRangeWithParent.DeepCopy()
-			ipamRangeWithNewParent.Spec.Parent = &v1alpha1.ScopedReference{
-				Name:  "a",
-				Scope: "c",
+			ipamRangeWithNewParent.Spec.Parent = &corev1.LocalObjectReference{
+				Name: "b",
 			}
 			Expect(k8sClient.Update(ctx, ipamRangeWithNewParent)).Should(Not(Succeed()))
 		})

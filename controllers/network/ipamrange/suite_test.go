@@ -18,7 +18,6 @@ package ipamrange
 
 import (
 	api "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
-	"github.com/onmetal/onmetal-api/pkg/manager"
 	"path/filepath"
 	ctrl "sigs.k8s.io/controller-runtime"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -31,7 +30,6 @@ import (
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
-	"sigs.k8s.io/controller-runtime/pkg/envtest/printer"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -42,9 +40,7 @@ var testEnv *envtest.Environment
 func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
 
-	RunSpecsWithDefaultAndCustomReporters(t,
-		"Controller Suite",
-		[]Reporter{printer.NewlineReporter{}})
+	RunSpecs(t, "Controller Suite")
 }
 
 var _ = BeforeSuite(func() {
@@ -71,18 +67,19 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 	Expect(k8sClient).NotTo(BeNil())
 
-	k8sManager, err := manager.NewManager(cfg, ctrl.Options{
+	k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
 		Scheme:             scheme.Scheme,
 		Host:               "127.0.0.1",
 		MetricsBindAddress: "0",
 	})
 	Expect(err).ToNot(HaveOccurred())
 
-	err = NewReconciler().SetupWithManager(k8sManager)
-	Expect(err).ToNot(HaveOccurred())
+	Expect((&Reconciler{
+		Client: k8sManager.GetClient(),
+	}).SetupWithManager(k8sManager)).To(Succeed())
 
 	go func() {
-		err = k8sManager.Manager.Start(ctrl.SetupSignalHandler())
+		err = k8sManager.Start(ctrl.SetupSignalHandler())
 		Expect(err).ToNot(HaveOccurred())
 	}()
 
