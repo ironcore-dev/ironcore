@@ -58,13 +58,9 @@ spec:
                   volume
                 properties:
                   name:
-                    description: Name is the name of the scope
+                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                      TODO: Add other useful fields. apiVersion, kind, uid?'
                     type: string
-                  scope:
-                    description: Scope is the absolute scope path
-                    type: string
-                required:
-                - name
                 type: object
             required:
             - size

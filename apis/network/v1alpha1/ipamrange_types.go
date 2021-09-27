@@ -18,6 +18,7 @@ package v1alpha1
 
 import (
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
@@ -35,7 +36,7 @@ var IPAMRangeGK = schema.GroupKind{
 // Otherwise, the status of the object will be set to "Invalid".
 type IPAMRangeSpec struct {
 	// Parent is the reference of the Parent IPAMRange from which the Cidr or size should be derived
-	Parent *common.ScopedReference `json:"parent,omitempty"`
+	Parent *corev1.LocalObjectReference `json:"parent,omitempty"`
 	// CIDRs is a list of CIDR specs which are defined for this IPAMRange
 	CIDRs []string `json:"cidrs,omitempty"`
 	// Mode

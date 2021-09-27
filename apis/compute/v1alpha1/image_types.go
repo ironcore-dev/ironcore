@@ -18,6 +18,7 @@ package v1alpha1
 
 import (
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -40,7 +41,7 @@ type ImageSpec struct {
 	// Source defines the source artefacts and their corresponding location
 	Source []SourceAttribute `json:"source"`
 	// ImageRef is a scoped reference to an existing Image
-	ImageRef common.ScopedReference `json:"imageRef,omitempty"`
+	ImageRef corev1.LocalObjectReference `json:"imageRef,omitempty"`
 	// Flags is a generic key value pair used for defining Image hints
 	Flags []Flag `json:"flags,omitempty"`
 }

@@ -65,13 +65,9 @@ spec:
                           description: SecurityGroupRef references a security group
                           properties:
                             name:
-                              description: Name is the name of the scope
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                TODO: Add other useful fields. apiVersion, kind, uid?'
                               type: string
-                            scope:
-                              description: Scope is the absolute scope path
-                              type: string
-                          required:
-                          - name
                           type: object
                       type: object
                     name:
@@ -97,13 +93,9 @@ spec:
                         SecurityGroup
                       properties:
                         name:
-                          description: Name is the name of the scope
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                            TODO: Add other useful fields. apiVersion, kind, uid?'
                           type: string
-                        scope:
-                          description: Scope is the absolute scope path
-                          type: string
-                      required:
-                      - name
                       type: object
                   required:
                   - name
@@ -141,13 +133,9 @@ spec:
                         SecurityGroup
                       properties:
                         name:
-                          description: Name is the name of the scope
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                            TODO: Add other useful fields. apiVersion, kind, uid?'
                           type: string
-                        scope:
-                          description: Scope is the absolute scope path
-                          type: string
-                      required:
-                      - name
                       type: object
                     source:
                       description: Source is either the cird or a reference to another
@@ -160,13 +148,9 @@ spec:
                           description: SecurityGroupRef references a security group
                           properties:
                             name:
-                              description: Name is the name of the scope
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                TODO: Add other useful fields. apiVersion, kind, uid?'
                               type: string
-                            scope:
-                              description: Scope is the absolute scope path
-                              type: string
-                          required:
-                          - name
                           type: object
                       type: object
                   required:

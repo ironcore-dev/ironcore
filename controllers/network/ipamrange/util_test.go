@@ -18,10 +18,10 @@ package ipamrange
 
 import (
 	"context"
-	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	api "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -39,7 +39,7 @@ type IPAMStatus struct {
 }
 
 const (
-	timeout  = time.Second * 60
+	timeout  = time.Second * 10
 	interval = time.Second * 1
 )
 
@@ -79,7 +79,7 @@ var cleanUp = func(keys ...client.ObjectKey) {
 	}
 }
 
-var createObject = func(key client.ObjectKey, parent *common.ScopedReference, cidrs ...string) {
+var createObject = func(key client.ObjectKey, parent *corev1.LocalObjectReference, cidrs ...string) {
 	Expect(k8sClient.Create(ctx, &api.IPAMRange{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      key.Name,
@@ -92,7 +92,7 @@ var createObject = func(key client.ObjectKey, parent *common.ScopedReference, ci
 	})).Should(Succeed())
 }
 
-var updateObject = func(key client.ObjectKey, parent *common.ScopedReference, cidrs ...string) {
+var updateObject = func(key client.ObjectKey, parent *corev1.LocalObjectReference, cidrs ...string) {
 	obj := &api.IPAMRange{}
 	Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
 	newObj := obj.DeepCopy()

@@ -52,26 +52,6 @@ type ZoneAvailability struct {
 	Name string `json:"name"`
 }
 
-//+kubebuilder:object:generate=true
-
-// ScopedReference refers to a scope and the scopes name
-type ScopedReference struct {
-	// Name is the name of the scope
-	Name string `json:"name"`
-	// Scope is the absolute scope path
-	//+optional
-	Scope string `json:"scope,omitempty"`
-}
-
-// ScopedKindReference defines an object with its kind and API group and its scope reference
-type ScopedKindReference struct {
-	// Kind is the kind of the object
-	Kind string `json:"kind"`
-	// APIGroup is the API group of the object
-	APIGroup        string `json:"apiGroup"`
-	ScopedReference `json:",inline"`
-}
-
 // ConfigMapKeySelector is a reference to a specific 'key' within a ConfigMap resource.
 // In some instances, `key` is a required field.
 type ConfigMapKeySelector struct {

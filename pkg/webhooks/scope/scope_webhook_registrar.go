@@ -17,17 +17,17 @@
 package scope
 
 import (
-	api "github.com/onmetal/onmetal-api/apis/core/v1alpha1"
-	"github.com/onmetal/onmetal-api/pkg/manager"
+	corev1alpha1 "github.com/onmetal/onmetal-api/apis/core/v1alpha1"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
 )
 
 type ScopeWebhook struct {
-	api.Scope
+	corev1alpha1.Scope
 }
 
-func (r *ScopeWebhook) SetupWebhookWithManager(mgr *manager.Manager) error {
+func (r *ScopeWebhook) SetupWebhookWithManager(mgr manager.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr).
-		For(&api.Scope{}).
+		For(&corev1alpha1.Scope{}).
 		Complete()
 }

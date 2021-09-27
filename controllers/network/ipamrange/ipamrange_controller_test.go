@@ -22,6 +22,7 @@ import (
 	api "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 )
 
@@ -81,7 +82,7 @@ var _ = OptionalDescribe("IPAMRange controller", func() {
 		})
 
 		It("Should create a valid IPAMRange with parent", func() {
-			createObject(validSubRangeLookupKey, &common.ScopedReference{
+			createObject(validSubRangeLookupKey, &corev1.LocalObjectReference{
 				Name: validParentRangeLookupKey.Name,
 			}, validSubRangeCidrs)
 		})
@@ -116,7 +117,7 @@ var _ = OptionalDescribe("IPAMRange controller", func() {
 			}))
 		})
 
-		It("Should release the allocated CIDR block on request deletion", func() {
+		PIt("Should release the allocated CIDR block on request deletion", func() {
 			By("Deleting the request IPAMRange object")
 			obj := &api.IPAMRange{}
 			Expect(k8sClient.Get(ctx, validSubRangeLookupKey, obj)).Should(Succeed())
@@ -149,7 +150,7 @@ var _ = OptionalDescribe("IPAMRange controller", func() {
 		It("Should clean and create base objects", func() {
 			cleanUp(invalidSubRangeLookupKey, invalidParentRangeLookupKey)
 			createObject(invalidParentRangeLookupKey, nil, invalidParentCidrs)
-			createObject(invalidSubRangeLookupKey, &common.ScopedReference{
+			createObject(invalidSubRangeLookupKey, &corev1.LocalObjectReference{
 				Name: invalidParentRangeLookupKey.Name,
 			}, invalidSubRangeCidrs)
 		})
@@ -216,7 +217,7 @@ var _ = OptionalDescribe("IPAMRange controller", func() {
 		It("Should clean and create base objects", func() {
 			cleanUp(validParentRangeLookupKey, validSubRangeLookupKey)
 			createObject(validParentRangeLookupKey, nil, validParentCidrs)
-			createObject(validSubRangeLookupKey, &common.ScopedReference{
+			createObject(validSubRangeLookupKey, &corev1.LocalObjectReference{
 				Name: validParentRangeLookupKey.Name,
 			}, validSubRangeCidrs)
 		})
@@ -250,7 +251,7 @@ var _ = OptionalDescribe("IPAMRange controller", func() {
 		})
 
 		It("Should create a second subrange with the same request CIDR", func() {
-			createObject(validSubRange2LookupKey, &common.ScopedReference{
+			createObject(validSubRange2LookupKey, &corev1.LocalObjectReference{
 				Name: validParentRangeLookupKey.Name,
 			}, validSubRange2Cidrs)
 		})
@@ -272,7 +273,7 @@ var _ = OptionalDescribe("IPAMRange controller", func() {
 			}))
 		})
 
-		It("Should allocate a range for the second subrange when the first one is deleted", func() {
+		PIt("Should allocate a range for the second subrange when the first one is deleted", func() {
 			obj := &api.IPAMRange{}
 			// get first one
 			Expect(k8sClient.Get(ctx, validSubRangeLookupKey, obj)).Should(Succeed())

@@ -60,16 +60,13 @@ spec:
                   should be assigned
                 properties:
                   apiGroup:
-                    description: APIGroup is the API group of the object
+                    description: APIGroup is the group for the resource being referenced
                     type: string
                   kind:
-                    description: Kind is the kind of the object
+                    description: Kind is the type of resource being referenced
                     type: string
                   name:
-                    description: Name is the name of the scope
-                    type: string
-                  scope:
-                    description: Scope is the absolute scope path
+                    description: Name is the name of resource being referenced
                     type: string
                 required:
                 - apiGroup
@@ -85,13 +82,9 @@ spec:
                   be reserved
                 properties:
                   name:
-                    description: Name is the name of the scope
+                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                      TODO: Add other useful fields. apiVersion, kind, uid?'
                     type: string
-                  scope:
-                    description: Scope is the absolute scope path
-                    type: string
-                required:
-                - name
                 type: object
             required:
             - subnet
@@ -103,20 +96,18 @@ spec:
                 description: ReservedIPBound describes the binding state of a ReservedIP
                 properties:
                   assignment:
-                    description: ScopedKindReference defines an object with its kind
-                      and API group and its scope reference
+                    description: ReservedIPAssignment contains information that points
+                      to the resource being used.
                     properties:
                       apiGroup:
-                        description: APIGroup is the API group of the object
+                        description: APIGroup is the group for the resource being
+                          referenced
                         type: string
                       kind:
-                        description: Kind is the kind of the object
+                        description: Kind is the type of resource being referenced
                         type: string
                       name:
-                        description: Name is the name of the scope
-                        type: string
-                      scope:
-                        description: Scope is the absolute scope path
+                        description: Name is the name of resource being referenced
                         type: string
                     required:
                     - apiGroup

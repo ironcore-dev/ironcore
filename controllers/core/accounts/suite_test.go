@@ -17,7 +17,6 @@
 package accounts
 
 import (
-	"github.com/onmetal/onmetal-api/pkg/manager"
 	"path/filepath"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"testing"
@@ -72,7 +71,7 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 	Expect(k8sClient).NotTo(BeNil())
 
-	k8sManager, err := manager.NewManager(cfg, ctrl.Options{
+	k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
 		Scheme:             scheme.Scheme,
 		Host:               "127.0.0.1",
 		MetricsBindAddress: "0",

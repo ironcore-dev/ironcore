@@ -18,15 +18,16 @@ package v1alpha1
 
 import (
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // VolumeAttachmentSpec defines the desired state of VolumeAttachment
 type VolumeAttachmentSpec struct {
 	// Volume is a reference of the volume object which should be attached
-	Volume common.ScopedReference `json:"volume,omitempty"`
+	Volume corev1.LocalObjectReference `json:"volume,omitempty"`
 	// Machine is a reference of the machine object which the volume should be attached to
-	Machine common.ScopedReference `json:"machine"`
+	Machine corev1.LocalObjectReference `json:"machine"`
 	// Device defines the device on the host for a volume
 	Device string `json:"device,omitempty"`
 	// Source references either an image or a snapshot
@@ -36,9 +37,9 @@ type VolumeAttachmentSpec struct {
 // VolumeSource defines the source of a volume which can be either an image or a snapshot
 type VolumeSource struct {
 	// Image defines the image name of the referenced image
-	Image common.ScopedReference `json:"image,omitempty"`
+	Image corev1.LocalObjectReference `json:"image,omitempty"`
 	// Snapshot defines the snapshot which should be used
-	Snapshot common.ScopedReference `json:"snapshot,omitempty"`
+	Snapshot corev1.LocalObjectReference `json:"snapshot,omitempty"`
 }
 
 // VolumeAttachmentStatus defines the observed state of VolumeAttachment

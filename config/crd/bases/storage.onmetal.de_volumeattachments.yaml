@@ -66,13 +66,9 @@ spec:
                   volume should be attached to
                 properties:
                   name:
-                    description: Name is the name of the scope
+                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                      TODO: Add other useful fields. apiVersion, kind, uid?'
                     type: string
-                  scope:
-                    description: Scope is the absolute scope path
-                    type: string
-                required:
-                - name
                 type: object
               source:
                 description: Source references either an image or a snapshot
@@ -81,25 +77,17 @@ spec:
                     description: Image defines the image name of the referenced image
                     properties:
                       name:
-                        description: Name is the name of the scope
+                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                          TODO: Add other useful fields. apiVersion, kind, uid?'
                         type: string
-                      scope:
-                        description: Scope is the absolute scope path
-                        type: string
-                    required:
-                    - name
                     type: object
                   snapshot:
                     description: Snapshot defines the snapshot which should be used
                     properties:
                       name:
-                        description: Name is the name of the scope
+                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                          TODO: Add other useful fields. apiVersion, kind, uid?'
                         type: string
-                      scope:
-                        description: Scope is the absolute scope path
-                        type: string
-                    required:
-                    - name
                     type: object
                 type: object
               volume:
@@ -107,13 +95,9 @@ spec:
                   be attached
                 properties:
                   name:
-                    description: Name is the name of the scope
+                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                      TODO: Add other useful fields. apiVersion, kind, uid?'
                     type: string
-                  scope:
-                    description: Scope is the absolute scope path
-                    type: string
-                required:
-                - name
                 type: object
             required:
             - machine

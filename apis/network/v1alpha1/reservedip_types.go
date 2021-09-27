@@ -18,18 +18,29 @@ package v1alpha1
 
 import (
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // ReservedIPSpec defines the desired state of ReservedIP
 type ReservedIPSpec struct {
 	// Subnet references the subnet where an IP address should be reserved
-	Subnet common.ScopedReference `json:"subnet"`
+	Subnet corev1.LocalObjectReference `json:"subnet"`
 	// IP specifies an IP address which should be reserved. Must be in the CIDR of the
 	// associated Subnet
 	IP common.IPAddr `json:"ip,omitempty"`
 	// Assignment indicates to which resource this IP address should be assigned
-	Assignment common.ScopedKindReference `json:"assignment,omitempty"`
+	Assignment ReservedIPAssignment `json:"assignment,omitempty"`
+}
+
+// ReservedIPAssignment contains information that points to the resource being used.
+type ReservedIPAssignment struct {
+	// APIGroup is the group for the resource being referenced
+	APIGroup string `json:"apiGroup" protobuf:"bytes,1,opt,name=apiGroup"`
+	// Kind is the type of resource being referenced
+	Kind string `json:"kind" protobuf:"bytes,2,opt,name=kind"`
+	// Name is the name of resource being referenced
+	Name string `json:"name" protobuf:"bytes,3,opt,name=name"`
 }
 
 // ReservedIPStatus defines the observed state of ReservedIP
@@ -42,8 +53,8 @@ type ReservedIPStatus struct {
 
 // ReservedIPBound describes the binding state of a ReservedIP
 type ReservedIPBound struct {
-	Mode       string                     `json:"mode"`
-	Assignment common.ScopedKindReference `json:"assignment,omitempty"`
+	Mode       string               `json:"mode"`
+	Assignment ReservedIPAssignment `json:"assignment,omitempty"`
 }
 
 const (

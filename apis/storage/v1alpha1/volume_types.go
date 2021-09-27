@@ -18,6 +18,7 @@ package v1alpha1
 
 import (
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -27,7 +28,7 @@ type VolumeSpec struct {
 	// StorageClass is the storage class of a volume
 	StorageClass string `json:"storage_class"`
 	// StoragePool indicates which storage pool to use for a volume
-	StoragePool common.ScopedReference `json:"storagepool"`
+	StoragePool corev1.LocalObjectReference `json:"storagepool"`
 	// Size defines the size of the volume
 	Size *resource.Quantity `json:"size"`
 }

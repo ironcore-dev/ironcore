@@ -18,7 +18,6 @@ package sshpublickey
 
 import (
 	"context"
-	"github.com/onmetal/onmetal-api/pkg/manager"
 	"path/filepath"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"testing"
@@ -76,7 +75,7 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 	Expect(k8sClient).NotTo(BeNil())
 
-	k8sManager, err := manager.NewManager(cfg, ctrl.Options{
+	k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
 		Scheme:             scheme.Scheme,
 		Host:               "127.0.0.1",
 		MetricsBindAddress: "0",
@@ -90,7 +89,7 @@ var _ = BeforeSuite(func() {
 	}).SetupWithManager(k8sManager)).To(Succeed())
 
 	go func() {
-		err = k8sManager.Manager.Start(mgrContext)
+		err = k8sManager.Start(mgrContext)
 		Expect(err).ToNot(HaveOccurred())
 	}()
 

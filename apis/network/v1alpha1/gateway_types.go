@@ -18,6 +18,7 @@ package v1alpha1
 
 import (
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -34,12 +35,22 @@ type GatewaySpec struct {
 	// Regions is a list of regions where this Gateway should be available
 	Regions     []string     `json:"regions,omitempty"`
 	FilterRules []FilterRule `json:"filterRules,omitempty"`
-	// Uplink is either a ReservedIP or a Subnet
-	Uplink common.ScopedKindReference `json:"uplink"`
+	// UplinkRef is either a ReservedIP or a Subnet
+	UplinkRef GatewayUplink `json:"uplink"`
+}
+
+// GatewayUplink contains information that points to the resource being used.
+type GatewayUplink struct {
+	// APIGroup is the group for the resource being referenced
+	APIGroup string `json:"apiGroup" protobuf:"bytes,1,opt,name=apiGroup"`
+	// Kind is the type of resource being referenced
+	Kind string `json:"kind" protobuf:"bytes,2,opt,name=kind"`
+	// Name is the name of resource being referenced
+	Name string `json:"name" protobuf:"bytes,3,opt,name=name"`
 }
 
 type FilterRule struct {
-	SecurityGroup common.ScopedReference `json:"securityGroup,omitempty"`
+	SecurityGroup corev1.LocalObjectReference `json:"securityGroup,omitempty"`
 }
 
 // GatewayStatus defines the observed state of Gateway

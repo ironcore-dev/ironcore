@@ -21,7 +21,6 @@ import (
 	"crypto/tls"
 	"fmt"
 	"github.com/onmetal/onmetal-api/apis/core/v1alpha1"
-	"github.com/onmetal/onmetal-api/pkg/manager"
 	"net"
 	"path/filepath"
 	"testing"
@@ -87,7 +86,7 @@ var _ = BeforeSuite(func() {
 
 	// start webhook server using Manager
 	webhookInstallOptions := &testEnv.WebhookInstallOptions
-	mgr, err := manager.NewManager(cfg, ctrl.Options{
+	mgr, err := ctrl.NewManager(cfg, ctrl.Options{
 		Scheme:             scheme,
 		Host:               webhookInstallOptions.LocalServingHost,
 		Port:               webhookInstallOptions.LocalServingPort,
@@ -103,7 +102,7 @@ var _ = BeforeSuite(func() {
 	//+kubebuilder:scaffold:webhook
 
 	go func() {
-		err = mgr.Manager.Start(ctx)
+		err = mgr.Start(ctx)
 		if err != nil {
 			Expect(err).NotTo(HaveOccurred())
 		}

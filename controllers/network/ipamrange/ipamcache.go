@@ -126,15 +126,3 @@ func (i *IPAMCache) getRange(ctx context.Context, log logr.Logger, name client.O
 	ipr.lock.Lock()
 	return ipr, nil
 }
-
-func (i *IPAMCache) removeRange(key client.ObjectKey) {
-	i.lock.Lock()
-	defer i.lock.Unlock()
-	old := i.lockedIpams[key]
-	if old != nil {
-		old.deleted = true
-	}
-	delete(i.pendingIpams, key)
-	delete(i.ipams, key)
-	delete(i.lockedIpams, key)
-}
