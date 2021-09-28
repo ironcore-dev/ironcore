@@ -22,31 +22,23 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+type GatewayMode string
+
 const (
-	SNATMode = "SNAT"
-	// Stateless NAT/1-1 NAT
-	NATMode         = "NAT"
-	TransparentMode = "Transparent"
+	// SNATMode is stateless NAT / 1-1 NAT (network address translation).
+	SNATMode GatewayMode = "SNAT"
+	// NATMode is regular NAT (network address translation).
+	NATMode GatewayMode = "NAT"
+	// TransparentMode makes the gateway behave transparently.
+	TransparentMode GatewayMode = "Transparent"
 )
 
 // GatewaySpec defines the desired state of Gateway
 type GatewaySpec struct {
-	Mode string `json:"mode"`
-	// Regions is a list of regions where this Gateway should be available
-	Regions     []string     `json:"regions,omitempty"`
+	Mode        GatewayMode  `json:"mode"`
 	FilterRules []FilterRule `json:"filterRules,omitempty"`
-	// UplinkRef is either a ReservedIP or a Subnet
-	UplinkRef GatewayUplink `json:"uplink"`
-}
-
-// GatewayUplink contains information that points to the resource being used.
-type GatewayUplink struct {
-	// APIGroup is the group for the resource being referenced
-	APIGroup string `json:"apiGroup" protobuf:"bytes,1,opt,name=apiGroup"`
-	// Kind is the type of resource being referenced
-	Kind string `json:"kind" protobuf:"bytes,2,opt,name=kind"`
-	// Name is the name of resource being referenced
-	Name string `json:"name" protobuf:"bytes,3,opt,name=name"`
+	// Uplink is a Target to route traffic to.
+	Uplink Target `json:"uplink"`
 }
 
 type FilterRule struct {
@@ -55,15 +47,38 @@ type FilterRule struct {
 
 // GatewayStatus defines the observed state of Gateway
 type GatewayStatus struct {
-	common.StateFields `json:",inline"`
-	IPs                []common.IPAddr `json:"ips,omitempty"`
+	State      GatewayState       `json:"state,omitempty"`
+	Conditions []GatewayCondition `json:"conditions,omitempty"`
+	IPs        []common.IPAddr    `json:"ips,omitempty"`
+}
+
+type GatewayState string
+
+// GatewayConditionType is a type a GatewayCondition can have.
+type GatewayConditionType string
+
+// GatewayCondition is one of the conditions of a volume.
+type GatewayCondition struct {
+	// Type is the type of the condition.
+	Type GatewayConditionType `json:"type"`
+	// Status is the status of the condition.
+	Status corev1.ConditionStatus `json:"status"`
+	// Reason is a machine-readable indication of why the condition is in a certain state.
+	Reason string `json:"reason"`
+	// Message is a human-readable explanation of why the condition has a certain reason / state.
+	Message string `json:"message"`
+	// ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
+	// LastUpdateTime is the last time a condition has been updated.
+	LastUpdateTime metav1.Time `json:"lastUpdateTime,omitempty"`
+	// LastTransitionTime is the last time the status of a condition has transitioned from one state to another.
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
 }
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 //+kubebuilder:resource:shortName=gw
 //+kubebuilder:printcolumn:name="Mode",type=string,JSONPath=`.spec.mode`
-//+kubebuilder:printcolumn:name="Regions",type=string,JSONPath=`.spec.regions`
 //+kubebuilder:printcolumn:name="Uplink",type=string,JSONPath=`.spec.uplink`,priority=100
 //+kubebuilder:printcolumn:name="IPs",type=string,JSONPath=`.status.ips`,priority=100
 //+kubebuilder:printcolumn:name="FilterRules",type=string,JSONPath=`.spec.filterRules`,priority=100

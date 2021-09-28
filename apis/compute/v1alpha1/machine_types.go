@@ -27,25 +27,37 @@ import (
 type MachineSpec struct {
 	// Hostname is the hostname of the machine
 	Hostname string `json:"hostname"`
-	// MachineClass is the machine class/flavor of the machine
+	// MachineClass is a reference to the machine class/flavor of the machine.
 	MachineClass corev1.LocalObjectReference `json:"machineClass"`
-	// MachinePool defines the compute pool of the machine
+	// MachinePool defines machine pool to run the machine in.
+	// If empty, a scheduler will figure out an appropriate pool to run the machine in.
 	MachinePool corev1.LocalObjectReference `json:"machinePool,omitempty"`
-	// Location is the physical location of the machine
-	Location common.Location `json:"location"`
-	// Image is the operating system image of the machine
-	Image corev1.LocalObjectReference `json:"image"`
-	// SSHPublicKeys is a list of SSH public keys of a machine
-	SSHPublicKeys []SSHPublicKeyEntry `json:"sshPublicKeys"`
+	// Image is the URL providing the operating system image of the machine.
+	Image string `json:"image"`
+	// SSHPublicKeys is a list of SSH public key secret references of a machine.
+	SSHPublicKeys []common.SecretKeySelector `json:"sshPublicKeys"`
 	// Interfaces define a list of network interfaces present on the machine
 	Interfaces []Interface `json:"interfaces,omitempty"`
 	// SecurityGroups is a list of security groups of a machine
 	SecurityGroups []corev1.LocalObjectReference `json:"securityGroups"`
 	// VolumeClaims
 	VolumeClaims []VolumeClaim `json:"volumeClaims"`
-	// UserData defines the ignition file
-	UserData string `json:"userData,omitempty"`
+	// Ignition is a reference to a config map containing the ignition YAML for the machine to boot up.
+	// If key is empty, DefaultIgnitionKey will be used as fallback.
+	Ignition *common.ConfigMapKeySelector `json:"ignition,omitempty"`
+	// EFIVars are variables to pass to EFI while booting up.
+	EFIVars []EFIVar `json:"efiVars,omitempty"`
 }
+
+// EFIVar is a variable to pass to EFI while booting up.
+type EFIVar struct {
+	Name  string `json:"name,omitempty"`
+	UUID  string `json:"uuid,omitempty"`
+	Value string `json:"value"`
+}
+
+// DefaultIgnitionKey is the default key for MachineSpec.UserData.
+const DefaultIgnitionKey = "ignition.yaml"
 
 // Interface is the definition of a single interface
 type Interface struct {
@@ -54,21 +66,19 @@ type Interface struct {
 	// Target is the referenced resource of this interface
 	Target corev1.LocalObjectReference `json:"target"`
 	// Priority is the priority level of this interface
-	Priority int `json:"priority,omitempty"`
+	Priority int32 `json:"priority,omitempty"`
 	// IP specifies a concrete IP address which should be allocated from a Subnet
 	IP string `json:"ip,omitempty"`
-	// RoutingOnly is a routing hint for this interface
-	RoutingOnly bool `json:"routingOnly,omitempty"`
 }
 
 // VolumeClaim defines a volume claim of a machine
 type VolumeClaim struct {
 	// Name is the name of the VolumeClaim
 	Name string `json:"name"`
+	// Priority is the OS priority of the volume.
+	Priority int32 `json:"priority,omitempty"`
 	// RetainPolicy defines what should happen when the machine is being deleted
 	RetainPolicy RetainPolicy `json:"retainPolicy"`
-	// Device defines the device for a volume on the machine
-	Device string `json:"device"`
 	// StorageClass describes the storage class of the volumes
 	StorageClass corev1.LocalObjectReference `json:"storageClass"`
 	// Size defines the size of the volume
@@ -82,36 +92,70 @@ type RetainPolicy string
 const (
 	RetainPolicyDeleteOnTermination RetainPolicy = "DeleteOnTermination"
 	RetainPolicyPersistent          RetainPolicy = "Persistent"
-	MachineStateRunning                          = "Running"
-	MachineStateShutdown                         = "Shutdown"
-	MachineStateError                            = "Error"
-	MachineStateInitial                          = "Initial"
 )
 
-// SSHPublicKeyEntry describes either a reference to a SSH public key or a selector
-// to filter for a public key
-type SSHPublicKeyEntry struct {
-	// Scope is the scope of a SSH public key
-	Scope string `json:"scope,omitempty"`
-	// Name is the name of the SSH public key
-	Name string `json:"name,omitempty"`
-	// Selector defines a LabelSelector to filter for a public key
-	Selector metav1.LabelSelector `json:"selector,omitempty"`
+// InterfaceStatus reports the status of an Interface.
+type InterfaceStatus struct {
+	// Name is the name of an interface.
+	Name string `json:"name"`
+	// IP is the IP allocated for an interface.
+	IP string `json:"ip"`
+	// Priority is the OS priority of the interface.
+	Priority int32 `json:"priority,omitempty"`
+}
+
+// VolumeClaimStatus is the status of a VolumeClaim.
+type VolumeClaimStatus struct {
+	// Name is the name of a volume claim.
+	Name string `json:"name"`
+	// Priority is the OS priority of the volume.
+	Priority int32 `json:"priority,omitempty"`
 }
 
 // MachineStatus defines the observed state of Machine
 type MachineStatus struct {
-	common.StateFields `json:",inline"`
-	//TODO: define machine state fields
+	State        MachineState        `json:"state,omitempty"`
+	Conditions   []MachineCondition  `json:"conditions,omitempty"`
+	Interfaces   []InterfaceStatus   `json:"interfaces,omitempty"`
+	VolumeClaims []VolumeClaimStatus `json:"volumeClaims,omitempty"`
+}
+
+type MachineState string
+
+const (
+	MachineStateRunning  MachineState = "Running"
+	MachineStateShutdown MachineState = "Shutdown"
+	MachineStateError    MachineState = "Error"
+	MachineStateInitial  MachineState = "Initial"
+)
+
+// MachineConditionType is a type a MachineCondition can have.
+type MachineConditionType string
+
+// MachineCondition is one of the conditions of a volume.
+type MachineCondition struct {
+	// Type is the type of the condition.
+	Type MachineConditionType `json:"type"`
+	// Status is the status of the condition.
+	Status corev1.ConditionStatus `json:"status"`
+	// Reason is a machine-readable indication of why the condition is in a certain state.
+	Reason string `json:"reason"`
+	// Message is a human-readable explanation of why the condition has a certain reason / state.
+	Message string `json:"message"`
+	// ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
+	// LastUpdateTime is the last time a condition has been updated.
+	LastUpdateTime metav1.Time `json:"lastUpdateTime,omitempty"`
+	// LastTransitionTime is the last time the status of a condition has transitioned from one state to another.
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
 }
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 //+kubebuilder:printcolumn:name="Hostname",type=string,JSONPath=`.spec.hostname`
 //+kubebuilder:printcolumn:name="MachineClass",type=string,JSONPath=`.spec.machineClass.name`
-//+kubebuilder:printcolumn:name="Image",type=string,JSONPath=`.spec.image.name`
-//+kubebuilder:printcolumn:name="Region",type=string,JSONPath=`.spec.location.region`
-//+kubebuilder:printcolumn:name="AZ",type=string,JSONPath=`.spec.location.availabilityZone`
+//+kubebuilder:printcolumn:name="Image",type=string,JSONPath=`.spec.image`
+//+kubebuilder:printcolumn:name="MachinePool",type=string,JSONPath=`.spec.machinePool.name`
 //+kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.state`
 //+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 

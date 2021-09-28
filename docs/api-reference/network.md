@@ -7,13 +7,13 @@
 <h2 id="network.onmetal.de/v1alpha1">network.onmetal.de/v1alpha1</h2>
 Resource Types:
 <ul></ul>
-<h3 id="network.onmetal.de/v1alpha1.ActionType">ActionType
+<h3 id="network.onmetal.de/v1alpha1.AllocationState">AllocationState
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SecurityGroupRule">SecurityGroupRule</a>)
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.CIDRAllocationStatus">CIDRAllocationStatus</a>)
 </p>
 <div>
-<p>ActionType describes the action type of a SecurityGroupRule</p>
+<p>AllocationState is a state an allocation can be in.</p>
 </div>
 <table>
 <thead>
@@ -22,11 +22,108 @@ Resource Types:
 <th>Description</th>
 </tr>
 </thead>
-<tbody><tr><td><p>&#34;allowed&#34;</p></td>
-<td></td>
-</tr><tr><td><p>&#34;deny&#34;</p></td>
-<td></td>
+<tbody><tr><td><p>&#34;Allocated&#34;</p></td>
+<td><p>AllocationStateAllocated reports that the allocation has been made successfully.</p>
+</td>
+</tr><tr><td><p>&#34;Busy&#34;</p></td>
+<td><p>AllocationStateBusy reports that an allocation is busy.</p>
+</td>
+</tr><tr><td><p>&#34;Failed&#34;</p></td>
+<td><p>AllocationStateFailed reports that an allocation has failed.</p>
+</td>
 </tr></tbody>
+</table>
+<h3 id="network.onmetal.de/v1alpha1.CIDRAllocation">CIDRAllocation
+</h3>
+<p>
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.CIDRAllocationStatus">CIDRAllocationStatus</a>, <a href="#network.onmetal.de/v1alpha1.IPAMPendingRequest">IPAMPendingRequest</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>request</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>cidr</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="network.onmetal.de/v1alpha1.CIDRAllocationStatus">CIDRAllocationStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.IPAMRangeStatus">IPAMRangeStatus</a>)
+</p>
+<div>
+<p>CIDRAllocationStatus is the result of a CIDR allocation request</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>CIDRAllocation</code><br/>
+<em>
+<a href="#network.onmetal.de/v1alpha1.CIDRAllocation">
+CIDRAllocation
+</a>
+</em>
+</td>
+<td>
+<p>
+(Members of <code>CIDRAllocation</code> are embedded into this type.)
+</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="#network.onmetal.de/v1alpha1.AllocationState">
+AllocationState
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>message</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
 </table>
 <h3 id="network.onmetal.de/v1alpha1.CIDRStatus">CIDRStatus
 </h3>
@@ -48,8 +145,8 @@ Resource Types:
 <td>
 <code>cidr</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Cidr">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.Cidr
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.CIDR">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.CIDR
 </a>
 </em>
 </td>
@@ -61,8 +158,8 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.Cidr
 <td>
 <code>blockedRanges</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Cidr">
-[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.Cidr
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.CIDR">
+[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.CIDR
 </a>
 </em>
 </td>
@@ -137,8 +234,8 @@ IPSetSpec
 <td>
 <code>securityGroup</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
 </td>
@@ -191,21 +288,12 @@ GatewaySpec
 <td>
 <code>mode</code><br/>
 <em>
-string
+<a href="#network.onmetal.de/v1alpha1.GatewayMode">
+GatewayMode
+</a>
 </em>
 </td>
 <td>
-</td>
-</tr>
-<tr>
-<td>
-<code>regions</code><br/>
-<em>
-[]string
-</em>
-</td>
-<td>
-<p>Regions is a list of regions where this Gateway should be available</p>
 </td>
 </tr>
 <tr>
@@ -224,13 +312,13 @@ string
 <td>
 <code>uplink</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedKindReference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
+<a href="#network.onmetal.de/v1alpha1.Target">
+Target
 </a>
 </em>
 </td>
 <td>
-<p>Uplink is either a ReservedIP or a Subnet</p>
+<p>Uplink is a Target to route traffic to.</p>
 </td>
 </tr>
 </table>
@@ -249,6 +337,142 @@ GatewayStatus
 </td>
 </tr>
 </tbody>
+</table>
+<h3 id="network.onmetal.de/v1alpha1.GatewayCondition">GatewayCondition
+</h3>
+<p>
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.GatewayStatus">GatewayStatus</a>)
+</p>
+<div>
+<p>GatewayCondition is one of the conditions of a volume.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>type</code><br/>
+<em>
+<a href="#network.onmetal.de/v1alpha1.GatewayConditionType">
+GatewayConditionType
+</a>
+</em>
+</td>
+<td>
+<p>Type is the type of the condition.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#conditionstatus-v1-core">
+Kubernetes core/v1.ConditionStatus
+</a>
+</em>
+</td>
+<td>
+<p>Status is the status of the condition.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>reason</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Reason is a machine-readable indication of why the condition is in a certain state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>message</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Message is a human-readable explanation of why the condition has a certain reason / state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>observedGeneration</code><br/>
+<em>
+int64
+</em>
+</td>
+<td>
+<p>ObservedGeneration represents the .metadata.generation that the condition was set based upon.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastUpdateTime</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastUpdateTime is the last time a condition has been updated.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastTransitionTime</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastTransitionTime is the last time the status of a condition has transitioned from one state to another.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="network.onmetal.de/v1alpha1.GatewayConditionType">GatewayConditionType
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.GatewayCondition">GatewayCondition</a>)
+</p>
+<div>
+<p>GatewayConditionType is a type a GatewayCondition can have.</p>
+</div>
+<h3 id="network.onmetal.de/v1alpha1.GatewayMode">GatewayMode
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.GatewaySpec">GatewaySpec</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;NAT&#34;</p></td>
+<td><p>NATMode is regular NAT (network address translation).</p>
+</td>
+</tr><tr><td><p>&#34;SNAT&#34;</p></td>
+<td><p>SNATMode is stateless NAT / 1-1 NAT (network address translation).</p>
+</td>
+</tr><tr><td><p>&#34;Transparent&#34;</p></td>
+<td><p>TransparentMode makes the gateway behave transparently.</p>
+</td>
+</tr></tbody>
 </table>
 <h3 id="network.onmetal.de/v1alpha1.GatewaySpec">GatewaySpec
 </h3>
@@ -270,21 +494,12 @@ GatewayStatus
 <td>
 <code>mode</code><br/>
 <em>
-string
+<a href="#network.onmetal.de/v1alpha1.GatewayMode">
+GatewayMode
+</a>
 </em>
 </td>
 <td>
-</td>
-</tr>
-<tr>
-<td>
-<code>regions</code><br/>
-<em>
-[]string
-</em>
-</td>
-<td>
-<p>Regions is a list of regions where this Gateway should be available</p>
 </td>
 </tr>
 <tr>
@@ -303,17 +518,24 @@ string
 <td>
 <code>uplink</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedKindReference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
+<a href="#network.onmetal.de/v1alpha1.Target">
+Target
 </a>
 </em>
 </td>
 <td>
-<p>Uplink is either a ReservedIP or a Subnet</p>
+<p>Uplink is a Target to route traffic to.</p>
 </td>
 </tr>
 </tbody>
 </table>
+<h3 id="network.onmetal.de/v1alpha1.GatewayState">GatewayState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.GatewayStatus">GatewayStatus</a>)
+</p>
+<div>
+</div>
 <h3 id="network.onmetal.de/v1alpha1.GatewayStatus">GatewayStatus
 </h3>
 <p>
@@ -332,17 +554,26 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
 <tbody>
 <tr>
 <td>
-<code>StateFields</code><br/>
+<code>state</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.StateFields">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
+<a href="#network.onmetal.de/v1alpha1.GatewayState">
+GatewayState
 </a>
 </em>
 </td>
 <td>
-<p>
-(Members of <code>StateFields</code> are embedded into this type.)
-</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>conditions</code><br/>
+<em>
+<a href="#network.onmetal.de/v1alpha1.GatewayCondition">
+[]GatewayCondition
+</a>
+</em>
+</td>
+<td>
 </td>
 </tr>
 <tr>
@@ -398,7 +629,21 @@ string
 <td>
 <code>cidrs</code><br/>
 <em>
-[]string
+<a href="#network.onmetal.de/v1alpha1.CIDRAllocation">
+[]CIDRAllocation
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>deletions</code><br/>
+<em>
+<a href="#network.onmetal.de/v1alpha1.CIDRAllocation">
+[]CIDRAllocation
+</a>
 </em>
 </td>
 <td>
@@ -450,8 +695,8 @@ IPAMRangeSpec
 <td>
 <code>parent</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
 </td>
@@ -474,11 +719,13 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 <td>
 <code>mode</code><br/>
 <em>
-string
+<a href="#network.onmetal.de/v1alpha1.IPAMRangeMode">
+IPAMRangeMode
+</a>
 </em>
 </td>
 <td>
-<p>Mode</p>
+<p>Mode is the mode to request an IPAMRange.</p>
 </td>
 </tr>
 </table>
@@ -497,6 +744,140 @@ IPAMRangeStatus
 </td>
 </tr>
 </tbody>
+</table>
+<h3 id="network.onmetal.de/v1alpha1.IPAMRangeCondition">IPAMRangeCondition
+</h3>
+<p>
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.IPAMRangeStatus">IPAMRangeStatus</a>)
+</p>
+<div>
+<p>IPAMRangeCondition is one of the conditions of a volume.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>type</code><br/>
+<em>
+<a href="#network.onmetal.de/v1alpha1.IPAMRangeConditionType">
+IPAMRangeConditionType
+</a>
+</em>
+</td>
+<td>
+<p>Type is the type of the condition.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#conditionstatus-v1-core">
+Kubernetes core/v1.ConditionStatus
+</a>
+</em>
+</td>
+<td>
+<p>Status is the status of the condition.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>reason</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Reason is a machine-readable indication of why the condition is in a certain state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>message</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Message is a human-readable explanation of why the condition has a certain reason / state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>observedGeneration</code><br/>
+<em>
+int64
+</em>
+</td>
+<td>
+<p>ObservedGeneration represents the .metadata.generation that the condition was set based upon.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastUpdateTime</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastUpdateTime is the last time a condition has been updated.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastTransitionTime</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastTransitionTime is the last time the status of a condition has transitioned from one state to another.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="network.onmetal.de/v1alpha1.IPAMRangeConditionType">IPAMRangeConditionType
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.IPAMRangeCondition">IPAMRangeCondition</a>)
+</p>
+<div>
+<p>IPAMRangeConditionType is a type a IPAMRangeCondition can have.</p>
+</div>
+<h3 id="network.onmetal.de/v1alpha1.IPAMRangeMode">IPAMRangeMode
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.IPAMRangeSpec">IPAMRangeSpec</a>)
+</p>
+<div>
+<p>IPAMRangeMode is the mode to request IPAMRanges.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;FirstMatch&#34;</p></td>
+<td><p>ModeFirstMatch requests IPAMRanges by using the first possible match.</p>
+</td>
+</tr><tr><td><p>&#34;RoundRobin&#34;</p></td>
+<td><p>ModeRoundRobin requests IPAMRanges in a round-robin fashion, distributing evenly.</p>
+</td>
+</tr></tbody>
 </table>
 <h3 id="network.onmetal.de/v1alpha1.IPAMRangeSpec">IPAMRangeSpec
 </h3>
@@ -522,8 +903,8 @@ Otherwise, the status of the object will be set to &ldquo;Invalid&rdquo;.</p>
 <td>
 <code>parent</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
 </td>
@@ -546,14 +927,46 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 <td>
 <code>mode</code><br/>
 <em>
-string
+<a href="#network.onmetal.de/v1alpha1.IPAMRangeMode">
+IPAMRangeMode
+</a>
 </em>
 </td>
 <td>
-<p>Mode</p>
+<p>Mode is the mode to request an IPAMRange.</p>
 </td>
 </tr>
 </tbody>
+</table>
+<h3 id="network.onmetal.de/v1alpha1.IPAMRangeState">IPAMRangeState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.IPAMRangeStatus">IPAMRangeStatus</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Available&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Busy&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Error&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Invalid&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Ready&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Up&#34;</p></td>
+<td></td>
+</tr></tbody>
 </table>
 <h3 id="network.onmetal.de/v1alpha1.IPAMRangeStatus">IPAMRangeStatus
 </h3>
@@ -573,24 +986,45 @@ string
 <tbody>
 <tr>
 <td>
-<code>StateFields</code><br/>
+<code>state</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.StateFields">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
+<a href="#network.onmetal.de/v1alpha1.IPAMRangeState">
+IPAMRangeState
 </a>
 </em>
 </td>
 <td>
-<p>
-(Members of <code>StateFields</code> are embedded into this type.)
-</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>message</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>conditions</code><br/>
+<em>
+<a href="#network.onmetal.de/v1alpha1.IPAMRangeCondition">
+[]IPAMRangeCondition
+</a>
+</em>
+</td>
+<td>
 </td>
 </tr>
 <tr>
 <td>
 <code>cidrs</code><br/>
 <em>
-[]string
+<a href="#network.onmetal.de/v1alpha1.CIDRAllocationStatus">
+[]CIDRAllocationStatus
+</a>
 </em>
 </td>
 <td>
@@ -629,6 +1063,18 @@ IPAMPendingRequest
 <td>
 </td>
 </tr>
+<tr>
+<td>
+<code>pendingDeletions</code><br/>
+<em>
+<a href="#network.onmetal.de/v1alpha1.CIDRAllocationStatus">
+[]CIDRAllocationStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
 </tbody>
 </table>
 <h3 id="network.onmetal.de/v1alpha1.IPSetSpec">IPSetSpec
@@ -651,8 +1097,8 @@ IPAMPendingRequest
 <td>
 <code>cidr</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Cidr">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.Cidr
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.CIDR">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.CIDR
 </a>
 </em>
 </td>
@@ -664,8 +1110,8 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.Cidr
 <td>
 <code>securityGroupref</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
 </td>
@@ -717,6 +1163,48 @@ IPSetSpec
 </td>
 <td>
 <p>Source is either the cird or a reference to another security group</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="network.onmetal.de/v1alpha1.MachineRouteTarget">MachineRouteTarget
+</h3>
+<p>
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.Target">Target</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>LocalObjectReference</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>
+(Members of <code>LocalObjectReference</code> are embedded into this type.)
+</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>interface</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
 </td>
 </tr>
 </tbody>
@@ -779,19 +1267,6 @@ int
 <tbody>
 <tr>
 <td>
-<code>ipam</code><br/>
-<em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
-</a>
-</em>
-</td>
-<td>
-<p>IPAM is a reference to the an range block of a subnet</p>
-</td>
-</tr>
-<tr>
-<td>
 <code>size</code><br/>
 <em>
 string
@@ -805,8 +1280,8 @@ string
 <td>
 <code>cidr</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Cidr">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.Cidr
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.CIDR">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.CIDR
 </a>
 </em>
 </td>
@@ -872,8 +1347,8 @@ ReservedIPSpec
 <td>
 <code>subnet</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
 </td>
@@ -899,8 +1374,8 @@ associated Subnet</p>
 <td>
 <code>assignment</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedKindReference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
+<a href="#network.onmetal.de/v1alpha1.ReservedIPAssignment">
+ReservedIPAssignment
 </a>
 </em>
 </td>
@@ -925,6 +1400,82 @@ ReservedIPStatus
 </tr>
 </tbody>
 </table>
+<h3 id="network.onmetal.de/v1alpha1.ReservedIPAssignment">ReservedIPAssignment
+</h3>
+<p>
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.ReservedIPBound">ReservedIPBound</a>, <a href="#network.onmetal.de/v1alpha1.ReservedIPSpec">ReservedIPSpec</a>)
+</p>
+<div>
+<p>ReservedIPAssignment contains information that points to the resource being used.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiGroup</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>APIGroup is the group for the resource being referenced</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Kind is the type of resource being referenced</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of resource being referenced</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="network.onmetal.de/v1alpha1.ReservedIPBindMode">ReservedIPBindMode
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.ReservedIPBound">ReservedIPBound</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Floating&#34;</p></td>
+<td><p>BindModeFloating defines a ReservedIP which is dynamically assigned
+as additional DNAT-ed IP for the target resource.</p>
+</td>
+</tr><tr><td><p>&#34;Static&#34;</p></td>
+<td><p>BindModeStatic defines a ReservedIP which is directly assigned to an interface
+of the target resource. This means the target is directly connected to the Subnet
+of the reserved IP.</p>
+</td>
+</tr></tbody>
+</table>
 <h3 id="network.onmetal.de/v1alpha1.ReservedIPBound">ReservedIPBound
 </h3>
 <p>
@@ -945,7 +1496,9 @@ ReservedIPStatus
 <td>
 <code>mode</code><br/>
 <em>
-string
+<a href="#network.onmetal.de/v1alpha1.ReservedIPBindMode">
+ReservedIPBindMode
+</a>
 </em>
 </td>
 <td>
@@ -955,8 +1508,8 @@ string
 <td>
 <code>assignment</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedKindReference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
+<a href="#network.onmetal.de/v1alpha1.ReservedIPAssignment">
+ReservedIPAssignment
 </a>
 </em>
 </td>
@@ -965,6 +1518,117 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
 </tr>
 </tbody>
 </table>
+<h3 id="network.onmetal.de/v1alpha1.ReservedIPCondition">ReservedIPCondition
+</h3>
+<p>
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.ReservedIPStatus">ReservedIPStatus</a>)
+</p>
+<div>
+<p>ReservedIPCondition is one of the conditions of a volume.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>type</code><br/>
+<em>
+<a href="#network.onmetal.de/v1alpha1.ReservedIPConditionType">
+ReservedIPConditionType
+</a>
+</em>
+</td>
+<td>
+<p>Type is the type of the condition.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#conditionstatus-v1-core">
+Kubernetes core/v1.ConditionStatus
+</a>
+</em>
+</td>
+<td>
+<p>Status is the status of the condition.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>reason</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Reason is a machine-readable indication of why the condition is in a certain state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>message</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Message is a human-readable explanation of why the condition has a certain reason / state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>observedGeneration</code><br/>
+<em>
+int64
+</em>
+</td>
+<td>
+<p>ObservedGeneration represents the .metadata.generation that the condition was set based upon.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastUpdateTime</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastUpdateTime is the last time a condition has been updated.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastTransitionTime</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastTransitionTime is the last time the status of a condition has transitioned from one state to another.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="network.onmetal.de/v1alpha1.ReservedIPConditionType">ReservedIPConditionType
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.ReservedIPCondition">ReservedIPCondition</a>)
+</p>
+<div>
+<p>ReservedIPConditionType is a type a ReservedIPCondition can have.</p>
+</div>
 <h3 id="network.onmetal.de/v1alpha1.ReservedIPSpec">ReservedIPSpec
 </h3>
 <p>
@@ -985,8 +1649,8 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
 <td>
 <code>subnet</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
 </td>
@@ -1012,8 +1676,8 @@ associated Subnet</p>
 <td>
 <code>assignment</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedKindReference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
+<a href="#network.onmetal.de/v1alpha1.ReservedIPAssignment">
+ReservedIPAssignment
 </a>
 </em>
 </td>
@@ -1023,6 +1687,13 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
 </tr>
 </tbody>
 </table>
+<h3 id="network.onmetal.de/v1alpha1.ReservedIPState">ReservedIPState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.ReservedIPStatus">ReservedIPStatus</a>)
+</p>
+<div>
+</div>
 <h3 id="network.onmetal.de/v1alpha1.ReservedIPStatus">ReservedIPStatus
 </h3>
 <p>
@@ -1041,6 +1712,30 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
 <tbody>
 <tr>
 <td>
+<code>state</code><br/>
+<em>
+<a href="#network.onmetal.de/v1alpha1.ReservedIPState">
+ReservedIPState
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>conditions</code><br/>
+<em>
+<a href="#network.onmetal.de/v1alpha1.ReservedIPCondition">
+[]ReservedIPCondition
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
 <code>ip</code><br/>
 <em>
 <a href="/api-reference/common/#common.onmetal.de/v1alpha1.IPAddr">
@@ -1050,21 +1745,6 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPAddr
 </td>
 <td>
 <p>IP indicates the effective reserved IP address</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>StateFields</code><br/>
-<em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.StateFields">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
-</a>
-</em>
-</td>
-<td>
-<p>
-(Members of <code>StateFields</code> are embedded into this type.)
-</p>
 </td>
 </tr>
 <tr>
@@ -1101,8 +1781,8 @@ ReservedIPBound
 <td>
 <code>subnetRef</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
 </td>
@@ -1125,8 +1805,8 @@ string
 <td>
 <code>target</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedKindReference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedKindReference
+<a href="#network.onmetal.de/v1alpha1.Target">
+Target
 </a>
 </em>
 </td>
@@ -1206,6 +1886,117 @@ RoutingDomainStatus
 </tr>
 </tbody>
 </table>
+<h3 id="network.onmetal.de/v1alpha1.RoutingDomainCondition">RoutingDomainCondition
+</h3>
+<p>
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.RoutingDomainStatus">RoutingDomainStatus</a>)
+</p>
+<div>
+<p>RoutingDomainCondition is one of the conditions of a volume.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>type</code><br/>
+<em>
+<a href="#network.onmetal.de/v1alpha1.RoutingDomainConditionType">
+RoutingDomainConditionType
+</a>
+</em>
+</td>
+<td>
+<p>Type is the type of the condition.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#conditionstatus-v1-core">
+Kubernetes core/v1.ConditionStatus
+</a>
+</em>
+</td>
+<td>
+<p>Status is the status of the condition.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>reason</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Reason is a machine-readable indication of why the condition is in a certain state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>message</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Message is a human-readable explanation of why the condition has a certain reason / state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>observedGeneration</code><br/>
+<em>
+int64
+</em>
+</td>
+<td>
+<p>ObservedGeneration represents the .metadata.generation that the condition was set based upon.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastUpdateTime</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastUpdateTime is the last time a condition has been updated.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastTransitionTime</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastTransitionTime is the last time the status of a condition has transitioned from one state to another.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="network.onmetal.de/v1alpha1.RoutingDomainConditionType">RoutingDomainConditionType
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.RoutingDomainCondition">RoutingDomainCondition</a>)
+</p>
+<div>
+<p>RoutingDomainConditionType is a type a RoutingDomainCondition can have.</p>
+</div>
 <h3 id="network.onmetal.de/v1alpha1.RoutingDomainSpec">RoutingDomainSpec
 </h3>
 <p>
@@ -1239,6 +2030,13 @@ need explicit routing instructions.</p>
 </tr>
 </tbody>
 </table>
+<h3 id="network.onmetal.de/v1alpha1.RoutingDomainState">RoutingDomainState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.RoutingDomainStatus">RoutingDomainStatus</a>)
+</p>
+<div>
+</div>
 <h3 id="network.onmetal.de/v1alpha1.RoutingDomainStatus">RoutingDomainStatus
 </h3>
 <p>
@@ -1257,17 +2055,26 @@ need explicit routing instructions.</p>
 <tbody>
 <tr>
 <td>
-<code>StateFields</code><br/>
+<code>state</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.StateFields">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
+<a href="#network.onmetal.de/v1alpha1.RoutingDomainState">
+RoutingDomainState
 </a>
 </em>
 </td>
 <td>
-<p>
-(Members of <code>StateFields</code> are embedded into this type.)
-</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>conditions</code><br/>
+<em>
+<a href="#network.onmetal.de/v1alpha1.RoutingDomainCondition">
+[]RoutingDomainCondition
+</a>
+</em>
+</td>
+<td>
 </td>
 </tr>
 </tbody>
@@ -1355,6 +2162,138 @@ SecurityGroupStatus
 </tr>
 </tbody>
 </table>
+<h3 id="network.onmetal.de/v1alpha1.SecurityGroupAction">SecurityGroupAction
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SecurityGroupRule">SecurityGroupRule</a>)
+</p>
+<div>
+<p>SecurityGroupAction describes the action of a SecurityGroupRule.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Allow&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Deny&#34;</p></td>
+<td></td>
+</tr></tbody>
+</table>
+<h3 id="network.onmetal.de/v1alpha1.SecurityGroupCondition">SecurityGroupCondition
+</h3>
+<p>
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SecurityGroupStatus">SecurityGroupStatus</a>)
+</p>
+<div>
+<p>SecurityGroupCondition is one of the conditions of a volume.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>type</code><br/>
+<em>
+<a href="#network.onmetal.de/v1alpha1.SecurityGroupConditionType">
+SecurityGroupConditionType
+</a>
+</em>
+</td>
+<td>
+<p>Type is the type of the condition.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#conditionstatus-v1-core">
+Kubernetes core/v1.ConditionStatus
+</a>
+</em>
+</td>
+<td>
+<p>Status is the status of the condition.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>reason</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Reason is a machine-readable indication of why the condition is in a certain state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>message</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Message is a human-readable explanation of why the condition has a certain reason / state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>observedGeneration</code><br/>
+<em>
+int64
+</em>
+</td>
+<td>
+<p>ObservedGeneration represents the .metadata.generation that the condition was set based upon.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastUpdateTime</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastUpdateTime is the last time a condition has been updated.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastTransitionTime</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastTransitionTime is the last time the status of a condition has transitioned from one state to another.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="network.onmetal.de/v1alpha1.SecurityGroupConditionType">SecurityGroupConditionType
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SecurityGroupCondition">SecurityGroupCondition</a>)
+</p>
+<div>
+<p>SecurityGroupConditionType is a type a SecurityGroupCondition can have.</p>
+</div>
 <h3 id="network.onmetal.de/v1alpha1.SecurityGroupRule">SecurityGroupRule
 </h3>
 <p>
@@ -1386,21 +2325,21 @@ string
 <td>
 <code>securityGroupRef</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
 </td>
 <td>
-<p>SecurityGroupRef is a scoped reference to an existing SecurityGroup</p>
+<p>SecurityGroupRef is a reference to an existing SecurityGroup</p>
 </td>
 </tr>
 <tr>
 <td>
 <code>action</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.ActionType">
-ActionType
+<a href="#network.onmetal.de/v1alpha1.SecurityGroupAction">
+SecurityGroupAction
 </a>
 </em>
 </td>
@@ -1478,6 +2417,29 @@ PortRange
 </tr>
 </tbody>
 </table>
+<h3 id="network.onmetal.de/v1alpha1.SecurityGroupState">SecurityGroupState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SecurityGroupStatus">SecurityGroupStatus</a>)
+</p>
+<div>
+<p>SecurityGroupState is the state of a SecurityGroup.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Invalid&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Unused&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Used&#34;</p></td>
+<td></td>
+</tr></tbody>
+</table>
 <h3 id="network.onmetal.de/v1alpha1.SecurityGroupStatus">SecurityGroupStatus
 </h3>
 <p>
@@ -1496,17 +2458,26 @@ PortRange
 <tbody>
 <tr>
 <td>
-<code>StateFields</code><br/>
+<code>state</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.StateFields">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
+<a href="#network.onmetal.de/v1alpha1.SecurityGroupState">
+SecurityGroupState
 </a>
 </em>
 </td>
 <td>
-<p>
-(Members of <code>StateFields</code> are embedded into this type.)
-</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>conditions</code><br/>
+<em>
+<a href="#network.onmetal.de/v1alpha1.SecurityGroupCondition">
+[]SecurityGroupCondition
+</a>
+</em>
+</td>
+<td>
 </td>
 </tr>
 </tbody>
@@ -1555,35 +2526,34 @@ SubnetSpec
 <td>
 <code>parent</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
 </td>
 <td>
-<p>Parent is a reference to a public parent Subnet without regional manifestation. The direct children
-then represent the regional incarnations of this public subnet.</p>
+<p>Parent is a reference to a public parent Subnet.</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>locations</code><br/>
+<code>machinePools</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.RegionAvailability">
-[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.RegionAvailability
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+[]Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
 </td>
 <td>
-<p>Locations defines in which regions and availability zone this subnet should be available</p>
+<p>MachinePools defines in which pools this subnet should be available</p>
 </td>
 </tr>
 <tr>
 <td>
 <code>routingDomain</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
 </td>
@@ -1621,6 +2591,117 @@ SubnetStatus
 </tr>
 </tbody>
 </table>
+<h3 id="network.onmetal.de/v1alpha1.SubnetCondition">SubnetCondition
+</h3>
+<p>
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SubnetStatus">SubnetStatus</a>)
+</p>
+<div>
+<p>SubnetCondition is one of the conditions of a volume.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>type</code><br/>
+<em>
+<a href="#network.onmetal.de/v1alpha1.SubnetConditionType">
+SubnetConditionType
+</a>
+</em>
+</td>
+<td>
+<p>Type is the type of the condition.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#conditionstatus-v1-core">
+Kubernetes core/v1.ConditionStatus
+</a>
+</em>
+</td>
+<td>
+<p>Status is the status of the condition.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>reason</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Reason is a machine-readable indication of why the condition is in a certain state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>message</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Message is a human-readable explanation of why the condition has a certain reason / state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>observedGeneration</code><br/>
+<em>
+int64
+</em>
+</td>
+<td>
+<p>ObservedGeneration represents the .metadata.generation that the condition was set based upon.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastUpdateTime</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastUpdateTime is the last time a condition has been updated.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastTransitionTime</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastTransitionTime is the last time the status of a condition has transitioned from one state to another.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="network.onmetal.de/v1alpha1.SubnetConditionType">SubnetConditionType
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SubnetCondition">SubnetCondition</a>)
+</p>
+<div>
+<p>SubnetConditionType is a type a SubnetCondition can have.</p>
+</div>
 <h3 id="network.onmetal.de/v1alpha1.SubnetSpec">SubnetSpec
 </h3>
 <p>
@@ -1641,35 +2722,34 @@ SubnetStatus
 <td>
 <code>parent</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
 </td>
 <td>
-<p>Parent is a reference to a public parent Subnet without regional manifestation. The direct children
-then represent the regional incarnations of this public subnet.</p>
+<p>Parent is a reference to a public parent Subnet.</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>locations</code><br/>
+<code>machinePools</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.RegionAvailability">
-[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.RegionAvailability
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+[]Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
 </td>
 <td>
-<p>Locations defines in which regions and availability zone this subnet should be available</p>
+<p>MachinePools defines in which pools this subnet should be available</p>
 </td>
 </tr>
 <tr>
 <td>
 <code>routingDomain</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
 </td>
@@ -1692,6 +2772,30 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </tr>
 </tbody>
 </table>
+<h3 id="network.onmetal.de/v1alpha1.SubnetState">SubnetState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SubnetStatus">SubnetStatus</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Down&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Initial&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Invalid&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Up&#34;</p></td>
+<td></td>
+</tr></tbody>
+</table>
 <h3 id="network.onmetal.de/v1alpha1.SubnetStatus">SubnetStatus
 </h3>
 <p>
@@ -1710,17 +2814,26 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 <tbody>
 <tr>
 <td>
-<code>StateFields</code><br/>
+<code>state</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.StateFields">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
+<a href="#network.onmetal.de/v1alpha1.SubnetState">
+SubnetState
 </a>
 </em>
 </td>
 <td>
-<p>
-(Members of <code>StateFields</code> are embedded into this type.)
-</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>conditions</code><br/>
+<em>
+<a href="#network.onmetal.de/v1alpha1.SubnetCondition">
+[]SubnetCondition
+</a>
+</em>
+</td>
+<td>
 </td>
 </tr>
 <tr>
@@ -1738,8 +2851,88 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 </tr>
 </tbody>
 </table>
+<h3 id="network.onmetal.de/v1alpha1.Target">Target
+</h3>
+<p>
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.GatewaySpec">GatewaySpec</a>, <a href="#network.onmetal.de/v1alpha1.Route">Route</a>)
+</p>
+<div>
+<p>Target is a target for network traffic.
+It may be either
+* a v1alpha1.Machine
+* a Gateway
+* a ReservedIP
+* a raw IP
+* a raw CIDR.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>machine</code><br/>
+<em>
+<a href="#network.onmetal.de/v1alpha1.MachineRouteTarget">
+MachineRouteTarget
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>gateway</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>reservedIP</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>ip</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>cidr</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
 <hr/>
 <p><em>
 Generated with <code>gen-crd-api-reference-docs</code>
-on git commit <code>003d1e1</code>.
+on git commit <code>6fe95dc</code>.
 </em></p>

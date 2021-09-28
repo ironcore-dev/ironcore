@@ -45,26 +45,52 @@ type ReservedIPAssignment struct {
 
 // ReservedIPStatus defines the observed state of ReservedIP
 type ReservedIPStatus struct {
+	State      ReservedIPState       `json:"state,omitempty"`
+	Conditions []ReservedIPCondition `json:"conditions,omitempty"`
 	// IP indicates the effective reserved IP address
-	IP                 common.IPAddr `json:"ip,omitempty"`
-	common.StateFields `json:",inline"`
-	Bound              *ReservedIPBound `json:"bound,omitempty"`
+	IP    common.IPAddr    `json:"ip,omitempty"`
+	Bound *ReservedIPBound `json:"bound,omitempty"`
+}
+
+type ReservedIPState string
+
+// ReservedIPConditionType is a type a ReservedIPCondition can have.
+type ReservedIPConditionType string
+
+// ReservedIPCondition is one of the conditions of a volume.
+type ReservedIPCondition struct {
+	// Type is the type of the condition.
+	Type ReservedIPConditionType `json:"type"`
+	// Status is the status of the condition.
+	Status corev1.ConditionStatus `json:"status"`
+	// Reason is a machine-readable indication of why the condition is in a certain state.
+	Reason string `json:"reason"`
+	// Message is a human-readable explanation of why the condition has a certain reason / state.
+	Message string `json:"message"`
+	// ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
+	// LastUpdateTime is the last time a condition has been updated.
+	LastUpdateTime metav1.Time `json:"lastUpdateTime,omitempty"`
+	// LastTransitionTime is the last time the status of a condition has transitioned from one state to another.
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
 }
 
 // ReservedIPBound describes the binding state of a ReservedIP
 type ReservedIPBound struct {
-	Mode       string               `json:"mode"`
+	Mode       ReservedIPBindMode   `json:"mode"`
 	Assignment ReservedIPAssignment `json:"assignment,omitempty"`
 }
 
+type ReservedIPBindMode string
+
 const (
-	// BoundModeFloating defines a ReservedIP which is dynamically assigned
+	// BindModeFloating defines a ReservedIP which is dynamically assigned
 	// as additional DNAT-ed IP for the target resource.
-	BoundModeFloating = "Floating"
-	// BoundModeStatic defines a ReservedIP which is directly assigned to an interface
+	BindModeFloating ReservedIPBindMode = "Floating"
+	// BindModeStatic defines a ReservedIP which is directly assigned to an interface
 	// of the target resource. This means the target is directly connected to the Subnet
 	// of the reserved IP.
-	BoundModeStatic = "Static"
+	BindModeStatic ReservedIPBindMode = "Static"
 )
 
 //+kubebuilder:object:root=true

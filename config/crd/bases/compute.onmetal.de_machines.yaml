@@ -23,14 +23,11 @@ spec:
     - jsonPath: .spec.machineClass.name
       name: MachineClass
       type: string
-    - jsonPath: .spec.image.name
+    - jsonPath: .spec.image
       name: Image
       type: string
-    - jsonPath: .spec.location.region
-      name: Region
-      type: string
-    - jsonPath: .spec.location.availabilityZone
-      name: AZ
+    - jsonPath: .spec.machinePool.name
+      name: MachinePool
       type: string
     - jsonPath: .status.state
       name: State
@@ -58,17 +55,43 @@ spec:
           spec:
             description: MachineSpec defines the desired state of Machine
             properties:
+              efiVars:
+                description: EFIVars are variables to pass to EFI while booting up.
+                items:
+                  description: EFIVar is a variable to pass to EFI while booting up.
+                  properties:
+                    name:
+                      type: string
+                    uuid:
+                      type: string
+                    value:
+                      type: string
+                  required:
+                  - value
+                  type: object
+                type: array
               hostname:
                 description: Hostname is the hostname of the machine
                 type: string
-              image:
-                description: Image is the operating system image of the machine
+              ignition:
+                description: Ignition is a reference to a config map containing the
+                  ignition YAML for the machine to boot up. If key is empty, DefaultIgnitionKey
+                  will be used as fallback.
                 properties:
+                  key:
+                    description: The key of the entry in the ConfigMap resource's
+                      `data` field to be used. Some instances of this field may be
+                      defaulted, in others it may be required.
+                    type: string
                   name:
                     description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                       TODO: Add other useful fields. apiVersion, kind, uid?'
                     type: string
                 type: object
+              image:
+                description: Image is the URL providing the operating system image
+                  of the machine.
+                type: string
               interfaces:
                 description: Interfaces define a list of network interfaces present
                   on the machine
@@ -84,10 +107,8 @@ spec:
                       type: string
                     priority:
                       description: Priority is the priority level of this interface
+                      format: int32
                       type: integer
-                    routingOnly:
-                      description: RoutingOnly is a routing hint for this interface
-                      type: boolean
                     target:
                       description: Target is the referenced resource of this interface
                       properties:
@@ -101,20 +122,9 @@ spec:
                   - target
                   type: object
                 type: array
-              location:
-                description: Location is the physical location of the machine
-                properties:
-                  availabilityZone:
-                    description: AvailabilityZone is the availability zone of a resource
-                    type: string
-                  region:
-                    description: Region defines the region of a resource
-                    type: string
-                required:
-                - region
-                type: object
               machineClass:
-                description: MachineClass is the machine class/flavor of the machine
+                description: MachineClass is a reference to the machine class/flavor
+                  of the machine.
                 properties:
                   name:
                     description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
@@ -122,7 +132,9 @@ spec:
                     type: string
                 type: object
               machinePool:
-                description: MachinePool defines the compute pool of the machine
+                description: MachinePool defines machine pool to run the machine in.
+                  If empty, a scheduler will figure out an appropriate pool to run
+                  the machine in.
                 properties:
                   name:
                     description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
@@ -142,78 +154,36 @@ spec:
                   type: object
                 type: array
               sshPublicKeys:
-                description: SSHPublicKeys is a list of SSH public keys of a machine
+                description: SSHPublicKeys is a list of SSH public key secret references
+                  of a machine.
                 items:
-                  description: SSHPublicKeyEntry describes either a reference to a
-                    SSH public key or a selector to filter for a public key
+                  description: SecretKeySelector is a reference to a specific 'key'
+                    within a Secret resource. In some instances, `key` is a required
+                    field.
                   properties:
+                    key:
+                      description: The key of the entry in the Secret resource's `data`
+                        field to be used. Some instances of this field may be defaulted,
+                        in others it may be required.
+                      type: string
                     name:
-                      description: Name is the name of the SSH public key
+                      description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                        TODO: Add other useful fields. apiVersion, kind, uid?'
                       type: string
-                    scope:
-                      description: Scope is the scope of a SSH public key
-                      type: string
-                    selector:
-                      description: Selector defines a LabelSelector to filter for
-                        a public key
-                      properties:
-                        matchExpressions:
-                          description: matchExpressions is a list of label selector
-                            requirements. The requirements are ANDed.
-                          items:
-                            description: A label selector requirement is a selector
-                              that contains values, a key, and an operator that relates
-                              the key and values.
-                            properties:
-                              key:
-                                description: key is the label key that the selector
-                                  applies to.
-                                type: string
-                              operator:
-                                description: operator represents a key's relationship
-                                  to a set of values. Valid operators are In, NotIn,
-                                  Exists and DoesNotExist.
-                                type: string
-                              values:
-                                description: values is an array of string values.
-                                  If the operator is In or NotIn, the values array
-                                  must be non-empty. If the operator is Exists or
-                                  DoesNotExist, the values array must be empty. This
-                                  array is replaced during a strategic merge patch.
-                                items:
-                                  type: string
-                                type: array
-                            required:
-                            - key
-                            - operator
-                            type: object
-                          type: array
-                        matchLabels:
-                          additionalProperties:
-                            type: string
-                          description: matchLabels is a map of {key,value} pairs.
-                            A single {key,value} in the matchLabels map is equivalent
-                            to an element of matchExpressions, whose key field is
-                            "key", the operator is "In", and the values array contains
-                            only "value". The requirements are ANDed.
-                          type: object
-                      type: object
                   type: object
                 type: array
-              userData:
-                description: UserData defines the ignition file
-                type: string
               volumeClaims:
                 description: VolumeClaims
                 items:
                   description: VolumeClaim defines a volume claim of a machine
                   properties:
-                    device:
-                      description: Device defines the device for a volume on the machine
-                      type: string
                     name:
                       description: Name is the name of the VolumeClaim
                       type: string
+                    priority:
+                      description: Priority is the OS priority of the volume.
+                      format: int32
+                      type: integer
                     retainPolicy:
                       description: RetainPolicy defines what should happen when the
                         machine is being deleted
@@ -243,7 +213,6 @@ spec:
                           type: string
                       type: object
                   required:
-                  - device
                   - name
                   - retainPolicy
                   - storageClass
@@ -252,7 +221,6 @@ spec:
             required:
             - hostname
             - image
-            - location
             - machineClass
             - securityGroups
             - sshPublicKeys
@@ -262,81 +230,81 @@ spec:
             description: MachineStatus defines the observed state of Machine
             properties:
               conditions:
-                description: Conditions represents the status for individual operators
                 items:
-                  description: "Condition contains details for one aspect of the current
-                    state of this API Resource. --- This struct is intended for direct
-                    use as an array at the field path .status.conditions.  For example,
-                    type FooStatus struct{     // Represents the observations of a
-                    foo's current state.     // Known .status.conditions.type are:
-                    \"Available\", \"Progressing\", and \"Degraded\"     // +patchMergeKey=type
-                    \    // +patchStrategy=merge     // +listType=map     // +listMapKey=type
-                    \    Conditions []metav1.Condition `json:\"conditions,omitempty\"
-                    patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"`
-                    \n     // other fields }"
+                  description: MachineCondition is one of the conditions of a volume.
                   properties:
                     lastTransitionTime:
-                      description: lastTransitionTime is the last time the condition
-                        transitioned from one status to another. This should be when
-                        the underlying condition changed.  If that is not known, then
-                        using the time when the API field changed is acceptable.
+                      description: LastTransitionTime is the last time the status
+                        of a condition has transitioned from one state to another.
+                      format: date-time
+                      type: string
+                    lastUpdateTime:
+                      description: LastUpdateTime is the last time a condition has
+                        been updated.
                       format: date-time
                       type: string
                     message:
-                      description: message is a human readable message indicating
-                        details about the transition. This may be an empty string.
-                      maxLength: 32768
+                      description: Message is a human-readable explanation of why
+                        the condition has a certain reason / state.
                       type: string
                     observedGeneration:
-                      description: observedGeneration represents the .metadata.generation
-                        that the condition was set based upon. For instance, if .metadata.generation
-                        is currently 12, but the .status.conditions[x].observedGeneration
-                        is 9, the condition is out of date with respect to the current
-                        state of the instance.
+                      description: ObservedGeneration represents the .metadata.generation
+                        that the condition was set based upon.
                       format: int64
-                      minimum: 0
                       type: integer
                     reason:
-                      description: reason contains a programmatic identifier indicating
-                        the reason for the condition's last transition. Producers
-                        of specific condition types may define expected values and
-                        meanings for this field, and whether the values are considered
-                        a guaranteed API. The value should be a CamelCase string.
-                        This field may not be empty.
-                      maxLength: 1024
-                      minLength: 1
-                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      description: Reason is a machine-readable indication of why
+                        the condition is in a certain state.
                       type: string
                     status:
-                      description: status of the condition, one of True, False, Unknown.
-                      enum:
-                      - "True"
-                      - "False"
-                      - Unknown
+                      description: Status is the status of the condition.
                       type: string
                     type:
-                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
-                        --- Many .condition.type values are consistent across resources
-                        like Available, but because arbitrary conditions can be useful
-                        (see .node.status.conditions), the ability to deconflict is
-                        important. The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
-                      maxLength: 316
-                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      description: Type is the type of the condition.
                       type: string
                   required:
-                  - lastTransitionTime
                   - message
                   - reason
                   - status
                   - type
                   type: object
                 type: array
-              message:
-                description: Message contains a message for the corresponding state
-                type: string
+              interfaces:
+                items:
+                  description: InterfaceStatus reports the status of an Interface.
+                  properties:
+                    ip:
+                      description: IP is the IP allocated for an interface.
+                      type: string
+                    name:
+                      description: Name is the name of an interface.
+                      type: string
+                    priority:
+                      description: Priority is the OS priority of the interface.
+                      format: int32
+                      type: integer
+                  required:
+                  - ip
+                  - name
+                  type: object
+                type: array
               state:
-                description: State indicates the state of a resource
                 type: string
+              volumeClaims:
+                items:
+                  description: VolumeClaimStatus is the status of a VolumeClaim.
+                  properties:
+                    name:
+                      description: Name is the name of a volume claim.
+                      type: string
+                    priority:
+                      description: Priority is the OS priority of the volume.
+                      format: int32
+                      type: integer
+                  required:
+                  - name
+                  type: object
+                type: array
             type: object
         type: object
     served: true

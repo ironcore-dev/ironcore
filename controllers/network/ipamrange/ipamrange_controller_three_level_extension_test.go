@@ -17,8 +17,7 @@
 package ipamrange
 
 import (
-	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
-	api "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
+	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -54,82 +53,82 @@ var _ = OptionalDescribe("IPAMRange three level extension", func() {
 		allocatedParentCidr2 := "10.1.0.0/16"
 		validSubRangeCidr := "/17"
 
-		configuredRootCIDRStatus := []api.CIDRAllocationStatus{
-			api.CIDRAllocationStatus{
-				CIDRAllocation: api.CIDRAllocation{
+		configuredRootCIDRStatus := []networkv1alpha1.CIDRAllocationStatus{
+			{
+				CIDRAllocation: networkv1alpha1.CIDRAllocation{
 					Request: validRootCidr,
 					CIDR:    validRootCidr,
 				},
-				Status:  api.AllocationStateAllocated,
+				Status:  networkv1alpha1.AllocationStateAllocated,
 				Message: SuccessfulUsageMessage,
 			},
 		}
-		allocatedCIDRParentStatus := []api.CIDRAllocationStatus{
-			api.CIDRAllocationStatus{
-				CIDRAllocation: api.CIDRAllocation{
+		allocatedCIDRParentStatus := []networkv1alpha1.CIDRAllocationStatus{
+			{
+				CIDRAllocation: networkv1alpha1.CIDRAllocation{
 					Request: validParentRequestCidr,
 					CIDR:    allocatedParentCidr1,
 				},
-				Status:  api.AllocationStateAllocated,
+				Status:  networkv1alpha1.AllocationStateAllocated,
 				Message: SuccessfulAllocationMessage,
 			},
 		}
-		allocatedCIDRParentStatus2 := []api.CIDRAllocationStatus{
-			api.CIDRAllocationStatus{
-				CIDRAllocation: api.CIDRAllocation{
+		allocatedCIDRParentStatus2 := []networkv1alpha1.CIDRAllocationStatus{
+			{
+				CIDRAllocation: networkv1alpha1.CIDRAllocation{
 					Request: validParentRequestCidr,
 					CIDR:    allocatedParentCidr1,
 				},
-				Status:  api.AllocationStateAllocated,
+				Status:  networkv1alpha1.AllocationStateAllocated,
 				Message: SuccessfulAllocationMessage,
 			},
-			api.CIDRAllocationStatus{
-				CIDRAllocation: api.CIDRAllocation{
+			{
+				CIDRAllocation: networkv1alpha1.CIDRAllocation{
 					Request: validParentRequestCidr,
 					CIDR:    allocatedParentCidr2,
 				},
-				Status:  api.AllocationStateAllocated,
+				Status:  networkv1alpha1.AllocationStateAllocated,
 				Message: SuccessfulAllocationMessage,
 			},
 		}
 
-		allocatedCIDRStatus1 := []api.CIDRAllocationStatus{
-			api.CIDRAllocationStatus{
-				CIDRAllocation: api.CIDRAllocation{
+		allocatedCIDRStatus1 := []networkv1alpha1.CIDRAllocationStatus{
+			{
+				CIDRAllocation: networkv1alpha1.CIDRAllocation{
 					Request: validSubRangeCidr,
 					CIDR:    "10.0.0.0/17",
 				},
-				Status:  api.AllocationStateAllocated,
+				Status:  networkv1alpha1.AllocationStateAllocated,
 				Message: SuccessfulAllocationMessage,
 			},
 		}
-		allocatedCIDRStatus2 := []api.CIDRAllocationStatus{
-			api.CIDRAllocationStatus{
-				CIDRAllocation: api.CIDRAllocation{
+		allocatedCIDRStatus2 := []networkv1alpha1.CIDRAllocationStatus{
+			{
+				CIDRAllocation: networkv1alpha1.CIDRAllocation{
 					Request: validSubRangeCidr,
 					CIDR:    "10.0.128.0/17",
 				},
-				Status:  api.AllocationStateAllocated,
+				Status:  networkv1alpha1.AllocationStateAllocated,
 				Message: SuccessfulAllocationMessage,
 			},
 		}
-		allocatedCIDRStatus3 := []api.CIDRAllocationStatus{
-			api.CIDRAllocationStatus{
-				CIDRAllocation: api.CIDRAllocation{
+		allocatedCIDRStatus3 := []networkv1alpha1.CIDRAllocationStatus{
+			{
+				CIDRAllocation: networkv1alpha1.CIDRAllocation{
 					Request: validSubRangeCidr,
 					CIDR:    "10.1.0.0/17",
 				},
-				Status:  api.AllocationStateAllocated,
+				Status:  networkv1alpha1.AllocationStateAllocated,
 				Message: SuccessfulAllocationMessage,
 			},
 		}
-		failedCIDRStatus3 := []api.CIDRAllocationStatus{
-			api.CIDRAllocationStatus{
-				CIDRAllocation: api.CIDRAllocation{
+		failedCIDRStatus3 := []networkv1alpha1.CIDRAllocationStatus{
+			{
+				CIDRAllocation: networkv1alpha1.CIDRAllocation{
 					Request: validSubRangeCidr,
 					CIDR:    "",
 				},
-				Status:  api.AllocationStateBusy,
+				Status:  networkv1alpha1.AllocationStateBusy,
 				Message: FailBusyAllocationMessage(validSubRangeCidr),
 			},
 		}
@@ -137,14 +136,12 @@ var _ = OptionalDescribe("IPAMRange three level extension", func() {
 		It("Should clean and create root range object", func() {
 			cleanUp(validRootRangeLookupKey, validParentRangeLookupKey, validSubRangeLookupKey1, validSubRangeLookupKey2, validSubRangeLookupKey3)
 			createObject(validRootRangeLookupKey, nil, validRootCidr)
-			Eventually(func() *api.IPAMRangeStatus {
-				obj := &api.IPAMRange{}
+			Eventually(func() *networkv1alpha1.IPAMRangeStatus {
+				obj := &networkv1alpha1.IPAMRange{}
 				Expect(k8sClient.Get(ctx, validRootRangeLookupKey, obj)).Should(Succeed())
 				return &obj.Status
-			}, timeout, interval).Should(Equal(&api.IPAMRangeStatus{
-				StateFields: common.StateFields{
-					State: common.StateReady,
-				},
+			}, timeout, interval).Should(Equal(&networkv1alpha1.IPAMRangeStatus{
+				State: networkv1alpha1.IPAMRangeReady,
 				CIDRs: configuredRootCIDRStatus,
 			}))
 		})
@@ -153,14 +150,12 @@ var _ = OptionalDescribe("IPAMRange three level extension", func() {
 			createObject(validParentRangeLookupKey, &corev1.LocalObjectReference{
 				Name: validRootRangeLookupKey.Name,
 			}, validParentRequestCidr)
-			Eventually(func() *api.IPAMRangeStatus {
-				obj := &api.IPAMRange{}
+			Eventually(func() *networkv1alpha1.IPAMRangeStatus {
+				obj := &networkv1alpha1.IPAMRange{}
 				Expect(k8sClient.Get(ctx, validParentRangeLookupKey, obj)).Should(Succeed())
 				return &obj.Status
-			}, timeout, interval).Should(Equal(&api.IPAMRangeStatus{
-				StateFields: common.StateFields{
-					State: common.StateReady,
-				},
+			}, timeout, interval).Should(Equal(&networkv1alpha1.IPAMRangeStatus{
+				State: networkv1alpha1.IPAMRangeReady,
 				CIDRs: allocatedCIDRParentStatus,
 			}))
 		})
@@ -172,7 +167,7 @@ var _ = OptionalDescribe("IPAMRange three level extension", func() {
 			Eventually(func() *IPAMStatus {
 				return projectStatus(ctx, validParentRangeLookupKey)
 			}, timeout, interval).Should(Equal(&IPAMStatus{
-				State: common.StateReady,
+				State: networkv1alpha1.IPAMRangeReady,
 				CIDRs: allocatedCIDRParentStatus,
 				AllocationState: []string{
 					"10.0.0.0/17[busy]",
@@ -183,7 +178,7 @@ var _ = OptionalDescribe("IPAMRange three level extension", func() {
 			Eventually(func() *IPAMStatus {
 				return projectStatus(ctx, validSubRangeLookupKey1)
 			}, timeout, interval).Should(Equal(&IPAMStatus{
-				State: common.StateReady,
+				State: networkv1alpha1.IPAMRangeReady,
 				CIDRs: allocatedCIDRStatus1,
 			}))
 		})
@@ -195,7 +190,7 @@ var _ = OptionalDescribe("IPAMRange three level extension", func() {
 			Eventually(func() *IPAMStatus {
 				return projectStatus(ctx, validParentRangeLookupKey)
 			}, timeout, interval).Should(Equal(&IPAMStatus{
-				State: common.StateReady,
+				State: networkv1alpha1.IPAMRangeReady,
 				CIDRs: allocatedCIDRParentStatus,
 				AllocationState: []string{
 					"10.0.0.0/16[busy]",
@@ -205,7 +200,7 @@ var _ = OptionalDescribe("IPAMRange three level extension", func() {
 			Eventually(func() *IPAMStatus {
 				return projectStatus(ctx, validSubRangeLookupKey2)
 			}, timeout, interval).Should(Equal(&IPAMStatus{
-				State: common.StateReady,
+				State: networkv1alpha1.IPAMRangeReady,
 				CIDRs: allocatedCIDRStatus2,
 			}))
 		})
@@ -217,7 +212,7 @@ var _ = OptionalDescribe("IPAMRange three level extension", func() {
 			Eventually(func() *IPAMStatus {
 				return projectStatus(ctx, validParentRangeLookupKey)
 			}, timeout, interval).Should(Equal(&IPAMStatus{
-				State: common.StateReady,
+				State: networkv1alpha1.IPAMRangeReady,
 				CIDRs: allocatedCIDRParentStatus,
 				AllocationState: []string{
 					"10.0.0.0/16[busy]",
@@ -227,7 +222,7 @@ var _ = OptionalDescribe("IPAMRange three level extension", func() {
 			Eventually(func() *IPAMStatus {
 				return projectStatus(ctx, validSubRangeLookupKey3)
 			}, timeout, interval).Should(Equal(&IPAMStatus{
-				State: common.StateBusy,
+				State: networkv1alpha1.IPAMRangeBusy,
 				CIDRs: failedCIDRStatus3,
 			}))
 		})
@@ -239,7 +234,7 @@ var _ = OptionalDescribe("IPAMRange three level extension", func() {
 			Eventually(func() *IPAMStatus {
 				return projectStatus(ctx, validParentRangeLookupKey)
 			}, timeout, interval).Should(Equal(&IPAMStatus{
-				State: common.StateReady,
+				State: networkv1alpha1.IPAMRangeReady,
 				CIDRs: allocatedCIDRParentStatus2,
 				AllocationState: []string{
 					"10.0.0.0/16[busy]",
@@ -251,7 +246,7 @@ var _ = OptionalDescribe("IPAMRange three level extension", func() {
 			Eventually(func() *IPAMStatus {
 				return projectStatus(ctx, validSubRangeLookupKey3)
 			}, timeout, interval).Should(Equal(&IPAMStatus{
-				State: common.StateReady,
+				State: networkv1alpha1.IPAMRangeReady,
 				CIDRs: allocatedCIDRStatus3,
 			}))
 		})

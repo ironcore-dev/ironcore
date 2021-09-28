@@ -2,17 +2,10 @@ apiVersion: storage.onmetal.de/v1alpha1
 kind: StoragePool
 metadata:
   name: storagepool-sample
-  namespace: scope-1234324
 spec:
-  region: eu-central
-  privacy: shared
-  replication: 3
-  capacity:
-    - name: fast-class
-      capacity: 100Gi # optional
-# status:
-#   state: Available/Pending/NotAvailable
-#   message: "All good"
-#   used: # optional: only for private pools with reservations
-#   - name: fast-class
-#     capacity: 1Gi
+  providerID: onmetal://shared
+#status:
+#  state: Available
+#  available:
+#    onmetal.de/fast-class: 10Gi
+#    onmetal.de/slow-class: 100Gi

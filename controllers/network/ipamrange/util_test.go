@@ -18,7 +18,7 @@ package ipamrange
 
 import (
 	"context"
-	api "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
+	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -31,11 +31,11 @@ import (
 )
 
 type IPAMStatus struct {
-	State            string
-	CIDRs            []api.CIDRAllocationStatus
+	State            networkv1alpha1.IPAMRangeState
+	CIDRs            []networkv1alpha1.CIDRAllocationStatus
 	AllocationState  []string
-	PendingRequest   *api.IPAMPendingRequest
-	PendingDeletions []api.CIDRAllocationStatus
+	PendingRequest   *networkv1alpha1.IPAMPendingRequest
+	PendingDeletions []networkv1alpha1.CIDRAllocationStatus
 }
 
 const (
@@ -61,7 +61,7 @@ func OptionalDescribe(n string, f func()) bool {
 
 var cleanUp = func(keys ...client.ObjectKey) {
 	for _, key := range keys {
-		ipamRange := &api.IPAMRange{}
+		ipamRange := &networkv1alpha1.IPAMRange{}
 		err := k8sClient.Get(ctx, types.NamespacedName{
 			Namespace: key.Namespace,
 			Name:      key.Name,
@@ -80,12 +80,12 @@ var cleanUp = func(keys ...client.ObjectKey) {
 }
 
 var createObject = func(key client.ObjectKey, parent *corev1.LocalObjectReference, cidrs ...string) {
-	Expect(k8sClient.Create(ctx, &api.IPAMRange{
+	Expect(k8sClient.Create(ctx, &networkv1alpha1.IPAMRange{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      key.Name,
 			Namespace: key.Namespace,
 		},
-		Spec: api.IPAMRangeSpec{
+		Spec: networkv1alpha1.IPAMRangeSpec{
 			Parent: parent,
 			CIDRs:  cidrs,
 		},
@@ -93,10 +93,10 @@ var createObject = func(key client.ObjectKey, parent *corev1.LocalObjectReferenc
 }
 
 var updateObject = func(key client.ObjectKey, parent *corev1.LocalObjectReference, cidrs ...string) {
-	obj := &api.IPAMRange{}
+	obj := &networkv1alpha1.IPAMRange{}
 	Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
 	newObj := obj.DeepCopy()
-	newObj.Spec = api.IPAMRangeSpec{
+	newObj.Spec = networkv1alpha1.IPAMRangeSpec{
 		Parent: parent,
 		CIDRs:  cidrs,
 	}
@@ -104,7 +104,7 @@ var updateObject = func(key client.ObjectKey, parent *corev1.LocalObjectReferenc
 }
 
 func projectStatus(ctx context.Context, lookupKey types.NamespacedName) *IPAMStatus {
-	obj := &api.IPAMRange{}
+	obj := &networkv1alpha1.IPAMRange{}
 	Expect(k8sClient.Get(ctx, lookupKey, obj)).Should(Succeed())
 	return &IPAMStatus{
 		State:            obj.Status.State,

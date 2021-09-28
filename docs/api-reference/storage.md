@@ -51,24 +51,13 @@ StorageClassSpec
 <td>
 <code>capabilities</code><br/>
 <em>
-<a href="#storage.onmetal.de/v1alpha1.StorageClassCapability">
-[]StorageClassCapability
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#resourcelist-v1-core">
+Kubernetes core/v1.ResourceList
 </a>
 </em>
 </td>
 <td>
 <p>Capabilities describes the capabilities of a storage class</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>description</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Description is a human readable description of a storage class</p>
 </td>
 </tr>
 </table>
@@ -84,88 +73,6 @@ StorageClassStatus
 </em>
 </td>
 <td>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="storage.onmetal.de/v1alpha1.StorageClassCapability">StorageClassCapability
-</h3>
-<p>
-(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.StorageClassSpec">StorageClassSpec</a>)
-</p>
-<div>
-<p>StorageClassCapability describes one attribute of the StorageClass</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>name</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Name is the name of a capability</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>value</code><br/>
-<em>
-k8s.io/apimachinery/pkg/util/intstr.IntOrString
-</em>
-</td>
-<td>
-<p>Value is the value of a capability</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="storage.onmetal.de/v1alpha1.StorageClassCapacity">StorageClassCapacity
-</h3>
-<p>
-(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.StoragePoolSpec">StoragePoolSpec</a>, <a href="#storage.onmetal.de/v1alpha1.StoragePoolStatus">StoragePoolStatus</a>)
-</p>
-<div>
-<p>StorageClassCapacity defines capacity attribute of a storage class</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>name</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Name is the name of a storage class capacity</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>capacity</code><br/>
-<em>
-<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/api/resource#Duration">
-k8s.io/apimachinery/pkg/api/resource.Quantity
-</a>
-</em>
-</td>
-<td>
-<p>Capacity is the quantity of a capacity</p>
 </td>
 </tr>
 </tbody>
@@ -190,24 +97,13 @@ k8s.io/apimachinery/pkg/api/resource.Quantity
 <td>
 <code>capabilities</code><br/>
 <em>
-<a href="#storage.onmetal.de/v1alpha1.StorageClassCapability">
-[]StorageClassCapability
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#resourcelist-v1-core">
+Kubernetes core/v1.ResourceList
 </a>
 </em>
 </td>
 <td>
 <p>Capabilities describes the capabilities of a storage class</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>description</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Description is a human readable description of a storage class</p>
 </td>
 </tr>
 </tbody>
@@ -220,29 +116,6 @@ string
 <div>
 <p>StorageClassStatus defines the observed state of StorageClass</p>
 </div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>availability</code><br/>
-<em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Availability">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.Availability
-</a>
-</em>
-</td>
-<td>
-<p>Availability describes the regions and zones where this MachineClass is available</p>
-</td>
-</tr>
-</tbody>
-</table>
 <h3 id="storage.onmetal.de/v1alpha1.StoragePool">StoragePool
 </h3>
 <div>
@@ -285,48 +158,13 @@ StoragePoolSpec
 <table>
 <tr>
 <td>
-<code>region</code><br/>
+<code>providerID</code><br/>
 <em>
 string
 </em>
 </td>
 <td>
-<p>Region defines the region of the storage pool</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>privacy</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Privacy defines the privacy scope of the storage pool</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>replication</code><br/>
-<em>
-int
-</em>
-</td>
-<td>
-<p>Replication indicates the replication factor in the storage pool</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>capacity</code><br/>
-<em>
-<a href="#storage.onmetal.de/v1alpha1.StorageClassCapacity">
-[]StorageClassCapacity
-</a>
-</em>
-</td>
-<td>
-<p>Capacity list the available capacity of a storage pool</p>
+<p>ProviderID identifies the StoragePool on provider side.</p>
 </td>
 </tr>
 </table>
@@ -346,6 +184,117 @@ StoragePoolStatus
 </tr>
 </tbody>
 </table>
+<h3 id="storage.onmetal.de/v1alpha1.StoragePoolCondition">StoragePoolCondition
+</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.StoragePoolStatus">StoragePoolStatus</a>)
+</p>
+<div>
+<p>StoragePoolCondition is one of the conditions of a volume.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>type</code><br/>
+<em>
+<a href="#storage.onmetal.de/v1alpha1.StoragePoolConditionType">
+StoragePoolConditionType
+</a>
+</em>
+</td>
+<td>
+<p>Type is the type of the condition.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#conditionstatus-v1-core">
+Kubernetes core/v1.ConditionStatus
+</a>
+</em>
+</td>
+<td>
+<p>Status is the status of the condition.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>reason</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Reason is a machine-readable indication of why the condition is in a certain state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>message</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Message is a human-readable explanation of why the condition has a certain reason / state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>observedGeneration</code><br/>
+<em>
+int64
+</em>
+</td>
+<td>
+<p>ObservedGeneration represents the .metadata.generation that the condition was set based upon.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastUpdateTime</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastUpdateTime is the last time a condition has been updated.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastTransitionTime</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastTransitionTime is the last time the status of a condition has transitioned from one state to another.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="storage.onmetal.de/v1alpha1.StoragePoolConditionType">StoragePoolConditionType
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.StoragePoolCondition">StoragePoolCondition</a>)
+</p>
+<div>
+<p>StoragePoolConditionType is a type a StoragePoolCondition can have.</p>
+</div>
 <h3 id="storage.onmetal.de/v1alpha1.StoragePoolSpec">StoragePoolSpec
 </h3>
 <p>
@@ -364,51 +313,38 @@ StoragePoolStatus
 <tbody>
 <tr>
 <td>
-<code>region</code><br/>
+<code>providerID</code><br/>
 <em>
 string
 </em>
 </td>
 <td>
-<p>Region defines the region of the storage pool</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>privacy</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Privacy defines the privacy scope of the storage pool</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>replication</code><br/>
-<em>
-int
-</em>
-</td>
-<td>
-<p>Replication indicates the replication factor in the storage pool</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>capacity</code><br/>
-<em>
-<a href="#storage.onmetal.de/v1alpha1.StorageClassCapacity">
-[]StorageClassCapacity
-</a>
-</em>
-</td>
-<td>
-<p>Capacity list the available capacity of a storage pool</p>
+<p>ProviderID identifies the StoragePool on provider side.</p>
 </td>
 </tr>
 </tbody>
+</table>
+<h3 id="storage.onmetal.de/v1alpha1.StoragePoolState">StoragePoolState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.StoragePoolStatus">StoragePoolStatus</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Available&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;NotAvailable&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td></td>
+</tr></tbody>
 </table>
 <h3 id="storage.onmetal.de/v1alpha1.StoragePoolStatus">StoragePoolStatus
 </h3>
@@ -428,25 +364,47 @@ int
 <tbody>
 <tr>
 <td>
-<code>StateFields</code><br/>
+<code>state</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.StateFields">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
+<a href="#storage.onmetal.de/v1alpha1.StoragePoolState">
+StoragePoolState
 </a>
 </em>
 </td>
 <td>
-<p>
-(Members of <code>StateFields</code> are embedded into this type.)
-</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>conditions</code><br/>
+<em>
+<a href="#storage.onmetal.de/v1alpha1.StoragePoolCondition">
+[]StoragePoolCondition
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>available</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#resourcelist-v1-core">
+Kubernetes core/v1.ResourceList
+</a>
+</em>
+</td>
+<td>
+<p>Available list the available capacity of a storage pool</p>
 </td>
 </tr>
 <tr>
 <td>
 <code>used</code><br/>
 <em>
-<a href="#storage.onmetal.de/v1alpha1.StorageClassCapacity">
-[]StorageClassCapacity
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#resourcelist-v1-core">
+Kubernetes core/v1.ResourceList
 </a>
 </em>
 </td>
@@ -498,9 +456,11 @@ VolumeSpec
 <table>
 <tr>
 <td>
-<code>storage_class</code><br/>
+<code>storageClass</code><br/>
 <em>
-string
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
 </em>
 </td>
 <td>
@@ -509,10 +469,10 @@ string
 </tr>
 <tr>
 <td>
-<code>storagepool</code><br/>
+<code>storagePool</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
 </td>
@@ -522,15 +482,15 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </tr>
 <tr>
 <td>
-<code>size</code><br/>
+<code>resources</code><br/>
 <em>
-<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/api/resource#Duration">
-k8s.io/apimachinery/pkg/api/resource.Quantity
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#resourcelist-v1-core">
+Kubernetes core/v1.ResourceList
 </a>
 </em>
 </td>
 <td>
-<p>Size defines the size of the volume</p>
+<p>Resources is a description of the volume&rsquo;s resources and capacity.</p>
 </td>
 </tr>
 </table>
@@ -594,8 +554,8 @@ VolumeAttachmentSpec
 <td>
 <code>volume</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
 </td>
@@ -607,37 +567,13 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 <td>
 <code>machine</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
 </td>
 <td>
 <p>Machine is a reference of the machine object which the volume should be attached to</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>device</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Device defines the device on the host for a volume</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>source</code><br/>
-<em>
-<a href="#storage.onmetal.de/v1alpha1.VolumeSource">
-VolumeSource
-</a>
-</em>
-</td>
-<td>
-<p>Source references either an image or a snapshot</p>
 </td>
 </tr>
 </table>
@@ -657,6 +593,117 @@ VolumeAttachmentStatus
 </tr>
 </tbody>
 </table>
+<h3 id="storage.onmetal.de/v1alpha1.VolumeAttachmentCondition">VolumeAttachmentCondition
+</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.VolumeAttachmentStatus">VolumeAttachmentStatus</a>)
+</p>
+<div>
+<p>VolumeAttachmentCondition is one of the conditions of a volume.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>type</code><br/>
+<em>
+<a href="#storage.onmetal.de/v1alpha1.VolumeAttachmentConditionType">
+VolumeAttachmentConditionType
+</a>
+</em>
+</td>
+<td>
+<p>Type is the type of the condition.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#conditionstatus-v1-core">
+Kubernetes core/v1.ConditionStatus
+</a>
+</em>
+</td>
+<td>
+<p>Status is the status of the condition.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>reason</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Reason is a machine-readable indication of why the condition is in a certain state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>message</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Message is a human-readable explanation of why the condition has a certain reason / state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>observedGeneration</code><br/>
+<em>
+int64
+</em>
+</td>
+<td>
+<p>ObservedGeneration represents the .metadata.generation that the condition was set based upon.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastUpdateTime</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastUpdateTime is the last time a condition has been updated.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastTransitionTime</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastTransitionTime is the last time the status of a condition has transitioned from one state to another.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="storage.onmetal.de/v1alpha1.VolumeAttachmentConditionType">VolumeAttachmentConditionType
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.VolumeAttachmentCondition">VolumeAttachmentCondition</a>)
+</p>
+<div>
+<p>VolumeAttachmentConditionType is a type a VolumeAttachmentCondition can have.</p>
+</div>
 <h3 id="storage.onmetal.de/v1alpha1.VolumeAttachmentSpec">VolumeAttachmentSpec
 </h3>
 <p>
@@ -677,8 +724,8 @@ VolumeAttachmentStatus
 <td>
 <code>volume</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
 </td>
@@ -690,8 +737,8 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 <td>
 <code>machine</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
 </td>
@@ -699,32 +746,16 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 <p>Machine is a reference of the machine object which the volume should be attached to</p>
 </td>
 </tr>
-<tr>
-<td>
-<code>device</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Device defines the device on the host for a volume</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>source</code><br/>
-<em>
-<a href="#storage.onmetal.de/v1alpha1.VolumeSource">
-VolumeSource
-</a>
-</em>
-</td>
-<td>
-<p>Source references either an image or a snapshot</p>
-</td>
-</tr>
 </tbody>
 </table>
+<h3 id="storage.onmetal.de/v1alpha1.VolumeAttachmentState">VolumeAttachmentState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.VolumeAttachmentStatus">VolumeAttachmentStatus</a>)
+</p>
+<div>
+<p>VolumeAttachmentState is a state a VolumeAttachment can be int.</p>
+</div>
 <h3 id="storage.onmetal.de/v1alpha1.VolumeAttachmentStatus">VolumeAttachmentStatus
 </h3>
 <p>
@@ -743,39 +774,39 @@ VolumeSource
 <tbody>
 <tr>
 <td>
-<code>StateFields</code><br/>
+<code>state</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.StateFields">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
+<a href="#storage.onmetal.de/v1alpha1.VolumeAttachmentState">
+VolumeAttachmentState
 </a>
 </em>
 </td>
 <td>
-<p>
-(Members of <code>StateFields</code> are embedded into this type.)
-</p>
+<p>State reports a VolumeAttachmentState a VolumeAttachment is in.</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>device</code><br/>
+<code>conditions</code><br/>
 <em>
-string
+<a href="#storage.onmetal.de/v1alpha1.VolumeAttachmentCondition">
+[]VolumeAttachmentCondition
+</a>
 </em>
 </td>
 <td>
-<p>Device describes the device of the volume on the host</p>
+<p>Conditions reports the conditions a VolumeAttachment may have.</p>
 </td>
 </tr>
 </tbody>
 </table>
-<h3 id="storage.onmetal.de/v1alpha1.VolumeSource">VolumeSource
+<h3 id="storage.onmetal.de/v1alpha1.VolumeCondition">VolumeCondition
 </h3>
 <p>
-(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.VolumeAttachmentSpec">VolumeAttachmentSpec</a>)
+(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.VolumeStatus">VolumeStatus</a>)
 </p>
 <div>
-<p>VolumeSource defines the source of a volume which can be either an image or a snapshot</p>
+<p>VolumeCondition is one of the conditions of a volume.</p>
 </div>
 <table>
 <thead>
@@ -787,32 +818,99 @@ string
 <tbody>
 <tr>
 <td>
-<code>image</code><br/>
+<code>type</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
+<a href="#storage.onmetal.de/v1alpha1.VolumeConditionType">
+VolumeConditionType
 </a>
 </em>
 </td>
 <td>
-<p>Image defines the image name of the referenced image</p>
+<p>Type is the type of the condition.</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>snapshot</code><br/>
+<code>status</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#conditionstatus-v1-core">
+Kubernetes core/v1.ConditionStatus
 </a>
 </em>
 </td>
 <td>
-<p>Snapshot defines the snapshot which should be used</p>
+<p>Status is the status of the condition.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>reason</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Reason is a machine-readable indication of why the condition is in a certain state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>message</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Message is a human-readable explanation of why the condition has a certain reason / state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>observedGeneration</code><br/>
+<em>
+int64
+</em>
+</td>
+<td>
+<p>ObservedGeneration represents the .metadata.generation that the condition was set based upon.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastUpdateTime</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastUpdateTime is the last time a condition has been updated.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastTransitionTime</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastTransitionTime is the last time the status of a condition has transitioned from one state to another.</p>
 </td>
 </tr>
 </tbody>
 </table>
+<h3 id="storage.onmetal.de/v1alpha1.VolumeConditionType">VolumeConditionType
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.VolumeCondition">VolumeCondition</a>)
+</p>
+<div>
+<p>VolumeConditionType is a type a VolumeCondition can have.</p>
+</div>
 <h3 id="storage.onmetal.de/v1alpha1.VolumeSpec">VolumeSpec
 </h3>
 <p>
@@ -831,9 +929,11 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 <tbody>
 <tr>
 <td>
-<code>storage_class</code><br/>
+<code>storageClass</code><br/>
 <em>
-string
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
 </em>
 </td>
 <td>
@@ -842,10 +942,10 @@ string
 </tr>
 <tr>
 <td>
-<code>storagepool</code><br/>
+<code>storagePool</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ScopedReference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
 </td>
@@ -855,18 +955,47 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ScopedReference
 </tr>
 <tr>
 <td>
-<code>size</code><br/>
+<code>resources</code><br/>
 <em>
-<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/api/resource#Duration">
-k8s.io/apimachinery/pkg/api/resource.Quantity
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#resourcelist-v1-core">
+Kubernetes core/v1.ResourceList
 </a>
 </em>
 </td>
 <td>
-<p>Size defines the size of the volume</p>
+<p>Resources is a description of the volume&rsquo;s resources and capacity.</p>
 </td>
 </tr>
 </tbody>
+</table>
+<h3 id="storage.onmetal.de/v1alpha1.VolumeState">VolumeState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.VolumeStatus">VolumeStatus</a>)
+</p>
+<div>
+<p>VolumeState is a possible state a volume can be in.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Attached&#34;</p></td>
+<td><p>VolumeStateAttached reports that the volume is attached and in-use.</p>
+</td>
+</tr><tr><td><p>&#34;Available&#34;</p></td>
+<td><p>VolumeStateAvailable reports whether the volume is available to be used.</p>
+</td>
+</tr><tr><td><p>&#34;Error&#34;</p></td>
+<td><p>VolumeStateError reports that the volume is in an error state.</p>
+</td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>VolumeStatePending reports whether the volume is about to be ready.</p>
+</td>
+</tr></tbody>
 </table>
 <h3 id="storage.onmetal.de/v1alpha1.VolumeStatus">VolumeStatus
 </h3>
@@ -886,17 +1015,26 @@ k8s.io/apimachinery/pkg/api/resource.Quantity
 <tbody>
 <tr>
 <td>
-<code>StateFields</code><br/>
+<code>state</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.StateFields">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
+<a href="#storage.onmetal.de/v1alpha1.VolumeState">
+VolumeState
 </a>
 </em>
 </td>
 <td>
-<p>
-(Members of <code>StateFields</code> are embedded into this type.)
-</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>conditions</code><br/>
+<em>
+<a href="#storage.onmetal.de/v1alpha1.VolumeCondition">
+[]VolumeCondition
+</a>
+</em>
+</td>
+<td>
 </td>
 </tr>
 </tbody>
@@ -904,5 +1042,5 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.StateFields
 <hr/>
 <p><em>
 Generated with <code>gen-crd-api-reference-docs</code>
-on git commit <code>003d1e1</code>.
+on git commit <code>6fe95dc</code>.
 </em></p>

@@ -7,45 +7,12 @@ repo: github.com/onmetal/onmetal-api
 resources:
 - api:
     crdVersion: v1
-  controller: true
-  domain: onmetal.de
-  group: core
-  kind: Account
-  path: github.com/onmetal/onmetal-api/apis/core/v1alpha1
-  version: v1alpha1
-  webhooks:
-    defaulting: true
-    validation: true
-    webhookVersion: v1
-- api:
-    crdVersion: v1
-    namespaced: true
-  controller: true
-  domain: onmetal.de
-  group: core
-  kind: Scope
-  path: github.com/onmetal/onmetal-api/apis/core/v1alpha1
-  version: v1alpha1
-  webhooks:
-    defaulting: true
-    validation: true
-    webhookVersion: v1
-- api:
-    crdVersion: v1
     namespaced: true
   controller: true
   domain: onmetal.de
   group: compute
   kind: MachineClass
   path: github.com/onmetal/onmetal-api/apis/compute/v1alpha1
-  version: v1alpha1
-- api:
-    crdVersion: v1
-  controller: true
-  domain: onmetal.de
-  group: core
-  kind: Region
-  path: github.com/onmetal/onmetal-api/apis/core/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
@@ -73,24 +40,6 @@ resources:
   group: storage
   kind: StorageClass
   path: github.com/onmetal/onmetal-api/apis/storage/v1alpha1
-  version: v1alpha1
-- api:
-    crdVersion: v1
-    namespaced: true
-  controller: true
-  domain: onmetal.de
-  group: compute
-  kind: Image
-  path: github.com/onmetal/onmetal-api/apis/compute/v1alpha1
-  version: v1alpha1
-- api:
-    crdVersion: v1
-    namespaced: true
-  controller: true
-  domain: onmetal.de
-  group: compute
-  kind: SSHPublicKey
-  path: github.com/onmetal/onmetal-api/apis/compute/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1

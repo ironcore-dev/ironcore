@@ -19,6 +19,7 @@ package ipamrange
 import (
 	"context"
 	"fmt"
+	"github.com/onmetal/onmetal-api/apis/network"
 	"k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/types"
 	"reflect"
@@ -32,16 +33,13 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	"github.com/go-logr/logr"
-	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
-	"github.com/onmetal/onmetal-api/apis/core"
 	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
-	"github.com/onmetal/onmetal-api/pkg/utils"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const (
-	finalizerName = core.LabelDomain + "/ipamrange"
+	finalizerName = network.LabelDomain + "/ipamrange"
 	fieldOwner    = client.FieldOwner(finalizerName)
 )
 
@@ -174,10 +172,10 @@ func (r *Reconciler) reconcileExists(ctx context.Context, log logr.Logger, obj *
 		}
 	}
 
-	newObjectKey := utils.NewObjectKey(obj)
+	newObjectKey := client.ObjectKeyFromObject(obj)
 	current, err := r.cache.getRange(ctx, log, newObjectKey, obj)
 	if err != nil {
-		return utils.Requeue(err)
+		return ctrl.Result{}, fmt.Errorf("could not get range: %w", err)
 	}
 	defer r.cache.release(log, newObjectKey)
 	if current.error != "" {
@@ -202,10 +200,10 @@ func (r *Reconciler) reconcileExists(ctx context.Context, log logr.Logger, obj *
 }
 
 func (r *Reconciler) delete(ctx context.Context, log logr.Logger, obj *networkv1alpha1.IPAMRange) (ctrl.Result, error) {
-	newObjectKey := utils.NewObjectKey(obj)
+	newObjectKey := client.ObjectKeyFromObject(obj)
 	current, err := r.cache.getRange(ctx, log, newObjectKey, obj)
 	if err != nil {
-		return utils.Requeue(err)
+		return ctrl.Result{}, fmt.Errorf("could not get range: %w", err)
 	}
 	defer r.cache.release(log, newObjectKey)
 	return r.deleteRequest(ctx, log, current)
@@ -213,17 +211,17 @@ func (r *Reconciler) delete(ctx context.Context, log logr.Logger, obj *networkv1
 
 // TODO: generalize state handling
 func (r *Reconciler) invalid(ctx context.Context, log logr.Logger, ipr *IPAM, message string, args ...interface{}) (ctrl.Result, error) {
-	return r.setStatus(ctx, log, ipr, common.StateInvalid, message, args...)
+	return r.setStatus(ctx, log, ipr, networkv1alpha1.IPAMRangeInvalid, message, args...)
 }
 
-func (r *Reconciler) setStatus(ctx context.Context, log logr.Logger, ipr *IPAM, state string, msg string, args ...interface{}) (ctrl.Result, error) {
+func (r *Reconciler) setStatus(ctx context.Context, log logr.Logger, ipr *IPAM, state networkv1alpha1.IPAMRangeState, msg string, args ...interface{}) (ctrl.Result, error) {
 	if err := updateStatus(ctx, log, r, ipr, func(obj *networkv1alpha1.IPAMRange) {
 		obj.Status.State = state
 		obj.Status.Message = fmt.Sprintf(msg, args...)
 	}, nil); err != nil {
-		return utils.Requeue(err)
+		return ctrl.Result{}, fmt.Errorf("could not update status")
 	}
-	return utils.Succeeded()
+	return ctrl.Result{}, nil
 }
 
 func updateStatus(ctx context.Context, log logr.Logger, clt client.Client, ipr *IPAM, update func(ipamRange *networkv1alpha1.IPAMRange), cache func()) error {

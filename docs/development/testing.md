@@ -1,6 +1,6 @@
 # Testing
 
-This project is using [Ginkgo](https://onsi.github.io/ginkgo/) as it's primary testing framework in conjunction with 
+This project is using [Ginkgo](https://onsi.github.io/ginkgo/) as it's primary testing framework in conjunction with
 [Gomega](https://onsi.github.io/gomega/) matcher/assertion library.
 
 ## Unit Tests
@@ -29,7 +29,8 @@ The testing code should meet the requirements of be common [Ginkgo](https://onsi
 ```go
 package mypackage
 
-import ...
+import
+...
 
 var _ = Describe("MyComponent", func() {
 
@@ -46,21 +47,22 @@ var _ = Describe("MyComponent", func() {
 })
 ```
 
-!!! note
-    More information on how to structure your tests can be found here: [Ginkgo documentation](https://onsi.github.io/ginkgo/#structuring-your-specs).
-    Assertion examples can be found here: [Gomega documentation](https://onsi.github.io/gomega/#making-assertions).
+!!! note More information on how to structure your tests can be found
+here: [Ginkgo documentation](https://onsi.github.io/ginkgo/#structuring-your-specs). Assertion examples can be found
+here: [Gomega documentation](https://onsi.github.io/gomega/#making-assertions).
 
 ## Controller Tests
 
-Setup a local Kubernetes control plane in order to write controller tests.
-Use `envtest` as a part of the [controller-runtime](https://github.com/kubernetes-sigs/controller-runtime) project.
+Setup a local Kubernetes control plane in order to write controller tests. Use `envtest` as a part of
+the [controller-runtime](https://github.com/kubernetes-sigs/controller-runtime) project.
 
 Example of `suite_test.go` inside a controller package is below:
 
 ```go
 package my_controller_package
 
-import ...
+import
+...
 
 // Those global vars are needed later.
 var cfg *rest.Config
@@ -92,7 +94,7 @@ var _ = BeforeSuite(func() {
 	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
 	...
 	k8sManager, err := manager.NewManager(cfg, ctrl.Options{
-		Scheme:             scheme.Scheme,
+		Scheme: scheme.Scheme,
 		// On MacOS it might happen, that the firewall warnings will
 		// popup if you open a port on your machine. It typically
 		// happens due to the metrics endpoint of the controller-manager.
@@ -101,7 +103,7 @@ var _ = BeforeSuite(func() {
 		Host:               "127.0.0.1",
 		MetricsBindAddress: "0",
 	})
-    ...
+	...
 	// Register our reconciler with the manager. In case if you want to test
 	// multiple reconcilers at once you have to register them one by
 	// one in the same fashion as is shown below.
@@ -127,15 +129,16 @@ var _ = AfterSuite(func() {
 })
 ```
 
-The Ginkgo style tests can be now written in the same manner as described in the [Unit Test](#unit-tests) section. The only
-difference now is, that you have a working controller manager in the background which is reacting on changes in the
+The Ginkgo style tests can be now written in the same manner as described in the [Unit Test](#unit-tests) section. The
+only difference now is, that you have a working controller manager in the background which is reacting on changes in the
 Kubernetes API which you can access via the `k8sClient` to create or modify your resources.
 
-More information on the envtest setup you can find in the CRD testing section here: [Kubebuilder](https://book.kubebuilder.io/reference/envtest.html) 
+More information on the envtest setup you can find in the CRD testing section
+here: [Kubebuilder](https://book.kubebuilder.io/reference/envtest.html)
 
 ## Webhook Tests
 
-Webhook tests are located under `pkg/webhooks/{Type}`. The `suite_test` for Webhooks is slighly different than the 
+Webhook tests are located under `pkg/webhooks/{Type}`. The `suite_test` for Webhooks is slighly different than the
 controller suite.
 
 ```go
@@ -145,36 +148,36 @@ err = admissionv1beta1.AddToScheme(scheme)
 // Start webhook server using Manager
 webhookInstallOptions := &testEnv.WebhookInstallOptions
 mgr, err := manager.NewManager(cfg, ctrl.Options{
-    Scheme:             scheme,
-    Host:               webhookInstallOptions.LocalServingHost,
-    Port:               webhookInstallOptions.LocalServingPort,
-    CertDir:            webhookInstallOptions.LocalServingCertDir,
-    LeaderElection:     false,
-    MetricsBindAddress: "0",
+Scheme:             scheme,
+Host:               webhookInstallOptions.LocalServingHost,
+Port:               webhookInstallOptions.LocalServingPort,
+CertDir:            webhookInstallOptions.LocalServingCertDir,
+LeaderElection:     false,
+MetricsBindAddress: "0",
 })
 ...
 // Setup webhook with manager
-err = (&ScopeWebhook{}).SetupWebhookWithManager(mgr)
+err = (&FooWebhook{}).SetupWebhookWithManager(mgr)
 ...
 // Wait for the webhook server to get ready
 dialer := &net.Dialer{Timeout: time.Second}
-addrPort := fmt.Sprintf("%s:%d", webhookInstallOptions.LocalServingHost, 
-	webhookInstallOptions.LocalServingPort)
-Eventually(func() error {
-    conn, err := tls.DialWithDialer(dialer, "tcp", addrPort, 
-    	&tls.Config{InsecureSkipVerify: true})
-    if err != nil {
-        return err
-    }
-    conn.Close()
-    return nil
+addrPort := fmt.Sprintf("%s:%d", webhookInstallOptions.LocalServingHost,
+webhookInstallOptions.LocalServingPort)
+Eventually(func () error {
+conn, err := tls.DialWithDialer(dialer, "tcp", addrPort,
+&tls.Config{InsecureSkipVerify: true})
+if err != nil {
+return err
+}
+conn.Close()
+return nil
 }).Should(Succeed())
 ```
 
 Test cases are written in a similar fashion as tests for controllers.
 
-!!! note
-    MutatingWebhooks (`Defaulter`) can not change `Status` fields. Keep this in mind if you write your Webhook tests.
+!!! note MutatingWebhooks (`Defaulter`) can not change `Status` fields. Keep this in mind if you write your Webhook
+tests.
 
 ## Running Tests
 
@@ -186,8 +189,8 @@ make test
 
 ## Goland Integration
 
-Running static Ginkgo/Gomega tests in Golang should work out of the box. However, in order to make the controller 
-test run from within your IDE you need to expose the following environment variable inside your 'Test Run Configuration'
+Running static Ginkgo/Gomega tests in Golang should work out of the box. However, in order to make the controller test
+run from within your IDE you need to expose the following environment variable inside your 'Test Run Configuration'
 
 ```shell
 KUBEBUILDER_ASSETS=/PATH_TO_MY_WORKSPACE/onmetal/onmetal-api/testbin/bin

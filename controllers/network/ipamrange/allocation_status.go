@@ -19,22 +19,22 @@ package ipamrange
 import (
 	"fmt"
 	"github.com/mandelsoft/kubipam/pkg/ipam"
-	api "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
+	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	"net"
 )
 
 type AllocationStatus struct {
 	Allocation
-	Status  string
+	Status  networkv1alpha1.AllocationState
 	Message string
 }
 
-func ParseAllocationStatus(allocation *api.CIDRAllocationStatus) *AllocationStatus {
+func ParseAllocationStatus(allocation *networkv1alpha1.CIDRAllocationStatus) *AllocationStatus {
 	a, err := ParseAllocation(&allocation.CIDRAllocation)
 	if err != nil {
 		return &AllocationStatus{
 			Allocation: *a,
-			Status:     api.AllocationStateFailed,
+			Status:     networkv1alpha1.AllocationStateFailed,
 			Message:    "invalid cidr",
 		}
 	}
@@ -47,7 +47,7 @@ func ParseAllocationStatus(allocation *api.CIDRAllocationStatus) *AllocationStat
 }
 
 func (a *AllocationStatus) IsValid() bool {
-	return a.CIDR != nil && a.Status == api.AllocationStateAllocated
+	return a.CIDR != nil && a.Status == networkv1alpha1.AllocationStateAllocated
 }
 
 func (a *AllocationStatus) String() string {
@@ -61,7 +61,7 @@ func NewAllocationStatusListFromAllocations(allocations AllocationList) Allocati
 	for i, a := range allocations {
 		status[i] = &AllocationStatus{
 			Allocation: *a,
-			Status:     api.AllocationStateAllocated,
+			Status:     networkv1alpha1.AllocationStateAllocated,
 			Message:    SuccessfulAllocationMessage,
 		}
 	}
@@ -78,7 +78,7 @@ func (l *AllocationStatusList) RemoveIndex(index int) {
 
 func (l AllocationStatusList) HasBusy() bool {
 	for _, a := range l {
-		if a.Status == api.AllocationStateBusy {
+		if a.Status == networkv1alpha1.AllocationStateBusy {
 			return true
 		}
 	}
@@ -153,11 +153,11 @@ func OptinalCIDRToString(cidr *net.IPNet) string {
 	return cidr.String()
 }
 
-func (l AllocationStatusList) AsCIDRAllocationStatusList() []api.CIDRAllocationStatus {
-	status := make([]api.CIDRAllocationStatus, len(l))
+func (l AllocationStatusList) AsCIDRAllocationStatusList() []networkv1alpha1.CIDRAllocationStatus {
+	status := make([]networkv1alpha1.CIDRAllocationStatus, len(l))
 	for i, a := range l {
-		status[i] = api.CIDRAllocationStatus{
-			CIDRAllocation: api.CIDRAllocation{
+		status[i] = networkv1alpha1.CIDRAllocationStatus{
+			CIDRAllocation: networkv1alpha1.CIDRAllocation{
 				Request: a.Request,
 				CIDR:    OptinalCIDRToString(a.CIDR),
 			},
@@ -181,7 +181,7 @@ func (l AllocationStatusList) AsCIDRList() ipam.CIDRList {
 func (l AllocationStatusList) Allocated() AllocationStatusList {
 	var list AllocationStatusList
 	for _, a := range l {
-		if a.Status != api.AllocationStateAllocated {
+		if a.Status != networkv1alpha1.AllocationStateAllocated {
 			continue
 		}
 		list = append(list, a)

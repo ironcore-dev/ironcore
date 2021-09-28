@@ -17,34 +17,22 @@
 package v1alpha1
 
 import (
-	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 // StorageClassSpec defines the desired state of StorageClass
 type StorageClassSpec struct {
 	// Capabilities describes the capabilities of a storage class
-	Capabilities []StorageClassCapability `json:"capabilities"`
-	// Description is a human readable description of a storage class
-	Description string `json:"description,omitempty"`
-}
-
-// StorageClassCapability describes one attribute of the StorageClass
-type StorageClassCapability struct {
-	// Name is the name of a capability
-	Name string `json:"name"`
-	// Value is the value of a capability
-	Value intstr.IntOrString `json:"value"`
+	Capabilities corev1.ResourceList `json:"capabilities,omitempty"`
 }
 
 // StorageClassStatus defines the observed state of StorageClass
 type StorageClassStatus struct {
-	// Availability describes the regions and zones where this MachineClass is available
-	Availability common.Availability `json:"availability,omitempty"`
 }
 
 //+kubebuilder:object:root=true
+//+kubebuilder:resource:scope=Cluster
 //+kubebuilder:subresource:status
 //+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 

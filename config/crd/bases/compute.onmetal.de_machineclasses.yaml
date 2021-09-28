@@ -14,7 +14,7 @@ spec:
     listKind: MachineClassList
     plural: machineclasses
     singular: machineclass
-  scope: Namespaced
+  scope: Cluster
   versions:
   - additionalPrinterColumns:
     - jsonPath: .metadata.creationTimestamp
@@ -41,57 +41,18 @@ spec:
             description: MachineClassSpec defines the desired state of MachineClass
             properties:
               capabilities:
-                description: Capabilities describes the features of the MachineClass
-                items:
-                  description: Capability describes a single feature of a MachineClass
-                  properties:
-                    name:
-                      description: Name is the name of the capability
-                      type: string
-                    type:
-                      description: Type defines the type of the capability
-                      type: string
-                    value:
-                      description: Value is the effective value of the capability
-                      type: string
-                  required:
-                  - name
-                  - type
-                  - value
-                  type: object
-                type: array
-            required:
-            - capabilities
+                additionalProperties:
+                  anyOf:
+                  - type: integer
+                  - type: string
+                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                  x-kubernetes-int-or-string: true
+                description: Capabilities describes the resources a machine class
+                  can provide.
+                type: object
             type: object
           status:
             description: MachineClassStatus defines the observed state of MachineClass
-            properties:
-              availability:
-                description: Availability describes the regions and zones where this
-                  MachineClass is available
-                items:
-                  description: RegionAvailability defines a region with its availability
-                    zones
-                  properties:
-                    availabilityZones:
-                      description: Zones is a list of zones in this region
-                      items:
-                        description: ZoneAvailability defines the name of a zone
-                        properties:
-                          name:
-                            description: Name is the name of the availability zone
-                            type: string
-                        required:
-                        - name
-                        type: object
-                      type: array
-                    region:
-                      description: Region is the name of the region
-                      type: string
-                  required:
-                  - region
-                  type: object
-                type: array
             type: object
         type: object
     served: true

@@ -17,57 +17,55 @@
 package v1alpha1
 
 import (
-	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // MachinePoolSpec defines the desired state of MachinePool
 type MachinePoolSpec struct {
-	// Region defines the region where this machine pool is available
-	Region string `json:"region,omitempty"`
-	// Privacy indicates the privacy scope of the machine pool
-	Privacy string `json:"privacy"`
-	// Capacity defines the quantity of this machine pool per availability zone
-	Capacity []AvailabilityZoneQuantity `json:"capacity"`
-}
-
-const (
-	PrivacyShared     = "shared"
-	PrivacyHypervisor = "hypervisor"
-	PrivacyCluster    = "cluster"
-)
-
-// AvailabilityZoneQuantity defines the quantity of available MachineClasses in a given AZ
-type AvailabilityZoneQuantity struct {
-	// AvailabilityZone is the name of the availability zone
-	AvailabilityZone string `json:"availabilityZone"`
-	// Classes defines a list of machine classes and their corresponding quantities
-	Classes []MachineClassQuantity `json:"classes"`
-}
-
-// MachineClassQuantity defines the quantity of a given MachineClass
-type MachineClassQuantity struct {
-	// Name is the name of the machine class quantity
-	Name string `json:"name"`
-	// Quantity is an absolut number of the available machine class
-	// +kubebuilder:validation:Minimum:=0
-	Quantity int `json:"quantity"`
+	// ProviderID identifies the MachinePool on provider side.
+	ProviderID string `json:"providerID"`
 }
 
 // MachinePoolStatus defines the observed state of MachinePool
 type MachinePoolStatus struct {
-	common.StateFields `json:",inline"`
-	Used               AvailabilityZoneQuantity `json:"used"`
+	State      MachinePoolState       `json:"state,omitempty"`
+	Conditions []MachinePoolCondition `json:"conditions,omitempty"`
 }
 
+// MachinePoolConditionType is a type a MachinePoolCondition can have.
+type MachinePoolConditionType string
+
+// MachinePoolCondition is one of the conditions of a volume.
+type MachinePoolCondition struct {
+	// Type is the type of the condition.
+	Type MachinePoolConditionType `json:"type"`
+	// Status is the status of the condition.
+	Status corev1.ConditionStatus `json:"status"`
+	// Reason is a machine-readable indication of why the condition is in a certain state.
+	Reason string `json:"reason"`
+	// Message is a human-readable explanation of why the condition has a certain reason / state.
+	Message string `json:"message"`
+	// ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
+	// LastUpdateTime is the last time a condition has been updated.
+	LastUpdateTime metav1.Time `json:"lastUpdateTime,omitempty"`
+	// LastTransitionTime is the last time the status of a condition has transitioned from one state to another.
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
+}
+
+// MachinePoolState is a state a MachinePool can be in.
+type MachinePoolState string
+
 const (
-	MachinePoolStateReady   = "Ready"
-	MachinePoolStatePending = "Pending"
-	MachinePoolStateError   = "Error"
-	MachinePoolStateOffline = "Offline"
+	MachinePoolStateReady   MachinePoolState = "Ready"
+	MachinePoolStatePending MachinePoolState = "Pending"
+	MachinePoolStateError   MachinePoolState = "Error"
+	MachinePoolStateOffline MachinePoolState = "Offline"
 )
 
 //+kubebuilder:object:root=true
+//+kubebuilder:resource:scope=Cluster
 //+kubebuilder:subresource:status
 //+kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.state`
 //+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
