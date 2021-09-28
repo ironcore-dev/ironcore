@@ -79,6 +79,7 @@ func main() {
 	}
 	opts.BindFlags(flag.CommandLine)
 	flag.Parse()
+	enableWebhooks = enableWebhooks && os.Getenv("ENABLE_WEBHOOKS") != "false"
 
 	logger := zap.New(zap.UseFlagOptions(&opts))
 	ctrl.SetLogger(logger)
