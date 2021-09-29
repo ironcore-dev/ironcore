@@ -12,6 +12,7 @@ resources:
   - bases/network.onmetal.de_securitygroups.yaml
   - bases/network.onmetal.de_subnets.yaml
   - bases/compute.onmetal.de_machines.yaml
+  - bases/network.onmetal.de_routingdomains.yaml
   - bases/network.onmetal.de_ipamranges.yaml
   - bases/network.onmetal.de_gateways.yaml
 #+kubebuilder:scaffold:crdkustomizeresource

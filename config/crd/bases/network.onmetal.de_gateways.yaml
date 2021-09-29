@@ -162,8 +162,7 @@ spec:
                 type: array
               ips:
                 items:
-                  description: 'IPAddr is an IP address. TODO: create marshal/unmarshal
-                    functions'
+                  description: IPAddr is an IP address.
                   type: string
                 type: array
               state:

@@ -19,17 +19,20 @@ spec:
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .spec.cidrs
-      name: CIDRS
-      type: string
-    - jsonPath: .status.cidrs
-      name: EffectiveCIDRs
-      type: string
     - jsonPath: .spec.parent.name
       name: Parent
       type: string
-    - jsonPath: .status.state
-      name: State
+    - jsonPath: .metadata.annotations.print\.onmetal\.de/free-allocations
+      name: Free
+      priority: 100
+      type: string
+    - jsonPath: .metadata.annotations.print\.onmetal\.de/used-allocations
+      name: Used
+      priority: 100
+      type: string
+    - jsonPath: .metadata.annotations.print\.onmetal\.de/failed-allocations
+      name: Failed
+      priority: 100
       type: string
     - jsonPath: .metadata.creationTimestamp
       name: Age
@@ -63,154 +66,121 @@ spec:
                 description: CIDRs is a list of CIDR specs which are defined for this
                   IPAMRange
                 items:
+                  description: CIDR represents a network CIDR.
                   type: string
                 type: array
-              mode:
-                description: Mode is the mode to request an IPAMRange.
-                type: string
               parent:
                 description: Parent is the reference of the Parent IPAMRange from
-                  which the Cidr or size should be derived
+                  which the CIDR or size should be derived
                 properties:
                   name:
                     description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                       TODO: Add other useful fields. apiVersion, kind, uid?'
                     type: string
                 type: object
+              requests:
+                items:
+                  properties:
+                    cidr:
+                      description: CIDR represents a network CIDR.
+                      type: string
+                    ipCount:
+                      description: IPCount requests a consecutive IP range of the
+                        given size.
+                      format: int32
+                      type: integer
+                    ips:
+                      description: IPRange is an IP range.
+                      properties:
+                        from:
+                          description: IPAddr is an IP address.
+                          type: string
+                        to:
+                          description: IPAddr is an IP address.
+                          type: string
+                      required:
+                      - from
+                      - to
+                      type: object
+                    size:
+                      description: Size requests a CIDR of the given size.
+                      format: int32
+                      type: integer
+                  type: object
+                type: array
             type: object
           status:
             description: IPAMRangeStatus defines the observed state of IPAMRange
             properties:
-              allocationState:
+              allocations:
                 items:
-                  type: string
-                type: array
-              cidrs:
-                description: CIDRs is a list of effective cidrs which belong to this
-                  IPAMRange
-                items:
-                  description: CIDRAllocationStatus is the result of a CIDR allocation
-                    request
+                  description: IPAMRangeAllocationStatus is the status of an IPAMRange
+                    allocation.
                   properties:
                     cidr:
+                      description: CIDR defines the cidr
                       type: string
-                    message:
-                      type: string
-                    request:
-                      type: string
-                    status:
-                      description: AllocationState is a state an allocation can be
-                        in.
-                      type: string
-                  required:
-                  - cidr
-                  - request
-                  - status
-                  type: object
-                type: array
-              conditions:
-                items:
-                  description: IPAMRangeCondition is one of the conditions of a volume.
-                  properties:
-                    lastTransitionTime:
-                      description: LastTransitionTime is the last time the status
-                        of a condition has transitioned from one state to another.
-                      format: date-time
-                      type: string
-                    lastUpdateTime:
-                      description: LastUpdateTime is the last time a condition has
-                        been updated.
-                      format: date-time
-                      type: string
-                    message:
-                      description: Message is a human-readable explanation of why
-                        the condition has a certain reason / state.
-                      type: string
-                    observedGeneration:
-                      description: ObservedGeneration represents the .metadata.generation
-                        that the condition was set based upon.
-                      format: int64
-                      type: integer
-                    reason:
-                      description: Reason is a machine-readable indication of why
-                        the condition is in a certain state.
-                      type: string
-                    status:
-                      description: Status is the status of the condition.
-                      type: string
-                    type:
-                      description: Type is the type of the condition.
-                      type: string
-                  required:
-                  - message
-                  - reason
-                  - status
-                  - type
-                  type: object
-                type: array
-              message:
-                type: string
-              pendingDeletions:
-                items:
-                  description: CIDRAllocationStatus is the result of a CIDR allocation
-                    request
-                  properties:
-                    cidr:
-                      type: string
-                    message:
-                      type: string
-                    request:
-                      type: string
-                    status:
-                      description: AllocationState is a state an allocation can be
-                        in.
-                      type: string
-                  required:
-                  - cidr
-                  - request
-                  - status
-                  type: object
-                type: array
-              pendingRequests:
-                properties:
-                  cidrs:
-                    items:
+                    ips:
+                      description: IPRange is an IP range.
                       properties:
-                        cidr:
+                        from:
+                          description: IPAddr is an IP address.
                           type: string
-                        request:
+                        to:
+                          description: IPAddr is an IP address.
                           type: string
                       required:
-                      - cidr
-                      - request
+                      - from
+                      - to
                       type: object
-                    type: array
-                  deletions:
-                    items:
+                    request:
                       properties:
                         cidr:
+                          description: CIDR represents a network CIDR.
                           type: string
-                        request:
-                          type: string
-                      required:
-                      - cidr
-                      - request
+                        ipCount:
+                          description: IPCount requests a consecutive IP range of
+                            the given size.
+                          format: int32
+                          type: integer
+                        ips:
+                          description: IPRange is an IP range.
+                          properties:
+                            from:
+                              description: IPAddr is an IP address.
+                              type: string
+                            to:
+                              description: IPAddr is an IP address.
+                              type: string
+                          required:
+                          - from
+                          - to
+                          type: object
+                        size:
+                          description: Size requests a CIDR of the given size.
+                          format: int32
+                          type: integer
                       type: object
-                    type: array
-                  name:
-                    type: string
-                  namespace:
-                    type: string
-                required:
-                - name
-                - namespace
-                type: object
-              roundRobinState:
-                items:
-                  type: string
+                    state:
+                      description: IPAMRangeAllocationState is a state an IPAMRangeAllocationStatus
+                        can have.
+                      type: string
+                    user:
+                      description: LocalObjectReference contains enough information
+                        to let you locate the referenced object inside the same namespace.
+                      properties:
+                        name:
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                            TODO: Add other useful fields. apiVersion, kind, uid?'
+                          type: string
+                      type: object
+                  required:
+                  - state
+                  type: object
                 type: array
-              state:
-                type: string
+              observedGeneration:
+                format: int64
+                type: integer
             type: object
         type: object
     served: true

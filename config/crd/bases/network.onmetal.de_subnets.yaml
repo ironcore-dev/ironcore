@@ -114,18 +114,50 @@ spec:
                 items:
                   description: CIDRStatus is the status of a CIDR
                   properties:
-                    blockedRanges:
-                      description: BlockedRanges is a list of blocked cidr ranges
-                      items:
-                        description: 'CIDR represents a network CIDR. TODO: create
-                          marshal/unmarshal functions'
-                        type: string
-                      type: array
                     cidr:
                       description: CIDR defines the cidr
                       type: string
+                    request:
+                      properties:
+                        cidr:
+                          description: CIDR represents a network CIDR.
+                          type: string
+                        ipCount:
+                          description: IPCount requests a consecutive IP range of
+                            the given size.
+                          format: int32
+                          type: integer
+                        ips:
+                          description: IPRange is an IP range.
+                          properties:
+                            from:
+                              description: IPAddr is an IP address.
+                              type: string
+                            to:
+                              description: IPAddr is an IP address.
+                              type: string
+                          required:
+                          - from
+                          - to
+                          type: object
+                        size:
+                          description: Size requests a CIDR of the given size.
+                          format: int32
+                          type: integer
+                      type: object
+                    state:
+                      type: string
+                    user:
+                      description: LocalObjectReference contains enough information
+                        to let you locate the referenced object inside the same namespace.
+                      properties:
+                        name:
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                            TODO: Add other useful fields. apiVersion, kind, uid?'
+                          type: string
+                      type: object
                   required:
-                  - cidr
+                  - state
                   type: object
                 type: array
               conditions:

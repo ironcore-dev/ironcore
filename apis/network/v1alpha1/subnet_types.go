@@ -17,7 +17,7 @@
 package v1alpha1
 
 import (
-	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -46,7 +46,7 @@ type RangeType struct {
 	// Size defines the size of a subnet e.g. "/12"
 	Size string `json:"size,omitempty"`
 	// CIDR is the CIDR block
-	CIDR common.CIDR `json:"cidr,omitempty"`
+	CIDR commonv1alpha1.CIDR `json:"cidr,omitempty"`
 	// BlockedRanges specifies which part of the subnet should be used for static IP assignment
 	// e.g. 0/14 means the first /14 subnet is blocked in the allocated /12 subnet
 	BlockedRanges []string `json:"blockedRanges,omitempty"`
@@ -55,10 +55,20 @@ type RangeType struct {
 // CIDRStatus is the status of a CIDR
 type CIDRStatus struct {
 	// CIDR defines the cidr
-	CIDR common.CIDR `json:"cidr"`
-	// BlockedRanges is a list of blocked cidr ranges
-	BlockedRanges []common.CIDR `json:"blockedRanges,omitempty"`
+	CIDR    commonv1alpha1.CIDR          `json:"cidr,omitempty"`
+	State   CIDRState                    `json:"state"`
+	Request *Request                     `json:"request,omitempty"`
+	User    *corev1.LocalObjectReference `json:"user,omitempty"`
 }
+
+type CIDRState string
+
+const (
+	CIDRFree    CIDRState = "Free"
+	CIDRUsed    CIDRState = "Used"
+	CIDRFailed  CIDRState = "Failed"
+	CIDRPending CIDRState = "Pending"
+)
 
 // SubnetStatus defines the observed state of Subnet
 type SubnetStatus struct {

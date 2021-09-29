@@ -17,6 +17,7 @@
 package v1alpha1
 
 import (
+	"inet.af/netaddr"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -45,9 +46,61 @@ type SecretKeySelector struct {
 }
 
 // IPAddr is an IP address.
-// TODO: create marshal/unmarshal functions
-type IPAddr string
+//+kubebuilder:validation:Type=string
+type IPAddr struct {
+	netaddr.IP `json:"-"`
+}
+
+func (in *IPAddr) DeepCopyInto(out *IPAddr) {
+	*out = *in
+}
+
+func (IPAddr) OpenAPISchemaType() []string { return []string{"string"} }
+
+func NewIPAddr(ip netaddr.IP) IPAddr {
+	return IPAddr{ip}
+}
+
+func NewIPAddrPtr(ip netaddr.IP) *IPAddr {
+	return &IPAddr{ip}
+}
+
+// IPRange is an IP range.
+type IPRange struct {
+	From IPAddr `json:"from"`
+	To   IPAddr `json:"to"`
+}
+
+func (i *IPRange) Range() netaddr.IPRange {
+	return netaddr.IPRangeFrom(i.From.IP, i.To.IP)
+}
+
+func NewIPRange(ipRange netaddr.IPRange) IPRange {
+	return IPRange{From: NewIPAddr(ipRange.From()), To: NewIPAddr(ipRange.To())}
+}
+
+func NewIPRangePtr(ipRange netaddr.IPRange) *IPRange {
+	r := NewIPRange(ipRange)
+	return &r
+}
 
 // CIDR represents a network CIDR.
-// TODO: create marshal/unmarshal functions
-type CIDR string
+//+kubebuilder:validation:Type=string
+type CIDR struct {
+	netaddr.IPPrefix `json:"-"`
+}
+
+func (in *CIDR) DeepCopyInto(out *CIDR) {
+	*out = *in
+}
+
+func (CIDR) OpenAPISchemaType() []string { return []string{"string"} }
+
+func NewCIDR(prefix netaddr.IPPrefix) CIDR {
+	return CIDR{IPPrefix: prefix}
+}
+
+func NewCIDRPtr(prefix netaddr.IPPrefix) *CIDR {
+	c := NewCIDR(prefix)
+	return &c
+}

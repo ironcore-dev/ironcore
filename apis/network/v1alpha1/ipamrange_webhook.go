@@ -17,11 +17,8 @@
 package v1alpha1
 
 import (
-	"fmt"
-	"github.com/mandelsoft/kubipam/pkg/ipam"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -49,10 +46,6 @@ var _ webhook.Defaulter = &IPAMRange{}
 // Default implements webhook.Defaulter so a webhook will be registered for the type
 func (r *IPAMRange) Default() {
 	ipamrangelog.Info("default", "name", r.Name)
-
-	if r.Spec.Mode == "" {
-		r.Spec.Mode = ModeFirstMatch
-	}
 }
 
 //+kubebuilder:webhook:path=/validate-network-onmetal-de-v1alpha1-ipamrange,mutating=false,failurePolicy=fail,sideEffects=None,groups=network.onmetal.de,resources=ipamranges,verbs=create;update;delete,versions=v1alpha1,name=vipamrange.kb.io,admissionReviewVersions={v1,v1beta1}
@@ -66,35 +59,10 @@ func (r *IPAMRange) ValidateCreate() error {
 	var allErrs field.ErrorList
 	path := field.NewPath("spec")
 
-	var specs []ipam.RequestSpec
-	for i, c := range r.Spec.CIDRs {
-		s, err := ipam.ParseRequestSpec(c)
-		if err != nil {
-			allErrs = append(allErrs, field.Invalid(path.Child("cidr").Index(i), r.Spec.CIDRs[i], err.Error()))
-		}
-		specs = append(specs, s)
-	}
-
 	if r.Spec.Parent != nil {
 		if r.Spec.Parent.Name == "" {
 			allErrs = append(allErrs, field.Required(path.Child("parent").Child("name"), r.Spec.Parent.Name))
 		}
-	}
-
-	if r.Spec.Parent == nil || r.Spec.Parent.Name == "" {
-		for i, s := range specs {
-			if s != nil && !s.IsCIDR() {
-				allErrs = append(allErrs, field.Invalid(path.Child("cidrs").Index(i), r.Spec.CIDRs[i], "only valid cidrs for root range"))
-			}
-		}
-	}
-
-	switch r.Spec.Mode {
-	case "":
-	case ModeFirstMatch:
-	case ModeRoundRobin:
-	default:
-		allErrs = append(allErrs, field.Invalid(path.Child("mode"), r.Spec.Mode, fmt.Sprintf("mode must be either %s or %s", ModeRoundRobin, ModeFirstMatch)))
 	}
 
 	if len(allErrs) == 0 {
@@ -118,12 +86,6 @@ func (r *IPAMRange) ValidateUpdate(old runtime.Object) error {
 
 	if !reflect.DeepEqual(r.Spec.CIDRs, oldRange.Spec.CIDRs) {
 		allErrs = append(allErrs, field.Invalid(path.Child("cidr"), r.Spec.CIDRs, fieldImmutable))
-	}
-
-	newCidrs := sets.NewString(r.Spec.CIDRs...)
-	oldCidrs := sets.NewString(oldRange.Spec.CIDRs...)
-	if diff := oldCidrs.Difference(newCidrs); len(diff) > 0 {
-		allErrs = append(allErrs, field.Invalid(path.Child("cidr"), diff, "cidr list may only be extended"))
 	}
 
 	if len(allErrs) == 0 {

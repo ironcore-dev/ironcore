@@ -53,7 +53,7 @@ vet: ## Run go vet against code.
 	go vet ./...
 
 lint:
-	golangci-lint run
+	golangci-lint run ./...
 
 .PHONY: docs
 docs: ## Run go generate to generate API reference documentation.
