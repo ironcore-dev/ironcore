@@ -13,7 +13,6 @@ RUN go mod download
 COPY main.go main.go
 COPY apis/ apis/
 COPY controllers/ controllers/
-COPY pkg/ pkg/
 COPY predicates/ predicates/
 
 # Build
