@@ -39,10 +39,10 @@ type IPAMRangeSpec struct {
 	Parent *corev1.LocalObjectReference `json:"parent,omitempty"`
 	// CIDRs is a list of CIDR specs which are defined for this IPAMRange
 	CIDRs    []commonv1alpha1.CIDR `json:"cidrs,omitempty"`
-	Requests []Request             `json:"requests,omitempty"`
+	Requests []IPAMRangeRequest    `json:"requests,omitempty"`
 }
 
-type Request struct {
+type IPAMRangeRequest struct {
 	// Size requests a CIDR of the given size.
 	Size int32                   `json:"size,omitempty"`
 	CIDR *commonv1alpha1.CIDR    `json:"cidr,omitempty"`
@@ -63,7 +63,7 @@ type IPAMRangeAllocationStatus struct {
 	CIDR    *commonv1alpha1.CIDR         `json:"cidr,omitempty"`
 	IPs     *commonv1alpha1.IPRange      `json:"ips,omitempty"`
 	State   IPAMRangeAllocationState     `json:"state"`
-	Request *Request                     `json:"request,omitempty"`
+	Request *IPAMRangeRequest            `json:"request,omitempty"`
 	User    *corev1.LocalObjectReference `json:"user,omitempty"`
 }
 
@@ -83,9 +83,6 @@ const (
 //+kubebuilder:subresource:status
 //+kubebuilder:resource:shortName=ipr
 //+kubebuilder:printcolumn:name="Parent",type=string,JSONPath=`.spec.parent.name`
-//+kubebuilder:printcolumn:name="Free",type=string,JSONPath=`.metadata.annotations.print\.onmetal\.de/free-allocations`,priority=100
-//+kubebuilder:printcolumn:name="Used",type=string,JSONPath=`.metadata.annotations.print\.onmetal\.de/used-allocations`,priority=100
-//+kubebuilder:printcolumn:name="Failed",type=string,JSONPath=`.metadata.annotations.print\.onmetal\.de/failed-allocations`,priority=100
 //+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
 // IPAMRange is the Schema for the ipamranges API

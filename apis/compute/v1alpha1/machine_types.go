@@ -17,11 +17,16 @@
 package v1alpha1
 
 import (
-	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	"fmt"
+	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
+
+func MachineInterfaceIPAMRangeName(machineName, ifaceName string) string {
+	return fmt.Sprintf("machine-iface-%s-%s", machineName, ifaceName)
+}
 
 // MachineSpec defines the desired state of Machine
 type MachineSpec struct {
@@ -35,7 +40,7 @@ type MachineSpec struct {
 	// Image is the URL providing the operating system image of the machine.
 	Image string `json:"image"`
 	// SSHPublicKeys is a list of SSH public key secret references of a machine.
-	SSHPublicKeys []common.SecretKeySelector `json:"sshPublicKeys"`
+	SSHPublicKeys []commonv1alpha1.SecretKeySelector `json:"sshPublicKeys"`
 	// Interfaces define a list of network interfaces present on the machine
 	Interfaces []Interface `json:"interfaces,omitempty"`
 	// SecurityGroups is a list of security groups of a machine
@@ -44,7 +49,7 @@ type MachineSpec struct {
 	VolumeClaims []VolumeClaim `json:"volumeClaims"`
 	// Ignition is a reference to a config map containing the ignition YAML for the machine to boot up.
 	// If key is empty, DefaultIgnitionKey will be used as fallback.
-	Ignition *common.ConfigMapKeySelector `json:"ignition,omitempty"`
+	Ignition *commonv1alpha1.ConfigMapKeySelector `json:"ignition,omitempty"`
 	// EFIVars are variables to pass to EFI while booting up.
 	EFIVars []EFIVar `json:"efiVars,omitempty"`
 }
@@ -63,12 +68,12 @@ const DefaultIgnitionKey = "ignition.yaml"
 type Interface struct {
 	// Name is the name of the interface
 	Name string `json:"name"`
-	// Target is the referenced resource of this interface
+	// Target is the referenced resource of this interface.
 	Target corev1.LocalObjectReference `json:"target"`
 	// Priority is the priority level of this interface
 	Priority int32 `json:"priority,omitempty"`
 	// IP specifies a concrete IP address which should be allocated from a Subnet
-	IP string `json:"ip,omitempty"`
+	IP *commonv1alpha1.IPAddr `json:"ip,omitempty"`
 }
 
 // VolumeClaim defines a volume claim of a machine
@@ -99,7 +104,7 @@ type InterfaceStatus struct {
 	// Name is the name of an interface.
 	Name string `json:"name"`
 	// IP is the IP allocated for an interface.
-	IP string `json:"ip"`
+	IP commonv1alpha1.IPAddr `json:"ip"`
 	// Priority is the OS priority of the interface.
 	Priority int32 `json:"priority,omitempty"`
 }

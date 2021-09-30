@@ -110,7 +110,7 @@ spec:
                       format: int32
                       type: integer
                     target:
-                      description: Target is the referenced resource of this interface
+                      description: Target is the referenced resource of this interface.
                       properties:
                         name:
                           description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names

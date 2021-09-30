@@ -78,19 +78,13 @@ spec:
                 items:
                   description: RangeType defines the range/size of a subnet
                   properties:
-                    blockedRanges:
-                      description: BlockedRanges specifies which part of the subnet
-                        should be used for static IP assignment e.g. 0/14 means the
-                        first /14 subnet is blocked in the allocated /12 subnet
-                      items:
-                        type: string
-                      type: array
                     cidr:
                       description: CIDR is the CIDR block
                       type: string
                     size:
-                      description: Size defines the size of a subnet e.g. "/12"
-                      type: string
+                      description: Size defines the size of a subnet e.g. 12
+                      format: int32
+                      type: integer
                   type: object
                 minItems: 1
                 type: array
@@ -110,55 +104,10 @@ spec:
             description: SubnetStatus defines the observed state of Subnet
             properties:
               cidrs:
-                description: CIDRs is a list of CIDR status
+                description: CIDRs is a list of CIDRs.
                 items:
-                  description: CIDRStatus is the status of a CIDR
-                  properties:
-                    cidr:
-                      description: CIDR defines the cidr
-                      type: string
-                    request:
-                      properties:
-                        cidr:
-                          description: CIDR represents a network CIDR.
-                          type: string
-                        ipCount:
-                          description: IPCount requests a consecutive IP range of
-                            the given size.
-                          format: int32
-                          type: integer
-                        ips:
-                          description: IPRange is an IP range.
-                          properties:
-                            from:
-                              description: IPAddr is an IP address.
-                              type: string
-                            to:
-                              description: IPAddr is an IP address.
-                              type: string
-                          required:
-                          - from
-                          - to
-                          type: object
-                        size:
-                          description: Size requests a CIDR of the given size.
-                          format: int32
-                          type: integer
-                      type: object
-                    state:
-                      type: string
-                    user:
-                      description: LocalObjectReference contains enough information
-                        to let you locate the referenced object inside the same namespace.
-                      properties:
-                        name:
-                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                            TODO: Add other useful fields. apiVersion, kind, uid?'
-                          type: string
-                      type: object
-                  required:
-                  - state
-                  type: object
+                  description: CIDR represents a network CIDR.
+                  type: string
                 type: array
               conditions:
                 items:

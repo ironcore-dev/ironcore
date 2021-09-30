@@ -18,13 +18,23 @@ package network
 
 import (
 	"context"
+	"fmt"
+	"github.com/go-logr/logr"
+	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
+	"github.com/onmetal/onmetal-api/predicates"
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/equality"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
+
+const fieldOwner = client.FieldOwner("networking.onmetal.de/subnet")
 
 // SubnetReconciler reconciles a Subnet object
 type SubnetReconciler struct {
@@ -35,10 +45,91 @@ type SubnetReconciler struct {
 //+kubebuilder:rbac:groups=network.onmetal.de,resources=subnets,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=network.onmetal.de,resources=subnets/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=network.onmetal.de,resources=subnets/finalizers,verbs=update
+//+kubebuilder:rbac:groups=network.onmetal.de,resources=ipamranges,verbs=get;list;watch;create;update;patch
 
-// Reconcile
+// Reconcile reconciles the spec with the real world.
 func (r *SubnetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	log := ctrl.LoggerFrom(ctx)
+	subnet := &networkv1alpha1.Subnet{}
+	if err := r.Get(ctx, req.NamespacedName, subnet); err != nil {
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+
+	return r.reconcileExists(ctx, log, subnet)
+}
+
+func (r *SubnetReconciler) reconcileExists(ctx context.Context, log logr.Logger, subnet *networkv1alpha1.Subnet) (ctrl.Result, error) {
+	if !subnet.DeletionTimestamp.IsZero() {
+		return ctrl.Result{}, nil
+	}
+
+	return r.reconcile(ctx, log, subnet)
+}
+
+func (r *SubnetReconciler) reconcile(ctx context.Context, log logr.Logger, subnet *networkv1alpha1.Subnet) (ctrl.Result, error) {
+	var (
+		ipamRangeParent *corev1.LocalObjectReference
+		requests        []networkv1alpha1.IPAMRangeRequest
+		rootCIDRs       []commonv1alpha1.CIDR
+	)
+	if parent := subnet.Spec.Parent; parent != nil {
+		ipamRangeParent = &corev1.LocalObjectReference{Name: networkv1alpha1.SubnetIPAMName(parent.Name)}
+		for _, rng := range subnet.Spec.Ranges {
+			cidr := rng.CIDR
+			requests = append(requests, networkv1alpha1.IPAMRangeRequest{
+				Size: rng.Size,
+				CIDR: &cidr,
+			})
+		}
+	} else {
+		for _, rng := range subnet.Spec.Ranges {
+			cidr := rng.CIDR
+			rootCIDRs = append(rootCIDRs, cidr)
+		}
+	}
+
+	ipamRange := &networkv1alpha1.IPAMRange{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: networkv1alpha1.GroupVersion.String(),
+			Kind:       networkv1alpha1.IPAMRangeGK.Kind,
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: subnet.Namespace,
+			Name:      networkv1alpha1.SubnetIPAMName(subnet.Name),
+		},
+		Spec: networkv1alpha1.IPAMRangeSpec{
+			Parent:   ipamRangeParent,
+			CIDRs:    rootCIDRs,
+			Requests: requests,
+		},
+	}
+	if err := ctrl.SetControllerReference(subnet, ipamRange, r.Scheme); err != nil {
+		return ctrl.Result{}, fmt.Errorf("could not own ipam range: %w", err)
+	}
+
+	if err := r.Patch(ctx, ipamRange, client.Apply, fieldOwner); err != nil {
+		return ctrl.Result{}, fmt.Errorf("could not apply ipam range: %w", err)
+	}
+
+	var cidrs []commonv1alpha1.CIDR
+	for _, allocation := range ipamRange.Status.Allocations {
+		if allocation.State == networkv1alpha1.IPAMRangeAllocationFailed || allocation.CIDR == nil {
+			continue
+		}
+
+		for _, request := range requests {
+			if equality.Semantic.DeepEqual(allocation.Request, request) {
+				cidrs = append(cidrs, *request.CIDR)
+			}
+		}
+	}
+
+	subnet.Status.CIDRs = cidrs
+	subnet.Status.State = networkv1alpha1.SubnetStateUp
+	if err := r.Status().Update(ctx, subnet); err != nil {
+		return ctrl.Result{}, fmt.Errorf("could not update subnet status")
+	}
+
 	return ctrl.Result{}, nil
 }
 
@@ -46,5 +137,11 @@ func (r *SubnetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 func (r *SubnetReconciler) SetupWithManager(mgr manager.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&networkv1alpha1.Subnet{}).
+		Owns(&networkv1alpha1.IPAMRange{},
+			builder.WithPredicates(
+				predicate.GenerationChangedPredicate{},
+				predicates.IPAMRangeStatusChangedPredicate{},
+			),
+		).
 		Complete(r)
 }

@@ -17,6 +17,7 @@
 package v1alpha1
 
 import (
+	"fmt"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,10 +29,14 @@ var SubnetGK = schema.GroupKind{
 	Kind:  "Subnet",
 }
 
+func SubnetIPAMName(subnetName string) string {
+	return fmt.Sprintf("subnet-%s", subnetName)
+}
+
 // SubnetSpec defines the desired state of Subnet
 type SubnetSpec struct {
 	// Parent is a reference to a public parent Subnet.
-	Parent corev1.LocalObjectReference `json:"parent,omitempty"`
+	Parent *corev1.LocalObjectReference `json:"parent,omitempty"`
 	// MachinePools defines in which pools this subnet should be available
 	MachinePools []corev1.LocalObjectReference `json:"machinePools,omitempty"`
 	// RoutingDomain is the reference to the routing domain this SubNet should be associated with
@@ -43,22 +48,10 @@ type SubnetSpec struct {
 
 // RangeType defines the range/size of a subnet
 type RangeType struct {
-	// Size defines the size of a subnet e.g. "/12"
-	Size string `json:"size,omitempty"`
+	// Size defines the size of a subnet e.g. 12
+	Size int32 `json:"size,omitempty"`
 	// CIDR is the CIDR block
 	CIDR commonv1alpha1.CIDR `json:"cidr,omitempty"`
-	// BlockedRanges specifies which part of the subnet should be used for static IP assignment
-	// e.g. 0/14 means the first /14 subnet is blocked in the allocated /12 subnet
-	BlockedRanges []string `json:"blockedRanges,omitempty"`
-}
-
-// CIDRStatus is the status of a CIDR
-type CIDRStatus struct {
-	// CIDR defines the cidr
-	CIDR    commonv1alpha1.CIDR          `json:"cidr,omitempty"`
-	State   CIDRState                    `json:"state"`
-	Request *Request                     `json:"request,omitempty"`
-	User    *corev1.LocalObjectReference `json:"user,omitempty"`
 }
 
 type CIDRState string
@@ -74,8 +67,8 @@ const (
 type SubnetStatus struct {
 	State      SubnetState       `json:"state,omitempty"`
 	Conditions []SubnetCondition `json:"conditions,omitempty"`
-	// CIDRs is a list of CIDR status
-	CIDRs []CIDRStatus `json:"cidrs,omitempty"`
+	// CIDRs is a list of CIDRs.
+	CIDRs []commonv1alpha1.CIDR `json:"cidrs,omitempty"`
 }
 
 type SubnetState string

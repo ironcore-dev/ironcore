@@ -22,18 +22,6 @@ spec:
     - jsonPath: .spec.parent.name
       name: Parent
       type: string
-    - jsonPath: .metadata.annotations.print\.onmetal\.de/free-allocations
-      name: Free
-      priority: 100
-      type: string
-    - jsonPath: .metadata.annotations.print\.onmetal\.de/used-allocations
-      name: Used
-      priority: 100
-      type: string
-    - jsonPath: .metadata.annotations.print\.onmetal\.de/failed-allocations
-      name: Failed
-      priority: 100
-      type: string
     - jsonPath: .metadata.creationTimestamp
       name: Age
       type: date

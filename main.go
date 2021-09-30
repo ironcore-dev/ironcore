@@ -19,7 +19,6 @@ package main
 import (
 	"flag"
 	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
-	"github.com/onmetal/onmetal-api/controllers/network/ipamrange"
 	"k8s.io/apimachinery/pkg/api/equality"
 	"os"
 
@@ -181,7 +180,7 @@ func main() {
 	}
 
 	// IPAMRange controller
-	if err = (&ipamrange.Reconciler{
+	if err = (&networkcontrollers.IPAMRangeReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
