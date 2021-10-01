@@ -22,16 +22,15 @@ import (
 	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
+	"github.com/onmetal/onmetal-api/equality"
 	"github.com/onmetal/onmetal-api/predicates"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/equality"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
-	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
 
 const fieldOwner = client.FieldOwner("networking.onmetal.de/subnet")
@@ -124,9 +123,10 @@ func (r *SubnetReconciler) reconcile(ctx context.Context, log logr.Logger, subne
 		}
 	}
 
-	subnet.Status.CIDRs = cidrs
-	subnet.Status.State = networkv1alpha1.SubnetStateUp
-	if err := r.Status().Update(ctx, subnet); err != nil {
+	updated := subnet.DeepCopy()
+	updated.Status.CIDRs = cidrs
+	updated.Status.State = networkv1alpha1.SubnetStateUp
+	if err := r.Status().Patch(ctx, updated, client.MergeFrom(subnet)); err != nil {
 		return ctrl.Result{}, fmt.Errorf("could not update subnet status")
 	}
 
@@ -137,11 +137,8 @@ func (r *SubnetReconciler) reconcile(ctx context.Context, log logr.Logger, subne
 func (r *SubnetReconciler) SetupWithManager(mgr manager.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&networkv1alpha1.Subnet{}).
-		Owns(&networkv1alpha1.IPAMRange{},
-			builder.WithPredicates(
-				predicate.GenerationChangedPredicate{},
-				predicates.IPAMRangeStatusChangedPredicate{},
-			),
-		).
+		Owns(&networkv1alpha1.IPAMRange{}, builder.WithPredicates(
+			predicates.IPAMRangeAllocationsChangedPredicate{},
+		)).
 		Complete(r)
 }

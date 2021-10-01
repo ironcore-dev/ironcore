@@ -31,7 +31,6 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
 
 const machineInterfaceFieldOwner = client.FieldOwner("compute.onmetal.de/machine-iface")
@@ -63,10 +62,7 @@ func (r *MachineReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 func (r *MachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&computev1alpha1.Machine{}).
-		Owns(&networkv1alpha1.IPAMRange{}, builder.WithPredicates(
-			predicate.GenerationChangedPredicate{},
-			predicates.IPAMRangeStatusChangedPredicate{},
-		)).
+		Owns(&networkv1alpha1.IPAMRange{}, builder.WithPredicates(predicates.IPAMRangeAllocationsChangedPredicate{})).
 		Complete(r)
 }
 

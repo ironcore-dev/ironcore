@@ -19,33 +19,35 @@ package network
 import (
 	"context"
 	"fmt"
+	"github.com/adracus/reflcompare"
+	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	"github.com/onmetal/onmetal-api/apis/network"
+	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
+	"github.com/onmetal/onmetal-api/equality"
 	"github.com/onmetal/onmetal-api/predicates"
 	"inet.af/netaddr"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
-	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 	"sort"
-	"strings"
-
-	"github.com/go-logr/logr"
-	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
-	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const (
 	ipamRangeFinalizerName = network.LabelDomain + "/ipamrange"
+)
+
+var (
+	allocationComparisons = reflcompare.NewComparisonsOrDie()
 )
 
 // IPAMRangeReconciler reconciles a IPAMRange object
@@ -70,21 +72,46 @@ func (r *IPAMRangeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	return r.reconcileExists(ctx, log, ipamRange)
 }
 
-var relevantIPAMChanges = predicate.Funcs{
-	UpdateFunc: func(event event.UpdateEvent) bool {
-		oldIpamRange, newIpamRange := event.ObjectOld.(*networkv1alpha1.IPAMRange), event.ObjectNew.(*networkv1alpha1.IPAMRange)
+const parentField = ".spec.parent.name"
 
-		return !equality.Semantic.DeepEqual(oldIpamRange.Spec, newIpamRange.Spec) ||
-			!equality.Semantic.DeepEqual(oldIpamRange.Status, newIpamRange.Status) ||
-			!equality.Semantic.DeepEqual(oldIpamRange.Finalizers, newIpamRange.Finalizers)
-	},
+func (r *IPAMRangeReconciler) reconcileRequestsFromParent(ctx context.Context, log logr.Logger, object client.Object) []reconcile.Request {
+	ipamRange := object.(*networkv1alpha1.IPAMRange)
+	if ipamRange.Spec.Parent == nil {
+		return nil
+	}
+
+	list := &networkv1alpha1.IPAMRangeList{}
+	if err := r.List(ctx, list, client.InNamespace(ipamRange.Namespace), client.MatchingFields{parentField: ipamRange.Name}); err != nil {
+		return nil
+	}
+
+	requests := make([]reconcile.Request, 0, len(list.Items))
+	for _, child := range list.Items {
+		requests = append(requests, reconcile.Request{NamespacedName: client.ObjectKeyFromObject(&child)})
+	}
+	return requests
 }
 
-const parentField = ".spec.parent.name"
+func (r *IPAMRangeReconciler) reconcileRequestsFromChildren(ctx context.Context, log logr.Logger, object client.Object) []reconcile.Request {
+	ipamRange := object.(*networkv1alpha1.IPAMRange)
+	if ipamRange.Spec.Parent == nil {
+		return nil
+	}
+
+	return []reconcile.Request{
+		{
+			NamespacedName: types.NamespacedName{
+				Namespace: ipamRange.Namespace,
+				Name:      ipamRange.Spec.Parent.Name,
+			},
+		},
+	}
+}
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *IPAMRangeReconciler) SetupWithManager(mgr manager.Manager) error {
 	ctx := context.Background()
+	log := ctrl.Log.WithName("ipamrange").WithName("setup-with-manager")
 
 	if err := mgr.GetFieldIndexer().IndexField(ctx, &networkv1alpha1.IPAMRange{}, parentField, func(object client.Object) []string {
 		ipamRange := object.(*networkv1alpha1.IPAMRange)
@@ -102,49 +129,17 @@ func (r *IPAMRangeReconciler) SetupWithManager(mgr manager.Manager) error {
 			// Parents trigger their children.
 			&source.Kind{Type: &networkv1alpha1.IPAMRange{}},
 			handler.EnqueueRequestsFromMapFunc(func(object client.Object) []reconcile.Request {
-				ipamRange := object.(*networkv1alpha1.IPAMRange)
-				if ipamRange.Spec.Parent == nil {
-					return nil
-				}
-
-				childrenList := &networkv1alpha1.IPAMRangeList{}
-				if err := mgr.GetClient().List(ctx, childrenList, client.InNamespace(ipamRange.Namespace), client.MatchingFields{parentField: ipamRange.Name}); err != nil {
-					return nil
-				}
-
-				requests := make([]reconcile.Request, 0, len(childrenList.Items))
-				for _, child := range childrenList.Items {
-					requests = append(requests, reconcile.Request{NamespacedName: client.ObjectKeyFromObject(&child)})
-				}
-				return requests
+				return r.reconcileRequestsFromParent(ctx, log, object)
 			}),
-			builder.WithPredicates(
-				predicate.GenerationChangedPredicate{},
-				predicates.IPAMRangeStatusChangedPredicate{},
-			),
+			builder.WithPredicates(predicates.IPAMRangeAllocationsChangedPredicate{}),
 		).
 		Watches(
 			// Children trigger their parents.
 			&source.Kind{Type: &networkv1alpha1.IPAMRange{}},
 			handler.EnqueueRequestsFromMapFunc(func(object client.Object) []reconcile.Request {
-				ipamRange := object.(*networkv1alpha1.IPAMRange)
-				if ipamRange.Spec.Parent == nil {
-					return nil
-				}
-
-				return []reconcile.Request{
-					{
-						NamespacedName: types.NamespacedName{
-							Namespace: ipamRange.Namespace,
-							Name:      ipamRange.Spec.Parent.Name,
-						},
-					},
-				}
+				return r.reconcileRequestsFromChildren(ctx, log, object)
 			}),
-			builder.WithPredicates(
-				predicate.GenerationChangedPredicate{},
-				predicates.IPAMRangeStatusChangedPredicate{},
-			),
+			builder.WithPredicates(predicate.GenerationChangedPredicate{}),
 		).
 		Complete(r)
 }
@@ -180,9 +175,9 @@ func (r *IPAMRangeReconciler) delete(ctx context.Context, log logr.Logger, ipamR
 	}
 
 	log.Info("No children present anymore, removing finalizer.")
-	withFinalizer := ipamRange.DeepCopy()
-	controllerutil.RemoveFinalizer(ipamRange, ipamRangeFinalizerName)
-	if err := r.Patch(ctx, ipamRange, client.MergeFrom(withFinalizer)); err != nil {
+	updated := ipamRange.DeepCopy()
+	controllerutil.RemoveFinalizer(updated, ipamRangeFinalizerName)
+	if err := r.Patch(ctx, updated, client.MergeFrom(ipamRange)); err != nil {
 		return ctrl.Result{}, fmt.Errorf("could not remove finalizer: %w", err)
 	}
 
@@ -207,20 +202,14 @@ func (r *IPAMRangeReconciler) mapChildNameToChild(items []networkv1alpha1.IPAMRa
 	return nameToChild
 }
 
-// TODO: rename
-type active struct {
-	ips  *commonv1alpha1.IPRange
-	cidr *commonv1alpha1.CIDR
-}
-
-func (r *IPAMRangeReconciler) fulfilledRequests(nameToChild map[string]networkv1alpha1.IPAMRange, ipamRange *networkv1alpha1.IPAMRange) map[string]map[networkv1alpha1.IPAMRangeRequest]active {
-	res := make(map[string]map[networkv1alpha1.IPAMRangeRequest]active)
-	for _, allocation := range ipamRange.Status.Allocations {
-		if allocation.State != networkv1alpha1.IPAMRangeAllocationUsed {
+func (r *IPAMRangeReconciler) fulfilledRequests(nameToChild map[string]networkv1alpha1.IPAMRange, ipamRange *networkv1alpha1.IPAMRange) map[string]map[networkv1alpha1.IPAMRangeRequest]allocation {
+	res := make(map[string]map[networkv1alpha1.IPAMRangeRequest]allocation)
+	for _, allocStatus := range ipamRange.Status.Allocations {
+		if allocStatus.State != networkv1alpha1.IPAMRangeAllocationUsed {
 			continue
 		}
 
-		user, request := allocation.User, allocation.Request
+		user, request := allocStatus.User, allocStatus.Request
 		if user == nil || request == nil {
 			continue
 		}
@@ -234,12 +223,12 @@ func (r *IPAMRangeReconciler) fulfilledRequests(nameToChild map[string]networkv1
 			if equality.Semantic.DeepEqual(childRequest, *request) {
 				requests := res[child.Name]
 				if requests == nil {
-					requests = make(map[networkv1alpha1.IPAMRangeRequest]active)
+					requests = make(map[networkv1alpha1.IPAMRangeRequest]allocation)
 				}
 
-				requests[*request] = active{
-					cidr: allocation.CIDR,
-					ips:  allocation.IPs,
+				requests[*request] = allocation{
+					cidr: allocStatus.CIDR,
+					ips:  allocStatus.IPs,
 				}
 
 				res[child.Name] = requests
@@ -255,7 +244,7 @@ type childNameAndRequest struct {
 	request   networkv1alpha1.IPAMRangeRequest
 }
 
-func (r *IPAMRangeReconciler) sortedRequests(items []networkv1alpha1.IPAMRange, fulfilledRequests map[string]map[networkv1alpha1.IPAMRangeRequest]active) []childNameAndRequest {
+func (r *IPAMRangeReconciler) sortedRequests(items []networkv1alpha1.IPAMRange, fulfilledRequests map[string]map[networkv1alpha1.IPAMRangeRequest]allocation) []childNameAndRequest {
 	var requests []childNameAndRequest
 	for _, item := range items {
 		for _, request := range item.Spec.Requests {
@@ -278,8 +267,8 @@ func (r *IPAMRangeReconciler) sortedRequests(items []networkv1alpha1.IPAMRange, 
 }
 
 type allocation struct {
-	ips  *netaddr.IPRange
-	cidr *netaddr.IPPrefix
+	ips  *commonv1alpha1.IPRange
+	cidr *commonv1alpha1.CIDR
 }
 
 func (r *IPAMRangeReconciler) gatherAvailable(ctx context.Context, ipamRange *networkv1alpha1.IPAMRange) (available *netaddr.IPSet, parentAllocations []allocation, failed []networkv1alpha1.IPAMRangeAllocationStatus, err error) {
@@ -301,31 +290,25 @@ func (r *IPAMRangeReconciler) gatherAvailable(ctx context.Context, ipamRange *ne
 		availableBldr netaddr.IPSetBuilder
 		other         []networkv1alpha1.IPAMRangeAllocationStatus
 	)
-	for _, cidr := range parent.Status.Allocations {
-		if activeRequest, user := cidr.Request, cidr.User; cidr.Request != nil && user != nil && user.Name == ipamRange.Name {
+	for _, allocStatus := range parent.Status.Allocations {
+		allocStatus := allocStatus
+		if activeRequest, user := allocStatus.Request, allocStatus.User; allocStatus.Request != nil && user != nil && user.Name == ipamRange.Name {
 			for _, request := range ipamRange.Spec.Requests {
-				if *activeRequest == request {
-					if cidr.State == networkv1alpha1.IPAMRangeAllocationUsed {
-						var (
-							usedCIDR *netaddr.IPPrefix
-							usedIPs  *netaddr.IPRange
-						)
+				if equality.Semantic.DeepEqual(*activeRequest, request) {
+					if allocStatus.State == networkv1alpha1.IPAMRangeAllocationUsed {
 						switch {
-						case cidr.CIDR != nil:
-							availableBldr.AddPrefix(cidr.CIDR.IPPrefix)
-							usedCIDR = &cidr.CIDR.IPPrefix
-						case cidr.IPs != nil:
-							availableBldr.AddRange(cidr.IPs.Range())
-							r := cidr.IPs.Range()
-							usedIPs = &r
+						case allocStatus.CIDR != nil:
+							availableBldr.AddPrefix(allocStatus.CIDR.IPPrefix)
+						case allocStatus.IPs != nil:
+							availableBldr.AddRange(allocStatus.IPs.Range())
 						}
-						parentAllocations = append(parentAllocations, allocation{usedIPs, usedCIDR})
+						parentAllocations = append(parentAllocations, allocation{allocStatus.IPs, allocStatus.CIDR})
 					} else {
 						other = append(other, networkv1alpha1.IPAMRangeAllocationStatus{
-							CIDR:    cidr.CIDR,
-							IPs:     cidr.IPs,
-							State:   cidr.State,
-							Request: cidr.Request,
+							CIDR:    allocStatus.CIDR,
+							IPs:     allocStatus.IPs,
+							State:   allocStatus.State,
+							Request: allocStatus.Request,
 						})
 					}
 				}
@@ -417,12 +400,15 @@ func (r *IPAMRangeReconciler) acquireRequest(set *netaddr.IPSet, request network
 
 func (r *IPAMRangeReconciler) computeChildAllocations(
 	available *netaddr.IPSet,
-	fulfilledRequests map[string]map[networkv1alpha1.IPAMRangeRequest]active,
+	fulfilledRequests map[string]map[networkv1alpha1.IPAMRangeRequest]allocation,
 	requests []childNameAndRequest,
 ) (newAvailable *netaddr.IPSet, childAllocations []networkv1alpha1.IPAMRangeAllocationStatus) {
 	for _, requestAndName := range requests {
-		request, name := requestAndName.request, requestAndName.childName
+		originalRequest, name := requestAndName.request, requestAndName.childName
 		oldRequests := fulfilledRequests[name]
+		// we copy the original request since we're modifying it
+		// below to force re-acquiring already allocated IPs.
+		request := originalRequest
 		if allocated, ok := oldRequests[request]; ok {
 			request.CIDR = allocated.cidr
 			request.IPs = allocated.ips
@@ -432,7 +418,7 @@ func (r *IPAMRangeReconciler) computeChildAllocations(
 		if !ok {
 			childAllocations = append(childAllocations, networkv1alpha1.IPAMRangeAllocationStatus{
 				State:   networkv1alpha1.IPAMRangeAllocationFailed,
-				Request: &request,
+				Request: &originalRequest,
 				User:    &corev1.LocalObjectReference{Name: name},
 			})
 		} else {
@@ -450,7 +436,7 @@ func (r *IPAMRangeReconciler) computeChildAllocations(
 				State:   networkv1alpha1.IPAMRangeAllocationUsed,
 				CIDR:    cidr,
 				IPs:     ips,
-				Request: &request,
+				Request: &originalRequest,
 				User:    &corev1.LocalObjectReference{Name: name},
 			})
 		}
@@ -468,9 +454,9 @@ func (r *IPAMRangeReconciler) intersectUsed(available *netaddr.IPSet, used alloc
 	var ipsSetBuilder netaddr.IPSetBuilder
 	switch {
 	case used.ips != nil:
-		ipsSetBuilder.AddRange(*used.ips)
+		ipsSetBuilder.AddRange(used.ips.Range())
 	case used.cidr != nil:
-		ipsSetBuilder.AddPrefix(*used.cidr)
+		ipsSetBuilder.AddPrefix(used.cidr.IPPrefix)
 	}
 	ipsSet, _ := ipsSetBuilder.IPSet()
 	intersectionBuilder.Intersect(ipsSet)
@@ -534,26 +520,18 @@ func (r *IPAMRangeReconciler) reconcile(ctx context.Context, log logr.Logger, ip
 	newAllocations = append(newAllocations, freeAllocations...)
 	newAllocations = append(newAllocations, otherAllocations...)
 
-	ipamRange.Status.ObservedGeneration = ipamRange.Generation
-	ipamRange.Status.Allocations = newAllocations
-	if err := r.Status().Update(ctx, ipamRange); err != nil {
+	// Sort the allocations to ensure idempotency when watching for allocation changes.
+	sort.Slice(newAllocations, func(i, j int) bool {
+		ai, aj := newAllocations[i], newAllocations[j]
+		return allocationComparisons.DeepCompare(ai, aj) < 0
+	})
+
+	updated := ipamRange.DeepCopy()
+	updated.Status.ObservedGeneration = updated.Generation
+	updated.Status.Allocations = newAllocations
+	if err := r.Status().Patch(ctx, updated, client.MergeFrom(ipamRange)); err != nil {
 		return reconcile.Result{}, fmt.Errorf("could not update ipam range status: %w", err)
 	}
 
 	return ctrl.Result{}, nil
-}
-
-func (r *IPAMRangeReconciler) filterAllocationsAndJoin(allocations []networkv1alpha1.IPAMRangeAllocationStatus, state networkv1alpha1.IPAMRangeAllocationState) string {
-	var res []string
-	for _, allocation := range allocations {
-		if allocation.State == state {
-			switch {
-			case allocation.CIDR != nil:
-				res = append(res, allocation.CIDR.String())
-			case allocation.IPs != nil:
-				res = append(res, allocation.IPs.Range().String())
-			}
-		}
-	}
-	return strings.Join(res, ",")
 }

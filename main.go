@@ -18,8 +18,6 @@ package main
 
 import (
 	"flag"
-	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
-	"k8s.io/apimachinery/pkg/api/equality"
 	"os"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
@@ -53,17 +51,6 @@ func init() {
 	utilruntime.Must(storagev1alpha1.AddToScheme(scheme))
 	utilruntime.Must(networkv1alpha1.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
-
-	utilruntime.Must(equality.Semantic.AddFuncs(
-		func(a, b common.CIDR) bool {
-			return a.String() == b.String()
-		},
-	))
-	utilruntime.Must(equality.Semantic.AddFuncs(
-		func(a, b common.IPAddr) bool {
-			return a.String() == b.String()
-		},
-	))
 }
 
 func main() {
