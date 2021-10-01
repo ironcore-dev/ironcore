@@ -16,6 +16,7 @@ spec:
       priority: 0 # optional
       target:
         name: mySubnetName
+      ip: 10.10.0.1
   securityGroups:
     - name: mysecgroup1
   volumeClaims:
@@ -25,8 +26,9 @@ spec:
       storageClass:
         name: slow
       size: 100Gi
-  ignition: |
-    myIgnitionYAML
+  ignition:
+    name: ignition-configmap-name
+    key: ignition-key
   efiVars:
     - name: PK
       uuid: 8be4df61-93ca-11d2-aa0d-00e098032b8c
