@@ -40,13 +40,13 @@ type MachineSpec struct {
 	// Image is the URL providing the operating system image of the machine.
 	Image string `json:"image"`
 	// SSHPublicKeys is a list of SSH public key secret references of a machine.
-	SSHPublicKeys []commonv1alpha1.SecretKeySelector `json:"sshPublicKeys"`
+	SSHPublicKeys []commonv1alpha1.SecretKeySelector `json:"sshPublicKeys,omitempty"`
 	// Interfaces define a list of network interfaces present on the machine
 	Interfaces []Interface `json:"interfaces,omitempty"`
 	// SecurityGroups is a list of security groups of a machine
-	SecurityGroups []corev1.LocalObjectReference `json:"securityGroups"`
-	// VolumeClaims
-	VolumeClaims []VolumeClaim `json:"volumeClaims"`
+	SecurityGroups []corev1.LocalObjectReference `json:"securityGroups,omitempty"`
+	// VolumeClaims are volumes claimed by this machine.
+	VolumeClaims []VolumeClaim `json:"volumeClaims,omitempty"`
 	// Ignition is a reference to a config map containing the ignition YAML for the machine to boot up.
 	// If key is empty, DefaultIgnitionKey will be used as fallback.
 	Ignition *commonv1alpha1.ConfigMapKeySelector `json:"ignition,omitempty"`

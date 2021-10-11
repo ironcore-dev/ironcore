@@ -173,7 +173,7 @@ spec:
                   type: object
                 type: array
               volumeClaims:
-                description: VolumeClaims
+                description: VolumeClaims are volumes claimed by this machine.
                 items:
                   description: VolumeClaim defines a volume claim of a machine
                   properties:
@@ -222,9 +222,6 @@ spec:
             - hostname
             - image
             - machineClass
-            - securityGroups
-            - sshPublicKeys
-            - volumeClaims
             type: object
           status:
             description: MachineStatus defines the observed state of Machine
