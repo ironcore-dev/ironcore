@@ -17,25 +17,75 @@
 package network
 
 import (
-	"context"
+	"reflect"
+	"time"
 
-	network "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
+	"github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	nw "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	. "github.com/onsi/ginkgo"
+	"inet.af/netaddr"
+	"k8s.io/apimachinery/pkg/types"
+
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("subnet controller", func() {
-	const (
-		ns   = "default" // namespace
-		name = "test"
-	)
-
 	Context("Reconcile", func() {
-		It("creates an instance", func() {
-			subnet := &network.Subnet{}
-			subnet.Namespace = ns
-			subnet.Name = name
-			Expect(k8sClient.Create(context.Background(), subnet)).Should(Succeed())
+		It("patches the status of the related IPAMRange", func() {
+			subnet := newSubnet()
+			Expect(k8sClient.Create(ctx, subnet)).Should(Succeed())
+
+			ipamRange := newIPAMRange(subnet)
+			Expect(k8sClient.Create(ctx, ipamRange)).Should(Succeed())
+
+			Eventually(func() bool {
+				got := &nw.IPAMRange{}
+				if err := k8sClient.Get(ctx, toObjectKey(ipamRange), got); err != nil {
+					return false
+				}
+
+				return func() bool {
+					if got.Status.Allocations == nil {
+						return false
+					}
+					return reflect.DeepEqual(got.Status.Allocations[0].CIDR, &subnet.Spec.Ranges[0].CIDR)
+				}()
+			}, timeout, interval).Should(BeTrue())
 		})
 	})
 })
+
+const (
+	ns   = "default" // namespace
+	name = "subnet"
+
+	ipPrefix = "192.168.0.0/24"
+
+	timeout  = time.Second * 10
+	interval = time.Millisecond * 250
+)
+
+func newSubnet() *nw.Subnet {
+	subnet := &nw.Subnet{}
+	subnet.Namespace = ns
+	subnet.Name = name
+
+	ipPrefix, err := netaddr.ParseIPPrefix(ipPrefix)
+	Expect(err).ToNot(HaveOccurred())
+	subnet.Spec.Ranges = []nw.RangeType{{CIDR: v1alpha1.CIDR{IPPrefix: ipPrefix}}}
+	return subnet
+}
+
+func newIPAMRange(sub *nw.Subnet) *nw.IPAMRange {
+	rng := &nw.IPAMRange{}
+	rng.Namespace = sub.Namespace
+	rng.Name = nw.SubnetIPAMName(sub.Name)
+	return rng
+}
+
+func toObjectKey(rng *nw.IPAMRange) types.NamespacedName {
+	return types.NamespacedName{
+		Namespace: rng.Namespace,
+		Name:      rng.Name,
+	}
+}
