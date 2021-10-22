@@ -43,19 +43,20 @@ var _ = Describe("subnet controller", func() {
 			Eventually(func() bool {
 				got := &nw.IPAMRange{}
 				Expect(k8sClient.Get(ctx, objectKey(ipamRange), got))
-				return got.Status.Allocations == nil
+				return got.Spec.CIDRs == nil
 			}, timeout, interval).Should(BeTrue())
 		})
 	})
 
 	Context("Reconcile", func() {
-		It("patches the status of the related IPAMRange", func() {
+		It("reconciles a child-subnet without a parent", func() {
 			subnet := newSubnet("reconciled")
 			Expect(k8sClient.Create(ctx, subnet)).Should(Succeed())
 
 			ipamRange := newIPAMRange(subnet)
 			Expect(k8sClient.Create(ctx, ipamRange)).Should(Succeed())
 
+			By("patches the spec. of the related IPAMRange")
 			Eventually(func() bool {
 				got := &nw.IPAMRange{}
 				if err := k8sClient.Get(ctx, objectKey(ipamRange), got); err != nil {
@@ -66,7 +67,8 @@ var _ = Describe("subnet controller", func() {
 					if got.Status.Allocations == nil {
 						return false
 					}
-					return reflect.DeepEqual(got.Status.Allocations[0].CIDR, &subnet.Spec.Ranges[0].CIDR)
+
+					return reflect.DeepEqual(got.Spec.CIDRs[0], subnet.Spec.Ranges[0].CIDR)
 				}()
 			}, timeout, interval).Should(BeTrue())
 		})
