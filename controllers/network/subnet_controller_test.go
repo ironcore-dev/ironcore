@@ -71,6 +71,14 @@ var _ = Describe("subnet controller", func() {
 			}, timeout, interval).Should(BeTrue())
 
 			By("patching the status of the Subnet")
+			Eventually(func() bool {
+				netGot := &nw.Subnet{}
+				Expect(k8sClient.Get(ctx, objectKey(subnet), netGot)).Should(Succeed())
+
+				return func() bool {
+					return netGot.Status.State == nw.SubnetStateUp
+				}()
+			}, timeout, interval).Should(BeTrue())
 		})
 	})
 })
