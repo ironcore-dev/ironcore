@@ -125,10 +125,11 @@ var _ = Describe("subnet controller", func() {
 })
 
 const (
-	ns = "default" // namespace
-
+	// test data
 	ipPrefix = "192.168.0.0/24"
+	ns       = "default" // namespace
 
+	// ginkgo
 	interval = time.Millisecond * 250
 	timeout  = time.Second * 10
 )
