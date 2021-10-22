@@ -97,14 +97,14 @@ var _ = Describe("subnet controller", func() {
 				Expect(k8sClient.Get(ctx, objectKey(ipamRng), rngGot)).Should(Succeed())
 
 				return func() bool {
-					rngParent := rngGot.Spec.Parent
-					childNetParent := child.Spec.Parent
-					if rngParent == nil || childNetParent == nil {
+					parentRng := rngGot.Spec.Parent
+					parentSubnet := child.Spec.Parent
+					if parentRng == nil || parentSubnet == nil {
 						return false
 					}
 
 					// Check if the IPAMRange is patched
-					return rngParent.Name == nw.SubnetIPAMName(childNetParent.Name) &&
+					return parentRng.Name == nw.SubnetIPAMName(parentSubnet.Name) &&
 						rngGot.Spec.CIDRs == nil &&
 						reflect.DeepEqual(rngGot.Spec.Requests[0], nw.IPAMRangeRequest{CIDR: &child.Spec.Ranges[0].CIDR})
 
