@@ -50,7 +50,7 @@ var _ = Describe("subnet controller", func() {
 
 	Context("Reconcile", func() {
 		It("reconciles a subnet without parent", func() {
-			subnet := newSubnet("reconciled")
+			subnet := newSubnet("no-parant")
 			ipamRange := newIPAMRange(subnet)
 
 			Expect(k8sClient.Create(ctx, ipamRange)).Should(Succeed())
