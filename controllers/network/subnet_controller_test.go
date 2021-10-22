@@ -24,6 +24,7 @@ import (
 	nw "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	. "github.com/onsi/ginkgo"
 	"inet.af/netaddr"
+	core "k8s.io/api/core/v1"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
@@ -82,7 +83,43 @@ var _ = Describe("subnet controller", func() {
 		})
 
 		It("reconciles a subnet with parent", func() {
+			parent := newSubnet("parent")
+			child := newSubnetWithParent("child", "parent")
+			ipamRng := newIPAMRange(child)
 
+			Expect(k8sClient.Create(ctx, ipamRng)).Should(Succeed())
+			Expect(k8sClient.Create(ctx, parent)).Should(Succeed())
+			Expect(k8sClient.Create(ctx, child)).Should(Succeed())
+
+			By("patching the spec of the owned IPAMRange")
+			Eventually(func() bool {
+				rngGot := &nw.IPAMRange{}
+				Expect(k8sClient.Get(ctx, objectKey(ipamRng), rngGot)).Should(Succeed())
+
+				return func() bool {
+					rngParent := rngGot.Spec.Parent
+					childNetParent := child.Spec.Parent
+					if rngParent == nil || childNetParent == nil {
+						return false
+					}
+
+					// Check if the IPAMRange patched
+					return rngParent.Name == nw.SubnetIPAMName(childNetParent.Name) &&
+						rngGot.Spec.CIDRs == nil &&
+						reflect.DeepEqual(rngGot.Spec.Requests[0], nw.IPAMRangeRequest{CIDR: &child.Spec.Ranges[0].CIDR})
+
+				}()
+			}, timeout, interval).Should(BeTrue())
+
+			By("patching the status of the Subnet")
+			Eventually(func() bool {
+				netGot := &nw.Subnet{}
+				Expect(k8sClient.Get(ctx, objectKey(child), netGot)).Should(Succeed())
+
+				return func() bool {
+					return netGot.Status.State == nw.SubnetStateUp
+				}()
+			}, timeout, interval).Should(BeTrue())
 		})
 	})
 })
@@ -109,6 +146,12 @@ func newSubnet(name string) *nw.Subnet {
 	ipPrefix, err := netaddr.ParseIPPrefix(ipPrefix)
 	Expect(err).ToNot(HaveOccurred())
 	subnet.Spec.Ranges = []nw.RangeType{{CIDR: v1alpha1.CIDR{IPPrefix: ipPrefix}}}
+	return subnet
+}
+
+func newSubnetWithParent(name, parentName string) *nw.Subnet {
+	subnet := newSubnet(name)
+	subnet.Spec.Parent = &core.LocalObjectReference{Name: parentName}
 	return subnet
 }
 
