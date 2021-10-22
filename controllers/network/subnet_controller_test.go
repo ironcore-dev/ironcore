@@ -129,13 +129,20 @@ const (
 
 	ipPrefix = "192.168.0.0/24"
 
-	timeout  = time.Second * 10
 	interval = time.Millisecond * 250
+	timeout  = time.Second * 10
 )
 
 type object interface {
 	GetNamespace() string
 	GetName() string
+}
+
+func newIPAMRange(sub *nw.Subnet) *nw.IPAMRange {
+	rng := &nw.IPAMRange{}
+	rng.Namespace = sub.Namespace
+	rng.Name = nw.SubnetIPAMName(sub.Name)
+	return rng
 }
 
 func newSubnet(name string) *nw.Subnet {
@@ -153,13 +160,6 @@ func newSubnetWithParent(name, parentName string) *nw.Subnet {
 	subnet := newSubnet(name)
 	subnet.Spec.Parent = &core.LocalObjectReference{Name: parentName}
 	return subnet
-}
-
-func newIPAMRange(sub *nw.Subnet) *nw.IPAMRange {
-	rng := &nw.IPAMRange{}
-	rng.Namespace = sub.Namespace
-	rng.Name = nw.SubnetIPAMName(sub.Name)
-	return rng
 }
 
 func now() *meta.Time {
