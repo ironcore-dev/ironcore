@@ -24,15 +24,17 @@ import (
 	nw "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	. "github.com/onsi/ginkgo"
 	"inet.af/netaddr"
+	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("subnet controller", func() {
-	Context("Reconcile", func() {
-		It("patches the status of the related IPAMRange", func() {
-			subnet := newSubnet()
+	Context("reconcileExists", func() {
+		It("finishes reconciliation early if the instance is being deleted", func() {
+			subnet := newSubnet("early-finished")
+			subnet.DeletionTimestamp = now()
 			Expect(k8sClient.Create(ctx, subnet)).Should(Succeed())
 
 			ipamRange := newIPAMRange(subnet)
@@ -40,7 +42,23 @@ var _ = Describe("subnet controller", func() {
 
 			Eventually(func() bool {
 				got := &nw.IPAMRange{}
-				if err := k8sClient.Get(ctx, toObjectKey(ipamRange), got); err != nil {
+				Expect(k8sClient.Get(ctx, objectKey(ipamRange), got))
+				return got.Status.Allocations == nil
+			}, timeout, interval).Should(BeTrue())
+		})
+	})
+
+	Context("Reconcile", func() {
+		It("patches the status of the related IPAMRange", func() {
+			subnet := newSubnet("reconciled")
+			Expect(k8sClient.Create(ctx, subnet)).Should(Succeed())
+
+			ipamRange := newIPAMRange(subnet)
+			Expect(k8sClient.Create(ctx, ipamRange)).Should(Succeed())
+
+			Eventually(func() bool {
+				got := &nw.IPAMRange{}
+				if err := k8sClient.Get(ctx, objectKey(ipamRange), got); err != nil {
 					return false
 				}
 
@@ -56,8 +74,7 @@ var _ = Describe("subnet controller", func() {
 })
 
 const (
-	ns   = "default" // namespace
-	name = "subnet"
+	ns = "default" // namespace
 
 	ipPrefix = "192.168.0.0/24"
 
@@ -65,7 +82,12 @@ const (
 	interval = time.Millisecond * 250
 )
 
-func newSubnet() *nw.Subnet {
+type object interface {
+	GetNamespace() string
+	GetName() string
+}
+
+func newSubnet(name string) *nw.Subnet {
 	subnet := &nw.Subnet{}
 	subnet.Namespace = ns
 	subnet.Name = name
@@ -83,9 +105,14 @@ func newIPAMRange(sub *nw.Subnet) *nw.IPAMRange {
 	return rng
 }
 
-func toObjectKey(rng *nw.IPAMRange) types.NamespacedName {
+func now() *meta.Time {
+	now := meta.NewTime(time.Now())
+	return &now
+}
+
+func objectKey(o object) types.NamespacedName {
 	return types.NamespacedName{
-		Namespace: rng.Namespace,
-		Name:      rng.Name,
+		Namespace: o.GetNamespace(),
+		Name:      o.GetName(),
 	}
 }
