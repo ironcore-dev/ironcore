@@ -49,7 +49,7 @@ var _ = Describe("subnet controller", func() {
 	})
 
 	Context("Reconcile", func() {
-		It("reconciles a child-subnet without a parent", func() {
+		It("reconciles a subnet without parent", func() {
 			subnet := newSubnet("reconciled")
 			ipamRange := newIPAMRange(subnet)
 
@@ -79,6 +79,10 @@ var _ = Describe("subnet controller", func() {
 					return netGot.Status.State == nw.SubnetStateUp
 				}()
 			}, timeout, interval).Should(BeTrue())
+		})
+
+		It("reconciles a subnet with parent", func() {
+
 		})
 	})
 })
