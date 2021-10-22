@@ -26,7 +26,7 @@ import (
 	"inet.af/netaddr"
 	core "k8s.io/api/core/v1"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	. "github.com/onsi/gomega"
 )
@@ -134,10 +134,7 @@ const (
 	timeout  = time.Second * 10
 )
 
-type object interface {
-	GetNamespace() string
-	GetName() string
-}
+var objectKey = client.ObjectKeyFromObject
 
 func newIPAMRange(sub *nw.Subnet) *nw.IPAMRange {
 	rng := &nw.IPAMRange{}
@@ -166,11 +163,4 @@ func newSubnetWithParent(name, parentName string) *nw.Subnet {
 func now() *meta.Time {
 	now := meta.NewTime(time.Now())
 	return &now
-}
-
-func objectKey(o object) types.NamespacedName {
-	return types.NamespacedName{
-		Namespace: o.GetNamespace(),
-		Name:      o.GetName(),
-	}
 }
