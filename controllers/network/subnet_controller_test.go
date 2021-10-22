@@ -41,9 +41,9 @@ var _ = Describe("subnet controller", func() {
 			Expect(k8sClient.Create(ctx, ipamRange)).Should(Succeed())
 
 			Eventually(func() bool {
-				got := &nw.IPAMRange{}
-				Expect(k8sClient.Get(ctx, objectKey(ipamRange), got))
-				return got.Spec.CIDRs == nil
+				rngGot := &nw.IPAMRange{}
+				Expect(k8sClient.Get(ctx, objectKey(ipamRange), rngGot))
+				return rngGot.Spec.CIDRs == nil
 			}, timeout, interval).Should(BeTrue())
 		})
 	})
@@ -58,15 +58,15 @@ var _ = Describe("subnet controller", func() {
 
 			By("patches the spec. of the related IPAMRange")
 			Eventually(func() bool {
-				got := &nw.IPAMRange{}
-				Expect(k8sClient.Get(ctx, objectKey(ipamRange), got)).Should(Succeed())
+				rngGot := &nw.IPAMRange{}
+				Expect(k8sClient.Get(ctx, objectKey(ipamRange), rngGot)).Should(Succeed())
 
 				return func() bool {
-					if got.Status.Allocations == nil {
+					if rngGot.Status.Allocations == nil {
 						return false
 					}
 
-					return reflect.DeepEqual(got.Spec.CIDRs[0], subnet.Spec.Ranges[0].CIDR)
+					return reflect.DeepEqual(rngGot.Spec.CIDRs[0], subnet.Spec.Ranges[0].CIDR)
 				}()
 			}, timeout, interval).Should(BeTrue())
 		})
