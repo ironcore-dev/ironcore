@@ -59,9 +59,7 @@ var _ = Describe("subnet controller", func() {
 			By("patches the spec. of the related IPAMRange")
 			Eventually(func() bool {
 				got := &nw.IPAMRange{}
-				if err := k8sClient.Get(ctx, objectKey(ipamRange), got); err != nil {
-					return false
-				}
+				Expect(k8sClient.Get(ctx, objectKey(ipamRange), got)).Should(Succeed())
 
 				return func() bool {
 					if got.Status.Allocations == nil {
