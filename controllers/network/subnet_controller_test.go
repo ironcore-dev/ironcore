@@ -35,10 +35,10 @@ var _ = Describe("subnet controller", func() {
 		It("finishes reconciliation early if the instance is being deleted", func() {
 			subnet := newSubnet("early-finished")
 			subnet.DeletionTimestamp = now()
-			Expect(k8sClient.Create(ctx, subnet)).Should(Succeed())
-
 			ipamRange := newIPAMRange(subnet)
+
 			Expect(k8sClient.Create(ctx, ipamRange)).Should(Succeed())
+			Expect(k8sClient.Create(ctx, subnet)).Should(Succeed())
 
 			Eventually(func() bool {
 				rngGot := &nw.IPAMRange{}
@@ -51,10 +51,10 @@ var _ = Describe("subnet controller", func() {
 	Context("Reconcile", func() {
 		It("reconciles a child-subnet without a parent", func() {
 			subnet := newSubnet("reconciled")
-			Expect(k8sClient.Create(ctx, subnet)).Should(Succeed())
-
 			ipamRange := newIPAMRange(subnet)
+
 			Expect(k8sClient.Create(ctx, ipamRange)).Should(Succeed())
+			Expect(k8sClient.Create(ctx, subnet)).Should(Succeed())
 
 			By("patches the spec. of the related IPAMRange")
 			Eventually(func() bool {
