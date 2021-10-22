@@ -103,7 +103,7 @@ var _ = Describe("subnet controller", func() {
 						return false
 					}
 
-					// Check if the IPAMRange patched
+					// Check if the IPAMRange is patched
 					return rngParent.Name == nw.SubnetIPAMName(childNetParent.Name) &&
 						rngGot.Spec.CIDRs == nil &&
 						reflect.DeepEqual(rngGot.Spec.Requests[0], nw.IPAMRangeRequest{CIDR: &child.Spec.Ranges[0].CIDR})
