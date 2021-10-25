@@ -8,11 +8,30 @@
 Resource Types:
 <ul></ul>
 <h3 id="common.onmetal.de/v1alpha1.CIDR">CIDR
-(<code>string</code> alias)</h3>
+</h3>
 <div>
-<p>CIDR represents a network CIDR.
-TODO: create marshal/unmarshal functions</p>
+<p>CIDR represents a network CIDR.</p>
 </div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>-</code><br/>
+<em>
+inet.af/netaddr.IPPrefix
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="common.onmetal.de/v1alpha1.ConfigMapKeySelector">ConfigMapKeySelector
 </h3>
 <div>
@@ -60,11 +79,72 @@ required.</p>
 </tbody>
 </table>
 <h3 id="common.onmetal.de/v1alpha1.IPAddr">IPAddr
-(<code>string</code> alias)</h3>
+</h3>
+<p>
+(<em>Appears on:</em><a href="#common.onmetal.de/v1alpha1.IPRange">IPRange</a>)
+</p>
 <div>
-<p>IPAddr is an IP address.
-TODO: create marshal/unmarshal functions</p>
+<p>IPAddr is an IP address.</p>
 </div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>-</code><br/>
+<em>
+inet.af/netaddr.IP
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="common.onmetal.de/v1alpha1.IPRange">IPRange
+</h3>
+<div>
+<p>IPRange is an IP range.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>from</code><br/>
+<em>
+<a href="#common.onmetal.de/v1alpha1.IPAddr">
+IPAddr
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>to</code><br/>
+<em>
+<a href="#common.onmetal.de/v1alpha1.IPAddr">
+IPAddr
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="common.onmetal.de/v1alpha1.SecretKeySelector">SecretKeySelector
 </h3>
 <div>
@@ -114,5 +194,5 @@ required.</p>
 <hr/>
 <p><em>
 Generated with <code>gen-crd-api-reference-docs</code>
-on git commit <code>6fe95dc</code>.
+on git commit <code>a435c36</code>.
 </em></p>
