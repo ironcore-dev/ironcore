@@ -38,27 +38,27 @@ var _ = Describe("subnet controller", func() {
 			subnet := newSubnet("owner")
 			Expect(k8sClient.Create(ctx, subnet)).Should(Succeed())
 
-			ipamRange := newIPAMRange(subnet)
+			ipamRng := newIPAMRange(subnet)
 			Eventually(func() error {
-				return k8sClient.Get(ctx, objectKey(ipamRange), ipamRange)
+				return k8sClient.Get(ctx, objectKey(ipamRng), ipamRng)
 			}, timeout, interval).Should(BeNil())
 
-			Expect(ipamRange.OwnerReferences).To(ContainElement(controllerReference(subnet)))
+			Expect(ipamRng.OwnerReferences).To(ContainElement(controllerReference(subnet)))
 		})
 
 		It("reconciles a subnet without parent", func() {
 			subnet := newSubnet("no-parant")
-			ipamRange := newIPAMRange(subnet)
+			ipamRng := newIPAMRange(subnet)
 
 			Expect(k8sClient.Create(ctx, subnet)).Should(Succeed())
 			Eventually(func() error {
-				return k8sClient.Get(ctx, objectKey(ipamRange), ipamRange)
+				return k8sClient.Get(ctx, objectKey(ipamRng), ipamRng)
 			}, timeout, interval).Should(BeNil())
 
 			By("patching the spec. of the related IPAMRange")
 			Eventually(func() bool {
 				rngGot := &networkv1alpha1.IPAMRange{}
-				Expect(k8sClient.Get(ctx, objectKey(ipamRange), rngGot)).Should(Succeed())
+				Expect(k8sClient.Get(ctx, objectKey(ipamRng), rngGot)).Should(Succeed())
 
 				return func() bool {
 					if rngGot.Status.Allocations == nil {
