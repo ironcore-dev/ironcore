@@ -47,7 +47,7 @@ func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
 
 	RunSpecsWithDefaultAndCustomReporters(t,
-		"Controller Suite",
+		"Newwork Controller Suite",
 		[]Reporter{printer.NewlineReporter{}})
 }
 
