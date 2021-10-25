@@ -20,15 +20,15 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/onmetal/onmetal-api/apis/common/v1alpha1"
-	nw "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"inet.af/netaddr"
 	core "k8s.io/api/core/v1"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	. "github.com/onsi/gomega"
+	"github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	nw "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 )
 
 var _ = Describe("subnet controller", func() {
