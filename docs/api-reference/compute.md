@@ -92,7 +92,7 @@ Kubernetes core/v1.LocalObjectReference
 </em>
 </td>
 <td>
-<p>Target is the referenced resource of this interface</p>
+<p>Target is the referenced resource of this interface.</p>
 </td>
 </tr>
 <tr>
@@ -110,7 +110,9 @@ int32
 <td>
 <code>ip</code><br/>
 <em>
-string
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IPAddr">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPAddr
+</a>
 </em>
 </td>
 <td>
@@ -150,7 +152,9 @@ string
 <td>
 <code>ip</code><br/>
 <em>
-string
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IPAddr">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPAddr
+</a>
 </em>
 </td>
 <td>
@@ -308,7 +312,7 @@ string
 </em>
 </td>
 <td>
-<p>VolumeClaims</p>
+<p>VolumeClaims are volumes claimed by this machine.</p>
 </td>
 </tr>
 <tr>
@@ -964,7 +968,7 @@ string
 </em>
 </td>
 <td>
-<p>VolumeClaims</p>
+<p>VolumeClaims are volumes claimed by this machine.</p>
 </td>
 </tr>
 <tr>
@@ -1241,5 +1245,5 @@ int32
 <hr/>
 <p><em>
 Generated with <code>gen-crd-api-reference-docs</code>
-on git commit <code>6fe95dc</code>.
+on git commit <code>a435c36</code>.
 </em></p>

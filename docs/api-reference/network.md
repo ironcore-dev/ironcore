@@ -7,13 +7,9 @@
 <h2 id="network.onmetal.de/v1alpha1">network.onmetal.de/v1alpha1</h2>
 Resource Types:
 <ul></ul>
-<h3 id="network.onmetal.de/v1alpha1.AllocationState">AllocationState
+<h3 id="network.onmetal.de/v1alpha1.CIDRState">CIDRState
 (<code>string</code> alias)</h3>
-<p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.CIDRAllocationStatus">CIDRAllocationStatus</a>)
-</p>
 <div>
-<p>AllocationState is a state an allocation can be in.</p>
 </div>
 <table>
 <thead>
@@ -22,152 +18,15 @@ Resource Types:
 <th>Description</th>
 </tr>
 </thead>
-<tbody><tr><td><p>&#34;Allocated&#34;</p></td>
-<td><p>AllocationStateAllocated reports that the allocation has been made successfully.</p>
-</td>
-</tr><tr><td><p>&#34;Busy&#34;</p></td>
-<td><p>AllocationStateBusy reports that an allocation is busy.</p>
-</td>
-</tr><tr><td><p>&#34;Failed&#34;</p></td>
-<td><p>AllocationStateFailed reports that an allocation has failed.</p>
-</td>
+<tbody><tr><td><p>&#34;Failed&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Free&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Used&#34;</p></td>
+<td></td>
 </tr></tbody>
-</table>
-<h3 id="network.onmetal.de/v1alpha1.CIDRAllocation">CIDRAllocation
-</h3>
-<p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.CIDRAllocationStatus">CIDRAllocationStatus</a>, <a href="#network.onmetal.de/v1alpha1.IPAMPendingRequest">IPAMPendingRequest</a>)
-</p>
-<div>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>request</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-</td>
-</tr>
-<tr>
-<td>
-<code>cidr</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="network.onmetal.de/v1alpha1.CIDRAllocationStatus">CIDRAllocationStatus
-</h3>
-<p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.IPAMRangeStatus">IPAMRangeStatus</a>)
-</p>
-<div>
-<p>CIDRAllocationStatus is the result of a CIDR allocation request</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>CIDRAllocation</code><br/>
-<em>
-<a href="#network.onmetal.de/v1alpha1.CIDRAllocation">
-CIDRAllocation
-</a>
-</em>
-</td>
-<td>
-<p>
-(Members of <code>CIDRAllocation</code> are embedded into this type.)
-</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>status</code><br/>
-<em>
-<a href="#network.onmetal.de/v1alpha1.AllocationState">
-AllocationState
-</a>
-</em>
-</td>
-<td>
-</td>
-</tr>
-<tr>
-<td>
-<code>message</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="network.onmetal.de/v1alpha1.CIDRStatus">CIDRStatus
-</h3>
-<p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SubnetStatus">SubnetStatus</a>)
-</p>
-<div>
-<p>CIDRStatus is the status of a CIDR</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>cidr</code><br/>
-<em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.CIDR">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.CIDR
-</a>
-</em>
-</td>
-<td>
-<p>CIDR defines the cidr</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>blockedRanges</code><br/>
-<em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.CIDR">
-[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.CIDR
-</a>
-</em>
-</td>
-<td>
-<p>BlockedRanges is a list of blocked cidr ranges</p>
-</td>
-</tr>
-</tbody>
 </table>
 <h3 id="network.onmetal.de/v1alpha1.EgressSecurityGroupRule">EgressSecurityGroupRule
 </h3>
@@ -590,67 +449,6 @@ GatewayState
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.IPAMPendingRequest">IPAMPendingRequest
-</h3>
-<p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.IPAMRangeStatus">IPAMRangeStatus</a>)
-</p>
-<div>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>name</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-</td>
-</tr>
-<tr>
-<td>
-<code>namespace</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-</td>
-</tr>
-<tr>
-<td>
-<code>cidrs</code><br/>
-<em>
-<a href="#network.onmetal.de/v1alpha1.CIDRAllocation">
-[]CIDRAllocation
-</a>
-</em>
-</td>
-<td>
-</td>
-</tr>
-<tr>
-<td>
-<code>deletions</code><br/>
-<em>
-<a href="#network.onmetal.de/v1alpha1.CIDRAllocation">
-[]CIDRAllocation
-</a>
-</em>
-</td>
-<td>
-</td>
-</tr>
-</tbody>
-</table>
 <h3 id="network.onmetal.de/v1alpha1.IPAMRange">IPAMRange
 </h3>
 <div>
@@ -701,14 +499,16 @@ Kubernetes core/v1.LocalObjectReference
 </em>
 </td>
 <td>
-<p>Parent is the reference of the Parent IPAMRange from which the Cidr or size should be derived</p>
+<p>Parent is the reference of the Parent IPAMRange from which the CIDR or size should be derived</p>
 </td>
 </tr>
 <tr>
 <td>
 <code>cidrs</code><br/>
 <em>
-[]string
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.CIDR">
+[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.CIDR
+</a>
 </em>
 </td>
 <td>
@@ -717,15 +517,14 @@ Kubernetes core/v1.LocalObjectReference
 </tr>
 <tr>
 <td>
-<code>mode</code><br/>
+<code>requests</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.IPAMRangeMode">
-IPAMRangeMode
+<a href="#network.onmetal.de/v1alpha1.IPAMRangeRequest">
+[]IPAMRangeRequest
 </a>
 </em>
 </td>
 <td>
-<p>Mode is the mode to request an IPAMRange.</p>
 </td>
 </tr>
 </table>
@@ -745,13 +544,39 @@ IPAMRangeStatus
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.IPAMRangeCondition">IPAMRangeCondition
+<h3 id="network.onmetal.de/v1alpha1.IPAMRangeAllocationState">IPAMRangeAllocationState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.IPAMRangeAllocationStatus">IPAMRangeAllocationStatus</a>)
+</p>
+<div>
+<p>IPAMRangeAllocationState is a state an IPAMRangeAllocationStatus can have.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Failed&#34;</p></td>
+<td><p>IPAMRangeAllocationFailed reports that an allocation could not be made successfully.</p>
+</td>
+</tr><tr><td><p>&#34;Free&#34;</p></td>
+<td><p>IPAMRangeAllocationFree reports that an allocation is available for use (by children or direct consumers).</p>
+</td>
+</tr><tr><td><p>&#34;Used&#34;</p></td>
+<td><p>IPAMRangeAllocationUsed reports that an allocation is used by a child.</p>
+</td>
+</tr></tbody>
+</table>
+<h3 id="network.onmetal.de/v1alpha1.IPAMRangeAllocationStatus">IPAMRangeAllocationStatus
 </h3>
 <p>
 (<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.IPAMRangeStatus">IPAMRangeStatus</a>)
 </p>
 <div>
-<p>IPAMRangeCondition is one of the conditions of a volume.</p>
+<p>IPAMRangeAllocationStatus is the status of an IPAMRange allocation.</p>
 </div>
 <table>
 <thead>
@@ -763,121 +588,125 @@ IPAMRangeStatus
 <tbody>
 <tr>
 <td>
-<code>type</code><br/>
+<code>cidr</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.IPAMRangeConditionType">
-IPAMRangeConditionType
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.CIDR">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.CIDR
 </a>
 </em>
 </td>
 <td>
-<p>Type is the type of the condition.</p>
+<p>CIDR defines the cidr</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>status</code><br/>
+<code>ips</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#conditionstatus-v1-core">
-Kubernetes core/v1.ConditionStatus
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPRange
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>state</code><br/>
+<em>
+<a href="#network.onmetal.de/v1alpha1.IPAMRangeAllocationState">
+IPAMRangeAllocationState
 </a>
 </em>
 </td>
 <td>
-<p>Status is the status of the condition.</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>reason</code><br/>
+<code>request</code><br/>
 <em>
-string
-</em>
-</td>
-<td>
-<p>Reason is a machine-readable indication of why the condition is in a certain state.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>message</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Message is a human-readable explanation of why the condition has a certain reason / state.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>observedGeneration</code><br/>
-<em>
-int64
-</em>
-</td>
-<td>
-<p>ObservedGeneration represents the .metadata.generation that the condition was set based upon.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>lastUpdateTime</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
-Kubernetes meta/v1.Time
+<a href="#network.onmetal.de/v1alpha1.IPAMRangeRequest">
+IPAMRangeRequest
 </a>
 </em>
 </td>
 <td>
-<p>LastUpdateTime is the last time a condition has been updated.</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>lastTransitionTime</code><br/>
+<code>user</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
-Kubernetes meta/v1.Time
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
 </td>
 <td>
-<p>LastTransitionTime is the last time the status of a condition has transitioned from one state to another.</p>
 </td>
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.IPAMRangeConditionType">IPAMRangeConditionType
-(<code>string</code> alias)</h3>
+<h3 id="network.onmetal.de/v1alpha1.IPAMRangeRequest">IPAMRangeRequest
+</h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.IPAMRangeCondition">IPAMRangeCondition</a>)
+(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.IPAMRangeAllocationStatus">IPAMRangeAllocationStatus</a>, <a href="#network.onmetal.de/v1alpha1.IPAMRangeSpec">IPAMRangeSpec</a>)
 </p>
 <div>
-<p>IPAMRangeConditionType is a type a IPAMRangeCondition can have.</p>
-</div>
-<h3 id="network.onmetal.de/v1alpha1.IPAMRangeMode">IPAMRangeMode
-(<code>string</code> alias)</h3>
-<p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.IPAMRangeSpec">IPAMRangeSpec</a>)
-</p>
-<div>
-<p>IPAMRangeMode is the mode to request IPAMRanges.</p>
 </div>
 <table>
 <thead>
 <tr>
-<th>Value</th>
+<th>Field</th>
 <th>Description</th>
 </tr>
 </thead>
-<tbody><tr><td><p>&#34;FirstMatch&#34;</p></td>
-<td><p>ModeFirstMatch requests IPAMRanges by using the first possible match.</p>
+<tbody>
+<tr>
+<td>
+<code>size</code><br/>
+<em>
+int32
+</em>
 </td>
-</tr><tr><td><p>&#34;RoundRobin&#34;</p></td>
-<td><p>ModeRoundRobin requests IPAMRanges in a round-robin fashion, distributing evenly.</p>
+<td>
+<p>Size requests a CIDR of the given size.</p>
 </td>
-</tr></tbody>
+</tr>
+<tr>
+<td>
+<code>cidr</code><br/>
+<em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.CIDR">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.CIDR
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>ips</code><br/>
+<em>
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPRange
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>ipCount</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>IPCount requests a consecutive IP range of the given size.</p>
+</td>
+</tr>
+</tbody>
 </table>
 <h3 id="network.onmetal.de/v1alpha1.IPAMRangeSpec">IPAMRangeSpec
 </h3>
@@ -909,14 +738,16 @@ Kubernetes core/v1.LocalObjectReference
 </em>
 </td>
 <td>
-<p>Parent is the reference of the Parent IPAMRange from which the Cidr or size should be derived</p>
+<p>Parent is the reference of the Parent IPAMRange from which the CIDR or size should be derived</p>
 </td>
 </tr>
 <tr>
 <td>
 <code>cidrs</code><br/>
 <em>
-[]string
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.CIDR">
+[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.CIDR
+</a>
 </em>
 </td>
 <td>
@@ -925,48 +756,17 @@ Kubernetes core/v1.LocalObjectReference
 </tr>
 <tr>
 <td>
-<code>mode</code><br/>
+<code>requests</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.IPAMRangeMode">
-IPAMRangeMode
+<a href="#network.onmetal.de/v1alpha1.IPAMRangeRequest">
+[]IPAMRangeRequest
 </a>
 </em>
 </td>
 <td>
-<p>Mode is the mode to request an IPAMRange.</p>
 </td>
 </tr>
 </tbody>
-</table>
-<h3 id="network.onmetal.de/v1alpha1.IPAMRangeState">IPAMRangeState
-(<code>string</code> alias)</h3>
-<p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.IPAMRangeStatus">IPAMRangeStatus</a>)
-</p>
-<div>
-</div>
-<table>
-<thead>
-<tr>
-<th>Value</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody><tr><td><p>&#34;Available&#34;</p></td>
-<td></td>
-</tr><tr><td><p>&#34;Busy&#34;</p></td>
-<td></td>
-</tr><tr><td><p>&#34;Error&#34;</p></td>
-<td></td>
-</tr><tr><td><p>&#34;Invalid&#34;</p></td>
-<td></td>
-</tr><tr><td><p>&#34;Pending&#34;</p></td>
-<td></td>
-</tr><tr><td><p>&#34;Ready&#34;</p></td>
-<td></td>
-</tr><tr><td><p>&#34;Up&#34;</p></td>
-<td></td>
-</tr></tbody>
 </table>
 <h3 id="network.onmetal.de/v1alpha1.IPAMRangeStatus">IPAMRangeStatus
 </h3>
@@ -986,11 +786,9 @@ IPAMRangeMode
 <tbody>
 <tr>
 <td>
-<code>state</code><br/>
+<code>observedGeneration</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.IPAMRangeState">
-IPAMRangeState
-</a>
+int64
 </em>
 </td>
 <td>
@@ -998,77 +796,10 @@ IPAMRangeState
 </tr>
 <tr>
 <td>
-<code>message</code><br/>
+<code>allocations</code><br/>
 <em>
-string
-</em>
-</td>
-<td>
-</td>
-</tr>
-<tr>
-<td>
-<code>conditions</code><br/>
-<em>
-<a href="#network.onmetal.de/v1alpha1.IPAMRangeCondition">
-[]IPAMRangeCondition
-</a>
-</em>
-</td>
-<td>
-</td>
-</tr>
-<tr>
-<td>
-<code>cidrs</code><br/>
-<em>
-<a href="#network.onmetal.de/v1alpha1.CIDRAllocationStatus">
-[]CIDRAllocationStatus
-</a>
-</em>
-</td>
-<td>
-<p>CIDRs is a list of effective cidrs which belong to this IPAMRange</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>allocationState</code><br/>
-<em>
-[]string
-</em>
-</td>
-<td>
-</td>
-</tr>
-<tr>
-<td>
-<code>roundRobinState</code><br/>
-<em>
-[]string
-</em>
-</td>
-<td>
-</td>
-</tr>
-<tr>
-<td>
-<code>pendingRequests</code><br/>
-<em>
-<a href="#network.onmetal.de/v1alpha1.IPAMPendingRequest">
-IPAMPendingRequest
-</a>
-</em>
-</td>
-<td>
-</td>
-</tr>
-<tr>
-<td>
-<code>pendingDeletions</code><br/>
-<em>
-<a href="#network.onmetal.de/v1alpha1.CIDRAllocationStatus">
-[]CIDRAllocationStatus
+<a href="#network.onmetal.de/v1alpha1.IPAMRangeAllocationStatus">
+[]IPAMRangeAllocationStatus
 </a>
 </em>
 </td>
@@ -1269,11 +1000,11 @@ int
 <td>
 <code>size</code><br/>
 <em>
-string
+int32
 </em>
 </td>
 <td>
-<p>Size defines the size of a subnet e.g. &ldquo;/12&rdquo;</p>
+<p>Size defines the size of a subnet e.g. 12</p>
 </td>
 </tr>
 <tr>
@@ -1287,18 +1018,6 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.CIDR
 </td>
 <td>
 <p>CIDR is the CIDR block</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>blockedRanges</code><br/>
-<em>
-[]string
-</em>
-</td>
-<td>
-<p>BlockedRanges specifies which part of the subnet should be used for static IP assignment
-e.g. 0/14 means the first /14 subnet is blocked in the allocated /12 subnet</p>
 </td>
 </tr>
 </tbody>
@@ -2840,13 +2559,13 @@ SubnetState
 <td>
 <code>cidrs</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.CIDRStatus">
-[]CIDRStatus
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.CIDR">
+[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.CIDR
 </a>
 </em>
 </td>
 <td>
-<p>CIDRs is a list of CIDR status</p>
+<p>CIDRs is a list of CIDRs.</p>
 </td>
 </tr>
 </tbody>
@@ -2934,5 +2653,5 @@ string
 <hr/>
 <p><em>
 Generated with <code>gen-crd-api-reference-docs</code>
-on git commit <code>6fe95dc</code>.
+on git commit <code>a435c36</code>.
 </em></p>
