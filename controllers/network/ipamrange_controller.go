@@ -408,7 +408,7 @@ func (r *IPAMRangeReconciler) computeChildAllocations(
 	for _, requestAndName := range requests {
 		originalRequest, name := requestAndName.request, requestAndName.childName
 
-		// TODO: it's possible tyhat no request from IPAMRange is fullfilled
+		// it's possible that no request from IPAMRange is fullfilled
 		oldRequests := fulfilledRequests[name]
 		// we copy the original request since we're modifying it
 		// below to force re-acquiring already allocated IPs.
