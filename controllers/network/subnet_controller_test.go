@@ -50,8 +50,10 @@ var _ = Describe("subnet controller", func() {
 			subnet := newSubnet("no-parant")
 			ipamRange := newIPAMRange(subnet)
 
-			Expect(k8sClient.Create(ctx, ipamRange)).Should(Succeed())
 			Expect(k8sClient.Create(ctx, subnet)).Should(Succeed())
+			Eventually(func() error {
+				return k8sClient.Get(ctx, objectKey(ipamRange), ipamRange)
+			}, timeout, interval).Should(BeNil())
 
 			By("patching the spec. of the related IPAMRange")
 			Eventually(func() bool {
@@ -83,9 +85,11 @@ var _ = Describe("subnet controller", func() {
 			child := newSubnetWithParent("child", "parent")
 			ipamRng := newIPAMRange(child)
 
-			Expect(k8sClient.Create(ctx, ipamRng)).Should(Succeed())
 			Expect(k8sClient.Create(ctx, parent)).Should(Succeed())
 			Expect(k8sClient.Create(ctx, child)).Should(Succeed())
+			Eventually(func() error {
+				return k8sClient.Get(ctx, objectKey(ipamRng), ipamRng)
+			}, timeout, interval).Should(BeNil())
 
 			By("patching the spec of the owned IPAMRange")
 			Eventually(func() bool {
