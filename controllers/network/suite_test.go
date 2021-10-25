@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package network
 
 import (
@@ -21,11 +20,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	ctrl "sigs.k8s.io/controller-runtime"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"k8s.io/client-go/kubernetes/scheme"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -45,7 +43,7 @@ var (
 func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
 
-	RunSpecs(t, "Newwork Controller Suite")
+	RunSpecs(t, "Network Controller Suite")
 }
 
 var _ = BeforeSuite(func() {
