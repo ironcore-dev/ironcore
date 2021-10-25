@@ -23,12 +23,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"inet.af/netaddr"
-	core "k8s.io/api/core/v1"
-	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/onmetal/onmetal-api/apis/common/v1alpha1"
-	nw "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
+	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 )
 
 var _ = Describe("subnet controller", func() {
@@ -42,7 +42,7 @@ var _ = Describe("subnet controller", func() {
 			Expect(k8sClient.Create(ctx, subnet)).Should(Succeed())
 
 			Eventually(func() bool {
-				rngGot := &nw.IPAMRange{}
+				rngGot := &networkv1alpha1.IPAMRange{}
 				Expect(k8sClient.Get(ctx, objectKey(ipamRange), rngGot)).To(Succeed())
 				return rngGot.Spec.CIDRs == nil
 			}, timeout, interval).Should(BeTrue())
@@ -59,7 +59,7 @@ var _ = Describe("subnet controller", func() {
 
 			By("patching the spec. of the related IPAMRange")
 			Eventually(func() bool {
-				rngGot := &nw.IPAMRange{}
+				rngGot := &networkv1alpha1.IPAMRange{}
 				Expect(k8sClient.Get(ctx, objectKey(ipamRange), rngGot)).Should(Succeed())
 
 				return func() bool {
@@ -73,11 +73,11 @@ var _ = Describe("subnet controller", func() {
 
 			By("patching the status of the Subnet")
 			Eventually(func() bool {
-				netGot := &nw.Subnet{}
+				netGot := &networkv1alpha1.Subnet{}
 				Expect(k8sClient.Get(ctx, objectKey(subnet), netGot)).Should(Succeed())
 
 				return func() bool {
-					return netGot.Status.State == nw.SubnetStateUp
+					return netGot.Status.State == networkv1alpha1.SubnetStateUp
 				}()
 			}, timeout, interval).Should(BeTrue())
 		})
@@ -93,7 +93,7 @@ var _ = Describe("subnet controller", func() {
 
 			By("patching the spec of the owned IPAMRange")
 			Eventually(func() bool {
-				rngGot := &nw.IPAMRange{}
+				rngGot := &networkv1alpha1.IPAMRange{}
 				Expect(k8sClient.Get(ctx, objectKey(ipamRng), rngGot)).Should(Succeed())
 
 				return func() bool {
@@ -104,20 +104,20 @@ var _ = Describe("subnet controller", func() {
 					}
 
 					// Check if the IPAMRange is patched
-					return parentRng.Name == nw.SubnetIPAMName(parentSubnet.Name) &&
+					return parentRng.Name == networkv1alpha1.SubnetIPAMName(parentSubnet.Name) &&
 						rngGot.Spec.CIDRs == nil &&
-						reflect.DeepEqual(rngGot.Spec.Requests[0], nw.IPAMRangeRequest{CIDR: &child.Spec.Ranges[0].CIDR})
+						reflect.DeepEqual(rngGot.Spec.Requests[0], networkv1alpha1.IPAMRangeRequest{CIDR: &child.Spec.Ranges[0].CIDR})
 
 				}()
 			}, timeout, interval).Should(BeTrue())
 
 			By("patching the status of the Subnet")
 			Eventually(func() bool {
-				netGot := &nw.Subnet{}
+				netGot := &networkv1alpha1.Subnet{}
 				Expect(k8sClient.Get(ctx, objectKey(child), netGot)).Should(Succeed())
 
 				return func() bool {
-					return netGot.Status.State == nw.SubnetStateUp
+					return netGot.Status.State == networkv1alpha1.SubnetStateUp
 				}()
 			}, timeout, interval).Should(BeTrue())
 		})
@@ -136,31 +136,31 @@ const (
 
 var objectKey = client.ObjectKeyFromObject
 
-func newIPAMRange(sub *nw.Subnet) *nw.IPAMRange {
-	rng := &nw.IPAMRange{}
+func newIPAMRange(sub *networkv1alpha1.Subnet) *networkv1alpha1.IPAMRange {
+	rng := &networkv1alpha1.IPAMRange{}
 	rng.Namespace = sub.Namespace
-	rng.Name = nw.SubnetIPAMName(sub.Name)
+	rng.Name = networkv1alpha1.SubnetIPAMName(sub.Name)
 	return rng
 }
 
-func newSubnet(name string) *nw.Subnet {
-	subnet := &nw.Subnet{}
+func newSubnet(name string) *networkv1alpha1.Subnet {
+	subnet := &networkv1alpha1.Subnet{}
 	subnet.Namespace = ns
 	subnet.Name = name
 
 	ipPrefix, err := netaddr.ParseIPPrefix(ipPrefix)
 	Expect(err).ToNot(HaveOccurred())
-	subnet.Spec.Ranges = []nw.RangeType{{CIDR: v1alpha1.CIDR{IPPrefix: ipPrefix}}}
+	subnet.Spec.Ranges = []networkv1alpha1.RangeType{{CIDR: v1alpha1.CIDR{IPPrefix: ipPrefix}}}
 	return subnet
 }
 
-func newSubnetWithParent(name, parentName string) *nw.Subnet {
+func newSubnetWithParent(name, parentName string) *networkv1alpha1.Subnet {
 	subnet := newSubnet(name)
-	subnet.Spec.Parent = &core.LocalObjectReference{Name: parentName}
+	subnet.Spec.Parent = &corev1.LocalObjectReference{Name: parentName}
 	return subnet
 }
 
-func now() *meta.Time {
-	now := meta.NewTime(time.Now())
+func now() *metav1.Time {
+	now := metav1.NewTime(time.Now())
 	return &now
 }
