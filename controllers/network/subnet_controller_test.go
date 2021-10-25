@@ -43,7 +43,7 @@ var _ = Describe("subnet controller", func() {
 
 			Eventually(func() bool {
 				rngGot := &nw.IPAMRange{}
-				Expect(k8sClient.Get(ctx, objectKey(ipamRange), rngGot))
+				Expect(k8sClient.Get(ctx, objectKey(ipamRange), rngGot)).To(Succeed())
 				return rngGot.Spec.CIDRs == nil
 			}, timeout, interval).Should(BeTrue())
 		})
