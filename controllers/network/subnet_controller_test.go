@@ -162,11 +162,6 @@ func newSubnetWithParent(name, parentName string) *networkv1alpha1.Subnet {
 	return subnet
 }
 
-func now() *metav1.Time {
-	now := metav1.NewTime(time.Now())
-	return &now
-}
-
 func controllerReference(subnet *networkv1alpha1.Subnet) metav1.OwnerReference {
 	return metav1.OwnerReference{
 		APIVersion:         networkv1alpha1.GroupVersion.String(),
