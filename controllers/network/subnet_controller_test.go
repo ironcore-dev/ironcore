@@ -25,6 +25,7 @@ import (
 	"inet.af/netaddr"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/onmetal/onmetal-api/apis/common/v1alpha1"
@@ -32,24 +33,19 @@ import (
 )
 
 var _ = Describe("subnet controller", func() {
-	Context("reconcileExists", func() {
-		It("finishes reconciliation early if the instance is being deleted", func() {
-			subnet := newSubnet("early-finished")
-			subnet.DeletionTimestamp = now()
-			ipamRange := newIPAMRange(subnet)
-
-			Expect(k8sClient.Create(ctx, ipamRange)).Should(Succeed())
+	Context("Reconcile", func() {
+		It("sets the owner Subnet as a Controller OwnerReference on the controlled IPAMRange", func() {
+			subnet := newSubnet("owner")
 			Expect(k8sClient.Create(ctx, subnet)).Should(Succeed())
 
-			Eventually(func() bool {
-				rngGot := &networkv1alpha1.IPAMRange{}
-				Expect(k8sClient.Get(ctx, objectKey(ipamRange), rngGot)).To(Succeed())
-				return rngGot.Spec.CIDRs == nil
-			}, timeout, interval).Should(BeTrue())
-		})
-	})
+			ipamRange := newIPAMRange(subnet)
+			Eventually(func() error {
+				return k8sClient.Get(ctx, objectKey(ipamRange), ipamRange)
+			}, timeout, interval).Should(BeNil())
 
-	Context("Reconcile", func() {
+			Expect(ipamRange.OwnerReferences).To(ContainElement(controllerReference(subnet)))
+		})
+
 		It("reconciles a subnet without parent", func() {
 			subnet := newSubnet("no-parant")
 			ipamRange := newIPAMRange(subnet)
@@ -145,6 +141,8 @@ func newIPAMRange(sub *networkv1alpha1.Subnet) *networkv1alpha1.IPAMRange {
 
 func newSubnet(name string) *networkv1alpha1.Subnet {
 	subnet := &networkv1alpha1.Subnet{}
+	subnet.APIVersion = networkv1alpha1.GroupVersion.String()
+	subnet.Kind = networkv1alpha1.SubnetGK.Kind
 	subnet.Namespace = ns
 	subnet.Name = name
 
@@ -163,4 +161,16 @@ func newSubnetWithParent(name, parentName string) *networkv1alpha1.Subnet {
 func now() *metav1.Time {
 	now := metav1.NewTime(time.Now())
 	return &now
+}
+
+func controllerReference(subnet *networkv1alpha1.Subnet) metav1.OwnerReference {
+	return metav1.OwnerReference{
+		APIVersion:         networkv1alpha1.GroupVersion.String(),
+		Kind:               networkv1alpha1.SubnetGK.Kind,
+		Name:               subnet.Name,
+		UID:                subnet.UID,
+		BlockOwnerDeletion: pointer.BoolPtr(true),
+		Controller:         pointer.BoolPtr(true),
+	}
+
 }
