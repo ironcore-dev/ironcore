@@ -17,7 +17,6 @@
 package network
 
 import (
-	"reflect"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -57,28 +56,16 @@ var _ = Describe("subnet controller", func() {
 			}, timeout, interval).Should(BeNil())
 
 			By("wating for the status of the owned IPAMRange to have an allocated CIDR")
-			Eventually(func() bool {
-				rngGot := &networkv1alpha1.IPAMRange{}
-				Expect(k8sClient.Get(ctx, objectKey(ipamRng), rngGot)).Should(Succeed())
-
-				return func() bool {
-					if rngGot.Status.Allocations == nil {
-						return false
-					}
-
-					return reflect.DeepEqual(rngGot.Spec.CIDRs[0], subnet.Spec.Ranges[0].CIDR)
-				}()
-			}, timeout, interval).Should(BeTrue())
+			Eventually(func() []v1alpha1.CIDR {
+				Expect(k8sClient.Get(ctx, objectKey(ipamRng), ipamRng)).Should(Succeed())
+				return ipamRng.Spec.CIDRs
+			}, timeout, interval).Should(Equal([]v1alpha1.CIDR{subnet.Spec.Ranges[0].CIDR}))
 
 			By("waiting for the status of the Subnet to become up")
-			Eventually(func() bool {
-				netGot := &networkv1alpha1.Subnet{}
-				Expect(k8sClient.Get(ctx, objectKey(subnet), netGot)).Should(Succeed())
-
-				return func() bool {
-					return netGot.Status.State == networkv1alpha1.SubnetStateUp
-				}()
-			}, timeout, interval).Should(BeTrue())
+			Eventually(func() networkv1alpha1.SubnetState {
+				Expect(k8sClient.Get(ctx, objectKey(subnet), subnet)).Should(Succeed())
+				return subnet.Status.State
+			}, timeout, interval).Should(Equal(networkv1alpha1.SubnetStateUp))
 		})
 
 		It("reconciles a subnet with parent", func() {
