@@ -82,46 +82,28 @@ var _ = Describe("subnet controller", func() {
 		})
 
 		It("reconciles a subnet with parent", func() {
-			parent := newSubnet("parent")
-			child := newSubnetWithParent("child", "parent")
-			ipamRng := newIPAMRange(child)
+			parentNet := newSubnet("parent")
+			childNet := newSubnetWithParent("child", "parent")
+			childRng := newIPAMRange(childNet)
 
-			By("creating a pair of parent- and child-Subnet")
-			Expect(k8sClient.Create(ctx, parent)).Should(Succeed())
-			Expect(k8sClient.Create(ctx, child)).Should(Succeed())
+			By("creating a pair of parent and child Subnet")
+			Expect(k8sClient.Create(ctx, parentNet)).Should(Succeed())
+			Expect(k8sClient.Create(ctx, childNet)).Should(Succeed())
 			Eventually(func() error {
-				return k8sClient.Get(ctx, objectKey(ipamRng), ipamRng)
+				return k8sClient.Get(ctx, objectKey(childRng), childRng)
 			}, timeout, interval).Should(BeNil())
 
-			By("wating for the spec of the child-IPAMRange to be patched")
-			Eventually(func() bool {
-				rngGot := &networkv1alpha1.IPAMRange{}
-				Expect(k8sClient.Get(ctx, objectKey(ipamRng), rngGot)).Should(Succeed())
-
-				return func() bool {
-					parentRng := rngGot.Spec.Parent
-					parentSubnet := child.Spec.Parent
-					if parentRng == nil || parentSubnet == nil {
-						return false
-					}
-
-					// Check if the IPAMRange is patched
-					return parentRng.Name == networkv1alpha1.SubnetIPAMName(parentSubnet.Name) &&
-						rngGot.Spec.CIDRs == nil &&
-						reflect.DeepEqual(rngGot.Spec.Requests[0], networkv1alpha1.IPAMRangeRequest{CIDR: &child.Spec.Ranges[0].CIDR})
-
-				}()
-			}, timeout, interval).Should(BeTrue())
+			By("wating for the spec of the child IPAMRange to be patched")
+			Eventually(func() *networkv1alpha1.IPAMRangeSpec {
+				Expect(k8sClient.Get(ctx, objectKey(childRng), childRng)).Should(Succeed())
+				return &childRng.Spec
+			}, timeout, interval).Should(Equal(ipamRangeSpec(childNet)))
 
 			By("waiting for the status of the Subnet to be become up")
-			Eventually(func() bool {
-				netGot := &networkv1alpha1.Subnet{}
-				Expect(k8sClient.Get(ctx, objectKey(child), netGot)).Should(Succeed())
-
-				return func() bool {
-					return netGot.Status.State == networkv1alpha1.SubnetStateUp
-				}()
-			}, timeout, interval).Should(BeTrue())
+			Eventually(func() networkv1alpha1.SubnetState {
+				Expect(k8sClient.Get(ctx, objectKey(childNet), childNet)).Should(Succeed())
+				return childNet.Status.State
+			}, timeout, interval).Should(Equal(networkv1alpha1.SubnetStateUp))
 		})
 	})
 })
@@ -137,6 +119,13 @@ const (
 )
 
 var objectKey = client.ObjectKeyFromObject
+
+func ipamRangeSpec(subnet *networkv1alpha1.Subnet) *networkv1alpha1.IPAMRangeSpec {
+	rngSpec := &networkv1alpha1.IPAMRangeSpec{}
+	rngSpec.Parent = &corev1.LocalObjectReference{Name: networkv1alpha1.SubnetIPAMName(subnet.Spec.Parent.Name)}
+	rngSpec.Requests = []networkv1alpha1.IPAMRangeRequest{{CIDR: &subnet.Spec.Ranges[0].CIDR}}
+	return rngSpec
+}
 
 func newIPAMRange(sub *networkv1alpha1.Subnet) *networkv1alpha1.IPAMRange {
 	rng := &networkv1alpha1.IPAMRange{}
