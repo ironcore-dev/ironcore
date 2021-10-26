@@ -59,7 +59,7 @@ var _ = Describe("subnet controller", func() {
 			Eventually(func() []v1alpha1.CIDR {
 				Expect(k8sClient.Get(ctx, objectKey(ipamRng), ipamRng)).Should(Succeed())
 				return ipamRng.Spec.CIDRs
-			}, timeout, interval).Should(Equal([]v1alpha1.CIDR{subnet.Spec.Ranges[0].CIDR}))
+			}, timeout, interval).Should(ContainElement(subnet.Spec.Ranges[0].CIDR))
 
 			By("waiting for the status of the Subnet to become up")
 			Eventually(func() networkv1alpha1.SubnetState {
