@@ -49,13 +49,12 @@ var _ = Describe("IPAMRangeReconciler", func() {
 		It("should reconcile parent without children", func() {
 			parent := createParentIPAMRange(ctx, ns)
 			validateAllocations(
-				ctx,
-				parent,
+				ctx, parent,
 				map[string]networkv1alpha1.IPAMRangeAllocationState{
 					parentCIDR: networkv1alpha1.IPAMRangeAllocationFree,
 				},
 				nil,
-				nil,
+				nil, nil,
 			)
 		})
 		It("should update parent allocations with CIDR request", func() {
@@ -67,23 +66,21 @@ var _ = Describe("IPAMRangeReconciler", func() {
 			}
 			child := createIPAMRange(ctx, meta, "192.168.1.0/25", parent.Name, nil, 0, 0)
 			validateAllocations(
-				ctx,
-				parent,
+				ctx, parent,
 				map[string]networkv1alpha1.IPAMRangeAllocationState{
 					"192.168.1.0/25":   networkv1alpha1.IPAMRangeAllocationUsed,
 					"192.168.1.128/25": networkv1alpha1.IPAMRangeAllocationFree,
 				},
 				nil,
-				nil,
+				nil, nil,
 			)
 			validateAllocations(
-				ctx,
-				child,
+				ctx, child,
 				map[string]networkv1alpha1.IPAMRangeAllocationState{
 					"192.168.1.0/25": networkv1alpha1.IPAMRangeAllocationFree,
 				},
 				nil,
-				nil,
+				nil, nil,
 			)
 		})
 		It("should update parent allocations with size request", func() {
@@ -95,23 +92,21 @@ var _ = Describe("IPAMRangeReconciler", func() {
 			}
 			child := createIPAMRange(ctx, meta, "", parent.Name, nil, 25, 0)
 			validateAllocations(
-				ctx,
-				parent,
+				ctx, parent,
 				map[string]networkv1alpha1.IPAMRangeAllocationState{
 					"192.168.1.0/25":   networkv1alpha1.IPAMRangeAllocationUsed,
 					"192.168.1.128/25": networkv1alpha1.IPAMRangeAllocationFree,
 				},
 				nil,
-				nil,
+				nil, nil,
 			)
 			validateAllocations(
-				ctx,
-				child,
+				ctx, child,
 				map[string]networkv1alpha1.IPAMRangeAllocationState{
 					"192.168.1.0/25": networkv1alpha1.IPAMRangeAllocationFree,
 				},
 				nil,
-				nil,
+				nil, nil,
 			)
 		})
 		It("should update parent allocations with ip request", func() {
@@ -129,20 +124,18 @@ var _ = Describe("IPAMRangeReconciler", func() {
 			}
 			child := createIPAMRange(ctx, meta, "", parent.Name, ipRange, 0, 0)
 			validateAllocations(
-				ctx,
-				parent,
+				ctx, parent,
 				map[string]networkv1alpha1.IPAMRangeAllocationState{
 					"192.168.1.128/25": networkv1alpha1.IPAMRangeAllocationFree,
 				},
 				nil,
-				ipRange,
+				ipRange, nil,
 			)
 			validateAllocations(
-				ctx,
-				child,
+				ctx, child,
 				nil,
 				nil,
-				ipRange,
+				ipRange, nil,
 			)
 		})
 
@@ -185,20 +178,18 @@ var _ = Describe("IPAMRangeReconciler", func() {
 			}
 			child := createIPAMRange(ctx, meta, "192.168.2.0/25", parent.Name, nil, 0, 0)
 			validateAllocations(
-				ctx,
-				parent,
+				ctx, parent,
 				map[string]networkv1alpha1.IPAMRangeAllocationState{
 					parentCIDR: networkv1alpha1.IPAMRangeAllocationFree,
 				},
 				child.Spec.Requests,
-				nil,
+				nil, nil,
 			)
 			validateAllocations(
-				ctx,
-				child,
+				ctx, child,
 				nil,
 				child.Spec.Requests,
-				nil,
+				nil, nil,
 			)
 		})
 		It("allocation should fail if size is too big", func() {
@@ -210,20 +201,18 @@ var _ = Describe("IPAMRangeReconciler", func() {
 			}
 			child := createIPAMRange(ctx, meta, "", parent.Name, nil, 23, 0)
 			validateAllocations(
-				ctx,
-				parent,
+				ctx, parent,
 				map[string]networkv1alpha1.IPAMRangeAllocationState{
 					parentCIDR: networkv1alpha1.IPAMRangeAllocationFree,
 				},
 				child.Spec.Requests,
-				nil,
+				nil, nil,
 			)
 			validateAllocations(
-				ctx,
-				child,
+				ctx, child,
 				nil,
 				child.Spec.Requests,
-				nil,
+				nil, nil,
 			)
 		})
 		It("allocation should fail if ip is out of range", func() {
@@ -241,24 +230,75 @@ var _ = Describe("IPAMRangeReconciler", func() {
 			}
 			child := createIPAMRange(ctx, meta, "", parent.Name, ipRange, 0, 0)
 			validateAllocations(
+				ctx, parent,
+				map[string]networkv1alpha1.IPAMRangeAllocationState{
+					parentCIDR: networkv1alpha1.IPAMRangeAllocationFree,
+				},
+				child.Spec.Requests,
+				nil, nil,
+			)
+			validateAllocations(
+				ctx, child,
+				nil,
+				child.Spec.Requests,
+				nil, nil,
+			)
+		})
+		It("should update allocations when CIDR is changed", func() {
+			parent := createParentIPAMRange(ctx, ns)
+
+			meta := metav1.ObjectMeta{
+				Name:      "child",
+				Namespace: ns.Name,
+			}
+
+			// Allocation should fail at first, because request CIDR is out of range
+			child := createIPAMRange(ctx, meta, "192.168.2.0/25", parent.Name, nil, 0, 0)
+			// Change parent CIDR and wait for allocation to succeed
+			callback := func() {
+				prefix, err := netaddr.ParseIPPrefix("192.168.2.0/24")
+				Expect(err).ToNot(HaveOccurred())
+
+				updParent := &networkv1alpha1.IPAMRange{}
+				k8sClient.Get(ctx, types.NamespacedName{
+					Name:      parent.Name,
+					Namespace: parent.Namespace,
+				}, updParent)
+				updParent.Spec.CIDRs = []commonv1alpha1.CIDR{commonv1alpha1.NewCIDR(prefix)}
+				Expect(k8sClient.Update(ctx, updParent)).To(Succeed())
+				validateAllocations(
+					ctx, updParent,
+					map[string]networkv1alpha1.IPAMRangeAllocationState{
+						"192.168.2.0/25":   networkv1alpha1.IPAMRangeAllocationUsed,
+						"192.168.2.128/25": networkv1alpha1.IPAMRangeAllocationFree,
+					},
+					nil, nil, nil,
+				)
+				validateAllocations(
+					ctx, child,
+					map[string]networkv1alpha1.IPAMRangeAllocationState{
+						"192.168.2.0/25": networkv1alpha1.IPAMRangeAllocationFree,
+					},
+					nil, nil, nil,
+				)
+			}
+			validateAllocations(
 				ctx,
 				parent,
 				map[string]networkv1alpha1.IPAMRangeAllocationState{
 					parentCIDR: networkv1alpha1.IPAMRangeAllocationFree,
 				},
 				child.Spec.Requests,
-				nil,
+				nil, callback,
 			)
 			validateAllocations(
 				ctx,
 				child,
 				nil,
 				child.Spec.Requests,
-				nil,
+				nil, nil,
 			)
 		})
-
-		//It("should update allocations when CIDR is changed", func(){})
 	})
 })
 
@@ -317,6 +357,7 @@ func validateAllocations(
 	cidrToState map[string]networkv1alpha1.IPAMRangeAllocationState,
 	failedRequests []networkv1alpha1.IPAMRangeRequest,
 	ipRange *commonv1alpha1.IPRange,
+	callback func(),
 ) {
 	Eventually(func() bool {
 		key := types.NamespacedName{Name: obj.Name, Namespace: obj.Namespace}
@@ -384,6 +425,9 @@ func validateAllocations(
 			}
 		}
 
+		if callback != nil {
+			go callback()
+		}
 		return true
 	}, timeout, interval).Should(BeTrue())
 }
