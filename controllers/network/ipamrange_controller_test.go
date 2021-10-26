@@ -138,37 +138,27 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				ipRange, nil,
 			)
 		})
+		It("should update parent allocations with ip count request", func() {
+			parent := createParentIPAMRange(ctx, ns)
 
-		// TODO: currently it's possible to request only single IP address with IPCount
-		// TODO: so 2 tests below are commented
-		//It("should update parent allocations with ip count request", func() {
-		//	parent := createParentIPAMRange(ctx, ns)
-		//
-		//	meta := metav1.ObjectMeta{
-		//		Name:      "child",
-		//		Namespace: ns.Name,
-		//	}
-		//	child := createIPAMRange(ctx, meta, "", parent.Name, nil, 0, 128)
-		//	validateAllocations(
-		//		ctx,
-		//		parent,
-		//		map[string]networkv1alpha1.IPAMRangeAllocationState{
-		//			"192.168.1.0/25":   networkv1alpha1.IPAMRangeAllocationUsed,
-		//			"192.168.1.128/25": networkv1alpha1.IPAMRangeAllocationFree,
-		//		},
-		//		nil,
-		//	)
-		//	validateAllocations(
-		//		ctx,
-		//		child,
-		//		map[string]networkv1alpha1.IPAMRangeAllocationState{
-		//			"192.168.1.0/25": networkv1alpha1.IPAMRangeAllocationFree,
-		//		},
-		//		nil,
-		//	)
-		//})
-		//It("allocations should fail if ip count is too big", func() {})
+			meta := metav1.ObjectMeta{
+				Name:      "child",
+				Namespace: ns.Name,
+			}
+			child := createIPAMRange(ctx, meta, "", parent.Name, nil, 0, 1)
 
+			fromIP, _ := netaddr.ParseIP("192.168.1.1")
+			toIP, _ := netaddr.ParseIP("192.168.1.1")
+			ipRange := &commonv1alpha1.IPRange{
+				From: commonv1alpha1.NewIPAddr(fromIP),
+				To:   commonv1alpha1.NewIPAddr(toIP),
+			}
+			checkRangeExists(ctx, parent, ipRange)
+			validateAllocations(
+				ctx, child,
+				nil, nil, ipRange, nil,
+			)
+		})
 		It("allocation should fail if CIDR is out of range", func() {
 			parent := createParentIPAMRange(ctx, ns)
 
@@ -260,10 +250,10 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				updParent := &networkv1alpha1.IPAMRange{}
-				k8sClient.Get(ctx, types.NamespacedName{
+				Expect(k8sClient.Get(ctx, types.NamespacedName{
 					Name:      parent.Name,
 					Namespace: parent.Namespace,
-				}, updParent)
+				}, updParent)).ToNot(HaveOccurred())
 				updParent.Spec.CIDRs = []commonv1alpha1.CIDR{commonv1alpha1.NewCIDR(prefix)}
 				Expect(k8sClient.Update(ctx, updParent)).To(Succeed())
 				validateAllocations(
@@ -429,6 +419,30 @@ func validateAllocations(
 			go callback()
 		}
 		return true
+	}, timeout, interval).Should(BeTrue())
+}
+
+func checkRangeExists(
+	ctx context.Context,
+	obj *networkv1alpha1.IPAMRange,
+	ipRange *commonv1alpha1.IPRange,
+) {
+	Eventually(func() bool {
+		key := types.NamespacedName{Name: obj.Name, Namespace: obj.Namespace}
+		freshObj := &networkv1alpha1.IPAMRange{}
+		if err := k8sClient.Get(ctx, key, freshObj); err != nil {
+			return false
+		}
+
+		for _, alloc := range freshObj.Status.Allocations {
+			if alloc.IPs != nil {
+				if reflect.DeepEqual(alloc.IPs, ipRange) {
+					return true
+				}
+			}
+		}
+
+		return false
 	}, timeout, interval).Should(BeTrue())
 }
 
