@@ -46,16 +46,17 @@ var _ = Describe("subnet controller", func() {
 			Expect(ipamRng.OwnerReferences).To(ContainElement(controllerReference(subnet)))
 		})
 
-		It("reconciles a subnet without parent", func() {
+		It("reconciles a Subnet without parent", func() {
 			subnet := newSubnet("no-parant")
 			ipamRng := newIPAMRange(subnet)
 
+			By("creating a Subnet without parent")
 			Expect(k8sClient.Create(ctx, subnet)).Should(Succeed())
 			Eventually(func() error {
 				return k8sClient.Get(ctx, objectKey(ipamRng), ipamRng)
 			}, timeout, interval).Should(BeNil())
 
-			By("patching the spec. of the related IPAMRange")
+			By("wating for the status of the owned IPAMRange to have an allocated CIDR")
 			Eventually(func() bool {
 				rngGot := &networkv1alpha1.IPAMRange{}
 				Expect(k8sClient.Get(ctx, objectKey(ipamRng), rngGot)).Should(Succeed())
@@ -69,7 +70,7 @@ var _ = Describe("subnet controller", func() {
 				}()
 			}, timeout, interval).Should(BeTrue())
 
-			By("patching the status of the Subnet")
+			By("waiting for the status of the Subnet to become up")
 			Eventually(func() bool {
 				netGot := &networkv1alpha1.Subnet{}
 				Expect(k8sClient.Get(ctx, objectKey(subnet), netGot)).Should(Succeed())
@@ -85,13 +86,14 @@ var _ = Describe("subnet controller", func() {
 			child := newSubnetWithParent("child", "parent")
 			ipamRng := newIPAMRange(child)
 
+			By("creating a pair of parent- and child-Subnet")
 			Expect(k8sClient.Create(ctx, parent)).Should(Succeed())
 			Expect(k8sClient.Create(ctx, child)).Should(Succeed())
 			Eventually(func() error {
 				return k8sClient.Get(ctx, objectKey(ipamRng), ipamRng)
 			}, timeout, interval).Should(BeNil())
 
-			By("patching the spec of the owned IPAMRange")
+			By("wating for the spec of the child-IPAMRange to be patched")
 			Eventually(func() bool {
 				rngGot := &networkv1alpha1.IPAMRange{}
 				Expect(k8sClient.Get(ctx, objectKey(ipamRng), rngGot)).Should(Succeed())
@@ -111,7 +113,7 @@ var _ = Describe("subnet controller", func() {
 				}()
 			}, timeout, interval).Should(BeTrue())
 
-			By("patching the status of the Subnet")
+			By("waiting for the status of the Subnet to be become up")
 			Eventually(func() bool {
 				netGot := &networkv1alpha1.Subnet{}
 				Expect(k8sClient.Get(ctx, objectKey(child), netGot)).Should(Succeed())
