@@ -61,6 +61,19 @@ spec:
                   x-kubernetes-int-or-string: true
                 description: Available list the available capacity of a storage pool
                 type: object
+              availableStorageClasses:
+                description: AvailableStorageClasses list the references of supported
+                  StorageClasses of this pool
+                items:
+                  description: LocalObjectReference contains enough information to
+                    let you locate the referenced object inside the same namespace.
+                  properties:
+                    name:
+                      description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                        TODO: Add other useful fields. apiVersion, kind, uid?'
+                      type: string
+                  type: object
+                type: array
               conditions:
                 items:
                   description: StoragePoolCondition is one of the conditions of a
