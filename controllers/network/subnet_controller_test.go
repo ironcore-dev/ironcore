@@ -23,6 +23,7 @@ import (
 	. "github.com/onsi/gomega"
 	"inet.af/netaddr"
 	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -40,7 +41,7 @@ var _ = Describe("subnet controller", func() {
 
 			Expect(k8sClient.Create(ctx, subnet)).Should(Succeed())
 			Eventually(func() error {
-				return k8sClient.Get(ctx, ipamRngKey, ipamRng)
+				return notFoundOrSucceed(k8sClient.Get(ctx, ipamRngKey, ipamRng))
 			}, timeout, interval).Should(Succeed())
 
 			Expect(ipamRng.OwnerReferences).To(ContainElement(controllerReference(subnet)))
@@ -56,7 +57,7 @@ var _ = Describe("subnet controller", func() {
 			By("creating a Subnet without parent")
 			Expect(k8sClient.Create(ctx, subnet)).Should(Succeed())
 			Eventually(func() error {
-				return k8sClient.Get(ctx, ipamRngKey, ipamRng)
+				return notFoundOrSucceed(k8sClient.Get(ctx, ipamRngKey, ipamRng))
 			}, timeout, interval).Should(Succeed())
 
 			By("wating for the status of the owned IPAMRange to have an allocated CIDR")
@@ -84,7 +85,7 @@ var _ = Describe("subnet controller", func() {
 			Expect(k8sClient.Create(ctx, parentNet)).Should(Succeed())
 			Expect(k8sClient.Create(ctx, childNet)).Should(Succeed())
 			Eventually(func() error {
-				return k8sClient.Get(ctx, childRngKey, childRng)
+				return notFoundOrSucceed(k8sClient.Get(ctx, childRngKey, childRng))
 			}, timeout, interval).Should(Succeed())
 
 			By("wating for the spec of the child IPAMRange to be patched")
@@ -145,6 +146,11 @@ func newSubnetWithParent(name, parentName string) *networkv1alpha1.Subnet {
 	subnet := newSubnet(name)
 	subnet.Spec.Parent = &corev1.LocalObjectReference{Name: parentName}
 	return subnet
+}
+
+func notFoundOrSucceed(err error) error {
+	Expect(apierrors.IsNotFound(err) || err == nil).To(BeTrue(), "error is `not found` or nil")
+	return err
 }
 
 func controllerReference(subnet *networkv1alpha1.Subnet) metav1.OwnerReference {
