@@ -115,6 +115,17 @@ const (
 
 var objectKey = client.ObjectKeyFromObject
 
+func controllerReference(subnet *networkv1alpha1.Subnet) metav1.OwnerReference {
+	return metav1.OwnerReference{
+		APIVersion:         networkv1alpha1.GroupVersion.String(),
+		Kind:               networkv1alpha1.SubnetGK.Kind,
+		Name:               subnet.Name,
+		UID:                subnet.UID,
+		BlockOwnerDeletion: pointer.BoolPtr(true),
+		Controller:         pointer.BoolPtr(true),
+	}
+}
+
 func ipamRangeSpec(subnet *networkv1alpha1.Subnet) *networkv1alpha1.IPAMRangeSpec {
 	rngSpec := &networkv1alpha1.IPAMRangeSpec{}
 	rngSpec.Parent = &corev1.LocalObjectReference{Name: networkv1alpha1.SubnetIPAMName(subnet.Spec.Parent.Name)}
@@ -151,16 +162,4 @@ func newSubnetWithParent(name, parentName string) *networkv1alpha1.Subnet {
 func notFoundOrSucceed(err error) error {
 	Expect(apierrors.IsNotFound(err) || err == nil).To(BeTrue(), "error is `not found` or nil")
 	return err
-}
-
-func controllerReference(subnet *networkv1alpha1.Subnet) metav1.OwnerReference {
-	return metav1.OwnerReference{
-		APIVersion:         networkv1alpha1.GroupVersion.String(),
-		Kind:               networkv1alpha1.SubnetGK.Kind,
-		Name:               subnet.Name,
-		UID:                subnet.UID,
-		BlockOwnerDeletion: pointer.BoolPtr(true),
-		Controller:         pointer.BoolPtr(true),
-	}
-
 }
