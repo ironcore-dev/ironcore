@@ -35,11 +35,12 @@ var _ = Describe("subnet controller", func() {
 	Context("Reconcile", func() {
 		It("sets the owner Subnet as a Controller OwnerReference on the controlled IPAMRange", func() {
 			subnet := newSubnet("owner")
-			Expect(k8sClient.Create(ctx, subnet)).Should(Succeed())
-
 			ipamRng := newIPAMRange(subnet)
+			ipamRngKey := objectKey(ipamRng)
+
+			Expect(k8sClient.Create(ctx, subnet)).Should(Succeed())
 			Eventually(func() error {
-				return k8sClient.Get(ctx, objectKey(ipamRng), ipamRng)
+				return k8sClient.Get(ctx, ipamRngKey, ipamRng)
 			}, timeout, interval).Should(BeNil())
 
 			Expect(ipamRng.OwnerReferences).To(ContainElement(controllerReference(subnet)))
@@ -49,21 +50,24 @@ var _ = Describe("subnet controller", func() {
 			subnet := newSubnet("no-parant")
 			ipamRng := newIPAMRange(subnet)
 
+			subnetKey := objectKey(subnet)
+			ipamRngKey := objectKey(ipamRng)
+
 			By("creating a Subnet without parent")
 			Expect(k8sClient.Create(ctx, subnet)).Should(Succeed())
 			Eventually(func() error {
-				return k8sClient.Get(ctx, objectKey(ipamRng), ipamRng)
+				return k8sClient.Get(ctx, ipamRngKey, ipamRng)
 			}, timeout, interval).Should(BeNil())
 
 			By("wating for the status of the owned IPAMRange to have an allocated CIDR")
 			Eventually(func() []v1alpha1.CIDR {
-				Expect(k8sClient.Get(ctx, objectKey(ipamRng), ipamRng)).Should(Succeed())
+				Expect(k8sClient.Get(ctx, ipamRngKey, ipamRng)).Should(Succeed())
 				return ipamRng.Spec.CIDRs
 			}, timeout, interval).Should(ContainElement(subnet.Spec.Ranges[0].CIDR))
 
 			By("waiting for the status of the Subnet to become up")
 			Eventually(func() networkv1alpha1.SubnetState {
-				Expect(k8sClient.Get(ctx, objectKey(subnet), subnet)).Should(Succeed())
+				Expect(k8sClient.Get(ctx, subnetKey, subnet)).Should(Succeed())
 				return subnet.Status.State
 			}, timeout, interval).Should(Equal(networkv1alpha1.SubnetStateUp))
 		})
@@ -73,22 +77,25 @@ var _ = Describe("subnet controller", func() {
 			childNet := newSubnetWithParent("child", "parent")
 			childRng := newIPAMRange(childNet)
 
+			childNetKey := objectKey(childNet)
+			childRngKey := objectKey(childRng)
+
 			By("creating a pair of parent and child Subnet")
 			Expect(k8sClient.Create(ctx, parentNet)).Should(Succeed())
 			Expect(k8sClient.Create(ctx, childNet)).Should(Succeed())
 			Eventually(func() error {
-				return k8sClient.Get(ctx, objectKey(childRng), childRng)
+				return k8sClient.Get(ctx, childRngKey, childRng)
 			}, timeout, interval).Should(BeNil())
 
 			By("wating for the spec of the child IPAMRange to be patched")
 			Eventually(func() *networkv1alpha1.IPAMRangeSpec {
-				Expect(k8sClient.Get(ctx, objectKey(childRng), childRng)).Should(Succeed())
+				Expect(k8sClient.Get(ctx, childRngKey, childRng)).Should(Succeed())
 				return &childRng.Spec
 			}, timeout, interval).Should(Equal(ipamRangeSpec(childNet)))
 
 			By("waiting for the status of the Subnet to be become up")
 			Eventually(func() networkv1alpha1.SubnetState {
-				Expect(k8sClient.Get(ctx, objectKey(childNet), childNet)).Should(Succeed())
+				Expect(k8sClient.Get(ctx, childNetKey, childNet)).Should(Succeed())
 				return childNet.Status.State
 			}, timeout, interval).Should(Equal(networkv1alpha1.SubnetStateUp))
 		})
