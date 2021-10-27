@@ -41,7 +41,7 @@ var _ = Describe("subnet controller", func() {
 			Expect(k8sClient.Create(ctx, subnet)).Should(Succeed())
 			Eventually(func() error {
 				return k8sClient.Get(ctx, ipamRngKey, ipamRng)
-			}, timeout, interval).Should(BeNil())
+			}, timeout, interval).Should(Succeed())
 
 			Expect(ipamRng.OwnerReferences).To(ContainElement(controllerReference(subnet)))
 		})
@@ -57,7 +57,7 @@ var _ = Describe("subnet controller", func() {
 			Expect(k8sClient.Create(ctx, subnet)).Should(Succeed())
 			Eventually(func() error {
 				return k8sClient.Get(ctx, ipamRngKey, ipamRng)
-			}, timeout, interval).Should(BeNil())
+			}, timeout, interval).Should(Succeed())
 
 			By("wating for the status of the owned IPAMRange to have an allocated CIDR")
 			Eventually(func() []v1alpha1.CIDR {
@@ -85,7 +85,7 @@ var _ = Describe("subnet controller", func() {
 			Expect(k8sClient.Create(ctx, childNet)).Should(Succeed())
 			Eventually(func() error {
 				return k8sClient.Get(ctx, childRngKey, childRng)
-			}, timeout, interval).Should(BeNil())
+			}, timeout, interval).Should(Succeed())
 
 			By("wating for the spec of the child IPAMRange to be patched")
 			Eventually(func() *networkv1alpha1.IPAMRangeSpec {
