@@ -111,7 +111,7 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 	AfterEach(func() {
 		cancel()
 		Expect(k8sClient.Delete(ctx, ns)).To(Succeed(), "failed to delete test namespace")
-		Expect(k8sClient.DeleteAllOf(ctx, &computev1alpha1.MachinePool{}))
+		Expect(k8sClient.DeleteAllOf(ctx, &computev1alpha1.MachinePool{})).To(Succeed())
 	})
 
 	return ns
