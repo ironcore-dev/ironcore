@@ -31,6 +31,8 @@ type StoragePoolSpec struct {
 type StoragePoolStatus struct {
 	State      StoragePoolState       `json:"state,omitempty"`
 	Conditions []StoragePoolCondition `json:"conditions,omitempty"`
+	// AvailableStorageClasses list the references of supported StorageClasses of this pool
+	AvailableStorageClasses []corev1.LocalObjectReference `json:"availableStorageClasses,omitempty"`
 	// Available list the available capacity of a storage pool
 	Available corev1.ResourceList `json:"available,omitempty"`
 	// Used indicates how much capacity has been used in a storage pool
