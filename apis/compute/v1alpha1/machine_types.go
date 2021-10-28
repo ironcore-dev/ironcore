@@ -128,6 +128,10 @@ type MachineStatus struct {
 type MachineState string
 
 const (
+	// MachineStatePending means the Machine has been accepted by the system, but not yet completely started.
+	// This includes time before being bound to a MachinePool, as well as time spent setting up the Machine on that
+	// MachinePool.
+	MachineStatePending  MachineState = "Pending"
 	MachineStateRunning  MachineState = "Running"
 	MachineStateShutdown MachineState = "Shutdown"
 	MachineStateError    MachineState = "Error"

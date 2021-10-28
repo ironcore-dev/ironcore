@@ -29,8 +29,9 @@ type MachinePoolSpec struct {
 
 // MachinePoolStatus defines the observed state of MachinePool
 type MachinePoolStatus struct {
-	State      MachinePoolState       `json:"state,omitempty"`
-	Conditions []MachinePoolCondition `json:"conditions,omitempty"`
+	State                   MachinePoolState              `json:"state,omitempty"`
+	Conditions              []MachinePoolCondition        `json:"conditions,omitempty"`
+	AvailableMachineClasses []corev1.LocalObjectReference `json:"availableMachineClasses,omitempty"`
 }
 
 // MachinePoolConditionType is a type a MachinePoolCondition can have.
