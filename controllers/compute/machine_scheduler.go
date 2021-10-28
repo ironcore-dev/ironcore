@@ -56,11 +56,6 @@ func (s *MachineScheduler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 
 func (s *MachineScheduler) schedule(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) (ctrl.Result, error) {
 	log.Info("Scheduling machine")
-	list := &computev1alpha1.MachinePoolList{}
-	if err := s.List(ctx, list, client.MatchingFields{machinePoolStatusAvailableMachineClassesNameField: machine.Spec.MachineClass.Name}); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error listing machine pools: %w", err)
-	}
-
 	if machine.Status.State != computev1alpha1.MachineStatePending {
 		base := machine.DeepCopy()
 		machine.Status.State = computev1alpha1.MachineStatePending
@@ -70,7 +65,18 @@ func (s *MachineScheduler) schedule(ctx context.Context, log logr.Logger, machin
 		return ctrl.Result{Requeue: true}, nil
 	}
 
-	if len(list.Items) == 0 {
+	list := &computev1alpha1.MachinePoolList{}
+	if err := s.List(ctx, list, client.MatchingFields{machinePoolStatusAvailableMachineClassesNameField: machine.Spec.MachineClass.Name}); err != nil {
+		return ctrl.Result{}, fmt.Errorf("error listing machine pools: %w", err)
+	}
+
+	var available []computev1alpha1.MachinePool
+	for _, pool := range list.Items {
+		if pool.DeletionTimestamp.IsZero() {
+			available = append(available, pool)
+		}
+	}
+	if len(available) == 0 {
 		log.Info("No machine pool available for machine class", "MachineClass", machine.Spec.MachineClass.Name)
 		s.Events.Eventf(machine, corev1.EventTypeNormal, "CannotSchedule", "No MachinePool found for MachineClass %s", machine.Spec.MachineClass.Name)
 		return ctrl.Result{}, nil
@@ -79,7 +85,7 @@ func (s *MachineScheduler) schedule(ctx context.Context, log logr.Logger, machin
 	// Get a random pool to distribute evenly.
 	// TODO: Instead of random distribution, try to come up w/ metrics that include usage of each pool to
 	// avoid unfortunate random distribution of items.
-	pool := list.Items[rand.Intn(len(list.Items))]
+	pool := available[rand.Intn(len(available))]
 	log = log.WithValues("MachinePool", pool.Name)
 	base := machine.DeepCopy()
 	machine.Spec.MachinePool.Name = pool.Name

@@ -69,10 +69,11 @@ var _ = Describe("MachineScheduler", func() {
 
 		By("waiting for the machine to indicate it is pending")
 		machineKey := client.ObjectKeyFromObject(machine)
-		Eventually(func(g Gomega) computev1alpha1.MachineState {
+		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, machineKey, machine)).To(Succeed())
-			return machine.Status.State
-		}).Should(Equal(computev1alpha1.MachineStatePending))
+			g.Expect(machine.Spec.MachinePool.Name).To(BeEmpty())
+			g.Expect(machine.Status.State).To(Equal(computev1alpha1.MachineStatePending))
+		}).Should(Succeed())
 
 		By("creating a machine pool")
 		machinePool := &computev1alpha1.MachinePool{
