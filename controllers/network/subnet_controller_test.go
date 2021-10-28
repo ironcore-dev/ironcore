@@ -17,8 +17,6 @@
 package network
 
 import (
-	"time"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"inet.af/netaddr"
@@ -107,10 +105,6 @@ const (
 	// test data
 	ipPrefix = "192.168.0.0/24"
 	ns       = "default" // namespace
-
-	// ginkgo
-	interval = time.Millisecond * 250
-	timeout  = time.Second * 10
 )
 
 var objectKey = client.ObjectKeyFromObject

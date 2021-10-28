@@ -17,9 +17,9 @@ package network
 
 import (
 	"context"
-	"math/rand"
 	"path/filepath"
 	"testing"
+	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -34,6 +34,11 @@ import (
 
 	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	//+kubebuilder:scaffold:imports
+)
+
+const (
+	interval = time.Millisecond * 250
+	timeout  = time.Second * 10
 )
 
 var (
@@ -97,12 +102,12 @@ var _ = BeforeSuite(func() {
 	}()
 }, 60)
 
-func SetupTest(ctx context.Context) *corev1.Namespace {
+func SetupTest() *corev1.Namespace {
 	ns := &corev1.Namespace{}
 
 	BeforeEach(func() {
 		*ns = corev1.Namespace{
-			ObjectMeta: metav1.ObjectMeta{Name: "testns-" + randSeq(5)},
+			ObjectMeta: metav1.ObjectMeta{GenerateName: "testns-"},
 		}
 		Expect(k8sClient.Create(ctx, ns)).NotTo(HaveOccurred(), "failed to create test namespace")
 
@@ -113,16 +118,6 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 	})
 
 	return ns
-}
-
-var letters = []rune("abcdefghijklmnopqrstuvwxyz1234567890")
-
-func randSeq(n int) string {
-	b := make([]rune, n)
-	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
-	}
-	return string(b)
 }
 
 var _ = AfterSuite(func() {
