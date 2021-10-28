@@ -17,6 +17,9 @@
 package compute
 
 import (
+	"context"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"path/filepath"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"testing"
@@ -27,11 +30,10 @@ import (
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
-	"sigs.k8s.io/controller-runtime/pkg/envtest/printer"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	api "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
+	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -45,9 +47,7 @@ var testEnv *envtest.Environment
 func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
 
-	RunSpecsWithDefaultAndCustomReporters(t,
-		"Controller Suite",
-		[]Reporter{printer.NewlineReporter{}})
+	RunSpecs(t, "Controller Suite")
 }
 
 var _ = BeforeSuite(func() {
@@ -65,7 +65,7 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 	Expect(cfg).NotTo(BeNil())
 
-	err = api.AddToScheme(scheme.Scheme)
+	err = computev1alpha1.AddToScheme(scheme.Scheme)
 	Expect(err).NotTo(HaveOccurred())
 
 	//+kubebuilder:scaffold:scheme
@@ -73,22 +73,49 @@ var _ = BeforeSuite(func() {
 	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
 	Expect(err).NotTo(HaveOccurred())
 	Expect(k8sClient).NotTo(BeNil())
-
-	k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
-		Scheme:             scheme.Scheme,
-		Host:               "127.0.0.1",
-		MetricsBindAddress: "0",
-	})
-	Expect(err).ToNot(HaveOccurred())
-
-	// register reconciler here
-
-	go func() {
-		err = k8sManager.Start(ctrl.SetupSignalHandler())
-		Expect(err).ToNot(HaveOccurred())
-	}()
-
 }, 60)
+
+func SetupTest(ctx context.Context) *corev1.Namespace {
+	var (
+		cancel context.CancelFunc
+	)
+	ns := &corev1.Namespace{}
+	BeforeEach(func() {
+		var mgrCtx context.Context
+		mgrCtx, cancel = context.WithCancel(ctx)
+		*ns = corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
+				GenerateName: "testns-",
+			},
+		}
+		Expect(k8sClient.Create(ctx, ns)).To(Succeed(), "failed to create test namespace")
+
+		k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
+			Scheme:             scheme.Scheme,
+			Host:               "127.0.0.1",
+			MetricsBindAddress: "0",
+		})
+		Expect(err).ToNot(HaveOccurred())
+
+		// register reconciler here
+		Expect((&MachineScheduler{
+			Client: k8sManager.GetClient(),
+			Events: k8sManager.GetEventRecorderFor("machine-scheduler"),
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
+		go func() {
+			Expect(k8sManager.Start(mgrCtx)).To(Succeed(), "failed to start manager")
+		}()
+	})
+
+	AfterEach(func() {
+		cancel()
+		Expect(k8sClient.Delete(ctx, ns)).To(Succeed(), "failed to delete test namespace")
+		Expect(k8sClient.DeleteAllOf(ctx, &computev1alpha1.MachinePool{}))
+	})
+
+	return ns
+}
 
 var _ = AfterSuite(func() {
 	By("tearing down the test environment")

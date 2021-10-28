@@ -102,6 +102,13 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "MachinePool")
 		os.Exit(1)
 	}
+	if err := (&computecontrollers.MachineScheduler{
+		Client: mgr.GetClient(),
+		Events: mgr.GetEventRecorderFor("machine-scheduler"),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "MachineScheduler")
+		os.Exit(1)
+	}
 	if err = (&storagecontrollers.StoragePoolReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
