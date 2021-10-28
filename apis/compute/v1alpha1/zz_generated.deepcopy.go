@@ -372,6 +372,13 @@ func (in *MachinePoolStatus) DeepCopy() *MachinePoolStatus {
 func (in *MachineSpec) DeepCopyInto(out *MachineSpec) {
 	*out = *in
 	out.MachineClass = in.MachineClass
+	if in.MachinePoolSelector != nil {
+		in, out := &in.MachinePoolSelector, &out.MachinePoolSelector
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	}
 	out.MachinePool = in.MachinePool
 	if in.SSHPublicKeys != nil {
 		in, out := &in.SSHPublicKeys, &out.SSHPublicKeys

@@ -1,3 +1,17 @@
+// Copyright 2021 OnMetal authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package compute
 
 import (
@@ -6,6 +20,7 @@ import (
 	"github.com/go-logr/logr"
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/workqueue"
@@ -66,7 +81,10 @@ func (s *MachineScheduler) schedule(ctx context.Context, log logr.Logger, machin
 	}
 
 	list := &computev1alpha1.MachinePoolList{}
-	if err := s.List(ctx, list, client.MatchingFields{machinePoolStatusAvailableMachineClassesNameField: machine.Spec.MachineClass.Name}); err != nil {
+	if err := s.List(ctx, list,
+		client.MatchingFields{machinePoolStatusAvailableMachineClassesNameField: machine.Spec.MachineClass.Name},
+		client.MatchingLabels(machine.Spec.MachinePoolSelector),
+	); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error listing machine pools: %w", err)
 	}
 
@@ -112,7 +130,8 @@ func (s *MachineScheduler) enqueueMatchingUnscheduledMachines(ctx context.Contex
 	}
 
 	for _, machine := range list.Items {
-		if availableClassNames.Has(machine.Spec.MachineClass.Name) {
+		machinePoolSelector := labels.SelectorFromSet(machine.Spec.MachinePoolSelector)
+		if availableClassNames.Has(machine.Spec.MachineClass.Name) && machinePoolSelector.Matches(labels.Set(pool.Labels)) {
 			queue.Add(ctrl.Request{NamespacedName: client.ObjectKeyFromObject(&machine)})
 		}
 	}

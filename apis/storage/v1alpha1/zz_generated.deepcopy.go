@@ -449,6 +449,13 @@ func (in *VolumeList) DeepCopyObject() runtime.Object {
 func (in *VolumeSpec) DeepCopyInto(out *VolumeSpec) {
 	*out = *in
 	out.StorageClass = in.StorageClass
+	if in.StoragePoolSelector != nil {
+		in, out := &in.StoragePoolSelector, &out.StoragePoolSelector
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	}
 	out.StoragePool = in.StoragePool
 	if in.Resources != nil {
 		in, out := &in.Resources, &out.Resources

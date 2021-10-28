@@ -55,6 +55,17 @@ vet: ## Run go vet against code.
 lint:
 	golangci-lint run ./...
 
+
+.PHONY: addlicense
+addlicense: ## Add license headers to all go files.
+	find . -name '*.go' -exec go run github.com/google/addlicense -c 'OnMetal authors' {} +
+
+.PHONY: checklicense
+checklicense: ## Check that every file has a license header present.
+	find . -name '*.go' -exec go run github.com/google/addlicense  -check -c 'OnMetal authors' {} +
+
+check: manifests generate addlicense lint test # Generate manifests, code, lint, add licenses, test
+
 .PHONY: docs
 docs: ## Run go generate to generate API reference documentation.
 	go generate ./...

@@ -34,6 +34,8 @@ type MachineSpec struct {
 	Hostname string `json:"hostname"`
 	// MachineClass is a reference to the machine class/flavor of the machine.
 	MachineClass corev1.LocalObjectReference `json:"machineClass"`
+	// MachinePoolSelector selects a suitable MachinePool by the given labels.
+	MachinePoolSelector map[string]string `json:"machinePoolSelector,omitempty"`
 	// MachinePool defines machine pool to run the machine in.
 	// If empty, a scheduler will figure out an appropriate pool to run the machine in.
 	MachinePool corev1.LocalObjectReference `json:"machinePool,omitempty"`

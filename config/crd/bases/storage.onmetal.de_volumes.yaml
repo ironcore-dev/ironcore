@@ -63,12 +63,18 @@ spec:
                 type: object
               storagePool:
                 description: StoragePool indicates which storage pool to use for a
-                  volume
+                  volume. If unset, the scheduler will figure out a suitable StoragePool.
                 properties:
                   name:
                     description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                       TODO: Add other useful fields. apiVersion, kind, uid?'
                     type: string
+                type: object
+              storagePoolSelector:
+                additionalProperties:
+                  type: string
+                description: StoragePoolSelector selects a suitable StoragePool by
+                  the given labels.
                 type: object
             required:
             - storageClass

@@ -141,6 +141,12 @@ spec:
                       TODO: Add other useful fields. apiVersion, kind, uid?'
                     type: string
                 type: object
+              machinePoolSelector:
+                additionalProperties:
+                  type: string
+                description: MachinePoolSelector selects a suitable MachinePool by
+                  the given labels.
+                type: object
               securityGroups:
                 description: SecurityGroups is a list of security groups of a machine
                 items:
