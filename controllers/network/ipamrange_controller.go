@@ -78,10 +78,6 @@ const parentField = ".spec.parent.name"
 
 func (r *IPAMRangeReconciler) reconcileRequestsFromParent(ctx context.Context, log logr.Logger, object client.Object) []reconcile.Request {
 	ipamRange := object.(*networkv1alpha1.IPAMRange)
-	if ipamRange.Spec.Parent == nil {
-		return nil
-	}
-
 	list := &networkv1alpha1.IPAMRangeList{}
 	if err := r.List(ctx, list, client.InNamespace(ipamRange.Namespace), client.MatchingFields{parentField: ipamRange.Name}); err != nil {
 		return nil
