@@ -15,18 +15,19 @@
 package compute
 
 import (
-	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 )
 
+// var ctx = ctrl.SetupSignalHandler()
+
 var _ = Describe("MachineScheduler", func() {
-	ctx := ctrl.SetupSignalHandler()
-	ns := SetupTest(ctx)
+	// ns := SetupTest(ctx)
 
 	It("should schedule machines on machine pools", func() {
 		By("creating a machine pool")

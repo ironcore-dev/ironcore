@@ -18,31 +18,37 @@ package compute
 
 import (
 	"context"
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"fmt"
 	"path/filepath"
-	ctrl "sigs.k8s.io/controller-runtime"
 	"testing"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
+	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	//+kubebuilder:scaffold:imports
 )
 
 // These tests use Ginkgo (BDD-style Go testing framework). Refer to
 // http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
 
-var cfg *rest.Config
-var k8sClient client.Client
-var testEnv *envtest.Environment
+var (
+	cfg       *rest.Config
+	ctx       = ctrl.SetupSignalHandler()
+	k8sClient client.Client
+	ns        = SetupTest(ctx)
+	testEnv   *envtest.Environment
+)
 
 func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -67,6 +73,8 @@ var _ = BeforeSuite(func() {
 
 	err = computev1alpha1.AddToScheme(scheme.Scheme)
 	Expect(err).NotTo(HaveOccurred())
+
+	Expect(networkv1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
 
 	//+kubebuilder:scaffold:scheme
 
@@ -102,6 +110,12 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 			Client: k8sManager.GetClient(),
 			Events: k8sManager.GetEventRecorderFor("machine-scheduler"),
 		}).SetupWithManager(k8sManager)).To(Succeed())
+
+		Expect((&MachineReconciler{
+			Client: k8sManager.GetClient(),
+			Scheme: k8sManager.GetScheme(),
+		}).SetupWithManager(k8sManager)).To(Succeed())
+		fmt.Fprint(GinkgoWriter, "--------> machine reconciler registered")
 
 		go func() {
 			Expect(k8sManager.Start(mgrCtx)).To(Succeed(), "failed to start manager")
