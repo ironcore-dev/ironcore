@@ -1,0 +1,32 @@
+---
+apiVersion: compute.onmetal.de/v1alpha1
+kind: Console
+metadata:
+  name: console-sample
+spec:
+  type: Service
+  machineRef:
+    name: my-machine
+#status:
+#  state: Ready
+#  tunnelClientConfig:
+#    url: https://my-tunnel-url.example.org
+#    keySecret:
+#      name: tunnel-key-secret
+---
+apiVersion: compute.onmetal.de/v1alpha1
+kind: Console
+metadata:
+  name: console-sample
+spec:
+  type: Lighthouse
+  machineRef:
+    name: my-machine
+  lighthouseClientConfig:
+    url: https://my-lighthouse.example.org
+    caBundle: |
+      my-ca-bundle
+    keySecret:
+      name: my-lighthouse-secret
+#status:
+#  state: Ready
