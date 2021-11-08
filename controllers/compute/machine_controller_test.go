@@ -35,6 +35,19 @@ import (
 )
 
 var _ = Describe("machine controller", func() {
+	It("reconciles a machine without interface", func() {
+		By("creating the machine")
+		m := newMachine()
+		Expect(k8sClient.Create(ctx, m)).To(Succeed())
+
+		By("checking if the machine's status gets reconciled")
+		key := objectKey(m)
+		Consistently(func() []computev1alpha1.InterfaceStatus {
+			Expect(k8sClient.Get(ctx, key, m)).To(Succeed())
+			return m.Status.Interfaces
+		}, timeout, interval).Should(BeEmpty())
+	})
+
 	It("reconciles a machine owning interfaces with IP", func() {
 		By("creating the subnet")
 		subnet := newSubnet(subnetName, "192.168.0.0/24")
@@ -63,8 +76,9 @@ var _ = Describe("machine controller", func() {
 		rngs := newIPAMRanges(m)
 		for i, rng := range rngs {
 			By("fetching the corresponding IPAMRange")
+			key := objectKey(rng)
 			Eventually(func() error {
-				return notFoundOrSucceed(k8sClient.Get(ctx, objectKey(rng), rng))
+				return notFoundOrSucceed(k8sClient.Get(ctx, key, rng))
 			}, timeout, interval).Should(Succeed())
 
 			By("checking if the parent of the IPAMRange corresponds to the target of the interface")
@@ -80,8 +94,9 @@ var _ = Describe("machine controller", func() {
 		expectedIfaceStatuses := []computev1alpha1.InterfaceStatus{}
 		for i, rng := range rngs {
 			By("waiting till the IPAMRange gets reconciled")
+			key := objectKey(rng)
 			Eventually(func() int {
-				Expect(k8sClient.Get(ctx, objectKey(rng), rng)).To(Succeed())
+				Expect(k8sClient.Get(ctx, key, rng)).To(Succeed())
 				return len(rng.Status.Allocations)
 			}, timeout, interval).ShouldNot(Equal(0))
 
@@ -89,8 +104,9 @@ var _ = Describe("machine controller", func() {
 		}
 
 		By("checking if the machine's status gets reconciled")
+		key := objectKey(m)
 		Eventually(func() []computev1alpha1.InterfaceStatus {
-			Expect(k8sClient.Get(ctx, objectKey(m), m)).To(Succeed())
+			Expect(k8sClient.Get(ctx, key, m)).To(Succeed())
 			return m.Status.Interfaces
 		}, timeout, interval).Should(Equal(expectedIfaceStatuses))
 	})
@@ -119,8 +135,9 @@ var _ = Describe("machine controller", func() {
 		rngs := newIPAMRanges(m)
 		for i, rng := range rngs {
 			By("fetching the corresponding IPAMRange")
+			key := objectKey(rng)
 			Eventually(func() error {
-				return notFoundOrSucceed(k8sClient.Get(ctx, objectKey(rng), rng))
+				return notFoundOrSucceed(k8sClient.Get(ctx, key, rng))
 			}, timeout, interval).Should(Succeed())
 
 			By("checking if the parent of the IPAMRange corresponds to the target of the interface")
@@ -136,8 +153,9 @@ var _ = Describe("machine controller", func() {
 		expectedIfaceStatuses := []computev1alpha1.InterfaceStatus{}
 		for i, rng := range rngs {
 			By("waiting till the IPAMRange gets reconciled")
+			key := objectKey(rng)
 			Eventually(func() int {
-				Expect(k8sClient.Get(ctx, objectKey(rng), rng)).To(Succeed())
+				Expect(k8sClient.Get(ctx, key, rng)).To(Succeed())
 				return len(rng.Status.Allocations)
 			}, timeout, interval).ShouldNot(Equal(0))
 
@@ -145,8 +163,9 @@ var _ = Describe("machine controller", func() {
 		}
 
 		By("checking if the machine's status gets reconciled")
+		key := objectKey(m)
 		Eventually(func() []computev1alpha1.InterfaceStatus {
-			Expect(k8sClient.Get(ctx, objectKey(m), m)).To(Succeed())
+			Expect(k8sClient.Get(ctx, key, m)).To(Succeed())
 			return m.Status.Interfaces
 		}, timeout, interval).Should(Equal(expectedIfaceStatuses))
 	})
