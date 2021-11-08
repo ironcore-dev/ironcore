@@ -18,7 +18,6 @@ package compute
 
 import (
 	"context"
-	"fmt"
 	"path/filepath"
 	"testing"
 
@@ -53,7 +52,7 @@ var (
 func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
 
-	RunSpecs(t, "Controller Suite")
+	RunSpecs(t, "Compute Controller Suite")
 }
 
 var _ = BeforeSuite(func() {
@@ -115,7 +114,6 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 			Client: k8sManager.GetClient(),
 			Scheme: k8sManager.GetScheme(),
 		}).SetupWithManager(k8sManager)).To(Succeed())
-		fmt.Fprint(GinkgoWriter, "--------> machine reconciler registered")
 
 		go func() {
 			Expect(k8sManager.Start(mgrCtx)).To(Succeed(), "failed to start manager")

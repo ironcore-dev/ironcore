@@ -19,13 +19,10 @@ package network
 import (
 	"context"
 	"fmt"
+	"sort"
+
 	"github.com/adracus/reflcompare"
 	"github.com/go-logr/logr"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
-	"github.com/onmetal/onmetal-api/apis/network"
-	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
-	"github.com/onmetal/onmetal-api/equality"
-	"github.com/onmetal/onmetal-api/predicates"
 	"inet.af/netaddr"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -39,7 +36,12 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/controller-runtime/pkg/source"
-	"sort"
+
+	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	"github.com/onmetal/onmetal-api/apis/network"
+	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
+	"github.com/onmetal/onmetal-api/equality"
+	"github.com/onmetal/onmetal-api/predicates"
 )
 
 const (
@@ -76,10 +78,6 @@ const parentField = ".spec.parent.name"
 
 func (r *IPAMRangeReconciler) reconcileRequestsFromParent(ctx context.Context, log logr.Logger, object client.Object) []reconcile.Request {
 	ipamRange := object.(*networkv1alpha1.IPAMRange)
-	if ipamRange.Spec.Parent == nil {
-		return nil
-	}
-
 	list := &networkv1alpha1.IPAMRangeList{}
 	if err := r.List(ctx, list, client.InNamespace(ipamRange.Namespace), client.MatchingFields{parentField: ipamRange.Name}); err != nil {
 		return nil
@@ -405,6 +403,8 @@ func (r *IPAMRangeReconciler) computeChildAllocations(
 ) (newAvailable *netaddr.IPSet, childAllocations []networkv1alpha1.IPAMRangeAllocationStatus) {
 	for _, requestAndName := range requests {
 		originalRequest, name := requestAndName.request, requestAndName.childName
+
+		// it's possible that no request from IPAMRange is fullfilled
 		oldRequests := fulfilledRequests[name]
 		// we copy the original request since we're modifying it
 		// below to force re-acquiring already allocated IPs.

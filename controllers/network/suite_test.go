@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package network
 
 import (
 	"context"
 	"path/filepath"
 	"testing"
-
-	ctrl "sigs.k8s.io/controller-runtime"
+	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -33,6 +34,11 @@ import (
 
 	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	//+kubebuilder:scaffold:imports
+)
+
+const (
+	interval = time.Millisecond * 250
+	timeout  = time.Second * 10
 )
 
 var (
@@ -45,7 +51,7 @@ var (
 func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
 
-	RunSpecs(t, "Newwork Controller Suite")
+	RunSpecs(t, "Network Controller Suite")
 }
 
 var _ = BeforeSuite(func() {
@@ -95,6 +101,24 @@ var _ = BeforeSuite(func() {
 		Expect(err).ToNot(HaveOccurred())
 	}()
 }, 60)
+
+func SetupTest() *corev1.Namespace {
+	ns := &corev1.Namespace{}
+
+	BeforeEach(func() {
+		*ns = corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{GenerateName: "testns-"},
+		}
+		Expect(k8sClient.Create(ctx, ns)).NotTo(HaveOccurred(), "failed to create test namespace")
+
+	})
+
+	AfterEach(func() {
+		Expect(k8sClient.Delete(ctx, ns)).NotTo(HaveOccurred(), "failed to delete test namespace")
+	})
+
+	return ns
+}
 
 var _ = AfterSuite(func() {
 	cancel()
