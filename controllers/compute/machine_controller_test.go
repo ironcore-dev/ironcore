@@ -35,7 +35,7 @@ import (
 )
 
 var _ = Describe("machine controller", func() {
-	It("reconciles a machine owing interfaces w/ IP", func() {
+	It("reconciles a machine owning interfaces with IP", func() {
 		By("creating the subnet")
 		subnet := newSubnet(subnetName, "192.168.0.0/24")
 		Expect(k8sClient.Patch(ctx, subnet, client.Apply, machineInterfaceFieldOwner)).To(Succeed())
