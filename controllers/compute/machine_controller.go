@@ -19,11 +19,8 @@ package compute
 import (
 	"context"
 	"fmt"
+
 	"github.com/go-logr/logr"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
-	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
-	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
-	"github.com/onmetal/onmetal-api/predicates"
 	"inet.af/netaddr"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -31,6 +28,11 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
+	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
+	"github.com/onmetal/onmetal-api/predicates"
 )
 
 const machineInterfaceFieldOwner = client.FieldOwner("compute.onmetal.de/machine-iface")
@@ -110,18 +112,7 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 			return ctrl.Result{}, fmt.Errorf("could not create iface %s ipam range: %w", iface.Name, err)
 		}
 
-		for _, allocation := range ifaceIPAMRange.Status.Allocations {
-			if allocation.State != networkv1alpha1.IPAMRangeAllocationFree || allocation.IPs == nil {
-				continue
-			}
-
-			ip := allocation.IPs.From
-			interfaceStatuses = append(interfaceStatuses, computev1alpha1.InterfaceStatus{
-				Name:     iface.Name,
-				IP:       ip,
-				Priority: iface.Priority,
-			})
-		}
+		interfaceStatuses = appendInterfaceStatuses(interfaceStatuses, &iface, ifaceIPAMRange)
 	}
 
 	outdatedStatusMachine := machine.DeepCopy()
@@ -130,4 +121,20 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 		return ctrl.Result{}, fmt.Errorf("could not update status: %w", err)
 	}
 	return ctrl.Result{}, nil
+}
+
+func appendInterfaceStatuses(statuses []computev1alpha1.InterfaceStatus, iface *computev1alpha1.Interface, rng *networkv1alpha1.IPAMRange) []computev1alpha1.InterfaceStatus {
+	for _, allocation := range rng.Status.Allocations {
+		if allocation.State != networkv1alpha1.IPAMRangeAllocationFree || allocation.IPs == nil {
+			continue
+		}
+
+		ip := allocation.IPs.From
+		statuses = append(statuses, computev1alpha1.InterfaceStatus{
+			Name:     iface.Name,
+			IP:       ip,
+			Priority: iface.Priority,
+		})
+	}
+	return statuses
 }

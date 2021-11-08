@@ -35,18 +35,24 @@ import (
 )
 
 var _ = Describe("machine controller", func() {
-	It("reconciles a machine with interfaces", func() {
-		m := newMachine("with-interfaces")
+	It("reconciles a machine owing interfaces w/ IP", func() {
+		By("creating the subnet")
+		subnet := newSubnet(subnetName, "192.168.0.0/24")
+		Expect(k8sClient.Patch(ctx, subnet, client.Apply, machineInterfaceFieldOwner)).To(Succeed())
+
+		m := newMachine()
 		ifaces := []computev1alpha1.Interface{
 			{
-				Name:   m.Name + "-0",
-				IP:     ip("192.168.0.0"),
-				Target: corev1.LocalObjectReference{Name: "target-0"},
+				Name:     "iface-0",
+				IP:       ip("192.168.0.0"),
+				Priority: 0,
+				Target:   corev1.LocalObjectReference{Name: subnetName},
 			},
 			{
-				Name:   m.Name + "-1",
-				IP:     ip("192.168.0.1"),
-				Target: corev1.LocalObjectReference{Name: "target-1"},
+				Name:     "iface-1",
+				IP:       ip("192.168.0.1"),
+				Priority: 1,
+				Target:   corev1.LocalObjectReference{Name: subnetName},
 			},
 		}
 		m.Spec.Interfaces = ifaces
@@ -70,16 +76,34 @@ var _ = Describe("machine controller", func() {
 			By("checking the OwnerReferences of the IPAMRange contain the machine")
 			Expect(rng.OwnerReferences).To(ContainElement(controllerReference(m)))
 		}
+
+		expectedIfaceStatuses := []computev1alpha1.InterfaceStatus{}
+		for i, rng := range rngs {
+			By("checking if the IPAMRange gets reconciled")
+			Eventually(func() int {
+				Expect(k8sClient.Get(ctx, objectKey(rng), rng)).To(Succeed())
+				return len(rng.Status.Allocations)
+			}, timeout, interval).ShouldNot(Equal(0))
+
+			expectedIfaceStatuses = appendInterfaceStatuses(expectedIfaceStatuses, &ifaces[i], rng)
+		}
+
+		By("checking if the machine's status gets reconciled")
+		Eventually(func() []computev1alpha1.InterfaceStatus {
+			Expect(k8sClient.Get(ctx, objectKey(m), m)).To(Succeed())
+			return m.Status.Interfaces
+		}, timeout, interval).Should(Equal(expectedIfaceStatuses))
 	})
 })
 
 const (
 	// test data
-	kind = "Machine"
+	kind       = "Machine"
+	subnetName = "sample"
 
 	// ginkgo
 	interval = time.Millisecond * 250
-	timeout  = time.Second * 10
+	timeout  = time.Second * 20
 )
 
 var (
@@ -118,13 +142,26 @@ func newIPAMRanges(m *computev1alpha1.Machine) (rngs []*networkv1alpha1.IPAMRang
 	return
 }
 
-func newMachine(name string) *computev1alpha1.Machine {
+func newMachine() *computev1alpha1.Machine {
 	m := &computev1alpha1.Machine{}
 	m.APIVersion = computev1alpha1.GroupVersion.String()
 	m.Kind = kind
 	m.Namespace = ns.Name
-	m.Name = name
+	m.GenerateName = "machine-controller-test"
 	return m
+}
+
+func newSubnet(name, ipPrefix string) *networkv1alpha1.Subnet {
+	subnet := &networkv1alpha1.Subnet{}
+	subnet.APIVersion = networkv1alpha1.GroupVersion.String()
+	subnet.Kind = networkv1alpha1.SubnetGK.Kind
+	subnet.Namespace = ns.Name
+	subnet.Name = name
+
+	parsed, err := netaddr.ParseIPPrefix(ipPrefix)
+	Expect(err).ToNot(HaveOccurred())
+	subnet.Spec.Ranges = []networkv1alpha1.RangeType{{CIDR: commonv1alpha1.CIDR{IPPrefix: parsed}}}
+	return subnet
 }
 
 func notFoundOrSucceed(err error) error {
