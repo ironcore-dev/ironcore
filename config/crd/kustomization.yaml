@@ -15,7 +15,7 @@ resources:
   - bases/network.onmetal.de_routingdomains.yaml
   - bases/network.onmetal.de_ipamranges.yaml
   - bases/network.onmetal.de_gateways.yaml
-- bases/compute.onmetal.de_consoles.yaml
+  - bases/compute.onmetal.de_consoles.yaml
 #+kubebuilder:scaffold:crdkustomizeresource
 
 patchesStrategicMerge:
@@ -34,7 +34,7 @@ patchesStrategicMerge:
   #- patches/webhook_in_routingdomain.yaml
   #- patches/webhook_in_ipamranges.yaml
   #- patches/webhook_in_gateways.yaml
-#- patches/webhook_in_consoles.yaml
+  #- patches/webhook_in_consoles.yaml
   #+kubebuilder:scaffold:crdkustomizewebhookpatch
 
   # [CERTMANAGER] To enable webhook, uncomment all the sections with [CERTMANAGER] prefix.
