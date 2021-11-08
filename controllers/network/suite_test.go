@@ -110,7 +110,6 @@ func SetupTest() *corev1.Namespace {
 			ObjectMeta: metav1.ObjectMeta{GenerateName: "testns-"},
 		}
 		Expect(k8sClient.Create(ctx, ns)).NotTo(HaveOccurred(), "failed to create test namespace")
-
 	})
 
 	AfterEach(func() {
