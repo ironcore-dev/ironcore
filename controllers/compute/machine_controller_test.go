@@ -79,7 +79,63 @@ var _ = Describe("machine controller", func() {
 
 		expectedIfaceStatuses := []computev1alpha1.InterfaceStatus{}
 		for i, rng := range rngs {
-			By("checking if the IPAMRange gets reconciled")
+			By("waiting till the IPAMRange gets reconciled")
+			Eventually(func() int {
+				Expect(k8sClient.Get(ctx, objectKey(rng), rng)).To(Succeed())
+				return len(rng.Status.Allocations)
+			}, timeout, interval).ShouldNot(Equal(0))
+
+			expectedIfaceStatuses = appendInterfaceStatuses(expectedIfaceStatuses, &ifaces[i], rng)
+		}
+
+		By("checking if the machine's status gets reconciled")
+		Eventually(func() []computev1alpha1.InterfaceStatus {
+			Expect(k8sClient.Get(ctx, objectKey(m), m)).To(Succeed())
+			return m.Status.Interfaces
+		}, timeout, interval).Should(Equal(expectedIfaceStatuses))
+	})
+
+	It("reconciles a machine owning interfaces without IP", func() {
+		By("creating the subnet")
+		subnet := newSubnet(subnetName, "192.168.0.0/24")
+		Expect(k8sClient.Patch(ctx, subnet, client.Apply, machineInterfaceFieldOwner)).To(Succeed())
+
+		m := newMachine()
+		ifaces := []computev1alpha1.Interface{
+			{
+				Name:   "iface-0",
+				Target: corev1.LocalObjectReference{Name: subnetName},
+			},
+			{
+				Name:   "iface-1",
+				Target: corev1.LocalObjectReference{Name: subnetName},
+			},
+		}
+		m.Spec.Interfaces = ifaces
+
+		By("creating the machine")
+		Expect(k8sClient.Create(ctx, m)).To(Succeed())
+
+		rngs := newIPAMRanges(m)
+		for i, rng := range rngs {
+			By("fetching the corresponding IPAMRange")
+			Eventually(func() error {
+				return notFoundOrSucceed(k8sClient.Get(ctx, objectKey(rng), rng))
+			}, timeout, interval).Should(Succeed())
+
+			By("checking if the parent of the IPAMRange corresponds to the target of the interface")
+			Expect(rng.Spec.Parent.Name).To(Equal(networkv1alpha1.SubnetIPAMName(ifaces[i].Target.Name)))
+
+			By("checking if the IP count in the IPAMRange request equals 1")
+			Expect(rng.Spec.Requests[0].IPCount).To(Equal(int32(1)))
+
+			By("checking the OwnerReferences of the IPAMRange contain the machine")
+			Expect(rng.OwnerReferences).To(ContainElement(controllerReference(m)))
+		}
+
+		expectedIfaceStatuses := []computev1alpha1.InterfaceStatus{}
+		for i, rng := range rngs {
+			By("waiting till the IPAMRange gets reconciled")
 			Eventually(func() int {
 				Expect(k8sClient.Get(ctx, objectKey(rng), rng)).To(Succeed())
 				return len(rng.Status.Allocations)
