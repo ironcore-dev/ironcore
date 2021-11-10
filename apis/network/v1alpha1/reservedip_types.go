@@ -22,6 +22,13 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+const (
+	ReservedIPStatePending ReservedIPState = "Pending"
+	ReservedIPStateReady   ReservedIPState = "Ready"
+	ReservedIPStateError   ReservedIPState = "Error"
+	ReservedIPStateInitial ReservedIPState = "Initial"
+)
+
 // ReservedIPSpec defines the desired state of ReservedIP
 type ReservedIPSpec struct {
 	// Subnet references the subnet where an IP address should be reserved
