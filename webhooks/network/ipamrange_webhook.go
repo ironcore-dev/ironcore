@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package v1alpha1
+package network
 
 import (
 	"context"
 	"fmt"
 	"reflect"
 
-	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
-
-	"sigs.k8s.io/controller-runtime/pkg/client"
-
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+
+	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 )
 
 const (
@@ -40,26 +40,33 @@ const (
 // log is for logging in this package.
 var ipamrangelog = logf.Log.WithName("ipamrange-resource")
 
-func (r *IPAMRange) SetupWebhookWithManager(mgr ctrl.Manager) error {
-	validator := &IPAMRangeValidator{
-		mgr.GetClient(),
-	}
+func SetupIPAMRangeWebhookWithManager(mgr ctrl.Manager) error {
+	defaulter := &IPAMRangeDefaulter{}
+	validator := &IPAMRangeValidator{mgr.GetClient()}
+
 	return ctrl.NewWebhookManagedBy(mgr).
+		WithDefaulter(defaulter).
 		WithValidator(validator).
-		For(r).
+		For(&networkv1alpha1.IPAMRange{}).
 		Complete()
 }
 
 //+kubebuilder:webhook:path=/mutate-network-onmetal-de-v1alpha1-ipamrange,mutating=true,failurePolicy=fail,sideEffects=None,groups=network.onmetal.de,resources=ipamranges,verbs=create;update,versions=v1alpha1,name=mipamrange.kb.io,admissionReviewVersions={v1,v1beta1}
 
-var _ webhook.Defaulter = &IPAMRange{}
+var _ webhook.CustomDefaulter = &IPAMRangeDefaulter{}
+
+type IPAMRangeDefaulter struct{}
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type
-func (r *IPAMRange) Default() {
+func (d *IPAMRangeDefaulter) Default(ctx context.Context, obj runtime.Object) error {
+	r := obj.(*networkv1alpha1.IPAMRange)
 	ipamrangelog.Info("default", "name", r.Name)
+	return nil
 }
 
 //+kubebuilder:webhook:path=/validate-network-onmetal-de-v1alpha1-ipamrange,mutating=false,failurePolicy=fail,sideEffects=None,groups=network.onmetal.de,resources=ipamranges,verbs=create;update;delete,versions=v1alpha1,name=vipamrange.kb.io,admissionReviewVersions={v1,v1beta1}
+
+var _ webhook.CustomValidator = &IPAMRangeValidator{}
 
 type IPAMRangeValidator struct {
 	client.Client
@@ -67,7 +74,7 @@ type IPAMRangeValidator struct {
 
 // ValidateCreate implements webhook.CustomValidator so a webhook will be registered for the type
 func (v *IPAMRangeValidator) ValidateCreate(ctx context.Context, obj runtime.Object) error {
-	r := obj.(*IPAMRange)
+	r := obj.(*networkv1alpha1.IPAMRange)
 	ipamrangelog.Info("validate create", "name", r.Name)
 
 	var allErrs field.ErrorList
@@ -90,15 +97,15 @@ func (v *IPAMRangeValidator) ValidateCreate(ctx context.Context, obj runtime.Obj
 	if len(allErrs) == 0 {
 		return nil
 	}
-	return apierrors.NewInvalid(IPAMRangeGK, r.Name, allErrs)
+	return apierrors.NewInvalid(networkv1alpha1.IPAMRangeGK, r.Name, allErrs)
 }
 
 // ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
 func (v *IPAMRangeValidator) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) error {
-	r := newObj.(*IPAMRange)
+	r := newObj.(*networkv1alpha1.IPAMRange)
 	ipamrangelog.Info("validate update", "name", r.Name)
 
-	oldRange := oldObj.(*IPAMRange)
+	oldRange := oldObj.(*networkv1alpha1.IPAMRange)
 	path := field.NewPath("spec")
 
 	var allErrs field.ErrorList
@@ -114,12 +121,12 @@ func (v *IPAMRangeValidator) ValidateUpdate(ctx context.Context, oldObj, newObj 
 	if len(allErrs) == 0 {
 		return nil
 	}
-	return apierrors.NewInvalid(IPAMRangeGK, r.Name, allErrs)
+	return apierrors.NewInvalid(networkv1alpha1.IPAMRangeGK, r.Name, allErrs)
 }
 
 // ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
 func (v *IPAMRangeValidator) ValidateDelete(ctx context.Context, obj runtime.Object) error {
-	r := obj.(*IPAMRange)
+	r := obj.(*networkv1alpha1.IPAMRange)
 	ipamrangelog.Info("validate delete", "name", r.Name)
 	// TODO(user): fill in your validation logic upon object deletion.
 	return nil
@@ -127,7 +134,7 @@ func (v *IPAMRangeValidator) ValidateDelete(ctx context.Context, obj runtime.Obj
 
 // overlappingParentExists checks if any other parent IPAM range is already overlapping passed CIDRs
 func (v *IPAMRangeValidator) overlappingParentExists(ctx context.Context, cidrs []commonv1alpha1.CIDR) (errs field.ErrorList) {
-	list := &IPAMRangeList{}
+	list := &networkv1alpha1.IPAMRangeList{}
 	path := field.NewPath("spec").Child("cidrs")
 
 	if err := v.List(ctx, list); err != nil {
@@ -153,8 +160,8 @@ func (v *IPAMRangeValidator) overlappingParentExists(ctx context.Context, cidrs 
 }
 
 // overlappingRequestExist checks if any other IPAM range request overlaps CIDR or IP range of passed request
-func (v *IPAMRangeValidator) overlappingRequestExist(ctx context.Context, requests []IPAMRangeRequest) (errs field.ErrorList) {
-	list := &IPAMRangeList{}
+func (v *IPAMRangeValidator) overlappingRequestExist(ctx context.Context, requests []networkv1alpha1.IPAMRangeRequest) (errs field.ErrorList) {
+	list := &networkv1alpha1.IPAMRangeList{}
 
 	if err := v.List(ctx, list); err != nil {
 		errs = append(errs, field.InternalError(nil, fmt.Errorf("failed to list existing IPAMRanges: %w", err)))
@@ -179,7 +186,7 @@ func (v *IPAMRangeValidator) overlappingRequestExist(ctx context.Context, reques
 }
 
 // checkRequestOverlap checks if requests overlap by CIDR or IP range
-func checkRequestOverlap(req, otherReq IPAMRangeRequest) *field.Error {
+func checkRequestOverlap(req, otherReq networkv1alpha1.IPAMRangeRequest) *field.Error {
 	path := field.NewPath("spec").Child("requests")
 
 	if req.CIDR != nil {

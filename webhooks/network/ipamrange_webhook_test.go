@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package v1alpha1
+package network
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -23,6 +23,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
+	"github.com/onmetal/onmetal-api/apis/network/v1alpha1"
+
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 )
 
@@ -31,12 +33,12 @@ var _ = Describe("IPAMRangeWebhook", func() {
 		ns := SetupTest()
 
 		It("parent name shouldn't be empty string", func() {
-			instance := &IPAMRange{
+			instance := &v1alpha1.IPAMRange{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "test",
 					Namespace: ns.Name,
 				},
-				Spec: IPAMRangeSpec{
+				Spec: v1alpha1.IPAMRangeSpec{
 					Parent: &corev1.LocalObjectReference{
 						Name: "",
 					},
@@ -59,12 +61,12 @@ var _ = Describe("IPAMRangeWebhook", func() {
 		It("parent CIDRs shouldn't overlap", func() {
 			prefix1, err := netaddr.ParseIPPrefix("192.168.1.0/24")
 			Expect(err).ToNot(HaveOccurred())
-			instance := &IPAMRange{
+			instance := &v1alpha1.IPAMRange{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "test",
 					Namespace: ns.Name,
 				},
-				Spec: IPAMRangeSpec{
+				Spec: v1alpha1.IPAMRangeSpec{
 					CIDRs: []commonv1alpha1.CIDR{
 						commonv1alpha1.NewCIDR(prefix1),
 					},
@@ -74,12 +76,12 @@ var _ = Describe("IPAMRangeWebhook", func() {
 
 			prefix2, err := netaddr.ParseIPPrefix("192.168.1.0/25")
 			Expect(err).ToNot(HaveOccurred())
-			instance2 := &IPAMRange{
+			instance2 := &v1alpha1.IPAMRange{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "test2",
 					Namespace: ns.Name,
 				},
-				Spec: IPAMRangeSpec{
+				Spec: v1alpha1.IPAMRangeSpec{
 					CIDRs: []commonv1alpha1.CIDR{
 						commonv1alpha1.NewCIDR(prefix2),
 					},
@@ -102,16 +104,16 @@ var _ = Describe("IPAMRangeWebhook", func() {
 			prefix1, err := netaddr.ParseIPPrefix("192.168.1.0/24")
 			Expect(err).ToNot(HaveOccurred())
 			cidr1 := commonv1alpha1.NewCIDR(prefix1)
-			instance := &IPAMRange{
+			instance := &v1alpha1.IPAMRange{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "test",
 					Namespace: ns.Name,
 				},
-				Spec: IPAMRangeSpec{
+				Spec: v1alpha1.IPAMRangeSpec{
 					Parent: &corev1.LocalObjectReference{
 						Name: "parent",
 					},
-					Requests: []IPAMRangeRequest{
+					Requests: []v1alpha1.IPAMRangeRequest{
 						{
 							CIDR: &cidr1,
 						},
@@ -123,16 +125,16 @@ var _ = Describe("IPAMRangeWebhook", func() {
 			prefix2, err := netaddr.ParseIPPrefix("192.168.1.0/25")
 			Expect(err).ToNot(HaveOccurred())
 			cidr2 := commonv1alpha1.NewCIDR(prefix2)
-			instance2 := &IPAMRange{
+			instance2 := &v1alpha1.IPAMRange{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "test2",
 					Namespace: ns.Name,
 				},
-				Spec: IPAMRangeSpec{
+				Spec: v1alpha1.IPAMRangeSpec{
 					Parent: &corev1.LocalObjectReference{
 						Name: "parent",
 					},
-					Requests: []IPAMRangeRequest{
+					Requests: []v1alpha1.IPAMRangeRequest{
 						{
 							CIDR: &cidr2,
 						},
