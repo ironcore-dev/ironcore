@@ -25,7 +25,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/onmetal/onmetal-api/apis/network/v1alpha1"
+	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -80,7 +80,7 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 	Expect(cfg).NotTo(BeNil())
 
-	Expect(v1alpha1.AddToScheme(scheme.Scheme)).NotTo(HaveOccurred())
+	Expect(networkv1alpha1.AddToScheme(scheme.Scheme)).NotTo(HaveOccurred())
 	Expect(admissionv1beta1.AddToScheme(scheme.Scheme)).NotTo(HaveOccurred())
 
 	//+kubebuilder:scaffold:scheme
@@ -102,6 +102,15 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 
 	Expect(SetupIPAMRangeWebhookWithManager(mgr)).NotTo(HaveOccurred())
+
+	// Index fields(in non-test environment it's done when reconcilers are setup
+	Expect(mgr.GetFieldIndexer().IndexField(ctx, &networkv1alpha1.IPAMRange{}, parentField, func(object client.Object) []string {
+		ipamRange := object.(*networkv1alpha1.IPAMRange)
+		if ipamRange.Spec.Parent == nil {
+			return nil
+		}
+		return []string{ipamRange.Spec.Parent.Name}
+	})).NotTo(HaveOccurred())
 
 	//+kubebuilder:scaffold:webhook
 
