@@ -95,19 +95,20 @@ var _ = Describe("machine controller", func() {
 			Expect(rng.OwnerReferences).To(ContainElement(controllerReference(m)))
 		}
 
-		expectedIfaceStatuses := []computev1alpha1.InterfaceStatus{}
-		for i, rng := range rngs {
-			By("waiting till the IPAMRange gets reconciled")
-			key := objectKey(rng)
-			Eventually(func() int {
-				Expect(k8sClient.Get(ctx, key, rng)).To(Succeed())
-				return len(rng.Status.Allocations)
-			}, timeout, interval).ShouldNot(Equal(0))
-
-			expectedIfaceStatuses = appendInterfaceStatuses(expectedIfaceStatuses, &ifaces[i], rng)
+		By("checking if the machine's status gets reconciled")
+		expectedIfaceStatuses := []computev1alpha1.InterfaceStatus{
+			{
+				Name:     "iface-0",
+				IP:       *mustParseIP("192.168.0.0"),
+				Priority: 0,
+			},
+			{
+				Name:     "iface-1",
+				IP:       *mustParseIP("192.168.0.1"),
+				Priority: 1,
+			},
 		}
 
-		By("checking if the machine's status gets reconciled")
 		key := objectKey(m)
 		Eventually(func() []computev1alpha1.InterfaceStatus {
 			Expect(k8sClient.Get(ctx, key, m)).To(Succeed())
@@ -158,24 +159,27 @@ var _ = Describe("machine controller", func() {
 			Expect(rng.OwnerReferences).To(ContainElement(controllerReference(m)))
 		}
 
-		expectedIfaceStatuses := []computev1alpha1.InterfaceStatus{}
-		for i, rng := range rngs {
-			By("waiting till the IPAMRange gets reconciled")
-			key := objectKey(rng)
-			Eventually(func() int {
-				Expect(k8sClient.Get(ctx, key, rng)).To(Succeed())
-				return len(rng.Status.Allocations)
-			}, timeout, interval).ShouldNot(Equal(0))
-
-			expectedIfaceStatuses = appendInterfaceStatuses(expectedIfaceStatuses, &ifaces[i], rng)
-		}
-
 		By("checking if the machine's status gets reconciled")
 		key := objectKey(m)
 		Eventually(func() []computev1alpha1.InterfaceStatus {
 			Expect(k8sClient.Get(ctx, key, m)).To(Succeed())
 			return m.Status.Interfaces
-		}, timeout, interval).Should(Equal(expectedIfaceStatuses))
+		}, timeout, interval).ShouldNot(BeEmpty())
+
+		iface0 := m.Status.Interfaces[0]
+		Expect(iface0.Name).To(Equal("iface-0"))
+		Expect(iface0.Priority).To(Equal(int32(0)))
+
+		iface1 := m.Status.Interfaces[1]
+		Expect(iface1.Name).To(Equal("iface-1"))
+		Expect(iface1.Priority).To(Equal(int32(0)))
+
+		subnetIPRange := subnet.Spec.Ranges[0].CIDR.IPPrefix.Range()
+		ip0 := iface0.IP.IP
+		ip1 := iface1.IP.IP
+		Expect(subnetIPRange.Contains(ip0)).To(BeTrue(), "The Subnet IP range contains the IP.")
+		Expect(subnetIPRange.Contains(ip1)).To(BeTrue(), "The Subnet IP range contains the IP.")
+		Expect(ip0.Compare(ip1) != 0).To(BeTrue(), "Two IP addresses are different.")
 	})
 })
 
@@ -191,7 +195,7 @@ const (
 
 var (
 	machineTestNS = &corev1.Namespace{}
-	objectKey = client.ObjectKeyFromObject
+	objectKey     = client.ObjectKeyFromObject
 )
 
 func controllerReference(m *computev1alpha1.Machine) metav1.OwnerReference {
