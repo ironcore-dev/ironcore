@@ -16,7 +16,9 @@
 package network
 
 import (
+	"context"
 	"fmt"
+	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -29,59 +31,90 @@ import (
 	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 )
 
+const (
+	parentsubCIDR = "10.0.0.0/16"
+)
+
 var _ = Describe("ReservedIPReconciler", func() {
-
 	Context("Reconcile an ReservedIP", func() {
-
-		ns := "default"
-
+		timeinterval := time.Millisecond * 500
+		ns := SetupTest()
 		It("should create reserved ip instance", func() {
-			ip, _ := netaddr.ParseIP("192.168.1.22")
+			subnet := createRootSubnet(context.Background(), ns)
+			Eventually(func(g Gomega) {
+				key := types.NamespacedName{Name: subnet.Name, Namespace: subnet.Namespace}
+				obj := &networkv1alpha1.Subnet{}
+				g.Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
+			}, timeout, interval).Should(Succeed())
+			ip, _ := netaddr.ParseIP("10.0.0.1")
+			resIP := commonv1alpha1.IPAddr{
+				IP: ip,
+			}
 			reservedip := &networkv1alpha1.ReservedIP{
-
 				ObjectMeta: metav1.ObjectMeta{
-					Namespace: ns,
+					Namespace: ns.Name,
 					Name:      "reservediptest",
 				},
 				Spec: networkv1alpha1.ReservedIPSpec{
-					Subnet: corev1.LocalObjectReference{Name: "testsubnet"},
+					Subnet: corev1.LocalObjectReference{Name: subnet.Name},
 					IP:     commonv1alpha1.IPAddr{IP: ip},
 				},
 			}
 			Expect(k8sClient.Create(ctx, reservedip)).To(Succeed())
 			Eventually(func(g Gomega) {
-				key := types.NamespacedName{Name: fmt.Sprintf("reservedip-subnet-%s-%s", reservedip.Name, reservedip.Spec.Subnet.Name), Namespace: ns}
+				key := types.NamespacedName{Name: fmt.Sprintf("reservedip-subnet-%s-%s", reservedip.Name, subnet.Name), Namespace: ns.Name}
 				obj := &networkv1alpha1.IPAMRange{}
 				g.Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
-			}, timeout, interval).Should(Succeed())
-		})
-
-		It("should update reserved ip instance", func() {
-
-			key := types.NamespacedName{Name: "reservediptest", Namespace: ns}
-			reservedip := &networkv1alpha1.ReservedIP{}
-			k8sClient.Get(ctx, key, reservedip)
-			reservedip.Spec.Subnet = corev1.LocalObjectReference{Name: "testsubnet2"}
-			Expect(k8sClient.Update(ctx, reservedip)).To(Succeed())
-
-			Eventually(func(g Gomega) {
-				key := types.NamespacedName{Name: fmt.Sprintf("reservedip-subnet-%s-%s", reservedip.Name, reservedip.Spec.Subnet.Name), Namespace: ns}
-				obj := &networkv1alpha1.IPAMRange{}
-				g.Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
-				g.Expect(obj.Spec.Parent.Name).To(Equal("subnet-testsubnet2"))
-
-			}, timeout, interval).Should(Succeed())
+				g.Expect(obj.Status).NotTo(BeNil())
+				g.Expect(validateAllocatedIP(obj, resIP, networkv1alpha1.IPAMRangeAllocationFree)).To(BeTrue())
+				key2 := types.NamespacedName{Name: "reservediptest", Namespace: ns.Name}
+				obj2 := &networkv1alpha1.ReservedIP{}
+				g.Expect(k8sClient.Get(ctx, key2, obj2)).Should(Succeed())
+				g.Expect(obj2.Status.IP).NotTo(BeNil())
+				g.Expect(obj2.Status.IP.IP).NotTo(BeNil())
+				g.Expect(obj2.Status.IP.IP.String()).To(Equal("10.0.0.1"))
+				g.Expect(obj2.Status.State).To(Equal(networkv1alpha1.ReservedIPStateReady))
+			}, timeout, timeinterval).Should(Succeed())
 		})
 	})
 })
 
-func getAllocationState(obj *networkv1alpha1.IPAMRange) map[string]networkv1alpha1.IPAMRangeAllocationState {
-	result := make(map[string]networkv1alpha1.IPAMRangeAllocationState)
+func createRootSubnet(ctx context.Context, ns *corev1.Namespace) *networkv1alpha1.Subnet {
+	meta := metav1.ObjectMeta{
+		Name:      "rootsubnet",
+		Namespace: ns.Name,
+	}
+	return createSubnet(ctx, parentsubCIDR, meta)
+}
+
+func createSubnet(ctx context.Context, cidrStr string, meta metav1.ObjectMeta) *networkv1alpha1.Subnet {
+	spec := networkv1alpha1.SubnetSpec{}
+	var cidr commonv1alpha1.CIDR
+	if cidrStr != "" {
+		prefix, err := netaddr.ParseIPPrefix(cidrStr)
+		Expect(err).ToNot(HaveOccurred())
+		cidr = commonv1alpha1.NewCIDR(prefix)
+	}
+	spec.RoutingDomain.Name = "routingdomain-sample"
+	spec.Ranges = []networkv1alpha1.RangeType{
+		{
+			Size: 1,
+			CIDR: cidr,
+		},
+	}
+	instance := &networkv1alpha1.Subnet{
+		Spec:       spec,
+		ObjectMeta: meta,
+	}
+	Expect(k8sClient.Create(ctx, instance)).To(Succeed())
+	return instance
+}
+
+func validateAllocatedIP(obj *networkv1alpha1.IPAMRange, ip commonv1alpha1.IPAddr, expState networkv1alpha1.IPAMRangeAllocationState) bool {
 	for _, alloc := range obj.Status.Allocations {
-		if alloc.CIDR != nil {
-			result[alloc.CIDR.String()] = alloc.State
+		if alloc.IPs.From == ip && alloc.State == expState {
+			return true
 		}
 	}
-
-	return result
+	return false
 }

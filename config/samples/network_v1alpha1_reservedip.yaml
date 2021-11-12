@@ -1,14 +1,11 @@
 apiVersion: network.onmetal.de/v1alpha1
 kind: ReservedIP
 metadata:
-  name: myReservedIP
+  name: myreservedip
 spec:
+  ip: 10.0.0.1
   subnet:
     name: subnet-sample
- assignment:
-   kind: Machine
-   apiGroup: compute.onmetal.de
-   name: machine-sample
 #status:
 #  ip: 1.2.3.4
 #  state: Assigned

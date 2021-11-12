@@ -32,7 +32,7 @@ import (
 	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 )
 
-const reservedIPFieldOwner = client.FieldOwner("compute.onmetal.de/reserved-ip")
+const reservedIPFieldOwner = client.FieldOwner("networking.onmetal.de/reservedip")
 
 // ReservedIPReconciler reconciles a ReservedIP object
 type ReservedIPReconciler struct {
@@ -105,7 +105,6 @@ func (r *ReservedIPReconciler) reconcile(ctx context.Context, log logr.Logger, r
 		reservedipStatus.State = networkv1alpha1.ReservedIPStateError
 		return ctrl.Result{}, fmt.Errorf("could not create subnet %s ipam range: %w", reservedip.Spec.Subnet.Name, err)
 	}
-
 	for _, allocation := range subIPAMRange.Status.Allocations {
 		if allocation.State != networkv1alpha1.IPAMRangeAllocationFree || allocation.IPs == nil {
 			continue
