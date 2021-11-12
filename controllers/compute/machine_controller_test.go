@@ -179,8 +179,8 @@ var _ = Describe("machine controller", func() {
 
 const (
 	// test data
-	kind       = "Machine"
-	subnetName = "sample"
+	machineKind = "Machine"
+	subnetName  = "sample"
 
 	// ginkgo
 	interval = time.Millisecond * 250
@@ -194,7 +194,7 @@ var (
 func controllerReference(m *computev1alpha1.Machine) metav1.OwnerReference {
 	return metav1.OwnerReference{
 		APIVersion:         computev1alpha1.GroupVersion.String(),
-		Kind:               kind,
+		Kind:               machineKind,
 		Name:               m.Name,
 		UID:                m.UID,
 		BlockOwnerDeletion: pointer.BoolPtr(true),
@@ -226,7 +226,7 @@ func newIPAMRanges(m *computev1alpha1.Machine) (rngs []*networkv1alpha1.IPAMRang
 func newMachine() *computev1alpha1.Machine {
 	m := &computev1alpha1.Machine{}
 	m.APIVersion = computev1alpha1.GroupVersion.String()
-	m.Kind = kind
+	m.Kind = machineKind
 	m.Namespace = ns.Name
 	m.GenerateName = "machine-controller-test"
 	return m
