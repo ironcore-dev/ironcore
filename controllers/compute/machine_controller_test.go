@@ -251,9 +251,3 @@ func newSubnet(name, ipPrefix string) *networkv1alpha1.Subnet {
 	subnet.Spec.Ranges = []networkv1alpha1.RangeType{{CIDR: commonv1alpha1.CIDR{IPPrefix: parsed}}}
 	return subnet
 }
-
-// func notFoundOrSucceed(err error) error {
-// 	fmt.Fprintf(GinkgoWriter, "error in notFoundOrSucceed %#v\n\n", err)
-// 	Expect(apierrors.IsNotFound(err) || err == nil).To(BeTrue(), "error is `not found` or nil")
-// 	return err
-// }
