@@ -17,14 +17,12 @@
 package compute
 
 import (
-	"fmt"
 	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"inet.af/netaddr"
 	corev1 "k8s.io/api/core/v1"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -78,7 +76,11 @@ var _ = Describe("machine controller", func() {
 			By("fetching the corresponding IPAMRange")
 			key := objectKey(rng)
 			Eventually(func() error {
-				return notFoundOrSucceed(k8sClient.Get(ctx, key, rng))
+				err := k8sClient.Get(ctx, key, rng)
+
+				// Errors other than `not-found` shouldn't exist
+				Expect(client.IgnoreNotFound(err)).To(Succeed())
+				return err
 			}, timeout, interval).Should(Succeed())
 
 			By("checking if the parent of the IPAMRange corresponds to the target of the interface")
@@ -137,7 +139,11 @@ var _ = Describe("machine controller", func() {
 			By("fetching the corresponding IPAMRange")
 			key := objectKey(rng)
 			Eventually(func() error {
-				return notFoundOrSucceed(k8sClient.Get(ctx, key, rng))
+				err := k8sClient.Get(ctx, key, rng)
+
+				// Errors other than `not-found` shouldn't exist
+				Expect(client.IgnoreNotFound(err)).To(Succeed())
+				return err
 			}, timeout, interval).Should(Succeed())
 
 			By("checking if the parent of the IPAMRange corresponds to the target of the interface")
@@ -239,8 +245,8 @@ func newSubnet(name, ipPrefix string) *networkv1alpha1.Subnet {
 	return subnet
 }
 
-func notFoundOrSucceed(err error) error {
-	fmt.Fprintf(GinkgoWriter, "error in notFoundOrSucceed %#v\n\n", err)
-	Expect(apierrors.IsNotFound(err) || err == nil).To(BeTrue(), "error is `not found` or nil")
-	return err
-}
+// func notFoundOrSucceed(err error) error {
+// 	fmt.Fprintf(GinkgoWriter, "error in notFoundOrSucceed %#v\n\n", err)
+// 	Expect(apierrors.IsNotFound(err) || err == nil).To(BeTrue(), "error is `not found` or nil")
+// 	return err
+// }
