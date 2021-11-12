@@ -71,7 +71,7 @@ var _ = Describe("machine controller", func() {
 		By("creating the machine")
 		Expect(k8sClient.Create(ctx, m)).To(Succeed())
 
-		rngs := newIPAMRanges(m)
+		rngs := toCorrespondingEmptyIPAMRanges(m)
 		for i, rng := range rngs {
 			By("fetching the corresponding IPAMRange")
 			key := objectKey(rng)
@@ -134,7 +134,7 @@ var _ = Describe("machine controller", func() {
 		By("creating the machine")
 		Expect(k8sClient.Create(ctx, m)).To(Succeed())
 
-		rngs := newIPAMRanges(m)
+		rngs := toCorrespondingEmptyIPAMRanges(m)
 		for i, rng := range rngs {
 			By("fetching the corresponding IPAMRange")
 			key := objectKey(rng)
@@ -213,7 +213,7 @@ func ipamRangeRequest(ip *commonv1alpha1.IPAddr) networkv1alpha1.IPAMRangeReques
 	}
 }
 
-func newIPAMRanges(m *computev1alpha1.Machine) (rngs []*networkv1alpha1.IPAMRange) {
+func toCorrespondingEmptyIPAMRanges(m *computev1alpha1.Machine) (rngs []*networkv1alpha1.IPAMRange) {
 	for _, iface := range m.Spec.Interfaces {
 		rng := &networkv1alpha1.IPAMRange{}
 		rng.Namespace = m.Namespace
