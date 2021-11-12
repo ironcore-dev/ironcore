@@ -33,6 +33,8 @@ import (
 )
 
 var _ = Describe("machine controller", func() {
+	machineTestNS = SetupTest(ctx)
+
 	It("reconciles a machine without interface", func() {
 		By("creating the machine")
 		m := newMachine()
@@ -188,6 +190,7 @@ const (
 )
 
 var (
+	machineTestNS = &corev1.Namespace{}
 	objectKey = client.ObjectKeyFromObject
 )
 
@@ -227,7 +230,7 @@ func newMachine() *computev1alpha1.Machine {
 	m := &computev1alpha1.Machine{}
 	m.APIVersion = computev1alpha1.GroupVersion.String()
 	m.Kind = machineKind
-	m.Namespace = ns.Name
+	m.Namespace = machineTestNS.Name
 	m.GenerateName = "machine-controller-test"
 	return m
 }
@@ -236,7 +239,7 @@ func newSubnet(name, ipPrefix string) *networkv1alpha1.Subnet {
 	subnet := &networkv1alpha1.Subnet{}
 	subnet.APIVersion = networkv1alpha1.GroupVersion.String()
 	subnet.Kind = networkv1alpha1.SubnetGK.Kind
-	subnet.Namespace = ns.Name
+	subnet.Namespace = machineTestNS.Name
 	subnet.Name = name
 
 	parsed, err := netaddr.ParseIPPrefix(ipPrefix)

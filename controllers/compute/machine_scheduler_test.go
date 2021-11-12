@@ -27,7 +27,7 @@ import (
 // var ctx = ctrl.SetupSignalHandler()
 
 var _ = Describe("MachineScheduler", func() {
-	// ns := SetupTest(ctx)
+	ns := SetupTest(ctx)
 
 	It("should schedule machines on machine pools", func() {
 		By("creating a machine pool")

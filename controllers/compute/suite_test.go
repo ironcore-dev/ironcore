@@ -46,7 +46,6 @@ var (
 	cfg       *rest.Config
 	ctx       = ctrl.SetupSignalHandler()
 	k8sClient client.Client
-	ns        = SetupTest(ctx)
 	testEnv   *envtest.Environment
 )
 
