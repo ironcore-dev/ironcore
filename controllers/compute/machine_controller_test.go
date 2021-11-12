@@ -55,13 +55,13 @@ var _ = Describe("machine controller", func() {
 		ifaces := []computev1alpha1.Interface{
 			{
 				Name:     "iface-0",
-				IP:       ip("192.168.0.0"),
+				IP:       mustParseIP("192.168.0.0"),
 				Priority: 0,
 				Target:   corev1.LocalObjectReference{Name: subnetName},
 			},
 			{
 				Name:     "iface-1",
-				IP:       ip("192.168.0.1"),
+				IP:       mustParseIP("192.168.0.1"),
 				Priority: 1,
 				Target:   corev1.LocalObjectReference{Name: subnetName},
 			},
@@ -202,7 +202,7 @@ func controllerReference(m *computev1alpha1.Machine) metav1.OwnerReference {
 	}
 }
 
-func ip(ip string) *commonv1alpha1.IPAddr {
+func mustParseIP(ip string) *commonv1alpha1.IPAddr {
 	parsed, _ := netaddr.ParseIP(ip)
 	return commonv1alpha1.NewIPAddrPtr(parsed)
 }
