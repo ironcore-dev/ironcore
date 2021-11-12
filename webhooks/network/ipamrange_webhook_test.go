@@ -16,6 +16,8 @@
 package network
 
 import (
+	"fmt"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"inet.af/netaddr"
@@ -53,6 +55,35 @@ var _ = Describe("IPAMRangeWebhook", func() {
 							Child("parent").
 							Child("name"),
 						"",
+					).Error()),
+				),
+			)
+		})
+		It("cidrs should be empty for child IPAMRange", func() {
+			prefix1, err := netaddr.ParseIPPrefix("192.168.1.0/24")
+			Expect(err).ToNot(HaveOccurred())
+			instance := &networkv1alpha1.IPAMRange{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "test",
+					Namespace: ns.Name,
+				},
+				Spec: networkv1alpha1.IPAMRangeSpec{
+					Parent: &corev1.LocalObjectReference{
+						Name: "parent",
+					},
+					CIDRs: []commonv1alpha1.CIDR{
+						commonv1alpha1.NewCIDR(prefix1),
+					},
+				},
+			}
+			Expect(k8sClient.Create(ctx, instance)).To(
+				WithTransform(
+					func(err error) string { return err.Error() },
+					ContainSubstring(field.Forbidden(
+						field.
+							NewPath("spec").
+							Child("cidrs"),
+						"CIDRs should be empty for child IPAMRange",
 					).Error()),
 				),
 			)
@@ -175,15 +206,14 @@ var _ = Describe("IPAMRangeWebhook", func() {
 
 			prefix2, err := netaddr.ParseIPPrefix("192.168.2.0/24")
 			Expect(err).ToNot(HaveOccurred())
+			cidr2 := commonv1alpha1.NewCIDR(prefix2)
 			instance2 := &networkv1alpha1.IPAMRange{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "test2",
 					Namespace: ns.Name,
 				},
 				Spec: networkv1alpha1.IPAMRangeSpec{
-					CIDRs: []commonv1alpha1.CIDR{
-						commonv1alpha1.NewCIDR(prefix2),
-					},
+					CIDRs: []commonv1alpha1.CIDR{cidr2},
 				},
 			}
 			Expect(k8sClient.Create(ctx, instance2)).To(Succeed())
@@ -256,6 +286,45 @@ var _ = Describe("IPAMRangeWebhook", func() {
 							Child("requests").
 							Child("cidr"),
 						prefix1.String(),
+					).Error()),
+				),
+			)
+		})
+		It("forbidden to delete used CIDRs", func() {
+			prefix1, err := netaddr.ParseIPPrefix("192.168.1.0/24")
+			Expect(err).ToNot(HaveOccurred())
+			cidr1 := commonv1alpha1.NewCIDR(prefix1)
+			prefix2, err := netaddr.ParseIPPrefix("192.168.2.0/24")
+			Expect(err).ToNot(HaveOccurred())
+			cidr2 := commonv1alpha1.NewCIDR(prefix2)
+			instance := &networkv1alpha1.IPAMRange{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "test",
+					Namespace: ns.Name,
+				},
+				Spec: networkv1alpha1.IPAMRangeSpec{
+					CIDRs: []commonv1alpha1.CIDR{cidr1, cidr2},
+				},
+			}
+			Expect(k8sClient.Create(ctx, instance)).To(Succeed())
+
+			instance.Status = networkv1alpha1.IPAMRangeStatus{
+				Allocations: []networkv1alpha1.IPAMRangeAllocationStatus{
+					{State: networkv1alpha1.IPAMRangeAllocationUsed, CIDR: &cidr2},
+				},
+			}
+			Expect(k8sClient.Status().Update(ctx, instance)).To(Succeed())
+
+			By("remove one of the CIDRs")
+			instance.Spec.CIDRs = []commonv1alpha1.CIDR{cidr1}
+			Expect(k8sClient.Update(ctx, instance)).To(
+				WithTransform(
+					func(err error) string { return err.Error() },
+					ContainSubstring(field.Forbidden(
+						field.
+							NewPath("spec").
+							Child("cidrs"),
+						fmt.Sprintf("CIDR %s is used by child request", cidr2.String()),
 					).Error()),
 				),
 			)
