@@ -51,7 +51,7 @@ var _ = Describe("machine controller", func() {
 	It("reconciles a machine owning interfaces with IP", func() {
 		By("creating the subnet")
 		subnet := newSubnet(subnetName, "192.168.0.0/24")
-		Expect(k8sClient.Patch(ctx, subnet, client.Apply, machineInterfaceFieldOwner)).To(Succeed())
+		Expect(k8sClient.Create(ctx, subnet)).To(Succeed())
 
 		m := newMachine()
 		ifaces := []computev1alpha1.Interface{
@@ -114,7 +114,7 @@ var _ = Describe("machine controller", func() {
 	It("reconciles a machine owning interfaces without IP", func() {
 		By("creating the subnet")
 		subnet := newSubnet(subnetName, "192.168.0.0/24")
-		Expect(k8sClient.Patch(ctx, subnet, client.Apply, machineInterfaceFieldOwner)).To(Succeed())
+		Expect(k8sClient.Create(ctx, subnet)).To(Succeed())
 
 		m := newMachine()
 		ifaces := []computev1alpha1.Interface{
