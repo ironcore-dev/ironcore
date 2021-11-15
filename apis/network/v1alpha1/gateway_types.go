@@ -17,9 +17,12 @@
 package v1alpha1
 
 import (
-	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	"fmt"
+
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 )
 
 type GatewayMode string
@@ -39,6 +42,10 @@ type GatewaySpec struct {
 	FilterRules []FilterRule `json:"filterRules,omitempty"`
 	// Uplink is a Target to route traffic to.
 	Uplink Target `json:"uplink"`
+
+	// Todo: Do we need this?
+	// SourceIPAMRange is the reference to the IPAMRange where the Gateway resides
+	SourceIPAMRange corev1.LocalObjectReference `json:"subnet"`
 }
 
 type FilterRule struct {
@@ -92,6 +99,16 @@ type Gateway struct {
 
 	Spec   GatewaySpec   `json:"spec,omitempty"`
 	Status GatewayStatus `json:"status,omitempty"`
+}
+
+// IsBeingDeleted returns if the instance is being deleted
+func (gw *Gateway) IsBeingDeleted() bool {
+	return !gw.DeletionTimestamp.IsZero()
+}
+
+// IPAMRangeName returns the name of the corresponding IPAMRange
+func (gw *Gateway) IPAMRangeName() string {
+	return fmt.Sprintf("gateway-%s", gw.Name)
 }
 
 //+kubebuilder:object:root=true
