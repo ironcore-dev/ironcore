@@ -20,6 +20,8 @@ import (
 	"context"
 	"fmt"
 
+	"k8s.io/apimachinery/pkg/util/sets"
+
 	"github.com/go-logr/logr"
 	"inet.af/netaddr"
 	corev1 "k8s.io/api/core/v1"
@@ -36,7 +38,7 @@ import (
 )
 
 const (
-	createdByLabel             = "created-by"
+	machineOwnerLabel          = "compute.onmetal.de/machine-owner"
 	machineInterfaceFieldOwner = client.FieldOwner("compute.onmetal.de/machine-iface")
 )
 
@@ -86,23 +88,16 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 	var (
 		interfaceStatuses  []computev1alpha1.InterfaceStatus
 		existingIPAMRanges = &networkv1alpha1.IPAMRangeList{}
-		ifaceCheckList     = map[string]bool{}
+		ifaceCheckList     = sets.NewString()
 	)
 
-	if err := r.List(ctx, existingIPAMRanges, client.MatchingLabels{createdByLabel: machine.Name}); err != nil {
-		return ctrl.Result{}, fmt.Errorf("failed to list IPAMRanges: %w", err)
-	}
-	for _, i := range existingIPAMRanges.Items {
-		ifaceCheckList[i.Name] = false
-	}
-
-	// Update IPAMRanges associated with machine interfaces
+	// Delete unused IPAMRanges associated with Machine interfaces
 	for _, iface := range machine.Spec.Interfaces {
 		var (
 			request  networkv1alpha1.IPAMRangeRequest
 			ipamName = computev1alpha1.MachineInterfaceIPAMRangeName(machine.Name, iface.Name)
 		)
-		ifaceCheckList[ipamName] = true
+		ifaceCheckList.Insert(ipamName)
 
 		if iface.IP != nil {
 			request.IPs = commonv1alpha1.NewIPRangePtr(netaddr.IPRangeFrom(iface.IP.IP, iface.IP.IP))
@@ -119,7 +114,7 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 				Namespace: machine.Namespace,
 				Name:      ipamName,
 				Labels: map[string]string{
-					createdByLabel: machine.Name,
+					machineOwnerLabel: machine.Name,
 				},
 			},
 			Spec: networkv1alpha1.IPAMRangeSpec{
@@ -151,15 +146,18 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 	}
 
 	// Delete IPAMRanges associated with interfaces deleted from machine
-	for ipamName, exists := range ifaceCheckList {
-		if exists {
+	if err := r.List(ctx, existingIPAMRanges, client.MatchingLabels{machineOwnerLabel: machine.Name}); err != nil {
+		return ctrl.Result{}, fmt.Errorf("failed to list IPAMRanges: %w", err)
+	}
+	for _, i := range existingIPAMRanges.Items {
+		if ifaceCheckList.Has(i.Name) {
 			continue
 		}
 
 		ipamRange := &networkv1alpha1.IPAMRange{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: machine.Namespace,
-				Name:      ipamName,
+				Name:      i.Name,
 			},
 		}
 		if err := r.Delete(ctx, ipamRange); err != nil {
