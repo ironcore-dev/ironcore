@@ -554,7 +554,10 @@ func (in *ReservedIPList) DeepCopyObject() runtime.Object {
 func (in *ReservedIPSpec) DeepCopyInto(out *ReservedIPSpec) {
 	*out = *in
 	out.Subnet = in.Subnet
-	in.IP.DeepCopyInto(&out.IP)
+	if in.IP != nil {
+		in, out := &in.IP, &out.IP
+		*out = (*in).DeepCopy()
+	}
 	out.Assignment = in.Assignment
 }
 
@@ -578,7 +581,10 @@ func (in *ReservedIPStatus) DeepCopyInto(out *ReservedIPStatus) {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
-	in.IP.DeepCopyInto(&out.IP)
+	if in.IP != nil {
+		in, out := &in.IP, &out.IP
+		*out = (*in).DeepCopy()
+	}
 	if in.Bound != nil {
 		in, out := &in.Bound, &out.Bound
 		*out = new(ReservedIPBound)

@@ -77,6 +77,10 @@ func NewIPAddrPtr(ip netaddr.IP) *IPAddr {
 	return &IPAddr{ip}
 }
 
+func PtrToIPAddr(addr IPAddr) *IPAddr {
+	return &addr
+}
+
 // IPRange is an IP range.
 type IPRange struct {
 	From IPAddr `json:"from"`
@@ -94,6 +98,14 @@ func NewIPRange(ipRange netaddr.IPRange) IPRange {
 func NewIPRangePtr(ipRange netaddr.IPRange) *IPRange {
 	r := NewIPRange(ipRange)
 	return &r
+}
+
+func PtrToIPRange(ipRange IPRange) *IPRange {
+	return &ipRange
+}
+
+func IPRangeFrom(from IPAddr, to IPAddr) IPRange {
+	return NewIPRange(netaddr.IPRangeFrom(from.IP, to.IP))
 }
 
 func ParseIPRange(s string) (IPRange, error) {
@@ -140,4 +152,8 @@ func MustParseCIDR(s string) CIDR {
 func NewCIDRPtr(prefix netaddr.IPPrefix) *CIDR {
 	c := NewCIDR(prefix)
 	return &c
+}
+
+func PtrToCIDR(cidr CIDR) *CIDR {
+	return &cidr
 }
