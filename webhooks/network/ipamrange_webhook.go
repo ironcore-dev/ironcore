@@ -29,7 +29,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
@@ -46,7 +45,7 @@ var ipamrangelog = logf.Log.WithName("ipamrange-resource")
 
 func SetupIPAMRangeWebhookWithManager(mgr ctrl.Manager) error {
 	defaulter := &IPAMRangeDefaulter{}
-	validator := &IPAMRangeValidator{mgr.GetClient()}
+	validator := &IPAMRangeValidator{}
 
 	return ctrl.NewWebhookManagedBy(mgr).
 		WithDefaulter(defaulter).
@@ -72,9 +71,7 @@ func (d *IPAMRangeDefaulter) Default(ctx context.Context, obj runtime.Object) er
 
 var _ webhook.CustomValidator = &IPAMRangeValidator{}
 
-type IPAMRangeValidator struct {
-	client.Client
-}
+type IPAMRangeValidator struct{}
 
 // ValidateCreate implements webhook.CustomValidator so a webhook will be registered for the type
 func (v *IPAMRangeValidator) ValidateCreate(ctx context.Context, obj runtime.Object) error {
@@ -91,9 +88,9 @@ func (v *IPAMRangeValidator) ValidateCreate(ctx context.Context, obj runtime.Obj
 		if len(r.Spec.CIDRs) > 0 {
 			allErrs = append(allErrs, field.Forbidden(path.Child("cidrs"), "CIDRs should be empty for child IPAMRange"))
 		}
-		allErrs = append(allErrs, v.overlappingRequestExist(ctx, r)...)
+		allErrs = append(allErrs, v.overlappingRequestExist(r)...)
 	} else {
-		allErrs = append(allErrs, v.overlappingParentExists(ctx, r)...)
+		allErrs = append(allErrs, v.overlappingParentExists(r)...)
 	}
 
 	if len(allErrs) == 0 {
@@ -115,9 +112,9 @@ func (v *IPAMRangeValidator) ValidateUpdate(ctx context.Context, oldObj, newObj 
 		if !reflect.DeepEqual(r.Spec.Parent, oldRange.Spec.Parent) {
 			allErrs = append(allErrs, field.Invalid(path.Child("parent"), r.Spec.Parent, fieldImmutable))
 		}
-		allErrs = append(allErrs, v.overlappingRequestExist(ctx, r)...)
+		allErrs = append(allErrs, v.overlappingRequestExist(r)...)
 	} else {
-		allErrs = append(allErrs, v.overlappingParentExists(ctx, r)...)
+		allErrs = append(allErrs, v.overlappingParentExists(r)...)
 		allErrs = append(allErrs, v.deletedCIDRsUsed(r, oldRange)...)
 	}
 
@@ -132,44 +129,28 @@ func (v *IPAMRangeValidator) ValidateDelete(ctx context.Context, obj runtime.Obj
 	r := obj.(*networkv1alpha1.IPAMRange)
 	ipamrangelog.Info("validate delete", "name", r.Name)
 
-	list := &networkv1alpha1.IPAMRangeList{}
-	if err := v.List(
-		ctx, list, client.InNamespace(r.Namespace),
-		client.MatchingFields{parentField: r.Name},
-	); err != nil {
-		return apierrors.NewInternalError(fmt.Errorf("failed to list children: %w", err))
-	}
-
-	if len(list.Items) > 0 {
-		return apierrors.NewForbidden(schema.GroupResource{
-			Group:    networkv1alpha1.IPAMRangeGK.Group,
-			Resource: networkv1alpha1.IPAMRangeGK.Kind,
-		}, r.Name, fmt.Errorf("there's still children that depend on this IPAMRange"))
+	for _, alloc := range r.Status.Allocations {
+		if alloc.State == networkv1alpha1.IPAMRangeAllocationUsed {
+			return apierrors.NewForbidden(schema.GroupResource{
+				Group:    networkv1alpha1.IPAMRangeGK.Group,
+				Resource: networkv1alpha1.IPAMRangeGK.Kind,
+			}, r.Name, fmt.Errorf("there's still children that depend on this IPAMRange"))
+		}
 	}
 
 	return nil
 }
 
 // overlappingParentExists checks if any other parent IPAM range is already overlapping passed CIDRs
-func (v *IPAMRangeValidator) overlappingParentExists(ctx context.Context, req *networkv1alpha1.IPAMRange) (errs field.ErrorList) {
+func (v *IPAMRangeValidator) overlappingParentExists(req *networkv1alpha1.IPAMRange) (errs field.ErrorList) {
 	path := field.NewPath("spec").Child("cidrs")
 
-	list := &networkv1alpha1.IPAMRangeList{}
-	if err := v.List(ctx, list, client.InNamespace(req.Namespace)); err != nil {
-		errs = append(errs, field.InternalError(nil, fmt.Errorf("failed to list existing IPAMRanges: %w", err)))
-		return
-	}
-
-	for _, i := range list.Items {
-		if i.Spec.Parent == nil && i.Name != req.Name {
-		loop:
-			for _, cidr := range req.Spec.CIDRs {
-				for _, otherCidr := range i.Spec.CIDRs {
-					if cidr.Overlaps(otherCidr.IPPrefix) {
-						errs = append(errs, field.Duplicate(path, cidr.String()))
-						continue loop
-					}
-				}
+	for i, cidr1 := range req.Spec.CIDRs {
+	loop:
+		for _, cidr2 := range req.Spec.CIDRs[i+1:] {
+			if cidr1.Overlaps(cidr2.IPPrefix) {
+				errs = append(errs, field.Duplicate(path, cidr2.String()))
+				continue loop
 			}
 		}
 	}
@@ -211,26 +192,13 @@ loop:
 }
 
 // overlappingRequestExist checks if any other IPAM range request overlaps CIDR or IP range of passed request
-func (v *IPAMRangeValidator) overlappingRequestExist(ctx context.Context, req *networkv1alpha1.IPAMRange) (errs field.ErrorList) {
-	list := &networkv1alpha1.IPAMRangeList{}
-	if err := v.List(
-		ctx, list, client.InNamespace(req.Namespace),
-		client.MatchingFields{parentField: req.Spec.Parent.Name},
-	); err != nil {
-		errs = append(errs, field.InternalError(nil, fmt.Errorf("failed to list existing IPAMRanges: %w", err)))
-		return
-	}
-
-	for _, i := range list.Items {
-		if i.Name != req.Name {
-		loop:
-			for _, req := range req.Spec.Requests {
-				for _, otherReq := range i.Spec.Requests {
-					if err := checkRequestOverlap(req, otherReq); err != nil {
-						errs = append(errs, err)
-						continue loop
-					}
-				}
+func (v *IPAMRangeValidator) overlappingRequestExist(ipamRange *networkv1alpha1.IPAMRange) (errs field.ErrorList) {
+	for i, req1 := range ipamRange.Spec.Requests {
+	loop:
+		for _, req2 := range ipamRange.Spec.Requests[i+1:] {
+			if err := checkRequestOverlap(req1, req2); err != nil {
+				errs = append(errs, err)
+				continue loop
 			}
 		}
 	}
@@ -239,23 +207,23 @@ func (v *IPAMRangeValidator) overlappingRequestExist(ctx context.Context, req *n
 }
 
 // checkRequestOverlap checks if requests overlap by CIDR or IP range
-func checkRequestOverlap(req, otherReq networkv1alpha1.IPAMRangeRequest) *field.Error {
+func checkRequestOverlap(req1, req2 networkv1alpha1.IPAMRangeRequest) *field.Error {
 	path := field.NewPath("spec").Child("requests")
 
-	if req.CIDR != nil {
+	if req1.CIDR != nil {
 		subpath := path.Child("cidr")
-		if otherReq.CIDR != nil && req.CIDR.Overlaps(otherReq.CIDR.IPPrefix) {
-			return field.Duplicate(subpath, req.CIDR.String())
-		} else if otherReq.IPs != nil && req.CIDR.Range().Overlaps(otherReq.IPs.Range()) {
-			return field.Duplicate(subpath, req.CIDR.String())
+		if req2.CIDR != nil && req1.CIDR.Overlaps(req2.CIDR.IPPrefix) {
+			return field.Duplicate(subpath, req2.CIDR.String())
+		} else if req2.IPs != nil && req1.CIDR.Range().Overlaps(req2.IPs.Range()) {
+			return field.Duplicate(subpath, req1.CIDR.String())
 		}
-	} else if req.IPs != nil {
+	} else if req1.IPs != nil {
 		subpath := path.Child("ips")
-		if otherReq.CIDR != nil && otherReq.CIDR.Range().Overlaps(req.IPs.Range()) {
-			return field.Duplicate(subpath, req.IPs.Range().String())
+		if req2.CIDR != nil && req2.CIDR.Range().Overlaps(req1.IPs.Range()) {
+			return field.Duplicate(subpath, req2.IPs.Range().String())
 		}
-		if otherReq.IPs != nil && otherReq.IPs.Range().Overlaps(req.IPs.Range()) {
-			return field.Duplicate(subpath, req.IPs.Range().String())
+		if req2.IPs != nil && req2.IPs.Range().Overlaps(req1.IPs.Range()) {
+			return field.Duplicate(subpath, req2.IPs.Range().String())
 		}
 	}
 

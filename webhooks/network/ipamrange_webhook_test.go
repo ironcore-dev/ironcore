@@ -91,33 +91,18 @@ var _ = Describe("IPAMRangeWebhook", func() {
 		It("parent CIDRs shouldn't overlap", func() {
 			prefix1, err := netaddr.ParseIPPrefix("192.168.1.0/24")
 			Expect(err).ToNot(HaveOccurred())
+			prefix2, err := netaddr.ParseIPPrefix("192.168.1.0/25")
+			Expect(err).ToNot(HaveOccurred())
 			instance := &networkv1alpha1.IPAMRange{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "test",
 					Namespace: ns.Name,
 				},
 				Spec: networkv1alpha1.IPAMRangeSpec{
-					CIDRs: []commonv1alpha1.CIDR{
-						commonv1alpha1.NewCIDR(prefix1),
-					},
+					CIDRs: []commonv1alpha1.CIDR{commonv1alpha1.NewCIDR(prefix1), commonv1alpha1.NewCIDR(prefix2)},
 				},
 			}
-			Expect(k8sClient.Create(ctx, instance)).To(Succeed())
-
-			prefix2, err := netaddr.ParseIPPrefix("192.168.1.0/25")
-			Expect(err).ToNot(HaveOccurred())
-			instance2 := &networkv1alpha1.IPAMRange{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "test2",
-					Namespace: ns.Name,
-				},
-				Spec: networkv1alpha1.IPAMRangeSpec{
-					CIDRs: []commonv1alpha1.CIDR{
-						commonv1alpha1.NewCIDR(prefix2),
-					},
-				},
-			}
-			Expect(k8sClient.Create(ctx, instance2)).To(
+			Expect(k8sClient.Create(ctx, instance)).To(
 				WithTransform(
 					func(err error) string { return err.Error() },
 					ContainSubstring(field.Duplicate(
@@ -133,6 +118,9 @@ var _ = Describe("IPAMRangeWebhook", func() {
 			prefix1, err := netaddr.ParseIPPrefix("192.168.1.0/24")
 			Expect(err).ToNot(HaveOccurred())
 			cidr1 := commonv1alpha1.NewCIDR(prefix1)
+			prefix2, err := netaddr.ParseIPPrefix("192.168.1.0/25")
+			Expect(err).ToNot(HaveOccurred())
+			cidr2 := commonv1alpha1.NewCIDR(prefix2)
 			instance := &networkv1alpha1.IPAMRange{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "test",
@@ -142,35 +130,10 @@ var _ = Describe("IPAMRangeWebhook", func() {
 					Parent: &corev1.LocalObjectReference{
 						Name: "parent",
 					},
-					Requests: []networkv1alpha1.IPAMRangeRequest{
-						{
-							CIDR: &cidr1,
-						},
-					},
+					Requests: []networkv1alpha1.IPAMRangeRequest{{CIDR: &cidr1}, {CIDR: &cidr2}},
 				},
 			}
-			Expect(k8sClient.Create(ctx, instance)).To(Succeed())
-
-			prefix2, err := netaddr.ParseIPPrefix("192.168.1.0/25")
-			Expect(err).ToNot(HaveOccurred())
-			cidr2 := commonv1alpha1.NewCIDR(prefix2)
-			instance2 := &networkv1alpha1.IPAMRange{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "test2",
-					Namespace: ns.Name,
-				},
-				Spec: networkv1alpha1.IPAMRangeSpec{
-					Parent: &corev1.LocalObjectReference{
-						Name: "parent",
-					},
-					Requests: []networkv1alpha1.IPAMRangeRequest{
-						{
-							CIDR: &cidr2,
-						},
-					},
-				},
-			}
-			Expect(k8sClient.Create(ctx, instance2)).To(
+			Expect(k8sClient.Create(ctx, instance)).To(
 				WithTransform(
 					func(err error) string { return err.Error() },
 					ContainSubstring(field.Duplicate(
@@ -182,6 +145,7 @@ var _ = Describe("IPAMRangeWebhook", func() {
 					).Error()),
 				),
 			)
+
 		})
 	})
 
@@ -204,30 +168,18 @@ var _ = Describe("IPAMRangeWebhook", func() {
 			}
 			Expect(k8sClient.Create(ctx, instance)).To(Succeed())
 
-			prefix2, err := netaddr.ParseIPPrefix("192.168.2.0/24")
+			By("updating parent with duplicate CIDR")
+			prefix2, err := netaddr.ParseIPPrefix("192.168.1.0/25")
 			Expect(err).ToNot(HaveOccurred())
-			cidr2 := commonv1alpha1.NewCIDR(prefix2)
-			instance2 := &networkv1alpha1.IPAMRange{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "test2",
-					Namespace: ns.Name,
-				},
-				Spec: networkv1alpha1.IPAMRangeSpec{
-					CIDRs: []commonv1alpha1.CIDR{cidr2},
-				},
-			}
-			Expect(k8sClient.Create(ctx, instance2)).To(Succeed())
-
-			By("Update second object with duplicate CIDR")
-			instance2.Spec.CIDRs = append(instance2.Spec.CIDRs, instance.Spec.CIDRs...)
-			Expect(k8sClient.Update(ctx, instance2)).To(
+			instance.Spec.CIDRs = append(instance.Spec.CIDRs, commonv1alpha1.NewCIDR(prefix2))
+			Expect(k8sClient.Update(ctx, instance)).To(
 				WithTransform(
 					func(err error) string { return err.Error() },
 					ContainSubstring(field.Duplicate(
 						field.
 							NewPath("spec").
 							Child("cidrs"),
-						prefix1.String(),
+						prefix2.String(),
 					).Error()),
 				),
 			)
@@ -245,39 +197,17 @@ var _ = Describe("IPAMRangeWebhook", func() {
 					Parent: &corev1.LocalObjectReference{
 						Name: "parent",
 					},
-					Requests: []networkv1alpha1.IPAMRangeRequest{
-						{
-							CIDR: &cidr1,
-						},
-					},
+					Requests: []networkv1alpha1.IPAMRangeRequest{{CIDR: &cidr1}},
 				},
 			}
 			Expect(k8sClient.Create(ctx, instance)).To(Succeed())
 
-			prefix2, err := netaddr.ParseIPPrefix("192.168.2.0/24")
+			By("updating IPAMRange with duplicate request")
+			prefix2, err := netaddr.ParseIPPrefix("192.168.1.0/25")
 			Expect(err).ToNot(HaveOccurred())
 			cidr2 := commonv1alpha1.NewCIDR(prefix2)
-			instance2 := &networkv1alpha1.IPAMRange{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "test2",
-					Namespace: ns.Name,
-				},
-				Spec: networkv1alpha1.IPAMRangeSpec{
-					Parent: &corev1.LocalObjectReference{
-						Name: "parent",
-					},
-					Requests: []networkv1alpha1.IPAMRangeRequest{
-						{
-							CIDR: &cidr2,
-						},
-					},
-				},
-			}
-			Expect(k8sClient.Create(ctx, instance2)).To(Succeed())
-
-			By("Update second object with duplicate request")
-			instance2.Spec.Requests = append(instance2.Spec.Requests, instance.Spec.Requests...)
-			Expect(k8sClient.Update(ctx, instance2)).To(
+			instance.Spec.Requests = append(instance.Spec.Requests, networkv1alpha1.IPAMRangeRequest{CIDR: &cidr2})
+			Expect(k8sClient.Update(ctx, instance)).To(
 				WithTransform(
 					func(err error) string { return err.Error() },
 					ContainSubstring(field.Duplicate(
@@ -285,7 +215,7 @@ var _ = Describe("IPAMRangeWebhook", func() {
 							NewPath("spec").
 							Child("requests").
 							Child("cidr"),
-						prefix1.String(),
+						prefix2.String(),
 					).Error()),
 				),
 			)
@@ -315,7 +245,7 @@ var _ = Describe("IPAMRangeWebhook", func() {
 			}
 			Expect(k8sClient.Status().Update(ctx, instance)).To(Succeed())
 
-			By("remove one of the CIDRs")
+			By("removing one of the CIDRs")
 			instance.Spec.CIDRs = []commonv1alpha1.CIDR{cidr1}
 			Expect(k8sClient.Update(ctx, instance)).To(
 				WithTransform(
@@ -337,32 +267,26 @@ var _ = Describe("IPAMRangeWebhook", func() {
 		It("shouldn't allow to delete IPAMRange if it has allocations", func() {
 			parentPrefix, err := netaddr.ParseIPPrefix("192.168.1.0/24")
 			Expect(err).ToNot(HaveOccurred())
-			parentCidr := commonv1alpha1.NewCIDR(parentPrefix)
-			parent := &networkv1alpha1.IPAMRange{
+			cidr := commonv1alpha1.NewCIDR(parentPrefix)
+			instance := &networkv1alpha1.IPAMRange{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "parent",
 					Namespace: ns.Name,
 				},
 				Spec: networkv1alpha1.IPAMRangeSpec{
-					CIDRs: []commonv1alpha1.CIDR{parentCidr},
+					CIDRs: []commonv1alpha1.CIDR{cidr},
 				},
 			}
-			Expect(k8sClient.Create(ctx, parent)).To(Succeed())
+			Expect(k8sClient.Create(ctx, instance)).To(Succeed())
 
-			child := &networkv1alpha1.IPAMRange{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "child",
-					Namespace: ns.Name,
-				},
-				Spec: networkv1alpha1.IPAMRangeSpec{
-					Parent: &corev1.LocalObjectReference{
-						Name: "parent",
-					},
+			instance.Status = networkv1alpha1.IPAMRangeStatus{
+				Allocations: []networkv1alpha1.IPAMRangeAllocationStatus{
+					{State: networkv1alpha1.IPAMRangeAllocationUsed, CIDR: &cidr},
 				},
 			}
-			Expect(k8sClient.Create(ctx, child)).To(Succeed())
+			Expect(k8sClient.Status().Update(ctx, instance)).To(Succeed())
 
-			Expect(k8sClient.Delete(ctx, parent)).To(
+			Expect(k8sClient.Delete(ctx, instance)).To(
 				WithTransform(
 					func(err error) string { return err.Error() },
 					ContainSubstring("there's still children that depend on this IPAMRange"),
