@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package compute
 
 import (
 	"context"
 	"path/filepath"
 	"testing"
+	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -41,6 +41,11 @@ import (
 
 // These tests use Ginkgo (BDD-style Go testing framework). Refer to
 // http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
+
+const (
+	interval = time.Millisecond * 250
+	timeout  = time.Second * 10
+)
 
 var (
 	cfg       *rest.Config
@@ -72,6 +77,7 @@ var _ = BeforeSuite(func() {
 
 	err = computev1alpha1.AddToScheme(scheme.Scheme)
 	Expect(err).NotTo(HaveOccurred())
+	Expect(networkv1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
 
 	Expect(networkv1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
 
