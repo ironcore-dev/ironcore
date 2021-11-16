@@ -19,11 +19,10 @@ package compute
 import (
 	"context"
 	"fmt"
+
+	"k8s.io/apimachinery/pkg/util/sets"
+
 	"github.com/go-logr/logr"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
-	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
-	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
-	"github.com/onmetal/onmetal-api/predicates"
 	"inet.af/netaddr"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -31,9 +30,17 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
+	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
+	"github.com/onmetal/onmetal-api/predicates"
 )
 
-const machineInterfaceFieldOwner = client.FieldOwner("compute.onmetal.de/machine-iface")
+const (
+	machineOwnerLabel          = "compute.onmetal.de/machine-owner"
+	machineInterfaceFieldOwner = client.FieldOwner("compute.onmetal.de/machine-iface")
+)
 
 // MachineReconciler reconciles a Machine object
 type MachineReconciler struct {
@@ -78,9 +85,20 @@ func (r *MachineReconciler) delete(ctx context.Context, log logr.Logger, machine
 }
 
 func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) (ctrl.Result, error) {
-	var interfaceStatuses []computev1alpha1.InterfaceStatus
+	var (
+		interfaceStatuses  []computev1alpha1.InterfaceStatus
+		existingIPAMRanges = &networkv1alpha1.IPAMRangeList{}
+		ifaceCheckList     = sets.NewString()
+	)
+
+	// Delete unused IPAMRanges associated with Machine interfaces
 	for _, iface := range machine.Spec.Interfaces {
-		var request networkv1alpha1.IPAMRangeRequest
+		var (
+			request  networkv1alpha1.IPAMRangeRequest
+			ipamName = computev1alpha1.MachineInterfaceIPAMRangeName(machine.Name, iface.Name)
+		)
+		ifaceCheckList.Insert(ipamName)
+
 		if iface.IP != nil {
 			request.IPs = commonv1alpha1.NewIPRangePtr(netaddr.IPRangeFrom(iface.IP.IP, iface.IP.IP))
 		} else {
@@ -94,7 +112,10 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 			},
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: machine.Namespace,
-				Name:      computev1alpha1.MachineInterfaceIPAMRangeName(machine.Name, iface.Name),
+				Name:      ipamName,
+				Labels: map[string]string{
+					machineOwnerLabel: machine.Name,
+				},
 			},
 			Spec: networkv1alpha1.IPAMRangeSpec{
 				Parent: &corev1.LocalObjectReference{
@@ -121,6 +142,26 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 				IP:       ip,
 				Priority: iface.Priority,
 			})
+		}
+	}
+
+	// Delete IPAMRanges associated with interfaces deleted from machine
+	if err := r.List(ctx, existingIPAMRanges, client.MatchingLabels{machineOwnerLabel: machine.Name}); err != nil {
+		return ctrl.Result{}, fmt.Errorf("failed to list IPAMRanges: %w", err)
+	}
+	for _, i := range existingIPAMRanges.Items {
+		if ifaceCheckList.Has(i.Name) {
+			continue
+		}
+
+		ipamRange := &networkv1alpha1.IPAMRange{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: machine.Namespace,
+				Name:      i.Name,
+			},
+		}
+		if err := r.Delete(ctx, ipamRange); err != nil {
+			return ctrl.Result{}, fmt.Errorf("failed to delete IPAMRange: %w", err)
 		}
 	}
 

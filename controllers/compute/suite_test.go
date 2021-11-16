@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package compute
 
 import (
 	"context"
 	"path/filepath"
 	"testing"
+	"time"
+
+	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -41,8 +43,14 @@ import (
 // These tests use Ginkgo (BDD-style Go testing framework). Refer to
 // http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
 
+const (
+	interval = time.Millisecond * 250
+	timeout  = time.Second * 10
+)
+
 var (
 	cfg       *rest.Config
+	ctx       = ctrl.SetupSignalHandler()
 	k8sClient client.Client
 	testEnv   *envtest.Environment
 )
@@ -70,6 +78,7 @@ var _ = BeforeSuite(func() {
 
 	err = computev1alpha1.AddToScheme(scheme.Scheme)
 	Expect(err).NotTo(HaveOccurred())
+	Expect(networkv1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
 
 	//+kubebuilder:scaffold:scheme
 
@@ -104,6 +113,11 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 		Expect((&MachineScheduler{
 			Client: k8sManager.GetClient(),
 			Events: k8sManager.GetEventRecorderFor("machine-scheduler"),
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
+		Expect((&MachineReconciler{
+			Client: k8sManager.GetClient(),
+			Scheme: k8sManager.GetScheme(),
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		go func() {
