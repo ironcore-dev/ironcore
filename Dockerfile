@@ -15,7 +15,6 @@ RUN go mod download
 COPY main.go main.go
 COPY apis/ apis/
 COPY controllers/ controllers/
-COPY webhooks/ webhooks/
 COPY predicates/ predicates/
 COPY equality/ equality/
 

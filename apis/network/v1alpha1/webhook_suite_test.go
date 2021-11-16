@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package network
+package v1alpha1
 
 import (
 	"context"
@@ -24,8 +24,6 @@ import (
 	"path/filepath"
 	"testing"
 	"time"
-
-	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -69,10 +67,10 @@ var _ = BeforeSuite(func() {
 
 	By("bootstrapping test environment")
 	testEnv = &envtest.Environment{
-		CRDDirectoryPaths:     []string{filepath.Join("..", "..", "config", "crd", "bases")},
+		CRDDirectoryPaths:     []string{filepath.Join("..", "..", "..", "config", "crd", "bases")},
 		ErrorIfCRDPathMissing: false,
 		WebhookInstallOptions: envtest.WebhookInstallOptions{
-			Paths: []string{filepath.Join("..", "..", "config", "webhook")},
+			Paths: []string{filepath.Join("..", "..", "..", "config", "webhook")},
 		},
 	}
 
@@ -80,7 +78,7 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 	Expect(cfg).NotTo(BeNil())
 
-	Expect(networkv1alpha1.AddToScheme(scheme.Scheme)).NotTo(HaveOccurred())
+	Expect(AddToScheme(scheme.Scheme)).NotTo(HaveOccurred())
 	Expect(admissionv1beta1.AddToScheme(scheme.Scheme)).NotTo(HaveOccurred())
 
 	//+kubebuilder:scaffold:scheme
@@ -101,16 +99,8 @@ var _ = BeforeSuite(func() {
 	})
 	Expect(err).NotTo(HaveOccurred())
 
-	Expect(SetupIPAMRangeWebhookWithManager(mgr)).NotTo(HaveOccurred())
-
-	// Index fields(in non-test environment it's done when reconcilers are setup
-	Expect(mgr.GetFieldIndexer().IndexField(ctx, &networkv1alpha1.IPAMRange{}, parentField, func(object client.Object) []string {
-		ipamRange := object.(*networkv1alpha1.IPAMRange)
-		if ipamRange.Spec.Parent == nil {
-			return nil
-		}
-		return []string{ipamRange.Spec.Parent.Name}
-	})).NotTo(HaveOccurred())
+	r := &IPAMRange{}
+	Expect(r.SetupWebhookWithManager(mgr)).NotTo(HaveOccurred())
 
 	//+kubebuilder:scaffold:webhook
 

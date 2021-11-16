@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network
+package v1alpha1
 
 import (
 	"fmt"
@@ -26,7 +26,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
-	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 )
 
 var _ = Describe("IPAMRangeWebhook", func() {
@@ -34,12 +33,12 @@ var _ = Describe("IPAMRangeWebhook", func() {
 		ns := SetupTest()
 
 		It("parent name shouldn't be empty string", func() {
-			instance := &networkv1alpha1.IPAMRange{
+			instance := &IPAMRange{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "test",
 					Namespace: ns.Name,
 				},
-				Spec: networkv1alpha1.IPAMRangeSpec{
+				Spec: IPAMRangeSpec{
 					Parent: &corev1.LocalObjectReference{
 						Name: "",
 					},
@@ -62,12 +61,12 @@ var _ = Describe("IPAMRangeWebhook", func() {
 		It("cidrs should be empty for child IPAMRange", func() {
 			prefix1, err := netaddr.ParseIPPrefix("192.168.1.0/24")
 			Expect(err).ToNot(HaveOccurred())
-			instance := &networkv1alpha1.IPAMRange{
+			instance := &IPAMRange{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "test",
 					Namespace: ns.Name,
 				},
-				Spec: networkv1alpha1.IPAMRangeSpec{
+				Spec: IPAMRangeSpec{
 					Parent: &corev1.LocalObjectReference{
 						Name: "parent",
 					},
@@ -93,12 +92,12 @@ var _ = Describe("IPAMRangeWebhook", func() {
 			Expect(err).ToNot(HaveOccurred())
 			prefix2, err := netaddr.ParseIPPrefix("192.168.1.0/25")
 			Expect(err).ToNot(HaveOccurred())
-			instance := &networkv1alpha1.IPAMRange{
+			instance := &IPAMRange{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "test",
 					Namespace: ns.Name,
 				},
-				Spec: networkv1alpha1.IPAMRangeSpec{
+				Spec: IPAMRangeSpec{
 					CIDRs: []commonv1alpha1.CIDR{commonv1alpha1.NewCIDR(prefix1), commonv1alpha1.NewCIDR(prefix2)},
 				},
 			}
@@ -121,16 +120,16 @@ var _ = Describe("IPAMRangeWebhook", func() {
 			prefix2, err := netaddr.ParseIPPrefix("192.168.1.0/25")
 			Expect(err).ToNot(HaveOccurred())
 			cidr2 := commonv1alpha1.NewCIDR(prefix2)
-			instance := &networkv1alpha1.IPAMRange{
+			instance := &IPAMRange{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "test",
 					Namespace: ns.Name,
 				},
-				Spec: networkv1alpha1.IPAMRangeSpec{
+				Spec: IPAMRangeSpec{
 					Parent: &corev1.LocalObjectReference{
 						Name: "parent",
 					},
-					Requests: []networkv1alpha1.IPAMRangeRequest{{CIDR: &cidr1}, {CIDR: &cidr2}},
+					Requests: []IPAMRangeRequest{{CIDR: &cidr1}, {CIDR: &cidr2}},
 				},
 			}
 			Expect(k8sClient.Create(ctx, instance)).To(
@@ -155,12 +154,12 @@ var _ = Describe("IPAMRangeWebhook", func() {
 		It("parent CIDRs shouldn't overlap", func() {
 			prefix1, err := netaddr.ParseIPPrefix("192.168.1.0/24")
 			Expect(err).ToNot(HaveOccurred())
-			instance := &networkv1alpha1.IPAMRange{
+			instance := &IPAMRange{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "test",
 					Namespace: ns.Name,
 				},
-				Spec: networkv1alpha1.IPAMRangeSpec{
+				Spec: IPAMRangeSpec{
 					CIDRs: []commonv1alpha1.CIDR{
 						commonv1alpha1.NewCIDR(prefix1),
 					},
@@ -188,16 +187,16 @@ var _ = Describe("IPAMRangeWebhook", func() {
 			prefix1, err := netaddr.ParseIPPrefix("192.168.1.0/24")
 			Expect(err).ToNot(HaveOccurred())
 			cidr1 := commonv1alpha1.NewCIDR(prefix1)
-			instance := &networkv1alpha1.IPAMRange{
+			instance := &IPAMRange{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "test",
 					Namespace: ns.Name,
 				},
-				Spec: networkv1alpha1.IPAMRangeSpec{
+				Spec: IPAMRangeSpec{
 					Parent: &corev1.LocalObjectReference{
 						Name: "parent",
 					},
-					Requests: []networkv1alpha1.IPAMRangeRequest{{CIDR: &cidr1}},
+					Requests: []IPAMRangeRequest{{CIDR: &cidr1}},
 				},
 			}
 			Expect(k8sClient.Create(ctx, instance)).To(Succeed())
@@ -206,7 +205,7 @@ var _ = Describe("IPAMRangeWebhook", func() {
 			prefix2, err := netaddr.ParseIPPrefix("192.168.1.0/25")
 			Expect(err).ToNot(HaveOccurred())
 			cidr2 := commonv1alpha1.NewCIDR(prefix2)
-			instance.Spec.Requests = append(instance.Spec.Requests, networkv1alpha1.IPAMRangeRequest{CIDR: &cidr2})
+			instance.Spec.Requests = append(instance.Spec.Requests, IPAMRangeRequest{CIDR: &cidr2})
 			Expect(k8sClient.Update(ctx, instance)).To(
 				WithTransform(
 					func(err error) string { return err.Error() },
@@ -227,20 +226,20 @@ var _ = Describe("IPAMRangeWebhook", func() {
 			prefix2, err := netaddr.ParseIPPrefix("192.168.2.0/24")
 			Expect(err).ToNot(HaveOccurred())
 			cidr2 := commonv1alpha1.NewCIDR(prefix2)
-			instance := &networkv1alpha1.IPAMRange{
+			instance := &IPAMRange{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "test",
 					Namespace: ns.Name,
 				},
-				Spec: networkv1alpha1.IPAMRangeSpec{
+				Spec: IPAMRangeSpec{
 					CIDRs: []commonv1alpha1.CIDR{cidr1, cidr2},
 				},
 			}
 			Expect(k8sClient.Create(ctx, instance)).To(Succeed())
 
-			instance.Status = networkv1alpha1.IPAMRangeStatus{
-				Allocations: []networkv1alpha1.IPAMRangeAllocationStatus{
-					{State: networkv1alpha1.IPAMRangeAllocationUsed, CIDR: &cidr2},
+			instance.Status = IPAMRangeStatus{
+				Allocations: []IPAMRangeAllocationStatus{
+					{State: IPAMRangeAllocationUsed, CIDR: &cidr2},
 				},
 			}
 			Expect(k8sClient.Status().Update(ctx, instance)).To(Succeed())
@@ -268,20 +267,20 @@ var _ = Describe("IPAMRangeWebhook", func() {
 			parentPrefix, err := netaddr.ParseIPPrefix("192.168.1.0/24")
 			Expect(err).ToNot(HaveOccurred())
 			cidr := commonv1alpha1.NewCIDR(parentPrefix)
-			instance := &networkv1alpha1.IPAMRange{
+			instance := &IPAMRange{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "parent",
 					Namespace: ns.Name,
 				},
-				Spec: networkv1alpha1.IPAMRangeSpec{
+				Spec: IPAMRangeSpec{
 					CIDRs: []commonv1alpha1.CIDR{cidr},
 				},
 			}
 			Expect(k8sClient.Create(ctx, instance)).To(Succeed())
 
-			instance.Status = networkv1alpha1.IPAMRangeStatus{
-				Allocations: []networkv1alpha1.IPAMRangeAllocationStatus{
-					{State: networkv1alpha1.IPAMRangeAllocationUsed, CIDR: &cidr},
+			instance.Status = IPAMRangeStatus{
+				Allocations: []IPAMRangeAllocationStatus{
+					{State: IPAMRangeAllocationUsed, CIDR: &cidr},
 				},
 			}
 			Expect(k8sClient.Status().Update(ctx, instance)).To(Succeed())
