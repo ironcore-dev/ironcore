@@ -77,13 +77,14 @@ func (r *SubnetReconciler) reconcile(ctx context.Context, log logr.Logger, subne
 			cidr := rng.CIDR
 			requests = append(requests, networkv1alpha1.IPAMRangeRequest{
 				Size: rng.Size,
-				CIDR: &cidr,
+				CIDR: cidr,
 			})
 		}
 	} else {
 		for _, rng := range subnet.Spec.Ranges {
-			cidr := rng.CIDR
-			rootCIDRs = append(rootCIDRs, cidr)
+			if rng.CIDR != nil {
+				rootCIDRs = append(rootCIDRs, *rng.CIDR)
+			}
 		}
 	}
 
