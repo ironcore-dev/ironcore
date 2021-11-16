@@ -161,7 +161,7 @@ var _ = Describe("machine controller", func() {
 			Expect(rng.Spec.Parent.Name).To(Equal(networkv1alpha1.SubnetIPAMName(ifaces[i].Target.Name)))
 
 			By("checking if the request of the IPAMRange corresponds to the IP of the machine's interface")
-			Expect(rng.Spec.Requests[0]).To(Equal(ipamRangeRequest(ifaces[i].IP)))
+			Expect(rng.Spec.Requests[0]).To(Equal(ipamRangeRequestFromIP(ifaces[i].IP)))
 
 			By("checking the OwnerReferences of the IPAMRange contain the machine")
 			Expect(rng.OwnerReferences).To(ContainElement(controllerReference(m)))
@@ -282,7 +282,7 @@ func mustParseIP(ip string) *commonv1alpha1.IPAddr {
 	return commonv1alpha1.NewIPAddrPtr(parsed)
 }
 
-func ipamRangeRequest(ip *commonv1alpha1.IPAddr) networkv1alpha1.IPAMRangeRequest {
+func ipamRangeRequestFromIP(ip *commonv1alpha1.IPAddr) networkv1alpha1.IPAMRangeRequest {
 	return networkv1alpha1.IPAMRangeRequest{
 		IPs: commonv1alpha1.NewIPRangePtr(netaddr.IPRangeFrom(ip.IP, ip.IP)),
 	}
