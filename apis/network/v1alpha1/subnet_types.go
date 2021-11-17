@@ -51,7 +51,7 @@ type RangeType struct {
 	// Size defines the size of a subnet e.g. 12
 	Size int32 `json:"size,omitempty"`
 	// CIDR is the CIDR block
-	CIDR commonv1alpha1.CIDR `json:"cidr,omitempty"`
+	CIDR *commonv1alpha1.CIDR `json:"cidr,omitempty"`
 }
 
 type CIDRState string

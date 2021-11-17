@@ -37,8 +37,8 @@ import (
 )
 
 const (
-	interval = time.Millisecond * 250
-	timeout  = time.Second * 10
+	interval = 50 * time.Millisecond
+	timeout  = 5 * time.Second
 )
 
 var (
@@ -90,6 +90,13 @@ var _ = BeforeSuite(func() {
 	Expect(err).ToNot(HaveOccurred())
 
 	err = (&IPAMRangeReconciler{
+		Client: k8sManager.GetClient(),
+		Scheme: k8sManager.GetScheme(),
+	}).SetupWithManager(k8sManager)
+	Expect(err).ToNot(HaveOccurred())
+
+	// Register reconcilers
+	err = (&ReservedIPReconciler{
 		Client: k8sManager.GetClient(),
 		Scheme: k8sManager.GetScheme(),
 	}).SetupWithManager(k8sManager)

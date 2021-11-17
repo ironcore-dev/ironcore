@@ -33,7 +33,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 )
 
-const fieldOwner = client.FieldOwner("networking.onmetal.de/subnet")
+const subnetFieldOwner = client.FieldOwner("networking.onmetal.de/subnet")
 
 // SubnetReconciler reconciles a Subnet object
 type SubnetReconciler struct {
@@ -77,13 +77,14 @@ func (r *SubnetReconciler) reconcile(ctx context.Context, log logr.Logger, subne
 			cidr := rng.CIDR
 			requests = append(requests, networkv1alpha1.IPAMRangeRequest{
 				Size: rng.Size,
-				CIDR: &cidr,
+				CIDR: cidr,
 			})
 		}
 	} else {
 		for _, rng := range subnet.Spec.Ranges {
-			cidr := rng.CIDR
-			rootCIDRs = append(rootCIDRs, cidr)
+			if rng.CIDR != nil {
+				rootCIDRs = append(rootCIDRs, *rng.CIDR)
+			}
 		}
 	}
 
@@ -106,7 +107,7 @@ func (r *SubnetReconciler) reconcile(ctx context.Context, log logr.Logger, subne
 		return ctrl.Result{}, fmt.Errorf("could not own ipam range: %w", err)
 	}
 
-	if err := r.Patch(ctx, ipamRange, client.Apply, fieldOwner); err != nil {
+	if err := r.Patch(ctx, ipamRange, client.Apply, subnetFieldOwner); err != nil {
 		return ctrl.Result{}, fmt.Errorf("could not apply ipam range: %w", err)
 	}
 
