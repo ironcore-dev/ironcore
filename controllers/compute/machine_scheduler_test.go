@@ -24,8 +24,6 @@ import (
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 )
 
-// var ctx = ctrl.SetupSignalHandler()
-
 var _ = Describe("MachineScheduler", func() {
 	ns := SetupTest(ctx)
 
