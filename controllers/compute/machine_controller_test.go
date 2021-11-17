@@ -316,6 +316,6 @@ func newSubnet(name, ipPrefix string) *networkv1alpha1.Subnet {
 
 	parsed, err := netaddr.ParseIPPrefix(ipPrefix)
 	Expect(err).ToNot(HaveOccurred())
-	subnet.Spec.Ranges = []networkv1alpha1.RangeType{{CIDR: commonv1alpha1.CIDR{IPPrefix: parsed}}}
+	subnet.Spec.Ranges = []networkv1alpha1.RangeType{{CIDR: &commonv1alpha1.CIDR{IPPrefix: parsed}}}
 	return subnet
 }
