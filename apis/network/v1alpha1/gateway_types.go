@@ -28,6 +28,9 @@ import (
 type GatewayMode string
 
 const (
+	// GatewayFinalizer is the finalizer used by the Gateway controller to
+	// cleanup the resources owned by the Gateway when a Gateway is being deleted.
+	GatewayFinalizer = "gateway.network.onmetal.de"
 	// SNATMode is stateless NAT / 1-1 NAT (network address translation).
 	SNATMode GatewayMode = "SNAT"
 	// NATMode is regular NAT (network address translation).
