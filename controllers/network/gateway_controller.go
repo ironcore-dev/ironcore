@@ -25,7 +25,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 )
@@ -43,15 +42,9 @@ type GatewayReconciler struct {
 
 // Reconcile moves the current state of the cluster closer to the desired state.
 func (r *GatewayReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
-
 	gw := &networkv1alpha1.Gateway{}
 	if err := r.Get(ctx, req.NamespacedName, gw); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
-	}
-
-	if gw.IsBeingDeleted() {
-		return ctrl.Result{}, nil
 	}
 
 	ipamRange := newIPAMRangeFromGateway(gw)
@@ -63,12 +56,7 @@ func (r *GatewayReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, fmt.Errorf("server-side applying the ipam range: %w", err)
 	}
 
-	oldGW := gw.DeepCopy()
-	gw.Status.IPs = append(gw.Status.IPs, ipamRange.Status.Allocations[0].IPs.From)
-	if err := r.Status().Patch(ctx, gw, client.MergeFrom(oldGW)); err != nil {
-		return ctrl.Result{}, fmt.Errorf("updating status: %w", err)
-	}
-	return ctrl.Result{}, nil
+	return r.updateGatewayStatus(ctx, gw, ipamRange)
 }
 
 // SetupWithManager sets up the controller with the Manager.
@@ -78,10 +66,19 @@ func (r *GatewayReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
+func (r *GatewayReconciler) updateGatewayStatus(ctx context.Context, gw *networkv1alpha1.Gateway, ipamRange *networkv1alpha1.IPAMRange) (ctrl.Result, error) {
+	oldGW := gw.DeepCopy()
+	gw.Status.IPs = append(gw.Status.IPs, ipamRange.Status.Allocations[0].IPs.From)
+	if err := r.Status().Patch(ctx, gw, client.MergeFrom(oldGW)); err != nil {
+		return ctrl.Result{}, fmt.Errorf("updating status: %w", err)
+	}
+	return ctrl.Result{}, nil
+}
+
 const gatewayFieldOwner = client.FieldOwner("compute.onmetal.de/gateway")
 
 func newIPAMRangeFromGateway(gw *networkv1alpha1.Gateway) *networkv1alpha1.IPAMRange {
-	ipamRange := &networkv1alpha1.IPAMRange{
+	return &networkv1alpha1.IPAMRange{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: networkv1alpha1.GroupVersion.String(),
 			Kind:       networkv1alpha1.IPAMRangeGK.Kind,
@@ -92,10 +89,9 @@ func newIPAMRangeFromGateway(gw *networkv1alpha1.Gateway) *networkv1alpha1.IPAMR
 		},
 		Spec: networkv1alpha1.IPAMRangeSpec{
 			Parent: &corev1.LocalObjectReference{
-				Name: networkv1alpha1.SubnetIPAMName(gw.Spec.SourceIPAMRange.Name),
+				Name: networkv1alpha1.SubnetIPAMName(gw.Spec.Subnet.Name),
 			},
 			Requests: []networkv1alpha1.IPAMRangeRequest{{IPCount: 1}},
 		},
 	}
-	return ipamRange
 }

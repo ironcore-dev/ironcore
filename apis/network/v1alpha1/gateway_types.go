@@ -43,9 +43,8 @@ type GatewaySpec struct {
 	// Uplink is a Target to route traffic to.
 	Uplink Target `json:"uplink"`
 
-	// Todo: Do we need this?
-	// SourceIPAMRange is the reference to the IPAMRange where the Gateway resides
-	SourceIPAMRange corev1.LocalObjectReference `json:"subnet"`
+	// Subnet is the reference to the IPAMRange where the Gateway resides
+	Subnet corev1.LocalObjectReference `json:"subnet"`
 }
 
 type FilterRule struct {
