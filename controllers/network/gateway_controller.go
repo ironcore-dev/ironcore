@@ -87,8 +87,9 @@ func (r *GatewayReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 func (r *GatewayReconciler) handleFinalizer(ctx context.Context, gw *networkv1alpha1.Gateway) error {
 	if !util.ContainsFinalizer(gw, networkv1alpha1.GatewayFinalizer) {
+		oldGW := gw.DeepCopy()
 		util.AddFinalizer(gw, networkv1alpha1.GatewayFinalizer)
-		if err := r.Patch(ctx, gw, client.Apply, gatewayFieldOwner); err != nil {
+		if err := r.Patch(ctx, gw, client.MergeFrom(oldGW)); err != nil {
 			return fmt.Errorf("adding the finalizer: %w", err)
 		}
 	}
