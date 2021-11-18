@@ -33,19 +33,19 @@ import (
 )
 
 var _ = Describe("machine controller", func() {
-	machineTestNS = SetupTest(ctx)
+	ns := SetupTest(ctx)
 
 	It("should delete unused IPAMRanges for deleted interfaces", func() {
 		By("creating the subnet")
-		subnet := newSubnet(subnetName, "192.168.0.0/24")
+		subnet := newSubnet(ns.Name, "192.168.0.0/24")
 		Expect(k8sClient.Create(ctx, subnet)).To(Succeed())
 
-		if1 := computev1alpha1.Interface{Name: "test-if1", Target: corev1.LocalObjectReference{Name: subnetName}}
-		if2 := computev1alpha1.Interface{Name: "test-if2", Target: corev1.LocalObjectReference{Name: subnetName}}
+		if1 := computev1alpha1.Interface{Name: "test-if1", Target: corev1.LocalObjectReference{Name: subnet.Name}}
+		if2 := computev1alpha1.Interface{Name: "test-if2", Target: corev1.LocalObjectReference{Name: subnet.Name}}
 		machine := &computev1alpha1.Machine{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "with-interfaces",
-				Namespace: machineTestNS.Name,
+				Namespace: ns.Name,
 			},
 			Spec: computev1alpha1.MachineSpec{
 				Interfaces: []computev1alpha1.Interface{if1, if2},
@@ -59,7 +59,7 @@ var _ = Describe("machine controller", func() {
 		Eventually(func(g Gomega) {
 			key1 := types.NamespacedName{
 				Name:      computev1alpha1.MachineInterfaceIPAMRangeName(machine.Name, if1.Name),
-				Namespace: machineTestNS.Name,
+				Namespace: ns.Name,
 			}
 			obj1 := &networkv1alpha1.IPAMRange{}
 			err := k8sClient.Get(ctx, key1, obj1)
@@ -68,7 +68,7 @@ var _ = Describe("machine controller", func() {
 
 			key2 := types.NamespacedName{
 				Name:      computev1alpha1.MachineInterfaceIPAMRangeName(machine.Name, if2.Name),
-				Namespace: machineTestNS.Name,
+				Namespace: ns.Name,
 			}
 			obj2 := &networkv1alpha1.IPAMRange{}
 			err = k8sClient.Get(ctx, key2, obj2)
@@ -90,7 +90,7 @@ var _ = Describe("machine controller", func() {
 			// One IPAMRange should be deleted
 			key1 := types.NamespacedName{
 				Name:      computev1alpha1.MachineInterfaceIPAMRangeName(machine.Name, if1.Name),
-				Namespace: machineTestNS.Name,
+				Namespace: ns.Name,
 			}
 			obj1 := &networkv1alpha1.IPAMRange{}
 			g.Expect(errors.IsNotFound(k8sClient.Get(ctx, key1, obj1))).To(BeTrue(), "IsNotFound error expected")
@@ -98,7 +98,7 @@ var _ = Describe("machine controller", func() {
 			// Another one should still exist
 			key2 := types.NamespacedName{
 				Name:      computev1alpha1.MachineInterfaceIPAMRangeName(machine.Name, if2.Name),
-				Namespace: machineTestNS.Name,
+				Namespace: ns.Name,
 			}
 			obj2 := &networkv1alpha1.IPAMRange{}
 			err := k8sClient.Get(ctx, key2, obj2)
@@ -109,7 +109,7 @@ var _ = Describe("machine controller", func() {
 
 	It("reconciles a machine without interface", func() {
 		By("creating the machine")
-		m := newMachine()
+		m := newMachine(ns.Name)
 		Expect(k8sClient.Create(ctx, m)).To(Succeed())
 
 		By("checking if the machine's status gets reconciled")
@@ -122,22 +122,22 @@ var _ = Describe("machine controller", func() {
 
 	It("reconciles a machine owning interfaces with IP", func() {
 		By("creating the subnet")
-		subnet := newSubnet(subnetName, "192.168.0.0/24")
+		subnet := newSubnet(ns.Name, "192.168.0.0/24")
 		Expect(k8sClient.Create(ctx, subnet)).To(Succeed())
 
-		m := newMachine()
+		m := newMachine(ns.Name)
 		ifaces := []computev1alpha1.Interface{
 			{
 				Name:     "iface-0",
 				IP:       mustParseIP("192.168.0.0"),
 				Priority: 0,
-				Target:   corev1.LocalObjectReference{Name: subnetName},
+				Target:   corev1.LocalObjectReference{Name: subnet.Name},
 			},
 			{
 				Name:     "iface-1",
 				IP:       mustParseIP("192.168.0.1"),
 				Priority: 1,
-				Target:   corev1.LocalObjectReference{Name: subnetName},
+				Target:   corev1.LocalObjectReference{Name: subnet.Name},
 			},
 		}
 		m.Spec.Interfaces = ifaces
@@ -190,18 +190,18 @@ var _ = Describe("machine controller", func() {
 
 	It("reconciles a machine owning interfaces without IP", func() {
 		By("creating the subnet")
-		subnet := newSubnet(subnetName, "192.168.0.0/24")
+		subnet := newSubnet(ns.Name, "192.168.0.0/24")
 		Expect(k8sClient.Create(ctx, subnet)).To(Succeed())
 
-		m := newMachine()
+		m := newMachine(ns.Name)
 		ifaces := []computev1alpha1.Interface{
 			{
 				Name:   "iface-0",
-				Target: corev1.LocalObjectReference{Name: subnetName},
+				Target: corev1.LocalObjectReference{Name: subnet.Name},
 			},
 			{
 				Name:   "iface-1",
-				Target: corev1.LocalObjectReference{Name: subnetName},
+				Target: corev1.LocalObjectReference{Name: subnet.Name},
 			},
 		}
 		m.Spec.Interfaces = ifaces
@@ -258,12 +258,11 @@ var _ = Describe("machine controller", func() {
 const (
 	// test data
 	machineKind = "Machine"
-	subnetName  = "sample"
+	// subnetName  = "sample"
 )
 
 var (
-	machineTestNS = &corev1.Namespace{}
-	objectKey     = client.ObjectKeyFromObject
+	objectKey = client.ObjectKeyFromObject
 )
 
 func controllerReference(m *computev1alpha1.Machine) metav1.OwnerReference {
@@ -298,21 +297,21 @@ func toCorrespondingEmptyIPAMRanges(m *computev1alpha1.Machine) (rngs []*network
 	return
 }
 
-func newMachine() *computev1alpha1.Machine {
+func newMachine(ns string) *computev1alpha1.Machine {
 	m := &computev1alpha1.Machine{}
 	m.APIVersion = computev1alpha1.GroupVersion.String()
 	m.Kind = machineKind
-	m.Namespace = machineTestNS.Name
+	m.Namespace = ns
 	m.GenerateName = "machine-controller-test"
 	return m
 }
 
-func newSubnet(name, ipPrefix string) *networkv1alpha1.Subnet {
+func newSubnet(ns, ipPrefix string) *networkv1alpha1.Subnet {
 	subnet := &networkv1alpha1.Subnet{}
 	subnet.APIVersion = networkv1alpha1.GroupVersion.String()
 	subnet.Kind = networkv1alpha1.SubnetGK.Kind
-	subnet.Namespace = machineTestNS.Name
-	subnet.Name = name
+	subnet.Namespace = ns
+	subnet.GenerateName = "machine-controller-test"
 
 	parsed, err := netaddr.ParseIPPrefix(ipPrefix)
 	Expect(err).ToNot(HaveOccurred())
