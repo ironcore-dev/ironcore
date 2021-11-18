@@ -21,7 +21,6 @@ import (
 	. "github.com/onsi/gomega"
 	"inet.af/netaddr"
 	v1 "k8s.io/api/core/v1"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -79,21 +78,6 @@ var _ = Describe("gateway controller", func() {
 			subnetIPRange := subnet.Spec.Ranges[0].CIDR.IPPrefix.Range()
 			gatewayIP := gw.Status.IPs[0].IP
 			Expect(subnetIPRange.Contains(gatewayIP)).To(BeTrue(), "The Subnet IP range contains the IP.")
-		})
-	})
-
-	Context("reconciling deletion", func() {
-		It("deletes the corresponding IPAMRange", func() {
-			subnet := mustCreateNamespacedSubnetFromIPPrefix(ns.Name, "192.168.0.0/24")
-			gw := mustCreateNamespacedGatewayFromSubnet(ns.Name, subnet)
-			ipamRange := newIPAMRangeFromGateway(gw)
-			ipamRangeKey := objectKey(ipamRange)
-			Expect(k8sClient.Delete(ctx, gw)).To(Succeed())
-			Eventually(func() bool {
-				err := k8sClient.Get(ctx, ipamRangeKey, ipamRange)
-				Expect(client.IgnoreNotFound(err)).To(Succeed())
-				return apierrors.IsNotFound(err)
-			}, timeout, interval).Should(BeTrue(), "The error is `Not Found`.")
 		})
 	})
 })
