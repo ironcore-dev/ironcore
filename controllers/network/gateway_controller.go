@@ -26,7 +26,6 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	util "sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
 	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	"github.com/onmetal/onmetal-api/predicates"
@@ -51,18 +50,8 @@ func (r *GatewayReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	// Add the finalizer to the Gateway for cleaning up the corresponding IPAMRange upon deletion of the Gateway
-	// if there's none.
-	if err := r.handleFinalizer(ctx, gw); err != nil {
-		return ctrl.Result{}, fmt.Errorf("handling finalizer: %w", err)
-	}
-
 	// Each Gateway needs an IP address which can be acquired via the corresponding IPAMRange.
 	ipamRange := newIPAMRangeFromGateway(gw)
-
-	if gw.IsBeingDeleted() {
-		return r.reconcileGatewayDeletion(ctx, gw, ipamRange)
-	}
 
 	// The Gateway is the controller (the top owner upon conflicts with other owners) of its corresponding IPAMRange.
 	if err := ctrl.SetControllerReference(gw, ipamRange, r.Scheme); err != nil {
@@ -83,31 +72,6 @@ func (r *GatewayReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		For(&networkv1alpha1.Gateway{}).
 		Owns(&networkv1alpha1.IPAMRange{}, builder.WithPredicates(predicates.IPAMRangeAllocationsChangedPredicate{})).
 		Complete(r)
-}
-
-func (r *GatewayReconciler) handleFinalizer(ctx context.Context, gw *networkv1alpha1.Gateway) error {
-	if !util.ContainsFinalizer(gw, networkv1alpha1.GatewayFinalizer) {
-		oldGW := gw.DeepCopy()
-		util.AddFinalizer(gw, networkv1alpha1.GatewayFinalizer)
-		if err := r.Patch(ctx, gw, client.MergeFrom(oldGW)); err != nil {
-			return fmt.Errorf("adding the finalizer: %w", err)
-		}
-	}
-	return nil
-}
-
-func (r *GatewayReconciler) reconcileGatewayDeletion(ctx context.Context, gw *networkv1alpha1.Gateway, ipamRange *networkv1alpha1.IPAMRange) (ctrl.Result, error) {
-	// Delete the corresponding IPAMRange.
-	if err := r.Delete(ctx, ipamRange); err != nil {
-		return ctrl.Result{}, fmt.Errorf("deleting the ipam range owned by the gateway: %w", err)
-	}
-
-	// Remove the finalizer in the Gateway.
-	util.RemoveFinalizer(gw, networkv1alpha1.GatewayFinalizer)
-	if err := r.Patch(ctx, gw, client.Apply, gatewayFieldOwner); err != nil {
-		return ctrl.Result{}, fmt.Errorf("adding the finalizer: %w", err)
-	}
-	return ctrl.Result{}, nil
 }
 
 func (r *GatewayReconciler) updateGatewayStatus(ctx context.Context, gw *networkv1alpha1.Gateway, ipamRange *networkv1alpha1.IPAMRange) (ctrl.Result, error) {

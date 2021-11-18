@@ -32,17 +32,6 @@ import (
 var _ = Describe("gateway controller", func() {
 	ns := SetupTest()
 	Context("reconciling creation", func() {
-		It("adds the finalizer", func() {
-			subnet := newNamespacedSubnetFromIPPrefix(ns.Name, "192.168.0.0/24")
-			gw := newNamespacedGatewayFromSubnet(ns.Name, subnet)
-			gwKey := objectKey(gw)
-			Eventually(func() []string {
-				err := k8sClient.Get(ctx, gwKey, gw)
-				Expect(client.IgnoreNotFound(err)).To(Succeed())
-				return gw.ObjectMeta.Finalizers
-			}, timeout, interval).Should(ContainElement(networkv1alpha1.GatewayFinalizer))
-		})
-
 		It("creates the corresponding IPAMRange", func() {
 			subnet := newNamespacedSubnetFromIPPrefix(ns.Name, "192.168.0.0/24")
 			gw := newNamespacedGatewayFromSubnet(ns.Name, subnet)
