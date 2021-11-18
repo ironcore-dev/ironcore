@@ -32,8 +32,8 @@ var _ = Describe("gateway controller", func() {
 	ns := SetupTest()
 	Context("creation", func() {
 		It("adds the finalizer", func() {
-			subnet := subnet(ns.Name, "192.168.0.0/24")
-			gw := gateway(ns.Name, subnet)
+			subnet := newNamespacedSubnetFromIPPrefix(ns.Name, "192.168.0.0/24")
+			gw := newNamespacedGatewayFromSubnet(ns.Name, subnet)
 			gwKey := objectKey(gw)
 			Eventually(func() []string {
 				err := k8sClient.Get(ctx, gwKey, gw)
@@ -41,10 +41,12 @@ var _ = Describe("gateway controller", func() {
 				return gw.ObjectMeta.Finalizers
 			}, timeout, interval).Should(ContainElement(networkv1alpha1.GatewayFinalizer))
 		})
+
+		
 	})
 })
 
-func gateway(ns string, subnet *networkv1alpha1.Subnet) *networkv1alpha1.Gateway {
+func newNamespacedGatewayFromSubnet(ns string, subnet *networkv1alpha1.Subnet) *networkv1alpha1.Gateway {
 	gw := &networkv1alpha1.Gateway{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: networkv1alpha1.GroupVersion.String(),
@@ -62,7 +64,7 @@ func gateway(ns string, subnet *networkv1alpha1.Subnet) *networkv1alpha1.Gateway
 	return gw
 }
 
-func subnet(ns string, ipPrefix string) *networkv1alpha1.Subnet {
+func newNamespacedSubnetFromIPPrefix(ns string, ipPrefix string) *networkv1alpha1.Subnet {
 	parsedPrefix, err := netaddr.ParseIPPrefix(ipPrefix)
 	Expect(err).ToNot(HaveOccurred())
 

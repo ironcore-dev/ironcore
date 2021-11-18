@@ -45,24 +45,31 @@ type GatewayReconciler struct {
 
 // Reconcile moves the current state of the cluster closer to the desired state.
 func (r *GatewayReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+	// Get the Gateway identified in the reg
 	gw := &networkv1alpha1.Gateway{}
 	if err := r.Get(ctx, req.NamespacedName, gw); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
+
+	// Add the finalizer to the Gateway for cleaning up the corresponding IPAMRange upon deletion of the Gateway
+	// if there's none.
 	if err := r.handleFinalizer(ctx, gw); err != nil {
 		return ctrl.Result{}, fmt.Errorf("handling finalizer: %w", err)
 	}
 
+	// Each Gateway needs an IP address which can be acquired via the corresponding IPAMRange.
 	ipamRange := newIPAMRangeFromGateway(gw)
 
 	if gw.IsBeingDeleted() {
-		return r.reconcileDeletion(ctx, gw, ipamRange)
+		return r.reconcileGatewayDeletion(ctx, gw, ipamRange)
 	}
 
+	// The Gateway is the controller (the top owner upon conflicts with other owners) of its corresponding IPAMRange.
 	if err := ctrl.SetControllerReference(gw, ipamRange, r.Scheme); err != nil {
 		return ctrl.Result{}, fmt.Errorf("setting the controller reference of the ipam range: %w", err)
 	}
 
+	// Server-side apply (create or update) the corrresponding IPAMRange
 	if err := r.Patch(ctx, ipamRange, client.Apply, gatewayFieldOwner); err != nil {
 		return ctrl.Result{}, fmt.Errorf("server-side applying the ipam range: %w", err)
 	}
@@ -88,12 +95,14 @@ func (r *GatewayReconciler) handleFinalizer(ctx context.Context, gw *networkv1al
 	return nil
 }
 
-func (r *GatewayReconciler) reconcileDeletion(ctx context.Context, gw *networkv1alpha1.Gateway, ipamRange *networkv1alpha1.IPAMRange) (ctrl.Result, error) {
+func (r *GatewayReconciler) reconcileGatewayDeletion(ctx context.Context, gw *networkv1alpha1.Gateway, ipamRange *networkv1alpha1.IPAMRange) (ctrl.Result, error) {
+	// Delete the corresponding IPAMRange.
 	if err := r.Delete(ctx, ipamRange); err != nil {
 		return ctrl.Result{}, fmt.Errorf("deleting the ipam range owned by the gateway: %w", err)
 	}
-	util.RemoveFinalizer(gw, networkv1alpha1.GatewayFinalizer)
 
+	// Remove the finalizer in the Gateway.
+	util.RemoveFinalizer(gw, networkv1alpha1.GatewayFinalizer)
 	if err := r.Patch(ctx, gw, client.Apply, gatewayFieldOwner); err != nil {
 		return ctrl.Result{}, fmt.Errorf("adding the finalizer: %w", err)
 	}
@@ -101,9 +110,12 @@ func (r *GatewayReconciler) reconcileDeletion(ctx context.Context, gw *networkv1
 }
 
 func (r *GatewayReconciler) updateGatewayStatus(ctx context.Context, gw *networkv1alpha1.Gateway, ipamRange *networkv1alpha1.IPAMRange) (ctrl.Result, error) {
+	// Check if the IPAMRange is reconciled. If not, requeue the Gateway.
 	if len(ipamRange.Status.Allocations) == 0 {
 		return ctrl.Result{Requeue: true}, nil
 	}
+
+	// Update the status of the Gateway.
 	oldGW := gw.DeepCopy()
 	gw.Status.IPs = append(gw.Status.IPs, ipamRange.Status.Allocations[0].IPs.From)
 	if err := r.Status().Patch(ctx, gw, client.MergeFrom(oldGW)); err != nil {
