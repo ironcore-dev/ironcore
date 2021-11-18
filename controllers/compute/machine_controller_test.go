@@ -37,7 +37,7 @@ var _ = Describe("machine controller", func() {
 
 	It("should delete unused IPAMRanges for deleted interfaces", func() {
 		By("creating the subnet")
-		subnet := newSubnet(ns.Name, "192.168.0.0/24")
+		subnet := newNamespacedSubnetFromIPPrefix(ns.Name, "192.168.0.0/24")
 		Expect(k8sClient.Create(ctx, subnet)).To(Succeed())
 
 		if1 := computev1alpha1.Interface{Name: "test-if1", Target: corev1.LocalObjectReference{Name: subnet.Name}}
@@ -109,7 +109,7 @@ var _ = Describe("machine controller", func() {
 
 	It("reconciles a machine without interface", func() {
 		By("creating the machine")
-		m := newMachine(ns.Name)
+		m := newNamespacedMachine(ns.Name)
 		Expect(k8sClient.Create(ctx, m)).To(Succeed())
 
 		By("checking if the machine's status gets reconciled")
@@ -122,10 +122,10 @@ var _ = Describe("machine controller", func() {
 
 	It("reconciles a machine owning interfaces with IP", func() {
 		By("creating the subnet")
-		subnet := newSubnet(ns.Name, "192.168.0.0/24")
+		subnet := newNamespacedSubnetFromIPPrefix(ns.Name, "192.168.0.0/24")
 		Expect(k8sClient.Create(ctx, subnet)).To(Succeed())
 
-		m := newMachine(ns.Name)
+		m := newNamespacedMachine(ns.Name)
 		ifaces := []computev1alpha1.Interface{
 			{
 				Name:     "iface-0",
@@ -190,10 +190,10 @@ var _ = Describe("machine controller", func() {
 
 	It("reconciles a machine owning interfaces without IP", func() {
 		By("creating the subnet")
-		subnet := newSubnet(ns.Name, "192.168.0.0/24")
+		subnet := newNamespacedSubnetFromIPPrefix(ns.Name, "192.168.0.0/24")
 		Expect(k8sClient.Create(ctx, subnet)).To(Succeed())
 
-		m := newMachine(ns.Name)
+		m := newNamespacedMachine(ns.Name)
 		ifaces := []computev1alpha1.Interface{
 			{
 				Name:   "iface-0",
@@ -297,7 +297,7 @@ func toCorrespondingEmptyIPAMRanges(m *computev1alpha1.Machine) (rngs []*network
 	return
 }
 
-func newMachine(ns string) *computev1alpha1.Machine {
+func newNamespacedMachine(ns string) *computev1alpha1.Machine {
 	m := &computev1alpha1.Machine{}
 	m.APIVersion = computev1alpha1.GroupVersion.String()
 	m.Kind = machineKind
@@ -306,7 +306,7 @@ func newMachine(ns string) *computev1alpha1.Machine {
 	return m
 }
 
-func newSubnet(ns, ipPrefix string) *networkv1alpha1.Subnet {
+func newNamespacedSubnetFromIPPrefix(ns, ipPrefix string) *networkv1alpha1.Subnet {
 	subnet := &networkv1alpha1.Subnet{}
 	subnet.APIVersion = networkv1alpha1.GroupVersion.String()
 	subnet.Kind = networkv1alpha1.SubnetGK.Kind
