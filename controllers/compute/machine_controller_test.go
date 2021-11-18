@@ -258,7 +258,6 @@ var _ = Describe("machine controller", func() {
 const (
 	// test data
 	machineKind = "Machine"
-	// subnetName  = "sample"
 )
 
 var (
