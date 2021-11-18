@@ -18,11 +18,14 @@ package compute
 
 import (
 	"context"
+	"fmt"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+
+	util "sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 )
@@ -37,19 +40,20 @@ type MachineClassReconciler struct {
 //+kubebuilder:rbac:groups=compute.onmetal.de,resources=machineclasses/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=compute.onmetal.de,resources=machineclasses/finalizers,verbs=update
 
-// Reconcile is part of the main kubernetes reconciliation loop which aims to
-// move the current state of the cluster closer to the desired state.
-// TODO(user): Modify the Reconcile function to compare the state specified by
-// the MachineClass object against the actual cluster state, and then
-// perform operations to make the cluster state reflect the state specified by
-// the user.
-//
-// For more details, check Reconcile and its Result here:
-// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.8.3/pkg/reconcile
+// Reconcile moves the current state of the cluster closer to the desired state
 func (r *MachineClassReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
 
-	// your logic here
+	mClass := &computev1alpha1.MachineClass{}
+	if err := r.Get(ctx, req.NamespacedName, mClass); err != nil {
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+
+	r.addFinalizerIfNone(ctx, mClass)
+
+	if mClass.IsBeingDeleted() {
+		return r.reconcileDeletion(ctx, mClass)
+	}
 
 	return ctrl.Result{}, nil
 }
@@ -59,4 +63,19 @@ func (r *MachineClassReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&computev1alpha1.MachineClass{}).
 		Complete(r)
+}
+
+func (r *MachineClassReconciler) addFinalizerIfNone(ctx context.Context, mClass *computev1alpha1.MachineClass) error {
+	if !util.ContainsFinalizer(mClass, computev1alpha1.MachineClassFinalizer) {
+		old := mClass.DeepCopy()
+		util.AddFinalizer(mClass, computev1alpha1.MachineClassFinalizer)
+		if err := r.Patch(ctx, mClass, client.MergeFrom(old)); err != nil {
+			return fmt.Errorf("adding the finalizer: %w", err)
+		}
+	}
+	return nil
+}
+
+func (r *MachineClassReconciler) reconcileDeletion(ctx context.Context, mClass *computev1alpha1.MachineClass) (ctrl.Result, error) {
+	return ctrl.Result{}, nil
 }

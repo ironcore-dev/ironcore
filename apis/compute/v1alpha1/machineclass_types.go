@@ -21,6 +21,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+const (
+	// MachineClassFinalizer is the finalizer
+	MachineClassFinalizer = "machineclass.network.onmetal.de"
+)
+
 // MachineClassSpec defines the desired state of MachineClass
 type MachineClassSpec struct {
 	// Capabilities describes the resources a machine class can provide.
@@ -43,6 +48,11 @@ type MachineClass struct {
 
 	Spec   MachineClassSpec   `json:"spec,omitempty"`
 	Status MachineClassStatus `json:"status,omitempty"`
+}
+
+// IsBeingDeleted returns if the instance is being deleted
+func (mClass *MachineClass) IsBeingDeleted() bool {
+	return !mClass.DeletionTimestamp.IsZero()
 }
 
 //+kubebuilder:object:root=true
