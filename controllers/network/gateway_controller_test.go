@@ -34,8 +34,8 @@ var _ = Describe("gateway controller", func() {
 	ns := SetupTest()
 	Context("reconciling creation", func() {
 		It("sets the ControllerReference of the corresponding IPAMRange to the Gateway", func() {
-			subnet := newNamespacedSubnetFromIPPrefix(ns.Name, "192.168.0.0/24")
-			gw := newNamespacedGatewayFromSubnet(ns.Name, subnet)
+			subnet := mustCreateNamespacedSubnetFromIPPrefix(ns.Name, "192.168.0.0/24")
+			gw := mustCreateNamespacedGatewayFromSubnet(ns.Name, subnet)
 			ipamRange := newIPAMRangeFromGateway(gw)
 			ipamRangeKey := objectKey(ipamRange)
 			Eventually(func(g Gomega) {
@@ -55,8 +55,8 @@ var _ = Describe("gateway controller", func() {
 		})
 
 		It("creates the corresponding IPAMRange", func() {
-			subnet := newNamespacedSubnetFromIPPrefix(ns.Name, "192.168.0.0/24")
-			gw := newNamespacedGatewayFromSubnet(ns.Name, subnet)
+			subnet := mustCreateNamespacedSubnetFromIPPrefix(ns.Name, "192.168.0.0/24")
+			gw := mustCreateNamespacedGatewayFromSubnet(ns.Name, subnet)
 			ipamRange := newIPAMRangeFromGateway(gw)
 			ipamRangeKey := objectKey(ipamRange)
 			Eventually(func() error {
@@ -67,8 +67,8 @@ var _ = Describe("gateway controller", func() {
 		})
 
 		It("updates the status of the Gateway", func() {
-			subnet := newNamespacedSubnetFromIPPrefix(ns.Name, "192.168.0.0/24")
-			gw := newNamespacedGatewayFromSubnet(ns.Name, subnet)
+			subnet := mustCreateNamespacedSubnetFromIPPrefix(ns.Name, "192.168.0.0/24")
+			gw := mustCreateNamespacedGatewayFromSubnet(ns.Name, subnet)
 			gwKey := objectKey(gw)
 			Eventually(func() []commonv1alpha1.IPAddr {
 				err := k8sClient.Get(ctx, gwKey, gw)
@@ -84,8 +84,8 @@ var _ = Describe("gateway controller", func() {
 
 	Context("reconciling deletion", func() {
 		It("deletes the corresponding IPAMRange", func() {
-			subnet := newNamespacedSubnetFromIPPrefix(ns.Name, "192.168.0.0/24")
-			gw := newNamespacedGatewayFromSubnet(ns.Name, subnet)
+			subnet := mustCreateNamespacedSubnetFromIPPrefix(ns.Name, "192.168.0.0/24")
+			gw := mustCreateNamespacedGatewayFromSubnet(ns.Name, subnet)
 			ipamRange := newIPAMRangeFromGateway(gw)
 			ipamRangeKey := objectKey(ipamRange)
 			Expect(k8sClient.Delete(ctx, gw)).To(Succeed())
@@ -98,7 +98,7 @@ var _ = Describe("gateway controller", func() {
 	})
 })
 
-func newNamespacedGatewayFromSubnet(ns string, subnet *networkv1alpha1.Subnet) *networkv1alpha1.Gateway {
+func mustCreateNamespacedGatewayFromSubnet(ns string, subnet *networkv1alpha1.Subnet) *networkv1alpha1.Gateway {
 	gw := &networkv1alpha1.Gateway{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: networkv1alpha1.GroupVersion.String(),
@@ -116,7 +116,7 @@ func newNamespacedGatewayFromSubnet(ns string, subnet *networkv1alpha1.Subnet) *
 	return gw
 }
 
-func newNamespacedSubnetFromIPPrefix(ns string, ipPrefix string) *networkv1alpha1.Subnet {
+func mustCreateNamespacedSubnetFromIPPrefix(ns string, ipPrefix string) *networkv1alpha1.Subnet {
 	parsedPrefix, err := netaddr.ParseIPPrefix(ipPrefix)
 	Expect(err).ToNot(HaveOccurred())
 
