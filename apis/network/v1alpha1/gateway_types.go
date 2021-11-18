@@ -103,11 +103,6 @@ type Gateway struct {
 	Status GatewayStatus `json:"status,omitempty"`
 }
 
-// IsBeingDeleted returns if the instance is being deleted
-func (gw *Gateway) IsBeingDeleted() bool {
-	return !gw.DeletionTimestamp.IsZero()
-}
-
 // IPAMRangeName returns the name of the corresponding IPAMRange
 func (gw *Gateway) IPAMRangeName() string {
 	return fmt.Sprintf("gateway-%s", gw.Name)
