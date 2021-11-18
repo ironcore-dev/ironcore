@@ -23,6 +23,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
@@ -32,6 +33,27 @@ import (
 var _ = Describe("gateway controller", func() {
 	ns := SetupTest()
 	Context("reconciling creation", func() {
+		It("sets the ControllerReference of the corresponding IPAMRange to the Gateway", func() {
+			subnet := newNamespacedSubnetFromIPPrefix(ns.Name, "192.168.0.0/24")
+			gw := newNamespacedGatewayFromSubnet(ns.Name, subnet)
+			ipamRange := newIPAMRangeFromGateway(gw)
+			ipamRangeKey := objectKey(ipamRange)
+			Eventually(func(g Gomega) {
+				err := k8sClient.Get(ctx, ipamRangeKey, ipamRange)
+				Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
+				g.Expect(err).NotTo(HaveOccurred())
+
+				g.Expect(ipamRange.OwnerReferences).To(ContainElement(metav1.OwnerReference{
+					APIVersion:         networkv1alpha1.GroupVersion.String(),
+					Kind:               "Gateway",
+					Name:               gw.Name,
+					UID:                gw.UID,
+					BlockOwnerDeletion: pointer.BoolPtr(true),
+					Controller:         pointer.BoolPtr(true),
+				}))
+			}, timeout, interval).Should(Succeed())
+		})
+
 		It("creates the corresponding IPAMRange", func() {
 			subnet := newNamespacedSubnetFromIPPrefix(ns.Name, "192.168.0.0/24")
 			gw := newNamespacedGatewayFromSubnet(ns.Name, subnet)
@@ -80,7 +102,7 @@ func newNamespacedGatewayFromSubnet(ns string, subnet *networkv1alpha1.Subnet) *
 	gw := &networkv1alpha1.Gateway{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: networkv1alpha1.GroupVersion.String(),
-			Kind:       "gateway",
+			Kind:       "Gateway",
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace:    ns,
