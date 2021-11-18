@@ -36,7 +36,13 @@ const (
 )
 
 // log is for logging in this package.
-var ipamrangelog = logf.Log.WithName("ipamrange-resource")
+var (
+	ipamrangelog = logf.Log.WithName("ipamrange-resource")
+	ipamRangeGR  = schema.GroupResource{
+		Group:    IPAMRangeGK.Group,
+		Resource: IPAMRangeGK.Kind,
+	}
+)
 
 func (r *IPAMRange) SetupWebhookWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr).
@@ -110,13 +116,22 @@ func (r *IPAMRange) ValidateUpdate(oldObj runtime.Object) error {
 func (r *IPAMRange) ValidateDelete() error {
 	ipamrangelog.Info("validate delete", "name", r.Name)
 
+	childrenNames := []string{}
 	for _, alloc := range r.Status.Allocations {
 		if alloc.State == IPAMRangeAllocationUsed {
-			return apierrors.NewForbidden(schema.GroupResource{
-				Group:    IPAMRangeGK.Group,
-				Resource: IPAMRangeGK.Kind,
-			}, r.Name, fmt.Errorf("there's still children that depend on this IPAMRange"))
+			if alloc.User == nil {
+				return apierrors.NewForbidden(ipamRangeGR, r.Name, fmt.Errorf("found allocation without user"))
+
+			}
+			childrenNames = append(childrenNames, alloc.User.Name)
 		}
+	}
+
+	if len(childrenNames) > 0 {
+		return apierrors.NewForbidden(
+			ipamRangeGR, r.Name,
+			fmt.Errorf("there's still children that depend on this IPAMRange: %v", childrenNames),
+		)
 	}
 
 	return nil

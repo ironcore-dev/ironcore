@@ -280,7 +280,7 @@ var _ = Describe("IPAMRangeWebhook", func() {
 
 			instance.Status = IPAMRangeStatus{
 				Allocations: []IPAMRangeAllocationStatus{
-					{State: IPAMRangeAllocationUsed, CIDR: &cidr},
+					{State: IPAMRangeAllocationUsed, CIDR: &cidr, User: &corev1.LocalObjectReference{Name: instance.Name}},
 				},
 			}
 			Expect(k8sClient.Status().Update(ctx, instance)).To(Succeed())
