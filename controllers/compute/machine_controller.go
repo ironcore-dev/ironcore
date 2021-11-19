@@ -67,6 +67,7 @@ func (r *MachineReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *MachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	// Index the field of machineclass name for listing machines in machineclass controller
 	if err := mgr.GetFieldIndexer().IndexField(
 		context.Background(),
 		&computev1alpha1.Machine{},
