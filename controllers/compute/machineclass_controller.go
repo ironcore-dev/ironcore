@@ -76,14 +76,21 @@ func (r *MachineClassReconciler) addFinalizerIfNone(ctx context.Context, mClass 
 
 func (r *MachineClassReconciler) reconcileDeletion(ctx context.Context, mClass *computev1alpha1.MachineClass) (ctrl.Result, error) {
 	// List the machines currently using the MachineClass
-	mm := &computev1alpha1.MachineList{}
-	if err := r.List(ctx, mm, client.InNamespace(mClass.Namespace), client.MatchingFields{machineClassNameField: mClass.Name}); err != nil {
+	mList := &computev1alpha1.MachineList{}
+	if err := r.List(ctx, mList, client.InNamespace(mClass.Namespace), client.MatchingFields{machineClassNameField: mClass.Name}); err != nil {
 		return ctrl.Result{}, fmt.Errorf("listing the machines using the MachineClass: %w", err)
 	}
 
 	// Check if there's still any machine using the MachineClass
-	if len(mm.Items) != 0 {
+	if len(mList.Items) != 0 {
 		return ctrl.Result{}, errMachineClassDeletionForbidden
+	}
+
+	// Remove the finalizer in the machineclass and persist the new state
+	old := mClass.DeepCopy()
+	util.RemoveFinalizer(mClass, computev1alpha1.MachineClassFinalizer)
+	if err := r.Patch(ctx, mClass, client.MergeFrom(old)); err != nil {
+		return ctrl.Result{}, fmt.Errorf("removing the finalizer: %w", err)
 	}
 	return ctrl.Result{}, nil
 }
