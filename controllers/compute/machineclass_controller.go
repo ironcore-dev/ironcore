@@ -24,7 +24,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	util "sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
@@ -43,8 +42,6 @@ type MachineClassReconciler struct {
 
 // Reconcile moves the current state of the cluster closer to the desired state
 func (r *MachineClassReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
-
 	mClass := &computev1alpha1.MachineClass{}
 	if err := r.Get(ctx, req.NamespacedName, mClass); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
