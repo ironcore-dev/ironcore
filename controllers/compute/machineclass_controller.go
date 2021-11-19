@@ -18,6 +18,7 @@ package compute
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"k8s.io/apimachinery/pkg/runtime"
@@ -77,5 +78,17 @@ func (r *MachineClassReconciler) addFinalizerIfNone(ctx context.Context, mClass 
 }
 
 func (r *MachineClassReconciler) reconcileDeletion(ctx context.Context, mClass *computev1alpha1.MachineClass) (ctrl.Result, error) {
+	// List the machines currently using the MachineClass
+	mm := &computev1alpha1.MachineList{}
+	if err := r.List(ctx, mm, client.InNamespace(mClass.Namespace), client.MatchingFields{machineClassNameField: mClass.Name}); err != nil {
+		return ctrl.Result{}, fmt.Errorf("listing the machines using the MachineClass: %w", err)
+	}
+
+	// Check if there's still any machine using the MachineClass
+	if len(mm.Items) != 0 {
+		return ctrl.Result{}, errMachineClassDeletionForbidden
+	}
 	return ctrl.Result{}, nil
 }
+
+var errMachineClassDeletionForbidden = errors.New("forbidden to delete the machineclass used by a machine")

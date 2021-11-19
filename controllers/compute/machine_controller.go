@@ -67,6 +67,21 @@ func (r *MachineReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *MachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	if err := mgr.GetFieldIndexer().IndexField(
+		context.Background(),
+		&computev1alpha1.Machine{},
+		machineClassNameField,
+		func(object client.Object) []string {
+			m := object.(*computev1alpha1.Machine)
+			if m.Spec.MachineClass.Name == "" {
+				return nil
+			}
+			return []string{m.Spec.MachineClass.Name}
+		},
+	); err != nil {
+		return fmt.Errorf("indexing the field %s: %w", machineClassNameField, err)
+	}
+
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&computev1alpha1.Machine{}).
 		Owns(&networkv1alpha1.IPAMRange{}, builder.WithPredicates(predicates.IPAMRangeAllocationsChangedPredicate{})).
@@ -172,3 +187,5 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 	}
 	return ctrl.Result{}, nil
 }
+
+const machineClassNameField = ".spec.machineClass.name"
