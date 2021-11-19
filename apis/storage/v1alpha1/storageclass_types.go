@@ -21,6 +21,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+const (
+	// StorageClassFinalizer
+	StorageClassFinalizer = "storageclass.network.onmetal.de"
+)
+
 // StorageClassSpec defines the desired state of StorageClass
 type StorageClassSpec struct {
 	// Capabilities describes the capabilities of a storage class
@@ -43,6 +48,11 @@ type StorageClass struct {
 
 	Spec   StorageClassSpec   `json:"spec,omitempty"`
 	Status StorageClassStatus `json:"status,omitempty"`
+}
+
+// IsBeingDeleted returns if the storageclass is being deleted
+func (sc *StorageClass) IsBeingDeleted() bool {
+	return !sc.DeletionTimestamp.IsZero()
 }
 
 //+kubebuilder:object:root=true
