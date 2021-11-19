@@ -22,7 +22,7 @@ import (
 )
 
 const (
-	// MachineClassFinalizer is the finalizer
+	// MachineClassFinalizer
 	MachineClassFinalizer = "machineclass.network.onmetal.de"
 )
 
