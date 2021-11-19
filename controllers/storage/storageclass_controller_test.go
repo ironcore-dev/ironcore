@@ -32,7 +32,7 @@ import (
 
 var _ = Describe("storageclass controller", func() {
 	ns := SetupTest(ctx)
-	It("signals error upon storageclass deletion if there's any volume still using the storageclass", func() {
+	It("removes the finalizer from the storageclass only if there's no volume still using the storageclass", func() {
 		time.Sleep(1 * time.Second)
 		sc := &storagev1alpha1.StorageClass{
 			ObjectMeta: metav1.ObjectMeta{
@@ -59,12 +59,13 @@ var _ = Describe("storageclass controller", func() {
 
 		// Check the finalizer is still there
 		scKey := objKey(sc)
-		Expect(k8sClient.Get(ctx, scKey, sc))
-		Expect(sc.Finalizers).To(ContainElement(storagev1alpha1.StorageClassFinalizer))
-
-		Expect(k8sClient.Delete(ctx, vol)).Should(Succeed())
+		Consistently(func() []string {
+			Expect(k8sClient.Get(ctx, scKey, sc))
+			return sc.Finalizers
+		}, interval).Should(ContainElement(storagev1alpha1.StorageClassFinalizer))
 
 		// Eventually the storageclass is gone
+		Expect(k8sClient.Delete(ctx, vol)).Should(Succeed())
 		Eventually(func() bool {
 			err := k8sClient.Get(ctx, scKey, sc)
 			fmt.Fprintf(GinkgoWriter, "%#v", err)
