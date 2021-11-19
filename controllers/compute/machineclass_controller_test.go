@@ -31,7 +31,7 @@ import (
 
 var _ = Describe("machineclass controller", func() {
 	ns := SetupTest(ctx)
-	It("signals error upon machineclass deletion if there's any machine still using the machineclass", func() {
+	It("removes the finalizer from machineclass only if there's no machine still using the machineclass", func() {
 		time.Sleep(1 * time.Second)
 		mClass := &computev1alpha1.MachineClass{
 			ObjectMeta: metav1.ObjectMeta{
@@ -58,8 +58,10 @@ var _ = Describe("machineclass controller", func() {
 
 		// Check the finalizer is still there
 		mClassKey := objKey(mClass)
-		Expect(k8sClient.Get(ctx, mClassKey, mClass))
-		Expect(mClass.Finalizers).To(ContainElement(computev1alpha1.MachineClassFinalizer))
+		Consistently(func() []string {
+			Expect(k8sClient.Get(ctx, mClassKey, mClass))
+			return mClass.Finalizers
+		}, interval).Should(ContainElement(computev1alpha1.MachineClassFinalizer))
 
 		// Eventually the machineclass is gone
 		Expect(k8sClient.Delete(ctx, m)).Should(Succeed())
