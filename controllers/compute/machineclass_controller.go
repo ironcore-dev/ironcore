@@ -47,7 +47,9 @@ func (r *MachineClassReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	r.addFinalizerIfNone(ctx, mClass)
+	if err := r.addFinalizerIfNone(ctx, mClass); err != nil {
+		return ctrl.Result{}, fmt.Errorf("adding the finalizer if none: %w", err)
+	}
 
 	if mClass.IsBeingDeleted() {
 		return r.reconcileDeletion(ctx, mClass)

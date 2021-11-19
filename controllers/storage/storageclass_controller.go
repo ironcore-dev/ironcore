@@ -46,7 +46,9 @@ func (r *StorageClassReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	r.addFinalizerIfNone(ctx, sc)
+	if err := r.addFinalizerIfNone(ctx, sc); err != nil {
+		return ctrl.Result{}, fmt.Errorf("adding the finalizer if none: %w", err)
+	}
 
 	if sc.IsBeingDeleted() {
 		return r.reconcileDeletion(ctx, sc)
