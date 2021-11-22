@@ -69,7 +69,7 @@ var _ = Describe("ReservedIPReconciler", func() {
 			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
 			g.Expect(err).NotTo(HaveOccurred())
 
-			g.Expect(ipamRange.Spec.Requests).To(ConsistOf(networkv1alpha1.IPAMRangeRequest{
+			g.Expect(ipamRange.Spec.Elements).To(ConsistOf(networkv1alpha1.IPAMRangeElement{
 				IPs: commonv1alpha1.PtrToIPRange(commonv1alpha1.IPRangeFrom(ip, ip)),
 			}))
 		}, timeout, interval).Should(Succeed())

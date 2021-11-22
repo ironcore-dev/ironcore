@@ -19,6 +19,7 @@ package network
 import (
 	"context"
 	"fmt"
+
 	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
@@ -68,14 +69,13 @@ func (r *SubnetReconciler) reconcileExists(ctx context.Context, log logr.Logger,
 func (r *SubnetReconciler) reconcile(ctx context.Context, log logr.Logger, subnet *networkv1alpha1.Subnet) (ctrl.Result, error) {
 	var (
 		ipamRangeParent *corev1.LocalObjectReference
-		requests        []networkv1alpha1.IPAMRangeRequest
-		rootCIDRs       []commonv1alpha1.CIDR
+		elements        []networkv1alpha1.IPAMRangeElement
 	)
 	if parent := subnet.Spec.Parent; parent != nil {
 		ipamRangeParent = &corev1.LocalObjectReference{Name: networkv1alpha1.SubnetIPAMName(parent.Name)}
 		for _, rng := range subnet.Spec.Ranges {
 			cidr := rng.CIDR
-			requests = append(requests, networkv1alpha1.IPAMRangeRequest{
+			elements = append(elements, networkv1alpha1.IPAMRangeElement{
 				Size: rng.Size,
 				CIDR: cidr,
 			})
@@ -83,7 +83,10 @@ func (r *SubnetReconciler) reconcile(ctx context.Context, log logr.Logger, subne
 	} else {
 		for _, rng := range subnet.Spec.Ranges {
 			if rng.CIDR != nil {
-				rootCIDRs = append(rootCIDRs, *rng.CIDR)
+				ele := networkv1alpha1.IPAMRangeElement{
+					CIDR: rng.CIDR,
+				}
+				elements = append(elements, ele)
 			}
 		}
 	}
@@ -99,8 +102,7 @@ func (r *SubnetReconciler) reconcile(ctx context.Context, log logr.Logger, subne
 		},
 		Spec: networkv1alpha1.IPAMRangeSpec{
 			Parent:   ipamRangeParent,
-			CIDRs:    rootCIDRs,
-			Requests: requests,
+			Elements: elements,
 		},
 	}
 	if err := ctrl.SetControllerReference(subnet, ipamRange, r.Scheme); err != nil {
@@ -117,7 +119,7 @@ func (r *SubnetReconciler) reconcile(ctx context.Context, log logr.Logger, subne
 			continue
 		}
 
-		for _, request := range requests {
+		for _, request := range elements {
 			if equality.Semantic.DeepEqual(allocation.Request, request) {
 				cidrs = append(cidrs, *request.CIDR)
 			}

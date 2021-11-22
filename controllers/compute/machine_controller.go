@@ -94,7 +94,7 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 	// Delete unused IPAMRanges associated with Machine interfaces
 	for _, iface := range machine.Spec.Interfaces {
 		var (
-			request  networkv1alpha1.IPAMRangeRequest
+			request  networkv1alpha1.IPAMRangeElement
 			ipamName = computev1alpha1.MachineInterfaceIPAMRangeName(machine.Name, iface.Name)
 		)
 		ifaceCheckList.Insert(ipamName)
@@ -121,7 +121,7 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 				Parent: &corev1.LocalObjectReference{
 					Name: networkv1alpha1.SubnetIPAMName(iface.Target.Name),
 				},
-				Requests: []networkv1alpha1.IPAMRangeRequest{request},
+				Elements: []networkv1alpha1.IPAMRangeElement{request},
 			},
 		}
 		if err := ctrl.SetControllerReference(machine, ifaceIPAMRange, r.Scheme); err != nil {

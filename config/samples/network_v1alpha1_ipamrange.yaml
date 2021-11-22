@@ -1,11 +1,12 @@
-#apiVersion: network.onmetal.de/v1alpha1
-#kind: IPAMRange
-#metadata:
-#  name: parent
-#spec:
-#  cidrs:
-#    - 10.0.0.0/16
-#---
+apiVersion: network.onmetal.de/v1alpha1
+kind: IPAMRange
+metadata:
+ name: parent
+spec:
+ elements:
+   - cidr: 10.0.0.0/16
+
+---
 apiVersion: network.onmetal.de/v1alpha1
 kind: IPAMRange
 metadata:
@@ -13,7 +14,7 @@ metadata:
 spec:
   parent:
     name: parent
-  requests:
+  elements:
     - size: 17
       #---
       #apiVersion: network.onmetal.de/v1alpha1

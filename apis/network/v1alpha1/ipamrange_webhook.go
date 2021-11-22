@@ -17,10 +17,11 @@
 package v1alpha1
 
 import (
+	"reflect"
+
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
-	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
@@ -84,8 +85,8 @@ func (r *IPAMRange) ValidateUpdate(old runtime.Object) error {
 		allErrs = append(allErrs, field.Invalid(path.Child("parent"), r.Spec.Parent, fieldImmutable))
 	}
 
-	if !reflect.DeepEqual(r.Spec.CIDRs, oldRange.Spec.CIDRs) {
-		allErrs = append(allErrs, field.Invalid(path.Child("cidr"), r.Spec.CIDRs, fieldImmutable))
+	if !reflect.DeepEqual(r.Spec.Elements, oldRange.Spec.Elements) {
+		allErrs = append(allErrs, field.Invalid(path.Child("elements"), r.Spec.Elements, fieldImmutable))
 	}
 
 	if len(allErrs) == 0 {

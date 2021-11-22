@@ -176,7 +176,7 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				obj := &networkv1alpha1.IPAMRange{}
 				g.Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
 				g.Expect(getAllocationStates(obj)).To(Equal(expectedParentAllocations))
-				g.Expect(getFailedRequests(obj)).To(ContainElements(getRequestKeys(child.Spec.Requests)...))
+				g.Expect(getFailedRequests(obj)).To(ContainElements(getRequestKeys(child.Spec.Elements)...))
 			}, timeout, interval).Should(Succeed())
 
 			By("Check child allocations")
@@ -184,7 +184,7 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				key := types.NamespacedName{Name: child.Name, Namespace: child.Namespace}
 				obj := &networkv1alpha1.IPAMRange{}
 				g.Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
-				g.Expect(getFailedRequests(obj)).To(ContainElements(getRequestKeys(child.Spec.Requests)...))
+				g.Expect(getFailedRequests(obj)).To(ContainElements(getRequestKeys(child.Spec.Elements)...))
 			}, timeout, interval).Should(Succeed())
 		})
 		It("allocation should fail if size is too big", func() {
@@ -200,7 +200,7 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				obj := &networkv1alpha1.IPAMRange{}
 				g.Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
 				g.Expect(getAllocationStates(obj)).To(Equal(expectedParentAllocations))
-				g.Expect(getFailedRequests(obj)).To(ContainElements(getRequestKeys(child.Spec.Requests)...))
+				g.Expect(getFailedRequests(obj)).To(ContainElements(getRequestKeys(child.Spec.Elements)...))
 			}, timeout, interval).Should(Succeed())
 
 			By("Check child allocations")
@@ -208,7 +208,7 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				key := types.NamespacedName{Name: child.Name, Namespace: child.Namespace}
 				obj := &networkv1alpha1.IPAMRange{}
 				g.Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
-				g.Expect(getFailedRequests(obj)).To(ContainElements(getRequestKeys(child.Spec.Requests)...))
+				g.Expect(getFailedRequests(obj)).To(ContainElements(getRequestKeys(child.Spec.Elements)...))
 			}, timeout, interval).Should(Succeed())
 		})
 		It("allocation should fail if ip is out of range", func() {
@@ -231,7 +231,7 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				obj := &networkv1alpha1.IPAMRange{}
 				g.Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
 				g.Expect(getAllocationStates(obj)).To(Equal(expectedParentAllocations))
-				g.Expect(getFailedRequests(obj)).To(ContainElements(getRequestKeys(child.Spec.Requests)...))
+				g.Expect(getFailedRequests(obj)).To(ContainElements(getRequestKeys(child.Spec.Elements)...))
 			}, timeout, interval).Should(Succeed())
 
 			By("Check child allocations")
@@ -239,7 +239,7 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				key := types.NamespacedName{Name: child.Name, Namespace: child.Namespace}
 				obj := &networkv1alpha1.IPAMRange{}
 				g.Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
-				g.Expect(getFailedRequests(obj)).To(ContainElements(getRequestKeys(child.Spec.Requests)...))
+				g.Expect(getFailedRequests(obj)).To(ContainElements(getRequestKeys(child.Spec.Elements)...))
 			}, timeout, interval).Should(Succeed())
 		})
 		It("should update allocations when CIDR is changed", func() {
@@ -256,7 +256,7 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				obj := &networkv1alpha1.IPAMRange{}
 				g.Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
 				g.Expect(getAllocationStates(obj)).To(Equal(expectedParentAllocations))
-				g.Expect(getFailedRequests(obj)).To(ContainElements(getRequestKeys(child.Spec.Requests)...))
+				g.Expect(getFailedRequests(obj)).To(ContainElements(getRequestKeys(child.Spec.Elements)...))
 
 				// Change parent CIDR and wait for allocation to succeed
 				prefix, err := netaddr.ParseIPPrefix("192.168.2.0/24")
@@ -267,7 +267,13 @@ var _ = Describe("IPAMRangeReconciler", func() {
 					Name:      parent.Name,
 					Namespace: parent.Namespace,
 				}, updParent)).ToNot(HaveOccurred())
-				updParent.Spec.CIDRs = []commonv1alpha1.CIDR{commonv1alpha1.NewCIDR(prefix)}
+				elements := []networkv1alpha1.IPAMRangeElement{}
+				for _, cidr := range []commonv1alpha1.CIDR{commonv1alpha1.NewCIDR(prefix)} {
+					elements = append(elements, networkv1alpha1.IPAMRangeElement{
+						CIDR: &cidr,
+					})
+				}
+				updParent.Spec.Elements = elements
 				Expect(k8sClient.Update(ctx, updParent)).To(Succeed())
 			}, timeout, interval).Should(Succeed())
 
@@ -276,7 +282,7 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				key := types.NamespacedName{Name: child.Name, Namespace: child.Namespace}
 				obj := &networkv1alpha1.IPAMRange{}
 				g.Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
-				g.Expect(getFailedRequests(obj)).To(ContainElements(getRequestKeys(child.Spec.Requests)...))
+				g.Expect(getFailedRequests(obj)).To(ContainElements(getRequestKeys(child.Spec.Elements)...))
 			}, timeout, interval).Should(Succeed())
 
 			By("Check parent allocations after CIDR change")
@@ -325,7 +331,7 @@ func createIPAMRange(
 		spec.Parent = &corev1.LocalObjectReference{
 			Name: parentName,
 		}
-		spec.Requests = []networkv1alpha1.IPAMRangeRequest{
+		spec.Elements = []networkv1alpha1.IPAMRangeElement{
 			{
 				CIDR:    cidr,
 				IPs:     ipRange,
@@ -334,7 +340,13 @@ func createIPAMRange(
 			},
 		}
 	} else if cidr != nil {
-		spec.CIDRs = []commonv1alpha1.CIDR{*cidr}
+		elements := []networkv1alpha1.IPAMRangeElement{}
+		for _, cidr := range []commonv1alpha1.CIDR{*cidr} {
+			elements = append(elements, networkv1alpha1.IPAMRangeElement{
+				CIDR: &cidr,
+			})
+		}
+		spec.Elements = elements
 	}
 
 	instance := &networkv1alpha1.IPAMRange{
@@ -399,7 +411,7 @@ func getFailedRequests(obj *networkv1alpha1.IPAMRange) (result []string) {
 	return
 }
 
-func getRequestKey(req networkv1alpha1.IPAMRangeRequest) (key string) {
+func getRequestKey(req networkv1alpha1.IPAMRangeElement) (key string) {
 	if req.IPs != nil {
 		key = req.IPs.From.String() + "-" + req.IPs.To.String()
 	} else {
@@ -409,7 +421,7 @@ func getRequestKey(req networkv1alpha1.IPAMRangeRequest) (key string) {
 	return
 }
 
-func getRequestKeys(reqs []networkv1alpha1.IPAMRangeRequest) (result []interface{}) {
+func getRequestKeys(reqs []networkv1alpha1.IPAMRangeElement) (result []interface{}) {
 	for _, r := range reqs {
 		result = append(result, getRequestKey(r))
 	}

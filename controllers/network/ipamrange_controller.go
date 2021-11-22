@@ -200,8 +200,8 @@ func (r *IPAMRangeReconciler) mapChildNameToChild(items []networkv1alpha1.IPAMRa
 	return nameToChild
 }
 
-func (r *IPAMRangeReconciler) fulfilledRequests(nameToChild map[string]networkv1alpha1.IPAMRange, ipamRange *networkv1alpha1.IPAMRange) map[string]map[networkv1alpha1.IPAMRangeRequest]allocation {
-	res := make(map[string]map[networkv1alpha1.IPAMRangeRequest]allocation)
+func (r *IPAMRangeReconciler) fulfilledRequests(nameToChild map[string]networkv1alpha1.IPAMRange, ipamRange *networkv1alpha1.IPAMRange) map[string]map[networkv1alpha1.IPAMRangeElement]allocation {
+	res := make(map[string]map[networkv1alpha1.IPAMRangeElement]allocation)
 	for _, allocStatus := range ipamRange.Status.Allocations {
 		if allocStatus.State != networkv1alpha1.IPAMRangeAllocationUsed {
 			continue
@@ -217,11 +217,11 @@ func (r *IPAMRangeReconciler) fulfilledRequests(nameToChild map[string]networkv1
 			continue
 		}
 
-		for _, childRequest := range child.Spec.Requests {
+		for _, childRequest := range child.Spec.Elements {
 			if equality.Semantic.DeepEqual(childRequest, *request) {
 				requests := res[child.Name]
 				if requests == nil {
-					requests = make(map[networkv1alpha1.IPAMRangeRequest]allocation)
+					requests = make(map[networkv1alpha1.IPAMRangeElement]allocation)
 				}
 
 				requests[*request] = allocation{
@@ -239,13 +239,13 @@ func (r *IPAMRangeReconciler) fulfilledRequests(nameToChild map[string]networkv1
 
 type childNameAndRequest struct {
 	childName string
-	request   networkv1alpha1.IPAMRangeRequest
+	request   networkv1alpha1.IPAMRangeElement
 }
 
-func (r *IPAMRangeReconciler) sortedRequests(items []networkv1alpha1.IPAMRange, fulfilledRequests map[string]map[networkv1alpha1.IPAMRangeRequest]allocation) []childNameAndRequest {
+func (r *IPAMRangeReconciler) sortedRequests(items []networkv1alpha1.IPAMRange, fulfilledRequests map[string]map[networkv1alpha1.IPAMRangeElement]allocation) []childNameAndRequest {
 	var requests []childNameAndRequest
 	for _, item := range items {
-		for _, request := range item.Spec.Requests {
+		for _, request := range item.Spec.Elements {
 			requests = append(requests, childNameAndRequest{
 				childName: item.Name,
 				request:   request,
@@ -271,7 +271,11 @@ type allocation struct {
 
 func (r *IPAMRangeReconciler) gatherAvailable(ctx context.Context, ipamRange *networkv1alpha1.IPAMRange) (available *netaddr.IPSet, parentAllocations []allocation, failed []networkv1alpha1.IPAMRangeAllocationStatus, err error) {
 	if ipamRange.Spec.Parent == nil {
-		available, err := ipSetFromCIDRs(ipamRange.Spec.CIDRs)
+		cidrs := []commonv1alpha1.CIDR{}
+		for _, ele := range ipamRange.Spec.Elements {
+			cidrs = append(cidrs, *ele.CIDR)
+		}
+		available, err := ipSetFromCIDRs(cidrs)
 		if err != nil {
 			return nil, nil, nil, err
 		}
@@ -291,7 +295,7 @@ func (r *IPAMRangeReconciler) gatherAvailable(ctx context.Context, ipamRange *ne
 	for _, allocStatus := range parent.Status.Allocations {
 		allocStatus := allocStatus
 		if activeRequest, user := allocStatus.Request, allocStatus.User; allocStatus.Request != nil && user != nil && user.Name == ipamRange.Name {
-			for _, request := range ipamRange.Spec.Requests {
+			for _, request := range ipamRange.Spec.Elements {
 				if equality.Semantic.DeepEqual(*activeRequest, request) {
 					if allocStatus.State == networkv1alpha1.IPAMRangeAllocationUsed {
 						switch {
@@ -332,7 +336,7 @@ func isNetIP(ip netaddr.IP) bool {
 	}
 }
 
-func (r *IPAMRangeReconciler) acquireRequest(set *netaddr.IPSet, request networkv1alpha1.IPAMRangeRequest) (prefix *netaddr.IPPrefix, ipRange *netaddr.IPRange, newSet *netaddr.IPSet, ok bool) {
+func (r *IPAMRangeReconciler) acquireRequest(set *netaddr.IPSet, request networkv1alpha1.IPAMRangeElement) (prefix *netaddr.IPPrefix, ipRange *netaddr.IPRange, newSet *netaddr.IPSet, ok bool) {
 	switch {
 	case request.CIDR != nil:
 		if !set.ContainsPrefix(request.CIDR.IPPrefix) {
@@ -398,7 +402,7 @@ func (r *IPAMRangeReconciler) acquireRequest(set *netaddr.IPSet, request network
 
 func (r *IPAMRangeReconciler) computeChildAllocations(
 	available *netaddr.IPSet,
-	fulfilledRequests map[string]map[networkv1alpha1.IPAMRangeRequest]allocation,
+	fulfilledRequests map[string]map[networkv1alpha1.IPAMRangeElement]allocation,
 	requests []childNameAndRequest,
 ) (newAvailable *netaddr.IPSet, childAllocations []networkv1alpha1.IPAMRangeAllocationStatus) {
 	for _, requestAndName := range requests {

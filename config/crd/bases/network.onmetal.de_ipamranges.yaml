@@ -50,23 +50,9 @@ spec:
               parent range and unused. It will be allocated if possible. Otherwise,
               the status of the object will be set to "Invalid".
             properties:
-              cidrs:
-                description: CIDRs is a list of CIDR specs which are defined for this
-                  IPAMRange
-                items:
-                  description: CIDR represents a network CIDR.
-                  type: string
-                type: array
-              parent:
-                description: Parent is the reference of the Parent IPAMRange from
-                  which the CIDR or size should be derived
-                properties:
-                  name:
-                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                      TODO: Add other useful fields. apiVersion, kind, uid?'
-                    type: string
-                type: object
-              requests:
+              elements:
+                description: Elements is a list of CIDR specs which are defined for
+                  this IPAMRange
                 items:
                   properties:
                     cidr:
@@ -96,6 +82,15 @@ spec:
                       type: integer
                   type: object
                 type: array
+              parent:
+                description: Parent is the reference of the Parent IPAMRange from
+                  which the CIDR or size should be derived
+                properties:
+                  name:
+                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                      TODO: Add other useful fields. apiVersion, kind, uid?'
+                    type: string
+                type: object
             type: object
           status:
             description: IPAMRangeStatus defines the observed state of IPAMRange
