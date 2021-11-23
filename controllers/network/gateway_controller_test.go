@@ -33,10 +33,43 @@ var _ = Describe("gateway controller", func() {
 	ns := SetupTest()
 	Context("reconciling creation", func() {
 		It("sets the ControllerReference of the corresponding IPAMRange to the Gateway", func() {
-			subnet := mustCreateNamespacedSubnetFromIPPrefix(ns.Name, "192.168.0.0/24")
-			gw := mustCreateNamespacedGatewayFromSubnet(ns.Name, subnet)
+			parsedPrefix, err := netaddr.ParseIPPrefix("192.168.0.0/24")
+			Expect(err).ToNot(HaveOccurred())
+
+			subnet := &networkv1alpha1.Subnet{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: networkv1alpha1.GroupVersion.String(),
+					Kind:       networkv1alpha1.SubnetGK.Kind,
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace:    ns.Name,
+					GenerateName: "gateway-controller-",
+				},
+				Spec: networkv1alpha1.SubnetSpec{
+					Ranges: []networkv1alpha1.RangeType{
+						{CIDR: &commonv1alpha1.CIDR{IPPrefix: parsedPrefix}},
+					},
+				},
+			}
+			Expect(k8sClient.Create(ctx, subnet)).To(Succeed())
+
+			gw := &networkv1alpha1.Gateway{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: networkv1alpha1.GroupVersion.String(),
+					Kind:       "Gateway",
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace:    ns.Name,
+					GenerateName: "gateway-controller-",
+				},
+				Spec: networkv1alpha1.GatewaySpec{
+					Subnet: v1.LocalObjectReference{Name: subnet.Name},
+				},
+			}
+			Expect(k8sClient.Create(ctx, gw)).To(Succeed())
+
 			ipamRange := newIPAMRangeFromGateway(gw)
-			ipamRangeKey := objectKey(ipamRange)
+			ipamRangeKey := client.ObjectKeyFromObject(ipamRange)
 			Eventually(func(g Gomega) {
 				err := k8sClient.Get(ctx, ipamRangeKey, ipamRange)
 				Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
@@ -54,10 +87,43 @@ var _ = Describe("gateway controller", func() {
 		})
 
 		It("creates the corresponding IPAMRange", func() {
-			subnet := mustCreateNamespacedSubnetFromIPPrefix(ns.Name, "192.168.0.0/24")
-			gw := mustCreateNamespacedGatewayFromSubnet(ns.Name, subnet)
+			parsedPrefix, err := netaddr.ParseIPPrefix("192.168.0.0/24")
+			Expect(err).ToNot(HaveOccurred())
+
+			subnet := &networkv1alpha1.Subnet{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: networkv1alpha1.GroupVersion.String(),
+					Kind:       networkv1alpha1.SubnetGK.Kind,
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace:    ns.Name,
+					GenerateName: "gateway-controller-",
+				},
+				Spec: networkv1alpha1.SubnetSpec{
+					Ranges: []networkv1alpha1.RangeType{
+						{CIDR: &commonv1alpha1.CIDR{IPPrefix: parsedPrefix}},
+					},
+				},
+			}
+			Expect(k8sClient.Create(ctx, subnet)).To(Succeed())
+
+			gw := &networkv1alpha1.Gateway{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: networkv1alpha1.GroupVersion.String(),
+					Kind:       "Gateway",
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace:    ns.Name,
+					GenerateName: "gateway-controller-",
+				},
+				Spec: networkv1alpha1.GatewaySpec{
+					Subnet: v1.LocalObjectReference{Name: subnet.Name},
+				},
+			}
+			Expect(k8sClient.Create(ctx, gw)).To(Succeed())
+
 			ipamRange := newIPAMRangeFromGateway(gw)
-			ipamRangeKey := objectKey(ipamRange)
+			ipamRangeKey := client.ObjectKeyFromObject(ipamRange)
 			Eventually(func() error {
 				err := k8sClient.Get(ctx, ipamRangeKey, ipamRange)
 				Expect(client.IgnoreNotFound(err)).To(Succeed())
@@ -66,9 +132,42 @@ var _ = Describe("gateway controller", func() {
 		})
 
 		It("updates the status of the Gateway", func() {
-			subnet := mustCreateNamespacedSubnetFromIPPrefix(ns.Name, "192.168.0.0/24")
-			gw := mustCreateNamespacedGatewayFromSubnet(ns.Name, subnet)
-			gwKey := objectKey(gw)
+			parsedPrefix, err := netaddr.ParseIPPrefix("192.168.0.0/24")
+			Expect(err).ToNot(HaveOccurred())
+
+			subnet := &networkv1alpha1.Subnet{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: networkv1alpha1.GroupVersion.String(),
+					Kind:       networkv1alpha1.SubnetGK.Kind,
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace:    ns.Name,
+					GenerateName: "gateway-controller-",
+				},
+				Spec: networkv1alpha1.SubnetSpec{
+					Ranges: []networkv1alpha1.RangeType{
+						{CIDR: &commonv1alpha1.CIDR{IPPrefix: parsedPrefix}},
+					},
+				},
+			}
+			Expect(k8sClient.Create(ctx, subnet)).To(Succeed())
+
+			gw := &networkv1alpha1.Gateway{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: networkv1alpha1.GroupVersion.String(),
+					Kind:       "Gateway",
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace:    ns.Name,
+					GenerateName: "gateway-controller-",
+				},
+				Spec: networkv1alpha1.GatewaySpec{
+					Subnet: v1.LocalObjectReference{Name: subnet.Name},
+				},
+			}
+			Expect(k8sClient.Create(ctx, gw)).To(Succeed())
+
+			gwKey := client.ObjectKeyFromObject(gw)
 			Eventually(func() []commonv1alpha1.IPAddr {
 				err := k8sClient.Get(ctx, gwKey, gw)
 				Expect(client.IgnoreNotFound(err)).To(Succeed())
@@ -81,47 +180,3 @@ var _ = Describe("gateway controller", func() {
 		})
 	})
 })
-
-func mustCreateNamespacedGatewayFromSubnet(ns string, subnet *networkv1alpha1.Subnet) *networkv1alpha1.Gateway {
-	gw := &networkv1alpha1.Gateway{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: networkv1alpha1.GroupVersion.String(),
-			Kind:       "Gateway",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace:    ns,
-			GenerateName: "gateway-controller-",
-		},
-		Spec: networkv1alpha1.GatewaySpec{
-			Subnet: v1.LocalObjectReference{Name: subnet.Name},
-		},
-	}
-	Expect(k8sClient.Create(ctx, gw)).To(Succeed())
-	return gw
-}
-
-func mustCreateNamespacedSubnetFromIPPrefix(ns string, ipPrefix string) *networkv1alpha1.Subnet {
-	parsedPrefix, err := netaddr.ParseIPPrefix(ipPrefix)
-	Expect(err).ToNot(HaveOccurred())
-
-	subnet := &networkv1alpha1.Subnet{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: networkv1alpha1.GroupVersion.String(),
-			Kind:       networkv1alpha1.SubnetGK.Kind,
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace:    ns,
-			GenerateName: "gateway-controller-",
-		},
-		Spec: networkv1alpha1.SubnetSpec{
-			Ranges: []networkv1alpha1.RangeType{
-				{CIDR: &commonv1alpha1.CIDR{IPPrefix: parsedPrefix}},
-			},
-		},
-	}
-
-	Expect(k8sClient.Create(ctx, subnet)).To(Succeed())
-	return subnet
-}
-
-var objectKey = client.ObjectKeyFromObject
