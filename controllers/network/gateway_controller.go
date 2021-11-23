@@ -26,6 +26,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	"github.com/onmetal/onmetal-api/predicates"
@@ -77,6 +78,7 @@ func (r *GatewayReconciler) SetupWithManager(mgr ctrl.Manager) error {
 func (r *GatewayReconciler) updateGatewayStatus(ctx context.Context, gw *networkv1alpha1.Gateway, ipamRange *networkv1alpha1.IPAMRange) (ctrl.Result, error) {
 	// Check if the IPAMRange is reconciled. If not, requeue the Gateway.
 	if len(ipamRange.Status.Allocations) == 0 {
+		log.FromContext(ctx).Info("requeuing the gateway due to the unreconciled ipamrange")
 		return ctrl.Result{Requeue: true}, nil
 	}
 
