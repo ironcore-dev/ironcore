@@ -17,8 +17,6 @@
 package compute
 
 import (
-	"time"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -32,7 +30,6 @@ import (
 var _ = Describe("machineclass controller", func() {
 	ns := SetupTest(ctx)
 	It("removes the finalizer from machineclass only if there's no machine still using the machineclass", func() {
-		time.Sleep(1 * time.Second)
 		mClass := &computev1alpha1.MachineClass{
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "machineclass-",

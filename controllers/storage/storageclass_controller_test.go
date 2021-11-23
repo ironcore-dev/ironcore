@@ -18,7 +18,6 @@ package storage
 
 import (
 	"fmt"
-	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -33,7 +32,6 @@ import (
 var _ = Describe("storageclass controller", func() {
 	ns := SetupTest(ctx)
 	It("removes the finalizer from the storageclass only if there's no volume still using the storageclass", func() {
-		time.Sleep(1 * time.Second)
 		sc := &storagev1alpha1.StorageClass{
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "storageclass-",
