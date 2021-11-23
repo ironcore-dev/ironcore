@@ -1,7 +1,7 @@
 name: Lint Golang Codebase
 
 on:
-  pull_request:
+  pull_request_target:
     paths-ignore:
       - 'docs/**'
       - '**/*.md'
