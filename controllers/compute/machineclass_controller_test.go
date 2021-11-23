@@ -57,7 +57,7 @@ var _ = Describe("machineclass controller", func() {
 		Expect(k8sClient.Delete(ctx, mClass)).Should(Succeed())
 
 		// Check the finalizer is still there
-		mClassKey := objKey(mClass)
+		mClassKey := client.ObjectKeyFromObject(mClass)
 		Consistently(func() []string {
 			Expect(k8sClient.Get(ctx, mClassKey, mClass))
 			return mClass.Finalizers
@@ -71,5 +71,3 @@ var _ = Describe("machineclass controller", func() {
 		}, timeout, interval).Should(BeTrue(), "error equal to `not found`")
 	})
 })
-
-var objKey = client.ObjectKeyFromObject

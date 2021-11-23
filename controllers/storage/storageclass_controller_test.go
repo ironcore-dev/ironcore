@@ -58,7 +58,7 @@ var _ = Describe("storageclass controller", func() {
 		Expect(k8sClient.Delete(ctx, sc)).Should(Succeed())
 
 		// Check the finalizer is still there
-		scKey := objKey(sc)
+		scKey := client.ObjectKeyFromObject(sc)
 		Consistently(func() []string {
 			Expect(k8sClient.Get(ctx, scKey, sc))
 			return sc.Finalizers
@@ -73,5 +73,3 @@ var _ = Describe("storageclass controller", func() {
 		}, timeout, interval).Should(BeTrue(), "error equal to `not found`")
 	})
 })
-
-var objKey = client.ObjectKeyFromObject
