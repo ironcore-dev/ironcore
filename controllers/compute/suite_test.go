@@ -43,8 +43,9 @@ import (
 // http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
 
 const (
-	interval = 50 * time.Millisecond
-	timeout  = 3 * time.Second
+	interval                 = 50 * time.Millisecond
+	timeout                  = 3 * time.Second
+	machinePoolReadyDuration = 300 * time.Second
 )
 
 var (
@@ -139,6 +140,12 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 			Scheme: k8sManager.GetScheme(),
 		}).SetupWithManager(k8sManager)
 		Expect(err).ToNot(HaveOccurred())
+
+		Expect((&MachinePoolReconciler{
+			Client:        k8sManager.GetClient(),
+			Scheme:        k8sManager.GetScheme(),
+			ReadyDuration: machinePoolReadyDuration,
+		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		go func() {
 			Expect(k8sManager.Start(mgrCtx)).To(Succeed(), "failed to start manager")

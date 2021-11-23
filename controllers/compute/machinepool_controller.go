@@ -18,19 +18,29 @@ package compute
 
 import (
 	"context"
+	"fmt"
+	"time"
+
+	"github.com/go-logr/logr"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/log"
+
+	"github.com/onmetal/controller-utils/conditionutils"
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
+)
+
+var (
+	pendingStateRequeueAfter = 30 * time.Second
 )
 
 // MachinePoolReconciler reconciles a MachinePool object
 type MachinePoolReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	Scheme        *runtime.Scheme
+	ReadyDuration time.Duration
 }
 
 //+kubebuilder:rbac:groups=compute.onmetal.de,resources=machinepools,verbs=get;list;watch;create;update;patch;delete
@@ -47,11 +57,41 @@ type MachinePoolReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.8.3/pkg/reconcile
 func (r *MachinePoolReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	log := ctrl.LoggerFrom(ctx)
+	pool := &computev1alpha1.MachinePool{}
+	if err := r.Get(ctx, req.NamespacedName, pool); err != nil {
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
 
-	// your logic here
+	return r.reconcileExists(ctx, log, pool)
+}
 
-	return ctrl.Result{}, nil
+func (r *MachinePoolReconciler) reconcileExists(ctx context.Context, log logr.Logger, pool *computev1alpha1.MachinePool) (ctrl.Result, error) {
+	cond := &computev1alpha1.MachinePoolCondition{}
+	ok, err := conditionutils.FindSlice(pool.Status.Conditions, string(computev1alpha1.MachinePoolConditionTypeReady), cond)
+	if err != nil {
+		return ctrl.Result{}, fmt.Errorf("failed while searching 'Ready' condition: %w", err)
+	}
+
+	outdatedPool := pool.DeepCopy()
+	requeueAfter := r.ReadyDuration
+	if ok {
+		if cond.LastUpdateTime.Add(r.ReadyDuration).After(time.Now()) {
+			pool.Status.State = computev1alpha1.MachinePoolStateReady
+		} else {
+			pool.Status.State = computev1alpha1.MachinePoolStatePending
+			requeueAfter = pendingStateRequeueAfter
+		}
+	} else {
+		pool.Status.State = computev1alpha1.MachinePoolStatePending
+		requeueAfter = pendingStateRequeueAfter
+	}
+
+	if err := r.Status().Patch(ctx, pool, client.MergeFrom(outdatedPool)); err != nil {
+		return ctrl.Result{}, fmt.Errorf("could not update status: %w", err)
+	}
+
+	return ctrl.Result{RequeueAfter: requeueAfter}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.

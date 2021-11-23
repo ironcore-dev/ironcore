@@ -37,6 +37,10 @@ type MachinePoolStatus struct {
 // MachinePoolConditionType is a type a MachinePoolCondition can have.
 type MachinePoolConditionType string
 
+const (
+	MachinePoolConditionTypeReady MachinePoolConditionType = "Ready"
+)
+
 // MachinePoolCondition is one of the conditions of a volume.
 type MachinePoolCondition struct {
 	// Type is the type of the condition.
