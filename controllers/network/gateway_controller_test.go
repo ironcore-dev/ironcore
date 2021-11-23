@@ -43,7 +43,7 @@ var _ = Describe("gateway controller", func() {
 				},
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace:    ns.Name,
-					GenerateName: "gateway-controller-",
+					GenerateName: "subnet-",
 				},
 				Spec: networkv1alpha1.SubnetSpec{
 					Ranges: []networkv1alpha1.RangeType{
@@ -60,7 +60,7 @@ var _ = Describe("gateway controller", func() {
 				},
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace:    ns.Name,
-					GenerateName: "gateway-controller-",
+					GenerateName: "gateway-",
 				},
 				Spec: networkv1alpha1.GatewaySpec{
 					Subnet: v1.LocalObjectReference{Name: subnet.Name},
@@ -97,7 +97,7 @@ var _ = Describe("gateway controller", func() {
 				},
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace:    ns.Name,
-					GenerateName: "gateway-controller-",
+					GenerateName: "subnet-",
 				},
 				Spec: networkv1alpha1.SubnetSpec{
 					Ranges: []networkv1alpha1.RangeType{
@@ -114,7 +114,7 @@ var _ = Describe("gateway controller", func() {
 				},
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace:    ns.Name,
-					GenerateName: "gateway-controller-",
+					GenerateName: "gateway-",
 				},
 				Spec: networkv1alpha1.GatewaySpec{
 					Subnet: v1.LocalObjectReference{Name: subnet.Name},
@@ -142,7 +142,7 @@ var _ = Describe("gateway controller", func() {
 				},
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace:    ns.Name,
-					GenerateName: "gateway-controller-",
+					GenerateName: "subnet-",
 				},
 				Spec: networkv1alpha1.SubnetSpec{
 					Ranges: []networkv1alpha1.RangeType{
@@ -159,7 +159,7 @@ var _ = Describe("gateway controller", func() {
 				},
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace:    ns.Name,
-					GenerateName: "gateway-controller-",
+					GenerateName: "gateway-",
 				},
 				Spec: networkv1alpha1.GatewaySpec{
 					Subnet: v1.LocalObjectReference{Name: subnet.Name},
