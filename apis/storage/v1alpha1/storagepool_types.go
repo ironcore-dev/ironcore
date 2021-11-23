@@ -50,6 +50,10 @@ const (
 // StoragePoolConditionType is a type a StoragePoolCondition can have.
 type StoragePoolConditionType string
 
+const (
+	StoragePoolConditionTypeReady StoragePoolConditionType = "Ready"
+)
+
 // StoragePoolCondition is one of the conditions of a volume.
 type StoragePoolCondition struct {
 	// Type is the type of the condition.

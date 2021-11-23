@@ -14,7 +14,7 @@
 // * limitations under the License.
 // */
 //
-package compute
+package storage
 
 import (
 	"time"
@@ -25,98 +25,98 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
+	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 )
 
-var _ = Describe("MachinePoolReconciler", func() {
-	Context("Reconcile a MachinePool", func() {
+var _ = Describe("StoragePoolReconciler", func() {
+	Context("Reconcile a StoragePool", func() {
 		ns := SetupTest(ctx)
 
 		It("should set state as Pending when Ready condition is not present", func() {
-			machinePool := &computev1alpha1.MachinePool{
+			storagePool := &storagev1alpha1.StoragePool{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "no-ready-condition",
 					Namespace: ns.Name,
 				},
 			}
-			Expect(k8sClient.Create(ctx, machinePool)).To(Succeed())
+			Expect(k8sClient.Create(ctx, storagePool)).To(Succeed())
 
-			By("checking that MachinePool is in pending state")
+			By("checking that StoragePool is in pending state")
 			Eventually(func(g Gomega) {
 				key := types.NamespacedName{
-					Name:      machinePool.Name,
+					Name:      storagePool.Name,
 					Namespace: ns.Name,
 				}
-				obj := &computev1alpha1.MachinePool{}
+				obj := &storagev1alpha1.StoragePool{}
 				err := k8sClient.Get(ctx, key, obj)
 				Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
 				g.Expect(err).NotTo(HaveOccurred())
 
-				g.Expect(obj.Status.State).To(Equal(computev1alpha1.MachinePoolStatePending))
+				g.Expect(obj.Status.State).To(Equal(storagev1alpha1.StoragePoolStatePending))
 			}, timeout, interval).Should(Succeed())
 		})
 		It("should set state as Pending when Ready condition is outdated", func() {
-			machinePool := &computev1alpha1.MachinePool{
+			storagePool := &storagev1alpha1.StoragePool{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "ready-out-of-date",
 					Namespace: ns.Name,
 				},
 			}
-			Expect(k8sClient.Create(ctx, machinePool)).To(Succeed())
+			Expect(k8sClient.Create(ctx, storagePool)).To(Succeed())
 
-			machinePool.Status.Conditions = []computev1alpha1.MachinePoolCondition{
+			storagePool.Status.Conditions = []storagev1alpha1.StoragePoolCondition{
 				{
-					Type:               computev1alpha1.MachinePoolConditionTypeReady,
-					LastUpdateTime:     metav1.Time{Time: time.Now().Add(time.Duration(-1) * machinePoolReadyDuration)},
+					Type:               storagev1alpha1.StoragePoolConditionTypeReady,
+					LastUpdateTime:     metav1.Time{Time: time.Now().Add(time.Duration(-1) * storagePoolReadyDuration)},
 					LastTransitionTime: metav1.Now(),
 				},
 			}
-			Expect(k8sClient.Status().Update(ctx, machinePool)).To(Succeed())
+			Expect(k8sClient.Status().Update(ctx, storagePool)).To(Succeed())
 
-			By("checking that MachinePool is in pending state")
+			By("checking that StoragePool is in pending state")
 			Eventually(func(g Gomega) {
 				key := types.NamespacedName{
-					Name:      machinePool.Name,
+					Name:      storagePool.Name,
 					Namespace: ns.Name,
 				}
-				obj := &computev1alpha1.MachinePool{}
+				obj := &storagev1alpha1.StoragePool{}
 				err := k8sClient.Get(ctx, key, obj)
 				Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
 				g.Expect(err).NotTo(HaveOccurred())
 
-				g.Expect(obj.Status.State).To(Equal(computev1alpha1.MachinePoolStatePending))
+				g.Expect(obj.Status.State).To(Equal(storagev1alpha1.StoragePoolStatePending))
 			}, timeout, interval).Should(Succeed())
 		})
-		It("should set state to Ready when Ready condition is up-to-date", func() {
-			machinePool := &computev1alpha1.MachinePool{
+		It("should set state to Available when Ready condition is up-to-date", func() {
+			storagePool := &storagev1alpha1.StoragePool{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "ready",
 					Namespace: ns.Name,
 				},
 			}
-			Expect(k8sClient.Create(ctx, machinePool)).To(Succeed())
+			Expect(k8sClient.Create(ctx, storagePool)).To(Succeed())
 
-			machinePool.Status.Conditions = []computev1alpha1.MachinePoolCondition{
+			storagePool.Status.Conditions = []storagev1alpha1.StoragePoolCondition{
 				{
-					Type:               computev1alpha1.MachinePoolConditionTypeReady,
+					Type:               storagev1alpha1.StoragePoolConditionTypeReady,
 					LastUpdateTime:     metav1.Now(),
 					LastTransitionTime: metav1.Now(),
 				},
 			}
-			Expect(k8sClient.Status().Update(ctx, machinePool)).To(Succeed())
+			Expect(k8sClient.Status().Update(ctx, storagePool)).To(Succeed())
 
-			By("checking that MachinePool is in ready state")
+			By("checking that StoragePool is in available state")
 			Eventually(func(g Gomega) {
 				key := types.NamespacedName{
-					Name:      machinePool.Name,
+					Name:      storagePool.Name,
 					Namespace: ns.Name,
 				}
-				obj := &computev1alpha1.MachinePool{}
+				obj := &storagev1alpha1.StoragePool{}
 				err := k8sClient.Get(ctx, key, obj)
 				Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
 				g.Expect(err).NotTo(HaveOccurred())
 
-				g.Expect(obj.Status.State).To(Equal(computev1alpha1.MachinePoolStateReady))
+				g.Expect(obj.Status.State).To(Equal(storagev1alpha1.StoragePoolStateAvailable))
 			}, timeout, interval).Should(Succeed())
 		})
 	})

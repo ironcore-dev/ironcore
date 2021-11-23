@@ -18,19 +18,28 @@ package storage
 
 import (
 	"context"
+	"fmt"
+	"time"
+
+	"github.com/go-logr/logr"
+	"github.com/onmetal/controller-utils/conditionutils"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
+)
+
+const (
+	pendingStateRequeueAfter = 30 * time.Second
 )
 
 // StoragePoolReconciler reconciles a StoragePool object
 type StoragePoolReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	Scheme        *runtime.Scheme
+	ReadyDuration time.Duration
 }
 
 //+kubebuilder:rbac:groups=storage.onmetal.de,resources=storagepools,verbs=get;list;watch;create;update;patch;delete
@@ -39,19 +48,42 @@ type StoragePoolReconciler struct {
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
-// TODO(user): Modify the Reconcile function to compare the state specified by
-// the StoragePool object against the actual cluster state, and then
-// perform operations to make the cluster state reflect the state specified by
-// the user.
-//
-// For more details, check Reconcile and its Result here:
-// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.8.3/pkg/reconcile
 func (r *StoragePoolReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	log := ctrl.LoggerFrom(ctx)
+	pool := &storagev1alpha1.StoragePool{}
+	if err := r.Get(ctx, req.NamespacedName, pool); err != nil {
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
 
-	// your logic here
+	return r.reconcileExists(ctx, log, pool)
+}
 
-	return ctrl.Result{}, nil
+func (r *StoragePoolReconciler) reconcileExists(ctx context.Context, log logr.Logger, pool *storagev1alpha1.StoragePool) (ctrl.Result, error) {
+	cond := &storagev1alpha1.StoragePoolCondition{}
+	ok, err := conditionutils.FindSlice(pool.Status.Conditions, string(storagev1alpha1.StoragePoolConditionTypeReady), cond)
+	if err != nil {
+		return ctrl.Result{}, fmt.Errorf("failed while searching 'Ready' condition: %w", err)
+	}
+
+	outdatedPool := pool.DeepCopy()
+	requeueAfter := r.ReadyDuration
+	if ok {
+		if cond.LastUpdateTime.Add(r.ReadyDuration).After(time.Now()) {
+			pool.Status.State = storagev1alpha1.StoragePoolStateAvailable
+		} else {
+			pool.Status.State = storagev1alpha1.StoragePoolStatePending
+			requeueAfter = pendingStateRequeueAfter
+		}
+	} else {
+		pool.Status.State = storagev1alpha1.StoragePoolStatePending
+		requeueAfter = pendingStateRequeueAfter
+	}
+
+	if err := r.Status().Patch(ctx, pool, client.MergeFrom(outdatedPool)); err != nil {
+		return ctrl.Result{}, fmt.Errorf("could not update status: %w", err)
+	}
+
+	return ctrl.Result{RequeueAfter: requeueAfter}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.

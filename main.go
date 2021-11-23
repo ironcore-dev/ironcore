@@ -83,6 +83,7 @@ func main() {
 	var enableLeaderElection bool
 	var probeAddr string
 	var machinePoolReadyDuration time.Duration
+	var storagePoolReadyDuration time.Duration
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
@@ -90,6 +91,8 @@ func main() {
 			"Enabling this will ensure there is only one active controller manager.")
 	flag.DurationVar(&machinePoolReadyDuration, "machinepool-ready-duration", 300*time.Second,
 		"Duration for which MachinePool ready condition is considered up-to-date")
+	flag.DurationVar(&storagePoolReadyDuration, "storagepool-ready-duration", 300*time.Second,
+		"Duration for which StoragePool ready condition is considered up-to-date")
 
 	controllers := switches.New(
 		machineClassController, machinePoolController, machineSchedulerController, storagePoolController,
@@ -154,8 +157,9 @@ func main() {
 	}
 	if controllers.Enabled(storagePoolController) {
 		if err = (&storagecontrollers.StoragePoolReconciler{
-			Client: mgr.GetClient(),
-			Scheme: mgr.GetScheme(),
+			Client:        mgr.GetClient(),
+			Scheme:        mgr.GetScheme(),
+			ReadyDuration: storagePoolReadyDuration,
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "StoragePool")
 			os.Exit(1)

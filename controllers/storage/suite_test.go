@@ -43,8 +43,9 @@ import (
 // http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
 
 const (
-	interval = 50 * time.Millisecond
-	timeout  = 3 * time.Second
+	interval                 = 50 * time.Millisecond
+	timeout                  = 3 * time.Second
+	storagePoolReadyDuration = 300 * time.Second
 )
 
 var (
@@ -107,7 +108,7 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 		})
 		Expect(err).ToNot(HaveOccurred())
 
-		// register reconciler here
+		// register reconcilers here
 		Expect((&VolumeReconciler{
 			Client: k8sManager.GetClient(),
 			Scheme: k8sManager.GetScheme(),
@@ -121,6 +122,12 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 		Expect((&StorageClassReconciler{
 			Client: k8sManager.GetClient(),
 			Scheme: k8sManager.GetScheme(),
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
+		Expect((&StoragePoolReconciler{
+			Client:        k8sManager.GetClient(),
+			Scheme:        k8sManager.GetScheme(),
+			ReadyDuration: storagePoolReadyDuration,
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		go func() {
