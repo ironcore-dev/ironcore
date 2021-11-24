@@ -17,8 +17,8 @@
 package network
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
-	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
+	"fmt"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
@@ -26,23 +26,23 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 )
 
 var _ = Describe("subnet controller", func() {
-	var (
-		testCIDR commonv1alpha1.CIDR
-	)
 	ns := SetupTest()
-	BeforeEach(func() {
-		testCIDR = commonv1alpha1.MustParseCIDR("192.168.0.0/24")
-	})
+
+	const cidrAddress = "192.168.0.0"
+	testCIDR := commonv1alpha1.MustParseCIDR(fmt.Sprintf("%s/24", cidrAddress))
 
 	It("sets the owner Subnet as a Controller OwnerReference on the controlled IPAMRange", func() {
 		By("creating a subnet")
 		subnet := &networkv1alpha1.Subnet{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
-				GenerateName: "test-ref-",
+				GenerateName: "test-",
 			},
 			Spec: networkv1alpha1.SubnetSpec{
 				Ranges: []networkv1alpha1.RangeType{
@@ -127,6 +127,7 @@ var _ = Describe("subnet controller", func() {
 		Expect(k8sClient.Create(ctx, parentSubnet)).Should(Succeed())
 
 		By("creating a child subnet")
+		rangeSize := 28
 		childSubnet := &networkv1alpha1.Subnet{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
@@ -138,7 +139,7 @@ var _ = Describe("subnet controller", func() {
 				},
 				Ranges: []networkv1alpha1.RangeType{
 					{
-						Size: 28,
+						Size: int32(rangeSize),
 					},
 				},
 			},
@@ -155,16 +156,18 @@ var _ = Describe("subnet controller", func() {
 			g.Expect(err).NotTo(HaveOccurred())
 			return ipamRange.Spec.Requests
 		}, timeout, interval).Should(ContainElement(networkv1alpha1.IPAMRangeRequest{
-			Size: 28,
+			Size: int32(rangeSize),
 		}))
 
 		By("waiting for the status of the Subnet to be be up")
 		childSubnetKey := client.ObjectKeyFromObject(childSubnet)
+		parsedCIDR := commonv1alpha1.MustParseCIDR(fmt.Sprintf("%s/%d", cidrAddress, rangeSize))
 		Eventually(func() networkv1alpha1.SubnetStatus {
 			Expect(k8sClient.Get(ctx, childSubnetKey, childSubnet)).Should(Succeed())
 			return childSubnet.Status
 		}, timeout, interval).Should(MatchFields(IgnoreMissing|IgnoreExtras, Fields{
 			"State": Equal(networkv1alpha1.SubnetStateUp),
+			"CIDRs": ContainElement(parsedCIDR),
 		}))
 	})
 })
