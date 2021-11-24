@@ -187,13 +187,13 @@ var _ = Describe("machine controller", func() {
 		ifaces := []computev1alpha1.Interface{
 			{
 				Name:     "iface-0",
-				IP:       mustParseIP("192.168.0.0"),
+				IP:       commonv1alpha1.PtrToIPAddr(commonv1alpha1.MustParseIPAddr("192.168.0.0")),
 				Priority: 0,
 				Target:   corev1.LocalObjectReference{Name: subnet.Name},
 			},
 			{
 				Name:     "iface-1",
-				IP:       mustParseIP("192.168.0.1"),
+				IP:       commonv1alpha1.PtrToIPAddr(commonv1alpha1.MustParseIPAddr("192.168.0.1")),
 				Priority: 1,
 				Target:   corev1.LocalObjectReference{Name: subnet.Name},
 			},
@@ -249,12 +249,12 @@ var _ = Describe("machine controller", func() {
 		expectedIfaceStatuses := []computev1alpha1.InterfaceStatus{
 			{
 				Name:     "iface-0",
-				IP:       *mustParseIP("192.168.0.0"),
+				IP:       commonv1alpha1.MustParseIPAddr("192.168.0.0"),
 				Priority: 0,
 			},
 			{
 				Name:     "iface-1",
-				IP:       *mustParseIP("192.168.0.1"),
+				IP:       commonv1alpha1.MustParseIPAddr("192.168.0.1"),
 				Priority: 1,
 			},
 		}
@@ -383,9 +383,3 @@ const (
 	// test data
 	machineKind = "Machine"
 )
-
-func mustParseIP(ip string) *commonv1alpha1.IPAddr {
-	parsed, err := netaddr.ParseIP(ip)
-	Expect(err).ToNot(HaveOccurred())
-	return commonv1alpha1.NewIPAddrPtr(parsed)
-}
