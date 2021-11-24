@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"time"
 
+	corev1 "k8s.io/api/core/v1"
+
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/conditionutils"
 
@@ -67,7 +69,7 @@ func (r *StoragePoolReconciler) reconcileExists(ctx context.Context, log logr.Lo
 
 	outdatedPool := pool.DeepCopy()
 	requeueAfter := r.ReadyDuration
-	if ok {
+	if ok && cond != nil && cond.Status == corev1.ConditionTrue {
 		if cond.LastUpdateTime.Add(r.ReadyDuration).After(time.Now()) {
 			pool.Status.State = storagev1alpha1.StoragePoolStateAvailable
 		} else {

@@ -19,6 +19,8 @@ package storage
 import (
 	"time"
 
+	corev1 "k8s.io/api/core/v1"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -67,6 +69,7 @@ var _ = Describe("StoragePoolReconciler", func() {
 			storagePool.Status.Conditions = []storagev1alpha1.StoragePoolCondition{
 				{
 					Type:               storagev1alpha1.StoragePoolConditionTypeReady,
+					Status:             corev1.ConditionTrue,
 					LastUpdateTime:     metav1.Time{Time: time.Now().Add(time.Duration(-1) * storagePoolReadyDuration)},
 					LastTransitionTime: metav1.Now(),
 				},
@@ -99,6 +102,7 @@ var _ = Describe("StoragePoolReconciler", func() {
 			storagePool.Status.Conditions = []storagev1alpha1.StoragePoolCondition{
 				{
 					Type:               storagev1alpha1.StoragePoolConditionTypeReady,
+					Status:             corev1.ConditionTrue,
 					LastUpdateTime:     metav1.Now(),
 					LastTransitionTime: metav1.Now(),
 				},

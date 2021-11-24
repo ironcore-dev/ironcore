@@ -21,6 +21,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -67,6 +68,7 @@ var _ = Describe("MachinePoolReconciler", func() {
 			machinePool.Status.Conditions = []computev1alpha1.MachinePoolCondition{
 				{
 					Type:               computev1alpha1.MachinePoolConditionTypeReady,
+					Status:             corev1.ConditionTrue,
 					LastUpdateTime:     metav1.Time{Time: time.Now().Add(time.Duration(-1) * machinePoolReadyDuration)},
 					LastTransitionTime: metav1.Now(),
 				},
@@ -99,6 +101,7 @@ var _ = Describe("MachinePoolReconciler", func() {
 			machinePool.Status.Conditions = []computev1alpha1.MachinePoolCondition{
 				{
 					Type:               computev1alpha1.MachinePoolConditionTypeReady,
+					Status:             corev1.ConditionTrue,
 					LastUpdateTime:     metav1.Now(),
 					LastTransitionTime: metav1.Now(),
 				},
