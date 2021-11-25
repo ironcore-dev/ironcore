@@ -149,7 +149,7 @@ var _ = Describe("subnet controller", func() {
 		By("waiting for the ipam range to exist and to have an allocated CIDR")
 		ipamRangeKey := client.ObjectKey{Namespace: childSubnet.Namespace, Name: networkv1alpha1.SubnetIPAMName(childSubnet.Name)}
 		ipamRange := &networkv1alpha1.IPAMRange{}
-		By("waiting for the status of the ipam range to have an allocated CIDR")
+		By("waiting for the child ipam range to be created and have the correct requests in spec")
 		Eventually(func(g Gomega) []networkv1alpha1.IPAMRangeRequest {
 			err := k8sClient.Get(ctx, ipamRangeKey, ipamRange)
 			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
