@@ -481,10 +481,14 @@ func (r *IPAMRangeReconciler) computeFreeAllocations(available *netaddr.IPSet, p
 			}
 		case info.cidr != nil:
 			for _, cidr := range intersection.Prefixes() {
-				res = append(res, networkv1alpha1.IPAMRangeAllocationStatus{
+				status := networkv1alpha1.IPAMRangeAllocationStatus{
 					CIDR:  commonv1alpha1.NewCIDRPtr(cidr),
 					State: networkv1alpha1.IPAMRangeAllocationFree,
-				})
+					// Request: &networkv1alpha1.IPAMRangeRequest{
+					// 	Size: int32(25),
+					// },
+				}
+				res = append(res, status)
 			}
 		}
 	}

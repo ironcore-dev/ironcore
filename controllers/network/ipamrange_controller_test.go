@@ -99,11 +99,19 @@ var _ = Describe("IPAMRangeReconciler", func() {
 			expectedChildAllocations := map[string]networkv1alpha1.IPAMRangeAllocationState{
 				"192.168.1.0/25": networkv1alpha1.IPAMRangeAllocationFree,
 			}
+			parsedCIDR := commonv1alpha1.MustParseCIDR("192.168.1.0/25")
 			Eventually(func(g Gomega) {
 				key := types.NamespacedName{Name: child.Name, Namespace: child.Namespace}
 				obj := &networkv1alpha1.IPAMRange{}
 				g.Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
 				g.Expect(getAllocationStates(obj)).To(Equal(expectedChildAllocations))
+				g.Expect(obj.Status.Allocations).To(ContainElement(networkv1alpha1.IPAMRangeAllocationStatus{
+					CIDR:  &parsedCIDR,
+					State: networkv1alpha1.IPAMRangeAllocationFree,
+					Request: &networkv1alpha1.IPAMRangeRequest{
+						Size: int32(25),
+					},
+				}))
 			}, timeout, interval).Should(Succeed())
 		})
 		It("should update parent allocations with ip request", func() {
