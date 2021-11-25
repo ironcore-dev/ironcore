@@ -34,10 +34,6 @@ import (
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 )
 
-const (
-	pendingStateRequeueAfter = 30 * time.Second
-)
-
 // MachinePoolReconciler reconciles a MachinePool object
 type MachinePoolReconciler struct {
 	client.Client
@@ -69,24 +65,21 @@ func (r *MachinePoolReconciler) reconcileExists(ctx context.Context, log logr.Lo
 	}
 
 	outdatedPool := pool.DeepCopy()
-	requeueAfter := r.ReadyDuration
 	if ok && cond != nil && cond.Status == corev1.ConditionTrue {
 		if cond.LastUpdateTime.Add(r.ReadyDuration).After(time.Now()) {
 			pool.Status.State = computev1alpha1.MachinePoolStateReady
 		} else {
 			pool.Status.State = computev1alpha1.MachinePoolStatePending
-			requeueAfter = pendingStateRequeueAfter
 		}
 	} else {
 		pool.Status.State = computev1alpha1.MachinePoolStatePending
-		requeueAfter = pendingStateRequeueAfter
 	}
 
 	if err := r.Status().Patch(ctx, pool, client.MergeFrom(outdatedPool)); err != nil {
 		return ctrl.Result{}, fmt.Errorf("could not update status: %w", err)
 	}
 
-	return ctrl.Result{RequeueAfter: requeueAfter}, nil
+	return ctrl.Result{}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
