@@ -263,7 +263,7 @@ var _ = Describe("IPAMRangeWebhook", func() {
 	Context("Validate IPAMRange at deletion", func() {
 		ns := SetupTest()
 
-		It("shouldn't allow to delete IPAMRange if it has allocations", func() {
+		It("shouldn't allow to delete IPAMRange if it has used allocations", func() {
 			parentPrefix, err := netaddr.ParseIPPrefix("192.168.1.0/24")
 			Expect(err).ToNot(HaveOccurred())
 			cidr := commonv1alpha1.NewCIDR(parentPrefix)
@@ -288,7 +288,7 @@ var _ = Describe("IPAMRangeWebhook", func() {
 			Expect(k8sClient.Delete(ctx, instance)).To(
 				WithTransform(
 					func(err error) string { return err.Error() },
-					ContainSubstring("there's still children that depend on this IPAMRange"),
+					ContainSubstring("there's still IP ranges that are in use by children"),
 				),
 			)
 		})

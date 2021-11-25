@@ -116,21 +116,21 @@ func (r *IPAMRange) ValidateUpdate(oldObj runtime.Object) error {
 func (r *IPAMRange) ValidateDelete() error {
 	ipamrangelog.Info("validate delete", "name", r.Name)
 
-	childrenNames := []string{}
+	ipRanges := []string{}
 	for _, alloc := range r.Status.Allocations {
 		if alloc.State == IPAMRangeAllocationUsed {
-			if alloc.User == nil {
-				return apierrors.NewForbidden(ipamRangeGR, r.Name, fmt.Errorf("found allocation without user"))
-
+			if alloc.CIDR != nil {
+				ipRanges = append(ipRanges, alloc.CIDR.String())
+			} else if alloc.IPs != nil {
+				ipRanges = append(ipRanges, alloc.IPs.Range().String())
 			}
-			childrenNames = append(childrenNames, alloc.User.Name)
 		}
 	}
 
-	if len(childrenNames) > 0 {
+	if len(ipRanges) > 0 {
 		return apierrors.NewForbidden(
 			ipamRangeGR, r.Name,
-			fmt.Errorf("there's still children that depend on this IPAMRange: %v", childrenNames),
+			fmt.Errorf("there's still IP ranges that are in use by children: %v", ipRanges),
 		)
 	}
 
