@@ -159,9 +159,23 @@ var _ = Describe("subnet controller", func() {
 			Size: int32(rangeSize),
 		}))
 
+		parsedCIDR := commonv1alpha1.MustParseCIDR(fmt.Sprintf("%s/%d", cidrAddress, rangeSize))
+		By("waiting for the status of the ipam range to have the correct allocations")
+		Eventually(func(g Gomega) []networkv1alpha1.IPAMRangeAllocationStatus {
+			err := k8sClient.Get(ctx, ipamRangeKey, ipamRange)
+			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
+			g.Expect(err).NotTo(HaveOccurred())
+			return ipamRange.Status.Allocations
+		}, timeout, interval).Should(ContainElement(networkv1alpha1.IPAMRangeAllocationStatus{
+			CIDR:  &parsedCIDR,
+			State: networkv1alpha1.IPAMRangeAllocationFree,
+			Request: &networkv1alpha1.IPAMRangeRequest{
+				Size: int32(rangeSize),
+			},
+		}))
+
 		By("waiting for the status of the Subnet to be be up")
 		childSubnetKey := client.ObjectKeyFromObject(childSubnet)
-		parsedCIDR := commonv1alpha1.MustParseCIDR(fmt.Sprintf("%s/%d", cidrAddress, rangeSize))
 		Eventually(func() networkv1alpha1.SubnetStatus {
 			Expect(k8sClient.Get(ctx, childSubnetKey, childSubnet)).Should(Succeed())
 			return childSubnet.Status
