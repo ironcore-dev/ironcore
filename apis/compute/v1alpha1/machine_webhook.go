@@ -53,10 +53,11 @@ func (r *Machine) ValidateDelete() error {
 func (m *Machine) ValidateUpdate(old runtime.Object) error {
 	machinelog.Info("validate update", "name", m.Name)
 
-	oldM := old.(*Machine)
-	if newName := m.Spec.MachinePool.Name; newName != oldM.Spec.MachineClass.Name {
+	newName := m.Spec.MachinePool.Name
+	oldName := old.(*Machine).Spec.MachineClass.Name
+	if newName != oldName {
 		path := field.NewPath("spec", "machinePool", "name")
-		fieldInvalid := field.Invalid(path, newName, "immutable")
+		fieldInvalid := field.Invalid(path, newName, "machinepool should be immutable")
 		var machineGK = schema.GroupKind{
 			Group: GroupVersion.Group,
 			Kind:  "Machine",
