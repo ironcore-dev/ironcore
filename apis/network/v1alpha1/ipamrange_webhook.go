@@ -85,8 +85,8 @@ func (r *IPAMRange) ValidateUpdate(old runtime.Object) error {
 		allErrs = append(allErrs, field.Invalid(path.Child("parent"), r.Spec.Parent, fieldImmutable))
 	}
 
-	if !reflect.DeepEqual(r.Spec.Elements, oldRange.Spec.Elements) {
-		allErrs = append(allErrs, field.Invalid(path.Child("elements"), r.Spec.Elements, fieldImmutable))
+	if !reflect.DeepEqual(r.Spec.Items, oldRange.Spec.Items) {
+		allErrs = append(allErrs, field.Invalid(path.Child("elements"), r.Spec.Items, fieldImmutable))
 	}
 
 	if len(allErrs) == 0 {

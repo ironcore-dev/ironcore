@@ -99,7 +99,7 @@ var _ = Describe("subnet controller", func() {
 			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
 			g.Expect(err).NotTo(HaveOccurred())
 			cirds := []commonv1alpha1.CIDR{}
-			for _, ele := range ipamRange.Spec.Elements {
+			for _, ele := range ipamRange.Spec.Items {
 				cirds = append(cirds, *ele.CIDR)
 			}
 			return cirds
@@ -153,12 +153,12 @@ var _ = Describe("subnet controller", func() {
 		ipamRangeKey := client.ObjectKey{Namespace: childSubnet.Namespace, Name: networkv1alpha1.SubnetIPAMName(childSubnet.Name)}
 		ipamRange := &networkv1alpha1.IPAMRange{}
 		By("waiting for the status of the ipam range to have an allocated CIDR")
-		Eventually(func(g Gomega) []networkv1alpha1.IPAMRangeElement {
+		Eventually(func(g Gomega) []networkv1alpha1.IPAMRangeItem {
 			err := k8sClient.Get(ctx, ipamRangeKey, ipamRange)
 			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
 			g.Expect(err).NotTo(HaveOccurred())
-			return ipamRange.Spec.Elements
-		}, timeout, interval).Should(ContainElement(networkv1alpha1.IPAMRangeElement{
+			return ipamRange.Spec.Items
+		}, timeout, interval).Should(ContainElement(networkv1alpha1.IPAMRangeItem{
 			Size: 28,
 		}))
 

@@ -66,7 +66,7 @@ func (r *ReservedIPReconciler) reconcileExists(ctx context.Context, log logr.Log
 }
 
 func (r *ReservedIPReconciler) reconcile(ctx context.Context, log logr.Logger, reservedIP *networkv1alpha1.ReservedIP) (ctrl.Result, error) {
-	var request networkv1alpha1.IPAMRangeElement
+	var request networkv1alpha1.IPAMRangeItem
 	if ip := reservedIP.Spec.IP; ip != nil {
 		request.IPs = commonv1alpha1.PtrToIPRange(commonv1alpha1.IPRangeFrom(*ip, *ip))
 	} else {
@@ -86,7 +86,7 @@ func (r *ReservedIPReconciler) reconcile(ctx context.Context, log logr.Logger, r
 			Parent: &corev1.LocalObjectReference{
 				Name: networkv1alpha1.SubnetIPAMName(reservedIP.Spec.Subnet.Name),
 			},
-			Elements: []networkv1alpha1.IPAMRangeElement{request},
+			Items: []networkv1alpha1.IPAMRangeItem{request},
 		},
 	}
 	if err := ctrl.SetControllerReference(reservedIP, ipamRange, r.Scheme); err != nil {

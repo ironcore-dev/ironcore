@@ -38,10 +38,10 @@ type IPAMRangeSpec struct {
 	// Parent is the reference of the Parent IPAMRange from which the CIDR or size should be derived
 	Parent *corev1.LocalObjectReference `json:"parent,omitempty"`
 	// Elements is a list of CIDR specs which are defined for this IPAMRange
-	Elements []IPAMRangeElement `json:"elements,omitempty"`
+	Items []IPAMRangeItem `json:"itmes,omitempty"`
 }
 
-type IPAMRangeElement struct {
+type IPAMRangeItem struct {
 	// Size requests a CIDR of the given size.
 	Size int32                   `json:"size,omitempty"`
 	CIDR *commonv1alpha1.CIDR    `json:"cidr,omitempty"`
@@ -59,11 +59,11 @@ type IPAMRangeStatus struct {
 // IPAMRangeAllocationStatus is the status of an IPAMRange allocation.
 type IPAMRangeAllocationStatus struct {
 	// CIDR defines the cidr
-	CIDR    *commonv1alpha1.CIDR         `json:"cidr,omitempty"`
-	IPs     *commonv1alpha1.IPRange      `json:"ips,omitempty"`
-	State   IPAMRangeAllocationState     `json:"state"`
-	Request *IPAMRangeElement            `json:"request,omitempty"`
-	User    *corev1.LocalObjectReference `json:"user,omitempty"`
+	CIDR  *commonv1alpha1.CIDR         `json:"cidr,omitempty"`
+	IPs   *commonv1alpha1.IPRange      `json:"ips,omitempty"`
+	State IPAMRangeAllocationState     `json:"state"`
+	Itme  *IPAMRangeItem               `json:"itme,omitempty"`
+	User  *corev1.LocalObjectReference `json:"user,omitempty"`
 }
 
 // IPAMRangeAllocationState is a state an IPAMRangeAllocationStatus can have.

@@ -50,7 +50,7 @@ spec:
               parent range and unused. It will be allocated if possible. Otherwise,
               the status of the object will be set to "Invalid".
             properties:
-              elements:
+              itmes:
                 description: Elements is a list of CIDR specs which are defined for
                   this IPAMRange
                 items:
@@ -116,7 +116,7 @@ spec:
                       - from
                       - to
                       type: object
-                    request:
+                    itmes:
                       properties:
                         cidr:
                           description: CIDR represents a network CIDR.

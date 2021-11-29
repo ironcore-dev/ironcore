@@ -69,13 +69,13 @@ func (r *SubnetReconciler) reconcileExists(ctx context.Context, log logr.Logger,
 func (r *SubnetReconciler) reconcile(ctx context.Context, log logr.Logger, subnet *networkv1alpha1.Subnet) (ctrl.Result, error) {
 	var (
 		ipamRangeParent *corev1.LocalObjectReference
-		elements        []networkv1alpha1.IPAMRangeElement
+		items           []networkv1alpha1.IPAMRangeItem
 	)
 	if parent := subnet.Spec.Parent; parent != nil {
 		ipamRangeParent = &corev1.LocalObjectReference{Name: networkv1alpha1.SubnetIPAMName(parent.Name)}
 		for _, rng := range subnet.Spec.Ranges {
 			cidr := rng.CIDR
-			elements = append(elements, networkv1alpha1.IPAMRangeElement{
+			items = append(items, networkv1alpha1.IPAMRangeItem{
 				Size: rng.Size,
 				CIDR: cidr,
 			})
@@ -83,10 +83,10 @@ func (r *SubnetReconciler) reconcile(ctx context.Context, log logr.Logger, subne
 	} else {
 		for _, rng := range subnet.Spec.Ranges {
 			if rng.CIDR != nil {
-				ele := networkv1alpha1.IPAMRangeElement{
+				ele := networkv1alpha1.IPAMRangeItem{
 					CIDR: rng.CIDR,
 				}
-				elements = append(elements, ele)
+				items = append(items, ele)
 			}
 		}
 	}
@@ -101,8 +101,8 @@ func (r *SubnetReconciler) reconcile(ctx context.Context, log logr.Logger, subne
 			Name:      networkv1alpha1.SubnetIPAMName(subnet.Name),
 		},
 		Spec: networkv1alpha1.IPAMRangeSpec{
-			Parent:   ipamRangeParent,
-			Elements: elements,
+			Parent: ipamRangeParent,
+			Items:  items,
 		},
 	}
 	if err := ctrl.SetControllerReference(subnet, ipamRange, r.Scheme); err != nil {
@@ -119,8 +119,8 @@ func (r *SubnetReconciler) reconcile(ctx context.Context, log logr.Logger, subne
 			continue
 		}
 
-		for _, request := range elements {
-			if equality.Semantic.DeepEqual(allocation.Request, request) {
+		for _, request := range items {
+			if equality.Semantic.DeepEqual(allocation.Itme, request) {
 				cidrs = append(cidrs, *request.CIDR)
 			}
 		}

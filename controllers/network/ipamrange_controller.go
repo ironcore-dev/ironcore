@@ -19,7 +19,10 @@ package network
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"sort"
+	"strconv"
+	"time"
 
 	"github.com/adracus/reflcompare"
 	"github.com/go-logr/logr"
@@ -200,14 +203,14 @@ func (r *IPAMRangeReconciler) mapChildNameToChild(items []networkv1alpha1.IPAMRa
 	return nameToChild
 }
 
-func (r *IPAMRangeReconciler) fulfilledRequests(nameToChild map[string]networkv1alpha1.IPAMRange, ipamRange *networkv1alpha1.IPAMRange) map[string]map[networkv1alpha1.IPAMRangeElement]allocation {
-	res := make(map[string]map[networkv1alpha1.IPAMRangeElement]allocation)
+func (r *IPAMRangeReconciler) fulfilledRequests(nameToChild map[string]networkv1alpha1.IPAMRange, ipamRange *networkv1alpha1.IPAMRange) map[string]map[networkv1alpha1.IPAMRangeItem]allocation {
+	res := make(map[string]map[networkv1alpha1.IPAMRangeItem]allocation)
 	for _, allocStatus := range ipamRange.Status.Allocations {
 		if allocStatus.State != networkv1alpha1.IPAMRangeAllocationUsed {
 			continue
 		}
 
-		user, request := allocStatus.User, allocStatus.Request
+		user, request := allocStatus.User, allocStatus.Itme
 		if user == nil || request == nil {
 			continue
 		}
@@ -217,11 +220,11 @@ func (r *IPAMRangeReconciler) fulfilledRequests(nameToChild map[string]networkv1
 			continue
 		}
 
-		for _, childRequest := range child.Spec.Elements {
+		for _, childRequest := range child.Spec.Items {
 			if equality.Semantic.DeepEqual(childRequest, *request) {
 				requests := res[child.Name]
 				if requests == nil {
-					requests = make(map[networkv1alpha1.IPAMRangeElement]allocation)
+					requests = make(map[networkv1alpha1.IPAMRangeItem]allocation)
 				}
 
 				requests[*request] = allocation{
@@ -239,13 +242,13 @@ func (r *IPAMRangeReconciler) fulfilledRequests(nameToChild map[string]networkv1
 
 type childNameAndRequest struct {
 	childName string
-	request   networkv1alpha1.IPAMRangeElement
+	request   networkv1alpha1.IPAMRangeItem
 }
 
-func (r *IPAMRangeReconciler) sortedRequests(items []networkv1alpha1.IPAMRange, fulfilledRequests map[string]map[networkv1alpha1.IPAMRangeElement]allocation) []childNameAndRequest {
+func (r *IPAMRangeReconciler) sortedRequests(items []networkv1alpha1.IPAMRange, fulfilledRequests map[string]map[networkv1alpha1.IPAMRangeItem]allocation) []childNameAndRequest {
 	var requests []childNameAndRequest
 	for _, item := range items {
-		for _, request := range item.Spec.Elements {
+		for _, request := range item.Spec.Items {
 			requests = append(requests, childNameAndRequest{
 				childName: item.Name,
 				request:   request,
@@ -270,17 +273,92 @@ type allocation struct {
 }
 
 func (r *IPAMRangeReconciler) gatherAvailable(ctx context.Context, ipamRange *networkv1alpha1.IPAMRange) (available *netaddr.IPSet, parentAllocations []allocation, failed []networkv1alpha1.IPAMRangeAllocationStatus, err error) {
-	if ipamRange.Spec.Parent == nil {
-		cidrs := []commonv1alpha1.CIDR{}
-		for _, ele := range ipamRange.Spec.Elements {
-			cidrs = append(cidrs, *ele.CIDR)
-		}
-		available, err := ipSetFromCIDRs(cidrs)
-		if err != nil {
-			return nil, nil, nil, err
-		}
 
-		return available, nil, nil, nil
+	if ipamRange.Spec.Parent == nil {
+		var bldr netaddr.IPSetBuilder
+		for _, ele := range ipamRange.Spec.Items {
+			if ele.CIDR != nil {
+				bldr.AddPrefix(ele.CIDR.IPPrefix)
+			}
+			if ele.IPs != nil {
+				ipRange := ele.IPs.Range()
+				bldr.AddRange(ipRange)
+			}
+			if ele.Size > 0 {
+				s, _ := bldr.IPSet()
+				ipPrefixes := s.Prefixes()
+				if len(ipPrefixes) > 0 {
+					lastIP := netaddr.IP{}
+					prefix := ipPrefixes[len(ipPrefixes)-1]
+					ip := prefix.IP().IPAddr().IP.To4()
+					if ip == nil {
+						return
+					}
+					for i := 0; i < int(ele.Size)-1; i++ {
+						ip[3]++
+						newip, _ := netaddr.FromStdIP(ip)
+						lastIP = newip
+					}
+					iprange := netaddr.IPRangeFrom(prefix.IP(), lastIP)
+					bldr.AddRange(iprange)
+				} else {
+					rand.Seed(time.Now().UnixNano())
+					ipStr := strconv.Itoa(randInt(1, 256)) + "." + strconv.Itoa(randInt(1, 256)) + "." + strconv.Itoa(randInt(1, 256)) + "." + strconv.Itoa(randInt(1, 256))
+					netaddrIP, _ := netaddr.ParseIP(ipStr)
+					ip := netaddrIP.IPAddr().IP.To4()
+					lastIP := netaddr.IP{}
+					fromIP, _ := netaddr.FromStdIP(ip)
+					for i := 0; i < int(ele.Size)-1; i++ {
+						ip[3]++
+						newip, _ := netaddr.FromStdIP(ip)
+						lastIP = newip
+
+					}
+					iprange := netaddr.IPRangeFrom(fromIP, lastIP)
+					bldr.AddRange(iprange)
+				}
+			}
+			if ele.IPCount != 0 {
+				set, _ := bldr.IPSet()
+				ranges := set.Ranges()
+				if len(ranges) > 0 {
+					for _, rng := range ranges {
+						fromIP := rng.From()
+						if isNetIP(fromIP) {
+							fromIP = fromIP.Next()
+						}
+						if fromIP.IsZero() || !rng.Contains(fromIP) {
+							continue
+						}
+						ip := rng.To().IPAddr().IP.To4()
+						lastIP := netaddr.IP{}
+						for i := 1; i <= int(ele.IPCount); i++ {
+							ip[3]++
+							newip, _ := netaddr.FromStdIP(ip)
+							lastIP = newip
+						}
+						iprange := netaddr.IPRangeFrom(fromIP, lastIP)
+						bldr.AddRange(iprange)
+					}
+				} else {
+					rand.Seed(time.Now().UnixNano())
+					ipStr := strconv.Itoa(randInt(1, 256)) + "." + strconv.Itoa(randInt(1, 256)) + "." + strconv.Itoa(randInt(1, 256)) + "." + strconv.Itoa(randInt(1, 256))
+					netaddrIP, _ := netaddr.ParseIP(ipStr)
+					ip := netaddrIP.IPAddr().IP.To4()
+					lastIP := netaddr.IP{}
+					fromIP, _ := netaddr.FromStdIP(ip)
+					for i := 1; i <= int(ele.IPCount); i++ {
+						ip[3]++
+						newip, _ := netaddr.FromStdIP(ip)
+						lastIP = newip
+					}
+					iprange := netaddr.IPRangeFrom(fromIP, lastIP)
+					bldr.AddRange(iprange)
+				}
+			}
+		}
+		available, err := bldr.IPSet()
+		return available, nil, nil, err
 	}
 
 	parent := &networkv1alpha1.IPAMRange{}
@@ -294,8 +372,8 @@ func (r *IPAMRangeReconciler) gatherAvailable(ctx context.Context, ipamRange *ne
 	)
 	for _, allocStatus := range parent.Status.Allocations {
 		allocStatus := allocStatus
-		if activeRequest, user := allocStatus.Request, allocStatus.User; allocStatus.Request != nil && user != nil && user.Name == ipamRange.Name {
-			for _, request := range ipamRange.Spec.Elements {
+		if activeRequest, user := allocStatus.Itme, allocStatus.User; allocStatus.Itme != nil && user != nil && user.Name == ipamRange.Name {
+			for _, request := range ipamRange.Spec.Items {
 				if equality.Semantic.DeepEqual(*activeRequest, request) {
 					if allocStatus.State == networkv1alpha1.IPAMRangeAllocationUsed {
 						switch {
@@ -307,10 +385,10 @@ func (r *IPAMRangeReconciler) gatherAvailable(ctx context.Context, ipamRange *ne
 						parentAllocations = append(parentAllocations, allocation{allocStatus.IPs, allocStatus.CIDR})
 					} else {
 						other = append(other, networkv1alpha1.IPAMRangeAllocationStatus{
-							CIDR:    allocStatus.CIDR,
-							IPs:     allocStatus.IPs,
-							State:   allocStatus.State,
-							Request: allocStatus.Request,
+							CIDR:  allocStatus.CIDR,
+							IPs:   allocStatus.IPs,
+							State: allocStatus.State,
+							Itme:  allocStatus.Itme,
 						})
 					}
 				}
@@ -335,8 +413,11 @@ func isNetIP(ip netaddr.IP) bool {
 		return false
 	}
 }
+func randInt(min int, max int) int {
+	return min + rand.Intn(max-min)
+}
 
-func (r *IPAMRangeReconciler) acquireRequest(set *netaddr.IPSet, request networkv1alpha1.IPAMRangeElement) (prefix *netaddr.IPPrefix, ipRange *netaddr.IPRange, newSet *netaddr.IPSet, ok bool) {
+func (r *IPAMRangeReconciler) acquireRequest(set *netaddr.IPSet, request networkv1alpha1.IPAMRangeItem) (prefix *netaddr.IPPrefix, ipRange *netaddr.IPRange, newSet *netaddr.IPSet, ok bool) {
 	switch {
 	case request.CIDR != nil:
 		if !set.ContainsPrefix(request.CIDR.IPPrefix) {
@@ -402,7 +483,7 @@ func (r *IPAMRangeReconciler) acquireRequest(set *netaddr.IPSet, request network
 
 func (r *IPAMRangeReconciler) computeChildAllocations(
 	available *netaddr.IPSet,
-	fulfilledRequests map[string]map[networkv1alpha1.IPAMRangeElement]allocation,
+	fulfilledRequests map[string]map[networkv1alpha1.IPAMRangeItem]allocation,
 	requests []childNameAndRequest,
 ) (newAvailable *netaddr.IPSet, childAllocations []networkv1alpha1.IPAMRangeAllocationStatus) {
 	for _, requestAndName := range requests {
@@ -421,9 +502,9 @@ func (r *IPAMRangeReconciler) computeChildAllocations(
 		prefix, ipRange, newSet, ok := r.acquireRequest(available, request)
 		if !ok {
 			childAllocations = append(childAllocations, networkv1alpha1.IPAMRangeAllocationStatus{
-				State:   networkv1alpha1.IPAMRangeAllocationFailed,
-				Request: &originalRequest,
-				User:    &corev1.LocalObjectReference{Name: name},
+				State: networkv1alpha1.IPAMRangeAllocationFailed,
+				Itme:  &originalRequest,
+				User:  &corev1.LocalObjectReference{Name: name},
 			})
 		} else {
 			available = newSet
@@ -437,11 +518,11 @@ func (r *IPAMRangeReconciler) computeChildAllocations(
 			}
 
 			childAllocations = append(childAllocations, networkv1alpha1.IPAMRangeAllocationStatus{
-				State:   networkv1alpha1.IPAMRangeAllocationUsed,
-				CIDR:    cidr,
-				IPs:     ips,
-				Request: &originalRequest,
-				User:    &corev1.LocalObjectReference{Name: name},
+				State: networkv1alpha1.IPAMRangeAllocationUsed,
+				CIDR:  cidr,
+				IPs:   ips,
+				Itme:  &originalRequest,
+				User:  &corev1.LocalObjectReference{Name: name},
 			})
 		}
 	}
