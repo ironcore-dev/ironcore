@@ -116,7 +116,7 @@ spec:
                       - from
                       - to
                       type: object
-                    itmes:
+                    item:
                       properties:
                         cidr:
                           description: CIDR represents a network CIDR.

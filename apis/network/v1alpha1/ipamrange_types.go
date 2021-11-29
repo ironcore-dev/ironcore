@@ -62,7 +62,7 @@ type IPAMRangeAllocationStatus struct {
 	CIDR  *commonv1alpha1.CIDR         `json:"cidr,omitempty"`
 	IPs   *commonv1alpha1.IPRange      `json:"ips,omitempty"`
 	State IPAMRangeAllocationState     `json:"state"`
-	Itme  *IPAMRangeItem               `json:"itme,omitempty"`
+	Item  *IPAMRangeItem               `json:"item,omitempty"`
 	User  *corev1.LocalObjectReference `json:"user,omitempty"`
 }
 

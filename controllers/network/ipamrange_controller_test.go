@@ -404,7 +404,7 @@ func getIPRanges(obj *networkv1alpha1.IPAMRange) (result []*commonv1alpha1.IPRan
 func getFailedRequests(obj *networkv1alpha1.IPAMRange) (result []string) {
 	for _, alloc := range obj.Status.Allocations {
 		if alloc.State == networkv1alpha1.IPAMRangeAllocationFailed {
-			result = append(result, getRequestKey(*alloc.Itme))
+			result = append(result, getRequestKey(*alloc.Item))
 		}
 	}
 
