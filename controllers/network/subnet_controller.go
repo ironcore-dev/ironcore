@@ -120,7 +120,7 @@ func (r *SubnetReconciler) reconcile(ctx context.Context, log logr.Logger, subne
 		}
 
 		for _, request := range items {
-			if equality.Semantic.DeepEqual(allocation.Item, request) {
+			if equality.Semantic.DeepEqual(allocation.Request, request) {
 				cidrs = append(cidrs, *request.CIDR)
 			}
 		}

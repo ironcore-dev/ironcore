@@ -37,7 +37,7 @@ var IPAMRangeGK = schema.GroupKind{
 type IPAMRangeSpec struct {
 	// Parent is the reference of the Parent IPAMRange from which the CIDR or size should be derived
 	Parent *corev1.LocalObjectReference `json:"parent,omitempty"`
-	// Elements is a list of CIDR specs which are defined for this IPAMRange
+	// Items is a list of CIDR specs which are defined for this IPAMRange
 	Items []IPAMRangeItem `json:"itmes,omitempty"`
 }
 
@@ -59,11 +59,11 @@ type IPAMRangeStatus struct {
 // IPAMRangeAllocationStatus is the status of an IPAMRange allocation.
 type IPAMRangeAllocationStatus struct {
 	// CIDR defines the cidr
-	CIDR  *commonv1alpha1.CIDR         `json:"cidr,omitempty"`
-	IPs   *commonv1alpha1.IPRange      `json:"ips,omitempty"`
-	State IPAMRangeAllocationState     `json:"state"`
-	Item  *IPAMRangeItem               `json:"item,omitempty"`
-	User  *corev1.LocalObjectReference `json:"user,omitempty"`
+	CIDR    *commonv1alpha1.CIDR         `json:"cidr,omitempty"`
+	IPs     *commonv1alpha1.IPRange      `json:"ips,omitempty"`
+	State   IPAMRangeAllocationState     `json:"state"`
+	Request *IPAMRangeItem               `json:"request,omitempty"`
+	User    *corev1.LocalObjectReference `json:"user,omitempty"`
 }
 
 // IPAMRangeAllocationState is a state an IPAMRangeAllocationStatus can have.

@@ -19,10 +19,7 @@ package network
 import (
 	"context"
 	"fmt"
-	"math/rand"
 	"sort"
-	"strconv"
-	"time"
 
 	"github.com/adracus/reflcompare"
 	"github.com/go-logr/logr"
@@ -58,7 +55,8 @@ var (
 // IPAMRangeReconciler reconciles a IPAMRange object
 type IPAMRangeReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	Scheme      *runtime.Scheme
+	DefaultAddr string
 }
 
 //+kubebuilder:rbac:groups=network.onmetal.de,resources=ipamranges,verbs=get;list;watch;create;update;patch;delete
@@ -186,14 +184,6 @@ func (r *IPAMRangeReconciler) delete(ctx context.Context, log logr.Logger, ipamR
 	return ctrl.Result{}, nil
 }
 
-func ipSetFromCIDRs(cidrs []commonv1alpha1.CIDR) (*netaddr.IPSet, error) {
-	var bldr netaddr.IPSetBuilder
-	for _, cidr := range cidrs {
-		bldr.AddPrefix(cidr.IPPrefix)
-	}
-	return bldr.IPSet()
-}
-
 func (r *IPAMRangeReconciler) mapChildNameToChild(items []networkv1alpha1.IPAMRange) map[string]networkv1alpha1.IPAMRange {
 	nameToChild := make(map[string]networkv1alpha1.IPAMRange)
 	for _, child := range items {
@@ -210,7 +200,7 @@ func (r *IPAMRangeReconciler) fulfilledRequests(nameToChild map[string]networkv1
 			continue
 		}
 
-		user, request := allocStatus.User, allocStatus.Item
+		user, request := allocStatus.User, allocStatus.Request
 		if user == nil || request == nil {
 			continue
 		}
@@ -230,8 +220,8 @@ func (r *IPAMRangeReconciler) fulfilledRequests(nameToChild map[string]networkv1
 				requests[*request] = allocation{
 					cidr:    allocStatus.CIDR,
 					ips:     allocStatus.IPs,
-					size:    allocStatus.Item.Size,
-					ipCount: allocStatus.Item.IPCount,
+					size:    allocStatus.Request.Size,
+					ipCount: allocStatus.Request.IPCount,
 				}
 
 				res[child.Name] = requests
@@ -277,7 +267,6 @@ type allocation struct {
 }
 
 func (r *IPAMRangeReconciler) gatherAvailable(ctx context.Context, ipamRange *networkv1alpha1.IPAMRange) (available *netaddr.IPSet, parentAllocations []allocation, failed []networkv1alpha1.IPAMRangeAllocationStatus, err error) {
-
 	if ipamRange.Spec.Parent == nil {
 		var bldr netaddr.IPSetBuilder
 		for _, ele := range ipamRange.Spec.Items {
@@ -306,8 +295,7 @@ func (r *IPAMRangeReconciler) gatherAvailable(ctx context.Context, ipamRange *ne
 					iprange := netaddr.IPRangeFrom(prefix.IP(), lastIP)
 					bldr.AddRange(iprange)
 				} else {
-					rand.Seed(time.Now().UnixNano())
-					ipStr := strconv.Itoa(randInt(1, 256)) + "." + strconv.Itoa(randInt(1, 256)) + "." + strconv.Itoa(randInt(1, 256)) + "." + strconv.Itoa(randInt(1, 256))
+					ipStr := r.DefaultAddr
 					netaddrIP, _ := netaddr.ParseIP(ipStr)
 					ip := netaddrIP.IPAddr().IP.To4()
 					lastIP := netaddr.IP{}
@@ -345,8 +333,7 @@ func (r *IPAMRangeReconciler) gatherAvailable(ctx context.Context, ipamRange *ne
 						bldr.AddRange(iprange)
 					}
 				} else {
-					rand.Seed(time.Now().UnixNano())
-					ipStr := strconv.Itoa(randInt(1, 256)) + "." + strconv.Itoa(randInt(1, 256)) + "." + strconv.Itoa(randInt(1, 256)) + "." + strconv.Itoa(randInt(1, 256))
+					ipStr := r.DefaultAddr
 					netaddrIP, _ := netaddr.ParseIP(ipStr)
 					ip := netaddrIP.IPAddr().IP.To4()
 					lastIP := netaddr.IP{}
@@ -376,9 +363,9 @@ func (r *IPAMRangeReconciler) gatherAvailable(ctx context.Context, ipamRange *ne
 	)
 	for _, allocStatus := range parent.Status.Allocations {
 		allocStatus := allocStatus
-		activeRequest, user := allocStatus.Item, allocStatus.User
+		activeRequest, user := allocStatus.Request, allocStatus.User
 
-		if allocStatus.Item != nil && user != nil && user.Name == ipamRange.Name {
+		if allocStatus.Request != nil && user != nil && user.Name == ipamRange.Name {
 			for _, request := range ipamRange.Spec.Items {
 				if equality.Semantic.DeepEqual(*activeRequest, request) {
 					if allocStatus.State == networkv1alpha1.IPAMRangeAllocationUsed {
@@ -388,13 +375,13 @@ func (r *IPAMRangeReconciler) gatherAvailable(ctx context.Context, ipamRange *ne
 						case allocStatus.IPs != nil:
 							availableBldr.AddRange(allocStatus.IPs.Range())
 						}
-						parentAllocations = append(parentAllocations, allocation{allocStatus.IPs, allocStatus.CIDR, allocStatus.Item.Size, allocStatus.Item.IPCount})
+						parentAllocations = append(parentAllocations, allocation{allocStatus.IPs, allocStatus.CIDR, allocStatus.Request.Size, allocStatus.Request.IPCount})
 					} else {
 						other = append(other, networkv1alpha1.IPAMRangeAllocationStatus{
-							CIDR:  allocStatus.CIDR,
-							IPs:   allocStatus.IPs,
-							State: allocStatus.State,
-							Item:  allocStatus.Item,
+							CIDR:    allocStatus.CIDR,
+							IPs:     allocStatus.IPs,
+							State:   allocStatus.State,
+							Request: allocStatus.Request,
 						})
 					}
 				}
@@ -417,9 +404,6 @@ func isNetIP(ip netaddr.IP) bool {
 	default:
 		return false
 	}
-}
-func randInt(min int, max int) int {
-	return min + rand.Intn(max-min)
 }
 
 func (r *IPAMRangeReconciler) acquireRequest(set *netaddr.IPSet, request networkv1alpha1.IPAMRangeItem) (prefix *netaddr.IPPrefix, ipRange *netaddr.IPRange, newSet *netaddr.IPSet, ok bool) {
@@ -509,9 +493,9 @@ func (r *IPAMRangeReconciler) computeChildAllocations(
 		prefix, ipRange, newSet, ok := r.acquireRequest(available, request)
 		if !ok {
 			childAllocations = append(childAllocations, networkv1alpha1.IPAMRangeAllocationStatus{
-				State: networkv1alpha1.IPAMRangeAllocationFailed,
-				Item:  &originalRequest,
-				User:  &corev1.LocalObjectReference{Name: name},
+				State:   networkv1alpha1.IPAMRangeAllocationFailed,
+				Request: &originalRequest,
+				User:    &corev1.LocalObjectReference{Name: name},
 			})
 		} else {
 			available = newSet
@@ -525,11 +509,11 @@ func (r *IPAMRangeReconciler) computeChildAllocations(
 			}
 
 			childAllocations = append(childAllocations, networkv1alpha1.IPAMRangeAllocationStatus{
-				State: networkv1alpha1.IPAMRangeAllocationUsed,
-				CIDR:  cidr,
-				IPs:   ips,
-				Item:  &originalRequest,
-				User:  &corev1.LocalObjectReference{Name: name},
+				State:   networkv1alpha1.IPAMRangeAllocationUsed,
+				CIDR:    cidr,
+				IPs:     ips,
+				Request: &originalRequest,
+				User:    &corev1.LocalObjectReference{Name: name},
 			})
 		}
 	}
