@@ -57,7 +57,7 @@ func (m *Machine) ValidateUpdate(old runtime.Object) error {
 	oldName := old.(*Machine).Spec.MachineClass.Name
 	if newName != oldName {
 		path := field.NewPath("spec", "machinePool", "name")
-		fieldInvalid := field.Invalid(path, newName, "machinepool should be immutable")
+		fieldInvalid := field.Invalid(path, newName, "immutable")
 		var machineGK = schema.GroupKind{
 			Group: GroupVersion.Group,
 			Kind:  "Machine",

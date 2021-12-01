@@ -42,7 +42,7 @@ var _ = Describe("machine validation webhook", func() {
 			Expect(err).To(HaveOccurred())
 
 			path := field.NewPath("spec", "machinePool", "name")
-			fieldErr := field.Invalid(path, newMachinePoolName, "machinepool should be immutable")
+			fieldErr := field.Invalid(path, newMachinePoolName, "immutable")
 			fieldErrList := field.ErrorList{fieldErr}
 			Expect(err.Error()).To(ContainSubstring(fieldErrList.ToAggregate().Error()))
 		})
