@@ -20,13 +20,12 @@ import (
 	"context"
 	"fmt"
 
-	"k8s.io/apimachinery/pkg/util/sets"
-
 	"github.com/go-logr/logr"
 	"inet.af/netaddr"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/sets"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -131,18 +130,7 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 			return ctrl.Result{}, fmt.Errorf("could not create iface %s ipam range: %w", iface.Name, err)
 		}
 
-		for _, allocation := range ifaceIPAMRange.Status.Allocations {
-			if allocation.State != networkv1alpha1.IPAMRangeAllocationFree || allocation.IPs == nil {
-				continue
-			}
-
-			ip := allocation.IPs.From
-			interfaceStatuses = append(interfaceStatuses, computev1alpha1.InterfaceStatus{
-				Name:     iface.Name,
-				IP:       ip,
-				Priority: iface.Priority,
-			})
-		}
+		interfaceStatuses = appendInterfaceStatuses(interfaceStatuses, &iface, ifaceIPAMRange)
 	}
 
 	// Delete IPAMRanges associated with interfaces deleted from machine
@@ -171,4 +159,20 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 		return ctrl.Result{}, fmt.Errorf("could not update status: %w", err)
 	}
 	return ctrl.Result{}, nil
+}
+
+func appendInterfaceStatuses(statuses []computev1alpha1.InterfaceStatus, iface *computev1alpha1.Interface, rng *networkv1alpha1.IPAMRange) []computev1alpha1.InterfaceStatus {
+	for _, allocation := range rng.Status.Allocations {
+		if allocation.State != networkv1alpha1.IPAMRangeAllocationFree || allocation.IPs == nil {
+			continue
+		}
+
+		ip := allocation.IPs.From
+		statuses = append(statuses, computev1alpha1.InterfaceStatus{
+			Name:     iface.Name,
+			IP:       ip,
+			Priority: iface.Priority,
+		})
+	}
+	return statuses
 }
