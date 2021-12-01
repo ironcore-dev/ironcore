@@ -31,6 +31,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
@@ -39,16 +40,15 @@ import (
 )
 
 var (
-	cancel    context.CancelFunc
-	ctx       context.Context
-	k8sClient client.Client
-	testEnv   *envtest.Environment
+	cfg           *rest.Config
+	ctx           = ctrl.SetupSignalHandler()
+	k8sClient     client.Client
+	webhookScheme *runtime.Scheme
+	testEnv       *envtest.Environment
 )
 
 var _ = BeforeSuite(func() {
 	logf.SetLogger(zap.New(zap.WriteTo(GinkgoWriter), zap.UseDevMode(true)))
-
-	ctx, cancel = context.WithCancel(context.TODO())
 
 	By("bootstrapping test environment")
 	testEnv = &envtest.Environment{
@@ -59,85 +59,93 @@ var _ = BeforeSuite(func() {
 		},
 	}
 
-	cfg, err := testEnv.Start()
+	var err error
+	cfg, err = testEnv.Start()
 	Expect(err).NotTo(HaveOccurred())
 	Expect(cfg).NotTo(BeNil())
 
-	scheme := runtime.NewScheme()
-	err = AddToScheme(scheme)
+	webhookScheme = runtime.NewScheme()
+	err = AddToScheme(webhookScheme)
 	Expect(err).NotTo(HaveOccurred())
 
-	err = admissionv1beta1.AddToScheme(scheme)
+	err = admissionv1beta1.AddToScheme(webhookScheme)
 	Expect(err).NotTo(HaveOccurred())
 
-	err = corev1.AddToScheme(scheme)
+	err = corev1.AddToScheme(webhookScheme)
 	Expect(err).NotTo(HaveOccurred())
 
 	//+kubebuilder:scaffold:scheme
 
-	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme})
+	k8sClient, err = client.New(cfg, client.Options{Scheme: webhookScheme})
 	Expect(err).NotTo(HaveOccurred())
 	Expect(k8sClient).NotTo(BeNil())
-
-	// start webhook server using Manager
-	webhookInstallOptions := &testEnv.WebhookInstallOptions
-	mgr, err := ctrl.NewManager(cfg, ctrl.Options{
-		Scheme:             scheme,
-		Host:               webhookInstallOptions.LocalServingHost,
-		Port:               webhookInstallOptions.LocalServingPort,
-		CertDir:            webhookInstallOptions.LocalServingCertDir,
-		LeaderElection:     false,
-		MetricsBindAddress: "0",
-	})
-	Expect(err).NotTo(HaveOccurred())
-
-	err = (&Machine{}).SetupWebhookWithManager(mgr)
-	Expect(err).NotTo(HaveOccurred())
-
-	//+kubebuilder:scaffold:webhook
-
-	go func() {
-		err = mgr.Start(ctx)
-		if err != nil {
-			Expect(err).NotTo(HaveOccurred())
-		}
-	}()
-
-	// wait for the webhook server to get ready
-	dialer := &net.Dialer{Timeout: time.Second}
-	addrPort := fmt.Sprintf("%s:%d", webhookInstallOptions.LocalServingHost, webhookInstallOptions.LocalServingPort)
-	Eventually(func() error {
-		conn, err := tls.DialWithDialer(dialer, "tcp", addrPort, &tls.Config{InsecureSkipVerify: true})
-		if err != nil {
-			return err
-		}
-		conn.Close()
-		return nil
-	}).Should(Succeed())
 
 }, 60)
 
 var _ = AfterSuite(func() {
-	cancel()
 	By("tearing down the test environment")
 	err := testEnv.Stop()
 	Expect(err).NotTo(HaveOccurred())
-
 })
 
 func SetupTest() *corev1.Namespace {
+	var (
+		cancel      context.CancelFunc
+		ctxForSetup context.Context
+	)
+
 	ns := &corev1.Namespace{}
 
 	BeforeEach(func() {
+		// start webhook server using Manager
+		ctxForSetup, cancel = context.WithCancel(ctx)
+		webhookInstallOptions := &testEnv.WebhookInstallOptions
+		mgr, err := ctrl.NewManager(cfg, ctrl.Options{
+			Scheme:             webhookScheme,
+			Host:               webhookInstallOptions.LocalServingHost,
+			Port:               webhookInstallOptions.LocalServingPort,
+			CertDir:            webhookInstallOptions.LocalServingCertDir,
+			LeaderElection:     false,
+			MetricsBindAddress: "0",
+		})
+		Expect(err).NotTo(HaveOccurred())
+
+		err = (&Machine{}).SetupWebhookWithManager(mgr)
+		Expect(err).NotTo(HaveOccurred())
+
+		//+kubebuilder:scaffold:webhook
+
+		go func() {
+			defer GinkgoRecover()
+
+			err = mgr.Start(ctxForSetup)
+			if err != nil {
+				Expect(err).NotTo(HaveOccurred())
+			}
+		}()
+
+		// wait for the webhook server to get ready
+		dialer := &net.Dialer{Timeout: time.Second}
+		addrPort := fmt.Sprintf("%s:%d", webhookInstallOptions.LocalServingHost, webhookInstallOptions.LocalServingPort)
+		Eventually(func() error {
+			conn, err := tls.DialWithDialer(dialer, "tcp", addrPort, &tls.Config{InsecureSkipVerify: true})
+			if err != nil {
+				return err
+			}
+			conn.Close()
+			return nil
+		}).Should(Succeed())
+
 		*ns = corev1.Namespace{
 			ObjectMeta: metav1.ObjectMeta{GenerateName: "ns-"},
 		}
-		Expect(k8sClient.Create(ctx, ns)).NotTo(HaveOccurred(), "failed to create test namespace")
-
+		Expect(k8sClient.Create(ctxForSetup, ns)).NotTo(HaveOccurred(), "failed to create test namespace")
 	})
 
 	AfterEach(func() {
-		Expect(k8sClient.Delete(ctx, ns)).NotTo(HaveOccurred(), "failed to delete test namespace")
+		Expect(k8sClient.Delete(ctxForSetup, ns)).NotTo(HaveOccurred(), "failed to delete test namespace")
+
+		cancel()
 	})
 
 	return ns
