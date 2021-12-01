@@ -225,8 +225,8 @@ func (in *IPAMRangeAllocationStatus) DeepCopyInto(out *IPAMRangeAllocationStatus
 		*out = new(commonv1alpha1.IPRange)
 		(*in).DeepCopyInto(*out)
 	}
-	if in.Item != nil {
-		in, out := &in.Item, &out.Item
+	if in.Request != nil {
+		in, out := &in.Request, &out.Request
 		*out = new(IPAMRangeItem)
 		(*in).DeepCopyInto(*out)
 	}

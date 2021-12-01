@@ -51,8 +51,8 @@ spec:
               the status of the object will be set to "Invalid".
             properties:
               itmes:
-                description: Elements is a list of CIDR specs which are defined for
-                  this IPAMRange
+                description: Items is a list of CIDR specs which are defined for this
+                  IPAMRange
                 items:
                   properties:
                     cidr:
@@ -116,7 +116,7 @@ spec:
                       - from
                       - to
                       type: object
-                    item:
+                    request:
                       properties:
                         cidr:
                           description: CIDR represents a network CIDR.
