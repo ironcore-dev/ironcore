@@ -19,7 +19,6 @@ package network
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"inet.af/netaddr"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/utils/pointer"
@@ -31,11 +30,11 @@ import (
 
 var _ = Describe("gateway controller", func() {
 	ns := SetupTest()
+
+	parsedCIDR := commonv1alpha1.MustParseCIDR("192.168.0.0/24")
+
 	Context("reconciling creation", func() {
 		It("sets the ControllerReference of the corresponding IPAMRange to the Gateway", func() {
-			parsedPrefix, err := netaddr.ParseIPPrefix("192.168.0.0/24")
-			Expect(err).ToNot(HaveOccurred())
-
 			subnet := &networkv1alpha1.Subnet{
 				TypeMeta: metav1.TypeMeta{
 					APIVersion: networkv1alpha1.GroupVersion.String(),
@@ -47,7 +46,7 @@ var _ = Describe("gateway controller", func() {
 				},
 				Spec: networkv1alpha1.SubnetSpec{
 					Ranges: []networkv1alpha1.RangeType{
-						{CIDR: &commonv1alpha1.CIDR{IPPrefix: parsedPrefix}},
+						{CIDR: &parsedCIDR},
 					},
 				},
 			}
@@ -87,9 +86,6 @@ var _ = Describe("gateway controller", func() {
 		})
 
 		It("creates the corresponding IPAMRange", func() {
-			parsedPrefix, err := netaddr.ParseIPPrefix("192.168.0.0/24")
-			Expect(err).ToNot(HaveOccurred())
-
 			subnet := &networkv1alpha1.Subnet{
 				TypeMeta: metav1.TypeMeta{
 					APIVersion: networkv1alpha1.GroupVersion.String(),
@@ -101,7 +97,7 @@ var _ = Describe("gateway controller", func() {
 				},
 				Spec: networkv1alpha1.SubnetSpec{
 					Ranges: []networkv1alpha1.RangeType{
-						{CIDR: &commonv1alpha1.CIDR{IPPrefix: parsedPrefix}},
+						{CIDR: &parsedCIDR},
 					},
 				},
 			}
@@ -132,9 +128,6 @@ var _ = Describe("gateway controller", func() {
 		})
 
 		It("updates the status of the Gateway", func() {
-			parsedPrefix, err := netaddr.ParseIPPrefix("192.168.0.0/24")
-			Expect(err).ToNot(HaveOccurred())
-
 			subnet := &networkv1alpha1.Subnet{
 				TypeMeta: metav1.TypeMeta{
 					APIVersion: networkv1alpha1.GroupVersion.String(),
@@ -146,7 +139,7 @@ var _ = Describe("gateway controller", func() {
 				},
 				Spec: networkv1alpha1.SubnetSpec{
 					Ranges: []networkv1alpha1.RangeType{
-						{CIDR: &commonv1alpha1.CIDR{IPPrefix: parsedPrefix}},
+						{CIDR: &parsedCIDR},
 					},
 				},
 			}
