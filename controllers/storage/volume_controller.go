@@ -60,5 +60,3 @@ func (r *VolumeReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		For(&storagev1alpha1.Volume{}).
 		Complete(r)
 }
-
-const storageClassNameField = ".spec.storageclass.name"

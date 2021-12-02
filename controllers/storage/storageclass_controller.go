@@ -29,6 +29,10 @@ import (
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 )
 
+const storageClassNameField = ".spec.storageclass.name"
+
+var errStorageClassDeletionForbidden = errors.New("forbidden to delete the storageclass used by a volume")
+
 // StorageClassReconciler reconciles a StorageClass object
 type StorageClassReconciler struct {
 	client.Client
@@ -111,5 +115,3 @@ func (r *StorageClassReconciler) reconcileDeletion(ctx context.Context, sc *stor
 	}
 	return ctrl.Result{}, nil
 }
-
-var errStorageClassDeletionForbidden = errors.New("forbidden to delete the storageclass used by a volume")
