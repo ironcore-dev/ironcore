@@ -53,7 +53,7 @@ var _ = Describe("storageclass controller", func() {
 		}
 		Expect(k8sClient.Create(ctx, vol)).Should(Succeed())
 
-		By("checking the storageclass and its finalizer consistently exists upon deletion ")
+		By("checking the storageclass and its finalizer consistently exist upon deletion ")
 		Expect(k8sClient.Delete(ctx, sc)).Should(Succeed())
 
 		scKey := client.ObjectKeyFromObject(sc)
