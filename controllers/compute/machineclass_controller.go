@@ -47,8 +47,15 @@ func (r *MachineClassReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	if err := r.addFinalizerIfNone(ctx, mClass); err != nil {
-		return ctrl.Result{}, fmt.Errorf("adding the finalizer if none: %w", err)
+	if !util.ContainsFinalizer(mClass, computev1alpha1.MachineClassFinalizer) {
+		old := mClass.DeepCopy()
+		util.AddFinalizer(mClass, computev1alpha1.MachineClassFinalizer)
+		if err := r.Patch(ctx, mClass, client.MergeFrom(old)); err != nil {
+			return ctrl.Result{}, fmt.Errorf("adding the finalizer: %w", err)
+		}
+
+		// Requeue since the machineclass can be simultaneously updated by multiple parties
+		return ctrl.Result{Requeue: true}, nil
 	}
 
 	if !mClass.DeletionTimestamp.IsZero() {
@@ -79,17 +86,6 @@ func (r *MachineClassReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&computev1alpha1.MachineClass{}).
 		Complete(r)
-}
-
-func (r *MachineClassReconciler) addFinalizerIfNone(ctx context.Context, mClass *computev1alpha1.MachineClass) error {
-	if !util.ContainsFinalizer(mClass, computev1alpha1.MachineClassFinalizer) {
-		old := mClass.DeepCopy()
-		util.AddFinalizer(mClass, computev1alpha1.MachineClassFinalizer)
-		if err := r.Patch(ctx, mClass, client.MergeFrom(old)); err != nil {
-			return fmt.Errorf("adding the finalizer: %w", err)
-		}
-	}
-	return nil
 }
 
 func (r *MachineClassReconciler) reconcileDeletion(ctx context.Context, mClass *computev1alpha1.MachineClass) (ctrl.Result, error) {

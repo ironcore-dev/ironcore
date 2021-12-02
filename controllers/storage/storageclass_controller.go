@@ -50,8 +50,15 @@ func (r *StorageClassReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	if err := r.addFinalizerIfNone(ctx, sc); err != nil {
-		return ctrl.Result{}, fmt.Errorf("adding the finalizer if none: %w", err)
+	if !util.ContainsFinalizer(sc, storagev1alpha1.StorageClassFinalizer) {
+		old := sc.DeepCopy()
+		util.AddFinalizer(sc, storagev1alpha1.StorageClassFinalizer)
+		if err := r.Patch(ctx, sc, client.MergeFrom(old)); err != nil {
+			return ctrl.Result{}, fmt.Errorf("adding the finalizer: %w", err)
+		}
+
+		// Requeue since the storageclass can be simultaneously updated by multiple parties
+		return ctrl.Result{Requeue: true}, nil
 	}
 
 	if !sc.DeletionTimestamp.IsZero() {
@@ -82,17 +89,6 @@ func (r *StorageClassReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&storagev1alpha1.StorageClass{}).
 		Complete(r)
-}
-
-func (r *StorageClassReconciler) addFinalizerIfNone(ctx context.Context, sc *storagev1alpha1.StorageClass) error {
-	if !util.ContainsFinalizer(sc, storagev1alpha1.StorageClassFinalizer) {
-		old := sc.DeepCopy()
-		util.AddFinalizer(sc, storagev1alpha1.StorageClassFinalizer)
-		if err := r.Patch(ctx, sc, client.MergeFrom(old)); err != nil {
-			return fmt.Errorf("adding the finalizer: %w", err)
-		}
-	}
-	return nil
 }
 
 func (r *StorageClassReconciler) reconcileDeletion(ctx context.Context, sc *storagev1alpha1.StorageClass) (ctrl.Result, error) {
