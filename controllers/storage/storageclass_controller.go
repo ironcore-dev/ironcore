@@ -24,7 +24,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	util "sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 )
@@ -50,9 +50,9 @@ func (r *StorageClassReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	if !util.ContainsFinalizer(sc, storagev1alpha1.StorageClassFinalizer) {
+	if !controllerutil.ContainsFinalizer(sc, storagev1alpha1.StorageClassFinalizer) {
 		old := sc.DeepCopy()
-		util.AddFinalizer(sc, storagev1alpha1.StorageClassFinalizer)
+		controllerutil.AddFinalizer(sc, storagev1alpha1.StorageClassFinalizer)
 		if err := r.Patch(ctx, sc, client.MergeFrom(old)); err != nil {
 			return ctrl.Result{}, fmt.Errorf("adding the finalizer: %w", err)
 		}
@@ -105,7 +105,7 @@ func (r *StorageClassReconciler) reconcileDeletion(ctx context.Context, sc *stor
 
 	// Remove the finalizer in the storageclass and persist the new state
 	old := sc.DeepCopy()
-	util.RemoveFinalizer(sc, storagev1alpha1.StorageClassFinalizer)
+	controllerutil.RemoveFinalizer(sc, storagev1alpha1.StorageClassFinalizer)
 	if err := r.Patch(ctx, sc, client.MergeFrom(old)); err != nil {
 		return ctrl.Result{}, fmt.Errorf("removing the finalizer: %w", err)
 	}

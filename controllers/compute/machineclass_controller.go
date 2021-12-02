@@ -24,8 +24,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-
-	util "sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 )
@@ -47,9 +46,9 @@ func (r *MachineClassReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	if !util.ContainsFinalizer(mClass, computev1alpha1.MachineClassFinalizer) {
+	if !controllerutil.ContainsFinalizer(mClass, computev1alpha1.MachineClassFinalizer) {
 		old := mClass.DeepCopy()
-		util.AddFinalizer(mClass, computev1alpha1.MachineClassFinalizer)
+		controllerutil.AddFinalizer(mClass, computev1alpha1.MachineClassFinalizer)
 		if err := r.Patch(ctx, mClass, client.MergeFrom(old)); err != nil {
 			return ctrl.Result{}, fmt.Errorf("adding the finalizer: %w", err)
 		}
@@ -102,7 +101,7 @@ func (r *MachineClassReconciler) reconcileDeletion(ctx context.Context, mClass *
 
 	// Remove the finalizer in the machineclass and persist the new state
 	old := mClass.DeepCopy()
-	util.RemoveFinalizer(mClass, computev1alpha1.MachineClassFinalizer)
+	controllerutil.RemoveFinalizer(mClass, computev1alpha1.MachineClassFinalizer)
 	if err := r.Patch(ctx, mClass, client.MergeFrom(old)); err != nil {
 		return ctrl.Result{}, fmt.Errorf("removing the finalizer: %w", err)
 	}
