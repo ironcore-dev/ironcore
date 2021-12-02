@@ -50,11 +50,6 @@ type MachineClass struct {
 	Status MachineClassStatus `json:"status,omitempty"`
 }
 
-// IsBeingDeleted returns if the instance is being deleted
-func (mClass *MachineClass) IsBeingDeleted() bool {
-	return !mClass.DeletionTimestamp.IsZero()
-}
-
 //+kubebuilder:object:root=true
 
 // MachineClassList contains a list of MachineClass

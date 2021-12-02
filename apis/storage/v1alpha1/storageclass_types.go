@@ -50,11 +50,6 @@ type StorageClass struct {
 	Status StorageClassStatus `json:"status,omitempty"`
 }
 
-// IsBeingDeleted returns if the storageclass is being deleted
-func (sc *StorageClass) IsBeingDeleted() bool {
-	return !sc.DeletionTimestamp.IsZero()
-}
-
 //+kubebuilder:object:root=true
 
 // StorageClassList contains a list of StorageClass
