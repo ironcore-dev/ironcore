@@ -101,7 +101,7 @@ func newIPAMRangeFromGateway(gw *networkv1alpha1.Gateway) *networkv1alpha1.IPAMR
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: gw.Namespace,
-			Name:      gw.IPAMRangeName(),
+			Name:      networkv1alpha1.GatewayIPAMRangeName(gw),
 		},
 		Spec: networkv1alpha1.IPAMRangeSpec{
 			Parent: &corev1.LocalObjectReference{

@@ -103,11 +103,6 @@ type Gateway struct {
 	Status GatewayStatus `json:"status,omitempty"`
 }
 
-// IPAMRangeName returns the name of the corresponding IPAMRange
-func (gw *Gateway) IPAMRangeName() string {
-	return fmt.Sprintf("gateway-%s", gw.Name)
-}
-
 //+kubebuilder:object:root=true
 
 // GatewayList contains a list of Gateway
@@ -115,6 +110,11 @@ type GatewayList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []Gateway `json:"items"`
+}
+
+// GatewayIPAMRangeName returns the name of the ipamrange which corresponds to the gw's subnet
+func GatewayIPAMRangeName(gw *Gateway) string {
+	return fmt.Sprintf("gateway-%s", gw.Name)
 }
 
 func init() {
