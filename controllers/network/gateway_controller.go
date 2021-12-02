@@ -32,6 +32,8 @@ import (
 	"github.com/onmetal/onmetal-api/predicates"
 )
 
+const gatewayFieldOwner = client.FieldOwner("compute.onmetal.de/gateway")
+
 // GatewayReconciler reconciles a Gateway object
 type GatewayReconciler struct {
 	client.Client
@@ -90,8 +92,6 @@ func (r *GatewayReconciler) updateGatewayStatus(ctx context.Context, gw *network
 	}
 	return ctrl.Result{}, nil
 }
-
-const gatewayFieldOwner = client.FieldOwner("compute.onmetal.de/gateway")
 
 func newIPAMRangeFromGateway(gw *networkv1alpha1.Gateway) *networkv1alpha1.IPAMRange {
 	return &networkv1alpha1.IPAMRange{
