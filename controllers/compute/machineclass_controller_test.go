@@ -30,6 +30,7 @@ import (
 var _ = Describe("machineclass controller", func() {
 	ns := SetupTest(ctx)
 	It("removes the finalizer from machineclass only if there's no machine still using the machineclass", func() {
+		By("creating the machineclass consumed by the machine")
 		mClass := &computev1alpha1.MachineClass{
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "machineclass-",
@@ -38,6 +39,7 @@ var _ = Describe("machineclass controller", func() {
 		}
 		Expect(k8sClient.Create(ctx, mClass)).Should(Succeed())
 
+		By("creating the machine")
 		m := &computev1alpha1.Machine{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
@@ -51,20 +53,21 @@ var _ = Describe("machineclass controller", func() {
 		}
 		Expect(k8sClient.Create(ctx, m)).Should(Succeed())
 
+		By("checking the machineclass and its finalizer consistently exist upon deletion ")
 		Expect(k8sClient.Delete(ctx, mClass)).Should(Succeed())
 
-		// Check the finalizer is still there
 		mClassKey := client.ObjectKeyFromObject(mClass)
 		Consistently(func() []string {
 			Expect(k8sClient.Get(ctx, mClassKey, mClass))
 			return mClass.Finalizers
 		}, interval).Should(ContainElement(computev1alpha1.MachineClassFinalizer))
 
-		// Eventually the machineclass is gone
+		By("checking the machineclass is eventually gone after the deletion of the machine")
 		Expect(k8sClient.Delete(ctx, m)).Should(Succeed())
 		Eventually(func() bool {
 			err := k8sClient.Get(ctx, mClassKey, mClass)
+			Expect(client.IgnoreNotFound(err)).To(BeEmpty(), "errors other than `not found` are not expected")
 			return apierrors.IsNotFound(err)
-		}, timeout, interval).Should(BeTrue(), "error equal to `not found`")
+		}, timeout, interval).Should(BeTrue(), "the error should be `not found`")
 	})
 })
