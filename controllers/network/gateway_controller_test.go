@@ -36,6 +36,7 @@ var _ = Describe("gateway controller", func() {
 
 	Context("reconciling creation", func() {
 		It("sets the ControllerReference of the corresponding IPAMRange to the Gateway", func() {
+			By("creating the subent consumed by the gateway")
 			subnet := &networkv1alpha1.Subnet{
 				TypeMeta: metav1.TypeMeta{
 					APIVersion: networkv1alpha1.GroupVersion.String(),
@@ -53,6 +54,7 @@ var _ = Describe("gateway controller", func() {
 			}
 			Expect(k8sClient.Create(ctx, subnet)).To(Succeed())
 
+			By("creating the gateway")
 			gw := &networkv1alpha1.Gateway{
 				TypeMeta: metav1.TypeMeta{
 					APIVersion: networkv1alpha1.GroupVersion.String(),
@@ -68,6 +70,7 @@ var _ = Describe("gateway controller", func() {
 			}
 			Expect(k8sClient.Create(ctx, gw)).To(Succeed())
 
+			By("waiting for the corresponding ipamrange´s controllerreference to be set")
 			ipamRange := &networkv1alpha1.IPAMRange{
 				TypeMeta: metav1.TypeMeta{
 					APIVersion: networkv1alpha1.GroupVersion.String(),
@@ -102,6 +105,7 @@ var _ = Describe("gateway controller", func() {
 		})
 
 		It("creates the corresponding IPAMRange", func() {
+			By("creating the subent consumed by the gateway")
 			subnet := &networkv1alpha1.Subnet{
 				TypeMeta: metav1.TypeMeta{
 					APIVersion: networkv1alpha1.GroupVersion.String(),
@@ -119,6 +123,7 @@ var _ = Describe("gateway controller", func() {
 			}
 			Expect(k8sClient.Create(ctx, subnet)).To(Succeed())
 
+			By("creating the gateway")
 			gw := &networkv1alpha1.Gateway{
 				TypeMeta: metav1.TypeMeta{
 					APIVersion: networkv1alpha1.GroupVersion.String(),
@@ -134,6 +139,7 @@ var _ = Describe("gateway controller", func() {
 			}
 			Expect(k8sClient.Create(ctx, gw)).To(Succeed())
 
+			By("waiting for the ipamrange to be created")
 			ipamRange := &networkv1alpha1.IPAMRange{
 				TypeMeta: metav1.TypeMeta{
 					APIVersion: networkv1alpha1.GroupVersion.String(),
@@ -159,6 +165,7 @@ var _ = Describe("gateway controller", func() {
 		})
 
 		It("updates the status of the Gateway", func() {
+			By("creating the subent consumed by the gateway")
 			subnet := &networkv1alpha1.Subnet{
 				TypeMeta: metav1.TypeMeta{
 					APIVersion: networkv1alpha1.GroupVersion.String(),
@@ -176,6 +183,7 @@ var _ = Describe("gateway controller", func() {
 			}
 			Expect(k8sClient.Create(ctx, subnet)).To(Succeed())
 
+			By("creating the gateway")
 			gw := &networkv1alpha1.Gateway{
 				TypeMeta: metav1.TypeMeta{
 					APIVersion: networkv1alpha1.GroupVersion.String(),
@@ -191,6 +199,7 @@ var _ = Describe("gateway controller", func() {
 			}
 			Expect(k8sClient.Create(ctx, gw)).To(Succeed())
 
+			By("waiting for the gateway status to be updated")
 			gwKey := client.ObjectKeyFromObject(gw)
 			Eventually(func() []commonv1alpha1.IPAddr {
 				err := k8sClient.Get(ctx, gwKey, gw)
@@ -198,9 +207,10 @@ var _ = Describe("gateway controller", func() {
 				return gw.Status.IPs
 			}, timeout, interval).ShouldNot(BeEmpty())
 
+			By("checking the gateway IP comes from the subnet")
 			subnetIPRange := subnet.Spec.Ranges[0].CIDR.IPPrefix.Range()
 			gatewayIP := gw.Status.IPs[0].IP
-			Expect(subnetIPRange.Contains(gatewayIP)).To(BeTrue(), "The Subnet IP range contains the IP.")
+			Expect(subnetIPRange.Contains(gatewayIP)).To(BeTrue(), "The Subnet IP range should contain the IP.")
 		})
 	})
 })
