@@ -86,52 +86,51 @@ var _ = BeforeSuite(func() {
 	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
 	Expect(err).NotTo(HaveOccurred())
 	Expect(k8sClient).NotTo(BeNil())
-
-	k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
-		Scheme:             scheme.Scheme,
-		Host:               "127.0.0.1",
-		MetricsBindAddress: "0",
-	})
-	Expect(err).ToNot(HaveOccurred())
-
-	// register reconciler here
-	Expect((&MachineScheduler{
-		Client: k8sManager.GetClient(),
-		Events: k8sManager.GetEventRecorderFor("machine-scheduler"),
-	}).SetupWithManager(k8sManager)).To(Succeed())
-
-	Expect((&MachineReconciler{
-		Client: k8sManager.GetClient(),
-		Scheme: k8sManager.GetScheme(),
-	}).SetupWithManager(k8sManager)).To(Succeed())
-
-	Expect((&MachineClassReconciler{
-		Client: k8sManager.GetClient(),
-		Scheme: k8sManager.GetScheme(),
-	}).SetupWithManager(k8sManager)).To(Succeed())
-
-	go func() {
-		var mgrCtx context.Context
-		mgrCtx, cancel = context.WithCancel(ctx)
-		Expect(k8sManager.Start(mgrCtx)).To(Succeed(), "failed to start manager")
-	}()
 }, 60)
 
 // SetupTest returns a namespace which will be created before each ginkgo `It` block and deleted at the end of `It`
 // so that each test case can run in an independent way
 func SetupTest(ctx context.Context) *corev1.Namespace {
+	var (
+		cancel context.CancelFunc
+	)
 	ns := &corev1.Namespace{}
 
 	BeforeEach(func() {
+		var mgrCtx context.Context
+		mgrCtx, cancel = context.WithCancel(ctx)
 		*ns = corev1.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "testns-",
 			},
 		}
 		Expect(k8sClient.Create(ctx, ns)).To(Succeed(), "failed to create test namespace")
+
+		k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
+			Scheme:             scheme.Scheme,
+			Host:               "127.0.0.1",
+			MetricsBindAddress: "0",
+		})
+		Expect(err).ToNot(HaveOccurred())
+
+		// register reconciler here
+		Expect((&MachineScheduler{
+			Client: k8sManager.GetClient(),
+			Events: k8sManager.GetEventRecorderFor("machine-scheduler"),
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
+		Expect((&MachineReconciler{
+			Client: k8sManager.GetClient(),
+			Scheme: k8sManager.GetScheme(),
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
+		go func() {
+			Expect(k8sManager.Start(mgrCtx)).To(Succeed(), "failed to start manager")
+		}()
 	})
 
 	AfterEach(func() {
+		cancel()
 		Expect(k8sClient.Delete(ctx, ns)).To(Succeed(), "failed to delete test namespace")
 		Expect(k8sClient.DeleteAllOf(ctx, &computev1alpha1.MachinePool{})).To(Succeed())
 	})
@@ -141,10 +140,6 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 
 var _ = AfterSuite(func() {
 	By("tearing down the test environment")
-
-	// Let the manager finish
-	cancel()
-
 	err := testEnv.Stop()
 	Expect(err).NotTo(HaveOccurred())
 })
