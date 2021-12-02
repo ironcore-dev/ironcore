@@ -21,9 +21,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-const (
+var (
 	// MachineClassFinalizer
-	MachineClassFinalizer = "machineclass.network.onmetal.de"
+	MachineClassFinalizer = GroupVersion.Group + "/machineclass"
 )
 
 // MachineClassSpec defines the desired state of MachineClass

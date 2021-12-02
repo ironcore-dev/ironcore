@@ -21,9 +21,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-const (
+var (
 	// StorageClassFinalizer
-	StorageClassFinalizer = "storageclass.network.onmetal.de"
+	StorageClassFinalizer = GroupVersion.Group + "/storageclass"
 )
 
 // StorageClassSpec defines the desired state of StorageClass
