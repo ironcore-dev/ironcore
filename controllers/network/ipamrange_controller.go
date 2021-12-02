@@ -269,86 +269,31 @@ type allocation struct {
 func (r *IPAMRangeReconciler) gatherAvailable(ctx context.Context, ipamRange *networkv1alpha1.IPAMRange) (available *netaddr.IPSet, parentAllocations []allocation, failed []networkv1alpha1.IPAMRangeAllocationStatus, err error) {
 	if ipamRange.Spec.Parent == nil {
 		var bldr netaddr.IPSetBuilder
-		for _, ele := range ipamRange.Spec.Items {
-			if ele.CIDR != nil {
-				bldr.AddPrefix(ele.CIDR.IPPrefix)
-			}
-			if ele.IPs != nil {
-				ipRange := ele.IPs.Range()
-				bldr.AddRange(ipRange)
-			}
-			if ele.Size > 0 {
-				s, _ := bldr.IPSet()
-				ipPrefixes := s.Prefixes()
-				if len(ipPrefixes) > 0 {
-					lastIP := netaddr.IP{}
-					prefix := ipPrefixes[len(ipPrefixes)-1]
-					ip := prefix.IP().IPAddr().IP.To4()
-					if ip == nil {
-						return
-					}
-					for i := 0; i < int(ele.Size)-1; i++ {
-						ip[3]++
-						newip, _ := netaddr.FromStdIP(ip)
-						lastIP = newip
-					}
-					iprange := netaddr.IPRangeFrom(prefix.IP(), lastIP)
-					bldr.AddRange(iprange)
-				} else {
-					ipStr := r.DefaultAddr
-					netaddrIP, _ := netaddr.ParseIP(ipStr)
-					ip := netaddrIP.IPAddr().IP.To4()
-					lastIP := netaddr.IP{}
-					fromIP, _ := netaddr.FromStdIP(ip)
-					for i := 0; i < int(ele.Size)-1; i++ {
-						ip[3]++
-						newip, _ := netaddr.FromStdIP(ip)
-						lastIP = newip
 
-					}
-					iprange := netaddr.IPRangeFrom(fromIP, lastIP)
-					bldr.AddRange(iprange)
+		var initbldr netaddr.IPSetBuilder
+		ipStr := "0.0.0.0"
+		netaddrIP, _ := netaddr.ParseIP(ipStr)
+		initialPrefix := netaddr.IPPrefixFrom(netaddrIP, 0)
+		initbldr.AddPrefix(initialPrefix)
+		set, err := initbldr.IPSet()
+		if err != nil {
+			return nil, nil, nil, err
+		}
+		for _, item := range ipamRange.Spec.Items {
+			ipprefix, iprange, _, ok := r.acquireRequest(set, item)
+			if ok {
+				if iprange != nil {
+					bldr.AddRange(*iprange)
 				}
-			}
-			if ele.IPCount != 0 {
-				set, _ := bldr.IPSet()
-				ranges := set.Ranges()
-				if len(ranges) > 0 {
-					for _, rng := range ranges {
-						fromIP := rng.From()
-						if isNetIP(fromIP) {
-							fromIP = fromIP.Next()
-						}
-						if fromIP.IsZero() || !rng.Contains(fromIP) {
-							continue
-						}
-						ip := rng.To().IPAddr().IP.To4()
-						lastIP := netaddr.IP{}
-						for i := 1; i <= int(ele.IPCount); i++ {
-							ip[3]++
-							newip, _ := netaddr.FromStdIP(ip)
-							lastIP = newip
-						}
-						iprange := netaddr.IPRangeFrom(fromIP, lastIP)
-						bldr.AddRange(iprange)
-					}
-				} else {
-					ipStr := r.DefaultAddr
-					netaddrIP, _ := netaddr.ParseIP(ipStr)
-					ip := netaddrIP.IPAddr().IP.To4()
-					lastIP := netaddr.IP{}
-					fromIP, _ := netaddr.FromStdIP(ip)
-					for i := 1; i <= int(ele.IPCount); i++ {
-						ip[3]++
-						newip, _ := netaddr.FromStdIP(ip)
-						lastIP = newip
-					}
-					iprange := netaddr.IPRangeFrom(fromIP, lastIP)
-					bldr.AddRange(iprange)
+				if ipprefix != nil {
+					bldr.AddPrefix(*ipprefix)
 				}
 			}
 		}
 		available, err := bldr.IPSet()
+		if err != nil {
+			return nil, nil, nil, err
+		}
 		return available, nil, nil, err
 	}
 
