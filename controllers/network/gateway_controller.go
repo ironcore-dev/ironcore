@@ -52,7 +52,7 @@ func (r *GatewayReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	// Each Gateway needs an IP address which can be acquired via the corresponding IPAMRange.
+	// Each Gateway needs an IP address, which can be acquired via a corresponding IPAMRange.
 	ipamRange := newIPAMRangeFromGateway(gw)
 
 	// The Gateway is the controller (the top owner upon conflicts with other owners) of its corresponding IPAMRange.
