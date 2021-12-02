@@ -42,6 +42,16 @@ var _ = Describe("MachinePoolReconciler", func() {
 			}
 			Expect(k8sClient.Create(ctx, machinePool)).To(Succeed())
 
+			machinePool.Status.Conditions = []computev1alpha1.MachinePoolCondition{
+				{
+					Type:               computev1alpha1.MachinePoolConditionTypeReady,
+					Status:             corev1.ConditionFalse,
+					LastUpdateTime:     metav1.Time{Time: time.Now().Add(time.Duration(-1) * machinePoolGracePeriod)},
+					LastTransitionTime: metav1.Now(),
+				},
+			}
+			Expect(k8sClient.Status().Update(ctx, machinePool)).To(Succeed())
+
 			By("checking that MachinePool is in pending state")
 			Eventually(func(g Gomega) {
 				key := types.NamespacedName{
@@ -69,7 +79,7 @@ var _ = Describe("MachinePoolReconciler", func() {
 				{
 					Type:               computev1alpha1.MachinePoolConditionTypeReady,
 					Status:             corev1.ConditionTrue,
-					LastUpdateTime:     metav1.Time{Time: time.Now().Add(time.Duration(-1) * machinePoolReadyDuration)},
+					LastUpdateTime:     metav1.Time{Time: time.Now().Add(time.Duration(-1) * machinePoolGracePeriod)},
 					LastTransitionTime: metav1.Now(),
 				},
 			}

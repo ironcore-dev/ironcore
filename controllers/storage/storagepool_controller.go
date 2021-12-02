@@ -36,8 +36,8 @@ import (
 // StoragePoolReconciler reconciles a StoragePool object
 type StoragePoolReconciler struct {
 	client.Client
-	Scheme        *runtime.Scheme
-	ReadyDuration time.Duration
+	Scheme                 *runtime.Scheme
+	StoragePoolGracePeriod time.Duration
 }
 
 //+kubebuilder:rbac:groups=storage.onmetal.de,resources=storagepools,verbs=get;list;watch;create;update;patch;delete
@@ -58,14 +58,14 @@ func (r *StoragePoolReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 func (r *StoragePoolReconciler) reconcileExists(ctx context.Context, log logr.Logger, pool *storagev1alpha1.StoragePool) (ctrl.Result, error) {
 	cond := &storagev1alpha1.StoragePoolCondition{}
-	ok, err := conditionutils.FindSlice(pool.Status.Conditions, string(storagev1alpha1.StoragePoolConditionTypeReady), cond)
-	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("failed while searching 'Ready' condition: %w", err)
+	ok := conditionutils.MustFindSlice(pool.Status.Conditions, string(storagev1alpha1.StoragePoolConditionTypeReady), cond)
+	if !ok {
+		return ctrl.Result{}, fmt.Errorf("failed to find 'Ready' condition")
 	}
 
 	outdatedPool := pool.DeepCopy()
-	if ok && cond != nil && cond.Status == corev1.ConditionTrue {
-		if cond.LastUpdateTime.Add(r.ReadyDuration).After(time.Now()) {
+	if cond.Status == corev1.ConditionTrue {
+		if cond.LastUpdateTime.Add(r.StoragePoolGracePeriod).After(time.Now()) {
 			pool.Status.State = storagev1alpha1.StoragePoolStateAvailable
 		} else {
 			pool.Status.State = storagev1alpha1.StoragePoolStatePending
@@ -78,7 +78,7 @@ func (r *StoragePoolReconciler) reconcileExists(ctx context.Context, log logr.Lo
 		return ctrl.Result{}, fmt.Errorf("could not update status: %w", err)
 	}
 
-	return ctrl.Result{}, nil
+	return ctrl.Result{RequeueAfter: r.StoragePoolGracePeriod}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.

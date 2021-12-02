@@ -43,6 +43,16 @@ var _ = Describe("StoragePoolReconciler", func() {
 			}
 			Expect(k8sClient.Create(ctx, storagePool)).To(Succeed())
 
+			storagePool.Status.Conditions = []storagev1alpha1.StoragePoolCondition{
+				{
+					Type:               storagev1alpha1.StoragePoolConditionTypeReady,
+					Status:             corev1.ConditionFalse,
+					LastUpdateTime:     metav1.Time{Time: time.Now().Add(time.Duration(-1) * storagePoolGracePeriod)},
+					LastTransitionTime: metav1.Now(),
+				},
+			}
+			Expect(k8sClient.Status().Update(ctx, storagePool)).To(Succeed())
+
 			By("checking that StoragePool is in pending state")
 			Eventually(func(g Gomega) {
 				key := types.NamespacedName{
@@ -70,7 +80,7 @@ var _ = Describe("StoragePoolReconciler", func() {
 				{
 					Type:               storagev1alpha1.StoragePoolConditionTypeReady,
 					Status:             corev1.ConditionTrue,
-					LastUpdateTime:     metav1.Time{Time: time.Now().Add(time.Duration(-1) * storagePoolReadyDuration)},
+					LastUpdateTime:     metav1.Time{Time: time.Now().Add(time.Duration(-1) * storagePoolGracePeriod)},
 					LastTransitionTime: metav1.Now(),
 				},
 			}

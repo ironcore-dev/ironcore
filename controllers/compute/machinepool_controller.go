@@ -37,8 +37,8 @@ import (
 // MachinePoolReconciler reconciles a MachinePool object
 type MachinePoolReconciler struct {
 	client.Client
-	Scheme        *runtime.Scheme
-	ReadyDuration time.Duration
+	Scheme                 *runtime.Scheme
+	MachinePoolGracePeriod time.Duration
 }
 
 //+kubebuilder:rbac:groups=compute.onmetal.de,resources=machinepools,verbs=get;list;watch;create;update;patch;delete
@@ -59,14 +59,14 @@ func (r *MachinePoolReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 func (r *MachinePoolReconciler) reconcileExists(ctx context.Context, log logr.Logger, pool *computev1alpha1.MachinePool) (ctrl.Result, error) {
 	cond := &computev1alpha1.MachinePoolCondition{}
-	ok, err := conditionutils.FindSlice(pool.Status.Conditions, string(computev1alpha1.MachinePoolConditionTypeReady), cond)
-	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("failed while searching 'Ready' condition: %w", err)
+	ok := conditionutils.MustFindSlice(pool.Status.Conditions, string(computev1alpha1.MachinePoolConditionTypeReady), cond)
+	if !ok {
+		return ctrl.Result{}, fmt.Errorf("failed to find 'Ready' condition")
 	}
 
 	outdatedPool := pool.DeepCopy()
-	if ok && cond != nil && cond.Status == corev1.ConditionTrue {
-		if cond.LastUpdateTime.Add(r.ReadyDuration).After(time.Now()) {
+	if cond.Status == corev1.ConditionTrue {
+		if cond.LastUpdateTime.Add(r.MachinePoolGracePeriod).After(time.Now()) {
 			pool.Status.State = computev1alpha1.MachinePoolStateReady
 		} else {
 			pool.Status.State = computev1alpha1.MachinePoolStatePending
@@ -79,7 +79,7 @@ func (r *MachinePoolReconciler) reconcileExists(ctx context.Context, log logr.Lo
 		return ctrl.Result{}, fmt.Errorf("could not update status: %w", err)
 	}
 
-	return ctrl.Result{}, nil
+	return ctrl.Result{RequeueAfter: r.MachinePoolGracePeriod}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
