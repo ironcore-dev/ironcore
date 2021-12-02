@@ -18,7 +18,6 @@ package storage
 
 import (
 	"context"
-	"fmt"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -57,22 +56,6 @@ func (r *VolumeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *VolumeReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	// Index the field of storageclass name for listing volumes in storageclass controller
-	if err := mgr.GetFieldIndexer().IndexField(
-		context.Background(),
-		&storagev1alpha1.Volume{},
-		storageClassNameField,
-		func(object client.Object) []string {
-			m := object.(*storagev1alpha1.Volume)
-			if m.Spec.StorageClass.Name == "" {
-				return nil
-			}
-			return []string{m.Spec.StorageClass.Name}
-		},
-	); err != nil {
-		return fmt.Errorf("indexing the field %s: %w", storageClassNameField, err)
-	}
-
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&storagev1alpha1.Volume{}).
 		Complete(r)
