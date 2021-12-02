@@ -17,8 +17,6 @@
 package storage
 
 import (
-	"fmt"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -32,6 +30,7 @@ import (
 var _ = Describe("storageclass controller", func() {
 	ns := SetupTest(ctx)
 	It("removes the finalizer from the storageclass only if there's no volume still using the storageclass", func() {
+		By("creating the storageclass consumed by the volume")
 		sc := &storagev1alpha1.StorageClass{
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "storageclass-",
@@ -40,6 +39,7 @@ var _ = Describe("storageclass controller", func() {
 		}
 		Expect(k8sClient.Create(ctx, sc)).Should(Succeed())
 
+		By("creating the volume")
 		vol := &storagev1alpha1.Volume{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
@@ -53,21 +53,21 @@ var _ = Describe("storageclass controller", func() {
 		}
 		Expect(k8sClient.Create(ctx, vol)).Should(Succeed())
 
+		By("checking the storageclass and its finalizer consistently exists upon deletion ")
 		Expect(k8sClient.Delete(ctx, sc)).Should(Succeed())
 
-		// Check the finalizer is still there
 		scKey := client.ObjectKeyFromObject(sc)
 		Consistently(func() []string {
 			Expect(k8sClient.Get(ctx, scKey, sc))
 			return sc.Finalizers
 		}, interval).Should(ContainElement(storagev1alpha1.StorageClassFinalizer))
 
-		// Eventually the storageclass is gone
+		By("checking the storageclass is eventually gone after the deletion of the volume")
 		Expect(k8sClient.Delete(ctx, vol)).Should(Succeed())
 		Eventually(func() bool {
 			err := k8sClient.Get(ctx, scKey, sc)
-			fmt.Fprintf(GinkgoWriter, "%#v", err)
+			Expect(client.IgnoreNotFound(err)).To(BeEmpty(), "error other than `not found` not expected")
 			return apierrors.IsNotFound(err)
-		}, timeout, interval).Should(BeTrue(), "error equal to `not found`")
+		}, timeout, interval).Should(BeTrue(), "`not found` expected")
 	})
 })
