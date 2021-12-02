@@ -19,6 +19,7 @@ package network
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/utils/pointer"
@@ -67,7 +68,22 @@ var _ = Describe("gateway controller", func() {
 			}
 			Expect(k8sClient.Create(ctx, gw)).To(Succeed())
 
-			ipamRange := newIPAMRangeFromGateway(gw)
+			ipamRange := &networkv1alpha1.IPAMRange{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: networkv1alpha1.GroupVersion.String(),
+					Kind:       networkv1alpha1.IPAMRangeGK.Kind,
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: gw.Namespace,
+					Name:      networkv1alpha1.GatewayIPAMRangeName(gw),
+				},
+				Spec: networkv1alpha1.IPAMRangeSpec{
+					Parent: &corev1.LocalObjectReference{
+						Name: networkv1alpha1.SubnetIPAMName(gw.Spec.Subnet.Name),
+					},
+					Requests: []networkv1alpha1.IPAMRangeRequest{{IPCount: 1}},
+				},
+			}
 			ipamRangeKey := client.ObjectKeyFromObject(ipamRange)
 			Eventually(func(g Gomega) {
 				err := k8sClient.Get(ctx, ipamRangeKey, ipamRange)
@@ -118,7 +134,22 @@ var _ = Describe("gateway controller", func() {
 			}
 			Expect(k8sClient.Create(ctx, gw)).To(Succeed())
 
-			ipamRange := newIPAMRangeFromGateway(gw)
+			ipamRange := &networkv1alpha1.IPAMRange{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: networkv1alpha1.GroupVersion.String(),
+					Kind:       networkv1alpha1.IPAMRangeGK.Kind,
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: gw.Namespace,
+					Name:      networkv1alpha1.GatewayIPAMRangeName(gw),
+				},
+				Spec: networkv1alpha1.IPAMRangeSpec{
+					Parent: &corev1.LocalObjectReference{
+						Name: networkv1alpha1.SubnetIPAMName(gw.Spec.Subnet.Name),
+					},
+					Requests: []networkv1alpha1.IPAMRangeRequest{{IPCount: 1}},
+				},
+			}
 			ipamRangeKey := client.ObjectKeyFromObject(ipamRange)
 			Eventually(func() error {
 				err := k8sClient.Get(ctx, ipamRangeKey, ipamRange)
