@@ -53,10 +53,17 @@ var _ = Describe("storageclass controller", func() {
 		}
 		Expect(k8sClient.Create(ctx, vol)).Should(Succeed())
 
+		By("checking the finalizer was added")
+		scKey := client.ObjectKeyFromObject(sc)
+		Eventually(func() []string {
+			err := k8sClient.Get(ctx, scKey, sc)
+			Expect(client.IgnoreNotFound(err)).To(Succeed(), "errors other than `not found` are not expected")
+			return sc.Finalizers
+		}, interval).Should(ContainElement(storagev1alpha1.StorageClassFinalizer))
+
 		By("checking the storageclass and its finalizer consistently exist upon deletion ")
 		Expect(k8sClient.Delete(ctx, sc)).Should(Succeed())
 
-		scKey := client.ObjectKeyFromObject(sc)
 		Consistently(func() []string {
 			Expect(k8sClient.Get(ctx, scKey, sc))
 			return sc.Finalizers
