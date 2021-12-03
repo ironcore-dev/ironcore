@@ -73,7 +73,7 @@ var _ = Describe("storageclass controller", func() {
 		Expect(k8sClient.Delete(ctx, vol)).Should(Succeed())
 		Eventually(func() bool {
 			err := k8sClient.Get(ctx, scKey, sc)
-			Expect(client.IgnoreNotFound(err)).To(BeEmpty(), "error other than `not found` not expected")
+			Expect(client.IgnoreNotFound(err)).To(Succeed(), "error other than `not found` not expected")
 			return apierrors.IsNotFound(err)
 		}, timeout, interval).Should(BeTrue(), "`not found` expected")
 	})
