@@ -66,7 +66,7 @@ var _ = Describe("machineclass controller", func() {
 		Expect(k8sClient.Delete(ctx, m)).Should(Succeed())
 		Eventually(func() bool {
 			err := k8sClient.Get(ctx, machineClassKey, machineClass)
-			Expect(client.IgnoreNotFound(err)).To(BeEmpty(), "errors other than `not found` are not expected")
+			Expect(client.IgnoreNotFound(err)).To(Succeed(), "errors other than `not found` are not expected")
 			return apierrors.IsNotFound(err)
 		}, timeout, interval).Should(BeTrue(), "the error should be `not found`")
 	})
