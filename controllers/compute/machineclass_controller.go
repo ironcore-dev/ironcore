@@ -21,10 +21,18 @@ import (
 	"errors"
 	"fmt"
 
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/util/workqueue"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+	"sigs.k8s.io/controller-runtime/pkg/event"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
+	"sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 )
@@ -33,6 +41,7 @@ import (
 type MachineClassReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
+	Events record.EventRecorder
 }
 
 //+kubebuilder:rbac:groups=compute.onmetal.de,resources=machineclasses,verbs=get;list;watch;create;update;patch;delete
@@ -84,6 +93,15 @@ func (r *MachineClassReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&computev1alpha1.MachineClass{}).
+		Watches(
+			&source.Kind{Type: &computev1alpha1.Machine{}},
+			handler.Funcs{
+				DeleteFunc: func(e event.DeleteEvent, q workqueue.RateLimitingInterface) {
+					m := e.Object.(*computev1alpha1.Machine)
+					q.Add(ctrl.Request{NamespacedName: types.NamespacedName{Name: m.Spec.MachineClass.Name}})
+				},
+			},
+		).
 		Complete(r)
 }
 
@@ -95,8 +113,17 @@ func (r *MachineClassReconciler) reconcileDeletion(ctx context.Context, machineC
 	}
 
 	// Check if there's still any machine using the MachineClass
-	if len(mList.Items) != 0 {
-		return ctrl.Result{}, errMachineClassDeletionForbidden
+	if mm := mList.Items; len(mm) != 0 {
+		// List the machine names still using the machineclass in the error message
+		machineNames := ""
+		for i := range mm {
+			machineNames += mm[i].Name + ", "
+		}
+		err := errors.New(fmt.Sprintf("the following machines still using the machineclass: %s", machineNames))
+
+		log.FromContext(ctx).Error(err, "Forbidden to delete the machineclass which is still used by machines")
+		r.Events.Eventf(machineClass, corev1.EventTypeWarning, "ForbiddenToDelete", err.Error())
+		return ctrl.Result{}, nil
 	}
 
 	// Remove the finalizer in the machineclass and persist the new state
@@ -107,5 +134,3 @@ func (r *MachineClassReconciler) reconcileDeletion(ctx context.Context, machineC
 	}
 	return ctrl.Result{}, nil
 }
-
-var errMachineClassDeletionForbidden = errors.New("forbidden to delete the machineclass used by a machine")

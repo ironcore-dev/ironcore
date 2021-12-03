@@ -127,6 +127,7 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 		Expect((&MachineClassReconciler{
 			Client: k8sManager.GetClient(),
 			Scheme: k8sManager.GetScheme(),
+			Events: k8sManager.GetEventRecorderFor("machineclass-controller"),
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		go func() {
