@@ -21,13 +21,10 @@ import (
 	"testing"
 	"time"
 
-	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
-
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -37,6 +34,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
+	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
+	"github.com/onmetal/onmetal-api/controllers/network"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -79,6 +78,8 @@ var _ = BeforeSuite(func() {
 
 	err = computev1alpha1.AddToScheme(scheme.Scheme)
 	Expect(err).NotTo(HaveOccurred())
+	Expect(networkv1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
+
 	Expect(networkv1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
 
 	//+kubebuilder:scaffold:scheme
@@ -129,6 +130,17 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 			Scheme: k8sManager.GetScheme(),
 			Events: k8sManager.GetEventRecorderFor("machineclass-controller"),
 		}).SetupWithManager(k8sManager)).To(Succeed())
+		err = (&network.SubnetReconciler{
+			Client: k8sManager.GetClient(),
+			Scheme: k8sManager.GetScheme(),
+		}).SetupWithManager(k8sManager)
+		Expect(err).ToNot(HaveOccurred())
+
+		err = (&network.IPAMRangeReconciler{
+			Client: k8sManager.GetClient(),
+			Scheme: k8sManager.GetScheme(),
+		}).SetupWithManager(k8sManager)
+		Expect(err).ToNot(HaveOccurred())
 
 		go func() {
 			Expect(k8sManager.Start(mgrCtx)).To(Succeed(), "failed to start manager")
