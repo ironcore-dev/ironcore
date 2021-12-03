@@ -31,8 +31,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
-	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/source"
+
+	"github.com/go-logr/logr"
 
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 )
@@ -54,6 +55,7 @@ type StorageClassReconciler struct {
 
 // Reconcile moves the current state of the cluster closer to the desired state.
 func (r *StorageClassReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+	log := ctrl.LoggerFrom(ctx)
 	sc := &storagev1alpha1.StorageClass{}
 	if err := r.Get(ctx, req.NamespacedName, sc); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
@@ -70,11 +72,8 @@ func (r *StorageClassReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		return ctrl.Result{Requeue: true}, nil
 	}
 
-	if !sc.DeletionTimestamp.IsZero() {
-		return r.reconcileDeletion(ctx, sc)
-	}
-
-	return ctrl.Result{}, nil
+	// return ctrl.Result{}, nil
+	return r.reconcileExists(ctx, log, sc)
 }
 
 // SetupWithManager sets up the controller with the Manager.
@@ -109,7 +108,7 @@ func (r *StorageClassReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-func (r *StorageClassReconciler) reconcileDeletion(ctx context.Context, sc *storagev1alpha1.StorageClass) (ctrl.Result, error) {
+func (r *StorageClassReconciler) delete(ctx context.Context, log logr.Logger, sc *storagev1alpha1.StorageClass) (ctrl.Result, error) {
 	// List the volumes currently using the storageclass
 	vList := &storagev1alpha1.VolumeList{}
 	if err := r.List(ctx, vList, client.InNamespace(sc.Namespace), client.MatchingFields{storageClassNameField: sc.Name}); err != nil {
@@ -125,7 +124,7 @@ func (r *StorageClassReconciler) reconcileDeletion(ctx context.Context, sc *stor
 		}
 		err := errors.New(fmt.Sprintf("the following volumes still using the volumeclass: %s", volumeNames))
 
-		log.FromContext(ctx).Error(err, "Forbidden to delete the volumeclass which is still used by volumes")
+		log.Error(err, "Forbidden to delete the volumeclass which is still used by volumes")
 		r.Events.Eventf(sc, corev1.EventTypeWarning, "ForbiddenToDelete", err.Error())
 		return ctrl.Result{}, nil
 	}
@@ -137,4 +136,15 @@ func (r *StorageClassReconciler) reconcileDeletion(ctx context.Context, sc *stor
 		return ctrl.Result{}, fmt.Errorf("removing the finalizer: %w", err)
 	}
 	return ctrl.Result{}, nil
+}
+
+func (r *StorageClassReconciler) reconcile(ctx context.Context, log logr.Logger, sc *storagev1alpha1.StorageClass) (ctrl.Result, error) {
+	return ctrl.Result{}, nil
+}
+
+func (r *StorageClassReconciler) reconcileExists(ctx context.Context, log logr.Logger, sc *storagev1alpha1.StorageClass) (ctrl.Result, error) {
+	if !sc.DeletionTimestamp.IsZero() {
+		return r.delete(ctx, log, sc)
+	}
+	return r.reconcile(ctx, log, sc)
 }

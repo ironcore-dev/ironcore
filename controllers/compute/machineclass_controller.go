@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
@@ -31,7 +32,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
-	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
@@ -50,6 +50,7 @@ type MachineClassReconciler struct {
 
 // Reconcile moves the current state of the cluster closer to the desired state
 func (r *MachineClassReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+	log := ctrl.LoggerFrom(ctx)
 	machineClass := &computev1alpha1.MachineClass{}
 	if err := r.Get(ctx, req.NamespacedName, machineClass); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
@@ -66,11 +67,7 @@ func (r *MachineClassReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		return ctrl.Result{Requeue: true}, nil
 	}
 
-	if !machineClass.DeletionTimestamp.IsZero() {
-		return r.reconcileDeletion(ctx, machineClass)
-	}
-
-	return ctrl.Result{}, nil
+	return r.reconcileExists(ctx, log, machineClass)
 }
 
 // SetupWithManager sets up the controller with the Manager.
@@ -105,7 +102,7 @@ func (r *MachineClassReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-func (r *MachineClassReconciler) reconcileDeletion(ctx context.Context, machineClass *computev1alpha1.MachineClass) (ctrl.Result, error) {
+func (r *MachineClassReconciler) delete(ctx context.Context, log logr.Logger, machineClass *computev1alpha1.MachineClass) (ctrl.Result, error) {
 	// List the machines currently using the MachineClass
 	mList := &computev1alpha1.MachineList{}
 	if err := r.List(ctx, mList, client.InNamespace(machineClass.Namespace), client.MatchingFields{machineClassNameField: machineClass.Name}); err != nil {
@@ -121,7 +118,7 @@ func (r *MachineClassReconciler) reconcileDeletion(ctx context.Context, machineC
 		}
 		err := errors.New(fmt.Sprintf("the following machines still using the machineclass: %s", machineNames))
 
-		log.FromContext(ctx).Error(err, "Forbidden to delete the machineclass which is still used by machines")
+		log.Error(err, "Forbidden to delete the machineclass which is still used by machines")
 		r.Events.Eventf(machineClass, corev1.EventTypeWarning, "ForbiddenToDelete", err.Error())
 		return ctrl.Result{}, nil
 	}
@@ -133,4 +130,15 @@ func (r *MachineClassReconciler) reconcileDeletion(ctx context.Context, machineC
 		return ctrl.Result{}, fmt.Errorf("removing the finalizer: %w", err)
 	}
 	return ctrl.Result{}, nil
+}
+
+func (r *MachineClassReconciler) reconcile(ctx context.Context, log logr.Logger, machineClass *computev1alpha1.MachineClass) (ctrl.Result, error) {
+	return ctrl.Result{}, nil
+}
+
+func (r *MachineClassReconciler) reconcileExists(ctx context.Context, log logr.Logger, machineClass *computev1alpha1.MachineClass) (ctrl.Result, error) {
+	if !machineClass.DeletionTimestamp.IsZero() {
+		return r.delete(ctx, log, machineClass)
+	}
+	return r.reconcile(ctx, log, machineClass)
 }
