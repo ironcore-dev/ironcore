@@ -21,10 +21,18 @@ import (
 	"errors"
 	"fmt"
 
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/util/workqueue"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+	"sigs.k8s.io/controller-runtime/pkg/event"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
+	"sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 )
@@ -37,6 +45,7 @@ var errStorageClassDeletionForbidden = errors.New("forbidden to delete the stora
 type StorageClassReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
+	Events record.EventRecorder
 }
 
 //+kubebuilder:rbac:groups=storage.onmetal.de,resources=storageclasses,verbs=get;list;watch;create;update;patch;delete
@@ -88,6 +97,15 @@ func (r *StorageClassReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&storagev1alpha1.StorageClass{}).
+		Watches(
+			&source.Kind{Type: &storagev1alpha1.Volume{}},
+			handler.Funcs{
+				DeleteFunc: func(e event.DeleteEvent, q workqueue.RateLimitingInterface) {
+					v := e.Object.(*storagev1alpha1.Volume)
+					q.Add(ctrl.Request{NamespacedName: types.NamespacedName{Name: v.Spec.StorageClass.Name}})
+				},
+			},
+		).
 		Complete(r)
 }
 
@@ -99,8 +117,17 @@ func (r *StorageClassReconciler) reconcileDeletion(ctx context.Context, sc *stor
 	}
 
 	// Check if there's still any volume using the storageclass
-	if len(vList.Items) != 0 {
-		return ctrl.Result{}, errStorageClassDeletionForbidden
+	if vv := vList.Items; len(vv) != 0 {
+		// List the volume names still using the storageclass in the error message
+		volumeNames := ""
+		for i := range vv {
+			volumeNames += vv[i].Name + ", "
+		}
+		err := errors.New(fmt.Sprintf("the following volumes still using the volumeclass: %s", volumeNames))
+
+		log.FromContext(ctx).Error(err, "Forbidden to delete the volumeclass which is still used by volumes")
+		r.Events.Eventf(sc, corev1.EventTypeWarning, "ForbiddenToDelete", err.Error())
+		return ctrl.Result{}, nil
 	}
 
 	// Remove the finalizer in the storageclass and persist the new state

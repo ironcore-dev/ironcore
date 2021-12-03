@@ -121,6 +121,7 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 		Expect((&StorageClassReconciler{
 			Client: k8sManager.GetClient(),
 			Scheme: k8sManager.GetScheme(),
+			Events: k8sManager.GetEventRecorderFor("storageclass-controller"),
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		go func() {
