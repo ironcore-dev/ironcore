@@ -41,15 +41,15 @@ type MachineClassReconciler struct {
 
 // Reconcile moves the current state of the cluster closer to the desired state
 func (r *MachineClassReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	mClass := &computev1alpha1.MachineClass{}
-	if err := r.Get(ctx, req.NamespacedName, mClass); err != nil {
+	machineClass := &computev1alpha1.MachineClass{}
+	if err := r.Get(ctx, req.NamespacedName, machineClass); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	if !controllerutil.ContainsFinalizer(mClass, computev1alpha1.MachineClassFinalizer) {
-		old := mClass.DeepCopy()
-		controllerutil.AddFinalizer(mClass, computev1alpha1.MachineClassFinalizer)
-		if err := r.Patch(ctx, mClass, client.MergeFrom(old)); err != nil {
+	if !controllerutil.ContainsFinalizer(machineClass, computev1alpha1.MachineClassFinalizer) {
+		old := machineClass.DeepCopy()
+		controllerutil.AddFinalizer(machineClass, computev1alpha1.MachineClassFinalizer)
+		if err := r.Patch(ctx, machineClass, client.MergeFrom(old)); err != nil {
 			return ctrl.Result{}, fmt.Errorf("adding the finalizer: %w", err)
 		}
 
@@ -57,8 +57,8 @@ func (r *MachineClassReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		return ctrl.Result{Requeue: true}, nil
 	}
 
-	if !mClass.DeletionTimestamp.IsZero() {
-		return r.reconcileDeletion(ctx, mClass)
+	if !machineClass.DeletionTimestamp.IsZero() {
+		return r.reconcileDeletion(ctx, machineClass)
 	}
 
 	return ctrl.Result{}, nil
@@ -87,10 +87,10 @@ func (r *MachineClassReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-func (r *MachineClassReconciler) reconcileDeletion(ctx context.Context, mClass *computev1alpha1.MachineClass) (ctrl.Result, error) {
+func (r *MachineClassReconciler) reconcileDeletion(ctx context.Context, machineClass *computev1alpha1.MachineClass) (ctrl.Result, error) {
 	// List the machines currently using the MachineClass
 	mList := &computev1alpha1.MachineList{}
-	if err := r.List(ctx, mList, client.InNamespace(mClass.Namespace), client.MatchingFields{machineClassNameField: mClass.Name}); err != nil {
+	if err := r.List(ctx, mList, client.InNamespace(machineClass.Namespace), client.MatchingFields{machineClassNameField: machineClass.Name}); err != nil {
 		return ctrl.Result{}, fmt.Errorf("listing the machines using the MachineClass: %w", err)
 	}
 
@@ -100,9 +100,9 @@ func (r *MachineClassReconciler) reconcileDeletion(ctx context.Context, mClass *
 	}
 
 	// Remove the finalizer in the machineclass and persist the new state
-	old := mClass.DeepCopy()
-	controllerutil.RemoveFinalizer(mClass, computev1alpha1.MachineClassFinalizer)
-	if err := r.Patch(ctx, mClass, client.MergeFrom(old)); err != nil {
+	old := machineClass.DeepCopy()
+	controllerutil.RemoveFinalizer(machineClass, computev1alpha1.MachineClassFinalizer)
+	if err := r.Patch(ctx, machineClass, client.MergeFrom(old)); err != nil {
 		return ctrl.Result{}, fmt.Errorf("removing the finalizer: %w", err)
 	}
 	return ctrl.Result{}, nil

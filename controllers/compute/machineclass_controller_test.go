@@ -31,13 +31,13 @@ var _ = Describe("machineclass controller", func() {
 	ns := SetupTest(ctx)
 	It("removes the finalizer from machineclass only if there's no machine still using the machineclass", func() {
 		By("creating the machineclass consumed by the machine")
-		mClass := &computev1alpha1.MachineClass{
+		machineClass := &computev1alpha1.MachineClass{
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "machineclass-",
 			},
 			Spec: computev1alpha1.MachineClassSpec{},
 		}
-		Expect(k8sClient.Create(ctx, mClass)).Should(Succeed())
+		Expect(k8sClient.Create(ctx, machineClass)).Should(Succeed())
 
 		By("creating the machine")
 		m := &computev1alpha1.Machine{
@@ -47,25 +47,25 @@ var _ = Describe("machineclass controller", func() {
 			},
 			Spec: computev1alpha1.MachineSpec{
 				MachineClass: corev1.LocalObjectReference{
-					Name: mClass.Name,
+					Name: machineClass.Name,
 				},
 			},
 		}
 		Expect(k8sClient.Create(ctx, m)).Should(Succeed())
 
 		By("checking the machineclass and its finalizer consistently exist upon deletion ")
-		Expect(k8sClient.Delete(ctx, mClass)).Should(Succeed())
+		Expect(k8sClient.Delete(ctx, machineClass)).Should(Succeed())
 
-		mClassKey := client.ObjectKeyFromObject(mClass)
+		machineClassKey := client.ObjectKeyFromObject(machineClass)
 		Consistently(func() []string {
-			Expect(k8sClient.Get(ctx, mClassKey, mClass))
-			return mClass.Finalizers
+			Expect(k8sClient.Get(ctx, machineClassKey, machineClass))
+			return machineClass.Finalizers
 		}, interval).Should(ContainElement(computev1alpha1.MachineClassFinalizer))
 
 		By("checking the machineclass is eventually gone after the deletion of the machine")
 		Expect(k8sClient.Delete(ctx, m)).Should(Succeed())
 		Eventually(func() bool {
-			err := k8sClient.Get(ctx, mClassKey, mClass)
+			err := k8sClient.Get(ctx, machineClassKey, machineClass)
 			Expect(client.IgnoreNotFound(err)).To(BeEmpty(), "errors other than `not found` are not expected")
 			return apierrors.IsNotFound(err)
 		}, timeout, interval).Should(BeTrue(), "the error should be `not found`")
