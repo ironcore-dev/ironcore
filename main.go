@@ -58,14 +58,12 @@ func main() {
 	var enableLeaderElection bool
 	var probeAddr string
 	var enableWebhooks bool
-	var defaultAddr string
 	flag.BoolVar(&enableWebhooks, "enable-webhooks", true, "Enable webhooks.")
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
-	flag.StringVar(&defaultAddr, "default-address", "10.0.0.1", "The default address for ip range.")
 	opts := zap.Options{
 		Development: true,
 	}
@@ -177,9 +175,8 @@ func main() {
 
 	// IPAMRange controller
 	if err = (&networkcontrollers.IPAMRangeReconciler{
-		Client:      mgr.GetClient(),
-		Scheme:      mgr.GetScheme(),
-		DefaultAddr: defaultAddr,
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "IPAMRange")
 		os.Exit(1)

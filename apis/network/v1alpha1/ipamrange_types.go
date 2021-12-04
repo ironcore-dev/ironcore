@@ -38,7 +38,7 @@ type IPAMRangeSpec struct {
 	// Parent is the reference of the Parent IPAMRange from which the CIDR or size should be derived
 	Parent *corev1.LocalObjectReference `json:"parent,omitempty"`
 	// Items is a list of CIDR specs which are defined for this IPAMRange
-	Items []IPAMRangeItem `json:"itmes,omitempty"`
+	Items []IPAMRangeItem `json:"items,omitempty"`
 }
 
 type IPAMRangeItem struct {

@@ -42,7 +42,18 @@ import (
 	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
 	"github.com/onmetal/onmetal-api/equality"
 	"github.com/onmetal/onmetal-api/predicates"
+	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 )
+
+var AllIPs *netaddr.IPSet
+
+func init() {
+	var allIPsBuilder netaddr.IPSetBuilder
+	allIPsBuilder.AddPrefix(netaddr.MustParseIPPrefix("0.0.0.0/0"))
+	var err error
+	AllIPs, err = allIPsBuilder.IPSet()
+	utilruntime.Must(err)
+}
 
 const (
 	ipamRangeFinalizerName = network.LabelDomain + "/ipamrange"
@@ -55,8 +66,7 @@ var (
 // IPAMRangeReconciler reconciles a IPAMRange object
 type IPAMRangeReconciler struct {
 	client.Client
-	Scheme      *runtime.Scheme
-	DefaultAddr string
+	Scheme *runtime.Scheme
 }
 
 //+kubebuilder:rbac:groups=network.onmetal.de,resources=ipamranges,verbs=get;list;watch;create;update;patch;delete
@@ -218,10 +228,8 @@ func (r *IPAMRangeReconciler) fulfilledRequests(nameToChild map[string]networkv1
 				}
 
 				requests[*request] = allocation{
-					cidr:    allocStatus.CIDR,
-					ips:     allocStatus.IPs,
-					size:    allocStatus.Request.Size,
-					ipCount: allocStatus.Request.IPCount,
+					cidr: allocStatus.CIDR,
+					ips:  allocStatus.IPs,
 				}
 
 				res[child.Name] = requests
@@ -260,27 +268,19 @@ func (r *IPAMRangeReconciler) sortedRequests(items []networkv1alpha1.IPAMRange, 
 }
 
 type allocation struct {
-	ips     *commonv1alpha1.IPRange
-	cidr    *commonv1alpha1.CIDR
-	size    int32
-	ipCount int32
+	ips  *commonv1alpha1.IPRange
+	cidr *commonv1alpha1.CIDR
 }
 
 func (r *IPAMRangeReconciler) gatherAvailable(ctx context.Context, ipamRange *networkv1alpha1.IPAMRange) (available *netaddr.IPSet, parentAllocations []allocation, failed []networkv1alpha1.IPAMRangeAllocationStatus, err error) {
 	if ipamRange.Spec.Parent == nil {
 		var bldr netaddr.IPSetBuilder
-
-		var initbldr netaddr.IPSetBuilder
-		ipStr := "0.0.0.0"
-		netaddrIP, _ := netaddr.ParseIP(ipStr)
-		initialPrefix := netaddr.IPPrefixFrom(netaddrIP, 0)
-		initbldr.AddPrefix(initialPrefix)
-		set, err := initbldr.IPSet()
-		if err != nil {
-			return nil, nil, nil, err
-		}
+		var ipprefix *netaddr.IPPrefix
+		var iprange *netaddr.IPRange
+		ok := false
+		set := AllIPs
 		for _, item := range ipamRange.Spec.Items {
-			ipprefix, iprange, _, ok := r.acquireRequest(set, item)
+			ipprefix, iprange, set, ok = r.acquireRequest(set, item)
 			if ok {
 				if iprange != nil {
 					bldr.AddRange(*iprange)
@@ -288,6 +288,12 @@ func (r *IPAMRangeReconciler) gatherAvailable(ctx context.Context, ipamRange *ne
 				if ipprefix != nil {
 					bldr.AddPrefix(*ipprefix)
 				}
+			} else {
+				failed = append(failed, networkv1alpha1.IPAMRangeAllocationStatus{
+					State:   networkv1alpha1.IPAMRangeAllocationFailed,
+					Request: &item,
+					User:    &corev1.LocalObjectReference{Name: ipamRange.Name},
+				})
 			}
 		}
 		available, err := bldr.IPSet()
@@ -320,7 +326,7 @@ func (r *IPAMRangeReconciler) gatherAvailable(ctx context.Context, ipamRange *ne
 						case allocStatus.IPs != nil:
 							availableBldr.AddRange(allocStatus.IPs.Range())
 						}
-						parentAllocations = append(parentAllocations, allocation{allocStatus.IPs, allocStatus.CIDR, allocStatus.Request.Size, allocStatus.Request.IPCount})
+						parentAllocations = append(parentAllocations, allocation{allocStatus.IPs, allocStatus.CIDR})
 					} else {
 						other = append(other, networkv1alpha1.IPAMRangeAllocationStatus{
 							CIDR:    allocStatus.CIDR,
@@ -431,10 +437,7 @@ func (r *IPAMRangeReconciler) computeChildAllocations(
 		if allocated, ok := oldRequests[request]; ok {
 			request.CIDR = allocated.cidr
 			request.IPs = allocated.ips
-			request.Size = allocated.size
-			request.IPCount = allocated.ipCount
 		}
-
 		prefix, ipRange, newSet, ok := r.acquireRequest(available, request)
 		if !ok {
 			childAllocations = append(childAllocations, networkv1alpha1.IPAMRangeAllocationStatus{
