@@ -275,13 +275,12 @@ type allocation struct {
 func (r *IPAMRangeReconciler) gatherAvailable(ctx context.Context, ipamRange *networkv1alpha1.IPAMRange) (available *netaddr.IPSet, parentAllocations []allocation, failed []networkv1alpha1.IPAMRangeAllocationStatus, err error) {
 	if ipamRange.Spec.Parent == nil {
 		var bldr netaddr.IPSetBuilder
-		var ipprefix *netaddr.IPPrefix
-		var iprange *netaddr.IPRange
-		ok := false
 		set := AllIPs
 		for _, item := range ipamRange.Spec.Items {
-			ipprefix, iprange, set, ok = r.acquireRequest(set, item)
+			originalRequest := item
+			ipprefix, iprange, newSet, ok := r.acquireRequest(set, item)
 			if ok {
+				set = newSet
 				if iprange != nil {
 					bldr.AddRange(*iprange)
 				}
@@ -291,7 +290,7 @@ func (r *IPAMRangeReconciler) gatherAvailable(ctx context.Context, ipamRange *ne
 			} else {
 				failed = append(failed, networkv1alpha1.IPAMRangeAllocationStatus{
 					State:   networkv1alpha1.IPAMRangeAllocationFailed,
-					Request: &item,
+					Request: &originalRequest,
 					User:    &corev1.LocalObjectReference{Name: ipamRange.Name},
 				})
 			}
