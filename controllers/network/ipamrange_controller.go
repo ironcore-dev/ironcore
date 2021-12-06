@@ -274,31 +274,14 @@ type allocation struct {
 
 func (r *IPAMRangeReconciler) gatherAvailable(ctx context.Context, ipamRange *networkv1alpha1.IPAMRange) (available *netaddr.IPSet, parentAllocations []allocation, failed []networkv1alpha1.IPAMRangeAllocationStatus, err error) {
 	if ipamRange.Spec.Parent == nil {
-		var bldr netaddr.IPSetBuilder
+		//var bldr netaddr.IPSetBuilder
 		set := AllIPs
-		for _, item := range ipamRange.Spec.Items {
-			originalRequest := item
-			ipprefix, iprange, newSet, ok := r.acquireRequest(set, item)
-			if ok {
-				set = newSet
-				if iprange != nil {
-					bldr.AddRange(*iprange)
-				}
-				if ipprefix != nil {
-					bldr.AddPrefix(*ipprefix)
-				}
-			} else {
-				failed = append(failed, networkv1alpha1.IPAMRangeAllocationStatus{
-					State:   networkv1alpha1.IPAMRangeAllocationFailed,
-					Request: &originalRequest,
-					User:    &corev1.LocalObjectReference{Name: ipamRange.Name},
-				})
-			}
-		}
-		available, err := bldr.IPSet()
-		if err != nil {
-			return nil, nil, nil, err
-		}
+		ipamRanges := []networkv1alpha1.IPAMRange{*ipamRange}
+		nameToChild := r.mapChildNameToChild(ipamRanges)
+		fulfilledRequests := r.fulfilledRequests(nameToChild, ipamRange)
+		requests := r.sortedRequests(ipamRanges, fulfilledRequests)
+		available, _ := r.computeChildAllocations(set, fulfilledRequests, requests, false)
+
 		return available, nil, nil, err
 	}
 
@@ -423,17 +406,18 @@ func (r *IPAMRangeReconciler) acquireRequest(set *netaddr.IPSet, request network
 func (r *IPAMRangeReconciler) computeChildAllocations(
 	available *netaddr.IPSet,
 	fulfilledRequests map[string]map[networkv1alpha1.IPAMRangeItem]allocation,
-	requests []childNameAndRequest,
+	requests []childNameAndRequest, updateStatus bool,
 ) (newAvailable *netaddr.IPSet, childAllocations []networkv1alpha1.IPAMRangeAllocationStatus) {
+	var bldr netaddr.IPSetBuilder
 	for _, requestAndName := range requests {
-		originalRequest, name := requestAndName.request, requestAndName.childName
 
+		originalRequest, name := requestAndName.request, requestAndName.childName
 		// it's possible that no request from IPAMRange is fullfilled
 		oldRequests := fulfilledRequests[name]
 		// we copy the original request since we're modifying it
 		// below to force re-acquiring already allocated IPs.
 		request := originalRequest
-		if allocated, ok := oldRequests[request]; ok {
+		if allocated, ok := oldRequests[request]; ok && (allocated.cidr != nil || allocated.ips != nil) {
 			request.CIDR = allocated.cidr
 			request.IPs = allocated.ips
 		}
@@ -446,23 +430,41 @@ func (r *IPAMRangeReconciler) computeChildAllocations(
 			})
 		} else {
 			available = newSet
-			var cidr *commonv1alpha1.CIDR
-			if prefix != nil {
-				cidr = commonv1alpha1.NewCIDRPtr(*prefix)
-			}
-			var ips *commonv1alpha1.IPRange
-			if ipRange != nil {
-				ips = commonv1alpha1.NewIPRangePtr(*ipRange)
+			if updateStatus {
+				var cidr *commonv1alpha1.CIDR
+				if prefix != nil {
+					cidr = commonv1alpha1.NewCIDRPtr(*prefix)
+				}
+				var ips *commonv1alpha1.IPRange
+				if ipRange != nil {
+					ips = commonv1alpha1.NewIPRangePtr(*ipRange)
+				}
+
+				childAllocations = append(childAllocations, networkv1alpha1.IPAMRangeAllocationStatus{
+					State:   networkv1alpha1.IPAMRangeAllocationUsed,
+					CIDR:    cidr,
+					IPs:     ips,
+					Request: &originalRequest,
+					User:    &corev1.LocalObjectReference{Name: name},
+				})
+			} else {
+				available = newSet
+				if ipRange != nil {
+					bldr.AddRange(*ipRange)
+				}
+				if prefix != nil {
+					bldr.AddPrefix(*prefix)
+				}
 			}
 
-			childAllocations = append(childAllocations, networkv1alpha1.IPAMRangeAllocationStatus{
-				State:   networkv1alpha1.IPAMRangeAllocationUsed,
-				CIDR:    cidr,
-				IPs:     ips,
-				Request: &originalRequest,
-				User:    &corev1.LocalObjectReference{Name: name},
-			})
 		}
+	}
+	if !updateStatus {
+		available, err := bldr.IPSet()
+		if err != nil {
+			return nil, nil
+		}
+		return available, nil
 	}
 	return available, childAllocations
 }
@@ -536,7 +538,7 @@ func (r *IPAMRangeReconciler) reconcile(ctx context.Context, log logr.Logger, ip
 	nameToChild := r.mapChildNameToChild(list.Items)
 	fulfilledRequests := r.fulfilledRequests(nameToChild, ipamRange)
 	requests := r.sortedRequests(list.Items, fulfilledRequests)
-	newAvailable, childAllocations := r.computeChildAllocations(available, fulfilledRequests, requests)
+	newAvailable, childAllocations := r.computeChildAllocations(available, fulfilledRequests, requests, true)
 	freeAllocations := r.computeFreeAllocations(newAvailable, parentAllocations)
 	var newAllocations []networkv1alpha1.IPAMRangeAllocationStatus
 	newAllocations = append(newAllocations, childAllocations...)
