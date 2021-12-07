@@ -50,6 +50,7 @@ var AllIPs *netaddr.IPSet
 func init() {
 	var allIPsBuilder netaddr.IPSetBuilder
 	allIPsBuilder.AddPrefix(netaddr.MustParseIPPrefix("0.0.0.0/0"))
+	allIPsBuilder.AddPrefix(netaddr.MustParseIPPrefix("::/0"))
 	var err error
 	AllIPs, err = allIPsBuilder.IPSet()
 	utilruntime.Must(err)

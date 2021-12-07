@@ -454,6 +454,34 @@ var _ = Describe("IPAMRangeReconciler", func() {
 			}, timeout, interval).Should(Succeed())
 
 		})
+
+		It("should reconcile parent without children with IPv6", func() {
+			parentCIDR := commonv1alpha1.MustParseCIDR("2001:4860:4860::8888/32")
+			parent := &networkv1alpha1.IPAMRange{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "parent",
+					Namespace: ns.Name,
+				},
+				Spec: networkv1alpha1.IPAMRangeSpec{
+					Items: []networkv1alpha1.IPAMRangeItem{
+						{
+							CIDR: &parentCIDR,
+						},
+					},
+				},
+			}
+			Expect(k8sClient.Create(ctx, parent)).To(Succeed())
+			By("checking parent allocations")
+			expectedAllocations := map[string]networkv1alpha1.IPAMRangeAllocationState{
+				"2001:4860::/32": networkv1alpha1.IPAMRangeAllocationFree,
+			}
+			Eventually(func(g Gomega) {
+				key := types.NamespacedName{Name: parent.Name, Namespace: parent.Namespace}
+				obj := &networkv1alpha1.IPAMRange{}
+				g.Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
+				g.Expect(getAllocationStates(obj)).To(Equal(expectedAllocations))
+			}, timeout, interval).Should(Succeed())
+		})
 	})
 })
 
