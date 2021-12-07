@@ -406,7 +406,7 @@ func (r *IPAMRangeReconciler) acquireRequest(set *netaddr.IPSet, request network
 func (r *IPAMRangeReconciler) computeChildAllocations(
 	available *netaddr.IPSet,
 	fulfilledRequests map[string]map[networkv1alpha1.IPAMRangeItem]allocation,
-	requests []childNameAndRequest, updateStatus bool,
+	requests []childNameAndRequest, childAllocation bool,
 ) (newAvailable *netaddr.IPSet, childAllocations []networkv1alpha1.IPAMRangeAllocationStatus) {
 	var bldr netaddr.IPSetBuilder
 	for _, requestAndName := range requests {
@@ -430,36 +430,34 @@ func (r *IPAMRangeReconciler) computeChildAllocations(
 			})
 		} else {
 			available = newSet
-			if updateStatus {
-				var cidr *commonv1alpha1.CIDR
-				if prefix != nil {
-					cidr = commonv1alpha1.NewCIDRPtr(*prefix)
-				}
-				var ips *commonv1alpha1.IPRange
-				if ipRange != nil {
-					ips = commonv1alpha1.NewIPRangePtr(*ipRange)
-				}
-
-				childAllocations = append(childAllocations, networkv1alpha1.IPAMRangeAllocationStatus{
-					State:   networkv1alpha1.IPAMRangeAllocationUsed,
-					CIDR:    cidr,
-					IPs:     ips,
-					Request: &originalRequest,
-					User:    &corev1.LocalObjectReference{Name: name},
-				})
-			} else {
-				available = newSet
-				if ipRange != nil {
-					bldr.AddRange(*ipRange)
-				}
-				if prefix != nil {
-					bldr.AddPrefix(*prefix)
-				}
+			// add range and prefix to ip set builder
+			if ipRange != nil {
+				bldr.AddRange(*ipRange)
+			}
+			if prefix != nil {
+				bldr.AddPrefix(*prefix)
+			}
+			var cidr *commonv1alpha1.CIDR
+			if prefix != nil {
+				cidr = commonv1alpha1.NewCIDRPtr(*prefix)
+			}
+			var ips *commonv1alpha1.IPRange
+			if ipRange != nil {
+				ips = commonv1alpha1.NewIPRangePtr(*ipRange)
 			}
 
+			childAllocations = append(childAllocations, networkv1alpha1.IPAMRangeAllocationStatus{
+				State:   networkv1alpha1.IPAMRangeAllocationUsed,
+				CIDR:    cidr,
+				IPs:     ips,
+				Request: &originalRequest,
+				User:    &corev1.LocalObjectReference{Name: name},
+			})
 		}
 	}
-	if !updateStatus {
+	// to get available ip set for root ipam range
+	if !childAllocation {
+		// get available ip set from builder
 		available, err := bldr.IPSet()
 		if err != nil {
 			return nil, nil
