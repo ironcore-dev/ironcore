@@ -159,7 +159,7 @@ var _ = Describe("subnet controller", func() {
 			Size: int32(rangeSize),
 		}))
 
-		By("waiting for the status of the Subnet to be be up")
+		By("waiting for the status of the Subnet to be up")
 		parsedCIDR := commonv1alpha1.MustParseCIDR(fmt.Sprintf("%s/%d", cidrAddress, rangeSize))
 		childSubnetKey := client.ObjectKeyFromObject(childSubnet)
 		Eventually(func() networkv1alpha1.SubnetStatus {
