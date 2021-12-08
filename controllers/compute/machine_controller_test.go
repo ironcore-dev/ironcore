@@ -19,12 +19,9 @@ package compute
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"inet.af/netaddr"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
@@ -36,14 +33,8 @@ var _ = Describe("machine controller", func() {
 	ns := SetupTest(ctx)
 
 	It("should delete unused IPAMRanges for deleted interfaces", func() {
-		By("creating the subnet")
-		parsed, err := netaddr.ParseIPPrefix("192.168.0.0/24")
-		Expect(err).ToNot(HaveOccurred())
+		By("creating a subnet")
 		subnet := &networkv1alpha1.Subnet{
-			TypeMeta: metav1.TypeMeta{
-				APIVersion: networkv1alpha1.GroupVersion.String(),
-				Kind:       networkv1alpha1.SubnetGK.Kind,
-			},
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
 				GenerateName: "subnet-",
@@ -51,113 +42,84 @@ var _ = Describe("machine controller", func() {
 			Spec: networkv1alpha1.SubnetSpec{
 				Ranges: []networkv1alpha1.RangeType{
 					{
-						CIDR: &commonv1alpha1.CIDR{
-							IPPrefix: parsed,
-						},
+						CIDR: commonv1alpha1.PtrToCIDR(commonv1alpha1.MustParseCIDR("192.168.0.0/24")),
 					},
 				},
 			},
 		}
 		Expect(k8sClient.Create(ctx, subnet)).To(Succeed())
 
-		if1 := computev1alpha1.Interface{Name: "test-if1", Target: corev1.LocalObjectReference{Name: subnet.Name}}
-		if2 := computev1alpha1.Interface{Name: "test-if2", Target: corev1.LocalObjectReference{Name: subnet.Name}}
+		By("creating a machine")
+		iface1 := computev1alpha1.Interface{Name: "test-if1", Target: corev1.LocalObjectReference{Name: subnet.Name}}
+		iface2 := computev1alpha1.Interface{Name: "test-if2", Target: corev1.LocalObjectReference{Name: subnet.Name}}
 		machine := &computev1alpha1.Machine{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "with-interfaces",
-				Namespace: ns.Name,
+				GenerateName: "interfaces-",
+				Namespace:    ns.Name,
 			},
 			Spec: computev1alpha1.MachineSpec{
-				Interfaces: []computev1alpha1.Interface{if1, if2},
+				Interfaces: []computev1alpha1.Interface{iface1, iface2},
 			},
 		}
-
-		By("creating the machine")
 		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
 
-		By("checking that IPAMRanges are created")
+		By("waiting for the corresponding IPAMRanges to be created")
+		ipamRange1 := &networkv1alpha1.IPAMRange{}
+		ipamRangeKey1 := client.ObjectKey{
+			Namespace: ns.Name,
+			Name:      computev1alpha1.MachineInterfaceIPAMRangeName(machine.Name, iface1.Name),
+		}
+		ipamRange2 := &networkv1alpha1.IPAMRange{}
+		ipamRangeKey2 := client.ObjectKey{
+			Namespace: ns.Name,
+			Name:      computev1alpha1.MachineInterfaceIPAMRangeName(machine.Name, iface2.Name),
+		}
 		Eventually(func(g Gomega) {
-			key1 := types.NamespacedName{
-				Name:      computev1alpha1.MachineInterfaceIPAMRangeName(machine.Name, if1.Name),
-				Namespace: ns.Name,
-			}
-			obj1 := &networkv1alpha1.IPAMRange{}
-			err := k8sClient.Get(ctx, key1, obj1)
+			err := k8sClient.Get(ctx, ipamRangeKey1, ipamRange1)
 			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
 			g.Expect(err).NotTo(HaveOccurred())
 
-			key2 := types.NamespacedName{
-				Name:      computev1alpha1.MachineInterfaceIPAMRangeName(machine.Name, if2.Name),
-				Namespace: ns.Name,
-			}
-			obj2 := &networkv1alpha1.IPAMRange{}
-			err = k8sClient.Get(ctx, key2, obj2)
+			err = k8sClient.Get(ctx, ipamRangeKey2, ipamRange2)
 			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
 			g.Expect(err).NotTo(HaveOccurred())
 		}, timeout, interval).Should(Succeed())
 
-		By("checking the IPAMRange associated with deleted interface is also deleted")
-		updMachine := &computev1alpha1.Machine{}
-		Expect(k8sClient.Get(ctx, types.NamespacedName{
-			Name:      machine.Name,
-			Namespace: machine.Namespace,
-		}, updMachine)).ToNot(HaveOccurred())
-		Expect(updMachine.Spec.Interfaces).To(Equal([]computev1alpha1.Interface{if1, if2}))
-		updMachine.Spec.Interfaces = []computev1alpha1.Interface{if2}
-		Expect(k8sClient.Update(ctx, updMachine)).To(Succeed())
+		By("removing the first interface from the machine")
+		machineBase := machine.DeepCopy()
+		machine.Spec.Interfaces = []computev1alpha1.Interface{iface2}
+		Expect(k8sClient.Patch(ctx, machine, client.MergeFrom(machineBase))).To(Succeed())
 
+		By("waiting for the corresponding IPAMRange of the interface to be gone")
 		Eventually(func(g Gomega) {
-			// One IPAMRange should be deleted
-			key1 := types.NamespacedName{
-				Name:      computev1alpha1.MachineInterfaceIPAMRangeName(machine.Name, if1.Name),
-				Namespace: ns.Name,
-			}
-			obj1 := &networkv1alpha1.IPAMRange{}
-			g.Expect(errors.IsNotFound(k8sClient.Get(ctx, key1, obj1))).To(BeTrue(), "IsNotFound error expected")
+			err := k8sClient.Get(ctx, ipamRangeKey1, ipamRange1)
+			g.Expect(errors.IsNotFound(err)).To(BeTrue(), "expected not found but got %v", err)
 
-			// Another one should still exist
-			key2 := types.NamespacedName{
-				Name:      computev1alpha1.MachineInterfaceIPAMRangeName(machine.Name, if2.Name),
-				Namespace: ns.Name,
-			}
-			obj2 := &networkv1alpha1.IPAMRange{}
-			err := k8sClient.Get(ctx, key2, obj2)
-			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
+			err = k8sClient.Get(ctx, ipamRangeKey2, ipamRange2)
 			g.Expect(err).NotTo(HaveOccurred())
 		}, timeout, interval).Should(Succeed())
 	})
 
-	It("reconciles a machine without interface", func() {
-		By("creating the machine")
-		m := &computev1alpha1.Machine{
-			TypeMeta: metav1.TypeMeta{
-				APIVersion: computev1alpha1.GroupVersion.String(),
-				Kind:       machineKind,
-			},
+	It("should reconcile a machine without any interface", func() {
+		By("creating a machine")
+		machine := &computev1alpha1.Machine{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
 				GenerateName: "machine-",
 			},
 		}
-		Expect(k8sClient.Create(ctx, m)).To(Succeed())
+		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
 
-		By("checking if the machine's status gets reconciled")
-		key := client.ObjectKeyFromObject(m)
+		By("asserting the interfaces in the machine's status stay empty")
+		key := client.ObjectKeyFromObject(machine)
 		Consistently(func() []computev1alpha1.InterfaceStatus {
-			Expect(k8sClient.Get(ctx, key, m)).To(Succeed())
-			return m.Status.Interfaces
+			Expect(k8sClient.Get(ctx, key, machine)).To(Succeed())
+			return machine.Status.Interfaces
 		}, timeout, interval).Should(BeEmpty())
 	})
 
 	It("reconciles a machine owning interfaces with IP", func() {
-		By("creating the subnet")
-		parsed, err := netaddr.ParseIPPrefix("192.168.0.0/24")
-		Expect(err).ToNot(HaveOccurred())
+		By("creating a subnet")
 		subnet := &networkv1alpha1.Subnet{
-			TypeMeta: metav1.TypeMeta{
-				APIVersion: networkv1alpha1.GroupVersion.String(),
-				Kind:       networkv1alpha1.SubnetGK.Kind,
-			},
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
 				GenerateName: "subnet-",
@@ -165,116 +127,84 @@ var _ = Describe("machine controller", func() {
 			Spec: networkv1alpha1.SubnetSpec{
 				Ranges: []networkv1alpha1.RangeType{
 					{
-						CIDR: &commonv1alpha1.CIDR{
-							IPPrefix: parsed,
-						},
+						CIDR: commonv1alpha1.PtrToCIDR(commonv1alpha1.MustParseCIDR("192.168.0.0/24")),
 					},
 				},
 			},
 		}
 		Expect(k8sClient.Create(ctx, subnet)).To(Succeed())
 
-		m := &computev1alpha1.Machine{
-			TypeMeta: metav1.TypeMeta{
-				APIVersion: computev1alpha1.GroupVersion.String(),
-				Kind:       machineKind,
-			},
+		By("creating a machine")
+		iface1 := computev1alpha1.Interface{
+			Name:     "iface-1",
+			IP:       commonv1alpha1.PtrToIPAddr(commonv1alpha1.MustParseIPAddr("192.168.0.0")),
+			Priority: 0,
+			Target:   corev1.LocalObjectReference{Name: subnet.Name},
+		}
+		iface2 := computev1alpha1.Interface{
+			Name:     "iface-2",
+			IP:       commonv1alpha1.PtrToIPAddr(commonv1alpha1.MustParseIPAddr("192.168.0.1")),
+			Priority: 1,
+			Target:   corev1.LocalObjectReference{Name: subnet.Name},
+		}
+		machine := &computev1alpha1.Machine{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
 				GenerateName: "machine-",
 			},
-		}
-		ifaces := []computev1alpha1.Interface{
-			{
-				Name:     "iface-0",
-				IP:       commonv1alpha1.PtrToIPAddr(commonv1alpha1.MustParseIPAddr("192.168.0.0")),
-				Priority: 0,
-				Target:   corev1.LocalObjectReference{Name: subnet.Name},
+			Spec: computev1alpha1.MachineSpec{
+				Interfaces: []computev1alpha1.Interface{iface1, iface2},
 			},
-			{
+		}
+		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+
+		By("waiting for the IPAMRanges of the interfaces to be ready")
+		ipamRange1 := &networkv1alpha1.IPAMRange{}
+		ipamRangeKey1 := client.ObjectKey{Namespace: ns.Name, Name: computev1alpha1.MachineInterfaceIPAMRangeName(machine.Name, iface1.Name)}
+		ipamRange2 := &networkv1alpha1.IPAMRange{}
+		ipamRangeKey2 := client.ObjectKey{Namespace: ns.Name, Name: computev1alpha1.MachineInterfaceIPAMRangeName(machine.Name, iface2.Name)}
+		Eventually(func(g Gomega) {
+			err := k8sClient.Get(ctx, ipamRangeKey1, ipamRange1)
+			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
+			g.Expect(err).NotTo(HaveOccurred())
+
+			g.Expect(ipamRange1.Spec.Parent.Name).To(Equal(networkv1alpha1.SubnetIPAMName(iface1.Target.Name)))
+			g.Expect(ipamRange1.Spec.Requests).To(ConsistOf(networkv1alpha1.IPAMRangeRequest{
+				IPs: commonv1alpha1.PtrToIPRange(commonv1alpha1.IPRangeFrom(*iface1.IP, *iface1.IP)),
+			}))
+
+			err = k8sClient.Get(ctx, ipamRangeKey2, ipamRange2)
+			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
+			g.Expect(err).NotTo(HaveOccurred())
+
+			g.Expect(ipamRange2.Spec.Parent.Name).To(Equal(networkv1alpha1.SubnetIPAMName(iface2.Target.Name)))
+			g.Expect(ipamRange2.Spec.Requests).To(ConsistOf(networkv1alpha1.IPAMRangeRequest{
+				IPs: commonv1alpha1.PtrToIPRange(commonv1alpha1.IPRangeFrom(*iface2.IP, *iface2.IP)),
+			}))
+		}, timeout, interval).Should(Succeed())
+
+		By("waiting for the machine's status to be updated")
+		machineKey := client.ObjectKeyFromObject(machine)
+		Eventually(func() []computev1alpha1.InterfaceStatus {
+			Expect(k8sClient.Get(ctx, machineKey, machine)).To(Succeed())
+			return machine.Status.Interfaces
+		}, timeout, interval).Should(ConsistOf(
+			computev1alpha1.InterfaceStatus{
 				Name:     "iface-1",
-				IP:       commonv1alpha1.PtrToIPAddr(commonv1alpha1.MustParseIPAddr("192.168.0.1")),
-				Priority: 1,
-				Target:   corev1.LocalObjectReference{Name: subnet.Name},
-			},
-		}
-		m.Spec.Interfaces = ifaces
-
-		By("creating the machine")
-		Expect(k8sClient.Create(ctx, m)).To(Succeed())
-
-		rngs := []*networkv1alpha1.IPAMRange{}
-		for _, iface := range m.Spec.Interfaces {
-			rng := &networkv1alpha1.IPAMRange{
-				ObjectMeta: metav1.ObjectMeta{
-					Namespace: m.Namespace,
-					Name:      computev1alpha1.MachineInterfaceIPAMRangeName(m.Name, iface.Name),
-				},
-			}
-			rngs = append(rngs, rng)
-		}
-
-		for i, rng := range rngs {
-			By("fetching the corresponding IPAMRange")
-			key := client.ObjectKeyFromObject(rng)
-			Eventually(func() error {
-				err := k8sClient.Get(ctx, key, rng)
-
-				// Errors other than `not-found` shouldn't exist
-				Expect(client.IgnoreNotFound(err)).To(Succeed())
-				return err
-			}, timeout, interval).Should(Succeed())
-
-			By("checking if the parent of the IPAMRange corresponds to the target of the interface")
-			Expect(rng.Spec.Parent.Name).To(Equal(networkv1alpha1.SubnetIPAMName(ifaces[i].Target.Name)))
-
-			By("checking if the request of the IPAMRange corresponds to the IP of the machine's interface")
-			ifaceIP := ifaces[i].IP
-			Expect(rng.Spec.Requests[0]).To(Equal(networkv1alpha1.IPAMRangeRequest{
-				IPs: commonv1alpha1.NewIPRangePtr(netaddr.IPRangeFrom(ifaceIP.IP, ifaceIP.IP)),
-			}))
-
-			By("checking the OwnerReferences of the IPAMRange contain the machine")
-			Expect(rng.OwnerReferences).To(ContainElement(metav1.OwnerReference{
-				APIVersion:         computev1alpha1.GroupVersion.String(),
-				Kind:               machineKind,
-				Name:               m.Name,
-				UID:                m.UID,
-				BlockOwnerDeletion: pointer.BoolPtr(true),
-				Controller:         pointer.BoolPtr(true),
-			}))
-		}
-
-		By("checking if the machine's status gets reconciled")
-		expectedIfaceStatuses := []computev1alpha1.InterfaceStatus{
-			{
-				Name:     "iface-0",
 				IP:       commonv1alpha1.MustParseIPAddr("192.168.0.0"),
 				Priority: 0,
 			},
-			{
-				Name:     "iface-1",
+			computev1alpha1.InterfaceStatus{
+				Name:     "iface-2",
 				IP:       commonv1alpha1.MustParseIPAddr("192.168.0.1"),
 				Priority: 1,
 			},
-		}
-
-		key := client.ObjectKeyFromObject(m)
-		Eventually(func() []computev1alpha1.InterfaceStatus {
-			Expect(k8sClient.Get(ctx, key, m)).To(Succeed())
-			return m.Status.Interfaces
-		}, timeout, interval).Should(Equal(expectedIfaceStatuses))
+		))
 	})
 
-	It("reconciles a machine owning interfaces without IP", func() {
-		By("creating the subnet")
-		parsed, err := netaddr.ParseIPPrefix("192.168.0.0/24")
-		Expect(err).ToNot(HaveOccurred())
+	It("should reconcile machines having interfaces with no IP", func() {
+		By("creating a subnet")
 		subnet := &networkv1alpha1.Subnet{
-			TypeMeta: metav1.TypeMeta{
-				APIVersion: networkv1alpha1.GroupVersion.String(),
-				Kind:       networkv1alpha1.SubnetGK.Kind,
-			},
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
 				GenerateName: "subnet-",
@@ -282,104 +212,106 @@ var _ = Describe("machine controller", func() {
 			Spec: networkv1alpha1.SubnetSpec{
 				Ranges: []networkv1alpha1.RangeType{
 					{
-						CIDR: &commonv1alpha1.CIDR{
-							IPPrefix: parsed,
-						},
+						CIDR: commonv1alpha1.PtrToCIDR(commonv1alpha1.MustParseCIDR("192.168.0.0/24")),
 					},
 				},
 			},
 		}
 		Expect(k8sClient.Create(ctx, subnet)).To(Succeed())
 
-		m := &computev1alpha1.Machine{
-			TypeMeta: metav1.TypeMeta{
-				APIVersion: computev1alpha1.GroupVersion.String(),
-				Kind:       machineKind,
-			},
+		By("creating a machine")
+		iface1 := computev1alpha1.Interface{
+			Name:   "iface-1",
+			Target: corev1.LocalObjectReference{Name: subnet.Name},
+		}
+		iface2 := computev1alpha1.Interface{
+			Name:   "iface-2",
+			Target: corev1.LocalObjectReference{Name: subnet.Name},
+		}
+		machine := &computev1alpha1.Machine{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
 				GenerateName: "machine-",
 			},
-		}
-		ifaces := []computev1alpha1.Interface{
-			{
-				Name:   "iface-0",
-				Target: corev1.LocalObjectReference{Name: subnet.Name},
-			},
-			{
-				Name:   "iface-1",
-				Target: corev1.LocalObjectReference{Name: subnet.Name},
+			Spec: computev1alpha1.MachineSpec{
+				Interfaces: []computev1alpha1.Interface{iface1, iface2},
 			},
 		}
-		m.Spec.Interfaces = ifaces
+		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
 
-		By("creating the machine")
-		Expect(k8sClient.Create(ctx, m)).To(Succeed())
+		By("waiting for the IPAMRanges to be created and up-to-date")
+		ipamRange1 := &networkv1alpha1.IPAMRange{}
+		ipamRangeKey1 := client.ObjectKey{Namespace: machine.Namespace, Name: computev1alpha1.MachineInterfaceIPAMRangeName(machine.Name, iface1.Name)}
+		var ifaceIP1 commonv1alpha1.IPAddr
+		ipamRange2 := &networkv1alpha1.IPAMRange{}
+		ipamRangeKey2 := client.ObjectKey{Namespace: machine.Namespace, Name: computev1alpha1.MachineInterfaceIPAMRangeName(machine.Name, iface2.Name)}
+		var ifaceIP2 commonv1alpha1.IPAddr
 
-		rngs := []*networkv1alpha1.IPAMRange{}
-		for _, iface := range m.Spec.Interfaces {
-			rng := &networkv1alpha1.IPAMRange{
-				ObjectMeta: metav1.ObjectMeta{
-					Namespace: m.Namespace,
-					Name:      computev1alpha1.MachineInterfaceIPAMRangeName(m.Name, iface.Name),
+		Eventually(func(g Gomega) {
+			By("getting the first IPAMRange")
+			err := k8sClient.Get(ctx, ipamRangeKey1, ipamRange1)
+			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
+			g.Expect(err).NotTo(HaveOccurred())
+
+			By("verifying the spec of the first IPAMRange")
+			g.Expect(ipamRange1.Spec).To(Equal(networkv1alpha1.IPAMRangeSpec{
+				Parent: &corev1.LocalObjectReference{
+					Name: networkv1alpha1.SubnetIPAMName(subnet.Name),
 				},
-			}
-			rngs = append(rngs, rng)
-		}
-
-		for i, rng := range rngs {
-			By("fetching the corresponding IPAMRange")
-			key := client.ObjectKeyFromObject(rng)
-			Eventually(func() error {
-				err := k8sClient.Get(ctx, key, rng)
-
-				// Errors other than `not-found` shouldn't exist
-				Expect(client.IgnoreNotFound(err)).To(Succeed())
-				return err
-			}, timeout, interval).Should(Succeed())
-
-			By("checking if the parent of the IPAMRange corresponds to the target of the interface")
-			Expect(rng.Spec.Parent.Name).To(Equal(networkv1alpha1.SubnetIPAMName(ifaces[i].Target.Name)))
-
-			By("checking if the IP count in the IPAMRange request equals 1")
-			Expect(rng.Spec.Requests[0].IPCount).To(Equal(int32(1)))
-
-			By("checking the OwnerReferences of the IPAMRange contain the machine")
-			Expect(rng.OwnerReferences).To(ContainElement(metav1.OwnerReference{
-				APIVersion:         computev1alpha1.GroupVersion.String(),
-				Kind:               machineKind,
-				Name:               m.Name,
-				UID:                m.UID,
-				BlockOwnerDeletion: pointer.BoolPtr(true),
-				Controller:         pointer.BoolPtr(true),
+				Requests: []networkv1alpha1.IPAMRangeRequest{
+					{
+						IPCount: 1,
+					},
+				},
 			}))
-		}
 
-		By("checking if the machine's status gets reconciled")
-		key := client.ObjectKeyFromObject(m)
-		Eventually(func() []computev1alpha1.InterfaceStatus {
-			Expect(k8sClient.Get(ctx, key, m)).To(Succeed())
-			return m.Status.Interfaces
-		}, timeout, interval).ShouldNot(BeEmpty())
+			By("verifying the first IPAMRange has allocated an IP")
+			g.Expect(ipamRange1.Status.Allocations).To(HaveLen(1))
+			allocation := ipamRange1.Status.Allocations[0]
+			g.Expect(allocation.IPs).NotTo(BeNil())
+			ifaceIP1 = allocation.IPs.From
 
-		iface0 := m.Status.Interfaces[0]
-		Expect(iface0.Name).To(Equal("iface-0"))
-		Expect(iface0.Priority).To(Equal(int32(0)))
+			By("getting the second IPAMRange")
+			err = k8sClient.Get(ctx, ipamRangeKey2, ipamRange2)
+			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
+			g.Expect(err).NotTo(HaveOccurred())
 
-		iface1 := m.Status.Interfaces[1]
-		Expect(iface1.Name).To(Equal("iface-1"))
-		Expect(iface1.Priority).To(Equal(int32(0)))
+			By("verifying the spec of the second IPAMRange")
+			g.Expect(ipamRange2.Spec).To(Equal(networkv1alpha1.IPAMRangeSpec{
+				Parent: &corev1.LocalObjectReference{
+					Name: networkv1alpha1.SubnetIPAMName(subnet.Name),
+				},
+				Requests: []networkv1alpha1.IPAMRangeRequest{
+					{
+						IPCount: 1,
+					},
+				},
+			}))
 
-		subnetIPRange := subnet.Spec.Ranges[0].CIDR.IPPrefix.Range()
-		ip0 := iface0.IP.IP
-		ip1 := iface1.IP.IP
-		Expect(subnetIPRange.Contains(ip0)).To(BeTrue(), "The Subnet IP range contains the IP.")
-		Expect(subnetIPRange.Contains(ip1)).To(BeTrue(), "The Subnet IP range contains the IP.")
-		Expect(ip0.Compare(ip1) != 0).To(BeTrue(), "Two IP addresses are different.")
+			By("verifying the second IPAMRange has allocated an IP")
+			g.Expect(ipamRange2.Status.Allocations).To(HaveLen(1))
+			allocation = ipamRange2.Status.Allocations[0]
+			g.Expect(allocation.IPs).NotTo(BeNil())
+			ifaceIP2 = allocation.IPs.From
+		}, timeout, interval).Should(Succeed())
+
+		By("waiting for the machine status interfaces to contain the IPs")
+		machineKey := client.ObjectKeyFromObject(machine)
+		Eventually(func(g Gomega) []computev1alpha1.InterfaceStatus {
+			Expect(k8sClient.Get(ctx, machineKey, machine)).To(Succeed())
+
+			return machine.Status.Interfaces
+		}, timeout, interval).Should(ConsistOf(
+			computev1alpha1.InterfaceStatus{
+				Name:     "iface-1",
+				IP:       ifaceIP1,
+				Priority: 0,
+			},
+			computev1alpha1.InterfaceStatus{
+				Name:     "iface-2",
+				IP:       ifaceIP2,
+				Priority: 0,
+			},
+		))
 	})
 })
-
-const (
-	// test data
-	machineKind = "Machine"
-)
