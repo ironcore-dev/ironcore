@@ -58,7 +58,6 @@ func (r *StorageClassReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	// return ctrl.Result{}, nil
 	return r.reconcileExists(ctx, log, sc)
 }
 
@@ -109,7 +108,6 @@ func (r *StorageClassReconciler) delete(ctx context.Context, log logr.Logger, sc
 			volumeNames += vv[i].Name + ", "
 		}
 		err := errors.New(fmt.Sprintf("the following volumes still using the volumeclass: %s", volumeNames))
-
 		log.Error(err, "Forbidden to delete the volumeclass which is still used by volumes")
 		return ctrl.Result{}, nil
 	}

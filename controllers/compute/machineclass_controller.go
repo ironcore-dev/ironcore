@@ -102,7 +102,6 @@ func (r *MachineClassReconciler) delete(ctx context.Context, log logr.Logger, ma
 			machineNames = append(machineNames, mm[i].Name)
 		}
 		err := fmt.Errorf("the following machines still using the machineclass: %v", machineNames)
-
 		log.Error(err, "Forbidden to delete the machineclass which is still used by machines")
 		return ctrl.Result{}, nil
 	}
