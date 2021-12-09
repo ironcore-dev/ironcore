@@ -21,10 +21,8 @@ import (
 	"errors"
 	"fmt"
 
-	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/workqueue"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -46,7 +44,6 @@ var errStorageClassDeletionForbidden = errors.New("forbidden to delete the stora
 type StorageClassReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
-	Events record.EventRecorder
 }
 
 //+kubebuilder:rbac:groups=storage.onmetal.de,resources=storageclasses,verbs=get;list;watch;create;update;patch;delete
@@ -114,7 +111,6 @@ func (r *StorageClassReconciler) delete(ctx context.Context, log logr.Logger, sc
 		err := errors.New(fmt.Sprintf("the following volumes still using the volumeclass: %s", volumeNames))
 
 		log.Error(err, "Forbidden to delete the volumeclass which is still used by volumes")
-		r.Events.Eventf(sc, corev1.EventTypeWarning, "ForbiddenToDelete", err.Error())
 		return ctrl.Result{}, nil
 	}
 

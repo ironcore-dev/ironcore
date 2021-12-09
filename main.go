@@ -119,7 +119,6 @@ func main() {
 	if err = (&storagecontrollers.StorageClassReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
-		Events: mgr.GetEventRecorderFor("storageclass-controller"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "StorageClass")
 		os.Exit(1)
