@@ -127,6 +127,9 @@ func (r *StorageClassReconciler) reconcile(ctx context.Context, log logr.Logger,
 
 func (r *StorageClassReconciler) reconcileExists(ctx context.Context, log logr.Logger, sc *storagev1alpha1.StorageClass) (ctrl.Result, error) {
 	if !sc.DeletionTimestamp.IsZero() {
+		if !controllerutil.ContainsFinalizer(sc, storagev1alpha1.StorageClassFinalizer) {
+			return ctrl.Result{}, nil
+		}
 		return r.delete(ctx, log, sc)
 	}
 
