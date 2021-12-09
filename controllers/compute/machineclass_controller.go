@@ -62,9 +62,7 @@ func (r *MachineClassReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		if err := r.Patch(ctx, machineClass, client.MergeFrom(old)); err != nil {
 			return ctrl.Result{}, fmt.Errorf("adding the finalizer: %w", err)
 		}
-
-		// Requeue since the machineclass can be simultaneously updated by multiple parties
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{}, nil
 	}
 
 	return r.reconcileExists(ctx, log, machineClass)

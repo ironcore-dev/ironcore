@@ -67,9 +67,7 @@ func (r *StorageClassReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		if err := r.Patch(ctx, sc, client.MergeFrom(old)); err != nil {
 			return ctrl.Result{}, fmt.Errorf("adding the finalizer: %w", err)
 		}
-
-		// Requeue since the storageclass can be simultaneously updated by multiple parties
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{}, nil
 	}
 
 	// return ctrl.Result{}, nil
