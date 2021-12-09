@@ -21,10 +21,8 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/workqueue"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -40,7 +38,6 @@ import (
 type MachineClassReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
-	Events record.EventRecorder
 }
 
 //+kubebuilder:rbac:groups=compute.onmetal.de,resources=machineclasses,verbs=get;list;watch;create;update;patch;delete
@@ -116,7 +113,6 @@ func (r *MachineClassReconciler) delete(ctx context.Context, log logr.Logger, ma
 		err := fmt.Errorf("the following machines still using the machineclass: %v", machineNames)
 
 		log.Error(err, "Forbidden to delete the machineclass which is still used by machines")
-		r.Events.Eventf(machineClass, corev1.EventTypeWarning, "ForbiddenToDelete", err.Error())
 		return ctrl.Result{}, nil
 	}
 
