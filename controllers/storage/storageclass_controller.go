@@ -18,7 +18,6 @@ package storage
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"k8s.io/apimachinery/pkg/runtime"
@@ -37,8 +36,6 @@ import (
 )
 
 const storageClassNameField = ".spec.storageclass.name"
-
-var errStorageClassDeletionForbidden = errors.New("forbidden to delete the storageclass used by a volume")
 
 // StorageClassReconciler reconciles a StorageClass object
 type StorageClassReconciler struct {

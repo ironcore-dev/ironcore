@@ -48,7 +48,6 @@ const (
 )
 
 var (
-	cancel    context.CancelFunc
 	cfg       *rest.Config
 	ctx       = ctrl.SetupSignalHandler()
 	k8sClient client.Client
