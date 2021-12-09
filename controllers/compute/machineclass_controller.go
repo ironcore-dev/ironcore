@@ -18,7 +18,6 @@ package compute
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/go-logr/logr"
@@ -110,11 +109,11 @@ func (r *MachineClassReconciler) delete(ctx context.Context, log logr.Logger, ma
 	// Check if there's still any machine using the MachineClass
 	if mm := mList.Items; len(mm) != 0 {
 		// List the machine names still using the machineclass in the error message
-		machineNames := ""
+		machineNames := []string{}
 		for i := range mm {
-			machineNames += mm[i].Name + ", "
+			machineNames = append(machineNames, mm[i].Name)
 		}
-		err := errors.New(fmt.Sprintf("the following machines still using the machineclass: %s", machineNames))
+		err := fmt.Errorf("the following machines still using the machineclass: %v", machineNames)
 
 		log.Error(err, "Forbidden to delete the machineclass which is still used by machines")
 		r.Events.Eventf(machineClass, corev1.EventTypeWarning, "ForbiddenToDelete", err.Error())
