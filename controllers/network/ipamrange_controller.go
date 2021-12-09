@@ -411,7 +411,9 @@ func (r *IPAMRangeReconciler) computeChildAllocations(
 ) (newAvailable *netaddr.IPSet, childAllocations []networkv1alpha1.IPAMRangeAllocationStatus) {
 	var bldr netaddr.IPSetBuilder
 	for _, requestAndName := range requests {
-
+		if childAllocation && requestAndName.request.Reserved {
+			continue
+		}
 		originalRequest, name := requestAndName.request, requestAndName.childName
 		// it's possible that no request from IPAMRange is fullfilled
 		oldRequests := fulfilledRequests[name]

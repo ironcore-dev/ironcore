@@ -47,7 +47,8 @@ type IPAMRangeItem struct {
 	CIDR *commonv1alpha1.CIDR    `json:"cidr,omitempty"`
 	IPs  *commonv1alpha1.IPRange `json:"ips,omitempty"`
 	// IPCount requests a consecutive IP range of the given size.
-	IPCount int32 `json:"ipCount,omitempty"`
+	IPCount  int32 `json:"ipCount,omitempty"`
+	Reserved bool  `json:"reserved,omitempty"`
 }
 
 // IPAMRangeStatus defines the observed state of IPAMRange
