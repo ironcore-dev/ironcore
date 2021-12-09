@@ -109,6 +109,7 @@ func (r *StorageClassReconciler) delete(ctx context.Context, log logr.Logger, sc
 		}
 		err := fmt.Errorf("the following volumes still using the volumeclass: %v", volumeNames)
 		log.Error(err, "Forbidden to delete the volumeclass which is still used by volumes")
+
 		return ctrl.Result{}, nil
 	}
 
@@ -118,6 +119,8 @@ func (r *StorageClassReconciler) delete(ctx context.Context, log logr.Logger, sc
 	if err := r.Patch(ctx, sc, client.MergeFrom(old)); err != nil {
 		return ctrl.Result{}, fmt.Errorf("removing the finalizer: %w", err)
 	}
+	log.V(1).Info("Successfully removed finalizer")
+
 	return ctrl.Result{}, nil
 }
 

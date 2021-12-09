@@ -103,6 +103,7 @@ func (r *MachineClassReconciler) delete(ctx context.Context, log logr.Logger, ma
 		}
 		err := fmt.Errorf("the following machines still using the machineclass: %v", machineNames)
 		log.Error(err, "Forbidden to delete the machineclass which is still used by machines")
+
 		return ctrl.Result{}, nil
 	}
 
@@ -112,6 +113,8 @@ func (r *MachineClassReconciler) delete(ctx context.Context, log logr.Logger, ma
 	if err := r.Patch(ctx, machineClass, client.MergeFrom(old)); err != nil {
 		return ctrl.Result{}, fmt.Errorf("removing the finalizer: %w", err)
 	}
+	log.V(1).Info("Successfully removed finalizer")
+
 	return ctrl.Result{}, nil
 }
 
