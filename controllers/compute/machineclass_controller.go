@@ -122,6 +122,9 @@ func (r *MachineClassReconciler) reconcile(ctx context.Context, log logr.Logger,
 
 func (r *MachineClassReconciler) reconcileExists(ctx context.Context, log logr.Logger, machineClass *computev1alpha1.MachineClass) (ctrl.Result, error) {
 	if !machineClass.DeletionTimestamp.IsZero() {
+		if !controllerutil.ContainsFinalizer(machineClass, computev1alpha1.MachineClassFinalizer) {
+			return ctrl.Result{}, nil
+		}
 		return r.delete(ctx, log, machineClass)
 	}
 
