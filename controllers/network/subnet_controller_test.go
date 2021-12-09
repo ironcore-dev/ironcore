@@ -170,4 +170,121 @@ var _ = Describe("subnet controller", func() {
 			"CIDRs": ContainElement(parsedCIDR),
 		}))
 	})
+
+	It("reconciles two child-subnets with the same parent", func() {
+		By("creating a parent-subnet")
+		parentSubnet := &networkv1alpha1.Subnet{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "parent-subnet-",
+			},
+			Spec: networkv1alpha1.SubnetSpec{
+				Ranges: []networkv1alpha1.RangeType{
+					{
+						CIDR: &testCIDR,
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, parentSubnet)).Should(Succeed())
+
+		By("creating the first child-subnet")
+		childRangeSize := 30
+		firstChildSubnet := &networkv1alpha1.Subnet{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "child-subnet-",
+			},
+			Spec: networkv1alpha1.SubnetSpec{
+				Parent: &corev1.LocalObjectReference{
+					Name: parentSubnet.Name,
+				},
+				Ranges: []networkv1alpha1.RangeType{
+					{
+						Size: int32(childRangeSize),
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, firstChildSubnet)).Should(Succeed())
+
+		By("creating the second child-subnet")
+		secondChildSubnet := &networkv1alpha1.Subnet{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "child-subnet-",
+			},
+			Spec: networkv1alpha1.SubnetSpec{
+				Parent: &corev1.LocalObjectReference{
+					Name: parentSubnet.Name,
+				},
+				Ranges: []networkv1alpha1.RangeType{
+					{
+						Size: int32(childRangeSize),
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, secondChildSubnet)).Should(Succeed())
+
+		By("waiting for the first child-ipam-range to be created and have the correct requests in spec")
+		firstIPAMRangeKey := client.ObjectKey{Namespace: firstChildSubnet.Namespace, Name: networkv1alpha1.SubnetIPAMName(firstChildSubnet.Name)}
+		firstIPAMRange := &networkv1alpha1.IPAMRange{}
+		Eventually(func(g Gomega) []networkv1alpha1.IPAMRangeRequest {
+			err := k8sClient.Get(ctx, firstIPAMRangeKey, firstIPAMRange)
+			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
+			g.Expect(err).NotTo(HaveOccurred())
+			return firstIPAMRange.Spec.Requests
+		}, timeout, interval).Should(ContainElement(networkv1alpha1.IPAMRangeRequest{
+			Size: int32(childRangeSize),
+		}))
+
+		By("waiting for the second-ipam-range to be created and have the correct requests in spec")
+		secondIPAMRangeKey := client.ObjectKey{Namespace: secondChildSubnet.Namespace, Name: networkv1alpha1.SubnetIPAMName(secondChildSubnet.Name)}
+		secondIPAMRange := &networkv1alpha1.IPAMRange{}
+		Eventually(func(g Gomega) []networkv1alpha1.IPAMRangeRequest {
+			err := k8sClient.Get(ctx, secondIPAMRangeKey, secondIPAMRange)
+			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
+			g.Expect(err).NotTo(HaveOccurred())
+			return secondIPAMRange.Spec.Requests
+		}, timeout, interval).Should(ContainElement(networkv1alpha1.IPAMRangeRequest{
+			Size: int32(childRangeSize),
+		}))
+
+		By("waiting for the status of the first child-subnet to be up")
+		firstChildSubnetKey := client.ObjectKeyFromObject(firstChildSubnet)
+		Eventually(func(g Gomega) networkv1alpha1.SubnetStatus {
+			err := k8sClient.Get(ctx, firstChildSubnetKey, firstChildSubnet)
+			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
+			g.Expect(err).ToNot(HaveOccurred())
+			return firstChildSubnet.Status
+		}, timeout, interval).Should(MatchFields(IgnoreMissing|IgnoreExtras, Fields{
+			"State": Equal(networkv1alpha1.SubnetStateUp),
+			"CIDRs": Not(BeEmpty()),
+		}))
+
+		By("waiting for the status of the second child-subnet to be up")
+		secondChildSubnetKey := client.ObjectKeyFromObject(secondChildSubnet)
+		Eventually(func(g Gomega) networkv1alpha1.SubnetStatus {
+			err := k8sClient.Get(ctx, secondChildSubnetKey, secondChildSubnet)
+			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
+			g.Expect(err).ToNot(HaveOccurred())
+			return secondChildSubnet.Status
+		}, timeout, interval).Should(MatchFields(IgnoreMissing|IgnoreExtras, Fields{
+			"State": Equal(networkv1alpha1.SubnetStateUp),
+			"CIDRs": Not(BeEmpty()),
+		}))
+
+		By("checking if the two child-subnets have non-overlapping CIDRs")
+		firstSubenetIPRange := firstChildSubnet.Status.CIDRs[0].IPPrefix.Range()
+		secondSubenetIPRange := secondChildSubnet.Status.CIDRs[0].IPPrefix.Range()
+		Expect(firstSubenetIPRange.Overlaps(secondSubenetIPRange)).To(BeFalse(), "Two child-subnets should have non-overlapping CIDRs.")
+
+		By("checking if both child-subnets originate from the parent-subnet")
+		parentSubnetIPRange := testCIDR.IPPrefix.Range()
+		Expect(parentSubnetIPRange.Contains(firstSubenetIPRange.From())).To(BeTrue(), "The parent-subnet contains the start of the child-subnet.")
+		Expect(parentSubnetIPRange.Contains(firstSubenetIPRange.To())).To(BeTrue(), "The parent-subnet contains the end of the child-subnet.")
+		Expect(parentSubnetIPRange.Contains(secondSubenetIPRange.From())).To(BeTrue(), "The parent-subnet contains the start of the child-subnet.")
+		Expect(parentSubnetIPRange.Contains(secondSubenetIPRange.To())).To(BeTrue(), "The parent-subnet contains the end of the child-subnet.")
+	})
 })
