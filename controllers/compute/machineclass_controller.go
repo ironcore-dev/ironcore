@@ -52,15 +52,6 @@ func (r *MachineClassReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	if !controllerutil.ContainsFinalizer(machineClass, computev1alpha1.MachineClassFinalizer) {
-		old := machineClass.DeepCopy()
-		controllerutil.AddFinalizer(machineClass, computev1alpha1.MachineClassFinalizer)
-		if err := r.Patch(ctx, machineClass, client.MergeFrom(old)); err != nil {
-			return ctrl.Result{}, fmt.Errorf("adding the finalizer: %w", err)
-		}
-		return ctrl.Result{}, nil
-	}
-
 	return r.reconcileExists(ctx, log, machineClass)
 }
 
@@ -133,5 +124,15 @@ func (r *MachineClassReconciler) reconcileExists(ctx context.Context, log logr.L
 	if !machineClass.DeletionTimestamp.IsZero() {
 		return r.delete(ctx, log, machineClass)
 	}
+
+	if !controllerutil.ContainsFinalizer(machineClass, computev1alpha1.MachineClassFinalizer) {
+		old := machineClass.DeepCopy()
+		controllerutil.AddFinalizer(machineClass, computev1alpha1.MachineClassFinalizer)
+		if err := r.Patch(ctx, machineClass, client.MergeFrom(old)); err != nil {
+			return ctrl.Result{}, fmt.Errorf("adding the finalizer: %w", err)
+		}
+		return ctrl.Result{}, nil
+	}
+
 	return r.reconcile(ctx, log, machineClass)
 }

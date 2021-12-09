@@ -61,15 +61,6 @@ func (r *StorageClassReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	if !controllerutil.ContainsFinalizer(sc, storagev1alpha1.StorageClassFinalizer) {
-		old := sc.DeepCopy()
-		controllerutil.AddFinalizer(sc, storagev1alpha1.StorageClassFinalizer)
-		if err := r.Patch(ctx, sc, client.MergeFrom(old)); err != nil {
-			return ctrl.Result{}, fmt.Errorf("adding the finalizer: %w", err)
-		}
-		return ctrl.Result{}, nil
-	}
-
 	// return ctrl.Result{}, nil
 	return r.reconcileExists(ctx, log, sc)
 }
@@ -144,5 +135,15 @@ func (r *StorageClassReconciler) reconcileExists(ctx context.Context, log logr.L
 	if !sc.DeletionTimestamp.IsZero() {
 		return r.delete(ctx, log, sc)
 	}
+
+	if !controllerutil.ContainsFinalizer(sc, storagev1alpha1.StorageClassFinalizer) {
+		old := sc.DeepCopy()
+		controllerutil.AddFinalizer(sc, storagev1alpha1.StorageClassFinalizer)
+		if err := r.Patch(ctx, sc, client.MergeFrom(old)); err != nil {
+			return ctrl.Result{}, fmt.Errorf("adding the finalizer: %w", err)
+		}
+		return ctrl.Result{}, nil
+	}
+
 	return r.reconcile(ctx, log, sc)
 }
