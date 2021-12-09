@@ -30,7 +30,7 @@ patchesStrategicMerge:
   #- patches/webhook_in_reservedips.yaml
   #- patches/webhook_in_securitygroups.yaml
   #- patches/webhook_in_subnets.yaml
-  #- patches/webhook_in_machines.yaml
+  - patches/webhook_in_machines.yaml
   #- patches/webhook_in_routingdomain.yaml
   #- patches/webhook_in_ipamranges.yaml
   #- patches/webhook_in_gateways.yaml
