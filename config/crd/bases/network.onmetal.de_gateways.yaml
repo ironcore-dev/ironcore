@@ -76,6 +76,15 @@ spec:
                 type: array
               mode:
                 type: string
+              subnet:
+                description: Subnet is the reference to the Subnet where the Gateway
+                  resides
+                properties:
+                  name:
+                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                      TODO: Add other useful fields. apiVersion, kind, uid?'
+                    type: string
+                type: object
               uplink:
                 description: Uplink is a Target to route traffic to.
                 properties:
@@ -115,6 +124,7 @@ spec:
                 type: object
             required:
             - mode
+            - subnet
             - uplink
             type: object
           status:

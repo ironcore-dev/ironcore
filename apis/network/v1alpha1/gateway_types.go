@@ -17,9 +17,12 @@
 package v1alpha1
 
 import (
-	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	"fmt"
+
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	common "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 )
 
 type GatewayMode string
@@ -39,6 +42,9 @@ type GatewaySpec struct {
 	FilterRules []FilterRule `json:"filterRules,omitempty"`
 	// Uplink is a Target to route traffic to.
 	Uplink Target `json:"uplink"`
+
+	// Subnet is the reference to the Subnet where the Gateway resides
+	Subnet corev1.LocalObjectReference `json:"subnet"`
 }
 
 type FilterRule struct {
@@ -101,6 +107,11 @@ type GatewayList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []Gateway `json:"items"`
+}
+
+// GatewayIPAMRangeName returns the name of the ipamrange which corresponds to the gw's subnet
+func GatewayIPAMRangeName(gw *Gateway) string {
+	return fmt.Sprintf("gateway-%s", gw.Name)
 }
 
 func init() {
