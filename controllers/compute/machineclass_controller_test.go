@@ -55,17 +55,20 @@ var _ = Describe("machineclass controller", func() {
 
 		By("checking the finalizer was added")
 		machineClassKey := client.ObjectKeyFromObject(machineClass)
-		Eventually(func() []string {
+		Eventually(func(g Gomega) []string {
 			err := k8sClient.Get(ctx, machineClassKey, machineClass)
 			Expect(client.IgnoreNotFound(err)).To(Succeed(), "errors other than `not found` are not expected")
+			g.Expect(err).NotTo(HaveOccurred())
 			return machineClass.Finalizers
 		}, interval).Should(ContainElement(computev1alpha1.MachineClassFinalizer))
 
 		By("checking the machineclass and its finalizer consistently exist upon deletion ")
 		Expect(k8sClient.Delete(ctx, machineClass)).Should(Succeed())
 
-		Consistently(func() []string {
-			Expect(k8sClient.Get(ctx, machineClassKey, machineClass))
+		Consistently(func(g Gomega) []string {
+			err := k8sClient.Get(ctx, machineClassKey, machineClass)
+			Expect(client.IgnoreNotFound(err)).To(Succeed(), "errors other than `not found` are not expected")
+			g.Expect(err).NotTo(HaveOccurred())
 			return machineClass.Finalizers
 		}, interval).Should(ContainElement(computev1alpha1.MachineClassFinalizer))
 
