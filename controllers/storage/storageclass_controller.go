@@ -50,12 +50,12 @@ type StorageClassReconciler struct {
 // Reconcile moves the current state of the cluster closer to the desired state.
 func (r *StorageClassReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
-	sc := &storagev1alpha1.StorageClass{}
-	if err := r.Get(ctx, req.NamespacedName, sc); err != nil {
+	storageclass := &storagev1alpha1.StorageClass{}
+	if err := r.Get(ctx, req.NamespacedName, storageclass); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	return r.reconcileExists(ctx, log, sc)
+	return r.reconcileExists(ctx, log, storageclass)
 }
 
 // SetupWithManager sets up the controller with the Manager.
@@ -90,10 +90,10 @@ func (r *StorageClassReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-func (r *StorageClassReconciler) delete(ctx context.Context, log logr.Logger, sc *storagev1alpha1.StorageClass) (ctrl.Result, error) {
+func (r *StorageClassReconciler) delete(ctx context.Context, log logr.Logger, storageclass *storagev1alpha1.StorageClass) (ctrl.Result, error) {
 	// List the volumes currently using the storageclass
 	vList := &storagev1alpha1.VolumeList{}
-	if err := r.List(ctx, vList, client.InNamespace(sc.Namespace), client.MatchingFields{storageClassNameField: sc.Name}); err != nil {
+	if err := r.List(ctx, vList, client.InNamespace(storageclass.Namespace), client.MatchingFields{storageClassNameField: storageclass.Name}); err != nil {
 		return ctrl.Result{}, fmt.Errorf("listing the volumes using the storageclass: %w", err)
 	}
 
@@ -111,9 +111,9 @@ func (r *StorageClassReconciler) delete(ctx context.Context, log logr.Logger, sc
 	}
 
 	// Remove the finalizer in the storageclass and persist the new state
-	old := sc.DeepCopy()
-	controllerutil.RemoveFinalizer(sc, storagev1alpha1.StorageClassFinalizer)
-	if err := r.Patch(ctx, sc, client.MergeFrom(old)); err != nil {
+	old := storageclass.DeepCopy()
+	controllerutil.RemoveFinalizer(storageclass, storagev1alpha1.StorageClassFinalizer)
+	if err := r.Patch(ctx, storageclass, client.MergeFrom(old)); err != nil {
 		return ctrl.Result{}, fmt.Errorf("removing the finalizer: %w", err)
 	}
 	log.V(1).Info("Successfully removed finalizer")
@@ -121,26 +121,26 @@ func (r *StorageClassReconciler) delete(ctx context.Context, log logr.Logger, sc
 	return ctrl.Result{}, nil
 }
 
-func (r *StorageClassReconciler) reconcile(ctx context.Context, log logr.Logger, sc *storagev1alpha1.StorageClass) (ctrl.Result, error) {
+func (r *StorageClassReconciler) reconcile(ctx context.Context, log logr.Logger, storageclass *storagev1alpha1.StorageClass) (ctrl.Result, error) {
 	return ctrl.Result{}, nil
 }
 
-func (r *StorageClassReconciler) reconcileExists(ctx context.Context, log logr.Logger, sc *storagev1alpha1.StorageClass) (ctrl.Result, error) {
-	if !sc.DeletionTimestamp.IsZero() {
-		if !controllerutil.ContainsFinalizer(sc, storagev1alpha1.StorageClassFinalizer) {
+func (r *StorageClassReconciler) reconcileExists(ctx context.Context, log logr.Logger, storageclass *storagev1alpha1.StorageClass) (ctrl.Result, error) {
+	if !storageclass.DeletionTimestamp.IsZero() {
+		if !controllerutil.ContainsFinalizer(storageclass, storagev1alpha1.StorageClassFinalizer) {
 			return ctrl.Result{}, nil
 		}
-		return r.delete(ctx, log, sc)
+		return r.delete(ctx, log, storageclass)
 	}
 
-	if !controllerutil.ContainsFinalizer(sc, storagev1alpha1.StorageClassFinalizer) {
-		old := sc.DeepCopy()
-		controllerutil.AddFinalizer(sc, storagev1alpha1.StorageClassFinalizer)
-		if err := r.Patch(ctx, sc, client.MergeFrom(old)); err != nil {
+	if !controllerutil.ContainsFinalizer(storageclass, storagev1alpha1.StorageClassFinalizer) {
+		old := storageclass.DeepCopy()
+		controllerutil.AddFinalizer(storageclass, storagev1alpha1.StorageClassFinalizer)
+		if err := r.Patch(ctx, storageclass, client.MergeFrom(old)); err != nil {
 			return ctrl.Result{}, fmt.Errorf("adding the finalizer: %w", err)
 		}
 		return ctrl.Result{}, nil
 	}
 
-	return r.reconcile(ctx, log, sc)
+	return r.reconcile(ctx, log, storageclass)
 }
