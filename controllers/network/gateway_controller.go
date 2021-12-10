@@ -105,7 +105,7 @@ func newIPAMRangeFromGateway(gw *networkv1alpha1.Gateway) *networkv1alpha1.IPAMR
 			Parent: &corev1.LocalObjectReference{
 				Name: networkv1alpha1.SubnetIPAMName(gw.Spec.Subnet.Name),
 			},
-			Requests: []networkv1alpha1.IPAMRangeRequest{{IPCount: 1}},
+			Items: []networkv1alpha1.IPAMRangeItem{{IPCount: 1}},
 		},
 	}
 }
