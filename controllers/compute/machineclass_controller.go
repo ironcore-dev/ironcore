@@ -89,16 +89,16 @@ func (r *MachineClassReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 func (r *MachineClassReconciler) delete(ctx context.Context, log logr.Logger, machineClass *computev1alpha1.MachineClass) (ctrl.Result, error) {
 	// List the machines currently using the MachineClass
-	mList := &computev1alpha1.MachineList{}
-	if err := r.List(ctx, mList, client.InNamespace(machineClass.Namespace), client.MatchingFields{machineClassNameField: machineClass.Name}); err != nil {
+	machineList := &computev1alpha1.MachineList{}
+	if err := r.List(ctx, machineList, client.InNamespace(machineClass.Namespace), client.MatchingFields{machineClassNameField: machineClass.Name}); err != nil {
 		return ctrl.Result{}, fmt.Errorf("listing the machines using the MachineClass: %w", err)
 	}
 
 	// Check if there's still any machine using the MachineClass
-	if len(mList.Items) != 0 {
+	if len(machineList.Items) != 0 {
 		// List the names of the machines still using the machineclass
-		machineNames := make([]string, 0, len(mList.Items))
-		for _, machine := range mList.Items {
+		machineNames := make([]string, 0, len(machineList.Items))
+		for _, machine := range machineList.Items {
 			machineNames = append(machineNames, machine.Name)
 		}
 		log.Info("Forbidden to delete the machineclass which is still used by machines", "machine names", machineNames)

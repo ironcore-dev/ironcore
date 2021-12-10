@@ -92,16 +92,16 @@ func (r *StorageClassReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 func (r *StorageClassReconciler) delete(ctx context.Context, log logr.Logger, storageclass *storagev1alpha1.StorageClass) (ctrl.Result, error) {
 	// List the volumes currently using the storageclass
-	vList := &storagev1alpha1.VolumeList{}
-	if err := r.List(ctx, vList, client.InNamespace(storageclass.Namespace), client.MatchingFields{storageClassNameField: storageclass.Name}); err != nil {
+	volumeList := &storagev1alpha1.VolumeList{}
+	if err := r.List(ctx, volumeList, client.InNamespace(storageclass.Namespace), client.MatchingFields{storageClassNameField: storageclass.Name}); err != nil {
 		return ctrl.Result{}, fmt.Errorf("listing the volumes using the storageclass: %w", err)
 	}
 
 	// Check if there's still any volume using the storageclass
-	if len(vList.Items) != 0 {
+	if len(volumeList.Items) != 0 {
 		// List the names of the volumes still using the storageclass
-		volumeNames := make([]string, 0, len(vList.Items))
-		for _, volume := range vList.Items {
+		volumeNames := make([]string, 0, len(volumeList.Items))
+		for _, volume := range volumeList.Items {
 			volumeNames = append(volumeNames, volume.Name)
 		}
 		log.Info("Forbidden to delete the volumeclass which is still used by volumes", "volume names", volumeNames)
