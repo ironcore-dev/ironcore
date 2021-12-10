@@ -88,6 +88,10 @@ func (r *MachineClassReconciler) SetupWithManager(mgr ctrl.Manager) error {
 }
 
 func (r *MachineClassReconciler) delete(ctx context.Context, log logr.Logger, machineClass *computev1alpha1.MachineClass) (ctrl.Result, error) {
+	if !controllerutil.ContainsFinalizer(machineClass, computev1alpha1.MachineClassFinalizer) {
+		return ctrl.Result{}, nil
+	}
+
 	// List the machines currently using the MachineClass
 	machineList := &computev1alpha1.MachineList{}
 	if err := r.List(ctx, machineList, client.InNamespace(machineClass.Namespace), client.MatchingFields{machineClassNameField: machineClass.Name}); err != nil {
@@ -118,17 +122,6 @@ func (r *MachineClassReconciler) delete(ctx context.Context, log logr.Logger, ma
 }
 
 func (r *MachineClassReconciler) reconcile(ctx context.Context, log logr.Logger, machineClass *computev1alpha1.MachineClass) (ctrl.Result, error) {
-	return ctrl.Result{}, nil
-}
-
-func (r *MachineClassReconciler) reconcileExists(ctx context.Context, log logr.Logger, machineClass *computev1alpha1.MachineClass) (ctrl.Result, error) {
-	if !machineClass.DeletionTimestamp.IsZero() {
-		if !controllerutil.ContainsFinalizer(machineClass, computev1alpha1.MachineClassFinalizer) {
-			return ctrl.Result{}, nil
-		}
-		return r.delete(ctx, log, machineClass)
-	}
-
 	if !controllerutil.ContainsFinalizer(machineClass, computev1alpha1.MachineClassFinalizer) {
 		old := machineClass.DeepCopy()
 		controllerutil.AddFinalizer(machineClass, computev1alpha1.MachineClassFinalizer)
@@ -138,5 +131,12 @@ func (r *MachineClassReconciler) reconcileExists(ctx context.Context, log logr.L
 		return ctrl.Result{}, nil
 	}
 
+	return ctrl.Result{}, nil
+}
+
+func (r *MachineClassReconciler) reconcileExists(ctx context.Context, log logr.Logger, machineClass *computev1alpha1.MachineClass) (ctrl.Result, error) {
+	if !machineClass.DeletionTimestamp.IsZero() {
+		return r.delete(ctx, log, machineClass)
+	}
 	return r.reconcile(ctx, log, machineClass)
 }

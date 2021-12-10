@@ -91,6 +91,10 @@ func (r *StorageClassReconciler) SetupWithManager(mgr ctrl.Manager) error {
 }
 
 func (r *StorageClassReconciler) delete(ctx context.Context, log logr.Logger, storageclass *storagev1alpha1.StorageClass) (ctrl.Result, error) {
+	if !controllerutil.ContainsFinalizer(storageclass, storagev1alpha1.StorageClassFinalizer) {
+		return ctrl.Result{}, nil
+	}
+
 	// List the volumes currently using the storageclass
 	volumeList := &storagev1alpha1.VolumeList{}
 	if err := r.List(ctx, volumeList, client.InNamespace(storageclass.Namespace), client.MatchingFields{storageClassNameField: storageclass.Name}); err != nil {
@@ -121,17 +125,6 @@ func (r *StorageClassReconciler) delete(ctx context.Context, log logr.Logger, st
 }
 
 func (r *StorageClassReconciler) reconcile(ctx context.Context, log logr.Logger, storageclass *storagev1alpha1.StorageClass) (ctrl.Result, error) {
-	return ctrl.Result{}, nil
-}
-
-func (r *StorageClassReconciler) reconcileExists(ctx context.Context, log logr.Logger, storageclass *storagev1alpha1.StorageClass) (ctrl.Result, error) {
-	if !storageclass.DeletionTimestamp.IsZero() {
-		if !controllerutil.ContainsFinalizer(storageclass, storagev1alpha1.StorageClassFinalizer) {
-			return ctrl.Result{}, nil
-		}
-		return r.delete(ctx, log, storageclass)
-	}
-
 	if !controllerutil.ContainsFinalizer(storageclass, storagev1alpha1.StorageClassFinalizer) {
 		old := storageclass.DeepCopy()
 		controllerutil.AddFinalizer(storageclass, storagev1alpha1.StorageClassFinalizer)
@@ -141,5 +134,12 @@ func (r *StorageClassReconciler) reconcileExists(ctx context.Context, log logr.L
 		return ctrl.Result{}, nil
 	}
 
+	return ctrl.Result{}, nil
+}
+
+func (r *StorageClassReconciler) reconcileExists(ctx context.Context, log logr.Logger, storageclass *storagev1alpha1.StorageClass) (ctrl.Result, error) {
+	if !storageclass.DeletionTimestamp.IsZero() {
+		return r.delete(ctx, log, storageclass)
+	}
 	return r.reconcile(ctx, log, storageclass)
 }
