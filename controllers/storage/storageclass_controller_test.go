@@ -60,7 +60,7 @@ var _ = Describe("storageclass controller", func() {
 			Expect(client.IgnoreNotFound(err)).To(Succeed(), "errors other than `not found` are not expected")
 			g.Expect(err).NotTo(HaveOccurred())
 			return sc.Finalizers
-		}, interval).Should(ContainElement(storagev1alpha1.StorageClassFinalizer))
+		}, timeout, interval).Should(ContainElement(storagev1alpha1.StorageClassFinalizer))
 
 		By("checking the storageclass and its finalizer consistently exist upon deletion ")
 		Expect(k8sClient.Delete(ctx, sc)).Should(Succeed())
@@ -70,7 +70,7 @@ var _ = Describe("storageclass controller", func() {
 			Expect(client.IgnoreNotFound(err)).To(Succeed(), "errors other than `not found` are not expected")
 			g.Expect(err).NotTo(HaveOccurred())
 			return sc.Finalizers
-		}, interval).Should(ContainElement(storagev1alpha1.StorageClassFinalizer))
+		}, timeout).Should(ContainElement(storagev1alpha1.StorageClassFinalizer))
 
 		By("checking the storageclass is eventually gone after the deletion of the volume")
 		Expect(k8sClient.Delete(ctx, vol)).Should(Succeed())

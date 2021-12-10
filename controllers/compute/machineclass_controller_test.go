@@ -60,7 +60,7 @@ var _ = Describe("machineclass controller", func() {
 			Expect(client.IgnoreNotFound(err)).To(Succeed(), "errors other than `not found` are not expected")
 			g.Expect(err).NotTo(HaveOccurred())
 			return machineClass.Finalizers
-		}, interval).Should(ContainElement(computev1alpha1.MachineClassFinalizer))
+		}, timeout, interval).Should(ContainElement(computev1alpha1.MachineClassFinalizer))
 
 		By("checking the machineclass and its finalizer consistently exist upon deletion ")
 		Expect(k8sClient.Delete(ctx, machineClass)).Should(Succeed())
@@ -70,7 +70,7 @@ var _ = Describe("machineclass controller", func() {
 			Expect(client.IgnoreNotFound(err)).To(Succeed(), "errors other than `not found` are not expected")
 			g.Expect(err).NotTo(HaveOccurred())
 			return machineClass.Finalizers
-		}, interval).Should(ContainElement(computev1alpha1.MachineClassFinalizer))
+		}, timeout).Should(ContainElement(computev1alpha1.MachineClassFinalizer))
 
 		By("checking the machineclass is eventually gone after the deletion of the machine")
 		Expect(k8sClient.Delete(ctx, m)).Should(Succeed())
