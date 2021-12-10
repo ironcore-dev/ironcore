@@ -21,10 +21,6 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
-	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
-	"github.com/onmetal/onmetal-api/equality"
-	"github.com/onmetal/onmetal-api/predicates"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -32,6 +28,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
+
+	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
+	"github.com/onmetal/onmetal-api/predicates"
 )
 
 const subnetFieldOwner = client.FieldOwner("networking.onmetal.de/subnet")
@@ -118,12 +118,7 @@ func (r *SubnetReconciler) reconcile(ctx context.Context, log logr.Logger, subne
 		if allocation.State == networkv1alpha1.IPAMRangeAllocationFailed || allocation.CIDR == nil {
 			continue
 		}
-
-		for _, request := range items {
-			if equality.Semantic.DeepEqual(allocation.Request, request) {
-				cidrs = append(cidrs, *request.CIDR)
-			}
-		}
+		cidrs = append(cidrs, *allocation.CIDR)
 	}
 
 	updated := subnet.DeepCopy()

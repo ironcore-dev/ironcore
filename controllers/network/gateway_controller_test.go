@@ -153,11 +153,8 @@ var _ = Describe("gateway controller", func() {
 					Parent: &corev1.LocalObjectReference{
 						Name: networkv1alpha1.SubnetIPAMName(gw.Spec.Subnet.Name),
 					},
-<<<<<<< HEAD
-					Requests: []networkv1alpha1.IPAMRangeRequest{{IPCount: 1}},
-=======
+
 					Items: []networkv1alpha1.IPAMRangeItem{{IPCount: 1}},
->>>>>>> ecc91ad (add reserved field to ipamRangeItem)
 				},
 			}
 			ipamRangeKey := client.ObjectKeyFromObject(ipamRange)
