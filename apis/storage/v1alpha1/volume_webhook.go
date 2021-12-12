@@ -17,7 +17,6 @@
 package v1alpha1
 
 import (
-	"fmt"
 	"reflect"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -51,7 +50,6 @@ var _ webhook.Validator = &Volume{}
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
 func (r *Volume) ValidateCreate() error {
 	volumelog.Info("validate create", "name", r.Name)
-	fmt.Println("------------------>")
 	// TODO(user): fill in your validation logic upon object creation.
 	return nil
 }
