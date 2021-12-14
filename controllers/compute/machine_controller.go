@@ -37,6 +37,7 @@ import (
 )
 
 const (
+	machineClassNameField      = ".spec.machineClass.name"
 	machineOwnerLabel          = "compute.onmetal.de/machine-owner"
 	machineInterfaceFieldOwner = client.FieldOwner("compute.onmetal.de/machine-iface")
 )

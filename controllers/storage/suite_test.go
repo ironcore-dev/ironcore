@@ -18,12 +18,15 @@ package storage
 
 import (
 	"context"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
+	"path/filepath"
+	"testing"
+	"time"
+
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"path/filepath"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"testing"
+
+	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -39,9 +42,17 @@ import (
 // These tests use Ginkgo (BDD-style Go testing framework). Refer to
 // http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
 
-var cfg *rest.Config
-var k8sClient client.Client
-var testEnv *envtest.Environment
+const (
+	interval = 50 * time.Millisecond
+	timeout  = 3 * time.Second
+)
+
+var (
+	cfg       *rest.Config
+	ctx       = ctrl.SetupSignalHandler()
+	k8sClient client.Client
+	testEnv   *envtest.Environment
+)
 
 func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -97,9 +108,19 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 		Expect(err).ToNot(HaveOccurred())
 
 		// register reconciler here
+		Expect((&VolumeReconciler{
+			Client: k8sManager.GetClient(),
+			Scheme: k8sManager.GetScheme(),
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
 		Expect((&VolumeScheduler{
 			Client: k8sManager.GetClient(),
 			Events: k8sManager.GetEventRecorderFor("volume-scheduler"),
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
+		Expect((&StorageClassReconciler{
+			Client: k8sManager.GetClient(),
+			Scheme: k8sManager.GetScheme(),
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		go func() {

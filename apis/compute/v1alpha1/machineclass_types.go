@@ -21,6 +21,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+var (
+	// MachineClassFinalizer
+	MachineClassFinalizer = GroupVersion.Group + "/machineclass"
+)
+
 // MachineClassSpec defines the desired state of MachineClass
 type MachineClassSpec struct {
 	// Capabilities describes the resources a machine class can provide.
