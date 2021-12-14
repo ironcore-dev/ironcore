@@ -19,7 +19,14 @@ package v1alpha1
 import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
+
+// VolumeGK is a helper to easily access the GroupKind information of an Volume
+var VolumeGK = schema.GroupKind{
+	Group: GroupVersion.Group,
+	Kind:  "Volume",
+}
 
 // VolumeSpec defines the desired state of Volume
 type VolumeSpec struct {

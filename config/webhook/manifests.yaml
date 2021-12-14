@@ -77,3 +77,24 @@ webhooks:
     resources:
     - ipamranges
   sideEffects: None
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-storage-onmetal-de-v1alpha1-volume
+  failurePolicy: Fail
+  name: vvolume.kb.io
+  rules:
+  - apiGroups:
+    - storage.onmetal.de
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - volumes
+  sideEffects: None

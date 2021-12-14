@@ -198,6 +198,11 @@ func main() {
 			setupLog.Error(err, "unable to create webhook", "webhook", "Machine")
 			os.Exit(1)
 		}
+
+		if err = (&storagev1alpha1.Volume{}).SetupWebhookWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create webhook", "webhook", "Volume")
+			os.Exit(1)
+		}
 	}
 
 	//+kubebuilder:scaffold:builder
