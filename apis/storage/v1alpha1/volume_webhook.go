@@ -73,10 +73,6 @@ func (r *Volume) ValidateUpdate(old runtime.Object) error {
 		allErrs = append(allErrs, field.Invalid(path.Child("storagePoolSelector"), r.Spec.StoragePoolSelector, fieldImmutable))
 	}
 
-	if !reflect.DeepEqual(r.Spec.Resources, oldRange.Spec.Resources) {
-		allErrs = append(allErrs, field.Invalid(path.Child("resources"), r.Spec.Resources, fieldImmutable))
-	}
-
 	if len(allErrs) == 0 {
 		return nil
 	}
@@ -86,7 +82,5 @@ func (r *Volume) ValidateUpdate(old runtime.Object) error {
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
 func (r *Volume) ValidateDelete() error {
 	volumelog.Info("validate delete", "name", r.Name)
-
-	// TODO(user): fill in your validation logic upon object deletion.
 	return nil
 }
