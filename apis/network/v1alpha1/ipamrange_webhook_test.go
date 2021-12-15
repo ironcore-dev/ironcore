@@ -259,38 +259,4 @@ var _ = Describe("IPAMRangeWebhook", func() {
 			)
 		})
 	})
-
-	Context("Validate IPAMRange at deletion", func() {
-		ns := SetupTest()
-
-		It("shouldn't allow to delete IPAMRange if it has used allocations", func() {
-			parentPrefix, err := netaddr.ParseIPPrefix("192.168.1.0/24")
-			Expect(err).ToNot(HaveOccurred())
-			cidr := commonv1alpha1.NewCIDR(parentPrefix)
-			instance := &IPAMRange{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "parent",
-					Namespace: ns.Name,
-				},
-				Spec: IPAMRangeSpec{
-					CIDRs: []commonv1alpha1.CIDR{cidr},
-				},
-			}
-			Expect(k8sClient.Create(ctx, instance)).To(Succeed())
-
-			instance.Status = IPAMRangeStatus{
-				Allocations: []IPAMRangeAllocationStatus{
-					{State: IPAMRangeAllocationUsed, CIDR: &cidr, User: &corev1.LocalObjectReference{Name: instance.Name}},
-				},
-			}
-			Expect(k8sClient.Status().Update(ctx, instance)).To(Succeed())
-
-			Expect(k8sClient.Delete(ctx, instance)).To(
-				WithTransform(
-					func(err error) string { return err.Error() },
-					ContainSubstring("there's still IP ranges that are in use by children"),
-				),
-			)
-		})
-	})
 })

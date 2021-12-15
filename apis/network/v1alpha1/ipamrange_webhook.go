@@ -22,7 +22,6 @@ import (
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	ctrl "sigs.k8s.io/controller-runtime"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -38,10 +37,6 @@ const (
 // log is for logging in this package.
 var (
 	ipamrangelog = logf.Log.WithName("ipamrange-resource")
-	ipamRangeGR  = schema.GroupResource{
-		Group:    IPAMRangeGK.Group,
-		Resource: IPAMRangeGK.Kind,
-	}
 )
 
 func (r *IPAMRange) SetupWebhookWithManager(mgr ctrl.Manager) error {
@@ -115,25 +110,6 @@ func (r *IPAMRange) ValidateUpdate(oldObj runtime.Object) error {
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
 func (r *IPAMRange) ValidateDelete() error {
 	ipamrangelog.Info("validate delete", "name", r.Name)
-
-	ipRanges := []string{}
-	for _, alloc := range r.Status.Allocations {
-		if alloc.State == IPAMRangeAllocationUsed {
-			if alloc.CIDR != nil {
-				ipRanges = append(ipRanges, alloc.CIDR.String())
-			} else if alloc.IPs != nil {
-				ipRanges = append(ipRanges, alloc.IPs.Range().String())
-			}
-		}
-	}
-
-	if len(ipRanges) > 0 {
-		return apierrors.NewForbidden(
-			ipamRangeGR, r.Name,
-			fmt.Errorf("there's still IP ranges that are in use by children: %v", ipRanges),
-		)
-	}
-
 	return nil
 }
 
