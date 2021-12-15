@@ -58,6 +58,17 @@ func (r *MachinePoolReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 }
 
 func (r *MachinePoolReconciler) reconcileExists(ctx context.Context, log logr.Logger, pool *computev1alpha1.MachinePool) (ctrl.Result, error) {
+	if !pool.DeletionTimestamp.IsZero() {
+		return r.delete(ctx, log, pool)
+	}
+	return r.reconcile(ctx, log, pool)
+}
+
+func (r *MachinePoolReconciler) delete(ctx context.Context, log logr.Logger, pool *computev1alpha1.MachinePool) (ctrl.Result, error) {
+	return ctrl.Result{}, nil
+}
+
+func (r *MachinePoolReconciler) reconcile(ctx context.Context, log logr.Logger, pool *computev1alpha1.MachinePool) (ctrl.Result, error) {
 	cond := &computev1alpha1.MachinePoolCondition{}
 	ok := conditionutils.MustFindSlice(pool.Status.Conditions, string(computev1alpha1.MachinePoolConditionTypeReady), cond)
 	if !ok {
