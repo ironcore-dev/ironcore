@@ -51,7 +51,7 @@ type RangeType struct {
 	// Size defines the size of a subnet e.g. 12
 	Size int32 `json:"size,omitempty"`
 	// CIDR is the CIDR block
-	CIDR *commonv1alpha1.CIDR `json:"cidr,omitempty"`
+	CIDR *commonv1alpha1.IPPrefix `json:"cidr,omitempty"`
 }
 
 type CIDRState string
@@ -68,7 +68,7 @@ type SubnetStatus struct {
 	State      SubnetState       `json:"state,omitempty"`
 	Conditions []SubnetCondition `json:"conditions,omitempty"`
 	// CIDRs is a list of CIDRs.
-	CIDRs []commonv1alpha1.CIDR `json:"cidrs,omitempty"`
+	CIDRs []commonv1alpha1.IPPrefix `json:"cidrs,omitempty"`
 }
 
 type SubnetState string

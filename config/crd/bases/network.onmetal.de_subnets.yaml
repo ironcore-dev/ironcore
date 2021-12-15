@@ -106,7 +106,7 @@ spec:
               cidrs:
                 description: CIDRs is a list of CIDRs.
                 items:
-                  description: CIDR represents a network CIDR.
+                  description: IPPrefix represents a network prefix.
                   type: string
                 type: array
               conditions:

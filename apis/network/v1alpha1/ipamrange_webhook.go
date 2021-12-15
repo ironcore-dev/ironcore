@@ -132,7 +132,7 @@ func (r *IPAMRange) overlappingParentExists() (errs field.ErrorList) {
 
 // deletedCIDRsUsed checks if some of deleted CIDRs are used by children requests
 func (r *IPAMRange) deletedCIDRsUsed(oldReq *IPAMRange) (errs field.ErrorList) {
-	deletedCIDRs := []commonv1alpha1.CIDR{}
+	var deletedCIDRs []commonv1alpha1.IPPrefix
 loop:
 	for _, cidr := range oldReq.Spec.CIDRs {
 		for _, newCidr := range r.Spec.CIDRs {

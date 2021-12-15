@@ -70,7 +70,7 @@ func (r *SubnetReconciler) reconcile(ctx context.Context, log logr.Logger, subne
 	var (
 		ipamRangeParent *corev1.LocalObjectReference
 		requests        []networkv1alpha1.IPAMRangeRequest
-		rootCIDRs       []commonv1alpha1.CIDR
+		rootCIDRs       []commonv1alpha1.IPPrefix
 	)
 	if parent := subnet.Spec.Parent; parent != nil {
 		ipamRangeParent = &corev1.LocalObjectReference{Name: networkv1alpha1.SubnetIPAMName(parent.Name)}
@@ -112,7 +112,7 @@ func (r *SubnetReconciler) reconcile(ctx context.Context, log logr.Logger, subne
 		return ctrl.Result{}, fmt.Errorf("could not apply ipam range: %w", err)
 	}
 
-	var cidrs []commonv1alpha1.CIDR
+	var cidrs []commonv1alpha1.IPPrefix
 	for _, allocation := range ipamRange.Status.Allocations {
 		if allocation.State == networkv1alpha1.IPAMRangeAllocationFailed || allocation.CIDR == nil {
 			continue

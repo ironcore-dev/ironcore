@@ -140,4 +140,47 @@ resources:
   kind: Console
   path: github.com/onmetal/onmetal-api/apis/compute/v1alpha1
   version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: onmetal.de
+  group: network
+  kind: Prefix
+  path: github.com/onmetal/onmetal-api/apis/network/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  domain: onmetal.de
+  group: network
+  kind: PrefixAllocation
+  path: github.com/onmetal/onmetal-api/apis/network/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: onmetal.de
+  group: network
+  kind: IP
+  path: github.com/onmetal/onmetal-api/apis/network/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: onmetal.de
+  group: network
+  kind: ClusterPrefix
+  path: github.com/onmetal/onmetal-api/apis/network/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  domain: onmetal.de
+  group: network
+  kind: ClusterPrefixAllocation
+  path: github.com/onmetal/onmetal-api/apis/network/v1alpha1
+  version: v1alpha1
 version: "3"

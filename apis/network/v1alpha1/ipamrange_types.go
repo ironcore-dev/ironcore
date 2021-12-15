@@ -38,15 +38,15 @@ type IPAMRangeSpec struct {
 	// Parent is the reference of the Parent IPAMRange from which the CIDR or size should be derived
 	Parent *corev1.LocalObjectReference `json:"parent,omitempty"`
 	// CIDRs is a list of CIDR specs which are defined for this IPAMRange
-	CIDRs    []commonv1alpha1.CIDR `json:"cidrs,omitempty"`
-	Requests []IPAMRangeRequest    `json:"requests,omitempty"`
+	CIDRs    []commonv1alpha1.IPPrefix `json:"cidrs,omitempty"`
+	Requests []IPAMRangeRequest        `json:"requests,omitempty"`
 }
 
 type IPAMRangeRequest struct {
 	// Size requests a CIDR of the given size.
-	Size int32                   `json:"size,omitempty"`
-	CIDR *commonv1alpha1.CIDR    `json:"cidr,omitempty"`
-	IPs  *commonv1alpha1.IPRange `json:"ips,omitempty"`
+	Size int32                    `json:"size,omitempty"`
+	CIDR *commonv1alpha1.IPPrefix `json:"cidr,omitempty"`
+	IPs  *commonv1alpha1.IPRange  `json:"ips,omitempty"`
 	// IPCount requests a consecutive IP range of the given size.
 	IPCount int32 `json:"ipCount,omitempty"`
 }
@@ -60,7 +60,7 @@ type IPAMRangeStatus struct {
 // IPAMRangeAllocationStatus is the status of an IPAMRange allocation.
 type IPAMRangeAllocationStatus struct {
 	// CIDR defines the cidr
-	CIDR    *commonv1alpha1.CIDR         `json:"cidr,omitempty"`
+	CIDR    *commonv1alpha1.IPPrefix     `json:"cidr,omitempty"`
 	IPs     *commonv1alpha1.IPRange      `json:"ips,omitempty"`
 	State   IPAMRangeAllocationState     `json:"state"`
 	Request *IPAMRangeRequest            `json:"request,omitempty"`
