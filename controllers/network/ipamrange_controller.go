@@ -416,11 +416,13 @@ func (r *IPAMRangeReconciler) computeChildAllocations(
 
 		prefix, ipRange, newSet, ok := r.acquireRequest(available, request)
 		if !ok {
-			childAllocations = append(childAllocations, networkv1alpha1.IPAMRangeAllocationStatus{
-				State:   networkv1alpha1.IPAMRangeAllocationFailed,
-				Request: &originalRequest,
-				User:    &corev1.LocalObjectReference{Name: name},
-			})
+			if !requestAndName.request.Reserved {
+				childAllocations = append(childAllocations, networkv1alpha1.IPAMRangeAllocationStatus{
+					State:   networkv1alpha1.IPAMRangeAllocationFailed,
+					Request: &originalRequest,
+					User:    &corev1.LocalObjectReference{Name: name},
+				})
+			}
 		} else {
 			available = newSet
 			var cidr *commonv1alpha1.CIDR
@@ -432,13 +434,15 @@ func (r *IPAMRangeReconciler) computeChildAllocations(
 				ips = commonv1alpha1.NewIPRangePtr(*ipRange)
 			}
 
-			childAllocations = append(childAllocations, networkv1alpha1.IPAMRangeAllocationStatus{
-				State:   networkv1alpha1.IPAMRangeAllocationUsed,
-				CIDR:    cidr,
-				IPs:     ips,
-				Request: &originalRequest,
-				User:    &corev1.LocalObjectReference{Name: name},
-			})
+			if !requestAndName.request.Reserved {
+				childAllocations = append(childAllocations, networkv1alpha1.IPAMRangeAllocationStatus{
+					State:   networkv1alpha1.IPAMRangeAllocationUsed,
+					CIDR:    cidr,
+					IPs:     ips,
+					Request: &originalRequest,
+					User:    &corev1.LocalObjectReference{Name: name},
+				})
+			}
 		}
 	}
 	return available, childAllocations
