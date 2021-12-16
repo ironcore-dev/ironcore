@@ -74,6 +74,8 @@ type IPAMRangeAllocationState string
 const (
 	// IPAMRangeAllocationFree reports that an allocation is available for use (by children or direct consumers).
 	IPAMRangeAllocationFree IPAMRangeAllocationState = "Free"
+	// IPAMRangeAllocationReserved reports that an allocation is available for use only to direct consumers.
+	IPAMRangeAllocationReserved IPAMRangeAllocationState = "Reserved"
 	// IPAMRangeAllocationUsed reports that an allocation is used by a child.
 	IPAMRangeAllocationUsed IPAMRangeAllocationState = "Used"
 	// IPAMRangeAllocationFailed reports that an allocation could not be made successfully.

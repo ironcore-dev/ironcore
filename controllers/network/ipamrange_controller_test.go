@@ -39,9 +39,9 @@ var _ = Describe("IPAMRangeReconciler", func() {
 		ns := SetupTest()
 
 		It("should reconcile parent without children", func() {
-			parent := createParentIPAMRange(ctx, ns, false)
+			parent := createParentIPAMRange(ctx, ns)
 
-			By("Check parent allocations")
+			By("checking parent allocations")
 			expectedAllocations := map[string]networkv1alpha1.IPAMRangeAllocationState{
 				parentCIDR: networkv1alpha1.IPAMRangeAllocationFree,
 			}
@@ -53,10 +53,10 @@ var _ = Describe("IPAMRangeReconciler", func() {
 			}, timeout, interval).Should(Succeed())
 		})
 		It("should update parent allocations with CIDR request", func() {
-			parent := createParentIPAMRange(ctx, ns, false)
+			parent := createParentIPAMRange(ctx, ns)
 			child := createChildIPAMRange(ctx, parent, "192.168.1.0/25", nil, 0, 0)
 
-			By("Check parent allocations")
+			By("checking parent allocations")
 			expectedParentAllocations := map[string]networkv1alpha1.IPAMRangeAllocationState{
 				"192.168.1.0/25":   networkv1alpha1.IPAMRangeAllocationUsed,
 				"192.168.1.128/25": networkv1alpha1.IPAMRangeAllocationFree,
@@ -68,7 +68,7 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				g.Expect(getAllocationStates(obj)).To(Equal(expectedParentAllocations))
 			}, timeout, interval).Should(Succeed())
 
-			By("Check child allocations")
+			By("checking child allocations")
 			expectedChildAllocations := map[string]networkv1alpha1.IPAMRangeAllocationState{
 				"192.168.1.0/25": networkv1alpha1.IPAMRangeAllocationFree,
 			}
@@ -80,10 +80,10 @@ var _ = Describe("IPAMRangeReconciler", func() {
 			}, timeout, interval).Should(Succeed())
 		})
 		It("should update parent allocations with size request", func() {
-			parent := createParentIPAMRange(ctx, ns, false)
+			parent := createParentIPAMRange(ctx, ns)
 			child := createChildIPAMRange(ctx, parent, "", nil, 25, 0)
 
-			By("Check parent allocations")
+			By("checking parent allocations")
 			expectedParentAllocations := map[string]networkv1alpha1.IPAMRangeAllocationState{
 				"192.168.1.0/25":   networkv1alpha1.IPAMRangeAllocationUsed,
 				"192.168.1.128/25": networkv1alpha1.IPAMRangeAllocationFree,
@@ -95,7 +95,7 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				g.Expect(getAllocationStates(obj)).To(Equal(expectedParentAllocations))
 			}, timeout, interval).Should(Succeed())
 
-			By("Check child allocations")
+			By("checking child allocations")
 			expectedChildAllocations := map[string]networkv1alpha1.IPAMRangeAllocationState{
 				"192.168.1.0/25": networkv1alpha1.IPAMRangeAllocationFree,
 			}
@@ -107,7 +107,7 @@ var _ = Describe("IPAMRangeReconciler", func() {
 			}, timeout, interval).Should(Succeed())
 		})
 		It("should update parent allocations with ip request", func() {
-			parent := createParentIPAMRange(ctx, ns, false)
+			parent := createParentIPAMRange(ctx, ns)
 
 			fromIP, _ := netaddr.ParseIP("192.168.1.0")
 			toIP, _ := netaddr.ParseIP("192.168.1.127")
@@ -117,7 +117,7 @@ var _ = Describe("IPAMRangeReconciler", func() {
 			}
 			child := createChildIPAMRange(ctx, parent, "", ipRange, 0, 0)
 
-			By("Check parent allocations")
+			By("checking parent allocations")
 			expectedParentAllocations := map[string]networkv1alpha1.IPAMRangeAllocationState{
 				"192.168.1.128/25": networkv1alpha1.IPAMRangeAllocationFree,
 			}
@@ -129,7 +129,7 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				g.Expect(getIPRanges(obj)).To(ContainElement(ipRange))
 			}, timeout, interval).Should(Succeed())
 
-			By("Check child allocations")
+			By("checking child allocations")
 			Eventually(func(g Gomega) {
 				key := types.NamespacedName{Name: child.Name, Namespace: child.Namespace}
 				obj := &networkv1alpha1.IPAMRange{}
@@ -138,10 +138,10 @@ var _ = Describe("IPAMRangeReconciler", func() {
 			}, timeout, interval).Should(Succeed())
 		})
 		It("should update parent allocations with ip count request", func() {
-			parent := createParentIPAMRange(ctx, ns, false)
+			parent := createParentIPAMRange(ctx, ns)
 			child := createChildIPAMRange(ctx, parent, "", nil, 0, 1)
 
-			By("Check parent allocations")
+			By("checking parent allocations")
 			fromIP, _ := netaddr.ParseIP("192.168.1.1")
 			toIP, _ := netaddr.ParseIP("192.168.1.1")
 			ipRange := &commonv1alpha1.IPRange{
@@ -155,7 +155,7 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				g.Expect(getIPRanges(obj)).To(ContainElement(ipRange))
 			}, timeout, interval).Should(Succeed())
 
-			By("Check child allocations")
+			By("checking child allocations")
 			Eventually(func(g Gomega) {
 				key := types.NamespacedName{Name: child.Name, Namespace: child.Namespace}
 				obj := &networkv1alpha1.IPAMRange{}
@@ -164,10 +164,10 @@ var _ = Describe("IPAMRangeReconciler", func() {
 			}, timeout, interval).Should(Succeed())
 		})
 		It("allocation should fail if CIDR is out of range", func() {
-			parent := createParentIPAMRange(ctx, ns, false)
+			parent := createParentIPAMRange(ctx, ns)
 			child := createChildIPAMRange(ctx, parent, "192.168.2.0/25", nil, 0, 0)
 
-			By("Check parent allocations")
+			By("checking parent allocations")
 			expectedParentAllocations := map[string]networkv1alpha1.IPAMRangeAllocationState{
 				parentCIDR: networkv1alpha1.IPAMRangeAllocationFree,
 			}
@@ -179,7 +179,7 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				g.Expect(getFailedRequests(obj)).To(ContainElements(getRequestKeys(child.Spec.Requests)...))
 			}, timeout, interval).Should(Succeed())
 
-			By("Check child allocations")
+			By("checking child allocations")
 			Eventually(func(g Gomega) {
 				key := types.NamespacedName{Name: child.Name, Namespace: child.Namespace}
 				obj := &networkv1alpha1.IPAMRange{}
@@ -188,10 +188,10 @@ var _ = Describe("IPAMRangeReconciler", func() {
 			}, timeout, interval).Should(Succeed())
 		})
 		It("allocation should fail if size is too big", func() {
-			parent := createParentIPAMRange(ctx, ns, false)
+			parent := createParentIPAMRange(ctx, ns)
 			child := createChildIPAMRange(ctx, parent, "", nil, 23, 0)
 
-			By("Check parent allocations")
+			By("checking parent allocations")
 			expectedParentAllocations := map[string]networkv1alpha1.IPAMRangeAllocationState{
 				parentCIDR: networkv1alpha1.IPAMRangeAllocationFree,
 			}
@@ -203,7 +203,7 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				g.Expect(getFailedRequests(obj)).To(ContainElements(getRequestKeys(child.Spec.Requests)...))
 			}, timeout, interval).Should(Succeed())
 
-			By("Check child allocations")
+			By("checking child allocations")
 			Eventually(func(g Gomega) {
 				key := types.NamespacedName{Name: child.Name, Namespace: child.Namespace}
 				obj := &networkv1alpha1.IPAMRange{}
@@ -212,7 +212,7 @@ var _ = Describe("IPAMRangeReconciler", func() {
 			}, timeout, interval).Should(Succeed())
 		})
 		It("allocation should fail if ip is out of range", func() {
-			parent := createParentIPAMRange(ctx, ns, false)
+			parent := createParentIPAMRange(ctx, ns)
 
 			fromIP, _ := netaddr.ParseIP("192.168.2.0")
 			toIP, _ := netaddr.ParseIP("192.168.2.127")
@@ -222,7 +222,7 @@ var _ = Describe("IPAMRangeReconciler", func() {
 			}
 			child := createChildIPAMRange(ctx, parent, "", ipRange, 0, 0)
 
-			By("Check parent allocations")
+			By("checking parent allocations")
 			expectedParentAllocations := map[string]networkv1alpha1.IPAMRangeAllocationState{
 				parentCIDR: networkv1alpha1.IPAMRangeAllocationFree,
 			}
@@ -234,7 +234,7 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				g.Expect(getFailedRequests(obj)).To(ContainElements(getRequestKeys(child.Spec.Requests)...))
 			}, timeout, interval).Should(Succeed())
 
-			By("Check child allocations")
+			By("checking child allocations")
 			Eventually(func(g Gomega) {
 				key := types.NamespacedName{Name: child.Name, Namespace: child.Namespace}
 				obj := &networkv1alpha1.IPAMRange{}
@@ -243,11 +243,11 @@ var _ = Describe("IPAMRangeReconciler", func() {
 			}, timeout, interval).Should(Succeed())
 		})
 		It("should update allocations when CIDR is changed", func() {
-			parent := createParentIPAMRange(ctx, ns, false)
+			parent := createParentIPAMRange(ctx, ns)
 			child := createChildIPAMRange(ctx, parent, "192.168.2.0/25", nil, 0, 0)
 
 			// Allocation should fail at first, because request CIDR is out of range
-			By("Check parent allocations")
+			By("checking parent allocations")
 			expectedParentAllocations := map[string]networkv1alpha1.IPAMRangeAllocationState{
 				parentCIDR: networkv1alpha1.IPAMRangeAllocationFree,
 			}
@@ -271,7 +271,7 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				Expect(k8sClient.Update(ctx, updParent)).To(Succeed())
 			}, timeout, interval).Should(Succeed())
 
-			By("Check child allocations")
+			By("checking child allocations")
 			Eventually(func(g Gomega) {
 				key := types.NamespacedName{Name: child.Name, Namespace: child.Namespace}
 				obj := &networkv1alpha1.IPAMRange{}
@@ -279,7 +279,7 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				g.Expect(getFailedRequests(obj)).To(ContainElements(getRequestKeys(child.Spec.Requests)...))
 			}, timeout, interval).Should(Succeed())
 
-			By("Check parent allocations after CIDR change")
+			By("checking parent allocations after CIDR change")
 			expectedChangedParentAllocations := map[string]networkv1alpha1.IPAMRangeAllocationState{
 				"192.168.2.0/25":   networkv1alpha1.IPAMRangeAllocationUsed,
 				"192.168.2.128/25": networkv1alpha1.IPAMRangeAllocationFree,
@@ -291,7 +291,7 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				g.Expect(getAllocationStates(obj)).To(Equal(expectedChangedParentAllocations))
 			}, timeout, interval).Should(Succeed())
 
-			By("Check child allocations after CIDR change")
+			By("checking child allocations after CIDR change")
 			expectedChangedChildAllocations := map[string]networkv1alpha1.IPAMRangeAllocationState{
 				"192.168.2.0/25": networkv1alpha1.IPAMRangeAllocationFree,
 			}
@@ -304,12 +304,70 @@ var _ = Describe("IPAMRangeReconciler", func() {
 		})
 
 		It("should not pass on reserved range to child", func() {
-			parent := createParentIPAMRange(ctx, ns, true)
-			child := createChildIPAMRange(ctx, parent, "", nil, 0, 0)
+			// parent := createParentIPAMRange(ctx, ns)
+			prefix, err := netaddr.ParseIPPrefix(parentCIDR)
+			Expect(err).ToNot(HaveOccurred())
+			pc := commonv1alpha1.NewCIDR(prefix)
+			parent := networkv1alpha1.IPAMRange{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "parent",
+					Namespace: ns.GetName(),
+				},
+				Spec: networkv1alpha1.IPAMRangeSpec{
+					CIDRs: []commonv1alpha1.CIDR{pc},
+				},
+			}
+			Expect(k8sClient.Create(ctx, &parent)).To(Succeed())
 
-			By("Check parent allocations")
+			//child := createChildIPAMRange(ctx, &parent, "192.168.1.0/25", nil, 0, 0)
+
+			prefix, err = netaddr.ParseIPPrefix("192.168.1.0/25")
+			Expect(err).ToNot(HaveOccurred())
+			cc := commonv1alpha1.NewCIDR(prefix)
+			child := networkv1alpha1.IPAMRange{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "child",
+					Namespace: parent.GetNamespace(),
+				},
+				Spec: networkv1alpha1.IPAMRangeSpec{
+					Parent: &corev1.LocalObjectReference{
+						Name: parent.GetName(),
+					},
+					Requests: []networkv1alpha1.IPAMRangeRequest{
+						{
+							CIDR:     &cc,
+							Reserved: true,
+						},
+					},
+				},
+			}
+			Expect(k8sClient.Create(ctx, &child)).To(Succeed())
+
+			prefix, err = netaddr.ParseIPPrefix("192.168.1.1/25")
+			Expect(err).ToNot(HaveOccurred())
+			scc := commonv1alpha1.NewCIDR(prefix)
+			secondChild := networkv1alpha1.IPAMRange{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "second-child",
+					Namespace: child.GetNamespace(),
+				},
+				Spec: networkv1alpha1.IPAMRangeSpec{
+					Parent: &corev1.LocalObjectReference{
+						Name: child.GetName(),
+					},
+					Requests: []networkv1alpha1.IPAMRangeRequest{
+						{
+							CIDR: &scc,
+						},
+					},
+				},
+			}
+			Expect(k8sClient.Create(ctx, &secondChild)).To(Succeed())
+
+			By("checking parent allocations")
 			expectedParentAllocations := map[string]networkv1alpha1.IPAMRangeAllocationState{
-				parentCIDR: networkv1alpha1.IPAMRangeAllocationFree,
+				"192.168.1.0/25":   networkv1alpha1.IPAMRangeAllocationUsed,
+				"192.168.1.128/25": networkv1alpha1.IPAMRangeAllocationFree,
 			}
 			Eventually(func(g Gomega) {
 				key := types.NamespacedName{Name: parent.Name, Namespace: parent.Namespace}
@@ -318,12 +376,24 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				g.Expect(getAllocationStates(obj)).To(Equal(expectedParentAllocations))
 			}, timeout, interval).Should(Succeed())
 
-			By("Check child allocations")
+			By("checking child allocations")
+			expectedChildAllocations := map[string]networkv1alpha1.IPAMRangeAllocationState{
+				"192.168.1.0/25": networkv1alpha1.IPAMRangeAllocationReserved,
+			}
 			Eventually(func(g Gomega) {
 				key := types.NamespacedName{Name: child.Name, Namespace: child.Namespace}
 				obj := &networkv1alpha1.IPAMRange{}
 				g.Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
-				g.Expect(getAllocationStates(obj)).To(Not(Equal(expectedParentAllocations)))
+				g.Expect(getAllocationStates(obj)).To(Equal(expectedChildAllocations))
+			}, timeout, interval).Should(Succeed())
+
+			By("checking second child allocations")
+			expectedSecondChildAllocations := map[string]networkv1alpha1.IPAMRangeAllocationState{}
+			Eventually(func(g Gomega) {
+				key := types.NamespacedName{Name: secondChild.Name, Namespace: secondChild.Namespace}
+				obj := &networkv1alpha1.IPAMRange{}
+				g.Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
+				g.Expect(getAllocationStates(obj)).To(Equal(expectedSecondChildAllocations))
 			}, timeout, interval).Should(Succeed())
 		})
 	})
@@ -335,7 +405,6 @@ func createIPAMRange(
 	cidrStr, parentName string,
 	ipRange *commonv1alpha1.IPRange,
 	size, count int32,
-	reserved bool,
 ) *networkv1alpha1.IPAMRange {
 	spec := networkv1alpha1.IPAMRangeSpec{}
 
@@ -360,15 +429,6 @@ func createIPAMRange(
 		}
 	} else if cidr != nil {
 		spec.CIDRs = []commonv1alpha1.CIDR{*cidr}
-
-		var elements []networkv1alpha1.IPAMRangeRequest
-		for _, cidr := range []commonv1alpha1.CIDR{*cidr} {
-			elements = append(elements, networkv1alpha1.IPAMRangeRequest{
-				CIDR:     &cidr,
-				Reserved: reserved,
-			})
-		}
-		spec.Requests = elements
 	}
 
 	instance := &networkv1alpha1.IPAMRange{
@@ -380,12 +440,12 @@ func createIPAMRange(
 	return instance
 }
 
-func createParentIPAMRange(ctx context.Context, ns *corev1.Namespace, reserved bool) *networkv1alpha1.IPAMRange {
+func createParentIPAMRange(ctx context.Context, ns *corev1.Namespace) *networkv1alpha1.IPAMRange {
 	meta := metav1.ObjectMeta{
 		Name:      "parent",
 		Namespace: ns.Name,
 	}
-	return createIPAMRange(ctx, meta, parentCIDR, "", nil, 0, 0, reserved)
+	return createIPAMRange(ctx, meta, parentCIDR, "", nil, 0, 0)
 }
 
 func createChildIPAMRange(
@@ -399,7 +459,7 @@ func createChildIPAMRange(
 		Name:      "child",
 		Namespace: parent.Namespace,
 	}
-	return createIPAMRange(ctx, meta, cidrStr, parent.Name, ipRange, size, count, false)
+	return createIPAMRange(ctx, meta, cidrStr, parent.Name, ipRange, size, count)
 }
 
 func getAllocationStates(obj *networkv1alpha1.IPAMRange) map[string]networkv1alpha1.IPAMRangeAllocationState {
