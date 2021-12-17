@@ -6,6 +6,7 @@ spec:
   capabilities:
     onmetal.de/burstFactor: 3
     onmetal.de/burstDurationSec: 10
+    onmetal.de/limitsPerGB: 1
     onmetal.de/IOPS: 100
     onmetal.de/readIOPS: 60
     onmetal.de/writeIOPS: 40
