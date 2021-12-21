@@ -43,8 +43,8 @@ import (
 // http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
 
 const (
-	interval = time.Millisecond * 50
-	timeout  = time.Second * 3
+	interval = 50 * time.Millisecond
+	timeout  = 3 * time.Second
 )
 
 var (
@@ -88,11 +88,14 @@ var _ = BeforeSuite(func() {
 	Expect(k8sClient).NotTo(BeNil())
 }, 60)
 
+// SetupTest returns a namespace which will be created before each ginkgo `It` block and deleted at the end of `It`
+// so that each test case can run in an independent way
 func SetupTest(ctx context.Context) *corev1.Namespace {
 	var (
 		cancel context.CancelFunc
 	)
 	ns := &corev1.Namespace{}
+
 	BeforeEach(func() {
 		var mgrCtx context.Context
 		mgrCtx, cancel = context.WithCancel(ctx)
@@ -121,6 +124,10 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 			Scheme: k8sManager.GetScheme(),
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
+		Expect((&MachineClassReconciler{
+			Client: k8sManager.GetClient(),
+			Scheme: k8sManager.GetScheme(),
+		}).SetupWithManager(k8sManager)).To(Succeed())
 		err = (&network.SubnetReconciler{
 			Client: k8sManager.GetClient(),
 			Scheme: k8sManager.GetScheme(),

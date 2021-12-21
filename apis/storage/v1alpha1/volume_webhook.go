@@ -17,7 +17,6 @@
 package v1alpha1
 
 import (
-	"fmt"
 	"reflect"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -41,9 +40,6 @@ func (r *Volume) SetupWebhookWithManager(mgr ctrl.Manager) error {
 		Complete()
 }
 
-// TODO(user): EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-
-// TODO(user): change verbs to "verbs=create;update;delete" if you want to enable deletion validation.
 //+kubebuilder:webhook:path=/validate-storage-onmetal-de-v1alpha1-volume,mutating=false,failurePolicy=fail,sideEffects=None,groups=storage.onmetal.de,resources=volumes,verbs=create;update,versions=v1alpha1,name=vvolume.kb.io,admissionReviewVersions=v1
 
 var _ webhook.Validator = &Volume{}
@@ -51,8 +47,6 @@ var _ webhook.Validator = &Volume{}
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
 func (r *Volume) ValidateCreate() error {
 	volumelog.Info("validate create", "name", r.Name)
-	fmt.Println("------------------>")
-	// TODO(user): fill in your validation logic upon object creation.
 	return nil
 }
 
@@ -75,10 +69,6 @@ func (r *Volume) ValidateUpdate(old runtime.Object) error {
 		allErrs = append(allErrs, field.Invalid(path.Child("storagePoolSelector"), r.Spec.StoragePoolSelector, fieldImmutable))
 	}
 
-	if !reflect.DeepEqual(r.Spec.Resources, oldRange.Spec.Resources) {
-		allErrs = append(allErrs, field.Invalid(path.Child("resources"), r.Spec.Resources, fieldImmutable))
-	}
-
 	if len(allErrs) == 0 {
 		return nil
 	}
@@ -88,7 +78,5 @@ func (r *Volume) ValidateUpdate(old runtime.Object) error {
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
 func (r *Volume) ValidateDelete() error {
 	volumelog.Info("validate delete", "name", r.Name)
-
-	// TODO(user): fill in your validation logic upon object deletion.
 	return nil
 }

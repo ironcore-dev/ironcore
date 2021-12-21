@@ -21,6 +21,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+var (
+	// StorageClassFinalizer
+	StorageClassFinalizer = GroupVersion.Group + "/storageclass"
+)
+
 // StorageClassSpec defines the desired state of StorageClass
 type StorageClassSpec struct {
 	// Capabilities describes the capabilities of a storage class

@@ -179,6 +179,7 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "IPAMRange")
 		os.Exit(1)
 	}
+
 	if err = (&networkcontrollers.GatewayReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
@@ -196,6 +197,11 @@ func main() {
 
 		if err = (&computev1alpha1.Machine{}).SetupWebhookWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create webhook", "webhook", "Machine")
+			os.Exit(1)
+		}
+
+		if err = (&storagev1alpha1.Volume{}).SetupWebhookWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create webhook", "webhook", "Volume")
 			os.Exit(1)
 		}
 	}
