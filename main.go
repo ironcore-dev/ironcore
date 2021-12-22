@@ -63,9 +63,10 @@ const (
 	routingDomainController    = "routingdomain"
 	ipamRangeController        = "ipamrange"
 	gatewayController          = "gateway"
-	ipamRangeWebhook           = "ipamrange-webhook"
-	machineWebhook             = "machine-webhook"
-	volumeWebhook              = "volume-webhook"
+
+	ipamRangeWebhook = "ipamrange-webhook"
+	machineWebhook   = "machine-webhook"
+	volumeWebhook    = "volume-webhook"
 )
 
 func init() {
@@ -90,12 +91,15 @@ func main() {
 
 	controllers := switches.New(
 		[]string{
-			machineClassController, machinePoolController, machineSchedulerController, storagePoolController, storageClassController,
-			volumeController, volumeAttachmentController, reservedIPController, securityGroupController, subnetController, machineController,
-			routingDomainController, ipamRangeController, gatewayController, ipamRangeWebhook, machineWebhook, volumeWebhook,
+			machineClassController, machinePoolController, machineSchedulerController, storagePoolController,
+			storageClassController, volumeController, volumeAttachmentController, reservedIPController, securityGroupController,
+			subnetController, machineController, routingDomainController, ipamRangeController, gatewayController,
 		},
 	)
 	flag.Var(controllers, "controllers", fmt.Sprintf("Controllers to enable. All controllers: %v. Disabled-by-default controllers: %v", controllers.All(), controllers.DisabledByDefault()))
+
+	webhooks := switches.New([]string{ipamRangeWebhook, machineWebhook, volumeWebhook})
+	flag.Var(webhooks, "webhooks", fmt.Sprintf("Webhooks to enable. All webhooks: %v. Disabled-by-default webhooks: %v", webhooks.All(), webhooks.DisabledByDefault()))
 
 	opts := zap.Options{
 		Development: true,
@@ -250,21 +254,21 @@ func main() {
 
 	// webhook
 	if enableWebhooks {
-		if controllers.Enabled(ipamRangeWebhook) {
+		if webhooks.Enabled(ipamRangeWebhook) {
 			if err = (&networkv1alpha1.IPAMRange{}).SetupWebhookWithManager(mgr); err != nil {
 				setupLog.Error(err, "unable to create webhook", "webhook", "IPAMRange")
 				os.Exit(1)
 			}
 		}
 
-		if controllers.Enabled(machineWebhook) {
+		if webhooks.Enabled(machineWebhook) {
 			if err = (&computev1alpha1.Machine{}).SetupWebhookWithManager(mgr); err != nil {
 				setupLog.Error(err, "unable to create webhook", "webhook", "Machine")
 				os.Exit(1)
 			}
 		}
 
-		if controllers.Enabled(volumeWebhook) {
+		if webhooks.Enabled(volumeWebhook) {
 			if err = (&storagev1alpha1.Volume{}).SetupWebhookWithManager(mgr); err != nil {
 				setupLog.Error(err, "unable to create webhook", "webhook", "Volume")
 				os.Exit(1)
