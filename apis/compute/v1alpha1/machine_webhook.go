@@ -28,7 +28,7 @@ import (
 var machinelog = logf.Log.WithName("machine-resource")
 
 // "verbs=update" since only update validation is enabled
-//+kubebuilder:webhook:path=/validate-compute-onmetal-de-v1alpha1-machine,mutating=false,failurePolicy=fail,sideEffects=None,groups=compute.onmetal.de,resources=machines,verbs=update,versions=v1alpha1,name=machine.v1alpha1.compute.onmetal.de,admissionReviewVersions={v1,v1beta1}
+//+kubebuilder:webhook:path=/validate-compute-onmetal-de-v1alpha1-machine,mutating=false,failurePolicy=fail,sideEffects=None,groups=compute.onmetal.de,resources=machines,verbs=update,versions=v1alpha1,name=vmachine.compute.onmetal.de,admissionReviewVersions=v1
 
 // SetupWebhookWithManager creates a new webhook which will be started by mgr
 func (m *Machine) SetupWebhookWithManager(mgr ctrl.Manager) error {

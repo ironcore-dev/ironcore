@@ -40,7 +40,7 @@ func (r *Volume) SetupWebhookWithManager(mgr ctrl.Manager) error {
 		Complete()
 }
 
-//+kubebuilder:webhook:path=/validate-storage-onmetal-de-v1alpha1-volume,mutating=false,failurePolicy=fail,sideEffects=None,groups=storage.onmetal.de,resources=volumes,verbs=create;update,versions=v1alpha1,name=vvolume.kb.io,admissionReviewVersions=v1
+//+kubebuilder:webhook:path=/validate-storage-onmetal-de-v1alpha1-volume,mutating=false,failurePolicy=fail,sideEffects=None,groups=storage.onmetal.de,resources=volumes,verbs=create;update,versions=v1alpha1,name=vvolume.storage.onmetal.de,admissionReviewVersions=v1
 
 var _ webhook.Validator = &Volume{}
 

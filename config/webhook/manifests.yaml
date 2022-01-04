@@ -8,14 +8,13 @@ metadata:
 webhooks:
 - admissionReviewVersions:
   - v1
-  - v1beta1
   clientConfig:
     service:
       name: webhook-service
       namespace: system
       path: /mutate-network-onmetal-de-v1alpha1-ipamrange
   failurePolicy: Fail
-  name: mipamrange.kb.io
+  name: mipamrange.network.onmetal.de
   rules:
   - apiGroups:
     - network.onmetal.de
@@ -37,14 +36,13 @@ metadata:
 webhooks:
 - admissionReviewVersions:
   - v1
-  - v1beta1
   clientConfig:
     service:
       name: webhook-service
       namespace: system
       path: /validate-compute-onmetal-de-v1alpha1-machine
   failurePolicy: Fail
-  name: machine.v1alpha1.compute.onmetal.de
+  name: vmachine.compute.onmetal.de
   rules:
   - apiGroups:
     - compute.onmetal.de
@@ -57,14 +55,13 @@ webhooks:
   sideEffects: None
 - admissionReviewVersions:
   - v1
-  - v1beta1
   clientConfig:
     service:
       name: webhook-service
       namespace: system
       path: /validate-network-onmetal-de-v1alpha1-ipamrange
   failurePolicy: Fail
-  name: vipamrange.kb.io
+  name: vipamrange.network.onmetal.de
   rules:
   - apiGroups:
     - network.onmetal.de
@@ -85,7 +82,7 @@ webhooks:
       namespace: system
       path: /validate-storage-onmetal-de-v1alpha1-volume
   failurePolicy: Fail
-  name: vvolume.kb.io
+  name: vvolume.storage.onmetal.de
   rules:
   - apiGroups:
     - storage.onmetal.de
