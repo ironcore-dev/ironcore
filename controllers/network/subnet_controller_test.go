@@ -35,7 +35,7 @@ var _ = Describe("subnet controller", func() {
 	ns := SetupTest()
 
 	const cidrAddress = "192.168.0.0"
-	testCIDR := commonv1alpha1.MustParseCIDR(fmt.Sprintf("%s/24", cidrAddress))
+	testCIDR := commonv1alpha1.MustParseIPPrefix(fmt.Sprintf("%s/24", cidrAddress))
 
 	It("sets the owner Subnet as a Controller OwnerReference on the controlled IPAMRange", func() {
 		By("creating a subnet")
@@ -93,7 +93,7 @@ var _ = Describe("subnet controller", func() {
 		By("waiting for the status of the ipam range to have an allocated CIDR")
 		ipamRangeKey := client.ObjectKey{Namespace: subnet.Namespace, Name: networkv1alpha1.SubnetIPAMName(subnet.Name)}
 		ipamRange := &networkv1alpha1.IPAMRange{}
-		Eventually(func(g Gomega) []commonv1alpha1.CIDR {
+		Eventually(func(g Gomega) []commonv1alpha1.IPPrefix {
 			err := k8sClient.Get(ctx, ipamRangeKey, ipamRange)
 			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
 			g.Expect(err).NotTo(HaveOccurred())
@@ -158,7 +158,7 @@ var _ = Describe("subnet controller", func() {
 		}))
 
 		By("waiting for the status of the Subnet to be up")
-		parsedCIDR := commonv1alpha1.MustParseCIDR(fmt.Sprintf("%s/%d", cidrAddress, rangeSize))
+		parsedCIDR := commonv1alpha1.MustParseIPPrefix(fmt.Sprintf("%s/%d", cidrAddress, rangeSize))
 		childSubnetKey := client.ObjectKeyFromObject(childSubnet)
 		Eventually(func() networkv1alpha1.SubnetStatus {
 			Expect(k8sClient.Get(ctx, childSubnetKey, childSubnet)).Should(Succeed())

@@ -42,7 +42,7 @@ var _ = Describe("machine controller", func() {
 			Spec: networkv1alpha1.SubnetSpec{
 				Ranges: []networkv1alpha1.RangeType{
 					{
-						CIDR: commonv1alpha1.PtrToCIDR(commonv1alpha1.MustParseCIDR("192.168.0.0/24")),
+						CIDR: commonv1alpha1.PtrToIPPrefix(commonv1alpha1.MustParseIPPrefix("192.168.0.0/24")),
 					},
 				},
 			},
@@ -127,7 +127,7 @@ var _ = Describe("machine controller", func() {
 			Spec: networkv1alpha1.SubnetSpec{
 				Ranges: []networkv1alpha1.RangeType{
 					{
-						CIDR: commonv1alpha1.PtrToCIDR(commonv1alpha1.MustParseCIDR("192.168.0.0/24")),
+						CIDR: commonv1alpha1.PtrToIPPrefix(commonv1alpha1.MustParseIPPrefix("192.168.0.0/24")),
 					},
 				},
 			},
@@ -137,13 +137,13 @@ var _ = Describe("machine controller", func() {
 		By("creating a machine")
 		iface1 := computev1alpha1.Interface{
 			Name:     "iface-1",
-			IP:       commonv1alpha1.PtrToIPAddr(commonv1alpha1.MustParseIPAddr("192.168.0.0")),
+			IP:       commonv1alpha1.PtrToIP(commonv1alpha1.MustParseIP("192.168.0.0")),
 			Priority: 0,
 			Target:   corev1.LocalObjectReference{Name: subnet.Name},
 		}
 		iface2 := computev1alpha1.Interface{
 			Name:     "iface-2",
-			IP:       commonv1alpha1.PtrToIPAddr(commonv1alpha1.MustParseIPAddr("192.168.0.1")),
+			IP:       commonv1alpha1.PtrToIP(commonv1alpha1.MustParseIP("192.168.0.1")),
 			Priority: 1,
 			Target:   corev1.LocalObjectReference{Name: subnet.Name},
 		}
@@ -191,12 +191,12 @@ var _ = Describe("machine controller", func() {
 		}, timeout, interval).Should(ConsistOf(
 			computev1alpha1.InterfaceStatus{
 				Name:     "iface-1",
-				IP:       commonv1alpha1.MustParseIPAddr("192.168.0.0"),
+				IP:       commonv1alpha1.MustParseIP("192.168.0.0"),
 				Priority: 0,
 			},
 			computev1alpha1.InterfaceStatus{
 				Name:     "iface-2",
-				IP:       commonv1alpha1.MustParseIPAddr("192.168.0.1"),
+				IP:       commonv1alpha1.MustParseIP("192.168.0.1"),
 				Priority: 1,
 			},
 		))
@@ -212,7 +212,7 @@ var _ = Describe("machine controller", func() {
 			Spec: networkv1alpha1.SubnetSpec{
 				Ranges: []networkv1alpha1.RangeType{
 					{
-						CIDR: commonv1alpha1.PtrToCIDR(commonv1alpha1.MustParseCIDR("192.168.0.0/24")),
+						CIDR: commonv1alpha1.PtrToIPPrefix(commonv1alpha1.MustParseIPPrefix("192.168.0.0/24")),
 					},
 				},
 			},
@@ -242,10 +242,10 @@ var _ = Describe("machine controller", func() {
 		By("waiting for the IPAMRanges to be created and up-to-date")
 		ipamRange1 := &networkv1alpha1.IPAMRange{}
 		ipamRangeKey1 := client.ObjectKey{Namespace: machine.Namespace, Name: computev1alpha1.MachineInterfaceIPAMRangeName(machine.Name, iface1.Name)}
-		var ifaceIP1 commonv1alpha1.IPAddr
+		var ifaceIP1 commonv1alpha1.IP
 		ipamRange2 := &networkv1alpha1.IPAMRange{}
 		ipamRangeKey2 := client.ObjectKey{Namespace: machine.Namespace, Name: computev1alpha1.MachineInterfaceIPAMRangeName(machine.Name, iface2.Name)}
-		var ifaceIP2 commonv1alpha1.IPAddr
+		var ifaceIP2 commonv1alpha1.IP
 
 		Eventually(func(g Gomega) {
 			By("getting the first IPAMRange")

@@ -31,7 +31,7 @@ var _ = Describe("ReservedIPReconciler", func() {
 	ns := SetupTest()
 	It("should reserve an IP", func() {
 		By("creating a subnet")
-		cidr := commonv1alpha1.MustParseCIDR("10.0.0.0/16")
+		cidr := commonv1alpha1.MustParseIPPrefix("10.0.0.0/16")
 		subnet := &networkv1alpha1.Subnet{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
@@ -48,7 +48,7 @@ var _ = Describe("ReservedIPReconciler", func() {
 		Expect(k8sClient.Create(ctx, subnet)).To(Succeed())
 
 		By("creating a reserved ip")
-		ip := commonv1alpha1.MustParseIPAddr("10.0.0.1")
+		ip := commonv1alpha1.MustParseIP("10.0.0.1")
 		reservedIP := &networkv1alpha1.ReservedIP{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
@@ -56,7 +56,7 @@ var _ = Describe("ReservedIPReconciler", func() {
 			},
 			Spec: networkv1alpha1.ReservedIPSpec{
 				Subnet: corev1.LocalObjectReference{Name: subnet.Name},
-				IP:     commonv1alpha1.PtrToIPAddr(ip),
+				IP:     commonv1alpha1.PtrToIP(ip),
 			},
 		}
 		Expect(k8sClient.Create(ctx, reservedIP)).To(Succeed())

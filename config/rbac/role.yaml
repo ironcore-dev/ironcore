@@ -87,6 +87,52 @@ rules:
 - apiGroups:
   - network.onmetal.de
   resources:
+  - clusterprefixallocations
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - clusterprefixallocations/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - clusterprefixes
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - clusterprefixes/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - clusterprefixes/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
   - gateways
   verbs:
   - create
@@ -132,6 +178,78 @@ rules:
   - network.onmetal.de
   resources:
   - ipamranges/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - ips
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - ips/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - ips/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - prefixallocations
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - prefixallocations/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - prefixes
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - prefixes/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - prefixes/status
   verbs:
   - get
   - patch

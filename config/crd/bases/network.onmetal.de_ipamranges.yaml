@@ -54,7 +54,7 @@ spec:
                 description: CIDRs is a list of CIDR specs which are defined for this
                   IPAMRange
                 items:
-                  description: CIDR represents a network CIDR.
+                  description: IPPrefix represents a network prefix.
                   type: string
                 type: array
               parent:
@@ -70,7 +70,7 @@ spec:
                 items:
                   properties:
                     cidr:
-                      description: CIDR represents a network CIDR.
+                      description: IPPrefix represents a network prefix.
                       type: string
                     ipCount:
                       description: IPCount requests a consecutive IP range of the
@@ -81,10 +81,10 @@ spec:
                       description: IPRange is an IP range.
                       properties:
                         from:
-                          description: IPAddr is an IP address.
+                          description: IP is an IP address.
                           type: string
                         to:
-                          description: IPAddr is an IP address.
+                          description: IP is an IP address.
                           type: string
                       required:
                       - from
@@ -114,10 +114,10 @@ spec:
                       description: IPRange is an IP range.
                       properties:
                         from:
-                          description: IPAddr is an IP address.
+                          description: IP is an IP address.
                           type: string
                         to:
-                          description: IPAddr is an IP address.
+                          description: IP is an IP address.
                           type: string
                       required:
                       - from
@@ -126,7 +126,7 @@ spec:
                     request:
                       properties:
                         cidr:
-                          description: CIDR represents a network CIDR.
+                          description: IPPrefix represents a network prefix.
                           type: string
                         ipCount:
                           description: IPCount requests a consecutive IP range of
@@ -137,10 +137,10 @@ spec:
                           description: IPRange is an IP range.
                           properties:
                             from:
-                              description: IPAddr is an IP address.
+                              description: IP is an IP address.
                               type: string
                             to:
-                              description: IPAddr is an IP address.
+                              description: IP is an IP address.
                               type: string
                           required:
                           - from

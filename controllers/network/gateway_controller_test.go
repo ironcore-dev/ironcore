@@ -32,7 +32,7 @@ import (
 var _ = Describe("gateway controller", func() {
 	ns := SetupTest()
 
-	parsedCIDR := commonv1alpha1.MustParseCIDR("192.168.0.0/24")
+	parsedCIDR := commonv1alpha1.MustParseIPPrefix("192.168.0.0/24")
 
 	Context("reconciling creation", func() {
 		It("sets the ControllerReference of the corresponding IPAMRange to the Gateway", func() {
@@ -201,7 +201,7 @@ var _ = Describe("gateway controller", func() {
 
 			By("waiting for the gateway status to be updated")
 			gwKey := client.ObjectKeyFromObject(gw)
-			Eventually(func() []commonv1alpha1.IPAddr {
+			Eventually(func() []commonv1alpha1.IP {
 				err := k8sClient.Get(ctx, gwKey, gw)
 				Expect(client.IgnoreNotFound(err)).To(Succeed())
 				return gw.Status.IPs

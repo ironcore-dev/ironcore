@@ -1,0 +1,47 @@
+apiVersion: network.onmetal.de/v1alpha1
+kind: Prefix
+metadata:
+  name: root
+  labels:
+    subnet-type: public
+spec:
+  prefix: 10.0.0.0/8
+---
+apiVersion: network.onmetal.de/v1alpha1
+kind: Prefix
+metadata:
+  name: root-2
+  labels:
+    subnet-type: public
+spec:
+  prefix: 11.0.0.0/8
+---
+apiVersion: network.onmetal.de/v1alpha1
+kind: Prefix
+metadata:
+  name: customer-subnet-1
+spec:
+  prefixLength: 9
+  parentSelector:
+    matchLabels:
+      subnet-type: public
+---
+apiVersion: network.onmetal.de/v1alpha1
+kind: Prefix
+metadata:
+  name: customer-subnet-2
+spec:
+  prefixLength: 9
+  parentSelector:
+    matchLabels:
+      subnet-type: public
+---
+apiVersion: network.onmetal.de/v1alpha1
+kind: Prefix
+metadata:
+  name: customer-subnet-3
+spec:
+  prefixLength: 9
+  parentSelector:
+    matchLabels:
+      subnet-type: public

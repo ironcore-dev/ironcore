@@ -55,7 +55,7 @@ type FilterRule struct {
 type GatewayStatus struct {
 	State      GatewayState       `json:"state,omitempty"`
 	Conditions []GatewayCondition `json:"conditions,omitempty"`
-	IPs        []common.IPAddr    `json:"ips,omitempty"`
+	IPs        []common.IP        `json:"ips,omitempty"`
 }
 
 type GatewayState string

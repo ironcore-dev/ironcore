@@ -21,6 +21,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/onsi/ginkgo/config"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -38,7 +40,7 @@ import (
 
 const (
 	interval = 50 * time.Millisecond
-	timeout  = 5 * time.Second
+	timeout  = 2 * time.Second
 )
 
 var (
@@ -49,6 +51,7 @@ var (
 )
 
 func TestAPIs(t *testing.T) {
+	config.DefaultReporterConfig.SlowSpecThreshold = 10 * time.Second.Seconds()
 	RegisterFailHandler(Fail)
 
 	RunSpecs(t, "Network Controller Suite")
@@ -107,6 +110,36 @@ var _ = BeforeSuite(func() {
 	}).SetupWithManager(k8sManager)
 	Expect(err).ToNot(HaveOccurred())
 
+	err = (&PrefixReconciler{
+		Client: k8sManager.GetClient(),
+		Scheme: k8sManager.GetScheme(),
+	}).SetupWithManager(k8sManager)
+	Expect(err).NotTo(HaveOccurred())
+
+	err = (&ClusterPrefixReconciler{
+		Client: k8sManager.GetClient(),
+		Scheme: k8sManager.GetScheme(),
+	}).SetupWithManager(k8sManager)
+	Expect(err).NotTo(HaveOccurred())
+
+	err = (&IPReconciler{
+		Client: k8sManager.GetClient(),
+		Scheme: k8sManager.GetScheme(),
+	}).SetupWithManager(k8sManager)
+	Expect(err).NotTo(HaveOccurred())
+
+	err = (&PrefixAllocationSchedulerReconciler{
+		Client: k8sManager.GetClient(),
+		Scheme: k8sManager.GetScheme(),
+	}).SetupWithManager(k8sManager)
+	Expect(err).NotTo(HaveOccurred())
+
+	err = (&ClusterPrefixAllocationSchedulerReconciler{
+		Client: k8sManager.GetClient(),
+		Scheme: k8sManager.GetScheme(),
+	}).SetupWithManager(k8sManager)
+	Expect(err).NotTo(HaveOccurred())
+
 	go func() {
 		defer GinkgoRecover()
 		err = k8sManager.Start(ctx)
@@ -126,6 +159,8 @@ func SetupTest() *corev1.Namespace {
 
 	AfterEach(func() {
 		Expect(k8sClient.Delete(ctx, ns)).NotTo(HaveOccurred(), "failed to delete test namespace")
+		Expect(k8sClient.DeleteAllOf(ctx, &networkv1alpha1.ClusterPrefixAllocation{})).NotTo(HaveOccurred(), "failed to delete cluster prefixe allocations")
+		Expect(k8sClient.DeleteAllOf(ctx, &networkv1alpha1.ClusterPrefix{})).NotTo(HaveOccurred(), "failed to delete cluster prefixes")
 	})
 
 	return ns
