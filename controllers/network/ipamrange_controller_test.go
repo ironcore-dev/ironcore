@@ -309,14 +309,14 @@ var _ = Describe("IPAMRangeReconciler", func() {
 			By("creating initial parent range")
 			prefix, err := netaddr.ParseIPPrefix(parentCIDR)
 			Expect(err).ToNot(HaveOccurred())
-			pc := commonv1alpha1.NewCIDR(prefix)
+			pc := commonv1alpha1.NewIPPrefix(prefix)
 			parent := networkv1alpha1.IPAMRange{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "parent",
 					Namespace: ns.GetName(),
 				},
 				Spec: networkv1alpha1.IPAMRangeSpec{
-					CIDRs: []commonv1alpha1.CIDR{pc},
+					CIDRs: []commonv1alpha1.IPPrefix{pc},
 				},
 			}
 			Expect(k8sClient.Create(ctx, &parent)).To(Succeed())
@@ -324,7 +324,7 @@ var _ = Describe("IPAMRangeReconciler", func() {
 			By("creating child with a reserved range")
 			prefix, err = netaddr.ParseIPPrefix("192.168.1.0/25")
 			Expect(err).ToNot(HaveOccurred())
-			cc := commonv1alpha1.NewCIDR(prefix)
+			cc := commonv1alpha1.NewIPPrefix(prefix)
 			child := networkv1alpha1.IPAMRange{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "child",
@@ -347,7 +347,7 @@ var _ = Describe("IPAMRangeReconciler", func() {
 			By("creating a second child that tries to allocate over the reserved range")
 			prefix, err = netaddr.ParseIPPrefix("192.168.1.1/25")
 			Expect(err).ToNot(HaveOccurred())
-			scc := commonv1alpha1.NewCIDR(prefix)
+			scc := commonv1alpha1.NewIPPrefix(prefix)
 			secondChild := networkv1alpha1.IPAMRange{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "second-child",
