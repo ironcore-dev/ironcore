@@ -304,7 +304,7 @@ var _ = Describe("IPAMRangeReconciler", func() {
 		})
 
 		It("should not pass on reserved range to child", func() {
-			// parent := createParentIPAMRange(ctx, ns)
+			By("creating initial parent range")
 			prefix, err := netaddr.ParseIPPrefix(parentCIDR)
 			Expect(err).ToNot(HaveOccurred())
 			pc := commonv1alpha1.NewCIDR(prefix)
@@ -319,8 +319,7 @@ var _ = Describe("IPAMRangeReconciler", func() {
 			}
 			Expect(k8sClient.Create(ctx, &parent)).To(Succeed())
 
-			//child := createChildIPAMRange(ctx, &parent, "192.168.1.0/25", nil, 0, 0)
-
+			By("creating child with a reserved range")
 			prefix, err = netaddr.ParseIPPrefix("192.168.1.0/25")
 			Expect(err).ToNot(HaveOccurred())
 			cc := commonv1alpha1.NewCIDR(prefix)
@@ -343,6 +342,7 @@ var _ = Describe("IPAMRangeReconciler", func() {
 			}
 			Expect(k8sClient.Create(ctx, &child)).To(Succeed())
 
+			By("creating a second child that tries to allocate over the reserved range")
 			prefix, err = netaddr.ParseIPPrefix("192.168.1.1/25")
 			Expect(err).ToNot(HaveOccurred())
 			scc := commonv1alpha1.NewCIDR(prefix)
