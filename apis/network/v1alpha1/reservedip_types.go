@@ -36,7 +36,7 @@ type ReservedIPSpec struct {
 	Subnet corev1.LocalObjectReference `json:"subnet"`
 	// IP specifies an IP address which should be reserved. Must be in the CIDR of the
 	// associated Subnet
-	IP *common.IPAddr `json:"ip,omitempty"`
+	IP *common.IP `json:"ip,omitempty"`
 	// Assignment indicates to which resource this IP address should be assigned
 	Assignment ReservedIPAssignment `json:"assignment,omitempty"`
 }
@@ -56,7 +56,7 @@ type ReservedIPStatus struct {
 	State      ReservedIPState       `json:"state,omitempty"`
 	Conditions []ReservedIPCondition `json:"conditions,omitempty"`
 	// IP indicates the effective reserved IP address
-	IP    *common.IPAddr   `json:"ip,omitempty"`
+	IP    *common.IP       `json:"ip,omitempty"`
 	Bound *ReservedIPBound `json:"bound,omitempty"`
 }
 

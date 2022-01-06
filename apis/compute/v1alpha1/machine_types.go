@@ -75,7 +75,7 @@ type Interface struct {
 	// Priority is the priority level of this interface
 	Priority int32 `json:"priority,omitempty"`
 	// IP specifies a concrete IP address which should be allocated from a Subnet
-	IP *commonv1alpha1.IPAddr `json:"ip,omitempty"`
+	IP *commonv1alpha1.IP `json:"ip,omitempty"`
 }
 
 // VolumeClaim defines a volume claim of a machine
@@ -106,7 +106,7 @@ type InterfaceStatus struct {
 	// Name is the name of an interface.
 	Name string `json:"name"`
 	// IP is the IP allocated for an interface.
-	IP commonv1alpha1.IPAddr `json:"ip"`
+	IP commonv1alpha1.IP `json:"ip"`
 	// Priority is the OS priority of the interface.
 	Priority int32 `json:"priority,omitempty"`
 }

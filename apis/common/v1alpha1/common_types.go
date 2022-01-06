@@ -17,6 +17,7 @@
 package v1alpha1
 
 import (
+	"encoding/json"
 	"inet.af/netaddr"
 	corev1 "k8s.io/api/core/v1"
 )
@@ -45,54 +46,112 @@ type SecretKeySelector struct {
 	Key string `json:"key,omitempty"`
 }
 
-// IPAddr is an IP address.
+// IP is an IP address.
 //+kubebuilder:validation:Type=string
-type IPAddr struct {
+type IP struct {
 	netaddr.IP `json:"-"`
 }
 
-func (in *IPAddr) DeepCopyInto(out *IPAddr) {
+func (in *IP) DeepCopyInto(out *IP) {
 	*out = *in
 }
 
-func (IPAddr) OpenAPISchemaType() []string { return []string{"string"} }
-
-func NewIPAddr(ip netaddr.IP) IPAddr {
-	return IPAddr{ip}
+func (i IP) GomegaString() string {
+	return i.String()
 }
 
-func ParseIPAddr(s string) (IPAddr, error) {
+func (i *IP) UnmarshalJSON(b []byte) error {
+	if len(b) == 4 && string(b) == "null" {
+		i.IP = netaddr.IP{}
+		return nil
+	}
+
+	var str string
+	err := json.Unmarshal(b, &str)
+	if err != nil {
+		return err
+	}
+
+	p, err := netaddr.ParseIP(str)
+	if err != nil {
+		return err
+	}
+
+	i.IP = p
+	return nil
+}
+
+func (i *IP) MarshalJSON() ([]byte, error) {
+	if i.IsZero() {
+		// Encode unset/nil objects as JSON's "null".
+		return []byte("null"), nil
+	}
+	return json.Marshal(i.String())
+}
+
+func (IP) OpenAPISchemaType() []string { return []string{"string"} }
+
+func NewIP(ip netaddr.IP) IP {
+	return IP{ip}
+}
+
+func ParseIP(s string) (IP, error) {
 	addr, err := netaddr.ParseIP(s)
 	if err != nil {
-		return IPAddr{}, err
+		return IP{}, err
 	}
-	return IPAddr{addr}, nil
+	return IP{addr}, nil
 }
 
-func MustParseIPAddr(s string) IPAddr {
-	return IPAddr{netaddr.MustParseIP(s)}
+func MustParseIP(s string) IP {
+	return IP{netaddr.MustParseIP(s)}
 }
 
-func NewIPAddrPtr(ip netaddr.IP) *IPAddr {
-	return &IPAddr{ip}
+func NewIPPtr(ip netaddr.IP) *IP {
+	return &IP{ip}
 }
 
-func PtrToIPAddr(addr IPAddr) *IPAddr {
+func PtrToIP(addr IP) *IP {
 	return &addr
 }
 
 // IPRange is an IP range.
 type IPRange struct {
-	From IPAddr `json:"from"`
-	To   IPAddr `json:"to"`
+	From IP `json:"from"`
+	To   IP `json:"to"`
 }
 
 func (i *IPRange) Range() netaddr.IPRange {
+	if i == nil {
+		return netaddr.IPRange{}
+	}
 	return netaddr.IPRangeFrom(i.From.IP, i.To.IP)
 }
 
+func (i *IPRange) IsValid() bool {
+	if i == nil {
+		return false
+	}
+	return i.Range().IsValid()
+}
+
+func (i *IPRange) IsZero() bool {
+	if i == nil {
+		return true
+	}
+	return i.Range().IsZero()
+}
+
+func (i IPRange) String() string {
+	return i.Range().String()
+}
+
+func (i IPRange) GomegaString() string {
+	return i.String()
+}
+
 func NewIPRange(ipRange netaddr.IPRange) IPRange {
-	return IPRange{From: NewIPAddr(ipRange.From()), To: NewIPAddr(ipRange.To())}
+	return IPRange{From: NewIP(ipRange.From()), To: NewIP(ipRange.To())}
 }
 
 func NewIPRangePtr(ipRange netaddr.IPRange) *IPRange {
@@ -104,7 +163,7 @@ func PtrToIPRange(ipRange IPRange) *IPRange {
 	return &ipRange
 }
 
-func IPRangeFrom(from IPAddr, to IPAddr) IPRange {
+func IPRangeFrom(from IP, to IP) IPRange {
 	return NewIPRange(netaddr.IPRangeFrom(from.IP, to.IP))
 }
 
@@ -113,47 +172,81 @@ func ParseIPRange(s string) (IPRange, error) {
 	if err != nil {
 		return IPRange{}, err
 	}
-	return IPRange{From: IPAddr{rng.From()}, To: IPAddr{rng.To()}}, nil
+	return IPRange{From: IP{rng.From()}, To: IP{rng.To()}}, nil
 }
 
 func MustParseIPRange(s string) IPRange {
 	rng := netaddr.MustParseIPRange(s)
-	return IPRange{From: IPAddr{rng.From()}, To: IPAddr{rng.To()}}
+	return IPRange{From: IP{rng.From()}, To: IP{rng.To()}}
 }
 
-// CIDR represents a network CIDR.
+// IPPrefix represents a network prefix.
 //+kubebuilder:validation:Type=string
-type CIDR struct {
+//+nullable
+type IPPrefix struct {
 	netaddr.IPPrefix `json:"-"`
 }
 
-func (in *CIDR) DeepCopyInto(out *CIDR) {
+func (i IPPrefix) GomegaString() string {
+	return i.String()
+}
+
+func (i *IPPrefix) UnmarshalJSON(b []byte) error {
+	if len(b) == 4 && string(b) == "null" {
+		i.IPPrefix = netaddr.IPPrefix{}
+		return nil
+	}
+
+	var str string
+	err := json.Unmarshal(b, &str)
+	if err != nil {
+		return err
+	}
+
+	p, err := netaddr.ParseIPPrefix(str)
+	if err != nil {
+		return err
+	}
+
+	i.IPPrefix = p
+	return nil
+}
+
+func (i *IPPrefix) MarshalJSON() ([]byte, error) {
+	if i.IsZero() {
+		// Encode unset/nil objects as JSON's "null".
+		return []byte("null"), nil
+	}
+	return json.Marshal(i.String())
+}
+
+func (in *IPPrefix) DeepCopyInto(out *IPPrefix) {
 	*out = *in
 }
 
-func (CIDR) OpenAPISchemaType() []string { return []string{"string"} }
+func (IPPrefix) OpenAPISchemaType() []string { return []string{"string"} }
 
-func NewCIDR(prefix netaddr.IPPrefix) CIDR {
-	return CIDR{IPPrefix: prefix}
+func NewIPPrefix(prefix netaddr.IPPrefix) IPPrefix {
+	return IPPrefix{IPPrefix: prefix}
 }
 
-func ParseCIDR(s string) (CIDR, error) {
+func ParseIPPrefix(s string) (IPPrefix, error) {
 	prefix, err := netaddr.ParseIPPrefix(s)
 	if err != nil {
-		return CIDR{}, err
+		return IPPrefix{}, err
 	}
-	return CIDR{prefix}, nil
+	return IPPrefix{prefix}, nil
 }
 
-func MustParseCIDR(s string) CIDR {
-	return CIDR{netaddr.MustParseIPPrefix(s)}
+func MustParseIPPrefix(s string) IPPrefix {
+	return IPPrefix{netaddr.MustParseIPPrefix(s)}
 }
 
-func NewCIDRPtr(prefix netaddr.IPPrefix) *CIDR {
-	c := NewCIDR(prefix)
+func NewIPPrefixPtr(prefix netaddr.IPPrefix) *IPPrefix {
+	c := NewIPPrefix(prefix)
 	return &c
 }
 
-func PtrToCIDR(cidr CIDR) *CIDR {
-	return &cidr
+func PtrToIPPrefix(prefix IPPrefix) *IPPrefix {
+	return &prefix
 }

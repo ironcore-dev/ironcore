@@ -42,6 +42,26 @@ webhooks:
     service:
       name: webhook-service
       namespace: system
+      path: /validate-compute-onmetal-de-v1alpha1-machine
+  failurePolicy: Fail
+  name: machine.v1alpha1.compute.onmetal.de
+  rules:
+  - apiGroups:
+    - compute.onmetal.de
+    apiVersions:
+    - v1alpha1
+    operations:
+    - UPDATE
+    resources:
+    - machines
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
       path: /validate-network-onmetal-de-v1alpha1-ipamrange
   failurePolicy: Fail
   name: vipamrange.kb.io
@@ -56,4 +76,24 @@ webhooks:
     - DELETE
     resources:
     - ipamranges
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-storage-onmetal-de-v1alpha1-volume
+  failurePolicy: Fail
+  name: vvolume.kb.io
+  rules:
+  - apiGroups:
+    - storage.onmetal.de
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - volumes
   sideEffects: None

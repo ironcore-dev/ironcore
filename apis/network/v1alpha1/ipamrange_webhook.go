@@ -17,13 +17,17 @@
 package v1alpha1
 
 import (
+	"fmt"
+	"reflect"
+
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
-	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+
+	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 )
 
 const (
@@ -31,7 +35,9 @@ const (
 )
 
 // log is for logging in this package.
-var ipamrangelog = logf.Log.WithName("ipamrange-resource")
+var (
+	ipamrangelog = logf.Log.WithName("ipamrange-resource")
+)
 
 func (r *IPAMRange) SetupWebhookWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr).
@@ -63,6 +69,12 @@ func (r *IPAMRange) ValidateCreate() error {
 		if r.Spec.Parent.Name == "" {
 			allErrs = append(allErrs, field.Required(path.Child("parent").Child("name"), r.Spec.Parent.Name))
 		}
+		if len(r.Spec.CIDRs) > 0 {
+			allErrs = append(allErrs, field.Forbidden(path.Child("cidrs"), "CIDRs should be empty for child IPAMRange"))
+		}
+		allErrs = append(allErrs, r.overlappingRequestExist()...)
+	} else {
+		allErrs = append(allErrs, r.overlappingParentExists()...)
 	}
 
 	if len(allErrs) == 0 {
@@ -72,20 +84,21 @@ func (r *IPAMRange) ValidateCreate() error {
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (r *IPAMRange) ValidateUpdate(old runtime.Object) error {
+func (r *IPAMRange) ValidateUpdate(oldObj runtime.Object) error {
 	ipamrangelog.Info("validate update", "name", r.Name)
 
-	oldRange := old.(*IPAMRange)
+	oldRange := oldObj.(*IPAMRange)
 	path := field.NewPath("spec")
 
 	var allErrs field.ErrorList
-
-	if !reflect.DeepEqual(r.Spec.Parent, oldRange.Spec.Parent) {
-		allErrs = append(allErrs, field.Invalid(path.Child("parent"), r.Spec.Parent, fieldImmutable))
-	}
-
-	if !reflect.DeepEqual(r.Spec.CIDRs, oldRange.Spec.CIDRs) {
-		allErrs = append(allErrs, field.Invalid(path.Child("cidr"), r.Spec.CIDRs, fieldImmutable))
+	if r.Spec.Parent != nil {
+		if !reflect.DeepEqual(r.Spec.Parent, oldRange.Spec.Parent) {
+			allErrs = append(allErrs, field.Invalid(path.Child("parent"), r.Spec.Parent, fieldImmutable))
+		}
+		allErrs = append(allErrs, r.overlappingRequestExist()...)
+	} else {
+		allErrs = append(allErrs, r.overlappingParentExists()...)
+		allErrs = append(allErrs, r.deletedCIDRsUsed(oldRange)...)
 	}
 
 	if len(allErrs) == 0 {
@@ -97,6 +110,94 @@ func (r *IPAMRange) ValidateUpdate(old runtime.Object) error {
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
 func (r *IPAMRange) ValidateDelete() error {
 	ipamrangelog.Info("validate delete", "name", r.Name)
-	// TODO(user): fill in your validation logic upon object deletion.
+	return nil
+}
+
+// overlappingParentExists checks if any other parent IPAM range is already overlapping passed CIDRs
+func (r *IPAMRange) overlappingParentExists() (errs field.ErrorList) {
+	path := field.NewPath("spec").Child("cidrs")
+
+	for i, cidr1 := range r.Spec.CIDRs {
+	loop:
+		for _, cidr2 := range r.Spec.CIDRs[i+1:] {
+			if cidr1.Overlaps(cidr2.IPPrefix) {
+				errs = append(errs, field.Duplicate(path, cidr2.String()))
+				continue loop
+			}
+		}
+	}
+
+	return
+}
+
+// deletedCIDRsUsed checks if some of deleted CIDRs are used by children requests
+func (r *IPAMRange) deletedCIDRsUsed(oldReq *IPAMRange) (errs field.ErrorList) {
+	var deletedCIDRs []commonv1alpha1.IPPrefix
+loop:
+	for _, cidr := range oldReq.Spec.CIDRs {
+		for _, newCidr := range r.Spec.CIDRs {
+			if cidr == newCidr {
+				continue loop
+			}
+		}
+
+		deletedCIDRs = append(deletedCIDRs, cidr)
+	}
+	if len(deletedCIDRs) == 0 {
+		return
+	}
+
+	path := field.NewPath("spec").Child("cidrs")
+	for _, alloc := range oldReq.Status.Allocations {
+		if alloc.State == IPAMRangeAllocationUsed {
+			for _, cidr := range deletedCIDRs {
+				if alloc.IPs != nil && alloc.IPs.Range().Overlaps(cidr.Range()) {
+					errs = append(errs, field.Forbidden(path, fmt.Sprintf("CIDR %s is used by child request", cidr.String())))
+				} else if alloc.CIDR != nil && alloc.CIDR.Overlaps(cidr.IPPrefix) {
+					errs = append(errs, field.Forbidden(path, fmt.Sprintf("CIDR %s is used by child request", cidr.String())))
+				}
+			}
+		}
+	}
+
+	return
+}
+
+// overlappingRequestExist checks if any other IPAM range request overlaps CIDR or IP range of passed request
+func (r *IPAMRange) overlappingRequestExist() (errs field.ErrorList) {
+	for i, req1 := range r.Spec.Requests {
+	loop:
+		for _, req2 := range r.Spec.Requests[i+1:] {
+			if err := checkRequestOverlap(req1, req2); err != nil {
+				errs = append(errs, err)
+				continue loop
+			}
+		}
+	}
+
+	return
+}
+
+// checkRequestOverlap checks if requests overlap by CIDR or IP range
+func checkRequestOverlap(req1, req2 IPAMRangeRequest) *field.Error {
+	path := field.NewPath("spec").Child("requests")
+
+	if req1.CIDR != nil {
+		subpath := path.Child("cidr")
+		if req2.CIDR != nil && req1.CIDR.Overlaps(req2.CIDR.IPPrefix) {
+			return field.Duplicate(subpath, req2.CIDR.String())
+		} else if req2.IPs != nil && req1.CIDR.Range().Overlaps(req2.IPs.Range()) {
+			return field.Duplicate(subpath, req1.CIDR.String())
+		}
+	} else if req1.IPs != nil {
+		subpath := path.Child("ips")
+		if req2.CIDR != nil && req2.CIDR.Range().Overlaps(req1.IPs.Range()) {
+			return field.Duplicate(subpath, req2.IPs.Range().String())
+		}
+		if req2.IPs != nil && req2.IPs.Range().Overlaps(req1.IPs.Range()) {
+			return field.Duplicate(subpath, req2.IPs.Range().String())
+		}
+	}
+
 	return nil
 }

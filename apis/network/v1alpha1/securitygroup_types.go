@@ -61,7 +61,7 @@ type SecurityGroupRule struct {
 // IPSetSpec defines either a cidr or a security group reference
 type IPSetSpec struct {
 	// CIDR block for source/destination
-	CIDR common.CIDR `json:"cidr,omitempty"`
+	CIDR common.IPPrefix `json:"cidr,omitempty"`
 	// SecurityGroupRef references a security group
 	SecurityGroupRef corev1.LocalObjectReference `json:"securityGroupref,omitempty"`
 }

@@ -106,7 +106,7 @@ func (r *ReservedIPReconciler) reconcile(ctx context.Context, log logr.Logger, r
 		return ctrl.Result{}, fmt.Errorf("could not apply ipam range: %w", err)
 	}
 
-	var ip *commonv1alpha1.IPAddr
+	var ip *commonv1alpha1.IP
 	for _, allocation := range ipamRange.Status.Allocations {
 		if allocation.State != networkv1alpha1.IPAMRangeAllocationFree || allocation.IPs == nil {
 			continue

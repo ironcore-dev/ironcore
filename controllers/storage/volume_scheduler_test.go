@@ -15,17 +15,16 @@
 package storage
 
 import (
-	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 )
 
 var _ = Describe("VolumeScheduler", func() {
-	ctx := ctrl.SetupSignalHandler()
 	ns := SetupTest(ctx)
 
 	It("should schedule volumes on storage pools", func() {

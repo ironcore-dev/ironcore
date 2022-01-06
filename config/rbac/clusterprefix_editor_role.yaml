@@ -1,0 +1,24 @@
+# permissions for end users to edit clusterprefixes.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: clusterprefix-editor-role
+rules:
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - clusterprefixes
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - clusterprefixes/status
+  verbs:
+  - get

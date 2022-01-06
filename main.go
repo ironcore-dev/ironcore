@@ -172,21 +172,12 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "RoutingDomain")
 		os.Exit(1)
 	}
-
-	// IPAMRange controller
 	if err = (&networkcontrollers.IPAMRangeReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "IPAMRange")
 		os.Exit(1)
-	}
-	// IPAMRange webhook
-	if enableWebhooks {
-		if err = (&networkv1alpha1.IPAMRange{}).SetupWebhookWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create webhook", "webhook", "IPAMRange")
-			os.Exit(1)
-		}
 	}
 
 	if err = (&networkcontrollers.GatewayReconciler{
@@ -197,7 +188,61 @@ func main() {
 		os.Exit(1)
 	}
 
+	// webhook
+	if enableWebhooks {
+		if err = (&networkv1alpha1.IPAMRange{}).SetupWebhookWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create webhook", "webhook", "IPAMRange")
+			os.Exit(1)
+		}
+
+		if err = (&computev1alpha1.Machine{}).SetupWebhookWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create webhook", "webhook", "Machine")
+			os.Exit(1)
+		}
+
+		if err = (&storagev1alpha1.Volume{}).SetupWebhookWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create webhook", "webhook", "Volume")
+			os.Exit(1)
+		}
+	}
+
+	if err = (&networkcontrollers.PrefixReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "Prefix")
+		os.Exit(1)
+	}
+	if err = (&networkcontrollers.IPReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "IP")
+		os.Exit(1)
+	}
+	if err = (&networkcontrollers.ClusterPrefixReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "ClusterPrefix")
+		os.Exit(1)
+	}
 	//+kubebuilder:scaffold:builder
+
+	if err = (&networkcontrollers.ClusterPrefixAllocationSchedulerReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "ClusterPrefixAllocationScheduler")
+		os.Exit(1)
+	}
+	if err = (&networkcontrollers.PrefixAllocationSchedulerReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "PrefixAllocationScheduler")
+		os.Exit(1)
+	}
 
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")

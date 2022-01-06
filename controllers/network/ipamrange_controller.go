@@ -183,7 +183,7 @@ func (r *IPAMRangeReconciler) delete(ctx context.Context, log logr.Logger, ipamR
 	return ctrl.Result{}, nil
 }
 
-func ipSetFromCIDRs(cidrs []commonv1alpha1.CIDR) (*netaddr.IPSet, error) {
+func ipSetFromCIDRs(cidrs []commonv1alpha1.IPPrefix) (*netaddr.IPSet, error) {
 	var bldr netaddr.IPSetBuilder
 	for _, cidr := range cidrs {
 		bldr.AddPrefix(cidr.IPPrefix)
@@ -266,7 +266,7 @@ func (r *IPAMRangeReconciler) sortedRequests(items []networkv1alpha1.IPAMRange, 
 
 type allocation struct {
 	ips  *commonv1alpha1.IPRange
-	cidr *commonv1alpha1.CIDR
+	cidr *commonv1alpha1.IPPrefix
 }
 
 func (r *IPAMRangeReconciler) gatherAvailable(ctx context.Context, ipamRange *networkv1alpha1.IPAMRange) (available *netaddr.IPSet, parentAllocations []allocation, failed []networkv1alpha1.IPAMRangeAllocationStatus, err error) {
@@ -423,9 +423,9 @@ func (r *IPAMRangeReconciler) computeChildAllocations(
 			})
 		} else {
 			available = newSet
-			var cidr *commonv1alpha1.CIDR
+			var cidr *commonv1alpha1.IPPrefix
 			if prefix != nil {
-				cidr = commonv1alpha1.NewCIDRPtr(*prefix)
+				cidr = commonv1alpha1.NewIPPrefixPtr(*prefix)
 			}
 			var ips *commonv1alpha1.IPRange
 			if ipRange != nil {
@@ -481,21 +481,17 @@ func (r *IPAMRangeReconciler) computeFreeAllocations(available *netaddr.IPSet, p
 			}
 		case info.cidr != nil:
 			for _, cidr := range intersection.Prefixes() {
-				status := networkv1alpha1.IPAMRangeAllocationStatus{
-					CIDR:  commonv1alpha1.NewCIDRPtr(cidr),
+				res = append(res, networkv1alpha1.IPAMRangeAllocationStatus{
+					CIDR:  commonv1alpha1.NewIPPrefixPtr(cidr),
 					State: networkv1alpha1.IPAMRangeAllocationFree,
-					// Request: &networkv1alpha1.IPAMRangeRequest{
-					// 	Size: int32(25),
-					// },
-				}
-				res = append(res, status)
+				})
 			}
 		}
 	}
 
 	for _, cidr := range available.Prefixes() {
 		res = append(res, networkv1alpha1.IPAMRangeAllocationStatus{
-			CIDR:  commonv1alpha1.NewCIDRPtr(cidr),
+			CIDR:  commonv1alpha1.NewIPPrefixPtr(cidr),
 			State: networkv1alpha1.IPAMRangeAllocationFree,
 		})
 	}

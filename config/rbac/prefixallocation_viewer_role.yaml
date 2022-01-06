@@ -1,0 +1,20 @@
+# permissions for end users to view prefixallocations.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: prefixallocation-viewer-role
+rules:
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - prefixallocations
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - network.onmetal.de
+  resources:
+  - prefixallocations/status
+  verbs:
+  - get
