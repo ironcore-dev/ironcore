@@ -36,53 +36,6 @@ spec:
           spec:
             description: ConsoleSpec defines the desired state of Console
             properties:
-              lighthouseClientConfig:
-                description: LighthouseClientConfig is the ConsoleClientConfig for
-                  the machine to connect to a common lighthouse.
-                properties:
-                  caBundle:
-                    description: CABundle is a PEM encoded CA bundle which will be
-                      used to validate the endpoint's server certificate. If unspecified,
-                      system trust roots on the machine will be used.
-                    format: byte
-                    type: string
-                  keySecret:
-                    description: KeySecret is the key that will be looked up for a
-                      client key.
-                    properties:
-                      key:
-                        description: The key of the entry in the Secret resource's
-                          `data` field to be used. Some instances of this field may
-                          be defaulted, in others it may be required.
-                        type: string
-                      name:
-                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                          TODO: Add other useful fields. apiVersion, kind, uid?'
-                        type: string
-                    type: object
-                  service:
-                    description: Service is the service to connect to.
-                    properties:
-                      name:
-                        description: Name of the referenced service.
-                        type: string
-                      path:
-                        description: '`path` is an optional URL path which will be
-                          sent in any request to this service.'
-                        type: string
-                      port:
-                        description: Port on the service hosting the console. Defaults
-                          to 443 for backward compatibility. `port` should be a valid
-                          port number (1-65535, inclusive).
-                        format: int32
-                        type: integer
-                    required:
-                    - name
-                    type: object
-                  url:
-                    description: URL is the url to connect to.
-                    type: string
-                type: object
               machineRef:
                 description: MachineRef references the machine to open a console to.
                 properties:
@@ -91,41 +44,16 @@ spec:
                       TODO: Add other useful fields. apiVersion, kind, uid?'
                     type: string
                 type: object
-              type:
-                description: Type is the ConsoleType to use.
-                enum:
-                - Service
-                - Lighthouse
-                type: string
             required:
             - machineRef
-            - type
             type: object
           status:
             description: ConsoleStatus defines the observed state of Console
             properties:
-              serviceClientConfig:
+              clientConfig:
+                description: ClientConfig is the client configuration to connect to
+                  a console. Only usable if the ConsoleStatus.State is ConsoleStateReady.
                 properties:
-                  caBundle:
-                    description: CABundle is a PEM encoded CA bundle which will be
-                      used to validate the endpoint's server certificate. If unspecified,
-                      system trust roots on the machine will be used.
-                    format: byte
-                    type: string
-                  keySecret:
-                    description: KeySecret is the key that will be looked up for a
-                      client key.
-                    properties:
-                      key:
-                        description: The key of the entry in the Secret resource's
-                          `data` field to be used. Some instances of this field may
-                          be defaulted, in others it may be required.
-                        type: string
-                      name:
-                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                          TODO: Add other useful fields. apiVersion, kind, uid?'
-                        type: string
-                    type: object
                   service:
                     description: Service is the service to connect to.
                     properties:
@@ -145,11 +73,11 @@ spec:
                     required:
                     - name
                     type: object
-                  url:
-                    description: URL is the url to connect to.
-                    type: string
+                required:
+                - service
                 type: object
               state:
+                description: State is the state of a Console.
                 type: string
             type: object
         type: object
