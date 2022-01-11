@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/adracus/reflcompare v0.1.0
 	github.com/ahmetb/gen-crd-api-reference-docs v0.3.0
-	github.com/go-logr/logr v1.2.0
+	github.com/go-logr/logr v1.2.2
 	github.com/google/addlicense v1.0.0
 	github.com/onmetal/controller-utils v0.2.4
 	github.com/onsi/ginkgo v1.16.5
