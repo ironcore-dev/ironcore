@@ -61,11 +61,20 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				"192.168.1.0/25":   networkv1alpha1.IPAMRangeAllocationUsed,
 				"192.168.1.128/25": networkv1alpha1.IPAMRangeAllocationFree,
 			}
+			requested := commonv1alpha1.MustParseIPPrefix("192.168.1.0/25")
 			Eventually(func(g Gomega) {
 				key := types.NamespacedName{Name: parent.Name, Namespace: parent.Namespace}
 				obj := &networkv1alpha1.IPAMRange{}
 				g.Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
 				g.Expect(getAllocationStates(obj)).To(Equal(expectedParentAllocations))
+				g.Expect(obj.Status.Allocations).To(ContainElement(networkv1alpha1.IPAMRangeAllocationStatus{
+					CIDR: &requested,
+					Request: &networkv1alpha1.IPAMRangeRequest{
+						CIDR: &requested,
+					},
+					State: networkv1alpha1.IPAMRangeAllocationUsed,
+					User:  &corev1.LocalObjectReference{Name: child.Name},
+				}))
 			}, timeout, interval).Should(Succeed())
 
 			By("Check child allocations")
@@ -77,6 +86,13 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				obj := &networkv1alpha1.IPAMRange{}
 				g.Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
 				g.Expect(getAllocationStates(obj)).To(Equal(expectedChildAllocations))
+				g.Expect(obj.Status.Allocations).To(ContainElement(networkv1alpha1.IPAMRangeAllocationStatus{
+					CIDR: &requested,
+					Request: &networkv1alpha1.IPAMRangeRequest{
+						CIDR: &requested,
+					},
+					State: networkv1alpha1.IPAMRangeAllocationFree,
+				}))
 			}, timeout, interval).Should(Succeed())
 		})
 		It("should update parent allocations with size request", func() {
@@ -88,29 +104,37 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				"192.168.1.0/25":   networkv1alpha1.IPAMRangeAllocationUsed,
 				"192.168.1.128/25": networkv1alpha1.IPAMRangeAllocationFree,
 			}
+			requested := commonv1alpha1.MustParseIPPrefix("192.168.1.0/25")
 			Eventually(func(g Gomega) {
 				key := types.NamespacedName{Name: parent.Name, Namespace: parent.Namespace}
 				obj := &networkv1alpha1.IPAMRange{}
 				g.Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
 				g.Expect(getAllocationStates(obj)).To(Equal(expectedParentAllocations))
+				g.Expect(obj.Status.Allocations).To(ContainElement(networkv1alpha1.IPAMRangeAllocationStatus{
+					CIDR: &requested,
+					Request: &networkv1alpha1.IPAMRangeRequest{
+						Size: int32(25),
+					},
+					State: networkv1alpha1.IPAMRangeAllocationUsed,
+					User:  &corev1.LocalObjectReference{Name: child.Name},
+				}))
 			}, timeout, interval).Should(Succeed())
 
 			By("Check child allocations")
 			expectedChildAllocations := map[string]networkv1alpha1.IPAMRangeAllocationState{
 				"192.168.1.0/25": networkv1alpha1.IPAMRangeAllocationFree,
 			}
-			parsedCIDR := commonv1alpha1.MustParseIPPrefix("192.168.1.0/25")
 			Eventually(func(g Gomega) {
 				key := types.NamespacedName{Name: child.Name, Namespace: child.Namespace}
 				obj := &networkv1alpha1.IPAMRange{}
 				g.Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
 				g.Expect(getAllocationStates(obj)).To(Equal(expectedChildAllocations))
 				g.Expect(obj.Status.Allocations).To(ContainElement(networkv1alpha1.IPAMRangeAllocationStatus{
-					CIDR:  &parsedCIDR,
-					State: networkv1alpha1.IPAMRangeAllocationFree,
+					CIDR: &requested,
 					Request: &networkv1alpha1.IPAMRangeRequest{
 						Size: int32(25),
 					},
+					State: networkv1alpha1.IPAMRangeAllocationFree,
 				}))
 			}, timeout, interval).Should(Succeed())
 		})
@@ -135,6 +159,14 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				g.Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
 				g.Expect(getAllocationStates(obj)).To(Equal(expectedParentAllocations))
 				g.Expect(getIPRanges(obj)).To(ContainElement(ipRange))
+				g.Expect(obj.Status.Allocations).To(ContainElement(networkv1alpha1.IPAMRangeAllocationStatus{
+					IPs: ipRange,
+					Request: &networkv1alpha1.IPAMRangeRequest{
+						IPs: ipRange,
+					},
+					State: networkv1alpha1.IPAMRangeAllocationUsed,
+					User:  &corev1.LocalObjectReference{Name: child.Name},
+				}))
 			}, timeout, interval).Should(Succeed())
 
 			By("Check child allocations")
@@ -143,6 +175,13 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				obj := &networkv1alpha1.IPAMRange{}
 				g.Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
 				g.Expect(getIPRanges(obj)).To(ContainElement(ipRange))
+				g.Expect(obj.Status.Allocations).To(ContainElement(networkv1alpha1.IPAMRangeAllocationStatus{
+					IPs: ipRange,
+					Request: &networkv1alpha1.IPAMRangeRequest{
+						IPs: ipRange,
+					},
+					State: networkv1alpha1.IPAMRangeAllocationFree,
+				}))
 			}, timeout, interval).Should(Succeed())
 		})
 		It("should update parent allocations with ip count request", func() {
@@ -161,6 +200,14 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				obj := &networkv1alpha1.IPAMRange{}
 				g.Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
 				g.Expect(getIPRanges(obj)).To(ContainElement(ipRange))
+				g.Expect(obj.Status.Allocations).To(ContainElement(networkv1alpha1.IPAMRangeAllocationStatus{
+					IPs: ipRange,
+					Request: &networkv1alpha1.IPAMRangeRequest{
+						IPCount: 1,
+					},
+					State: networkv1alpha1.IPAMRangeAllocationUsed,
+					User:  &corev1.LocalObjectReference{Name: child.Name},
+				}))
 			}, timeout, interval).Should(Succeed())
 
 			By("Check child allocations")
@@ -169,6 +216,13 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				obj := &networkv1alpha1.IPAMRange{}
 				g.Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
 				g.Expect(getIPRanges(obj)).To(ContainElement(ipRange))
+				g.Expect(obj.Status.Allocations).To(ContainElement(networkv1alpha1.IPAMRangeAllocationStatus{
+					IPs: ipRange,
+					Request: &networkv1alpha1.IPAMRangeRequest{
+						IPCount: 1,
+					},
+					State: networkv1alpha1.IPAMRangeAllocationFree,
+				}))
 			}, timeout, interval).Should(Succeed())
 		})
 		It("allocation should fail if CIDR is out of range", func() {
@@ -179,12 +233,20 @@ var _ = Describe("IPAMRangeReconciler", func() {
 			expectedParentAllocations := map[string]networkv1alpha1.IPAMRangeAllocationState{
 				parentCIDR: networkv1alpha1.IPAMRangeAllocationFree,
 			}
+			requested := commonv1alpha1.MustParseIPPrefix("192.168.2.0/25")
 			Eventually(func(g Gomega) {
 				key := types.NamespacedName{Name: parent.Name, Namespace: parent.Namespace}
 				obj := &networkv1alpha1.IPAMRange{}
 				g.Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
 				g.Expect(getAllocationStates(obj)).To(Equal(expectedParentAllocations))
 				g.Expect(getFailedRequests(obj)).To(ContainElements(getRequestKeys(child.Spec.Requests)...))
+				g.Expect(obj.Status.Allocations).To(ContainElement(networkv1alpha1.IPAMRangeAllocationStatus{
+					Request: &networkv1alpha1.IPAMRangeRequest{
+						CIDR: &requested,
+					},
+					State: networkv1alpha1.IPAMRangeAllocationFailed,
+					User:  &corev1.LocalObjectReference{Name: child.Name},
+				}))
 			}, timeout, interval).Should(Succeed())
 
 			By("Check child allocations")
@@ -193,6 +255,12 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				obj := &networkv1alpha1.IPAMRange{}
 				g.Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
 				g.Expect(getFailedRequests(obj)).To(ContainElements(getRequestKeys(child.Spec.Requests)...))
+				g.Expect(obj.Status.Allocations).To(ContainElement(networkv1alpha1.IPAMRangeAllocationStatus{
+					Request: &networkv1alpha1.IPAMRangeRequest{
+						CIDR: &requested,
+					},
+					State: networkv1alpha1.IPAMRangeAllocationFailed,
+				}))
 			}, timeout, interval).Should(Succeed())
 		})
 		It("allocation should fail if size is too big", func() {
@@ -209,6 +277,13 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				g.Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
 				g.Expect(getAllocationStates(obj)).To(Equal(expectedParentAllocations))
 				g.Expect(getFailedRequests(obj)).To(ContainElements(getRequestKeys(child.Spec.Requests)...))
+				g.Expect(obj.Status.Allocations).To(ContainElement(networkv1alpha1.IPAMRangeAllocationStatus{
+					Request: &networkv1alpha1.IPAMRangeRequest{
+						Size: 23,
+					},
+					State: networkv1alpha1.IPAMRangeAllocationFailed,
+					User:  &corev1.LocalObjectReference{Name: child.Name},
+				}))
 			}, timeout, interval).Should(Succeed())
 
 			By("Check child allocations")
@@ -217,6 +292,12 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				obj := &networkv1alpha1.IPAMRange{}
 				g.Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
 				g.Expect(getFailedRequests(obj)).To(ContainElements(getRequestKeys(child.Spec.Requests)...))
+				g.Expect(obj.Status.Allocations).To(ContainElement(networkv1alpha1.IPAMRangeAllocationStatus{
+					Request: &networkv1alpha1.IPAMRangeRequest{
+						Size: 23,
+					},
+					State: networkv1alpha1.IPAMRangeAllocationFailed,
+				}))
 			}, timeout, interval).Should(Succeed())
 		})
 		It("allocation should fail if ip is out of range", func() {
@@ -240,6 +321,13 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				g.Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
 				g.Expect(getAllocationStates(obj)).To(Equal(expectedParentAllocations))
 				g.Expect(getFailedRequests(obj)).To(ContainElements(getRequestKeys(child.Spec.Requests)...))
+				g.Expect(obj.Status.Allocations).To(ContainElement(networkv1alpha1.IPAMRangeAllocationStatus{
+					Request: &networkv1alpha1.IPAMRangeRequest{
+						IPs: ipRange,
+					},
+					State: networkv1alpha1.IPAMRangeAllocationFailed,
+					User:  &corev1.LocalObjectReference{Name: child.Name},
+				}))
 			}, timeout, interval).Should(Succeed())
 
 			By("Check child allocations")
@@ -248,6 +336,12 @@ var _ = Describe("IPAMRangeReconciler", func() {
 				obj := &networkv1alpha1.IPAMRange{}
 				g.Expect(k8sClient.Get(ctx, key, obj)).Should(Succeed())
 				g.Expect(getFailedRequests(obj)).To(ContainElements(getRequestKeys(child.Spec.Requests)...))
+				g.Expect(obj.Status.Allocations).To(ContainElement(networkv1alpha1.IPAMRangeAllocationStatus{
+					Request: &networkv1alpha1.IPAMRangeRequest{
+						IPs: ipRange,
+					},
+					State: networkv1alpha1.IPAMRangeAllocationFailed,
+				}))
 			}, timeout, interval).Should(Succeed())
 		})
 
