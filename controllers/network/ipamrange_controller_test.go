@@ -99,7 +99,7 @@ var _ = Describe("IPAMRangeReconciler", func() {
 			expectedChildAllocations := map[string]networkv1alpha1.IPAMRangeAllocationState{
 				"192.168.1.0/25": networkv1alpha1.IPAMRangeAllocationFree,
 			}
-			parsedCIDR := commonv1alpha1.MustParseCIDR("192.168.1.0/25")
+			parsedCIDR := commonv1alpha1.MustParseIPPrefix("192.168.1.0/25")
 			Eventually(func(g Gomega) {
 				key := types.NamespacedName{Name: child.Name, Namespace: child.Namespace}
 				obj := &networkv1alpha1.IPAMRange{}
