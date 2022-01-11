@@ -64,9 +64,9 @@ const (
 	ipamRangeController        = "ipamrange"
 	gatewayController          = "gateway"
 
-	ipamRangeWebhook = "ipamrange-webhook"
-	machineWebhook   = "machine-webhook"
-	volumeWebhook    = "volume-webhook"
+	ipamRangeWebhook = "ipamrange"
+	machineWebhook   = "machine"
+	volumeWebhook    = "volume"
 )
 
 func init() {
