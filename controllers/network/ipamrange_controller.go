@@ -265,8 +265,9 @@ func (r *IPAMRangeReconciler) sortedRequests(items []networkv1alpha1.IPAMRange, 
 }
 
 type allocation struct {
-	ips  *commonv1alpha1.IPRange
-	cidr *commonv1alpha1.IPPrefix
+	ips     *commonv1alpha1.IPRange
+	cidr    *commonv1alpha1.IPPrefix
+	request *networkv1alpha1.IPAMRangeRequest
 }
 
 func (r *IPAMRangeReconciler) gatherAvailable(ctx context.Context, ipamRange *networkv1alpha1.IPAMRange) (available *netaddr.IPSet, parentAllocations []allocation, other []networkv1alpha1.IPAMRangeAllocationStatus, err error) {
@@ -296,7 +297,7 @@ func (r *IPAMRangeReconciler) gatherAvailable(ctx context.Context, ipamRange *ne
 						case allocStatus.IPs != nil:
 							availableBldr.AddRange(allocStatus.IPs.Range())
 						}
-						parentAllocations = append(parentAllocations, allocation{allocStatus.IPs, allocStatus.CIDR})
+						parentAllocations = append(parentAllocations, allocation{allocStatus.IPs, allocStatus.CIDR, &request})
 					} else {
 						other = append(other, networkv1alpha1.IPAMRangeAllocationStatus{
 							CIDR:    allocStatus.CIDR,
@@ -470,15 +471,17 @@ func (r *IPAMRangeReconciler) computeFreeAllocations(available *netaddr.IPSet, p
 		case info.ips != nil:
 			for _, ipRange := range intersection.Ranges() {
 				res = append(res, networkv1alpha1.IPAMRangeAllocationStatus{
-					IPs:   commonv1alpha1.NewIPRangePtr(ipRange),
-					State: networkv1alpha1.IPAMRangeAllocationFree,
+					IPs:     commonv1alpha1.NewIPRangePtr(ipRange),
+					Request: info.request,
+					State:   networkv1alpha1.IPAMRangeAllocationFree,
 				})
 			}
 		case info.cidr != nil:
 			for _, cidr := range intersection.Prefixes() {
 				res = append(res, networkv1alpha1.IPAMRangeAllocationStatus{
-					CIDR:  commonv1alpha1.NewIPPrefixPtr(cidr),
-					State: networkv1alpha1.IPAMRangeAllocationFree,
+					CIDR:    commonv1alpha1.NewIPPrefixPtr(cidr),
+					Request: info.request,
+					State:   networkv1alpha1.IPAMRangeAllocationFree,
 				})
 			}
 		}
