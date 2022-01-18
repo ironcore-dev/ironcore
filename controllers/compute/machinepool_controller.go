@@ -76,13 +76,14 @@ func (r *MachinePoolReconciler) reconcile(ctx context.Context, log logr.Logger, 
 	}
 
 	outdatedPool := pool.DeepCopy()
-	if cond.Status == corev1.ConditionTrue {
+	switch cond.Status {
+	case corev1.ConditionTrue:
 		if cond.LastUpdateTime.Add(r.MachinePoolGracePeriod).After(time.Now()) {
 			pool.Status.State = computev1alpha1.MachinePoolStateReady
 		} else {
 			pool.Status.State = computev1alpha1.MachinePoolStatePending
 		}
-	} else {
+	default:
 		pool.Status.State = computev1alpha1.MachinePoolStatePending
 	}
 

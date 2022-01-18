@@ -64,13 +64,14 @@ func (r *StoragePoolReconciler) reconcileExists(ctx context.Context, log logr.Lo
 	}
 
 	outdatedPool := pool.DeepCopy()
-	if cond.Status == corev1.ConditionTrue {
+	switch cond.Status {
+	case corev1.ConditionTrue:
 		if cond.LastUpdateTime.Add(r.StoragePoolGracePeriod).After(time.Now()) {
 			pool.Status.State = storagev1alpha1.StoragePoolStateAvailable
 		} else {
 			pool.Status.State = storagev1alpha1.StoragePoolStatePending
 		}
-	} else {
+	default:
 		pool.Status.State = storagev1alpha1.StoragePoolStatePending
 	}
 
