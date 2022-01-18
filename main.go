@@ -81,8 +81,6 @@ func main() {
 	var metricsAddr string
 	var enableLeaderElection bool
 	var probeAddr string
-	var enableWebhooks bool
-	flag.BoolVar(&enableWebhooks, "enable-webhooks", true, "Enable webhooks.")
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
@@ -104,7 +102,6 @@ func main() {
 	}
 	opts.BindFlags(flag.CommandLine)
 	flag.Parse()
-	enableWebhooks = enableWebhooks && os.Getenv("ENABLE_WEBHOOKS") != "false"
 
 	logger := zap.New(zap.UseFlagOptions(&opts))
 	ctrl.SetLogger(logger)
@@ -251,26 +248,24 @@ func main() {
 	}
 
 	// webhook
-	if enableWebhooks {
-		if webhooks.Enabled(ipamRangeWebhook) {
-			if err = (&networkv1alpha1.IPAMRange{}).SetupWebhookWithManager(mgr); err != nil {
-				setupLog.Error(err, "unable to create webhook", "webhook", "IPAMRange")
-				os.Exit(1)
-			}
+	if webhooks.Enabled(ipamRangeWebhook) {
+		if err = (&networkv1alpha1.IPAMRange{}).SetupWebhookWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create webhook", "webhook", "IPAMRange")
+			os.Exit(1)
 		}
+	}
 
-		if webhooks.Enabled(machineWebhook) {
-			if err = (&computev1alpha1.Machine{}).SetupWebhookWithManager(mgr); err != nil {
-				setupLog.Error(err, "unable to create webhook", "webhook", "Machine")
-				os.Exit(1)
-			}
+	if webhooks.Enabled(machineWebhook) {
+		if err = (&computev1alpha1.Machine{}).SetupWebhookWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create webhook", "webhook", "Machine")
+			os.Exit(1)
 		}
+	}
 
-		if webhooks.Enabled(volumeWebhook) {
-			if err = (&storagev1alpha1.Volume{}).SetupWebhookWithManager(mgr); err != nil {
-				setupLog.Error(err, "unable to create webhook", "webhook", "Volume")
-				os.Exit(1)
-			}
+	if webhooks.Enabled(volumeWebhook) {
+		if err = (&storagev1alpha1.Volume{}).SetupWebhookWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create webhook", "webhook", "Volume")
+			os.Exit(1)
 		}
 	}
 
