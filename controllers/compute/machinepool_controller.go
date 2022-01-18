@@ -69,13 +69,13 @@ func (r *MachinePoolReconciler) delete(ctx context.Context, log logr.Logger, poo
 }
 
 func (r *MachinePoolReconciler) reconcile(ctx context.Context, log logr.Logger, pool *computev1alpha1.MachinePool) (ctrl.Result, error) {
+	outdatedPool := pool.DeepCopy()
 	cond := &computev1alpha1.MachinePoolCondition{}
 	ok := conditionutils.MustFindSlice(pool.Status.Conditions, string(computev1alpha1.MachinePoolConditionTypeReady), cond)
 	if !ok {
-		return ctrl.Result{}, fmt.Errorf("failed to find 'Ready' condition")
+		log.Info("Didn't found ready condition for MachinePool")
 	}
 
-	outdatedPool := pool.DeepCopy()
 	switch cond.Status {
 	case corev1.ConditionTrue:
 		if cond.LastUpdateTime.Add(r.MachinePoolGracePeriod).After(time.Now()) {

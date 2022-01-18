@@ -60,7 +60,7 @@ func (r *StoragePoolReconciler) reconcileExists(ctx context.Context, log logr.Lo
 	cond := &storagev1alpha1.StoragePoolCondition{}
 	ok := conditionutils.MustFindSlice(pool.Status.Conditions, string(storagev1alpha1.StoragePoolConditionTypeReady), cond)
 	if !ok {
-		return ctrl.Result{}, fmt.Errorf("failed to find 'Ready' condition")
+		log.Info("Didn't found ready condition for StoragePool")
 	}
 
 	outdatedPool := pool.DeepCopy()
