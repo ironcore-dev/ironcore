@@ -29,6 +29,8 @@ spec:
         - /manager
         args:
         - --leader-elect
+        - --controllers=*
+        - --webhooks=*
         image: controller:latest
         name: manager
         securityContext:
