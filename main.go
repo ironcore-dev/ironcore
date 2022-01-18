@@ -90,15 +90,13 @@ func main() {
 			"Enabling this will ensure there is only one active controller manager.")
 
 	controllers := switches.New(
-		[]string{
-			machineClassController, machinePoolController, machineSchedulerController, storagePoolController,
-			storageClassController, volumeController, volumeAttachmentController, reservedIPController, securityGroupController,
-			subnetController, machineController, routingDomainController, ipamRangeController, gatewayController,
-		},
+		machineClassController, machinePoolController, machineSchedulerController, storagePoolController,
+		storageClassController, volumeController, volumeAttachmentController, reservedIPController, securityGroupController,
+		subnetController, machineController, routingDomainController, ipamRangeController, gatewayController,
 	)
 	flag.Var(controllers, "controllers", fmt.Sprintf("Controllers to enable. All controllers: %v. Disabled-by-default controllers: %v", controllers.All(), controllers.DisabledByDefault()))
 
-	webhooks := switches.New([]string{ipamRangeWebhook, machineWebhook, volumeWebhook})
+	webhooks := switches.New(ipamRangeWebhook, machineWebhook, volumeWebhook)
 	flag.Var(webhooks, "webhooks", fmt.Sprintf("Webhooks to enable. All webhooks: %v. Disabled-by-default webhooks: %v", webhooks.All(), webhooks.DisabledByDefault()))
 
 	opts := zap.Options{
