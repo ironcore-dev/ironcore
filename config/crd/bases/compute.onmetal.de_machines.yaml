@@ -178,40 +178,20 @@ spec:
                       type: string
                   type: object
                 type: array
-              volumeClaims:
-                description: VolumeClaims are volumes claimed by this machine.
+              volumeAttachments:
+                description: VolumeAttachments are volumes attached to this machine.
                 items:
-                  description: VolumeClaim defines a volume claim of a machine
+                  description: VolumeAttachment defines a volume attachment of a machine
                   properties:
                     name:
-                      description: Name is the name of the VolumeClaim
+                      description: Name is the name of the VolumeAttachment
                       type: string
                     priority:
                       description: Priority is the OS priority of the volume.
                       format: int32
                       type: integer
-                    retainPolicy:
-                      description: RetainPolicy defines what should happen when the
-                        machine is being deleted
-                      type: string
-                    size:
-                      anyOf:
-                      - type: integer
-                      - type: string
-                      description: Size defines the size of the volume
-                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
-                      x-kubernetes-int-or-string: true
-                    storageClass:
-                      description: StorageClass describes the storage class of the
-                        volumes
-                      properties:
-                        name:
-                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                            TODO: Add other useful fields. apiVersion, kind, uid?'
-                          type: string
-                      type: object
-                    volume:
-                      description: Volume is a reference to an existing volume
+                    volumeRef:
+                      description: VolumeRef is a reference to an existing volume
                       properties:
                         name:
                           description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
@@ -220,8 +200,6 @@ spec:
                       type: object
                   required:
                   - name
-                  - retainPolicy
-                  - storageClass
                   type: object
                 type: array
             required:
@@ -293,12 +271,12 @@ spec:
                 type: array
               state:
                 type: string
-              volumeClaims:
+              volumeAttachments:
                 items:
-                  description: VolumeClaimStatus is the status of a VolumeClaim.
+                  description: VolumeAttachmentStatus is the status of a VolumeAttachment.
                   properties:
                     name:
-                      description: Name is the name of a volume claim.
+                      description: Name is the name of a volume attachment.
                       type: string
                     priority:
                       description: Priority is the OS priority of the volume.

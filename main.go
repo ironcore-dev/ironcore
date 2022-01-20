@@ -55,7 +55,6 @@ const (
 	storagePoolController      = "storagepool"
 	storageClassController     = "storageclass"
 	volumeController           = "volume"
-	volumeAttachmentController = "volumeattachment"
 	reservedIPController       = "reservedip"
 	securityGroupController    = "securitygroup"
 	subnetController           = "subnet"
@@ -89,7 +88,7 @@ func main() {
 
 	controllers := switches.New(
 		machineClassController, machinePoolController, machineSchedulerController, storagePoolController,
-		storageClassController, volumeController, volumeAttachmentController, reservedIPController, securityGroupController,
+		storageClassController, volumeController, reservedIPController, securityGroupController,
 		subnetController, machineController, routingDomainController, ipamRangeController, gatewayController,
 	)
 	flag.Var(controllers, "controllers", fmt.Sprintf("Controllers to enable. All controllers: %v. Disabled-by-default controllers: %v", controllers.All(), controllers.DisabledByDefault()))
@@ -171,15 +170,6 @@ func main() {
 			Scheme: mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "Volume")
-			os.Exit(1)
-		}
-	}
-	if controllers.Enabled(volumeAttachmentController) {
-		if err = (&storagecontrollers.VolumeAttachmentReconciler{
-			Client: mgr.GetClient(),
-			Scheme: mgr.GetScheme(),
-		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "VolumeAttachment")
 			os.Exit(1)
 		}
 	}
