@@ -7,31 +7,6 @@
 <h2 id="common.onmetal.de/v1alpha1">common.onmetal.de/v1alpha1</h2>
 Resource Types:
 <ul></ul>
-<h3 id="common.onmetal.de/v1alpha1.CIDR">CIDR
-</h3>
-<div>
-<p>CIDR represents a network CIDR.</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>-</code><br/>
-<em>
-inet.af/netaddr.IPPrefix
-</em>
-</td>
-<td>
-</td>
-</tr>
-</tbody>
-</table>
 <h3 id="common.onmetal.de/v1alpha1.ConfigMapKeySelector">ConfigMapKeySelector
 </h3>
 <div>
@@ -78,13 +53,13 @@ required.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="common.onmetal.de/v1alpha1.IPAddr">IPAddr
+<h3 id="common.onmetal.de/v1alpha1.IP">IP
 </h3>
 <p>
 (<em>Appears on:</em><a href="#common.onmetal.de/v1alpha1.IPRange">IPRange</a>)
 </p>
 <div>
-<p>IPAddr is an IP address.</p>
+<p>IP is an IP address.</p>
 </div>
 <table>
 <thead>
@@ -99,6 +74,31 @@ required.</p>
 <code>-</code><br/>
 <em>
 inet.af/netaddr.IP
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="common.onmetal.de/v1alpha1.IPPrefix">IPPrefix
+</h3>
+<div>
+<p>IPPrefix represents a network prefix.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>-</code><br/>
+<em>
+inet.af/netaddr.IPPrefix
 </em>
 </td>
 <td>
@@ -123,8 +123,8 @@ inet.af/netaddr.IP
 <td>
 <code>from</code><br/>
 <em>
-<a href="#common.onmetal.de/v1alpha1.IPAddr">
-IPAddr
+<a href="#common.onmetal.de/v1alpha1.IP">
+IP
 </a>
 </em>
 </td>
@@ -135,8 +135,8 @@ IPAddr
 <td>
 <code>to</code><br/>
 <em>
-<a href="#common.onmetal.de/v1alpha1.IPAddr">
-IPAddr
+<a href="#common.onmetal.de/v1alpha1.IP">
+IP
 </a>
 </em>
 </td>
@@ -194,5 +194,5 @@ required.</p>
 <hr/>
 <p><em>
 Generated with <code>gen-crd-api-reference-docs</code>
-on git commit <code>a435c36</code>.
+on git commit <code>1e9845c</code>.
 </em></p>

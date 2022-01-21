@@ -388,6 +388,19 @@ StoragePoolState
 </tr>
 <tr>
 <td>
+<code>availableStorageClasses</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+[]Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>AvailableStorageClasses list the references of supported StorageClasses of this pool</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>available</code><br/>
 <em>
 <a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#resourcelist-v1-core">
@@ -469,6 +482,17 @@ Kubernetes core/v1.LocalObjectReference
 </tr>
 <tr>
 <td>
+<code>storagePoolSelector</code><br/>
+<em>
+map[string]string
+</em>
+</td>
+<td>
+<p>StoragePoolSelector selects a suitable StoragePool by the given labels.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>storagePool</code><br/>
 <em>
 <a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
@@ -477,7 +501,8 @@ Kubernetes core/v1.LocalObjectReference
 </em>
 </td>
 <td>
-<p>StoragePool indicates which storage pool to use for a volume</p>
+<p>StoragePool indicates which storage pool to use for a volume.
+If unset, the scheduler will figure out a suitable StoragePool.</p>
 </td>
 </tr>
 <tr>
@@ -506,296 +531,6 @@ VolumeStatus
 </em>
 </td>
 <td>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="storage.onmetal.de/v1alpha1.VolumeAttachment">VolumeAttachment
-</h3>
-<div>
-<p>VolumeAttachment is the Schema for the volumeattachments API</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>metadata</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
-Kubernetes meta/v1.ObjectMeta
-</a>
-</em>
-</td>
-<td>
-Refer to the Kubernetes API documentation for the fields of the
-<code>metadata</code> field.
-</td>
-</tr>
-<tr>
-<td>
-<code>spec</code><br/>
-<em>
-<a href="#storage.onmetal.de/v1alpha1.VolumeAttachmentSpec">
-VolumeAttachmentSpec
-</a>
-</em>
-</td>
-<td>
-<br/>
-<br/>
-<table>
-<tr>
-<td>
-<code>volume</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>Volume is a reference of the volume object which should be attached</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>machine</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>Machine is a reference of the machine object which the volume should be attached to</p>
-</td>
-</tr>
-</table>
-</td>
-</tr>
-<tr>
-<td>
-<code>status</code><br/>
-<em>
-<a href="#storage.onmetal.de/v1alpha1.VolumeAttachmentStatus">
-VolumeAttachmentStatus
-</a>
-</em>
-</td>
-<td>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="storage.onmetal.de/v1alpha1.VolumeAttachmentCondition">VolumeAttachmentCondition
-</h3>
-<p>
-(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.VolumeAttachmentStatus">VolumeAttachmentStatus</a>)
-</p>
-<div>
-<p>VolumeAttachmentCondition is one of the conditions of a volume.</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>type</code><br/>
-<em>
-<a href="#storage.onmetal.de/v1alpha1.VolumeAttachmentConditionType">
-VolumeAttachmentConditionType
-</a>
-</em>
-</td>
-<td>
-<p>Type is the type of the condition.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>status</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#conditionstatus-v1-core">
-Kubernetes core/v1.ConditionStatus
-</a>
-</em>
-</td>
-<td>
-<p>Status is the status of the condition.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>reason</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Reason is a machine-readable indication of why the condition is in a certain state.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>message</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Message is a human-readable explanation of why the condition has a certain reason / state.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>observedGeneration</code><br/>
-<em>
-int64
-</em>
-</td>
-<td>
-<p>ObservedGeneration represents the .metadata.generation that the condition was set based upon.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>lastUpdateTime</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
-Kubernetes meta/v1.Time
-</a>
-</em>
-</td>
-<td>
-<p>LastUpdateTime is the last time a condition has been updated.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>lastTransitionTime</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
-Kubernetes meta/v1.Time
-</a>
-</em>
-</td>
-<td>
-<p>LastTransitionTime is the last time the status of a condition has transitioned from one state to another.</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="storage.onmetal.de/v1alpha1.VolumeAttachmentConditionType">VolumeAttachmentConditionType
-(<code>string</code> alias)</h3>
-<p>
-(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.VolumeAttachmentCondition">VolumeAttachmentCondition</a>)
-</p>
-<div>
-<p>VolumeAttachmentConditionType is a type a VolumeAttachmentCondition can have.</p>
-</div>
-<h3 id="storage.onmetal.de/v1alpha1.VolumeAttachmentSpec">VolumeAttachmentSpec
-</h3>
-<p>
-(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.VolumeAttachment">VolumeAttachment</a>)
-</p>
-<div>
-<p>VolumeAttachmentSpec defines the desired state of VolumeAttachment</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>volume</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>Volume is a reference of the volume object which should be attached</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>machine</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>Machine is a reference of the machine object which the volume should be attached to</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="storage.onmetal.de/v1alpha1.VolumeAttachmentState">VolumeAttachmentState
-(<code>string</code> alias)</h3>
-<p>
-(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.VolumeAttachmentStatus">VolumeAttachmentStatus</a>)
-</p>
-<div>
-<p>VolumeAttachmentState is a state a VolumeAttachment can be int.</p>
-</div>
-<h3 id="storage.onmetal.de/v1alpha1.VolumeAttachmentStatus">VolumeAttachmentStatus
-</h3>
-<p>
-(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.VolumeAttachment">VolumeAttachment</a>)
-</p>
-<div>
-<p>VolumeAttachmentStatus defines the observed state of VolumeAttachment</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>state</code><br/>
-<em>
-<a href="#storage.onmetal.de/v1alpha1.VolumeAttachmentState">
-VolumeAttachmentState
-</a>
-</em>
-</td>
-<td>
-<p>State reports a VolumeAttachmentState a VolumeAttachment is in.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>conditions</code><br/>
-<em>
-<a href="#storage.onmetal.de/v1alpha1.VolumeAttachmentCondition">
-[]VolumeAttachmentCondition
-</a>
-</em>
-</td>
-<td>
-<p>Conditions reports the conditions a VolumeAttachment may have.</p>
 </td>
 </tr>
 </tbody>
@@ -942,6 +677,17 @@ Kubernetes core/v1.LocalObjectReference
 </tr>
 <tr>
 <td>
+<code>storagePoolSelector</code><br/>
+<em>
+map[string]string
+</em>
+</td>
+<td>
+<p>StoragePoolSelector selects a suitable StoragePool by the given labels.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>storagePool</code><br/>
 <em>
 <a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
@@ -950,7 +696,8 @@ Kubernetes core/v1.LocalObjectReference
 </em>
 </td>
 <td>
-<p>StoragePool indicates which storage pool to use for a volume</p>
+<p>StoragePool indicates which storage pool to use for a volume.
+If unset, the scheduler will figure out a suitable StoragePool.</p>
 </td>
 </tr>
 <tr>
@@ -1042,5 +789,5 @@ VolumeState
 <hr/>
 <p><em>
 Generated with <code>gen-crd-api-reference-docs</code>
-on git commit <code>a435c36</code>.
+on git commit <code>1e9845c</code>.
 </em></p>
