@@ -56,6 +56,21 @@ make manifests
     Make sure you install all new versions of the CRDs into your cluster by running `make install` after new manifests 
     have been generated.
 
+## Setup formatting tools
+
+Project uses `gofmt` and `goimports` for formatting. `gofmt` is used with default settings. While `goimports` should be used with `--local github.com/onmetal` flag, so that `goimports` would sort `onmetal` pkgs separately.
+
+You can automate running formatting tools in your IDE.
+
+- **VSCode** -- add following to the `settings.json`:
+```
+    "go.formatTool": "goimports",
+    "gopls": {
+        "formatting.local": "github.com/onmetal",
+    },
+```
+- **Goland** -- go to `File -> Settings -> Tools -> File Watchers` and replace contents of `Arguments` with `--local github.com/onmetal -w $FilePath$`
+
 ## Cleanup
 
 Remove the CRDs from your cluster.
