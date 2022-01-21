@@ -345,8 +345,7 @@ var _ = Describe("IPAMRangeReconciler", func() {
 			}, timeout, interval).Should(Succeed())
 		})
 
-		// TODO: Fix sporadic issue
-		PIt("should update allocations when CIDR is changed", func() {
+		It("should update allocations when CIDR is changed", func() {
 			parent := createParentIPAMRange(ctx, ns)
 			child := createChildIPAMRange(ctx, parent, "192.168.2.0/25", nil, 0, 0)
 
