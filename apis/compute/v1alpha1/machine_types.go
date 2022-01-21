@@ -18,10 +18,11 @@ package v1alpha1
 
 import (
 	"fmt"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 )
 
 func MachineInterfaceIPAMRangeName(machineName, ifaceName string) string {
@@ -47,8 +48,8 @@ type MachineSpec struct {
 	Interfaces []Interface `json:"interfaces,omitempty"`
 	// SecurityGroups is a list of security groups of a machine
 	SecurityGroups []corev1.LocalObjectReference `json:"securityGroups,omitempty"`
-	// VolumeClaims are volumes claimed by this machine.
-	VolumeClaims []VolumeClaim `json:"volumeClaims,omitempty"`
+	// VolumeAttachments are volumes attached to this machine.
+	VolumeAttachments []VolumeAttachment `json:"volumeAttachments,omitempty"`
 	// Ignition is a reference to a config map containing the ignition YAML for the machine to boot up.
 	// If key is empty, DefaultIgnitionKey will be used as fallback.
 	Ignition *commonv1alpha1.ConfigMapKeySelector `json:"ignition,omitempty"`
@@ -78,20 +79,14 @@ type Interface struct {
 	IP *commonv1alpha1.IP `json:"ip,omitempty"`
 }
 
-// VolumeClaim defines a volume claim of a machine
-type VolumeClaim struct {
-	// Name is the name of the VolumeClaim
+// VolumeAttachment defines a volume attachment of a machine
+type VolumeAttachment struct {
+	// Name is the name of the VolumeAttachment
 	Name string `json:"name"`
 	// Priority is the OS priority of the volume.
 	Priority int32 `json:"priority,omitempty"`
-	// RetainPolicy defines what should happen when the machine is being deleted
-	RetainPolicy RetainPolicy `json:"retainPolicy"`
-	// StorageClass describes the storage class of the volumes
-	StorageClass corev1.LocalObjectReference `json:"storageClass"`
-	// Size defines the size of the volume
-	Size *resource.Quantity `json:"size,omitempty"`
-	// Volume is a reference to an existing volume
-	Volume corev1.LocalObjectReference `json:"volume,omitempty"`
+	// VolumeRef is a reference to an existing volume
+	VolumeRef corev1.LocalObjectReference `json:"volumeRef,omitempty"`
 }
 
 type RetainPolicy string
@@ -111,9 +106,9 @@ type InterfaceStatus struct {
 	Priority int32 `json:"priority,omitempty"`
 }
 
-// VolumeClaimStatus is the status of a VolumeClaim.
-type VolumeClaimStatus struct {
-	// Name is the name of a volume claim.
+// VolumeAttachmentStatus is the status of a VolumeAttachment.
+type VolumeAttachmentStatus struct {
+	// Name is the name of a volume attachment.
 	Name string `json:"name"`
 	// Priority is the OS priority of the volume.
 	Priority int32 `json:"priority,omitempty"`
@@ -121,10 +116,10 @@ type VolumeClaimStatus struct {
 
 // MachineStatus defines the observed state of Machine
 type MachineStatus struct {
-	State        MachineState        `json:"state,omitempty"`
-	Conditions   []MachineCondition  `json:"conditions,omitempty"`
-	Interfaces   []InterfaceStatus   `json:"interfaces,omitempty"`
-	VolumeClaims []VolumeClaimStatus `json:"volumeClaims,omitempty"`
+	State             MachineState             `json:"state,omitempty"`
+	Conditions        []MachineCondition       `json:"conditions,omitempty"`
+	Interfaces        []InterfaceStatus        `json:"interfaces,omitempty"`
+	VolumeAttachments []VolumeAttachmentStatus `json:"volumeAttachments,omitempty"`
 }
 
 type MachineState string
