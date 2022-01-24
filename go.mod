@@ -7,7 +7,7 @@ require (
 	github.com/ahmetb/gen-crd-api-reference-docs v0.3.0
 	github.com/go-logr/logr v1.2.2
 	github.com/google/addlicense v1.0.0
-	github.com/onmetal/controller-utils v0.2.4
+	github.com/onmetal/controller-utils v0.3.0
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.17.0
 	inet.af/netaddr v0.0.0-20210903134321-85fa6c94624e

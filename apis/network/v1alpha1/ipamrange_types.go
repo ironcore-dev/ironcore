@@ -48,7 +48,8 @@ type IPAMRangeRequest struct {
 	CIDR *commonv1alpha1.IPPrefix `json:"cidr,omitempty"`
 	IPs  *commonv1alpha1.IPRange  `json:"ips,omitempty"`
 	// IPCount requests a consecutive IP range of the given size.
-	IPCount int32 `json:"ipCount,omitempty"`
+	IPCount  int32 `json:"ipCount,omitempty"`
+	Reserved bool  `json:"reserved,omitempty"`
 }
 
 // IPAMRangeStatus defines the observed state of IPAMRange
@@ -73,6 +74,8 @@ type IPAMRangeAllocationState string
 const (
 	// IPAMRangeAllocationFree reports that an allocation is available for use (by children or direct consumers).
 	IPAMRangeAllocationFree IPAMRangeAllocationState = "Free"
+	// IPAMRangeAllocationReserved reports that an allocation is available for use only to direct consumers.
+	IPAMRangeAllocationReserved IPAMRangeAllocationState = "Reserved"
 	// IPAMRangeAllocationUsed reports that an allocation is used by a child.
 	IPAMRangeAllocationUsed IPAMRangeAllocationState = "Used"
 	// IPAMRangeAllocationFailed reports that an allocation could not be made successfully.

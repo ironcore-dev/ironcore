@@ -7,6 +7,205 @@
 <h2 id="compute.onmetal.de/v1alpha1">compute.onmetal.de/v1alpha1</h2>
 Resource Types:
 <ul></ul>
+<h3 id="compute.onmetal.de/v1alpha1.Console">Console
+</h3>
+<div>
+<p>Console is the Schema for the consoles API</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#compute.onmetal.de/v1alpha1.ConsoleSpec">
+ConsoleSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>machineRef</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>MachineRef references the machine to open a console to.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="#compute.onmetal.de/v1alpha1.ConsoleStatus">
+ConsoleStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="compute.onmetal.de/v1alpha1.ConsoleClientConfig">ConsoleClientConfig
+</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.ConsoleStatus">ConsoleStatus</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>service</code><br/>
+<em>
+<a href="#compute.onmetal.de/v1alpha1.ServiceReference">
+ServiceReference
+</a>
+</em>
+</td>
+<td>
+<p>Service is the service to connect to.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="compute.onmetal.de/v1alpha1.ConsoleSpec">ConsoleSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.Console">Console</a>)
+</p>
+<div>
+<p>ConsoleSpec defines the desired state of Console</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>machineRef</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>MachineRef references the machine to open a console to.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="compute.onmetal.de/v1alpha1.ConsoleState">ConsoleState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.ConsoleStatus">ConsoleStatus</a>)
+</p>
+<div>
+<p>ConsoleState is a state a Console can be in.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Error&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Ready&#34;</p></td>
+<td></td>
+</tr></tbody>
+</table>
+<h3 id="compute.onmetal.de/v1alpha1.ConsoleStatus">ConsoleStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.Console">Console</a>)
+</p>
+<div>
+<p>ConsoleStatus defines the observed state of Console</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>state</code><br/>
+<em>
+<a href="#compute.onmetal.de/v1alpha1.ConsoleState">
+ConsoleState
+</a>
+</em>
+</td>
+<td>
+<p>State is the state of a Console.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>clientConfig</code><br/>
+<em>
+<a href="#compute.onmetal.de/v1alpha1.ConsoleClientConfig">
+ConsoleClientConfig
+</a>
+</em>
+</td>
+<td>
+<p>ClientConfig is the client configuration to connect to a console.
+Only usable if the ConsoleStatus.State is ConsoleStateReady.</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="compute.onmetal.de/v1alpha1.EFIVar">EFIVar
 </h3>
 <p>
@@ -110,9 +309,7 @@ int32
 <td>
 <code>ip</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IPAddr">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPAddr
-</a>
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
 </em>
 </td>
 <td>
@@ -152,9 +349,7 @@ string
 <td>
 <code>ip</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IPAddr">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPAddr
-</a>
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
 </em>
 </td>
 <td>
@@ -240,6 +435,17 @@ Kubernetes core/v1.LocalObjectReference
 </tr>
 <tr>
 <td>
+<code>machinePoolSelector</code><br/>
+<em>
+map[string]string
+</em>
+</td>
+<td>
+<p>MachinePoolSelector selects a suitable MachinePool by the given labels.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>machinePool</code><br/>
 <em>
 <a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
@@ -304,15 +510,15 @@ string
 </tr>
 <tr>
 <td>
-<code>volumeClaims</code><br/>
+<code>volumeAttachments</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.VolumeClaim">
-[]VolumeClaim
+<a href="#compute.onmetal.de/v1alpha1.VolumeAttachment">
+[]VolumeAttachment
 </a>
 </em>
 </td>
 <td>
-<p>VolumeClaims are volumes claimed by this machine.</p>
+<p>VolumeAttachments are volumes attached to this machine.</p>
 </td>
 </tr>
 <tr>
@@ -852,6 +1058,18 @@ MachinePoolState
 <td>
 </td>
 </tr>
+<tr>
+<td>
+<code>availableMachineClasses</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+[]Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
 </tbody>
 </table>
 <h3 id="compute.onmetal.de/v1alpha1.MachineSpec">MachineSpec
@@ -892,6 +1110,17 @@ Kubernetes core/v1.LocalObjectReference
 </td>
 <td>
 <p>MachineClass is a reference to the machine class/flavor of the machine.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>machinePoolSelector</code><br/>
+<em>
+map[string]string
+</em>
+</td>
+<td>
+<p>MachinePoolSelector selects a suitable MachinePool by the given labels.</p>
 </td>
 </tr>
 <tr>
@@ -960,15 +1189,15 @@ string
 </tr>
 <tr>
 <td>
-<code>volumeClaims</code><br/>
+<code>volumeAttachments</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.VolumeClaim">
-[]VolumeClaim
+<a href="#compute.onmetal.de/v1alpha1.VolumeAttachment">
+[]VolumeAttachment
 </a>
 </em>
 </td>
 <td>
-<p>VolumeClaims are volumes claimed by this machine.</p>
+<p>VolumeAttachments are volumes attached to this machine.</p>
 </td>
 </tr>
 <tr>
@@ -1018,6 +1247,11 @@ If key is empty, DefaultIgnitionKey will be used as fallback.</p>
 <td></td>
 </tr><tr><td><p>&#34;Initial&#34;</p></td>
 <td></td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>MachineStatePending means the Machine has been accepted by the system, but not yet completely started.
+This includes time before being bound to a MachinePool, as well as time spent setting up the Machine on that
+MachinePool.</p>
+</td>
 </tr><tr><td><p>&#34;Running&#34;</p></td>
 <td></td>
 </tr><tr><td><p>&#34;Shutdown&#34;</p></td>
@@ -1078,10 +1312,10 @@ MachineState
 </tr>
 <tr>
 <td>
-<code>volumeClaims</code><br/>
+<code>volumeAttachments</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.VolumeClaimStatus">
-[]VolumeClaimStatus
+<a href="#compute.onmetal.de/v1alpha1.VolumeAttachmentStatus">
+[]VolumeAttachmentStatus
 </a>
 </em>
 </td>
@@ -1092,9 +1326,6 @@ MachineState
 </table>
 <h3 id="compute.onmetal.de/v1alpha1.RetainPolicy">RetainPolicy
 (<code>string</code> alias)</h3>
-<p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.VolumeClaim">VolumeClaim</a>)
-</p>
 <div>
 </div>
 <table>
@@ -1110,13 +1341,13 @@ MachineState
 <td></td>
 </tr></tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.VolumeClaim">VolumeClaim
+<h3 id="compute.onmetal.de/v1alpha1.ServiceReference">ServiceReference
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.MachineSpec">MachineSpec</a>)
+(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.ConsoleClientConfig">ConsoleClientConfig</a>)
 </p>
 <div>
-<p>VolumeClaim defines a volume claim of a machine</p>
+<p>ServiceReference is a reference to a Service in the same namespace as the referent.</p>
 </div>
 <table>
 <thead>
@@ -1134,7 +1365,62 @@ string
 </em>
 </td>
 <td>
-<p>Name is the name of the VolumeClaim</p>
+<p>Name of the referenced service.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>path</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p><code>path</code> is an optional URL path which will be sent in any request to
+this service.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>port</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>Port on the service hosting the console.
+Defaults to 443 for backward compatibility.
+<code>port</code> should be a valid port number (1-65535, inclusive).</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="compute.onmetal.de/v1alpha1.VolumeAttachment">VolumeAttachment
+</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.MachineSpec">MachineSpec</a>)
+</p>
+<div>
+<p>VolumeAttachment defines a volume attachment of a machine</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the VolumeAttachment</p>
 </td>
 </tr>
 <tr>
@@ -1150,20 +1436,7 @@ int32
 </tr>
 <tr>
 <td>
-<code>retainPolicy</code><br/>
-<em>
-<a href="#compute.onmetal.de/v1alpha1.RetainPolicy">
-RetainPolicy
-</a>
-</em>
-</td>
-<td>
-<p>RetainPolicy defines what should happen when the machine is being deleted</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>storageClass</code><br/>
+<code>volumeRef</code><br/>
 <em>
 <a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
@@ -1171,44 +1444,18 @@ Kubernetes core/v1.LocalObjectReference
 </em>
 </td>
 <td>
-<p>StorageClass describes the storage class of the volumes</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>size</code><br/>
-<em>
-<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/api/resource#Duration">
-k8s.io/apimachinery/pkg/api/resource.Quantity
-</a>
-</em>
-</td>
-<td>
-<p>Size defines the size of the volume</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>volume</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>Volume is a reference to an existing volume</p>
+<p>VolumeRef is a reference to an existing volume</p>
 </td>
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.VolumeClaimStatus">VolumeClaimStatus
+<h3 id="compute.onmetal.de/v1alpha1.VolumeAttachmentStatus">VolumeAttachmentStatus
 </h3>
 <p>
 (<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.MachineStatus">MachineStatus</a>)
 </p>
 <div>
-<p>VolumeClaimStatus is the status of a VolumeClaim.</p>
+<p>VolumeAttachmentStatus is the status of a VolumeAttachment.</p>
 </div>
 <table>
 <thead>
@@ -1226,7 +1473,7 @@ string
 </em>
 </td>
 <td>
-<p>Name is the name of a volume claim.</p>
+<p>Name is the name of a volume attachment.</p>
 </td>
 </tr>
 <tr>
@@ -1245,5 +1492,5 @@ int32
 <hr/>
 <p><em>
 Generated with <code>gen-crd-api-reference-docs</code>
-on git commit <code>a435c36</code>.
+on git commit <code>1e9845c</code>.
 </em></p>

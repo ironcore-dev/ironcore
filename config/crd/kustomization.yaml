@@ -7,7 +7,6 @@ resources:
   - bases/storage.onmetal.de_storagepools.yaml
   - bases/storage.onmetal.de_storageclasses.yaml
   - bases/storage.onmetal.de_volumes.yaml
-  - bases/storage.onmetal.de_volumeattachments.yaml
   - bases/network.onmetal.de_reservedips.yaml
   - bases/network.onmetal.de_securitygroups.yaml
   - bases/network.onmetal.de_subnets.yaml
@@ -31,7 +30,6 @@ patchesStrategicMerge:
   #- patches/webhook_in_storagepools.yaml
   #- patches/webhook_in_storageclasses.yaml
   #- patches/webhook_in_volumes.yaml
-  #- patches/webhook_in_volumeattachments.yaml
   #- patches/webhook_in_reservedips.yaml
   #- patches/webhook_in_securitygroups.yaml
   #- patches/webhook_in_subnets.yaml
@@ -55,7 +53,6 @@ patchesStrategicMerge:
   - patches/cainjection_in_storagepools.yaml
   - patches/cainjection_in_storageclasses.yaml
   - patches/cainjection_in_volumes.yaml
-  - patches/cainjection_in_volumeattachments.yaml
   - patches/cainjection_in_reservedips.yaml
   - patches/cainjection_in_securitygroups.yaml
   - patches/cainjection_in_subnets.yaml

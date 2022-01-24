@@ -90,6 +90,8 @@ spec:
                       - from
                       - to
                       type: object
+                    reserved:
+                      type: boolean
                     size:
                       description: Size requests a CIDR of the given size.
                       format: int32
@@ -144,6 +146,8 @@ spec:
                           - from
                           - to
                           type: object
+                        reserved:
+                          type: boolean
                         size:
                           description: Size requests a CIDR of the given size.
                           format: int32
