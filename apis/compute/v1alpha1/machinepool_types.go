@@ -24,7 +24,14 @@ import (
 // MachinePoolSpec defines the desired state of MachinePool
 type MachinePoolSpec struct {
 	// ProviderID identifies the MachinePool on provider side.
-	ProviderID string `json:"providerID"`
+	ProviderID string  `json:"providerID"`
+	Taints     []Taint `json:"taints,omitempty"`
+}
+
+type Taint struct {
+	Key    string `json:"key,omitempty"`
+	Value  string `json:"value,omitempty"`
+	Effect string `json:"effect,omitempty"`
 }
 
 // MachinePoolStatus defines the observed state of MachinePool

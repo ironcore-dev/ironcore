@@ -18,6 +18,7 @@ package v1alpha1
 
 import (
 	"fmt"
+
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -53,7 +54,15 @@ type MachineSpec struct {
 	// If key is empty, DefaultIgnitionKey will be used as fallback.
 	Ignition *commonv1alpha1.ConfigMapKeySelector `json:"ignition,omitempty"`
 	// EFIVars are variables to pass to EFI while booting up.
-	EFIVars []EFIVar `json:"efiVars,omitempty"`
+	EFIVars     []EFIVar     `json:"efiVars,omitempty"`
+	Tolerations []Toleration `json:"tolerations,omitempty"`
+}
+
+type Toleration struct {
+	Key      string `json:"key,omitempty"`
+	Operator string `json:"operator,omitempty"`
+	Value    string `json:"value,omitempty"`
+	Effect   string `json:"effect,omitempty"`
 }
 
 // EFIVar is a variable to pass to EFI while booting up.
