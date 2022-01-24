@@ -16,7 +16,10 @@ package compute
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"math/rand"
+
 	"github.com/go-logr/logr"
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
@@ -24,7 +27,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/workqueue"
-	"math/rand"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -66,6 +68,7 @@ func (s *MachineScheduler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 		log.Info("Machine is already assigned")
 		return ctrl.Result{}, nil
 	}
+
 	return s.schedule(ctx, log, machine)
 }
 
@@ -103,7 +106,11 @@ func (s *MachineScheduler) schedule(ctx context.Context, log logr.Logger, machin
 	// Get a random pool to distribute evenly.
 	// TODO: Instead of random distribution, try to come up w/ metrics that include usage of each pool to
 	// avoid unfortunate random distribution of items.
-	pool := available[rand.Intn(len(available))]
+	//pool := available[rand.Intn(len(available))]
+	pool := s.validateTolerations(ctx, available, machine)
+	if pool == nil {
+		return ctrl.Result{}, errors.New("error scheduling machine on pool")
+	}
 	log = log.WithValues("MachinePool", pool.Name)
 	base := machine.DeepCopy()
 	machine.Spec.MachinePool.Name = pool.Name
@@ -116,6 +123,42 @@ func (s *MachineScheduler) schedule(ctx context.Context, log logr.Logger, machin
 	return ctrl.Result{}, nil
 }
 
+func (s *MachineScheduler) validateTolerations(ctx context.Context, availablePools []computev1alpha1.MachinePool, machine *computev1alpha1.Machine) *computev1alpha1.MachinePool {
+	taintsFound := false
+	// get machine pool based of TaintToleration
+	for _, pool := range availablePools {
+		if len(pool.Spec.Taints) > 0 {
+			taintsFound = true
+			if s.matchTaintToleration(ctx, pool.Spec.Taints, machine.Spec.Tolerations) {
+				return &pool
+			}
+		}
+	}
+	// if no taints are defined on any machine pool
+	if !taintsFound {
+		pool := availablePools[rand.Intn(len(availablePools))]
+		return &pool
+	}
+	return nil
+}
+
+func (s *MachineScheduler) matchTaintToleration(ctx context.Context, taints []corev1.Taint, tolerations []corev1.Toleration) bool {
+	foundMatch := false
+	for _, toleration := range tolerations {
+		for _, taint := range taints {
+			if !toleration.ToleratesTaint(&taint) {
+				foundMatch = false
+				continue
+			} else {
+				foundMatch = true
+			}
+		}
+		if foundMatch {
+			return foundMatch
+		}
+	}
+	return false
+}
 func (s *MachineScheduler) enqueueMatchingUnscheduledMachines(ctx context.Context, pool *computev1alpha1.MachinePool, queue workqueue.RateLimitingInterface) {
 	log := ctrl.LoggerFrom(ctx)
 	list := &computev1alpha1.MachineList{}

@@ -39,14 +39,7 @@ type VolumeSpec struct {
 	StoragePool corev1.LocalObjectReference `json:"storagePool"`
 	// Resources is a description of the volume's resources and capacity.
 	Resources   corev1.ResourceList `json:"resources,omitempty"`
-	Tolerations []Toleration        `json:"tolerations,omitempty"`
-}
-
-type Toleration struct {
-	Key      string `json:"key,omitempty"`
-	Operator string `json:"operator,omitempty"`
-	Value    string `json:"value,omitempty"`
-	Effect   string `json:"effect,omitempty"`
+	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
 }
 
 // VolumeStatus defines the observed state of Volume

@@ -33,6 +33,20 @@ var _ = Describe("MachineScheduler", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "test-pool-",
 			},
+			Spec: computev1alpha1.MachinePoolSpec{
+				Taints: []corev1.Taint{
+					{
+						Key:    "key1",
+						Value:  "value1",
+						Effect: "NoSchedule",
+					},
+					{
+						Key:    "key2",
+						Value:  "value2",
+						Effect: "NoSchedule",
+					},
+				},
+			},
 		}
 		Expect(k8sClient.Create(ctx, machinePool)).To(Succeed(), "failed to create machine pool")
 
@@ -51,6 +65,20 @@ var _ = Describe("MachineScheduler", func() {
 			Spec: computev1alpha1.MachineSpec{
 				MachineClass: corev1.LocalObjectReference{
 					Name: "my-machineclass",
+				},
+				Tolerations: []corev1.Toleration{
+					{
+						Key:      "key1",
+						Value:    "value1",
+						Operator: "Equal",
+						Effect:   "NoSchedule",
+					},
+					{
+						Key:      "key2",
+						Value:    "value2",
+						Operator: "Equal",
+						Effect:   "NoSchedule",
+					},
 				},
 			},
 		}
@@ -76,6 +104,20 @@ var _ = Describe("MachineScheduler", func() {
 				MachineClass: corev1.LocalObjectReference{
 					Name: "my-machineclass",
 				},
+				Tolerations: []corev1.Toleration{
+					{
+						Key:      "key1",
+						Value:    "value1",
+						Operator: "Equal",
+						Effect:   "NoSchedule",
+					},
+					{
+						Key:      "key2",
+						Value:    "value2",
+						Operator: "Equal",
+						Effect:   "NoSchedule",
+					},
+				},
 			},
 		}
 		Expect(k8sClient.Create(ctx, machine)).To(Succeed(), "failed to create machine")
@@ -92,6 +134,20 @@ var _ = Describe("MachineScheduler", func() {
 		machinePool := &computev1alpha1.MachinePool{
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "test-pool-",
+			},
+			Spec: computev1alpha1.MachinePoolSpec{
+				Taints: []corev1.Taint{
+					{
+						Key:    "key1",
+						Value:  "value1",
+						Effect: "NoSchedule",
+					},
+					{
+						Key:    "key2",
+						Value:  "value2",
+						Effect: "NoSchedule",
+					},
+				},
 			},
 		}
 		Expect(k8sClient.Create(ctx, machinePool)).To(Succeed(), "failed to create machine pool")
@@ -115,6 +171,20 @@ var _ = Describe("MachineScheduler", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "test-pool-",
 			},
+			Spec: computev1alpha1.MachinePoolSpec{
+				Taints: []corev1.Taint{
+					{
+						Key:    "key1",
+						Value:  "value1",
+						Effect: "NoSchedule",
+					},
+					{
+						Key:    "key2",
+						Value:  "value2",
+						Effect: "NoSchedule",
+					},
+				},
+			},
 		}
 		Expect(k8sClient.Create(ctx, machinePoolNoMatchingLabels)).To(Succeed(), "failed to create machine pool")
 
@@ -130,6 +200,20 @@ var _ = Describe("MachineScheduler", func() {
 				GenerateName: "test-pool-",
 				Labels: map[string]string{
 					"foo": "bar",
+				},
+			},
+			Spec: computev1alpha1.MachinePoolSpec{
+				Taints: []corev1.Taint{
+					{
+						Key:    "key1",
+						Value:  "value1",
+						Effect: "NoSchedule",
+					},
+					{
+						Key:    "key2",
+						Value:  "value2",
+						Effect: "NoSchedule",
+					},
 				},
 			},
 		}
@@ -153,6 +237,20 @@ var _ = Describe("MachineScheduler", func() {
 				},
 				MachineClass: corev1.LocalObjectReference{
 					Name: "my-machineclass",
+				},
+				Tolerations: []corev1.Toleration{
+					{
+						Key:      "key1",
+						Value:    "value1",
+						Operator: "Equal",
+						Effect:   "NoSchedule",
+					},
+					{
+						Key:      "key2",
+						Value:    "value2",
+						Operator: "Equal",
+						Effect:   "NoSchedule",
+					},
 				},
 			},
 		}
