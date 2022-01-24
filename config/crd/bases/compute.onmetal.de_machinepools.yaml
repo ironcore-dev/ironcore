@@ -46,6 +46,17 @@ spec:
               providerID:
                 description: ProviderID identifies the MachinePool on provider side.
                 type: string
+              taints:
+                items:
+                  properties:
+                    effect:
+                      type: string
+                    key:
+                      type: string
+                    value:
+                      type: string
+                  type: object
+                type: array
             required:
             - providerID
             type: object

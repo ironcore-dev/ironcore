@@ -178,6 +178,19 @@ spec:
                       type: string
                   type: object
                 type: array
+              tolerations:
+                items:
+                  properties:
+                    effect:
+                      type: string
+                    key:
+                      type: string
+                    operator:
+                      type: string
+                    value:
+                      type: string
+                  type: object
+                type: array
               volumeAttachments:
                 description: VolumeAttachments are volumes attached to this machine.
                 items:
