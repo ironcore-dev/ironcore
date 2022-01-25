@@ -55,6 +55,7 @@ const (
 	storagePoolController      = "storagepool"
 	storageClassController     = "storageclass"
 	volumeController           = "volume"
+	volumeScheduler            = "volumescheduler"
 	reservedIPController       = "reservedip"
 	securityGroupController    = "securitygroup"
 	subnetController           = "subnet"
@@ -88,7 +89,7 @@ func main() {
 
 	controllers := switches.New(
 		machineClassController, machinePoolController, machineSchedulerController, storagePoolController,
-		storageClassController, volumeController, reservedIPController, securityGroupController,
+		storageClassController, volumeController, volumeScheduler, reservedIPController, securityGroupController,
 		subnetController, machineController, routingDomainController, ipamRangeController, gatewayController,
 	)
 	flag.Var(controllers, "controllers", fmt.Sprintf("Controllers to enable. All controllers: %v. Disabled-by-default controllers: %v", controllers.All(), controllers.DisabledByDefault()))
@@ -171,6 +172,13 @@ func main() {
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "Volume")
 			os.Exit(1)
+		}
+	}
+	if controllers.Enabled(volumeScheduler) {
+		if err = (&storagecontrollers.VolumeScheduler{
+			Client: mgr.GetClient(),
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "VolumeScheduler")
 		}
 	}
 	if controllers.Enabled(reservedIPController) {
