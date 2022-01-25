@@ -71,10 +71,7 @@ func (r *MachinePoolReconciler) delete(ctx context.Context, log logr.Logger, poo
 func (r *MachinePoolReconciler) reconcile(ctx context.Context, log logr.Logger, pool *computev1alpha1.MachinePool) (ctrl.Result, error) {
 	outdatedPool := pool.DeepCopy()
 	cond := &computev1alpha1.MachinePoolCondition{}
-	ok := conditionutils.MustFindSlice(pool.Status.Conditions, string(computev1alpha1.MachinePoolConditionTypeReady), cond)
-	if !ok {
-		log.Info("Didn't found ready condition for MachinePool")
-	}
+	conditionutils.MustFindSlice(pool.Status.Conditions, string(computev1alpha1.MachinePoolConditionTypeReady), cond) // nolint
 
 	switch cond.Status {
 	case corev1.ConditionTrue:
@@ -83,8 +80,14 @@ func (r *MachinePoolReconciler) reconcile(ctx context.Context, log logr.Logger, 
 		} else {
 			pool.Status.State = computev1alpha1.MachinePoolStatePending
 		}
+	case corev1.ConditionFalse:
+		pool.Status.State = computev1alpha1.MachinePoolStateError
 	default:
-		pool.Status.State = computev1alpha1.MachinePoolStatePending
+		if cond.LastUpdateTime.Add(r.MachinePoolGracePeriod).After(time.Now()) {
+			pool.Status.State = computev1alpha1.MachinePoolStatePending
+		} else {
+			pool.Status.State = computev1alpha1.MachinePoolStateError
+		}
 	}
 
 	if err := r.Status().Patch(ctx, pool, client.MergeFrom(outdatedPool)); err != nil {

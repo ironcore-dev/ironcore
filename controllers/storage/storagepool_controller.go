@@ -71,8 +71,14 @@ func (r *StoragePoolReconciler) reconcileExists(ctx context.Context, log logr.Lo
 		} else {
 			pool.Status.State = storagev1alpha1.StoragePoolStatePending
 		}
+	case corev1.ConditionFalse:
+		pool.Status.State = storagev1alpha1.StoragePoolStateNotAvailable
 	default:
-		pool.Status.State = storagev1alpha1.StoragePoolStatePending
+		if cond.LastUpdateTime.Add(r.StoragePoolGracePeriod).After(time.Now()) {
+			pool.Status.State = storagev1alpha1.StoragePoolStatePending
+		} else {
+			pool.Status.State = storagev1alpha1.StoragePoolStateNotAvailable
+		}
 	}
 
 	if err := r.Status().Patch(ctx, pool, client.MergeFrom(outdatedPool)); err != nil {

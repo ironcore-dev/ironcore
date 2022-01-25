@@ -34,7 +34,7 @@ var _ = Describe("StoragePoolReconciler", func() {
 	Context("Reconcile a StoragePool", func() {
 		ns := SetupTest(ctx)
 
-		It("should set state as Pending when Ready condition is not present", func() {
+		It("should set state as NotAvailable when Ready condition is not present", func() {
 			storagePool := &storagev1alpha1.StoragePool{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "no-ready-condition",
@@ -42,16 +42,6 @@ var _ = Describe("StoragePoolReconciler", func() {
 				},
 			}
 			Expect(k8sClient.Create(ctx, storagePool)).To(Succeed())
-
-			storagePool.Status.Conditions = []storagev1alpha1.StoragePoolCondition{
-				{
-					Type:               storagev1alpha1.StoragePoolConditionTypeReady,
-					Status:             corev1.ConditionFalse,
-					LastUpdateTime:     metav1.Time{Time: time.Now().Add(time.Duration(-1) * storagePoolGracePeriod)},
-					LastTransitionTime: metav1.Now(),
-				},
-			}
-			Expect(k8sClient.Status().Update(ctx, storagePool)).To(Succeed())
 
 			By("checking that StoragePool is in pending state")
 			Eventually(func(g Gomega) {
@@ -64,7 +54,7 @@ var _ = Describe("StoragePoolReconciler", func() {
 				Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
 				g.Expect(err).NotTo(HaveOccurred())
 
-				g.Expect(obj.Status.State).To(Equal(storagev1alpha1.StoragePoolStatePending))
+				g.Expect(obj.Status.State).To(Equal(storagev1alpha1.StoragePoolStateNotAvailable))
 			}, timeout, interval).Should(Succeed())
 		})
 		It("should set state as Pending when Ready condition is outdated", func() {
