@@ -112,7 +112,8 @@ func (s *MachineScheduler) schedule(ctx context.Context, log logr.Logger, machin
 	}
 	if len(filtered) == 0 {
 		log.Info("No machine pool tolerated by the machine", "Tolerations", machine.Spec.Tolerations)
-		s.Events.Eventf(machine, corev1.EventTypeNormal, "CannotSchedule", "No MachinePool tolerated by %s", &machine.Spec.Tolerations)
+		s.Events.Eventf(machine, corev1.EventTypeNormal, "CannotSchedule", "No MachinePool tolerated by tolerations: %s", &machine.Spec.Tolerations)
+		return ctrl.Result{}, nil
 	}
 	available = filtered
 

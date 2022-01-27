@@ -113,6 +113,7 @@ func (s *VolumeScheduler) schedule(ctx context.Context, log logr.Logger, volume 
 	if len(filtered) == 0 {
 		log.Info("No storage pool tolerated by the volume", "Tolerations", volume.Spec.Tolerations)
 		s.Events.Eventf(volume, corev1.EventTypeNormal, "CannotSchedule", "No StoragePool tolerated by %s", &volume.Spec.Tolerations)
+		return ctrl.Result{}, nil
 	}
 	available = filtered
 
