@@ -332,12 +332,14 @@ const (
 
 // TolerateTaints returns if tolerations tolerate all taints
 func TolerateTaints(tolerations []Toleration, taints []Taint) bool {
-	for _, toleration := range tolerations {
-		for _, taint := range taints {
-			if !toleration.ToleratesTaint(&taint) {
-				return false
+OUTER:
+	for _, taint := range taints {
+		for _, toleration := range tolerations {
+			if toleration.ToleratesTaint(&taint) {
+				continue OUTER
 			}
 		}
+		return false
 	}
 	return true
 }
