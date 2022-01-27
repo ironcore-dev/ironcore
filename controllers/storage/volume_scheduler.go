@@ -16,12 +16,10 @@ package storage
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"math/rand"
 
 	"github.com/go-logr/logr"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -35,6 +33,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/source"
+
+	"github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 )
 
 const (
@@ -102,15 +103,23 @@ func (s *VolumeScheduler) schedule(ctx context.Context, log logr.Logger, volume 
 		return ctrl.Result{}, nil
 	}
 
+	// Filter storage pools by checking if the volume tolerates all the taints of a storage pool
+	filtered := []storagev1alpha1.StoragePool{}
+	for _, pool := range available {
+		if v1alpha1.TolerateTaints(volume.Spec.Tolerations, pool.Spec.Taints) {
+			filtered = append(filtered, pool)
+		}
+	}
+	if len(filtered) == 0 {
+		log.Info("No storage pool tolerated by the volume", "Tolerations", volume.Spec.Tolerations)
+		s.Events.Eventf(volume, corev1.EventTypeNormal, "CannotSchedule", "No StoragePool tolerated by %s", &volume.Spec.Tolerations)
+	}
+	available = filtered
+
 	// Get a random pool to distribute evenly.
 	// TODO: Instead of random distribution, try to come up w/ metrics that include usage of each pool to
 	// avoid unfortunate random distribution of items.
-	//pool := available[rand.Intn(len(available))]
-	allowedPools := s.getStoragePools(ctx, available, volume)
-	if allowedPools == nil {
-		return ctrl.Result{}, errors.New("error scheduling volume on pool")
-	}
-	pool := allowedPools[rand.Intn(len(allowedPools))]
+	pool := available[rand.Intn(len(available))]
 	log = log.WithValues("StoragePool", pool.Name)
 	base := volume.DeepCopy()
 	volume.Spec.StoragePool.Name = pool.Name
@@ -123,38 +132,6 @@ func (s *VolumeScheduler) schedule(ctx context.Context, log logr.Logger, volume 
 	return ctrl.Result{}, nil
 }
 
-func (s *VolumeScheduler) getStoragePools(ctx context.Context, availablePools []storagev1alpha1.StoragePool, volume *storagev1alpha1.Volume) []storagev1alpha1.StoragePool {
-	matchingPools := []storagev1alpha1.StoragePool{}
-	// get machine pools based of TaintToleration
-	for _, pool := range availablePools {
-		if len(pool.Spec.Taints) > 0 {
-			if s.matchTaintToleration(ctx, pool.Spec.Taints, volume.Spec.Tolerations) {
-				matchingPools = append(matchingPools, pool)
-			}
-		} else {
-			matchingPools = append(matchingPools, pool)
-		}
-	}
-	return matchingPools
-}
-
-func (s *VolumeScheduler) matchTaintToleration(ctx context.Context, taints []corev1.Taint, tolerations []corev1.Toleration) bool {
-	foundMatch := false
-	for _, taint := range taints {
-		for _, toleration := range tolerations {
-			if !toleration.ToleratesTaint(&taint) {
-				foundMatch = false
-			} else {
-				foundMatch = true
-				break
-			}
-		}
-		if !foundMatch {
-			return false
-		}
-	}
-	return true
-}
 func (s *VolumeScheduler) enqueueMatchingUnscheduledVolumes(ctx context.Context, pool *storagev1alpha1.StoragePool, queue workqueue.RateLimitingInterface) {
 	log := ctrl.LoggerFrom(ctx)
 	list := &storagev1alpha1.VolumeList{}
