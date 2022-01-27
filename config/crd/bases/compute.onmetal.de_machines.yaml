@@ -179,8 +179,9 @@ spec:
                   type: object
                 type: array
               tolerations:
-                description: Tolerations define a list of toleration the Machine has
-                  Tolerations will be matched against taints added for MachinePool.
+                description: Tolerations define tolerations the Machine has. Only
+                  MachinePools whose taints covered by Tolerations will be considered
+                  to run the Machine.
                 items:
                   description: The resource this Toleration is attached to tolerates
                     any taint that matches the triple <key,value,effect> using the

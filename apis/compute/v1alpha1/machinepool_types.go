@@ -27,7 +27,8 @@ import (
 type MachinePoolSpec struct {
 	// ProviderID identifies the MachinePool on provider side.
 	ProviderID string `json:"providerID"`
-	// Taints define a list of taints to be added for MachinePool.
+	// Taints of the MachinePool. Only Machines who tolerate all the taints
+	// will land in the MachinePool.
 	Taints []commonv1alpha1.Taint `json:"taints,omitempty"`
 }
 

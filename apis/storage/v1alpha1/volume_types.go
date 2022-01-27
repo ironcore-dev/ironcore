@@ -41,8 +41,8 @@ type VolumeSpec struct {
 	StoragePool corev1.LocalObjectReference `json:"storagePool"`
 	// Resources is a description of the volume's resources and capacity.
 	Resources corev1.ResourceList `json:"resources,omitempty"`
-	// Tolerations define a list of toleration the Volume has
-	// Tolerations will be matched against taints added for StoragePool.
+	// Tolerations define tolerations the Volume has. Only StoragePools whose taints
+	// covered by Tolerations will be considered to host the Volume.
 	Tolerations []commonv1alpha1.Toleration `json:"tolerations,omitempty"`
 }
 

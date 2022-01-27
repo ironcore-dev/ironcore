@@ -77,8 +77,9 @@ spec:
                   the given labels.
                 type: object
               tolerations:
-                description: Tolerations define a list of toleration the Volume has
-                  Tolerations will be matched against taints added for StoragePool.
+                description: Tolerations define tolerations the Volume has. Only StoragePools
+                  whose taints covered by Tolerations will be considered to host the
+                  Volume.
                 items:
                   description: The resource this Toleration is attached to tolerates
                     any taint that matches the triple <key,value,effect> using the

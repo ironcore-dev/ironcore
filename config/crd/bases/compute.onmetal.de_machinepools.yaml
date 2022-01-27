@@ -47,7 +47,8 @@ spec:
                 description: ProviderID identifies the MachinePool on provider side.
                 type: string
               taints:
-                description: Taints define a list of taints to be added for MachinePool.
+                description: Taints of the MachinePool. Only Machines who tolerate
+                  all the taints will land in the MachinePool.
                 items:
                   description: The resource pool this Taint is attached to has the
                     "effect" on any resource that does not tolerate the Taint.

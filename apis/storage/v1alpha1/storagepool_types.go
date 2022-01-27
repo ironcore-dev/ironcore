@@ -27,7 +27,8 @@ import (
 type StoragePoolSpec struct {
 	// ProviderID identifies the StoragePool on provider side.
 	ProviderID string `json:"providerID"`
-	// Taints define a list of taints to be added for StoragePool.
+	// Taints of the StoragePool. Only Volumes who tolerate all the taints
+	// will land in the StoragePool.
 	Taints []commonv1alpha1.Taint `json:"taints,omitempty"`
 }
 
