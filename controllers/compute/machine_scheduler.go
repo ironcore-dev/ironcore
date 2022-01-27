@@ -68,7 +68,6 @@ func (s *MachineScheduler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 		log.Info("Machine is already assigned")
 		return ctrl.Result{}, nil
 	}
-
 	return s.schedule(ctx, log, machine)
 }
 
