@@ -106,10 +106,11 @@ func (s *VolumeScheduler) schedule(ctx context.Context, log logr.Logger, volume 
 	// TODO: Instead of random distribution, try to come up w/ metrics that include usage of each pool to
 	// avoid unfortunate random distribution of items.
 	//pool := available[rand.Intn(len(available))]
-	pool := s.validateTolerations(ctx, available, volume)
-	if pool == nil {
+	allowedPools := s.getStoragePools(ctx, available, volume)
+	if allowedPools == nil {
 		return ctrl.Result{}, errors.New("error scheduling volume on pool")
 	}
+	pool := allowedPools[rand.Intn(len(allowedPools))]
 	log = log.WithValues("StoragePool", pool.Name)
 	base := volume.DeepCopy()
 	volume.Spec.StoragePool.Name = pool.Name
@@ -121,41 +122,38 @@ func (s *VolumeScheduler) schedule(ctx context.Context, log logr.Logger, volume 
 	log.Info("Successfully assigned volume")
 	return ctrl.Result{}, nil
 }
-func (s *VolumeScheduler) validateTolerations(ctx context.Context, availablePools []storagev1alpha1.StoragePool, volume *storagev1alpha1.Volume) *storagev1alpha1.StoragePool {
-	taintsFound := false
-	// get storage pool based of TaintToleration
+
+func (s *VolumeScheduler) getStoragePools(ctx context.Context, availablePools []storagev1alpha1.StoragePool, volume *storagev1alpha1.Volume) []storagev1alpha1.StoragePool {
+	matchingPools := []storagev1alpha1.StoragePool{}
+	// get machine pools based of TaintToleration
 	for _, pool := range availablePools {
 		if len(pool.Spec.Taints) > 0 {
-			taintsFound = true
 			if s.matchTaintToleration(ctx, pool.Spec.Taints, volume.Spec.Tolerations) {
-				return &pool
+				matchingPools = append(matchingPools, pool)
 			}
+		} else {
+			matchingPools = append(matchingPools, pool)
 		}
 	}
-	// if no taints are defined on any storage pool
-	if !taintsFound {
-		pool := availablePools[rand.Intn(len(availablePools))]
-		return &pool
-	}
-	return nil
+	return matchingPools
 }
 
 func (s *VolumeScheduler) matchTaintToleration(ctx context.Context, taints []corev1.Taint, tolerations []corev1.Toleration) bool {
 	foundMatch := false
-	for _, toleration := range tolerations {
-		for _, taint := range taints {
+	for _, taint := range taints {
+		for _, toleration := range tolerations {
 			if !toleration.ToleratesTaint(&taint) {
 				foundMatch = false
-				continue
 			} else {
 				foundMatch = true
+				break
 			}
 		}
-		if foundMatch {
-			return foundMatch
+		if !foundMatch {
+			return false
 		}
 	}
-	return false
+	return true
 }
 func (s *VolumeScheduler) enqueueMatchingUnscheduledVolumes(ctx context.Context, pool *storagev1alpha1.StoragePool, queue workqueue.RateLimitingInterface) {
 	log := ctrl.LoggerFrom(ctx)

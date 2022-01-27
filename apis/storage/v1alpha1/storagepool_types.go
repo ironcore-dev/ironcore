@@ -24,8 +24,9 @@ import (
 // StoragePoolSpec defines the desired state of StoragePool
 type StoragePoolSpec struct {
 	// ProviderID identifies the StoragePool on provider side.
-	ProviderID string         `json:"providerID"`
-	Taints     []corev1.Taint `json:"taints,omitempty"`
+	ProviderID string `json:"providerID"`
+	// Taints define a list of taints to be added for StoragePool.
+	Taints []corev1.Taint `json:"taints,omitempty"`
 }
 
 // StoragePoolStatus defines the observed state of StoragePool

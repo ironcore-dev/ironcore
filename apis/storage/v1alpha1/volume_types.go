@@ -38,7 +38,9 @@ type VolumeSpec struct {
 	// If unset, the scheduler will figure out a suitable StoragePool.
 	StoragePool corev1.LocalObjectReference `json:"storagePool"`
 	// Resources is a description of the volume's resources and capacity.
-	Resources   corev1.ResourceList `json:"resources,omitempty"`
+	Resources corev1.ResourceList `json:"resources,omitempty"`
+	// Tolerations define a list of toleration the Volume has
+	// Tolerations will be matched against taints added for StoragePool.
 	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
 }
 

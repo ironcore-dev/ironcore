@@ -54,7 +54,9 @@ type MachineSpec struct {
 	// If key is empty, DefaultIgnitionKey will be used as fallback.
 	Ignition *commonv1alpha1.ConfigMapKeySelector `json:"ignition,omitempty"`
 	// EFIVars are variables to pass to EFI while booting up.
-	EFIVars     []EFIVar            `json:"efiVars,omitempty"`
+	EFIVars []EFIVar `json:"efiVars,omitempty"`
+	// Tolerations define a list of toleration the Machine has
+	// Tolerations will be matched against taints added for MachinePool.
 	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
 }
 
