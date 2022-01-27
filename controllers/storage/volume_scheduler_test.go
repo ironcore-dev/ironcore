@@ -33,20 +33,6 @@ var _ = Describe("VolumeScheduler", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "test-pool-",
 			},
-			Spec: storagev1alpha1.StoragePoolSpec{
-				Taints: []corev1.Taint{
-					{
-						Key:    "key1",
-						Value:  "value1",
-						Effect: "NoSchedule",
-					},
-					{
-						Key:    "key2",
-						Value:  "value2",
-						Effect: "NoSchedule",
-					},
-				},
-			},
 		}
 		Expect(k8sClient.Create(ctx, storagePool)).To(Succeed(), "failed to create storage pool")
 
@@ -65,20 +51,6 @@ var _ = Describe("VolumeScheduler", func() {
 			Spec: storagev1alpha1.VolumeSpec{
 				StorageClass: corev1.LocalObjectReference{
 					Name: "my-volumeclass",
-				},
-				Tolerations: []corev1.Toleration{
-					{
-						Key:      "key1",
-						Value:    "value1",
-						Operator: "Equal",
-						Effect:   "NoSchedule",
-					},
-					{
-						Key:      "key2",
-						Value:    "value2",
-						Operator: "Equal",
-						Effect:   "NoSchedule",
-					},
 				},
 			},
 		}
@@ -104,20 +76,6 @@ var _ = Describe("VolumeScheduler", func() {
 				StorageClass: corev1.LocalObjectReference{
 					Name: "my-volumeclass",
 				},
-				Tolerations: []corev1.Toleration{
-					{
-						Key:      "key1",
-						Value:    "value1",
-						Operator: "Equal",
-						Effect:   "NoSchedule",
-					},
-					{
-						Key:      "key2",
-						Value:    "value2",
-						Operator: "Equal",
-						Effect:   "NoSchedule",
-					},
-				},
 			},
 		}
 		Expect(k8sClient.Create(ctx, volume)).To(Succeed(), "failed to create volume")
@@ -134,20 +92,6 @@ var _ = Describe("VolumeScheduler", func() {
 		storagePool := &storagev1alpha1.StoragePool{
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "test-pool-",
-			},
-			Spec: storagev1alpha1.StoragePoolSpec{
-				Taints: []corev1.Taint{
-					{
-						Key:    "key1",
-						Value:  "value1",
-						Effect: "NoSchedule",
-					},
-					{
-						Key:    "key2",
-						Value:  "value2",
-						Effect: "NoSchedule",
-					},
-				},
 			},
 		}
 		Expect(k8sClient.Create(ctx, storagePool)).To(Succeed(), "failed to create storage pool")
@@ -171,20 +115,6 @@ var _ = Describe("VolumeScheduler", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "test-pool-",
 			},
-			Spec: storagev1alpha1.StoragePoolSpec{
-				Taints: []corev1.Taint{
-					{
-						Key:    "key1",
-						Value:  "value1",
-						Effect: "NoSchedule",
-					},
-					{
-						Key:    "key2",
-						Value:  "value2",
-						Effect: "NoSchedule",
-					},
-				},
-			},
 		}
 		Expect(k8sClient.Create(ctx, storagePoolNoMatchingLabels)).To(Succeed(), "failed to create storage pool")
 
@@ -200,20 +130,6 @@ var _ = Describe("VolumeScheduler", func() {
 				GenerateName: "test-pool-",
 				Labels: map[string]string{
 					"foo": "bar",
-				},
-			},
-			Spec: storagev1alpha1.StoragePoolSpec{
-				Taints: []corev1.Taint{
-					{
-						Key:    "key1",
-						Value:  "value1",
-						Effect: "NoSchedule",
-					},
-					{
-						Key:    "key2",
-						Value:  "value2",
-						Effect: "NoSchedule",
-					},
 				},
 			},
 		}
@@ -237,20 +153,6 @@ var _ = Describe("VolumeScheduler", func() {
 				},
 				StorageClass: corev1.LocalObjectReference{
 					Name: "my-storageclass",
-				},
-				Tolerations: []corev1.Toleration{
-					{
-						Key:      "key1",
-						Value:    "value1",
-						Operator: "Equal",
-						Effect:   "NoSchedule",
-					},
-					{
-						Key:      "key2",
-						Value:    "value2",
-						Operator: "Equal",
-						Effect:   "NoSchedule",
-					},
 				},
 			},
 		}
