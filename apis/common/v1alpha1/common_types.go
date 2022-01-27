@@ -21,7 +21,6 @@ import (
 
 	"inet.af/netaddr"
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // ConfigMapKeySelector is a reference to a specific 'key' within a ConfigMap resource.
@@ -264,11 +263,6 @@ type Taint struct {
 	// that do not tolerate the taint.
 	// Valid effects are NoSchedule, PreferNoSchedule and NoExecute.
 	Effect TaintEffect `json:"effect" protobuf:"bytes,3,opt,name=effect,casttype=TaintEffect"`
-
-	// NOT YET IMPLEMENTED. TODO: Uncomment field once it is implemented.
-	// TimeAdded represents the time at which the taint was added.
-	// It is only written for NoExecute taints.
-	// TimeAdded *metav1.Time `json:"timeAdded,omitempty" protobuf:"bytes,4,opt,name=timeAdded"`
 }
 
 // +enum
@@ -279,16 +273,6 @@ const (
 	// but allow all already-running resources to continue running.
 	// Enforced by the scheduler.
 	TaintEffectNoSchedule TaintEffect = "NoSchedule"
-
-	// NOT YET IMPLEMENTED. TODO: Uncomment field once it is implemented.
-	// Like TaintEffectNoSchedule, but the scheduler tries not to schedule
-	// new resources onto the resource pool, rather than prohibiting new resources from scheduling
-	// onto the resource pool entirely.
-	// TaintEffectPreferNoSchedule TaintEffect = "PreferNoSchedule"
-
-	// NOT YET IMPLEMENTED. TODO: Uncomment field once it is implemented.
-	// Evict any already-running resources that do not tolerate the taint.
-	// TaintEffectNoExecute TaintEffect = "NoExecute"
 )
 
 // The resource this Toleration is attached to tolerates any taint that matches
@@ -308,13 +292,6 @@ type Toleration struct {
 	// Effect indicates the taint effect to match. Empty means match all taint effects.
 	// When specified, allowed values are NoSchedule.
 	Effect TaintEffect `json:"effect,omitempty" protobuf:"bytes,4,opt,name=effect,casttype=TaintEffect"`
-
-	// NOT YET IMPLEMENTED. TODO: Uncomment field once it is implemented.
-	// TolerationSeconds represents the period of time the toleration (which must be
-	// of effect NoExecute, otherwise this field is ignored) tolerates the taint. By default,
-	// it is not set, which means tolerate the taint forever (do not evict). Zero and
-	// negative values will be treated as 0 (evict immediately) by the system.
-	// TolerationSeconds *int64 `json:"tolerationSeconds,omitempty" protobuf:"varint,5,opt,name=tolerationSeconds"`
 }
 
 // ToleratesTaint checks if the toleration tolerates the taint.
