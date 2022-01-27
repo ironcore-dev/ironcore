@@ -57,7 +57,7 @@ type MachineSpec struct {
 	EFIVars []EFIVar `json:"efiVars,omitempty"`
 	// Tolerations define a list of toleration the Machine has
 	// Tolerations will be matched against taints added for MachinePool.
-	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
+	Tolerations []commonv1alpha1.Toleration `json:"tolerations,omitempty"`
 }
 
 // EFIVar is a variable to pass to EFI while booting up.

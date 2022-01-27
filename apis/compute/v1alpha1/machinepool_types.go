@@ -19,6 +19,8 @@ package v1alpha1
 import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 )
 
 // MachinePoolSpec defines the desired state of MachinePool
@@ -26,7 +28,7 @@ type MachinePoolSpec struct {
 	// ProviderID identifies the MachinePool on provider side.
 	ProviderID string `json:"providerID"`
 	// Taints define a list of taints to be added for MachinePool.
-	Taints []corev1.Taint `json:"taints,omitempty"`
+	Taints []commonv1alpha1.Taint `json:"taints,omitempty"`
 }
 
 // MachinePoolStatus defines the observed state of MachinePool

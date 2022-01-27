@@ -18,8 +18,10 @@ package v1alpha1
 
 import (
 	"encoding/json"
+
 	"inet.af/netaddr"
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // ConfigMapKeySelector is a reference to a specific 'key' within a ConfigMap resource.
@@ -249,4 +251,116 @@ func NewIPPrefixPtr(prefix netaddr.IPPrefix) *IPPrefix {
 
 func PtrToIPPrefix(prefix IPPrefix) *IPPrefix {
 	return &prefix
+}
+
+// The resource pool this Taint is attached to has the "effect" on
+// any resource that does not tolerate the Taint.
+type Taint struct {
+	// The taint key to be applied to a resource pool.
+	Key string `json:"key" protobuf:"bytes,1,opt,name=key"`
+	// The taint value corresponding to the taint key.
+	Value string `json:"value,omitempty" protobuf:"bytes,2,opt,name=value"`
+	// The effect of the taint on resources
+	// that do not tolerate the taint.
+	// Valid effects are NoSchedule, PreferNoSchedule and NoExecute.
+	Effect TaintEffect `json:"effect" protobuf:"bytes,3,opt,name=effect,casttype=TaintEffect"`
+
+	// NOT YET IMPLEMENTED. TODO: Uncomment field once it is implemented.
+	// TimeAdded represents the time at which the taint was added.
+	// It is only written for NoExecute taints.
+	// TimeAdded *metav1.Time `json:"timeAdded,omitempty" protobuf:"bytes,4,opt,name=timeAdded"`
+}
+
+// +enum
+type TaintEffect string
+
+const (
+	// Do not allow new resources to schedule onto the resource pool unless they tolerate the taint,
+	// but allow all already-running resources to continue running.
+	// Enforced by the scheduler.
+	TaintEffectNoSchedule TaintEffect = "NoSchedule"
+
+	// NOT YET IMPLEMENTED. TODO: Uncomment field once it is implemented.
+	// Like TaintEffectNoSchedule, but the scheduler tries not to schedule
+	// new resources onto the resource pool, rather than prohibiting new resources from scheduling
+	// onto the resource pool entirely.
+	// TaintEffectPreferNoSchedule TaintEffect = "PreferNoSchedule"
+
+	// NOT YET IMPLEMENTED. TODO: Uncomment field once it is implemented.
+	// Evict any already-running resources that do not tolerate the taint.
+	// TaintEffectNoExecute TaintEffect = "NoExecute"
+)
+
+// The resource this Toleration is attached to tolerates any taint that matches
+// the triple <key,value,effect> using the matching operator <operator>.
+type Toleration struct {
+	// Key is the taint key that the toleration applies to. Empty means match all taint keys.
+	// If the key is empty, operator must be Exists; this combination means to match all values and all keys.
+	Key string `json:"key,omitempty" protobuf:"bytes,1,opt,name=key"`
+	// Operator represents a key's relationship to the value.
+	// Valid operators are Exists and Equal. Defaults to Equal.
+	// Exists is equivalent to wildcard for value, so that a resource can
+	// tolerate all taints of a particular category.
+	Operator TolerationOperator `json:"operator,omitempty" protobuf:"bytes,2,opt,name=operator,casttype=TolerationOperator"`
+	// Value is the taint value the toleration matches to.
+	// If the operator is Exists, the value should be empty, otherwise just a regular string.
+	Value string `json:"value,omitempty" protobuf:"bytes,3,opt,name=value"`
+	// Effect indicates the taint effect to match. Empty means match all taint effects.
+	// When specified, allowed values are NoSchedule.
+	Effect TaintEffect `json:"effect,omitempty" protobuf:"bytes,4,opt,name=effect,casttype=TaintEffect"`
+
+	// NOT YET IMPLEMENTED. TODO: Uncomment field once it is implemented.
+	// TolerationSeconds represents the period of time the toleration (which must be
+	// of effect NoExecute, otherwise this field is ignored) tolerates the taint. By default,
+	// it is not set, which means tolerate the taint forever (do not evict). Zero and
+	// negative values will be treated as 0 (evict immediately) by the system.
+	// TolerationSeconds *int64 `json:"tolerationSeconds,omitempty" protobuf:"varint,5,opt,name=tolerationSeconds"`
+}
+
+// ToleratesTaint checks if the toleration tolerates the taint.
+// The matching follows the rules below:
+// (1) Empty toleration.effect means to match all taint effects,
+//     otherwise taint effect must equal to toleration.effect.
+// (2) If toleration.operator is 'Exists', it means to match all taint values.
+// (3) Empty toleration.key means to match all taint keys.
+//     If toleration.key is empty, toleration.operator must be 'Exists';
+//     this combination means to match all taint values and all taint keys.
+func (t *Toleration) ToleratesTaint(taint *Taint) bool {
+	if len(t.Effect) > 0 && t.Effect != taint.Effect {
+		return false
+	}
+
+	if len(t.Key) > 0 && t.Key != taint.Key {
+		return false
+	}
+
+	switch t.Operator {
+	case "", TolerationOpEqual: // empty operator means Equal
+		return t.Value == taint.Value
+	case TolerationOpExists:
+		return true
+	default:
+		return false
+	}
+}
+
+// A toleration operator is the set of operators that can be used in a toleration.
+// +enum
+type TolerationOperator string
+
+const (
+	TolerationOpExists TolerationOperator = "Exists"
+	TolerationOpEqual  TolerationOperator = "Equal"
+)
+
+// TolerateTaints returns if tolerations tolerate all taints
+func TolerateTaints(tolerations []Toleration, taints []Taint) bool {
+	for _, toleration := range tolerations {
+		for _, taint := range taints {
+			if !toleration.ToleratesTaint(&taint) {
+				return false
+			}
+		}
+	}
+	return true
 }
