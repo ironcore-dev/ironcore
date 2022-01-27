@@ -22,6 +22,7 @@
 package v1alpha1
 
 import (
+	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
@@ -203,10 +204,8 @@ func (in *StoragePoolSpec) DeepCopyInto(out *StoragePoolSpec) {
 	*out = *in
 	if in.Taints != nil {
 		in, out := &in.Taints, &out.Taints
-		*out = make([]v1.Taint, len(*in))
-		for i := range *in {
-			(*in)[i].DeepCopyInto(&(*out)[i])
-		}
+		*out = make([]commonv1alpha1.Taint, len(*in))
+		copy(*out, *in)
 	}
 }
 
@@ -358,10 +357,8 @@ func (in *VolumeSpec) DeepCopyInto(out *VolumeSpec) {
 	}
 	if in.Tolerations != nil {
 		in, out := &in.Tolerations, &out.Tolerations
-		*out = make([]v1.Toleration, len(*in))
-		for i := range *in {
-			(*in)[i].DeepCopyInto(&(*out)[i])
-		}
+		*out = make([]commonv1alpha1.Toleration, len(*in))
+		copy(*out, *in)
 	}
 }
 
