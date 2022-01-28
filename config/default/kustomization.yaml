@@ -48,6 +48,7 @@ replacements:
       kind: Certificate
       group: cert-manager.io
       version: v1
+      name: serving-cert
       fieldPath: .metadata.namespace
     targets:
       - select:
@@ -75,6 +76,7 @@ replacements:
       kind: Certificate
       group: cert-manager.io
       version: v1
+      name: serving-cert
       fieldPath: .metadata.name
     targets:
       - select:
