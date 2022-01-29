@@ -294,6 +294,7 @@ type Toleration struct {
 	Effect TaintEffect `json:"effect,omitempty" protobuf:"bytes,4,opt,name=effect,casttype=TaintEffect"`
 }
 
+// From https://pkg.go.dev/k8s.io/api/core/v1#Toleration.ToleratesTaint with our own Toleration and Taint
 // ToleratesTaint checks if the toleration tolerates the taint.
 // The matching follows the rules below:
 // (1) Empty toleration.effect means to match all taint effects,
