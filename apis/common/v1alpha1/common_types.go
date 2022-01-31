@@ -262,10 +262,10 @@ type Taint struct {
 	// The effect of the taint on resources
 	// that do not tolerate the taint.
 	// Valid effects are NoSchedule, PreferNoSchedule and NoExecute.
+	//+kubebuilder:validation:Enum=NoSchedule
 	Effect TaintEffect `json:"effect"`
 }
 
-// +enum
 type TaintEffect string
 
 const (
@@ -285,12 +285,14 @@ type Toleration struct {
 	// Valid operators are Exists and Equal. Defaults to Equal.
 	// Exists is equivalent to wildcard for value, so that a resource can
 	// tolerate all taints of a particular category.
+	//+kubebuilder:validation:Enum=TolerationOpExists;TolerationOpEqual
 	Operator TolerationOperator `json:"operator,omitempty"`
 	// Value is the taint value the toleration matches to.
 	// If the operator is Exists, the value should be empty, otherwise just a regular string.
 	Value string `json:"value,omitempty"`
 	// Effect indicates the taint effect to match. Empty means match all taint effects.
 	// When specified, allowed values are NoSchedule.
+	//+kubebuilder:validation:Enum=NoSchedule
 	Effect TaintEffect `json:"effect,omitempty"`
 }
 
@@ -323,7 +325,6 @@ func (t *Toleration) ToleratesTaint(taint *Taint) bool {
 }
 
 // A toleration operator is the set of operators that can be used in a toleration.
-// +enum
 type TolerationOperator string
 
 const (

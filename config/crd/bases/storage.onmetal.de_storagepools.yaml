@@ -57,6 +57,8 @@ spec:
                       description: The effect of the taint on resources that do not
                         tolerate the taint. Valid effects are NoSchedule, PreferNoSchedule
                         and NoExecute.
+                      enum:
+                      - NoSchedule
                       type: string
                     key:
                       description: The taint key to be applied to a resource pool.

@@ -89,6 +89,8 @@ spec:
                       description: Effect indicates the taint effect to match. Empty
                         means match all taint effects. When specified, allowed values
                         are NoSchedule.
+                      enum:
+                      - NoSchedule
                       type: string
                     key:
                       description: Key is the taint key that the toleration applies
@@ -101,6 +103,9 @@ spec:
                         value. Valid operators are Exists and Equal. Defaults to Equal.
                         Exists is equivalent to wildcard for value, so that a resource
                         can tolerate all taints of a particular category.
+                      enum:
+                      - TolerationOpExists
+                      - TolerationOpEqual
                       type: string
                     value:
                       description: Value is the taint value the toleration matches
