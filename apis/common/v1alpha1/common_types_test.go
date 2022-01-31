@@ -21,9 +21,9 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("func TolerateTaints", func() {
+var _ = Describe("TolerateTaints", func() {
 	It("returns true upon empty taints", func() {
-		Expect(TolerateTaints(nil, nil)).To(BeTrue())
+		Expect(TolerateTaints(nil, nil)).To(BeTrue(), "expected empty tolerations tolerate empty taints")
 
 		tolerations := []Toleration{
 			{
@@ -32,7 +32,7 @@ var _ = Describe("func TolerateTaints", func() {
 				Operator: TolerationOpExists,
 			},
 		}
-		Expect(TolerateTaints(tolerations, nil)).To(BeTrue())
+		Expect(TolerateTaints(tolerations, nil)).To(BeTrue(), "expected non-empty tolerations tolerate empty taints")
 	})
 
 	It("returns false upon empty tolerations and non-empty taints", func() {
@@ -42,7 +42,7 @@ var _ = Describe("func TolerateTaints", func() {
 				Effect: TaintEffectNoSchedule,
 			},
 		}
-		Expect(TolerateTaints(nil, taints)).To(BeFalse())
+		Expect(TolerateTaints(nil, taints)).To(BeFalse(), "expected empty tolerations don't tolerate non-empty taints")
 	})
 
 	It("returns false when tolerations don't cover all taints", func() {
@@ -64,7 +64,7 @@ var _ = Describe("func TolerateTaints", func() {
 				Effect: TaintEffectNoSchedule,
 			},
 		}
-		Expect(TolerateTaints(tolerations, taints)).To(BeFalse())
+		Expect(TolerateTaints(tolerations, taints)).To(BeFalse(), "expected the tolerations don't cover all the taints")
 	})
 
 	It("returns false when tolerations cover all taints", func() {
@@ -92,6 +92,6 @@ var _ = Describe("func TolerateTaints", func() {
 				Effect: TaintEffectNoSchedule,
 			},
 		}
-		Expect(TolerateTaints(tolerations, taints)).To(BeTrue())
+		Expect(TolerateTaints(tolerations, taints)).To(BeTrue(), "expected the tolerations cover all the taints")
 	})
 })
