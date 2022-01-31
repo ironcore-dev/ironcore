@@ -256,13 +256,13 @@ func PtrToIPPrefix(prefix IPPrefix) *IPPrefix {
 // any resource that does not tolerate the Taint.
 type Taint struct {
 	// The taint key to be applied to a resource pool.
-	Key string `json:"key" protobuf:"bytes,1,opt,name=key"`
+	Key string `json:"key"`
 	// The taint value corresponding to the taint key.
-	Value string `json:"value,omitempty" protobuf:"bytes,2,opt,name=value"`
+	Value string `json:"value,omitempty"`
 	// The effect of the taint on resources
 	// that do not tolerate the taint.
 	// Valid effects are NoSchedule, PreferNoSchedule and NoExecute.
-	Effect TaintEffect `json:"effect" protobuf:"bytes,3,opt,name=effect,casttype=TaintEffect"`
+	Effect TaintEffect `json:"effect"`
 }
 
 // +enum
@@ -280,18 +280,18 @@ const (
 type Toleration struct {
 	// Key is the taint key that the toleration applies to. Empty means match all taint keys.
 	// If the key is empty, operator must be Exists; this combination means to match all values and all keys.
-	Key string `json:"key,omitempty" protobuf:"bytes,1,opt,name=key"`
+	Key string `json:"key,omitempty"`
 	// Operator represents a key's relationship to the value.
 	// Valid operators are Exists and Equal. Defaults to Equal.
 	// Exists is equivalent to wildcard for value, so that a resource can
 	// tolerate all taints of a particular category.
-	Operator TolerationOperator `json:"operator,omitempty" protobuf:"bytes,2,opt,name=operator,casttype=TolerationOperator"`
+	Operator TolerationOperator `json:"operator,omitempty"`
 	// Value is the taint value the toleration matches to.
 	// If the operator is Exists, the value should be empty, otherwise just a regular string.
-	Value string `json:"value,omitempty" protobuf:"bytes,3,opt,name=value"`
+	Value string `json:"value,omitempty"`
 	// Effect indicates the taint effect to match. Empty means match all taint effects.
 	// When specified, allowed values are NoSchedule.
-	Effect TaintEffect `json:"effect,omitempty" protobuf:"bytes,4,opt,name=effect,casttype=TaintEffect"`
+	Effect TaintEffect `json:"effect,omitempty"`
 }
 
 // From https://pkg.go.dev/k8s.io/api/core/v1#Toleration.ToleratesTaint with our own Toleration and Taint
