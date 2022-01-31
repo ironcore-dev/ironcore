@@ -285,7 +285,7 @@ type Toleration struct {
 	// Valid operators are Exists and Equal. Defaults to Equal.
 	// Exists is equivalent to wildcard for value, so that a resource can
 	// tolerate all taints of a particular category.
-	//+kubebuilder:validation:Enum=TolerationOpExists;TolerationOpEqual
+	//+kubebuilder:validation:Enum=Equal;Exists
 	Operator TolerationOperator `json:"operator,omitempty"`
 	// Value is the taint value the toleration matches to.
 	// If the operator is Exists, the value should be empty, otherwise just a regular string.
@@ -328,8 +328,8 @@ func (t *Toleration) ToleratesTaint(taint *Taint) bool {
 type TolerationOperator string
 
 const (
-	TolerationOpExists TolerationOperator = "Exists"
 	TolerationOpEqual  TolerationOperator = "Equal"
+	TolerationOpExists TolerationOperator = "Exists"
 )
 
 // TolerateTaints returns if tolerations tolerate all taints

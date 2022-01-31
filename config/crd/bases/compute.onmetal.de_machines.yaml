@@ -206,8 +206,8 @@ spec:
                         Exists is equivalent to wildcard for value, so that a resource
                         can tolerate all taints of a particular category.
                       enum:
-                      - TolerationOpExists
-                      - TolerationOpEqual
+                      - Equal
+                      - Exists
                       type: string
                     value:
                       description: Value is the taint value the toleration matches
