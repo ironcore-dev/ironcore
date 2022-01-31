@@ -17,14 +17,14 @@ package storage
 import (
 	"context"
 	"fmt"
+	"math/rand"
+
 	"github.com/go-logr/logr"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/workqueue"
-	"math/rand"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -33,6 +33,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/source"
+
+	"github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 )
 
 const (
@@ -99,6 +102,20 @@ func (s *VolumeScheduler) schedule(ctx context.Context, log logr.Logger, volume 
 		s.Events.Eventf(volume, corev1.EventTypeNormal, "CannotSchedule", "No StoragePool found for StorageClass %s", volume.Spec.StorageClass.Name)
 		return ctrl.Result{}, nil
 	}
+
+	// Filter storage pools by checking if the volume tolerates all the taints of a storage pool
+	filtered := []storagev1alpha1.StoragePool{}
+	for _, pool := range available {
+		if v1alpha1.TolerateTaints(volume.Spec.Tolerations, pool.Spec.Taints) {
+			filtered = append(filtered, pool)
+		}
+	}
+	if len(filtered) == 0 {
+		log.Info("No storage pool tolerated by the volume", "Tolerations", volume.Spec.Tolerations)
+		s.Events.Eventf(volume, corev1.EventTypeNormal, "CannotSchedule", "No StoragePool tolerated by %s", &volume.Spec.Tolerations)
+		return ctrl.Result{}, nil
+	}
+	available = filtered
 
 	// Get a random pool to distribute evenly.
 	// TODO: Instead of random distribution, try to come up w/ metrics that include usage of each pool to

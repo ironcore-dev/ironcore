@@ -46,6 +46,31 @@ spec:
               providerID:
                 description: ProviderID identifies the MachinePool on provider side.
                 type: string
+              taints:
+                description: Taints of the MachinePool. Only Machines who tolerate
+                  all the taints will land in the MachinePool.
+                items:
+                  description: The resource pool this Taint is attached to has the
+                    "effect" on any resource that does not tolerate the Taint.
+                  properties:
+                    effect:
+                      description: The effect of the taint on resources that do not
+                        tolerate the taint. Valid effects are NoSchedule, PreferNoSchedule
+                        and NoExecute.
+                      enum:
+                      - NoSchedule
+                      type: string
+                    key:
+                      description: The taint key to be applied to a resource pool.
+                      type: string
+                    value:
+                      description: The taint value corresponding to the taint key.
+                      type: string
+                  required:
+                  - effect
+                  - key
+                  type: object
+                type: array
             required:
             - providerID
             type: object

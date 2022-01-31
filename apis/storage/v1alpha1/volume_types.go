@@ -20,6 +20,8 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+
+	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 )
 
 // VolumeGK is a helper to easily access the GroupKind information of an Volume
@@ -39,6 +41,9 @@ type VolumeSpec struct {
 	StoragePool corev1.LocalObjectReference `json:"storagePool"`
 	// Resources is a description of the volume's resources and capacity.
 	Resources corev1.ResourceList `json:"resources,omitempty"`
+	// Tolerations define tolerations the Volume has. Only StoragePools whose taints
+	// covered by Tolerations will be considered to host the Volume.
+	Tolerations []commonv1alpha1.Toleration `json:"tolerations,omitempty"`
 }
 
 // VolumeStatus defines the observed state of Volume

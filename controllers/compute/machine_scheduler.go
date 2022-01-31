@@ -17,14 +17,14 @@ package compute
 import (
 	"context"
 	"fmt"
+	"math/rand"
+
 	"github.com/go-logr/logr"
-	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/workqueue"
-	"math/rand"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -33,6 +33,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/source"
+
+	"github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 )
 
 const (
@@ -99,6 +102,20 @@ func (s *MachineScheduler) schedule(ctx context.Context, log logr.Logger, machin
 		s.Events.Eventf(machine, corev1.EventTypeNormal, "CannotSchedule", "No MachinePool found for MachineClass %s", machine.Spec.MachineClass.Name)
 		return ctrl.Result{}, nil
 	}
+
+	// Filter machine pools by checking if the machine tolerates all the taints of a machine pool
+	filtered := []computev1alpha1.MachinePool{}
+	for _, pool := range available {
+		if v1alpha1.TolerateTaints(machine.Spec.Tolerations, pool.Spec.Taints) {
+			filtered = append(filtered, pool)
+		}
+	}
+	if len(filtered) == 0 {
+		log.Info("No machine pool tolerated by the machine", "Tolerations", machine.Spec.Tolerations)
+		s.Events.Eventf(machine, corev1.EventTypeNormal, "CannotSchedule", "No MachinePool tolerated by tolerations: %s", &machine.Spec.Tolerations)
+		return ctrl.Result{}, nil
+	}
+	available = filtered
 
 	// Get a random pool to distribute evenly.
 	// TODO: Instead of random distribution, try to come up w/ metrics that include usage of each pool to

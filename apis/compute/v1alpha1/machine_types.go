@@ -55,6 +55,9 @@ type MachineSpec struct {
 	Ignition *commonv1alpha1.ConfigMapKeySelector `json:"ignition,omitempty"`
 	// EFIVars are variables to pass to EFI while booting up.
 	EFIVars []EFIVar `json:"efiVars,omitempty"`
+	// Tolerations define tolerations the Machine has. Only MachinePools whose taints
+	// covered by Tolerations will be considered to run the Machine.
+	Tolerations []commonv1alpha1.Toleration `json:"tolerations,omitempty"`
 }
 
 // EFIVar is a variable to pass to EFI while booting up.

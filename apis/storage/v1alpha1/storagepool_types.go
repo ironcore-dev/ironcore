@@ -19,12 +19,17 @@ package v1alpha1
 import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 )
 
 // StoragePoolSpec defines the desired state of StoragePool
 type StoragePoolSpec struct {
 	// ProviderID identifies the StoragePool on provider side.
 	ProviderID string `json:"providerID"`
+	// Taints of the StoragePool. Only Volumes who tolerate all the taints
+	// will land in the StoragePool.
+	Taints []commonv1alpha1.Taint `json:"taints,omitempty"`
 }
 
 // StoragePoolStatus defines the observed state of StoragePool
