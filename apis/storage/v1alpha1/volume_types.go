@@ -67,7 +67,13 @@ const (
 )
 
 // VolumeConditionType is a type a VolumeCondition can have.
+//+kubebuilder:validation:Enum=Synced
 type VolumeConditionType string
+
+const (
+	// VolumeSynced represents the condition of a volume being synced with its backing resources
+	VolumeSynced VolumeConditionType = "Synced"
+)
 
 // VolumeCondition is one of the conditions of a volume.
 type VolumeCondition struct {

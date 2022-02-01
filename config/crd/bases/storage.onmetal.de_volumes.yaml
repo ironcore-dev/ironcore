@@ -153,6 +153,8 @@ spec:
                       type: string
                     type:
                       description: Type is the type of the condition.
+                      enum:
+                      - Synced
                       type: string
                   required:
                   - message
