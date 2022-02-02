@@ -21,6 +21,7 @@ import (
 
 	"inet.af/netaddr"
 	corev1 "k8s.io/api/core/v1"
+	apiequality "k8s.io/apimachinery/pkg/api/equality"
 )
 
 // ConfigMapKeySelector is a reference to a specific 'key' within a ConfigMap resource.
@@ -330,6 +331,56 @@ const (
 	TolerationOpEqual  TolerationOperator = "Equal"
 	TolerationOpExists TolerationOperator = "Exists"
 )
+
+// From https://pkg.go.dev/k8s.io/kubernetes/pkg/util/tolerations#MergeTolerations with our own Tolerations
+// MergeTolerations merges two sets of tolerations into one. If one toleration is a superset of
+// another, only the superset is kept.
+func MergeTolerations(first, second []Toleration) []Toleration {
+	all := append(first, second...)
+	var merged []Toleration
+
+Next:
+	for i, t := range all {
+		for _, t2 := range merged {
+			if isSuperset(&t2, &t) {
+				continue Next // t is redundant; ignore it
+			}
+		}
+		if i+1 < len(all) {
+			for _, t2 := range all[i+1:] {
+				if !apiequality.Semantic.DeepEqual(&t2, &t) && isSuperset(&t2, &t) { // if there's a superset later in `all`
+					continue Next // t is redundant; ignore it
+				}
+			}
+		}
+		merged = append(merged, t) // If some tolerations are equal, the first occurrence will be appended.
+	}
+
+	return merged
+}
+
+// isSuperset checks whether super tolerates a superset of sub.
+func isSuperset(super, sub *Toleration) bool {
+	if super.Key != sub.Key &&
+		// An empty key with Exists operator means matching all keys & values.
+		!(super.Key == "" && super.Operator == TolerationOpExists) {
+		return false
+	}
+
+	// An empty effect means matching all effects.
+	if super.Effect != "" && sub.Effect != super.Effect {
+		return false
+	}
+
+	switch super.Operator {
+	case TolerationOpEqual, "": // empty operator means Equal
+		return sub.Operator == TolerationOpEqual && super.Value == sub.Value
+	case TolerationOpExists:
+		return true
+	default: // false operator
+		return false
+	}
+}
 
 // TolerateTaints returns if tolerations tolerate all taints
 func TolerateTaints(tolerations []Toleration, taints []Taint) bool {
