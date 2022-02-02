@@ -141,6 +141,11 @@ const (
 // MachineConditionType is a type a MachineCondition can have.
 type MachineConditionType string
 
+const (
+	// MachineSynced represents the condition of a machine being synced with its backing resources
+	MachineSynced MachineConditionType = "Synced"
+)
+
 // MachineCondition is one of the conditions of a volume.
 type MachineCondition struct {
 	// Type is the type of the condition.

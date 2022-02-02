@@ -69,6 +69,11 @@ const (
 // VolumeConditionType is a type a VolumeCondition can have.
 type VolumeConditionType string
 
+const (
+	// VolumeSynced represents the condition of a volume being synced with its backing resources
+	VolumeSynced VolumeConditionType = "Synced"
+)
+
 // VolumeCondition is one of the conditions of a volume.
 type VolumeCondition struct {
 	// Type is the type of the condition.
@@ -91,6 +96,8 @@ type VolumeCondition struct {
 //+kubebuilder:subresource:status
 //+kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.state`
 //+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
+//+kubebuilder:printcolumn:name="StoragePool",type=string,JSONPath=`.spec.storagePool.name`
+//+kubebuilder:printcolumn:name="StorageClass",type=string,JSONPath=`.spec.storageClass.name`
 
 // Volume is the Schema for the volumes API
 type Volume struct {
