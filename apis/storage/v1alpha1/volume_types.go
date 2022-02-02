@@ -67,7 +67,6 @@ const (
 )
 
 // VolumeConditionType is a type a VolumeCondition can have.
-//+kubebuilder:validation:Enum=Synced
 type VolumeConditionType string
 
 const (

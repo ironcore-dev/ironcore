@@ -139,7 +139,6 @@ const (
 )
 
 // MachineConditionType is a type a MachineCondition can have.
-//+kubebuilder:validation:Enum=Synced
 type MachineConditionType string
 
 const (
