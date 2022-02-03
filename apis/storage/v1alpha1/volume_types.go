@@ -96,6 +96,8 @@ type VolumeCondition struct {
 //+kubebuilder:subresource:status
 //+kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.state`
 //+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
+//+kubebuilder:printcolumn:name="StoragePool",type=string,JSONPath=`.spec.storagePool.name`
+//+kubebuilder:printcolumn:name="StorageClass",type=string,JSONPath=`.spec.storageClass.name`
 
 // Volume is the Schema for the volumes API
 type Volume struct {
