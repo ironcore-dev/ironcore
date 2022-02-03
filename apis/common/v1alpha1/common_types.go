@@ -374,7 +374,8 @@ func isSuperset(super, sub *Toleration) bool {
 
 	switch super.Operator {
 	case TolerationOpEqual, "": // empty operator means Equal
-		return sub.Operator == TolerationOpEqual && super.Value == sub.Value
+		return (sub.Operator == TolerationOpEqual || sub.Operator == "") &&
+			super.Value == sub.Value
 	case TolerationOpExists:
 		return true
 	default: // false operator
