@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
+// The package is based on https://pkg.go.dev/k8s.io/kubernetes/pkg/util/tolerations
+// The code differs from k8s in the following aspects:
+// - Our own `Toleration` is used
+// - Only `TaintEffectNoSchedule` is supported
+// - No `TolerationSeconds` in our `Toleration`
 package tolerations
 
 import (
@@ -22,7 +27,6 @@ import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 )
 
-// Based on https://pkg.go.dev/k8s.io/kubernetes/pkg/util/tolerations#MergeTolerations with our own Tolerations
 // MergeTolerations merges two sets of tolerations into one. If one toleration is a superset of
 // another, only the superset is kept.
 func MergeTolerations(first, second []commonv1alpha1.Toleration) []commonv1alpha1.Toleration {

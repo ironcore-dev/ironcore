@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-// package taints is from https://pkg.go.dev/k8s.io/kubernetes/pkg/util/taints with our own Taint type and without any function relating to corev1.Node
+// This package is the same as https://pkg.go.dev/k8s.io/kubernetes/pkg/util/taints , but with our own `Taint`
+// and without any function relating to `corev1.Node`. The only modification is in the func `validateTaintEffect`
+// where only `TaintEffectNoSchedule` is valid.
 package taints
 
 import (
@@ -73,7 +75,7 @@ func parseTaint(st string) (commonv1alpha1.Taint, error) {
 }
 
 func validateTaintEffect(effect commonv1alpha1.TaintEffect) error {
-	if effect != commonv1alpha1.TaintEffectNoSchedule { // the only valid effect right now, different from k8s
+	if effect != commonv1alpha1.TaintEffectNoSchedule { // the only valid effect
 		return fmt.Errorf("invalid taint effect: %v, unsupported taint effect", effect)
 	}
 
