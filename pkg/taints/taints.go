@@ -27,12 +27,6 @@ import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 )
 
-const (
-	MODIFIED  = "modified"
-	TAINTED   = "tainted"
-	UNTAINTED = "untainted"
-)
-
 // parseTaint parses a taint from a string, whose form must be either
 // '<key>=<value>:<effect>', '<key>:<effect>', or '<key>'.
 func parseTaint(st string) (commonv1alpha1.Taint, error) {
