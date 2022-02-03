@@ -18,51 +18,88 @@ package v1alpha1
 
 import (
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
-var tolerationMap = map[string]Toleration{ // map key format: key-value-effect
-	"all": {Operator: TolerationOpExists},
-	"all-nosched": {
+const (
+	anyExists = iota
+	anyExistsNoSchedule
+	anyExistsValANoSchedule
+	keyAExists
+	keyAExistsNoSchedule
+	keyAEqualsValA
+	keyARedundantlyEqualsValA
+	keyAEqualsValANoSchedule
+	keyARedundantlyEqualsValANoSchedule
+	keyAEqualsValBNoSchedule
+	keyARedundantlyEqualsValBNoSchedule
+	keyBExistsNoSchedule
+	keyBEqualsValBNoSchedule
+)
+
+var tolerationMap = map[int]Toleration{
+	anyExists: { // tolerates any key and any effect
+		Operator: TolerationOpExists,
+	},
+	anyExistsNoSchedule: { // tolerates any key with the effect `TaintEffectNoSchedule`
 		Operator: TolerationOpExists,
 		Effect:   TaintEffectNoSchedule,
 	},
-	"foo": {
-		Key:      "foo",
+	anyExistsValANoSchedule: { // tolerates any key with the effect `TaintEffectNoSchedule` and ignores the value
+		Operator: TolerationOpExists,
+		Value:    "valA",
+		Effect:   TaintEffectNoSchedule,
+	},
+	keyAExists: {
+		Key:      "keyA",
 		Operator: TolerationOpExists,
 	},
-	"foo-bar": {
-		Key:      "foo",
-		Operator: TolerationOpEqual,
-		Value:    "bar",
-	},
-	"foo-nosched": {
-		Key:      "foo",
-		Operator: TolerationOpExists,
-		Effect:   TaintEffectNoSchedule,
-	},
-	"foo-bar-nosched": {
-		Key:      "foo",
-		Operator: TolerationOpEqual,
-		Value:    "bar",
-		Effect:   TaintEffectNoSchedule,
-	},
-	"foo-baz-nosched": {
-		Key:      "foo",
-		Operator: TolerationOpEqual,
-		Value:    "baz",
-		Effect:   TaintEffectNoSchedule,
-	},
-	"faz-nosched": {
-		Key:      "faz",
+	keyAExistsNoSchedule: {
+		Key:      "keyA",
 		Operator: TolerationOpExists,
 		Effect:   TaintEffectNoSchedule,
 	},
-	"faz-baz-nosched": {
-		Key:      "faz",
+	keyAEqualsValA: {
+		Key:   "keyA",
+		Value: "valA",
+	},
+	keyARedundantlyEqualsValA: {
+		Key:      "keyA",
 		Operator: TolerationOpEqual,
-		Value:    "baz",
+		Value:    "valA",
+	},
+	keyAEqualsValANoSchedule: {
+		Key:    "keyA",
+		Value:  "valA",
+		Effect: TaintEffectNoSchedule,
+	},
+	keyARedundantlyEqualsValANoSchedule: {
+		Key:      "keyA",
+		Operator: TolerationOpEqual,
+		Value:    "valA",
 		Effect:   TaintEffectNoSchedule,
+	},
+	keyAEqualsValBNoSchedule: {
+		Key:    "keyA",
+		Value:  "valB",
+		Effect: TaintEffectNoSchedule,
+	},
+	keyARedundantlyEqualsValBNoSchedule: {
+		Key:      "keyA",
+		Operator: TolerationOpEqual,
+		Value:    "valB",
+		Effect:   TaintEffectNoSchedule,
+	},
+	keyBExistsNoSchedule: {
+		Key:      "keyB",
+		Operator: TolerationOpExists,
+		Effect:   TaintEffectNoSchedule,
+	},
+	keyBEqualsValBNoSchedule: {
+		Key:    "keyB",
+		Value:  "valB",
+		Effect: TaintEffectNoSchedule,
 	},
 }
 
@@ -142,80 +179,121 @@ var _ = Describe("TolerateTaints", func() {
 })
 
 var _ = Describe("MergeTolerations", func() {
-	It("merges two tolerations into one", func() {
-		toTolerations := func(names []string) []Toleration {
-			ans := []Toleration{}
-			for _, name := range names {
-				ans = append(ans, tolerationMap[name])
-			}
-			return ans
+	toTolerations := func(names []int) []Toleration {
+		ans := []Toleration{}
+		for _, name := range names {
+			ans = append(ans, tolerationMap[name])
 		}
+		return ans
+	}
 
-		tests := []struct {
-			name     string
-			a, b     []string
-			expected []string
-		}{{
-			name:     "disjoint",
-			a:        []string{"foo-bar-nosched", "faz-baz-nosched"},
-			b:        []string{"foo-baz-nosched"},
-			expected: []string{"foo-bar-nosched", "faz-baz-nosched", "foo-baz-nosched"},
-		}, {
-			name:     "duplicate",
-			a:        []string{"foo-bar-nosched", "faz-baz-nosched"},
-			b:        []string{"foo-bar-nosched", "faz-baz-nosched"},
-			expected: []string{"foo-bar-nosched", "faz-baz-nosched"},
-		}, {
-			name:     "merge redundant",
-			a:        []string{"foo-bar-nosched", "foo-baz-nosched"},
-			b:        []string{"foo-nosched", "faz-baz-nosched"},
-			expected: []string{"foo-nosched", "faz-baz-nosched"},
-		}}
-
-		for _, test := range tests {
-			Expect(MergeTolerations(toTolerations(test.a), toTolerations(test.b))).To(Equal(toTolerations(test.expected)))
-		}
-	})
+	DescribeTable("merges two tolerations into one",
+		func(a, b, merged []int) {
+			Expect(MergeTolerations(toTolerations(a), toTolerations(b))).To(Equal(toTolerations(merged)))
+		},
+		Entry(
+			"disjointed",
+			[]int{keyAEqualsValANoSchedule, keyBEqualsValBNoSchedule},
+			[]int{keyAEqualsValBNoSchedule},
+			[]int{keyAEqualsValANoSchedule, keyBEqualsValBNoSchedule, keyAEqualsValBNoSchedule},
+		),
+		Entry(
+			"duplicate",
+			[]int{keyAEqualsValANoSchedule, keyBEqualsValBNoSchedule},
+			[]int{keyAEqualsValANoSchedule, keyBEqualsValBNoSchedule},
+			[]int{keyAEqualsValANoSchedule, keyBEqualsValBNoSchedule},
+		),
+		Entry(
+			"redundant",
+			[]int{keyAEqualsValANoSchedule, keyAEqualsValBNoSchedule},
+			[]int{keyAExistsNoSchedule, keyBEqualsValBNoSchedule},
+			[]int{keyAExistsNoSchedule, keyBEqualsValBNoSchedule},
+		),
+	)
 })
 
 var _ = Describe("isSuperset", func() {
-	It("tells if a toleration is a superset of another toleration", func() {
-		superSubPairs := []struct {
-			superset string
-			subsets  []string
-		}{{
-			"all",
-			[]string{"all-nosched", "foo", "foo-bar", "foo-nosched", "foo-bar-nosched", "foo-baz-nosched", "faz-nosched", "faz-baz-nosched"},
-		}, {
-			"all-nosched",
-			[]string{"foo-nosched", "foo-bar-nosched", "foo-baz-nosched", "faz-nosched", "faz-baz-nosched"},
-		}, {
-			"foo",
-			[]string{"foo-bar", "foo-nosched", "foo-bar-nosched", "foo-baz-nosched"},
-		}, {
-			"foo-nosched",
-			[]string{"foo-bar-nosched", "foo-baz-nosched"},
-		}, {
-			"foo-bar",
-			[]string{"foo-bar-nosched"},
-		}}
-
-		contains := func(ss []string, target string) bool {
-			for _, s := range ss {
-				if s == target {
-					return true
-				}
+	contains := func(nums []int, target int) bool {
+		for _, num := range nums {
+			if num == target {
+				return true
 			}
-			return false
 		}
+		return false
+	}
 
-		for key := range tolerationMap {
+	superSubPairs := []struct {
+		superKey int
+		subKeys  []int
+	}{{
+		anyExists,
+		[]int{
+			anyExistsNoSchedule,
+			anyExistsValANoSchedule,
+			keyAExists,
+			keyAExistsNoSchedule,
+			keyAEqualsValA,
+			keyARedundantlyEqualsValA,
+			keyAEqualsValANoSchedule,
+			keyARedundantlyEqualsValANoSchedule,
+			keyAEqualsValBNoSchedule,
+			keyARedundantlyEqualsValBNoSchedule,
+			keyBExistsNoSchedule,
+			keyBEqualsValBNoSchedule,
+		},
+	}, {
+		anyExistsNoSchedule,
+		[]int{
+			anyExistsValANoSchedule,
+			keyAExistsNoSchedule,
+			keyAEqualsValANoSchedule,
+			keyARedundantlyEqualsValANoSchedule,
+			keyAEqualsValBNoSchedule,
+			keyARedundantlyEqualsValBNoSchedule,
+			keyBExistsNoSchedule,
+			keyBEqualsValBNoSchedule,
+		},
+	}, {
+		keyAExists,
+		[]int{
+			keyAEqualsValA,
+			keyARedundantlyEqualsValA,
+			keyAExistsNoSchedule,
+			keyAEqualsValANoSchedule,
+			keyARedundantlyEqualsValANoSchedule,
+			keyAEqualsValBNoSchedule,
+			keyARedundantlyEqualsValBNoSchedule,
+		},
+	}, {
+		keyAExistsNoSchedule,
+		[]int{
+			keyAEqualsValANoSchedule,
+			keyARedundantlyEqualsValANoSchedule,
+			keyAEqualsValBNoSchedule,
+			keyARedundantlyEqualsValBNoSchedule,
+		},
+	}, {
+		keyAEqualsValA,
+		[]int{
+			keyARedundantlyEqualsValA,
+			keyAEqualsValANoSchedule,
+			keyARedundantlyEqualsValANoSchedule,
+		},
+	}}
+
+	It("confirms a toleration is a superset of itsself", func() {
+		for _, toleration := range tolerationMap {
+			Expect(isSuperset(&toleration, &toleration)).To(BeTrue(), "expected %v is a superset of itself", toleration)
+		}
+	})
+
+	It("tells if a toleration is a superset of another toleration", func() {
+		for subKey, sub := range tolerationMap {
 			for _, pair := range superSubPairs {
-				super := tolerationMap[pair.superset]
-				sub := tolerationMap[key]
-				if key == pair.superset || contains(pair.subsets, key) { // tolerations[key] is the superset or it's among the subsets
+				super := tolerationMap[pair.superKey]
+				if contains(pair.subKeys, subKey) { // sub is among the subsets
 					Expect(isSuperset(&super, &sub)).To(BeTrue(), "expected %v is a superset of %v", super, sub)
-				} else { // nothing to do with this pair
+				} else if subKey != pair.superKey { // nothing to do with this pair
 					Expect(isSuperset(&super, &sub)).To(BeFalse(), "expected %v is not a superset of %v", super, sub)
 				}
 			}
