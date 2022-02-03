@@ -1,0 +1,7 @@
+apiVersion: storage.onmetal.de/v1alpha1
+kind: VolumeClaim
+metadata:
+  name: volumeclaim-sample
+spec:
+  volumeRef:
+    name: volume-sample

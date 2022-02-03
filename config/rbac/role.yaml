@@ -413,6 +413,32 @@ rules:
 - apiGroups:
   - storage.onmetal.de
   resources:
+  - volumeclaims
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - volumeclaims/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - storage.onmetal.de
+  resources:
+  - volumeclaims/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - storage.onmetal.de
+  resources:
   - volumes
   verbs:
   - create

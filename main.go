@@ -288,6 +288,13 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "ClusterPrefix")
 		os.Exit(1)
 	}
+	if err = (&storagecontrollers.VolumeClaimReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "VolumeClaim")
+		os.Exit(1)
+	}
 	//+kubebuilder:scaffold:builder
 
 	if err = (&networkcontrollers.ClusterPrefixAllocationSchedulerReconciler{
