@@ -50,7 +50,7 @@ var _ = Describe("VolumeScheduler", func() {
 				GenerateName: "test-volume-",
 			},
 			Spec: storagev1alpha1.VolumeSpec{
-				StorageClass: corev1.LocalObjectReference{
+				StorageClassRef: corev1.LocalObjectReference{
 					Name: "my-volumeclass",
 				},
 			},
@@ -74,7 +74,7 @@ var _ = Describe("VolumeScheduler", func() {
 				GenerateName: "test-volume-",
 			},
 			Spec: storagev1alpha1.VolumeSpec{
-				StorageClass: corev1.LocalObjectReference{
+				StorageClassRef: corev1.LocalObjectReference{
 					Name: "my-volumeclass",
 				},
 			},
@@ -152,7 +152,7 @@ var _ = Describe("VolumeScheduler", func() {
 				StoragePoolSelector: map[string]string{
 					"foo": "bar",
 				},
-				StorageClass: corev1.LocalObjectReference{
+				StorageClassRef: corev1.LocalObjectReference{
 					Name: "my-storageclass",
 				},
 			},
@@ -203,7 +203,7 @@ var _ = Describe("VolumeScheduler", func() {
 				GenerateName: "test-volume-",
 			},
 			Spec: storagev1alpha1.VolumeSpec{
-				StorageClass: corev1.LocalObjectReference{
+				StorageClassRef: corev1.LocalObjectReference{
 					Name: "my-storageclass",
 				},
 			},

@@ -67,10 +67,10 @@ func (r *StorageClassReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		storageClassNameField,
 		func(object client.Object) []string {
 			m := object.(*storagev1alpha1.Volume)
-			if m.Spec.StorageClass.Name == "" {
+			if m.Spec.StorageClassRef.Name == "" {
 				return nil
 			}
-			return []string{m.Spec.StorageClass.Name}
+			return []string{m.Spec.StorageClassRef.Name}
 		},
 	); err != nil {
 		return fmt.Errorf("indexing the field %s: %w", storageClassNameField, err)
@@ -83,7 +83,7 @@ func (r *StorageClassReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			handler.Funcs{
 				DeleteFunc: func(e event.DeleteEvent, q workqueue.RateLimitingInterface) {
 					v := e.Object.(*storagev1alpha1.Volume)
-					q.Add(ctrl.Request{NamespacedName: types.NamespacedName{Name: v.Spec.StorageClass.Name}})
+					q.Add(ctrl.Request{NamespacedName: types.NamespacedName{Name: v.Spec.StorageClassRef.Name}})
 				},
 			},
 		).

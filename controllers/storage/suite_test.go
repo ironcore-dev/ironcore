@@ -107,10 +107,26 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 		})
 		Expect(err).ToNot(HaveOccurred())
 
+		// index fields here
+		fieldIndexer := NewSharedIndexer(k8sManager)
+		Expect(fieldIndexer.IndexField(ctx, &storagev1alpha1.Volume{}, VolumeSpecVolumeClaimNameRefField)).ToNot(HaveOccurred())
+
 		// register reconciler here
+		Expect((&VolumeClaimScheduler{
+			Client:        k8sManager.GetClient(),
+			EventRecorder: k8sManager.GetEventRecorderFor("volume-claim-scheduler"),
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
 		Expect((&VolumeReconciler{
-			Client: k8sManager.GetClient(),
-			Scheme: k8sManager.GetScheme(),
+			Client:             k8sManager.GetClient(),
+			Scheme:             k8sManager.GetScheme(),
+			SharedFieldIndexer: fieldIndexer,
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
+		Expect((&VolumeClaimReconciler{
+			Client:             k8sManager.GetClient(),
+			Scheme:             k8sManager.GetScheme(),
+			SharedFieldIndexer: fieldIndexer,
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		Expect((&VolumeScheduler{

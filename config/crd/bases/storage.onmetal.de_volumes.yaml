@@ -17,18 +17,21 @@ spec:
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
+    - jsonPath: .spec.storagePool.name
+      name: StoragePool
+      type: string
+    - jsonPath: .spec.storageClassRef.name
+      name: StorageClass
+      type: string
     - jsonPath: .status.state
       name: State
+      type: string
+    - jsonPath: .status.phase
+      name: Phase
       type: string
     - jsonPath: .metadata.creationTimestamp
       name: Age
       type: date
-    - jsonPath: .spec.storagePool.name
-      name: StoragePool
-      type: string
-    - jsonPath: .spec.storageClass.name
-      name: StorageClass
-      type: string
     name: v1alpha1
     schema:
       openAPIV3Schema:
@@ -49,6 +52,20 @@ spec:
           spec:
             description: VolumeSpec defines the desired state of Volume
             properties:
+              claimRef:
+                description: ClaimRef is the reference to the VolumeClaim used by
+                  the Volume.
+                properties:
+                  name:
+                    description: Name is the name of the referenced VolumeClaim.
+                    type: string
+                  uid:
+                    description: UID is the UID of the referenced VolumeClaim.
+                    type: string
+                required:
+                - name
+                - uid
+                type: object
               resources:
                 additionalProperties:
                   anyOf:
@@ -68,8 +85,8 @@ spec:
                       TODO: Add other useful fields. apiVersion, kind, uid?'
                     type: string
                 type: object
-              storageClass:
-                description: StorageClass is the storage class of a volume
+              storageClassRef:
+                description: StorageClassRef is the storage class of a volume
                 properties:
                   name:
                     description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
@@ -130,7 +147,7 @@ spec:
                   type: object
                 type: array
             required:
-            - storageClass
+            - storageClassRef
             - storagePool
             type: object
           status:
@@ -176,8 +193,16 @@ spec:
                   - type
                   type: object
                 type: array
+              phase:
+                description: Phase represents the VolumeClaim binding phase of a Volume.
+                enum:
+                - Pending
+                - Available
+                - Bound
+                - Failed
+                type: string
               state:
-                description: VolumeState is a possible state a volume can be in.
+                description: State represents the infrastructure state of a Volume.
                 type: string
             type: object
         type: object

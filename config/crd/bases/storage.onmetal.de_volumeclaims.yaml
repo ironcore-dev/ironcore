@@ -46,6 +46,15 @@ spec:
           spec:
             description: VolumeClaimSpec defines the desired state of VolumeClaim
             properties:
+              resources:
+                additionalProperties:
+                  anyOf:
+                  - type: integer
+                  - type: string
+                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                  x-kubernetes-int-or-string: true
+                description: Resources are the requested Volume resources.
+                type: object
               selector:
                 description: Selector is a label query over volumes to consider for
                   binding.
@@ -91,6 +100,15 @@ spec:
                       are ANDed.
                     type: object
                 type: object
+              storageClassRef:
+                description: StorageClassRef references the StorageClass used by the
+                  Volume.
+                properties:
+                  name:
+                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                      TODO: Add other useful fields. apiVersion, kind, uid?'
+                    type: string
+                type: object
               volumeRef:
                 description: VolumeRef is the reference to the Volume used by the
                   VolumeClaim
@@ -100,13 +118,15 @@ spec:
                       TODO: Add other useful fields. apiVersion, kind, uid?'
                     type: string
                 type: object
+            required:
+            - resources
+            - storageClassRef
             type: object
           status:
             description: VolumeClaimStatus defines the observed state of VolumeClaim
             properties:
               phase:
-                description: VolumeClaimPhase represents the state a VolumeClaim can
-                  be in.
+                description: Phase represents the state a VolumeClaim can be in.
                 type: string
             type: object
         type: object
