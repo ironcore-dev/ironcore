@@ -20,7 +20,7 @@ resources:
   - bases/network.onmetal.de_ips.yaml
   - bases/network.onmetal.de_clusterprefixes.yaml
   - bases/network.onmetal.de_clusterprefixallocations.yaml
-- bases/storage.onmetal.de_volumeclaims.yaml
+  - bases/storage.onmetal.de_volumeclaims.yaml
 #+kubebuilder:scaffold:crdkustomizeresource
 
 patchesStrategicMerge:
