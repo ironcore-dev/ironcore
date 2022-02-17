@@ -17,11 +17,11 @@
 package v1alpha1
 
 import (
+	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-
-	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 // VolumeGK is a helper to easily access the GroupKind information of an Volume
@@ -32,8 +32,8 @@ var VolumeGK = schema.GroupKind{
 
 // VolumeSpec defines the desired state of Volume
 type VolumeSpec struct {
-	// StorageClass is the storage class of a volume
-	StorageClass corev1.LocalObjectReference `json:"storageClass"`
+	// StorageClassRef is the storage class of a volume
+	StorageClassRef corev1.LocalObjectReference `json:"storageClassRef"`
 	// StoragePoolSelector selects a suitable StoragePool by the given labels.
 	StoragePoolSelector map[string]string `json:"storagePoolSelector,omitempty"`
 	// StoragePool indicates which storage pool to use for a volume.
@@ -41,6 +41,8 @@ type VolumeSpec struct {
 	StoragePool corev1.LocalObjectReference `json:"storagePool"`
 	// SecretRef references the Secret containing the access credentials to consume a Volume.
 	SecretRef corev1.LocalObjectReference `json:"secretRef,omitempty"`
+	// ClaimRef is the reference to the VolumeClaim used by the Volume.
+	ClaimRef ClaimReference `json:"claimRef,omitempty"`
 	// Resources is a description of the volume's resources and capacity.
 	Resources corev1.ResourceList `json:"resources,omitempty"`
 	// Tolerations define tolerations the Volume has. Only StoragePools whose taints
@@ -48,11 +50,38 @@ type VolumeSpec struct {
 	Tolerations []commonv1alpha1.Toleration `json:"tolerations,omitempty"`
 }
 
+// ClaimReference points to a referenced VolumeClaim.
+type ClaimReference struct {
+	// Name is the name of the referenced VolumeClaim.
+	Name string `json:"name"`
+	// UID is the UID of the referenced VolumeClaim.
+	UID types.UID `json:"uid"`
+}
+
 // VolumeStatus defines the observed state of Volume
 type VolumeStatus struct {
-	State      VolumeState       `json:"state,omitempty"`
+	// State represents the infrastructure state of a Volume.
+	State VolumeState `json:"state,omitempty"`
+	// Phase represents the VolumeClaim binding phase of a Volume.
+	Phase      VolumePhase       `json:"phase,omitempty"`
 	Conditions []VolumeCondition `json:"conditions,omitempty"`
 }
+
+// VolumePhase represents the VolumeClaim binding phase of a Volume
+// +kubebuilder:validation:Enum=Pending;Available;Bound;Failed
+type VolumePhase string
+
+const (
+	// VolumePending is used for Volumes that are not available.
+	VolumePending VolumePhase = "Pending"
+	// VolumeAvailable is used for Volumes that are not yet bound
+	// Available volumes are held by the binder and matched to VolumeClaims.
+	VolumeAvailable VolumePhase = "Available"
+	// VolumeBound is used for Volumes that are bound.
+	VolumeBound VolumePhase = "Bound"
+	// VolumeFailed is used for Volumes that failed to be correctly freed from a VolumeClaim.
+	VolumeFailed VolumePhase = "Failed"
+)
 
 // VolumeState is a possible state a volume can be in.
 type VolumeState string
@@ -62,8 +91,6 @@ const (
 	VolumeStateAvailable VolumeState = "Available"
 	// VolumeStatePending reports whether the volume is about to be ready.
 	VolumeStatePending VolumeState = "Pending"
-	// VolumeStateAttached reports that the volume is attached and in-use.
-	VolumeStateAttached VolumeState = "Attached"
 	// VolumeStateError reports that the volume is in an error state.
 	VolumeStateError VolumeState = "Error"
 )
@@ -96,10 +123,11 @@ type VolumeCondition struct {
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
-//+kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.state`
-//+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 //+kubebuilder:printcolumn:name="StoragePool",type=string,JSONPath=`.spec.storagePool.name`
-//+kubebuilder:printcolumn:name="StorageClass",type=string,JSONPath=`.spec.storageClass.name`
+//+kubebuilder:printcolumn:name="StorageClass",type=string,JSONPath=`.spec.storageClassRef.name`
+//+kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.state`
+//+kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
+//+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
 // Volume is the Schema for the volumes API
 type Volume struct {

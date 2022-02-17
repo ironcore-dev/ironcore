@@ -46,7 +46,7 @@ var _ = Describe("storageclass controller", func() {
 				GenerateName: "volume-",
 			},
 			Spec: storagev1alpha1.VolumeSpec{
-				StorageClass: corev1.LocalObjectReference{
+				StorageClassRef: corev1.LocalObjectReference{
 					Name: sc.Name,
 				},
 			},

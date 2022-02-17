@@ -51,14 +51,14 @@ var _ = Describe("volume validation webhook", func() {
 					GenerateName: "test-volume-",
 				},
 				Spec: VolumeSpec{
-					StorageClass: corev1.LocalObjectReference{
+					StorageClassRef: corev1.LocalObjectReference{
 						Name: "my-volumeclass",
 					},
 				},
 			}
 			Expect(k8sClient.Create(ctx, volume)).To(Succeed(), "failed to create volume")
 			newStorageClass := v1.LocalObjectReference{Name: "newclass"}
-			volume.Spec.StorageClass = newStorageClass
+			volume.Spec.StorageClassRef = newStorageClass
 			err := k8sClient.Update(ctx, volume)
 			Expect(err).To(HaveOccurred())
 			path := field.NewPath("spec")

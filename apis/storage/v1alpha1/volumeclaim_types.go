@@ -17,21 +17,32 @@
 package v1alpha1
 
 import (
-	v1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
+
+// VolumeClaimGK is a helper to easily access the GroupKind information of an VolumeClaim
+var VolumeClaimGK = schema.GroupKind{
+	Group: GroupVersion.Group,
+	Kind:  "VolumeClaim",
+}
 
 // VolumeClaimSpec defines the desired state of VolumeClaim
 type VolumeClaimSpec struct {
 	// VolumeRef is the reference to the Volume used by the VolumeClaim
-	VolumeRef v1.LocalObjectReference `json:"volumeRef,omitempty"`
+	VolumeRef corev1.LocalObjectReference `json:"volumeRef,omitempty"`
 	// Selector is a label query over volumes to consider for binding.
-	Selector metav1.LabelSelector `json:"selector,omitempty"`
+	Selector *metav1.LabelSelector `json:"selector,omitempty"`
+	// Resources are the requested Volume resources.
+	Resources corev1.ResourceList `json:"resources"`
+	// StorageClassRef references the StorageClass used by the Volume.
+	StorageClassRef corev1.LocalObjectReference `json:"storageClassRef"`
 }
 
 // VolumeClaimStatus defines the observed state of VolumeClaim
 type VolumeClaimStatus struct {
-	// VolumeClaimPhase represents the state a VolumeClaim can be in.
+	// Phase represents the state a VolumeClaim can be in.
 	Phase VolumeClaimPhase `json:"phase,omitempty"`
 }
 
@@ -39,13 +50,13 @@ type VolumeClaimStatus struct {
 type VolumeClaimPhase string
 
 const (
-	// VolumeClaimPhasePending is used for a VolumeClaim which is not yet bound.
-	VolumeClaimPhasePending VolumeClaimPhase = "Pending"
-	// VolumeClaimPhaseBound is used for a VolumeClaim which is bound to a Volume.
-	VolumeClaimPhaseBound VolumeClaimPhase = "Bound"
-	// VolumeClaimPhaseLost is used for a VolumeClaim that lost its underlying Volume. The claim was bound to a
+	// VolumeClaimPending is used for a VolumeClaim which is not yet bound.
+	VolumeClaimPending VolumeClaimPhase = "Pending"
+	// VolumeClaimBound is used for a VolumeClaim which is bound to a Volume.
+	VolumeClaimBound VolumeClaimPhase = "Bound"
+	// VolumeClaimLost is used for a VolumeClaim that lost its underlying Volume. The claim was bound to a
 	// Volume and this volume does not exist any longer and all data on it was lost.
-	VolumeClaimPhaseLost VolumeClaimPhase = "Lost"
+	VolumeClaimLost VolumeClaimPhase = "Lost"
 )
 
 //+kubebuilder:object:root=true

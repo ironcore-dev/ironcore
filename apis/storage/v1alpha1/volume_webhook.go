@@ -57,8 +57,8 @@ func (r *Volume) ValidateUpdate(old runtime.Object) error {
 	path := field.NewPath("spec")
 
 	var allErrs field.ErrorList
-	if !reflect.DeepEqual(r.Spec.StorageClass, oldRange.Spec.StorageClass) {
-		allErrs = append(allErrs, field.Invalid(path.Child("storageClass"), r.Spec.StorageClass, fieldImmutable))
+	if !reflect.DeepEqual(r.Spec.StorageClassRef, oldRange.Spec.StorageClassRef) {
+		allErrs = append(allErrs, field.Invalid(path.Child("storageClass"), r.Spec.StorageClassRef, fieldImmutable))
 	}
 
 	if oldRange.Spec.StoragePool.Name != "" && !reflect.DeepEqual(r.Spec.StoragePool, oldRange.Spec.StoragePool) {

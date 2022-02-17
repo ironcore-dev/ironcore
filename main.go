@@ -55,7 +55,9 @@ const (
 	storagePoolController      = "storagepool"
 	storageClassController     = "storageclass"
 	volumeController           = "volume"
+	volumeClaimController      = "volumeclaim"
 	volumeScheduler            = "volumescheduler"
+	volumeClaimScheduler       = "volumeclaimscheduler"
 	reservedIPController       = "reservedip"
 	securityGroupController    = "securitygroup"
 	subnetController           = "subnet"
@@ -89,8 +91,9 @@ func main() {
 
 	controllers := switches.New(
 		machineClassController, machinePoolController, machineSchedulerController, storagePoolController,
-		storageClassController, volumeController, volumeScheduler, reservedIPController, securityGroupController,
-		subnetController, machineController, routingDomainController, ipamRangeController, gatewayController,
+		storageClassController, volumeController, volumeClaimController, volumeScheduler, volumeClaimScheduler, reservedIPController,
+		securityGroupController, subnetController, machineController, routingDomainController, ipamRangeController,
+		gatewayController,
 	)
 	flag.Var(controllers, "controllers", fmt.Sprintf("Controllers to enable. All controllers: %v. Disabled-by-default controllers: %v", controllers.All(), controllers.DisabledByDefault()))
 
@@ -120,6 +123,10 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Index fields
+	sharedStorageFieldIndexer := storagecontrollers.NewSharedIndexer(mgr)
+
+	// Register controllers
 	if controllers.Enabled(machineClassController) {
 		if err = (&computecontrollers.MachineClassReconciler{
 			Client: mgr.GetClient(),
@@ -167,10 +174,21 @@ func main() {
 	}
 	if controllers.Enabled(volumeController) {
 		if err = (&storagecontrollers.VolumeReconciler{
-			Client: mgr.GetClient(),
-			Scheme: mgr.GetScheme(),
+			Client:             mgr.GetClient(),
+			Scheme:             mgr.GetScheme(),
+			SharedFieldIndexer: sharedStorageFieldIndexer,
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "Volume")
+			os.Exit(1)
+		}
+	}
+	if controllers.Enabled(volumeClaimController) {
+		if err = (&storagecontrollers.VolumeClaimReconciler{
+			Client:             mgr.GetClient(),
+			Scheme:             mgr.GetScheme(),
+			SharedFieldIndexer: sharedStorageFieldIndexer,
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "VolumeClaim")
 			os.Exit(1)
 		}
 	}
@@ -179,6 +197,14 @@ func main() {
 			Client: mgr.GetClient(),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "VolumeScheduler")
+		}
+	}
+	if controllers.Enabled(volumeClaimScheduler) {
+		if err = (&storagecontrollers.VolumeClaimScheduler{
+			Client:        mgr.GetClient(),
+			EventRecorder: mgr.GetEventRecorderFor("volume-claim-scheduler"),
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "VolumeClaimScheduler")
 		}
 	}
 	if controllers.Enabled(reservedIPController) {
@@ -288,13 +314,7 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "ClusterPrefix")
 		os.Exit(1)
 	}
-	if err = (&storagecontrollers.VolumeClaimReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "VolumeClaim")
-		os.Exit(1)
-	}
+
 	//+kubebuilder:scaffold:builder
 
 	if err = (&networkcontrollers.ClusterPrefixAllocationSchedulerReconciler{

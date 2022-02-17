@@ -18,45 +18,140 @@ package storage
 
 import (
 	"context"
+	"fmt"
 
-	"k8s.io/apimachinery/pkg/runtime"
-	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/log"
-
+	"github.com/go-logr/logr"
+	"github.com/onmetal/controller-utils/clientutils"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
+	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/fields"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
+	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
 // VolumeReconciler reconciles a Volume object
 type VolumeReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	Scheme             *runtime.Scheme
+	SharedFieldIndexer *clientutils.SharedFieldIndexer
 }
 
 //+kubebuilder:rbac:groups=storage.onmetal.de,resources=volumes,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=storage.onmetal.de,resources=volumes/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=storage.onmetal.de,resources=volumes/finalizers,verbs=update
+//+kubebuilder:rbac:groups=storage.onmetal.de,resources=volumeclaims,verbs=get;list
 
-// Reconcile is part of the main kubernetes reconciliation loop which aims to
-// move the current state of the cluster closer to the desired state.
-// TODO(user): Modify the Reconcile function to compare the state specified by
-// the Volume object against the actual cluster state, and then
-// perform operations to make the cluster state reflect the state specified by
-// the user.
-//
-// For more details, check Reconcile and its Result here:
-// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.8.3/pkg/reconcile
+// Reconcile is part of the main reconciliation loop for Volume types
 func (r *VolumeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	log := ctrl.LoggerFrom(ctx)
+	volume := &storagev1alpha1.Volume{}
+	if err := r.Get(ctx, req.NamespacedName, volume); err != nil {
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+	return r.reconcileExists(ctx, log, volume)
+}
 
-	// your logic here
+func (r *VolumeReconciler) reconcileExists(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume) (ctrl.Result, error) {
+	if !volume.DeletionTimestamp.IsZero() {
+		return r.delete(ctx, log, volume)
+	}
+	return r.reconcile(ctx, log, volume)
+}
 
+func (r *VolumeReconciler) delete(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume) (ctrl.Result, error) {
 	return ctrl.Result{}, nil
+}
+
+func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume) (ctrl.Result, error) {
+	log.Info("synchronizing Volume", "Volume", client.ObjectKeyFromObject(volume))
+	if volume.Spec.ClaimRef.Name == "" {
+		if err := r.updateVolumePhase(ctx, log, volume, storagev1alpha1.VolumeAvailable); err != nil {
+			return ctrl.Result{}, err
+		}
+		return ctrl.Result{}, nil
+	}
+
+	log.Info("synchronizing Volume: volume is bound to claim",
+		"Volume", client.ObjectKeyFromObject(volume), "VolumeClaim", volume.Spec.ClaimRef.Name)
+	claim := &storagev1alpha1.VolumeClaim{}
+	claimKey := types.NamespacedName{
+		Namespace: volume.Namespace,
+		Name:      volume.Spec.ClaimRef.Name,
+	}
+	if err := r.Get(ctx, claimKey, claim); err != nil {
+		if !errors.IsNotFound(err) {
+			return ctrl.Result{}, fmt.Errorf("failed to get volumeclaim %s for volume %s: %w", claimKey, client.ObjectKeyFromObject(volume), err)
+		}
+		log.Info("volume is released as the corresponding claim can not be found", "Volume", client.ObjectKeyFromObject(volume), "VolumeClaim", claimKey)
+		if err := r.updateVolumePhase(ctx, log, volume, storagev1alpha1.VolumeAvailable); err != nil {
+			return ctrl.Result{}, err
+		}
+		return ctrl.Result{}, nil
+	}
+	if claim.Spec.VolumeRef.Name == volume.Name && volume.Spec.ClaimRef.UID == claim.UID {
+		log.Info("synchronizing Volume: all is bound", "Volume", client.ObjectKeyFromObject(volume))
+		if err := r.updateVolumePhase(ctx, log, volume, storagev1alpha1.VolumeBound); err != nil {
+			return ctrl.Result{}, err
+		}
+	}
+	return ctrl.Result{}, nil
+}
+
+func (r *VolumeReconciler) updateVolumePhase(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume, phase storagev1alpha1.VolumePhase) error {
+	log.V(1).Info("patching volume phase", "Volume", client.ObjectKeyFromObject(volume), "Phase", phase)
+	if volume.Status.Phase == phase {
+		// Nothing to do.
+		log.V(1).Info("updating Volume: phase already set", "Volume", client.ObjectKeyFromObject(volume), "Phase", phase)
+		return nil
+	}
+	volumeBase := volume.DeepCopy()
+	volume.Status.Phase = phase
+	if err := r.Status().Patch(ctx, volume, client.MergeFrom(volumeBase)); err != nil {
+		return fmt.Errorf("updating Volume %s: set phase %s failed: %w", volume.Name, phase, err)
+	}
+	log.V(1).Info("patched volume phase", "Volume", client.ObjectKeyFromObject(volume), "Phase", phase)
+	return nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *VolumeReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	ctx := context.Background()
+	if err := r.SharedFieldIndexer.IndexField(ctx, &storagev1alpha1.Volume{}, VolumeSpecVolumeClaimNameRefField); err != nil {
+		return err
+	}
+
 	return ctrl.NewControllerManagedBy(mgr).
+		Named("volume-controller").
 		For(&storagev1alpha1.Volume{}).
+		Watches(&source.Kind{Type: &storagev1alpha1.VolumeClaim{}},
+			handler.EnqueueRequestsFromMapFunc(func(object client.Object) []reconcile.Request {
+				volumeClaim := object.(*storagev1alpha1.VolumeClaim)
+				volumes := &storagev1alpha1.VolumeList{}
+				if err := r.List(ctx, volumes, &client.ListOptions{
+					FieldSelector: fields.OneTermEqualSelector(VolumeSpecVolumeClaimNameRefField, volumeClaim.GetName()),
+					Namespace:     volumeClaim.GetNamespace(),
+				}); err != nil {
+					return []reconcile.Request{}
+				}
+				requests := make([]reconcile.Request, len(volumes.Items))
+				for i, item := range volumes.Items {
+					requests[i] = reconcile.Request{
+						NamespacedName: types.NamespacedName{
+							Name:      item.GetName(),
+							Namespace: item.GetNamespace(),
+						},
+					}
+				}
+				return requests
+			}),
+			builder.WithPredicates(predicate.ResourceVersionChangedPredicate{}),
+		).
 		Complete(r)
 }
