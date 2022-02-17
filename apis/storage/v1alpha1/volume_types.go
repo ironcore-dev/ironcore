@@ -39,6 +39,8 @@ type VolumeSpec struct {
 	// StoragePool indicates which storage pool to use for a volume.
 	// If unset, the scheduler will figure out a suitable StoragePool.
 	StoragePool corev1.LocalObjectReference `json:"storagePool"`
+	// SecretRef references the Secret containing the access credentials to consume a Volume.
+	SecretRef corev1.LocalObjectReference `json:"secretRef,omitempty"`
 	// Resources is a description of the volume's resources and capacity.
 	Resources corev1.ResourceList `json:"resources,omitempty"`
 	// Tolerations define tolerations the Volume has. Only StoragePools whose taints

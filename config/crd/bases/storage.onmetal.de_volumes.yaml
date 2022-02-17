@@ -59,6 +59,15 @@ spec:
                 description: Resources is a description of the volume's resources
                   and capacity.
                 type: object
+              secretRef:
+                description: SecretRef references the Secret containing the access
+                  credentials to consume a Volume.
+                properties:
+                  name:
+                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                      TODO: Add other useful fields. apiVersion, kind, uid?'
+                    type: string
+                type: object
               storageClass:
                 description: StorageClass is the storage class of a volume
                 properties:
