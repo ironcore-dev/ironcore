@@ -228,13 +228,20 @@ spec:
                       description: Priority is the OS priority of the volume.
                       format: int32
                       type: integer
-                    volumeRef:
-                      description: VolumeRef is a reference to an existing volume
+                    volumeClaim:
+                      description: VolumeClaim instructs the VolumeAttachment to use
+                        a VolumeClaim as source for the attachment.
                       properties:
-                        name:
-                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                            TODO: Add other useful fields. apiVersion, kind, uid?'
-                          type: string
+                        ref:
+                          description: Ref is a reference to the VolumeClaim.
+                          properties:
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                TODO: Add other useful fields. apiVersion, kind, uid?'
+                              type: string
+                          type: object
+                      required:
+                      - ref
                       type: object
                   required:
                   - name

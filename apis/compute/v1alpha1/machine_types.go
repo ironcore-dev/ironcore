@@ -88,8 +88,20 @@ type VolumeAttachment struct {
 	Name string `json:"name"`
 	// Priority is the OS priority of the volume.
 	Priority int32 `json:"priority,omitempty"`
-	// VolumeRef is a reference to an existing volume
-	VolumeRef corev1.LocalObjectReference `json:"volumeRef,omitempty"`
+	// VolumeAttachmentSource is the source where the storage for the VolumeAttachment resides at.
+	VolumeAttachmentSource `json:",inline"`
+}
+
+// VolumeAttachmentSource specifies the source to use for a VolumeAttachment.
+type VolumeAttachmentSource struct {
+	// VolumeClaim instructs the VolumeAttachment to use a VolumeClaim as source for the attachment.
+	VolumeClaim *VolumeClaimAttachmentSource `json:"volumeClaim,omitempty"`
+}
+
+// VolumeClaimAttachmentSource references a VolumeClaim as VolumeAttachment source.
+type VolumeClaimAttachmentSource struct {
+	// Ref is a reference to the VolumeClaim.
+	Ref corev1.LocalObjectReference `json:"ref"`
 }
 
 type RetainPolicy string
