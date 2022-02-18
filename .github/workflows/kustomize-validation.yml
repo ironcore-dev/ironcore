@@ -1,0 +1,20 @@
+name: Kustomize Validation
+
+on:
+  pull_request:
+    types: [ assigned, opened, synchronize, reopened ]
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+
+jobs:
+  kustomize-validation:
+    runs-on: self-hosted
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - uses: imranismail/setup-kustomize@v1
+        with:
+          kustomize-version: 4.5.2
+      - run: |
+          ./hack/validate_kustomize.sh
