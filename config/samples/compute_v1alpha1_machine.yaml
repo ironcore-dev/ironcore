@@ -18,15 +18,14 @@ spec:
         name: mySubnetName
   securityGroups:
     - name: mysecgroup1
-  volumeClaims:
+  volumeAttachments:
     - name: rootdisk # first disk is root disk
-      retainPolicy: DeleteOnTermination
-      priority: 0 # optional
-      storageClass:
-        name: slow
-      size: 100Gi
-  ignition: |
-    myIgnitionYAML
+      # priority: 0 # optional
+      volumeClaim:
+        ref:
+          name: my-volumeclaim
+  ignition:
+    name: my-ignition-configmap
   efiVars:
     - name: PK
       uuid: 8be4df61-93ca-11d2-aa0d-00e098032b8c

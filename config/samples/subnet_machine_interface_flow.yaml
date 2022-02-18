@@ -44,13 +44,6 @@ spec:
         name: subnet-sample
   securityGroups:
     - name: mysecgroup1
-  volumeClaims:
-    - name: rootdisk # first disk is root disk
-      retainPolicy: DeleteOnTermination
-      priority: 0 # optional
-      storageClass:
-        name: slow
-      size: 100Gi
   ignition:
     name: ignition-sample
   efiVars:
@@ -78,13 +71,6 @@ spec:
         name: subnet-sample
   securityGroups:
     - name: mysecgroup1
-  volumeClaims:
-    - name: rootdisk # first disk is root disk
-      retainPolicy: DeleteOnTermination
-      priority: 0 # optional
-      storageClass:
-        name: slow
-      size: 100Gi
   ignition:
     name: ignition-sample
   efiVars:
