@@ -66,6 +66,35 @@ spec:
                 - name
                 - uid
                 type: object
+              mvi:
+                description: MVI specifies how to manage the volume via MVI.
+                properties:
+                  driver:
+                    description: Driver is the name of the drive to use for this volume.
+                      Required.
+                    type: string
+                  secretRef:
+                    description: SecretRef references the Secret containing the access
+                      credentials to consume a Volume.
+                    properties:
+                      name:
+                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                          TODO: Add other useful fields. apiVersion, kind, uid?'
+                        type: string
+                    type: object
+                  volumeAttributes:
+                    additionalProperties:
+                      type: string
+                    description: VolumeAttributes are attributes of the volume to
+                      use.
+                    type: object
+                required:
+                - driver
+                type: object
+              providerID:
+                description: ProviderID is the unique id of the volume on provider
+                  side.
+                type: string
               resources:
                 additionalProperties:
                   anyOf:
@@ -75,15 +104,6 @@ spec:
                   x-kubernetes-int-or-string: true
                 description: Resources is a description of the volume's resources
                   and capacity.
-                type: object
-              secretRef:
-                description: SecretRef references the Secret containing the access
-                  credentials to consume a Volume.
-                properties:
-                  name:
-                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                      TODO: Add other useful fields. apiVersion, kind, uid?'
-                    type: string
                 type: object
               storageClassRef:
                 description: StorageClassRef is the storage class of a volume
