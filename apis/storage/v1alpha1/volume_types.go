@@ -39,8 +39,8 @@ type VolumeSpec struct {
 	// StoragePool indicates which storage pool to use for a volume.
 	// If unset, the scheduler will figure out a suitable StoragePool.
 	StoragePool corev1.LocalObjectReference `json:"storagePool"`
-	// SecretRef references the Secret containing the access credentials to consume a Volume.
-	SecretRef corev1.LocalObjectReference `json:"secretRef,omitempty"`
+	// ProviderID is the unique id of the volume on provider side.
+	ProviderID string `json:"providerID,omitempty"`
 	// ClaimRef is the reference to the VolumeClaim used by the Volume.
 	ClaimRef ClaimReference `json:"claimRef,omitempty"`
 	// Resources is a description of the volume's resources and capacity.
@@ -48,6 +48,18 @@ type VolumeSpec struct {
 	// Tolerations define tolerations the Volume has. Only StoragePools whose taints
 	// covered by Tolerations will be considered to host the Volume.
 	Tolerations []commonv1alpha1.Toleration `json:"tolerations,omitempty"`
+	// MVI specifies how to manage the volume via MVI.
+	MVI MVIVolumeSource `json:"mvi,omitempty"`
+}
+
+// MVIVolumeSource represents storage that is managed by an external MVI volume driver.
+type MVIVolumeSource struct {
+	// SecretRef references the Secret containing the access credentials to consume a Volume.
+	SecretRef corev1.LocalObjectReference `json:"secretRef,omitempty"`
+	// Driver is the name of the drive to use for this volume. Required.
+	Driver string `json:"driver"`
+	// VolumeAttributes are attributes of the volume to use.
+	VolumeAttributes map[string]string `json:"volumeAttributes,omitempty"`
 }
 
 // ClaimReference points to a referenced VolumeClaim.
