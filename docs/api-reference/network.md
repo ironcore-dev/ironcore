@@ -335,7 +335,9 @@ Kubernetes meta/v1.Time
 <td>
 <code>prefix</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
+</a>
 </em>
 </td>
 <td>
@@ -372,7 +374,9 @@ byte
 <td>
 <code>prefix</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
+</a>
 </em>
 </td>
 <td>
@@ -668,7 +672,9 @@ PrefixSpace
 <td>
 <code>available</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 []github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
+</a>
 </em>
 </td>
 <td>
@@ -679,7 +685,9 @@ PrefixSpace
 <td>
 <code>reserved</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 []github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
+</a>
 </em>
 </td>
 <td>
@@ -1125,7 +1133,9 @@ GatewayState
 <td>
 <code>ips</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 []github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
+</a>
 </em>
 </td>
 <td>
@@ -1203,7 +1213,9 @@ PrefixSelector
 <td>
 <code>ip</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
+</a>
 </em>
 </td>
 <td>
@@ -1284,7 +1296,9 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>cidrs</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 []github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
+</a>
 </em>
 </td>
 <td>
@@ -1369,7 +1383,9 @@ IPAMRangeStatus
 <td>
 <code>cidr</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
+</a>
 </em>
 </td>
 <td>
@@ -1380,7 +1396,9 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
 <td>
 <code>ips</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPRange
+</a>
 </em>
 </td>
 <td>
@@ -1454,7 +1472,9 @@ int32
 <td>
 <code>cidr</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
+</a>
 </em>
 </td>
 <td>
@@ -1464,7 +1484,9 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
 <td>
 <code>ips</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPRange
+</a>
 </em>
 </td>
 <td>
@@ -1530,7 +1552,9 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>cidrs</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 []github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
+</a>
 </em>
 </td>
 <td>
@@ -1702,7 +1726,9 @@ Kubernetes meta/v1.Time
 <td>
 <code>cidr</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
+</a>
 </em>
 </td>
 <td>
@@ -1770,7 +1796,9 @@ PrefixSelector
 <td>
 <code>ip</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
+</a>
 </em>
 </td>
 <td>
@@ -2246,7 +2274,9 @@ Kubernetes meta/v1.Time
 <td>
 <code>prefix</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
+</a>
 </em>
 </td>
 <td>
@@ -2266,7 +2296,9 @@ byte
 <td>
 <code>range</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPRange
+</a>
 </em>
 </td>
 <td>
@@ -2303,7 +2335,9 @@ int64
 <td>
 <code>prefix</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
+</a>
 </em>
 </td>
 <td>
@@ -2313,7 +2347,9 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
 <td>
 <code>range</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPRange
+</a>
 </em>
 </td>
 <td>
@@ -2629,7 +2665,9 @@ byte
 <td>
 <code>prefix</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
+</a>
 </em>
 </td>
 <td>
@@ -2641,7 +2679,9 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
 <td>
 <code>reservations</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 []github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
+</a>
 </em>
 </td>
 <td>
@@ -2756,7 +2796,9 @@ PrefixSpace
 <td>
 <code>available</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 []github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
+</a>
 </em>
 </td>
 <td>
@@ -2767,7 +2809,9 @@ PrefixSpace
 <td>
 <code>reserved</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 []github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
+</a>
 </em>
 </td>
 <td>
@@ -2807,7 +2851,9 @@ int32
 <td>
 <code>cidr</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
+</a>
 </em>
 </td>
 <td>
@@ -2873,7 +2919,9 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>ip</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
+</a>
 </em>
 </td>
 <td>
@@ -3173,7 +3221,9 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>ip</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
+</a>
 </em>
 </td>
 <td>
@@ -3264,7 +3314,9 @@ ReservedIPState
 <td>
 <code>ip</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
+</a>
 </em>
 </td>
 <td>
@@ -4364,7 +4416,9 @@ SubnetState
 <td>
 <code>cidrs</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 []github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
+</a>
 </em>
 </td>
 <td>
@@ -4456,5 +4510,5 @@ string
 <hr/>
 <p><em>
 Generated with <code>gen-crd-api-reference-docs</code>
-on git commit <code>1e9845c</code>.
+on git commit <code>7399651</code>.
 </em></p>

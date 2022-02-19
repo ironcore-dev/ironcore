@@ -8,12 +8,20 @@
     ],
     "externalPackages": [
         {
+            "typeMatchPrefix": "^inet\\.af/netaddr\\.IP",
+            "docsURLTemplate": "https://pkg.go.dev/inet.af/netaddr#IP"
+        },
+        {
+            "typeMatchPrefix": "^inet\\.af/netaddr\\.IPPrefix",
+            "docsURLTemplate": "https://pkg.go.dev/inet.af/netaddr#IPPrefix"
+        },
+        {
             "typeMatchPrefix": "^k8s\\.io/apimachinery/pkg/api/resource\\.Quantity",
             "docsURLTemplate": "https://pkg.go.dev/k8s.io/apimachinery/pkg/api/resource#Duration"
         },
         {
             "typeMatchPrefix": "^k8s\\.io/(api|apimachinery/pkg/apis)/",
-            "docsURLTemplate": "https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#{{lower .TypeIdentifier}}-{{arrIndex .PackageSegments -1}}-{{arrIndex .PackageSegments -2}}"
+            "docsURLTemplate": "https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#{{lower .TypeIdentifier}}-{{arrIndex .PackageSegments -1}}-{{arrIndex .PackageSegments -2}}"
         }
     ],
     "typeDisplayNamePrefixOverrides": {

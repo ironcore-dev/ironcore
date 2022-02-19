@@ -5,7 +5,6 @@ is automatically generated from the Go types in the `apis` folder. For more info
 built and how it can be updated please refer to the [Updating API Reference Documentation](/development/documentation/#api-reference-documentation)
 in the documentation development guide.
 
-* [Core](../core/)
 * [Network](../network)
 * [Compute](../compute)
 * [Storage](../storage)

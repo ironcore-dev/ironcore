@@ -24,7 +24,7 @@ Resource Types:
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -51,7 +51,7 @@ ConsoleSpec
 <td>
 <code>machineRef</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -127,7 +127,7 @@ ServiceReference
 <td>
 <code>machineRef</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -285,7 +285,7 @@ string
 <td>
 <code>target</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -309,7 +309,9 @@ int32
 <td>
 <code>ip</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
+</a>
 </em>
 </td>
 <td>
@@ -349,7 +351,9 @@ string
 <td>
 <code>ip</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
+</a>
 </em>
 </td>
 <td>
@@ -386,7 +390,7 @@ int32
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -424,7 +428,7 @@ string
 <td>
 <code>machineClass</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -448,7 +452,7 @@ map[string]string
 <td>
 <code>machinePool</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -499,7 +503,7 @@ string
 <td>
 <code>securityGroups</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
 []Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -548,6 +552,20 @@ If key is empty, DefaultIgnitionKey will be used as fallback.</p>
 <p>EFIVars are variables to pass to EFI while booting up.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>tolerations</code><br/>
+<em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Toleration">
+[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.Toleration
+</a>
+</em>
+</td>
+<td>
+<p>Tolerations define tolerations the Machine has. Only MachinePools whose taints
+covered by Tolerations will be considered to run the Machine.</p>
+</td>
+</tr>
 </table>
 </td>
 </tr>
@@ -582,7 +600,7 @@ MachineStatus
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -609,7 +627,7 @@ MachineClassSpec
 <td>
 <code>capabilities</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#resourcelist-v1-core">
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#resourcelist-v1-core">
 Kubernetes core/v1.ResourceList
 </a>
 </em>
@@ -655,7 +673,7 @@ MachineClassStatus
 <td>
 <code>capabilities</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#resourcelist-v1-core">
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#resourcelist-v1-core">
 Kubernetes core/v1.ResourceList
 </a>
 </em>
@@ -707,7 +725,7 @@ MachineConditionType
 <td>
 <code>status</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#conditionstatus-v1-core">
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#conditionstatus-v1-core">
 Kubernetes core/v1.ConditionStatus
 </a>
 </em>
@@ -753,7 +771,7 @@ int64
 <td>
 <code>lastUpdateTime</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -766,7 +784,7 @@ Kubernetes meta/v1.Time
 <td>
 <code>lastTransitionTime</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -785,6 +803,18 @@ Kubernetes meta/v1.Time
 <div>
 <p>MachineConditionType is a type a MachineCondition can have.</p>
 </div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Synced&#34;</p></td>
+<td><p>MachineSynced represents the condition of a machine being synced with its backing resources</p>
+</td>
+</tr></tbody>
+</table>
 <h3 id="compute.onmetal.de/v1alpha1.MachinePool">MachinePool
 </h3>
 <div>
@@ -802,7 +832,7 @@ Kubernetes meta/v1.Time
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -834,6 +864,20 @@ string
 </td>
 <td>
 <p>ProviderID identifies the MachinePool on provider side.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>taints</code><br/>
+<em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Taint">
+[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.Taint
+</a>
+</em>
+</td>
+<td>
+<p>Taints of the MachinePool. Only Machines who tolerate all the taints
+will land in the MachinePool.</p>
 </td>
 </tr>
 </table>
@@ -886,7 +930,7 @@ MachinePoolConditionType
 <td>
 <code>status</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#conditionstatus-v1-core">
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#conditionstatus-v1-core">
 Kubernetes core/v1.ConditionStatus
 </a>
 </em>
@@ -932,7 +976,7 @@ int64
 <td>
 <code>lastUpdateTime</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -945,7 +989,7 @@ Kubernetes meta/v1.Time
 <td>
 <code>lastTransitionTime</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -989,6 +1033,20 @@ string
 </td>
 <td>
 <p>ProviderID identifies the MachinePool on provider side.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>taints</code><br/>
+<em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Taint">
+[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.Taint
+</a>
+</em>
+</td>
+<td>
+<p>Taints of the MachinePool. Only Machines who tolerate all the taints
+will land in the MachinePool.</p>
 </td>
 </tr>
 </tbody>
@@ -1062,7 +1120,7 @@ MachinePoolState
 <td>
 <code>availableMachineClasses</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
 []Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1103,7 +1161,7 @@ string
 <td>
 <code>machineClass</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1127,7 +1185,7 @@ map[string]string
 <td>
 <code>machinePool</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1178,7 +1236,7 @@ string
 <td>
 <code>securityGroups</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
 []Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1225,6 +1283,20 @@ If key is empty, DefaultIgnitionKey will be used as fallback.</p>
 </td>
 <td>
 <p>EFIVars are variables to pass to EFI while booting up.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>tolerations</code><br/>
+<em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Toleration">
+[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.Toleration
+</a>
+</em>
+</td>
+<td>
+<p>Tolerations define tolerations the Machine has. Only MachinePools whose taints
+covered by Tolerations will be considered to run the Machine.</p>
 </td>
 </tr>
 </tbody>
@@ -1436,15 +1508,49 @@ int32
 </tr>
 <tr>
 <td>
-<code>volumeRef</code><br/>
+<code>VolumeAttachmentSource</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
+<a href="#compute.onmetal.de/v1alpha1.VolumeAttachmentSource">
+VolumeAttachmentSource
 </a>
 </em>
 </td>
 <td>
-<p>VolumeRef is a reference to an existing volume</p>
+<p>
+(Members of <code>VolumeAttachmentSource</code> are embedded into this type.)
+</p>
+<p>VolumeAttachmentSource is the source where the storage for the VolumeAttachment resides at.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="compute.onmetal.de/v1alpha1.VolumeAttachmentSource">VolumeAttachmentSource
+</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.VolumeAttachment">VolumeAttachment</a>)
+</p>
+<div>
+<p>VolumeAttachmentSource specifies the source to use for a VolumeAttachment.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>volumeClaim</code><br/>
+<em>
+<a href="#compute.onmetal.de/v1alpha1.VolumeClaimAttachmentSource">
+VolumeClaimAttachmentSource
+</a>
+</em>
+</td>
+<td>
+<p>VolumeClaim instructs the VolumeAttachment to use a VolumeClaim as source for the attachment.</p>
 </td>
 </tr>
 </tbody>
@@ -1489,8 +1595,39 @@ int32
 </tr>
 </tbody>
 </table>
+<h3 id="compute.onmetal.de/v1alpha1.VolumeClaimAttachmentSource">VolumeClaimAttachmentSource
+</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.VolumeAttachmentSource">VolumeAttachmentSource</a>)
+</p>
+<div>
+<p>VolumeClaimAttachmentSource references a VolumeClaim as VolumeAttachment source.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>ref</code><br/>
+<em>
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>Ref is a reference to the VolumeClaim.</p>
+</td>
+</tr>
+</tbody>
+</table>
 <hr/>
 <p><em>
 Generated with <code>gen-crd-api-reference-docs</code>
-on git commit <code>1e9845c</code>.
+on git commit <code>7399651</code>.
 </em></p>

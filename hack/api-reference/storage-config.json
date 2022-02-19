@@ -8,6 +8,10 @@
   ],
   "externalPackages": [
     {
+      "typeMatchPrefix": "^k8s\\.io/apimachinery/pkg/types\\.UID",
+      "docsURLTemplate": "https://pkg.go.dev/k8s.io/apimachinery/pkg/types#UID"
+    },
+    {
       "typeMatchPrefix": "^k8s\\.io/apimachinery/pkg/api/resource\\.Quantity",
       "docsURLTemplate": "https://pkg.go.dev/k8s.io/apimachinery/pkg/api/resource#Duration"
     },
@@ -26,6 +30,14 @@
     {
       "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.SecretKeySelector$",
       "docsURLTemplate": "/api-reference/common/#common.onmetal.de/v1alpha1.SecretKeySelector"
+    },
+    {
+      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.Toleration",
+      "docsURLTemplate": "/api-reference/common/#common.onmetal.de/v1alpha1.Toleration"
+    },
+    {
+      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.Taint",
+      "docsURLTemplate": "/api-reference/common/#common.onmetal.de/v1alpha1.Taint"
     },
     {
       "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.ConfigMapKeySelector$",
