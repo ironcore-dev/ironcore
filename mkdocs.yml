@@ -25,7 +25,11 @@ plugins:
 
 markdown_extensions:
   - pymdownx.highlight
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.snippets
   - codehilite
   - admonition
@@ -45,7 +49,6 @@ nav:
       - Contribution Guide: development/contribution.md
   - API Reference:
       - Overview: api-reference/overview.md
-      - Core: api-reference/core.md
       - Network: api-reference/network.md
       - Compute: api-reference/compute.md
       - Storage: api-reference/storage.md

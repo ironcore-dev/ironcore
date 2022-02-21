@@ -12,5 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Placeholder file to make Go vendor this directory properly.
+// Package template Placeholder file to make Go vendor this directory properly.
 package template
