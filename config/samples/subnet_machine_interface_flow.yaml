@@ -1,15 +1,15 @@
 apiVersion: network.onmetal.de/v1alpha1
 kind: RoutingDomain
 metadata:
-  name: routingdomain-sample
+  name: routingdomain-sample-1
 ---
 apiVersion: network.onmetal.de/v1alpha1
 kind: Subnet
 metadata:
-  name: subnet-sample
+  name: subnet-sample-1
 spec:
   routingDomain:
-    name: routingdomain-sample
+    name: routingdomain-sample-1
   ranges:
     - cidr: 192.168.0.0/24
 ---
@@ -24,7 +24,7 @@ data:
 apiVersion: compute.onmetal.de/v1alpha1
 kind: Machine
 metadata:
-  name: machine-sample
+  name: machine-sample-1
 spec:
   hostname: myhost
   machineClass:
@@ -38,10 +38,10 @@ spec:
     - name: myinterface
       priority: 0 # optional
       target:
-        name: subnet-sample
+        name: subnet-sample-1
     - name: myotherinterface
       target:
-        name: subnet-sample
+        name: subnet-sample-1
   securityGroups:
     - name: mysecgroup1
   ignition:
@@ -68,7 +68,7 @@ spec:
     - name: myinterface
       priority: 0 # optional
       target:
-        name: subnet-sample
+        name: subnet-sample-1
   securityGroups:
     - name: mysecgroup1
   ignition:

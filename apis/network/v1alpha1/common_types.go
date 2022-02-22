@@ -23,12 +23,14 @@ import (
 // * a v1alpha1.Machine
 // * a Gateway
 // * a ReservedIP
+// * a Subnet
 // * a raw IP
 // * a raw CIDR.
 type Target struct {
 	Machine    *MachineRouteTarget          `json:"machine,omitempty"`
 	Gateway    *corev1.LocalObjectReference `json:"gateway,omitempty"`
 	ReservedIP *corev1.LocalObjectReference `json:"reservedIP,omitempty"`
+	Subnet     *corev1.LocalObjectReference `json:"subnet,omitempty"`
 	IP         string                       `json:"ip,omitempty"`
 	CIDR       string                       `json:"cidr,omitempty"`
 }

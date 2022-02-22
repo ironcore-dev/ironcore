@@ -15,7 +15,7 @@ spec:
     - name: myinterface
       priority: 0 # optional
       target:
-        name: mySubnetName
+        name: subnet-sample
   securityGroups:
     - name: mysecgroup1
   volumeAttachments:

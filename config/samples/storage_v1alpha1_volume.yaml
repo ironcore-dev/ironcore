@@ -3,7 +3,7 @@ kind: Volume
 metadata:
   name: volume-sample
 spec:
-  storageClass:
+  storageClassRef:
     name: storageclass-sample
   storagePool:
     name: storagepool-sample
