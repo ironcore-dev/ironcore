@@ -7,8 +7,5 @@ spec:
   uplink:
     subnet:
       name: subnet-sample
-#status:
-#  state: Up
-#  ips:
-#    - 35.0.0.1
-
+  subnet:
+    name: subnet-sample-1

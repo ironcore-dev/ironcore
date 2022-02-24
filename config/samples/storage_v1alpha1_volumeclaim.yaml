@@ -3,5 +3,9 @@ kind: VolumeClaim
 metadata:
   name: volumeclaim-sample
 spec:
+  storageClassRef:
+    name: storageclass-sample
   volumeRef:
     name: volume-sample
+  resources:
+    storage: 100Gi
