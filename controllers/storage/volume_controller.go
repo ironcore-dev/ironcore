@@ -93,6 +93,11 @@ func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volum
 		if err := r.updateVolumePhase(ctx, log, volume, storagev1alpha1.VolumeAvailable); err != nil {
 			return ctrl.Result{}, err
 		}
+		baseVolume := volume.DeepCopy()
+		volume.Spec.ClaimRef = storagev1alpha1.ClaimReference{}
+		if err := r.Patch(ctx, volume, client.MergeFrom(baseVolume)); err != nil {
+			return ctrl.Result{}, fmt.Errorf("could not remove claim to volume %s: %w", client.ObjectKeyFromObject(volume), err)
+		}
 		return ctrl.Result{}, nil
 	}
 	if claim.Spec.VolumeRef.Name == volume.Name && volume.Spec.ClaimRef.UID == claim.UID {

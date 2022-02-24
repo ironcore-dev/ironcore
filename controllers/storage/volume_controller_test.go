@@ -116,6 +116,7 @@ var _ = Describe("VolumeReconciler", func() {
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
 			g.Expect(volume.Status.Phase).To(Equal(storagev1alpha1.VolumeAvailable))
+			g.Expect(volume.Spec.ClaimRef.Name).To(Equal(""))
 		}, timeout, interval).Should(Succeed())
 	})
 })
