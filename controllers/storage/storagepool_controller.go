@@ -19,10 +19,10 @@ package storage
 import (
 	"context"
 
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 )
@@ -47,10 +47,23 @@ type StoragePoolReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.8.3/pkg/reconcile
 func (r *StoragePoolReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	log := ctrl.LoggerFrom(ctx)
+	log.Info("process StoragePool")
+	storagePool := &storagev1alpha1.StoragePool{}
+
+	if err := r.Get(ctx, req.NamespacedName, storagePool); err != nil {
+		log.Error(err, "error get storage pool")
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
 
 	// your logic here
-
+	storagePoolBase := storagePool.DeepCopy()
+	storagePool.Status.AvailableStorageClasses = []corev1.LocalObjectReference{{Name: "slow"}, {Name: "fast"}}
+	err := r.Client.Status().Patch(ctx, storagePool, client.MergeFrom(storagePoolBase))
+	if err != nil {
+		log.Error(err, "error update status for storagepool")
+		return ctrl.Result{}, err
+	}
 	return ctrl.Result{}, nil
 }
 

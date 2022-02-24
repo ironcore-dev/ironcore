@@ -3,9 +3,8 @@ kind: Volume
 metadata:
   name: volume-sample
 spec:
-  storageClass:
-    name: storageclass-sample
-  storagePool:
-    name: storagepool-sample
+  storageClassRef:
+    name: slow
+  storagePool: {}
   resources:
-    storage: 100Gi
+    storage: 1Gi

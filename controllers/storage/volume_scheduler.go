@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
+
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	"github.com/go-logr/logr"
@@ -127,7 +128,12 @@ func (s *VolumeScheduler) schedule(ctx context.Context, log logr.Logger, volume 
 	if err := s.Patch(ctx, volume, client.MergeFrom(base)); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error scheduling volume on pool: %w", err)
 	}
-
+	log.Info("---------------------------------------------->")
+	base = volume.DeepCopy()
+	volume.Status.State = storagev1alpha1.VolumeStateAvailable
+	if err := s.Status().Patch(ctx, volume, client.MergeFrom(base)); err != nil {
+		return ctrl.Result{}, fmt.Errorf("error patching volume state to pending: %w", err)
+	}
 	log.Info("Successfully assigned volume")
 	return ctrl.Result{}, nil
 }
