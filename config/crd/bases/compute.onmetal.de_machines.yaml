@@ -320,6 +320,9 @@ spec:
                 items:
                   description: VolumeAttachmentStatus is the status of a VolumeAttachment.
                   properties:
+                    deviceID:
+                      description: DeviceID is the disk device ID on the host.
+                      type: string
                     name:
                       description: Name is the name of a volume attachment.
                       type: string
