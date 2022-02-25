@@ -127,6 +127,8 @@ type VolumeAttachmentStatus struct {
 	Name string `json:"name"`
 	// Priority is the OS priority of the volume.
 	Priority int32 `json:"priority,omitempty"`
+	// DeviceID is the disk device ID on the host.
+	DeviceID string `json:"deviceID,omitempty"`
 }
 
 // MachineStatus defines the observed state of Machine
