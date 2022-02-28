@@ -26,38 +26,61 @@ import (
 
 var _ = Describe("machine validation webhook", func() {
 	ns := SetupTest()
-	Context("upon machine update", func() {
-		It("signals error if machinepool is changed", func() {
-			m := &Machine{
+	Context("machine update", func() {
+		It("should error if the machine pool is set and changed", func() {
+			machine := &Machine{
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace:    ns.Name,
 					GenerateName: "machine-",
 				},
+				Spec: MachineSpec{
+					MachinePool:  corev1.LocalObjectReference{Name: "my-pool"},
+					MachineClass: corev1.LocalObjectReference{Name: "my-class"},
+				},
 			}
-			Expect(k8sClient.Create(ctx, m)).To(Succeed())
+			Expect(k8sClient.Create(ctx, machine)).To(Succeed())
 
-			newMachinePoolName := "another machinepool"
-			m.Spec.MachinePool.Name = newMachinePoolName
-			err := k8sClient.Update(ctx, m)
-			Expect(err).To(HaveOccurred())
-
+			machine.Spec.MachinePool.Name = "my-other-pool"
 			path := field.NewPath("spec", "machinePool", "name")
-			fieldErr := field.Invalid(path, newMachinePoolName, "immutable")
+			fieldErr := field.Invalid(path, "my-other-pool", "immutable")
 			fieldErrList := field.ErrorList{fieldErr}
-			Expect(err.Error()).To(ContainSubstring(fieldErrList.ToAggregate().Error()))
+			Expect(k8sClient.Update(ctx, machine)).To(SatisfyAll(
+				HaveOccurred(),
+				WithTransform(func(err error) string {
+					return err.Error()
+				}, ContainSubstring(fieldErrList.ToAggregate().Error())),
+			))
 		})
 
-		It("keeps silent when machinepool isn't changed", func() {
-			m := &Machine{
+		It("should allow updating from a zero machine pool ref to a valid ref", func() {
+			By("creating a machine")
+			machine := &Machine{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace:    ns.Name,
+					GenerateName: "machine-",
+				},
+				Spec: MachineSpec{
+					MachineClass: corev1.LocalObjectReference{Name: "my-class"},
+				},
+			}
+			Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+
+			By("updating the machine pool")
+			machine.Spec.MachinePool.Name = "my-pool"
+			Expect(k8sClient.Update(ctx, machine)).To(Succeed())
+		})
+
+		It("should allow other updates", func() {
+			machine := &Machine{
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace:    ns.Name,
 					GenerateName: "machine-",
 				},
 			}
-			Expect(k8sClient.Create(ctx, m)).To(Succeed())
+			Expect(k8sClient.Create(ctx, machine)).To(Succeed())
 
-			m.Spec.SecurityGroups = []corev1.LocalObjectReference{{Name: "new-security-group"}}
-			err := k8sClient.Update(ctx, m)
+			machine.Spec.SecurityGroups = []corev1.LocalObjectReference{{Name: "new-security-group"}}
+			err := k8sClient.Update(ctx, machine)
 			Expect(err).ToNot(HaveOccurred())
 		})
 	})

@@ -52,18 +52,21 @@ func (r *Machine) ValidateDelete() error {
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
 func (m *Machine) ValidateUpdate(old runtime.Object) error {
 	machinelog.Info("validate update", "name", m.Name)
+	oldMachine := old.(*Machine)
 
-	newName := m.Spec.MachinePool.Name
-	oldName := old.(*Machine).Spec.MachineClass.Name
-	if newName != oldName {
+	var allErrs field.ErrorList
+
+	if oldMachine.Spec.MachinePool.Name != "" && oldMachine.Spec.MachinePool != m.Spec.MachinePool {
 		path := field.NewPath("spec", "machinePool", "name")
-		fieldInvalid := field.Invalid(path, newName, "immutable")
-		var machineGK = schema.GroupKind{
-			Group: GroupVersion.Group,
-			Kind:  "Machine",
-		}
-
-		return apierrors.NewInvalid(machineGK, m.Name, field.ErrorList{fieldInvalid})
+		fieldInvalid := field.Invalid(path, m.Spec.MachinePool.Name, "immutable")
+		allErrs = append(allErrs, fieldInvalid)
 	}
-	return nil
+
+	if len(allErrs) == 0 {
+		return nil
+	}
+	return apierrors.NewInvalid(schema.GroupKind{
+		Group: GroupVersion.Group,
+		Kind:  "Machine",
+	}, m.Name, allErrs)
 }
