@@ -186,6 +186,17 @@ var _ = Describe("subnet controller", func() {
 		}
 		Expect(k8sClient.Create(ctx, parentSubnet)).Should(Succeed())
 
+		By("waiting for the parent-subnet to be reconciled")
+		Eventually(func(g Gomega) networkv1alpha1.SubnetStatus {
+			err := k8sClient.Get(ctx, client.ObjectKeyFromObject(parentSubnet), parentSubnet)
+			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
+			g.Expect(err).ToNot(HaveOccurred())
+			return parentSubnet.Status
+		}, timeout, interval).Should(Equal(networkv1alpha1.SubnetStatus{
+			State: networkv1alpha1.SubnetStateUp,
+			CIDRs: []commonv1alpha1.IPPrefix{testCIDR},
+		}))
+
 		By("creating the first child-subnet")
 		childRangeSize := 30
 		firstChildSubnet := &networkv1alpha1.Subnet{
