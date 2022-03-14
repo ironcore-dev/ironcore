@@ -19,6 +19,7 @@ package network
 import (
 	"context"
 	"fmt"
+
 	"github.com/onmetal/onmetal-api/predicates"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 
@@ -97,7 +98,7 @@ func (r *ReservedIPReconciler) reconcile(ctx context.Context, log logr.Logger, r
 		return ctrl.Result{}, fmt.Errorf("could not own ipam range: %w", err)
 	}
 
-	if err := r.Patch(ctx, ipamRange, client.Apply, reservedIPFieldOwner); err != nil {
+	if err := r.Patch(ctx, ipamRange, client.Apply, reservedIPFieldOwner, client.ForceOwnership); err != nil {
 		base := reservedIP.DeepCopy()
 		reservedIP.Status.State = networkv1alpha1.ReservedIPStateError
 		if err := r.Status().Patch(ctx, reservedIP, client.MergeFrom(base)); err != nil {

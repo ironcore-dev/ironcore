@@ -108,7 +108,7 @@ func (r *SubnetReconciler) reconcile(ctx context.Context, log logr.Logger, subne
 		return ctrl.Result{}, fmt.Errorf("could not own ipam range: %w", err)
 	}
 
-	if err := r.Patch(ctx, ipamRange, client.Apply, subnetFieldOwner); err != nil {
+	if err := r.Patch(ctx, ipamRange, client.Apply, subnetFieldOwner, client.ForceOwnership); err != nil {
 		return ctrl.Result{}, fmt.Errorf("could not apply ipam range: %w", err)
 	}
 

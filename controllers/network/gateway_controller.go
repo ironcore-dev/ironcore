@@ -61,7 +61,7 @@ func (r *GatewayReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	// Server-side apply (create or update) the corrresponding IPAMRange
-	if err := r.Patch(ctx, ipamRange, client.Apply, gatewayFieldOwner); err != nil {
+	if err := r.Patch(ctx, ipamRange, client.Apply, gatewayFieldOwner, client.ForceOwnership); err != nil {
 		return ctrl.Result{}, fmt.Errorf("server-side applying the ipam range: %w", err)
 	}
 
