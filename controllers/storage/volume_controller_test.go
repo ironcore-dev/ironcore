@@ -84,6 +84,12 @@ var _ = Describe("VolumeReconciler", func() {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
 			g.Expect(volume.Status.Phase).To(Equal(storagev1alpha1.VolumeBound))
 		}, timeout, interval).Should(Succeed())
+
+		By("making sure the volume stays bound")
+		Consistently(func(g Gomega) {
+			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
+			g.Expect(volume.Status.Phase).To(Equal(storagev1alpha1.VolumeBound))
+		}, timeout, interval).Should(Succeed())
 	})
 
 	It("should un-bind a volume if the underlying volume claim changes its volume ref", func() {

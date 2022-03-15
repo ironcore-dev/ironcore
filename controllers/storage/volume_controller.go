@@ -23,16 +23,16 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/clientutils"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
-	"k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/fields"
+	apiequality "github.com/onmetal/onmetal-api/equality"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
-	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
@@ -72,7 +72,8 @@ func (r *VolumeReconciler) delete(ctx context.Context, log logr.Logger, volume *
 func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume) (ctrl.Result, error) {
 	log.V(1).Info("Reconciling volume")
 	if volume.Spec.ClaimRef.Name == "" {
-		if err := r.updateVolumePhase(ctx, log, volume, storagev1alpha1.VolumeAvailable); err != nil {
+		log.V(1).Info("Volume does not reference any claim")
+		if err := r.patchVolumeStatus(ctx, volume, storagev1alpha1.VolumeAvailable); err != nil {
 			return ctrl.Result{}, err
 		}
 		return ctrl.Result{}, nil
@@ -83,80 +84,104 @@ func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volum
 		Namespace: volume.Namespace,
 		Name:      volume.Spec.ClaimRef.Name,
 	}
-	log.V(1).Info("Volume is bound to claim", "VolumeClaimKey", volumeClaimKey)
-	if err := r.Get(ctx, volumeClaimKey, volumeClaim); err != nil {
-		if !errors.IsNotFound(err) {
-			return ctrl.Result{}, fmt.Errorf("failed to get volumeclaim %s: %w", volumeClaimKey, err)
+	log = log.WithValues("VolumeClaimKey", volumeClaimKey)
+	log.V(1).Info("Volume references volume claim")
+	err := r.Get(ctx, volumeClaimKey, volumeClaim)
+	if client.IgnoreNotFound(err) != nil {
+		return ctrl.Result{}, fmt.Errorf("failed to get volumeclaim %s: %w", volumeClaimKey, err)
+	}
+
+	if apierrors.IsNotFound(err) || !r.validReferences(volume, volumeClaim) {
+		log.V(1).Info("Volume binding is not valid, releasing volume")
+		if err := r.releaseVolume(ctx, volume); err != nil {
+			return ctrl.Result{}, fmt.Errorf("error releasing volume: %w", err)
 		}
 
-		log.V(1).Info("volume is released as the corresponding claim can not be found", "Volume", client.ObjectKeyFromObject(volume), "VolumeClaim", volumeClaimKey)
-		if err := r.updateVolumePhase(ctx, log, volume, storagev1alpha1.VolumeAvailable); err != nil {
-			return ctrl.Result{}, err
-		}
-		baseVolume := volume.DeepCopy()
-		volume.Spec.ClaimRef = storagev1alpha1.ClaimReference{}
-		if err := r.Patch(ctx, volume, client.MergeFrom(baseVolume)); err != nil {
-			return ctrl.Result{}, fmt.Errorf("could not remove claim to volume %s: %w", client.ObjectKeyFromObject(volume), err)
-		}
+		log.V(1).Info("Successfully released volume from invalid binding")
 		return ctrl.Result{}, nil
 	}
-	if volumeClaim.Spec.VolumeRef.Name == volume.Name && volume.Spec.ClaimRef.UID == volumeClaim.UID {
-		log.Info("synchronizing Volume: all is bound", "Volume", client.ObjectKeyFromObject(volume))
-		if err := r.updateVolumePhase(ctx, log, volume, storagev1alpha1.VolumeBound); err != nil {
-			return ctrl.Result{}, err
-		}
+
+	log.V(1).Info("Setting volume as bound")
+	if err := r.patchVolumeStatus(ctx, volume, storagev1alpha1.VolumeBound); err != nil {
+		return ctrl.Result{}, err
 	}
+
+	log.V(1).Info("Successfully set volume as bound")
 	return ctrl.Result{}, nil
 }
 
-func (r *VolumeReconciler) updateVolumePhase(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume, phase storagev1alpha1.VolumePhase) error {
-	log.V(1).Info("patching volume phase", "Volume", client.ObjectKeyFromObject(volume), "Phase", phase)
-	if volume.Status.Phase == phase {
-		// Nothing to do.
-		log.V(1).Info("updating Volume: phase already set", "Volume", client.ObjectKeyFromObject(volume), "Phase", phase)
-		return nil
+func (r *VolumeReconciler) validReferences(volume *storagev1alpha1.Volume, volumeClaim *storagev1alpha1.VolumeClaim) bool {
+	volumeRef := volumeClaim.Spec.VolumeRef
+	if volumeRef.Name != volume.Name {
+		return false
 	}
+
+	claimRef := volume.Spec.ClaimRef
+	return claimRef.Name == volumeClaim.Name && claimRef.UID == volumeClaim.UID
+}
+
+func (r *VolumeReconciler) releaseVolume(ctx context.Context, volume *storagev1alpha1.Volume) error {
+	baseVolume := volume.DeepCopy()
+	volume.Spec.ClaimRef = storagev1alpha1.ClaimReference{}
+	return r.Patch(ctx, volume, client.MergeFrom(baseVolume))
+}
+
+func (r *VolumeReconciler) patchVolumeStatus(ctx context.Context, volume *storagev1alpha1.Volume, phase storagev1alpha1.VolumePhase) error {
 	volumeBase := volume.DeepCopy()
 	volume.Status.Phase = phase
-	if err := r.Status().Patch(ctx, volume, client.MergeFrom(volumeBase)); err != nil {
-		return fmt.Errorf("updating Volume %s: set phase %s failed: %w", volume.Name, phase, err)
-	}
-	log.V(1).Info("patched volume phase", "Volume", client.ObjectKeyFromObject(volume), "Phase", phase)
-	return nil
+	return r.Status().Patch(ctx, volume, client.MergeFrom(volumeBase))
 }
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *VolumeReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	ctx := context.Background()
+	log := ctrl.Log.WithName("volume").WithName("setup")
 	if err := r.SharedFieldIndexer.IndexField(ctx, &storagev1alpha1.Volume{}, VolumeSpecVolumeClaimNameRefField); err != nil {
 		return err
 	}
 
 	return ctrl.NewControllerManagedBy(mgr).
-		Named("volume-controller").
-		For(&storagev1alpha1.Volume{}).
+		For(
+			&storagev1alpha1.Volume{},
+			builder.WithPredicates(predicate.Funcs{
+				UpdateFunc: func(event event.UpdateEvent) bool {
+					oldVolume, newVolume := event.ObjectOld.(*storagev1alpha1.Volume), event.ObjectNew.(*storagev1alpha1.Volume)
+					return !apiequality.Semantic.DeepEqual(oldVolume.Spec, newVolume.Spec) ||
+						oldVolume.Status.State != newVolume.Status.State ||
+						oldVolume.Status.Phase != newVolume.Status.Phase
+				},
+			}),
+		).
 		Watches(&source.Kind{Type: &storagev1alpha1.VolumeClaim{}},
-			handler.EnqueueRequestsFromMapFunc(func(object client.Object) []reconcile.Request {
-				volumeClaim := object.(*storagev1alpha1.VolumeClaim)
+			handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+				volumeClaim := obj.(*storagev1alpha1.VolumeClaim)
+
 				volumes := &storagev1alpha1.VolumeList{}
-				if err := r.List(ctx, volumes, &client.ListOptions{
-					FieldSelector: fields.OneTermEqualSelector(VolumeSpecVolumeClaimNameRefField, volumeClaim.GetName()),
-					Namespace:     volumeClaim.GetNamespace(),
+				if err := r.List(ctx, volumes, client.InNamespace(volumeClaim.Namespace), client.MatchingFields{
+					VolumeSpecVolumeClaimNameRefField: volumeClaim.Name,
 				}); err != nil {
-					return []reconcile.Request{}
+					log.Error(err, "Error listing claims using volume")
+					return []ctrl.Request{}
 				}
-				requests := make([]reconcile.Request, len(volumes.Items))
-				for i, item := range volumes.Items {
-					requests[i] = reconcile.Request{
+
+				res := make([]ctrl.Request, 0, len(volumes.Items))
+				for _, item := range volumes.Items {
+					res = append(res, ctrl.Request{
 						NamespacedName: types.NamespacedName{
 							Name:      item.GetName(),
 							Namespace: item.GetNamespace(),
 						},
-					}
+					})
 				}
-				return requests
+				return res
 			}),
-			builder.WithPredicates(predicate.ResourceVersionChangedPredicate{}),
+			builder.WithPredicates(predicate.Funcs{
+				UpdateFunc: func(event event.UpdateEvent) bool {
+					oldVolumeClaim, newVolumeClaim := event.ObjectOld.(*storagev1alpha1.VolumeClaim), event.ObjectNew.(*storagev1alpha1.VolumeClaim)
+					return !apiequality.Semantic.DeepEqual(oldVolumeClaim.Spec, newVolumeClaim.Spec) ||
+						oldVolumeClaim.Status.Phase != newVolumeClaim.Status.Phase
+				},
+			}),
 		).
 		Complete(r)
 }
