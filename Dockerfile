@@ -1,7 +1,5 @@
 # Build the manager binary
-FROM golang:1.17.0 as builder
-
-ARG GOARCH=''
+FROM --platform=$BUILDPLATFORM golang:1.17 as builder
 
 WORKDIR /workspace
 # Copy the Go Modules manifests
@@ -18,8 +16,12 @@ COPY controllers/ controllers/
 COPY predicates/ predicates/
 COPY equality/ equality/
 
+ARG TARGETOS TARGETARCH
+
 # Build
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=${GOARCH:-$(go env GOARCH)} GO111MODULE=on go build -ldflags="-s -w" -a -o manager main.go
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/go/pkg \
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o manager main.go
 
 # Use distroless as minimal base image to package the manager binary
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
