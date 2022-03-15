@@ -70,7 +70,7 @@ func (r *VolumeReconciler) delete(ctx context.Context, log logr.Logger, volume *
 }
 
 func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume) (ctrl.Result, error) {
-	log.Info("synchronizing Volume", "Volume", client.ObjectKeyFromObject(volume))
+	log.V(1).Info("Reconciling volume")
 	if volume.Spec.ClaimRef.Name == "" {
 		if err := r.updateVolumePhase(ctx, log, volume, storagev1alpha1.VolumeAvailable); err != nil {
 			return ctrl.Result{}, err
@@ -78,18 +78,18 @@ func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volum
 		return ctrl.Result{}, nil
 	}
 
-	log.Info("synchronizing Volume: volume is bound to claim",
-		"Volume", client.ObjectKeyFromObject(volume), "VolumeClaim", volume.Spec.ClaimRef.Name)
-	claim := &storagev1alpha1.VolumeClaim{}
-	claimKey := types.NamespacedName{
+	volumeClaim := &storagev1alpha1.VolumeClaim{}
+	volumeClaimKey := client.ObjectKey{
 		Namespace: volume.Namespace,
 		Name:      volume.Spec.ClaimRef.Name,
 	}
-	if err := r.Get(ctx, claimKey, claim); err != nil {
+	log.V(1).Info("Volume is bound to claim", "VolumeClaimKey", volumeClaimKey)
+	if err := r.Get(ctx, volumeClaimKey, volumeClaim); err != nil {
 		if !errors.IsNotFound(err) {
-			return ctrl.Result{}, fmt.Errorf("failed to get volumeclaim %s for volume %s: %w", claimKey, client.ObjectKeyFromObject(volume), err)
+			return ctrl.Result{}, fmt.Errorf("failed to get volumeclaim %s: %w", volumeClaimKey, err)
 		}
-		log.Info("volume is released as the corresponding claim can not be found", "Volume", client.ObjectKeyFromObject(volume), "VolumeClaim", claimKey)
+
+		log.V(1).Info("volume is released as the corresponding claim can not be found", "Volume", client.ObjectKeyFromObject(volume), "VolumeClaim", volumeClaimKey)
 		if err := r.updateVolumePhase(ctx, log, volume, storagev1alpha1.VolumeAvailable); err != nil {
 			return ctrl.Result{}, err
 		}
@@ -100,7 +100,7 @@ func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volum
 		}
 		return ctrl.Result{}, nil
 	}
-	if claim.Spec.VolumeRef.Name == volume.Name && volume.Spec.ClaimRef.UID == claim.UID {
+	if volumeClaim.Spec.VolumeRef.Name == volume.Name && volume.Spec.ClaimRef.UID == volumeClaim.UID {
 		log.Info("synchronizing Volume: all is bound", "Volume", client.ObjectKeyFromObject(volume))
 		if err := r.updateVolumePhase(ctx, log, volume, storagev1alpha1.VolumeBound); err != nil {
 			return ctrl.Result{}, err

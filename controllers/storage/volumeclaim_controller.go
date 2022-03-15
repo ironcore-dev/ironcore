@@ -24,11 +24,9 @@ import (
 	"github.com/onmetal/controller-utils/clientutils"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/fields"
-	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
-	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
@@ -71,54 +69,52 @@ func (r *VolumeClaimReconciler) delete(ctx context.Context, log logr.Logger, cla
 }
 
 func (r *VolumeClaimReconciler) reconcile(ctx context.Context, log logr.Logger, claim *storagev1alpha1.VolumeClaim) (ctrl.Result, error) {
-	log.Info("synchronizing VolumeClaim", "VolumeClaim", client.ObjectKeyFromObject(claim))
+	log.V(1).Info("Reconciling volume claim")
 	if claim.Spec.VolumeRef.Name == "" {
-		if err := r.updateVolumeClaimPhase(ctx, log, claim, storagev1alpha1.VolumeClaimPending); err != nil {
-			return ctrl.Result{}, err
+		log.V(1).Info("Volume claim is not bound")
+		if err := r.patchVolumeClaimStatus(ctx, claim, storagev1alpha1.VolumeClaimPending); err != nil {
+			return ctrl.Result{}, fmt.Errorf("error setting volume claim to pending: %w", err)
 		}
 		return ctrl.Result{}, nil
 	}
 
-	log.Info("synchronizing VolumeClaim: claim is bound to volume",
-		"VolumeClaim", client.ObjectKeyFromObject(claim), "Volume", claim.Spec.VolumeRef.Name)
 	volume := &storagev1alpha1.Volume{}
-	volumeKey := types.NamespacedName{
+	volumeKey := client.ObjectKey{
 		Namespace: claim.Namespace,
 		Name:      claim.Spec.VolumeRef.Name,
 	}
+	log.V(1).Info("Getting volume for volume claim", "VolumeKey", volumeKey)
 	if err := r.Get(ctx, volumeKey, volume); err != nil {
 		if !errors.IsNotFound(err) {
-			return ctrl.Result{}, fmt.Errorf("failed to get volume %s for volumeclaim %s: %w", volumeKey, client.ObjectKeyFromObject(claim), err)
+			return ctrl.Result{}, fmt.Errorf("error getting volume %s for volume claim: %w", volumeKey, err)
 		}
-		log.Info("volumeclaim is released as the corresponding volume can not be found", "VolumeClaim", client.ObjectKeyFromObject(claim), "Volume", volumeKey)
-		if err := r.updateVolumeClaimPhase(ctx, log, claim, storagev1alpha1.VolumeClaimLost); err != nil {
-			return ctrl.Result{}, err
+
+		log.V(1).Info("Volume claim is lost as the corresponding volume cannot be found", "VolumeKey", volumeKey)
+		if err := r.patchVolumeClaimStatus(ctx, claim, storagev1alpha1.VolumeClaimLost); err != nil {
+			return ctrl.Result{}, fmt.Errorf("error setting volume claim to lost: %w", err)
 		}
 		return ctrl.Result{}, nil
 	}
+
 	if volume.Spec.ClaimRef.Name == claim.Name && volume.Spec.ClaimRef.UID == claim.UID {
-		log.Info("synchronizing VolumeClaim: all is bound", "VolumeClaim", client.ObjectKeyFromObject(claim))
-		if err := r.updateVolumeClaimPhase(ctx, log, claim, storagev1alpha1.VolumeClaimBound); err != nil {
-			return ctrl.Result{}, err
+		log.V(1).Info("Volume is bound to claim", "VolumeKey", volumeKey)
+		if err := r.patchVolumeClaimStatus(ctx, claim, storagev1alpha1.VolumeClaimBound); err != nil {
+			return ctrl.Result{}, fmt.Errorf("error setting volume claim to bound: %w", err)
 		}
+		return ctrl.Result{}, nil
+	}
+
+	log.V(1).Info("Volume is not (yet) bound to claim", "VolumeKey", volumeKey, "ClaimRef", volume.Spec.ClaimRef)
+	if err := r.patchVolumeClaimStatus(ctx, claim, storagev1alpha1.VolumeClaimPending); err != nil {
+		return ctrl.Result{}, fmt.Errorf("error setting volume claim to pending: %w", err)
 	}
 	return ctrl.Result{}, nil
 }
 
-func (r *VolumeClaimReconciler) updateVolumeClaimPhase(ctx context.Context, log logr.Logger, claim *storagev1alpha1.VolumeClaim, phase storagev1alpha1.VolumeClaimPhase) error {
-	log.V(1).Info("patching volumeclaim phase", "VolumeClaim", client.ObjectKeyFromObject(claim), "Phase", phase)
-	if claim.Status.Phase == phase {
-		// Nothing to do.
-		log.V(1).Info("updating VolumeClaim: phase already set", "VolumeClaim", client.ObjectKeyFromObject(claim), "Phase", phase)
-		return nil
-	}
-	volumeClaimBase := claim.DeepCopy()
-	claim.Status.Phase = phase
-	if err := r.Status().Patch(ctx, claim, client.MergeFrom(volumeClaimBase)); err != nil {
-		return fmt.Errorf("updating VolumeClaim %s: set phase %s failed: %w", claim.Name, phase, err)
-	}
-	log.V(1).Info("patched volumeclaim phase", "VolumeClaim", client.ObjectKeyFromObject(claim), "Phase", phase)
-	return nil
+func (r *VolumeClaimReconciler) patchVolumeClaimStatus(ctx context.Context, volumeClaim *storagev1alpha1.VolumeClaim, phase storagev1alpha1.VolumeClaimPhase) error {
+	base := volumeClaim.DeepCopy()
+	volumeClaim.Status.Phase = phase
+	return r.Status().Patch(ctx, volumeClaim, client.MergeFrom(base))
 }
 
 const (
@@ -128,9 +124,12 @@ const (
 // SetupWithManager sets up the controller with the Manager.
 func (r *VolumeClaimReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	ctx := context.Background()
+	log := ctrl.Log.WithName("volumeclaim").WithName("setup")
+
 	if err := r.SharedFieldIndexer.IndexField(ctx, &storagev1alpha1.Volume{}, VolumeSpecVolumeClaimNameRefField); err != nil {
 		return err
 	}
+
 	if err := mgr.GetFieldIndexer().IndexField(ctx, &storagev1alpha1.VolumeClaim{}, VolumeClaimSpecVolumeRefNameField, func(object client.Object) []string {
 		claim := object.(*storagev1alpha1.VolumeClaim)
 		if claim.Spec.VolumeRef.Name == "" {
@@ -141,28 +140,27 @@ func (r *VolumeClaimReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		return err
 	}
 	return ctrl.NewControllerManagedBy(mgr).
-		Named("volumeclaim-controller").
 		For(&storagev1alpha1.VolumeClaim{}).
 		Watches(&source.Kind{Type: &storagev1alpha1.Volume{}},
-			handler.EnqueueRequestsFromMapFunc(func(object client.Object) []reconcile.Request {
+			handler.EnqueueRequestsFromMapFunc(func(object client.Object) []ctrl.Request {
 				volume := object.(*storagev1alpha1.Volume)
+
 				claims := &storagev1alpha1.VolumeClaimList{}
 				if err := r.List(ctx, claims, &client.ListOptions{
 					FieldSelector: fields.OneTermEqualSelector(VolumeClaimSpecVolumeRefNameField, volume.GetName()),
 					Namespace:     volume.GetNamespace(),
 				}); err != nil {
-					return []reconcile.Request{}
+					log.Error(err, "error listing volume claims matching volume", "VolumeKey", client.ObjectKeyFromObject(volume))
+					return []ctrl.Request{}
 				}
-				requests := make([]reconcile.Request, len(claims.Items))
-				for i, item := range claims.Items {
-					requests[i] = reconcile.Request{
-						NamespacedName: types.NamespacedName{
-							Name:      item.GetName(),
-							Namespace: item.GetNamespace(),
-						},
-					}
+
+				res := make([]ctrl.Request, 0, len(claims.Items))
+				for _, item := range claims.Items {
+					res = append(res, ctrl.Request{
+						NamespacedName: client.ObjectKeyFromObject(&item),
+					})
 				}
-				return requests
+				return res
 			}),
 			builder.WithPredicates(predicate.ResourceVersionChangedPredicate{}),
 		).

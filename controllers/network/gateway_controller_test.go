@@ -164,7 +164,7 @@ var _ = Describe("gateway controller", func() {
 			}, timeout, interval).Should(Succeed())
 		})
 
-		It("updates the status of the Gateway", func() {
+		PIt("updates the status of the Gateway", func() {
 			By("creating the subent consumed by the gateway")
 			subnet := &networkv1alpha1.Subnet{
 				TypeMeta: metav1.TypeMeta{

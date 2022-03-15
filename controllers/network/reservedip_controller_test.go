@@ -29,7 +29,7 @@ import (
 
 var _ = Describe("ReservedIPReconciler", func() {
 	ns := SetupTest()
-	It("should reserve an IP", func() {
+	PIt("should reserve an IP", func() {
 		By("creating a subnet")
 		cidr := commonv1alpha1.MustParseIPPrefix("10.0.0.0/16")
 		subnet := &networkv1alpha1.Subnet{
