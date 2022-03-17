@@ -11,8 +11,8 @@ require (
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.18.1
 	inet.af/netaddr v0.0.0-20210903134321-85fa6c94624e
-	k8s.io/api v0.23.4
-	k8s.io/apimachinery v0.23.4
+	k8s.io/api v0.23.5
+	k8s.io/apimachinery v0.23.5
 	k8s.io/apiserver v0.23.4
 	k8s.io/client-go v0.23.4
 	k8s.io/utils v0.0.0-20211116205334-6203023598ed
