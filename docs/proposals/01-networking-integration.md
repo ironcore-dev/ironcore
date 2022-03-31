@@ -93,7 +93,9 @@ metadata:
 spec:
   prefix: 192.0.0.0/8
   # ipamPrefixRef:
+  #   # Either size or prefix can be requested from the target ipam prefix.
   #   size: 8
+  #   # prefix: 192.0.0.0/8
   #   name: my-ipam-prefix
 status:
   available:
@@ -118,6 +120,7 @@ Example manifest:
 apiVersion: compute.onmetal.de/v1alpha1
 kind: NetworkInterface
 metadata:
+  namespace: default
   name: my-nic
 spec:
   networkRef:
@@ -153,23 +156,27 @@ status:
   ...
 ```
 
-### The `Service` type
+### The `VirtualPrefix` type
 
-The `Service` type controls how to do routing to a `NetworkInterface` / a `Machine`. A `Service` has a type that
-specifies what routing is desired. For the initial use case, public prefix routing is realized via `type: PublicPrefix`.
-A `Service` selects the members that are targeted by routing. Once selected, a public prefix gets assigned to
-the `Service` and routing will take effect. Successfully allocated prefixes are reported in the `status`.
+The `VirtualPrefix` type controls how to do routing to a `NetworkInterface` / a `Machine`. A `VirtualPrefix` has a type
+that specifies what routing is desired.
+
+**Public prefix**:
+
+Public prefix routing is realized via `type: Public`. A `VirtualPrefix` selects the members that are targeted by
+routing. Once selected, a public prefix gets assigned to the `VirtualPrefix` and routing will take effect. Successfully
+allocated prefixes are reported in the `status`.
 
 Example manifest:
 
 ```yaml
 apiVersion: compute.onmetal.de/v1alpha1
-kind: Service
+kind: VirtualPrefix
 metadata:
   namespace: default
   name: my-public-prefix
 spec:
-  type: PublicPrefix
+  type: Public
   selector:
     kind: Machine
     matchLabels:
@@ -177,6 +184,32 @@ spec:
 status:
   prefixes:
     - 13.14.15.1/32
+```
+
+**Network prefix**:
+
+Network prefix routing is realized via `type: Network`. A network has to be referenced via the `networkRef`. Once
+successfully applied, the network prefix is routed to the target of the `VirtualPrefix`.
+
+Example manifest:
+
+```yaml
+apiVersion: compute.onmetal.de/v1alpha1
+kind: VirtualPrefix
+metadata:
+  namespace: default
+  name: my-network-prefix
+spec:
+  type: Network
+  networkRef:
+    name: my-network
+  selector:
+    kind: Machine
+    matchLabels:
+      app: web
+status:
+  prefixes:
+    - 192.168.178.0/24
 ```
 
 ## Alternatives
