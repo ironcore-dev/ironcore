@@ -4,17 +4,17 @@ kind: ClusterRole
 metadata:
   name: prefix-viewer-role
 rules:
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - prefixes
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - prefixes/status
-  verbs:
-  - get
+  - apiGroups:
+      - ipam.api.onmetal.de
+    resources:
+      - prefixes
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ipam.api.onmetal.de
+    resources:
+      - prefixes/status
+    verbs:
+      - get

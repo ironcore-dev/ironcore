@@ -27,4 +27,6 @@ vendor/
 testbin/
 dev/
 charts/
-/local
+apiserver.local.config/
+default.etcd/
+

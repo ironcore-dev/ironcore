@@ -22,6 +22,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/onmetal/onmetal-api/envtestutils"
+	"github.com/onmetal/onmetal-api/envtestutils/apiserver"
+	"github.com/onmetal/onmetal-api/testdata/apiserverbin"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -48,10 +51,12 @@ const (
 )
 
 var (
-	cfg       *rest.Config
-	ctx       = ctrl.SetupSignalHandler()
-	k8sClient client.Client
-	testEnv   *envtest.Environment
+	ctx, cancel = context.WithCancel(context.Background())
+
+	cfg        *rest.Config
+	k8sClient  client.Client
+	testEnv    *envtest.Environment
+	testEnvExt *envtestutils.EnvironmentExtensions
 )
 
 func TestAPIs(t *testing.T) {
@@ -66,12 +71,13 @@ var _ = BeforeSuite(func() {
 	var err error
 
 	By("bootstrapping test environment")
-	testEnv = &envtest.Environment{
-		CRDDirectoryPaths:     []string{filepath.Join("..", "..", "config", "crd", "bases")},
-		ErrorIfCRDPathMissing: true,
+	testEnv = &envtest.Environment{}
+	testEnvExt = &envtestutils.EnvironmentExtensions{
+		APIServiceDirectoryPaths:       []string{filepath.Join("..", "..", "config", "apiservice", "bases")},
+		ErrorIfAPIServicePathIsMissing: true,
 	}
 
-	cfg, err = testEnv.Start()
+	cfg, err = envtestutils.StartWithExtensions(testEnv, testEnvExt)
 	Expect(err).NotTo(HaveOccurred())
 	Expect(cfg).NotTo(BeNil())
 
@@ -83,6 +89,24 @@ var _ = BeforeSuite(func() {
 	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
 	Expect(err).NotTo(HaveOccurred())
 	Expect(k8sClient).NotTo(BeNil())
+
+	apiSrv, err := apiserver.New(cfg, apiserver.Options{
+		Command:     []string{apiserverbin.Path},
+		ETCDServers: []string{testEnv.ControlPlane.Etcd.URL.String()},
+		Host:        testEnvExt.APIServiceInstallOptions.LocalServingHost,
+		Port:        testEnvExt.APIServiceInstallOptions.LocalServingPort,
+		CertDir:     testEnvExt.APIServiceInstallOptions.LocalServingCertDir,
+	})
+	Expect(err).NotTo(HaveOccurred())
+
+	go func() {
+		defer GinkgoRecover()
+		err := apiSrv.Start(ctx)
+		Expect(err).NotTo(HaveOccurred())
+	}()
+
+	err = envtestutils.WaitUntilAPIServicesReadyWithTimeout(30*time.Second, testEnvExt, k8sClient, scheme.Scheme)
+	Expect(err).NotTo(HaveOccurred())
 }, 60)
 
 func SetupTest(ctx context.Context) *corev1.Namespace {
@@ -119,12 +143,14 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 
 		Expect((&VolumeReconciler{
 			Client:             k8sManager.GetClient(),
+			APIReader:          k8sManager.GetAPIReader(),
 			Scheme:             k8sManager.GetScheme(),
 			SharedFieldIndexer: fieldIndexer,
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		Expect((&VolumeClaimReconciler{
 			Client:             k8sManager.GetClient(),
+			APIReader:          k8sManager.GetAPIReader(),
 			Scheme:             k8sManager.GetScheme(),
 			SharedFieldIndexer: fieldIndexer,
 		}).SetupWithManager(k8sManager)).To(Succeed())
@@ -135,8 +161,9 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		Expect((&StorageClassReconciler{
-			Client: k8sManager.GetClient(),
-			Scheme: k8sManager.GetScheme(),
+			Client:    k8sManager.GetClient(),
+			APIReader: k8sManager.GetAPIReader(),
+			Scheme:    k8sManager.GetScheme(),
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		go func() {
@@ -154,6 +181,8 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 }
 
 var _ = AfterSuite(func() {
+	cancel()
+
 	By("tearing down the test environment")
 	err := testEnv.Stop()
 	Expect(err).NotTo(HaveOccurred())

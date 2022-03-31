@@ -4,21 +4,21 @@ kind: ClusterRole
 metadata:
   name: prefixallocation-editor-role
 rules:
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - prefixallocations
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - prefixallocations/status
-  verbs:
-  - get
+  - apiGroups:
+      - ipam.api.onmetal.de
+    resources:
+      - prefixallocations
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - ipam.api.onmetal.de
+    resources:
+      - prefixallocations/status
+    verbs:
+      - get

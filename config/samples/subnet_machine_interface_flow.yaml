@@ -1,9 +1,9 @@
-apiVersion: network.onmetal.de/v1alpha1
+apiVersion: ipam.api.onmetal.de/v1alpha1
 kind: RoutingDomain
 metadata:
   name: routingdomain-sample-1
 ---
-apiVersion: network.onmetal.de/v1alpha1
+apiVersion: ipam.api.onmetal.de/v1alpha1
 kind: Subnet
 metadata:
   name: subnet-sample-1

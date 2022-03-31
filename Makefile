@@ -1,8 +1,6 @@
 
 # Image URL to use all building/pushing image targets
 IMG ?= controller:latest
-# Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
-CRD_OPTIONS ?= "crd:trivialVersions=true,preserveUnknownFields=false"
 
 # Docker image name for the mkdocs based local development setup
 IMAGE=onmetal-api/documentation
@@ -41,10 +39,10 @@ help: ## Display this help.
 ##@ Development
 
 manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
-	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
+	$(CONTROLLER_GEN) rbac:roleName=manager-role webhook paths="./controllers/...;./apis/..."
 
-generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
-	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
+generate:
+	./hack/update-codegen.sh
 
 fmt: ## Run go fmt against code.
 	go fmt ./...
@@ -112,10 +110,65 @@ deploy: manifests kustomize ## Deploy controller to the K8s cluster specified in
 undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/config.
 	$(KUSTOMIZE) build config/default | kubectl delete -f -
 
+##@ Kind Deployment plumbing
+
+.PHONY: kind-build-controller
+kind-build-controller: ## Build the controller for usage in kind.
+	docker build --ssh default --target manager -t controller .
+
+.PHONY: kind-build-apiserver
+kind-build-apiserver: ## Build the apiserver for usage in kind.
+	docker build --ssh default --target apiserver -t apiserver .
+
+.PHONY: kind-build
+kind-build: kind-build-controller kind-build-apiserver ## Build the controller and apiserver for usage in kind.
+
+.PHONY: kind-load-controller
+kind-load-controller: ## Load and restart the controller in kind.
+	kind load docker-image controller
+
+.PHONY: kind-load-apiserver
+kind-load-apiserver: ## Load and restart the apiserver in kind.
+	kind load docker-image apiserver
+
+.PHONY: kind-load
+kind-load: kind-load-controller kind-load-apiserver ## Load and restart the controller and apiserver in kind.
+
+.PHONY: kind-restart-controller
+kind-restart-controller: ## Restart the controller in kind.
+	kubectl -n onmetal-system delete rs -l control-plane=controller-manager
+
+.PHONY: kind-restart-apiserver
+kind-restart-apiserver: ## Restart the apiserver in kind.
+	kubectl -n onmetal-system delete rs -l control-plane=apiserver
+
+.PHONY: kind-restart
+kind-restart: kind-restart-controller kind-restart-apiserver ## Restart the controller and apiserver in kind.
+
+.PHONY: kind-run-controller
+kind-run-controller: kind-build-controller kind-load-controller kind-restart-controller ## Build, load and restart the controller in kind.
+
+.PHONY: kind-run-apiserver
+kind-run-apiserver: kind-build-apiserver kind-load-apiserver kind-restart-apiserver ## Build, load and restart the apiserver in kind.
+
+.PHONY: kind-run
+kind-run: kind-run-controller kind-run-apiserver ## Build load and restart the controller and apiserver in kind.
+
+.PHONY: kind-apply
+kind-apply: ## Apply the kind config in kind.
+	kubectl apply -k config/kind
+
+.PHONY: kind-deploy
+kind-deploy: kind-build kind-load kind-restart kind-apply ## Build, load and apply the controller and apiserver in kind.
+
+##@ Tools
 
 CONTROLLER_GEN = $(shell pwd)/bin/controller-gen
 controller-gen: ## Download controller-gen locally if necessary.
 	$(call go-get-tool,$(CONTROLLER_GEN),sigs.k8s.io/controller-tools/cmd/controller-gen@v0.6.2)
+
+CODE_GENERATOR_VERSION=v0.23.5
+code-generator: conversion-gen defaulter-gen informer-gen lister-gen
 
 KUSTOMIZE = $(shell pwd)/bin/kustomize
 kustomize: ## Download kustomize locally if necessary.

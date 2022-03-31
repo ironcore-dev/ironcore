@@ -26,7 +26,7 @@ import (
 
 // VolumeGK is a helper to easily access the GroupKind information of an Volume
 var VolumeGK = schema.GroupKind{
-	Group: GroupVersion.Group,
+	Group: SchemeGroupVersion.Group,
 	Kind:  "Volume",
 }
 
@@ -133,13 +133,8 @@ type VolumeCondition struct {
 	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
 }
 
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
-//+kubebuilder:printcolumn:name="StoragePool",type=string,JSONPath=`.spec.storagePool.name`
-//+kubebuilder:printcolumn:name="StorageClass",type=string,JSONPath=`.spec.storageClassRef.name`
-//+kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.state`
-//+kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
-//+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// +genclient
 
 // Volume is the Schema for the volumes API
 type Volume struct {
@@ -150,15 +145,11 @@ type Volume struct {
 	Status VolumeStatus `json:"status,omitempty"`
 }
 
-//+kubebuilder:object:root=true
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // VolumeList contains a list of Volume
 type VolumeList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []Volume `json:"items"`
-}
-
-func init() {
-	SchemeBuilder.Register(&Volume{}, &VolumeList{})
 }

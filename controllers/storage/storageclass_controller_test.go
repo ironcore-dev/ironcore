@@ -17,6 +17,7 @@
 package storage
 
 import (
+	. "github.com/onmetal/controller-utils/testutils"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -29,55 +30,55 @@ import (
 
 var _ = Describe("storageclass controller", func() {
 	ns := SetupTest(ctx)
-	It("removes the finalizer from the storageclass only if there's no volume still using the storageclass", func() {
+	It("should finalize the storageclass if no volume is using it", func() {
 		By("creating the storageclass consumed by the volume")
-		sc := &storagev1alpha1.StorageClass{
+		storageClass := &storagev1alpha1.StorageClass{
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "storageclass-",
 			},
 			Spec: storagev1alpha1.StorageClassSpec{},
 		}
-		Expect(k8sClient.Create(ctx, sc)).Should(Succeed())
+		Expect(k8sClient.Create(ctx, storageClass)).Should(Succeed())
 
 		By("creating the volume")
-		vol := &storagev1alpha1.Volume{
+		volume := &storagev1alpha1.Volume{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
 				GenerateName: "volume-",
 			},
 			Spec: storagev1alpha1.VolumeSpec{
 				StorageClassRef: corev1.LocalObjectReference{
-					Name: sc.Name,
+					Name: storageClass.Name,
 				},
 			},
 		}
-		Expect(k8sClient.Create(ctx, vol)).Should(Succeed())
+		Expect(k8sClient.Create(ctx, volume)).Should(Succeed())
 
-		By("checking the finalizer was added")
-		scKey := client.ObjectKeyFromObject(sc)
+		By("checking the finalizer is present")
+		storageClassKey := client.ObjectKeyFromObject(storageClass)
 		Eventually(func(g Gomega) []string {
-			err := k8sClient.Get(ctx, scKey, sc)
-			Expect(client.IgnoreNotFound(err)).To(Succeed(), "errors other than `not found` are not expected")
+			err := k8sClient.Get(ctx, storageClassKey, storageClass)
+			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
 			g.Expect(err).NotTo(HaveOccurred())
-			return sc.Finalizers
+			return storageClass.Finalizers
 		}, timeout, interval).Should(ContainElement(storagev1alpha1.StorageClassFinalizer))
 
-		By("checking the storageclass and its finalizer consistently exist upon deletion ")
-		Expect(k8sClient.Delete(ctx, sc)).Should(Succeed())
+		By("issuing a delete request for the storage class")
+		Expect(k8sClient.Delete(ctx, storageClass)).Should(Succeed())
 
+		By("asserting the storage class is still present as the volume is referencing it")
 		Consistently(func(g Gomega) []string {
-			err := k8sClient.Get(ctx, scKey, sc)
-			Expect(client.IgnoreNotFound(err)).To(Succeed(), "errors other than `not found` are not expected")
+			err := k8sClient.Get(ctx, storageClassKey, storageClass)
 			g.Expect(err).NotTo(HaveOccurred())
-			return sc.Finalizers
+			return storageClass.Finalizers
 		}, timeout).Should(ContainElement(storagev1alpha1.StorageClassFinalizer))
 
-		By("checking the storageclass is eventually gone after the deletion of the volume")
-		Expect(k8sClient.Delete(ctx, vol)).Should(Succeed())
-		Eventually(func() bool {
-			err := k8sClient.Get(ctx, scKey, sc)
-			Expect(client.IgnoreNotFound(err)).To(Succeed(), "error other than `not found` not expected")
-			return apierrors.IsNotFound(err)
-		}, timeout, interval).Should(BeTrue(), "`not found` expected")
+		By("deleting the referencing volume")
+		Expect(k8sClient.Delete(ctx, volume)).Should(Succeed())
+
+		By("waiting for the storage class to be gone")
+		Eventually(func() error {
+			return k8sClient.Get(ctx, storageClassKey, storageClass)
+		}, timeout, interval).Should(MatchErrorFunc(apierrors.IsNotFound))
 	})
 })

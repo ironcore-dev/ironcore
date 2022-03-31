@@ -85,7 +85,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - network.onmetal.de
+  - ipam.api.onmetal.de
   resources:
   - clusterprefixallocations
   verbs:
@@ -97,7 +97,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - network.onmetal.de
+  - ipam.api.onmetal.de
   resources:
   - clusterprefixallocations/status
   verbs:
@@ -105,7 +105,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - network.onmetal.de
+  - ipam.api.onmetal.de
   resources:
   - clusterprefixes
   verbs:
@@ -117,13 +117,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - network.onmetal.de
+  - ipam.api.onmetal.de
   resources:
   - clusterprefixes/finalizers
   verbs:
   - update
 - apiGroups:
-  - network.onmetal.de
+  - ipam.api.onmetal.de
   resources:
   - clusterprefixes/status
   verbs:
@@ -131,59 +131,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - network.onmetal.de
-  resources:
-  - gateways
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - gateways/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - gateways/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - ipamranges
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - ipamranges/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - ipamranges/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - network.onmetal.de
+  - ipam.api.onmetal.de
   resources:
   - ips
   verbs:
@@ -195,13 +143,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - network.onmetal.de
+  - ipam.api.onmetal.de
   resources:
   - ips/finalizers
   verbs:
   - update
 - apiGroups:
-  - network.onmetal.de
+  - ipam.api.onmetal.de
   resources:
   - ips/status
   verbs:
@@ -209,7 +157,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - network.onmetal.de
+  - ipam.api.onmetal.de
   resources:
   - prefixallocations
   verbs:
@@ -221,7 +169,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - network.onmetal.de
+  - ipam.api.onmetal.de
   resources:
   - prefixallocations/status
   verbs:
@@ -229,7 +177,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - network.onmetal.de
+  - ipam.api.onmetal.de
   resources:
   - prefixes
   verbs:
@@ -241,119 +189,15 @@ rules:
   - update
   - watch
 - apiGroups:
-  - network.onmetal.de
+  - ipam.api.onmetal.de
   resources:
   - prefixes/finalizers
   verbs:
   - update
 - apiGroups:
-  - network.onmetal.de
+  - ipam.api.onmetal.de
   resources:
   - prefixes/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - reservedips
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - reservedips/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - reservedips/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - routingdomains
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - routingdomains/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - routingdomains/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - securitygroups
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - securitygroups/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - securitygroups/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - subnets
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - subnets/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - subnets/status
   verbs:
   - get
   - patch

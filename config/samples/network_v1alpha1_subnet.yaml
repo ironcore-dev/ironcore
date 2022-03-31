@@ -1,10 +1,10 @@
-apiVersion: network.onmetal.de/v1alpha1
+apiVersion: ipam.api.onmetal.de/v1alpha1
 kind: Subnet
 metadata:
   name: subnet-sample
 spec:
-#  parentSubnet:
-#    name: mySubnet1
+  #  parentSubnet:
+  #    name: mySubnet1
   routingDomain:
     name: routingdomain-sample
   ranges:

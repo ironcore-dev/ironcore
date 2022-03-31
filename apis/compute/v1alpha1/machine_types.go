@@ -42,8 +42,6 @@ type MachineSpec struct {
 	MachinePool corev1.LocalObjectReference `json:"machinePool,omitempty"`
 	// Image is the URL providing the operating system image of the machine.
 	Image string `json:"image"`
-	// SSHPublicKeys is a list of SSH public key secret references of a machine.
-	SSHPublicKeys []commonv1alpha1.SecretKeySelector `json:"sshPublicKeys,omitempty"`
 	// Interfaces define a list of network interfaces present on the machine
 	Interfaces []Interface `json:"interfaces,omitempty"`
 	// SecurityGroups is a list of security groups of a machine
@@ -178,14 +176,8 @@ type MachineCondition struct {
 	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
 }
 
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
-//+kubebuilder:printcolumn:name="Hostname",type=string,JSONPath=`.spec.hostname`
-//+kubebuilder:printcolumn:name="MachineClass",type=string,JSONPath=`.spec.machineClass.name`
-//+kubebuilder:printcolumn:name="Image",type=string,JSONPath=`.spec.image`
-//+kubebuilder:printcolumn:name="MachinePool",type=string,JSONPath=`.spec.machinePool.name`
-//+kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.state`
-//+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
+// +genclient
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // Machine is the Schema for the machines API
 type Machine struct {
@@ -196,15 +188,11 @@ type Machine struct {
 	Status MachineStatus `json:"status,omitempty"`
 }
 
-//+kubebuilder:object:root=true
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // MachineList contains a list of Machine
 type MachineList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []Machine `json:"items"`
-}
-
-func init() {
-	SchemeBuilder.Register(&Machine{}, &MachineList{})
 }

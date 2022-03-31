@@ -39,6 +39,7 @@ import (
 // VolumeReconciler reconciles a Volume object
 type VolumeReconciler struct {
 	client.Client
+	APIReader          client.Reader
 	Scheme             *runtime.Scheme
 	SharedFieldIndexer *clientutils.SharedFieldIndexer
 }
@@ -72,7 +73,7 @@ func (r *VolumeReconciler) delete(ctx context.Context, log logr.Logger, volume *
 func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume) (ctrl.Result, error) {
 	log.V(1).Info("Reconciling volume")
 	if volume.Spec.ClaimRef.Name == "" {
-		log.V(1).Info("Volume does not reference any claim")
+		log.V(1).Info("Volume does not reference any claim, marking it as available")
 		if err := r.patchVolumeStatus(ctx, volume, storagev1alpha1.VolumeAvailable); err != nil {
 			return ctrl.Result{}, err
 		}
@@ -85,14 +86,15 @@ func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volum
 		Name:      volume.Spec.ClaimRef.Name,
 	}
 	log = log.WithValues("VolumeClaimKey", volumeClaimKey)
-	log.V(1).Info("Volume references volume claim")
-	err := r.Get(ctx, volumeClaimKey, volumeClaim)
+	log.V(1).Info("Reconciling volume referencing claim")
+	// We have to use APIReader here as stale data might cause unbinding a volume for a short duration.
+	err := r.APIReader.Get(ctx, volumeClaimKey, volumeClaim)
 	if client.IgnoreNotFound(err) != nil {
 		return ctrl.Result{}, fmt.Errorf("failed to get volumeclaim %s: %w", volumeClaimKey, err)
 	}
 
-	if apierrors.IsNotFound(err) || !r.validReferences(volume, volumeClaim) {
-		log.V(1).Info("Volume binding is not valid, releasing volume")
+	if isNotFound := apierrors.IsNotFound(err); isNotFound || !r.validReferences(volume, volumeClaim) {
+		log.V(1).Info("Volume binding is not valid, releasing volume", "IsNotFound", isNotFound, "ValidReferences", !isNotFound)
 		if err := r.releaseVolume(ctx, volume); err != nil {
 			return ctrl.Result{}, fmt.Errorf("error releasing volume: %w", err)
 		}

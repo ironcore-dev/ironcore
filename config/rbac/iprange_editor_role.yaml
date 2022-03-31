@@ -4,21 +4,21 @@ kind: ClusterRole
 metadata:
   name: ipamrange-editor-role
 rules:
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - ipamranges
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - ipamranges/status
-  verbs:
-  - get
+  - apiGroups:
+      - ipam.api.onmetal.de
+    resources:
+      - ipamranges
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - ipam.api.onmetal.de
+    resources:
+      - ipamranges/status
+    verbs:
+      - get

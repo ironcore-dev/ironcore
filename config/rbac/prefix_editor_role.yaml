@@ -4,21 +4,21 @@ kind: ClusterRole
 metadata:
   name: prefix-editor-role
 rules:
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - prefixes
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - prefixes/status
-  verbs:
-  - get
+  - apiGroups:
+      - ipam.api.onmetal.de
+    resources:
+      - prefixes
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - ipam.api.onmetal.de
+    resources:
+      - prefixes/status
+    verbs:
+      - get

@@ -4,17 +4,17 @@ kind: ClusterRole
 metadata:
   name: clusterprefixallocation-viewer-role
 rules:
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - clusterprefixallocations
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - network.onmetal.de
-  resources:
-  - clusterprefixallocations/status
-  verbs:
-  - get
+  - apiGroups:
+      - ipam.api.onmetal.de
+    resources:
+      - clusterprefixallocations
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ipam.api.onmetal.de
+    resources:
+      - clusterprefixallocations/status
+    verbs:
+      - get

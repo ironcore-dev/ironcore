@@ -1,13 +1,13 @@
 <p>Packages:</p>
 <ul>
 <li>
-<a href="#network.onmetal.de%2fv1alpha1">network.onmetal.de/v1alpha1</a>
+<a href="#ipam.api.onmetal.de%2fv1alpha1">ipam.api.onmetal.de/v1alpha1</a>
 </li>
 </ul>
-<h2 id="network.onmetal.de/v1alpha1">network.onmetal.de/v1alpha1</h2>
+<h2 id="ipam.api.onmetal.de/v1alpha1">ipam.api.onmetal.de/v1alpha1</h2>
 Resource Types:
 <ul></ul>
-<h3 id="network.onmetal.de/v1alpha1.CIDRState">CIDRState
+<h3 id="ipam.api.onmetal.de/v1alpha1.CIDRState">CIDRState
 (<code>string</code> alias)</h3>
 <div>
 </div>
@@ -28,7 +28,7 @@ Resource Types:
 <td></td>
 </tr></tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.ClusterPrefix">ClusterPrefix
+<h3 id="ipam.api.onmetal.de/v1alpha1.ClusterPrefix">ClusterPrefix
 </h3>
 <div>
 <p>ClusterPrefix is the Schema for the clusterprefixes API</p>
@@ -59,7 +59,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.ClusterPrefixSpec">
+<a href="#ipam.api.onmetal.de/v1alpha1.ClusterPrefixSpec">
 ClusterPrefixSpec
 </a>
 </em>
@@ -100,7 +100,7 @@ Kubernetes meta/v1.LabelSelector
 <td>
 <code>PrefixSpace</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.PrefixSpace">
+<a href="#ipam.api.onmetal.de/v1alpha1.PrefixSpace">
 PrefixSpace
 </a>
 </em>
@@ -119,7 +119,7 @@ PrefixSpace
 <td>
 <code>status</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.ClusterPrefixStatus">
+<a href="#ipam.api.onmetal.de/v1alpha1.ClusterPrefixStatus">
 ClusterPrefixStatus
 </a>
 </em>
@@ -129,7 +129,7 @@ ClusterPrefixStatus
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.ClusterPrefixAllocation">ClusterPrefixAllocation
+<h3 id="ipam.api.onmetal.de/v1alpha1.ClusterPrefixAllocation">ClusterPrefixAllocation
 </h3>
 <div>
 <p>ClusterPrefixAllocation is the Schema for the clusterprefixallocations API</p>
@@ -160,7 +160,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.ClusterPrefixAllocationSpec">
+<a href="#ipam.api.onmetal.de/v1alpha1.ClusterPrefixAllocationSpec">
 ClusterPrefixAllocationSpec
 </a>
 </em>
@@ -197,7 +197,7 @@ Kubernetes meta/v1.LabelSelector
 <td>
 <code>ClusterPrefixAllocationRequest</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.ClusterPrefixAllocationRequest">
+<a href="#ipam.api.onmetal.de/v1alpha1.ClusterPrefixAllocationRequest">
 ClusterPrefixAllocationRequest
 </a>
 </em>
@@ -215,7 +215,7 @@ ClusterPrefixAllocationRequest
 <td>
 <code>status</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.ClusterPrefixAllocationStatus">
+<a href="#ipam.api.onmetal.de/v1alpha1.ClusterPrefixAllocationStatus">
 ClusterPrefixAllocationStatus
 </a>
 </em>
@@ -225,10 +225,10 @@ ClusterPrefixAllocationStatus
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.ClusterPrefixAllocationCondition">ClusterPrefixAllocationCondition
+<h3 id="ipam.api.onmetal.de/v1alpha1.ClusterPrefixAllocationCondition">ClusterPrefixAllocationCondition
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.ClusterPrefixAllocationStatus">ClusterPrefixAllocationStatus</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.ClusterPrefixAllocationStatus">ClusterPrefixAllocationStatus</a>)
 </p>
 <div>
 </div>
@@ -244,7 +244,7 @@ ClusterPrefixAllocationStatus
 <td>
 <code>type</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.ClusterPrefixAllocationConditionType">
+<a href="#ipam.api.onmetal.de/v1alpha1.ClusterPrefixAllocationConditionType">
 ClusterPrefixAllocationConditionType
 </a>
 </em>
@@ -298,10 +298,10 @@ Kubernetes meta/v1.Time
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.ClusterPrefixAllocationConditionType">ClusterPrefixAllocationConditionType
+<h3 id="ipam.api.onmetal.de/v1alpha1.ClusterPrefixAllocationConditionType">ClusterPrefixAllocationConditionType
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.ClusterPrefixAllocationCondition">ClusterPrefixAllocationCondition</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.ClusterPrefixAllocationCondition">ClusterPrefixAllocationCondition</a>)
 </p>
 <div>
 </div>
@@ -316,10 +316,10 @@ Kubernetes meta/v1.Time
 <td></td>
 </tr></tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.ClusterPrefixAllocationRequest">ClusterPrefixAllocationRequest
+<h3 id="ipam.api.onmetal.de/v1alpha1.ClusterPrefixAllocationRequest">ClusterPrefixAllocationRequest
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.ClusterPrefixAllocationSpec">ClusterPrefixAllocationSpec</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.ClusterPrefixAllocationSpec">ClusterPrefixAllocationSpec</a>)
 </p>
 <div>
 </div>
@@ -355,10 +355,10 @@ byte
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.ClusterPrefixAllocationResult">ClusterPrefixAllocationResult
+<h3 id="ipam.api.onmetal.de/v1alpha1.ClusterPrefixAllocationResult">ClusterPrefixAllocationResult
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.ClusterPrefixAllocationStatus">ClusterPrefixAllocationStatus</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.ClusterPrefixAllocationStatus">ClusterPrefixAllocationStatus</a>)
 </p>
 <div>
 </div>
@@ -384,10 +384,10 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.ClusterPrefixAllocationSpec">ClusterPrefixAllocationSpec
+<h3 id="ipam.api.onmetal.de/v1alpha1.ClusterPrefixAllocationSpec">ClusterPrefixAllocationSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.ClusterPrefixAllocation">ClusterPrefixAllocation</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.ClusterPrefixAllocation">ClusterPrefixAllocation</a>)
 </p>
 <div>
 <p>ClusterPrefixAllocationSpec defines the desired state of ClusterPrefixAllocation</p>
@@ -428,7 +428,7 @@ Kubernetes meta/v1.LabelSelector
 <td>
 <code>ClusterPrefixAllocationRequest</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.ClusterPrefixAllocationRequest">
+<a href="#ipam.api.onmetal.de/v1alpha1.ClusterPrefixAllocationRequest">
 ClusterPrefixAllocationRequest
 </a>
 </em>
@@ -441,10 +441,10 @@ ClusterPrefixAllocationRequest
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.ClusterPrefixAllocationStatus">ClusterPrefixAllocationStatus
+<h3 id="ipam.api.onmetal.de/v1alpha1.ClusterPrefixAllocationStatus">ClusterPrefixAllocationStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.ClusterPrefixAllocation">ClusterPrefixAllocation</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.ClusterPrefixAllocation">ClusterPrefixAllocation</a>)
 </p>
 <div>
 <p>ClusterPrefixAllocationStatus defines the observed state of ClusterPrefixAllocation</p>
@@ -461,7 +461,7 @@ ClusterPrefixAllocationRequest
 <td>
 <code>ClusterPrefixAllocationResult</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.ClusterPrefixAllocationResult">
+<a href="#ipam.api.onmetal.de/v1alpha1.ClusterPrefixAllocationResult">
 ClusterPrefixAllocationResult
 </a>
 </em>
@@ -476,7 +476,7 @@ ClusterPrefixAllocationResult
 <td>
 <code>conditions</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.ClusterPrefixAllocationCondition">
+<a href="#ipam.api.onmetal.de/v1alpha1.ClusterPrefixAllocationCondition">
 []ClusterPrefixAllocationCondition
 </a>
 </em>
@@ -486,10 +486,10 @@ ClusterPrefixAllocationResult
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.ClusterPrefixCondition">ClusterPrefixCondition
+<h3 id="ipam.api.onmetal.de/v1alpha1.ClusterPrefixCondition">ClusterPrefixCondition
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.ClusterPrefixStatus">ClusterPrefixStatus</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.ClusterPrefixStatus">ClusterPrefixStatus</a>)
 </p>
 <div>
 </div>
@@ -505,7 +505,7 @@ ClusterPrefixAllocationResult
 <td>
 <code>type</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.ClusterPrefixConditionType">
+<a href="#ipam.api.onmetal.de/v1alpha1.ClusterPrefixConditionType">
 ClusterPrefixConditionType
 </a>
 </em>
@@ -559,10 +559,10 @@ Kubernetes meta/v1.Time
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.ClusterPrefixConditionType">ClusterPrefixConditionType
+<h3 id="ipam.api.onmetal.de/v1alpha1.ClusterPrefixConditionType">ClusterPrefixConditionType
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.ClusterPrefixCondition">ClusterPrefixCondition</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.ClusterPrefixCondition">ClusterPrefixCondition</a>)
 </p>
 <div>
 </div>
@@ -577,10 +577,10 @@ Kubernetes meta/v1.Time
 <td></td>
 </tr></tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.ClusterPrefixSpec">ClusterPrefixSpec
+<h3 id="ipam.api.onmetal.de/v1alpha1.ClusterPrefixSpec">ClusterPrefixSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.ClusterPrefix">ClusterPrefix</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.ClusterPrefix">ClusterPrefix</a>)
 </p>
 <div>
 <p>ClusterPrefixSpec defines the desired state of ClusterPrefix</p>
@@ -625,7 +625,7 @@ Kubernetes meta/v1.LabelSelector
 <td>
 <code>PrefixSpace</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.PrefixSpace">
+<a href="#ipam.api.onmetal.de/v1alpha1.PrefixSpace">
 PrefixSpace
 </a>
 </em>
@@ -639,10 +639,10 @@ PrefixSpace
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.ClusterPrefixStatus">ClusterPrefixStatus
+<h3 id="ipam.api.onmetal.de/v1alpha1.ClusterPrefixStatus">ClusterPrefixStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.ClusterPrefix">ClusterPrefix</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.ClusterPrefix">ClusterPrefix</a>)
 </p>
 <div>
 <p>ClusterPrefixStatus defines the observed state of ClusterPrefix</p>
@@ -659,7 +659,7 @@ PrefixSpace
 <td>
 <code>conditions</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.ClusterPrefixCondition">
+<a href="#ipam.api.onmetal.de/v1alpha1.ClusterPrefixCondition">
 []ClusterPrefixCondition
 </a>
 </em>
@@ -696,10 +696,10 @@ PrefixSpace
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.EgressSecurityGroupRule">EgressSecurityGroupRule
+<h3 id="ipam.api.onmetal.de/v1alpha1.EgressSecurityGroupRule">EgressSecurityGroupRule
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SecurityGroupSpec">SecurityGroupSpec</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.SecurityGroupSpec">SecurityGroupSpec</a>)
 </p>
 <div>
 <p>EgressSecurityGroupRule is an egress rule of a security group</p>
@@ -716,7 +716,7 @@ PrefixSpace
 <td>
 <code>SecurityGroupRule</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.SecurityGroupRule">
+<a href="#ipam.api.onmetal.de/v1alpha1.SecurityGroupRule">
 SecurityGroupRule
 </a>
 </em>
@@ -731,7 +731,7 @@ SecurityGroupRule
 <td>
 <code>destination</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.IPSetSpec">
+<a href="#ipam.api.onmetal.de/v1alpha1.IPSetSpec">
 IPSetSpec
 </a>
 </em>
@@ -742,10 +742,10 @@ IPSetSpec
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.FilterRule">FilterRule
+<h3 id="ipam.api.onmetal.de/v1alpha1.FilterRule">FilterRule
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.GatewaySpec">GatewaySpec</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.GatewaySpec">GatewaySpec</a>)
 </p>
 <div>
 </div>
@@ -771,7 +771,7 @@ Kubernetes core/v1.LocalObjectReference
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.Gateway">Gateway
+<h3 id="ipam.api.onmetal.de/v1alpha1.Gateway">Gateway
 </h3>
 <div>
 <p>Gateway is the Schema for the gateways API</p>
@@ -802,7 +802,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.GatewaySpec">
+<a href="#ipam.api.onmetal.de/v1alpha1.GatewaySpec">
 GatewaySpec
 </a>
 </em>
@@ -815,7 +815,7 @@ GatewaySpec
 <td>
 <code>mode</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.GatewayMode">
+<a href="#ipam.api.onmetal.de/v1alpha1.GatewayMode">
 GatewayMode
 </a>
 </em>
@@ -827,7 +827,7 @@ GatewayMode
 <td>
 <code>filterRules</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.FilterRule">
+<a href="#ipam.api.onmetal.de/v1alpha1.FilterRule">
 []FilterRule
 </a>
 </em>
@@ -839,7 +839,7 @@ GatewayMode
 <td>
 <code>uplink</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.Target">
+<a href="#ipam.api.onmetal.de/v1alpha1.Target">
 Target
 </a>
 </em>
@@ -868,7 +868,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>status</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.GatewayStatus">
+<a href="#ipam.api.onmetal.de/v1alpha1.GatewayStatus">
 GatewayStatus
 </a>
 </em>
@@ -878,10 +878,10 @@ GatewayStatus
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.GatewayCondition">GatewayCondition
+<h3 id="ipam.api.onmetal.de/v1alpha1.GatewayCondition">GatewayCondition
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.GatewayStatus">GatewayStatus</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.GatewayStatus">GatewayStatus</a>)
 </p>
 <div>
 <p>GatewayCondition is one of the conditions of a volume.</p>
@@ -898,7 +898,7 @@ GatewayStatus
 <td>
 <code>type</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.GatewayConditionType">
+<a href="#ipam.api.onmetal.de/v1alpha1.GatewayConditionType">
 GatewayConditionType
 </a>
 </em>
@@ -981,18 +981,18 @@ Kubernetes meta/v1.Time
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.GatewayConditionType">GatewayConditionType
+<h3 id="ipam.api.onmetal.de/v1alpha1.GatewayConditionType">GatewayConditionType
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.GatewayCondition">GatewayCondition</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.GatewayCondition">GatewayCondition</a>)
 </p>
 <div>
 <p>GatewayConditionType is a type a GatewayCondition can have.</p>
 </div>
-<h3 id="network.onmetal.de/v1alpha1.GatewayMode">GatewayMode
+<h3 id="ipam.api.onmetal.de/v1alpha1.GatewayMode">GatewayMode
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.GatewaySpec">GatewaySpec</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.GatewaySpec">GatewaySpec</a>)
 </p>
 <div>
 </div>
@@ -1014,10 +1014,10 @@ Kubernetes meta/v1.Time
 </td>
 </tr></tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.GatewaySpec">GatewaySpec
+<h3 id="ipam.api.onmetal.de/v1alpha1.GatewaySpec">GatewaySpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.Gateway">Gateway</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.Gateway">Gateway</a>)
 </p>
 <div>
 <p>GatewaySpec defines the desired state of Gateway</p>
@@ -1034,7 +1034,7 @@ Kubernetes meta/v1.Time
 <td>
 <code>mode</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.GatewayMode">
+<a href="#ipam.api.onmetal.de/v1alpha1.GatewayMode">
 GatewayMode
 </a>
 </em>
@@ -1046,7 +1046,7 @@ GatewayMode
 <td>
 <code>filterRules</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.FilterRule">
+<a href="#ipam.api.onmetal.de/v1alpha1.FilterRule">
 []FilterRule
 </a>
 </em>
@@ -1058,7 +1058,7 @@ GatewayMode
 <td>
 <code>uplink</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.Target">
+<a href="#ipam.api.onmetal.de/v1alpha1.Target">
 Target
 </a>
 </em>
@@ -1082,17 +1082,17 @@ Kubernetes core/v1.LocalObjectReference
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.GatewayState">GatewayState
+<h3 id="ipam.api.onmetal.de/v1alpha1.GatewayState">GatewayState
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.GatewayStatus">GatewayStatus</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.GatewayStatus">GatewayStatus</a>)
 </p>
 <div>
 </div>
-<h3 id="network.onmetal.de/v1alpha1.GatewayStatus">GatewayStatus
+<h3 id="ipam.api.onmetal.de/v1alpha1.GatewayStatus">GatewayStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.Gateway">Gateway</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.Gateway">Gateway</a>)
 </p>
 <div>
 <p>GatewayStatus defines the observed state of Gateway</p>
@@ -1109,7 +1109,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>state</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.GatewayState">
+<a href="#ipam.api.onmetal.de/v1alpha1.GatewayState">
 GatewayState
 </a>
 </em>
@@ -1121,7 +1121,7 @@ GatewayState
 <td>
 <code>conditions</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.GatewayCondition">
+<a href="#ipam.api.onmetal.de/v1alpha1.GatewayCondition">
 []GatewayCondition
 </a>
 </em>
@@ -1143,7 +1143,7 @@ GatewayState
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.IP">IP
+<h3 id="ipam.api.onmetal.de/v1alpha1.IP">IP
 </h3>
 <div>
 <p>IP is the Schema for the ips API</p>
@@ -1174,7 +1174,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.IPSpec">
+<a href="#ipam.api.onmetal.de/v1alpha1.IPSpec">
 IPSpec
 </a>
 </em>
@@ -1187,7 +1187,7 @@ IPSpec
 <td>
 <code>prefixRef</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.PrefixReference">
+<a href="#ipam.api.onmetal.de/v1alpha1.PrefixReference">
 PrefixReference
 </a>
 </em>
@@ -1200,7 +1200,7 @@ PrefixReference
 <td>
 <code>prefixSelector</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.PrefixSelector">
+<a href="#ipam.api.onmetal.de/v1alpha1.PrefixSelector">
 PrefixSelector
 </a>
 </em>
@@ -1229,7 +1229,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
 <td>
 <code>status</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.IPStatus">
+<a href="#ipam.api.onmetal.de/v1alpha1.IPStatus">
 IPStatus
 </a>
 </em>
@@ -1239,7 +1239,7 @@ IPStatus
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.IPAMRange">IPAMRange
+<h3 id="ipam.api.onmetal.de/v1alpha1.IPAMRange">IPAMRange
 </h3>
 <div>
 <p>IPAMRange is the Schema for the ipamranges API</p>
@@ -1270,7 +1270,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.IPAMRangeSpec">
+<a href="#ipam.api.onmetal.de/v1alpha1.IPAMRangeSpec">
 IPAMRangeSpec
 </a>
 </em>
@@ -1309,7 +1309,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>requests</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.IPAMRangeRequest">
+<a href="#ipam.api.onmetal.de/v1alpha1.IPAMRangeRequest">
 []IPAMRangeRequest
 </a>
 </em>
@@ -1324,7 +1324,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>status</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.IPAMRangeStatus">
+<a href="#ipam.api.onmetal.de/v1alpha1.IPAMRangeStatus">
 IPAMRangeStatus
 </a>
 </em>
@@ -1334,10 +1334,10 @@ IPAMRangeStatus
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.IPAMRangeAllocationState">IPAMRangeAllocationState
+<h3 id="ipam.api.onmetal.de/v1alpha1.IPAMRangeAllocationState">IPAMRangeAllocationState
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.IPAMRangeAllocationStatus">IPAMRangeAllocationStatus</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.IPAMRangeAllocationStatus">IPAMRangeAllocationStatus</a>)
 </p>
 <div>
 <p>IPAMRangeAllocationState is a state an IPAMRangeAllocationStatus can have.</p>
@@ -1363,10 +1363,10 @@ IPAMRangeStatus
 </td>
 </tr></tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.IPAMRangeAllocationStatus">IPAMRangeAllocationStatus
+<h3 id="ipam.api.onmetal.de/v1alpha1.IPAMRangeAllocationStatus">IPAMRangeAllocationStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.IPAMRangeStatus">IPAMRangeStatus</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.IPAMRangeStatus">IPAMRangeStatus</a>)
 </p>
 <div>
 <p>IPAMRangeAllocationStatus is the status of an IPAMRange allocation.</p>
@@ -1408,7 +1408,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPRange
 <td>
 <code>state</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.IPAMRangeAllocationState">
+<a href="#ipam.api.onmetal.de/v1alpha1.IPAMRangeAllocationState">
 IPAMRangeAllocationState
 </a>
 </em>
@@ -1420,7 +1420,7 @@ IPAMRangeAllocationState
 <td>
 <code>request</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.IPAMRangeRequest">
+<a href="#ipam.api.onmetal.de/v1alpha1.IPAMRangeRequest">
 IPAMRangeRequest
 </a>
 </em>
@@ -1442,10 +1442,10 @@ Kubernetes core/v1.LocalObjectReference
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.IPAMRangeRequest">IPAMRangeRequest
+<h3 id="ipam.api.onmetal.de/v1alpha1.IPAMRangeRequest">IPAMRangeRequest
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.IPAMRangeAllocationStatus">IPAMRangeAllocationStatus</a>, <a href="#network.onmetal.de/v1alpha1.IPAMRangeSpec">IPAMRangeSpec</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.IPAMRangeAllocationStatus">IPAMRangeAllocationStatus</a>, <a href="#ipam.api.onmetal.de/v1alpha1.IPAMRangeSpec">IPAMRangeSpec</a>)
 </p>
 <div>
 </div>
@@ -1515,10 +1515,10 @@ bool
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.IPAMRangeSpec">IPAMRangeSpec
+<h3 id="ipam.api.onmetal.de/v1alpha1.IPAMRangeSpec">IPAMRangeSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.IPAMRange">IPAMRange</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.IPAMRange">IPAMRange</a>)
 </p>
 <div>
 <p>IPAMRangeSpec defines the desired state of IPAMRange
@@ -1565,7 +1565,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>requests</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.IPAMRangeRequest">
+<a href="#ipam.api.onmetal.de/v1alpha1.IPAMRangeRequest">
 []IPAMRangeRequest
 </a>
 </em>
@@ -1575,10 +1575,10 @@ Kubernetes core/v1.LocalObjectReference
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.IPAMRangeStatus">IPAMRangeStatus
+<h3 id="ipam.api.onmetal.de/v1alpha1.IPAMRangeStatus">IPAMRangeStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.IPAMRange">IPAMRange</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.IPAMRange">IPAMRange</a>)
 </p>
 <div>
 <p>IPAMRangeStatus defines the observed state of IPAMRange</p>
@@ -1605,7 +1605,7 @@ int64
 <td>
 <code>allocations</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.IPAMRangeAllocationStatus">
+<a href="#ipam.api.onmetal.de/v1alpha1.IPAMRangeAllocationStatus">
 []IPAMRangeAllocationStatus
 </a>
 </em>
@@ -1615,10 +1615,10 @@ int64
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.IPCondition">IPCondition
+<h3 id="ipam.api.onmetal.de/v1alpha1.IPCondition">IPCondition
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.IPStatus">IPStatus</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.IPStatus">IPStatus</a>)
 </p>
 <div>
 </div>
@@ -1634,7 +1634,7 @@ int64
 <td>
 <code>type</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.IPConditionType">
+<a href="#ipam.api.onmetal.de/v1alpha1.IPConditionType">
 IPConditionType
 </a>
 </em>
@@ -1688,10 +1688,10 @@ Kubernetes meta/v1.Time
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.IPConditionType">IPConditionType
+<h3 id="ipam.api.onmetal.de/v1alpha1.IPConditionType">IPConditionType
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.IPCondition">IPCondition</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.IPCondition">IPCondition</a>)
 </p>
 <div>
 </div>
@@ -1706,10 +1706,10 @@ Kubernetes meta/v1.Time
 <td></td>
 </tr></tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.IPSetSpec">IPSetSpec
+<h3 id="ipam.api.onmetal.de/v1alpha1.IPSetSpec">IPSetSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.EgressSecurityGroupRule">EgressSecurityGroupRule</a>, <a href="#network.onmetal.de/v1alpha1.IngressSecurityGroupRule">IngressSecurityGroupRule</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.EgressSecurityGroupRule">EgressSecurityGroupRule</a>, <a href="#ipam.api.onmetal.de/v1alpha1.IngressSecurityGroupRule">IngressSecurityGroupRule</a>)
 </p>
 <div>
 <p>IPSetSpec defines either a cidr or a security group reference</p>
@@ -1750,10 +1750,10 @@ Kubernetes core/v1.LocalObjectReference
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.IPSpec">IPSpec
+<h3 id="ipam.api.onmetal.de/v1alpha1.IPSpec">IPSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.IP">IP</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.IP">IP</a>)
 </p>
 <div>
 <p>IPSpec defines the desired state of IP</p>
@@ -1770,7 +1770,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>prefixRef</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.PrefixReference">
+<a href="#ipam.api.onmetal.de/v1alpha1.PrefixReference">
 PrefixReference
 </a>
 </em>
@@ -1783,7 +1783,7 @@ PrefixReference
 <td>
 <code>prefixSelector</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.PrefixSelector">
+<a href="#ipam.api.onmetal.de/v1alpha1.PrefixSelector">
 PrefixSelector
 </a>
 </em>
@@ -1807,10 +1807,10 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.IPStatus">IPStatus
+<h3 id="ipam.api.onmetal.de/v1alpha1.IPStatus">IPStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.IP">IP</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.IP">IP</a>)
 </p>
 <div>
 <p>IPStatus defines the observed state of IP</p>
@@ -1827,7 +1827,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
 <td>
 <code>conditions</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.IPCondition">
+<a href="#ipam.api.onmetal.de/v1alpha1.IPCondition">
 []IPCondition
 </a>
 </em>
@@ -1837,10 +1837,10 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.IngressSecurityGroupRule">IngressSecurityGroupRule
+<h3 id="ipam.api.onmetal.de/v1alpha1.IngressSecurityGroupRule">IngressSecurityGroupRule
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SecurityGroupSpec">SecurityGroupSpec</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.SecurityGroupSpec">SecurityGroupSpec</a>)
 </p>
 <div>
 <p>IngressSecurityGroupRule is an ingress rule of a security group</p>
@@ -1857,7 +1857,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
 <td>
 <code>SecurityGroupRule</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.SecurityGroupRule">
+<a href="#ipam.api.onmetal.de/v1alpha1.SecurityGroupRule">
 SecurityGroupRule
 </a>
 </em>
@@ -1872,7 +1872,7 @@ SecurityGroupRule
 <td>
 <code>source</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.IPSetSpec">
+<a href="#ipam.api.onmetal.de/v1alpha1.IPSetSpec">
 IPSetSpec
 </a>
 </em>
@@ -1883,10 +1883,10 @@ IPSetSpec
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.MachineRouteTarget">MachineRouteTarget
+<h3 id="ipam.api.onmetal.de/v1alpha1.MachineRouteTarget">MachineRouteTarget
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.Target">Target</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.Target">Target</a>)
 </p>
 <div>
 </div>
@@ -1925,10 +1925,10 @@ string
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.PortRange">PortRange
+<h3 id="ipam.api.onmetal.de/v1alpha1.PortRange">PortRange
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SecurityGroupRule">SecurityGroupRule</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.SecurityGroupRule">SecurityGroupRule</a>)
 </p>
 <div>
 <p>PortRange defines the start and end of a port range</p>
@@ -1965,7 +1965,7 @@ int
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.Prefix">Prefix
+<h3 id="ipam.api.onmetal.de/v1alpha1.Prefix">Prefix
 </h3>
 <div>
 <p>Prefix is the Schema for the prefixes API</p>
@@ -1996,7 +1996,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.PrefixSpec">
+<a href="#ipam.api.onmetal.de/v1alpha1.PrefixSpec">
 PrefixSpec
 </a>
 </em>
@@ -2009,7 +2009,7 @@ PrefixSpec
 <td>
 <code>parentRef</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.PrefixReference">
+<a href="#ipam.api.onmetal.de/v1alpha1.PrefixReference">
 PrefixReference
 </a>
 </em>
@@ -2024,7 +2024,7 @@ allocated by itself.</p>
 <td>
 <code>parentSelector</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.PrefixSelector">
+<a href="#ipam.api.onmetal.de/v1alpha1.PrefixSelector">
 PrefixSelector
 </a>
 </em>
@@ -2037,7 +2037,7 @@ PrefixSelector
 <td>
 <code>PrefixSpace</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.PrefixSpace">
+<a href="#ipam.api.onmetal.de/v1alpha1.PrefixSpace">
 PrefixSpace
 </a>
 </em>
@@ -2056,7 +2056,7 @@ PrefixSpace
 <td>
 <code>status</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.PrefixStatus">
+<a href="#ipam.api.onmetal.de/v1alpha1.PrefixStatus">
 PrefixStatus
 </a>
 </em>
@@ -2066,7 +2066,7 @@ PrefixStatus
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.PrefixAllocation">PrefixAllocation
+<h3 id="ipam.api.onmetal.de/v1alpha1.PrefixAllocation">PrefixAllocation
 </h3>
 <div>
 <p>PrefixAllocation is the Schema for the prefixallocations API</p>
@@ -2097,7 +2097,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.PrefixAllocationSpec">
+<a href="#ipam.api.onmetal.de/v1alpha1.PrefixAllocationSpec">
 PrefixAllocationSpec
 </a>
 </em>
@@ -2110,7 +2110,7 @@ PrefixAllocationSpec
 <td>
 <code>prefixRef</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.PrefixReference">
+<a href="#ipam.api.onmetal.de/v1alpha1.PrefixReference">
 PrefixReference
 </a>
 </em>
@@ -2124,7 +2124,7 @@ PrefixReference
 <td>
 <code>prefixSelector</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.PrefixSelector">
+<a href="#ipam.api.onmetal.de/v1alpha1.PrefixSelector">
 PrefixSelector
 </a>
 </em>
@@ -2136,7 +2136,7 @@ PrefixSelector
 <td>
 <code>PrefixAllocationRequest</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.PrefixAllocationRequest">
+<a href="#ipam.api.onmetal.de/v1alpha1.PrefixAllocationRequest">
 PrefixAllocationRequest
 </a>
 </em>
@@ -2154,7 +2154,7 @@ PrefixAllocationRequest
 <td>
 <code>status</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.PrefixAllocationStatus">
+<a href="#ipam.api.onmetal.de/v1alpha1.PrefixAllocationStatus">
 PrefixAllocationStatus
 </a>
 </em>
@@ -2164,10 +2164,10 @@ PrefixAllocationStatus
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.PrefixAllocationCondition">PrefixAllocationCondition
+<h3 id="ipam.api.onmetal.de/v1alpha1.PrefixAllocationCondition">PrefixAllocationCondition
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.PrefixAllocationStatus">PrefixAllocationStatus</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.PrefixAllocationStatus">PrefixAllocationStatus</a>)
 </p>
 <div>
 </div>
@@ -2183,7 +2183,7 @@ PrefixAllocationStatus
 <td>
 <code>type</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.PrefixAllocationConditionType">
+<a href="#ipam.api.onmetal.de/v1alpha1.PrefixAllocationConditionType">
 PrefixAllocationConditionType
 </a>
 </em>
@@ -2237,10 +2237,10 @@ Kubernetes meta/v1.Time
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.PrefixAllocationConditionType">PrefixAllocationConditionType
+<h3 id="ipam.api.onmetal.de/v1alpha1.PrefixAllocationConditionType">PrefixAllocationConditionType
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.PrefixAllocationCondition">PrefixAllocationCondition</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.PrefixAllocationCondition">PrefixAllocationCondition</a>)
 </p>
 <div>
 </div>
@@ -2255,10 +2255,10 @@ Kubernetes meta/v1.Time
 <td></td>
 </tr></tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.PrefixAllocationRequest">PrefixAllocationRequest
+<h3 id="ipam.api.onmetal.de/v1alpha1.PrefixAllocationRequest">PrefixAllocationRequest
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.PrefixAllocationSpec">PrefixAllocationSpec</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.PrefixAllocationSpec">PrefixAllocationSpec</a>)
 </p>
 <div>
 </div>
@@ -2316,10 +2316,10 @@ int64
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.PrefixAllocationResult">PrefixAllocationResult
+<h3 id="ipam.api.onmetal.de/v1alpha1.PrefixAllocationResult">PrefixAllocationResult
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.PrefixAllocationStatus">PrefixAllocationStatus</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.PrefixAllocationStatus">PrefixAllocationStatus</a>)
 </p>
 <div>
 </div>
@@ -2357,10 +2357,10 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPRange
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.PrefixAllocationSpec">PrefixAllocationSpec
+<h3 id="ipam.api.onmetal.de/v1alpha1.PrefixAllocationSpec">PrefixAllocationSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.PrefixAllocation">PrefixAllocation</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.PrefixAllocation">PrefixAllocation</a>)
 </p>
 <div>
 <p>PrefixAllocationSpec defines the desired state of PrefixAllocation</p>
@@ -2377,7 +2377,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPRange
 <td>
 <code>prefixRef</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.PrefixReference">
+<a href="#ipam.api.onmetal.de/v1alpha1.PrefixReference">
 PrefixReference
 </a>
 </em>
@@ -2391,7 +2391,7 @@ PrefixReference
 <td>
 <code>prefixSelector</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.PrefixSelector">
+<a href="#ipam.api.onmetal.de/v1alpha1.PrefixSelector">
 PrefixSelector
 </a>
 </em>
@@ -2403,7 +2403,7 @@ PrefixSelector
 <td>
 <code>PrefixAllocationRequest</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.PrefixAllocationRequest">
+<a href="#ipam.api.onmetal.de/v1alpha1.PrefixAllocationRequest">
 PrefixAllocationRequest
 </a>
 </em>
@@ -2416,10 +2416,10 @@ PrefixAllocationRequest
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.PrefixAllocationStatus">PrefixAllocationStatus
+<h3 id="ipam.api.onmetal.de/v1alpha1.PrefixAllocationStatus">PrefixAllocationStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.PrefixAllocation">PrefixAllocation</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.PrefixAllocation">PrefixAllocation</a>)
 </p>
 <div>
 </div>
@@ -2435,7 +2435,7 @@ PrefixAllocationRequest
 <td>
 <code>PrefixAllocationResult</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.PrefixAllocationResult">
+<a href="#ipam.api.onmetal.de/v1alpha1.PrefixAllocationResult">
 PrefixAllocationResult
 </a>
 </em>
@@ -2450,7 +2450,7 @@ PrefixAllocationResult
 <td>
 <code>conditions</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.PrefixAllocationCondition">
+<a href="#ipam.api.onmetal.de/v1alpha1.PrefixAllocationCondition">
 []PrefixAllocationCondition
 </a>
 </em>
@@ -2460,10 +2460,10 @@ PrefixAllocationResult
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.PrefixCondition">PrefixCondition
+<h3 id="ipam.api.onmetal.de/v1alpha1.PrefixCondition">PrefixCondition
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.PrefixStatus">PrefixStatus</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.PrefixStatus">PrefixStatus</a>)
 </p>
 <div>
 </div>
@@ -2479,7 +2479,7 @@ PrefixAllocationResult
 <td>
 <code>type</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.PrefixConditionType">
+<a href="#ipam.api.onmetal.de/v1alpha1.PrefixConditionType">
 PrefixConditionType
 </a>
 </em>
@@ -2533,10 +2533,10 @@ Kubernetes meta/v1.Time
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.PrefixConditionType">PrefixConditionType
+<h3 id="ipam.api.onmetal.de/v1alpha1.PrefixConditionType">PrefixConditionType
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.PrefixCondition">PrefixCondition</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.PrefixCondition">PrefixCondition</a>)
 </p>
 <div>
 </div>
@@ -2551,10 +2551,10 @@ Kubernetes meta/v1.Time
 <td></td>
 </tr></tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.PrefixReference">PrefixReference
+<h3 id="ipam.api.onmetal.de/v1alpha1.PrefixReference">PrefixReference
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.IPSpec">IPSpec</a>, <a href="#network.onmetal.de/v1alpha1.PrefixAllocationSpec">PrefixAllocationSpec</a>, <a href="#network.onmetal.de/v1alpha1.PrefixSpec">PrefixSpec</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.IPSpec">IPSpec</a>, <a href="#ipam.api.onmetal.de/v1alpha1.PrefixAllocationSpec">PrefixAllocationSpec</a>, <a href="#ipam.api.onmetal.de/v1alpha1.PrefixSpec">PrefixSpec</a>)
 </p>
 <div>
 </div>
@@ -2590,10 +2590,10 @@ string
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.PrefixSelector">PrefixSelector
+<h3 id="ipam.api.onmetal.de/v1alpha1.PrefixSelector">PrefixSelector
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.IPSpec">IPSpec</a>, <a href="#network.onmetal.de/v1alpha1.PrefixAllocationSpec">PrefixAllocationSpec</a>, <a href="#network.onmetal.de/v1alpha1.PrefixSpec">PrefixSpec</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.IPSpec">IPSpec</a>, <a href="#ipam.api.onmetal.de/v1alpha1.PrefixAllocationSpec">PrefixAllocationSpec</a>, <a href="#ipam.api.onmetal.de/v1alpha1.PrefixSpec">PrefixSpec</a>)
 </p>
 <div>
 </div>
@@ -2634,10 +2634,10 @@ Kubernetes meta/v1.LabelSelector
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.PrefixSpace">PrefixSpace
+<h3 id="ipam.api.onmetal.de/v1alpha1.PrefixSpace">PrefixSpace
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.ClusterPrefixSpec">ClusterPrefixSpec</a>, <a href="#network.onmetal.de/v1alpha1.PrefixSpec">PrefixSpec</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.ClusterPrefixSpec">ClusterPrefixSpec</a>, <a href="#ipam.api.onmetal.de/v1alpha1.PrefixSpec">PrefixSpec</a>)
 </p>
 <div>
 <p>PrefixSpace is the space a prefix manages.</p>
@@ -2701,10 +2701,10 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.PrefixSpec">PrefixSpec
+<h3 id="ipam.api.onmetal.de/v1alpha1.PrefixSpec">PrefixSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.Prefix">Prefix</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.Prefix">Prefix</a>)
 </p>
 <div>
 <p>PrefixSpec defines the desired state of Prefix</p>
@@ -2721,7 +2721,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
 <td>
 <code>parentRef</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.PrefixReference">
+<a href="#ipam.api.onmetal.de/v1alpha1.PrefixReference">
 PrefixReference
 </a>
 </em>
@@ -2736,7 +2736,7 @@ allocated by itself.</p>
 <td>
 <code>parentSelector</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.PrefixSelector">
+<a href="#ipam.api.onmetal.de/v1alpha1.PrefixSelector">
 PrefixSelector
 </a>
 </em>
@@ -2749,7 +2749,7 @@ PrefixSelector
 <td>
 <code>PrefixSpace</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.PrefixSpace">
+<a href="#ipam.api.onmetal.de/v1alpha1.PrefixSpace">
 PrefixSpace
 </a>
 </em>
@@ -2763,10 +2763,10 @@ PrefixSpace
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.PrefixStatus">PrefixStatus
+<h3 id="ipam.api.onmetal.de/v1alpha1.PrefixStatus">PrefixStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.Prefix">Prefix</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.Prefix">Prefix</a>)
 </p>
 <div>
 <p>PrefixStatus defines the observed state of Prefix</p>
@@ -2783,7 +2783,7 @@ PrefixSpace
 <td>
 <code>conditions</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.PrefixCondition">
+<a href="#ipam.api.onmetal.de/v1alpha1.PrefixCondition">
 []PrefixCondition
 </a>
 </em>
@@ -2820,10 +2820,10 @@ PrefixSpace
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.RangeType">RangeType
+<h3 id="ipam.api.onmetal.de/v1alpha1.RangeType">RangeType
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SubnetSpec">SubnetSpec</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.SubnetSpec">SubnetSpec</a>)
 </p>
 <div>
 <p>RangeType defines the range/size of a subnet</p>
@@ -2862,7 +2862,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.ReservedIP">ReservedIP
+<h3 id="ipam.api.onmetal.de/v1alpha1.ReservedIP">ReservedIP
 </h3>
 <div>
 <p>ReservedIP is the Schema for the reservedips API</p>
@@ -2893,7 +2893,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.ReservedIPSpec">
+<a href="#ipam.api.onmetal.de/v1alpha1.ReservedIPSpec">
 ReservedIPSpec
 </a>
 </em>
@@ -2933,7 +2933,7 @@ associated Subnet</p>
 <td>
 <code>assignment</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.ReservedIPAssignment">
+<a href="#ipam.api.onmetal.de/v1alpha1.ReservedIPAssignment">
 ReservedIPAssignment
 </a>
 </em>
@@ -2949,7 +2949,7 @@ ReservedIPAssignment
 <td>
 <code>status</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.ReservedIPStatus">
+<a href="#ipam.api.onmetal.de/v1alpha1.ReservedIPStatus">
 ReservedIPStatus
 </a>
 </em>
@@ -2959,10 +2959,10 @@ ReservedIPStatus
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.ReservedIPAssignment">ReservedIPAssignment
+<h3 id="ipam.api.onmetal.de/v1alpha1.ReservedIPAssignment">ReservedIPAssignment
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.ReservedIPBound">ReservedIPBound</a>, <a href="#network.onmetal.de/v1alpha1.ReservedIPSpec">ReservedIPSpec</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.ReservedIPBound">ReservedIPBound</a>, <a href="#ipam.api.onmetal.de/v1alpha1.ReservedIPSpec">ReservedIPSpec</a>)
 </p>
 <div>
 <p>ReservedIPAssignment contains information that points to the resource being used.</p>
@@ -3010,10 +3010,10 @@ string
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.ReservedIPBindMode">ReservedIPBindMode
+<h3 id="ipam.api.onmetal.de/v1alpha1.ReservedIPBindMode">ReservedIPBindMode
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.ReservedIPBound">ReservedIPBound</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.ReservedIPBound">ReservedIPBound</a>)
 </p>
 <div>
 </div>
@@ -3035,10 +3035,10 @@ of the reserved IP.</p>
 </td>
 </tr></tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.ReservedIPBound">ReservedIPBound
+<h3 id="ipam.api.onmetal.de/v1alpha1.ReservedIPBound">ReservedIPBound
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.ReservedIPStatus">ReservedIPStatus</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.ReservedIPStatus">ReservedIPStatus</a>)
 </p>
 <div>
 <p>ReservedIPBound describes the binding state of a ReservedIP</p>
@@ -3055,7 +3055,7 @@ of the reserved IP.</p>
 <td>
 <code>mode</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.ReservedIPBindMode">
+<a href="#ipam.api.onmetal.de/v1alpha1.ReservedIPBindMode">
 ReservedIPBindMode
 </a>
 </em>
@@ -3067,7 +3067,7 @@ ReservedIPBindMode
 <td>
 <code>assignment</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.ReservedIPAssignment">
+<a href="#ipam.api.onmetal.de/v1alpha1.ReservedIPAssignment">
 ReservedIPAssignment
 </a>
 </em>
@@ -3077,10 +3077,10 @@ ReservedIPAssignment
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.ReservedIPCondition">ReservedIPCondition
+<h3 id="ipam.api.onmetal.de/v1alpha1.ReservedIPCondition">ReservedIPCondition
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.ReservedIPStatus">ReservedIPStatus</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.ReservedIPStatus">ReservedIPStatus</a>)
 </p>
 <div>
 <p>ReservedIPCondition is one of the conditions of a volume.</p>
@@ -3097,7 +3097,7 @@ ReservedIPAssignment
 <td>
 <code>type</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.ReservedIPConditionType">
+<a href="#ipam.api.onmetal.de/v1alpha1.ReservedIPConditionType">
 ReservedIPConditionType
 </a>
 </em>
@@ -3180,18 +3180,18 @@ Kubernetes meta/v1.Time
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.ReservedIPConditionType">ReservedIPConditionType
+<h3 id="ipam.api.onmetal.de/v1alpha1.ReservedIPConditionType">ReservedIPConditionType
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.ReservedIPCondition">ReservedIPCondition</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.ReservedIPCondition">ReservedIPCondition</a>)
 </p>
 <div>
 <p>ReservedIPConditionType is a type a ReservedIPCondition can have.</p>
 </div>
-<h3 id="network.onmetal.de/v1alpha1.ReservedIPSpec">ReservedIPSpec
+<h3 id="ipam.api.onmetal.de/v1alpha1.ReservedIPSpec">ReservedIPSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.ReservedIP">ReservedIP</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.ReservedIP">ReservedIP</a>)
 </p>
 <div>
 <p>ReservedIPSpec defines the desired state of ReservedIP</p>
@@ -3235,7 +3235,7 @@ associated Subnet</p>
 <td>
 <code>assignment</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.ReservedIPAssignment">
+<a href="#ipam.api.onmetal.de/v1alpha1.ReservedIPAssignment">
 ReservedIPAssignment
 </a>
 </em>
@@ -3246,10 +3246,10 @@ ReservedIPAssignment
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.ReservedIPState">ReservedIPState
+<h3 id="ipam.api.onmetal.de/v1alpha1.ReservedIPState">ReservedIPState
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.ReservedIPStatus">ReservedIPStatus</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.ReservedIPStatus">ReservedIPStatus</a>)
 </p>
 <div>
 </div>
@@ -3270,10 +3270,10 @@ ReservedIPAssignment
 <td></td>
 </tr></tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.ReservedIPStatus">ReservedIPStatus
+<h3 id="ipam.api.onmetal.de/v1alpha1.ReservedIPStatus">ReservedIPStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.ReservedIP">ReservedIP</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.ReservedIP">ReservedIP</a>)
 </p>
 <div>
 <p>ReservedIPStatus defines the observed state of ReservedIP</p>
@@ -3290,7 +3290,7 @@ ReservedIPAssignment
 <td>
 <code>state</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.ReservedIPState">
+<a href="#ipam.api.onmetal.de/v1alpha1.ReservedIPState">
 ReservedIPState
 </a>
 </em>
@@ -3302,7 +3302,7 @@ ReservedIPState
 <td>
 <code>conditions</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.ReservedIPCondition">
+<a href="#ipam.api.onmetal.de/v1alpha1.ReservedIPCondition">
 []ReservedIPCondition
 </a>
 </em>
@@ -3327,7 +3327,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
 <td>
 <code>bound</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.ReservedIPBound">
+<a href="#ipam.api.onmetal.de/v1alpha1.ReservedIPBound">
 ReservedIPBound
 </a>
 </em>
@@ -3337,10 +3337,10 @@ ReservedIPBound
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.Route">Route
+<h3 id="ipam.api.onmetal.de/v1alpha1.Route">Route
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.RoutingDomainSpec">RoutingDomainSpec</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.RoutingDomainSpec">RoutingDomainSpec</a>)
 </p>
 <div>
 <p>Route describes a single route definition</p>
@@ -3381,7 +3381,7 @@ string
 <td>
 <code>target</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.Target">
+<a href="#ipam.api.onmetal.de/v1alpha1.Target">
 Target
 </a>
 </em>
@@ -3392,7 +3392,7 @@ Target
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.RoutingDomain">RoutingDomain
+<h3 id="ipam.api.onmetal.de/v1alpha1.RoutingDomain">RoutingDomain
 </h3>
 <div>
 <p>RoutingDomain is the Schema for the RoutingDomain API</p>
@@ -3423,7 +3423,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.RoutingDomainSpec">
+<a href="#ipam.api.onmetal.de/v1alpha1.RoutingDomainSpec">
 RoutingDomainSpec
 </a>
 </em>
@@ -3436,7 +3436,7 @@ RoutingDomainSpec
 <td>
 <code>routes</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.Route">
+<a href="#ipam.api.onmetal.de/v1alpha1.Route">
 []Route
 </a>
 </em>
@@ -3452,7 +3452,7 @@ RoutingDomainSpec
 <td>
 <code>status</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.RoutingDomainStatus">
+<a href="#ipam.api.onmetal.de/v1alpha1.RoutingDomainStatus">
 RoutingDomainStatus
 </a>
 </em>
@@ -3462,10 +3462,10 @@ RoutingDomainStatus
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.RoutingDomainCondition">RoutingDomainCondition
+<h3 id="ipam.api.onmetal.de/v1alpha1.RoutingDomainCondition">RoutingDomainCondition
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.RoutingDomainStatus">RoutingDomainStatus</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.RoutingDomainStatus">RoutingDomainStatus</a>)
 </p>
 <div>
 <p>RoutingDomainCondition is one of the conditions of a volume.</p>
@@ -3482,7 +3482,7 @@ RoutingDomainStatus
 <td>
 <code>type</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.RoutingDomainConditionType">
+<a href="#ipam.api.onmetal.de/v1alpha1.RoutingDomainConditionType">
 RoutingDomainConditionType
 </a>
 </em>
@@ -3565,18 +3565,18 @@ Kubernetes meta/v1.Time
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.RoutingDomainConditionType">RoutingDomainConditionType
+<h3 id="ipam.api.onmetal.de/v1alpha1.RoutingDomainConditionType">RoutingDomainConditionType
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.RoutingDomainCondition">RoutingDomainCondition</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.RoutingDomainCondition">RoutingDomainCondition</a>)
 </p>
 <div>
 <p>RoutingDomainConditionType is a type a RoutingDomainCondition can have.</p>
 </div>
-<h3 id="network.onmetal.de/v1alpha1.RoutingDomainSpec">RoutingDomainSpec
+<h3 id="ipam.api.onmetal.de/v1alpha1.RoutingDomainSpec">RoutingDomainSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.RoutingDomain">RoutingDomain</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.RoutingDomain">RoutingDomain</a>)
 </p>
 <div>
 <p>RoutingDomainSpec defines the desired state of RoutingDomain
@@ -3595,7 +3595,7 @@ need explicit routing instructions.</p>
 <td>
 <code>routes</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.Route">
+<a href="#ipam.api.onmetal.de/v1alpha1.Route">
 []Route
 </a>
 </em>
@@ -3606,17 +3606,17 @@ need explicit routing instructions.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.RoutingDomainState">RoutingDomainState
+<h3 id="ipam.api.onmetal.de/v1alpha1.RoutingDomainState">RoutingDomainState
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.RoutingDomainStatus">RoutingDomainStatus</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.RoutingDomainStatus">RoutingDomainStatus</a>)
 </p>
 <div>
 </div>
-<h3 id="network.onmetal.de/v1alpha1.RoutingDomainStatus">RoutingDomainStatus
+<h3 id="ipam.api.onmetal.de/v1alpha1.RoutingDomainStatus">RoutingDomainStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.RoutingDomain">RoutingDomain</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.RoutingDomain">RoutingDomain</a>)
 </p>
 <div>
 <p>RoutingDomainStatus defines the observed state of RoutingDomain</p>
@@ -3633,7 +3633,7 @@ need explicit routing instructions.</p>
 <td>
 <code>state</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.RoutingDomainState">
+<a href="#ipam.api.onmetal.de/v1alpha1.RoutingDomainState">
 RoutingDomainState
 </a>
 </em>
@@ -3645,7 +3645,7 @@ RoutingDomainState
 <td>
 <code>conditions</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.RoutingDomainCondition">
+<a href="#ipam.api.onmetal.de/v1alpha1.RoutingDomainCondition">
 []RoutingDomainCondition
 </a>
 </em>
@@ -3655,7 +3655,7 @@ RoutingDomainState
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.SecurityGroup">SecurityGroup
+<h3 id="ipam.api.onmetal.de/v1alpha1.SecurityGroup">SecurityGroup
 </h3>
 <div>
 <p>SecurityGroup is the Schema for the securitygroups API</p>
@@ -3686,7 +3686,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.SecurityGroupSpec">
+<a href="#ipam.api.onmetal.de/v1alpha1.SecurityGroupSpec">
 SecurityGroupSpec
 </a>
 </em>
@@ -3699,7 +3699,7 @@ SecurityGroupSpec
 <td>
 <code>ingress</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.IngressSecurityGroupRule">
+<a href="#ipam.api.onmetal.de/v1alpha1.IngressSecurityGroupRule">
 []IngressSecurityGroupRule
 </a>
 </em>
@@ -3712,7 +3712,7 @@ SecurityGroupSpec
 <td>
 <code>egress</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.EgressSecurityGroupRule">
+<a href="#ipam.api.onmetal.de/v1alpha1.EgressSecurityGroupRule">
 []EgressSecurityGroupRule
 </a>
 </em>
@@ -3728,7 +3728,7 @@ SecurityGroupSpec
 <td>
 <code>status</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.SecurityGroupStatus">
+<a href="#ipam.api.onmetal.de/v1alpha1.SecurityGroupStatus">
 SecurityGroupStatus
 </a>
 </em>
@@ -3738,10 +3738,10 @@ SecurityGroupStatus
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.SecurityGroupAction">SecurityGroupAction
+<h3 id="ipam.api.onmetal.de/v1alpha1.SecurityGroupAction">SecurityGroupAction
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SecurityGroupRule">SecurityGroupRule</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.SecurityGroupRule">SecurityGroupRule</a>)
 </p>
 <div>
 <p>SecurityGroupAction describes the action of a SecurityGroupRule.</p>
@@ -3759,10 +3759,10 @@ SecurityGroupStatus
 <td></td>
 </tr></tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.SecurityGroupCondition">SecurityGroupCondition
+<h3 id="ipam.api.onmetal.de/v1alpha1.SecurityGroupCondition">SecurityGroupCondition
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SecurityGroupStatus">SecurityGroupStatus</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.SecurityGroupStatus">SecurityGroupStatus</a>)
 </p>
 <div>
 <p>SecurityGroupCondition is one of the conditions of a volume.</p>
@@ -3779,7 +3779,7 @@ SecurityGroupStatus
 <td>
 <code>type</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.SecurityGroupConditionType">
+<a href="#ipam.api.onmetal.de/v1alpha1.SecurityGroupConditionType">
 SecurityGroupConditionType
 </a>
 </em>
@@ -3862,18 +3862,18 @@ Kubernetes meta/v1.Time
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.SecurityGroupConditionType">SecurityGroupConditionType
+<h3 id="ipam.api.onmetal.de/v1alpha1.SecurityGroupConditionType">SecurityGroupConditionType
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SecurityGroupCondition">SecurityGroupCondition</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.SecurityGroupCondition">SecurityGroupCondition</a>)
 </p>
 <div>
 <p>SecurityGroupConditionType is a type a SecurityGroupCondition can have.</p>
 </div>
-<h3 id="network.onmetal.de/v1alpha1.SecurityGroupRule">SecurityGroupRule
+<h3 id="ipam.api.onmetal.de/v1alpha1.SecurityGroupRule">SecurityGroupRule
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.EgressSecurityGroupRule">EgressSecurityGroupRule</a>, <a href="#network.onmetal.de/v1alpha1.IngressSecurityGroupRule">IngressSecurityGroupRule</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.EgressSecurityGroupRule">EgressSecurityGroupRule</a>, <a href="#ipam.api.onmetal.de/v1alpha1.IngressSecurityGroupRule">IngressSecurityGroupRule</a>)
 </p>
 <div>
 <p>SecurityGroupRule is a single access rule</p>
@@ -3914,7 +3914,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>action</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.SecurityGroupAction">
+<a href="#ipam.api.onmetal.de/v1alpha1.SecurityGroupAction">
 SecurityGroupAction
 </a>
 </em>
@@ -3938,7 +3938,7 @@ string
 <td>
 <code>portRange</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.PortRange">
+<a href="#ipam.api.onmetal.de/v1alpha1.PortRange">
 PortRange
 </a>
 </em>
@@ -3949,10 +3949,10 @@ PortRange
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.SecurityGroupSpec">SecurityGroupSpec
+<h3 id="ipam.api.onmetal.de/v1alpha1.SecurityGroupSpec">SecurityGroupSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SecurityGroup">SecurityGroup</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.SecurityGroup">SecurityGroup</a>)
 </p>
 <div>
 <p>SecurityGroupSpec defines the desired state of SecurityGroup</p>
@@ -3969,7 +3969,7 @@ PortRange
 <td>
 <code>ingress</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.IngressSecurityGroupRule">
+<a href="#ipam.api.onmetal.de/v1alpha1.IngressSecurityGroupRule">
 []IngressSecurityGroupRule
 </a>
 </em>
@@ -3982,7 +3982,7 @@ PortRange
 <td>
 <code>egress</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.EgressSecurityGroupRule">
+<a href="#ipam.api.onmetal.de/v1alpha1.EgressSecurityGroupRule">
 []EgressSecurityGroupRule
 </a>
 </em>
@@ -3993,10 +3993,10 @@ PortRange
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.SecurityGroupState">SecurityGroupState
+<h3 id="ipam.api.onmetal.de/v1alpha1.SecurityGroupState">SecurityGroupState
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SecurityGroupStatus">SecurityGroupStatus</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.SecurityGroupStatus">SecurityGroupStatus</a>)
 </p>
 <div>
 <p>SecurityGroupState is the state of a SecurityGroup.</p>
@@ -4016,10 +4016,10 @@ PortRange
 <td></td>
 </tr></tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.SecurityGroupStatus">SecurityGroupStatus
+<h3 id="ipam.api.onmetal.de/v1alpha1.SecurityGroupStatus">SecurityGroupStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SecurityGroup">SecurityGroup</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.SecurityGroup">SecurityGroup</a>)
 </p>
 <div>
 <p>SecurityGroupStatus defines the observed state of SecurityGroup</p>
@@ -4036,7 +4036,7 @@ PortRange
 <td>
 <code>state</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.SecurityGroupState">
+<a href="#ipam.api.onmetal.de/v1alpha1.SecurityGroupState">
 SecurityGroupState
 </a>
 </em>
@@ -4048,7 +4048,7 @@ SecurityGroupState
 <td>
 <code>conditions</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.SecurityGroupCondition">
+<a href="#ipam.api.onmetal.de/v1alpha1.SecurityGroupCondition">
 []SecurityGroupCondition
 </a>
 </em>
@@ -4058,7 +4058,7 @@ SecurityGroupState
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.Subnet">Subnet
+<h3 id="ipam.api.onmetal.de/v1alpha1.Subnet">Subnet
 </h3>
 <div>
 <p>Subnet is the Schema for the subnets API</p>
@@ -4089,7 +4089,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.SubnetSpec">
+<a href="#ipam.api.onmetal.de/v1alpha1.SubnetSpec">
 SubnetSpec
 </a>
 </em>
@@ -4141,7 +4141,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>ranges</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.RangeType">
+<a href="#ipam.api.onmetal.de/v1alpha1.RangeType">
 []RangeType
 </a>
 </em>
@@ -4157,7 +4157,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>status</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.SubnetStatus">
+<a href="#ipam.api.onmetal.de/v1alpha1.SubnetStatus">
 SubnetStatus
 </a>
 </em>
@@ -4167,10 +4167,10 @@ SubnetStatus
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.SubnetCondition">SubnetCondition
+<h3 id="ipam.api.onmetal.de/v1alpha1.SubnetCondition">SubnetCondition
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SubnetStatus">SubnetStatus</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.SubnetStatus">SubnetStatus</a>)
 </p>
 <div>
 <p>SubnetCondition is one of the conditions of a volume.</p>
@@ -4187,7 +4187,7 @@ SubnetStatus
 <td>
 <code>type</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.SubnetConditionType">
+<a href="#ipam.api.onmetal.de/v1alpha1.SubnetConditionType">
 SubnetConditionType
 </a>
 </em>
@@ -4270,18 +4270,18 @@ Kubernetes meta/v1.Time
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.SubnetConditionType">SubnetConditionType
+<h3 id="ipam.api.onmetal.de/v1alpha1.SubnetConditionType">SubnetConditionType
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SubnetCondition">SubnetCondition</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.SubnetCondition">SubnetCondition</a>)
 </p>
 <div>
 <p>SubnetConditionType is a type a SubnetCondition can have.</p>
 </div>
-<h3 id="network.onmetal.de/v1alpha1.SubnetSpec">SubnetSpec
+<h3 id="ipam.api.onmetal.de/v1alpha1.SubnetSpec">SubnetSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.Subnet">Subnet</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.Subnet">Subnet</a>)
 </p>
 <div>
 <p>SubnetSpec defines the desired state of Subnet</p>
@@ -4337,7 +4337,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>ranges</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.RangeType">
+<a href="#ipam.api.onmetal.de/v1alpha1.RangeType">
 []RangeType
 </a>
 </em>
@@ -4348,10 +4348,10 @@ Kubernetes core/v1.LocalObjectReference
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.SubnetState">SubnetState
+<h3 id="ipam.api.onmetal.de/v1alpha1.SubnetState">SubnetState
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.SubnetStatus">SubnetStatus</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.SubnetStatus">SubnetStatus</a>)
 </p>
 <div>
 </div>
@@ -4372,10 +4372,10 @@ Kubernetes core/v1.LocalObjectReference
 <td></td>
 </tr></tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.SubnetStatus">SubnetStatus
+<h3 id="ipam.api.onmetal.de/v1alpha1.SubnetStatus">SubnetStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.Subnet">Subnet</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.Subnet">Subnet</a>)
 </p>
 <div>
 <p>SubnetStatus defines the observed state of Subnet</p>
@@ -4392,7 +4392,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>state</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.SubnetState">
+<a href="#ipam.api.onmetal.de/v1alpha1.SubnetState">
 SubnetState
 </a>
 </em>
@@ -4404,7 +4404,7 @@ SubnetState
 <td>
 <code>conditions</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.SubnetCondition">
+<a href="#ipam.api.onmetal.de/v1alpha1.SubnetCondition">
 []SubnetCondition
 </a>
 </em>
@@ -4427,10 +4427,10 @@ SubnetState
 </tr>
 </tbody>
 </table>
-<h3 id="network.onmetal.de/v1alpha1.Target">Target
+<h3 id="ipam.api.onmetal.de/v1alpha1.Target">Target
 </h3>
 <p>
-(<em>Appears on:</em><a href="#network.onmetal.de/v1alpha1.GatewaySpec">GatewaySpec</a>, <a href="#network.onmetal.de/v1alpha1.Route">Route</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.GatewaySpec">GatewaySpec</a>, <a href="#ipam.api.onmetal.de/v1alpha1.Route">Route</a>)
 </p>
 <div>
 <p>Target is a target for network traffic.
@@ -4453,7 +4453,7 @@ It may be either
 <td>
 <code>machine</code><br/>
 <em>
-<a href="#network.onmetal.de/v1alpha1.MachineRouteTarget">
+<a href="#ipam.api.onmetal.de/v1alpha1.MachineRouteTarget">
 MachineRouteTarget
 </a>
 </em>
