@@ -74,13 +74,12 @@ the internet.
 
 ### `Network` type
 
-The `Network` type defines a private `Network`. Private meaning that it is isolated from the public internet and
-communication within it can be freely managed. Traffic can be allowed or disallowed. For defining a network, a new
-namespaced `Network` type will be introduced. A `Network` has a `prefix` that define its boundaries. The `prefix` can be
-defined statically or via an `ipamPrefixRef` and a specified `size`.
+The namespaced `Network` type defines a `Network` bracket. Traffic from, to and within the `Network` can be managed.
+A `Network` has to specify the ip families it wants to allow (same is design as in the Kubernetes `Service` type).
 
-Once a `Network` is up and ready, the prefixes available for allocation are reported in its `status`
-as well as a condition indicating its availability / health.
+IP address space in a `Network` is not dictated in any way. A `Network` however has to accept any claimed IP address
+space within it. For initial design, a `Network` will only accept non-overlapping space. In a later version, this may be
+regulated with e.g. a `.spec.ipPolicy`.
 
 Example manifest:
 
@@ -91,51 +90,53 @@ metadata:
   namespace: default
   name: my-network
 spec:
-  prefix: 192.0.0.0/8
-  # ipamPrefixRef:
-  #   # Either size or prefix can be requested from the target ipam prefix.
-  #   size: 8
-  #   # prefix: 192.0.0.0/8
-  #   name: my-ipam-prefix
+  ipFamilies:
+    - IPv4
+    - IPv6
 status:
-  available:
-    - 192.0.0.0/8
+  used:
+    - 192.168.178.1/32
+    - 2607:f0d0:1002:51::4/128
+    - 192.168.179.0/24
+    - 10.5.3.7/32
   conditions:
     - type: Available # Available may be the name for this condition, though this has to be refined.
       status: True
       reason: PrefixAllocated
 ```
 
-### `NetworkInterface` type
+### The `NetworkInterface` type
 
-A `NetworkInterface` lets a `Machine` join a `Network`. For now, only **1** network interface per
-`Machine` will be allowed. In contrast to the current state (`Machine` specifying multiple network interfaces in its
-spec), a `NetworkInterface` is a separate, dedicated type that has to be referenced by a `Machine`.
+A `NetworkInterface` lets a `Machine` join a `Network`. As such, in its `spec`, it references a `Network` and
+the `Prefix` it shall allocate an IP from.
 
-A network interface will get a random ip assigned.
+The binding between a `NetworkInterface` and a `Machine` is bidirectional via `NetworkInterface.spec.machineRef.name` /
+`Machine.spec.interfaces[*].name`. For the mvp, we will only allow exactly **1** `NetworkInterface` per `Machine`.
 
-Example manifest:
+Example usage:
 
 ```yaml
 apiVersion: compute.onmetal.de/v1alpha1
 kind: NetworkInterface
 metadata:
   namespace: default
-  name: my-nic
+  name: my-machine-interface
 spec:
   networkRef:
     name: my-network
+  prefixRef:
+    name: my-node-prefix
+  machineRef:
+    name: my-machine
 status:
-  ip: 192.168.178.1
+  primaryIPs:
+    - 192.168.178.1
+    - 2607:f0d0:1002:51::4
   conditions:
-    - type: Available # Available may be the name for this condition, though this has to be refined.
-      status: true
-      reason: IPAllocated
-```
-
-The `Machine` type will be modified to reference the `NetworkInterface`:
-
-```yaml
+    - type: Available
+      status: True
+      reason: JoinedNetwork
+---
 apiVersion: compute.onmetal.de/v1alpha1
 kind: Machine
 metadata:
@@ -144,72 +145,114 @@ metadata:
   labels:
     app: web
 spec:
-  ...
   interfaces:
-      - name: my-inteface
-        ref:
-          name: my-nic
+    - name: my-interface
+      ref:
+        name: my-machine-interface
   ...
 status:
-  ips: # The machine reports all ips available via its interfaces
-    - 192.168.178.1
+  interfaces:
+    - name: my-interface
+      primaryIPs: # The machine reports all ips available via its interfaces
+        - 192.168.178.1
+        - 2607:f0d0:1002:51::4
   ...
 ```
 
-### The `VirtualPrefix` type
+### The `AliasPrefix` type.
 
-The `VirtualPrefix` type controls how to do routing to a `NetworkInterface` / a `Machine`. A `VirtualPrefix` has a type
-that specifies what routing is desired.
-
-**Public prefix**:
-
-Public prefix routing is realized via `type: Public`. A `VirtualPrefix` selects the members that are targeted by
-routing. Once selected, a public prefix gets assigned to the `VirtualPrefix` and routing will take effect. Successfully
-allocated prefixes are reported in the `status`.
+An `AliasPrefix` allows routing a sub-prefix of a network to multiple `NetworkInterface`s. It thus requires a reference
+to a `Network` as well as a reference to a `Prefix`.
 
 Example manifest:
 
 ```yaml
-apiVersion: compute.onmetal.de/v1alpha1
-kind: VirtualPrefix
+apiVersion: network.onmetal.de
+kind: AliasPrefix
 metadata:
   namespace: default
-  name: my-public-prefix
+  name: my-alias-prefix
 spec:
-  type: Public
-  selector:
-    kind: Machine
-    matchLabels:
-      app: web
-status:
-  prefixes:
-    - 13.14.15.1/32
-```
-
-**Network prefix**:
-
-Network prefix routing is realized via `type: Network`. A network has to be referenced via the `networkRef`. Once
-successfully applied, the network prefix is routed to the target of the `VirtualPrefix`.
-
-Example manifest:
-
-```yaml
-apiVersion: compute.onmetal.de/v1alpha1
-kind: VirtualPrefix
-metadata:
-  namespace: default
-  name: my-network-prefix
-spec:
-  type: Network
   networkRef:
     name: my-network
-  selector:
-    kind: Machine
-    matchLabels:
-      app: web
+  prefixRef:
+    sizes: [ 24, 120 ]
+    name: my-prefix
 status:
   prefixes:
-    - 192.168.178.0/24
+    - 192.168.0.0/24
+    - 2607:f0d0:1002:51::4/120
+```
+
+This only allocates the `AliasPrefix`. To establish the binding between `AliasPrefix` and `NetworkInterface`, the
+`NetworkInterface` has to reference the desired `AliasPrefix`es:
+
+```yaml
+apiVersion: compute.onmetal.de
+kind: NetworkInterface
+metadata:
+  namespace: default
+  name: my-machine-interface
+spec:
+  aliasPrefixes:
+    - name: my-alias-prefix
+      ref:
+        name: my-alias-prefix
+...
+status:
+  aliasPrefixes:
+    - name: my-alias-prefix
+      prefixes:
+        - 192.168.0.0/24
+        - 2607:f0d0:1002:51::4/120
+...
+```
+
+### The `VirtualIP` type
+
+A `VirtualIP` requests a stable public IP for multiple `NetworkInterface`s. We also have a
+`type` field that currently only can be `type: Public` in order to support future `VirtualIP` types (most prominently
+here `VirtualIP`s in other networks).
+
+As this type manages public IPs, no `prefixRef` can be specified.
+
+Example manifest:
+
+```yaml
+apiVersion: compute.onmetal.de
+kind: VirtualIP
+metadata:
+  namespace: default
+  name: my-virtual-ip
+spec:
+  type: Public
+status:
+  ips:
+    - 45.86.152.88
+    - 2607:f0d0:1002:51::4
+```
+
+Again, to assign such a `VirtualIP` to a `NetworkInterface`, the `NetworkInterface` has to reference it:
+
+```yaml
+apiVersion: compute.onmetal.de
+kind: NetworkInterface
+metadata:
+  namespace: default
+  name: my-machine-interface
+spec:
+  virtualIPs:
+    - name: my-virtual-ip
+      ref:
+        name: my-virtual-ip
+...
+status:
+  virtualIPs:
+    - name: my-virtualIP
+      ips:
+        - 45.86.152.88
+        - 2607:f0d0:1002:51::4
+...
 ```
 
 ## Alternatives
