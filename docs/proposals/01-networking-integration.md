@@ -73,6 +73,26 @@ the internet.
 
 ## Proposal
 
+### Preface
+
+As onmetal is Kubernetes-API, it should integrate nicely within the existing ecosystem. Some API design choices are made
+in that regard. For further information about Kubernetes, see
+[the Kubernetes reference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#ephemeralvolumesource-v1-core)
+.
+
+* Resources that are created, managed, and deleted in scope of another resource are called `ephemeral`. An example in
+  Kubernetes is the `Pod.spec.volumes.ephemeralVolume` that creates a volume just before a
+  `Pod` is created and deletes it alongside the `Pod` after usage.
+* `1:1` binding between two resources is achieved by both resources referencing each other. This can be seen in
+  Kubernetes'
+  `PersistentVolumeClaim.Spec.volumeName` - `PersistentVolume.spec.claimRef`.
+* `1:n` binding between two resources is achieved by the resource on `n` side having a reference to the resource on
+  the `1` side. This can be seen in `n` `Pod.spec.nodeName` referencing a `Node`.
+* `m:n` binding between two resources is achieved by using `selector`s and a 'binding' resource that usually gets
+  created on-the-fly, though this also usually can be modified. An example can be seen in the relation between
+  `Service`s and `Pod`s. A `Service` selects multiple `Pod`s via its `.spec.selector`. The resulting manifested binding
+  resource is realized via the `Endpoints` kind that contains the current target list.
+
 The proposal is divided into two parts: The first part purely focuses on IP address management. The second part defines
 the actual networking types while allowing the user to use the IP address management features of the first part.
 
