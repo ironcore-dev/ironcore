@@ -72,7 +72,7 @@ var _ = BeforeSuite(func() {
 	By("bootstrapping test environment")
 	testEnv = &envtest.Environment{}
 	testEnvExt = &envtestutils.EnvironmentExtensions{
-		APIServiceDirectoryPaths:       []string{filepath.Join("..", "..", "config", "apiservice", "bases")},
+		APIServiceDirectoryPaths:       []string{filepath.Join("..", "..", "config", "apiserver", "apiservice", "bases")},
 		ErrorIfAPIServicePathIsMissing: true,
 	}
 

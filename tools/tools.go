@@ -26,4 +26,6 @@ import (
 	_ "k8s.io/code-generator"
 	// Use vgopath for setting up GOPATH to generate code with code-generator.
 	_ "github.com/onmetal/vgopath"
+	// Use gen-crd-api-reference-docs for generating API reference documentation.
+	_ "github.com/ahmetb/gen-crd-api-reference-docs"
 )

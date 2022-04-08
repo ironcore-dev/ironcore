@@ -1,6 +1,7 @@
 
 # Image URL to use all building/pushing image targets
-IMG ?= controller:latest
+CONTROLLER_IMG ?= controller:latest
+APISERVER_IMG ?= apiserver:latest
 
 # Docker image name for the mkdocs based local development setup
 IMAGE=onmetal-api/documentation
@@ -39,7 +40,7 @@ help: ## Display this help.
 ##@ Development
 
 manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
-	$(CONTROLLER_GEN) rbac:roleName=manager-role webhook paths="./controllers/...;./apis/..."
+	$(CONTROLLER_GEN) rbac:roleName=manager-role webhook paths="./controllers/...;./apis/..." output:rbac:artifacts:config=config/controller/rbac
 
 generate:
 	./hack/update-codegen.sh
@@ -66,7 +67,10 @@ check: manifests generate addlicense lint test # Generate manifests, code, lint,
 
 .PHONY: docs
 docs: ## Run go generate to generate API reference documentation.
-	go generate ./...
+	go run github.com/ahmetb/gen-crd-api-reference-docs -api-dir ./apis/common/v1alpha1 -config ./hack/api-reference/common-config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/common.md
+	go run github.com/ahmetb/gen-crd-api-reference-docs -api-dir ./apis/compute/v1alpha1 -config ./hack/api-reference/compute-config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/compute.md
+	go run github.com/ahmetb/gen-crd-api-reference-docs -api-dir ./apis/ipam/v1alpha1 -config ./hack/api-reference/network-config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/network.md
+	go run github.com/ahmetb/gen-crd-api-reference-docs -api-dir ./apis/storage/v1alpha1 -config ./hack/api-reference/storage-config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/storage.md
 
 start-docs: ## Start the local mkdocs based development environment.
 	docker build -t $(IMAGE) -f docs/Dockerfile .
@@ -90,85 +94,100 @@ run: manifests generate fmt vet ## Run a controller from your host.
 	go run ./main.go
 
 docker-build: test ## Build docker image with the manager.
-	docker build -t ${IMG} .
+	docker build --target apiserver -t ${CONTROLLER_IMG} .
+	docker build --target manager -t ${APISERVER_IMG} .
 
 docker-push: ## Push docker image with the manager.
-	docker push ${IMG}
+	docker push ${CONTROLLER_IMG}
+	docker push ${APISERVER_IMG}
 
 ##@ Deployment
 
-install: manifests kustomize ## Install CRDs into the K8s cluster specified in ~/.kube/config.
-	$(KUSTOMIZE) build config/crd | kubectl apply -f -
+install: manifests kustomize ## Install API server & API services into the K8s cluster specified in ~/.kube/config. This requires APISERVER_IMG to be available for the cluster.
+	cd config/apiserver/server && $(KUSTOMIZE) edit set image apiserver=${APISERVER_IMG}
+	kubectl apply -k config/apiserver/default
 
-uninstall: manifests kustomize ## Uninstall CRDs from the K8s cluster specified in ~/.kube/config.
-	$(KUSTOMIZE) build config/crd | kubectl delete -f -
+uninstall: manifests kustomize ## Uninstall API server & API services from the K8s cluster specified in ~/.kube/config.
+	kubectl delete -k config/apiserver/default
 
 deploy: manifests kustomize ## Deploy controller to the K8s cluster specified in ~/.kube/config.
-	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
-	$(KUSTOMIZE) build config/default | kubectl apply -f -
+	cd config/controller/manager && $(KUSTOMIZE) edit set image controller=${CONTROLLER_IMG}
+	kubectl apply -k config/controller/default
 
 undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/config.
-	$(KUSTOMIZE) build config/default | kubectl delete -f -
+	kubectl delete -k config/controller/default
 
 ##@ Kind Deployment plumbing
-
-.PHONY: kind-build-controller
-kind-build-controller: ## Build the controller for usage in kind.
-	docker build --ssh default --target manager -t controller .
 
 .PHONY: kind-build-apiserver
 kind-build-apiserver: ## Build the apiserver for usage in kind.
 	docker build --ssh default --target apiserver -t apiserver .
 
-.PHONY: kind-build
-kind-build: kind-build-controller kind-build-apiserver ## Build the controller and apiserver for usage in kind.
+.PHONY: kind-build-controller
+kind-build-controller: ## Build the controller for usage in kind.
+	docker build --ssh default --target manager -t controller .
 
-.PHONY: kind-load-controller
-kind-load-controller: ## Load and restart the controller in kind.
-	kind load docker-image controller
+.PHONY: kind-build
+kind-build: kind-build-apiserver kind-build-controller ## Build the apiserver and controller for usage in kind.
 
 .PHONY: kind-load-apiserver
-kind-load-apiserver: ## Load and restart the apiserver in kind.
+kind-load-apiserver: ## Load the apiserver image into the kind cluster.
 	kind load docker-image apiserver
 
-.PHONY: kind-load
-kind-load: kind-load-controller kind-load-apiserver ## Load and restart the controller and apiserver in kind.
+.PHONY: kind-load-controller
+kind-load-controller: ## Load the controller image into the kind cluster.
+	kind load docker-image controller
 
-.PHONY: kind-restart-controller
-kind-restart-controller: ## Restart the controller in kind.
-	kubectl -n onmetal-system delete rs -l control-plane=controller-manager
+.PHONY: kind-load
+kind-load: kind-load-apiserver kind-load-controller ## Load the apiserver and controller in kind.
 
 .PHONY: kind-restart-apiserver
-kind-restart-apiserver: ## Restart the apiserver in kind.
+kind-restart-apiserver: ## Restart the apiserver in kind. Useless if the manifests are not in place (deployed e.g. via kind-apply / kind-deploy).
 	kubectl -n onmetal-system delete rs -l control-plane=apiserver
 
+.PHONY: kind-restart-controller
+kind-restart-controller: ## Restart the controller in kind. Useless if the manifests are not in place (deployed e.g. via kind-apply / kind-deploy).
+	kubectl -n onmetal-system delete rs -l control-plane=controller-manager
+
 .PHONY: kind-restart
-kind-restart: kind-restart-controller kind-restart-apiserver ## Restart the controller and apiserver in kind.
+kind-restart: kind-restart-apiserver kind-restart-controller ## Restart the apiserver and controller in kind. Restart is useless if the manifests are not in place (deployed e.g. via kind-apply / kind-deploy).
 
-.PHONY: kind-run-controller
-kind-run-controller: kind-build-controller kind-load-controller kind-restart-controller ## Build, load and restart the controller in kind.
+.PHONY: kind-build-load-restart-controller
+kind-build-load-restart-controller: kind-build-controller kind-load-controller kind-restart-controller ## Build, load and restart the controller in kind. Restart is useless if the manifests are not in place (deployed e.g. via kind-apply / kind-deploy).
 
-.PHONY: kind-run-apiserver
-kind-run-apiserver: kind-build-apiserver kind-load-apiserver kind-restart-apiserver ## Build, load and restart the apiserver in kind.
+.PHONY: kind-build-load-restart-apiserver
+kind-build-load-restart-apiserver: kind-build-apiserver kind-load-apiserver kind-restart-apiserver ## Build, load and restart the apiserver in kind. Restart is useless if the manifests are not in place (deployed e.g. via kind-apply / kind-deploy).
 
-.PHONY: kind-run
-kind-run: kind-run-controller kind-run-apiserver ## Build load and restart the controller and apiserver in kind.
+.PHONY: kind-build-load-restart
+kind-build-load-restart: kind-build-load-restart-apiserver kind-build-load-restart-controller ## Build load and restart the apiserver and controller in kind. Restart is useless if the manifests are not in place (deployed e.g. via kind-apply / kind-deploy).
+
+.PHONY: kind-apply-apiserver
+kind-apply-apiserver: manifests kustomize ## Applies the apiserver manifests in kind. Caution, without loading the images, the pods won't come up. Use kind-install / kind-deploy for a deployment including loading the images.
+	kubectl apply -k config/apiserver/kind
+
+.PHONY: kind-install
+kind-install: kind-build-load-restart-apiserver kind-apply-apiserver ## Build and load and apply apiserver in kind. Restarts apiserver if it was present.
+
+.PHONY: kind-uninstall
+kind-uninstall: manifests kustomize ## Uninstall API server & API services from the K8s cluster specified in ~/.kube/config.
+	kubectl delete -k config/apiserver/kind
 
 .PHONY: kind-apply
-kind-apply: ## Apply the kind config in kind.
+kind-apply: ## Apply the config in kind. Caution: Without loading the images, the pods won't come up. Use kind-deploy for a deployment including loading the images.
 	kubectl apply -k config/kind
 
+.PHONY: kind-delete
+kind-delete: ## Delete the config from kind.
+	kubectl delete -k config/kind
+
 .PHONY: kind-deploy
-kind-deploy: kind-build kind-load kind-restart kind-apply ## Build, load and apply the controller and apiserver in kind.
+kind-deploy: kind-build-load-restart kind-apply ## Build and load apiserver and controller into the kind cluster, then apply the config. Restarts apiserver / controller if they were present.
 
 ##@ Tools
 
 CONTROLLER_GEN = $(shell pwd)/bin/controller-gen
 controller-gen: ## Download controller-gen locally if necessary.
 	$(call go-get-tool,$(CONTROLLER_GEN),sigs.k8s.io/controller-tools/cmd/controller-gen@v0.6.2)
-
-CODE_GENERATOR_VERSION=v0.23.5
-code-generator: conversion-gen defaulter-gen informer-gen lister-gen
 
 KUSTOMIZE = $(shell pwd)/bin/kustomize
 kustomize: ## Download kustomize locally if necessary.
