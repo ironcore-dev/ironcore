@@ -57,6 +57,7 @@ the internet.
   future.
 * Define APIs for assigning / routing public IPs / prefixes to members of a network / subnet.
 * Adapt the `compute.Machine` type to integrate with the network API.
+* Have fully integrated IP address management for all resources (IPAM).
 * It should be possible to extend the API in the future to achieve the following (listed by decreasing priority):
     * Regulate Communication within a subnet (plus security concepts)
     * Subnet-to-subnet communication (plus security concepts)
@@ -72,6 +73,85 @@ the internet.
 
 ## Proposal
 
+The proposal is divided into two parts: The first part purely focuses on IP address management. The second part defines
+the actual networking types while allowing the user to use the IP address management features of the first part.
+
+### `IPAMPrefix` type
+
+The `IPAMPrefix` simplifies management of IP prefixes (v4 and v6 are both supported).
+
+An `IPAMPrefix` may be a root prefix by specifying no parent / parent selector and a prefix it manages. If
+an `IPAMPrefix` specifies a parent / parent selector, the requested prefix / prefix length is allocated from the
+parent (that matches, if selector is used). This means, prefixes can both be allocated dynamically by specifying only a
+desired prefix length or 'statically' by specifying the desired prefix.
+
+Example manifests:
+
+[//]: # (@formatter:off)
+```yaml
+apiVersion: core.onmetal.de/v1alpha1
+kind: IPAMPrefix
+metadata:
+  namespace: default
+  name: my-root-prefix
+spec:
+  prefix: 10.0.0.0/8
+status:
+  conditions:
+    - type: Ready
+      status: True
+      reason: RootPrefix
+---
+apiVersion: core.onmetal.de/v1alpha1
+kind: IPAMPrefix
+metadata:
+  namespace: default
+  name: my-sub-prefix
+spec:
+  parentRef:
+    name: my-root-prefix
+#  parentSelector: # A metav1.LabelSelector can be used to select the parent.
+#    matchLabels:
+#      foo: bar
+  prefixLength: 16
+  # prefix: 10.0.0.0/16 # Once successfully allocated, the spec is patched.
+status:
+  conditions:
+    - type: Ready
+      status: False # This will become true once the parent prefix allocates it.
+      Reason: Pending
+```
+[//]: # (@formatter:on)
+
+### The `IPAMIP` type
+
+The `IPAMIP` type allows allocating an IP from an `IPAMPrefix`. It needs to specify a target `IPAMPrefix` either by
+referencing it via its name or by a label selector.
+
+Example manifest:
+
+[//]: # (@formatter:off)
+```yaml
+apiVersion: core.onmetal.de/v1alpha1
+kind: IPAMIP
+metadata:
+  namespace: default
+  name: my-ip
+spec:
+  # ip: 10.0.0.1 # This gets patched in once allocated
+  prefixRef:
+    name: my-sub-prefix
+  # prefixSelector:
+  #   matchLabels:
+  #     foo: bar
+status:
+  conditions:
+    - type: Ready
+      status: False # This will be set to true once successfully allocated.
+      reason: Pending
+```
+[//]: # (@formatter:on)
+
 ### `Network` type
 
 The namespaced `Network` type defines a `Network` bracket. Traffic from, to and within the `Network` can be managed.
@@ -79,42 +159,40 @@ A `Network` has to specify the ip families it wants to allow (same is design as 
 
 IP address space in a `Network` is not dictated in any way. A `Network` however has to accept any claimed IP address
 space within it. For initial design, a `Network` will only accept non-overlapping space. In a later version, this may be
-regulated with e.g. a `.spec.ipPolicy`.
+regulated with a field / policy of some kind.
 
 Example manifest:
 
 ```yaml
-apiVersion: network.onmetal.de/v1alpha1
+apiVersion: core.onmetal.de/v1alpha1
 kind: Network
 metadata:
   namespace: default
   name: my-network
-spec:
-  ipFamilies:
-    - IPv4
-    - IPv6
-status:
-  used:
-    - 192.168.178.1/32
-    - 2607:f0d0:1002:51::4/128
-    - 192.168.179.0/24
-    - 10.5.3.7/32
-  conditions:
-    - type: Available # Available may be the name for this condition, though this has to be refined.
-      status: True
-      reason: PrefixAllocated
 ```
 
 ### The `NetworkInterface` type
 
-A `NetworkInterface` lets a `Machine` join a `Network`. As such, in its `spec`, it references a `Network` and
-the `Prefix` it shall allocate an IP from.
+A `NetworkInterface` is the binding piece between a `Machine` and a `Network`. A `NetworkInterface` references the
+`Network` it wants to join as well as the IPs it should use in that `Network`.
+
+The IPs (v4 / v6) can be specified in multiple ways:
+
+* Without IPAM by specifying an IP literal
+* As `ephemeralIPAMIP`, creating an `IPAMIP` that will be owned and also deleted by the `NetworkInterface`. The name of
+  the created `IPAMIP` will be `<nic-name>-<index>`, where `<index>` is the index of the `ephemeralIPAMIP` in the `ips`
+  list. An existing `IPAMIP` with that name will *not* be used for the `NetworkInterface` to avoid using an
+  unrelated `IPAMIP` by mistake.
+
+Once created and bound, a `NetworkInterface` will in turn create a `NetworkInterfaceBinding` with the same name as
+itself where the allocated IPs are stored.
 
 The binding between a `NetworkInterface` and a `Machine` is bidirectional via `NetworkInterface.spec.machineRef.name` /
 `Machine.spec.interfaces[*].name`. For the mvp, we will only allow exactly **1** `NetworkInterface` per `Machine`.
 
 Example usage:
 
+[//]: # (@formatter:off)
 ```yaml
 apiVersion: compute.onmetal.de/v1alpha1
 kind: NetworkInterface
@@ -124,20 +202,25 @@ metadata:
 spec:
   networkRef:
     name: my-network
-  prefixRef:
-    name: my-node-prefix
+  ips:
+#    - value: 10.0.0.1 # It is also possible to directly specify IPs without IPAM 
+#    - value: 2607:f0d0:1002:51::4 # Same applies for v6 addresses
+    - ephemeralIPAMIP:
+        spec:
+          prefixRef:
+            name: my-node-prefix-v4
+    - ephemeralIPAMIP:
+        spec:
+          prefixRef:
+            name: my-node-prefix-v6
   machineRef:
     name: my-machine
 status:
-  primaryIPs:
-    - 192.168.178.1
+  ips: # This will be updated with the allocated addresses.
+    - 10.0.0.1
     - 2607:f0d0:1002:51::4
-  conditions:
-    - type: Available
-      status: True
-      reason: JoinedNetwork
 ---
-apiVersion: compute.onmetal.de/v1alpha1
+apiVersion: core.onmetal.de/v1alpha1
 kind: Machine
 metadata:
   namespace: default
@@ -147,77 +230,167 @@ metadata:
 spec:
   interfaces:
     - name: my-interface
-      ref:
-        name: my-machine-interface
+      networkInterface:
+        ref:
+          name: my-machine-interface
   ...
 status:
   interfaces:
     - name: my-interface
-      primaryIPs: # The machine reports all ips available via its interfaces
+      ips: # The machine reports all ips available via its interfaces
         - 192.168.178.1
         - 2607:f0d0:1002:51::4
   ...
 ```
+[//]: # (@formatter:on)
+
+This would result in the following `NetworkInterfaceBinding`:
+
+[//]: # (@formatter:off)
+```yaml
+apiVersion: core.onmetal.de/v1alpha1
+kind: NetworkInterfaceBinding
+metadata:
+  namespace: default
+  name: my-machine-interface
+ips:
+  - 192.168.178.1
+  - 2607:f0d0:1002:51::4
+```
+[//]: # (@formatter:on)
+
+To simplify managing the creation of a `NetworkInterface` per `Machine`, a `Machine` can specify a `NetworkInterface`
+as `ephemeralNetworkInterface`, creating and owning it before the `Machine` becomes available. The name of the
+`NetworkInterface` will be `<machine-name>-<name>` where `<name>` is the `name:` value in the `interfaces` list.
+Existing `NetworkInterface`s will not be adopted by the `Machine`.
+
+Sample manifest:
+
+[//]: # (@formatter:off)
+```yaml
+apiVersion: core.onmetal.de/v1alpha1
+kind: Machine
+spec:
+  interfaces:
+    - name: my-interface
+      ephemeralNetworkInterface:
+        spec:
+          networkRef:
+            name: my-network
+          ips:
+            - ephemeralIPAMIP:
+                spec:
+                  prefixRef:
+                    name: my-node-prefix-v4
+            - ephemeralIPAMIP:
+                spec:
+                  prefixRef:
+                    name: my-node-prefix-v6
+  ...
+```
+[//]: # (@formatter:on)
 
 ### The `AliasPrefix` type.
 
-An `AliasPrefix` allows routing a sub-prefix of a network to multiple `NetworkInterface`s. It thus requires a reference
-to a `Network` as well as a reference to a `Prefix`.
+An `AliasPrefix` allows routing a sub-prefix of a network to multiple targets (in our case, `NetworkInterface`s). It
+references its target `Network` and selects the `NetworkInterfaces` via its `selector` to apply the alias to.
+
+The `AliasPrefix` creates an `AliasPrefixRouting` object with the same name as itself where it maintains a list of
+the `NetworkInterface`s matching its `selector`. If the `selector` is empty it is assumed that an external process
+manages the `AliasPrefixRouting` belonging to that `AliasPrefix`.
 
 Example manifest:
 
+[//]: # (@formatter:off)
 ```yaml
-apiVersion: network.onmetal.de
+apiVersion: core.onmetal.de/v1alpha1
 kind: AliasPrefix
 metadata:
   namespace: default
-  name: my-alias-prefix
+  name: my-pod-prefix-1
 spec:
   networkRef:
     name: my-network
-  prefixRef:
-    sizes: [ 24, 120 ]
-    name: my-prefix
+  selector:
+    matchLabels:
+      foo: bar
+  prefix:
+#    value: 10.0.0.0/24 # It's possible to directly specify the AliasPrefix value
+    ephemeralIPAMPrefix:
+      spec:
+        prefixRef:
+          name: my-pod-prefix
+        prefixLength: 24
 status:
-  prefixes:
-    - 192.168.0.0/24
-    - 2607:f0d0:1002:51::4/120
+  prefix: 10.0.0.0/24
 ```
+[//]: # (@formatter:on)
 
-This only allocates the `AliasPrefix`. To establish the binding between `AliasPrefix` and `NetworkInterface`, the
-`NetworkInterface` has to reference the desired `AliasPrefix`es:
+This could manifest in the following `AliasPrefixRouting`:
 
+[//]: # (@formatter:off)
 ```yaml
-apiVersion: compute.onmetal.de
+apiVersion: core.onmetal.de/v1alpha1
+kind: AliasPrefixRouting
+metadata:
+  namespace: default
+  name: my-pod-prefix-1
+networkRef:
+  name: my-network
+subsets:
+  - targetRef:
+      name: my-machine-interface
+      uid: 2020dcf9-e030-427e-b0fc-4fec2016e73b
+```
+[//]: # (@formatter:on)
+
+To simplify the creation and use of an `AliasPrefix` per `NetworkInterface`, a `NetworkInterface`
+allows the creation via `ephemeralAliasPrefixes`. The resulting `AliasPrefix` name will be
+`<nic-name>-<name>` where `<name>` is the name in the `ephemeralAliasPrefixes` list.
+
+It will also automatically be set in the same network and only target the hosting `NetworkInterface`.
+`selector` and `networkRef` in `spec` thus cannot be specified.
+
+[//]: # (@formatter:off)
+```yaml
+apiVersion: core.onmetal.de/v1alpha1
 kind: NetworkInterface
 metadata:
   namespace: default
   name: my-machine-interface
 spec:
-  aliasPrefixes:
-    - name: my-alias-prefix
-      ref:
-        name: my-alias-prefix
-...
-status:
-  aliasPrefixes:
-    - name: my-alias-prefix
-      prefixes:
-        - 192.168.0.0/24
-        - 2607:f0d0:1002:51::4/120
-...
+  ephemeralAliasPrefixes:
+    - name: podrange-v4
+      spec:
+        prefix:
+#          value: 10.0.0.0/24 # It's possible to directly specify the AliasPrefix value
+          ephemeralIPAMPrefix:
+            spec:
+              prefixRef:
+                name: my-pod-prefix
+              prefixLength: 24
 ```
+[//]: # (@formatter:on)
 
 ### The `VirtualIP` type
 
-A `VirtualIP` requests a stable public IP for multiple `NetworkInterface`s. We also have a
-`type` field that currently only can be `type: Public` in order to support future `VirtualIP` types (most prominently
-here `VirtualIP`s in other networks).
+A `VirtualIP` requests a stable public IP for multiple targets (`NetworkInterface`s). There is a
+`type` field that currently only can be `type: Public` in order to support other future `VirtualIP` types (for instance,
+`VirtualIP`s in other networks).
 
-As this type manages public IPs, no `prefixRef` can be specified.
+As the public prefixes are provider-managed and custom public IP pools are not in scope of this draft, the IP allocation
+cannot be influenced and thus no construct like `prefixRef` is possible for `VirtualIP`s.
+
+To disambiguate between IPv4 and IPv6, the `VirtualIP` requires an `ipFamily` (same enum type as in Kubernetes'
+`Service.spec.ipFamilies`).
+
+The `VirtualIP` creates an `VirtualIPRouting` object with the same name as itself where it maintains a list of
+the `NetworkInterface`s matching its `selector`. If the `selector` is empty it is assumed that an external process
+manages the `VirtualIPRouting` belonging to that `VirtualIP`.
 
 Example manifest:
 
+[//]: # (@formatter:off)
 ```yaml
 apiVersion: compute.onmetal.de
 kind: VirtualIP
@@ -226,34 +399,167 @@ metadata:
   name: my-virtual-ip
 spec:
   type: Public
+  ipFamily: IPv4
+  selector:
+    matchLabels:
+      foo: bar
 status:
-  ips:
-    - 45.86.152.88
-    - 2607:f0d0:1002:51::4
+  ip: 45.86.152.88
 ```
+[//]: # (@formatter:on)
 
-Again, to assign such a `VirtualIP` to a `NetworkInterface`, the `NetworkInterface` has to reference it:
+This could manifest in the following `VirtualIPRouting`:
 
+[//]: # (@formatter:off)
 ```yaml
 apiVersion: compute.onmetal.de
+kind: VirtualIPRouting
+metadata:
+  namespace: default
+  name: my-virtual-ip
+networkRef:
+  name: my-network
+subsets:
+  - targetRef:
+      name: my-machine-interface
+      uid: 2020dcf9-e030-427e-b0fc-4fec2016e73b
+```
+[//]: # (@formatter:on)
+
+To simplify the creation and use of a `VirtualIP` per `NetworkInterface`, a `NetworkInterface`
+allows the creation via `ephemeralVirtualIPs`. The resulting `VirtualPrefix` name will be
+`<nic-name>-<name>` where `<name>` is the name in the `ephemeralVirtualIPs` list. It will also automatically be set up
+to only target the creating `NetworkInterface`. A `selector` in the `spec` thus cannot be specified.
+
+[//]: # (@formatter:off)
+```yaml
+apiVersion: core.onmetal.de/v1alpha1
 kind: NetworkInterface
 metadata:
   namespace: default
   name: my-machine-interface
 spec:
-  virtualIPs:
-    - name: my-virtual-ip
-      ref:
-        name: my-virtual-ip
-...
-status:
-  virtualIPs:
-    - name: my-virtualIP
-      ips:
-        - 45.86.152.88
-        - 2607:f0d0:1002:51::4
-...
+  ephemeralVirtualIPs:
+    - name: public-v4
+      spec:
+        type: Public
+        ipFamily: IPv4
 ```
+[//]: # (@formatter:on)
+
+## Scenarios
+
+### Kubernetes (Gardener) integration on top of onmetal
+
+For a Kubernetes integration, multiple worker nodes should be created in the same network. For each worker node, a
+separate pod prefix should be allocated. For internet-facing requests, each node should get a distinct
+public `VirtualIP` (in the future, outgoing requests will be solved via `SNAT`, but for the initial version of the MVP
+a `VirtualIP` is chosen).
+
+Additionally, to show it's possible, an `AliasPrefix` that is shared across different nodes is created.
+
+These are the required manifests:
+
+[//]: # (@formatter:off)
+```yaml
+# IPAM Setup:
+# Create a root prefix and a pod / node sub-prefix.
+apiVersion: core.onmetal.de/v1alpha1
+kind: IPAMPrefix
+metadata:
+  namespace: default
+  name: root
+spec:
+  prefix: 10.0.0.0/8
+---
+apiVersion: core.onmetal.de/v1alpha1
+kind: IPAMPrefix
+metadata:
+  namespace: default
+  name: pods
+spec:
+  prefixLength: 11
+  parentRef:
+    name: root
+---
+apiVersion: core.onmetal.de/v1alpha1
+kind: IPAMPrefix
+metadata:
+  namespace: default
+  name: nodes
+spec:
+  prefixLength: 16
+  parentRef:
+    name: root
+---
+# Once IPAM is done, the concrete networking is defined
+# The Network is the bracket around all resources
+apiVersion: core.onmetal.de/v1alpha1
+kind: Network
+metadata:
+  namespace: default
+  name: k8s
+---
+# Create one prefix that should be shared across all machines
+apiVersion: core.onmetal.de/v1alpha1
+kind: AliasPrefix
+metadata:
+  namespace: default
+  name: shared
+spec:
+  networkRef:
+    name: k8s
+  selector:
+    matchLabels:
+      type: k8s-worker
+  prefix:
+    ephemeralIPAMPrefix:
+      spec:
+        prefixRef:
+          name: k8s
+        prefixLength: 16
+---
+# Create the actual machine
+apiVersion: core.onmetal.de/v1alpha1
+kind: Machine
+metadata:
+  namespace: default
+  name: worker-1
+  labels:
+    type: k8s-worker
+spec:
+  image: gardenlinux-k8s-worker:v0.23.5
+  networkInterfaces:
+    - name: primary
+      ephemeralNetworkInterface:
+        # Let the nic join the network
+        spec:
+          networkRef:
+            name: k8s
+          # The IP should be allocated from the node range
+          ips:
+            - ephemeralIPAMIP:
+                spec:
+                  prefixRef:
+                    name: nodes
+          # Create a pod alias range exclusively for this machine
+          ephemeralAliasPrefixes:
+            - name: pods
+              spec:
+                prefix:
+                  ephemeralIPAMPrefix:
+                    spec:
+                      prefixRef:
+                        name: pods
+                      prefixLength: 24
+          # Create a virtual IP exclusively for this machine
+          ephemeralVirtualIPs:
+            - name: public
+              spec:
+                type: Public
+                ipFamily: IPv4
+```
+[//]: # (@formatter:on)
 
 ## Alternatives
 
