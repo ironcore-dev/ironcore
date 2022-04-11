@@ -96,14 +96,14 @@ in that regard. For further information about Kubernetes, see
 The proposal is divided into two parts: The first part purely focuses on IP address management. The second part defines
 the actual networking types while allowing the user to use the IP address management features of the first part.
 
-### `IPAMPrefix` type
+### `Prefix` type
 
-The `IPAMPrefix` simplifies management of IP prefixes (v4 and v6 are both supported).
+The `Prefix` simplifies management of IP prefixes (v4 and v6 are both supported).
 
-An `IPAMPrefix` may be a root prefix by specifying no parent / parent selector and a prefix it manages. If
-an `IPAMPrefix` specifies a parent / parent selector, the requested prefix / prefix length is allocated from the
-parent (that matches, if selector is used). This means, prefixes can both be allocated dynamically by specifying only a
-desired prefix length or 'statically' by specifying the desired prefix.
+An `Prefix` may be a root prefix by specifying no parent / parent selector and a prefix it manages. If an `Prefix`
+specifies a parent / parent selector, the requested prefix / prefix length is allocated from the parent (that matches,
+if selector is used). This means, prefixes can both be allocated dynamically by specifying only a desired prefix length
+or 'statically' by specifying the desired prefix.
 
 Example manifests:
 
@@ -143,10 +143,10 @@ status:
 ```
 [//]: # (@formatter:on)
 
-### The `IPAMIP` type
+### The `IP` type
 
-The `IPAMIP` type allows allocating an IP from an `IPAMPrefix`. It needs to specify a target `IPAMPrefix` either by
-referencing it via its name or by a label selector.
+The `IP` type allows allocating an IP from an `Prefix`. It needs to specify a target `Prefix` either by referencing it
+via its name or by a label selector.
 
 Example manifest:
 
@@ -199,10 +199,13 @@ A `NetworkInterface` is the binding piece between a `Machine` and a `Network`. A
 The IPs (v4 / v6) can be specified in multiple ways:
 
 * Without IPAM by specifying an IP literal
-* As `ephemeralIPAMIP`, creating an `IPAMIP` that will be owned and also deleted by the `NetworkInterface`. The name of
-  the created `IPAMIP` will be `<nic-name>-<index>`, where `<index>` is the index of the `ephemeralIPAMIP` in the `ips`
-  list. An existing `IPAMIP` with that name will *not* be used for the `NetworkInterface` to avoid using an
-  unrelated `IPAMIP` by mistake.
+* As `ephemeralIP`, creating an `ipam.IP` that will be owned and also deleted by the `NetworkInterface`. The name of the
+  created `ipam.IP` will be `<nic-name>-<index>`, where `<index>` is the index of the `ephemeralIP` in the `ips`
+  list. An existing `IP` with that name will *not* be used for the `NetworkInterface` to avoid using an unrelated `IP`
+  by mistake.
+
+When specifying IPs, a user should also specify `ipFamilies`. `ipFamilies` validates that there can be either a
+single `IPv4` / `IPv6`, or an ordered list of an `IPv4` / `IPv6` address.
 
 Once created and bound, a `NetworkInterface` will in turn create a `NetworkInterfaceBinding` with the same name as
 itself where the allocated IPs are stored.
@@ -222,14 +225,15 @@ metadata:
 spec:
   networkRef:
     name: my-network
+  ipFamilies: [IPv4, IPv6]
   ips:
 #    - value: 10.0.0.1 # It is also possible to directly specify IPs without IPAM 
 #    - value: 2607:f0d0:1002:51::4 # Same applies for v6 addresses
-    - ephemeralIPAMIP:
+    - ephemeralIP:
         spec:
           prefixRef:
             name: my-node-prefix-v4
-    - ephemeralIPAMIP:
+    - ephemeralIP:
         spec:
           prefixRef:
             name: my-node-prefix-v6
@@ -250,15 +254,14 @@ metadata:
 spec:
   interfaces:
     - name: my-interface
-      networkInterface:
-        ref:
-          name: my-machine-interface
+      networkInterfaceRef:
+        name: my-machine-interface
   ...
 status:
   interfaces:
     - name: my-interface
       ips: # The machine reports all ips available via its interfaces
-        - 192.168.178.1
+        - 10.0.0.1
         - 2607:f0d0:1002:51::4
   ...
 ```
@@ -298,11 +301,11 @@ spec:
           networkRef:
             name: my-network
           ips:
-            - ephemeralIPAMIP:
+            - ephemeralIP:
                 spec:
                   prefixRef:
                     name: my-node-prefix-v4
-            - ephemeralIPAMIP:
+            - ephemeralIP:
                 spec:
                   prefixRef:
                     name: my-node-prefix-v6
@@ -331,12 +334,12 @@ metadata:
 spec:
   networkRef:
     name: my-network
-  selector:
+  networkInterfaceSelector:
     matchLabels:
       foo: bar
   prefix:
 #    value: 10.0.0.0/24 # It's possible to directly specify the AliasPrefix value
-    ephemeralIPAMPrefix:
+    ephemeralPrefix:
       spec:
         prefixRef:
           name: my-pod-prefix
@@ -384,7 +387,7 @@ spec:
       spec:
         prefix:
 #          value: 10.0.0.0/24 # It's possible to directly specify the AliasPrefix value
-          ephemeralIPAMPrefix:
+          ephemeralPrefix:
             spec:
               prefixRef:
                 name: my-pod-prefix
@@ -420,7 +423,7 @@ metadata:
 spec:
   type: Public
   ipFamily: IPv4
-  selector:
+  networkInterfaceSelector:
     matchLabels:
       foo: bar
 status:
@@ -529,11 +532,11 @@ metadata:
 spec:
   networkRef:
     name: k8s
-  selector:
+  networkInterfaceSelector:
     matchLabels:
       type: k8s-worker
   prefix:
-    ephemeralIPAMPrefix:
+    ephemeralPrefix:
       spec:
         prefixRef:
           name: k8s
@@ -558,7 +561,7 @@ spec:
             name: k8s
           # The IP should be allocated from the node range
           ips:
-            - ephemeralIPAMIP:
+            - ephemeralIP:
                 spec:
                   prefixRef:
                     name: nodes
@@ -567,7 +570,7 @@ spec:
             - name: pods
               spec:
                 prefix:
-                  ephemeralIPAMPrefix:
+                  ephemeralPrefix:
                     spec:
                       prefixRef:
                         name: pods
