@@ -5,103 +5,19 @@
 </li>
 </ul>
 <h2 id="storage.onmetal.de/v1alpha1">storage.onmetal.de/v1alpha1</h2>
+<div>
+<p>Package v1alpha1 is the v1alpha1 version of the API.</p>
+</div>
 Resource Types:
-<ul></ul>
-<h3 id="storage.onmetal.de/v1alpha1.ClaimReference">ClaimReference
-</h3>
-<p>
-(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.VolumeSpec">VolumeSpec</a>)
-</p>
-<div>
-<p>ClaimReference points to a referenced VolumeClaim.</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>name</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Name is the name of the referenced VolumeClaim.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>uid</code><br/>
-<em>
-<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/types#UID">
-k8s.io/apimachinery/pkg/types.UID
-</a>
-</em>
-</td>
-<td>
-<p>UID is the UID of the referenced VolumeClaim.</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="storage.onmetal.de/v1alpha1.MVIVolumeSource">MVIVolumeSource
-</h3>
-<p>
-(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.VolumeSpec">VolumeSpec</a>)
-</p>
-<div>
-<p>MVIVolumeSource represents storage that is managed by an external MVI volume driver.</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>secretRef</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>SecretRef references the Secret containing the access credentials to consume a Volume.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>driver</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Driver is the name of the drive to use for this volume. Required.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>volumeAttributes</code><br/>
-<em>
-map[string]string
-</em>
-</td>
-<td>
-<p>VolumeAttributes are attributes of the volume to use.</p>
-</td>
-</tr>
-</tbody>
-</table>
+<ul><li>
+<a href="#storage.onmetal.de/v1alpha1.StorageClass">StorageClass</a>
+</li><li>
+<a href="#storage.onmetal.de/v1alpha1.StoragePool">StoragePool</a>
+</li><li>
+<a href="#storage.onmetal.de/v1alpha1.Volume">Volume</a>
+</li><li>
+<a href="#storage.onmetal.de/v1alpha1.VolumeClaim">VolumeClaim</a>
+</li></ul>
 <h3 id="storage.onmetal.de/v1alpha1.StorageClass">StorageClass
 </h3>
 <div>
@@ -115,6 +31,23 @@ map[string]string
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+storage.onmetal.de/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>StorageClass</code></td>
+</tr>
 <tr>
 <td>
 <code>metadata</code><br/>
@@ -158,59 +91,8 @@ Kubernetes core/v1.ResourceList
 </table>
 </td>
 </tr>
-<tr>
-<td>
-<code>status</code><br/>
-<em>
-<a href="#storage.onmetal.de/v1alpha1.StorageClassStatus">
-StorageClassStatus
-</a>
-</em>
-</td>
-<td>
-</td>
-</tr>
 </tbody>
 </table>
-<h3 id="storage.onmetal.de/v1alpha1.StorageClassSpec">StorageClassSpec
-</h3>
-<p>
-(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.StorageClass">StorageClass</a>)
-</p>
-<div>
-<p>StorageClassSpec defines the desired state of StorageClass</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>capabilities</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#resourcelist-v1-core">
-Kubernetes core/v1.ResourceList
-</a>
-</em>
-</td>
-<td>
-<p>Capabilities describes the capabilities of a storage class</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="storage.onmetal.de/v1alpha1.StorageClassStatus">StorageClassStatus
-</h3>
-<p>
-(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.StorageClass">StorageClass</a>)
-</p>
-<div>
-<p>StorageClassStatus defines the observed state of StorageClass</p>
-</div>
 <h3 id="storage.onmetal.de/v1alpha1.StoragePool">StoragePool
 </h3>
 <div>
@@ -224,6 +106,23 @@ Kubernetes core/v1.ResourceList
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+storage.onmetal.de/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>StoragePool</code></td>
+</tr>
 <tr>
 <td>
 <code>metadata</code><br/>
@@ -289,6 +188,357 @@ StoragePoolStatus
 </em>
 </td>
 <td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="storage.onmetal.de/v1alpha1.Volume">Volume
+</h3>
+<div>
+<p>Volume is the Schema for the volumes API</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+storage.onmetal.de/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>Volume</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#storage.onmetal.de/v1alpha1.VolumeSpec">
+VolumeSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>storageClassRef</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>StorageClassRef is the storage class of a volume</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>storagePoolSelector</code><br/>
+<em>
+map[string]string
+</em>
+</td>
+<td>
+<p>StoragePoolSelector selects a suitable StoragePool by the given labels.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>storagePool</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>StoragePool indicates which storage pool to use for a volume.
+If unset, the scheduler will figure out a suitable StoragePool.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>claimRef</code><br/>
+<em>
+<a href="#storage.onmetal.de/v1alpha1.ClaimReference">
+ClaimReference
+</a>
+</em>
+</td>
+<td>
+<p>ClaimRef is the reference to the VolumeClaim used by the Volume.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>resources</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#resourcelist-v1-core">
+Kubernetes core/v1.ResourceList
+</a>
+</em>
+</td>
+<td>
+<p>Resources is a description of the volume&rsquo;s resources and capacity.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>tolerations</code><br/>
+<em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Toleration">
+[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.Toleration
+</a>
+</em>
+</td>
+<td>
+<p>Tolerations define tolerations the Volume has. Only StoragePools whose taints
+covered by Tolerations will be considered to host the Volume.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="#storage.onmetal.de/v1alpha1.VolumeStatus">
+VolumeStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="storage.onmetal.de/v1alpha1.VolumeClaim">VolumeClaim
+</h3>
+<div>
+<p>VolumeClaim is the Schema for the volumeclaims API</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+storage.onmetal.de/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>VolumeClaim</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#storage.onmetal.de/v1alpha1.VolumeClaimSpec">
+VolumeClaimSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>volumeRef</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>VolumeRef is the reference to the Volume used by the VolumeClaim</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>selector</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#labelselector-v1-meta">
+Kubernetes meta/v1.LabelSelector
+</a>
+</em>
+</td>
+<td>
+<p>Selector is a label query over volumes to consider for binding.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>resources</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#resourcelist-v1-core">
+Kubernetes core/v1.ResourceList
+</a>
+</em>
+</td>
+<td>
+<p>Resources are the requested Volume resources.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>storageClassRef</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>StorageClassRef references the StorageClass used by the Volume.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="#storage.onmetal.de/v1alpha1.VolumeClaimStatus">
+VolumeClaimStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="storage.onmetal.de/v1alpha1.ClaimReference">ClaimReference
+</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.VolumeSpec">VolumeSpec</a>)
+</p>
+<div>
+<p>ClaimReference points to a referenced VolumeClaim.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the referenced VolumeClaim.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>uid</code><br/>
+<em>
+<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/types#UID">
+k8s.io/apimachinery/pkg/types.UID
+</a>
+</em>
+</td>
+<td>
+<p>UID is the UID of the referenced VolumeClaim.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="storage.onmetal.de/v1alpha1.StorageClassSpec">StorageClassSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.StorageClass">StorageClass</a>)
+</p>
+<div>
+<p>StorageClassSpec defines the desired state of StorageClass</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>capabilities</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#resourcelist-v1-core">
+Kubernetes core/v1.ResourceList
+</a>
+</em>
+</td>
+<td>
+<p>Capabilities describes the capabilities of a storage class</p>
 </td>
 </tr>
 </tbody>
@@ -550,10 +800,13 @@ Kubernetes core/v1.ResourceList
 </tr>
 </tbody>
 </table>
-<h3 id="storage.onmetal.de/v1alpha1.Volume">Volume
+<h3 id="storage.onmetal.de/v1alpha1.VolumeAccess">VolumeAccess
 </h3>
+<p>
+(<em>Appears on:</em><a href="#storage.onmetal.de/v1alpha1.VolumeStatus">VolumeStatus</a>)
+</p>
 <div>
-<p>Volume is the Schema for the volumes API</p>
+<p>VolumeAccess represents information on how to access a volume.</p>
 </div>
 <table>
 <thead>
@@ -565,34 +818,7 @@ Kubernetes core/v1.ResourceList
 <tbody>
 <tr>
 <td>
-<code>metadata</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
-Kubernetes meta/v1.ObjectMeta
-</a>
-</em>
-</td>
-<td>
-Refer to the Kubernetes API documentation for the fields of the
-<code>metadata</code> field.
-</td>
-</tr>
-<tr>
-<td>
-<code>spec</code><br/>
-<em>
-<a href="#storage.onmetal.de/v1alpha1.VolumeSpec">
-VolumeSpec
-</a>
-</em>
-</td>
-<td>
-<br/>
-<br/>
-<table>
-<tr>
-<td>
-<code>storageClassRef</code><br/>
+<code>secretRef</code><br/>
 <em>
 <a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
@@ -600,220 +826,29 @@ Kubernetes core/v1.LocalObjectReference
 </em>
 </td>
 <td>
-<p>StorageClassRef is the storage class of a volume</p>
+<p>SecretRef references the Secret containing the access credentials to consume a Volume.</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>storagePoolSelector</code><br/>
-<em>
-map[string]string
-</em>
-</td>
-<td>
-<p>StoragePoolSelector selects a suitable StoragePool by the given labels.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>storagePool</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>StoragePool indicates which storage pool to use for a volume.
-If unset, the scheduler will figure out a suitable StoragePool.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>providerID</code><br/>
+<code>driver</code><br/>
 <em>
 string
 </em>
 </td>
 <td>
-<p>ProviderID is the unique id of the volume on provider side.</p>
+<p>Driver is the name of the drive to use for this volume. Required.</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>claimRef</code><br/>
+<code>volumeAttributes</code><br/>
 <em>
-<a href="#storage.onmetal.de/v1alpha1.ClaimReference">
-ClaimReference
-</a>
+map[string]string
 </em>
 </td>
 <td>
-<p>ClaimRef is the reference to the VolumeClaim used by the Volume.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>resources</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#resourcelist-v1-core">
-Kubernetes core/v1.ResourceList
-</a>
-</em>
-</td>
-<td>
-<p>Resources is a description of the volume&rsquo;s resources and capacity.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>tolerations</code><br/>
-<em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Toleration">
-[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.Toleration
-</a>
-</em>
-</td>
-<td>
-<p>Tolerations define tolerations the Volume has. Only StoragePools whose taints
-covered by Tolerations will be considered to host the Volume.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>mvi</code><br/>
-<em>
-<a href="#storage.onmetal.de/v1alpha1.MVIVolumeSource">
-MVIVolumeSource
-</a>
-</em>
-</td>
-<td>
-<p>MVI specifies how to manage the volume via MVI.</p>
-</td>
-</tr>
-</table>
-</td>
-</tr>
-<tr>
-<td>
-<code>status</code><br/>
-<em>
-<a href="#storage.onmetal.de/v1alpha1.VolumeStatus">
-VolumeStatus
-</a>
-</em>
-</td>
-<td>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="storage.onmetal.de/v1alpha1.VolumeClaim">VolumeClaim
-</h3>
-<div>
-<p>VolumeClaim is the Schema for the volumeclaims API</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>metadata</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
-Kubernetes meta/v1.ObjectMeta
-</a>
-</em>
-</td>
-<td>
-Refer to the Kubernetes API documentation for the fields of the
-<code>metadata</code> field.
-</td>
-</tr>
-<tr>
-<td>
-<code>spec</code><br/>
-<em>
-<a href="#storage.onmetal.de/v1alpha1.VolumeClaimSpec">
-VolumeClaimSpec
-</a>
-</em>
-</td>
-<td>
-<br/>
-<br/>
-<table>
-<tr>
-<td>
-<code>volumeRef</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>VolumeRef is the reference to the Volume used by the VolumeClaim</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>selector</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#labelselector-v1-meta">
-Kubernetes meta/v1.LabelSelector
-</a>
-</em>
-</td>
-<td>
-<p>Selector is a label query over volumes to consider for binding.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>resources</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#resourcelist-v1-core">
-Kubernetes core/v1.ResourceList
-</a>
-</em>
-</td>
-<td>
-<p>Resources are the requested Volume resources.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>storageClassRef</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>StorageClassRef references the StorageClass used by the Volume.</p>
-</td>
-</tr>
-</table>
-</td>
-</tr>
-<tr>
-<td>
-<code>status</code><br/>
-<em>
-<a href="#storage.onmetal.de/v1alpha1.VolumeClaimStatus">
-VolumeClaimStatus
-</a>
-</em>
-</td>
-<td>
+<p>VolumeAttributes are attributes of the volume to use.</p>
 </td>
 </tr>
 </tbody>
@@ -1155,17 +1190,6 @@ If unset, the scheduler will figure out a suitable StoragePool.</p>
 </tr>
 <tr>
 <td>
-<code>providerID</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>ProviderID is the unique id of the volume on provider side.</p>
-</td>
-</tr>
-<tr>
-<td>
 <code>claimRef</code><br/>
 <em>
 <a href="#storage.onmetal.de/v1alpha1.ClaimReference">
@@ -1202,19 +1226,6 @@ Kubernetes core/v1.ResourceList
 <td>
 <p>Tolerations define tolerations the Volume has. Only StoragePools whose taints
 covered by Tolerations will be considered to host the Volume.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>mvi</code><br/>
-<em>
-<a href="#storage.onmetal.de/v1alpha1.MVIVolumeSource">
-MVIVolumeSource
-</a>
-</em>
-</td>
-<td>
-<p>MVI specifies how to manage the volume via MVI.</p>
 </td>
 </tr>
 </tbody>
@@ -1297,6 +1308,21 @@ VolumePhase
 </em>
 </td>
 <td>
+<p>Conditions represents different status aspects of a Volume.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>access</code><br/>
+<em>
+<a href="#storage.onmetal.de/v1alpha1.VolumeAccess">
+VolumeAccess
+</a>
+</em>
+</td>
+<td>
+<p>Access specifies how to access a Volume.
+This is set by the volume provider when the volume is provisioned.</p>
 </td>
 </tr>
 </tbody>
@@ -1304,5 +1330,5 @@ VolumePhase
 <hr/>
 <p><em>
 Generated with <code>gen-crd-api-reference-docs</code>
-on git commit <code>7399651</code>.
+on git commit <code>23732c2</code>.
 </em></p>

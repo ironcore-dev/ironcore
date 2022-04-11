@@ -58,33 +58,6 @@ resources:
     namespaced: true
   controller: true
   domain: onmetal.de
-  group: network
-  kind: ReservedIP
-  path: github.com/onmetal/onmetal-api/apis/network/v1alpha1
-  version: v1alpha1
-- api:
-    crdVersion: v1
-    namespaced: true
-  controller: true
-  domain: onmetal.de
-  group: network
-  kind: SecurityGroup
-  path: github.com/onmetal/onmetal-api/apis/network/v1alpha1
-  version: v1alpha1
-- api:
-    crdVersion: v1
-    namespaced: true
-  controller: true
-  domain: onmetal.de
-  group: network
-  kind: Subnet
-  path: github.com/onmetal/onmetal-api/apis/network/v1alpha1
-  version: v1alpha1
-- api:
-    crdVersion: v1
-    namespaced: true
-  controller: true
-  domain: onmetal.de
   group: compute
   kind: Machine
   path: github.com/onmetal/onmetal-api/apis/compute/v1alpha1
@@ -96,83 +69,44 @@ resources:
     crdVersion: v1
     namespaced: true
   controller: true
-  domain: onmetal.de
-  group: network
-  kind: RoutingDomain
-  path: github.com/onmetal/onmetal-api/apis/network/v1alpha1
-  version: v1alpha1
-- api:
-    crdVersion: v1
-    namespaced: true
-  controller: true
-  domain: onmetal.de
-  group: network
-  kind: IPAMRange
-  path: github.com/onmetal/onmetal-api/apis/network/v1alpha1
-  version: v1alpha1
-  webhooks:
-    defaulting: true
-    validation: true
-    webhookVersion: v1
-- api:
-    crdVersion: v1
-    namespaced: true
-  controller: true
-  domain: onmetal.de
-  group: network
-  kind: Gateway
-  path: github.com/onmetal/onmetal-api/apis/network/v1alpha1
-  version: v1alpha1
-- api:
-    crdVersion: v1
-    namespaced: true
-  domain: onmetal.de
-  group: compute
-  kind: Console
-  path: github.com/onmetal/onmetal-api/apis/compute/v1alpha1
-  version: v1alpha1
-- api:
-    crdVersion: v1
-    namespaced: true
-  controller: true
-  domain: onmetal.de
-  group: network
+  domain: api.onmetal.de
+  group: ipam
   kind: Prefix
-  path: github.com/onmetal/onmetal-api/apis/network/v1alpha1
+  path: github.com/onmetal/onmetal-api/apis/ipam/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
     namespaced: true
-  domain: onmetal.de
-  group: network
+  domain: api.onmetal.de
+  group: ipam
   kind: PrefixAllocation
-  path: github.com/onmetal/onmetal-api/apis/network/v1alpha1
+  path: github.com/onmetal/onmetal-api/apis/ipam/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
     namespaced: true
   controller: true
-  domain: onmetal.de
-  group: network
+  domain: api.onmetal.de
+  group: ipam
   kind: IP
-  path: github.com/onmetal/onmetal-api/apis/network/v1alpha1
+  path: github.com/onmetal/onmetal-api/apis/ipam/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
     namespaced: true
   controller: true
-  domain: onmetal.de
-  group: network
+  domain: api.onmetal.de
+  group: ipam
   kind: ClusterPrefix
-  path: github.com/onmetal/onmetal-api/apis/network/v1alpha1
+  path: github.com/onmetal/onmetal-api/apis/ipam/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
     namespaced: true
-  domain: onmetal.de
-  group: network
+  domain: api.onmetal.de
+  group: ipam
   kind: ClusterPrefixAllocation
-  path: github.com/onmetal/onmetal-api/apis/network/v1alpha1
+  path: github.com/onmetal/onmetal-api/apis/ipam/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1

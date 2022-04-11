@@ -3,21 +3,12 @@ kind: Machine
 metadata:
   name: machine-sample
 spec:
-  hostname: myhost
+  hostname: machine-sample
   machineClass:
     name: x3.xlarge
   machinePool:
     name: default
   image: myimage_repo_location
-  sshPublicKeys:
-    - name: mykey
-  interfaces:
-    - name: myinterface
-      priority: 0 # optional
-      target:
-        name: subnet-sample
-  securityGroups:
-    - name: mysecgroup1
   volumeAttachments:
     - name: rootdisk # first disk is root disk
       # priority: 0 # optional
@@ -26,7 +17,3 @@ spec:
           name: my-volumeclaim
   ignition:
     name: my-ignition-configmap
-  efiVars:
-    - name: PK
-      uuid: 8be4df61-93ca-11d2-aa0d-00e098032b8c
-      value: pki.Gardenlinux.io/kernel.crt

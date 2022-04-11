@@ -1,4 +1,4 @@
-apiVersion: network.onmetal.de/v1alpha1
+apiVersion: ipam.api.onmetal.de/v1alpha1
 kind: ClusterPrefix
 metadata:
   name: clusterprefix-sample
@@ -7,7 +7,7 @@ metadata:
 spec:
   prefix: 10.0.0.0/8
 ---
-apiVersion: network.onmetal.de/v1alpha1
+apiVersion: ipam.api.onmetal.de/v1alpha1
 kind: ClusterPrefix
 metadata:
   name: clusterprefix-child-sample
@@ -16,7 +16,7 @@ spec:
   parentRef:
     name: clusterprefix-sample
 ---
-apiVersion: network.onmetal.de/v1alpha1
+apiVersion: ipam.api.onmetal.de/v1alpha1
 kind: ClusterPrefix
 metadata:
   name: clusterprefix-child-sample-selector
@@ -29,7 +29,7 @@ spec:
     matchLabels:
       subnet-type: public
 ---
-apiVersion: network.onmetal.de/v1alpha1
+apiVersion: ipam.api.onmetal.de/v1alpha1
 kind: Prefix
 metadata:
   name: clusterprefix-child-sample-selector
@@ -40,7 +40,7 @@ spec:
     matchLabels:
       subnet-type: public
 ---
-apiVersion: network.onmetal.de/v1alpha1
+apiVersion: ipam.api.onmetal.de/v1alpha1
 kind: IP
 metadata:
   name: clusterprefix-child-sample-selector

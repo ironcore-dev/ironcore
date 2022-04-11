@@ -1,0 +1,11 @@
+# This file is for teaching kustomize how to substitute name and namespace reference in APIService
+nameReference:
+  - kind: Service
+    version: v1
+    fieldSpecs:
+      - kind: APIService
+        version: v1
+        group: apiregistration.k8s.io
+        path: spec/service/name
+varReference:
+  - path: metadata/annotations

@@ -1,4 +1,4 @@
-#apiVersion: network.onmetal.de/v1alpha1
+#apiVersion: ipam.api.onmetal.de/v1alpha1
 #kind: IPAMRange
 #metadata:
 #  name: parent
@@ -6,7 +6,7 @@
 #  cidrs:
 #    - 10.0.0.0/16
 #---
-apiVersion: network.onmetal.de/v1alpha1
+apiVersion: ipam.api.onmetal.de/v1alpha1
 kind: IPAMRange
 metadata:
   name: child
@@ -16,7 +16,7 @@ spec:
   requests:
     - size: 17
       #---
-      #apiVersion: network.onmetal.de/v1alpha1
+      #apiVersion: ipam.api.onmetal.de/v1alpha1
       #kind: IPAMRange
       #metadata:
       #  name: grandchild
@@ -26,7 +26,7 @@ spec:
       #  requests:
       #    - size: 32
       #---
-      #apiVersion: network.onmetal.de/v1alpha1
+      #apiVersion: ipam.api.onmetal.de/v1alpha1
       #kind: IPAMRange
       #metadata:
       #  name: grandchild2

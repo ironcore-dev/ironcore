@@ -82,7 +82,7 @@ func (i *IP) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func (i *IP) MarshalJSON() ([]byte, error) {
+func (i IP) MarshalJSON() ([]byte, error) {
 	if i.IsZero() {
 		// Encode unset/nil objects as JSON's "null".
 		return []byte("null"), nil
@@ -90,7 +90,16 @@ func (i *IP) MarshalJSON() ([]byte, error) {
 	return json.Marshal(i.String())
 }
 
-func (IP) OpenAPISchemaType() []string { return []string{"string"} }
+func (i IP) ToUnstructured() interface{} {
+	if i.IsZero() {
+		return nil
+	}
+	return i.IP.String()
+}
+
+func (_ IP) OpenAPISchemaType() []string { return []string{"string"} }
+
+func (_ IP) OpenAPISchemaFormat() string { return "ip" }
 
 func NewIP(ip netaddr.IP) IP {
 	return IP{ip}
@@ -213,7 +222,7 @@ func (i *IPPrefix) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func (i *IPPrefix) MarshalJSON() ([]byte, error) {
+func (i IPPrefix) MarshalJSON() ([]byte, error) {
 	if i.IsZero() {
 		// Encode unset/nil objects as JSON's "null".
 		return []byte("null"), nil
@@ -221,11 +230,20 @@ func (i *IPPrefix) MarshalJSON() ([]byte, error) {
 	return json.Marshal(i.String())
 }
 
+func (i IPPrefix) ToUnstructured() interface{} {
+	if i.IsZero() {
+		return nil
+	}
+	return i.String()
+}
+
 func (in *IPPrefix) DeepCopyInto(out *IPPrefix) {
 	*out = *in
 }
 
-func (IPPrefix) OpenAPISchemaType() []string { return []string{"string"} }
+func (_ IPPrefix) OpenAPISchemaType() []string { return []string{"string"} }
+
+func (_ IPPrefix) OpenAPISchemaFormat() string { return "ip-prefix" }
 
 func NewIPPrefix(prefix netaddr.IPPrefix) IPPrefix {
 	return IPPrefix{IPPrefix: prefix}

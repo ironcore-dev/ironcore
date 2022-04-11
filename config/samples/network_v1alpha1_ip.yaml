@@ -1,11 +1,11 @@
-apiVersion: network.onmetal.de/v1alpha1
+apiVersion: ipam.api.onmetal.de/v1alpha1
 kind: Prefix
 metadata:
   name: ip-sample-prefix
 spec:
   prefix: 10.10.10.0/24
 ---
-apiVersion: network.onmetal.de/v1alpha1
+apiVersion: ipam.api.onmetal.de/v1alpha1
 kind: IP
 metadata:
   name: ip-sample

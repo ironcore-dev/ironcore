@@ -38,6 +38,7 @@ import (
 // VolumeClaimReconciler reconciles a VolumeClaim object
 type VolumeClaimReconciler struct {
 	client.Client
+	APIReader          client.Reader
 	Scheme             *runtime.Scheme
 	SharedFieldIndexer *clientutils.SharedFieldIndexer
 }
@@ -84,7 +85,8 @@ func (r *VolumeClaimReconciler) reconcile(ctx context.Context, log logr.Logger, 
 		Name:      claim.Spec.VolumeRef.Name,
 	}
 	log.V(1).Info("Getting volume for volume claim", "VolumeKey", volumeKey)
-	if err := r.Get(ctx, volumeKey, volume); err != nil {
+	// We have to use APIReader here as stale data might cause unbinding the already bound volume.
+	if err := r.APIReader.Get(ctx, volumeKey, volume); err != nil {
 		if !errors.IsNotFound(err) {
 			return ctrl.Result{}, fmt.Errorf("error getting volume %s for volume claim: %w", volumeKey, err)
 		}

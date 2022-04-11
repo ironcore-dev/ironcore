@@ -24,7 +24,7 @@ import (
 
 // VolumeClaimGK is a helper to easily access the GroupKind information of an VolumeClaim
 var VolumeClaimGK = schema.GroupKind{
-	Group: GroupVersion.Group,
+	Group: SchemeGroupVersion.Group,
 	Kind:  "VolumeClaim",
 }
 
@@ -59,11 +59,8 @@ const (
 	VolumeClaimLost VolumeClaimPhase = "Lost"
 )
 
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
-//+kubebuilder:printcolumn:name="ReferencedVolume",type=string,JSONPath=`.spec.volumeRef.name`
-//+kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
-//+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// +genclient
 
 // VolumeClaim is the Schema for the volumeclaims API
 type VolumeClaim struct {
@@ -74,15 +71,11 @@ type VolumeClaim struct {
 	Status VolumeClaimStatus `json:"status,omitempty"`
 }
 
-//+kubebuilder:object:root=true
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // VolumeClaimList contains a list of VolumeClaim
 type VolumeClaimList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []VolumeClaim `json:"items"`
-}
-
-func init() {
-	SchemeBuilder.Register(&VolumeClaim{}, &VolumeClaimList{})
 }

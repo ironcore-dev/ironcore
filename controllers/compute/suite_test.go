@@ -21,6 +21,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/onmetal/onmetal-api/envtestutils"
+	"github.com/onmetal/onmetal-api/envtestutils/apiserver"
+	"github.com/onmetal/onmetal-api/testdata/apiserverbin"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -34,8 +37,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
-	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
-	"github.com/onmetal/onmetal-api/controllers/network"
+	ipamv1alpha1 "github.com/onmetal/onmetal-api/apis/ipam/v1alpha1"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -48,10 +50,12 @@ const (
 )
 
 var (
-	cfg       *rest.Config
-	ctx       = ctrl.SetupSignalHandler()
-	k8sClient client.Client
-	testEnv   *envtest.Environment
+	ctx, cancel = context.WithCancel(context.Background())
+
+	cfg        *rest.Config
+	k8sClient  client.Client
+	testEnv    *envtest.Environment
+	testEnvExt *envtestutils.EnvironmentExtensions
 )
 
 func TestAPIs(t *testing.T) {
@@ -66,26 +70,42 @@ var _ = BeforeSuite(func() {
 	var err error
 
 	By("bootstrapping test environment")
-	testEnv = &envtest.Environment{
-		CRDDirectoryPaths:     []string{filepath.Join("..", "..", "config", "crd", "bases")},
-		ErrorIfCRDPathMissing: true,
+	testEnv = &envtest.Environment{}
+	testEnvExt = &envtestutils.EnvironmentExtensions{
+		APIServiceDirectoryPaths:       []string{filepath.Join("..", "..", "config", "apiserver", "apiservice", "bases")},
+		ErrorIfAPIServicePathIsMissing: true,
 	}
 
-	cfg, err = testEnv.Start()
+	cfg, err = envtestutils.StartWithExtensions(testEnv, testEnvExt)
 	Expect(err).NotTo(HaveOccurred())
 	Expect(cfg).NotTo(BeNil())
 
-	err = computev1alpha1.AddToScheme(scheme.Scheme)
-	Expect(err).NotTo(HaveOccurred())
-	Expect(networkv1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
-
-	Expect(networkv1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
+	Expect(computev1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
+	Expect(ipamv1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
 
 	//+kubebuilder:scaffold:scheme
 
 	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
 	Expect(err).NotTo(HaveOccurred())
 	Expect(k8sClient).NotTo(BeNil())
+
+	apiSrv, err := apiserver.New(cfg, apiserver.Options{
+		Command:     []string{apiserverbin.Path},
+		ETCDServers: []string{testEnv.ControlPlane.Etcd.URL.String()},
+		Host:        testEnvExt.APIServiceInstallOptions.LocalServingHost,
+		Port:        testEnvExt.APIServiceInstallOptions.LocalServingPort,
+		CertDir:     testEnvExt.APIServiceInstallOptions.LocalServingCertDir,
+	})
+	Expect(err).NotTo(HaveOccurred())
+
+	go func() {
+		defer GinkgoRecover()
+		err := apiSrv.Start(ctx)
+		Expect(err).NotTo(HaveOccurred())
+	}()
+
+	err = envtestutils.WaitUntilAPIServicesReadyWithTimeout(30*time.Second, testEnvExt, k8sClient, scheme.Scheme)
+	Expect(err).NotTo(HaveOccurred())
 }, 60)
 
 // SetupTest returns a namespace which will be created before each ginkgo `It` block and deleted at the end of `It`
@@ -125,20 +145,10 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		Expect((&MachineClassReconciler{
-			Client: k8sManager.GetClient(),
-			Scheme: k8sManager.GetScheme(),
+			Client:    k8sManager.GetClient(),
+			APIReader: k8sManager.GetAPIReader(),
+			Scheme:    k8sManager.GetScheme(),
 		}).SetupWithManager(k8sManager)).To(Succeed())
-		err = (&network.SubnetReconciler{
-			Client: k8sManager.GetClient(),
-			Scheme: k8sManager.GetScheme(),
-		}).SetupWithManager(k8sManager)
-		Expect(err).ToNot(HaveOccurred())
-
-		err = (&network.IPAMRangeReconciler{
-			Client: k8sManager.GetClient(),
-			Scheme: k8sManager.GetScheme(),
-		}).SetupWithManager(k8sManager)
-		Expect(err).ToNot(HaveOccurred())
 
 		go func() {
 			Expect(k8sManager.Start(mgrCtx)).To(Succeed(), "failed to start manager")
@@ -155,6 +165,7 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 }
 
 var _ = AfterSuite(func() {
+	cancel()
 	By("tearing down the test environment")
 	err := testEnv.Stop()
 	Expect(err).NotTo(HaveOccurred())

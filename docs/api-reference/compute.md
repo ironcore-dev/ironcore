@@ -5,12 +5,21 @@
 </li>
 </ul>
 <h2 id="compute.onmetal.de/v1alpha1">compute.onmetal.de/v1alpha1</h2>
+<div>
+<p>Package v1alpha1 is the v1alpha1 version of the API.</p>
+</div>
 Resource Types:
-<ul></ul>
-<h3 id="compute.onmetal.de/v1alpha1.Console">Console
+<ul><li>
+<a href="#compute.onmetal.de/v1alpha1.Machine">Machine</a>
+</li><li>
+<a href="#compute.onmetal.de/v1alpha1.MachineClass">MachineClass</a>
+</li><li>
+<a href="#compute.onmetal.de/v1alpha1.MachinePool">MachinePool</a>
+</li></ul>
+<h3 id="compute.onmetal.de/v1alpha1.Machine">Machine
 </h3>
 <div>
-<p>Console is the Schema for the consoles API</p>
+<p>Machine is the Schema for the machines API</p>
 </div>
 <table>
 <thead>
@@ -20,6 +29,23 @@ Resource Types:
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+compute.onmetal.de/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>Machine</code></td>
+</tr>
 <tr>
 <td>
 <code>metadata</code><br/>
@@ -38,8 +64,8 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.ConsoleSpec">
-ConsoleSpec
+<a href="#compute.onmetal.de/v1alpha1.MachineSpec">
+MachineSpec
 </a>
 </em>
 </td>
@@ -49,7 +75,18 @@ ConsoleSpec
 <table>
 <tr>
 <td>
-<code>machineRef</code><br/>
+<code>hostname</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Hostname is the hostname of the machine</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>machineClass</code><br/>
 <em>
 <a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
@@ -57,7 +94,123 @@ Kubernetes core/v1.LocalObjectReference
 </em>
 </td>
 <td>
-<p>MachineRef references the machine to open a console to.</p>
+<p>MachineClass is a reference to the machine class/flavor of the machine.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>machinePoolSelector</code><br/>
+<em>
+map[string]string
+</em>
+</td>
+<td>
+<p>MachinePoolSelector selects a suitable MachinePool by the given labels.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>machinePool</code><br/>
+<em>
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>MachinePool defines machine pool to run the machine in.
+If empty, a scheduler will figure out an appropriate pool to run the machine in.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>image</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Image is the URL providing the operating system image of the machine.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>interfaces</code><br/>
+<em>
+<a href="#compute.onmetal.de/v1alpha1.Interface">
+[]Interface
+</a>
+</em>
+</td>
+<td>
+<p>Interfaces define a list of network interfaces present on the machine</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>securityGroups</code><br/>
+<em>
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
+[]Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>SecurityGroups is a list of security groups of a machine</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>volumeAttachments</code><br/>
+<em>
+<a href="#compute.onmetal.de/v1alpha1.VolumeAttachment">
+[]VolumeAttachment
+</a>
+</em>
+</td>
+<td>
+<p>VolumeAttachments are volumes attached to this machine.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ignition</code><br/>
+<em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ConfigMapKeySelector">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.ConfigMapKeySelector
+</a>
+</em>
+</td>
+<td>
+<p>Ignition is a reference to a config map containing the ignition YAML for the machine to boot up.
+If key is empty, DefaultIgnitionKey will be used as fallback.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>efiVars</code><br/>
+<em>
+<a href="#compute.onmetal.de/v1alpha1.EFIVar">
+[]EFIVar
+</a>
+</em>
+</td>
+<td>
+<p>EFIVars are variables to pass to EFI while booting up.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>tolerations</code><br/>
+<em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Toleration">
+[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.Toleration
+</a>
+</em>
+</td>
+<td>
+<p>Tolerations define tolerations the Machine has. Only MachinePools whose taints
+covered by Tolerations will be considered to run the Machine.</p>
 </td>
 </tr>
 </table>
@@ -67,8 +220,8 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>status</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.ConsoleStatus">
-ConsoleStatus
+<a href="#compute.onmetal.de/v1alpha1.MachineStatus">
+MachineStatus
 </a>
 </em>
 </td>
@@ -77,12 +230,10 @@ ConsoleStatus
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.ConsoleClientConfig">ConsoleClientConfig
+<h3 id="compute.onmetal.de/v1alpha1.MachineClass">MachineClass
 </h3>
-<p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.ConsoleStatus">ConsoleStatus</a>)
-</p>
 <div>
+<p>MachineClass is the Schema for the machineclasses API</p>
 </div>
 <table>
 <thead>
@@ -94,26 +245,70 @@ ConsoleStatus
 <tbody>
 <tr>
 <td>
-<code>service</code><br/>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+compute.onmetal.de/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>MachineClass</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.ServiceReference">
-ServiceReference
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
 </td>
 <td>
-<p>Service is the service to connect to.</p>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#compute.onmetal.de/v1alpha1.MachineClassSpec">
+MachineClassSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>capabilities</code><br/>
+<em>
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#resourcelist-v1-core">
+Kubernetes core/v1.ResourceList
+</a>
+</em>
+</td>
+<td>
+<p>Capabilities describes the resources a machine class can provide.</p>
+</td>
+</tr>
+</table>
 </td>
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.ConsoleSpec">ConsoleSpec
+<h3 id="compute.onmetal.de/v1alpha1.MachinePool">MachinePool
 </h3>
-<p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.Console">Console</a>)
-</p>
 <div>
-<p>ConsoleSpec defines the desired state of Console</p>
+<p>MachinePool is the Schema for the machinepools API</p>
 </div>
 <table>
 <thead>
@@ -125,83 +320,86 @@ ServiceReference
 <tbody>
 <tr>
 <td>
-<code>machineRef</code><br/>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+compute.onmetal.de/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>MachinePool</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
 <em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
 </td>
 <td>
-<p>MachineRef references the machine to open a console to.</p>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
 </td>
 </tr>
-</tbody>
-</table>
-<h3 id="compute.onmetal.de/v1alpha1.ConsoleState">ConsoleState
-(<code>string</code> alias)</h3>
-<p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.ConsoleStatus">ConsoleStatus</a>)
-</p>
-<div>
-<p>ConsoleState is a state a Console can be in.</p>
-</div>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#compute.onmetal.de/v1alpha1.MachinePoolSpec">
+MachinePoolSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
 <table>
-<thead>
 <tr>
-<th>Value</th>
-<th>Description</th>
+<td>
+<code>providerID</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>ProviderID identifies the MachinePool on provider side.</p>
+</td>
 </tr>
-</thead>
-<tbody><tr><td><p>&#34;Error&#34;</p></td>
-<td></td>
-</tr><tr><td><p>&#34;Pending&#34;</p></td>
-<td></td>
-</tr><tr><td><p>&#34;Ready&#34;</p></td>
-<td></td>
-</tr></tbody>
+<tr>
+<td>
+<code>taints</code><br/>
+<em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Taint">
+[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.Taint
+</a>
+</em>
+</td>
+<td>
+<p>Taints of the MachinePool. Only Machines who tolerate all the taints
+will land in the MachinePool.</p>
+</td>
+</tr>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.ConsoleStatus">ConsoleStatus
-</h3>
-<p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.Console">Console</a>)
-</p>
-<div>
-<p>ConsoleStatus defines the observed state of Console</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>state</code><br/>
-<em>
-<a href="#compute.onmetal.de/v1alpha1.ConsoleState">
-ConsoleState
-</a>
-</em>
-</td>
-<td>
-<p>State is the state of a Console.</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>clientConfig</code><br/>
+<code>status</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.ConsoleClientConfig">
-ConsoleClientConfig
+<a href="#compute.onmetal.de/v1alpha1.MachinePoolStatus">
+MachinePoolStatus
 </a>
 </em>
 </td>
 <td>
-<p>ClientConfig is the client configuration to connect to a console.
-Only usable if the ConsoleStatus.State is ConsoleStateReady.</p>
 </td>
 </tr>
 </tbody>
@@ -373,286 +571,6 @@ int32
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.Machine">Machine
-</h3>
-<div>
-<p>Machine is the Schema for the machines API</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>metadata</code><br/>
-<em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#objectmeta-v1-meta">
-Kubernetes meta/v1.ObjectMeta
-</a>
-</em>
-</td>
-<td>
-Refer to the Kubernetes API documentation for the fields of the
-<code>metadata</code> field.
-</td>
-</tr>
-<tr>
-<td>
-<code>spec</code><br/>
-<em>
-<a href="#compute.onmetal.de/v1alpha1.MachineSpec">
-MachineSpec
-</a>
-</em>
-</td>
-<td>
-<br/>
-<br/>
-<table>
-<tr>
-<td>
-<code>hostname</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Hostname is the hostname of the machine</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>machineClass</code><br/>
-<em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>MachineClass is a reference to the machine class/flavor of the machine.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>machinePoolSelector</code><br/>
-<em>
-map[string]string
-</em>
-</td>
-<td>
-<p>MachinePoolSelector selects a suitable MachinePool by the given labels.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>machinePool</code><br/>
-<em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>MachinePool defines machine pool to run the machine in.
-If empty, a scheduler will figure out an appropriate pool to run the machine in.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>image</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Image is the URL providing the operating system image of the machine.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>sshPublicKeys</code><br/>
-<em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.SecretKeySelector">
-[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.SecretKeySelector
-</a>
-</em>
-</td>
-<td>
-<p>SSHPublicKeys is a list of SSH public key secret references of a machine.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>interfaces</code><br/>
-<em>
-<a href="#compute.onmetal.de/v1alpha1.Interface">
-[]Interface
-</a>
-</em>
-</td>
-<td>
-<p>Interfaces define a list of network interfaces present on the machine</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>securityGroups</code><br/>
-<em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
-[]Kubernetes core/v1.LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>SecurityGroups is a list of security groups of a machine</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>volumeAttachments</code><br/>
-<em>
-<a href="#compute.onmetal.de/v1alpha1.VolumeAttachment">
-[]VolumeAttachment
-</a>
-</em>
-</td>
-<td>
-<p>VolumeAttachments are volumes attached to this machine.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>ignition</code><br/>
-<em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ConfigMapKeySelector">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ConfigMapKeySelector
-</a>
-</em>
-</td>
-<td>
-<p>Ignition is a reference to a config map containing the ignition YAML for the machine to boot up.
-If key is empty, DefaultIgnitionKey will be used as fallback.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>efiVars</code><br/>
-<em>
-<a href="#compute.onmetal.de/v1alpha1.EFIVar">
-[]EFIVar
-</a>
-</em>
-</td>
-<td>
-<p>EFIVars are variables to pass to EFI while booting up.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>tolerations</code><br/>
-<em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Toleration">
-[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.Toleration
-</a>
-</em>
-</td>
-<td>
-<p>Tolerations define tolerations the Machine has. Only MachinePools whose taints
-covered by Tolerations will be considered to run the Machine.</p>
-</td>
-</tr>
-</table>
-</td>
-</tr>
-<tr>
-<td>
-<code>status</code><br/>
-<em>
-<a href="#compute.onmetal.de/v1alpha1.MachineStatus">
-MachineStatus
-</a>
-</em>
-</td>
-<td>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="compute.onmetal.de/v1alpha1.MachineClass">MachineClass
-</h3>
-<div>
-<p>MachineClass is the Schema for the machineclasses API</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>metadata</code><br/>
-<em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#objectmeta-v1-meta">
-Kubernetes meta/v1.ObjectMeta
-</a>
-</em>
-</td>
-<td>
-Refer to the Kubernetes API documentation for the fields of the
-<code>metadata</code> field.
-</td>
-</tr>
-<tr>
-<td>
-<code>spec</code><br/>
-<em>
-<a href="#compute.onmetal.de/v1alpha1.MachineClassSpec">
-MachineClassSpec
-</a>
-</em>
-</td>
-<td>
-<br/>
-<br/>
-<table>
-<tr>
-<td>
-<code>capabilities</code><br/>
-<em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#resourcelist-v1-core">
-Kubernetes core/v1.ResourceList
-</a>
-</em>
-</td>
-<td>
-<p>Capabilities describes the resources a machine class can provide.</p>
-</td>
-</tr>
-</table>
-</td>
-</tr>
-<tr>
-<td>
-<code>status</code><br/>
-<em>
-<a href="#compute.onmetal.de/v1alpha1.MachineClassStatus">
-MachineClassStatus
-</a>
-</em>
-</td>
-<td>
-</td>
-</tr>
-</tbody>
-</table>
 <h3 id="compute.onmetal.de/v1alpha1.MachineClassSpec">MachineClassSpec
 </h3>
 <p>
@@ -684,14 +602,6 @@ Kubernetes core/v1.ResourceList
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.MachineClassStatus">MachineClassStatus
-</h3>
-<p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.MachineClass">MachineClass</a>)
-</p>
-<div>
-<p>MachineClassStatus defines the observed state of MachineClass</p>
-</div>
 <h3 id="compute.onmetal.de/v1alpha1.MachineCondition">MachineCondition
 </h3>
 <p>
@@ -814,88 +724,6 @@ Kubernetes meta/v1.Time
 <td><p>MachineSynced represents the condition of a machine being synced with its backing resources</p>
 </td>
 </tr></tbody>
-</table>
-<h3 id="compute.onmetal.de/v1alpha1.MachinePool">MachinePool
-</h3>
-<div>
-<p>MachinePool is the Schema for the machinepools API</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>metadata</code><br/>
-<em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#objectmeta-v1-meta">
-Kubernetes meta/v1.ObjectMeta
-</a>
-</em>
-</td>
-<td>
-Refer to the Kubernetes API documentation for the fields of the
-<code>metadata</code> field.
-</td>
-</tr>
-<tr>
-<td>
-<code>spec</code><br/>
-<em>
-<a href="#compute.onmetal.de/v1alpha1.MachinePoolSpec">
-MachinePoolSpec
-</a>
-</em>
-</td>
-<td>
-<br/>
-<br/>
-<table>
-<tr>
-<td>
-<code>providerID</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>ProviderID identifies the MachinePool on provider side.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>taints</code><br/>
-<em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Taint">
-[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.Taint
-</a>
-</em>
-</td>
-<td>
-<p>Taints of the MachinePool. Only Machines who tolerate all the taints
-will land in the MachinePool.</p>
-</td>
-</tr>
-</table>
-</td>
-</tr>
-<tr>
-<td>
-<code>status</code><br/>
-<em>
-<a href="#compute.onmetal.de/v1alpha1.MachinePoolStatus">
-MachinePoolStatus
-</a>
-</em>
-</td>
-<td>
-</td>
-</tr>
-</tbody>
 </table>
 <h3 id="compute.onmetal.de/v1alpha1.MachinePoolCondition">MachinePoolCondition
 </h3>
@@ -1208,19 +1036,6 @@ string
 </tr>
 <tr>
 <td>
-<code>sshPublicKeys</code><br/>
-<em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.SecretKeySelector">
-[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.SecretKeySelector
-</a>
-</em>
-</td>
-<td>
-<p>SSHPublicKeys is a list of SSH public key secret references of a machine.</p>
-</td>
-</tr>
-<tr>
-<td>
 <code>interfaces</code><br/>
 <em>
 <a href="#compute.onmetal.de/v1alpha1.Interface">
@@ -1413,61 +1228,6 @@ MachineState
 <td></td>
 </tr></tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.ServiceReference">ServiceReference
-</h3>
-<p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.ConsoleClientConfig">ConsoleClientConfig</a>)
-</p>
-<div>
-<p>ServiceReference is a reference to a Service in the same namespace as the referent.</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>name</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Name of the referenced service.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>path</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p><code>path</code> is an optional URL path which will be sent in any request to
-this service.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>port</code><br/>
-<em>
-int32
-</em>
-</td>
-<td>
-<p>Port on the service hosting the console.
-Defaults to 443 for backward compatibility.
-<code>port</code> should be a valid port number (1-65535, inclusive).</p>
-</td>
-</tr>
-</tbody>
-</table>
 <h3 id="compute.onmetal.de/v1alpha1.VolumeAttachment">VolumeAttachment
 </h3>
 <p>
@@ -1593,6 +1353,17 @@ int32
 <p>Priority is the OS priority of the volume.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>deviceID</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>DeviceID is the disk device ID on the host.</p>
+</td>
+</tr>
 </tbody>
 </table>
 <h3 id="compute.onmetal.de/v1alpha1.VolumeClaimAttachmentSource">VolumeClaimAttachmentSource
@@ -1629,5 +1400,5 @@ Kubernetes core/v1.LocalObjectReference
 <hr/>
 <p><em>
 Generated with <code>gen-crd-api-reference-docs</code>
-on git commit <code>7399651</code>.
+on git commit <code>23732c2</code>.
 </em></p>

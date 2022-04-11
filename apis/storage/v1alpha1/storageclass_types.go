@@ -22,8 +22,8 @@ import (
 )
 
 var (
-	// StorageClassFinalizer
-	StorageClassFinalizer = GroupVersion.Group + "/storageclass"
+	// StorageClassFinalizer is the finalizer for StorageClass.
+	StorageClassFinalizer = SchemeGroupVersion.Group + "/storageclass"
 )
 
 // StorageClassSpec defines the desired state of StorageClass
@@ -32,33 +32,24 @@ type StorageClassSpec struct {
 	Capabilities corev1.ResourceList `json:"capabilities,omitempty"`
 }
 
-// StorageClassStatus defines the observed state of StorageClass
-type StorageClassStatus struct {
-}
-
-//+kubebuilder:object:root=true
-//+kubebuilder:resource:scope=Cluster
-//+kubebuilder:subresource:status
-//+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// +genclient
+// +genclient:nonNamespaced
+// +genclient:noStatus
 
 // StorageClass is the Schema for the storageclasses API
 type StorageClass struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   StorageClassSpec   `json:"spec,omitempty"`
-	Status StorageClassStatus `json:"status,omitempty"`
+	Spec StorageClassSpec `json:"spec,omitempty"`
 }
 
-//+kubebuilder:object:root=true
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // StorageClassList contains a list of StorageClass
 type StorageClassList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []StorageClass `json:"items"`
-}
-
-func init() {
-	SchemeBuilder.Register(&StorageClass{}, &StorageClassList{})
 }

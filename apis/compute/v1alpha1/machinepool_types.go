@@ -70,11 +70,9 @@ const (
 	MachinePoolStateOffline MachinePoolState = "Offline"
 )
 
-//+kubebuilder:object:root=true
-//+kubebuilder:resource:scope=Cluster
-//+kubebuilder:subresource:status
-//+kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.state`
-//+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// +genclient
+// +genClient:nonNamespaced
 
 // MachinePool is the Schema for the machinepools API
 type MachinePool struct {
@@ -85,15 +83,11 @@ type MachinePool struct {
 	Status MachinePoolStatus `json:"status,omitempty"`
 }
 
-//+kubebuilder:object:root=true
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // MachinePoolList contains a list of MachinePool
 type MachinePoolList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []MachinePool `json:"items"`
-}
-
-func init() {
-	SchemeBuilder.Register(&MachinePool{}, &MachinePoolList{})
 }

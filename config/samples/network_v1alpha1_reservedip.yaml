@@ -1,4 +1,4 @@
-apiVersion: network.onmetal.de/v1alpha1
+apiVersion: ipam.api.onmetal.de/v1alpha1
 kind: ReservedIP
 metadata:
   name: myreservedip
