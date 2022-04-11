@@ -35,7 +35,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-// VolumeClaimReconciler reconciles a VolumeClaim object
+// VolumeClaimReconciler reconciles a VolumeClaimRef object
 type VolumeClaimReconciler struct {
 	client.Client
 	APIReader          client.Reader
@@ -43,12 +43,12 @@ type VolumeClaimReconciler struct {
 	SharedFieldIndexer *clientutils.SharedFieldIndexer
 }
 
-//+kubebuilder:rbac:groups=storage.onmetal.de,resources=volumeclaims,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=storage.onmetal.de,resources=volumeclaims/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=storage.onmetal.de,resources=volumeclaims/finalizers,verbs=update
-//+kubebuilder:rbac:groups=storage.onmetal.de,resources=volumes,verbs=get;list
+//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumeclaims,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumeclaims/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumeclaims/finalizers,verbs=update
+//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes,verbs=get;list
 
-// Reconcile is part of the main reconciliation loop for VolumeClaim types
+// Reconcile is part of the main reconciliation loop for VolumeClaimRef types
 func (r *VolumeClaimReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
 	claim := &storagev1alpha1.VolumeClaim{}

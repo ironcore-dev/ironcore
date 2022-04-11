@@ -33,7 +33,7 @@ import (
 func GetAttrs(obj runtime.Object) (labels.Set, fields.Set, error) {
 	volumeClaim, ok := obj.(*storage.VolumeClaim)
 	if !ok {
-		return nil, nil, fmt.Errorf("given object is not a VolumeClaim")
+		return nil, nil, fmt.Errorf("given object is not a VolumeClaimRef")
 	}
 	return volumeClaim.Labels, SelectableFields(volumeClaim), nil
 }
@@ -102,7 +102,7 @@ var StatusStrategy = volumeClaimStatusStrategy{Strategy}
 
 func (volumeClaimStatusStrategy) GetResetFields() map[fieldpath.APIVersion]*fieldpath.Set {
 	return map[fieldpath.APIVersion]*fieldpath.Set{
-		"storage.onmetal.de/v1alpha1": fieldpath.NewSet(
+		"storage.api.onmetal.de/v1alpha1": fieldpath.NewSet(
 			fieldpath.MakePathOrDie("spec"),
 		),
 	}

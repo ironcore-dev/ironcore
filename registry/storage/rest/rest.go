@@ -18,15 +18,15 @@ import (
 	"github.com/onmetal/onmetal-api/api"
 	"github.com/onmetal/onmetal-api/apis/storage"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
-	storagepoolstorage "github.com/onmetal/onmetal-api/registry/storage/storagepool/storage"
 	volumestorage "github.com/onmetal/onmetal-api/registry/storage/volume/storage"
 	volumeclaimstorage "github.com/onmetal/onmetal-api/registry/storage/volumeclaim/storage"
+	volumepoolstorage "github.com/onmetal/onmetal-api/registry/storage/volumepool/storage"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apiserver/pkg/registry/generic"
 	"k8s.io/apiserver/pkg/registry/rest"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 
-	storageclassstore "github.com/onmetal/onmetal-api/registry/storage/storageclass/storage"
+	volumeclassstore "github.com/onmetal/onmetal-api/registry/storage/volumeclass/storage"
 
 	serverstorage "k8s.io/apiserver/pkg/server/storage"
 )
@@ -55,20 +55,20 @@ func (p StorageProvider) NewRESTStorage(apiResourceConfigSource serverstorage.AP
 func (p StorageProvider) v1alpha1Storage(restOptionsGetter generic.RESTOptionsGetter) (map[string]rest.Storage, error) {
 	storageMap := map[string]rest.Storage{}
 
-	storageClassStorage, err := storageclassstore.NewStorage(restOptionsGetter)
+	volumeClassStorage, err := volumeclassstore.NewStorage(restOptionsGetter)
 	if err != nil {
 		return storageMap, err
 	}
 
-	storageMap["storageclasses"] = storageClassStorage.StorageClass
+	storageMap["volumeclasses"] = volumeClassStorage.VolumeClass
 
-	storagePoolStorage, err := storagepoolstorage.NewStorage(restOptionsGetter)
+	volumePoolStorage, err := volumepoolstorage.NewStorage(restOptionsGetter)
 	if err != nil {
 		return storageMap, err
 	}
 
-	storageMap["storagepools"] = storagePoolStorage.StoragePool
-	storageMap["storagepools/status"] = storagePoolStorage.Status
+	storageMap["volumepools"] = volumePoolStorage.VolumePool
+	storageMap["volumepools/status"] = volumePoolStorage.Status
 
 	volumeStorage, err := volumestorage.NewStorage(restOptionsGetter)
 	if err != nil {

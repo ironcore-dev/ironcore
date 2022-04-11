@@ -19,7 +19,7 @@
 // +k8s:openapi-gen=true
 // +k8s:defaulter-gen=TypeMeta
 // +k8s:protobuf-gen=package
-// +groupName=storage.onmetal.de
+// +groupName=storage.api.onmetal.de
 
 // Package v1alpha1 is the v1alpha1 version of the API.
 package v1alpha1 // import "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"

@@ -160,7 +160,7 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 			Events: k8sManager.GetEventRecorderFor("volume-scheduler"),
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
-		Expect((&StorageClassReconciler{
+		Expect((&VolumeClassReconciler{
 			Client:    k8sManager.GetClient(),
 			APIReader: k8sManager.GetAPIReader(),
 			Scheme:    k8sManager.GetScheme(),
@@ -174,7 +174,7 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 	AfterEach(func() {
 		cancel()
 		Expect(k8sClient.Delete(ctx, ns)).To(Succeed(), "failed to delete test namespace")
-		Expect(k8sClient.DeleteAllOf(ctx, &storagev1alpha1.StoragePool{})).To(Succeed())
+		Expect(k8sClient.DeleteAllOf(ctx, &storagev1alpha1.VolumePool{})).To(Succeed())
 	})
 
 	return ns

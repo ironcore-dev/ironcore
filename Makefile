@@ -19,6 +19,7 @@ endif
 SHELL = /usr/bin/env bash -o pipefail
 .SHELLFLAGS = -ec
 
+.PHONY: all
 all: build
 
 ##@ General
@@ -34,23 +35,29 @@ all: build
 # More info on the awk command:
 # http://linuxcommand.org/lc3_adv_awk.php
 
+.PHONY: help
 help: ## Display this help.
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
 ##@ Development
 
+.PHONY: manifests
 manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
 	$(CONTROLLER_GEN) rbac:roleName=manager-role webhook paths="./controllers/...;./apis/..." output:rbac:artifacts:config=config/controller/rbac
 
+.PHONY: generate
 generate:
 	./hack/update-codegen.sh
 
+.PHONY: fmt
 fmt: ## Run go fmt against code.
 	go fmt ./...
 
+.PHONY: vet
 vet: ## Run go vet against code.
 	go vet ./...
 
+.PHONY: lint
 lint:
 	golangci-lint run ./...
 
@@ -63,23 +70,27 @@ addlicense: ## Add license headers to all go files.
 checklicense: ## Check that every file has a license header present.
 	find . -name '*.go' -exec go run github.com/google/addlicense  -check -c 'OnMetal authors' {} +
 
+.PHONY: check
 check: manifests generate addlicense lint test # Generate manifests, code, lint, add licenses, test
 
 .PHONY: docs
 docs: ## Run go generate to generate API reference documentation.
 	go run github.com/ahmetb/gen-crd-api-reference-docs -api-dir ./apis/common/v1alpha1 -config ./hack/api-reference/common-config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/common.md
 	go run github.com/ahmetb/gen-crd-api-reference-docs -api-dir ./apis/compute/v1alpha1 -config ./hack/api-reference/compute-config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/compute.md
-	go run github.com/ahmetb/gen-crd-api-reference-docs -api-dir ./apis/ipam/v1alpha1 -config ./hack/api-reference/network-config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/network.md
+	go run github.com/ahmetb/gen-crd-api-reference-docs -api-dir ./apis/ipam/v1alpha1 -config ./hack/api-reference/ipam-config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/ipam.md
 	go run github.com/ahmetb/gen-crd-api-reference-docs -api-dir ./apis/storage/v1alpha1 -config ./hack/api-reference/storage-config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/storage.md
 
+.PHONY: start-docs
 start-docs: ## Start the local mkdocs based development environment.
 	docker build -t $(IMAGE) -f docs/Dockerfile .
 	docker run -p 8000:8000 -v `pwd`/:/docs $(IMAGE)
 
+.PHONY: clean-docs
 clean-docs: ## Remove all local mkdocs Docker images (cleanup).
 	docker container prune --force --filter "label=project=onmetal_api_documentation"
 
 ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
+.PHONY: test
 test: manifests generate fmt vet ## Run tests.
 	mkdir -p ${ENVTEST_ASSETS_DIR}
 	test -f ${ENVTEST_ASSETS_DIR}/setup-envtest.sh || curl -sSLo ${ENVTEST_ASSETS_DIR}/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/v0.8.3/hack/setup-envtest.sh
@@ -87,33 +98,41 @@ test: manifests generate fmt vet ## Run tests.
 
 ##@ Build
 
+.PHONY: build
 build: generate fmt vet ## Build manager binary.
 	go build -o bin/manager main.go
 
+.PHONY: run
 run: manifests generate fmt vet ## Run a controller from your host.
 	go run ./main.go
 
+.PHONY: docker-build
 docker-build: test ## Build docker image with the manager.
 	docker build --target apiserver -t ${CONTROLLER_IMG} .
 	docker build --target manager -t ${APISERVER_IMG} .
 
+.PHONY: docker-push
 docker-push: ## Push docker image with the manager.
 	docker push ${CONTROLLER_IMG}
 	docker push ${APISERVER_IMG}
 
 ##@ Deployment
 
+.PHONY: install
 install: manifests kustomize ## Install API server & API services into the K8s cluster specified in ~/.kube/config. This requires APISERVER_IMG to be available for the cluster.
 	cd config/apiserver/server && $(KUSTOMIZE) edit set image apiserver=${APISERVER_IMG}
 	kubectl apply -k config/apiserver/default
 
+.PHONY: uninstall
 uninstall: manifests kustomize ## Uninstall API server & API services from the K8s cluster specified in ~/.kube/config.
 	kubectl delete -k config/apiserver/default
 
+.PHONY: deploy
 deploy: manifests kustomize ## Deploy controller to the K8s cluster specified in ~/.kube/config.
 	cd config/controller/manager && $(KUSTOMIZE) edit set image controller=${CONTROLLER_IMG}
 	kubectl apply -k config/controller/default
 
+.PHONY: undeploy
 undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/config.
 	kubectl delete -k config/controller/default
 
@@ -186,10 +205,12 @@ kind-deploy: kind-build-load-restart kind-apply ## Build and load apiserver and 
 ##@ Tools
 
 CONTROLLER_GEN = $(shell pwd)/bin/controller-gen
+.PHONY: controller-gen
 controller-gen: ## Download controller-gen locally if necessary.
 	$(call go-get-tool,$(CONTROLLER_GEN),sigs.k8s.io/controller-tools/cmd/controller-gen@v0.6.2)
 
 KUSTOMIZE = $(shell pwd)/bin/kustomize
+.PHONY: kustomize
 kustomize: ## Download kustomize locally if necessary.
 	$(call go-get-tool,$(KUSTOMIZE),sigs.k8s.io/kustomize/kustomize/v4@v4.4.1)
 

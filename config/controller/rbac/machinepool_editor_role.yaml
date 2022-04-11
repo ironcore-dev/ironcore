@@ -4,21 +4,21 @@ kind: ClusterRole
 metadata:
   name: machinepool-editor-role
 rules:
-- apiGroups:
-  - compute.onmetal.de
-  resources:
-  - machinepools
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - compute.onmetal.de
-  resources:
-  - machinepools/status
-  verbs:
-  - get
+  - apiGroups:
+      - compute.api.onmetal.de
+    resources:
+      - machinepools
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - compute.api.onmetal.de
+    resources:
+      - machinepools/status
+    verbs:
+      - get

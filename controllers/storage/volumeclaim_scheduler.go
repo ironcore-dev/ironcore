@@ -40,10 +40,10 @@ type VolumeClaimScheduler struct {
 	record.EventRecorder
 }
 
-//+kubebuilder:rbac:groups=storage.onmetal.de,resources=volumeclaims,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=storage.onmetal.de,resources=volumeclaims/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=storage.onmetal.de,resources=volumeclaims/finalizers,verbs=update
-//+kubebuilder:rbac:groups=storage.onmetal.de,resources=volumes,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumeclaims,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumeclaims/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumeclaims/finalizers,verbs=update
+//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes,verbs=get;list;watch;update;patch
 
 func (s *VolumeClaimScheduler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
@@ -171,7 +171,7 @@ func (s *VolumeClaimScheduler) volumeSatisfiesClaim(volume *storagev1alpha1.Volu
 	if volume.Status.State != storagev1alpha1.VolumeStateAvailable {
 		return false
 	}
-	if claim.Spec.StorageClassRef != volume.Spec.StorageClassRef {
+	if claim.Spec.VolumeClassRef != volume.Spec.VolumeClassRef {
 		return false
 	}
 	// Check if the volume can occupy the claim
@@ -199,13 +199,13 @@ func (s *VolumeClaimScheduler) SetupWithManager(mgr ctrl.Manager) error {
 					claim := &storagev1alpha1.VolumeClaim{}
 					claimKey := client.ObjectKey{Namespace: volume.Namespace, Name: claimName}
 					if err := s.Get(ctx, claimKey, claim); err != nil {
-						log.Error(err, "failed to get claim referenced by volume", "VolumeClaim", claimKey)
+						log.Error(err, "failed to get claim referenced by volume", "VolumeClaimRef", claimKey)
 						return nil
 					}
 					if claim.Spec.VolumeRef.Name != "" {
 						return nil
 					}
-					log.V(1).Info("enqueueing claim that has already been accepted by its volume", "VolumeClaim", claimKey)
+					log.V(1).Info("enqueueing claim that has already been accepted by its volume", "VolumeClaimRef", claimKey)
 					return []ctrl.Request{
 						{NamespacedName: claimKey},
 					}

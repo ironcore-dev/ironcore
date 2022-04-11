@@ -44,10 +44,10 @@ var _ = Describe("VolumeClaimScheduler", func() {
 				Resources: map[corev1.ResourceName]resource.Quantity{
 					"storage": resource.MustParse("100Gi"),
 				},
-				StoragePool: corev1.LocalObjectReference{
-					Name: "my-storagepool",
+				VolumePoolRef: corev1.LocalObjectReference{
+					Name: "my-volumepool",
 				},
-				StorageClassRef: corev1.LocalObjectReference{
+				VolumeClassRef: corev1.LocalObjectReference{
 					Name: "my-volumeclass",
 				},
 			},
@@ -62,10 +62,10 @@ var _ = Describe("VolumeClaimScheduler", func() {
 				Resources: map[corev1.ResourceName]resource.Quantity{
 					"storage": resource.MustParse("10Gi"),
 				},
-				StoragePool: corev1.LocalObjectReference{
-					Name: "my-storagepool",
+				VolumePoolRef: corev1.LocalObjectReference{
+					Name: "my-volumepool",
 				},
-				StorageClassRef: corev1.LocalObjectReference{
+				VolumeClassRef: corev1.LocalObjectReference{
 					Name: "my-volumeclass",
 				},
 			},
@@ -80,7 +80,7 @@ var _ = Describe("VolumeClaimScheduler", func() {
 					"storage": resource.MustParse("100Gi"),
 				},
 				Selector: &metav1.LabelSelector{},
-				StorageClassRef: corev1.LocalObjectReference{
+				VolumeClassRef: corev1.LocalObjectReference{
 					Name: "my-volumeclass",
 				},
 			},
@@ -174,7 +174,7 @@ var _ = Describe("VolumeClaimScheduler", func() {
 		}, timeout, interval).Should(Succeed())
 	})
 
-	It("Should not claim a volume when the storageclasses are different", func() {
+	It("Should not claim a volume when the volumeclasses are different", func() {
 		By("creating a volume w/ a set of resources")
 		Expect(k8sClient.Create(ctx, volume)).To(Succeed(), "failed to create volume")
 
@@ -185,7 +185,7 @@ var _ = Describe("VolumeClaimScheduler", func() {
 			To(Succeed(), "failed to patch volume status")
 
 		By("creating a volumeclaim which should claim the matching volume")
-		volumeClaim.Spec.StorageClassRef = corev1.LocalObjectReference{
+		volumeClaim.Spec.VolumeClassRef = corev1.LocalObjectReference{
 			Name: "my-volumeclass2",
 		}
 		Expect(k8sClient.Create(ctx, volumeClaim)).To(Succeed(), "failed to create volumeclaim")

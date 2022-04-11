@@ -25,26 +25,22 @@ import (
 
 // MachineSpec defines the desired state of Machine
 type MachineSpec struct {
-	// Hostname is the hostname of the machine
-	Hostname string
-	// MachineClass is a reference to the machine class/flavor of the machine.
-	MachineClass corev1.LocalObjectReference
-	// MachinePoolSelector selects a suitable MachinePool by the given labels.
+	// MachineClassRef is a reference to the machine class/flavor of the machine.
+	MachineClassRef corev1.LocalObjectReference
+	// MachinePoolSelector selects a suitable MachinePoolRef by the given labels.
 	MachinePoolSelector map[string]string
-	// MachinePool defines machine pool to run the machine in.
+	// MachinePoolRef defines machine pool to run the machine in.
 	// If empty, a scheduler will figure out an appropriate pool to run the machine in.
-	MachinePool corev1.LocalObjectReference
+	MachinePoolRef corev1.LocalObjectReference
 	// Image is the URL providing the operating system image of the machine.
 	Image string
 	// Interfaces define a list of network interfaces present on the machine
 	Interfaces []Interface
-	// SecurityGroups is a list of security groups of a machine
-	SecurityGroups []corev1.LocalObjectReference
-	// VolumeAttachments are volumes attached to this machine.
-	VolumeAttachments []VolumeAttachment
-	// Ignition is a reference to a config map containing the ignition YAML for the machine to boot up.
+	// Volumes are volumes attached to this machine.
+	Volumes []Volume
+	// IgnitionRef is a reference to a config map containing the ignition YAML for the machine to boot up.
 	// If key is empty, DefaultIgnitionKey will be used as fallback.
-	Ignition *commonv1alpha1.ConfigMapKeySelector
+	IgnitionRef *commonv1alpha1.ConfigMapKeySelector
 	// EFIVars are variables to pass to EFI while booting up.
 	EFIVars []EFIVar
 	// Tolerations define tolerations the Machine has. Only MachinePools whose taints
@@ -63,37 +59,20 @@ type EFIVar struct {
 const DefaultIgnitionKey = "ignition.yaml"
 
 // Interface is the definition of a single interface
-type Interface struct {
-	// Name is the name of the interface
+type Interface struct{}
+
+// Volume defines a volume attachment of a machine
+type Volume struct {
+	// Name is the name of the Volume
 	Name string
-	// Target is the referenced resource of this interface.
-	Target corev1.LocalObjectReference
-	// Priority is the priority level of this interface
-	Priority int32
-	// IP specifies a concrete IP address which should be allocated from a Subnet
-	IP *commonv1alpha1.IP
+	// VolumeSource is the source where the storage for the Volume resides at.
+	VolumeSource
 }
 
-// VolumeAttachment defines a volume attachment of a machine
-type VolumeAttachment struct {
-	// Name is the name of the VolumeAttachment
-	Name string
-	// Priority is the OS priority of the volume.
-	Priority int32
-	// VolumeAttachmentSource is the source where the storage for the VolumeAttachment resides at.
-	VolumeAttachmentSource
-}
-
-// VolumeAttachmentSource specifies the source to use for a VolumeAttachment.
-type VolumeAttachmentSource struct {
-	// VolumeClaim instructs the VolumeAttachment to use a VolumeClaim as source for the attachment.
-	VolumeClaim *VolumeClaimAttachmentSource
-}
-
-// VolumeClaimAttachmentSource references a VolumeClaim as VolumeAttachment source.
-type VolumeClaimAttachmentSource struct {
-	// Ref is a reference to the VolumeClaim.
-	Ref corev1.LocalObjectReference
+// VolumeSource specifies the source to use for a Volume.
+type VolumeSource struct {
+	// VolumeClaimRef instructs the Volume to use a VolumeClaimRef as source for the attachment.
+	VolumeClaimRef *corev1.LocalObjectReference
 }
 
 type RetainPolicy string
@@ -104,21 +83,12 @@ const (
 )
 
 // InterfaceStatus reports the status of an Interface.
-type InterfaceStatus struct {
-	// Name is the name of an interface.
-	Name string
-	// IP is the IP allocated for an interface.
-	IP commonv1alpha1.IP
-	// Priority is the OS priority of the interface.
-	Priority int32
-}
+type InterfaceStatus struct{}
 
-// VolumeAttachmentStatus is the status of a VolumeAttachment.
-type VolumeAttachmentStatus struct {
+// VolumeStatus is the status of a Volume.
+type VolumeStatus struct {
 	// Name is the name of a volume attachment.
 	Name string
-	// Priority is the OS priority of the volume.
-	Priority int32
 	// DeviceID is the disk device ID on the host.
 	DeviceID string
 }
@@ -128,7 +98,7 @@ type MachineStatus struct {
 	State             MachineState
 	Conditions        []MachineCondition
 	Interfaces        []InterfaceStatus
-	VolumeAttachments []VolumeAttachmentStatus
+	VolumeAttachments []VolumeStatus
 }
 
 type MachineState string

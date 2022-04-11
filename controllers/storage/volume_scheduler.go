@@ -39,8 +39,8 @@ import (
 )
 
 const (
-	storagePoolStatusAvailableStorageClassesNameField = ".status.availableStorageClasses[*].name"
-	volumeSpecStoragePoolNameField                    = ".spec.storagePool.name"
+	volumePoolStatusAvailableVolumeClassesNameField = ".status.availableVolumeClasses[*].name"
+	volumeSpecVolumePoolNameField                   = ".spec.volumePool.name"
 )
 
 type VolumeScheduler struct {
@@ -48,9 +48,9 @@ type VolumeScheduler struct {
 	Events record.EventRecorder
 }
 
-//+kubebuilder:rbac:groups=storage.onmetal.de,resources=volumes,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=storage.onmetal.de,resources=volumes/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=storage.onmetal.de,resources=storagepools,verbs=get;list;watch
+//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumepools,verbs=get;list;watch
 
 // Reconcile reconciles the desired with the actual state.
 func (s *VolumeScheduler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -65,7 +65,7 @@ func (s *VolumeScheduler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		log.Info("Volume is already deleting")
 		return ctrl.Result{}, nil
 	}
-	if volume.Spec.StoragePool.Name != "" {
+	if volume.Spec.VolumePoolRef.Name != "" {
 		log.Info("Volume is already assigned")
 		return ctrl.Result{}, nil
 	}
@@ -83,36 +83,36 @@ func (s *VolumeScheduler) schedule(ctx context.Context, log logr.Logger, volume 
 		return ctrl.Result{Requeue: true}, nil
 	}
 
-	list := &storagev1alpha1.StoragePoolList{}
+	list := &storagev1alpha1.VolumePoolList{}
 	if err := s.List(ctx, list,
-		client.MatchingFields{storagePoolStatusAvailableStorageClassesNameField: volume.Spec.StorageClassRef.Name},
-		client.MatchingLabels(volume.Spec.StoragePoolSelector),
+		client.MatchingFields{volumePoolStatusAvailableVolumeClassesNameField: volume.Spec.VolumeClassRef.Name},
+		client.MatchingLabels(volume.Spec.VolumePoolSelector),
 	); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error listing storage pools: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error listing volume pools: %w", err)
 	}
 
-	var available []storagev1alpha1.StoragePool
-	for _, storagePool := range list.Items {
-		if storagePool.DeletionTimestamp.IsZero() {
-			available = append(available, storagePool)
+	var available []storagev1alpha1.VolumePool
+	for _, volumePool := range list.Items {
+		if volumePool.DeletionTimestamp.IsZero() {
+			available = append(available, volumePool)
 		}
 	}
 	if len(available) == 0 {
-		log.Info("No storage pool available for storage class", "StorageClass", volume.Spec.StorageClassRef.Name)
-		s.Events.Eventf(volume, corev1.EventTypeNormal, "CannotSchedule", "No StoragePool found for StorageClass %s", volume.Spec.StorageClassRef.Name)
+		log.Info("No volume pool available for volume class", "VolumeClass", volume.Spec.VolumeClassRef.Name)
+		s.Events.Eventf(volume, corev1.EventTypeNormal, "CannotSchedule", "No VolumePoolRef found for VolumeClass %s", volume.Spec.VolumeClassRef.Name)
 		return ctrl.Result{}, nil
 	}
 
-	// Filter storage pools by checking if the volume tolerates all the taints of a storage pool
-	var filtered []storagev1alpha1.StoragePool
+	// Filter volume pools by checking if the volume tolerates all the taints of a volume pool
+	var filtered []storagev1alpha1.VolumePool
 	for _, pool := range available {
 		if v1alpha1.TolerateTaints(volume.Spec.Tolerations, pool.Spec.Taints) {
 			filtered = append(filtered, pool)
 		}
 	}
 	if len(filtered) == 0 {
-		log.Info("No storage pool tolerated by the volume", "Tolerations", volume.Spec.Tolerations)
-		s.Events.Eventf(volume, corev1.EventTypeNormal, "CannotSchedule", "No StoragePool tolerated by %s", &volume.Spec.Tolerations)
+		log.Info("No volume pool tolerated by the volume", "Tolerations", volume.Spec.Tolerations)
+		s.Events.Eventf(volume, corev1.EventTypeNormal, "CannotSchedule", "No VolumePoolRef tolerated by %s", &volume.Spec.Tolerations)
 		return ctrl.Result{}, nil
 	}
 	available = filtered
@@ -121,9 +121,9 @@ func (s *VolumeScheduler) schedule(ctx context.Context, log logr.Logger, volume 
 	// TODO: Instead of random distribution, try to come up w/ metrics that include usage of each pool to
 	// avoid unfortunate random distribution of items.
 	pool := available[rand.Intn(len(available))]
-	log = log.WithValues("StoragePool", pool.Name)
+	log = log.WithValues("VolumePoolRef", pool.Name)
 	base := volume.DeepCopy()
-	volume.Spec.StoragePool.Name = pool.Name
+	volume.Spec.VolumePoolRef.Name = pool.Name
 	log.Info("Patching volume")
 	if err := s.Patch(ctx, volume, client.MergeFrom(base)); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error scheduling volume on pool: %w", err)
@@ -138,22 +138,22 @@ func (s *VolumeScheduler) SetupWithManager(mgr manager.Manager) error {
 	log := ctrl.Log.WithName("volume-scheduler").WithName("setup")
 	ctx = ctrl.LoggerInto(ctx, log)
 
-	if err := mgr.GetFieldIndexer().IndexField(ctx, &storagev1alpha1.StoragePool{}, storagePoolStatusAvailableStorageClassesNameField, func(object client.Object) []string {
-		pool := object.(*storagev1alpha1.StoragePool)
-		names := make([]string, 0, len(pool.Status.AvailableStorageClasses))
-		for _, availableStorageClass := range pool.Status.AvailableStorageClasses {
-			names = append(names, availableStorageClass.Name)
+	if err := mgr.GetFieldIndexer().IndexField(ctx, &storagev1alpha1.VolumePool{}, volumePoolStatusAvailableVolumeClassesNameField, func(object client.Object) []string {
+		pool := object.(*storagev1alpha1.VolumePool)
+		names := make([]string, 0, len(pool.Status.AvailableVolumeClasses))
+		for _, availableVolumeClass := range pool.Status.AvailableVolumeClasses {
+			names = append(names, availableVolumeClass.Name)
 		}
 		return names
 	}); err != nil {
-		return fmt.Errorf("could not setup field indexer for %s: %w", storagePoolStatusAvailableStorageClassesNameField, err)
+		return fmt.Errorf("could not setup field indexer for %s: %w", volumePoolStatusAvailableVolumeClassesNameField, err)
 	}
 
-	if err := mgr.GetFieldIndexer().IndexField(ctx, &storagev1alpha1.Volume{}, volumeSpecStoragePoolNameField, func(object client.Object) []string {
+	if err := mgr.GetFieldIndexer().IndexField(ctx, &storagev1alpha1.Volume{}, volumeSpecVolumePoolNameField, func(object client.Object) []string {
 		volume := object.(*storagev1alpha1.Volume)
-		return []string{volume.Spec.StoragePool.Name}
+		return []string{volume.Spec.VolumePoolRef.Name}
 	}); err != nil {
-		return fmt.Errorf("could not setup field indexer for %s: %w", volumeSpecStoragePoolNameField, err)
+		return fmt.Errorf("could not setup field indexer for %s: %w", volumeSpecVolumePoolNameField, err)
 	}
 
 	return ctrl.NewControllerManagedBy(mgr).
@@ -163,33 +163,33 @@ func (s *VolumeScheduler) SetupWithManager(mgr manager.Manager) error {
 			builder.WithPredicates(
 				predicate.NewPredicateFuncs(func(object client.Object) bool {
 					volume := object.(*storagev1alpha1.Volume)
-					return volume.DeletionTimestamp.IsZero() && volume.Spec.StoragePool.Name == ""
+					return volume.DeletionTimestamp.IsZero() && volume.Spec.VolumePoolRef.Name == ""
 				}),
 			),
 		).
-		// Enqueue unscheduled volumes if a storage pool w/ required storage classes becomes available.
-		Watches(&source.Kind{Type: &storagev1alpha1.StoragePool{}},
+		// Enqueue unscheduled volumes if a volume pool w/ required volume classes becomes available.
+		Watches(&source.Kind{Type: &storagev1alpha1.VolumePool{}},
 			handler.EnqueueRequestsFromMapFunc(func(object client.Object) []reconcile.Request {
-				pool := object.(*storagev1alpha1.StoragePool)
+				pool := object.(*storagev1alpha1.VolumePool)
 				if !pool.DeletionTimestamp.IsZero() {
 					return nil
 				}
 
 				list := &storagev1alpha1.VolumeList{}
-				if err := s.List(ctx, list, client.MatchingFields{volumeSpecStoragePoolNameField: ""}); err != nil {
+				if err := s.List(ctx, list, client.MatchingFields{volumeSpecVolumePoolNameField: ""}); err != nil {
 					log.Error(err, "error listing unscheduled volumes")
 					return nil
 				}
 
 				availableClassNames := sets.NewString()
-				for _, availableStorageClass := range pool.Status.AvailableStorageClasses {
-					availableClassNames.Insert(availableStorageClass.Name)
+				for _, availableVolumeClass := range pool.Status.AvailableVolumeClasses {
+					availableClassNames.Insert(availableVolumeClass.Name)
 				}
 
 				var requests []reconcile.Request
 				for _, volume := range list.Items {
-					storagePoolSelector := labels.SelectorFromSet(volume.Spec.StoragePoolSelector)
-					if availableClassNames.Has(volume.Spec.StorageClassRef.Name) && storagePoolSelector.Matches(labels.Set(pool.Labels)) {
+					volumePoolSelector := labels.SelectorFromSet(volume.Spec.VolumePoolSelector)
+					if availableClassNames.Has(volume.Spec.VolumeClassRef.Name) && volumePoolSelector.Matches(labels.Set(pool.Labels)) {
 						requests = append(requests, ctrl.Request{NamespacedName: client.ObjectKeyFromObject(&volume)})
 					}
 				}

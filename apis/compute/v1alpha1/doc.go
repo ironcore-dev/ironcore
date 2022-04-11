@@ -18,7 +18,7 @@
 // +k8s:conversion-gen=github.com/onmetal/onmetal-api/apis/compute
 // +k8s:openapi-gen=true
 // +k8s:defaulter-gen=TypeMeta
-// +groupName=compute.onmetal.de
+// +groupName=compute.api.onmetal.de
 
 // Package v1alpha1 is the v1alpha1 version of the API.
 package v1alpha1 // import "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"

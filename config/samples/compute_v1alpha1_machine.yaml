@@ -1,19 +1,17 @@
-apiVersion: compute.onmetal.de/v1alpha1
+apiVersion: compute.api.onmetal.de/v1alpha1
 kind: Machine
 metadata:
   name: machine-sample
 spec:
-  hostname: machine-sample
   machineClass:
     name: x3.xlarge
   machinePool:
     name: default
   image: myimage_repo_location
-  volumeAttachments:
+  volumes:
     - name: rootdisk # first disk is root disk
       # priority: 0 # optional
-      volumeClaim:
-        ref:
-          name: my-volumeclaim
+      volumeClaimRef:
+        name: my-volumeclaim
   ignition:
     name: my-ignition-configmap

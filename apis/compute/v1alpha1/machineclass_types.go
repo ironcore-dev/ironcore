@@ -26,12 +26,6 @@ var (
 	MachineClassFinalizer = SchemeGroupVersion.Group + "/machineclass"
 )
 
-// MachineClassSpec defines the desired state of MachineClass
-type MachineClassSpec struct {
-	// Capabilities describes the resources a machine class can provide.
-	Capabilities corev1.ResourceList `json:"capabilities,omitempty"`
-}
-
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +genclient
 // +genClient:nonNamespaced
@@ -42,7 +36,7 @@ type MachineClass struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec MachineClassSpec `json:"spec,omitempty"`
+	Capabilities corev1.ResourceList `json:"capabilities,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

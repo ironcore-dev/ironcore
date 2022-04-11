@@ -1,8 +1,0 @@
----
-apiVersion: compute.onmetal.de/v1alpha1
-kind: Console
-metadata:
-  name: console-sample
-spec:
-  machineRef:
-    name: my-machine

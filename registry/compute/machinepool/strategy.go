@@ -34,7 +34,7 @@ import (
 func GetAttrs(obj runtime.Object) (labels.Set, fields.Set, error) {
 	machinePool, ok := obj.(*compute.MachinePool)
 	if !ok {
-		return nil, nil, fmt.Errorf("given object is not a MachinePool")
+		return nil, nil, fmt.Errorf("given object is not a MachinePoolRef")
 	}
 	return machinePool.Labels, SelectableFields(machinePool), nil
 }
@@ -64,7 +64,7 @@ func (machinePoolStrategy) NamespaceScoped() bool {
 
 func (machinePoolStrategy) GetResetFields() map[fieldpath.APIVersion]*fieldpath.Set {
 	return map[fieldpath.APIVersion]*fieldpath.Set{
-		"compute.onmetal.de/v1alpha1": fieldpath.NewSet(
+		"compute.api.onmetal.de/v1alpha1": fieldpath.NewSet(
 			fieldpath.MakePathOrDie("status"),
 		),
 	}
@@ -121,7 +121,7 @@ var StatusStrategy = machinePoolStatusStrategy{Strategy}
 
 func (machinePoolStatusStrategy) GetResetFields() map[fieldpath.APIVersion]*fieldpath.Set {
 	return map[fieldpath.APIVersion]*fieldpath.Set{
-		"compute.onmetal.de/v1alpha1": fieldpath.NewSet(
+		"compute.api.onmetal.de/v1alpha1": fieldpath.NewSet(
 			fieldpath.MakePathOrDie("spec"),
 		),
 	}

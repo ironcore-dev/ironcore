@@ -17,10 +17,10 @@
 
 package v1alpha1
 
-type StorageClassExpansion interface{}
-
-type StoragePoolExpansion interface{}
-
 type VolumeExpansion interface{}
 
 type VolumeClaimExpansion interface{}
+
+type VolumeClassExpansion interface{}
+
+type VolumePoolExpansion interface{}

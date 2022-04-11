@@ -4,17 +4,17 @@ kind: ClusterRole
 metadata:
   name: machineclass-viewer-role
 rules:
-- apiGroups:
-  - compute.onmetal.de
-  resources:
-  - machineclasses
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - compute.onmetal.de
-  resources:
-  - machineclasses/status
-  verbs:
-  - get
+  - apiGroups:
+      - compute.api.onmetal.de
+    resources:
+      - machineclasses
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - compute.api.onmetal.de
+    resources:
+      - machineclasses/status
+    verbs:
+      - get

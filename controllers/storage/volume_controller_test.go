@@ -39,13 +39,13 @@ var _ = Describe("VolumeReconciler", func() {
 				GenerateName: "test-volume-",
 			},
 			Spec: storagev1alpha1.VolumeSpec{
-				StoragePool: corev1.LocalObjectReference{
-					Name: "my-storagepool",
+				VolumePoolRef: corev1.LocalObjectReference{
+					Name: "my-volumepool",
 				},
 				Resources: map[corev1.ResourceName]resource.Quantity{
 					"storage": resource.MustParse("100Gi"),
 				},
-				StorageClassRef: corev1.LocalObjectReference{
+				VolumeClassRef: corev1.LocalObjectReference{
 					Name: "my-volumeclass",
 				},
 			},
@@ -60,7 +60,7 @@ var _ = Describe("VolumeReconciler", func() {
 					"storage": resource.MustParse("100Gi"),
 				},
 				Selector: &metav1.LabelSelector{},
-				StorageClassRef: corev1.LocalObjectReference{
+				VolumeClassRef: corev1.LocalObjectReference{
 					Name: "my-volumeclass",
 				},
 			},

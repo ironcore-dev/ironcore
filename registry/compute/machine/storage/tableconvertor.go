@@ -31,9 +31,9 @@ var (
 
 	headers = []metav1.TableColumnDefinition{
 		{Name: "Name", Type: "string", Format: "name", Description: objectMetaSwaggerDoc["name"]},
-		{Name: "MachineClass", Type: "string", Description: "The machine class of this machine"},
+		{Name: "MachineClassRef", Type: "string", Description: "The machine class of this machine"},
 		{Name: "Image", Type: "string", Description: "The image the machine shall use"},
-		{Name: "MachinePool", Type: "string", Description: "The machine pool the machine is running on"},
+		{Name: "MachinePoolRef", Type: "string", Description: "The machine pool the machine is running on"},
 		{Name: "State", Type: "string", Description: "The current state of the machine"},
 		{Name: "Age", Type: "string", Format: "date", Description: objectMetaSwaggerDoc["creationTimestamp"]},
 	}
@@ -64,9 +64,9 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 		machine := obj.(*compute.Machine)
 
 		cells = append(cells, name)
-		cells = append(cells, machine.Spec.MachineClass.Name)
+		cells = append(cells, machine.Spec.MachineClassRef.Name)
 		cells = append(cells, machine.Spec.Image)
-		if machinePoolName := machine.Spec.MachinePool.Name; machinePoolName != "" {
+		if machinePoolName := machine.Spec.MachinePoolRef.Name; machinePoolName != "" {
 			cells = append(cells, machinePoolName)
 		} else {
 			cells = append(cells, "<none>")

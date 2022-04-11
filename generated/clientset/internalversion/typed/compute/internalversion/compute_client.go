@@ -31,7 +31,7 @@ type ComputeInterface interface {
 	MachinePoolsGetter
 }
 
-// ComputeClient is used to interact with features provided by the compute.onmetal.de group.
+// ComputeClient is used to interact with features provided by the compute.api.onmetal.de group.
 type ComputeClient struct {
 	restClient rest.Interface
 }
@@ -97,8 +97,8 @@ func setConfigDefaults(config *rest.Config) error {
 	if config.UserAgent == "" {
 		config.UserAgent = rest.DefaultKubernetesUserAgent()
 	}
-	if config.GroupVersion == nil || config.GroupVersion.Group != scheme.Scheme.PrioritizedVersionsForGroup("compute.onmetal.de")[0].Group {
-		gv := scheme.Scheme.PrioritizedVersionsForGroup("compute.onmetal.de")[0]
+	if config.GroupVersion == nil || config.GroupVersion.Group != scheme.Scheme.PrioritizedVersionsForGroup("compute.api.onmetal.de")[0].Group {
+		gv := scheme.Scheme.PrioritizedVersionsForGroup("compute.api.onmetal.de")[0]
 		config.GroupVersion = &gv
 	}
 	config.NegotiatedSerializer = scheme.Codecs

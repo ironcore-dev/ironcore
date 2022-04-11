@@ -4,21 +4,21 @@ kind: ClusterRole
 metadata:
   name: machineclass-editor-role
 rules:
-- apiGroups:
-  - compute.onmetal.de
-  resources:
-  - machineclasses
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - compute.onmetal.de
-  resources:
-  - machineclasses/status
-  verbs:
-  - get
+  - apiGroups:
+      - compute.api.onmetal.de
+    resources:
+      - machineclasses
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - compute.api.onmetal.de
+    resources:
+      - machineclasses/status
+    verbs:
+      - get

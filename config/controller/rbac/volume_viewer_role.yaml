@@ -4,17 +4,17 @@ kind: ClusterRole
 metadata:
   name: volume-viewer-role
 rules:
-- apiGroups:
-  - storage.onmetal.de
-  resources:
-  - volumes
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - storage.onmetal.de
-  resources:
-  - volumes/status
-  verbs:
-  - get
+  - apiGroups:
+      - storage.api.onmetal.de
+    resources:
+      - volumes
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - storage.api.onmetal.de
+    resources:
+      - volumes/status
+    verbs:
+      - get

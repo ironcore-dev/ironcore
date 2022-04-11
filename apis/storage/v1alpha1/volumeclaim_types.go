@@ -25,7 +25,7 @@ import (
 // VolumeClaimGK is a helper to easily access the GroupKind information of an VolumeClaim
 var VolumeClaimGK = schema.GroupKind{
 	Group: SchemeGroupVersion.Group,
-	Kind:  "VolumeClaim",
+	Kind:  "VolumeClaimRef",
 }
 
 // VolumeClaimSpec defines the desired state of VolumeClaim
@@ -36,8 +36,8 @@ type VolumeClaimSpec struct {
 	Selector *metav1.LabelSelector `json:"selector,omitempty"`
 	// Resources are the requested Volume resources.
 	Resources corev1.ResourceList `json:"resources"`
-	// StorageClassRef references the StorageClass used by the Volume.
-	StorageClassRef corev1.LocalObjectReference `json:"storageClassRef"`
+	// VolumeClassRef references the VolumeClass used by the Volume.
+	VolumeClassRef corev1.LocalObjectReference `json:"volumeClassRef"`
 }
 
 // VolumeClaimStatus defines the observed state of VolumeClaim

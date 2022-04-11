@@ -97,16 +97,6 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*MachineClassSpec)(nil), (*compute.MachineClassSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_MachineClassSpec_To_compute_MachineClassSpec(a.(*MachineClassSpec), b.(*compute.MachineClassSpec), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*compute.MachineClassSpec)(nil), (*MachineClassSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_MachineClassSpec_To_v1alpha1_MachineClassSpec(a.(*compute.MachineClassSpec), b.(*MachineClassSpec), scope)
-	}); err != nil {
-		return err
-	}
 	if err := s.AddGeneratedConversionFunc((*MachineCondition)(nil), (*compute.MachineCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1alpha1_MachineCondition_To_compute_MachineCondition(a.(*MachineCondition), b.(*compute.MachineCondition), scope)
 	}); err != nil {
@@ -197,43 +187,33 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*VolumeAttachment)(nil), (*compute.VolumeAttachment)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_VolumeAttachment_To_compute_VolumeAttachment(a.(*VolumeAttachment), b.(*compute.VolumeAttachment), scope)
+	if err := s.AddGeneratedConversionFunc((*Volume)(nil), (*compute.Volume)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_Volume_To_compute_Volume(a.(*Volume), b.(*compute.Volume), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*compute.VolumeAttachment)(nil), (*VolumeAttachment)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_VolumeAttachment_To_v1alpha1_VolumeAttachment(a.(*compute.VolumeAttachment), b.(*VolumeAttachment), scope)
+	if err := s.AddGeneratedConversionFunc((*compute.Volume)(nil), (*Volume)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_Volume_To_v1alpha1_Volume(a.(*compute.Volume), b.(*Volume), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*VolumeAttachmentSource)(nil), (*compute.VolumeAttachmentSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_VolumeAttachmentSource_To_compute_VolumeAttachmentSource(a.(*VolumeAttachmentSource), b.(*compute.VolumeAttachmentSource), scope)
+	if err := s.AddGeneratedConversionFunc((*VolumeSource)(nil), (*compute.VolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VolumeSource_To_compute_VolumeSource(a.(*VolumeSource), b.(*compute.VolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*compute.VolumeAttachmentSource)(nil), (*VolumeAttachmentSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_VolumeAttachmentSource_To_v1alpha1_VolumeAttachmentSource(a.(*compute.VolumeAttachmentSource), b.(*VolumeAttachmentSource), scope)
+	if err := s.AddGeneratedConversionFunc((*compute.VolumeSource)(nil), (*VolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_VolumeSource_To_v1alpha1_VolumeSource(a.(*compute.VolumeSource), b.(*VolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*VolumeAttachmentStatus)(nil), (*compute.VolumeAttachmentStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_VolumeAttachmentStatus_To_compute_VolumeAttachmentStatus(a.(*VolumeAttachmentStatus), b.(*compute.VolumeAttachmentStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*VolumeStatus)(nil), (*compute.VolumeStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VolumeStatus_To_compute_VolumeStatus(a.(*VolumeStatus), b.(*compute.VolumeStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*compute.VolumeAttachmentStatus)(nil), (*VolumeAttachmentStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_VolumeAttachmentStatus_To_v1alpha1_VolumeAttachmentStatus(a.(*compute.VolumeAttachmentStatus), b.(*VolumeAttachmentStatus), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*VolumeClaimAttachmentSource)(nil), (*compute.VolumeClaimAttachmentSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_VolumeClaimAttachmentSource_To_compute_VolumeClaimAttachmentSource(a.(*VolumeClaimAttachmentSource), b.(*compute.VolumeClaimAttachmentSource), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*compute.VolumeClaimAttachmentSource)(nil), (*VolumeClaimAttachmentSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_VolumeClaimAttachmentSource_To_v1alpha1_VolumeClaimAttachmentSource(a.(*compute.VolumeClaimAttachmentSource), b.(*VolumeClaimAttachmentSource), scope)
+	if err := s.AddGeneratedConversionFunc((*compute.VolumeStatus)(nil), (*VolumeStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_VolumeStatus_To_v1alpha1_VolumeStatus(a.(*compute.VolumeStatus), b.(*VolumeStatus), scope)
 	}); err != nil {
 		return err
 	}
@@ -265,10 +245,6 @@ func Convert_compute_EFIVar_To_v1alpha1_EFIVar(in *compute.EFIVar, out *EFIVar, 
 }
 
 func autoConvert_v1alpha1_Interface_To_compute_Interface(in *Interface, out *compute.Interface, s conversion.Scope) error {
-	out.Name = in.Name
-	out.Target = in.Target
-	out.Priority = in.Priority
-	out.IP = (*commonv1alpha1.IP)(unsafe.Pointer(in.IP))
 	return nil
 }
 
@@ -278,10 +254,6 @@ func Convert_v1alpha1_Interface_To_compute_Interface(in *Interface, out *compute
 }
 
 func autoConvert_compute_Interface_To_v1alpha1_Interface(in *compute.Interface, out *Interface, s conversion.Scope) error {
-	out.Name = in.Name
-	out.Target = in.Target
-	out.Priority = in.Priority
-	out.IP = (*commonv1alpha1.IP)(unsafe.Pointer(in.IP))
 	return nil
 }
 
@@ -291,9 +263,6 @@ func Convert_compute_Interface_To_v1alpha1_Interface(in *compute.Interface, out 
 }
 
 func autoConvert_v1alpha1_InterfaceStatus_To_compute_InterfaceStatus(in *InterfaceStatus, out *compute.InterfaceStatus, s conversion.Scope) error {
-	out.Name = in.Name
-	out.IP = in.IP
-	out.Priority = in.Priority
 	return nil
 }
 
@@ -303,9 +272,6 @@ func Convert_v1alpha1_InterfaceStatus_To_compute_InterfaceStatus(in *InterfaceSt
 }
 
 func autoConvert_compute_InterfaceStatus_To_v1alpha1_InterfaceStatus(in *compute.InterfaceStatus, out *InterfaceStatus, s conversion.Scope) error {
-	out.Name = in.Name
-	out.IP = in.IP
-	out.Priority = in.Priority
 	return nil
 }
 
@@ -348,9 +314,7 @@ func Convert_compute_Machine_To_v1alpha1_Machine(in *compute.Machine, out *Machi
 
 func autoConvert_v1alpha1_MachineClass_To_compute_MachineClass(in *MachineClass, out *compute.MachineClass, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
-	if err := Convert_v1alpha1_MachineClassSpec_To_compute_MachineClassSpec(&in.Spec, &out.Spec, s); err != nil {
-		return err
-	}
+	out.Capabilities = *(*v1.ResourceList)(unsafe.Pointer(&in.Capabilities))
 	return nil
 }
 
@@ -361,9 +325,7 @@ func Convert_v1alpha1_MachineClass_To_compute_MachineClass(in *MachineClass, out
 
 func autoConvert_compute_MachineClass_To_v1alpha1_MachineClass(in *compute.MachineClass, out *MachineClass, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
-	if err := Convert_compute_MachineClassSpec_To_v1alpha1_MachineClassSpec(&in.Spec, &out.Spec, s); err != nil {
-		return err
-	}
+	out.Capabilities = *(*v1.ResourceList)(unsafe.Pointer(&in.Capabilities))
 	return nil
 }
 
@@ -392,26 +354,6 @@ func autoConvert_compute_MachineClassList_To_v1alpha1_MachineClassList(in *compu
 // Convert_compute_MachineClassList_To_v1alpha1_MachineClassList is an autogenerated conversion function.
 func Convert_compute_MachineClassList_To_v1alpha1_MachineClassList(in *compute.MachineClassList, out *MachineClassList, s conversion.Scope) error {
 	return autoConvert_compute_MachineClassList_To_v1alpha1_MachineClassList(in, out, s)
-}
-
-func autoConvert_v1alpha1_MachineClassSpec_To_compute_MachineClassSpec(in *MachineClassSpec, out *compute.MachineClassSpec, s conversion.Scope) error {
-	out.Capabilities = *(*v1.ResourceList)(unsafe.Pointer(&in.Capabilities))
-	return nil
-}
-
-// Convert_v1alpha1_MachineClassSpec_To_compute_MachineClassSpec is an autogenerated conversion function.
-func Convert_v1alpha1_MachineClassSpec_To_compute_MachineClassSpec(in *MachineClassSpec, out *compute.MachineClassSpec, s conversion.Scope) error {
-	return autoConvert_v1alpha1_MachineClassSpec_To_compute_MachineClassSpec(in, out, s)
-}
-
-func autoConvert_compute_MachineClassSpec_To_v1alpha1_MachineClassSpec(in *compute.MachineClassSpec, out *MachineClassSpec, s conversion.Scope) error {
-	out.Capabilities = *(*v1.ResourceList)(unsafe.Pointer(&in.Capabilities))
-	return nil
-}
-
-// Convert_compute_MachineClassSpec_To_v1alpha1_MachineClassSpec is an autogenerated conversion function.
-func Convert_compute_MachineClassSpec_To_v1alpha1_MachineClassSpec(in *compute.MachineClassSpec, out *MachineClassSpec, s conversion.Scope) error {
-	return autoConvert_compute_MachineClassSpec_To_v1alpha1_MachineClassSpec(in, out, s)
 }
 
 func autoConvert_v1alpha1_MachineCondition_To_compute_MachineCondition(in *MachineCondition, out *compute.MachineCondition, s conversion.Scope) error {
@@ -601,15 +543,13 @@ func Convert_compute_MachinePoolStatus_To_v1alpha1_MachinePoolStatus(in *compute
 }
 
 func autoConvert_v1alpha1_MachineSpec_To_compute_MachineSpec(in *MachineSpec, out *compute.MachineSpec, s conversion.Scope) error {
-	out.Hostname = in.Hostname
-	out.MachineClass = in.MachineClass
+	out.MachineClassRef = in.MachineClassRef
 	out.MachinePoolSelector = *(*map[string]string)(unsafe.Pointer(&in.MachinePoolSelector))
-	out.MachinePool = in.MachinePool
+	out.MachinePoolRef = in.MachinePoolRef
 	out.Image = in.Image
 	out.Interfaces = *(*[]compute.Interface)(unsafe.Pointer(&in.Interfaces))
-	out.SecurityGroups = *(*[]v1.LocalObjectReference)(unsafe.Pointer(&in.SecurityGroups))
-	out.VolumeAttachments = *(*[]compute.VolumeAttachment)(unsafe.Pointer(&in.VolumeAttachments))
-	out.Ignition = (*commonv1alpha1.ConfigMapKeySelector)(unsafe.Pointer(in.Ignition))
+	out.Volumes = *(*[]compute.Volume)(unsafe.Pointer(&in.Volumes))
+	out.IgnitionRef = (*commonv1alpha1.ConfigMapKeySelector)(unsafe.Pointer(in.IgnitionRef))
 	out.EFIVars = *(*[]compute.EFIVar)(unsafe.Pointer(&in.EFIVars))
 	out.Tolerations = *(*[]commonv1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
 	return nil
@@ -621,15 +561,13 @@ func Convert_v1alpha1_MachineSpec_To_compute_MachineSpec(in *MachineSpec, out *c
 }
 
 func autoConvert_compute_MachineSpec_To_v1alpha1_MachineSpec(in *compute.MachineSpec, out *MachineSpec, s conversion.Scope) error {
-	out.Hostname = in.Hostname
-	out.MachineClass = in.MachineClass
+	out.MachineClassRef = in.MachineClassRef
 	out.MachinePoolSelector = *(*map[string]string)(unsafe.Pointer(&in.MachinePoolSelector))
-	out.MachinePool = in.MachinePool
+	out.MachinePoolRef = in.MachinePoolRef
 	out.Image = in.Image
 	out.Interfaces = *(*[]Interface)(unsafe.Pointer(&in.Interfaces))
-	out.SecurityGroups = *(*[]v1.LocalObjectReference)(unsafe.Pointer(&in.SecurityGroups))
-	out.VolumeAttachments = *(*[]VolumeAttachment)(unsafe.Pointer(&in.VolumeAttachments))
-	out.Ignition = (*commonv1alpha1.ConfigMapKeySelector)(unsafe.Pointer(in.Ignition))
+	out.Volumes = *(*[]Volume)(unsafe.Pointer(&in.Volumes))
+	out.IgnitionRef = (*commonv1alpha1.ConfigMapKeySelector)(unsafe.Pointer(in.IgnitionRef))
 	out.EFIVars = *(*[]EFIVar)(unsafe.Pointer(&in.EFIVars))
 	out.Tolerations = *(*[]commonv1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
 	return nil
@@ -644,7 +582,7 @@ func autoConvert_v1alpha1_MachineStatus_To_compute_MachineStatus(in *MachineStat
 	out.State = compute.MachineState(in.State)
 	out.Conditions = *(*[]compute.MachineCondition)(unsafe.Pointer(&in.Conditions))
 	out.Interfaces = *(*[]compute.InterfaceStatus)(unsafe.Pointer(&in.Interfaces))
-	out.VolumeAttachments = *(*[]compute.VolumeAttachmentStatus)(unsafe.Pointer(&in.VolumeAttachments))
+	out.VolumeAttachments = *(*[]compute.VolumeStatus)(unsafe.Pointer(&in.VolumeAttachments))
 	return nil
 }
 
@@ -657,7 +595,7 @@ func autoConvert_compute_MachineStatus_To_v1alpha1_MachineStatus(in *compute.Mac
 	out.State = MachineState(in.State)
 	out.Conditions = *(*[]MachineCondition)(unsafe.Pointer(&in.Conditions))
 	out.Interfaces = *(*[]InterfaceStatus)(unsafe.Pointer(&in.Interfaces))
-	out.VolumeAttachments = *(*[]VolumeAttachmentStatus)(unsafe.Pointer(&in.VolumeAttachments))
+	out.VolumeAttachments = *(*[]VolumeStatus)(unsafe.Pointer(&in.VolumeAttachments))
 	return nil
 }
 
@@ -666,94 +604,70 @@ func Convert_compute_MachineStatus_To_v1alpha1_MachineStatus(in *compute.Machine
 	return autoConvert_compute_MachineStatus_To_v1alpha1_MachineStatus(in, out, s)
 }
 
-func autoConvert_v1alpha1_VolumeAttachment_To_compute_VolumeAttachment(in *VolumeAttachment, out *compute.VolumeAttachment, s conversion.Scope) error {
+func autoConvert_v1alpha1_Volume_To_compute_Volume(in *Volume, out *compute.Volume, s conversion.Scope) error {
 	out.Name = in.Name
-	out.Priority = in.Priority
-	if err := Convert_v1alpha1_VolumeAttachmentSource_To_compute_VolumeAttachmentSource(&in.VolumeAttachmentSource, &out.VolumeAttachmentSource, s); err != nil {
+	if err := Convert_v1alpha1_VolumeSource_To_compute_VolumeSource(&in.VolumeSource, &out.VolumeSource, s); err != nil {
 		return err
 	}
 	return nil
 }
 
-// Convert_v1alpha1_VolumeAttachment_To_compute_VolumeAttachment is an autogenerated conversion function.
-func Convert_v1alpha1_VolumeAttachment_To_compute_VolumeAttachment(in *VolumeAttachment, out *compute.VolumeAttachment, s conversion.Scope) error {
-	return autoConvert_v1alpha1_VolumeAttachment_To_compute_VolumeAttachment(in, out, s)
+// Convert_v1alpha1_Volume_To_compute_Volume is an autogenerated conversion function.
+func Convert_v1alpha1_Volume_To_compute_Volume(in *Volume, out *compute.Volume, s conversion.Scope) error {
+	return autoConvert_v1alpha1_Volume_To_compute_Volume(in, out, s)
 }
 
-func autoConvert_compute_VolumeAttachment_To_v1alpha1_VolumeAttachment(in *compute.VolumeAttachment, out *VolumeAttachment, s conversion.Scope) error {
+func autoConvert_compute_Volume_To_v1alpha1_Volume(in *compute.Volume, out *Volume, s conversion.Scope) error {
 	out.Name = in.Name
-	out.Priority = in.Priority
-	if err := Convert_compute_VolumeAttachmentSource_To_v1alpha1_VolumeAttachmentSource(&in.VolumeAttachmentSource, &out.VolumeAttachmentSource, s); err != nil {
+	if err := Convert_compute_VolumeSource_To_v1alpha1_VolumeSource(&in.VolumeSource, &out.VolumeSource, s); err != nil {
 		return err
 	}
 	return nil
 }
 
-// Convert_compute_VolumeAttachment_To_v1alpha1_VolumeAttachment is an autogenerated conversion function.
-func Convert_compute_VolumeAttachment_To_v1alpha1_VolumeAttachment(in *compute.VolumeAttachment, out *VolumeAttachment, s conversion.Scope) error {
-	return autoConvert_compute_VolumeAttachment_To_v1alpha1_VolumeAttachment(in, out, s)
+// Convert_compute_Volume_To_v1alpha1_Volume is an autogenerated conversion function.
+func Convert_compute_Volume_To_v1alpha1_Volume(in *compute.Volume, out *Volume, s conversion.Scope) error {
+	return autoConvert_compute_Volume_To_v1alpha1_Volume(in, out, s)
 }
 
-func autoConvert_v1alpha1_VolumeAttachmentSource_To_compute_VolumeAttachmentSource(in *VolumeAttachmentSource, out *compute.VolumeAttachmentSource, s conversion.Scope) error {
-	out.VolumeClaim = (*compute.VolumeClaimAttachmentSource)(unsafe.Pointer(in.VolumeClaim))
+func autoConvert_v1alpha1_VolumeSource_To_compute_VolumeSource(in *VolumeSource, out *compute.VolumeSource, s conversion.Scope) error {
+	out.VolumeClaimRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeClaimRef))
 	return nil
 }
 
-// Convert_v1alpha1_VolumeAttachmentSource_To_compute_VolumeAttachmentSource is an autogenerated conversion function.
-func Convert_v1alpha1_VolumeAttachmentSource_To_compute_VolumeAttachmentSource(in *VolumeAttachmentSource, out *compute.VolumeAttachmentSource, s conversion.Scope) error {
-	return autoConvert_v1alpha1_VolumeAttachmentSource_To_compute_VolumeAttachmentSource(in, out, s)
+// Convert_v1alpha1_VolumeSource_To_compute_VolumeSource is an autogenerated conversion function.
+func Convert_v1alpha1_VolumeSource_To_compute_VolumeSource(in *VolumeSource, out *compute.VolumeSource, s conversion.Scope) error {
+	return autoConvert_v1alpha1_VolumeSource_To_compute_VolumeSource(in, out, s)
 }
 
-func autoConvert_compute_VolumeAttachmentSource_To_v1alpha1_VolumeAttachmentSource(in *compute.VolumeAttachmentSource, out *VolumeAttachmentSource, s conversion.Scope) error {
-	out.VolumeClaim = (*VolumeClaimAttachmentSource)(unsafe.Pointer(in.VolumeClaim))
+func autoConvert_compute_VolumeSource_To_v1alpha1_VolumeSource(in *compute.VolumeSource, out *VolumeSource, s conversion.Scope) error {
+	out.VolumeClaimRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeClaimRef))
 	return nil
 }
 
-// Convert_compute_VolumeAttachmentSource_To_v1alpha1_VolumeAttachmentSource is an autogenerated conversion function.
-func Convert_compute_VolumeAttachmentSource_To_v1alpha1_VolumeAttachmentSource(in *compute.VolumeAttachmentSource, out *VolumeAttachmentSource, s conversion.Scope) error {
-	return autoConvert_compute_VolumeAttachmentSource_To_v1alpha1_VolumeAttachmentSource(in, out, s)
+// Convert_compute_VolumeSource_To_v1alpha1_VolumeSource is an autogenerated conversion function.
+func Convert_compute_VolumeSource_To_v1alpha1_VolumeSource(in *compute.VolumeSource, out *VolumeSource, s conversion.Scope) error {
+	return autoConvert_compute_VolumeSource_To_v1alpha1_VolumeSource(in, out, s)
 }
 
-func autoConvert_v1alpha1_VolumeAttachmentStatus_To_compute_VolumeAttachmentStatus(in *VolumeAttachmentStatus, out *compute.VolumeAttachmentStatus, s conversion.Scope) error {
+func autoConvert_v1alpha1_VolumeStatus_To_compute_VolumeStatus(in *VolumeStatus, out *compute.VolumeStatus, s conversion.Scope) error {
 	out.Name = in.Name
-	out.Priority = in.Priority
 	out.DeviceID = in.DeviceID
 	return nil
 }
 
-// Convert_v1alpha1_VolumeAttachmentStatus_To_compute_VolumeAttachmentStatus is an autogenerated conversion function.
-func Convert_v1alpha1_VolumeAttachmentStatus_To_compute_VolumeAttachmentStatus(in *VolumeAttachmentStatus, out *compute.VolumeAttachmentStatus, s conversion.Scope) error {
-	return autoConvert_v1alpha1_VolumeAttachmentStatus_To_compute_VolumeAttachmentStatus(in, out, s)
+// Convert_v1alpha1_VolumeStatus_To_compute_VolumeStatus is an autogenerated conversion function.
+func Convert_v1alpha1_VolumeStatus_To_compute_VolumeStatus(in *VolumeStatus, out *compute.VolumeStatus, s conversion.Scope) error {
+	return autoConvert_v1alpha1_VolumeStatus_To_compute_VolumeStatus(in, out, s)
 }
 
-func autoConvert_compute_VolumeAttachmentStatus_To_v1alpha1_VolumeAttachmentStatus(in *compute.VolumeAttachmentStatus, out *VolumeAttachmentStatus, s conversion.Scope) error {
+func autoConvert_compute_VolumeStatus_To_v1alpha1_VolumeStatus(in *compute.VolumeStatus, out *VolumeStatus, s conversion.Scope) error {
 	out.Name = in.Name
-	out.Priority = in.Priority
 	out.DeviceID = in.DeviceID
 	return nil
 }
 
-// Convert_compute_VolumeAttachmentStatus_To_v1alpha1_VolumeAttachmentStatus is an autogenerated conversion function.
-func Convert_compute_VolumeAttachmentStatus_To_v1alpha1_VolumeAttachmentStatus(in *compute.VolumeAttachmentStatus, out *VolumeAttachmentStatus, s conversion.Scope) error {
-	return autoConvert_compute_VolumeAttachmentStatus_To_v1alpha1_VolumeAttachmentStatus(in, out, s)
-}
-
-func autoConvert_v1alpha1_VolumeClaimAttachmentSource_To_compute_VolumeClaimAttachmentSource(in *VolumeClaimAttachmentSource, out *compute.VolumeClaimAttachmentSource, s conversion.Scope) error {
-	out.Ref = in.Ref
-	return nil
-}
-
-// Convert_v1alpha1_VolumeClaimAttachmentSource_To_compute_VolumeClaimAttachmentSource is an autogenerated conversion function.
-func Convert_v1alpha1_VolumeClaimAttachmentSource_To_compute_VolumeClaimAttachmentSource(in *VolumeClaimAttachmentSource, out *compute.VolumeClaimAttachmentSource, s conversion.Scope) error {
-	return autoConvert_v1alpha1_VolumeClaimAttachmentSource_To_compute_VolumeClaimAttachmentSource(in, out, s)
-}
-
-func autoConvert_compute_VolumeClaimAttachmentSource_To_v1alpha1_VolumeClaimAttachmentSource(in *compute.VolumeClaimAttachmentSource, out *VolumeClaimAttachmentSource, s conversion.Scope) error {
-	out.Ref = in.Ref
-	return nil
-}
-
-// Convert_compute_VolumeClaimAttachmentSource_To_v1alpha1_VolumeClaimAttachmentSource is an autogenerated conversion function.
-func Convert_compute_VolumeClaimAttachmentSource_To_v1alpha1_VolumeClaimAttachmentSource(in *compute.VolumeClaimAttachmentSource, out *VolumeClaimAttachmentSource, s conversion.Scope) error {
-	return autoConvert_compute_VolumeClaimAttachmentSource_To_v1alpha1_VolumeClaimAttachmentSource(in, out, s)
+// Convert_compute_VolumeStatus_To_v1alpha1_VolumeStatus is an autogenerated conversion function.
+func Convert_compute_VolumeStatus_To_v1alpha1_VolumeStatus(in *compute.VolumeStatus, out *VolumeStatus, s conversion.Scope) error {
+	return autoConvert_compute_VolumeStatus_To_v1alpha1_VolumeStatus(in, out, s)
 }

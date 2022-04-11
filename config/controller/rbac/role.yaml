@@ -7,7 +7,7 @@ metadata:
   name: manager-role
 rules:
 - apiGroups:
-  - compute.onmetal.de
+  - compute.api.onmetal.de
   resources:
   - machineclasses
   verbs:
@@ -19,13 +19,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - compute.onmetal.de
+  - compute.api.onmetal.de
   resources:
   - machineclasses/finalizers
   verbs:
   - update
 - apiGroups:
-  - compute.onmetal.de
+  - compute.api.onmetal.de
   resources:
   - machineclasses/status
   verbs:
@@ -33,7 +33,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - compute.onmetal.de
+  - compute.api.onmetal.de
   resources:
   - machinepools
   verbs:
@@ -45,13 +45,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - compute.onmetal.de
+  - compute.api.onmetal.de
   resources:
   - machinepools/finalizers
   verbs:
   - update
 - apiGroups:
-  - compute.onmetal.de
+  - compute.api.onmetal.de
   resources:
   - machinepools/status
   verbs:
@@ -59,7 +59,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - compute.onmetal.de
+  - compute.api.onmetal.de
   resources:
   - machines
   verbs:
@@ -71,13 +71,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - compute.onmetal.de
+  - compute.api.onmetal.de
   resources:
   - machines/finalizers
   verbs:
   - update
 - apiGroups:
-  - compute.onmetal.de
+  - compute.api.onmetal.de
   resources:
   - machines/status
   verbs:
@@ -203,59 +203,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - storage.onmetal.de
-  resources:
-  - storageclasses
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - storage.onmetal.de
-  resources:
-  - storageclasses/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - storage.onmetal.de
-  resources:
-  - storageclasses/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - storage.onmetal.de
-  resources:
-  - storagepools
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - storage.onmetal.de
-  resources:
-  - storagepools/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - storage.onmetal.de
-  resources:
-  - storagepools/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - storage.onmetal.de
+  - storage.api.onmetal.de
   resources:
   - volumeclaims
   verbs:
@@ -267,13 +215,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - storage.onmetal.de
+  - storage.api.onmetal.de
   resources:
   - volumeclaims/finalizers
   verbs:
   - update
 - apiGroups:
-  - storage.onmetal.de
+  - storage.api.onmetal.de
   resources:
   - volumeclaims/status
   verbs:
@@ -281,7 +229,59 @@ rules:
   - patch
   - update
 - apiGroups:
-  - storage.onmetal.de
+  - storage.api.onmetal.de
+  resources:
+  - volumeclasses
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - storage.api.onmetal.de
+  resources:
+  - volumeclasses/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - storage.api.onmetal.de
+  resources:
+  - volumeclasses/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - storage.api.onmetal.de
+  resources:
+  - volumepools
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - storage.api.onmetal.de
+  resources:
+  - volumepools/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - storage.api.onmetal.de
+  resources:
+  - volumepools/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - storage.api.onmetal.de
   resources:
   - volumes
   verbs:
@@ -293,13 +293,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - storage.onmetal.de
+  - storage.api.onmetal.de
   resources:
   - volumes/finalizers
   verbs:
   - update
 - apiGroups:
-  - storage.onmetal.de
+  - storage.api.onmetal.de
   resources:
   - volumes/status
   verbs:

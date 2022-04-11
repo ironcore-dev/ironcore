@@ -17,14 +17,6 @@
 
 package internalversion
 
-// StorageClassListerExpansion allows custom methods to be added to
-// StorageClassLister.
-type StorageClassListerExpansion interface{}
-
-// StoragePoolListerExpansion allows custom methods to be added to
-// StoragePoolLister.
-type StoragePoolListerExpansion interface{}
-
 // VolumeListerExpansion allows custom methods to be added to
 // VolumeLister.
 type VolumeListerExpansion interface{}
@@ -40,3 +32,11 @@ type VolumeClaimListerExpansion interface{}
 // VolumeClaimNamespaceListerExpansion allows custom methods to be added to
 // VolumeClaimNamespaceLister.
 type VolumeClaimNamespaceListerExpansion interface{}
+
+// VolumeClassListerExpansion allows custom methods to be added to
+// VolumeClassLister.
+type VolumeClassListerExpansion interface{}
+
+// VolumePoolListerExpansion allows custom methods to be added to
+// VolumePoolLister.
+type VolumePoolListerExpansion interface{}

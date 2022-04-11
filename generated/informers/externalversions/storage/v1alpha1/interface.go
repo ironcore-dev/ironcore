@@ -23,14 +23,14 @@ import (
 
 // Interface provides access to all the informers in this group version.
 type Interface interface {
-	// StorageClasses returns a StorageClassInformer.
-	StorageClasses() StorageClassInformer
-	// StoragePools returns a StoragePoolInformer.
-	StoragePools() StoragePoolInformer
 	// Volumes returns a VolumeInformer.
 	Volumes() VolumeInformer
 	// VolumeClaims returns a VolumeClaimInformer.
 	VolumeClaims() VolumeClaimInformer
+	// VolumeClasses returns a VolumeClassInformer.
+	VolumeClasses() VolumeClassInformer
+	// VolumePools returns a VolumePoolInformer.
+	VolumePools() VolumePoolInformer
 }
 
 type version struct {
@@ -44,16 +44,6 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// StorageClasses returns a StorageClassInformer.
-func (v *version) StorageClasses() StorageClassInformer {
-	return &storageClassInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
-}
-
-// StoragePools returns a StoragePoolInformer.
-func (v *version) StoragePools() StoragePoolInformer {
-	return &storagePoolInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
-}
-
 // Volumes returns a VolumeInformer.
 func (v *version) Volumes() VolumeInformer {
 	return &volumeInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
@@ -62,4 +52,14 @@ func (v *version) Volumes() VolumeInformer {
 // VolumeClaims returns a VolumeClaimInformer.
 func (v *version) VolumeClaims() VolumeClaimInformer {
 	return &volumeClaimInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// VolumeClasses returns a VolumeClassInformer.
+func (v *version) VolumeClasses() VolumeClassInformer {
+	return &volumeClassInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
+// VolumePools returns a VolumePoolInformer.
+func (v *version) VolumePools() VolumePoolInformer {
+	return &volumePoolInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }

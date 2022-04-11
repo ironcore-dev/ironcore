@@ -27,23 +27,15 @@ import (
 
 type StorageV1alpha1Interface interface {
 	RESTClient() rest.Interface
-	StorageClassesGetter
-	StoragePoolsGetter
 	VolumesGetter
 	VolumeClaimsGetter
+	VolumeClassesGetter
+	VolumePoolsGetter
 }
 
-// StorageV1alpha1Client is used to interact with features provided by the storage.onmetal.de group.
+// StorageV1alpha1Client is used to interact with features provided by the storage.api.onmetal.de group.
 type StorageV1alpha1Client struct {
 	restClient rest.Interface
-}
-
-func (c *StorageV1alpha1Client) StorageClasses() StorageClassInterface {
-	return newStorageClasses(c)
-}
-
-func (c *StorageV1alpha1Client) StoragePools() StoragePoolInterface {
-	return newStoragePools(c)
 }
 
 func (c *StorageV1alpha1Client) Volumes(namespace string) VolumeInterface {
@@ -52,6 +44,14 @@ func (c *StorageV1alpha1Client) Volumes(namespace string) VolumeInterface {
 
 func (c *StorageV1alpha1Client) VolumeClaims(namespace string) VolumeClaimInterface {
 	return newVolumeClaims(c, namespace)
+}
+
+func (c *StorageV1alpha1Client) VolumeClasses() VolumeClassInterface {
+	return newVolumeClasses(c)
+}
+
+func (c *StorageV1alpha1Client) VolumePools() VolumePoolInterface {
+	return newVolumePools(c)
 }
 
 // NewForConfig creates a new StorageV1alpha1Client for the given config.

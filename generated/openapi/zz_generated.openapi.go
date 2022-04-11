@@ -45,7 +45,6 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.Machine":                       schema_onmetal_api_apis_compute_v1alpha1_Machine(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachineClass":                  schema_onmetal_api_apis_compute_v1alpha1_MachineClass(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachineClassList":              schema_onmetal_api_apis_compute_v1alpha1_MachineClassList(ref),
-		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachineClassSpec":              schema_onmetal_api_apis_compute_v1alpha1_MachineClassSpec(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachineCondition":              schema_onmetal_api_apis_compute_v1alpha1_MachineCondition(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachineList":                   schema_onmetal_api_apis_compute_v1alpha1_MachineList(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachinePool":                   schema_onmetal_api_apis_compute_v1alpha1_MachinePool(ref),
@@ -55,10 +54,9 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachinePoolStatus":             schema_onmetal_api_apis_compute_v1alpha1_MachinePoolStatus(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachineSpec":                   schema_onmetal_api_apis_compute_v1alpha1_MachineSpec(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachineStatus":                 schema_onmetal_api_apis_compute_v1alpha1_MachineStatus(ref),
-		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.VolumeAttachment":              schema_onmetal_api_apis_compute_v1alpha1_VolumeAttachment(ref),
-		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.VolumeAttachmentSource":        schema_onmetal_api_apis_compute_v1alpha1_VolumeAttachmentSource(ref),
-		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.VolumeAttachmentStatus":        schema_onmetal_api_apis_compute_v1alpha1_VolumeAttachmentStatus(ref),
-		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.VolumeClaimAttachmentSource":   schema_onmetal_api_apis_compute_v1alpha1_VolumeClaimAttachmentSource(ref),
+		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.Volume":                        schema_onmetal_api_apis_compute_v1alpha1_Volume(ref),
+		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.VolumeSource":                  schema_onmetal_api_apis_compute_v1alpha1_VolumeSource(ref),
+		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.VolumeStatus":                  schema_onmetal_api_apis_compute_v1alpha1_VolumeStatus(ref),
 		"github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.ClusterPrefix":                    schema_onmetal_api_apis_ipam_v1alpha1_ClusterPrefix(ref),
 		"github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.ClusterPrefixAllocation":          schema_onmetal_api_apis_ipam_v1alpha1_ClusterPrefixAllocation(ref),
 		"github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.ClusterPrefixAllocationCondition": schema_onmetal_api_apis_ipam_v1alpha1_ClusterPrefixAllocationCondition(ref),
@@ -92,22 +90,21 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixSpec":                       schema_onmetal_api_apis_ipam_v1alpha1_PrefixSpec(ref),
 		"github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixStatus":                     schema_onmetal_api_apis_ipam_v1alpha1_PrefixStatus(ref),
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.ClaimReference":                schema_onmetal_api_apis_storage_v1alpha1_ClaimReference(ref),
-		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.StorageClass":                  schema_onmetal_api_apis_storage_v1alpha1_StorageClass(ref),
-		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.StorageClassList":              schema_onmetal_api_apis_storage_v1alpha1_StorageClassList(ref),
-		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.StorageClassSpec":              schema_onmetal_api_apis_storage_v1alpha1_StorageClassSpec(ref),
-		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.StoragePool":                   schema_onmetal_api_apis_storage_v1alpha1_StoragePool(ref),
-		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.StoragePoolCondition":          schema_onmetal_api_apis_storage_v1alpha1_StoragePoolCondition(ref),
-		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.StoragePoolList":               schema_onmetal_api_apis_storage_v1alpha1_StoragePoolList(ref),
-		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.StoragePoolSpec":               schema_onmetal_api_apis_storage_v1alpha1_StoragePoolSpec(ref),
-		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.StoragePoolStatus":             schema_onmetal_api_apis_storage_v1alpha1_StoragePoolStatus(ref),
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.Volume":                        schema_onmetal_api_apis_storage_v1alpha1_Volume(ref),
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeAccess":                  schema_onmetal_api_apis_storage_v1alpha1_VolumeAccess(ref),
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeClaim":                   schema_onmetal_api_apis_storage_v1alpha1_VolumeClaim(ref),
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeClaimList":               schema_onmetal_api_apis_storage_v1alpha1_VolumeClaimList(ref),
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeClaimSpec":               schema_onmetal_api_apis_storage_v1alpha1_VolumeClaimSpec(ref),
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeClaimStatus":             schema_onmetal_api_apis_storage_v1alpha1_VolumeClaimStatus(ref),
+		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeClass":                   schema_onmetal_api_apis_storage_v1alpha1_VolumeClass(ref),
+		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeClassList":               schema_onmetal_api_apis_storage_v1alpha1_VolumeClassList(ref),
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeCondition":               schema_onmetal_api_apis_storage_v1alpha1_VolumeCondition(ref),
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeList":                    schema_onmetal_api_apis_storage_v1alpha1_VolumeList(ref),
+		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumePool":                    schema_onmetal_api_apis_storage_v1alpha1_VolumePool(ref),
+		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumePoolCondition":           schema_onmetal_api_apis_storage_v1alpha1_VolumePoolCondition(ref),
+		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumePoolList":                schema_onmetal_api_apis_storage_v1alpha1_VolumePoolList(ref),
+		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumePoolSpec":                schema_onmetal_api_apis_storage_v1alpha1_VolumePoolSpec(ref),
+		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumePoolStatus":              schema_onmetal_api_apis_storage_v1alpha1_VolumePoolStatus(ref),
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeSpec":                    schema_onmetal_api_apis_storage_v1alpha1_VolumeSpec(ref),
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeStatus":                  schema_onmetal_api_apis_storage_v1alpha1_VolumeStatus(ref),
 		"k8s.io/api/core/v1.AWSElasticBlockStoreVolumeSource":                                schema_k8sio_api_core_v1_AWSElasticBlockStoreVolumeSource(ref),
@@ -599,41 +596,8 @@ func schema_onmetal_api_apis_compute_v1alpha1_Interface(ref common.ReferenceCall
 			SchemaProps: spec.SchemaProps{
 				Description: "Interface is the definition of a single interface",
 				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"name": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Name is the name of the interface",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"target": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Target is the referenced resource of this interface.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
-						},
-					},
-					"priority": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Priority is the priority level of this interface",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"ip": {
-						SchemaProps: spec.SchemaProps{
-							Description: "IP specifies a concrete IP address which should be allocated from a Subnet",
-							Ref:         ref("github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP"),
-						},
-					},
-				},
-				Required: []string{"name", "target"},
 			},
 		},
-		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP", "k8s.io/api/core/v1.LocalObjectReference"},
 	}
 }
 
@@ -643,35 +607,8 @@ func schema_onmetal_api_apis_compute_v1alpha1_InterfaceStatus(ref common.Referen
 			SchemaProps: spec.SchemaProps{
 				Description: "InterfaceStatus reports the status of an Interface.",
 				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"name": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Name is the name of an interface.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"ip": {
-						SchemaProps: spec.SchemaProps{
-							Description: "IP is the IP allocated for an interface.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP"),
-						},
-					},
-					"priority": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Priority is the OS priority of the interface.",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-				},
-				Required: []string{"name", "ip"},
 			},
 		},
-		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP"},
 	}
 }
 
@@ -749,17 +686,25 @@ func schema_onmetal_api_apis_compute_v1alpha1_MachineClass(ref common.ReferenceC
 							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
 					},
-					"spec": {
+					"capabilities": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachineClassSpec"),
+							Type: []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
+									},
+								},
+							},
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachineClassSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			"k8s.io/apimachinery/pkg/api/resource.Quantity", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 
@@ -809,36 +754,6 @@ func schema_onmetal_api_apis_compute_v1alpha1_MachineClassList(ref common.Refere
 		},
 		Dependencies: []string{
 			"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachineClass", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
-	}
-}
-
-func schema_onmetal_api_apis_compute_v1alpha1_MachineClassSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "MachineClassSpec defines the desired state of MachineClass",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"capabilities": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Capabilities describes the resources a machine class can provide.",
-							Type:        []string{"object"},
-							AdditionalProperties: &spec.SchemaOrBool{
-								Allows: true,
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/api/resource.Quantity"},
 	}
 }
 
@@ -1217,24 +1132,16 @@ func schema_onmetal_api_apis_compute_v1alpha1_MachineSpec(ref common.ReferenceCa
 				Description: "MachineSpec defines the desired state of Machine",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"hostname": {
+					"machineClassRef": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Hostname is the hostname of the machine",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"machineClass": {
-						SchemaProps: spec.SchemaProps{
-							Description: "MachineClass is a reference to the machine class/flavor of the machine.",
+							Description: "MachineClassRef is a reference to the machine class/flavor of the machine.",
 							Default:     map[string]interface{}{},
 							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
 						},
 					},
 					"machinePoolSelector": {
 						SchemaProps: spec.SchemaProps{
-							Description: "MachinePoolSelector selects a suitable MachinePool by the given labels.",
+							Description: "MachinePoolSelector selects a suitable MachinePoolRef by the given labels.",
 							Type:        []string{"object"},
 							AdditionalProperties: &spec.SchemaOrBool{
 								Allows: true,
@@ -1248,9 +1155,9 @@ func schema_onmetal_api_apis_compute_v1alpha1_MachineSpec(ref common.ReferenceCa
 							},
 						},
 					},
-					"machinePool": {
+					"machinePoolRef": {
 						SchemaProps: spec.SchemaProps{
-							Description: "MachinePool defines machine pool to run the machine in. If empty, a scheduler will figure out an appropriate pool to run the machine in.",
+							Description: "MachinePoolRef defines machine pool to run the machine in. If empty, a scheduler will figure out an appropriate pool to run the machine in.",
 							Default:     map[string]interface{}{},
 							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
 						},
@@ -1277,29 +1184,15 @@ func schema_onmetal_api_apis_compute_v1alpha1_MachineSpec(ref common.ReferenceCa
 							},
 						},
 					},
-					"securityGroups": {
+					"volumes": {
 						SchemaProps: spec.SchemaProps{
-							Description: "SecurityGroups is a list of security groups of a machine",
+							Description: "Volumes are volumes attached to this machine.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("k8s.io/api/core/v1.LocalObjectReference"),
-									},
-								},
-							},
-						},
-					},
-					"volumeAttachments": {
-						SchemaProps: spec.SchemaProps{
-							Description: "VolumeAttachments are volumes attached to this machine.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("github.com/onmetal/onmetal-api/apis/compute/v1alpha1.VolumeAttachment"),
+										Ref:     ref("github.com/onmetal/onmetal-api/apis/compute/v1alpha1.Volume"),
 									},
 								},
 							},
@@ -1307,7 +1200,7 @@ func schema_onmetal_api_apis_compute_v1alpha1_MachineSpec(ref common.ReferenceCa
 					},
 					"ignition": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Ignition is a reference to a config map containing the ignition YAML for the machine to boot up. If key is empty, DefaultIgnitionKey will be used as fallback.",
+							Description: "IgnitionRef is a reference to a config map containing the ignition YAML for the machine to boot up. If key is empty, DefaultIgnitionKey will be used as fallback.",
 							Ref:         ref("github.com/onmetal/onmetal-api/apis/common/v1alpha1.ConfigMapKeySelector"),
 						},
 					},
@@ -1340,11 +1233,11 @@ func schema_onmetal_api_apis_compute_v1alpha1_MachineSpec(ref common.ReferenceCa
 						},
 					},
 				},
-				Required: []string{"hostname", "machineClass", "image"},
+				Required: []string{"machineClassRef", "image"},
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/common/v1alpha1.ConfigMapKeySelector", "github.com/onmetal/onmetal-api/apis/common/v1alpha1.Toleration", "github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EFIVar", "github.com/onmetal/onmetal-api/apis/compute/v1alpha1.Interface", "github.com/onmetal/onmetal-api/apis/compute/v1alpha1.VolumeAttachment", "k8s.io/api/core/v1.LocalObjectReference"},
+			"github.com/onmetal/onmetal-api/apis/common/v1alpha1.ConfigMapKeySelector", "github.com/onmetal/onmetal-api/apis/common/v1alpha1.Toleration", "github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EFIVar", "github.com/onmetal/onmetal-api/apis/compute/v1alpha1.Interface", "github.com/onmetal/onmetal-api/apis/compute/v1alpha1.Volume", "k8s.io/api/core/v1.LocalObjectReference"},
 	}
 }
 
@@ -1387,14 +1280,14 @@ func schema_onmetal_api_apis_compute_v1alpha1_MachineStatus(ref common.Reference
 							},
 						},
 					},
-					"volumeAttachments": {
+					"volumes": {
 						SchemaProps: spec.SchemaProps{
 							Type: []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/onmetal/onmetal-api/apis/compute/v1alpha1.VolumeAttachmentStatus"),
+										Ref:     ref("github.com/onmetal/onmetal-api/apis/compute/v1alpha1.VolumeStatus"),
 									},
 								},
 							},
@@ -1404,36 +1297,29 @@ func schema_onmetal_api_apis_compute_v1alpha1_MachineStatus(ref common.Reference
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.InterfaceStatus", "github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachineCondition", "github.com/onmetal/onmetal-api/apis/compute/v1alpha1.VolumeAttachmentStatus"},
+			"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.InterfaceStatus", "github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachineCondition", "github.com/onmetal/onmetal-api/apis/compute/v1alpha1.VolumeStatus"},
 	}
 }
 
-func schema_onmetal_api_apis_compute_v1alpha1_VolumeAttachment(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_onmetal_api_apis_compute_v1alpha1_Volume(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "VolumeAttachment defines a volume attachment of a machine",
+				Description: "Volume defines a volume attachment of a machine",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"name": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Name is the name of the VolumeAttachment",
+							Description: "Name is the name of the Volume",
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
-					"priority": {
+					"volumeClaimRef": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Priority is the OS priority of the volume.",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"volumeClaim": {
-						SchemaProps: spec.SchemaProps{
-							Description: "VolumeClaim instructs the VolumeAttachment to use a VolumeClaim as source for the attachment.",
-							Ref:         ref("github.com/onmetal/onmetal-api/apis/compute/v1alpha1.VolumeClaimAttachmentSource"),
+							Description: "VolumeClaim instructs the Volume to use a VolumeClaim as source for the attachment.",
+							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
 						},
 					},
 				},
@@ -1441,36 +1327,36 @@ func schema_onmetal_api_apis_compute_v1alpha1_VolumeAttachment(ref common.Refere
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.VolumeClaimAttachmentSource"},
+			"k8s.io/api/core/v1.LocalObjectReference"},
 	}
 }
 
-func schema_onmetal_api_apis_compute_v1alpha1_VolumeAttachmentSource(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_onmetal_api_apis_compute_v1alpha1_VolumeSource(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "VolumeAttachmentSource specifies the source to use for a VolumeAttachment.",
+				Description: "VolumeSource specifies the source to use for a Volume.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"volumeClaim": {
+					"volumeClaimRef": {
 						SchemaProps: spec.SchemaProps{
-							Description: "VolumeClaim instructs the VolumeAttachment to use a VolumeClaim as source for the attachment.",
-							Ref:         ref("github.com/onmetal/onmetal-api/apis/compute/v1alpha1.VolumeClaimAttachmentSource"),
+							Description: "VolumeClaim instructs the Volume to use a VolumeClaim as source for the attachment.",
+							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.VolumeClaimAttachmentSource"},
+			"k8s.io/api/core/v1.LocalObjectReference"},
 	}
 }
 
-func schema_onmetal_api_apis_compute_v1alpha1_VolumeAttachmentStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_onmetal_api_apis_compute_v1alpha1_VolumeStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "VolumeAttachmentStatus is the status of a VolumeAttachment.",
+				Description: "VolumeStatus is the status of a Volume.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"name": {
@@ -1479,13 +1365,6 @@ func schema_onmetal_api_apis_compute_v1alpha1_VolumeAttachmentStatus(ref common.
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
-						},
-					},
-					"priority": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Priority is the OS priority of the volume.",
-							Type:        []string{"integer"},
-							Format:      "int32",
 						},
 					},
 					"deviceID": {
@@ -1499,29 +1378,6 @@ func schema_onmetal_api_apis_compute_v1alpha1_VolumeAttachmentStatus(ref common.
 				Required: []string{"name"},
 			},
 		},
-	}
-}
-
-func schema_onmetal_api_apis_compute_v1alpha1_VolumeClaimAttachmentSource(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "VolumeClaimAttachmentSource references a VolumeClaim as VolumeAttachment source.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"ref": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Ref is a reference to the VolumeClaim.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
-						},
-					},
-				},
-				Required: []string{"ref"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/api/core/v1.LocalObjectReference"},
 	}
 }
 
@@ -2990,407 +2846,6 @@ func schema_onmetal_api_apis_storage_v1alpha1_ClaimReference(ref common.Referenc
 	}
 }
 
-func schema_onmetal_api_apis_storage_v1alpha1_StorageClass(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "StorageClass is the Schema for the storageclasses API",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("github.com/onmetal/onmetal-api/apis/storage/v1alpha1.StorageClassSpec"),
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.StorageClassSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
-	}
-}
-
-func schema_onmetal_api_apis_storage_v1alpha1_StorageClassList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "StorageClassList contains a list of StorageClass",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("github.com/onmetal/onmetal-api/apis/storage/v1alpha1.StorageClass"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.StorageClass", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
-	}
-}
-
-func schema_onmetal_api_apis_storage_v1alpha1_StorageClassSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "StorageClassSpec defines the desired state of StorageClass",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"capabilities": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Capabilities describes the capabilities of a storage class",
-							Type:        []string{"object"},
-							AdditionalProperties: &spec.SchemaOrBool{
-								Allows: true,
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/api/resource.Quantity"},
-	}
-}
-
-func schema_onmetal_api_apis_storage_v1alpha1_StoragePool(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "StoragePool is the Schema for the storagepools API",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("github.com/onmetal/onmetal-api/apis/storage/v1alpha1.StoragePoolSpec"),
-						},
-					},
-					"status": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("github.com/onmetal/onmetal-api/apis/storage/v1alpha1.StoragePoolStatus"),
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.StoragePoolSpec", "github.com/onmetal/onmetal-api/apis/storage/v1alpha1.StoragePoolStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
-	}
-}
-
-func schema_onmetal_api_apis_storage_v1alpha1_StoragePoolCondition(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "StoragePoolCondition is one of the conditions of a volume.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"type": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Type is the type of the condition.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"status": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Status is the status of the condition.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"reason": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Reason is a machine-readable indication of why the condition is in a certain state.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"message": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Message is a human-readable explanation of why the condition has a certain reason / state.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"observedGeneration": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ObservedGeneration represents the .metadata.generation that the condition was set based upon.",
-							Type:        []string{"integer"},
-							Format:      "int64",
-						},
-					},
-					"lastUpdateTime": {
-						SchemaProps: spec.SchemaProps{
-							Description: "LastUpdateTime is the last time a condition has been updated.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
-						},
-					},
-					"lastTransitionTime": {
-						SchemaProps: spec.SchemaProps{
-							Description: "LastTransitionTime is the last time the status of a condition has transitioned from one state to another.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
-						},
-					},
-				},
-				Required: []string{"type", "status", "reason", "message"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
-	}
-}
-
-func schema_onmetal_api_apis_storage_v1alpha1_StoragePoolList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "StoragePoolList contains a list of StoragePool",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("github.com/onmetal/onmetal-api/apis/storage/v1alpha1.StoragePool"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.StoragePool", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
-	}
-}
-
-func schema_onmetal_api_apis_storage_v1alpha1_StoragePoolSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "StoragePoolSpec defines the desired state of StoragePool",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"providerID": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ProviderID identifies the StoragePool on provider side.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"taints": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Taints of the StoragePool. Only Volumes who tolerate all the taints will land in the StoragePool.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("github.com/onmetal/onmetal-api/apis/common/v1alpha1.Taint"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"providerID"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/common/v1alpha1.Taint"},
-	}
-}
-
-func schema_onmetal_api_apis_storage_v1alpha1_StoragePoolStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "StoragePoolStatus defines the observed state of StoragePool",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"state": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"conditions": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("github.com/onmetal/onmetal-api/apis/storage/v1alpha1.StoragePoolCondition"),
-									},
-								},
-							},
-						},
-					},
-					"availableStorageClasses": {
-						SchemaProps: spec.SchemaProps{
-							Description: "AvailableStorageClasses list the references of supported StorageClasses of this pool",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("k8s.io/api/core/v1.LocalObjectReference"),
-									},
-								},
-							},
-						},
-					},
-					"available": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Available list the available capacity of a storage pool",
-							Type:        []string{"object"},
-							AdditionalProperties: &spec.SchemaOrBool{
-								Allows: true,
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
-									},
-								},
-							},
-						},
-					},
-					"used": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Used indicates how much capacity has been used in a storage pool",
-							Type:        []string{"object"},
-							AdditionalProperties: &spec.SchemaOrBool{
-								Allows: true,
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.StoragePoolCondition", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/api/resource.Quantity"},
-	}
-}
-
 func schema_onmetal_api_apis_storage_v1alpha1_Volume(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -3616,15 +3071,15 @@ func schema_onmetal_api_apis_storage_v1alpha1_VolumeClaimSpec(ref common.Referen
 							},
 						},
 					},
-					"storageClassRef": {
+					"volumeClassRef": {
 						SchemaProps: spec.SchemaProps{
-							Description: "StorageClassRef references the StorageClass used by the Volume.",
+							Description: "VolumeClassRef references the VolumeClass used by the Volume.",
 							Default:     map[string]interface{}{},
 							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
 						},
 					},
 				},
-				Required: []string{"resources", "storageClassRef"},
+				Required: []string{"resources", "volumeClassRef"},
 			},
 		},
 		Dependencies: []string{
@@ -3649,6 +3104,105 @@ func schema_onmetal_api_apis_storage_v1alpha1_VolumeClaimStatus(ref common.Refer
 				},
 			},
 		},
+	}
+}
+
+func schema_onmetal_api_apis_storage_v1alpha1_VolumeClass(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "VolumeClass is the Schema for the volumeclasses API",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"capabilities": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Capabilities describes the capabilities of a VolumeClass.",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/api/resource.Quantity", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_onmetal_api_apis_storage_v1alpha1_VolumeClassList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "VolumeClassList contains a list of VolumeClass",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeClass"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeClass", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
 	}
 }
 
@@ -3770,6 +3324,287 @@ func schema_onmetal_api_apis_storage_v1alpha1_VolumeList(ref common.ReferenceCal
 	}
 }
 
+func schema_onmetal_api_apis_storage_v1alpha1_VolumePool(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "VolumePool is the Schema for the volumepools API",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumePoolSpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumePoolStatus"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumePoolSpec", "github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumePoolStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_onmetal_api_apis_storage_v1alpha1_VolumePoolCondition(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "VolumePoolCondition is one of the conditions of a volume.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Type is the type of the condition.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Status is the status of the condition.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"reason": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Reason is a machine-readable indication of why the condition is in a certain state.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"message": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Message is a human-readable explanation of why the condition has a certain reason / state.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"observedGeneration": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ObservedGeneration represents the .metadata.generation that the condition was set based upon.",
+							Type:        []string{"integer"},
+							Format:      "int64",
+						},
+					},
+					"lastUpdateTime": {
+						SchemaProps: spec.SchemaProps{
+							Description: "LastUpdateTime is the last time a condition has been updated.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
+						},
+					},
+					"lastTransitionTime": {
+						SchemaProps: spec.SchemaProps{
+							Description: "LastTransitionTime is the last time the status of a condition has transitioned from one state to another.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
+						},
+					},
+				},
+				Required: []string{"type", "status", "reason", "message"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+	}
+}
+
+func schema_onmetal_api_apis_storage_v1alpha1_VolumePoolList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "VolumePoolList contains a list of VolumePool",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumePool"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumePool", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_onmetal_api_apis_storage_v1alpha1_VolumePoolSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "VolumePoolSpec defines the desired state of VolumePool",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"providerID": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ProviderID identifies the VolumePool on provider side.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"taints": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Taints of the VolumePool. Only Volumes who tolerate all the taints will land in the VolumePool.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/apis/common/v1alpha1.Taint"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"providerID"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/apis/common/v1alpha1.Taint"},
+	}
+}
+
+func schema_onmetal_api_apis_storage_v1alpha1_VolumePoolStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "VolumePoolStatus defines the observed state of VolumePool",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"state": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"conditions": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumePoolCondition"),
+									},
+								},
+							},
+						},
+					},
+					"availableVolumeClasses": {
+						SchemaProps: spec.SchemaProps{
+							Description: "AvailableVolumeClasses list the references of any supported VolumeClass of this pool",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/api/core/v1.LocalObjectReference"),
+									},
+								},
+							},
+						},
+					},
+					"available": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Available list the available capacity of a VolumePool.",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
+									},
+								},
+							},
+						},
+					},
+					"used": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Used indicates how much capacity has been used in a VolumePool.",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumePoolCondition", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/api/resource.Quantity"},
+	}
+}
+
 func schema_onmetal_api_apis_storage_v1alpha1_VolumeSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -3777,16 +3612,16 @@ func schema_onmetal_api_apis_storage_v1alpha1_VolumeSpec(ref common.ReferenceCal
 				Description: "VolumeSpec defines the desired state of Volume",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"storageClassRef": {
+					"volumeClassRef": {
 						SchemaProps: spec.SchemaProps{
-							Description: "StorageClassRef is the storage class of a volume",
+							Description: "VolumeClassRef is the VolumeClass of a volume",
 							Default:     map[string]interface{}{},
 							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
 						},
 					},
-					"storagePoolSelector": {
+					"volumePoolSelector": {
 						SchemaProps: spec.SchemaProps{
-							Description: "StoragePoolSelector selects a suitable StoragePool by the given labels.",
+							Description: "VolumePoolSelector selects a suitable VolumePoolRef by the given labels.",
 							Type:        []string{"object"},
 							AdditionalProperties: &spec.SchemaOrBool{
 								Allows: true,
@@ -3800,9 +3635,9 @@ func schema_onmetal_api_apis_storage_v1alpha1_VolumeSpec(ref common.ReferenceCal
 							},
 						},
 					},
-					"storagePool": {
+					"volumePoolRef": {
 						SchemaProps: spec.SchemaProps{
-							Description: "StoragePool indicates which storage pool to use for a volume. If unset, the scheduler will figure out a suitable StoragePool.",
+							Description: "VolumePoolRef indicates which VolumePool to use for a volume. If unset, the scheduler will figure out a suitable VolumePoolRef.",
 							Default:     map[string]interface{}{},
 							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
 						},
@@ -3831,7 +3666,7 @@ func schema_onmetal_api_apis_storage_v1alpha1_VolumeSpec(ref common.ReferenceCal
 					},
 					"tolerations": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Tolerations define tolerations the Volume has. Only StoragePools whose taints covered by Tolerations will be considered to host the Volume.",
+							Description: "Tolerations define tolerations the Volume has. Only any VolumePool whose taints covered by Tolerations will be considered to host the Volume.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -3844,7 +3679,7 @@ func schema_onmetal_api_apis_storage_v1alpha1_VolumeSpec(ref common.ReferenceCal
 						},
 					},
 				},
-				Required: []string{"storageClassRef", "storagePool"},
+				Required: []string{"volumeClassRef"},
 			},
 		},
 		Dependencies: []string{

@@ -1,10 +1,10 @@
-apiVersion: storage.onmetal.de/v1alpha1
+apiVersion: storage.api.onmetal.de/v1alpha1
 kind: VolumeClaim
 metadata:
   name: volumeclaim-sample
 spec:
-  storageClassRef:
-    name: storageclass-sample
+  volumeClassRef:
+    name: volumeclass-sample
   volumeRef:
     name: volume-sample
   resources:

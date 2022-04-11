@@ -1,24 +1,24 @@
-# permissions for end users to edit storagepools.
+# permissions for end users to edit volumepools.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: storagepool-editor-role
+  name: volumepool-editor-role
 rules:
-- apiGroups:
-  - storage.onmetal.de
-  resources:
-  - storagepools
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - storage.onmetal.de
-  resources:
-  - storagepools/status
-  verbs:
-  - get
+  - apiGroups:
+      - storage.api.onmetal.de
+    resources:
+      - volumepools
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - storage.api.onmetal.de
+    resources:
+      - volumepools/status
+    verbs:
+      - get
