@@ -109,8 +109,8 @@ Example manifests:
 
 [//]: # (@formatter:off)
 ```yaml
-apiVersion: core.onmetal.de/v1alpha1
-kind: IPAMPrefix
+apiVersion: ipam.onmetal.de/v1alpha1
+kind: Prefix
 metadata:
   namespace: default
   name: my-root-prefix
@@ -122,8 +122,8 @@ status:
       status: True
       reason: RootPrefix
 ---
-apiVersion: core.onmetal.de/v1alpha1
-kind: IPAMPrefix
+apiVersion: ipam.onmetal.de/v1alpha1
+kind: Prefix
 metadata:
   namespace: default
   name: my-sub-prefix
@@ -152,8 +152,8 @@ Example manifest:
 
 [//]: # (@formatter:off)
 ```yaml
-apiVersion: core.onmetal.de/v1alpha1
-kind: IPAMIP
+apiVersion: ipam.onmetal.de/v1alpha1
+kind: IP
 metadata:
   namespace: default
   name: my-ip
@@ -184,7 +184,7 @@ regulated with a field / policy of some kind.
 Example manifest:
 
 ```yaml
-apiVersion: core.onmetal.de/v1alpha1
+apiVersion: networking.onmetal.de/v1alpha1
 kind: Network
 metadata:
   namespace: default
@@ -214,7 +214,7 @@ Example usage:
 
 [//]: # (@formatter:off)
 ```yaml
-apiVersion: compute.onmetal.de/v1alpha1
+apiVersion: networking.onmetal.de/v1alpha1
 kind: NetworkInterface
 metadata:
   namespace: default
@@ -240,7 +240,7 @@ status:
     - 10.0.0.1
     - 2607:f0d0:1002:51::4
 ---
-apiVersion: core.onmetal.de/v1alpha1
+apiVersion: compute.onmetal.de/v1alpha1
 kind: Machine
 metadata:
   namespace: default
@@ -268,7 +268,7 @@ This would result in the following `NetworkInterfaceBinding`:
 
 [//]: # (@formatter:off)
 ```yaml
-apiVersion: core.onmetal.de/v1alpha1
+apiVersion: networking.onmetal.de/v1alpha1
 kind: NetworkInterfaceBinding
 metadata:
   namespace: default
@@ -288,7 +288,7 @@ Sample manifest:
 
 [//]: # (@formatter:off)
 ```yaml
-apiVersion: core.onmetal.de/v1alpha1
+apiVersion: compute.onmetal.de/v1alpha1
 kind: Machine
 spec:
   interfaces:
@@ -323,7 +323,7 @@ Example manifest:
 
 [//]: # (@formatter:off)
 ```yaml
-apiVersion: core.onmetal.de/v1alpha1
+apiVersion: networking.onmetal.de/v1alpha1
 kind: AliasPrefix
 metadata:
   namespace: default
@@ -350,7 +350,7 @@ This could manifest in the following `AliasPrefixRouting`:
 
 [//]: # (@formatter:off)
 ```yaml
-apiVersion: core.onmetal.de/v1alpha1
+apiVersion: networking.onmetal.de/v1alpha1
 kind: AliasPrefixRouting
 metadata:
   namespace: default
@@ -373,7 +373,7 @@ It will also automatically be set in the same network and only target the hostin
 
 [//]: # (@formatter:off)
 ```yaml
-apiVersion: core.onmetal.de/v1alpha1
+apiVersion: networking.onmetal.de/v1alpha1
 kind: NetworkInterface
 metadata:
   namespace: default
@@ -412,7 +412,7 @@ Example manifest:
 
 [//]: # (@formatter:off)
 ```yaml
-apiVersion: compute.onmetal.de
+apiVersion: networking.onmetal.de
 kind: VirtualIP
 metadata:
   namespace: default
@@ -432,7 +432,7 @@ This could manifest in the following `VirtualIPRouting`:
 
 [//]: # (@formatter:off)
 ```yaml
-apiVersion: compute.onmetal.de
+apiVersion: networking.onmetal.de
 kind: VirtualIPRouting
 metadata:
   namespace: default
@@ -453,7 +453,7 @@ to only target the creating `NetworkInterface`. A `selector` in the `spec` thus 
 
 [//]: # (@formatter:off)
 ```yaml
-apiVersion: core.onmetal.de/v1alpha1
+apiVersion: networking.onmetal.de/v1alpha1
 kind: NetworkInterface
 metadata:
   namespace: default
@@ -484,16 +484,16 @@ These are the required manifests:
 ```yaml
 # IPAM Setup:
 # Create a root prefix and a pod / node sub-prefix.
-apiVersion: core.onmetal.de/v1alpha1
-kind: IPAMPrefix
+apiVersion: ipam.onmetal.de/v1alpha1
+kind: Prefix
 metadata:
   namespace: default
   name: root
 spec:
   prefix: 10.0.0.0/8
 ---
-apiVersion: core.onmetal.de/v1alpha1
-kind: IPAMPrefix
+apiVersion: ipam.onmetal.de/v1alpha1
+kind: Prefix
 metadata:
   namespace: default
   name: pods
@@ -502,8 +502,8 @@ spec:
   parentRef:
     name: root
 ---
-apiVersion: core.onmetal.de/v1alpha1
-kind: IPAMPrefix
+apiVersion: ipam.onmetal.de/v1alpha1
+kind: Prefix
 metadata:
   namespace: default
   name: nodes
@@ -514,14 +514,14 @@ spec:
 ---
 # Once IPAM is done, the concrete networking is defined
 # The Network is the bracket around all resources
-apiVersion: core.onmetal.de/v1alpha1
+apiVersion: networking.onmetal.de/v1alpha1
 kind: Network
 metadata:
   namespace: default
   name: k8s
 ---
 # Create one prefix that should be shared across all machines
-apiVersion: core.onmetal.de/v1alpha1
+apiVersion: networking.onmetal.de/v1alpha1
 kind: AliasPrefix
 metadata:
   namespace: default
@@ -540,7 +540,7 @@ spec:
         prefixLength: 16
 ---
 # Create the actual machine
-apiVersion: core.onmetal.de/v1alpha1
+apiVersion: compute.onmetal.de/v1alpha1
 kind: Machine
 metadata:
   namespace: default
