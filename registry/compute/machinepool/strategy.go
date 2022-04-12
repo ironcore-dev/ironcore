@@ -20,6 +20,7 @@ import (
 
 	"github.com/onmetal/onmetal-api/api"
 	"github.com/onmetal/onmetal-api/apis/compute"
+	"github.com/onmetal/onmetal-api/apis/compute/validation"
 	"github.com/onmetal/onmetal-api/equality"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
@@ -87,7 +88,8 @@ func (machinePoolStrategy) PrepareForUpdate(ctx context.Context, obj, old runtim
 }
 
 func (machinePoolStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
-	return field.ErrorList{}
+	machinePool := obj.(*compute.MachinePool)
+	return validation.ValidateMachinePool(machinePool)
 }
 
 func (machinePoolStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
@@ -134,7 +136,9 @@ func (machinePoolStatusStrategy) PrepareForUpdate(ctx context.Context, obj, old 
 }
 
 func (machinePoolStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
-	return nil
+	newMachinePool := obj.(*compute.MachinePool)
+	oldMachinePool := old.(*compute.MachinePool)
+	return validation.ValidateMachinePoolUpdate(newMachinePool, oldMachinePool)
 }
 
 func (machinePoolStatusStrategy) WarningsOnUpdate(cxt context.Context, obj, old runtime.Object) []string {

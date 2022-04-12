@@ -20,6 +20,7 @@ import (
 
 	"github.com/onmetal/onmetal-api/api"
 	"github.com/onmetal/onmetal-api/apis/compute"
+	"github.com/onmetal/onmetal-api/apis/compute/validation"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -68,7 +69,8 @@ func (machineStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Ob
 }
 
 func (machineStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
-	return field.ErrorList{}
+	machine := obj.(*compute.Machine)
+	return validation.ValidateMachine(machine)
 }
 
 func (machineStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
@@ -115,7 +117,9 @@ func (machineStatusStrategy) PrepareForUpdate(ctx context.Context, obj, old runt
 }
 
 func (machineStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
-	return nil
+	newMachine := obj.(*compute.Machine)
+	oldMachine := old.(*compute.Machine)
+	return validation.ValidateMachineUpdate(newMachine, oldMachine)
 }
 
 func (machineStatusStrategy) WarningsOnUpdate(cxt context.Context, obj, old runtime.Object) []string {

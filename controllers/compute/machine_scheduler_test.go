@@ -50,6 +50,7 @@ var _ = Describe("MachineScheduler", func() {
 				GenerateName: "test-machine-",
 			},
 			Spec: computev1alpha1.MachineSpec{
+				Image: "my-image",
 				MachineClassRef: corev1.LocalObjectReference{
 					Name: "my-machineclass",
 				},
@@ -74,6 +75,7 @@ var _ = Describe("MachineScheduler", func() {
 				GenerateName: "test-machine-",
 			},
 			Spec: computev1alpha1.MachineSpec{
+				Image: "my-image",
 				MachineClassRef: corev1.LocalObjectReference{
 					Name: "my-machineclass",
 				},
@@ -149,6 +151,7 @@ var _ = Describe("MachineScheduler", func() {
 				GenerateName: "test-machine-",
 			},
 			Spec: computev1alpha1.MachineSpec{
+				Image: "my-image",
 				MachinePoolSelector: map[string]string{
 					"foo": "bar",
 				},
@@ -203,6 +206,7 @@ var _ = Describe("MachineScheduler", func() {
 				GenerateName: "test-machine-",
 			},
 			Spec: computev1alpha1.MachineSpec{
+				Image: "my-image",
 				MachineClassRef: corev1.LocalObjectReference{
 					Name: "my-machineclass",
 				},
