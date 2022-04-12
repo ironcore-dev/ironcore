@@ -26,23 +26,15 @@ import (
 
 type StorageInterface interface {
 	RESTClient() rest.Interface
-	StorageClassesGetter
-	StoragePoolsGetter
 	VolumesGetter
 	VolumeClaimsGetter
+	VolumeClassesGetter
+	VolumePoolsGetter
 }
 
-// StorageClient is used to interact with features provided by the storage.onmetal.de group.
+// StorageClient is used to interact with features provided by the storage.api.onmetal.de group.
 type StorageClient struct {
 	restClient rest.Interface
-}
-
-func (c *StorageClient) StorageClasses() StorageClassInterface {
-	return newStorageClasses(c)
-}
-
-func (c *StorageClient) StoragePools() StoragePoolInterface {
-	return newStoragePools(c)
 }
 
 func (c *StorageClient) Volumes(namespace string) VolumeInterface {
@@ -51,6 +43,14 @@ func (c *StorageClient) Volumes(namespace string) VolumeInterface {
 
 func (c *StorageClient) VolumeClaims(namespace string) VolumeClaimInterface {
 	return newVolumeClaims(c, namespace)
+}
+
+func (c *StorageClient) VolumeClasses() VolumeClassInterface {
+	return newVolumeClasses(c)
+}
+
+func (c *StorageClient) VolumePools() VolumePoolInterface {
+	return newVolumePools(c)
 }
 
 // NewForConfig creates a new StorageClient for the given config.
@@ -102,8 +102,8 @@ func setConfigDefaults(config *rest.Config) error {
 	if config.UserAgent == "" {
 		config.UserAgent = rest.DefaultKubernetesUserAgent()
 	}
-	if config.GroupVersion == nil || config.GroupVersion.Group != scheme.Scheme.PrioritizedVersionsForGroup("storage.onmetal.de")[0].Group {
-		gv := scheme.Scheme.PrioritizedVersionsForGroup("storage.onmetal.de")[0]
+	if config.GroupVersion == nil || config.GroupVersion.Group != scheme.Scheme.PrioritizedVersionsForGroup("storage.api.onmetal.de")[0].Group {
+		gv := scheme.Scheme.PrioritizedVersionsForGroup("storage.api.onmetal.de")[0]
 		config.GroupVersion = &gv
 	}
 	config.NegotiatedSerializer = scheme.Codecs

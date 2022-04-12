@@ -18,7 +18,7 @@
 // +k8s:openapi-gen=true
 // +k8s:defaulter-gen=TypeMeta
 // +k8s:protobuf-gen=package
-// +groupName=compute.onmetal.de
+// +groupName=compute.api.onmetal.de
 
 // Package compute is the internal version of the API.
 package compute // import "github.com/onmetal/onmetal-api/apis/compute"

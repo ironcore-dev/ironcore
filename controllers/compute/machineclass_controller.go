@@ -35,17 +35,17 @@ import (
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 )
 
-// MachineClassReconciler reconciles a MachineClass object
+// MachineClassReconciler reconciles a MachineClassRef object
 type MachineClassReconciler struct {
 	client.Client
 	APIReader client.Reader
 	Scheme    *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=compute.onmetal.de,resources=machineclasses,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=compute.onmetal.de,resources=machineclasses/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=compute.onmetal.de,resources=machineclasses/finalizers,verbs=update
-//+kubebuilder:rbac:groups=compute.onmetal.de,resources=machines,verbs=get;list;watch
+//+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machineclasses,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machineclasses/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machineclasses/finalizers,verbs=update
+//+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machines,verbs=get;list;watch
 
 // Reconcile moves the current state of the cluster closer to the desired state
 func (r *MachineClassReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -67,7 +67,7 @@ func (r *MachineClassReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			handler.Funcs{
 				DeleteFunc: func(event event.DeleteEvent, queue workqueue.RateLimitingInterface) {
 					machine := event.Object.(*computev1alpha1.Machine)
-					queue.Add(ctrl.Request{NamespacedName: types.NamespacedName{Name: machine.Spec.MachineClass.Name}})
+					queue.Add(ctrl.Request{NamespacedName: types.NamespacedName{Name: machine.Spec.MachineClassRef.Name}})
 				},
 			},
 		).
@@ -82,7 +82,7 @@ func (r *MachineClassReconciler) listReferencingMachines(ctx context.Context, ma
 
 	var machines []computev1alpha1.Machine
 	for _, machine := range machineList.Items {
-		if machine.Spec.MachineClass.Name == machineClass.Name {
+		if machine.Spec.MachineClassRef.Name == machineClass.Name {
 			machines = append(machines, machine)
 		}
 	}

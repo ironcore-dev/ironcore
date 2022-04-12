@@ -572,8 +572,7 @@ func (in *PrefixAllocationRequest) DeepCopyInto(out *PrefixAllocationRequest) {
 	in.Prefix.DeepCopyInto(&out.Prefix)
 	if in.Range != nil {
 		in, out := &in.Range, &out.Range
-		*out = new(commonv1alpha1.IPRange)
-		(*in).DeepCopyInto(*out)
+		*out = (*in).DeepCopy()
 	}
 	return
 }
@@ -594,8 +593,7 @@ func (in *PrefixAllocationResult) DeepCopyInto(out *PrefixAllocationResult) {
 	in.Prefix.DeepCopyInto(&out.Prefix)
 	if in.Range != nil {
 		in, out := &in.Range, &out.Range
-		*out = new(commonv1alpha1.IPRange)
-		(*in).DeepCopyInto(*out)
+		*out = (*in).DeepCopy()
 	}
 	return
 }

@@ -35,9 +35,9 @@ type FakeVolumeClaims struct {
 	ns   string
 }
 
-var volumeclaimsResource = schema.GroupVersionResource{Group: "storage.onmetal.de", Version: "v1alpha1", Resource: "volumeclaims"}
+var volumeclaimsResource = schema.GroupVersionResource{Group: "storage.api.onmetal.de", Version: "v1alpha1", Resource: "volumeclaims"}
 
-var volumeclaimsKind = schema.GroupVersionKind{Group: "storage.onmetal.de", Version: "v1alpha1", Kind: "VolumeClaim"}
+var volumeclaimsKind = schema.GroupVersionKind{Group: "storage.api.onmetal.de", Version: "v1alpha1", Kind: "VolumeClaim"}
 
 // Get takes name of the volumeClaim, and returns the corresponding volumeClaim object, and an error if there is any.
 func (c *FakeVolumeClaims) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.VolumeClaim, err error) {

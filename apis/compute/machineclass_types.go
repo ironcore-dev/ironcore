@@ -21,12 +21,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// MachineClassSpec defines the desired state of MachineClass
-type MachineClassSpec struct {
-	// Capabilities describes the resources a machine class can provide.
-	Capabilities corev1.ResourceList
-}
-
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +genclient
 // +genClient:nonNamespaced
@@ -37,7 +31,8 @@ type MachineClass struct {
 	metav1.TypeMeta
 	metav1.ObjectMeta
 
-	Spec MachineClassSpec
+	// Capabilities describes the resources a machine class can provide.
+	Capabilities corev1.ResourceList
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

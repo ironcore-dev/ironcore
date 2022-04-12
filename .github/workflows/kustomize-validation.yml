@@ -17,4 +17,4 @@ jobs:
         with:
           kustomize-version: 4.5.4
       - run: |
-          ./hack/validate_kustomize.sh
+          ./hack/validate-kustomize.sh

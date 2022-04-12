@@ -35,9 +35,9 @@ type FakeMachines struct {
 	ns   string
 }
 
-var machinesResource = schema.GroupVersionResource{Group: "compute.onmetal.de", Version: "", Resource: "machines"}
+var machinesResource = schema.GroupVersionResource{Group: "compute.api.onmetal.de", Version: "", Resource: "machines"}
 
-var machinesKind = schema.GroupVersionKind{Group: "compute.onmetal.de", Version: "", Kind: "Machine"}
+var machinesKind = schema.GroupVersionKind{Group: "compute.api.onmetal.de", Version: "", Kind: "Machine"}
 
 // Get takes name of the machine, and returns the corresponding machine object, and an error if there is any.
 func (c *FakeMachines) Get(ctx context.Context, name string, options v1.GetOptions) (result *compute.Machine, err error) {

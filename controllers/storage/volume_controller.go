@@ -44,10 +44,10 @@ type VolumeReconciler struct {
 	SharedFieldIndexer *clientutils.SharedFieldIndexer
 }
 
-//+kubebuilder:rbac:groups=storage.onmetal.de,resources=volumes,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=storage.onmetal.de,resources=volumes/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=storage.onmetal.de,resources=volumes/finalizers,verbs=update
-//+kubebuilder:rbac:groups=storage.onmetal.de,resources=volumeclaims,verbs=get;list
+//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes/finalizers,verbs=update
+//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumeclaims,verbs=get;list
 
 // Reconcile is part of the main reconciliation loop for Volume types
 func (r *VolumeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {

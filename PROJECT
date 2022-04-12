@@ -29,7 +29,7 @@ resources:
   controller: true
   domain: onmetal.de
   group: storage
-  kind: StoragePool
+  kind: VolumePool
   path: github.com/onmetal/onmetal-api/apis/storage/v1alpha1
   version: v1alpha1
 - api:
@@ -38,7 +38,7 @@ resources:
   controller: true
   domain: onmetal.de
   group: storage
-  kind: StorageClass
+  kind: VolumeClass
   path: github.com/onmetal/onmetal-api/apis/storage/v1alpha1
   version: v1alpha1
 - api:

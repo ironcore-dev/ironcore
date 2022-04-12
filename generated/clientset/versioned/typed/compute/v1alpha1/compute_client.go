@@ -32,7 +32,7 @@ type ComputeV1alpha1Interface interface {
 	MachinePoolsGetter
 }
 
-// ComputeV1alpha1Client is used to interact with features provided by the compute.onmetal.de group.
+// ComputeV1alpha1Client is used to interact with features provided by the compute.api.onmetal.de group.
 type ComputeV1alpha1Client struct {
 	restClient rest.Interface
 }

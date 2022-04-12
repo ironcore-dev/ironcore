@@ -27,20 +27,20 @@ type FakeStorage struct {
 	*testing.Fake
 }
 
-func (c *FakeStorage) StorageClasses() internalversion.StorageClassInterface {
-	return &FakeStorageClasses{c}
-}
-
-func (c *FakeStorage) StoragePools() internalversion.StoragePoolInterface {
-	return &FakeStoragePools{c}
-}
-
 func (c *FakeStorage) Volumes(namespace string) internalversion.VolumeInterface {
 	return &FakeVolumes{c, namespace}
 }
 
 func (c *FakeStorage) VolumeClaims(namespace string) internalversion.VolumeClaimInterface {
 	return &FakeVolumeClaims{c, namespace}
+}
+
+func (c *FakeStorage) VolumeClasses() internalversion.VolumeClassInterface {
+	return &FakeVolumeClasses{c}
+}
+
+func (c *FakeStorage) VolumePools() internalversion.VolumePoolInterface {
+	return &FakeVolumePools{c}
 }
 
 // RESTClient returns a RESTClient that is used to communicate

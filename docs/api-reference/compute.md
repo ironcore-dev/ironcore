@@ -1,22 +1,22 @@
 <p>Packages:</p>
 <ul>
 <li>
-<a href="#compute.onmetal.de%2fv1alpha1">compute.onmetal.de/v1alpha1</a>
+<a href="#compute.api.onmetal.de%2fv1alpha1">compute.api.onmetal.de/v1alpha1</a>
 </li>
 </ul>
-<h2 id="compute.onmetal.de/v1alpha1">compute.onmetal.de/v1alpha1</h2>
+<h2 id="compute.api.onmetal.de/v1alpha1">compute.api.onmetal.de/v1alpha1</h2>
 <div>
 <p>Package v1alpha1 is the v1alpha1 version of the API.</p>
 </div>
 Resource Types:
 <ul><li>
-<a href="#compute.onmetal.de/v1alpha1.Machine">Machine</a>
+<a href="#compute.api.onmetal.de/v1alpha1.Machine">Machine</a>
 </li><li>
-<a href="#compute.onmetal.de/v1alpha1.MachineClass">MachineClass</a>
+<a href="#compute.api.onmetal.de/v1alpha1.MachineClass">MachineClass</a>
 </li><li>
-<a href="#compute.onmetal.de/v1alpha1.MachinePool">MachinePool</a>
+<a href="#compute.api.onmetal.de/v1alpha1.MachinePool">MachinePool</a>
 </li></ul>
-<h3 id="compute.onmetal.de/v1alpha1.Machine">Machine
+<h3 id="compute.api.onmetal.de/v1alpha1.Machine">Machine
 </h3>
 <div>
 <p>Machine is the Schema for the machines API</p>
@@ -35,7 +35,7 @@ Resource Types:
 string</td>
 <td>
 <code>
-compute.onmetal.de/v1alpha1
+compute.api.onmetal.de/v1alpha1
 </code>
 </td>
 </tr>
@@ -64,7 +64,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.MachineSpec">
+<a href="#compute.api.onmetal.de/v1alpha1.MachineSpec">
 MachineSpec
 </a>
 </em>
@@ -75,18 +75,7 @@ MachineSpec
 <table>
 <tr>
 <td>
-<code>hostname</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Hostname is the hostname of the machine</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>machineClass</code><br/>
+<code>machineClassRef</code><br/>
 <em>
 <a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
@@ -94,7 +83,7 @@ Kubernetes core/v1.LocalObjectReference
 </em>
 </td>
 <td>
-<p>MachineClass is a reference to the machine class/flavor of the machine.</p>
+<p>MachineClassRef is a reference to the machine class/flavor of the machine.</p>
 </td>
 </tr>
 <tr>
@@ -105,12 +94,12 @@ map[string]string
 </em>
 </td>
 <td>
-<p>MachinePoolSelector selects a suitable MachinePool by the given labels.</p>
+<p>MachinePoolSelector selects a suitable MachinePoolRef by the given labels.</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>machinePool</code><br/>
+<code>machinePoolRef</code><br/>
 <em>
 <a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
@@ -118,7 +107,7 @@ Kubernetes core/v1.LocalObjectReference
 </em>
 </td>
 <td>
-<p>MachinePool defines machine pool to run the machine in.
+<p>MachinePoolRef defines machine pool to run the machine in.
 If empty, a scheduler will figure out an appropriate pool to run the machine in.</p>
 </td>
 </tr>
@@ -137,7 +126,7 @@ string
 <td>
 <code>interfaces</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.Interface">
+<a href="#compute.api.onmetal.de/v1alpha1.Interface">
 []Interface
 </a>
 </em>
@@ -148,28 +137,15 @@ string
 </tr>
 <tr>
 <td>
-<code>securityGroups</code><br/>
+<code>volumes</code><br/>
 <em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
-[]Kubernetes core/v1.LocalObjectReference
+<a href="#compute.api.onmetal.de/v1alpha1.Volume">
+[]Volume
 </a>
 </em>
 </td>
 <td>
-<p>SecurityGroups is a list of security groups of a machine</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>volumeAttachments</code><br/>
-<em>
-<a href="#compute.onmetal.de/v1alpha1.VolumeAttachment">
-[]VolumeAttachment
-</a>
-</em>
-</td>
-<td>
-<p>VolumeAttachments are volumes attached to this machine.</p>
+<p>Volumes are volumes attached to this machine.</p>
 </td>
 </tr>
 <tr>
@@ -182,7 +158,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ConfigMapKeySelector
 </em>
 </td>
 <td>
-<p>Ignition is a reference to a config map containing the ignition YAML for the machine to boot up.
+<p>IgnitionRef is a reference to a config map containing the ignition YAML for the machine to boot up.
 If key is empty, DefaultIgnitionKey will be used as fallback.</p>
 </td>
 </tr>
@@ -190,7 +166,7 @@ If key is empty, DefaultIgnitionKey will be used as fallback.</p>
 <td>
 <code>efiVars</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.EFIVar">
+<a href="#compute.api.onmetal.de/v1alpha1.EFIVar">
 []EFIVar
 </a>
 </em>
@@ -220,7 +196,7 @@ covered by Tolerations will be considered to run the Machine.</p>
 <td>
 <code>status</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.MachineStatus">
+<a href="#compute.api.onmetal.de/v1alpha1.MachineStatus">
 MachineStatus
 </a>
 </em>
@@ -230,7 +206,7 @@ MachineStatus
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.MachineClass">MachineClass
+<h3 id="compute.api.onmetal.de/v1alpha1.MachineClass">MachineClass
 </h3>
 <div>
 <p>MachineClass is the Schema for the machineclasses API</p>
@@ -249,7 +225,7 @@ MachineStatus
 string</td>
 <td>
 <code>
-compute.onmetal.de/v1alpha1
+compute.api.onmetal.de/v1alpha1
 </code>
 </td>
 </tr>
@@ -276,19 +252,6 @@ Refer to the Kubernetes API documentation for the fields of the
 </tr>
 <tr>
 <td>
-<code>spec</code><br/>
-<em>
-<a href="#compute.onmetal.de/v1alpha1.MachineClassSpec">
-MachineClassSpec
-</a>
-</em>
-</td>
-<td>
-<br/>
-<br/>
-<table>
-<tr>
-<td>
 <code>capabilities</code><br/>
 <em>
 <a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#resourcelist-v1-core">
@@ -297,15 +260,11 @@ Kubernetes core/v1.ResourceList
 </em>
 </td>
 <td>
-<p>Capabilities describes the resources a machine class can provide.</p>
-</td>
-</tr>
-</table>
 </td>
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.MachinePool">MachinePool
+<h3 id="compute.api.onmetal.de/v1alpha1.MachinePool">MachinePool
 </h3>
 <div>
 <p>MachinePool is the Schema for the machinepools API</p>
@@ -324,7 +283,7 @@ Kubernetes core/v1.ResourceList
 string</td>
 <td>
 <code>
-compute.onmetal.de/v1alpha1
+compute.api.onmetal.de/v1alpha1
 </code>
 </td>
 </tr>
@@ -353,7 +312,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.MachinePoolSpec">
+<a href="#compute.api.onmetal.de/v1alpha1.MachinePoolSpec">
 MachinePoolSpec
 </a>
 </em>
@@ -394,7 +353,7 @@ will land in the MachinePool.</p>
 <td>
 <code>status</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.MachinePoolStatus">
+<a href="#compute.api.onmetal.de/v1alpha1.MachinePoolStatus">
 MachinePoolStatus
 </a>
 </em>
@@ -404,10 +363,10 @@ MachinePoolStatus
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.EFIVar">EFIVar
+<h3 id="compute.api.onmetal.de/v1alpha1.EFIVar">EFIVar
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.MachineSpec">MachineSpec</a>)
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachineSpec">MachineSpec</a>)
 </p>
 <div>
 <p>EFIVar is a variable to pass to EFI while booting up.</p>
@@ -452,160 +411,26 @@ string
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.Interface">Interface
+<h3 id="compute.api.onmetal.de/v1alpha1.Interface">Interface
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.MachineSpec">MachineSpec</a>)
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachineSpec">MachineSpec</a>)
 </p>
 <div>
 <p>Interface is the definition of a single interface</p>
 </div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>name</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Name is the name of the interface</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>target</code><br/>
-<em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>Target is the referenced resource of this interface.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>priority</code><br/>
-<em>
-int32
-</em>
-</td>
-<td>
-<p>Priority is the priority level of this interface</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>ip</code><br/>
-<em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
-</a>
-</em>
-</td>
-<td>
-<p>IP specifies a concrete IP address which should be allocated from a Subnet</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="compute.onmetal.de/v1alpha1.InterfaceStatus">InterfaceStatus
+<h3 id="compute.api.onmetal.de/v1alpha1.InterfaceStatus">InterfaceStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.MachineStatus">MachineStatus</a>)
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachineStatus">MachineStatus</a>)
 </p>
 <div>
 <p>InterfaceStatus reports the status of an Interface.</p>
 </div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>name</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Name is the name of an interface.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>ip</code><br/>
-<em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
-</a>
-</em>
-</td>
-<td>
-<p>IP is the IP allocated for an interface.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>priority</code><br/>
-<em>
-int32
-</em>
-</td>
-<td>
-<p>Priority is the OS priority of the interface.</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="compute.onmetal.de/v1alpha1.MachineClassSpec">MachineClassSpec
+<h3 id="compute.api.onmetal.de/v1alpha1.MachineCondition">MachineCondition
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.MachineClass">MachineClass</a>)
-</p>
-<div>
-<p>MachineClassSpec defines the desired state of MachineClass</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>capabilities</code><br/>
-<em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#resourcelist-v1-core">
-Kubernetes core/v1.ResourceList
-</a>
-</em>
-</td>
-<td>
-<p>Capabilities describes the resources a machine class can provide.</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="compute.onmetal.de/v1alpha1.MachineCondition">MachineCondition
-</h3>
-<p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.MachineStatus">MachineStatus</a>)
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachineStatus">MachineStatus</a>)
 </p>
 <div>
 <p>MachineCondition is one of the conditions of a volume.</p>
@@ -622,7 +447,7 @@ Kubernetes core/v1.ResourceList
 <td>
 <code>type</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.MachineConditionType">
+<a href="#compute.api.onmetal.de/v1alpha1.MachineConditionType">
 MachineConditionType
 </a>
 </em>
@@ -705,10 +530,10 @@ Kubernetes meta/v1.Time
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.MachineConditionType">MachineConditionType
+<h3 id="compute.api.onmetal.de/v1alpha1.MachineConditionType">MachineConditionType
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.MachineCondition">MachineCondition</a>)
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachineCondition">MachineCondition</a>)
 </p>
 <div>
 <p>MachineConditionType is a type a MachineCondition can have.</p>
@@ -725,10 +550,10 @@ Kubernetes meta/v1.Time
 </td>
 </tr></tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.MachinePoolCondition">MachinePoolCondition
+<h3 id="compute.api.onmetal.de/v1alpha1.MachinePoolCondition">MachinePoolCondition
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.MachinePoolStatus">MachinePoolStatus</a>)
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachinePoolStatus">MachinePoolStatus</a>)
 </p>
 <div>
 <p>MachinePoolCondition is one of the conditions of a volume.</p>
@@ -745,7 +570,7 @@ Kubernetes meta/v1.Time
 <td>
 <code>type</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.MachinePoolConditionType">
+<a href="#compute.api.onmetal.de/v1alpha1.MachinePoolConditionType">
 MachinePoolConditionType
 </a>
 </em>
@@ -828,18 +653,18 @@ Kubernetes meta/v1.Time
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.MachinePoolConditionType">MachinePoolConditionType
+<h3 id="compute.api.onmetal.de/v1alpha1.MachinePoolConditionType">MachinePoolConditionType
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.MachinePoolCondition">MachinePoolCondition</a>)
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachinePoolCondition">MachinePoolCondition</a>)
 </p>
 <div>
 <p>MachinePoolConditionType is a type a MachinePoolCondition can have.</p>
 </div>
-<h3 id="compute.onmetal.de/v1alpha1.MachinePoolSpec">MachinePoolSpec
+<h3 id="compute.api.onmetal.de/v1alpha1.MachinePoolSpec">MachinePoolSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.MachinePool">MachinePool</a>)
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachinePool">MachinePool</a>)
 </p>
 <div>
 <p>MachinePoolSpec defines the desired state of MachinePool</p>
@@ -879,10 +704,10 @@ will land in the MachinePool.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.MachinePoolState">MachinePoolState
+<h3 id="compute.api.onmetal.de/v1alpha1.MachinePoolState">MachinePoolState
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.MachinePoolStatus">MachinePoolStatus</a>)
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachinePoolStatus">MachinePoolStatus</a>)
 </p>
 <div>
 <p>MachinePoolState is a state a MachinePool can be in.</p>
@@ -904,10 +729,10 @@ will land in the MachinePool.</p>
 <td></td>
 </tr></tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.MachinePoolStatus">MachinePoolStatus
+<h3 id="compute.api.onmetal.de/v1alpha1.MachinePoolStatus">MachinePoolStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.MachinePool">MachinePool</a>)
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachinePool">MachinePool</a>)
 </p>
 <div>
 <p>MachinePoolStatus defines the observed state of MachinePool</p>
@@ -924,7 +749,7 @@ will land in the MachinePool.</p>
 <td>
 <code>state</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.MachinePoolState">
+<a href="#compute.api.onmetal.de/v1alpha1.MachinePoolState">
 MachinePoolState
 </a>
 </em>
@@ -936,7 +761,7 @@ MachinePoolState
 <td>
 <code>conditions</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.MachinePoolCondition">
+<a href="#compute.api.onmetal.de/v1alpha1.MachinePoolCondition">
 []MachinePoolCondition
 </a>
 </em>
@@ -958,10 +783,10 @@ MachinePoolState
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.MachineSpec">MachineSpec
+<h3 id="compute.api.onmetal.de/v1alpha1.MachineSpec">MachineSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.Machine">Machine</a>)
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.Machine">Machine</a>)
 </p>
 <div>
 <p>MachineSpec defines the desired state of Machine</p>
@@ -976,18 +801,7 @@ MachinePoolState
 <tbody>
 <tr>
 <td>
-<code>hostname</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Hostname is the hostname of the machine</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>machineClass</code><br/>
+<code>machineClassRef</code><br/>
 <em>
 <a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
@@ -995,7 +809,7 @@ Kubernetes core/v1.LocalObjectReference
 </em>
 </td>
 <td>
-<p>MachineClass is a reference to the machine class/flavor of the machine.</p>
+<p>MachineClassRef is a reference to the machine class/flavor of the machine.</p>
 </td>
 </tr>
 <tr>
@@ -1006,12 +820,12 @@ map[string]string
 </em>
 </td>
 <td>
-<p>MachinePoolSelector selects a suitable MachinePool by the given labels.</p>
+<p>MachinePoolSelector selects a suitable MachinePoolRef by the given labels.</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>machinePool</code><br/>
+<code>machinePoolRef</code><br/>
 <em>
 <a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
@@ -1019,7 +833,7 @@ Kubernetes core/v1.LocalObjectReference
 </em>
 </td>
 <td>
-<p>MachinePool defines machine pool to run the machine in.
+<p>MachinePoolRef defines machine pool to run the machine in.
 If empty, a scheduler will figure out an appropriate pool to run the machine in.</p>
 </td>
 </tr>
@@ -1038,7 +852,7 @@ string
 <td>
 <code>interfaces</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.Interface">
+<a href="#compute.api.onmetal.de/v1alpha1.Interface">
 []Interface
 </a>
 </em>
@@ -1049,28 +863,15 @@ string
 </tr>
 <tr>
 <td>
-<code>securityGroups</code><br/>
+<code>volumes</code><br/>
 <em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
-[]Kubernetes core/v1.LocalObjectReference
+<a href="#compute.api.onmetal.de/v1alpha1.Volume">
+[]Volume
 </a>
 </em>
 </td>
 <td>
-<p>SecurityGroups is a list of security groups of a machine</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>volumeAttachments</code><br/>
-<em>
-<a href="#compute.onmetal.de/v1alpha1.VolumeAttachment">
-[]VolumeAttachment
-</a>
-</em>
-</td>
-<td>
-<p>VolumeAttachments are volumes attached to this machine.</p>
+<p>Volumes are volumes attached to this machine.</p>
 </td>
 </tr>
 <tr>
@@ -1083,7 +884,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.ConfigMapKeySelector
 </em>
 </td>
 <td>
-<p>Ignition is a reference to a config map containing the ignition YAML for the machine to boot up.
+<p>IgnitionRef is a reference to a config map containing the ignition YAML for the machine to boot up.
 If key is empty, DefaultIgnitionKey will be used as fallback.</p>
 </td>
 </tr>
@@ -1091,7 +892,7 @@ If key is empty, DefaultIgnitionKey will be used as fallback.</p>
 <td>
 <code>efiVars</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.EFIVar">
+<a href="#compute.api.onmetal.de/v1alpha1.EFIVar">
 []EFIVar
 </a>
 </em>
@@ -1116,10 +917,10 @@ covered by Tolerations will be considered to run the Machine.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.MachineState">MachineState
+<h3 id="compute.api.onmetal.de/v1alpha1.MachineState">MachineState
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.MachineStatus">MachineStatus</a>)
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachineStatus">MachineStatus</a>)
 </p>
 <div>
 </div>
@@ -1145,10 +946,10 @@ MachinePool.</p>
 <td></td>
 </tr></tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.MachineStatus">MachineStatus
+<h3 id="compute.api.onmetal.de/v1alpha1.MachineStatus">MachineStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.Machine">Machine</a>)
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.Machine">Machine</a>)
 </p>
 <div>
 <p>MachineStatus defines the observed state of Machine</p>
@@ -1165,7 +966,7 @@ MachinePool.</p>
 <td>
 <code>state</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.MachineState">
+<a href="#compute.api.onmetal.de/v1alpha1.MachineState">
 MachineState
 </a>
 </em>
@@ -1177,7 +978,7 @@ MachineState
 <td>
 <code>conditions</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.MachineCondition">
+<a href="#compute.api.onmetal.de/v1alpha1.MachineCondition">
 []MachineCondition
 </a>
 </em>
@@ -1189,7 +990,7 @@ MachineState
 <td>
 <code>interfaces</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.InterfaceStatus">
+<a href="#compute.api.onmetal.de/v1alpha1.InterfaceStatus">
 []InterfaceStatus
 </a>
 </em>
@@ -1199,10 +1000,10 @@ MachineState
 </tr>
 <tr>
 <td>
-<code>volumeAttachments</code><br/>
+<code>volumes</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.VolumeAttachmentStatus">
-[]VolumeAttachmentStatus
+<a href="#compute.api.onmetal.de/v1alpha1.VolumeStatus">
+[]VolumeStatus
 </a>
 </em>
 </td>
@@ -1211,7 +1012,7 @@ MachineState
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.RetainPolicy">RetainPolicy
+<h3 id="compute.api.onmetal.de/v1alpha1.RetainPolicy">RetainPolicy
 (<code>string</code> alias)</h3>
 <div>
 </div>
@@ -1228,13 +1029,13 @@ MachineState
 <td></td>
 </tr></tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.VolumeAttachment">VolumeAttachment
+<h3 id="compute.api.onmetal.de/v1alpha1.Volume">Volume
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.MachineSpec">MachineSpec</a>)
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachineSpec">MachineSpec</a>)
 </p>
 <div>
-<p>VolumeAttachment defines a volume attachment of a machine</p>
+<p>Volume defines a volume attachment of a machine</p>
 </div>
 <table>
 <thead>
@@ -1252,45 +1053,34 @@ string
 </em>
 </td>
 <td>
-<p>Name is the name of the VolumeAttachment</p>
+<p>Name is the name of the Volume</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>priority</code><br/>
+<code>VolumeSource</code><br/>
 <em>
-int32
-</em>
-</td>
-<td>
-<p>Priority is the OS priority of the volume.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>VolumeAttachmentSource</code><br/>
-<em>
-<a href="#compute.onmetal.de/v1alpha1.VolumeAttachmentSource">
-VolumeAttachmentSource
+<a href="#compute.api.onmetal.de/v1alpha1.VolumeSource">
+VolumeSource
 </a>
 </em>
 </td>
 <td>
 <p>
-(Members of <code>VolumeAttachmentSource</code> are embedded into this type.)
+(Members of <code>VolumeSource</code> are embedded into this type.)
 </p>
-<p>VolumeAttachmentSource is the source where the storage for the VolumeAttachment resides at.</p>
+<p>VolumeSource is the source where the storage for the Volume resides at.</p>
 </td>
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.VolumeAttachmentSource">VolumeAttachmentSource
+<h3 id="compute.api.onmetal.de/v1alpha1.VolumeSource">VolumeSource
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.VolumeAttachment">VolumeAttachment</a>)
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.Volume">Volume</a>)
 </p>
 <div>
-<p>VolumeAttachmentSource specifies the source to use for a VolumeAttachment.</p>
+<p>VolumeSource specifies the source to use for a Volume.</p>
 </div>
 <table>
 <thead>
@@ -1302,26 +1092,26 @@ VolumeAttachmentSource
 <tbody>
 <tr>
 <td>
-<code>volumeClaim</code><br/>
+<code>volumeClaimRef</code><br/>
 <em>
-<a href="#compute.onmetal.de/v1alpha1.VolumeClaimAttachmentSource">
-VolumeClaimAttachmentSource
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
 </td>
 <td>
-<p>VolumeClaim instructs the VolumeAttachment to use a VolumeClaim as source for the attachment.</p>
+<p>VolumeClaim instructs the Volume to use a VolumeClaim as source for the attachment.</p>
 </td>
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.VolumeAttachmentStatus">VolumeAttachmentStatus
+<h3 id="compute.api.onmetal.de/v1alpha1.VolumeStatus">VolumeStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.MachineStatus">MachineStatus</a>)
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachineStatus">MachineStatus</a>)
 </p>
 <div>
-<p>VolumeAttachmentStatus is the status of a VolumeAttachment.</p>
+<p>VolumeStatus is the status of a Volume.</p>
 </div>
 <table>
 <thead>
@@ -1344,17 +1134,6 @@ string
 </tr>
 <tr>
 <td>
-<code>priority</code><br/>
-<em>
-int32
-</em>
-</td>
-<td>
-<p>Priority is the OS priority of the volume.</p>
-</td>
-</tr>
-<tr>
-<td>
 <code>deviceID</code><br/>
 <em>
 string
@@ -1366,39 +1145,8 @@ string
 </tr>
 </tbody>
 </table>
-<h3 id="compute.onmetal.de/v1alpha1.VolumeClaimAttachmentSource">VolumeClaimAttachmentSource
-</h3>
-<p>
-(<em>Appears on:</em><a href="#compute.onmetal.de/v1alpha1.VolumeAttachmentSource">VolumeAttachmentSource</a>)
-</p>
-<div>
-<p>VolumeClaimAttachmentSource references a VolumeClaim as VolumeAttachment source.</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>ref</code><br/>
-<em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>Ref is a reference to the VolumeClaim.</p>
-</td>
-</tr>
-</tbody>
-</table>
 <hr/>
 <p><em>
 Generated with <code>gen-crd-api-reference-docs</code>
-on git commit <code>23732c2</code>.
+on git commit <code>bbff837</code>.
 </em></p>

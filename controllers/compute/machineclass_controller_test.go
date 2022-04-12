@@ -35,7 +35,6 @@ var _ = Describe("machineclass controller", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "machineclass-",
 			},
-			Spec: computev1alpha1.MachineClassSpec{},
 		}
 		Expect(k8sClient.Create(ctx, machineClass)).Should(Succeed())
 
@@ -46,7 +45,7 @@ var _ = Describe("machineclass controller", func() {
 				GenerateName: "machine-",
 			},
 			Spec: computev1alpha1.MachineSpec{
-				MachineClass: corev1.LocalObjectReference{
+				MachineClassRef: corev1.LocalObjectReference{
 					Name: machineClass.Name,
 				},
 			},

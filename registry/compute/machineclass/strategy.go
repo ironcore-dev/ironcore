@@ -33,7 +33,7 @@ import (
 func GetAttrs(obj runtime.Object) (labels.Set, fields.Set, error) {
 	machineClass, ok := obj.(*compute.MachineClass)
 	if !ok {
-		return nil, nil, fmt.Errorf("given object is not a MachineClass")
+		return nil, nil, fmt.Errorf("given object is not a MachineClassRef")
 	}
 	return machineClass.Labels, SelectableFields(machineClass), nil
 }
@@ -70,7 +70,7 @@ func (machineClassStrategy) PrepareForUpdate(ctx context.Context, obj, old runti
 	newMachineClass := obj.(*compute.MachineClass)
 	oldMachineClass := old.(*compute.MachineClass)
 
-	if !equality.Semantic.DeepEqual(&newMachineClass.Spec, oldMachineClass.Spec) {
+	if !equality.Semantic.DeepEqual(&newMachineClass.Capabilities, oldMachineClass.Capabilities) {
 		newMachineClass.Generation = oldMachineClass.Generation + 1
 	}
 }

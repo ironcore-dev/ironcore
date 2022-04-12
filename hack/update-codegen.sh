@@ -17,7 +17,7 @@ export GOPATH="$VGOPATH"
 export GO111MODULE=off
 
 bash "$CODEGEN_PKG"/generate-internal-groups.sh \
-  deepcopy,defaulter,client,lister,informer \
+  deepcopy,defaulter,conversion,client,lister,informer \
   github.com/onmetal/onmetal-api/generated \
   github.com/onmetal/onmetal-api/apis \
   github.com/onmetal/onmetal-api/apis \

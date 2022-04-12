@@ -53,7 +53,7 @@ func (f *genericInformer) Lister() cache.GenericLister {
 // TODO extend this to unknown resources with a client pool
 func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericInformer, error) {
 	switch resource {
-	// Group=compute.onmetal.de, Version=v1alpha1
+	// Group=compute.api.onmetal.de, Version=v1alpha1
 	case v1alpha1.SchemeGroupVersion.WithResource("machines"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Compute().V1alpha1().Machines().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("machineclasses"):
@@ -73,15 +73,15 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 	case ipamv1alpha1.SchemeGroupVersion.WithResource("prefixallocations"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Ipam().V1alpha1().PrefixAllocations().Informer()}, nil
 
-		// Group=storage.onmetal.de, Version=v1alpha1
-	case storagev1alpha1.SchemeGroupVersion.WithResource("storageclasses"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Storage().V1alpha1().StorageClasses().Informer()}, nil
-	case storagev1alpha1.SchemeGroupVersion.WithResource("storagepools"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Storage().V1alpha1().StoragePools().Informer()}, nil
+		// Group=storage.api.onmetal.de, Version=v1alpha1
 	case storagev1alpha1.SchemeGroupVersion.WithResource("volumes"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Storage().V1alpha1().Volumes().Informer()}, nil
 	case storagev1alpha1.SchemeGroupVersion.WithResource("volumeclaims"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Storage().V1alpha1().VolumeClaims().Informer()}, nil
+	case storagev1alpha1.SchemeGroupVersion.WithResource("volumeclasses"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Storage().V1alpha1().VolumeClasses().Informer()}, nil
+	case storagev1alpha1.SchemeGroupVersion.WithResource("volumepools"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Storage().V1alpha1().VolumePools().Informer()}, nil
 
 	}
 

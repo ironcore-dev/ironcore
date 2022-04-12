@@ -52,8 +52,8 @@ const (
 	machineClassController     = "machineclass"
 	machinePoolController      = "machinepool"
 	machineSchedulerController = "machinescheduler"
-	storagePoolController      = "storagepool"
-	storageClassController     = "storageclass"
+	volumePoolController       = "volumepool"
+	volumeClassController      = "volumeclass"
 	volumeController           = "volume"
 	volumeClaimController      = "volumeclaim"
 	volumeScheduler            = "volumescheduler"
@@ -80,8 +80,8 @@ func main() {
 			"Enabling this will ensure there is only one active controller manager.")
 
 	controllers := switches.New(
-		machineClassController, machinePoolController, machineSchedulerController, storagePoolController,
-		storageClassController, volumeController, volumeClaimController, volumeScheduler, volumeClaimScheduler,
+		machineClassController, machinePoolController, machineSchedulerController, volumePoolController,
+		volumeClassController, volumeController, volumeClaimController, volumeScheduler, volumeClaimScheduler,
 		machineController,
 	)
 	flag.Var(controllers, "controllers", fmt.Sprintf("Controllers to enable. All controllers: %v. Disabled-by-default controllers: %v", controllers.All(), controllers.DisabledByDefault()))
@@ -119,7 +119,7 @@ func main() {
 			APIReader: mgr.GetAPIReader(),
 			Scheme:    mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "MachineClass")
+			setupLog.Error(err, "unable to create controller", "controller", "MachineClassRef")
 			os.Exit(1)
 		}
 	}
@@ -128,7 +128,7 @@ func main() {
 			Client: mgr.GetClient(),
 			Scheme: mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "MachinePool")
+			setupLog.Error(err, "unable to create controller", "controller", "MachinePoolRef")
 			os.Exit(1)
 		}
 	}
@@ -141,22 +141,22 @@ func main() {
 			os.Exit(1)
 		}
 	}
-	if controllers.Enabled(storagePoolController) {
-		if err = (&storagecontrollers.StoragePoolReconciler{
+	if controllers.Enabled(volumePoolController) {
+		if err = (&storagecontrollers.VolumePoolReconciler{
 			Client: mgr.GetClient(),
 			Scheme: mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "StoragePool")
+			setupLog.Error(err, "unable to create controller", "controller", "VolumePoolRef")
 			os.Exit(1)
 		}
 	}
-	if controllers.Enabled(storageClassController) {
-		if err = (&storagecontrollers.StorageClassReconciler{
+	if controllers.Enabled(volumeClassController) {
+		if err = (&storagecontrollers.VolumeClassReconciler{
 			Client:    mgr.GetClient(),
 			APIReader: mgr.GetAPIReader(),
 			Scheme:    mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "StorageClass")
+			setupLog.Error(err, "unable to create controller", "controller", "VolumeClass")
 			os.Exit(1)
 		}
 	}
@@ -178,7 +178,7 @@ func main() {
 			Scheme:             mgr.GetScheme(),
 			SharedFieldIndexer: sharedStorageFieldIndexer,
 		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "VolumeClaim")
+			setupLog.Error(err, "unable to create controller", "controller", "VolumeClaimRef")
 			os.Exit(1)
 		}
 	}

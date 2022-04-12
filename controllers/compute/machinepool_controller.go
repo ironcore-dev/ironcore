@@ -27,20 +27,20 @@ import (
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 )
 
-// MachinePoolReconciler reconciles a MachinePool object
+// MachinePoolReconciler reconciles a MachinePoolRef object
 type MachinePoolReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=compute.onmetal.de,resources=machinepools,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=compute.onmetal.de,resources=machinepools/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=compute.onmetal.de,resources=machinepools/finalizers,verbs=update
+//+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machinepools,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machinepools/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machinepools/finalizers,verbs=update
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
 // TODO(user): Modify the Reconcile function to compare the state specified by
-// the MachinePool object against the actual cluster state, and then
+// the MachinePoolRef object against the actual cluster state, and then
 // perform operations to make the cluster state reflect the state specified by
 // the user.
 //

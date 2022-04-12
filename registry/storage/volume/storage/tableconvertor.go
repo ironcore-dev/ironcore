@@ -31,9 +31,9 @@ var (
 
 	headers = []metav1.TableColumnDefinition{
 		{Name: "Name", Type: "string", Format: "name", Description: objectMetaSwaggerDoc["name"]},
-		{Name: "StoragePool", Type: "string", Description: "The storage pool this volume is hosted on"},
-		{Name: "StorageClass", Type: "string", Description: "The storage class of this volume"},
-		{Name: "State", Type: "string", Description: "The state of the volume on the underlying storage pool"},
+		{Name: "VolumePoolRef", Type: "string", Description: "The volume pool this volume is hosted on"},
+		{Name: "VolumeClass", Type: "string", Description: "The volume class of this volume"},
+		{Name: "State", Type: "string", Description: "The state of the volume on the underlying volume pool"},
 		{Name: "Phase", Type: "string", Description: "The binding phase of the volume"},
 		{Name: "Age", Type: "string", Format: "date", Description: objectMetaSwaggerDoc["creationTimestamp"]},
 	}
@@ -64,12 +64,12 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 		volume := obj.(*storage.Volume)
 
 		cells = append(cells, name)
-		if storagePoolName := volume.Spec.StoragePool.Name; storagePoolName != "" {
-			cells = append(cells, storagePoolName)
+		if volumePoolName := volume.Spec.VolumePoolRef.Name; volumePoolName != "" {
+			cells = append(cells, volumePoolName)
 		} else {
 			cells = append(cells, "<none>")
 		}
-		cells = append(cells, volume.Spec.StorageClassRef.Name)
+		cells = append(cells, volume.Spec.VolumeClassRef.Name)
 		if state := volume.Status.Phase; state != "" {
 			cells = append(cells, state)
 		} else {

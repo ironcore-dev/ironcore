@@ -35,9 +35,9 @@ type FakeMachinePools struct {
 	ns   string
 }
 
-var machinepoolsResource = schema.GroupVersionResource{Group: "compute.onmetal.de", Version: "v1alpha1", Resource: "machinepools"}
+var machinepoolsResource = schema.GroupVersionResource{Group: "compute.api.onmetal.de", Version: "v1alpha1", Resource: "machinepools"}
 
-var machinepoolsKind = schema.GroupVersionKind{Group: "compute.onmetal.de", Version: "v1alpha1", Kind: "MachinePool"}
+var machinepoolsKind = schema.GroupVersionKind{Group: "compute.api.onmetal.de", Version: "v1alpha1", Kind: "MachinePool"}
 
 // Get takes name of the machinePool, and returns the corresponding machinePool object, and an error if there is any.
 func (c *FakeMachinePools) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.MachinePool, err error) {

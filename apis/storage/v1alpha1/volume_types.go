@@ -32,18 +32,18 @@ var VolumeGK = schema.GroupKind{
 
 // VolumeSpec defines the desired state of Volume
 type VolumeSpec struct {
-	// StorageClassRef is the storage class of a volume
-	StorageClassRef corev1.LocalObjectReference `json:"storageClassRef"`
-	// StoragePoolSelector selects a suitable StoragePool by the given labels.
-	StoragePoolSelector map[string]string `json:"storagePoolSelector,omitempty"`
-	// StoragePool indicates which storage pool to use for a volume.
-	// If unset, the scheduler will figure out a suitable StoragePool.
-	StoragePool corev1.LocalObjectReference `json:"storagePool"`
+	// VolumeClassRef is the VolumeClass of a volume
+	VolumeClassRef corev1.LocalObjectReference `json:"volumeClassRef"`
+	// VolumePoolSelector selects a suitable VolumePoolRef by the given labels.
+	VolumePoolSelector map[string]string `json:"volumePoolSelector,omitempty"`
+	// VolumePoolRef indicates which VolumePool to use for a volume.
+	// If unset, the scheduler will figure out a suitable VolumePoolRef.
+	VolumePoolRef corev1.LocalObjectReference `json:"volumePoolRef,omitempty"`
 	// ClaimRef is the reference to the VolumeClaim used by the Volume.
 	ClaimRef ClaimReference `json:"claimRef,omitempty"`
 	// Resources is a description of the volume's resources and capacity.
 	Resources corev1.ResourceList `json:"resources,omitempty"`
-	// Tolerations define tolerations the Volume has. Only StoragePools whose taints
+	// Tolerations define tolerations the Volume has. Only any VolumePool whose taints
 	// covered by Tolerations will be considered to host the Volume.
 	Tolerations []commonv1alpha1.Toleration `json:"tolerations,omitempty"`
 }
