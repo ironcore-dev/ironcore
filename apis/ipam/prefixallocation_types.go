@@ -24,29 +24,25 @@ import (
 
 // PrefixAllocationSpec defines the desired state of PrefixAllocation
 type PrefixAllocationSpec struct {
-	// PrefixRef references the prefix to allocate from.
-	//+optional
-	PrefixRef      *PrefixReference
-	PrefixSelector *PrefixSelector
-	PrefixAllocationRequest
-}
-
-type PrefixAllocationRequest struct {
-	// +nullable
-	Prefix       commonv1alpha1.IPPrefix
+	// IPFamily is the IPFamily of the prefix.
+	// If unset but Prefix is set, this can be inferred.
+	IPFamily corev1.IPFamily
+	// Prefix is the prefix to allocate for this Prefix.
+	Prefix *commonv1alpha1.IPPrefix
+	// PrefixLength is the length of prefix to allocate for this Prefix.
 	PrefixLength int32
-	Range        *commonv1alpha1.IPRange
-	RangeLength  int64
+
+	// PrefixRef references the prefix to allocate from.
+	PrefixRef *corev1.LocalObjectReference
+	// PrefixSelector selects the prefix to allocate from.
+	PrefixSelector *metav1.LabelSelector
 }
 
-type PrefixAllocationResult struct {
-	// +nullable
-	Prefix commonv1alpha1.IPPrefix
-	Range  *commonv1alpha1.IPRange
-}
-
+// PrefixAllocationStatus is the status of a PrefixAllocation.
 type PrefixAllocationStatus struct {
-	PrefixAllocationResult
+	// Prefix is the allocated prefix, if any
+	Prefix *commonv1alpha1.IPPrefix
+	// Conditions represent various state aspects of a PrefixAllocation.
 	Conditions []PrefixAllocationCondition
 }
 
@@ -54,12 +50,6 @@ type PrefixAllocationConditionType string
 
 const (
 	PrefixAllocationReady PrefixAllocationConditionType = "Ready"
-)
-
-const (
-	PrefixAllocationReadyReasonFailed    = "Failed"
-	PrefixAllocationReadyReasonPending   = "Pending"
-	PrefixAllocationReadyReasonSucceeded = "Succeeded"
 )
 
 type PrefixAllocationCondition struct {

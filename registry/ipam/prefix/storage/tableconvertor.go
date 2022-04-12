@@ -76,7 +76,7 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 			cells = append(cells, "<none>")
 		}
 		if parentRef := prefix.Spec.ParentRef; parentRef != nil {
-			cells = append(cells, parentRef.String())
+			cells = append(cells, parentRef.Name)
 		} else {
 			cells = append(cells, "<none>")
 		}

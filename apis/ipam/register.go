@@ -44,12 +44,6 @@ func Resource(name string) schema.GroupResource {
 
 func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion,
-		&ClusterPrefix{},
-		&ClusterPrefixList{},
-		&ClusterPrefixAllocation{},
-		&ClusterPrefixAllocationList{},
-		&IP{},
-		&IPList{},
 		&Prefix{},
 		&PrefixList{},
 		&PrefixAllocation{},

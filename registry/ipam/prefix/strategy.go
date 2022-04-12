@@ -20,6 +20,7 @@ import (
 
 	"github.com/onmetal/onmetal-api/api"
 	"github.com/onmetal/onmetal-api/apis/ipam"
+	"github.com/onmetal/onmetal-api/apis/ipam/validation"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -68,7 +69,8 @@ func (prefixStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Obj
 }
 
 func (prefixStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
-	return field.ErrorList{}
+	prefix := obj.(*ipam.Prefix)
+	return validation.ValidatePrefix(prefix)
 }
 
 func (prefixStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
@@ -87,7 +89,9 @@ func (prefixStrategy) Canonicalize(obj runtime.Object) {
 }
 
 func (prefixStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
-	return field.ErrorList{}
+	newPrefix := obj.(*ipam.Prefix)
+	oldPrefix := old.(*ipam.Prefix)
+	return validation.ValidatePrefixUpdate(newPrefix, oldPrefix)
 }
 
 func (prefixStrategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {
@@ -115,7 +119,9 @@ func (prefixStatusStrategy) PrepareForUpdate(ctx context.Context, obj, old runti
 }
 
 func (prefixStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
-	return nil
+	newPrefix := obj.(*ipam.Prefix)
+	oldPrefix := old.(*ipam.Prefix)
+	return validation.ValidatePrefixStatusUpdate(newPrefix, oldPrefix)
 }
 
 func (prefixStatusStrategy) WarningsOnUpdate(cxt context.Context, obj, old runtime.Object) []string {

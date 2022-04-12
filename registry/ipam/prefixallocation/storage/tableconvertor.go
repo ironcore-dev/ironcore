@@ -52,31 +52,22 @@ func prefixAllocationReadyState(prefixAllocation *ipam.PrefixAllocation) string 
 }
 
 func prefixAllocationRequest(prefixAllocation *ipam.PrefixAllocation) string {
-	req := prefixAllocation.Spec.PrefixAllocationRequest
+	spec := prefixAllocation.Spec
 	switch {
-	case req.Prefix.IsValid():
-		return req.Prefix.String()
-	case req.PrefixLength > 0:
-		return fmt.Sprintf("/%d", req.PrefixLength)
-	case req.Range.IsValid():
-		return req.Range.String()
-	case req.RangeLength > 0:
-		return fmt.Sprintf("rlen %d", req.RangeLength)
+	case spec.Prefix.IsValid():
+		return spec.Prefix.String()
+	case spec.PrefixLength > 0:
+		return fmt.Sprintf("/%d", spec.PrefixLength)
 	default:
 		return ""
 	}
 }
 
 func prefixAllocationResult(prefixAllocation *ipam.PrefixAllocation) string {
-	res := prefixAllocation.Status.PrefixAllocationResult
-	switch {
-	case res.Prefix.IsValid():
-		return res.Prefix.String()
-	case res.Range.IsValid():
-		return res.Range.String()
-	default:
-		return ""
+	if prefix := prefixAllocation.Status.Prefix; prefix.IsValid() {
+		return prefix.String()
 	}
+	return ""
 }
 
 func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tableOptions runtime.Object) (*metav1.Table, error) {
@@ -101,7 +92,7 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 
 		cells = append(cells, name)
 		if prefixRef := prefixAllocation.Spec.PrefixRef; prefixRef != nil {
-			cells = append(cells, prefixRef.String())
+			cells = append(cells, prefixRef.Name)
 		} else {
 			cells = append(cells, "<none>")
 		}

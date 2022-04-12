@@ -24,42 +24,32 @@ import (
 
 // PrefixAllocationSpec defines the desired state of PrefixAllocation
 type PrefixAllocationSpec struct {
+	// IPFamily is the IPFamily of the prefix.
+	// If unset but Prefix is set, this can be inferred.
+	IPFamily corev1.IPFamily `json:"ipFamily,omitempty"`
+	// Prefix is the prefix to allocate for this Prefix.
+	Prefix *commonv1alpha1.IPPrefix `json:"prefix,omitempty"`
+	// PrefixLength is the length of prefix to allocate for this Prefix.
+	PrefixLength int32 `json:"prefixLength,omitempty"`
+
 	// PrefixRef references the prefix to allocate from.
-	//+optional
-	PrefixRef               *PrefixReference `json:"prefixRef,omitempty"`
-	PrefixSelector          *PrefixSelector  `json:"prefixSelector,omitempty"`
-	PrefixAllocationRequest `json:",inline"`
+	PrefixRef *corev1.LocalObjectReference `json:"prefixRef,omitempty"`
+	// PrefixSelector selects the prefix to allocate from.
+	PrefixSelector *metav1.LabelSelector `json:"prefixSelector,omitempty"`
 }
 
-type PrefixAllocationRequest struct {
-	// +nullable
-	Prefix       commonv1alpha1.IPPrefix `json:"prefix,omitempty"`
-	PrefixLength int32                   `json:"prefixLength,omitempty"`
-	Range        *commonv1alpha1.IPRange `json:"range,omitempty"`
-	RangeLength  int64                   `json:"rangeLength,omitempty"`
-}
-
-type PrefixAllocationResult struct {
-	// +nullable
-	Prefix commonv1alpha1.IPPrefix `json:"prefix,omitempty"`
-	Range  *commonv1alpha1.IPRange `json:"range,omitempty"`
-}
-
+// PrefixAllocationStatus is the status of a PrefixAllocation.
 type PrefixAllocationStatus struct {
-	PrefixAllocationResult `json:",inline,omitempty"`
-	Conditions             []PrefixAllocationCondition `json:"conditions,omitempty"`
+	// Prefix is the allocated prefix, if any
+	Prefix *commonv1alpha1.IPPrefix `json:"prefix,omitempty"`
+	// Conditions represent various state aspects of a PrefixAllocation.
+	Conditions []PrefixAllocationCondition `json:"conditions,omitempty"`
 }
 
 type PrefixAllocationConditionType string
 
 const (
 	PrefixAllocationReady PrefixAllocationConditionType = "Ready"
-)
-
-const (
-	PrefixAllocationReadyReasonFailed    = "Failed"
-	PrefixAllocationReadyReasonPending   = "Pending"
-	PrefixAllocationReadyReasonSucceeded = "Succeeded"
 )
 
 type PrefixAllocationCondition struct {

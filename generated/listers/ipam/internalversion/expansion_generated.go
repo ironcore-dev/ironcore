@@ -17,22 +17,6 @@
 
 package internalversion
 
-// ClusterPrefixListerExpansion allows custom methods to be added to
-// ClusterPrefixLister.
-type ClusterPrefixListerExpansion interface{}
-
-// ClusterPrefixAllocationListerExpansion allows custom methods to be added to
-// ClusterPrefixAllocationLister.
-type ClusterPrefixAllocationListerExpansion interface{}
-
-// IPListerExpansion allows custom methods to be added to
-// IPLister.
-type IPListerExpansion interface{}
-
-// IPNamespaceListerExpansion allows custom methods to be added to
-// IPNamespaceLister.
-type IPNamespaceListerExpansion interface{}
-
 // PrefixListerExpansion allows custom methods to be added to
 // PrefixLister.
 type PrefixListerExpansion interface{}

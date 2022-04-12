@@ -30,28 +30,19 @@ var (
 	SchemeGroupVersion = schema.GroupVersion{Group: "ipam.api.onmetal.de", Version: "v1alpha1"}
 
 	// SchemeBuilder is used to add go types to the GroupVersionKind scheme
-	SchemeBuilder      = runtime.NewSchemeBuilder(addKnownTypes)
+	SchemeBuilder      = runtime.NewSchemeBuilder(addKnownTypes, addDefaultingFuncs)
 	localSchemeBuilder = &SchemeBuilder
 
 	// AddToScheme adds the types in this group-version to the given scheme.
 	AddToScheme = SchemeBuilder.AddToScheme
 )
 
-func Resource(name string) schema.GroupResource {
-	return schema.GroupResource{
-		Group:    SchemeGroupVersion.Group,
-		Resource: name,
-	}
+func Resource(resource string) schema.GroupResource {
+	return SchemeGroupVersion.WithResource(resource).GroupResource()
 }
 
 func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion,
-		&ClusterPrefix{},
-		&ClusterPrefixList{},
-		&ClusterPrefixAllocation{},
-		&ClusterPrefixAllocationList{},
-		&IP{},
-		&IPList{},
 		&Prefix{},
 		&PrefixList{},
 		&PrefixAllocation{},

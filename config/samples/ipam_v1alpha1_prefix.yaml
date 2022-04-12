@@ -1,30 +1,28 @@
 apiVersion: ipam.api.onmetal.de/v1alpha1
-kind: ClusterPrefix
+kind: Prefix
 metadata:
-  name: clusterprefix-sample
+  name: root
   labels:
     subnet-type: public
 spec:
   prefix: 10.0.0.0/8
 ---
 apiVersion: ipam.api.onmetal.de/v1alpha1
-kind: ClusterPrefix
+kind: Prefix
 metadata:
-  name: clusterprefix-child-sample
-spec:
-  prefixLength: 24
-  parentRef:
-    name: clusterprefix-sample
----
-apiVersion: ipam.api.onmetal.de/v1alpha1
-kind: ClusterPrefix
-metadata:
-  name: clusterprefix-child-sample-selector
+  name: root-2
   labels:
     subnet-type: public
-    subnet-sub: ok
 spec:
-  prefixLength: 24
+  prefix: 11.0.0.0/8
+---
+apiVersion: ipam.api.onmetal.de/v1alpha1
+kind: Prefix
+metadata:
+  name: customer-subnet-1
+spec:
+  ipFamily: IPv4
+  prefixLength: 9
   parentSelector:
     matchLabels:
       subnet-type: public
@@ -32,21 +30,21 @@ spec:
 apiVersion: ipam.api.onmetal.de/v1alpha1
 kind: Prefix
 metadata:
-  name: clusterprefix-child-sample-selector
+  name: customer-subnet-2
 spec:
-  prefixLength: 24
+  ipFamily: IPv4
+  prefixLength: 9
   parentSelector:
-    kind: ClusterPrefix
     matchLabels:
       subnet-type: public
 ---
 apiVersion: ipam.api.onmetal.de/v1alpha1
-kind: IP
+kind: Prefix
 metadata:
-  name: clusterprefix-child-sample-selector
+  name: customer-subnet-3
 spec:
-  prefixSelector:
-    kind: ClusterPrefix
+  ipFamily: IPv4
+  prefixLength: 9
+  parentSelector:
     matchLabels:
       subnet-type: public
-      subnet-sub: ok

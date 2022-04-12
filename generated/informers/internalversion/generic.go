@@ -62,12 +62,6 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Compute().InternalVersion().MachinePools().Informer()}, nil
 
 		// Group=ipam.api.onmetal.de, Version=internalVersion
-	case ipam.SchemeGroupVersion.WithResource("clusterprefixes"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Ipam().InternalVersion().ClusterPrefixes().Informer()}, nil
-	case ipam.SchemeGroupVersion.WithResource("clusterprefixallocations"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Ipam().InternalVersion().ClusterPrefixAllocations().Informer()}, nil
-	case ipam.SchemeGroupVersion.WithResource("ips"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Ipam().InternalVersion().IPs().Informer()}, nil
 	case ipam.SchemeGroupVersion.WithResource("prefixes"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Ipam().InternalVersion().Prefixes().Informer()}, nil
 	case ipam.SchemeGroupVersion.WithResource("prefixallocations"):

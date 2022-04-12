@@ -17,12 +17,6 @@
 
 package internalversion
 
-type ClusterPrefixExpansion interface{}
-
-type ClusterPrefixAllocationExpansion interface{}
-
-type IPExpansion interface{}
-
 type PrefixExpansion interface{}
 
 type PrefixAllocationExpansion interface{}

@@ -27,9 +27,6 @@ import (
 
 type IpamV1alpha1Interface interface {
 	RESTClient() rest.Interface
-	ClusterPrefixesGetter
-	ClusterPrefixAllocationsGetter
-	IPsGetter
 	PrefixesGetter
 	PrefixAllocationsGetter
 }
@@ -37,18 +34,6 @@ type IpamV1alpha1Interface interface {
 // IpamV1alpha1Client is used to interact with features provided by the ipam.api.onmetal.de group.
 type IpamV1alpha1Client struct {
 	restClient rest.Interface
-}
-
-func (c *IpamV1alpha1Client) ClusterPrefixes() ClusterPrefixInterface {
-	return newClusterPrefixes(c)
-}
-
-func (c *IpamV1alpha1Client) ClusterPrefixAllocations() ClusterPrefixAllocationInterface {
-	return newClusterPrefixAllocations(c)
-}
-
-func (c *IpamV1alpha1Client) IPs(namespace string) IPInterface {
-	return newIPs(c, namespace)
 }
 
 func (c *IpamV1alpha1Client) Prefixes(namespace string) PrefixInterface {

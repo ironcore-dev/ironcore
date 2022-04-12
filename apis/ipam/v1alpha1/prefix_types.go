@@ -26,68 +26,40 @@ const (
 	PrefixKind = "Prefix"
 )
 
-type PrefixReference struct {
-	// Kind is the kind of prefix to select.
-	//+kubebuilder:validation:Enum=Prefix;ClusterPrefix
-	//+optional
-	Kind string `json:"kind"`
-	Name string `json:"name"`
-}
-
-type PrefixSelector struct {
-	// Kind is the kind of prefix to select.
-	//+kubebuilder:validation:Enum=Prefix;ClusterPrefix
-	//+optional
-	Kind                 string `json:"kind"`
-	metav1.LabelSelector `json:",inline"`
-}
-
 // PrefixSpec defines the desired state of Prefix
 type PrefixSpec struct {
+	// IPFamily is the IPFamily of the prefix.
+	// If unset but Prefix is set, this can be inferred.
+	IPFamily corev1.IPFamily `json:"ipFamily,omitempty"`
+	// Prefix is the prefix to allocate for this Prefix.
+	Prefix *commonv1alpha1.IPPrefix `json:"prefix,omitempty"`
+	// PrefixLength is the length of prefix to allocate for this Prefix.
+	PrefixLength int32 `json:"prefixLength,omitempty"`
+
 	// ParentRef references the parent to allocate the Prefix from.
 	// If ParentRef and ParentSelector is empty, the Prefix is considered a root prefix and thus
 	// allocated by itself.
-	ParentRef *PrefixReference `json:"parentRef,omitempty"`
+	ParentRef *corev1.LocalObjectReference `json:"parentRef,omitempty"`
 	// ParentSelector is the LabelSelector to use for determining the parent for this Prefix.
-	ParentSelector *PrefixSelector `json:"parentSelector,omitempty"`
-	// PrefixSpace is the definition of the space the prefix manages.
-	PrefixSpace `json:",inline"`
+	ParentSelector *metav1.LabelSelector `json:"parentSelector,omitempty"`
 }
 
-// PrefixSpace is the space a prefix manages.
-type PrefixSpace struct {
-	// PrefixLength is the length of prefix to allocate for this Prefix.
-	PrefixLength int32 `json:"prefixLength,omitempty"`
-	// Prefix is the prefix to allocate for this Prefix.
-	//+optional
-	//+nullable
-	Prefix commonv1alpha1.IPPrefix `json:"prefix,omitempty"`
-
-	// Reservations is a list of IPPrefixes to reserve for this Prefix.
-	Reservations []commonv1alpha1.IPPrefix `json:"reservations,omitempty"`
-	// ReservationLengths is a list of IPPrefixes to reserve for this Prefix.
-	ReservationLengths []int32 `json:"reservationLengths,omitempty"`
+func (s *PrefixSpec) IsRoot() bool {
+	return s.ParentRef == nil && s.ParentSelector == nil
 }
 
 // PrefixStatus defines the observed state of Prefix
 type PrefixStatus struct {
 	// Conditions is a list of conditions of a Prefix.
 	Conditions []PrefixCondition `json:"conditions,omitempty"`
-	// Available is a list of available prefixes.
-	Available []commonv1alpha1.IPPrefix `json:"available,omitempty"`
-	// Reserved is a list of reserved prefixes.
-	Reserved []commonv1alpha1.IPPrefix `json:"reserved,omitempty"`
+	// Used is a list of used prefixes.
+	Used []commonv1alpha1.IPPrefix `json:"used,omitempty"`
 }
 
 type PrefixConditionType string
 
 const (
 	PrefixReady PrefixConditionType = "Ready"
-)
-
-const (
-	PrefixReadyReasonPending   = "Pending"
-	PrefixReadyReasonAllocated = "Allocated"
 )
 
 type PrefixCondition struct {
@@ -108,6 +80,15 @@ type Prefix struct {
 
 	Spec   PrefixSpec   `json:"spec,omitempty"`
 	Status PrefixStatus `json:"status,omitempty"`
+}
+
+func (p *Prefix) IsRoot() bool {
+	return p.Spec.IsRoot()
+}
+
+func (p *Prefix) Readiness() Readiness {
+	readiness, _ := GetPrefixConditionsReadinessAndIndex(p.Status.Conditions)
+	return readiness
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

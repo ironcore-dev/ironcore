@@ -20,6 +20,7 @@ import (
 
 	"github.com/onmetal/onmetal-api/api"
 	"github.com/onmetal/onmetal-api/apis/ipam"
+	"github.com/onmetal/onmetal-api/apis/ipam/validation"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -68,7 +69,8 @@ func (prefixAllocationStrategy) PrepareForUpdate(ctx context.Context, obj, old r
 }
 
 func (prefixAllocationStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
-	return field.ErrorList{}
+	prefixAllocation := obj.(*ipam.PrefixAllocation)
+	return validation.ValidatePrefixAllocation(prefixAllocation)
 }
 
 func (prefixAllocationStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
@@ -87,7 +89,9 @@ func (prefixAllocationStrategy) Canonicalize(obj runtime.Object) {
 }
 
 func (prefixAllocationStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
-	return field.ErrorList{}
+	newPrefixAllocation := obj.(*ipam.PrefixAllocation)
+	oldPrefixAllocation := old.(*ipam.PrefixAllocation)
+	return validation.ValidatePrefixAllocationUpdate(newPrefixAllocation, oldPrefixAllocation)
 }
 
 func (prefixAllocationStrategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {
@@ -115,7 +119,9 @@ func (prefixAllocationStatusStrategy) PrepareForUpdate(ctx context.Context, obj,
 }
 
 func (prefixAllocationStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
-	return nil
+	newPrefixAllocation := obj.(*ipam.PrefixAllocation)
+	oldPrefixAllocation := old.(*ipam.PrefixAllocation)
+	return validation.ValidatePrefixAllocationStatusUpdate(newPrefixAllocation, oldPrefixAllocation)
 }
 
 func (prefixAllocationStatusStrategy) WarningsOnUpdate(cxt context.Context, obj, old runtime.Object) []string {

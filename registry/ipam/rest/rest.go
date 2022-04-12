@@ -18,9 +18,6 @@ import (
 	"github.com/onmetal/onmetal-api/api"
 	"github.com/onmetal/onmetal-api/apis/ipam"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/apis/ipam/v1alpha1"
-	clusterprefixstorage "github.com/onmetal/onmetal-api/registry/ipam/clusterprefix/storage"
-	clusterprefixallocationstorage "github.com/onmetal/onmetal-api/registry/ipam/clusterprefixallocation/storage"
-	ipstorage "github.com/onmetal/onmetal-api/registry/ipam/ip/storage"
 	prefixstorage "github.com/onmetal/onmetal-api/registry/ipam/prefix/storage"
 	prefixallocationstorage "github.com/onmetal/onmetal-api/registry/ipam/prefixallocation/storage"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -54,30 +51,6 @@ func (p StorageProvider) NewRESTStorage(apiResourceConfigSource serverstorage.AP
 
 func (p StorageProvider) v1alpha1Storage(restOptionsGetter generic.RESTOptionsGetter) (map[string]rest.Storage, error) {
 	storageMap := map[string]rest.Storage{}
-
-	clusterPrefixStorage, err := clusterprefixstorage.NewStorage(restOptionsGetter)
-	if err != nil {
-		return storageMap, err
-	}
-
-	storageMap["clusterprefixes"] = clusterPrefixStorage.ClusterPrefix
-	storageMap["clusterprefixes/status"] = clusterPrefixStorage.Status
-
-	clusterPrefixAllocationStorage, err := clusterprefixallocationstorage.NewStorage(restOptionsGetter)
-	if err != nil {
-		return storageMap, err
-	}
-
-	storageMap["clusterprefixallocations"] = clusterPrefixAllocationStorage.ClusterPrefixAllocation
-	storageMap["clusterprefixallocations/status"] = clusterPrefixAllocationStorage.Status
-
-	ipStorage, err := ipstorage.NewStorage(restOptionsGetter)
-	if err != nil {
-		return storageMap, err
-	}
-
-	storageMap["ips"] = ipStorage.IP
-	storageMap["ips/status"] = ipStorage.Status
 
 	prefixStorage, err := prefixstorage.NewStorage(restOptionsGetter)
 	if err != nil {

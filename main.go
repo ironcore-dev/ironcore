@@ -20,6 +20,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"time"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
@@ -52,13 +53,17 @@ const (
 	machineClassController     = "machineclass"
 	machinePoolController      = "machinepool"
 	machineSchedulerController = "machinescheduler"
-	volumePoolController       = "volumepool"
-	volumeClassController      = "volumeclass"
-	volumeController           = "volume"
-	volumeClaimController      = "volumeclaim"
-	volumeScheduler            = "volumescheduler"
-	volumeClaimScheduler       = "volumeclaimscheduler"
 	machineController          = "machine"
+
+	volumePoolController  = "volumepool"
+	volumeClassController = "volumeclass"
+	volumeController      = "volume"
+	volumeClaimController = "volumeclaim"
+	volumeScheduler       = "volumescheduler"
+	volumeClaimScheduler  = "volumeclaimscheduler"
+
+	prefixController          = "prefix"
+	prefixAllocationScheduler = "prefixallocationscheduler"
 )
 
 func init() {
@@ -73,16 +78,18 @@ func main() {
 	var metricsAddr string
 	var enableLeaderElection bool
 	var probeAddr string
+	var prefixAllocationTimeout time.Duration
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
+	flag.DurationVar(&prefixAllocationTimeout, "prefix-allocation-timeout", 1*time.Second, "Time to wait until considering a pending allocation failed.")
 
 	controllers := switches.New(
-		machineClassController, machinePoolController, machineSchedulerController, volumePoolController,
-		volumeClassController, volumeController, volumeClaimController, volumeScheduler, volumeClaimScheduler,
-		machineController,
+		machineClassController, machinePoolController, machineSchedulerController, machineController,
+		volumePoolController, volumeClassController, volumeController, volumeClaimController, volumeScheduler, volumeClaimScheduler,
+		prefixController, prefixAllocationScheduler,
 	)
 	flag.Var(controllers, "controllers", fmt.Sprintf("Controllers to enable. All controllers: %v. Disabled-by-default controllers: %v", controllers.All(), controllers.DisabledByDefault()))
 
@@ -207,43 +214,33 @@ func main() {
 		}
 	}
 
-	if err = (&ipamcontrollers.PrefixReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "Prefix")
-		os.Exit(1)
-	}
-	if err = (&ipamcontrollers.IPReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "IP")
-		os.Exit(1)
-	}
-	if err = (&ipamcontrollers.ClusterPrefixReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "ClusterPrefix")
-		os.Exit(1)
+	if controllers.Enabled(prefixController) || controllers.Enabled(prefixAllocationScheduler) {
+		if err = ipamcontrollers.SetupPrefixSpecIPFamilyFieldIndexer(mgr); err != nil {
+			setupLog.Error(err, "unable setup indexer", "indexer", "prefix.spec.ipFamily")
+			os.Exit(1)
+		}
 	}
 
-	//+kubebuilder:scaffold:builder
-
-	if err = (&ipamcontrollers.ClusterPrefixAllocationSchedulerReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "ClusterPrefixAllocationScheduler")
-		os.Exit(1)
+	if controllers.Enabled(prefixController) {
+		if err = (&ipamcontrollers.PrefixReconciler{
+			Client:                  mgr.GetClient(),
+			APIReader:               mgr.GetAPIReader(),
+			Scheme:                  mgr.GetScheme(),
+			PrefixAllocationTimeout: prefixAllocationTimeout,
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "Prefix")
+			os.Exit(1)
+		}
 	}
-	if err = (&ipamcontrollers.PrefixAllocationSchedulerReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "PrefixAllocationScheduler")
-		os.Exit(1)
+
+	if controllers.Enabled(prefixAllocationScheduler) {
+		if err = (&ipamcontrollers.PrefixAllocationScheduler{
+			Client: mgr.GetClient(),
+			Scheme: mgr.GetScheme(),
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "PrefixAllocationScheduler")
+			os.Exit(1)
+		}
 	}
 
 	if err != nil {
