@@ -39,6 +39,10 @@ func (c *FakeComputeV1alpha1) MachinePools(namespace string) v1alpha1.MachinePoo
 	return &FakeMachinePools{c, namespace}
 }
 
+func (c *FakeComputeV1alpha1) NetworkInterfaces(namespace string) v1alpha1.NetworkInterfaceInterface {
+	return &FakeNetworkInterfaces{c, namespace}
+}
+
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
 func (c *FakeComputeV1alpha1) RESTClient() rest.Interface {

@@ -29,6 +29,8 @@ type Interface interface {
 	MachineClasses() MachineClassInformer
 	// MachinePools returns a MachinePoolInformer.
 	MachinePools() MachinePoolInformer
+	// NetworkInterfaces returns a NetworkInterfaceInformer.
+	NetworkInterfaces() NetworkInterfaceInformer
 }
 
 type version struct {
@@ -55,4 +57,9 @@ func (v *version) MachineClasses() MachineClassInformer {
 // MachinePools returns a MachinePoolInformer.
 func (v *version) MachinePools() MachinePoolInformer {
 	return &machinePoolInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
+// NetworkInterfaces returns a NetworkInterfaceInformer.
+func (v *version) NetworkInterfaces() NetworkInterfaceInformer {
+	return &networkInterfaceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

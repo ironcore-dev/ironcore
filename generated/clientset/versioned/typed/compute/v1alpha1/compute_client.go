@@ -30,6 +30,7 @@ type ComputeV1alpha1Interface interface {
 	MachinesGetter
 	MachineClassesGetter
 	MachinePoolsGetter
+	NetworkInterfacesGetter
 }
 
 // ComputeV1alpha1Client is used to interact with features provided by the compute.api.onmetal.de group.
@@ -47,6 +48,10 @@ func (c *ComputeV1alpha1Client) MachineClasses(namespace string) MachineClassInt
 
 func (c *ComputeV1alpha1Client) MachinePools(namespace string) MachinePoolInterface {
 	return newMachinePools(c, namespace)
+}
+
+func (c *ComputeV1alpha1Client) NetworkInterfaces(namespace string) NetworkInterfaceInterface {
+	return newNetworkInterfaces(c, namespace)
 }
 
 // NewForConfig creates a new ComputeV1alpha1Client for the given config.
