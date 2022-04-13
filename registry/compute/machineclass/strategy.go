@@ -20,6 +20,7 @@ import (
 
 	"github.com/onmetal/onmetal-api/api"
 	"github.com/onmetal/onmetal-api/apis/compute"
+	"github.com/onmetal/onmetal-api/apis/compute/validation"
 	"github.com/onmetal/onmetal-api/equality"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
@@ -76,7 +77,8 @@ func (machineClassStrategy) PrepareForUpdate(ctx context.Context, obj, old runti
 }
 
 func (machineClassStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
-	return field.ErrorList{}
+	machineClass := obj.(*compute.MachineClass)
+	return validation.ValidateMachineClass(machineClass)
 }
 
 func (machineClassStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
@@ -95,7 +97,9 @@ func (machineClassStrategy) Canonicalize(obj runtime.Object) {
 }
 
 func (machineClassStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
-	return field.ErrorList{}
+	newMachineClass := obj.(*compute.MachineClass)
+	oldMachineClass := old.(*compute.MachineClass)
+	return validation.ValidateMachineClassUpdate(newMachineClass, oldMachineClass)
 }
 
 func (machineClassStrategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {

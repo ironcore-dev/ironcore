@@ -45,6 +45,7 @@ var _ = Describe("machineclass controller", func() {
 				GenerateName: "machine-",
 			},
 			Spec: computev1alpha1.MachineSpec{
+				Image: "my-image",
 				MachineClassRef: corev1.LocalObjectReference{
 					Name: machineClass.Name,
 				},

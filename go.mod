@@ -9,6 +9,7 @@ require (
 	github.com/onmetal/controller-utils v0.5.2
 	github.com/onmetal/vgopath v0.0.1
 	github.com/onsi/ginkgo v1.16.5
+	github.com/onsi/ginkgo/v2 v2.1.3
 	github.com/onsi/gomega v1.19.0
 	github.com/spf13/cobra v1.2.1
 	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e
