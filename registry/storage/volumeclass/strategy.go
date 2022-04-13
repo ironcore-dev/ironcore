@@ -20,6 +20,7 @@ import (
 
 	"github.com/onmetal/onmetal-api/api"
 	"github.com/onmetal/onmetal-api/apis/storage"
+	"github.com/onmetal/onmetal-api/apis/storage/validation"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -67,7 +68,8 @@ func (volumeClassStrategy) PrepareForUpdate(ctx context.Context, obj, old runtim
 }
 
 func (volumeClassStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
-	return field.ErrorList{}
+	volumeClass := obj.(*storage.VolumeClass)
+	return validation.ValidateVolumeClass(volumeClass)
 }
 
 func (volumeClassStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
@@ -86,7 +88,9 @@ func (volumeClassStrategy) Canonicalize(obj runtime.Object) {
 }
 
 func (volumeClassStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
-	return field.ErrorList{}
+	newVolumeClass := obj.(*storage.VolumeClass)
+	oldVolumeClass := old.(*storage.VolumeClass)
+	return validation.ValidateVolumeClassUpdate(newVolumeClass, oldVolumeClass)
 }
 
 func (volumeClassStrategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {

@@ -20,6 +20,7 @@ import (
 
 	"github.com/onmetal/onmetal-api/api"
 	"github.com/onmetal/onmetal-api/apis/storage"
+	"github.com/onmetal/onmetal-api/apis/storage/validation"
 	"github.com/onmetal/onmetal-api/equality"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
@@ -87,7 +88,8 @@ func (volumePoolStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime
 }
 
 func (volumePoolStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
-	return field.ErrorList{}
+	volumePool := obj.(*storage.VolumePool)
+	return validation.ValidateVolumePool(volumePool)
 }
 
 func (volumePoolStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
@@ -134,7 +136,9 @@ func (volumePoolStatusStrategy) PrepareForUpdate(ctx context.Context, obj, old r
 }
 
 func (volumePoolStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
-	return nil
+	newVolumePool := obj.(*storage.VolumePool)
+	oldVolumePool := old.(*storage.VolumePool)
+	return validation.ValidateVolumePoolUpdate(newVolumePool, oldVolumePool)
 }
 
 func (volumePoolStatusStrategy) WarningsOnUpdate(cxt context.Context, obj, old runtime.Object) []string {
