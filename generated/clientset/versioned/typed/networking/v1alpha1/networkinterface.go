@@ -21,7 +21,7 @@ import (
 	"context"
 	"time"
 
-	v1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
+	v1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
 	scheme "github.com/onmetal/onmetal-api/generated/clientset/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -56,7 +56,7 @@ type networkInterfaces struct {
 }
 
 // newNetworkInterfaces returns a NetworkInterfaces
-func newNetworkInterfaces(c *ComputeV1alpha1Client, namespace string) *networkInterfaces {
+func newNetworkInterfaces(c *NetworkingV1alpha1Client, namespace string) *networkInterfaces {
 	return &networkInterfaces{
 		client: c.RESTClient(),
 		ns:     namespace,

@@ -22,6 +22,7 @@ import (
 	"github.com/onmetal/onmetal-api/api"
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/apis/ipam/v1alpha1"
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 	"github.com/onmetal/onmetal-api/apiserver"
 	clientset "github.com/onmetal/onmetal-api/generated/clientset/versioned"
@@ -48,7 +49,7 @@ func NewResourceConfig() *serverstorage.ResourceConfig {
 	cfg.EnableVersions(
 		computev1alpha1.SchemeGroupVersion,
 		storagev1alpha1.SchemeGroupVersion,
-		//networkingv1alpha1.SchemeGroupVersion, TODO: Include once there are resources
+		networkingv1alpha1.SchemeGroupVersion,
 		ipamv1alpha1.SchemeGroupVersion,
 	)
 	return cfg
@@ -67,7 +68,7 @@ func NewOnmetalAPIServerOptions() *OnmetalAPIServerOptions {
 			api.Codecs.LegacyCodec(
 				computev1alpha1.SchemeGroupVersion,
 				storagev1alpha1.SchemeGroupVersion,
-				//networkingv1alpha1.SchemeGroupVersion, TODO: Include once there are resources
+				networkingv1alpha1.SchemeGroupVersion,
 				ipamv1alpha1.SchemeGroupVersion,
 			),
 		),
@@ -76,7 +77,7 @@ func NewOnmetalAPIServerOptions() *OnmetalAPIServerOptions {
 		computev1alpha1.SchemeGroupVersion,
 		schema.GroupKind{Group: computev1alpha1.SchemeGroupVersion.Group},
 		schema.GroupKind{Group: storagev1alpha1.SchemeGroupVersion.Group},
-		//schema.GroupKind{Group: networkingv1alpha1.SchemeGroupVersion.Group}, TODO: Include once there are resources
+		schema.GroupKind{Group: networkingv1alpha1.SchemeGroupVersion.Group},
 		schema.GroupKind{Group: ipamv1alpha1.SchemeGroupVersion.Group},
 	)
 	return o

@@ -17,7 +17,7 @@
 package validation
 
 import (
-	"github.com/onmetal/onmetal-api/apis/compute"
+	"github.com/onmetal/onmetal-api/apis/networking"
 	corev1 "k8s.io/api/core/v1"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -27,7 +27,7 @@ import (
 var supportedServiceIPFamily = sets.NewString(string(corev1.IPv4Protocol), string(corev1.IPv6Protocol))
 
 // ValidateNetworkInterface validates a network interface object.
-func ValidateNetworkInterface(networkInterface *compute.NetworkInterface) field.ErrorList {
+func ValidateNetworkInterface(networkInterface *networking.NetworkInterface) field.ErrorList {
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(networkInterface, true, apivalidation.NameIsDNSLabel, field.NewPath("metadata"))...)
@@ -37,7 +37,7 @@ func ValidateNetworkInterface(networkInterface *compute.NetworkInterface) field.
 }
 
 // ValidateNetworkInterfaceUpdate validates a NetworkInterface object before an update.
-func ValidateNetworkInterfaceUpdate(newNetworkInterface, oldNetworkInterface *compute.NetworkInterface) field.ErrorList {
+func ValidateNetworkInterfaceUpdate(newNetworkInterface, oldNetworkInterface *networking.NetworkInterface) field.ErrorList {
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessorUpdate(newNetworkInterface, oldNetworkInterface, field.NewPath("metadata"))...)
@@ -47,7 +47,7 @@ func ValidateNetworkInterfaceUpdate(newNetworkInterface, oldNetworkInterface *co
 	return allErrs
 }
 
-func validateNetworkInterfaceSpec(networkInterfaceSpec *compute.NetworkInterfaceSpec, fldPath *field.Path) field.ErrorList {
+func validateNetworkInterfaceSpec(networkInterfaceSpec *networking.NetworkInterfaceSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
 	if networkInterfaceSpec.NetworkRef == (corev1.LocalObjectReference{}) {
@@ -94,7 +94,7 @@ func validateNetworkInterfaceSpec(networkInterfaceSpec *compute.NetworkInterface
 }
 
 // validateNetworkInterfaceSpecUpdate validates the spec of a NetworkInterface object before an update.
-func validateNetworkInterfaceSpecUpdate(new, old *compute.NetworkInterfaceSpec, deletionTimestampSet bool, fldPath *field.Path) field.ErrorList {
+func validateNetworkInterfaceSpecUpdate(new, old *networking.NetworkInterfaceSpec, deletionTimestampSet bool, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, apivalidation.ValidateImmutableField(new.NetworkRef, old.NetworkRef, fldPath.Child("networkRef"))...)

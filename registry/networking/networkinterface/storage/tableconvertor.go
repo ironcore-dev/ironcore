@@ -18,7 +18,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/onmetal/onmetal-api/apis/compute"
+	"github.com/onmetal/onmetal-api/apis/networking"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/meta/table"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -61,7 +61,7 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 
 	var err error
 	tab.Rows, err = table.MetaToTableRow(obj, func(obj runtime.Object, m metav1.Object, name, age string) (cells []interface{}, err error) {
-		networkInterface := obj.(*compute.NetworkInterface)
+		networkInterface := obj.(*networking.NetworkInterface)
 
 		cells = append(cells, name)
 		cells = append(cells, networkInterface.Spec.NetworkRef.Name)

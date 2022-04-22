@@ -22,6 +22,7 @@ import (
 
 	v1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/apis/ipam/v1alpha1"
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	cache "k8s.io/client-go/tools/cache"
@@ -60,14 +61,16 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Compute().V1alpha1().MachineClasses().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("machinepools"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Compute().V1alpha1().MachinePools().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("networkinterfaces"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Compute().V1alpha1().NetworkInterfaces().Informer()}, nil
 
 		// Group=ipam.api.onmetal.de, Version=v1alpha1
 	case ipamv1alpha1.SchemeGroupVersion.WithResource("prefixes"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Ipam().V1alpha1().Prefixes().Informer()}, nil
 	case ipamv1alpha1.SchemeGroupVersion.WithResource("prefixallocations"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Ipam().V1alpha1().PrefixAllocations().Informer()}, nil
+
+		// Group=networking.api.onmetal.de, Version=v1alpha1
+	case networkingv1alpha1.SchemeGroupVersion.WithResource("networkinterfaces"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().NetworkInterfaces().Informer()}, nil
 
 		// Group=storage.api.onmetal.de, Version=v1alpha1
 	case storagev1alpha1.SchemeGroupVersion.WithResource("volumes"):

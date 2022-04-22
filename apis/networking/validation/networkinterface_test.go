@@ -17,7 +17,7 @@
 package validation
 
 import (
-	"github.com/onmetal/onmetal-api/apis/compute"
+	"github.com/onmetal/onmetal-api/apis/networking"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"
@@ -27,77 +27,77 @@ import (
 
 var _ = Describe("NetworkInterface", func() {
 	DescribeTable("ValidateNetworkInterface",
-		func(networkInterface *compute.NetworkInterface, match types.GomegaMatcher) {
+		func(networkInterface *networking.NetworkInterface, match types.GomegaMatcher) {
 			errList := ValidateNetworkInterface(networkInterface)
 			Expect(errList).To(match)
 		},
 		Entry("missing name",
-			&compute.NetworkInterface{},
+			&networking.NetworkInterface{},
 			ContainElement(RequiredField("metadata.name")),
 		),
 		Entry("missing namespace",
-			&compute.NetworkInterface{ObjectMeta: metav1.ObjectMeta{Name: "foo"}},
+			&networking.NetworkInterface{ObjectMeta: metav1.ObjectMeta{Name: "foo"}},
 			ContainElement(RequiredField("metadata.namespace")),
 		),
 		Entry("bad name",
-			&compute.NetworkInterface{ObjectMeta: metav1.ObjectMeta{Name: "foo*"}},
+			&networking.NetworkInterface{ObjectMeta: metav1.ObjectMeta{Name: "foo*"}},
 			ContainElement(InvalidField("metadata.name")),
 		),
 		Entry("no network ref",
-			&compute.NetworkInterface{},
+			&networking.NetworkInterface{},
 			ContainElement(RequiredField("spec.networkRef")),
 		),
 		Entry("invalid network ref name",
-			&compute.NetworkInterface{
-				Spec: compute.NetworkInterfaceSpec{
+			&networking.NetworkInterface{
+				Spec: networking.NetworkInterfaceSpec{
 					NetworkRef: corev1.LocalObjectReference{Name: "foo*"},
 				},
 			},
 			ContainElement(InvalidField("spec.networkRef.name")),
 		),
 		Entry("invalid machine ref name",
-			&compute.NetworkInterface{
-				Spec: compute.NetworkInterfaceSpec{
+			&networking.NetworkInterface{
+				Spec: networking.NetworkInterfaceSpec{
 					MachineRef: corev1.LocalObjectReference{Name: "foo*"},
 				},
 			},
 			ContainElement(InvalidField("spec.machineRef.name")),
 		),
 		Entry("missing ip families",
-			&compute.NetworkInterface{},
+			&networking.NetworkInterface{},
 			ContainElement(RequiredField("spec.ipFamilies")),
 		),
 		Entry("not supported ip family",
-			&compute.NetworkInterface{
-				Spec: compute.NetworkInterfaceSpec{
+			&networking.NetworkInterface{
+				Spec: networking.NetworkInterfaceSpec{
 					IPFamilies: []corev1.IPFamily{"foo"},
 				},
 			},
 			ContainElement(NotSupportedField("spec.ipFamilies[0]")),
 		),
 		Entry("duplicate ip family",
-			&compute.NetworkInterface{
-				Spec: compute.NetworkInterfaceSpec{
+			&networking.NetworkInterface{
+				Spec: networking.NetworkInterfaceSpec{
 					IPFamilies: []corev1.IPFamily{"IPv4", "IPv4"},
 				},
 			},
 			ContainElement(DuplicateField("spec.ipFamilies[1]")),
 		),
 		Entry("missing ephemeral prefix name",
-			&compute.NetworkInterface{
-				Spec: compute.NetworkInterfaceSpec{
-					IPs: []compute.IPSource{{EphemeralPrefix: &compute.EphemeralPrefixSource{
-						PrefixTemplate: &compute.PrefixTemplate{}}},
+			&networking.NetworkInterface{
+				Spec: networking.NetworkInterfaceSpec{
+					IPs: []networking.IPSource{{EphemeralPrefix: &networking.EphemeralPrefixSource{
+						PrefixTemplate: &networking.PrefixTemplate{}}},
 					},
 				},
 			},
 			ContainElement(RequiredField("spec.ips[0].ephemeralPrefix.metadata.name")),
 		),
 		Entry("invalid ephemeral prefix name",
-			&compute.NetworkInterface{
-				Spec: compute.NetworkInterfaceSpec{
-					IPs: []compute.IPSource{{EphemeralPrefix: &compute.EphemeralPrefixSource{
-						PrefixTemplate: &compute.PrefixTemplate{
+			&networking.NetworkInterface{
+				Spec: networking.NetworkInterfaceSpec{
+					IPs: []networking.IPSource{{EphemeralPrefix: &networking.EphemeralPrefixSource{
+						PrefixTemplate: &networking.PrefixTemplate{
 							ObjectMeta: metav1.ObjectMeta{Name: "foo*"},
 						}}},
 					},
@@ -106,10 +106,10 @@ var _ = Describe("NetworkInterface", func() {
 			ContainElement(InvalidField("spec.ips[0].ephemeralPrefix.metadata.name")),
 		),
 		Entry("missing ephemeral prefix namespace",
-			&compute.NetworkInterface{
-				Spec: compute.NetworkInterfaceSpec{
-					IPs: []compute.IPSource{{EphemeralPrefix: &compute.EphemeralPrefixSource{
-						PrefixTemplate: &compute.PrefixTemplate{
+			&networking.NetworkInterface{
+				Spec: networking.NetworkInterfaceSpec{
+					IPs: []networking.IPSource{{EphemeralPrefix: &networking.EphemeralPrefixSource{
+						PrefixTemplate: &networking.PrefixTemplate{
 							ObjectMeta: metav1.ObjectMeta{Name: "foo"},
 						}}},
 					},
@@ -121,18 +121,18 @@ var _ = Describe("NetworkInterface", func() {
 	)
 
 	DescribeTable("ValidateNetworkInterfaceUpdate",
-		func(newNetworkInterface, oldNetworkInterface *compute.NetworkInterface, match types.GomegaMatcher) {
+		func(newNetworkInterface, oldNetworkInterface *networking.NetworkInterface, match types.GomegaMatcher) {
 			errList := ValidateNetworkInterfaceUpdate(newNetworkInterface, oldNetworkInterface)
 			Expect(errList).To(match)
 		},
 		Entry("immutable networkRef if set",
-			&compute.NetworkInterface{
-				Spec: compute.NetworkInterfaceSpec{
+			&networking.NetworkInterface{
+				Spec: networking.NetworkInterfaceSpec{
 					NetworkRef: corev1.LocalObjectReference{Name: "foo"},
 				},
 			},
-			&compute.NetworkInterface{
-				Spec: compute.NetworkInterfaceSpec{
+			&networking.NetworkInterface{
+				Spec: networking.NetworkInterfaceSpec{
 					NetworkRef: corev1.LocalObjectReference{Name: "bar"},
 				},
 			},

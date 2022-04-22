@@ -26,11 +26,16 @@ import (
 
 type NetworkingInterface interface {
 	RESTClient() rest.Interface
+	NetworkInterfacesGetter
 }
 
 // NetworkingClient is used to interact with features provided by the networking.api.onmetal.de group.
 type NetworkingClient struct {
 	restClient rest.Interface
+}
+
+func (c *NetworkingClient) NetworkInterfaces(namespace string) NetworkInterfaceInterface {
+	return newNetworkInterfaces(c, namespace)
 }
 
 // NewForConfig creates a new NetworkingClient for the given config.

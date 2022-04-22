@@ -49,8 +49,6 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&MachineClassList{},
 		&MachinePool{},
 		&MachinePoolList{},
-		&NetworkInterface{},
-		&NetworkInterfaceList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil

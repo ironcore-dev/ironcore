@@ -47,8 +47,6 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&MachineClassList{},
 		&MachinePool{},
 		&MachinePoolList{},
-		&NetworkInterface{},
-		&NetworkInterfaceList{},
 	)
 	return nil
 }

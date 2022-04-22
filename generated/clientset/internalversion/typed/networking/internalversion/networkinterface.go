@@ -21,7 +21,7 @@ import (
 	"context"
 	"time"
 
-	compute "github.com/onmetal/onmetal-api/apis/compute"
+	networking "github.com/onmetal/onmetal-api/apis/networking"
 	scheme "github.com/onmetal/onmetal-api/generated/clientset/internalversion/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -37,15 +37,15 @@ type NetworkInterfacesGetter interface {
 
 // NetworkInterfaceInterface has methods to work with NetworkInterface resources.
 type NetworkInterfaceInterface interface {
-	Create(ctx context.Context, networkInterface *compute.NetworkInterface, opts v1.CreateOptions) (*compute.NetworkInterface, error)
-	Update(ctx context.Context, networkInterface *compute.NetworkInterface, opts v1.UpdateOptions) (*compute.NetworkInterface, error)
-	UpdateStatus(ctx context.Context, networkInterface *compute.NetworkInterface, opts v1.UpdateOptions) (*compute.NetworkInterface, error)
+	Create(ctx context.Context, networkInterface *networking.NetworkInterface, opts v1.CreateOptions) (*networking.NetworkInterface, error)
+	Update(ctx context.Context, networkInterface *networking.NetworkInterface, opts v1.UpdateOptions) (*networking.NetworkInterface, error)
+	UpdateStatus(ctx context.Context, networkInterface *networking.NetworkInterface, opts v1.UpdateOptions) (*networking.NetworkInterface, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
-	Get(ctx context.Context, name string, opts v1.GetOptions) (*compute.NetworkInterface, error)
-	List(ctx context.Context, opts v1.ListOptions) (*compute.NetworkInterfaceList, error)
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*networking.NetworkInterface, error)
+	List(ctx context.Context, opts v1.ListOptions) (*networking.NetworkInterfaceList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
-	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *compute.NetworkInterface, err error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *networking.NetworkInterface, err error)
 	NetworkInterfaceExpansion
 }
 
@@ -56,7 +56,7 @@ type networkInterfaces struct {
 }
 
 // newNetworkInterfaces returns a NetworkInterfaces
-func newNetworkInterfaces(c *ComputeClient, namespace string) *networkInterfaces {
+func newNetworkInterfaces(c *NetworkingClient, namespace string) *networkInterfaces {
 	return &networkInterfaces{
 		client: c.RESTClient(),
 		ns:     namespace,
@@ -64,8 +64,8 @@ func newNetworkInterfaces(c *ComputeClient, namespace string) *networkInterfaces
 }
 
 // Get takes name of the networkInterface, and returns the corresponding networkInterface object, and an error if there is any.
-func (c *networkInterfaces) Get(ctx context.Context, name string, options v1.GetOptions) (result *compute.NetworkInterface, err error) {
-	result = &compute.NetworkInterface{}
+func (c *networkInterfaces) Get(ctx context.Context, name string, options v1.GetOptions) (result *networking.NetworkInterface, err error) {
+	result = &networking.NetworkInterface{}
 	err = c.client.Get().
 		Namespace(c.ns).
 		Resource("networkinterfaces").
@@ -77,12 +77,12 @@ func (c *networkInterfaces) Get(ctx context.Context, name string, options v1.Get
 }
 
 // List takes label and field selectors, and returns the list of NetworkInterfaces that match those selectors.
-func (c *networkInterfaces) List(ctx context.Context, opts v1.ListOptions) (result *compute.NetworkInterfaceList, err error) {
+func (c *networkInterfaces) List(ctx context.Context, opts v1.ListOptions) (result *networking.NetworkInterfaceList, err error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
 	}
-	result = &compute.NetworkInterfaceList{}
+	result = &networking.NetworkInterfaceList{}
 	err = c.client.Get().
 		Namespace(c.ns).
 		Resource("networkinterfaces").
@@ -109,8 +109,8 @@ func (c *networkInterfaces) Watch(ctx context.Context, opts v1.ListOptions) (wat
 }
 
 // Create takes the representation of a networkInterface and creates it.  Returns the server's representation of the networkInterface, and an error, if there is any.
-func (c *networkInterfaces) Create(ctx context.Context, networkInterface *compute.NetworkInterface, opts v1.CreateOptions) (result *compute.NetworkInterface, err error) {
-	result = &compute.NetworkInterface{}
+func (c *networkInterfaces) Create(ctx context.Context, networkInterface *networking.NetworkInterface, opts v1.CreateOptions) (result *networking.NetworkInterface, err error) {
+	result = &networking.NetworkInterface{}
 	err = c.client.Post().
 		Namespace(c.ns).
 		Resource("networkinterfaces").
@@ -122,8 +122,8 @@ func (c *networkInterfaces) Create(ctx context.Context, networkInterface *comput
 }
 
 // Update takes the representation of a networkInterface and updates it. Returns the server's representation of the networkInterface, and an error, if there is any.
-func (c *networkInterfaces) Update(ctx context.Context, networkInterface *compute.NetworkInterface, opts v1.UpdateOptions) (result *compute.NetworkInterface, err error) {
-	result = &compute.NetworkInterface{}
+func (c *networkInterfaces) Update(ctx context.Context, networkInterface *networking.NetworkInterface, opts v1.UpdateOptions) (result *networking.NetworkInterface, err error) {
+	result = &networking.NetworkInterface{}
 	err = c.client.Put().
 		Namespace(c.ns).
 		Resource("networkinterfaces").
@@ -137,8 +137,8 @@ func (c *networkInterfaces) Update(ctx context.Context, networkInterface *comput
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *networkInterfaces) UpdateStatus(ctx context.Context, networkInterface *compute.NetworkInterface, opts v1.UpdateOptions) (result *compute.NetworkInterface, err error) {
-	result = &compute.NetworkInterface{}
+func (c *networkInterfaces) UpdateStatus(ctx context.Context, networkInterface *networking.NetworkInterface, opts v1.UpdateOptions) (result *networking.NetworkInterface, err error) {
+	result = &networking.NetworkInterface{}
 	err = c.client.Put().
 		Namespace(c.ns).
 		Resource("networkinterfaces").
@@ -179,8 +179,8 @@ func (c *networkInterfaces) DeleteCollection(ctx context.Context, opts v1.Delete
 }
 
 // Patch applies the patch and returns the patched networkInterface.
-func (c *networkInterfaces) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *compute.NetworkInterface, err error) {
-	result = &compute.NetworkInterface{}
+func (c *networkInterfaces) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *networking.NetworkInterface, err error) {
+	result = &networking.NetworkInterface{}
 	err = c.client.Patch(pt).
 		Namespace(c.ns).
 		Resource("networkinterfaces").

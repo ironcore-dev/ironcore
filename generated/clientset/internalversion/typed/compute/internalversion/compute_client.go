@@ -29,7 +29,6 @@ type ComputeInterface interface {
 	MachinesGetter
 	MachineClassesGetter
 	MachinePoolsGetter
-	NetworkInterfacesGetter
 }
 
 // ComputeClient is used to interact with features provided by the compute.api.onmetal.de group.
@@ -47,10 +46,6 @@ func (c *ComputeClient) MachineClasses(namespace string) MachineClassInterface {
 
 func (c *ComputeClient) MachinePools() MachinePoolInterface {
 	return newMachinePools(c)
-}
-
-func (c *ComputeClient) NetworkInterfaces(namespace string) NetworkInterfaceInterface {
-	return newNetworkInterfaces(c, namespace)
 }
 
 // NewForConfig creates a new ComputeClient for the given config.

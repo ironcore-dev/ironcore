@@ -18,7 +18,8 @@ import (
 	"context"
 
 	"github.com/onmetal/onmetal-api/apis/compute"
-	"github.com/onmetal/onmetal-api/registry/compute/networkinterface"
+	"github.com/onmetal/onmetal-api/apis/networking"
+	"github.com/onmetal/onmetal-api/registry/networking/networkinterface"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apiserver/pkg/registry/generic"
@@ -43,10 +44,10 @@ func (REST) ShortNames() []string {
 func NewStorage(optsGetter generic.RESTOptionsGetter) (NetworkInteraceStorage, error) {
 	store := &genericregistry.Store{
 		NewFunc: func() runtime.Object {
-			return &compute.NetworkInterface{}
+			return &networking.NetworkInterface{}
 		},
 		NewListFunc: func() runtime.Object {
-			return &compute.NetworkInterfaceList{}
+			return &networking.NetworkInterfaceList{}
 		},
 		PredicateFunc:            networkinterface.MatchNetworkInterface,
 		DefaultQualifiedResource: compute.Resource("networkinterfaces"),
@@ -78,7 +79,7 @@ type StatusREST struct {
 }
 
 func (r *StatusREST) New() runtime.Object {
-	return &compute.NetworkInterface{}
+	return &networking.NetworkInterface{}
 }
 
 func (r *StatusREST) Get(ctx context.Context, name string, options *metav1.GetOptions) (runtime.Object, error) {

@@ -22,6 +22,7 @@ import (
 
 	compute "github.com/onmetal/onmetal-api/apis/compute"
 	ipam "github.com/onmetal/onmetal-api/apis/ipam"
+	networking "github.com/onmetal/onmetal-api/apis/networking"
 	storage "github.com/onmetal/onmetal-api/apis/storage"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	cache "k8s.io/client-go/tools/cache"
@@ -60,14 +61,16 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Compute().InternalVersion().MachineClasses().Informer()}, nil
 	case compute.SchemeGroupVersion.WithResource("machinepools"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Compute().InternalVersion().MachinePools().Informer()}, nil
-	case compute.SchemeGroupVersion.WithResource("networkinterfaces"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Compute().InternalVersion().NetworkInterfaces().Informer()}, nil
 
 		// Group=ipam.api.onmetal.de, Version=internalVersion
 	case ipam.SchemeGroupVersion.WithResource("prefixes"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Ipam().InternalVersion().Prefixes().Informer()}, nil
 	case ipam.SchemeGroupVersion.WithResource("prefixallocations"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Ipam().InternalVersion().PrefixAllocations().Informer()}, nil
+
+		// Group=networking.api.onmetal.de, Version=internalVersion
+	case networking.SchemeGroupVersion.WithResource("networkinterfaces"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().InternalVersion().NetworkInterfaces().Informer()}, nil
 
 		// Group=storage.api.onmetal.de, Version=internalVersion
 	case storage.SchemeGroupVersion.WithResource("volumes"):

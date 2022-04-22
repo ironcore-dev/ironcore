@@ -162,23 +162,23 @@ func (a *APIServer) Start(ctx context.Context) error {
 	case <-waitDone:
 		healthCancel()
 		if waitErr != nil {
-			return fmt.Errorf("wait returned with error before healthy: %w", err)
+			return fmt.Errorf("wait returned with error before healthy: %w", waitErr)
 		}
 		return fmt.Errorf("wait returned before ready")
 	case <-healthDone:
 		if healthErr != nil {
-			return fmt.Errorf("healthiness check returned an error: %w", err)
+			return fmt.Errorf("healthiness check returned an error: %w", healthErr)
 		}
 	}
 
 	select {
 	case <-ctx.Done():
 		if err := cmd.Process.Signal(syscall.SIGTERM); err != nil {
-			return fmt.Errorf("error to signal process to stop: %w", err)
+			return fmt.Errorf("error signaling process to stop: %w", err)
 		}
 	case <-waitDone:
 		if waitErr != nil {
-			return fmt.Errorf("process exited early with error: %w", err)
+			return fmt.Errorf("process exited early with error: %w", waitErr)
 		}
 		return fmt.Errorf("process exited early with no error")
 	}

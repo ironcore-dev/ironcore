@@ -19,8 +19,8 @@ import (
 	"fmt"
 
 	"github.com/onmetal/onmetal-api/api"
-	"github.com/onmetal/onmetal-api/apis/compute"
-	"github.com/onmetal/onmetal-api/apis/compute/validation"
+	"github.com/onmetal/onmetal-api/apis/networking"
+	"github.com/onmetal/onmetal-api/apis/networking/validation"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -32,7 +32,7 @@ import (
 )
 
 func GetAttrs(obj runtime.Object) (labels.Set, fields.Set, error) {
-	networkInterface, ok := obj.(*compute.NetworkInterface)
+	networkInterface, ok := obj.(*networking.NetworkInterface)
 	if !ok {
 		return nil, nil, fmt.Errorf("given object is not a NetworkInterface")
 	}
@@ -47,7 +47,7 @@ func MatchNetworkInterface(label labels.Selector, field fields.Selector) apisrvs
 	}
 }
 
-func SelectableFields(networkInterface *compute.NetworkInterface) fields.Set {
+func SelectableFields(networkInterface *networking.NetworkInterface) fields.Set {
 	return generic.ObjectMetaFieldsSet(&networkInterface.ObjectMeta, true)
 }
 
@@ -69,7 +69,7 @@ func (networkInterfaceStrategy) PrepareForUpdate(ctx context.Context, obj, old r
 }
 
 func (networkInterfaceStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
-	networkInterface := obj.(*compute.NetworkInterface)
+	networkInterface := obj.(*networking.NetworkInterface)
 	return validation.ValidateNetworkInterface(networkInterface)
 }
 
@@ -111,14 +111,14 @@ func (networkInterfaceStatusStrategy) GetResetFields() map[fieldpath.APIVersion]
 }
 
 func (networkInterfaceStatusStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Object) {
-	newNetworkInterface := obj.(*compute.NetworkInterface)
-	oldNetworkInterface := old.(*compute.NetworkInterface)
+	newNetworkInterface := obj.(*networking.NetworkInterface)
+	oldNetworkInterface := old.(*networking.NetworkInterface)
 	newNetworkInterface.Spec = oldNetworkInterface.Spec
 }
 
 func (networkInterfaceStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
-	newNetworkInterface := obj.(*compute.NetworkInterface)
-	oldNetworkInterface := old.(*compute.NetworkInterface)
+	newNetworkInterface := obj.(*networking.NetworkInterface)
+	oldNetworkInterface := old.(*networking.NetworkInterface)
 	return validation.ValidateNetworkInterfaceUpdate(newNetworkInterface, oldNetworkInterface)
 }
 

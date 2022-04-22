@@ -1,22 +1,22 @@
-apiVersion: compute.api.onmetal.de/v1alpha1
+apiVersion: networking.api.onmetal.de/v1alpha1
 kind: NetworkInterface
 metadata:
   name: networkinterface-sample
 spec:
   networkRef:
     name: network-sample
-  ipFamilies: [IPv4, IPv6]
+  ipFamilies: [ IPv4, IPv6 ]
   ips:
     - value: 10.0.0.1 # It is also possible to directly specify IPs without IPAM
-#    - value: 2607:f0d0:1002:51::4 # Same applies for v6 addresses
-#    - ephemeralIP:
-#        spec:
-#          prefixRef:
-#            name: my-node-prefix-v4
-#    - ephemeralIP:
-#        spec:
-#          prefixRef:
-#            name: my-node-prefix-v6
+  #    - value: 2607:f0d0:1002:51::4 # Same applies for v6 addresses
+  #    - ephemeralIP:
+  #        spec:
+  #          prefixRef:
+  #            name: my-node-prefix-v4
+  #    - ephemeralIP:
+  #        spec:
+  #          prefixRef:
+  #            name: my-node-prefix-v6
   machineRef:
     name: machine-sample
 #status:

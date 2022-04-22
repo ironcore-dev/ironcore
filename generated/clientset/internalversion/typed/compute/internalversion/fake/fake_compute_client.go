@@ -39,10 +39,6 @@ func (c *FakeCompute) MachinePools() internalversion.MachinePoolInterface {
 	return &FakeMachinePools{c}
 }
 
-func (c *FakeCompute) NetworkInterfaces(namespace string) internalversion.NetworkInterfaceInterface {
-	return &FakeNetworkInterfaces{c, namespace}
-}
-
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
 func (c *FakeCompute) RESTClient() rest.Interface {

@@ -23,12 +23,8 @@ import (
 
 // Interface provides access to all the informers in this group version.
 type Interface interface {
-	// Machines returns a MachineInformer.
-	Machines() MachineInformer
-	// MachineClasses returns a MachineClassInformer.
-	MachineClasses() MachineClassInformer
-	// MachinePools returns a MachinePoolInformer.
-	MachinePools() MachinePoolInformer
+	// NetworkInterfaces returns a NetworkInterfaceInformer.
+	NetworkInterfaces() NetworkInterfaceInformer
 }
 
 type version struct {
@@ -42,17 +38,7 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// Machines returns a MachineInformer.
-func (v *version) Machines() MachineInformer {
-	return &machineInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
-}
-
-// MachineClasses returns a MachineClassInformer.
-func (v *version) MachineClasses() MachineClassInformer {
-	return &machineClassInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
-}
-
-// MachinePools returns a MachinePoolInformer.
-func (v *version) MachinePools() MachinePoolInformer {
-	return &machinePoolInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+// NetworkInterfaces returns a NetworkInterfaceInformer.
+func (v *version) NetworkInterfaces() NetworkInterfaceInformer {
+	return &networkInterfaceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

@@ -19,6 +19,7 @@ import (
 
 	computerest "github.com/onmetal/onmetal-api/registry/compute/rest"
 	ipamrest "github.com/onmetal/onmetal-api/registry/ipam/rest"
+	networkingrest "github.com/onmetal/onmetal-api/registry/networking/rest"
 	storagerest "github.com/onmetal/onmetal-api/registry/storage/rest"
 	"k8s.io/apimachinery/pkg/version"
 	"k8s.io/apiserver/pkg/registry/generic"
@@ -92,7 +93,7 @@ func (c completedConfig) New() (*OnmetalAPIServer, error) {
 	restStorageProviders := []RESTStorageProvider{
 		ipamrest.StorageProvider{},
 		computerest.StorageProvider{},
-		//networkingrest.StorageProvider{}, TODO: Include once there are resources
+		networkingrest.StorageProvider{},
 		storagerest.StorageProvider{},
 	}
 

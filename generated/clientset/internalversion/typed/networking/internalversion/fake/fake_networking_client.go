@@ -18,12 +18,17 @@
 package fake
 
 import (
+	internalversion "github.com/onmetal/onmetal-api/generated/clientset/internalversion/typed/networking/internalversion"
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
 )
 
 type FakeNetworking struct {
 	*testing.Fake
+}
+
+func (c *FakeNetworking) NetworkInterfaces(namespace string) internalversion.NetworkInterfaceInterface {
+	return &FakeNetworkInterfaces{c, namespace}
 }
 
 // RESTClient returns a RESTClient that is used to communicate

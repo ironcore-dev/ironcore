@@ -21,6 +21,7 @@
 package v1alpha1
 
 import (
+	ipamv1alpha1 "github.com/onmetal/onmetal-api/apis/ipam/v1alpha1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -28,5 +29,25 @@ import (
 // Public to allow building arbitrary schemes.
 // All generated defaulters are covering - they call all nested defaulters.
 func RegisterDefaults(scheme *runtime.Scheme) error {
+	scheme.AddTypeDefaultingFunc(&NetworkInterface{}, func(obj interface{}) { SetObjectDefaults_NetworkInterface(obj.(*NetworkInterface)) })
+	scheme.AddTypeDefaultingFunc(&NetworkInterfaceList{}, func(obj interface{}) { SetObjectDefaults_NetworkInterfaceList(obj.(*NetworkInterfaceList)) })
 	return nil
+}
+
+func SetObjectDefaults_NetworkInterface(in *NetworkInterface) {
+	for i := range in.Spec.IPs {
+		a := &in.Spec.IPs[i]
+		if a.EphemeralPrefix != nil {
+			if a.EphemeralPrefix.PrefixTemplate != nil {
+				ipamv1alpha1.SetDefaults_PrefixSpec(&a.EphemeralPrefix.PrefixTemplate.Spec)
+			}
+		}
+	}
+}
+
+func SetObjectDefaults_NetworkInterfaceList(in *NetworkInterfaceList) {
+	for i := range in.Items {
+		a := &in.Items[i]
+		SetObjectDefaults_NetworkInterface(a)
+	}
 }

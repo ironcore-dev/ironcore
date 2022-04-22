@@ -18,6 +18,7 @@ import (
 	"github.com/onmetal/onmetal-api/api"
 	"github.com/onmetal/onmetal-api/apis/networking"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
+	networkinterfacestorage "github.com/onmetal/onmetal-api/registry/networking/networkinterface/storage"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/registry/generic"
@@ -51,6 +52,14 @@ func (p StorageProvider) NewRESTStorage(apiResourceConfigSource storage.APIResou
 
 func (p StorageProvider) v1alpha1Storage(restOptionsGetter generic.RESTOptionsGetter) (map[string]rest.Storage, error) {
 	storageMap := map[string]rest.Storage{}
+
+	networkInterfaceStorage, err := networkinterfacestorage.NewStorage(restOptionsGetter)
+	if err != nil {
+		return storageMap, err
+	}
+
+	storageMap["networkinterfaces"] = networkInterfaceStorage.NetworkInterface
+	storageMap["networkinterfaces/status"] = networkInterfaceStorage.Status
 
 	return storageMap, nil
 }

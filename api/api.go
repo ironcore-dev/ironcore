@@ -17,6 +17,7 @@ package api
 import (
 	computeinstall "github.com/onmetal/onmetal-api/apis/compute/install"
 	ipaminstall "github.com/onmetal/onmetal-api/apis/ipam/install"
+	networkinginstall "github.com/onmetal/onmetal-api/apis/networking/install"
 	storageinstall "github.com/onmetal/onmetal-api/apis/storage/install"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -36,6 +37,7 @@ var (
 func init() {
 	ipaminstall.Install(Scheme)
 	computeinstall.Install(Scheme)
+	networkinginstall.Install(Scheme)
 	storageinstall.Install(Scheme)
 
 	utilruntime.Must(autoscalingv1.AddToScheme(Scheme))

@@ -22,5 +22,3 @@ type MachineExpansion interface{}
 type MachineClassExpansion interface{}
 
 type MachinePoolExpansion interface{}
-
-type NetworkInterfaceExpansion interface{}

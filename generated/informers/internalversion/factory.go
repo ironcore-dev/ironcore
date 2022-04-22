@@ -26,6 +26,7 @@ import (
 	compute "github.com/onmetal/onmetal-api/generated/informers/internalversion/compute"
 	internalinterfaces "github.com/onmetal/onmetal-api/generated/informers/internalversion/internalinterfaces"
 	ipam "github.com/onmetal/onmetal-api/generated/informers/internalversion/ipam"
+	networking "github.com/onmetal/onmetal-api/generated/informers/internalversion/networking"
 	storage "github.com/onmetal/onmetal-api/generated/informers/internalversion/storage"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
@@ -175,6 +176,7 @@ type SharedInformerFactory interface {
 
 	Compute() compute.Interface
 	Ipam() ipam.Interface
+	Networking() networking.Interface
 	Storage() storage.Interface
 }
 
@@ -184,6 +186,10 @@ func (f *sharedInformerFactory) Compute() compute.Interface {
 
 func (f *sharedInformerFactory) Ipam() ipam.Interface {
 	return ipam.New(f, f.namespace, f.tweakListOptions)
+}
+
+func (f *sharedInformerFactory) Networking() networking.Interface {
+	return networking.New(f, f.namespace, f.tweakListOptions)
 }
 
 func (f *sharedInformerFactory) Storage() storage.Interface {

@@ -21,10 +21,10 @@ import (
 	"context"
 	time "time"
 
-	compute "github.com/onmetal/onmetal-api/apis/compute"
+	networking "github.com/onmetal/onmetal-api/apis/networking"
 	clientsetinternalversion "github.com/onmetal/onmetal-api/generated/clientset/internalversion"
 	internalinterfaces "github.com/onmetal/onmetal-api/generated/informers/internalversion/internalinterfaces"
-	internalversion "github.com/onmetal/onmetal-api/generated/listers/compute/internalversion"
+	internalversion "github.com/onmetal/onmetal-api/generated/listers/networking/internalversion"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
@@ -61,16 +61,16 @@ func NewFilteredNetworkInterfaceInformer(client clientsetinternalversion.Interfa
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.Compute().NetworkInterfaces(namespace).List(context.TODO(), options)
+				return client.Networking().NetworkInterfaces(namespace).List(context.TODO(), options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.Compute().NetworkInterfaces(namespace).Watch(context.TODO(), options)
+				return client.Networking().NetworkInterfaces(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&compute.NetworkInterface{},
+		&networking.NetworkInterface{},
 		resyncPeriod,
 		indexers,
 	)
@@ -81,7 +81,7 @@ func (f *networkInterfaceInformer) defaultInformer(client clientsetinternalversi
 }
 
 func (f *networkInterfaceInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&compute.NetworkInterface{}, f.defaultInformer)
+	return f.factory.InformerFor(&networking.NetworkInterface{}, f.defaultInformer)
 }
 
 func (f *networkInterfaceInformer) Lister() internalversion.NetworkInterfaceLister {

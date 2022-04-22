@@ -27,11 +27,16 @@ import (
 
 type NetworkingV1alpha1Interface interface {
 	RESTClient() rest.Interface
+	NetworkInterfacesGetter
 }
 
 // NetworkingV1alpha1Client is used to interact with features provided by the networking.api.onmetal.de group.
 type NetworkingV1alpha1Client struct {
 	restClient rest.Interface
+}
+
+func (c *NetworkingV1alpha1Client) NetworkInterfaces(namespace string) NetworkInterfaceInterface {
+	return newNetworkInterfaces(c, namespace)
 }
 
 // NewForConfig creates a new NetworkingV1alpha1Client for the given config.

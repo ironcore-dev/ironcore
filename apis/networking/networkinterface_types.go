@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package compute
+package networking
 
 import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
