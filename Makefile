@@ -77,8 +77,9 @@ check: manifests generate addlicense lint test # Generate manifests, code, lint,
 docs: ## Run go generate to generate API reference documentation.
 	go run github.com/ahmetb/gen-crd-api-reference-docs -api-dir ./apis/common/v1alpha1 -config ./hack/api-reference/common-config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/common.md
 	go run github.com/ahmetb/gen-crd-api-reference-docs -api-dir ./apis/compute/v1alpha1 -config ./hack/api-reference/compute-config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/compute.md
-	go run github.com/ahmetb/gen-crd-api-reference-docs -api-dir ./apis/ipam/v1alpha1 -config ./hack/api-reference/ipam-config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/ipam.md
 	go run github.com/ahmetb/gen-crd-api-reference-docs -api-dir ./apis/storage/v1alpha1 -config ./hack/api-reference/storage-config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/storage.md
+	# TODO: Enable once first types are there # go run github.com/ahmetb/gen-crd-api-reference-docs -api-dir ./apis/networking/v1alpha1 -config ./hack/api-reference/networking-config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/networking.md
+	go run github.com/ahmetb/gen-crd-api-reference-docs -api-dir ./apis/ipam/v1alpha1 -config ./hack/api-reference/ipam-config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/ipam.md
 
 .PHONY: start-docs
 start-docs: ## Start the local mkdocs based development environment.

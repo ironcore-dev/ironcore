@@ -1,0 +1,48 @@
+{
+  "hideMemberFields": [
+    "TypeMeta"
+  ],
+  "hideTypePatterns": [
+    "ParseError$",
+    "List$"
+  ],
+  "externalPackages": [
+    {
+      "typeMatchPrefix": "^k8s\\.io/apimachinery/pkg/api/resource\\.Quantity",
+      "docsURLTemplate": "https://pkg.go.dev/k8s.io/apimachinery/pkg/api/resource#Duration"
+    },
+    {
+      "typeMatchPrefix": "^k8s\\.io/(api|apimachinery/pkg/apis)/",
+      "docsURLTemplate": "https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#{{lower .TypeIdentifier}}-{{arrIndex .PackageSegments -1}}-{{arrIndex .PackageSegments -2}}"
+    },
+    {
+      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.CIDR",
+      "docsURLTemplate": "/api-reference/common/#common.onmetal.de/v1alpha1.CIDR"
+    },
+    {
+      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.IPAddr",
+      "docsURLTemplate": "/api-reference/common/#common.onmetal.de/v1alpha1.IPAddr"
+    },
+    {
+      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.IP",
+      "docsURLTemplate": "/api-reference/common/#common.onmetal.de/v1alpha1.IP"
+    },
+    {
+      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.IPPrefix",
+      "docsURLTemplate": "/api-reference/common/#common.onmetal.de/v1alpha1.IPPrefix"
+    },
+    {
+      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.SecretKeySelector$",
+      "docsURLTemplate": "/api-reference/common/#common.onmetal.de/v1alpha1.SecretKeySelector"
+    },
+    {
+      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.ConfigMapKeySelector$",
+      "docsURLTemplate": "/api-reference/common/#common.onmetal.de/v1alpha1.ConfigMapKeySelector"
+    }
+  ],
+  "typeDisplayNamePrefixOverrides": {
+    "k8s.io/api/": "Kubernetes ",
+    "k8s.io/apimachinery/pkg/apis/": "Kubernetes "
+  },
+  "markdownDisabled": false
+}

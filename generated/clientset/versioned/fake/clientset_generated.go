@@ -23,6 +23,8 @@ import (
 	fakecomputev1alpha1 "github.com/onmetal/onmetal-api/generated/clientset/versioned/typed/compute/v1alpha1/fake"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/generated/clientset/versioned/typed/ipam/v1alpha1"
 	fakeipamv1alpha1 "github.com/onmetal/onmetal-api/generated/clientset/versioned/typed/ipam/v1alpha1/fake"
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/generated/clientset/versioned/typed/networking/v1alpha1"
+	fakenetworkingv1alpha1 "github.com/onmetal/onmetal-api/generated/clientset/versioned/typed/networking/v1alpha1/fake"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/generated/clientset/versioned/typed/storage/v1alpha1"
 	fakestoragev1alpha1 "github.com/onmetal/onmetal-api/generated/clientset/versioned/typed/storage/v1alpha1/fake"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -90,6 +92,11 @@ func (c *Clientset) ComputeV1alpha1() computev1alpha1.ComputeV1alpha1Interface {
 // IpamV1alpha1 retrieves the IpamV1alpha1Client
 func (c *Clientset) IpamV1alpha1() ipamv1alpha1.IpamV1alpha1Interface {
 	return &fakeipamv1alpha1.FakeIpamV1alpha1{Fake: &c.Fake}
+}
+
+// NetworkingV1alpha1 retrieves the NetworkingV1alpha1Client
+func (c *Clientset) NetworkingV1alpha1() networkingv1alpha1.NetworkingV1alpha1Interface {
+	return &fakenetworkingv1alpha1.FakeNetworkingV1alpha1{Fake: &c.Fake}
 }
 
 // StorageV1alpha1 retrieves the StorageV1alpha1Client

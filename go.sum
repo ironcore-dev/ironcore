@@ -399,8 +399,8 @@ github.com/nxadm/tail v1.4.8/go.mod h1:+ncqLTQzXmGhMZNUePPaPqPvBxHAIsmXswZKocGu+
 github.com/oklog/ulid v1.3.1/go.mod h1:CirwcVhetQ6Lv90oh/F+FBtV6XMibvdAFo93nm5qn4U=
 github.com/onmetal/controller-utils v0.5.2 h1:e6Mag5EMqUNCBLzyDZikunT/CdzjIl2+slf3/HuHhw8=
 github.com/onmetal/controller-utils v0.5.2/go.mod h1:2WG5YlYYKnlR0mwXWFw5TceJ4wvuIAeOC/HKeiGNIrc=
-github.com/onmetal/vgopath v0.0.1 h1:/0PYsmLx8nO6O0HZ9XTvJqjuy/QdeSKztQAmVTq6/us=
-github.com/onmetal/vgopath v0.0.1/go.mod h1:NG4LDHJtbl4qyCz6pH5V1xCHUJFsHuIXcy1yTJbXknw=
+github.com/onmetal/vgopath v0.0.2 h1:OOCs939S7qMF+FcT+5u4fImcAwLpErAhOj1W/Yb+NxM=
+github.com/onmetal/vgopath v0.0.2/go.mod h1:YBlloKU+SDCJatvr61Zsg3DyYxlNgTqkkkA7CDmFhr4=
 github.com/onsi/ginkgo v0.0.0-20170829012221-11459a886d9c/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
 github.com/onsi/ginkgo v1.6.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
 github.com/onsi/ginkgo v1.12.1/go.mod h1:zj2OWP4+oCPe1qIXoGWkgMRwljMUYCdkwsT2108oapk=

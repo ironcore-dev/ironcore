@@ -184,6 +184,6 @@ var _ = AfterSuite(func() {
 	cancel()
 
 	By("tearing down the test environment")
-	err := testEnv.Stop()
+	err := envtestutils.StopWithExtensions(testEnv, testEnvExt)
 	Expect(err).NotTo(HaveOccurred())
 })

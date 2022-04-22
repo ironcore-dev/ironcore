@@ -48,6 +48,7 @@ func NewResourceConfig() *serverstorage.ResourceConfig {
 	cfg.EnableVersions(
 		computev1alpha1.SchemeGroupVersion,
 		storagev1alpha1.SchemeGroupVersion,
+		//networkingv1alpha1.SchemeGroupVersion, TODO: Include once there are resources
 		ipamv1alpha1.SchemeGroupVersion,
 	)
 	return cfg
@@ -66,6 +67,7 @@ func NewOnmetalAPIServerOptions() *OnmetalAPIServerOptions {
 			api.Codecs.LegacyCodec(
 				computev1alpha1.SchemeGroupVersion,
 				storagev1alpha1.SchemeGroupVersion,
+				//networkingv1alpha1.SchemeGroupVersion, TODO: Include once there are resources
 				ipamv1alpha1.SchemeGroupVersion,
 			),
 		),
@@ -74,6 +76,7 @@ func NewOnmetalAPIServerOptions() *OnmetalAPIServerOptions {
 		computev1alpha1.SchemeGroupVersion,
 		schema.GroupKind{Group: computev1alpha1.SchemeGroupVersion.Group},
 		schema.GroupKind{Group: storagev1alpha1.SchemeGroupVersion.Group},
+		//schema.GroupKind{Group: networkingv1alpha1.SchemeGroupVersion.Group}, TODO: Include once there are resources
 		schema.GroupKind{Group: ipamv1alpha1.SchemeGroupVersion.Group},
 	)
 	return o
