@@ -19,6 +19,8 @@ import (
 	"github.com/onmetal/onmetal-api/apis/compute"
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	machinestorage "github.com/onmetal/onmetal-api/registry/compute/machine/storage"
+	networkinterfacestorage "github.com/onmetal/onmetal-api/registry/compute/networkinterface/storage"
+
 	machinepoolstorage "github.com/onmetal/onmetal-api/registry/compute/machinepool/storage"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apiserver/pkg/registry/generic"
@@ -76,6 +78,14 @@ func (p StorageProvider) v1alpha1Storage(restOptionsGetter generic.RESTOptionsGe
 
 	storageMap["machines"] = machineStorage.Machine
 	storageMap["machines/status"] = machineStorage.Status
+
+	networkInterfaceStorage, err := networkinterfacestorage.NewStorage(restOptionsGetter)
+	if err != nil {
+		return storageMap, err
+	}
+
+	storageMap["networkinterfaces"] = networkInterfaceStorage.NetworkInterface
+	storageMap["networkinterfaces/status"] = networkInterfaceStorage.Status
 
 	return storageMap, nil
 }

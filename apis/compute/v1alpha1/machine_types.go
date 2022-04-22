@@ -122,7 +122,7 @@ const (
 	MachineSynced MachineConditionType = "Synced"
 )
 
-// MachineCondition is one of the conditions of a volume.
+// MachineCondition is one of the conditions of a Machine.
 type MachineCondition struct {
 	// Type is the type of the condition.
 	Type MachineConditionType `json:"type"`

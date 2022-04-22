@@ -47,6 +47,26 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
+	if err := s.AddGeneratedConversionFunc((*EphemeralPrefixSource)(nil), (*compute.EphemeralPrefixSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_EphemeralPrefixSource_To_compute_EphemeralPrefixSource(a.(*EphemeralPrefixSource), b.(*compute.EphemeralPrefixSource), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*compute.EphemeralPrefixSource)(nil), (*EphemeralPrefixSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_EphemeralPrefixSource_To_v1alpha1_EphemeralPrefixSource(a.(*compute.EphemeralPrefixSource), b.(*EphemeralPrefixSource), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*IPSource)(nil), (*compute.IPSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_IPSource_To_compute_IPSource(a.(*IPSource), b.(*compute.IPSource), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*compute.IPSource)(nil), (*IPSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_IPSource_To_v1alpha1_IPSource(a.(*compute.IPSource), b.(*IPSource), scope)
+	}); err != nil {
+		return err
+	}
 	if err := s.AddGeneratedConversionFunc((*Interface)(nil), (*compute.Interface)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1alpha1_Interface_To_compute_Interface(a.(*Interface), b.(*compute.Interface), scope)
 	}); err != nil {
@@ -187,6 +207,56 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
+	if err := s.AddGeneratedConversionFunc((*NetworkInterface)(nil), (*compute.NetworkInterface)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_NetworkInterface_To_compute_NetworkInterface(a.(*NetworkInterface), b.(*compute.NetworkInterface), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*compute.NetworkInterface)(nil), (*NetworkInterface)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_NetworkInterface_To_v1alpha1_NetworkInterface(a.(*compute.NetworkInterface), b.(*NetworkInterface), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*NetworkInterfaceList)(nil), (*compute.NetworkInterfaceList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_NetworkInterfaceList_To_compute_NetworkInterfaceList(a.(*NetworkInterfaceList), b.(*compute.NetworkInterfaceList), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*compute.NetworkInterfaceList)(nil), (*NetworkInterfaceList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_NetworkInterfaceList_To_v1alpha1_NetworkInterfaceList(a.(*compute.NetworkInterfaceList), b.(*NetworkInterfaceList), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*NetworkInterfaceSpec)(nil), (*compute.NetworkInterfaceSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_NetworkInterfaceSpec_To_compute_NetworkInterfaceSpec(a.(*NetworkInterfaceSpec), b.(*compute.NetworkInterfaceSpec), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*compute.NetworkInterfaceSpec)(nil), (*NetworkInterfaceSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_NetworkInterfaceSpec_To_v1alpha1_NetworkInterfaceSpec(a.(*compute.NetworkInterfaceSpec), b.(*NetworkInterfaceSpec), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*NetworkInterfaceStatus)(nil), (*compute.NetworkInterfaceStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_NetworkInterfaceStatus_To_compute_NetworkInterfaceStatus(a.(*NetworkInterfaceStatus), b.(*compute.NetworkInterfaceStatus), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*compute.NetworkInterfaceStatus)(nil), (*NetworkInterfaceStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStatus(a.(*compute.NetworkInterfaceStatus), b.(*NetworkInterfaceStatus), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*PrefixTemplate)(nil), (*compute.PrefixTemplate)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_PrefixTemplate_To_compute_PrefixTemplate(a.(*PrefixTemplate), b.(*compute.PrefixTemplate), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*compute.PrefixTemplate)(nil), (*PrefixTemplate)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_PrefixTemplate_To_v1alpha1_PrefixTemplate(a.(*compute.PrefixTemplate), b.(*PrefixTemplate), scope)
+	}); err != nil {
+		return err
+	}
 	if err := s.AddGeneratedConversionFunc((*Volume)(nil), (*compute.Volume)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1alpha1_Volume_To_compute_Volume(a.(*Volume), b.(*compute.Volume), scope)
 	}); err != nil {
@@ -242,6 +312,48 @@ func autoConvert_compute_EFIVar_To_v1alpha1_EFIVar(in *compute.EFIVar, out *EFIV
 // Convert_compute_EFIVar_To_v1alpha1_EFIVar is an autogenerated conversion function.
 func Convert_compute_EFIVar_To_v1alpha1_EFIVar(in *compute.EFIVar, out *EFIVar, s conversion.Scope) error {
 	return autoConvert_compute_EFIVar_To_v1alpha1_EFIVar(in, out, s)
+}
+
+func autoConvert_v1alpha1_EphemeralPrefixSource_To_compute_EphemeralPrefixSource(in *EphemeralPrefixSource, out *compute.EphemeralPrefixSource, s conversion.Scope) error {
+	out.PrefixTemplate = (*compute.PrefixTemplate)(unsafe.Pointer(in.PrefixTemplate))
+	return nil
+}
+
+// Convert_v1alpha1_EphemeralPrefixSource_To_compute_EphemeralPrefixSource is an autogenerated conversion function.
+func Convert_v1alpha1_EphemeralPrefixSource_To_compute_EphemeralPrefixSource(in *EphemeralPrefixSource, out *compute.EphemeralPrefixSource, s conversion.Scope) error {
+	return autoConvert_v1alpha1_EphemeralPrefixSource_To_compute_EphemeralPrefixSource(in, out, s)
+}
+
+func autoConvert_compute_EphemeralPrefixSource_To_v1alpha1_EphemeralPrefixSource(in *compute.EphemeralPrefixSource, out *EphemeralPrefixSource, s conversion.Scope) error {
+	out.PrefixTemplate = (*PrefixTemplate)(unsafe.Pointer(in.PrefixTemplate))
+	return nil
+}
+
+// Convert_compute_EphemeralPrefixSource_To_v1alpha1_EphemeralPrefixSource is an autogenerated conversion function.
+func Convert_compute_EphemeralPrefixSource_To_v1alpha1_EphemeralPrefixSource(in *compute.EphemeralPrefixSource, out *EphemeralPrefixSource, s conversion.Scope) error {
+	return autoConvert_compute_EphemeralPrefixSource_To_v1alpha1_EphemeralPrefixSource(in, out, s)
+}
+
+func autoConvert_v1alpha1_IPSource_To_compute_IPSource(in *IPSource, out *compute.IPSource, s conversion.Scope) error {
+	out.Value = (*commonv1alpha1.IP)(unsafe.Pointer(in.Value))
+	out.EphemeralPrefix = (*compute.EphemeralPrefixSource)(unsafe.Pointer(in.EphemeralPrefix))
+	return nil
+}
+
+// Convert_v1alpha1_IPSource_To_compute_IPSource is an autogenerated conversion function.
+func Convert_v1alpha1_IPSource_To_compute_IPSource(in *IPSource, out *compute.IPSource, s conversion.Scope) error {
+	return autoConvert_v1alpha1_IPSource_To_compute_IPSource(in, out, s)
+}
+
+func autoConvert_compute_IPSource_To_v1alpha1_IPSource(in *compute.IPSource, out *IPSource, s conversion.Scope) error {
+	out.Value = (*commonv1alpha1.IP)(unsafe.Pointer(in.Value))
+	out.EphemeralPrefix = (*EphemeralPrefixSource)(unsafe.Pointer(in.EphemeralPrefix))
+	return nil
+}
+
+// Convert_compute_IPSource_To_v1alpha1_IPSource is an autogenerated conversion function.
+func Convert_compute_IPSource_To_v1alpha1_IPSource(in *compute.IPSource, out *IPSource, s conversion.Scope) error {
+	return autoConvert_compute_IPSource_To_v1alpha1_IPSource(in, out, s)
 }
 
 func autoConvert_v1alpha1_Interface_To_compute_Interface(in *Interface, out *compute.Interface, s conversion.Scope) error {
@@ -602,6 +714,128 @@ func autoConvert_compute_MachineStatus_To_v1alpha1_MachineStatus(in *compute.Mac
 // Convert_compute_MachineStatus_To_v1alpha1_MachineStatus is an autogenerated conversion function.
 func Convert_compute_MachineStatus_To_v1alpha1_MachineStatus(in *compute.MachineStatus, out *MachineStatus, s conversion.Scope) error {
 	return autoConvert_compute_MachineStatus_To_v1alpha1_MachineStatus(in, out, s)
+}
+
+func autoConvert_v1alpha1_NetworkInterface_To_compute_NetworkInterface(in *NetworkInterface, out *compute.NetworkInterface, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
+	if err := Convert_v1alpha1_NetworkInterfaceSpec_To_compute_NetworkInterfaceSpec(&in.Spec, &out.Spec, s); err != nil {
+		return err
+	}
+	if err := Convert_v1alpha1_NetworkInterfaceStatus_To_compute_NetworkInterfaceStatus(&in.Status, &out.Status, s); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Convert_v1alpha1_NetworkInterface_To_compute_NetworkInterface is an autogenerated conversion function.
+func Convert_v1alpha1_NetworkInterface_To_compute_NetworkInterface(in *NetworkInterface, out *compute.NetworkInterface, s conversion.Scope) error {
+	return autoConvert_v1alpha1_NetworkInterface_To_compute_NetworkInterface(in, out, s)
+}
+
+func autoConvert_compute_NetworkInterface_To_v1alpha1_NetworkInterface(in *compute.NetworkInterface, out *NetworkInterface, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
+	if err := Convert_compute_NetworkInterfaceSpec_To_v1alpha1_NetworkInterfaceSpec(&in.Spec, &out.Spec, s); err != nil {
+		return err
+	}
+	if err := Convert_compute_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStatus(&in.Status, &out.Status, s); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Convert_compute_NetworkInterface_To_v1alpha1_NetworkInterface is an autogenerated conversion function.
+func Convert_compute_NetworkInterface_To_v1alpha1_NetworkInterface(in *compute.NetworkInterface, out *NetworkInterface, s conversion.Scope) error {
+	return autoConvert_compute_NetworkInterface_To_v1alpha1_NetworkInterface(in, out, s)
+}
+
+func autoConvert_v1alpha1_NetworkInterfaceList_To_compute_NetworkInterfaceList(in *NetworkInterfaceList, out *compute.NetworkInterfaceList, s conversion.Scope) error {
+	out.ListMeta = in.ListMeta
+	out.Items = *(*[]compute.NetworkInterface)(unsafe.Pointer(&in.Items))
+	return nil
+}
+
+// Convert_v1alpha1_NetworkInterfaceList_To_compute_NetworkInterfaceList is an autogenerated conversion function.
+func Convert_v1alpha1_NetworkInterfaceList_To_compute_NetworkInterfaceList(in *NetworkInterfaceList, out *compute.NetworkInterfaceList, s conversion.Scope) error {
+	return autoConvert_v1alpha1_NetworkInterfaceList_To_compute_NetworkInterfaceList(in, out, s)
+}
+
+func autoConvert_compute_NetworkInterfaceList_To_v1alpha1_NetworkInterfaceList(in *compute.NetworkInterfaceList, out *NetworkInterfaceList, s conversion.Scope) error {
+	out.ListMeta = in.ListMeta
+	out.Items = *(*[]NetworkInterface)(unsafe.Pointer(&in.Items))
+	return nil
+}
+
+// Convert_compute_NetworkInterfaceList_To_v1alpha1_NetworkInterfaceList is an autogenerated conversion function.
+func Convert_compute_NetworkInterfaceList_To_v1alpha1_NetworkInterfaceList(in *compute.NetworkInterfaceList, out *NetworkInterfaceList, s conversion.Scope) error {
+	return autoConvert_compute_NetworkInterfaceList_To_v1alpha1_NetworkInterfaceList(in, out, s)
+}
+
+func autoConvert_v1alpha1_NetworkInterfaceSpec_To_compute_NetworkInterfaceSpec(in *NetworkInterfaceSpec, out *compute.NetworkInterfaceSpec, s conversion.Scope) error {
+	out.NetworkRef = in.NetworkRef
+	out.MachineRef = in.MachineRef
+	out.IPFamilies = *(*[]v1.IPFamily)(unsafe.Pointer(&in.IPFamilies))
+	out.IPs = *(*[]compute.IPSource)(unsafe.Pointer(&in.IPs))
+	return nil
+}
+
+// Convert_v1alpha1_NetworkInterfaceSpec_To_compute_NetworkInterfaceSpec is an autogenerated conversion function.
+func Convert_v1alpha1_NetworkInterfaceSpec_To_compute_NetworkInterfaceSpec(in *NetworkInterfaceSpec, out *compute.NetworkInterfaceSpec, s conversion.Scope) error {
+	return autoConvert_v1alpha1_NetworkInterfaceSpec_To_compute_NetworkInterfaceSpec(in, out, s)
+}
+
+func autoConvert_compute_NetworkInterfaceSpec_To_v1alpha1_NetworkInterfaceSpec(in *compute.NetworkInterfaceSpec, out *NetworkInterfaceSpec, s conversion.Scope) error {
+	out.NetworkRef = in.NetworkRef
+	out.MachineRef = in.MachineRef
+	out.IPFamilies = *(*[]v1.IPFamily)(unsafe.Pointer(&in.IPFamilies))
+	out.IPs = *(*[]IPSource)(unsafe.Pointer(&in.IPs))
+	return nil
+}
+
+// Convert_compute_NetworkInterfaceSpec_To_v1alpha1_NetworkInterfaceSpec is an autogenerated conversion function.
+func Convert_compute_NetworkInterfaceSpec_To_v1alpha1_NetworkInterfaceSpec(in *compute.NetworkInterfaceSpec, out *NetworkInterfaceSpec, s conversion.Scope) error {
+	return autoConvert_compute_NetworkInterfaceSpec_To_v1alpha1_NetworkInterfaceSpec(in, out, s)
+}
+
+func autoConvert_v1alpha1_NetworkInterfaceStatus_To_compute_NetworkInterfaceStatus(in *NetworkInterfaceStatus, out *compute.NetworkInterfaceStatus, s conversion.Scope) error {
+	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
+	return nil
+}
+
+// Convert_v1alpha1_NetworkInterfaceStatus_To_compute_NetworkInterfaceStatus is an autogenerated conversion function.
+func Convert_v1alpha1_NetworkInterfaceStatus_To_compute_NetworkInterfaceStatus(in *NetworkInterfaceStatus, out *compute.NetworkInterfaceStatus, s conversion.Scope) error {
+	return autoConvert_v1alpha1_NetworkInterfaceStatus_To_compute_NetworkInterfaceStatus(in, out, s)
+}
+
+func autoConvert_compute_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStatus(in *compute.NetworkInterfaceStatus, out *NetworkInterfaceStatus, s conversion.Scope) error {
+	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
+	return nil
+}
+
+// Convert_compute_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStatus is an autogenerated conversion function.
+func Convert_compute_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStatus(in *compute.NetworkInterfaceStatus, out *NetworkInterfaceStatus, s conversion.Scope) error {
+	return autoConvert_compute_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStatus(in, out, s)
+}
+
+func autoConvert_v1alpha1_PrefixTemplate_To_compute_PrefixTemplate(in *PrefixTemplate, out *compute.PrefixTemplate, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
+	out.Spec = in.Spec
+	return nil
+}
+
+// Convert_v1alpha1_PrefixTemplate_To_compute_PrefixTemplate is an autogenerated conversion function.
+func Convert_v1alpha1_PrefixTemplate_To_compute_PrefixTemplate(in *PrefixTemplate, out *compute.PrefixTemplate, s conversion.Scope) error {
+	return autoConvert_v1alpha1_PrefixTemplate_To_compute_PrefixTemplate(in, out, s)
+}
+
+func autoConvert_compute_PrefixTemplate_To_v1alpha1_PrefixTemplate(in *compute.PrefixTemplate, out *PrefixTemplate, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
+	out.Spec = in.Spec
+	return nil
+}
+
+// Convert_compute_PrefixTemplate_To_v1alpha1_PrefixTemplate is an autogenerated conversion function.
+func Convert_compute_PrefixTemplate_To_v1alpha1_PrefixTemplate(in *compute.PrefixTemplate, out *PrefixTemplate, s conversion.Scope) error {
+	return autoConvert_compute_PrefixTemplate_To_v1alpha1_PrefixTemplate(in, out, s)
 }
 
 func autoConvert_v1alpha1_Volume_To_compute_Volume(in *Volume, out *compute.Volume, s conversion.Scope) error {

@@ -39,6 +39,14 @@ func RequiredField(fld string) types.GomegaMatcher {
 	return FieldError(field.ErrorTypeRequired, fld)
 }
 
+func NotSupportedField(fld string) types.GomegaMatcher {
+	return FieldError(field.ErrorTypeNotSupported, fld)
+}
+
+func DuplicateField(fld string) types.GomegaMatcher {
+	return FieldError(field.ErrorTypeDuplicate, fld)
+}
+
 func FieldError(errorType field.ErrorType, fld string) types.GomegaMatcher {
 	return MaskedFieldError(func(error *field.Error) {
 		error.Detail = ""

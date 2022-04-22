@@ -40,3 +40,11 @@ type MachinePoolListerExpansion interface{}
 // MachinePoolNamespaceListerExpansion allows custom methods to be added to
 // MachinePoolNamespaceLister.
 type MachinePoolNamespaceListerExpansion interface{}
+
+// NetworkInterfaceListerExpansion allows custom methods to be added to
+// NetworkInterfaceLister.
+type NetworkInterfaceListerExpansion interface{}
+
+// NetworkInterfaceNamespaceListerExpansion allows custom methods to be added to
+// NetworkInterfaceNamespaceLister.
+type NetworkInterfaceNamespaceListerExpansion interface{}

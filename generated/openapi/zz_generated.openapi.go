@@ -40,6 +40,8 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/apis/common/v1alpha1.Taint":                   schema_onmetal_api_apis_common_v1alpha1_Taint(ref),
 		"github.com/onmetal/onmetal-api/apis/common/v1alpha1.Toleration":              schema_onmetal_api_apis_common_v1alpha1_Toleration(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EFIVar":                 schema_onmetal_api_apis_compute_v1alpha1_EFIVar(ref),
+		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EphemeralPrefixSource":  schema_onmetal_api_apis_compute_v1alpha1_EphemeralPrefixSource(ref),
+		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.IPSource":               schema_onmetal_api_apis_compute_v1alpha1_IPSource(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.Interface":              schema_onmetal_api_apis_compute_v1alpha1_Interface(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.InterfaceStatus":        schema_onmetal_api_apis_compute_v1alpha1_InterfaceStatus(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.Machine":                schema_onmetal_api_apis_compute_v1alpha1_Machine(ref),
@@ -54,6 +56,11 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachinePoolStatus":      schema_onmetal_api_apis_compute_v1alpha1_MachinePoolStatus(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachineSpec":            schema_onmetal_api_apis_compute_v1alpha1_MachineSpec(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachineStatus":          schema_onmetal_api_apis_compute_v1alpha1_MachineStatus(ref),
+		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.NetworkInterface":       schema_onmetal_api_apis_compute_v1alpha1_NetworkInterface(ref),
+		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.NetworkInterfaceList":   schema_onmetal_api_apis_compute_v1alpha1_NetworkInterfaceList(ref),
+		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.NetworkInterfaceSpec":   schema_onmetal_api_apis_compute_v1alpha1_NetworkInterfaceSpec(ref),
+		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.NetworkInterfaceStatus": schema_onmetal_api_apis_compute_v1alpha1_NetworkInterfaceStatus(ref),
+		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.PrefixTemplate":         schema_onmetal_api_apis_compute_v1alpha1_PrefixTemplate(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.Volume":                 schema_onmetal_api_apis_compute_v1alpha1_Volume(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.VolumeSource":           schema_onmetal_api_apis_compute_v1alpha1_VolumeSource(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.VolumeStatus":           schema_onmetal_api_apis_compute_v1alpha1_VolumeStatus(ref),
@@ -568,6 +575,49 @@ func schema_onmetal_api_apis_compute_v1alpha1_EFIVar(ref common.ReferenceCallbac
 	}
 }
 
+func schema_onmetal_api_apis_compute_v1alpha1_EphemeralPrefixSource(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"prefixTemplate": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("github.com/onmetal/onmetal-api/apis/compute/v1alpha1.PrefixTemplate"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.PrefixTemplate"},
+	}
+}
+
+func schema_onmetal_api_apis_compute_v1alpha1_IPSource(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"value": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP"),
+						},
+					},
+					"ephemeralPrefix": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EphemeralPrefixSource"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP", "github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EphemeralPrefixSource"},
+	}
+}
+
 func schema_onmetal_api_apis_compute_v1alpha1_Interface(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -739,7 +789,7 @@ func schema_onmetal_api_apis_compute_v1alpha1_MachineCondition(ref common.Refere
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "MachineCondition is one of the conditions of a volume.",
+				Description: "MachineCondition is one of the conditions of a Machine.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"type": {
@@ -1276,6 +1326,216 @@ func schema_onmetal_api_apis_compute_v1alpha1_MachineStatus(ref common.Reference
 		},
 		Dependencies: []string{
 			"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.InterfaceStatus", "github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachineCondition", "github.com/onmetal/onmetal-api/apis/compute/v1alpha1.VolumeStatus"},
+	}
+}
+
+func schema_onmetal_api_apis_compute_v1alpha1_NetworkInterface(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkInterface is the Schema for the networkinterfaces API",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/onmetal/onmetal-api/apis/compute/v1alpha1.NetworkInterfaceSpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/onmetal/onmetal-api/apis/compute/v1alpha1.NetworkInterfaceStatus"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.NetworkInterfaceSpec", "github.com/onmetal/onmetal-api/apis/compute/v1alpha1.NetworkInterfaceStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_onmetal_api_apis_compute_v1alpha1_NetworkInterfaceList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkInterfaceList contains a list of NetworkInterface",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/apis/compute/v1alpha1.NetworkInterface"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.NetworkInterface", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_onmetal_api_apis_compute_v1alpha1_NetworkInterfaceSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkInterfaceSpec defines the desired state of NetworkInterface",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"networkRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "NetworkRef is the Network this NetworkInterface is connected to",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
+						},
+					},
+					"machineRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "MachineRef is the Machine this NetworkInterface is used by",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
+						},
+					},
+					"ipFamilies": {
+						SchemaProps: spec.SchemaProps{
+							Description: "IPFamilies defines which IPFamilies this NetworkInterface is supporting",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"ips": {
+						SchemaProps: spec.SchemaProps{
+							Description: "IPs is the list of provided IPs or EphemeralIPs which should be assigned to this NetworkInterface",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/apis/compute/v1alpha1.IPSource"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"networkRef", "ipFamilies", "ips"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.IPSource", "k8s.io/api/core/v1.LocalObjectReference"},
+	}
+}
+
+func schema_onmetal_api_apis_compute_v1alpha1_NetworkInterfaceStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkInterfaceStatus defines the observed state of NetworkInterface",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"ips": {
+						SchemaProps: spec.SchemaProps{
+							Description: "IPs represent the effective IP addresses of the NetworkInterface",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP"},
+	}
+}
+
+func schema_onmetal_api_apis_compute_v1alpha1_PrefixTemplate(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixSpec"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 

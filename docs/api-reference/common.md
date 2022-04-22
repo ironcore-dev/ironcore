@@ -366,5 +366,5 @@ When specified, allowed values are NoSchedule.</p>
 <hr/>
 <p><em>
 Generated with <code>gen-crd-api-reference-docs</code>
-on git commit <code>33fd61e</code>.
+on git commit <code>eef9659</code>.
 </em></p>
