@@ -92,6 +92,7 @@ func (c completedConfig) New() (*OnmetalAPIServer, error) {
 	restStorageProviders := []RESTStorageProvider{
 		ipamrest.StorageProvider{},
 		computerest.StorageProvider{},
+		//networkingrest.StorageProvider{}, TODO: Include once there are resources
 		storagerest.StorageProvider{},
 	}
 

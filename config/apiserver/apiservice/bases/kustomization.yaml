@@ -4,4 +4,5 @@ kind: Kustomization
 resources:
   - v1alpha1.compute.api.onmetal.de.yaml
   - v1alpha1.storage.api.onmetal.de.yaml
+  # TODO: Include once there are resources - v1alpha1.networking.api.onmetal.de.yaml
   - v1alpha1.ipam.api.onmetal.de.yaml

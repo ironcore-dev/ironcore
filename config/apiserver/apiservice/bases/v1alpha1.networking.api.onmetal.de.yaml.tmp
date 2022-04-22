@@ -1,0 +1,13 @@
+# TODO: rename once there are resources
+apiVersion: apiregistration.k8s.io/v1
+kind: APIService
+metadata:
+  name: v1alpha1.networking.api.onmetal.de
+spec:
+  group: networking.api.onmetal.de
+  version: v1alpha1
+  service:
+    namespace: system
+    name: apiserver-service
+  groupPriorityMinimum: 2000
+  versionPriority: 100

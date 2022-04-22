@@ -21,6 +21,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"sort"
 	"strings"
 	"time"
 
@@ -402,7 +403,7 @@ func WaitUntilTypesDiscoverableWithTimeout(timeout time.Duration, c client.Clien
 }
 
 func waitUntilGVKsDiscoverable(ctx context.Context, c client.Client, gvks map[schema.GroupVersionKind]struct{}) error {
-	return wait.PollImmediateInfiniteWithContext(ctx, 50*time.Millisecond, func(ctx context.Context) (done bool, err error) {
+	if err := wait.PollImmediateInfiniteWithContext(ctx, 50*time.Millisecond, func(ctx context.Context) (done bool, err error) {
 		for gvk := range gvks {
 			mappings, err := c.RESTMapper().RESTMappings(gvk.GroupKind(), gvk.Version)
 			if err != nil {
@@ -423,7 +424,18 @@ func waitUntilGVKsDiscoverable(ctx context.Context, c client.Client, gvks map[sc
 		}
 
 		return len(gvks) == 0, nil
-	})
+	}); err != nil {
+		if len(gvks) == 0 {
+			return err
+		}
+		unavailableGVKs := make([]string, 0, len(gvks))
+		for gvk := range gvks {
+			unavailableGVKs = append(unavailableGVKs, gvk.String())
+		}
+		sort.Strings(unavailableGVKs)
+		return fmt.Errorf("%w, unavailable gvks: %v", err, unavailableGVKs)
+	}
+	return nil
 }
 
 func WaitUntilTypesDiscoverable(ctx context.Context, c client.Client, objs ...client.Object) error {
@@ -473,7 +485,7 @@ func WaitUntilAPIServicesAvailable(ctx context.Context, c client.Client, service
 		apiServices = append(apiServices, service.DeepCopy())
 	}
 
-	return wait.PollImmediateInfiniteWithContext(ctx, 50*time.Millisecond, func(ctx context.Context) (done bool, err error) {
+	if err := wait.PollImmediateInfiniteWithContext(ctx, 50*time.Millisecond, func(ctx context.Context) (done bool, err error) {
 		for i := len(apiServices) - 1; i >= 0; i-- {
 			apiService := apiServices[i]
 			key := client.ObjectKeyFromObject(apiService)
@@ -487,7 +499,18 @@ func WaitUntilAPIServicesAvailable(ctx context.Context, c client.Client, service
 			}
 		}
 		return len(apiServices) == 0, nil
-	})
+	}); err != nil {
+		if len(apiServices) == 0 {
+			return err
+		}
+		unavailableAPIServices := make([]string, 0, len(apiServices))
+		for _, apiService := range apiServices {
+			unavailableAPIServices = append(unavailableAPIServices, apiService.Name)
+		}
+		sort.Strings(unavailableAPIServices)
+		return fmt.Errorf("%w, unavailable api serivces: %v", err, unavailableAPIServices)
+	}
+	return nil
 }
 
 func WaitUntilGroupVersionsDiscoverableWithTimeout(timeout time.Duration, c client.Client, scheme *runtime.Scheme, gvs ...schema.GroupVersion) error {
@@ -501,14 +524,17 @@ func WaitUntilAPIServicesReady(ctx context.Context, ext *EnvironmentExtensions, 
 	apiServices := ext.APIServiceInstallOptions.APIServices
 
 	if err := WaitUntilAPIServicesAvailable(ctx, c, apiServices...); err != nil {
-		return err
+		return fmt.Errorf("error waiting for api services to be available: %w", err)
 	}
 
 	groupVersions := make([]schema.GroupVersion, 0, len(apiServices))
 	for _, apiService := range apiServices {
 		groupVersions = append(groupVersions, schema.GroupVersion{Group: apiService.Spec.Group, Version: apiService.Spec.Version})
 	}
-	return WaitUntilGroupVersionsDiscoverable(ctx, c, scheme, groupVersions...)
+	if err := WaitUntilGroupVersionsDiscoverable(ctx, c, scheme, groupVersions...); err != nil {
+		return fmt.Errorf("error waiting for group versions to be available: %w", err)
+	}
+	return nil
 }
 
 func WaitUntilAPIServicesReadyWithTimeout(timeout time.Duration, ext *EnvironmentExtensions, c client.Client, scheme *runtime.Scheme) error {

@@ -20,6 +20,7 @@ package fake
 import (
 	computeinternalversion "github.com/onmetal/onmetal-api/apis/compute"
 	ipaminternalversion "github.com/onmetal/onmetal-api/apis/ipam"
+	networkinginternalversion "github.com/onmetal/onmetal-api/apis/networking"
 	storageinternalversion "github.com/onmetal/onmetal-api/apis/storage"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
@@ -34,6 +35,7 @@ var codecs = serializer.NewCodecFactory(scheme)
 var localSchemeBuilder = runtime.SchemeBuilder{
 	computeinternalversion.AddToScheme,
 	ipaminternalversion.AddToScheme,
+	networkinginternalversion.AddToScheme,
 	storageinternalversion.AddToScheme,
 }
 

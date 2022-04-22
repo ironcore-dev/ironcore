@@ -23,6 +23,7 @@ import (
 
 	computeinternalversion "github.com/onmetal/onmetal-api/generated/clientset/internalversion/typed/compute/internalversion"
 	ipaminternalversion "github.com/onmetal/onmetal-api/generated/clientset/internalversion/typed/ipam/internalversion"
+	networkinginternalversion "github.com/onmetal/onmetal-api/generated/clientset/internalversion/typed/networking/internalversion"
 	storageinternalversion "github.com/onmetal/onmetal-api/generated/clientset/internalversion/typed/storage/internalversion"
 	discovery "k8s.io/client-go/discovery"
 	rest "k8s.io/client-go/rest"
@@ -33,6 +34,7 @@ type Interface interface {
 	Discovery() discovery.DiscoveryInterface
 	Compute() computeinternalversion.ComputeInterface
 	Ipam() ipaminternalversion.IpamInterface
+	Networking() networkinginternalversion.NetworkingInterface
 	Storage() storageinternalversion.StorageInterface
 }
 
@@ -40,9 +42,10 @@ type Interface interface {
 // version included in a Clientset.
 type Clientset struct {
 	*discovery.DiscoveryClient
-	compute *computeinternalversion.ComputeClient
-	ipam    *ipaminternalversion.IpamClient
-	storage *storageinternalversion.StorageClient
+	compute    *computeinternalversion.ComputeClient
+	ipam       *ipaminternalversion.IpamClient
+	networking *networkinginternalversion.NetworkingClient
+	storage    *storageinternalversion.StorageClient
 }
 
 // Compute retrieves the ComputeClient
@@ -53,6 +56,11 @@ func (c *Clientset) Compute() computeinternalversion.ComputeInterface {
 // Ipam retrieves the IpamClient
 func (c *Clientset) Ipam() ipaminternalversion.IpamInterface {
 	return c.ipam
+}
+
+// Networking retrieves the NetworkingClient
+func (c *Clientset) Networking() networkinginternalversion.NetworkingInterface {
+	return c.networking
 }
 
 // Storage retrieves the StorageClient
@@ -108,6 +116,10 @@ func NewForConfigAndClient(c *rest.Config, httpClient *http.Client) (*Clientset,
 	if err != nil {
 		return nil, err
 	}
+	cs.networking, err = networkinginternalversion.NewForConfigAndClient(&configShallowCopy, httpClient)
+	if err != nil {
+		return nil, err
+	}
 	cs.storage, err = storageinternalversion.NewForConfigAndClient(&configShallowCopy, httpClient)
 	if err != nil {
 		return nil, err
@@ -135,6 +147,7 @@ func New(c rest.Interface) *Clientset {
 	var cs Clientset
 	cs.compute = computeinternalversion.New(c)
 	cs.ipam = ipaminternalversion.New(c)
+	cs.networking = networkinginternalversion.New(c)
 	cs.storage = storageinternalversion.New(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClient(c)

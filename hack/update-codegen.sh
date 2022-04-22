@@ -21,7 +21,7 @@ bash "$CODEGEN_PKG"/generate-internal-groups.sh \
   github.com/onmetal/onmetal-api/generated \
   github.com/onmetal/onmetal-api/apis \
   github.com/onmetal/onmetal-api/apis \
-  "compute:v1alpha1 storage:v1alpha1 ipam:v1alpha1" \
+  "compute:v1alpha1 storage:v1alpha1 networking:v1alpha1 ipam:v1alpha1" \
   --output-base "$VGOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt"
 
@@ -39,7 +39,7 @@ bash "$CODEGEN_PKG"/generate-internal-groups.sh \
   github.com/onmetal/onmetal-api/generated \
   github.com/onmetal/onmetal-api/apis \
   github.com/onmetal/onmetal-api/apis \
-  "common:v1alpha1 compute:v1alpha1 storage:v1alpha1 ipam:v1alpha1" \
+  "common:v1alpha1 compute:v1alpha1 storage:v1alpha1 networking:v1alpha1 ipam:v1alpha1" \
   --output-base "$VGOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
   --input-dirs=k8s.io/api/core/v1 \

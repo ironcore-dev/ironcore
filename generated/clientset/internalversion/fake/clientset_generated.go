@@ -23,6 +23,8 @@ import (
 	fakecomputeinternalversion "github.com/onmetal/onmetal-api/generated/clientset/internalversion/typed/compute/internalversion/fake"
 	ipaminternalversion "github.com/onmetal/onmetal-api/generated/clientset/internalversion/typed/ipam/internalversion"
 	fakeipaminternalversion "github.com/onmetal/onmetal-api/generated/clientset/internalversion/typed/ipam/internalversion/fake"
+	networkinginternalversion "github.com/onmetal/onmetal-api/generated/clientset/internalversion/typed/networking/internalversion"
+	fakenetworkinginternalversion "github.com/onmetal/onmetal-api/generated/clientset/internalversion/typed/networking/internalversion/fake"
 	storageinternalversion "github.com/onmetal/onmetal-api/generated/clientset/internalversion/typed/storage/internalversion"
 	fakestorageinternalversion "github.com/onmetal/onmetal-api/generated/clientset/internalversion/typed/storage/internalversion/fake"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -90,6 +92,11 @@ func (c *Clientset) Compute() computeinternalversion.ComputeInterface {
 // Ipam retrieves the IpamClient
 func (c *Clientset) Ipam() ipaminternalversion.IpamInterface {
 	return &fakeipaminternalversion.FakeIpam{Fake: &c.Fake}
+}
+
+// Networking retrieves the NetworkingClient
+func (c *Clientset) Networking() networkinginternalversion.NetworkingInterface {
+	return &fakenetworkinginternalversion.FakeNetworking{Fake: &c.Fake}
 }
 
 // Storage retrieves the StorageClient

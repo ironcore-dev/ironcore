@@ -20,6 +20,7 @@ package scheme
 import (
 	compute "github.com/onmetal/onmetal-api/apis/compute/install"
 	ipam "github.com/onmetal/onmetal-api/apis/ipam/install"
+	networking "github.com/onmetal/onmetal-api/apis/networking/install"
 	storage "github.com/onmetal/onmetal-api/apis/storage/install"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
@@ -40,5 +41,6 @@ func init() {
 func Install(scheme *runtime.Scheme) {
 	compute.Install(scheme)
 	ipam.Install(scheme)
+	networking.Install(scheme)
 	storage.Install(scheme)
 }
