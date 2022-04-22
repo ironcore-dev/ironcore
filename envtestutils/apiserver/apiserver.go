@@ -16,8 +16,10 @@ package apiserver
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"os/exec"
 	"path"
@@ -28,6 +30,7 @@ import (
 
 	"github.com/onmetal/onmetal-api/envtestutils/internal/controlplane"
 	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/rest"
 )
 
@@ -48,7 +51,8 @@ type APIServer struct {
 	stdout  io.Writer
 	stderr  io.Writer
 
-	waitTimeout time.Duration
+	healthTimeout time.Duration
+	waitTimeout   time.Duration
 }
 
 type Options struct {
@@ -63,7 +67,8 @@ type Options struct {
 	Stdout      io.Writer
 	Stderr      io.Writer
 
-	WaitTimeout time.Duration
+	HealthTimeout time.Duration
+	WaitTimeout   time.Duration
 }
 
 func MergeArgs(customArgs, defaultArgs ProcessArgs) ProcessArgs {
@@ -87,6 +92,9 @@ func setAPIServerOptionsDefaults(opts *Options) {
 	if opts.Port == 0 {
 		opts.Port = 8443
 	}
+	if opts.HealthTimeout == 0 {
+		opts.HealthTimeout = 20 * time.Second
+	}
 	if opts.WaitTimeout == 0 {
 		opts.WaitTimeout = 20 * time.Second
 	}
@@ -102,75 +110,77 @@ func New(cfg *rest.Config, opts Options) (*APIServer, error) {
 	setAPIServerOptionsDefaults(&opts)
 
 	return &APIServer{
-		mainPath:    opts.MainPath,
-		command:     opts.Command,
-		config:      cfg,
-		etcdServers: opts.ETCDServers,
-		args:        make(ProcessArgs),
-		mergeArgs:   opts.MergeArgs,
-		host:        opts.Host,
-		port:        opts.Port,
-		certDir:     opts.CertDir,
-		stdout:      opts.Stdout,
-		stderr:      opts.Stderr,
-		waitTimeout: opts.WaitTimeout,
+		mainPath:      opts.MainPath,
+		command:       opts.Command,
+		config:        cfg,
+		etcdServers:   opts.ETCDServers,
+		args:          make(ProcessArgs),
+		mergeArgs:     opts.MergeArgs,
+		host:          opts.Host,
+		port:          opts.Port,
+		certDir:       opts.CertDir,
+		stdout:        opts.Stdout,
+		stderr:        opts.Stderr,
+		healthTimeout: opts.HealthTimeout,
+		waitTimeout:   opts.WaitTimeout,
 	}, nil
 }
 
 func (a *APIServer) Start(ctx context.Context) error {
-	tmpDir, err := os.MkdirTemp("", "apiserver")
+	tmp, err := a.setupTempDir()
 	if err != nil {
-		return fmt.Errorf("error creating temp directory")
+		return fmt.Errorf("error setting up temp dir: %w", err)
 	}
-	defer func() { _ = os.RemoveAll(tmpDir) }()
-
-	if a.mainPath != "" {
-		apiSrvBinary, err := os.CreateTemp(tmpDir, "apiserver")
-		if err != nil {
-			return fmt.Errorf("error creating api server binary file")
-		}
-
-		cmd := exec.Command("go", "build", "-o", apiSrvBinary.Name(), a.mainPath)
-		cmd.Stdout = a.stdout
-		cmd.Stderr = a.stderr
-		if err := cmd.Run(); err != nil {
-			return fmt.Errorf("error building api server binary: %w", err)
-		}
-
-		a.command = []string{apiSrvBinary.Name()}
-	}
-
-	cfgData, err := controlplane.KubeConfigFromREST(a.config)
-	if err != nil {
-		return err
-	}
-
-	tmp, err := os.CreateTemp(tmpDir, "kubeconfig")
-	if err != nil {
-		return err
-	}
-
-	if err := os.WriteFile(tmp.Name(), cfgData, 0666); err != nil {
-		return err
-	}
+	defer func() { _ = os.RemoveAll(tmp.Name()) }()
 
 	cmd := a.createCmd(tmp)
 	if err := cmd.Start(); err != nil {
-		return err
+		return fmt.Errorf("error starting api server: %w", err)
 	}
 
 	var (
 		waitDone = make(chan struct{})
-		exitErr  error
+		waitErr  error
 	)
 	go func() {
 		defer close(waitDone)
-		exitErr = cmd.Wait()
+		waitErr = cmd.Wait()
 	}()
 
-	<-ctx.Done()
-	if err := cmd.Process.Signal(syscall.SIGTERM); err != nil {
-		return fmt.Errorf("error to signal process to stop: %w", err)
+	var (
+		healthDone              = make(chan struct{})
+		healthErr               error
+		healthCtx, healthCancel = context.WithTimeout(ctx, a.healthTimeout)
+	)
+	defer healthCancel()
+	go func() {
+		defer close(healthDone)
+		healthErr = a.pollHealthCheck(healthCtx)
+	}()
+
+	select {
+	case <-waitDone:
+		healthCancel()
+		if waitErr != nil {
+			return fmt.Errorf("wait returned with error before healthy: %w", err)
+		}
+		return fmt.Errorf("wait returned before ready")
+	case <-healthDone:
+		if healthErr != nil {
+			return fmt.Errorf("healthiness check returned an error: %w", err)
+		}
+	}
+
+	select {
+	case <-ctx.Done():
+		if err := cmd.Process.Signal(syscall.SIGTERM); err != nil {
+			return fmt.Errorf("error to signal process to stop: %w", err)
+		}
+	case <-waitDone:
+		if waitErr != nil {
+			return fmt.Errorf("process exited early with error: %w", err)
+		}
+		return fmt.Errorf("process exited early with no error")
 	}
 
 	t := time.NewTimer(a.waitTimeout)
@@ -178,10 +188,78 @@ func (a *APIServer) Start(ctx context.Context) error {
 
 	select {
 	case <-waitDone:
-		return exitErr
+		return waitErr
 	case <-t.C:
 		return fmt.Errorf("timeout waiting for process to stop")
 	}
+}
+
+func (a *APIServer) pollHealthCheck(ctx context.Context) error {
+	httpClient := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true, // skip verify for doing local health checks is ok.
+			},
+		},
+	}
+
+	return wait.PollImmediateInfiniteWithContext(ctx, 1*time.Second, func(ctx context.Context) (done bool, err error) {
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("https://%s:%d/readyz", a.host, a.port), nil)
+		if err != nil {
+			return false, fmt.Errorf("error creating health request: %w", err)
+		}
+
+		res, err := httpClient.Do(req)
+		if err != nil {
+			return false, nil
+		}
+
+		_ = res.Body.Close()
+		return res.StatusCode == http.StatusOK, nil
+	})
+}
+
+func (a *APIServer) setupTempDir() (*os.File, error) {
+	tmpDir, err := os.MkdirTemp("", "apiserver")
+	if err != nil {
+		return nil, fmt.Errorf("error creating temp directory")
+	}
+
+	if a.mainPath != "" {
+		apiSrvBinary, err := os.CreateTemp(tmpDir, "apiserver")
+		if err != nil {
+			_ = os.RemoveAll(tmpDir)
+			return nil, fmt.Errorf("error creating api server binary file")
+		}
+
+		cmd := exec.Command("go", "build", "-o", apiSrvBinary.Name(), a.mainPath)
+		cmd.Stdout = a.stdout
+		cmd.Stderr = a.stderr
+		if err := cmd.Run(); err != nil {
+			_ = os.RemoveAll(tmpDir)
+			return nil, fmt.Errorf("error building api server binary: %w", err)
+		}
+
+		a.command = []string{apiSrvBinary.Name()}
+	}
+
+	cfgData, err := controlplane.KubeConfigFromREST(a.config)
+	if err != nil {
+		_ = os.RemoveAll(tmpDir)
+		return nil, err
+	}
+
+	tmp, err := os.CreateTemp(tmpDir, "kubeconfig")
+	if err != nil {
+		_ = os.RemoveAll(tmpDir)
+		return nil, err
+	}
+
+	if err := os.WriteFile(tmp.Name(), cfgData, 0666); err != nil {
+		_ = os.RemoveAll(tmpDir)
+		return nil, err
+	}
+	return tmp, nil
 }
 
 func (a *APIServer) createCmd(tmp *os.File) *exec.Cmd {
