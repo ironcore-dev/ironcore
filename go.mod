@@ -17,10 +17,10 @@ require (
 	inet.af/netaddr v0.0.0-20210903134321-85fa6c94624e
 	k8s.io/api v0.23.6
 	k8s.io/apimachinery v0.23.6
-	k8s.io/apiserver v0.23.5
+	k8s.io/apiserver v0.23.6
 	k8s.io/client-go v0.23.6
 	k8s.io/code-generator v0.23.6
-	k8s.io/component-base v0.23.5
+	k8s.io/component-base v0.23.6
 	k8s.io/kube-aggregator v0.23.5
 	k8s.io/kube-openapi v0.0.0-20211115234752-e816edb12b65
 	k8s.io/utils v0.0.0-20211116205334-6203023598ed
