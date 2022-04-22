@@ -23,12 +23,6 @@ import (
 
 // Interface provides access to all the informers in this group version.
 type Interface interface {
-	// ClusterPrefixes returns a ClusterPrefixInformer.
-	ClusterPrefixes() ClusterPrefixInformer
-	// ClusterPrefixAllocations returns a ClusterPrefixAllocationInformer.
-	ClusterPrefixAllocations() ClusterPrefixAllocationInformer
-	// IPs returns a IPInformer.
-	IPs() IPInformer
 	// Prefixes returns a PrefixInformer.
 	Prefixes() PrefixInformer
 	// PrefixAllocations returns a PrefixAllocationInformer.
@@ -44,21 +38,6 @@ type version struct {
 // New returns a new Interface.
 func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakListOptions internalinterfaces.TweakListOptionsFunc) Interface {
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
-}
-
-// ClusterPrefixes returns a ClusterPrefixInformer.
-func (v *version) ClusterPrefixes() ClusterPrefixInformer {
-	return &clusterPrefixInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
-}
-
-// ClusterPrefixAllocations returns a ClusterPrefixAllocationInformer.
-func (v *version) ClusterPrefixAllocations() ClusterPrefixAllocationInformer {
-	return &clusterPrefixAllocationInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
-}
-
-// IPs returns a IPInformer.
-func (v *version) IPs() IPInformer {
-	return &iPInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // Prefixes returns a PrefixInformer.

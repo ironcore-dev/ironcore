@@ -14,14 +14,33 @@
 
 package v1alpha1
 
-func SetDefaults_PrefixReference(ref *PrefixReference) {
-	if ref.Kind == "" {
-		ref.Kind = PrefixKind
+import (
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+)
+
+func addDefaultingFuncs(scheme *runtime.Scheme) error {
+	return RegisterDefaults(scheme)
+}
+
+func SetDefaults_PrefixSpec(spec *PrefixSpec) {
+	if string(spec.IPFamily) == "" && spec.Prefix.IsValid() && spec.PrefixLength == 0 {
+		switch {
+		case spec.Prefix.IP().Is4():
+			spec.IPFamily = corev1.IPv4Protocol
+		case spec.Prefix.IP().Is6():
+			spec.IPFamily = corev1.IPv6Protocol
+		}
 	}
 }
 
-func SetDefaults_PrefixSelector(sel *PrefixSelector) {
-	if sel.Kind == "" {
-		sel.Kind = PrefixKind
+func SetDefaults_PrefixAllocationSpec(spec *PrefixAllocationSpec) {
+	if string(spec.IPFamily) == "" && spec.Prefix.IsValid() && spec.PrefixLength == 0 {
+		switch {
+		case spec.Prefix.IP().Is4():
+			spec.IPFamily = corev1.IPv4Protocol
+		case spec.Prefix.IP().Is6():
+			spec.IPFamily = corev1.IPv6Protocol
+		}
 	}
 }

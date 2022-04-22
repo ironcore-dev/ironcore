@@ -21,6 +21,7 @@ import (
 
 	"inet.af/netaddr"
 	corev1 "k8s.io/api/core/v1"
+	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 )
 
 // ConfigMapKeySelector is a reference to a specific 'key' within a ConfigMap resource.
@@ -101,6 +102,25 @@ func (i IP) ToUnstructured() interface{} {
 	return i.IP.String()
 }
 
+func (i *IP) IsValid() bool {
+	return i != nil && i.IP.IsValid()
+}
+
+func (i *IP) IsZero() bool {
+	return i == nil || i.IP.IsZero()
+}
+
+func (i IP) Family() corev1.IPFamily {
+	switch {
+	case i.Is4():
+		return corev1.IPv4Protocol
+	case i.Is6():
+		return corev1.IPv6Protocol
+	default:
+		return ""
+	}
+}
+
 func (_ IP) OpenAPISchemaType() []string { return []string{"string"} }
 
 func (_ IP) OpenAPISchemaFormat() string { return "ip" }
@@ -117,8 +137,22 @@ func ParseIP(s string) (IP, error) {
 	return IP{addr}, nil
 }
 
+func ParseNewIP(s string) (*IP, error) {
+	ip, err := ParseIP(s)
+	if err != nil {
+		return nil, err
+	}
+	return &ip, nil
+}
+
 func MustParseIP(s string) IP {
 	return IP{netaddr.MustParseIP(s)}
+}
+
+func MustParseNewIP(s string) *IP {
+	ip, err := ParseNewIP(s)
+	utilruntime.Must(err)
+	return ip
 }
 
 func NewIPPtr(ip netaddr.IP) *IP {
@@ -127,6 +161,10 @@ func NewIPPtr(ip netaddr.IP) *IP {
 
 func PtrToIP(addr IP) *IP {
 	return &addr
+}
+
+func EqualIPs(a, b IP) bool {
+	return a == b
 }
 
 // IPRange is an IP range.
@@ -143,17 +181,11 @@ func (i *IPRange) Range() netaddr.IPRange {
 }
 
 func (i *IPRange) IsValid() bool {
-	if i == nil {
-		return false
-	}
-	return i.Range().IsValid()
+	return i != nil && i.Range().IsValid()
 }
 
 func (i *IPRange) IsZero() bool {
-	if i == nil {
-		return true
-	}
-	return i.Range().IsZero()
+	return i == nil || i.Range().IsZero()
 }
 
 func (i IPRange) String() string {
@@ -202,9 +234,27 @@ func ParseIPRange(s string) (IPRange, error) {
 	return IPRange{From: IP{rng.From()}, To: IP{rng.To()}}, nil
 }
 
+func ParseNewIPRange(s string) (*IPRange, error) {
+	rng, err := ParseIPRange(s)
+	if err != nil {
+		return nil, err
+	}
+	return &rng, nil
+}
+
 func MustParseIPRange(s string) IPRange {
 	rng := netaddr.MustParseIPRange(s)
 	return IPRange{From: IP{rng.From()}, To: IP{rng.To()}}
+}
+
+func MustParseNewIPRange(s string) *IPRange {
+	rng, err := ParseNewIPRange(s)
+	utilruntime.Must(err)
+	return rng
+}
+
+func EqualIPRanges(a, b IPRange) bool {
+	return EqualIPs(a.From, b.From) && EqualIPs(a.To, b.To)
 }
 
 // IPPrefix represents a network prefix.
@@ -216,6 +266,10 @@ type IPPrefix struct {
 
 func (i IPPrefix) GomegaString() string {
 	return i.String()
+}
+
+func (i IPPrefix) IP() IP {
+	return IP{i.IPPrefix.IP()}
 }
 
 func (i *IPPrefix) UnmarshalJSON(b []byte) error {
@@ -258,12 +312,24 @@ func (in *IPPrefix) DeepCopyInto(out *IPPrefix) {
 	*out = *in
 }
 
+func (in *IPPrefix) DeepCopy() *IPPrefix {
+	return &IPPrefix{in.IPPrefix}
+}
+
+func (in *IPPrefix) IsValid() bool {
+	return in != nil && in.IPPrefix.IsValid()
+}
+
+func (in *IPPrefix) IsZero() bool {
+	return in == nil || in.IPPrefix.IsZero()
+}
+
 func (_ IPPrefix) OpenAPISchemaType() []string { return []string{"string"} }
 
 func (_ IPPrefix) OpenAPISchemaFormat() string { return "ip-prefix" }
 
-func NewIPPrefix(prefix netaddr.IPPrefix) IPPrefix {
-	return IPPrefix{IPPrefix: prefix}
+func NewIPPrefix(prefix netaddr.IPPrefix) *IPPrefix {
+	return &IPPrefix{IPPrefix: prefix}
 }
 
 func ParseIPPrefix(s string) (IPPrefix, error) {
@@ -274,17 +340,30 @@ func ParseIPPrefix(s string) (IPPrefix, error) {
 	return IPPrefix{prefix}, nil
 }
 
+func ParseNewIPPrefix(s string) (*IPPrefix, error) {
+	prefix, err := ParseIPPrefix(s)
+	if err != nil {
+		return nil, err
+	}
+	return &prefix, nil
+}
+
 func MustParseIPPrefix(s string) IPPrefix {
 	return IPPrefix{netaddr.MustParseIPPrefix(s)}
 }
 
-func NewIPPrefixPtr(prefix netaddr.IPPrefix) *IPPrefix {
-	c := NewIPPrefix(prefix)
-	return &c
+func MustParseNewIPPrefix(s string) *IPPrefix {
+	prefix, err := ParseNewIPPrefix(s)
+	utilruntime.Must(err)
+	return prefix
 }
 
 func PtrToIPPrefix(prefix IPPrefix) *IPPrefix {
 	return &prefix
+}
+
+func EqualIPPrefixes(a, b IPPrefix) bool {
+	return a == b
 }
 
 // The resource pool this Taint is attached to has the "effect" on

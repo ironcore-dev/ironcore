@@ -28,8 +28,6 @@ import (
 // Public to allow building arbitrary schemes.
 // All generated defaulters are covering - they call all nested defaulters.
 func RegisterDefaults(scheme *runtime.Scheme) error {
-	scheme.AddTypeDefaultingFunc(&IP{}, func(obj interface{}) { SetObjectDefaults_IP(obj.(*IP)) })
-	scheme.AddTypeDefaultingFunc(&IPList{}, func(obj interface{}) { SetObjectDefaults_IPList(obj.(*IPList)) })
 	scheme.AddTypeDefaultingFunc(&Prefix{}, func(obj interface{}) { SetObjectDefaults_Prefix(obj.(*Prefix)) })
 	scheme.AddTypeDefaultingFunc(&PrefixAllocation{}, func(obj interface{}) { SetObjectDefaults_PrefixAllocation(obj.(*PrefixAllocation)) })
 	scheme.AddTypeDefaultingFunc(&PrefixAllocationList{}, func(obj interface{}) { SetObjectDefaults_PrefixAllocationList(obj.(*PrefixAllocationList)) })
@@ -37,38 +35,12 @@ func RegisterDefaults(scheme *runtime.Scheme) error {
 	return nil
 }
 
-func SetObjectDefaults_IP(in *IP) {
-	if in.Spec.PrefixRef != nil {
-		SetDefaults_PrefixReference(in.Spec.PrefixRef)
-	}
-	if in.Spec.PrefixSelector != nil {
-		SetDefaults_PrefixSelector(in.Spec.PrefixSelector)
-	}
-}
-
-func SetObjectDefaults_IPList(in *IPList) {
-	for i := range in.Items {
-		a := &in.Items[i]
-		SetObjectDefaults_IP(a)
-	}
-}
-
 func SetObjectDefaults_Prefix(in *Prefix) {
-	if in.Spec.ParentRef != nil {
-		SetDefaults_PrefixReference(in.Spec.ParentRef)
-	}
-	if in.Spec.ParentSelector != nil {
-		SetDefaults_PrefixSelector(in.Spec.ParentSelector)
-	}
+	SetDefaults_PrefixSpec(&in.Spec)
 }
 
 func SetObjectDefaults_PrefixAllocation(in *PrefixAllocation) {
-	if in.Spec.PrefixRef != nil {
-		SetDefaults_PrefixReference(in.Spec.PrefixRef)
-	}
-	if in.Spec.PrefixSelector != nil {
-		SetDefaults_PrefixSelector(in.Spec.PrefixSelector)
-	}
+	SetDefaults_PrefixAllocationSpec(&in.Spec)
 }
 
 func SetObjectDefaults_PrefixAllocationList(in *PrefixAllocationList) {

@@ -27,18 +27,6 @@ type FakeIpam struct {
 	*testing.Fake
 }
 
-func (c *FakeIpam) ClusterPrefixes() internalversion.ClusterPrefixInterface {
-	return &FakeClusterPrefixes{c}
-}
-
-func (c *FakeIpam) ClusterPrefixAllocations() internalversion.ClusterPrefixAllocationInterface {
-	return &FakeClusterPrefixAllocations{c}
-}
-
-func (c *FakeIpam) IPs(namespace string) internalversion.IPInterface {
-	return &FakeIPs{c, namespace}
-}
-
 func (c *FakeIpam) Prefixes(namespace string) internalversion.PrefixInterface {
 	return &FakePrefixes{c, namespace}
 }

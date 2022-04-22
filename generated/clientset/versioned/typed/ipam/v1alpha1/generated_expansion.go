@@ -17,12 +17,6 @@
 
 package v1alpha1
 
-type ClusterPrefixExpansion interface{}
-
-type ClusterPrefixAllocationExpansion interface{}
-
-type IPExpansion interface{}
-
 type PrefixExpansion interface{}
 
 type PrefixAllocationExpansion interface{}

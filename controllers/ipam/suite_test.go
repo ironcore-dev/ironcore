@@ -24,10 +24,8 @@ import (
 	"github.com/onmetal/onmetal-api/envtestutils"
 	"github.com/onmetal/onmetal-api/envtestutils/apiserver"
 	"github.com/onmetal/onmetal-api/testdata/apiserverbin"
-	"github.com/onsi/ginkgo/config"
-	"inet.af/netaddr"
-
 	. "github.com/onsi/ginkgo"
+	"github.com/onsi/ginkgo/config"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -108,34 +106,20 @@ var _ = BeforeSuite(func() {
 
 	// Register reconcilers
 	err = (&PrefixReconciler{
+		Client:                  k8sManager.GetClient(),
+		APIReader:               k8sManager.GetAPIReader(),
+		Scheme:                  k8sManager.GetScheme(),
+		PrefixAllocationTimeout: 1 * time.Second,
+	}).SetupWithManager(k8sManager)
+	Expect(err).NotTo(HaveOccurred())
+
+	err = (&PrefixAllocationScheduler{
 		Client: k8sManager.GetClient(),
 		Scheme: k8sManager.GetScheme(),
 	}).SetupWithManager(k8sManager)
 	Expect(err).NotTo(HaveOccurred())
 
-	err = (&ClusterPrefixReconciler{
-		Client: k8sManager.GetClient(),
-		Scheme: k8sManager.GetScheme(),
-	}).SetupWithManager(k8sManager)
-	Expect(err).NotTo(HaveOccurred())
-
-	err = (&IPReconciler{
-		Client: k8sManager.GetClient(),
-		Scheme: k8sManager.GetScheme(),
-	}).SetupWithManager(k8sManager)
-	Expect(err).NotTo(HaveOccurred())
-
-	err = (&PrefixAllocationSchedulerReconciler{
-		Client: k8sManager.GetClient(),
-		Scheme: k8sManager.GetScheme(),
-	}).SetupWithManager(k8sManager)
-	Expect(err).NotTo(HaveOccurred())
-
-	err = (&ClusterPrefixAllocationSchedulerReconciler{
-		Client: k8sManager.GetClient(),
-		Scheme: k8sManager.GetScheme(),
-	}).SetupWithManager(k8sManager)
-	Expect(err).NotTo(HaveOccurred())
+	Expect(SetupPrefixSpecIPFamilyFieldIndexer(k8sManager)).To(Succeed())
 
 	go func() {
 		defer GinkgoRecover()
@@ -156,8 +140,6 @@ func SetupTest() *corev1.Namespace {
 
 	AfterEach(func() {
 		Expect(k8sClient.Delete(ctx, ns)).NotTo(HaveOccurred(), "failed to delete test namespace")
-		Expect(k8sClient.DeleteAllOf(ctx, &ipamv1alpha1.ClusterPrefixAllocation{})).NotTo(HaveOccurred(), "failed to delete cluster prefixe allocations")
-		Expect(k8sClient.DeleteAllOf(ctx, &ipamv1alpha1.ClusterPrefix{})).NotTo(HaveOccurred(), "failed to delete cluster prefixes")
 	})
 
 	return ns
@@ -169,16 +151,3 @@ var _ = AfterSuite(func() {
 	err := envtestutils.StopWithExtensions(testEnv, testEnvExt)
 	Expect(err).NotTo(HaveOccurred())
 })
-
-func ipSetFromPrefix(prefix netaddr.IPPrefix) *netaddr.IPSet {
-	var bldr netaddr.IPSetBuilder
-	bldr.AddPrefix(prefix)
-	set, err := bldr.IPSet()
-	ExpectWithOffset(1, err).NotTo(HaveOccurred())
-	return set
-}
-
-func ExpectIPSet(set *netaddr.IPSet, err error) *netaddr.IPSet {
-	Expect(err).NotTo(HaveOccurred())
-	return set
-}

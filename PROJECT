@@ -86,32 +86,6 @@ resources:
     crdVersion: v1
     namespaced: true
   controller: true
-  domain: api.onmetal.de
-  group: ipam
-  kind: IP
-  path: github.com/onmetal/onmetal-api/apis/ipam/v1alpha1
-  version: v1alpha1
-- api:
-    crdVersion: v1
-    namespaced: true
-  controller: true
-  domain: api.onmetal.de
-  group: ipam
-  kind: ClusterPrefix
-  path: github.com/onmetal/onmetal-api/apis/ipam/v1alpha1
-  version: v1alpha1
-- api:
-    crdVersion: v1
-    namespaced: true
-  domain: api.onmetal.de
-  group: ipam
-  kind: ClusterPrefixAllocation
-  path: github.com/onmetal/onmetal-api/apis/ipam/v1alpha1
-  version: v1alpha1
-- api:
-    crdVersion: v1
-    namespaced: true
-  controller: true
   domain: onmetal.de
   group: storage
   kind: VolumeClaim

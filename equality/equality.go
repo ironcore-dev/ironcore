@@ -33,11 +33,7 @@ func init() {
 	}
 	Semantic = conversion.Equalities{Equalities: base}
 	utilruntime.Must(Semantic.AddFuncs(
-		func(a, b commonv1alpha1.IPPrefix) bool {
-			return a.String() == b.String()
-		},
-		func(a, b commonv1alpha1.IP) bool {
-			return a.String() == b.String()
-		},
+		commonv1alpha1.EqualIPs,
+		commonv1alpha1.EqualIPPrefixes,
 	))
 }
