@@ -29,6 +29,8 @@ type NetworkingV1alpha1Interface interface {
 	RESTClient() rest.Interface
 	NetworksGetter
 	NetworkInterfacesGetter
+	VirtualIPsGetter
+	VirtualIPRoutingsGetter
 }
 
 // NetworkingV1alpha1Client is used to interact with features provided by the networking.api.onmetal.de group.
@@ -42,6 +44,14 @@ func (c *NetworkingV1alpha1Client) Networks(namespace string) NetworkInterface {
 
 func (c *NetworkingV1alpha1Client) NetworkInterfaces(namespace string) NetworkInterfaceInterface {
 	return newNetworkInterfaces(c, namespace)
+}
+
+func (c *NetworkingV1alpha1Client) VirtualIPs(namespace string) VirtualIPInterface {
+	return newVirtualIPs(c, namespace)
+}
+
+func (c *NetworkingV1alpha1Client) VirtualIPRoutings(namespace string) VirtualIPRoutingInterface {
+	return newVirtualIPRoutings(c, namespace)
 }
 
 // NewForConfig creates a new NetworkingV1alpha1Client for the given config.

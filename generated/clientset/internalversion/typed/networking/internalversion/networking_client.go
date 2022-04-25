@@ -28,6 +28,8 @@ type NetworkingInterface interface {
 	RESTClient() rest.Interface
 	NetworksGetter
 	NetworkInterfacesGetter
+	VirtualIPsGetter
+	VirtualIPRoutingsGetter
 }
 
 // NetworkingClient is used to interact with features provided by the networking.api.onmetal.de group.
@@ -41,6 +43,14 @@ func (c *NetworkingClient) Networks(namespace string) NetworkInterface {
 
 func (c *NetworkingClient) NetworkInterfaces(namespace string) NetworkInterfaceInterface {
 	return newNetworkInterfaces(c, namespace)
+}
+
+func (c *NetworkingClient) VirtualIPs(namespace string) VirtualIPInterface {
+	return newVirtualIPs(c, namespace)
+}
+
+func (c *NetworkingClient) VirtualIPRoutings(namespace string) VirtualIPRoutingInterface {
+	return newVirtualIPRoutings(c, namespace)
 }
 
 // NewForConfig creates a new NetworkingClient for the given config.

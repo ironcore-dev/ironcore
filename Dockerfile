@@ -20,6 +20,7 @@ COPY controllers/ controllers/
 COPY equality/ equality/
 COPY generated/ generated/
 COPY registry/ registry/
+COPY tableconvertor/ tableconvertor/
 
 ARG TARGETOS TARGETARCH
 

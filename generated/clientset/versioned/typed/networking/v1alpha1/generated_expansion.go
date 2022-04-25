@@ -20,3 +20,7 @@ package v1alpha1
 type NetworkExpansion interface{}
 
 type NetworkInterfaceExpansion interface{}
+
+type VirtualIPExpansion interface{}
+
+type VirtualIPRoutingExpansion interface{}

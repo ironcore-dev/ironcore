@@ -20,3 +20,7 @@ package internalversion
 type NetworkExpansion interface{}
 
 type NetworkInterfaceExpansion interface{}
+
+type VirtualIPExpansion interface{}
+
+type VirtualIPRoutingExpansion interface{}

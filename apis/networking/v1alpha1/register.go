@@ -50,6 +50,10 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&NetworkInterfaceList{},
 		&Network{},
 		&NetworkList{},
+		&VirtualIP{},
+		&VirtualIPList{},
+		&VirtualIPRouting{},
+		&VirtualIPRoutingList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil

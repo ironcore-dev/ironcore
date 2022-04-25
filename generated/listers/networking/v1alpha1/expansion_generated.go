@@ -32,3 +32,19 @@ type NetworkInterfaceListerExpansion interface{}
 // NetworkInterfaceNamespaceListerExpansion allows custom methods to be added to
 // NetworkInterfaceNamespaceLister.
 type NetworkInterfaceNamespaceListerExpansion interface{}
+
+// VirtualIPListerExpansion allows custom methods to be added to
+// VirtualIPLister.
+type VirtualIPListerExpansion interface{}
+
+// VirtualIPNamespaceListerExpansion allows custom methods to be added to
+// VirtualIPNamespaceLister.
+type VirtualIPNamespaceListerExpansion interface{}
+
+// VirtualIPRoutingListerExpansion allows custom methods to be added to
+// VirtualIPRoutingLister.
+type VirtualIPRoutingListerExpansion interface{}
+
+// VirtualIPRoutingNamespaceListerExpansion allows custom methods to be added to
+// VirtualIPRoutingNamespaceLister.
+type VirtualIPRoutingNamespaceListerExpansion interface{}
