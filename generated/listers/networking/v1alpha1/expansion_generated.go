@@ -17,6 +17,14 @@
 
 package v1alpha1
 
+// NetworkListerExpansion allows custom methods to be added to
+// NetworkLister.
+type NetworkListerExpansion interface{}
+
+// NetworkNamespaceListerExpansion allows custom methods to be added to
+// NetworkNamespaceLister.
+type NetworkNamespaceListerExpansion interface{}
+
 // NetworkInterfaceListerExpansion allows custom methods to be added to
 // NetworkInterfaceLister.
 type NetworkInterfaceListerExpansion interface{}

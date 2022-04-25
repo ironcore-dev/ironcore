@@ -17,4 +17,6 @@
 
 package v1alpha1
 
+type NetworkExpansion interface{}
+
 type NetworkInterfaceExpansion interface{}
