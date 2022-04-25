@@ -35,6 +35,14 @@ func (c *FakeNetworking) NetworkInterfaces(namespace string) internalversion.Net
 	return &FakeNetworkInterfaces{c, namespace}
 }
 
+func (c *FakeNetworking) VirtualIPs(namespace string) internalversion.VirtualIPInterface {
+	return &FakeVirtualIPs{c, namespace}
+}
+
+func (c *FakeNetworking) VirtualIPRoutings(namespace string) internalversion.VirtualIPRoutingInterface {
+	return &FakeVirtualIPRoutings{c, namespace}
+}
+
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
 func (c *FakeNetworking) RESTClient() rest.Interface {

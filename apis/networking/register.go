@@ -48,6 +48,10 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&NetworkInterfaceList{},
 		&Network{},
 		&NetworkList{},
+		&VirtualIP{},
+		&VirtualIPList{},
+		&VirtualIPRouting{},
+		&VirtualIPRoutingList{},
 	)
 	return nil
 }

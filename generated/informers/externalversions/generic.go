@@ -73,6 +73,10 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().Networks().Informer()}, nil
 	case networkingv1alpha1.SchemeGroupVersion.WithResource("networkinterfaces"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().NetworkInterfaces().Informer()}, nil
+	case networkingv1alpha1.SchemeGroupVersion.WithResource("virtualips"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().VirtualIPs().Informer()}, nil
+	case networkingv1alpha1.SchemeGroupVersion.WithResource("virtualiproutings"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().VirtualIPRoutings().Informer()}, nil
 
 		// Group=storage.api.onmetal.de, Version=v1alpha1
 	case storagev1alpha1.SchemeGroupVersion.WithResource("volumes"):

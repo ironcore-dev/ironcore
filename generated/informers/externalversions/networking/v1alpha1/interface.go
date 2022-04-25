@@ -27,6 +27,10 @@ type Interface interface {
 	Networks() NetworkInformer
 	// NetworkInterfaces returns a NetworkInterfaceInformer.
 	NetworkInterfaces() NetworkInterfaceInformer
+	// VirtualIPs returns a VirtualIPInformer.
+	VirtualIPs() VirtualIPInformer
+	// VirtualIPRoutings returns a VirtualIPRoutingInformer.
+	VirtualIPRoutings() VirtualIPRoutingInformer
 }
 
 type version struct {
@@ -48,4 +52,14 @@ func (v *version) Networks() NetworkInformer {
 // NetworkInterfaces returns a NetworkInterfaceInformer.
 func (v *version) NetworkInterfaces() NetworkInterfaceInformer {
 	return &networkInterfaceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// VirtualIPs returns a VirtualIPInformer.
+func (v *version) VirtualIPs() VirtualIPInformer {
+	return &virtualIPInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// VirtualIPRoutings returns a VirtualIPRoutingInformer.
+func (v *version) VirtualIPRoutings() VirtualIPRoutingInformer {
+	return &virtualIPRoutingInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

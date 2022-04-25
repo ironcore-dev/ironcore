@@ -28,8 +28,10 @@ import (
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/apis/ipam/v1alpha1"
 	networking "github.com/onmetal/onmetal-api/apis/networking"
 	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	conversion "k8s.io/apimachinery/pkg/conversion"
 	runtime "k8s.io/apimachinery/pkg/runtime"
+	types "k8s.io/apimachinery/pkg/types"
 )
 
 func init() {
@@ -56,6 +58,16 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}
 	if err := s.AddGeneratedConversionFunc((*networking.IPSource)(nil), (*IPSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_networking_IPSource_To_v1alpha1_IPSource(a.(*networking.IPSource), b.(*IPSource), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*LocalUIDReference)(nil), (*networking.LocalUIDReference)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_LocalUIDReference_To_networking_LocalUIDReference(a.(*LocalUIDReference), b.(*networking.LocalUIDReference), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*networking.LocalUIDReference)(nil), (*LocalUIDReference)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_networking_LocalUIDReference_To_v1alpha1_LocalUIDReference(a.(*networking.LocalUIDReference), b.(*LocalUIDReference), scope)
 	}); err != nil {
 		return err
 	}
@@ -119,6 +131,76 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
+	if err := s.AddGeneratedConversionFunc((*VirtualIP)(nil), (*networking.VirtualIP)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VirtualIP_To_networking_VirtualIP(a.(*VirtualIP), b.(*networking.VirtualIP), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*networking.VirtualIP)(nil), (*VirtualIP)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_networking_VirtualIP_To_v1alpha1_VirtualIP(a.(*networking.VirtualIP), b.(*VirtualIP), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*VirtualIPList)(nil), (*networking.VirtualIPList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VirtualIPList_To_networking_VirtualIPList(a.(*VirtualIPList), b.(*networking.VirtualIPList), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*networking.VirtualIPList)(nil), (*VirtualIPList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_networking_VirtualIPList_To_v1alpha1_VirtualIPList(a.(*networking.VirtualIPList), b.(*VirtualIPList), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*VirtualIPRouting)(nil), (*networking.VirtualIPRouting)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VirtualIPRouting_To_networking_VirtualIPRouting(a.(*VirtualIPRouting), b.(*networking.VirtualIPRouting), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*networking.VirtualIPRouting)(nil), (*VirtualIPRouting)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_networking_VirtualIPRouting_To_v1alpha1_VirtualIPRouting(a.(*networking.VirtualIPRouting), b.(*VirtualIPRouting), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*VirtualIPRoutingList)(nil), (*networking.VirtualIPRoutingList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VirtualIPRoutingList_To_networking_VirtualIPRoutingList(a.(*VirtualIPRoutingList), b.(*networking.VirtualIPRoutingList), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*networking.VirtualIPRoutingList)(nil), (*VirtualIPRoutingList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_networking_VirtualIPRoutingList_To_v1alpha1_VirtualIPRoutingList(a.(*networking.VirtualIPRoutingList), b.(*VirtualIPRoutingList), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*VirtualIPRoutingSubset)(nil), (*networking.VirtualIPRoutingSubset)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VirtualIPRoutingSubset_To_networking_VirtualIPRoutingSubset(a.(*VirtualIPRoutingSubset), b.(*networking.VirtualIPRoutingSubset), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*networking.VirtualIPRoutingSubset)(nil), (*VirtualIPRoutingSubset)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_networking_VirtualIPRoutingSubset_To_v1alpha1_VirtualIPRoutingSubset(a.(*networking.VirtualIPRoutingSubset), b.(*VirtualIPRoutingSubset), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*VirtualIPSpec)(nil), (*networking.VirtualIPSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VirtualIPSpec_To_networking_VirtualIPSpec(a.(*VirtualIPSpec), b.(*networking.VirtualIPSpec), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*networking.VirtualIPSpec)(nil), (*VirtualIPSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_networking_VirtualIPSpec_To_v1alpha1_VirtualIPSpec(a.(*networking.VirtualIPSpec), b.(*VirtualIPSpec), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*VirtualIPStatus)(nil), (*networking.VirtualIPStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VirtualIPStatus_To_networking_VirtualIPStatus(a.(*VirtualIPStatus), b.(*networking.VirtualIPStatus), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*networking.VirtualIPStatus)(nil), (*VirtualIPStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_networking_VirtualIPStatus_To_v1alpha1_VirtualIPStatus(a.(*networking.VirtualIPStatus), b.(*VirtualIPStatus), scope)
+	}); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -162,6 +244,28 @@ func autoConvert_networking_IPSource_To_v1alpha1_IPSource(in *networking.IPSourc
 // Convert_networking_IPSource_To_v1alpha1_IPSource is an autogenerated conversion function.
 func Convert_networking_IPSource_To_v1alpha1_IPSource(in *networking.IPSource, out *IPSource, s conversion.Scope) error {
 	return autoConvert_networking_IPSource_To_v1alpha1_IPSource(in, out, s)
+}
+
+func autoConvert_v1alpha1_LocalUIDReference_To_networking_LocalUIDReference(in *LocalUIDReference, out *networking.LocalUIDReference, s conversion.Scope) error {
+	out.Name = in.Name
+	out.UID = types.UID(in.UID)
+	return nil
+}
+
+// Convert_v1alpha1_LocalUIDReference_To_networking_LocalUIDReference is an autogenerated conversion function.
+func Convert_v1alpha1_LocalUIDReference_To_networking_LocalUIDReference(in *LocalUIDReference, out *networking.LocalUIDReference, s conversion.Scope) error {
+	return autoConvert_v1alpha1_LocalUIDReference_To_networking_LocalUIDReference(in, out, s)
+}
+
+func autoConvert_networking_LocalUIDReference_To_v1alpha1_LocalUIDReference(in *networking.LocalUIDReference, out *LocalUIDReference, s conversion.Scope) error {
+	out.Name = in.Name
+	out.UID = types.UID(in.UID)
+	return nil
+}
+
+// Convert_networking_LocalUIDReference_To_v1alpha1_LocalUIDReference is an autogenerated conversion function.
+func Convert_networking_LocalUIDReference_To_v1alpha1_LocalUIDReference(in *networking.LocalUIDReference, out *LocalUIDReference, s conversion.Scope) error {
+	return autoConvert_networking_LocalUIDReference_To_v1alpha1_LocalUIDReference(in, out, s)
 }
 
 func autoConvert_v1alpha1_Network_To_networking_Network(in *Network, out *networking.Network, s conversion.Scope) error {
@@ -304,4 +408,172 @@ func autoConvert_networking_NetworkList_To_v1alpha1_NetworkList(in *networking.N
 // Convert_networking_NetworkList_To_v1alpha1_NetworkList is an autogenerated conversion function.
 func Convert_networking_NetworkList_To_v1alpha1_NetworkList(in *networking.NetworkList, out *NetworkList, s conversion.Scope) error {
 	return autoConvert_networking_NetworkList_To_v1alpha1_NetworkList(in, out, s)
+}
+
+func autoConvert_v1alpha1_VirtualIP_To_networking_VirtualIP(in *VirtualIP, out *networking.VirtualIP, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
+	if err := Convert_v1alpha1_VirtualIPSpec_To_networking_VirtualIPSpec(&in.Spec, &out.Spec, s); err != nil {
+		return err
+	}
+	if err := Convert_v1alpha1_VirtualIPStatus_To_networking_VirtualIPStatus(&in.Status, &out.Status, s); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Convert_v1alpha1_VirtualIP_To_networking_VirtualIP is an autogenerated conversion function.
+func Convert_v1alpha1_VirtualIP_To_networking_VirtualIP(in *VirtualIP, out *networking.VirtualIP, s conversion.Scope) error {
+	return autoConvert_v1alpha1_VirtualIP_To_networking_VirtualIP(in, out, s)
+}
+
+func autoConvert_networking_VirtualIP_To_v1alpha1_VirtualIP(in *networking.VirtualIP, out *VirtualIP, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
+	if err := Convert_networking_VirtualIPSpec_To_v1alpha1_VirtualIPSpec(&in.Spec, &out.Spec, s); err != nil {
+		return err
+	}
+	if err := Convert_networking_VirtualIPStatus_To_v1alpha1_VirtualIPStatus(&in.Status, &out.Status, s); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Convert_networking_VirtualIP_To_v1alpha1_VirtualIP is an autogenerated conversion function.
+func Convert_networking_VirtualIP_To_v1alpha1_VirtualIP(in *networking.VirtualIP, out *VirtualIP, s conversion.Scope) error {
+	return autoConvert_networking_VirtualIP_To_v1alpha1_VirtualIP(in, out, s)
+}
+
+func autoConvert_v1alpha1_VirtualIPList_To_networking_VirtualIPList(in *VirtualIPList, out *networking.VirtualIPList, s conversion.Scope) error {
+	out.ListMeta = in.ListMeta
+	out.Items = *(*[]networking.VirtualIP)(unsafe.Pointer(&in.Items))
+	return nil
+}
+
+// Convert_v1alpha1_VirtualIPList_To_networking_VirtualIPList is an autogenerated conversion function.
+func Convert_v1alpha1_VirtualIPList_To_networking_VirtualIPList(in *VirtualIPList, out *networking.VirtualIPList, s conversion.Scope) error {
+	return autoConvert_v1alpha1_VirtualIPList_To_networking_VirtualIPList(in, out, s)
+}
+
+func autoConvert_networking_VirtualIPList_To_v1alpha1_VirtualIPList(in *networking.VirtualIPList, out *VirtualIPList, s conversion.Scope) error {
+	out.ListMeta = in.ListMeta
+	out.Items = *(*[]VirtualIP)(unsafe.Pointer(&in.Items))
+	return nil
+}
+
+// Convert_networking_VirtualIPList_To_v1alpha1_VirtualIPList is an autogenerated conversion function.
+func Convert_networking_VirtualIPList_To_v1alpha1_VirtualIPList(in *networking.VirtualIPList, out *VirtualIPList, s conversion.Scope) error {
+	return autoConvert_networking_VirtualIPList_To_v1alpha1_VirtualIPList(in, out, s)
+}
+
+func autoConvert_v1alpha1_VirtualIPRouting_To_networking_VirtualIPRouting(in *VirtualIPRouting, out *networking.VirtualIPRouting, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
+	out.Subsets = *(*[]networking.VirtualIPRoutingSubset)(unsafe.Pointer(&in.Subsets))
+	return nil
+}
+
+// Convert_v1alpha1_VirtualIPRouting_To_networking_VirtualIPRouting is an autogenerated conversion function.
+func Convert_v1alpha1_VirtualIPRouting_To_networking_VirtualIPRouting(in *VirtualIPRouting, out *networking.VirtualIPRouting, s conversion.Scope) error {
+	return autoConvert_v1alpha1_VirtualIPRouting_To_networking_VirtualIPRouting(in, out, s)
+}
+
+func autoConvert_networking_VirtualIPRouting_To_v1alpha1_VirtualIPRouting(in *networking.VirtualIPRouting, out *VirtualIPRouting, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
+	out.Subsets = *(*[]VirtualIPRoutingSubset)(unsafe.Pointer(&in.Subsets))
+	return nil
+}
+
+// Convert_networking_VirtualIPRouting_To_v1alpha1_VirtualIPRouting is an autogenerated conversion function.
+func Convert_networking_VirtualIPRouting_To_v1alpha1_VirtualIPRouting(in *networking.VirtualIPRouting, out *VirtualIPRouting, s conversion.Scope) error {
+	return autoConvert_networking_VirtualIPRouting_To_v1alpha1_VirtualIPRouting(in, out, s)
+}
+
+func autoConvert_v1alpha1_VirtualIPRoutingList_To_networking_VirtualIPRoutingList(in *VirtualIPRoutingList, out *networking.VirtualIPRoutingList, s conversion.Scope) error {
+	out.ListMeta = in.ListMeta
+	out.Items = *(*[]networking.VirtualIPRouting)(unsafe.Pointer(&in.Items))
+	return nil
+}
+
+// Convert_v1alpha1_VirtualIPRoutingList_To_networking_VirtualIPRoutingList is an autogenerated conversion function.
+func Convert_v1alpha1_VirtualIPRoutingList_To_networking_VirtualIPRoutingList(in *VirtualIPRoutingList, out *networking.VirtualIPRoutingList, s conversion.Scope) error {
+	return autoConvert_v1alpha1_VirtualIPRoutingList_To_networking_VirtualIPRoutingList(in, out, s)
+}
+
+func autoConvert_networking_VirtualIPRoutingList_To_v1alpha1_VirtualIPRoutingList(in *networking.VirtualIPRoutingList, out *VirtualIPRoutingList, s conversion.Scope) error {
+	out.ListMeta = in.ListMeta
+	out.Items = *(*[]VirtualIPRouting)(unsafe.Pointer(&in.Items))
+	return nil
+}
+
+// Convert_networking_VirtualIPRoutingList_To_v1alpha1_VirtualIPRoutingList is an autogenerated conversion function.
+func Convert_networking_VirtualIPRoutingList_To_v1alpha1_VirtualIPRoutingList(in *networking.VirtualIPRoutingList, out *VirtualIPRoutingList, s conversion.Scope) error {
+	return autoConvert_networking_VirtualIPRoutingList_To_v1alpha1_VirtualIPRoutingList(in, out, s)
+}
+
+func autoConvert_v1alpha1_VirtualIPRoutingSubset_To_networking_VirtualIPRoutingSubset(in *VirtualIPRoutingSubset, out *networking.VirtualIPRoutingSubset, s conversion.Scope) error {
+	out.IP = in.IP
+	if err := Convert_v1alpha1_LocalUIDReference_To_networking_LocalUIDReference(&in.TargetRef, &out.TargetRef, s); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Convert_v1alpha1_VirtualIPRoutingSubset_To_networking_VirtualIPRoutingSubset is an autogenerated conversion function.
+func Convert_v1alpha1_VirtualIPRoutingSubset_To_networking_VirtualIPRoutingSubset(in *VirtualIPRoutingSubset, out *networking.VirtualIPRoutingSubset, s conversion.Scope) error {
+	return autoConvert_v1alpha1_VirtualIPRoutingSubset_To_networking_VirtualIPRoutingSubset(in, out, s)
+}
+
+func autoConvert_networking_VirtualIPRoutingSubset_To_v1alpha1_VirtualIPRoutingSubset(in *networking.VirtualIPRoutingSubset, out *VirtualIPRoutingSubset, s conversion.Scope) error {
+	out.IP = in.IP
+	if err := Convert_networking_LocalUIDReference_To_v1alpha1_LocalUIDReference(&in.TargetRef, &out.TargetRef, s); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Convert_networking_VirtualIPRoutingSubset_To_v1alpha1_VirtualIPRoutingSubset is an autogenerated conversion function.
+func Convert_networking_VirtualIPRoutingSubset_To_v1alpha1_VirtualIPRoutingSubset(in *networking.VirtualIPRoutingSubset, out *VirtualIPRoutingSubset, s conversion.Scope) error {
+	return autoConvert_networking_VirtualIPRoutingSubset_To_v1alpha1_VirtualIPRoutingSubset(in, out, s)
+}
+
+func autoConvert_v1alpha1_VirtualIPSpec_To_networking_VirtualIPSpec(in *VirtualIPSpec, out *networking.VirtualIPSpec, s conversion.Scope) error {
+	out.Type = networking.VirtualIPType(in.Type)
+	out.IPFamily = v1.IPFamily(in.IPFamily)
+	out.NetworkInterfaceSelector = (*metav1.LabelSelector)(unsafe.Pointer(in.NetworkInterfaceSelector))
+	return nil
+}
+
+// Convert_v1alpha1_VirtualIPSpec_To_networking_VirtualIPSpec is an autogenerated conversion function.
+func Convert_v1alpha1_VirtualIPSpec_To_networking_VirtualIPSpec(in *VirtualIPSpec, out *networking.VirtualIPSpec, s conversion.Scope) error {
+	return autoConvert_v1alpha1_VirtualIPSpec_To_networking_VirtualIPSpec(in, out, s)
+}
+
+func autoConvert_networking_VirtualIPSpec_To_v1alpha1_VirtualIPSpec(in *networking.VirtualIPSpec, out *VirtualIPSpec, s conversion.Scope) error {
+	out.Type = VirtualIPType(in.Type)
+	out.IPFamily = v1.IPFamily(in.IPFamily)
+	out.NetworkInterfaceSelector = (*metav1.LabelSelector)(unsafe.Pointer(in.NetworkInterfaceSelector))
+	return nil
+}
+
+// Convert_networking_VirtualIPSpec_To_v1alpha1_VirtualIPSpec is an autogenerated conversion function.
+func Convert_networking_VirtualIPSpec_To_v1alpha1_VirtualIPSpec(in *networking.VirtualIPSpec, out *VirtualIPSpec, s conversion.Scope) error {
+	return autoConvert_networking_VirtualIPSpec_To_v1alpha1_VirtualIPSpec(in, out, s)
+}
+
+func autoConvert_v1alpha1_VirtualIPStatus_To_networking_VirtualIPStatus(in *VirtualIPStatus, out *networking.VirtualIPStatus, s conversion.Scope) error {
+	out.IP = (*commonv1alpha1.IP)(unsafe.Pointer(in.IP))
+	return nil
+}
+
+// Convert_v1alpha1_VirtualIPStatus_To_networking_VirtualIPStatus is an autogenerated conversion function.
+func Convert_v1alpha1_VirtualIPStatus_To_networking_VirtualIPStatus(in *VirtualIPStatus, out *networking.VirtualIPStatus, s conversion.Scope) error {
+	return autoConvert_v1alpha1_VirtualIPStatus_To_networking_VirtualIPStatus(in, out, s)
+}
+
+func autoConvert_networking_VirtualIPStatus_To_v1alpha1_VirtualIPStatus(in *networking.VirtualIPStatus, out *VirtualIPStatus, s conversion.Scope) error {
+	out.IP = (*commonv1alpha1.IP)(unsafe.Pointer(in.IP))
+	return nil
+}
+
+// Convert_networking_VirtualIPStatus_To_v1alpha1_VirtualIPStatus is an autogenerated conversion function.
+func Convert_networking_VirtualIPStatus_To_v1alpha1_VirtualIPStatus(in *networking.VirtualIPStatus, out *VirtualIPStatus, s conversion.Scope) error {
+	return autoConvert_networking_VirtualIPStatus_To_v1alpha1_VirtualIPStatus(in, out, s)
 }
