@@ -15,6 +15,7 @@
 package validation
 
 import (
+	onmetalapivalidation "github.com/onmetal/onmetal-api/api/validation"
 	"github.com/onmetal/onmetal-api/apis/storage"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -49,7 +50,7 @@ func validateVolumePoolSpecUpdate(newSpec, oldSpec *storage.VolumePoolSpec, fldP
 	var allErrs field.ErrorList
 
 	if oldSpec.ProviderID != "" {
-		allErrs = append(allErrs, ValidateImmutable(newSpec.ProviderID, oldSpec.ProviderID, fldPath.Child("providerID"))...)
+		allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableField(newSpec.ProviderID, oldSpec.ProviderID, fldPath.Child("providerID"))...)
 	}
 
 	return allErrs

@@ -35,6 +35,7 @@ func RegisterDefaults(scheme *runtime.Scheme) error {
 }
 
 func SetObjectDefaults_NetworkInterface(in *NetworkInterface) {
+	SetDefaults_NetworkInterfaceSpec(&in.Spec)
 	for i := range in.Spec.IPs {
 		a := &in.Spec.IPs[i]
 		if a.EphemeralPrefix != nil {

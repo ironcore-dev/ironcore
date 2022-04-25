@@ -23,7 +23,7 @@ import (
 
 	"github.com/onmetal/onmetal-api/envtestutils"
 	"github.com/onmetal/onmetal-api/envtestutils/apiserver"
-	"github.com/onmetal/onmetal-api/testdata/apiserverbin"
+	"github.com/onmetal/onmetal-api/testutils/apiserverbin"
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/ginkgo/config"
 	. "github.com/onsi/gomega"

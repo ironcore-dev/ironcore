@@ -17,6 +17,7 @@ package validation_test
 import (
 	"github.com/onmetal/onmetal-api/apis/storage"
 	. "github.com/onmetal/onmetal-api/apis/storage/validation"
+	. "github.com/onmetal/onmetal-api/testutils/validation"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"

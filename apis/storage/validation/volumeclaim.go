@@ -15,6 +15,7 @@
 package validation
 
 import (
+	onmetalapivalidation "github.com/onmetal/onmetal-api/api/validation"
 	"github.com/onmetal/onmetal-api/apis/storage"
 	corev1 "k8s.io/api/core/v1"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
@@ -53,7 +54,7 @@ func validateVolumeClaimSpec(volumeClaimSpec *storage.VolumeClaimSpec, fldPath *
 	if !ok {
 		allErrs = append(allErrs, field.Required(fldPath.Child("resources").Key(string(corev1.ResourceStorage)), ""))
 	} else {
-		allErrs = append(allErrs, ValidatePositiveQuantity(storageValue, fldPath.Child("resources").Key(string(corev1.ResourceStorage)))...)
+		allErrs = append(allErrs, onmetalapivalidation.ValidatePositiveQuantity(storageValue, fldPath.Child("resources").Key(string(corev1.ResourceStorage)))...)
 	}
 
 	return allErrs
@@ -79,7 +80,7 @@ func validateVolumeClaimSpecUpdate(newSpec, oldSpec *storage.VolumeClaimSpec, fl
 		oldSpecCopy.VolumeRef.Name = newSpecCopy.VolumeRef.Name
 	}
 
-	allErrs = append(allErrs, ValidateImmutableWithDiff(newSpecCopy, oldSpecCopy, fldPath)...)
+	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableFieldWithDiff(newSpecCopy, oldSpecCopy, fldPath)...)
 
 	return allErrs
 }

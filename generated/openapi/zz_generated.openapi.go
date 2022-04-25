@@ -67,13 +67,13 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixList":                   schema_onmetal_api_apis_ipam_v1alpha1_PrefixList(ref),
 		"github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixSpec":                   schema_onmetal_api_apis_ipam_v1alpha1_PrefixSpec(ref),
 		"github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixStatus":                 schema_onmetal_api_apis_ipam_v1alpha1_PrefixStatus(ref),
+		"github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixTemplateSpec":           schema_onmetal_api_apis_ipam_v1alpha1_PrefixTemplateSpec(ref),
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.EphemeralPrefixSource":  schema_onmetal_api_apis_networking_v1alpha1_EphemeralPrefixSource(ref),
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.IPSource":               schema_onmetal_api_apis_networking_v1alpha1_IPSource(ref),
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.NetworkInterface":       schema_onmetal_api_apis_networking_v1alpha1_NetworkInterface(ref),
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.NetworkInterfaceList":   schema_onmetal_api_apis_networking_v1alpha1_NetworkInterfaceList(ref),
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.NetworkInterfaceSpec":   schema_onmetal_api_apis_networking_v1alpha1_NetworkInterfaceSpec(ref),
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.NetworkInterfaceStatus": schema_onmetal_api_apis_networking_v1alpha1_NetworkInterfaceStatus(ref),
-		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.PrefixTemplate":         schema_onmetal_api_apis_networking_v1alpha1_PrefixTemplate(ref),
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.ClaimReference":            schema_onmetal_api_apis_storage_v1alpha1_ClaimReference(ref),
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.Volume":                    schema_onmetal_api_apis_storage_v1alpha1_Volume(ref),
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeAccess":              schema_onmetal_api_apis_storage_v1alpha1_VolumeAccess(ref),
@@ -1824,6 +1824,32 @@ func schema_onmetal_api_apis_ipam_v1alpha1_PrefixStatus(ref common.ReferenceCall
 	}
 }
 
+func schema_onmetal_api_apis_ipam_v1alpha1_PrefixTemplateSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixSpec"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
 func schema_onmetal_api_apis_networking_v1alpha1_EphemeralPrefixSource(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -1832,14 +1858,14 @@ func schema_onmetal_api_apis_networking_v1alpha1_EphemeralPrefixSource(ref commo
 				Properties: map[string]spec.Schema{
 					"prefixTemplate": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/onmetal/onmetal-api/apis/networking/v1alpha1.PrefixTemplate"),
+							Ref: ref("github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixTemplateSpec"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.PrefixTemplate"},
+			"github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixTemplateSpec"},
 	}
 }
 
@@ -2048,32 +2074,6 @@ func schema_onmetal_api_apis_networking_v1alpha1_NetworkInterfaceStatus(ref comm
 		},
 		Dependencies: []string{
 			"github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP"},
-	}
-}
-
-func schema_onmetal_api_apis_networking_v1alpha1_PrefixTemplate(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixSpec"),
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 

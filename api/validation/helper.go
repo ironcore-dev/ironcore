@@ -12,23 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package validation
+package apivalidation
 
 import (
 	"fmt"
 	"reflect"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/google/go-cmp/cmp"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	"github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	"github.com/onmetal/onmetal-api/equality"
 	"k8s.io/apimachinery/pkg/api/resource"
-	apivalidation "k8s.io/apimachinery/pkg/api/validation"
+	"k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
 const (
-	isNegativeErrorMsg    = apivalidation.IsNegativeErrorMsg
+	isNegativeErrorMsg    = validation.IsNegativeErrorMsg
 	isNotPositiveErrorMsg = `must be greater than zero`
 )
 
@@ -51,24 +53,24 @@ func ValidatePositiveQuantity(value resource.Quantity, fldPath *field.Path) fiel
 func ValidateSetOnceField(newVal, oldVal interface{}, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 	if !reflect.ValueOf(oldVal).IsZero() {
-		allErrs = append(allErrs, apivalidation.ValidateImmutableField(newVal, oldVal, fldPath)...)
+		allErrs = append(allErrs, ValidateImmutableField(newVal, oldVal, fldPath)...)
 	}
 	return allErrs
 }
 
-func ValidateImmutable(newVal, oldVal interface{}, fldPath *field.Path) field.ErrorList {
+func ValidateImmutableField(newVal, oldVal interface{}, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 	if !equality.Semantic.DeepEqual(oldVal, newVal) {
-		allErrs = append(allErrs, field.Invalid(fldPath, newVal, apivalidation.FieldImmutableErrorMsg))
+		allErrs = append(allErrs, field.Forbidden(fldPath, validation.FieldImmutableErrorMsg))
 	}
 	return allErrs
 }
 
-func ValidateImmutableWithDiff(newVal, oldVal interface{}, fldPath *field.Path) field.ErrorList {
+func ValidateImmutableFieldWithDiff(newVal, oldVal interface{}, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 	if !equality.Semantic.DeepEqual(oldVal, newVal) {
-		diff := cmp.Diff(oldVal, newVal, cmp.Comparer(commonv1alpha1.EqualIPs), cmp.Comparer(commonv1alpha1.EqualIPPrefixes))
-		allErrs = append(allErrs, field.Invalid(fldPath, newVal, fmt.Sprintf("%s\n%s", apivalidation.FieldImmutableErrorMsg, diff)))
+		diff := cmp.Diff(oldVal, newVal, cmp.Comparer(v1alpha1.EqualIPs), cmp.Comparer(v1alpha1.EqualIPPrefixes))
+		allErrs = append(allErrs, field.Forbidden(fldPath, fmt.Sprintf("%s\n%s", validation.FieldImmutableErrorMsg, diff)))
 	}
 	return allErrs
 }
@@ -80,5 +82,28 @@ func ValidateStringSetEnum(allowed sets.String, value string, fldPath *field.Pat
 	} else if !allowed.Has(value) {
 		allErrs = append(allErrs, field.NotSupported(fldPath, value, allowed.List()))
 	}
+	return allErrs
+}
+
+// ValidateFieldAllowList checks that only allowed fields are set.
+// The value must be a struct (not a pointer to a struct!).
+func ValidateFieldAllowList(value interface{}, allowedFields sets.String, errorText string, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	reflectType, reflectValue := reflect.TypeOf(value), reflect.ValueOf(value)
+	for i := 0; i < reflectType.NumField(); i++ {
+		f := reflectType.Field(i)
+		if allowedFields.Has(f.Name) {
+			continue
+		}
+
+		// Compare the value of this field to its zero value to determine if it has been set
+		if !equality.Semantic.DeepEqual(reflectValue.Field(i).Interface(), reflect.Zero(f.Type).Interface()) {
+			r, n := utf8.DecodeRuneInString(f.Name)
+			lcName := string(unicode.ToLower(r)) + f.Name[n:]
+			allErrs = append(allErrs, field.Forbidden(fldPath.Child(lcName), errorText))
+		}
+	}
+
 	return allErrs
 }

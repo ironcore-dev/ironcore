@@ -15,6 +15,7 @@
 package validation
 
 import (
+	onmetalapivalidation "github.com/onmetal/onmetal-api/api/validation"
 	"github.com/onmetal/onmetal-api/apis/storage"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -32,7 +33,7 @@ func ValidateVolumeClassUpdate(newVolumeClass, oldVolumeClass *storage.VolumeCla
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessorUpdate(newVolumeClass, oldVolumeClass, field.NewPath("metadata"))...)
-	allErrs = append(allErrs, ValidateImmutable(newVolumeClass.Capabilities, oldVolumeClass.Capabilities, field.NewPath("capabilities"))...)
+	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableField(newVolumeClass.Capabilities, oldVolumeClass.Capabilities, field.NewPath("capabilities"))...)
 	allErrs = append(allErrs, ValidateVolumeClass(newVolumeClass)...)
 
 	return allErrs

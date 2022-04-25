@@ -30,7 +30,7 @@ var (
 	SchemeGroupVersion = schema.GroupVersion{Group: "networking.api.onmetal.de", Version: "v1alpha1"}
 
 	// SchemeBuilder is used to add go types to the GroupVersionKind scheme
-	SchemeBuilder      = runtime.NewSchemeBuilder(addKnownTypes)
+	SchemeBuilder      = runtime.NewSchemeBuilder(addKnownTypes, addDefaultingFuncs)
 	localSchemeBuilder = &SchemeBuilder
 
 	// AddToScheme adds the types in this group-version to the given scheme.

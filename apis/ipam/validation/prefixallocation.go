@@ -17,6 +17,8 @@ package validation
 import (
 	"fmt"
 
+	onmetalapivalidation "github.com/onmetal/onmetal-api/api/validation"
+	commonv1alpha1validation "github.com/onmetal/onmetal-api/apis/common/v1alpha1/validation"
 	"github.com/onmetal/onmetal-api/apis/ipam"
 	"github.com/onmetal/onmetal-api/equality"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
@@ -36,7 +38,7 @@ func ValidatePrefixAllocation(prefixAllocation *ipam.PrefixAllocation) field.Err
 func validatePrefixAllocationSpec(spec *ipam.PrefixAllocationSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, validateIPFamilyPrefixAndLength(spec.IPFamily, spec.Prefix, spec.PrefixLength, fldPath)...)
+	allErrs = append(allErrs, validateIPFamilyAndOptionalPrefixAndLength(spec.IPFamily, spec.Prefix, spec.PrefixLength, fldPath)...)
 	allErrs = append(allErrs, validateOptionalRef(spec.PrefixRef, fldPath.Child("prefixRef"))...)
 	allErrs = append(allErrs, metav1validation.ValidateLabelSelector(spec.PrefixSelector, fldPath.Child("prefixSelector"))...)
 
@@ -89,7 +91,7 @@ func validatePrefixAllocationSpecUpdate(newSpec, oldSpec *ipam.PrefixAllocationS
 		oldSpecCopy.PrefixRef = newSpecCopy.PrefixRef
 	}
 
-	allErrs = append(allErrs, ValidateImmutableWithDiff(newSpecCopy, oldSpecCopy, fldPath)...)
+	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableFieldWithDiff(newSpecCopy, oldSpecCopy, fldPath)...)
 
 	return allErrs
 }
@@ -97,7 +99,9 @@ func validatePrefixAllocationSpecUpdate(newSpec, oldSpec *ipam.PrefixAllocationS
 func ValidatePrefixAllocationStatus(status *ipam.PrefixAllocationStatus, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, validateOptionalPrefix(status.Prefix, fldPath.Child("prefix"))...)
+	if status.Prefix != nil {
+		allErrs = append(allErrs, commonv1alpha1validation.ValidateIPPrefix(status.Prefix.IP().Family(), *status.Prefix, fldPath.Child("prefix"))...)
+	}
 
 	readiness, _ := ipam.GetPrefixAllocationConditionsReadinessAndIndex(status.Conditions)
 	switch readiness {
@@ -135,8 +139,9 @@ func ValidatePrefixAllocationStatusUpdate(newPrefixAllocation, oldPrefixAllocati
 	}
 
 	statusPrefixField := statusField.Child("prefix")
-	allErrs = append(allErrs, validateOptionalPrefixAndIPFamily(newPrefixAllocation.Spec.IPFamily, newPrefixAllocation.Status.Prefix, statusPrefixField)...)
 	if newStatusPrefix := newPrefixAllocation.Status.Prefix; newStatusPrefix != nil {
+		allErrs = append(allErrs, commonv1alpha1validation.ValidateIPPrefix(newPrefixAllocation.Spec.IPFamily, *newStatusPrefix, statusPrefixField)...)
+
 		if newSpecPrefix := newPrefixAllocation.Spec.Prefix; newSpecPrefix.IsValid() {
 			if !equality.Semantic.DeepEqual(newStatusPrefix, newSpecPrefix) {
 				allErrs = append(allErrs, field.Forbidden(statusPrefixField, fmt.Sprintf("does not match spec prefix %s", newSpecPrefix)))

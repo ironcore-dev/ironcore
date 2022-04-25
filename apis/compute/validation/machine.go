@@ -17,9 +17,9 @@
 package validation
 
 import (
+	onmetalapivalidation "github.com/onmetal/onmetal-api/api/validation"
 	"github.com/onmetal/onmetal-api/apis/compute"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/validation"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1validation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -94,9 +94,9 @@ func validateMachineSpec(machineSpec *compute.MachineSpec, fldPath *field.Path) 
 func validateMachineSpecUpdate(new, old *compute.MachineSpec, deletionTimestampSet bool, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, validation.ValidateImmutableField(new.Image, old.Image, fldPath.Child("image"))...)
-	allErrs = append(allErrs, apivalidation.ValidateImmutableField(new.MachineClassRef, old.MachineClassRef, fldPath.Child("machineClassRef"))...)
-	allErrs = append(allErrs, ValidateSetOnceField(new.MachinePoolRef, old.MachinePoolRef, fldPath.Child("machinePoolRef"))...)
+	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableField(new.Image, old.Image, fldPath.Child("image"))...)
+	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableField(new.MachineClassRef, old.MachineClassRef, fldPath.Child("machineClassRef"))...)
+	allErrs = append(allErrs, onmetalapivalidation.ValidateSetOnceField(new.MachinePoolRef, old.MachinePoolRef, fldPath.Child("machinePoolRef"))...)
 
 	return allErrs
 }

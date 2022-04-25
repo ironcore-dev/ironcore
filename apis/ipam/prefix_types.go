@@ -90,3 +90,8 @@ type PrefixList struct {
 	metav1.ListMeta
 	Items []Prefix
 }
+
+type PrefixTemplateSpec struct {
+	metav1.ObjectMeta
+	Spec PrefixSpec
+}

@@ -99,3 +99,8 @@ type PrefixList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []Prefix `json:"items"`
 }
+
+type PrefixTemplateSpec struct {
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+	Spec              PrefixSpec `json:"spec,omitempty"`
+}

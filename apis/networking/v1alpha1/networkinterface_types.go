@@ -42,12 +42,7 @@ type IPSource struct {
 }
 
 type EphemeralPrefixSource struct {
-	PrefixTemplate *PrefixTemplate `json:"prefixTemplate,omitempty"`
-}
-
-type PrefixTemplate struct {
-	metav1.ObjectMeta `json:"metadata,omitempty"`
-	Spec              ipamv1alpha1.PrefixSpec `json:"spec,omitempty"`
+	PrefixTemplate *ipamv1alpha1.PrefixTemplateSpec `json:"prefixTemplate,omitempty"`
 }
 
 // NetworkInterfaceStatus defines the observed state of NetworkInterface

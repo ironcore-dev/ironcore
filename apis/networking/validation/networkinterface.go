@@ -17,21 +17,25 @@
 package validation
 
 import (
+	"fmt"
+
+	onmetalapivalidation "github.com/onmetal/onmetal-api/api/validation"
+	commonv1alpha1validation "github.com/onmetal/onmetal-api/apis/common/v1alpha1/validation"
+	"github.com/onmetal/onmetal-api/apis/ipam"
+	ipamvalidation "github.com/onmetal/onmetal-api/apis/ipam/validation"
 	"github.com/onmetal/onmetal-api/apis/networking"
 	corev1 "k8s.io/api/core/v1"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
-	"k8s.io/apimachinery/pkg/util/sets"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
-
-var supportedServiceIPFamily = sets.NewString(string(corev1.IPv4Protocol), string(corev1.IPv6Protocol))
 
 // ValidateNetworkInterface validates a network interface object.
 func ValidateNetworkInterface(networkInterface *networking.NetworkInterface) field.ErrorList {
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(networkInterface, true, apivalidation.NameIsDNSLabel, field.NewPath("metadata"))...)
-	allErrs = append(allErrs, validateNetworkInterfaceSpec(&networkInterface.Spec, field.NewPath("spec"))...)
+	allErrs = append(allErrs, validateNetworkInterfaceSpec(&networkInterface.Spec, &networkInterface.ObjectMeta, field.NewPath("spec"))...)
 
 	return allErrs
 }
@@ -41,67 +45,133 @@ func ValidateNetworkInterfaceUpdate(newNetworkInterface, oldNetworkInterface *ne
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessorUpdate(newNetworkInterface, oldNetworkInterface, field.NewPath("metadata"))...)
-	allErrs = append(allErrs, validateNetworkInterfaceSpecUpdate(&newNetworkInterface.Spec, &oldNetworkInterface.Spec, newNetworkInterface.DeletionTimestamp != nil, field.NewPath("spec"))...)
+	allErrs = append(allErrs, validateNetworkInterfaceSpecUpdate(&newNetworkInterface.Spec, &oldNetworkInterface.Spec, field.NewPath("spec"))...)
 	allErrs = append(allErrs, ValidateNetworkInterface(newNetworkInterface)...)
 
 	return allErrs
 }
 
-func validateNetworkInterfaceSpec(networkInterfaceSpec *networking.NetworkInterfaceSpec, fldPath *field.Path) field.ErrorList {
+func validateNetworkInterfaceSpec(spec *networking.NetworkInterfaceSpec, nicMeta *metav1.ObjectMeta, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	if networkInterfaceSpec.NetworkRef == (corev1.LocalObjectReference{}) {
+	if spec.NetworkRef == (corev1.LocalObjectReference{}) {
 		allErrs = append(allErrs, field.Required(fldPath.Child("networkRef"), "must specify a network ref"))
 	}
 
-	for _, msg := range apivalidation.NameIsDNSLabel(networkInterfaceSpec.NetworkRef.Name, false) {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("networkRef").Child("name"), networkInterfaceSpec.NetworkRef.Name, msg))
+	for _, msg := range apivalidation.NameIsDNSLabel(spec.NetworkRef.Name, false) {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("networkRef").Child("name"), spec.NetworkRef.Name, msg))
 	}
 
-	if networkInterfaceSpec.MachineRef.Name != "" {
-		for _, msg := range apivalidation.NameIsDNSLabel(networkInterfaceSpec.MachineRef.Name, false) {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("machineRef").Child("name"), networkInterfaceSpec.MachineRef.Name, msg))
+	for _, msg := range apivalidation.NameIsDNSLabel(spec.MachineRef.Name, false) {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("machineRef").Child("name"), spec.MachineRef.Name, msg))
+	}
+
+	allErrs = append(allErrs, onmetalapivalidation.ValidateIPFamilies(spec.IPFamilies, fldPath.Child("ipFamilies"))...)
+
+	if len(spec.IPFamilies) != len(spec.IPs) {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("ips"), spec.IPFamilies, "ip families must match ips"))
+	}
+
+	allErrs = append(allErrs, validateNetworkInterfaceIPSources(spec.IPs, spec.IPFamilies, nicMeta, fldPath.Child("ips"))...)
+
+	return allErrs
+}
+
+func validateNetworkInterfaceIPSources(ipSources []networking.IPSource, ipFamilies []corev1.IPFamily, nicMeta *metav1.ObjectMeta, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	for i, ip := range ipSources {
+		var ipFamily corev1.IPFamily
+		if i < len(ipFamilies) {
+			ipFamily = ipFamilies[i]
+		}
+
+		allErrs = append(allErrs, validateIPSource(ip, i, ipFamily, nicMeta, fldPath.Index(i))...)
+	}
+
+	return allErrs
+}
+
+func validateIPSource(ipSource networking.IPSource, idx int, ipFamily corev1.IPFamily, nicMeta *metav1.ObjectMeta, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	var numSources int
+	if ip := ipSource.Value; ip.IsValid() {
+		numSources++
+		allErrs = append(allErrs, commonv1alpha1validation.ValidateIP(ipFamily, *ip, fldPath.Child("value"))...)
+	}
+	if ephemeralPrefixSource := ipSource.EphemeralPrefix; ephemeralPrefixSource != nil {
+		if numSources > 0 {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("ephemeralPrefix"), ephemeralPrefixSource, "cannot specify multiple ip sources"))
+		} else {
+			numSources++
+			allErrs = append(allErrs, validateEphemeralPrefixSource(ipFamily, ephemeralPrefixSource, fldPath.Child("ephemeralPrefix"))...)
+			if nicMeta != nil && nicMeta.Name != "" {
+				prefixName := fmt.Sprintf("%s-%d", nicMeta.Name, idx)
+				for _, msg := range apivalidation.NameIsDNSLabel(prefixName, false) {
+					allErrs = append(allErrs, field.Invalid(fldPath, prefixName, fmt.Sprintf("resulting prefix name %q is invalid: %s", prefixName, msg)))
+				}
+			}
+		}
+	}
+	if numSources == 0 {
+		allErrs = append(allErrs, field.Invalid(fldPath, ipSource, "must specify an ip source"))
+	}
+
+	return allErrs
+}
+
+var ipFamilyToBits = map[corev1.IPFamily]int32{
+	corev1.IPv4Protocol: 32,
+	corev1.IPv6Protocol: 128,
+}
+
+func ValidatePrefixTemplateForNetworkInterface(template *ipam.PrefixTemplateSpec, ipFamily corev1.IPFamily, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	if template == nil {
+		allErrs = append(allErrs, field.Required(fldPath, ""))
+	} else {
+		allErrs = append(allErrs, ipamvalidation.ValidatePrefixTemplateSpec(template, fldPath)...)
+
+		spec := template.Spec
+		specField := fldPath.Child("spec")
+		if spec.IPFamily != ipFamily {
+			allErrs = append(allErrs, field.Forbidden(specField.Child("ipFamily"), fmt.Sprintf("has to match network interface ip family %q", ipFamily)))
+		}
+
+		if prefix := spec.Prefix; prefix != nil {
+			if !prefix.IsSingleIP() {
+				allErrs = append(allErrs, field.Forbidden(specField.Child("prefix"), "must be a single IP"))
+			}
+		}
+		if prefixLength := spec.PrefixLength; prefixLength != 0 {
+			if prefixLength != ipFamilyToBits[ipFamily] {
+				allErrs = append(allErrs, field.Forbidden(specField.Child("prefixLength"), "must be a single IP"))
+			}
 		}
 	}
 
-	if len(networkInterfaceSpec.IPFamilies) == 0 {
-		allErrs = append(allErrs, field.Required(fldPath.Child("ipFamilies"), "must provide at least one ip family"))
-	}
+	return allErrs
+}
 
-	// ipfamilies stand alone validation
-	// must be either IPv4 or IPv6
-	seen := sets.String{}
-	for i, ipFamily := range networkInterfaceSpec.IPFamilies {
-		if !supportedServiceIPFamily.Has(string(ipFamily)) {
-			allErrs = append(allErrs, field.NotSupported(fldPath.Child("ipFamilies").Index(i), ipFamily, supportedServiceIPFamily.List()))
-		}
-		// no duplicate check also ensures that ipfamilies is dualstacked, in any order
-		if seen.Has(string(ipFamily)) {
-			allErrs = append(allErrs, field.Duplicate(fldPath.Child("ipFamilies").Index(i), ipFamily))
-		}
-		seen.Insert(string(ipFamily))
-	}
+func validateEphemeralPrefixSource(ipFamily corev1.IPFamily, source *networking.EphemeralPrefixSource, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
 
-	for i, ipSource := range networkInterfaceSpec.IPs {
-		if ipSource.EphemeralPrefix != nil && ipSource.EphemeralPrefix.PrefixTemplate != nil {
-			allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(ipSource.EphemeralPrefix.PrefixTemplate,
-				true, apivalidation.NameIsDNSLabel, fldPath.Child("ips").Index(i).Child("ephemeralPrefix").Child("metadata"))...)
-		}
-		// TODO: validate PrefixSpec once new Prefix is merged
-	}
+	allErrs = append(allErrs, ValidatePrefixTemplateForNetworkInterface(source.PrefixTemplate, ipFamily, fldPath)...)
 
 	return allErrs
 }
 
 // validateNetworkInterfaceSpecUpdate validates the spec of a NetworkInterface object before an update.
-func validateNetworkInterfaceSpecUpdate(new, old *networking.NetworkInterfaceSpec, deletionTimestampSet bool, fldPath *field.Path) field.ErrorList {
+func validateNetworkInterfaceSpecUpdate(newSpec, oldSpec *networking.NetworkInterfaceSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, apivalidation.ValidateImmutableField(new.NetworkRef, old.NetworkRef, fldPath.Child("networkRef"))...)
+	newSpecCopy := newSpec.DeepCopy()
+	oldSpecCopy := oldSpec.DeepCopy()
+
+	oldSpecCopy.MachineRef = newSpec.MachineRef
+	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableFieldWithDiff(newSpecCopy, oldSpecCopy, fldPath)...)
 
 	return allErrs
-}
-
-func IsValidIPFamily(family corev1.IPFamily) bool {
-	return family == corev1.IPv4Protocol || family == corev1.IPv6Protocol
 }

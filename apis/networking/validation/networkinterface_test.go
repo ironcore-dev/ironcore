@@ -17,7 +17,9 @@
 package validation
 
 import (
+	"github.com/onmetal/onmetal-api/apis/ipam"
 	"github.com/onmetal/onmetal-api/apis/networking"
+	. "github.com/onmetal/onmetal-api/testutils/validation"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"
@@ -83,41 +85,60 @@ var _ = Describe("NetworkInterface", func() {
 			},
 			ContainElement(DuplicateField("spec.ipFamilies[1]")),
 		),
-		Entry("missing ephemeral prefix name",
+		Entry("ephemeral prefix name present",
 			&networking.NetworkInterface{
 				Spec: networking.NetworkInterfaceSpec{
 					IPs: []networking.IPSource{{EphemeralPrefix: &networking.EphemeralPrefixSource{
-						PrefixTemplate: &networking.PrefixTemplate{}}},
-					},
-				},
-			},
-			ContainElement(RequiredField("spec.ips[0].ephemeralPrefix.metadata.name")),
-		),
-		Entry("invalid ephemeral prefix name",
-			&networking.NetworkInterface{
-				Spec: networking.NetworkInterfaceSpec{
-					IPs: []networking.IPSource{{EphemeralPrefix: &networking.EphemeralPrefixSource{
-						PrefixTemplate: &networking.PrefixTemplate{
-							ObjectMeta: metav1.ObjectMeta{Name: "foo*"},
-						}}},
-					},
-				},
-			},
-			ContainElement(InvalidField("spec.ips[0].ephemeralPrefix.metadata.name")),
-		),
-		Entry("missing ephemeral prefix namespace",
-			&networking.NetworkInterface{
-				Spec: networking.NetworkInterfaceSpec{
-					IPs: []networking.IPSource{{EphemeralPrefix: &networking.EphemeralPrefixSource{
-						PrefixTemplate: &networking.PrefixTemplate{
+						PrefixTemplate: &ipam.PrefixTemplateSpec{
 							ObjectMeta: metav1.ObjectMeta{Name: "foo"},
 						}}},
 					},
 				},
 			},
-			ContainElement(RequiredField("spec.ips[0].ephemeralPrefix.metadata.namespace")),
+			ContainElement(ForbiddenField("spec.ips[0].ephemeralPrefix.metadata.name")),
 		),
-		// TODO: add validation tests for Prefix spec once new Prefix is merged
+		Entry("ephemeral prefix namespace present",
+			&networking.NetworkInterface{
+				Spec: networking.NetworkInterfaceSpec{
+					IPs: []networking.IPSource{{EphemeralPrefix: &networking.EphemeralPrefixSource{
+						PrefixTemplate: &ipam.PrefixTemplateSpec{
+							ObjectMeta: metav1.ObjectMeta{Namespace: "foo"},
+						}}},
+					},
+				},
+			},
+			ContainElement(ForbiddenField("spec.ips[0].ephemeralPrefix.metadata.namespace")),
+		),
+		Entry("ephemeral prefix ip family mismatch",
+			&networking.NetworkInterface{
+				Spec: networking.NetworkInterfaceSpec{
+					IPFamilies: []corev1.IPFamily{corev1.IPv4Protocol},
+					IPs: []networking.IPSource{{EphemeralPrefix: &networking.EphemeralPrefixSource{
+						PrefixTemplate: &ipam.PrefixTemplateSpec{
+							Spec: ipam.PrefixSpec{
+								IPFamily: corev1.IPv6Protocol,
+							},
+						}}},
+					},
+				},
+			},
+			ContainElement(ForbiddenField("spec.ips[0].ephemeralPrefix.spec.ipFamily")),
+		),
+		Entry("ephemeral prefix does not create a single ip",
+			&networking.NetworkInterface{
+				Spec: networking.NetworkInterfaceSpec{
+					IPFamilies: []corev1.IPFamily{corev1.IPv4Protocol},
+					IPs: []networking.IPSource{{EphemeralPrefix: &networking.EphemeralPrefixSource{
+						PrefixTemplate: &ipam.PrefixTemplateSpec{
+							Spec: ipam.PrefixSpec{
+								PrefixLength: 24,
+							},
+						}}},
+					},
+				},
+			},
+			ContainElement(ForbiddenField("spec.ips[0].ephemeralPrefix.spec.prefixLength")),
+		),
 	)
 
 	DescribeTable("ValidateNetworkInterfaceUpdate",
@@ -125,7 +146,7 @@ var _ = Describe("NetworkInterface", func() {
 			errList := ValidateNetworkInterfaceUpdate(newNetworkInterface, oldNetworkInterface)
 			Expect(errList).To(match)
 		},
-		Entry("immutable networkRef if set",
+		Entry("immutable networkRef",
 			&networking.NetworkInterface{
 				Spec: networking.NetworkInterfaceSpec{
 					NetworkRef: corev1.LocalObjectReference{Name: "foo"},
@@ -136,7 +157,37 @@ var _ = Describe("NetworkInterface", func() {
 					NetworkRef: corev1.LocalObjectReference{Name: "bar"},
 				},
 			},
-			ContainElement(ImmutableField("spec.networkRef")),
+			ContainElement(ForbiddenField("spec")),
+		),
+		Entry("immutable ip families",
+			&networking.NetworkInterface{
+				Spec: networking.NetworkInterfaceSpec{
+					IPFamilies: []corev1.IPFamily{corev1.IPv4Protocol},
+				},
+			},
+			&networking.NetworkInterface{
+				Spec: networking.NetworkInterfaceSpec{
+					IPFamilies: []corev1.IPFamily{corev1.IPv6Protocol},
+				},
+			},
+			ContainElement(ForbiddenField("spec")),
+		),
+		Entry("mutable machine ref",
+			&networking.NetworkInterface{
+				Spec: networking.NetworkInterfaceSpec{
+					MachineRef: corev1.LocalObjectReference{
+						Name: "bar",
+					},
+				},
+			},
+			&networking.NetworkInterface{
+				Spec: networking.NetworkInterfaceSpec{
+					MachineRef: corev1.LocalObjectReference{
+						Name: "foo",
+					},
+				},
+			},
+			Not(ContainElement(ForbiddenField("spec"))),
 		),
 	)
 })

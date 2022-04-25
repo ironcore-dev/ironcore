@@ -17,7 +17,9 @@ package validation
 import (
 	"fmt"
 
+	onmetalapivalidation "github.com/onmetal/onmetal-api/api/validation"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	commonv1alpha1validation "github.com/onmetal/onmetal-api/apis/common/v1alpha1/validation"
 	"github.com/onmetal/onmetal-api/apis/ipam"
 	"inet.af/netaddr"
 	corev1 "k8s.io/api/core/v1"
@@ -31,94 +33,22 @@ func ValidatePrefix(prefix *ipam.Prefix) field.ErrorList {
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(prefix, true, apivalidation.NameIsDNSLabel, field.NewPath("metadata"))...)
-	allErrs = append(allErrs, validatePrefixSpec(&prefix.Spec, field.NewPath("spec"))...)
+	allErrs = append(allErrs, ValidatePrefixSpec(&prefix.Spec, field.NewPath("spec"))...)
 
 	return allErrs
 }
 
-var supportedIPFamilies = sets.NewString(
-	string(corev1.IPv4Protocol),
-	string(corev1.IPv6Protocol),
-)
-
-func validateIPFamily(ipFamily corev1.IPFamily, fldPath *field.Path, requiredDetail string) field.ErrorList {
-	return ValidateStringSetEnum(supportedIPFamilies, string(ipFamily), fldPath, requiredDetail)
-}
-
-func validateOptionalPrefix(prefixPtr *commonv1alpha1.IPPrefix, fldPath *field.Path) field.ErrorList {
+func validateIPFamilyAndOptionalPrefixAndLength(ipFamily corev1.IPFamily, prefix *commonv1alpha1.IPPrefix, prefixLength int32, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	if prefixPtr == nil {
-		return allErrs
+	allErrs = append(allErrs, onmetalapivalidation.ValidateIPFamily(ipFamily, fldPath.Child("ipFamily"))...)
+
+	if prefix != nil {
+		allErrs = append(allErrs, commonv1alpha1validation.ValidateIPPrefix(ipFamily, *prefix, fldPath.Child("prefix"))...)
 	}
-
-	allErrs = append(allErrs, validatePrefix(*prefixPtr, fldPath)...)
-
-	return allErrs
-}
-
-func validatePrefix(prefix commonv1alpha1.IPPrefix, fldPath *field.Path) field.ErrorList {
-	var allErrs field.ErrorList
-
-	if !prefix.IsValid() {
-		allErrs = append(allErrs, field.Invalid(fldPath, prefix, "must specify a valid prefix"))
+	if prefixLength != 0 {
+		allErrs = append(allErrs, commonv1alpha1validation.ValidatePrefixLength(ipFamily, prefixLength, fldPath.Child("prefixLength"))...)
 	}
-
-	return allErrs
-}
-
-func validatePrefixIPFamily(ipFamily corev1.IPFamily, prefix commonv1alpha1.IPPrefix, fldPath *field.Path) field.ErrorList {
-	var allErrs field.ErrorList
-
-	if actualFamily := prefix.IP().Family(); actualFamily != ipFamily {
-		allErrs = append(allErrs, field.Invalid(fldPath, prefix, fmt.Sprintf("prefix family %q is not equal expected family %q", actualFamily, ipFamily)))
-	}
-
-	return allErrs
-}
-
-func validateOptionalPrefixAndIPFamily(ipFamily corev1.IPFamily, prefixPtr *commonv1alpha1.IPPrefix, fldPath *field.Path) field.ErrorList {
-	var allErrs field.ErrorList
-
-	allErrs = append(allErrs, validateOptionalPrefix(prefixPtr, fldPath)...)
-	if prefixPtr != nil {
-		allErrs = append(allErrs, validatePrefixIPFamily(ipFamily, *prefixPtr, fldPath)...)
-	}
-
-	return allErrs
-}
-
-func validateOptionalPrefixLengthAndIPFamily(ipFamily corev1.IPFamily, prefixLength int32, fldPath *field.Path) field.ErrorList {
-	var allErrs field.ErrorList
-
-	if prefixLength == 0 {
-		return allErrs
-	}
-
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(prefixLength), fldPath)...)
-
-	switch ipFamily {
-	case corev1.IPv4Protocol:
-		if prefixLength > 32 {
-			allErrs = append(allErrs, field.Invalid(fldPath, prefixLength, "too large prefix length for IPv4"))
-		}
-	case corev1.IPv6Protocol:
-		if prefixLength > 128 {
-			allErrs = append(allErrs, field.Invalid(fldPath, prefixLength, "too large prefix length for IPv6"))
-		}
-	default:
-		return allErrs
-	}
-
-	return allErrs
-}
-
-func validateIPFamilyPrefixAndLength(ipFamily corev1.IPFamily, prefix *commonv1alpha1.IPPrefix, prefixLength int32, fldPath *field.Path) field.ErrorList {
-	var allErrs field.ErrorList
-
-	allErrs = append(allErrs, validateIPFamily(ipFamily, fldPath.Child("ipFamily"), "ipFamily is required")...)
-	allErrs = append(allErrs, validateOptionalPrefixAndIPFamily(ipFamily, prefix, fldPath.Child("prefix"))...)
-	allErrs = append(allErrs, validateOptionalPrefixLengthAndIPFamily(ipFamily, prefixLength, fldPath.Child("prefixLength"))...)
 
 	return allErrs
 }
@@ -140,10 +70,13 @@ func validateOptionalRef(ref *corev1.LocalObjectReference, fldPath *field.Path) 
 	return allErrs
 }
 
-func validatePrefixSpec(spec *ipam.PrefixSpec, fldPath *field.Path) field.ErrorList {
+func ValidatePrefixSpec(spec *ipam.PrefixSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, validateIPFamilyPrefixAndLength(spec.IPFamily, spec.Prefix, spec.PrefixLength, fldPath)...)
+	if spec.Prefix != nil {
+		allErrs = append(allErrs, commonv1alpha1validation.ValidateIPPrefix(spec.IPFamily, *spec.Prefix, fldPath.Child("prefix"))...)
+	}
+	allErrs = append(allErrs, validateIPFamilyAndOptionalPrefixAndLength(spec.IPFamily, spec.Prefix, spec.PrefixLength, fldPath)...)
 
 	if spec.IsRoot() {
 		if spec.PrefixLength != 0 {
@@ -195,7 +128,7 @@ func validatePrefixSpecUpdate(newSpec, oldSpec *ipam.PrefixSpec, fldPath *field.
 		oldSpecCopy.Prefix = newSpecCopy.Prefix
 	}
 	// We allow setting PrefixLength for symmetry with setting Prefix.
-	// validatePrefixSpec will guard against any mismatch with prefix.
+	// ValidatePrefixSpec will guard against any mismatch with prefix.
 	if oldSpec.PrefixLength == 0 {
 		oldSpecCopy.PrefixLength = newSpecCopy.PrefixLength
 	}
@@ -204,7 +137,7 @@ func validatePrefixSpecUpdate(newSpec, oldSpec *ipam.PrefixSpec, fldPath *field.
 		oldSpecCopy.ParentRef = newSpecCopy.ParentRef
 	}
 
-	allErrs = append(allErrs, ValidateImmutableWithDiff(newSpecCopy, oldSpecCopy, fldPath)...)
+	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableFieldWithDiff(newSpecCopy, oldSpecCopy, fldPath)...)
 
 	return allErrs
 }
@@ -223,7 +156,7 @@ func ValidatePrefixStatus(status *ipam.PrefixStatus, fldPath *field.Path) field.
 		)
 		for i, used := range status.Used {
 			usedField := fldPath.Child("used").Index(i)
-			allErrs = append(allErrs, validatePrefix(used, usedField)...)
+			allErrs = append(allErrs, commonv1alpha1validation.ValidateIPPrefix(used.IP().Family(), used, usedField)...)
 			seenFamilies.Insert(string(used.IP().Family()))
 
 			if !overlapSeen {

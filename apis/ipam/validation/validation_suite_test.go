@@ -19,61 +19,9 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/onsi/gomega/types"
-	"k8s.io/apimachinery/pkg/api/validation"
-	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
 func TestValidation(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Validation Suite")
-}
-
-func UnsupportedField(fld string) types.GomegaMatcher {
-	return FieldError(field.ErrorTypeNotSupported, fld)
-}
-
-func ForbiddenField(fld string) types.GomegaMatcher {
-	return FieldError(field.ErrorTypeForbidden, fld)
-}
-
-func InvalidField(fld string) types.GomegaMatcher {
-	return FieldError(field.ErrorTypeInvalid, fld)
-}
-
-func RequiredField(fld string) types.GomegaMatcher {
-	return FieldError(field.ErrorTypeRequired, fld)
-}
-
-func ImmutableField(fld string) types.GomegaMatcher {
-	return And(
-		MaskedFieldError(func(error *field.Error) {
-			error.BadValue = nil
-			error.Detail = ""
-		}, &field.Error{
-			Type:  field.ErrorTypeInvalid,
-			Field: fld,
-		}),
-		WithTransform(func(error *field.Error) string {
-			return error.Detail
-		}, HavePrefix(validation.FieldImmutableErrorMsg)),
-	)
-}
-
-func MaskedFieldError(maskFn func(error *field.Error), fieldErr *field.Error) types.GomegaMatcher {
-	return WithTransform(func(fieldErr *field.Error) *field.Error {
-		res := *fieldErr
-		maskFn(&res)
-		return &res
-	}, Equal(fieldErr))
-}
-
-func FieldError(errorType field.ErrorType, fld string) types.GomegaMatcher {
-	return MaskedFieldError(func(error *field.Error) {
-		error.Detail = ""
-		error.BadValue = nil
-	}, &field.Error{
-		Type:  errorType,
-		Field: fld,
-	})
 }

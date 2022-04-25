@@ -17,6 +17,7 @@ package validation_test
 import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	"github.com/onmetal/onmetal-api/apis/ipam"
+	. "github.com/onmetal/onmetal-api/testutils/validation"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -56,7 +57,7 @@ var _ = Describe("PrefixAllocation", func() {
 					IPFamily: "invalid",
 				},
 			},
-			ContainElement(UnsupportedField("spec.ipFamily")),
+			ContainElement(NotSupportedField("spec.ipFamily")),
 		),
 		Entry("negative prefixLength",
 			&ipam.PrefixAllocation{

@@ -17,6 +17,7 @@
 package validation
 
 import (
+	onmetalapivalidation "github.com/onmetal/onmetal-api/api/validation"
 	"github.com/onmetal/onmetal-api/apis/compute"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -36,7 +37,7 @@ func ValidateMachineClassUpdate(newMachineClass, oldMachineClass *compute.Machin
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessorUpdate(newMachineClass, oldMachineClass, field.NewPath("metadata"))...)
-	allErrs = append(allErrs, ValidateImmutable(newMachineClass.Capabilities, oldMachineClass.Capabilities, field.NewPath("capabilities"))...)
+	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableField(newMachineClass.Capabilities, oldMachineClass.Capabilities, field.NewPath("capabilities"))...)
 	allErrs = append(allErrs, ValidateMachineClass(newMachineClass)...)
 
 	return allErrs
