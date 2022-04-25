@@ -69,6 +69,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Ipam().InternalVersion().PrefixAllocations().Informer()}, nil
 
 		// Group=networking.api.onmetal.de, Version=internalVersion
+	case networking.SchemeGroupVersion.WithResource("networks"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().InternalVersion().Networks().Informer()}, nil
 	case networking.SchemeGroupVersion.WithResource("networkinterfaces"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().InternalVersion().NetworkInterfaces().Informer()}, nil
 

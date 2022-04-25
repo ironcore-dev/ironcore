@@ -50,6 +50,10 @@ autolabeler:
     files:
       - '/apis/compute/*'
       - '/controllers/compute/*'
+  - label: 'networking'
+    files:
+      - '/apis/networking/*'
+      - '/controllers/networking/*'
   - label: 'documentation'
     files:
       - '*.md'

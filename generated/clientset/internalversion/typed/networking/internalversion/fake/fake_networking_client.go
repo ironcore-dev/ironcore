@@ -27,6 +27,10 @@ type FakeNetworking struct {
 	*testing.Fake
 }
 
+func (c *FakeNetworking) Networks(namespace string) internalversion.NetworkInterface {
+	return &FakeNetworks{c, namespace}
+}
+
 func (c *FakeNetworking) NetworkInterfaces(namespace string) internalversion.NetworkInterfaceInterface {
 	return &FakeNetworkInterfaces{c, namespace}
 }

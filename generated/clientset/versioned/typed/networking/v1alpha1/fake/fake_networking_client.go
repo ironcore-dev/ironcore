@@ -27,6 +27,10 @@ type FakeNetworkingV1alpha1 struct {
 	*testing.Fake
 }
 
+func (c *FakeNetworkingV1alpha1) Networks(namespace string) v1alpha1.NetworkInterface {
+	return &FakeNetworks{c, namespace}
+}
+
 func (c *FakeNetworkingV1alpha1) NetworkInterfaces(namespace string) v1alpha1.NetworkInterfaceInterface {
 	return &FakeNetworkInterfaces{c, namespace}
 }

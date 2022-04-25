@@ -10,8 +10,56 @@
 </div>
 Resource Types:
 <ul><li>
+<a href="#networking.api.onmetal.de/v1alpha1.Network">Network</a>
+</li><li>
 <a href="#networking.api.onmetal.de/v1alpha1.NetworkInterface">NetworkInterface</a>
 </li></ul>
+<h3 id="networking.api.onmetal.de/v1alpha1.Network">Network
+</h3>
+<div>
+<p>Network is the Schema for the network API</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+networking.api.onmetal.de/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>Network</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="networking.api.onmetal.de/v1alpha1.NetworkInterface">NetworkInterface
 </h3>
 <div>
@@ -345,7 +393,9 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
+<a href="/api-reference/common/#ipam.onmetal.de/v1alpha1.PrefixSpec">
 github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixSpec
+</a>
 </em>
 </td>
 <td>
@@ -426,5 +476,4 @@ Kubernetes meta/v1.LabelSelector
 <hr/>
 <p><em>
 Generated with <code>gen-crd-api-reference-docs</code>
-on git commit <code>965c4f3</code>.
 </em></p>
