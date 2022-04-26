@@ -54,6 +54,10 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&VirtualIPList{},
 		&VirtualIPRouting{},
 		&VirtualIPRoutingList{},
+		&AliasPrefix{},
+		&AliasPrefixList{},
+		&AliasPrefixRouting{},
+		&AliasPrefixRoutingList{},
 	)
 	return nil
 }

@@ -18,7 +18,6 @@ package v1alpha1
 
 import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
-	ipamv1alpha1 "github.com/onmetal/onmetal-api/apis/ipam/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -39,10 +38,6 @@ type NetworkInterfaceSpec struct {
 type IPSource struct {
 	Value           *commonv1alpha1.IP     `json:"value,omitempty"`
 	EphemeralPrefix *EphemeralPrefixSource `json:"ephemeralPrefix,omitempty"`
-}
-
-type EphemeralPrefixSource struct {
-	PrefixTemplate *ipamv1alpha1.PrefixTemplateSpec `json:"prefixTemplate,omitempty"`
 }
 
 // NetworkInterfaceStatus defines the observed state of NetworkInterface

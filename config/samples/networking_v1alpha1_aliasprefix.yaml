@@ -1,0 +1,20 @@
+apiVersion: networking.api.onmetal.de/v1alpha1
+kind: AliasPrefix
+metadata:
+  namespace: default
+  name: aliasprefix-sample
+spec:
+  networkRef:
+    name: network-sample
+#  networkInterfaceSelector:
+#    matchLabels:
+#      foo: bar
+  prefix:
+    #    value: 10.0.0.0/24 # It's possible to directly specify the AliasPrefix value
+    ephemeralPrefix:
+      spec:
+        parentRef:
+          name: prefix-sample
+        prefixLength: 24
+#status:
+#  prefix: 10.0.0.0/24

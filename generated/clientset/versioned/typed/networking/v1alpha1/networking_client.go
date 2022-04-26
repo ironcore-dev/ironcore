@@ -27,6 +27,8 @@ import (
 
 type NetworkingV1alpha1Interface interface {
 	RESTClient() rest.Interface
+	AliasPrefixesGetter
+	AliasPrefixRoutingsGetter
 	NetworksGetter
 	NetworkInterfacesGetter
 	NetworkInterfaceBindingsGetter
@@ -37,6 +39,14 @@ type NetworkingV1alpha1Interface interface {
 // NetworkingV1alpha1Client is used to interact with features provided by the networking.api.onmetal.de group.
 type NetworkingV1alpha1Client struct {
 	restClient rest.Interface
+}
+
+func (c *NetworkingV1alpha1Client) AliasPrefixes(namespace string) AliasPrefixInterface {
+	return newAliasPrefixes(c, namespace)
+}
+
+func (c *NetworkingV1alpha1Client) AliasPrefixRoutings(namespace string) AliasPrefixRoutingInterface {
+	return newAliasPrefixRoutings(c, namespace)
 }
 
 func (c *NetworkingV1alpha1Client) Networks(namespace string) NetworkInterface {

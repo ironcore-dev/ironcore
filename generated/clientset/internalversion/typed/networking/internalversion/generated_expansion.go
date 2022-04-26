@@ -17,6 +17,10 @@
 
 package internalversion
 
+type AliasPrefixExpansion interface{}
+
+type AliasPrefixRoutingExpansion interface{}
+
 type NetworkExpansion interface{}
 
 type NetworkInterfaceExpansion interface{}

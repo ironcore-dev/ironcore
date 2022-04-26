@@ -11,11 +11,11 @@ spec:
   #    - value: 2607:f0d0:1002:51::4 # Same applies for v6 addresses
   #    - ephemeralIP:
   #        spec:
-  #          prefixRef:
+  #          parentRef:
   #            name: my-node-prefix-v4
   #    - ephemeralIP:
   #        spec:
-  #          prefixRef:
+  #          parentRef:
   #            name: my-node-prefix-v6
   machineRef:
     name: machine-sample
