@@ -2920,13 +2920,6 @@ func schema_onmetal_api_apis_storage_v1alpha1_VolumeCondition(ref common.Referen
 							Format:      "int64",
 						},
 					},
-					"lastUpdateTime": {
-						SchemaProps: spec.SchemaProps{
-							Description: "LastUpdateTime is the last time a condition has been updated.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
-						},
-					},
 					"lastTransitionTime": {
 						SchemaProps: spec.SchemaProps{
 							Description: "LastTransitionTime is the last time the status of a condition has transitioned from one state to another.",
@@ -3365,13 +3358,6 @@ func schema_onmetal_api_apis_storage_v1alpha1_VolumeStatus(ref common.ReferenceC
 					"state": {
 						SchemaProps: spec.SchemaProps{
 							Description: "State represents the infrastructure state of a Volume.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"phase": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Phase represents the VolumeClaim binding phase of a Volume.",
 							Type:        []string{"string"},
 							Format:      "",
 						},

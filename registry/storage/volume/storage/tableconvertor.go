@@ -70,12 +70,12 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 			cells = append(cells, "<none>")
 		}
 		cells = append(cells, volume.Spec.VolumeClassRef.Name)
-		if state := volume.Status.Phase; state != "" {
+		if state := volume.Status.State; state != "" {
 			cells = append(cells, state)
 		} else {
 			cells = append(cells, "<unknown>")
 		}
-		if phase := volume.Status.Phase; phase != "" {
+		if phase := storage.GetVolumePhase(volume); phase != "" {
 			cells = append(cells, phase)
 		} else {
 			cells = append(cells, "<unknown>")
