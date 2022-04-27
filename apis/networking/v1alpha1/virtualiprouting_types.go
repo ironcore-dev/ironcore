@@ -39,15 +39,21 @@ type LocalUIDReference struct {
 	// Name is the name of the referenced entity.
 	Name string `json:"name"`
 	// UID is the UID of the referenced entity.
-	UID types.UID
+	UID types.UID `json:"uid"`
 }
 
 // VirtualIPRoutingSubset is one of the targets of a VirtualIPRouting.
 type VirtualIPRoutingSubset struct {
-	// IP is the IP of the entity routed towards.
+	// NetworkRef is the network all targets are in.
+	NetworkRef LocalUIDReference `json:"networkRef"`
+	// Targets are the targets of the virtual IP.
+	Targets []VirtualIPRoutingSubsetTarget `json:"targets"`
+}
+
+type VirtualIPRoutingSubsetTarget struct {
+	LocalUIDReference `json:",inline"`
+	// IP is the target ip to route to.
 	IP commonv1alpha1.IP `json:"ip"`
-	// TargetRef is the targeted entity.
-	TargetRef LocalUIDReference `json:"targetRef"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

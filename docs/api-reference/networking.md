@@ -495,7 +495,7 @@ EphemeralPrefixSource
 <h3 id="networking.api.onmetal.de/v1alpha1.LocalUIDReference">LocalUIDReference
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.VirtualIPRoutingSubset">VirtualIPRoutingSubset</a>)
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.VirtualIPRoutingSubset">VirtualIPRoutingSubset</a>, <a href="#networking.api.onmetal.de/v1alpha1.VirtualIPRoutingSubsetTarget">VirtualIPRoutingSubsetTarget</a>)
 </p>
 <div>
 <p>LocalUIDReference is a reference to another entity including its UID.</p>
@@ -521,7 +521,7 @@ string
 </tr>
 <tr>
 <td>
-<code>UID</code><br/>
+<code>uid</code><br/>
 <em>
 k8s.io/apimachinery/pkg/types.UID
 </em>
@@ -653,6 +653,64 @@ IPs represent the effective IP addresses of the NetworkInterface</p>
 <tbody>
 <tr>
 <td>
+<code>networkRef</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.LocalUIDReference">
+LocalUIDReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef is the network all targets are in.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>targets</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPRoutingSubsetTarget">
+[]VirtualIPRoutingSubsetTarget
+</a>
+</em>
+</td>
+<td>
+<p>Targets are the targets of the virtual IP.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.VirtualIPRoutingSubsetTarget">VirtualIPRoutingSubsetTarget
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.VirtualIPRoutingSubset">VirtualIPRoutingSubset</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>LocalUIDReference</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.LocalUIDReference">
+LocalUIDReference
+</a>
+</em>
+</td>
+<td>
+<p>
+(Members of <code>LocalUIDReference</code> are embedded into this type.)
+</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>ip</code><br/>
 <em>
 <a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
@@ -661,20 +719,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
 </em>
 </td>
 <td>
-<p>IP is the IP of the entity routed towards.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>targetRef</code><br/>
-<em>
-<a href="#networking.api.onmetal.de/v1alpha1.LocalUIDReference">
-LocalUIDReference
-</a>
-</em>
-</td>
-<td>
-<p>TargetRef is the targeted entity.</p>
+<p>IP is the target ip to route to.</p>
 </td>
 </tr>
 </tbody>

@@ -44,40 +44,44 @@ var _ = Describe("VirtualIPRouting", func() {
 			&networking.VirtualIPRouting{ObjectMeta: metav1.ObjectMeta{Name: "foo*"}},
 			ContainElement(InvalidField("metadata.name")),
 		),
-		Entry("invalid subset ip",
+		Entry("subset with no targets",
 			&networking.VirtualIPRouting{
 				Subsets: []networking.VirtualIPRoutingSubset{{}},
 			},
-			ContainElement(InvalidField("subsets[0].ip")),
+			ContainElement(InvalidField("subsets[0]")),
 		),
-		Entry("missing subset ref name",
+		Entry("missing subset network ref name",
 			&networking.VirtualIPRouting{
 				Subsets: []networking.VirtualIPRoutingSubset{{}},
 			},
-			ContainElement(RequiredField("subsets[0].targetRef.name")),
+			ContainElement(RequiredField("subsets[0].networkRef.name")),
 		),
-		Entry("invalid subset ref name",
+		Entry("invalid subset network ref name",
 			&networking.VirtualIPRouting{
 				Subsets: []networking.VirtualIPRoutingSubset{{
-					TargetRef: networking.LocalUIDReference{Name: "foo*"},
+					NetworkRef: networking.LocalUIDReference{Name: "foo*"},
 				}},
 			},
-			ContainElement(InvalidField("subsets[0].targetRef.name")),
+			ContainElement(InvalidField("subsets[0].networkRef.name")),
 		),
-		Entry("duplicate subset entry",
+		Entry("duplicate subset target entry",
 			&networking.VirtualIPRouting{
 				Subsets: []networking.VirtualIPRoutingSubset{
 					{
-						IP:        commonv1alpha1.MustParseIP("10.0.0.1"),
-						TargetRef: networking.LocalUIDReference{Name: "foo*"},
-					},
-					{
-						IP:        commonv1alpha1.MustParseIP("10.0.0.1"),
-						TargetRef: networking.LocalUIDReference{Name: "foo*"},
+						Targets: []networking.VirtualIPRoutingSubsetTarget{
+							{
+								IP:                commonv1alpha1.MustParseIP("10.0.0.1"),
+								LocalUIDReference: networking.LocalUIDReference{Name: "foo"},
+							},
+							{
+								IP:                commonv1alpha1.MustParseIP("10.0.0.1"),
+								LocalUIDReference: networking.LocalUIDReference{Name: "foo"},
+							},
+						},
 					},
 				},
 			},
-			ContainElement(DuplicateField("subsets[1]")),
+			ContainElement(DuplicateField("subsets[0].targets[1]")),
 		),
 	)
 
