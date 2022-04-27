@@ -21,6 +21,8 @@ type NetworkExpansion interface{}
 
 type NetworkInterfaceExpansion interface{}
 
+type NetworkInterfaceBindingExpansion interface{}
+
 type VirtualIPExpansion interface{}
 
 type VirtualIPRoutingExpansion interface{}

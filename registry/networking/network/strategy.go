@@ -104,7 +104,7 @@ var StatusStrategy = networkStatusStrategy{Strategy}
 
 func (networkStatusStrategy) GetResetFields() map[fieldpath.APIVersion]*fieldpath.Set {
 	return map[fieldpath.APIVersion]*fieldpath.Set{
-		"compute.api.onmetal.de/v1alpha1": fieldpath.NewSet(
+		"networking.api.onmetal.de/v1alpha1": fieldpath.NewSet(
 			fieldpath.MakePathOrDie("spec"),
 		),
 	}

@@ -28,6 +28,7 @@ type NetworkingInterface interface {
 	RESTClient() rest.Interface
 	NetworksGetter
 	NetworkInterfacesGetter
+	NetworkInterfaceBindingsGetter
 	VirtualIPsGetter
 	VirtualIPRoutingsGetter
 }
@@ -43,6 +44,10 @@ func (c *NetworkingClient) Networks(namespace string) NetworkInterface {
 
 func (c *NetworkingClient) NetworkInterfaces(namespace string) NetworkInterfaceInterface {
 	return newNetworkInterfaces(c, namespace)
+}
+
+func (c *NetworkingClient) NetworkInterfaceBindings(namespace string) NetworkInterfaceBindingInterface {
+	return newNetworkInterfaceBindings(c, namespace)
 }
 
 func (c *NetworkingClient) VirtualIPs(namespace string) VirtualIPInterface {

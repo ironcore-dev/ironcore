@@ -73,6 +73,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().InternalVersion().Networks().Informer()}, nil
 	case networking.SchemeGroupVersion.WithResource("networkinterfaces"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().InternalVersion().NetworkInterfaces().Informer()}, nil
+	case networking.SchemeGroupVersion.WithResource("networkinterfacebindings"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().InternalVersion().NetworkInterfaceBindings().Informer()}, nil
 	case networking.SchemeGroupVersion.WithResource("virtualips"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().InternalVersion().VirtualIPs().Informer()}, nil
 	case networking.SchemeGroupVersion.WithResource("virtualiproutings"):

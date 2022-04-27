@@ -17,7 +17,6 @@ package storage
 import (
 	"context"
 
-	"github.com/onmetal/onmetal-api/apis/compute"
 	"github.com/onmetal/onmetal-api/apis/networking"
 	"github.com/onmetal/onmetal-api/registry/networking/network"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -50,7 +49,7 @@ func NewStorage(optsGetter generic.RESTOptionsGetter) (NetworkStorage, error) {
 			return &networking.NetworkList{}
 		},
 		PredicateFunc:            network.MatchNetwork,
-		DefaultQualifiedResource: compute.Resource("networks"),
+		DefaultQualifiedResource: networking.Resource("networks"),
 
 		CreateStrategy: network.Strategy,
 		UpdateStrategy: network.Strategy,
