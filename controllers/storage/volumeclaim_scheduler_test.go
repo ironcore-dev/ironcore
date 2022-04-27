@@ -211,22 +211,18 @@ var _ = Describe("VolumeClaimScheduler", func() {
 		Expect(k8sClient.Create(ctx, volume)).To(Succeed(), "failed to create volume")
 
 		By("patching the volume status to available")
-		volumeBase := volume.DeepCopy()
 		volume.Status.State = storagev1alpha1.VolumeStateAvailable
-		Expect(k8sClient.Status().Patch(ctx, volume, client.MergeFrom(volumeBase))).
-			To(Succeed(), "failed to patch volume status")
+		Expect(k8sClient.Status().Update(ctx, volume)).To(Succeed())
 
 		By("creating a 10Gi volume")
 		Expect(k8sClient.Create(ctx, volume2)).To(Succeed(), "failed to create volume")
 
 		By("patching the volume status to available")
-		volumeBase2 := volume2.DeepCopy()
 		volume2.Status.State = storagev1alpha1.VolumeStateAvailable
-		Expect(k8sClient.Status().Patch(ctx, volume2, client.MergeFrom(volumeBase2))).
-			To(Succeed(), "failed to patch volume status")
+		Expect(k8sClient.Status().Update(ctx, volume2)).To(Succeed())
 
-		By("creating a volumeclaim which should claim the matching volume")
-		Expect(k8sClient.Create(ctx, volumeClaim)).To(Succeed(), "failed to create volumeclaim")
+		By("creating a volume claim which should claim the matching volume")
+		Expect(k8sClient.Create(ctx, volumeClaim)).To(Succeed(), "failed to create volume claim")
 
 		By("waiting for the correct volume to reference the claim")
 		volumeKey := client.ObjectKeyFromObject(volume)

@@ -15,6 +15,8 @@
 package storage
 
 import (
+	"time"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -228,7 +230,7 @@ var _ = Describe("VolumeScheduler", func() {
 		Consistently(func() string {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed())
 			return volume.Spec.VolumePoolRef.Name
-		}, timeout, interval).Should(BeEmpty())
+		}, 1*time.Second, interval).Should(BeEmpty())
 
 		By("patching the volume to contain only one of the corresponding tolerations")
 		volumeBase := volume.DeepCopy()
@@ -244,7 +246,7 @@ var _ = Describe("VolumeScheduler", func() {
 		Consistently(func() string {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed())
 			return volume.Spec.VolumePoolRef.Name
-		}, timeout, interval).Should(BeEmpty())
+		}, 1*time.Second, interval).Should(BeEmpty())
 
 		By("patching the volume to contain all of the corresponding tolerations")
 		volumeBase = volume.DeepCopy()
@@ -259,6 +261,6 @@ var _ = Describe("VolumeScheduler", func() {
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get the volume")
 			g.Expect(volume.Spec.VolumePoolRef.Name).To(Equal(taintedVolumePool.Name))
-		}).Should(Succeed())
+		}, timeout, interval).Should(Succeed())
 	})
 })

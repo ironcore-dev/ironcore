@@ -70,8 +70,6 @@ type ClaimReference struct {
 type VolumeStatus struct {
 	// State represents the infrastructure state of a Volume.
 	State VolumeState
-	// Phase represents the VolumeClaim binding phase of a Volume.
-	Phase VolumePhase
 	// Conditions represents different status aspects of a Volume.
 	Conditions []VolumeCondition
 	// Access specifies how to access a Volume.
@@ -79,26 +77,68 @@ type VolumeStatus struct {
 	Access *VolumeAccess
 }
 
-// VolumePhase represents the VolumeClaim binding phase of a Volume
-// +kubebuilder:validation:Enum=Pending;Available;Bound;Failed
+const (
+	// VolumeBoundReasonUnbound is used for any Volume that is not bound.
+	VolumeBoundReasonUnbound = "Unbound"
+	// VolumeBoundReasonPending is used for any Volume that is not available.
+	VolumeBoundReasonPending = "Pending"
+	// VolumeBoundReasonBound is used for any Volume that is bound.
+	VolumeBoundReasonBound = "Bound"
+)
+
+// VolumePhase is the binding phase of a volume.
 type VolumePhase string
 
 const (
-	// VolumePending is used for Volumes that are not available.
-	VolumePending VolumePhase = "Pending"
-	// VolumeAvailable is used for Volumes that are not yet bound
-	// Available volumes are held by the binder and matched to VolumeClaims.
-	VolumeAvailable VolumePhase = "Available"
-	// VolumeBound is used for Volumes that are bound.
-	VolumeBound VolumePhase = "Bound"
-	// VolumeFailed is used for Volumes that failed to be correctly freed from a VolumeClaim.
-	VolumeFailed VolumePhase = "Failed"
+	// VolumePhaseUnknown is used for any Volume for which it is unknown whether it can be used for binding.
+	VolumePhaseUnknown VolumePhase = "Unknown"
+	// VolumePhaseUnbound is used for any Volume that not bound.
+	VolumePhaseUnbound VolumePhase = "Unbound"
+	// VolumePhasePending is used for any Volume that is currently awaiting binding.
+	VolumePhasePending VolumePhase = "Pending"
+	// VolumePhaseBound is used for any Volume that is properly bound.
+	VolumePhaseBound VolumePhase = "Bound"
 )
+
+func FindVolumeCondition(conditions []VolumeCondition, conditionType VolumeConditionType) (VolumeCondition, int) {
+	for i, condition := range conditions {
+		if condition.Type == conditionType {
+			return condition, i
+		}
+	}
+	return VolumeCondition{}, -1
+}
+
+func VolumePhaseFromBoundStatusAndReason(status corev1.ConditionStatus, reason string) VolumePhase {
+	switch {
+	case status == corev1.ConditionFalse && reason == VolumeBoundReasonPending:
+		return VolumePhasePending
+	case status == corev1.ConditionFalse && reason == VolumeBoundReasonUnbound:
+		return VolumePhaseUnbound
+	case status == corev1.ConditionTrue:
+		return VolumePhaseBound
+	default:
+		return VolumePhaseUnknown
+	}
+}
+
+func GetVolumePhaseAndCondition(volume *Volume) (VolumePhase, VolumeCondition, int) {
+	cond, idx := FindVolumeCondition(volume.Status.Conditions, VolumeBound)
+	phase := VolumePhaseFromBoundStatusAndReason(cond.Status, cond.Reason)
+	return phase, cond, idx
+}
+
+func GetVolumePhase(volume *Volume) VolumePhase {
+	phase, _, _ := GetVolumePhaseAndCondition(volume)
+	return phase
+}
 
 // VolumeState is a possible state a volume can be in.
 type VolumeState string
 
 const (
+	// VolumeStateUnknown reports whether a Volume is in an unknown state.
+	VolumeStateUnknown VolumeState = "Unknown"
 	// VolumeStateAvailable reports whether the volume is available to be used.
 	VolumeStateAvailable VolumeState = "Available"
 	// VolumeStatePending reports whether the volume is about to be ready.
@@ -113,6 +153,9 @@ type VolumeConditionType string
 const (
 	// VolumeSynced represents the condition of a volume being synced with its backing resources
 	VolumeSynced VolumeConditionType = "Synced"
+
+	// VolumeBound represents the binding state of a Volume.
+	VolumeBound VolumeConditionType = "Bound"
 )
 
 // VolumeCondition is one of the conditions of a volume.
@@ -127,8 +170,6 @@ type VolumeCondition struct {
 	Message string
 	// ObservedGeneration represents the .metadata.generation that the condition was set based upon.
 	ObservedGeneration int64
-	// LastUpdateTime is the last time a condition has been updated.
-	LastUpdateTime metav1.Time
 	// LastTransitionTime is the last time the status of a condition has transitioned from one state to another.
 	LastTransitionTime metav1.Time
 }

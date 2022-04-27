@@ -27,6 +27,7 @@ import (
 	"github.com/onmetal/onmetal-api/testutils/apiserverbin"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
@@ -138,7 +139,7 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 		// register reconciler here
 		Expect((&VolumeClaimScheduler{
 			Client:        k8sManager.GetClient(),
-			EventRecorder: k8sManager.GetEventRecorderFor("volume-claim-scheduler"),
+			EventRecorder: &record.FakeRecorder{},
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		Expect((&VolumeReconciler{
@@ -146,6 +147,7 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 			APIReader:          k8sManager.GetAPIReader(),
 			Scheme:             k8sManager.GetScheme(),
 			SharedFieldIndexer: fieldIndexer,
+			BoundTimeout:       1 * time.Second,
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		Expect((&VolumeClaimReconciler{
@@ -157,7 +159,7 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 
 		Expect((&VolumeScheduler{
 			Client: k8sManager.GetClient(),
-			Events: k8sManager.GetEventRecorderFor("volume-scheduler"),
+			Events: &record.FakeRecorder{},
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		Expect((&VolumeClassReconciler{

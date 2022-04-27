@@ -79,12 +79,14 @@ func main() {
 	var enableLeaderElection bool
 	var probeAddr string
 	var prefixAllocationTimeout time.Duration
+	var volumeBoundTimeout time.Duration
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
 	flag.DurationVar(&prefixAllocationTimeout, "prefix-allocation-timeout", 1*time.Second, "Time to wait until considering a pending allocation failed.")
+	flag.DurationVar(&volumeBoundTimeout, "volume-bound-timeout", 10*time.Second, "Time to wait until considering a volume bind to be failed.")
 
 	controllers := switches.New(
 		machineClassController, machinePoolController, machineSchedulerController, machineController,
@@ -173,6 +175,7 @@ func main() {
 			APIReader:          mgr.GetAPIReader(),
 			Scheme:             mgr.GetScheme(),
 			SharedFieldIndexer: sharedStorageFieldIndexer,
+			BoundTimeout:       volumeBoundTimeout,
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "Volume")
 			os.Exit(1)

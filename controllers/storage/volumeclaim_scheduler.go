@@ -146,6 +146,10 @@ func (s *VolumeClaimScheduler) reconcile(ctx context.Context, log logr.Logger, v
 func (s *VolumeClaimScheduler) findVolumeForClaim(volumes []storagev1alpha1.Volume, claim *storagev1alpha1.VolumeClaim) *storagev1alpha1.Volume {
 	var matchingVolume *storagev1alpha1.Volume
 	for _, vol := range volumes {
+		if !vol.DeletionTimestamp.IsZero() {
+			continue
+		}
+
 		if claimRefName := vol.Spec.ClaimRef.Name; claimRefName != "" {
 			if claimRefName != claim.Name {
 				continue
@@ -158,6 +162,7 @@ func (s *VolumeClaimScheduler) findVolumeForClaim(volumes []storagev1alpha1.Volu
 			vol := vol
 			return &vol
 		}
+
 		if !s.volumeSatisfiesClaim(&vol, claim) {
 			continue
 		}
@@ -199,22 +204,27 @@ func (s *VolumeClaimScheduler) SetupWithManager(mgr ctrl.Manager) error {
 					claim := &storagev1alpha1.VolumeClaim{}
 					claimKey := client.ObjectKey{Namespace: volume.Namespace, Name: claimName}
 					if err := s.Get(ctx, claimKey, claim); err != nil {
-						log.Error(err, "failed to get claim referenced by volume", "VolumeClaimRef", claimKey)
+						if !apierrors.IsNotFound(err) {
+							log.Error(err, "Failed to get claim referenced by volume", "VolumeClaimRef", claimKey)
+							return nil
+						}
+
+						log.V(1).Info("Claim referenced by volume does not exist", "VolumeClaimRef", claimKey)
 						return nil
 					}
+
 					if claim.Spec.VolumeRef.Name != "" {
 						return nil
 					}
-					log.V(1).Info("enqueueing claim that has already been accepted by its volume", "VolumeClaimRef", claimKey)
-					return []ctrl.Request{
-						{NamespacedName: claimKey},
-					}
+					log.V(1).Info("Enqueueing claim that has already been accepted by its volume", "VolumeClaimRef", claimKey)
+					return []ctrl.Request{{NamespacedName: claimKey}}
 				}
+
 				volumeClaims := &storagev1alpha1.VolumeClaimList{}
 				if err := s.List(ctx, volumeClaims, client.InNamespace(volume.Namespace), client.MatchingFields{
 					VolumeClaimSpecVolumeRefNameField: "",
 				}); err != nil {
-					log.Error(err, "could not list empty VolumeClaims", "Namespace", volume.Namespace)
+					log.Error(err, "Could not list empty VolumeClaims", "Namespace", volume.Namespace)
 					return nil
 				}
 				var requests []ctrl.Request
