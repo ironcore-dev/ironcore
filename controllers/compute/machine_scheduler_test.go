@@ -15,7 +15,8 @@
 package compute
 
 import (
-	. "github.com/onsi/ginkgo"
+	"github.com/onmetal/onmetal-api/testutils"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -26,6 +27,7 @@ import (
 )
 
 var _ = Describe("MachineScheduler", func() {
+	ctx := testutils.SetupContext()
 	ns := SetupTest(ctx)
 
 	It("should schedule machines on machine pools", func() {
@@ -219,7 +221,7 @@ var _ = Describe("MachineScheduler", func() {
 		Consistently(func() string {
 			Expect(k8sClient.Get(ctx, machineKey, machine)).To(Succeed())
 			return machine.Spec.MachinePoolRef.Name
-		}, timeout, interval).Should(BeEmpty())
+		}).Should(BeEmpty())
 
 		By("patching the machine to contain only one of the corresponding tolerations")
 		machineBase := machine.DeepCopy()
@@ -235,7 +237,7 @@ var _ = Describe("MachineScheduler", func() {
 		Consistently(func() string {
 			Expect(k8sClient.Get(ctx, machineKey, machine)).To(Succeed())
 			return machine.Spec.MachinePoolRef.Name
-		}, timeout, interval).Should(BeEmpty())
+		}).Should(BeEmpty())
 
 		By("patching the machine to contain all of the corresponding tolerations")
 		machineBase = machine.DeepCopy()

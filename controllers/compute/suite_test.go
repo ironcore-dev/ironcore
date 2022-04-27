@@ -24,7 +24,7 @@ import (
 	"github.com/onmetal/onmetal-api/envtestutils"
 	"github.com/onmetal/onmetal-api/envtestutils/apiserver"
 	"github.com/onmetal/onmetal-api/testutils/apiserverbin"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -45,13 +45,12 @@ import (
 // http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
 
 const (
-	interval = 50 * time.Millisecond
-	timeout  = 3 * time.Second
+	pollingInterval      = 50 * time.Millisecond
+	eventuallyTimeout    = 3 * time.Second
+	consistentlyDuration = 1 * time.Second
 )
 
 var (
-	ctx, cancel = context.WithCancel(context.Background())
-
 	cfg        *rest.Config
 	k8sClient  client.Client
 	testEnv    *envtest.Environment
@@ -59,6 +58,13 @@ var (
 )
 
 func TestAPIs(t *testing.T) {
+	_, reporterConfig := GinkgoConfiguration()
+	reporterConfig.SlowSpecThreshold = 10 * time.Second
+	SetDefaultConsistentlyPollingInterval(pollingInterval)
+	SetDefaultEventuallyPollingInterval(pollingInterval)
+	SetDefaultEventuallyTimeout(eventuallyTimeout)
+	SetDefaultConsistentlyDuration(consistentlyDuration)
+
 	RegisterFailHandler(Fail)
 
 	RunSpecs(t, "Compute Controller Suite")
@@ -79,6 +85,7 @@ var _ = BeforeSuite(func() {
 	cfg, err = envtestutils.StartWithExtensions(testEnv, testEnvExt)
 	Expect(err).NotTo(HaveOccurred())
 	Expect(cfg).NotTo(BeNil())
+	DeferCleanup(envtestutils.StopWithExtensions, testEnv, testEnvExt)
 
 	Expect(computev1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
 	Expect(ipamv1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
@@ -98,15 +105,17 @@ var _ = BeforeSuite(func() {
 	})
 	Expect(err).NotTo(HaveOccurred())
 
+	ctx, cancel := context.WithCancel(context.Background())
+	DeferCleanup(cancel)
 	go func() {
 		defer GinkgoRecover()
 		err := apiSrv.Start(ctx)
 		Expect(err).NotTo(HaveOccurred())
 	}()
 
-	err = envtestutils.WaitUntilAPIServicesReadyWithTimeout(30*time.Second, testEnvExt, k8sClient, scheme.Scheme)
+	err = envtestutils.WaitUntilAPIServicesReadyWithTimeout(60*time.Second, testEnvExt, k8sClient, scheme.Scheme)
 	Expect(err).NotTo(HaveOccurred())
-}, 60)
+})
 
 // SetupTest returns a namespace which will be created before each ginkgo `It` block and deleted at the end of `It`
 // so that each test case can run in an independent way
@@ -151,6 +160,7 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		go func() {
+			defer GinkgoRecover()
 			Expect(k8sManager.Start(mgrCtx)).To(Succeed(), "failed to start manager")
 		}()
 	})
@@ -163,10 +173,3 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 
 	return ns
 }
-
-var _ = AfterSuite(func() {
-	cancel()
-	By("tearing down the test environment")
-	err := envtestutils.StopWithExtensions(testEnv, testEnvExt)
-	Expect(err).NotTo(HaveOccurred())
-})

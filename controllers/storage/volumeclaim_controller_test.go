@@ -18,7 +18,8 @@ package storage
 
 import (
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
-	. "github.com/onsi/ginkgo"
+	"github.com/onmetal/onmetal-api/testutils"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -27,6 +28,7 @@ import (
 )
 
 var _ = Describe("VolumeClaimReconciler", func() {
+	ctx := testutils.SetupContext()
 	ns := SetupTest(ctx)
 
 	var volume *storagev1alpha1.Volume
@@ -85,7 +87,7 @@ var _ = Describe("VolumeClaimReconciler", func() {
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, claimKey, volumeClaim)).To(Succeed(), "failed to get volumeclaim")
 			g.Expect(volumeClaim.Status.Phase).To(Equal(storagev1alpha1.VolumeClaimBound))
-		}, timeout, interval).Should(Succeed())
+		}).Should(Succeed())
 	})
 
 	It("Should un-bind a volumeclaim if the underlying volume is deleted", func() {
@@ -107,7 +109,7 @@ var _ = Describe("VolumeClaimReconciler", func() {
 			Expect(k8sClient.Get(ctx, volumeClaimKey, volumeClaim)).To(Succeed(), "failed to get volumeclaim")
 			g.Expect(volumeClaim.Spec.VolumeRef.Name).To(Equal(volume.Name))
 			g.Expect(volumeClaim.Status.Phase).To(Equal(storagev1alpha1.VolumeClaimBound))
-		}, timeout, interval).Should(Succeed())
+		}).Should(Succeed())
 
 		By("deleting the volume")
 		Expect(k8sClient.Delete(ctx, volume)).To(Succeed(), "failed to delete volume")
@@ -116,6 +118,6 @@ var _ = Describe("VolumeClaimReconciler", func() {
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeClaimKey, volumeClaim)).To(Succeed(), "failed to get volumeclaim")
 			g.Expect(volumeClaim.Status.Phase).To(Equal(storagev1alpha1.VolumeClaimLost))
-		}, timeout, interval).Should(Succeed())
+		}).Should(Succeed())
 	})
 })

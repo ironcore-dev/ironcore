@@ -24,8 +24,7 @@ import (
 	"github.com/onmetal/onmetal-api/envtestutils"
 	"github.com/onmetal/onmetal-api/envtestutils/apiserver"
 	"github.com/onmetal/onmetal-api/testutils/apiserverbin"
-	. "github.com/onsi/ginkgo"
-	"github.com/onsi/ginkgo/config"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -41,20 +40,24 @@ import (
 )
 
 const (
-	interval = 50 * time.Millisecond
-	timeout  = 2 * time.Second
+	pollingInterval      = 50 * time.Millisecond
+	eventuallyTimeout    = 3 * time.Second
+	consistentlyDuration = 1 * time.Second
 )
 
 var (
-	ctx, cancel = context.WithCancel(context.Background())
-
 	k8sClient  client.Client
 	testEnv    *envtest.Environment
 	testEnvExt *envtestutils.EnvironmentExtensions
 )
 
 func TestAPIs(t *testing.T) {
-	config.DefaultReporterConfig.SlowSpecThreshold = 10 * time.Second.Seconds()
+	_, reporterConfig := GinkgoConfiguration()
+	reporterConfig.SlowSpecThreshold = 10 * time.Second
+	SetDefaultConsistentlyPollingInterval(pollingInterval)
+	SetDefaultEventuallyPollingInterval(pollingInterval)
+	SetDefaultEventuallyTimeout(eventuallyTimeout)
+	SetDefaultConsistentlyDuration(consistentlyDuration)
 	RegisterFailHandler(Fail)
 
 	RunSpecs(t, "IPAM Controller Suite")
@@ -74,6 +77,8 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 	Expect(cfg).NotTo(BeNil())
 
+	DeferCleanup(envtestutils.StopWithExtensions, testEnv, testEnvExt)
+
 	Expect(ipamv1alpha1.AddToScheme(scheme.Scheme)).Should(Succeed())
 
 	// Init package-level k8sClient
@@ -90,13 +95,15 @@ var _ = BeforeSuite(func() {
 	})
 	Expect(err).NotTo(HaveOccurred())
 
+	ctx, cancel := context.WithCancel(context.Background())
+	DeferCleanup(cancel)
 	go func() {
 		defer GinkgoRecover()
 		err := apiSrv.Start(ctx)
 		Expect(err).NotTo(HaveOccurred())
 	}()
 
-	Expect(envtestutils.WaitUntilAPIServicesReadyWithTimeout(30*time.Second, testEnvExt, k8sClient, scheme.Scheme)).To(Succeed())
+	Expect(envtestutils.WaitUntilAPIServicesReadyWithTimeout(60*time.Second, testEnvExt, k8sClient, scheme.Scheme)).To(Succeed())
 
 	k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
 		Scheme:             scheme.Scheme,
@@ -126,9 +133,9 @@ var _ = BeforeSuite(func() {
 		err = k8sManager.Start(ctx)
 		Expect(err).ToNot(HaveOccurred())
 	}()
-}, 60)
+})
 
-func SetupTest() *corev1.Namespace {
+func SetupTest(ctx context.Context) *corev1.Namespace {
 	ns := &corev1.Namespace{}
 
 	BeforeEach(func() {
@@ -136,18 +143,9 @@ func SetupTest() *corev1.Namespace {
 			ObjectMeta: metav1.ObjectMeta{GenerateName: "testns-"},
 		}
 		Expect(k8sClient.Create(ctx, ns)).NotTo(HaveOccurred(), "failed to create test namespace")
-	})
 
-	AfterEach(func() {
-		Expect(k8sClient.Delete(ctx, ns)).NotTo(HaveOccurred(), "failed to delete test namespace")
+		DeferCleanup(k8sClient.Delete, ctx, ns)
 	})
 
 	return ns
 }
-
-var _ = AfterSuite(func() {
-	cancel()
-	By("tearing down the test environment")
-	err := envtestutils.StopWithExtensions(testEnv, testEnvExt)
-	Expect(err).NotTo(HaveOccurred())
-})
