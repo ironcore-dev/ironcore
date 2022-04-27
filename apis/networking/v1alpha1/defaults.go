@@ -14,7 +14,17 @@
 
 package v1alpha1
 
-import "k8s.io/apimachinery/pkg/runtime"
+import (
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+)
+
+var (
+	ipFamilyToPrefixLength = map[corev1.IPFamily]int32{
+		corev1.IPv4Protocol: 32,
+		corev1.IPv6Protocol: 128,
+	}
+)
 
 func addDefaultingFuncs(scheme *runtime.Scheme) error {
 	return RegisterDefaults(scheme)
@@ -35,15 +45,22 @@ func SetDefaults_NetworkInterfaceSpec(spec *NetworkInterfaceSpec) {
 				}
 			}
 		}
-	} else {
-		if len(spec.IPs) > 0 {
-			for _, ip := range spec.IPs {
-				switch {
-				case ip.Value != nil:
-					spec.IPFamilies = append(spec.IPFamilies, ip.Value.Family())
-				case ip.EphemeralPrefix != nil && ip.EphemeralPrefix.PrefixTemplate != nil:
-					spec.IPFamilies = append(spec.IPFamilies, ip.EphemeralPrefix.PrefixTemplate.Spec.IPFamily)
-				}
+	} else if len(spec.IPs) > 0 {
+		for _, ip := range spec.IPs {
+			switch {
+			case ip.Value != nil:
+				spec.IPFamilies = append(spec.IPFamilies, ip.Value.Family())
+			case ip.EphemeralPrefix != nil && ip.EphemeralPrefix.PrefixTemplate != nil:
+				spec.IPFamilies = append(spec.IPFamilies, ip.EphemeralPrefix.PrefixTemplate.Spec.IPFamily)
+			}
+		}
+	}
+
+	for _, ip := range spec.IPs {
+		if ip.EphemeralPrefix != nil && ip.EphemeralPrefix.PrefixTemplate != nil {
+			templateSpec := ip.EphemeralPrefix.PrefixTemplate.Spec
+			if templateSpec.Prefix == nil && templateSpec.PrefixLength == 0 {
+				templateSpec.PrefixLength = ipFamilyToPrefixLength[templateSpec.IPFamily]
 			}
 		}
 	}

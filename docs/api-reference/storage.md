@@ -754,19 +754,6 @@ int64
 </tr>
 <tr>
 <td>
-<code>lastUpdateTime</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
-Kubernetes meta/v1.Time
-</a>
-</em>
-</td>
-<td>
-<p>LastUpdateTime is the last time a condition has been updated.</p>
-</td>
-</tr>
-<tr>
-<td>
 <code>lastTransitionTime</code><br/>
 <em>
 <a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
@@ -795,18 +782,18 @@ Kubernetes meta/v1.Time
 <th>Description</th>
 </tr>
 </thead>
-<tbody><tr><td><p>&#34;Synced&#34;</p></td>
+<tbody><tr><td><p>&#34;Bound&#34;</p></td>
+<td><p>VolumeBound represents the binding state of a Volume.</p>
+</td>
+</tr><tr><td><p>&#34;Synced&#34;</p></td>
 <td><p>VolumeSynced represents the condition of a volume being synced with its backing resources</p>
 </td>
 </tr></tbody>
 </table>
 <h3 id="storage.api.onmetal.de/v1alpha1.VolumePhase">VolumePhase
 (<code>string</code> alias)</h3>
-<p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.VolumeStatus">VolumeStatus</a>)
-</p>
 <div>
-<p>VolumePhase represents the VolumeClaim binding phase of a Volume</p>
+<p>VolumePhase is the binding phase of a volume.</p>
 </div>
 <table>
 <thead>
@@ -815,18 +802,17 @@ Kubernetes meta/v1.Time
 <th>Description</th>
 </tr>
 </thead>
-<tbody><tr><td><p>&#34;Available&#34;</p></td>
-<td><p>VolumeAvailable is used for Volumes that are not yet bound
-Available volumes are held by the binder and matched to VolumeClaims.</p>
-</td>
-</tr><tr><td><p>&#34;Bound&#34;</p></td>
-<td><p>VolumeBound is used for Volumes that are bound.</p>
-</td>
-</tr><tr><td><p>&#34;Failed&#34;</p></td>
-<td><p>VolumeFailed is used for Volumes that failed to be correctly freed from a VolumeClaim.</p>
+<tbody><tr><td><p>&#34;Bound&#34;</p></td>
+<td><p>VolumePhaseBound is used for any Volume that is properly bound.</p>
 </td>
 </tr><tr><td><p>&#34;Pending&#34;</p></td>
-<td><p>VolumePending is used for Volumes that are not available.</p>
+<td><p>VolumePhasePending is used for any Volume that is currently awaiting binding.</p>
+</td>
+</tr><tr><td><p>&#34;Unbound&#34;</p></td>
+<td><p>VolumePhaseUnbound is used for any Volume that not bound.</p>
+</td>
+</tr><tr><td><p>&#34;Unknown&#34;</p></td>
+<td><p>VolumePhaseUnknown is used for any Volume for which it is unknown whether it can be used for binding.</p>
 </td>
 </tr></tbody>
 </table>
@@ -1199,13 +1185,16 @@ covered by Tolerations will be considered to host the Volume.</p>
 </tr>
 </thead>
 <tbody><tr><td><p>&#34;Available&#34;</p></td>
-<td><p>VolumeStateAvailable reports whether the volume is available to be used.</p>
+<td><p>VolumeStateAvailable reports whether a Volume is available to be used.</p>
 </td>
 </tr><tr><td><p>&#34;Error&#34;</p></td>
-<td><p>VolumeStateError reports that the volume is in an error state.</p>
+<td><p>VolumeStateError reports that a Volume is in an error state.</p>
 </td>
 </tr><tr><td><p>&#34;Pending&#34;</p></td>
-<td><p>VolumeStatePending reports whether the volume is about to be ready.</p>
+<td><p>VolumeStatePending reports whether a Volume is about to be ready.</p>
+</td>
+</tr><tr><td><p>&#34;Unknown&#34;</p></td>
+<td><p>VolumeStateUnknown reports whether a Volume is in an unknown state.</p>
 </td>
 </tr></tbody>
 </table>
@@ -1236,19 +1225,6 @@ VolumeState
 </td>
 <td>
 <p>State represents the infrastructure state of a Volume.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>phase</code><br/>
-<em>
-<a href="#storage.api.onmetal.de/v1alpha1.VolumePhase">
-VolumePhase
-</a>
-</em>
-</td>
-<td>
-<p>Phase represents the VolumeClaim binding phase of a Volume.</p>
 </td>
 </tr>
 <tr>

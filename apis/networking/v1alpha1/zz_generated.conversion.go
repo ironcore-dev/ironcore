@@ -408,7 +408,7 @@ func Convert_networking_NetworkInterfaceList_To_v1alpha1_NetworkInterfaceList(in
 
 func autoConvert_v1alpha1_NetworkInterfaceSpec_To_networking_NetworkInterfaceSpec(in *NetworkInterfaceSpec, out *networking.NetworkInterfaceSpec, s conversion.Scope) error {
 	out.NetworkRef = in.NetworkRef
-	out.MachineRef = in.MachineRef
+	out.MachineRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.MachineRef))
 	out.IPFamilies = *(*[]v1.IPFamily)(unsafe.Pointer(&in.IPFamilies))
 	out.IPs = *(*[]networking.IPSource)(unsafe.Pointer(&in.IPs))
 	return nil
@@ -421,7 +421,7 @@ func Convert_v1alpha1_NetworkInterfaceSpec_To_networking_NetworkInterfaceSpec(in
 
 func autoConvert_networking_NetworkInterfaceSpec_To_v1alpha1_NetworkInterfaceSpec(in *networking.NetworkInterfaceSpec, out *NetworkInterfaceSpec, s conversion.Scope) error {
 	out.NetworkRef = in.NetworkRef
-	out.MachineRef = in.MachineRef
+	out.MachineRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.MachineRef))
 	out.IPFamilies = *(*[]v1.IPFamily)(unsafe.Pointer(&in.IPFamilies))
 	out.IPs = *(*[]IPSource)(unsafe.Pointer(&in.IPs))
 	return nil

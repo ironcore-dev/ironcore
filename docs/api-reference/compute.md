@@ -419,13 +419,80 @@ string
 <div>
 <p>Interface is the definition of a single interface</p>
 </div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the network interface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>InterfaceSource</code><br/>
+<em>
+<a href="#compute.api.onmetal.de/v1alpha1.InterfaceSource">
+InterfaceSource
+</a>
+</em>
+</td>
+<td>
+<p>
+(Members of <code>InterfaceSource</code> are embedded into this type.)
+</p>
+<p>InterfaceSource is where to obtain the interface from.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="compute.api.onmetal.de/v1alpha1.InterfaceSource">InterfaceSource
+</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.Interface">Interface</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>networkInterfaceRef</code><br/>
+<em>
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkInterfaceRef instructs to use the NetworkInterface at the target reference.</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="compute.api.onmetal.de/v1alpha1.InterfaceStatus">InterfaceStatus
 </h3>
 <p>
 (<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachineStatus">MachineStatus</a>)
 </p>
 <div>
-<p>InterfaceStatus reports the status of an Interface.</p>
+<p>InterfaceStatus reports the status of an InterfaceSource.</p>
 </div>
 <h3 id="compute.api.onmetal.de/v1alpha1.MachineCondition">MachineCondition
 </h3>

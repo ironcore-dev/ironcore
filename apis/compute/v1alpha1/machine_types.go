@@ -59,7 +59,17 @@ type EFIVar struct {
 const DefaultIgnitionKey = "ignition.yaml"
 
 // Interface is the definition of a single interface
-type Interface struct{}
+type Interface struct {
+	// Name is the name of the network interface.
+	Name string `json:"name"`
+	// InterfaceSource is where to obtain the interface from.
+	InterfaceSource `json:",inline"`
+}
+
+type InterfaceSource struct {
+	// NetworkInterfaceRef instructs to use the NetworkInterface at the target reference.
+	NetworkInterfaceRef *corev1.LocalObjectReference `json:"networkInterfaceRef,omitempty"`
+}
 
 // Volume defines a volume attachment of a machine
 type Volume struct {
@@ -82,7 +92,7 @@ const (
 	RetainPolicyPersistent          RetainPolicy = "Persistent"
 )
 
-// InterfaceStatus reports the status of an Interface.
+// InterfaceStatus reports the status of an InterfaceSource.
 type InterfaceStatus struct{}
 
 // VolumeStatus is the status of a Volume.

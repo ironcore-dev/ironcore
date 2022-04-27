@@ -14,6 +14,8 @@ Resource Types:
 </li><li>
 <a href="#networking.api.onmetal.de/v1alpha1.NetworkInterface">NetworkInterface</a>
 </li><li>
+<a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceBinding">NetworkInterfaceBinding</a>
+</li><li>
 <a href="#networking.api.onmetal.de/v1alpha1.VirtualIP">VirtualIP</a>
 </li><li>
 <a href="#networking.api.onmetal.de/v1alpha1.VirtualIPRouting">VirtualIPRouting</a>
@@ -183,6 +185,64 @@ this NetworkInterface</p>
 <em>
 <a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceStatus">
 NetworkInterfaceStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.NetworkInterfaceBinding">NetworkInterfaceBinding
+</h3>
+<div>
+<p>NetworkInterfaceBinding is the Schema for the networkinterfacebindings API</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+networking.api.onmetal.de/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>NetworkInterfaceBinding</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>ips</code><br/>
+<em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
+[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
 </a>
 </em>
 </td>

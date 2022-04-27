@@ -41,6 +41,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/apis/common/v1alpha1.Toleration":                      schema_onmetal_api_apis_common_v1alpha1_Toleration(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EFIVar":                         schema_onmetal_api_apis_compute_v1alpha1_EFIVar(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.Interface":                      schema_onmetal_api_apis_compute_v1alpha1_Interface(ref),
+		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.InterfaceSource":                schema_onmetal_api_apis_compute_v1alpha1_InterfaceSource(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.InterfaceStatus":                schema_onmetal_api_apis_compute_v1alpha1_InterfaceStatus(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.Machine":                        schema_onmetal_api_apis_compute_v1alpha1_Machine(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachineClass":                   schema_onmetal_api_apis_compute_v1alpha1_MachineClass(ref),
@@ -593,8 +594,47 @@ func schema_onmetal_api_apis_compute_v1alpha1_Interface(ref common.ReferenceCall
 			SchemaProps: spec.SchemaProps{
 				Description: "Interface is the definition of a single interface",
 				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the name of the network interface.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"networkInterfaceRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "NetworkInterfaceRef instructs to use the NetworkInterface at the target reference.",
+							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
+						},
+					},
+				},
+				Required: []string{"name"},
 			},
 		},
+		Dependencies: []string{
+			"k8s.io/api/core/v1.LocalObjectReference"},
+	}
+}
+
+func schema_onmetal_api_apis_compute_v1alpha1_InterfaceSource(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"networkInterfaceRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "NetworkInterfaceRef instructs to use the NetworkInterface at the target reference.",
+							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/api/core/v1.LocalObjectReference"},
 	}
 }
 
@@ -602,7 +642,7 @@ func schema_onmetal_api_apis_compute_v1alpha1_InterfaceStatus(ref common.Referen
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "InterfaceStatus reports the status of an Interface.",
+				Description: "InterfaceStatus reports the status of an InterfaceSource.",
 				Type:        []string{"object"},
 			},
 		},
@@ -2180,7 +2220,6 @@ func schema_onmetal_api_apis_networking_v1alpha1_NetworkInterfaceSpec(ref common
 					"machineRef": {
 						SchemaProps: spec.SchemaProps{
 							Description: "MachineRef is the Machine this NetworkInterface is used by",
-							Default:     map[string]interface{}{},
 							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
 						},
 					},

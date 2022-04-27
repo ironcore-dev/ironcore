@@ -60,7 +60,7 @@ var _ = Describe("NetworkInterface", func() {
 		Entry("invalid machine ref name",
 			&networking.NetworkInterface{
 				Spec: networking.NetworkInterfaceSpec{
-					MachineRef: corev1.LocalObjectReference{Name: "foo*"},
+					MachineRef: &corev1.LocalObjectReference{Name: "foo*"},
 				},
 			},
 			ContainElement(InvalidField("spec.machineRef.name")),
@@ -175,16 +175,12 @@ var _ = Describe("NetworkInterface", func() {
 		Entry("mutable machine ref",
 			&networking.NetworkInterface{
 				Spec: networking.NetworkInterfaceSpec{
-					MachineRef: corev1.LocalObjectReference{
-						Name: "bar",
-					},
+					MachineRef: &corev1.LocalObjectReference{Name: "bar"},
 				},
 			},
 			&networking.NetworkInterface{
 				Spec: networking.NetworkInterfaceSpec{
-					MachineRef: corev1.LocalObjectReference{
-						Name: "foo",
-					},
+					MachineRef: &corev1.LocalObjectReference{Name: "foo"},
 				},
 			},
 			Not(ContainElement(ForbiddenField("spec"))),

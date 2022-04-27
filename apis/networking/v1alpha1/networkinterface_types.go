@@ -28,7 +28,7 @@ type NetworkInterfaceSpec struct {
 	// NetworkRef is the Network this NetworkInterface is connected to
 	NetworkRef corev1.LocalObjectReference `json:"networkRef"`
 	// MachineRef is the Machine this NetworkInterface is used by
-	MachineRef corev1.LocalObjectReference `json:"machineRef,omitempty"`
+	MachineRef *corev1.LocalObjectReference `json:"machineRef,omitempty"`
 	// IPFamilies defines which IPFamilies this NetworkInterface is supporting
 	IPFamilies []corev1.IPFamily `json:"ipFamilies"`
 	// IPs is the list of provided IPs or EphemeralIPs which should be assigned to
