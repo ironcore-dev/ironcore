@@ -44,10 +44,12 @@ func Resource(name string) schema.GroupResource {
 
 func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion,
-		&NetworkInterface{},
-		&NetworkInterfaceList{},
 		&Network{},
 		&NetworkList{},
+		&NetworkInterface{},
+		&NetworkInterfaceList{},
+		&NetworkInterfaceBinding{},
+		&NetworkInterfaceBindingList{},
 		&VirtualIP{},
 		&VirtualIPList{},
 		&VirtualIPRouting{},

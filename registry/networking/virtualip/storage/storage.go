@@ -17,7 +17,6 @@ package storage
 import (
 	"context"
 
-	"github.com/onmetal/onmetal-api/apis/compute"
 	"github.com/onmetal/onmetal-api/apis/networking"
 	"github.com/onmetal/onmetal-api/registry/networking/virtualip"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -50,7 +49,7 @@ func NewStorage(optsGetter generic.RESTOptionsGetter) (VirtualIPStorage, error) 
 			return &networking.VirtualIPList{}
 		},
 		PredicateFunc:            virtualip.MatchVirtualIP,
-		DefaultQualifiedResource: compute.Resource("virtualips"),
+		DefaultQualifiedResource: networking.Resource("virtualips"),
 
 		CreateStrategy: virtualip.Strategy,
 		UpdateStrategy: virtualip.Strategy,

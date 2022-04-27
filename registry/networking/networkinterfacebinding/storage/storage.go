@@ -16,14 +16,14 @@ package storage
 
 import (
 	"github.com/onmetal/onmetal-api/apis/networking"
-	"github.com/onmetal/onmetal-api/registry/networking/virtualiprouting"
+	"github.com/onmetal/onmetal-api/registry/networking/networkinterfacebinding"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apiserver/pkg/registry/generic"
 	genericregistry "k8s.io/apiserver/pkg/registry/generic/registry"
 )
 
-type VirtualIPRoutingStorage struct {
-	VirtualIPRouting *REST
+type NetworkInterfaceBindingStorage struct {
+	NetworkInterfaceBinding *REST
 }
 
 type REST struct {
@@ -31,33 +31,33 @@ type REST struct {
 }
 
 func (REST) ShortNames() []string {
-	return []string{"vipr", "viprouting"}
+	return []string{"nicb", "nicbinding"}
 }
 
-func NewStorage(optsGetter generic.RESTOptionsGetter) (VirtualIPRoutingStorage, error) {
+func NewStorage(optsGetter generic.RESTOptionsGetter) (NetworkInterfaceBindingStorage, error) {
 	store := &genericregistry.Store{
 		NewFunc: func() runtime.Object {
-			return &networking.VirtualIPRouting{}
+			return &networking.NetworkInterfaceBinding{}
 		},
 		NewListFunc: func() runtime.Object {
-			return &networking.VirtualIPRoutingList{}
+			return &networking.NetworkInterfaceBindingList{}
 		},
-		PredicateFunc:            virtualiprouting.MatchVirtualIPRouting,
-		DefaultQualifiedResource: networking.Resource("virtualiproutings"),
+		PredicateFunc:            networkinterfacebinding.MatchNetworkInterfaceBinding,
+		DefaultQualifiedResource: networking.Resource("networkinterfacebindings"),
 
-		CreateStrategy: virtualiprouting.Strategy,
-		UpdateStrategy: virtualiprouting.Strategy,
-		DeleteStrategy: virtualiprouting.Strategy,
+		CreateStrategy: networkinterfacebinding.Strategy,
+		UpdateStrategy: networkinterfacebinding.Strategy,
+		DeleteStrategy: networkinterfacebinding.Strategy,
 
 		TableConvertor: newTableConvertor(),
 	}
 
-	options := &generic.StoreOptions{RESTOptions: optsGetter, AttrFunc: virtualiprouting.GetAttrs}
+	options := &generic.StoreOptions{RESTOptions: optsGetter, AttrFunc: networkinterfacebinding.GetAttrs}
 	if err := store.CompleteWithOptions(options); err != nil {
-		return VirtualIPRoutingStorage{}, err
+		return NetworkInterfaceBindingStorage{}, err
 	}
 
-	return VirtualIPRoutingStorage{
-		VirtualIPRouting: &REST{store},
+	return NetworkInterfaceBindingStorage{
+		NetworkInterfaceBinding: &REST{store},
 	}, nil
 }

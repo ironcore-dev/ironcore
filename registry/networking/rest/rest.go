@@ -20,6 +20,7 @@ import (
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
 	networkstorage "github.com/onmetal/onmetal-api/registry/networking/network/storage"
 	networkinterfacestorage "github.com/onmetal/onmetal-api/registry/networking/networkinterface/storage"
+	networkinterfacebindingstorage "github.com/onmetal/onmetal-api/registry/networking/networkinterfacebinding/storage"
 	virtualipstorage "github.com/onmetal/onmetal-api/registry/networking/virtualip/storage"
 	virtualiproutingstorage "github.com/onmetal/onmetal-api/registry/networking/virtualiprouting/storage"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -70,6 +71,13 @@ func (p StorageProvider) v1alpha1Storage(restOptionsGetter generic.RESTOptionsGe
 	}
 
 	storageMap["networks"] = networkStorage.Network
+
+	networkInterfaceBindingStorage, err := networkinterfacebindingstorage.NewStorage(restOptionsGetter)
+	if err != nil {
+		return storageMap, err
+	}
+
+	storageMap["networkinterfacebindings"] = networkInterfaceBindingStorage.NetworkInterfaceBinding
 
 	virtualIPStorage, err := virtualipstorage.NewStorage(restOptionsGetter)
 	if err != nil {

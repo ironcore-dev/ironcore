@@ -32,8 +32,6 @@ var (
 
 	headers = []metav1.TableColumnDefinition{
 		{Name: "Name", Type: "string", Format: "name", Description: objectMetaSwaggerDoc["name"]},
-		{Name: "Network", Type: "string", Description: "The network this network interface is connected to"},
-		{Name: "Machine", Type: "string", Description: "The machine this network interface is used by"},
 		{Name: "IPs", Type: "string", Description: "List of effective IPs of the network interface"},
 		{Name: "Age", Type: "string", Format: "date", Description: objectMetaSwaggerDoc["creationTimestamp"]},
 	}
@@ -61,18 +59,12 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 
 	var err error
 	tab.Rows, err = table.MetaToTableRow(obj, func(obj runtime.Object, m metav1.Object, name, age string) (cells []interface{}, err error) {
-		networkInterface := obj.(*networking.NetworkInterface)
+		networkInterfaceBinding := obj.(*networking.NetworkInterfaceBinding)
 
 		cells = append(cells, name)
-		cells = append(cells, networkInterface.Spec.NetworkRef.Name)
-		if machineRefName := networkInterface.Spec.MachineRef.Name; machineRefName != "" {
-			cells = append(cells, machineRefName)
-		} else {
-			cells = append(cells, "<none>")
-		}
-		if effectiveIPs := networkInterface.Status.IPs; len(effectiveIPs) > 0 {
+		if ips := networkInterfaceBinding.IPs; len(ips) > 0 {
 			var eIPs []string
-			for _, ip := range effectiveIPs {
+			for _, ip := range ips {
 				eIPs = append(eIPs, ip.String())
 			}
 			cells = append(cells, strings.Join(eIPs, ","))

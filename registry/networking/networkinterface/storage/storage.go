@@ -17,7 +17,6 @@ package storage
 import (
 	"context"
 
-	"github.com/onmetal/onmetal-api/apis/compute"
 	"github.com/onmetal/onmetal-api/apis/networking"
 	"github.com/onmetal/onmetal-api/registry/networking/networkinterface"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,7 +27,7 @@ import (
 	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 )
 
-type NetworkInteraceStorage struct {
+type NetworkInterfaceStorage struct {
 	NetworkInterface *REST
 	Status           *StatusREST
 }
@@ -41,7 +40,7 @@ func (REST) ShortNames() []string {
 	return []string{"nic"}
 }
 
-func NewStorage(optsGetter generic.RESTOptionsGetter) (NetworkInteraceStorage, error) {
+func NewStorage(optsGetter generic.RESTOptionsGetter) (NetworkInterfaceStorage, error) {
 	store := &genericregistry.Store{
 		NewFunc: func() runtime.Object {
 			return &networking.NetworkInterface{}
@@ -50,7 +49,7 @@ func NewStorage(optsGetter generic.RESTOptionsGetter) (NetworkInteraceStorage, e
 			return &networking.NetworkInterfaceList{}
 		},
 		PredicateFunc:            networkinterface.MatchNetworkInterface,
-		DefaultQualifiedResource: compute.Resource("networkinterfaces"),
+		DefaultQualifiedResource: networking.Resource("networkinterfaces"),
 
 		CreateStrategy: networkinterface.Strategy,
 		UpdateStrategy: networkinterface.Strategy,
@@ -61,14 +60,14 @@ func NewStorage(optsGetter generic.RESTOptionsGetter) (NetworkInteraceStorage, e
 
 	options := &generic.StoreOptions{RESTOptions: optsGetter, AttrFunc: networkinterface.GetAttrs}
 	if err := store.CompleteWithOptions(options); err != nil {
-		return NetworkInteraceStorage{}, err
+		return NetworkInterfaceStorage{}, err
 	}
 
 	statusStore := *store
 	statusStore.UpdateStrategy = networkinterface.StatusStrategy
 	statusStore.ResetFieldsStrategy = networkinterface.StatusStrategy
 
-	return NetworkInteraceStorage{
+	return NetworkInterfaceStorage{
 		NetworkInterface: &REST{store},
 		Status:           &StatusREST{&statusStore},
 	}, nil

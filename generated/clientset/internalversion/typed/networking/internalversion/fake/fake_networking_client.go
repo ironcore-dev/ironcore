@@ -35,6 +35,10 @@ func (c *FakeNetworking) NetworkInterfaces(namespace string) internalversion.Net
 	return &FakeNetworkInterfaces{c, namespace}
 }
 
+func (c *FakeNetworking) NetworkInterfaceBindings(namespace string) internalversion.NetworkInterfaceBindingInterface {
+	return &FakeNetworkInterfaceBindings{c, namespace}
+}
+
 func (c *FakeNetworking) VirtualIPs(namespace string) internalversion.VirtualIPInterface {
 	return &FakeVirtualIPs{c, namespace}
 }
