@@ -17,7 +17,8 @@
 package compute
 
 import (
-	. "github.com/onsi/ginkgo"
+	"github.com/onmetal/onmetal-api/testutils"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -28,6 +29,7 @@ import (
 )
 
 var _ = Describe("machineclass controller", func() {
+	ctx := testutils.SetupContext()
 	ns := SetupTest(ctx)
 	It("removes the finalizer from machineclass only if there's no machine still using the machineclass", func() {
 		By("creating the machineclass consumed by the machine")
@@ -60,7 +62,7 @@ var _ = Describe("machineclass controller", func() {
 			Expect(client.IgnoreNotFound(err)).To(Succeed(), "errors other than `not found` are not expected")
 			g.Expect(err).NotTo(HaveOccurred())
 			return machineClass.Finalizers
-		}, timeout, interval).Should(ContainElement(computev1alpha1.MachineClassFinalizer))
+		}).Should(ContainElement(computev1alpha1.MachineClassFinalizer))
 
 		By("checking the machineclass and its finalizer consistently exist upon deletion ")
 		Expect(k8sClient.Delete(ctx, machineClass)).Should(Succeed())
@@ -70,7 +72,7 @@ var _ = Describe("machineclass controller", func() {
 			Expect(client.IgnoreNotFound(err)).To(Succeed(), "errors other than `not found` are not expected")
 			g.Expect(err).NotTo(HaveOccurred())
 			return machineClass.Finalizers
-		}, timeout).Should(ContainElement(computev1alpha1.MachineClassFinalizer))
+		}).Should(ContainElement(computev1alpha1.MachineClassFinalizer))
 
 		By("checking the machineclass is eventually gone after the deletion of the machine")
 		Expect(k8sClient.Delete(ctx, m)).Should(Succeed())
@@ -78,6 +80,6 @@ var _ = Describe("machineclass controller", func() {
 			err := k8sClient.Get(ctx, machineClassKey, machineClass)
 			Expect(client.IgnoreNotFound(err)).To(Succeed(), "errors other than `not found` are not expected")
 			return apierrors.IsNotFound(err)
-		}, timeout, interval).Should(BeTrue(), "the error should be `not found`")
+		}).Should(BeTrue(), "the error should be `not found`")
 	})
 })

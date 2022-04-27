@@ -15,9 +15,8 @@
 package storage
 
 import (
-	"time"
-
-	. "github.com/onsi/ginkgo"
+	"github.com/onmetal/onmetal-api/testutils"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -29,6 +28,7 @@ import (
 )
 
 var _ = Describe("VolumeScheduler", func() {
+	ctx := testutils.SetupContext()
 	ns := SetupTest(ctx)
 
 	It("should schedule volumes on volume pools", func() {
@@ -230,7 +230,7 @@ var _ = Describe("VolumeScheduler", func() {
 		Consistently(func() string {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed())
 			return volume.Spec.VolumePoolRef.Name
-		}, 1*time.Second, interval).Should(BeEmpty())
+		}).Should(BeEmpty())
 
 		By("patching the volume to contain only one of the corresponding tolerations")
 		volumeBase := volume.DeepCopy()
@@ -246,7 +246,7 @@ var _ = Describe("VolumeScheduler", func() {
 		Consistently(func() string {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed())
 			return volume.Spec.VolumePoolRef.Name
-		}, 1*time.Second, interval).Should(BeEmpty())
+		}).Should(BeEmpty())
 
 		By("patching the volume to contain all of the corresponding tolerations")
 		volumeBase = volume.DeepCopy()
@@ -261,6 +261,6 @@ var _ = Describe("VolumeScheduler", func() {
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get the volume")
 			g.Expect(volume.Spec.VolumePoolRef.Name).To(Equal(taintedVolumePool.Name))
-		}, timeout, interval).Should(Succeed())
+		}).Should(Succeed())
 	})
 })

@@ -32,7 +32,7 @@ import (
 
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
@@ -47,13 +47,12 @@ import (
 // http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
 
 const (
-	interval = 50 * time.Millisecond
-	timeout  = 3 * time.Second
+	pollingInterval      = 50 * time.Millisecond
+	eventuallyTimeout    = 3 * time.Second
+	consistentlyDuration = 1 * time.Second
 )
 
 var (
-	ctx, cancel = context.WithCancel(context.Background())
-
 	cfg        *rest.Config
 	k8sClient  client.Client
 	testEnv    *envtest.Environment
@@ -61,6 +60,12 @@ var (
 )
 
 func TestAPIs(t *testing.T) {
+	_, reporterConfig := GinkgoConfiguration()
+	reporterConfig.SlowSpecThreshold = 10 * time.Second
+	SetDefaultConsistentlyPollingInterval(pollingInterval)
+	SetDefaultEventuallyPollingInterval(pollingInterval)
+	SetDefaultEventuallyTimeout(eventuallyTimeout)
+	SetDefaultConsistentlyDuration(consistentlyDuration)
 	RegisterFailHandler(Fail)
 
 	RunSpecs(t, "Controller Suite")
@@ -82,6 +87,8 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 	Expect(cfg).NotTo(BeNil())
 
+	DeferCleanup(envtestutils.StopWithExtensions, testEnv, testEnvExt)
+
 	err = storagev1alpha1.AddToScheme(scheme.Scheme)
 	Expect(err).NotTo(HaveOccurred())
 
@@ -100,15 +107,16 @@ var _ = BeforeSuite(func() {
 	})
 	Expect(err).NotTo(HaveOccurred())
 
+	ctx, cancel := context.WithCancel(context.Background())
+	DeferCleanup(cancel)
 	go func() {
 		defer GinkgoRecover()
 		err := apiSrv.Start(ctx)
 		Expect(err).NotTo(HaveOccurred())
 	}()
 
-	err = envtestutils.WaitUntilAPIServicesReadyWithTimeout(30*time.Second, testEnvExt, k8sClient, scheme.Scheme)
-	Expect(err).NotTo(HaveOccurred())
-}, 60)
+	Expect(envtestutils.WaitUntilAPIServicesReadyWithTimeout(60*time.Second, testEnvExt, k8sClient, scheme.Scheme)).To(Succeed())
+})
 
 func SetupTest(ctx context.Context) *corev1.Namespace {
 	var (
@@ -169,6 +177,7 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		go func() {
+			defer GinkgoRecover()
 			Expect(k8sManager.Start(mgrCtx)).To(Succeed(), "failed to start manager")
 		}()
 	})
@@ -181,11 +190,3 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 
 	return ns
 }
-
-var _ = AfterSuite(func() {
-	cancel()
-
-	By("tearing down the test environment")
-	err := envtestutils.StopWithExtensions(testEnv, testEnvExt)
-	Expect(err).NotTo(HaveOccurred())
-})

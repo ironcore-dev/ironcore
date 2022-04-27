@@ -18,7 +18,8 @@ package storage
 
 import (
 	. "github.com/onmetal/controller-utils/testutils"
-	. "github.com/onsi/ginkgo"
+	"github.com/onmetal/onmetal-api/testutils"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -30,7 +31,9 @@ import (
 )
 
 var _ = Describe("VolumeClass controller", func() {
+	ctx := testutils.SetupContext()
 	ns := SetupTest(ctx)
+
 	It("should finalize the volume class if no volume is using it", func() {
 		By("creating the volume class consumed by the volume")
 		volumeClass := &storagev1alpha1.VolumeClass{
@@ -64,7 +67,7 @@ var _ = Describe("VolumeClass controller", func() {
 			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
 			g.Expect(err).NotTo(HaveOccurred())
 			return volumeClass.Finalizers
-		}, timeout, interval).Should(ContainElement(storagev1alpha1.VolumeClassFinalizer))
+		}).Should(ContainElement(storagev1alpha1.VolumeClassFinalizer))
 
 		By("issuing a delete request for the volume class")
 		Expect(k8sClient.Delete(ctx, volumeClass)).Should(Succeed())
@@ -74,7 +77,7 @@ var _ = Describe("VolumeClass controller", func() {
 			err := k8sClient.Get(ctx, volumeClassKey, volumeClass)
 			g.Expect(err).NotTo(HaveOccurred())
 			return volumeClass.Finalizers
-		}, timeout).Should(ContainElement(storagev1alpha1.VolumeClassFinalizer))
+		}).Should(ContainElement(storagev1alpha1.VolumeClassFinalizer))
 
 		By("deleting the referencing volume")
 		Expect(k8sClient.Delete(ctx, volume)).Should(Succeed())
@@ -82,6 +85,6 @@ var _ = Describe("VolumeClass controller", func() {
 		By("waiting for the volume class to be gone")
 		Eventually(func() error {
 			return k8sClient.Get(ctx, volumeClassKey, volumeClass)
-		}, timeout, interval).Should(MatchErrorFunc(apierrors.IsNotFound))
+		}).Should(MatchErrorFunc(apierrors.IsNotFound))
 	})
 })

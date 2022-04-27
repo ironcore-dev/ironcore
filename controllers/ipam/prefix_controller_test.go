@@ -16,12 +16,11 @@
 package ipam
 
 import (
-	"time"
-
 	"github.com/onmetal/controller-utils/clientutils"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/apis/ipam/v1alpha1"
-	. "github.com/onsi/ginkgo"
+	"github.com/onmetal/onmetal-api/testutils"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -29,7 +28,8 @@ import (
 )
 
 var _ = Describe("PrefixReconciler", func() {
-	ns := SetupTest()
+	ctx := testutils.SetupContext()
+	ns := SetupTest(ctx)
 
 	It("should mark root prefixes as ready", func() {
 		By("creating a root prefix")
@@ -50,7 +50,7 @@ var _ = Describe("PrefixReconciler", func() {
 			list := &ipamv1alpha1.PrefixAllocationList{}
 			g.Expect(clientutils.ListAndFilterControlledBy(ctx, k8sClient, prefix, list, client.InNamespace(ns.Name))).To(Succeed())
 			g.Expect(list.Items).To(BeEmpty())
-		}, timeout, interval).Should(Succeed())
+		}).Should(Succeed())
 
 		By("waiting for the prefix to be marked as ready and report its available ranges")
 		prefixKey := client.ObjectKeyFromObject(prefix)
@@ -58,7 +58,7 @@ var _ = Describe("PrefixReconciler", func() {
 			Expect(k8sClient.Get(ctx, prefixKey, prefix)).To(Succeed())
 			g.Expect(ipamv1alpha1.GetPrefixReadiness(prefix)).To(Equal(ipamv1alpha1.ReadinessSucceeded))
 			g.Expect(prefix.Status.Used).To(BeEmpty())
-		}, timeout, interval).Should(Succeed())
+		}).Should(Succeed())
 	})
 
 	It("should allocate child prefixes", func() {
@@ -101,7 +101,7 @@ var _ = Describe("PrefixReconciler", func() {
 				Name: rootPrefix.Name,
 			}))
 			g.Expect(childPrefix.Status.Used).To(BeEmpty())
-		}, 1000*time.Second, interval).Should(Succeed())
+		}).Should(Succeed())
 
 		By("asserting the parent's available ranges have been updated")
 		rootPrefixKey := client.ObjectKeyFromObject(rootPrefix)
@@ -165,7 +165,7 @@ var _ = Describe("PrefixReconciler", func() {
 			g.Expect(list.Items).To(HaveLen(1))
 			allocation := list.Items[0]
 			g.Expect(ipamv1alpha1.GetPrefixAllocationReadiness(&allocation)).To(Equal(ipamv1alpha1.ReadinessFailed))
-		}, timeout, interval).Should(Succeed())
+		}).Should(Succeed())
 	})
 
 	It("should assign a prefix on matching parents", func() {
@@ -196,7 +196,7 @@ var _ = Describe("PrefixReconciler", func() {
 				Equal(ipamv1alpha1.ReadinessUnknown),
 			))
 			g.Expect(childPrefix.Spec.ParentRef).To(BeNil())
-		}, timeout, interval).Should(Succeed())
+		}).Should(Succeed())
 
 		By("creating a root prefix that would fit but does not match")
 		prefixValue := commonv1alpha1.MustParseNewIPPrefix("10.0.0.0/24")
@@ -216,7 +216,7 @@ var _ = Describe("PrefixReconciler", func() {
 			g.Expect(k8sClient.Get(ctx, childPrefixKey, childPrefix)).Should(Succeed())
 			g.Expect(ipamv1alpha1.GetPrefixReadiness(childPrefix)).To(Equal(ipamv1alpha1.ReadinessPending))
 			g.Expect(childPrefix.Spec.ParentRef).To(BeNil())
-		}, timeout, interval).Should(Succeed())
+		}).Should(Succeed())
 
 		By("creating a root prefix that fits and matches")
 		rootPrefix := &ipamv1alpha1.Prefix{
@@ -242,7 +242,7 @@ var _ = Describe("PrefixReconciler", func() {
 				Name: rootPrefix.Name,
 			}))
 			g.Expect(childPrefix.Spec.Prefix).To(HaveValue(Equal(expectedChildPrefix)))
-		}, 100*time.Second, interval).Should(Succeed())
+		}).Should(Succeed())
 
 		By("asserting the parent's used ranges have been updated")
 		rootPrefixKey := client.ObjectKeyFromObject(rootPrefix)
@@ -301,7 +301,7 @@ var _ = Describe("PrefixReconciler", func() {
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, childPrefixKey, childPrefix)).To(Succeed())
 			g.Expect(ipamv1alpha1.GetPrefixReadiness(childPrefix)).To(Equal(ipamv1alpha1.ReadinessSucceeded))
-		}, timeout, interval).Should(Succeed())
+		}).Should(Succeed())
 	})
 
 	It("should not allocate a prefix equal to the prefix of the parent", func() {
@@ -335,7 +335,7 @@ var _ = Describe("PrefixReconciler", func() {
 		Consistently(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, childPrefixKey, childPrefix)).To(Succeed())
 			g.Expect(ipamv1alpha1.GetPrefixReadiness(childPrefix)).NotTo(Equal(ipamv1alpha1.ReadinessSucceeded))
-		}, timeout, interval).Should(Succeed())
+		}).Should(Succeed())
 	})
 
 	It("should not allocate a prefix length equal to the prefix bits of the parent", func() {
@@ -370,6 +370,6 @@ var _ = Describe("PrefixReconciler", func() {
 		Consistently(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, childPrefixKey, childPrefix)).To(Succeed())
 			g.Expect(ipamv1alpha1.GetPrefixReadiness(childPrefix)).NotTo(Equal(ipamv1alpha1.ReadinessSucceeded))
-		}, timeout, interval).Should(Succeed())
+		}).Should(Succeed())
 	})
 })

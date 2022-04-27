@@ -17,7 +17,7 @@
 package compute
 
 import (
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 )
 
 var _ = Describe("machine controller", func() {

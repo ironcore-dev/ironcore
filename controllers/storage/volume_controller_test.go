@@ -18,7 +18,8 @@ package storage
 
 import (
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
-	. "github.com/onsi/ginkgo"
+	"github.com/onmetal/onmetal-api/testutils"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -27,6 +28,7 @@ import (
 )
 
 var _ = Describe("VolumeReconciler", func() {
+	ctx := testutils.SetupContext()
 	ns := SetupTest(ctx)
 
 	var volume *storagev1alpha1.Volume
@@ -83,13 +85,13 @@ var _ = Describe("VolumeReconciler", func() {
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
 			g.Expect(storagev1alpha1.GetVolumePhase(volume)).To(Equal(storagev1alpha1.VolumePhaseBound))
-		}, timeout, interval).Should(Succeed())
+		}).Should(Succeed())
 
 		By("making sure the volume stays bound")
 		Consistently(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
 			g.Expect(storagev1alpha1.GetVolumePhase(volume)).To(Equal(storagev1alpha1.VolumePhaseBound))
-		}, timeout, interval).Should(Succeed())
+		}).Should(Succeed())
 	})
 
 	It("should un-bind a volume if the underlying volume claim changes its volume ref", func() {
@@ -109,7 +111,7 @@ var _ = Describe("VolumeReconciler", func() {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
 			g.Expect(volume.Spec.ClaimRef.Name).To(Equal(volumeClaim.Name))
 			g.Expect(storagev1alpha1.GetVolumePhase(volume)).To(Equal(storagev1alpha1.VolumePhaseBound))
-		}, timeout, interval).Should(Succeed())
+		}).Should(Succeed())
 
 		By("deleting the volume claim")
 		Expect(k8sClient.Delete(ctx, volumeClaim)).To(Succeed(), "failed to delete volume claim")
@@ -119,6 +121,6 @@ var _ = Describe("VolumeReconciler", func() {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
 			g.Expect(storagev1alpha1.GetVolumePhase(volume)).To(Equal(storagev1alpha1.VolumePhaseUnbound))
 			g.Expect(volume.Spec.ClaimRef).To(BeZero())
-		}, timeout, interval).Should(Succeed())
+		}).Should(Succeed())
 	})
 })
