@@ -22,6 +22,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/onmetal/onmetal-api/controllers/networking"
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -64,6 +65,8 @@ const (
 
 	prefixController          = "prefix"
 	prefixAllocationScheduler = "prefixallocationscheduler"
+
+	networkInterfaceController = "networkInterface"
 )
 
 func init() {
@@ -89,8 +92,16 @@ func main() {
 	flag.DurationVar(&volumeBoundTimeout, "volume-bound-timeout", 10*time.Second, "Time to wait until considering a volume bind to be failed.")
 
 	controllers := switches.New(
+		// Compute controllers
 		machineClassController, machinePoolController, machineSchedulerController, machineController,
+
+		// Storage controllers
 		volumePoolController, volumeClassController, volumeController, volumeClaimController, volumeScheduler, volumeClaimScheduler,
+
+		// Networking controllers
+		networkInterfaceController,
+
+		// IPAM controllers
 		prefixController, prefixAllocationScheduler,
 	)
 	flag.Var(controllers, "controllers", fmt.Sprintf("Controllers to enable. All controllers: %v. Disabled-by-default controllers: %v", controllers.All(), controllers.DisabledByDefault()))
@@ -242,6 +253,16 @@ func main() {
 			Scheme: mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "PrefixAllocationScheduler")
+			os.Exit(1)
+		}
+	}
+
+	if controllers.Enabled(networkInterfaceController) {
+		if err = (&networking.NetworkInterfaceReconciler{
+			Client: mgr.GetClient(),
+			Scheme: mgr.GetScheme(),
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "NetworkInterface")
 			os.Exit(1)
 		}
 	}

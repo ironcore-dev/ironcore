@@ -62,8 +62,10 @@ func validateNetworkInterfaceSpec(spec *networking.NetworkInterfaceSpec, nicMeta
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("networkRef").Child("name"), spec.NetworkRef.Name, msg))
 	}
 
-	for _, msg := range apivalidation.NameIsDNSLabel(spec.MachineRef.Name, false) {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("machineRef").Child("name"), spec.MachineRef.Name, msg))
+	if spec.MachineRef != nil {
+		for _, msg := range apivalidation.NameIsDNSLabel(spec.MachineRef.Name, false) {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("machineRef").Child("name"), spec.MachineRef.Name, msg))
+		}
 	}
 
 	allErrs = append(allErrs, onmetalapivalidation.ValidateIPFamilies(spec.IPFamilies, fldPath.Child("ipFamilies"))...)

@@ -247,7 +247,11 @@ func (in *NetworkInterfaceList) DeepCopyObject() runtime.Object {
 func (in *NetworkInterfaceSpec) DeepCopyInto(out *NetworkInterfaceSpec) {
 	*out = *in
 	out.NetworkRef = in.NetworkRef
-	out.MachineRef = in.MachineRef
+	if in.MachineRef != nil {
+		in, out := &in.MachineRef, &out.MachineRef
+		*out = new(v1.LocalObjectReference)
+		**out = **in
+	}
 	if in.IPFamilies != nil {
 		in, out := &in.IPFamilies, &out.IPFamilies
 		*out = make([]v1.IPFamily, len(*in))
