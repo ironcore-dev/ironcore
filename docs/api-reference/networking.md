@@ -10,6 +10,10 @@
 </div>
 Resource Types:
 <ul><li>
+<a href="#networking.api.onmetal.de/v1alpha1.AliasPrefix">AliasPrefix</a>
+</li><li>
+<a href="#networking.api.onmetal.de/v1alpha1.AliasPrefixRouting">AliasPrefixRouting</a>
+</li><li>
 <a href="#networking.api.onmetal.de/v1alpha1.Network">Network</a>
 </li><li>
 <a href="#networking.api.onmetal.de/v1alpha1.NetworkInterface">NetworkInterface</a>
@@ -20,6 +24,193 @@ Resource Types:
 </li><li>
 <a href="#networking.api.onmetal.de/v1alpha1.VirtualIPRouting">VirtualIPRouting</a>
 </li></ul>
+<h3 id="networking.api.onmetal.de/v1alpha1.AliasPrefix">AliasPrefix
+</h3>
+<div>
+<p>AliasPrefix is the Schema for the AliasPrefix API</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+networking.api.onmetal.de/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>AliasPrefix</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.AliasPrefixSpec">
+AliasPrefixSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef is the Network this AliasPrefix should belong to</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkInterfaceSelector</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#labelselector-v1-meta">
+Kubernetes meta/v1.LabelSelector
+</a>
+</em>
+</td>
+<td>
+<p>NetworkInterfaceSelector defines the NetworkInterfaces
+for which this AliasPrefix should be applied</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>prefix</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.PrefixSource">
+PrefixSource
+</a>
+</em>
+</td>
+<td>
+<p>Prefix is the provided Prefix or EphemeralPrefix which
+should be used by this AliasPrefix</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.AliasPrefixStatus">
+AliasPrefixStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.AliasPrefixRouting">AliasPrefixRouting
+</h3>
+<div>
+<p>AliasPrefixRouting is the Schema for the aliasprefixrouting API</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+networking.api.onmetal.de/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>AliasPrefixRouting</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef is the Network this AliasPrefixRouting should belong to</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>subsets</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.AliasPrefixRoutingSubset">
+[]AliasPrefixRoutingSubset
+</a>
+</em>
+</td>
+<td>
+<p>Subsets are the subsets that make up an AliasPrefixRouting</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="networking.api.onmetal.de/v1alpha1.Network">Network
 </h3>
 <div>
@@ -424,10 +615,131 @@ Refer to the Kubernetes API documentation for the fields of the
 </tr>
 </tbody>
 </table>
+<h3 id="networking.api.onmetal.de/v1alpha1.AliasPrefixRoutingSubset">AliasPrefixRoutingSubset
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.AliasPrefixRouting">AliasPrefixRouting</a>)
+</p>
+<div>
+<p>AliasPrefixRoutingSubset is one of the targets of a AliasPrefixRouting</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>targetRef</code><br/>
+<em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
+</a>
+</em>
+</td>
+<td>
+<p>TargetRef is the targeted entity</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.AliasPrefixSpec">AliasPrefixSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.AliasPrefix">AliasPrefix</a>)
+</p>
+<div>
+<p>AliasPrefixSpec defines the desired state of AliasPrefix</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef is the Network this AliasPrefix should belong to</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkInterfaceSelector</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#labelselector-v1-meta">
+Kubernetes meta/v1.LabelSelector
+</a>
+</em>
+</td>
+<td>
+<p>NetworkInterfaceSelector defines the NetworkInterfaces
+for which this AliasPrefix should be applied</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>prefix</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.PrefixSource">
+PrefixSource
+</a>
+</em>
+</td>
+<td>
+<p>Prefix is the provided Prefix or EphemeralPrefix which
+should be used by this AliasPrefix</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.AliasPrefixStatus">AliasPrefixStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.AliasPrefix">AliasPrefix</a>)
+</p>
+<div>
+<p>AliasPrefixStatus defines the observed state of AliasPrefix</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>prefix</code><br/>
+<em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
+</a>
+</em>
+</td>
+<td>
+<p>Prefix is the Prefix reserved by this AliasPrefix</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="networking.api.onmetal.de/v1alpha1.EphemeralPrefixSource">EphemeralPrefixSource
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.IPSource">IPSource</a>)
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.IPSource">IPSource</a>, <a href="#networking.api.onmetal.de/v1alpha1.PrefixSource">PrefixSource</a>)
 </p>
 <div>
 </div>
@@ -441,12 +753,17 @@ Refer to the Kubernetes API documentation for the fields of the
 <tbody>
 <tr>
 <td>
-<code>prefixTemplate</code><br/>
+<code>PrefixTemplateSpec</code><br/>
 <em>
+<a href="/api-reference/common/#ipam.onmetal.de/v1alpha1.PrefixTemplateSpec">
 github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixTemplateSpec
+</a>
 </em>
 </td>
 <td>
+<p>
+(Members of <code>PrefixTemplateSpec</code> are embedded into this type.)
+</p>
 </td>
 </tr>
 </tbody>
@@ -488,46 +805,6 @@ EphemeralPrefixSource
 </em>
 </td>
 <td>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="networking.api.onmetal.de/v1alpha1.LocalUIDReference">LocalUIDReference
-</h3>
-<p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.VirtualIPRoutingSubset">VirtualIPRoutingSubset</a>, <a href="#networking.api.onmetal.de/v1alpha1.VirtualIPRoutingSubsetTarget">VirtualIPRoutingSubsetTarget</a>)
-</p>
-<div>
-<p>LocalUIDReference is a reference to another entity including its UID.</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>name</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Name is the name of the referenced entity.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>uid</code><br/>
-<em>
-k8s.io/apimachinery/pkg/types.UID
-</em>
-</td>
-<td>
-<p>UID is the UID of the referenced entity.</p>
 </td>
 </tr>
 </tbody>
@@ -635,6 +912,50 @@ IPs represent the effective IP addresses of the NetworkInterface</p>
 </tr>
 </tbody>
 </table>
+<h3 id="networking.api.onmetal.de/v1alpha1.PrefixSource">PrefixSource
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.AliasPrefixSpec">AliasPrefixSpec</a>)
+</p>
+<div>
+<p>PrefixSource is the source of the Prefix definition in an AliasPrefix</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>value</code><br/>
+<em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
+</a>
+</em>
+</td>
+<td>
+<p>Value is a single IPPrefix value as defined in the AliasPrefix</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ephemeralPrefix</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.EphemeralPrefixSource">
+EphemeralPrefixSource
+</a>
+</em>
+</td>
+<td>
+<p>EphemeralPrefix defines the Prefix which should be allocated by the AliasPrefix</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="networking.api.onmetal.de/v1alpha1.VirtualIPRoutingSubset">VirtualIPRoutingSubset
 </h3>
 <p>
@@ -655,8 +976,8 @@ IPs represent the effective IP addresses of the NetworkInterface</p>
 <td>
 <code>networkRef</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.LocalUIDReference">
-LocalUIDReference
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
 </a>
 </em>
 </td>
@@ -698,8 +1019,8 @@ LocalUIDReference
 <td>
 <code>LocalUIDReference</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.LocalUIDReference">
-LocalUIDReference
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
 </a>
 </em>
 </td>

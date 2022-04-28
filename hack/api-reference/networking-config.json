@@ -32,8 +32,16 @@
       "docsURLTemplate": "/api-reference/common/#common.onmetal.de/v1alpha1.IPPrefix"
     },
     {
+      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.LocalUIDReference",
+      "docsURLTemplate": "/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference"
+    },
+    {
       "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/ipam/v1alpha1\\.PrefixSpec",
       "docsURLTemplate": "/api-reference/common/#ipam.onmetal.de/v1alpha1.PrefixSpec"
+    },
+    {
+      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/ipam/v1alpha1\\.PrefixTemplateSpec",
+      "docsURLTemplate": "/api-reference/common/#ipam.onmetal.de/v1alpha1.PrefixTemplateSpec"
     },
     {
       "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.SecretKeySelector$",
