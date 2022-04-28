@@ -57,6 +57,16 @@ var _ = Describe("AliasPrefix", func() {
 			},
 			ContainElement(InvalidField("spec.networkRef.name")),
 		),
+		Entry("missing ephemeral prefix template",
+			&networking.AliasPrefix{
+				Spec: networking.AliasPrefixSpec{
+					Prefix: networking.PrefixSource{
+						EphemeralPrefix: &networking.EphemeralPrefixSource{},
+					},
+				},
+			},
+			ContainElement(RequiredField("spec.prefix.ephemeralPrefix")),
+		),
 	)
 
 	DescribeTable("ValidateAliasPrefixUpdate",
