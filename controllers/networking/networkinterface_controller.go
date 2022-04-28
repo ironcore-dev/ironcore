@@ -89,7 +89,7 @@ func (r *NetworkInterfaceReconciler) applyIPs(ctx context.Context, nic *networki
 		case ipSource.Value != nil:
 			ips = append(ips, *ipSource.Value)
 		case ipSource.EphemeralPrefix != nil:
-			template := ipSource.EphemeralPrefix.PrefixTemplate
+			template := ipSource.EphemeralPrefix.PrefixTemplateSpec
 
 			prefixMeta := template.ObjectMeta
 			prefixMeta.Namespace = nic.Namespace

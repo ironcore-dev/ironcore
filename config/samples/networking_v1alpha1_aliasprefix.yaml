@@ -10,7 +10,7 @@ spec:
 #    matchLabels:
 #      foo: bar
   prefix:
-    #    value: 10.0.0.0/24 # It's possible to directly specify the AliasPrefix value
+    # value: 10.0.0.0/24 # It's possible to directly specify the AliasPrefix value
     ephemeralPrefix:
       spec:
         parentRef:

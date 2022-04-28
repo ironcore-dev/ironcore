@@ -21,5 +21,5 @@ import (
 )
 
 type EphemeralPrefixSource struct {
-	PrefixTemplate *ipam.PrefixTemplateSpec
+	*ipam.PrefixTemplateSpec
 }

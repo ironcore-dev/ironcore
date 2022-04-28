@@ -89,7 +89,7 @@ var _ = Describe("NetworkInterface", func() {
 			&networking.NetworkInterface{
 				Spec: networking.NetworkInterfaceSpec{
 					IPs: []networking.IPSource{{EphemeralPrefix: &networking.EphemeralPrefixSource{
-						PrefixTemplate: &ipam.PrefixTemplateSpec{
+						PrefixTemplateSpec: &ipam.PrefixTemplateSpec{
 							ObjectMeta: metav1.ObjectMeta{Name: "foo"},
 						}}},
 					},
@@ -101,7 +101,7 @@ var _ = Describe("NetworkInterface", func() {
 			&networking.NetworkInterface{
 				Spec: networking.NetworkInterfaceSpec{
 					IPs: []networking.IPSource{{EphemeralPrefix: &networking.EphemeralPrefixSource{
-						PrefixTemplate: &ipam.PrefixTemplateSpec{
+						PrefixTemplateSpec: &ipam.PrefixTemplateSpec{
 							ObjectMeta: metav1.ObjectMeta{Namespace: "foo"},
 						}}},
 					},
@@ -114,7 +114,7 @@ var _ = Describe("NetworkInterface", func() {
 				Spec: networking.NetworkInterfaceSpec{
 					IPFamilies: []corev1.IPFamily{corev1.IPv4Protocol},
 					IPs: []networking.IPSource{{EphemeralPrefix: &networking.EphemeralPrefixSource{
-						PrefixTemplate: &ipam.PrefixTemplateSpec{
+						PrefixTemplateSpec: &ipam.PrefixTemplateSpec{
 							Spec: ipam.PrefixSpec{
 								IPFamily: corev1.IPv6Protocol,
 							},
@@ -129,7 +129,7 @@ var _ = Describe("NetworkInterface", func() {
 				Spec: networking.NetworkInterfaceSpec{
 					IPFamilies: []corev1.IPFamily{corev1.IPv4Protocol},
 					IPs: []networking.IPSource{{EphemeralPrefix: &networking.EphemeralPrefixSource{
-						PrefixTemplate: &ipam.PrefixTemplateSpec{
+						PrefixTemplateSpec: &ipam.PrefixTemplateSpec{
 							Spec: ipam.PrefixSpec{
 								PrefixLength: 24,
 							},

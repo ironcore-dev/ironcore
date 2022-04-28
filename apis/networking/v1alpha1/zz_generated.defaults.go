@@ -38,8 +38,8 @@ func RegisterDefaults(scheme *runtime.Scheme) error {
 
 func SetObjectDefaults_AliasPrefix(in *AliasPrefix) {
 	if in.Spec.Prefix.EphemeralPrefix != nil {
-		if in.Spec.Prefix.EphemeralPrefix.PrefixTemplate != nil {
-			ipamv1alpha1.SetDefaults_PrefixSpec(&in.Spec.Prefix.EphemeralPrefix.PrefixTemplate.Spec)
+		if in.Spec.Prefix.EphemeralPrefix.PrefixTemplateSpec != nil {
+			ipamv1alpha1.SetDefaults_PrefixSpec(&in.Spec.Prefix.EphemeralPrefix.PrefixTemplateSpec.Spec)
 		}
 	}
 }
@@ -56,8 +56,8 @@ func SetObjectDefaults_NetworkInterface(in *NetworkInterface) {
 	for i := range in.Spec.IPs {
 		a := &in.Spec.IPs[i]
 		if a.EphemeralPrefix != nil {
-			if a.EphemeralPrefix.PrefixTemplate != nil {
-				ipamv1alpha1.SetDefaults_PrefixSpec(&a.EphemeralPrefix.PrefixTemplate.Spec)
+			if a.EphemeralPrefix.PrefixTemplateSpec != nil {
+				ipamv1alpha1.SetDefaults_PrefixSpec(&a.EphemeralPrefix.PrefixTemplateSpec.Spec)
 			}
 		}
 	}

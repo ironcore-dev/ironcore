@@ -19,6 +19,8 @@ package validation
 import (
 	onmetalapivalidation "github.com/onmetal/onmetal-api/api/validation"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	"github.com/onmetal/onmetal-api/apis/ipam"
+	ipamvalidation "github.com/onmetal/onmetal-api/apis/ipam/validation"
 	"github.com/onmetal/onmetal-api/apis/networking"
 	corev1 "k8s.io/api/core/v1"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
@@ -56,15 +58,31 @@ func validateAliasPrefixSpec(spec *networking.AliasPrefixSpec, fldPath *field.Pa
 func validateAliasPrefixSources(prefixSource networking.PrefixSource, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	var ipFamily corev1.IPFamily
 	if ephemeralPrefix := prefixSource.EphemeralPrefix; ephemeralPrefix != nil {
-		if prefixTemplate := ephemeralPrefix.PrefixTemplate; prefixTemplate != nil {
-			ipFamily = prefixTemplate.Spec.IPFamily
-		}
-		allErrs = append(allErrs, validateEphemeralPrefixSource(ipFamily, prefixSource.EphemeralPrefix, fldPath.Child("ephemeralPrefix"))...)
+		allErrs = append(allErrs, validateEphemeralAliasPrefixSource(prefixSource.EphemeralPrefix, fldPath.Child("ephemeralPrefix"))...)
 	}
 
 	allErrs = append(allErrs, validateValuePrefixSource(prefixSource.Value, fldPath.Child("value"))...)
+
+	return allErrs
+}
+
+func validateEphemeralAliasPrefixSource(source *networking.EphemeralPrefixSource, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	allErrs = append(allErrs, ValidatePrefixTemplateForAliasPrefix(source.PrefixTemplateSpec, fldPath)...)
+
+	return allErrs
+}
+
+func ValidatePrefixTemplateForAliasPrefix(template *ipam.PrefixTemplateSpec, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	if template == nil {
+		allErrs = append(allErrs, field.Required(fldPath, ""))
+	} else {
+		allErrs = append(allErrs, ipamvalidation.ValidatePrefixTemplateSpec(template, fldPath)...)
+	}
 
 	return allErrs
 }

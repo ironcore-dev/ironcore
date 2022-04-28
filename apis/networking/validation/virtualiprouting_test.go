@@ -59,7 +59,7 @@ var _ = Describe("VirtualIPRouting", func() {
 		Entry("invalid subset network ref name",
 			&networking.VirtualIPRouting{
 				Subsets: []networking.VirtualIPRoutingSubset{{
-					NetworkRef: networking.LocalUIDReference{Name: "foo*"},
+					NetworkRef: commonv1alpha1.LocalUIDReference{Name: "foo*"},
 				}},
 			},
 			ContainElement(InvalidField("subsets[0].networkRef.name")),
@@ -71,11 +71,11 @@ var _ = Describe("VirtualIPRouting", func() {
 						Targets: []networking.VirtualIPRoutingSubsetTarget{
 							{
 								IP:                commonv1alpha1.MustParseIP("10.0.0.1"),
-								LocalUIDReference: networking.LocalUIDReference{Name: "foo"},
+								LocalUIDReference: commonv1alpha1.LocalUIDReference{Name: "foo"},
 							},
 							{
 								IP:                commonv1alpha1.MustParseIP("10.0.0.1"),
-								LocalUIDReference: networking.LocalUIDReference{Name: "foo"},
+								LocalUIDReference: commonv1alpha1.LocalUIDReference{Name: "foo"},
 							},
 						},
 					},
