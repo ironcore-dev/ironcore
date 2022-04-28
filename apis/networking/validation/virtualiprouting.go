@@ -21,14 +21,9 @@ import (
 	"github.com/onmetal/onmetal-api/apis/common/v1alpha1/validation"
 	"github.com/onmetal/onmetal-api/apis/networking"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
-
-type virtualIPRoutingSubsetKey struct {
-	IP  commonv1alpha1.IP
-	Ref networking.LocalUIDReference
-}
-type virtualIPRoutingSubsetKeySet map[virtualIPRoutingSubsetKey]struct{}
 
 // ValidateVirtualIPRouting validates a virtual ip object.
 func ValidateVirtualIPRouting(virtualIPRouting *networking.VirtualIPRouting) field.ErrorList {
@@ -43,17 +38,15 @@ func ValidateVirtualIPRouting(virtualIPRouting *networking.VirtualIPRouting) fie
 func validateVirtualIPRoutingSubsets(virtualIPRouting *networking.VirtualIPRouting, subsetsField *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	seen := make(virtualIPRoutingSubsetKeySet)
+	seenNetworkNames := sets.NewString()
 	for idx := range virtualIPRouting.Subsets {
 		subset := &virtualIPRouting.Subsets[idx]
 
 		allErrs = append(allErrs, validateVirtualIPRoutingSubset(subset, subsetsField.Index(idx))...)
 
-		key := virtualIPRoutingSubsetKey{IP: subset.IP, Ref: subset.TargetRef}
-		if _, ok := seen[key]; ok {
+		if seenNetworkNames.Has(subset.NetworkRef.Name) {
 			allErrs = append(allErrs, field.Duplicate(subsetsField.Index(idx), subset))
 		}
-		seen[key] = struct{}{}
 	}
 
 	return allErrs
@@ -62,13 +55,47 @@ func validateVirtualIPRoutingSubsets(virtualIPRouting *networking.VirtualIPRouti
 func validateVirtualIPRoutingSubset(subset *networking.VirtualIPRoutingSubset, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, validation.ValidateIP(subset.IP.Family(), subset.IP, fldPath.Child("ip"))...)
-
-	if subset.TargetRef.Name == "" {
-		allErrs = append(allErrs, field.Required(fldPath.Child("targetRef", "name"), "must specify network interface ref name"))
+	if subset.NetworkRef.Name == "" {
+		allErrs = append(allErrs, field.Required(fldPath.Child("networkRef", "name"), "must specify network name"))
+	} else {
+		for _, msg := range apivalidation.NameIsDNSLabel(subset.NetworkRef.Name, false) {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("networkRef", "name"), subset.NetworkRef.Name, msg))
+		}
 	}
-	for _, msg := range apivalidation.NameIsDNSLabel(subset.TargetRef.Name, false) {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("targetRef", "name"), subset.TargetRef.Name, msg))
+
+	if len(subset.Targets) == 0 {
+		allErrs = append(allErrs, field.Invalid(fldPath, subset, "may not specify no targets"))
+	} else {
+		type targetKey struct {
+			name string
+			ip   commonv1alpha1.IP
+		}
+		seenTargetKeys := make(map[targetKey]struct{})
+		for idx := range subset.Targets {
+			target := &subset.Targets[idx]
+			allErrs = append(allErrs, validateVirtualIPRoutingSubsetTarget(target, fldPath.Child("targets").Index(idx))...)
+			key := targetKey{target.Name, target.IP}
+			if _, ok := seenTargetKeys[key]; ok {
+				allErrs = append(allErrs, field.Duplicate(fldPath.Child("targets").Index(idx), target))
+			} else {
+				seenTargetKeys[key] = struct{}{}
+			}
+		}
+	}
+	return allErrs
+}
+
+func validateVirtualIPRoutingSubsetTarget(target *networking.VirtualIPRoutingSubsetTarget, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	allErrs = append(allErrs, validation.ValidateIP(target.IP.Family(), target.IP, fldPath.Child("ip"))...)
+
+	if target.Name == "" {
+		allErrs = append(allErrs, field.Required(fldPath.Child("name"), "must specify target name"))
+	} else {
+		for _, msg := range apivalidation.NameIsDNSLabel(target.Name, false) {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), target.Name, msg))
+		}
 	}
 
 	return allErrs

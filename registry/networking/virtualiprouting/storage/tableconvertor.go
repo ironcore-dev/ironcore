@@ -16,6 +16,7 @@ package storage
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/onmetal/onmetal-api/apis/networking"
 	"github.com/onmetal/onmetal-api/tableconvertor"
@@ -41,10 +42,12 @@ func newTableConvertor() *convertor {
 	return &convertor{}
 }
 
-func formatEndpoints(virtualIPRoutingSubsets []networking.VirtualIPRoutingSubset) string {
-	parts := make([]string, 0, len(virtualIPRoutingSubsets))
-	for _, virtualIPRoutingSubset := range virtualIPRoutingSubsets {
-		parts = append(parts, virtualIPRoutingSubset.IP.String())
+func formatEndpoints(subsets []networking.VirtualIPRoutingSubset) string {
+	var parts []string
+	for _, subset := range subsets {
+		for _, target := range subset.Targets {
+			parts = append(parts, fmt.Sprintf("%s:%s", subset.NetworkRef.Name, target.IP))
+		}
 	}
 	return tableconvertor.JoinStringsMore(parts, ",", 3)
 }

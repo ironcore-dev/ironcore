@@ -44,10 +44,16 @@ type LocalUIDReference struct {
 
 // VirtualIPRoutingSubset is one of the targets of a VirtualIPRouting.
 type VirtualIPRoutingSubset struct {
-	// IP is the IP of the entity routed towards.
+	// NetworkRef is the network all targets are in.
+	NetworkRef LocalUIDReference
+	// Targets are the targets of the virtual IP.
+	Targets []VirtualIPRoutingSubsetTarget
+}
+
+type VirtualIPRoutingSubsetTarget struct {
+	LocalUIDReference
+	// IP is the target ip to route to.
 	IP commonv1alpha1.IP
-	// TargetRef is the targeted entity.
-	TargetRef LocalUIDReference
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

@@ -67,6 +67,7 @@ const (
 	prefixAllocationScheduler = "prefixallocationscheduler"
 
 	networkInterfaceController = "networkInterface"
+	virtualIPController        = "virtualip"
 )
 
 func init() {
@@ -99,7 +100,7 @@ func main() {
 		volumePoolController, volumeClassController, volumeController, volumeClaimController, volumeScheduler, volumeClaimScheduler,
 
 		// Networking controllers
-		networkInterfaceController,
+		networkInterfaceController, virtualIPController,
 
 		// IPAM controllers
 		prefixController, prefixAllocationScheduler,
@@ -263,6 +264,16 @@ func main() {
 			Scheme: mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "NetworkInterface")
+			os.Exit(1)
+		}
+	}
+
+	if controllers.Enabled(virtualIPController) {
+		if err = (&networking.VirtualIPReconciler{
+			Client: mgr.GetClient(),
+			Scheme: mgr.GetScheme(),
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "VirtualIP")
 			os.Exit(1)
 		}
 	}
