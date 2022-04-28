@@ -50,6 +50,7 @@ const (
 	pollingInterval      = 50 * time.Millisecond
 	eventuallyTimeout    = 3 * time.Second
 	consistentlyDuration = 1 * time.Second
+	apiServiceTimeout    = 5 * time.Minute
 )
 
 var (
@@ -115,7 +116,7 @@ var _ = BeforeSuite(func() {
 		Expect(err).NotTo(HaveOccurred())
 	}()
 
-	Expect(envtestutils.WaitUntilAPIServicesReadyWithTimeout(60*time.Second, testEnvExt, k8sClient, scheme.Scheme)).To(Succeed())
+	Expect(envtestutils.WaitUntilAPIServicesReadyWithTimeout(apiServiceTimeout, testEnvExt, k8sClient, scheme.Scheme)).To(Succeed())
 })
 
 func SetupTest(ctx context.Context) *corev1.Namespace {

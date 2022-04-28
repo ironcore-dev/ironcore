@@ -48,6 +48,7 @@ const (
 	pollingInterval      = 50 * time.Millisecond
 	eventuallyTimeout    = 3 * time.Second
 	consistentlyDuration = 1 * time.Second
+	apiServiceTimeout    = 5 * time.Minute
 )
 
 var (
@@ -113,7 +114,7 @@ var _ = BeforeSuite(func() {
 		Expect(err).NotTo(HaveOccurred())
 	}()
 
-	err = envtestutils.WaitUntilAPIServicesReadyWithTimeout(60*time.Second, testEnvExt, k8sClient, scheme.Scheme)
+	err = envtestutils.WaitUntilAPIServicesReadyWithTimeout(apiServiceTimeout, testEnvExt, k8sClient, scheme.Scheme)
 	Expect(err).NotTo(HaveOccurred())
 })
 
