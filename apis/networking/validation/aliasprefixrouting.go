@@ -25,11 +25,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
-type aliasPrefixRoutingSubsetKey struct {
-	Ref commonv1alpha1.LocalUIDReference
-}
-type aliasPrefixRoutingSubsetKeySet map[aliasPrefixRoutingSubsetKey]struct{}
-
 // ValidateAliasPrefixRouting validates an AliasPrefixRouting object.
 func ValidateAliasPrefixRouting(aliasPrefixRouting *networking.AliasPrefixRouting) field.ErrorList {
 	var allErrs field.ErrorList
@@ -46,10 +41,10 @@ func validateAliasPrefixRouting(aliasPrefixRouting *networking.AliasPrefixRoutin
 
 	if aliasPrefixRouting.NetworkRef == (corev1.LocalObjectReference{}) {
 		allErrs = append(allErrs, field.Required(field.NewPath("networkRef"), "must specify a network ref"))
-	}
-
-	for _, msg := range apivalidation.NameIsDNSLabel(aliasPrefixRouting.NetworkRef.Name, false) {
-		allErrs = append(allErrs, field.Invalid(field.NewPath("networkRef").Child("name"), aliasPrefixRouting.NetworkRef.Name, msg))
+	} else {
+		for _, msg := range apivalidation.NameIsDNSLabel(aliasPrefixRouting.NetworkRef.Name, false) {
+			allErrs = append(allErrs, field.Invalid(field.NewPath("networkRef").Child("name"), aliasPrefixRouting.NetworkRef.Name, msg))
+		}
 	}
 
 	return allErrs
@@ -58,13 +53,13 @@ func validateAliasPrefixRouting(aliasPrefixRouting *networking.AliasPrefixRoutin
 func validateAliasPrefixRoutingSubsets(aliasPrefixRouting *networking.AliasPrefixRouting, subsetsField *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	seen := make(aliasPrefixRoutingSubsetKeySet)
+	seen := make(map[commonv1alpha1.LocalUIDReference]struct{})
 	for idx := range aliasPrefixRouting.Subsets {
 		subset := &aliasPrefixRouting.Subsets[idx]
 
 		allErrs = append(allErrs, validateAliasPrefixRoutingSubset(subset, subsetsField.Index(idx))...)
 
-		key := aliasPrefixRoutingSubsetKey{Ref: subset.TargetRef}
+		key := subset.TargetRef
 		if _, ok := seen[key]; ok {
 			allErrs = append(allErrs, field.Duplicate(subsetsField.Index(idx), subset))
 		}
@@ -79,9 +74,10 @@ func validateAliasPrefixRoutingSubset(subset *networking.AliasPrefixSubset, fldP
 
 	if subset.TargetRef.Name == "" {
 		allErrs = append(allErrs, field.Required(fldPath.Child("targetRef", "name"), "must specify network interface ref name"))
-	}
-	for _, msg := range apivalidation.NameIsDNSLabel(subset.TargetRef.Name, false) {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("targetRef", "name"), subset.TargetRef.Name, msg))
+	} else {
+		for _, msg := range apivalidation.NameIsDNSLabel(subset.TargetRef.Name, false) {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("targetRef", "name"), subset.TargetRef.Name, msg))
+		}
 	}
 
 	return allErrs

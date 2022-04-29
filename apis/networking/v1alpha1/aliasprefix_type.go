@@ -45,7 +45,7 @@ type PrefixSource struct {
 // AliasPrefixStatus defines the observed state of AliasPrefix
 type AliasPrefixStatus struct {
 	// Prefix is the Prefix reserved by this AliasPrefix
-	Prefix commonv1alpha1.IPPrefix `json:"prefix,omitempty"`
+	Prefix *commonv1alpha1.IPPrefix `json:"prefix,omitempty"`
 }
 
 // +genclient

@@ -91,7 +91,9 @@ func (aliasPrefixStrategy) Canonicalize(obj runtime.Object) {
 }
 
 func (aliasPrefixStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
-	return field.ErrorList{}
+	newAliasPrefix := obj.(*networking.AliasPrefix)
+	oldAliasPrefix := old.(*networking.AliasPrefix)
+	return validation.ValidateAliasPrefixUpdate(newAliasPrefix, oldAliasPrefix)
 }
 
 func (aliasPrefixStrategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {

@@ -422,7 +422,7 @@ func Convert_networking_AliasPrefixSpec_To_v1alpha1_AliasPrefixSpec(in *networki
 }
 
 func autoConvert_v1alpha1_AliasPrefixStatus_To_networking_AliasPrefixStatus(in *AliasPrefixStatus, out *networking.AliasPrefixStatus, s conversion.Scope) error {
-	out.Prefix = in.Prefix
+	out.Prefix = (*commonv1alpha1.IPPrefix)(unsafe.Pointer(in.Prefix))
 	return nil
 }
 
@@ -432,7 +432,7 @@ func Convert_v1alpha1_AliasPrefixStatus_To_networking_AliasPrefixStatus(in *Alia
 }
 
 func autoConvert_networking_AliasPrefixStatus_To_v1alpha1_AliasPrefixStatus(in *networking.AliasPrefixStatus, out *AliasPrefixStatus, s conversion.Scope) error {
-	out.Prefix = in.Prefix
+	out.Prefix = (*commonv1alpha1.IPPrefix)(unsafe.Pointer(in.Prefix))
 	return nil
 }
 
@@ -442,7 +442,7 @@ func Convert_networking_AliasPrefixStatus_To_v1alpha1_AliasPrefixStatus(in *netw
 }
 
 func autoConvert_v1alpha1_EphemeralPrefixSource_To_networking_EphemeralPrefixSource(in *EphemeralPrefixSource, out *networking.EphemeralPrefixSource, s conversion.Scope) error {
-	out.PrefixTemplateSpec = (*ipam.PrefixTemplateSpec)(unsafe.Pointer(in.PrefixTemplateSpec))
+	out.PrefixTemplate = (*ipam.PrefixTemplateSpec)(unsafe.Pointer(in.PrefixTemplate))
 	return nil
 }
 
@@ -452,7 +452,7 @@ func Convert_v1alpha1_EphemeralPrefixSource_To_networking_EphemeralPrefixSource(
 }
 
 func autoConvert_networking_EphemeralPrefixSource_To_v1alpha1_EphemeralPrefixSource(in *networking.EphemeralPrefixSource, out *EphemeralPrefixSource, s conversion.Scope) error {
-	out.PrefixTemplateSpec = (*ipamv1alpha1.PrefixTemplateSpec)(unsafe.Pointer(in.PrefixTemplateSpec))
+	out.PrefixTemplate = (*ipamv1alpha1.PrefixTemplateSpec)(unsafe.Pointer(in.PrefixTemplate))
 	return nil
 }
 

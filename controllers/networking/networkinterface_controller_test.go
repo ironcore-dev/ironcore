@@ -120,7 +120,7 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 				IPs: []networkingv1alpha1.IPSource{
 					{
 						EphemeralPrefix: &networkingv1alpha1.EphemeralPrefixSource{
-							PrefixTemplateSpec: &ipamv1alpha1.PrefixTemplateSpec{
+							PrefixTemplate: &ipamv1alpha1.PrefixTemplateSpec{
 								Spec: ipamv1alpha1.PrefixSpec{
 									IPFamily:  corev1.IPv4Protocol,
 									ParentRef: &corev1.LocalObjectReference{Name: rootPrefix.Name},

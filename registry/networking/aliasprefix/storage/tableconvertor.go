@@ -63,7 +63,11 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 		aliasPrefix := obj.(*networking.AliasPrefix)
 
 		cells = append(cells, name)
-		cells = append(cells, aliasPrefix.Status.Prefix)
+		if aliasPrefix.Status.Prefix != nil && aliasPrefix.Status.Prefix.IsValid() {
+			cells = append(cells, aliasPrefix.Status.Prefix)
+		} else {
+			cells = append(cells, "None")
+		}
 		cells = append(cells, age)
 
 		return cells, nil

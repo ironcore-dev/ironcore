@@ -12,9 +12,11 @@ spec:
   prefix:
     # value: 10.0.0.0/24 # It's possible to directly specify the AliasPrefix value
     ephemeralPrefix:
-      spec:
-        parentRef:
-          name: prefix-sample
-        prefixLength: 24
+      prefixTemplate:
+        spec:
+          ipFamily: IPv4
+          parentRef:
+            name: prefix-sample
+          prefixLength: 24
 #status:
 #  prefix: 10.0.0.0/24

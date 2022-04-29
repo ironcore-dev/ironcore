@@ -17,6 +17,7 @@
 package validation
 
 import (
+	"github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	"github.com/onmetal/onmetal-api/apis/networking"
 	"github.com/onmetal/onmetal-api/testutils/validation"
 	. "github.com/onmetal/onmetal-api/testutils/validation"
@@ -65,7 +66,18 @@ var _ = Describe("AliasPrefix", func() {
 					},
 				},
 			},
-			ContainElement(RequiredField("spec.prefix.ephemeralPrefix")),
+			ContainElement(RequiredField("spec.prefix.ephemeralPrefix.prefixTemplate")),
+		),
+		Entry("ephemeral prefix and value are provided",
+			&networking.AliasPrefix{
+				Spec: networking.AliasPrefixSpec{
+					Prefix: networking.PrefixSource{
+						EphemeralPrefix: &networking.EphemeralPrefixSource{},
+						Value:           v1alpha1.PtrToIPPrefix(v1alpha1.MustParseIPPrefix("10.0.0.0/24")),
+					},
+				},
+			},
+			ContainElement(ForbiddenField("spec.prefix")),
 		),
 	)
 

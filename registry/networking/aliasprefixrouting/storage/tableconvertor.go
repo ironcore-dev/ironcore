@@ -19,6 +19,8 @@ package storage
 import (
 	"context"
 
+	"github.com/onmetal/onmetal-api/apis/networking"
+	"github.com/onmetal/onmetal-api/tableconvertor"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/meta/table"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -32,6 +34,7 @@ var (
 
 	headers = []metav1.TableColumnDefinition{
 		{Name: "Name", Type: "string", Format: "name", Description: objectMetaSwaggerDoc["name"]},
+		{Name: "Targets", Type: "string", Description: "The target endpoints of this alias prefix."},
 		{Name: "Age", Type: "string", Format: "date", Description: objectMetaSwaggerDoc["creationTimestamp"]},
 	}
 )
@@ -58,10 +61,21 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 
 	var err error
 	tab.Rows, err = table.MetaToTableRow(obj, func(obj runtime.Object, m metav1.Object, name, age string) (cells []interface{}, err error) {
+		aliasPrefixRouting := obj.(*networking.AliasPrefixRouting)
+
 		cells = append(cells, name)
+		cells = append(cells, formatEndpoints(aliasPrefixRouting.Subsets))
 		cells = append(cells, age)
 
 		return cells, nil
 	})
 	return tab, err
+}
+
+func formatEndpoints(subsets []networking.AliasPrefixSubset) string {
+	var parts []string
+	for _, subset := range subsets {
+		parts = append(parts, subset.TargetRef.Name)
+	}
+	return tableconvertor.JoinStringsMore(parts, ",", 3)
 }

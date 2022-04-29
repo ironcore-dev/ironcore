@@ -2212,7 +2212,6 @@ func schema_onmetal_api_apis_networking_v1alpha1_AliasPrefixStatus(ref common.Re
 					"prefix": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Prefix is the Prefix reserved by this AliasPrefix",
-							Default:     map[string]interface{}{},
 							Ref:         ref("github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix"),
 						},
 					},
@@ -2230,23 +2229,16 @@ func schema_onmetal_api_apis_networking_v1alpha1_EphemeralPrefixSource(ref commo
 			SchemaProps: spec.SchemaProps{
 				Type: []string{"object"},
 				Properties: map[string]spec.Schema{
-					"metadata": {
+					"prefixTemplate": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixSpec"),
+							Ref: ref("github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixTemplateSpec"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			"github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixTemplateSpec"},
 	}
 }
 

@@ -89,32 +89,32 @@ var _ = Describe("NetworkInterface", func() {
 			&networking.NetworkInterface{
 				Spec: networking.NetworkInterfaceSpec{
 					IPs: []networking.IPSource{{EphemeralPrefix: &networking.EphemeralPrefixSource{
-						PrefixTemplateSpec: &ipam.PrefixTemplateSpec{
+						PrefixTemplate: &ipam.PrefixTemplateSpec{
 							ObjectMeta: metav1.ObjectMeta{Name: "foo"},
 						}}},
 					},
 				},
 			},
-			ContainElement(ForbiddenField("spec.ips[0].ephemeralPrefix.metadata.name")),
+			ContainElement(ForbiddenField("spec.ips[0].ephemeralPrefix.prefixTemplate.metadata.name")),
 		),
 		Entry("ephemeral prefix namespace present",
 			&networking.NetworkInterface{
 				Spec: networking.NetworkInterfaceSpec{
 					IPs: []networking.IPSource{{EphemeralPrefix: &networking.EphemeralPrefixSource{
-						PrefixTemplateSpec: &ipam.PrefixTemplateSpec{
+						PrefixTemplate: &ipam.PrefixTemplateSpec{
 							ObjectMeta: metav1.ObjectMeta{Namespace: "foo"},
 						}}},
 					},
 				},
 			},
-			ContainElement(ForbiddenField("spec.ips[0].ephemeralPrefix.metadata.namespace")),
+			ContainElement(ForbiddenField("spec.ips[0].ephemeralPrefix.prefixTemplate.metadata.namespace")),
 		),
 		Entry("ephemeral prefix ip family mismatch",
 			&networking.NetworkInterface{
 				Spec: networking.NetworkInterfaceSpec{
 					IPFamilies: []corev1.IPFamily{corev1.IPv4Protocol},
 					IPs: []networking.IPSource{{EphemeralPrefix: &networking.EphemeralPrefixSource{
-						PrefixTemplateSpec: &ipam.PrefixTemplateSpec{
+						PrefixTemplate: &ipam.PrefixTemplateSpec{
 							Spec: ipam.PrefixSpec{
 								IPFamily: corev1.IPv6Protocol,
 							},
@@ -122,14 +122,14 @@ var _ = Describe("NetworkInterface", func() {
 					},
 				},
 			},
-			ContainElement(ForbiddenField("spec.ips[0].ephemeralPrefix.spec.ipFamily")),
+			ContainElement(ForbiddenField("spec.ips[0].ephemeralPrefix.prefixTemplate.spec.ipFamily")),
 		),
 		Entry("ephemeral prefix does not create a single ip",
 			&networking.NetworkInterface{
 				Spec: networking.NetworkInterfaceSpec{
 					IPFamilies: []corev1.IPFamily{corev1.IPv4Protocol},
 					IPs: []networking.IPSource{{EphemeralPrefix: &networking.EphemeralPrefixSource{
-						PrefixTemplateSpec: &ipam.PrefixTemplateSpec{
+						PrefixTemplate: &ipam.PrefixTemplateSpec{
 							Spec: ipam.PrefixSpec{
 								PrefixLength: 24,
 							},
@@ -137,7 +137,7 @@ var _ = Describe("NetworkInterface", func() {
 					},
 				},
 			},
-			ContainElement(ForbiddenField("spec.ips[0].ephemeralPrefix.spec.prefixLength")),
+			ContainElement(ForbiddenField("spec.ips[0].ephemeralPrefix.prefixTemplate.spec.prefixLength")),
 		),
 	)
 

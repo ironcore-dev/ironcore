@@ -43,10 +43,10 @@ func validateAliasPrefixSpec(spec *networking.AliasPrefixSpec, fldPath *field.Pa
 
 	if spec.NetworkRef == (corev1.LocalObjectReference{}) {
 		allErrs = append(allErrs, field.Required(fldPath.Child("networkRef"), "must specify a network ref"))
-	}
-
-	for _, msg := range apivalidation.NameIsDNSLabel(spec.NetworkRef.Name, false) {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("networkRef").Child("name"), spec.NetworkRef.Name, msg))
+	} else {
+		for _, msg := range apivalidation.NameIsDNSLabel(spec.NetworkRef.Name, false) {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("networkRef").Child("name"), spec.NetworkRef.Name, msg))
+		}
 	}
 
 	allErrs = append(allErrs, metav1validation.ValidateLabelSelector(spec.NetworkInterfaceSelector, fldPath.Child("networkInterfaceSelector"))...)
@@ -58,11 +58,15 @@ func validateAliasPrefixSpec(spec *networking.AliasPrefixSpec, fldPath *field.Pa
 func validateAliasPrefixSources(prefixSource networking.PrefixSource, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
+	if prefixSource.EphemeralPrefix != nil && prefixSource.Value != nil {
+		allErrs = append(allErrs, field.Forbidden(fldPath, "only ephemeralPrefix or value should be provided"))
+	}
+
 	if ephemeralPrefix := prefixSource.EphemeralPrefix; ephemeralPrefix != nil {
 		allErrs = append(allErrs, validateEphemeralAliasPrefixSource(prefixSource.EphemeralPrefix, fldPath.Child("ephemeralPrefix"))...)
 	}
 
-	allErrs = append(allErrs, validateValuePrefixSource(prefixSource.Value, fldPath.Child("value"))...)
+	allErrs = append(allErrs, validateValuePrefixSource(prefixSource.Value, fldPath.Child("prefixTemplate").Child("value"))...)
 
 	return allErrs
 }
@@ -70,7 +74,7 @@ func validateAliasPrefixSources(prefixSource networking.PrefixSource, fldPath *f
 func validateEphemeralAliasPrefixSource(source *networking.EphemeralPrefixSource, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, ValidatePrefixTemplateForAliasPrefix(source.PrefixTemplateSpec, fldPath)...)
+	allErrs = append(allErrs, ValidatePrefixTemplateForAliasPrefix(source.PrefixTemplate, fldPath.Child("prefixTemplate"))...)
 
 	return allErrs
 }
