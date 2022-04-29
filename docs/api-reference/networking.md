@@ -753,7 +753,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
 <tbody>
 <tr>
 <td>
-<code>PrefixTemplateSpec</code><br/>
+<code>prefixTemplate</code><br/>
 <em>
 <a href="/api-reference/common/#ipam.onmetal.de/v1alpha1.PrefixTemplateSpec">
 github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixTemplateSpec
@@ -761,9 +761,6 @@ github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixTemplateSpec
 </em>
 </td>
 <td>
-<p>
-(Members of <code>PrefixTemplateSpec</code> are embedded into this type.)
-</p>
 </td>
 </tr>
 </tbody>
