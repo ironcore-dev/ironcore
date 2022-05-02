@@ -152,6 +152,45 @@ IP
 </tr>
 </tbody>
 </table>
+<h3 id="common.onmetal.de/v1alpha1.LocalUIDReference">LocalUIDReference
+</h3>
+<div>
+<p>LocalUIDReference is a reference to another entity including its UID</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the referenced entity.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>uid</code><br/>
+<em>
+<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/types#UID">
+k8s.io/apimachinery/pkg/types.UID
+</a>
+</em>
+</td>
+<td>
+<p>UID is the UID of the referenced entity.</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="common.onmetal.de/v1alpha1.SecretKeySelector">SecretKeySelector
 </h3>
 <div>

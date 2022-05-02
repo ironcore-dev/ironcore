@@ -27,6 +27,14 @@ type FakeNetworkingV1alpha1 struct {
 	*testing.Fake
 }
 
+func (c *FakeNetworkingV1alpha1) AliasPrefixes(namespace string) v1alpha1.AliasPrefixInterface {
+	return &FakeAliasPrefixes{c, namespace}
+}
+
+func (c *FakeNetworkingV1alpha1) AliasPrefixRoutings(namespace string) v1alpha1.AliasPrefixRoutingInterface {
+	return &FakeAliasPrefixRoutings{c, namespace}
+}
+
 func (c *FakeNetworkingV1alpha1) Networks(namespace string) v1alpha1.NetworkInterface {
 	return &FakeNetworks{c, namespace}
 }

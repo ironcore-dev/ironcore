@@ -19,7 +19,6 @@ package v1alpha1
 import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
 )
 
 // +genclient
@@ -34,24 +33,16 @@ type VirtualIPRouting struct {
 	Subsets []VirtualIPRoutingSubset `json:"subsets,omitempty"`
 }
 
-// LocalUIDReference is a reference to another entity including its UID.
-type LocalUIDReference struct {
-	// Name is the name of the referenced entity.
-	Name string `json:"name"`
-	// UID is the UID of the referenced entity.
-	UID types.UID `json:"uid"`
-}
-
 // VirtualIPRoutingSubset is one of the targets of a VirtualIPRouting.
 type VirtualIPRoutingSubset struct {
 	// NetworkRef is the network all targets are in.
-	NetworkRef LocalUIDReference `json:"networkRef"`
+	NetworkRef commonv1alpha1.LocalUIDReference `json:"networkRef"`
 	// Targets are the targets of the virtual IP.
 	Targets []VirtualIPRoutingSubsetTarget `json:"targets"`
 }
 
 type VirtualIPRoutingSubsetTarget struct {
-	LocalUIDReference `json:",inline"`
+	commonv1alpha1.LocalUIDReference `json:",inline"`
 	// IP is the target ip to route to.
 	IP commonv1alpha1.IP `json:"ip"`
 }

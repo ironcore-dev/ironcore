@@ -11,6 +11,7 @@ API rule violation: list_type_missing,github.com/onmetal/onmetal-api/apis/comput
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/apis/ipam/v1alpha1,PrefixAllocationStatus,Conditions
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/apis/ipam/v1alpha1,PrefixStatus,Conditions
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/apis/ipam/v1alpha1,PrefixStatus,Used
+API rule violation: list_type_missing,github.com/onmetal/onmetal-api/apis/networking/v1alpha1,AliasPrefixRouting,Subsets
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/apis/networking/v1alpha1,NetworkInterfaceBinding,IPs
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/apis/networking/v1alpha1,NetworkInterfaceSpec,IPFamilies
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/apis/networking/v1alpha1,NetworkInterfaceSpec,IPs

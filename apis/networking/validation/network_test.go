@@ -18,7 +18,7 @@ package validation
 
 import (
 	"github.com/onmetal/onmetal-api/apis/networking"
-	"github.com/onmetal/onmetal-api/testutils/validation"
+	. "github.com/onmetal/onmetal-api/testutils/validation"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"
@@ -33,15 +33,15 @@ var _ = Describe("Network", func() {
 		},
 		Entry("missing name",
 			&networking.Network{},
-			ContainElement(validation.RequiredField("metadata.name")),
+			ContainElement(RequiredField("metadata.name")),
 		),
 		Entry("missing namespace",
 			&networking.Network{ObjectMeta: metav1.ObjectMeta{Name: "foo"}},
-			ContainElement(validation.RequiredField("metadata.namespace")),
+			ContainElement(RequiredField("metadata.namespace")),
 		),
 		Entry("bad name",
 			&networking.Network{ObjectMeta: metav1.ObjectMeta{Name: "foo*"}},
-			ContainElement(validation.InvalidField("metadata.name")),
+			ContainElement(InvalidField("metadata.name")),
 		),
 	)
 

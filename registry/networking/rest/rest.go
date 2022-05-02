@@ -18,6 +18,8 @@ import (
 	"github.com/onmetal/onmetal-api/api"
 	"github.com/onmetal/onmetal-api/apis/networking"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
+	aliasprefixstorage "github.com/onmetal/onmetal-api/registry/networking/aliasprefix/storage"
+	aliasprefixroutingstoratge "github.com/onmetal/onmetal-api/registry/networking/aliasprefixrouting/storage"
 	networkstorage "github.com/onmetal/onmetal-api/registry/networking/network/storage"
 	networkinterfacestorage "github.com/onmetal/onmetal-api/registry/networking/networkinterface/storage"
 	networkinterfacebindingstorage "github.com/onmetal/onmetal-api/registry/networking/networkinterfacebinding/storage"
@@ -93,6 +95,21 @@ func (p StorageProvider) v1alpha1Storage(restOptionsGetter generic.RESTOptionsGe
 	}
 
 	storageMap["virtualiproutings"] = virtualIPRoutingStorage.VirtualIPRouting
+
+	aliasPrefixStorage, err := aliasprefixstorage.NewStorage(restOptionsGetter)
+	if err != nil {
+		return storageMap, err
+	}
+
+	storageMap["aliasprefixes"] = aliasPrefixStorage.AliasPrefix
+	storageMap["aliasprefixes/status"] = aliasPrefixStorage.Status
+
+	aliasPrefixRoutingStorage, err := aliasprefixroutingstoratge.NewStorage(restOptionsGetter)
+	if err != nil {
+		return storageMap, err
+	}
+
+	storageMap["aliasprefixroutings"] = aliasPrefixRoutingStorage.AliasPrefixRouting
 
 	return storageMap, nil
 }

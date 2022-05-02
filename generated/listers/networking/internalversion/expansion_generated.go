@@ -17,6 +17,22 @@
 
 package internalversion
 
+// AliasPrefixListerExpansion allows custom methods to be added to
+// AliasPrefixLister.
+type AliasPrefixListerExpansion interface{}
+
+// AliasPrefixNamespaceListerExpansion allows custom methods to be added to
+// AliasPrefixNamespaceLister.
+type AliasPrefixNamespaceListerExpansion interface{}
+
+// AliasPrefixRoutingListerExpansion allows custom methods to be added to
+// AliasPrefixRoutingLister.
+type AliasPrefixRoutingListerExpansion interface{}
+
+// AliasPrefixRoutingNamespaceListerExpansion allows custom methods to be added to
+// AliasPrefixRoutingNamespaceLister.
+type AliasPrefixRoutingNamespaceListerExpansion interface{}
+
 // NetworkListerExpansion allows custom methods to be added to
 // NetworkLister.
 type NetworkListerExpansion interface{}

@@ -160,7 +160,7 @@ func ValidatePrefixTemplateForNetworkInterface(template *ipam.PrefixTemplateSpec
 func validateEphemeralPrefixSource(ipFamily corev1.IPFamily, source *networking.EphemeralPrefixSource, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, ValidatePrefixTemplateForNetworkInterface(source.PrefixTemplate, ipFamily, fldPath)...)
+	allErrs = append(allErrs, ValidatePrefixTemplateForNetworkInterface(source.PrefixTemplate, ipFamily, fldPath.Child("prefixTemplate"))...)
 
 	return allErrs
 }

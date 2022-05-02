@@ -17,6 +17,10 @@
 
 package v1alpha1
 
+type AliasPrefixExpansion interface{}
+
+type AliasPrefixRoutingExpansion interface{}
+
 type NetworkExpansion interface{}
 
 type NetworkInterfaceExpansion interface{}

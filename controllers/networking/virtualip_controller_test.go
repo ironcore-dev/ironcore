@@ -87,13 +87,13 @@ var _ = Describe("VirtualIPReconciler", func() {
 
 			g.Expect(virtualIPRouting.Subsets).To(ConsistOf(
 				networkingv1alpha1.VirtualIPRoutingSubset{
-					NetworkRef: networkingv1alpha1.LocalUIDReference{
+					NetworkRef: commonv1alpha1.LocalUIDReference{
 						Name: network.Name,
 						UID:  network.UID,
 					},
 					Targets: []networkingv1alpha1.VirtualIPRoutingSubsetTarget{
 						{
-							LocalUIDReference: networkingv1alpha1.LocalUIDReference{
+							LocalUIDReference: commonv1alpha1.LocalUIDReference{
 								Name: nic.Name,
 								UID:  nic.UID,
 							},

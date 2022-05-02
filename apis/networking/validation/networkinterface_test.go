@@ -95,7 +95,7 @@ var _ = Describe("NetworkInterface", func() {
 					},
 				},
 			},
-			ContainElement(ForbiddenField("spec.ips[0].ephemeralPrefix.metadata.name")),
+			ContainElement(ForbiddenField("spec.ips[0].ephemeralPrefix.prefixTemplate.metadata.name")),
 		),
 		Entry("ephemeral prefix namespace present",
 			&networking.NetworkInterface{
@@ -107,7 +107,7 @@ var _ = Describe("NetworkInterface", func() {
 					},
 				},
 			},
-			ContainElement(ForbiddenField("spec.ips[0].ephemeralPrefix.metadata.namespace")),
+			ContainElement(ForbiddenField("spec.ips[0].ephemeralPrefix.prefixTemplate.metadata.namespace")),
 		),
 		Entry("ephemeral prefix ip family mismatch",
 			&networking.NetworkInterface{
@@ -122,7 +122,7 @@ var _ = Describe("NetworkInterface", func() {
 					},
 				},
 			},
-			ContainElement(ForbiddenField("spec.ips[0].ephemeralPrefix.spec.ipFamily")),
+			ContainElement(ForbiddenField("spec.ips[0].ephemeralPrefix.prefixTemplate.spec.ipFamily")),
 		),
 		Entry("ephemeral prefix does not create a single ip",
 			&networking.NetworkInterface{
@@ -137,7 +137,7 @@ var _ = Describe("NetworkInterface", func() {
 					},
 				},
 			},
-			ContainElement(ForbiddenField("spec.ips[0].ephemeralPrefix.spec.prefixLength")),
+			ContainElement(ForbiddenField("spec.ips[0].ephemeralPrefix.prefixTemplate.spec.prefixLength")),
 		),
 	)
 

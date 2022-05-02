@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
+	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -98,7 +99,7 @@ func (r *VirtualIPReconciler) reconcile(ctx context.Context, log logr.Logger, vi
 		networkName := nic.Spec.NetworkRef.Name
 		for _, ip := range nicBinding.IPs {
 			targetsByNetworkName[networkName] = append(targetsByNetworkName[networkName], networkingv1alpha1.VirtualIPRoutingSubsetTarget{
-				LocalUIDReference: networkingv1alpha1.LocalUIDReference{
+				LocalUIDReference: commonv1alpha1.LocalUIDReference{
 					Name: nic.Name,
 					UID:  nic.UID,
 				},
@@ -121,7 +122,7 @@ func (r *VirtualIPReconciler) reconcile(ctx context.Context, log logr.Logger, vi
 		}
 
 		subsets = append(subsets, networkingv1alpha1.VirtualIPRoutingSubset{
-			NetworkRef: networkingv1alpha1.LocalUIDReference{
+			NetworkRef: commonv1alpha1.LocalUIDReference{
 				Name: networkName,
 				UID:  network.UID,
 			},
