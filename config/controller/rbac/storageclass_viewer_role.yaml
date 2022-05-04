@@ -1,0 +1,20 @@
+# permissions for end users to view volumeclasses.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: volumeclass-viewer-role
+rules:
+  - apiGroups:
+      - storage.api.onmetal.de
+    resources:
+      - volumeclasses
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - storage.api.onmetal.de
+    resources:
+      - volumeclasses/status
+    verbs:
+      - get

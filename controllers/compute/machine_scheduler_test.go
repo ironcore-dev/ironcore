@@ -15,7 +15,8 @@
 package compute
 
 import (
-	. "github.com/onsi/ginkgo"
+	"github.com/onmetal/onmetal-api/testutils"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -26,6 +27,7 @@ import (
 )
 
 var _ = Describe("MachineScheduler", func() {
+	ctx := testutils.SetupContext()
 	ns := SetupTest(ctx)
 
 	It("should schedule machines on machine pools", func() {
@@ -50,7 +52,8 @@ var _ = Describe("MachineScheduler", func() {
 				GenerateName: "test-machine-",
 			},
 			Spec: computev1alpha1.MachineSpec{
-				MachineClass: corev1.LocalObjectReference{
+				Image: "my-image",
+				MachineClassRef: corev1.LocalObjectReference{
 					Name: "my-machineclass",
 				},
 			},
@@ -61,7 +64,7 @@ var _ = Describe("MachineScheduler", func() {
 		machineKey := client.ObjectKeyFromObject(machine)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, machineKey, machine)).To(Succeed(), "failed to get machine")
-			g.Expect(machine.Spec.MachinePool.Name).To(Equal(machinePool.Name))
+			g.Expect(machine.Spec.MachinePoolRef.Name).To(Equal(machinePool.Name))
 			g.Expect(machine.Status.State).To(Equal(computev1alpha1.MachineStatePending))
 		}).Should(Succeed())
 	})
@@ -74,7 +77,8 @@ var _ = Describe("MachineScheduler", func() {
 				GenerateName: "test-machine-",
 			},
 			Spec: computev1alpha1.MachineSpec{
-				MachineClass: corev1.LocalObjectReference{
+				Image: "my-image",
+				MachineClassRef: corev1.LocalObjectReference{
 					Name: "my-machineclass",
 				},
 			},
@@ -85,7 +89,7 @@ var _ = Describe("MachineScheduler", func() {
 		machineKey := client.ObjectKeyFromObject(machine)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, machineKey, machine)).To(Succeed())
-			g.Expect(machine.Spec.MachinePool.Name).To(BeEmpty())
+			g.Expect(machine.Spec.MachinePoolRef.Name).To(BeEmpty())
 			g.Expect(machine.Status.State).To(Equal(computev1alpha1.MachineStatePending))
 		}).Should(Succeed())
 
@@ -106,7 +110,7 @@ var _ = Describe("MachineScheduler", func() {
 		By("waiting for the machine to be scheduled onto the machine pool")
 		Eventually(func() string {
 			Expect(k8sClient.Get(ctx, machineKey, machine)).To(Succeed(), "failed to get machine")
-			return machine.Spec.MachinePool.Name
+			return machine.Spec.MachinePoolRef.Name
 		}).Should(Equal(machinePool.Name))
 	})
 
@@ -149,10 +153,11 @@ var _ = Describe("MachineScheduler", func() {
 				GenerateName: "test-machine-",
 			},
 			Spec: computev1alpha1.MachineSpec{
+				Image: "my-image",
 				MachinePoolSelector: map[string]string{
 					"foo": "bar",
 				},
-				MachineClass: corev1.LocalObjectReference{
+				MachineClassRef: corev1.LocalObjectReference{
 					Name: "my-machineclass",
 				},
 			},
@@ -163,7 +168,7 @@ var _ = Describe("MachineScheduler", func() {
 		machineKey := client.ObjectKeyFromObject(machine)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, machineKey, machine)).To(Succeed(), "failed to get machine")
-			g.Expect(machine.Spec.MachinePool.Name).To(Equal(machinePoolMatchingLabels.Name))
+			g.Expect(machine.Spec.MachinePoolRef.Name).To(Equal(machinePoolMatchingLabels.Name))
 			g.Expect(machine.Status.State).To(Equal(computev1alpha1.MachineStatePending))
 		}).Should(Succeed())
 	})
@@ -203,7 +208,8 @@ var _ = Describe("MachineScheduler", func() {
 				GenerateName: "test-machine-",
 			},
 			Spec: computev1alpha1.MachineSpec{
-				MachineClass: corev1.LocalObjectReference{
+				Image: "my-image",
+				MachineClassRef: corev1.LocalObjectReference{
 					Name: "my-machineclass",
 				},
 			},
@@ -214,8 +220,8 @@ var _ = Describe("MachineScheduler", func() {
 		machineKey := client.ObjectKeyFromObject(machine)
 		Consistently(func() string {
 			Expect(k8sClient.Get(ctx, machineKey, machine)).To(Succeed())
-			return machine.Spec.MachinePool.Name
-		}, timeout, interval).Should(BeEmpty())
+			return machine.Spec.MachinePoolRef.Name
+		}).Should(BeEmpty())
 
 		By("patching the machine to contain only one of the corresponding tolerations")
 		machineBase := machine.DeepCopy()
@@ -230,8 +236,8 @@ var _ = Describe("MachineScheduler", func() {
 		By("observing the machine isn't scheduled onto the machine pool")
 		Consistently(func() string {
 			Expect(k8sClient.Get(ctx, machineKey, machine)).To(Succeed())
-			return machine.Spec.MachinePool.Name
-		}, timeout, interval).Should(BeEmpty())
+			return machine.Spec.MachinePoolRef.Name
+		}).Should(BeEmpty())
 
 		By("patching the machine to contain all of the corresponding tolerations")
 		machineBase = machine.DeepCopy()
@@ -245,7 +251,7 @@ var _ = Describe("MachineScheduler", func() {
 		By("observing the machine is scheduled onto the machine pool")
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, machineKey, machine)).To(Succeed(), "failed to get the machine")
-			g.Expect(machine.Spec.MachinePool.Name).To(Equal(taintedMachinePool.Name))
+			g.Expect(machine.Spec.MachinePoolRef.Name).To(Equal(taintedMachinePool.Name))
 		}).Should(Succeed())
 	})
 })

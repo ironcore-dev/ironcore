@@ -19,12 +19,14 @@ package storage
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/clientutils"
+	"github.com/onmetal/controller-utils/conditionutils"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 	apiequality "github.com/onmetal/onmetal-api/equality"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -36,17 +38,29 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
+var (
+	accessor = conditionutils.NewAccessor(conditionutils.AccessorOptions{
+		Transition: &conditionutils.FieldsTransition{
+			IncludeStatus: true,
+			IncludeReason: true,
+		},
+	})
+)
+
 // VolumeReconciler reconciles a Volume object
 type VolumeReconciler struct {
 	client.Client
-	Scheme             *runtime.Scheme
+	APIReader client.Reader
+	Scheme    *runtime.Scheme
+	// BoundTimeout is the maximum duration until a Volume's Bound condition is considered to be timed out.
+	BoundTimeout       time.Duration
 	SharedFieldIndexer *clientutils.SharedFieldIndexer
 }
 
-//+kubebuilder:rbac:groups=storage.onmetal.de,resources=volumes,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=storage.onmetal.de,resources=volumes/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=storage.onmetal.de,resources=volumes/finalizers,verbs=update
-//+kubebuilder:rbac:groups=storage.onmetal.de,resources=volumeclaims,verbs=get;list
+//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes/finalizers,verbs=update
+//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumeclaims,verbs=get;list
 
 // Reconcile is part of the main reconciliation loop for Volume types
 func (r *VolumeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -69,13 +83,26 @@ func (r *VolumeReconciler) delete(ctx context.Context, log logr.Logger, volume *
 	return ctrl.Result{}, nil
 }
 
+func (r *VolumeReconciler) boundConditionTimedOut(cond storagev1alpha1.VolumeCondition) bool {
+	if cond.LastTransitionTime.IsZero() {
+		return false
+	}
+	return cond.LastTransitionTime.Add(r.BoundTimeout).Before(time.Now())
+}
+
 func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume) (ctrl.Result, error) {
 	log.V(1).Info("Reconciling volume")
 	if volume.Spec.ClaimRef.Name == "" {
-		log.V(1).Info("Volume does not reference any claim")
-		if err := r.patchVolumeStatus(ctx, volume, storagev1alpha1.VolumeAvailable); err != nil {
+		log.V(1).Info("Volume is not bound and not referencing any claim")
+		if err := r.patchVolumeStatus(ctx, volume, storagev1alpha1.VolumeCondition{
+			Status:  corev1.ConditionFalse,
+			Reason:  storagev1alpha1.VolumeBoundReasonUnbound,
+			Message: "Volume is not bound.",
+		}); err != nil {
 			return ctrl.Result{}, err
 		}
+
+		log.V(1).Info("Successfully marked volume as unbound")
 		return ctrl.Result{}, nil
 	}
 
@@ -85,29 +112,70 @@ func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volum
 		Name:      volume.Spec.ClaimRef.Name,
 	}
 	log = log.WithValues("VolumeClaimKey", volumeClaimKey)
-	log.V(1).Info("Volume references volume claim")
-	err := r.Get(ctx, volumeClaimKey, volumeClaim)
+	log.V(1).Info("Volume references claim")
+	// We have to use APIReader here as stale data might cause unbinding a volume for a short duration.
+	err := r.APIReader.Get(ctx, volumeClaimKey, volumeClaim)
 	if client.IgnoreNotFound(err) != nil {
-		return ctrl.Result{}, fmt.Errorf("failed to get volumeclaim %s: %w", volumeClaimKey, err)
+		return ctrl.Result{}, fmt.Errorf("error getting volume claim %s: %w", volumeClaimKey, err)
 	}
 
-	if apierrors.IsNotFound(err) || !r.validReferences(volume, volumeClaim) {
-		log.V(1).Info("Volume binding is not valid, releasing volume")
+	volumeClaimExists := err == nil
+	validReferences := volumeClaimExists && r.validReferences(volume, volumeClaim)
+	volumePhase, boundCond, _ := storagev1alpha1.GetVolumePhaseAndCondition(volume)
+	volumeState := volume.Status.State
+
+	bindOK := volumeState == storagev1alpha1.VolumeStateAvailable && validReferences
+
+	log = log.WithValues(
+		"VolumeClaimExists", volumeClaimExists,
+		"ValidReferences", validReferences,
+		"VolumeState", volumeState,
+		"VolumePhase", volumePhase,
+		"VolumeBoundLastTransitionTime", boundCond.LastTransitionTime,
+	)
+	switch {
+	case bindOK:
+		log.V(1).Info("Setting volume to bound")
+		if err := r.patchVolumeStatus(ctx, volume, storagev1alpha1.VolumeCondition{
+			Status:  corev1.ConditionTrue,
+			Reason:  storagev1alpha1.VolumeBoundReasonBound,
+			Message: "Successfully bound volume to claim.",
+		}); err != nil {
+			return ctrl.Result{}, fmt.Errorf("error binding volume: %w", err)
+		}
+
+		log.V(1).Info("Successfully set volume to bound.")
+		return ctrl.Result{}, nil
+	case !bindOK && volumePhase == storagev1alpha1.VolumePhasePending && r.boundConditionTimedOut(boundCond):
+		log.V(1).Info("Bind is not ok and timed out, releasing volume")
 		if err := r.releaseVolume(ctx, volume); err != nil {
 			return ctrl.Result{}, fmt.Errorf("error releasing volume: %w", err)
 		}
 
-		log.V(1).Info("Successfully released volume from invalid binding")
+		log.V(1).Info("Successfully released volume")
 		return ctrl.Result{}, nil
-	}
+	default:
+		log.V(1).Info("Bind is not ok and not yet timed out, setting to pending")
+		if err := r.patchVolumeStatus(ctx, volume, storagev1alpha1.VolumeCondition{
+			Status:  corev1.ConditionFalse,
+			Reason:  storagev1alpha1.VolumeBoundReasonPending,
+			Message: "Volume binding is pending.",
+		}); err != nil {
+			return ctrl.Result{}, fmt.Errorf("error setting volume to pending: %w", err)
+		}
 
-	log.V(1).Info("Setting volume as bound")
-	if err := r.patchVolumeStatus(ctx, volume, storagev1alpha1.VolumeBound); err != nil {
-		return ctrl.Result{}, err
+		log.V(1).Info("Successfully set volume to pending")
+		return r.requeueAfterBoundTimeout(volume), nil
 	}
+}
 
-	log.V(1).Info("Successfully set volume as bound")
-	return ctrl.Result{}, nil
+func (r *VolumeReconciler) requeueAfterBoundTimeout(volume *storagev1alpha1.Volume) ctrl.Result {
+	_, cond, _ := storagev1alpha1.GetVolumePhaseAndCondition(volume)
+	boundTimeoutExpirationDuration := time.Until(cond.LastTransitionTime.Add(r.BoundTimeout)).Round(time.Second)
+	if boundTimeoutExpirationDuration <= 0 {
+		return ctrl.Result{Requeue: true}
+	}
+	return ctrl.Result{RequeueAfter: boundTimeoutExpirationDuration}
 }
 
 func (r *VolumeReconciler) validReferences(volume *storagev1alpha1.Volume, volumeClaim *storagev1alpha1.VolumeClaim) bool {
@@ -126,9 +194,12 @@ func (r *VolumeReconciler) releaseVolume(ctx context.Context, volume *storagev1a
 	return r.Patch(ctx, volume, client.MergeFrom(baseVolume))
 }
 
-func (r *VolumeReconciler) patchVolumeStatus(ctx context.Context, volume *storagev1alpha1.Volume, phase storagev1alpha1.VolumePhase) error {
+func (r *VolumeReconciler) patchVolumeStatus(ctx context.Context, volume *storagev1alpha1.Volume, boundCond storagev1alpha1.VolumeCondition) error {
 	volumeBase := volume.DeepCopy()
-	volume.Status.Phase = phase
+	accessor.MustUpdateSlice(&volume.Status.Conditions, string(storagev1alpha1.VolumeBound),
+		conditionutils.UpdateFromCondition{Condition: boundCond},
+		conditionutils.UpdateObserved(volume),
+	)
 	return r.Status().Patch(ctx, volume, client.MergeFrom(volumeBase))
 }
 
@@ -146,9 +217,11 @@ func (r *VolumeReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			builder.WithPredicates(predicate.Funcs{
 				UpdateFunc: func(event event.UpdateEvent) bool {
 					oldVolume, newVolume := event.ObjectOld.(*storagev1alpha1.Volume), event.ObjectNew.(*storagev1alpha1.Volume)
+					oldPhase := storagev1alpha1.GetVolumePhase(oldVolume)
+					newPhase := storagev1alpha1.GetVolumePhase(newVolume)
 					return !apiequality.Semantic.DeepEqual(oldVolume.Spec, newVolume.Spec) ||
 						oldVolume.Status.State != newVolume.Status.State ||
-						oldVolume.Status.Phase != newVolume.Status.Phase
+						oldPhase != newPhase
 				},
 			}),
 		).

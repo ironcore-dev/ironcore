@@ -48,9 +48,9 @@ type MachineScheduler struct {
 	Events record.EventRecorder
 }
 
-//+kubebuilder:rbac:groups=compute.onmetal.de,resources=machines,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=compute.onmetal.de,resources=machines/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=compute.onmetal.de,resources=machinepools,verbs=get;list;watch
+//+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machines,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machines/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machinepools,verbs=get;list;watch
 
 // Reconcile reconciles the desired with the actual state.
 func (s *MachineScheduler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -65,7 +65,7 @@ func (s *MachineScheduler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 		log.Info("Machine is already deleting")
 		return ctrl.Result{}, nil
 	}
-	if machine.Spec.MachinePool.Name != "" {
+	if machine.Spec.MachinePoolRef.Name != "" {
 		log.Info("Machine is already assigned")
 		return ctrl.Result{}, nil
 	}
@@ -85,7 +85,7 @@ func (s *MachineScheduler) schedule(ctx context.Context, log logr.Logger, machin
 
 	list := &computev1alpha1.MachinePoolList{}
 	if err := s.List(ctx, list,
-		client.MatchingFields{machinePoolStatusAvailableMachineClassesNameField: machine.Spec.MachineClass.Name},
+		client.MatchingFields{machinePoolStatusAvailableMachineClassesNameField: machine.Spec.MachineClassRef.Name},
 		client.MatchingLabels(machine.Spec.MachinePoolSelector),
 	); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error listing machine pools: %w", err)
@@ -98,8 +98,8 @@ func (s *MachineScheduler) schedule(ctx context.Context, log logr.Logger, machin
 		}
 	}
 	if len(available) == 0 {
-		log.Info("No machine pool available for machine class", "MachineClass", machine.Spec.MachineClass.Name)
-		s.Events.Eventf(machine, corev1.EventTypeNormal, "CannotSchedule", "No MachinePool found for MachineClass %s", machine.Spec.MachineClass.Name)
+		log.Info("No machine pool available for machine class", "MachineClassRef", machine.Spec.MachineClassRef.Name)
+		s.Events.Eventf(machine, corev1.EventTypeNormal, "CannotSchedule", "No MachinePoolRef found for MachineClassRef %s", machine.Spec.MachineClassRef.Name)
 		return ctrl.Result{}, nil
 	}
 
@@ -112,7 +112,7 @@ func (s *MachineScheduler) schedule(ctx context.Context, log logr.Logger, machin
 	}
 	if len(filtered) == 0 {
 		log.Info("No machine pool tolerated by the machine", "Tolerations", machine.Spec.Tolerations)
-		s.Events.Eventf(machine, corev1.EventTypeNormal, "CannotSchedule", "No MachinePool tolerated by tolerations: %s", &machine.Spec.Tolerations)
+		s.Events.Eventf(machine, corev1.EventTypeNormal, "CannotSchedule", "No MachinePoolRef tolerated by tolerations: %s", &machine.Spec.Tolerations)
 		return ctrl.Result{}, nil
 	}
 	available = filtered
@@ -121,9 +121,9 @@ func (s *MachineScheduler) schedule(ctx context.Context, log logr.Logger, machin
 	// TODO: Instead of random distribution, try to come up w/ metrics that include usage of each pool to
 	// avoid unfortunate random distribution of items.
 	pool := available[rand.Intn(len(available))]
-	log = log.WithValues("MachinePool", pool.Name)
+	log = log.WithValues("MachinePoolRef", pool.Name)
 	base := machine.DeepCopy()
-	machine.Spec.MachinePool.Name = pool.Name
+	machine.Spec.MachinePoolRef.Name = pool.Name
 	log.Info("Patching machine")
 	if err := s.Patch(ctx, machine, client.MergeFrom(base)); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error scheduling machine on pool: %w", err)
@@ -148,7 +148,7 @@ func (s *MachineScheduler) enqueueMatchingUnscheduledMachines(ctx context.Contex
 
 	for _, machine := range list.Items {
 		machinePoolSelector := labels.SelectorFromSet(machine.Spec.MachinePoolSelector)
-		if availableClassNames.Has(machine.Spec.MachineClass.Name) && machinePoolSelector.Matches(labels.Set(pool.Labels)) {
+		if availableClassNames.Has(machine.Spec.MachineClassRef.Name) && machinePoolSelector.Matches(labels.Set(pool.Labels)) {
 			queue.Add(ctrl.Request{NamespacedName: client.ObjectKeyFromObject(&machine)})
 		}
 	}
@@ -171,7 +171,7 @@ func (s *MachineScheduler) SetupWithManager(mgr manager.Manager) error {
 
 	if err := mgr.GetFieldIndexer().IndexField(ctx, &computev1alpha1.Machine{}, machineSpecMachinePoolNameField, func(object client.Object) []string {
 		machine := object.(*computev1alpha1.Machine)
-		return []string{machine.Spec.MachinePool.Name}
+		return []string{machine.Spec.MachinePoolRef.Name}
 	}); err != nil {
 		return fmt.Errorf("could not setup field indexer for %s: %w", machineSpecMachinePoolNameField, err)
 	}
@@ -183,7 +183,7 @@ func (s *MachineScheduler) SetupWithManager(mgr manager.Manager) error {
 			builder.WithPredicates(
 				predicate.NewPredicateFuncs(func(object client.Object) bool {
 					machine := object.(*computev1alpha1.Machine)
-					return machine.DeletionTimestamp.IsZero() && machine.Spec.MachinePool.Name == ""
+					return machine.DeletionTimestamp.IsZero() && machine.Spec.MachinePoolRef.Name == ""
 				}),
 			),
 		).

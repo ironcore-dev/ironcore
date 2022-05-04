@@ -21,7 +21,10 @@ import (
 	"testing"
 	"time"
 
-	. "github.com/onsi/ginkgo"
+	"github.com/onmetal/onmetal-api/envtestutils"
+	"github.com/onmetal/onmetal-api/envtestutils/apiserver"
+	"github.com/onmetal/onmetal-api/testutils/apiserverbin"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -34,8 +37,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
-	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
-	"github.com/onmetal/onmetal-api/controllers/network"
+	ipamv1alpha1 "github.com/onmetal/onmetal-api/apis/ipam/v1alpha1"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -43,18 +45,26 @@ import (
 // http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
 
 const (
-	interval = 50 * time.Millisecond
-	timeout  = 3 * time.Second
+	pollingInterval      = 50 * time.Millisecond
+	eventuallyTimeout    = 3 * time.Second
+	consistentlyDuration = 1 * time.Second
 )
 
 var (
-	cfg       *rest.Config
-	ctx       = ctrl.SetupSignalHandler()
-	k8sClient client.Client
-	testEnv   *envtest.Environment
+	cfg        *rest.Config
+	k8sClient  client.Client
+	testEnv    *envtest.Environment
+	testEnvExt *envtestutils.EnvironmentExtensions
 )
 
 func TestAPIs(t *testing.T) {
+	_, reporterConfig := GinkgoConfiguration()
+	reporterConfig.SlowSpecThreshold = 10 * time.Second
+	SetDefaultConsistentlyPollingInterval(pollingInterval)
+	SetDefaultEventuallyPollingInterval(pollingInterval)
+	SetDefaultEventuallyTimeout(eventuallyTimeout)
+	SetDefaultConsistentlyDuration(consistentlyDuration)
+
 	RegisterFailHandler(Fail)
 
 	RunSpecs(t, "Compute Controller Suite")
@@ -66,27 +76,46 @@ var _ = BeforeSuite(func() {
 	var err error
 
 	By("bootstrapping test environment")
-	testEnv = &envtest.Environment{
-		CRDDirectoryPaths:     []string{filepath.Join("..", "..", "config", "crd", "bases")},
-		ErrorIfCRDPathMissing: true,
+	testEnv = &envtest.Environment{}
+	testEnvExt = &envtestutils.EnvironmentExtensions{
+		APIServiceDirectoryPaths:       []string{filepath.Join("..", "..", "config", "apiserver", "apiservice", "bases")},
+		ErrorIfAPIServicePathIsMissing: true,
 	}
 
-	cfg, err = testEnv.Start()
+	cfg, err = envtestutils.StartWithExtensions(testEnv, testEnvExt)
 	Expect(err).NotTo(HaveOccurred())
 	Expect(cfg).NotTo(BeNil())
+	DeferCleanup(envtestutils.StopWithExtensions, testEnv, testEnvExt)
 
-	err = computev1alpha1.AddToScheme(scheme.Scheme)
-	Expect(err).NotTo(HaveOccurred())
-	Expect(networkv1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
-
-	Expect(networkv1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
+	Expect(computev1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
+	Expect(ipamv1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
 
 	//+kubebuilder:scaffold:scheme
 
 	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
 	Expect(err).NotTo(HaveOccurred())
 	Expect(k8sClient).NotTo(BeNil())
-}, 60)
+
+	apiSrv, err := apiserver.New(cfg, apiserver.Options{
+		Command:     []string{apiserverbin.Path},
+		ETCDServers: []string{testEnv.ControlPlane.Etcd.URL.String()},
+		Host:        testEnvExt.APIServiceInstallOptions.LocalServingHost,
+		Port:        testEnvExt.APIServiceInstallOptions.LocalServingPort,
+		CertDir:     testEnvExt.APIServiceInstallOptions.LocalServingCertDir,
+	})
+	Expect(err).NotTo(HaveOccurred())
+
+	ctx, cancel := context.WithCancel(context.Background())
+	DeferCleanup(cancel)
+	go func() {
+		defer GinkgoRecover()
+		err := apiSrv.Start(ctx)
+		Expect(err).NotTo(HaveOccurred())
+	}()
+
+	err = envtestutils.WaitUntilAPIServicesReadyWithTimeout(60*time.Second, testEnvExt, k8sClient, scheme.Scheme)
+	Expect(err).NotTo(HaveOccurred())
+})
 
 // SetupTest returns a namespace which will be created before each ginkgo `It` block and deleted at the end of `It`
 // so that each test case can run in an independent way
@@ -125,22 +154,13 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		Expect((&MachineClassReconciler{
-			Client: k8sManager.GetClient(),
-			Scheme: k8sManager.GetScheme(),
+			Client:    k8sManager.GetClient(),
+			APIReader: k8sManager.GetAPIReader(),
+			Scheme:    k8sManager.GetScheme(),
 		}).SetupWithManager(k8sManager)).To(Succeed())
-		err = (&network.SubnetReconciler{
-			Client: k8sManager.GetClient(),
-			Scheme: k8sManager.GetScheme(),
-		}).SetupWithManager(k8sManager)
-		Expect(err).ToNot(HaveOccurred())
-
-		err = (&network.IPAMRangeReconciler{
-			Client: k8sManager.GetClient(),
-			Scheme: k8sManager.GetScheme(),
-		}).SetupWithManager(k8sManager)
-		Expect(err).ToNot(HaveOccurred())
 
 		go func() {
+			defer GinkgoRecover()
 			Expect(k8sManager.Start(mgrCtx)).To(Succeed(), "failed to start manager")
 		}()
 	})
@@ -153,9 +173,3 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 
 	return ns
 }
-
-var _ = AfterSuite(func() {
-	By("tearing down the test environment")
-	err := testEnv.Stop()
-	Expect(err).NotTo(HaveOccurred())
-})

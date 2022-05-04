@@ -5,6 +5,9 @@
 </li>
 </ul>
 <h2 id="common.onmetal.de/v1alpha1">common.onmetal.de/v1alpha1</h2>
+<div>
+<p>Package v1alpha1 is the v1alpha1 version of the API.</p>
+</div>
 Resource Types:
 <ul></ul>
 <h3 id="common.onmetal.de/v1alpha1.ConfigMapKeySelector">ConfigMapKeySelector
@@ -363,5 +366,4 @@ When specified, allowed values are NoSchedule.</p>
 <hr/>
 <p><em>
 Generated with <code>gen-crd-api-reference-docs</code>
-on git commit <code>7399651</code>.
 </em></p>

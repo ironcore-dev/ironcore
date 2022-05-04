@@ -42,14 +42,18 @@ autolabeler:
     files:
       - '/apis/storage/*'
       - '/controllers/storage/*'
-  - label: 'network'
+  - label: 'ipam'
     files:
-      - '/apis/network/*'
-      - '/controllers/network/*'
+      - '/apis/ipam/*'
+      - '/controllers/ipam/*'
   - label: 'compute'
     files:
       - '/apis/compute/*'
       - '/controllers/compute/*'
+  - label: 'networking'
+    files:
+      - '/apis/networking/*'
+      - '/controllers/networking/*'
   - label: 'documentation'
     files:
       - '*.md'

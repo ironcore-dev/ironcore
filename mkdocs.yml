@@ -5,18 +5,18 @@ theme:
   name: material
   logo: assets/logo.png
   palette:
-  - media: "(prefers-color-scheme: light)"
-    scheme: default
-    primary: white
-    toggle:
-      icon: material/toggle-switch-off-outline
-      name: Switch to dark mode
-  - media: "(prefers-color-scheme: dark)"
-    scheme: slate
-    primary: black
-    toggle:
-      icon: material/toggle-switch
-      name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: white
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode
   font:
     text: 'Work Sans'
 
@@ -49,7 +49,7 @@ nav:
       - Contribution Guide: development/contribution.md
   - API Reference:
       - Overview: api-reference/overview.md
-      - Network: api-reference/network.md
+      - IPAM: api-reference/ipam.md
       - Compute: api-reference/compute.md
       - Storage: api-reference/storage.md
       - Common: api-reference/common.md

@@ -1,0 +1,24 @@
+# permissions for end users to edit volumeclasses.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: volumeclass-editor-role
+rules:
+  - apiGroups:
+      - storage.api.onmetal.de
+    resources:
+      - volumeclasses
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - storage.api.onmetal.de
+    resources:
+      - volumeclasses/status
+    verbs:
+      - get

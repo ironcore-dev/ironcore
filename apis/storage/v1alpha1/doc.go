@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-// Package v1alpha1 is the v1alpha1 version of the API.
-// +k8s:deepcopy-gen=package,register
+// +k8s:deepcopy-gen=package
+// +k8s:conversion-gen=github.com/onmetal/onmetal-api/apis/storage
 // +k8s:openapi-gen=true
 // +k8s:defaulter-gen=TypeMeta
 // +k8s:protobuf-gen=package
+// +groupName=storage.api.onmetal.de
 
-//go:generate go run github.com/ahmetb/gen-crd-api-reference-docs -api-dir . -config ../../../hack/api-reference/storage-config.json -template-dir ../../../hack/api-reference/template -out-file ../../../docs/api-reference/storage.md
-
-// Package v1beta1 is a version of the API.
-// +groupName=storage.onmetal.de
-
-package v1alpha1
+// Package v1alpha1 is the v1alpha1 version of the API.
+package v1alpha1 // import "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"

@@ -20,7 +20,9 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"time"
 
+	"github.com/onmetal/onmetal-api/controllers/networking"
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -35,10 +37,10 @@ import (
 	"github.com/onmetal/controller-utils/cmdutils/switches"
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
-	networkv1alpha1 "github.com/onmetal/onmetal-api/apis/network/v1alpha1"
+	ipamv1alpha1 "github.com/onmetal/onmetal-api/apis/ipam/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 	computecontrollers "github.com/onmetal/onmetal-api/controllers/compute"
-	networkcontrollers "github.com/onmetal/onmetal-api/controllers/network"
+	ipamcontrollers "github.com/onmetal/onmetal-api/controllers/ipam"
 	storagecontrollers "github.com/onmetal/onmetal-api/controllers/storage"
 	//+kubebuilder:scaffold:imports
 )
@@ -52,30 +54,27 @@ const (
 	machineClassController     = "machineclass"
 	machinePoolController      = "machinepool"
 	machineSchedulerController = "machinescheduler"
-	storagePoolController      = "storagepool"
-	storageClassController     = "storageclass"
-	volumeController           = "volume"
-	volumeClaimController      = "volumeclaim"
-	volumeScheduler            = "volumescheduler"
-	volumeClaimScheduler       = "volumeclaimscheduler"
-	reservedIPController       = "reservedip"
-	securityGroupController    = "securitygroup"
-	subnetController           = "subnet"
 	machineController          = "machine"
-	routingDomainController    = "routingdomain"
-	ipamRangeController        = "ipamrange"
-	gatewayController          = "gateway"
 
-	ipamRangeWebhook = "ipamrange"
-	machineWebhook   = "machine"
-	volumeWebhook    = "volume"
+	volumePoolController  = "volumepool"
+	volumeClassController = "volumeclass"
+	volumeController      = "volume"
+	volumeClaimController = "volumeclaim"
+	volumeScheduler       = "volumescheduler"
+	volumeClaimScheduler  = "volumeclaimscheduler"
+
+	prefixController          = "prefix"
+	prefixAllocationScheduler = "prefixallocationscheduler"
+
+	networkInterfaceController = "networkInterface"
+	virtualIPController        = "virtualip"
 )
 
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 	utilruntime.Must(computev1alpha1.AddToScheme(scheme))
 	utilruntime.Must(storagev1alpha1.AddToScheme(scheme))
-	utilruntime.Must(networkv1alpha1.AddToScheme(scheme))
+	utilruntime.Must(ipamv1alpha1.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 
@@ -83,22 +82,30 @@ func main() {
 	var metricsAddr string
 	var enableLeaderElection bool
 	var probeAddr string
+	var prefixAllocationTimeout time.Duration
+	var volumeBoundTimeout time.Duration
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
+	flag.DurationVar(&prefixAllocationTimeout, "prefix-allocation-timeout", 1*time.Second, "Time to wait until considering a pending allocation failed.")
+	flag.DurationVar(&volumeBoundTimeout, "volume-bound-timeout", 10*time.Second, "Time to wait until considering a volume bind to be failed.")
 
 	controllers := switches.New(
-		machineClassController, machinePoolController, machineSchedulerController, storagePoolController,
-		storageClassController, volumeController, volumeClaimController, volumeScheduler, volumeClaimScheduler, reservedIPController,
-		securityGroupController, subnetController, machineController, routingDomainController, ipamRangeController,
-		gatewayController,
+		// Compute controllers
+		machineClassController, machinePoolController, machineSchedulerController, machineController,
+
+		// Storage controllers
+		volumePoolController, volumeClassController, volumeController, volumeClaimController, volumeScheduler, volumeClaimScheduler,
+
+		// Networking controllers
+		networkInterfaceController, virtualIPController,
+
+		// IPAM controllers
+		prefixController, prefixAllocationScheduler,
 	)
 	flag.Var(controllers, "controllers", fmt.Sprintf("Controllers to enable. All controllers: %v. Disabled-by-default controllers: %v", controllers.All(), controllers.DisabledByDefault()))
-
-	webhooks := switches.New(ipamRangeWebhook, machineWebhook, volumeWebhook)
-	flag.Var(webhooks, "webhooks", fmt.Sprintf("Webhooks to enable. All webhooks: %v. Disabled-by-default webhooks: %v", webhooks.All(), webhooks.DisabledByDefault()))
 
 	opts := zap.Options{
 		Development: true,
@@ -129,10 +136,11 @@ func main() {
 	// Register controllers
 	if controllers.Enabled(machineClassController) {
 		if err = (&computecontrollers.MachineClassReconciler{
-			Client: mgr.GetClient(),
-			Scheme: mgr.GetScheme(),
+			Client:    mgr.GetClient(),
+			APIReader: mgr.GetAPIReader(),
+			Scheme:    mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "MachineClass")
+			setupLog.Error(err, "unable to create controller", "controller", "MachineClassRef")
 			os.Exit(1)
 		}
 	}
@@ -141,7 +149,7 @@ func main() {
 			Client: mgr.GetClient(),
 			Scheme: mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "MachinePool")
+			setupLog.Error(err, "unable to create controller", "controller", "MachinePoolRef")
 			os.Exit(1)
 		}
 	}
@@ -154,29 +162,32 @@ func main() {
 			os.Exit(1)
 		}
 	}
-	if controllers.Enabled(storagePoolController) {
-		if err = (&storagecontrollers.StoragePoolReconciler{
+	if controllers.Enabled(volumePoolController) {
+		if err = (&storagecontrollers.VolumePoolReconciler{
 			Client: mgr.GetClient(),
 			Scheme: mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "StoragePool")
+			setupLog.Error(err, "unable to create controller", "controller", "VolumePoolRef")
 			os.Exit(1)
 		}
 	}
-	if controllers.Enabled(storageClassController) {
-		if err = (&storagecontrollers.StorageClassReconciler{
-			Client: mgr.GetClient(),
-			Scheme: mgr.GetScheme(),
+	if controllers.Enabled(volumeClassController) {
+		if err = (&storagecontrollers.VolumeClassReconciler{
+			Client:    mgr.GetClient(),
+			APIReader: mgr.GetAPIReader(),
+			Scheme:    mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "StorageClass")
+			setupLog.Error(err, "unable to create controller", "controller", "VolumeClass")
 			os.Exit(1)
 		}
 	}
 	if controllers.Enabled(volumeController) {
 		if err = (&storagecontrollers.VolumeReconciler{
 			Client:             mgr.GetClient(),
+			APIReader:          mgr.GetAPIReader(),
 			Scheme:             mgr.GetScheme(),
 			SharedFieldIndexer: sharedStorageFieldIndexer,
+			BoundTimeout:       volumeBoundTimeout,
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "Volume")
 			os.Exit(1)
@@ -185,10 +196,11 @@ func main() {
 	if controllers.Enabled(volumeClaimController) {
 		if err = (&storagecontrollers.VolumeClaimReconciler{
 			Client:             mgr.GetClient(),
+			APIReader:          mgr.GetAPIReader(),
 			Scheme:             mgr.GetScheme(),
 			SharedFieldIndexer: sharedStorageFieldIndexer,
 		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "VolumeClaim")
+			setupLog.Error(err, "unable to create controller", "controller", "VolumeClaimRef")
 			os.Exit(1)
 		}
 	}
@@ -207,33 +219,6 @@ func main() {
 			setupLog.Error(err, "unable to create controller", "controller", "VolumeClaimScheduler")
 		}
 	}
-	if controllers.Enabled(reservedIPController) {
-		if err = (&networkcontrollers.ReservedIPReconciler{
-			Client: mgr.GetClient(),
-			Scheme: mgr.GetScheme(),
-		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "ReservedIP")
-			os.Exit(1)
-		}
-	}
-	if controllers.Enabled(securityGroupController) {
-		if err = (&networkcontrollers.SecurityGroupReconciler{
-			Client: mgr.GetClient(),
-			Scheme: mgr.GetScheme(),
-		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "SecurityGroup")
-			os.Exit(1)
-		}
-	}
-	if controllers.Enabled(subnetController) {
-		if err = (&networkcontrollers.SubnetReconciler{
-			Client: mgr.GetClient(),
-			Scheme: mgr.GetScheme(),
-		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "Subnet")
-			os.Exit(1)
-		}
-	}
 	if controllers.Enabled(machineController) {
 		if err = (&computecontrollers.MachineReconciler{
 			Client: mgr.GetClient(),
@@ -243,93 +228,54 @@ func main() {
 			os.Exit(1)
 		}
 	}
-	if controllers.Enabled(routingDomainController) {
-		if err = (&networkcontrollers.RoutingDomainReconciler{
+
+	if controllers.Enabled(prefixController) || controllers.Enabled(prefixAllocationScheduler) {
+		if err = ipamcontrollers.SetupPrefixSpecIPFamilyFieldIndexer(mgr); err != nil {
+			setupLog.Error(err, "unable setup indexer", "indexer", "prefix.spec.ipFamily")
+			os.Exit(1)
+		}
+	}
+
+	if controllers.Enabled(prefixController) {
+		if err = (&ipamcontrollers.PrefixReconciler{
+			Client:                  mgr.GetClient(),
+			APIReader:               mgr.GetAPIReader(),
+			Scheme:                  mgr.GetScheme(),
+			PrefixAllocationTimeout: prefixAllocationTimeout,
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "Prefix")
+			os.Exit(1)
+		}
+	}
+
+	if controllers.Enabled(prefixAllocationScheduler) {
+		if err = (&ipamcontrollers.PrefixAllocationScheduler{
 			Client: mgr.GetClient(),
 			Scheme: mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "RoutingDomain")
+			setupLog.Error(err, "unable to create controller", "controller", "PrefixAllocationScheduler")
 			os.Exit(1)
 		}
 	}
-	if controllers.Enabled(ipamRangeController) {
-		if err = (&networkcontrollers.IPAMRangeReconciler{
+
+	if controllers.Enabled(networkInterfaceController) {
+		if err = (&networking.NetworkInterfaceReconciler{
 			Client: mgr.GetClient(),
 			Scheme: mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "IPAMRange")
+			setupLog.Error(err, "unable to create controller", "controller", "NetworkInterface")
 			os.Exit(1)
 		}
 	}
-	if controllers.Enabled(gatewayController) {
-		if err = (&networkcontrollers.GatewayReconciler{
+
+	if controllers.Enabled(virtualIPController) {
+		if err = (&networking.VirtualIPReconciler{
 			Client: mgr.GetClient(),
 			Scheme: mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "Gateway")
+			setupLog.Error(err, "unable to create controller", "controller", "VirtualIP")
 			os.Exit(1)
 		}
-	}
-
-	// webhook
-	if webhooks.Enabled(ipamRangeWebhook) {
-		if err = (&networkv1alpha1.IPAMRange{}).SetupWebhookWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create webhook", "webhook", "IPAMRange")
-			os.Exit(1)
-		}
-	}
-
-	if webhooks.Enabled(machineWebhook) {
-		if err = (&computev1alpha1.Machine{}).SetupWebhookWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create webhook", "webhook", "Machine")
-			os.Exit(1)
-		}
-	}
-
-	if webhooks.Enabled(volumeWebhook) {
-		if err = (&storagev1alpha1.Volume{}).SetupWebhookWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create webhook", "webhook", "Volume")
-			os.Exit(1)
-		}
-	}
-
-	if err = (&networkcontrollers.PrefixReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "Prefix")
-		os.Exit(1)
-	}
-	if err = (&networkcontrollers.IPReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "IP")
-		os.Exit(1)
-	}
-	if err = (&networkcontrollers.ClusterPrefixReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "ClusterPrefix")
-		os.Exit(1)
-	}
-
-	//+kubebuilder:scaffold:builder
-
-	if err = (&networkcontrollers.ClusterPrefixAllocationSchedulerReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "ClusterPrefixAllocationScheduler")
-		os.Exit(1)
-	}
-	if err = (&networkcontrollers.PrefixAllocationSchedulerReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "PrefixAllocationScheduler")
-		os.Exit(1)
 	}
 
 	if err != nil {

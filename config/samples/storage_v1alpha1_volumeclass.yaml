@@ -1,0 +1,15 @@
+apiVersion: storage.api.onmetal.de/v1alpha1
+kind: VolumeClass
+metadata:
+  name: volumeclass-sample
+capabilities:
+  onmetal.de/burstFactor: 3
+  onmetal.de/burstDurationSec: 10
+  onmetal.de/limitsPerGB: 1
+  onmetal.de/IOPS: 100
+  onmetal.de/readIOPS: 60
+  onmetal.de/writeIOPS: 40
+  onmetal.de/BPS: 50Mi
+  onmetal.de/readBPS: 30Mi
+  onmetal.de/writeBPS: 20Mi
+  onmetal.de/encryption: 1

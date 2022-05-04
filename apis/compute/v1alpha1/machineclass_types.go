@@ -22,43 +22,28 @@ import (
 )
 
 var (
-	// MachineClassFinalizer
-	MachineClassFinalizer = GroupVersion.Group + "/machineclass"
+	// MachineClassFinalizer is the finalizer for MachineClass.
+	MachineClassFinalizer = SchemeGroupVersion.Group + "/machineclass"
 )
 
-// MachineClassSpec defines the desired state of MachineClass
-type MachineClassSpec struct {
-	// Capabilities describes the resources a machine class can provide.
-	Capabilities corev1.ResourceList `json:"capabilities,omitempty"`
-}
-
-// MachineClassStatus defines the observed state of MachineClass
-type MachineClassStatus struct {
-}
-
-//+kubebuilder:object:root=true
-//+kubebuilder:resource:scope=Cluster
-//+kubebuilder:subresource:status
-//+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// +genclient
+// +genClient:nonNamespaced
+// +genClient:noStatus
 
 // MachineClass is the Schema for the machineclasses API
 type MachineClass struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   MachineClassSpec   `json:"spec,omitempty"`
-	Status MachineClassStatus `json:"status,omitempty"`
+	Capabilities corev1.ResourceList `json:"capabilities,omitempty"`
 }
 
-//+kubebuilder:object:root=true
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // MachineClassList contains a list of MachineClass
 type MachineClassList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []MachineClass `json:"items"`
-}
-
-func init() {
-	SchemeBuilder.Register(&MachineClass{}, &MachineClassList{})
 }

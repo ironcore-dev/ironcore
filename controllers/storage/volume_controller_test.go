@@ -18,7 +18,8 @@ package storage
 
 import (
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
-	. "github.com/onsi/ginkgo"
+	"github.com/onmetal/onmetal-api/testutils"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -27,6 +28,7 @@ import (
 )
 
 var _ = Describe("VolumeReconciler", func() {
+	ctx := testutils.SetupContext()
 	ns := SetupTest(ctx)
 
 	var volume *storagev1alpha1.Volume
@@ -39,13 +41,13 @@ var _ = Describe("VolumeReconciler", func() {
 				GenerateName: "test-volume-",
 			},
 			Spec: storagev1alpha1.VolumeSpec{
-				StoragePool: corev1.LocalObjectReference{
-					Name: "my-storagepool",
+				VolumePoolRef: corev1.LocalObjectReference{
+					Name: "my-volumepool",
 				},
 				Resources: map[corev1.ResourceName]resource.Quantity{
 					"storage": resource.MustParse("100Gi"),
 				},
-				StorageClassRef: corev1.LocalObjectReference{
+				VolumeClassRef: corev1.LocalObjectReference{
 					Name: "my-volumeclass",
 				},
 			},
@@ -60,7 +62,7 @@ var _ = Describe("VolumeReconciler", func() {
 					"storage": resource.MustParse("100Gi"),
 				},
 				Selector: &metav1.LabelSelector{},
-				StorageClassRef: corev1.LocalObjectReference{
+				VolumeClassRef: corev1.LocalObjectReference{
 					Name: "my-volumeclass",
 				},
 			},
@@ -82,25 +84,25 @@ var _ = Describe("VolumeReconciler", func() {
 		volumeKey := client.ObjectKeyFromObject(volume)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
-			g.Expect(volume.Status.Phase).To(Equal(storagev1alpha1.VolumeBound))
-		}, timeout, interval).Should(Succeed())
+			g.Expect(storagev1alpha1.GetVolumePhase(volume)).To(Equal(storagev1alpha1.VolumePhaseBound))
+		}).Should(Succeed())
 
 		By("making sure the volume stays bound")
 		Consistently(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
-			g.Expect(volume.Status.Phase).To(Equal(storagev1alpha1.VolumeBound))
-		}, timeout, interval).Should(Succeed())
+			g.Expect(storagev1alpha1.GetVolumePhase(volume)).To(Equal(storagev1alpha1.VolumePhaseBound))
+		}).Should(Succeed())
 	})
 
 	It("should un-bind a volume if the underlying volume claim changes its volume ref", func() {
 		By("creating a volume w/ a set of resources")
 		Expect(k8sClient.Create(ctx, volume)).To(Succeed(), "failed to create volume")
 
-		By("patching the volume status to available")
+		By("updating the volume status to available")
 		volume.Status.State = storagev1alpha1.VolumeStateAvailable
 		Expect(k8sClient.Status().Update(ctx, volume)).To(Succeed(), "failed to patch volume status")
 
-		By("creating a volumeclaim which should claim the matching volume")
+		By("creating a volume claim which should claim the matching volume")
 		Expect(k8sClient.Create(ctx, volumeClaim)).To(Succeed(), "failed to create volume claim")
 
 		By("waiting for the volume phase to become bound")
@@ -108,8 +110,8 @@ var _ = Describe("VolumeReconciler", func() {
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
 			g.Expect(volume.Spec.ClaimRef.Name).To(Equal(volumeClaim.Name))
-			g.Expect(volume.Status.Phase).To(Equal(storagev1alpha1.VolumeBound))
-		}, timeout, interval).Should(Succeed())
+			g.Expect(storagev1alpha1.GetVolumePhase(volume)).To(Equal(storagev1alpha1.VolumePhaseBound))
+		}).Should(Succeed())
 
 		By("deleting the volume claim")
 		Expect(k8sClient.Delete(ctx, volumeClaim)).To(Succeed(), "failed to delete volume claim")
@@ -117,8 +119,8 @@ var _ = Describe("VolumeReconciler", func() {
 		By("waiting for the volume phase to become available")
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
-			g.Expect(volume.Status.Phase).To(Equal(storagev1alpha1.VolumeAvailable))
+			g.Expect(storagev1alpha1.GetVolumePhase(volume)).To(Equal(storagev1alpha1.VolumePhaseUnbound))
 			g.Expect(volume.Spec.ClaimRef).To(BeZero())
-		}, timeout, interval).Should(Succeed())
+		}).Should(Succeed())
 	})
 })

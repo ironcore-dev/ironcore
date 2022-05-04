@@ -1,0 +1,236 @@
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: manager-role
+rules:
+- apiGroups:
+  - compute.api.onmetal.de
+  resources:
+  - machineclasses
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - compute.api.onmetal.de
+  resources:
+  - machineclasses/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - compute.api.onmetal.de
+  resources:
+  - machineclasses/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - compute.api.onmetal.de
+  resources:
+  - machinepools
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - compute.api.onmetal.de
+  resources:
+  - machinepools/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - compute.api.onmetal.de
+  resources:
+  - machinepools/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - compute.api.onmetal.de
+  resources:
+  - machines
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - compute.api.onmetal.de
+  resources:
+  - machines/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - compute.api.onmetal.de
+  resources:
+  - machines/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - ipam.api.onmetal.de
+  resources:
+  - prefixallocations
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ipam.api.onmetal.de
+  resources:
+  - prefixallocations/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - ipam.api.onmetal.de
+  resources:
+  - prefixes
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ipam.api.onmetal.de
+  resources:
+  - prefixes/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - ipam.api.onmetal.de
+  resources:
+  - prefixes/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - storage.api.onmetal.de
+  resources:
+  - volumeclaims
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - storage.api.onmetal.de
+  resources:
+  - volumeclaims/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - storage.api.onmetal.de
+  resources:
+  - volumeclaims/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - storage.api.onmetal.de
+  resources:
+  - volumeclasses
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - storage.api.onmetal.de
+  resources:
+  - volumeclasses/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - storage.api.onmetal.de
+  resources:
+  - volumeclasses/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - storage.api.onmetal.de
+  resources:
+  - volumepools
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - storage.api.onmetal.de
+  resources:
+  - volumepools/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - storage.api.onmetal.de
+  resources:
+  - volumepools/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - storage.api.onmetal.de
+  resources:
+  - volumes
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - storage.api.onmetal.de
+  resources:
+  - volumes/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - storage.api.onmetal.de
+  resources:
+  - volumes/status
+  verbs:
+  - get
+  - patch
+  - update

@@ -1,0 +1,5 @@
+apiVersion: networking.api.onmetal.de/v1alpha1
+kind: Network
+metadata:
+  namespace: default
+  name: network-sample

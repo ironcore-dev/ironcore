@@ -20,8 +20,12 @@
 package tools
 
 import (
-  // Use gen-crd-api-reference-docs for generating crd api reference docs.
-	_ "github.com/ahmetb/gen-crd-api-reference-docs"
 	// Use addlicense for adding license headers.
 	_ "github.com/google/addlicense"
+	// Use code-generator for generating aggregated-api code.
+	_ "k8s.io/code-generator"
+	// Use vgopath for setting up GOPATH to generate code with code-generator.
+	_ "github.com/onmetal/vgopath"
+	// Use gen-crd-api-reference-docs for generating API reference documentation.
+	_ "github.com/ahmetb/gen-crd-api-reference-docs"
 )

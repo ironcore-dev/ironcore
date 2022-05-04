@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
+	"github.com/onmetal/controller-utils/clientutils"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/util/workqueue"
@@ -34,15 +35,17 @@ import (
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 )
 
-// MachineClassReconciler reconciles a MachineClass object
+// MachineClassReconciler reconciles a MachineClassRef object
 type MachineClassReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	APIReader client.Reader
+	Scheme    *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=compute.onmetal.de,resources=machineclasses,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=compute.onmetal.de,resources=machineclasses/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=compute.onmetal.de,resources=machineclasses/finalizers,verbs=update
+//+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machineclasses,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machineclasses/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machineclasses/finalizers,verbs=update
+//+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machines,verbs=get;list;watch
 
 // Reconcile moves the current state of the cluster closer to the desired state
 func (r *MachineClassReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -57,34 +60,33 @@ func (r *MachineClassReconciler) Reconcile(ctx context.Context, req ctrl.Request
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *MachineClassReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	// Index the field of machineclass name for listing machines in machineclass controller
-	if err := mgr.GetFieldIndexer().IndexField(
-		context.Background(),
-		&computev1alpha1.Machine{},
-		machineClassNameField,
-		func(object client.Object) []string {
-			m := object.(*computev1alpha1.Machine)
-			if m.Spec.MachineClass.Name == "" {
-				return nil
-			}
-			return []string{m.Spec.MachineClass.Name}
-		},
-	); err != nil {
-		return fmt.Errorf("indexing the field %s: %w", machineClassNameField, err)
-	}
-
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&computev1alpha1.MachineClass{}).
 		Watches(
 			&source.Kind{Type: &computev1alpha1.Machine{}},
 			handler.Funcs{
-				DeleteFunc: func(e event.DeleteEvent, q workqueue.RateLimitingInterface) {
-					m := e.Object.(*computev1alpha1.Machine)
-					q.Add(ctrl.Request{NamespacedName: types.NamespacedName{Name: m.Spec.MachineClass.Name}})
+				DeleteFunc: func(event event.DeleteEvent, queue workqueue.RateLimitingInterface) {
+					machine := event.Object.(*computev1alpha1.Machine)
+					queue.Add(ctrl.Request{NamespacedName: types.NamespacedName{Name: machine.Spec.MachineClassRef.Name}})
 				},
 			},
 		).
 		Complete(r)
+}
+
+func (r *MachineClassReconciler) listReferencingMachines(ctx context.Context, machineClass *computev1alpha1.MachineClass) ([]computev1alpha1.Machine, error) {
+	machineList := &computev1alpha1.MachineList{}
+	if err := r.APIReader.List(ctx, machineList, client.InNamespace(machineClass.Namespace)); err != nil {
+		return nil, fmt.Errorf("error listing the machines using the machine class: %w", err)
+	}
+
+	var machines []computev1alpha1.Machine
+	for _, machine := range machineList.Items {
+		if machine.Spec.MachineClassRef.Name == machineClass.Name {
+			machines = append(machines, machine)
+		}
+	}
+	return machines, nil
 }
 
 func (r *MachineClassReconciler) delete(ctx context.Context, log logr.Logger, machineClass *computev1alpha1.MachineClass) (ctrl.Result, error) {
@@ -92,45 +94,37 @@ func (r *MachineClassReconciler) delete(ctx context.Context, log logr.Logger, ma
 		return ctrl.Result{}, nil
 	}
 
-	// List the machines currently using the MachineClass
-	machineList := &computev1alpha1.MachineList{}
-	if err := r.List(ctx, machineList, client.InNamespace(machineClass.Namespace), client.MatchingFields{machineClassNameField: machineClass.Name}); err != nil {
-		return ctrl.Result{}, fmt.Errorf("listing the machines using the MachineClass: %w", err)
+	machines, err := r.listReferencingMachines(ctx, machineClass)
+	if err != nil {
+		return ctrl.Result{}, err
 	}
 
-	// Check if there's still any machine using the MachineClass
-	if len(machineList.Items) != 0 {
-		// List the names of the machines still using the machineclass
-		machineNames := make([]string, 0, len(machineList.Items))
-		for _, machine := range machineList.Items {
+	if len(machines) != 0 {
+		machineNames := make([]string, 0, len(machines))
+		for _, machine := range machines {
 			machineNames = append(machineNames, machine.Name)
 		}
-		log.Info("Forbidden to delete the machineclass which is still used by machines", "machine names", machineNames)
 
+		log.V(1).Info("Machine class is still in use", "ReferencingMachineNames", machineNames)
 		return ctrl.Result{}, nil
 	}
 
-	// Remove the finalizer in the machineclass and persist the new state
-	old := machineClass.DeepCopy()
-	controllerutil.RemoveFinalizer(machineClass, computev1alpha1.MachineClassFinalizer)
-	if err := r.Patch(ctx, machineClass, client.MergeFrom(old)); err != nil {
-		return ctrl.Result{}, fmt.Errorf("removing the finalizer: %w", err)
+	log.V(1).Info("Machine class is not in use anymore, removing finalizer")
+	if err := clientutils.PatchRemoveFinalizer(ctx, r.Client, machineClass, computev1alpha1.MachineClassFinalizer); err != nil {
+		return ctrl.Result{}, err
 	}
-	log.V(1).Info("Successfully removed finalizer")
 
+	log.V(1).Info("Successfully removed finalizer")
 	return ctrl.Result{}, nil
 }
 
 func (r *MachineClassReconciler) reconcile(ctx context.Context, log logr.Logger, machineClass *computev1alpha1.MachineClass) (ctrl.Result, error) {
-	if !controllerutil.ContainsFinalizer(machineClass, computev1alpha1.MachineClassFinalizer) {
-		old := machineClass.DeepCopy()
-		controllerutil.AddFinalizer(machineClass, computev1alpha1.MachineClassFinalizer)
-		if err := r.Patch(ctx, machineClass, client.MergeFrom(old)); err != nil {
-			return ctrl.Result{}, fmt.Errorf("adding the finalizer: %w", err)
-		}
-		return ctrl.Result{}, nil
+	log.V(1).Info("Ensuring finalizer")
+	if modified, err := clientutils.PatchEnsureFinalizer(ctx, r.Client, machineClass, computev1alpha1.MachineClassFinalizer); err != nil || modified {
+		return ctrl.Result{}, err
 	}
 
+	log.V(1).Info("Finalizer is present")
 	return ctrl.Result{}, nil
 }
 

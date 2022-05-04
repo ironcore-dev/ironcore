@@ -1,11 +1,11 @@
-apiVersion: storage.onmetal.de/v1alpha1
+apiVersion: storage.api.onmetal.de/v1alpha1
 kind: Volume
 metadata:
   name: volume-sample
 spec:
-  storageClassRef:
-    name: storageclass-sample
-  storagePool:
-    name: storagepool-sample
+  volumeClassRef:
+    name: volumeclass-sample
+  volumePool:
+    name: volumepool-sample
   resources:
     storage: 100Gi

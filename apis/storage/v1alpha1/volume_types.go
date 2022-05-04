@@ -26,24 +26,24 @@ import (
 
 // VolumeGK is a helper to easily access the GroupKind information of an Volume
 var VolumeGK = schema.GroupKind{
-	Group: GroupVersion.Group,
+	Group: SchemeGroupVersion.Group,
 	Kind:  "Volume",
 }
 
 // VolumeSpec defines the desired state of Volume
 type VolumeSpec struct {
-	// StorageClassRef is the storage class of a volume
-	StorageClassRef corev1.LocalObjectReference `json:"storageClassRef"`
-	// StoragePoolSelector selects a suitable StoragePool by the given labels.
-	StoragePoolSelector map[string]string `json:"storagePoolSelector,omitempty"`
-	// StoragePool indicates which storage pool to use for a volume.
-	// If unset, the scheduler will figure out a suitable StoragePool.
-	StoragePool corev1.LocalObjectReference `json:"storagePool"`
+	// VolumeClassRef is the VolumeClass of a volume
+	VolumeClassRef corev1.LocalObjectReference `json:"volumeClassRef"`
+	// VolumePoolSelector selects a suitable VolumePoolRef by the given labels.
+	VolumePoolSelector map[string]string `json:"volumePoolSelector,omitempty"`
+	// VolumePoolRef indicates which VolumePool to use for a volume.
+	// If unset, the scheduler will figure out a suitable VolumePoolRef.
+	VolumePoolRef corev1.LocalObjectReference `json:"volumePoolRef,omitempty"`
 	// ClaimRef is the reference to the VolumeClaim used by the Volume.
 	ClaimRef ClaimReference `json:"claimRef,omitempty"`
 	// Resources is a description of the volume's resources and capacity.
 	Resources corev1.ResourceList `json:"resources,omitempty"`
-	// Tolerations define tolerations the Volume has. Only StoragePools whose taints
+	// Tolerations define tolerations the Volume has. Only any VolumePool whose taints
 	// covered by Tolerations will be considered to host the Volume.
 	Tolerations []commonv1alpha1.Toleration `json:"tolerations,omitempty"`
 }
@@ -70,8 +70,6 @@ type ClaimReference struct {
 type VolumeStatus struct {
 	// State represents the infrastructure state of a Volume.
 	State VolumeState `json:"state,omitempty"`
-	// Phase represents the VolumeClaim binding phase of a Volume.
-	Phase VolumePhase `json:"phase,omitempty"`
 	// Conditions represents different status aspects of a Volume.
 	Conditions []VolumeCondition `json:"conditions,omitempty"`
 	// Access specifies how to access a Volume.
@@ -79,31 +77,73 @@ type VolumeStatus struct {
 	Access *VolumeAccess `json:"access,omitempty"`
 }
 
-// VolumePhase represents the VolumeClaim binding phase of a Volume
-// +kubebuilder:validation:Enum=Pending;Available;Bound;Failed
+const (
+	// VolumeBoundReasonUnbound is used for any Volume that is not bound.
+	VolumeBoundReasonUnbound = "Unbound"
+	// VolumeBoundReasonPending is used for any Volume that is not available.
+	VolumeBoundReasonPending = "Pending"
+	// VolumeBoundReasonBound is used for any Volume that is bound.
+	VolumeBoundReasonBound = "Bound"
+)
+
+// VolumePhase is the binding phase of a volume.
 type VolumePhase string
 
 const (
-	// VolumePending is used for Volumes that are not available.
-	VolumePending VolumePhase = "Pending"
-	// VolumeAvailable is used for Volumes that are not yet bound
-	// Available volumes are held by the binder and matched to VolumeClaims.
-	VolumeAvailable VolumePhase = "Available"
-	// VolumeBound is used for Volumes that are bound.
-	VolumeBound VolumePhase = "Bound"
-	// VolumeFailed is used for Volumes that failed to be correctly freed from a VolumeClaim.
-	VolumeFailed VolumePhase = "Failed"
+	// VolumePhaseUnknown is used for any Volume for which it is unknown whether it can be used for binding.
+	VolumePhaseUnknown VolumePhase = "Unknown"
+	// VolumePhaseUnbound is used for any Volume that not bound.
+	VolumePhaseUnbound VolumePhase = "Unbound"
+	// VolumePhasePending is used for any Volume that is currently awaiting binding.
+	VolumePhasePending VolumePhase = "Pending"
+	// VolumePhaseBound is used for any Volume that is properly bound.
+	VolumePhaseBound VolumePhase = "Bound"
 )
+
+func FindVolumeCondition(conditions []VolumeCondition, conditionType VolumeConditionType) (VolumeCondition, int) {
+	for i, condition := range conditions {
+		if condition.Type == conditionType {
+			return condition, i
+		}
+	}
+	return VolumeCondition{}, -1
+}
+
+func VolumePhaseFromBoundStatusAndReason(status corev1.ConditionStatus, reason string) VolumePhase {
+	switch {
+	case status == corev1.ConditionFalse && reason == VolumeBoundReasonPending:
+		return VolumePhasePending
+	case status == corev1.ConditionFalse && reason == VolumeBoundReasonUnbound:
+		return VolumePhaseUnbound
+	case status == corev1.ConditionTrue:
+		return VolumePhaseBound
+	default:
+		return VolumePhaseUnknown
+	}
+}
+
+func GetVolumePhaseAndCondition(volume *Volume) (VolumePhase, VolumeCondition, int) {
+	cond, idx := FindVolumeCondition(volume.Status.Conditions, VolumeBound)
+	phase := VolumePhaseFromBoundStatusAndReason(cond.Status, cond.Reason)
+	return phase, cond, idx
+}
+
+func GetVolumePhase(volume *Volume) VolumePhase {
+	phase, _, _ := GetVolumePhaseAndCondition(volume)
+	return phase
+}
 
 // VolumeState is a possible state a volume can be in.
 type VolumeState string
 
 const (
-	// VolumeStateAvailable reports whether the volume is available to be used.
-	VolumeStateAvailable VolumeState = "Available"
-	// VolumeStatePending reports whether the volume is about to be ready.
+	// VolumeStateUnknown reports whether a Volume is in an unknown state.
+	VolumeStateUnknown VolumeState = "Unknown"
+	// VolumeStatePending reports whether a Volume is about to be ready.
 	VolumeStatePending VolumeState = "Pending"
-	// VolumeStateError reports that the volume is in an error state.
+	// VolumeStateAvailable reports whether a Volume is available to be used.
+	VolumeStateAvailable VolumeState = "Available"
+	// VolumeStateError reports that a Volume is in an error state.
 	VolumeStateError VolumeState = "Error"
 )
 
@@ -113,6 +153,9 @@ type VolumeConditionType string
 const (
 	// VolumeSynced represents the condition of a volume being synced with its backing resources
 	VolumeSynced VolumeConditionType = "Synced"
+
+	// VolumeBound represents the binding state of a Volume.
+	VolumeBound VolumeConditionType = "Bound"
 )
 
 // VolumeCondition is one of the conditions of a volume.
@@ -127,19 +170,12 @@ type VolumeCondition struct {
 	Message string `json:"message"`
 	// ObservedGeneration represents the .metadata.generation that the condition was set based upon.
 	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
-	// LastUpdateTime is the last time a condition has been updated.
-	LastUpdateTime metav1.Time `json:"lastUpdateTime,omitempty"`
 	// LastTransitionTime is the last time the status of a condition has transitioned from one state to another.
 	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
 }
 
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
-//+kubebuilder:printcolumn:name="StoragePool",type=string,JSONPath=`.spec.storagePool.name`
-//+kubebuilder:printcolumn:name="StorageClass",type=string,JSONPath=`.spec.storageClassRef.name`
-//+kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.state`
-//+kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
-//+kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// +genclient
 
 // Volume is the Schema for the volumes API
 type Volume struct {
@@ -150,15 +186,11 @@ type Volume struct {
 	Status VolumeStatus `json:"status,omitempty"`
 }
 
-//+kubebuilder:object:root=true
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // VolumeList contains a list of Volume
 type VolumeList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []Volume `json:"items"`
-}
-
-func init() {
-	SchemeBuilder.Register(&Volume{}, &VolumeList{})
 }

@@ -21,6 +21,13 @@ on:
 
 jobs:
   buildAndPush:
+    strategy:
+      matrix:
+        image:
+          - name: onmetal-api-controller-manager
+            target: manager
+          - name: onmetal-api-apiserver
+            target: apiserver
     if: ${{ github.event.label.name == 'ok-to-image' }} || ${{ github.event.label.name == 'ok-to-🐳' }} || ${{ github.ref == 'refs/heads/main' }}
     runs-on: self-hosted
     steps:
@@ -29,7 +36,7 @@ jobs:
         id: meta
         with:
           images: |
-            ghcr.io/${{ github.repository_owner }}/onmetal-api-controller-manager
+            ghcr.io/${{ github.repository_owner }}/${{ matrix.image.name }}
           tags: |
             type=semver,pattern={{version}}
             type=schedule
@@ -71,3 +78,4 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          target: ${{ matrix.image.target }}

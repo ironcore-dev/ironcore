@@ -1,0 +1,11 @@
+apiVersion: storage.api.onmetal.de/v1alpha1
+kind: VolumePool
+metadata:
+  name: volumepool-sample
+spec:
+  providerID: onmetal://shared
+#status:
+#  state: Available
+#  available:
+#    onmetal.de/fast-class: 10Gi
+#    onmetal.de/slow-class: 100Gi

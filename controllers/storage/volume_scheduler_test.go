@@ -15,9 +15,11 @@
 package storage
 
 import (
-	. "github.com/onsi/ginkgo"
+	"github.com/onmetal/onmetal-api/testutils"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -26,56 +28,63 @@ import (
 )
 
 var _ = Describe("VolumeScheduler", func() {
+	ctx := testutils.SetupContext()
 	ns := SetupTest(ctx)
 
-	It("should schedule volumes on storage pools", func() {
-		By("creating a storage pool")
-		storagePool := &storagev1alpha1.StoragePool{
+	It("should schedule volumes on volume pools", func() {
+		By("creating a volume pool")
+		volumePool := &storagev1alpha1.VolumePool{
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "test-pool-",
 			},
 		}
-		Expect(k8sClient.Create(ctx, storagePool)).To(Succeed(), "failed to create storage pool")
+		Expect(k8sClient.Create(ctx, volumePool)).To(Succeed(), "failed to create volume pool")
 
-		By("patching the storage pool status to contain a storage class")
-		storagePoolBase := storagePool.DeepCopy()
-		storagePool.Status.AvailableStorageClasses = []corev1.LocalObjectReference{{Name: "my-volumeclass"}}
-		Expect(k8sClient.Status().Patch(ctx, storagePool, client.MergeFrom(storagePoolBase))).
-			To(Succeed(), "failed to patch storage pool status")
+		By("patching the volume pool status to contain a volume class")
+		volumePoolBase := volumePool.DeepCopy()
+		volumePool.Status.AvailableVolumeClasses = []corev1.LocalObjectReference{{Name: "my-volumeclass"}}
+		Expect(k8sClient.Status().Patch(ctx, volumePool, client.MergeFrom(volumePoolBase))).
+			To(Succeed(), "failed to patch volume pool status")
 
-		By("creating a volume w/ the requested storage class")
+		By("creating a volume w/ the requested volume class")
 		volume := &storagev1alpha1.Volume{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
 				GenerateName: "test-volume-",
 			},
 			Spec: storagev1alpha1.VolumeSpec{
-				StorageClassRef: corev1.LocalObjectReference{
+				VolumeClassRef: corev1.LocalObjectReference{
 					Name: "my-volumeclass",
+				},
+				Resources: corev1.ResourceList{
+					corev1.ResourceStorage: resource.MustParse("1Gi"),
 				},
 			},
 		}
 		Expect(k8sClient.Create(ctx, volume)).To(Succeed(), "failed to create volume")
 
-		By("waiting for the volume to be scheduled onto the storage pool")
+		By("waiting for the volume to be scheduled onto the volume pool")
 		volumeKey := client.ObjectKeyFromObject(volume)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
-			g.Expect(volume.Spec.StoragePool.Name).To(Equal(storagePool.Name))
+			g.Expect(volume.Spec.VolumePoolRef.Name).To(Equal(volumePool.Name))
 			g.Expect(volume.Status.State).To(Equal(storagev1alpha1.VolumeStatePending))
 		}).Should(Succeed())
 	})
 
-	It("should schedule schedule volumes onto storage pools if the pool becomes available later than the volume", func() {
-		By("creating a volume w/ the requested storage class")
+	It("should schedule schedule volumes onto volume pools if the pool becomes available later than the volume", func() {
+		By("creating a volume w/ the requested volume class")
 		volume := &storagev1alpha1.Volume{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
 				GenerateName: "test-volume-",
 			},
 			Spec: storagev1alpha1.VolumeSpec{
-				StorageClassRef: corev1.LocalObjectReference{
+				VolumeClassRef: corev1.LocalObjectReference{
 					Name: "my-volumeclass",
+				},
+				Resources: corev1.ResourceList{
+					corev1.ResourceStorage: resource.MustParse("1Gi"),
 				},
 			},
 		}
@@ -85,48 +94,48 @@ var _ = Describe("VolumeScheduler", func() {
 		volumeKey := client.ObjectKeyFromObject(volume)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed())
-			g.Expect(volume.Spec.StoragePool.Name).To(BeEmpty())
+			g.Expect(volume.Spec.VolumePoolRef.Name).To(BeEmpty())
 			g.Expect(volume.Status.State).To(Equal(storagev1alpha1.VolumeStatePending))
 		}).Should(Succeed())
 
-		By("creating a storage pool")
-		storagePool := &storagev1alpha1.StoragePool{
+		By("creating a volume pool")
+		volumePool := &storagev1alpha1.VolumePool{
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "test-pool-",
 			},
 		}
-		Expect(k8sClient.Create(ctx, storagePool)).To(Succeed(), "failed to create storage pool")
+		Expect(k8sClient.Create(ctx, volumePool)).To(Succeed(), "failed to create volume pool")
 
-		By("patching the storage pool status to contain a storage class")
-		storagePoolBase := storagePool.DeepCopy()
-		storagePool.Status.AvailableStorageClasses = []corev1.LocalObjectReference{{Name: "my-volumeclass"}}
-		Expect(k8sClient.Status().Patch(ctx, storagePool, client.MergeFrom(storagePoolBase))).
-			To(Succeed(), "failed to patch storage pool status")
+		By("patching the volume pool status to contain a volume class")
+		volumePoolBase := volumePool.DeepCopy()
+		volumePool.Status.AvailableVolumeClasses = []corev1.LocalObjectReference{{Name: "my-volumeclass"}}
+		Expect(k8sClient.Status().Patch(ctx, volumePool, client.MergeFrom(volumePoolBase))).
+			To(Succeed(), "failed to patch volume pool status")
 
-		By("waiting for the volume to be scheduled onto the storage pool")
+		By("waiting for the volume to be scheduled onto the volume pool")
 		Eventually(func() string {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
-			return volume.Spec.StoragePool.Name
-		}).Should(Equal(storagePool.Name))
+			return volume.Spec.VolumePoolRef.Name
+		}).Should(Equal(volumePool.Name))
 	})
 
-	It("should schedule onto storage pools with matching labels", func() {
-		By("creating a storage pool w/o matching labels")
-		storagePoolNoMatchingLabels := &storagev1alpha1.StoragePool{
+	It("should schedule onto volume pools with matching labels", func() {
+		By("creating a volume pool w/o matching labels")
+		volumePoolNoMatchingLabels := &storagev1alpha1.VolumePool{
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "test-pool-",
 			},
 		}
-		Expect(k8sClient.Create(ctx, storagePoolNoMatchingLabels)).To(Succeed(), "failed to create storage pool")
+		Expect(k8sClient.Create(ctx, volumePoolNoMatchingLabels)).To(Succeed(), "failed to create volume pool")
 
-		By("patching the storage pool status to contain a storage class")
-		storagePoolNoMatchingLabelsBase := storagePoolNoMatchingLabels.DeepCopy()
-		storagePoolNoMatchingLabels.Status.AvailableStorageClasses = []corev1.LocalObjectReference{{Name: "my-storageclass"}}
-		Expect(k8sClient.Status().Patch(ctx, storagePoolNoMatchingLabels, client.MergeFrom(storagePoolNoMatchingLabelsBase))).
-			To(Succeed(), "failed to patch storage pool status")
+		By("patching the volume pool status to contain a volume class")
+		volumePoolNoMatchingLabelsBase := volumePoolNoMatchingLabels.DeepCopy()
+		volumePoolNoMatchingLabels.Status.AvailableVolumeClasses = []corev1.LocalObjectReference{{Name: "my-volumeclass"}}
+		Expect(k8sClient.Status().Patch(ctx, volumePoolNoMatchingLabels, client.MergeFrom(volumePoolNoMatchingLabelsBase))).
+			To(Succeed(), "failed to patch volume pool status")
 
-		By("creating a storage pool w/ matching labels")
-		storagePoolMatchingLabels := &storagev1alpha1.StoragePool{
+		By("creating a volume pool w/ matching labels")
+		volumePoolMatchingLabels := &storagev1alpha1.VolumePool{
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "test-pool-",
 				Labels: map[string]string{
@@ -134,47 +143,50 @@ var _ = Describe("VolumeScheduler", func() {
 				},
 			},
 		}
-		Expect(k8sClient.Create(ctx, storagePoolMatchingLabels)).To(Succeed(), "failed to create storage pool")
+		Expect(k8sClient.Create(ctx, volumePoolMatchingLabels)).To(Succeed(), "failed to create volume pool")
 
-		By("patching the storage pool status to contain a storage class")
-		storagePoolMatchingLabelsBase := storagePoolMatchingLabels.DeepCopy()
-		storagePoolMatchingLabels.Status.AvailableStorageClasses = []corev1.LocalObjectReference{{Name: "my-storageclass"}}
-		Expect(k8sClient.Status().Patch(ctx, storagePoolMatchingLabels, client.MergeFrom(storagePoolMatchingLabelsBase))).
-			To(Succeed(), "failed to patch storage pool status")
+		By("patching the volume pool status to contain a volume class")
+		volumePoolMatchingLabelsBase := volumePoolMatchingLabels.DeepCopy()
+		volumePoolMatchingLabels.Status.AvailableVolumeClasses = []corev1.LocalObjectReference{{Name: "my-volumeclass"}}
+		Expect(k8sClient.Status().Patch(ctx, volumePoolMatchingLabels, client.MergeFrom(volumePoolMatchingLabelsBase))).
+			To(Succeed(), "failed to patch volume pool status")
 
-		By("creating a volume w/ the requested storage class")
+		By("creating a volume w/ the requested volume class")
 		volume := &storagev1alpha1.Volume{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
 				GenerateName: "test-volume-",
 			},
 			Spec: storagev1alpha1.VolumeSpec{
-				StoragePoolSelector: map[string]string{
+				VolumePoolSelector: map[string]string{
 					"foo": "bar",
 				},
-				StorageClassRef: corev1.LocalObjectReference{
-					Name: "my-storageclass",
+				VolumeClassRef: corev1.LocalObjectReference{
+					Name: "my-volumeclass",
+				},
+				Resources: corev1.ResourceList{
+					corev1.ResourceStorage: resource.MustParse("1Gi"),
 				},
 			},
 		}
 		Expect(k8sClient.Create(ctx, volume)).To(Succeed(), "failed to create volume")
 
-		By("waiting for the volume to be scheduled onto the storage pool")
+		By("waiting for the volume to be scheduled onto the volume pool")
 		volumeKey := client.ObjectKeyFromObject(volume)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
-			g.Expect(volume.Spec.StoragePool.Name).To(Equal(storagePoolMatchingLabels.Name))
+			g.Expect(volume.Spec.VolumePoolRef.Name).To(Equal(volumePoolMatchingLabels.Name))
 			g.Expect(volume.Status.State).To(Equal(storagev1alpha1.VolumeStatePending))
 		}).Should(Succeed())
 	})
 
-	It("should schedule a volume with corresponding tolerations onto a storage pool with taints", func() {
-		By("creating a storage pool w/ taints")
-		taintedStoragePool := &storagev1alpha1.StoragePool{
+	It("should schedule a volume with corresponding tolerations onto a volume pool with taints", func() {
+		By("creating a volume pool w/ taints")
+		taintedVolumePool := &storagev1alpha1.VolumePool{
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "test-pool-",
 			},
-			Spec: storagev1alpha1.StoragePoolSpec{
+			Spec: storagev1alpha1.VolumePoolSpec{
 				Taints: []commonv1alpha1.Taint{
 					{
 						Key:    "key",
@@ -188,13 +200,13 @@ var _ = Describe("VolumeScheduler", func() {
 				},
 			},
 		}
-		Expect(k8sClient.Create(ctx, taintedStoragePool)).To(Succeed(), "failed to create the storage pool")
+		Expect(k8sClient.Create(ctx, taintedVolumePool)).To(Succeed(), "failed to create the volume pool")
 
-		By("patching the storage pool status to contain a storage class")
-		volumePoolBase := taintedStoragePool.DeepCopy()
-		taintedStoragePool.Status.AvailableStorageClasses = []corev1.LocalObjectReference{{Name: "my-storageclass"}}
-		Expect(k8sClient.Status().Patch(ctx, taintedStoragePool, client.MergeFrom(volumePoolBase))).
-			To(Succeed(), "failed to patch the storage pool status")
+		By("patching the volume pool status to contain a volume class")
+		volumePoolBase := taintedVolumePool.DeepCopy()
+		taintedVolumePool.Status.AvailableVolumeClasses = []corev1.LocalObjectReference{{Name: "my-volumeclass"}}
+		Expect(k8sClient.Status().Patch(ctx, taintedVolumePool, client.MergeFrom(volumePoolBase))).
+			To(Succeed(), "failed to patch the volume pool status")
 
 		By("creating a volume")
 		volume := &storagev1alpha1.Volume{
@@ -203,19 +215,22 @@ var _ = Describe("VolumeScheduler", func() {
 				GenerateName: "test-volume-",
 			},
 			Spec: storagev1alpha1.VolumeSpec{
-				StorageClassRef: corev1.LocalObjectReference{
-					Name: "my-storageclass",
+				VolumeClassRef: corev1.LocalObjectReference{
+					Name: "my-volumeclass",
+				},
+				Resources: corev1.ResourceList{
+					corev1.ResourceStorage: resource.MustParse("1Gi"),
 				},
 			},
 		}
 		Expect(k8sClient.Create(ctx, volume)).To(Succeed(), "failed to create the volume")
 
-		By("observing the volume isn't scheduled onto the storage pool")
+		By("observing the volume isn't scheduled onto the volume pool")
 		volumeKey := client.ObjectKeyFromObject(volume)
 		Consistently(func() string {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed())
-			return volume.Spec.StoragePool.Name
-		}, timeout, interval).Should(BeEmpty())
+			return volume.Spec.VolumePoolRef.Name
+		}).Should(BeEmpty())
 
 		By("patching the volume to contain only one of the corresponding tolerations")
 		volumeBase := volume.DeepCopy()
@@ -227,11 +242,11 @@ var _ = Describe("VolumeScheduler", func() {
 		})
 		Expect(k8sClient.Patch(ctx, volume, client.MergeFrom(volumeBase))).To(Succeed(), "failed to patch the volume's spec")
 
-		By("observing the volume isn't scheduled onto the storage pool")
+		By("observing the volume isn't scheduled onto the volume pool")
 		Consistently(func() string {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed())
-			return volume.Spec.StoragePool.Name
-		}, timeout, interval).Should(BeEmpty())
+			return volume.Spec.VolumePoolRef.Name
+		}).Should(BeEmpty())
 
 		By("patching the volume to contain all of the corresponding tolerations")
 		volumeBase = volume.DeepCopy()
@@ -242,10 +257,10 @@ var _ = Describe("VolumeScheduler", func() {
 		})
 		Expect(k8sClient.Patch(ctx, volume, client.MergeFrom(volumeBase))).To(Succeed(), "failed to patch the volume's spec")
 
-		By("observing the volume is scheduled onto the storage pool")
+		By("observing the volume is scheduled onto the volume pool")
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get the volume")
-			g.Expect(volume.Spec.StoragePool.Name).To(Equal(taintedStoragePool.Name))
+			g.Expect(volume.Spec.VolumePoolRef.Name).To(Equal(taintedVolumePool.Name))
 		}).Should(Succeed())
 	})
 })
