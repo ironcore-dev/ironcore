@@ -32,7 +32,7 @@ type NetworkingInterface interface {
 	NetworkInterfacesGetter
 	NetworkInterfaceBindingsGetter
 	VirtualIPsGetter
-	VirtualIPRoutingsGetter
+	VirtualIPClaimsGetter
 }
 
 // NetworkingClient is used to interact with features provided by the networking.api.onmetal.de group.
@@ -64,8 +64,8 @@ func (c *NetworkingClient) VirtualIPs(namespace string) VirtualIPInterface {
 	return newVirtualIPs(c, namespace)
 }
 
-func (c *NetworkingClient) VirtualIPRoutings(namespace string) VirtualIPRoutingInterface {
-	return newVirtualIPRoutings(c, namespace)
+func (c *NetworkingClient) VirtualIPClaims(namespace string) VirtualIPClaimInterface {
+	return newVirtualIPClaims(c, namespace)
 }
 
 // NewForConfig creates a new NetworkingClient for the given config.

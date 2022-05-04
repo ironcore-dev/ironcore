@@ -51,8 +51,8 @@ func (c *FakeNetworking) VirtualIPs(namespace string) internalversion.VirtualIPI
 	return &FakeVirtualIPs{c, namespace}
 }
 
-func (c *FakeNetworking) VirtualIPRoutings(namespace string) internalversion.VirtualIPRoutingInterface {
-	return &FakeVirtualIPRoutings{c, namespace}
+func (c *FakeNetworking) VirtualIPClaims(namespace string) internalversion.VirtualIPClaimInterface {
+	return &FakeVirtualIPClaims{c, namespace}
 }
 
 // RESTClient returns a RESTClient that is used to communicate

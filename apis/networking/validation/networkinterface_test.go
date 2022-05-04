@@ -139,6 +139,37 @@ var _ = Describe("NetworkInterface", func() {
 			},
 			ContainElement(ForbiddenField("spec.ips[0].ephemeralPrefix.prefixTemplate.spec.prefixLength")),
 		),
+		Entry("invalid virtual ip claim reference",
+			&networking.NetworkInterface{
+				Spec: networking.NetworkInterfaceSpec{
+					VirtualIP: &networking.VirtualIPSource{
+						VirtualIPClaimRef: &corev1.LocalObjectReference{Name: "foo*"},
+					},
+				},
+			},
+			ContainElement(InvalidField("spec.virtualIP.virtualIPClaimRef.name")),
+		),
+		Entry("missing virtual ip ephemeral virtual ip claim template",
+			&networking.NetworkInterface{
+				Spec: networking.NetworkInterfaceSpec{
+					VirtualIP: &networking.VirtualIPSource{
+						Ephemeral: &networking.EphemeralVirtualIPSource{},
+					},
+				},
+			},
+			ContainElement(RequiredField("spec.virtualIP.ephemeral.virtualIPClaimTemplate")),
+		),
+		Entry("multiple virtual ip sources",
+			&networking.NetworkInterface{
+				Spec: networking.NetworkInterfaceSpec{
+					VirtualIP: &networking.VirtualIPSource{
+						VirtualIPClaimRef: &corev1.LocalObjectReference{Name: "foo"},
+						Ephemeral:         &networking.EphemeralVirtualIPSource{},
+					},
+				},
+			},
+			ContainElement(InvalidField("spec.virtualIP.ephemeral")),
+		),
 	)
 
 	DescribeTable("ValidateNetworkInterfaceUpdate",

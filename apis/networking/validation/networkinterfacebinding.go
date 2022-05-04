@@ -39,6 +39,12 @@ func ValidateNetworkInterfaceBinding(networkInterfaceBinding *networking.Network
 		seenIPFamilies[ip.Family()] = struct{}{}
 	}
 
+	if virtualIPRef := networkInterfaceBinding.VirtualIPRef; virtualIPRef != nil {
+		for _, msg := range apivalidation.NameIsDNSLabel(virtualIPRef.Name, false) {
+			allErrs = append(allErrs, field.Invalid(field.NewPath("virtualIPRef", "name"), virtualIPRef.Name, msg))
+		}
+	}
+
 	return allErrs
 }
 

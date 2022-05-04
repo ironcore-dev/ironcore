@@ -33,6 +33,8 @@ type NetworkInterfaceSpec struct {
 	// IPs is the list of provided IPs or EphemeralIPs which should be assigned to
 	// this NetworkInterface
 	IPs []IPSource
+	// VirtualIP specifies the virtual ip that should be assigned to this NetworkInterface.
+	VirtualIP *VirtualIPSource
 }
 
 type IPSource struct {
@@ -40,9 +42,13 @@ type IPSource struct {
 	EphemeralPrefix *EphemeralPrefixSource
 }
 
+type VirtualIPSource struct {
+	VirtualIPClaimRef *corev1.LocalObjectReference
+	Ephemeral         *EphemeralVirtualIPSource
+}
+
 // NetworkInterfaceStatus defines the observed state of NetworkInterface
 type NetworkInterfaceStatus struct {
-	// TODO: Add State, Conditions
 	// IPs represent the effective IP addresses of the NetworkInterface
 	IPs []commonv1alpha1.IP
 }

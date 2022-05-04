@@ -24,7 +24,7 @@ import (
 	networkinterfacestorage "github.com/onmetal/onmetal-api/registry/networking/networkinterface/storage"
 	networkinterfacebindingstorage "github.com/onmetal/onmetal-api/registry/networking/networkinterfacebinding/storage"
 	virtualipstorage "github.com/onmetal/onmetal-api/registry/networking/virtualip/storage"
-	virtualiproutingstorage "github.com/onmetal/onmetal-api/registry/networking/virtualiprouting/storage"
+	virtualipclaimstorage "github.com/onmetal/onmetal-api/registry/networking/virtualipclaim/storage"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/registry/generic"
@@ -89,12 +89,13 @@ func (p StorageProvider) v1alpha1Storage(restOptionsGetter generic.RESTOptionsGe
 	storageMap["virtualips"] = virtualIPStorage.VirtualIP
 	storageMap["virtualips/status"] = virtualIPStorage.Status
 
-	virtualIPRoutingStorage, err := virtualiproutingstorage.NewStorage(restOptionsGetter)
+	virtualIPClaimStorage, err := virtualipclaimstorage.NewStorage(restOptionsGetter)
 	if err != nil {
 		return storageMap, err
 	}
 
-	storageMap["virtualiproutings"] = virtualIPRoutingStorage.VirtualIPRouting
+	storageMap["virtualipclaims"] = virtualIPClaimStorage.VirtualIPClaim
+	storageMap["virtualipclaims/status"] = virtualIPClaimStorage.Status
 
 	aliasPrefixStorage, err := aliasprefixstorage.NewStorage(restOptionsGetter)
 	if err != nil {

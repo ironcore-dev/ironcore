@@ -65,10 +65,10 @@ type VirtualIPListerExpansion interface{}
 // VirtualIPNamespaceLister.
 type VirtualIPNamespaceListerExpansion interface{}
 
-// VirtualIPRoutingListerExpansion allows custom methods to be added to
-// VirtualIPRoutingLister.
-type VirtualIPRoutingListerExpansion interface{}
+// VirtualIPClaimListerExpansion allows custom methods to be added to
+// VirtualIPClaimLister.
+type VirtualIPClaimListerExpansion interface{}
 
-// VirtualIPRoutingNamespaceListerExpansion allows custom methods to be added to
-// VirtualIPRoutingNamespaceLister.
-type VirtualIPRoutingNamespaceListerExpansion interface{}
+// VirtualIPClaimNamespaceListerExpansion allows custom methods to be added to
+// VirtualIPClaimNamespaceLister.
+type VirtualIPClaimNamespaceListerExpansion interface{}

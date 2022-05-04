@@ -23,3 +23,7 @@ import (
 type EphemeralPrefixSource struct {
 	PrefixTemplate *ipam.PrefixTemplateSpec
 }
+
+type EphemeralVirtualIPSource struct {
+	VirtualIPClaimTemplate *VirtualIPClaimTemplateSpec `json:"virtualIPClaimTemplate,omitempty"`
+}

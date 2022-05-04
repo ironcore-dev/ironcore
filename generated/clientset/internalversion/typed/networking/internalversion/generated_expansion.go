@@ -29,4 +29,4 @@ type NetworkInterfaceBindingExpansion interface{}
 
 type VirtualIPExpansion interface{}
 
-type VirtualIPRoutingExpansion interface{}
+type VirtualIPClaimExpansion interface{}
