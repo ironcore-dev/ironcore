@@ -289,6 +289,9 @@ kind: NetworkInterfaceBinding
 metadata:
   namespace: default
   name: my-machine-interface
+## A virtual ip may also be bound here
+# virtualIPRef:
+#   name: my-virtual-ip
 ips:
   - 192.168.178.1
   - 2607:f0d0:1002:51::4
@@ -429,8 +432,9 @@ cannot be influenced and thus no construct like `prefixRef` is possible for `Vir
 To disambiguate between IPv4 and IPv6, the `VirtualIP` requires an `ipFamily` (same enum type as in Kubernetes'
 `Service.spec.ipFamilies`).
 
-The `VirtualIP` creates an `VirtualIPRouting` object with the same name as itself where the targeted
-`NetworkInterface`s if specified via `networkInterfaceRef`.
+The `VirtualIP` can reference a `VirtualIPClaim` that associates it in-use with a requester (typically
+a `NetworkInterface`). Once claimed successfully, the corresponding `NetworkInterfaceBinding` will be updated
+with a reference to the claimed `VirtualIP`.
 
 Example manifest:
 
@@ -451,29 +455,10 @@ status:
 ```
 [//]: # (@formatter:on)
 
-This could manifest in the following `VirtualIPRouting`:
-
-[//]: # (@formatter:off)
-```yaml
-apiVersion: networking.onmetal.de
-kind: VirtualIPRouting
-metadata:
-  namespace: default
-  name: my-virtual-ip
-networkRef:
-  name: my-network
-machinePoolRef:
-  name: my-machine-pool
-targetRef:
-  name: my-machine-interface
-  uid: 2020dcf9-e030-427e-b0fc-4fec2016e73b
-```
-[//]: # (@formatter:on)
-
 To simplify the creation and use of a `VirtualIP` per `NetworkInterface`, a `NetworkInterface`
-allows the creation via `ephemeralVirtualIPs`. The resulting `VirtualPrefix` name will be
-`<nic-name>-<name>` where `<name>` is the name in the `ephemeralVirtualIPs` list. It will also automatically be set up
-to only target the creating `NetworkInterface`. A `networkInterfaceRef` in the `spec` thus cannot be specified.
+allows the creation via `virtualIP.ephemeral`. The resulting `VirtualPrefix` name will be
+`<nic-name>` It will also automatically be set up to reference the creating `NetworkInterface`.
+A `networkInterfaceRef` in the `spec` thus cannot be specified.
 
 [//]: # (@formatter:off)
 ```yaml
@@ -483,11 +468,12 @@ metadata:
   namespace: default
   name: my-machine-interface
 spec:
-  ephemeralVirtualIPs:
-    - name: public-v4
-      spec:
-        type: Public
-        ipFamily: IPv4
+  virtualIP:
+    ephemeral:
+      virtualIPClaimTemplate:
+        spec:
+          type: Public
+          ipFamily: IPv4
 ```
 [//]: # (@formatter:on)
 
@@ -596,12 +582,13 @@ spec:
                       prefixRef:
                         name: pods
                       prefixLength: 24
-          # Create a virtual IP exclusively for this machine
-          ephemeralVirtualIPs:
-            - name: public
-              spec:
-                type: Public
-                ipFamily: IPv4
+          # Create a virtual IP for this machine
+          virtualIP:
+            - ephemeral:
+                virtualIPClaimTemplate:
+                  spec:
+                    type: Public
+                    ipFamily: IPv4
 ```
 [//]: # (@formatter:on)
 
