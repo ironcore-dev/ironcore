@@ -80,6 +80,19 @@ in that regard. For further information about Kubernetes, see
 [the Kubernetes reference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#ephemeralvolumesource-v1-core)
 .
 
+* Kubernetes specifies multiple ip types using `IPFamily`. This means, that instead of e.g. an object having
+  ```yaml
+  ipv4: 10.0.0.1
+  ipv6: ffff::
+  ```
+  Kubernetes specifies it as
+  ```yaml
+  ipFamilies: [IPv4, IPv6]
+  ips:
+  - 10.0.0.1
+  - ffff::
+  ```
+  The proposal should integrate into Kubernetes by using the same notation.
 * Resources that are created, managed, and deleted in scope of another resource are called `ephemeral`. An example in
   Kubernetes is the `Pod.spec.volumes.ephemeralVolume` that creates a volume just before a
   `Pod` is created and deletes it alongside the `Pod` after usage.
@@ -361,9 +374,18 @@ metadata:
 networkRef:
   name: my-network
 subsets:
-  - targetRef:
-      name: my-machine-interface
+  - machinePoolRef:
+      name: pool-1
       uid: 2020dcf9-e030-427e-b0fc-4fec2016e73b
+    targets:
+      - name: my-machine-interface-1
+        uid: 2020dcf9-e030-427e-b0fc-4fec2016e73a
+  - machinePoolRef:
+      name: pool-2
+      uid: 2020dcf9-e030-427e-b0fc-4fec2016e73c
+    targets:
+      - name: my-machine-interface-2
+        uid: 2020dcf9-e030-427e-b0fc-4fec2016e73d
 ```
 [//]: # (@formatter:on)
 
@@ -397,7 +419,7 @@ spec:
 
 ### The `VirtualIP` type
 
-A `VirtualIP` requests a stable public IP for multiple targets (`NetworkInterface`s). There is a
+A `VirtualIP` requests a stable public IP for a single targets (`NetworkInterface`s). There is a
 `type` field that currently only can be `type: Public` in order to support other future `VirtualIP` types (for instance,
 `VirtualIP`s in other networks).
 
@@ -407,9 +429,8 @@ cannot be influenced and thus no construct like `prefixRef` is possible for `Vir
 To disambiguate between IPv4 and IPv6, the `VirtualIP` requires an `ipFamily` (same enum type as in Kubernetes'
 `Service.spec.ipFamilies`).
 
-The `VirtualIP` creates an `VirtualIPRouting` object with the same name as itself where it maintains a list of
-the `NetworkInterface`s matching its `selector`. If the `selector` is empty it is assumed that an external process
-manages the `VirtualIPRouting` belonging to that `VirtualIP`.
+The `VirtualIP` creates an `VirtualIPRouting` object with the same name as itself where the targeted
+`NetworkInterface`s if specified via `networkInterfaceRef`.
 
 Example manifest:
 
@@ -423,9 +444,8 @@ metadata:
 spec:
   type: Public
   ipFamily: IPv4
-  networkInterfaceSelector:
-    matchLabels:
-      foo: bar
+  networkInterfaceRef:
+    name: my-nic
 status:
   ip: 45.86.152.88
 ```
@@ -442,17 +462,18 @@ metadata:
   name: my-virtual-ip
 networkRef:
   name: my-network
-subsets:
-  - targetRef:
-      name: my-machine-interface
-      uid: 2020dcf9-e030-427e-b0fc-4fec2016e73b
+machinePoolRef:
+  name: my-machine-pool
+targetRef:
+  name: my-machine-interface
+  uid: 2020dcf9-e030-427e-b0fc-4fec2016e73b
 ```
 [//]: # (@formatter:on)
 
 To simplify the creation and use of a `VirtualIP` per `NetworkInterface`, a `NetworkInterface`
 allows the creation via `ephemeralVirtualIPs`. The resulting `VirtualPrefix` name will be
 `<nic-name>-<name>` where `<name>` is the name in the `ephemeralVirtualIPs` list. It will also automatically be set up
-to only target the creating `NetworkInterface`. A `selector` in the `spec` thus cannot be specified.
+to only target the creating `NetworkInterface`. A `networkInterfaceRef` in the `spec` thus cannot be specified.
 
 [//]: # (@formatter:off)
 ```yaml
