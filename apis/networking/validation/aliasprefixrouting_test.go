@@ -56,32 +56,49 @@ var _ = Describe("AliasPrefixRouting", func() {
 			},
 			ContainElement(InvalidField("networkRef.name")),
 		),
-		Entry("missing subset ref name",
+		Entry("missing machine pool ref name",
 			&networking.AliasPrefixRouting{
 				Subsets: []networking.AliasPrefixSubset{{}},
 			},
-			ContainElement(RequiredField("subsets[0].targetRef.name")),
+			ContainElement(RequiredField("subsets[0].machinePoolRef.name")),
 		),
-		Entry("invalid subset ref name",
-			&networking.AliasPrefixRouting{
-				Subsets: []networking.AliasPrefixSubset{{
-					TargetRef: commonv1alpha1.LocalUIDReference{Name: "foo*"},
-				}},
-			},
-			ContainElement(InvalidField("subsets[0].targetRef.name")),
-		),
-		Entry("duplicate subset entry",
+		Entry("duplicate machine pool ref name",
 			&networking.AliasPrefixRouting{
 				Subsets: []networking.AliasPrefixSubset{
-					{
-						TargetRef: commonv1alpha1.LocalUIDReference{Name: "foo*"},
-					},
-					{
-						TargetRef: commonv1alpha1.LocalUIDReference{Name: "foo*"},
-					},
+					{MachinePoolRef: commonv1alpha1.LocalUIDReference{Name: "foo"}},
+					{MachinePoolRef: commonv1alpha1.LocalUIDReference{Name: "foo"}},
 				},
 			},
 			ContainElement(DuplicateField("subsets[1]")),
+		),
+		Entry("empty targets",
+			&networking.AliasPrefixRouting{
+				Subsets: []networking.AliasPrefixSubset{
+					{MachinePoolRef: commonv1alpha1.LocalUIDReference{Name: "foo"}},
+				},
+			},
+			ContainElement(RequiredField("subsets[0].targets")),
+		),
+		Entry("invalid subset target name",
+			&networking.AliasPrefixRouting{
+				Subsets: []networking.AliasPrefixSubset{{
+					Targets: []commonv1alpha1.LocalUIDReference{
+						{Name: "foo*"},
+					},
+				}},
+			},
+			ContainElement(InvalidField("subsets[0].targets[0].name")),
+		),
+		Entry("duplicate subset target name",
+			&networking.AliasPrefixRouting{
+				Subsets: []networking.AliasPrefixSubset{{
+					Targets: []commonv1alpha1.LocalUIDReference{
+						{Name: "foo"},
+						{Name: "foo"},
+					},
+				}},
+			},
+			ContainElement(DuplicateField("subsets[0].targets[1]")),
 		),
 	)
 

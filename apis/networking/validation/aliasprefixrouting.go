@@ -18,10 +18,10 @@ package validation
 
 import (
 	onmetalapivalidation "github.com/onmetal/onmetal-api/api/validation"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	"github.com/onmetal/onmetal-api/apis/networking"
 	corev1 "k8s.io/api/core/v1"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
@@ -50,20 +50,20 @@ func validateAliasPrefixRouting(aliasPrefixRouting *networking.AliasPrefixRoutin
 	return allErrs
 }
 
-func validateAliasPrefixRoutingSubsets(aliasPrefixRouting *networking.AliasPrefixRouting, subsetsField *field.Path) field.ErrorList {
+func validateAliasPrefixRoutingSubsets(aliasPrefixRouting *networking.AliasPrefixRouting, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	seen := make(map[commonv1alpha1.LocalUIDReference]struct{})
+	seenPoolNames := sets.NewString()
 	for idx := range aliasPrefixRouting.Subsets {
 		subset := &aliasPrefixRouting.Subsets[idx]
 
-		allErrs = append(allErrs, validateAliasPrefixRoutingSubset(subset, subsetsField.Index(idx))...)
+		allErrs = append(allErrs, validateAliasPrefixRoutingSubset(subset, fldPath.Index(idx))...)
 
-		key := subset.TargetRef
-		if _, ok := seen[key]; ok {
-			allErrs = append(allErrs, field.Duplicate(subsetsField.Index(idx), subset))
+		if seenPoolNames.Has(subset.MachinePoolRef.Name) {
+			allErrs = append(allErrs, field.Duplicate(fldPath.Index(idx), subset))
+		} else {
+			seenPoolNames.Insert(subset.MachinePoolRef.Name)
 		}
-		seen[key] = struct{}{}
 	}
 
 	return allErrs
@@ -72,11 +72,35 @@ func validateAliasPrefixRoutingSubsets(aliasPrefixRouting *networking.AliasPrefi
 func validateAliasPrefixRoutingSubset(subset *networking.AliasPrefixSubset, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	if subset.TargetRef.Name == "" {
-		allErrs = append(allErrs, field.Required(fldPath.Child("targetRef", "name"), "must specify network interface ref name"))
+	if subset.MachinePoolRef.Name == "" {
+		allErrs = append(allErrs, field.Required(fldPath.Child("machinePoolRef", "name"), "must specify machine pool ref name"))
 	} else {
-		for _, msg := range apivalidation.NameIsDNSLabel(subset.TargetRef.Name, false) {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("targetRef", "name"), subset.TargetRef.Name, msg))
+		for _, msg := range apivalidation.NameIsDNSLabel(subset.MachinePoolRef.Name, false) {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("machinePoolRef", "name"), subset.MachinePoolRef.Name, msg))
+		}
+	}
+
+	seenTargetNames := sets.NewString()
+	targetsPath := fldPath.Child("targets")
+	if len(subset.Targets) == 0 {
+		allErrs = append(allErrs, field.Required(targetsPath, "must specify at least 1 target"))
+	} else {
+		for i := range subset.Targets {
+			target := &subset.Targets[i]
+			targetPath := targetsPath.Index(i)
+			if target.Name == "" {
+				allErrs = append(allErrs, field.Required(targetPath.Child("name"), "must specify network interface ref name"))
+			} else {
+				for _, msg := range apivalidation.NameIsDNSLabel(target.Name, false) {
+					allErrs = append(allErrs, field.Invalid(targetPath.Child("name"), target.Name, msg))
+				}
+
+				if seenTargetNames.Has(target.Name) {
+					allErrs = append(allErrs, field.Duplicate(targetPath, target))
+				} else {
+					seenTargetNames.Insert(target.Name)
+				}
+			}
 		}
 	}
 
