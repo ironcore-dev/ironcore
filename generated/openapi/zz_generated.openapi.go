@@ -2150,15 +2150,29 @@ func schema_onmetal_api_apis_networking_v1alpha1_AliasPrefixRoutingSubset(ref co
 				Description: "AliasPrefixRoutingSubset is one of the targets of a AliasPrefixRouting",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"targetRef": {
+					"machinePoolRef": {
 						SchemaProps: spec.SchemaProps{
-							Description: "TargetRef is the targeted entity",
+							Description: "MachinePoolRef is the machine pool hosting the targeted entities.",
 							Default:     map[string]interface{}{},
 							Ref:         ref("github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference"),
 						},
 					},
+					"targets": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Targets are the entities targeted by the alias prefix routing.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference"),
+									},
+								},
+							},
+						},
+					},
 				},
-				Required: []string{"targetRef"},
+				Required: []string{"machinePoolRef", "targets"},
 			},
 		},
 		Dependencies: []string{

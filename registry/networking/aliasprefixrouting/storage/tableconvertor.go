@@ -75,7 +75,9 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 func formatEndpoints(subsets []networking.AliasPrefixSubset) string {
 	var parts []string
 	for _, subset := range subsets {
-		parts = append(parts, subset.TargetRef.Name)
+		for _, target := range subset.Targets {
+			parts = append(parts, target.Name)
+		}
 	}
 	return tableconvertor.JoinStringsMore(parts, ",", 3)
 }

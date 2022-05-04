@@ -24,8 +24,10 @@ import (
 
 // AliasPrefixSubset is one of the targets of a AliasPrefixRouting
 type AliasPrefixSubset struct {
-	// TargetRef is the targeted entity
-	TargetRef commonv1alpha1.LocalUIDReference
+	// MachinePoolRef is the machine pool hosting the targeted entities.
+	MachinePoolRef commonv1alpha1.LocalUIDReference
+	// Targets are the entities targeted by the alias prefix routing.
+	Targets []commonv1alpha1.LocalUIDReference
 }
 
 // +genclient
