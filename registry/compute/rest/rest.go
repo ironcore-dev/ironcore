@@ -39,7 +39,7 @@ func (p StorageProvider) GroupName() string {
 func (p StorageProvider) NewRESTStorage(apiResourceConfigSource serverstorage.APIResourceConfigSource, restOptionsGetter generic.RESTOptionsGetter) (genericapiserver.APIGroupInfo, bool, error) {
 	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(p.GroupName(), api.Scheme, metav1.ParameterCodec, api.Codecs)
 
-	if apiResourceConfigSource.VersionEnabled(computev1alpha1.SchemeGroupVersion) {
+	if apiResourceConfigSource.AnyResourceForGroupEnabled(computev1alpha1.SchemeGroupVersion.Group) {
 		storageMap, err := p.v1alpha1Storage(restOptionsGetter)
 		if err != nil {
 			return genericapiserver.APIGroupInfo{}, false, err
