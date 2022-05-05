@@ -59,6 +59,14 @@ var _ = Describe("NetworkInterfaceBinding", func() {
 			},
 			ContainElement(ForbiddenField("ips[1]")),
 		),
+		Entry("invalid virtual ip ref",
+			&networking.NetworkInterfaceBinding{
+				VirtualIPRef: &commonv1alpha1.LocalUIDReference{
+					Name: "foo*",
+				},
+			},
+			ContainElement(InvalidField("virtualIPRef.name")),
+		),
 		Entry("valid network interface binding with two ips",
 			&networking.NetworkInterfaceBinding{
 				ObjectMeta: metav1.ObjectMeta{

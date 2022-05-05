@@ -17,7 +17,6 @@
 package validation
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	"github.com/onmetal/onmetal-api/apis/networking"
 	. "github.com/onmetal/onmetal-api/testutils/validation"
 	. "github.com/onsi/ginkgo/v2"
@@ -27,68 +26,68 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-var _ = Describe("VirtualIP", func() {
-	DescribeTable("ValidateVirtualIP",
-		func(virtualIP *networking.VirtualIP, match types.GomegaMatcher) {
-			errList := ValidateVirtualIP(virtualIP)
+var _ = Describe("VirtualIPClaim", func() {
+	DescribeTable("ValidateVirtualIPClaim",
+		func(vipClaim *networking.VirtualIPClaim, match types.GomegaMatcher) {
+			errList := ValidateVirtualIPClaim(vipClaim)
 			Expect(errList).To(match)
 		},
 		Entry("missing name",
-			&networking.VirtualIP{},
+			&networking.VirtualIPClaim{},
 			ContainElement(RequiredField("metadata.name")),
 		),
 		Entry("missing namespace",
-			&networking.VirtualIP{ObjectMeta: metav1.ObjectMeta{Name: "foo"}},
+			&networking.VirtualIPClaim{ObjectMeta: metav1.ObjectMeta{Name: "foo"}},
 			ContainElement(RequiredField("metadata.namespace")),
 		),
 		Entry("bad name",
-			&networking.VirtualIP{ObjectMeta: metav1.ObjectMeta{Name: "foo*"}},
+			&networking.VirtualIPClaim{ObjectMeta: metav1.ObjectMeta{Name: "foo*"}},
 			ContainElement(InvalidField("metadata.name")),
 		),
 		Entry("no type",
-			&networking.VirtualIP{},
+			&networking.VirtualIPClaim{},
 			ContainElement(RequiredField("spec.type")),
 		),
 		Entry("invalid type",
-			&networking.VirtualIP{
-				Spec: networking.VirtualIPSpec{
+			&networking.VirtualIPClaim{
+				Spec: networking.VirtualIPClaimSpec{
 					Type: "invalid",
 				},
 			},
 			ContainElement(NotSupportedField("spec.type")),
 		),
 		Entry("no ip family",
-			&networking.VirtualIP{},
+			&networking.VirtualIPClaim{},
 			ContainElement(RequiredField("spec.ipFamily")),
 		),
 		Entry("invalid ip family",
-			&networking.VirtualIP{
-				Spec: networking.VirtualIPSpec{
+			&networking.VirtualIPClaim{
+				Spec: networking.VirtualIPClaimSpec{
 					IPFamily: "invalid",
 				},
 			},
 			ContainElement(NotSupportedField("spec.ipFamily")),
 		),
 		Entry("invalid claim ref name",
-			&networking.VirtualIP{
-				Spec: networking.VirtualIPSpec{
-					ClaimRef: &commonv1alpha1.LocalUIDReference{
+			&networking.VirtualIPClaim{
+				Spec: networking.VirtualIPClaimSpec{
+					VirtualIPRef: &corev1.LocalObjectReference{
 						Name: "foo*",
 					},
 				},
 			},
-			ContainElement(InvalidField("spec.claimRef.name")),
+			ContainElement(InvalidField("spec.virtualIPRef.name")),
 		),
-		Entry("valid virtual ip",
-			&networking.VirtualIP{
+		Entry("valid virtual ip claim",
+			&networking.VirtualIPClaim{
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: "foo",
 					Name:      "bar",
 				},
-				Spec: networking.VirtualIPSpec{
+				Spec: networking.VirtualIPClaimSpec{
 					Type:     networking.VirtualIPTypePublic,
 					IPFamily: corev1.IPv4Protocol,
-					ClaimRef: &commonv1alpha1.LocalUIDReference{
+					VirtualIPRef: &corev1.LocalObjectReference{
 						Name: "foo",
 					},
 				},
@@ -97,53 +96,53 @@ var _ = Describe("VirtualIP", func() {
 		),
 	)
 
-	DescribeTable("ValidateVirtualIPUpdate",
-		func(newVirtualIP, oldVirtualIP *networking.VirtualIP, match types.GomegaMatcher) {
-			errList := ValidateVirtualIPUpdate(newVirtualIP, oldVirtualIP)
+	DescribeTable("ValidateVirtualIPClaimUpdate",
+		func(newVIPClaim, oldVIPClaim *networking.VirtualIPClaim, match types.GomegaMatcher) {
+			errList := ValidateVirtualIPClaimUpdate(newVIPClaim, oldVIPClaim)
 			Expect(errList).To(match)
 		},
 		Entry("immutable type",
-			&networking.VirtualIP{
-				Spec: networking.VirtualIPSpec{
+			&networking.VirtualIPClaim{
+				Spec: networking.VirtualIPClaimSpec{
 					Type: networking.VirtualIPTypePublic,
 				},
 			},
-			&networking.VirtualIP{
-				Spec: networking.VirtualIPSpec{
+			&networking.VirtualIPClaim{
+				Spec: networking.VirtualIPClaimSpec{
 					Type: "other",
 				},
 			},
 			ContainElement(ForbiddenField("spec")),
 		),
 		Entry("immutable ip family",
-			&networking.VirtualIP{
-				Spec: networking.VirtualIPSpec{
+			&networking.VirtualIPClaim{
+				Spec: networking.VirtualIPClaimSpec{
 					IPFamily: corev1.IPv6Protocol,
 				},
 			},
-			&networking.VirtualIP{
-				Spec: networking.VirtualIPSpec{
+			&networking.VirtualIPClaim{
+				Spec: networking.VirtualIPClaimSpec{
 					IPFamily: corev1.IPv4Protocol,
 				},
 			},
 			ContainElement(ForbiddenField("spec")),
 		),
-		Entry("mutable claim reference",
-			&networking.VirtualIP{
-				Spec: networking.VirtualIPSpec{
-					ClaimRef: &commonv1alpha1.LocalUIDReference{
+		Entry("immutable virtual ip reference",
+			&networking.VirtualIPClaim{
+				Spec: networking.VirtualIPClaimSpec{
+					VirtualIPRef: &corev1.LocalObjectReference{
 						Name: "bar",
 					},
 				},
 			},
-			&networking.VirtualIP{
-				Spec: networking.VirtualIPSpec{
-					ClaimRef: &commonv1alpha1.LocalUIDReference{
+			&networking.VirtualIPClaim{
+				Spec: networking.VirtualIPClaimSpec{
+					VirtualIPRef: &corev1.LocalObjectReference{
 						Name: "foo",
 					},
 				},
 			},
-			Not(ContainElement(ForbiddenField("spec"))),
+			ContainElement(ForbiddenField("spec")),
 		),
 	)
 })

@@ -26,7 +26,9 @@ import (
 type NetworkInterfaceBinding struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-	IPs               []commonv1alpha1.IP `json:"ips,omitempty"`
+
+	IPs          []commonv1alpha1.IP               `json:"ips,omitempty"`
+	VirtualIPRef *commonv1alpha1.LocalUIDReference `json:"virtualIPRef,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

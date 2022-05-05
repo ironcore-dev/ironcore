@@ -28,9 +28,9 @@ type VirtualIPSpec struct {
 	Type VirtualIPType
 	// IPFamily is the ip family of the VirtualIP.
 	IPFamily corev1.IPFamily
-	// NetworkInterfaceSelector selects any NetworkInterface that should get the VirtualIP routed.
-	// If empty, it is assumed that an external process manages the VirtualIPRouting for this VirtualIP.
-	NetworkInterfaceSelector *metav1.LabelSelector
+
+	// ClaimRef references the VirtualIPClaim that claimed this virtual ip.
+	ClaimRef *commonv1alpha1.LocalUIDReference
 }
 
 // VirtualIPType is a type of VirtualIP.

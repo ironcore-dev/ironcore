@@ -17,8 +17,6 @@ API rule violation: list_type_missing,github.com/onmetal/onmetal-api/apis/networ
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/apis/networking/v1alpha1,NetworkInterfaceSpec,IPFamilies
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/apis/networking/v1alpha1,NetworkInterfaceSpec,IPs
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/apis/networking/v1alpha1,NetworkInterfaceStatus,IPs
-API rule violation: list_type_missing,github.com/onmetal/onmetal-api/apis/networking/v1alpha1,VirtualIPRouting,Subsets
-API rule violation: list_type_missing,github.com/onmetal/onmetal-api/apis/networking/v1alpha1,VirtualIPRoutingSubset,Targets
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/apis/storage/v1alpha1,VolumePoolSpec,Taints
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/apis/storage/v1alpha1,VolumePoolStatus,AvailableVolumeClasses
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/apis/storage/v1alpha1,VolumePoolStatus,Conditions
@@ -151,6 +149,7 @@ API rule violation: names_match,github.com/onmetal/onmetal-api/apis/compute/v1al
 API rule violation: names_match,github.com/onmetal/onmetal-api/apis/compute/v1alpha1,MachineStatus,VolumeAttachments
 API rule violation: names_match,github.com/onmetal/onmetal-api/apis/networking/v1alpha1,NetworkInterfaceBinding,IPs
 API rule violation: names_match,github.com/onmetal/onmetal-api/apis/networking/v1alpha1,NetworkInterfaceSpec,IPs
+API rule violation: names_match,github.com/onmetal/onmetal-api/apis/networking/v1alpha1,NetworkInterfaceSpec,VirtualIP
 API rule violation: names_match,github.com/onmetal/onmetal-api/apis/networking/v1alpha1,NetworkInterfaceStatus,IPs
 API rule violation: names_match,k8s.io/api/core/v1,AzureDiskVolumeSource,DataDiskURI
 API rule violation: names_match,k8s.io/api/core/v1,ContainerStatus,LastTerminationState

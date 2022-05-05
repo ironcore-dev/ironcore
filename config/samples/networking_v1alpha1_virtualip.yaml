@@ -5,8 +5,5 @@ metadata:
 spec:
   type: Public
   ipFamily: IPv4
-  networkInterfaceSelector:
-    matchLabels:
-      foo: bar
 #status:
 #  ip: 10.0.0.1 # This will be populated by the corresponding controller.

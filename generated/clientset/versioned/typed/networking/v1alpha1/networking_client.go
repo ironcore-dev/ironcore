@@ -33,7 +33,7 @@ type NetworkingV1alpha1Interface interface {
 	NetworkInterfacesGetter
 	NetworkInterfaceBindingsGetter
 	VirtualIPsGetter
-	VirtualIPRoutingsGetter
+	VirtualIPClaimsGetter
 }
 
 // NetworkingV1alpha1Client is used to interact with features provided by the networking.api.onmetal.de group.
@@ -65,8 +65,8 @@ func (c *NetworkingV1alpha1Client) VirtualIPs(namespace string) VirtualIPInterfa
 	return newVirtualIPs(c, namespace)
 }
 
-func (c *NetworkingV1alpha1Client) VirtualIPRoutings(namespace string) VirtualIPRoutingInterface {
-	return newVirtualIPRoutings(c, namespace)
+func (c *NetworkingV1alpha1Client) VirtualIPClaims(namespace string) VirtualIPClaimInterface {
+	return newVirtualIPClaims(c, namespace)
 }
 
 // NewForConfig creates a new NetworkingV1alpha1Client for the given config.

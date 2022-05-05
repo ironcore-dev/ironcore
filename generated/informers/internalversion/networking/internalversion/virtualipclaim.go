@@ -31,59 +31,59 @@ import (
 	cache "k8s.io/client-go/tools/cache"
 )
 
-// VirtualIPRoutingInformer provides access to a shared informer and lister for
-// VirtualIPRoutings.
-type VirtualIPRoutingInformer interface {
+// VirtualIPClaimInformer provides access to a shared informer and lister for
+// VirtualIPClaims.
+type VirtualIPClaimInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() internalversion.VirtualIPRoutingLister
+	Lister() internalversion.VirtualIPClaimLister
 }
 
-type virtualIPRoutingInformer struct {
+type virtualIPClaimInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
 	tweakListOptions internalinterfaces.TweakListOptionsFunc
 	namespace        string
 }
 
-// NewVirtualIPRoutingInformer constructs a new informer for VirtualIPRouting type.
+// NewVirtualIPClaimInformer constructs a new informer for VirtualIPClaim type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewVirtualIPRoutingInformer(client clientsetinternalversion.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
-	return NewFilteredVirtualIPRoutingInformer(client, namespace, resyncPeriod, indexers, nil)
+func NewVirtualIPClaimInformer(client clientsetinternalversion.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return NewFilteredVirtualIPClaimInformer(client, namespace, resyncPeriod, indexers, nil)
 }
 
-// NewFilteredVirtualIPRoutingInformer constructs a new informer for VirtualIPRouting type.
+// NewFilteredVirtualIPClaimInformer constructs a new informer for VirtualIPClaim type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredVirtualIPRoutingInformer(client clientsetinternalversion.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
+func NewFilteredVirtualIPClaimInformer(client clientsetinternalversion.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.Networking().VirtualIPRoutings(namespace).List(context.TODO(), options)
+				return client.Networking().VirtualIPClaims(namespace).List(context.TODO(), options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.Networking().VirtualIPRoutings(namespace).Watch(context.TODO(), options)
+				return client.Networking().VirtualIPClaims(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&networking.VirtualIPRouting{},
+		&networking.VirtualIPClaim{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *virtualIPRoutingInformer) defaultInformer(client clientsetinternalversion.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredVirtualIPRoutingInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *virtualIPClaimInformer) defaultInformer(client clientsetinternalversion.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+	return NewFilteredVirtualIPClaimInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *virtualIPRoutingInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&networking.VirtualIPRouting{}, f.defaultInformer)
+func (f *virtualIPClaimInformer) Informer() cache.SharedIndexInformer {
+	return f.factory.InformerFor(&networking.VirtualIPClaim{}, f.defaultInformer)
 }
 
-func (f *virtualIPRoutingInformer) Lister() internalversion.VirtualIPRoutingLister {
-	return internalversion.NewVirtualIPRoutingLister(f.Informer().GetIndexer())
+func (f *virtualIPClaimInformer) Lister() internalversion.VirtualIPClaimLister {
+	return internalversion.NewVirtualIPClaimLister(f.Informer().GetIndexer())
 }

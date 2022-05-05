@@ -16,10 +16,8 @@ package storage
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/onmetal/onmetal-api/apis/networking"
-	"github.com/onmetal/onmetal-api/tableconvertor"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/meta/table"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -33,23 +31,13 @@ var (
 
 	headers = []metav1.TableColumnDefinition{
 		{Name: "Name", Type: "string", Format: "name", Description: objectMetaSwaggerDoc["name"]},
-		{Name: "Endpoints", Type: "string", Description: "The target endpoints of this virtual ip."},
+		{Name: "VirtualIP", Type: "string", Description: "The referenced virtual ip, if any."},
 		{Name: "Age", Type: "string", Format: "date", Description: objectMetaSwaggerDoc["creationTimestamp"]},
 	}
 )
 
 func newTableConvertor() *convertor {
 	return &convertor{}
-}
-
-func formatEndpoints(subsets []networking.VirtualIPRoutingSubset) string {
-	var parts []string
-	for _, subset := range subsets {
-		for _, target := range subset.Targets {
-			parts = append(parts, fmt.Sprintf("%s:%s", subset.NetworkRef.Name, target.IP))
-		}
-	}
-	return tableconvertor.JoinStringsMore(parts, ",", 3)
 }
 
 func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tableOptions runtime.Object) (*metav1.Table, error) {
@@ -70,10 +58,14 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 
 	var err error
 	tab.Rows, err = table.MetaToTableRow(obj, func(obj runtime.Object, m metav1.Object, name, age string) (cells []interface{}, err error) {
-		virtualIPRouting := obj.(*networking.VirtualIPRouting)
+		vipClaim := obj.(*networking.VirtualIPClaim)
 
 		cells = append(cells, name)
-		cells = append(cells, formatEndpoints(virtualIPRouting.Subsets))
+		if vipRef := vipClaim.Spec.VirtualIPRef; vipRef != nil {
+			cells = append(cells, vipRef.Name)
+		} else {
+			cells = append(cells, "None")
+		}
 		cells = append(cells, age)
 
 		return cells, nil
