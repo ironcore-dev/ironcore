@@ -51,6 +51,8 @@ type VirtualIPSource struct {
 type NetworkInterfaceStatus struct {
 	// IPs represent the effective IP addresses of the NetworkInterface
 	IPs []commonv1alpha1.IP `json:"ips,omitempty"`
+	// VirtualIP is any virtual ip assigned to the NetworkInterface.
+	VirtualIP *commonv1alpha1.IP `json:"virtualIP,omitempty"`
 }
 
 // +genclient

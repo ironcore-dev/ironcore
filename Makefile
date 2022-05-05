@@ -58,9 +58,12 @@ vet: ## Run go vet against code.
 	go vet ./...
 
 .PHONY: lint
-lint:
+lint: ## Run golangci-lint on the code.
 	golangci-lint run ./...
 
+.PHONY: clean
+clean: ## Clean any artifacts that can be regenerated.
+	rm -rf generated/*
 
 .PHONY: addlicense
 addlicense: ## Add license headers to all go files.
