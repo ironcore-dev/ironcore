@@ -70,28 +70,23 @@ type ClaimReference struct {
 type VolumeStatus struct {
 	// State represents the infrastructure state of a Volume.
 	State VolumeState `json:"state,omitempty"`
-	// Conditions represents different status aspects of a Volume.
-	Conditions []VolumeCondition `json:"conditions,omitempty"`
+	// LastStateTransitionTime is the last time the State transitioned between values.
+	LastStateTransitionTime *metav1.Time `json:"lastStateTransitionTime,omitempty"`
+
+	// Phase represents the binding phase of a Volume.
+	Phase VolumePhase `json:"phase,omitempty"`
+	// LastPhaseTransitionTime is the last time the Phase transitioned between values.
+	LastPhaseTransitionTime *metav1.Time `json:"lastPhaseTransitionTime,omitempty"`
+
 	// Access specifies how to access a Volume.
 	// This is set by the volume provider when the volume is provisioned.
 	Access *VolumeAccess `json:"access,omitempty"`
 }
 
-const (
-	// VolumeBoundReasonUnbound is used for any Volume that is not bound.
-	VolumeBoundReasonUnbound = "Unbound"
-	// VolumeBoundReasonPending is used for any Volume that is not available.
-	VolumeBoundReasonPending = "Pending"
-	// VolumeBoundReasonBound is used for any Volume that is bound.
-	VolumeBoundReasonBound = "Bound"
-)
-
-// VolumePhase is the binding phase of a volume.
+// VolumePhase represents the binding phase of a Volume.
 type VolumePhase string
 
 const (
-	// VolumePhaseUnknown is used for any Volume for which it is unknown whether it can be used for binding.
-	VolumePhaseUnknown VolumePhase = "Unknown"
 	// VolumePhaseUnbound is used for any Volume that not bound.
 	VolumePhaseUnbound VolumePhase = "Unbound"
 	// VolumePhasePending is used for any Volume that is currently awaiting binding.
@@ -100,45 +95,10 @@ const (
 	VolumePhaseBound VolumePhase = "Bound"
 )
 
-func FindVolumeCondition(conditions []VolumeCondition, conditionType VolumeConditionType) (VolumeCondition, int) {
-	for i, condition := range conditions {
-		if condition.Type == conditionType {
-			return condition, i
-		}
-	}
-	return VolumeCondition{}, -1
-}
-
-func VolumePhaseFromBoundStatusAndReason(status corev1.ConditionStatus, reason string) VolumePhase {
-	switch {
-	case status == corev1.ConditionFalse && reason == VolumeBoundReasonPending:
-		return VolumePhasePending
-	case status == corev1.ConditionFalse && reason == VolumeBoundReasonUnbound:
-		return VolumePhaseUnbound
-	case status == corev1.ConditionTrue:
-		return VolumePhaseBound
-	default:
-		return VolumePhaseUnknown
-	}
-}
-
-func GetVolumePhaseAndCondition(volume *Volume) (VolumePhase, VolumeCondition, int) {
-	cond, idx := FindVolumeCondition(volume.Status.Conditions, VolumeBound)
-	phase := VolumePhaseFromBoundStatusAndReason(cond.Status, cond.Reason)
-	return phase, cond, idx
-}
-
-func GetVolumePhase(volume *Volume) VolumePhase {
-	phase, _, _ := GetVolumePhaseAndCondition(volume)
-	return phase
-}
-
-// VolumeState is a possible state a volume can be in.
+// VolumeState represents the infrastructure state of a Volume.
 type VolumeState string
 
 const (
-	// VolumeStateUnknown reports whether a Volume is in an unknown state.
-	VolumeStateUnknown VolumeState = "Unknown"
 	// VolumeStatePending reports whether a Volume is about to be ready.
 	VolumeStatePending VolumeState = "Pending"
 	// VolumeStateAvailable reports whether a Volume is available to be used.
@@ -146,33 +106,6 @@ const (
 	// VolumeStateError reports that a Volume is in an error state.
 	VolumeStateError VolumeState = "Error"
 )
-
-// VolumeConditionType is a type a VolumeCondition can have.
-type VolumeConditionType string
-
-const (
-	// VolumeSynced represents the condition of a volume being synced with its backing resources
-	VolumeSynced VolumeConditionType = "Synced"
-
-	// VolumeBound represents the binding state of a Volume.
-	VolumeBound VolumeConditionType = "Bound"
-)
-
-// VolumeCondition is one of the conditions of a volume.
-type VolumeCondition struct {
-	// Type is the type of the condition.
-	Type VolumeConditionType `json:"type"`
-	// Status is the status of the condition.
-	Status corev1.ConditionStatus `json:"status"`
-	// Reason is a machine-readable indication of why the condition is in a certain state.
-	Reason string `json:"reason"`
-	// Message is a human-readable explanation of why the condition has a certain reason / state.
-	Message string `json:"message"`
-	// ObservedGeneration represents the .metadata.generation that the condition was set based upon.
-	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
-	// LastTransitionTime is the last time the status of a condition has transitioned from one state to another.
-	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
-}
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +genclient
