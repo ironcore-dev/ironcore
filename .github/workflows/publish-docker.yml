@@ -29,7 +29,7 @@ jobs:
           - name: onmetal-api-apiserver
             target: apiserver
     if: ${{ github.event.label.name == 'ok-to-image' }} || ${{ github.event.label.name == 'ok-to-🐳' }} || ${{ github.ref == 'refs/heads/main' }}
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: docker/metadata-action@v3

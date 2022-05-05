@@ -6,7 +6,7 @@ on:
 
 jobs:
   size-label:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: size-label
         uses: pascalgn/size-label-action@v0.4.3
