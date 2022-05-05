@@ -75,7 +75,7 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 		} else {
 			cells = append(cells, "<unknown>")
 		}
-		if phase := storage.GetVolumePhase(volume); phase != "" {
+		if phase := volume.Status.Phase; phase != "" {
 			cells = append(cells, phase)
 		} else {
 			cells = append(cells, "<unknown>")

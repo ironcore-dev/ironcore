@@ -84,13 +84,13 @@ var _ = Describe("VolumeReconciler", func() {
 		volumeKey := client.ObjectKeyFromObject(volume)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
-			g.Expect(storagev1alpha1.GetVolumePhase(volume)).To(Equal(storagev1alpha1.VolumePhaseBound))
+			g.Expect(volume.Status.Phase).To(Equal(storagev1alpha1.VolumePhaseBound))
 		}).Should(Succeed())
 
 		By("making sure the volume stays bound")
 		Consistently(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
-			g.Expect(storagev1alpha1.GetVolumePhase(volume)).To(Equal(storagev1alpha1.VolumePhaseBound))
+			g.Expect(volume.Status.Phase).To(Equal(storagev1alpha1.VolumePhaseBound))
 		}).Should(Succeed())
 	})
 
@@ -110,7 +110,7 @@ var _ = Describe("VolumeReconciler", func() {
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
 			g.Expect(volume.Spec.ClaimRef.Name).To(Equal(volumeClaim.Name))
-			g.Expect(storagev1alpha1.GetVolumePhase(volume)).To(Equal(storagev1alpha1.VolumePhaseBound))
+			g.Expect(volume.Status.Phase).To(Equal(storagev1alpha1.VolumePhaseBound))
 		}).Should(Succeed())
 
 		By("deleting the volume claim")
@@ -119,7 +119,7 @@ var _ = Describe("VolumeReconciler", func() {
 		By("waiting for the volume phase to become available")
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
-			g.Expect(storagev1alpha1.GetVolumePhase(volume)).To(Equal(storagev1alpha1.VolumePhaseUnbound))
+			g.Expect(volume.Status.Phase).To(Equal(storagev1alpha1.VolumePhaseUnbound))
 			g.Expect(volume.Spec.ClaimRef).To(BeZero())
 		}).Should(Succeed())
 	})
