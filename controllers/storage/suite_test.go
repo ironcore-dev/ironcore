@@ -156,7 +156,7 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 			APIReader:          k8sManager.GetAPIReader(),
 			Scheme:             k8sManager.GetScheme(),
 			SharedFieldIndexer: fieldIndexer,
-			BoundTimeout:       1 * time.Second,
+			BindTimeout:        1 * time.Second,
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		Expect((&VolumeClaimReconciler{

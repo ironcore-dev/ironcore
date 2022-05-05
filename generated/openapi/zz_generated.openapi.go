@@ -2869,6 +2869,12 @@ func schema_onmetal_api_apis_networking_v1alpha1_VirtualIPClaimSpec(ref common.R
 							Format:      "",
 							Enum:        []interface{}{"IPv4", "IPv6"}},
 					},
+					"selector": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Selector is the selector for a VirtualIP.",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"),
+						},
+					},
 					"virtualIPRef": {
 						SchemaProps: spec.SchemaProps{
 							Description: "VirtualIPRef references the virtual ip to claim.",
@@ -2880,7 +2886,7 @@ func schema_onmetal_api_apis_networking_v1alpha1_VirtualIPClaimSpec(ref common.R
 			},
 		},
 		Dependencies: []string{
-			"k8s.io/api/core/v1.LocalObjectReference"},
+			"k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"},
 	}
 }
 
@@ -2891,17 +2897,15 @@ func schema_onmetal_api_apis_networking_v1alpha1_VirtualIPClaimStatus(ref common
 				Description: "VirtualIPClaimStatus defines the observed state of VirtualIPClaim",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"ip": {
+					"phase": {
 						SchemaProps: spec.SchemaProps{
-							Description: "IP is the allocated IP, if any.",
-							Ref:         ref("github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP"),
+							Type:   []string{"string"},
+							Format: "",
 						},
 					},
 				},
 			},
 		},
-		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP"},
 	}
 }
 
@@ -3055,11 +3059,24 @@ func schema_onmetal_api_apis_networking_v1alpha1_VirtualIPStatus(ref common.Refe
 							Ref:         ref("github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP"),
 						},
 					},
+					"phase": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Phase is the VirtualIPPhase of the VirtualIP.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"phaseLastTransitionTime": {
+						SchemaProps: spec.SchemaProps{
+							Description: "LastPhaseTransitionTime is the last time the Phase transitioned from one value to another.",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP"},
+			"github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
 	}
 }
 

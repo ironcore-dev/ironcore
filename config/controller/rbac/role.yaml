@@ -131,6 +131,58 @@ rules:
   - patch
   - update
 - apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - virtualipclaims
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - virtualipclaims/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - virtualipclaims/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - virtualips
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - virtualips/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - virtualips/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
   - storage.api.onmetal.de
   resources:
   - volumeclaims

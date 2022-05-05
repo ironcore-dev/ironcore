@@ -66,7 +66,10 @@ const (
 	prefixController          = "prefix"
 	prefixAllocationScheduler = "prefixallocationscheduler"
 
-	networkInterfaceController = "networkInterface"
+	networkInterfaceController = "networkinterface"
+	virtualIPController        = "virtualip"
+	virtualIPClaimController   = "virtualipclaim"
+	virtualIPClaimScheduler    = "virtualipclaimscheduler"
 )
 
 func init() {
@@ -82,14 +85,16 @@ func main() {
 	var enableLeaderElection bool
 	var probeAddr string
 	var prefixAllocationTimeout time.Duration
-	var volumeBoundTimeout time.Duration
+	var volumeBindTimeout time.Duration
+	var virtualIPBindTimeout time.Duration
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
 	flag.DurationVar(&prefixAllocationTimeout, "prefix-allocation-timeout", 1*time.Second, "Time to wait until considering a pending allocation failed.")
-	flag.DurationVar(&volumeBoundTimeout, "volume-bound-timeout", 10*time.Second, "Time to wait until considering a volume bind to be failed.")
+	flag.DurationVar(&volumeBindTimeout, "volume-bind-timeout", 10*time.Second, "Time to wait until considering a volume bind to be failed.")
+	flag.DurationVar(&virtualIPBindTimeout, "virtual-ip-bind-timeout", 10*time.Second, "Time to wait until considering a virtual ip bind to be failed.")
 
 	controllers := switches.New(
 		// Compute controllers
@@ -186,7 +191,7 @@ func main() {
 			APIReader:          mgr.GetAPIReader(),
 			Scheme:             mgr.GetScheme(),
 			SharedFieldIndexer: sharedStorageFieldIndexer,
-			BoundTimeout:       volumeBoundTimeout,
+			BindTimeout:        volumeBindTimeout,
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "Volume")
 			os.Exit(1)
@@ -263,6 +268,46 @@ func main() {
 			Scheme: mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "NetworkInterface")
+			os.Exit(1)
+		}
+	}
+
+	if controllers.Enabled(virtualIPClaimController) || controllers.Enabled(virtualIPClaimScheduler) {
+		if err = networking.SetupVirtualIPClaimSpecVirtualIPRefNameField(mgr); err != nil {
+			setupLog.Error(err, "unable to setup field indexer", "field", "VirtualIPClaimSpecVirtualIPRefName")
+			os.Exit(1)
+		}
+	}
+
+	if controllers.Enabled(virtualIPController) {
+		if err = (&networking.VirtualIPReconciler{
+			Client:      mgr.GetClient(),
+			APIReader:   mgr.GetAPIReader(),
+			Scheme:      mgr.GetScheme(),
+			BindTimeout: virtualIPBindTimeout,
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "VirtualIP")
+			os.Exit(1)
+		}
+	}
+
+	if controllers.Enabled(virtualIPClaimController) {
+		if err = (&networking.VirtualIPClaimReconciler{
+			Client:    mgr.GetClient(),
+			APIReader: mgr.GetAPIReader(),
+			Scheme:    mgr.GetScheme(),
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "VirtualIPClaim")
+			os.Exit(1)
+		}
+	}
+
+	if controllers.Enabled(virtualIPClaimScheduler) {
+		if err = (&networking.VirtualIPClaimScheduler{
+			Client:        mgr.GetClient(),
+			EventRecorder: mgr.GetEventRecorderFor("virtual-ip-claim-scheduler"),
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "VirtualIPClaimScheduler")
 			os.Exit(1)
 		}
 	}

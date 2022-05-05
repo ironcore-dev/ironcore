@@ -834,6 +834,7 @@ func Convert_networking_VirtualIPClaimList_To_v1alpha1_VirtualIPClaimList(in *ne
 func autoConvert_v1alpha1_VirtualIPClaimSpec_To_networking_VirtualIPClaimSpec(in *VirtualIPClaimSpec, out *networking.VirtualIPClaimSpec, s conversion.Scope) error {
 	out.Type = networking.VirtualIPType(in.Type)
 	out.IPFamily = corev1.IPFamily(in.IPFamily)
+	out.Selector = (*v1.LabelSelector)(unsafe.Pointer(in.Selector))
 	out.VirtualIPRef = (*corev1.LocalObjectReference)(unsafe.Pointer(in.VirtualIPRef))
 	return nil
 }
@@ -846,6 +847,7 @@ func Convert_v1alpha1_VirtualIPClaimSpec_To_networking_VirtualIPClaimSpec(in *Vi
 func autoConvert_networking_VirtualIPClaimSpec_To_v1alpha1_VirtualIPClaimSpec(in *networking.VirtualIPClaimSpec, out *VirtualIPClaimSpec, s conversion.Scope) error {
 	out.Type = VirtualIPType(in.Type)
 	out.IPFamily = corev1.IPFamily(in.IPFamily)
+	out.Selector = (*v1.LabelSelector)(unsafe.Pointer(in.Selector))
 	out.VirtualIPRef = (*corev1.LocalObjectReference)(unsafe.Pointer(in.VirtualIPRef))
 	return nil
 }
@@ -856,7 +858,7 @@ func Convert_networking_VirtualIPClaimSpec_To_v1alpha1_VirtualIPClaimSpec(in *ne
 }
 
 func autoConvert_v1alpha1_VirtualIPClaimStatus_To_networking_VirtualIPClaimStatus(in *VirtualIPClaimStatus, out *networking.VirtualIPClaimStatus, s conversion.Scope) error {
-	out.IP = (*commonv1alpha1.IP)(unsafe.Pointer(in.IP))
+	out.Phase = networking.VirtualIPClaimPhase(in.Phase)
 	return nil
 }
 
@@ -866,7 +868,7 @@ func Convert_v1alpha1_VirtualIPClaimStatus_To_networking_VirtualIPClaimStatus(in
 }
 
 func autoConvert_networking_VirtualIPClaimStatus_To_v1alpha1_VirtualIPClaimStatus(in *networking.VirtualIPClaimStatus, out *VirtualIPClaimStatus, s conversion.Scope) error {
-	out.IP = (*commonv1alpha1.IP)(unsafe.Pointer(in.IP))
+	out.Phase = VirtualIPClaimPhase(in.Phase)
 	return nil
 }
 
@@ -971,6 +973,8 @@ func Convert_networking_VirtualIPSpec_To_v1alpha1_VirtualIPSpec(in *networking.V
 
 func autoConvert_v1alpha1_VirtualIPStatus_To_networking_VirtualIPStatus(in *VirtualIPStatus, out *networking.VirtualIPStatus, s conversion.Scope) error {
 	out.IP = (*commonv1alpha1.IP)(unsafe.Pointer(in.IP))
+	out.Phase = networking.VirtualIPPhase(in.Phase)
+	out.LastPhaseTransitionTime = (*v1.Time)(unsafe.Pointer(in.LastPhaseTransitionTime))
 	return nil
 }
 
@@ -981,6 +985,8 @@ func Convert_v1alpha1_VirtualIPStatus_To_networking_VirtualIPStatus(in *VirtualI
 
 func autoConvert_networking_VirtualIPStatus_To_v1alpha1_VirtualIPStatus(in *networking.VirtualIPStatus, out *VirtualIPStatus, s conversion.Scope) error {
 	out.IP = (*commonv1alpha1.IP)(unsafe.Pointer(in.IP))
+	out.Phase = VirtualIPPhase(in.Phase)
+	out.LastPhaseTransitionTime = (*v1.Time)(unsafe.Pointer(in.LastPhaseTransitionTime))
 	return nil
 }
 
