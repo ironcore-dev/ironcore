@@ -495,6 +495,10 @@ func (in *NetworkInterfaceStatus) DeepCopyInto(out *NetworkInterfaceStatus) {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
+	if in.VirtualIP != nil {
+		in, out := &in.VirtualIP, &out.VirtualIP
+		*out = (*in).DeepCopy()
+	}
 	return
 }
 

@@ -2619,6 +2619,12 @@ func schema_onmetal_api_apis_networking_v1alpha1_NetworkInterfaceStatus(ref comm
 							},
 						},
 					},
+					"virtualIP": {
+						SchemaProps: spec.SchemaProps{
+							Description: "VirtualIP is any virtual ip assigned to the NetworkInterface.",
+							Ref:         ref("github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP"),
+						},
+					},
 				},
 			},
 		},

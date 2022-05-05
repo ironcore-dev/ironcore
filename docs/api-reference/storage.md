@@ -677,123 +677,13 @@ VolumeClaimPhase
 </tr>
 </tbody>
 </table>
-<h3 id="storage.api.onmetal.de/v1alpha1.VolumeCondition">VolumeCondition
-</h3>
+<h3 id="storage.api.onmetal.de/v1alpha1.VolumePhase">VolumePhase
+(<code>string</code> alias)</h3>
 <p>
 (<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.VolumeStatus">VolumeStatus</a>)
 </p>
 <div>
-<p>VolumeCondition is one of the conditions of a volume.</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>type</code><br/>
-<em>
-<a href="#storage.api.onmetal.de/v1alpha1.VolumeConditionType">
-VolumeConditionType
-</a>
-</em>
-</td>
-<td>
-<p>Type is the type of the condition.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>status</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#conditionstatus-v1-core">
-Kubernetes core/v1.ConditionStatus
-</a>
-</em>
-</td>
-<td>
-<p>Status is the status of the condition.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>reason</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Reason is a machine-readable indication of why the condition is in a certain state.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>message</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Message is a human-readable explanation of why the condition has a certain reason / state.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>observedGeneration</code><br/>
-<em>
-int64
-</em>
-</td>
-<td>
-<p>ObservedGeneration represents the .metadata.generation that the condition was set based upon.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>lastTransitionTime</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
-Kubernetes meta/v1.Time
-</a>
-</em>
-</td>
-<td>
-<p>LastTransitionTime is the last time the status of a condition has transitioned from one state to another.</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="storage.api.onmetal.de/v1alpha1.VolumeConditionType">VolumeConditionType
-(<code>string</code> alias)</h3>
-<p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.VolumeCondition">VolumeCondition</a>)
-</p>
-<div>
-<p>VolumeConditionType is a type a VolumeCondition can have.</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Value</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody><tr><td><p>&#34;Bound&#34;</p></td>
-<td><p>VolumeBound represents the binding state of a Volume.</p>
-</td>
-</tr><tr><td><p>&#34;Synced&#34;</p></td>
-<td><p>VolumeSynced represents the condition of a volume being synced with its backing resources</p>
-</td>
-</tr></tbody>
-</table>
-<h3 id="storage.api.onmetal.de/v1alpha1.VolumePhase">VolumePhase
-(<code>string</code> alias)</h3>
-<div>
-<p>VolumePhase is the binding phase of a volume.</p>
+<p>VolumePhase represents the binding phase of a Volume.</p>
 </div>
 <table>
 <thead>
@@ -810,9 +700,6 @@ Kubernetes meta/v1.Time
 </td>
 </tr><tr><td><p>&#34;Unbound&#34;</p></td>
 <td><p>VolumePhaseUnbound is used for any Volume that not bound.</p>
-</td>
-</tr><tr><td><p>&#34;Unknown&#34;</p></td>
-<td><p>VolumePhaseUnknown is used for any Volume for which it is unknown whether it can be used for binding.</p>
 </td>
 </tr></tbody>
 </table>
@@ -1175,7 +1062,7 @@ covered by Tolerations will be considered to host the Volume.</p>
 (<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.VolumeStatus">VolumeStatus</a>)
 </p>
 <div>
-<p>VolumeState is a possible state a volume can be in.</p>
+<p>VolumeState represents the infrastructure state of a Volume.</p>
 </div>
 <table>
 <thead>
@@ -1192,9 +1079,6 @@ covered by Tolerations will be considered to host the Volume.</p>
 </td>
 </tr><tr><td><p>&#34;Pending&#34;</p></td>
 <td><p>VolumeStatePending reports whether a Volume is about to be ready.</p>
-</td>
-</tr><tr><td><p>&#34;Unknown&#34;</p></td>
-<td><p>VolumeStateUnknown reports whether a Volume is in an unknown state.</p>
 </td>
 </tr></tbody>
 </table>
@@ -1229,15 +1113,41 @@ VolumeState
 </tr>
 <tr>
 <td>
-<code>conditions</code><br/>
+<code>lastStateTransitionTime</code><br/>
 <em>
-<a href="#storage.api.onmetal.de/v1alpha1.VolumeCondition">
-[]VolumeCondition
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+Kubernetes meta/v1.Time
 </a>
 </em>
 </td>
 <td>
-<p>Conditions represents different status aspects of a Volume.</p>
+<p>LastStateTransitionTime is the last time the State transitioned between values.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>phase</code><br/>
+<em>
+<a href="#storage.api.onmetal.de/v1alpha1.VolumePhase">
+VolumePhase
+</a>
+</em>
+</td>
+<td>
+<p>Phase represents the binding phase of a Volume.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastPhaseTransitionTime</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastPhaseTransitionTime is the last time the Phase transitioned between values.</p>
 </td>
 </tr>
 <tr>

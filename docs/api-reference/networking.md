@@ -665,6 +665,19 @@ Kubernetes core/v1.IPFamily
 </tr>
 <tr>
 <td>
+<code>selector</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#labelselector-v1-meta">
+Kubernetes meta/v1.LabelSelector
+</a>
+</em>
+</td>
+<td>
+<p>Selector is the selector for a VirtualIP.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>virtualIPRef</code><br/>
 <em>
 <a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
@@ -1039,6 +1052,19 @@ VirtualIPSource
 <p>IPs represent the effective IP addresses of the NetworkInterface</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>virtualIP</code><br/>
+<em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
+</a>
+</em>
+</td>
+<td>
+<p>VirtualIP is any virtual ip assigned to the NetworkInterface.</p>
+</td>
+</tr>
 </tbody>
 </table>
 <h3 id="networking.api.onmetal.de/v1alpha1.PrefixSource">PrefixSource
@@ -1085,6 +1111,32 @@ EphemeralPrefixSource
 </tr>
 </tbody>
 </table>
+<h3 id="networking.api.onmetal.de/v1alpha1.VirtualIPClaimPhase">VirtualIPClaimPhase
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.VirtualIPClaimStatus">VirtualIPClaimStatus</a>)
+</p>
+<div>
+<p>VirtualIPClaimPhase represents the state a VirtualIPClaim can be in.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Bound&#34;</p></td>
+<td><p>VirtualIPClaimPhaseBound is used for a VirtualIPClaim which is bound to a VirtualIP.</p>
+</td>
+</tr><tr><td><p>&#34;Lost&#34;</p></td>
+<td><p>VirtualIPClaimPhaseLost is used for a VirtualIPClaim that lost its underlying VirtualIP.</p>
+</td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>VirtualIPClaimPhasePending is used for a VirtualIPClaim which is not yet bound.</p>
+</td>
+</tr></tbody>
+</table>
 <h3 id="networking.api.onmetal.de/v1alpha1.VirtualIPClaimSpec">VirtualIPClaimSpec
 </h3>
 <p>
@@ -1129,6 +1181,19 @@ Kubernetes core/v1.IPFamily
 </tr>
 <tr>
 <td>
+<code>selector</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#labelselector-v1-meta">
+Kubernetes meta/v1.LabelSelector
+</a>
+</em>
+</td>
+<td>
+<p>Selector is the selector for a VirtualIP.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>virtualIPRef</code><br/>
 <em>
 <a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
@@ -1160,15 +1225,14 @@ Kubernetes core/v1.LocalObjectReference
 <tbody>
 <tr>
 <td>
-<code>ip</code><br/>
+<code>phase</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
+<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPClaimPhase">
+VirtualIPClaimPhase
 </a>
 </em>
 </td>
 <td>
-<p>IP is the allocated IP, if any.</p>
 </td>
 </tr>
 </tbody>
@@ -1243,6 +1307,19 @@ Kubernetes core/v1.IPFamily
 </tr>
 <tr>
 <td>
+<code>selector</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#labelselector-v1-meta">
+Kubernetes meta/v1.LabelSelector
+</a>
+</em>
+</td>
+<td>
+<p>Selector is the selector for a VirtualIP.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>virtualIPRef</code><br/>
 <em>
 <a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
@@ -1258,6 +1335,32 @@ Kubernetes core/v1.LocalObjectReference
 </td>
 </tr>
 </tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.VirtualIPPhase">VirtualIPPhase
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.VirtualIPStatus">VirtualIPStatus</a>)
+</p>
+<div>
+<p>VirtualIPPhase is the binding phase of a VirtualIP.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Bound&#34;</p></td>
+<td><p>VirtualIPPhaseBound is used for any VirtualIP that is properly bound.</p>
+</td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>VirtualIPPhasePending is used for any VirtualIP that is currently awaiting binding.</p>
+</td>
+</tr><tr><td><p>&#34;Unbound&#34;</p></td>
+<td><p>VirtualIPPhaseUnbound is used for any VirtualIP that is not bound.</p>
+</td>
+</tr></tbody>
 </table>
 <h3 id="networking.api.onmetal.de/v1alpha1.VirtualIPSource">VirtualIPSource
 </h3>
@@ -1384,6 +1487,32 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
 </td>
 <td>
 <p>IP is the allocated IP, if any.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>phase</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPPhase">
+VirtualIPPhase
+</a>
+</em>
+</td>
+<td>
+<p>Phase is the VirtualIPPhase of the VirtualIP.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>phaseLastTransitionTime</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastPhaseTransitionTime is the last time the Phase transitioned from one value to another.</p>
 </td>
 </tr>
 </tbody>
