@@ -26,6 +26,7 @@ import (
 type NetworkInterfaceBinding struct {
 	metav1.TypeMeta
 	metav1.ObjectMeta
+	NetworkRef   commonv1alpha1.LocalUIDReference
 	IPs          []commonv1alpha1.IP
 	VirtualIPRef *commonv1alpha1.LocalUIDReference
 }

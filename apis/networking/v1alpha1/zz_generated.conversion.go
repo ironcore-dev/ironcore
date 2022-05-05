@@ -587,6 +587,7 @@ func Convert_networking_NetworkInterface_To_v1alpha1_NetworkInterface(in *networ
 
 func autoConvert_v1alpha1_NetworkInterfaceBinding_To_networking_NetworkInterfaceBinding(in *NetworkInterfaceBinding, out *networking.NetworkInterfaceBinding, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
+	out.NetworkRef = in.NetworkRef
 	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
 	out.VirtualIPRef = (*commonv1alpha1.LocalUIDReference)(unsafe.Pointer(in.VirtualIPRef))
 	return nil
@@ -599,6 +600,7 @@ func Convert_v1alpha1_NetworkInterfaceBinding_To_networking_NetworkInterfaceBind
 
 func autoConvert_networking_NetworkInterfaceBinding_To_v1alpha1_NetworkInterfaceBinding(in *networking.NetworkInterfaceBinding, out *NetworkInterfaceBinding, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
+	out.NetworkRef = in.NetworkRef
 	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
 	out.VirtualIPRef = (*commonv1alpha1.LocalUIDReference)(unsafe.Pointer(in.VirtualIPRef))
 	return nil

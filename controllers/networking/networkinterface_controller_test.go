@@ -73,6 +73,10 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 			g.Expect(err).NotTo(HaveOccurred())
 
 			g.Expect(metav1.IsControlledBy(nicBinding, nic)).To(BeTrue(), "network interface binding is not controlled by network interface: %#v", nicBinding)
+			g.Expect(nicBinding.NetworkRef).To(Equal(commonv1alpha1.LocalUIDReference{
+				Name: network.Name,
+				UID:  network.UID,
+			}))
 			g.Expect(nicBinding.IPs).To(Equal([]commonv1alpha1.IP{commonv1alpha1.MustParseIP("10.0.0.1")}))
 		}).Should(Succeed())
 

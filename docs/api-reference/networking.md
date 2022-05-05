@@ -443,6 +443,18 @@ Refer to the Kubernetes API documentation for the fields of the
 </tr>
 <tr>
 <td>
+<code>networkRef</code><br/>
+<em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
 <code>ips</code><br/>
 <em>
 <a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">

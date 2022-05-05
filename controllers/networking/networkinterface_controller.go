@@ -61,6 +61,13 @@ func (r *NetworkInterfaceReconciler) delete(ctx context.Context, log logr.Logger
 }
 
 func (r *NetworkInterfaceReconciler) reconcile(ctx context.Context, log logr.Logger, nic *networkingv1alpha1.NetworkInterface) (ctrl.Result, error) {
+	log.V(1).Info("Getting network")
+	network := &networkingv1alpha1.Network{}
+	if err := r.Get(ctx, client.ObjectKey{Namespace: nic.Namespace, Name: nic.Spec.NetworkRef.Name}, network); err != nil {
+		return ctrl.Result{}, fmt.Errorf("error getting network: %w", err)
+	}
+	log.V(1).Info("Successfully got network")
+
 	log.V(1).Info("Applying IPs")
 	ips, err := r.applyIPs(ctx, nic)
 	if err != nil {
@@ -76,7 +83,7 @@ func (r *NetworkInterfaceReconciler) reconcile(ctx context.Context, log logr.Log
 	log.V(1).Info("Successfully applied virtual IP")
 
 	log.V(1).Info("Applying network interface binding")
-	if err := r.applyNetworkInterfaceBinding(ctx, nic, ips, virtualIP); err != nil {
+	if err := r.applyNetworkInterfaceBinding(ctx, nic, network, ips, virtualIP); err != nil {
 		return ctrl.Result{}, err
 	}
 	log.V(1).Info("Successfully applied network interface binding")
@@ -183,7 +190,13 @@ func (r *NetworkInterfaceReconciler) getOrManageVirtualIPClaim(ctx context.Conte
 	return ephemeralVip, nil
 }
 
-func (r *NetworkInterfaceReconciler) applyNetworkInterfaceBinding(ctx context.Context, nic *networkingv1alpha1.NetworkInterface, ips []commonv1alpha1.IP, virtualIP *networkingv1alpha1.VirtualIP) error {
+func (r *NetworkInterfaceReconciler) applyNetworkInterfaceBinding(
+	ctx context.Context,
+	nic *networkingv1alpha1.NetworkInterface,
+	network *networkingv1alpha1.Network,
+	ips []commonv1alpha1.IP,
+	virtualIP *networkingv1alpha1.VirtualIP,
+) error {
 	var vipRef *commonv1alpha1.LocalUIDReference
 	if virtualIP != nil {
 		vipRef = &commonv1alpha1.LocalUIDReference{
@@ -199,6 +212,10 @@ func (r *NetworkInterfaceReconciler) applyNetworkInterfaceBinding(ctx context.Co
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: nic.Namespace,
 			Name:      nic.Name,
+		},
+		NetworkRef: commonv1alpha1.LocalUIDReference{
+			Name: network.Name,
+			UID:  network.UID,
 		},
 		IPs:          ips,
 		VirtualIPRef: vipRef,

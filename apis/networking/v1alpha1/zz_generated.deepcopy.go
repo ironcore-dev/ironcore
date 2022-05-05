@@ -347,6 +347,7 @@ func (in *NetworkInterfaceBinding) DeepCopyInto(out *NetworkInterfaceBinding) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
 	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
+	out.NetworkRef = in.NetworkRef
 	if in.IPs != nil {
 		in, out := &in.IPs, &out.IPs
 		*out = make([]commonv1alpha1.IP, len(*in))

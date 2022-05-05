@@ -2410,6 +2410,12 @@ func schema_onmetal_api_apis_networking_v1alpha1_NetworkInterfaceBinding(ref com
 							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
 					},
+					"networkRef": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference"),
+						},
+					},
 					"ips": {
 						SchemaProps: spec.SchemaProps{
 							Type: []string{"array"},
@@ -2429,6 +2435,7 @@ func schema_onmetal_api_apis_networking_v1alpha1_NetworkInterfaceBinding(ref com
 						},
 					},
 				},
+				Required: []string{"networkRef"},
 			},
 		},
 		Dependencies: []string{

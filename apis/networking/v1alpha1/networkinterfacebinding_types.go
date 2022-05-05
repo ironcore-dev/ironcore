@@ -27,6 +27,7 @@ type NetworkInterfaceBinding struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
+	NetworkRef   commonv1alpha1.LocalUIDReference  `json:"networkRef"`
 	IPs          []commonv1alpha1.IP               `json:"ips,omitempty"`
 	VirtualIPRef *commonv1alpha1.LocalUIDReference `json:"virtualIPRef,omitempty"`
 }
