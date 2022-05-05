@@ -42,8 +42,8 @@ type VolumeReconciler struct {
 	client.Client
 	APIReader client.Reader
 	Scheme    *runtime.Scheme
-	// BoundTimeout is the maximum duration until a Volume's Bound condition is considered to be timed out.
-	BoundTimeout       time.Duration
+	// BindTimeout is the maximum duration until a Volume's Bound condition is considered to be timed out.
+	BindTimeout        time.Duration
 	SharedFieldIndexer *clientutils.SharedFieldIndexer
 }
 
@@ -77,7 +77,7 @@ func (r *VolumeReconciler) phaseTransitionTimedOut(timestamp *metav1.Time) bool 
 	if timestamp.IsZero() {
 		return false
 	}
-	return timestamp.Add(r.BoundTimeout).Before(time.Now())
+	return timestamp.Add(r.BindTimeout).Before(time.Now())
 }
 
 func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume) (ctrl.Result, error) {
@@ -149,7 +149,7 @@ func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volum
 }
 
 func (r *VolumeReconciler) requeueAfterBoundTimeout(volume *storagev1alpha1.Volume) ctrl.Result {
-	boundTimeoutExpirationDuration := time.Until(volume.Status.LastPhaseTransitionTime.Add(r.BoundTimeout)).Round(time.Second)
+	boundTimeoutExpirationDuration := time.Until(volume.Status.LastPhaseTransitionTime.Add(r.BindTimeout)).Round(time.Second)
 	if boundTimeoutExpirationDuration <= 0 {
 		return ctrl.Result{Requeue: true}
 	}

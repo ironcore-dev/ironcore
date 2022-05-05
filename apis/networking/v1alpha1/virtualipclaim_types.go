@@ -15,7 +15,6 @@
 package v1alpha1
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -27,15 +26,29 @@ type VirtualIPClaimSpec struct {
 	// IPFamily is the ip family of the VirtualIP.
 	IPFamily corev1.IPFamily `json:"ipFamily"`
 
+	// Selector is the selector for a VirtualIP.
+	Selector *metav1.LabelSelector `json:"selector,omitempty"`
+
 	// VirtualIPRef references the virtual ip to claim.
 	VirtualIPRef *corev1.LocalObjectReference `json:"virtualIPRef,omitempty"`
 }
 
 // VirtualIPClaimStatus defines the observed state of VirtualIPClaim
 type VirtualIPClaimStatus struct {
-	// IP is the allocated IP, if any.
-	IP *commonv1alpha1.IP `json:"ip,omitempty"`
+	Phase VirtualIPClaimPhase `json:"phase,omitempty"`
 }
+
+// VirtualIPClaimPhase represents the state a VirtualIPClaim can be in.
+type VirtualIPClaimPhase string
+
+const (
+	// VirtualIPClaimPhasePending is used for a VirtualIPClaim which is not yet bound.
+	VirtualIPClaimPhasePending VirtualIPClaimPhase = "Pending"
+	// VirtualIPClaimPhaseBound is used for a VirtualIPClaim which is bound to a VirtualIP.
+	VirtualIPClaimPhaseBound VirtualIPClaimPhase = "Bound"
+	// VirtualIPClaimPhaseLost is used for a VirtualIPClaim that lost its underlying VirtualIP.
+	VirtualIPClaimPhaseLost VirtualIPClaimPhase = "Lost"
+)
 
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
