@@ -44,14 +44,12 @@ func (p StorageProvider) NewRESTStorage(apiResourceConfigSource storage.APIResou
 	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(p.GroupName(), api.Scheme, metav1.ParameterCodec, api.Codecs)
 	apiGroupInfo.PrioritizedVersions = []schema.GroupVersion{networkingv1alpha1.SchemeGroupVersion}
 
-	if apiResourceConfigSource.VersionEnabled(networkingv1alpha1.SchemeGroupVersion) {
-		storageMap, err := p.v1alpha1Storage(restOptionsGetter)
-		if err != nil {
-			return genericapiserver.APIGroupInfo{}, false, err
-		}
-
-		apiGroupInfo.VersionedResourcesStorageMap[networkingv1alpha1.SchemeGroupVersion.Version] = storageMap
+	storageMap, err := p.v1alpha1Storage(restOptionsGetter)
+	if err != nil {
+		return genericapiserver.APIGroupInfo{}, false, err
 	}
+
+	apiGroupInfo.VersionedResourcesStorageMap[networkingv1alpha1.SchemeGroupVersion.Version] = storageMap
 
 	return apiGroupInfo, true, nil
 }

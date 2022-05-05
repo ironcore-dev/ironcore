@@ -102,7 +102,7 @@ func (c completedConfig) New() (*OnmetalAPIServer, error) {
 		groupName := restStorageProvider.GroupName()
 		logf := logf.WithValues("GroupName", groupName)
 
-		if !apiResourceConfigSource.AnyVersionForGroupEnabled(groupName) {
+		if !apiResourceConfigSource.AnyResourceForGroupEnabled(groupName) {
 			logf.V(1).Info("Skipping disabled api group")
 			continue
 		}
