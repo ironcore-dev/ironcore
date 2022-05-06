@@ -69,15 +69,15 @@ var _ = Describe("VirtualIP", func() {
 			},
 			ContainElement(NotSupportedField("spec.ipFamily")),
 		),
-		Entry("invalid claim ref name",
+		Entry("invalid target ref name",
 			&networking.VirtualIP{
 				Spec: networking.VirtualIPSpec{
-					ClaimRef: &commonv1alpha1.LocalUIDReference{
+					TargetRef: &commonv1alpha1.LocalUIDReference{
 						Name: "foo*",
 					},
 				},
 			},
-			ContainElement(InvalidField("spec.claimRef.name")),
+			ContainElement(InvalidField("spec.targetRef.name")),
 		),
 		Entry("valid virtual ip",
 			&networking.VirtualIP{
@@ -88,7 +88,7 @@ var _ = Describe("VirtualIP", func() {
 				Spec: networking.VirtualIPSpec{
 					Type:     networking.VirtualIPTypePublic,
 					IPFamily: corev1.IPv4Protocol,
-					ClaimRef: &commonv1alpha1.LocalUIDReference{
+					TargetRef: &commonv1alpha1.LocalUIDReference{
 						Name: "foo",
 					},
 				},
@@ -128,17 +128,17 @@ var _ = Describe("VirtualIP", func() {
 			},
 			ContainElement(ForbiddenField("spec")),
 		),
-		Entry("mutable claim reference",
+		Entry("mutable target reference",
 			&networking.VirtualIP{
 				Spec: networking.VirtualIPSpec{
-					ClaimRef: &commonv1alpha1.LocalUIDReference{
+					TargetRef: &commonv1alpha1.LocalUIDReference{
 						Name: "bar",
 					},
 				},
 			},
 			&networking.VirtualIP{
 				Spec: networking.VirtualIPSpec{
-					ClaimRef: &commonv1alpha1.LocalUIDReference{
+					TargetRef: &commonv1alpha1.LocalUIDReference{
 						Name: "foo",
 					},
 				},

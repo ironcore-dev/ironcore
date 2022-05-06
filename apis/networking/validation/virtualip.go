@@ -59,9 +59,9 @@ func validateVirtualIPSpec(spec *networking.VirtualIPSpec, fldPath *field.Path) 
 	allErrs = append(allErrs, validateVirtualIPType(spec.Type, fldPath.Child("type"))...)
 	allErrs = append(allErrs, onmetalapivalidation.ValidateIPFamily(spec.IPFamily, fldPath.Child("ipFamily"))...)
 
-	if claimRef := spec.ClaimRef; claimRef != nil {
-		for _, msg := range apivalidation.NameIsDNSLabel(claimRef.Name, false) {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("claimRef", "name"), claimRef.Name, msg))
+	if targetRef := spec.TargetRef; targetRef != nil {
+		for _, msg := range apivalidation.NameIsDNSLabel(targetRef.Name, false) {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("targetRef", "name"), targetRef.Name, msg))
 		}
 	}
 
@@ -75,7 +75,7 @@ func validateVirtualIPSpecUpdate(newSpec, oldSpec *networking.VirtualIPSpec, fld
 	newSpecCopy := newSpec.DeepCopy()
 	oldSpecCopy := oldSpec.DeepCopy()
 
-	oldSpecCopy.ClaimRef = newSpec.ClaimRef
+	oldSpecCopy.TargetRef = newSpec.TargetRef
 	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableFieldWithDiff(newSpecCopy, oldSpecCopy, fldPath)...)
 
 	return allErrs

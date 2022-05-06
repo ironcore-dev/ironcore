@@ -64,11 +64,3 @@ type VirtualIPListerExpansion interface{}
 // VirtualIPNamespaceListerExpansion allows custom methods to be added to
 // VirtualIPNamespaceLister.
 type VirtualIPNamespaceListerExpansion interface{}
-
-// VirtualIPClaimListerExpansion allows custom methods to be added to
-// VirtualIPClaimLister.
-type VirtualIPClaimListerExpansion interface{}
-
-// VirtualIPClaimNamespaceListerExpansion allows custom methods to be added to
-// VirtualIPClaimNamespaceLister.
-type VirtualIPClaimNamespaceListerExpansion interface{}

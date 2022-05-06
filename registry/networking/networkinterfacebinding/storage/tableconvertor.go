@@ -33,6 +33,7 @@ var (
 	headers = []metav1.TableColumnDefinition{
 		{Name: "Name", Type: "string", Format: "name", Description: objectMetaSwaggerDoc["name"]},
 		{Name: "IPs", Type: "string", Description: "List of effective IPs of the network interface"},
+		{Name: "VirtualIP", Type: "string", Description: "The name of a bound virtual IP"},
 		{Name: "Age", Type: "string", Format: "date", Description: objectMetaSwaggerDoc["creationTimestamp"]},
 	}
 )
@@ -66,6 +67,11 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 				eIPs = append(eIPs, ip.String())
 			}
 			cells = append(cells, strings.Join(eIPs, ","))
+		} else {
+			cells = append(cells, "<none>")
+		}
+		if vipRef := networkInterfaceBinding.VirtualIPRef; vipRef != nil {
+			cells = append(cells, vipRef.Name)
 		} else {
 			cells = append(cells, "<none>")
 		}

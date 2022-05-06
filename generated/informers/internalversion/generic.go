@@ -81,8 +81,6 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().InternalVersion().NetworkInterfaceBindings().Informer()}, nil
 	case networking.SchemeGroupVersion.WithResource("virtualips"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().InternalVersion().VirtualIPs().Informer()}, nil
-	case networking.SchemeGroupVersion.WithResource("virtualipclaims"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().InternalVersion().VirtualIPClaims().Informer()}, nil
 
 		// Group=storage.api.onmetal.de, Version=internalVersion
 	case storage.SchemeGroupVersion.WithResource("volumes"):

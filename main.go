@@ -22,6 +22,7 @@ import (
 	"os"
 	"time"
 
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
 	"github.com/onmetal/onmetal-api/controllers/networking"
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
@@ -68,14 +69,13 @@ const (
 
 	networkInterfaceController = "networkinterface"
 	virtualIPController        = "virtualip"
-	virtualIPClaimController   = "virtualipclaim"
-	virtualIPClaimScheduler    = "virtualipclaimscheduler"
 )
 
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 	utilruntime.Must(computev1alpha1.AddToScheme(scheme))
 	utilruntime.Must(storagev1alpha1.AddToScheme(scheme))
+	utilruntime.Must(networkingv1alpha1.AddToScheme(scheme))
 	utilruntime.Must(ipamv1alpha1.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
@@ -104,7 +104,7 @@ func main() {
 		volumePoolController, volumeClassController, volumeController, volumeClaimController, volumeScheduler, volumeClaimScheduler,
 
 		// Networking controllers
-		networkInterfaceController,
+		networkInterfaceController, virtualIPController,
 
 		// IPAM controllers
 		prefixController, prefixAllocationScheduler,
@@ -262,19 +262,19 @@ func main() {
 		}
 	}
 
+	if controllers.Enabled(networkInterfaceController) || controllers.Enabled(virtualIPController) {
+		if err = networking.SetupNetworkInterfaceVirtualIPNameFieldIndexer(mgr); err != nil {
+			setupLog.Error(err, "unable to setup field indexer", "field", "NetworkInterfaceVirtualIPName")
+			os.Exit(1)
+		}
+	}
+
 	if controllers.Enabled(networkInterfaceController) {
 		if err = (&networking.NetworkInterfaceReconciler{
 			Client: mgr.GetClient(),
 			Scheme: mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "NetworkInterface")
-			os.Exit(1)
-		}
-	}
-
-	if controllers.Enabled(virtualIPClaimController) || controllers.Enabled(virtualIPClaimScheduler) {
-		if err = networking.SetupVirtualIPClaimSpecVirtualIPRefNameField(mgr); err != nil {
-			setupLog.Error(err, "unable to setup field indexer", "field", "VirtualIPClaimSpecVirtualIPRefName")
 			os.Exit(1)
 		}
 	}
@@ -287,27 +287,6 @@ func main() {
 			BindTimeout: virtualIPBindTimeout,
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "VirtualIP")
-			os.Exit(1)
-		}
-	}
-
-	if controllers.Enabled(virtualIPClaimController) {
-		if err = (&networking.VirtualIPClaimReconciler{
-			Client:    mgr.GetClient(),
-			APIReader: mgr.GetAPIReader(),
-			Scheme:    mgr.GetScheme(),
-		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "VirtualIPClaim")
-			os.Exit(1)
-		}
-	}
-
-	if controllers.Enabled(virtualIPClaimScheduler) {
-		if err = (&networking.VirtualIPClaimScheduler{
-			Client:        mgr.GetClient(),
-			EventRecorder: mgr.GetEventRecorderFor("virtual-ip-claim-scheduler"),
-		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "VirtualIPClaimScheduler")
 			os.Exit(1)
 		}
 	}

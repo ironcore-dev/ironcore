@@ -51,10 +51,6 @@ func (c *FakeNetworking) VirtualIPs(namespace string) internalversion.VirtualIPI
 	return &FakeVirtualIPs{c, namespace}
 }
 
-func (c *FakeNetworking) VirtualIPClaims(namespace string) internalversion.VirtualIPClaimInterface {
-	return &FakeVirtualIPClaims{c, namespace}
-}
-
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
 func (c *FakeNetworking) RESTClient() rest.Interface {

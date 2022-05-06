@@ -106,12 +106,12 @@ func validateIPSource(ipSource networking.IPSource, idx int, ipFamily corev1.IPF
 		numSources++
 		allErrs = append(allErrs, commonv1alpha1validation.ValidateIP(ipFamily, *ip, fldPath.Child("value"))...)
 	}
-	if ephemeralPrefixSource := ipSource.EphemeralPrefix; ephemeralPrefixSource != nil {
+	if ephemeral := ipSource.Ephemeral; ephemeral != nil {
 		if numSources > 0 {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("ephemeralPrefix"), ephemeralPrefixSource, "cannot specify multiple ip sources"))
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("ephemeral"), ephemeral, "cannot specify multiple ip sources"))
 		} else {
 			numSources++
-			allErrs = append(allErrs, validateEphemeralPrefixSource(ipFamily, ephemeralPrefixSource, fldPath.Child("ephemeralPrefix"))...)
+			allErrs = append(allErrs, validateEphemeralPrefixSource(ipFamily, ephemeral, fldPath.Child("ephemeral"))...)
 			if nicMeta != nil && nicMeta.Name != "" {
 				prefixName := fmt.Sprintf("%s-%d", nicMeta.Name, idx)
 				for _, msg := range apivalidation.NameIsDNSLabel(prefixName, false) {
@@ -131,10 +131,10 @@ func validateVirtualIPSource(vipSource *networking.VirtualIPSource, fldPath *fie
 	var allErrs field.ErrorList
 
 	var numSources int
-	if vipClaimRef := vipSource.VirtualIPClaimRef; vipClaimRef != nil {
+	if vipRef := vipSource.VirtualIPRef; vipRef != nil {
 		numSources++
-		for _, msg := range apivalidation.NameIsDNSLabel(vipClaimRef.Name, false) {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("virtualIPClaimRef", "name"), vipClaimRef.Name, msg))
+		for _, msg := range apivalidation.NameIsDNSLabel(vipRef.Name, false) {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("virtualIPRef", "name"), vipRef.Name, msg))
 		}
 	}
 	if ephemeral := vipSource.Ephemeral; ephemeral != nil {
@@ -194,13 +194,13 @@ func validateEphemeralPrefixSource(ipFamily corev1.IPFamily, source *networking.
 	return allErrs
 }
 
-func ValidateVirtualIPClaimTemplateForNetworkInterface(vipClaimTemplate *networking.VirtualIPClaimTemplateSpec, fldPath *field.Path) field.ErrorList {
+func ValidateVirtualIPTemplateForNetworkInterface(vipTemplateSpec *networking.VirtualIPTemplateSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	if vipClaimTemplate == nil {
+	if vipTemplateSpec == nil {
 		allErrs = append(allErrs, field.Required(fldPath, ""))
 	} else {
-		allErrs = append(allErrs, ValidateVirtualIPClaimTemplateSpec(vipClaimTemplate, fldPath)...)
+		allErrs = append(allErrs, ValidateVirtualIPTemplateSpec(vipTemplateSpec, fldPath)...)
 	}
 
 	return allErrs
@@ -209,7 +209,7 @@ func ValidateVirtualIPClaimTemplateForNetworkInterface(vipClaimTemplate *network
 func validateEphemeralVirtualIPSource(source *networking.EphemeralVirtualIPSource, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, ValidateVirtualIPClaimTemplateForNetworkInterface(source.VirtualIPClaimTemplate, fldPath.Child("virtualIPClaimTemplate"))...)
+	allErrs = append(allErrs, ValidateVirtualIPTemplateForNetworkInterface(source.VirtualIPTemplate, fldPath.Child("virtualIPTemplate"))...)
 
 	return allErrs
 }

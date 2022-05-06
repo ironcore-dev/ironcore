@@ -36,9 +36,9 @@ func SetDefaults_NetworkInterfaceSpec(spec *NetworkInterfaceSpec) {
 	if len(spec.IPFamilies) > 0 {
 		if len(spec.IPFamilies) == len(spec.IPs) {
 			for i, ip := range spec.IPs {
-				if ip.EphemeralPrefix != nil {
-					if ip.EphemeralPrefix.PrefixTemplate != nil {
-						ephemeralPrefixSpec := &ip.EphemeralPrefix.PrefixTemplate.Spec
+				if ip.Ephemeral != nil {
+					if ip.Ephemeral.PrefixTemplate != nil {
+						ephemeralPrefixSpec := &ip.Ephemeral.PrefixTemplate.Spec
 
 						if ephemeralPrefixSpec.IPFamily == "" {
 							ephemeralPrefixSpec.IPFamily = spec.IPFamilies[i]
@@ -52,15 +52,15 @@ func SetDefaults_NetworkInterfaceSpec(spec *NetworkInterfaceSpec) {
 			switch {
 			case ip.Value != nil:
 				spec.IPFamilies = append(spec.IPFamilies, ip.Value.Family())
-			case ip.EphemeralPrefix != nil && ip.EphemeralPrefix.PrefixTemplate != nil:
-				spec.IPFamilies = append(spec.IPFamilies, ip.EphemeralPrefix.PrefixTemplate.Spec.IPFamily)
+			case ip.Ephemeral != nil && ip.Ephemeral.PrefixTemplate != nil:
+				spec.IPFamilies = append(spec.IPFamilies, ip.Ephemeral.PrefixTemplate.Spec.IPFamily)
 			}
 		}
 	}
 
 	for _, ip := range spec.IPs {
-		if ip.EphemeralPrefix != nil && ip.EphemeralPrefix.PrefixTemplate != nil {
-			templateSpec := ip.EphemeralPrefix.PrefixTemplate.Spec
+		if ip.Ephemeral != nil && ip.Ephemeral.PrefixTemplate != nil {
+			templateSpec := ip.Ephemeral.PrefixTemplate.Spec
 			if templateSpec.Prefix == nil && templateSpec.PrefixLength == 0 {
 				templateSpec.PrefixLength = ipFamilyToPrefixLength[templateSpec.IPFamily]
 			}

@@ -55,9 +55,9 @@ func SetObjectDefaults_NetworkInterface(in *NetworkInterface) {
 	SetDefaults_NetworkInterfaceSpec(&in.Spec)
 	for i := range in.Spec.IPs {
 		a := &in.Spec.IPs[i]
-		if a.EphemeralPrefix != nil {
-			if a.EphemeralPrefix.PrefixTemplate != nil {
-				ipamv1alpha1.SetDefaults_PrefixSpec(&a.EphemeralPrefix.PrefixTemplate.Spec)
+		if a.Ephemeral != nil {
+			if a.Ephemeral.PrefixTemplate != nil {
+				ipamv1alpha1.SetDefaults_PrefixSpec(&a.Ephemeral.PrefixTemplate.Spec)
 			}
 		}
 	}

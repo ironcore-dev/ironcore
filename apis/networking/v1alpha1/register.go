@@ -54,8 +54,6 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&NetworkInterfaceBindingList{},
 		&VirtualIP{},
 		&VirtualIPList{},
-		&VirtualIPClaim{},
-		&VirtualIPClaimList{},
 		&AliasPrefix{},
 		&AliasPrefixList{},
 		&AliasPrefixRouting{},

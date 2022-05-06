@@ -17,6 +17,7 @@ package networking
 import (
 	"context"
 	"fmt"
+	"reflect"
 
 	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
@@ -38,6 +39,14 @@ type NetworkInterfaceReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
 }
+
+//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces/finalizers,verbs=update
+//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=virtualips,verbs=get;create;list;watch
+//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfacebindings,verbs=get;list;watch;create;update;patch
+//+kubebuilder:rbac:groups=ipam.api.onmetal.de,resources=prefix,verbs=get;create;list;watch
+//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networks,verbs=get;list;watch
 
 func (r *NetworkInterfaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
@@ -107,8 +116,8 @@ func (r *NetworkInterfaceReconciler) applyIPs(ctx context.Context, nic *networki
 		switch {
 		case ipSource.Value != nil:
 			ips = append(ips, *ipSource.Value)
-		case ipSource.EphemeralPrefix != nil:
-			template := ipSource.EphemeralPrefix.PrefixTemplate
+		case ipSource.Ephemeral != nil:
+			template := ipSource.Ephemeral.PrefixTemplate
 			prefix := &ipamv1alpha1.Prefix{
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: nic.Namespace,
@@ -138,56 +147,50 @@ func (r *NetworkInterfaceReconciler) applyVirtualIP(ctx context.Context, log log
 		return nil, nil
 	}
 
-	vipClaim, err := r.getOrManageVirtualIPClaim(ctx, log, nic)
+	vip, err := r.getOrManageVirtualIP(ctx, log, nic)
 	if err != nil {
 		return nil, err
 	}
 
-	if phase := vipClaim.Status.Phase; phase != networkingv1alpha1.VirtualIPClaimPhaseBound {
-		log.V(1).Info("Virtual ip claim phase is not yet bound", "Phase", phase)
+	if !reflect.DeepEqual(vip.Spec.TargetRef, &commonv1alpha1.LocalUIDReference{Name: nic.Name, UID: nic.UID}) {
+		log.V(1).Info("Virtual ip does not target network interface", "TargetRef", vip.Spec.TargetRef)
 		return nil, nil
 	}
 
-	vip := &networkingv1alpha1.VirtualIP{}
-	vipKey := client.ObjectKey{Namespace: nic.Namespace, Name: vipClaim.Spec.VirtualIPRef.Name}
-	log.V(1).Info("Getting virtual ip bound by claim", "VirtualIPKey", vipKey)
-	if err := r.Get(ctx, vipKey, vip); err != nil {
-		return nil, fmt.Errorf("error getting virtual ip %s: %w", vipKey, err)
-	}
-
-	log.V(1).Info("Successfully retrieved virtual ip", "VirtualIPIP", vip.Status.IP)
+	log.V(1).Info("Successfully retrieved virtual ip that is targeting network interface", "IP", vip.Status.IP)
 	return vip, nil
 }
 
-func (r *NetworkInterfaceReconciler) getOrManageVirtualIPClaim(ctx context.Context, log logr.Logger, nic *networkingv1alpha1.NetworkInterface) (*networkingv1alpha1.VirtualIPClaim, error) {
-	if vipClaimRef := nic.Spec.VirtualIP.VirtualIPClaimRef; vipClaimRef != nil {
-		vipClaim := &networkingv1alpha1.VirtualIPClaim{}
-		vipClaimKey := client.ObjectKey{Namespace: nic.Namespace, Name: vipClaimRef.Name}
-		log.V(1).Info("Getting referenced virtual ip claim", "VirtualIPClaimKey", vipClaimKey)
-		if err := r.Get(ctx, vipClaimKey, vipClaim); err != nil {
-			return nil, fmt.Errorf("error getting referenced virtual ip claim %s: %w", vipClaimKey, err)
+func (r *NetworkInterfaceReconciler) getOrManageVirtualIP(ctx context.Context, log logr.Logger, nic *networkingv1alpha1.NetworkInterface) (*networkingv1alpha1.VirtualIP, error) {
+	if vipRef := nic.Spec.VirtualIP.VirtualIPRef; vipRef != nil {
+		vip := &networkingv1alpha1.VirtualIP{}
+		vipKey := client.ObjectKey{Namespace: nic.Namespace, Name: vipRef.Name}
+		log.V(1).Info("Getting referenced virtual ip", "VirtualIPKey", vipKey)
+		if err := r.Get(ctx, vipKey, vip); err != nil {
+			return nil, fmt.Errorf("error getting referenced virtual ip claim %s: %w", vipKey, err)
 		}
 
-		return vipClaim, nil
+		return vip, nil
 	}
 
 	log.V(1).Info("Managing ephemeral virtual ip claim")
-	ephemeralVip := &networkingv1alpha1.VirtualIPClaim{
+	vip := &networkingv1alpha1.VirtualIP{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: nic.Namespace,
 			Name:      nic.Name,
 		},
 	}
-	if err := onmetalapiclientutils.ControlledCreateOrGet(ctx, r.Client, nic, ephemeralVip, func() error {
+	if err := onmetalapiclientutils.ControlledCreateOrGet(ctx, r.Client, nic, vip, func() error {
 		ephemeral := nic.Spec.VirtualIP.Ephemeral
-		ephemeralVip.Labels = ephemeral.VirtualIPClaimTemplate.Labels
-		ephemeralVip.Annotations = ephemeral.VirtualIPClaimTemplate.Annotations
-		ephemeralVip.Spec = ephemeral.VirtualIPClaimTemplate.Spec
+		vip.Labels = ephemeral.VirtualIPTemplate.Labels
+		vip.Annotations = ephemeral.VirtualIPTemplate.Annotations
+		vip.Spec = ephemeral.VirtualIPTemplate.Spec
+		vip.Spec.TargetRef = &commonv1alpha1.LocalUIDReference{Name: nic.Name, UID: nic.UID}
 		return nil
 	}); err != nil {
-		return nil, fmt.Errorf("error managing ephemeral virtual ip claim: %w", err)
+		return nil, fmt.Errorf("error managing ephemeral virtual ip: %w", err)
 	}
-	return ephemeralVip, nil
+	return vip, nil
 }
 
 func (r *NetworkInterfaceReconciler) applyNetworkInterfaceBinding(
@@ -239,37 +242,18 @@ func (r *NetworkInterfaceReconciler) patchStatus(ctx context.Context, nic *netwo
 	return nil
 }
 
-const networkInterfaceSpecVirtualIPVirtualIPClaimRefNameField = ".spec.virtualIP.virtualIPClaimRef.name"
-
 func (r *NetworkInterfaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	ctx := context.Background()
 	log := ctrl.Log.WithName("networkinterface").WithName("setup")
-
-	if err := mgr.GetFieldIndexer().IndexField(ctx, &networkingv1alpha1.NetworkInterface{}, networkInterfaceSpecVirtualIPVirtualIPClaimRefNameField, func(obj client.Object) []string {
-		nic := obj.(*networkingv1alpha1.NetworkInterface)
-		virtualIP := nic.Spec.VirtualIP
-		if virtualIP == nil {
-			return nil
-		}
-
-		claimRef := virtualIP.VirtualIPClaimRef
-		if claimRef == nil {
-			return nil
-		}
-
-		return []string{claimRef.Name}
-	}); err != nil {
-		return err
-	}
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&networkingv1alpha1.NetworkInterface{}).
 		Owns(&ipamv1alpha1.Prefix{}).
 		Owns(&networkingv1alpha1.NetworkInterfaceBinding{}).
-		Owns(&networkingv1alpha1.VirtualIPClaim{}).
+		Owns(&networkingv1alpha1.VirtualIP{}).
 		Watches(
-			&source.Kind{Type: &networkingv1alpha1.VirtualIPClaim{}},
-			r.enqueueByReverseVirtualIPClaimReference(log, ctx)).
+			&source.Kind{Type: &networkingv1alpha1.VirtualIP{}},
+			r.enqueueByNetworkInterfaceVirtualIPReferences(log, ctx)).
 		Watches(
 			&source.Kind{Type: &computev1alpha1.Machine{}},
 			r.enqueueByMachineNetworkInterfaceReference(),
@@ -292,17 +276,17 @@ func (r *NetworkInterfaceReconciler) enqueueByMachineNetworkInterfaceReference()
 	})
 }
 
-func (r *NetworkInterfaceReconciler) enqueueByReverseVirtualIPClaimReference(log logr.Logger, ctx context.Context) handler.EventHandler {
+func (r *NetworkInterfaceReconciler) enqueueByNetworkInterfaceVirtualIPReferences(log logr.Logger, ctx context.Context) handler.EventHandler {
 	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
-		vipClaim := obj.(*networkingv1alpha1.VirtualIPClaim)
-		log = log.WithValues("VirtualIPClaimKey", client.ObjectKeyFromObject(vipClaim))
+		vip := obj.(*networkingv1alpha1.VirtualIP)
+		log = log.WithValues("VirtualIPKey", client.ObjectKeyFromObject(vip))
 
 		nicList := &networkingv1alpha1.NetworkInterfaceList{}
 		if err := r.List(ctx, nicList,
-			client.InNamespace(vipClaim.Namespace),
-			client.MatchingFields{networkInterfaceSpecVirtualIPVirtualIPClaimRefNameField: vipClaim.Name},
+			client.InNamespace(vip.Namespace),
+			client.MatchingFields{networkInterfaceVirtualIPNames: vip.Name},
 		); err != nil {
-			log.Error(err, "Error listing network interfaces using virtual ip claim")
+			log.Error(err, "Error listing network interfaces using virtual ip")
 			return nil
 		}
 

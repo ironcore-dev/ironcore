@@ -25,5 +25,5 @@ type EphemeralPrefixSource struct {
 }
 
 type EphemeralVirtualIPSource struct {
-	VirtualIPClaimTemplate *VirtualIPClaimTemplateSpec `json:"virtualIPClaimTemplate,omitempty"`
+	VirtualIPTemplate *VirtualIPTemplateSpec `json:"virtualIPTemplate,omitempty"`
 }

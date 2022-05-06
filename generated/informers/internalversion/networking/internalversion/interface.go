@@ -35,8 +35,6 @@ type Interface interface {
 	NetworkInterfaceBindings() NetworkInterfaceBindingInformer
 	// VirtualIPs returns a VirtualIPInformer.
 	VirtualIPs() VirtualIPInformer
-	// VirtualIPClaims returns a VirtualIPClaimInformer.
-	VirtualIPClaims() VirtualIPClaimInformer
 }
 
 type version struct {
@@ -78,9 +76,4 @@ func (v *version) NetworkInterfaceBindings() NetworkInterfaceBindingInformer {
 // VirtualIPs returns a VirtualIPInformer.
 func (v *version) VirtualIPs() VirtualIPInformer {
 	return &virtualIPInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
-}
-
-// VirtualIPClaims returns a VirtualIPClaimInformer.
-func (v *version) VirtualIPClaims() VirtualIPClaimInformer {
-	return &virtualIPClaimInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

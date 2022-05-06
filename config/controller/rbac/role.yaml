@@ -87,6 +87,15 @@ rules:
 - apiGroups:
   - ipam.api.onmetal.de
   resources:
+  - prefix
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ipam.api.onmetal.de
+  resources:
   - prefixallocations
   verbs:
   - create
@@ -133,7 +142,18 @@ rules:
 - apiGroups:
   - networking.api.onmetal.de
   resources:
-  - virtualipclaims
+  - networkinterfacebindings
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - networkinterfaces
   verbs:
   - create
   - delete
@@ -145,17 +165,25 @@ rules:
 - apiGroups:
   - networking.api.onmetal.de
   resources:
-  - virtualipclaims/finalizers
+  - networkinterfaces/finalizers
   verbs:
   - update
 - apiGroups:
   - networking.api.onmetal.de
   resources:
-  - virtualipclaims/status
+  - networkinterfaces/status
   verbs:
   - get
   - patch
   - update
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - networks
+  verbs:
+  - get
+  - list
+  - watch
 - apiGroups:
   - networking.api.onmetal.de
   resources:

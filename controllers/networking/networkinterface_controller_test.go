@@ -123,7 +123,7 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 				},
 				IPs: []networkingv1alpha1.IPSource{
 					{
-						EphemeralPrefix: &networkingv1alpha1.EphemeralPrefixSource{
+						Ephemeral: &networkingv1alpha1.EphemeralPrefixSource{
 							PrefixTemplate: &ipamv1alpha1.PrefixTemplateSpec{
 								Spec: ipamv1alpha1.PrefixSpec{
 									IPFamily:  corev1.IPv4Protocol,
@@ -175,7 +175,7 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 		}).Should(Equal([]commonv1alpha1.IP{commonv1alpha1.MustParseIP("10.0.0.1")}))
 	})
 
-	It("should create and manage ephemeral virtual ip claims", func() {
+	It("should create and manage ephemeral virtual ips", func() {
 		By("creating a network")
 		network := &networkingv1alpha1.Network{
 			ObjectMeta: metav1.ObjectMeta{
@@ -184,23 +184,6 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())
-
-		By("creating a virtual ip")
-		virtualIP := &networkingv1alpha1.VirtualIP{
-			ObjectMeta: metav1.ObjectMeta{
-				Namespace:    ns.Name,
-				GenerateName: "vip-",
-			},
-			Spec: networkingv1alpha1.VirtualIPSpec{
-				Type:     networkingv1alpha1.VirtualIPTypePublic,
-				IPFamily: corev1.IPv4Protocol,
-			},
-		}
-		Expect(k8sClient.Create(ctx, virtualIP)).To(Succeed())
-
-		By("updating the virtual ip to have an ip allocated")
-		virtualIP.Status.IP = commonv1alpha1.MustParseNewIP("10.0.0.1")
-		Expect(k8sClient.Status().Update(ctx, virtualIP)).To(Succeed())
 
 		By("creating a network interface")
 		nic := &networkingv1alpha1.NetworkInterface{
@@ -218,11 +201,10 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 				},
 				VirtualIP: &networkingv1alpha1.VirtualIPSource{
 					Ephemeral: &networkingv1alpha1.EphemeralVirtualIPSource{
-						VirtualIPClaimTemplate: &networkingv1alpha1.VirtualIPClaimTemplateSpec{
-							Spec: networkingv1alpha1.VirtualIPClaimSpec{
-								Type:         networkingv1alpha1.VirtualIPTypePublic,
-								IPFamily:     corev1.IPv4Protocol,
-								VirtualIPRef: &corev1.LocalObjectReference{Name: virtualIP.Name},
+						VirtualIPTemplate: &networkingv1alpha1.VirtualIPTemplateSpec{
+							Spec: networkingv1alpha1.VirtualIPSpec{
+								Type:     networkingv1alpha1.VirtualIPTypePublic,
+								IPFamily: corev1.IPv4Protocol,
 							},
 						},
 					},
@@ -231,22 +213,26 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 		}
 		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
 
-		By("waiting for the virtual ip claim to exist and be bound")
-		virtualIPClaimKey := client.ObjectKeyFromObject(nic)
+		By("waiting for the virtual ip to exist and be bound")
+		virtualIP := &networkingv1alpha1.VirtualIP{}
+		virtualIPKey := client.ObjectKeyFromObject(nic)
 		Eventually(func(g Gomega) {
-			virtualIPClaim := &networkingv1alpha1.VirtualIPClaim{}
-			err := k8sClient.Get(ctx, virtualIPClaimKey, virtualIPClaim)
+			err := k8sClient.Get(ctx, virtualIPKey, virtualIP)
 			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
 			g.Expect(err).NotTo(HaveOccurred())
 
-			g.Expect(metav1.IsControlledBy(virtualIPClaim, nic)).To(BeTrue(), "virtual ip claim is not bound by nic: %#v", virtualIPClaim)
-			g.Expect(virtualIPClaim.Spec).To(Equal(networkingv1alpha1.VirtualIPClaimSpec{
-				Type:         networkingv1alpha1.VirtualIPTypePublic,
-				IPFamily:     corev1.IPv4Protocol,
-				VirtualIPRef: &corev1.LocalObjectReference{Name: virtualIP.Name},
+			g.Expect(metav1.IsControlledBy(virtualIP, nic)).To(BeTrue(), "virtual ip is not owned by nic: %#v", virtualIP)
+			g.Expect(virtualIP.Spec).To(Equal(networkingv1alpha1.VirtualIPSpec{
+				Type:      networkingv1alpha1.VirtualIPTypePublic,
+				IPFamily:  corev1.IPv4Protocol,
+				TargetRef: &commonv1alpha1.LocalUIDReference{Name: virtualIP.Name, UID: nic.UID},
 			}))
-			g.Expect(virtualIPClaim.Status.Phase).To(Equal(networkingv1alpha1.VirtualIPClaimPhaseBound))
+			g.Expect(virtualIP.Status.Phase).To(Equal(networkingv1alpha1.VirtualIPPhaseBound))
 		}).Should(Succeed())
+
+		By("updating the virtual ip ip")
+		virtualIP.Status.IP = commonv1alpha1.MustParseNewIP("10.0.0.1")
+		Expect(k8sClient.Status().Update(ctx, virtualIP)).To(Succeed())
 
 		By("waiting for the network interface binding to be created and report virtual ip")
 		nicKey := client.ObjectKeyFromObject(nic)

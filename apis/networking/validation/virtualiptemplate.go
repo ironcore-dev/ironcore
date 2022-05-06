@@ -29,7 +29,7 @@ var allowedPrefixTemplateObjectMetaFields = sets.NewString(
 	"Labels",
 )
 
-func validateVirtualIPClaimTemplateSpecMetadata(objMeta *metav1.ObjectMeta, fldPath *field.Path) field.ErrorList {
+func validateVirtualIPTemplateSpecMetadata(objMeta *metav1.ObjectMeta, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, metav1validation.ValidateLabels(objMeta.Labels, fldPath.Child("labels"))...)
@@ -39,12 +39,12 @@ func validateVirtualIPClaimTemplateSpecMetadata(objMeta *metav1.ObjectMeta, fldP
 	return allErrs
 }
 
-// ValidateVirtualIPClaimTemplateSpec validates the spec of a prefix template.
-func ValidateVirtualIPClaimTemplateSpec(spec *networking.VirtualIPClaimTemplateSpec, fldPath *field.Path) field.ErrorList {
+// ValidateVirtualIPTemplateSpec validates the spec of a virtual ip template.
+func ValidateVirtualIPTemplateSpec(spec *networking.VirtualIPTemplateSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, validateVirtualIPClaimTemplateSpecMetadata(&spec.ObjectMeta, fldPath.Child("metadata"))...)
-	allErrs = append(allErrs, validateVirtualIPClaimSpec(&spec.Spec, fldPath.Child("spec"))...)
+	allErrs = append(allErrs, validateVirtualIPTemplateSpecMetadata(&spec.ObjectMeta, fldPath.Child("metadata"))...)
+	allErrs = append(allErrs, validateVirtualIPSpec(&spec.Spec, fldPath.Child("spec"))...)
 
 	return allErrs
 }

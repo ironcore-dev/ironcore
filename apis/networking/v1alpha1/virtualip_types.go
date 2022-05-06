@@ -29,8 +29,8 @@ type VirtualIPSpec struct {
 	// IPFamily is the ip family of the VirtualIP.
 	IPFamily corev1.IPFamily `json:"ipFamily"`
 
-	// ClaimRef references the VirtualIPClaim that claimed this virtual ip.
-	ClaimRef *commonv1alpha1.LocalUIDReference `json:"claimRef,omitempty"`
+	// TargetRef references the target for this VirtualIP (currently only NetworkInterface).
+	TargetRef *commonv1alpha1.LocalUIDReference `json:"targetRef,omitempty"`
 }
 
 // VirtualIPType is a type of VirtualIP.
@@ -83,4 +83,10 @@ type VirtualIPList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []VirtualIP `json:"items"`
+}
+
+// VirtualIPTemplateSpec is the specification of a VirtualIP template.
+type VirtualIPTemplateSpec struct {
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+	Spec              VirtualIPSpec `json:"spec,omitempty"`
 }

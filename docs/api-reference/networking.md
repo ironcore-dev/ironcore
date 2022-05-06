@@ -21,8 +21,6 @@ Resource Types:
 <a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceBinding">NetworkInterfaceBinding</a>
 </li><li>
 <a href="#networking.api.onmetal.de/v1alpha1.VirtualIP">VirtualIP</a>
-</li><li>
-<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPClaim">VirtualIPClaim</a>
 </li></ul>
 <h3 id="networking.api.onmetal.de/v1alpha1.AliasPrefix">AliasPrefix
 </h3>
@@ -564,7 +562,7 @@ Kubernetes core/v1.IPFamily
 </tr>
 <tr>
 <td>
-<code>claimRef</code><br/>
+<code>targetRef</code><br/>
 <em>
 <a href="/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
@@ -572,7 +570,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
 </em>
 </td>
 <td>
-<p>ClaimRef references the VirtualIPClaim that claimed this virtual ip.</p>
+<p>TargetRef references the target for this VirtualIP (currently only NetworkInterface).</p>
 </td>
 </tr>
 </table>
@@ -584,132 +582,6 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
 <em>
 <a href="#networking.api.onmetal.de/v1alpha1.VirtualIPStatus">
 VirtualIPStatus
-</a>
-</em>
-</td>
-<td>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="networking.api.onmetal.de/v1alpha1.VirtualIPClaim">VirtualIPClaim
-</h3>
-<div>
-<p>VirtualIPClaim is the Schema for the virtualipclaims API</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>apiVersion</code><br/>
-string</td>
-<td>
-<code>
-networking.api.onmetal.de/v1alpha1
-</code>
-</td>
-</tr>
-<tr>
-<td>
-<code>kind</code><br/>
-string
-</td>
-<td><code>VirtualIPClaim</code></td>
-</tr>
-<tr>
-<td>
-<code>metadata</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
-Kubernetes meta/v1.ObjectMeta
-</a>
-</em>
-</td>
-<td>
-Refer to the Kubernetes API documentation for the fields of the
-<code>metadata</code> field.
-</td>
-</tr>
-<tr>
-<td>
-<code>spec</code><br/>
-<em>
-<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPClaimSpec">
-VirtualIPClaimSpec
-</a>
-</em>
-</td>
-<td>
-<br/>
-<br/>
-<table>
-<tr>
-<td>
-<code>type</code><br/>
-<em>
-<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPType">
-VirtualIPType
-</a>
-</em>
-</td>
-<td>
-<p>Type is the type of VirtualIP.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>ipFamily</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#ipfamily-v1-core">
-Kubernetes core/v1.IPFamily
-</a>
-</em>
-</td>
-<td>
-<p>IPFamily is the ip family of the VirtualIP.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>selector</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#labelselector-v1-meta">
-Kubernetes meta/v1.LabelSelector
-</a>
-</em>
-</td>
-<td>
-<p>Selector is the selector for a VirtualIP.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>virtualIPRef</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>VirtualIPRef references the virtual ip to claim.</p>
-</td>
-</tr>
-</table>
-</td>
-</tr>
-<tr>
-<td>
-<code>status</code><br/>
-<em>
-<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPClaimStatus">
-VirtualIPClaimStatus
 </a>
 </em>
 </td>
@@ -898,10 +770,10 @@ github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixTemplateSpec
 <tbody>
 <tr>
 <td>
-<code>virtualIPClaimTemplate</code><br/>
+<code>virtualIPTemplate</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPClaimTemplateSpec">
-VirtualIPClaimTemplateSpec
+<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPTemplateSpec">
+VirtualIPTemplateSpec
 </a>
 </em>
 </td>
@@ -916,6 +788,7 @@ VirtualIPClaimTemplateSpec
 (<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceSpec">NetworkInterfaceSpec</a>)
 </p>
 <div>
+<p>IPSource is the definition of how to obtain an IP.</p>
 </div>
 <table>
 <thead>
@@ -935,11 +808,12 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
 </em>
 </td>
 <td>
+<p>Value specifies an IP by using an IP literal.</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>ephemeralPrefix</code><br/>
+<code>ephemeral</code><br/>
 <em>
 <a href="#networking.api.onmetal.de/v1alpha1.EphemeralPrefixSource">
 EphemeralPrefixSource
@@ -947,6 +821,7 @@ EphemeralPrefixSource
 </em>
 </td>
 <td>
+<p>Ephemeral specifies an IP by creating an ephemeral Prefix to allocate the IP with.</p>
 </td>
 </tr>
 </tbody>
@@ -1123,231 +998,6 @@ EphemeralPrefixSource
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.VirtualIPClaimPhase">VirtualIPClaimPhase
-(<code>string</code> alias)</h3>
-<p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.VirtualIPClaimStatus">VirtualIPClaimStatus</a>)
-</p>
-<div>
-<p>VirtualIPClaimPhase represents the state a VirtualIPClaim can be in.</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Value</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody><tr><td><p>&#34;Bound&#34;</p></td>
-<td><p>VirtualIPClaimPhaseBound is used for a VirtualIPClaim which is bound to a VirtualIP.</p>
-</td>
-</tr><tr><td><p>&#34;Lost&#34;</p></td>
-<td><p>VirtualIPClaimPhaseLost is used for a VirtualIPClaim that lost its underlying VirtualIP.</p>
-</td>
-</tr><tr><td><p>&#34;Pending&#34;</p></td>
-<td><p>VirtualIPClaimPhasePending is used for a VirtualIPClaim which is not yet bound.</p>
-</td>
-</tr></tbody>
-</table>
-<h3 id="networking.api.onmetal.de/v1alpha1.VirtualIPClaimSpec">VirtualIPClaimSpec
-</h3>
-<p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.VirtualIPClaim">VirtualIPClaim</a>, <a href="#networking.api.onmetal.de/v1alpha1.VirtualIPClaimTemplateSpec">VirtualIPClaimTemplateSpec</a>)
-</p>
-<div>
-<p>VirtualIPClaimSpec defines the desired state of VirtualIPClaim</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>type</code><br/>
-<em>
-<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPType">
-VirtualIPType
-</a>
-</em>
-</td>
-<td>
-<p>Type is the type of VirtualIP.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>ipFamily</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#ipfamily-v1-core">
-Kubernetes core/v1.IPFamily
-</a>
-</em>
-</td>
-<td>
-<p>IPFamily is the ip family of the VirtualIP.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>selector</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#labelselector-v1-meta">
-Kubernetes meta/v1.LabelSelector
-</a>
-</em>
-</td>
-<td>
-<p>Selector is the selector for a VirtualIP.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>virtualIPRef</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>VirtualIPRef references the virtual ip to claim.</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="networking.api.onmetal.de/v1alpha1.VirtualIPClaimStatus">VirtualIPClaimStatus
-</h3>
-<p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.VirtualIPClaim">VirtualIPClaim</a>)
-</p>
-<div>
-<p>VirtualIPClaimStatus defines the observed state of VirtualIPClaim</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>phase</code><br/>
-<em>
-<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPClaimPhase">
-VirtualIPClaimPhase
-</a>
-</em>
-</td>
-<td>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="networking.api.onmetal.de/v1alpha1.VirtualIPClaimTemplateSpec">VirtualIPClaimTemplateSpec
-</h3>
-<p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.EphemeralVirtualIPSource">EphemeralVirtualIPSource</a>)
-</p>
-<div>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>metadata</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
-Kubernetes meta/v1.ObjectMeta
-</a>
-</em>
-</td>
-<td>
-Refer to the Kubernetes API documentation for the fields of the
-<code>metadata</code> field.
-</td>
-</tr>
-<tr>
-<td>
-<code>spec</code><br/>
-<em>
-<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPClaimSpec">
-VirtualIPClaimSpec
-</a>
-</em>
-</td>
-<td>
-<br/>
-<br/>
-<table>
-<tr>
-<td>
-<code>type</code><br/>
-<em>
-<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPType">
-VirtualIPType
-</a>
-</em>
-</td>
-<td>
-<p>Type is the type of VirtualIP.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>ipFamily</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#ipfamily-v1-core">
-Kubernetes core/v1.IPFamily
-</a>
-</em>
-</td>
-<td>
-<p>IPFamily is the ip family of the VirtualIP.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>selector</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#labelselector-v1-meta">
-Kubernetes meta/v1.LabelSelector
-</a>
-</em>
-</td>
-<td>
-<p>Selector is the selector for a VirtualIP.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>virtualIPRef</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>VirtualIPRef references the virtual ip to claim.</p>
-</td>
-</tr>
-</table>
-</td>
-</tr>
-</tbody>
-</table>
 <h3 id="networking.api.onmetal.de/v1alpha1.VirtualIPPhase">VirtualIPPhase
 (<code>string</code> alias)</h3>
 <p>
@@ -1380,6 +1030,7 @@ Kubernetes core/v1.LocalObjectReference
 (<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceSpec">NetworkInterfaceSpec</a>)
 </p>
 <div>
+<p>VirtualIPSource is the definition of how to obtain a VirtualIP.</p>
 </div>
 <table>
 <thead>
@@ -1391,7 +1042,7 @@ Kubernetes core/v1.LocalObjectReference
 <tbody>
 <tr>
 <td>
-<code>virtualIPClaimRef</code><br/>
+<code>virtualIPRef</code><br/>
 <em>
 <a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
@@ -1399,6 +1050,7 @@ Kubernetes core/v1.LocalObjectReference
 </em>
 </td>
 <td>
+<p>VirtualIPRef references a VirtualIP to use.</p>
 </td>
 </tr>
 <tr>
@@ -1411,6 +1063,8 @@ EphemeralVirtualIPSource
 </em>
 </td>
 <td>
+<p>Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object)
+VirtualIP.</p>
 </td>
 </tr>
 </tbody>
@@ -1418,7 +1072,7 @@ EphemeralVirtualIPSource
 <h3 id="networking.api.onmetal.de/v1alpha1.VirtualIPSpec">VirtualIPSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.VirtualIP">VirtualIP</a>)
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.VirtualIP">VirtualIP</a>, <a href="#networking.api.onmetal.de/v1alpha1.VirtualIPTemplateSpec">VirtualIPTemplateSpec</a>)
 </p>
 <div>
 <p>VirtualIPSpec defines the desired state of VirtualIP</p>
@@ -1459,7 +1113,7 @@ Kubernetes core/v1.IPFamily
 </tr>
 <tr>
 <td>
-<code>claimRef</code><br/>
+<code>targetRef</code><br/>
 <em>
 <a href="/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
@@ -1467,7 +1121,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
 </em>
 </td>
 <td>
-<p>ClaimRef references the VirtualIPClaim that claimed this virtual ip.</p>
+<p>TargetRef references the target for this VirtualIP (currently only NetworkInterface).</p>
 </td>
 </tr>
 </tbody>
@@ -1529,10 +1183,97 @@ Kubernetes meta/v1.Time
 </tr>
 </tbody>
 </table>
+<h3 id="networking.api.onmetal.de/v1alpha1.VirtualIPTemplateSpec">VirtualIPTemplateSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.EphemeralVirtualIPSource">EphemeralVirtualIPSource</a>)
+</p>
+<div>
+<p>VirtualIPTemplateSpec is the specification of a VirtualIP template.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPSpec">
+VirtualIPSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>type</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPType">
+VirtualIPType
+</a>
+</em>
+</td>
+<td>
+<p>Type is the type of VirtualIP.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ipFamily</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#ipfamily-v1-core">
+Kubernetes core/v1.IPFamily
+</a>
+</em>
+</td>
+<td>
+<p>IPFamily is the ip family of the VirtualIP.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>targetRef</code><br/>
+<em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
+</a>
+</em>
+</td>
+<td>
+<p>TargetRef references the target for this VirtualIP (currently only NetworkInterface).</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="networking.api.onmetal.de/v1alpha1.VirtualIPType">VirtualIPType
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.VirtualIPClaimSpec">VirtualIPClaimSpec</a>, <a href="#networking.api.onmetal.de/v1alpha1.VirtualIPSpec">VirtualIPSpec</a>)
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.VirtualIPSpec">VirtualIPSpec</a>)
 </p>
 <div>
 <p>VirtualIPType is a type of VirtualIP.</p>

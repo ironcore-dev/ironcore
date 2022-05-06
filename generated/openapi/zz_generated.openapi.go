@@ -90,15 +90,11 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.NetworkList":                 schema_onmetal_api_apis_networking_v1alpha1_NetworkList(ref),
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.PrefixSource":                schema_onmetal_api_apis_networking_v1alpha1_PrefixSource(ref),
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.VirtualIP":                   schema_onmetal_api_apis_networking_v1alpha1_VirtualIP(ref),
-		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.VirtualIPClaim":              schema_onmetal_api_apis_networking_v1alpha1_VirtualIPClaim(ref),
-		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.VirtualIPClaimList":          schema_onmetal_api_apis_networking_v1alpha1_VirtualIPClaimList(ref),
-		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.VirtualIPClaimSpec":          schema_onmetal_api_apis_networking_v1alpha1_VirtualIPClaimSpec(ref),
-		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.VirtualIPClaimStatus":        schema_onmetal_api_apis_networking_v1alpha1_VirtualIPClaimStatus(ref),
-		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.VirtualIPClaimTemplateSpec":  schema_onmetal_api_apis_networking_v1alpha1_VirtualIPClaimTemplateSpec(ref),
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.VirtualIPList":               schema_onmetal_api_apis_networking_v1alpha1_VirtualIPList(ref),
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.VirtualIPSource":             schema_onmetal_api_apis_networking_v1alpha1_VirtualIPSource(ref),
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.VirtualIPSpec":               schema_onmetal_api_apis_networking_v1alpha1_VirtualIPSpec(ref),
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.VirtualIPStatus":             schema_onmetal_api_apis_networking_v1alpha1_VirtualIPStatus(ref),
+		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.VirtualIPTemplateSpec":       schema_onmetal_api_apis_networking_v1alpha1_VirtualIPTemplateSpec(ref),
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.ClaimReference":                 schema_onmetal_api_apis_storage_v1alpha1_ClaimReference(ref),
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.Volume":                         schema_onmetal_api_apis_storage_v1alpha1_Volume(ref),
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeAccess":                   schema_onmetal_api_apis_storage_v1alpha1_VolumeAccess(ref),
@@ -2264,16 +2260,16 @@ func schema_onmetal_api_apis_networking_v1alpha1_EphemeralVirtualIPSource(ref co
 			SchemaProps: spec.SchemaProps{
 				Type: []string{"object"},
 				Properties: map[string]spec.Schema{
-					"virtualIPClaimTemplate": {
+					"virtualIPTemplate": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/onmetal/onmetal-api/apis/networking/v1alpha1.VirtualIPClaimTemplateSpec"),
+							Ref: ref("github.com/onmetal/onmetal-api/apis/networking/v1alpha1.VirtualIPTemplateSpec"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.VirtualIPClaimTemplateSpec"},
+			"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.VirtualIPTemplateSpec"},
 	}
 }
 
@@ -2281,16 +2277,19 @@ func schema_onmetal_api_apis_networking_v1alpha1_IPSource(ref common.ReferenceCa
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "IPSource is the definition of how to obtain an IP.",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"value": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP"),
+							Description: "Value specifies an IP by using an IP literal.",
+							Ref:         ref("github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP"),
 						},
 					},
-					"ephemeralPrefix": {
+					"ephemeral": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/onmetal/onmetal-api/apis/networking/v1alpha1.EphemeralPrefixSource"),
+							Description: "Ephemeral specifies an IP by creating an ephemeral Prefix to allocate the IP with.",
+							Ref:         ref("github.com/onmetal/onmetal-api/apis/networking/v1alpha1.EphemeralPrefixSource"),
 						},
 					},
 				},
@@ -2763,191 +2762,6 @@ func schema_onmetal_api_apis_networking_v1alpha1_VirtualIP(ref common.ReferenceC
 	}
 }
 
-func schema_onmetal_api_apis_networking_v1alpha1_VirtualIPClaim(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "VirtualIPClaim is the Schema for the virtualipclaims API",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("github.com/onmetal/onmetal-api/apis/networking/v1alpha1.VirtualIPClaimSpec"),
-						},
-					},
-					"status": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("github.com/onmetal/onmetal-api/apis/networking/v1alpha1.VirtualIPClaimStatus"),
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.VirtualIPClaimSpec", "github.com/onmetal/onmetal-api/apis/networking/v1alpha1.VirtualIPClaimStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
-	}
-}
-
-func schema_onmetal_api_apis_networking_v1alpha1_VirtualIPClaimList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "VirtualIPClaimList contains a list of VirtualIPClaim",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("github.com/onmetal/onmetal-api/apis/networking/v1alpha1.VirtualIPClaim"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.VirtualIPClaim", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
-	}
-}
-
-func schema_onmetal_api_apis_networking_v1alpha1_VirtualIPClaimSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "VirtualIPClaimSpec defines the desired state of VirtualIPClaim",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"type": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Type is the type of VirtualIP.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"ipFamily": {
-						SchemaProps: spec.SchemaProps{
-							Description: "IPFamily is the ip family of the VirtualIP.\n\nPossible enum values:\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-							Enum:        []interface{}{"IPv4", "IPv6"}},
-					},
-					"selector": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Selector is the selector for a VirtualIP.",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"),
-						},
-					},
-					"virtualIPRef": {
-						SchemaProps: spec.SchemaProps{
-							Description: "VirtualIPRef references the virtual ip to claim.",
-							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
-						},
-					},
-				},
-				Required: []string{"type", "ipFamily"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"},
-	}
-}
-
-func schema_onmetal_api_apis_networking_v1alpha1_VirtualIPClaimStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "VirtualIPClaimStatus defines the observed state of VirtualIPClaim",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"phase": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-				},
-			},
-		},
-	}
-}
-
-func schema_onmetal_api_apis_networking_v1alpha1_VirtualIPClaimTemplateSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("github.com/onmetal/onmetal-api/apis/networking/v1alpha1.VirtualIPClaimSpec"),
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.VirtualIPClaimSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
-	}
-}
-
 func schema_onmetal_api_apis_networking_v1alpha1_VirtualIPList(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -3001,16 +2815,19 @@ func schema_onmetal_api_apis_networking_v1alpha1_VirtualIPSource(ref common.Refe
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "VirtualIPSource is the definition of how to obtain a VirtualIP.",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"virtualIPClaimRef": {
+					"virtualIPRef": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/api/core/v1.LocalObjectReference"),
+							Description: "VirtualIPRef references a VirtualIP to use.",
+							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
 						},
 					},
 					"ephemeral": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/onmetal/onmetal-api/apis/networking/v1alpha1.EphemeralVirtualIPSource"),
+							Description: "Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object) VirtualIP.",
+							Ref:         ref("github.com/onmetal/onmetal-api/apis/networking/v1alpha1.EphemeralVirtualIPSource"),
 						},
 					},
 				},
@@ -3044,9 +2861,9 @@ func schema_onmetal_api_apis_networking_v1alpha1_VirtualIPSpec(ref common.Refere
 							Format:      "",
 							Enum:        []interface{}{"IPv4", "IPv6"}},
 					},
-					"claimRef": {
+					"targetRef": {
 						SchemaProps: spec.SchemaProps{
-							Description: "ClaimRef references the VirtualIPClaim that claimed this virtual ip.",
+							Description: "TargetRef references the target for this VirtualIP (currently only NetworkInterface).",
 							Ref:         ref("github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference"),
 						},
 					},
@@ -3090,6 +2907,33 @@ func schema_onmetal_api_apis_networking_v1alpha1_VirtualIPStatus(ref common.Refe
 		},
 		Dependencies: []string{
 			"github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+	}
+}
+
+func schema_onmetal_api_apis_networking_v1alpha1_VirtualIPTemplateSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "VirtualIPTemplateSpec is the specification of a VirtualIP template.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/onmetal/onmetal-api/apis/networking/v1alpha1.VirtualIPSpec"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.VirtualIPSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 

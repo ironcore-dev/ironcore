@@ -53,6 +53,15 @@ var _ = Describe("VirtualIPReconciler", func() {
 	})
 
 	It("should set the virtual ip status to bound if it gets bound and set it to unbound if it gets unbound", func() {
+		By("creating a network")
+		network := &networkingv1alpha1.Network{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "network-",
+			},
+		}
+		Expect(k8sClient.Create(ctx, network)).To(Succeed())
+
 		By("creating a virtual ip")
 		virtualIP := &networkingv1alpha1.VirtualIP{
 			ObjectMeta: metav1.ObjectMeta{
@@ -70,21 +79,30 @@ var _ = Describe("VirtualIPReconciler", func() {
 		virtualIP.Status.IP = commonv1alpha1.MustParseNewIP("10.0.0.1")
 		Expect(k8sClient.Status().Update(ctx, virtualIP)).To(Succeed())
 
-		By("creating a virtual ip claim")
-		virtualIPClaim := &networkingv1alpha1.VirtualIPClaim{
+		By("creating a network interface referencing the virtual ip")
+		nic := &networkingv1alpha1.NetworkInterface{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
-				GenerateName: "vip-claim-",
+				GenerateName: "nic-",
 			},
-			Spec: networkingv1alpha1.VirtualIPClaimSpec{
-				Type:     networkingv1alpha1.VirtualIPTypePublic,
-				IPFamily: corev1.IPv4Protocol,
-				VirtualIPRef: &corev1.LocalObjectReference{
-					Name: virtualIP.Name,
+			Spec: networkingv1alpha1.NetworkInterfaceSpec{
+				NetworkRef: corev1.LocalObjectReference{
+					Name: network.Name,
+				},
+				IPFamilies: []corev1.IPFamily{
+					corev1.IPv4Protocol,
+				},
+				IPs: []networkingv1alpha1.IPSource{
+					{Value: commonv1alpha1.MustParseNewIP("192.168.178.1")},
+				},
+				VirtualIP: &networkingv1alpha1.VirtualIPSource{
+					VirtualIPRef: &corev1.LocalObjectReference{
+						Name: virtualIP.Name,
+					},
 				},
 			},
 		}
-		Expect(k8sClient.Create(ctx, virtualIPClaim)).To(Succeed())
+		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
 
 		By("waiting for the virtual ip to be bound")
 		virtualIPKey := client.ObjectKeyFromObject(virtualIP)
@@ -92,21 +110,21 @@ var _ = Describe("VirtualIPReconciler", func() {
 			Expect(k8sClient.Get(ctx, virtualIPKey, virtualIP)).To(Succeed())
 
 			g.Expect(virtualIP.Status.Phase).To(Equal(networkingv1alpha1.VirtualIPPhaseBound))
-			g.Expect(virtualIP.Spec.ClaimRef).To(Equal(&commonv1alpha1.LocalUIDReference{
-				Name: virtualIPClaim.Name,
-				UID:  virtualIPClaim.UID,
+			g.Expect(virtualIP.Spec.TargetRef).To(Equal(&commonv1alpha1.LocalUIDReference{
+				Name: nic.Name,
+				UID:  nic.UID,
 			}))
 		}).Should(Succeed())
 
-		By("deleting the virtual ip claim")
-		Expect(k8sClient.Delete(ctx, virtualIPClaim)).To(Succeed())
+		By("deleting the network interface")
+		Expect(k8sClient.Delete(ctx, nic)).To(Succeed())
 
 		By("waiting for the virtual ip to be unbound again")
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, virtualIPKey, virtualIP)).To(Succeed())
 
 			g.Expect(virtualIP.Status.Phase).To(Equal(networkingv1alpha1.VirtualIPPhaseUnbound))
-			g.Expect(virtualIP.Spec.ClaimRef).To(BeNil())
+			g.Expect(virtualIP.Spec.TargetRef).To(BeNil())
 		}).Should(Succeed())
 	})
 })

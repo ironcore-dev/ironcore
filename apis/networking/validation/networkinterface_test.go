@@ -88,32 +88,32 @@ var _ = Describe("NetworkInterface", func() {
 		Entry("ephemeral prefix name present",
 			&networking.NetworkInterface{
 				Spec: networking.NetworkInterfaceSpec{
-					IPs: []networking.IPSource{{EphemeralPrefix: &networking.EphemeralPrefixSource{
+					IPs: []networking.IPSource{{Ephemeral: &networking.EphemeralPrefixSource{
 						PrefixTemplate: &ipam.PrefixTemplateSpec{
 							ObjectMeta: metav1.ObjectMeta{Name: "foo"},
 						}}},
 					},
 				},
 			},
-			ContainElement(ForbiddenField("spec.ips[0].ephemeralPrefix.prefixTemplate.metadata.name")),
+			ContainElement(ForbiddenField("spec.ips[0].ephemeral.prefixTemplate.metadata.name")),
 		),
 		Entry("ephemeral prefix namespace present",
 			&networking.NetworkInterface{
 				Spec: networking.NetworkInterfaceSpec{
-					IPs: []networking.IPSource{{EphemeralPrefix: &networking.EphemeralPrefixSource{
+					IPs: []networking.IPSource{{Ephemeral: &networking.EphemeralPrefixSource{
 						PrefixTemplate: &ipam.PrefixTemplateSpec{
 							ObjectMeta: metav1.ObjectMeta{Namespace: "foo"},
 						}}},
 					},
 				},
 			},
-			ContainElement(ForbiddenField("spec.ips[0].ephemeralPrefix.prefixTemplate.metadata.namespace")),
+			ContainElement(ForbiddenField("spec.ips[0].ephemeral.prefixTemplate.metadata.namespace")),
 		),
 		Entry("ephemeral prefix ip family mismatch",
 			&networking.NetworkInterface{
 				Spec: networking.NetworkInterfaceSpec{
 					IPFamilies: []corev1.IPFamily{corev1.IPv4Protocol},
-					IPs: []networking.IPSource{{EphemeralPrefix: &networking.EphemeralPrefixSource{
+					IPs: []networking.IPSource{{Ephemeral: &networking.EphemeralPrefixSource{
 						PrefixTemplate: &ipam.PrefixTemplateSpec{
 							Spec: ipam.PrefixSpec{
 								IPFamily: corev1.IPv6Protocol,
@@ -122,13 +122,13 @@ var _ = Describe("NetworkInterface", func() {
 					},
 				},
 			},
-			ContainElement(ForbiddenField("spec.ips[0].ephemeralPrefix.prefixTemplate.spec.ipFamily")),
+			ContainElement(ForbiddenField("spec.ips[0].ephemeral.prefixTemplate.spec.ipFamily")),
 		),
 		Entry("ephemeral prefix does not create a single ip",
 			&networking.NetworkInterface{
 				Spec: networking.NetworkInterfaceSpec{
 					IPFamilies: []corev1.IPFamily{corev1.IPv4Protocol},
-					IPs: []networking.IPSource{{EphemeralPrefix: &networking.EphemeralPrefixSource{
+					IPs: []networking.IPSource{{Ephemeral: &networking.EphemeralPrefixSource{
 						PrefixTemplate: &ipam.PrefixTemplateSpec{
 							Spec: ipam.PrefixSpec{
 								PrefixLength: 24,
@@ -137,19 +137,19 @@ var _ = Describe("NetworkInterface", func() {
 					},
 				},
 			},
-			ContainElement(ForbiddenField("spec.ips[0].ephemeralPrefix.prefixTemplate.spec.prefixLength")),
+			ContainElement(ForbiddenField("spec.ips[0].ephemeral.prefixTemplate.spec.prefixLength")),
 		),
-		Entry("invalid virtual ip claim reference",
+		Entry("invalid virtual ip reference",
 			&networking.NetworkInterface{
 				Spec: networking.NetworkInterfaceSpec{
 					VirtualIP: &networking.VirtualIPSource{
-						VirtualIPClaimRef: &corev1.LocalObjectReference{Name: "foo*"},
+						VirtualIPRef: &corev1.LocalObjectReference{Name: "foo*"},
 					},
 				},
 			},
-			ContainElement(InvalidField("spec.virtualIP.virtualIPClaimRef.name")),
+			ContainElement(InvalidField("spec.virtualIP.virtualIPRef.name")),
 		),
-		Entry("missing virtual ip ephemeral virtual ip claim template",
+		Entry("missing virtual ip ephemeral virtual ip template",
 			&networking.NetworkInterface{
 				Spec: networking.NetworkInterfaceSpec{
 					VirtualIP: &networking.VirtualIPSource{
@@ -157,14 +157,14 @@ var _ = Describe("NetworkInterface", func() {
 					},
 				},
 			},
-			ContainElement(RequiredField("spec.virtualIP.ephemeral.virtualIPClaimTemplate")),
+			ContainElement(RequiredField("spec.virtualIP.ephemeral.virtualIPTemplate")),
 		),
 		Entry("multiple virtual ip sources",
 			&networking.NetworkInterface{
 				Spec: networking.NetworkInterfaceSpec{
 					VirtualIP: &networking.VirtualIPSource{
-						VirtualIPClaimRef: &corev1.LocalObjectReference{Name: "foo"},
-						Ephemeral:         &networking.EphemeralVirtualIPSource{},
+						VirtualIPRef: &corev1.LocalObjectReference{Name: "foo"},
+						Ephemeral:    &networking.EphemeralVirtualIPSource{},
 					},
 				},
 			},

@@ -37,14 +37,21 @@ type NetworkInterfaceSpec struct {
 	VirtualIP *VirtualIPSource
 }
 
+// IPSource is the definition of how to obtain an IP.
 type IPSource struct {
-	Value           *commonv1alpha1.IP
-	EphemeralPrefix *EphemeralPrefixSource
+	// Value specifies an IP by using an IP literal.
+	Value *commonv1alpha1.IP
+	// Ephemeral specifies an IP by creating an ephemeral Prefix to allocate the IP with.
+	Ephemeral *EphemeralPrefixSource
 }
 
+// VirtualIPSource is the definition of how to obtain a VirtualIP.
 type VirtualIPSource struct {
-	VirtualIPClaimRef *corev1.LocalObjectReference
-	Ephemeral         *EphemeralVirtualIPSource
+	// VirtualIPRef references a VirtualIP to use.
+	VirtualIPRef *corev1.LocalObjectReference
+	// Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object)
+	// VirtualIP.
+	Ephemeral *EphemeralVirtualIPSource
 }
 
 // NetworkInterfaceStatus defines the observed state of NetworkInterface
