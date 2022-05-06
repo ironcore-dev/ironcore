@@ -205,19 +205,6 @@ func (i IPRange) GomegaString() string {
 	return i.String()
 }
 
-func (in *IPRange) DeepCopyInto(out *IPRange) {
-	*out = *in
-	in.From.DeepCopyInto(&out.From)
-	in.To.DeepCopyInto(&out.To)
-}
-
-func (in *IPRange) DeepCopy() *IPRange {
-	return &IPRange{
-		From: *in.From.DeepCopy(),
-		To:   *in.From.DeepCopy(),
-	}
-}
-
 func NewIPRange(ipRange netaddr.IPRange) IPRange {
 	return IPRange{From: NewIP(ipRange.From()), To: NewIP(ipRange.To())}
 }

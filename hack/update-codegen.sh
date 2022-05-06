@@ -29,7 +29,6 @@ bash "$CODEGEN_PKG"/generate-groups.sh \
   deepcopy \
   github.com/onmetal/onmetal-api/generated \
   github.com/onmetal/onmetal-api/apis \
-  github.com/onmetal/onmetal-api/apis \
   "common:v1alpha1" \
   --output-base "$VGOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt"
