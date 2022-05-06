@@ -16,8 +16,6 @@
 package networking
 
 import (
-	"fmt"
-
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/apis/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
@@ -63,24 +61,8 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 		}
 		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
 
-		By("waiting for the owned network interface binding to be created and report the correct ips")
-		nicKey := client.ObjectKeyFromObject(nic)
-		Eventually(func(g Gomega) {
-			nicBinding := &networkingv1alpha1.NetworkInterfaceBinding{}
-
-			err := k8sClient.Get(ctx, nicKey, nicBinding)
-			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
-			g.Expect(err).NotTo(HaveOccurred())
-
-			g.Expect(metav1.IsControlledBy(nicBinding, nic)).To(BeTrue(), "network interface binding is not controlled by network interface: %#v", nicBinding)
-			g.Expect(nicBinding.NetworkRef).To(Equal(commonv1alpha1.LocalUIDReference{
-				Name: network.Name,
-				UID:  network.UID,
-			}))
-			g.Expect(nicBinding.IPs).To(Equal([]commonv1alpha1.IP{commonv1alpha1.MustParseIP("10.0.0.1")}))
-		}).Should(Succeed())
-
 		By("waiting for the network interface to report the correct ips")
+		nicKey := client.ObjectKeyFromObject(nic)
 		Eventually(func(g Gomega) []commonv1alpha1.IP {
 			Expect(k8sClient.Get(ctx, nicKey, nic)).To(Succeed())
 			return nic.Status.IPs
@@ -139,7 +121,7 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
 
 		By("waiting for the prefix to be created with the correct ips and become ready")
-		prefixKey := client.ObjectKey{Namespace: ns.Name, Name: fmt.Sprintf("%s-%d", nic.Name, 0)}
+		prefixKey := client.ObjectKey{Namespace: ns.Name, Name: NetworkInterfaceEphemeralIPName(nic.Name, 0)}
 		Eventually(func(g Gomega) {
 			prefix := &ipamv1alpha1.Prefix{}
 			err := k8sClient.Get(ctx, prefixKey, prefix)
@@ -155,20 +137,8 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 			g.Expect(ipamv1alpha1.GetPrefixReadiness(prefix)).To(Equal(ipamv1alpha1.ReadinessSucceeded))
 		}).Should(Succeed())
 
-		By("waiting for the network interface binding to be created and report the correct ips")
-		nicKey := client.ObjectKeyFromObject(nic)
-		Eventually(func(g Gomega) {
-			nicBinding := &networkingv1alpha1.NetworkInterfaceBinding{}
-
-			err := k8sClient.Get(ctx, nicKey, nicBinding)
-			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
-			g.Expect(err).NotTo(HaveOccurred())
-
-			g.Expect(metav1.IsControlledBy(nicBinding, nic)).To(BeTrue(), "network interface binding is not controlled by network interface: %#v", nicBinding)
-			g.Expect(nicBinding.IPs).To(Equal([]commonv1alpha1.IP{commonv1alpha1.MustParseIP("10.0.0.1")}))
-		}).Should(Succeed())
-
 		By("waiting for the network interface to report the correct ips")
+		nicKey := client.ObjectKeyFromObject(nic)
 		Eventually(func(g Gomega) []commonv1alpha1.IP {
 			Expect(k8sClient.Get(ctx, nicKey, nic)).To(Succeed())
 			return nic.Status.IPs
@@ -234,23 +204,8 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 		virtualIP.Status.IP = commonv1alpha1.MustParseNewIP("10.0.0.1")
 		Expect(k8sClient.Status().Update(ctx, virtualIP)).To(Succeed())
 
-		By("waiting for the network interface binding to be created and report virtual ip")
-		nicKey := client.ObjectKeyFromObject(nic)
-		Eventually(func(g Gomega) {
-			nicBinding := &networkingv1alpha1.NetworkInterfaceBinding{}
-
-			err := k8sClient.Get(ctx, nicKey, nicBinding)
-			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
-			g.Expect(err).NotTo(HaveOccurred())
-
-			g.Expect(metav1.IsControlledBy(nicBinding, nic)).To(BeTrue(), "network interface binding is not controlled by network interface: %#v", nicBinding)
-			g.Expect(nicBinding.VirtualIPRef).To(Equal(&commonv1alpha1.LocalUIDReference{
-				Name: virtualIP.Name,
-				UID:  virtualIP.UID,
-			}))
-		}).Should(Succeed())
-
 		By("waiting for the virtual ip to be reported in the network interface status")
+		nicKey := client.ObjectKeyFromObject(nic)
 		Eventually(func() *commonv1alpha1.IP {
 			Expect(k8sClient.Get(ctx, nicKey, nic)).To(Succeed())
 			return nic.Status.VirtualIP

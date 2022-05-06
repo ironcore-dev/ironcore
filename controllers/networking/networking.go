@@ -16,26 +16,26 @@ package networking
 
 import (
 	"context"
+	"fmt"
 
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func NetworkInterfaceVirtualIPName(nic *networkingv1alpha1.NetworkInterface) string {
-	virtualIP := nic.Spec.VirtualIP
-	if virtualIP == nil {
-		return ""
-	}
-
+func NetworkInterfaceVirtualIPName(nicName string, vipSource networkingv1alpha1.VirtualIPSource) string {
 	switch {
-	case virtualIP.VirtualIPRef != nil:
-		return virtualIP.VirtualIPRef.Name
-	case virtualIP.Ephemeral != nil:
-		return nic.Name
+	case vipSource.VirtualIPRef != nil:
+		return vipSource.VirtualIPRef.Name
+	case vipSource.Ephemeral != nil:
+		return nicName
 	default:
 		return ""
 	}
+}
+
+func NetworkInterfaceEphemeralIPName(nicName string, idx int) string {
+	return fmt.Sprintf("%s-%d", nicName, idx)
 }
 
 const networkInterfaceVirtualIPNames = "networkinterface-virtual-ip-names"
@@ -45,7 +45,12 @@ func SetupNetworkInterfaceVirtualIPNameFieldIndexer(mgr ctrl.Manager) error {
 	return mgr.GetFieldIndexer().IndexField(ctx, &networkingv1alpha1.NetworkInterface{}, networkInterfaceVirtualIPNames, func(obj client.Object) []string {
 		nic := obj.(*networkingv1alpha1.NetworkInterface)
 
-		virtualIPName := NetworkInterfaceVirtualIPName(nic)
+		virtualIP := nic.Spec.VirtualIP
+		if virtualIP == nil {
+			return nil
+		}
+
+		virtualIPName := NetworkInterfaceVirtualIPName(nic.Name, *nic.Spec.VirtualIP)
 		if virtualIPName == "" {
 			return nil
 		}

@@ -27,7 +27,7 @@ type NetworkInterfaceSpec struct {
 	// NetworkRef is the Network this NetworkInterface is connected to
 	NetworkRef corev1.LocalObjectReference `json:"networkRef"`
 	// MachineRef is the Machine this NetworkInterface is used by
-	MachineRef *corev1.LocalObjectReference `json:"machineRef,omitempty"`
+	MachineRef *commonv1alpha1.LocalUIDReference `json:"machineRef,omitempty"`
 	// IPFamilies defines which IPFamilies this NetworkInterface is supporting
 	IPFamilies []corev1.IPFamily `json:"ipFamilies"`
 	// IPs is the list of provided IPs or EphemeralIPs which should be assigned to
@@ -60,7 +60,24 @@ type NetworkInterfaceStatus struct {
 	IPs []commonv1alpha1.IP `json:"ips,omitempty"`
 	// VirtualIP is any virtual ip assigned to the NetworkInterface.
 	VirtualIP *commonv1alpha1.IP `json:"virtualIP,omitempty"`
+
+	// Phase is the NetworkInterfacePhase of the NetworkInterface.
+	Phase NetworkInterfacePhase `json:"phase,omitempty"`
+	// LastPhaseTransitionTime is the last time the Phase transitioned from one value to another.
+	LastPhaseTransitionTime *metav1.Time `json:"phaseLastTransitionTime,omitempty"`
 }
+
+// NetworkInterfacePhase is the binding phase of a NetworkInterface.
+type NetworkInterfacePhase string
+
+const (
+	// NetworkInterfacePhaseUnbound is used for any NetworkInterface that is not bound.
+	NetworkInterfacePhaseUnbound NetworkInterfacePhase = "Unbound"
+	// NetworkInterfacePhasePending is used for any NetworkInterface that is currently awaiting binding.
+	NetworkInterfacePhasePending NetworkInterfacePhase = "Pending"
+	// NetworkInterfacePhaseBound is used for any NetworkInterface that is properly bound.
+	NetworkInterfacePhaseBound NetworkInterfacePhase = "Bound"
+)
 
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -81,4 +98,10 @@ type NetworkInterfaceList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []NetworkInterface `json:"items"`
+}
+
+// NetworkInterfaceTemplateSpec is the specification of a NetworkInterface template.
+type NetworkInterfaceTemplateSpec struct {
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+	Spec              NetworkInterfaceSpec `json:"spec,omitempty"`
 }

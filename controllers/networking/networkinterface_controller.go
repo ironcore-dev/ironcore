@@ -21,7 +21,6 @@ import (
 
 	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
-	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/apis/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
 	onmetalapiclientutils "github.com/onmetal/onmetal-api/clientutils"
@@ -33,11 +32,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
-var nicFieldOwner = client.FieldOwner(networkingv1alpha1.Resource("networkinterfaces").String())
-
 type NetworkInterfaceReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	APIReader client.Reader
+	Scheme    *runtime.Scheme
 }
 
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces,verbs=get;list;watch;create;update;patch;delete
@@ -45,7 +43,7 @@ type NetworkInterfaceReconciler struct {
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces/finalizers,verbs=update
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=virtualips,verbs=get;create;list;watch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfacebindings,verbs=get;list;watch;create;update;patch
-//+kubebuilder:rbac:groups=ipam.api.onmetal.de,resources=prefix,verbs=get;create;list;watch
+//+kubebuilder:rbac:groups=ipam.api.onmetal.de,resources=prefix,verbs=get;create;list;update;patch;watch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networks,verbs=get;list;watch
 
 func (r *NetworkInterfaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -91,23 +89,24 @@ func (r *NetworkInterfaceReconciler) reconcile(ctx context.Context, log logr.Log
 	}
 	log.V(1).Info("Successfully applied virtual IP")
 
-	log.V(1).Info("Applying network interface binding")
-	if err := r.applyNetworkInterfaceBinding(ctx, nic, network, ips, virtualIP); err != nil {
-		return ctrl.Result{}, err
-	}
-	log.V(1).Info("Successfully applied network interface binding")
-
 	log.V(1).Info("Patching status")
-	var vip *commonv1alpha1.IP
-	if virtualIP != nil {
-		vip = virtualIP.Status.IP
-	}
-	if err := r.patchStatus(ctx, nic, ips, vip); err != nil {
+	if err := r.patchStatus(ctx, nic, ips, virtualIP); err != nil {
 		return ctrl.Result{}, err
 	}
-
 	log.V(1).Info("Successfully patched status")
 	return ctrl.Result{}, nil
+}
+
+func (r *NetworkInterfaceReconciler) patchStatus(ctx context.Context, nic *networkingv1alpha1.NetworkInterface, ips []commonv1alpha1.IP, virtualIP *commonv1alpha1.IP) error {
+	base := nic.DeepCopy()
+
+	nic.Status.IPs = ips
+	nic.Status.VirtualIP = virtualIP
+
+	if err := r.Status().Patch(ctx, nic, client.MergeFrom(base)); err != nil {
+		return fmt.Errorf("error patching status: %w", err)
+	}
+	return nil
 }
 
 func (r *NetworkInterfaceReconciler) applyIPs(ctx context.Context, nic *networkingv1alpha1.NetworkInterface) ([]commonv1alpha1.IP, error) {
@@ -121,7 +120,7 @@ func (r *NetworkInterfaceReconciler) applyIPs(ctx context.Context, nic *networki
 			prefix := &ipamv1alpha1.Prefix{
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: nic.Namespace,
-					Name:      fmt.Sprintf("%s-%d", nic.Name, i),
+					Name:      NetworkInterfaceEphemeralIPName(nic.Name, i),
 				},
 			}
 			if err := onmetalapiclientutils.ControlledCreateOrGet(ctx, r.Client, nic, prefix, func() error {
@@ -141,7 +140,7 @@ func (r *NetworkInterfaceReconciler) applyIPs(ctx context.Context, nic *networki
 	return ips, nil
 }
 
-func (r *NetworkInterfaceReconciler) applyVirtualIP(ctx context.Context, log logr.Logger, nic *networkingv1alpha1.NetworkInterface) (*networkingv1alpha1.VirtualIP, error) {
+func (r *NetworkInterfaceReconciler) applyVirtualIP(ctx context.Context, log logr.Logger, nic *networkingv1alpha1.NetworkInterface) (*commonv1alpha1.IP, error) {
 	if nic.Spec.VirtualIP == nil {
 		log.V(1).Info("Network interface does not specify any virtual ip")
 		return nil, nil
@@ -157,8 +156,13 @@ func (r *NetworkInterfaceReconciler) applyVirtualIP(ctx context.Context, log log
 		return nil, nil
 	}
 
-	log.V(1).Info("Successfully retrieved virtual ip that is targeting network interface", "IP", vip.Status.IP)
-	return vip, nil
+	if phase := vip.Status.Phase; phase != networkingv1alpha1.VirtualIPPhaseBound {
+		log.V(1).Info("Virtual ip is not bound", "Phase", phase)
+		return nil, nil
+	}
+
+	log.V(1).Info("Virtual ip is up and bound", "IP", vip.Status.IP)
+	return vip.Status.IP, nil
 }
 
 func (r *NetworkInterfaceReconciler) getOrManageVirtualIP(ctx context.Context, log logr.Logger, nic *networkingv1alpha1.NetworkInterface) (*networkingv1alpha1.VirtualIP, error) {
@@ -193,55 +197,6 @@ func (r *NetworkInterfaceReconciler) getOrManageVirtualIP(ctx context.Context, l
 	return vip, nil
 }
 
-func (r *NetworkInterfaceReconciler) applyNetworkInterfaceBinding(
-	ctx context.Context,
-	nic *networkingv1alpha1.NetworkInterface,
-	network *networkingv1alpha1.Network,
-	ips []commonv1alpha1.IP,
-	virtualIP *networkingv1alpha1.VirtualIP,
-) error {
-	var vipRef *commonv1alpha1.LocalUIDReference
-	if virtualIP != nil {
-		vipRef = &commonv1alpha1.LocalUIDReference{
-			Name: virtualIP.Name,
-			UID:  virtualIP.UID,
-		}
-	}
-	nicBinding := &networkingv1alpha1.NetworkInterfaceBinding{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: networkingv1alpha1.SchemeGroupVersion.String(),
-			Kind:       "NetworkInterfaceBinding",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: nic.Namespace,
-			Name:      nic.Name,
-		},
-		NetworkRef: commonv1alpha1.LocalUIDReference{
-			Name: network.Name,
-			UID:  network.UID,
-		},
-		IPs:          ips,
-		VirtualIPRef: vipRef,
-	}
-	if err := ctrl.SetControllerReference(nic, nicBinding, r.Scheme); err != nil {
-		return fmt.Errorf("error setting controller reference on network interface binding: %w", err)
-	}
-	if err := r.Patch(ctx, nicBinding, client.Apply, nicFieldOwner, client.ForceOwnership); err != nil {
-		return fmt.Errorf("error applying network interface binding: %w", err)
-	}
-	return nil
-}
-
-func (r *NetworkInterfaceReconciler) patchStatus(ctx context.Context, nic *networkingv1alpha1.NetworkInterface, ips []commonv1alpha1.IP, virtualIP *commonv1alpha1.IP) error {
-	base := nic.DeepCopy()
-	nic.Status.IPs = ips
-	nic.Status.VirtualIP = virtualIP
-	if err := r.Status().Patch(ctx, nic, client.MergeFrom(base)); err != nil {
-		return fmt.Errorf("error patching status: %w", err)
-	}
-	return nil
-}
-
 func (r *NetworkInterfaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	ctx := context.Background()
 	log := ctrl.Log.WithName("networkinterface").WithName("setup")
@@ -249,31 +204,12 @@ func (r *NetworkInterfaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&networkingv1alpha1.NetworkInterface{}).
 		Owns(&ipamv1alpha1.Prefix{}).
-		Owns(&networkingv1alpha1.NetworkInterfaceBinding{}).
 		Owns(&networkingv1alpha1.VirtualIP{}).
 		Watches(
 			&source.Kind{Type: &networkingv1alpha1.VirtualIP{}},
-			r.enqueueByNetworkInterfaceVirtualIPReferences(log, ctx)).
-		Watches(
-			&source.Kind{Type: &computev1alpha1.Machine{}},
-			r.enqueueByMachineNetworkInterfaceReference(),
+			r.enqueueByNetworkInterfaceVirtualIPReferences(log, ctx),
 		).
 		Complete(r)
-}
-
-func (r *NetworkInterfaceReconciler) enqueueByMachineNetworkInterfaceReference() handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
-		machine := obj.(*computev1alpha1.Machine)
-
-		var reqs []ctrl.Request
-		for _, nic := range machine.Spec.Interfaces {
-			if nic.NetworkInterfaceRef != nil {
-				reqs = append(reqs, ctrl.Request{NamespacedName: client.ObjectKey{Namespace: machine.Namespace, Name: nic.Name}})
-			}
-		}
-
-		return reqs
-	})
 }
 
 func (r *NetworkInterfaceReconciler) enqueueByNetworkInterfaceVirtualIPReferences(log logr.Logger, ctx context.Context) handler.EventHandler {
