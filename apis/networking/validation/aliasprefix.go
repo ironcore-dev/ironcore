@@ -58,12 +58,12 @@ func validateAliasPrefixSpec(spec *networking.AliasPrefixSpec, fldPath *field.Pa
 func validateAliasPrefixSources(prefixSource networking.PrefixSource, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	if prefixSource.EphemeralPrefix != nil && prefixSource.Value != nil {
-		allErrs = append(allErrs, field.Forbidden(fldPath, "only ephemeralPrefix or value should be provided"))
+	if prefixSource.Ephemeral != nil && prefixSource.Value != nil {
+		allErrs = append(allErrs, field.Forbidden(fldPath, "only ephemeral or value should be provided"))
 	}
 
-	if ephemeralPrefix := prefixSource.EphemeralPrefix; ephemeralPrefix != nil {
-		allErrs = append(allErrs, validateEphemeralAliasPrefixSource(prefixSource.EphemeralPrefix, fldPath.Child("ephemeralPrefix"))...)
+	if ephemeral := prefixSource.Ephemeral; ephemeral != nil {
+		allErrs = append(allErrs, validateEphemeralAliasPrefixSource(prefixSource.Ephemeral, fldPath.Child("ephemeral"))...)
 	}
 
 	allErrs = append(allErrs, validateValuePrefixSource(prefixSource.Value, fldPath.Child("prefixTemplate").Child("value"))...)
@@ -106,17 +106,17 @@ func ValidateAliasPrefixUpdate(newAliasPrefix, oldAliasPrefix *networking.AliasP
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessorUpdate(newAliasPrefix, oldAliasPrefix, field.NewPath("metadata"))...)
-	allErrs = append(allErrs, validateAliasPrefixUpdate(newAliasPrefix, oldAliasPrefix, field.NewPath("spec"))...)
+	allErrs = append(allErrs, validateAliasSpecPrefixUpdate(&newAliasPrefix.Spec, &oldAliasPrefix.Spec, field.NewPath("spec"))...)
 	allErrs = append(allErrs, ValidateAliasPrefix(newAliasPrefix)...)
 
 	return allErrs
 }
 
-// validateAliasPrefixUpdate validates the spec of a aliasPrefix object before an update.
-func validateAliasPrefixUpdate(new, old *networking.AliasPrefix, fldPath *field.Path) field.ErrorList {
+// validateAliasSpecPrefixUpdate validates the spec of a aliasPrefix object before an update.
+func validateAliasSpecPrefixUpdate(newSpec, oldSpec *networking.AliasPrefixSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableField(new, old, fldPath.Child("networkRef"))...)
+	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableField(newSpec.NetworkRef, oldSpec.NetworkRef, fldPath.Child("networkRef"))...)
 
 	return allErrs
 }

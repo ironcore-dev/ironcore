@@ -29,7 +29,7 @@ type AliasPrefixSpec struct {
 	// NetworkInterfaceSelector defines the NetworkInterfaces
 	// for which this AliasPrefix should be applied
 	NetworkInterfaceSelector *metav1.LabelSelector
-	// Prefix is the provided Prefix or EphemeralPrefix which
+	// Prefix is the provided Prefix or Ephemeral which
 	// should be used by this AliasPrefix
 	Prefix PrefixSource
 }
@@ -39,7 +39,7 @@ type PrefixSource struct {
 	// Value is a single IPPrefix value as defined in the AliasPrefix
 	Value *commonv1alpha1.IPPrefix
 	// EphemeralPrefix defines the Prefix which should be allocated by the AliasPrefix
-	EphemeralPrefix *EphemeralPrefixSource
+	Ephemeral *EphemeralPrefixSource
 }
 
 // AliasPrefixStatus defines the observed state of AliasPrefix

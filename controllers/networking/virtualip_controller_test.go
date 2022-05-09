@@ -76,8 +76,9 @@ var _ = Describe("VirtualIPReconciler", func() {
 		Expect(k8sClient.Create(ctx, virtualIP)).To(Succeed())
 
 		By("updating the virtual ip to have an ip allocated")
+		baseVirtualIP := virtualIP.DeepCopy()
 		virtualIP.Status.IP = commonv1alpha1.MustParseNewIP("10.0.0.1")
-		Expect(k8sClient.Status().Update(ctx, virtualIP)).To(Succeed())
+		Expect(k8sClient.Status().Patch(ctx, virtualIP, client.MergeFrom(baseVirtualIP))).To(Succeed())
 
 		By("creating a network interface referencing the virtual ip")
 		nic := &networkingv1alpha1.NetworkInterface{

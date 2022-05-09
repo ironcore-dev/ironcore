@@ -75,7 +75,6 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.AliasPrefixList":              schema_onmetal_api_apis_networking_v1alpha1_AliasPrefixList(ref),
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.AliasPrefixRouting":           schema_onmetal_api_apis_networking_v1alpha1_AliasPrefixRouting(ref),
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.AliasPrefixRoutingList":       schema_onmetal_api_apis_networking_v1alpha1_AliasPrefixRoutingList(ref),
-		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.AliasPrefixRoutingSubset":     schema_onmetal_api_apis_networking_v1alpha1_AliasPrefixRoutingSubset(ref),
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.AliasPrefixSpec":              schema_onmetal_api_apis_networking_v1alpha1_AliasPrefixSpec(ref),
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.AliasPrefixStatus":            schema_onmetal_api_apis_networking_v1alpha1_AliasPrefixStatus(ref),
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.EphemeralPrefixSource":        schema_onmetal_api_apis_networking_v1alpha1_EphemeralPrefixSource(ref),
@@ -2124,33 +2123,26 @@ func schema_onmetal_api_apis_networking_v1alpha1_AliasPrefixRouting(ref common.R
 							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
 					},
-					"networkRef": {
+					"destinations": {
 						SchemaProps: spec.SchemaProps{
-							Description: "NetworkRef is the Network this AliasPrefixRouting should belong to",
-							Default:     map[string]interface{}{},
-							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
-						},
-					},
-					"subsets": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Subsets are the subsets that make up an AliasPrefixRouting",
+							Description: "Destinations are the destinations for an AliasPrefix.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/onmetal/onmetal-api/apis/networking/v1alpha1.AliasPrefixRoutingSubset"),
+										Ref:     ref("github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference"),
 									},
 								},
 							},
 						},
 					},
 				},
-				Required: []string{"networkRef"},
+				Required: []string{"destinations"},
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.AliasPrefixRoutingSubset", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			"github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 
@@ -2203,43 +2195,6 @@ func schema_onmetal_api_apis_networking_v1alpha1_AliasPrefixRoutingList(ref comm
 	}
 }
 
-func schema_onmetal_api_apis_networking_v1alpha1_AliasPrefixRoutingSubset(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "AliasPrefixRoutingSubset is one of the targets of a AliasPrefixRouting",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"machinePoolRef": {
-						SchemaProps: spec.SchemaProps{
-							Description: "MachinePoolRef is the machine pool hosting the targeted entities.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference"),
-						},
-					},
-					"targets": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Targets are the entities targeted by the alias prefix routing.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"machinePoolRef", "targets"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference"},
-	}
-}
-
 func schema_onmetal_api_apis_networking_v1alpha1_AliasPrefixSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -2262,7 +2217,7 @@ func schema_onmetal_api_apis_networking_v1alpha1_AliasPrefixSpec(ref common.Refe
 					},
 					"prefix": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Prefix is the provided Prefix or EphemeralPrefix which should be used by this AliasPrefix",
+							Description: "Prefix is the provided Prefix or Ephemeral which should be used by this AliasPrefix",
 							Default:     map[string]interface{}{},
 							Ref:         ref("github.com/onmetal/onmetal-api/apis/networking/v1alpha1.PrefixSource"),
 						},
@@ -2803,9 +2758,9 @@ func schema_onmetal_api_apis_networking_v1alpha1_PrefixSource(ref common.Referen
 							Ref:         ref("github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix"),
 						},
 					},
-					"ephemeralPrefix": {
+					"ephemeral": {
 						SchemaProps: spec.SchemaProps{
-							Description: "EphemeralPrefix defines the Prefix which should be allocated by the AliasPrefix",
+							Description: "Ephemeral defines the Prefix which should be allocated by the AliasPrefix",
 							Ref:         ref("github.com/onmetal/onmetal-api/apis/networking/v1alpha1.EphemeralPrefixSource"),
 						},
 					},

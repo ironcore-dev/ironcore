@@ -62,18 +62,18 @@ var _ = Describe("AliasPrefix", func() {
 			&networking.AliasPrefix{
 				Spec: networking.AliasPrefixSpec{
 					Prefix: networking.PrefixSource{
-						EphemeralPrefix: &networking.EphemeralPrefixSource{},
+						Ephemeral: &networking.EphemeralPrefixSource{},
 					},
 				},
 			},
-			ContainElement(RequiredField("spec.prefix.ephemeralPrefix.prefixTemplate")),
+			ContainElement(RequiredField("spec.prefix.ephemeral.prefixTemplate")),
 		),
 		Entry("ephemeral prefix and value are provided",
 			&networking.AliasPrefix{
 				Spec: networking.AliasPrefixSpec{
 					Prefix: networking.PrefixSource{
-						EphemeralPrefix: &networking.EphemeralPrefixSource{},
-						Value:           v1alpha1.PtrToIPPrefix(v1alpha1.MustParseIPPrefix("10.0.0.0/24")),
+						Ephemeral: &networking.EphemeralPrefixSource{},
+						Value:     v1alpha1.PtrToIPPrefix(v1alpha1.MustParseIPPrefix("10.0.0.0/24")),
 					},
 				},
 			},

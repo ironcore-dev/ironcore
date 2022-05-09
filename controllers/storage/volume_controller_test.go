@@ -74,8 +74,9 @@ var _ = Describe("VolumeReconciler", func() {
 		Expect(k8sClient.Create(ctx, volume)).To(Succeed(), "failed to create volume")
 
 		By("patching the volume status to available")
+		baseVolume := volume.DeepCopy()
 		volume.Status.State = storagev1alpha1.VolumeStateAvailable
-		Expect(k8sClient.Status().Update(ctx, volume)).To(Succeed(), "failed to patch volume status")
+		Expect(k8sClient.Status().Patch(ctx, volume, client.MergeFrom(baseVolume))).To(Succeed())
 
 		By("creating a volume claim which should claim the matching volume")
 		Expect(k8sClient.Create(ctx, volumeClaim)).To(Succeed(), "failed to create volume claim")
@@ -99,8 +100,9 @@ var _ = Describe("VolumeReconciler", func() {
 		Expect(k8sClient.Create(ctx, volume)).To(Succeed(), "failed to create volume")
 
 		By("updating the volume status to available")
+		baseVolume := volume.DeepCopy()
 		volume.Status.State = storagev1alpha1.VolumeStateAvailable
-		Expect(k8sClient.Status().Update(ctx, volume)).To(Succeed(), "failed to patch volume status")
+		Expect(k8sClient.Status().Patch(ctx, volume, client.MergeFrom(baseVolume))).To(Succeed())
 
 		By("creating a volume claim which should claim the matching volume")
 		Expect(k8sClient.Create(ctx, volumeClaim)).To(Succeed(), "failed to create volume claim")

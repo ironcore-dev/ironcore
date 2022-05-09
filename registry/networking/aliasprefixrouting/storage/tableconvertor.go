@@ -19,6 +19,7 @@ package storage
 import (
 	"context"
 
+	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	"github.com/onmetal/onmetal-api/apis/networking"
 	"github.com/onmetal/onmetal-api/tableconvertor"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -62,7 +63,7 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 		aliasPrefixRouting := obj.(*networking.AliasPrefixRouting)
 
 		cells = append(cells, name)
-		cells = append(cells, formatEndpoints(aliasPrefixRouting.Subsets))
+		cells = append(cells, formatDestinations(aliasPrefixRouting.Destinations))
 		cells = append(cells, age)
 
 		return cells, nil
@@ -70,12 +71,10 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 	return tab, err
 }
 
-func formatEndpoints(subsets []networking.AliasPrefixSubset) string {
+func formatDestinations(destinations []commonv1alpha1.LocalUIDReference) string {
 	var parts []string
-	for _, subset := range subsets {
-		for _, target := range subset.Targets {
-			parts = append(parts, target.Name)
-		}
+	for _, destination := range destinations {
+		parts = append(parts, destination.Name)
 	}
 	return tableconvertor.JoinStringsMore(parts, ",", 3)
 }
