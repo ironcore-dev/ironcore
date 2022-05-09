@@ -27,7 +27,7 @@ type NetworkInterfaceSpec struct {
 	// NetworkRef is the Network this NetworkInterface is connected to
 	NetworkRef corev1.LocalObjectReference
 	// MachineRef is the Machine this NetworkInterface is used by
-	MachineRef *corev1.LocalObjectReference
+	MachineRef *commonv1alpha1.LocalUIDReference
 	// IPFamilies defines which IPFamilies this NetworkInterface is supporting
 	IPFamilies []corev1.IPFamily
 	// IPs is the list of provided IPs or EphemeralIPs which should be assigned to
@@ -60,7 +60,24 @@ type NetworkInterfaceStatus struct {
 	IPs []commonv1alpha1.IP
 	// VirtualIP is any virtual ip assigned to the NetworkInterface.
 	VirtualIP *commonv1alpha1.IP
+
+	// Phase is the NetworkInterfacePhase of the NetworkInterface.
+	Phase NetworkInterfacePhase
+	// LastPhaseTransitionTime is the last time the Phase transitioned from one value to another.
+	LastPhaseTransitionTime *metav1.Time
 }
+
+// NetworkInterfacePhase is the binding phase of a NetworkInterface.
+type NetworkInterfacePhase string
+
+const (
+	// NetworkInterfacePhaseUnbound is used for any NetworkInterface that is not bound.
+	NetworkInterfacePhaseUnbound NetworkInterfacePhase = "Unbound"
+	// NetworkInterfacePhasePending is used for any NetworkInterface that is currently awaiting binding.
+	NetworkInterfacePhasePending NetworkInterfacePhase = "Pending"
+	// NetworkInterfacePhaseBound is used for any NetworkInterface that is properly bound.
+	NetworkInterfacePhaseBound NetworkInterfacePhase = "Bound"
+)
 
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -81,4 +98,10 @@ type NetworkInterfaceList struct {
 	metav1.TypeMeta
 	metav1.ListMeta
 	Items []NetworkInterface
+}
+
+// NetworkInterfaceTemplateSpec is the specification of a NetworkInterface template.
+type NetworkInterfaceTemplateSpec struct {
+	metav1.ObjectMeta
+	Spec NetworkInterfaceSpec
 }

@@ -411,6 +411,33 @@ string
 </tr>
 </tbody>
 </table>
+<h3 id="compute.api.onmetal.de/v1alpha1.EphemeralNetworkInterfaceSource">EphemeralNetworkInterfaceSource
+</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.InterfaceSource">InterfaceSource</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>networkInterfaceTemplate</code><br/>
+<em>
+github.com/onmetal/onmetal-api/apis/networking/v1alpha1.NetworkInterfaceTemplateSpec
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="compute.api.onmetal.de/v1alpha1.Interface">Interface
 </h3>
 <p>
@@ -484,6 +511,20 @@ Kubernetes core/v1.LocalObjectReference
 <p>NetworkInterfaceRef instructs to use the NetworkInterface at the target reference.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>ephemeral</code><br/>
+<em>
+<a href="#compute.api.onmetal.de/v1alpha1.EphemeralNetworkInterfaceSource">
+EphemeralNetworkInterfaceSource
+</a>
+</em>
+</td>
+<td>
+<p>Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object)
+NetworkInterface to use.</p>
+</td>
+</tr>
 </tbody>
 </table>
 <h3 id="compute.api.onmetal.de/v1alpha1.InterfaceStatus">InterfaceStatus
@@ -494,6 +535,50 @@ Kubernetes core/v1.LocalObjectReference
 <div>
 <p>InterfaceStatus reports the status of an InterfaceSource.</p>
 </div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>ips</code><br/>
+<em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
+[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>virtualIP</code><br/>
+<em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="compute.api.onmetal.de/v1alpha1.MachineCondition">MachineCondition
 </h3>
 <p>

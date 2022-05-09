@@ -329,8 +329,8 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>machineRef</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
 </a>
 </em>
 </td>
@@ -826,10 +826,36 @@ EphemeralPrefixSource
 </tr>
 </tbody>
 </table>
+<h3 id="networking.api.onmetal.de/v1alpha1.NetworkInterfacePhase">NetworkInterfacePhase
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceStatus">NetworkInterfaceStatus</a>)
+</p>
+<div>
+<p>NetworkInterfacePhase is the binding phase of a NetworkInterface.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Bound&#34;</p></td>
+<td><p>NetworkInterfacePhaseBound is used for any NetworkInterface that is properly bound.</p>
+</td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>NetworkInterfacePhasePending is used for any NetworkInterface that is currently awaiting binding.</p>
+</td>
+</tr><tr><td><p>&#34;Unbound&#34;</p></td>
+<td><p>NetworkInterfacePhaseUnbound is used for any NetworkInterface that is not bound.</p>
+</td>
+</tr></tbody>
+</table>
 <h3 id="networking.api.onmetal.de/v1alpha1.NetworkInterfaceSpec">NetworkInterfaceSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkInterface">NetworkInterface</a>)
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkInterface">NetworkInterface</a>, <a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceTemplateSpec">NetworkInterfaceTemplateSpec</a>)
 </p>
 <div>
 <p>NetworkInterfaceSpec defines the desired state of NetworkInterface</p>
@@ -859,8 +885,8 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>machineRef</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
 </a>
 </em>
 </td>
@@ -950,6 +976,143 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
 </td>
 <td>
 <p>VirtualIP is any virtual ip assigned to the NetworkInterface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>phase</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfacePhase">
+NetworkInterfacePhase
+</a>
+</em>
+</td>
+<td>
+<p>Phase is the NetworkInterfacePhase of the NetworkInterface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>phaseLastTransitionTime</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastPhaseTransitionTime is the last time the Phase transitioned from one value to another.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.NetworkInterfaceTemplateSpec">NetworkInterfaceTemplateSpec
+</h3>
+<div>
+<p>NetworkInterfaceTemplateSpec is the specification of a NetworkInterface template.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceSpec">
+NetworkInterfaceSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef is the Network this NetworkInterface is connected to</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>machineRef</code><br/>
+<em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
+</a>
+</em>
+</td>
+<td>
+<p>MachineRef is the Machine this NetworkInterface is used by</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ipFamilies</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#ipfamily-v1-core">
+[]Kubernetes core/v1.IPFamily
+</a>
+</em>
+</td>
+<td>
+<p>IPFamilies defines which IPFamilies this NetworkInterface is supporting</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ips</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.IPSource">
+[]IPSource
+</a>
+</em>
+</td>
+<td>
+<p>IPs is the list of provided IPs or EphemeralIPs which should be assigned to
+this NetworkInterface</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>virtualIp</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPSource">
+VirtualIPSource
+</a>
+</em>
+</td>
+<td>
+<p>VirtualIP specifies the virtual ip that should be assigned to this NetworkInterface.</p>
+</td>
+</tr>
+</table>
 </td>
 </tr>
 </tbody>

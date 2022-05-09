@@ -24,6 +24,7 @@ import (
 
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
 	"github.com/onmetal/onmetal-api/controllers/networking"
+	"github.com/onmetal/onmetal-api/controllers/shared"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
@@ -68,8 +69,9 @@ const (
 	prefixController          = "prefix"
 	prefixAllocationScheduler = "prefixallocationscheduler"
 
-	networkInterfaceController = "networkinterface"
-	virtualIPController        = "virtualip"
+	networkInterfaceController     = "networkinterface"
+	networkInterfaceBindController = "networkinterfacebind"
+	virtualIPController            = "virtualip"
 )
 
 func init() {
@@ -88,6 +90,7 @@ func main() {
 	var prefixAllocationTimeout time.Duration
 	var volumeBindTimeout time.Duration
 	var virtualIPBindTimeout time.Duration
+	var networkInterfaceBindTimeout time.Duration
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
@@ -96,6 +99,7 @@ func main() {
 	flag.DurationVar(&prefixAllocationTimeout, "prefix-allocation-timeout", 1*time.Second, "Time to wait until considering a pending allocation failed.")
 	flag.DurationVar(&volumeBindTimeout, "volume-bind-timeout", 10*time.Second, "Time to wait until considering a volume bind to be failed.")
 	flag.DurationVar(&virtualIPBindTimeout, "virtual-ip-bind-timeout", 10*time.Second, "Time to wait until considering a virtual ip bind to be failed.")
+	flag.DurationVar(&networkInterfaceBindTimeout, "network-interface-bind-timeout", 10*time.Second, "Timet to wait until considering a network interface bind to be failed.")
 
 	controllers := switches.New(
 		// Compute controllers
@@ -105,7 +109,7 @@ func main() {
 		volumePoolController, volumeClassController, volumeController, volumeClaimController, volumeScheduler, volumeClaimScheduler,
 
 		// Networking controllers
-		networkInterfaceController, virtualIPController,
+		networkInterfaceController, networkInterfaceBindController, virtualIPController,
 
 		// IPAM controllers
 		prefixController, prefixAllocationScheduler,
@@ -149,6 +153,7 @@ func main() {
 			os.Exit(1)
 		}
 	}
+
 	if controllers.Enabled(machinePoolController) {
 		if err = (&computecontrollers.MachinePoolReconciler{
 			Client: mgr.GetClient(),
@@ -158,6 +163,7 @@ func main() {
 			os.Exit(1)
 		}
 	}
+
 	if controllers.Enabled(machineSchedulerController) {
 		if err := (&computecontrollers.MachineScheduler{
 			Client: mgr.GetClient(),
@@ -167,6 +173,7 @@ func main() {
 			os.Exit(1)
 		}
 	}
+
 	if controllers.Enabled(volumePoolController) {
 		if err = (&storagecontrollers.VolumePoolReconciler{
 			Client: mgr.GetClient(),
@@ -176,6 +183,7 @@ func main() {
 			os.Exit(1)
 		}
 	}
+
 	if controllers.Enabled(volumeClassController) {
 		if err = (&storagecontrollers.VolumeClassReconciler{
 			Client:    mgr.GetClient(),
@@ -186,6 +194,7 @@ func main() {
 			os.Exit(1)
 		}
 	}
+
 	if controllers.Enabled(volumeController) {
 		if err = (&storagecontrollers.VolumeReconciler{
 			Client:             mgr.GetClient(),
@@ -198,6 +207,7 @@ func main() {
 			os.Exit(1)
 		}
 	}
+
 	if controllers.Enabled(volumeClaimController) {
 		if err = (&storagecontrollers.VolumeClaimReconciler{
 			Client:             mgr.GetClient(),
@@ -209,6 +219,7 @@ func main() {
 			os.Exit(1)
 		}
 	}
+
 	if controllers.Enabled(volumeScheduler) {
 		if err = (&storagecontrollers.VolumeScheduler{
 			Client: mgr.GetClient(),
@@ -216,6 +227,7 @@ func main() {
 			setupLog.Error(err, "unable to create controller", "controller", "VolumeScheduler")
 		}
 	}
+
 	if controllers.Enabled(volumeClaimScheduler) {
 		if err = (&storagecontrollers.VolumeClaimScheduler{
 			Client:        mgr.GetClient(),
@@ -224,12 +236,20 @@ func main() {
 			setupLog.Error(err, "unable to create controller", "controller", "VolumeClaimScheduler")
 		}
 	}
+
 	if controllers.Enabled(machineController) {
 		if err = (&computecontrollers.MachineReconciler{
 			Client: mgr.GetClient(),
 			Scheme: mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "Machine")
+			os.Exit(1)
+		}
+	}
+
+	if controllers.Enabled(machineController) || controllers.Enabled(networkInterfaceBindController) {
+		if err = shared.SetupMachineNetworkInterfaceNamesFieldIndexer(mgr); err != nil {
+			setupLog.Error(err, "unable setup indexer", "indexer", "machine-network-interface-names")
 			os.Exit(1)
 		}
 	}
@@ -276,6 +296,18 @@ func main() {
 			Scheme: mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "NetworkInterface")
+			os.Exit(1)
+		}
+	}
+
+	if controllers.Enabled(networkInterfaceBindController) {
+		if err = (&networking.NetworkInterfaceBindReconciler{
+			Client:      mgr.GetClient(),
+			APIReader:   mgr.GetAPIReader(),
+			Scheme:      mgr.GetScheme(),
+			BindTimeout: networkInterfaceBindTimeout,
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "NetworkInterfaceBind")
 			os.Exit(1)
 		}
 	}

@@ -17,6 +17,7 @@
 package validation
 
 import (
+	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	"github.com/onmetal/onmetal-api/apis/ipam"
 	"github.com/onmetal/onmetal-api/apis/networking"
 	. "github.com/onmetal/onmetal-api/testutils/validation"
@@ -60,7 +61,7 @@ var _ = Describe("NetworkInterface", func() {
 		Entry("invalid machine ref name",
 			&networking.NetworkInterface{
 				Spec: networking.NetworkInterfaceSpec{
-					MachineRef: &corev1.LocalObjectReference{Name: "foo*"},
+					MachineRef: &commonv1alpha1.LocalUIDReference{Name: "foo*"},
 				},
 			},
 			ContainElement(InvalidField("spec.machineRef.name")),
@@ -206,12 +207,12 @@ var _ = Describe("NetworkInterface", func() {
 		Entry("mutable machine ref",
 			&networking.NetworkInterface{
 				Spec: networking.NetworkInterfaceSpec{
-					MachineRef: &corev1.LocalObjectReference{Name: "bar"},
+					MachineRef: &commonv1alpha1.LocalUIDReference{Name: "bar"},
 				},
 			},
 			&networking.NetworkInterface{
 				Spec: networking.NetworkInterfaceSpec{
-					MachineRef: &corev1.LocalObjectReference{Name: "foo"},
+					MachineRef: &commonv1alpha1.LocalUIDReference{Name: "foo"},
 				},
 			},
 			Not(ContainElement(ForbiddenField("spec"))),

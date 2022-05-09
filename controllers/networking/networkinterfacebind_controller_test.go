@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package compute
+package networking
 
 import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
-	"github.com/onmetal/onmetal-api/controllers/shared"
 	"github.com/onmetal/onmetal-api/testutils"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -29,11 +27,11 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-var _ = Describe("MachineReconciler", func() {
+var _ = Describe("NetworkInterfaceBindReconciler", func() {
 	ctx := testutils.SetupContext()
 	ns := SetupTest(ctx)
 
-	It("should manage ephemeral network interfaces", func() {
+	It("should reconcile the binding phase", func() {
 		By("creating a network")
 		network := &networkingv1alpha1.Network{
 			ObjectMeta: metav1.ObjectMeta{
@@ -42,6 +40,33 @@ var _ = Describe("MachineReconciler", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())
+
+		By("creating a network interface")
+		nic := &networkingv1alpha1.NetworkInterface{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "nic-",
+			},
+			Spec: networkingv1alpha1.NetworkInterfaceSpec{
+				NetworkRef: corev1.LocalObjectReference{Name: network.Name},
+				IPFamilies: []corev1.IPFamily{
+					corev1.IPv4Protocol,
+				},
+				IPs: []networkingv1alpha1.IPSource{
+					{
+						Value: commonv1alpha1.MustParseNewIP("10.0.0.1"),
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
+
+		By("waiting for the phase to be unbound")
+		nicKey := client.ObjectKeyFromObject(nic)
+		Eventually(func() networkingv1alpha1.NetworkInterfacePhase {
+			Expect(k8sClient.Get(ctx, nicKey, nic)).To(Succeed())
+			return nic.Status.Phase
+		}).Should(Equal(networkingv1alpha1.NetworkInterfacePhaseUnbound))
 
 		By("creating a machine")
 		machine := &computev1alpha1.Machine{
@@ -56,13 +81,8 @@ var _ = Describe("MachineReconciler", func() {
 					{
 						Name: "interface",
 						InterfaceSource: computev1alpha1.InterfaceSource{
-							Ephemeral: &computev1alpha1.EphemeralNetworkInterfaceSource{
-								NetworkInterfaceTemplate: &networkingv1alpha1.NetworkInterfaceTemplateSpec{
-									Spec: networkingv1alpha1.NetworkInterfaceSpec{
-										NetworkRef: corev1.LocalObjectReference{Name: network.Name},
-										IPs:        []networkingv1alpha1.IPSource{{Value: commonv1alpha1.MustParseNewIP("10.0.0.1")}},
-									},
-								},
+							NetworkInterfaceRef: &corev1.LocalObjectReference{
+								Name: nic.Name,
 							},
 						},
 					},
@@ -71,19 +91,23 @@ var _ = Describe("MachineReconciler", func() {
 		}
 		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
 
-		By("waiting for the network interface to exist")
-		nic := &networkingv1alpha1.NetworkInterface{}
-		nicKey := client.ObjectKey{Namespace: ns.Name, Name: shared.MachineEphemeralNetworkInterfaceName(machine.Name, "interface")}
+		By("waiting for the assignment and the phase to be bound")
 		Eventually(func(g Gomega) {
-			err := k8sClient.Get(ctx, nicKey, nic)
-			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
-			g.Expect(err).NotTo(HaveOccurred())
+			Expect(k8sClient.Get(ctx, nicKey, nic)).To(Succeed())
 
-			g.Expect(metav1.IsControlledBy(nic, machine)).To(BeTrue(), "network interface is not controlled by machine: %#v", nic.OwnerReferences)
-			g.Expect(nic.Spec.MachineRef).To(Equal(&commonv1alpha1.LocalUIDReference{
-				Name: machine.Name,
-				UID:  machine.UID,
-			}))
+			g.Expect(nic.Spec.MachineRef).To(Equal(&commonv1alpha1.LocalUIDReference{Name: machine.Name, UID: machine.UID}))
+			g.Expect(nic.Status.Phase).To(Equal(networkingv1alpha1.NetworkInterfacePhaseBound))
+		}).Should(Succeed())
+
+		By("deleting the machine")
+		Expect(k8sClient.Delete(ctx, machine)).To(Succeed())
+
+		By("waiting for the assignment and the phase to be unbound")
+		Eventually(func(g Gomega) {
+			Expect(k8sClient.Get(ctx, nicKey, nic)).To(Succeed())
+
+			g.Expect(nic.Spec.MachineRef).To(BeNil())
+			g.Expect(nic.Status.Phase).To(Equal(networkingv1alpha1.NetworkInterfacePhaseUnbound))
 		}).Should(Succeed())
 	})
 })

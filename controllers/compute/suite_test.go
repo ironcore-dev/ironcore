@@ -21,6 +21,9 @@ import (
 	"testing"
 	"time"
 
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
+	"github.com/onmetal/onmetal-api/controllers/networking"
+	"github.com/onmetal/onmetal-api/controllers/shared"
 	"github.com/onmetal/onmetal-api/envtestutils"
 	"github.com/onmetal/onmetal-api/envtestutils/apiserver"
 	"github.com/onmetal/onmetal-api/testutils/apiserverbin"
@@ -90,6 +93,7 @@ var _ = BeforeSuite(func() {
 
 	Expect(computev1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
 	Expect(ipamv1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
+	Expect(networkingv1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
 
 	//+kubebuilder:scaffold:scheme
 
@@ -142,6 +146,9 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 			MetricsBindAddress: "0",
 		})
 		Expect(err).ToNot(HaveOccurred())
+
+		Expect(networking.SetupNetworkInterfaceVirtualIPNameFieldIndexer(k8sManager)).To(Succeed())
+		Expect(shared.SetupMachineNetworkInterfaceNamesFieldIndexer(k8sManager)).To(Succeed())
 
 		// register reconciler here
 		Expect((&MachineScheduler{

@@ -69,6 +69,9 @@ type Interface struct {
 type InterfaceSource struct {
 	// NetworkInterfaceRef instructs to use the NetworkInterface at the target reference.
 	NetworkInterfaceRef *corev1.LocalObjectReference
+	// Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object)
+	// NetworkInterface to use.
+	Ephemeral *EphemeralNetworkInterfaceSource
 }
 
 // Volume defines a volume attachment of a machine
@@ -92,8 +95,12 @@ const (
 	RetainPolicyPersistent          RetainPolicy = "Persistent"
 )
 
-// InterfaceStatus reports the status of an Interface.
-type InterfaceStatus struct{}
+// InterfaceStatus reports the status of an InterfaceSource.
+type InterfaceStatus struct {
+	Name      string
+	IPs       []commonv1alpha1.IP
+	VirtualIP *commonv1alpha1.IP
+}
 
 // VolumeStatus is the status of a Volume.
 type VolumeStatus struct {

@@ -79,13 +79,13 @@ func (r *VirtualIPReconciler) phaseTransitionTimedOut(timestamp *metav1.Time) bo
 func (r *VirtualIPReconciler) reconcile(ctx context.Context, log logr.Logger, virtualIP *networkingv1alpha1.VirtualIP) (ctrl.Result, error) {
 	log.V(1).Info("Reconciling virtual ip")
 	if virtualIP.Spec.TargetRef == nil {
-		return r.reconcileNoTarget(ctx, log, virtualIP)
+		return r.reconcileUnbound(ctx, log, virtualIP)
 	}
 
-	return r.reconcileTarget(ctx, log, virtualIP)
+	return r.reconcileBound(ctx, log, virtualIP)
 }
 
-func (r *VirtualIPReconciler) reconcileTarget(ctx context.Context, log logr.Logger, virtualIP *networkingv1alpha1.VirtualIP) (ctrl.Result, error) {
+func (r *VirtualIPReconciler) reconcileBound(ctx context.Context, log logr.Logger, virtualIP *networkingv1alpha1.VirtualIP) (ctrl.Result, error) {
 	nic := &networkingv1alpha1.NetworkInterface{}
 	nicKey := client.ObjectKey{
 		Namespace: virtualIP.Namespace,
@@ -101,27 +101,27 @@ func (r *VirtualIPReconciler) reconcileTarget(ctx context.Context, log logr.Logg
 
 	nicExists := err == nil
 	validReferences := nicExists && r.validReferences(virtualIP, nic)
-	virtualIPPhase := virtualIP.Status.Phase
-	virtualIPPhaseLastTransitionTime := virtualIP.Status.LastPhaseTransitionTime
+	phase := virtualIP.Status.Phase
+	phaseLastTransitionTime := virtualIP.Status.LastPhaseTransitionTime
 
 	log = log.WithValues(
 		"NetworkInterfaceExists", nicExists,
 		"ValidReferences", validReferences,
-		"VirtualIPPhase", virtualIPPhase,
-		"VirtualIPPhaseLastTransitionTime", virtualIPPhaseLastTransitionTime,
+		"Phase", phase,
+		"PhaseLastTransitionTime", phaseLastTransitionTime,
 	)
 	switch {
 	case validReferences:
 		log.V(1).Info("Setting virtual ip to bound")
-		if err := r.patchVirtualIPStatus(ctx, virtualIP, networkingv1alpha1.VirtualIPPhaseBound); err != nil {
+		if err := r.patchStatus(ctx, virtualIP, networkingv1alpha1.VirtualIPPhaseBound); err != nil {
 			return ctrl.Result{}, fmt.Errorf("error binding virtualip: %w", err)
 		}
 
 		log.V(1).Info("Successfully set virtual ip to bound.")
 		return ctrl.Result{}, nil
-	case !validReferences && virtualIPPhase == networkingv1alpha1.VirtualIPPhasePending && r.phaseTransitionTimedOut(virtualIPPhaseLastTransitionTime):
+	case !validReferences && phase == networkingv1alpha1.VirtualIPPhasePending && r.phaseTransitionTimedOut(phaseLastTransitionTime):
 		log.V(1).Info("Bind is not ok and timed out, releasing virtual ip")
-		if err := r.releaseVirtualIP(ctx, virtualIP); err != nil {
+		if err := r.release(ctx, virtualIP); err != nil {
 			return ctrl.Result{}, fmt.Errorf("error releasing virtualip: %w", err)
 		}
 
@@ -129,7 +129,7 @@ func (r *VirtualIPReconciler) reconcileTarget(ctx context.Context, log logr.Logg
 		return ctrl.Result{}, nil
 	default:
 		log.V(1).Info("Bind is not ok and not yet timed out, setting to pending")
-		if err := r.patchVirtualIPStatus(ctx, virtualIP, networkingv1alpha1.VirtualIPPhasePending); err != nil {
+		if err := r.patchStatus(ctx, virtualIP, networkingv1alpha1.VirtualIPPhasePending); err != nil {
 			return ctrl.Result{}, fmt.Errorf("error setting virtualip to pending: %w", err)
 		}
 
@@ -138,43 +138,45 @@ func (r *VirtualIPReconciler) reconcileTarget(ctx context.Context, log logr.Logg
 	}
 }
 
-func (r *VirtualIPReconciler) reconcileNoTarget(ctx context.Context, log logr.Logger, virtualIP *networkingv1alpha1.VirtualIP) (ctrl.Result, error) {
+func (r *VirtualIPReconciler) reconcileUnbound(ctx context.Context, log logr.Logger, virtualIP *networkingv1alpha1.VirtualIP) (ctrl.Result, error) {
+	log.V(1).Info("Reconcile unbound")
+
 	if virtualIP.Status.IP == nil {
-		log.V(1).Info("VirtualIP is not bound, not referencing any target and does not have an ip assigned, marking it as unbound")
-		if err := r.patchVirtualIPStatus(ctx, virtualIP, networkingv1alpha1.VirtualIPPhaseUnbound); err != nil {
+		log.V(1).Info("No ip assigned, marking as phase unbound")
+		if err := r.patchStatus(ctx, virtualIP, networkingv1alpha1.VirtualIPPhaseUnbound); err != nil {
 			return ctrl.Result{}, err
 		}
 
-		log.V(1).Info("Successfully marked VirtualIP as unbound")
+		log.V(1).Info("Successfully marked as phase unbound")
 		return ctrl.Result{}, nil
 	}
 
-	log.V(1).Info("Virtual IP is not bound but has an IP assigned, searching for matching network interface")
+	log.V(1).Info("IP assigned, searching for suitable requester")
 	nic, err := r.getMatchingNetworkInterface(ctx, virtualIP)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
 
 	if nic == nil {
-		log.V(1).Info("No matching network interface found, setting to unbound")
-		if err := r.patchVirtualIPStatus(ctx, virtualIP, networkingv1alpha1.VirtualIPPhaseUnbound); err != nil {
+		log.V(1).Info("No requester found, setting to phase unbound")
+		if err := r.patchStatus(ctx, virtualIP, networkingv1alpha1.VirtualIPPhaseUnbound); err != nil {
 			return ctrl.Result{}, err
 		}
-		log.V(1).Info("Successfully set virtual ip to unbound")
+		log.V(1).Info("Successfully set to phase unbound")
 		return ctrl.Result{}, nil
 	}
 
 	log = log.WithValues("NetworkInterfaceKey", client.ObjectKeyFromObject(nic))
-	log.V(1).Info("Found a matching network interface and assigning virtual ip to it")
-	if err := r.assignToNetworkInterface(ctx, virtualIP, nic); err != nil {
+	log.V(1).Info("Found a matching requester, assigning to it")
+	if err := r.assign(ctx, virtualIP, nic); err != nil {
 		return ctrl.Result{}, err
 	}
 
-	log.V(1).Info("Successfully assigned virtual ip to network interface")
+	log.V(1).Info("Successfully assigned")
 	return ctrl.Result{}, nil
 }
 
-func (r *VirtualIPReconciler) assignToNetworkInterface(ctx context.Context, virtualIP *networkingv1alpha1.VirtualIP, nic *networkingv1alpha1.NetworkInterface) error {
+func (r *VirtualIPReconciler) assign(ctx context.Context, virtualIP *networkingv1alpha1.VirtualIP, nic *networkingv1alpha1.NetworkInterface) error {
 	base := virtualIP.DeepCopy()
 	virtualIP.Spec.TargetRef = &commonv1alpha1.LocalUIDReference{Name: nic.Name, UID: nic.UID}
 	if err := r.Patch(ctx, virtualIP, client.MergeFrom(base)); err != nil {
@@ -189,7 +191,7 @@ func (r *VirtualIPReconciler) getMatchingNetworkInterface(ctx context.Context, v
 		client.InNamespace(virtualIP.Namespace),
 		client.MatchingFields{networkInterfaceVirtualIPNames: virtualIP.Name},
 	); err != nil {
-		return nil, fmt.Errorf("error listing suitable network interfaces: %w", err)
+		return nil, fmt.Errorf("error listing suitable requesters: %w", err)
 	}
 
 	var matches []networkingv1alpha1.NetworkInterface
@@ -210,8 +212,12 @@ func (r *VirtualIPReconciler) getMatchingNetworkInterface(ctx context.Context, v
 }
 
 func (r *VirtualIPReconciler) networkInterfaceReferencesVirtualIP(virtualIP *networkingv1alpha1.VirtualIP, nic *networkingv1alpha1.NetworkInterface) bool {
-	// TODO: Should we give higher priority to bindings via `ephemeral`?
-	return NetworkInterfaceVirtualIPName(nic) == virtualIP.Name
+	nicVirtualIP := nic.Spec.VirtualIP
+	if nicVirtualIP == nil {
+		return false
+	}
+
+	return NetworkInterfaceVirtualIPName(nic.Name, *nicVirtualIP) == virtualIP.Name
 }
 
 func (r *VirtualIPReconciler) requeueAfterBoundTimeout(virtualIP *networkingv1alpha1.VirtualIP) ctrl.Result {
@@ -243,13 +249,13 @@ func (r *VirtualIPReconciler) validReferences(virtualIP *networkingv1alpha1.Virt
 	}
 }
 
-func (r *VirtualIPReconciler) releaseVirtualIP(ctx context.Context, virtualIP *networkingv1alpha1.VirtualIP) error {
+func (r *VirtualIPReconciler) release(ctx context.Context, virtualIP *networkingv1alpha1.VirtualIP) error {
 	baseVirtualIP := virtualIP.DeepCopy()
 	virtualIP.Spec.TargetRef = nil
 	return r.Patch(ctx, virtualIP, client.MergeFrom(baseVirtualIP))
 }
 
-func (r *VirtualIPReconciler) patchVirtualIPStatus(ctx context.Context, virtualIP *networkingv1alpha1.VirtualIP, phase networkingv1alpha1.VirtualIPPhase) error {
+func (r *VirtualIPReconciler) patchStatus(ctx context.Context, virtualIP *networkingv1alpha1.VirtualIP, phase networkingv1alpha1.VirtualIPPhase) error {
 	now := metav1.Now()
 	virtualIPBase := virtualIP.DeepCopy()
 
@@ -302,7 +308,7 @@ func (r *VirtualIPReconciler) enqueueByTargetNameReferencingNetworkInterface(ctx
 		if err := r.List(ctx, virtualIPs, client.InNamespace(nic.Namespace), client.MatchingFields{
 			virtualIPSpecTargetRefNameField: nic.Name,
 		}); err != nil {
-			log.Error(err, "Error listing network interfaces using virtual ip")
+			log.Error(err, "Error listing virtual ips targeting network interface")
 			return []ctrl.Request{}
 		}
 
@@ -323,7 +329,12 @@ func (r *VirtualIPReconciler) enqueueByNameEqualNetworkInterfaceVirtualIPName(ct
 	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
 		nic := obj.(*networkingv1alpha1.NetworkInterface)
 
-		nicVirtualIPName := NetworkInterfaceVirtualIPName(nic)
+		nicVirtualIP := nic.Spec.VirtualIP
+		if nicVirtualIP == nil {
+			return nil
+		}
+
+		nicVirtualIPName := NetworkInterfaceVirtualIPName(nic.Name, *nicVirtualIP)
 		if nicVirtualIPName == "" {
 			return nil
 		}

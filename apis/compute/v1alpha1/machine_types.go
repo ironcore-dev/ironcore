@@ -69,6 +69,9 @@ type Interface struct {
 type InterfaceSource struct {
 	// NetworkInterfaceRef instructs to use the NetworkInterface at the target reference.
 	NetworkInterfaceRef *corev1.LocalObjectReference `json:"networkInterfaceRef,omitempty"`
+	// Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object)
+	// NetworkInterface to use.
+	Ephemeral *EphemeralNetworkInterfaceSource `json:"ephemeral,omitempty"`
 }
 
 // Volume defines a volume attachment of a machine
@@ -93,7 +96,11 @@ const (
 )
 
 // InterfaceStatus reports the status of an InterfaceSource.
-type InterfaceStatus struct{}
+type InterfaceStatus struct {
+	Name      string              `json:"name,omitempty"`
+	IPs       []commonv1alpha1.IP `json:"ips"`
+	VirtualIP *commonv1alpha1.IP  `json:"virtualIP,omitempty"`
+}
 
 // VolumeStatus is the status of a Volume.
 type VolumeStatus struct {
