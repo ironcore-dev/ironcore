@@ -16,6 +16,7 @@ Following tools are required to work on that package.
 * [make](https://www.gnu.org/software/make/) - to execute build goals
 * [docker](https://www.docker.com) - to run the local mkdocs environment
 * [git](https://git-scm.com/downloads) - to be able to commit any changes to repository
+* [kubectl](https://kubernetes.io/docs/reference/kubectl/) (>= v1.23.4) - to be able to talk to the kubernetes cluster
   
 !!! note
     If you don't have Docker installed on your machine please follow one of those guides:
