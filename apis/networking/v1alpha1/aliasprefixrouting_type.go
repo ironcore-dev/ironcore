@@ -18,17 +18,8 @@ package v1alpha1
 
 import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
-
-// AliasPrefixRoutingSubset is one of the targets of a AliasPrefixRouting
-type AliasPrefixRoutingSubset struct {
-	// MachinePoolRef is the machine pool hosting the targeted entities.
-	MachinePoolRef commonv1alpha1.LocalUIDReference `json:"machinePoolRef"`
-	// Targets are the entities targeted by the alias prefix routing.
-	Targets []commonv1alpha1.LocalUIDReference `json:"targets"`
-}
 
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -38,10 +29,8 @@ type AliasPrefixRouting struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// NetworkRef is the Network this AliasPrefixRouting should belong to
-	NetworkRef corev1.LocalObjectReference `json:"networkRef"`
-	// Subsets are the subsets that make up an AliasPrefixRouting
-	Subsets []AliasPrefixRoutingSubset `json:"subsets,omitempty"`
+	// Destinations are the destinations for an AliasPrefix.
+	Destinations []commonv1alpha1.LocalUIDReference `json:"destinations"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

@@ -72,6 +72,7 @@ const (
 	networkInterfaceController     = "networkinterface"
 	networkInterfaceBindController = "networkinterfacebind"
 	virtualIPController            = "virtualip"
+	aliasPrefixController          = "aliasprefix"
 )
 
 func init() {
@@ -109,7 +110,7 @@ func main() {
 		volumePoolController, volumeClassController, volumeController, volumeClaimController, volumeScheduler, volumeClaimScheduler,
 
 		// Networking controllers
-		networkInterfaceController, networkInterfaceBindController, virtualIPController,
+		networkInterfaceController, networkInterfaceBindController, virtualIPController, aliasPrefixController,
 
 		// IPAM controllers
 		prefixController, prefixAllocationScheduler,
@@ -320,6 +321,16 @@ func main() {
 			BindTimeout: virtualIPBindTimeout,
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "VirtualIP")
+			os.Exit(1)
+		}
+	}
+
+	if controllers.Enabled(aliasPrefixController) {
+		if err = (&networking.AliasPrefixReconciler{
+			Client: mgr.GetClient(),
+			Scheme: mgr.GetScheme(),
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "AliasPrefix")
 			os.Exit(1)
 		}
 	}

@@ -116,7 +116,7 @@ PrefixSource
 </em>
 </td>
 <td>
-<p>Prefix is the provided Prefix or EphemeralPrefix which
+<p>Prefix is the provided Prefix or Ephemeral which
 should be used by this AliasPrefix</p>
 </td>
 </tr>
@@ -183,28 +183,15 @@ Refer to the Kubernetes API documentation for the fields of the
 </tr>
 <tr>
 <td>
-<code>networkRef</code><br/>
+<code>destinations</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference">
+[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
 </a>
 </em>
 </td>
 <td>
-<p>NetworkRef is the Network this AliasPrefixRouting should belong to</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>subsets</code><br/>
-<em>
-<a href="#networking.api.onmetal.de/v1alpha1.AliasPrefixRoutingSubset">
-[]AliasPrefixRoutingSubset
-</a>
-</em>
-</td>
-<td>
-<p>Subsets are the subsets that make up an AliasPrefixRouting</p>
+<p>Destinations are the destinations for an AliasPrefix.</p>
 </td>
 </tr>
 </tbody>
@@ -590,50 +577,6 @@ VirtualIPStatus
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.AliasPrefixRoutingSubset">AliasPrefixRoutingSubset
-</h3>
-<p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.AliasPrefixRouting">AliasPrefixRouting</a>)
-</p>
-<div>
-<p>AliasPrefixRoutingSubset is one of the targets of a AliasPrefixRouting</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>machinePoolRef</code><br/>
-<em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
-</a>
-</em>
-</td>
-<td>
-<p>MachinePoolRef is the machine pool hosting the targeted entities.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>targets</code><br/>
-<em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference">
-[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
-</a>
-</em>
-</td>
-<td>
-<p>Targets are the entities targeted by the alias prefix routing.</p>
-</td>
-</tr>
-</tbody>
-</table>
 <h3 id="networking.api.onmetal.de/v1alpha1.AliasPrefixSpec">AliasPrefixSpec
 </h3>
 <p>
@@ -687,7 +630,7 @@ PrefixSource
 </em>
 </td>
 <td>
-<p>Prefix is the provided Prefix or EphemeralPrefix which
+<p>Prefix is the provided Prefix or Ephemeral which
 should be used by this AliasPrefix</p>
 </td>
 </tr>
@@ -1148,7 +1091,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
 </tr>
 <tr>
 <td>
-<code>ephemeralPrefix</code><br/>
+<code>ephemeral</code><br/>
 <em>
 <a href="#networking.api.onmetal.de/v1alpha1.EphemeralPrefixSource">
 EphemeralPrefixSource
@@ -1156,7 +1099,7 @@ EphemeralPrefixSource
 </em>
 </td>
 <td>
-<p>EphemeralPrefix defines the Prefix which should be allocated by the AliasPrefix</p>
+<p>Ephemeral defines the Prefix which should be allocated by the AliasPrefix</p>
 </td>
 </tr>
 </tbody>

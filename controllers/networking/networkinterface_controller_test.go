@@ -201,8 +201,9 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 		}).Should(Succeed())
 
 		By("updating the virtual ip ip")
+		baseVirtualIP := virtualIP.DeepCopy()
 		virtualIP.Status.IP = commonv1alpha1.MustParseNewIP("10.0.0.1")
-		Expect(k8sClient.Status().Update(ctx, virtualIP)).To(Succeed())
+		Expect(k8sClient.Status().Patch(ctx, virtualIP, client.MergeFrom(baseVirtualIP))).To(Succeed())
 
 		By("waiting for the virtual ip to be reported in the network interface status")
 		nicKey := client.ObjectKeyFromObject(nic)

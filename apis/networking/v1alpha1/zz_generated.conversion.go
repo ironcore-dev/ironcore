@@ -349,8 +349,7 @@ func Convert_networking_AliasPrefixList_To_v1alpha1_AliasPrefixList(in *networki
 
 func autoConvert_v1alpha1_AliasPrefixRouting_To_networking_AliasPrefixRouting(in *AliasPrefixRouting, out *networking.AliasPrefixRouting, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
-	out.NetworkRef = in.NetworkRef
-	out.Subsets = *(*[]networking.AliasPrefixSubset)(unsafe.Pointer(&in.Subsets))
+	out.Destinations = *(*[]commonv1alpha1.LocalUIDReference)(unsafe.Pointer(&in.Destinations))
 	return nil
 }
 
@@ -361,8 +360,7 @@ func Convert_v1alpha1_AliasPrefixRouting_To_networking_AliasPrefixRouting(in *Al
 
 func autoConvert_networking_AliasPrefixRouting_To_v1alpha1_AliasPrefixRouting(in *networking.AliasPrefixRouting, out *AliasPrefixRouting, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
-	out.NetworkRef = in.NetworkRef
-	out.Subsets = *(*[]AliasPrefixRoutingSubset)(unsafe.Pointer(&in.Subsets))
+	out.Destinations = *(*[]commonv1alpha1.LocalUIDReference)(unsafe.Pointer(&in.Destinations))
 	return nil
 }
 
@@ -729,7 +727,7 @@ func Convert_networking_NetworkList_To_v1alpha1_NetworkList(in *networking.Netwo
 
 func autoConvert_v1alpha1_PrefixSource_To_networking_PrefixSource(in *PrefixSource, out *networking.PrefixSource, s conversion.Scope) error {
 	out.Value = (*commonv1alpha1.IPPrefix)(unsafe.Pointer(in.Value))
-	out.EphemeralPrefix = (*networking.EphemeralPrefixSource)(unsafe.Pointer(in.EphemeralPrefix))
+	out.Ephemeral = (*networking.EphemeralPrefixSource)(unsafe.Pointer(in.Ephemeral))
 	return nil
 }
 
@@ -740,7 +738,7 @@ func Convert_v1alpha1_PrefixSource_To_networking_PrefixSource(in *PrefixSource, 
 
 func autoConvert_networking_PrefixSource_To_v1alpha1_PrefixSource(in *networking.PrefixSource, out *PrefixSource, s conversion.Scope) error {
 	out.Value = (*commonv1alpha1.IPPrefix)(unsafe.Pointer(in.Value))
-	out.EphemeralPrefix = (*EphemeralPrefixSource)(unsafe.Pointer(in.EphemeralPrefix))
+	out.Ephemeral = (*EphemeralPrefixSource)(unsafe.Pointer(in.Ephemeral))
 	return nil
 }
 

@@ -37,9 +37,9 @@ func RegisterDefaults(scheme *runtime.Scheme) error {
 }
 
 func SetObjectDefaults_AliasPrefix(in *AliasPrefix) {
-	if in.Spec.Prefix.EphemeralPrefix != nil {
-		if in.Spec.Prefix.EphemeralPrefix.PrefixTemplate != nil {
-			ipamv1alpha1.SetDefaults_PrefixSpec(&in.Spec.Prefix.EphemeralPrefix.PrefixTemplate.Spec)
+	if in.Spec.Prefix.Ephemeral != nil {
+		if in.Spec.Prefix.Ephemeral.PrefixTemplate != nil {
+			ipamv1alpha1.SetDefaults_PrefixSpec(&in.Spec.Prefix.Ephemeral.PrefixTemplate.Spec)
 		}
 	}
 }

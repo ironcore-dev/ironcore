@@ -144,6 +144,12 @@ var _ = BeforeSuite(func() {
 	}).SetupWithManager(k8sManager)
 	Expect(err).NotTo(HaveOccurred())
 
+	err = (&AliasPrefixReconciler{
+		Client: k8sManager.GetClient(),
+		Scheme: k8sManager.GetScheme(),
+	}).SetupWithManager(k8sManager)
+	Expect(err).NotTo(HaveOccurred())
+
 	err = (&ipam.PrefixReconciler{
 		Client:                  k8sManager.GetClient(),
 		APIReader:               k8sManager.GetAPIReader(),
