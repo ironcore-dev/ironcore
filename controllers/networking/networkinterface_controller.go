@@ -132,7 +132,7 @@ func (r *NetworkInterfaceReconciler) applyIPs(ctx context.Context, nic *networki
 				return nil, fmt.Errorf("error managing ephemeral prefix %s: %w", prefix.Name, err)
 			}
 
-			if ipamv1alpha1.GetPrefixReadiness(prefix) == ipamv1alpha1.ReadinessSucceeded {
+			if prefix.Status.Phase == ipamv1alpha1.PrefixPhaseAllocated {
 				ips = append(ips, prefix.Spec.Prefix.IP())
 			}
 		}

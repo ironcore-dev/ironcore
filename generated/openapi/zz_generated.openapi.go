@@ -62,11 +62,9 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.VolumeStatus":                    schema_onmetal_api_apis_compute_v1alpha1_VolumeStatus(ref),
 		"github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.Prefix":                             schema_onmetal_api_apis_ipam_v1alpha1_Prefix(ref),
 		"github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixAllocation":                   schema_onmetal_api_apis_ipam_v1alpha1_PrefixAllocation(ref),
-		"github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixAllocationCondition":          schema_onmetal_api_apis_ipam_v1alpha1_PrefixAllocationCondition(ref),
 		"github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixAllocationList":               schema_onmetal_api_apis_ipam_v1alpha1_PrefixAllocationList(ref),
 		"github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixAllocationSpec":               schema_onmetal_api_apis_ipam_v1alpha1_PrefixAllocationSpec(ref),
 		"github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixAllocationStatus":             schema_onmetal_api_apis_ipam_v1alpha1_PrefixAllocationStatus(ref),
-		"github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixCondition":                    schema_onmetal_api_apis_ipam_v1alpha1_PrefixCondition(ref),
 		"github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixList":                         schema_onmetal_api_apis_ipam_v1alpha1_PrefixList(ref),
 		"github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixSpec":                         schema_onmetal_api_apis_ipam_v1alpha1_PrefixSpec(ref),
 		"github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixStatus":                       schema_onmetal_api_apis_ipam_v1alpha1_PrefixStatus(ref),
@@ -1610,53 +1608,6 @@ func schema_onmetal_api_apis_ipam_v1alpha1_PrefixAllocation(ref common.Reference
 	}
 }
 
-func schema_onmetal_api_apis_ipam_v1alpha1_PrefixAllocationCondition(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"type": {
-						SchemaProps: spec.SchemaProps{
-							Default: "",
-							Type:    []string{"string"},
-							Format:  "",
-						},
-					},
-					"status": {
-						SchemaProps: spec.SchemaProps{
-							Default: "",
-							Type:    []string{"string"},
-							Format:  "",
-						},
-					},
-					"reason": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"message": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"lastTransitionTime": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
-						},
-					},
-				},
-				Required: []string{"type", "status"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
-	}
-}
-
 func schema_onmetal_api_apis_ipam_v1alpha1_PrefixAllocationList(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -1766,72 +1717,24 @@ func schema_onmetal_api_apis_ipam_v1alpha1_PrefixAllocationStatus(ref common.Ref
 							Ref:         ref("github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix"),
 						},
 					},
-					"conditions": {
+					"phase": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Conditions represent various state aspects of a PrefixAllocation.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixAllocationCondition"),
-									},
-								},
-							},
+							Description: "Phase is the phase of the PrefixAllocation.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"lastPhaseTransitionTime": {
+						SchemaProps: spec.SchemaProps{
+							Description: "LastPhaseTransitionTime is the last time the Phase changed values.",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix", "github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixAllocationCondition"},
-	}
-}
-
-func schema_onmetal_api_apis_ipam_v1alpha1_PrefixCondition(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"type": {
-						SchemaProps: spec.SchemaProps{
-							Default: "",
-							Type:    []string{"string"},
-							Format:  "",
-						},
-					},
-					"status": {
-						SchemaProps: spec.SchemaProps{
-							Default: "",
-							Type:    []string{"string"},
-							Format:  "",
-						},
-					},
-					"reason": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"message": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"lastTransitionTime": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
-						},
-					},
-				},
-				Required: []string{"type", "status"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+			"github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
 	}
 }
 
@@ -1938,18 +1841,17 @@ func schema_onmetal_api_apis_ipam_v1alpha1_PrefixStatus(ref common.ReferenceCall
 				Description: "PrefixStatus defines the observed state of Prefix",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"conditions": {
+					"phase": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Conditions is a list of conditions of a Prefix.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixCondition"),
-									},
-								},
-							},
+							Description: "Phase is the PrefixPhase of the Prefix.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"lastPhaseTransitionTime": {
+						SchemaProps: spec.SchemaProps{
+							Description: "LastPhaseTransitionTime is the last time the Phase changed values.",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
 						},
 					},
 					"used": {
@@ -1970,7 +1872,7 @@ func schema_onmetal_api_apis_ipam_v1alpha1_PrefixStatus(ref common.ReferenceCall
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix", "github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixCondition"},
+			"github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
 	}
 }
 

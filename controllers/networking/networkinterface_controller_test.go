@@ -134,7 +134,7 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 				ParentRef: &corev1.LocalObjectReference{Name: rootPrefix.Name},
 				Prefix:    commonv1alpha1.MustParseNewIPPrefix("10.0.0.1/32"),
 			}))
-			g.Expect(ipamv1alpha1.GetPrefixReadiness(prefix)).To(Equal(ipamv1alpha1.ReadinessSucceeded))
+			g.Expect(prefix.Status.Phase).To(Equal(ipamv1alpha1.PrefixPhaseAllocated))
 		}).Should(Succeed())
 
 		By("waiting for the network interface to report the correct ips")

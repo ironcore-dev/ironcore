@@ -38,26 +38,36 @@ type PrefixAllocationSpec struct {
 	PrefixSelector *metav1.LabelSelector `json:"prefixSelector,omitempty"`
 }
 
+// PrefixAllocationPhase is a phase a PrefixAllocation can be in.
+type PrefixAllocationPhase string
+
+func (p PrefixAllocationPhase) IsTerminal() bool {
+	switch p {
+	case PrefixAllocationPhaseFailed, PrefixAllocationPhaseAllocated:
+		return true
+	default:
+		return false
+	}
+}
+
+const (
+	// PrefixAllocationPhasePending marks a PrefixAllocation as waiting for allocation.
+	PrefixAllocationPhasePending PrefixAllocationPhase = "Pending"
+	// PrefixAllocationPhaseAllocated marks a PrefixAllocation as allocated by a Prefix.
+	PrefixAllocationPhaseAllocated PrefixAllocationPhase = "Allocated"
+	// PrefixAllocationPhaseFailed marks a PrefixAllocation as failed.
+	PrefixAllocationPhaseFailed PrefixAllocationPhase = "Failed"
+)
+
 // PrefixAllocationStatus is the status of a PrefixAllocation.
 type PrefixAllocationStatus struct {
 	// Prefix is the allocated prefix, if any
 	Prefix *commonv1alpha1.IPPrefix `json:"prefix,omitempty"`
-	// Conditions represent various state aspects of a PrefixAllocation.
-	Conditions []PrefixAllocationCondition `json:"conditions,omitempty"`
-}
 
-type PrefixAllocationConditionType string
-
-const (
-	PrefixAllocationReady PrefixAllocationConditionType = "Ready"
-)
-
-type PrefixAllocationCondition struct {
-	Type               PrefixAllocationConditionType `json:"type"`
-	Status             corev1.ConditionStatus        `json:"status"`
-	Reason             string                        `json:"reason,omitempty"`
-	Message            string                        `json:"message,omitempty"`
-	LastTransitionTime metav1.Time                   `json:"lastTransitionTime,omitempty"`
+	// Phase is the phase of the PrefixAllocation.
+	Phase PrefixAllocationPhase `json:"phase,omitempty"`
+	// LastPhaseTransitionTime is the last time the Phase changed values.
+	LastPhaseTransitionTime *metav1.Time `json:"lastPhaseTransitionTime,omitempty"`
 }
 
 // +genclient

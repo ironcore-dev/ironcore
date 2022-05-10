@@ -56,7 +56,7 @@ var _ = Describe("PrefixReconciler", func() {
 		prefixKey := client.ObjectKeyFromObject(prefix)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, prefixKey, prefix)).To(Succeed())
-			g.Expect(ipamv1alpha1.GetPrefixReadiness(prefix)).To(Equal(ipamv1alpha1.ReadinessSucceeded))
+			g.Expect(prefix.Status.Phase).To(Equal(ipamv1alpha1.PrefixPhaseAllocated))
 			g.Expect(prefix.Status.Used).To(BeEmpty())
 		}).Should(Succeed())
 	})
@@ -96,7 +96,7 @@ var _ = Describe("PrefixReconciler", func() {
 		childPrefixKey := client.ObjectKeyFromObject(childPrefix)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, childPrefixKey, childPrefix)).To(Succeed())
-			g.Expect(ipamv1alpha1.GetPrefixReadiness(childPrefix)).To(Equal(ipamv1alpha1.ReadinessSucceeded))
+			g.Expect(childPrefix.Status.Phase).To(Equal(ipamv1alpha1.PrefixPhaseAllocated))
 			g.Expect(childPrefix.Spec.ParentRef).To(Equal(&corev1.LocalObjectReference{
 				Name: rootPrefix.Name,
 			}))
@@ -113,7 +113,7 @@ var _ = Describe("PrefixReconciler", func() {
 		Expect(clientutils.ListAndFilterControlledBy(ctx, k8sClient, childPrefix, list, client.InNamespace(ns.Name))).To(Succeed())
 		Expect(list.Items).To(HaveLen(1))
 		allocation := list.Items[0]
-		Expect(ipamv1alpha1.GetPrefixAllocationReadiness(&allocation)).To(Equal(ipamv1alpha1.ReadinessSucceeded))
+		Expect(allocation.Status.Phase).To(Equal(ipamv1alpha1.PrefixAllocationPhaseAllocated))
 		Expect(allocation.Spec).To(Equal(ipamv1alpha1.PrefixAllocationSpec{
 			IPFamily:     corev1.IPv4Protocol,
 			PrefixLength: 28,
@@ -158,13 +158,13 @@ var _ = Describe("PrefixReconciler", func() {
 		childPrefixKey := client.ObjectKeyFromObject(childPrefix)
 		Eventually(func(g Gomega) {
 			g.Expect(k8sClient.Get(ctx, childPrefixKey, childPrefix)).Should(Succeed())
-			g.Expect(ipamv1alpha1.GetPrefixReadiness(childPrefix)).To(Equal(ipamv1alpha1.ReadinessPending))
+			g.Expect(childPrefix.Status.Phase).To(Equal(ipamv1alpha1.PrefixPhasePending))
 
 			list := &ipamv1alpha1.PrefixAllocationList{}
 			g.Expect(clientutils.ListAndFilterControlledBy(ctx, k8sClient, childPrefix, list, client.InNamespace(ns.Name))).To(Succeed())
 			g.Expect(list.Items).To(HaveLen(1))
 			allocation := list.Items[0]
-			g.Expect(ipamv1alpha1.GetPrefixAllocationReadiness(&allocation)).To(Equal(ipamv1alpha1.ReadinessFailed))
+			g.Expect(allocation.Status.Phase).To(Equal(ipamv1alpha1.PrefixAllocationPhaseFailed))
 		}).Should(Succeed())
 	})
 
@@ -191,9 +191,9 @@ var _ = Describe("PrefixReconciler", func() {
 		childPrefixKey := client.ObjectKeyFromObject(childPrefix)
 		Consistently(func(g Gomega) {
 			g.Expect(k8sClient.Get(ctx, childPrefixKey, childPrefix)).Should(Succeed())
-			g.Expect(ipamv1alpha1.GetPrefixReadiness(childPrefix)).To(Or(
-				Equal(ipamv1alpha1.ReadinessPending),
-				Equal(ipamv1alpha1.ReadinessUnknown),
+			g.Expect(childPrefix.Status.Phase).To(Or(
+				BeEquivalentTo(""),
+				Equal(ipamv1alpha1.PrefixPhasePending),
 			))
 			g.Expect(childPrefix.Spec.ParentRef).To(BeNil())
 		}).Should(Succeed())
@@ -203,7 +203,7 @@ var _ = Describe("PrefixReconciler", func() {
 		notMatchingRootPrefix := &ipamv1alpha1.Prefix{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
-				GenerateName: "test-root-",
+				GenerateName: "not-matching-root-",
 			},
 			Spec: ipamv1alpha1.PrefixSpec{
 				Prefix: prefixValue,
@@ -214,7 +214,7 @@ var _ = Describe("PrefixReconciler", func() {
 		By("checking that the child prefix is not being assigned")
 		Consistently(func(g Gomega) {
 			g.Expect(k8sClient.Get(ctx, childPrefixKey, childPrefix)).Should(Succeed())
-			g.Expect(ipamv1alpha1.GetPrefixReadiness(childPrefix)).To(Equal(ipamv1alpha1.ReadinessPending))
+			g.Expect(childPrefix.Status.Phase).To(Equal(ipamv1alpha1.PrefixPhasePending))
 			g.Expect(childPrefix.Spec.ParentRef).To(BeNil())
 		}).Should(Succeed())
 
@@ -222,7 +222,7 @@ var _ = Describe("PrefixReconciler", func() {
 		rootPrefix := &ipamv1alpha1.Prefix{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
-				GenerateName: "test-root-",
+				GenerateName: "matching-root-",
 				Labels: map[string]string{
 					"foo": "bar",
 				},
@@ -237,7 +237,7 @@ var _ = Describe("PrefixReconciler", func() {
 		expectedChildPrefix := commonv1alpha1.MustParseIPPrefix("10.0.0.0/28")
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, childPrefixKey, childPrefix)).To(Succeed())
-			g.Expect(ipamv1alpha1.GetPrefixReadiness(childPrefix)).To(Equal(ipamv1alpha1.ReadinessSucceeded))
+			g.Expect(childPrefix.Status.Phase).To(Equal(ipamv1alpha1.PrefixPhaseAllocated))
 			g.Expect(childPrefix.Spec.ParentRef).To(Equal(&corev1.LocalObjectReference{
 				Name: rootPrefix.Name,
 			}))
@@ -266,7 +266,7 @@ var _ = Describe("PrefixReconciler", func() {
 				},
 			},
 		}))
-		Expect(ipamv1alpha1.GetPrefixAllocationReadiness(allocation)).To(Equal(ipamv1alpha1.ReadinessSucceeded))
+		Expect(allocation.Status.Phase).To(Equal(ipamv1alpha1.PrefixAllocationPhaseAllocated))
 		Expect(allocation.Status.Prefix).To(HaveValue(Equal(expectedChildPrefix)))
 	})
 
@@ -300,7 +300,7 @@ var _ = Describe("PrefixReconciler", func() {
 		childPrefixKey := client.ObjectKeyFromObject(childPrefix)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, childPrefixKey, childPrefix)).To(Succeed())
-			g.Expect(ipamv1alpha1.GetPrefixReadiness(childPrefix)).To(Equal(ipamv1alpha1.ReadinessSucceeded))
+			g.Expect(childPrefix.Status.Phase).To(Equal(ipamv1alpha1.PrefixPhaseAllocated))
 		}).Should(Succeed())
 	})
 
@@ -334,7 +334,7 @@ var _ = Describe("PrefixReconciler", func() {
 		childPrefixKey := client.ObjectKeyFromObject(childPrefix)
 		Consistently(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, childPrefixKey, childPrefix)).To(Succeed())
-			g.Expect(ipamv1alpha1.GetPrefixReadiness(childPrefix)).NotTo(Equal(ipamv1alpha1.ReadinessSucceeded))
+			g.Expect(childPrefix.Status.Phase).NotTo(Equal(ipamv1alpha1.PrefixPhaseAllocated))
 		}).Should(Succeed())
 	})
 
@@ -369,7 +369,7 @@ var _ = Describe("PrefixReconciler", func() {
 		childPrefixKey := client.ObjectKeyFromObject(childPrefix)
 		Consistently(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, childPrefixKey, childPrefix)).To(Succeed())
-			g.Expect(ipamv1alpha1.GetPrefixReadiness(childPrefix)).NotTo(Equal(ipamv1alpha1.ReadinessSucceeded))
+			g.Expect(childPrefix.Status.Phase).NotTo(Equal(ipamv1alpha1.PrefixPhaseAllocated))
 		}).Should(Succeed())
 	})
 })

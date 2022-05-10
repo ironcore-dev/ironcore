@@ -18,8 +18,6 @@ import (
 	"context"
 
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/apis/ipam/v1alpha1"
-	"k8s.io/apimachinery/pkg/api/meta"
-	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -34,20 +32,4 @@ func SetupPrefixSpecIPFamilyFieldIndexer(mgr ctrl.Manager) error {
 		prefix := obj.(*ipamv1alpha1.Prefix)
 		return []string{string(prefix.Spec.IPFamily)}
 	})
-}
-
-type readerClient struct {
-	client.Reader
-	noReaderClient
-}
-
-type noReaderClient interface {
-	client.Writer
-	client.StatusClient
-	Scheme() *runtime.Scheme
-	RESTMapper() meta.RESTMapper
-}
-
-func ReaderClient(reader client.Reader, c client.Client) client.Client {
-	return readerClient{reader, c}
 }

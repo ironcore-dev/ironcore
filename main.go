@@ -278,6 +278,7 @@ func main() {
 		if err = (&ipamcontrollers.PrefixAllocationScheduler{
 			Client: mgr.GetClient(),
 			Scheme: mgr.GetScheme(),
+			Events: mgr.GetEventRecorderFor("prefix-allocation-scheduler"),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "PrefixAllocationScheduler")
 			os.Exit(1)

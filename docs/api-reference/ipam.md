@@ -292,85 +292,13 @@ PrefixAllocationStatus
 </tr>
 </tbody>
 </table>
-<h3 id="ipam.api.onmetal.de/v1alpha1.PrefixAllocationCondition">PrefixAllocationCondition
-</h3>
+<h3 id="ipam.api.onmetal.de/v1alpha1.PrefixAllocationPhase">PrefixAllocationPhase
+(<code>string</code> alias)</h3>
 <p>
 (<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.PrefixAllocationStatus">PrefixAllocationStatus</a>)
 </p>
 <div>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>type</code><br/>
-<em>
-<a href="#ipam.api.onmetal.de/v1alpha1.PrefixAllocationConditionType">
-PrefixAllocationConditionType
-</a>
-</em>
-</td>
-<td>
-</td>
-</tr>
-<tr>
-<td>
-<code>status</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#conditionstatus-v1-core">
-Kubernetes core/v1.ConditionStatus
-</a>
-</em>
-</td>
-<td>
-</td>
-</tr>
-<tr>
-<td>
-<code>reason</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-</td>
-</tr>
-<tr>
-<td>
-<code>message</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-</td>
-</tr>
-<tr>
-<td>
-<code>lastTransitionTime</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
-Kubernetes meta/v1.Time
-</a>
-</em>
-</td>
-<td>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="ipam.api.onmetal.de/v1alpha1.PrefixAllocationConditionType">PrefixAllocationConditionType
-(<code>string</code> alias)</h3>
-<p>
-(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.PrefixAllocationCondition">PrefixAllocationCondition</a>)
-</p>
-<div>
+<p>PrefixAllocationPhase is a phase a PrefixAllocation can be in.</p>
 </div>
 <table>
 <thead>
@@ -379,8 +307,15 @@ Kubernetes meta/v1.Time
 <th>Description</th>
 </tr>
 </thead>
-<tbody><tr><td><p>&#34;Ready&#34;</p></td>
-<td></td>
+<tbody><tr><td><p>&#34;Allocated&#34;</p></td>
+<td><p>PrefixAllocationPhaseAllocated marks a PrefixAllocation as allocated by a Prefix.</p>
+</td>
+</tr><tr><td><p>&#34;Failed&#34;</p></td>
+<td><p>PrefixAllocationPhaseFailed marks a PrefixAllocation as failed.</p>
+</td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>PrefixAllocationPhasePending marks a PrefixAllocation as waiting for allocation.</p>
+</td>
 </tr></tbody>
 </table>
 <h3 id="ipam.api.onmetal.de/v1alpha1.PrefixAllocationSpec">PrefixAllocationSpec
@@ -496,81 +431,20 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
 </tr>
 <tr>
 <td>
-<code>conditions</code><br/>
+<code>phase</code><br/>
 <em>
-<a href="#ipam.api.onmetal.de/v1alpha1.PrefixAllocationCondition">
-[]PrefixAllocationCondition
+<a href="#ipam.api.onmetal.de/v1alpha1.PrefixAllocationPhase">
+PrefixAllocationPhase
 </a>
 </em>
 </td>
 <td>
-<p>Conditions represent various state aspects of a PrefixAllocation.</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="ipam.api.onmetal.de/v1alpha1.PrefixCondition">PrefixCondition
-</h3>
-<p>
-(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.PrefixStatus">PrefixStatus</a>)
-</p>
-<div>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>type</code><br/>
-<em>
-<a href="#ipam.api.onmetal.de/v1alpha1.PrefixConditionType">
-PrefixConditionType
-</a>
-</em>
-</td>
-<td>
+<p>Phase is the phase of the PrefixAllocation.</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>status</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#conditionstatus-v1-core">
-Kubernetes core/v1.ConditionStatus
-</a>
-</em>
-</td>
-<td>
-</td>
-</tr>
-<tr>
-<td>
-<code>reason</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-</td>
-</tr>
-<tr>
-<td>
-<code>message</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-</td>
-</tr>
-<tr>
-<td>
-<code>lastTransitionTime</code><br/>
+<code>lastPhaseTransitionTime</code><br/>
 <em>
 <a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
 Kubernetes meta/v1.Time
@@ -578,16 +452,18 @@ Kubernetes meta/v1.Time
 </em>
 </td>
 <td>
+<p>LastPhaseTransitionTime is the last time the Phase changed values.</p>
 </td>
 </tr>
 </tbody>
 </table>
-<h3 id="ipam.api.onmetal.de/v1alpha1.PrefixConditionType">PrefixConditionType
+<h3 id="ipam.api.onmetal.de/v1alpha1.PrefixPhase">PrefixPhase
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.PrefixCondition">PrefixCondition</a>)
+(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.PrefixStatus">PrefixStatus</a>)
 </p>
 <div>
+<p>PrefixPhase is a phase a Prefix can be in.</p>
 </div>
 <table>
 <thead>
@@ -596,8 +472,12 @@ Kubernetes meta/v1.Time
 <th>Description</th>
 </tr>
 </thead>
-<tbody><tr><td><p>&#34;Ready&#34;</p></td>
-<td></td>
+<tbody><tr><td><p>&#34;Allocated&#34;</p></td>
+<td><p>PrefixPhaseAllocated marks a prefix as allocated.</p>
+</td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>PrefixPhasePending marks a prefix as waiting for allocation.</p>
+</td>
 </tr></tbody>
 </table>
 <h3 id="ipam.api.onmetal.de/v1alpha1.PrefixSpec">PrefixSpec
@@ -702,15 +582,28 @@ Kubernetes meta/v1.LabelSelector
 <tbody>
 <tr>
 <td>
-<code>conditions</code><br/>
+<code>phase</code><br/>
 <em>
-<a href="#ipam.api.onmetal.de/v1alpha1.PrefixCondition">
-[]PrefixCondition
+<a href="#ipam.api.onmetal.de/v1alpha1.PrefixPhase">
+PrefixPhase
 </a>
 </em>
 </td>
 <td>
-<p>Conditions is a list of conditions of a Prefix.</p>
+<p>Phase is the PrefixPhase of the Prefix.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastPhaseTransitionTime</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastPhaseTransitionTime is the last time the Phase changed values.</p>
 </td>
 </tr>
 <tr>
@@ -837,27 +730,6 @@ Kubernetes meta/v1.LabelSelector
 </td>
 </tr>
 </tbody>
-</table>
-<h3 id="ipam.api.onmetal.de/v1alpha1.Readiness">Readiness
-(<code>string</code> alias)</h3>
-<div>
-</div>
-<table>
-<thead>
-<tr>
-<th>Value</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody><tr><td><p>&#34;Failed&#34;</p></td>
-<td></td>
-</tr><tr><td><p>&#34;Pending&#34;</p></td>
-<td></td>
-</tr><tr><td><p>&#34;Succeeded&#34;</p></td>
-<td></td>
-</tr><tr><td><p>&#34;Unknown&#34;</p></td>
-<td></td>
-</tr></tbody>
 </table>
 <hr/>
 <p><em>

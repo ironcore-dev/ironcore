@@ -103,15 +103,14 @@ func ValidatePrefixAllocationStatus(status *ipam.PrefixAllocationStatus, fldPath
 		allErrs = append(allErrs, commonv1alpha1validation.ValidateIPPrefix(status.Prefix.IP().Family(), *status.Prefix, fldPath.Child("prefix"))...)
 	}
 
-	readiness, _ := ipam.GetPrefixAllocationConditionsReadinessAndIndex(status.Conditions)
-	switch readiness {
-	case ipam.ReadinessSucceeded:
+	switch status.Phase {
+	case ipam.PrefixAllocationPhaseAllocated:
 		if status.Prefix == nil {
-			allErrs = append(allErrs, field.Required(fldPath.Child("prefix"), "must specify prefix when succeeded"))
+			allErrs = append(allErrs, field.Required(fldPath.Child("prefix"), "must specify prefix when allocated"))
 		}
 	default:
 		if status.Prefix != nil {
-			allErrs = append(allErrs, field.Forbidden(fldPath.Child("prefix"), "must not specify a prefix when not succeeded"))
+			allErrs = append(allErrs, field.Forbidden(fldPath.Child("prefix"), "must not specify a prefix when not allocated"))
 		}
 	}
 
@@ -126,16 +125,10 @@ func ValidatePrefixAllocationStatusUpdate(newPrefixAllocation, oldPrefixAllocati
 	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessorUpdate(newPrefixAllocation, oldPrefixAllocation, field.NewPath("metadata"))...)
 	allErrs = append(allErrs, ValidatePrefixAllocationStatus(&newPrefixAllocation.Status, statusField)...)
 
-	conditionsField := statusField.Child("conditions")
-
-	newReadiness, newReadyIdx := ipam.GetPrefixAllocationConditionsReadinessAndIndex(newPrefixAllocation.Status.Conditions)
-	oldReadiness, _ := ipam.GetPrefixAllocationConditionsReadinessAndIndex(oldPrefixAllocation.Status.Conditions)
-	if oldReadiness.Terminal() && newReadiness != oldReadiness {
-		if newReadyIdx < 0 {
-			allErrs = append(allErrs, field.Required(conditionsField.Index(0), "terminal ready condition is missing"))
-		} else {
-			allErrs = append(allErrs, field.Forbidden(conditionsField.Index(newReadyIdx), "may not change terminal ready condition"))
-		}
+	newPhase := newPrefixAllocation.Status.Phase
+	oldPhase := oldPrefixAllocation.Status.Phase
+	if (oldPhase == ipam.PrefixAllocationPhaseFailed || oldPhase == ipam.PrefixAllocationPhaseAllocated) && newPhase != oldPhase {
+		allErrs = append(allErrs, field.Forbidden(field.NewPath("status", "phase"), "must not set failed / allocated allocation to non-failed / non-allocated"))
 	}
 
 	statusPrefixField := statusField.Child("prefix")
