@@ -31,8 +31,6 @@ type Interface interface {
 	Networks() NetworkInformer
 	// NetworkInterfaces returns a NetworkInterfaceInformer.
 	NetworkInterfaces() NetworkInterfaceInformer
-	// NetworkInterfaceBindings returns a NetworkInterfaceBindingInformer.
-	NetworkInterfaceBindings() NetworkInterfaceBindingInformer
 	// VirtualIPs returns a VirtualIPInformer.
 	VirtualIPs() VirtualIPInformer
 }
@@ -66,11 +64,6 @@ func (v *version) Networks() NetworkInformer {
 // NetworkInterfaces returns a NetworkInterfaceInformer.
 func (v *version) NetworkInterfaces() NetworkInterfaceInformer {
 	return &networkInterfaceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
-}
-
-// NetworkInterfaceBindings returns a NetworkInterfaceBindingInformer.
-func (v *version) NetworkInterfaceBindings() NetworkInterfaceBindingInformer {
-	return &networkInterfaceBindingInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // VirtualIPs returns a VirtualIPInformer.

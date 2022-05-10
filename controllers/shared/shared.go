@@ -33,7 +33,7 @@ func MachineEphemeralNetworkInterfaceName(machineName, ifaceName string) string 
 
 func MachineNetworkInterfaceNames(machine *v1alpha1.Machine) []string {
 	var names []string
-	for _, iface := range machine.Spec.Interfaces {
+	for _, iface := range machine.Spec.NetworkInterfaces {
 		switch {
 		case iface.NetworkInterfaceRef != nil:
 			names = append(names, iface.NetworkInterfaceRef.Name)

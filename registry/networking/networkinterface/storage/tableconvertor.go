@@ -64,8 +64,8 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 
 		cells = append(cells, name)
 		cells = append(cells, networkInterface.Spec.NetworkRef.Name)
-		if machineRefName := networkInterface.Spec.MachineRef.Name; machineRefName != "" {
-			cells = append(cells, machineRefName)
+		if machineRef := networkInterface.Spec.MachineRef; machineRef != nil {
+			cells = append(cells, machineRef.Name)
 		} else {
 			cells = append(cells, "<none>")
 		}

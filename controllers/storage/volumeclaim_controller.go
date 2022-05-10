@@ -71,7 +71,7 @@ func (r *VolumeClaimReconciler) delete(ctx context.Context, log logr.Logger, cla
 
 func (r *VolumeClaimReconciler) reconcile(ctx context.Context, log logr.Logger, claim *storagev1alpha1.VolumeClaim) (ctrl.Result, error) {
 	log.V(1).Info("Reconciling volume claim")
-	if claim.Spec.VolumeRef.Name == "" {
+	if claim.Spec.VolumeRef == nil {
 		log.V(1).Info("Volume claim is not bound")
 		if err := r.patchVolumeClaimStatus(ctx, claim, storagev1alpha1.VolumeClaimPending); err != nil {
 			return ctrl.Result{}, fmt.Errorf("error setting volume claim to pending: %w", err)
@@ -98,7 +98,7 @@ func (r *VolumeClaimReconciler) reconcile(ctx context.Context, log logr.Logger, 
 		return ctrl.Result{}, nil
 	}
 
-	if volume.Spec.ClaimRef.Name == claim.Name && volume.Spec.ClaimRef.UID == claim.UID {
+	if volume.Spec.ClaimRef != nil && volume.Spec.ClaimRef.Name == claim.Name && volume.Spec.ClaimRef.UID == claim.UID {
 		log.V(1).Info("Volume is bound to claim", "VolumeKey", volumeKey)
 		if err := r.patchVolumeClaimStatus(ctx, claim, storagev1alpha1.VolumeClaimBound); err != nil {
 			return ctrl.Result{}, fmt.Errorf("error setting volume claim to bound: %w", err)
@@ -134,10 +134,12 @@ func (r *VolumeClaimReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 	if err := mgr.GetFieldIndexer().IndexField(ctx, &storagev1alpha1.VolumeClaim{}, VolumeClaimSpecVolumeRefNameField, func(object client.Object) []string {
 		claim := object.(*storagev1alpha1.VolumeClaim)
-		if claim.Spec.VolumeRef.Name == "" {
-			return nil
+		volumeRef := claim.Spec.VolumeRef
+		if volumeRef == nil {
+			return []string{""}
 		}
-		return []string{claim.Spec.VolumeRef.Name}
+
+		return []string{volumeRef.Name}
 	}); err != nil {
 		return err
 	}

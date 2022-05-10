@@ -6,12 +6,11 @@ metadata:
 spec:
   networkRef:
     name: network-sample
-#  networkInterfaceSelector:
-#    matchLabels:
-#      foo: bar
-  prefix:
-    # value: 10.0.0.0/24 # It's possible to directly specify the AliasPrefix value
-    ephemeralPrefix:
+  #  networkInterfaceSelector:
+  #    matchLabels:
+  #      foo: bar
+  prefix: # value: 10.0.0.0/24 # It's possible to directly specify the AliasPrefix value
+    ephemeral:
       prefixTemplate:
         spec:
           ipFamily: IPv4

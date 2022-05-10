@@ -280,7 +280,7 @@ func (r *VirtualIPReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		virtualIP := object.(*networkingv1alpha1.VirtualIP)
 		targetRef := virtualIP.Spec.TargetRef
 		if targetRef == nil {
-			return nil
+			return []string{""}
 		}
 		return []string{targetRef.Name}
 	}); err != nil {

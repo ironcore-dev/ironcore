@@ -14,8 +14,13 @@
 
 package v1alpha1
 
-import networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
+import (
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
+)
 
+// EphemeralNetworkInterfaceSource is a definition for an ephemeral (i.e. coupled to the lifetime of the surrounding
+// object) networking.NetworkInterface.
 type EphemeralNetworkInterfaceSource struct {
+	// NetworkInterfaceTemplate is the template definition of the networking.NetworkInterface.
 	NetworkInterfaceTemplate *networkingv1alpha1.NetworkInterfaceTemplateSpec `json:"networkInterfaceTemplate,omitempty"`
 }

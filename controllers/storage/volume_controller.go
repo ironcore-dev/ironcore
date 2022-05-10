@@ -82,7 +82,7 @@ func (r *VolumeReconciler) phaseTransitionTimedOut(timestamp *metav1.Time) bool 
 
 func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume) (ctrl.Result, error) {
 	log.V(1).Info("Reconciling volume")
-	if volume.Spec.ClaimRef.Name == "" {
+	if volume.Spec.ClaimRef == nil {
 		log.V(1).Info("Volume is not bound and not referencing any claim")
 		if err := r.patchVolumeStatus(ctx, volume, storagev1alpha1.VolumePhaseUnbound); err != nil {
 			return ctrl.Result{}, err
@@ -158,17 +158,20 @@ func (r *VolumeReconciler) requeueAfterBoundTimeout(volume *storagev1alpha1.Volu
 
 func (r *VolumeReconciler) validReferences(volume *storagev1alpha1.Volume, volumeClaim *storagev1alpha1.VolumeClaim) bool {
 	volumeRef := volumeClaim.Spec.VolumeRef
-	if volumeRef.Name != volume.Name {
+	if volumeRef == nil || volumeRef.Name != volume.Name {
 		return false
 	}
 
 	claimRef := volume.Spec.ClaimRef
+	if claimRef == nil {
+		return false
+	}
 	return claimRef.Name == volumeClaim.Name && claimRef.UID == volumeClaim.UID
 }
 
 func (r *VolumeReconciler) releaseVolume(ctx context.Context, volume *storagev1alpha1.Volume) error {
 	baseVolume := volume.DeepCopy()
-	volume.Spec.ClaimRef = storagev1alpha1.ClaimReference{}
+	volume.Spec.ClaimRef = nil
 	return r.Patch(ctx, volume, client.MergeFrom(baseVolume))
 }
 

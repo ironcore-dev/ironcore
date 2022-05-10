@@ -60,8 +60,8 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 		volumeClaim := obj.(*storage.VolumeClaim)
 
 		cells = append(cells, name)
-		if volumeName := volumeClaim.Spec.VolumeRef.Name; volumeName != "" {
-			cells = append(cells, volumeName)
+		if volumeRef := volumeClaim.Spec.VolumeRef; volumeRef != nil {
+			cells = append(cells, volumeRef.Name)
 		} else {
 			cells = append(cells, "<unknown>")
 		}

@@ -17,6 +17,7 @@
 package storage
 
 import (
+	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 	"github.com/onmetal/onmetal-api/testutils"
 	. "github.com/onsi/ginkgo/v2"
@@ -24,7 +25,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -46,7 +46,7 @@ var _ = Describe("VolumeClaimScheduler", func() {
 				Resources: map[corev1.ResourceName]resource.Quantity{
 					"storage": resource.MustParse("100Gi"),
 				},
-				VolumePoolRef: corev1.LocalObjectReference{
+				VolumePoolRef: &corev1.LocalObjectReference{
 					Name: "my-volumepool",
 				},
 				VolumeClassRef: corev1.LocalObjectReference{
@@ -64,7 +64,7 @@ var _ = Describe("VolumeClaimScheduler", func() {
 				Resources: map[corev1.ResourceName]resource.Quantity{
 					"storage": resource.MustParse("10Gi"),
 				},
-				VolumePoolRef: corev1.LocalObjectReference{
+				VolumePoolRef: &corev1.LocalObjectReference{
 					Name: "my-volumepool",
 				},
 				VolumeClassRef: corev1.LocalObjectReference{
@@ -106,15 +106,17 @@ var _ = Describe("VolumeClaimScheduler", func() {
 		volumeKey := client.ObjectKeyFromObject(volume)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
-			g.Expect(volume.Spec.ClaimRef.Name).To(Equal(volumeClaim.Name))
-			g.Expect(volume.Spec.ClaimRef.UID).To(Equal(volumeClaim.UID))
+			g.Expect(volume.Spec.ClaimRef).To(Equal(&commonv1alpha1.LocalUIDReference{
+				Name: volumeClaim.Name,
+				UID:  volumeClaim.UID,
+			}))
 		}).Should(Succeed())
 
 		By("waiting for the volumeclaim to reference the volume")
 		claimKey := client.ObjectKeyFromObject(volumeClaim)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, claimKey, volumeClaim)).To(Succeed(), "failed to get volumeclaim")
-			g.Expect(volumeClaim.Spec.VolumeRef.Name).To(Equal(volume.Name))
+			g.Expect(volumeClaim.Spec.VolumeRef).To(Equal(&corev1.LocalObjectReference{Name: volume.Name}))
 		}).Should(Succeed())
 	})
 
@@ -135,15 +137,14 @@ var _ = Describe("VolumeClaimScheduler", func() {
 		volume2Key := client.ObjectKeyFromObject(volume2)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volume2Key, volume2)).To(Succeed(), "failed to get volume")
-			g.Expect(volume2.Spec.ClaimRef.Name).To(Equal(""))
-			g.Expect(volume2.Spec.ClaimRef.UID).To(Equal(types.UID("")))
+			g.Expect(volume2.Spec.ClaimRef).To(BeNil())
 		}).Should(Succeed())
 
 		By("waiting for the volumeclaim to reference the volume")
 		claimKey := client.ObjectKeyFromObject(volumeClaim)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, claimKey, volumeClaim)).To(Succeed(), "failed to get volumeclaim")
-			g.Expect(volumeClaim.Spec.VolumeRef.Name).To(Equal(""))
+			g.Expect(volumeClaim.Spec.VolumeRef).To(BeNil())
 		}).Should(Succeed())
 	})
 
@@ -164,15 +165,14 @@ var _ = Describe("VolumeClaimScheduler", func() {
 		volumeKey := client.ObjectKeyFromObject(volume)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
-			g.Expect(volume.Spec.ClaimRef.Name).To(Equal(""))
-			g.Expect(volume.Spec.ClaimRef.UID).To(Equal(types.UID("")))
+			g.Expect(volume.Spec.ClaimRef).To(BeNil())
 		}).Should(Succeed())
 
 		By("waiting for the volumeclaim to reference the volume")
 		claimKey := client.ObjectKeyFromObject(volumeClaim)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, claimKey, volumeClaim)).To(Succeed(), "failed to get volumeclaim")
-			g.Expect(volumeClaim.Spec.VolumeRef.Name).To(Equal(""))
+			g.Expect(volumeClaim.Spec.VolumeRef).To(BeNil())
 		}).Should(Succeed())
 	})
 
@@ -196,15 +196,14 @@ var _ = Describe("VolumeClaimScheduler", func() {
 		claimKey := client.ObjectKeyFromObject(volumeClaim)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, claimKey, volumeClaim)).To(Succeed(), "failed to get volumeclaim")
-			g.Expect(volumeClaim.Spec.VolumeRef.Name).To(Equal(""))
+			g.Expect(volumeClaim.Spec.VolumeRef).To(BeNil())
 		}).Should(Succeed())
 
 		By("waiting for the volume to reference the claim")
 		volumeKey := client.ObjectKeyFromObject(volume)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
-			g.Expect(volume.Spec.ClaimRef.Name).To(Equal(""))
-			g.Expect(volume.Spec.ClaimRef.UID).To(Equal(types.UID("")))
+			g.Expect(volume.Spec.ClaimRef).To(BeNil())
 		}).Should(Succeed())
 	})
 
@@ -232,29 +231,27 @@ var _ = Describe("VolumeClaimScheduler", func() {
 		volumeKey := client.ObjectKeyFromObject(volume)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
-			g.Expect(volume.Spec.ClaimRef.Name).To(Equal(volumeClaim.Name))
-			g.Expect(volume.Spec.ClaimRef.UID).To(Equal(volumeClaim.UID))
+			g.Expect(volume.Spec.ClaimRef).To(BeNil())
 		}).Should(Succeed())
 
 		By("waiting for the incorrect volume to not be claimed")
 		volumeKey2 := client.ObjectKeyFromObject(volume2)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey2, volume2)).To(Succeed(), "failed to get volume")
-			g.Expect(volume2.Spec.ClaimRef.Name).To(Equal(""))
-			g.Expect(volume2.Spec.ClaimRef.UID).To(Equal(types.UID("")))
+			g.Expect(volume2.Spec.ClaimRef).To(BeNil())
 		}).Should(Succeed())
 
 		By("waiting for the volumeclaim to reference the volume")
 		claimKey := client.ObjectKeyFromObject(volumeClaim)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, claimKey, volumeClaim)).To(Succeed(), "failed to get volumeclaim")
-			g.Expect(volumeClaim.Spec.VolumeRef.Name).To(Equal(volume.Name))
+			g.Expect(volumeClaim.Spec.VolumeRef).To(Equal(&corev1.LocalObjectReference{Name: volume.Name}))
 		}).Should(Succeed())
 	})
 
 	It("Should not claim a volume when the volumeref is set", func() {
 		By("creating a volume w/ a set of resources")
-		volume.Spec.ClaimRef = storagev1alpha1.ClaimReference{
+		volume.Spec.ClaimRef = &commonv1alpha1.LocalUIDReference{
 			Name: "my-volume",
 			UID:  "12345",
 		}
@@ -273,7 +270,7 @@ var _ = Describe("VolumeClaimScheduler", func() {
 		claimKey := client.ObjectKeyFromObject(volumeClaim)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, claimKey, volumeClaim)).To(Succeed(), "failed to get volumeclaim")
-			g.Expect(volumeClaim.Spec.VolumeRef.Name).To(Equal(""))
+			g.Expect(volumeClaim.Spec.VolumeRef).To(BeNil())
 		}).Should(Succeed())
 	})
 
@@ -287,7 +284,7 @@ var _ = Describe("VolumeClaimScheduler", func() {
 		Expect(k8sClient.Patch(ctx, volume, client.MergeFrom(baseVolume))).To(Succeed())
 
 		By("creating a volume claim w/ an explicit volumeref")
-		volumeClaim.Spec.VolumeRef = corev1.LocalObjectReference{Name: volume.Name}
+		volumeClaim.Spec.VolumeRef = &corev1.LocalObjectReference{Name: volume.Name}
 		Expect(k8sClient.Create(ctx, volumeClaim)).To(Succeed(), "failed to create volume claim")
 
 		By("waiting for the volume claim to be bound to the volume")
@@ -298,7 +295,7 @@ var _ = Describe("VolumeClaimScheduler", func() {
 			g.Expect(volumeClaim.Status.Phase).To(Equal(storagev1alpha1.VolumeClaimBound))
 
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
-			g.Expect(volume.Spec.ClaimRef).To(Equal(storagev1alpha1.ClaimReference{
+			g.Expect(volume.Spec.ClaimRef).To(Equal(&commonv1alpha1.LocalUIDReference{
 				Name: volumeClaim.Name,
 				UID:  volumeClaim.UID,
 			}))

@@ -44,13 +44,13 @@ func validateVolumeSpec(volumeSpec *storage.VolumeSpec, fldPath *field.Path) fie
 
 	allErrs = append(allErrs, metav1validation.ValidateLabels(volumeSpec.VolumePoolSelector, fldPath.Child("volumePoolSelector"))...)
 
-	if volumeSpec.VolumePoolRef.Name != "" {
+	if volumeSpec.VolumePoolRef != nil {
 		for _, msg := range apivalidation.NameIsDNSLabel(volumeSpec.VolumePoolRef.Name, false) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("volumePoolRef").Child("name"), volumeSpec.VolumePoolRef.Name, msg))
 		}
 	}
 
-	if volumeSpec.ClaimRef.Name != "" {
+	if volumeSpec.ClaimRef != nil {
 		for _, msg := range apivalidation.NameIsDNSLabel(volumeSpec.ClaimRef.Name, false) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("claimRef").Child("name"), volumeSpec.ClaimRef.Name, msg))
 		}

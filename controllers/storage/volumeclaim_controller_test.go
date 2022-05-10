@@ -41,7 +41,7 @@ var _ = Describe("VolumeClaimReconciler", func() {
 				GenerateName: "test-volume-",
 			},
 			Spec: storagev1alpha1.VolumeSpec{
-				VolumePoolRef: corev1.LocalObjectReference{
+				VolumePoolRef: &corev1.LocalObjectReference{
 					Name: "my-volumepool",
 				},
 				Resources: map[corev1.ResourceName]resource.Quantity{
@@ -107,7 +107,7 @@ var _ = Describe("VolumeClaimReconciler", func() {
 		volumeClaimKey := client.ObjectKeyFromObject(volumeClaim)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeClaimKey, volumeClaim)).To(Succeed(), "failed to get volumeclaim")
-			g.Expect(volumeClaim.Spec.VolumeRef.Name).To(Equal(volume.Name))
+			g.Expect(volumeClaim.Spec.VolumeRef).To(Equal(&corev1.LocalObjectReference{Name: volume.Name}))
 			g.Expect(volumeClaim.Status.Phase).To(Equal(storagev1alpha1.VolumeClaimBound))
 		}).Should(Succeed())
 

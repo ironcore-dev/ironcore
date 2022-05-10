@@ -13,5 +13,5 @@ spec:
       # priority: 0 # optional
       volumeClaimRef:
         name: my-volumeclaim
-  ignition:
+  ignitionRef:
     name: my-ignition-configmap

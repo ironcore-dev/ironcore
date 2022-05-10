@@ -20,10 +20,16 @@ import (
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/apis/ipam/v1alpha1"
 )
 
+// EphemeralPrefixSource contains the definition to create an ephemeral (i.e. coupled to the lifetime of the
+// surrounding object) Prefix.
 type EphemeralPrefixSource struct {
+	// PrefixTemplate is the template for the Prefix.
 	PrefixTemplate *ipamv1alpha1.PrefixTemplateSpec `json:"prefixTemplate,omitempty"`
 }
 
+// EphemeralVirtualIPSource contains the definition to create an ephemeral (i.e. coupled to the lifetime of the
+// surrounding object) VirtualIP.
 type EphemeralVirtualIPSource struct {
+	// VirtualIPTemplate is the template for the VirtualIP.
 	VirtualIPTemplate *VirtualIPTemplateSpec `json:"virtualIPTemplate,omitempty"`
 }

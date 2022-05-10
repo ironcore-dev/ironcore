@@ -67,7 +67,7 @@ var _ = Describe("VolumeScheduler", func() {
 		volumeKey := client.ObjectKeyFromObject(volume)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
-			g.Expect(volume.Spec.VolumePoolRef.Name).To(Equal(volumePool.Name))
+			g.Expect(volume.Spec.VolumePoolRef).To(Equal(&corev1.LocalObjectReference{Name: volumePool.Name}))
 			g.Expect(volume.Status.State).To(Equal(storagev1alpha1.VolumeStatePending))
 		}).Should(Succeed())
 	})
@@ -94,7 +94,7 @@ var _ = Describe("VolumeScheduler", func() {
 		volumeKey := client.ObjectKeyFromObject(volume)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed())
-			g.Expect(volume.Spec.VolumePoolRef.Name).To(BeEmpty())
+			g.Expect(volume.Spec.VolumePoolRef).To(BeNil())
 			g.Expect(volume.Status.State).To(Equal(storagev1alpha1.VolumeStatePending))
 		}).Should(Succeed())
 
@@ -113,10 +113,10 @@ var _ = Describe("VolumeScheduler", func() {
 			To(Succeed(), "failed to patch volume pool status")
 
 		By("waiting for the volume to be scheduled onto the volume pool")
-		Eventually(func() string {
+		Eventually(func() *corev1.LocalObjectReference {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
-			return volume.Spec.VolumePoolRef.Name
-		}).Should(Equal(volumePool.Name))
+			return volume.Spec.VolumePoolRef
+		}).Should(Equal(&corev1.LocalObjectReference{Name: volumePool.Name}))
 	})
 
 	It("should schedule onto volume pools with matching labels", func() {
@@ -175,7 +175,7 @@ var _ = Describe("VolumeScheduler", func() {
 		volumeKey := client.ObjectKeyFromObject(volume)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
-			g.Expect(volume.Spec.VolumePoolRef.Name).To(Equal(volumePoolMatchingLabels.Name))
+			g.Expect(volume.Spec.VolumePoolRef).To(Equal(&corev1.LocalObjectReference{Name: volumePoolMatchingLabels.Name}))
 			g.Expect(volume.Status.State).To(Equal(storagev1alpha1.VolumeStatePending))
 		}).Should(Succeed())
 	})
@@ -227,10 +227,10 @@ var _ = Describe("VolumeScheduler", func() {
 
 		By("observing the volume isn't scheduled onto the volume pool")
 		volumeKey := client.ObjectKeyFromObject(volume)
-		Consistently(func() string {
+		Consistently(func() *corev1.LocalObjectReference {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed())
-			return volume.Spec.VolumePoolRef.Name
-		}).Should(BeEmpty())
+			return volume.Spec.VolumePoolRef
+		}).Should(BeNil())
 
 		By("patching the volume to contain only one of the corresponding tolerations")
 		volumeBase := volume.DeepCopy()
@@ -243,10 +243,10 @@ var _ = Describe("VolumeScheduler", func() {
 		Expect(k8sClient.Patch(ctx, volume, client.MergeFrom(volumeBase))).To(Succeed(), "failed to patch the volume's spec")
 
 		By("observing the volume isn't scheduled onto the volume pool")
-		Consistently(func() string {
+		Consistently(func() *corev1.LocalObjectReference {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed())
-			return volume.Spec.VolumePoolRef.Name
-		}).Should(BeEmpty())
+			return volume.Spec.VolumePoolRef
+		}).Should(BeNil())
 
 		By("patching the volume to contain all of the corresponding tolerations")
 		volumeBase = volume.DeepCopy()
@@ -260,7 +260,7 @@ var _ = Describe("VolumeScheduler", func() {
 		By("observing the volume is scheduled onto the volume pool")
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get the volume")
-			g.Expect(volume.Spec.VolumePoolRef.Name).To(Equal(taintedVolumePool.Name))
+			g.Expect(volume.Spec.VolumePoolRef).To(Equal(&corev1.LocalObjectReference{Name: taintedVolumePool.Name}))
 		}).Should(Succeed())
 	})
 })

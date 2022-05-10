@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
+	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -37,7 +38,7 @@ import (
 
 type VolumeClaimScheduler struct {
 	client.Client
-	record.EventRecorder
+	Events record.EventRecorder
 }
 
 //+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumeclaims,verbs=get;list;watch;create;update;patch;delete
@@ -67,7 +68,7 @@ func (s *VolumeClaimScheduler) delete(ctx context.Context, log logr.Logger, clai
 
 func (s *VolumeClaimScheduler) bind(ctx context.Context, volumeClaim *storagev1alpha1.VolumeClaim, volume *storagev1alpha1.Volume) error {
 	baseVolume := volume.DeepCopy()
-	volume.Spec.ClaimRef = storagev1alpha1.ClaimReference{
+	volume.Spec.ClaimRef = &commonv1alpha1.LocalUIDReference{
 		Name: volumeClaim.Name,
 		UID:  volumeClaim.UID,
 	}
@@ -76,7 +77,7 @@ func (s *VolumeClaimScheduler) bind(ctx context.Context, volumeClaim *storagev1a
 	}
 
 	baseClaim := volumeClaim.DeepCopy()
-	volumeClaim.Spec.VolumeRef = corev1.LocalObjectReference{Name: volume.Name}
+	volumeClaim.Spec.VolumeRef = &corev1.LocalObjectReference{Name: volume.Name}
 	if err := s.Patch(ctx, volumeClaim, client.MergeFrom(baseClaim)); err != nil {
 		return fmt.Errorf("could not assign volume %s to volume claim: %w", client.ObjectKeyFromObject(volume), err)
 	}
@@ -86,9 +87,9 @@ func (s *VolumeClaimScheduler) bind(ctx context.Context, volumeClaim *storagev1a
 
 func (s *VolumeClaimScheduler) reconcile(ctx context.Context, log logr.Logger, volumeClaim *storagev1alpha1.VolumeClaim) (ctrl.Result, error) {
 	log.V(1).Info("Reconciling volume claim")
-	if volumeRefName := volumeClaim.Spec.VolumeRef.Name; volumeRefName != "" {
+	if volumeRef := volumeClaim.Spec.VolumeRef; volumeRef != nil {
 		volume := &storagev1alpha1.Volume{}
-		volumeKey := client.ObjectKey{Namespace: volumeClaim.Namespace, Name: volumeRefName}
+		volumeKey := client.ObjectKey{Namespace: volumeClaim.Namespace, Name: volumeRef.Name}
 		log = log.WithValues("VolumeKey", volumeKey)
 		log.V(1).Info("Getting volume specified by volume claim")
 		if err := s.Get(ctx, volumeKey, volume); err != nil {
@@ -100,7 +101,7 @@ func (s *VolumeClaimScheduler) reconcile(ctx context.Context, log logr.Logger, v
 			return ctrl.Result{}, nil
 		}
 
-		if volume.Spec.ClaimRef.Name != "" {
+		if volume.Spec.ClaimRef != nil {
 			log.V(1).Info("Volume already specifies a claim ref", "ClaimRef", volume.Spec.ClaimRef)
 			return ctrl.Result{}, nil
 		}
@@ -128,7 +129,7 @@ func (s *VolumeClaimScheduler) reconcile(ctx context.Context, log logr.Logger, v
 	log.V(1).Info("Searching for suitable volumes for volume claim")
 	volume := s.findVolumeForClaim(volumeList.Items, volumeClaim)
 	if volume == nil {
-		s.Event(volumeClaim, corev1.EventTypeNormal, "FailedScheduling", "no matching volume found for volume claim")
+		s.Events.Event(volumeClaim, corev1.EventTypeNormal, "FailedScheduling", "no matching volume found for volume claim")
 		log.V(1).Info("Could not find a matching volume for volume claim")
 		return ctrl.Result{}, nil
 	}
@@ -150,11 +151,11 @@ func (s *VolumeClaimScheduler) findVolumeForClaim(volumes []storagev1alpha1.Volu
 			continue
 		}
 
-		if claimRefName := vol.Spec.ClaimRef.Name; claimRefName != "" {
-			if claimRefName != claim.Name {
+		if claimRef := vol.Spec.ClaimRef; claimRef != nil {
+			if claimRef.Name != claim.Name {
 				continue
 			}
-			if vol.Spec.ClaimRef.UID != claim.UID {
+			if claimRef.UID != claim.UID {
 				continue
 			}
 			// If we hit a Volume that matches exactly our claim we need to return immediately to avoid over-claiming
@@ -200,9 +201,9 @@ func (s *VolumeClaimScheduler) SetupWithManager(mgr ctrl.Manager) error {
 		Watches(&source.Kind{Type: &storagev1alpha1.Volume{}}, handler.EnqueueRequestsFromMapFunc(
 			func(object client.Object) []ctrl.Request {
 				volume := object.(*storagev1alpha1.Volume)
-				if claimName := volume.Spec.ClaimRef.Name; claimName != "" {
+				if claimRef := volume.Spec.ClaimRef; claimRef != nil {
 					claim := &storagev1alpha1.VolumeClaim{}
-					claimKey := client.ObjectKey{Namespace: volume.Namespace, Name: claimName}
+					claimKey := client.ObjectKey{Namespace: volume.Namespace, Name: claimRef.Name}
 					if err := s.Get(ctx, claimKey, claim); err != nil {
 						if !apierrors.IsNotFound(err) {
 							log.Error(err, "Failed to get claim referenced by volume", "VolumeClaimRef", claimKey)
@@ -213,7 +214,7 @@ func (s *VolumeClaimScheduler) SetupWithManager(mgr ctrl.Manager) error {
 						return nil
 					}
 
-					if claim.Spec.VolumeRef.Name != "" {
+					if claim.Spec.VolumeRef != nil {
 						return nil
 					}
 					log.V(1).Info("Enqueueing claim that has already been accepted by its volume", "VolumeClaimRef", claimKey)

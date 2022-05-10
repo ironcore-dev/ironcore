@@ -5,7 +5,7 @@ metadata:
 spec:
   volumeClassRef:
     name: volumeclass-sample
-  volumePool:
+  volumePoolRef:
     name: volumepool-sample
   resources:
     storage: 100Gi

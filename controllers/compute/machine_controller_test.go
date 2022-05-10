@@ -52,10 +52,10 @@ var _ = Describe("MachineReconciler", func() {
 			Spec: computev1alpha1.MachineSpec{
 				MachineClassRef: corev1.LocalObjectReference{Name: "machine-class"},
 				Image:           "my-image:latest",
-				Interfaces: []computev1alpha1.Interface{
+				NetworkInterfaces: []computev1alpha1.NetworkInterface{
 					{
 						Name: "interface",
-						InterfaceSource: computev1alpha1.InterfaceSource{
+						NetworkInterfaceSource: computev1alpha1.NetworkInterfaceSource{
 							Ephemeral: &computev1alpha1.EphemeralNetworkInterfaceSource{
 								NetworkInterfaceTemplate: &networkingv1alpha1.NetworkInterfaceTemplateSpec{
 									Spec: networkingv1alpha1.NetworkInterfaceSpec{

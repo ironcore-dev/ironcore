@@ -49,14 +49,6 @@ type NetworkInterfaceListerExpansion interface{}
 // NetworkInterfaceNamespaceLister.
 type NetworkInterfaceNamespaceListerExpansion interface{}
 
-// NetworkInterfaceBindingListerExpansion allows custom methods to be added to
-// NetworkInterfaceBindingLister.
-type NetworkInterfaceBindingListerExpansion interface{}
-
-// NetworkInterfaceBindingNamespaceListerExpansion allows custom methods to be added to
-// NetworkInterfaceBindingNamespaceLister.
-type NetworkInterfaceBindingNamespaceListerExpansion interface{}
-
 // VirtualIPListerExpansion allows custom methods to be added to
 // VirtualIPLister.
 type VirtualIPListerExpansion interface{}

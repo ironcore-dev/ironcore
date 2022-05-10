@@ -112,12 +112,12 @@ var _ = Describe("Machine", func() {
 		Entry("immutable machinePoolRef if set",
 			&compute.Machine{
 				Spec: compute.MachineSpec{
-					MachinePoolRef: corev1.LocalObjectReference{Name: "foo"},
+					MachinePoolRef: &corev1.LocalObjectReference{Name: "foo"},
 				},
 			},
 			&compute.Machine{
 				Spec: compute.MachineSpec{
-					MachinePoolRef: corev1.LocalObjectReference{Name: "bar"},
+					MachinePoolRef: &corev1.LocalObjectReference{Name: "bar"},
 				},
 			},
 			ContainElement(ImmutableField("spec.machinePoolRef")),
@@ -125,7 +125,7 @@ var _ = Describe("Machine", func() {
 		Entry("mutable machinePoolRef if not set",
 			&compute.Machine{
 				Spec: compute.MachineSpec{
-					MachinePoolRef: corev1.LocalObjectReference{Name: "foo"},
+					MachinePoolRef: &corev1.LocalObjectReference{Name: "foo"},
 				},
 			},
 			&compute.Machine{},
