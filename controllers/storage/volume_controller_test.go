@@ -17,6 +17,7 @@
 package storage
 
 import (
+	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 	"github.com/onmetal/onmetal-api/testutils"
 	. "github.com/onsi/ginkgo/v2"
@@ -41,7 +42,7 @@ var _ = Describe("VolumeReconciler", func() {
 				GenerateName: "test-volume-",
 			},
 			Spec: storagev1alpha1.VolumeSpec{
-				VolumePoolRef: corev1.LocalObjectReference{
+				VolumePoolRef: &corev1.LocalObjectReference{
 					Name: "my-volumepool",
 				},
 				Resources: map[corev1.ResourceName]resource.Quantity{
@@ -111,7 +112,10 @@ var _ = Describe("VolumeReconciler", func() {
 		volumeKey := client.ObjectKeyFromObject(volume)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
-			g.Expect(volume.Spec.ClaimRef.Name).To(Equal(volumeClaim.Name))
+			g.Expect(volume.Spec.ClaimRef).To(Equal(&commonv1alpha1.LocalUIDReference{
+				Name: volumeClaim.Name,
+				UID:  volumeClaim.UID,
+			}))
 			g.Expect(volume.Status.Phase).To(Equal(storagev1alpha1.VolumePhaseBound))
 		}).Should(Succeed())
 

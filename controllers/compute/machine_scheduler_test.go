@@ -64,7 +64,7 @@ var _ = Describe("MachineScheduler", func() {
 		machineKey := client.ObjectKeyFromObject(machine)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, machineKey, machine)).To(Succeed(), "failed to get machine")
-			g.Expect(machine.Spec.MachinePoolRef.Name).To(Equal(machinePool.Name))
+			g.Expect(machine.Spec.MachinePoolRef).To(Equal(&corev1.LocalObjectReference{Name: machinePool.Name}))
 			g.Expect(machine.Status.State).To(Equal(computev1alpha1.MachineStatePending))
 		}).Should(Succeed())
 	})
@@ -89,7 +89,7 @@ var _ = Describe("MachineScheduler", func() {
 		machineKey := client.ObjectKeyFromObject(machine)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, machineKey, machine)).To(Succeed())
-			g.Expect(machine.Spec.MachinePoolRef.Name).To(BeEmpty())
+			g.Expect(machine.Spec.MachinePoolRef).To(BeNil())
 			g.Expect(machine.Status.State).To(Equal(computev1alpha1.MachineStatePending))
 		}).Should(Succeed())
 
@@ -108,10 +108,10 @@ var _ = Describe("MachineScheduler", func() {
 			To(Succeed(), "failed to patch machine pool status")
 
 		By("waiting for the machine to be scheduled onto the machine pool")
-		Eventually(func() string {
+		Eventually(func() *corev1.LocalObjectReference {
 			Expect(k8sClient.Get(ctx, machineKey, machine)).To(Succeed(), "failed to get machine")
-			return machine.Spec.MachinePoolRef.Name
-		}).Should(Equal(machinePool.Name))
+			return machine.Spec.MachinePoolRef
+		}).Should(Equal(&corev1.LocalObjectReference{Name: machinePool.Name}))
 	})
 
 	It("should schedule onto machine pools with matching labels", func() {
@@ -168,7 +168,7 @@ var _ = Describe("MachineScheduler", func() {
 		machineKey := client.ObjectKeyFromObject(machine)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, machineKey, machine)).To(Succeed(), "failed to get machine")
-			g.Expect(machine.Spec.MachinePoolRef.Name).To(Equal(machinePoolMatchingLabels.Name))
+			g.Expect(machine.Spec.MachinePoolRef).To(Equal(&corev1.LocalObjectReference{Name: machinePoolMatchingLabels.Name}))
 			g.Expect(machine.Status.State).To(Equal(computev1alpha1.MachineStatePending))
 		}).Should(Succeed())
 	})
@@ -218,10 +218,10 @@ var _ = Describe("MachineScheduler", func() {
 
 		By("observing the machine isn't scheduled onto the machine pool")
 		machineKey := client.ObjectKeyFromObject(machine)
-		Consistently(func() string {
+		Consistently(func() *corev1.LocalObjectReference {
 			Expect(k8sClient.Get(ctx, machineKey, machine)).To(Succeed())
-			return machine.Spec.MachinePoolRef.Name
-		}).Should(BeEmpty())
+			return machine.Spec.MachinePoolRef
+		}).Should(BeNil())
 
 		By("patching the machine to contain only one of the corresponding tolerations")
 		machineBase := machine.DeepCopy()
@@ -234,10 +234,10 @@ var _ = Describe("MachineScheduler", func() {
 		Expect(k8sClient.Patch(ctx, machine, client.MergeFrom(machineBase))).To(Succeed(), "failed to patch the machine's spec")
 
 		By("observing the machine isn't scheduled onto the machine pool")
-		Consistently(func() string {
+		Consistently(func() *corev1.LocalObjectReference {
 			Expect(k8sClient.Get(ctx, machineKey, machine)).To(Succeed())
-			return machine.Spec.MachinePoolRef.Name
-		}).Should(BeEmpty())
+			return machine.Spec.MachinePoolRef
+		}).Should(BeNil())
 
 		By("patching the machine to contain all of the corresponding tolerations")
 		machineBase = machine.DeepCopy()
@@ -251,7 +251,7 @@ var _ = Describe("MachineScheduler", func() {
 		By("observing the machine is scheduled onto the machine pool")
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, machineKey, machine)).To(Succeed(), "failed to get the machine")
-			g.Expect(machine.Spec.MachinePoolRef.Name).To(Equal(taintedMachinePool.Name))
+			g.Expect(machine.Spec.MachinePoolRef).To(Equal(&corev1.LocalObjectReference{Name: taintedMachinePool.Name}))
 		}).Should(Succeed())
 	})
 })

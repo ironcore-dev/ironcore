@@ -54,19 +54,22 @@ type MachinePoolCondition struct {
 	Message string `json:"message"`
 	// ObservedGeneration represents the .metadata.generation that the condition was set based upon.
 	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
-	// LastUpdateTime is the last time a condition has been updated.
-	LastUpdateTime metav1.Time `json:"lastUpdateTime,omitempty"`
 	// LastTransitionTime is the last time the status of a condition has transitioned from one state to another.
 	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
 }
 
 // MachinePoolState is a state a MachinePool can be in.
+//+enum
 type MachinePoolState string
 
 const (
-	MachinePoolStateReady   MachinePoolState = "Ready"
+	// MachinePoolStateReady marks a MachinePool as ready for accepting a Machine.
+	MachinePoolStateReady MachinePoolState = "Ready"
+	// MachinePoolStatePending marks a MachinePool as pending readiness.
 	MachinePoolStatePending MachinePoolState = "Pending"
-	MachinePoolStateError   MachinePoolState = "Error"
+	// MachinePoolStateError marks a MachinePool in an error state.
+	MachinePoolStateError MachinePoolState = "Error"
+	// MachinePoolStateOffline marks a MachinePool as offline.
 	MachinePoolStateOffline MachinePoolState = "Offline"
 )
 

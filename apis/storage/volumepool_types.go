@@ -67,8 +67,6 @@ type VolumePoolCondition struct {
 	Message string
 	// ObservedGeneration represents the .metadata.generation that the condition was set based upon.
 	ObservedGeneration int64
-	// LastUpdateTime is the last time a condition has been updated.
-	LastUpdateTime metav1.Time
 	// LastTransitionTime is the last time the status of a condition has transitioned from one state to another.
 	LastTransitionTime metav1.Time
 }

@@ -44,7 +44,7 @@ func validateVolumeClaimSpec(volumeClaimSpec *storage.VolumeClaimSpec, fldPath *
 
 	allErrs = append(allErrs, metav1validation.ValidateLabelSelector(volumeClaimSpec.Selector, fldPath.Child("selector"))...)
 
-	if volumeClaimSpec.VolumeRef.Name != "" {
+	if volumeClaimSpec.VolumeRef != nil {
 		for _, msg := range apivalidation.NameIsDNSLabel(volumeClaimSpec.VolumeRef.Name, false) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("volumeRef").Child("name"), volumeClaimSpec.VolumeRef.Name, msg))
 		}
@@ -76,8 +76,8 @@ func validateVolumeClaimSpecUpdate(newSpec, oldSpec *storage.VolumeClaimSpec, fl
 	newSpecCopy := newSpec.DeepCopy()
 	oldSpecCopy := oldSpec.DeepCopy()
 
-	if oldSpec.VolumeRef.Name == "" {
-		oldSpecCopy.VolumeRef.Name = newSpecCopy.VolumeRef.Name
+	if oldSpec.VolumeRef == nil {
+		oldSpecCopy.VolumeRef = newSpecCopy.VolumeRef
 	}
 
 	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableFieldWithDiff(newSpecCopy, oldSpecCopy, fldPath)...)

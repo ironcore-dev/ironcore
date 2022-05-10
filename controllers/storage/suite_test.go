@@ -147,8 +147,8 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 
 		// register reconciler here
 		Expect((&VolumeClaimScheduler{
-			Client:        k8sManager.GetClient(),
-			EventRecorder: &record.FakeRecorder{},
+			Client: k8sManager.GetClient(),
+			Events: &record.FakeRecorder{},
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		Expect((&VolumeReconciler{

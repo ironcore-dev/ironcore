@@ -31,7 +31,7 @@ var VolumeClaimGK = schema.GroupKind{
 // VolumeClaimSpec defines the desired state of VolumeClaim
 type VolumeClaimSpec struct {
 	// VolumeRef is the reference to the Volume used by the VolumeClaim
-	VolumeRef corev1.LocalObjectReference `json:"volumeRef,omitempty"`
+	VolumeRef *corev1.LocalObjectReference `json:"volumeRef,omitempty"`
 	// Selector is a label query over volumes to consider for binding.
 	Selector *metav1.LabelSelector `json:"selector,omitempty"`
 	// Resources are the requested Volume resources.

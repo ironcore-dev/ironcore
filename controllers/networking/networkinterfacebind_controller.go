@@ -253,7 +253,7 @@ func (r *NetworkInterfaceBindReconciler) SetupWithManager(mgr ctrl.Manager) erro
 
 		machineRef := nic.Spec.MachineRef
 		if machineRef == nil {
-			return nil
+			return []string{""}
 		}
 
 		return []string{machineRef.Name}

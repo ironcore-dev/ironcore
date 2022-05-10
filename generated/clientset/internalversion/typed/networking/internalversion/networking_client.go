@@ -30,7 +30,6 @@ type NetworkingInterface interface {
 	AliasPrefixRoutingsGetter
 	NetworksGetter
 	NetworkInterfacesGetter
-	NetworkInterfaceBindingsGetter
 	VirtualIPsGetter
 }
 
@@ -53,10 +52,6 @@ func (c *NetworkingClient) Networks(namespace string) NetworkInterface {
 
 func (c *NetworkingClient) NetworkInterfaces(namespace string) NetworkInterfaceInterface {
 	return newNetworkInterfaces(c, namespace)
-}
-
-func (c *NetworkingClient) NetworkInterfaceBindings(namespace string) NetworkInterfaceBindingInterface {
-	return newNetworkInterfaceBindings(c, namespace)
 }
 
 func (c *NetworkingClient) VirtualIPs(namespace string) VirtualIPInterface {

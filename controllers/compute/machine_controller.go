@@ -69,7 +69,7 @@ func (r *MachineReconciler) delete(ctx context.Context, log logr.Logger, machine
 	return ctrl.Result{}, nil
 }
 
-func (r *MachineReconciler) getOrManageNetworkInterface(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine, name string, iface *computev1alpha1.Interface) (*networkingv1alpha1.NetworkInterface, error) {
+func (r *MachineReconciler) getOrManageNetworkInterface(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine, name string, iface *computev1alpha1.NetworkInterface) (*networkingv1alpha1.NetworkInterface, error) {
 	switch {
 	case iface.NetworkInterfaceRef != nil:
 		nic := &networkingv1alpha1.NetworkInterface{}
@@ -108,9 +108,9 @@ func (r *MachineReconciler) getOrManageNetworkInterface(ctx context.Context, log
 	}
 }
 
-func (r *MachineReconciler) applyNetworkInterfaces(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) ([]computev1alpha1.InterfaceStatus, error) {
-	var res []computev1alpha1.InterfaceStatus
-	for _, iface := range machine.Spec.Interfaces {
+func (r *MachineReconciler) applyNetworkInterfaces(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) ([]computev1alpha1.NetworkInterfaceStatus, error) {
+	var res []computev1alpha1.NetworkInterfaceStatus
+	for _, iface := range machine.Spec.NetworkInterfaces {
 		nic, err := r.getOrManageNetworkInterface(ctx, log, machine, iface.Name, &iface)
 		if err != nil {
 			return nil, fmt.Errorf("[interface %s]: %w", iface.Name, err)
@@ -123,7 +123,7 @@ func (r *MachineReconciler) applyNetworkInterfaces(ctx context.Context, log logr
 			continue
 		}
 
-		res = append(res, computev1alpha1.InterfaceStatus{
+		res = append(res, computev1alpha1.NetworkInterfaceStatus{
 			Name:      iface.Name,
 			IPs:       nic.Status.IPs,
 			VirtualIP: nic.Status.VirtualIP,
@@ -132,9 +132,9 @@ func (r *MachineReconciler) applyNetworkInterfaces(ctx context.Context, log logr
 	return res, nil
 }
 
-func (r *MachineReconciler) patchStatus(ctx context.Context, machine *computev1alpha1.Machine, ifaceStates []computev1alpha1.InterfaceStatus) error {
+func (r *MachineReconciler) patchStatus(ctx context.Context, machine *computev1alpha1.Machine, ifaceStates []computev1alpha1.NetworkInterfaceStatus) error {
 	base := machine.DeepCopy()
-	machine.Status.Interfaces = ifaceStates
+	machine.Status.NetworkInterfaces = ifaceStates
 	if err := r.Patch(ctx, machine, client.MergeFrom(base)); err != nil {
 		return fmt.Errorf("error patching machine: %w", err)
 	}

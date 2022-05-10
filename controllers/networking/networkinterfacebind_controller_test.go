@@ -77,10 +77,10 @@ var _ = Describe("NetworkInterfaceBindReconciler", func() {
 			Spec: computev1alpha1.MachineSpec{
 				MachineClassRef: corev1.LocalObjectReference{Name: "machine-class"},
 				Image:           "my-image:latest",
-				Interfaces: []computev1alpha1.Interface{
+				NetworkInterfaces: []computev1alpha1.NetworkInterface{
 					{
 						Name: "interface",
-						InterfaceSource: computev1alpha1.InterfaceSource{
+						NetworkInterfaceSource: computev1alpha1.NetworkInterfaceSource{
 							NetworkInterfaceRef: &corev1.LocalObjectReference{
 								Name: nic.Name,
 							},

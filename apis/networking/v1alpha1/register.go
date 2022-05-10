@@ -50,8 +50,6 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&NetworkList{},
 		&NetworkInterface{},
 		&NetworkInterfaceList{},
-		&NetworkInterfaceBinding{},
-		&NetworkInterfaceBindingList{},
 		&VirtualIP{},
 		&VirtualIPList{},
 		&AliasPrefix{},

@@ -21,7 +21,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/apimachinery/pkg/types"
 )
 
 // VolumeGK is a helper to easily access the GroupKind information of an Volume
@@ -38,9 +37,9 @@ type VolumeSpec struct {
 	VolumePoolSelector map[string]string `json:"volumePoolSelector,omitempty"`
 	// VolumePoolRef indicates which VolumePool to use for a volume.
 	// If unset, the scheduler will figure out a suitable VolumePoolRef.
-	VolumePoolRef corev1.LocalObjectReference `json:"volumePoolRef,omitempty"`
+	VolumePoolRef *corev1.LocalObjectReference `json:"volumePoolRef,omitempty"`
 	// ClaimRef is the reference to the VolumeClaim used by the Volume.
-	ClaimRef ClaimReference `json:"claimRef,omitempty"`
+	ClaimRef *commonv1alpha1.LocalUIDReference `json:"claimRef,omitempty"`
 	// Resources is a description of the volume's resources and capacity.
 	Resources corev1.ResourceList `json:"resources,omitempty"`
 	// Tolerations define tolerations the Volume has. Only any VolumePool whose taints
@@ -51,19 +50,11 @@ type VolumeSpec struct {
 // VolumeAccess represents information on how to access a volume.
 type VolumeAccess struct {
 	// SecretRef references the Secret containing the access credentials to consume a Volume.
-	SecretRef corev1.LocalObjectReference `json:"secretRef,omitempty"`
+	SecretRef *corev1.LocalObjectReference `json:"secretRef,omitempty"`
 	// Driver is the name of the drive to use for this volume. Required.
 	Driver string `json:"driver"`
 	// VolumeAttributes are attributes of the volume to use.
 	VolumeAttributes map[string]string `json:"volumeAttributes,omitempty"`
-}
-
-// ClaimReference points to a referenced VolumeClaim.
-type ClaimReference struct {
-	// Name is the name of the referenced VolumeClaim.
-	Name string `json:"name"`
-	// UID is the UID of the referenced VolumeClaim.
-	UID types.UID `json:"uid"`
 }
 
 // VolumeStatus defines the observed state of Volume
