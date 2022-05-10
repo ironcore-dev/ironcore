@@ -17,7 +17,6 @@ package storage
 import (
 	"context"
 
-	"github.com/onmetal/controller-utils/conditionutils"
 	"github.com/onmetal/onmetal-api/apis/ipam"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/meta/table"
@@ -34,19 +33,13 @@ var (
 		{Name: "Name", Type: "string", Format: "name", Description: objectMetaSwaggerDoc["name"]},
 		{Name: "Prefix", Type: "string", Description: "The managed prefix, if any"},
 		{Name: "Parent", Type: "string", Description: "The parent, if any"},
-		{Name: "State", Type: "string", Description: "The allocation of the prefix"},
+		{Name: "Phase", Type: "string", Description: "The phase of the prefix"},
 		{Name: "Age", Type: "string", Format: "date", Description: objectMetaSwaggerDoc["creationTimestamp"]},
 	}
 )
 
 func newTableConvertor() *convertor {
 	return &convertor{}
-}
-
-func prefixReadyState(prefix *ipam.Prefix) string {
-	readyCond := ipam.PrefixCondition{}
-	conditionutils.MustFindSlice(prefix.Status.Conditions, string(ipam.PrefixReady), &readyCond)
-	return readyCond.Reason
 }
 
 func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tableOptions runtime.Object) (*metav1.Table, error) {
@@ -78,8 +71,8 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 		} else {
 			cells = append(cells, "<none>")
 		}
-		if readyState := prefixReadyState(prefix); readyState != "" {
-			cells = append(cells, readyState)
+		if phase := prefix.Status.Phase; phase != "" {
+			cells = append(cells, phase)
 		} else {
 			cells = append(cells, "<unknown>")
 		}

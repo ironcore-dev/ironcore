@@ -46,25 +46,24 @@ func (s *PrefixSpec) IsRoot() bool {
 
 // PrefixStatus defines the observed state of Prefix
 type PrefixStatus struct {
-	// Conditions is a list of conditions of a Prefix.
-	Conditions []PrefixCondition
+	// Phase is the PrefixPhase of the Prefix.
+	Phase PrefixPhase
+	// LastPhaseTransitionTime is the last time the Phase changed values.
+	LastPhaseTransitionTime *metav1.Time
+
 	// Used is a list of used prefixes.
 	Used []commonv1alpha1.IPPrefix
 }
 
-type PrefixConditionType string
+// PrefixPhase is a phase a Prefix can be in.
+type PrefixPhase string
 
 const (
-	PrefixReady PrefixConditionType = "Ready"
+	// PrefixPhasePending marks a prefix as waiting for allocation.
+	PrefixPhasePending PrefixPhase = "Pending"
+	// PrefixPhaseAllocated marks a prefix as allocated.
+	PrefixPhaseAllocated PrefixPhase = "Allocated"
 )
-
-type PrefixCondition struct {
-	Type               PrefixConditionType
-	Status             corev1.ConditionStatus
-	Reason             string
-	Message            string
-	LastTransitionTime metav1.Time
-}
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +genclient

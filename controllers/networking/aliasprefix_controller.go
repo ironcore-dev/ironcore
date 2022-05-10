@@ -86,12 +86,12 @@ func (r *AliasPrefixReconciler) applyPrefix(ctx context.Context, log logr.Logger
 			return nil, fmt.Errorf("error managing prefix: %w", err)
 		}
 
-		readiness := ipamv1alpha1.GetPrefixReadiness(prefix)
-		if readiness == ipamv1alpha1.ReadinessSucceeded {
-			log.V(1).Info("Ephemeral prefix is ready")
+		phase := prefix.Status.Phase
+		if phase == ipamv1alpha1.PrefixPhaseAllocated {
+			log.V(1).Info("Ephemeral prefix is allocated")
 			return prefix.Spec.Prefix, nil
 		}
-		log.V(1).Info("Ephemeral prefix is not yet ready", "Readiness", readiness)
+		log.V(1).Info("Ephemeral prefix is not yet allocated", "Phase", phase)
 		return nil, nil
 	default:
 		return nil, fmt.Errorf("invalid prefix source %#v", prefixSrc)

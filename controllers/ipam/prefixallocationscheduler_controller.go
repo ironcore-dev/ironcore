@@ -20,13 +20,13 @@ import (
 	"math/rand"
 
 	"github.com/go-logr/logr"
-	"github.com/onmetal/controller-utils/conditionutils"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/apis/ipam/v1alpha1"
 	"inet.af/netaddr"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
@@ -37,6 +37,7 @@ import (
 type PrefixAllocationScheduler struct {
 	client.Client
 	Scheme *runtime.Scheme
+	Events record.EventRecorder
 }
 
 //+kubebuilder:rbac:groups=ipam.api.onmetal.de,resources=prefixes,verbs=get;list;watch
@@ -62,25 +63,12 @@ func (s *PrefixAllocationScheduler) reconcileExists(ctx context.Context, log log
 	return s.reconcile(ctx, log, allocation)
 }
 
-func (s *PrefixAllocationScheduler) patchReadiness(ctx context.Context, allocation *ipamv1alpha1.PrefixAllocation, readyCond ipamv1alpha1.PrefixAllocationCondition) error {
-	base := allocation.DeepCopy()
-	conditionutils.MustUpdateSlice(&allocation.Status.Conditions, string(ipamv1alpha1.PrefixAllocationReady),
-		conditionutils.UpdateStatus(readyCond.Status),
-		conditionutils.UpdateReason(readyCond.Reason),
-		conditionutils.UpdateMessage(readyCond.Message),
-	)
-	if err := s.Status().Patch(ctx, allocation, client.MergeFrom(base)); err != nil {
-		return fmt.Errorf("error patching ready condition: %w", err)
-	}
-	return nil
-}
-
-func isPrefixReadyAndNotDeleting(prefix *ipamv1alpha1.Prefix) bool {
+func isPrefixAllocatedAndNotDeleting(prefix *ipamv1alpha1.Prefix) bool {
 	return prefix.DeletionTimestamp.IsZero() &&
-		ipamv1alpha1.GetPrefixReadiness(prefix) == ipamv1alpha1.ReadinessSucceeded
+		prefix.Status.Phase == ipamv1alpha1.PrefixPhaseAllocated
 }
 
-func (s *PrefixAllocationScheduler) prefixRefForAllocation(ctx context.Context, log logr.Logger, allocation *ipamv1alpha1.PrefixAllocation) (string, error) {
+func (s *PrefixAllocationScheduler) prefixForAllocation(ctx context.Context, log logr.Logger, allocation *ipamv1alpha1.PrefixAllocation) (string, error) {
 	sel, err := metav1.LabelSelectorAsSelector(allocation.Spec.PrefixSelector)
 	if err != nil {
 		return "", fmt.Errorf("error building label selector: %w", err)
@@ -97,7 +85,7 @@ func (s *PrefixAllocationScheduler) prefixRefForAllocation(ctx context.Context, 
 
 	var suitable []ipamv1alpha1.Prefix
 	for _, prefix := range list.Items {
-		if !isPrefixReadyAndNotDeleting(&prefix) {
+		if !isPrefixAllocatedAndNotDeleting(&prefix) {
 			continue
 		}
 
@@ -158,29 +146,23 @@ func (s *PrefixAllocationScheduler) reconcile(ctx context.Context, log logr.Logg
 		log.V(1).Info("Allocation has no selector")
 		return ctrl.Result{}, nil
 	}
-	if readiness := ipamv1alpha1.GetPrefixAllocationReadiness(allocation); readiness.IsTerminal() {
-		log.V(1).Info("Allocation is in terminal state", "Readiness", readiness)
+	if allocation.Status.Phase.IsTerminal() {
+		log.V(1).Info("Allocation is in terminal state", "Phase", allocation.Status.Phase)
 		return ctrl.Result{}, nil
 	}
 
-	log.V(1).Info("Determining suitable prefix ref for allocation")
-	ref, err := s.prefixRefForAllocation(ctx, log, allocation)
+	log.V(1).Info("Determining suitable prefix for allocation")
+	ref, err := s.prefixForAllocation(ctx, log, allocation)
 	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("error computing prefix ref for allocation: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error finding prefix for allocation: %w", err)
 	}
 	if ref == "" {
-		log.V(1).Info("No suitable prefix ref found")
-		if err := s.patchReadiness(ctx, allocation, ipamv1alpha1.PrefixAllocationCondition{
-			Status:  corev1.ConditionFalse,
-			Reason:  ipamv1alpha1.ReasonPending,
-			Message: "There is currently no prefix that satisfies the requirements.",
-		}); err != nil {
-			return ctrl.Result{}, fmt.Errorf("error patching readiness: %w", err)
-		}
+		log.V(1).Info("No suitable prefix found")
+		s.Events.Event(allocation, corev1.EventTypeNormal, "NoSuitablePrefix", "No suitable prefix for scheduling allocation found.")
 		return ctrl.Result{}, nil
 	}
 
-	log.V(1).Info("Suitable prefix ref found, assigning allocation", "PrefixRef", ref)
+	log.V(1).Info("Suitable prefix found, assigning allocation", "Prefix", ref)
 	base := allocation.DeepCopy()
 	allocation.Spec.PrefixRef = &corev1.LocalObjectReference{Name: ref}
 	if err := s.Patch(ctx, allocation, client.MergeFrom(base)); err != nil {
@@ -217,7 +199,7 @@ func (s *PrefixAllocationScheduler) SetupWithManager(mgr manager.Manager) error 
 func (s *PrefixAllocationScheduler) enqueueByMatchingPrefix(ctx context.Context, log logr.Logger) handler.EventHandler {
 	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
 		prefix := obj.(*ipamv1alpha1.Prefix)
-		if !isPrefixReadyAndNotDeleting(prefix) {
+		if !isPrefixAllocatedAndNotDeleting(prefix) {
 			return nil
 		}
 

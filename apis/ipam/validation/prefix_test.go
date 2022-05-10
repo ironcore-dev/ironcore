@@ -268,26 +268,16 @@ var _ = Describe("Prefix", func() {
 			errList := ValidatePrefixStatus(status, field.NewPath("status"))
 			Expect(errList).To(match)
 		},
-		Entry("succeeded invalid used",
+		Entry("allocated invalid used",
 			&ipam.PrefixStatus{
-				Conditions: []ipam.PrefixCondition{
-					{
-						Type:   ipam.PrefixReady,
-						Status: corev1.ConditionTrue,
-					},
-				},
-				Used: []commonv1alpha1.IPPrefix{{}},
+				Phase: ipam.PrefixPhaseAllocated,
+				Used:  []commonv1alpha1.IPPrefix{{}},
 			},
 			ContainElement(InvalidField("status.used[0]")),
 		),
-		Entry("succeeded overlapping used",
+		Entry("allocated overlapping used",
 			&ipam.PrefixStatus{
-				Conditions: []ipam.PrefixCondition{
-					{
-						Type:   ipam.PrefixReady,
-						Status: corev1.ConditionTrue,
-					},
-				},
+				Phase: ipam.PrefixPhaseAllocated,
 				Used: []commonv1alpha1.IPPrefix{
 					commonv1alpha1.MustParseIPPrefix("10.0.0.0/8"),
 					commonv1alpha1.MustParseIPPrefix("10.0.0.0/16"),
@@ -295,14 +285,9 @@ var _ = Describe("Prefix", func() {
 			},
 			ContainElement(InvalidField("status.used")),
 		),
-		Entry("succeeded different ip families used",
+		Entry("allocated different ip families used",
 			&ipam.PrefixStatus{
-				Conditions: []ipam.PrefixCondition{
-					{
-						Type:   ipam.PrefixReady,
-						Status: corev1.ConditionTrue,
-					},
-				},
+				Phase: ipam.PrefixPhaseAllocated,
 				Used: []commonv1alpha1.IPPrefix{
 					commonv1alpha1.MustParseIPPrefix("10.0.0.0/8"),
 					commonv1alpha1.MustParseIPPrefix("beef::/64"),
@@ -310,20 +295,15 @@ var _ = Describe("Prefix", func() {
 			},
 			ContainElement(InvalidField("status.used")),
 		),
-		Entry("not succeeded but used",
+		Entry("not allocated but used",
 			&ipam.PrefixStatus{
 				Used: []commonv1alpha1.IPPrefix{{}},
 			},
 			ContainElement(InvalidField("status.used")),
 		),
-		Entry("succeeded valid",
+		Entry("allocated valid",
 			&ipam.PrefixStatus{
-				Conditions: []ipam.PrefixCondition{
-					{
-						Type:   ipam.PrefixReady,
-						Status: corev1.ConditionTrue,
-					},
-				},
+				Phase: ipam.PrefixPhaseAllocated,
 				Used: []commonv1alpha1.IPPrefix{
 					commonv1alpha1.MustParseIPPrefix("10.0.0.0/8"),
 					commonv1alpha1.MustParseIPPrefix("11.0.0.0/8"),
@@ -331,7 +311,7 @@ var _ = Describe("Prefix", func() {
 			},
 			BeEmpty(),
 		),
-		Entry("not succeeded valid",
+		Entry("not allocated valid",
 			&ipam.PrefixStatus{},
 			BeEmpty(),
 		),
@@ -346,69 +326,43 @@ var _ = Describe("Prefix", func() {
 			&ipam.Prefix{},
 			&ipam.Prefix{
 				Status: ipam.PrefixStatus{
-					Conditions: []ipam.PrefixCondition{
-						{
-							Type:   ipam.PrefixReady,
-							Status: corev1.ConditionTrue,
-						},
-					},
+					Phase: ipam.PrefixPhaseAllocated,
 				},
 			},
-			ContainElement(RequiredField("status.conditions[0]")),
+			ContainElement(ForbiddenField("status.phase")),
 		),
 		Entry("terminal to non-terminal ready condition",
 			&ipam.Prefix{
 				Status: ipam.PrefixStatus{
-					Conditions: []ipam.PrefixCondition{
-						{
-							Type:   ipam.PrefixReady,
-							Status: corev1.ConditionFalse,
-							Reason: ipam.ReasonPending,
-						},
-					},
+					Phase: ipam.PrefixPhasePending,
 				},
 			},
 			&ipam.Prefix{
 				Status: ipam.PrefixStatus{
-					Conditions: []ipam.PrefixCondition{
-						{
-							Type:   ipam.PrefixReady,
-							Status: corev1.ConditionTrue,
-						},
-					},
+					Phase: ipam.PrefixPhaseAllocated,
 				},
 			},
-			ContainElement(ForbiddenField("status.conditions[0]")),
+			ContainElement(ForbiddenField("status.phase")),
 		),
 		Entry("non-terminal to terminal ready condition",
 			&ipam.Prefix{
 				Status: ipam.PrefixStatus{
-					Conditions: []ipam.PrefixCondition{
-						{
-							Type:   ipam.PrefixReady,
-							Status: corev1.ConditionTrue,
-						},
-					},
+					Phase: ipam.PrefixPhaseAllocated,
 				},
 			},
 			&ipam.Prefix{},
-			Not(ContainElement(InvalidField("status.conditions[0]"))),
+			Not(ContainElement(InvalidField("status.phase"))),
 		),
-		Entry("empty to succeeded but prefix not valid",
+		Entry("empty to allocated but prefix not valid",
 			&ipam.Prefix{
 				Status: ipam.PrefixStatus{
-					Conditions: []ipam.PrefixCondition{
-						{
-							Type:   ipam.PrefixReady,
-							Status: corev1.ConditionTrue,
-						},
-					},
+					Phase: ipam.PrefixPhaseAllocated,
 				},
 			},
 			&ipam.Prefix{},
-			ContainElement(ForbiddenField("status.conditions[0]")),
+			ContainElement(RequiredField("spec.prefix")),
 		),
-		Entry("empty to succeeded and prefix valid but child and no parent",
+		Entry("empty to allocated and prefix valid but child and no parent",
 			&ipam.Prefix{
 				Spec: ipam.PrefixSpec{
 					Prefix: commonv1alpha1.MustParseNewIPPrefix("10.0.0.0/8"),
@@ -417,12 +371,7 @@ var _ = Describe("Prefix", func() {
 					},
 				},
 				Status: ipam.PrefixStatus{
-					Conditions: []ipam.PrefixCondition{
-						{
-							Type:   ipam.PrefixReady,
-							Status: corev1.ConditionTrue,
-						},
-					},
+					Phase: ipam.PrefixPhaseAllocated,
 				},
 			},
 			&ipam.Prefix{
@@ -433,20 +382,15 @@ var _ = Describe("Prefix", func() {
 					},
 				},
 			},
-			ContainElement(ForbiddenField("status.conditions[0]")),
+			ContainElement(RequiredField("spec.parentRef")),
 		),
-		Entry("empty to succeeded and prefix valid",
+		Entry("empty to allocated and prefix valid",
 			&ipam.Prefix{
 				Spec: ipam.PrefixSpec{
 					Prefix: commonv1alpha1.MustParseNewIPPrefix("10.0.0.0/8"),
 				},
 				Status: ipam.PrefixStatus{
-					Conditions: []ipam.PrefixCondition{
-						{
-							Type:   ipam.PrefixReady,
-							Status: corev1.ConditionTrue,
-						},
-					},
+					Phase: ipam.PrefixPhaseAllocated,
 				},
 			},
 			&ipam.Prefix{
@@ -454,7 +398,7 @@ var _ = Describe("Prefix", func() {
 					Prefix: commonv1alpha1.MustParseNewIPPrefix("10.0.0.0/8"),
 				},
 			},
-			Not(ContainElement(ForbiddenField("status.conditions[0]"))),
+			Not(ContainElement(ForbiddenField("status.phase"))),
 		),
 		Entry("used not covered by spec",
 			&ipam.Prefix{
@@ -465,12 +409,7 @@ var _ = Describe("Prefix", func() {
 					Used: []commonv1alpha1.IPPrefix{
 						commonv1alpha1.MustParseIPPrefix("11.0.0.0/8"),
 					},
-					Conditions: []ipam.PrefixCondition{
-						{
-							Type:   ipam.PrefixReady,
-							Status: corev1.ConditionTrue,
-						},
-					},
+					Phase: ipam.PrefixPhaseAllocated,
 				},
 			},
 			&ipam.Prefix{
@@ -478,12 +417,7 @@ var _ = Describe("Prefix", func() {
 					Prefix: commonv1alpha1.MustParseNewIPPrefix("10.0.0.0/8"),
 				},
 				Status: ipam.PrefixStatus{
-					Conditions: []ipam.PrefixCondition{
-						{
-							Type:   ipam.PrefixReady,
-							Status: corev1.ConditionTrue,
-						},
-					},
+					Phase: ipam.PrefixPhaseAllocated,
 				},
 			},
 			ContainElement(ForbiddenField("status.used[0]")),
@@ -494,14 +428,9 @@ var _ = Describe("Prefix", func() {
 					Prefix: commonv1alpha1.MustParseNewIPPrefix("10.0.0.0/8"),
 				},
 				Status: ipam.PrefixStatus{
+					Phase: ipam.PrefixPhaseAllocated,
 					Used: []commonv1alpha1.IPPrefix{
 						commonv1alpha1.MustParseIPPrefix("10.0.0.0/8"),
-					},
-					Conditions: []ipam.PrefixCondition{
-						{
-							Type:   ipam.PrefixReady,
-							Status: corev1.ConditionTrue,
-						},
 					},
 				},
 			},
@@ -510,12 +439,7 @@ var _ = Describe("Prefix", func() {
 					Prefix: commonv1alpha1.MustParseNewIPPrefix("10.0.0.0/8"),
 				},
 				Status: ipam.PrefixStatus{
-					Conditions: []ipam.PrefixCondition{
-						{
-							Type:   ipam.PrefixReady,
-							Status: corev1.ConditionTrue,
-						},
-					},
+					Phase: ipam.PrefixPhaseAllocated,
 				},
 			},
 			Not(ContainElement(ForbiddenField("status.used[0]"))),

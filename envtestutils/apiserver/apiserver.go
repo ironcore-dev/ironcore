@@ -64,8 +64,10 @@ type Options struct {
 	Host        string
 	Port        int
 	CertDir     string
-	Stdout      io.Writer
-	Stderr      io.Writer
+
+	AttachOutput bool
+	Stdout       io.Writer
+	Stderr       io.Writer
 
 	HealthTimeout time.Duration
 	WaitTimeout   time.Duration
@@ -98,11 +100,18 @@ func setAPIServerOptionsDefaults(opts *Options) {
 	if opts.WaitTimeout == 0 {
 		opts.WaitTimeout = 20 * time.Second
 	}
+	if opts.AttachOutput {
+		opts.Stdout = os.Stdout
+		opts.Stderr = os.Stderr
+	}
 }
 
 func New(cfg *rest.Config, opts Options) (*APIServer, error) {
 	if opts.MainPath == "" && len(opts.Command) == 0 {
 		return nil, fmt.Errorf("must specify opts.MainPath or opts.Command")
+	}
+	if opts.AttachOutput && (opts.Stdout != nil || opts.Stderr != nil) {
+		return nil, fmt.Errorf("must not specify AttachOutput and Stdout / Stderr simultaneously")
 	}
 	if len(opts.ETCDServers) == 0 {
 		return nil, fmt.Errorf("must specify opts.ETCDServers")

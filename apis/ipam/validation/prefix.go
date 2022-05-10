@@ -145,9 +145,9 @@ func validatePrefixSpecUpdate(newSpec, oldSpec *ipam.PrefixSpec, fldPath *field.
 func ValidatePrefixStatus(status *ipam.PrefixStatus, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	readiness, _ := ipam.GetPrefixConditionsReadinessAndIndex(status.Conditions)
-	switch readiness {
-	case ipam.ReadinessSucceeded:
+	phase := status.Phase
+	switch phase {
+	case ipam.PrefixPhaseAllocated:
 		var bldr netaddr.IPSetBuilder
 
 		var (
@@ -192,26 +192,20 @@ func ValidatePrefixStatusUpdate(newPrefix, oldPrefix *ipam.Prefix) field.ErrorLi
 	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessorUpdate(newPrefix, oldPrefix, field.NewPath("metadata"))...)
 	allErrs = append(allErrs, ValidatePrefixStatus(&newPrefix.Status, statusField)...)
 
-	conditionsField := statusField.Child("conditions")
+	newPhase := newPrefix.Status.Phase
+	oldPhase := oldPrefix.Status.Phase
 
-	newReadiness, newReadyIdx := ipam.GetPrefixConditionsReadinessAndIndex(newPrefix.Status.Conditions)
-	oldReadiness, _ := ipam.GetPrefixConditionsReadinessAndIndex(oldPrefix.Status.Conditions)
-
-	if oldReadiness.Terminal() && oldReadiness != newReadiness {
-		if newReadyIdx < 0 {
-			allErrs = append(allErrs, field.Required(conditionsField.Index(0), "terminal ready condition is missing"))
-		} else {
-			allErrs = append(allErrs, field.Forbidden(conditionsField.Index(newReadyIdx), "may not change terminal ready condition"))
-		}
+	if oldPhase == ipam.PrefixPhaseAllocated && oldPhase != newPhase {
+		allErrs = append(allErrs, field.Forbidden(field.NewPath("status", "phase"), "may not update from allocated to non-allocated phase"))
 	}
 
-	if newReadiness == ipam.ReadinessSucceeded {
+	if newPhase == ipam.PrefixPhaseAllocated {
 		if !newPrefix.Spec.Prefix.IsValid() {
-			allErrs = append(allErrs, field.Forbidden(conditionsField.Index(newReadyIdx), "spec.prefix has to be defined"))
+			allErrs = append(allErrs, field.Required(field.NewPath("spec", "prefix"), "must specify prefix if allocated"))
 		}
 
 		if newPrefix.Spec.ParentSelector != nil && newPrefix.Spec.ParentRef == nil {
-			allErrs = append(allErrs, field.Forbidden(conditionsField.Index(newReadyIdx), "child prefix cannot be allocated without parentRef set"))
+			allErrs = append(allErrs, field.Required(field.NewPath("spec", "parentRef"), "must specify parentRef when allocating sub-prefix"))
 		}
 	}
 
