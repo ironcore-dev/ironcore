@@ -21,6 +21,7 @@ COPY controllers/ controllers/
 COPY equality/ equality/
 COPY generated/ generated/
 COPY registry/ registry/
+COPY serializer/ serializer/
 COPY tableconvertor/ tableconvertor/
 
 ARG TARGETOS TARGETARCH

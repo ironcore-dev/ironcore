@@ -23,6 +23,7 @@ import (
 	networkstorage "github.com/onmetal/onmetal-api/registry/networking/network/storage"
 	networkinterfacestorage "github.com/onmetal/onmetal-api/registry/networking/networkinterface/storage"
 	virtualipstorage "github.com/onmetal/onmetal-api/registry/networking/virtualip/storage"
+	onmetalapiserializer "github.com/onmetal/onmetal-api/serializer"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/registry/generic"
@@ -41,6 +42,7 @@ func (p StorageProvider) GroupName() string {
 func (p StorageProvider) NewRESTStorage(apiResourceConfigSource storage.APIResourceConfigSource, restOptionsGetter generic.RESTOptionsGetter) (genericapiserver.APIGroupInfo, bool, error) {
 	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(p.GroupName(), api.Scheme, metav1.ParameterCodec, api.Codecs)
 	apiGroupInfo.PrioritizedVersions = []schema.GroupVersion{networkingv1alpha1.SchemeGroupVersion}
+	apiGroupInfo.NegotiatedSerializer = onmetalapiserializer.DefaultSubsetNegotiatedSerializer(api.Codecs)
 
 	storageMap, err := p.v1alpha1Storage(restOptionsGetter)
 	if err != nil {
