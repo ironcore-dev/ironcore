@@ -41,6 +41,12 @@ type AliasPrefixReconciler struct {
 	Scheme *runtime.Scheme
 }
 
+//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=aliasprefixes,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=aliasprefixes/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=aliasprefixes/finalizers,verbs=update
+//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces,verbs=get;list;watch
+//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=aliasprefixroutings,verbs=get;list;watch;create;update;patch;delete
+
 func (r *AliasPrefixReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
 	aliasPrefix := &networkingv1alpha1.AliasPrefix{}
