@@ -41,6 +41,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/apis/common/v1alpha1.Taint":                            schema_onmetal_api_apis_common_v1alpha1_Taint(ref),
 		"github.com/onmetal/onmetal-api/apis/common/v1alpha1.Toleration":                       schema_onmetal_api_apis_common_v1alpha1_Toleration(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EFIVar":                          schema_onmetal_api_apis_compute_v1alpha1_EFIVar(ref),
+		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EmptyDiskVolumeSource":           schema_onmetal_api_apis_compute_v1alpha1_EmptyDiskVolumeSource(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EphemeralNetworkInterfaceSource": schema_onmetal_api_apis_compute_v1alpha1_EphemeralNetworkInterfaceSource(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.Machine":                         schema_onmetal_api_apis_compute_v1alpha1_Machine(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachineClass":                    schema_onmetal_api_apis_compute_v1alpha1_MachineClass(ref),
@@ -623,6 +624,27 @@ func schema_onmetal_api_apis_compute_v1alpha1_EFIVar(ref common.ReferenceCallbac
 				Required: []string{"name", "uuid", "value"},
 			},
 		},
+	}
+}
+
+func schema_onmetal_api_apis_compute_v1alpha1_EmptyDiskVolumeSource(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "EmptyDiskVolumeSource is a volume that's offered by the machine pool provider. Usually ephemeral (i.e. deleted when the surrounding entity is deleted), with varying performance characteristics. Potentially not recoverable.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"sizeLimit": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SizeLimit is the total amount of local storage required for this EmptyDisk volume. The default is nil which means that the limit is undefined.",
+							Ref:         ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/api/resource.Quantity"},
 	}
 }
 
@@ -1451,12 +1473,18 @@ func schema_onmetal_api_apis_compute_v1alpha1_Volume(ref common.ReferenceCallbac
 							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
 						},
 					},
+					"emptyDisk": {
+						SchemaProps: spec.SchemaProps{
+							Description: "EmptyDisk instructs to use a Volume offered by the machine pool provider.",
+							Ref:         ref("github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EmptyDiskVolumeSource"),
+						},
+					},
 				},
 				Required: []string{"name"},
 			},
 		},
 		Dependencies: []string{
-			"k8s.io/api/core/v1.LocalObjectReference"},
+			"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EmptyDiskVolumeSource", "k8s.io/api/core/v1.LocalObjectReference"},
 	}
 }
 
@@ -1473,11 +1501,17 @@ func schema_onmetal_api_apis_compute_v1alpha1_VolumeSource(ref common.ReferenceC
 							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
 						},
 					},
+					"emptyDisk": {
+						SchemaProps: spec.SchemaProps{
+							Description: "EmptyDisk instructs to use a Volume offered by the machine pool provider.",
+							Ref:         ref("github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EmptyDiskVolumeSource"),
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"k8s.io/api/core/v1.LocalObjectReference"},
+			"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EmptyDiskVolumeSource", "k8s.io/api/core/v1.LocalObjectReference"},
 	}
 }
 
