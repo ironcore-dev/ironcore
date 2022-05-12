@@ -315,6 +315,8 @@ func autoConvert_v1alpha1_VolumeClaimSpec_To_storage_VolumeClaimSpec(in *VolumeC
 	out.VolumeRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeRef))
 	out.Selector = (*metav1.LabelSelector)(unsafe.Pointer(in.Selector))
 	out.Resources = *(*v1.ResourceList)(unsafe.Pointer(&in.Resources))
+	out.Image = in.Image
+	out.ImagePullSecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.ImagePullSecretRef))
 	out.VolumeClassRef = in.VolumeClassRef
 	return nil
 }
@@ -328,6 +330,8 @@ func autoConvert_storage_VolumeClaimSpec_To_v1alpha1_VolumeClaimSpec(in *storage
 	out.VolumeRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeRef))
 	out.Selector = (*metav1.LabelSelector)(unsafe.Pointer(in.Selector))
 	out.Resources = *(*v1.ResourceList)(unsafe.Pointer(&in.Resources))
+	out.Image = in.Image
+	out.ImagePullSecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.ImagePullSecretRef))
 	out.VolumeClassRef = in.VolumeClassRef
 	return nil
 }
@@ -563,6 +567,8 @@ func autoConvert_v1alpha1_VolumeSpec_To_storage_VolumeSpec(in *VolumeSpec, out *
 	out.VolumePoolRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumePoolRef))
 	out.ClaimRef = (*commonv1alpha1.LocalUIDReference)(unsafe.Pointer(in.ClaimRef))
 	out.Resources = *(*v1.ResourceList)(unsafe.Pointer(&in.Resources))
+	out.Image = in.Image
+	out.ImagePullSecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.ImagePullSecretRef))
 	out.Tolerations = *(*[]commonv1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
 	return nil
 }
@@ -578,6 +584,8 @@ func autoConvert_storage_VolumeSpec_To_v1alpha1_VolumeSpec(in *storage.VolumeSpe
 	out.VolumePoolRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumePoolRef))
 	out.ClaimRef = (*commonv1alpha1.LocalUIDReference)(unsafe.Pointer(in.ClaimRef))
 	out.Resources = *(*v1.ResourceList)(unsafe.Pointer(&in.Resources))
+	out.Image = in.Image
+	out.ImagePullSecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.ImagePullSecretRef))
 	out.Tolerations = *(*[]commonv1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
 	return nil
 }

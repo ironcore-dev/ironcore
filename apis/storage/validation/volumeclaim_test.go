@@ -56,6 +56,14 @@ var _ = Describe("VolumeClaim", func() {
 			},
 			ContainElement(InvalidField("spec.volumeClassRef.name")),
 		),
+		Entry("invalid image pull secret ref name",
+			&storage.VolumeClaim{
+				Spec: storage.VolumeClaimSpec{
+					ImagePullSecretRef: &corev1.LocalObjectReference{Name: "foo*"},
+				},
+			},
+			ContainElement(InvalidField("spec.imagePullSecretRef.name")),
+		),
 		Entry("invalid volume ref name",
 			&storage.VolumeClaim{
 				Spec: storage.VolumeClaimSpec{

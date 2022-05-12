@@ -3050,6 +3050,19 @@ func schema_onmetal_api_apis_storage_v1alpha1_VolumeClaimSpec(ref common.Referen
 							},
 						},
 					},
+					"image": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Image is an optional image to bootstrap the volume with.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"imagePullSecretRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ImagePullSecretRef is an optional secret for pulling the image of a volume.",
+							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
+						},
+					},
 					"volumeClassRef": {
 						SchemaProps: spec.SchemaProps{
 							Description: "VolumeClassRef references the VolumeClass used by the Volume.",
@@ -3563,6 +3576,19 @@ func schema_onmetal_api_apis_storage_v1alpha1_VolumeSpec(ref common.ReferenceCal
 									},
 								},
 							},
+						},
+					},
+					"image": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Image is an optional image to bootstrap the volume with.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"imagePullSecretRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ImagePullSecretRef is an optional secret for pulling the image of a volume.",
+							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
 						},
 					},
 					"tolerations": {
