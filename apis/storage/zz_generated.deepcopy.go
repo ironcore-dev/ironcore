@@ -164,6 +164,11 @@ func (in *VolumeClaimSpec) DeepCopyInto(out *VolumeClaimSpec) {
 			(*out)[key] = val.DeepCopy()
 		}
 	}
+	if in.ImagePullSecretRef != nil {
+		in, out := &in.ImagePullSecretRef, &out.ImagePullSecretRef
+		*out = new(v1.LocalObjectReference)
+		**out = **in
+	}
 	out.VolumeClassRef = in.VolumeClassRef
 	return
 }
@@ -461,6 +466,11 @@ func (in *VolumeSpec) DeepCopyInto(out *VolumeSpec) {
 		for key, val := range *in {
 			(*out)[key] = val.DeepCopy()
 		}
+	}
+	if in.ImagePullSecretRef != nil {
+		in, out := &in.ImagePullSecretRef, &out.ImagePullSecretRef
+		*out = new(v1.LocalObjectReference)
+		**out = **in
 	}
 	if in.Tolerations != nil {
 		in, out := &in.Tolerations, &out.Tolerations

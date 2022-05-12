@@ -36,6 +36,10 @@ type VolumeClaimSpec struct {
 	Selector *metav1.LabelSelector
 	// Resources are the requested Volume resources.
 	Resources corev1.ResourceList
+	// Image is an optional image to bootstrap the volume with.
+	Image string
+	// ImagePullSecretRef is an optional secret for pulling the image of a volume.
+	ImagePullSecretRef *corev1.LocalObjectReference
 	// VolumeClassRef references the VolumeClass used by the Volume.
 	VolumeClassRef corev1.LocalObjectReference
 }

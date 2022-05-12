@@ -42,6 +42,10 @@ type VolumeSpec struct {
 	ClaimRef *commonv1alpha1.LocalUIDReference
 	// Resources is a description of the volume's resources and capacity.
 	Resources corev1.ResourceList
+	// Image is an optional image to bootstrap the volume with.
+	Image string
+	// ImagePullSecretRef is an optional secret for pulling the image of a volume.
+	ImagePullSecretRef *corev1.LocalObjectReference
 	// Tolerations define tolerations the Volume has. Only a VolumePool whose taints
 	// covered by Tolerations will be considered to host the Volume.
 	Tolerations []commonv1alpha1.Toleration

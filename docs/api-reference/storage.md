@@ -139,6 +139,30 @@ Kubernetes core/v1.ResourceList
 </tr>
 <tr>
 <td>
+<code>image</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Image is an optional image to bootstrap the volume with.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>imagePullSecretRef</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>ImagePullSecretRef is an optional secret for pulling the image of a volume.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>tolerations</code><br/>
 <em>
 <a href="/api-reference/common/#common.onmetal.de/v1alpha1.Toleration">
@@ -262,6 +286,30 @@ Kubernetes core/v1.ResourceList
 </td>
 <td>
 <p>Resources are the requested Volume resources.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>image</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Image is an optional image to bootstrap the volume with.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>imagePullSecretRef</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>ImagePullSecretRef is an optional secret for pulling the image of a volume.</p>
 </td>
 </tr>
 <tr>
@@ -585,6 +633,30 @@ Kubernetes core/v1.ResourceList
 </td>
 <td>
 <p>Resources are the requested Volume resources.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>image</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Image is an optional image to bootstrap the volume with.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>imagePullSecretRef</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>ImagePullSecretRef is an optional secret for pulling the image of a volume.</p>
 </td>
 </tr>
 <tr>
@@ -979,6 +1051,30 @@ Kubernetes core/v1.ResourceList
 </td>
 <td>
 <p>Resources is a description of the volume&rsquo;s resources and capacity.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>image</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Image is an optional image to bootstrap the volume with.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>imagePullSecretRef</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>ImagePullSecretRef is an optional secret for pulling the image of a volume.</p>
 </td>
 </tr>
 <tr>
