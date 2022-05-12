@@ -141,6 +141,7 @@ API rule violation: list_type_missing,k8s.io/apimachinery/pkg/apis/meta/v1,Table
 API rule violation: list_type_missing,k8s.io/apimachinery/pkg/apis/meta/v1,UpdateOptions,DryRun
 API rule violation: list_type_missing,k8s.io/apimachinery/pkg/runtime,RawExtension,Raw
 API rule violation: list_type_missing,k8s.io/apimachinery/pkg/runtime,Unknown,Raw
+API rule violation: names_match,github.com/onmetal/onmetal-api/apis/compute/v1alpha1,MachineSpec,ImagePullSecretRef
 API rule violation: names_match,github.com/onmetal/onmetal-api/apis/compute/v1alpha1,NetworkInterfaceStatus,IPs
 API rule violation: names_match,github.com/onmetal/onmetal-api/apis/networking/v1alpha1,NetworkInterfaceSpec,IPs
 API rule violation: names_match,github.com/onmetal/onmetal-api/apis/networking/v1alpha1,NetworkInterfaceSpec,VirtualIP

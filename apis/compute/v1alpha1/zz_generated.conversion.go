@@ -580,6 +580,7 @@ func autoConvert_v1alpha1_MachineSpec_To_compute_MachineSpec(in *MachineSpec, ou
 	out.MachinePoolSelector = *(*map[string]string)(unsafe.Pointer(&in.MachinePoolSelector))
 	out.MachinePoolRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.MachinePoolRef))
 	out.Image = in.Image
+	out.ImagePullSecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.ImagePullSecretRef))
 	out.NetworkInterfaces = *(*[]compute.NetworkInterface)(unsafe.Pointer(&in.NetworkInterfaces))
 	out.Volumes = *(*[]compute.Volume)(unsafe.Pointer(&in.Volumes))
 	out.IgnitionRef = (*commonv1alpha1.ConfigMapKeySelector)(unsafe.Pointer(in.IgnitionRef))
@@ -598,6 +599,7 @@ func autoConvert_compute_MachineSpec_To_v1alpha1_MachineSpec(in *compute.Machine
 	out.MachinePoolSelector = *(*map[string]string)(unsafe.Pointer(&in.MachinePoolSelector))
 	out.MachinePoolRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.MachinePoolRef))
 	out.Image = in.Image
+	out.ImagePullSecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.ImagePullSecretRef))
 	out.NetworkInterfaces = *(*[]NetworkInterface)(unsafe.Pointer(&in.NetworkInterfaces))
 	out.Volumes = *(*[]Volume)(unsafe.Pointer(&in.Volumes))
 	out.IgnitionRef = (*commonv1alpha1.ConfigMapKeySelector)(unsafe.Pointer(in.IgnitionRef))

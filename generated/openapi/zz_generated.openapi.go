@@ -1211,6 +1211,12 @@ func schema_onmetal_api_apis_compute_v1alpha1_MachineSpec(ref common.ReferenceCa
 							Format:      "",
 						},
 					},
+					"imagePullSecret": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ImagePullSecretRef is an optional secret for pulling the image of a machine.",
+							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
+						},
+					},
 					"networkInterfaces": {
 						SchemaProps: spec.SchemaProps{
 							Description: "NetworkInterfaces define a list of network interfaces present on the machine",

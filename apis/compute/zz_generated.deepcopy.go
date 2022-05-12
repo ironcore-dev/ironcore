@@ -372,6 +372,11 @@ func (in *MachineSpec) DeepCopyInto(out *MachineSpec) {
 		*out = new(v1.LocalObjectReference)
 		**out = **in
 	}
+	if in.ImagePullSecretRef != nil {
+		in, out := &in.ImagePullSecretRef, &out.ImagePullSecretRef
+		*out = new(v1.LocalObjectReference)
+		**out = **in
+	}
 	if in.NetworkInterfaces != nil {
 		in, out := &in.NetworkInterfaces, &out.NetworkInterfaces
 		*out = make([]NetworkInterface, len(*in))

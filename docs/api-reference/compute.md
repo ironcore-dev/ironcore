@@ -124,6 +124,19 @@ string
 </tr>
 <tr>
 <td>
+<code>imagePullSecret</code><br/>
+<em>
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>ImagePullSecretRef is an optional secret for pulling the image of a machine.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>networkInterfaces</code><br/>
 <em>
 <a href="#compute.api.onmetal.de/v1alpha1.NetworkInterface">
@@ -875,6 +888,19 @@ string
 </td>
 <td>
 <p>Image is the URL providing the operating system image of the machine.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>imagePullSecret</code><br/>
+<em>
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>ImagePullSecretRef is an optional secret for pulling the image of a machine.</p>
 </td>
 </tr>
 <tr>
