@@ -50,12 +50,10 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 
 	if m, err := meta.ListAccessor(obj); err == nil {
 		tab.ResourceVersion = m.GetResourceVersion()
-		tab.SelfLink = m.GetSelfLink()
 		tab.Continue = m.GetContinue()
 	} else {
 		if m, err := meta.CommonAccessor(obj); err == nil {
 			tab.ResourceVersion = m.GetResourceVersion()
-			tab.SelfLink = m.GetSelfLink()
 		}
 	}
 
@@ -64,8 +62,8 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 		volume := obj.(*storage.Volume)
 
 		cells = append(cells, name)
-		if volumePoolName := volume.Spec.VolumePoolRef.Name; volumePoolName != "" {
-			cells = append(cells, volumePoolName)
+		if volumePoolRef := volume.Spec.VolumePoolRef; volumePoolRef != nil {
+			cells = append(cells, volumePoolRef.Name)
 		} else {
 			cells = append(cells, "<none>")
 		}
@@ -75,7 +73,7 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 		} else {
 			cells = append(cells, "<unknown>")
 		}
-		if phase := storage.GetVolumePhase(volume); phase != "" {
+		if phase := volume.Status.Phase; phase != "" {
 			cells = append(cells, phase)
 		} else {
 			cells = append(cells, "<unknown>")

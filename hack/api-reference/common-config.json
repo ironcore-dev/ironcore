@@ -20,6 +20,10 @@
             "docsURLTemplate": "https://pkg.go.dev/k8s.io/apimachinery/pkg/api/resource#Duration"
         },
         {
+            "typeMatchPrefix": "^k8s\\.io/apimachinery/pkg/types\\.UID",
+            "docsURLTemplate": "https://pkg.go.dev/k8s.io/apimachinery/pkg/types#UID"
+        },
+        {
             "typeMatchPrefix": "^k8s\\.io/(api|apimachinery/pkg/apis)/",
             "docsURLTemplate": "https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#{{lower .TypeIdentifier}}-{{arrIndex .PackageSegments -1}}-{{arrIndex .PackageSegments -2}}"
         }

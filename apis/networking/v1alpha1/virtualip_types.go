@@ -28,9 +28,9 @@ type VirtualIPSpec struct {
 	Type VirtualIPType `json:"type"`
 	// IPFamily is the ip family of the VirtualIP.
 	IPFamily corev1.IPFamily `json:"ipFamily"`
-	// NetworkInterfaceSelector selects any NetworkInterface that should get the VirtualIP routed.
-	// If empty, it is assumed that an external process manages the VirtualIPRouting for this VirtualIP.
-	NetworkInterfaceSelector *metav1.LabelSelector `json:"networkInterfaceSelector,omitempty"`
+
+	// TargetRef references the target for this VirtualIP (currently only NetworkInterface).
+	TargetRef *commonv1alpha1.LocalUIDReference `json:"targetRef,omitempty"`
 }
 
 // VirtualIPType is a type of VirtualIP.
@@ -45,7 +45,24 @@ const (
 type VirtualIPStatus struct {
 	// IP is the allocated IP, if any.
 	IP *commonv1alpha1.IP `json:"ip,omitempty"`
+
+	// Phase is the VirtualIPPhase of the VirtualIP.
+	Phase VirtualIPPhase `json:"phase,omitempty"`
+	// LastPhaseTransitionTime is the last time the Phase transitioned from one value to another.
+	LastPhaseTransitionTime *metav1.Time `json:"phaseLastTransitionTime,omitempty"`
 }
+
+// VirtualIPPhase is the binding phase of a VirtualIP.
+type VirtualIPPhase string
+
+const (
+	// VirtualIPPhaseUnbound is used for any VirtualIP that is not bound.
+	VirtualIPPhaseUnbound VirtualIPPhase = "Unbound"
+	// VirtualIPPhasePending is used for any VirtualIP that is currently awaiting binding.
+	VirtualIPPhasePending VirtualIPPhase = "Pending"
+	// VirtualIPPhaseBound is used for any VirtualIP that is properly bound.
+	VirtualIPPhaseBound VirtualIPPhase = "Bound"
+)
 
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -66,4 +83,10 @@ type VirtualIPList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []VirtualIP `json:"items"`
+}
+
+// VirtualIPTemplateSpec is the specification of a VirtualIP template.
+type VirtualIPTemplateSpec struct {
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+	Spec              VirtualIPSpec `json:"spec,omitempty"`
 }

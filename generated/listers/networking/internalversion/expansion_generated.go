@@ -17,6 +17,22 @@
 
 package internalversion
 
+// AliasPrefixListerExpansion allows custom methods to be added to
+// AliasPrefixLister.
+type AliasPrefixListerExpansion interface{}
+
+// AliasPrefixNamespaceListerExpansion allows custom methods to be added to
+// AliasPrefixNamespaceLister.
+type AliasPrefixNamespaceListerExpansion interface{}
+
+// AliasPrefixRoutingListerExpansion allows custom methods to be added to
+// AliasPrefixRoutingLister.
+type AliasPrefixRoutingListerExpansion interface{}
+
+// AliasPrefixRoutingNamespaceListerExpansion allows custom methods to be added to
+// AliasPrefixRoutingNamespaceLister.
+type AliasPrefixRoutingNamespaceListerExpansion interface{}
+
 // NetworkListerExpansion allows custom methods to be added to
 // NetworkLister.
 type NetworkListerExpansion interface{}
@@ -33,14 +49,6 @@ type NetworkInterfaceListerExpansion interface{}
 // NetworkInterfaceNamespaceLister.
 type NetworkInterfaceNamespaceListerExpansion interface{}
 
-// NetworkInterfaceBindingListerExpansion allows custom methods to be added to
-// NetworkInterfaceBindingLister.
-type NetworkInterfaceBindingListerExpansion interface{}
-
-// NetworkInterfaceBindingNamespaceListerExpansion allows custom methods to be added to
-// NetworkInterfaceBindingNamespaceLister.
-type NetworkInterfaceBindingNamespaceListerExpansion interface{}
-
 // VirtualIPListerExpansion allows custom methods to be added to
 // VirtualIPLister.
 type VirtualIPListerExpansion interface{}
@@ -48,11 +56,3 @@ type VirtualIPListerExpansion interface{}
 // VirtualIPNamespaceListerExpansion allows custom methods to be added to
 // VirtualIPNamespaceLister.
 type VirtualIPNamespaceListerExpansion interface{}
-
-// VirtualIPRoutingListerExpansion allows custom methods to be added to
-// VirtualIPRoutingLister.
-type VirtualIPRoutingListerExpansion interface{}
-
-// VirtualIPRoutingNamespaceListerExpansion allows custom methods to be added to
-// VirtualIPRoutingNamespaceLister.
-type VirtualIPRoutingNamespaceListerExpansion interface{}

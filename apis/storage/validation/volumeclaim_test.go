@@ -56,10 +56,18 @@ var _ = Describe("VolumeClaim", func() {
 			},
 			ContainElement(InvalidField("spec.volumeClassRef.name")),
 		),
+		Entry("invalid image pull secret ref name",
+			&storage.VolumeClaim{
+				Spec: storage.VolumeClaimSpec{
+					ImagePullSecretRef: &corev1.LocalObjectReference{Name: "foo*"},
+				},
+			},
+			ContainElement(InvalidField("spec.imagePullSecretRef.name")),
+		),
 		Entry("invalid volume ref name",
 			&storage.VolumeClaim{
 				Spec: storage.VolumeClaimSpec{
-					VolumeRef: corev1.LocalObjectReference{Name: "foo*"},
+					VolumeRef: &corev1.LocalObjectReference{Name: "foo*"},
 				},
 			},
 			ContainElement(InvalidField("spec.volumeRef.name")),
@@ -101,12 +109,12 @@ var _ = Describe("VolumeClaim", func() {
 		Entry("immutable volumeRef if set",
 			&storage.VolumeClaim{
 				Spec: storage.VolumeClaimSpec{
-					VolumeRef: corev1.LocalObjectReference{Name: "foo"},
+					VolumeRef: &corev1.LocalObjectReference{Name: "foo"},
 				},
 			},
 			&storage.VolumeClaim{
 				Spec: storage.VolumeClaimSpec{
-					VolumeRef: corev1.LocalObjectReference{Name: "bar"},
+					VolumeRef: &corev1.LocalObjectReference{Name: "bar"},
 				},
 			},
 			ContainElement(ImmutableField("spec")),
@@ -114,7 +122,7 @@ var _ = Describe("VolumeClaim", func() {
 		Entry("mutable volumeRef if not set",
 			&storage.VolumeClaim{
 				Spec: storage.VolumeClaimSpec{
-					VolumeRef: corev1.LocalObjectReference{Name: "foo"},
+					VolumeRef: &corev1.LocalObjectReference{Name: "foo"},
 				},
 			},
 			&storage.VolumeClaim{},

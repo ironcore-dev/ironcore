@@ -15,6 +15,7 @@
 package validation_test
 
 import (
+	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	"github.com/onmetal/onmetal-api/apis/storage"
 	. "github.com/onmetal/onmetal-api/apis/storage/validation"
 	. "github.com/onmetal/onmetal-api/testutils/validation"
@@ -59,10 +60,18 @@ var _ = Describe("Volume", func() {
 		Entry("invalid claim ref name",
 			&storage.Volume{
 				Spec: storage.VolumeSpec{
-					ClaimRef: storage.ClaimReference{Name: "foo*"},
+					ClaimRef: &commonv1alpha1.LocalUIDReference{Name: "foo*"},
 				},
 			},
 			ContainElement(InvalidField("spec.claimRef.name")),
+		),
+		Entry("invalid image pull secret ref name",
+			&storage.Volume{
+				Spec: storage.VolumeSpec{
+					ImagePullSecretRef: &corev1.LocalObjectReference{Name: "foo*"},
+				},
+			},
+			ContainElement(InvalidField("spec.imagePullSecretRef.name")),
 		),
 		Entry("no resources[storage]",
 			&storage.Volume{},
@@ -101,12 +110,12 @@ var _ = Describe("Volume", func() {
 		Entry("immutable volumePoolRef if set",
 			&storage.Volume{
 				Spec: storage.VolumeSpec{
-					VolumePoolRef: corev1.LocalObjectReference{Name: "foo"},
+					VolumePoolRef: &corev1.LocalObjectReference{Name: "foo"},
 				},
 			},
 			&storage.Volume{
 				Spec: storage.VolumeSpec{
-					VolumePoolRef: corev1.LocalObjectReference{Name: "bar"},
+					VolumePoolRef: &corev1.LocalObjectReference{Name: "bar"},
 				},
 			},
 			ContainElement(ImmutableField("spec.volumePoolRef")),
@@ -114,7 +123,7 @@ var _ = Describe("Volume", func() {
 		Entry("mutable volumePoolRef if not set",
 			&storage.Volume{
 				Spec: storage.VolumeSpec{
-					VolumePoolRef: corev1.LocalObjectReference{Name: "foo"},
+					VolumePoolRef: &corev1.LocalObjectReference{Name: "foo"},
 				},
 			},
 			&storage.Volume{},

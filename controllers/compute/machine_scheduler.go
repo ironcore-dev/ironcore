@@ -65,8 +65,8 @@ func (s *MachineScheduler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 		log.Info("Machine is already deleting")
 		return ctrl.Result{}, nil
 	}
-	if machine.Spec.MachinePoolRef.Name != "" {
-		log.Info("Machine is already assigned")
+	if machine.Spec.MachinePoolRef != nil {
+		log.Info("Machine is already assigned", "MachinePoolRef", machine.Spec.MachinePoolRef)
 		return ctrl.Result{}, nil
 	}
 	return s.schedule(ctx, log, machine)
@@ -123,7 +123,7 @@ func (s *MachineScheduler) schedule(ctx context.Context, log logr.Logger, machin
 	pool := available[rand.Intn(len(available))]
 	log = log.WithValues("MachinePoolRef", pool.Name)
 	base := machine.DeepCopy()
-	machine.Spec.MachinePoolRef.Name = pool.Name
+	machine.Spec.MachinePoolRef = &corev1.LocalObjectReference{Name: pool.Name}
 	log.Info("Patching machine")
 	if err := s.Patch(ctx, machine, client.MergeFrom(base)); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error scheduling machine on pool: %w", err)
@@ -171,7 +171,12 @@ func (s *MachineScheduler) SetupWithManager(mgr manager.Manager) error {
 
 	if err := mgr.GetFieldIndexer().IndexField(ctx, &computev1alpha1.Machine{}, machineSpecMachinePoolNameField, func(object client.Object) []string {
 		machine := object.(*computev1alpha1.Machine)
-		return []string{machine.Spec.MachinePoolRef.Name}
+		machinePoolRef := machine.Spec.MachinePoolRef
+		if machinePoolRef == nil {
+			return []string{""}
+		}
+
+		return []string{machinePoolRef.Name}
 	}); err != nil {
 		return fmt.Errorf("could not setup field indexer for %s: %w", machineSpecMachinePoolNameField, err)
 	}
@@ -183,7 +188,7 @@ func (s *MachineScheduler) SetupWithManager(mgr manager.Manager) error {
 			builder.WithPredicates(
 				predicate.NewPredicateFuncs(func(object client.Object) bool {
 					machine := object.(*computev1alpha1.Machine)
-					return machine.DeletionTimestamp.IsZero() && machine.Spec.MachinePoolRef.Name == ""
+					return machine.DeletionTimestamp.IsZero() && machine.Spec.MachinePoolRef == nil
 				}),
 			),
 		).

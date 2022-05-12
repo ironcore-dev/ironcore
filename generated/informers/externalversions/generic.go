@@ -69,16 +69,16 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Ipam().V1alpha1().PrefixAllocations().Informer()}, nil
 
 		// Group=networking.api.onmetal.de, Version=v1alpha1
+	case networkingv1alpha1.SchemeGroupVersion.WithResource("aliasprefixes"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().AliasPrefixes().Informer()}, nil
+	case networkingv1alpha1.SchemeGroupVersion.WithResource("aliasprefixroutings"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().AliasPrefixRoutings().Informer()}, nil
 	case networkingv1alpha1.SchemeGroupVersion.WithResource("networks"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().Networks().Informer()}, nil
 	case networkingv1alpha1.SchemeGroupVersion.WithResource("networkinterfaces"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().NetworkInterfaces().Informer()}, nil
-	case networkingv1alpha1.SchemeGroupVersion.WithResource("networkinterfacebindings"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().NetworkInterfaceBindings().Informer()}, nil
 	case networkingv1alpha1.SchemeGroupVersion.WithResource("virtualips"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().VirtualIPs().Informer()}, nil
-	case networkingv1alpha1.SchemeGroupVersion.WithResource("virtualiproutings"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().VirtualIPRoutings().Informer()}, nil
 
 		// Group=storage.api.onmetal.de, Version=v1alpha1
 	case storagev1alpha1.SchemeGroupVersion.WithResource("volumes"):

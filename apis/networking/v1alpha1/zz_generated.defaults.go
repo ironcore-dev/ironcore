@@ -29,18 +29,35 @@ import (
 // Public to allow building arbitrary schemes.
 // All generated defaulters are covering - they call all nested defaulters.
 func RegisterDefaults(scheme *runtime.Scheme) error {
+	scheme.AddTypeDefaultingFunc(&AliasPrefix{}, func(obj interface{}) { SetObjectDefaults_AliasPrefix(obj.(*AliasPrefix)) })
+	scheme.AddTypeDefaultingFunc(&AliasPrefixList{}, func(obj interface{}) { SetObjectDefaults_AliasPrefixList(obj.(*AliasPrefixList)) })
 	scheme.AddTypeDefaultingFunc(&NetworkInterface{}, func(obj interface{}) { SetObjectDefaults_NetworkInterface(obj.(*NetworkInterface)) })
 	scheme.AddTypeDefaultingFunc(&NetworkInterfaceList{}, func(obj interface{}) { SetObjectDefaults_NetworkInterfaceList(obj.(*NetworkInterfaceList)) })
 	return nil
+}
+
+func SetObjectDefaults_AliasPrefix(in *AliasPrefix) {
+	if in.Spec.Prefix.Ephemeral != nil {
+		if in.Spec.Prefix.Ephemeral.PrefixTemplate != nil {
+			ipamv1alpha1.SetDefaults_PrefixSpec(&in.Spec.Prefix.Ephemeral.PrefixTemplate.Spec)
+		}
+	}
+}
+
+func SetObjectDefaults_AliasPrefixList(in *AliasPrefixList) {
+	for i := range in.Items {
+		a := &in.Items[i]
+		SetObjectDefaults_AliasPrefix(a)
+	}
 }
 
 func SetObjectDefaults_NetworkInterface(in *NetworkInterface) {
 	SetDefaults_NetworkInterfaceSpec(&in.Spec)
 	for i := range in.Spec.IPs {
 		a := &in.Spec.IPs[i]
-		if a.EphemeralPrefix != nil {
-			if a.EphemeralPrefix.PrefixTemplate != nil {
-				ipamv1alpha1.SetDefaults_PrefixSpec(&a.EphemeralPrefix.PrefixTemplate.Spec)
+		if a.Ephemeral != nil {
+			if a.Ephemeral.PrefixTemplate != nil {
+				ipamv1alpha1.SetDefaults_PrefixSpec(&a.Ephemeral.PrefixTemplate.Spec)
 			}
 		}
 	}

@@ -124,15 +124,28 @@ string
 </tr>
 <tr>
 <td>
-<code>interfaces</code><br/>
+<code>imagePullSecret</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.Interface">
-[]Interface
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
 </td>
 <td>
-<p>Interfaces define a list of network interfaces present on the machine</p>
+<p>ImagePullSecretRef is an optional secret for pulling the image of a machine.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkInterfaces</code><br/>
+<em>
+<a href="#compute.api.onmetal.de/v1alpha1.NetworkInterface">
+[]NetworkInterface
+</a>
+</em>
+</td>
+<td>
+<p>NetworkInterfaces define a list of network interfaces present on the machine</p>
 </td>
 </tr>
 <tr>
@@ -150,7 +163,7 @@ string
 </tr>
 <tr>
 <td>
-<code>ignition</code><br/>
+<code>ignitionRef</code><br/>
 <em>
 <a href="/api-reference/common/#common.onmetal.de/v1alpha1.ConfigMapKeySelector">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ConfigMapKeySelector
@@ -387,6 +400,7 @@ string
 </em>
 </td>
 <td>
+<p>Name is the name of the EFIVar.</p>
 </td>
 </tr>
 <tr>
@@ -397,6 +411,7 @@ string
 </em>
 </td>
 <td>
+<p>UUID is the uuid of the EFIVar.</p>
 </td>
 </tr>
 <tr>
@@ -407,17 +422,20 @@ string
 </em>
 </td>
 <td>
+<p>Value is the value of the EFIVar.</p>
 </td>
 </tr>
 </tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.Interface">Interface
+<h3 id="compute.api.onmetal.de/v1alpha1.EmptyDiskVolumeSource">EmptyDiskVolumeSource
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachineSpec">MachineSpec</a>)
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.VolumeSource">VolumeSource</a>)
 </p>
 <div>
-<p>Interface is the definition of a single interface</p>
+<p>EmptyDiskVolumeSource is a volume that&rsquo;s offered by the machine pool provider.
+Usually ephemeral (i.e. deleted when the surrounding entity is deleted), with
+varying performance characteristics. Potentially not recoverable.</p>
 </div>
 <table>
 <thead>
@@ -429,39 +447,28 @@ string
 <tbody>
 <tr>
 <td>
-<code>name</code><br/>
+<code>sizeLimit</code><br/>
 <em>
-string
-</em>
-</td>
-<td>
-<p>Name is the name of the network interface.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>InterfaceSource</code><br/>
-<em>
-<a href="#compute.api.onmetal.de/v1alpha1.InterfaceSource">
-InterfaceSource
+<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/api/resource#Duration">
+k8s.io/apimachinery/pkg/api/resource.Quantity
 </a>
 </em>
 </td>
 <td>
-<p>
-(Members of <code>InterfaceSource</code> are embedded into this type.)
-</p>
-<p>InterfaceSource is where to obtain the interface from.</p>
+<p>SizeLimit is the total amount of local storage required for this EmptyDisk volume.
+The default is nil which means that the limit is undefined.</p>
 </td>
 </tr>
 </tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.InterfaceSource">InterfaceSource
+<h3 id="compute.api.onmetal.de/v1alpha1.EphemeralNetworkInterfaceSource">EphemeralNetworkInterfaceSource
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.Interface">Interface</a>)
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.NetworkInterfaceSource">NetworkInterfaceSource</a>)
 </p>
 <div>
+<p>EphemeralNetworkInterfaceSource is a definition for an ephemeral (i.e. coupled to the lifetime of the surrounding
+object) networking.NetworkInterface.</p>
 </div>
 <table>
 <thead>
@@ -473,34 +480,24 @@ InterfaceSource
 <tbody>
 <tr>
 <td>
-<code>networkInterfaceRef</code><br/>
+<code>networkInterfaceTemplate</code><br/>
 <em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
+github.com/onmetal/onmetal-api/apis/networking/v1alpha1.NetworkInterfaceTemplateSpec
 </em>
 </td>
 <td>
-<p>NetworkInterfaceRef instructs to use the NetworkInterface at the target reference.</p>
+<p>NetworkInterfaceTemplate is the template definition of the networking.NetworkInterface.</p>
 </td>
 </tr>
 </tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.InterfaceStatus">InterfaceStatus
-</h3>
-<p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachineStatus">MachineStatus</a>)
-</p>
-<div>
-<p>InterfaceStatus reports the status of an InterfaceSource.</p>
-</div>
 <h3 id="compute.api.onmetal.de/v1alpha1.MachineCondition">MachineCondition
 </h3>
 <p>
 (<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachineStatus">MachineStatus</a>)
 </p>
 <div>
-<p>MachineCondition is one of the conditions of a Machine.</p>
+<p>MachineCondition is one of the conditions of a volume.</p>
 </div>
 <table>
 <thead>
@@ -567,19 +564,6 @@ int64
 </td>
 <td>
 <p>ObservedGeneration represents the .metadata.generation that the condition was set based upon.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>lastUpdateTime</code><br/>
-<em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#time-v1-meta">
-Kubernetes meta/v1.Time
-</a>
-</em>
-</td>
-<td>
-<p>LastUpdateTime is the last time a condition has been updated.</p>
 </td>
 </tr>
 <tr>
@@ -694,19 +678,6 @@ int64
 </tr>
 <tr>
 <td>
-<code>lastUpdateTime</code><br/>
-<em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#time-v1-meta">
-Kubernetes meta/v1.Time
-</a>
-</em>
-</td>
-<td>
-<p>LastUpdateTime is the last time a condition has been updated.</p>
-</td>
-</tr>
-<tr>
-<td>
 <code>lastTransitionTime</code><br/>
 <em>
 <a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#time-v1-meta">
@@ -787,13 +758,17 @@ will land in the MachinePool.</p>
 </tr>
 </thead>
 <tbody><tr><td><p>&#34;Error&#34;</p></td>
-<td></td>
+<td><p>MachinePoolStateError marks a MachinePool in an error state.</p>
+</td>
 </tr><tr><td><p>&#34;Offline&#34;</p></td>
-<td></td>
+<td><p>MachinePoolStateOffline marks a MachinePool as offline.</p>
+</td>
 </tr><tr><td><p>&#34;Pending&#34;</p></td>
-<td></td>
+<td><p>MachinePoolStatePending marks a MachinePool as pending readiness.</p>
+</td>
 </tr><tr><td><p>&#34;Ready&#34;</p></td>
-<td></td>
+<td><p>MachinePoolStateReady marks a MachinePool as ready for accepting a Machine.</p>
+</td>
 </tr></tbody>
 </table>
 <h3 id="compute.api.onmetal.de/v1alpha1.MachinePoolStatus">MachinePoolStatus
@@ -917,15 +892,28 @@ string
 </tr>
 <tr>
 <td>
-<code>interfaces</code><br/>
+<code>imagePullSecret</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.Interface">
-[]Interface
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
 </td>
 <td>
-<p>Interfaces define a list of network interfaces present on the machine</p>
+<p>ImagePullSecretRef is an optional secret for pulling the image of a machine.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkInterfaces</code><br/>
+<em>
+<a href="#compute.api.onmetal.de/v1alpha1.NetworkInterface">
+[]NetworkInterface
+</a>
+</em>
+</td>
+<td>
+<p>NetworkInterfaces define a list of network interfaces present on the machine</p>
 </td>
 </tr>
 <tr>
@@ -943,7 +931,7 @@ string
 </tr>
 <tr>
 <td>
-<code>ignition</code><br/>
+<code>ignitionRef</code><br/>
 <em>
 <a href="/api-reference/common/#common.onmetal.de/v1alpha1.ConfigMapKeySelector">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.ConfigMapKeySelector
@@ -990,6 +978,7 @@ covered by Tolerations will be considered to run the Machine.</p>
 (<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachineStatus">MachineStatus</a>)
 </p>
 <div>
+<p>MachineState is the state of a machine.</p>
 </div>
 <table>
 <thead>
@@ -999,18 +988,19 @@ covered by Tolerations will be considered to run the Machine.</p>
 </tr>
 </thead>
 <tbody><tr><td><p>&#34;Error&#34;</p></td>
-<td></td>
-</tr><tr><td><p>&#34;Initial&#34;</p></td>
-<td></td>
+<td><p>MachineStateError means the machine is in an error state.</p>
+</td>
 </tr><tr><td><p>&#34;Pending&#34;</p></td>
 <td><p>MachineStatePending means the Machine has been accepted by the system, but not yet completely started.
 This includes time before being bound to a MachinePool, as well as time spent setting up the Machine on that
 MachinePool.</p>
 </td>
 </tr><tr><td><p>&#34;Running&#34;</p></td>
-<td></td>
+<td><p>MachineStateRunning means the machine is running on a MachinePool.</p>
+</td>
 </tr><tr><td><p>&#34;Shutdown&#34;</p></td>
-<td></td>
+<td><p>MachineStateShutdown means the machine is shut down.</p>
+</td>
 </tr></tbody>
 </table>
 <h3 id="compute.api.onmetal.de/v1alpha1.MachineStatus">MachineStatus
@@ -1039,6 +1029,7 @@ MachineState
 </em>
 </td>
 <td>
+<p>State is the state of the machine.</p>
 </td>
 </tr>
 <tr>
@@ -1051,18 +1042,20 @@ MachineState
 </em>
 </td>
 <td>
+<p>Conditions are the conditions of the machines.</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>interfaces</code><br/>
+<code>networkInterfaces</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.InterfaceStatus">
-[]InterfaceStatus
+<a href="#compute.api.onmetal.de/v1alpha1.NetworkInterfaceStatus">
+[]NetworkInterfaceStatus
 </a>
 </em>
 </td>
 <td>
+<p>NetworkInterfaces is the list of network interface states for the machine.</p>
 </td>
 </tr>
 <tr>
@@ -1075,26 +1068,154 @@ MachineState
 </em>
 </td>
 <td>
+<p>Volumes is the list of volume states for the machine.</p>
 </td>
 </tr>
 </tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.RetainPolicy">RetainPolicy
-(<code>string</code> alias)</h3>
+<h3 id="compute.api.onmetal.de/v1alpha1.NetworkInterface">NetworkInterface
+</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachineSpec">MachineSpec</a>)
+</p>
+<div>
+<p>NetworkInterface is the definition of a single interface</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the network interface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>NetworkInterfaceSource</code><br/>
+<em>
+<a href="#compute.api.onmetal.de/v1alpha1.NetworkInterfaceSource">
+NetworkInterfaceSource
+</a>
+</em>
+</td>
+<td>
+<p>
+(Members of <code>NetworkInterfaceSource</code> are embedded into this type.)
+</p>
+<p>NetworkInterfaceSource is where to obtain the interface from.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="compute.api.onmetal.de/v1alpha1.NetworkInterfaceSource">NetworkInterfaceSource
+</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.NetworkInterface">NetworkInterface</a>)
+</p>
 <div>
 </div>
 <table>
 <thead>
 <tr>
-<th>Value</th>
+<th>Field</th>
 <th>Description</th>
 </tr>
 </thead>
-<tbody><tr><td><p>&#34;DeleteOnTermination&#34;</p></td>
-<td></td>
-</tr><tr><td><p>&#34;Persistent&#34;</p></td>
-<td></td>
-</tr></tbody>
+<tbody>
+<tr>
+<td>
+<code>networkInterfaceRef</code><br/>
+<em>
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkInterfaceRef instructs to use the NetworkInterface at the target reference.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ephemeral</code><br/>
+<em>
+<a href="#compute.api.onmetal.de/v1alpha1.EphemeralNetworkInterfaceSource">
+EphemeralNetworkInterfaceSource
+</a>
+</em>
+</td>
+<td>
+<p>Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object)
+NetworkInterface to use.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="compute.api.onmetal.de/v1alpha1.NetworkInterfaceStatus">NetworkInterfaceStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachineStatus">MachineStatus</a>)
+</p>
+<div>
+<p>NetworkInterfaceStatus reports the status of an NetworkInterfaceSource.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the NetworkInterface to whom the status belongs to.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ips</code><br/>
+<em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
+[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
+</a>
+</em>
+</td>
+<td>
+<p>IPs are the ips allocated for the network interface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>virtualIP</code><br/>
+<em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
+</a>
+</em>
+</td>
+<td>
+<p>VirtualIP is the virtual ip allocated for the network interface.</p>
+</td>
+</tr>
+</tbody>
 </table>
 <h3 id="compute.api.onmetal.de/v1alpha1.Volume">Volume
 </h3>
@@ -1167,7 +1288,20 @@ Kubernetes core/v1.LocalObjectReference
 </em>
 </td>
 <td>
-<p>VolumeClaim instructs the Volume to use a VolumeClaim as source for the attachment.</p>
+<p>VolumeClaimRef instructs the Volume to use a VolumeClaimRef as source for the attachment.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>emptyDisk</code><br/>
+<em>
+<a href="#compute.api.onmetal.de/v1alpha1.EmptyDiskVolumeSource">
+EmptyDiskVolumeSource
+</a>
+</em>
+</td>
+<td>
+<p>EmptyDisk instructs to use a Volume offered by the machine pool provider.</p>
 </td>
 </tr>
 </tbody>

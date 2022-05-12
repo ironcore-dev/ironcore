@@ -17,6 +17,7 @@
 package validation
 
 import (
+	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	"github.com/onmetal/onmetal-api/apis/networking"
 	. "github.com/onmetal/onmetal-api/testutils/validation"
 	. "github.com/onsi/ginkgo/v2"
@@ -68,6 +69,16 @@ var _ = Describe("VirtualIP", func() {
 			},
 			ContainElement(NotSupportedField("spec.ipFamily")),
 		),
+		Entry("invalid target ref name",
+			&networking.VirtualIP{
+				Spec: networking.VirtualIPSpec{
+					TargetRef: &commonv1alpha1.LocalUIDReference{
+						Name: "foo*",
+					},
+				},
+			},
+			ContainElement(InvalidField("spec.targetRef.name")),
+		),
 		Entry("valid virtual ip",
 			&networking.VirtualIP{
 				ObjectMeta: metav1.ObjectMeta{
@@ -77,8 +88,8 @@ var _ = Describe("VirtualIP", func() {
 				Spec: networking.VirtualIPSpec{
 					Type:     networking.VirtualIPTypePublic,
 					IPFamily: corev1.IPv4Protocol,
-					NetworkInterfaceSelector: &metav1.LabelSelector{
-						MatchLabels: map[string]string{"foo": "bar"},
+					TargetRef: &commonv1alpha1.LocalUIDReference{
+						Name: "foo",
 					},
 				},
 			},
@@ -117,18 +128,18 @@ var _ = Describe("VirtualIP", func() {
 			},
 			ContainElement(ForbiddenField("spec")),
 		),
-		Entry("mutable network interface selector",
+		Entry("mutable target reference",
 			&networking.VirtualIP{
 				Spec: networking.VirtualIPSpec{
-					NetworkInterfaceSelector: &metav1.LabelSelector{
-						MatchLabels: map[string]string{"foo": "bar"},
+					TargetRef: &commonv1alpha1.LocalUIDReference{
+						Name: "bar",
 					},
 				},
 			},
 			&networking.VirtualIP{
 				Spec: networking.VirtualIPSpec{
-					NetworkInterfaceSelector: &metav1.LabelSelector{
-						MatchLabels: map[string]string{"bar": "baz"},
+					TargetRef: &commonv1alpha1.LocalUIDReference{
+						Name: "foo",
 					},
 				},
 			},

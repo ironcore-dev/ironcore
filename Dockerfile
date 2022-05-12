@@ -16,10 +16,12 @@ COPY apis/ apis/
 COPY apiserver/ apiserver/
 COPY app/ app/
 COPY cmd/ cmd/
+COPY clientutils/ clientutils/
 COPY controllers/ controllers/
 COPY equality/ equality/
 COPY generated/ generated/
 COPY registry/ registry/
+COPY serializer/ serializer/
 COPY tableconvertor/ tableconvertor/
 
 ARG TARGETOS TARGETARCH

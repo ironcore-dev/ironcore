@@ -69,16 +69,16 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Ipam().InternalVersion().PrefixAllocations().Informer()}, nil
 
 		// Group=networking.api.onmetal.de, Version=internalVersion
+	case networking.SchemeGroupVersion.WithResource("aliasprefixes"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().InternalVersion().AliasPrefixes().Informer()}, nil
+	case networking.SchemeGroupVersion.WithResource("aliasprefixroutings"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().InternalVersion().AliasPrefixRoutings().Informer()}, nil
 	case networking.SchemeGroupVersion.WithResource("networks"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().InternalVersion().Networks().Informer()}, nil
 	case networking.SchemeGroupVersion.WithResource("networkinterfaces"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().InternalVersion().NetworkInterfaces().Informer()}, nil
-	case networking.SchemeGroupVersion.WithResource("networkinterfacebindings"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().InternalVersion().NetworkInterfaceBindings().Informer()}, nil
 	case networking.SchemeGroupVersion.WithResource("virtualips"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().InternalVersion().VirtualIPs().Informer()}, nil
-	case networking.SchemeGroupVersion.WithResource("virtualiproutings"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().InternalVersion().VirtualIPRoutings().Informer()}, nil
 
 		// Group=storage.api.onmetal.de, Version=internalVersion
 	case storage.SchemeGroupVersion.WithResource("volumes"):

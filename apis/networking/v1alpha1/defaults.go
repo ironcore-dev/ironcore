@@ -1,16 +1,18 @@
-// Copyright 2022 OnMetal authors
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ * Copyright (c) 2022 by the OnMetal authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package v1alpha1
 
@@ -34,9 +36,9 @@ func SetDefaults_NetworkInterfaceSpec(spec *NetworkInterfaceSpec) {
 	if len(spec.IPFamilies) > 0 {
 		if len(spec.IPFamilies) == len(spec.IPs) {
 			for i, ip := range spec.IPs {
-				if ip.EphemeralPrefix != nil {
-					if ip.EphemeralPrefix.PrefixTemplate != nil {
-						ephemeralPrefixSpec := &ip.EphemeralPrefix.PrefixTemplate.Spec
+				if ip.Ephemeral != nil {
+					if ip.Ephemeral.PrefixTemplate != nil {
+						ephemeralPrefixSpec := &ip.Ephemeral.PrefixTemplate.Spec
 
 						if ephemeralPrefixSpec.IPFamily == "" {
 							ephemeralPrefixSpec.IPFamily = spec.IPFamilies[i]
@@ -50,15 +52,15 @@ func SetDefaults_NetworkInterfaceSpec(spec *NetworkInterfaceSpec) {
 			switch {
 			case ip.Value != nil:
 				spec.IPFamilies = append(spec.IPFamilies, ip.Value.Family())
-			case ip.EphemeralPrefix != nil && ip.EphemeralPrefix.PrefixTemplate != nil:
-				spec.IPFamilies = append(spec.IPFamilies, ip.EphemeralPrefix.PrefixTemplate.Spec.IPFamily)
+			case ip.Ephemeral != nil && ip.Ephemeral.PrefixTemplate != nil:
+				spec.IPFamilies = append(spec.IPFamilies, ip.Ephemeral.PrefixTemplate.Spec.IPFamily)
 			}
 		}
 	}
 
 	for _, ip := range spec.IPs {
-		if ip.EphemeralPrefix != nil && ip.EphemeralPrefix.PrefixTemplate != nil {
-			templateSpec := ip.EphemeralPrefix.PrefixTemplate.Spec
+		if ip.Ephemeral != nil && ip.Ephemeral.PrefixTemplate != nil {
+			templateSpec := ip.Ephemeral.PrefixTemplate.Spec
 			if templateSpec.Prefix == nil && templateSpec.PrefixLength == 0 {
 				templateSpec.PrefixLength = ipFamilyToPrefixLength[templateSpec.IPFamily]
 			}

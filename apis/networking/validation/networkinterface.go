@@ -76,6 +76,10 @@ func validateNetworkInterfaceSpec(spec *networking.NetworkInterfaceSpec, nicMeta
 
 	allErrs = append(allErrs, validateNetworkInterfaceIPSources(spec.IPs, spec.IPFamilies, nicMeta, fldPath.Child("ips"))...)
 
+	if virtualIP := spec.VirtualIP; virtualIP != nil {
+		allErrs = append(allErrs, validateVirtualIPSource(virtualIP, fldPath.Child("virtualIP"))...)
+	}
+
 	return allErrs
 }
 
@@ -102,12 +106,12 @@ func validateIPSource(ipSource networking.IPSource, idx int, ipFamily corev1.IPF
 		numSources++
 		allErrs = append(allErrs, commonv1alpha1validation.ValidateIP(ipFamily, *ip, fldPath.Child("value"))...)
 	}
-	if ephemeralPrefixSource := ipSource.EphemeralPrefix; ephemeralPrefixSource != nil {
+	if ephemeral := ipSource.Ephemeral; ephemeral != nil {
 		if numSources > 0 {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("ephemeralPrefix"), ephemeralPrefixSource, "cannot specify multiple ip sources"))
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("ephemeral"), ephemeral, "cannot specify multiple ip sources"))
 		} else {
 			numSources++
-			allErrs = append(allErrs, validateEphemeralPrefixSource(ipFamily, ephemeralPrefixSource, fldPath.Child("ephemeralPrefix"))...)
+			allErrs = append(allErrs, validateEphemeralPrefixSource(ipFamily, ephemeral, fldPath.Child("ephemeral"))...)
 			if nicMeta != nil && nicMeta.Name != "" {
 				prefixName := fmt.Sprintf("%s-%d", nicMeta.Name, idx)
 				for _, msg := range apivalidation.NameIsDNSLabel(prefixName, false) {
@@ -118,6 +122,31 @@ func validateIPSource(ipSource networking.IPSource, idx int, ipFamily corev1.IPF
 	}
 	if numSources == 0 {
 		allErrs = append(allErrs, field.Invalid(fldPath, ipSource, "must specify an ip source"))
+	}
+
+	return allErrs
+}
+
+func validateVirtualIPSource(vipSource *networking.VirtualIPSource, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	var numSources int
+	if vipRef := vipSource.VirtualIPRef; vipRef != nil {
+		numSources++
+		for _, msg := range apivalidation.NameIsDNSLabel(vipRef.Name, false) {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("virtualIPRef", "name"), vipRef.Name, msg))
+		}
+	}
+	if ephemeral := vipSource.Ephemeral; ephemeral != nil {
+		if numSources > 0 {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("ephemeral"), ephemeral, "cannot specify multiple sources"))
+		} else {
+			numSources++
+			allErrs = append(allErrs, validateEphemeralVirtualIPSource(ephemeral, fldPath.Child("ephemeral"))...)
+		}
+	}
+	if numSources == 0 {
+		allErrs = append(allErrs, field.Invalid(fldPath, vipSource, "must specify a virtual ip source"))
 	}
 
 	return allErrs
@@ -160,7 +189,27 @@ func ValidatePrefixTemplateForNetworkInterface(template *ipam.PrefixTemplateSpec
 func validateEphemeralPrefixSource(ipFamily corev1.IPFamily, source *networking.EphemeralPrefixSource, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, ValidatePrefixTemplateForNetworkInterface(source.PrefixTemplate, ipFamily, fldPath)...)
+	allErrs = append(allErrs, ValidatePrefixTemplateForNetworkInterface(source.PrefixTemplate, ipFamily, fldPath.Child("prefixTemplate"))...)
+
+	return allErrs
+}
+
+func ValidateVirtualIPTemplateForNetworkInterface(vipTemplateSpec *networking.VirtualIPTemplateSpec, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	if vipTemplateSpec == nil {
+		allErrs = append(allErrs, field.Required(fldPath, ""))
+	} else {
+		allErrs = append(allErrs, ValidateVirtualIPTemplateSpec(vipTemplateSpec, fldPath)...)
+	}
+
+	return allErrs
+}
+
+func validateEphemeralVirtualIPSource(source *networking.EphemeralVirtualIPSource, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	allErrs = append(allErrs, ValidateVirtualIPTemplateForNetworkInterface(source.VirtualIPTemplate, fldPath.Child("virtualIPTemplate"))...)
 
 	return allErrs
 }

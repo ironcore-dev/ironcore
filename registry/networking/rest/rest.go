@@ -18,11 +18,12 @@ import (
 	"github.com/onmetal/onmetal-api/api"
 	"github.com/onmetal/onmetal-api/apis/networking"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
+	aliasprefixstorage "github.com/onmetal/onmetal-api/registry/networking/aliasprefix/storage"
+	aliasprefixroutingstoratge "github.com/onmetal/onmetal-api/registry/networking/aliasprefixrouting/storage"
 	networkstorage "github.com/onmetal/onmetal-api/registry/networking/network/storage"
 	networkinterfacestorage "github.com/onmetal/onmetal-api/registry/networking/networkinterface/storage"
-	networkinterfacebindingstorage "github.com/onmetal/onmetal-api/registry/networking/networkinterfacebinding/storage"
 	virtualipstorage "github.com/onmetal/onmetal-api/registry/networking/virtualip/storage"
-	virtualiproutingstorage "github.com/onmetal/onmetal-api/registry/networking/virtualiprouting/storage"
+	onmetalapiserializer "github.com/onmetal/onmetal-api/serializer"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/registry/generic"
@@ -41,15 +42,14 @@ func (p StorageProvider) GroupName() string {
 func (p StorageProvider) NewRESTStorage(apiResourceConfigSource storage.APIResourceConfigSource, restOptionsGetter generic.RESTOptionsGetter) (genericapiserver.APIGroupInfo, bool, error) {
 	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(p.GroupName(), api.Scheme, metav1.ParameterCodec, api.Codecs)
 	apiGroupInfo.PrioritizedVersions = []schema.GroupVersion{networkingv1alpha1.SchemeGroupVersion}
+	apiGroupInfo.NegotiatedSerializer = onmetalapiserializer.DefaultSubsetNegotiatedSerializer(api.Codecs)
 
-	if apiResourceConfigSource.VersionEnabled(networkingv1alpha1.SchemeGroupVersion) {
-		storageMap, err := p.v1alpha1Storage(restOptionsGetter)
-		if err != nil {
-			return genericapiserver.APIGroupInfo{}, false, err
-		}
-
-		apiGroupInfo.VersionedResourcesStorageMap[networkingv1alpha1.SchemeGroupVersion.Version] = storageMap
+	storageMap, err := p.v1alpha1Storage(restOptionsGetter)
+	if err != nil {
+		return genericapiserver.APIGroupInfo{}, false, err
 	}
+
+	apiGroupInfo.VersionedResourcesStorageMap[networkingv1alpha1.SchemeGroupVersion.Version] = storageMap
 
 	return apiGroupInfo, true, nil
 }
@@ -72,13 +72,6 @@ func (p StorageProvider) v1alpha1Storage(restOptionsGetter generic.RESTOptionsGe
 
 	storageMap["networks"] = networkStorage.Network
 
-	networkInterfaceBindingStorage, err := networkinterfacebindingstorage.NewStorage(restOptionsGetter)
-	if err != nil {
-		return storageMap, err
-	}
-
-	storageMap["networkinterfacebindings"] = networkInterfaceBindingStorage.NetworkInterfaceBinding
-
 	virtualIPStorage, err := virtualipstorage.NewStorage(restOptionsGetter)
 	if err != nil {
 		return storageMap, err
@@ -87,12 +80,20 @@ func (p StorageProvider) v1alpha1Storage(restOptionsGetter generic.RESTOptionsGe
 	storageMap["virtualips"] = virtualIPStorage.VirtualIP
 	storageMap["virtualips/status"] = virtualIPStorage.Status
 
-	virtualIPRoutingStorage, err := virtualiproutingstorage.NewStorage(restOptionsGetter)
+	aliasPrefixStorage, err := aliasprefixstorage.NewStorage(restOptionsGetter)
 	if err != nil {
 		return storageMap, err
 	}
 
-	storageMap["virtualiproutings"] = virtualIPRoutingStorage.VirtualIPRouting
+	storageMap["aliasprefixes"] = aliasPrefixStorage.AliasPrefix
+	storageMap["aliasprefixes/status"] = aliasPrefixStorage.Status
+
+	aliasPrefixRoutingStorage, err := aliasprefixroutingstoratge.NewStorage(restOptionsGetter)
+	if err != nil {
+		return storageMap, err
+	}
+
+	storageMap["aliasprefixroutings"] = aliasPrefixRoutingStorage.AliasPrefixRouting
 
 	return storageMap, nil
 }

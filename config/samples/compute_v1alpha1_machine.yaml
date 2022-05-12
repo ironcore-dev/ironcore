@@ -3,9 +3,9 @@ kind: Machine
 metadata:
   name: machine-sample
 spec:
-  machineClass:
-    name: x3.xlarge
-  machinePool:
+  machineClassRef:
+    name: machineclass-sample
+  machinePoolRef:
     name: default
   image: myimage_repo_location
   volumes:
@@ -13,5 +13,5 @@ spec:
       # priority: 0 # optional
       volumeClaimRef:
         name: my-volumeclaim
-  ignition:
+  ignitionRef:
     name: my-ignition-configmap

@@ -44,31 +44,26 @@ type PrefixSpec struct {
 	ParentSelector *metav1.LabelSelector `json:"parentSelector,omitempty"`
 }
 
-func (s *PrefixSpec) IsRoot() bool {
-	return s.ParentRef == nil && s.ParentSelector == nil
-}
-
 // PrefixStatus defines the observed state of Prefix
 type PrefixStatus struct {
-	// Conditions is a list of conditions of a Prefix.
-	Conditions []PrefixCondition `json:"conditions,omitempty"`
+	// Phase is the PrefixPhase of the Prefix.
+	Phase PrefixPhase `json:"phase,omitempty"`
+	// LastPhaseTransitionTime is the last time the Phase changed values.
+	LastPhaseTransitionTime *metav1.Time `json:"lastPhaseTransitionTime,omitempty"`
+
 	// Used is a list of used prefixes.
 	Used []commonv1alpha1.IPPrefix `json:"used,omitempty"`
 }
 
-type PrefixConditionType string
+// PrefixPhase is a phase a Prefix can be in.
+type PrefixPhase string
 
 const (
-	PrefixReady PrefixConditionType = "Ready"
+	// PrefixPhasePending marks a prefix as waiting for allocation.
+	PrefixPhasePending PrefixPhase = "Pending"
+	// PrefixPhaseAllocated marks a prefix as allocated.
+	PrefixPhaseAllocated PrefixPhase = "Allocated"
 )
-
-type PrefixCondition struct {
-	Type               PrefixConditionType    `json:"type"`
-	Status             corev1.ConditionStatus `json:"status"`
-	Reason             string                 `json:"reason,omitempty"`
-	Message            string                 `json:"message,omitempty"`
-	LastTransitionTime metav1.Time            `json:"lastTransitionTime,omitempty"`
-}
 
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -80,15 +75,6 @@ type Prefix struct {
 
 	Spec   PrefixSpec   `json:"spec,omitempty"`
 	Status PrefixStatus `json:"status,omitempty"`
-}
-
-func (p *Prefix) IsRoot() bool {
-	return p.Spec.IsRoot()
-}
-
-func (p *Prefix) Readiness() Readiness {
-	readiness, _ := GetPrefixConditionsReadinessAndIndex(p.Status.Conditions)
-	return readiness
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

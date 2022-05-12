@@ -18,7 +18,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/onmetal/controller-utils/conditionutils"
 	"github.com/onmetal/onmetal-api/apis/ipam"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/meta/table"
@@ -43,12 +42,6 @@ var (
 
 func newTableConvertor() *convertor {
 	return &convertor{}
-}
-
-func prefixAllocationReadyState(prefixAllocation *ipam.PrefixAllocation) string {
-	readyCond := ipam.PrefixAllocationCondition{}
-	conditionutils.MustFindSlice(prefixAllocation.Status.Conditions, string(ipam.PrefixAllocationReady), &readyCond)
-	return readyCond.Reason
 }
 
 func prefixAllocationRequest(prefixAllocation *ipam.PrefixAllocation) string {
@@ -77,12 +70,10 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 
 	if m, err := meta.ListAccessor(obj); err == nil {
 		tab.ResourceVersion = m.GetResourceVersion()
-		tab.SelfLink = m.GetSelfLink()
 		tab.Continue = m.GetContinue()
 	} else {
 		if m, err := meta.CommonAccessor(obj); err == nil {
 			tab.ResourceVersion = m.GetResourceVersion()
-			tab.SelfLink = m.GetSelfLink()
 		}
 	}
 
@@ -101,8 +92,8 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 		} else {
 			cells = append(cells, "<invalid>")
 		}
-		if readyState := prefixAllocationReadyState(prefixAllocation); readyState != "" {
-			cells = append(cells, readyState)
+		if phase := prefixAllocation.Status.Phase; phase != "" {
+			cells = append(cells, phase)
 		} else {
 			cells = append(cells, "<unknown>")
 		}

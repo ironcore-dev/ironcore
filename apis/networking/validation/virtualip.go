@@ -20,7 +20,6 @@ import (
 	onmetalapivalidation "github.com/onmetal/onmetal-api/api/validation"
 	"github.com/onmetal/onmetal-api/apis/networking"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
-	metav1validation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
@@ -50,12 +49,21 @@ var supportedVirtualIPTypes = sets.NewString(
 	string(networking.VirtualIPTypePublic),
 )
 
+func validateVirtualIPType(virtualIPType networking.VirtualIPType, fldPath *field.Path) field.ErrorList {
+	return onmetalapivalidation.ValidateStringSetEnum(supportedVirtualIPTypes, string(virtualIPType), fldPath, "must specify type")
+}
+
 func validateVirtualIPSpec(spec *networking.VirtualIPSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, onmetalapivalidation.ValidateStringSetEnum(supportedVirtualIPTypes, string(spec.Type), fldPath.Child("type"), "must specify type")...)
+	allErrs = append(allErrs, validateVirtualIPType(spec.Type, fldPath.Child("type"))...)
 	allErrs = append(allErrs, onmetalapivalidation.ValidateIPFamily(spec.IPFamily, fldPath.Child("ipFamily"))...)
-	allErrs = append(allErrs, metav1validation.ValidateLabelSelector(spec.NetworkInterfaceSelector, fldPath.Child("networkInterfaceSelector"))...)
+
+	if targetRef := spec.TargetRef; targetRef != nil {
+		for _, msg := range apivalidation.NameIsDNSLabel(targetRef.Name, false) {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("targetRef", "name"), targetRef.Name, msg))
+		}
+	}
 
 	return allErrs
 }
@@ -67,7 +75,7 @@ func validateVirtualIPSpecUpdate(newSpec, oldSpec *networking.VirtualIPSpec, fld
 	newSpecCopy := newSpec.DeepCopy()
 	oldSpecCopy := oldSpec.DeepCopy()
 
-	oldSpecCopy.NetworkInterfaceSelector = newSpec.NetworkInterfaceSelector
+	oldSpecCopy.TargetRef = newSpec.TargetRef
 	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableFieldWithDiff(newSpecCopy, oldSpecCopy, fldPath)...)
 
 	return allErrs

@@ -18,7 +18,6 @@ package networking
 
 import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
-	"github.com/onmetal/onmetal-api/apis/ipam"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -28,29 +27,57 @@ type NetworkInterfaceSpec struct {
 	// NetworkRef is the Network this NetworkInterface is connected to
 	NetworkRef corev1.LocalObjectReference
 	// MachineRef is the Machine this NetworkInterface is used by
-	MachineRef *corev1.LocalObjectReference
+	MachineRef *commonv1alpha1.LocalUIDReference
 	// IPFamilies defines which IPFamilies this NetworkInterface is supporting
 	IPFamilies []corev1.IPFamily
 	// IPs is the list of provided IPs or EphemeralIPs which should be assigned to
 	// this NetworkInterface
 	IPs []IPSource
+	// VirtualIP specifies the virtual ip that should be assigned to this NetworkInterface.
+	VirtualIP *VirtualIPSource
 }
 
+// IPSource is the definition of how to obtain an IP.
 type IPSource struct {
-	Value           *commonv1alpha1.IP
-	EphemeralPrefix *EphemeralPrefixSource
+	// Value specifies an IP by using an IP literal.
+	Value *commonv1alpha1.IP
+	// Ephemeral specifies an IP by creating an ephemeral Prefix to allocate the IP with.
+	Ephemeral *EphemeralPrefixSource
 }
 
-type EphemeralPrefixSource struct {
-	PrefixTemplate *ipam.PrefixTemplateSpec
+// VirtualIPSource is the definition of how to obtain a VirtualIP.
+type VirtualIPSource struct {
+	// VirtualIPRef references a VirtualIP to use.
+	VirtualIPRef *corev1.LocalObjectReference
+	// Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object)
+	// VirtualIP.
+	Ephemeral *EphemeralVirtualIPSource
 }
 
 // NetworkInterfaceStatus defines the observed state of NetworkInterface
 type NetworkInterfaceStatus struct {
-	// TODO: Add State, Conditions
 	// IPs represent the effective IP addresses of the NetworkInterface
 	IPs []commonv1alpha1.IP
+	// VirtualIP is any virtual ip assigned to the NetworkInterface.
+	VirtualIP *commonv1alpha1.IP
+
+	// Phase is the NetworkInterfacePhase of the NetworkInterface.
+	Phase NetworkInterfacePhase
+	// LastPhaseTransitionTime is the last time the Phase transitioned from one value to another.
+	LastPhaseTransitionTime *metav1.Time
 }
+
+// NetworkInterfacePhase is the binding phase of a NetworkInterface.
+type NetworkInterfacePhase string
+
+const (
+	// NetworkInterfacePhaseUnbound is used for any NetworkInterface that is not bound.
+	NetworkInterfacePhaseUnbound NetworkInterfacePhase = "Unbound"
+	// NetworkInterfacePhasePending is used for any NetworkInterface that is currently awaiting binding.
+	NetworkInterfacePhasePending NetworkInterfacePhase = "Pending"
+	// NetworkInterfacePhaseBound is used for any NetworkInterface that is properly bound.
+	NetworkInterfacePhaseBound NetworkInterfacePhase = "Bound"
+)
 
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -71,4 +98,10 @@ type NetworkInterfaceList struct {
 	metav1.TypeMeta
 	metav1.ListMeta
 	Items []NetworkInterface
+}
+
+// NetworkInterfaceTemplateSpec is the specification of a NetworkInterface template.
+type NetworkInterfaceTemplateSpec struct {
+	metav1.ObjectMeta
+	Spec NetworkInterfaceSpec
 }

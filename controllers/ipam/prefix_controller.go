@@ -25,12 +25,10 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/clientutils"
-	"github.com/onmetal/controller-utils/conditionutils"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/apis/ipam/v1alpha1"
 	"github.com/onmetal/onmetal-api/equality"
 	"inet.af/netaddr"
-	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -152,7 +150,7 @@ func (r *PrefixReconciler) delete(ctx context.Context, log logr.Logger, prefix *
 			continue
 		}
 
-		if ipamv1alpha1.GetPrefixAllocationReadiness(&allocation) != ipamv1alpha1.ReadinessSucceeded {
+		if allocation.Status.Phase != ipamv1alpha1.PrefixAllocationPhaseAllocated {
 			continue
 		}
 
@@ -173,13 +171,17 @@ func (r *PrefixReconciler) delete(ctx context.Context, log logr.Logger, prefix *
 	return ctrl.Result{}, nil
 }
 
-func (r *PrefixReconciler) patchStatus(ctx context.Context, prefix *ipamv1alpha1.Prefix, readyCond ipamv1alpha1.PrefixCondition) error {
+func (r *PrefixReconciler) patchStatus(ctx context.Context, prefix *ipamv1alpha1.Prefix, phase ipamv1alpha1.PrefixPhase) error {
+	now := metav1.Now()
 	base := prefix.DeepCopy()
-	conditionutils.MustUpdateSlice(&prefix.Status.Conditions, string(ipamv1alpha1.PrefixReady),
-		conditionutils.UpdateFromCondition{Condition: readyCond},
-	)
+
+	if prefix.Status.Phase != phase {
+		prefix.Status.LastPhaseTransitionTime = &now
+	}
+	prefix.Status.Phase = phase
+
 	if err := r.Status().Patch(ctx, prefix, client.MergeFrom(base)); err != nil {
-		return fmt.Errorf("error patching ready condition: %w", err)
+		return fmt.Errorf("error patching status: %w", err)
 	}
 	return nil
 }
@@ -201,7 +203,7 @@ func (r *PrefixReconciler) allocationMatchesPrefix(allocation *ipamv1alpha1.Pref
 		return (p1 == nil) == (p2 == nil) && (p1 == nil || *p1 == *p2)
 	}
 
-	if ipamv1alpha1.GetPrefixAllocationReadiness(allocation) == ipamv1alpha1.ReadinessSucceeded {
+	if allocation.Status.Phase == ipamv1alpha1.PrefixAllocationPhaseAllocated {
 		switch {
 		case prefix.Spec.Prefix.IsValid():
 			return *prefix.Spec.Prefix == *allocation.Status.Prefix
@@ -222,10 +224,16 @@ func (r *PrefixReconciler) allocationMatchesPrefix(allocation *ipamv1alpha1.Pref
 	}
 }
 
-// prefixAllocationLess determines if allocation is less than other by first comparing the readiness of both conditions
-// and then, if both readiness states are the same, prefers the older object.
+var prefixAllocationPhaseValue = map[ipamv1alpha1.PrefixAllocationPhase]int{
+	ipamv1alpha1.PrefixAllocationPhaseAllocated: 2,
+	ipamv1alpha1.PrefixAllocationPhaseFailed:    -1,
+	ipamv1alpha1.PrefixAllocationPhasePending:   1,
+}
+
+// prefixAllocationLess determines if allocation is less than other by first comparing the phase of both
+// and then, if both phases are the same, prefers the older object.
 func (r *PrefixReconciler) prefixAllocationLess(allocation, other *ipamv1alpha1.PrefixAllocation) bool {
-	return ipamv1alpha1.GetPrefixAllocationReadiness(allocation) < ipamv1alpha1.GetPrefixAllocationReadiness(other) ||
+	return prefixAllocationPhaseValue[allocation.Status.Phase] < prefixAllocationPhaseValue[other.Status.Phase] ||
 		allocation.GetCreationTimestamp().Time.After(other.GetCreationTimestamp().Time)
 }
 
@@ -284,7 +292,7 @@ func (r *PrefixReconciler) findActiveAllocation(prefix *ipamv1alpha1.Prefix, all
 func (r *PrefixReconciler) allocateSubPrefix(ctx context.Context, log logr.Logger, prefix *ipamv1alpha1.Prefix) (*ipamv1alpha1.PrefixAllocation, time.Duration, error) {
 	log.V(1).Info("Listing prefix allocations controlled by prefix")
 	allocationList := &ipamv1alpha1.PrefixAllocationList{}
-	if err := clientutils.ListAndFilterControlledBy(ctx, ReaderClient(r.APIReader, r.Client), prefix, allocationList,
+	if err := clientutils.ListAndFilterControlledBy(ctx, clientutils.ReaderClient(r.APIReader, r.Client), prefix, allocationList,
 		client.InNamespace(prefix.Namespace),
 		client.MatchingLabels{
 			prefixAllocationRequesterUIDLabel: string(prefix.UID),
@@ -303,13 +311,14 @@ func (r *PrefixReconciler) allocateSubPrefix(ctx context.Context, log logr.Logge
 		return created, 0, err
 	}
 
-	readiness := r.adjustedAllocationReadiness(prefix, active)
-	log.V(1).Info("Found active allocation", "Active", active.Name, "Readiness", readiness)
+	allocationPhase := r.adjustedAllocationPhase(active)
 	switch {
-	case readiness == ipamv1alpha1.ReadinessSucceeded:
+	case allocationPhase == ipamv1alpha1.PrefixAllocationPhaseAllocated:
+		log.V(1).Info("Allocation is allocated")
 		r.forgetAllocationBackoffFor(client.ObjectKeyFromObject(prefix))
 		return active, 0, nil
-	case readiness == ipamv1alpha1.ReadinessFailed:
+	case allocationPhase == ipamv1alpha1.PrefixAllocationPhaseFailed:
+		log.V(1).Info("Allocation is failed")
 		retry, err := r.canRetryAllocation(ctx, prefix, active)
 		if err != nil || !retry {
 			return active, 0, err
@@ -322,45 +331,43 @@ func (r *PrefixReconciler) allocateSubPrefix(ctx context.Context, log logr.Logge
 		}
 
 		// Delete / free up the old allocation
+		log.V(1).Info("Deleting old allocation")
 		if err := r.Delete(ctx, active); client.IgnoreNotFound(err) != nil {
 			return nil, 0, err
 		}
 
 		// Actually initiate the retry
+		log.V(1).Info("Retrying allocation")
 		created, err := r.createNewAllocation(ctx, prefix)
 		return created, 0, err
 	default:
+		log.V(1).Info("Allocation is not allocated / failed", "Phase", allocationPhase)
 		return active, 0, nil
 	}
 }
 
-// adjustedAllocationReadiness calculates an adjusted readiness of a PrefixAllocation.
-// For the adjusted readiness, it is considered
-// * If the allocation is in a terminal state, that state is returned.
+// adjustedAllocationPhase calculates an adjusted phase of a PrefixAllocation.
+// For the adjusted phase, it is considered
+// * If the allocation is in a terminal phase, that state is returned.
 // * If the allocation is not scheduled, that state is returned.
+// * If the allocation is scheduled but no lastTransitionTime has been recorded, that state is returned
 // * If the allocation is in a non-terminal state, and it has been scheduled, once a configurable timeout has passed,
 //   it is considered to be failed.
-func (r *PrefixReconciler) adjustedAllocationReadiness(prefix *ipamv1alpha1.Prefix, allocation *ipamv1alpha1.PrefixAllocation) ipamv1alpha1.Readiness {
-	allocationReadiness, allocationReadyIdx := ipamv1alpha1.GetPrefixAllocationConditionsReadinessAndIndex(allocation.Status.Conditions)
-	if allocationReadiness.IsTerminal() || allocation.Spec.PrefixRef == nil {
-		return allocationReadiness
+func (r *PrefixReconciler) adjustedAllocationPhase(allocation *ipamv1alpha1.PrefixAllocation) ipamv1alpha1.PrefixAllocationPhase {
+	allocationPhase := allocation.Status.Phase
+	if allocationPhase.IsTerminal() || allocation.Spec.PrefixRef == nil {
+		return allocationPhase
 	}
 
-	now := time.Now()
-	lastTransitionTime := now
-	if allocationReadyIdx != -1 {
-		lastTransitionTime = allocation.Status.Conditions[allocationReadyIdx].LastTransitionTime.Time
-	} else {
-		_, idx := ipamv1alpha1.GetPrefixConditionsReadinessAndIndex(prefix.Status.Conditions)
-		if idx != -1 {
-			lastTransitionTime = prefix.Status.Conditions[idx].LastTransitionTime.Time
-		}
+	lastTransitionTime := allocation.Status.LastPhaseTransitionTime
+	if lastTransitionTime.IsZero() {
+		return allocationPhase
 	}
 
-	if lastTransitionTime.Add(r.PrefixAllocationTimeout).After(now) {
-		return ipamv1alpha1.ReadinessFailed
+	if lastTransitionTime.Add(r.PrefixAllocationTimeout).After(time.Now()) {
+		return ipamv1alpha1.PrefixAllocationPhaseFailed
 	}
-	return allocationReadiness
+	return allocationPhase
 }
 
 func (r *PrefixReconciler) createNewAllocation(ctx context.Context, prefix *ipamv1alpha1.Prefix) (*ipamv1alpha1.PrefixAllocation, error) {
@@ -405,16 +412,12 @@ func (r *PrefixReconciler) pruneOutdatedAllocations(ctx context.Context, log log
 
 func (r *PrefixReconciler) allocateSelf(ctx context.Context, log logr.Logger, prefix *ipamv1alpha1.Prefix) (ok bool, backoff time.Duration, err error) {
 	switch {
-	case prefix.Readiness() == ipamv1alpha1.ReadinessSucceeded:
+	case prefix.Status.Phase == ipamv1alpha1.PrefixPhaseAllocated:
 		log.V(1).Info("Prefix is allocated")
 		return true, 0, nil
-	case prefix.IsRoot():
-		log.V(1).Info("Patching root prefix as succeeded")
-		if err := r.patchStatus(ctx, prefix, ipamv1alpha1.PrefixCondition{
-			Status:  corev1.ConditionTrue,
-			Reason:  ipamv1alpha1.ReasonSucceeded,
-			Message: "Root prefixes are allocated by default.",
-		}); err != nil {
+	case prefix.Spec.ParentRef == nil && prefix.Spec.ParentSelector == nil:
+		log.V(1).Info("Marking root prefix as allocated")
+		if err := r.patchStatus(ctx, prefix, ipamv1alpha1.PrefixPhaseAllocated); err != nil {
 			return false, 0, fmt.Errorf("error marking root prefix as allocated: %w", err)
 		}
 		return false, 0, nil
@@ -422,39 +425,28 @@ func (r *PrefixReconciler) allocateSelf(ctx context.Context, log logr.Logger, pr
 		log.V(1).Info("Allocating sub-prefix")
 		allocation, backoff, err := r.allocateSubPrefix(ctx, log, prefix)
 		if err != nil {
-			if err := r.patchStatus(ctx, prefix, ipamv1alpha1.PrefixCondition{
-				Status:  corev1.ConditionUnknown,
-				Reason:  "ErrorAllocating",
-				Message: fmt.Sprintf("Allocating resulted in an error: %v.", err),
-			}); err != nil {
-				log.Error(err, "Error patching readiness")
+			log.Error(err, "Error allocating sub-prefix")
+			if err := r.patchStatus(ctx, prefix, ipamv1alpha1.PrefixPhasePending); err != nil {
+				log.Error(err, "Error patching status")
 			}
 			return false, 0, fmt.Errorf("error applying allocation: %w", err)
 		}
 
-		readiness := ipamv1alpha1.GetPrefixAllocationReadiness(allocation)
+		allocationPhase := allocation.Status.Phase
 		switch {
-		case readiness == ipamv1alpha1.ReadinessSucceeded && !prefix.Spec.Prefix.IsValid():
+		case allocationPhase == ipamv1alpha1.PrefixAllocationPhaseAllocated && !prefix.Spec.Prefix.IsValid():
 			if err := r.assignPrefix(ctx, prefix, allocation); err != nil {
 				return false, 0, fmt.Errorf("error patching prefix assignment: %w", err)
 			}
 			return false, 0, nil
-		case readiness == ipamv1alpha1.ReadinessSucceeded:
+		case allocationPhase == ipamv1alpha1.PrefixAllocationPhaseAllocated:
 			log.V(1).Info("Marking sub prefix as allocated")
-			if err := r.patchStatus(ctx, prefix, ipamv1alpha1.PrefixCondition{
-				Status:  corev1.ConditionTrue,
-				Reason:  ipamv1alpha1.ReasonSucceeded,
-				Message: "Prefix has been successfully allocated.",
-			}); err != nil {
+			if err := r.patchStatus(ctx, prefix, ipamv1alpha1.PrefixPhaseAllocated); err != nil {
 				return false, 0, fmt.Errorf("error marking prefix as allocated: %w", err)
 			}
 			return false, 0, nil
 		default:
-			if err := r.patchStatus(ctx, prefix, ipamv1alpha1.PrefixCondition{
-				Status:  corev1.ConditionFalse,
-				Reason:  ipamv1alpha1.ReasonPending,
-				Message: "Prefix is not yet allocated.",
-			}); err != nil {
+			if err := r.patchStatus(ctx, prefix, ipamv1alpha1.PrefixPhasePending); err != nil {
 				return false, backoff, fmt.Errorf("error marking prefix as pending: %w", err)
 			}
 			return false, backoff, nil
@@ -488,12 +480,12 @@ func (r *PrefixReconciler) processAllocations(ctx context.Context, log logr.Logg
 	)
 	availableBuilder.AddPrefix(prefix.Spec.Prefix.IPPrefix)
 	for _, allocation := range list.Items {
-		readiness := ipamv1alpha1.GetPrefixAllocationReadiness(&allocation)
+		allocationPhase := allocation.Status.Phase
 		switch {
-		case readiness == ipamv1alpha1.ReadinessSucceeded:
+		case allocationPhase == ipamv1alpha1.PrefixAllocationPhaseAllocated:
 			used = append(used, *allocation.Status.Prefix)
 			availableBuilder.RemovePrefix(allocation.Status.Prefix.IPPrefix)
-		case readiness != ipamv1alpha1.ReadinessFailed:
+		case allocationPhase != ipamv1alpha1.PrefixAllocationPhaseFailed:
 			newAllocations = append(newAllocations, allocation)
 		}
 	}
@@ -525,13 +517,16 @@ func (r *PrefixReconciler) patchAllocationStatus(
 	ctx context.Context,
 	allocation *ipamv1alpha1.PrefixAllocation,
 	prefix *commonv1alpha1.IPPrefix,
-	readyCond ipamv1alpha1.PrefixAllocationCondition,
+	phase ipamv1alpha1.PrefixAllocationPhase,
 ) error {
+	now := metav1.Now()
 	base := allocation.DeepCopy()
+
 	allocation.Status.Prefix = prefix
-	conditionutils.MustUpdateSlice(&allocation.Status.Conditions, string(ipamv1alpha1.PrefixAllocationReady),
-		conditionutils.UpdateFromCondition{Condition: readyCond},
-	)
+	if allocation.Status.Phase != phase {
+		allocation.Status.LastPhaseTransitionTime = &now
+	}
+	allocation.Status.Phase = phase
 	if err := r.Status().Patch(ctx, allocation, client.MergeFrom(base)); err != nil {
 		return fmt.Errorf("error updating allocation status: %w", err)
 	}
@@ -548,31 +543,19 @@ func (r *PrefixReconciler) processAllocation(ctx context.Context, log logr.Logge
 	switch {
 	case !ok && terminal:
 		log.V(1).Info("Marking terminally non-allocatable allocation as failed")
-		if err := r.patchAllocationStatus(ctx, allocation, allocation.Status.Prefix, ipamv1alpha1.PrefixAllocationCondition{
-			Status:  corev1.ConditionFalse,
-			Reason:  ipamv1alpha1.ReasonFailed,
-			Message: "The prefix can not fit the allocation.",
-		}); client.IgnoreNotFound(err) != nil {
+		if err := r.patchAllocationStatus(ctx, allocation, allocation.Status.Prefix, ipamv1alpha1.PrefixAllocationPhaseFailed); client.IgnoreNotFound(err) != nil {
 			return available, netaddr.IPPrefix{}, fmt.Errorf("could not mark allocation as failed: %w", err)
 		}
 		return available, netaddr.IPPrefix{}, nil
 	case !ok:
 		log.V(1).Info("Marking non-allocatable allocation as pending")
-		if err := r.patchAllocationStatus(ctx, allocation, allocation.Status.Prefix, ipamv1alpha1.PrefixAllocationCondition{
-			Status:  corev1.ConditionFalse,
-			Reason:  ipamv1alpha1.ReasonPending,
-			Message: "Could not allocate request.",
-		}); client.IgnoreNotFound(err) != nil {
+		if err := r.patchAllocationStatus(ctx, allocation, allocation.Status.Prefix, ipamv1alpha1.PrefixAllocationPhasePending); client.IgnoreNotFound(err) != nil {
 			return available, netaddr.IPPrefix{}, fmt.Errorf("could not mark allocation as pending: %w", err)
 		}
 		return available, netaddr.IPPrefix{}, nil
 	default:
 		log.V(1).Info("Marking allocation as allocated")
-		if err := r.patchAllocationStatus(ctx, allocation, commonv1alpha1.NewIPPrefix(res), ipamv1alpha1.PrefixAllocationCondition{
-			Status:  corev1.ConditionTrue,
-			Reason:  ipamv1alpha1.ReasonSucceeded,
-			Message: "The request has been successfully allocated.",
-		}); err != nil {
+		if err := r.patchAllocationStatus(ctx, allocation, commonv1alpha1.NewIPPrefix(res), ipamv1alpha1.PrefixAllocationPhaseAllocated); err != nil {
 			return available, netaddr.IPPrefix{}, fmt.Errorf("error marking allocation as succeeded: %w", err)
 		}
 		return newAvailableSet, res, nil
@@ -684,7 +667,7 @@ func (r *PrefixReconciler) enqueueByAllocationPrefixRef() handler.EventHandler {
 func (r *PrefixReconciler) enqueueByPrefixParentSelector(ctx context.Context, log logr.Logger) handler.EventHandler {
 	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
 		prefix := obj.(*ipamv1alpha1.Prefix)
-		if !isPrefixReadyAndNotDeleting(prefix) {
+		if !isPrefixAllocatedAndNotDeleting(prefix) {
 			return nil
 		}
 
@@ -723,7 +706,7 @@ func (r *PrefixReconciler) enqueueByPrefixParentSelector(ctx context.Context, lo
 func (r *PrefixReconciler) enqueueByPrefixParentRef(ctx context.Context, log logr.Logger) handler.EventHandler {
 	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
 		prefix := obj.(*ipamv1alpha1.Prefix)
-		if !isPrefixReadyAndNotDeleting(prefix) {
+		if !isPrefixAllocatedAndNotDeleting(prefix) {
 			return nil
 		}
 

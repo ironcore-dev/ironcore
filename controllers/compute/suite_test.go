@@ -21,6 +21,9 @@ import (
 	"testing"
 	"time"
 
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
+	"github.com/onmetal/onmetal-api/controllers/networking"
+	"github.com/onmetal/onmetal-api/controllers/shared"
 	"github.com/onmetal/onmetal-api/envtestutils"
 	"github.com/onmetal/onmetal-api/envtestutils/apiserver"
 	"github.com/onmetal/onmetal-api/testutils/apiserverbin"
@@ -30,6 +33,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
@@ -48,6 +52,7 @@ const (
 	pollingInterval      = 50 * time.Millisecond
 	eventuallyTimeout    = 3 * time.Second
 	consistentlyDuration = 1 * time.Second
+	apiServiceTimeout    = 5 * time.Minute
 )
 
 var (
@@ -89,6 +94,7 @@ var _ = BeforeSuite(func() {
 
 	Expect(computev1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
 	Expect(ipamv1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
+	Expect(networkingv1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
 
 	//+kubebuilder:scaffold:scheme
 
@@ -113,7 +119,7 @@ var _ = BeforeSuite(func() {
 		Expect(err).NotTo(HaveOccurred())
 	}()
 
-	err = envtestutils.WaitUntilAPIServicesReadyWithTimeout(60*time.Second, testEnvExt, k8sClient, scheme.Scheme)
+	err = envtestutils.WaitUntilAPIServicesReadyWithTimeout(apiServiceTimeout, testEnvExt, k8sClient, scheme.Scheme)
 	Expect(err).NotTo(HaveOccurred())
 })
 
@@ -142,10 +148,13 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 		})
 		Expect(err).ToNot(HaveOccurred())
 
+		Expect(networking.SetupNetworkInterfaceVirtualIPNameFieldIndexer(k8sManager)).To(Succeed())
+		Expect(shared.SetupMachineNetworkInterfaceNamesFieldIndexer(k8sManager)).To(Succeed())
+
 		// register reconciler here
 		Expect((&MachineScheduler{
 			Client: k8sManager.GetClient(),
-			Events: k8sManager.GetEventRecorderFor("machine-scheduler"),
+			Events: &record.FakeRecorder{},
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		Expect((&MachineReconciler{

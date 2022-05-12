@@ -27,16 +27,24 @@ import (
 
 type NetworkingV1alpha1Interface interface {
 	RESTClient() rest.Interface
+	AliasPrefixesGetter
+	AliasPrefixRoutingsGetter
 	NetworksGetter
 	NetworkInterfacesGetter
-	NetworkInterfaceBindingsGetter
 	VirtualIPsGetter
-	VirtualIPRoutingsGetter
 }
 
 // NetworkingV1alpha1Client is used to interact with features provided by the networking.api.onmetal.de group.
 type NetworkingV1alpha1Client struct {
 	restClient rest.Interface
+}
+
+func (c *NetworkingV1alpha1Client) AliasPrefixes(namespace string) AliasPrefixInterface {
+	return newAliasPrefixes(c, namespace)
+}
+
+func (c *NetworkingV1alpha1Client) AliasPrefixRoutings(namespace string) AliasPrefixRoutingInterface {
+	return newAliasPrefixRoutings(c, namespace)
 }
 
 func (c *NetworkingV1alpha1Client) Networks(namespace string) NetworkInterface {
@@ -47,16 +55,8 @@ func (c *NetworkingV1alpha1Client) NetworkInterfaces(namespace string) NetworkIn
 	return newNetworkInterfaces(c, namespace)
 }
 
-func (c *NetworkingV1alpha1Client) NetworkInterfaceBindings(namespace string) NetworkInterfaceBindingInterface {
-	return newNetworkInterfaceBindings(c, namespace)
-}
-
 func (c *NetworkingV1alpha1Client) VirtualIPs(namespace string) VirtualIPInterface {
 	return newVirtualIPs(c, namespace)
-}
-
-func (c *NetworkingV1alpha1Client) VirtualIPRoutings(namespace string) VirtualIPRoutingInterface {
-	return newVirtualIPRoutings(c, namespace)
 }
 
 // NewForConfig creates a new NetworkingV1alpha1Client for the given config.

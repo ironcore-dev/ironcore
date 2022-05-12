@@ -24,6 +24,7 @@ import (
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
 	"github.com/onmetal/onmetal-api/controllers/ipam"
+	"github.com/onmetal/onmetal-api/controllers/shared"
 	"github.com/onmetal/onmetal-api/envtestutils"
 	"github.com/onmetal/onmetal-api/envtestutils/apiserver"
 	"github.com/onmetal/onmetal-api/testutils/apiserverbin"
@@ -46,6 +47,7 @@ const (
 	pollingInterval      = 50 * time.Millisecond
 	eventuallyTimeout    = 3 * time.Second
 	consistentlyDuration = 1 * time.Second
+	apiServiceTimeout    = 5 * time.Minute
 )
 
 var (
@@ -108,13 +110,16 @@ var _ = BeforeSuite(func() {
 		Expect(err).NotTo(HaveOccurred())
 	}()
 
-	Expect(envtestutils.WaitUntilAPIServicesReadyWithTimeout(60*time.Second, testEnvExt, k8sClient, scheme.Scheme)).To(Succeed())
+	Expect(envtestutils.WaitUntilAPIServicesReadyWithTimeout(apiServiceTimeout, testEnvExt, k8sClient, scheme.Scheme)).To(Succeed())
 
 	k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
 		Scheme:             scheme.Scheme,
 		MetricsBindAddress: "0",
 	})
 	Expect(err).ToNot(HaveOccurred())
+
+	Expect(SetupNetworkInterfaceVirtualIPNameFieldIndexer(k8sManager)).To(Succeed())
+	Expect(shared.SetupMachineNetworkInterfaceNamesFieldIndexer(k8sManager)).To(Succeed())
 
 	// Register reconcilers
 	err = (&NetworkInterfaceReconciler{
@@ -123,7 +128,23 @@ var _ = BeforeSuite(func() {
 	}).SetupWithManager(k8sManager)
 	Expect(err).NotTo(HaveOccurred())
 
+	err = (&NetworkInterfaceBindReconciler{
+		Client:      k8sManager.GetClient(),
+		APIReader:   k8sManager.GetAPIReader(),
+		Scheme:      k8sManager.GetScheme(),
+		BindTimeout: 1 * time.Second,
+	}).SetupWithManager(k8sManager)
+	Expect(err).NotTo(HaveOccurred())
+
 	err = (&VirtualIPReconciler{
+		Client:      k8sManager.GetClient(),
+		APIReader:   k8sManager.GetAPIReader(),
+		Scheme:      k8sManager.GetScheme(),
+		BindTimeout: 1 * time.Second,
+	}).SetupWithManager(k8sManager)
+	Expect(err).NotTo(HaveOccurred())
+
+	err = (&AliasPrefixReconciler{
 		Client: k8sManager.GetClient(),
 		Scheme: k8sManager.GetScheme(),
 	}).SetupWithManager(k8sManager)

@@ -35,6 +35,7 @@ var (
 		{Name: "Network", Type: "string", Description: "The network this network interface is connected to"},
 		{Name: "Machine", Type: "string", Description: "The machine this network interface is used by"},
 		{Name: "IPs", Type: "string", Description: "List of effective IPs of the network interface"},
+		{Name: "VirtualIP", Type: "string", Description: "The virtual IP assigned to this interface, if any"},
 		{Name: "Age", Type: "string", Format: "date", Description: objectMetaSwaggerDoc["creationTimestamp"]},
 	}
 )
@@ -50,12 +51,10 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 
 	if m, err := meta.ListAccessor(obj); err == nil {
 		tab.ResourceVersion = m.GetResourceVersion()
-		tab.SelfLink = m.GetSelfLink()
 		tab.Continue = m.GetContinue()
 	} else {
 		if m, err := meta.CommonAccessor(obj); err == nil {
 			tab.ResourceVersion = m.GetResourceVersion()
-			tab.SelfLink = m.GetSelfLink()
 		}
 	}
 
@@ -65,8 +64,8 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 
 		cells = append(cells, name)
 		cells = append(cells, networkInterface.Spec.NetworkRef.Name)
-		if machineRefName := networkInterface.Spec.MachineRef.Name; machineRefName != "" {
-			cells = append(cells, machineRefName)
+		if machineRef := networkInterface.Spec.MachineRef; machineRef != nil {
+			cells = append(cells, machineRef.Name)
 		} else {
 			cells = append(cells, "<none>")
 		}
@@ -76,6 +75,11 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 				eIPs = append(eIPs, ip.String())
 			}
 			cells = append(cells, strings.Join(eIPs, ","))
+		} else {
+			cells = append(cells, "<none>")
+		}
+		if vip := networkInterface.Status.VirtualIP; vip != nil {
+			cells = append(cells, vip.String())
 		} else {
 			cells = append(cells, "<none>")
 		}

@@ -189,32 +189,22 @@ var _ = Describe("PrefixAllocation", func() {
 			errList := ValidatePrefixAllocationStatus(status, field.NewPath("status"))
 			Expect(errList).To(match)
 		},
-		Entry("succeeded but no result",
+		Entry("allocated but no result",
 			&ipam.PrefixAllocationStatus{
-				Conditions: []ipam.PrefixAllocationCondition{
-					{
-						Type:   ipam.PrefixAllocationReady,
-						Status: corev1.ConditionTrue,
-					},
-				},
+				Phase: ipam.PrefixAllocationPhaseAllocated,
 			},
 			ContainElement(RequiredField("status.prefix")),
 		),
-		Entry("not succeeded but result",
+		Entry("not allocated but result",
 			&ipam.PrefixAllocationStatus{
 				Prefix: commonv1alpha1.MustParseNewIPPrefix("10.0.0.0/8"),
 			},
 			ContainElement(ForbiddenField("status.prefix")),
 		),
-		Entry("succeeded with result",
+		Entry("allocated with result",
 			&ipam.PrefixAllocationStatus{
 				Prefix: commonv1alpha1.MustParseNewIPPrefix("10.0.0.0/8"),
-				Conditions: []ipam.PrefixAllocationCondition{
-					{
-						Type:   ipam.PrefixAllocationReady,
-						Status: corev1.ConditionTrue,
-					},
-				},
+				Phase:  ipam.PrefixAllocationPhaseAllocated,
 			},
 			Not(ContainElement(ForbiddenField("status.prefix"))),
 		),
@@ -225,44 +215,27 @@ var _ = Describe("PrefixAllocation", func() {
 			errList := ValidatePrefixAllocationStatusUpdate(newPrefixAllocation, oldPrefixAllocation)
 			Expect(errList).To(match)
 		},
-		Entry("update from terminal readiness to missing readiness",
+		Entry("update from terminal phase to missing phase",
 			&ipam.PrefixAllocation{},
 			&ipam.PrefixAllocation{
 				Status: ipam.PrefixAllocationStatus{
-					Conditions: []ipam.PrefixAllocationCondition{
-						{
-							Type:   ipam.PrefixAllocationReady,
-							Status: corev1.ConditionFalse,
-							Reason: ipam.ReasonFailed,
-						},
-					},
+					Phase: ipam.PrefixAllocationPhaseFailed,
 				},
 			},
-			ContainElement(RequiredField("status.conditions[0]")),
+			ContainElement(ForbiddenField("status.phase")),
 		),
-		Entry("update from terminal readiness to other readiness",
+		Entry("update from terminal phase to other phase",
 			&ipam.PrefixAllocation{
 				Status: ipam.PrefixAllocationStatus{
-					Conditions: []ipam.PrefixAllocationCondition{
-						{
-							Type:   ipam.PrefixAllocationReady,
-							Status: corev1.ConditionTrue,
-						},
-					},
+					Phase: ipam.PrefixAllocationPhaseAllocated,
 				},
 			},
 			&ipam.PrefixAllocation{
 				Status: ipam.PrefixAllocationStatus{
-					Conditions: []ipam.PrefixAllocationCondition{
-						{
-							Type:   ipam.PrefixAllocationReady,
-							Status: corev1.ConditionFalse,
-							Reason: ipam.ReasonFailed,
-						},
-					},
+					Phase: ipam.PrefixAllocationPhaseFailed,
 				},
 			},
-			ContainElement(ForbiddenField("status.conditions[0]")),
+			ContainElement(ForbiddenField("status.phase")),
 		),
 		Entry("prefix mismatch with spec.prefix",
 			&ipam.PrefixAllocation{
@@ -271,13 +244,8 @@ var _ = Describe("PrefixAllocation", func() {
 					PrefixRef: &corev1.LocalObjectReference{Name: "foo"},
 				},
 				Status: ipam.PrefixAllocationStatus{
+					Phase:  ipam.PrefixAllocationPhaseAllocated,
 					Prefix: commonv1alpha1.MustParseNewIPPrefix("10.0.0.9/32"),
-					Conditions: []ipam.PrefixAllocationCondition{
-						{
-							Type:   ipam.PrefixAllocationReady,
-							Status: corev1.ConditionTrue,
-						},
-					},
 				},
 			},
 			&ipam.PrefixAllocation{
@@ -296,13 +264,8 @@ var _ = Describe("PrefixAllocation", func() {
 					PrefixRef:    &corev1.LocalObjectReference{Name: "foo"},
 				},
 				Status: ipam.PrefixAllocationStatus{
+					Phase:  ipam.PrefixAllocationPhaseAllocated,
 					Prefix: commonv1alpha1.MustParseNewIPPrefix("10.0.0.9/32"),
-					Conditions: []ipam.PrefixAllocationCondition{
-						{
-							Type:   ipam.PrefixAllocationReady,
-							Status: corev1.ConditionTrue,
-						},
-					},
 				},
 			},
 			&ipam.PrefixAllocation{
@@ -322,13 +285,8 @@ var _ = Describe("PrefixAllocation", func() {
 					PrefixRef:    &corev1.LocalObjectReference{Name: "foo"},
 				},
 				Status: ipam.PrefixAllocationStatus{
+					Phase:  ipam.PrefixAllocationPhaseAllocated,
 					Prefix: commonv1alpha1.MustParseNewIPPrefix("beef::/8"),
-					Conditions: []ipam.PrefixAllocationCondition{
-						{
-							Type:   ipam.PrefixAllocationReady,
-							Status: corev1.ConditionTrue,
-						},
-					},
 				},
 			},
 			&ipam.PrefixAllocation{
@@ -346,13 +304,8 @@ var _ = Describe("PrefixAllocation", func() {
 					PrefixLength: 32,
 				},
 				Status: ipam.PrefixAllocationStatus{
+					Phase:  ipam.PrefixAllocationPhaseAllocated,
 					Prefix: commonv1alpha1.MustParseNewIPPrefix("10.0.0.9/32"),
-					Conditions: []ipam.PrefixAllocationCondition{
-						{
-							Type:   ipam.PrefixAllocationReady,
-							Status: corev1.ConditionTrue,
-						},
-					},
 				},
 			},
 			&ipam.PrefixAllocation{

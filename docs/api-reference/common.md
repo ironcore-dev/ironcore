@@ -1,16 +1,16 @@
 <p>Packages:</p>
 <ul>
 <li>
-<a href="#common.onmetal.de%2fv1alpha1">common.onmetal.de/v1alpha1</a>
+<a href="#common.api.onmetal.de%2fv1alpha1">common.api.onmetal.de/v1alpha1</a>
 </li>
 </ul>
-<h2 id="common.onmetal.de/v1alpha1">common.onmetal.de/v1alpha1</h2>
+<h2 id="common.api.onmetal.de/v1alpha1">common.api.onmetal.de/v1alpha1</h2>
 <div>
 <p>Package v1alpha1 is the v1alpha1 version of the API.</p>
 </div>
 Resource Types:
 <ul></ul>
-<h3 id="common.onmetal.de/v1alpha1.ConfigMapKeySelector">ConfigMapKeySelector
+<h3 id="common.api.onmetal.de/v1alpha1.ConfigMapKeySelector">ConfigMapKeySelector
 </h3>
 <div>
 <p>ConfigMapKeySelector is a reference to a specific &lsquo;key&rsquo; within a ConfigMap resource.
@@ -56,10 +56,10 @@ required.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="common.onmetal.de/v1alpha1.IP">IP
+<h3 id="common.api.onmetal.de/v1alpha1.IP">IP
 </h3>
 <p>
-(<em>Appears on:</em><a href="#common.onmetal.de/v1alpha1.IPRange">IPRange</a>)
+(<em>Appears on:</em><a href="#common.api.onmetal.de/v1alpha1.IPRange">IPRange</a>)
 </p>
 <div>
 <p>IP is an IP address.</p>
@@ -86,7 +86,7 @@ inet.af/netaddr.IP
 </tr>
 </tbody>
 </table>
-<h3 id="common.onmetal.de/v1alpha1.IPPrefix">IPPrefix
+<h3 id="common.api.onmetal.de/v1alpha1.IPPrefix">IPPrefix
 </h3>
 <div>
 <p>IPPrefix represents a network prefix.</p>
@@ -113,7 +113,7 @@ inet.af/netaddr.IPPrefix
 </tr>
 </tbody>
 </table>
-<h3 id="common.onmetal.de/v1alpha1.IPRange">IPRange
+<h3 id="common.api.onmetal.de/v1alpha1.IPRange">IPRange
 </h3>
 <div>
 <p>IPRange is an IP range.</p>
@@ -130,7 +130,7 @@ inet.af/netaddr.IPPrefix
 <td>
 <code>from</code><br/>
 <em>
-<a href="#common.onmetal.de/v1alpha1.IP">
+<a href="#common.api.onmetal.de/v1alpha1.IP">
 IP
 </a>
 </em>
@@ -142,7 +142,7 @@ IP
 <td>
 <code>to</code><br/>
 <em>
-<a href="#common.onmetal.de/v1alpha1.IP">
+<a href="#common.api.onmetal.de/v1alpha1.IP">
 IP
 </a>
 </em>
@@ -152,7 +152,46 @@ IP
 </tr>
 </tbody>
 </table>
-<h3 id="common.onmetal.de/v1alpha1.SecretKeySelector">SecretKeySelector
+<h3 id="common.api.onmetal.de/v1alpha1.LocalUIDReference">LocalUIDReference
+</h3>
+<div>
+<p>LocalUIDReference is a reference to another entity including its UID</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the referenced entity.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>uid</code><br/>
+<em>
+<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/types#UID">
+k8s.io/apimachinery/pkg/types.UID
+</a>
+</em>
+</td>
+<td>
+<p>UID is the UID of the referenced entity.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="common.api.onmetal.de/v1alpha1.SecretKeySelector">SecretKeySelector
 </h3>
 <div>
 <p>SecretKeySelector is a reference to a specific &lsquo;key&rsquo; within a Secret resource.
@@ -198,7 +237,7 @@ required.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="common.onmetal.de/v1alpha1.Taint">Taint
+<h3 id="common.api.onmetal.de/v1alpha1.Taint">Taint
 </h3>
 <div>
 <p>The resource pool this Taint is attached to has the &ldquo;effect&rdquo; on
@@ -238,7 +277,7 @@ string
 <td>
 <code>effect</code><br/>
 <em>
-<a href="#common.onmetal.de/v1alpha1.TaintEffect">
+<a href="#common.api.onmetal.de/v1alpha1.TaintEffect">
 TaintEffect
 </a>
 </em>
@@ -251,10 +290,10 @@ Valid effects are NoSchedule, PreferNoSchedule and NoExecute.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="common.onmetal.de/v1alpha1.TaintEffect">TaintEffect
+<h3 id="common.api.onmetal.de/v1alpha1.TaintEffect">TaintEffect
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#common.onmetal.de/v1alpha1.Taint">Taint</a>, <a href="#common.onmetal.de/v1alpha1.Toleration">Toleration</a>)
+(<em>Appears on:</em><a href="#common.api.onmetal.de/v1alpha1.Taint">Taint</a>, <a href="#common.api.onmetal.de/v1alpha1.Toleration">Toleration</a>)
 </p>
 <div>
 </div>
@@ -272,7 +311,7 @@ Enforced by the scheduler.</p>
 </td>
 </tr></tbody>
 </table>
-<h3 id="common.onmetal.de/v1alpha1.Toleration">Toleration
+<h3 id="common.api.onmetal.de/v1alpha1.Toleration">Toleration
 </h3>
 <div>
 <p>The resource this Toleration is attached to tolerates any taint that matches
@@ -302,7 +341,7 @@ If the key is empty, operator must be Exists; this combination means to match al
 <td>
 <code>operator</code><br/>
 <em>
-<a href="#common.onmetal.de/v1alpha1.TolerationOperator">
+<a href="#common.api.onmetal.de/v1alpha1.TolerationOperator">
 TolerationOperator
 </a>
 </em>
@@ -330,7 +369,7 @@ If the operator is Exists, the value should be empty, otherwise just a regular s
 <td>
 <code>effect</code><br/>
 <em>
-<a href="#common.onmetal.de/v1alpha1.TaintEffect">
+<a href="#common.api.onmetal.de/v1alpha1.TaintEffect">
 TaintEffect
 </a>
 </em>
@@ -342,10 +381,10 @@ When specified, allowed values are NoSchedule.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="common.onmetal.de/v1alpha1.TolerationOperator">TolerationOperator
+<h3 id="common.api.onmetal.de/v1alpha1.TolerationOperator">TolerationOperator
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#common.onmetal.de/v1alpha1.Toleration">Toleration</a>)
+(<em>Appears on:</em><a href="#common.api.onmetal.de/v1alpha1.Toleration">Toleration</a>)
 </p>
 <div>
 <p>A toleration operator is the set of operators that can be used in a toleration.</p>

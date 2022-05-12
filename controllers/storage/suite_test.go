@@ -50,6 +50,7 @@ const (
 	pollingInterval      = 50 * time.Millisecond
 	eventuallyTimeout    = 3 * time.Second
 	consistentlyDuration = 1 * time.Second
+	apiServiceTimeout    = 5 * time.Minute
 )
 
 var (
@@ -115,7 +116,7 @@ var _ = BeforeSuite(func() {
 		Expect(err).NotTo(HaveOccurred())
 	}()
 
-	Expect(envtestutils.WaitUntilAPIServicesReadyWithTimeout(60*time.Second, testEnvExt, k8sClient, scheme.Scheme)).To(Succeed())
+	Expect(envtestutils.WaitUntilAPIServicesReadyWithTimeout(apiServiceTimeout, testEnvExt, k8sClient, scheme.Scheme)).To(Succeed())
 })
 
 func SetupTest(ctx context.Context) *corev1.Namespace {
@@ -146,8 +147,8 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 
 		// register reconciler here
 		Expect((&VolumeClaimScheduler{
-			Client:        k8sManager.GetClient(),
-			EventRecorder: &record.FakeRecorder{},
+			Client: k8sManager.GetClient(),
+			Events: &record.FakeRecorder{},
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		Expect((&VolumeReconciler{
@@ -155,7 +156,7 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 			APIReader:          k8sManager.GetAPIReader(),
 			Scheme:             k8sManager.GetScheme(),
 			SharedFieldIndexer: fieldIndexer,
-			BoundTimeout:       1 * time.Second,
+			BindTimeout:        1 * time.Second,
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		Expect((&VolumeClaimReconciler{

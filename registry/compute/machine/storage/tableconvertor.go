@@ -50,12 +50,10 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 
 	if m, err := meta.ListAccessor(obj); err == nil {
 		tab.ResourceVersion = m.GetResourceVersion()
-		tab.SelfLink = m.GetSelfLink()
 		tab.Continue = m.GetContinue()
 	} else {
 		if m, err := meta.CommonAccessor(obj); err == nil {
 			tab.ResourceVersion = m.GetResourceVersion()
-			tab.SelfLink = m.GetSelfLink()
 		}
 	}
 
@@ -66,8 +64,8 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 		cells = append(cells, name)
 		cells = append(cells, machine.Spec.MachineClassRef.Name)
 		cells = append(cells, machine.Spec.Image)
-		if machinePoolName := machine.Spec.MachinePoolRef.Name; machinePoolName != "" {
-			cells = append(cells, machinePoolName)
+		if machinePoolRef := machine.Spec.MachinePoolRef; machinePoolRef != nil {
+			cells = append(cells, machinePoolRef.Name)
 		} else {
 			cells = append(cells, "<none>")
 		}

@@ -58,9 +58,12 @@ vet: ## Run go vet against code.
 	go vet ./...
 
 .PHONY: lint
-lint:
+lint: ## Run golangci-lint on the code.
 	golangci-lint run ./...
 
+.PHONY: clean
+clean: ## Clean any artifacts that can be regenerated.
+	rm -rf generated/*
 
 .PHONY: addlicense
 addlicense: ## Add license headers to all go files.
@@ -144,11 +147,11 @@ undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/confi
 
 .PHONY: kind-build-apiserver
 kind-build-apiserver: ## Build the apiserver for usage in kind.
-	docker build --ssh default --target apiserver -t apiserver .
+	docker build --target apiserver -t apiserver .
 
 .PHONY: kind-build-controller
 kind-build-controller: ## Build the controller for usage in kind.
-	docker build --ssh default --target manager -t controller .
+	docker build --target manager -t controller .
 
 .PHONY: kind-build
 kind-build: kind-build-apiserver kind-build-controller ## Build the apiserver and controller for usage in kind.

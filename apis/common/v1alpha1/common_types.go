@@ -21,6 +21,7 @@ import (
 
 	"inet.af/netaddr"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/types"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 )
 
@@ -46,6 +47,14 @@ type SecretKeySelector struct {
 	// required.
 	// +optional
 	Key string `json:"key,omitempty"`
+}
+
+// LocalUIDReference is a reference to another entity including its UID
+type LocalUIDReference struct {
+	// Name is the name of the referenced entity.
+	Name string `json:"name"`
+	// UID is the UID of the referenced entity.
+	UID types.UID `json:"uid"`
 }
 
 // IP is an IP address.
@@ -194,19 +203,6 @@ func (i IPRange) String() string {
 
 func (i IPRange) GomegaString() string {
 	return i.String()
-}
-
-func (in *IPRange) DeepCopyInto(out *IPRange) {
-	*out = *in
-	in.From.DeepCopyInto(&out.From)
-	in.To.DeepCopyInto(&out.To)
-}
-
-func (in *IPRange) DeepCopy() *IPRange {
-	return &IPRange{
-		From: *in.From.DeepCopy(),
-		To:   *in.From.DeepCopy(),
-	}
 }
 
 func NewIPRange(ipRange netaddr.IPRange) IPRange {

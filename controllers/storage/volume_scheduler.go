@@ -19,8 +19,6 @@ import (
 	"fmt"
 	"math/rand"
 
-	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -65,8 +63,8 @@ func (s *VolumeScheduler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		log.Info("Volume is already deleting")
 		return ctrl.Result{}, nil
 	}
-	if volume.Spec.VolumePoolRef.Name != "" {
-		log.Info("Volume is already assigned")
+	if volume.Spec.VolumePoolRef != nil {
+		log.Info("Volume is already assigned", "VolumePoolRef", volume.Spec.VolumePoolRef)
 		return ctrl.Result{}, nil
 	}
 	return s.schedule(ctx, log, volume)
@@ -123,7 +121,7 @@ func (s *VolumeScheduler) schedule(ctx context.Context, log logr.Logger, volume 
 	pool := available[rand.Intn(len(available))]
 	log = log.WithValues("VolumePoolRef", pool.Name)
 	base := volume.DeepCopy()
-	volume.Spec.VolumePoolRef.Name = pool.Name
+	volume.Spec.VolumePoolRef = &corev1.LocalObjectReference{Name: pool.Name}
 	log.Info("Patching volume")
 	if err := s.Patch(ctx, volume, client.MergeFrom(base)); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error scheduling volume on pool: %w", err)
@@ -138,22 +136,26 @@ func (s *VolumeScheduler) SetupWithManager(mgr manager.Manager) error {
 	log := ctrl.Log.WithName("volume-scheduler").WithName("setup")
 	ctx = ctrl.LoggerInto(ctx, log)
 
-	if err := mgr.GetFieldIndexer().IndexField(ctx, &storagev1alpha1.VolumePool{}, volumePoolStatusAvailableVolumeClassesNameField, func(object client.Object) []string {
-		pool := object.(*storagev1alpha1.VolumePool)
+	if err := mgr.GetFieldIndexer().IndexField(ctx, &storagev1alpha1.VolumePool{}, volumePoolStatusAvailableVolumeClassesNameField, func(obj client.Object) []string {
+		pool := obj.(*storagev1alpha1.VolumePool)
 		names := make([]string, 0, len(pool.Status.AvailableVolumeClasses))
 		for _, availableVolumeClass := range pool.Status.AvailableVolumeClasses {
 			names = append(names, availableVolumeClass.Name)
 		}
 		return names
 	}); err != nil {
-		return fmt.Errorf("could not setup field indexer for %s: %w", volumePoolStatusAvailableVolumeClassesNameField, err)
+		return err
 	}
 
-	if err := mgr.GetFieldIndexer().IndexField(ctx, &storagev1alpha1.Volume{}, volumeSpecVolumePoolNameField, func(object client.Object) []string {
-		volume := object.(*storagev1alpha1.Volume)
-		return []string{volume.Spec.VolumePoolRef.Name}
+	if err := mgr.GetFieldIndexer().IndexField(ctx, &storagev1alpha1.Volume{}, volumeSpecVolumePoolNameField, func(obj client.Object) []string {
+		volume := obj.(*storagev1alpha1.Volume)
+		volumePoolRef := volume.Spec.VolumePoolRef
+		if volumePoolRef == nil {
+			return []string{""}
+		}
+		return []string{volumePoolRef.Name}
 	}); err != nil {
-		return fmt.Errorf("could not setup field indexer for %s: %w", volumeSpecVolumePoolNameField, err)
+		return err
 	}
 
 	return ctrl.NewControllerManagedBy(mgr).
@@ -163,13 +165,13 @@ func (s *VolumeScheduler) SetupWithManager(mgr manager.Manager) error {
 			builder.WithPredicates(
 				predicate.NewPredicateFuncs(func(object client.Object) bool {
 					volume := object.(*storagev1alpha1.Volume)
-					return volume.DeletionTimestamp.IsZero() && volume.Spec.VolumePoolRef.Name == ""
+					return volume.DeletionTimestamp.IsZero() && volume.Spec.VolumePoolRef == nil
 				}),
 			),
 		).
 		// Enqueue unscheduled volumes if a volume pool w/ required volume classes becomes available.
 		Watches(&source.Kind{Type: &storagev1alpha1.VolumePool{}},
-			handler.EnqueueRequestsFromMapFunc(func(object client.Object) []reconcile.Request {
+			handler.EnqueueRequestsFromMapFunc(func(object client.Object) []ctrl.Request {
 				pool := object.(*storagev1alpha1.VolumePool)
 				if !pool.DeletionTimestamp.IsZero() {
 					return nil
@@ -186,7 +188,7 @@ func (s *VolumeScheduler) SetupWithManager(mgr manager.Manager) error {
 					availableClassNames.Insert(availableVolumeClass.Name)
 				}
 
-				var requests []reconcile.Request
+				var requests []ctrl.Request
 				for _, volume := range list.Items {
 					volumePoolSelector := labels.SelectorFromSet(volume.Spec.VolumePoolSelector)
 					if availableClassNames.Has(volume.Spec.VolumeClassRef.Name) && volumePoolSelector.Matches(labels.Set(pool.Labels)) {

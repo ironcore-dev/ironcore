@@ -30,10 +30,11 @@ func NewSharedIndexer(mgr manager.Manager) *clientutils.SharedFieldIndexer {
 
 	sharedIndexer.MustRegister(&storagev1alpha1.Volume{}, VolumeSpecVolumeClaimNameRefField, func(object client.Object) []string {
 		volume := object.(*storagev1alpha1.Volume)
-		if volume.Spec.ClaimRef.Name == "" {
-			return nil
+		claimRef := volume.Spec.ClaimRef
+		if claimRef == nil {
+			return []string{""}
 		}
-		return []string{volume.Spec.ClaimRef.Name}
+		return []string{claimRef.Name}
 	})
 
 	return sharedIndexer

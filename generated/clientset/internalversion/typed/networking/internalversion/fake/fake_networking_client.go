@@ -27,6 +27,14 @@ type FakeNetworking struct {
 	*testing.Fake
 }
 
+func (c *FakeNetworking) AliasPrefixes(namespace string) internalversion.AliasPrefixInterface {
+	return &FakeAliasPrefixes{c, namespace}
+}
+
+func (c *FakeNetworking) AliasPrefixRoutings(namespace string) internalversion.AliasPrefixRoutingInterface {
+	return &FakeAliasPrefixRoutings{c, namespace}
+}
+
 func (c *FakeNetworking) Networks(namespace string) internalversion.NetworkInterface {
 	return &FakeNetworks{c, namespace}
 }
@@ -35,16 +43,8 @@ func (c *FakeNetworking) NetworkInterfaces(namespace string) internalversion.Net
 	return &FakeNetworkInterfaces{c, namespace}
 }
 
-func (c *FakeNetworking) NetworkInterfaceBindings(namespace string) internalversion.NetworkInterfaceBindingInterface {
-	return &FakeNetworkInterfaceBindings{c, namespace}
-}
-
 func (c *FakeNetworking) VirtualIPs(namespace string) internalversion.VirtualIPInterface {
 	return &FakeVirtualIPs{c, namespace}
-}
-
-func (c *FakeNetworking) VirtualIPRoutings(namespace string) internalversion.VirtualIPRoutingInterface {
-	return &FakeVirtualIPRoutings{c, namespace}
 }
 
 // RESTClient returns a RESTClient that is used to communicate

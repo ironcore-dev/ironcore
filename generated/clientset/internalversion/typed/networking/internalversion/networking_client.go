@@ -26,16 +26,24 @@ import (
 
 type NetworkingInterface interface {
 	RESTClient() rest.Interface
+	AliasPrefixesGetter
+	AliasPrefixRoutingsGetter
 	NetworksGetter
 	NetworkInterfacesGetter
-	NetworkInterfaceBindingsGetter
 	VirtualIPsGetter
-	VirtualIPRoutingsGetter
 }
 
 // NetworkingClient is used to interact with features provided by the networking.api.onmetal.de group.
 type NetworkingClient struct {
 	restClient rest.Interface
+}
+
+func (c *NetworkingClient) AliasPrefixes(namespace string) AliasPrefixInterface {
+	return newAliasPrefixes(c, namespace)
+}
+
+func (c *NetworkingClient) AliasPrefixRoutings(namespace string) AliasPrefixRoutingInterface {
+	return newAliasPrefixRoutings(c, namespace)
 }
 
 func (c *NetworkingClient) Networks(namespace string) NetworkInterface {
@@ -46,16 +54,8 @@ func (c *NetworkingClient) NetworkInterfaces(namespace string) NetworkInterfaceI
 	return newNetworkInterfaces(c, namespace)
 }
 
-func (c *NetworkingClient) NetworkInterfaceBindings(namespace string) NetworkInterfaceBindingInterface {
-	return newNetworkInterfaceBindings(c, namespace)
-}
-
 func (c *NetworkingClient) VirtualIPs(namespace string) VirtualIPInterface {
 	return newVirtualIPs(c, namespace)
-}
-
-func (c *NetworkingClient) VirtualIPRoutings(namespace string) VirtualIPRoutingInterface {
-	return newVirtualIPRoutings(c, namespace)
 }
 
 // NewForConfig creates a new NetworkingClient for the given config.

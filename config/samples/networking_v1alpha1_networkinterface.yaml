@@ -5,20 +5,22 @@ metadata:
 spec:
   networkRef:
     name: network-sample
-  ipFamilies: [ IPv4, IPv6 ]
+  ipFamilies: [ IPv4 ]
   ips:
     - value: 10.0.0.1 # It is also possible to directly specify IPs without IPAM
   #    - value: 2607:f0d0:1002:51::4 # Same applies for v6 addresses
-  #    - ephemeralIP:
-  #        spec:
-  #          prefixRef:
-  #            name: my-node-prefix-v4
-  #    - ephemeralIP:
-  #        spec:
-  #          prefixRef:
-  #            name: my-node-prefix-v6
-  machineRef:
-    name: machine-sample
+  #    - ephemeral:
+  #        prefixTemplate
+  #          spec:
+  #            ipFamily: IPv4
+  #            parentRef:
+  #              name: my-node-prefix-v4
+  #    - ephemeral:
+  #        prefixTemplate
+  #          spec:
+  #            ipFamily: IPv6
+  #            parentRef:
+  #              name: my-node-prefix-v6
 #status:
 #  ips: # This will be updated with the allocated addresses.
 #    - 10.0.0.1

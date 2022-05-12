@@ -23,16 +23,16 @@ import (
 
 // Interface provides access to all the informers in this group version.
 type Interface interface {
+	// AliasPrefixes returns a AliasPrefixInformer.
+	AliasPrefixes() AliasPrefixInformer
+	// AliasPrefixRoutings returns a AliasPrefixRoutingInformer.
+	AliasPrefixRoutings() AliasPrefixRoutingInformer
 	// Networks returns a NetworkInformer.
 	Networks() NetworkInformer
 	// NetworkInterfaces returns a NetworkInterfaceInformer.
 	NetworkInterfaces() NetworkInterfaceInformer
-	// NetworkInterfaceBindings returns a NetworkInterfaceBindingInformer.
-	NetworkInterfaceBindings() NetworkInterfaceBindingInformer
 	// VirtualIPs returns a VirtualIPInformer.
 	VirtualIPs() VirtualIPInformer
-	// VirtualIPRoutings returns a VirtualIPRoutingInformer.
-	VirtualIPRoutings() VirtualIPRoutingInformer
 }
 
 type version struct {
@@ -46,6 +46,16 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
+// AliasPrefixes returns a AliasPrefixInformer.
+func (v *version) AliasPrefixes() AliasPrefixInformer {
+	return &aliasPrefixInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// AliasPrefixRoutings returns a AliasPrefixRoutingInformer.
+func (v *version) AliasPrefixRoutings() AliasPrefixRoutingInformer {
+	return &aliasPrefixRoutingInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
 // Networks returns a NetworkInformer.
 func (v *version) Networks() NetworkInformer {
 	return &networkInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
@@ -56,17 +66,7 @@ func (v *version) NetworkInterfaces() NetworkInterfaceInformer {
 	return &networkInterfaceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// NetworkInterfaceBindings returns a NetworkInterfaceBindingInformer.
-func (v *version) NetworkInterfaceBindings() NetworkInterfaceBindingInformer {
-	return &networkInterfaceBindingInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
-}
-
 // VirtualIPs returns a VirtualIPInformer.
 func (v *version) VirtualIPs() VirtualIPInformer {
 	return &virtualIPInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
-}
-
-// VirtualIPRoutings returns a VirtualIPRoutingInformer.
-func (v *version) VirtualIPRoutings() VirtualIPRoutingInformer {
-	return &virtualIPRoutingInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

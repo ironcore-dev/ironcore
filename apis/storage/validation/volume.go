@@ -32,35 +32,41 @@ func ValidateVolume(volume *storage.Volume) field.ErrorList {
 	return allErrs
 }
 
-func validateVolumeSpec(volumeSpec *storage.VolumeSpec, fldPath *field.Path) field.ErrorList {
+func validateVolumeSpec(spec *storage.VolumeSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	if volumeSpec.VolumeClassRef == (corev1.LocalObjectReference{}) {
+	if spec.VolumeClassRef == (corev1.LocalObjectReference{}) {
 		allErrs = append(allErrs, field.Required(fldPath.Child("volumeClassRef"), "must specify a volume class ref"))
 	}
-	for _, msg := range apivalidation.NameIsDNSLabel(volumeSpec.VolumeClassRef.Name, false) {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("volumeClassRef").Child("name"), volumeSpec.VolumeClassRef.Name, msg))
+	for _, msg := range apivalidation.NameIsDNSLabel(spec.VolumeClassRef.Name, false) {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("volumeClassRef").Child("name"), spec.VolumeClassRef.Name, msg))
 	}
 
-	allErrs = append(allErrs, metav1validation.ValidateLabels(volumeSpec.VolumePoolSelector, fldPath.Child("volumePoolSelector"))...)
+	allErrs = append(allErrs, metav1validation.ValidateLabels(spec.VolumePoolSelector, fldPath.Child("volumePoolSelector"))...)
 
-	if volumeSpec.VolumePoolRef.Name != "" {
-		for _, msg := range apivalidation.NameIsDNSLabel(volumeSpec.VolumePoolRef.Name, false) {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("volumePoolRef").Child("name"), volumeSpec.VolumePoolRef.Name, msg))
+	if spec.VolumePoolRef != nil {
+		for _, msg := range apivalidation.NameIsDNSLabel(spec.VolumePoolRef.Name, false) {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("volumePoolRef").Child("name"), spec.VolumePoolRef.Name, msg))
 		}
 	}
 
-	if volumeSpec.ClaimRef.Name != "" {
-		for _, msg := range apivalidation.NameIsDNSLabel(volumeSpec.ClaimRef.Name, false) {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("claimRef").Child("name"), volumeSpec.ClaimRef.Name, msg))
+	if spec.ClaimRef != nil {
+		for _, msg := range apivalidation.NameIsDNSLabel(spec.ClaimRef.Name, false) {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("claimRef").Child("name"), spec.ClaimRef.Name, msg))
 		}
 	}
 
-	storageValue, ok := volumeSpec.Resources[corev1.ResourceStorage]
+	storageValue, ok := spec.Resources[corev1.ResourceStorage]
 	if !ok {
 		allErrs = append(allErrs, field.Required(fldPath.Child("resources").Key(string(corev1.ResourceStorage)), ""))
 	} else {
 		allErrs = append(allErrs, onmetalapivalidation.ValidatePositiveQuantity(storageValue, fldPath.Child("resources").Key(string(corev1.ResourceStorage)))...)
+	}
+
+	if spec.ImagePullSecretRef != nil {
+		for _, msg := range apivalidation.NameIsDNSLabel(spec.ImagePullSecretRef.Name, false) {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("imagePullSecretRef").Child("name"), spec.ImagePullSecretRef.Name, msg))
+		}
 	}
 
 	return allErrs

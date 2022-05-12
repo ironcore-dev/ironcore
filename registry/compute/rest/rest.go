@@ -20,6 +20,7 @@ import (
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	machinestorage "github.com/onmetal/onmetal-api/registry/compute/machine/storage"
 	machinepoolstorage "github.com/onmetal/onmetal-api/registry/compute/machinepool/storage"
+	onmetalapiserializer "github.com/onmetal/onmetal-api/serializer"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apiserver/pkg/registry/generic"
 	"k8s.io/apiserver/pkg/registry/rest"
@@ -38,15 +39,14 @@ func (p StorageProvider) GroupName() string {
 
 func (p StorageProvider) NewRESTStorage(apiResourceConfigSource serverstorage.APIResourceConfigSource, restOptionsGetter generic.RESTOptionsGetter) (genericapiserver.APIGroupInfo, bool, error) {
 	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(p.GroupName(), api.Scheme, metav1.ParameterCodec, api.Codecs)
+	apiGroupInfo.NegotiatedSerializer = onmetalapiserializer.DefaultSubsetNegotiatedSerializer(api.Codecs)
 
-	if apiResourceConfigSource.VersionEnabled(computev1alpha1.SchemeGroupVersion) {
-		storageMap, err := p.v1alpha1Storage(restOptionsGetter)
-		if err != nil {
-			return genericapiserver.APIGroupInfo{}, false, err
-		}
-
-		apiGroupInfo.VersionedResourcesStorageMap[computev1alpha1.SchemeGroupVersion.Version] = storageMap
+	storageMap, err := p.v1alpha1Storage(restOptionsGetter)
+	if err != nil {
+		return genericapiserver.APIGroupInfo{}, false, err
 	}
+
+	apiGroupInfo.VersionedResourcesStorageMap[computev1alpha1.SchemeGroupVersion.Version] = storageMap
 
 	return apiGroupInfo, true, nil
 }

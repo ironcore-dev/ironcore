@@ -10,16 +10,190 @@
 </div>
 Resource Types:
 <ul><li>
+<a href="#networking.api.onmetal.de/v1alpha1.AliasPrefix">AliasPrefix</a>
+</li><li>
+<a href="#networking.api.onmetal.de/v1alpha1.AliasPrefixRouting">AliasPrefixRouting</a>
+</li><li>
 <a href="#networking.api.onmetal.de/v1alpha1.Network">Network</a>
 </li><li>
 <a href="#networking.api.onmetal.de/v1alpha1.NetworkInterface">NetworkInterface</a>
 </li><li>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceBinding">NetworkInterfaceBinding</a>
-</li><li>
 <a href="#networking.api.onmetal.de/v1alpha1.VirtualIP">VirtualIP</a>
-</li><li>
-<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPRouting">VirtualIPRouting</a>
 </li></ul>
+<h3 id="networking.api.onmetal.de/v1alpha1.AliasPrefix">AliasPrefix
+</h3>
+<div>
+<p>AliasPrefix is the Schema for the AliasPrefix API</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+networking.api.onmetal.de/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>AliasPrefix</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.AliasPrefixSpec">
+AliasPrefixSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef is the Network this AliasPrefix should belong to</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkInterfaceSelector</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#labelselector-v1-meta">
+Kubernetes meta/v1.LabelSelector
+</a>
+</em>
+</td>
+<td>
+<p>NetworkInterfaceSelector defines the NetworkInterfaces
+for which this AliasPrefix should be applied</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>prefix</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.PrefixSource">
+PrefixSource
+</a>
+</em>
+</td>
+<td>
+<p>Prefix is the provided Prefix or Ephemeral which
+should be used by this AliasPrefix</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.AliasPrefixStatus">
+AliasPrefixStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.AliasPrefixRouting">AliasPrefixRouting
+</h3>
+<div>
+<p>AliasPrefixRouting is the Schema for the aliasprefixrouting API</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+networking.api.onmetal.de/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>AliasPrefixRouting</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>destinations</code><br/>
+<em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference">
+[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
+</a>
+</em>
+</td>
+<td>
+<p>Destinations are the destinations for an AliasPrefix.</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="networking.api.onmetal.de/v1alpha1.Network">Network
 </h3>
 <div>
@@ -140,8 +314,8 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>machineRef</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
 </a>
 </em>
 </td>
@@ -176,6 +350,19 @@ Kubernetes core/v1.LocalObjectReference
 this NetworkInterface</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>virtualIp</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPSource">
+VirtualIPSource
+</a>
+</em>
+</td>
+<td>
+<p>VirtualIP specifies the virtual ip that should be assigned to this NetworkInterface.</p>
+</td>
+</tr>
 </table>
 </td>
 </tr>
@@ -185,64 +372,6 @@ this NetworkInterface</p>
 <em>
 <a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceStatus">
 NetworkInterfaceStatus
-</a>
-</em>
-</td>
-<td>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="networking.api.onmetal.de/v1alpha1.NetworkInterfaceBinding">NetworkInterfaceBinding
-</h3>
-<div>
-<p>NetworkInterfaceBinding is the Schema for the networkinterfacebindings API</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>apiVersion</code><br/>
-string</td>
-<td>
-<code>
-networking.api.onmetal.de/v1alpha1
-</code>
-</td>
-</tr>
-<tr>
-<td>
-<code>kind</code><br/>
-string
-</td>
-<td><code>NetworkInterfaceBinding</code></td>
-</tr>
-<tr>
-<td>
-<code>metadata</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
-Kubernetes meta/v1.ObjectMeta
-</a>
-</em>
-</td>
-<td>
-Refer to the Kubernetes API documentation for the fields of the
-<code>metadata</code> field.
-</td>
-</tr>
-<tr>
-<td>
-<code>ips</code><br/>
-<em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
-[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
 </a>
 </em>
 </td>
@@ -336,16 +465,15 @@ Kubernetes core/v1.IPFamily
 </tr>
 <tr>
 <td>
-<code>networkInterfaceSelector</code><br/>
+<code>targetRef</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#labelselector-v1-meta">
-Kubernetes meta/v1.LabelSelector
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
 </a>
 </em>
 </td>
 <td>
-<p>NetworkInterfaceSelector selects any NetworkInterface that should get the VirtualIP routed.
-If empty, it is assumed that an external process manages the VirtualIPRouting for this VirtualIP.</p>
+<p>TargetRef references the target for this VirtualIP (currently only NetworkInterface).</p>
 </td>
 </tr>
 </table>
@@ -365,10 +493,13 @@ VirtualIPStatus
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.VirtualIPRouting">VirtualIPRouting
+<h3 id="networking.api.onmetal.de/v1alpha1.AliasPrefixSpec">AliasPrefixSpec
 </h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.AliasPrefix">AliasPrefix</a>)
+</p>
 <div>
-<p>VirtualIPRouting is the Schema for the virtualiproutings API</p>
+<p>AliasPrefixSpec defines the desired state of AliasPrefix</p>
 </div>
 <table>
 <thead>
@@ -380,46 +511,74 @@ VirtualIPStatus
 <tbody>
 <tr>
 <td>
-<code>apiVersion</code><br/>
-string</td>
-<td>
-<code>
-networking.api.onmetal.de/v1alpha1
-</code>
-</td>
-</tr>
-<tr>
-<td>
-<code>kind</code><br/>
-string
-</td>
-<td><code>VirtualIPRouting</code></td>
-</tr>
-<tr>
-<td>
-<code>metadata</code><br/>
+<code>networkRef</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
-Kubernetes meta/v1.ObjectMeta
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
 </td>
 <td>
-Refer to the Kubernetes API documentation for the fields of the
-<code>metadata</code> field.
+<p>NetworkRef is the Network this AliasPrefix should belong to</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>subsets</code><br/>
+<code>networkInterfaceSelector</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPRoutingSubset">
-[]VirtualIPRoutingSubset
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#labelselector-v1-meta">
+Kubernetes meta/v1.LabelSelector
 </a>
 </em>
 </td>
 <td>
-<p>Subsets are the subsets that make up a VirtualIPRouting.</p>
+<p>NetworkInterfaceSelector defines the NetworkInterfaces
+for which this AliasPrefix should be applied</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>prefix</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.PrefixSource">
+PrefixSource
+</a>
+</em>
+</td>
+<td>
+<p>Prefix is the provided Prefix or Ephemeral which
+should be used by this AliasPrefix</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.AliasPrefixStatus">AliasPrefixStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.AliasPrefix">AliasPrefix</a>)
+</p>
+<div>
+<p>AliasPrefixStatus defines the observed state of AliasPrefix</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>prefix</code><br/>
+<em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
+</a>
+</em>
+</td>
+<td>
+<p>Prefix is the Prefix reserved by this AliasPrefix</p>
 </td>
 </tr>
 </tbody>
@@ -427,9 +586,11 @@ Refer to the Kubernetes API documentation for the fields of the
 <h3 id="networking.api.onmetal.de/v1alpha1.EphemeralPrefixSource">EphemeralPrefixSource
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.IPSource">IPSource</a>)
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.IPSource">IPSource</a>, <a href="#networking.api.onmetal.de/v1alpha1.PrefixSource">PrefixSource</a>)
 </p>
 <div>
+<p>EphemeralPrefixSource contains the definition to create an ephemeral (i.e. coupled to the lifetime of the
+surrounding object) Prefix.</p>
 </div>
 <table>
 <thead>
@@ -443,10 +604,45 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>prefixTemplate</code><br/>
 <em>
+<a href="/api-reference/common/#ipam.onmetal.de/v1alpha1.PrefixTemplateSpec">
 github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixTemplateSpec
+</a>
 </em>
 </td>
 <td>
+<p>PrefixTemplate is the template for the Prefix.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.EphemeralVirtualIPSource">EphemeralVirtualIPSource
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.VirtualIPSource">VirtualIPSource</a>)
+</p>
+<div>
+<p>EphemeralVirtualIPSource contains the definition to create an ephemeral (i.e. coupled to the lifetime of the
+surrounding object) VirtualIP.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>virtualIPTemplate</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPTemplateSpec">
+VirtualIPTemplateSpec
+</a>
+</em>
+</td>
+<td>
+<p>VirtualIPTemplate is the template for the VirtualIP.</p>
 </td>
 </tr>
 </tbody>
@@ -457,6 +653,7 @@ github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixTemplateSpec
 (<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceSpec">NetworkInterfaceSpec</a>)
 </p>
 <div>
+<p>IPSource is the definition of how to obtain an IP.</p>
 </div>
 <table>
 <thead>
@@ -476,11 +673,12 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
 </em>
 </td>
 <td>
+<p>Value specifies an IP by using an IP literal.</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>ephemeralPrefix</code><br/>
+<code>ephemeral</code><br/>
 <em>
 <a href="#networking.api.onmetal.de/v1alpha1.EphemeralPrefixSource">
 EphemeralPrefixSource
@@ -488,54 +686,41 @@ EphemeralPrefixSource
 </em>
 </td>
 <td>
+<p>Ephemeral specifies an IP by creating an ephemeral Prefix to allocate the IP with.</p>
 </td>
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.LocalUIDReference">LocalUIDReference
-</h3>
+<h3 id="networking.api.onmetal.de/v1alpha1.NetworkInterfacePhase">NetworkInterfacePhase
+(<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.VirtualIPRoutingSubset">VirtualIPRoutingSubset</a>, <a href="#networking.api.onmetal.de/v1alpha1.VirtualIPRoutingSubsetTarget">VirtualIPRoutingSubsetTarget</a>)
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceStatus">NetworkInterfaceStatus</a>)
 </p>
 <div>
-<p>LocalUIDReference is a reference to another entity including its UID.</p>
+<p>NetworkInterfacePhase is the binding phase of a NetworkInterface.</p>
 </div>
 <table>
 <thead>
 <tr>
-<th>Field</th>
+<th>Value</th>
 <th>Description</th>
 </tr>
 </thead>
-<tbody>
-<tr>
-<td>
-<code>name</code><br/>
-<em>
-string
-</em>
+<tbody><tr><td><p>&#34;Bound&#34;</p></td>
+<td><p>NetworkInterfacePhaseBound is used for any NetworkInterface that is properly bound.</p>
 </td>
-<td>
-<p>Name is the name of the referenced entity.</p>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>NetworkInterfacePhasePending is used for any NetworkInterface that is currently awaiting binding.</p>
 </td>
-</tr>
-<tr>
-<td>
-<code>uid</code><br/>
-<em>
-k8s.io/apimachinery/pkg/types.UID
-</em>
+</tr><tr><td><p>&#34;Unbound&#34;</p></td>
+<td><p>NetworkInterfacePhaseUnbound is used for any NetworkInterface that is not bound.</p>
 </td>
-<td>
-<p>UID is the UID of the referenced entity.</p>
-</td>
-</tr>
-</tbody>
+</tr></tbody>
 </table>
 <h3 id="networking.api.onmetal.de/v1alpha1.NetworkInterfaceSpec">NetworkInterfaceSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkInterface">NetworkInterface</a>)
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkInterface">NetworkInterface</a>, <a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceTemplateSpec">NetworkInterfaceTemplateSpec</a>)
 </p>
 <div>
 <p>NetworkInterfaceSpec defines the desired state of NetworkInterface</p>
@@ -565,8 +750,8 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>machineRef</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
 </a>
 </em>
 </td>
@@ -601,6 +786,19 @@ Kubernetes core/v1.LocalObjectReference
 this NetworkInterface</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>virtualIp</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPSource">
+VirtualIPSource
+</a>
+</em>
+</td>
+<td>
+<p>VirtualIP specifies the virtual ip that should be assigned to this NetworkInterface.</p>
+</td>
+</tr>
 </tbody>
 </table>
 <h3 id="networking.api.onmetal.de/v1alpha1.NetworkInterfaceStatus">NetworkInterfaceStatus
@@ -629,89 +827,12 @@ this NetworkInterface</p>
 </em>
 </td>
 <td>
-<p>TODO: Add State, Conditions
-IPs represent the effective IP addresses of the NetworkInterface</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="networking.api.onmetal.de/v1alpha1.VirtualIPRoutingSubset">VirtualIPRoutingSubset
-</h3>
-<p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.VirtualIPRouting">VirtualIPRouting</a>)
-</p>
-<div>
-<p>VirtualIPRoutingSubset is one of the targets of a VirtualIPRouting.</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>networkRef</code><br/>
-<em>
-<a href="#networking.api.onmetal.de/v1alpha1.LocalUIDReference">
-LocalUIDReference
-</a>
-</em>
-</td>
-<td>
-<p>NetworkRef is the network all targets are in.</p>
+<p>IPs represent the effective IP addresses of the NetworkInterface</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>targets</code><br/>
-<em>
-<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPRoutingSubsetTarget">
-[]VirtualIPRoutingSubsetTarget
-</a>
-</em>
-</td>
-<td>
-<p>Targets are the targets of the virtual IP.</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="networking.api.onmetal.de/v1alpha1.VirtualIPRoutingSubsetTarget">VirtualIPRoutingSubsetTarget
-</h3>
-<p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.VirtualIPRoutingSubset">VirtualIPRoutingSubset</a>)
-</p>
-<div>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>LocalUIDReference</code><br/>
-<em>
-<a href="#networking.api.onmetal.de/v1alpha1.LocalUIDReference">
-LocalUIDReference
-</a>
-</em>
-</td>
-<td>
-<p>
-(Members of <code>LocalUIDReference</code> are embedded into this type.)
-</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>ip</code><br/>
+<code>virtualIP</code><br/>
 <em>
 <a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
@@ -719,7 +840,259 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
 </em>
 </td>
 <td>
-<p>IP is the target ip to route to.</p>
+<p>VirtualIP is any virtual ip assigned to the NetworkInterface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>phase</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfacePhase">
+NetworkInterfacePhase
+</a>
+</em>
+</td>
+<td>
+<p>Phase is the NetworkInterfacePhase of the NetworkInterface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>phaseLastTransitionTime</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastPhaseTransitionTime is the last time the Phase transitioned from one value to another.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.NetworkInterfaceTemplateSpec">NetworkInterfaceTemplateSpec
+</h3>
+<div>
+<p>NetworkInterfaceTemplateSpec is the specification of a NetworkInterface template.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceSpec">
+NetworkInterfaceSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef is the Network this NetworkInterface is connected to</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>machineRef</code><br/>
+<em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
+</a>
+</em>
+</td>
+<td>
+<p>MachineRef is the Machine this NetworkInterface is used by</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ipFamilies</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#ipfamily-v1-core">
+[]Kubernetes core/v1.IPFamily
+</a>
+</em>
+</td>
+<td>
+<p>IPFamilies defines which IPFamilies this NetworkInterface is supporting</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ips</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.IPSource">
+[]IPSource
+</a>
+</em>
+</td>
+<td>
+<p>IPs is the list of provided IPs or EphemeralIPs which should be assigned to
+this NetworkInterface</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>virtualIp</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPSource">
+VirtualIPSource
+</a>
+</em>
+</td>
+<td>
+<p>VirtualIP specifies the virtual ip that should be assigned to this NetworkInterface.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.PrefixSource">PrefixSource
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.AliasPrefixSpec">AliasPrefixSpec</a>)
+</p>
+<div>
+<p>PrefixSource is the source of the Prefix definition in an AliasPrefix</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>value</code><br/>
+<em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
+</a>
+</em>
+</td>
+<td>
+<p>Value is a single IPPrefix value as defined in the AliasPrefix</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ephemeral</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.EphemeralPrefixSource">
+EphemeralPrefixSource
+</a>
+</em>
+</td>
+<td>
+<p>Ephemeral defines the Prefix which should be allocated by the AliasPrefix</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.VirtualIPPhase">VirtualIPPhase
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.VirtualIPStatus">VirtualIPStatus</a>)
+</p>
+<div>
+<p>VirtualIPPhase is the binding phase of a VirtualIP.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Bound&#34;</p></td>
+<td><p>VirtualIPPhaseBound is used for any VirtualIP that is properly bound.</p>
+</td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>VirtualIPPhasePending is used for any VirtualIP that is currently awaiting binding.</p>
+</td>
+</tr><tr><td><p>&#34;Unbound&#34;</p></td>
+<td><p>VirtualIPPhaseUnbound is used for any VirtualIP that is not bound.</p>
+</td>
+</tr></tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.VirtualIPSource">VirtualIPSource
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceSpec">NetworkInterfaceSpec</a>)
+</p>
+<div>
+<p>VirtualIPSource is the definition of how to obtain a VirtualIP.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>virtualIPRef</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>VirtualIPRef references a VirtualIP to use.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ephemeral</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.EphemeralVirtualIPSource">
+EphemeralVirtualIPSource
+</a>
+</em>
+</td>
+<td>
+<p>Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object)
+VirtualIP.</p>
 </td>
 </tr>
 </tbody>
@@ -727,7 +1100,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
 <h3 id="networking.api.onmetal.de/v1alpha1.VirtualIPSpec">VirtualIPSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.VirtualIP">VirtualIP</a>)
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.VirtualIP">VirtualIP</a>, <a href="#networking.api.onmetal.de/v1alpha1.VirtualIPTemplateSpec">VirtualIPTemplateSpec</a>)
 </p>
 <div>
 <p>VirtualIPSpec defines the desired state of VirtualIP</p>
@@ -768,16 +1141,15 @@ Kubernetes core/v1.IPFamily
 </tr>
 <tr>
 <td>
-<code>networkInterfaceSelector</code><br/>
+<code>targetRef</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#labelselector-v1-meta">
-Kubernetes meta/v1.LabelSelector
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
 </a>
 </em>
 </td>
 <td>
-<p>NetworkInterfaceSelector selects any NetworkInterface that should get the VirtualIP routed.
-If empty, it is assumed that an external process manages the VirtualIPRouting for this VirtualIP.</p>
+<p>TargetRef references the target for this VirtualIP (currently only NetworkInterface).</p>
 </td>
 </tr>
 </tbody>
@@ -809,6 +1181,119 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
 </td>
 <td>
 <p>IP is the allocated IP, if any.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>phase</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPPhase">
+VirtualIPPhase
+</a>
+</em>
+</td>
+<td>
+<p>Phase is the VirtualIPPhase of the VirtualIP.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>phaseLastTransitionTime</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastPhaseTransitionTime is the last time the Phase transitioned from one value to another.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.VirtualIPTemplateSpec">VirtualIPTemplateSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.EphemeralVirtualIPSource">EphemeralVirtualIPSource</a>)
+</p>
+<div>
+<p>VirtualIPTemplateSpec is the specification of a VirtualIP template.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPSpec">
+VirtualIPSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>type</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPType">
+VirtualIPType
+</a>
+</em>
+</td>
+<td>
+<p>Type is the type of VirtualIP.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ipFamily</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#ipfamily-v1-core">
+Kubernetes core/v1.IPFamily
+</a>
+</em>
+</td>
+<td>
+<p>IPFamily is the ip family of the VirtualIP.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>targetRef</code><br/>
+<em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
+</a>
+</em>
+</td>
+<td>
+<p>TargetRef references the target for this VirtualIP (currently only NetworkInterface).</p>
+</td>
+</tr>
+</table>
 </td>
 </tr>
 </tbody>
