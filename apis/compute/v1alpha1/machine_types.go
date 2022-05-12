@@ -35,6 +35,8 @@ type MachineSpec struct {
 	MachinePoolRef *corev1.LocalObjectReference `json:"machinePoolRef,omitempty"`
 	// Image is the URL providing the operating system image of the machine.
 	Image string `json:"image"`
+	// ImagePullSecretRef is an optional secret for pulling the image of a machine.
+	ImagePullSecretRef *corev1.LocalObjectReference `json:"imagePullSecret,omitempty"`
 	// NetworkInterfaces define a list of network interfaces present on the machine
 	NetworkInterfaces []NetworkInterface `json:"networkInterfaces,omitempty"`
 	// Volumes are volumes attached to this machine.

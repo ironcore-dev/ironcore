@@ -71,6 +71,12 @@ func validateMachineSpec(machineSpec *compute.MachineSpec, fldPath *field.Path) 
 		}
 	}
 
+	if machineSpec.ImagePullSecretRef != nil {
+		for _, msg := range apivalidation.NameIsDNSLabel(machineSpec.ImagePullSecretRef.Name, false) {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("imagePullSecretRef").Child("name"), machineSpec.ImagePullSecretRef.Name, msg))
+		}
+	}
+
 	seenNames := sets.NewString()
 	for i, vol := range machineSpec.Volumes {
 		if seenNames.Has(vol.Name) {

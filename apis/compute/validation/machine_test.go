@@ -121,6 +121,16 @@ var _ = Describe("Machine", func() {
 			},
 			ContainElement(InvalidField("spec.ignitionRef.name")),
 		),
+		Entry("invalid ignition ref name",
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					ImagePullSecretRef: &corev1.LocalObjectReference{
+						Name: "foo*",
+					},
+				},
+			},
+			ContainElement(InvalidField("spec.imagePullSecretRef.name")),
+		),
 	)
 
 	DescribeTable("ValidateMachineUpdate",
