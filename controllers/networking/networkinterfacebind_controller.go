@@ -206,11 +206,14 @@ func (r *NetworkInterfaceBindReconciler) release(ctx context.Context, nic *netwo
 }
 
 func (r *NetworkInterfaceBindReconciler) requeueAfterBoundTimeout(nic *networkingv1alpha1.NetworkInterface) ctrl.Result {
-	boundTimeoutExpirationDuration := time.Until(nic.Status.LastPhaseTransitionTime.Add(r.BindTimeout)).Round(time.Second)
-	if boundTimeoutExpirationDuration <= 0 {
-		return ctrl.Result{Requeue: true}
+	if nic.Status.LastPhaseTransitionTime != nil {
+		boundTimeoutExpirationDuration := time.Until(nic.Status.LastPhaseTransitionTime.Add(r.BindTimeout)).Round(time.Second)
+		if boundTimeoutExpirationDuration <= 0 {
+			return ctrl.Result{Requeue: true}
+		}
+		return ctrl.Result{RequeueAfter: boundTimeoutExpirationDuration}
 	}
-	return ctrl.Result{RequeueAfter: boundTimeoutExpirationDuration}
+	return ctrl.Result{}
 }
 
 func (r *NetworkInterfaceBindReconciler) validReferences(nic *networkingv1alpha1.NetworkInterface, machine *computev1alpha1.Machine) bool {
