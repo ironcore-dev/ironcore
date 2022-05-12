@@ -62,7 +62,7 @@ the internet.
     * Regulate Communication within a subnet (plus security concepts)
     * Subnet-to-subnet communication (plus security concepts)
     * Isolated network-to-network communication (plus security concepts)
-    * Cross-region isolated network-to-network communicaction (plus security concepts)
+    * Cross-region isolated network-to-network communication (plus security concepts)
 
 ### Non-Goals
 
@@ -130,10 +130,7 @@ metadata:
 spec:
   prefix: 10.0.0.0/8
 status:
-  conditions:
-    - type: Ready
-      status: True
-      reason: RootPrefix
+  phase: Allocated
 ---
 apiVersion: ipam.onmetal.de/v1alpha1
 kind: Prefix
@@ -149,39 +146,7 @@ spec:
   prefixLength: 16
   # prefix: 10.0.0.0/16 # Once successfully allocated, the spec is patched.
 status:
-  conditions:
-    - type: Ready
-      status: False # This will become true once the parent prefix allocates it.
-      Reason: Pending
-```
-[//]: # (@formatter:on)
-
-### The `IP` type
-
-The `IP` type allows allocating an IP from an `Prefix`. It needs to specify a target `Prefix` either by referencing it
-via its name or by a label selector.
-
-Example manifest:
-
-[//]: # (@formatter:off)
-```yaml
-apiVersion: ipam.onmetal.de/v1alpha1
-kind: IP
-metadata:
-  namespace: default
-  name: my-ip
-spec:
-  # ip: 10.0.0.1 # This gets patched in once allocated
-  prefixRef:
-    name: my-sub-prefix
-  # prefixSelector:
-  #   matchLabels:
-  #     foo: bar
-status:
-  conditions:
-    - type: Ready
-      status: False # This will be set to true once successfully allocated.
-      reason: Pending
+  phase: Pending # This will become `Allocated` once the controller approves it.
 ```
 [//]: # (@formatter:on)
 
@@ -212,19 +177,19 @@ A `NetworkInterface` is the binding piece between a `Machine` and a `Network`. A
 The IPs (v4 / v6) can be specified in multiple ways:
 
 * Without IPAM by specifying an IP literal
-* As `ephemeralIP`, creating an `ipam.IP` that will be owned and also deleted by the `NetworkInterface`. The name of the
-  created `ipam.IP` will be `<nic-name>-<index>`, where `<index>` is the index of the `ephemeralIP` in the `ips`
-  list. An existing `IP` with that name will *not* be used for the `NetworkInterface` to avoid using an unrelated `IP`
-  by mistake.
+* As `ephemeral`, creating an `ipam.Prefix` with the prefix length of the specified ip family (32 / 128) that will be
+  owned and also deleted alongside the surrounding `NetworkInterface`. The name of the
+  created `ipam.Prefix` will be `<nic-name>-<index>`, where `<index>` is the index of the `ephemeral` in the `ips`
+  list. An existing `Prefix` with that name will *not* be used for the `NetworkInterface` to avoid using an unrelated
+  `Prefix` by mistake.
 
 When specifying IPs, a user should also specify `ipFamilies`. `ipFamilies` validates that there can be either a
-single `IPv4` / `IPv6`, or an ordered list of an `IPv4` / `IPv6` address.
-
-Once created and bound, a `NetworkInterface` will in turn create a `NetworkInterfaceBinding` with the same name as
-itself where the allocated IPs are stored.
+single `IPv4` / `IPv6`, or an ordered list of an `IPv4` / `IPv6` address. If left empty and it can be deducted
+deterministically from the `ips`, it will be defaulted. Same applies vice versa.
 
 The binding between a `NetworkInterface` and a `Machine` is bidirectional via `NetworkInterface.spec.machineRef.name` /
-`Machine.spec.interfaces[*].name`. For the mvp, we will only allow exactly **1** `NetworkInterface` per `Machine`.
+`Machine.spec.networkInterfaces[*].name`. For the mvp, we will only allow exactly **1** `NetworkInterface` per `Machine`
+.
 
 Example usage:
 
@@ -242,14 +207,16 @@ spec:
   ips:
 #    - value: 10.0.0.1 # It is also possible to directly specify IPs without IPAM 
 #    - value: 2607:f0d0:1002:51::4 # Same applies for v6 addresses
-    - ephemeralIP:
-        spec:
-          prefixRef:
-            name: my-node-prefix-v4
-    - ephemeralIP:
-        spec:
-          prefixRef:
-            name: my-node-prefix-v6
+    - ephemeral:
+        prefixTemplate:
+          spec:
+            prefixRef:
+              name: my-node-prefix-v4
+    - ephemeral:
+        prefixTemplate:
+          spec:
+            prefixRef:
+              name: my-node-prefix-v6
   machineRef:
     name: my-machine
 status:
@@ -265,13 +232,13 @@ metadata:
   labels:
     app: web
 spec:
-  interfaces:
+  networkInterfaces:
     - name: my-interface
       networkInterfaceRef:
         name: my-machine-interface
   ...
 status:
-  interfaces:
+  networkInterfaces:
     - name: my-interface
       ips: # The machine reports all ips available via its interfaces
         - 10.0.0.1
@@ -280,27 +247,9 @@ status:
 ```
 [//]: # (@formatter:on)
 
-This would result in the following `NetworkInterfaceBinding`:
-
-[//]: # (@formatter:off)
-```yaml
-apiVersion: networking.onmetal.de/v1alpha1
-kind: NetworkInterfaceBinding
-metadata:
-  namespace: default
-  name: my-machine-interface
-## A virtual ip may also be bound here
-# virtualIPRef:
-#   name: my-virtual-ip
-ips:
-  - 192.168.178.1
-  - 2607:f0d0:1002:51::4
-```
-[//]: # (@formatter:on)
-
 To simplify managing the creation of a `NetworkInterface` per `Machine`, a `Machine` can specify a `NetworkInterface`
-as `ephemeralNetworkInterface`, creating and owning it before the `Machine` becomes available. The name of the
-`NetworkInterface` will be `<machine-name>-<name>` where `<name>` is the `name:` value in the `interfaces` list.
+as `ephemeral`, creating and owning it before the `Machine` becomes available. The name of the
+`NetworkInterface` will be `<machine-name>-<name>` where `<name>` is the `name:` value in the `networkInterfaces` list.
 Existing `NetworkInterface`s will not be adopted by the `Machine`.
 
 Sample manifest:
@@ -312,19 +261,23 @@ kind: Machine
 spec:
   interfaces:
     - name: my-interface
-      ephemeralNetworkInterface:
-        spec:
-          networkRef:
-            name: my-network
-          ips:
-            - ephemeralIP:
-                spec:
-                  prefixRef:
-                    name: my-node-prefix-v4
-            - ephemeralIP:
-                spec:
-                  prefixRef:
-                    name: my-node-prefix-v6
+      ephemeral:
+        networkInterfaceTemplate:
+          spec:
+            ipFamilies: [IPv4, IPv6]
+            networkRef:
+              name: my-network
+            ips:
+              - ephemeral:
+                  prefixTemplate:
+                    spec:
+                      prefixRef:
+                        name: my-node-prefix-v4
+              - ephemeral:
+                  prefixTemplate:
+                    spec:
+                      prefixRef:
+                        name: my-node-prefix-v6
   ...
 ```
 [//]: # (@formatter:on)
@@ -348,6 +301,7 @@ metadata:
   namespace: default
   name: my-pod-prefix-1
 spec:
+  ipFamily: IPv4
   networkRef:
     name: my-network
   networkInterfaceSelector:
@@ -355,11 +309,12 @@ spec:
       foo: bar
   prefix:
 #    value: 10.0.0.0/24 # It's possible to directly specify the AliasPrefix value
-    ephemeralPrefix:
-      spec:
-        prefixRef:
-          name: my-pod-prefix
-        prefixLength: 24
+    ephemeral:
+      prefixTemplate:
+        spec:
+          prefixRef:
+            name: my-pod-prefix
+          prefixLength: 24
 status:
   prefix: 10.0.0.0/24
 ```
@@ -376,19 +331,11 @@ metadata:
   name: my-pod-prefix-1
 networkRef:
   name: my-network
-subsets:
-  - machinePoolRef:
-      name: pool-1
-      uid: 2020dcf9-e030-427e-b0fc-4fec2016e73b
-    targets:
-      - name: my-machine-interface-1
-        uid: 2020dcf9-e030-427e-b0fc-4fec2016e73a
-  - machinePoolRef:
-      name: pool-2
-      uid: 2020dcf9-e030-427e-b0fc-4fec2016e73c
-    targets:
-      - name: my-machine-interface-2
-        uid: 2020dcf9-e030-427e-b0fc-4fec2016e73d
+destinations:
+  - name: my-machine-interface-1
+    uid: 2020dcf9-e030-427e-b0fc-4fec2016e73a
+  - name: my-machine-interface-2
+    uid: 2020dcf9-e030-427e-b0fc-4fec2016e73d
 ```
 [//]: # (@formatter:on)
 
@@ -432,9 +379,7 @@ cannot be influenced and thus no construct like `prefixRef` is possible for `Vir
 To disambiguate between IPv4 and IPv6, the `VirtualIP` requires an `ipFamily` (same enum type as in Kubernetes'
 `Service.spec.ipFamilies`).
 
-The `VirtualIP` can reference a `VirtualIPClaim` that associates it in-use with a requester (typically
-a `NetworkInterface`). Once claimed successfully, the corresponding `NetworkInterfaceBinding` will be updated
-with a reference to the claimed `VirtualIP`.
+The `VirtualIP` references the claiming `NetworkInterface` using `targetRef`.
 
 Example manifest:
 
@@ -448,10 +393,12 @@ metadata:
 spec:
   type: Public
   ipFamily: IPv4
-  networkInterfaceRef:
+  targetRef:
     name: my-nic
+    uid: 2020dcf9-e030-427e-b0fc-4fec2016e73d
 status:
   ip: 45.86.152.88
+  phase: Bound
 ```
 [//]: # (@formatter:on)
 
@@ -470,7 +417,7 @@ metadata:
 spec:
   virtualIP:
     ephemeral:
-      virtualIPClaimTemplate:
+      virtualIPTemplate:
         spec:
           type: Public
           ipFamily: IPv4
@@ -543,11 +490,12 @@ spec:
     matchLabels:
       type: k8s-worker
   prefix:
-    ephemeralPrefix:
-      spec:
-        prefixRef:
-          name: k8s
-        prefixLength: 16
+    ephemeral:
+      prefixTemplate:
+        spec:
+          prefixRef:
+            name: k8s
+          prefixLength: 16
 ---
 # Create the actual machine
 apiVersion: compute.onmetal.de/v1alpha1
@@ -561,34 +509,39 @@ spec:
   image: gardenlinux-k8s-worker:v0.23.5
   networkInterfaces:
     - name: primary
-      ephemeralNetworkInterface:
-        # Let the nic join the network
-        spec:
-          networkRef:
-            name: k8s
-          # The IP should be allocated from the node range
-          ips:
-            - ephemeralIP:
-                spec:
-                  prefixRef:
-                    name: nodes
-          # Create a pod alias range exclusively for this machine
-          ephemeralAliasPrefixes:
-            - name: pods
-              spec:
-                prefix:
-                  ephemeralPrefix:
+      ephemeral:
+        networkInterfaceTemplate:
+          spec:
+            # Let the nic join the network
+            networkRef:
+              name: k8s
+            # The IP should be allocated from the node range
+            ips:
+              - ephemeral:
+                  prefixTemplate:
                     spec:
+                      ipFamily: IPv4
                       prefixRef:
-                        name: pods
-                      prefixLength: 24
-          # Create a virtual IP for this machine
-          virtualIP:
-            - ephemeral:
-                virtualIPClaimTemplate:
-                  spec:
-                    type: Public
-                    ipFamily: IPv4
+                        name: nodes
+            # Create a pod alias range exclusively for this machine
+            ephemeralAliasPrefixes:
+              - name: pods
+                spec:
+                  prefix:
+                    ephemeral:
+                      prefixTemplate:
+                        ipFamily: IPv4
+                        spec:
+                          prefixRef:
+                            name: pods
+                          prefixLength: 24
+            # Create a virtual IP for this machine
+            virtualIP:
+              - ephemeral:
+                  virtualIPTemplate:
+                    spec:
+                      type: Public
+                      ipFamily: IPv4
 ```
 [//]: # (@formatter:on)
 
