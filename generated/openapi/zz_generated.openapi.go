@@ -101,6 +101,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeClaimStatus":               schema_onmetal_api_apis_storage_v1alpha1_VolumeClaimStatus(ref),
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeClass":                     schema_onmetal_api_apis_storage_v1alpha1_VolumeClass(ref),
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeClassList":                 schema_onmetal_api_apis_storage_v1alpha1_VolumeClassList(ref),
+		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeCondition":                 schema_onmetal_api_apis_storage_v1alpha1_VolumeCondition(ref),
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeList":                      schema_onmetal_api_apis_storage_v1alpha1_VolumeList(ref),
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumePool":                      schema_onmetal_api_apis_storage_v1alpha1_VolumePool(ref),
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumePoolCondition":             schema_onmetal_api_apis_storage_v1alpha1_VolumePoolCondition(ref),
@@ -3198,6 +3199,66 @@ func schema_onmetal_api_apis_storage_v1alpha1_VolumeClassList(ref common.Referen
 	}
 }
 
+func schema_onmetal_api_apis_storage_v1alpha1_VolumeCondition(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "VolumeCondition is one of the conditions of a volume.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Type is the type of the condition.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Status is the status of the condition.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"reason": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Reason is a machine-readable indication of why the condition is in a certain state.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"message": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Message is a human-readable explanation of why the condition has a certain reason / state.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"observedGeneration": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ObservedGeneration represents the .metadata.generation that the condition was set based upon.",
+							Type:        []string{"integer"},
+							Format:      "int64",
+						},
+					},
+					"lastTransitionTime": {
+						SchemaProps: spec.SchemaProps{
+							Description: "LastTransitionTime is the last time the status of a condition has transitioned from one state to another.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
+						},
+					},
+				},
+				Required: []string{"type", "status"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+	}
+}
+
 func schema_onmetal_api_apis_storage_v1alpha1_VolumeList(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -3653,11 +3714,25 @@ func schema_onmetal_api_apis_storage_v1alpha1_VolumeStatus(ref common.ReferenceC
 							Ref:         ref("github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeAccess"),
 						},
 					},
+					"conditions": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Conditions are the conditions of a volume.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeCondition"),
+									},
+								},
+							},
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeAccess", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+			"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeAccess", "github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeCondition", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
 	}
 }
 

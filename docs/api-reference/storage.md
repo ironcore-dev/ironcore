@@ -705,6 +705,104 @@ VolumeClaimPhase
 </tr>
 </tbody>
 </table>
+<h3 id="storage.api.onmetal.de/v1alpha1.VolumeCondition">VolumeCondition
+</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.VolumeStatus">VolumeStatus</a>)
+</p>
+<div>
+<p>VolumeCondition is one of the conditions of a volume.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>type</code><br/>
+<em>
+<a href="#storage.api.onmetal.de/v1alpha1.VolumeConditionType">
+VolumeConditionType
+</a>
+</em>
+</td>
+<td>
+<p>Type is the type of the condition.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#conditionstatus-v1-core">
+Kubernetes core/v1.ConditionStatus
+</a>
+</em>
+</td>
+<td>
+<p>Status is the status of the condition.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>reason</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Reason is a machine-readable indication of why the condition is in a certain state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>message</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Message is a human-readable explanation of why the condition has a certain reason / state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>observedGeneration</code><br/>
+<em>
+int64
+</em>
+</td>
+<td>
+<p>ObservedGeneration represents the .metadata.generation that the condition was set based upon.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastTransitionTime</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastTransitionTime is the last time the status of a condition has transitioned from one state to another.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="storage.api.onmetal.de/v1alpha1.VolumeConditionType">VolumeConditionType
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.VolumeCondition">VolumeCondition</a>)
+</p>
+<div>
+<p>VolumeConditionType is a type a VolumeCondition can have.</p>
+</div>
 <h3 id="storage.api.onmetal.de/v1alpha1.VolumePhase">VolumePhase
 (<code>string</code> alias)</h3>
 <p>
@@ -1199,6 +1297,19 @@ VolumeAccess
 <td>
 <p>Access specifies how to access a Volume.
 This is set by the volume provider when the volume is provisioned.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>conditions</code><br/>
+<em>
+<a href="#storage.api.onmetal.de/v1alpha1.VolumeCondition">
+[]VolumeCondition
+</a>
+</em>
+</td>
+<td>
+<p>Conditions are the conditions of a volume.</p>
 </td>
 </tr>
 </tbody>

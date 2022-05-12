@@ -76,6 +76,28 @@ type VolumeStatus struct {
 	// Access specifies how to access a Volume.
 	// This is set by the volume provider when the volume is provisioned.
 	Access *VolumeAccess
+
+	// Conditions are the conditions of a volume.
+	Conditions []VolumeCondition
+}
+
+// VolumeConditionType is a type a VolumeCondition can have.
+type VolumeConditionType string
+
+// VolumeCondition is one of the conditions of a volume.
+type VolumeCondition struct {
+	// Type is the type of the condition.
+	Type VolumeConditionType
+	// Status is the status of the condition.
+	Status corev1.ConditionStatus
+	// Reason is a machine-readable indication of why the condition is in a certain state.
+	Reason string
+	// Message is a human-readable explanation of why the condition has a certain reason / state.
+	Message string
+	// ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+	ObservedGeneration int64
+	// LastTransitionTime is the last time the status of a condition has transitioned from one state to another.
+	LastTransitionTime metav1.Time
 }
 
 // VolumePhase represents the binding phase of a Volume.
