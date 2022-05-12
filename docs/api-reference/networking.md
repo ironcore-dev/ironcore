@@ -589,6 +589,8 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
 (<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.IPSource">IPSource</a>, <a href="#networking.api.onmetal.de/v1alpha1.PrefixSource">PrefixSource</a>)
 </p>
 <div>
+<p>EphemeralPrefixSource contains the definition to create an ephemeral (i.e. coupled to the lifetime of the
+surrounding object) Prefix.</p>
 </div>
 <table>
 <thead>
@@ -608,6 +610,7 @@ github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixTemplateSpec
 </em>
 </td>
 <td>
+<p>PrefixTemplate is the template for the Prefix.</p>
 </td>
 </tr>
 </tbody>
@@ -618,6 +621,8 @@ github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixTemplateSpec
 (<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.VirtualIPSource">VirtualIPSource</a>)
 </p>
 <div>
+<p>EphemeralVirtualIPSource contains the definition to create an ephemeral (i.e. coupled to the lifetime of the
+surrounding object) VirtualIP.</p>
 </div>
 <table>
 <thead>
@@ -637,6 +642,7 @@ VirtualIPTemplateSpec
 </em>
 </td>
 <td>
+<p>VirtualIPTemplate is the template for the VirtualIP.</p>
 </td>
 </tr>
 </tbody>

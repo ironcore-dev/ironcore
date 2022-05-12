@@ -22,6 +22,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1validation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
@@ -70,15 +71,17 @@ func validateMachineSpec(machineSpec *compute.MachineSpec, fldPath *field.Path) 
 		}
 	}
 
+	seenNames := sets.NewString()
 	for i, vol := range machineSpec.Volumes {
-		for _, msg := range apivalidation.NameIsDNSLabel(vol.Name, false) {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("volume").Index(i).Child("name"), vol.Name, msg))
-		}
-		if vol.VolumeClaimRef != nil && vol.VolumeClaimRef.Name != "" {
-			for _, msg := range apivalidation.NameIsDNSLabel(vol.VolumeClaimRef.Name, false) {
-				allErrs = append(allErrs, field.Invalid(fldPath.Child("volume").Index(i).Child("volumeClaimRef").Child("name"), vol.VolumeClaimRef.Name, msg))
+		if seenNames.Has(vol.Name) {
+			allErrs = append(allErrs, field.Duplicate(fldPath.Child("volume").Index(i).Child("name"), vol.Name))
+		} else {
+			seenNames.Insert(vol.Name)
+			for _, msg := range apivalidation.NameIsDNSLabel(vol.Name, false) {
+				allErrs = append(allErrs, field.Invalid(fldPath.Child("volume").Index(i).Child("name"), vol.Name, msg))
 			}
 		}
+		allErrs = append(allErrs, validateVolumeSource(&vol.VolumeSource, fldPath.Child("volume").Index(i))...)
 	}
 
 	if machineSpec.Image == "" {
@@ -86,6 +89,41 @@ func validateMachineSpec(machineSpec *compute.MachineSpec, fldPath *field.Path) 
 	}
 
 	allErrs = append(allErrs, metav1validation.ValidateLabels(machineSpec.MachinePoolSelector, fldPath.Child("machinePoolSelector"))...)
+
+	return allErrs
+}
+
+func validateVolumeSource(source *compute.VolumeSource, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	var numDefs int
+	if source.VolumeClaimRef != nil {
+		numDefs++
+		for _, msg := range apivalidation.NameIsDNSLabel(source.VolumeClaimRef.Name, false) {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("volumeClaimRef").Child("name"), source.VolumeClaimRef.Name, msg))
+		}
+	}
+	if source.EmptyDisk != nil {
+		if numDefs > 0 {
+			allErrs = append(allErrs, field.Forbidden(fldPath.Child("emptyDisk"), "must only specify one volume source"))
+		} else {
+			numDefs++
+			allErrs = append(allErrs, validateEmptyDiskVolumeSource(source.EmptyDisk, fldPath.Child("emptyDisk"))...)
+		}
+	}
+	if numDefs == 0 {
+		allErrs = append(allErrs, field.Invalid(fldPath, source, "must specify at least one volume source"))
+	}
+
+	return allErrs
+}
+
+func validateEmptyDiskVolumeSource(source *compute.EmptyDiskVolumeSource, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	if sizeLimit := source.SizeLimit; sizeLimit != nil {
+		allErrs = append(allErrs, onmetalapivalidation.ValidateNonNegativeQuantity(*sizeLimit, fldPath.Child("sizeLimit"))...)
+	}
 
 	return allErrs
 }

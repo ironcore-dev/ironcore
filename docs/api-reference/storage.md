@@ -117,9 +117,7 @@ If unset, the scheduler will figure out a suitable VolumePoolRef.</p>
 <td>
 <code>claimRef</code><br/>
 <em>
-<a href="#storage.api.onmetal.de/v1alpha1.ClaimReference">
-ClaimReference
-</a>
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
 </em>
 </td>
 <td>
@@ -454,48 +452,6 @@ VolumePoolStatus
 </tr>
 </tbody>
 </table>
-<h3 id="storage.api.onmetal.de/v1alpha1.ClaimReference">ClaimReference
-</h3>
-<p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.VolumeSpec">VolumeSpec</a>)
-</p>
-<div>
-<p>ClaimReference points to a referenced VolumeClaim.</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>name</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Name is the name of the referenced VolumeClaim.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>uid</code><br/>
-<em>
-<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/types#UID">
-k8s.io/apimachinery/pkg/types.UID
-</a>
-</em>
-</td>
-<td>
-<p>UID is the UID of the referenced VolumeClaim.</p>
-</td>
-</tr>
-</tbody>
-</table>
 <h3 id="storage.api.onmetal.de/v1alpha1.VolumeAccess">VolumeAccess
 </h3>
 <p>
@@ -780,19 +736,6 @@ int64
 </tr>
 <tr>
 <td>
-<code>lastUpdateTime</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
-Kubernetes meta/v1.Time
-</a>
-</em>
-</td>
-<td>
-<p>LastUpdateTime is the last time a condition has been updated.</p>
-</td>
-</tr>
-<tr>
-<td>
 <code>lastTransitionTime</code><br/>
 <em>
 <a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
@@ -1018,9 +961,7 @@ If unset, the scheduler will figure out a suitable VolumePoolRef.</p>
 <td>
 <code>claimRef</code><br/>
 <em>
-<a href="#storage.api.onmetal.de/v1alpha1.ClaimReference">
-ClaimReference
-</a>
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
 </em>
 </td>
 <td>

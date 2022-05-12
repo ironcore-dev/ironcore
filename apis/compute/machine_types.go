@@ -18,6 +18,7 @@ package compute
 
 import (
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
@@ -89,6 +90,17 @@ type Volume struct {
 type VolumeSource struct {
 	// VolumeClaimRef instructs the Volume to use a VolumeClaimRef as source for the attachment.
 	VolumeClaimRef *corev1.LocalObjectReference
+	// EmptyDisk instructs to use a Volume offered by the machine pool provider.
+	EmptyDisk *EmptyDiskVolumeSource
+}
+
+// EmptyDiskVolumeSource is a volume that's offered by the machine pool provider.
+// Usually ephemeral (i.e. deleted when the surrounding entity is deleted), with
+// varying performance characteristics. Potentially not recoverable.
+type EmptyDiskVolumeSource struct {
+	// SizeLimit is the total amount of local storage required for this EmptyDisk volume.
+	// The default is nil which means that the limit is undefined.
+	SizeLimit *resource.Quantity
 }
 
 // NetworkInterfaceStatus reports the status of an NetworkInterfaceSource.

@@ -24,8 +24,14 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
+
+func mustParseNewQuantity(s string) *resource.Quantity {
+	q := resource.MustParse(s)
+	return &q
+}
 
 var _ = Describe("Machine", func() {
 	DescribeTable("ValidateMachine",
@@ -65,6 +71,17 @@ var _ = Describe("Machine", func() {
 			},
 			ContainElement(InvalidField("spec.volume[0].name")),
 		),
+		Entry("duplicate volume name",
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					Volumes: []compute.Volume{
+						{Name: "foo"},
+						{Name: "foo"},
+					},
+				},
+			},
+			ContainElement(DuplicateField("spec.volume[1].name")),
+		),
 		Entry("invalid volumeClaimRef name",
 			&compute.Machine{
 				Spec: compute.MachineSpec{
@@ -76,6 +93,21 @@ var _ = Describe("Machine", func() {
 				},
 			},
 			ContainElement(InvalidField("spec.volume[0].volumeClaimRef.name")),
+		),
+		Entry("invalid empty disk size limit quantity",
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					Volumes: []compute.Volume{
+						{
+							Name: "foo",
+							VolumeSource: compute.VolumeSource{
+								EmptyDisk: &compute.EmptyDiskVolumeSource{SizeLimit: mustParseNewQuantity("-1Gi")},
+							},
+						},
+					},
+				},
+			},
+			ContainElement(InvalidField("spec.volume[0].emptyDisk.sizeLimit")),
 		),
 		Entry("invalid ignition ref name",
 			&compute.Machine{
