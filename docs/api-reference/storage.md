@@ -117,7 +117,9 @@ If unset, the scheduler will figure out a suitable VolumePoolRef.</p>
 <td>
 <code>claimRef</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
+</a>
 </em>
 </td>
 <td>
@@ -1131,7 +1133,9 @@ If unset, the scheduler will figure out a suitable VolumePoolRef.</p>
 <td>
 <code>claimRef</code><br/>
 <em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
+</a>
 </em>
 </td>
 <td>

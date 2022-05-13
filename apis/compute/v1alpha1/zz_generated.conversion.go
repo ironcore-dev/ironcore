@@ -40,6 +40,56 @@ func init() {
 // RegisterConversions adds conversion functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterConversions(s *runtime.Scheme) error {
+	if err := s.AddGeneratedConversionFunc((*Console)(nil), (*compute.Console)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_Console_To_compute_Console(a.(*Console), b.(*compute.Console), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*compute.Console)(nil), (*Console)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_Console_To_v1alpha1_Console(a.(*compute.Console), b.(*Console), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*ConsoleClientConfig)(nil), (*compute.ConsoleClientConfig)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_ConsoleClientConfig_To_compute_ConsoleClientConfig(a.(*ConsoleClientConfig), b.(*compute.ConsoleClientConfig), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*compute.ConsoleClientConfig)(nil), (*ConsoleClientConfig)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_ConsoleClientConfig_To_v1alpha1_ConsoleClientConfig(a.(*compute.ConsoleClientConfig), b.(*ConsoleClientConfig), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*ConsoleList)(nil), (*compute.ConsoleList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_ConsoleList_To_compute_ConsoleList(a.(*ConsoleList), b.(*compute.ConsoleList), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*compute.ConsoleList)(nil), (*ConsoleList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_ConsoleList_To_v1alpha1_ConsoleList(a.(*compute.ConsoleList), b.(*ConsoleList), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*ConsoleSpec)(nil), (*compute.ConsoleSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_ConsoleSpec_To_compute_ConsoleSpec(a.(*ConsoleSpec), b.(*compute.ConsoleSpec), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*compute.ConsoleSpec)(nil), (*ConsoleSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_ConsoleSpec_To_v1alpha1_ConsoleSpec(a.(*compute.ConsoleSpec), b.(*ConsoleSpec), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*ConsoleStatus)(nil), (*compute.ConsoleStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_ConsoleStatus_To_compute_ConsoleStatus(a.(*ConsoleStatus), b.(*compute.ConsoleStatus), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*compute.ConsoleStatus)(nil), (*ConsoleStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_ConsoleStatus_To_v1alpha1_ConsoleStatus(a.(*compute.ConsoleStatus), b.(*ConsoleStatus), scope)
+	}); err != nil {
+		return err
+	}
 	if err := s.AddGeneratedConversionFunc((*EFIVar)(nil), (*compute.EFIVar)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1alpha1_EFIVar_To_compute_EFIVar(a.(*EFIVar), b.(*compute.EFIVar), scope)
 	}); err != nil {
@@ -220,6 +270,16 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
+	if err := s.AddGeneratedConversionFunc((*ServiceReference)(nil), (*compute.ServiceReference)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_ServiceReference_To_compute_ServiceReference(a.(*ServiceReference), b.(*compute.ServiceReference), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*compute.ServiceReference)(nil), (*ServiceReference)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_ServiceReference_To_v1alpha1_ServiceReference(a.(*compute.ServiceReference), b.(*ServiceReference), scope)
+	}); err != nil {
+		return err
+	}
 	if err := s.AddGeneratedConversionFunc((*Volume)(nil), (*compute.Volume)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1alpha1_Volume_To_compute_Volume(a.(*Volume), b.(*compute.Volume), scope)
 	}); err != nil {
@@ -251,6 +311,126 @@ func RegisterConversions(s *runtime.Scheme) error {
 		return err
 	}
 	return nil
+}
+
+func autoConvert_v1alpha1_Console_To_compute_Console(in *Console, out *compute.Console, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
+	if err := Convert_v1alpha1_ConsoleSpec_To_compute_ConsoleSpec(&in.Spec, &out.Spec, s); err != nil {
+		return err
+	}
+	if err := Convert_v1alpha1_ConsoleStatus_To_compute_ConsoleStatus(&in.Status, &out.Status, s); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Convert_v1alpha1_Console_To_compute_Console is an autogenerated conversion function.
+func Convert_v1alpha1_Console_To_compute_Console(in *Console, out *compute.Console, s conversion.Scope) error {
+	return autoConvert_v1alpha1_Console_To_compute_Console(in, out, s)
+}
+
+func autoConvert_compute_Console_To_v1alpha1_Console(in *compute.Console, out *Console, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
+	if err := Convert_compute_ConsoleSpec_To_v1alpha1_ConsoleSpec(&in.Spec, &out.Spec, s); err != nil {
+		return err
+	}
+	if err := Convert_compute_ConsoleStatus_To_v1alpha1_ConsoleStatus(&in.Status, &out.Status, s); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Convert_compute_Console_To_v1alpha1_Console is an autogenerated conversion function.
+func Convert_compute_Console_To_v1alpha1_Console(in *compute.Console, out *Console, s conversion.Scope) error {
+	return autoConvert_compute_Console_To_v1alpha1_Console(in, out, s)
+}
+
+func autoConvert_v1alpha1_ConsoleClientConfig_To_compute_ConsoleClientConfig(in *ConsoleClientConfig, out *compute.ConsoleClientConfig, s conversion.Scope) error {
+	if err := Convert_v1alpha1_ServiceReference_To_compute_ServiceReference(&in.Service, &out.Service, s); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Convert_v1alpha1_ConsoleClientConfig_To_compute_ConsoleClientConfig is an autogenerated conversion function.
+func Convert_v1alpha1_ConsoleClientConfig_To_compute_ConsoleClientConfig(in *ConsoleClientConfig, out *compute.ConsoleClientConfig, s conversion.Scope) error {
+	return autoConvert_v1alpha1_ConsoleClientConfig_To_compute_ConsoleClientConfig(in, out, s)
+}
+
+func autoConvert_compute_ConsoleClientConfig_To_v1alpha1_ConsoleClientConfig(in *compute.ConsoleClientConfig, out *ConsoleClientConfig, s conversion.Scope) error {
+	if err := Convert_compute_ServiceReference_To_v1alpha1_ServiceReference(&in.Service, &out.Service, s); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Convert_compute_ConsoleClientConfig_To_v1alpha1_ConsoleClientConfig is an autogenerated conversion function.
+func Convert_compute_ConsoleClientConfig_To_v1alpha1_ConsoleClientConfig(in *compute.ConsoleClientConfig, out *ConsoleClientConfig, s conversion.Scope) error {
+	return autoConvert_compute_ConsoleClientConfig_To_v1alpha1_ConsoleClientConfig(in, out, s)
+}
+
+func autoConvert_v1alpha1_ConsoleList_To_compute_ConsoleList(in *ConsoleList, out *compute.ConsoleList, s conversion.Scope) error {
+	out.ListMeta = in.ListMeta
+	out.Items = *(*[]compute.Console)(unsafe.Pointer(&in.Items))
+	return nil
+}
+
+// Convert_v1alpha1_ConsoleList_To_compute_ConsoleList is an autogenerated conversion function.
+func Convert_v1alpha1_ConsoleList_To_compute_ConsoleList(in *ConsoleList, out *compute.ConsoleList, s conversion.Scope) error {
+	return autoConvert_v1alpha1_ConsoleList_To_compute_ConsoleList(in, out, s)
+}
+
+func autoConvert_compute_ConsoleList_To_v1alpha1_ConsoleList(in *compute.ConsoleList, out *ConsoleList, s conversion.Scope) error {
+	out.ListMeta = in.ListMeta
+	out.Items = *(*[]Console)(unsafe.Pointer(&in.Items))
+	return nil
+}
+
+// Convert_compute_ConsoleList_To_v1alpha1_ConsoleList is an autogenerated conversion function.
+func Convert_compute_ConsoleList_To_v1alpha1_ConsoleList(in *compute.ConsoleList, out *ConsoleList, s conversion.Scope) error {
+	return autoConvert_compute_ConsoleList_To_v1alpha1_ConsoleList(in, out, s)
+}
+
+func autoConvert_v1alpha1_ConsoleSpec_To_compute_ConsoleSpec(in *ConsoleSpec, out *compute.ConsoleSpec, s conversion.Scope) error {
+	out.MachineRef = in.MachineRef
+	return nil
+}
+
+// Convert_v1alpha1_ConsoleSpec_To_compute_ConsoleSpec is an autogenerated conversion function.
+func Convert_v1alpha1_ConsoleSpec_To_compute_ConsoleSpec(in *ConsoleSpec, out *compute.ConsoleSpec, s conversion.Scope) error {
+	return autoConvert_v1alpha1_ConsoleSpec_To_compute_ConsoleSpec(in, out, s)
+}
+
+func autoConvert_compute_ConsoleSpec_To_v1alpha1_ConsoleSpec(in *compute.ConsoleSpec, out *ConsoleSpec, s conversion.Scope) error {
+	out.MachineRef = in.MachineRef
+	return nil
+}
+
+// Convert_compute_ConsoleSpec_To_v1alpha1_ConsoleSpec is an autogenerated conversion function.
+func Convert_compute_ConsoleSpec_To_v1alpha1_ConsoleSpec(in *compute.ConsoleSpec, out *ConsoleSpec, s conversion.Scope) error {
+	return autoConvert_compute_ConsoleSpec_To_v1alpha1_ConsoleSpec(in, out, s)
+}
+
+func autoConvert_v1alpha1_ConsoleStatus_To_compute_ConsoleStatus(in *ConsoleStatus, out *compute.ConsoleStatus, s conversion.Scope) error {
+	out.State = compute.ConsoleState(in.State)
+	out.ClientConfig = (*compute.ConsoleClientConfig)(unsafe.Pointer(in.ClientConfig))
+	return nil
+}
+
+// Convert_v1alpha1_ConsoleStatus_To_compute_ConsoleStatus is an autogenerated conversion function.
+func Convert_v1alpha1_ConsoleStatus_To_compute_ConsoleStatus(in *ConsoleStatus, out *compute.ConsoleStatus, s conversion.Scope) error {
+	return autoConvert_v1alpha1_ConsoleStatus_To_compute_ConsoleStatus(in, out, s)
+}
+
+func autoConvert_compute_ConsoleStatus_To_v1alpha1_ConsoleStatus(in *compute.ConsoleStatus, out *ConsoleStatus, s conversion.Scope) error {
+	out.State = ConsoleState(in.State)
+	out.ClientConfig = (*ConsoleClientConfig)(unsafe.Pointer(in.ClientConfig))
+	return nil
+}
+
+// Convert_compute_ConsoleStatus_To_v1alpha1_ConsoleStatus is an autogenerated conversion function.
+func Convert_compute_ConsoleStatus_To_v1alpha1_ConsoleStatus(in *compute.ConsoleStatus, out *ConsoleStatus, s conversion.Scope) error {
+	return autoConvert_compute_ConsoleStatus_To_v1alpha1_ConsoleStatus(in, out, s)
 }
 
 func autoConvert_v1alpha1_EFIVar_To_compute_EFIVar(in *EFIVar, out *compute.EFIVar, s conversion.Scope) error {
@@ -709,6 +889,30 @@ func autoConvert_compute_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStat
 // Convert_compute_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStatus is an autogenerated conversion function.
 func Convert_compute_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStatus(in *compute.NetworkInterfaceStatus, out *NetworkInterfaceStatus, s conversion.Scope) error {
 	return autoConvert_compute_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStatus(in, out, s)
+}
+
+func autoConvert_v1alpha1_ServiceReference_To_compute_ServiceReference(in *ServiceReference, out *compute.ServiceReference, s conversion.Scope) error {
+	out.Name = in.Name
+	out.Path = (*string)(unsafe.Pointer(in.Path))
+	out.Port = (*int32)(unsafe.Pointer(in.Port))
+	return nil
+}
+
+// Convert_v1alpha1_ServiceReference_To_compute_ServiceReference is an autogenerated conversion function.
+func Convert_v1alpha1_ServiceReference_To_compute_ServiceReference(in *ServiceReference, out *compute.ServiceReference, s conversion.Scope) error {
+	return autoConvert_v1alpha1_ServiceReference_To_compute_ServiceReference(in, out, s)
+}
+
+func autoConvert_compute_ServiceReference_To_v1alpha1_ServiceReference(in *compute.ServiceReference, out *ServiceReference, s conversion.Scope) error {
+	out.Name = in.Name
+	out.Path = (*string)(unsafe.Pointer(in.Path))
+	out.Port = (*int32)(unsafe.Pointer(in.Port))
+	return nil
+}
+
+// Convert_compute_ServiceReference_To_v1alpha1_ServiceReference is an autogenerated conversion function.
+func Convert_compute_ServiceReference_To_v1alpha1_ServiceReference(in *compute.ServiceReference, out *ServiceReference, s conversion.Scope) error {
+	return autoConvert_compute_ServiceReference_To_v1alpha1_ServiceReference(in, out, s)
 }
 
 func autoConvert_v1alpha1_Volume_To_compute_Volume(in *Volume, out *compute.Volume, s conversion.Scope) error {

@@ -26,6 +26,7 @@ import (
 
 type ComputeInterface interface {
 	RESTClient() rest.Interface
+	ConsolesGetter
 	MachinesGetter
 	MachineClassesGetter
 	MachinePoolsGetter
@@ -34,6 +35,10 @@ type ComputeInterface interface {
 // ComputeClient is used to interact with features provided by the compute.api.onmetal.de group.
 type ComputeClient struct {
 	restClient rest.Interface
+}
+
+func (c *ComputeClient) Consoles(namespace string) ConsoleInterface {
+	return newConsoles(c, namespace)
 }
 
 func (c *ComputeClient) Machines(namespace string) MachineInterface {

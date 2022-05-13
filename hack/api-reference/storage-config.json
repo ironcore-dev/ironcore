@@ -8,6 +8,10 @@
   ],
   "externalPackages": [
     {
+      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.LocalUIDReference",
+      "docsURLTemplate": "/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference"
+    },
+    {
       "typeMatchPrefix": "^k8s\\.io/apimachinery/pkg/types\\.UID",
       "docsURLTemplate": "https://pkg.go.dev/k8s.io/apimachinery/pkg/types#UID"
     },

@@ -42,6 +42,10 @@
     {
       "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.ConfigMapKeySelector$",
       "docsURLTemplate": "/api-reference/common/#common.onmetal.de/v1alpha1.ConfigMapKeySelector"
+    },
+    {
+      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/networking/v1alpha1\\.NetworkInterfaceTemplateSpec",
+      "docsURLTemplate": "/api-reference/networking/#networking.api.onmetal.de/v1alpha1.NetworkInterfaceTemplateSpec"
     }
   ],
   "typeDisplayNamePrefixOverrides": {

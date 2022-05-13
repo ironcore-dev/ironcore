@@ -27,6 +27,7 @@ import (
 
 type ComputeV1alpha1Interface interface {
 	RESTClient() rest.Interface
+	ConsolesGetter
 	MachinesGetter
 	MachineClassesGetter
 	MachinePoolsGetter
@@ -35,6 +36,10 @@ type ComputeV1alpha1Interface interface {
 // ComputeV1alpha1Client is used to interact with features provided by the compute.api.onmetal.de group.
 type ComputeV1alpha1Client struct {
 	restClient rest.Interface
+}
+
+func (c *ComputeV1alpha1Client) Consoles(namespace string) ConsoleInterface {
+	return newConsoles(c, namespace)
 }
 
 func (c *ComputeV1alpha1Client) Machines(namespace string) MachineInterface {

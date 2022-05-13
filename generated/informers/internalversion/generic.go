@@ -55,6 +55,8 @@ func (f *genericInformer) Lister() cache.GenericLister {
 func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericInformer, error) {
 	switch resource {
 	// Group=compute.api.onmetal.de, Version=internalVersion
+	case compute.SchemeGroupVersion.WithResource("consoles"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Compute().InternalVersion().Consoles().Informer()}, nil
 	case compute.SchemeGroupVersion.WithResource("machines"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Compute().InternalVersion().Machines().Informer()}, nil
 	case compute.SchemeGroupVersion.WithResource("machineclasses"):

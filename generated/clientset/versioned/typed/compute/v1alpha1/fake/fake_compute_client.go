@@ -27,6 +27,10 @@ type FakeComputeV1alpha1 struct {
 	*testing.Fake
 }
 
+func (c *FakeComputeV1alpha1) Consoles(namespace string) v1alpha1.ConsoleInterface {
+	return &FakeConsoles{c, namespace}
+}
+
 func (c *FakeComputeV1alpha1) Machines(namespace string) v1alpha1.MachineInterface {
 	return &FakeMachines{c, namespace}
 }

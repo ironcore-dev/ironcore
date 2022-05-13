@@ -17,6 +17,14 @@
 
 package v1alpha1
 
+// ConsoleListerExpansion allows custom methods to be added to
+// ConsoleLister.
+type ConsoleListerExpansion interface{}
+
+// ConsoleNamespaceListerExpansion allows custom methods to be added to
+// ConsoleNamespaceLister.
+type ConsoleNamespaceListerExpansion interface{}
+
 // MachineListerExpansion allows custom methods to be added to
 // MachineLister.
 type MachineListerExpansion interface{}

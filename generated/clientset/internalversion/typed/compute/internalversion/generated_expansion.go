@@ -17,6 +17,8 @@
 
 package internalversion
 
+type ConsoleExpansion interface{}
+
 type MachineExpansion interface{}
 
 type MachineClassExpansion interface{}

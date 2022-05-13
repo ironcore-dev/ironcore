@@ -10,12 +10,101 @@
 </div>
 Resource Types:
 <ul><li>
+<a href="#compute.api.onmetal.de/v1alpha1.Console">Console</a>
+</li><li>
 <a href="#compute.api.onmetal.de/v1alpha1.Machine">Machine</a>
 </li><li>
 <a href="#compute.api.onmetal.de/v1alpha1.MachineClass">MachineClass</a>
 </li><li>
 <a href="#compute.api.onmetal.de/v1alpha1.MachinePool">MachinePool</a>
 </li></ul>
+<h3 id="compute.api.onmetal.de/v1alpha1.Console">Console
+</h3>
+<div>
+<p>Console is the Schema for the consoles API</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+compute.api.onmetal.de/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>Console</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#compute.api.onmetal.de/v1alpha1.ConsoleSpec">
+ConsoleSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>machineRef</code><br/>
+<em>
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>MachineRef references the machine to open a console to.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="#compute.api.onmetal.de/v1alpha1.ConsoleStatus">
+ConsoleStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="compute.api.onmetal.de/v1alpha1.Machine">Machine
 </h3>
 <div>
@@ -376,6 +465,135 @@ MachinePoolStatus
 </tr>
 </tbody>
 </table>
+<h3 id="compute.api.onmetal.de/v1alpha1.ConsoleClientConfig">ConsoleClientConfig
+</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.ConsoleStatus">ConsoleStatus</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>service</code><br/>
+<em>
+<a href="#compute.api.onmetal.de/v1alpha1.ServiceReference">
+ServiceReference
+</a>
+</em>
+</td>
+<td>
+<p>Service is the service to connect to.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="compute.api.onmetal.de/v1alpha1.ConsoleSpec">ConsoleSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.Console">Console</a>)
+</p>
+<div>
+<p>ConsoleSpec defines the desired state of Console</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>machineRef</code><br/>
+<em>
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>MachineRef references the machine to open a console to.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="compute.api.onmetal.de/v1alpha1.ConsoleState">ConsoleState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.ConsoleStatus">ConsoleStatus</a>)
+</p>
+<div>
+<p>ConsoleState is a state a Console can be in.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Error&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Ready&#34;</p></td>
+<td></td>
+</tr></tbody>
+</table>
+<h3 id="compute.api.onmetal.de/v1alpha1.ConsoleStatus">ConsoleStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.Console">Console</a>)
+</p>
+<div>
+<p>ConsoleStatus defines the observed state of Console</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>state</code><br/>
+<em>
+<a href="#compute.api.onmetal.de/v1alpha1.ConsoleState">
+ConsoleState
+</a>
+</em>
+</td>
+<td>
+<p>State is the state of a Console.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>clientConfig</code><br/>
+<em>
+<a href="#compute.api.onmetal.de/v1alpha1.ConsoleClientConfig">
+ConsoleClientConfig
+</a>
+</em>
+</td>
+<td>
+<p>ClientConfig is the client configuration to connect to a console.
+Only usable if the ConsoleStatus.State is ConsoleStateReady.</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="compute.api.onmetal.de/v1alpha1.EFIVar">EFIVar
 </h3>
 <p>
@@ -482,7 +700,9 @@ object) networking.NetworkInterface.</p>
 <td>
 <code>networkInterfaceTemplate</code><br/>
 <em>
+<a href="/api-reference/networking/#networking.api.onmetal.de/v1alpha1.NetworkInterfaceTemplateSpec">
 github.com/onmetal/onmetal-api/apis/networking/v1alpha1.NetworkInterfaceTemplateSpec
+</a>
 </em>
 </td>
 <td>
@@ -1213,6 +1433,61 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
 </td>
 <td>
 <p>VirtualIP is the virtual ip allocated for the network interface.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="compute.api.onmetal.de/v1alpha1.ServiceReference">ServiceReference
+</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.ConsoleClientConfig">ConsoleClientConfig</a>)
+</p>
+<div>
+<p>ServiceReference is a reference to a Service in the same namespace as the referent.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name of the referenced service.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>path</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p><code>path</code> is an optional URL path which will be sent in any request to
+this service.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>port</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>Port on the service hosting the console.
+Defaults to 443 for backward compatibility.
+<code>port</code> should be a valid port number (1-65535, inclusive).</p>
 </td>
 </tr>
 </tbody>

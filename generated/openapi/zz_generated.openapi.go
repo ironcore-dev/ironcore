@@ -40,6 +40,11 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/apis/common/v1alpha1.SecretKeySelector":                schema_onmetal_api_apis_common_v1alpha1_SecretKeySelector(ref),
 		"github.com/onmetal/onmetal-api/apis/common/v1alpha1.Taint":                            schema_onmetal_api_apis_common_v1alpha1_Taint(ref),
 		"github.com/onmetal/onmetal-api/apis/common/v1alpha1.Toleration":                       schema_onmetal_api_apis_common_v1alpha1_Toleration(ref),
+		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.Console":                         schema_onmetal_api_apis_compute_v1alpha1_Console(ref),
+		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.ConsoleClientConfig":             schema_onmetal_api_apis_compute_v1alpha1_ConsoleClientConfig(ref),
+		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.ConsoleList":                     schema_onmetal_api_apis_compute_v1alpha1_ConsoleList(ref),
+		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.ConsoleSpec":                     schema_onmetal_api_apis_compute_v1alpha1_ConsoleSpec(ref),
+		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.ConsoleStatus":                   schema_onmetal_api_apis_compute_v1alpha1_ConsoleStatus(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EFIVar":                          schema_onmetal_api_apis_compute_v1alpha1_EFIVar(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EmptyDiskVolumeSource":           schema_onmetal_api_apis_compute_v1alpha1_EmptyDiskVolumeSource(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EphemeralNetworkInterfaceSource": schema_onmetal_api_apis_compute_v1alpha1_EphemeralNetworkInterfaceSource(ref),
@@ -58,6 +63,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.NetworkInterface":                schema_onmetal_api_apis_compute_v1alpha1_NetworkInterface(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.NetworkInterfaceSource":          schema_onmetal_api_apis_compute_v1alpha1_NetworkInterfaceSource(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.NetworkInterfaceStatus":          schema_onmetal_api_apis_compute_v1alpha1_NetworkInterfaceStatus(ref),
+		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.ServiceReference":                schema_onmetal_api_apis_compute_v1alpha1_ServiceReference(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.Volume":                          schema_onmetal_api_apis_compute_v1alpha1_Volume(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.VolumeSource":                    schema_onmetal_api_apis_compute_v1alpha1_VolumeSource(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.VolumeStatus":                    schema_onmetal_api_apis_compute_v1alpha1_VolumeStatus(ref),
@@ -587,6 +593,175 @@ func schema_onmetal_api_apis_common_v1alpha1_Toleration(ref common.ReferenceCall
 				},
 			},
 		},
+	}
+}
+
+func schema_onmetal_api_apis_compute_v1alpha1_Console(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "Console is the Schema for the consoles API",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/onmetal/onmetal-api/apis/compute/v1alpha1.ConsoleSpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/onmetal/onmetal-api/apis/compute/v1alpha1.ConsoleStatus"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.ConsoleSpec", "github.com/onmetal/onmetal-api/apis/compute/v1alpha1.ConsoleStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_onmetal_api_apis_compute_v1alpha1_ConsoleClientConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"service": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Service is the service to connect to.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/onmetal/onmetal-api/apis/compute/v1alpha1.ServiceReference"),
+						},
+					},
+				},
+				Required: []string{"service"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.ServiceReference"},
+	}
+}
+
+func schema_onmetal_api_apis_compute_v1alpha1_ConsoleList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ConsoleList contains a list of Console",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/apis/compute/v1alpha1.Console"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.Console", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_onmetal_api_apis_compute_v1alpha1_ConsoleSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ConsoleSpec defines the desired state of Console",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"machineRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "MachineRef references the machine to open a console to.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
+						},
+					},
+				},
+				Required: []string{"machineRef"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/api/core/v1.LocalObjectReference"},
+	}
+}
+
+func schema_onmetal_api_apis_compute_v1alpha1_ConsoleStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ConsoleStatus defines the observed state of Console",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"state": {
+						SchemaProps: spec.SchemaProps{
+							Description: "State is the state of a Console.\n\nPossible enum values:\n - `\"Error\"`\n - `\"Pending\"`\n - `\"Ready\"`",
+							Type:        []string{"string"},
+							Format:      "",
+							Enum:        []interface{}{"Error", "Pending", "Ready"}},
+					},
+					"clientConfig": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ClientConfig is the client configuration to connect to a console. Only usable if the ConsoleStatus.State is ConsoleStateReady.",
+							Ref:         ref("github.com/onmetal/onmetal-api/apis/compute/v1alpha1.ConsoleClientConfig"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.ConsoleClientConfig"},
 	}
 }
 
@@ -1456,6 +1631,42 @@ func schema_onmetal_api_apis_compute_v1alpha1_NetworkInterfaceStatus(ref common.
 		},
 		Dependencies: []string{
 			"github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP"},
+	}
+}
+
+func schema_onmetal_api_apis_compute_v1alpha1_ServiceReference(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ServiceReference is a reference to a Service in the same namespace as the referent.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name of the referenced service.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"path": {
+						SchemaProps: spec.SchemaProps{
+							Description: "`path` is an optional URL path which will be sent in any request to this service.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"port": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Port on the service hosting the console. Defaults to 443 for backward compatibility. `port` should be a valid port number (1-65535, inclusive).",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+				},
+				Required: []string{"name"},
+			},
+		},
 	}
 }
 
