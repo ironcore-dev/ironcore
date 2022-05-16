@@ -7,7 +7,7 @@ require (
 	github.com/go-logr/logr v1.2.3
 	github.com/google/addlicense v1.0.0
 	github.com/google/go-cmp v0.5.8
-	github.com/onmetal/controller-utils v0.5.7
+	github.com/onmetal/controller-utils v0.6.0
 	github.com/onmetal/vgopath v0.0.2
 	github.com/onsi/ginkgo/v2 v2.1.4
 	github.com/onsi/gomega v1.19.0
