@@ -17,6 +17,14 @@ git clone git@github.com:onmetal/onmetal-api.git
 cd onmetal-api
 ```
 
+## Install cert-manager
+
+If there is no [cert-manager](https://cert-manager.io/docs/) present in the cluster it needs to be installed.
+
+```shell
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.8.0/cert-manager.yaml
+```
+
 ## Install APIs into the Cluster
 
 Your Kubernetes API server needs to know about the APIs which come with the `onmetal-api` project. To install the APIs
