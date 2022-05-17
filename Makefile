@@ -7,7 +7,7 @@ APISERVER_IMG ?= apiserver:latest
 IMAGE=onmetal-api/documentation
 
 # kind cluster which should be used
-KIND_CLUSTER ?= main
+KIND_CLUSTER ?= kind
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
