@@ -6,9 +6,6 @@ APISERVER_IMG ?= apiserver:latest
 # Docker image name for the mkdocs based local development setup
 IMAGE=onmetal-api/documentation
 
-# kind cluster which should be used
-KIND_CLUSTER ?= kind
-
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
 GOBIN=$(shell go env GOPATH)/bin
@@ -161,11 +158,11 @@ kind-build: kind-build-apiserver kind-build-controller ## Build the apiserver an
 
 .PHONY: kind-load-apiserver
 kind-load-apiserver: ## Load the apiserver image into the kind cluster.
-	kind load docker-image apiserver --name ${KIND_CLUSTER}
+	kind load docker-image apiserver
 
 .PHONY: kind-load-controller
 kind-load-controller: ## Load the controller image into the kind cluster.
-	kind load docker-image controller --name ${KIND_CLUSTER}
+	kind load docker-image controller
 
 .PHONY: kind-load
 kind-load: kind-load-apiserver kind-load-controller ## Load the apiserver and controller in kind.

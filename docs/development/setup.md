@@ -42,6 +42,9 @@ the manifests is available via
 make kind-install
 ```
 
+**Note**: If a `kind context` different to the default is used, be aware that the `Makefile` is referencing the default
+context. 
+
 ## Start the Controller Manager
 
 The controller manager can be started via the following command
