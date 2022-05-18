@@ -68,7 +68,6 @@ var _ = Describe("VolumeScheduler", func() {
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
 			g.Expect(volume.Spec.VolumePoolRef).To(Equal(&corev1.LocalObjectReference{Name: volumePool.Name}))
-			g.Expect(volume.Status.State).To(Equal(storagev1alpha1.VolumeStatePending))
 		}).Should(Succeed())
 	})
 
@@ -95,7 +94,6 @@ var _ = Describe("VolumeScheduler", func() {
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed())
 			g.Expect(volume.Spec.VolumePoolRef).To(BeNil())
-			g.Expect(volume.Status.State).To(Equal(storagev1alpha1.VolumeStatePending))
 		}).Should(Succeed())
 
 		By("creating a volume pool")
@@ -176,7 +174,6 @@ var _ = Describe("VolumeScheduler", func() {
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
 			g.Expect(volume.Spec.VolumePoolRef).To(Equal(&corev1.LocalObjectReference{Name: volumePoolMatchingLabels.Name}))
-			g.Expect(volume.Status.State).To(Equal(storagev1alpha1.VolumeStatePending))
 		}).Should(Succeed())
 	})
 

@@ -72,15 +72,6 @@ func (s *VolumeScheduler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 
 func (s *VolumeScheduler) schedule(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume) (ctrl.Result, error) {
 	log.Info("Scheduling volume")
-	if volume.Status.State != storagev1alpha1.VolumeStatePending {
-		base := volume.DeepCopy()
-		volume.Status.State = storagev1alpha1.VolumeStatePending
-		if err := s.Status().Patch(ctx, volume, client.MergeFrom(base)); err != nil {
-			return ctrl.Result{}, fmt.Errorf("error patching volume state to pending: %w", err)
-		}
-		return ctrl.Result{Requeue: true}, nil
-	}
-
 	list := &storagev1alpha1.VolumePoolList{}
 	if err := s.List(ctx, list,
 		client.MatchingFields{volumePoolStatusAvailableVolumeClassesNameField: volume.Spec.VolumeClassRef.Name},
