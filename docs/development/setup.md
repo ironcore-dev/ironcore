@@ -42,8 +42,8 @@ the manifests is available via
 make kind-install
 ```
 
-**Note**: If a `kind context` different to the default is used, be aware that the `Makefile` is referencing the default
-context. 
+**Note**: In case that there are multiple environments running, ensure that `kind get clusters` is pointing to the
+default kind cluster.
 
 ## Start the Controller Manager
 
