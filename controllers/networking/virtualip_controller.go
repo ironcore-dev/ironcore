@@ -76,6 +76,15 @@ func (r *VirtualIPReconciler) phaseTransitionTimedOut(timestamp *metav1.Time) bo
 	return timestamp.Add(r.BindTimeout).Before(time.Now())
 }
 
+func (r *VirtualIPReconciler) setTargetRefUID(ctx context.Context, virtualIP *networkingv1alpha1.VirtualIP, uid types.UID) error {
+	base := virtualIP.DeepCopy()
+	virtualIP.Spec.TargetRef.UID = uid
+	if err := r.Patch(ctx, virtualIP, client.MergeFrom(base)); err != nil {
+		return fmt.Errorf("error setting target ref uid: %w", err)
+	}
+	return nil
+}
+
 func (r *VirtualIPReconciler) reconcile(ctx context.Context, log logr.Logger, virtualIP *networkingv1alpha1.VirtualIP) (ctrl.Result, error) {
 	log.V(1).Info("Reconciling virtual ip")
 	if virtualIP.Spec.TargetRef == nil {
@@ -97,6 +106,17 @@ func (r *VirtualIPReconciler) reconcileBound(ctx context.Context, log logr.Logge
 	err := r.APIReader.Get(ctx, nicKey, nic)
 	if client.IgnoreNotFound(err) != nil {
 		return ctrl.Result{}, fmt.Errorf("error getting network interface %s: %w", nicKey, err)
+	}
+
+	if err == nil && virtualIP.Spec.TargetRef.UID == "" {
+		log = log.WithValues("TargetUID", nic.UID)
+		log.V(1).Info("Setting target ref uid")
+		if err := r.setTargetRefUID(ctx, virtualIP, nic.UID); err != nil {
+			return ctrl.Result{}, err
+		}
+
+		log.V(1).Info("Set target ref uid")
+		return ctrl.Result{}, nil
 	}
 
 	nicExists := err == nil

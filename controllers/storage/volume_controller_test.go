@@ -25,6 +25,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -128,5 +129,31 @@ var _ = Describe("VolumeReconciler", func() {
 			g.Expect(volume.Status.Phase).To(Equal(storagev1alpha1.VolumePhaseUnbound))
 			g.Expect(volume.Spec.ClaimRef).To(BeZero())
 		}).Should(Succeed())
+	})
+
+	It("should dynamically patch in the claim uid if it is unset", func() {
+		By("creating a volume w/ a set of resources")
+		Expect(k8sClient.Create(ctx, volume)).To(Succeed(), "failed to create volume")
+
+		By("updating the volume status to available")
+		baseVolume := volume.DeepCopy()
+		volume.Status.State = storagev1alpha1.VolumeStateAvailable
+		Expect(k8sClient.Status().Patch(ctx, volume, client.MergeFrom(baseVolume))).To(Succeed())
+
+		By("creating a volume claim referencing the volume")
+		volumeClaim.Spec.VolumeRef = &corev1.LocalObjectReference{Name: volume.Name}
+		Expect(k8sClient.Create(ctx, volumeClaim)).To(Succeed(), "failed to create volume claim")
+
+		By("setting the volume claim ref to the claim name")
+		baseVolume = volume.DeepCopy()
+		volume.Spec.ClaimRef = &commonv1alpha1.LocalUIDReference{Name: volumeClaim.Name}
+		Expect(k8sClient.Patch(ctx, volume, client.MergeFrom(baseVolume))).To(Succeed())
+
+		By("waiting for the claim uid to be patched in")
+		volumeKey := client.ObjectKeyFromObject(volume)
+		Eventually(func() types.UID {
+			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed())
+			return volume.Spec.ClaimRef.UID
+		}).Should(Equal(volumeClaim.UID))
 	})
 })

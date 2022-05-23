@@ -23,6 +23,7 @@ import (
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -127,5 +128,71 @@ var _ = Describe("VirtualIPReconciler", func() {
 			g.Expect(virtualIP.Status.Phase).To(Equal(networkingv1alpha1.VirtualIPPhaseUnbound))
 			g.Expect(virtualIP.Spec.TargetRef).To(BeNil())
 		}).Should(Succeed())
+	})
+
+	It("should dynamically patch in the target uid if it is unset", func() {
+		By("creating a network")
+		network := &networkingv1alpha1.Network{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "network-",
+			},
+		}
+		Expect(k8sClient.Create(ctx, network)).To(Succeed())
+
+		By("creating a virtual ip")
+		virtualIP := &networkingv1alpha1.VirtualIP{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "vip-",
+			},
+			Spec: networkingv1alpha1.VirtualIPSpec{
+				Type:     networkingv1alpha1.VirtualIPTypePublic,
+				IPFamily: corev1.IPv4Protocol,
+			},
+		}
+		Expect(k8sClient.Create(ctx, virtualIP)).To(Succeed())
+
+		By("updating the virtual ip to have an ip allocated")
+		baseVirtualIP := virtualIP.DeepCopy()
+		virtualIP.Status.IP = commonv1alpha1.MustParseNewIP("10.0.0.1")
+		Expect(k8sClient.Status().Patch(ctx, virtualIP, client.MergeFrom(baseVirtualIP))).To(Succeed())
+
+		By("creating a network interface referencing the virtual ip")
+		nic := &networkingv1alpha1.NetworkInterface{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "nic-",
+			},
+			Spec: networkingv1alpha1.NetworkInterfaceSpec{
+				NetworkRef: corev1.LocalObjectReference{
+					Name: network.Name,
+				},
+				IPFamilies: []corev1.IPFamily{
+					corev1.IPv4Protocol,
+				},
+				IPs: []networkingv1alpha1.IPSource{
+					{Value: commonv1alpha1.MustParseNewIP("192.168.178.1")},
+				},
+				VirtualIP: &networkingv1alpha1.VirtualIPSource{
+					VirtualIPRef: &corev1.LocalObjectReference{
+						Name: virtualIP.Name,
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
+
+		By("updating only the target ref name but not the uid")
+		baseVirtualIP = virtualIP.DeepCopy()
+		virtualIP.Spec.TargetRef = &commonv1alpha1.LocalUIDReference{Name: nic.Name}
+		Expect(k8sClient.Patch(ctx, virtualIP, client.MergeFrom(baseVirtualIP))).To(Succeed())
+
+		By("waiting for the uid to be patched into the target ref")
+		virtualIPKey := client.ObjectKeyFromObject(virtualIP)
+		Eventually(func() types.UID {
+			Expect(k8sClient.Get(ctx, virtualIPKey, virtualIP)).To(Succeed())
+			return virtualIP.Spec.TargetRef.UID
+		}).Should(Equal(nic.UID))
 	})
 })

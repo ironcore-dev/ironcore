@@ -105,6 +105,17 @@ func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volum
 		return ctrl.Result{}, fmt.Errorf("error getting volume claim %s: %w", volumeClaimKey, err)
 	}
 
+	if err == nil && volume.Spec.ClaimRef.UID == "" {
+		log = log.WithValues("VolumeClaimUID", volumeClaim.UID)
+		log.V(1).Info("Setting claim ref uid")
+		if err := r.setClaimRefUID(ctx, volume, volumeClaim.UID); err != nil {
+			return ctrl.Result{}, err
+		}
+
+		log.V(1).Info("Set claim ref uid")
+		return ctrl.Result{}, nil
+	}
+
 	volumeClaimExists := err == nil
 	validReferences := volumeClaimExists && r.validReferences(volume, volumeClaim)
 	volumePhase := volume.Status.Phase
@@ -173,6 +184,15 @@ func (r *VolumeReconciler) releaseVolume(ctx context.Context, volume *storagev1a
 	baseVolume := volume.DeepCopy()
 	volume.Spec.ClaimRef = nil
 	return r.Patch(ctx, volume, client.MergeFrom(baseVolume))
+}
+
+func (r *VolumeReconciler) setClaimRefUID(ctx context.Context, volume *storagev1alpha1.Volume, uid types.UID) error {
+	base := volume.DeepCopy()
+	volume.Spec.ClaimRef.UID = uid
+	if err := r.Patch(ctx, volume, client.MergeFrom(base)); err != nil {
+		return fmt.Errorf("error setting claim ref uid: %w", err)
+	}
+	return nil
 }
 
 func (r *VolumeReconciler) patchVolumeStatus(ctx context.Context, volume *storagev1alpha1.Volume, phase storagev1alpha1.VolumePhase) error {
