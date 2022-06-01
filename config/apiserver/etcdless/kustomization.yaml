@@ -1,0 +1,89 @@
+# Adds namespace to all resources.
+namespace: onmetal-system
+
+# Value of this field is prepended to the
+# names of all resources, e.g. a deployment named
+# "wordpress" becomes "alices-wordpress".
+# Note that it should also match with the prefix (text before '-') of the namespace
+# field above.
+namePrefix: onmetal-
+
+# Labels to add to all resources and selectors.
+#commonLabels:
+#  someName: someValue
+
+resources:
+  - ../rbac
+  - ../server
+  - ../apiservice
+  - ../certmanager
+
+patchesStrategicMerge:
+  - apiserver_certificate_patch.yaml
+  - apiservicecainjection_patch.yaml
+
+replacements:
+  - source:
+      kind: Certificate
+      group: cert-manager.io
+      version: v1
+      name: apiserver-cert
+      fieldPath: .metadata.namespace
+    targets:
+      - select:
+          kind: APIService
+        fieldPaths:
+          - .metadata.annotations.[cert-manager.io/inject-ca-from]
+        options:
+          delimiter: '/'
+          index: 0
+          create: true
+  - source:
+      kind: Certificate
+      group: cert-manager.io
+      version: v1
+      name: apiserver-cert
+      fieldPath: .metadata.name
+    targets:
+      - select:
+          kind: APIService
+        fieldPaths:
+          - .metadata.annotations.[cert-manager.io/inject-ca-from]
+        options:
+          delimiter: '/'
+          index: 1
+          create: true
+  - source:
+      kind: Service
+      version: v1
+      name: apiserver-service
+      fieldPath: .metadata.name
+    targets:
+      - select:
+          kind: Certificate
+          group: cert-manager.io
+          version: v1
+        fieldPaths:
+          - .spec.dnsNames.0
+          - .spec.dnsNames.1
+        options:
+          delimiter: '.'
+          index: 0
+          create: true
+  - source:
+      kind: Service
+      version: v1
+      name: apiserver-service
+      fieldPath: .metadata.namespace
+    targets:
+      - select:
+          kind: Certificate
+          group: cert-manager.io
+          version: v1
+        fieldPaths:
+          - .spec.dnsNames.0
+          - .spec.dnsNames.1
+        options:
+          delimiter: '.'
+          index: 1
+          create: true
