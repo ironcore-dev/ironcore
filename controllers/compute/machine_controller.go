@@ -313,7 +313,7 @@ func (r *MachineReconciler) applyVolume(ctx context.Context, log logr.Logger, ma
 		return computev1alpha1.VolumePhaseBound, nil
 	case machineVolume.VolumeRef != nil:
 		volume := &storagev1alpha1.Volume{}
-		volumeKey := client.ObjectKey{Namespace: machine.Namespace, Name: machineVolume.Name}
+		volumeKey := client.ObjectKey{Namespace: machine.Namespace, Name: machineVolume.VolumeRef.Name}
 		log.V(1).Info("Getting volume", "VolumeKey", volumeKey)
 		if err := r.Get(ctx, volumeKey, volume); err != nil {
 			return "", fmt.Errorf("error getting volume %s: %w", volumeKey, err)
