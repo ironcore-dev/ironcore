@@ -63,6 +63,7 @@ const (
 	volumePoolController  = "volumepool"
 	volumeClassController = "volumeclass"
 	volumeController      = "volume"
+	volumeScheduler       = "volumescheduler"
 
 	prefixController          = "prefix"
 	prefixAllocationScheduler = "prefixallocationscheduler"
@@ -105,7 +106,7 @@ func main() {
 		machineClassController, machinePoolController, machineSchedulerController, machineController,
 
 		// Storage controllers
-		volumePoolController, volumeClassController, volumeController,
+		volumePoolController, volumeClassController, volumeController, volumeScheduler,
 
 		// Networking controllers
 		networkInterfaceController, networkInterfaceBindController, virtualIPController, aliasPrefixController,
@@ -205,6 +206,14 @@ func main() {
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "Volume")
 			os.Exit(1)
+		}
+	}
+
+	if controllers.Enabled(volumeScheduler) {
+		if err = (&storagecontrollers.VolumeScheduler{
+			Client: mgr.GetClient(),
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "VolumeScheduler")
 		}
 	}
 

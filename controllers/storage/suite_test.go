@@ -29,6 +29,7 @@ import (
 	"github.com/onmetal/onmetal-api/testutils/apiserverbin"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 
@@ -160,6 +161,11 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 			Client:    k8sManager.GetClient(),
 			APIReader: k8sManager.GetAPIReader(),
 			Scheme:    k8sManager.GetScheme(),
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
+		Expect((&VolumeScheduler{
+			Client: k8sManager.GetClient(),
+			Events: &record.FakeRecorder{},
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		go func() {
