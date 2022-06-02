@@ -129,7 +129,7 @@ var _ = BeforeSuite(func() {
 	}).SetupWithManager(k8sManager)
 	Expect(err).NotTo(HaveOccurred())
 
-	Expect(SetupPrefixSpecIPFamilyFieldIndexer(k8sManager)).To(Succeed())
+	Expect(SetupPrefixSpecIPFamilyFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 
 	go func() {
 		defer GinkgoRecover()

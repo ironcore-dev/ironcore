@@ -146,3 +146,9 @@ type VolumeList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []Volume `json:"items"`
 }
+
+// VolumeTemplateSpec is the specification of a Volume template.
+type VolumeTemplateSpec struct {
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+	Spec              VolumeSpec `json:"spec,omitempty"`
+}

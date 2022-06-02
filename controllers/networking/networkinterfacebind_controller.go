@@ -175,7 +175,7 @@ func (r *NetworkInterfaceBindReconciler) getRequestingMachine(ctx context.Contex
 	if err := r.List(ctx, machineList,
 		client.InNamespace(nic.Namespace),
 		client.MatchingFields{
-			shared.MachineNetworkInterfaceNamesField: nic.Name,
+			shared.MachineSpecNetworkInterfaceNamesField: nic.Name,
 		},
 	); err != nil {
 		return nil, fmt.Errorf("error listing matching machines: %w", err)
@@ -222,12 +222,7 @@ func (r *NetworkInterfaceBindReconciler) validReferences(nic *networkingv1alpha1
 		return false
 	}
 
-	for _, name := range shared.MachineNetworkInterfaceNames(machine) {
-		if name == nic.Name {
-			return true
-		}
-	}
-	return false
+	return shared.MachineSpecNetworkInterfaceNames(machine).Has(nic.Name)
 }
 
 func (r *NetworkInterfaceBindReconciler) patchStatus(ctx context.Context, nic *networkingv1alpha1.NetworkInterface, phase networkingv1alpha1.NetworkInterfacePhase) error {
@@ -283,7 +278,7 @@ func (r *NetworkInterfaceBindReconciler) enqueueByMachineNetworkInterfaceReferen
 		machine := obj.(*computev1alpha1.Machine)
 
 		var reqs []ctrl.Request
-		for _, name := range shared.MachineNetworkInterfaceNames(machine) {
+		for name := range shared.MachineSpecNetworkInterfaceNames(machine) {
 			reqs = append(reqs, ctrl.Request{NamespacedName: client.ObjectKey{Namespace: machine.Namespace, Name: name}})
 		}
 

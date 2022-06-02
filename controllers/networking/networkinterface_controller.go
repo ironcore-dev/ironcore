@@ -24,6 +24,7 @@ import (
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/apis/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
 	onmetalapiclientutils "github.com/onmetal/onmetal-api/clientutils"
+	"github.com/onmetal/onmetal-api/controllers/shared"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -120,7 +121,7 @@ func (r *NetworkInterfaceReconciler) applyIPs(ctx context.Context, nic *networki
 			prefix := &ipamv1alpha1.Prefix{
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: nic.Namespace,
-					Name:      NetworkInterfaceEphemeralIPName(nic.Name, i),
+					Name:      shared.NetworkInterfaceEphemeralIPName(nic.Name, i),
 				},
 			}
 			if err := onmetalapiclientutils.ControlledCreateOrGet(ctx, r.Client, nic, prefix, func() error {
@@ -220,7 +221,7 @@ func (r *NetworkInterfaceReconciler) enqueueByNetworkInterfaceVirtualIPReference
 		nicList := &networkingv1alpha1.NetworkInterfaceList{}
 		if err := r.List(ctx, nicList,
 			client.InNamespace(vip.Namespace),
-			client.MatchingFields{networkInterfaceVirtualIPNames: vip.Name},
+			client.MatchingFields{shared.NetworkInterfaceVirtualIPNames: vip.Name},
 		); err != nil {
 			log.Error(err, "Error listing network interfaces using virtual ip")
 			return nil

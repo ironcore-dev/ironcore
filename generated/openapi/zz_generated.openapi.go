@@ -43,6 +43,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EFIVar":                          schema_onmetal_api_apis_compute_v1alpha1_EFIVar(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EmptyDiskVolumeSource":           schema_onmetal_api_apis_compute_v1alpha1_EmptyDiskVolumeSource(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EphemeralNetworkInterfaceSource": schema_onmetal_api_apis_compute_v1alpha1_EphemeralNetworkInterfaceSource(ref),
+		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EphemeralVolumeSource":           schema_onmetal_api_apis_compute_v1alpha1_EphemeralVolumeSource(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.Machine":                         schema_onmetal_api_apis_compute_v1alpha1_Machine(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachineClass":                    schema_onmetal_api_apis_compute_v1alpha1_MachineClass(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachineClassList":                schema_onmetal_api_apis_compute_v1alpha1_MachineClassList(ref),
@@ -106,6 +107,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumePoolStatus":                schema_onmetal_api_apis_storage_v1alpha1_VolumePoolStatus(ref),
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeSpec":                      schema_onmetal_api_apis_storage_v1alpha1_VolumeSpec(ref),
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeStatus":                    schema_onmetal_api_apis_storage_v1alpha1_VolumeStatus(ref),
+		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeTemplateSpec":              schema_onmetal_api_apis_storage_v1alpha1_VolumeTemplateSpec(ref),
 		"k8s.io/api/core/v1.AWSElasticBlockStoreVolumeSource":                                  schema_k8sio_api_core_v1_AWSElasticBlockStoreVolumeSource(ref),
 		"k8s.io/api/core/v1.Affinity":                                                          schema_k8sio_api_core_v1_Affinity(ref),
 		"k8s.io/api/core/v1.AttachedVolume":                                                    schema_k8sio_api_core_v1_AttachedVolume(ref),
@@ -663,6 +665,27 @@ func schema_onmetal_api_apis_compute_v1alpha1_EphemeralNetworkInterfaceSource(re
 		},
 		Dependencies: []string{
 			"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.NetworkInterfaceTemplateSpec"},
+	}
+}
+
+func schema_onmetal_api_apis_compute_v1alpha1_EphemeralVolumeSource(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "EphemeralVolumeSource is a definition for an ephemeral (i.e. coupled to the lifetime of the surrounding object) storage.Volume.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"volumeTemplate": {
+						SchemaProps: spec.SchemaProps{
+							Description: "VolumeTemplate is the template definition of the storage.Volume.",
+							Ref:         ref("github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeTemplateSpec"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeTemplateSpec"},
 	}
 }
 
@@ -1426,6 +1449,13 @@ func schema_onmetal_api_apis_compute_v1alpha1_NetworkInterfaceStatus(ref common.
 							Format:      "",
 						},
 					},
+					"phase": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Phase is the NetworkInterface binding phase of the NetworkInterface.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 					"ips": {
 						SchemaProps: spec.SchemaProps{
 							Description: "IPs are the ips allocated for the network interface.",
@@ -1482,12 +1512,18 @@ func schema_onmetal_api_apis_compute_v1alpha1_Volume(ref common.ReferenceCallbac
 							Ref:         ref("github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EmptyDiskVolumeSource"),
 						},
 					},
+					"ephemeral": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object) Volume to use.",
+							Ref:         ref("github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EphemeralVolumeSource"),
+						},
+					},
 				},
 				Required: []string{"name"},
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EmptyDiskVolumeSource", "k8s.io/api/core/v1.LocalObjectReference"},
+			"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EmptyDiskVolumeSource", "github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EphemeralVolumeSource", "k8s.io/api/core/v1.LocalObjectReference"},
 	}
 }
 
@@ -1510,11 +1546,17 @@ func schema_onmetal_api_apis_compute_v1alpha1_VolumeSource(ref common.ReferenceC
 							Ref:         ref("github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EmptyDiskVolumeSource"),
 						},
 					},
+					"ephemeral": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object) Volume to use.",
+							Ref:         ref("github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EphemeralVolumeSource"),
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EmptyDiskVolumeSource", "k8s.io/api/core/v1.LocalObjectReference"},
+			"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EmptyDiskVolumeSource", "github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EphemeralVolumeSource", "k8s.io/api/core/v1.LocalObjectReference"},
 	}
 }
 
@@ -1529,6 +1571,13 @@ func schema_onmetal_api_apis_compute_v1alpha1_VolumeStatus(ref common.ReferenceC
 						SchemaProps: spec.SchemaProps{
 							Description: "Name is the name of a volume attachment.",
 							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"phase": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Phase represents the binding phase of a Volume.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -3557,6 +3606,33 @@ func schema_onmetal_api_apis_storage_v1alpha1_VolumeStatus(ref common.ReferenceC
 		},
 		Dependencies: []string{
 			"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeAccess", "github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeCondition", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+	}
+}
+
+func schema_onmetal_api_apis_storage_v1alpha1_VolumeTemplateSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "VolumeTemplateSpec is the specification of a Volume template.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeSpec"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 

@@ -25,6 +25,7 @@ import (
 	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
+	"github.com/onmetal/onmetal-api/controllers/shared"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
@@ -209,7 +210,7 @@ func (r *VirtualIPReconciler) getMatchingNetworkInterface(ctx context.Context, v
 	nicList := &networkingv1alpha1.NetworkInterfaceList{}
 	if err := r.List(ctx, nicList,
 		client.InNamespace(virtualIP.Namespace),
-		client.MatchingFields{networkInterfaceVirtualIPNames: virtualIP.Name},
+		client.MatchingFields{shared.NetworkInterfaceVirtualIPNames: virtualIP.Name},
 	); err != nil {
 		return nil, fmt.Errorf("error listing suitable requesters: %w", err)
 	}
@@ -237,7 +238,7 @@ func (r *VirtualIPReconciler) networkInterfaceReferencesVirtualIP(virtualIP *net
 		return false
 	}
 
-	return NetworkInterfaceVirtualIPName(nic.Name, *nicVirtualIP) == virtualIP.Name
+	return shared.NetworkInterfaceVirtualIPName(nic.Name, *nicVirtualIP) == virtualIP.Name
 }
 
 func (r *VirtualIPReconciler) requeueAfterBoundTimeout(virtualIP *networkingv1alpha1.VirtualIP) ctrl.Result {
@@ -354,7 +355,7 @@ func (r *VirtualIPReconciler) enqueueByNameEqualNetworkInterfaceVirtualIPName(ct
 			return nil
 		}
 
-		nicVirtualIPName := NetworkInterfaceVirtualIPName(nic.Name, *nicVirtualIP)
+		nicVirtualIPName := shared.NetworkInterfaceVirtualIPName(nic.Name, *nicVirtualIP)
 		if nicVirtualIPName == "" {
 			return nil
 		}

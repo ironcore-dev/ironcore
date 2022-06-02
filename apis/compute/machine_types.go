@@ -94,6 +94,9 @@ type VolumeSource struct {
 	VolumeRef *corev1.LocalObjectReference
 	// EmptyDisk instructs to use a Volume offered by the machine pool provider.
 	EmptyDisk *EmptyDiskVolumeSource
+	// Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object)
+	// Volume to use.
+	Ephemeral *EphemeralVolumeSource
 }
 
 // EmptyDiskVolumeSource is a volume that's offered by the machine pool provider.
@@ -109,19 +112,43 @@ type EmptyDiskVolumeSource struct {
 type NetworkInterfaceStatus struct {
 	// Name is the name of the NetworkInterface to whom the status belongs to.
 	Name string
+	// Phase is the NetworkInterface binding phase of the NetworkInterface.
+	Phase NetworkInterfacePhase
 	// IPs are the ips allocated for the network interface.
 	IPs []commonv1alpha1.IP
 	// VirtualIP is the virtual ip allocated for the network interface.
 	VirtualIP *commonv1alpha1.IP
 }
 
+// NetworkInterfacePhase represents the binding phase a NetworkInterface can be in.
+type NetworkInterfacePhase string
+
+const (
+	// NetworkInterfacePhasePending is used for a NetworkInterface that is not yet bound.
+	NetworkInterfacePhasePending NetworkInterfacePhase = "Pending"
+	// NetworkInterfacePhaseBound is used for a NetworkInterface that is bound.
+	NetworkInterfacePhaseBound NetworkInterfacePhase = "Bound"
+)
+
 // VolumeStatus is the status of a Volume.
 type VolumeStatus struct {
 	// Name is the name of a volume attachment.
 	Name string
+	// Phase represents the binding phase of a Volume.
+	Phase VolumePhase
 	// DeviceID is the disk device ID on the host.
 	DeviceID string
 }
+
+// VolumePhase represents the binding phase a Volume can be in.
+type VolumePhase string
+
+const (
+	// VolumePhasePending is used for a Volume that is not yet bound.
+	VolumePhasePending VolumePhase = "Pending"
+	// VolumePhaseBound is used for a Volume that is bound.
+	VolumePhaseBound VolumePhase = "Bound"
+)
 
 // MachineStatus defines the observed state of Machine
 type MachineStatus struct {

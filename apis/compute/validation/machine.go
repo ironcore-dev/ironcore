@@ -19,6 +19,8 @@ package validation
 import (
 	onmetalapivalidation "github.com/onmetal/onmetal-api/api/validation"
 	"github.com/onmetal/onmetal-api/apis/compute"
+	"github.com/onmetal/onmetal-api/apis/storage"
+	storagevalidation "github.com/onmetal/onmetal-api/apis/storage/validation"
 	corev1 "k8s.io/api/core/v1"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1validation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
@@ -117,6 +119,14 @@ func validateVolumeSource(source *compute.VolumeSource, fldPath *field.Path) fie
 			allErrs = append(allErrs, validateEmptyDiskVolumeSource(source.EmptyDisk, fldPath.Child("emptyDisk"))...)
 		}
 	}
+	if source.Ephemeral != nil {
+		if numDefs > 0 {
+			allErrs = append(allErrs, field.Forbidden(fldPath.Child("ephemeral"), "must only specify one volume source"))
+		} else {
+			numDefs++
+			allErrs = append(allErrs, validateEphemeralVolumeSource(source.Ephemeral, fldPath.Child("ephemeral"))...)
+		}
+	}
 	if numDefs == 0 {
 		allErrs = append(allErrs, field.Invalid(fldPath, source, "must specify at least one volume source"))
 	}
@@ -129,6 +139,37 @@ func validateEmptyDiskVolumeSource(source *compute.EmptyDiskVolumeSource, fldPat
 
 	if sizeLimit := source.SizeLimit; sizeLimit != nil {
 		allErrs = append(allErrs, onmetalapivalidation.ValidateNonNegativeQuantity(*sizeLimit, fldPath.Child("sizeLimit"))...)
+	}
+
+	return allErrs
+}
+
+func validateEphemeralVolumeSource(source *compute.EphemeralVolumeSource, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	if source.VolumeTemplate == nil {
+		allErrs = append(allErrs, field.Required(fldPath.Child("volumeTemplate"), "must specify volume template"))
+	} else {
+		allErrs = append(allErrs, validateVolumeTemplateSpecForMachine(source.VolumeTemplate, fldPath.Child("volumeTemplate"))...)
+	}
+
+	return allErrs
+}
+
+func validateVolumeTemplateSpecForMachine(template *storage.VolumeTemplateSpec, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	if template == nil {
+		allErrs = append(allErrs, field.Required(fldPath, ""))
+	} else {
+		allErrs = append(allErrs, storagevalidation.ValidateVolumeTemplateSpec(template, fldPath)...)
+
+		if template.Spec.ClaimRef != nil {
+			allErrs = append(allErrs, field.Forbidden(fldPath.Child("spec", "claimRef"), "may not specify claimRef"))
+		}
+		if template.Spec.Unclaimable {
+			allErrs = append(allErrs, field.Forbidden(fldPath.Child("spec", "unclaimable"), "may not specify unclaimable"))
+		}
 	}
 
 	return allErrs

@@ -22,8 +22,10 @@ import (
 	"time"
 
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
+	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 	"github.com/onmetal/onmetal-api/controllers/networking"
 	"github.com/onmetal/onmetal-api/controllers/shared"
+	"github.com/onmetal/onmetal-api/controllers/storage"
 	"github.com/onmetal/onmetal-api/envtestutils"
 	"github.com/onmetal/onmetal-api/envtestutils/apiserver"
 	"github.com/onmetal/onmetal-api/testutils/apiserverbin"
@@ -37,6 +39,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
+	"sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
@@ -93,6 +96,7 @@ var _ = BeforeSuite(func() {
 	DeferCleanup(envtestutils.StopWithExtensions, testEnv, testEnvExt)
 
 	Expect(computev1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
+	Expect(storagev1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
 	Expect(ipamv1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
 	Expect(networkingv1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
 
@@ -101,6 +105,8 @@ var _ = BeforeSuite(func() {
 	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
 	Expect(err).NotTo(HaveOccurred())
 	Expect(k8sClient).NotTo(BeNil())
+
+	komega.SetClient(k8sClient)
 
 	apiSrv, err := apiserver.New(cfg, apiserver.Options{
 		Command:     []string{apiserverbin.Path},
@@ -148,8 +154,9 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 		})
 		Expect(err).ToNot(HaveOccurred())
 
-		Expect(networking.SetupNetworkInterfaceVirtualIPNameFieldIndexer(k8sManager)).To(Succeed())
-		Expect(shared.SetupMachineNetworkInterfaceNamesFieldIndexer(k8sManager)).To(Succeed())
+		Expect(shared.SetupNetworkInterfaceVirtualIPNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+		Expect(shared.SetupMachineSpecNetworkInterfaceNamesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+		Expect(shared.SetupMachineSpecVolumeNamesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 
 		// register reconciler here
 		Expect((&MachineScheduler{
@@ -166,6 +173,19 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 			Client:    k8sManager.GetClient(),
 			APIReader: k8sManager.GetAPIReader(),
 			Scheme:    k8sManager.GetScheme(),
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
+		Expect((&networking.NetworkInterfaceReconciler{
+			Client:    k8sManager.GetClient(),
+			APIReader: k8sManager.GetAPIReader(),
+			Scheme:    k8sManager.GetScheme(),
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
+		Expect((&storage.VolumeReconciler{
+			Client:      k8sManager.GetClient(),
+			APIReader:   k8sManager.GetAPIReader(),
+			Scheme:      k8sManager.GetScheme(),
+			BindTimeout: 1 * time.Second,
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		go func() {

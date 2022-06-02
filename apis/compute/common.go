@@ -16,6 +16,7 @@ package compute
 
 import (
 	"github.com/onmetal/onmetal-api/apis/networking"
+	"github.com/onmetal/onmetal-api/apis/storage"
 )
 
 // EphemeralNetworkInterfaceSource is a definition for an ephemeral (i.e. coupled to the lifetime of the surrounding
@@ -23,4 +24,11 @@ import (
 type EphemeralNetworkInterfaceSource struct {
 	// NetworkInterfaceTemplate is the template definition of the networking.NetworkInterface.
 	NetworkInterfaceTemplate *networking.NetworkInterfaceTemplateSpec
+}
+
+// EphemeralVolumeSource is a definition for an ephemeral (i.e. coupled to the lifetime of the surrounding object)
+// storage.Volume.
+type EphemeralVolumeSource struct {
+	// VolumeTemplate is the template definition of the storage.Volume.
+	VolumeTemplate *storage.VolumeTemplateSpec
 }

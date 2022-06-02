@@ -18,17 +18,15 @@ import (
 	"context"
 
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/apis/ipam/v1alpha1"
-	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const (
-	prefixSpecIPFamilyField = "spec.ipFamily"
+	PrefixSpecIPFamilyField = "spec.ipFamily"
 )
 
-func SetupPrefixSpecIPFamilyFieldIndexer(mgr ctrl.Manager) error {
-	ctx := context.Background()
-	return mgr.GetFieldIndexer().IndexField(ctx, &ipamv1alpha1.Prefix{}, prefixSpecIPFamilyField, func(obj client.Object) []string {
+func SetupPrefixSpecIPFamilyFieldIndexer(ctx context.Context, indexer client.FieldIndexer) error {
+	return indexer.IndexField(ctx, &ipamv1alpha1.Prefix{}, PrefixSpecIPFamilyField, func(obj client.Object) []string {
 		prefix := obj.(*ipamv1alpha1.Prefix)
 		return []string{string(prefix.Spec.IPFamily)}
 	})
