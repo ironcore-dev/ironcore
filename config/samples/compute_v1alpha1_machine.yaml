@@ -5,13 +5,13 @@ metadata:
 spec:
   machineClassRef:
     name: machineclass-sample
-  machinePoolRef:
-    name: default
-  image: myimage_repo_location
+  #  machinePoolRef:
+  #    name: default
+  image: my-image
   volumes:
     - name: rootdisk # first disk is root disk
       # priority: 0 # optional
-      volumeClaimRef:
-        name: my-volumeclaim
+      volumeRef:
+        name: my-volume
   ignitionRef:
     name: my-ignition-configmap

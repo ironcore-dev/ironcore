@@ -90,8 +90,8 @@ type Volume struct {
 
 // VolumeSource specifies the source to use for a Volume.
 type VolumeSource struct {
-	// VolumeClaimRef instructs the Volume to use a VolumeClaimRef as source for the attachment.
-	VolumeClaimRef *corev1.LocalObjectReference `json:"volumeClaimRef,omitempty"`
+	// VolumeRef instructs to use the specified Volume as source for the attachment.
+	VolumeRef *corev1.LocalObjectReference `json:"volumeRef,omitempty"`
 	// EmptyDisk instructs to use a Volume offered by the machine pool provider.
 	EmptyDisk *EmptyDiskVolumeSource `json:"emptyDisk,omitempty"`
 }

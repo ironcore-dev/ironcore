@@ -17,6 +17,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"os"
@@ -62,9 +63,6 @@ const (
 	volumePoolController  = "volumepool"
 	volumeClassController = "volumeclass"
 	volumeController      = "volume"
-	volumeClaimController = "volumeclaim"
-	volumeScheduler       = "volumescheduler"
-	volumeClaimScheduler  = "volumeclaimscheduler"
 
 	prefixController          = "prefix"
 	prefixAllocationScheduler = "prefixallocationscheduler"
@@ -107,7 +105,7 @@ func main() {
 		machineClassController, machinePoolController, machineSchedulerController, machineController,
 
 		// Storage controllers
-		volumePoolController, volumeClassController, volumeController, volumeClaimController, volumeScheduler, volumeClaimScheduler,
+		volumePoolController, volumeClassController, volumeController,
 
 		// Networking controllers
 		networkInterfaceController, networkInterfaceBindController, virtualIPController, aliasPrefixController,
@@ -197,6 +195,11 @@ func main() {
 	}
 
 	if controllers.Enabled(volumeController) {
+		if err = shared.SetupMachineSpecVolumeNamesFieldIndexer(context.TODO(), mgr.GetFieldIndexer()); err != nil {
+			setupLog.Error(err, "unable to index field", "field", shared.MachineSpecVolumeNamesField)
+			os.Exit(1)
+		}
+
 		if err = (&storagecontrollers.VolumeReconciler{
 			Client:             mgr.GetClient(),
 			APIReader:          mgr.GetAPIReader(),
@@ -206,35 +209,6 @@ func main() {
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "Volume")
 			os.Exit(1)
-		}
-	}
-
-	if controllers.Enabled(volumeClaimController) {
-		if err = (&storagecontrollers.VolumeClaimReconciler{
-			Client:             mgr.GetClient(),
-			APIReader:          mgr.GetAPIReader(),
-			Scheme:             mgr.GetScheme(),
-			SharedFieldIndexer: sharedStorageFieldIndexer,
-		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "VolumeClaimRef")
-			os.Exit(1)
-		}
-	}
-
-	if controllers.Enabled(volumeScheduler) {
-		if err = (&storagecontrollers.VolumeScheduler{
-			Client: mgr.GetClient(),
-		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "VolumeScheduler")
-		}
-	}
-
-	if controllers.Enabled(volumeClaimScheduler) {
-		if err = (&storagecontrollers.VolumeClaimScheduler{
-			Client: mgr.GetClient(),
-			Events: mgr.GetEventRecorderFor("volume-claim-scheduler"),
-		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "VolumeClaimScheduler")
 		}
 	}
 

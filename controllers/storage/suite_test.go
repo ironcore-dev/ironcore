@@ -22,13 +22,15 @@ import (
 	"testing"
 	"time"
 
+	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
+	"github.com/onmetal/onmetal-api/controllers/shared"
 	"github.com/onmetal/onmetal-api/envtestutils"
 	"github.com/onmetal/onmetal-api/envtestutils/apiserver"
 	"github.com/onmetal/onmetal-api/testutils/apiserverbin"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 
@@ -90,14 +92,16 @@ var _ = BeforeSuite(func() {
 
 	DeferCleanup(envtestutils.StopWithExtensions, testEnv, testEnvExt)
 
-	err = storagev1alpha1.AddToScheme(scheme.Scheme)
-	Expect(err).NotTo(HaveOccurred())
+	Expect(storagev1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
+	Expect(computev1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
 
 	//+kubebuilder:scaffold:scheme
 
 	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
 	Expect(err).NotTo(HaveOccurred())
 	Expect(k8sClient).NotTo(BeNil())
+
+	komega.SetClient(k8sClient)
 
 	apiSrv, err := apiserver.New(cfg, apiserver.Options{
 		Command:     []string{apiserverbin.Path},
@@ -143,32 +147,16 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 
 		// index fields here
 		fieldIndexer := NewSharedIndexer(k8sManager)
-		Expect(fieldIndexer.IndexField(ctx, &storagev1alpha1.Volume{}, VolumeSpecVolumeClaimNameRefField)).ToNot(HaveOccurred())
+		Expect(fieldIndexer.IndexField(ctx, &storagev1alpha1.Volume{}, VolumeSpecClaimRefNameField)).ToNot(HaveOccurred())
+		Expect(shared.SetupMachineSpecVolumeNamesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 
 		// register reconciler here
-		Expect((&VolumeClaimScheduler{
-			Client: k8sManager.GetClient(),
-			Events: &record.FakeRecorder{},
-		}).SetupWithManager(k8sManager)).To(Succeed())
-
 		Expect((&VolumeReconciler{
 			Client:             k8sManager.GetClient(),
 			APIReader:          k8sManager.GetAPIReader(),
 			Scheme:             k8sManager.GetScheme(),
 			SharedFieldIndexer: fieldIndexer,
 			BindTimeout:        1 * time.Second,
-		}).SetupWithManager(k8sManager)).To(Succeed())
-
-		Expect((&VolumeClaimReconciler{
-			Client:             k8sManager.GetClient(),
-			APIReader:          k8sManager.GetAPIReader(),
-			Scheme:             k8sManager.GetScheme(),
-			SharedFieldIndexer: fieldIndexer,
-		}).SetupWithManager(k8sManager)).To(Succeed())
-
-		Expect((&VolumeScheduler{
-			Client: k8sManager.GetClient(),
-			Events: &record.FakeRecorder{},
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		Expect((&VolumeClassReconciler{

@@ -31,10 +31,6 @@ func (c *FakeStorageV1alpha1) Volumes(namespace string) v1alpha1.VolumeInterface
 	return &FakeVolumes{c, namespace}
 }
 
-func (c *FakeStorageV1alpha1) VolumeClaims(namespace string) v1alpha1.VolumeClaimInterface {
-	return &FakeVolumeClaims{c, namespace}
-}
-
 func (c *FakeStorageV1alpha1) VolumeClasses() v1alpha1.VolumeClassInterface {
 	return &FakeVolumeClasses{c}
 }

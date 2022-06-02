@@ -38,7 +38,7 @@ type VolumeSpec struct {
 	// VolumePoolRef indicates which volume pool to use for a volume.
 	// If unset, the scheduler will figure out a suitable VolumePoolRef.
 	VolumePoolRef *corev1.LocalObjectReference
-	// ClaimRef is the reference to the VolumeClaim used by the Volume.
+	// ClaimRef is the reference to the claiming entity of the Volume.
 	ClaimRef *commonv1alpha1.LocalUIDReference
 	// Resources is a description of the volume's resources and capacity.
 	Resources corev1.ResourceList
@@ -46,6 +46,8 @@ type VolumeSpec struct {
 	Image string
 	// ImagePullSecretRef is an optional secret for pulling the image of a volume.
 	ImagePullSecretRef *corev1.LocalObjectReference
+	// Unclaimable marks the volume as unclaimable.
+	Unclaimable bool
 	// Tolerations define tolerations the Volume has. Only a VolumePool whose taints
 	// covered by Tolerations will be considered to host the Volume.
 	Tolerations []commonv1alpha1.Toleration

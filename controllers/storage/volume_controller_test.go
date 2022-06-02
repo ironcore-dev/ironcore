@@ -18,6 +18,7 @@ package storage
 
 import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 	"github.com/onmetal/onmetal-api/testutils"
 	. "github.com/onsi/ginkgo/v2"
@@ -25,135 +26,121 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
-	"sigs.k8s.io/controller-runtime/pkg/client"
+	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 )
 
 var _ = Describe("VolumeReconciler", func() {
 	ctx := testutils.SetupContext()
 	ns := SetupTest(ctx)
 
-	var volume *storagev1alpha1.Volume
-	var volumeClaim *storagev1alpha1.VolumeClaim
-
-	BeforeEach(func() {
-		volume = &storagev1alpha1.Volume{
+	It("should schedule, bind and unbind a volume to a machine", func() {
+		By("creating a volume")
+		volume := &storagev1alpha1.Volume{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
-				GenerateName: "test-volume-",
+				GenerateName: "volume-",
 			},
 			Spec: storagev1alpha1.VolumeSpec{
-				VolumePoolRef: &corev1.LocalObjectReference{
-					Name: "my-volumepool",
-				},
-				Resources: map[corev1.ResourceName]resource.Quantity{
-					"storage": resource.MustParse("100Gi"),
-				},
-				VolumeClassRef: corev1.LocalObjectReference{
-					Name: "my-volumeclass",
+				VolumeClassRef: corev1.LocalObjectReference{Name: "my-class"},
+				VolumePoolRef:  &corev1.LocalObjectReference{Name: "my-pool"},
+				Resources: corev1.ResourceList{
+					"storage": resource.MustParse("1Gi"),
 				},
 			},
 		}
-		volumeClaim = &storagev1alpha1.VolumeClaim{
+		Expect(k8sClient.Create(ctx, volume)).To(Succeed())
+
+		By("creating a machine referencing the volume")
+		machine := &computev1alpha1.Machine{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
-				GenerateName: "test-volume-claim-",
+				GenerateName: "machine-",
 			},
-			Spec: storagev1alpha1.VolumeClaimSpec{
-				Resources: map[corev1.ResourceName]resource.Quantity{
-					"storage": resource.MustParse("100Gi"),
-				},
-				Selector: &metav1.LabelSelector{},
-				VolumeClassRef: corev1.LocalObjectReference{
-					Name: "my-volumeclass",
+			Spec: computev1alpha1.MachineSpec{
+				MachineClassRef: corev1.LocalObjectReference{Name: "my-class"},
+				MachinePoolRef:  &corev1.LocalObjectReference{Name: "my-pool"},
+				Image:           "my-image",
+				Volumes: []computev1alpha1.Volume{
+					{
+						Name: "my-volume",
+						VolumeSource: computev1alpha1.VolumeSource{
+							VolumeRef: &corev1.LocalObjectReference{Name: volume.Name},
+						},
+					},
 				},
 			},
 		}
+		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+
+		By("waiting for the volume to be bound to the machine")
+		Eventually(Object(volume)).Should(SatisfyAll(
+			HaveField("Status.Phase", Equal(storagev1alpha1.VolumePhaseBound)),
+			HaveField("Spec.ClaimRef", Equal(&commonv1alpha1.LocalUIDReference{
+				Name: machine.Name,
+				UID:  machine.UID,
+			})),
+		))
+
+		By("deleting the machine")
+		Expect(k8sClient.Delete(ctx, machine)).To(Succeed())
+
+		By("waiting for the volume to be unbound again")
+		Eventually(Object(volume)).Should(SatisfyAll(
+			HaveField("Status.Phase", Equal(storagev1alpha1.VolumePhaseUnbound)),
+			HaveField("Spec.ClaimRef", BeNil()),
+		))
 	})
 
-	It("should bind a volume if the claim has the correct volume ref", func() {
-		By("creating a volume w/ a set of resources")
-		Expect(k8sClient.Create(ctx, volume)).To(Succeed(), "failed to create volume")
+	It("should not claim a volume if it is marked as unclaimable", func() {
+		By("creating an unclaimable volume")
+		volume := &storagev1alpha1.Volume{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "volume-",
+			},
+			Spec: storagev1alpha1.VolumeSpec{
+				VolumeClassRef: corev1.LocalObjectReference{Name: "my-class"},
+				VolumePoolRef:  &corev1.LocalObjectReference{Name: "my-pool"},
+				Unclaimable:    true,
+				Resources: corev1.ResourceList{
+					"storage": resource.MustParse("1Gi"),
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, volume)).To(Succeed())
 
-		By("patching the volume status to available")
-		baseVolume := volume.DeepCopy()
-		volume.Status.State = storagev1alpha1.VolumeStateAvailable
-		Expect(k8sClient.Status().Patch(ctx, volume, client.MergeFrom(baseVolume))).To(Succeed())
+		By("waiting for the volume to report as unbound")
+		Eventually(Object(volume)).Should(SatisfyAll(
+			HaveField("Status.Phase", Equal(storagev1alpha1.VolumePhaseUnbound)),
+			HaveField("Spec.ClaimRef", BeNil()),
+		))
 
-		By("creating a volume claim which should claim the matching volume")
-		Expect(k8sClient.Create(ctx, volumeClaim)).To(Succeed(), "failed to create volume claim")
+		By("creating a machine referencing the volume")
+		machine := &computev1alpha1.Machine{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "machine-",
+			},
+			Spec: computev1alpha1.MachineSpec{
+				MachineClassRef: corev1.LocalObjectReference{Name: "my-class"},
+				MachinePoolRef:  &corev1.LocalObjectReference{Name: "my-pool"},
+				Image:           "my-image",
+				Volumes: []computev1alpha1.Volume{
+					{
+						Name: "my-volume",
+						VolumeSource: computev1alpha1.VolumeSource{
+							VolumeRef: &corev1.LocalObjectReference{Name: volume.Name},
+						},
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
 
-		By("waiting for the volume phase to become bound")
-		volumeKey := client.ObjectKeyFromObject(volume)
-		Eventually(func(g Gomega) {
-			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
-			g.Expect(volume.Status.Phase).To(Equal(storagev1alpha1.VolumePhaseBound))
-		}).Should(Succeed())
-
-		By("making sure the volume stays bound")
-		Consistently(func(g Gomega) {
-			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
-			g.Expect(volume.Status.Phase).To(Equal(storagev1alpha1.VolumePhaseBound))
-		}).Should(Succeed())
-	})
-
-	It("should un-bind a volume if the underlying volume claim changes its volume ref", func() {
-		By("creating a volume w/ a set of resources")
-		Expect(k8sClient.Create(ctx, volume)).To(Succeed(), "failed to create volume")
-
-		By("updating the volume status to available")
-		baseVolume := volume.DeepCopy()
-		volume.Status.State = storagev1alpha1.VolumeStateAvailable
-		Expect(k8sClient.Status().Patch(ctx, volume, client.MergeFrom(baseVolume))).To(Succeed())
-
-		By("creating a volume claim which should claim the matching volume")
-		Expect(k8sClient.Create(ctx, volumeClaim)).To(Succeed(), "failed to create volume claim")
-
-		By("waiting for the volume phase to become bound")
-		volumeKey := client.ObjectKeyFromObject(volume)
-		Eventually(func(g Gomega) {
-			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
-			g.Expect(volume.Spec.ClaimRef).To(Equal(&commonv1alpha1.LocalUIDReference{
-				Name: volumeClaim.Name,
-				UID:  volumeClaim.UID,
-			}))
-			g.Expect(volume.Status.Phase).To(Equal(storagev1alpha1.VolumePhaseBound))
-		}).Should(Succeed())
-
-		By("deleting the volume claim")
-		Expect(k8sClient.Delete(ctx, volumeClaim)).To(Succeed(), "failed to delete volume claim")
-
-		By("waiting for the volume phase to become available")
-		Eventually(func(g Gomega) {
-			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed(), "failed to get volume")
-			g.Expect(volume.Status.Phase).To(Equal(storagev1alpha1.VolumePhaseUnbound))
-			g.Expect(volume.Spec.ClaimRef).To(BeZero())
-		}).Should(Succeed())
-	})
-
-	It("should dynamically patch in the claim uid if it is unset", func() {
-		By("creating a volume w/ a set of resources")
-		Expect(k8sClient.Create(ctx, volume)).To(Succeed(), "failed to create volume")
-
-		By("updating the volume status to available")
-		baseVolume := volume.DeepCopy()
-		volume.Status.State = storagev1alpha1.VolumeStateAvailable
-		Expect(k8sClient.Status().Patch(ctx, volume, client.MergeFrom(baseVolume))).To(Succeed())
-
-		By("creating a volume claim referencing the volume")
-		volumeClaim.Spec.VolumeRef = &corev1.LocalObjectReference{Name: volume.Name}
-		Expect(k8sClient.Create(ctx, volumeClaim)).To(Succeed(), "failed to create volume claim")
-
-		By("setting the volume claim ref to the claim name")
-		baseVolume = volume.DeepCopy()
-		volume.Spec.ClaimRef = &commonv1alpha1.LocalUIDReference{Name: volumeClaim.Name}
-		Expect(k8sClient.Patch(ctx, volume, client.MergeFrom(baseVolume))).To(Succeed())
-
-		By("waiting for the claim uid to be patched in")
-		volumeKey := client.ObjectKeyFromObject(volume)
-		Eventually(func() types.UID {
-			Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed())
-			return volume.Spec.ClaimRef.UID
-		}).Should(Equal(volumeClaim.UID))
+		By("asserting the volume does not get claimed")
+		Consistently(Object(volume)).Should(SatisfyAll(
+			HaveField("Status.Phase", Equal(storagev1alpha1.VolumePhaseUnbound)),
+			HaveField("Spec.ClaimRef", BeNil()),
+		))
 	})
 })

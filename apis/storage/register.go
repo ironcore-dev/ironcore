@@ -50,8 +50,6 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&VolumePoolList{},
 		&Volume{},
 		&VolumeList{},
-		&VolumeClaim{},
-		&VolumeClaimList{},
 	)
 	return nil
 }

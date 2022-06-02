@@ -18,20 +18,22 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
+	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
+	"k8s.io/apimachinery/pkg/util/sets"
 	controllerruntime "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const (
-	MachineNetworkInterfaceNamesField = "machines-network-interface-names"
+	MachineNetworkInterfaceNamesField = "machine-network-interface-names"
+	MachineSpecVolumeNamesField       = "machine-volume-names"
 )
 
 func MachineEphemeralNetworkInterfaceName(machineName, ifaceName string) string {
 	return fmt.Sprintf("%s-%s", machineName, ifaceName)
 }
 
-func MachineNetworkInterfaceNames(machine *v1alpha1.Machine) []string {
+func MachineNetworkInterfaceNames(machine *computev1alpha1.Machine) []string {
 	var names []string
 	for _, iface := range machine.Spec.NetworkInterfaces {
 		switch {
@@ -44,11 +46,34 @@ func MachineNetworkInterfaceNames(machine *v1alpha1.Machine) []string {
 	return names
 }
 
+func MachineSpecVolumeNames(machine *computev1alpha1.Machine) sets.String {
+	names := sets.NewString()
+	for _, volume := range machine.Spec.Volumes {
+		switch {
+		case volume.VolumeRef != nil:
+			names.Insert(volume.VolumeRef.Name)
+		}
+	}
+	return names
+}
+
 func SetupMachineNetworkInterfaceNamesFieldIndexer(mgr controllerruntime.Manager) error {
 	ctx := context.Background()
-	return mgr.GetFieldIndexer().IndexField(ctx, &v1alpha1.Machine{}, MachineNetworkInterfaceNamesField, func(obj client.Object) []string {
-		machine := obj.(*v1alpha1.Machine)
+	return mgr.GetFieldIndexer().IndexField(ctx, &computev1alpha1.Machine{}, MachineNetworkInterfaceNamesField, func(obj client.Object) []string {
+		machine := obj.(*computev1alpha1.Machine)
+		if names := MachineNetworkInterfaceNames(machine); len(names) > 0 {
+			return names
+		}
+		return []string{""}
+	})
+}
 
-		return MachineNetworkInterfaceNames(machine)
+func SetupMachineSpecVolumeNamesFieldIndexer(ctx context.Context, indexer client.FieldIndexer) error {
+	return indexer.IndexField(ctx, &computev1alpha1.Machine{}, MachineSpecVolumeNamesField, func(obj client.Object) []string {
+		machine := obj.(*computev1alpha1.Machine)
+		if names := MachineSpecVolumeNames(machine); len(names) > 0 {
+			return names.UnsortedList()
+		}
+		return []string{""}
 	})
 }

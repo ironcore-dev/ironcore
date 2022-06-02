@@ -103,10 +103,10 @@ func validateVolumeSource(source *compute.VolumeSource, fldPath *field.Path) fie
 	var allErrs field.ErrorList
 
 	var numDefs int
-	if source.VolumeClaimRef != nil {
+	if source.VolumeRef != nil {
 		numDefs++
-		for _, msg := range apivalidation.NameIsDNSLabel(source.VolumeClaimRef.Name, false) {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("volumeClaimRef").Child("name"), source.VolumeClaimRef.Name, msg))
+		for _, msg := range apivalidation.NameIsDNSLabel(source.VolumeRef.Name, false) {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("volumeRef").Child("name"), source.VolumeRef.Name, msg))
 		}
 	}
 	if source.EmptyDisk != nil {

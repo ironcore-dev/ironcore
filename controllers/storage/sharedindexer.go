@@ -22,13 +22,13 @@ import (
 )
 
 const (
-	VolumeSpecVolumeClaimNameRefField = ".spec.claimRef.name"
+	VolumeSpecClaimRefNameField = ".spec.claimRef.name"
 )
 
 func NewSharedIndexer(mgr manager.Manager) *clientutils.SharedFieldIndexer {
 	sharedIndexer := clientutils.NewSharedFieldIndexer(mgr.GetFieldIndexer(), mgr.GetScheme())
 
-	sharedIndexer.MustRegister(&storagev1alpha1.Volume{}, VolumeSpecVolumeClaimNameRefField, func(object client.Object) []string {
+	sharedIndexer.MustRegister(&storagev1alpha1.Volume{}, VolumeSpecClaimRefNameField, func(object client.Object) []string {
 		volume := object.(*storagev1alpha1.Volume)
 		claimRef := volume.Spec.ClaimRef
 		if claimRef == nil {

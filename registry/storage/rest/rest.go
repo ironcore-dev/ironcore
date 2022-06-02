@@ -19,7 +19,6 @@ import (
 	"github.com/onmetal/onmetal-api/apis/storage"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 	volumestorage "github.com/onmetal/onmetal-api/registry/storage/volume/storage"
-	volumeclaimstorage "github.com/onmetal/onmetal-api/registry/storage/volumeclaim/storage"
 	volumepoolstorage "github.com/onmetal/onmetal-api/registry/storage/volumepool/storage"
 	onmetalapiserializer "github.com/onmetal/onmetal-api/serializer"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -77,14 +76,6 @@ func (p StorageProvider) v1alpha1Storage(restOptionsGetter generic.RESTOptionsGe
 
 	storageMap["volumes"] = volumeStorage.Volume
 	storageMap["volumes/status"] = volumeStorage.Status
-
-	volumeClaimStorage, err := volumeclaimstorage.NewStorage(restOptionsGetter)
-	if err != nil {
-		return storageMap, err
-	}
-
-	storageMap["volumeclaims"] = volumeClaimStorage.VolumeClaim
-	storageMap["volumeclaims/status"] = volumeClaimStorage.Status
 
 	return storageMap, nil
 }

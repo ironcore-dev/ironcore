@@ -12,8 +12,6 @@ Resource Types:
 <ul><li>
 <a href="#storage.api.onmetal.de/v1alpha1.Volume">Volume</a>
 </li><li>
-<a href="#storage.api.onmetal.de/v1alpha1.VolumeClaim">VolumeClaim</a>
-</li><li>
 <a href="#storage.api.onmetal.de/v1alpha1.VolumeClass">VolumeClass</a>
 </li><li>
 <a href="#storage.api.onmetal.de/v1alpha1.VolumePool">VolumePool</a>
@@ -163,6 +161,17 @@ Kubernetes core/v1.LocalObjectReference
 </tr>
 <tr>
 <td>
+<code>unclaimable</code><br/>
+<em>
+bool
+</em>
+</td>
+<td>
+<p>Unclaimable marks the volume as unclaimable.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>tolerations</code><br/>
 <em>
 <a href="/api-reference/common/#common.onmetal.de/v1alpha1.Toleration">
@@ -184,156 +193,6 @@ covered by Tolerations will be considered to host the Volume.</p>
 <em>
 <a href="#storage.api.onmetal.de/v1alpha1.VolumeStatus">
 VolumeStatus
-</a>
-</em>
-</td>
-<td>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="storage.api.onmetal.de/v1alpha1.VolumeClaim">VolumeClaim
-</h3>
-<div>
-<p>VolumeClaim is the Schema for the volumeclaims API</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>apiVersion</code><br/>
-string</td>
-<td>
-<code>
-storage.api.onmetal.de/v1alpha1
-</code>
-</td>
-</tr>
-<tr>
-<td>
-<code>kind</code><br/>
-string
-</td>
-<td><code>VolumeClaim</code></td>
-</tr>
-<tr>
-<td>
-<code>metadata</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
-Kubernetes meta/v1.ObjectMeta
-</a>
-</em>
-</td>
-<td>
-Refer to the Kubernetes API documentation for the fields of the
-<code>metadata</code> field.
-</td>
-</tr>
-<tr>
-<td>
-<code>spec</code><br/>
-<em>
-<a href="#storage.api.onmetal.de/v1alpha1.VolumeClaimSpec">
-VolumeClaimSpec
-</a>
-</em>
-</td>
-<td>
-<br/>
-<br/>
-<table>
-<tr>
-<td>
-<code>volumeRef</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>VolumeRef is the reference to the Volume used by the VolumeClaim</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>selector</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#labelselector-v1-meta">
-Kubernetes meta/v1.LabelSelector
-</a>
-</em>
-</td>
-<td>
-<p>Selector is a label query over volumes to consider for binding.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>resources</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#resourcelist-v1-core">
-Kubernetes core/v1.ResourceList
-</a>
-</em>
-</td>
-<td>
-<p>Resources are the requested Volume resources.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>image</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Image is an optional image to bootstrap the volume with.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>imagePullSecretRef</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>ImagePullSecretRef is an optional secret for pulling the image of a volume.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>volumeClassRef</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>VolumeClassRef references the VolumeClass used by the Volume.</p>
-</td>
-</tr>
-</table>
-</td>
-</tr>
-<tr>
-<td>
-<code>status</code><br/>
-<em>
-<a href="#storage.api.onmetal.de/v1alpha1.VolumeClaimStatus">
-VolumeClaimStatus
 </a>
 </em>
 </td>
@@ -549,158 +408,6 @@ map[string]string
 </td>
 <td>
 <p>VolumeAttributes are attributes of the volume to use.</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="storage.api.onmetal.de/v1alpha1.VolumeClaimPhase">VolumeClaimPhase
-(<code>string</code> alias)</h3>
-<p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.VolumeClaimStatus">VolumeClaimStatus</a>)
-</p>
-<div>
-<p>VolumeClaimPhase represents the state a VolumeClaim can be in.</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Value</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody><tr><td><p>&#34;Bound&#34;</p></td>
-<td><p>VolumeClaimBound is used for a VolumeClaim which is bound to a Volume.</p>
-</td>
-</tr><tr><td><p>&#34;Lost&#34;</p></td>
-<td><p>VolumeClaimLost is used for a VolumeClaim that lost its underlying Volume. The claim was bound to a
-Volume and this volume does not exist any longer and all data on it was lost.</p>
-</td>
-</tr><tr><td><p>&#34;Pending&#34;</p></td>
-<td><p>VolumeClaimPending is used for a VolumeClaim which is not yet bound.</p>
-</td>
-</tr></tbody>
-</table>
-<h3 id="storage.api.onmetal.de/v1alpha1.VolumeClaimSpec">VolumeClaimSpec
-</h3>
-<p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.VolumeClaim">VolumeClaim</a>)
-</p>
-<div>
-<p>VolumeClaimSpec defines the desired state of VolumeClaim</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>volumeRef</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>VolumeRef is the reference to the Volume used by the VolumeClaim</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>selector</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#labelselector-v1-meta">
-Kubernetes meta/v1.LabelSelector
-</a>
-</em>
-</td>
-<td>
-<p>Selector is a label query over volumes to consider for binding.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>resources</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#resourcelist-v1-core">
-Kubernetes core/v1.ResourceList
-</a>
-</em>
-</td>
-<td>
-<p>Resources are the requested Volume resources.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>image</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Image is an optional image to bootstrap the volume with.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>imagePullSecretRef</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>ImagePullSecretRef is an optional secret for pulling the image of a volume.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>volumeClassRef</code><br/>
-<em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>VolumeClassRef references the VolumeClass used by the Volume.</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="storage.api.onmetal.de/v1alpha1.VolumeClaimStatus">VolumeClaimStatus
-</h3>
-<p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.VolumeClaim">VolumeClaim</a>)
-</p>
-<div>
-<p>VolumeClaimStatus defines the observed state of VolumeClaim</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>phase</code><br/>
-<em>
-<a href="#storage.api.onmetal.de/v1alpha1.VolumeClaimPhase">
-VolumeClaimPhase
-</a>
-</em>
-</td>
-<td>
-<p>Phase represents the state a VolumeClaim can be in.</p>
 </td>
 </tr>
 </tbody>
@@ -1173,6 +880,17 @@ Kubernetes core/v1.LocalObjectReference
 </td>
 <td>
 <p>ImagePullSecretRef is an optional secret for pulling the image of a volume.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>unclaimable</code><br/>
+<em>
+bool
+</em>
+</td>
+<td>
+<p>Unclaimable marks the volume as unclaimable.</p>
 </td>
 </tr>
 <tr>

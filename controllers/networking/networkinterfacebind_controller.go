@@ -103,7 +103,7 @@ func (r *NetworkInterfaceBindReconciler) reconcileBound(ctx context.Context, log
 		"MachineExists", machineExists,
 		"ValidReferences", validReferences,
 		"Phase", phase,
-		"PhaseLastTransitionTIme", phaseLastTransitionTime,
+		"PhaseLastTransitionTime", phaseLastTransitionTime,
 	)
 	switch {
 	case validReferences:
