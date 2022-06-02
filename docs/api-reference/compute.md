@@ -1280,7 +1280,7 @@ VolumeSource
 <tbody>
 <tr>
 <td>
-<code>volumeClaimRef</code><br/>
+<code>volumeRef</code><br/>
 <em>
 <a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
@@ -1288,7 +1288,7 @@ Kubernetes core/v1.LocalObjectReference
 </em>
 </td>
 <td>
-<p>VolumeClaimRef instructs the Volume to use a VolumeClaimRef as source for the attachment.</p>
+<p>VolumeRef instructs to use the specified Volume as source for the attachment.</p>
 </td>
 </tr>
 <tr>

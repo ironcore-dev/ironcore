@@ -82,17 +82,17 @@ var _ = Describe("Machine", func() {
 			},
 			ContainElement(DuplicateField("spec.volume[1].name")),
 		),
-		Entry("invalid volumeClaimRef name",
+		Entry("invalid volumeRef name",
 			&compute.Machine{
 				Spec: compute.MachineSpec{
 					Volumes: []compute.Volume{
 						{Name: "foo", VolumeSource: compute.VolumeSource{
-							VolumeClaimRef: &corev1.LocalObjectReference{Name: "foo*"}},
+							VolumeRef: &corev1.LocalObjectReference{Name: "foo*"}},
 						},
 					},
 				},
 			},
-			ContainElement(InvalidField("spec.volume[0].volumeClaimRef.name")),
+			ContainElement(InvalidField("spec.volume[0].volumeRef.name")),
 		),
 		Entry("invalid empty disk size limit quantity",
 			&compute.Machine{

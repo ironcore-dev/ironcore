@@ -83,8 +83,6 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		// Group=storage.api.onmetal.de, Version=v1alpha1
 	case storagev1alpha1.SchemeGroupVersion.WithResource("volumes"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Storage().V1alpha1().Volumes().Informer()}, nil
-	case storagev1alpha1.SchemeGroupVersion.WithResource("volumeclaims"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Storage().V1alpha1().VolumeClaims().Informer()}, nil
 	case storagev1alpha1.SchemeGroupVersion.WithResource("volumeclasses"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Storage().V1alpha1().VolumeClasses().Informer()}, nil
 	case storagev1alpha1.SchemeGroupVersion.WithResource("volumepools"):

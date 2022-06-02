@@ -19,11 +19,15 @@ package storage
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/clientutils"
+	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
+	"github.com/onmetal/onmetal-api/controllers/shared"
 	apiequality "github.com/onmetal/onmetal-api/equality"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -50,7 +54,7 @@ type VolumeReconciler struct {
 //+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes/finalizers,verbs=update
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumeclaims,verbs=get;list
+//+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machines,verbs=get;list;watch
 
 // Reconcile is part of the main reconciliation loop for Volume types
 func (r *VolumeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -83,64 +87,128 @@ func (r *VolumeReconciler) phaseTransitionTimedOut(timestamp *metav1.Time) bool 
 func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume) (ctrl.Result, error) {
 	log.V(1).Info("Reconciling volume")
 	if volume.Spec.ClaimRef == nil {
-		log.V(1).Info("Volume is not bound and not referencing any claim")
-		if err := r.patchVolumeStatus(ctx, volume, storagev1alpha1.VolumePhaseUnbound); err != nil {
+		return r.reconcileUnbound(ctx, log, volume)
+	}
+
+	return r.reconcileBound(ctx, log, volume)
+}
+
+func (r *VolumeReconciler) assign(ctx context.Context, volume *storagev1alpha1.Volume, claimRef commonv1alpha1.LocalUIDReference) error {
+	base := volume.DeepCopy()
+	volume.Spec.ClaimRef = &claimRef
+	if err := r.Patch(ctx, volume, client.MergeFrom(base)); err != nil {
+		return fmt.Errorf("error assigning volume: %w", err)
+	}
+	return nil
+}
+
+func (r *VolumeReconciler) reconcileUnbound(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume) (ctrl.Result, error) {
+	log.V(1).Info("Reconcile unbound")
+
+	if volume.Spec.Unclaimable {
+		log.V(1).Info("Volume is marked as unclaimable, setting to unbound")
+		if err := r.patchStatus(ctx, volume, storagev1alpha1.VolumePhaseUnbound); err != nil {
 			return ctrl.Result{}, err
 		}
 
-		log.V(1).Info("Successfully marked volume as unbound")
+		log.V(1).Info("Set volume to unbound")
 		return ctrl.Result{}, nil
 	}
 
-	volumeClaim := &storagev1alpha1.VolumeClaim{}
-	volumeClaimKey := client.ObjectKey{
+	log.V(1).Info("Getting requesting machine")
+	machine, err := r.getRequestingMachine(ctx, volume)
+	if err != nil {
+		return ctrl.Result{}, fmt.Errorf("error getting requesting machine: %w", err)
+	}
+
+	if machine == nil {
+		log.V(1).Info("No requester found, setting volume to unbound")
+		if err := r.patchStatus(ctx, volume, storagev1alpha1.VolumePhaseUnbound); err != nil {
+			return ctrl.Result{}, err
+		}
+
+		log.V(1).Info("Set volume to unbound")
+		return ctrl.Result{}, nil
+	}
+
+	machineKey := client.ObjectKeyFromObject(machine)
+	log = log.WithValues("MachineKey", machineKey)
+
+	claimRef := commonv1alpha1.LocalUIDReference{
+		Name: machine.Name,
+		UID:  machine.UID,
+	}
+	log.V(1).Info("Assigning volume")
+	if err := r.assign(ctx, volume, claimRef); err != nil {
+		return ctrl.Result{}, fmt.Errorf("error assigning volume: %w", err)
+	}
+
+	log.V(1).Info("Successfully assigned volume")
+	return ctrl.Result{}, nil
+}
+
+func (r *VolumeReconciler) getRequestingMachine(ctx context.Context, volume *storagev1alpha1.Volume) (*computev1alpha1.Machine, error) {
+	machineList := &computev1alpha1.MachineList{}
+	if err := r.List(ctx, machineList,
+		client.InNamespace(volume.Namespace),
+		client.MatchingFields{shared.MachineSpecVolumeNamesField: volume.Name},
+	); err != nil {
+		return nil, fmt.Errorf("error listing machines specifying volume: %w", err)
+	}
+
+	var matches []computev1alpha1.Machine
+	for _, machine := range machineList.Items {
+		if !machine.DeletionTimestamp.IsZero() {
+			continue
+		}
+
+		matches = append(matches, machine)
+	}
+	if len(matches) == 0 {
+		return nil, nil
+	}
+
+	match := matches[rand.Intn(len(matches))]
+	return &match, nil
+}
+
+func (r *VolumeReconciler) reconcileBound(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume) (ctrl.Result, error) {
+	machine := &computev1alpha1.Machine{}
+	machineKey := client.ObjectKey{
 		Namespace: volume.Namespace,
 		Name:      volume.Spec.ClaimRef.Name,
 	}
-	log = log.WithValues("VolumeClaimKey", volumeClaimKey)
-	log.V(1).Info("Volume references claim")
+	log = log.WithValues("MachineKey", machineKey)
+	log.V(1).Info("Reconcile bound")
 	// We have to use APIReader here as stale data might cause unbinding a volume for a short duration.
-	err := r.APIReader.Get(ctx, volumeClaimKey, volumeClaim)
+	err := r.APIReader.Get(ctx, machineKey, machine)
 	if client.IgnoreNotFound(err) != nil {
-		return ctrl.Result{}, fmt.Errorf("error getting volume claim %s: %w", volumeClaimKey, err)
+		return ctrl.Result{}, fmt.Errorf("error getting machine %s: %w", machineKey, err)
 	}
 
-	if err == nil && volume.Spec.ClaimRef.UID == "" {
-		log = log.WithValues("VolumeClaimUID", volumeClaim.UID)
-		log.V(1).Info("Setting claim ref uid")
-		if err := r.setClaimRefUID(ctx, volume, volumeClaim.UID); err != nil {
-			return ctrl.Result{}, err
-		}
-
-		log.V(1).Info("Set claim ref uid")
-		return ctrl.Result{}, nil
-	}
-
-	volumeClaimExists := err == nil
-	validReferences := volumeClaimExists && r.validReferences(volume, volumeClaim)
+	machineExists := err == nil
+	validReferences := machineExists && r.validReferences(volume, machine)
 	volumePhase := volume.Status.Phase
 	volumePhaseLastTransitionTime := volume.Status.LastPhaseTransitionTime
 	volumeState := volume.Status.State
 
-	bindOK := volumeState == storagev1alpha1.VolumeStateAvailable && validReferences
-
 	log = log.WithValues(
-		"VolumeClaimExists", volumeClaimExists,
+		"MachineExists", machineExists,
 		"ValidReferences", validReferences,
 		"VolumeState", volumeState,
 		"VolumePhase", volumePhase,
 		"VolumePhaseLastTransitionTime", volumePhaseLastTransitionTime,
 	)
 	switch {
-	case bindOK:
+	case validReferences:
 		log.V(1).Info("Setting volume to bound")
-		if err := r.patchVolumeStatus(ctx, volume, storagev1alpha1.VolumePhaseBound); err != nil {
+		if err := r.patchStatus(ctx, volume, storagev1alpha1.VolumePhaseBound); err != nil {
 			return ctrl.Result{}, fmt.Errorf("error binding volume: %w", err)
 		}
 
 		log.V(1).Info("Successfully set volume to bound.")
 		return ctrl.Result{}, nil
-	case !bindOK && volumePhase == storagev1alpha1.VolumePhasePending && r.phaseTransitionTimedOut(volumePhaseLastTransitionTime):
+	case !validReferences && volumePhase == storagev1alpha1.VolumePhasePending && r.phaseTransitionTimedOut(volumePhaseLastTransitionTime):
 		log.V(1).Info("Bind is not ok and timed out, releasing volume")
 		if err := r.releaseVolume(ctx, volume); err != nil {
 			return ctrl.Result{}, fmt.Errorf("error releasing volume: %w", err)
@@ -150,7 +218,7 @@ func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volum
 		return ctrl.Result{}, nil
 	default:
 		log.V(1).Info("Bind is not ok and not yet timed out, setting to pending")
-		if err := r.patchVolumeStatus(ctx, volume, storagev1alpha1.VolumePhasePending); err != nil {
+		if err := r.patchStatus(ctx, volume, storagev1alpha1.VolumePhasePending); err != nil {
 			return ctrl.Result{}, fmt.Errorf("error setting volume to pending: %w", err)
 		}
 
@@ -167,9 +235,8 @@ func (r *VolumeReconciler) requeueAfterBoundTimeout(volume *storagev1alpha1.Volu
 	return ctrl.Result{RequeueAfter: boundTimeoutExpirationDuration}
 }
 
-func (r *VolumeReconciler) validReferences(volume *storagev1alpha1.Volume, volumeClaim *storagev1alpha1.VolumeClaim) bool {
-	volumeRef := volumeClaim.Spec.VolumeRef
-	if volumeRef == nil || volumeRef.Name != volume.Name {
+func (r *VolumeReconciler) validReferences(volume *storagev1alpha1.Volume, machine *computev1alpha1.Machine) bool {
+	if !shared.MachineSpecVolumeNames(machine).Has(volume.Name) {
 		return false
 	}
 
@@ -177,7 +244,7 @@ func (r *VolumeReconciler) validReferences(volume *storagev1alpha1.Volume, volum
 	if claimRef == nil {
 		return false
 	}
-	return claimRef.Name == volumeClaim.Name && claimRef.UID == volumeClaim.UID
+	return claimRef.Name == machine.Name && claimRef.UID == machine.UID
 }
 
 func (r *VolumeReconciler) releaseVolume(ctx context.Context, volume *storagev1alpha1.Volume) error {
@@ -186,16 +253,7 @@ func (r *VolumeReconciler) releaseVolume(ctx context.Context, volume *storagev1a
 	return r.Patch(ctx, volume, client.MergeFrom(baseVolume))
 }
 
-func (r *VolumeReconciler) setClaimRefUID(ctx context.Context, volume *storagev1alpha1.Volume, uid types.UID) error {
-	base := volume.DeepCopy()
-	volume.Spec.ClaimRef.UID = uid
-	if err := r.Patch(ctx, volume, client.MergeFrom(base)); err != nil {
-		return fmt.Errorf("error setting claim ref uid: %w", err)
-	}
-	return nil
-}
-
-func (r *VolumeReconciler) patchVolumeStatus(ctx context.Context, volume *storagev1alpha1.Volume, phase storagev1alpha1.VolumePhase) error {
+func (r *VolumeReconciler) patchStatus(ctx context.Context, volume *storagev1alpha1.Volume, phase storagev1alpha1.VolumePhase) error {
 	now := metav1.Now()
 	volumeBase := volume.DeepCopy()
 
@@ -210,8 +268,7 @@ func (r *VolumeReconciler) patchVolumeStatus(ctx context.Context, volume *storag
 // SetupWithManager sets up the controller with the Manager.
 func (r *VolumeReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	ctx := context.Background()
-	log := ctrl.Log.WithName("volume").WithName("setup")
-	if err := r.SharedFieldIndexer.IndexField(ctx, &storagev1alpha1.Volume{}, VolumeSpecVolumeClaimNameRefField); err != nil {
+	if err := r.SharedFieldIndexer.IndexField(ctx, &storagev1alpha1.Volume{}, VolumeSpecClaimRefNameField); err != nil {
 		return err
 	}
 
@@ -227,35 +284,21 @@ func (r *VolumeReconciler) SetupWithManager(mgr ctrl.Manager) error {
 				},
 			}),
 		).
-		Watches(&source.Kind{Type: &storagev1alpha1.VolumeClaim{}},
+		Watches(&source.Kind{Type: &computev1alpha1.Machine{}},
 			handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
-				volumeClaim := obj.(*storagev1alpha1.VolumeClaim)
+				machine := obj.(*computev1alpha1.Machine)
 
-				volumes := &storagev1alpha1.VolumeList{}
-				if err := r.List(ctx, volumes, client.InNamespace(volumeClaim.Namespace), client.MatchingFields{
-					VolumeSpecVolumeClaimNameRefField: volumeClaim.Name,
-				}); err != nil {
-					log.Error(err, "Error listing claims using volume")
-					return []ctrl.Request{}
-				}
-
-				res := make([]ctrl.Request, 0, len(volumes.Items))
-				for _, item := range volumes.Items {
+				volumeNames := shared.MachineSpecVolumeNames(machine)
+				res := make([]ctrl.Request, 0, len(volumeNames))
+				for volumeName := range volumeNames {
 					res = append(res, ctrl.Request{
 						NamespacedName: types.NamespacedName{
-							Name:      item.GetName(),
-							Namespace: item.GetNamespace(),
+							Namespace: machine.Namespace,
+							Name:      volumeName,
 						},
 					})
 				}
 				return res
-			}),
-			builder.WithPredicates(predicate.Funcs{
-				UpdateFunc: func(event event.UpdateEvent) bool {
-					oldVolumeClaim, newVolumeClaim := event.ObjectOld.(*storagev1alpha1.VolumeClaim), event.ObjectNew.(*storagev1alpha1.VolumeClaim)
-					return !apiequality.Semantic.DeepEqual(oldVolumeClaim.Spec, newVolumeClaim.Spec) ||
-						oldVolumeClaim.Status.Phase != newVolumeClaim.Status.Phase
-				},
 			}),
 		).
 		Complete(r)

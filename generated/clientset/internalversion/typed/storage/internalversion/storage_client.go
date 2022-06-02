@@ -27,7 +27,6 @@ import (
 type StorageInterface interface {
 	RESTClient() rest.Interface
 	VolumesGetter
-	VolumeClaimsGetter
 	VolumeClassesGetter
 	VolumePoolsGetter
 }
@@ -39,10 +38,6 @@ type StorageClient struct {
 
 func (c *StorageClient) Volumes(namespace string) VolumeInterface {
 	return newVolumes(c, namespace)
-}
-
-func (c *StorageClient) VolumeClaims(namespace string) VolumeClaimInterface {
-	return newVolumeClaims(c, namespace)
 }
 
 func (c *StorageClient) VolumeClasses() VolumeClassInterface {

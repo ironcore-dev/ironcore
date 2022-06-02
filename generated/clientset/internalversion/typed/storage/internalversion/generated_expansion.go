@@ -19,8 +19,6 @@ package internalversion
 
 type VolumeExpansion interface{}
 
-type VolumeClaimExpansion interface{}
-
 type VolumeClassExpansion interface{}
 
 type VolumePoolExpansion interface{}

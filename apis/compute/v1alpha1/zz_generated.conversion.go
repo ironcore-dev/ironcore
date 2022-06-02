@@ -738,7 +738,7 @@ func Convert_compute_Volume_To_v1alpha1_Volume(in *compute.Volume, out *Volume, 
 }
 
 func autoConvert_v1alpha1_VolumeSource_To_compute_VolumeSource(in *VolumeSource, out *compute.VolumeSource, s conversion.Scope) error {
-	out.VolumeClaimRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeClaimRef))
+	out.VolumeRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeRef))
 	out.EmptyDisk = (*compute.EmptyDiskVolumeSource)(unsafe.Pointer(in.EmptyDisk))
 	return nil
 }
@@ -749,7 +749,7 @@ func Convert_v1alpha1_VolumeSource_To_compute_VolumeSource(in *VolumeSource, out
 }
 
 func autoConvert_compute_VolumeSource_To_v1alpha1_VolumeSource(in *compute.VolumeSource, out *VolumeSource, s conversion.Scope) error {
-	out.VolumeClaimRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeClaimRef))
+	out.VolumeRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeRef))
 	out.EmptyDisk = (*EmptyDiskVolumeSource)(unsafe.Pointer(in.EmptyDisk))
 	return nil
 }

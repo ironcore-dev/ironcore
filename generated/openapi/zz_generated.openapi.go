@@ -95,10 +95,6 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.VirtualIPTemplateSpec":        schema_onmetal_api_apis_networking_v1alpha1_VirtualIPTemplateSpec(ref),
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.Volume":                          schema_onmetal_api_apis_storage_v1alpha1_Volume(ref),
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeAccess":                    schema_onmetal_api_apis_storage_v1alpha1_VolumeAccess(ref),
-		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeClaim":                     schema_onmetal_api_apis_storage_v1alpha1_VolumeClaim(ref),
-		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeClaimList":                 schema_onmetal_api_apis_storage_v1alpha1_VolumeClaimList(ref),
-		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeClaimSpec":                 schema_onmetal_api_apis_storage_v1alpha1_VolumeClaimSpec(ref),
-		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeClaimStatus":               schema_onmetal_api_apis_storage_v1alpha1_VolumeClaimStatus(ref),
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeClass":                     schema_onmetal_api_apis_storage_v1alpha1_VolumeClass(ref),
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeClassList":                 schema_onmetal_api_apis_storage_v1alpha1_VolumeClassList(ref),
 		"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeCondition":                 schema_onmetal_api_apis_storage_v1alpha1_VolumeCondition(ref),
@@ -1474,9 +1470,9 @@ func schema_onmetal_api_apis_compute_v1alpha1_Volume(ref common.ReferenceCallbac
 							Format:      "",
 						},
 					},
-					"volumeClaimRef": {
+					"volumeRef": {
 						SchemaProps: spec.SchemaProps{
-							Description: "VolumeClaimRef instructs the Volume to use a VolumeClaimRef as source for the attachment.",
+							Description: "VolumeRef instructs to use the specified Volume as source for the attachment.",
 							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
 						},
 					},
@@ -1502,9 +1498,9 @@ func schema_onmetal_api_apis_compute_v1alpha1_VolumeSource(ref common.ReferenceC
 				Description: "VolumeSource specifies the source to use for a Volume.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"volumeClaimRef": {
+					"volumeRef": {
 						SchemaProps: spec.SchemaProps{
-							Description: "VolumeClaimRef instructs the Volume to use a VolumeClaimRef as source for the attachment.",
+							Description: "VolumeRef instructs to use the specified Volume as source for the attachment.",
 							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
 						},
 					},
@@ -2921,185 +2917,6 @@ func schema_onmetal_api_apis_storage_v1alpha1_VolumeAccess(ref common.ReferenceC
 	}
 }
 
-func schema_onmetal_api_apis_storage_v1alpha1_VolumeClaim(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "VolumeClaim is the Schema for the volumeclaims API",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeClaimSpec"),
-						},
-					},
-					"status": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeClaimStatus"),
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeClaimSpec", "github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeClaimStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
-	}
-}
-
-func schema_onmetal_api_apis_storage_v1alpha1_VolumeClaimList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "VolumeClaimList contains a list of VolumeClaim",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeClaim"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeClaim", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
-	}
-}
-
-func schema_onmetal_api_apis_storage_v1alpha1_VolumeClaimSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "VolumeClaimSpec defines the desired state of VolumeClaim",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"volumeRef": {
-						SchemaProps: spec.SchemaProps{
-							Description: "VolumeRef is the reference to the Volume used by the VolumeClaim",
-							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
-						},
-					},
-					"selector": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Selector is a label query over volumes to consider for binding.",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"),
-						},
-					},
-					"resources": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Resources are the requested Volume resources.",
-							Type:        []string{"object"},
-							AdditionalProperties: &spec.SchemaOrBool{
-								Allows: true,
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
-									},
-								},
-							},
-						},
-					},
-					"image": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Image is an optional image to bootstrap the volume with.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"imagePullSecretRef": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ImagePullSecretRef is an optional secret for pulling the image of a volume.",
-							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
-						},
-					},
-					"volumeClassRef": {
-						SchemaProps: spec.SchemaProps{
-							Description: "VolumeClassRef references the VolumeClass used by the Volume.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
-						},
-					},
-				},
-				Required: []string{"resources", "volumeClassRef"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/api/resource.Quantity", "k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"},
-	}
-}
-
-func schema_onmetal_api_apis_storage_v1alpha1_VolumeClaimStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "VolumeClaimStatus defines the observed state of VolumeClaim",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"phase": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Phase represents the state a VolumeClaim can be in.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-			},
-		},
-	}
-}
-
 func schema_onmetal_api_apis_storage_v1alpha1_VolumeClass(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -3620,7 +3437,7 @@ func schema_onmetal_api_apis_storage_v1alpha1_VolumeSpec(ref common.ReferenceCal
 					},
 					"claimRef": {
 						SchemaProps: spec.SchemaProps{
-							Description: "ClaimRef is the reference to the VolumeClaim used by the Volume.",
+							Description: "ClaimRef is the reference to the claiming entity of the Volume.",
 							Ref:         ref("github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference"),
 						},
 					},
@@ -3650,6 +3467,13 @@ func schema_onmetal_api_apis_storage_v1alpha1_VolumeSpec(ref common.ReferenceCal
 						SchemaProps: spec.SchemaProps{
 							Description: "ImagePullSecretRef is an optional secret for pulling the image of a volume.",
 							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
+						},
+					},
+					"unclaimable": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Unclaimable marks the volume as unclaimable.",
+							Type:        []string{"boolean"},
+							Format:      "",
 						},
 					},
 					"tolerations": {

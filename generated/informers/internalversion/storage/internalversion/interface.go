@@ -25,8 +25,6 @@ import (
 type Interface interface {
 	// Volumes returns a VolumeInformer.
 	Volumes() VolumeInformer
-	// VolumeClaims returns a VolumeClaimInformer.
-	VolumeClaims() VolumeClaimInformer
 	// VolumeClasses returns a VolumeClassInformer.
 	VolumeClasses() VolumeClassInformer
 	// VolumePools returns a VolumePoolInformer.
@@ -47,11 +45,6 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 // Volumes returns a VolumeInformer.
 func (v *version) Volumes() VolumeInformer {
 	return &volumeInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
-}
-
-// VolumeClaims returns a VolumeClaimInformer.
-func (v *version) VolumeClaims() VolumeClaimInformer {
-	return &volumeClaimInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // VolumeClasses returns a VolumeClassInformer.
