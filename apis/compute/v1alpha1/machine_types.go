@@ -94,6 +94,9 @@ type VolumeSource struct {
 	VolumeRef *corev1.LocalObjectReference `json:"volumeRef,omitempty"`
 	// EmptyDisk instructs to use a Volume offered by the machine pool provider.
 	EmptyDisk *EmptyDiskVolumeSource `json:"emptyDisk,omitempty"`
+	// Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object)
+	// Volume to use.
+	Ephemeral *EphemeralVolumeSource `json:"ephemeral,omitempty"`
 }
 
 // EmptyDiskVolumeSource is a volume that's offered by the machine pool provider.
@@ -109,19 +112,43 @@ type EmptyDiskVolumeSource struct {
 type NetworkInterfaceStatus struct {
 	// Name is the name of the NetworkInterface to whom the status belongs to.
 	Name string `json:"name"`
+	// Phase is the NetworkInterface binding phase of the NetworkInterface.
+	Phase NetworkInterfacePhase `json:"phase,omitempty"`
 	// IPs are the ips allocated for the network interface.
 	IPs []commonv1alpha1.IP `json:"ips,omitempty"`
 	// VirtualIP is the virtual ip allocated for the network interface.
 	VirtualIP *commonv1alpha1.IP `json:"virtualIP,omitempty"`
 }
 
+// NetworkInterfacePhase represents the binding phase a NetworkInterface can be in.
+type NetworkInterfacePhase string
+
+const (
+	// NetworkInterfacePhasePending is used for a NetworkInterface that is not yet bound.
+	NetworkInterfacePhasePending NetworkInterfacePhase = "Pending"
+	// NetworkInterfacePhaseBound is used for a NetworkInterface that is bound.
+	NetworkInterfacePhaseBound NetworkInterfacePhase = "Bound"
+)
+
 // VolumeStatus is the status of a Volume.
 type VolumeStatus struct {
 	// Name is the name of a volume attachment.
 	Name string `json:"name"`
+	// Phase represents the binding phase of a Volume.
+	Phase VolumePhase `json:"phase,omitempty"`
 	// DeviceID is the disk device ID on the host.
 	DeviceID string `json:"deviceID,omitempty"`
 }
+
+// VolumePhase represents the binding phase a Volume can be in.
+type VolumePhase string
+
+const (
+	// VolumePhasePending is used for a Volume that is not yet bound.
+	VolumePhasePending VolumePhase = "Pending"
+	// VolumePhaseBound is used for a Volume that is bound.
+	VolumePhaseBound VolumePhase = "Bound"
+)
 
 // MachineStatus defines the observed state of Machine
 type MachineStatus struct {

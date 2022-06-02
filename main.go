@@ -138,9 +138,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Index fields
-	sharedStorageFieldIndexer := storagecontrollers.NewSharedIndexer(mgr)
-
 	// Register controllers
 	if controllers.Enabled(machineClassController) {
 		if err = (&computecontrollers.MachineClassReconciler{
@@ -201,11 +198,10 @@ func main() {
 		}
 
 		if err = (&storagecontrollers.VolumeReconciler{
-			Client:             mgr.GetClient(),
-			APIReader:          mgr.GetAPIReader(),
-			Scheme:             mgr.GetScheme(),
-			SharedFieldIndexer: sharedStorageFieldIndexer,
-			BindTimeout:        volumeBindTimeout,
+			Client:      mgr.GetClient(),
+			APIReader:   mgr.GetAPIReader(),
+			Scheme:      mgr.GetScheme(),
+			BindTimeout: volumeBindTimeout,
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "Volume")
 			os.Exit(1)
@@ -223,15 +219,15 @@ func main() {
 	}
 
 	if controllers.Enabled(machineController) || controllers.Enabled(networkInterfaceBindController) {
-		if err = shared.SetupMachineNetworkInterfaceNamesFieldIndexer(mgr); err != nil {
-			setupLog.Error(err, "unable setup indexer", "indexer", "machine-network-interface-names")
+		if err = shared.SetupMachineSpecNetworkInterfaceNamesFieldIndexer(context.TODO(), mgr.GetFieldIndexer()); err != nil {
+			setupLog.Error(err, "unable to setup field indexer", "field", shared.MachineSpecNetworkInterfaceNamesField)
 			os.Exit(1)
 		}
 	}
 
 	if controllers.Enabled(prefixController) || controllers.Enabled(prefixAllocationScheduler) {
-		if err = ipamcontrollers.SetupPrefixSpecIPFamilyFieldIndexer(mgr); err != nil {
-			setupLog.Error(err, "unable setup indexer", "indexer", "prefix.spec.ipFamily")
+		if err = ipamcontrollers.SetupPrefixSpecIPFamilyFieldIndexer(context.TODO(), mgr.GetFieldIndexer()); err != nil {
+			setupLog.Error(err, "unable to setup field indexer", "field", ipamcontrollers.PrefixSpecIPFamilyField)
 			os.Exit(1)
 		}
 	}
@@ -260,7 +256,7 @@ func main() {
 	}
 
 	if controllers.Enabled(networkInterfaceController) || controllers.Enabled(virtualIPController) {
-		if err = networking.SetupNetworkInterfaceVirtualIPNameFieldIndexer(mgr); err != nil {
+		if err = shared.SetupNetworkInterfaceVirtualIPNameFieldIndexer(context.TODO(), mgr.GetFieldIndexer()); err != nil {
 			setupLog.Error(err, "unable to setup field indexer", "field", "NetworkInterfaceVirtualIPName")
 			os.Exit(1)
 		}

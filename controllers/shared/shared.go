@@ -19,28 +19,34 @@ import (
 	"fmt"
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
+	v1alpha12 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
 	"k8s.io/apimachinery/pkg/util/sets"
-	controllerruntime "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const (
-	MachineNetworkInterfaceNamesField = "machine-network-interface-names"
-	MachineSpecVolumeNamesField       = "machine-volume-names"
+	MachineSpecNetworkInterfaceNamesField = "machine-spec-network-interface-names"
+	MachineSpecVolumeNamesField           = "machine-spec-volume-names"
+
+	NetworkInterfaceVirtualIPNames = "networkinterface-virtual-ip-names"
 )
 
-func MachineEphemeralNetworkInterfaceName(machineName, ifaceName string) string {
-	return fmt.Sprintf("%s-%s", machineName, ifaceName)
+func MachineEphemeralNetworkInterfaceName(machineName, machineNicName string) string {
+	return fmt.Sprintf("%s-%s", machineName, machineNicName)
 }
 
-func MachineNetworkInterfaceNames(machine *computev1alpha1.Machine) []string {
-	var names []string
-	for _, iface := range machine.Spec.NetworkInterfaces {
+func MachineEphemeralVolumeName(machineName, machineVolumeName string) string {
+	return fmt.Sprintf("%s-%s", machineName, machineVolumeName)
+}
+
+func MachineSpecNetworkInterfaceNames(machine *computev1alpha1.Machine) sets.String {
+	names := sets.NewString()
+	for _, machineNic := range machine.Spec.NetworkInterfaces {
 		switch {
-		case iface.NetworkInterfaceRef != nil:
-			names = append(names, iface.NetworkInterfaceRef.Name)
-		case iface.Ephemeral != nil:
-			names = append(names, MachineEphemeralNetworkInterfaceName(machine.Name, iface.Name))
+		case machineNic.NetworkInterfaceRef != nil:
+			names.Insert(machineNic.NetworkInterfaceRef.Name)
+		case machineNic.Ephemeral != nil:
+			names.Insert(MachineEphemeralNetworkInterfaceName(machine.Name, machineNic.Name))
 		}
 	}
 	return names
@@ -48,21 +54,22 @@ func MachineNetworkInterfaceNames(machine *computev1alpha1.Machine) []string {
 
 func MachineSpecVolumeNames(machine *computev1alpha1.Machine) sets.String {
 	names := sets.NewString()
-	for _, volume := range machine.Spec.Volumes {
+	for _, machineVolume := range machine.Spec.Volumes {
 		switch {
-		case volume.VolumeRef != nil:
-			names.Insert(volume.VolumeRef.Name)
+		case machineVolume.VolumeRef != nil:
+			names.Insert(machineVolume.VolumeRef.Name)
+		case machineVolume.Ephemeral != nil:
+			names.Insert(MachineEphemeralVolumeName(machine.Name, machineVolume.Name))
 		}
 	}
 	return names
 }
 
-func SetupMachineNetworkInterfaceNamesFieldIndexer(mgr controllerruntime.Manager) error {
-	ctx := context.Background()
-	return mgr.GetFieldIndexer().IndexField(ctx, &computev1alpha1.Machine{}, MachineNetworkInterfaceNamesField, func(obj client.Object) []string {
+func SetupMachineSpecNetworkInterfaceNamesFieldIndexer(ctx context.Context, indexer client.FieldIndexer) error {
+	return indexer.IndexField(ctx, &computev1alpha1.Machine{}, MachineSpecNetworkInterfaceNamesField, func(obj client.Object) []string {
 		machine := obj.(*computev1alpha1.Machine)
-		if names := MachineNetworkInterfaceNames(machine); len(names) > 0 {
-			return names
+		if names := MachineSpecNetworkInterfaceNames(machine); len(names) > 0 {
+			return names.UnsortedList()
 		}
 		return []string{""}
 	})
@@ -75,5 +82,38 @@ func SetupMachineSpecVolumeNamesFieldIndexer(ctx context.Context, indexer client
 			return names.UnsortedList()
 		}
 		return []string{""}
+	})
+}
+
+func NetworkInterfaceVirtualIPName(nicName string, vipSource v1alpha12.VirtualIPSource) string {
+	switch {
+	case vipSource.VirtualIPRef != nil:
+		return vipSource.VirtualIPRef.Name
+	case vipSource.Ephemeral != nil:
+		return nicName
+	default:
+		return ""
+	}
+}
+
+func NetworkInterfaceEphemeralIPName(nicName string, idx int) string {
+	return fmt.Sprintf("%s-%d", nicName, idx)
+}
+
+func SetupNetworkInterfaceVirtualIPNameFieldIndexer(ctx context.Context, indexer client.FieldIndexer) error {
+	return indexer.IndexField(ctx, &v1alpha12.NetworkInterface{}, NetworkInterfaceVirtualIPNames, func(obj client.Object) []string {
+		nic := obj.(*v1alpha12.NetworkInterface)
+
+		virtualIP := nic.Spec.VirtualIP
+		if virtualIP == nil {
+			return nil
+		}
+
+		virtualIPName := NetworkInterfaceVirtualIPName(nic.Name, *nic.Spec.VirtualIP)
+		if virtualIPName == "" {
+			return nil
+		}
+
+		return []string{virtualIPName}
 	})
 }

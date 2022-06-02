@@ -78,7 +78,7 @@ func (s *PrefixAllocationScheduler) prefixForAllocation(ctx context.Context, log
 	if err := s.List(ctx, list,
 		client.InNamespace(allocation.Namespace),
 		client.MatchingLabelsSelector{Selector: sel},
-		client.MatchingFields{prefixSpecIPFamilyField: string(allocation.Spec.IPFamily)},
+		client.MatchingFields{PrefixSpecIPFamilyField: string(allocation.Spec.IPFamily)},
 	); err != nil {
 		return "", fmt.Errorf("error listing prefixes: %w", err)
 	}
@@ -204,7 +204,7 @@ func (s *PrefixAllocationScheduler) enqueueByMatchingPrefix(ctx context.Context,
 		}
 
 		list := &ipamv1alpha1.PrefixAllocationList{}
-		if err := s.List(ctx, list, client.MatchingFields{prefixSpecIPFamilyField: string(prefix.Spec.IPFamily)}); err != nil {
+		if err := s.List(ctx, list, client.MatchingFields{PrefixSpecIPFamilyField: string(prefix.Spec.IPFamily)}); err != nil {
 			log.Error(err, "Error listing prefix allocations")
 			return nil
 		}

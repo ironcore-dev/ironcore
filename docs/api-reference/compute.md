@@ -491,6 +491,36 @@ github.com/onmetal/onmetal-api/apis/networking/v1alpha1.NetworkInterfaceTemplate
 </tr>
 </tbody>
 </table>
+<h3 id="compute.api.onmetal.de/v1alpha1.EphemeralVolumeSource">EphemeralVolumeSource
+</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.VolumeSource">VolumeSource</a>)
+</p>
+<div>
+<p>EphemeralVolumeSource is a definition for an ephemeral (i.e. coupled to the lifetime of the surrounding object)
+storage.Volume.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>volumeTemplate</code><br/>
+<em>
+github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeTemplateSpec
+</em>
+</td>
+<td>
+<p>VolumeTemplate is the template definition of the storage.Volume.</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="compute.api.onmetal.de/v1alpha1.MachineCondition">MachineCondition
 </h3>
 <p>
@@ -1118,6 +1148,29 @@ NetworkInterfaceSource
 </tr>
 </tbody>
 </table>
+<h3 id="compute.api.onmetal.de/v1alpha1.NetworkInterfacePhase">NetworkInterfacePhase
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.NetworkInterfaceStatus">NetworkInterfaceStatus</a>)
+</p>
+<div>
+<p>NetworkInterfacePhase represents the binding phase a NetworkInterface can be in.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Bound&#34;</p></td>
+<td><p>NetworkInterfacePhaseBound is used for a NetworkInterface that is bound.</p>
+</td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>NetworkInterfacePhasePending is used for a NetworkInterface that is not yet bound.</p>
+</td>
+</tr></tbody>
+</table>
 <h3 id="compute.api.onmetal.de/v1alpha1.NetworkInterfaceSource">NetworkInterfaceSource
 </h3>
 <p>
@@ -1187,6 +1240,19 @@ string
 </td>
 <td>
 <p>Name is the name of the NetworkInterface to whom the status belongs to.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>phase</code><br/>
+<em>
+<a href="#compute.api.onmetal.de/v1alpha1.NetworkInterfacePhase">
+NetworkInterfacePhase
+</a>
+</em>
+</td>
+<td>
+<p>Phase is the NetworkInterface binding phase of the NetworkInterface.</p>
 </td>
 </tr>
 <tr>
@@ -1262,6 +1328,29 @@ VolumeSource
 </tr>
 </tbody>
 </table>
+<h3 id="compute.api.onmetal.de/v1alpha1.VolumePhase">VolumePhase
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.VolumeStatus">VolumeStatus</a>)
+</p>
+<div>
+<p>VolumePhase represents the binding phase a Volume can be in.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Bound&#34;</p></td>
+<td><p>VolumePhaseBound is used for a Volume that is bound.</p>
+</td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>VolumePhasePending is used for a Volume that is not yet bound.</p>
+</td>
+</tr></tbody>
+</table>
 <h3 id="compute.api.onmetal.de/v1alpha1.VolumeSource">VolumeSource
 </h3>
 <p>
@@ -1304,6 +1393,20 @@ EmptyDiskVolumeSource
 <p>EmptyDisk instructs to use a Volume offered by the machine pool provider.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>ephemeral</code><br/>
+<em>
+<a href="#compute.api.onmetal.de/v1alpha1.EphemeralVolumeSource">
+EphemeralVolumeSource
+</a>
+</em>
+</td>
+<td>
+<p>Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object)
+Volume to use.</p>
+</td>
+</tr>
 </tbody>
 </table>
 <h3 id="compute.api.onmetal.de/v1alpha1.VolumeStatus">VolumeStatus
@@ -1331,6 +1434,19 @@ string
 </td>
 <td>
 <p>Name is the name of a volume attachment.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>phase</code><br/>
+<em>
+<a href="#compute.api.onmetal.de/v1alpha1.VolumePhase">
+VolumePhase
+</a>
+</em>
+</td>
+<td>
+<p>Phase represents the binding phase of a Volume.</p>
 </td>
 </tr>
 <tr>

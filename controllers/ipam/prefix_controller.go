@@ -674,7 +674,7 @@ func (r *PrefixReconciler) enqueueByPrefixParentSelector(ctx context.Context, lo
 		list := &ipamv1alpha1.PrefixList{}
 		if err := r.List(ctx, list,
 			client.InNamespace(prefix.Namespace),
-			client.MatchingFields{prefixSpecIPFamilyField: string(prefix.Spec.IPFamily)},
+			client.MatchingFields{PrefixSpecIPFamilyField: string(prefix.Spec.IPFamily)},
 		); err != nil {
 			log.V(1).Error(err, "Error listing prefixes", "Namespace", prefix.Namespace, "IPFamily", prefix.Spec.IPFamily)
 			return nil

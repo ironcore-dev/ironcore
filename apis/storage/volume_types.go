@@ -146,3 +146,9 @@ type VolumeList struct {
 	metav1.ListMeta
 	Items []Volume
 }
+
+// VolumeTemplateSpec is the specification of a Volume template.
+type VolumeTemplateSpec struct {
+	metav1.ObjectMeta
+	Spec VolumeSpec
+}

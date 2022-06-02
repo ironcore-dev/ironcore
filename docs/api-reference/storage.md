@@ -119,7 +119,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
 </em>
 </td>
 <td>
-<p>ClaimRef is the reference to the VolumeClaim used by the Volume.</p>
+<p>ClaimRef is the reference to the claiming entity of the Volume.</p>
 </td>
 </tr>
 <tr>
@@ -783,7 +783,7 @@ Kubernetes core/v1.ResourceList
 <h3 id="storage.api.onmetal.de/v1alpha1.VolumeSpec">VolumeSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.Volume">Volume</a>)
+(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.Volume">Volume</a>, <a href="#storage.api.onmetal.de/v1alpha1.VolumeTemplateSpec">VolumeTemplateSpec</a>)
 </p>
 <div>
 <p>VolumeSpec defines the desired state of Volume</p>
@@ -842,7 +842,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
 </em>
 </td>
 <td>
-<p>ClaimRef is the reference to the VolumeClaim used by the Volume.</p>
+<p>ClaimRef is the reference to the claiming entity of the Volume.</p>
 </td>
 </tr>
 <tr>
@@ -1028,6 +1028,162 @@ This is set by the volume provider when the volume is provisioned.</p>
 </td>
 <td>
 <p>Conditions are the conditions of a volume.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="storage.api.onmetal.de/v1alpha1.VolumeTemplateSpec">VolumeTemplateSpec
+</h3>
+<div>
+<p>VolumeTemplateSpec is the specification of a Volume template.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#storage.api.onmetal.de/v1alpha1.VolumeSpec">
+VolumeSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>volumeClassRef</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>VolumeClassRef is the VolumeClass of a volume</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>volumePoolSelector</code><br/>
+<em>
+map[string]string
+</em>
+</td>
+<td>
+<p>VolumePoolSelector selects a suitable VolumePoolRef by the given labels.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>volumePoolRef</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>VolumePoolRef indicates which VolumePool to use for a volume.
+If unset, the scheduler will figure out a suitable VolumePoolRef.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>claimRef</code><br/>
+<em>
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
+</em>
+</td>
+<td>
+<p>ClaimRef is the reference to the claiming entity of the Volume.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>resources</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#resourcelist-v1-core">
+Kubernetes core/v1.ResourceList
+</a>
+</em>
+</td>
+<td>
+<p>Resources is a description of the volume&rsquo;s resources and capacity.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>image</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Image is an optional image to bootstrap the volume with.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>imagePullSecretRef</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>ImagePullSecretRef is an optional secret for pulling the image of a volume.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>unclaimable</code><br/>
+<em>
+bool
+</em>
+</td>
+<td>
+<p>Unclaimable marks the volume as unclaimable.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>tolerations</code><br/>
+<em>
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Toleration">
+[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.Toleration
+</a>
+</em>
+</td>
+<td>
+<p>Tolerations define tolerations the Volume has. Only any VolumePool whose taints
+covered by Tolerations will be considered to host the Volume.</p>
+</td>
+</tr>
+</table>
 </td>
 </tr>
 </tbody>

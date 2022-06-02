@@ -65,6 +65,15 @@ var _ = Describe("Volume", func() {
 			},
 			ContainElement(InvalidField("spec.claimRef.name")),
 		),
+		Entry("unclaimable and claim ref",
+			&storage.Volume{
+				Spec: storage.VolumeSpec{
+					Unclaimable: true,
+					ClaimRef:    &commonv1alpha1.LocalUIDReference{Name: "foo"},
+				},
+			},
+			ContainElement(ForbiddenField("spec.claimRef")),
+		),
 		Entry("invalid image pull secret ref name",
 			&storage.Volume{
 				Spec: storage.VolumeSpec{

@@ -50,9 +50,15 @@ func validateVolumeSpec(spec *storage.VolumeSpec, fldPath *field.Path) field.Err
 		}
 	}
 
-	if spec.ClaimRef != nil {
-		for _, msg := range apivalidation.NameIsDNSLabel(spec.ClaimRef.Name, false) {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("claimRef").Child("name"), spec.ClaimRef.Name, msg))
+	if spec.Unclaimable {
+		if spec.ClaimRef != nil {
+			allErrs = append(allErrs, field.Forbidden(fldPath.Child("claimRef"), "cannot specify unclaimable and claimRef"))
+		}
+	} else {
+		if spec.ClaimRef != nil {
+			for _, msg := range apivalidation.NameIsDNSLabel(spec.ClaimRef.Name, false) {
+				allErrs = append(allErrs, field.Invalid(fldPath.Child("claimRef").Child("name"), spec.ClaimRef.Name, msg))
+			}
 		}
 	}
 

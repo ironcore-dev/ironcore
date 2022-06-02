@@ -23,7 +23,6 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	"github.com/onmetal/controller-utils/clientutils"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
@@ -47,8 +46,7 @@ type VolumeReconciler struct {
 	APIReader client.Reader
 	Scheme    *runtime.Scheme
 	// BindTimeout is the maximum duration until a Volume's Bound condition is considered to be timed out.
-	BindTimeout        time.Duration
-	SharedFieldIndexer *clientutils.SharedFieldIndexer
+	BindTimeout time.Duration
 }
 
 //+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes,verbs=get;list;watch;create;update;patch;delete
@@ -267,11 +265,6 @@ func (r *VolumeReconciler) patchStatus(ctx context.Context, volume *storagev1alp
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *VolumeReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	ctx := context.Background()
-	if err := r.SharedFieldIndexer.IndexField(ctx, &storagev1alpha1.Volume{}, VolumeSpecClaimRefNameField); err != nil {
-		return err
-	}
-
 	return ctrl.NewControllerManagedBy(mgr).
 		For(
 			&storagev1alpha1.Volume{},

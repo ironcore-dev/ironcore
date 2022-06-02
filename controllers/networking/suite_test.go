@@ -118,8 +118,8 @@ var _ = BeforeSuite(func() {
 	})
 	Expect(err).ToNot(HaveOccurred())
 
-	Expect(SetupNetworkInterfaceVirtualIPNameFieldIndexer(k8sManager)).To(Succeed())
-	Expect(shared.SetupMachineNetworkInterfaceNamesFieldIndexer(k8sManager)).To(Succeed())
+	Expect(shared.SetupNetworkInterfaceVirtualIPNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+	Expect(shared.SetupMachineSpecNetworkInterfaceNamesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 
 	// Register reconcilers
 	err = (&NetworkInterfaceReconciler{
