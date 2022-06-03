@@ -212,6 +212,7 @@ func main() {
 	if controllers.Enabled(volumeScheduler) {
 		if err = (&storagecontrollers.VolumeScheduler{
 			Client: mgr.GetClient(),
+			Events: mgr.GetEventRecorderFor("volume-scheduler"),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "VolumeScheduler")
 		}
