@@ -1,4 +1,5 @@
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/apis/compute/v1alpha1,MachinePoolSpec,Taints
+API rule violation: list_type_missing,github.com/onmetal/onmetal-api/apis/compute/v1alpha1,MachinePoolStatus,Addresses
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/apis/compute/v1alpha1,MachinePoolStatus,AvailableMachineClasses
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/apis/compute/v1alpha1,MachinePoolStatus,Conditions
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/apis/compute/v1alpha1,MachineSpec,EFIVars

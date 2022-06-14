@@ -16,11 +16,16 @@ package storage
 
 import (
 	"context"
+	"fmt"
+	"net/http"
+	"net/url"
 
 	"github.com/onmetal/onmetal-api/apis/compute"
+	"github.com/onmetal/onmetal-api/machinepoollet/client"
 	"github.com/onmetal/onmetal-api/registry/compute/machine"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/proxy"
 	"k8s.io/apiserver/pkg/registry/generic"
 	genericregistry "k8s.io/apiserver/pkg/registry/generic/registry"
 	"k8s.io/apiserver/pkg/registry/rest"
@@ -30,13 +35,14 @@ import (
 type MachineStorage struct {
 	Machine *REST
 	Status  *StatusREST
+	Exec    *ExecREST
 }
 
 type REST struct {
 	*genericregistry.Store
 }
 
-func NewStorage(optsGetter generic.RESTOptionsGetter) (MachineStorage, error) {
+func NewStorage(optsGetter generic.RESTOptionsGetter, k client.ConnectionInfoGetter) (MachineStorage, error) {
 	store := &genericregistry.Store{
 		NewFunc: func() runtime.Object {
 			return &compute.Machine{}
@@ -66,6 +72,7 @@ func NewStorage(optsGetter generic.RESTOptionsGetter) (MachineStorage, error) {
 	return MachineStorage{
 		Machine: &REST{store},
 		Status:  &StatusREST{&statusStore},
+		Exec:    &ExecREST{store, k},
 	}, nil
 }
 
@@ -87,4 +94,43 @@ func (r *StatusREST) Update(ctx context.Context, name string, objInfo rest.Updat
 
 func (r *StatusREST) GetResetFields() map[fieldpath.APIVersion]*fieldpath.Set {
 	return r.store.GetResetFields()
+}
+
+// Support both GET and POST methods. We must support GET for browsers that want to use WebSockets.
+var upgradeableMethods = []string{"GET", "POST"}
+
+type ExecREST struct {
+	Store       *genericregistry.Store
+	MachineConn client.ConnectionInfoGetter
+}
+
+func (r *ExecREST) New() runtime.Object {
+	return &compute.MachineExecOptions{}
+}
+
+func (r *ExecREST) Connect(ctx context.Context, name string, opts runtime.Object, responder rest.Responder) (http.Handler, error) {
+	execOpts, ok := opts.(*compute.MachineExecOptions)
+	if !ok {
+		return nil, fmt.Errorf("invalid options objects: %#v", opts)
+	}
+
+	location, transport, err := machine.ExecLocation(ctx, r.Store, r.MachineConn, name, execOpts)
+	if err != nil {
+		return nil, err
+	}
+
+	return newThrottledUpgradeAwareProxyHandler(location, transport, false, false, responder), nil
+}
+
+func newThrottledUpgradeAwareProxyHandler(location *url.URL, transport http.RoundTripper, wrapTransport, upgradeRequired bool, responder rest.Responder) *proxy.UpgradeAwareHandler {
+	handler := proxy.NewUpgradeAwareHandler(location, transport, wrapTransport, upgradeRequired, proxy.NewErrorResponder(responder))
+	return handler
+}
+
+func (r *ExecREST) NewConnectOptions() (runtime.Object, bool, string) {
+	return &compute.MachineExecOptions{}, false, ""
+}
+
+func (r *ExecREST) ConnectMethods() []string {
+	return upgradeableMethods
 }

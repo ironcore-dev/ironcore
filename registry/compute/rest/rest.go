@@ -18,10 +18,10 @@ import (
 	"github.com/onmetal/onmetal-api/api"
 	"github.com/onmetal/onmetal-api/apis/compute"
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
+	"github.com/onmetal/onmetal-api/machinepoollet/client"
 	machinestorage "github.com/onmetal/onmetal-api/registry/compute/machine/storage"
 	machinepoolstorage "github.com/onmetal/onmetal-api/registry/compute/machinepool/storage"
 	onmetalapiserializer "github.com/onmetal/onmetal-api/serializer"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apiserver/pkg/registry/generic"
 	"k8s.io/apiserver/pkg/registry/rest"
 	genericapiserver "k8s.io/apiserver/pkg/server"
@@ -31,14 +31,16 @@ import (
 	serverstorage "k8s.io/apiserver/pkg/server/storage"
 )
 
-type StorageProvider struct{}
+type StorageProvider struct {
+	MachinePoolletClientConfig client.MachinePoolletClientConfig
+}
 
 func (p StorageProvider) GroupName() string {
 	return compute.SchemeGroupVersion.Group
 }
 
 func (p StorageProvider) NewRESTStorage(apiResourceConfigSource serverstorage.APIResourceConfigSource, restOptionsGetter generic.RESTOptionsGetter) (genericapiserver.APIGroupInfo, bool, error) {
-	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(p.GroupName(), api.Scheme, metav1.ParameterCodec, api.Codecs)
+	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(p.GroupName(), api.Scheme, api.ParameterCodec, api.Codecs)
 	apiGroupInfo.NegotiatedSerializer = onmetalapiserializer.DefaultSubsetNegotiatedSerializer(api.Codecs)
 
 	storageMap, err := p.v1alpha1Storage(restOptionsGetter)
@@ -61,7 +63,7 @@ func (p StorageProvider) v1alpha1Storage(restOptionsGetter generic.RESTOptionsGe
 
 	storageMap["machineclasses"] = machineClassStorage.MachineClass
 
-	machinePoolStorage, err := machinepoolstorage.NewStorage(restOptionsGetter)
+	machinePoolStorage, err := machinepoolstorage.NewStorage(restOptionsGetter, p.MachinePoolletClientConfig)
 	if err != nil {
 		return storageMap, err
 	}
@@ -69,13 +71,14 @@ func (p StorageProvider) v1alpha1Storage(restOptionsGetter generic.RESTOptionsGe
 	storageMap["machinepools"] = machinePoolStorage.MachinePool
 	storageMap["machinepools/status"] = machinePoolStorage.Status
 
-	machineStorage, err := machinestorage.NewStorage(restOptionsGetter)
+	machineStorage, err := machinestorage.NewStorage(restOptionsGetter, machinePoolStorage.MachinePoolletConnectionInfo)
 	if err != nil {
 		return storageMap, err
 	}
 
 	storageMap["machines"] = machineStorage.Machine
 	storageMap["machines/status"] = machineStorage.Status
+	storageMap["machines/exec"] = machineStorage.Exec
 
 	return storageMap, nil
 }

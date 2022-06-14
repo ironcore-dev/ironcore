@@ -21,6 +21,7 @@
 package v1alpha1
 
 import (
+	url "net/url"
 	unsafe "unsafe"
 
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
@@ -42,6 +43,16 @@ func init() {
 // RegisterConversions adds conversion functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterConversions(s *runtime.Scheme) error {
+	if err := s.AddGeneratedConversionFunc((*DaemonEndpoint)(nil), (*compute.DaemonEndpoint)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_DaemonEndpoint_To_compute_DaemonEndpoint(a.(*DaemonEndpoint), b.(*compute.DaemonEndpoint), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*compute.DaemonEndpoint)(nil), (*DaemonEndpoint)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_DaemonEndpoint_To_v1alpha1_DaemonEndpoint(a.(*compute.DaemonEndpoint), b.(*DaemonEndpoint), scope)
+	}); err != nil {
+		return err
+	}
 	if err := s.AddGeneratedConversionFunc((*EFIVar)(nil), (*compute.EFIVar)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1alpha1_EFIVar_To_compute_EFIVar(a.(*EFIVar), b.(*compute.EFIVar), scope)
 	}); err != nil {
@@ -122,6 +133,16 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
+	if err := s.AddGeneratedConversionFunc((*MachineExecOptions)(nil), (*compute.MachineExecOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_MachineExecOptions_To_compute_MachineExecOptions(a.(*MachineExecOptions), b.(*compute.MachineExecOptions), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*compute.MachineExecOptions)(nil), (*MachineExecOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_MachineExecOptions_To_v1alpha1_MachineExecOptions(a.(*compute.MachineExecOptions), b.(*MachineExecOptions), scope)
+	}); err != nil {
+		return err
+	}
 	if err := s.AddGeneratedConversionFunc((*MachineList)(nil), (*compute.MachineList)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1alpha1_MachineList_To_compute_MachineList(a.(*MachineList), b.(*compute.MachineList), scope)
 	}); err != nil {
@@ -142,6 +163,16 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
+	if err := s.AddGeneratedConversionFunc((*MachinePoolAddress)(nil), (*compute.MachinePoolAddress)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_MachinePoolAddress_To_compute_MachinePoolAddress(a.(*MachinePoolAddress), b.(*compute.MachinePoolAddress), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*compute.MachinePoolAddress)(nil), (*MachinePoolAddress)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_MachinePoolAddress_To_v1alpha1_MachinePoolAddress(a.(*compute.MachinePoolAddress), b.(*MachinePoolAddress), scope)
+	}); err != nil {
+		return err
+	}
 	if err := s.AddGeneratedConversionFunc((*MachinePoolCondition)(nil), (*compute.MachinePoolCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1alpha1_MachinePoolCondition_To_compute_MachinePoolCondition(a.(*MachinePoolCondition), b.(*compute.MachinePoolCondition), scope)
 	}); err != nil {
@@ -149,6 +180,16 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}
 	if err := s.AddGeneratedConversionFunc((*compute.MachinePoolCondition)(nil), (*MachinePoolCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_compute_MachinePoolCondition_To_v1alpha1_MachinePoolCondition(a.(*compute.MachinePoolCondition), b.(*MachinePoolCondition), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*MachinePoolDaemonEndpoints)(nil), (*compute.MachinePoolDaemonEndpoints)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_MachinePoolDaemonEndpoints_To_compute_MachinePoolDaemonEndpoints(a.(*MachinePoolDaemonEndpoints), b.(*compute.MachinePoolDaemonEndpoints), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*compute.MachinePoolDaemonEndpoints)(nil), (*MachinePoolDaemonEndpoints)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_MachinePoolDaemonEndpoints_To_v1alpha1_MachinePoolDaemonEndpoints(a.(*compute.MachinePoolDaemonEndpoints), b.(*MachinePoolDaemonEndpoints), scope)
 	}); err != nil {
 		return err
 	}
@@ -262,7 +303,32 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
+	if err := s.AddGeneratedConversionFunc((*url.Values)(nil), (*MachineExecOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_url_Values_To_v1alpha1_MachineExecOptions(a.(*url.Values), b.(*MachineExecOptions), scope)
+	}); err != nil {
+		return err
+	}
 	return nil
+}
+
+func autoConvert_v1alpha1_DaemonEndpoint_To_compute_DaemonEndpoint(in *DaemonEndpoint, out *compute.DaemonEndpoint, s conversion.Scope) error {
+	out.Port = in.Port
+	return nil
+}
+
+// Convert_v1alpha1_DaemonEndpoint_To_compute_DaemonEndpoint is an autogenerated conversion function.
+func Convert_v1alpha1_DaemonEndpoint_To_compute_DaemonEndpoint(in *DaemonEndpoint, out *compute.DaemonEndpoint, s conversion.Scope) error {
+	return autoConvert_v1alpha1_DaemonEndpoint_To_compute_DaemonEndpoint(in, out, s)
+}
+
+func autoConvert_compute_DaemonEndpoint_To_v1alpha1_DaemonEndpoint(in *compute.DaemonEndpoint, out *DaemonEndpoint, s conversion.Scope) error {
+	out.Port = in.Port
+	return nil
+}
+
+// Convert_compute_DaemonEndpoint_To_v1alpha1_DaemonEndpoint is an autogenerated conversion function.
+func Convert_compute_DaemonEndpoint_To_v1alpha1_DaemonEndpoint(in *compute.DaemonEndpoint, out *DaemonEndpoint, s conversion.Scope) error {
+	return autoConvert_compute_DaemonEndpoint_To_v1alpha1_DaemonEndpoint(in, out, s)
 }
 
 func autoConvert_v1alpha1_EFIVar_To_compute_EFIVar(in *EFIVar, out *compute.EFIVar, s conversion.Scope) error {
@@ -455,6 +521,44 @@ func Convert_compute_MachineCondition_To_v1alpha1_MachineCondition(in *compute.M
 	return autoConvert_compute_MachineCondition_To_v1alpha1_MachineCondition(in, out, s)
 }
 
+func autoConvert_v1alpha1_MachineExecOptions_To_compute_MachineExecOptions(in *MachineExecOptions, out *compute.MachineExecOptions, s conversion.Scope) error {
+	out.InsecureSkipTLSVerifyBackend = in.InsecureSkipTLSVerifyBackend
+	return nil
+}
+
+// Convert_v1alpha1_MachineExecOptions_To_compute_MachineExecOptions is an autogenerated conversion function.
+func Convert_v1alpha1_MachineExecOptions_To_compute_MachineExecOptions(in *MachineExecOptions, out *compute.MachineExecOptions, s conversion.Scope) error {
+	return autoConvert_v1alpha1_MachineExecOptions_To_compute_MachineExecOptions(in, out, s)
+}
+
+func autoConvert_compute_MachineExecOptions_To_v1alpha1_MachineExecOptions(in *compute.MachineExecOptions, out *MachineExecOptions, s conversion.Scope) error {
+	out.InsecureSkipTLSVerifyBackend = in.InsecureSkipTLSVerifyBackend
+	return nil
+}
+
+// Convert_compute_MachineExecOptions_To_v1alpha1_MachineExecOptions is an autogenerated conversion function.
+func Convert_compute_MachineExecOptions_To_v1alpha1_MachineExecOptions(in *compute.MachineExecOptions, out *MachineExecOptions, s conversion.Scope) error {
+	return autoConvert_compute_MachineExecOptions_To_v1alpha1_MachineExecOptions(in, out, s)
+}
+
+func autoConvert_url_Values_To_v1alpha1_MachineExecOptions(in *url.Values, out *MachineExecOptions, s conversion.Scope) error {
+	// WARNING: Field TypeMeta does not have json tag, skipping.
+
+	if values, ok := map[string][]string(*in)["insecureSkipTLSVerifyBackend"]; ok && len(values) > 0 {
+		if err := runtime.Convert_Slice_string_To_bool(&values, &out.InsecureSkipTLSVerifyBackend, s); err != nil {
+			return err
+		}
+	} else {
+		out.InsecureSkipTLSVerifyBackend = false
+	}
+	return nil
+}
+
+// Convert_url_Values_To_v1alpha1_MachineExecOptions is an autogenerated conversion function.
+func Convert_url_Values_To_v1alpha1_MachineExecOptions(in *url.Values, out *MachineExecOptions, s conversion.Scope) error {
+	return autoConvert_url_Values_To_v1alpha1_MachineExecOptions(in, out, s)
+}
+
 func autoConvert_v1alpha1_MachineList_To_compute_MachineList(in *MachineList, out *compute.MachineList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	out.Items = *(*[]compute.Machine)(unsafe.Pointer(&in.Items))
@@ -509,6 +613,28 @@ func Convert_compute_MachinePool_To_v1alpha1_MachinePool(in *compute.MachinePool
 	return autoConvert_compute_MachinePool_To_v1alpha1_MachinePool(in, out, s)
 }
 
+func autoConvert_v1alpha1_MachinePoolAddress_To_compute_MachinePoolAddress(in *MachinePoolAddress, out *compute.MachinePoolAddress, s conversion.Scope) error {
+	out.Type = compute.MachinePoolAddressType(in.Type)
+	out.Address = in.Address
+	return nil
+}
+
+// Convert_v1alpha1_MachinePoolAddress_To_compute_MachinePoolAddress is an autogenerated conversion function.
+func Convert_v1alpha1_MachinePoolAddress_To_compute_MachinePoolAddress(in *MachinePoolAddress, out *compute.MachinePoolAddress, s conversion.Scope) error {
+	return autoConvert_v1alpha1_MachinePoolAddress_To_compute_MachinePoolAddress(in, out, s)
+}
+
+func autoConvert_compute_MachinePoolAddress_To_v1alpha1_MachinePoolAddress(in *compute.MachinePoolAddress, out *MachinePoolAddress, s conversion.Scope) error {
+	out.Type = MachinePoolAddressType(in.Type)
+	out.Address = in.Address
+	return nil
+}
+
+// Convert_compute_MachinePoolAddress_To_v1alpha1_MachinePoolAddress is an autogenerated conversion function.
+func Convert_compute_MachinePoolAddress_To_v1alpha1_MachinePoolAddress(in *compute.MachinePoolAddress, out *MachinePoolAddress, s conversion.Scope) error {
+	return autoConvert_compute_MachinePoolAddress_To_v1alpha1_MachinePoolAddress(in, out, s)
+}
+
 func autoConvert_v1alpha1_MachinePoolCondition_To_compute_MachinePoolCondition(in *MachinePoolCondition, out *compute.MachinePoolCondition, s conversion.Scope) error {
 	out.Type = compute.MachinePoolConditionType(in.Type)
 	out.Status = v1.ConditionStatus(in.Status)
@@ -537,6 +663,30 @@ func autoConvert_compute_MachinePoolCondition_To_v1alpha1_MachinePoolCondition(i
 // Convert_compute_MachinePoolCondition_To_v1alpha1_MachinePoolCondition is an autogenerated conversion function.
 func Convert_compute_MachinePoolCondition_To_v1alpha1_MachinePoolCondition(in *compute.MachinePoolCondition, out *MachinePoolCondition, s conversion.Scope) error {
 	return autoConvert_compute_MachinePoolCondition_To_v1alpha1_MachinePoolCondition(in, out, s)
+}
+
+func autoConvert_v1alpha1_MachinePoolDaemonEndpoints_To_compute_MachinePoolDaemonEndpoints(in *MachinePoolDaemonEndpoints, out *compute.MachinePoolDaemonEndpoints, s conversion.Scope) error {
+	if err := Convert_v1alpha1_DaemonEndpoint_To_compute_DaemonEndpoint(&in.MachinepoolletEndpoint, &out.MachinepoolletEndpoint, s); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Convert_v1alpha1_MachinePoolDaemonEndpoints_To_compute_MachinePoolDaemonEndpoints is an autogenerated conversion function.
+func Convert_v1alpha1_MachinePoolDaemonEndpoints_To_compute_MachinePoolDaemonEndpoints(in *MachinePoolDaemonEndpoints, out *compute.MachinePoolDaemonEndpoints, s conversion.Scope) error {
+	return autoConvert_v1alpha1_MachinePoolDaemonEndpoints_To_compute_MachinePoolDaemonEndpoints(in, out, s)
+}
+
+func autoConvert_compute_MachinePoolDaemonEndpoints_To_v1alpha1_MachinePoolDaemonEndpoints(in *compute.MachinePoolDaemonEndpoints, out *MachinePoolDaemonEndpoints, s conversion.Scope) error {
+	if err := Convert_compute_DaemonEndpoint_To_v1alpha1_DaemonEndpoint(&in.MachinepoolletEndpoint, &out.MachinepoolletEndpoint, s); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Convert_compute_MachinePoolDaemonEndpoints_To_v1alpha1_MachinePoolDaemonEndpoints is an autogenerated conversion function.
+func Convert_compute_MachinePoolDaemonEndpoints_To_v1alpha1_MachinePoolDaemonEndpoints(in *compute.MachinePoolDaemonEndpoints, out *MachinePoolDaemonEndpoints, s conversion.Scope) error {
+	return autoConvert_compute_MachinePoolDaemonEndpoints_To_v1alpha1_MachinePoolDaemonEndpoints(in, out, s)
 }
 
 func autoConvert_v1alpha1_MachinePoolList_To_compute_MachinePoolList(in *MachinePoolList, out *compute.MachinePoolList, s conversion.Scope) error {
@@ -587,6 +737,10 @@ func autoConvert_v1alpha1_MachinePoolStatus_To_compute_MachinePoolStatus(in *Mac
 	out.State = compute.MachinePoolState(in.State)
 	out.Conditions = *(*[]compute.MachinePoolCondition)(unsafe.Pointer(&in.Conditions))
 	out.AvailableMachineClasses = *(*[]v1.LocalObjectReference)(unsafe.Pointer(&in.AvailableMachineClasses))
+	out.Addresses = *(*[]compute.MachinePoolAddress)(unsafe.Pointer(&in.Addresses))
+	if err := Convert_v1alpha1_MachinePoolDaemonEndpoints_To_compute_MachinePoolDaemonEndpoints(&in.DaemonEndpoints, &out.DaemonEndpoints, s); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -599,6 +753,10 @@ func autoConvert_compute_MachinePoolStatus_To_v1alpha1_MachinePoolStatus(in *com
 	out.State = MachinePoolState(in.State)
 	out.Conditions = *(*[]MachinePoolCondition)(unsafe.Pointer(&in.Conditions))
 	out.AvailableMachineClasses = *(*[]v1.LocalObjectReference)(unsafe.Pointer(&in.AvailableMachineClasses))
+	out.Addresses = *(*[]MachinePoolAddress)(unsafe.Pointer(&in.Addresses))
+	if err := Convert_compute_MachinePoolDaemonEndpoints_To_v1alpha1_MachinePoolDaemonEndpoints(&in.DaemonEndpoints, &out.DaemonEndpoints, s); err != nil {
+		return err
+	}
 	return nil
 }
 

@@ -223,3 +223,12 @@ type MachineList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []Machine `json:"items"`
 }
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// +k8s:conversion-gen:explicit-from=net/url.Values
+
+// MachineExecOptions is the query options to a Machine's remote exec call
+type MachineExecOptions struct {
+	metav1.TypeMeta              `json:",inline"`
+	InsecureSkipTLSVerifyBackend bool `json:"insecureSkipTLSVerifyBackend,omitempty"`
+}

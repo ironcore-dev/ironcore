@@ -18,8 +18,10 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"time"
 
 	"github.com/onmetal/onmetal-api/api"
+	"github.com/onmetal/onmetal-api/apis/compute"
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/apis/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
@@ -28,7 +30,9 @@ import (
 	clientset "github.com/onmetal/onmetal-api/generated/clientset/versioned"
 	informers "github.com/onmetal/onmetal-api/generated/informers/externalversions"
 	onmetalopenapi "github.com/onmetal/onmetal-api/generated/openapi"
+	"github.com/onmetal/onmetal-api/machinepoollet/client"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
@@ -56,9 +60,30 @@ func NewResourceConfig() *serverstorage.ResourceConfig {
 }
 
 type OnmetalAPIServerOptions struct {
-	RecommendedOptions *genericoptions.RecommendedOptions
+	RecommendedOptions   *genericoptions.RecommendedOptions
+	MachinePoolletConfig client.MachinePoolletClientConfig
 
 	SharedInformerFactory informers.SharedInformerFactory
+}
+
+func (o *OnmetalAPIServerOptions) AddFlags(fs *pflag.FlagSet) {
+	o.RecommendedOptions.AddFlags(fs)
+
+	// machinepoollet related flags:
+	fs.StringSliceVar(&o.MachinePoolletConfig.PreferredAddressTypes, "machinepoollet-preferred-address-types", o.MachinePoolletConfig.PreferredAddressTypes,
+		"List of the preferred MachinePoolAddressTypes to use for machinepoollet connections.")
+
+	fs.DurationVar(&o.MachinePoolletConfig.HTTPTimeout, "machinepoollet-timeout", o.MachinePoolletConfig.HTTPTimeout,
+		"Timeout for machinepoollet operations.")
+
+	fs.StringVar(&o.MachinePoolletConfig.CertFile, "machinepoollet-client-certificate", o.MachinePoolletConfig.CertFile,
+		"Path to a client cert file for TLS.")
+
+	fs.StringVar(&o.MachinePoolletConfig.KeyFile, "machinepoollet-client-key", o.MachinePoolletConfig.KeyFile,
+		"Path to a client key file for TLS.")
+
+	fs.StringVar(&o.MachinePoolletConfig.CAFile, "machinepoollet-certificate-authority", o.MachinePoolletConfig.CAFile,
+		"Path to a cert file for the certificate authority.")
 }
 
 func NewOnmetalAPIServerOptions() *OnmetalAPIServerOptions {
@@ -72,6 +97,15 @@ func NewOnmetalAPIServerOptions() *OnmetalAPIServerOptions {
 				ipamv1alpha1.SchemeGroupVersion,
 			),
 		),
+		MachinePoolletConfig: client.MachinePoolletClientConfig{
+			Port:         12319,
+			ReadOnlyPort: 12320,
+			PreferredAddressTypes: []string{
+				string(compute.MachinePoolExternalDNS),
+				string(compute.MachinePoolExternalIP),
+			},
+			HTTPTimeout: time.Duration(5) * time.Second,
+		},
 	}
 	o.RecommendedOptions.Etcd.StorageConfig.EncodeVersioner = runtime.NewMultiGroupVersioner(
 		computev1alpha1.SchemeGroupVersion,
@@ -102,7 +136,7 @@ func NewCommandStartOnmetalAPIServer(ctx context.Context, defaults *OnmetalAPISe
 		},
 	}
 
-	o.RecommendedOptions.AddFlags(cmd.Flags())
+	o.AddFlags(cmd.Flags())
 	utilfeature.DefaultMutableFeatureGate.AddFlag(cmd.Flags())
 
 	return cmd
@@ -146,15 +180,21 @@ func (o *OnmetalAPIServerOptions) Config() (*apiserver.Config, error) {
 		return nil, err
 	}
 
-	apiResourceConfig := serverstorage.NewResourceConfig()
-	apiResourceConfig.EnableResources()
+	apiResourceConfig := NewResourceConfig()
 
 	config := &apiserver.Config{
 		GenericConfig: serverConfig,
 		ExtraConfig: apiserver.ExtraConfig{
-			APIResourceConfigSource: NewResourceConfig(),
+			APIResourceConfigSource: apiResourceConfig,
+			MachinePoolletConfig:    o.MachinePoolletConfig,
 		},
 	}
+
+	if config.GenericConfig.EgressSelector != nil {
+		// Use the config.GenericConfig.EgressSelector lookup to find the dialer to connect to the machinepoollet
+		config.ExtraConfig.MachinePoolletConfig.Lookup = config.GenericConfig.EgressSelector.Lookup
+	}
+
 	return config, nil
 }
 

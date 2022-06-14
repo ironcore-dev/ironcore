@@ -376,6 +376,35 @@ MachinePoolStatus
 </tr>
 </tbody>
 </table>
+<h3 id="compute.api.onmetal.de/v1alpha1.DaemonEndpoint">DaemonEndpoint
+</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachinePoolDaemonEndpoints">MachinePoolDaemonEndpoints</a>)
+</p>
+<div>
+<p>DaemonEndpoint contains information about a single Daemon endpoint.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>port</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>Port number of the given endpoint.</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="compute.api.onmetal.de/v1alpha1.EFIVar">EFIVar
 </h3>
 <p>
@@ -631,6 +660,94 @@ Kubernetes meta/v1.Time
 </td>
 </tr></tbody>
 </table>
+<h3 id="compute.api.onmetal.de/v1alpha1.MachineExecOptions">MachineExecOptions
+</h3>
+<div>
+<p>MachineExecOptions is the query options to a Machine&rsquo;s remote exec call</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>insecureSkipTLSVerifyBackend</code><br/>
+<em>
+bool
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="compute.api.onmetal.de/v1alpha1.MachinePoolAddress">MachinePoolAddress
+</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachinePoolStatus">MachinePoolStatus</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>type</code><br/>
+<em>
+<a href="#compute.api.onmetal.de/v1alpha1.MachinePoolAddressType">
+MachinePoolAddressType
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>address</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="compute.api.onmetal.de/v1alpha1.MachinePoolAddressType">MachinePoolAddressType
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachinePoolAddress">MachinePoolAddress</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;ExternalDNS&#34;</p></td>
+<td><p>MachinePoolExternalDNS identifies a DNS name which resolves to an IP address which has the characteristics
+of MachinePoolExternalIP. The IP it resolves to may or may not be a listed MachineExternalIP address.</p>
+</td>
+</tr><tr><td><p>&#34;ExternalIP&#34;</p></td>
+<td><p>MachinePoolExternalIP identifies an IP address which is, in some way, intended to be more usable from outside
+the cluster than an internal IP, though no specific semantics are defined.</p>
+</td>
+</tr></tbody>
+</table>
 <h3 id="compute.api.onmetal.de/v1alpha1.MachinePoolCondition">MachinePoolCondition
 </h3>
 <p>
@@ -729,6 +846,38 @@ Kubernetes meta/v1.Time
 <div>
 <p>MachinePoolConditionType is a type a MachinePoolCondition can have.</p>
 </div>
+<h3 id="compute.api.onmetal.de/v1alpha1.MachinePoolDaemonEndpoints">MachinePoolDaemonEndpoints
+</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachinePoolStatus">MachinePoolStatus</a>)
+</p>
+<div>
+<p>MachinePoolDaemonEndpoints lists ports opened by daemons running on the MachinePool.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>machinepoolletEndpoint</code><br/>
+<em>
+<a href="#compute.api.onmetal.de/v1alpha1.DaemonEndpoint">
+DaemonEndpoint
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Endpoint on which machinepoollet is listening.</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="compute.api.onmetal.de/v1alpha1.MachinePoolSpec">MachinePoolSpec
 </h3>
 <p>
@@ -847,6 +996,30 @@ MachinePoolState
 <em>
 <a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
 []Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>addresses</code><br/>
+<em>
+<a href="#compute.api.onmetal.de/v1alpha1.MachinePoolAddress">
+[]MachinePoolAddress
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>daemonEndpoints</code><br/>
+<em>
+<a href="#compute.api.onmetal.de/v1alpha1.MachinePoolDaemonEndpoints">
+MachinePoolDaemonEndpoints
 </a>
 </em>
 </td>
