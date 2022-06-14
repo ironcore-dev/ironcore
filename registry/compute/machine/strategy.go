@@ -17,10 +17,16 @@ package machine
 import (
 	"context"
 	"fmt"
+	"net"
+	"net/http"
+	"net/url"
 
 	"github.com/onmetal/onmetal-api/api"
 	"github.com/onmetal/onmetal-api/apis/compute"
 	"github.com/onmetal/onmetal-api/apis/compute/validation"
+	"github.com/onmetal/onmetal-api/machinepoollet/client"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -124,4 +130,57 @@ func (machineStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtim
 
 func (machineStatusStrategy) WarningsOnUpdate(cxt context.Context, obj, old runtime.Object) []string {
 	return nil
+}
+
+type ResourceGetter interface {
+	Get(ctx context.Context, name string, options *metav1.GetOptions) (runtime.Object, error)
+}
+
+func ExecLocation(
+	ctx context.Context,
+	getter ResourceGetter,
+	connInfo client.ConnectionInfoGetter,
+	name string,
+	opts *compute.MachineExecOptions,
+) (*url.URL, http.RoundTripper, error) {
+	machine, err := getMachine(ctx, getter, name)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	machinePoolRef := machine.Spec.MachinePoolRef
+	if machinePoolRef == nil {
+		return nil, nil, apierrors.NewBadRequest(fmt.Sprintf("machine %s has no machine pool assigned", name))
+	}
+
+	machinePoolName := machinePoolRef.Name
+	machinePoolInfo, err := connInfo.GetConnectionInfo(ctx, machinePoolName)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	loc := &url.URL{
+		Scheme: machinePoolInfo.Scheme,
+		Host:   net.JoinHostPort(machinePoolInfo.Hostname, machinePoolInfo.Port),
+		Path:   fmt.Sprintf("/apis/compute.api.onmetal.de/namespaces/%s/machines/%s/exec", machine.Namespace, machine.Name),
+	}
+	transport := machinePoolInfo.Transport
+	if opts.InsecureSkipTLSVerifyBackend {
+		transport = machinePoolInfo.InsecureSkipTLSVerifyTransport
+	}
+
+	return loc, transport, nil
+}
+
+func getMachine(ctx context.Context, getter ResourceGetter, name string) (*compute.Machine, error) {
+	obj, err := getter.Get(ctx, name, &metav1.GetOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	machine, ok := obj.(*compute.Machine)
+	if !ok {
+		return nil, fmt.Errorf("unexpected object type %T", obj)
+	}
+	return machine, nil
 }

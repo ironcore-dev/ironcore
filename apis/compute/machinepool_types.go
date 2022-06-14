@@ -37,6 +37,38 @@ type MachinePoolStatus struct {
 	State                   MachinePoolState
 	Conditions              []MachinePoolCondition
 	AvailableMachineClasses []corev1.LocalObjectReference
+	Addresses               []MachinePoolAddress
+	DaemonEndpoints         MachinePoolDaemonEndpoints
+}
+
+// MachinePoolDaemonEndpoints lists ports opened by daemons running on the MachinePool.
+type MachinePoolDaemonEndpoints struct {
+	// Endpoint on which machinepoollet is listening.
+	// +optional
+	MachinepoolletEndpoint DaemonEndpoint
+}
+
+// DaemonEndpoint contains information about a single Daemon endpoint.
+type DaemonEndpoint struct {
+	// Port number of the given endpoint.
+	Port int32
+}
+
+type MachinePoolAddressType string
+
+const (
+	// MachinePoolExternalIP identifies an IP address which is, in some way, intended to be more usable from outside
+	// the cluster than an internal IP, though no specific semantics are defined.
+	MachinePoolExternalIP MachinePoolAddressType = "ExternalIP"
+
+	// MachinePoolExternalDNS identifies a DNS name which resolves to an IP address which has the characteristics
+	// of MachinePoolExternalIP. The IP it resolves to may or may not be a listed MachineExternalIP address.
+	MachinePoolExternalDNS MachinePoolAddressType = "ExternalDNS"
+)
+
+type MachinePoolAddress struct {
+	Type    MachinePoolAddressType
+	Address string
 }
 
 // MachinePoolConditionType is a type a MachinePoolCondition can have.

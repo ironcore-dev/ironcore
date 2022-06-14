@@ -17,6 +17,7 @@ package apiserver
 import (
 	"fmt"
 
+	"github.com/onmetal/onmetal-api/machinepoollet/client"
 	computerest "github.com/onmetal/onmetal-api/registry/compute/rest"
 	ipamrest "github.com/onmetal/onmetal-api/registry/ipam/rest"
 	networkingrest "github.com/onmetal/onmetal-api/registry/networking/rest"
@@ -35,6 +36,7 @@ var (
 // ExtraConfig holds custom apiserver config
 type ExtraConfig struct {
 	APIResourceConfigSource serverstorage.APIResourceConfigSource
+	MachinePoolletConfig    client.MachinePoolletClientConfig
 }
 
 // Config defines the config for the apiserver
@@ -92,7 +94,9 @@ func (c completedConfig) New() (*OnmetalAPIServer, error) {
 	apiResourceConfigSource := c.ExtraConfig.APIResourceConfigSource
 	restStorageProviders := []RESTStorageProvider{
 		ipamrest.StorageProvider{},
-		computerest.StorageProvider{},
+		computerest.StorageProvider{
+			MachinePoolletClientConfig: c.ExtraConfig.MachinePoolletConfig,
+		},
 		networkingrest.StorageProvider{},
 		storagerest.StorageProvider{},
 	}

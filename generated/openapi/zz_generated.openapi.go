@@ -40,6 +40,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/apis/common/v1alpha1.SecretKeySelector":                schema_onmetal_api_apis_common_v1alpha1_SecretKeySelector(ref),
 		"github.com/onmetal/onmetal-api/apis/common/v1alpha1.Taint":                            schema_onmetal_api_apis_common_v1alpha1_Taint(ref),
 		"github.com/onmetal/onmetal-api/apis/common/v1alpha1.Toleration":                       schema_onmetal_api_apis_common_v1alpha1_Toleration(ref),
+		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.DaemonEndpoint":                  schema_onmetal_api_apis_compute_v1alpha1_DaemonEndpoint(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EFIVar":                          schema_onmetal_api_apis_compute_v1alpha1_EFIVar(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EmptyDiskVolumeSource":           schema_onmetal_api_apis_compute_v1alpha1_EmptyDiskVolumeSource(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EphemeralNetworkInterfaceSource": schema_onmetal_api_apis_compute_v1alpha1_EphemeralNetworkInterfaceSource(ref),
@@ -48,9 +49,12 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachineClass":                    schema_onmetal_api_apis_compute_v1alpha1_MachineClass(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachineClassList":                schema_onmetal_api_apis_compute_v1alpha1_MachineClassList(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachineCondition":                schema_onmetal_api_apis_compute_v1alpha1_MachineCondition(ref),
+		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachineExecOptions":              schema_onmetal_api_apis_compute_v1alpha1_MachineExecOptions(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachineList":                     schema_onmetal_api_apis_compute_v1alpha1_MachineList(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachinePool":                     schema_onmetal_api_apis_compute_v1alpha1_MachinePool(ref),
+		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachinePoolAddress":              schema_onmetal_api_apis_compute_v1alpha1_MachinePoolAddress(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachinePoolCondition":            schema_onmetal_api_apis_compute_v1alpha1_MachinePoolCondition(ref),
+		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachinePoolDaemonEndpoints":      schema_onmetal_api_apis_compute_v1alpha1_MachinePoolDaemonEndpoints(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachinePoolList":                 schema_onmetal_api_apis_compute_v1alpha1_MachinePoolList(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachinePoolSpec":                 schema_onmetal_api_apis_compute_v1alpha1_MachinePoolSpec(ref),
 		"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachinePoolStatus":               schema_onmetal_api_apis_compute_v1alpha1_MachinePoolStatus(ref),
@@ -588,6 +592,28 @@ func schema_onmetal_api_apis_common_v1alpha1_Toleration(ref common.ReferenceCall
 	}
 }
 
+func schema_onmetal_api_apis_compute_v1alpha1_DaemonEndpoint(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "DaemonEndpoint contains information about a single Daemon endpoint.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"port": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Port number of the given endpoint.",
+							Default:     0,
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+				},
+				Required: []string{"port"},
+			},
+		},
+	}
+}
+
 func schema_onmetal_api_apis_compute_v1alpha1_EFIVar(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -894,6 +920,39 @@ func schema_onmetal_api_apis_compute_v1alpha1_MachineCondition(ref common.Refere
 	}
 }
 
+func schema_onmetal_api_apis_compute_v1alpha1_MachineExecOptions(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "MachineExecOptions is the query options to a Machine's remote exec call",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"insecureSkipTLSVerifyBackend": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"boolean"},
+							Format: "",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func schema_onmetal_api_apis_compute_v1alpha1_MachineList(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -990,6 +1049,33 @@ func schema_onmetal_api_apis_compute_v1alpha1_MachinePool(ref common.ReferenceCa
 	}
 }
 
+func schema_onmetal_api_apis_compute_v1alpha1_MachinePoolAddress(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
+					"address": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
+				},
+				Required: []string{"type", "address"},
+			},
+		},
+	}
+}
+
 func schema_onmetal_api_apis_compute_v1alpha1_MachinePoolCondition(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -1049,6 +1135,28 @@ func schema_onmetal_api_apis_compute_v1alpha1_MachinePoolCondition(ref common.Re
 		},
 		Dependencies: []string{
 			"k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+	}
+}
+
+func schema_onmetal_api_apis_compute_v1alpha1_MachinePoolDaemonEndpoints(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "MachinePoolDaemonEndpoints lists ports opened by daemons running on the MachinePool.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"machinepoolletEndpoint": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Endpoint on which machinepoollet is listening.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/onmetal/onmetal-api/apis/compute/v1alpha1.DaemonEndpoint"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.DaemonEndpoint"},
 	}
 }
 
@@ -1179,11 +1287,30 @@ func schema_onmetal_api_apis_compute_v1alpha1_MachinePoolStatus(ref common.Refer
 							},
 						},
 					},
+					"addresses": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachinePoolAddress"),
+									},
+								},
+							},
+						},
+					},
+					"daemonEndpoints": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachinePoolDaemonEndpoints"),
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachinePoolCondition", "k8s.io/api/core/v1.LocalObjectReference"},
+			"github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachinePoolAddress", "github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachinePoolCondition", "github.com/onmetal/onmetal-api/apis/compute/v1alpha1.MachinePoolDaemonEndpoints", "k8s.io/api/core/v1.LocalObjectReference"},
 	}
 }
 

@@ -16,8 +16,11 @@ package storage
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/onmetal/onmetal-api/apis/compute"
+	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
+	"github.com/onmetal/onmetal-api/machinepoollet/client"
 	"github.com/onmetal/onmetal-api/registry/compute/machinepool"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -32,11 +35,12 @@ type REST struct {
 }
 
 type MachinePoolStorage struct {
-	MachinePool *REST
-	Status      *StatusREST
+	MachinePool                  *REST
+	Status                       *StatusREST
+	MachinePoolletConnectionInfo client.ConnectionInfoGetter
 }
 
-func NewStorage(optsGetter generic.RESTOptionsGetter) (MachinePoolStorage, error) {
+func NewStorage(optsGetter generic.RESTOptionsGetter, machinePoolletClientConfig client.MachinePoolletClientConfig) (MachinePoolStorage, error) {
 	store := &genericregistry.Store{
 		NewFunc: func() runtime.Object {
 			return &compute.MachinePool{}
@@ -63,9 +67,35 @@ func NewStorage(optsGetter generic.RESTOptionsGetter) (MachinePoolStorage, error
 	statusStore.UpdateStrategy = machinepool.StatusStrategy
 	statusStore.ResetFieldsStrategy = machinepool.StatusStrategy
 
+	machinePoolRest := &REST{store}
+	statusRest := &StatusREST{&statusStore}
+
+	// Build a MachinePoolGetter that looks up nodes using the REST handler
+	machinePoolGetter := client.MachinePoolGetterFunc(func(ctx context.Context, machinePoolName string, options metav1.GetOptions) (*computev1alpha1.MachinePool, error) {
+		obj, err := machinePoolRest.Get(ctx, machinePoolName, &options)
+		if err != nil {
+			return nil, err
+		}
+		machinePool, ok := obj.(*compute.MachinePool)
+		if !ok {
+			return nil, fmt.Errorf("unexpected type %T", obj)
+		}
+		// TODO: Remove the conversion. Consider only return the MachinePoolAddresses
+		externalMachinePool := &computev1alpha1.MachinePool{}
+		if err := computev1alpha1.Convert_compute_MachinePool_To_v1alpha1_MachinePool(machinePool, externalMachinePool, nil); err != nil {
+			return nil, fmt.Errorf("failed to convert to v1alpha1.MachinePool: %v", err)
+		}
+		return externalMachinePool, nil
+	})
+	connectionInfoGetter, err := client.NewMachinePoolConnectionInfoGetter(machinePoolGetter, machinePoolletClientConfig)
+	if err != nil {
+		return MachinePoolStorage{}, err
+	}
+
 	return MachinePoolStorage{
-		MachinePool: &REST{store},
-		Status:      &StatusREST{&statusStore},
+		MachinePool:                  machinePoolRest,
+		Status:                       statusRest,
+		MachinePoolletConnectionInfo: connectionInfoGetter,
 	}, nil
 }
 

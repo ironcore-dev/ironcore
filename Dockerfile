@@ -20,6 +20,7 @@ COPY clientutils/ clientutils/
 COPY controllers/ controllers/
 COPY equality/ equality/
 COPY generated/ generated/
+COPY machinepoollet/ machinepoollet/
 COPY registry/ registry/
 COPY serializer/ serializer/
 COPY tableconvertor/ tableconvertor/

@@ -223,3 +223,11 @@ type MachineList struct {
 	metav1.ListMeta
 	Items []Machine
 }
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+
+// MachineExecOptions is the query options to a Machine's remote exec call
+type MachineExecOptions struct {
+	metav1.TypeMeta
+	InsecureSkipTLSVerifyBackend bool
+}
