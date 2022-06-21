@@ -11,7 +11,7 @@ require (
 	github.com/onmetal/vgopath v0.0.2
 	github.com/onsi/ginkgo/v2 v2.1.4
 	github.com/onsi/gomega v1.19.0
-	github.com/spf13/cobra v1.4.0
+	github.com/spf13/cobra v1.5.0
 	github.com/spf13/pflag v1.0.5
 	golang.org/x/sys v0.0.0-20220319134239-a9b59b0215f8
 	inet.af/netaddr v0.0.0-20210903134321-85fa6c94624e
