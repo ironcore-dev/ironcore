@@ -17,6 +17,7 @@ package compute
 
 import (
 	"context"
+	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -26,7 +27,8 @@ import (
 	"github.com/onmetal/onmetal-api/envtestutils"
 	"github.com/onmetal/onmetal-api/envtestutils/apiserver"
 	onmetalclientset "github.com/onmetal/onmetal-api/generated/clientset/versioned"
-	"github.com/onmetal/onmetal-api/testutils/apiserverbin"
+	"github.com/onmetal/onmetal-api/internal/testing/apiserverbin"
+	"github.com/onmetal/onmetal-api/internal/testing/certs"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -60,6 +62,12 @@ var (
 	onmetalClientSet onmetalclientset.Interface
 	testEnv          *envtest.Environment
 	testEnvExt       *envtestutils.EnvironmentExtensions
+
+	machinePoolletCA             *certs.TinyCA
+	machinePoolletCertDir        string
+	machinePoolletCAFile         string
+	machinePoolletClientCertFile string
+	machinePoolletClientKeyFile  string
 )
 
 func TestAPIs(t *testing.T) {
@@ -109,12 +117,50 @@ var _ = BeforeSuite(func() {
 
 	komega.SetClient(k8sClient)
 
+	By("initializing a ca for machinepoollet testing")
+	machinePoolletCA, err = certs.NewTinyCA()
+	Expect(err).NotTo(HaveOccurred())
+
+	machinePoolletCertDir, err = os.MkdirTemp("", "machinepoollet-cert")
+	Expect(err).NotTo(HaveOccurred())
+	DeferCleanup(os.RemoveAll, machinePoolletCertDir)
+
+	machinePoolletCAFile = filepath.Join(machinePoolletCertDir, "ca.crt")
+	Expect(os.WriteFile(machinePoolletCAFile, machinePoolletCA.CA.CertBytes(), 0640)).To(Succeed())
+
+	machinePoolletClientCert, err := machinePoolletCA.NewClientCert(certs.ClientInfo{
+		Name:   "admin",
+		Groups: []string{"system:masters"},
+	})
+	Expect(err).NotTo(HaveOccurred())
+
+	machinePoolletClientCertData, machinePoolletClientKey, err := machinePoolletClientCert.AsBytes()
+	Expect(err).NotTo(HaveOccurred())
+
+	machinePoolletClientCertFile = filepath.Join(machinePoolletCertDir, "client.crt")
+	machinePoolletClientKeyFile = filepath.Join(machinePoolletCertDir, "client.key")
+	Expect(os.WriteFile(machinePoolletClientCertFile, machinePoolletClientCertData, 0640)).To(Succeed())
+	Expect(os.WriteFile(machinePoolletClientKeyFile, machinePoolletClientKey, 0640)).To(Succeed())
+
+	machinePoolletServerCert, err := machinePoolletCA.NewServingCert(nil, nil)
+	Expect(err).NotTo(HaveOccurred())
+
+	machinePoolletServerCertData, machinePoolletServerKey, err := machinePoolletServerCert.AsBytes()
+	Expect(err).NotTo(HaveOccurred())
+
+	Expect(os.WriteFile(filepath.Join(machinePoolletCertDir, "tls.crt"), machinePoolletServerCertData, 0640)).To(Succeed())
+	Expect(os.WriteFile(filepath.Join(machinePoolletCertDir, "tls.key"), machinePoolletServerKey, 0640)).To(Succeed())
+
 	apiSrv, err := apiserver.New(cfg, apiserver.Options{
 		Command:     []string{apiserverbin.Path},
 		ETCDServers: []string{testEnv.ControlPlane.Etcd.URL.String()},
 		Host:        testEnvExt.APIServiceInstallOptions.LocalServingHost,
 		Port:        testEnvExt.APIServiceInstallOptions.LocalServingPort,
 		CertDir:     testEnvExt.APIServiceInstallOptions.LocalServingCertDir,
+		Args: apiserver.EmptyProcessArgs().
+			Set("machinepoollet-certificate-authority", machinePoolletCAFile).
+			Set("machinepoollet-client-certificate", machinePoolletClientCertFile).
+			Set("machinepoollet-client-key", machinePoolletClientKeyFile),
 	})
 	Expect(err).NotTo(HaveOccurred())
 

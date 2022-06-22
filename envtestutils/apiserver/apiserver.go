@@ -28,13 +28,22 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/onmetal/onmetal-api/envtestutils/internal/controlplane"
+	"github.com/onmetal/onmetal-api/internal/testing/controlplane"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/rest"
 )
 
 type ProcessArgs map[string][]string
+
+func EmptyProcessArgs() ProcessArgs {
+	return make(ProcessArgs)
+}
+
+func (p ProcessArgs) Set(key string, values ...string) ProcessArgs {
+	p[key] = values
+	return p
+}
 
 type APIServer struct {
 	mainPath string
@@ -58,6 +67,7 @@ type APIServer struct {
 type Options struct {
 	MainPath  string
 	Command   []string
+	Args      ProcessArgs
 	MergeArgs func(customArgs, defaultArgs ProcessArgs) ProcessArgs
 
 	ETCDServers []string
@@ -104,6 +114,9 @@ func setAPIServerOptionsDefaults(opts *Options) {
 		opts.Stdout = os.Stdout
 		opts.Stderr = os.Stderr
 	}
+	if opts.Args == nil {
+		opts.Args = make(ProcessArgs)
+	}
 }
 
 func New(cfg *rest.Config, opts Options) (*APIServer, error) {
@@ -123,7 +136,7 @@ func New(cfg *rest.Config, opts Options) (*APIServer, error) {
 		command:       opts.Command,
 		config:        cfg,
 		etcdServers:   opts.ETCDServers,
-		args:          make(ProcessArgs),
+		args:          opts.Args,
 		mergeArgs:     opts.MergeArgs,
 		host:          opts.Host,
 		port:          opts.Port,

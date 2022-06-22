@@ -26,7 +26,7 @@ import (
 	"github.com/onmetal/onmetal-api/controllers/shared"
 	"github.com/onmetal/onmetal-api/envtestutils"
 	"github.com/onmetal/onmetal-api/envtestutils/apiserver"
-	"github.com/onmetal/onmetal-api/testutils/apiserverbin"
+	"github.com/onmetal/onmetal-api/internal/testing/apiserverbin"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/record"

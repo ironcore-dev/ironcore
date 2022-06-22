@@ -28,7 +28,7 @@ import (
 	"github.com/onmetal/onmetal-api/controllers/storage"
 	"github.com/onmetal/onmetal-api/envtestutils"
 	"github.com/onmetal/onmetal-api/envtestutils/apiserver"
-	"github.com/onmetal/onmetal-api/testutils/apiserverbin"
+	"github.com/onmetal/onmetal-api/internal/testing/apiserverbin"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"

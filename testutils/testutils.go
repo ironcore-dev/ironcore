@@ -16,6 +16,8 @@ package testutils
 
 import (
 	"context"
+	"math/rand"
+	"strings"
 	"sync"
 	"time"
 
@@ -77,4 +79,63 @@ func SetupContext() context.Context {
 	})
 
 	return delegCtx
+}
+
+// LowerCaseAlphabetCharset is a charset consisting of lower-case alphabet letters.
+const LowerCaseAlphabetCharset = "abcdefghijklmnopqrstuvwxyz"
+
+// RandomStringOptions are options for RandomString.
+type RandomStringOptions struct {
+	// Charset overrides the default RandomString charset if non-empty.
+	Charset string
+}
+
+// ApplyToRandomString implements RandomStringOption.
+func (o *RandomStringOptions) ApplyToRandomString(o2 *RandomStringOptions) {
+	if o.Charset != "" {
+		o2.Charset = o.Charset
+	}
+}
+
+// ApplyOptions applies the slice of RandomStringOption to the RandomStringOptions.
+func (o *RandomStringOptions) ApplyOptions(opts []RandomStringOption) {
+	for _, opt := range opts {
+		opt.ApplyToRandomString(o)
+	}
+}
+
+// RandomStringOption is an option to RandomString.
+type RandomStringOption interface {
+	// ApplyToRandomString modifies the given RandomStringOptions with the option settings.
+	ApplyToRandomString(o *RandomStringOptions)
+}
+
+// Charset specifies an explicit charset to use.
+type Charset string
+
+// ApplyToRandomString implements RandomStringOption.
+func (s Charset) ApplyToRandomString(o *RandomStringOptions) {
+	o.Charset = string(s)
+}
+
+// RandomString generates a random string of length n with the given options.
+// If n is negative, RandomString panics.
+func RandomString(n int, opts ...RandomStringOption) string {
+	if n < 0 {
+		panic("RandomString: negative length")
+	}
+
+	o := RandomStringOptions{}
+	o.ApplyOptions(opts)
+
+	charset := o.Charset
+	if charset == "" {
+		charset = LowerCaseAlphabetCharset
+	}
+
+	var sb strings.Builder
+	for i := 0; i < n; i++ {
+		sb.WriteRune(rune(charset[rand.Intn(len(charset))]))
+	}
+	return sb.String()
 }

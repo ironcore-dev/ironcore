@@ -35,12 +35,14 @@ func init() {
 		panic("apiserverbin: unable to determine filename")
 	}
 
-	Path = filepath.Join(filename, "..", "..", "..", "testbin", "apiserver")
+	projectRoot := filepath.Join(filename, "..", "..", "..", "..")
+
+	Path = filepath.Join(projectRoot, "testbin", "apiserver")
 
 	var out bytes.Buffer
 	cmd := exec.Command("go", "build", "-o",
 		Path,
-		filepath.Join(filename, "..", "..", "..", "cmd", "apiserver"),
+		filepath.Join(projectRoot, "cmd", "apiserver"),
 	)
 	cmd.Stdout = &out
 	cmd.Stderr = &out

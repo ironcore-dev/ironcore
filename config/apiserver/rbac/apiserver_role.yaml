@@ -13,6 +13,20 @@ rules:
       - list
       - watch
   - apiGroups:
+      - compute.api.onmetal.de
+    resources:
+      - machinepools/proxy
+    verbs:
+      - '*'
+  - apiGroups:
+      - compute.api.onmetal.de
+    resources:
+      - machinepools
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
       - admissionregistration.k8s.io
     resources:
       - mutatingwebhookconfigurations

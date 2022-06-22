@@ -119,7 +119,7 @@ func (r *ExecREST) Connect(ctx context.Context, name string, opts runtime.Object
 		return nil, err
 	}
 
-	return newThrottledUpgradeAwareProxyHandler(location, transport, false, false, responder), nil
+	return newThrottledUpgradeAwareProxyHandler(location, transport, false, true, responder), nil
 }
 
 func newThrottledUpgradeAwareProxyHandler(location *url.URL, transport http.RoundTripper, wrapTransport, upgradeRequired bool, responder rest.Responder) *proxy.UpgradeAwareHandler {
