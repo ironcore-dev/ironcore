@@ -44,6 +44,8 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/remotecommand"
+	certutil "k8s.io/client-go/util/cert"
+	"k8s.io/client-go/util/keyutil"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/runtime/inject"
@@ -54,19 +56,27 @@ type MachineExec interface {
 }
 
 type Options struct {
-	MachinePoolName string
-	MachineExec     MachineExec
+	MachineExec MachineExec
 
+	// HostnameOverride is an optional hostname override to supply for self-signed certificate generation.
+	HostnameOverride string
+
+	// Host is the host to bind the server on.
 	Host string
+	// Port is the port to bind the server on. If unset, a random port will be allocated.
 	Port int
 
 	// CertDir is the directory that contains the server key and certificate.
 	// If not set, the server would look up the key and certificate in
 	// {TempDir}/onmetal-api-machinepool-server/serving-certs. The key and certificate
 	// must be named tls.key and tls.crt, respectively.
+	// If the files don't exist, a self-signed certificate is generated.
 	CertDir string
 
-	Auth *AuthOptions
+	// Auth are options for authentication.
+	Auth AuthOptions
+	// DisableAuth will turn off authN/Z.
+	DisableAuth bool
 
 	StreamCreationTimeout time.Duration
 	StreamIdleTimeout     time.Duration
@@ -197,6 +207,27 @@ func NewAuth(cfg *rest.Config, opts AuthOptions) (Auth, error) {
 	}, nil
 }
 
+// GetHostname returns OS's hostname if 'hostnameOverride' is empty; otherwise, return 'hostnameOverride'.
+// Copied from Kubernetes' nodeutil to avoid a dependency to kubernetes/kubernetes.
+func GetHostname(hostnameOverride string) (string, error) {
+	hostName := hostnameOverride
+	if len(hostName) == 0 {
+		nodeName, err := os.Hostname()
+		if err != nil {
+			return "", fmt.Errorf("couldn't determine hostname: %v", err)
+		}
+		hostName = nodeName
+	}
+
+	// Trim whitespaces first to avoid getting an empty hostname
+	// For linux, the hostname is read from file /proc/sys/kernel/hostname directly
+	hostName = strings.TrimSpace(hostName)
+	if len(hostName) == 0 {
+		return "", fmt.Errorf("empty hostname is invalid")
+	}
+	return strings.ToLower(hostName), nil
+}
+
 func New(cfg *rest.Config, opts Options) (*Server, error) {
 	if cfg == nil {
 		return nil, fmt.Errorf("must specify config")
@@ -207,19 +238,13 @@ func New(cfg *rest.Config, opts Options) (*Server, error) {
 
 	setOptionsDefaults(&opts)
 
-	var (
-		auth              Auth
-		caCertificateFile string
-		err               error
-	)
+	auth, caCertificateFile, err := initializeAuth(cfg, opts)
+	if err != nil {
+		return nil, err
+	}
 
-	if opts.Auth != nil {
-		auth, err = NewAuth(cfg, *opts.Auth)
-		if err != nil {
-			return nil, err
-		}
-
-		caCertificateFile = opts.Auth.Authentication.ClientCAFile
+	if err := initializeTLS(opts); err != nil {
+		return nil, err
 	}
 
 	return &Server{
@@ -233,6 +258,54 @@ func New(cfg *rest.Config, opts Options) (*Server, error) {
 		streamIdleTimeout:     opts.StreamIdleTimeout,
 		shutdownTimeout:       opts.ShutdownTimeout,
 	}, nil
+}
+
+func initializeAuth(cfg *rest.Config, opts Options) (auth Auth, caCertificateFile string, err error) {
+	if !opts.DisableAuth {
+		auth, err = NewAuth(cfg, opts.Auth)
+		if err != nil {
+			return nil, "", err
+		}
+
+		caCertificateFile = opts.Auth.Authentication.ClientCAFile
+	}
+	return auth, caCertificateFile, nil
+}
+
+func initializeTLS(opts Options) error {
+	ok, err := certutil.CanReadCertAndKey(
+		getCertPath(opts.CertDir),
+		getKeyPath(opts.CertDir),
+	)
+	if err != nil || ok {
+		return err
+	}
+	hostName, err := GetHostname(opts.HostnameOverride)
+	if err != nil {
+		return err
+	}
+
+	cert, key, err := certutil.GenerateSelfSignedCertKey(hostName, nil, nil)
+	if err != nil {
+		return fmt.Errorf("unable to generate self signed cert: %w", err)
+	}
+
+	if err := certutil.WriteCert(getCertPath(opts.CertDir), cert); err != nil {
+		return err
+	}
+
+	if err := keyutil.WriteKey(getKeyPath(opts.CertDir), key); err != nil {
+		return err
+	}
+	return nil
+}
+
+func getCertPath(certDir string) string {
+	return filepath.Join(certDir, "tls.crt")
+}
+
+func getKeyPath(certDir string) string {
+	return filepath.Join(certDir, "tls.key")
 }
 
 // InjectFunc implements inject.Injector.
@@ -430,8 +503,8 @@ func (s *Server) Start(ctx context.Context) error {
 
 		srvErr = srv.ServeTLS(
 			ln,
-			filepath.Join(s.certDir, "tls.crt"),
-			filepath.Join(s.certDir, "tls.key"),
+			getCertPath(s.certDir),
+			getKeyPath(s.certDir),
 		)
 	}()
 
