@@ -746,6 +746,24 @@ of MachinePoolExternalIP. The IP it resolves to may or may not be a listed Machi
 <td><p>MachinePoolExternalIP identifies an IP address which is, in some way, intended to be more usable from outside
 the cluster than an internal IP, though no specific semantics are defined.</p>
 </td>
+</tr><tr><td><p>&#34;Hostname&#34;</p></td>
+<td><p>MachinePoolHostName identifies a name of the machine pool. Although every machine pool can be assumed
+to have a MachinePoolAddress of this type, its exact syntax and semantics are not
+defined, and are not consistent between different clusters.</p>
+</td>
+</tr><tr><td><p>&#34;InternalDNS&#34;</p></td>
+<td><p>MachinePoolInternalDNS identifies a DNS name which resolves to an IP address which has
+the characteristics of a MachinePoolInternalIP. The IP it resolves to may or may not
+be a listed MachinePoolInternalIP address.</p>
+</td>
+</tr><tr><td><p>&#34;InternalIP&#34;</p></td>
+<td><p>MachinePoolInternalIP identifies an IP address which may not be visible to hosts outside the cluster.
+By default, it is assumed that onmetal-api-apiserver can reach machine pool internal IPs, though it is possible
+to configure clusters where this is not the case.</p>
+<p>MachinePoolInternalIP is the default type of machine pool IP, and does not necessarily imply
+that the IP is ONLY reachable internally. If a machine pool has multiple internal IPs,
+no specific semantics are assigned to the additional IPs.</p>
+</td>
 </tr></tbody>
 </table>
 <h3 id="compute.api.onmetal.de/v1alpha1.MachinePoolCondition">MachinePoolCondition

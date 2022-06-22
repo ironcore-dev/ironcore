@@ -18,21 +18,20 @@ import (
 	"github.com/onmetal/onmetal-api/api"
 	"github.com/onmetal/onmetal-api/apis/compute"
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
-	"github.com/onmetal/onmetal-api/machinepoollet/client"
+	machinepoolletclient "github.com/onmetal/onmetal-api/machinepoollet/client"
 	machinestorage "github.com/onmetal/onmetal-api/registry/compute/machine/storage"
+	machineclassstore "github.com/onmetal/onmetal-api/registry/compute/machineclass/storage"
 	machinepoolstorage "github.com/onmetal/onmetal-api/registry/compute/machinepool/storage"
 	onmetalapiserializer "github.com/onmetal/onmetal-api/serializer"
 	"k8s.io/apiserver/pkg/registry/generic"
 	"k8s.io/apiserver/pkg/registry/rest"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 
-	machineclassstore "github.com/onmetal/onmetal-api/registry/compute/machineclass/storage"
-
 	serverstorage "k8s.io/apiserver/pkg/server/storage"
 )
 
 type StorageProvider struct {
-	MachinePoolletClientConfig client.MachinePoolletClientConfig
+	MachinePoolletClientConfig machinepoolletclient.MachinePoolletClientConfig
 }
 
 func (p StorageProvider) GroupName() string {

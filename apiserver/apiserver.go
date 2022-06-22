@@ -120,6 +120,17 @@ func (c completedConfig) New() (*OnmetalAPIServer, error) {
 			continue
 		}
 
+		if postHookProvider, ok := restStorageProvider.(genericapiserver.PostStartHookProvider); ok {
+			name, hook, err := postHookProvider.PostStartHook()
+			if err != nil {
+				return nil, fmt.Errorf("error building post start hook: %w", err)
+			}
+
+			if err := s.GenericAPIServer.AddPostStartHook(name, hook); err != nil {
+				return nil, err
+			}
+		}
+
 		apiGroupsInfos = append(apiGroupsInfos, &apiGroupInfo)
 	}
 

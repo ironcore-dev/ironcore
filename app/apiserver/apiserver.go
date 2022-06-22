@@ -101,6 +101,13 @@ func NewOnmetalAPIServerOptions() *OnmetalAPIServerOptions {
 			Port:         12319,
 			ReadOnlyPort: 12320,
 			PreferredAddressTypes: []string{
+				string(compute.MachinePoolHostName),
+
+				// internal, preferring DNS if reported
+				string(compute.MachinePoolInternalDNS),
+				string(compute.MachinePoolInternalIP),
+
+				// external, preferring DNS if reported
 				string(compute.MachinePoolExternalDNS),
 				string(compute.MachinePoolExternalIP),
 			},

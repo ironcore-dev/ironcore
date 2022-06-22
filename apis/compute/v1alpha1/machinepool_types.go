@@ -57,9 +57,28 @@ type DaemonEndpoint struct {
 type MachinePoolAddressType string
 
 const (
+	// MachinePoolHostName identifies a name of the machine pool. Although every machine pool can be assumed
+	// to have a MachinePoolAddress of this type, its exact syntax and semantics are not
+	// defined, and are not consistent between different clusters.
+	MachinePoolHostName MachinePoolAddressType = "Hostname"
+
+	// MachinePoolInternalIP identifies an IP address which may not be visible to hosts outside the cluster.
+	// By default, it is assumed that onmetal-api-apiserver can reach machine pool internal IPs, though it is possible
+	// to configure clusters where this is not the case.
+	//
+	// MachinePoolInternalIP is the default type of machine pool IP, and does not necessarily imply
+	// that the IP is ONLY reachable internally. If a machine pool has multiple internal IPs,
+	// no specific semantics are assigned to the additional IPs.
+	MachinePoolInternalIP MachinePoolAddressType = "InternalIP"
+
 	// MachinePoolExternalIP identifies an IP address which is, in some way, intended to be more usable from outside
 	// the cluster than an internal IP, though no specific semantics are defined.
 	MachinePoolExternalIP MachinePoolAddressType = "ExternalIP"
+
+	// MachinePoolInternalDNS identifies a DNS name which resolves to an IP address which has
+	// the characteristics of a MachinePoolInternalIP. The IP it resolves to may or may not
+	// be a listed MachinePoolInternalIP address.
+	MachinePoolInternalDNS MachinePoolAddressType = "InternalDNS"
 
 	// MachinePoolExternalDNS identifies a DNS name which resolves to an IP address which has the characteristics
 	// of MachinePoolExternalIP. The IP it resolves to may or may not be a listed MachineExternalIP address.
