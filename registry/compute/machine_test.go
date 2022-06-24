@@ -62,7 +62,7 @@ var _ = Describe("Machine", func() {
 			MachineExec: exec,
 			Host:        "localhost",
 			CertDir:     machinePoolletCertDir,
-			Auth: &server.AuthOptions{
+			Auth: server.AuthOptions{
 				MachinePoolName: machinePoolName,
 				Authentication: server.AuthenticationOptions{
 					ClientCAFile: machinePoolletCAFile,

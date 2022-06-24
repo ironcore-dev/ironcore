@@ -324,21 +324,25 @@ func (s *Server) InjectFunc(f inject.Func) error {
 func (s *Server) router() http.Handler {
 	m := mux.NewRouter()
 
-	m.Use(func(handler http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			req = req.WithContext(ctrl.LoggerInto(req.Context(), log))
-			handler.ServeHTTP(w, req)
-		})
-	})
+	m.Use(s.logMiddleware)
 
 	computeRouter := m.PathPrefix("/apis/compute.api.onmetal.de").Subrouter()
-	computeRouter.Use(s.authMiddleware)
+	if s.auth != nil {
+		computeRouter.Use(s.authMiddleware)
+	}
 	s.registerComputeRoutes(computeRouter)
 
 	m.Methods(http.MethodGet).Path("/healthz").Handler(healthz.CheckHandler{Checker: healthz.Ping})
 	m.Methods(http.MethodGet).Path("/readyz").Handler(healthz.CheckHandler{Checker: healthz.Ping})
 
 	return m
+}
+
+func (s *Server) logMiddleware(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		req = req.WithContext(ctrl.LoggerInto(req.Context(), log))
+		handler.ServeHTTP(w, req)
+	})
 }
 
 func (s *Server) authMiddleware(handler http.Handler) http.Handler {
