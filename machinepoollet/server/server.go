@@ -29,7 +29,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/go-logr/logr"
 	"github.com/gorilla/mux"
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	"github.com/onmetal/onmetal-api/terminal"
@@ -48,14 +47,20 @@ import (
 	"k8s.io/client-go/util/keyutil"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
+	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/runtime/inject"
 )
 
+var log = logf.Log.WithName("machinepoollet").WithName("server")
+
+// MachineExec is an interface a provider needs to implement in order to provide exec-functionality.
 type MachineExec interface {
+	// Exec execs into the target machine.
 	Exec(ctx context.Context, namespace, name string, in io.Reader, out, err io.WriteCloser, resize <-chan remotecommand.TerminalSize) error
 }
 
 type Options struct {
+	// MachineExec allows exec-ing onto a Machine.
 	MachineExec MachineExec
 
 	// HostnameOverride is an optional hostname override to supply for self-signed certificate generation.
@@ -316,7 +321,7 @@ func (s *Server) InjectFunc(f inject.Func) error {
 	return nil
 }
 
-func (s *Server) router(log logr.Logger) http.Handler {
+func (s *Server) router() http.Handler {
 	m := mux.NewRouter()
 
 	m.Use(func(handler http.Handler) http.Handler {
@@ -326,9 +331,9 @@ func (s *Server) router(log logr.Logger) http.Handler {
 		})
 	})
 
-	m.Use(s.authMiddleware)
-
-	s.registerComputeRoutes(m.PathPrefix("/apis/compute.api.onmetal.de").Subrouter())
+	computeRouter := m.PathPrefix("/apis/compute.api.onmetal.de").Subrouter()
+	computeRouter.Use(s.authMiddleware)
+	s.registerComputeRoutes(computeRouter)
 
 	m.Methods(http.MethodGet).Path("/healthz").Handler(healthz.CheckHandler{Checker: healthz.Ping})
 	m.Methods(http.MethodGet).Path("/readyz").Handler(healthz.CheckHandler{Checker: healthz.Ping})
@@ -339,7 +344,6 @@ func (s *Server) router(log logr.Logger) http.Handler {
 func (s *Server) authMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		ctx := req.Context()
-		log := ctrl.LoggerFrom(ctx)
 
 		info, ok, err := s.auth.AuthenticateRequest(req)
 		if err != nil || !ok {
@@ -350,7 +354,7 @@ func (s *Server) authMiddleware(handler http.Handler) http.Handler {
 			return
 		}
 
-		log = log.WithValues(
+		log := log.WithValues(
 			"user-name", info.User.GetName(),
 			"user-id", info.User.GetUID(),
 		)
@@ -493,7 +497,7 @@ func (s *Server) Start(ctx context.Context) error {
 	)
 
 	srv := &http.Server{
-		Handler:   s.router(log),
+		Handler:   s.router(),
 		TLSConfig: tlsConfig,
 	}
 
@@ -501,6 +505,7 @@ func (s *Server) Start(ctx context.Context) error {
 		defer close(srvDone)
 		defer func() { _ = ln.Close() }()
 
+		log.Info("Start serving", "Host", s.host, "Port", port)
 		srvErr = srv.ServeTLS(
 			ln,
 			getCertPath(s.certDir),
