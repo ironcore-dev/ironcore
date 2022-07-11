@@ -481,7 +481,6 @@ func (s *Server) Start(ctx context.Context) error {
 	}
 
 	s.started = true
-	log := ctrl.LoggerFrom(ctx)
 
 	tlsConfig, err := s.tlsConfig()
 	if err != nil {
