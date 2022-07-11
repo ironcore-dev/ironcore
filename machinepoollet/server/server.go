@@ -66,10 +66,9 @@ type Options struct {
 	// HostnameOverride is an optional hostname override to supply for self-signed certificate generation.
 	HostnameOverride string
 
-	// Host is the host to bind the server on.
-	Host string
-	// Port is the port to bind the server on. If unset, a random port will be allocated.
-	Port int
+	// Address is the address to listen on.
+	// Leave empty to auto-determine host / ephemeral port.
+	Address string
 
 	// CertDir is the directory that contains the server key and certificate.
 	// If not set, the server would look up the key and certificate in
@@ -111,6 +110,8 @@ type Server struct {
 
 	machineExec MachineExec
 
+	address string
+
 	host              string
 	port              int
 	certDir           string
@@ -122,9 +123,6 @@ type Server struct {
 }
 
 func setOptionsDefaults(opts *Options) {
-	if opts.Host == "" {
-		opts.Host = "localhost"
-	}
 	if opts.CertDir == "" {
 		opts.CertDir = filepath.Join(os.TempDir(), "onmetal-api-machinepool-server", "serving-certs")
 	}
@@ -255,8 +253,7 @@ func New(cfg *rest.Config, opts Options) (*Server, error) {
 	return &Server{
 		auth:                  auth,
 		machineExec:           opts.MachineExec,
-		host:                  opts.Host,
-		port:                  opts.Port,
+		address:               opts.Address,
 		certDir:               opts.CertDir,
 		caCertificateFile:     caCertificateFile,
 		streamCreationTimeout: opts.StreamCreationTimeout,
@@ -436,8 +433,13 @@ func (s *Server) registerComputeRoutes(r *mux.Router) {
 func (s *Server) Port() int {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-
 	return s.port
+}
+
+func (s *Server) Host() string {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.host
 }
 
 func (s *Server) Started() bool {
@@ -487,12 +489,13 @@ func (s *Server) Start(ctx context.Context) error {
 		return err
 	}
 
-	ln, port, err := s.listen()
+	ln, host, port, err := s.listen()
 	if err != nil {
 		s.mu.Unlock()
 		return err
 	}
 
+	s.host = host
 	s.port = port
 
 	var (
@@ -536,22 +539,23 @@ func (s *Server) Start(ctx context.Context) error {
 	}
 }
 
-func (s *Server) listen() (net.Listener, int, error) {
-	ln, err := net.Listen("tcp", net.JoinHostPort(s.host, strconv.Itoa(s.port)))
+func (s *Server) listen() (ln net.Listener, host string, port int, err error) {
+	ln, err = net.Listen("tcp", s.address)
 	if err != nil {
-		return nil, 0, err
+		return nil, "", 0, err
 	}
 
-	_, portString, err := net.SplitHostPort(ln.Addr().String())
+	var portString string
+	host, portString, err = net.SplitHostPort(ln.Addr().String())
 	if err != nil {
 		_ = ln.Close()
-		return nil, 0, err
+		return nil, "", 0, err
 	}
 
-	port, err := strconv.Atoi(portString)
+	port, err = strconv.Atoi(portString)
 	if err != nil {
 		_ = ln.Close()
-		return nil, 0, err
+		return nil, "", 0, err
 	}
-	return ln, port, nil
+	return ln, host, port, nil
 }

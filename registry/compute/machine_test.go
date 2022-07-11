@@ -60,7 +60,7 @@ var _ = Describe("Machine", func() {
 		By("starting a machine pool server")
 		srv, err := server.New(cfg, server.Options{
 			MachineExec: exec,
-			Host:        "localhost",
+			Address:     "localhost:",
 			CertDir:     machinePoolletCertDir,
 			Auth: server.AuthOptions{
 				MachinePoolName: machinePoolName,
@@ -73,6 +73,7 @@ var _ = Describe("Machine", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		go func() {
+			defer GinkgoRecover()
 			_ = srv.Start(ctx)
 		}()
 
@@ -133,19 +134,20 @@ var _ = Describe("Machine", func() {
 		var (
 			in, writeIn = io.Pipe()
 			out         fake.ThreadSafeBuffer
-			streamErr   = make(chan error)
+			done        = make(chan struct{})
 		)
 		go func() {
-			err := executor.Stream(remotecommand.StreamOptions{
+			defer close(done)
+			defer GinkgoRecover()
+
+			Expect(executor.Stream(remotecommand.StreamOptions{
 				Stdin:  in,
 				Stdout: &out,
 				Tty:    true,
-			})
-			streamErr <- err
+			})).NotTo(HaveOccurred())
 		}()
 
 		By("checking the stream does not crash and observing the terminal getting connected")
-		Consistently(streamErr).ShouldNot(Receive())
 		Eventually(term.Connected).Should(BeTrue())
 
 		By("writing as client and observing the server reception")
@@ -164,6 +166,6 @@ var _ = Describe("Machine", func() {
 		Eventually(term.Closed).Should(BeTrue())
 
 		By("waiting for the executor to return")
-		Eventually(streamErr).Should(Receive(BeNil()))
+		Eventually(done).Should(BeClosed())
 	})
 })
