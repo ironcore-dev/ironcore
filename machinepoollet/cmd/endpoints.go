@@ -22,6 +22,7 @@ import (
 
 	"github.com/onmetal/onmetal-api/machinepoollet/endpoints"
 	"github.com/spf13/pflag"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
@@ -34,17 +35,27 @@ const (
 	EndpointsTypeLoadBalancer EndpointsType = "LoadBalancer"
 )
 
-var AvailableEndpointsTypes = []EndpointsType{
-	EndpointsTypeNone,
-	EndpointsTypeNodePort,
-	EndpointsTypeLoadBalancer,
-}
+var (
+	AvailableEndpointsTypes = []EndpointsType{
+		EndpointsTypeNone,
+		EndpointsTypeNodePort,
+		EndpointsTypeLoadBalancer,
+	}
+	AvailableNodeAddressTypes = []string{
+		string(corev1.NodeHostName),
+		string(corev1.NodeInternalIP),
+		string(corev1.NodeInternalDNS),
+		string(corev1.NodeExternalIP),
+		string(corev1.NodeExternalDNS),
+	}
+)
 
 type EndpointsOptions struct {
-	Type        EndpointsType
-	Namespace   string
-	ServiceName string
-	PortName    string
+	Type             EndpointsType
+	Namespace        string
+	ServiceName      string
+	PortName         string
+	NodeAddressTypes []string
 }
 
 func NewEndpointsOptions() *EndpointsOptions {
@@ -60,6 +71,7 @@ func (o *EndpointsOptions) AddFlags(fs *pflag.FlagSet) {
 		"If unspecified while running in Kubernetes this is auto-determined.")
 	fs.StringVar(&o.ServiceName, "endpoints-service-name", "", "Name of the service to inspect for endpoints.")
 	fs.StringVar(&o.PortName, "endpoints-port-name", "", "Name of the service port to inspect for endpoints.")
+	fs.StringSliceVar(&o.NodeAddressTypes, "endpoints-node-address-types", AvailableNodeAddressTypes, "Node address types to use.")
 }
 
 func (o *EndpointsOptions) getNamespace() string {
@@ -69,6 +81,14 @@ func (o *EndpointsOptions) getNamespace() string {
 
 	namespace, _ := os.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
 	return strings.TrimSpace(string(namespace))
+}
+
+func (o *EndpointsOptions) nodeAddressTypes() []corev1.NodeAddressType {
+	res := make([]corev1.NodeAddressType, 0, len(o.NodeAddressTypes))
+	for _, addressType := range o.NodeAddressTypes {
+		res = append(res, corev1.NodeAddressType(addressType))
+	}
+	return res
 }
 
 func (o *EndpointsOptions) NewEndpoints(ctx context.Context, cfg *rest.Config) (endpoints.Endpoints, error) {
@@ -83,9 +103,10 @@ func (o *EndpointsOptions) NewEndpoints(ctx context.Context, cfg *rest.Config) (
 		})
 	case EndpointsTypeNodePort:
 		return endpoints.NewNodePortServiceEndpoints(ctx, cfg, endpoints.NodePortServiceEndpointsOptions{
-			Namespace:   o.getNamespace(),
-			ServiceName: o.ServiceName,
-			PortName:    o.PortName,
+			Namespace:        o.getNamespace(),
+			ServiceName:      o.ServiceName,
+			PortName:         o.PortName,
+			NodeAddressTypes: o.nodeAddressTypes(),
 		})
 	default:
 		return nil, fmt.Errorf("unknown endpoints type %q", o.Type)
