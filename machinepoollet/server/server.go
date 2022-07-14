@@ -112,10 +112,10 @@ type Server struct {
 
 	address string
 
-	host              string
-	port              int
-	certDir           string
-	caCertificateFile string
+	host                    string
+	port                    int
+	certDir                 string
+	clientCACertificateFile string
 
 	streamCreationTimeout time.Duration
 	streamIdleTimeout     time.Duration
@@ -251,14 +251,14 @@ func New(cfg *rest.Config, opts Options) (*Server, error) {
 	}
 
 	return &Server{
-		auth:                  auth,
-		machineExec:           opts.MachineExec,
-		address:               opts.Address,
-		certDir:               opts.CertDir,
-		caCertificateFile:     caCertificateFile,
-		streamCreationTimeout: opts.StreamCreationTimeout,
-		streamIdleTimeout:     opts.StreamIdleTimeout,
-		shutdownTimeout:       opts.ShutdownTimeout,
+		auth:                    auth,
+		machineExec:             opts.MachineExec,
+		address:                 opts.Address,
+		certDir:                 opts.CertDir,
+		clientCACertificateFile: caCertificateFile,
+		streamCreationTimeout:   opts.StreamCreationTimeout,
+		streamIdleTimeout:       opts.StreamIdleTimeout,
+		shutdownTimeout:         opts.ShutdownTimeout,
 	}, nil
 }
 
@@ -455,10 +455,10 @@ func (s *Server) tlsConfig() (*tls.Config, error) {
 		ClientAuth:               tls.RequestClientCert,
 	}
 
-	if s.caCertificateFile != "" {
-		pem, err := os.ReadFile(s.caCertificateFile)
+	if s.clientCACertificateFile != "" {
+		pem, err := os.ReadFile(s.clientCACertificateFile)
 		if err != nil {
-			return nil, fmt.Errorf("error reading ca certificate %s: %w", s.caCertificateFile, err)
+			return nil, fmt.Errorf("error reading ca certificate %s: %w", s.clientCACertificateFile, err)
 		}
 
 		cfg.ClientAuth = tls.RequireAndVerifyClientCert
