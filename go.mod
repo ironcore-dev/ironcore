@@ -16,13 +16,14 @@ require (
 	github.com/onsi/gomega v1.19.0
 	github.com/spf13/cobra v1.5.0
 	github.com/spf13/pflag v1.0.5
+	go.uber.org/atomic v1.7.0
 	golang.org/x/sys v0.0.0-20220319134239-a9b59b0215f8
 	inet.af/netaddr v0.0.0-20210903134321-85fa6c94624e
 	k8s.io/api v0.24.2
 	k8s.io/apimachinery v0.24.2
 	k8s.io/apiserver v0.24.2
 	k8s.io/client-go v0.24.2
-	k8s.io/code-generator v0.24.2
+	k8s.io/code-generator v0.24.3
 	k8s.io/component-base v0.24.2
 	k8s.io/kube-aggregator v0.24.2
 	k8s.io/kube-openapi v0.0.0-20220328201542-3ee0da9b0b42
@@ -99,7 +100,6 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v0.20.0 // indirect
 	go.opentelemetry.io/otel/trace v0.20.0 // indirect
 	go.opentelemetry.io/proto/otlp v0.7.0 // indirect
-	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.19.1 // indirect
 	go4.org/intern v0.0.0-20210108033219-3eb7198706b2 // indirect
