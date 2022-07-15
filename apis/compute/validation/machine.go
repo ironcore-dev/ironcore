@@ -92,10 +92,6 @@ func validateMachineSpec(machineSpec *compute.MachineSpec, fldPath *field.Path) 
 		allErrs = append(allErrs, validateVolumeSource(&vol.VolumeSource, fldPath.Child("volume").Index(i))...)
 	}
 
-	if machineSpec.Image == "" {
-		allErrs = append(allErrs, field.Required(fldPath.Child("image"), "must specify an image"))
-	}
-
 	allErrs = append(allErrs, metav1validation.ValidateLabels(machineSpec.MachinePoolSelector, fldPath.Child("machinePoolSelector"))...)
 
 	return allErrs

@@ -63,6 +63,11 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 
 		cells = append(cells, name)
 		cells = append(cells, machine.Spec.MachineClassRef.Name)
+		if image := machine.Spec.Image; image != "" {
+			cells = append(cells, image)
+		} else {
+			cells = append(cells, "<none>")
+		}
 		cells = append(cells, machine.Spec.Image)
 		if machinePoolRef := machine.Spec.MachinePoolRef; machinePoolRef != nil {
 			cells = append(cells, machinePoolRef.Name)
@@ -70,7 +75,7 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 			cells = append(cells, "<none>")
 		}
 		if state := machine.Status.State; state != "" {
-			cells = append(cells, machine.Status.State)
+			cells = append(cells, state)
 		} else {
 			cells = append(cells, "<unknown>")
 		}
