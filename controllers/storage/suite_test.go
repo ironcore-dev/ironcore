@@ -26,7 +26,7 @@ import (
 	"github.com/onmetal/onmetal-api/controllers/shared"
 	"github.com/onmetal/onmetal-api/envtestutils"
 	"github.com/onmetal/onmetal-api/envtestutils/apiserver"
-	"github.com/onmetal/onmetal-api/internal/testing/apiserverbin"
+	"github.com/onsi/gomega/gexec"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/record"
@@ -57,10 +57,11 @@ const (
 )
 
 var (
-	cfg        *rest.Config
-	k8sClient  client.Client
-	testEnv    *envtest.Environment
-	testEnvExt *envtestutils.EnvironmentExtensions
+	apiServerBinary string
+	cfg             *rest.Config
+	k8sClient       client.Client
+	testEnv         *envtest.Environment
+	testEnvExt      *envtestutils.EnvironmentExtensions
 )
 
 func TestAPIs(t *testing.T) {
@@ -75,7 +76,14 @@ func TestAPIs(t *testing.T) {
 	RunSpecs(t, "Controller Suite")
 }
 
-var _ = BeforeSuite(func() {
+var _ = SynchronizedBeforeSuite(func() []byte {
+	path, err := gexec.Build(filepath.Join("..", "..", "cmd", "apiserver"))
+	Expect(err).NotTo(HaveOccurred())
+	DeferCleanup(gexec.CleanupBuildArtifacts)
+	return []byte(path)
+}, func(path []byte) {
+	apiServerBinary = string(path)
+
 	logf.SetLogger(zap.New(zap.WriteTo(GinkgoWriter), zap.UseDevMode(true)))
 
 	var err error
@@ -105,7 +113,7 @@ var _ = BeforeSuite(func() {
 	komega.SetClient(k8sClient)
 
 	apiSrv, err := apiserver.New(cfg, apiserver.Options{
-		Command:     []string{apiserverbin.Path},
+		Command:     []string{apiServerBinary},
 		ETCDServers: []string{testEnv.ControlPlane.Etcd.URL.String()},
 		Host:        testEnvExt.APIServiceInstallOptions.LocalServingHost,
 		Port:        testEnvExt.APIServiceInstallOptions.LocalServingPort,
