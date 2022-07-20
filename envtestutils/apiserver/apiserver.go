@@ -23,8 +23,10 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"sort"
 	"strconv"
+	"sync"
 	"syscall"
 	"time"
 
@@ -48,6 +50,7 @@ func (p ProcessArgs) Set(key string, values ...string) ProcessArgs {
 type APIServer struct {
 	mainPath string
 	command  []string
+	cmd      *exec.Cmd
 
 	config      *rest.Config
 	etcdServers []string
@@ -62,6 +65,12 @@ type APIServer struct {
 
 	healthTimeout time.Duration
 	waitTimeout   time.Duration
+
+	waitDone chan struct{}
+	errMu    sync.Mutex
+	exitErr  error
+	exited   bool
+	dir      string
 }
 
 type Options struct {
@@ -148,31 +157,42 @@ func New(cfg *rest.Config, opts Options) (*APIServer, error) {
 	}, nil
 }
 
-func (a *APIServer) Start(ctx context.Context) error {
-	tmp, err := a.setupTempDir()
+func (a *APIServer) Exited() (bool, error) {
+	a.errMu.Lock()
+	defer a.errMu.Unlock()
+	return a.exited, a.exitErr
+}
+
+func (a *APIServer) Start() error {
+	var err error
+	a.dir, err = a.setupTempDir()
 	if err != nil {
 		return fmt.Errorf("error setting up temp dir: %w", err)
 	}
-	defer func() { _ = os.RemoveAll(tmp.Name()) }()
 
-	cmd := a.createCmd(tmp)
-	if err := cmd.Start(); err != nil {
+	a.cmd = a.createCmd()
+	if err := a.cmd.Start(); err != nil {
+		a.errMu.Lock()
+		defer a.errMu.Unlock()
+		a.exited = true
 		return fmt.Errorf("error starting api server: %w", err)
 	}
 
-	var (
-		waitDone = make(chan struct{})
-		waitErr  error
-	)
+	a.waitDone = make(chan struct{})
 	go func() {
-		defer close(waitDone)
-		waitErr = cmd.Wait()
+		defer close(a.waitDone)
+		err := a.cmd.Wait()
+
+		a.errMu.Lock()
+		defer a.errMu.Unlock()
+		a.exitErr = err
+		a.exited = true
 	}()
 
 	var (
 		healthDone              = make(chan struct{})
 		healthErr               error
-		healthCtx, healthCancel = context.WithTimeout(ctx, a.healthTimeout)
+		healthCtx, healthCancel = context.WithTimeout(context.Background(), a.healthTimeout)
 	)
 	defer healthCancel()
 	go func() {
@@ -181,36 +201,48 @@ func (a *APIServer) Start(ctx context.Context) error {
 	}()
 
 	select {
-	case <-waitDone:
+	case <-a.waitDone:
 		healthCancel()
-		if waitErr != nil {
-			return fmt.Errorf("wait returned with error before healthy: %w", waitErr)
+		_, exitErr := a.Exited()
+		if exitErr != nil {
+			return fmt.Errorf("wait returned with error before healthy: %w", exitErr)
 		}
 		return fmt.Errorf("wait returned before ready")
 	case <-healthDone:
 		if healthErr != nil {
+			if a.cmd != nil {
+				// intentionally ignore this -- we might've crashed, failed to start, etc
+				_ = a.cmd.Process.Signal(syscall.SIGTERM)
+			}
 			return fmt.Errorf("healthiness check returned an error: %w", healthErr)
 		}
+		// This means we started successfully, health is done and returned no error.
+		return nil
 	}
+}
 
-	select {
-	case <-ctx.Done():
-		if err := cmd.Process.Signal(syscall.SIGTERM); err != nil {
-			return fmt.Errorf("error signaling process to stop: %w", err)
+func (a *APIServer) Stop() error {
+	defer func() {
+		if a.dir != "" {
+			_ = os.RemoveAll(a.dir)
 		}
-	case <-waitDone:
-		if waitErr != nil {
-			return fmt.Errorf("process exited early with error: %w", waitErr)
-		}
-		return fmt.Errorf("process exited early with no error")
+	}()
+	if a.cmd == nil {
+		return nil
+	}
+	if done, _ := a.Exited(); done {
+		return nil
+	}
+	if err := a.cmd.Process.Signal(syscall.SIGTERM); err != nil {
+		return fmt.Errorf("unable to signal for process to stop: %w", err)
 	}
 
 	t := time.NewTimer(a.waitTimeout)
 	defer t.Stop()
 
 	select {
-	case <-waitDone:
-		return waitErr
+	case <-a.waitDone:
+		return nil
 	case <-t.C:
 		return fmt.Errorf("timeout waiting for process to stop")
 	}
@@ -241,17 +273,17 @@ func (a *APIServer) pollHealthCheck(ctx context.Context) error {
 	})
 }
 
-func (a *APIServer) setupTempDir() (*os.File, error) {
+func (a *APIServer) setupTempDir() (string, error) {
 	tmpDir, err := os.MkdirTemp("", "apiserver")
 	if err != nil {
-		return nil, fmt.Errorf("error creating temp directory")
+		return "", fmt.Errorf("error creating temp directory")
 	}
 
 	if a.mainPath != "" {
 		apiSrvBinary, err := os.CreateTemp(tmpDir, "apiserver")
 		if err != nil {
 			_ = os.RemoveAll(tmpDir)
-			return nil, fmt.Errorf("error creating api server binary file")
+			return "", fmt.Errorf("error creating api server binary file")
 		}
 
 		cmd := exec.Command("go", "build", "-o", apiSrvBinary.Name(), a.mainPath)
@@ -259,7 +291,7 @@ func (a *APIServer) setupTempDir() (*os.File, error) {
 		cmd.Stderr = a.stderr
 		if err := cmd.Run(); err != nil {
 			_ = os.RemoveAll(tmpDir)
-			return nil, fmt.Errorf("error building api server binary: %w", err)
+			return "", fmt.Errorf("error building api server binary: %w", err)
 		}
 
 		a.command = []string{apiSrvBinary.Name()}
@@ -268,28 +300,23 @@ func (a *APIServer) setupTempDir() (*os.File, error) {
 	cfgData, err := controlplane.KubeConfigFromREST(a.config)
 	if err != nil {
 		_ = os.RemoveAll(tmpDir)
-		return nil, err
+		return "", err
 	}
 
-	tmp, err := os.CreateTemp(tmpDir, "kubeconfig")
-	if err != nil {
+	if err := os.WriteFile(filepath.Join(tmpDir, "kubeconfig"), cfgData, 0666); err != nil {
 		_ = os.RemoveAll(tmpDir)
-		return nil, err
+		return "", err
 	}
-
-	if err := os.WriteFile(tmp.Name(), cfgData, 0666); err != nil {
-		_ = os.RemoveAll(tmpDir)
-		return nil, err
-	}
-	return tmp, nil
+	return tmpDir, nil
 }
 
-func (a *APIServer) createCmd(tmp *os.File) *exec.Cmd {
+func (a *APIServer) createCmd() *exec.Cmd {
+	kubeconfig := filepath.Join(a.dir, "kubeconfig")
 	defaultArgs := ProcessArgs{
 		"etcd-servers":              a.etcdServers,
-		"kubeconfig":                []string{tmp.Name()},
-		"authentication-kubeconfig": []string{tmp.Name()},
-		"authorization-kubeconfig":  []string{tmp.Name()},
+		"kubeconfig":                []string{kubeconfig},
+		"authentication-kubeconfig": []string{kubeconfig},
+		"authorization-kubeconfig":  []string{kubeconfig},
 		"bind-address":              []string{a.host},
 		"secure-port":               []string{strconv.Itoa(a.port)},
 		"feature-gates":             []string{"APIPriorityAndFairness=false"},

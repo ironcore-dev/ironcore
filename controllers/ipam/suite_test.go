@@ -105,13 +105,8 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	})
 	Expect(err).NotTo(HaveOccurred())
 
-	ctx, cancel := context.WithCancel(context.Background())
-	DeferCleanup(cancel)
-	go func() {
-		defer GinkgoRecover()
-		err := apiSrv.Start(ctx)
-		Expect(err).NotTo(HaveOccurred())
-	}()
+	Expect(apiSrv.Start()).To(Succeed())
+	DeferCleanup(apiSrv.Stop)
 
 	Expect(envtestutils.WaitUntilAPIServicesReadyWithTimeout(apiServiceTimeout, testEnvExt, k8sClient, scheme.Scheme)).To(Succeed())
 
@@ -137,6 +132,8 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	}).SetupWithManager(k8sManager)
 	Expect(err).NotTo(HaveOccurred())
 
+	ctx, cancel := context.WithCancel(context.Background())
+	DeferCleanup(cancel)
 	Expect(SetupPrefixSpecIPFamilyFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 
 	go func() {

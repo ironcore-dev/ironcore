@@ -125,13 +125,8 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	})
 	Expect(err).NotTo(HaveOccurred())
 
-	ctx, cancel := context.WithCancel(context.Background())
-	DeferCleanup(cancel)
-	go func() {
-		defer GinkgoRecover()
-		err := apiSrv.Start(ctx)
-		Expect(err).NotTo(HaveOccurred())
-	}()
+	Expect(apiSrv.Start()).To(Succeed())
+	DeferCleanup(apiSrv.Stop)
 
 	err = envtestutils.WaitUntilAPIServicesReadyWithTimeout(apiServiceTimeout, testEnvExt, k8sClient, scheme.Scheme)
 	Expect(err).NotTo(HaveOccurred())
