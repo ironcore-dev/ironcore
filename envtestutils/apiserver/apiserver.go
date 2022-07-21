@@ -30,6 +30,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/onmetal/controller-utils/buildutils"
 	"github.com/onmetal/onmetal-api/internal/testing/controlplane"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -48,9 +49,10 @@ func (p ProcessArgs) Set(key string, values ...string) ProcessArgs {
 }
 
 type APIServer struct {
-	mainPath string
-	command  []string
-	cmd      *exec.Cmd
+	mainPackage  string
+	buildOptions []buildutils.BuildOption
+	command      []string
+	cmd          *exec.Cmd
 
 	config      *rest.Config
 	etcdServers []string
@@ -74,10 +76,11 @@ type APIServer struct {
 }
 
 type Options struct {
-	MainPath  string
-	Command   []string
-	Args      ProcessArgs
-	MergeArgs func(customArgs, defaultArgs ProcessArgs) ProcessArgs
+	MainPath     string
+	BuildOptions []buildutils.BuildOption
+	Command      []string
+	Args         ProcessArgs
+	MergeArgs    func(customArgs, defaultArgs ProcessArgs) ProcessArgs
 
 	ETCDServers []string
 	Host        string
@@ -141,7 +144,8 @@ func New(cfg *rest.Config, opts Options) (*APIServer, error) {
 	setAPIServerOptionsDefaults(&opts)
 
 	return &APIServer{
-		mainPath:      opts.MainPath,
+		mainPackage:   opts.MainPath,
+		buildOptions:  opts.BuildOptions,
 		command:       opts.Command,
 		config:        cfg,
 		etcdServers:   opts.ETCDServers,
@@ -279,17 +283,14 @@ func (a *APIServer) setupTempDir() (string, error) {
 		return "", fmt.Errorf("error creating temp directory")
 	}
 
-	if a.mainPath != "" {
+	if a.mainPackage != "" {
 		apiSrvBinary, err := os.CreateTemp(tmpDir, "apiserver")
 		if err != nil {
 			_ = os.RemoveAll(tmpDir)
 			return "", fmt.Errorf("error creating api server binary file")
 		}
 
-		cmd := exec.Command("go", "build", "-o", apiSrvBinary.Name(), a.mainPath)
-		cmd.Stdout = a.stdout
-		cmd.Stderr = a.stderr
-		if err := cmd.Run(); err != nil {
+		if err := buildutils.Build(a.mainPackage, apiSrvBinary.Name(), a.buildOptions...); err != nil {
 			_ = os.RemoveAll(tmpDir)
 			return "", fmt.Errorf("error building api server binary: %w", err)
 		}
