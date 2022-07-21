@@ -16,7 +16,7 @@ require (
 	github.com/onsi/gomega v1.20.0
 	github.com/spf13/cobra v1.5.0
 	github.com/spf13/pflag v1.0.5
-	go.uber.org/atomic v1.7.0
+	go.uber.org/atomic v1.9.0
 	golang.org/x/sys v0.0.0-20220422013727-9388b58f7150
 	inet.af/netaddr v0.0.0-20210903134321-85fa6c94624e
 	k8s.io/api v0.24.3
