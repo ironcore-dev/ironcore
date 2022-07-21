@@ -495,7 +495,7 @@ func (in *MachineSpec) DeepCopyInto(out *MachineSpec) {
 	}
 	if in.IgnitionRef != nil {
 		in, out := &in.IgnitionRef, &out.IgnitionRef
-		*out = new(commonv1alpha1.ConfigMapKeySelector)
+		*out = new(commonv1alpha1.SecretKeySelector)
 		**out = **in
 	}
 	if in.EFIVars != nil {

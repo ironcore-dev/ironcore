@@ -116,7 +116,7 @@ var _ = Describe("Machine", func() {
 		Entry("invalid ignition ref name",
 			&compute.Machine{
 				Spec: compute.MachineSpec{
-					IgnitionRef: &commonv1alpha1.ConfigMapKeySelector{
+					IgnitionRef: &commonv1alpha1.SecretKeySelector{
 						LocalObjectReference: corev1.LocalObjectReference{
 							Name: "foo*",
 						},

@@ -352,7 +352,7 @@ this NetworkInterface</p>
 </tr>
 <tr>
 <td>
-<code>virtualIp</code><br/>
+<code>virtualIP</code><br/>
 <em>
 <a href="#networking.api.onmetal.de/v1alpha1.VirtualIPSource">
 VirtualIPSource
@@ -788,7 +788,7 @@ this NetworkInterface</p>
 </tr>
 <tr>
 <td>
-<code>virtualIp</code><br/>
+<code>virtualIP</code><br/>
 <em>
 <a href="#networking.api.onmetal.de/v1alpha1.VirtualIPSource">
 VirtualIPSource
@@ -966,7 +966,7 @@ this NetworkInterface</p>
 </tr>
 <tr>
 <td>
-<code>virtualIp</code><br/>
+<code>virtualIP</code><br/>
 <em>
 <a href="#networking.api.onmetal.de/v1alpha1.VirtualIPSource">
 VirtualIPSource

@@ -43,7 +43,7 @@ type MachineSpec struct {
 	Volumes []Volume `json:"volumes,omitempty"`
 	// IgnitionRef is a reference to a config map containing the ignition YAML for the machine to boot up.
 	// If key is empty, DefaultIgnitionKey will be used as fallback.
-	IgnitionRef *commonv1alpha1.ConfigMapKeySelector `json:"ignitionRef,omitempty"`
+	IgnitionRef *commonv1alpha1.SecretKeySelector `json:"ignitionRef,omitempty"`
 	// EFIVars are variables to pass to EFI while booting up.
 	EFIVars []EFIVar `json:"efiVars,omitempty"`
 	// Tolerations define tolerations the Machine has. Only MachinePools whose taints

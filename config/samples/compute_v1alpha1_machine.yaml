@@ -14,4 +14,4 @@ spec:
       volumeRef:
         name: my-volume
   ignitionRef:
-    name: my-ignition-configmap
+    name: my-ignition-secret

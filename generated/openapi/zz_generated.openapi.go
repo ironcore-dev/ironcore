@@ -1395,7 +1395,7 @@ func schema_onmetal_api_apis_compute_v1alpha1_MachineSpec(ref common.ReferenceCa
 					"ignitionRef": {
 						SchemaProps: spec.SchemaProps{
 							Description: "IgnitionRef is a reference to a config map containing the ignition YAML for the machine to boot up. If key is empty, DefaultIgnitionKey will be used as fallback.",
-							Ref:         ref("github.com/onmetal/onmetal-api/apis/common/v1alpha1.ConfigMapKeySelector"),
+							Ref:         ref("github.com/onmetal/onmetal-api/apis/common/v1alpha1.SecretKeySelector"),
 						},
 					},
 					"efiVars": {
@@ -1431,7 +1431,7 @@ func schema_onmetal_api_apis_compute_v1alpha1_MachineSpec(ref common.ReferenceCa
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/common/v1alpha1.ConfigMapKeySelector", "github.com/onmetal/onmetal-api/apis/common/v1alpha1.Toleration", "github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EFIVar", "github.com/onmetal/onmetal-api/apis/compute/v1alpha1.NetworkInterface", "github.com/onmetal/onmetal-api/apis/compute/v1alpha1.Volume", "k8s.io/api/core/v1.LocalObjectReference"},
+			"github.com/onmetal/onmetal-api/apis/common/v1alpha1.SecretKeySelector", "github.com/onmetal/onmetal-api/apis/common/v1alpha1.Toleration", "github.com/onmetal/onmetal-api/apis/compute/v1alpha1.EFIVar", "github.com/onmetal/onmetal-api/apis/compute/v1alpha1.NetworkInterface", "github.com/onmetal/onmetal-api/apis/compute/v1alpha1.Volume", "k8s.io/api/core/v1.LocalObjectReference"},
 	}
 }
 
@@ -2612,7 +2612,7 @@ func schema_onmetal_api_apis_networking_v1alpha1_NetworkInterfaceSpec(ref common
 							},
 						},
 					},
-					"virtualIp": {
+					"virtualIP": {
 						SchemaProps: spec.SchemaProps{
 							Description: "VirtualIP specifies the virtual ip that should be assigned to this NetworkInterface.",
 							Ref:         ref("github.com/onmetal/onmetal-api/apis/networking/v1alpha1.VirtualIPSource"),

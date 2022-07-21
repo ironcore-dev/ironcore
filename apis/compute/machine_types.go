@@ -41,9 +41,9 @@ type MachineSpec struct {
 	NetworkInterfaces []NetworkInterface
 	// Volumes are volumes attached to this machine.
 	Volumes []Volume
-	// IgnitionRef is a reference to a config map containing the ignition YAML for the machine to boot up.
+	// IgnitionRef is a reference to a secret containing the ignition YAML for the machine to boot up.
 	// If key is empty, DefaultIgnitionKey will be used as fallback.
-	IgnitionRef *commonv1alpha1.ConfigMapKeySelector
+	IgnitionRef *commonv1alpha1.SecretKeySelector
 	// EFIVars are variables to pass to EFI while booting up.
 	EFIVars []EFIVar
 	// Tolerations define tolerations the Machine has. Only MachinePools whose taints
