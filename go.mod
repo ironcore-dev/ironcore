@@ -10,7 +10,7 @@ require (
 	github.com/google/go-cmp v0.5.8
 	github.com/gorilla/mux v1.8.0
 	github.com/moby/term v0.0.0-20210619224110-3f7ff695adc6
-	github.com/onmetal/controller-utils v0.6.1
+	github.com/onmetal/controller-utils v0.6.2
 	github.com/onmetal/vgopath v0.0.2
 	github.com/onsi/ginkgo/v2 v2.1.4
 	github.com/onsi/gomega v1.20.0
