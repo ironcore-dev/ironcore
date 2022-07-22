@@ -34,7 +34,7 @@ type NetworkInterfaceSpec struct {
 	// this NetworkInterface
 	IPs []IPSource `json:"ips"`
 	// VirtualIP specifies the virtual ip that should be assigned to this NetworkInterface.
-	VirtualIP *VirtualIPSource `json:"virtualIp,omitempty"`
+	VirtualIP *VirtualIPSource `json:"virtualIP,omitempty"`
 }
 
 // IPSource is the definition of how to obtain an IP.

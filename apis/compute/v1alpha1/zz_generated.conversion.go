@@ -773,7 +773,7 @@ func autoConvert_v1alpha1_MachineSpec_To_compute_MachineSpec(in *MachineSpec, ou
 	out.ImagePullSecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.ImagePullSecretRef))
 	out.NetworkInterfaces = *(*[]compute.NetworkInterface)(unsafe.Pointer(&in.NetworkInterfaces))
 	out.Volumes = *(*[]compute.Volume)(unsafe.Pointer(&in.Volumes))
-	out.IgnitionRef = (*commonv1alpha1.ConfigMapKeySelector)(unsafe.Pointer(in.IgnitionRef))
+	out.IgnitionRef = (*commonv1alpha1.SecretKeySelector)(unsafe.Pointer(in.IgnitionRef))
 	out.EFIVars = *(*[]compute.EFIVar)(unsafe.Pointer(&in.EFIVars))
 	out.Tolerations = *(*[]commonv1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
 	return nil
@@ -792,7 +792,7 @@ func autoConvert_compute_MachineSpec_To_v1alpha1_MachineSpec(in *compute.Machine
 	out.ImagePullSecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.ImagePullSecretRef))
 	out.NetworkInterfaces = *(*[]NetworkInterface)(unsafe.Pointer(&in.NetworkInterfaces))
 	out.Volumes = *(*[]Volume)(unsafe.Pointer(&in.Volumes))
-	out.IgnitionRef = (*commonv1alpha1.ConfigMapKeySelector)(unsafe.Pointer(in.IgnitionRef))
+	out.IgnitionRef = (*commonv1alpha1.SecretKeySelector)(unsafe.Pointer(in.IgnitionRef))
 	out.EFIVars = *(*[]EFIVar)(unsafe.Pointer(&in.EFIVars))
 	out.Tolerations = *(*[]commonv1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
 	return nil

@@ -165,8 +165,8 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>ignitionRef</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ConfigMapKeySelector">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ConfigMapKeySelector
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.SecretKeySelector">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.SecretKeySelector
 </a>
 </em>
 </td>
@@ -1154,8 +1154,8 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>ignitionRef</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.ConfigMapKeySelector">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.ConfigMapKeySelector
+<a href="/api-reference/common/#common.onmetal.de/v1alpha1.SecretKeySelector">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.SecretKeySelector
 </a>
 </em>
 </td>
