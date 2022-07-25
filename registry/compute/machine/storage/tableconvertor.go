@@ -68,7 +68,6 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 		} else {
 			cells = append(cells, "<none>")
 		}
-		cells = append(cells, machine.Spec.Image)
 		if machinePoolRef := machine.Spec.MachinePoolRef; machinePoolRef != nil {
 			cells = append(cells, machinePoolRef.Name)
 		} else {
