@@ -25,6 +25,7 @@ import (
 	"github.com/onmetal/onmetal-api/testutils"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gstruct"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -140,19 +141,19 @@ var _ = Describe("MachineReconciler", func() {
 
 		By("waiting for the machine status to be updated")
 		Eventually(Object(machine)).Should(SatisfyAll(
-			HaveField("Status.NetworkInterfaces", []computev1alpha1.NetworkInterfaceStatus{
-				{
-					Name:  "interface",
-					Phase: computev1alpha1.NetworkInterfacePhaseBound,
-					IPs:   []commonv1alpha1.IP{commonv1alpha1.MustParseIP("10.0.0.1")},
-				},
-			}),
-			HaveField("Status.Volumes", []computev1alpha1.VolumeStatus{
-				{
-					Name:  "volume",
-					Phase: computev1alpha1.VolumePhaseBound,
-				},
-			}),
+			HaveField("Status.NetworkInterfaces", ConsistOf(
+				MatchFields(IgnoreMissing|IgnoreExtras, Fields{
+					"Name":  Equal("interface"),
+					"Phase": Equal(computev1alpha1.NetworkInterfacePhaseBound),
+					"IPs":   ConsistOf(commonv1alpha1.MustParseIP("10.0.0.1")),
+				}),
+			)),
+			HaveField("Status.Volumes", ConsistOf(
+				MatchFields(IgnoreMissing|IgnoreExtras, Fields{
+					"Name":  Equal("volume"),
+					"Phase": Equal(computev1alpha1.VolumePhaseBound),
+				}),
+			)),
 		))
 
 		By("removing the ephemeral items from the machine")

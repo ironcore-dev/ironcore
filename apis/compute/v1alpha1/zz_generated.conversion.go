@@ -32,6 +32,7 @@ import (
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 	resource "k8s.io/apimachinery/pkg/api/resource"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	conversion "k8s.io/apimachinery/pkg/conversion"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
@@ -880,6 +881,7 @@ func Convert_compute_NetworkInterfaceSource_To_v1alpha1_NetworkInterfaceSource(i
 func autoConvert_v1alpha1_NetworkInterfaceStatus_To_compute_NetworkInterfaceStatus(in *NetworkInterfaceStatus, out *compute.NetworkInterfaceStatus, s conversion.Scope) error {
 	out.Name = in.Name
 	out.Phase = compute.NetworkInterfacePhase(in.Phase)
+	out.LastPhaseTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastPhaseTransitionTime))
 	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
 	out.VirtualIP = (*commonv1alpha1.IP)(unsafe.Pointer(in.VirtualIP))
 	return nil
@@ -893,6 +895,7 @@ func Convert_v1alpha1_NetworkInterfaceStatus_To_compute_NetworkInterfaceStatus(i
 func autoConvert_compute_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStatus(in *compute.NetworkInterfaceStatus, out *NetworkInterfaceStatus, s conversion.Scope) error {
 	out.Name = in.Name
 	out.Phase = NetworkInterfacePhase(in.Phase)
+	out.LastPhaseTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastPhaseTransitionTime))
 	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
 	out.VirtualIP = (*commonv1alpha1.IP)(unsafe.Pointer(in.VirtualIP))
 	return nil
@@ -956,6 +959,7 @@ func Convert_compute_VolumeSource_To_v1alpha1_VolumeSource(in *compute.VolumeSou
 func autoConvert_v1alpha1_VolumeStatus_To_compute_VolumeStatus(in *VolumeStatus, out *compute.VolumeStatus, s conversion.Scope) error {
 	out.Name = in.Name
 	out.Phase = compute.VolumePhase(in.Phase)
+	out.LastPhaseTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastPhaseTransitionTime))
 	out.DeviceID = in.DeviceID
 	return nil
 }
@@ -968,6 +972,7 @@ func Convert_v1alpha1_VolumeStatus_To_compute_VolumeStatus(in *VolumeStatus, out
 func autoConvert_compute_VolumeStatus_To_v1alpha1_VolumeStatus(in *compute.VolumeStatus, out *VolumeStatus, s conversion.Scope) error {
 	out.Name = in.Name
 	out.Phase = VolumePhase(in.Phase)
+	out.LastPhaseTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastPhaseTransitionTime))
 	out.DeviceID = in.DeviceID
 	return nil
 }

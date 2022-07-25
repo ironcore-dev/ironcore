@@ -35,9 +35,9 @@ import (
 )
 
 type PrefixAllocationScheduler struct {
+	record.EventRecorder
 	client.Client
 	Scheme *runtime.Scheme
-	Events record.EventRecorder
 }
 
 //+kubebuilder:rbac:groups=ipam.api.onmetal.de,resources=prefixes,verbs=get;list;watch
@@ -158,7 +158,7 @@ func (s *PrefixAllocationScheduler) reconcile(ctx context.Context, log logr.Logg
 	}
 	if ref == "" {
 		log.V(1).Info("No suitable prefix found")
-		s.Events.Event(allocation, corev1.EventTypeNormal, "NoSuitablePrefix", "No suitable prefix for scheduling allocation found.")
+		s.Event(allocation, corev1.EventTypeNormal, "NoSuitablePrefix", "No suitable prefix for scheduling allocation found.")
 		return ctrl.Result{}, nil
 	}
 

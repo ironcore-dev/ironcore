@@ -114,6 +114,8 @@ type NetworkInterfaceStatus struct {
 	Name string
 	// Phase is the NetworkInterface binding phase of the NetworkInterface.
 	Phase NetworkInterfacePhase
+	// LastPhaseTransitionTime is the last time the Phase transitioned.
+	LastPhaseTransitionTime *metav1.Time
 	// IPs are the ips allocated for the network interface.
 	IPs []commonv1alpha1.IP
 	// VirtualIP is the virtual ip allocated for the network interface.
@@ -136,6 +138,8 @@ type VolumeStatus struct {
 	Name string
 	// Phase represents the binding phase of a Volume.
 	Phase VolumePhase
+	// LastPhaseTransitionTime is the last time the Phase transitioned.
+	LastPhaseTransitionTime *metav1.Time
 	// DeviceID is the disk device ID on the host.
 	DeviceID string
 }

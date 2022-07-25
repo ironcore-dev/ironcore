@@ -1583,6 +1583,12 @@ func schema_onmetal_api_apis_compute_v1alpha1_NetworkInterfaceStatus(ref common.
 							Format:      "",
 						},
 					},
+					"lastPhaseTransitionTime": {
+						SchemaProps: spec.SchemaProps{
+							Description: "LastPhaseTransitionTime is the last time the Phase transitioned.",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
+						},
+					},
 					"ips": {
 						SchemaProps: spec.SchemaProps{
 							Description: "IPs are the ips allocated for the network interface.",
@@ -1608,7 +1614,7 @@ func schema_onmetal_api_apis_compute_v1alpha1_NetworkInterfaceStatus(ref common.
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP"},
+			"github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
 	}
 }
 
@@ -1709,6 +1715,12 @@ func schema_onmetal_api_apis_compute_v1alpha1_VolumeStatus(ref common.ReferenceC
 							Format:      "",
 						},
 					},
+					"lastPhaseTransitionTime": {
+						SchemaProps: spec.SchemaProps{
+							Description: "LastPhaseTransitionTime is the last time the Phase transitioned.",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
+						},
+					},
 					"deviceID": {
 						SchemaProps: spec.SchemaProps{
 							Description: "DeviceID is the disk device ID on the host.",
@@ -1720,6 +1732,8 @@ func schema_onmetal_api_apis_compute_v1alpha1_VolumeStatus(ref common.ReferenceC
 				Required: []string{"name"},
 			},
 		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
 	}
 }
 

@@ -163,8 +163,8 @@ func main() {
 
 	if controllers.Enabled(machineSchedulerController) {
 		if err := (&computecontrollers.MachineScheduler{
-			Client: mgr.GetClient(),
-			Events: mgr.GetEventRecorderFor("machine-scheduler"),
+			Client:        mgr.GetClient(),
+			EventRecorder: mgr.GetEventRecorderFor("machine-scheduler"),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "MachineScheduler")
 			os.Exit(1)
@@ -199,10 +199,11 @@ func main() {
 		}
 
 		if err = (&storagecontrollers.VolumeReconciler{
-			Client:      mgr.GetClient(),
-			APIReader:   mgr.GetAPIReader(),
-			Scheme:      mgr.GetScheme(),
-			BindTimeout: volumeBindTimeout,
+			EventRecorder: mgr.GetEventRecorderFor("volumes"),
+			Client:        mgr.GetClient(),
+			APIReader:     mgr.GetAPIReader(),
+			Scheme:        mgr.GetScheme(),
+			BindTimeout:   volumeBindTimeout,
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "Volume")
 			os.Exit(1)
@@ -211,8 +212,8 @@ func main() {
 
 	if controllers.Enabled(volumeScheduler) {
 		if err = (&storagecontrollers.VolumeScheduler{
-			Client: mgr.GetClient(),
-			Events: mgr.GetEventRecorderFor("volume-scheduler"),
+			EventRecorder: mgr.GetEventRecorderFor("volume-scheduler"),
+			Client:        mgr.GetClient(),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "VolumeScheduler")
 		}
@@ -220,8 +221,9 @@ func main() {
 
 	if controllers.Enabled(machineController) {
 		if err = (&computecontrollers.MachineReconciler{
-			Client: mgr.GetClient(),
-			Scheme: mgr.GetScheme(),
+			EventRecorder: mgr.GetEventRecorderFor("machines"),
+			Client:        mgr.GetClient(),
+			Scheme:        mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "Machine")
 			os.Exit(1)
@@ -256,9 +258,9 @@ func main() {
 
 	if controllers.Enabled(prefixAllocationScheduler) {
 		if err = (&ipamcontrollers.PrefixAllocationScheduler{
-			Client: mgr.GetClient(),
-			Scheme: mgr.GetScheme(),
-			Events: mgr.GetEventRecorderFor("prefix-allocation-scheduler"),
+			Client:        mgr.GetClient(),
+			Scheme:        mgr.GetScheme(),
+			EventRecorder: mgr.GetEventRecorderFor("prefix-allocation-scheduler"),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "PrefixAllocationScheduler")
 			os.Exit(1)
@@ -274,8 +276,9 @@ func main() {
 
 	if controllers.Enabled(networkInterfaceController) {
 		if err = (&networking.NetworkInterfaceReconciler{
-			Client: mgr.GetClient(),
-			Scheme: mgr.GetScheme(),
+			EventRecorder: mgr.GetEventRecorderFor("networkinterfaces"),
+			Client:        mgr.GetClient(),
+			Scheme:        mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "NetworkInterface")
 			os.Exit(1)
@@ -284,10 +287,11 @@ func main() {
 
 	if controllers.Enabled(networkInterfaceBindController) {
 		if err = (&networking.NetworkInterfaceBindReconciler{
-			Client:      mgr.GetClient(),
-			APIReader:   mgr.GetAPIReader(),
-			Scheme:      mgr.GetScheme(),
-			BindTimeout: networkInterfaceBindTimeout,
+			EventRecorder: mgr.GetEventRecorderFor("networkinterfaces"),
+			Client:        mgr.GetClient(),
+			APIReader:     mgr.GetAPIReader(),
+			Scheme:        mgr.GetScheme(),
+			BindTimeout:   networkInterfaceBindTimeout,
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "NetworkInterfaceBind")
 			os.Exit(1)
@@ -296,10 +300,11 @@ func main() {
 
 	if controllers.Enabled(virtualIPController) {
 		if err = (&networking.VirtualIPReconciler{
-			Client:      mgr.GetClient(),
-			APIReader:   mgr.GetAPIReader(),
-			Scheme:      mgr.GetScheme(),
-			BindTimeout: virtualIPBindTimeout,
+			EventRecorder: mgr.GetEventRecorderFor("virtualips"),
+			Client:        mgr.GetClient(),
+			APIReader:     mgr.GetAPIReader(),
+			Scheme:        mgr.GetScheme(),
+			BindTimeout:   virtualIPBindTimeout,
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "VirtualIP")
 			os.Exit(1)

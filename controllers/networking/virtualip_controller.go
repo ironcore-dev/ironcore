@@ -25,10 +25,13 @@ import (
 	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
+	"github.com/onmetal/onmetal-api/controllers/networking/events"
 	"github.com/onmetal/onmetal-api/controllers/shared"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
@@ -37,6 +40,7 @@ import (
 
 // VirtualIPReconciler reconciles a VirtualIP object
 type VirtualIPReconciler struct {
+	record.EventRecorder
 	client.Client
 	APIReader client.Reader
 	Scheme    *runtime.Scheme
@@ -131,6 +135,11 @@ func (r *VirtualIPReconciler) reconcileBound(ctx context.Context, log logr.Logge
 		"Phase", phase,
 		"PhaseLastTransitionTime", phaseLastTransitionTime,
 	)
+
+	if !nicExists {
+		r.Eventf(virtualIP, corev1.EventTypeWarning, events.FailedBindingNetworkInterface, "Network interface %s not found", nicKey.Name)
+	}
+
 	switch {
 	case validReferences:
 		log.V(1).Info("Setting virtual ip to bound")

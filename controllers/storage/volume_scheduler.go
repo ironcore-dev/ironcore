@@ -42,8 +42,8 @@ const (
 )
 
 type VolumeScheduler struct {
+	record.EventRecorder
 	client.Client
-	Events record.EventRecorder
 }
 
 //+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes,verbs=get;list;watch;update;patch
@@ -88,7 +88,7 @@ func (s *VolumeScheduler) schedule(ctx context.Context, log logr.Logger, volume 
 	}
 	if len(available) == 0 {
 		log.Info("No volume pool available for volume class", "VolumeClass", volume.Spec.VolumeClassRef.Name)
-		s.Events.Eventf(volume, corev1.EventTypeNormal, "CannotSchedule", "No VolumePoolRef found for VolumeClass %s", volume.Spec.VolumeClassRef.Name)
+		s.Eventf(volume, corev1.EventTypeNormal, "CannotSchedule", "No VolumePoolRef found for VolumeClass %s", volume.Spec.VolumeClassRef.Name)
 		return ctrl.Result{}, nil
 	}
 
@@ -101,7 +101,7 @@ func (s *VolumeScheduler) schedule(ctx context.Context, log logr.Logger, volume 
 	}
 	if len(filtered) == 0 {
 		log.Info("No volume pool tolerated by the volume", "Tolerations", volume.Spec.Tolerations)
-		s.Events.Eventf(volume, corev1.EventTypeNormal, "CannotSchedule", "No VolumePoolRef tolerated by %s", &volume.Spec.Tolerations)
+		s.Eventf(volume, corev1.EventTypeNormal, "CannotSchedule", "No VolumePoolRef tolerated by %s", &volume.Spec.Tolerations)
 		return ctrl.Result{}, nil
 	}
 	available = filtered

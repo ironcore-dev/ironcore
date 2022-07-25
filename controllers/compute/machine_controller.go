@@ -18,18 +18,24 @@ package compute
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"reflect"
 
 	"github.com/go-logr/logr"
+	"github.com/onmetal/controller-utils/metautils"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 	onmetalapiclientutils "github.com/onmetal/onmetal-api/clientutils"
+	"github.com/onmetal/onmetal-api/controllers/compute/events"
 	"github.com/onmetal/onmetal-api/controllers/shared"
+	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
@@ -42,6 +48,7 @@ const (
 
 // MachineReconciler reconciles a Machine object
 type MachineReconciler struct {
+	record.EventRecorder
 	client.Client
 	Scheme *runtime.Scheme
 }
@@ -82,7 +89,12 @@ func (r *MachineReconciler) computeNetworkInterfaceStatusValues(machine *compute
 	return computev1alpha1.NetworkInterfacePhaseBound, nic.Status.IPs, nic.Status.VirtualIP
 }
 
-func (r *MachineReconciler) applyNetworkInterface(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine, machineNic *computev1alpha1.NetworkInterface) (phase computev1alpha1.NetworkInterfacePhase, ips []commonv1alpha1.IP, virtualIP *commonv1alpha1.IP, err error) {
+func (r *MachineReconciler) applyNetworkInterface(
+	ctx context.Context,
+	log logr.Logger,
+	machine *computev1alpha1.Machine,
+	machineNic *computev1alpha1.NetworkInterface,
+) (phase computev1alpha1.NetworkInterfacePhase, ips []commonv1alpha1.IP, virtualIP *commonv1alpha1.IP, bindWarning string, err error) {
 	switch {
 	case machineNic.NetworkInterfaceRef != nil:
 		nic := &networkingv1alpha1.NetworkInterface{}
@@ -90,11 +102,15 @@ func (r *MachineReconciler) applyNetworkInterface(ctx context.Context, log logr.
 		log = log.WithValues("NetworkInterfaceKey", nicKey)
 		log.V(1).Info("Getting referenced network interface")
 		if err := r.Get(ctx, nicKey, nic); err != nil {
-			return "", nil, nil, fmt.Errorf("error getting network interface %s: %w", nicKey, err)
+			if !apierrors.IsNotFound(err) {
+				return "", nil, nil, "", fmt.Errorf("error getting network interface %s: %w", nicKey, err)
+			}
+
+			return computev1alpha1.NetworkInterfacePhasePending, nil, nil, fmt.Sprintf("network interface %s not found", nicKey.Name), nil
 		}
 
 		phase, ips, virtualIP = r.computeNetworkInterfaceStatusValues(machine, nic)
-		return phase, ips, virtualIP, nil
+		return phase, ips, virtualIP, "", nil
 	case machineNic.Ephemeral != nil:
 		template := machineNic.Ephemeral.NetworkInterfaceTemplate
 		nic := &networkingv1alpha1.NetworkInterface{
@@ -109,19 +125,23 @@ func (r *MachineReconciler) applyNetworkInterface(ctx context.Context, log logr.
 		if err := onmetalapiclientutils.ControlledCreateOrGet(ctx, r.Client, machine, nic, func() error {
 			nic.Labels = template.Labels
 			nic.Annotations = template.Annotations
-			metav1.SetMetaDataLabel(&nic.ObjectMeta, ephemeralSourceMachineUIDLabel, string(machine.UID))
+			metautils.SetLabel(nic, ephemeralSourceMachineUIDLabel, string(machine.UID))
 
 			nic.Spec = template.Spec
 			nic.Spec.MachineRef = &commonv1alpha1.LocalUIDReference{Name: machine.Name, UID: machine.UID}
 			return nil
 		}); err != nil {
-			return "", nil, nil, fmt.Errorf("error managing network interface %s: %w", nic.Name, err)
+			if !errors.Is(err, onmetalapiclientutils.ErrNotControlled) {
+				return "", nil, nil, "", fmt.Errorf("error managing network interface %s: %w", nic.Name, err)
+			}
+
+			return computev1alpha1.NetworkInterfacePhasePending, nil, nil, fmt.Sprintf("network interface %s cannot be managed", nic.Name), nil
 		}
 
 		phase, ips, virtualIP = r.computeNetworkInterfaceStatusValues(machine, nic)
-		return phase, ips, virtualIP, nil
+		return phase, ips, virtualIP, "", nil
 	default:
-		return "", nil, nil, fmt.Errorf("invalid interface %#v", machineNic)
+		return "", nil, nil, "", fmt.Errorf("invalid interface %#v", machineNic)
 	}
 }
 
@@ -170,27 +190,41 @@ func (r *MachineReconciler) pruneEphemeralNetworkInterfaces(ctx context.Context,
 	return nil
 }
 
-func (r *MachineReconciler) applyNetworkInterfaces(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) ([]computev1alpha1.NetworkInterfaceStatus, error) {
+func (r *MachineReconciler) bindNetworkInterfaces(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) ([]computev1alpha1.NetworkInterfaceStatus, error) {
 	defer func() {
 		if err := r.pruneEphemeralNetworkInterfaces(ctx, machine); err != nil {
 			log.Error(err, "Error pruning ephemeral network interfaces")
 		}
 	}()
 
-	var res []computev1alpha1.NetworkInterfaceStatus
+	var (
+		res          []computev1alpha1.NetworkInterfaceStatus
+		bindWarnings []string
+		now          = metav1.Now()
+	)
 	for _, machineNic := range machine.Spec.NetworkInterfaces {
-		phase, ips, virtualIP, err := r.applyNetworkInterface(ctx, log, machine, &machineNic)
+		phase, ips, virtualIP, bindError, err := r.applyNetworkInterface(ctx, log, machine, &machineNic)
 		if err != nil {
 			return nil, fmt.Errorf("[interface %s]: %w", machineNic.Name, err)
 		}
+		if bindError != "" {
+			bindWarnings = append(bindWarnings, bindError)
+		}
 
 		status := r.getOrInitNetworkInterfaceStatus(machine, machineNic.Name)
+		if phase != status.Phase {
+			status.LastPhaseTransitionTime = &now
+		}
 		status.Phase = phase
 		status.IPs = ips
 		status.VirtualIP = virtualIP
 
 		res = append(res, status)
 	}
+	if len(bindWarnings) > 0 {
+		r.Eventf(machine, corev1.EventTypeWarning, events.FailedBindingNetworkInterfaces, "Failed binding network interface(s): %v", bindWarnings)
+	}
+
 	return res, nil
 }
 
@@ -239,23 +273,37 @@ func (r *MachineReconciler) pruneEphemeralVolumes(ctx context.Context, machine *
 	return nil
 }
 
-func (r *MachineReconciler) applyVolumes(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) ([]computev1alpha1.VolumeStatus, error) {
+func (r *MachineReconciler) bindVolumes(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) ([]computev1alpha1.VolumeStatus, error) {
 	defer func() {
 		if err := r.pruneEphemeralVolumes(ctx, machine); err != nil {
 			log.Error(err, "Error pruning ephemeral volumes")
 		}
 	}()
 
-	var res []computev1alpha1.VolumeStatus
+	var (
+		res          []computev1alpha1.VolumeStatus
+		bindWarnings []string
+		now          = metav1.Now()
+	)
 	for _, machineVolume := range machine.Spec.Volumes {
-		phase, err := r.applyVolume(ctx, log, machine, &machineVolume)
+		phase, bindWarning, err := r.bindVolume(ctx, log, machine, &machineVolume)
 		if err != nil {
 			return nil, fmt.Errorf("[volume %s] %w", machineVolume.Name, err)
 		}
+		if bindWarning != "" {
+			bindWarnings = append(bindWarnings, bindWarning)
+		}
 
 		status := r.getOrInitVolumeStatus(machine, machineVolume.Name)
+		if phase != status.Phase {
+			status.LastPhaseTransitionTime = &now
+		}
 		status.Phase = phase
 		res = append(res, status)
+	}
+
+	if len(bindWarnings) > 0 {
+		r.Eventf(machine, corev1.EventTypeWarning, events.FailedBindingVolumes, "Failed binding volume(s): %v", bindWarnings)
 	}
 
 	return res, nil
@@ -280,13 +328,13 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 	log.V(1).Info("Reconciling")
 
 	log.V(1).Info("Applying network interfaces")
-	nics, err := r.applyNetworkInterfaces(ctx, log, machine)
+	nics, err := r.bindNetworkInterfaces(ctx, log, machine)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error applying network interfaces: %w", err)
 	}
 
 	log.V(1).Info("Applying  volumes")
-	volumes, err := r.applyVolumes(ctx, log, machine)
+	volumes, err := r.bindVolumes(ctx, log, machine)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error applying volumes: %w", err)
 	}
@@ -307,19 +355,27 @@ func (r *MachineReconciler) computeVolumePhase(machine *computev1alpha1.Machine,
 	return computev1alpha1.VolumePhaseBound
 }
 
-func (r *MachineReconciler) applyVolume(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine, machineVolume *computev1alpha1.Volume) (computev1alpha1.VolumePhase, error) {
+func (r *MachineReconciler) bindVolume(
+	ctx context.Context,
+	log logr.Logger,
+	machine *computev1alpha1.Machine,
+	machineVolume *computev1alpha1.Volume,
+) (phase computev1alpha1.VolumePhase, bindWarning string, err error) {
 	switch {
 	case machineVolume.EmptyDisk != nil:
-		return computev1alpha1.VolumePhaseBound, nil
+		return computev1alpha1.VolumePhaseBound, "", nil
 	case machineVolume.VolumeRef != nil:
 		volume := &storagev1alpha1.Volume{}
 		volumeKey := client.ObjectKey{Namespace: machine.Namespace, Name: machineVolume.VolumeRef.Name}
 		log.V(1).Info("Getting volume", "VolumeKey", volumeKey)
 		if err := r.Get(ctx, volumeKey, volume); err != nil {
-			return "", fmt.Errorf("error getting volume %s: %w", volumeKey, err)
-		}
+			if !apierrors.IsNotFound(err) {
+				return "", "", fmt.Errorf("error getting volume %s: %w", volumeKey, err)
+			}
 
-		return r.computeVolumePhase(machine, volume), nil
+			return computev1alpha1.VolumePhasePending, fmt.Sprintf("volume %s not found", volumeKey.Name), nil
+		}
+		return r.computeVolumePhase(machine, volume), "", nil
 	case machineVolume.Ephemeral != nil:
 		template := machineVolume.Ephemeral.VolumeTemplate
 		volume := &storagev1alpha1.Volume{
@@ -340,12 +396,16 @@ func (r *MachineReconciler) applyVolume(ctx context.Context, log logr.Logger, ma
 			volume.Spec.ClaimRef = &commonv1alpha1.LocalUIDReference{Name: machine.Name, UID: machine.UID}
 			return nil
 		}); err != nil {
-			return "", fmt.Errorf("error managing volume %s: %w", volume.Name, err)
+			if !errors.Is(err, onmetalapiclientutils.ErrNotControlled) {
+				return "", "", fmt.Errorf("error managing volume %s: %w", volume.Name, err)
+			}
+
+			return computev1alpha1.VolumePhasePending, fmt.Sprintf("volume %s cannot be managed", volume.Name), nil
 		}
 
-		return r.computeVolumePhase(machine, volume), nil
+		return r.computeVolumePhase(machine, volume), "", nil
 	default:
-		return "", fmt.Errorf("invalid volume %#v", machineVolume)
+		return "", "", fmt.Errorf("invalid volume %#v", machineVolume)
 	}
 }
 

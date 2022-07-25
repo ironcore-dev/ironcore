@@ -98,10 +98,10 @@ var _ = Describe("LoadBalancerService", func() {
 		Eventually(func() []computev1alpha1.MachinePoolAddress {
 			addresses, _ = (*eps).GetEndpoints()
 			return addresses
-		}).Should(Equal([]computev1alpha1.MachinePoolAddress{
-			{Type: computev1alpha1.MachinePoolExternalDNS, Address: "foo.example.org"},
-			{Type: computev1alpha1.MachinePoolExternalIP, Address: "127.0.0.1"},
-		}))
+		}).Should(ConsistOf(
+			computev1alpha1.MachinePoolAddress{Type: computev1alpha1.MachinePoolExternalDNS, Address: "foo.example.org"},
+			computev1alpha1.MachinePoolAddress{Type: computev1alpha1.MachinePoolExternalIP, Address: "127.0.0.1"},
+		))
 		Expect(notifyCount.Load()).To(BeEquivalentTo(1), "notify count not updated")
 
 		By("emptying the service load balancer ingress items")

@@ -16,6 +16,7 @@ package clientutils
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -24,6 +25,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
+
+// ErrNotControlled is returned if the actual object is not controlled by the specified owner.
+var ErrNotControlled = errors.New("not controlled")
 
 // ControlledCreateOrGet gets an object if it is controlled by the owner or creates the object with the given owner.
 // If the object exists but is not owned, an error is returned.
@@ -44,8 +48,8 @@ func ControlledCreateOrGet(ctx context.Context, c client.Client, owner client.Ob
 	}
 
 	if !metav1.IsControlledBy(obj, owner) {
-		return fmt.Errorf("existing object %s is not controlled by %s",
-			key, client.ObjectKeyFromObject(owner))
+		return fmt.Errorf("%w: existing object %s is not controlled by %s",
+			ErrNotControlled, key, client.ObjectKeyFromObject(owner))
 	}
 	return nil
 }

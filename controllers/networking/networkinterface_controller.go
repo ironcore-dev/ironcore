@@ -16,6 +16,7 @@ package networking
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"reflect"
 
@@ -24,9 +25,13 @@ import (
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/apis/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
 	onmetalapiclientutils "github.com/onmetal/onmetal-api/clientutils"
+	"github.com/onmetal/onmetal-api/controllers/networking/events"
 	"github.com/onmetal/onmetal-api/controllers/shared"
+	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
@@ -34,9 +39,9 @@ import (
 )
 
 type NetworkInterfaceReconciler struct {
+	record.EventRecorder
 	client.Client
-	APIReader client.Reader
-	Scheme    *runtime.Scheme
+	Scheme *runtime.Scheme
 }
 
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces,verbs=get;list;watch;create;update;patch;delete
@@ -69,13 +74,6 @@ func (r *NetworkInterfaceReconciler) delete(ctx context.Context, log logr.Logger
 }
 
 func (r *NetworkInterfaceReconciler) reconcile(ctx context.Context, log logr.Logger, nic *networkingv1alpha1.NetworkInterface) (ctrl.Result, error) {
-	log.V(1).Info("Getting network")
-	network := &networkingv1alpha1.Network{}
-	if err := r.Get(ctx, client.ObjectKey{Namespace: nic.Namespace, Name: nic.Spec.NetworkRef.Name}, network); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error getting network: %w", err)
-	}
-	log.V(1).Info("Successfully got network")
-
 	log.V(1).Info("Applying IPs")
 	ips, err := r.applyIPs(ctx, nic)
 	if err != nil {
@@ -111,91 +109,125 @@ func (r *NetworkInterfaceReconciler) patchStatus(ctx context.Context, nic *netwo
 }
 
 func (r *NetworkInterfaceReconciler) applyIPs(ctx context.Context, nic *networkingv1alpha1.NetworkInterface) ([]commonv1alpha1.IP, error) {
-	var ips []commonv1alpha1.IP
-	for i, ipSource := range nic.Spec.IPs {
-		switch {
-		case ipSource.Value != nil:
-			ips = append(ips, *ipSource.Value)
-		case ipSource.Ephemeral != nil:
-			template := ipSource.Ephemeral.PrefixTemplate
-			prefix := &ipamv1alpha1.Prefix{
-				ObjectMeta: metav1.ObjectMeta{
-					Namespace: nic.Namespace,
-					Name:      shared.NetworkInterfaceEphemeralIPName(nic.Name, i),
-				},
-			}
-			if err := onmetalapiclientutils.ControlledCreateOrGet(ctx, r.Client, nic, prefix, func() error {
-				prefix.Labels = template.Labels
-				prefix.Annotations = template.Annotations
-				prefix.Spec = template.Spec
-				return nil
-			}); err != nil {
-				return nil, fmt.Errorf("error managing ephemeral prefix %s: %w", prefix.Name, err)
-			}
-
-			if prefix.Status.Phase == ipamv1alpha1.PrefixPhaseAllocated {
-				ips = append(ips, prefix.Spec.Prefix.IP())
-			}
+	var (
+		ips           []commonv1alpha1.IP
+		applyWarnings []string
+	)
+	for idx, ipSource := range nic.Spec.IPs {
+		ip, ok, applyWarning, err := r.applyIP(ctx, nic, ipSource, idx)
+		if err != nil {
+			return nil, fmt.Errorf("[ip %d] %w", idx, err)
+		}
+		if ok {
+			ips = append(ips, ip)
+		}
+		if applyWarning != "" {
+			applyWarnings = append(applyWarnings, applyWarning)
 		}
 	}
+
+	if len(applyWarnings) > 0 {
+		r.Eventf(nic, corev1.EventTypeWarning, events.FailedApplyingIPs, "Failed applying ip(s): %v", applyWarnings)
+	}
+
 	return ips, nil
 }
 
+func (r *NetworkInterfaceReconciler) applyIP(ctx context.Context, nic *networkingv1alpha1.NetworkInterface, ipSource networkingv1alpha1.IPSource, idx int) (commonv1alpha1.IP, bool, string, error) {
+	switch {
+	case ipSource.Value != nil:
+		return *ipSource.Value, true, "", nil
+	case ipSource.Ephemeral != nil:
+		template := ipSource.Ephemeral.PrefixTemplate
+		prefix := &ipamv1alpha1.Prefix{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: nic.Namespace,
+				Name:      shared.NetworkInterfaceEphemeralIPName(nic.Name, idx),
+			},
+		}
+		if err := onmetalapiclientutils.ControlledCreateOrGet(ctx, r.Client, nic, prefix, func() error {
+			prefix.Labels = template.Labels
+			prefix.Annotations = template.Annotations
+			prefix.Spec = template.Spec
+			return nil
+		}); err != nil {
+			if !errors.Is(err, onmetalapiclientutils.ErrNotControlled) {
+				return commonv1alpha1.IP{}, false, "", fmt.Errorf("error managing ephemeral prefix %s: %w", prefix.Name, err)
+			}
+			return commonv1alpha1.IP{}, false, fmt.Sprintf("prefix %s cannot be managed", prefix.Name), nil
+		}
+
+		if prefix.Status.Phase == ipamv1alpha1.PrefixPhaseAllocated {
+			return prefix.Spec.Prefix.IP(), true, "", nil
+		}
+		return commonv1alpha1.IP{}, false, "", nil
+	default:
+		return commonv1alpha1.IP{}, false, "", fmt.Errorf("unknown ip source %#v", ipSource)
+	}
+}
+
 func (r *NetworkInterfaceReconciler) applyVirtualIP(ctx context.Context, log logr.Logger, nic *networkingv1alpha1.NetworkInterface) (*commonv1alpha1.IP, error) {
-	if nic.Spec.VirtualIP == nil {
+	virtualIP := nic.Spec.VirtualIP
+	switch {
+	case virtualIP == nil:
 		log.V(1).Info("Network interface does not specify any virtual ip")
 		return nil, nil
-	}
+	case virtualIP.VirtualIPRef != nil:
+		vip := &networkingv1alpha1.VirtualIP{}
+		vipKey := client.ObjectKey{Namespace: nic.Namespace, Name: virtualIP.VirtualIPRef.Name}
+		log.V(1).Info("Getting referenced virtual ip", "VirtualIPKey", vipKey)
+		if err := r.Get(ctx, vipKey, vip); err != nil {
+			if !apierrors.IsNotFound(err) {
+				return nil, fmt.Errorf("error getting referenced virtual ip claim %s: %w", vipKey, err)
+			}
 
-	vip, err := r.getOrManageVirtualIP(ctx, log, nic)
-	if err != nil {
-		return nil, err
-	}
+			r.Eventf(nic, corev1.EventTypeWarning, events.FailedApplyingVirtualIP, "Virtual IP %s not found", vipKey.Name)
+			return nil, nil
+		}
 
+		return r.getVirtualIPIP(log, nic, vip), nil
+	case virtualIP.Ephemeral != nil:
+		log.V(1).Info("Managing ephemeral virtual ip claim")
+		vip := &networkingv1alpha1.VirtualIP{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: nic.Namespace,
+				Name:      nic.Name,
+			},
+		}
+		if err := onmetalapiclientutils.ControlledCreateOrGet(ctx, r.Client, nic, vip, func() error {
+			ephemeral := nic.Spec.VirtualIP.Ephemeral
+			vip.Labels = ephemeral.VirtualIPTemplate.Labels
+			vip.Annotations = ephemeral.VirtualIPTemplate.Annotations
+			vip.Spec = ephemeral.VirtualIPTemplate.Spec
+			vip.Spec.TargetRef = &commonv1alpha1.LocalUIDReference{Name: nic.Name, UID: nic.UID}
+			return nil
+		}); err != nil {
+			if !errors.Is(onmetalapiclientutils.ErrNotControlled, err) {
+				return nil, fmt.Errorf("error managing ephemeral virtual ip: %w", err)
+			}
+
+			r.Eventf(nic, corev1.EventTypeWarning, events.FailedApplyingVirtualIP, "Cannot manage virtual ip %s", vip.Name)
+			return nil, nil
+		}
+		return r.getVirtualIPIP(log, nic, vip), nil
+	default:
+		return nil, fmt.Errorf("unknown virtual ip %#v", virtualIP)
+	}
+}
+
+func (r *NetworkInterfaceReconciler) getVirtualIPIP(log logr.Logger, nic *networkingv1alpha1.NetworkInterface, vip *networkingv1alpha1.VirtualIP) *commonv1alpha1.IP {
 	if !reflect.DeepEqual(vip.Spec.TargetRef, &commonv1alpha1.LocalUIDReference{Name: nic.Name, UID: nic.UID}) {
 		log.V(1).Info("Virtual ip does not target network interface", "TargetRef", vip.Spec.TargetRef)
-		return nil, nil
+		return nil
 	}
 
 	if phase := vip.Status.Phase; phase != networkingv1alpha1.VirtualIPPhaseBound {
 		log.V(1).Info("Virtual ip is not bound", "Phase", phase)
-		return nil, nil
+		return nil
 	}
 
 	log.V(1).Info("Virtual ip is up and bound", "IP", vip.Status.IP)
-	return vip.Status.IP, nil
-}
-
-func (r *NetworkInterfaceReconciler) getOrManageVirtualIP(ctx context.Context, log logr.Logger, nic *networkingv1alpha1.NetworkInterface) (*networkingv1alpha1.VirtualIP, error) {
-	if vipRef := nic.Spec.VirtualIP.VirtualIPRef; vipRef != nil {
-		vip := &networkingv1alpha1.VirtualIP{}
-		vipKey := client.ObjectKey{Namespace: nic.Namespace, Name: vipRef.Name}
-		log.V(1).Info("Getting referenced virtual ip", "VirtualIPKey", vipKey)
-		if err := r.Get(ctx, vipKey, vip); err != nil {
-			return nil, fmt.Errorf("error getting referenced virtual ip claim %s: %w", vipKey, err)
-		}
-
-		return vip, nil
-	}
-
-	log.V(1).Info("Managing ephemeral virtual ip claim")
-	vip := &networkingv1alpha1.VirtualIP{
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: nic.Namespace,
-			Name:      nic.Name,
-		},
-	}
-	if err := onmetalapiclientutils.ControlledCreateOrGet(ctx, r.Client, nic, vip, func() error {
-		ephemeral := nic.Spec.VirtualIP.Ephemeral
-		vip.Labels = ephemeral.VirtualIPTemplate.Labels
-		vip.Annotations = ephemeral.VirtualIPTemplate.Annotations
-		vip.Spec = ephemeral.VirtualIPTemplate.Spec
-		vip.Spec.TargetRef = &commonv1alpha1.LocalUIDReference{Name: nic.Name, UID: nic.UID}
-		return nil
-	}); err != nil {
-		return nil, fmt.Errorf("error managing ephemeral virtual ip: %w", err)
-	}
-	return vip, nil
+	return vip.Status.IP
 }
 
 func (r *NetworkInterfaceReconciler) SetupWithManager(mgr ctrl.Manager) error {

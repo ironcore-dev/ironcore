@@ -154,10 +154,11 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 
 		// register reconciler here
 		Expect((&VolumeReconciler{
-			Client:      k8sManager.GetClient(),
-			APIReader:   k8sManager.GetAPIReader(),
-			Scheme:      k8sManager.GetScheme(),
-			BindTimeout: 1 * time.Second,
+			EventRecorder: &record.FakeRecorder{},
+			Client:        k8sManager.GetClient(),
+			APIReader:     k8sManager.GetAPIReader(),
+			Scheme:        k8sManager.GetScheme(),
+			BindTimeout:   1 * time.Second,
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		Expect((&VolumeClassReconciler{
@@ -167,8 +168,8 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		Expect((&VolumeScheduler{
-			Client: k8sManager.GetClient(),
-			Events: &record.FakeRecorder{},
+			Client:        k8sManager.GetClient(),
+			EventRecorder: &record.FakeRecorder{},
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		go func() {

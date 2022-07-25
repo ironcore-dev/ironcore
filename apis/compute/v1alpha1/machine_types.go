@@ -114,6 +114,8 @@ type NetworkInterfaceStatus struct {
 	Name string `json:"name"`
 	// Phase is the NetworkInterface binding phase of the NetworkInterface.
 	Phase NetworkInterfacePhase `json:"phase,omitempty"`
+	// LastPhaseTransitionTime is the last time the Phase transitioned.
+	LastPhaseTransitionTime *metav1.Time `json:"lastPhaseTransitionTime,omitempty"`
 	// IPs are the ips allocated for the network interface.
 	IPs []commonv1alpha1.IP `json:"ips,omitempty"`
 	// VirtualIP is the virtual ip allocated for the network interface.
@@ -136,6 +138,8 @@ type VolumeStatus struct {
 	Name string `json:"name"`
 	// Phase represents the binding phase of a Volume.
 	Phase VolumePhase `json:"phase,omitempty"`
+	// LastPhaseTransitionTime is the last time the Phase transitioned.
+	LastPhaseTransitionTime *metav1.Time `json:"lastPhaseTransitionTime,omitempty"`
 	// DeviceID is the disk device ID on the host.
 	DeviceID string `json:"deviceID,omitempty"`
 }

@@ -1448,6 +1448,19 @@ NetworkInterfacePhase
 </tr>
 <tr>
 <td>
+<code>lastPhaseTransitionTime</code><br/>
+<em>
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastPhaseTransitionTime is the last time the Phase transitioned.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>ips</code><br/>
 <em>
 <a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
@@ -1638,6 +1651,19 @@ VolumePhase
 </td>
 <td>
 <p>Phase represents the binding phase of a Volume.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastPhaseTransitionTime</code><br/>
+<em>
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastPhaseTransitionTime is the last time the Phase transitioned.</p>
 </td>
 </tr>
 <tr>

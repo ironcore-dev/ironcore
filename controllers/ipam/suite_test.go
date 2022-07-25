@@ -126,9 +126,9 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	Expect(err).NotTo(HaveOccurred())
 
 	err = (&PrefixAllocationScheduler{
-		Client: k8sManager.GetClient(),
-		Scheme: k8sManager.GetScheme(),
-		Events: &record.FakeRecorder{},
+		Client:        k8sManager.GetClient(),
+		Scheme:        k8sManager.GetScheme(),
+		EventRecorder: &record.FakeRecorder{},
 	}).SetupWithManager(k8sManager)
 	Expect(err).NotTo(HaveOccurred())
 

@@ -44,8 +44,8 @@ const (
 )
 
 type MachineScheduler struct {
+	record.EventRecorder
 	client.Client
-	Events record.EventRecorder
 }
 
 //+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machines,verbs=get;list;watch;update;patch
@@ -99,12 +99,12 @@ func (s *MachineScheduler) schedule(ctx context.Context, log logr.Logger, machin
 	}
 	if len(available) == 0 {
 		log.Info("No machine pool available for machine class", "MachineClassRef", machine.Spec.MachineClassRef.Name)
-		s.Events.Eventf(machine, corev1.EventTypeNormal, "CannotSchedule", "No MachinePoolRef found for MachineClassRef %s", machine.Spec.MachineClassRef.Name)
+		s.Eventf(machine, corev1.EventTypeNormal, "CannotSchedule", "No MachinePoolRef found for MachineClassRef %s", machine.Spec.MachineClassRef.Name)
 		return ctrl.Result{}, nil
 	}
 
 	// Filter machine pools by checking if the machine tolerates all the taints of a machine pool
-	filtered := []computev1alpha1.MachinePool{}
+	var filtered []computev1alpha1.MachinePool
 	for _, pool := range available {
 		if v1alpha1.TolerateTaints(machine.Spec.Tolerations, pool.Spec.Taints) {
 			filtered = append(filtered, pool)
@@ -112,7 +112,7 @@ func (s *MachineScheduler) schedule(ctx context.Context, log logr.Logger, machin
 	}
 	if len(filtered) == 0 {
 		log.Info("No machine pool tolerated by the machine", "Tolerations", machine.Spec.Tolerations)
-		s.Events.Eventf(machine, corev1.EventTypeNormal, "CannotSchedule", "No MachinePoolRef tolerated by tolerations: %s", &machine.Spec.Tolerations)
+		s.Eventf(machine, corev1.EventTypeNormal, "CannotSchedule", "No MachinePoolRef tolerated by tolerations: %s", &machine.Spec.Tolerations)
 		return ctrl.Result{}, nil
 	}
 	available = filtered

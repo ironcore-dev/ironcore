@@ -163,13 +163,14 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 
 		// register reconciler here
 		Expect((&MachineScheduler{
-			Client: k8sManager.GetClient(),
-			Events: &record.FakeRecorder{},
+			Client:        k8sManager.GetClient(),
+			EventRecorder: &record.FakeRecorder{},
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		Expect((&MachineReconciler{
-			Client: k8sManager.GetClient(),
-			Scheme: k8sManager.GetScheme(),
+			EventRecorder: &record.FakeRecorder{},
+			Client:        k8sManager.GetClient(),
+			Scheme:        k8sManager.GetScheme(),
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		Expect((&MachineClassReconciler{
@@ -179,16 +180,17 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		Expect((&networking.NetworkInterfaceReconciler{
-			Client:    k8sManager.GetClient(),
-			APIReader: k8sManager.GetAPIReader(),
-			Scheme:    k8sManager.GetScheme(),
+			EventRecorder: &record.FakeRecorder{},
+			Client:        k8sManager.GetClient(),
+			Scheme:        k8sManager.GetScheme(),
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		Expect((&storage.VolumeReconciler{
-			Client:      k8sManager.GetClient(),
-			APIReader:   k8sManager.GetAPIReader(),
-			Scheme:      k8sManager.GetScheme(),
-			BindTimeout: 1 * time.Second,
+			EventRecorder: &record.FakeRecorder{},
+			Client:        k8sManager.GetClient(),
+			APIReader:     k8sManager.GetAPIReader(),
+			Scheme:        k8sManager.GetScheme(),
+			BindTimeout:   1 * time.Second,
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		go func() {

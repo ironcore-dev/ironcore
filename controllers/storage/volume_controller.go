@@ -27,10 +27,13 @@ import (
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 	"github.com/onmetal/onmetal-api/controllers/shared"
+	"github.com/onmetal/onmetal-api/controllers/storage/events"
 	apiequality "github.com/onmetal/onmetal-api/equality"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -42,6 +45,7 @@ import (
 
 // VolumeReconciler reconciles a Volume object
 type VolumeReconciler struct {
+	record.EventRecorder
 	client.Client
 	APIReader client.Reader
 	Scheme    *runtime.Scheme
@@ -197,6 +201,11 @@ func (r *VolumeReconciler) reconcileBound(ctx context.Context, log logr.Logger, 
 		"VolumePhase", volumePhase,
 		"VolumePhaseLastTransitionTime", volumePhaseLastTransitionTime,
 	)
+
+	if !machineExists {
+		r.Eventf(volume, corev1.EventTypeWarning, events.FailedBindingMachine, "Machine %s not found", machineKey.Name)
+	}
+
 	switch {
 	case validReferences:
 		log.V(1).Info("Setting volume to bound")

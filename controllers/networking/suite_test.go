@@ -33,6 +33,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
@@ -128,24 +129,27 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 
 	// Register reconcilers
 	err = (&NetworkInterfaceReconciler{
-		Client: k8sManager.GetClient(),
-		Scheme: k8sManager.GetScheme(),
+		EventRecorder: &record.FakeRecorder{},
+		Client:        k8sManager.GetClient(),
+		Scheme:        k8sManager.GetScheme(),
 	}).SetupWithManager(k8sManager)
 	Expect(err).NotTo(HaveOccurred())
 
 	err = (&NetworkInterfaceBindReconciler{
-		Client:      k8sManager.GetClient(),
-		APIReader:   k8sManager.GetAPIReader(),
-		Scheme:      k8sManager.GetScheme(),
-		BindTimeout: 1 * time.Second,
+		EventRecorder: &record.FakeRecorder{},
+		Client:        k8sManager.GetClient(),
+		APIReader:     k8sManager.GetAPIReader(),
+		Scheme:        k8sManager.GetScheme(),
+		BindTimeout:   1 * time.Second,
 	}).SetupWithManager(k8sManager)
 	Expect(err).NotTo(HaveOccurred())
 
 	err = (&VirtualIPReconciler{
-		Client:      k8sManager.GetClient(),
-		APIReader:   k8sManager.GetAPIReader(),
-		Scheme:      k8sManager.GetScheme(),
-		BindTimeout: 1 * time.Second,
+		EventRecorder: &record.FakeRecorder{},
+		Client:        k8sManager.GetClient(),
+		APIReader:     k8sManager.GetAPIReader(),
+		Scheme:        k8sManager.GetScheme(),
+		BindTimeout:   1 * time.Second,
 	}).SetupWithManager(k8sManager)
 	Expect(err).NotTo(HaveOccurred())
 
