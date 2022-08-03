@@ -68,6 +68,7 @@ const (
 	prefixController          = "prefix"
 	prefixAllocationScheduler = "prefixallocationscheduler"
 
+	networkProtectionController    = "networkprotection"
 	networkInterfaceController     = "networkinterface"
 	networkInterfaceBindController = "networkinterfacebind"
 	virtualIPController            = "virtualip"
@@ -109,7 +110,7 @@ func main() {
 		volumePoolController, volumeClassController, volumeController, volumeScheduler,
 
 		// Networking controllers
-		networkInterfaceController, networkInterfaceBindController, virtualIPController, aliasPrefixController,
+		networkProtectionController, networkInterfaceController, networkInterfaceBindController, virtualIPController, aliasPrefixController,
 
 		// IPAM controllers
 		prefixController, prefixAllocationScheduler,
@@ -263,6 +264,16 @@ func main() {
 			EventRecorder: mgr.GetEventRecorderFor("prefix-allocation-scheduler"),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "PrefixAllocationScheduler")
+			os.Exit(1)
+		}
+	}
+
+	if controllers.Enabled(networkProtectionController) {
+		if err = (&networking.NetworkProtectionReconciler{
+			Client: mgr.GetClient(),
+			Scheme: mgr.GetScheme(),
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "NetworkProtection")
 			os.Exit(1)
 		}
 	}
