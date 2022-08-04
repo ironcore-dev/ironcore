@@ -23,7 +23,6 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/clientutils"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
-	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -68,13 +67,13 @@ func (r *NetworkProtectionReconciler) reconcileExists(ctx context.Context, log l
 func (r *NetworkProtectionReconciler) delete(ctx context.Context, log logr.Logger, network *networkingv1alpha1.Network) (ctrl.Result, error) {
 	log.Info("Deleting Network")
 
-	if networkInUse, err := r.isNetworkInUse(ctx, log, network); err != nil {
+	if ok, err := r.isNetworkInUse(ctx, log, network); err != nil || !ok {
 		return ctrl.Result{}, err
-	} else if !networkInUse {
-		log.V(1).Info("Removing finalizer from Network as the Network is not in use")
-		if _, err := clientutils.PatchEnsureNoFinalizer(ctx, r.Client, network, networkFinalizer); err != nil {
-			return ctrl.Result{}, fmt.Errorf("failed to remove finalizer from network: %w", err)
-		}
+	}
+
+	log.V(1).Info("Removing finalizer from Network as the Network is not in use")
+	if _, err := clientutils.PatchEnsureNoFinalizer(ctx, r.Client, network, networkFinalizer); err != nil {
+		return ctrl.Result{}, fmt.Errorf("failed to remove finalizer from network: %w", err)
 	}
 
 	log.Info("Successfully deleted Network")
@@ -84,17 +83,13 @@ func (r *NetworkProtectionReconciler) delete(ctx context.Context, log logr.Logge
 func (r *NetworkProtectionReconciler) reconcile(ctx context.Context, log logr.Logger, network *networkingv1alpha1.Network) (ctrl.Result, error) {
 	log.Info("Reconcile Network")
 
-	var networkInUse bool
-	var err error
-	if networkInUse, err = r.isNetworkInUse(ctx, log, network); err != nil {
-		return ctrl.Result{}, err
+	log.V(1).Info("Patching finalizer from Network as the Network is in use")
+	if _, err := clientutils.PatchEnsureFinalizer(ctx, r.Client, network, networkFinalizer); err != nil {
+		return ctrl.Result{}, fmt.Errorf("failed to patch finalizer from network: %w", err)
 	}
 
-	if networkInUse {
-		log.V(1).Info("Patching finalizer from Network as the Network is in use")
-		if _, err := clientutils.PatchEnsureFinalizer(ctx, r.Client, network, networkFinalizer); err != nil {
-			return ctrl.Result{}, fmt.Errorf("failed to patch finalizer from network: %w", err)
-		}
+	if ok, err := r.isNetworkInUse(ctx, log, network); err != nil || ok {
+		return ctrl.Result{}, err
 	} else {
 		log.V(1).Info("Removing finalizer from Network as the Network is not in use")
 		if _, err := clientutils.PatchEnsureNoFinalizer(ctx, r.Client, network, networkFinalizer); err != nil {
@@ -111,9 +106,7 @@ func (r *NetworkProtectionReconciler) isNetworkInUse(ctx context.Context, log lo
 
 	// NetworkInterfaces
 	networkInterfaces := &networkingv1alpha1.NetworkInterfaceList{}
-	if err := r.List(ctx, networkInterfaces, &client.ListOptions{
-		FieldSelector: fields.OneTermEqualSelector(networkNameFieldPath, network.Name),
-	}); err != nil {
+	if err := r.List(ctx, networkInterfaces, client.MatchingFields{networkNameFieldPath: network.Name}); err != nil {
 		return false, fmt.Errorf("failed to list NetworkInterfaces: %w", err)
 	}
 	for _, networkInterface := range networkInterfaces.Items {
@@ -126,9 +119,7 @@ func (r *NetworkProtectionReconciler) isNetworkInUse(ctx context.Context, log lo
 
 	// AliasPrefixes
 	aliasPrefixes := &networkingv1alpha1.AliasPrefixList{}
-	if err := r.List(ctx, aliasPrefixes, &client.ListOptions{
-		FieldSelector: fields.OneTermEqualSelector(networkNameFieldPath, network.Name),
-	}); err != nil {
+	if err := r.List(ctx, aliasPrefixes, client.MatchingFields{networkNameFieldPath: network.Name}); err != nil {
 		return false, fmt.Errorf("failed to list NetworkInterfaces: %w", err)
 	}
 	for _, aliasPrefix := range aliasPrefixes.Items {
