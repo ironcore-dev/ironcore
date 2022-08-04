@@ -220,9 +220,27 @@ rules:
   resources:
   - networks
   verbs:
+  - create
+  - delete
   - get
   - list
+  - patch
+  - update
   - watch
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - networks/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - networks/status
+  verbs:
+  - get
+  - patch
+  - update
 - apiGroups:
   - networking.api.onmetal.de
   resources:
