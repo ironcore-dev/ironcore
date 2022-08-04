@@ -84,15 +84,6 @@ var _ = Describe("NetworkProtectionReconciler", func() {
 		By("deleting the network interface")
 		Expect(k8sClient.Delete(ctx, networkInterface)).To(Succeed())
 
-		By("ensuring that the finalizer has been removed from the network")
-		Eventually(func(g Gomega) {
-			err := k8sClient.Get(ctx, networkKey, network)
-			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
-			g.Expect(err).NotTo(HaveOccurred())
-
-			g.Expect(network.GetFinalizers()).To(BeEmpty())
-		}).Should(Succeed())
-
 		By("deleting the network")
 		Expect(k8sClient.Delete(ctx, network)).To(Succeed())
 
@@ -217,15 +208,6 @@ var _ = Describe("NetworkProtectionReconciler", func() {
 		By("deleting the first network interface")
 		Expect(k8sClient.Delete(ctx, networkInterface)).To(Succeed())
 
-		By("ensuring that the finalizer is still present")
-		Eventually(func(g Gomega) {
-			err := k8sClient.Get(ctx, networkKey, network)
-			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
-			g.Expect(err).NotTo(HaveOccurred())
-
-			g.Expect(network.GetFinalizers()).To(ContainElement(networkFinalizer))
-		}).Should(Succeed())
-
 		By("deleting the network")
 		Expect(k8sClient.Delete(ctx, network)).To(Succeed())
 
@@ -270,15 +252,6 @@ var _ = Describe("NetworkProtectionReconciler", func() {
 
 		By("deleting the alias prefix")
 		Expect(k8sClient.Delete(ctx, aliasPrefix)).To(Succeed())
-
-		By("ensuring that the finalizer has been removed from the network")
-		Eventually(func(g Gomega) {
-			err := k8sClient.Get(ctx, networkKey, network)
-			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
-			g.Expect(err).NotTo(HaveOccurred())
-
-			g.Expect(network.GetFinalizers()).To(BeEmpty())
-		}).Should(Succeed())
 
 		By("deleting the network")
 		Expect(k8sClient.Delete(ctx, network)).To(Succeed())
@@ -334,15 +307,6 @@ var _ = Describe("NetworkProtectionReconciler", func() {
 
 		By("deleting the first alias prefix")
 		Expect(k8sClient.Delete(ctx, aliasPrefix)).To(Succeed())
-
-		By("ensuring that the finalizer has been removed from the network")
-		Eventually(func(g Gomega) {
-			err := k8sClient.Get(ctx, networkKey, network)
-			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
-			g.Expect(err).NotTo(HaveOccurred())
-
-			g.Expect(network.GetFinalizers()).To(ContainElement(networkFinalizer))
-		}).Should(Succeed())
 
 		By("deleting the network")
 		Expect(k8sClient.Delete(ctx, network)).To(Succeed())

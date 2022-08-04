@@ -83,18 +83,9 @@ func (r *NetworkProtectionReconciler) delete(ctx context.Context, log logr.Logge
 func (r *NetworkProtectionReconciler) reconcile(ctx context.Context, log logr.Logger, network *networkingv1alpha1.Network) (ctrl.Result, error) {
 	log.Info("Reconcile Network")
 
-	log.V(1).Info("Patching finalizer from Network as the Network is in use")
+	log.V(1).Info("Ensuring finalizer on Network")
 	if _, err := clientutils.PatchEnsureFinalizer(ctx, r.Client, network, networkFinalizer); err != nil {
 		return ctrl.Result{}, fmt.Errorf("failed to patch finalizer from network: %w", err)
-	}
-
-	if ok, err := r.isNetworkInUse(ctx, log, network); err != nil || ok {
-		return ctrl.Result{}, err
-	} else {
-		log.V(1).Info("Removing finalizer from Network as the Network is not in use")
-		if _, err := clientutils.PatchEnsureNoFinalizer(ctx, r.Client, network, networkFinalizer); err != nil {
-			return ctrl.Result{}, fmt.Errorf("failed to remove finalizer from network: %w", err)
-		}
 	}
 
 	log.Info("Successfully reconciled Network")
