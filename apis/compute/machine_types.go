@@ -167,7 +167,7 @@ type MachineStatus struct {
 }
 
 // MachineState is the state of a machine.
-//+enum
+// +enum
 type MachineState string
 
 const (

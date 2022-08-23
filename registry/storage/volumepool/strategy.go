@@ -82,7 +82,7 @@ func (volumePoolStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime
 	oldVolumePool := old.(*storage.VolumePool)
 	newVolumePool.Status = oldVolumePool.Status
 
-	if !equality.Semantic.DeepEqual(&newVolumePool.Spec, oldVolumePool.Spec) {
+	if !equality.Semantic.DeepEqual(newVolumePool.Spec, oldVolumePool.Spec) {
 		newVolumePool.Generation = oldVolumePool.Generation + 1
 	}
 }

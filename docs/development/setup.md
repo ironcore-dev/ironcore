@@ -2,7 +2,7 @@
 
 ## Requirements
 
-* `go` >= 1.17
+* `go` >= 1.19
 * `git`, `make` and `kubectl`
 * [Kustomize](https://kustomize.io/)
 * Access to a Kubernetes cluster ([Minikube](https://minikube.sigs.k8s.io/docs/), [kind](https://kind.sigs.k8s.io/) or a

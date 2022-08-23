@@ -82,7 +82,7 @@ func (machinePoolStrategy) PrepareForUpdate(ctx context.Context, obj, old runtim
 	oldMachinePool := old.(*compute.MachinePool)
 	newMachinePool.Status = oldMachinePool.Status
 
-	if !equality.Semantic.DeepEqual(&newMachinePool.Spec, oldMachinePool.Spec) {
+	if !equality.Semantic.DeepEqual(newMachinePool.Spec, oldMachinePool.Spec) {
 		newMachinePool.Generation = oldMachinePool.Generation + 1
 	}
 }

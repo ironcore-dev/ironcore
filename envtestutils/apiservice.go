@@ -18,7 +18,6 @@ import (
 	"bufio"
 	"bytes"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -79,8 +78,20 @@ func renderAPIServices(options *APIServiceInstallOptions) ([]*apiregistrationv1.
 
 		if !info.IsDir() {
 			filePath, files = filepath.Dir(path), []os.FileInfo{info}
-		} else if files, err = ioutil.ReadDir(path); err != nil {
-			return nil, err
+		} else {
+			entries, err := os.ReadDir(path)
+			if err != nil {
+				return nil, err
+			}
+
+			for _, entry := range entries {
+				file, err := entry.Info()
+				if err != nil {
+					return nil, err
+				}
+
+				files = append(files, file)
+			}
 		}
 
 		log.V(1).Info("reading APIServices from path", "path", path)

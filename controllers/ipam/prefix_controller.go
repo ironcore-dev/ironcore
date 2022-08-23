@@ -348,11 +348,11 @@ func (r *PrefixReconciler) allocateSubPrefix(ctx context.Context, log logr.Logge
 
 // adjustedAllocationPhase calculates an adjusted phase of a PrefixAllocation.
 // For the adjusted phase, it is considered
-// * If the allocation is in a terminal phase, that state is returned.
-// * If the allocation is not scheduled, that state is returned.
-// * If the allocation is scheduled but no lastTransitionTime has been recorded, that state is returned
-// * If the allocation is in a non-terminal state, and it has been scheduled, once a configurable timeout has passed,
-//   it is considered to be failed.
+//   - If the allocation is in a terminal phase, that state is returned.
+//   - If the allocation is not scheduled, that state is returned.
+//   - If the allocation is scheduled but no lastTransitionTime has been recorded, that state is returned
+//   - If the allocation is in a non-terminal state, and it has been scheduled, once a configurable timeout has passed,
+//     it is considered to be failed.
 func (r *PrefixReconciler) adjustedAllocationPhase(allocation *ipamv1alpha1.PrefixAllocation) ipamv1alpha1.PrefixAllocationPhase {
 	allocationPhase := allocation.Status.Phase
 	if allocationPhase.IsTerminal() || allocation.Spec.PrefixRef == nil {
