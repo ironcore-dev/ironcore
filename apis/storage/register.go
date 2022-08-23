@@ -15,8 +15,8 @@
  */
 
 // Package storage contains API Schema definitions for the storage internal API group
-//+kubebuilder:object:generate=true
-//+groupName=storage.api.onmetal.de
+// +kubebuilder:object:generate=true
+// +groupName=storage.api.onmetal.de
 package storage
 
 import (

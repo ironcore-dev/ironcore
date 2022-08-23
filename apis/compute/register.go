@@ -15,8 +15,8 @@
  */
 
 // Package compute contains API Schema definitions for the compute internal API group
-//+kubebuilder:object:generate=true
-//+groupName=compute.api.onmetal.de
+// +kubebuilder:object:generate=true
+// +groupName=compute.api.onmetal.de
 package compute
 
 import (

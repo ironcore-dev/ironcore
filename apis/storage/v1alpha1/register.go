@@ -15,8 +15,8 @@
  */
 
 // Package v1alpha1 contains API Schema definitions for the storage v1alpha1 API group
-//+kubebuilder:object:generate=true
-//+groupName=storage.api.onmetal.de
+// +kubebuilder:object:generate=true
+// +groupName=storage.api.onmetal.de
 package v1alpha1
 
 import (

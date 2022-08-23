@@ -17,7 +17,6 @@ package envtestutils
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -106,7 +105,7 @@ func (o *APIServiceInstallOptions) setupCA() error {
 		return fmt.Errorf("unable to set up api service serving certs: %v", err)
 	}
 
-	localServingCertsDir, err := ioutil.TempDir("", "envtest-apiservice-certs-")
+	localServingCertsDir, err := os.MkdirTemp("", "envtest-apiservice-certs-")
 	o.LocalServingCertDir = localServingCertsDir
 	if err != nil {
 		return fmt.Errorf("unable to create directory for apiservice serving certs: %v", err)
@@ -117,13 +116,13 @@ func (o *APIServiceInstallOptions) setupCA() error {
 		return fmt.Errorf("unable to marshal api service serving certs: %v", err)
 	}
 
-	if err := ioutil.WriteFile(o.caCertPath(), apiServiceCA.CA.CertBytes(), 0640); err != nil {
+	if err := os.WriteFile(o.caCertPath(), apiServiceCA.CA.CertBytes(), 0640); err != nil {
 		return fmt.Errorf("unable to write api service ca to disk: %w", err)
 	}
-	if err := ioutil.WriteFile(o.tlsCertPath(), certData, 0640); err != nil {
+	if err := os.WriteFile(o.tlsCertPath(), certData, 0640); err != nil {
 		return fmt.Errorf("unable to write api service serving cert to disk: %w", err)
 	}
-	if err := ioutil.WriteFile(o.tlsKeyPath(), keyData, 0640); err != nil {
+	if err := os.WriteFile(o.tlsKeyPath(), keyData, 0640); err != nil {
 		return fmt.Errorf("unable to write api service serving key to disk: %w", err)
 	}
 
@@ -232,7 +231,7 @@ func (o *APIServiceInstallOptions) SetupClientCA() error {
 		return fmt.Errorf("unable to set up apiserver client serving certs: %v", err)
 	}
 
-	clientCertDir, err := ioutil.TempDir("", "envtest-apiserver-client-certs-")
+	clientCertDir, err := os.MkdirTemp("", "envtest-apiserver-client-certs-")
 	o.ClientCertDir = clientCertDir
 	if err != nil {
 		return fmt.Errorf("unable to create directory for apiserver client certs: %v", err)
@@ -243,13 +242,13 @@ func (o *APIServiceInstallOptions) SetupClientCA() error {
 		return fmt.Errorf("unable to marshal apiserver client certs: %v", err)
 	}
 
-	if err := ioutil.WriteFile(o.clientCACertPath(), clientCA.CA.CertBytes(), 0640); err != nil {
+	if err := os.WriteFile(o.clientCACertPath(), clientCA.CA.CertBytes(), 0640); err != nil {
 		return fmt.Errorf("unable to write apiserver client ca to disk: %w", err)
 	}
-	if err := ioutil.WriteFile(o.clientCertPath(), certData, 0640); err != nil {
+	if err := os.WriteFile(o.clientCertPath(), certData, 0640); err != nil {
 		return fmt.Errorf("unable to write apiserver client cert to disk: %w", err)
 	}
-	if err := ioutil.WriteFile(o.clientKeyPath(), keyData, 0640); err != nil {
+	if err := os.WriteFile(o.clientKeyPath(), keyData, 0640); err != nil {
 		return fmt.Errorf("unable to write apiserver client key to disk: %w", err)
 	}
 

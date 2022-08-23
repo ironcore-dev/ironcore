@@ -71,7 +71,7 @@ func (machineClassStrategy) PrepareForUpdate(ctx context.Context, obj, old runti
 	newMachineClass := obj.(*compute.MachineClass)
 	oldMachineClass := old.(*compute.MachineClass)
 
-	if !equality.Semantic.DeepEqual(&newMachineClass.Capabilities, oldMachineClass.Capabilities) {
+	if !equality.Semantic.DeepEqual(newMachineClass.Capabilities, oldMachineClass.Capabilities) {
 		newMachineClass.Generation = oldMachineClass.Generation + 1
 	}
 }

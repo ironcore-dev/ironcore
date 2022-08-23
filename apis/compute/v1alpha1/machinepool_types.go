@@ -110,7 +110,7 @@ type MachinePoolCondition struct {
 }
 
 // MachinePoolState is a state a MachinePool can be in.
-//+enum
+// +enum
 type MachinePoolState string
 
 const (

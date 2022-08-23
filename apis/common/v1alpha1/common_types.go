@@ -58,7 +58,7 @@ type LocalUIDReference struct {
 }
 
 // IP is an IP address.
-//+kubebuilder:validation:Type=string
+// +kubebuilder:validation:Type=string
 type IP struct {
 	netaddr.IP `json:"-"`
 }
@@ -254,8 +254,8 @@ func EqualIPRanges(a, b IPRange) bool {
 }
 
 // IPPrefix represents a network prefix.
-//+kubebuilder:validation:Type=string
-//+nullable
+// +kubebuilder:validation:Type=string
+// +nullable
 type IPPrefix struct {
 	netaddr.IPPrefix `json:"-"`
 }
@@ -375,7 +375,7 @@ type Taint struct {
 	Effect TaintEffect `json:"effect"`
 }
 
-//+kubebuilder:validation:Enum=NoSchedule
+// +kubebuilder:validation:Enum=NoSchedule
 type TaintEffect string
 
 const (
@@ -408,11 +408,14 @@ type Toleration struct {
 // ToleratesTaint checks if the toleration tolerates the taint.
 // The matching follows the rules below:
 // (1) Empty toleration.effect means to match all taint effects,
-//     otherwise taint effect must equal to toleration.effect.
+//
+//	otherwise taint effect must equal to toleration.effect.
+//
 // (2) If toleration.operator is 'Exists', it means to match all taint values.
 // (3) Empty toleration.key means to match all taint keys.
-//     If toleration.key is empty, toleration.operator must be 'Exists';
-//     this combination means to match all taint values and all taint keys.
+//
+//	If toleration.key is empty, toleration.operator must be 'Exists';
+//	this combination means to match all taint values and all taint keys.
 func (t *Toleration) ToleratesTaint(taint *Taint) bool {
 	if len(t.Effect) > 0 && t.Effect != taint.Effect {
 		return false
@@ -433,7 +436,7 @@ func (t *Toleration) ToleratesTaint(taint *Taint) bool {
 }
 
 // A toleration operator is the set of operators that can be used in a toleration.
-//+kubebuilder:validation:Enum=Equal;Exists
+// +kubebuilder:validation:Enum=Equal;Exists
 type TolerationOperator string
 
 const (

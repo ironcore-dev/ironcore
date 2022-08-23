@@ -15,8 +15,8 @@
  */
 
 // Package v1alpha1 contains API Schema definitions for the network v1alpha1 API group
-//+kubebuilder:object:generate=true
-//+groupName=ipam.api.onmetal.de
+// +kubebuilder:object:generate=true
+// +groupName=ipam.api.onmetal.de
 package v1alpha1
 
 import (
