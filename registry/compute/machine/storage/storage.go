@@ -96,6 +96,8 @@ func (r *StatusREST) GetResetFields() map[fieldpath.APIVersion]*fieldpath.Set {
 	return r.store.GetResetFields()
 }
 
+func (r *StatusREST) Destroy() {}
+
 // Support both GET and POST methods. We must support GET for browsers that want to use WebSockets.
 var upgradeableMethods = []string{"GET", "POST"}
 
@@ -134,3 +136,5 @@ func (r *ExecREST) NewConnectOptions() (runtime.Object, bool, string) {
 func (r *ExecREST) ConnectMethods() []string {
 	return upgradeableMethods
 }
+
+func (r *ExecREST) Destroy() {}
