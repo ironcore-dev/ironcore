@@ -67,8 +67,8 @@ func (r *NetworkProtectionReconciler) reconcileExists(ctx context.Context, log l
 func (r *NetworkProtectionReconciler) delete(ctx context.Context, log logr.Logger, network *networkingv1alpha1.Network) (ctrl.Result, error) {
 	log.Info("Deleting Network")
 
-	if ok, err := r.isNetworkInUse(ctx, log, network); err != nil || !ok {
-		return ctrl.Result{}, err
+	if ok, err := r.isNetworkInUse(ctx, log, network); err != nil || ok {
+		return ctrl.Result{Requeue: ok}, err
 	}
 
 	log.V(1).Info("Removing finalizer from Network as the Network is not in use")
