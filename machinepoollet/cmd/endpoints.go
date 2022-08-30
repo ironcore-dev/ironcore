@@ -30,9 +30,10 @@ import (
 type EndpointsType string
 
 const (
-	EndpointsTypeNone         EndpointsType = "None"
-	EndpointsTypeNodePort     EndpointsType = "NodePort"
-	EndpointsTypeLoadBalancer EndpointsType = "LoadBalancer"
+	EndpointsTypeNone           EndpointsType = "None"
+	EndpointsTypeNodePort       EndpointsType = "NodePort"
+	EndpointsTypeLoadBalancer   EndpointsType = "LoadBalancer"
+	EndpointsTypeStaticHostname EndpointsType = "StaticHostName"
 )
 
 var (
@@ -40,6 +41,7 @@ var (
 		EndpointsTypeNone,
 		EndpointsTypeNodePort,
 		EndpointsTypeLoadBalancer,
+		EndpointsTypeStaticHostname,
 	}
 	AvailableNodeAddressTypes = []string{
 		string(corev1.NodeHostName),
@@ -56,6 +58,8 @@ type EndpointsOptions struct {
 	ServiceName      string
 	PortName         string
 	NodeAddressTypes []string
+	StaticHostname   string
+	StaticPort       int32
 }
 
 func NewEndpointsOptions() *EndpointsOptions {
@@ -72,6 +76,8 @@ func (o *EndpointsOptions) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.ServiceName, "endpoints-service-name", "", "Name of the service to inspect for endpoints.")
 	fs.StringVar(&o.PortName, "endpoints-port-name", "", "Name of the service port to inspect for endpoints.")
 	fs.StringSliceVar(&o.NodeAddressTypes, "endpoints-node-address-types", AvailableNodeAddressTypes, "Node address types to use.")
+	fs.StringVar(&o.StaticHostname, "static-host-name", o.StaticHostname, "Static hostname to report.")
+	fs.Int32Var(&o.StaticPort, "static-port", o.StaticPort, "Static port to report.")
 }
 
 func (o *EndpointsOptions) getNamespace() string {
@@ -108,6 +114,8 @@ func (o *EndpointsOptions) NewEndpoints(ctx context.Context, cfg *rest.Config) (
 			PortName:         o.PortName,
 			NodeAddressTypes: o.nodeAddressTypes(),
 		})
+	case EndpointsTypeStaticHostname:
+		return endpoints.NewStaticHostName(o.StaticHostname, o.StaticPort)
 	default:
 		return nil, fmt.Errorf("unknown endpoints type %q", o.Type)
 	}

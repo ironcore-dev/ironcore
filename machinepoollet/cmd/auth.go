@@ -58,11 +58,17 @@ type ServingOptions struct {
 	ShutdownTimeout       time.Duration
 }
 
+func NewServingOptions() *ServingOptions {
+	return &ServingOptions{
+		Address: ":20250",
+	}
+}
+
 // AddFlags adds the flags to the pflag.FlagSet.
 func (o *ServingOptions) AddFlags(fs *pflag.FlagSet) {
 	fs.BoolVar(&o.DisableAuth, "insecure-disable-auth", o.DisableAuth, "whether to completely disable authN/Z. Insecure and discouraged.")
 	fs.StringVar(&o.HostnameOverride, "hostname-override", o.HostnameOverride, "Override for the hostname.")
-	fs.StringVar(&o.Address, ":20250", o.Address, "Address to listen / serve on.")
+	fs.StringVar(&o.Address, "address", o.Address, "Address to listen / serve on.")
 	fs.StringVar(&o.CertDir, "cert-dir", o.CertDir, "The directory that contains the server key and certificate."+
 		"The files have to be named 'tls.crt' and 'tls.key'. If unset, "+
 		"{TempDir}/onmetal-api-machinepool-server/serving-certs will be looked up for the certificates.")
@@ -91,6 +97,13 @@ func (o *ServingOptions) ServerOptions(exec server.MachineExec, authOpts server.
 type ServerOptions struct {
 	Serving ServingOptions
 	Auth    AuthOptions
+}
+
+func NewServerOptions() *ServerOptions {
+	return &ServerOptions{
+		Serving: *NewServingOptions(),
+		Auth:    AuthOptions{},
+	}
 }
 
 // AddFlags adds the flags to the pflag.FlagSet.
