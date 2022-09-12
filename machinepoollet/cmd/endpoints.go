@@ -64,7 +64,9 @@ type EndpointsOptions struct {
 
 func NewEndpointsOptions() *EndpointsOptions {
 	return &EndpointsOptions{
-		Type: EndpointsTypeNone,
+		Type:           EndpointsTypeNone,
+		StaticHostname: "localhost",
+		StaticPort:     20250,
 	}
 }
 

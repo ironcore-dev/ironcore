@@ -21,10 +21,12 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
+var ValidateVolumePoolName = apivalidation.NameIsDNSSubdomain
+
 func ValidateVolumePool(volumePool *storage.VolumePool) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(volumePool, false, apivalidation.NameIsDNSLabel, field.NewPath("metadata"))...)
+	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(volumePool, false, ValidateVolumePoolName, field.NewPath("metadata"))...)
 	allErrs = append(allErrs, validateVolumePoolSpec(&volumePool.Spec, field.NewPath("spec"))...)
 
 	return allErrs

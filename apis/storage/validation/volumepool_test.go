@@ -38,6 +38,10 @@ var _ = Describe("VolumePool", func() {
 			&storage.VolumePool{ObjectMeta: metav1.ObjectMeta{Name: "foo*"}},
 			ContainElement(InvalidField("metadata.name")),
 		),
+		Entry("dns subdomain name",
+			&storage.VolumePool{ObjectMeta: metav1.ObjectMeta{Name: "foo.bar.baz"}},
+			Not(ContainElement(InvalidField("metadata.name"))),
+		),
 	)
 
 	DescribeTable("ValidateVolumeUpdate",

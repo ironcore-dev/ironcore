@@ -39,6 +39,10 @@ var _ = Describe("MachinePool", func() {
 			&compute.MachinePool{ObjectMeta: metav1.ObjectMeta{Name: "foo*"}},
 			ContainElement(InvalidField("metadata.name")),
 		),
+		Entry("dns subdomain name",
+			&compute.MachinePool{ObjectMeta: metav1.ObjectMeta{Name: "foo.bar.baz"}},
+			Not(ContainElement(InvalidField("metadata.name"))),
+		),
 	)
 
 	DescribeTable("ValidateMachinePoolUpdate",

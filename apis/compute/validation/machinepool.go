@@ -23,10 +23,12 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
+var ValidateMachinePoolName = apivalidation.NameIsDNSSubdomain
+
 func ValidateMachinePool(machinePool *compute.MachinePool) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(machinePool, false, apivalidation.NameIsDNSLabel, field.NewPath("metadata"))...)
+	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(machinePool, false, ValidateMachinePoolName, field.NewPath("metadata"))...)
 	allErrs = append(allErrs, validateMachinePoolSpec(&machinePool.Spec, field.NewPath("spec"))...)
 
 	return allErrs
