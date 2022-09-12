@@ -67,6 +67,14 @@ var _ = Describe("Machine", func() {
 			},
 			ContainElement(InvalidField("spec.machineClassRef.name")),
 		),
+		Entry("valid machine pool ref subdomain name",
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					MachinePoolRef: &corev1.LocalObjectReference{Name: "foo.bar.baz"},
+				},
+			},
+			Not(ContainElement(InvalidField("spec.machinePoolRef.name"))),
+		),
 		Entry("invalid volume name",
 			&compute.Machine{
 				Spec: compute.MachineSpec{

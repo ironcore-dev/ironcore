@@ -57,6 +57,14 @@ var _ = Describe("Volume", func() {
 			},
 			ContainElement(InvalidField("spec.volumeClassRef.name")),
 		),
+		Entry("valid volume pool ref name subdomain",
+			&storage.Volume{
+				Spec: storage.VolumeSpec{
+					VolumePoolRef: &corev1.LocalObjectReference{Name: "foo.bar.baz"},
+				},
+			},
+			Not(ContainElement(InvalidField("spec.volumePoolRef.name"))),
+		),
 		Entry("invalid claim ref name",
 			&storage.Volume{
 				Spec: storage.VolumeSpec{

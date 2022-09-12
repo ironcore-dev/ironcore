@@ -62,7 +62,7 @@ func validateMachineSpec(machineSpec *compute.MachineSpec, fldPath *field.Path) 
 	}
 
 	if machineSpec.MachinePoolRef != nil {
-		for _, msg := range apivalidation.NameIsDNSLabel(machineSpec.MachinePoolRef.Name, false) {
+		for _, msg := range ValidateMachinePoolName(machineSpec.MachinePoolRef.Name, false) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("machinePoolRef").Child("name"), machineSpec.MachinePoolRef.Name, msg))
 		}
 	}

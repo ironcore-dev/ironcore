@@ -45,7 +45,7 @@ func validateVolumeSpec(spec *storage.VolumeSpec, fldPath *field.Path) field.Err
 	allErrs = append(allErrs, metav1validation.ValidateLabels(spec.VolumePoolSelector, fldPath.Child("volumePoolSelector"))...)
 
 	if spec.VolumePoolRef != nil {
-		for _, msg := range apivalidation.NameIsDNSLabel(spec.VolumePoolRef.Name, false) {
+		for _, msg := range ValidateVolumePoolName(spec.VolumePoolRef.Name, false) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("volumePoolRef").Child("name"), spec.VolumePoolRef.Name, msg))
 		}
 	}
