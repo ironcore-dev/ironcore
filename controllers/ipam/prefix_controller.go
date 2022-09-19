@@ -19,6 +19,7 @@ package ipam
 import (
 	"context"
 	"fmt"
+	"net/netip"
 	"sort"
 	"sync"
 	"time"
@@ -28,7 +29,7 @@ import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/apis/ipam/v1alpha1"
 	"github.com/onmetal/onmetal-api/equality"
-	"inet.af/netaddr"
+	"go4.org/netipx"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -46,34 +47,38 @@ const (
 	prefixAllocationRequesterUIDLabel = "ipam.api.onmetal.de/requester-uid"
 )
 
-func (r *PrefixReconciler) acquireAllocation(prefix *ipamv1alpha1.Prefix, set *netaddr.IPSet, allocation *ipamv1alpha1.PrefixAllocation) (res netaddr.IPPrefix, newSet *netaddr.IPSet, ok bool, terminal bool) {
+func (r *PrefixReconciler) acquireAllocation(
+	prefix *ipamv1alpha1.Prefix,
+	set *netipx.IPSet,
+	allocation *ipamv1alpha1.PrefixAllocation,
+) (res netip.Prefix, newSet *netipx.IPSet, ok bool, terminal bool) {
 	if !prefixCompatibleWithAllocation(prefix, allocation) {
-		return netaddr.IPPrefix{}, set, false, true
+		return netip.Prefix{}, set, false, true
 	}
 
 	switch {
 	case allocation.Spec.Prefix.IsValid():
-		requestedPrefix := allocation.Spec.Prefix.IPPrefix
+		requestedPrefix := allocation.Spec.Prefix.Prefix
 		if set, ok := r.ipSetRemovePrefix(set, requestedPrefix); ok {
 			return requestedPrefix, set, true, true
 		}
-		return netaddr.IPPrefix{}, set, false, false
+		return netip.Prefix{}, set, false, false
 	case allocation.Spec.PrefixLength > 0:
 		requestedPrefixLength := allocation.Spec.PrefixLength
 		if prefix, set, ok := set.RemoveFreePrefix(uint8(requestedPrefixLength)); ok {
 			return prefix, set, true, true
 		}
-		return netaddr.IPPrefix{}, set, false, false
+		return netip.Prefix{}, set, false, false
 	default:
 		panic(fmt.Sprintf("unhandled allocation %#v", allocation))
 	}
 }
 
-func (r *PrefixReconciler) ipSetRemovePrefix(set *netaddr.IPSet, prefix netaddr.IPPrefix) (*netaddr.IPSet, bool) {
+func (r *PrefixReconciler) ipSetRemovePrefix(set *netipx.IPSet, prefix netip.Prefix) (*netipx.IPSet, bool) {
 	if !prefix.IsValid() || !set.ContainsPrefix(prefix) {
 		return set, false
 	}
-	var sb netaddr.IPSetBuilder
+	var sb netipx.IPSetBuilder
 	sb.AddSet(set)
 	sb.RemovePrefix(prefix)
 	set, _ = sb.IPSet()
@@ -475,16 +480,16 @@ func (r *PrefixReconciler) processAllocations(ctx context.Context, log logr.Logg
 	}
 
 	var (
-		availableBuilder netaddr.IPSetBuilder
+		availableBuilder netipx.IPSetBuilder
 		newAllocations   []ipamv1alpha1.PrefixAllocation
 	)
-	availableBuilder.AddPrefix(prefix.Spec.Prefix.IPPrefix)
+	availableBuilder.AddPrefix(prefix.Spec.Prefix.Prefix)
 	for _, allocation := range list.Items {
 		allocationPhase := allocation.Status.Phase
 		switch {
 		case allocationPhase == ipamv1alpha1.PrefixAllocationPhaseAllocated:
 			used = append(used, *allocation.Status.Prefix)
-			availableBuilder.RemovePrefix(allocation.Status.Prefix.IPPrefix)
+			availableBuilder.RemovePrefix(allocation.Status.Prefix.Prefix)
 		case allocationPhase != ipamv1alpha1.PrefixAllocationPhaseFailed:
 			newAllocations = append(newAllocations, allocation)
 		}
@@ -504,7 +509,7 @@ func (r *PrefixReconciler) processAllocations(ctx context.Context, log logr.Logg
 
 		availableSet = newAvailableSet
 		if res.IsValid() {
-			used = append(used, commonv1alpha1.IPPrefix{IPPrefix: res})
+			used = append(used, commonv1alpha1.IPPrefix{Prefix: res})
 		}
 	}
 
@@ -533,10 +538,16 @@ func (r *PrefixReconciler) patchAllocationStatus(
 	return nil
 }
 
-func (r *PrefixReconciler) processAllocation(ctx context.Context, log logr.Logger, prefix *ipamv1alpha1.Prefix, available *netaddr.IPSet, allocation *ipamv1alpha1.PrefixAllocation) (*netaddr.IPSet, netaddr.IPPrefix, error) {
+func (r *PrefixReconciler) processAllocation(
+	ctx context.Context,
+	log logr.Logger,
+	prefix *ipamv1alpha1.Prefix,
+	available *netipx.IPSet,
+	allocation *ipamv1alpha1.PrefixAllocation,
+) (*netipx.IPSet, netip.Prefix, error) {
 	log = log.WithValues("AllocationKey", client.ObjectKeyFromObject(allocation))
 	if !allocation.DeletionTimestamp.IsZero() {
-		return available, netaddr.IPPrefix{}, nil
+		return available, netip.Prefix{}, nil
 	}
 
 	res, newAvailableSet, ok, terminal := r.acquireAllocation(prefix, available, allocation)
@@ -544,19 +555,19 @@ func (r *PrefixReconciler) processAllocation(ctx context.Context, log logr.Logge
 	case !ok && terminal:
 		log.V(1).Info("Marking terminally non-allocatable allocation as failed")
 		if err := r.patchAllocationStatus(ctx, allocation, allocation.Status.Prefix, ipamv1alpha1.PrefixAllocationPhaseFailed); client.IgnoreNotFound(err) != nil {
-			return available, netaddr.IPPrefix{}, fmt.Errorf("could not mark allocation as failed: %w", err)
+			return available, netip.Prefix{}, fmt.Errorf("could not mark allocation as failed: %w", err)
 		}
-		return available, netaddr.IPPrefix{}, nil
+		return available, netip.Prefix{}, nil
 	case !ok:
 		log.V(1).Info("Marking non-allocatable allocation as pending")
 		if err := r.patchAllocationStatus(ctx, allocation, allocation.Status.Prefix, ipamv1alpha1.PrefixAllocationPhasePending); client.IgnoreNotFound(err) != nil {
-			return available, netaddr.IPPrefix{}, fmt.Errorf("could not mark allocation as pending: %w", err)
+			return available, netip.Prefix{}, fmt.Errorf("could not mark allocation as pending: %w", err)
 		}
-		return available, netaddr.IPPrefix{}, nil
+		return available, netip.Prefix{}, nil
 	default:
 		log.V(1).Info("Marking allocation as allocated")
 		if err := r.patchAllocationStatus(ctx, allocation, commonv1alpha1.NewIPPrefix(res), ipamv1alpha1.PrefixAllocationPhaseAllocated); err != nil {
-			return available, netaddr.IPPrefix{}, fmt.Errorf("error marking allocation as succeeded: %w", err)
+			return available, netip.Prefix{}, fmt.Errorf("error marking allocation as succeeded: %w", err)
 		}
 		return newAvailableSet, res, nil
 	}

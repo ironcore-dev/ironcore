@@ -21,7 +21,7 @@ import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	commonv1alpha1validation "github.com/onmetal/onmetal-api/apis/common/v1alpha1/validation"
 	"github.com/onmetal/onmetal-api/apis/ipam"
-	"inet.af/netaddr"
+	"go4.org/netipx"
 	corev1 "k8s.io/api/core/v1"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1validation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
@@ -148,7 +148,7 @@ func ValidatePrefixStatus(status *ipam.PrefixStatus, fldPath *field.Path) field.
 	phase := status.Phase
 	switch phase {
 	case ipam.PrefixPhaseAllocated:
-		var bldr netaddr.IPSetBuilder
+		var bldr netipx.IPSetBuilder
 
 		var (
 			seenFamilies = sets.NewString()
@@ -161,8 +161,8 @@ func ValidatePrefixStatus(status *ipam.PrefixStatus, fldPath *field.Path) field.
 
 			if !overlapSeen {
 				ipSet, _ := bldr.IPSet()
-				var usedBldr netaddr.IPSetBuilder
-				usedBldr.AddPrefix(used.IPPrefix)
+				var usedBldr netipx.IPSetBuilder
+				usedBldr.AddPrefix(used.Prefix)
 				usedSet, _ := usedBldr.IPSet()
 
 				overlapSeen = ipSet.Overlaps(usedSet)
@@ -212,12 +212,12 @@ func ValidatePrefixStatusUpdate(newPrefix, oldPrefix *ipam.Prefix) field.ErrorLi
 	// We only have to validate that used / reserved prefixes are contained in the allocated prefix.
 	// ValidatePrefixStatus already validates that they're non-overlapping.
 	if prefix := newPrefix.Spec.Prefix; prefix.IsValid() {
-		var bldr netaddr.IPSetBuilder
-		bldr.AddPrefix(prefix.IPPrefix)
+		var bldr netipx.IPSetBuilder
+		bldr.AddPrefix(prefix.Prefix)
 		set, _ := bldr.IPSet()
 
 		for i, used := range newPrefix.Status.Used {
-			if !set.ContainsPrefix(used.IPPrefix) {
+			if !set.ContainsPrefix(used.Prefix) {
 				allErrs = append(allErrs, field.Forbidden(statusField.Child("used").Index(i), fmt.Sprintf("not contained in prefix %s", prefix)))
 			}
 		}
