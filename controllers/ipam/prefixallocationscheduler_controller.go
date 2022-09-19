@@ -21,7 +21,7 @@ import (
 
 	"github.com/go-logr/logr"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/apis/ipam/v1alpha1"
-	"inet.af/netaddr"
+	"go4.org/netipx"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -119,16 +119,16 @@ func prefixFitsAllocation(prefix *ipamv1alpha1.Prefix, allocation *ipamv1alpha1.
 		return false
 	}
 
-	var bldr netaddr.IPSetBuilder
-	bldr.AddPrefix(prefix.Spec.Prefix.IPPrefix)
+	var bldr netipx.IPSetBuilder
+	bldr.AddPrefix(prefix.Spec.Prefix.Prefix)
 	for _, used := range prefix.Status.Used {
-		bldr.RemovePrefix(used.IPPrefix)
+		bldr.RemovePrefix(used.Prefix)
 	}
 	set, _ := bldr.IPSet()
 
 	switch {
 	case allocation.Spec.Prefix.IsValid():
-		return set.ContainsPrefix(allocation.Spec.Prefix.IPPrefix)
+		return set.ContainsPrefix(allocation.Spec.Prefix.Prefix)
 	case allocation.Spec.PrefixLength > 0:
 		_, _, ok := set.RemoveFreePrefix(uint8(allocation.Spec.PrefixLength))
 		return ok
