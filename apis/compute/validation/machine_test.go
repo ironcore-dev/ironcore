@@ -121,6 +121,61 @@ var _ = Describe("Machine", func() {
 			},
 			ContainElement(InvalidField("spec.volume[0].emptyDisk.sizeLimit")),
 		),
+		Entry("duplicate machine volume device",
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					Volumes: []compute.Volume{
+						{
+							Name:   "foo",
+							Device: "vda",
+						},
+						{
+							Name:   "bar",
+							Device: "vda",
+						},
+					},
+				},
+			},
+			ContainElement(DuplicateField("spec.volume[1].device")),
+		),
+		Entry("empty machine volume device",
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					Volumes: []compute.Volume{
+						{
+							Name: "foo",
+						},
+					},
+				},
+			},
+			ContainElement(RequiredField("spec.volume[0].device")),
+		),
+		Entry("invalid volume device",
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					Volumes: []compute.Volume{
+						{
+							Name:   "foo",
+							Device: "foobar",
+						},
+					},
+				},
+			},
+			ContainElement(InvalidField("spec.volume[0].device")),
+		),
+		Entry("reserved volume device",
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					Volumes: []compute.Volume{
+						{
+							Name:   "foo",
+							Device: "vda",
+						},
+					},
+				},
+			},
+			ContainElement(ForbiddenField("spec.volume[0].device")),
+		),
 		Entry("invalid ignition ref name",
 			&compute.Machine{
 				Spec: compute.MachineSpec{

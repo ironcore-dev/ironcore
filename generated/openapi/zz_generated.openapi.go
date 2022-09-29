@@ -1633,6 +1633,13 @@ func schema_onmetal_api_apis_compute_v1alpha1_Volume(ref common.ReferenceCallbac
 							Format:      "",
 						},
 					},
+					"device": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Device is the device name where the volume should be attached. If empty, an unused device name will be determined if possible.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 					"volumeRef": {
 						SchemaProps: spec.SchemaProps{
 							Description: "VolumeRef instructs to use the specified Volume as source for the attachment.",

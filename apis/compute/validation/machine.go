@@ -17,6 +17,9 @@
 package validation
 
 import (
+	"fmt"
+
+	"github.com/onmetal/onmetal-api/admission/plugin/machinevolumedevices/device"
 	onmetalapivalidation "github.com/onmetal/onmetal-api/api/validation"
 	"github.com/onmetal/onmetal-api/apis/compute"
 	"github.com/onmetal/onmetal-api/apis/storage"
@@ -80,19 +83,52 @@ func validateMachineSpec(machineSpec *compute.MachineSpec, fldPath *field.Path) 
 	}
 
 	seenNames := sets.NewString()
+	seenDevices := sets.NewString()
 	for i, vol := range machineSpec.Volumes {
 		if seenNames.Has(vol.Name) {
 			allErrs = append(allErrs, field.Duplicate(fldPath.Child("volume").Index(i).Child("name"), vol.Name))
 		} else {
 			seenNames.Insert(vol.Name)
-			for _, msg := range apivalidation.NameIsDNSLabel(vol.Name, false) {
-				allErrs = append(allErrs, field.Invalid(fldPath.Child("volume").Index(i).Child("name"), vol.Name, msg))
-			}
 		}
-		allErrs = append(allErrs, validateVolumeSource(&vol.VolumeSource, fldPath.Child("volume").Index(i))...)
+		if seenDevices.Has(vol.Device) {
+			allErrs = append(allErrs, field.Duplicate(fldPath.Child("volume").Index(i).Child("device"), vol.Device))
+		} else {
+			seenDevices.Insert(vol.Device)
+		}
+		allErrs = append(allErrs, validateVolume(&vol, fldPath.Child("volume").Index(i))...)
 	}
 
 	allErrs = append(allErrs, metav1validation.ValidateLabels(machineSpec.MachinePoolSelector, fldPath.Child("machinePoolSelector"))...)
+
+	return allErrs
+}
+
+func isReservedDeviceName(prefix string, idx int) bool {
+	return idx == 0
+}
+
+func validateVolume(volume *compute.Volume, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	for _, msg := range apivalidation.NameIsDNSLabel(volume.Name, false) {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), volume.Name, msg))
+	}
+
+	if volume.Device == "" {
+		allErrs = append(allErrs, field.Required(fldPath.Child("device"), "must specify device"))
+	} else {
+		// TODO: Improve validation on prefix.
+		prefix, idx, err := device.ParseName(volume.Device)
+		if err != nil {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("device"), volume.Device, fmt.Sprintf("invalid device name: %v", err)))
+		} else {
+			if isReservedDeviceName(prefix, idx) {
+				allErrs = append(allErrs, field.Forbidden(fldPath.Child("device"), fmt.Sprintf("device name %s is reserved", volume.Device)))
+			}
+		}
+	}
+
+	allErrs = append(allErrs, validateVolumeSource(&volume.VolumeSource, fldPath)...)
 
 	return allErrs
 }

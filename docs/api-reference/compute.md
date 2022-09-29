@@ -1516,6 +1516,18 @@ string
 </tr>
 <tr>
 <td>
+<code>device</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Device is the device name where the volume should be attached. If empty,
+an unused device name will be determined if possible.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>VolumeSource</code><br/>
 <em>
 <a href="#compute.api.onmetal.de/v1alpha1.VolumeSource">

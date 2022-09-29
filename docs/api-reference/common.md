@@ -76,9 +76,7 @@ required.</p>
 <td>
 <code>-</code><br/>
 <em>
-<a href="https://pkg.go.dev/inet.af/netaddr#IP">
-inet.af/netaddr.IP
-</a>
+net/netip.Addr
 </em>
 </td>
 <td>
@@ -103,9 +101,7 @@ inet.af/netaddr.IP
 <td>
 <code>-</code><br/>
 <em>
-<a href="https://pkg.go.dev/inet.af/netaddr#IP">
-inet.af/netaddr.IPPrefix
-</a>
+net/netip.Prefix
 </em>
 </td>
 <td>
