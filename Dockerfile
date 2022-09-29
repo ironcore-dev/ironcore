@@ -11,6 +11,7 @@ RUN go mod download
 
 # Copy the go source
 COPY main.go main.go
+COPY admission/ admission/
 COPY api/ api/
 COPY apis/ apis/
 COPY apiserver/ apiserver/
