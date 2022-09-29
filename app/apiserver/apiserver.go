@@ -20,6 +20,7 @@ import (
 	"net"
 	"time"
 
+	"github.com/onmetal/onmetal-api/admission/plugin/machinevolumedevices"
 	"github.com/onmetal/onmetal-api/api"
 	"github.com/onmetal/onmetal-api/apis/compute"
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
@@ -156,6 +157,10 @@ func (o *OnmetalAPIServerOptions) Validate(args []string) error {
 }
 
 func (o *OnmetalAPIServerOptions) Complete() error {
+	machinevolumedevices.Register(o.RecommendedOptions.Admission.Plugins)
+
+	o.RecommendedOptions.Admission.RecommendedPluginOrder = append(o.RecommendedOptions.Admission.RecommendedPluginOrder, machinevolumedevices.PluginName)
+
 	return nil
 }
 

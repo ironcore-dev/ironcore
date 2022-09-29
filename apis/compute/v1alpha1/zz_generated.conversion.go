@@ -908,6 +908,7 @@ func Convert_compute_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStatus(i
 
 func autoConvert_v1alpha1_Volume_To_compute_Volume(in *Volume, out *compute.Volume, s conversion.Scope) error {
 	out.Name = in.Name
+	out.Device = in.Device
 	if err := Convert_v1alpha1_VolumeSource_To_compute_VolumeSource(&in.VolumeSource, &out.VolumeSource, s); err != nil {
 		return err
 	}
@@ -921,6 +922,7 @@ func Convert_v1alpha1_Volume_To_compute_Volume(in *Volume, out *compute.Volume, 
 
 func autoConvert_compute_Volume_To_v1alpha1_Volume(in *compute.Volume, out *Volume, s conversion.Scope) error {
 	out.Name = in.Name
+	out.Device = in.Device
 	if err := Convert_compute_VolumeSource_To_v1alpha1_VolumeSource(&in.VolumeSource, &out.VolumeSource, s); err != nil {
 		return err
 	}

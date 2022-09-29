@@ -84,6 +84,9 @@ type NetworkInterfaceSource struct {
 type Volume struct {
 	// Name is the name of the Volume
 	Name string `json:"name"`
+	// Device is the device name where the volume should be attached. If empty,
+	// an unused device name will be determined if possible.
+	Device string `json:"device,omitempty"`
 	// VolumeSource is the source where the storage for the Volume resides at.
 	VolumeSource `json:",inline"`
 }
