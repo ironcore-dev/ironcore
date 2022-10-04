@@ -22,8 +22,8 @@ import (
 )
 
 const (
-	// Max throughput in bytes per seconds.
-	ResourceBPS corev1.ResourceName = "bps"
+	// Max throughput per second. (e.g. 1Gi)
+	ResourceTPS corev1.ResourceName = "tps"
 	// Max IOPS in input/output operations per second.
 	ResourceIOPS corev1.ResourceName = "iops"
 	// Dynamic resource limits flag: limits  per GB of volume.
