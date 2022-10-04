@@ -21,6 +21,15 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+const (
+	// Max throughput in bytes per seconds.
+	ResourceBPS corev1.ResourceName = "bps"
+	// Max IOPS in input/output operations per second.
+	ResourceIOPS corev1.ResourceName = "iops"
+	// Dynamic resource limits flag: limits  per GB of volume.
+	ResourceDynamic corev1.ResourceName = "dynamic"
+)
+
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +genclient
 // +genclient:nonNamespaced
