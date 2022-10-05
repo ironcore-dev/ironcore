@@ -22,12 +22,10 @@ import (
 )
 
 const (
-	// Max throughput per second. (e.g. 1Gi)
+	// ResourceTPS defines max throughput per second. (e.g. 1Gi)
 	ResourceTPS corev1.ResourceName = "tps"
-	// Max IOPS in input/output operations per second.
+	// ResourceIOPS defines max IOPS in input/output operations per second.
 	ResourceIOPS corev1.ResourceName = "iops"
-	// Dynamic resource limits flag: limits  per GB of volume.
-	ResourceDynamic corev1.ResourceName = "dynamic"
 )
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
