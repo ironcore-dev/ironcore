@@ -21,6 +21,13 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+const (
+	// ResourceTPS defines max throughput per second. (e.g. 1Gi)
+	ResourceTPS corev1.ResourceName = "tps"
+	// ResourceIOPS defines max IOPS in input/output operations per second.
+	ResourceIOPS corev1.ResourceName = "iops"
+)
+
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +genclient
 // +genclient:nonNamespaced
