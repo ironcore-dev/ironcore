@@ -89,7 +89,9 @@ func (networkInterfaceStrategy) Canonicalize(obj runtime.Object) {
 }
 
 func (networkInterfaceStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
-	return field.ErrorList{}
+	oldNetworkInterface := old.(*networking.NetworkInterface)
+	newNetworkInterfae := obj.(*networking.NetworkInterface)
+	return validation.ValidateNetworkInterfaceUpdate(newNetworkInterfae, oldNetworkInterface)
 }
 
 func (networkInterfaceStrategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {

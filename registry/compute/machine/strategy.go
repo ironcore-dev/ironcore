@@ -95,7 +95,9 @@ func (machineStrategy) Canonicalize(obj runtime.Object) {
 }
 
 func (machineStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
-	return field.ErrorList{}
+	oldMachine := old.(*compute.Machine)
+	newMachine := obj.(*compute.Machine)
+	return validation.ValidateMachineUpdate(newMachine, oldMachine)
 }
 
 func (machineStrategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {

@@ -89,7 +89,9 @@ func (virtualIPStrategy) Canonicalize(obj runtime.Object) {
 }
 
 func (virtualIPStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
-	return field.ErrorList{}
+	newVirtualIP := obj.(*networking.VirtualIP)
+	oldVirtualIP := old.(*networking.VirtualIP)
+	return validation.ValidateVirtualIPUpdate(newVirtualIP, oldVirtualIP)
 }
 
 func (virtualIPStrategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {

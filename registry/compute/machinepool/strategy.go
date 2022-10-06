@@ -108,7 +108,9 @@ func (machinePoolStrategy) Canonicalize(obj runtime.Object) {
 }
 
 func (machinePoolStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
-	return field.ErrorList{}
+	newMachinePool := obj.(*compute.MachinePool)
+	oldMachinePool := old.(*compute.MachinePool)
+	return validation.ValidateMachinePoolUpdate(newMachinePool, oldMachinePool)
 }
 
 func (machinePoolStrategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {
