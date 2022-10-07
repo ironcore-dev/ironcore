@@ -104,6 +104,10 @@ ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
 test-only: envtest ## Run *only* the tests - no generation, linting etc.
 	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" go test ./... -coverprofile cover.out
 
+.PHONEY: openapi-extractor
+extract-openapi: openapi-extractor
+	$(OPENAPI_EXTRACTOR) --apiserver-package="github.com/onmetal/onmetal-api/cmd/apiserver" --apiserver-build-opts=mod --apiservices="./config/apiserver/apiservice/bases" --output="./gen"
+
 ##@ Build
 
 .PHONY: build
@@ -221,6 +225,7 @@ $(LOCALBIN):
 KUSTOMIZE ?= $(LOCALBIN)/kustomize
 CONTROLLER_GEN ?= $(LOCALBIN)/controller-gen
 ENVTEST ?= $(LOCALBIN)/setup-envtest
+OPENAPI_EXTRACTOR ?= $(LOCALBIN)/openapi-extractor
 
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v3.8.7
@@ -242,3 +247,7 @@ envtest: $(ENVTEST) ## Download envtest-setup locally if necessary.
 $(ENVTEST): $(LOCALBIN)
 	GOBIN=$(LOCALBIN) go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
 
+.PHONY: openapi-extractor
+openapi-extractor: $(OPENAPI_EXTRACTOR) ## Download openapi-extractor locally if necessary.
+$(OPENAPI_EXTRACTOR): $(LOCALBIN)
+	GOBIN=$(LOCALBIN) go install github.com/onmetal/openapi-extractor/cmd/openapi-extractor@latest
