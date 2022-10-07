@@ -24,8 +24,8 @@ import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
+	onmetalapiclient "github.com/onmetal/onmetal-api/client"
 	"github.com/onmetal/onmetal-api/controllers/networking/events"
-	"github.com/onmetal/onmetal-api/controllers/shared"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -184,7 +184,7 @@ func (r *NetworkInterfaceBindReconciler) getRequestingMachine(ctx context.Contex
 	if err := r.List(ctx, machineList,
 		client.InNamespace(nic.Namespace),
 		client.MatchingFields{
-			shared.MachineSpecNetworkInterfaceNamesField: nic.Name,
+			onmetalapiclient.MachineSpecNetworkInterfaceNamesField: nic.Name,
 		},
 	); err != nil {
 		return nil, fmt.Errorf("error listing matching machines: %w", err)
@@ -231,7 +231,12 @@ func (r *NetworkInterfaceBindReconciler) validReferences(nic *networkingv1alpha1
 		return false
 	}
 
-	return shared.MachineSpecNetworkInterfaceNames(machine).Has(nic.Name)
+	for _, name := range computev1alpha1.MachineNetworkInterfaceNames(machine) {
+		if name == nic.Name {
+			return true
+		}
+	}
+	return false
 }
 
 func (r *NetworkInterfaceBindReconciler) patchStatus(ctx context.Context, nic *networkingv1alpha1.NetworkInterface, phase networkingv1alpha1.NetworkInterfacePhase) error {
@@ -287,7 +292,7 @@ func (r *NetworkInterfaceBindReconciler) enqueueByMachineNetworkInterfaceReferen
 		machine := obj.(*computev1alpha1.Machine)
 
 		var reqs []ctrl.Request
-		for name := range shared.MachineSpecNetworkInterfaceNames(machine) {
+		for _, name := range computev1alpha1.MachineNetworkInterfaceNames(machine) {
 			reqs = append(reqs, ctrl.Request{NamespacedName: client.ObjectKey{Namespace: machine.Namespace, Name: name}})
 		}
 

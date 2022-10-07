@@ -23,7 +23,7 @@ import (
 	"time"
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
-	"github.com/onmetal/onmetal-api/controllers/shared"
+	onmetalapiclient "github.com/onmetal/onmetal-api/client"
 	"github.com/onmetal/onmetal-api/envtestutils"
 	"github.com/onmetal/onmetal-api/envtestutils/apiserver"
 	"github.com/onsi/gomega/gexec"
@@ -150,7 +150,7 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 		Expect(err).ToNot(HaveOccurred())
 
 		// index fields here
-		Expect(shared.SetupMachineSpecVolumeNamesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+		Expect(onmetalapiclient.SetupMachineSpecVolumeNamesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 
 		// register reconciler here
 		Expect((&VolumeReconciler{

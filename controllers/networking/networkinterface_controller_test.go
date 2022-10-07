@@ -19,7 +19,6 @@ import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/apis/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
-	"github.com/onmetal/onmetal-api/controllers/shared"
 	"github.com/onmetal/onmetal-api/testutils"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -122,7 +121,7 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
 
 		By("waiting for the prefix to be created with the correct ips and become ready")
-		prefixKey := client.ObjectKey{Namespace: ns.Name, Name: shared.NetworkInterfaceEphemeralIPName(nic.Name, 0)}
+		prefixKey := client.ObjectKey{Namespace: ns.Name, Name: networkingv1alpha1.NetworkInterfaceIPSourceEphemeralPrefixName(nic.Name, 0)}
 		Eventually(func(g Gomega) {
 			prefix := &ipamv1alpha1.Prefix{}
 			err := k8sClient.Get(ctx, prefixKey, prefix)

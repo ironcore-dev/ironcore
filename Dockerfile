@@ -17,6 +17,7 @@ COPY apis/ apis/
 COPY apiserver/ apiserver/
 COPY app/ app/
 COPY cmd/ cmd/
+COPY client/ client/
 COPY clientutils/ clientutils/
 COPY controllers/ controllers/
 COPY equality/ equality/

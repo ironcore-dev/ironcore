@@ -21,7 +21,6 @@ import (
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
-	"github.com/onmetal/onmetal-api/controllers/shared"
 	"github.com/onmetal/onmetal-api/testutils"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -99,7 +98,7 @@ var _ = Describe("MachineReconciler", func() {
 		nic := &networkingv1alpha1.NetworkInterface{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: ns.Name,
-				Name:      shared.MachineEphemeralNetworkInterfaceName(machine.Name, "interface"),
+				Name:      computev1alpha1.MachineEphemeralNetworkInterfaceName(machine.Name, "interface"),
 			},
 		}
 		Eventually(Object(nic)).Should(SatisfyAll(
@@ -121,7 +120,7 @@ var _ = Describe("MachineReconciler", func() {
 		volume := &storagev1alpha1.Volume{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: ns.Name,
-				Name:      shared.MachineEphemeralVolumeName(machine.Name, "volume"),
+				Name:      computev1alpha1.MachineEphemeralVolumeName(machine.Name, "volume"),
 			},
 		}
 		Eventually(Object(volume)).Should(SatisfyAll(

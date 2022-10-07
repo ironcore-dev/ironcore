@@ -26,7 +26,7 @@ import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
-	"github.com/onmetal/onmetal-api/controllers/shared"
+	onmetalapiclient "github.com/onmetal/onmetal-api/client"
 	"github.com/onmetal/onmetal-api/controllers/storage/events"
 	apiequality "github.com/onmetal/onmetal-api/equality"
 	corev1 "k8s.io/api/core/v1"
@@ -153,7 +153,7 @@ func (r *VolumeReconciler) getRequestingMachine(ctx context.Context, volume *sto
 	machineList := &computev1alpha1.MachineList{}
 	if err := r.List(ctx, machineList,
 		client.InNamespace(volume.Namespace),
-		client.MatchingFields{shared.MachineSpecVolumeNamesField: volume.Name},
+		client.MatchingFields{onmetalapiclient.MachineSpecVolumeNamesField: volume.Name},
 	); err != nil {
 		return nil, fmt.Errorf("error listing machines specifying volume: %w", err)
 	}
@@ -242,8 +242,17 @@ func (r *VolumeReconciler) requeueAfterBoundTimeout(volume *storagev1alpha1.Volu
 	return ctrl.Result{RequeueAfter: boundTimeoutExpirationDuration}
 }
 
+func machineContainsVolumeName(machine *computev1alpha1.Machine, volumeName string) bool {
+	for _, name := range computev1alpha1.MachineVolumeNames(machine) {
+		if name == volumeName {
+			return true
+		}
+	}
+	return false
+}
+
 func (r *VolumeReconciler) validReferences(volume *storagev1alpha1.Volume, machine *computev1alpha1.Machine) bool {
-	if !shared.MachineSpecVolumeNames(machine).Has(volume.Name) {
+	if !machineContainsVolumeName(machine, volume.Name) {
 		return false
 	}
 
@@ -290,9 +299,9 @@ func (r *VolumeReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
 				machine := obj.(*computev1alpha1.Machine)
 
-				volumeNames := shared.MachineSpecVolumeNames(machine)
+				volumeNames := computev1alpha1.MachineVolumeNames(machine)
 				res := make([]ctrl.Request, 0, len(volumeNames))
-				for volumeName := range volumeNames {
+				for _, volumeName := range volumeNames {
 					res = append(res, ctrl.Request{
 						NamespacedName: types.NamespacedName{
 							Namespace: machine.Namespace,

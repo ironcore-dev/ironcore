@@ -24,8 +24,8 @@ import (
 	"time"
 
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
+	onmetalapiclient "github.com/onmetal/onmetal-api/client"
 	"github.com/onmetal/onmetal-api/controllers/networking"
-	"github.com/onmetal/onmetal-api/controllers/shared"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
@@ -194,8 +194,8 @@ func main() {
 	}
 
 	if controllers.Enabled(volumeController) {
-		if err = shared.SetupMachineSpecVolumeNamesFieldIndexer(context.TODO(), mgr.GetFieldIndexer()); err != nil {
-			setupLog.Error(err, "unable to index field", "field", shared.MachineSpecVolumeNamesField)
+		if err = onmetalapiclient.SetupMachineSpecVolumeNamesFieldIndexer(context.TODO(), mgr.GetFieldIndexer()); err != nil {
+			setupLog.Error(err, "unable to index field", "field", onmetalapiclient.MachineSpecVolumeNamesField)
 			os.Exit(1)
 		}
 
@@ -232,8 +232,8 @@ func main() {
 	}
 
 	if controllers.Enabled(machineController) || controllers.Enabled(networkInterfaceBindController) {
-		if err = shared.SetupMachineSpecNetworkInterfaceNamesFieldIndexer(context.TODO(), mgr.GetFieldIndexer()); err != nil {
-			setupLog.Error(err, "unable to setup field indexer", "field", shared.MachineSpecNetworkInterfaceNamesField)
+		if err = onmetalapiclient.SetupMachineSpecNetworkInterfaceNamesFieldIndexer(context.TODO(), mgr.GetFieldIndexer()); err != nil {
+			setupLog.Error(err, "unable to setup field indexer", "field", onmetalapiclient.MachineSpecNetworkInterfaceNamesField)
 			os.Exit(1)
 		}
 	}
@@ -279,7 +279,7 @@ func main() {
 	}
 
 	if controllers.Enabled(networkInterfaceController) || controllers.Enabled(virtualIPController) {
-		if err = shared.SetupNetworkInterfaceVirtualIPNameFieldIndexer(context.TODO(), mgr.GetFieldIndexer()); err != nil {
+		if err = onmetalapiclient.SetupNetworkInterfaceVirtualIPNameFieldIndexer(context.TODO(), mgr.GetFieldIndexer()); err != nil {
 			setupLog.Error(err, "unable to setup field indexer", "field", "NetworkInterfaceVirtualIPName")
 			os.Exit(1)
 		}

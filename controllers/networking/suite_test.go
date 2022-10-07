@@ -23,8 +23,8 @@ import (
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
+	onmetalapiclient "github.com/onmetal/onmetal-api/client"
 	"github.com/onmetal/onmetal-api/controllers/ipam"
-	"github.com/onmetal/onmetal-api/controllers/shared"
 	"github.com/onmetal/onmetal-api/envtestutils"
 	"github.com/onmetal/onmetal-api/envtestutils/apiserver"
 	. "github.com/onsi/ginkgo/v2"
@@ -124,8 +124,8 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	DeferCleanup(cancel)
-	Expect(shared.SetupNetworkInterfaceVirtualIPNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
-	Expect(shared.SetupMachineSpecNetworkInterfaceNamesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+	Expect(onmetalapiclient.SetupNetworkInterfaceVirtualIPNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+	Expect(onmetalapiclient.SetupMachineSpecNetworkInterfaceNamesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 
 	// Register reconcilers
 	err = (&NetworkInterfaceReconciler{

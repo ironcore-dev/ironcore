@@ -24,13 +24,14 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/metautils"
+	"github.com/onmetal/controller-utils/set"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
+	onmetalapiclient "github.com/onmetal/onmetal-api/client"
 	onmetalapiclientutils "github.com/onmetal/onmetal-api/clientutils"
 	"github.com/onmetal/onmetal-api/controllers/compute/events"
-	"github.com/onmetal/onmetal-api/controllers/shared"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -168,7 +169,7 @@ func (r *MachineReconciler) pruneEphemeralNetworkInterfaces(ctx context.Context,
 	}
 
 	var (
-		activeNames = shared.MachineSpecNetworkInterfaceNames(machine)
+		activeNames = set.New(computev1alpha1.MachineNetworkInterfaceNames(machine)...)
 		errs        []error
 	)
 
@@ -251,7 +252,7 @@ func (r *MachineReconciler) pruneEphemeralVolumes(ctx context.Context, machine *
 	}
 
 	var (
-		activeNames = shared.MachineSpecVolumeNames(machine)
+		activeNames = set.New(computev1alpha1.MachineVolumeNames(machine)...)
 		errs        []error
 	)
 
@@ -438,7 +439,7 @@ func (r *MachineReconciler) enqueueByMachineNetworkInterfaceReferences(ctx conte
 		if err := r.List(ctx, machineList,
 			client.InNamespace(nic.Namespace),
 			client.MatchingFields{
-				shared.MachineSpecNetworkInterfaceNamesField: nic.Name,
+				onmetalapiclient.MachineSpecNetworkInterfaceNamesField: nic.Name,
 			},
 		); err != nil {
 			log.Error(err, "Error listing machines using network interface")
@@ -462,7 +463,7 @@ func (r *MachineReconciler) enqueueByMachineVolumeReferences(ctx context.Context
 		if err := r.List(ctx, machineList,
 			client.InNamespace(volume.Namespace),
 			client.MatchingFields{
-				shared.MachineSpecVolumeNamesField: volume.Name,
+				onmetalapiclient.MachineSpecVolumeNamesField: volume.Name,
 			},
 		); err != nil {
 			log.Error(err, "Error listing machines using volume")
