@@ -12,7 +12,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/moby/term v0.0.0-20210619224110-3f7ff695adc6
 	github.com/onmetal/controller-utils v0.6.3
-	github.com/onmetal/vgopath v0.0.2
+	github.com/onmetal/vgopath v0.0.3
 	github.com/onsi/ginkgo/v2 v2.1.6
 	github.com/onsi/gomega v1.21.1
 	github.com/spf13/cobra v1.5.0
