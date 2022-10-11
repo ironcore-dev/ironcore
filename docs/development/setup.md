@@ -102,4 +102,27 @@ To remove the APIs from your cluster, simply run
 make uninstall
 ```
 
+**Note** In case `make uninstall` got stuck while deleting `onmetal-system` namespace, first delete all resources
+present in `onmetal-system` namespace and then delete `onmetal-system` namespace using below command.
+
+```shell
+kubectl delete ns onmetal-system
+```
+
+## Troubleshooting
+
+* Docker buildkit should be enabled while doing `make install` or `make kind-install`.
+
+  Error: "the --mount option require BuildKit"
+
+  Solution: Refer https://docks.docker.com/go/buildkit to enable BuildKit
+
+* Build platform should be known.
+
+  Error: "failed to parse platform : "" is an invalid component of "": platform specifier component must
+  match "^[A-Za-z0-9_-]+$": invalid argument" "
+
+  Solution: Provide platform to Dockerfile as `BUILDPLATFORM` varible before doing `make install` or
+  `make kind-install`
+
 --8<-- "hack/docs/abbreviations.md"
