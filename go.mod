@@ -24,10 +24,10 @@ require (
 	k8s.io/apimachinery v0.24.3
 	k8s.io/apiserver v0.24.3
 	k8s.io/client-go v0.24.3
-	k8s.io/code-generator v0.24.3
+	k8s.io/code-generator v0.25.3
 	k8s.io/component-base v0.24.3
 	k8s.io/kube-aggregator v0.24.3
-	k8s.io/kube-openapi v0.0.0-20220401212409-b28bf2818661
+	k8s.io/kube-openapi v0.0.0-20220803162953-67bda5d908f1
 	k8s.io/utils v0.0.0-20220210201930-3a6ce19ff2f9
 	sigs.k8s.io/controller-runtime v0.12.3
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3
@@ -54,6 +54,7 @@ require (
 	github.com/coreos/go-systemd/v22 v22.3.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emicklei/go-restful v2.9.5+incompatible // indirect
+	github.com/emicklei/go-restful/v3 v3.8.0 // indirect
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
 	github.com/felixge/httpsnoop v1.0.1 // indirect
 	github.com/form3tech-oss/jwt-go v3.2.3+incompatible // indirect
@@ -124,7 +125,7 @@ require (
 	k8s.io/apiextensions-apiserver v0.24.3 // indirect
 	k8s.io/gengo v0.0.0-20211129171323-c02415ce4185 // indirect
 	k8s.io/klog v0.2.0 // indirect
-	k8s.io/klog/v2 v2.60.1 // indirect
+	k8s.io/klog/v2 v2.70.1 // indirect
 	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.0.30 // indirect
 	sigs.k8s.io/json v0.0.0-20211208200746-9f7c6b3444d2 // indirect
 )
