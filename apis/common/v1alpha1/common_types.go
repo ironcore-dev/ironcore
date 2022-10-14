@@ -26,6 +26,14 @@ import (
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 )
 
+const (
+	// WatchLabel is a label that can be applied to any onmetal resource.
+	//
+	// Provider controllers that allow for selective reconciliation may check this label and proceed
+	// with reconciliation of the object only if this label and a configured value are present.
+	WatchLabel = "common.api.onmetal.de/watch-filter"
+)
+
 // ConfigMapKeySelector is a reference to a specific 'key' within a ConfigMap resource.
 // In some instances, `key` is a required field.
 type ConfigMapKeySelector struct {

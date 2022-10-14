@@ -26,6 +26,7 @@ COPY machinepoollet/ machinepoollet/
 COPY registry/ registry/
 COPY serializer/ serializer/
 COPY tableconvertor/ tableconvertor/
+COPY util/ util/
 
 ARG TARGETOS TARGETARCH
 
