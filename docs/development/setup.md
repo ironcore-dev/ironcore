@@ -7,6 +7,7 @@
 * [Kustomize](https://kustomize.io/)
 * Access to a Kubernetes cluster ([Minikube](https://minikube.sigs.k8s.io/docs/), [kind](https://kind.sigs.k8s.io/) or a
   real cluster)
+* `Docker` >= 19.03
 
 ## Clone the Repository
 
@@ -102,12 +103,13 @@ To remove the APIs from your cluster, simply run
 make uninstall
 ```
 
-**Note** In case `make uninstall` got stuck while deleting `onmetal-system` namespace, first delete all resources
-present in `onmetal-system` namespace and then delete `onmetal-system` namespace using below command.
+**Note** In case `make uninstall` got stuck while deleting `onmetal-system` namespace, check resources under `onmetal-system`
+namespace using below command and delete all resources present and then delete namespace.
 
 ```shell
-kubectl delete ns onmetal-system
+kubectl api-resources --verbs=list --namespaced -o name | xargs -n 1 kubectl get --show-kind --ignore-not-found -n onmetal-system
 ```
+
 
 ## Troubleshooting
 
@@ -116,13 +118,5 @@ kubectl delete ns onmetal-system
   Error: "the --mount option require BuildKit"
 
   Solution: Refer https://docks.docker.com/go/buildkit to enable BuildKit
-
-* Build platform should be known.
-
-  Error: "failed to parse platform : "" is an invalid component of "": platform specifier component must
-  match "^[A-Za-z0-9_-]+$": invalid argument" "
-
-  Solution: Provide platform to Dockerfile as `BUILDPLATFORM` varible before doing `make install` or
-  `make kind-install`
 
 --8<-- "hack/docs/abbreviations.md"
