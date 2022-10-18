@@ -10,10 +10,11 @@ status: implementable
 authors:
 
 - "@gehoern"
-  reviewers:
-- #"@MalteJ"
-- #"@adracus"
-- #"@afritzler"
+reviewers:
+- "@adracus"
+- "@afritzler"
+- "@guvenc"
+- "@MalteJ"
 
 ---
 
@@ -43,8 +44,8 @@ To avoid those limitations and to have better control over the load balancer beh
 - the load balancer needs to avoid forwarding unintended traffic.
   - based on ports/protocols it can be filtered what needs to be load balanced
   - icmp requests are not part of forwarded traffic and will be filtered by the load balancer anyhow
-- Load balancer (ip) and targets can be parts of different networks (VNI's) but
-- all targets must be of the same network (VNI)
+- Load balancer (ip) and targets can be parts of different networks but
+- all targets (NetworkInterfaces) must be of the same network 
 
 ### Non-Goals
 - no address or port translation / rewriting (no SNAT / DNAT) (L4 Loadbalancer)
@@ -65,37 +66,47 @@ A network loadbalancer CRD allows the user to define the network function. all e
 
 ```yaml
 apiVersion: networking.onmetal.de
-kind: NetworkLoadBalancer
+kind: LoadBalancer
 metadata: 
-  name: myLoadBalancer
+  name: myLoadBalancer-2abf34
   namespace: customer-1
 spec:
-  # same behavior as VirtualIP from OEP-1
-  # should also provide non public IP
-  loadBalancerIP:
-    ephemeral:
-      virtualIPTemplate:
-        spec:
-          type: Public
-          ipFamily: IPv4
+  type: Public
+  ipFamilies: [ IPv4, IPv6 ]
+
+  # limits the networkinterfaces to select from
+  networkRef:
+    name: 
   ports:
-    - name: webserver
+    - name: webserver  # might be optional
       protocol: tcp
       port: 80
     - name: db
       protocol: udp
       port: 1024
       portEnd: 2048
-  targetNetworkInterface:
-    - name: myDbMachineInterface
-    - labelSelector:
-        key: db          
+  networkInterfaceSelector:
+    matchLabels: 
+      key: db
+      foo: bar
 status:
-  ip: 45.86.152.88
-  phase: Bound
-  targetNetworkInterfaces:
-  - name: myDbMachineInterface
-  - name: autoSelectedMachineInterface
-  - name: autoSelectedMachineInterface-2
+  ips: 
+    - 45.86.152.88
+    - 2001::
+```
+
+```yaml
+apiVersion: networking.onmetal.de/v1alpha1
+kind: LoadBalancerRouting
+metadata:
+  name: myLoadBalancer-2abf34
+  namespace: customer-1
+networkRef:
+  name: my-network
+destinations:
+  - name: my-machine-interface-1
+    uid: 2020dcf9-e030-427e-b0fc-4fec2016e73a
+  - name: my-machine-interface-2
+    uid: 2020dcf9-e030-427e-b0fc-4fec2016e73d
 ```
 

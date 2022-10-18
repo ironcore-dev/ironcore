@@ -11,9 +11,10 @@ authors:
 
 - "@gehoern"
   reviewers:
-- #"@MalteJ"
-- #"@adracus"
-- #"@afritzler"
+- "@MalteJ"
+- "@adracus"
+- "@afritzler"
+- "@guvenc"
 
 ---
 
@@ -46,24 +47,42 @@ The NatGateway definition allows to define a gateway for a network. The prefix i
 
 ```yaml
 apiVersion: networking.onmetal.de
-kind: NatGateway
+kind: NATGateway
 metadata:
-  name: my-nat
+  name: my-nat-4711ab
+  namespace: customer-1
 spec:
   # the network the Nat gateway operates on
-  prefixRef: sample-network
+  networkRef: 
+    name: sample-network
   # public ip's the NatGateway has. To have more ports available add more IP addresses 
+  type: Public
   natIPs:
-    - ephemeral:
-      virtualIPTemplate:
-        spec:
-          type: Public
-          ipFamily: IPv4
+    - ipFamily: IPv4
   # defines the concurrent connections per machine
   PortsPerMachine: 64                    # 64, 128, 256, 512 or 1024
 status:
-  Status: Running
-  # information of Network interfaces without a virtualIP is needed 
-  PortsUsed: {{ PortsPerMachine * sample-network.networkInterfaceWithoutVitualIP }}
-  PortsAvailable: {{ ( natIPs * 64512 ) - PortsUsed}}
+ # information of Network interfaces without a virtualIP is needed
+
+  portsUsed: {{ PortsPerMachine * sample-network.networkInterfaceWithoutVirtualIP }}
+  portsAvailable: {{ ( natIPs * 64512 ) - PortsUsed}}
+```
+
+```yaml
+apiVersion: networking.onmetal.de/v1alpha1
+kind: NATGatewayRouting
+metadata:
+  name: my-nat-4711ab
+  namespace: customer-1
+networkRef:
+  name: my-network
+destinations:
+  - name: my-machine-interface-1
+    uid: 2020dcf9-e030-427e-b0fc-4fec2016e73a
+    port: 1024
+    portEnd: 1087
+  - name: my-machine-interface-2
+    uid: 2020dcf9-e030-427e-b0fc-4fec2016e73d
+    port: 1088
+    portEnd: 1151
 ```
