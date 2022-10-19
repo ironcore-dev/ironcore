@@ -65,7 +65,7 @@ To avoid those limitations and to have better control over the load balancer beh
 A network loadbalancer CRD allows the user to define the network function. all entries except the `targetNetworkInterface` must be immutable. 
 
 ```yaml
-apiVersion: networking.onmetal.de
+apiVersion: networking.api.onmetal.de/v1alpha1
 kind: LoadBalancer
 metadata: 
   name: myLoadBalancer-2abf34
@@ -96,7 +96,7 @@ status:
 ```
 
 ```yaml
-apiVersion: networking.onmetal.de/v1alpha1
+apiVersion: networking.api.onmetal.de/v1alpha1
 kind: LoadBalancerRouting
 metadata:
   name: myLoadBalancer-2abf34

@@ -46,7 +46,7 @@ Some machines of the network have no public IP addresses. But those machines als
 The NatGateway definition allows to define a gateway for a network. The prefix is implying the Network (VNI) this NAT-Gateway runs on. Better: every machine in that prefix will get a NAT-Gateway. If a machine gets a virtual IP it no longer needs a NAT-Gateway assignment. Anything except the `natIPs` is immutable on the NatGateway. Those are used to scale the size of the Gateway. Changes of the `PortPerMachine` cause the whole NAT-Gateway to be recomputed and can therefore only happen on initializing
 
 ```yaml
-apiVersion: networking.API.onmetal.de
+apiVersion: networking.api.onmetal.de/v1alpha1
 kind: NATGateway
 metadata:
   name: my-nat-4711ab
@@ -69,7 +69,7 @@ status:
 ```
 
 ```yaml
-apiVersion: networking.onmetal.de/v1alpha1
+apiVersion: networking.api.onmetal.de/v1alpha1
 kind: NATGatewayRouting
 metadata:
   name: my-nat-4711ab
