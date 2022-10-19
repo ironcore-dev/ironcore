@@ -92,7 +92,7 @@ spec:
   #all networkInterfaces must be connected to this network.
   networkRef:
     name:
-  #a selector for the network interfaces to be load balancer targets, normal kubernetes selector logic
+  #a selector for the NetworkInterfaces to be load balancer targets, normal kubernetes selector logic
   #TODO explicit machines ?
   networkInterfaceSelector:
     matchLabels: 
