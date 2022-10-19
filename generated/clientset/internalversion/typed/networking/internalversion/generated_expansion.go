@@ -25,6 +25,10 @@ type LoadBalancerExpansion interface{}
 
 type LoadBalancerRoutingExpansion interface{}
 
+type NATGatewayExpansion interface{}
+
+type NATGatewayRoutingExpansion interface{}
+
 type NetworkExpansion interface{}
 
 type NetworkInterfaceExpansion interface{}

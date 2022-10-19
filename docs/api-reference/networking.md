@@ -14,6 +14,14 @@ Resource Types:
 </li><li>
 <a href="#networking.api.onmetal.de/v1alpha1.AliasPrefixRouting">AliasPrefixRouting</a>
 </li><li>
+<a href="#networking.api.onmetal.de/v1alpha1.LoadBalancer">LoadBalancer</a>
+</li><li>
+<a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerRouting">LoadBalancerRouting</a>
+</li><li>
+<a href="#networking.api.onmetal.de/v1alpha1.NATGateway">NATGateway</a>
+</li><li>
+<a href="#networking.api.onmetal.de/v1alpha1.NATGatewayRouting">NATGatewayRouting</a>
+</li><li>
 <a href="#networking.api.onmetal.de/v1alpha1.Network">Network</a>
 </li><li>
 <a href="#networking.api.onmetal.de/v1alpha1.NetworkInterface">NetworkInterface</a>
@@ -190,6 +198,442 @@ Refer to the Kubernetes API documentation for the fields of the
 </td>
 <td>
 <p>Destinations are the destinations for an AliasPrefix.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.LoadBalancer">LoadBalancer
+</h3>
+<div>
+<p>LoadBalancer is the Schema for the LoadBalancer API</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+networking.api.onmetal.de/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>LoadBalancer</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerSpec">
+LoadBalancerSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>type</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerType">
+LoadBalancerType
+</a>
+</em>
+</td>
+<td>
+<p>Type is the type of LoadBalancer.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ipFamilies</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#ipfamily-v1-core">
+[]Kubernetes core/v1.IPFamily
+</a>
+</em>
+</td>
+<td>
+<p>IPFamilies are the ip families the load balancer should have.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef is the Network this LoadBalancer should belong to.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkInterfaceSelector</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#labelselector-v1-meta">
+Kubernetes meta/v1.LabelSelector
+</a>
+</em>
+</td>
+<td>
+<p>NetworkInterfaceSelector defines the NetworkInterfaces
+for which this LoadBalancer should be applied</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ports</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerPort">
+[]LoadBalancerPort
+</a>
+</em>
+</td>
+<td>
+<p>Ports are the ports the load balancer should allow.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerStatus">
+LoadBalancerStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.LoadBalancerRouting">LoadBalancerRouting
+</h3>
+<div>
+<p>LoadBalancerRouting is the Schema for the aliasprefixrouting API</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+networking.api.onmetal.de/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>LoadBalancerRouting</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="/api-reference/common.md#localuidreference">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef is the network the load balancer is assigned to.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>destinations</code><br/>
+<em>
+<a href="/api-reference/common.md#localuidreference">
+[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
+</a>
+</em>
+</td>
+<td>
+<p>Destinations are the destinations for an LoadBalancer.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.NATGateway">NATGateway
+</h3>
+<div>
+<p>NATGateway is the Schema for the NATGateway API</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+networking.api.onmetal.de/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>NATGateway</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NATGatewaySpec">
+NATGatewaySpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>type</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NATGatewayType">
+NATGatewayType
+</a>
+</em>
+</td>
+<td>
+<p>Type is the type of NATGateway.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ipFamilies</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#ipfamily-v1-core">
+[]Kubernetes core/v1.IPFamily
+</a>
+</em>
+</td>
+<td>
+<p>IPFamilies are the ip families the load balancer should have.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ips</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NATGatewayIP">
+[]NATGatewayIP
+</a>
+</em>
+</td>
+<td>
+<p>IPs are the ips the NAT gateway should allocate.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef is the Network this NATGateway should belong to.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkInterfaceSelector</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#labelselector-v1-meta">
+Kubernetes meta/v1.LabelSelector
+</a>
+</em>
+</td>
+<td>
+<p>NetworkInterfaceSelector defines the NetworkInterfaces
+for which this NATGateway should be applied</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>portsPerNetworkInterface</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>PortsPerNetworkInterface defines the number of concurrent connections per target network interface.
+Has to be a power of 2. If empty, 64 is the default.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NATGatewayStatus">
+NATGatewayStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.NATGatewayRouting">NATGatewayRouting
+</h3>
+<div>
+<p>NATGatewayRouting is the Schema for the aliasprefixrouting API</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+networking.api.onmetal.de/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>NATGatewayRouting</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="/api-reference/common.md#localuidreference">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef is the network the NAT gateway is assigned to.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>destinations</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NATGatewayDestination">
+[]NATGatewayDestination
+</a>
+</em>
+</td>
+<td>
+<p>Destinations are the destinations for an NATGateway.</p>
 </td>
 </tr>
 </tbody>
@@ -690,6 +1134,517 @@ EphemeralPrefixSource
 </td>
 </tr>
 </tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.LoadBalancerPort">LoadBalancerPort
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerSpec">LoadBalancerSpec</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>protocol</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#protocol-v1-core">
+Kubernetes core/v1.Protocol
+</a>
+</em>
+</td>
+<td>
+<p>Protocol is the protocol the load balancer should allow.
+If not specified, defaults to TCP.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>port</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>Port is the port to allow.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>endPort</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>EndPort marks the end of the port range to allow.
+If unspecified, only a single port, Port, will be allowed.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.LoadBalancerSpec">LoadBalancerSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.LoadBalancer">LoadBalancer</a>)
+</p>
+<div>
+<p>LoadBalancerSpec defines the desired state of LoadBalancer</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>type</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerType">
+LoadBalancerType
+</a>
+</em>
+</td>
+<td>
+<p>Type is the type of LoadBalancer.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ipFamilies</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#ipfamily-v1-core">
+[]Kubernetes core/v1.IPFamily
+</a>
+</em>
+</td>
+<td>
+<p>IPFamilies are the ip families the load balancer should have.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef is the Network this LoadBalancer should belong to.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkInterfaceSelector</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#labelselector-v1-meta">
+Kubernetes meta/v1.LabelSelector
+</a>
+</em>
+</td>
+<td>
+<p>NetworkInterfaceSelector defines the NetworkInterfaces
+for which this LoadBalancer should be applied</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ports</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerPort">
+[]LoadBalancerPort
+</a>
+</em>
+</td>
+<td>
+<p>Ports are the ports the load balancer should allow.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.LoadBalancerStatus">LoadBalancerStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.LoadBalancer">LoadBalancer</a>)
+</p>
+<div>
+<p>LoadBalancerStatus defines the observed state of LoadBalancer</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>ips</code><br/>
+<em>
+<a href="/api-reference/common.md#ip">
+[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
+</a>
+</em>
+</td>
+<td>
+<p>IPs are the IPs allocated for the load balancer.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.LoadBalancerType">LoadBalancerType
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerSpec">LoadBalancerSpec</a>)
+</p>
+<div>
+<p>LoadBalancerType is a type of LoadBalancer.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Public&#34;</p></td>
+<td><p>LoadBalancerTypePublic is a LoadBalancer that allocates and routes a stable public IP.</p>
+</td>
+</tr></tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.NATGatewayDestination">NATGatewayDestination
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NATGatewayRouting">NATGatewayRouting</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>LocalUIDReference</code><br/>
+<em>
+<a href="/api-reference/common.md#localuidreference">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
+</a>
+</em>
+</td>
+<td>
+<p>
+(Members of <code>LocalUIDReference</code> are embedded into this type.)
+</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ips</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NATGatewayDestinationIP">
+[]NATGatewayDestinationIP
+</a>
+</em>
+</td>
+<td>
+<p>IPs are the nat gateway ips used.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.NATGatewayDestinationIP">NATGatewayDestinationIP
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NATGatewayDestination">NATGatewayDestination</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>ip</code><br/>
+<em>
+<a href="/api-reference/common.md#ip">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
+</a>
+</em>
+</td>
+<td>
+<p>IP is the ip used for the NAT gateway.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>port</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>Port is the first port used by the destination.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>endPort</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>EndPort is the last port used by the destination.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.NATGatewayIP">NATGatewayIP
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NATGatewaySpec">NATGatewaySpec</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name to associate with the NAT gateway IP.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.NATGatewayIPStatus">NATGatewayIPStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NATGatewayStatus">NATGatewayStatus</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>ip</code><br/>
+<em>
+<a href="/api-reference/common.md#ip">
+github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.NATGatewaySpec">NATGatewaySpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NATGateway">NATGateway</a>)
+</p>
+<div>
+<p>NATGatewaySpec defines the desired state of NATGateway</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>type</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NATGatewayType">
+NATGatewayType
+</a>
+</em>
+</td>
+<td>
+<p>Type is the type of NATGateway.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ipFamilies</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#ipfamily-v1-core">
+[]Kubernetes core/v1.IPFamily
+</a>
+</em>
+</td>
+<td>
+<p>IPFamilies are the ip families the load balancer should have.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ips</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NATGatewayIP">
+[]NATGatewayIP
+</a>
+</em>
+</td>
+<td>
+<p>IPs are the ips the NAT gateway should allocate.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef is the Network this NATGateway should belong to.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkInterfaceSelector</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#labelselector-v1-meta">
+Kubernetes meta/v1.LabelSelector
+</a>
+</em>
+</td>
+<td>
+<p>NetworkInterfaceSelector defines the NetworkInterfaces
+for which this NATGateway should be applied</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>portsPerNetworkInterface</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>PortsPerNetworkInterface defines the number of concurrent connections per target network interface.
+Has to be a power of 2. If empty, 64 is the default.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.NATGatewayStatus">NATGatewayStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NATGateway">NATGateway</a>)
+</p>
+<div>
+<p>NATGatewayStatus defines the observed state of NATGateway</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>ips</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NATGatewayIPStatus">
+[]NATGatewayIPStatus
+</a>
+</em>
+</td>
+<td>
+<p>IPs are the IPs allocated for the NAT gateway.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>portsUsed</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>PortsUsed is the number of used ports.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.NATGatewayType">NATGatewayType
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NATGatewaySpec">NATGatewaySpec</a>)
+</p>
+<div>
+<p>NATGatewayType is a type of NATGateway.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Public&#34;</p></td>
+<td><p>NATGatewayTypePublic is a NATGateway that allocates and routes a stable public IP.</p>
+</td>
+</tr></tbody>
 </table>
 <h3 id="networking.api.onmetal.de/v1alpha1.NetworkInterfacePhase">NetworkInterfacePhase
 (<code>string</code> alias)</h3>

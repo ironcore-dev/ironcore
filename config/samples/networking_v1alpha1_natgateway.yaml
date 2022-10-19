@@ -1,0 +1,20 @@
+apiVersion: networking.api.onmetal.de/v1alpha1
+kind: NATGateway
+metadata:
+  namespace: default
+  name: natgateway-sample
+spec:
+  type: Public
+  ips:
+    - name: ip1
+      ipFamily: IPv4
+  # portsPerNetworkInterface: 128
+  networkRef:
+    name: network-sample
+  networkInterfaceSelector:
+    matchLabels:
+      app: web
+#status:
+#  ips:
+#  - name: ip1
+#    ip: 10.0.0.1

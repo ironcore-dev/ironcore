@@ -77,6 +77,10 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().LoadBalancers().Informer()}, nil
 	case networkingv1alpha1.SchemeGroupVersion.WithResource("loadbalancerroutings"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().LoadBalancerRoutings().Informer()}, nil
+	case networkingv1alpha1.SchemeGroupVersion.WithResource("natgateways"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().NATGateways().Informer()}, nil
+	case networkingv1alpha1.SchemeGroupVersion.WithResource("natgatewayroutings"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().NATGatewayRoutings().Informer()}, nil
 	case networkingv1alpha1.SchemeGroupVersion.WithResource("networks"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().Networks().Informer()}, nil
 	case networkingv1alpha1.SchemeGroupVersion.WithResource("networkinterfaces"):
