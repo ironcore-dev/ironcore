@@ -54,6 +54,10 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&AliasPrefixList{},
 		&AliasPrefixRouting{},
 		&AliasPrefixRoutingList{},
+		&LoadBalancer{},
+		&LoadBalancerList{},
+		&LoadBalancerRouting{},
+		&LoadBalancerRoutingList{},
 	)
 	return nil
 }

@@ -21,6 +21,10 @@ type AliasPrefixExpansion interface{}
 
 type AliasPrefixRoutingExpansion interface{}
 
+type LoadBalancerExpansion interface{}
+
+type LoadBalancerRoutingExpansion interface{}
+
 type NetworkExpansion interface{}
 
 type NetworkInterfaceExpansion interface{}

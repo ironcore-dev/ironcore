@@ -27,6 +27,10 @@ type Interface interface {
 	AliasPrefixes() AliasPrefixInformer
 	// AliasPrefixRoutings returns a AliasPrefixRoutingInformer.
 	AliasPrefixRoutings() AliasPrefixRoutingInformer
+	// LoadBalancers returns a LoadBalancerInformer.
+	LoadBalancers() LoadBalancerInformer
+	// LoadBalancerRoutings returns a LoadBalancerRoutingInformer.
+	LoadBalancerRoutings() LoadBalancerRoutingInformer
 	// Networks returns a NetworkInformer.
 	Networks() NetworkInformer
 	// NetworkInterfaces returns a NetworkInterfaceInformer.
@@ -54,6 +58,16 @@ func (v *version) AliasPrefixes() AliasPrefixInformer {
 // AliasPrefixRoutings returns a AliasPrefixRoutingInformer.
 func (v *version) AliasPrefixRoutings() AliasPrefixRoutingInformer {
 	return &aliasPrefixRoutingInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// LoadBalancers returns a LoadBalancerInformer.
+func (v *version) LoadBalancers() LoadBalancerInformer {
+	return &loadBalancerInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// LoadBalancerRoutings returns a LoadBalancerRoutingInformer.
+func (v *version) LoadBalancerRoutings() LoadBalancerRoutingInformer {
+	return &loadBalancerRoutingInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // Networks returns a NetworkInformer.

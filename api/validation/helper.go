@@ -17,10 +17,12 @@ package apivalidation
 import (
 	"fmt"
 	"reflect"
+	"sort"
 	"unicode"
 	"unicode/utf8"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/onmetal/controller-utils/set"
 	"github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	"github.com/onmetal/onmetal-api/equality"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -75,12 +77,19 @@ func ValidateImmutableFieldWithDiff(newVal, oldVal interface{}, fldPath *field.P
 	return allErrs
 }
 
-func ValidateStringSetEnum(allowed sets.String, value string, fldPath *field.Path, requiredDetail string) field.ErrorList {
+func ValidateEnum[E comparable](allowed set.Set[E], value E, fldPath *field.Path, requiredDetail string) field.ErrorList {
 	var allErrs field.ErrorList
-	if value == "" && !allowed.Has("") {
+	var zero E
+	if value == zero && !allowed.Has(zero) {
 		allErrs = append(allErrs, field.Required(fldPath, requiredDetail))
 	} else if !allowed.Has(value) {
-		allErrs = append(allErrs, field.NotSupported(fldPath, value, allowed.List()))
+		validValues := make([]string, 0, allowed.Len())
+		for item := range allowed {
+			validValues = append(validValues, fmt.Sprintf("%v", item))
+		}
+		sort.Strings(validValues)
+
+		allErrs = append(allErrs, field.NotSupported(fldPath, value, validValues))
 	}
 	return allErrs
 }

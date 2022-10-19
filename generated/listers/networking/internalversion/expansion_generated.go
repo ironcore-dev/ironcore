@@ -33,6 +33,22 @@ type AliasPrefixRoutingListerExpansion interface{}
 // AliasPrefixRoutingNamespaceLister.
 type AliasPrefixRoutingNamespaceListerExpansion interface{}
 
+// LoadBalancerListerExpansion allows custom methods to be added to
+// LoadBalancerLister.
+type LoadBalancerListerExpansion interface{}
+
+// LoadBalancerNamespaceListerExpansion allows custom methods to be added to
+// LoadBalancerNamespaceLister.
+type LoadBalancerNamespaceListerExpansion interface{}
+
+// LoadBalancerRoutingListerExpansion allows custom methods to be added to
+// LoadBalancerRoutingLister.
+type LoadBalancerRoutingListerExpansion interface{}
+
+// LoadBalancerRoutingNamespaceListerExpansion allows custom methods to be added to
+// LoadBalancerRoutingNamespaceLister.
+type LoadBalancerRoutingNamespaceListerExpansion interface{}
+
 // NetworkListerExpansion allows custom methods to be added to
 // NetworkLister.
 type NetworkListerExpansion interface{}

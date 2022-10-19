@@ -29,6 +29,8 @@ type NetworkingV1alpha1Interface interface {
 	RESTClient() rest.Interface
 	AliasPrefixesGetter
 	AliasPrefixRoutingsGetter
+	LoadBalancersGetter
+	LoadBalancerRoutingsGetter
 	NetworksGetter
 	NetworkInterfacesGetter
 	VirtualIPsGetter
@@ -45,6 +47,14 @@ func (c *NetworkingV1alpha1Client) AliasPrefixes(namespace string) AliasPrefixIn
 
 func (c *NetworkingV1alpha1Client) AliasPrefixRoutings(namespace string) AliasPrefixRoutingInterface {
 	return newAliasPrefixRoutings(c, namespace)
+}
+
+func (c *NetworkingV1alpha1Client) LoadBalancers(namespace string) LoadBalancerInterface {
+	return newLoadBalancers(c, namespace)
+}
+
+func (c *NetworkingV1alpha1Client) LoadBalancerRoutings(namespace string) LoadBalancerRoutingInterface {
+	return newLoadBalancerRoutings(c, namespace)
 }
 
 func (c *NetworkingV1alpha1Client) Networks(namespace string) NetworkInterface {
