@@ -30,40 +30,44 @@ reviewers:
 - [Proposal](#proposal)
 
 ## Summary
-Network service for Load Balancing is needed in every modern infrastructure (e.g. Kubernetes). Load balancing makes services scalable, fault-tolerant and accessible from external users. The load balancer described here is a L3-Loadbalancer (so it implements an IP level load balancing). The load balancer function is a standard network function that can be to be deployed (as an implementation detail) on a platform/node that is capable of running network functions (e.g. dp-service enabled nodes/nic's) 
+Network service for Load Balancing is needed modern network architecture(e.g. requirement for Kubernetes services). Load balancing makes services scalable, fault-tolerant and accessible from external users. The load balancer described here is a L3-LoadBalancer (implements an IP level load balancing, not port and not protocol). The load balancer is a network function that will be to be deployed on any platform/node being capable of running load balancer functions. Load balancers do not require to be co-located to load balancer targets but usually network regions. No cross region load balancer is described here.
 
 ## Motivation
-The onMetal network is a fully routed network. To run workloads hosted on several nodes (in Kubernetes terms equivalent to cluster IP's) and not only on a single node (node IP's) solutions like ECMP (Equal cost multi pathing) seem to be the natural solution. But ECMP has certain limitations: the amount of nodes it can be used to distribute traffic to and a hash based algorithm to pin the network flows, that changes - based on the amount of targets - its distributed pinning. 
-To avoid those limitations and to have better control over the load balancer behavior an onMetal load balancer service needs to be provided.
+The onmetal network is a fully routed network. We announce a VirtualIP ([OEP-1](01-networking-integration.md#the-virtualip-type)) which is a single stable public IP attached to a `NetworkInterface`, to scale beyond single network interfaces, LoadBalancers offer the capability to dynamically route traffic to multiple targets (Kubernetes equivalent is a cluster IP's) and not only on a single node (node IP's). 
+Solutions like ECMP (Equal cost multi pathing) seem to be the natural but ECMP has certain limitations: the amount of nodes it can be used to distribute traffic to and a hash based algorithm to pin the network flows. Everytime the number of targets changes the pining hash buckets are newly shuffled. So ECMP is not sufficient.
+To avoid those limitations and to have better control over the load balancer behavior an onmetal load balancer service will be provided.
 
 ### Goals
-- define a user facing API (onMetal api) for the load balancer
-- enable the user to request an L3 Loadbalancer (only IP addresses) with load balancer address (outside facing) and 
-- with multiple target's based on the onMetal ([OEP-1](01-networking-integration.md)) network interface architecture
-- the targets of the load balancer must be dynamic changeable
-- the load balancer needs to avoid forwarding unintended traffic.
+- Define an API for managing L3 load balancers with publicly available addresses
+- LoadBalancer are IP only and allows to define one IPv4 and one IPv6 addresses (outside facing) and 
+- Multiple target's based on the onmetal ([OEP-1](01-networking-integration.md#the-networkinterface-type)) network interface architecture
+- The load balancer object allows dynamic changes (adding/removing) of targets during its lifetime.
+- Load balancer (`ips`) and targets can be parts of different `Networks` but
+- All targets (`NetworkInterfaces`) must be in the same `Network`
+- The load balancer needs to avoid forwarding unintended traffic.
   - based on ports/protocols (UDP/TCP/SCTP) it must filter what needs to be load balanced
-  - ICMP requests are not part of forwarded traffic and will be filtered by the load balancer anyhow (the loa)
-- Load balancer (IP) and targets can be parts of different networks but
-- all targets (NetworkInterfaces) must be of the same network 
+  - ICMP requests are not part of forwarded traffic and will be filtered by the load balancer
+  - filtering L4 based but does not change IP objects, just decides to load balance or ignore packets
+- load balancing will be transparent for both target and source 
 
 ### Non-Goals
-- no address or port translation / rewriting (no SNAT / DNAT) (L4 Loadbalancer) support
-- no injection of additional information (e.g. x-forwarded-for) (L7 Loadbalancer) support
-- no protocol offloading like ssl (L7 Loadbalancer) support
-- if multiple load balancer IP's are needed, request multiple load balancers (a load balancer services one load balancer IP)
+- No address or port translation / rewriting (no SNAT / DNAT) (L4 Loadbalancer) support
+- No injection of additional information (e.g. x-forwarded-for) (L7 Loadbalancer) support
+- No protocol offloading like ssl (L7 Loadbalancer) support
+- If multiple load balancer IP's are needed, request multiple load balancers (a load balancer services one load balancer IP)
 
 ### Details
-- load balancing is used to deliver a packet addressed to the load balancer to one of its targets via the onMetal network routing
-- the load balancing will be for the target and the source transparent
-- the target needs to know the load balancers IP and needs to answer with it (and to receive traffic with it)
-- answers to request will be directly delivered since all details are known to the target
-- payload packages are not changed, to not lose any information
+- Load balancing is used to deliver a packet addressed to the load balancer to one of its targets via the onmetal network routing
+- The target needs to be aware of the load balancer's IP and needs to answer with it (and to receive traffic with it)
+- Answers to request will be directly delivered since all details are known by the target
+- Payload packages are not changed (ingress / egress), to not lose any information
 
 ## Proposal
-A network loadbalancer CRD allows the user to define the network function. all entries except the `targetNetworkInterface` must be immutable. 
+A `LoadBalancer` allows the user to define the network function. All fields are immutable, but the `networkInterfaceSelector` allows for a dynamic target selection, based e.g. on labels (default Kubernetes selector arithmetics). 
+The `LoadBalancer` of `type: Public` takes ips for the defined `ipFamilies` out of the public ip address pool and persists its status in `status.ips`. It is possible to assign over the `VirtualIP` object ([OEP-1](01-networking-integration.md#the-virtualip-type)) an explicit and persistent ip to the `LoadBalancer`. The `LoadBalancer` is not aware of any explicit services of higher levels in the software stack: e.g. in Kubernetes the NodeIP's can be targets of the `LoadBalancer` but the actual service dispatching is done by the Kubernetes Ingress.
+`ports` is the definition of the filtering mechanism for interesting traffic. This is purely filtering but not changing packages and coveres ports (as `port:`) and port ranges (as `port:` and `portEnd:` combinations)
+`networkRef` defines explicitly the `networkRef` of a `NetworkInterface` ([OEP-1](01-networking-integration.md#the-networkinterface-type)) in the `networkInterfaceSelector`.
 
-### User defined object
 ```yaml
 apiVersion: networking.api.onmetal.de/v1alpha1
 kind: LoadBalancer
@@ -72,7 +76,6 @@ metadata:
   namespace: customer-1
 spec:
   #the load balancer IP. is a generated IP and only of type public (internet IP) 
-  #TODO other types of IP addresses (e.g. internal LB) and pinned IP types
   type: Public
   #a load balancer can have two IP addresses: IPv4 or IPv6 but not more addresses IPfamily
   ipFamilies: [ IPv4, IPv6 ]
@@ -93,7 +96,6 @@ spec:
   networkRef:
     name:
   #a selector for the NetworkInterfaces to be load balancer targets, normal kubernetes selector logic
-  #TODO explicit machines ?
   networkInterfaceSelector:
     matchLabels: 
       key: db
@@ -104,9 +106,10 @@ status:
     - 45.86.152.88
     - 2001::
 ```
-### internal reconcile object (not customer visible)
-The load balancer needs some data computable at the onMetal API level to describe the explicit targets in a pool. Since onMetal is using a complete routing infrastructure this object in fact describes NetworkInterfaces load balanced traffic is routed to.
-This object should not be visible to the customer but is available in the customer namespace
+
+### routing state object
+The load balancer needs details computable at the onmetal API level to describe the explicit targets in a pool traffic is routed to. `LoadBalancerRouting` describes `NetworkInterfaces` load balanced traffic is routed to.
+This object describes a state of the `LoadBalancer` and results of the `LoadBalancer` definition specifically `networkInterfaceSelector` and `networkRef`. The object is not directly changeable.
 
 ```yaml
 apiVersion: networking.api.onmetal.de/v1alpha1
