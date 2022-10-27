@@ -18478,8 +18478,7 @@
 				"description": "MachineSpec defines the desired state of Machine",
 				"type": "object",
 				"required": [
-					"machineClassRef",
-					"image"
+					"machineClassRef"
 				],
 				"properties": {
 					"efiVars": {
@@ -18498,7 +18497,7 @@
 						]
 					},
 					"image": {
-						"description": "Image is the URL providing the operating system image of the machine.",
+						"description": "Image is the optional URL providing the operating system image of the machine.",
 						"type": "string"
 					},
 					"imagePullSecret": {

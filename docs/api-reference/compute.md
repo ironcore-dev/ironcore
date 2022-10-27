@@ -119,7 +119,8 @@ string
 </em>
 </td>
 <td>
-<p>Image is the URL providing the operating system image of the machine.</p>
+<em>(Optional)</em>
+<p>Image is the optional URL providing the operating system image of the machine.</p>
 </td>
 </tr>
 <tr>
@@ -165,7 +166,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>ignitionRef</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.SecretKeySelector">
+<a href="/api-reference/common.md#secretkeyselector">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.SecretKeySelector
 </a>
 </em>
@@ -192,7 +193,7 @@ If key is empty, DefaultIgnitionKey will be used as fallback.</p>
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Toleration">
+<a href="/api-reference/common.md#toleration">
 []github.com/onmetal/onmetal-api/apis/common/v1alpha1.Toleration
 </a>
 </em>
@@ -349,7 +350,7 @@ string
 <td>
 <code>taints</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Taint">
+<a href="/api-reference/common.md#taint">
 []github.com/onmetal/onmetal-api/apis/common/v1alpha1.Taint
 </a>
 </em>
@@ -511,7 +512,9 @@ object) networking.NetworkInterface.</p>
 <td>
 <code>networkInterfaceTemplate</code><br/>
 <em>
+<a href="/api-reference/networking.md#networking.api.onmetal.de/v1alpha1.NetworkInterfaceTemplateSpec">
 github.com/onmetal/onmetal-api/apis/networking/v1alpha1.NetworkInterfaceTemplateSpec
+</a>
 </em>
 </td>
 <td>
@@ -541,7 +544,9 @@ storage.Volume.</p>
 <td>
 <code>volumeTemplate</code><br/>
 <em>
+<a href="/api-reference/storage.md#storage.api.onmetal.de/v1alpha1.VolumeTemplateSpec">
 github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeTemplateSpec
+</a>
 </em>
 </td>
 <td>
@@ -927,7 +932,7 @@ string
 <td>
 <code>taints</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Taint">
+<a href="/api-reference/common.md#taint">
 []github.com/onmetal/onmetal-api/apis/common/v1alpha1.Taint
 </a>
 </em>
@@ -1108,7 +1113,8 @@ string
 </em>
 </td>
 <td>
-<p>Image is the URL providing the operating system image of the machine.</p>
+<em>(Optional)</em>
+<p>Image is the optional URL providing the operating system image of the machine.</p>
 </td>
 </tr>
 <tr>
@@ -1154,7 +1160,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>ignitionRef</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.SecretKeySelector">
+<a href="/api-reference/common.md#secretkeyselector">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.SecretKeySelector
 </a>
 </em>
@@ -1181,7 +1187,7 @@ If key is empty, DefaultIgnitionKey will be used as fallback.</p>
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Toleration">
+<a href="/api-reference/common.md#toleration">
 []github.com/onmetal/onmetal-api/apis/common/v1alpha1.Toleration
 </a>
 </em>
@@ -1463,7 +1469,7 @@ Kubernetes meta/v1.Time
 <td>
 <code>ips</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
+<a href="/api-reference/common.md#ip">
 []github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
 </a>
 </em>
@@ -1476,7 +1482,7 @@ Kubernetes meta/v1.Time
 <td>
 <code>virtualIP</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
+<a href="/api-reference/common.md#ip">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
 </a>
 </em>

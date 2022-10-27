@@ -76,7 +76,9 @@ required.</p>
 <td>
 <code>-</code><br/>
 <em>
+<a href="https://pkg.go.dev/net/netip#Addr">
 net/netip.Addr
+</a>
 </em>
 </td>
 <td>
@@ -101,7 +103,9 @@ net/netip.Addr
 <td>
 <code>-</code><br/>
 <em>
+<a href="https://pkg.go.dev/net/netip#Prefix">
 net/netip.Prefix
+</a>
 </em>
 </td>
 <td>

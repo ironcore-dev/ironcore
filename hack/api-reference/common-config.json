@@ -8,12 +8,12 @@
     ],
     "externalPackages": [
         {
-            "typeMatchPrefix": "^inet\\.af/netaddr\\.IP",
-            "docsURLTemplate": "https://pkg.go.dev/inet.af/netaddr#IP"
+            "typeMatchPrefix": "^net/netip\\.Addr",
+            "docsURLTemplate": "https://pkg.go.dev/net/netip#Addr"
         },
         {
-            "typeMatchPrefix": "^inet\\.af/netaddr\\.IPPrefix",
-            "docsURLTemplate": "https://pkg.go.dev/inet.af/netaddr#IPPrefix"
+            "typeMatchPrefix": "^net/netip\\.Prefix",
+            "docsURLTemplate": "https://pkg.go.dev/net/netip#Prefix"
         },
         {
             "typeMatchPrefix": "^k8s\\.io/apimachinery/pkg/api/resource\\.Quantity",
