@@ -23,6 +23,7 @@ COPY controllers/ controllers/
 COPY equality/ equality/
 COPY generated/ generated/
 COPY machinepoollet/ machinepoollet/
+COPY ori/ ori/
 COPY registry/ registry/
 COPY serializer/ serializer/
 COPY tableconvertor/ tableconvertor/

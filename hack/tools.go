@@ -30,4 +30,6 @@ import (
 	_ "github.com/ahmetb/gen-crd-api-reference-docs"
 	// Use mockgen for generating mocks.
 	_ "github.com/golang/mock/mockgen"
+	// Use gogoproto for protobuf generation.
+	_ "github.com/gogo/protobuf/gogoproto"
 )
