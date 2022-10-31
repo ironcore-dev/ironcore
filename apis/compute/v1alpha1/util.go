@@ -74,3 +74,18 @@ func MachineVolumeNames(machine *Machine) []string {
 	}
 	return names
 }
+
+// MachineSecretNames returns all secret names of a machine.
+func MachineSecretNames(machine *Machine) []string {
+	var names []string
+
+	if imagePullSecretRef := machine.Spec.ImagePullSecretRef; imagePullSecretRef != nil {
+		names = append(names, imagePullSecretRef.Name)
+	}
+
+	if ignitionRef := machine.Spec.IgnitionRef; ignitionRef != nil {
+		names = append(names, ignitionRef.Name)
+	}
+
+	return names
+}

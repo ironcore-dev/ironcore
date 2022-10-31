@@ -184,6 +184,8 @@ const (
 	MachineStateShutdown MachineState = "Shutdown"
 	// MachineStateError means the machine is in an error state.
 	MachineStateError MachineState = "Error"
+	// MachineStateUnknown means the machine is in an unknown state.
+	MachineStateUnknown MachineState = "Unknown"
 )
 
 // MachineConditionType is a type a MachineCondition can have.

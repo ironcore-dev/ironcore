@@ -1444,10 +1444,10 @@ func schema_onmetal_api_apis_compute_v1alpha1_MachineStatus(ref common.Reference
 				Properties: map[string]spec.Schema{
 					"state": {
 						SchemaProps: spec.SchemaProps{
-							Description: "State is the state of the machine.\n\nPossible enum values:\n - `\"Error\"` means the machine is in an error state.\n - `\"Pending\"` means the Machine has been accepted by the system, but not yet completely started. This includes time before being bound to a MachinePool, as well as time spent setting up the Machine on that MachinePool.\n - `\"Running\"` means the machine is running on a MachinePool.\n - `\"Shutdown\"` means the machine is shut down.",
+							Description: "State is the state of the machine.\n\nPossible enum values:\n - `\"Error\"` means the machine is in an error state.\n - `\"Pending\"` means the Machine has been accepted by the system, but not yet completely started. This includes time before being bound to a MachinePool, as well as time spent setting up the Machine on that MachinePool.\n - `\"Running\"` means the machine is running on a MachinePool.\n - `\"Shutdown\"` means the machine is shut down.\n - `\"Unknown\"` means the machine is in an unknown state.",
 							Type:        []string{"string"},
 							Format:      "",
-							Enum:        []interface{}{"Error", "Pending", "Running", "Shutdown"}},
+							Enum:        []interface{}{"Error", "Pending", "Running", "Shutdown", "Unknown"}},
 					},
 					"conditions": {
 						SchemaProps: spec.SchemaProps{

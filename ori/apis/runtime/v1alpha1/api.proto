@@ -1,0 +1,299 @@
+syntax = "proto3";
+
+package runtime.v1alpha1;
+option go_package = "ori/apis/runtime/v1alpha1";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+
+option (gogoproto.goproto_stringer_all) = false;
+option (gogoproto.stringer_all) = true;
+option (gogoproto.goproto_getters_all) = true;
+option (gogoproto.marshaler_all) = true;
+option (gogoproto.sizer_all) = true;
+option (gogoproto.unmarshaler_all) = true;
+option (gogoproto.goproto_unrecognized_all) = false;
+
+service MachineRuntime {
+  rpc ListMachines(ListMachinesRequest) returns (ListMachinesResponse) {};
+  rpc CreateMachine(CreateMachineRequest) returns (CreateMachineResponse) {};
+  rpc MachineStatus(MachineStatusRequest) returns (MachineStatusResponse) {};
+  rpc DeleteMachine(DeleteMachineRequest) returns (DeleteMachineResponse) {};
+
+  rpc ListVolumes(ListVolumesRequest) returns (ListVolumesResponse) {};
+  rpc ConfirmVolume(ConfirmVolumeRequest) returns (ConfirmVolumeResponse) {};
+  rpc AttachVolume(AttachVolumeRequest) returns (AttachVolumeResponse) {};
+  rpc UpdateVolume(UpdateVolumeRequest) returns (UpdateVolumeResponse) {};
+  rpc DetachVolume(DetachVolumeRequest) returns (DetachVolumeResponse) {};
+
+  rpc ListNetworkInterfaces(ListNetworkInterfacesRequest) returns (ListNetworkInterfacesResponse);
+  rpc AttachNetworkInterface(AttachNetworkInterfaceRequest) returns (AttachNetworkInterfaceResponse);
+  rpc UpdateNetworkInterface(UpdateNetworkInterfaceRequest) returns (UpdateNetworkInterfaceResponse);
+  rpc DetachNetworkInterface(DetachNetworkInterfaceRequest) returns (DetachNetworkInterfaceResponse);
+}
+
+message VolumeFilter {
+  // ID of the machine.
+  string machine_id = 1;
+}
+
+message VolumeAccessConfig {
+  string driver = 1;
+  map<string, string> attributes = 2;
+  map<string, bytes> secret_data = 3;
+}
+
+message EmptyDiskConfig {
+  uint64 size_limit_bytes = 1;
+}
+
+message VolumeMachineMetadata {
+  string namespace = 1;
+  string name = 2;
+  string uid = 3;
+}
+
+message Volume {
+  string machine_id = 1;
+  VolumeMachineMetadata machine_metadata = 2;
+  string name = 3;
+  string device = 4;
+  VolumeAccessConfig access = 5;
+  EmptyDiskConfig empty_disk = 6;
+}
+
+message VolumeConfig {
+  string name = 1;
+  string device = 2;
+  VolumeAccessConfig access = 3;
+  EmptyDiskConfig empty_disk = 4;
+}
+
+message NetworkInterfaceFilter {
+  // ID of the machine.
+  string machine_id = 1;
+}
+
+message NetworkConfig {
+  string name = 1;
+  string uid = 2;
+}
+
+message VirtualIPConfig {
+  string ip = 1;
+}
+
+message NetworkInterfaceConfig {
+  string name = 1;
+  NetworkConfig network = 2;
+  repeated string ips = 3;
+  VirtualIPConfig virtual_ip = 4;
+}
+
+message NetworkInterfaceMachineMetadata {
+  string namespace = 1;
+  string name = 2;
+  string uid = 3;
+}
+
+message NetworkInterface {
+  string machine_id = 1;
+  NetworkInterfaceMachineMetadata machine_metadata = 2;
+  string name = 3;
+  NetworkConfig network = 4;
+  repeated string ips = 5;
+  VirtualIPConfig virtual_ip = 6;
+}
+
+message IgnitionConfig {
+  bytes data = 1;
+}
+
+message MachineFilter {
+  string id = 1;
+  map<string, string> label_selector = 2;
+}
+
+message MachineMetadata {
+  string namespace = 1;
+  string name = 2;
+  string uid = 3;
+  map<string, string> annotations = 4;
+  map<string, string> labels = 5;
+}
+
+message MachineResources {
+  int32 cpu_count = 1;
+  uint64 memory_bytes = 2;
+}
+
+message MachineConfig {
+  MachineMetadata metadata = 1;
+  string image = 2;
+  MachineResources resources = 3;
+  IgnitionConfig ignition = 4;
+  repeated VolumeConfig volumes = 5;
+  repeated NetworkInterfaceConfig network_interfaces = 6;
+}
+
+message Machine {
+  string id = 1;
+  MachineMetadata metadata = 2;
+}
+
+message VolumeStatus {
+  string name = 1;
+  string device = 2;
+  VolumeAccessConfig access = 3;
+  EmptyDiskConfig empty_disk = 4;
+  string device_id = 5;
+}
+
+message NetworkStatus {
+  string name = 1;
+  string uid = 2;
+}
+
+message VirtualIPStatus {
+  string ip = 1;
+}
+
+message NetworkInterfaceStatus {
+  string name = 1;
+  NetworkStatus network = 2;
+  repeated string ips = 3;
+  VirtualIPStatus virtual_ip = 4;
+}
+
+enum MachineState {
+  MACHINE_PENDING = 0;
+  MACHINE_RUNNING = 1;
+  MACHINE_SHUTDOWN = 2;
+  MACHINE_ERROR = 3;
+  MACHINE_UNKNOWN = 4;
+}
+
+message MachineStatus {
+  string id = 1;
+  MachineMetadata metadata = 2;
+  string image = 3;
+  string image_ref = 4;
+  MachineState state = 5;
+  repeated VolumeStatus volumes = 6;
+  repeated NetworkInterfaceStatus network_interfaces = 7;
+}
+
+message ListMachinesRequest {
+  MachineFilter filter = 1;
+}
+
+message ListMachinesResponse {
+  repeated Machine machines = 1;
+}
+
+message CreateMachineRequest {
+  MachineConfig config = 1;
+}
+
+message CreateMachineResponse {
+  Machine machine = 1;
+}
+
+message MachineStatusRequest {
+  string machine_id = 1;
+}
+
+message MachineStatusResponse {
+  MachineStatus status = 1;
+}
+
+message DeleteMachineRequest {
+  string machine_id = 1;
+}
+
+message DeleteMachineResponse {
+}
+
+message ListVolumesRequest {
+  VolumeFilter filter = 1;
+}
+
+message ListVolumesResponse {
+  repeated Volume volumes = 1;
+}
+
+message AttachVolumeRequest {
+  string machine_id = 1;
+  VolumeConfig config = 2;
+}
+
+message AttachVolumeResponse {
+  string device_id = 1;
+}
+
+message UpdateVolumeRequest {
+  string machine_id = 1;
+  string volume_name = 2;
+  VolumeAccessConfig access = 3;
+  EmptyDiskConfig empty_disk = 4;
+}
+
+message UpdateVolumeResponse {
+  string device_id = 1;
+}
+
+message DetachVolumeRequest {
+  string machine_id = 1;
+  string volume_name = 2;
+}
+
+message DetachVolumeResponse {
+}
+
+message ConfirmVolumeRequest {
+  string machine_id = 1;
+  string volume_name = 2;
+  VolumeAccessConfig access = 3;
+  EmptyDiskConfig empty_disk = 4;
+}
+
+message VolumeConfirmation {
+  string device_id = 1;
+}
+
+message ConfirmVolumeResponse {
+  VolumeConfirmation confirmation = 1;
+}
+
+message ListNetworkInterfacesRequest {
+  NetworkInterfaceFilter filter = 1;
+}
+
+message ListNetworkInterfacesResponse {
+  repeated NetworkInterface network_interfaces = 1;
+}
+
+message AttachNetworkInterfaceRequest {
+  string machine_id = 1;
+  NetworkInterfaceConfig config = 2;
+}
+
+message AttachNetworkInterfaceResponse {
+}
+
+message UpdateNetworkInterfaceRequest {
+  string machine_id = 1;
+  string network_interface_name = 2;
+  repeated string ips = 3;
+  VirtualIPConfig virtual_ip = 4;
+}
+
+message UpdateNetworkInterfaceResponse {
+}
+
+message DetachNetworkInterfaceRequest {
+  string machine_id = 1;
+  string network_interface_name = 2;
+}
+
+message DetachNetworkInterfaceResponse {
+}

@@ -52,3 +52,29 @@ func MachineVolumeName(machineName string, volume Volume) string {
 		return ""
 	}
 }
+
+// MachineVolumeNames returns all Volume names of a machine.
+func MachineVolumeNames(machine *Machine) []string {
+	var names []string
+	for _, volume := range machine.Spec.Volumes {
+		if name := MachineVolumeName(machine.Name, volume); name != "" {
+			names = append(names, name)
+		}
+	}
+	return names
+}
+
+// MachineSecretNames returns all secret names of a machine.
+func MachineSecretNames(machine *Machine) []string {
+	var names []string
+
+	if imagePullSecretRef := machine.Spec.ImagePullSecretRef; imagePullSecretRef != nil {
+		names = append(names, imagePullSecretRef.Name)
+	}
+
+	if ignitionRef := machine.Spec.IgnitionRef; ignitionRef != nil {
+		names = append(names, ignitionRef.Name)
+	}
+
+	return names
+}

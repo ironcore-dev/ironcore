@@ -32,6 +32,9 @@ const (
 	// Provider controllers that allow for selective reconciliation may check this label and proceed
 	// with reconciliation of the object only if this label and a configured value are present.
 	WatchLabel = "common.api.onmetal.de/watch-filter"
+
+	// ReconcileRequestAnnotation is an annotation that requested a reconciliation at a specific time.
+	ReconcileRequestAnnotation = "reconcile.common.api.onmetal.de/requested-at"
 )
 
 // ConfigMapKeySelector is a reference to a specific 'key' within a ConfigMap resource.
