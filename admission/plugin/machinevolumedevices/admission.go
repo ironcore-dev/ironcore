@@ -45,6 +45,22 @@ func NewMachineVolumeDevices() *MachineVolumeDevices {
 	}
 }
 
+func findOldDeviceIfExists(volumeName string, a admission.Attributes) (string, error) {
+	if oldObj := a.GetOldObject(); oldObj != nil {
+		oldMachine, ok := oldObj.(*compute.Machine)
+		if !ok {
+			return "", apierrors.NewBadRequest("Resource was marked with kind Machine but was unable to be converted")
+		}
+
+		for _, oldVolume := range oldMachine.Spec.Volumes {
+			if oldVolume.Name == volumeName {
+				return oldVolume.Device, nil
+			}
+		}
+	}
+	return "", nil
+}
+
 func (d *MachineVolumeDevices) Admit(ctx context.Context, a admission.Attributes, o admission.ObjectInterfaces) error {
 	if shouldIgnore(a) {
 		return nil
@@ -66,12 +82,19 @@ func (d *MachineVolumeDevices) Admit(ctx context.Context, a admission.Attributes
 			continue
 		}
 
-		dev, err := namer.Generate(device.VirtioPrefix) // TODO: We should have a better way for a device prefix.
+		volume.Device, err = findOldDeviceIfExists(volume.Name, a)
+		if err != nil {
+			return err
+		}
+
+		if volume.Device != "" {
+			continue
+		}
+
+		volume.Device, err = namer.Generate(device.VirtioPrefix) // TODO: We should have a better way for a device prefix.
 		if err != nil {
 			return apierrors.NewBadRequest("No device names left for machine")
 		}
-
-		volume.Device = dev
 	}
 
 	return nil
