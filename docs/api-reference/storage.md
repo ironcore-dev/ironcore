@@ -115,7 +115,9 @@ If unset, the scheduler will figure out a suitable VolumePoolRef.</p>
 <td>
 <code>claimRef</code><br/>
 <em>
+<a href="/api-reference/common.md#localuidreference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
+</a>
 </em>
 </td>
 <td>
@@ -174,7 +176,7 @@ bool
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Toleration">
+<a href="/api-reference/common.md#toleration">
 []github.com/onmetal/onmetal-api/apis/common/v1alpha1.Toleration
 </a>
 </em>
@@ -332,7 +334,7 @@ string
 <td>
 <code>taints</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Taint">
+<a href="/api-reference/common.md#taint">
 []github.com/onmetal/onmetal-api/apis/common/v1alpha1.Taint
 </a>
 </em>
@@ -665,7 +667,7 @@ string
 <td>
 <code>taints</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Taint">
+<a href="/api-reference/common.md#taint">
 []github.com/onmetal/onmetal-api/apis/common/v1alpha1.Taint
 </a>
 </em>
@@ -838,7 +840,9 @@ If unset, the scheduler will figure out a suitable VolumePoolRef.</p>
 <td>
 <code>claimRef</code><br/>
 <em>
+<a href="/api-reference/common.md#localuidreference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
+</a>
 </em>
 </td>
 <td>
@@ -897,7 +901,7 @@ bool
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Toleration">
+<a href="/api-reference/common.md#toleration">
 []github.com/onmetal/onmetal-api/apis/common/v1alpha1.Toleration
 </a>
 </em>
@@ -1114,7 +1118,9 @@ If unset, the scheduler will figure out a suitable VolumePoolRef.</p>
 <td>
 <code>claimRef</code><br/>
 <em>
+<a href="/api-reference/common.md#localuidreference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
+</a>
 </em>
 </td>
 <td>
@@ -1173,7 +1179,7 @@ bool
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.Toleration">
+<a href="/api-reference/common.md#toleration">
 []github.com/onmetal/onmetal-api/apis/common/v1alpha1.Toleration
 </a>
 </em>

@@ -16,32 +16,32 @@
       "docsURLTemplate": "https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#{{lower .TypeIdentifier}}-{{arrIndex .PackageSegments -1}}-{{arrIndex .PackageSegments -2}}"
     },
     {
-      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.CIDR",
-      "docsURLTemplate": "/api-reference/common/#common.onmetal.de/v1alpha1.CIDR"
-    },
-    {
-      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.IP",
-      "docsURLTemplate": "/api-reference/common/#common.onmetal.de/v1alpha1.IP"
-    },
-    {
-      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.Toleration",
-      "docsURLTemplate": "/api-reference/common/#common.onmetal.de/v1alpha1.Toleration"
-    },
-    {
-      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.Taint",
-      "docsURLTemplate": "/api-reference/common/#common.onmetal.de/v1alpha1.Taint"
-    },
-    {
-      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.IPAddr",
-      "docsURLTemplate": "/api-reference/common/#common.onmetal.de/v1alpha1.IPAddr"
-    },
-    {
       "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.SecretKeySelector$",
-      "docsURLTemplate": "/api-reference/common/#common.onmetal.de/v1alpha1.SecretKeySelector"
+      "docsURLTemplate": "/api-reference/common.md#secretkeyselector"
     },
     {
       "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.ConfigMapKeySelector$",
-      "docsURLTemplate": "/api-reference/common/#common.onmetal.de/v1alpha1.ConfigMapKeySelector"
+      "docsURLTemplate": "/api-reference/common.md#configmapkeyselector"
+    },
+    {
+      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/networking/v1alpha1\\.NetworkInterfaceTemplateSpec",
+      "docsURLTemplate": "/api-reference/networking.md#networking.api.onmetal.de/v1alpha1.NetworkInterfaceTemplateSpec"
+    },
+    {
+      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/storage/v1alpha1\\.VolumeTemplateSpec",
+      "docsURLTemplate": "/api-reference/storage.md#storage.api.onmetal.de/v1alpha1.VolumeTemplateSpec"
+    },
+    {
+      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.IP",
+      "docsURLTemplate": "/api-reference/common.md#ip"
+    },
+    {
+      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.Toleration",
+      "docsURLTemplate": "/api-reference/common.md#toleration"
+    },
+    {
+      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.Taint",
+      "docsURLTemplate": "/api-reference/common.md#taint"
     }
   ],
   "typeDisplayNamePrefixOverrides": {

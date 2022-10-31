@@ -33,8 +33,9 @@ type MachineSpec struct {
 	// MachinePoolRef defines machine pool to run the machine in.
 	// If empty, a scheduler will figure out an appropriate pool to run the machine in.
 	MachinePoolRef *corev1.LocalObjectReference `json:"machinePoolRef,omitempty"`
-	// Image is the URL providing the operating system image of the machine.
-	Image string `json:"image"`
+	// Image is the optional URL providing the operating system image of the machine.
+	// +optional
+	Image string `json:"image,omitempty"`
 	// ImagePullSecretRef is an optional secret for pulling the image of a machine.
 	ImagePullSecretRef *corev1.LocalObjectReference `json:"imagePullSecret,omitempty"`
 	// NetworkInterfaces define a list of network interfaces present on the machine

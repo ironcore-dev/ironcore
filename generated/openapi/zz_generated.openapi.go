@@ -1352,8 +1352,7 @@ func schema_onmetal_api_apis_compute_v1alpha1_MachineSpec(ref common.ReferenceCa
 					},
 					"image": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Image is the URL providing the operating system image of the machine.",
-							Default:     "",
+							Description: "Image is the optional URL providing the operating system image of the machine.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -1427,7 +1426,7 @@ func schema_onmetal_api_apis_compute_v1alpha1_MachineSpec(ref common.ReferenceCa
 						},
 					},
 				},
-				Required: []string{"machineClassRef", "image"},
+				Required: []string{"machineClassRef"},
 			},
 		},
 		Dependencies: []string{

@@ -183,7 +183,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>destinations</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference">
+<a href="/api-reference/common.md#localuidreference">
 []github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -314,7 +314,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>machineRef</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference">
+<a href="/api-reference/common.md#localuidreference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -467,7 +467,7 @@ Kubernetes core/v1.IPFamily
 <td>
 <code>targetRef</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference">
+<a href="/api-reference/common.md#localuidreference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -572,7 +572,7 @@ should be used by this AliasPrefix</p>
 <td>
 <code>prefix</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
+<a href="/api-reference/common.md#ip">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
 </a>
 </em>
@@ -604,7 +604,7 @@ surrounding object) Prefix.</p>
 <td>
 <code>prefixTemplate</code><br/>
 <em>
-<a href="/api-reference/common/#ipam.onmetal.de/v1alpha1.PrefixTemplateSpec">
+<a href="/api-reference/ipam.md#ipam.api.onmetal.de/v1alpha1.PrefixTemplateSpec">
 github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixTemplateSpec
 </a>
 </em>
@@ -667,7 +667,7 @@ VirtualIPTemplateSpec
 <td>
 <code>value</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
+<a href="/api-reference/common.md#ip">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
 </a>
 </em>
@@ -750,7 +750,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>machineRef</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference">
+<a href="/api-reference/common.md#localuidreference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -821,7 +821,7 @@ VirtualIPSource
 <td>
 <code>ips</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
+<a href="/api-reference/common.md#ip">
 []github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
 </a>
 </em>
@@ -834,7 +834,7 @@ VirtualIPSource
 <td>
 <code>virtualIP</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
+<a href="/api-reference/common.md#ip">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
 </a>
 </em>
@@ -928,7 +928,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>machineRef</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference">
+<a href="/api-reference/common.md#localuidreference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -1002,7 +1002,7 @@ VirtualIPSource
 <td>
 <code>value</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
+<a href="/api-reference/common.md#ip">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
 </a>
 </em>
@@ -1143,7 +1143,7 @@ Kubernetes core/v1.IPFamily
 <td>
 <code>targetRef</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference">
+<a href="/api-reference/common.md#localuidreference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -1174,7 +1174,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
 <td>
 <code>ip</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.IP">
+<a href="/api-reference/common.md#ip">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
 </a>
 </em>
@@ -1284,7 +1284,7 @@ Kubernetes core/v1.IPFamily
 <td>
 <code>targetRef</code><br/>
 <em>
-<a href="/api-reference/common/#common.onmetal.de/v1alpha1.LocalUIDReference">
+<a href="/api-reference/common.md#localuidreference">
 github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
 </a>
 </em>
