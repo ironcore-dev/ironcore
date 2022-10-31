@@ -116,4 +116,48 @@ var _ = Describe("Admission", func() {
 			},
 		}))
 	})
+
+	It("should re-use old volume device names when available", func() {
+		oldMachine := &compute.Machine{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: "foo",
+				Name:      "bar",
+			},
+			Spec: compute.MachineSpec{
+				Volumes: []compute.Volume{
+					{
+						Name:   "foo",
+						Device: "vdb",
+					},
+				},
+			},
+		}
+		newMachine := oldMachine.DeepCopy()
+		newMachine.Spec.Volumes[0].Device = ""
+
+		Expect(plugin.Admit(
+			context.TODO(),
+			admission.NewAttributesRecord(
+				newMachine,
+				oldMachine,
+				compute.Kind("Machine").WithVersion("version"),
+				oldMachine.Namespace,
+				oldMachine.Name,
+				compute.Resource("machines").WithVersion("version"),
+				"",
+				admission.Update,
+				&metav1.CreateOptions{},
+				false,
+				nil,
+			),
+			nil,
+		)).NotTo(HaveOccurred())
+
+		Expect(newMachine.Spec.Volumes).To(Equal([]compute.Volume{
+			{
+				Name:   "foo",
+				Device: "vdb",
+			},
+		}))
+	})
 })
