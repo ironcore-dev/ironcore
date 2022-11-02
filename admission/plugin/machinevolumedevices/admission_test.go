@@ -160,4 +160,66 @@ var _ = Describe("Admission", func() {
 			},
 		}))
 	})
+
+	It("should allow adding a new volume with unset device", func() {
+		oldMachine := &compute.Machine{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: "foo",
+				Name:      "bar",
+			},
+			Spec: compute.MachineSpec{
+				Volumes: []compute.Volume{
+					{
+						Name:   "foo",
+						Device: "vdb",
+					},
+				},
+			},
+		}
+		newMachine := &compute.Machine{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: "foo",
+				Name:      "bar",
+			},
+			Spec: compute.MachineSpec{
+				Volumes: []compute.Volume{
+					{
+						Name: "foo",
+					},
+					{
+						Name: "bar",
+					},
+				},
+			},
+		}
+
+		Expect(plugin.Admit(
+			context.TODO(),
+			admission.NewAttributesRecord(
+				newMachine,
+				oldMachine,
+				compute.Kind("Machine").WithVersion("version"),
+				oldMachine.Namespace,
+				oldMachine.Name,
+				compute.Resource("machines").WithVersion("version"),
+				"",
+				admission.Update,
+				&metav1.CreateOptions{},
+				false,
+				nil,
+			),
+			nil,
+		)).NotTo(HaveOccurred())
+
+		Expect(newMachine.Spec.Volumes).To(Equal([]compute.Volume{
+			{
+				Name:   "foo",
+				Device: "vdb",
+			},
+			{
+				Name:   "bar",
+				Device: "vdc",
+			},
+		}))
+	})
 })
