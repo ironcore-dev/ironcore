@@ -200,6 +200,106 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
+	if err := s.AddGeneratedConversionFunc((*NATGateway)(nil), (*networking.NATGateway)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_NATGateway_To_networking_NATGateway(a.(*NATGateway), b.(*networking.NATGateway), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*networking.NATGateway)(nil), (*NATGateway)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_networking_NATGateway_To_v1alpha1_NATGateway(a.(*networking.NATGateway), b.(*NATGateway), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*NATGatewayDestination)(nil), (*networking.NATGatewayDestination)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_NATGatewayDestination_To_networking_NATGatewayDestination(a.(*NATGatewayDestination), b.(*networking.NATGatewayDestination), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*networking.NATGatewayDestination)(nil), (*NATGatewayDestination)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_networking_NATGatewayDestination_To_v1alpha1_NATGatewayDestination(a.(*networking.NATGatewayDestination), b.(*NATGatewayDestination), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*NATGatewayDestinationIP)(nil), (*networking.NATGatewayDestinationIP)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_NATGatewayDestinationIP_To_networking_NATGatewayDestinationIP(a.(*NATGatewayDestinationIP), b.(*networking.NATGatewayDestinationIP), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*networking.NATGatewayDestinationIP)(nil), (*NATGatewayDestinationIP)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_networking_NATGatewayDestinationIP_To_v1alpha1_NATGatewayDestinationIP(a.(*networking.NATGatewayDestinationIP), b.(*NATGatewayDestinationIP), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*NATGatewayIP)(nil), (*networking.NATGatewayIP)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_NATGatewayIP_To_networking_NATGatewayIP(a.(*NATGatewayIP), b.(*networking.NATGatewayIP), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*networking.NATGatewayIP)(nil), (*NATGatewayIP)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_networking_NATGatewayIP_To_v1alpha1_NATGatewayIP(a.(*networking.NATGatewayIP), b.(*NATGatewayIP), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*NATGatewayIPStatus)(nil), (*networking.NATGatewayIPStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_NATGatewayIPStatus_To_networking_NATGatewayIPStatus(a.(*NATGatewayIPStatus), b.(*networking.NATGatewayIPStatus), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*networking.NATGatewayIPStatus)(nil), (*NATGatewayIPStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_networking_NATGatewayIPStatus_To_v1alpha1_NATGatewayIPStatus(a.(*networking.NATGatewayIPStatus), b.(*NATGatewayIPStatus), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*NATGatewayList)(nil), (*networking.NATGatewayList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_NATGatewayList_To_networking_NATGatewayList(a.(*NATGatewayList), b.(*networking.NATGatewayList), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*networking.NATGatewayList)(nil), (*NATGatewayList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_networking_NATGatewayList_To_v1alpha1_NATGatewayList(a.(*networking.NATGatewayList), b.(*NATGatewayList), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*NATGatewayRouting)(nil), (*networking.NATGatewayRouting)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_NATGatewayRouting_To_networking_NATGatewayRouting(a.(*NATGatewayRouting), b.(*networking.NATGatewayRouting), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*networking.NATGatewayRouting)(nil), (*NATGatewayRouting)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_networking_NATGatewayRouting_To_v1alpha1_NATGatewayRouting(a.(*networking.NATGatewayRouting), b.(*NATGatewayRouting), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*NATGatewayRoutingList)(nil), (*networking.NATGatewayRoutingList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_NATGatewayRoutingList_To_networking_NATGatewayRoutingList(a.(*NATGatewayRoutingList), b.(*networking.NATGatewayRoutingList), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*networking.NATGatewayRoutingList)(nil), (*NATGatewayRoutingList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_networking_NATGatewayRoutingList_To_v1alpha1_NATGatewayRoutingList(a.(*networking.NATGatewayRoutingList), b.(*NATGatewayRoutingList), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*NATGatewaySpec)(nil), (*networking.NATGatewaySpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_NATGatewaySpec_To_networking_NATGatewaySpec(a.(*NATGatewaySpec), b.(*networking.NATGatewaySpec), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*networking.NATGatewaySpec)(nil), (*NATGatewaySpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_networking_NATGatewaySpec_To_v1alpha1_NATGatewaySpec(a.(*networking.NATGatewaySpec), b.(*NATGatewaySpec), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*NATGatewayStatus)(nil), (*networking.NATGatewayStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_NATGatewayStatus_To_networking_NATGatewayStatus(a.(*NATGatewayStatus), b.(*networking.NATGatewayStatus), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*networking.NATGatewayStatus)(nil), (*NATGatewayStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_networking_NATGatewayStatus_To_v1alpha1_NATGatewayStatus(a.(*networking.NATGatewayStatus), b.(*NATGatewayStatus), scope)
+	}); err != nil {
+		return err
+	}
 	if err := s.AddGeneratedConversionFunc((*Network)(nil), (*networking.Network)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1alpha1_Network_To_networking_Network(a.(*Network), b.(*networking.Network), scope)
 	}); err != nil {
@@ -721,6 +821,246 @@ func autoConvert_networking_LoadBalancerStatus_To_v1alpha1_LoadBalancerStatus(in
 // Convert_networking_LoadBalancerStatus_To_v1alpha1_LoadBalancerStatus is an autogenerated conversion function.
 func Convert_networking_LoadBalancerStatus_To_v1alpha1_LoadBalancerStatus(in *networking.LoadBalancerStatus, out *LoadBalancerStatus, s conversion.Scope) error {
 	return autoConvert_networking_LoadBalancerStatus_To_v1alpha1_LoadBalancerStatus(in, out, s)
+}
+
+func autoConvert_v1alpha1_NATGateway_To_networking_NATGateway(in *NATGateway, out *networking.NATGateway, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
+	if err := Convert_v1alpha1_NATGatewaySpec_To_networking_NATGatewaySpec(&in.Spec, &out.Spec, s); err != nil {
+		return err
+	}
+	if err := Convert_v1alpha1_NATGatewayStatus_To_networking_NATGatewayStatus(&in.Status, &out.Status, s); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Convert_v1alpha1_NATGateway_To_networking_NATGateway is an autogenerated conversion function.
+func Convert_v1alpha1_NATGateway_To_networking_NATGateway(in *NATGateway, out *networking.NATGateway, s conversion.Scope) error {
+	return autoConvert_v1alpha1_NATGateway_To_networking_NATGateway(in, out, s)
+}
+
+func autoConvert_networking_NATGateway_To_v1alpha1_NATGateway(in *networking.NATGateway, out *NATGateway, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
+	if err := Convert_networking_NATGatewaySpec_To_v1alpha1_NATGatewaySpec(&in.Spec, &out.Spec, s); err != nil {
+		return err
+	}
+	if err := Convert_networking_NATGatewayStatus_To_v1alpha1_NATGatewayStatus(&in.Status, &out.Status, s); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Convert_networking_NATGateway_To_v1alpha1_NATGateway is an autogenerated conversion function.
+func Convert_networking_NATGateway_To_v1alpha1_NATGateway(in *networking.NATGateway, out *NATGateway, s conversion.Scope) error {
+	return autoConvert_networking_NATGateway_To_v1alpha1_NATGateway(in, out, s)
+}
+
+func autoConvert_v1alpha1_NATGatewayDestination_To_networking_NATGatewayDestination(in *NATGatewayDestination, out *networking.NATGatewayDestination, s conversion.Scope) error {
+	out.LocalUIDReference = in.LocalUIDReference
+	out.IPs = *(*[]networking.NATGatewayDestinationIP)(unsafe.Pointer(&in.IPs))
+	return nil
+}
+
+// Convert_v1alpha1_NATGatewayDestination_To_networking_NATGatewayDestination is an autogenerated conversion function.
+func Convert_v1alpha1_NATGatewayDestination_To_networking_NATGatewayDestination(in *NATGatewayDestination, out *networking.NATGatewayDestination, s conversion.Scope) error {
+	return autoConvert_v1alpha1_NATGatewayDestination_To_networking_NATGatewayDestination(in, out, s)
+}
+
+func autoConvert_networking_NATGatewayDestination_To_v1alpha1_NATGatewayDestination(in *networking.NATGatewayDestination, out *NATGatewayDestination, s conversion.Scope) error {
+	out.LocalUIDReference = in.LocalUIDReference
+	out.IPs = *(*[]NATGatewayDestinationIP)(unsafe.Pointer(&in.IPs))
+	return nil
+}
+
+// Convert_networking_NATGatewayDestination_To_v1alpha1_NATGatewayDestination is an autogenerated conversion function.
+func Convert_networking_NATGatewayDestination_To_v1alpha1_NATGatewayDestination(in *networking.NATGatewayDestination, out *NATGatewayDestination, s conversion.Scope) error {
+	return autoConvert_networking_NATGatewayDestination_To_v1alpha1_NATGatewayDestination(in, out, s)
+}
+
+func autoConvert_v1alpha1_NATGatewayDestinationIP_To_networking_NATGatewayDestinationIP(in *NATGatewayDestinationIP, out *networking.NATGatewayDestinationIP, s conversion.Scope) error {
+	out.IP = in.IP
+	out.Port = in.Port
+	out.EndPort = in.EndPort
+	return nil
+}
+
+// Convert_v1alpha1_NATGatewayDestinationIP_To_networking_NATGatewayDestinationIP is an autogenerated conversion function.
+func Convert_v1alpha1_NATGatewayDestinationIP_To_networking_NATGatewayDestinationIP(in *NATGatewayDestinationIP, out *networking.NATGatewayDestinationIP, s conversion.Scope) error {
+	return autoConvert_v1alpha1_NATGatewayDestinationIP_To_networking_NATGatewayDestinationIP(in, out, s)
+}
+
+func autoConvert_networking_NATGatewayDestinationIP_To_v1alpha1_NATGatewayDestinationIP(in *networking.NATGatewayDestinationIP, out *NATGatewayDestinationIP, s conversion.Scope) error {
+	out.IP = in.IP
+	out.Port = in.Port
+	out.EndPort = in.EndPort
+	return nil
+}
+
+// Convert_networking_NATGatewayDestinationIP_To_v1alpha1_NATGatewayDestinationIP is an autogenerated conversion function.
+func Convert_networking_NATGatewayDestinationIP_To_v1alpha1_NATGatewayDestinationIP(in *networking.NATGatewayDestinationIP, out *NATGatewayDestinationIP, s conversion.Scope) error {
+	return autoConvert_networking_NATGatewayDestinationIP_To_v1alpha1_NATGatewayDestinationIP(in, out, s)
+}
+
+func autoConvert_v1alpha1_NATGatewayIP_To_networking_NATGatewayIP(in *NATGatewayIP, out *networking.NATGatewayIP, s conversion.Scope) error {
+	out.Name = in.Name
+	return nil
+}
+
+// Convert_v1alpha1_NATGatewayIP_To_networking_NATGatewayIP is an autogenerated conversion function.
+func Convert_v1alpha1_NATGatewayIP_To_networking_NATGatewayIP(in *NATGatewayIP, out *networking.NATGatewayIP, s conversion.Scope) error {
+	return autoConvert_v1alpha1_NATGatewayIP_To_networking_NATGatewayIP(in, out, s)
+}
+
+func autoConvert_networking_NATGatewayIP_To_v1alpha1_NATGatewayIP(in *networking.NATGatewayIP, out *NATGatewayIP, s conversion.Scope) error {
+	out.Name = in.Name
+	return nil
+}
+
+// Convert_networking_NATGatewayIP_To_v1alpha1_NATGatewayIP is an autogenerated conversion function.
+func Convert_networking_NATGatewayIP_To_v1alpha1_NATGatewayIP(in *networking.NATGatewayIP, out *NATGatewayIP, s conversion.Scope) error {
+	return autoConvert_networking_NATGatewayIP_To_v1alpha1_NATGatewayIP(in, out, s)
+}
+
+func autoConvert_v1alpha1_NATGatewayIPStatus_To_networking_NATGatewayIPStatus(in *NATGatewayIPStatus, out *networking.NATGatewayIPStatus, s conversion.Scope) error {
+	out.Name = in.Name
+	out.IP = in.IP
+	return nil
+}
+
+// Convert_v1alpha1_NATGatewayIPStatus_To_networking_NATGatewayIPStatus is an autogenerated conversion function.
+func Convert_v1alpha1_NATGatewayIPStatus_To_networking_NATGatewayIPStatus(in *NATGatewayIPStatus, out *networking.NATGatewayIPStatus, s conversion.Scope) error {
+	return autoConvert_v1alpha1_NATGatewayIPStatus_To_networking_NATGatewayIPStatus(in, out, s)
+}
+
+func autoConvert_networking_NATGatewayIPStatus_To_v1alpha1_NATGatewayIPStatus(in *networking.NATGatewayIPStatus, out *NATGatewayIPStatus, s conversion.Scope) error {
+	out.Name = in.Name
+	out.IP = in.IP
+	return nil
+}
+
+// Convert_networking_NATGatewayIPStatus_To_v1alpha1_NATGatewayIPStatus is an autogenerated conversion function.
+func Convert_networking_NATGatewayIPStatus_To_v1alpha1_NATGatewayIPStatus(in *networking.NATGatewayIPStatus, out *NATGatewayIPStatus, s conversion.Scope) error {
+	return autoConvert_networking_NATGatewayIPStatus_To_v1alpha1_NATGatewayIPStatus(in, out, s)
+}
+
+func autoConvert_v1alpha1_NATGatewayList_To_networking_NATGatewayList(in *NATGatewayList, out *networking.NATGatewayList, s conversion.Scope) error {
+	out.ListMeta = in.ListMeta
+	out.Items = *(*[]networking.NATGateway)(unsafe.Pointer(&in.Items))
+	return nil
+}
+
+// Convert_v1alpha1_NATGatewayList_To_networking_NATGatewayList is an autogenerated conversion function.
+func Convert_v1alpha1_NATGatewayList_To_networking_NATGatewayList(in *NATGatewayList, out *networking.NATGatewayList, s conversion.Scope) error {
+	return autoConvert_v1alpha1_NATGatewayList_To_networking_NATGatewayList(in, out, s)
+}
+
+func autoConvert_networking_NATGatewayList_To_v1alpha1_NATGatewayList(in *networking.NATGatewayList, out *NATGatewayList, s conversion.Scope) error {
+	out.ListMeta = in.ListMeta
+	out.Items = *(*[]NATGateway)(unsafe.Pointer(&in.Items))
+	return nil
+}
+
+// Convert_networking_NATGatewayList_To_v1alpha1_NATGatewayList is an autogenerated conversion function.
+func Convert_networking_NATGatewayList_To_v1alpha1_NATGatewayList(in *networking.NATGatewayList, out *NATGatewayList, s conversion.Scope) error {
+	return autoConvert_networking_NATGatewayList_To_v1alpha1_NATGatewayList(in, out, s)
+}
+
+func autoConvert_v1alpha1_NATGatewayRouting_To_networking_NATGatewayRouting(in *NATGatewayRouting, out *networking.NATGatewayRouting, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
+	out.NetworkRef = in.NetworkRef
+	out.Destinations = *(*[]networking.NATGatewayDestination)(unsafe.Pointer(&in.Destinations))
+	return nil
+}
+
+// Convert_v1alpha1_NATGatewayRouting_To_networking_NATGatewayRouting is an autogenerated conversion function.
+func Convert_v1alpha1_NATGatewayRouting_To_networking_NATGatewayRouting(in *NATGatewayRouting, out *networking.NATGatewayRouting, s conversion.Scope) error {
+	return autoConvert_v1alpha1_NATGatewayRouting_To_networking_NATGatewayRouting(in, out, s)
+}
+
+func autoConvert_networking_NATGatewayRouting_To_v1alpha1_NATGatewayRouting(in *networking.NATGatewayRouting, out *NATGatewayRouting, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
+	out.NetworkRef = in.NetworkRef
+	out.Destinations = *(*[]NATGatewayDestination)(unsafe.Pointer(&in.Destinations))
+	return nil
+}
+
+// Convert_networking_NATGatewayRouting_To_v1alpha1_NATGatewayRouting is an autogenerated conversion function.
+func Convert_networking_NATGatewayRouting_To_v1alpha1_NATGatewayRouting(in *networking.NATGatewayRouting, out *NATGatewayRouting, s conversion.Scope) error {
+	return autoConvert_networking_NATGatewayRouting_To_v1alpha1_NATGatewayRouting(in, out, s)
+}
+
+func autoConvert_v1alpha1_NATGatewayRoutingList_To_networking_NATGatewayRoutingList(in *NATGatewayRoutingList, out *networking.NATGatewayRoutingList, s conversion.Scope) error {
+	out.ListMeta = in.ListMeta
+	out.Items = *(*[]networking.NATGatewayRouting)(unsafe.Pointer(&in.Items))
+	return nil
+}
+
+// Convert_v1alpha1_NATGatewayRoutingList_To_networking_NATGatewayRoutingList is an autogenerated conversion function.
+func Convert_v1alpha1_NATGatewayRoutingList_To_networking_NATGatewayRoutingList(in *NATGatewayRoutingList, out *networking.NATGatewayRoutingList, s conversion.Scope) error {
+	return autoConvert_v1alpha1_NATGatewayRoutingList_To_networking_NATGatewayRoutingList(in, out, s)
+}
+
+func autoConvert_networking_NATGatewayRoutingList_To_v1alpha1_NATGatewayRoutingList(in *networking.NATGatewayRoutingList, out *NATGatewayRoutingList, s conversion.Scope) error {
+	out.ListMeta = in.ListMeta
+	out.Items = *(*[]NATGatewayRouting)(unsafe.Pointer(&in.Items))
+	return nil
+}
+
+// Convert_networking_NATGatewayRoutingList_To_v1alpha1_NATGatewayRoutingList is an autogenerated conversion function.
+func Convert_networking_NATGatewayRoutingList_To_v1alpha1_NATGatewayRoutingList(in *networking.NATGatewayRoutingList, out *NATGatewayRoutingList, s conversion.Scope) error {
+	return autoConvert_networking_NATGatewayRoutingList_To_v1alpha1_NATGatewayRoutingList(in, out, s)
+}
+
+func autoConvert_v1alpha1_NATGatewaySpec_To_networking_NATGatewaySpec(in *NATGatewaySpec, out *networking.NATGatewaySpec, s conversion.Scope) error {
+	out.Type = networking.NATGatewayType(in.Type)
+	out.IPFamilies = *(*[]corev1.IPFamily)(unsafe.Pointer(&in.IPFamilies))
+	out.IPs = *(*[]networking.NATGatewayIP)(unsafe.Pointer(&in.IPs))
+	out.NetworkRef = in.NetworkRef
+	out.NetworkInterfaceSelector = (*v1.LabelSelector)(unsafe.Pointer(in.NetworkInterfaceSelector))
+	out.PortsPerNetworkInterface = (*int32)(unsafe.Pointer(in.PortsPerNetworkInterface))
+	return nil
+}
+
+// Convert_v1alpha1_NATGatewaySpec_To_networking_NATGatewaySpec is an autogenerated conversion function.
+func Convert_v1alpha1_NATGatewaySpec_To_networking_NATGatewaySpec(in *NATGatewaySpec, out *networking.NATGatewaySpec, s conversion.Scope) error {
+	return autoConvert_v1alpha1_NATGatewaySpec_To_networking_NATGatewaySpec(in, out, s)
+}
+
+func autoConvert_networking_NATGatewaySpec_To_v1alpha1_NATGatewaySpec(in *networking.NATGatewaySpec, out *NATGatewaySpec, s conversion.Scope) error {
+	out.Type = NATGatewayType(in.Type)
+	out.IPFamilies = *(*[]corev1.IPFamily)(unsafe.Pointer(&in.IPFamilies))
+	out.IPs = *(*[]NATGatewayIP)(unsafe.Pointer(&in.IPs))
+	out.NetworkRef = in.NetworkRef
+	out.NetworkInterfaceSelector = (*v1.LabelSelector)(unsafe.Pointer(in.NetworkInterfaceSelector))
+	out.PortsPerNetworkInterface = (*int32)(unsafe.Pointer(in.PortsPerNetworkInterface))
+	return nil
+}
+
+// Convert_networking_NATGatewaySpec_To_v1alpha1_NATGatewaySpec is an autogenerated conversion function.
+func Convert_networking_NATGatewaySpec_To_v1alpha1_NATGatewaySpec(in *networking.NATGatewaySpec, out *NATGatewaySpec, s conversion.Scope) error {
+	return autoConvert_networking_NATGatewaySpec_To_v1alpha1_NATGatewaySpec(in, out, s)
+}
+
+func autoConvert_v1alpha1_NATGatewayStatus_To_networking_NATGatewayStatus(in *NATGatewayStatus, out *networking.NATGatewayStatus, s conversion.Scope) error {
+	out.IPs = *(*[]networking.NATGatewayIPStatus)(unsafe.Pointer(&in.IPs))
+	out.PortsUsed = (*int32)(unsafe.Pointer(in.PortsUsed))
+	return nil
+}
+
+// Convert_v1alpha1_NATGatewayStatus_To_networking_NATGatewayStatus is an autogenerated conversion function.
+func Convert_v1alpha1_NATGatewayStatus_To_networking_NATGatewayStatus(in *NATGatewayStatus, out *networking.NATGatewayStatus, s conversion.Scope) error {
+	return autoConvert_v1alpha1_NATGatewayStatus_To_networking_NATGatewayStatus(in, out, s)
+}
+
+func autoConvert_networking_NATGatewayStatus_To_v1alpha1_NATGatewayStatus(in *networking.NATGatewayStatus, out *NATGatewayStatus, s conversion.Scope) error {
+	out.IPs = *(*[]NATGatewayIPStatus)(unsafe.Pointer(&in.IPs))
+	out.PortsUsed = (*int32)(unsafe.Pointer(in.PortsUsed))
+	return nil
+}
+
+// Convert_networking_NATGatewayStatus_To_v1alpha1_NATGatewayStatus is an autogenerated conversion function.
+func Convert_networking_NATGatewayStatus_To_v1alpha1_NATGatewayStatus(in *networking.NATGatewayStatus, out *NATGatewayStatus, s conversion.Scope) error {
+	return autoConvert_networking_NATGatewayStatus_To_v1alpha1_NATGatewayStatus(in, out, s)
 }
 
 func autoConvert_v1alpha1_Network_To_networking_Network(in *Network, out *networking.Network, s conversion.Scope) error {

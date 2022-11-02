@@ -36,6 +36,14 @@ const (
 	isNotPositiveErrorMsg = `must be greater than zero`
 )
 
+func ValidatePowerOfTwo(value int64, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+	if value <= 0 || value&(value-1) != 0 {
+		allErrs = append(allErrs, field.Invalid(fldPath, value, fmt.Sprintf("%d is not a power of 2", value)))
+	}
+	return allErrs
+}
+
 func ValidateNonNegativeQuantity(value resource.Quantity, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 	if value.Cmp(resource.Quantity{}) < 0 {

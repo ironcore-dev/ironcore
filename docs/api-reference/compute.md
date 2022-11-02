@@ -1228,6 +1228,9 @@ MachinePool.</p>
 </tr><tr><td><p>&#34;Shutdown&#34;</p></td>
 <td><p>MachineStateShutdown means the machine is shut down.</p>
 </td>
+</tr><tr><td><p>&#34;Unknown&#34;</p></td>
+<td><p>MachineStateUnknown means the machine is in an unknown state.</p>
+</td>
 </tr></tbody>
 </table>
 <h3 id="compute.api.onmetal.de/v1alpha1.MachineStatus">MachineStatus

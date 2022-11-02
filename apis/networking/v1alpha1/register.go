@@ -60,6 +60,10 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&LoadBalancerList{},
 		&LoadBalancerRouting{},
 		&LoadBalancerRoutingList{},
+		&NATGateway{},
+		&NATGatewayList{},
+		&NATGatewayRouting{},
+		&NATGatewayRoutingList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil

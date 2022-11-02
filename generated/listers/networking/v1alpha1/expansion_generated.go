@@ -49,6 +49,22 @@ type LoadBalancerRoutingListerExpansion interface{}
 // LoadBalancerRoutingNamespaceLister.
 type LoadBalancerRoutingNamespaceListerExpansion interface{}
 
+// NATGatewayListerExpansion allows custom methods to be added to
+// NATGatewayLister.
+type NATGatewayListerExpansion interface{}
+
+// NATGatewayNamespaceListerExpansion allows custom methods to be added to
+// NATGatewayNamespaceLister.
+type NATGatewayNamespaceListerExpansion interface{}
+
+// NATGatewayRoutingListerExpansion allows custom methods to be added to
+// NATGatewayRoutingLister.
+type NATGatewayRoutingListerExpansion interface{}
+
+// NATGatewayRoutingNamespaceListerExpansion allows custom methods to be added to
+// NATGatewayRoutingNamespaceLister.
+type NATGatewayRoutingNamespaceListerExpansion interface{}
+
 // NetworkListerExpansion allows custom methods to be added to
 // NetworkLister.
 type NetworkListerExpansion interface{}

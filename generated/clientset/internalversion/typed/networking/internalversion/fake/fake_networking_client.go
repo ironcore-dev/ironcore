@@ -43,6 +43,14 @@ func (c *FakeNetworking) LoadBalancerRoutings(namespace string) internalversion.
 	return &FakeLoadBalancerRoutings{c, namespace}
 }
 
+func (c *FakeNetworking) NATGateways(namespace string) internalversion.NATGatewayInterface {
+	return &FakeNATGateways{c, namespace}
+}
+
+func (c *FakeNetworking) NATGatewayRoutings(namespace string) internalversion.NATGatewayRoutingInterface {
+	return &FakeNATGatewayRoutings{c, namespace}
+}
+
 func (c *FakeNetworking) Networks(namespace string) internalversion.NetworkInterface {
 	return &FakeNetworks{c, namespace}
 }

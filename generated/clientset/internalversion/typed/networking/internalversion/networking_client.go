@@ -30,6 +30,8 @@ type NetworkingInterface interface {
 	AliasPrefixRoutingsGetter
 	LoadBalancersGetter
 	LoadBalancerRoutingsGetter
+	NATGatewaysGetter
+	NATGatewayRoutingsGetter
 	NetworksGetter
 	NetworkInterfacesGetter
 	VirtualIPsGetter
@@ -54,6 +56,14 @@ func (c *NetworkingClient) LoadBalancers(namespace string) LoadBalancerInterface
 
 func (c *NetworkingClient) LoadBalancerRoutings(namespace string) LoadBalancerRoutingInterface {
 	return newLoadBalancerRoutings(c, namespace)
+}
+
+func (c *NetworkingClient) NATGateways(namespace string) NATGatewayInterface {
+	return newNATGateways(c, namespace)
+}
+
+func (c *NetworkingClient) NATGatewayRoutings(namespace string) NATGatewayRoutingInterface {
+	return newNATGatewayRoutings(c, namespace)
 }
 
 func (c *NetworkingClient) Networks(namespace string) NetworkInterface {
