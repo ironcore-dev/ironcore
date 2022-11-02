@@ -31,8 +31,8 @@ import (
 
 	"github.com/gorilla/mux"
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
-	"github.com/onmetal/onmetal-api/terminal"
-	httpterminal "github.com/onmetal/onmetal-api/terminal/http"
+	"github.com/onmetal/onmetal-api/machinepoollet/terminal"
+	http2 "github.com/onmetal/onmetal-api/machinepoollet/terminal/http"
 	"k8s.io/apiserver/pkg/authentication/authenticator"
 	"k8s.io/apiserver/pkg/authentication/authenticatorfactory"
 	"k8s.io/apiserver/pkg/authentication/user"
@@ -421,12 +421,12 @@ func (s *Server) registerComputeRoutes(r *mux.Router) {
 		supportedStreamProtocols := strings.Split(req.Header.Get("X-Stream-Protocol-Version"), ",")
 
 		term := NewMachineExecTerminal(ctx, s.machineExec, namespace, name)
-		streamOpts := &httpterminal.Options{
+		streamOpts := &http2.Options{
 			Stdin:  true,
 			Stdout: true,
 			TTY:    true,
 		}
-		httpterminal.Serve(w, req, term, streamOpts, s.streamIdleTimeout, s.streamCreationTimeout, supportedStreamProtocols)
+		http2.Serve(w, req, term, streamOpts, s.streamIdleTimeout, s.streamCreationTimeout, supportedStreamProtocols)
 	})
 }
 

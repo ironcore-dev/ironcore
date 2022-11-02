@@ -18,8 +18,8 @@ package validation
 
 import (
 	"github.com/onmetal/controller-utils/set"
-	onmetalapivalidation "github.com/onmetal/onmetal-api/api/validation"
 	"github.com/onmetal/onmetal-api/apis/networking"
+	onmetalapivalidation "github.com/onmetal/onmetal-api/onmetal-apiserver/api/validation"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )

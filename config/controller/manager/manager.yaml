@@ -28,7 +28,7 @@ spec:
         runAsNonRoot: true
       containers:
         - command:
-            - /manager
+            - /onmetal-controller-manager
           args:
             - --leader-elect
             - --controllers=*

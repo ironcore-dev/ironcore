@@ -15,8 +15,8 @@
 package validation
 
 import (
-	onmetalapivalidation "github.com/onmetal/onmetal-api/api/validation"
 	"github.com/onmetal/onmetal-api/apis/storage"
+	onmetalapivalidation "github.com/onmetal/onmetal-api/onmetal-apiserver/api/validation"
 	corev1 "k8s.io/api/core/v1"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1validation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
