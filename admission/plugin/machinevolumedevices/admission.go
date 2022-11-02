@@ -21,6 +21,7 @@ import (
 
 	"github.com/onmetal/onmetal-api/admission/plugin/machinevolumedevices/device"
 	"github.com/onmetal/onmetal-api/apis/compute"
+	"github.com/onmetal/onmetal-api/equality"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apiserver/pkg/admission"
 )
@@ -45,22 +46,6 @@ func NewMachineVolumeDevices() *MachineVolumeDevices {
 	}
 }
 
-func findOldDeviceIfExists(volumeName string, a admission.Attributes) (string, error) {
-	if oldObj := a.GetOldObject(); oldObj != nil {
-		oldMachine, ok := oldObj.(*compute.Machine)
-		if !ok {
-			return "", apierrors.NewBadRequest("Resource was marked with kind Machine but was unable to be converted")
-		}
-
-		for _, oldVolume := range oldMachine.Spec.Volumes {
-			if oldVolume.Name == volumeName {
-				return oldVolume.Device, nil
-			}
-		}
-	}
-	return "", nil
-}
-
 func (d *MachineVolumeDevices) Admit(ctx context.Context, a admission.Attributes, o admission.ObjectInterfaces) error {
 	if shouldIgnore(a) {
 		return nil
@@ -69,6 +54,10 @@ func (d *MachineVolumeDevices) Admit(ctx context.Context, a admission.Attributes
 	machine, ok := a.GetObject().(*compute.Machine)
 	if !ok {
 		return apierrors.NewBadRequest("Resource was marked with kind Machine but was unable to be converted")
+	}
+
+	if err := d.reuseOldDevices(a, machine); err != nil {
+		return err
 	}
 
 	namer, err := deviceNamerFromMachineVolumes(machine)
@@ -82,21 +71,36 @@ func (d *MachineVolumeDevices) Admit(ctx context.Context, a admission.Attributes
 			continue
 		}
 
-		volume.Device, err = findOldDeviceIfExists(volume.Name, a)
-		if err != nil {
-			return err
-		}
-
-		if volume.Device != "" {
-			continue
-		}
-
 		volume.Device, err = namer.Generate(device.VirtioPrefix) // TODO: We should have a better way for a device prefix.
 		if err != nil {
 			return apierrors.NewBadRequest("No device names left for machine")
 		}
 	}
 
+	return nil
+}
+
+func (d *MachineVolumeDevices) reuseOldDevices(a admission.Attributes, machine *compute.Machine) error {
+	if oldObj := a.GetOldObject(); oldObj != nil {
+		oldMachine, ok := oldObj.(*compute.Machine)
+		if !ok {
+			return apierrors.NewBadRequest("Resource was marked with kind Machine but was unable to be converted")
+		}
+
+		for i := range machine.Spec.Volumes {
+			volume := &machine.Spec.Volumes[i]
+			if volume.Device != "" {
+				continue
+			}
+
+			for _, oldVolume := range oldMachine.Spec.Volumes {
+				if oldVolume.Name == volume.Name && equality.Semantic.DeepEqual(volume.VolumeSource, oldVolume.VolumeSource) {
+					volume.Device = oldVolume.Device
+					break
+				}
+			}
+		}
+	}
 	return nil
 }
 
