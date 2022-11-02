@@ -56,6 +56,10 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&AliasPrefixList{},
 		&AliasPrefixRouting{},
 		&AliasPrefixRoutingList{},
+		&LoadBalancer{},
+		&LoadBalancerList{},
+		&LoadBalancerRouting{},
+		&LoadBalancerRoutingList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil

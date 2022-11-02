@@ -106,14 +106,14 @@ func ValidateAliasPrefixUpdate(newAliasPrefix, oldAliasPrefix *networking.AliasP
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessorUpdate(newAliasPrefix, oldAliasPrefix, field.NewPath("metadata"))...)
-	allErrs = append(allErrs, validateAliasSpecPrefixUpdate(&newAliasPrefix.Spec, &oldAliasPrefix.Spec, field.NewPath("spec"))...)
+	allErrs = append(allErrs, validateAliasPrefixSpecPrefixUpdate(&newAliasPrefix.Spec, &oldAliasPrefix.Spec, field.NewPath("spec"))...)
 	allErrs = append(allErrs, ValidateAliasPrefix(newAliasPrefix)...)
 
 	return allErrs
 }
 
-// validateAliasSpecPrefixUpdate validates the spec of a aliasPrefix object before an update.
-func validateAliasSpecPrefixUpdate(newSpec, oldSpec *networking.AliasPrefixSpec, fldPath *field.Path) field.ErrorList {
+// validateAliasPrefixSpecPrefixUpdate validates the spec of a aliasPrefix object before an update.
+func validateAliasPrefixSpecPrefixUpdate(newSpec, oldSpec *networking.AliasPrefixSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableField(newSpec.NetworkRef, oldSpec.NetworkRef, fldPath.Child("networkRef"))...)

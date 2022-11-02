@@ -35,6 +35,14 @@ func (c *FakeNetworkingV1alpha1) AliasPrefixRoutings(namespace string) v1alpha1.
 	return &FakeAliasPrefixRoutings{c, namespace}
 }
 
+func (c *FakeNetworkingV1alpha1) LoadBalancers(namespace string) v1alpha1.LoadBalancerInterface {
+	return &FakeLoadBalancers{c, namespace}
+}
+
+func (c *FakeNetworkingV1alpha1) LoadBalancerRoutings(namespace string) v1alpha1.LoadBalancerRoutingInterface {
+	return &FakeLoadBalancerRoutings{c, namespace}
+}
+
 func (c *FakeNetworkingV1alpha1) Networks(namespace string) v1alpha1.NetworkInterface {
 	return &FakeNetworks{c, namespace}
 }

@@ -17,10 +17,10 @@
 package validation
 
 import (
+	"github.com/onmetal/controller-utils/set"
 	onmetalapivalidation "github.com/onmetal/onmetal-api/api/validation"
 	"github.com/onmetal/onmetal-api/apis/networking"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
-	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
@@ -45,12 +45,12 @@ func ValidateVirtualIPUpdate(newVirtualIP, oldVirtualIP *networking.VirtualIP) f
 	return allErrs
 }
 
-var supportedVirtualIPTypes = sets.NewString(
-	string(networking.VirtualIPTypePublic),
+var supportedVirtualIPTypes = set.New(
+	networking.VirtualIPTypePublic,
 )
 
 func validateVirtualIPType(virtualIPType networking.VirtualIPType, fldPath *field.Path) field.ErrorList {
-	return onmetalapivalidation.ValidateStringSetEnum(supportedVirtualIPTypes, string(virtualIPType), fldPath, "must specify type")
+	return onmetalapivalidation.ValidateEnum(supportedVirtualIPTypes, virtualIPType, fldPath, "must specify type")
 }
 
 func validateVirtualIPSpec(spec *networking.VirtualIPSpec, fldPath *field.Path) field.ErrorList {

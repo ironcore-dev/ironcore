@@ -130,6 +130,76 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
+	if err := s.AddGeneratedConversionFunc((*LoadBalancer)(nil), (*networking.LoadBalancer)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_LoadBalancer_To_networking_LoadBalancer(a.(*LoadBalancer), b.(*networking.LoadBalancer), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*networking.LoadBalancer)(nil), (*LoadBalancer)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_networking_LoadBalancer_To_v1alpha1_LoadBalancer(a.(*networking.LoadBalancer), b.(*LoadBalancer), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*LoadBalancerList)(nil), (*networking.LoadBalancerList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_LoadBalancerList_To_networking_LoadBalancerList(a.(*LoadBalancerList), b.(*networking.LoadBalancerList), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*networking.LoadBalancerList)(nil), (*LoadBalancerList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_networking_LoadBalancerList_To_v1alpha1_LoadBalancerList(a.(*networking.LoadBalancerList), b.(*LoadBalancerList), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*LoadBalancerPort)(nil), (*networking.LoadBalancerPort)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_LoadBalancerPort_To_networking_LoadBalancerPort(a.(*LoadBalancerPort), b.(*networking.LoadBalancerPort), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*networking.LoadBalancerPort)(nil), (*LoadBalancerPort)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_networking_LoadBalancerPort_To_v1alpha1_LoadBalancerPort(a.(*networking.LoadBalancerPort), b.(*LoadBalancerPort), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*LoadBalancerRouting)(nil), (*networking.LoadBalancerRouting)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_LoadBalancerRouting_To_networking_LoadBalancerRouting(a.(*LoadBalancerRouting), b.(*networking.LoadBalancerRouting), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*networking.LoadBalancerRouting)(nil), (*LoadBalancerRouting)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_networking_LoadBalancerRouting_To_v1alpha1_LoadBalancerRouting(a.(*networking.LoadBalancerRouting), b.(*LoadBalancerRouting), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*LoadBalancerRoutingList)(nil), (*networking.LoadBalancerRoutingList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_LoadBalancerRoutingList_To_networking_LoadBalancerRoutingList(a.(*LoadBalancerRoutingList), b.(*networking.LoadBalancerRoutingList), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*networking.LoadBalancerRoutingList)(nil), (*LoadBalancerRoutingList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_networking_LoadBalancerRoutingList_To_v1alpha1_LoadBalancerRoutingList(a.(*networking.LoadBalancerRoutingList), b.(*LoadBalancerRoutingList), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*LoadBalancerSpec)(nil), (*networking.LoadBalancerSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_LoadBalancerSpec_To_networking_LoadBalancerSpec(a.(*LoadBalancerSpec), b.(*networking.LoadBalancerSpec), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*networking.LoadBalancerSpec)(nil), (*LoadBalancerSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_networking_LoadBalancerSpec_To_v1alpha1_LoadBalancerSpec(a.(*networking.LoadBalancerSpec), b.(*LoadBalancerSpec), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*LoadBalancerStatus)(nil), (*networking.LoadBalancerStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_LoadBalancerStatus_To_networking_LoadBalancerStatus(a.(*LoadBalancerStatus), b.(*networking.LoadBalancerStatus), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*networking.LoadBalancerStatus)(nil), (*LoadBalancerStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_networking_LoadBalancerStatus_To_v1alpha1_LoadBalancerStatus(a.(*networking.LoadBalancerStatus), b.(*LoadBalancerStatus), scope)
+	}); err != nil {
+		return err
+	}
 	if err := s.AddGeneratedConversionFunc((*Network)(nil), (*networking.Network)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1alpha1_Network_To_networking_Network(a.(*Network), b.(*networking.Network), scope)
 	}); err != nil {
@@ -479,6 +549,178 @@ func autoConvert_networking_IPSource_To_v1alpha1_IPSource(in *networking.IPSourc
 // Convert_networking_IPSource_To_v1alpha1_IPSource is an autogenerated conversion function.
 func Convert_networking_IPSource_To_v1alpha1_IPSource(in *networking.IPSource, out *IPSource, s conversion.Scope) error {
 	return autoConvert_networking_IPSource_To_v1alpha1_IPSource(in, out, s)
+}
+
+func autoConvert_v1alpha1_LoadBalancer_To_networking_LoadBalancer(in *LoadBalancer, out *networking.LoadBalancer, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
+	if err := Convert_v1alpha1_LoadBalancerSpec_To_networking_LoadBalancerSpec(&in.Spec, &out.Spec, s); err != nil {
+		return err
+	}
+	if err := Convert_v1alpha1_LoadBalancerStatus_To_networking_LoadBalancerStatus(&in.Status, &out.Status, s); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Convert_v1alpha1_LoadBalancer_To_networking_LoadBalancer is an autogenerated conversion function.
+func Convert_v1alpha1_LoadBalancer_To_networking_LoadBalancer(in *LoadBalancer, out *networking.LoadBalancer, s conversion.Scope) error {
+	return autoConvert_v1alpha1_LoadBalancer_To_networking_LoadBalancer(in, out, s)
+}
+
+func autoConvert_networking_LoadBalancer_To_v1alpha1_LoadBalancer(in *networking.LoadBalancer, out *LoadBalancer, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
+	if err := Convert_networking_LoadBalancerSpec_To_v1alpha1_LoadBalancerSpec(&in.Spec, &out.Spec, s); err != nil {
+		return err
+	}
+	if err := Convert_networking_LoadBalancerStatus_To_v1alpha1_LoadBalancerStatus(&in.Status, &out.Status, s); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Convert_networking_LoadBalancer_To_v1alpha1_LoadBalancer is an autogenerated conversion function.
+func Convert_networking_LoadBalancer_To_v1alpha1_LoadBalancer(in *networking.LoadBalancer, out *LoadBalancer, s conversion.Scope) error {
+	return autoConvert_networking_LoadBalancer_To_v1alpha1_LoadBalancer(in, out, s)
+}
+
+func autoConvert_v1alpha1_LoadBalancerList_To_networking_LoadBalancerList(in *LoadBalancerList, out *networking.LoadBalancerList, s conversion.Scope) error {
+	out.ListMeta = in.ListMeta
+	out.Items = *(*[]networking.LoadBalancer)(unsafe.Pointer(&in.Items))
+	return nil
+}
+
+// Convert_v1alpha1_LoadBalancerList_To_networking_LoadBalancerList is an autogenerated conversion function.
+func Convert_v1alpha1_LoadBalancerList_To_networking_LoadBalancerList(in *LoadBalancerList, out *networking.LoadBalancerList, s conversion.Scope) error {
+	return autoConvert_v1alpha1_LoadBalancerList_To_networking_LoadBalancerList(in, out, s)
+}
+
+func autoConvert_networking_LoadBalancerList_To_v1alpha1_LoadBalancerList(in *networking.LoadBalancerList, out *LoadBalancerList, s conversion.Scope) error {
+	out.ListMeta = in.ListMeta
+	out.Items = *(*[]LoadBalancer)(unsafe.Pointer(&in.Items))
+	return nil
+}
+
+// Convert_networking_LoadBalancerList_To_v1alpha1_LoadBalancerList is an autogenerated conversion function.
+func Convert_networking_LoadBalancerList_To_v1alpha1_LoadBalancerList(in *networking.LoadBalancerList, out *LoadBalancerList, s conversion.Scope) error {
+	return autoConvert_networking_LoadBalancerList_To_v1alpha1_LoadBalancerList(in, out, s)
+}
+
+func autoConvert_v1alpha1_LoadBalancerPort_To_networking_LoadBalancerPort(in *LoadBalancerPort, out *networking.LoadBalancerPort, s conversion.Scope) error {
+	out.Protocol = (*corev1.Protocol)(unsafe.Pointer(in.Protocol))
+	out.Port = in.Port
+	out.EndPort = (*int32)(unsafe.Pointer(in.EndPort))
+	return nil
+}
+
+// Convert_v1alpha1_LoadBalancerPort_To_networking_LoadBalancerPort is an autogenerated conversion function.
+func Convert_v1alpha1_LoadBalancerPort_To_networking_LoadBalancerPort(in *LoadBalancerPort, out *networking.LoadBalancerPort, s conversion.Scope) error {
+	return autoConvert_v1alpha1_LoadBalancerPort_To_networking_LoadBalancerPort(in, out, s)
+}
+
+func autoConvert_networking_LoadBalancerPort_To_v1alpha1_LoadBalancerPort(in *networking.LoadBalancerPort, out *LoadBalancerPort, s conversion.Scope) error {
+	out.Protocol = (*corev1.Protocol)(unsafe.Pointer(in.Protocol))
+	out.Port = in.Port
+	out.EndPort = (*int32)(unsafe.Pointer(in.EndPort))
+	return nil
+}
+
+// Convert_networking_LoadBalancerPort_To_v1alpha1_LoadBalancerPort is an autogenerated conversion function.
+func Convert_networking_LoadBalancerPort_To_v1alpha1_LoadBalancerPort(in *networking.LoadBalancerPort, out *LoadBalancerPort, s conversion.Scope) error {
+	return autoConvert_networking_LoadBalancerPort_To_v1alpha1_LoadBalancerPort(in, out, s)
+}
+
+func autoConvert_v1alpha1_LoadBalancerRouting_To_networking_LoadBalancerRouting(in *LoadBalancerRouting, out *networking.LoadBalancerRouting, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
+	out.NetworkRef = in.NetworkRef
+	out.Destinations = *(*[]commonv1alpha1.LocalUIDReference)(unsafe.Pointer(&in.Destinations))
+	return nil
+}
+
+// Convert_v1alpha1_LoadBalancerRouting_To_networking_LoadBalancerRouting is an autogenerated conversion function.
+func Convert_v1alpha1_LoadBalancerRouting_To_networking_LoadBalancerRouting(in *LoadBalancerRouting, out *networking.LoadBalancerRouting, s conversion.Scope) error {
+	return autoConvert_v1alpha1_LoadBalancerRouting_To_networking_LoadBalancerRouting(in, out, s)
+}
+
+func autoConvert_networking_LoadBalancerRouting_To_v1alpha1_LoadBalancerRouting(in *networking.LoadBalancerRouting, out *LoadBalancerRouting, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
+	out.NetworkRef = in.NetworkRef
+	out.Destinations = *(*[]commonv1alpha1.LocalUIDReference)(unsafe.Pointer(&in.Destinations))
+	return nil
+}
+
+// Convert_networking_LoadBalancerRouting_To_v1alpha1_LoadBalancerRouting is an autogenerated conversion function.
+func Convert_networking_LoadBalancerRouting_To_v1alpha1_LoadBalancerRouting(in *networking.LoadBalancerRouting, out *LoadBalancerRouting, s conversion.Scope) error {
+	return autoConvert_networking_LoadBalancerRouting_To_v1alpha1_LoadBalancerRouting(in, out, s)
+}
+
+func autoConvert_v1alpha1_LoadBalancerRoutingList_To_networking_LoadBalancerRoutingList(in *LoadBalancerRoutingList, out *networking.LoadBalancerRoutingList, s conversion.Scope) error {
+	out.ListMeta = in.ListMeta
+	out.Items = *(*[]networking.LoadBalancerRouting)(unsafe.Pointer(&in.Items))
+	return nil
+}
+
+// Convert_v1alpha1_LoadBalancerRoutingList_To_networking_LoadBalancerRoutingList is an autogenerated conversion function.
+func Convert_v1alpha1_LoadBalancerRoutingList_To_networking_LoadBalancerRoutingList(in *LoadBalancerRoutingList, out *networking.LoadBalancerRoutingList, s conversion.Scope) error {
+	return autoConvert_v1alpha1_LoadBalancerRoutingList_To_networking_LoadBalancerRoutingList(in, out, s)
+}
+
+func autoConvert_networking_LoadBalancerRoutingList_To_v1alpha1_LoadBalancerRoutingList(in *networking.LoadBalancerRoutingList, out *LoadBalancerRoutingList, s conversion.Scope) error {
+	out.ListMeta = in.ListMeta
+	out.Items = *(*[]LoadBalancerRouting)(unsafe.Pointer(&in.Items))
+	return nil
+}
+
+// Convert_networking_LoadBalancerRoutingList_To_v1alpha1_LoadBalancerRoutingList is an autogenerated conversion function.
+func Convert_networking_LoadBalancerRoutingList_To_v1alpha1_LoadBalancerRoutingList(in *networking.LoadBalancerRoutingList, out *LoadBalancerRoutingList, s conversion.Scope) error {
+	return autoConvert_networking_LoadBalancerRoutingList_To_v1alpha1_LoadBalancerRoutingList(in, out, s)
+}
+
+func autoConvert_v1alpha1_LoadBalancerSpec_To_networking_LoadBalancerSpec(in *LoadBalancerSpec, out *networking.LoadBalancerSpec, s conversion.Scope) error {
+	out.Type = networking.LoadBalancerType(in.Type)
+	out.IPFamilies = *(*[]corev1.IPFamily)(unsafe.Pointer(&in.IPFamilies))
+	out.NetworkRef = in.NetworkRef
+	out.NetworkInterfaceSelector = (*v1.LabelSelector)(unsafe.Pointer(in.NetworkInterfaceSelector))
+	out.Ports = *(*[]networking.LoadBalancerPort)(unsafe.Pointer(&in.Ports))
+	return nil
+}
+
+// Convert_v1alpha1_LoadBalancerSpec_To_networking_LoadBalancerSpec is an autogenerated conversion function.
+func Convert_v1alpha1_LoadBalancerSpec_To_networking_LoadBalancerSpec(in *LoadBalancerSpec, out *networking.LoadBalancerSpec, s conversion.Scope) error {
+	return autoConvert_v1alpha1_LoadBalancerSpec_To_networking_LoadBalancerSpec(in, out, s)
+}
+
+func autoConvert_networking_LoadBalancerSpec_To_v1alpha1_LoadBalancerSpec(in *networking.LoadBalancerSpec, out *LoadBalancerSpec, s conversion.Scope) error {
+	out.Type = LoadBalancerType(in.Type)
+	out.IPFamilies = *(*[]corev1.IPFamily)(unsafe.Pointer(&in.IPFamilies))
+	out.NetworkRef = in.NetworkRef
+	out.NetworkInterfaceSelector = (*v1.LabelSelector)(unsafe.Pointer(in.NetworkInterfaceSelector))
+	out.Ports = *(*[]LoadBalancerPort)(unsafe.Pointer(&in.Ports))
+	return nil
+}
+
+// Convert_networking_LoadBalancerSpec_To_v1alpha1_LoadBalancerSpec is an autogenerated conversion function.
+func Convert_networking_LoadBalancerSpec_To_v1alpha1_LoadBalancerSpec(in *networking.LoadBalancerSpec, out *LoadBalancerSpec, s conversion.Scope) error {
+	return autoConvert_networking_LoadBalancerSpec_To_v1alpha1_LoadBalancerSpec(in, out, s)
+}
+
+func autoConvert_v1alpha1_LoadBalancerStatus_To_networking_LoadBalancerStatus(in *LoadBalancerStatus, out *networking.LoadBalancerStatus, s conversion.Scope) error {
+	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
+	return nil
+}
+
+// Convert_v1alpha1_LoadBalancerStatus_To_networking_LoadBalancerStatus is an autogenerated conversion function.
+func Convert_v1alpha1_LoadBalancerStatus_To_networking_LoadBalancerStatus(in *LoadBalancerStatus, out *networking.LoadBalancerStatus, s conversion.Scope) error {
+	return autoConvert_v1alpha1_LoadBalancerStatus_To_networking_LoadBalancerStatus(in, out, s)
+}
+
+func autoConvert_networking_LoadBalancerStatus_To_v1alpha1_LoadBalancerStatus(in *networking.LoadBalancerStatus, out *LoadBalancerStatus, s conversion.Scope) error {
+	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
+	return nil
+}
+
+// Convert_networking_LoadBalancerStatus_To_v1alpha1_LoadBalancerStatus is an autogenerated conversion function.
+func Convert_networking_LoadBalancerStatus_To_v1alpha1_LoadBalancerStatus(in *networking.LoadBalancerStatus, out *LoadBalancerStatus, s conversion.Scope) error {
+	return autoConvert_networking_LoadBalancerStatus_To_v1alpha1_LoadBalancerStatus(in, out, s)
 }
 
 func autoConvert_v1alpha1_Network_To_networking_Network(in *Network, out *networking.Network, s conversion.Scope) error {

@@ -84,6 +84,13 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.EphemeralPrefixSource":        schema_onmetal_api_apis_networking_v1alpha1_EphemeralPrefixSource(ref),
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.EphemeralVirtualIPSource":     schema_onmetal_api_apis_networking_v1alpha1_EphemeralVirtualIPSource(ref),
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.IPSource":                     schema_onmetal_api_apis_networking_v1alpha1_IPSource(ref),
+		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.LoadBalancer":                 schema_onmetal_api_apis_networking_v1alpha1_LoadBalancer(ref),
+		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.LoadBalancerList":             schema_onmetal_api_apis_networking_v1alpha1_LoadBalancerList(ref),
+		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.LoadBalancerPort":             schema_onmetal_api_apis_networking_v1alpha1_LoadBalancerPort(ref),
+		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.LoadBalancerRouting":          schema_onmetal_api_apis_networking_v1alpha1_LoadBalancerRouting(ref),
+		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.LoadBalancerRoutingList":      schema_onmetal_api_apis_networking_v1alpha1_LoadBalancerRoutingList(ref),
+		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.LoadBalancerSpec":             schema_onmetal_api_apis_networking_v1alpha1_LoadBalancerSpec(ref),
+		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.LoadBalancerStatus":           schema_onmetal_api_apis_networking_v1alpha1_LoadBalancerStatus(ref),
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.Network":                      schema_onmetal_api_apis_networking_v1alpha1_Network(ref),
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.NetworkInterface":             schema_onmetal_api_apis_networking_v1alpha1_NetworkInterface(ref),
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.NetworkInterfaceList":         schema_onmetal_api_apis_networking_v1alpha1_NetworkInterfaceList(ref),
@@ -2449,6 +2456,338 @@ func schema_onmetal_api_apis_networking_v1alpha1_IPSource(ref common.ReferenceCa
 		},
 		Dependencies: []string{
 			"github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP", "github.com/onmetal/onmetal-api/apis/networking/v1alpha1.EphemeralPrefixSource"},
+	}
+}
+
+func schema_onmetal_api_apis_networking_v1alpha1_LoadBalancer(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "LoadBalancer is the Schema for the LoadBalancer API",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/onmetal/onmetal-api/apis/networking/v1alpha1.LoadBalancerSpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/onmetal/onmetal-api/apis/networking/v1alpha1.LoadBalancerStatus"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.LoadBalancerSpec", "github.com/onmetal/onmetal-api/apis/networking/v1alpha1.LoadBalancerStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_onmetal_api_apis_networking_v1alpha1_LoadBalancerList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "LoadBalancerList contains a list of LoadBalancer",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/apis/networking/v1alpha1.LoadBalancer"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.LoadBalancer", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_onmetal_api_apis_networking_v1alpha1_LoadBalancerPort(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"protocol": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Protocol is the protocol the load balancer should allow. If not specified, defaults to TCP.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"port": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Port is the port to allow.",
+							Default:     0,
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"endPort": {
+						SchemaProps: spec.SchemaProps{
+							Description: "EndPort marks the end of the port range to allow. If unspecified, only a single port, Port, will be allowed.",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+				},
+				Required: []string{"port"},
+			},
+		},
+	}
+}
+
+func schema_onmetal_api_apis_networking_v1alpha1_LoadBalancerRouting(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "LoadBalancerRouting is the Schema for the aliasprefixrouting API",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"networkRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "NetworkRef is the network the load balancer is assigned to.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference"),
+						},
+					},
+					"destinations": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Destinations are the destinations for an LoadBalancer.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"networkRef", "destinations"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_onmetal_api_apis_networking_v1alpha1_LoadBalancerRoutingList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "LoadBalancerRoutingList contains a list of LoadBalancerRouting",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/apis/networking/v1alpha1.LoadBalancerRouting"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.LoadBalancerRouting", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_onmetal_api_apis_networking_v1alpha1_LoadBalancerSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "LoadBalancerSpec defines the desired state of LoadBalancer",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Type is the type of LoadBalancer.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"ipFamilies": {
+						SchemaProps: spec.SchemaProps{
+							Description: "IPFamilies are the ip families the load balancer should have.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"networkRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "NetworkRef is the Network this LoadBalancer should belong to.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
+						},
+					},
+					"networkInterfaceSelector": {
+						SchemaProps: spec.SchemaProps{
+							Description: "NetworkInterfaceSelector defines the NetworkInterfaces for which this LoadBalancer should be applied",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"),
+						},
+					},
+					"ports": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Ports are the ports the load balancer should allow.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/apis/networking/v1alpha1.LoadBalancerPort"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"type", "ipFamilies", "networkRef"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.LoadBalancerPort", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"},
+	}
+}
+
+func schema_onmetal_api_apis_networking_v1alpha1_LoadBalancerStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "LoadBalancerStatus defines the observed state of LoadBalancer",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"ips": {
+						SchemaProps: spec.SchemaProps{
+							Description: "IPs are the IPs allocated for the load balancer.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP"},
 	}
 }
 

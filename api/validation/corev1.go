@@ -15,22 +15,23 @@
 package apivalidation
 
 import (
+	"github.com/onmetal/controller-utils/set"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
-var supportedIPFamilies = sets.NewString(
-	string(corev1.IPv4Protocol),
-	string(corev1.IPv6Protocol),
+var supportedIPFamilies = set.New(
+	corev1.IPv4Protocol,
+	corev1.IPv6Protocol,
 )
 
 func IsSupportedIPFamily(ipFamily corev1.IPFamily) bool {
-	return supportedIPFamilies.Has(string(ipFamily))
+	return supportedIPFamilies.Has(ipFamily)
 }
 
 func ValidateIPFamily(ipFamily corev1.IPFamily, fldPath *field.Path) field.ErrorList {
-	return ValidateStringSetEnum(supportedIPFamilies, string(ipFamily), fldPath, "must specify ipFamily")
+	return ValidateEnum(supportedIPFamilies, ipFamily, fldPath, "must specify ipFamily")
 }
 
 func ValidateIPFamilies(ipFamilies []corev1.IPFamily, fldPath *field.Path) field.ErrorList {
@@ -52,4 +53,14 @@ func ValidateIPFamilies(ipFamilies []corev1.IPFamily, fldPath *field.Path) field
 	}
 
 	return allErrs
+}
+
+var supportedProtocols = set.New(
+	corev1.ProtocolTCP,
+	corev1.ProtocolUDP,
+	corev1.ProtocolSCTP,
+)
+
+func ValidateProtocol(protocol corev1.Protocol, fldPath *field.Path) field.ErrorList {
+	return ValidateEnum(supportedProtocols, protocol, fldPath, "must specify protocol")
 }
