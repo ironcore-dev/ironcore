@@ -69,7 +69,7 @@ var _ = Describe("VolumePool", func() {
 				},
 			},
 			&storage.VolumePool{},
-			Not(ContainElement(ImmutableField("spec.volumePoolRef"))),
+			Not(ContainElement(ImmutableField("spec.providerID"))),
 		),
 	)
 })
