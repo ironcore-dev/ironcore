@@ -18,6 +18,30 @@ package v1alpha1
 
 import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+// NetworkSpec defines the desired state of Network
+type NetworkSpec struct {
+	ProviderID string
+}
+
+// NetworkStatus defines the observed state of Network
+type NetworkStatus struct {
+	// State is the state of the machine.
+	State NetworkState
+}
+
+// NetworkState is the state of a machine.
+// +enum
+type NetworkState string
+
+const (
+	// NetworkStatePending means the network is being provisioned.
+	NetworkStatePending NetworkState = "Pending"
+	// NetworkStateAvailable means the network is ready to use.
+	NetworkStateAvailable NetworkState = "Available"
+	// NetworkStateError means the network is in an error state.
+	NetworkStateError NetworkState = "Error"
+)
+
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
@@ -25,6 +49,9 @@ import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 type Network struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   NetworkSpec
+	Status NetworkStatus
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
