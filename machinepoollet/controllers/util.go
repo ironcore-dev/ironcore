@@ -78,11 +78,6 @@ func ORIMachineMetadata(machine *computev1alpha1.Machine) *ori.MachineMetadata {
 	return &ori.MachineMetadata{
 		Namespace: machine.Namespace,
 		Name:      machine.Name,
-		Labels: map[string]string{
-			MachineUIDLabel:       string(machine.UID),
-			MachineNamespaceLabel: machine.Namespace,
-			MachineNameLabel:      machine.Name,
-		},
 	}
 }
 

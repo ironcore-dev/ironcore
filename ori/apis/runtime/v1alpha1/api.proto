@@ -117,8 +117,6 @@ message MachineMetadata {
   string namespace = 1;
   string name = 2;
   string uid = 3;
-  map<string, string> annotations = 4;
-  map<string, string> labels = 5;
 }
 
 message MachineResources {
@@ -133,11 +131,15 @@ message MachineConfig {
   IgnitionConfig ignition = 4;
   repeated VolumeConfig volumes = 5;
   repeated NetworkInterfaceConfig network_interfaces = 6;
+  map<string, string> annotations = 7;
+  map<string, string> labels = 8;
 }
 
 message Machine {
   string id = 1;
   MachineMetadata metadata = 2;
+  map<string, string> annotations = 3;
+  map<string, string> labels = 4;
 }
 
 message VolumeStatus {
@@ -180,6 +182,8 @@ message MachineStatus {
   MachineState state = 5;
   repeated VolumeStatus volumes = 6;
   repeated NetworkInterfaceStatus network_interfaces = 7;
+  map<string, string> annotations = 8;
+  map<string, string> labels = 9;
 }
 
 message ListMachinesRequest {

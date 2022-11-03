@@ -765,6 +765,11 @@ func (r *MachineReconciler) getMachineConfig(ctx context.Context, log logr.Logge
 		Ignition:          ignitionConfig,
 		Volumes:           volumeConfigs,
 		NetworkInterfaces: networkInterfaceConfigs,
+		Labels: map[string]string{
+			MachineUIDLabel:       string(machine.UID),
+			MachineNamespaceLabel: machine.Namespace,
+			MachineNameLabel:      machine.Name,
+		},
 	}, nil
 }
 
