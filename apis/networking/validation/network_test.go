@@ -44,4 +44,33 @@ var _ = Describe("Network", func() {
 			ContainElement(InvalidField("metadata.name")),
 		),
 	)
+
+	DescribeTable("ValidateVolumeUpdate",
+		func(newNetwork, oldNetwork *networking.Network, match types.GomegaMatcher) {
+			errList := ValidateNetworkUpdate(newNetwork, oldNetwork)
+			Expect(errList).To(match)
+		},
+		Entry("immutable providerID if set",
+			&networking.Network{
+				Spec: networking.NetworkSpec{
+					ProviderID: "foo",
+				},
+			},
+			&networking.Network{
+				Spec: networking.NetworkSpec{
+					ProviderID: "bar",
+				},
+			},
+			ContainElement(ImmutableField("spec.providerID")),
+		),
+		Entry("mutable providerID if not set",
+			&networking.Network{
+				Spec: networking.NetworkSpec{
+					ProviderID: "foo",
+				},
+			},
+			&networking.Network{},
+			Not(ContainElement(ImmutableField("spec.providerID"))),
+		),
+	)
 })
