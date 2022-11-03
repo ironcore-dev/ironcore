@@ -55,11 +55,4 @@ var _ = Describe("LoadBalancerRouting", func() {
 			ContainElement(DuplicateField("destinations[1]")),
 		),
 	)
-
-	DescribeTable("ValidateLoadBalancerRoutingUpdate",
-		func(newLoadBalancerRouting, oldLoadBalancerRouting *networking.LoadBalancerRouting, match types.GomegaMatcher) {
-			errList := ValidateLoadBalancerRoutingUpdate(newLoadBalancerRouting, oldLoadBalancerRouting)
-			Expect(errList).To(match)
-		},
-	)
 })

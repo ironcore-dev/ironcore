@@ -44,11 +44,4 @@ var _ = Describe("Network", func() {
 			ContainElement(InvalidField("metadata.name")),
 		),
 	)
-
-	DescribeTable("ValidateNetworkUpdate",
-		func(newNetwork, oldNetwork *networking.Network, match types.GomegaMatcher) {
-			errList := ValidateNetworkUpdate(newNetwork, oldNetwork)
-			Expect(errList).To(match)
-		},
-	)
 })

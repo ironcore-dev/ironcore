@@ -23,8 +23,7 @@ import (
 )
 
 func HasReconcileAnnotation(o metav1.Object) bool {
-	_, ok := o.GetAnnotations()[commonv1alpha1.ReconcileRequestAnnotation]
-	return ok
+	return metautils.HasAnnotation(o, commonv1alpha1.ReconcileRequestAnnotation)
 }
 
 func SetReconcileAnnotation(o metav1.Object) {
@@ -32,7 +31,17 @@ func SetReconcileAnnotation(o metav1.Object) {
 }
 
 func RemoveReconcileAnnotation(o metav1.Object) {
-	annotations := o.GetAnnotations()
-	delete(annotations, commonv1alpha1.ReconcileRequestAnnotation)
-	o.SetAnnotations(annotations)
+	metautils.DeleteAnnotation(o, commonv1alpha1.ReconcileRequestAnnotation)
+}
+
+func IsExternallyManaged(o metav1.Object) bool {
+	return metautils.HasAnnotation(o, commonv1alpha1.ManagedByAnnotation)
+}
+
+func SetExternallyMangedBy(o metav1.Object, manager string) {
+	metautils.SetAnnotation(o, commonv1alpha1.ManagedByAnnotation, manager)
+}
+
+func RemoveExternallyManaged(o metav1.Object) {
+	metautils.DeleteAnnotation(o, commonv1alpha1.ManagedByAnnotation)
 }

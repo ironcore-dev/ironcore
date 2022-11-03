@@ -55,11 +55,4 @@ var _ = Describe("NATGatewayRouting", func() {
 			ContainElement(DuplicateField("destinations[1]")),
 		),
 	)
-
-	DescribeTable("ValidateNATGatewayRoutingUpdate",
-		func(newNATGatewayRouting, oldNATGatewayRouting *networking.NATGatewayRouting, match types.GomegaMatcher) {
-			errList := ValidateNATGatewayRoutingUpdate(newNATGatewayRouting, oldNATGatewayRouting)
-			Expect(errList).To(match)
-		},
-	)
 })

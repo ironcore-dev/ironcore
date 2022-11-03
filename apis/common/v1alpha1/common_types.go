@@ -35,6 +35,10 @@ const (
 
 	// ReconcileRequestAnnotation is an annotation that requested a reconciliation at a specific time.
 	ReconcileRequestAnnotation = "reconcile.common.api.onmetal.de/requested-at"
+
+	// ManagedByAnnotation is an annotation that can be applied to resources to signify that
+	// some external system is managing the resource.
+	ManagedByAnnotation = "common.api.onmetal.de/managed-by"
 )
 
 // ConfigMapKeySelector is a reference to a specific 'key' within a ConfigMap resource.

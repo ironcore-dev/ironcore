@@ -55,11 +55,4 @@ var _ = Describe("AliasPrefixRouting", func() {
 			ContainElement(DuplicateField("destinations[1]")),
 		),
 	)
-
-	DescribeTable("ValidateAliasPrefixRoutingUpdate",
-		func(newAliasPrefixRouting, oldAliasPrefixRouting *networking.AliasPrefixRouting, match types.GomegaMatcher) {
-			errList := ValidateAliasPrefixRoutingUpdate(newAliasPrefixRouting, oldAliasPrefixRouting)
-			Expect(errList).To(match)
-		},
-	)
 })
