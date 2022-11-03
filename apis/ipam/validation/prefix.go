@@ -17,10 +17,10 @@ package validation
 import (
 	"fmt"
 
-	onmetalapivalidation "github.com/onmetal/onmetal-api/api/validation"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	commonv1alpha1validation "github.com/onmetal/onmetal-api/apis/common/v1alpha1/validation"
 	"github.com/onmetal/onmetal-api/apis/ipam"
+	onmetalapivalidation "github.com/onmetal/onmetal-api/onmetal-apiserver/api/validation"
 	"go4.org/netipx"
 	corev1 "k8s.io/api/core/v1"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"

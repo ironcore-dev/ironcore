@@ -5,10 +5,10 @@ metadata:
   name: natgateway-sample
 spec:
   type: Public
+  ipFamilies: [ IPv4 ]
   ips:
     - name: ip1
-      ipFamily: IPv4
-  # portsPerNetworkInterface: 128
+  portsPerNetworkInterface: 64
   networkRef:
     name: network-sample
   networkInterfaceSelector:

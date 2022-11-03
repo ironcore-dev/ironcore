@@ -28,7 +28,7 @@ spec:
         runAsNonRoot: true
       containers:
         - command:
-            - /apiserver
+            - /onmetal-apiserver
           args:
             - --etcd-servers=http://$(ONMETAL_API_APISERVER_ETCD_SERVICE_NAME):2379
             - --secure-port=8443

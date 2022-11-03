@@ -46,7 +46,7 @@ help: ## Display this help.
 
 .PHONY: manifests
 manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
-	$(CONTROLLER_GEN) rbac:roleName=manager-role webhook paths="./controllers/...;./apis/..." output:rbac:artifacts:config=config/controller/rbac
+	$(CONTROLLER_GEN) rbac:roleName=manager-role webhook paths="./onmetal-controller-manager/controllers/...;./apis/..." output:rbac:artifacts:config=config/controller/rbac
 
 .PHONY: generate
 generate:
@@ -106,17 +106,17 @@ test-only: envtest ## Run *only* the tests - no generation, linting etc.
 
 .PHONEY: openapi-extractor
 extract-openapi: openapi-extractor
-	$(OPENAPI_EXTRACTOR) --apiserver-package="github.com/onmetal/onmetal-api/cmd/apiserver" --apiserver-build-opts=mod --apiservices="./config/apiserver/apiservice/bases" --output="./gen"
+	$(OPENAPI_EXTRACTOR) --apiserver-package="github.com/onmetal/onmetal-api/onmetal-apiserver/cmd/apiserver" --apiserver-build-opts=mod --apiservices="./config/apiserver/apiservice/bases" --output="./gen"
 
 ##@ Build
 
 .PHONY: build
 build: generate fmt vet ## Build manager binary.
-	go build -o bin/manager main.go
+	go build -o bin/manager ./onmetal-controller-manager/main.go
 
 .PHONY: run
 run: manifests generate fmt vet ## Run a controller from your host.
-	go run ./main.go
+	go run ./onmetal-controller-manager/main.go
 
 .PHONY: docker-build
 docker-build: test ## Build docker image with the manager.
