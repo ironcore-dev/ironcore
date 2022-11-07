@@ -17,6 +17,7 @@ package storage
 import (
 	"context"
 
+	"github.com/onmetal/onmetal-api/apis/networking"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/meta/table"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -30,6 +31,7 @@ var (
 
 	headers = []metav1.TableColumnDefinition{
 		{Name: "Name", Type: "string", Format: "name", Description: objectMetaSwaggerDoc["name"]},
+		{Name: "State", Type: "string", Description: "The state of the network"},
 		{Name: "Age", Type: "string", Format: "date", Description: objectMetaSwaggerDoc["creationTimestamp"]},
 	}
 )
@@ -54,7 +56,17 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 
 	var err error
 	tab.Rows, err = table.MetaToTableRow(obj, func(obj runtime.Object, m metav1.Object, name, age string) (cells []interface{}, err error) {
+		network := obj.(*networking.Network)
+
 		cells = append(cells, name)
+
+		switch state := network.Status.State; state {
+		case "":
+			cells = append(cells, "<unknown>")
+		default:
+			cells = append(cells, state)
+		}
+
 		cells = append(cells, age)
 
 		return cells, nil

@@ -89,7 +89,8 @@ func (networkStrategy) Canonicalize(obj runtime.Object) {
 }
 
 func (networkStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
-	return field.ErrorList{}
+	newNetwork, oldNetwork := obj.(*networking.Network), old.(*networking.Network)
+	return validation.ValidateNetworkUpdate(newNetwork, oldNetwork)
 }
 
 func (networkStrategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {
@@ -111,6 +112,8 @@ func (networkStatusStrategy) GetResetFields() map[fieldpath.APIVersion]*fieldpat
 }
 
 func (networkStatusStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Object) {
+	newNetwork, oldNetwork := obj.(*networking.Network), old.(*networking.Network)
+	newNetwork.Spec = oldNetwork.Spec
 }
 
 func (networkStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
