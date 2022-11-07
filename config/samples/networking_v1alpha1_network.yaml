@@ -3,5 +3,3 @@ kind: Network
 metadata:
   namespace: default
   name: network-sample
-spec:
-  providerID: onmetal://shared

@@ -45,7 +45,7 @@ var _ = Describe("Network", func() {
 		),
 	)
 
-	DescribeTable("ValidateVolumeUpdate",
+	DescribeTable("ValidateNetworkUpdate",
 		func(newNetwork, oldNetwork *networking.Network, match types.GomegaMatcher) {
 			errList := ValidateNetworkUpdate(newNetwork, oldNetwork)
 			Expect(errList).To(match)

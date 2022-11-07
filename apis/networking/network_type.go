@@ -29,7 +29,7 @@ type NetworkStatus struct {
 	State NetworkState
 }
 
-// NetworkState is the state of a machine.
+// NetworkState is the state of a network.
 // +enum
 type NetworkState string
 
