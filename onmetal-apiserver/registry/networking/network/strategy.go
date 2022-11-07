@@ -20,6 +20,7 @@ import (
 
 	"github.com/onmetal/onmetal-api/apis/networking"
 	"github.com/onmetal/onmetal-api/apis/networking/validation"
+	"github.com/onmetal/onmetal-api/apiutils/equality"
 	"github.com/onmetal/onmetal-api/onmetal-apiserver/api"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
@@ -63,9 +64,18 @@ func (networkStrategy) NamespaceScoped() bool {
 }
 
 func (networkStrategy) PrepareForCreate(ctx context.Context, obj runtime.Object) {
+	machinePool := obj.(*networking.Network)
+	machinePool.Status = networking.NetworkStatus{}
+	machinePool.Generation = 1
 }
 
 func (networkStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Object) {
+	newNetwork, oldNetwork := obj.(*networking.Network), old.(*networking.Network)
+	newNetwork.Status = oldNetwork.Status
+
+	if !equality.Semantic.DeepEqual(newNetwork.Spec, oldNetwork.Spec) {
+		newNetwork.Generation = oldNetwork.Generation + 1
+	}
 }
 
 func (networkStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {

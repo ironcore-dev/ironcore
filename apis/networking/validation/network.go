@@ -28,6 +28,13 @@ func ValidateNetwork(network *networking.Network) field.ErrorList {
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(network, true, apivalidation.NameIsDNSLabel, field.NewPath("metadata"))...)
+	allErrs = append(allErrs, validateNetworkSpec(&network.Spec, field.NewPath("spec"))...)
+
+	return allErrs
+}
+
+func validateNetworkSpec(networkSpec *networking.NetworkSpec, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
 
 	return allErrs
 }

@@ -20,13 +20,13 @@ import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 // NetworkSpec defines the desired state of Network
 type NetworkSpec struct {
-	ProviderID string
+	ProviderID string `json:"providerID"`
 }
 
 // NetworkStatus defines the observed state of Network
 type NetworkStatus struct {
 	// State is the state of the machine.
-	State NetworkState
+	State NetworkState `json:"state,omitempty"`
 }
 
 // NetworkState is the state of a machine.
@@ -50,8 +50,8 @@ type Network struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   NetworkSpec
-	Status NetworkStatus
+	Spec   NetworkSpec   `json:"spec,omitempty"`
+	Status NetworkStatus `json:"status,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

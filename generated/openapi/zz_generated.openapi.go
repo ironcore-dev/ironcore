@@ -3273,20 +3273,19 @@ func schema_onmetal_api_apis_networking_v1alpha1_Network(ref common.ReferenceCal
 							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
 					},
-					"Spec": {
+					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
 							Ref:     ref("github.com/onmetal/onmetal-api/apis/networking/v1alpha1.NetworkSpec"),
 						},
 					},
-					"Status": {
+					"status": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
 							Ref:     ref("github.com/onmetal/onmetal-api/apis/networking/v1alpha1.NetworkStatus"),
 						},
 					},
 				},
-				Required: []string{"Spec", "Status"},
 			},
 		},
 		Dependencies: []string{
@@ -3585,7 +3584,7 @@ func schema_onmetal_api_apis_networking_v1alpha1_NetworkSpec(ref common.Referenc
 				Description: "NetworkSpec defines the desired state of Network",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"ProviderID": {
+					"providerID": {
 						SchemaProps: spec.SchemaProps{
 							Default: "",
 							Type:    []string{"string"},
@@ -3593,7 +3592,7 @@ func schema_onmetal_api_apis_networking_v1alpha1_NetworkSpec(ref common.Referenc
 						},
 					},
 				},
-				Required: []string{"ProviderID"},
+				Required: []string{"providerID"},
 			},
 		},
 	}
@@ -3606,16 +3605,14 @@ func schema_onmetal_api_apis_networking_v1alpha1_NetworkStatus(ref common.Refere
 				Description: "NetworkStatus defines the observed state of Network",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"State": {
+					"state": {
 						SchemaProps: spec.SchemaProps{
 							Description: "State is the state of the machine.\n\nPossible enum values:\n - `\"Available\"` means the network is ready to use.\n - `\"Error\"` means the network is in an error state.\n - `\"Pending\"` means the network is being provisioned.",
-							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
 							Enum:        []interface{}{"Available", "Error", "Pending"}},
 					},
 				},
-				Required: []string{"State"},
 			},
 		},
 	}

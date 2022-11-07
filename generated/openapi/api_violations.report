@@ -158,13 +158,9 @@ API rule violation: names_match,github.com/onmetal/onmetal-api/apis/networking/v
 API rule violation: names_match,github.com/onmetal/onmetal-api/apis/networking/v1alpha1,NATGatewayDestination,IPs
 API rule violation: names_match,github.com/onmetal/onmetal-api/apis/networking/v1alpha1,NATGatewaySpec,IPs
 API rule violation: names_match,github.com/onmetal/onmetal-api/apis/networking/v1alpha1,NATGatewayStatus,IPs
-API rule violation: names_match,github.com/onmetal/onmetal-api/apis/networking/v1alpha1,Network,Spec
-API rule violation: names_match,github.com/onmetal/onmetal-api/apis/networking/v1alpha1,Network,Status
 API rule violation: names_match,github.com/onmetal/onmetal-api/apis/networking/v1alpha1,NetworkInterfaceSpec,IPs
 API rule violation: names_match,github.com/onmetal/onmetal-api/apis/networking/v1alpha1,NetworkInterfaceStatus,IPs
 API rule violation: names_match,github.com/onmetal/onmetal-api/apis/networking/v1alpha1,NetworkInterfaceStatus,LastPhaseTransitionTime
-API rule violation: names_match,github.com/onmetal/onmetal-api/apis/networking/v1alpha1,NetworkSpec,ProviderID
-API rule violation: names_match,github.com/onmetal/onmetal-api/apis/networking/v1alpha1,NetworkStatus,State
 API rule violation: names_match,github.com/onmetal/onmetal-api/apis/networking/v1alpha1,VirtualIPStatus,LastPhaseTransitionTime
 API rule violation: names_match,k8s.io/api/core/v1,AzureDiskVolumeSource,DataDiskURI
 API rule violation: names_match,k8s.io/api/core/v1,ContainerStatus,LastTerminationState
