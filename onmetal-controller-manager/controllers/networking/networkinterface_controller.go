@@ -38,6 +38,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
+var (
+	errNetworkNotReady = errors.New("network not ready")
+)
+
 type NetworkInterfaceReconciler struct {
 	record.EventRecorder
 	client.Client
@@ -74,6 +78,16 @@ func (r *NetworkInterfaceReconciler) delete(ctx context.Context, log logr.Logger
 }
 
 func (r *NetworkInterfaceReconciler) reconcile(ctx context.Context, log logr.Logger, nic *networkingv1alpha1.NetworkInterface) (ctrl.Result, error) {
+	log.V(1).Info("Getting network handle")
+	networkHandle, err := r.getNetworkHandle(ctx, nic)
+	if err != nil {
+		if !errors.Is(err, errNetworkNotReady) {
+			return ctrl.Result{}, fmt.Errorf("error getting network handle: %w", err)
+		}
+		r.Eventf(nic, corev1.EventTypeNormal, "NetworkNotReady", "The network of the network interface is not ready")
+		return ctrl.Result{}, nil
+	}
+
 	log.V(1).Info("Applying IPs")
 	ips, err := r.applyIPs(ctx, nic)
 	if err != nil {
@@ -89,16 +103,23 @@ func (r *NetworkInterfaceReconciler) reconcile(ctx context.Context, log logr.Log
 	log.V(1).Info("Successfully applied virtual IP")
 
 	log.V(1).Info("Patching status")
-	if err := r.patchStatus(ctx, nic, ips, virtualIP); err != nil {
+	if err := r.patchStatus(ctx, nic, networkHandle, ips, virtualIP); err != nil {
 		return ctrl.Result{}, err
 	}
 	log.V(1).Info("Successfully patched status")
 	return ctrl.Result{}, nil
 }
 
-func (r *NetworkInterfaceReconciler) patchStatus(ctx context.Context, nic *networkingv1alpha1.NetworkInterface, ips []commonv1alpha1.IP, virtualIP *commonv1alpha1.IP) error {
+func (r *NetworkInterfaceReconciler) patchStatus(
+	ctx context.Context,
+	nic *networkingv1alpha1.NetworkInterface,
+	networkHandle string,
+	ips []commonv1alpha1.IP,
+	virtualIP *commonv1alpha1.IP,
+) error {
 	base := nic.DeepCopy()
 
+	nic.Status.NetworkHandle = networkHandle
 	nic.Status.IPs = ips
 	nic.Status.VirtualIP = virtualIP
 
@@ -106,6 +127,24 @@ func (r *NetworkInterfaceReconciler) patchStatus(ctx context.Context, nic *netwo
 		return fmt.Errorf("error patching status: %w", err)
 	}
 	return nil
+}
+
+func (r *NetworkInterfaceReconciler) getNetworkHandle(ctx context.Context, nic *networkingv1alpha1.NetworkInterface) (string, error) {
+	network := &networkingv1alpha1.Network{}
+	networkKey := client.ObjectKey{Namespace: nic.Namespace, Name: nic.Spec.NetworkRef.Name}
+	if err := r.Get(ctx, networkKey, network); err != nil {
+		if !apierrors.IsNotFound(err) {
+			return "", fmt.Errorf("error getting network %s: %w", networkKey, err)
+		}
+		return "", fmt.Errorf("%w: network not found", errNetworkNotReady)
+	}
+
+	switch state := network.Status.State; state {
+	case networkingv1alpha1.NetworkStateAvailable:
+		return network.Spec.ProviderID, nil
+	default:
+		return "", fmt.Errorf("%w: network is not in state %s but %s", errNetworkNotReady, networkingv1alpha1.NetworkStateAvailable, state)
+	}
 }
 
 func (r *NetworkInterfaceReconciler) applyIPs(ctx context.Context, nic *networkingv1alpha1.NetworkInterface) ([]commonv1alpha1.IP, error) {
@@ -239,13 +278,17 @@ func (r *NetworkInterfaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Owns(&ipamv1alpha1.Prefix{}).
 		Owns(&networkingv1alpha1.VirtualIP{}).
 		Watches(
+			&source.Kind{Type: &networkingv1alpha1.Network{}},
+			r.enqueueByNetworkInterfaceNetworkReferences(ctx, log),
+		).
+		Watches(
 			&source.Kind{Type: &networkingv1alpha1.VirtualIP{}},
-			r.enqueueByNetworkInterfaceVirtualIPReferences(log, ctx),
+			r.enqueueByNetworkInterfaceVirtualIPReferences(ctx, log),
 		).
 		Complete(r)
 }
 
-func (r *NetworkInterfaceReconciler) enqueueByNetworkInterfaceVirtualIPReferences(log logr.Logger, ctx context.Context) handler.EventHandler {
+func (r *NetworkInterfaceReconciler) enqueueByNetworkInterfaceVirtualIPReferences(ctx context.Context, log logr.Logger) handler.EventHandler {
 	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
 		vip := obj.(*networkingv1alpha1.VirtualIP)
 		log = log.WithValues("VirtualIPKey", client.ObjectKeyFromObject(vip))
@@ -256,6 +299,28 @@ func (r *NetworkInterfaceReconciler) enqueueByNetworkInterfaceVirtualIPReference
 			client.MatchingFields{onmetalapiclient.NetworkInterfaceVirtualIPNames: vip.Name},
 		); err != nil {
 			log.Error(err, "Error listing network interfaces using virtual ip")
+			return nil
+		}
+
+		reqs := make([]ctrl.Request, 0, len(nicList.Items))
+		for _, nic := range nicList.Items {
+			reqs = append(reqs, ctrl.Request{NamespacedName: client.ObjectKeyFromObject(&nic)})
+		}
+		return reqs
+	})
+}
+
+func (r *NetworkInterfaceReconciler) enqueueByNetworkInterfaceNetworkReferences(ctx context.Context, log logr.Logger) handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+		network := obj.(*networkingv1alpha1.Network)
+		log = log.WithValues("NetworkKey", client.ObjectKeyFromObject(network))
+
+		nicList := &networkingv1alpha1.NetworkInterfaceList{}
+		if err := r.List(ctx, nicList,
+			client.InNamespace(network.Namespace),
+			client.MatchingFields{onmetalapiclient.NetworkInterfaceNetworkName: network.Name},
+		); err != nil {
+			log.Error(err, "Error listing network interface using network")
 			return nil
 		}
 

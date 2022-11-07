@@ -20,15 +20,13 @@ service MachineRuntime {
   rpc DeleteMachine(DeleteMachineRequest) returns (DeleteMachineResponse) {};
 
   rpc ListVolumes(ListVolumesRequest) returns (ListVolumesResponse) {};
-  rpc ConfirmVolume(ConfirmVolumeRequest) returns (ConfirmVolumeResponse) {};
-  rpc AttachVolume(AttachVolumeRequest) returns (AttachVolumeResponse) {};
-  rpc UpdateVolume(UpdateVolumeRequest) returns (UpdateVolumeResponse) {};
-  rpc DetachVolume(DetachVolumeRequest) returns (DetachVolumeResponse) {};
+  rpc CreateVolume(CreateVolumeRequest) returns (CreateVolumeResponse) {};
+  rpc DeleteVolume(DeleteVolumeRequest) returns (DeleteVolumeResponse) {};
 
   rpc ListNetworkInterfaces(ListNetworkInterfacesRequest) returns (ListNetworkInterfacesResponse);
-  rpc AttachNetworkInterface(AttachNetworkInterfaceRequest) returns (AttachNetworkInterfaceResponse);
+  rpc CreateNetworkInterface(CreateNetworkInterfaceRequest) returns (CreateNetworkInterfaceResponse);
   rpc UpdateNetworkInterface(UpdateNetworkInterfaceRequest) returns (UpdateNetworkInterfaceResponse);
-  rpc DetachNetworkInterface(DetachNetworkInterfaceRequest) returns (DetachNetworkInterfaceResponse);
+  rpc DeleteNetworkInterface(DeleteNetworkInterfaceRequest) returns (DeleteNetworkInterfaceResponse);
 }
 
 message VolumeFilter {
@@ -38,27 +36,31 @@ message VolumeFilter {
 
 message VolumeAccessConfig {
   string driver = 1;
-  map<string, string> attributes = 2;
-  map<string, bytes> secret_data = 3;
+  string handle = 2;
+  map<string, string> attributes = 3;
+  map<string, bytes> secret_data = 4;
 }
 
 message EmptyDiskConfig {
   uint64 size_limit_bytes = 1;
 }
 
-message VolumeMachineMetadata {
-  string namespace = 1;
-  string name = 2;
-  string uid = 3;
-}
-
 message Volume {
   string machine_id = 1;
-  VolumeMachineMetadata machine_metadata = 2;
+  MachineMetadata machine_metadata = 2;
   string name = 3;
   string device = 4;
-  VolumeAccessConfig access = 5;
-  EmptyDiskConfig empty_disk = 6;
+  VolumeAccess access = 5;
+  EmptyDisk empty_disk = 6;
+}
+
+message VolumeAccess {
+  string driver = 1;
+  string handle = 2;
+}
+
+message EmptyDisk {
+  uint64 size_limit_bytes = 1;
 }
 
 message VolumeConfig {
@@ -74,8 +76,7 @@ message NetworkInterfaceFilter {
 }
 
 message NetworkConfig {
-  string name = 1;
-  string uid = 2;
+  string handle = 1;
 }
 
 message VirtualIPConfig {
@@ -89,15 +90,9 @@ message NetworkInterfaceConfig {
   VirtualIPConfig virtual_ip = 4;
 }
 
-message NetworkInterfaceMachineMetadata {
-  string namespace = 1;
-  string name = 2;
-  string uid = 3;
-}
-
 message NetworkInterface {
   string machine_id = 1;
-  NetworkInterfaceMachineMetadata machine_metadata = 2;
+  MachineMetadata machine_metadata = 2;
   string name = 3;
   NetworkConfig network = 4;
   repeated string ips = 5;
@@ -142,17 +137,32 @@ message Machine {
   map<string, string> labels = 4;
 }
 
+message VolumeAccessStatus {
+  string driver = 1;
+  string handle = 2;
+}
+
+message EmptyDiskStatus {
+  uint64 size_bytes = 1;
+}
+
+enum VolumeState {
+  VOLUME_PENDING = 0;
+  VOLUME_ATTACHED = 1;
+  VOLUME_DETACHED = 2;
+  VOLUME_ERROR = 3;
+}
+
 message VolumeStatus {
   string name = 1;
   string device = 2;
-  VolumeAccessConfig access = 3;
-  EmptyDiskConfig empty_disk = 4;
-  string device_id = 5;
+  VolumeState state = 3;
+  VolumeAccessStatus access = 4;
+  EmptyDiskStatus empty_disk = 5;
 }
 
 message NetworkStatus {
-  string name = 1;
-  string uid = 2;
+  string handle = 1;
 }
 
 message VirtualIPStatus {
@@ -164,6 +174,14 @@ message NetworkInterfaceStatus {
   NetworkStatus network = 2;
   repeated string ips = 3;
   VirtualIPStatus virtual_ip = 4;
+  NetworkInterfaceState state = 5;
+}
+
+enum NetworkInterfaceState {
+  NETWORK_INTERFACE_PENDING = 0;
+  NETWORK_INTERFACE_ATTACHED = 1;
+  NETWORK_INTERFACE_DETACHED = 2;
+  NETWORK_INTERFACE_ERROR = 3;
 }
 
 enum MachineState {
@@ -225,47 +243,20 @@ message ListVolumesResponse {
   repeated Volume volumes = 1;
 }
 
-message AttachVolumeRequest {
+message CreateVolumeRequest {
   string machine_id = 1;
   VolumeConfig config = 2;
 }
 
-message AttachVolumeResponse {
-  string device_id = 1;
+message CreateVolumeResponse {
 }
 
-message UpdateVolumeRequest {
-  string machine_id = 1;
-  string volume_name = 2;
-  VolumeAccessConfig access = 3;
-  EmptyDiskConfig empty_disk = 4;
-}
-
-message UpdateVolumeResponse {
-  string device_id = 1;
-}
-
-message DetachVolumeRequest {
+message DeleteVolumeRequest {
   string machine_id = 1;
   string volume_name = 2;
 }
 
-message DetachVolumeResponse {
-}
-
-message ConfirmVolumeRequest {
-  string machine_id = 1;
-  string volume_name = 2;
-  VolumeAccessConfig access = 3;
-  EmptyDiskConfig empty_disk = 4;
-}
-
-message VolumeConfirmation {
-  string device_id = 1;
-}
-
-message ConfirmVolumeResponse {
-  VolumeConfirmation confirmation = 1;
+message DeleteVolumeResponse {
 }
 
 message ListNetworkInterfacesRequest {
@@ -276,12 +267,12 @@ message ListNetworkInterfacesResponse {
   repeated NetworkInterface network_interfaces = 1;
 }
 
-message AttachNetworkInterfaceRequest {
+message CreateNetworkInterfaceRequest {
   string machine_id = 1;
   NetworkInterfaceConfig config = 2;
 }
 
-message AttachNetworkInterfaceResponse {
+message CreateNetworkInterfaceResponse {
 }
 
 message UpdateNetworkInterfaceRequest {
@@ -294,10 +285,10 @@ message UpdateNetworkInterfaceRequest {
 message UpdateNetworkInterfaceResponse {
 }
 
-message DetachNetworkInterfaceRequest {
+message DeleteNetworkInterfaceRequest {
   string machine_id = 1;
   string network_interface_name = 2;
 }
 
-message DetachNetworkInterfaceResponse {
+message DeleteNetworkInterfaceResponse {
 }

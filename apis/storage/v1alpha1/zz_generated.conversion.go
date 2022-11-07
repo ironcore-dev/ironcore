@@ -216,6 +216,7 @@ func Convert_storage_Volume_To_v1alpha1_Volume(in *storage.Volume, out *Volume, 
 func autoConvert_v1alpha1_VolumeAccess_To_storage_VolumeAccess(in *VolumeAccess, out *storage.VolumeAccess, s conversion.Scope) error {
 	out.SecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
 	out.Driver = in.Driver
+	out.Handle = in.Handle
 	out.VolumeAttributes = *(*map[string]string)(unsafe.Pointer(&in.VolumeAttributes))
 	return nil
 }
@@ -228,6 +229,7 @@ func Convert_v1alpha1_VolumeAccess_To_storage_VolumeAccess(in *VolumeAccess, out
 func autoConvert_storage_VolumeAccess_To_v1alpha1_VolumeAccess(in *storage.VolumeAccess, out *VolumeAccess, s conversion.Scope) error {
 	out.SecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
 	out.Driver = in.Driver
+	out.Handle = in.Handle
 	out.VolumeAttributes = *(*map[string]string)(unsafe.Pointer(&in.VolumeAttributes))
 	return nil
 }

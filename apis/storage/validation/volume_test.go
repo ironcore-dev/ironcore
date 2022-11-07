@@ -92,7 +92,7 @@ var _ = Describe("Volume", func() {
 		),
 		Entry("no resources[storage]",
 			&storage.Volume{},
-			ContainElement(RequiredField("spec.resources[storage]")),
+			Not(ContainElement(RequiredField("spec.resources[storage]"))),
 		),
 		Entry("negative resources[storage]",
 			&storage.Volume{

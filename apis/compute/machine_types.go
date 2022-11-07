@@ -93,7 +93,7 @@ type Volume struct {
 
 // VolumeSource specifies the source to use for a Volume.
 type VolumeSource struct {
-	// VolumeRef instructs the Volume to use the specified Volume for the attachment.
+	// VolumeRef instructs to use the specified Volume as source for the attachment.
 	VolumeRef *corev1.LocalObjectReference
 	// EmptyDisk instructs to use a Volume offered by the machine pool provider.
 	EmptyDisk *EmptyDiskVolumeSource
@@ -115,15 +115,35 @@ type EmptyDiskVolumeSource struct {
 type NetworkInterfaceStatus struct {
 	// Name is the name of the NetworkInterface to whom the status belongs to.
 	Name string
-	// Phase is the NetworkInterface binding phase of the NetworkInterface.
-	Phase NetworkInterfacePhase
-	// LastPhaseTransitionTime is the last time the Phase transitioned.
-	LastPhaseTransitionTime *metav1.Time
+	// NetworkHandle is the handle of the network the NetworkInterface is in.
+	NetworkHandle string
 	// IPs are the ips allocated for the network interface.
 	IPs []commonv1alpha1.IP
 	// VirtualIP is the virtual ip allocated for the network interface.
 	VirtualIP *commonv1alpha1.IP
+	// State represents the attachment state of a NetworkInterface.
+	State NetworkInterfaceState
+	// LastStateTransitionTime is the last time the State transitioned.
+	LastStateTransitionTime *metav1.Time
+	// Phase is the NetworkInterface binding phase of the NetworkInterface.
+	Phase NetworkInterfacePhase
+	// LastPhaseTransitionTime is the last time the Phase transitioned.
+	LastPhaseTransitionTime *metav1.Time
 }
+
+// NetworkInterfaceState is the infrastructure attachment state a NetworkInterface can be in.
+type NetworkInterfaceState string
+
+const (
+	// NetworkInterfaceStatePending indicates that the attachment of a network interface is pending.
+	NetworkInterfaceStatePending NetworkInterfaceState = "Pending"
+	// NetworkInterfaceStateAttached indicates that a network interface has been successfully attached.
+	NetworkInterfaceStateAttached NetworkInterfaceState = "Attached"
+	// NetworkInterfaceStateError indicates that there was an error during attaching a network interface.
+	NetworkInterfaceStateError NetworkInterfaceState = "Error"
+	// NetworkInterfaceStateDetached indicates that a network interface has been successfully detached.
+	NetworkInterfaceStateDetached NetworkInterfaceState = "Detached"
+)
 
 // NetworkInterfacePhase represents the binding phase a NetworkInterface can be in.
 type NetworkInterfacePhase string
@@ -135,17 +155,57 @@ const (
 	NetworkInterfacePhaseBound NetworkInterfacePhase = "Bound"
 )
 
+// EmptyDiskVolumeStatus is the status of an EmptyDiskVolumeSource Volume.
+type EmptyDiskVolumeStatus struct {
+	// Size is the current size of the volume, if any discrete size is available.
+	Size *resource.Quantity
+}
+
+type ReferencedVolumeStatus struct {
+	// Driver is the driver used for the volume.
+	Driver string
+	// Handle is the unique provider handle of the volume.
+	Handle string
+}
+
+type VolumeSourceStatus struct {
+	// EmptyDisk indicates the empty disk status of the volume if it's from an empty disk source.
+	EmptyDisk *EmptyDiskVolumeStatus
+	// Referenced is the status of a referenced volume (either VolumeSource.Ephemeral or VolumeSource.VolumeRef).
+	Referenced *ReferencedVolumeStatus
+}
+
 // VolumeStatus is the status of a Volume.
 type VolumeStatus struct {
 	// Name is the name of a volume attachment.
 	Name string
+	// Device is the device the volume is mounted with on the host.
+	Device string
+	// VolumeSourceStatus is the status of the configuration of the volume specified as source.
+	VolumeSourceStatus
+	// State represents the attachment state of a Volume.
+	State VolumeState
+	// LastStateTransitionTime is the last time the State transitioned.
+	LastStateTransitionTime *metav1.Time
 	// Phase represents the binding phase of a Volume.
 	Phase VolumePhase
 	// LastPhaseTransitionTime is the last time the Phase transitioned.
 	LastPhaseTransitionTime *metav1.Time
-	// DeviceID is the disk device ID on the host.
-	DeviceID string
 }
+
+// VolumeState is the infrastructure attachment state a Volume can be in.
+type VolumeState string
+
+const (
+	// VolumeStatePending indicates that the attachment of a volume is pending.
+	VolumeStatePending VolumeState = "Pending"
+	// VolumeStateAttached indicates that a volume has been successfully attached.
+	VolumeStateAttached VolumeState = "Attached"
+	// VolumeStateError indicates that there was an error during attaching a volume.
+	VolumeStateError VolumeState = "Error"
+	// VolumeStateDetached indicates that a volume has been successfully detached.
+	VolumeStateDetached VolumeState = "Detached"
+)
 
 // VolumePhase represents the binding phase a Volume can be in.
 type VolumePhase string
@@ -234,6 +294,7 @@ type MachineList struct {
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// +k8s:conversion-gen:explicit-from=net/url.Values
 
 // MachineExecOptions is the query options to a Machine's remote exec call
 type MachineExecOptions struct {

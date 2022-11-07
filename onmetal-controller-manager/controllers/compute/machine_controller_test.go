@@ -45,8 +45,16 @@ var _ = Describe("MachineReconciler", func() {
 				Namespace:    ns.Name,
 				GenerateName: "network-",
 			},
+			Spec: networkingv1alpha1.NetworkSpec{
+				ProviderID: "foo",
+			},
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())
+
+		By("patching the network to be ready")
+		baseNetwork := network.DeepCopy()
+		network.Status.State = networkingv1alpha1.NetworkStateAvailable
+		Expect(k8sClient.Status().Patch(ctx, network, client.MergeFrom(baseNetwork))).To(Succeed())
 
 		By("creating a machine")
 		machine := &computev1alpha1.Machine{

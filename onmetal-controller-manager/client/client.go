@@ -27,6 +27,7 @@ const (
 	MachineSpecVolumeNamesField           = "machine-spec-volume-names"
 
 	NetworkInterfaceVirtualIPNames = "networkinterface-virtual-ip-names"
+	NetworkInterfaceNetworkName    = "networkinterface-network-name"
 )
 
 func SetupMachineSpecNetworkInterfaceNamesFieldIndexer(ctx context.Context, indexer client.FieldIndexer) error {
@@ -64,5 +65,12 @@ func SetupNetworkInterfaceVirtualIPNameFieldIndexer(ctx context.Context, indexer
 		}
 
 		return []string{virtualIPName}
+	})
+}
+
+func SetupNetworkInterfaceNetworkNameFieldIndexer(ctx context.Context, indexer client.FieldIndexer) error {
+	return indexer.IndexField(ctx, &networkingv1alpha1.NetworkInterface{}, NetworkInterfaceNetworkName, func(obj client.Object) []string {
+		nic := obj.(*networkingv1alpha1.NetworkInterface)
+		return []string{nic.Spec.NetworkRef.Name}
 	})
 }

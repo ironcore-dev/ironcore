@@ -62,10 +62,7 @@ func validateVolumeSpec(spec *storage.VolumeSpec, fldPath *field.Path) field.Err
 		}
 	}
 
-	storageValue, ok := spec.Resources[corev1.ResourceStorage]
-	if !ok {
-		allErrs = append(allErrs, field.Required(fldPath.Child("resources").Key(string(corev1.ResourceStorage)), ""))
-	} else {
+	if storageValue, ok := spec.Resources[corev1.ResourceStorage]; ok {
 		allErrs = append(allErrs, onmetalapivalidation.ValidatePositiveQuantity(storageValue, fldPath.Child("resources").Key(string(corev1.ResourceStorage)))...)
 	}
 

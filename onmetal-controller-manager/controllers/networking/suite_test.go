@@ -124,6 +124,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	DeferCleanup(cancel)
+	Expect(onmetalapiclient.SetupNetworkInterfaceNetworkNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 	Expect(onmetalapiclient.SetupNetworkInterfaceVirtualIPNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 	Expect(onmetalapiclient.SetupMachineSpecNetworkInterfaceNamesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 

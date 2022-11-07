@@ -30,6 +30,68 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+type VolumeState int32
+
+const (
+	VolumeState_VOLUME_PENDING  VolumeState = 0
+	VolumeState_VOLUME_ATTACHED VolumeState = 1
+	VolumeState_VOLUME_DETACHED VolumeState = 2
+	VolumeState_VOLUME_ERROR    VolumeState = 3
+)
+
+var VolumeState_name = map[int32]string{
+	0: "VOLUME_PENDING",
+	1: "VOLUME_ATTACHED",
+	2: "VOLUME_DETACHED",
+	3: "VOLUME_ERROR",
+}
+
+var VolumeState_value = map[string]int32{
+	"VOLUME_PENDING":  0,
+	"VOLUME_ATTACHED": 1,
+	"VOLUME_DETACHED": 2,
+	"VOLUME_ERROR":    3,
+}
+
+func (x VolumeState) String() string {
+	return proto.EnumName(VolumeState_name, int32(x))
+}
+
+func (VolumeState) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_00212fb1f9d3bf1c, []int{0}
+}
+
+type NetworkInterfaceState int32
+
+const (
+	NetworkInterfaceState_NETWORK_INTERFACE_PENDING  NetworkInterfaceState = 0
+	NetworkInterfaceState_NETWORK_INTERFACE_ATTACHED NetworkInterfaceState = 1
+	NetworkInterfaceState_NETWORK_INTERFACE_DETACHED NetworkInterfaceState = 2
+	NetworkInterfaceState_NETWORK_INTERFACE_ERROR    NetworkInterfaceState = 3
+)
+
+var NetworkInterfaceState_name = map[int32]string{
+	0: "NETWORK_INTERFACE_PENDING",
+	1: "NETWORK_INTERFACE_ATTACHED",
+	2: "NETWORK_INTERFACE_DETACHED",
+	3: "NETWORK_INTERFACE_ERROR",
+}
+
+var NetworkInterfaceState_value = map[string]int32{
+	"NETWORK_INTERFACE_PENDING":  0,
+	"NETWORK_INTERFACE_ATTACHED": 1,
+	"NETWORK_INTERFACE_DETACHED": 2,
+	"NETWORK_INTERFACE_ERROR":    3,
+}
+
+func (x NetworkInterfaceState) String() string {
+	return proto.EnumName(NetworkInterfaceState_name, int32(x))
+}
+
+func (NetworkInterfaceState) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_00212fb1f9d3bf1c, []int{1}
+}
+
 type MachineState int32
 
 const (
@@ -61,7 +123,7 @@ func (x MachineState) String() string {
 }
 
 func (MachineState) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{0}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{2}
 }
 
 type VolumeFilter struct {
@@ -112,8 +174,9 @@ func (m *VolumeFilter) GetMachineId() string {
 
 type VolumeAccessConfig struct {
 	Driver               string            `protobuf:"bytes,1,opt,name=driver,proto3" json:"driver,omitempty"`
-	Attributes           map[string]string `protobuf:"bytes,2,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	SecretData           map[string][]byte `protobuf:"bytes,3,rep,name=secret_data,json=secretData,proto3" json:"secret_data,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Handle               string            `protobuf:"bytes,2,opt,name=handle,proto3" json:"handle,omitempty"`
+	Attributes           map[string]string `protobuf:"bytes,3,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	SecretData           map[string][]byte `protobuf:"bytes,4,rep,name=secret_data,json=secretData,proto3" json:"secret_data,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
 }
@@ -153,6 +216,13 @@ var xxx_messageInfo_VolumeAccessConfig proto.InternalMessageInfo
 func (m *VolumeAccessConfig) GetDriver() string {
 	if m != nil {
 		return m.Driver
+	}
+	return ""
+}
+
+func (m *VolumeAccessConfig) GetHandle() string {
+	if m != nil {
+		return m.Handle
 	}
 	return ""
 }
@@ -216,82 +286,21 @@ func (m *EmptyDiskConfig) GetSizeLimitBytes() uint64 {
 	return 0
 }
 
-type VolumeMachineMetadata struct {
-	Namespace            string   `protobuf:"bytes,1,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Uid                  string   `protobuf:"bytes,3,opt,name=uid,proto3" json:"uid,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *VolumeMachineMetadata) Reset()      { *m = VolumeMachineMetadata{} }
-func (*VolumeMachineMetadata) ProtoMessage() {}
-func (*VolumeMachineMetadata) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{3}
-}
-func (m *VolumeMachineMetadata) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *VolumeMachineMetadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_VolumeMachineMetadata.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *VolumeMachineMetadata) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_VolumeMachineMetadata.Merge(m, src)
-}
-func (m *VolumeMachineMetadata) XXX_Size() int {
-	return m.Size()
-}
-func (m *VolumeMachineMetadata) XXX_DiscardUnknown() {
-	xxx_messageInfo_VolumeMachineMetadata.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_VolumeMachineMetadata proto.InternalMessageInfo
-
-func (m *VolumeMachineMetadata) GetNamespace() string {
-	if m != nil {
-		return m.Namespace
-	}
-	return ""
-}
-
-func (m *VolumeMachineMetadata) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
-func (m *VolumeMachineMetadata) GetUid() string {
-	if m != nil {
-		return m.Uid
-	}
-	return ""
-}
-
 type Volume struct {
-	MachineId            string                 `protobuf:"bytes,1,opt,name=machine_id,json=machineId,proto3" json:"machine_id,omitempty"`
-	MachineMetadata      *VolumeMachineMetadata `protobuf:"bytes,2,opt,name=machine_metadata,json=machineMetadata,proto3" json:"machine_metadata,omitempty"`
-	Name                 string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	Device               string                 `protobuf:"bytes,4,opt,name=device,proto3" json:"device,omitempty"`
-	Access               *VolumeAccessConfig    `protobuf:"bytes,5,opt,name=access,proto3" json:"access,omitempty"`
-	EmptyDisk            *EmptyDiskConfig       `protobuf:"bytes,6,opt,name=empty_disk,json=emptyDisk,proto3" json:"empty_disk,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}               `json:"-"`
-	XXX_sizecache        int32                  `json:"-"`
+	MachineId            string           `protobuf:"bytes,1,opt,name=machine_id,json=machineId,proto3" json:"machine_id,omitempty"`
+	MachineMetadata      *MachineMetadata `protobuf:"bytes,2,opt,name=machine_metadata,json=machineMetadata,proto3" json:"machine_metadata,omitempty"`
+	Name                 string           `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Device               string           `protobuf:"bytes,4,opt,name=device,proto3" json:"device,omitempty"`
+	Access               *VolumeAccess    `protobuf:"bytes,5,opt,name=access,proto3" json:"access,omitempty"`
+	EmptyDisk            *EmptyDisk       `protobuf:"bytes,6,opt,name=empty_disk,json=emptyDisk,proto3" json:"empty_disk,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
+	XXX_sizecache        int32            `json:"-"`
 }
 
 func (m *Volume) Reset()      { *m = Volume{} }
 func (*Volume) ProtoMessage() {}
 func (*Volume) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{4}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{3}
 }
 func (m *Volume) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -327,7 +336,7 @@ func (m *Volume) GetMachineId() string {
 	return ""
 }
 
-func (m *Volume) GetMachineMetadata() *VolumeMachineMetadata {
+func (m *Volume) GetMachineMetadata() *MachineMetadata {
 	if m != nil {
 		return m.MachineMetadata
 	}
@@ -348,18 +357,116 @@ func (m *Volume) GetDevice() string {
 	return ""
 }
 
-func (m *Volume) GetAccess() *VolumeAccessConfig {
+func (m *Volume) GetAccess() *VolumeAccess {
 	if m != nil {
 		return m.Access
 	}
 	return nil
 }
 
-func (m *Volume) GetEmptyDisk() *EmptyDiskConfig {
+func (m *Volume) GetEmptyDisk() *EmptyDisk {
 	if m != nil {
 		return m.EmptyDisk
 	}
 	return nil
+}
+
+type VolumeAccess struct {
+	Driver               string   `protobuf:"bytes,1,opt,name=driver,proto3" json:"driver,omitempty"`
+	Handle               string   `protobuf:"bytes,2,opt,name=handle,proto3" json:"handle,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *VolumeAccess) Reset()      { *m = VolumeAccess{} }
+func (*VolumeAccess) ProtoMessage() {}
+func (*VolumeAccess) Descriptor() ([]byte, []int) {
+	return fileDescriptor_00212fb1f9d3bf1c, []int{4}
+}
+func (m *VolumeAccess) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *VolumeAccess) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_VolumeAccess.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *VolumeAccess) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_VolumeAccess.Merge(m, src)
+}
+func (m *VolumeAccess) XXX_Size() int {
+	return m.Size()
+}
+func (m *VolumeAccess) XXX_DiscardUnknown() {
+	xxx_messageInfo_VolumeAccess.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_VolumeAccess proto.InternalMessageInfo
+
+func (m *VolumeAccess) GetDriver() string {
+	if m != nil {
+		return m.Driver
+	}
+	return ""
+}
+
+func (m *VolumeAccess) GetHandle() string {
+	if m != nil {
+		return m.Handle
+	}
+	return ""
+}
+
+type EmptyDisk struct {
+	SizeLimitBytes       uint64   `protobuf:"varint,1,opt,name=size_limit_bytes,json=sizeLimitBytes,proto3" json:"size_limit_bytes,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *EmptyDisk) Reset()      { *m = EmptyDisk{} }
+func (*EmptyDisk) ProtoMessage() {}
+func (*EmptyDisk) Descriptor() ([]byte, []int) {
+	return fileDescriptor_00212fb1f9d3bf1c, []int{5}
+}
+func (m *EmptyDisk) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *EmptyDisk) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_EmptyDisk.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *EmptyDisk) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_EmptyDisk.Merge(m, src)
+}
+func (m *EmptyDisk) XXX_Size() int {
+	return m.Size()
+}
+func (m *EmptyDisk) XXX_DiscardUnknown() {
+	xxx_messageInfo_EmptyDisk.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_EmptyDisk proto.InternalMessageInfo
+
+func (m *EmptyDisk) GetSizeLimitBytes() uint64 {
+	if m != nil {
+		return m.SizeLimitBytes
+	}
+	return 0
 }
 
 type VolumeConfig struct {
@@ -374,7 +481,7 @@ type VolumeConfig struct {
 func (m *VolumeConfig) Reset()      { *m = VolumeConfig{} }
 func (*VolumeConfig) ProtoMessage() {}
 func (*VolumeConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{5}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{6}
 }
 func (m *VolumeConfig) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -441,7 +548,7 @@ type NetworkInterfaceFilter struct {
 func (m *NetworkInterfaceFilter) Reset()      { *m = NetworkInterfaceFilter{} }
 func (*NetworkInterfaceFilter) ProtoMessage() {}
 func (*NetworkInterfaceFilter) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{6}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{7}
 }
 func (m *NetworkInterfaceFilter) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -478,8 +585,7 @@ func (m *NetworkInterfaceFilter) GetMachineId() string {
 }
 
 type NetworkConfig struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Uid                  string   `protobuf:"bytes,2,opt,name=uid,proto3" json:"uid,omitempty"`
+	Handle               string   `protobuf:"bytes,1,opt,name=handle,proto3" json:"handle,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
@@ -487,7 +593,7 @@ type NetworkConfig struct {
 func (m *NetworkConfig) Reset()      { *m = NetworkConfig{} }
 func (*NetworkConfig) ProtoMessage() {}
 func (*NetworkConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{7}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{8}
 }
 func (m *NetworkConfig) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -516,16 +622,9 @@ func (m *NetworkConfig) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_NetworkConfig proto.InternalMessageInfo
 
-func (m *NetworkConfig) GetName() string {
+func (m *NetworkConfig) GetHandle() string {
 	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
-func (m *NetworkConfig) GetUid() string {
-	if m != nil {
-		return m.Uid
+		return m.Handle
 	}
 	return ""
 }
@@ -539,7 +638,7 @@ type VirtualIPConfig struct {
 func (m *VirtualIPConfig) Reset()      { *m = VirtualIPConfig{} }
 func (*VirtualIPConfig) ProtoMessage() {}
 func (*VirtualIPConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{8}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{9}
 }
 func (m *VirtualIPConfig) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -587,7 +686,7 @@ type NetworkInterfaceConfig struct {
 func (m *NetworkInterfaceConfig) Reset()      { *m = NetworkInterfaceConfig{} }
 func (*NetworkInterfaceConfig) ProtoMessage() {}
 func (*NetworkInterfaceConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{9}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{10}
 }
 func (m *NetworkInterfaceConfig) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -644,76 +743,15 @@ func (m *NetworkInterfaceConfig) GetVirtualIp() *VirtualIPConfig {
 	return nil
 }
 
-type NetworkInterfaceMachineMetadata struct {
-	Namespace            string   `protobuf:"bytes,1,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Uid                  string   `protobuf:"bytes,3,opt,name=uid,proto3" json:"uid,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *NetworkInterfaceMachineMetadata) Reset()      { *m = NetworkInterfaceMachineMetadata{} }
-func (*NetworkInterfaceMachineMetadata) ProtoMessage() {}
-func (*NetworkInterfaceMachineMetadata) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{10}
-}
-func (m *NetworkInterfaceMachineMetadata) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *NetworkInterfaceMachineMetadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_NetworkInterfaceMachineMetadata.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *NetworkInterfaceMachineMetadata) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_NetworkInterfaceMachineMetadata.Merge(m, src)
-}
-func (m *NetworkInterfaceMachineMetadata) XXX_Size() int {
-	return m.Size()
-}
-func (m *NetworkInterfaceMachineMetadata) XXX_DiscardUnknown() {
-	xxx_messageInfo_NetworkInterfaceMachineMetadata.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_NetworkInterfaceMachineMetadata proto.InternalMessageInfo
-
-func (m *NetworkInterfaceMachineMetadata) GetNamespace() string {
-	if m != nil {
-		return m.Namespace
-	}
-	return ""
-}
-
-func (m *NetworkInterfaceMachineMetadata) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
-func (m *NetworkInterfaceMachineMetadata) GetUid() string {
-	if m != nil {
-		return m.Uid
-	}
-	return ""
-}
-
 type NetworkInterface struct {
-	MachineId            string                           `protobuf:"bytes,1,opt,name=machine_id,json=machineId,proto3" json:"machine_id,omitempty"`
-	MachineMetadata      *NetworkInterfaceMachineMetadata `protobuf:"bytes,2,opt,name=machine_metadata,json=machineMetadata,proto3" json:"machine_metadata,omitempty"`
-	Name                 string                           `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	Network              *NetworkConfig                   `protobuf:"bytes,4,opt,name=network,proto3" json:"network,omitempty"`
-	Ips                  []string                         `protobuf:"bytes,5,rep,name=ips,proto3" json:"ips,omitempty"`
-	VirtualIp            *VirtualIPConfig                 `protobuf:"bytes,6,opt,name=virtual_ip,json=virtualIp,proto3" json:"virtual_ip,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                         `json:"-"`
-	XXX_sizecache        int32                            `json:"-"`
+	MachineId            string           `protobuf:"bytes,1,opt,name=machine_id,json=machineId,proto3" json:"machine_id,omitempty"`
+	MachineMetadata      *MachineMetadata `protobuf:"bytes,2,opt,name=machine_metadata,json=machineMetadata,proto3" json:"machine_metadata,omitempty"`
+	Name                 string           `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Network              *NetworkConfig   `protobuf:"bytes,4,opt,name=network,proto3" json:"network,omitempty"`
+	Ips                  []string         `protobuf:"bytes,5,rep,name=ips,proto3" json:"ips,omitempty"`
+	VirtualIp            *VirtualIPConfig `protobuf:"bytes,6,opt,name=virtual_ip,json=virtualIp,proto3" json:"virtual_ip,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
+	XXX_sizecache        int32            `json:"-"`
 }
 
 func (m *NetworkInterface) Reset()      { *m = NetworkInterface{} }
@@ -755,7 +793,7 @@ func (m *NetworkInterface) GetMachineId() string {
 	return ""
 }
 
-func (m *NetworkInterface) GetMachineMetadata() *NetworkInterfaceMachineMetadata {
+func (m *NetworkInterface) GetMachineMetadata() *MachineMetadata {
 	if m != nil {
 		return m.MachineMetadata
 	}
@@ -1172,12 +1210,110 @@ func (m *Machine) GetLabels() map[string]string {
 	return nil
 }
 
+type VolumeAccessStatus struct {
+	Driver               string   `protobuf:"bytes,1,opt,name=driver,proto3" json:"driver,omitempty"`
+	Handle               string   `protobuf:"bytes,2,opt,name=handle,proto3" json:"handle,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *VolumeAccessStatus) Reset()      { *m = VolumeAccessStatus{} }
+func (*VolumeAccessStatus) ProtoMessage() {}
+func (*VolumeAccessStatus) Descriptor() ([]byte, []int) {
+	return fileDescriptor_00212fb1f9d3bf1c, []int{18}
+}
+func (m *VolumeAccessStatus) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *VolumeAccessStatus) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_VolumeAccessStatus.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *VolumeAccessStatus) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_VolumeAccessStatus.Merge(m, src)
+}
+func (m *VolumeAccessStatus) XXX_Size() int {
+	return m.Size()
+}
+func (m *VolumeAccessStatus) XXX_DiscardUnknown() {
+	xxx_messageInfo_VolumeAccessStatus.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_VolumeAccessStatus proto.InternalMessageInfo
+
+func (m *VolumeAccessStatus) GetDriver() string {
+	if m != nil {
+		return m.Driver
+	}
+	return ""
+}
+
+func (m *VolumeAccessStatus) GetHandle() string {
+	if m != nil {
+		return m.Handle
+	}
+	return ""
+}
+
+type EmptyDiskStatus struct {
+	SizeBytes            uint64   `protobuf:"varint,1,opt,name=size_bytes,json=sizeBytes,proto3" json:"size_bytes,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *EmptyDiskStatus) Reset()      { *m = EmptyDiskStatus{} }
+func (*EmptyDiskStatus) ProtoMessage() {}
+func (*EmptyDiskStatus) Descriptor() ([]byte, []int) {
+	return fileDescriptor_00212fb1f9d3bf1c, []int{19}
+}
+func (m *EmptyDiskStatus) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *EmptyDiskStatus) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_EmptyDiskStatus.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *EmptyDiskStatus) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_EmptyDiskStatus.Merge(m, src)
+}
+func (m *EmptyDiskStatus) XXX_Size() int {
+	return m.Size()
+}
+func (m *EmptyDiskStatus) XXX_DiscardUnknown() {
+	xxx_messageInfo_EmptyDiskStatus.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_EmptyDiskStatus proto.InternalMessageInfo
+
+func (m *EmptyDiskStatus) GetSizeBytes() uint64 {
+	if m != nil {
+		return m.SizeBytes
+	}
+	return 0
+}
+
 type VolumeStatus struct {
 	Name                 string              `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Device               string              `protobuf:"bytes,2,opt,name=device,proto3" json:"device,omitempty"`
-	Access               *VolumeAccessConfig `protobuf:"bytes,3,opt,name=access,proto3" json:"access,omitempty"`
-	EmptyDisk            *EmptyDiskConfig    `protobuf:"bytes,4,opt,name=empty_disk,json=emptyDisk,proto3" json:"empty_disk,omitempty"`
-	DeviceId             string              `protobuf:"bytes,5,opt,name=device_id,json=deviceId,proto3" json:"device_id,omitempty"`
+	State                VolumeState         `protobuf:"varint,3,opt,name=state,proto3,enum=runtime.v1alpha1.VolumeState" json:"state,omitempty"`
+	Access               *VolumeAccessStatus `protobuf:"bytes,4,opt,name=access,proto3" json:"access,omitempty"`
+	EmptyDisk            *EmptyDiskStatus    `protobuf:"bytes,5,opt,name=empty_disk,json=emptyDisk,proto3" json:"empty_disk,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
 	XXX_sizecache        int32               `json:"-"`
 }
@@ -1185,7 +1321,7 @@ type VolumeStatus struct {
 func (m *VolumeStatus) Reset()      { *m = VolumeStatus{} }
 func (*VolumeStatus) ProtoMessage() {}
 func (*VolumeStatus) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{18}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{20}
 }
 func (m *VolumeStatus) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1228,30 +1364,29 @@ func (m *VolumeStatus) GetDevice() string {
 	return ""
 }
 
-func (m *VolumeStatus) GetAccess() *VolumeAccessConfig {
+func (m *VolumeStatus) GetState() VolumeState {
+	if m != nil {
+		return m.State
+	}
+	return VolumeState_VOLUME_PENDING
+}
+
+func (m *VolumeStatus) GetAccess() *VolumeAccessStatus {
 	if m != nil {
 		return m.Access
 	}
 	return nil
 }
 
-func (m *VolumeStatus) GetEmptyDisk() *EmptyDiskConfig {
+func (m *VolumeStatus) GetEmptyDisk() *EmptyDiskStatus {
 	if m != nil {
 		return m.EmptyDisk
 	}
 	return nil
 }
 
-func (m *VolumeStatus) GetDeviceId() string {
-	if m != nil {
-		return m.DeviceId
-	}
-	return ""
-}
-
 type NetworkStatus struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Uid                  string   `protobuf:"bytes,2,opt,name=uid,proto3" json:"uid,omitempty"`
+	Handle               string   `protobuf:"bytes,1,opt,name=handle,proto3" json:"handle,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
@@ -1259,7 +1394,7 @@ type NetworkStatus struct {
 func (m *NetworkStatus) Reset()      { *m = NetworkStatus{} }
 func (*NetworkStatus) ProtoMessage() {}
 func (*NetworkStatus) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{19}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{21}
 }
 func (m *NetworkStatus) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1288,16 +1423,9 @@ func (m *NetworkStatus) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_NetworkStatus proto.InternalMessageInfo
 
-func (m *NetworkStatus) GetName() string {
+func (m *NetworkStatus) GetHandle() string {
 	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
-func (m *NetworkStatus) GetUid() string {
-	if m != nil {
-		return m.Uid
+		return m.Handle
 	}
 	return ""
 }
@@ -1311,7 +1439,7 @@ type VirtualIPStatus struct {
 func (m *VirtualIPStatus) Reset()      { *m = VirtualIPStatus{} }
 func (*VirtualIPStatus) ProtoMessage() {}
 func (*VirtualIPStatus) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{20}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{22}
 }
 func (m *VirtualIPStatus) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1348,18 +1476,19 @@ func (m *VirtualIPStatus) GetIp() string {
 }
 
 type NetworkInterfaceStatus struct {
-	Name                 string           `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Network              *NetworkStatus   `protobuf:"bytes,2,opt,name=network,proto3" json:"network,omitempty"`
-	Ips                  []string         `protobuf:"bytes,3,rep,name=ips,proto3" json:"ips,omitempty"`
-	VirtualIp            *VirtualIPStatus `protobuf:"bytes,4,opt,name=virtual_ip,json=virtualIp,proto3" json:"virtual_ip,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
-	XXX_sizecache        int32            `json:"-"`
+	Name                 string                `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Network              *NetworkStatus        `protobuf:"bytes,2,opt,name=network,proto3" json:"network,omitempty"`
+	Ips                  []string              `protobuf:"bytes,3,rep,name=ips,proto3" json:"ips,omitempty"`
+	VirtualIp            *VirtualIPStatus      `protobuf:"bytes,4,opt,name=virtual_ip,json=virtualIp,proto3" json:"virtual_ip,omitempty"`
+	State                NetworkInterfaceState `protobuf:"varint,5,opt,name=state,proto3,enum=runtime.v1alpha1.NetworkInterfaceState" json:"state,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
+	XXX_sizecache        int32                 `json:"-"`
 }
 
 func (m *NetworkInterfaceStatus) Reset()      { *m = NetworkInterfaceStatus{} }
 func (*NetworkInterfaceStatus) ProtoMessage() {}
 func (*NetworkInterfaceStatus) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{21}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{23}
 }
 func (m *NetworkInterfaceStatus) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1416,6 +1545,13 @@ func (m *NetworkInterfaceStatus) GetVirtualIp() *VirtualIPStatus {
 	return nil
 }
 
+func (m *NetworkInterfaceStatus) GetState() NetworkInterfaceState {
+	if m != nil {
+		return m.State
+	}
+	return NetworkInterfaceState_NETWORK_INTERFACE_PENDING
+}
+
 type MachineStatus struct {
 	Id                   string                    `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Metadata             *MachineMetadata          `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
@@ -1433,7 +1569,7 @@ type MachineStatus struct {
 func (m *MachineStatus) Reset()      { *m = MachineStatus{} }
 func (*MachineStatus) ProtoMessage() {}
 func (*MachineStatus) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{22}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{24}
 }
 func (m *MachineStatus) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1534,7 +1670,7 @@ type ListMachinesRequest struct {
 func (m *ListMachinesRequest) Reset()      { *m = ListMachinesRequest{} }
 func (*ListMachinesRequest) ProtoMessage() {}
 func (*ListMachinesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{23}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{25}
 }
 func (m *ListMachinesRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1579,7 +1715,7 @@ type ListMachinesResponse struct {
 func (m *ListMachinesResponse) Reset()      { *m = ListMachinesResponse{} }
 func (*ListMachinesResponse) ProtoMessage() {}
 func (*ListMachinesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{24}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{26}
 }
 func (m *ListMachinesResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1624,7 +1760,7 @@ type CreateMachineRequest struct {
 func (m *CreateMachineRequest) Reset()      { *m = CreateMachineRequest{} }
 func (*CreateMachineRequest) ProtoMessage() {}
 func (*CreateMachineRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{25}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{27}
 }
 func (m *CreateMachineRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1669,7 +1805,7 @@ type CreateMachineResponse struct {
 func (m *CreateMachineResponse) Reset()      { *m = CreateMachineResponse{} }
 func (*CreateMachineResponse) ProtoMessage() {}
 func (*CreateMachineResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{26}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{28}
 }
 func (m *CreateMachineResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1714,7 +1850,7 @@ type MachineStatusRequest struct {
 func (m *MachineStatusRequest) Reset()      { *m = MachineStatusRequest{} }
 func (*MachineStatusRequest) ProtoMessage() {}
 func (*MachineStatusRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{27}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{29}
 }
 func (m *MachineStatusRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1759,7 +1895,7 @@ type MachineStatusResponse struct {
 func (m *MachineStatusResponse) Reset()      { *m = MachineStatusResponse{} }
 func (*MachineStatusResponse) ProtoMessage() {}
 func (*MachineStatusResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{28}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{30}
 }
 func (m *MachineStatusResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1804,7 +1940,7 @@ type DeleteMachineRequest struct {
 func (m *DeleteMachineRequest) Reset()      { *m = DeleteMachineRequest{} }
 func (*DeleteMachineRequest) ProtoMessage() {}
 func (*DeleteMachineRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{29}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{31}
 }
 func (m *DeleteMachineRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1848,7 +1984,7 @@ type DeleteMachineResponse struct {
 func (m *DeleteMachineResponse) Reset()      { *m = DeleteMachineResponse{} }
 func (*DeleteMachineResponse) ProtoMessage() {}
 func (*DeleteMachineResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{30}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{32}
 }
 func (m *DeleteMachineResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1886,7 +2022,7 @@ type ListVolumesRequest struct {
 func (m *ListVolumesRequest) Reset()      { *m = ListVolumesRequest{} }
 func (*ListVolumesRequest) ProtoMessage() {}
 func (*ListVolumesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{31}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{33}
 }
 func (m *ListVolumesRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1931,7 +2067,7 @@ type ListVolumesResponse struct {
 func (m *ListVolumesResponse) Reset()      { *m = ListVolumesResponse{} }
 func (*ListVolumesResponse) ProtoMessage() {}
 func (*ListVolumesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{32}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{34}
 }
 func (m *ListVolumesResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1967,24 +2103,24 @@ func (m *ListVolumesResponse) GetVolumes() []*Volume {
 	return nil
 }
 
-type AttachVolumeRequest struct {
+type CreateVolumeRequest struct {
 	MachineId            string        `protobuf:"bytes,1,opt,name=machine_id,json=machineId,proto3" json:"machine_id,omitempty"`
 	Config               *VolumeConfig `protobuf:"bytes,2,opt,name=config,proto3" json:"config,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_sizecache        int32         `json:"-"`
 }
 
-func (m *AttachVolumeRequest) Reset()      { *m = AttachVolumeRequest{} }
-func (*AttachVolumeRequest) ProtoMessage() {}
-func (*AttachVolumeRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{33}
+func (m *CreateVolumeRequest) Reset()      { *m = CreateVolumeRequest{} }
+func (*CreateVolumeRequest) ProtoMessage() {}
+func (*CreateVolumeRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_00212fb1f9d3bf1c, []int{35}
 }
-func (m *AttachVolumeRequest) XXX_Unmarshal(b []byte) error {
+func (m *CreateVolumeRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *AttachVolumeRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *CreateVolumeRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_AttachVolumeRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_CreateVolumeRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -1994,163 +2130,48 @@ func (m *AttachVolumeRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return b[:n], nil
 	}
 }
-func (m *AttachVolumeRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AttachVolumeRequest.Merge(m, src)
+func (m *CreateVolumeRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateVolumeRequest.Merge(m, src)
 }
-func (m *AttachVolumeRequest) XXX_Size() int {
+func (m *CreateVolumeRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *AttachVolumeRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_AttachVolumeRequest.DiscardUnknown(m)
+func (m *CreateVolumeRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateVolumeRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_AttachVolumeRequest proto.InternalMessageInfo
+var xxx_messageInfo_CreateVolumeRequest proto.InternalMessageInfo
 
-func (m *AttachVolumeRequest) GetMachineId() string {
+func (m *CreateVolumeRequest) GetMachineId() string {
 	if m != nil {
 		return m.MachineId
 	}
 	return ""
 }
 
-func (m *AttachVolumeRequest) GetConfig() *VolumeConfig {
+func (m *CreateVolumeRequest) GetConfig() *VolumeConfig {
 	if m != nil {
 		return m.Config
 	}
 	return nil
 }
 
-type AttachVolumeResponse struct {
-	DeviceId             string   `protobuf:"bytes,1,opt,name=device_id,json=deviceId,proto3" json:"device_id,omitempty"`
+type CreateVolumeResponse struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *AttachVolumeResponse) Reset()      { *m = AttachVolumeResponse{} }
-func (*AttachVolumeResponse) ProtoMessage() {}
-func (*AttachVolumeResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{34}
-}
-func (m *AttachVolumeResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *AttachVolumeResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_AttachVolumeResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *AttachVolumeResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AttachVolumeResponse.Merge(m, src)
-}
-func (m *AttachVolumeResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *AttachVolumeResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_AttachVolumeResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_AttachVolumeResponse proto.InternalMessageInfo
-
-func (m *AttachVolumeResponse) GetDeviceId() string {
-	if m != nil {
-		return m.DeviceId
-	}
-	return ""
-}
-
-type UpdateVolumeRequest struct {
-	MachineId            string              `protobuf:"bytes,1,opt,name=machine_id,json=machineId,proto3" json:"machine_id,omitempty"`
-	VolumeName           string              `protobuf:"bytes,2,opt,name=volume_name,json=volumeName,proto3" json:"volume_name,omitempty"`
-	Access               *VolumeAccessConfig `protobuf:"bytes,3,opt,name=access,proto3" json:"access,omitempty"`
-	EmptyDisk            *EmptyDiskConfig    `protobuf:"bytes,4,opt,name=empty_disk,json=emptyDisk,proto3" json:"empty_disk,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
-	XXX_sizecache        int32               `json:"-"`
-}
-
-func (m *UpdateVolumeRequest) Reset()      { *m = UpdateVolumeRequest{} }
-func (*UpdateVolumeRequest) ProtoMessage() {}
-func (*UpdateVolumeRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{35}
-}
-func (m *UpdateVolumeRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *UpdateVolumeRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_UpdateVolumeRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *UpdateVolumeRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UpdateVolumeRequest.Merge(m, src)
-}
-func (m *UpdateVolumeRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *UpdateVolumeRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_UpdateVolumeRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_UpdateVolumeRequest proto.InternalMessageInfo
-
-func (m *UpdateVolumeRequest) GetMachineId() string {
-	if m != nil {
-		return m.MachineId
-	}
-	return ""
-}
-
-func (m *UpdateVolumeRequest) GetVolumeName() string {
-	if m != nil {
-		return m.VolumeName
-	}
-	return ""
-}
-
-func (m *UpdateVolumeRequest) GetAccess() *VolumeAccessConfig {
-	if m != nil {
-		return m.Access
-	}
-	return nil
-}
-
-func (m *UpdateVolumeRequest) GetEmptyDisk() *EmptyDiskConfig {
-	if m != nil {
-		return m.EmptyDisk
-	}
-	return nil
-}
-
-type UpdateVolumeResponse struct {
-	DeviceId             string   `protobuf:"bytes,1,opt,name=device_id,json=deviceId,proto3" json:"device_id,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *UpdateVolumeResponse) Reset()      { *m = UpdateVolumeResponse{} }
-func (*UpdateVolumeResponse) ProtoMessage() {}
-func (*UpdateVolumeResponse) Descriptor() ([]byte, []int) {
+func (m *CreateVolumeResponse) Reset()      { *m = CreateVolumeResponse{} }
+func (*CreateVolumeResponse) ProtoMessage() {}
+func (*CreateVolumeResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_00212fb1f9d3bf1c, []int{36}
 }
-func (m *UpdateVolumeResponse) XXX_Unmarshal(b []byte) error {
+func (m *CreateVolumeResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *UpdateVolumeResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *CreateVolumeResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_UpdateVolumeResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_CreateVolumeResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -2160,43 +2181,36 @@ func (m *UpdateVolumeResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return b[:n], nil
 	}
 }
-func (m *UpdateVolumeResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UpdateVolumeResponse.Merge(m, src)
+func (m *CreateVolumeResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateVolumeResponse.Merge(m, src)
 }
-func (m *UpdateVolumeResponse) XXX_Size() int {
+func (m *CreateVolumeResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *UpdateVolumeResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_UpdateVolumeResponse.DiscardUnknown(m)
+func (m *CreateVolumeResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateVolumeResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_UpdateVolumeResponse proto.InternalMessageInfo
+var xxx_messageInfo_CreateVolumeResponse proto.InternalMessageInfo
 
-func (m *UpdateVolumeResponse) GetDeviceId() string {
-	if m != nil {
-		return m.DeviceId
-	}
-	return ""
-}
-
-type DetachVolumeRequest struct {
+type DeleteVolumeRequest struct {
 	MachineId            string   `protobuf:"bytes,1,opt,name=machine_id,json=machineId,proto3" json:"machine_id,omitempty"`
 	VolumeName           string   `protobuf:"bytes,2,opt,name=volume_name,json=volumeName,proto3" json:"volume_name,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *DetachVolumeRequest) Reset()      { *m = DetachVolumeRequest{} }
-func (*DetachVolumeRequest) ProtoMessage() {}
-func (*DetachVolumeRequest) Descriptor() ([]byte, []int) {
+func (m *DeleteVolumeRequest) Reset()      { *m = DeleteVolumeRequest{} }
+func (*DeleteVolumeRequest) ProtoMessage() {}
+func (*DeleteVolumeRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_00212fb1f9d3bf1c, []int{37}
 }
-func (m *DetachVolumeRequest) XXX_Unmarshal(b []byte) error {
+func (m *DeleteVolumeRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *DetachVolumeRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *DeleteVolumeRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_DetachVolumeRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_DeleteVolumeRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -2206,48 +2220,48 @@ func (m *DetachVolumeRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return b[:n], nil
 	}
 }
-func (m *DetachVolumeRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DetachVolumeRequest.Merge(m, src)
+func (m *DeleteVolumeRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeleteVolumeRequest.Merge(m, src)
 }
-func (m *DetachVolumeRequest) XXX_Size() int {
+func (m *DeleteVolumeRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *DetachVolumeRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_DetachVolumeRequest.DiscardUnknown(m)
+func (m *DeleteVolumeRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeleteVolumeRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_DetachVolumeRequest proto.InternalMessageInfo
+var xxx_messageInfo_DeleteVolumeRequest proto.InternalMessageInfo
 
-func (m *DetachVolumeRequest) GetMachineId() string {
+func (m *DeleteVolumeRequest) GetMachineId() string {
 	if m != nil {
 		return m.MachineId
 	}
 	return ""
 }
 
-func (m *DetachVolumeRequest) GetVolumeName() string {
+func (m *DeleteVolumeRequest) GetVolumeName() string {
 	if m != nil {
 		return m.VolumeName
 	}
 	return ""
 }
 
-type DetachVolumeResponse struct {
+type DeleteVolumeResponse struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *DetachVolumeResponse) Reset()      { *m = DetachVolumeResponse{} }
-func (*DetachVolumeResponse) ProtoMessage() {}
-func (*DetachVolumeResponse) Descriptor() ([]byte, []int) {
+func (m *DeleteVolumeResponse) Reset()      { *m = DeleteVolumeResponse{} }
+func (*DeleteVolumeResponse) ProtoMessage() {}
+func (*DeleteVolumeResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_00212fb1f9d3bf1c, []int{38}
 }
-func (m *DetachVolumeResponse) XXX_Unmarshal(b []byte) error {
+func (m *DeleteVolumeResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *DetachVolumeResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *DeleteVolumeResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_DetachVolumeResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_DeleteVolumeResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -2257,176 +2271,17 @@ func (m *DetachVolumeResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return b[:n], nil
 	}
 }
-func (m *DetachVolumeResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DetachVolumeResponse.Merge(m, src)
+func (m *DeleteVolumeResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeleteVolumeResponse.Merge(m, src)
 }
-func (m *DetachVolumeResponse) XXX_Size() int {
+func (m *DeleteVolumeResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *DetachVolumeResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_DetachVolumeResponse.DiscardUnknown(m)
+func (m *DeleteVolumeResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeleteVolumeResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_DetachVolumeResponse proto.InternalMessageInfo
-
-type ConfirmVolumeRequest struct {
-	MachineId            string              `protobuf:"bytes,1,opt,name=machine_id,json=machineId,proto3" json:"machine_id,omitempty"`
-	VolumeName           string              `protobuf:"bytes,2,opt,name=volume_name,json=volumeName,proto3" json:"volume_name,omitempty"`
-	Access               *VolumeAccessConfig `protobuf:"bytes,3,opt,name=access,proto3" json:"access,omitempty"`
-	EmptyDisk            *EmptyDiskConfig    `protobuf:"bytes,4,opt,name=empty_disk,json=emptyDisk,proto3" json:"empty_disk,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
-	XXX_sizecache        int32               `json:"-"`
-}
-
-func (m *ConfirmVolumeRequest) Reset()      { *m = ConfirmVolumeRequest{} }
-func (*ConfirmVolumeRequest) ProtoMessage() {}
-func (*ConfirmVolumeRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{39}
-}
-func (m *ConfirmVolumeRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ConfirmVolumeRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ConfirmVolumeRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *ConfirmVolumeRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ConfirmVolumeRequest.Merge(m, src)
-}
-func (m *ConfirmVolumeRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *ConfirmVolumeRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_ConfirmVolumeRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ConfirmVolumeRequest proto.InternalMessageInfo
-
-func (m *ConfirmVolumeRequest) GetMachineId() string {
-	if m != nil {
-		return m.MachineId
-	}
-	return ""
-}
-
-func (m *ConfirmVolumeRequest) GetVolumeName() string {
-	if m != nil {
-		return m.VolumeName
-	}
-	return ""
-}
-
-func (m *ConfirmVolumeRequest) GetAccess() *VolumeAccessConfig {
-	if m != nil {
-		return m.Access
-	}
-	return nil
-}
-
-func (m *ConfirmVolumeRequest) GetEmptyDisk() *EmptyDiskConfig {
-	if m != nil {
-		return m.EmptyDisk
-	}
-	return nil
-}
-
-type VolumeConfirmation struct {
-	DeviceId             string   `protobuf:"bytes,1,opt,name=device_id,json=deviceId,proto3" json:"device_id,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *VolumeConfirmation) Reset()      { *m = VolumeConfirmation{} }
-func (*VolumeConfirmation) ProtoMessage() {}
-func (*VolumeConfirmation) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{40}
-}
-func (m *VolumeConfirmation) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *VolumeConfirmation) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_VolumeConfirmation.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *VolumeConfirmation) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_VolumeConfirmation.Merge(m, src)
-}
-func (m *VolumeConfirmation) XXX_Size() int {
-	return m.Size()
-}
-func (m *VolumeConfirmation) XXX_DiscardUnknown() {
-	xxx_messageInfo_VolumeConfirmation.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_VolumeConfirmation proto.InternalMessageInfo
-
-func (m *VolumeConfirmation) GetDeviceId() string {
-	if m != nil {
-		return m.DeviceId
-	}
-	return ""
-}
-
-type ConfirmVolumeResponse struct {
-	Confirmation         *VolumeConfirmation `protobuf:"bytes,1,opt,name=confirmation,proto3" json:"confirmation,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
-	XXX_sizecache        int32               `json:"-"`
-}
-
-func (m *ConfirmVolumeResponse) Reset()      { *m = ConfirmVolumeResponse{} }
-func (*ConfirmVolumeResponse) ProtoMessage() {}
-func (*ConfirmVolumeResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{41}
-}
-func (m *ConfirmVolumeResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ConfirmVolumeResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ConfirmVolumeResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *ConfirmVolumeResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ConfirmVolumeResponse.Merge(m, src)
-}
-func (m *ConfirmVolumeResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *ConfirmVolumeResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_ConfirmVolumeResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ConfirmVolumeResponse proto.InternalMessageInfo
-
-func (m *ConfirmVolumeResponse) GetConfirmation() *VolumeConfirmation {
-	if m != nil {
-		return m.Confirmation
-	}
-	return nil
-}
+var xxx_messageInfo_DeleteVolumeResponse proto.InternalMessageInfo
 
 type ListNetworkInterfacesRequest struct {
 	Filter               *NetworkInterfaceFilter `protobuf:"bytes,1,opt,name=filter,proto3" json:"filter,omitempty"`
@@ -2437,7 +2292,7 @@ type ListNetworkInterfacesRequest struct {
 func (m *ListNetworkInterfacesRequest) Reset()      { *m = ListNetworkInterfacesRequest{} }
 func (*ListNetworkInterfacesRequest) ProtoMessage() {}
 func (*ListNetworkInterfacesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{42}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{39}
 }
 func (m *ListNetworkInterfacesRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -2482,7 +2337,7 @@ type ListNetworkInterfacesResponse struct {
 func (m *ListNetworkInterfacesResponse) Reset()      { *m = ListNetworkInterfacesResponse{} }
 func (*ListNetworkInterfacesResponse) ProtoMessage() {}
 func (*ListNetworkInterfacesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{43}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{40}
 }
 func (m *ListNetworkInterfacesResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -2518,24 +2373,24 @@ func (m *ListNetworkInterfacesResponse) GetNetworkInterfaces() []*NetworkInterfa
 	return nil
 }
 
-type AttachNetworkInterfaceRequest struct {
+type CreateNetworkInterfaceRequest struct {
 	MachineId            string                  `protobuf:"bytes,1,opt,name=machine_id,json=machineId,proto3" json:"machine_id,omitempty"`
 	Config               *NetworkInterfaceConfig `protobuf:"bytes,2,opt,name=config,proto3" json:"config,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                `json:"-"`
 	XXX_sizecache        int32                   `json:"-"`
 }
 
-func (m *AttachNetworkInterfaceRequest) Reset()      { *m = AttachNetworkInterfaceRequest{} }
-func (*AttachNetworkInterfaceRequest) ProtoMessage() {}
-func (*AttachNetworkInterfaceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{44}
+func (m *CreateNetworkInterfaceRequest) Reset()      { *m = CreateNetworkInterfaceRequest{} }
+func (*CreateNetworkInterfaceRequest) ProtoMessage() {}
+func (*CreateNetworkInterfaceRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_00212fb1f9d3bf1c, []int{41}
 }
-func (m *AttachNetworkInterfaceRequest) XXX_Unmarshal(b []byte) error {
+func (m *CreateNetworkInterfaceRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *AttachNetworkInterfaceRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *CreateNetworkInterfaceRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_AttachNetworkInterfaceRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_CreateNetworkInterfaceRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -2545,48 +2400,48 @@ func (m *AttachNetworkInterfaceRequest) XXX_Marshal(b []byte, deterministic bool
 		return b[:n], nil
 	}
 }
-func (m *AttachNetworkInterfaceRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AttachNetworkInterfaceRequest.Merge(m, src)
+func (m *CreateNetworkInterfaceRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateNetworkInterfaceRequest.Merge(m, src)
 }
-func (m *AttachNetworkInterfaceRequest) XXX_Size() int {
+func (m *CreateNetworkInterfaceRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *AttachNetworkInterfaceRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_AttachNetworkInterfaceRequest.DiscardUnknown(m)
+func (m *CreateNetworkInterfaceRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateNetworkInterfaceRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_AttachNetworkInterfaceRequest proto.InternalMessageInfo
+var xxx_messageInfo_CreateNetworkInterfaceRequest proto.InternalMessageInfo
 
-func (m *AttachNetworkInterfaceRequest) GetMachineId() string {
+func (m *CreateNetworkInterfaceRequest) GetMachineId() string {
 	if m != nil {
 		return m.MachineId
 	}
 	return ""
 }
 
-func (m *AttachNetworkInterfaceRequest) GetConfig() *NetworkInterfaceConfig {
+func (m *CreateNetworkInterfaceRequest) GetConfig() *NetworkInterfaceConfig {
 	if m != nil {
 		return m.Config
 	}
 	return nil
 }
 
-type AttachNetworkInterfaceResponse struct {
+type CreateNetworkInterfaceResponse struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *AttachNetworkInterfaceResponse) Reset()      { *m = AttachNetworkInterfaceResponse{} }
-func (*AttachNetworkInterfaceResponse) ProtoMessage() {}
-func (*AttachNetworkInterfaceResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{45}
+func (m *CreateNetworkInterfaceResponse) Reset()      { *m = CreateNetworkInterfaceResponse{} }
+func (*CreateNetworkInterfaceResponse) ProtoMessage() {}
+func (*CreateNetworkInterfaceResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_00212fb1f9d3bf1c, []int{42}
 }
-func (m *AttachNetworkInterfaceResponse) XXX_Unmarshal(b []byte) error {
+func (m *CreateNetworkInterfaceResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *AttachNetworkInterfaceResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *CreateNetworkInterfaceResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_AttachNetworkInterfaceResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_CreateNetworkInterfaceResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -2596,17 +2451,17 @@ func (m *AttachNetworkInterfaceResponse) XXX_Marshal(b []byte, deterministic boo
 		return b[:n], nil
 	}
 }
-func (m *AttachNetworkInterfaceResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AttachNetworkInterfaceResponse.Merge(m, src)
+func (m *CreateNetworkInterfaceResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateNetworkInterfaceResponse.Merge(m, src)
 }
-func (m *AttachNetworkInterfaceResponse) XXX_Size() int {
+func (m *CreateNetworkInterfaceResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *AttachNetworkInterfaceResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_AttachNetworkInterfaceResponse.DiscardUnknown(m)
+func (m *CreateNetworkInterfaceResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateNetworkInterfaceResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_AttachNetworkInterfaceResponse proto.InternalMessageInfo
+var xxx_messageInfo_CreateNetworkInterfaceResponse proto.InternalMessageInfo
 
 type UpdateNetworkInterfaceRequest struct {
 	MachineId            string           `protobuf:"bytes,1,opt,name=machine_id,json=machineId,proto3" json:"machine_id,omitempty"`
@@ -2620,7 +2475,7 @@ type UpdateNetworkInterfaceRequest struct {
 func (m *UpdateNetworkInterfaceRequest) Reset()      { *m = UpdateNetworkInterfaceRequest{} }
 func (*UpdateNetworkInterfaceRequest) ProtoMessage() {}
 func (*UpdateNetworkInterfaceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{46}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{43}
 }
 func (m *UpdateNetworkInterfaceRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -2685,7 +2540,7 @@ type UpdateNetworkInterfaceResponse struct {
 func (m *UpdateNetworkInterfaceResponse) Reset()      { *m = UpdateNetworkInterfaceResponse{} }
 func (*UpdateNetworkInterfaceResponse) ProtoMessage() {}
 func (*UpdateNetworkInterfaceResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{47}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{44}
 }
 func (m *UpdateNetworkInterfaceResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -2714,24 +2569,24 @@ func (m *UpdateNetworkInterfaceResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_UpdateNetworkInterfaceResponse proto.InternalMessageInfo
 
-type DetachNetworkInterfaceRequest struct {
+type DeleteNetworkInterfaceRequest struct {
 	MachineId            string   `protobuf:"bytes,1,opt,name=machine_id,json=machineId,proto3" json:"machine_id,omitempty"`
 	NetworkInterfaceName string   `protobuf:"bytes,2,opt,name=network_interface_name,json=networkInterfaceName,proto3" json:"network_interface_name,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *DetachNetworkInterfaceRequest) Reset()      { *m = DetachNetworkInterfaceRequest{} }
-func (*DetachNetworkInterfaceRequest) ProtoMessage() {}
-func (*DetachNetworkInterfaceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{48}
+func (m *DeleteNetworkInterfaceRequest) Reset()      { *m = DeleteNetworkInterfaceRequest{} }
+func (*DeleteNetworkInterfaceRequest) ProtoMessage() {}
+func (*DeleteNetworkInterfaceRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_00212fb1f9d3bf1c, []int{45}
 }
-func (m *DetachNetworkInterfaceRequest) XXX_Unmarshal(b []byte) error {
+func (m *DeleteNetworkInterfaceRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *DetachNetworkInterfaceRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *DeleteNetworkInterfaceRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_DetachNetworkInterfaceRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_DeleteNetworkInterfaceRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -2741,48 +2596,48 @@ func (m *DetachNetworkInterfaceRequest) XXX_Marshal(b []byte, deterministic bool
 		return b[:n], nil
 	}
 }
-func (m *DetachNetworkInterfaceRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DetachNetworkInterfaceRequest.Merge(m, src)
+func (m *DeleteNetworkInterfaceRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeleteNetworkInterfaceRequest.Merge(m, src)
 }
-func (m *DetachNetworkInterfaceRequest) XXX_Size() int {
+func (m *DeleteNetworkInterfaceRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *DetachNetworkInterfaceRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_DetachNetworkInterfaceRequest.DiscardUnknown(m)
+func (m *DeleteNetworkInterfaceRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeleteNetworkInterfaceRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_DetachNetworkInterfaceRequest proto.InternalMessageInfo
+var xxx_messageInfo_DeleteNetworkInterfaceRequest proto.InternalMessageInfo
 
-func (m *DetachNetworkInterfaceRequest) GetMachineId() string {
+func (m *DeleteNetworkInterfaceRequest) GetMachineId() string {
 	if m != nil {
 		return m.MachineId
 	}
 	return ""
 }
 
-func (m *DetachNetworkInterfaceRequest) GetNetworkInterfaceName() string {
+func (m *DeleteNetworkInterfaceRequest) GetNetworkInterfaceName() string {
 	if m != nil {
 		return m.NetworkInterfaceName
 	}
 	return ""
 }
 
-type DetachNetworkInterfaceResponse struct {
+type DeleteNetworkInterfaceResponse struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *DetachNetworkInterfaceResponse) Reset()      { *m = DetachNetworkInterfaceResponse{} }
-func (*DetachNetworkInterfaceResponse) ProtoMessage() {}
-func (*DetachNetworkInterfaceResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{49}
+func (m *DeleteNetworkInterfaceResponse) Reset()      { *m = DeleteNetworkInterfaceResponse{} }
+func (*DeleteNetworkInterfaceResponse) ProtoMessage() {}
+func (*DeleteNetworkInterfaceResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_00212fb1f9d3bf1c, []int{46}
 }
-func (m *DetachNetworkInterfaceResponse) XXX_Unmarshal(b []byte) error {
+func (m *DeleteNetworkInterfaceResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *DetachNetworkInterfaceResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *DeleteNetworkInterfaceResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_DetachNetworkInterfaceResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_DeleteNetworkInterfaceResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -2792,33 +2647,35 @@ func (m *DetachNetworkInterfaceResponse) XXX_Marshal(b []byte, deterministic boo
 		return b[:n], nil
 	}
 }
-func (m *DetachNetworkInterfaceResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DetachNetworkInterfaceResponse.Merge(m, src)
+func (m *DeleteNetworkInterfaceResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeleteNetworkInterfaceResponse.Merge(m, src)
 }
-func (m *DetachNetworkInterfaceResponse) XXX_Size() int {
+func (m *DeleteNetworkInterfaceResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *DetachNetworkInterfaceResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_DetachNetworkInterfaceResponse.DiscardUnknown(m)
+func (m *DeleteNetworkInterfaceResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeleteNetworkInterfaceResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_DetachNetworkInterfaceResponse proto.InternalMessageInfo
+var xxx_messageInfo_DeleteNetworkInterfaceResponse proto.InternalMessageInfo
 
 func init() {
+	proto.RegisterEnum("runtime.v1alpha1.VolumeState", VolumeState_name, VolumeState_value)
+	proto.RegisterEnum("runtime.v1alpha1.NetworkInterfaceState", NetworkInterfaceState_name, NetworkInterfaceState_value)
 	proto.RegisterEnum("runtime.v1alpha1.MachineState", MachineState_name, MachineState_value)
 	proto.RegisterType((*VolumeFilter)(nil), "runtime.v1alpha1.VolumeFilter")
 	proto.RegisterType((*VolumeAccessConfig)(nil), "runtime.v1alpha1.VolumeAccessConfig")
 	proto.RegisterMapType((map[string]string)(nil), "runtime.v1alpha1.VolumeAccessConfig.AttributesEntry")
 	proto.RegisterMapType((map[string][]byte)(nil), "runtime.v1alpha1.VolumeAccessConfig.SecretDataEntry")
 	proto.RegisterType((*EmptyDiskConfig)(nil), "runtime.v1alpha1.EmptyDiskConfig")
-	proto.RegisterType((*VolumeMachineMetadata)(nil), "runtime.v1alpha1.VolumeMachineMetadata")
 	proto.RegisterType((*Volume)(nil), "runtime.v1alpha1.Volume")
+	proto.RegisterType((*VolumeAccess)(nil), "runtime.v1alpha1.VolumeAccess")
+	proto.RegisterType((*EmptyDisk)(nil), "runtime.v1alpha1.EmptyDisk")
 	proto.RegisterType((*VolumeConfig)(nil), "runtime.v1alpha1.VolumeConfig")
 	proto.RegisterType((*NetworkInterfaceFilter)(nil), "runtime.v1alpha1.NetworkInterfaceFilter")
 	proto.RegisterType((*NetworkConfig)(nil), "runtime.v1alpha1.NetworkConfig")
 	proto.RegisterType((*VirtualIPConfig)(nil), "runtime.v1alpha1.VirtualIPConfig")
 	proto.RegisterType((*NetworkInterfaceConfig)(nil), "runtime.v1alpha1.NetworkInterfaceConfig")
-	proto.RegisterType((*NetworkInterfaceMachineMetadata)(nil), "runtime.v1alpha1.NetworkInterfaceMachineMetadata")
 	proto.RegisterType((*NetworkInterface)(nil), "runtime.v1alpha1.NetworkInterface")
 	proto.RegisterType((*IgnitionConfig)(nil), "runtime.v1alpha1.IgnitionConfig")
 	proto.RegisterType((*MachineFilter)(nil), "runtime.v1alpha1.MachineFilter")
@@ -2831,6 +2688,8 @@ func init() {
 	proto.RegisterType((*Machine)(nil), "runtime.v1alpha1.Machine")
 	proto.RegisterMapType((map[string]string)(nil), "runtime.v1alpha1.Machine.AnnotationsEntry")
 	proto.RegisterMapType((map[string]string)(nil), "runtime.v1alpha1.Machine.LabelsEntry")
+	proto.RegisterType((*VolumeAccessStatus)(nil), "runtime.v1alpha1.VolumeAccessStatus")
+	proto.RegisterType((*EmptyDiskStatus)(nil), "runtime.v1alpha1.EmptyDiskStatus")
 	proto.RegisterType((*VolumeStatus)(nil), "runtime.v1alpha1.VolumeStatus")
 	proto.RegisterType((*NetworkStatus)(nil), "runtime.v1alpha1.NetworkStatus")
 	proto.RegisterType((*VirtualIPStatus)(nil), "runtime.v1alpha1.VirtualIPStatus")
@@ -2848,145 +2707,143 @@ func init() {
 	proto.RegisterType((*DeleteMachineResponse)(nil), "runtime.v1alpha1.DeleteMachineResponse")
 	proto.RegisterType((*ListVolumesRequest)(nil), "runtime.v1alpha1.ListVolumesRequest")
 	proto.RegisterType((*ListVolumesResponse)(nil), "runtime.v1alpha1.ListVolumesResponse")
-	proto.RegisterType((*AttachVolumeRequest)(nil), "runtime.v1alpha1.AttachVolumeRequest")
-	proto.RegisterType((*AttachVolumeResponse)(nil), "runtime.v1alpha1.AttachVolumeResponse")
-	proto.RegisterType((*UpdateVolumeRequest)(nil), "runtime.v1alpha1.UpdateVolumeRequest")
-	proto.RegisterType((*UpdateVolumeResponse)(nil), "runtime.v1alpha1.UpdateVolumeResponse")
-	proto.RegisterType((*DetachVolumeRequest)(nil), "runtime.v1alpha1.DetachVolumeRequest")
-	proto.RegisterType((*DetachVolumeResponse)(nil), "runtime.v1alpha1.DetachVolumeResponse")
-	proto.RegisterType((*ConfirmVolumeRequest)(nil), "runtime.v1alpha1.ConfirmVolumeRequest")
-	proto.RegisterType((*VolumeConfirmation)(nil), "runtime.v1alpha1.VolumeConfirmation")
-	proto.RegisterType((*ConfirmVolumeResponse)(nil), "runtime.v1alpha1.ConfirmVolumeResponse")
+	proto.RegisterType((*CreateVolumeRequest)(nil), "runtime.v1alpha1.CreateVolumeRequest")
+	proto.RegisterType((*CreateVolumeResponse)(nil), "runtime.v1alpha1.CreateVolumeResponse")
+	proto.RegisterType((*DeleteVolumeRequest)(nil), "runtime.v1alpha1.DeleteVolumeRequest")
+	proto.RegisterType((*DeleteVolumeResponse)(nil), "runtime.v1alpha1.DeleteVolumeResponse")
 	proto.RegisterType((*ListNetworkInterfacesRequest)(nil), "runtime.v1alpha1.ListNetworkInterfacesRequest")
 	proto.RegisterType((*ListNetworkInterfacesResponse)(nil), "runtime.v1alpha1.ListNetworkInterfacesResponse")
-	proto.RegisterType((*AttachNetworkInterfaceRequest)(nil), "runtime.v1alpha1.AttachNetworkInterfaceRequest")
-	proto.RegisterType((*AttachNetworkInterfaceResponse)(nil), "runtime.v1alpha1.AttachNetworkInterfaceResponse")
+	proto.RegisterType((*CreateNetworkInterfaceRequest)(nil), "runtime.v1alpha1.CreateNetworkInterfaceRequest")
+	proto.RegisterType((*CreateNetworkInterfaceResponse)(nil), "runtime.v1alpha1.CreateNetworkInterfaceResponse")
 	proto.RegisterType((*UpdateNetworkInterfaceRequest)(nil), "runtime.v1alpha1.UpdateNetworkInterfaceRequest")
 	proto.RegisterType((*UpdateNetworkInterfaceResponse)(nil), "runtime.v1alpha1.UpdateNetworkInterfaceResponse")
-	proto.RegisterType((*DetachNetworkInterfaceRequest)(nil), "runtime.v1alpha1.DetachNetworkInterfaceRequest")
-	proto.RegisterType((*DetachNetworkInterfaceResponse)(nil), "runtime.v1alpha1.DetachNetworkInterfaceResponse")
+	proto.RegisterType((*DeleteNetworkInterfaceRequest)(nil), "runtime.v1alpha1.DeleteNetworkInterfaceRequest")
+	proto.RegisterType((*DeleteNetworkInterfaceResponse)(nil), "runtime.v1alpha1.DeleteNetworkInterfaceResponse")
 }
 
 func init() { proto.RegisterFile("api.proto", fileDescriptor_00212fb1f9d3bf1c) }
 
 var fileDescriptor_00212fb1f9d3bf1c = []byte{
-	// 1854 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xdc, 0x5a, 0x4d, 0x73, 0xdb, 0x5c,
-	0x15, 0x8e, 0x6c, 0xc7, 0xb1, 0x8f, 0xf3, 0xe1, 0xf7, 0xc6, 0x09, 0x7e, 0xdd, 0xc6, 0x49, 0x35,
-	0x69, 0x9b, 0x29, 0x53, 0xa7, 0x49, 0x5a, 0xd2, 0x42, 0xcb, 0x24, 0x4d, 0x02, 0xf5, 0x90, 0xb8,
-	0x45, 0x69, 0xda, 0x01, 0x3a, 0x63, 0x14, 0xf9, 0x26, 0xd1, 0xc4, 0xb6, 0x8c, 0x74, 0x1d, 0x08,
-	0x6c, 0xba, 0x67, 0xc3, 0xbf, 0x60, 0xcf, 0x12, 0xf8, 0x01, 0x5d, 0xb2, 0x81, 0xb2, 0x6c, 0xc3,
-	0x9e, 0x0d, 0x7f, 0x80, 0xb9, 0x1f, 0x52, 0x24, 0xf9, 0xca, 0xb2, 0x43, 0x0b, 0xe5, 0xdd, 0x49,
-	0x37, 0xf7, 0x3c, 0xe7, 0x39, 0xdf, 0x47, 0x9e, 0x40, 0x56, 0xef, 0x98, 0x95, 0x8e, 0x6d, 0x11,
-	0x0b, 0xe5, 0xed, 0x6e, 0x9b, 0x98, 0x2d, 0x5c, 0x39, 0x5b, 0xd1, 0x9b, 0x9d, 0x13, 0x7d, 0xa5,
-	0x74, 0xf7, 0xd8, 0x24, 0x27, 0xdd, 0xc3, 0x8a, 0x61, 0xb5, 0x96, 0x8f, 0xad, 0x63, 0x6b, 0x99,
-	0x5d, 0x3c, 0xec, 0x1e, 0xb1, 0x37, 0xf6, 0xc2, 0x9e, 0x38, 0x80, 0x7a, 0x17, 0xc6, 0x5f, 0x59,
-	0xcd, 0x6e, 0x0b, 0xff, 0xc0, 0x6c, 0x12, 0x6c, 0xa3, 0x39, 0x80, 0x96, 0x6e, 0x9c, 0x98, 0x6d,
-	0x5c, 0x37, 0x1b, 0x45, 0x65, 0x41, 0x59, 0xca, 0x6a, 0x59, 0x71, 0x52, 0x6d, 0xa8, 0xef, 0x13,
-	0x80, 0xf8, 0xfd, 0x4d, 0xc3, 0xc0, 0x8e, 0xb3, 0x65, 0xb5, 0x8f, 0xcc, 0x63, 0x34, 0x0b, 0xe9,
-	0x86, 0x6d, 0x9e, 0x61, 0x5b, 0x48, 0x88, 0x37, 0xf4, 0x12, 0x40, 0x27, 0xc4, 0x36, 0x0f, 0xbb,
-	0x04, 0x3b, 0xc5, 0xc4, 0x42, 0x72, 0x29, 0xb7, 0x7a, 0xbf, 0x12, 0xe6, 0x5c, 0xe9, 0x45, 0xac,
-	0x6c, 0x7a, 0x62, 0x3b, 0x6d, 0x62, 0x9f, 0x6b, 0x3e, 0x1c, 0x74, 0x00, 0x39, 0x07, 0x1b, 0x36,
-	0x26, 0xf5, 0x86, 0x4e, 0xf4, 0x62, 0x72, 0x08, 0xd8, 0x7d, 0x26, 0xb7, 0xad, 0x13, 0x5d, 0xc0,
-	0x3a, 0xde, 0x41, 0xe9, 0x09, 0x4c, 0x85, 0xb4, 0xa2, 0x3c, 0x24, 0x4f, 0xf1, 0xb9, 0x30, 0x8a,
-	0x3e, 0xa2, 0x02, 0x8c, 0x9e, 0xe9, 0xcd, 0x2e, 0x2e, 0x26, 0xd8, 0x19, 0x7f, 0xf9, 0x6e, 0xe2,
-	0xa1, 0x42, 0xc5, 0x43, 0xe8, 0x71, 0xe2, 0xe3, 0x3e, 0x71, 0xf5, 0x7b, 0x30, 0xb5, 0xd3, 0xea,
-	0x90, 0xf3, 0x6d, 0xd3, 0x39, 0x15, 0x5e, 0x5d, 0x82, 0xbc, 0x63, 0xfe, 0x1a, 0xd7, 0x9b, 0x66,
-	0xcb, 0x24, 0xf5, 0xc3, 0x73, 0xea, 0x43, 0x8a, 0x95, 0xd2, 0x26, 0xe9, 0xf9, 0x2e, 0x3d, 0x7e,
-	0x4a, 0x4f, 0xd5, 0x9f, 0xc1, 0x0c, 0x37, 0x76, 0x8f, 0x47, 0x6a, 0x0f, 0x13, 0x9d, 0xfa, 0x06,
-	0x5d, 0x87, 0x6c, 0x5b, 0x6f, 0x61, 0xa7, 0xa3, 0x1b, 0xd8, 0x8d, 0xa6, 0x77, 0x80, 0x10, 0xa4,
-	0xe8, 0x8b, 0xb0, 0x85, 0x3d, 0x53, 0xce, 0x5d, 0xb3, 0x51, 0x4c, 0x72, 0xce, 0x5d, 0xb3, 0xa1,
-	0xfe, 0x3e, 0x01, 0x69, 0x8e, 0x1e, 0x93, 0x1d, 0x48, 0x83, 0xbc, 0xfb, 0xe7, 0x96, 0x60, 0xc0,
-	0xb0, 0x73, 0xab, 0xb7, 0xa3, 0xa2, 0x13, 0x22, 0xac, 0x4d, 0xb5, 0x42, 0x16, 0xb8, 0x1c, 0x93,
-	0x3e, 0x8e, 0x34, 0xdd, 0xf0, 0x99, 0x69, 0xe0, 0x62, 0x4a, 0xa4, 0x1b, 0x7b, 0x43, 0x8f, 0x21,
-	0xad, 0xb3, 0x68, 0x17, 0x47, 0x99, 0xd6, 0xc5, 0x41, 0x72, 0x42, 0x13, 0x32, 0x68, 0x03, 0x00,
-	0xd3, 0x08, 0xd4, 0x1b, 0xa6, 0x73, 0x5a, 0x4c, 0x33, 0x84, 0x1b, 0xbd, 0x08, 0xa1, 0x28, 0x69,
-	0x59, 0xec, 0x1e, 0xa8, 0x7f, 0x54, 0xdc, 0x6a, 0x12, 0x11, 0x74, 0xc9, 0x2b, 0x52, 0xf2, 0x89,
-	0x08, 0xf2, 0xc9, 0xff, 0x98, 0x7c, 0xea, 0x0a, 0xe4, 0xd7, 0x61, 0xb6, 0x86, 0xc9, 0x2f, 0x2d,
-	0xfb, 0xb4, 0xda, 0x26, 0xd8, 0x3e, 0xd2, 0x8d, 0x01, 0x7b, 0xc2, 0x03, 0x98, 0x10, 0x82, 0x7d,
-	0xac, 0x16, 0x69, 0x95, 0xb8, 0x4c, 0xab, 0x1b, 0x30, 0xf5, 0xca, 0xb4, 0x49, 0x57, 0x6f, 0x56,
-	0x5f, 0x08, 0xc1, 0x49, 0x48, 0x98, 0x1d, 0x21, 0x96, 0x30, 0x3b, 0xea, 0x9f, 0x94, 0x5e, 0x4e,
-	0x7d, 0x74, 0x3c, 0x82, 0xb1, 0x36, 0xbf, 0x2d, 0xb2, 0x6e, 0xbe, 0xd7, 0x01, 0x01, 0xa6, 0x9a,
-	0x7b, 0x9f, 0xd2, 0x33, 0x3b, 0x0e, 0x6b, 0x25, 0x59, 0x8d, 0x3e, 0x52, 0x87, 0x9e, 0x71, 0x7a,
-	0x75, 0xb3, 0x13, 0xed, 0xd0, 0x90, 0x09, 0x5a, 0x56, 0x08, 0x55, 0x3b, 0x2a, 0x86, 0xf9, 0x30,
-	0xf9, 0xcf, 0x51, 0x9e, 0x7f, 0x48, 0x40, 0x3e, 0xac, 0x27, 0xae, 0x50, 0xdf, 0x44, 0x16, 0xea,
-	0x4a, 0xa4, 0xcb, 0xa2, 0x8c, 0x18, 0xac, 0x64, 0x7d, 0xb1, 0x49, 0x5d, 0x2d, 0x36, 0xa3, 0x51,
-	0xb1, 0x49, 0x5f, 0x21, 0x36, 0x8b, 0x30, 0x59, 0x3d, 0x6e, 0x9b, 0xc4, 0xb4, 0xda, 0x97, 0x09,
-	0xc5, 0xdc, 0xa0, 0xb0, 0xc6, 0xcc, 0x9e, 0xd5, 0x3f, 0x2b, 0x30, 0x21, 0xac, 0x15, 0xa5, 0x40,
-	0x33, 0xb4, 0xe1, 0x65, 0x68, 0x03, 0xfd, 0x04, 0x26, 0x9b, 0xfa, 0x21, 0x6e, 0xd6, 0x1d, 0xdc,
-	0xc4, 0x06, 0xb1, 0x6c, 0x31, 0xe4, 0x56, 0x7b, 0xd9, 0x04, 0x80, 0x2a, 0xbb, 0x54, 0x6a, 0x5f,
-	0x08, 0xf1, 0x59, 0x34, 0xd1, 0xf4, 0x9f, 0x95, 0x36, 0x00, 0xf5, 0x5e, 0x1a, 0x66, 0x22, 0xa9,
-	0x07, 0x30, 0xf5, 0x39, 0x12, 0x4e, 0x83, 0xbc, 0x80, 0xd5, 0xb0, 0x63, 0x75, 0x6d, 0x03, 0x3b,
-	0xe8, 0x1a, 0x64, 0x8d, 0x4e, 0xb7, 0x6e, 0x58, 0xdd, 0x36, 0x61, 0xb8, 0xa3, 0x5a, 0xc6, 0xe8,
-	0x74, 0xb7, 0xe8, 0x3b, 0xba, 0x01, 0xe3, 0x2d, 0xdc, 0xb2, 0xec, 0x73, 0x31, 0xc3, 0x12, 0x6c,
-	0x86, 0xe5, 0xf8, 0x19, 0x1f, 0x60, 0xbf, 0x1d, 0xf5, 0x3c, 0x2d, 0xe2, 0xf1, 0x04, 0x32, 0x5e,
-	0x6a, 0x2a, 0x51, 0x11, 0x0e, 0xa7, 0xa2, 0x27, 0x42, 0xbd, 0x62, 0xb6, 0xf4, 0x63, 0xcf, 0x2b,
-	0xec, 0x05, 0x6d, 0x40, 0xd6, 0x76, 0x39, 0x8b, 0x36, 0xab, 0x46, 0xa2, 0x7a, 0xd6, 0x69, 0x97,
-	0x42, 0xe8, 0x31, 0x64, 0x4c, 0x91, 0x38, 0x22, 0x91, 0x17, 0x7a, 0x01, 0x82, 0xa9, 0xa5, 0x79,
-	0x12, 0xe8, 0x21, 0x8c, 0x9d, 0xb1, 0x1e, 0xce, 0xd3, 0x39, 0xb7, 0x5a, 0x8e, 0x6a, 0xf2, 0x6e,
-	0x11, 0x88, 0xeb, 0xe8, 0x35, 0x20, 0x51, 0x0f, 0x75, 0xd3, 0x2d, 0x44, 0xa7, 0x98, 0x66, 0x20,
-	0x4b, 0xf1, 0x35, 0x2b, 0xe0, 0xbe, 0x6a, 0x87, 0xce, 0x1d, 0xa4, 0x41, 0x4e, 0x6f, 0xb7, 0x2d,
-	0xa2, 0x53, 0x82, 0x4e, 0x71, 0x8c, 0x21, 0xde, 0x8b, 0x74, 0x8a, 0xbb, 0x9e, 0x5d, 0x8a, 0xf0,
-	0xe4, 0xf5, 0x83, 0xa0, 0x2d, 0x48, 0xb3, 0x5c, 0x76, 0x8a, 0x19, 0x06, 0xf7, 0xed, 0x38, 0x38,
-	0x96, 0xe8, 0x02, 0x49, 0x88, 0x96, 0xbe, 0x0f, 0xf9, 0xb0, 0x96, 0xa1, 0xf6, 0xb1, 0x47, 0x90,
-	0xf3, 0xc1, 0x0e, 0x55, 0x38, 0x1f, 0x12, 0x30, 0x26, 0x08, 0xf6, 0x54, 0xbc, 0x3f, 0x2f, 0x13,
-	0xc3, 0xe7, 0xe5, 0x6e, 0xd0, 0xdd, 0x7c, 0x77, 0xbd, 0x13, 0x89, 0x10, 0xe3, 0xe8, 0x27, 0x9e,
-	0xa3, 0x53, 0x0c, 0xe8, 0x66, 0x34, 0xd0, 0x17, 0xe6, 0xe2, 0xf7, 0xde, 0xaa, 0xb4, 0x4f, 0x74,
-	0xd2, 0x75, 0xfe, 0x9f, 0x56, 0x25, 0xda, 0xed, 0x38, 0x13, 0x3a, 0x5c, 0x47, 0x19, 0xb5, 0x0c,
-	0x3f, 0x08, 0xac, 0x43, 0x7d, 0x2c, 0xeb, 0xbf, 0x0e, 0x09, 0xc1, 0x41, 0xd6, 0xa1, 0x3e, 0x3a,
-	0x86, 0x58, 0x87, 0x38, 0xca, 0xa7, 0x5c, 0x87, 0x04, 0xa2, 0x6f, 0xe4, 0xfe, 0x33, 0xe5, 0xb5,
-	0x78, 0x9f, 0x7d, 0x9f, 0xb0, 0xb4, 0xbc, 0x96, 0x9f, 0xf4, 0xb7, 0xfc, 0x6b, 0x90, 0x65, 0x0f,
-	0x75, 0x1b, 0x1f, 0x89, 0xcf, 0x85, 0x0c, 0x3b, 0xd0, 0xf0, 0x11, 0xba, 0x0f, 0xa3, 0x0e, 0xd1,
-	0x09, 0x66, 0x41, 0x9c, 0x94, 0x75, 0x63, 0x1f, 0x63, 0xac, 0xf1, 0xcb, 0xfe, 0x2e, 0x9e, 0xee,
-	0xdf, 0xc5, 0x5d, 0xbf, 0xf6, 0xef, 0xe2, 0x63, 0x83, 0x76, 0x71, 0x01, 0x17, 0xdf, 0xc5, 0x33,
-	0x31, 0x5d, 0x9c, 0x03, 0x0d, 0xdc, 0xc5, 0xb3, 0x31, 0x5d, 0x5c, 0xc0, 0x7d, 0x61, 0x2d, 0xa6,
-	0x06, 0xd3, 0xbb, 0xa6, 0x43, 0x04, 0x47, 0x47, 0xc3, 0xbf, 0xe8, 0x62, 0x87, 0xa0, 0x75, 0x48,
-	0x1f, 0xb1, 0x1d, 0x4c, 0xac, 0x15, 0xf3, 0x31, 0xab, 0x9a, 0x26, 0xae, 0xab, 0x7b, 0x50, 0x08,
-	0xe2, 0x39, 0x1d, 0xab, 0xed, 0x60, 0xf4, 0x00, 0x32, 0x62, 0x03, 0xa6, 0x9f, 0xe7, 0xd4, 0x53,
-	0x5f, 0x47, 0xef, 0x14, 0xde, 0x55, 0xf5, 0x39, 0x14, 0xb6, 0x6c, 0xac, 0x13, 0xec, 0xad, 0x1b,
-	0x1e, 0x3f, 0x83, 0x75, 0x9c, 0x58, 0x7e, 0x6e, 0x5f, 0xe3, 0xd7, 0xd5, 0x5d, 0x98, 0x09, 0x01,
-	0x0a, 0x82, 0x6b, 0x30, 0x26, 0xb4, 0x0a, 0xc8, 0x3e, 0xfc, 0xdc, 0x9b, 0xea, 0x03, 0x28, 0x04,
-	0xa2, 0xeb, 0xd2, 0x8b, 0xf9, 0x18, 0x7c, 0x01, 0x33, 0x21, 0x31, 0x41, 0x62, 0x1d, 0xd2, 0x0e,
-	0x3b, 0x89, 0x35, 0x4b, 0x08, 0x8a, 0xeb, 0x94, 0xc8, 0x36, 0x6e, 0xe2, 0x1e, 0x3f, 0xc5, 0x10,
-	0xf9, 0x16, 0xcc, 0x84, 0xc4, 0x38, 0x11, 0x75, 0x17, 0x10, 0x0d, 0x23, 0x2f, 0x50, 0xcf, 0xac,
-	0xef, 0x84, 0xb2, 0x22, 0xb2, 0xa4, 0x43, 0x49, 0x51, 0xe5, 0x49, 0xe6, 0xa1, 0x09, 0x6b, 0x57,
-	0x2f, 0x5b, 0x04, 0x4f, 0x89, 0x62, 0x14, 0x9e, 0xd7, 0x1c, 0xd4, 0x26, 0x4c, 0x6f, 0x12, 0xa2,
-	0x1b, 0x27, 0xe2, 0x0f, 0x03, 0xd9, 0x49, 0x89, 0x8b, 0x74, 0x49, 0xf4, 0x27, 0x1e, 0xca, 0x96,
-	0x35, 0x28, 0x04, 0xb5, 0x09, 0xe6, 0x81, 0xd9, 0xa6, 0x84, 0x66, 0xdb, 0x5f, 0x15, 0x98, 0x3e,
-	0xe8, 0x34, 0x74, 0x82, 0x87, 0xe2, 0x38, 0x0f, 0x39, 0x6e, 0x64, 0xdd, 0xf7, 0x79, 0x01, 0xfc,
-	0xa8, 0x46, 0x47, 0xd5, 0xff, 0xfa, 0xb7, 0x8f, 0x35, 0x28, 0x04, 0xcd, 0x1a, 0xc4, 0x19, 0x07,
-	0x30, 0xbd, 0x8d, 0x87, 0x8e, 0x57, 0x9c, 0x2f, 0xd4, 0x59, 0x9a, 0xef, 0xbd, 0x81, 0x51, 0xff,
-	0xa6, 0x40, 0x81, 0x31, 0xb7, 0x5b, 0xdf, 0x2c, 0xe7, 0xaf, 0xb8, 0x3f, 0x29, 0x0b, 0xeb, 0xd8,
-	0xa8, 0xe8, 0xef, 0x7a, 0x1d, 0x66, 0x42, 0xae, 0x10, 0x01, 0x7b, 0x06, 0xe3, 0x86, 0x0f, 0x45,
-	0x14, 0xf3, 0x62, 0xdf, 0x9a, 0x10, 0x77, 0xb5, 0x80, 0xa4, 0xfa, 0x73, 0xb8, 0x4e, 0x0b, 0x3b,
-	0x3c, 0x82, 0xbd, 0x86, 0xb1, 0x11, 0x6a, 0x18, 0x03, 0x8c, 0xef, 0x50, 0xeb, 0xb0, 0x61, 0x2e,
-	0x42, 0x83, 0x30, 0xe6, 0xc7, 0xd2, 0x6d, 0x81, 0xf7, 0x13, 0x35, 0x5e, 0x9d, 0x64, 0x4f, 0x50,
-	0xdf, 0x2a, 0x30, 0xc7, 0xcb, 0xbe, 0xe7, 0xf6, 0x60, 0xd9, 0xb4, 0x11, 0x6a, 0x37, 0x83, 0x7f,
-	0x7b, 0xba, 0x8d, 0x67, 0x01, 0xca, 0x51, 0x0c, 0x44, 0xa6, 0xbf, 0x53, 0x60, 0x8e, 0x97, 0xe3,
-	0x15, 0x49, 0xde, 0x87, 0xd9, 0x1e, 0xc7, 0xf9, 0xb3, 0xbf, 0x10, 0x76, 0x4c, 0x4d, 0xec, 0xe4,
-	0x9f, 0xfc, 0x37, 0xc0, 0x05, 0x28, 0x47, 0x59, 0x22, 0x8c, 0x25, 0x30, 0xc7, 0xcb, 0xfd, 0xbf,
-	0x69, 0x2b, 0xe5, 0x15, 0xa5, 0x95, 0xf3, 0xba, 0x73, 0x06, 0xe3, 0xfe, 0xdd, 0x17, 0x4d, 0xc3,
-	0xd4, 0xde, 0xe6, 0xd6, 0xb3, 0x6a, 0x6d, 0xa7, 0xfe, 0x62, 0xa7, 0xb6, 0x5d, 0xad, 0xfd, 0x30,
-	0x3f, 0xe2, 0x3f, 0xd4, 0x0e, 0x6a, 0x35, 0x7a, 0xa8, 0xa0, 0x02, 0xe4, 0xdd, 0xc3, 0xfd, 0x67,
-	0x07, 0x2f, 0xb7, 0x9f, 0xbf, 0xae, 0xe5, 0x13, 0xe8, 0x2b, 0x98, 0x70, 0x4f, 0x77, 0x34, 0xed,
-	0xb9, 0x96, 0x4f, 0xfa, 0xa5, 0x0f, 0x6a, 0x3f, 0xaa, 0xd1, 0x7b, 0xa9, 0xd5, 0x7f, 0x01, 0x4c,
-	0xba, 0x23, 0x9b, 0x3b, 0x1a, 0xd5, 0x61, 0xdc, 0xbf, 0x78, 0x21, 0xc9, 0x57, 0xae, 0x64, 0xd1,
-	0x2b, 0xdd, 0x8a, 0xbb, 0x26, 0x22, 0x30, 0x82, 0x0e, 0x61, 0x22, 0xb0, 0x39, 0x21, 0x89, 0xa8,
-	0x6c, 0x57, 0x2b, 0xdd, 0x8e, 0xbd, 0xe7, 0xd7, 0x11, 0xfc, 0xfa, 0xb9, 0x15, 0xb7, 0x00, 0x45,
-	0xeb, 0x90, 0x6e, 0x58, 0x5c, 0x47, 0x60, 0xe7, 0x91, 0xe9, 0x90, 0xed, 0x52, 0x32, 0x1d, 0xf2,
-	0xe5, 0x69, 0x04, 0xbd, 0x81, 0x9c, 0x6f, 0xe1, 0x41, 0x8b, 0x72, 0x27, 0x07, 0xb7, 0xab, 0xd2,
-	0xcd, 0x98, 0x5b, 0x81, 0x48, 0xf8, 0x1b, 0xbb, 0x34, 0x12, 0x92, 0x21, 0x28, 0x8d, 0x84, 0x6c,
-	0x42, 0xa8, 0x23, 0x34, 0x9d, 0xfc, 0x9b, 0x8f, 0x2c, 0x9d, 0x24, 0x7b, 0x98, 0x2c, 0x9d, 0x64,
-	0x0b, 0x14, 0x57, 0xe0, 0xdf, 0x26, 0x64, 0x0a, 0x24, 0x4b, 0x94, 0x4c, 0x81, 0x6c, 0x29, 0xe1,
-	0x0a, 0xfc, 0x2b, 0x82, 0x4c, 0x81, 0x64, 0x33, 0x29, 0xdd, 0x8a, 0xbb, 0xe6, 0x29, 0xf8, 0x15,
-	0xcc, 0x48, 0x47, 0x13, 0xaa, 0xc8, 0x03, 0x19, 0x35, 0x25, 0x4b, 0xcb, 0x03, 0xdf, 0x17, 0x33,
-	0xef, 0x37, 0x30, 0x2b, 0x9f, 0x0e, 0x68, 0x39, 0xca, 0xff, 0x11, 0x8d, 0xb3, 0x74, 0x6f, 0x70,
-	0x81, 0x4b, 0xe5, 0xf2, 0x6e, 0x2d, 0x53, 0xde, 0x77, 0x42, 0xc9, 0x94, 0xf7, 0x1f, 0x04, 0x54,
-	0xb9, 0xbc, 0x25, 0xcb, 0x94, 0xf7, 0x1d, 0x19, 0x32, 0xe5, 0xfd, 0xbb, 0xfd, 0xd3, 0xf5, 0x77,
-	0x1f, 0xcb, 0xca, 0xdf, 0x3f, 0x96, 0x47, 0xde, 0x5e, 0x94, 0x95, 0x77, 0x17, 0x65, 0xe5, 0x2f,
-	0x17, 0x65, 0xe5, 0xc3, 0x45, 0x59, 0xf9, 0xdd, 0x3f, 0xca, 0x23, 0x3f, 0xfd, 0xda, 0xb2, 0xcd,
-	0x65, 0xbd, 0x63, 0x3a, 0xcb, 0x02, 0x77, 0xd9, 0xc5, 0x3d, 0x4c, 0xb3, 0x7f, 0x23, 0x58, 0xfb,
-	0x77, 0x00, 0x00, 0x00, 0xff, 0xff, 0x02, 0x6d, 0xb6, 0x08, 0x94, 0x20, 0x00, 0x00,
+	// 1903 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x59, 0x4b, 0x6f, 0xdb, 0xd8,
+	0x15, 0x36, 0xa9, 0x87, 0xad, 0x23, 0x3f, 0x34, 0xd7, 0x8f, 0x51, 0xe4, 0x91, 0xe2, 0x10, 0x19,
+	0xc7, 0x48, 0x31, 0x72, 0xc6, 0x49, 0xc6, 0x33, 0xd3, 0x38, 0xb0, 0x63, 0x29, 0x8d, 0x10, 0x59,
+	0x4e, 0x69, 0x2b, 0x41, 0x8b, 0x16, 0x2a, 0x2d, 0x5d, 0xdb, 0x84, 0x25, 0x51, 0x25, 0x29, 0xb7,
+	0x6e, 0x37, 0xd9, 0x77, 0x53, 0xa0, 0xe8, 0x1f, 0xe8, 0x0f, 0xe8, 0x0f, 0x68, 0xfb, 0x03, 0xb2,
+	0xec, 0xb2, 0xcb, 0xc4, 0xdd, 0x37, 0xfb, 0xae, 0x8a, 0xfb, 0x20, 0x75, 0x49, 0x91, 0xa2, 0x14,
+	0x04, 0x9d, 0xec, 0xc8, 0xa3, 0xf3, 0xba, 0xdf, 0x39, 0xf7, 0x7c, 0x87, 0x36, 0xa4, 0xb4, 0x9e,
+	0x5e, 0xec, 0x99, 0x86, 0x6d, 0xa0, 0x8c, 0xd9, 0xef, 0xda, 0x7a, 0x07, 0x17, 0x2f, 0xbf, 0xd6,
+	0xda, 0xbd, 0x73, 0xed, 0xeb, 0xdc, 0x57, 0x67, 0xba, 0x7d, 0xde, 0x3f, 0x29, 0x36, 0x8d, 0xce,
+	0xe6, 0x99, 0x71, 0x66, 0x6c, 0x52, 0xc5, 0x93, 0xfe, 0x29, 0x7d, 0xa3, 0x2f, 0xf4, 0x89, 0x39,
+	0x50, 0xbe, 0x82, 0xd9, 0x97, 0x46, 0xbb, 0xdf, 0xc1, 0x4f, 0xf5, 0xb6, 0x8d, 0x4d, 0x94, 0x07,
+	0xe8, 0x68, 0xcd, 0x73, 0xbd, 0x8b, 0x1b, 0x7a, 0x2b, 0x2b, 0xad, 0x49, 0x1b, 0x29, 0x35, 0xc5,
+	0x25, 0x95, 0x96, 0xf2, 0x5e, 0x06, 0xc4, 0xf4, 0xf7, 0x9a, 0x4d, 0x6c, 0x59, 0xfb, 0x46, 0xf7,
+	0x54, 0x3f, 0x43, 0x2b, 0x90, 0x6c, 0x99, 0xfa, 0x25, 0x36, 0xb9, 0x05, 0x7f, 0x23, 0xf2, 0x73,
+	0xad, 0xdb, 0x6a, 0xe3, 0xac, 0xcc, 0xe4, 0xec, 0x0d, 0x1d, 0x03, 0x68, 0xb6, 0x6d, 0xea, 0x27,
+	0x7d, 0x1b, 0x5b, 0xd9, 0xd8, 0x5a, 0x6c, 0x23, 0xbd, 0xf5, 0xa0, 0xe8, 0x3f, 0x4b, 0x71, 0x38,
+	0x52, 0x71, 0xcf, 0x35, 0x2b, 0x77, 0x6d, 0xf3, 0x4a, 0x15, 0xfc, 0xa0, 0x3a, 0xa4, 0x2d, 0xdc,
+	0x34, 0xb1, 0xdd, 0x68, 0x69, 0xb6, 0x96, 0x8d, 0x4f, 0xe0, 0xf6, 0x88, 0xda, 0x95, 0x34, 0x5b,
+	0xe3, 0x6e, 0x2d, 0x57, 0x90, 0xdb, 0x81, 0x05, 0x5f, 0x54, 0x94, 0x81, 0xd8, 0x05, 0xbe, 0xe2,
+	0x87, 0x25, 0x8f, 0x68, 0x09, 0x12, 0x97, 0x5a, 0xbb, 0xef, 0x1c, 0x94, 0xbd, 0x7c, 0x2f, 0x7f,
+	0x2b, 0x11, 0x73, 0x9f, 0xf7, 0x28, 0xf3, 0x59, 0xc1, 0x5c, 0xf9, 0x31, 0x2c, 0x94, 0x3b, 0x3d,
+	0xfb, 0xaa, 0xa4, 0x5b, 0x17, 0x1c, 0xed, 0x0d, 0xc8, 0x58, 0xfa, 0xef, 0x70, 0xa3, 0xad, 0x77,
+	0x74, 0xbb, 0x71, 0x72, 0x45, 0x30, 0x24, 0xbe, 0xe2, 0xea, 0x3c, 0x91, 0x57, 0x89, 0xf8, 0x09,
+	0x91, 0x2a, 0x7f, 0x96, 0x21, 0xc9, 0x4e, 0x1b, 0x51, 0x58, 0x54, 0x85, 0x8c, 0xf3, 0x73, 0x07,
+	0xdb, 0x1a, 0x05, 0x90, 0xe4, 0x92, 0xde, 0xba, 0x35, 0x0c, 0xe0, 0x01, 0xd3, 0x3c, 0xe0, 0x8a,
+	0xea, 0x42, 0xc7, 0x2b, 0x40, 0x08, 0xe2, 0x5d, 0xad, 0x83, 0xb3, 0x31, 0x1a, 0x86, 0x3e, 0xd3,
+	0x1e, 0xc1, 0x97, 0x7a, 0x13, 0x67, 0xe3, 0xbc, 0x47, 0xe8, 0x1b, 0xfa, 0x06, 0x92, 0x1a, 0x2d,
+	0x45, 0x36, 0x41, 0xe3, 0x15, 0x46, 0x17, 0x4c, 0xe5, 0xda, 0xe8, 0x7b, 0x00, 0x4c, 0x80, 0x69,
+	0xb4, 0x74, 0xeb, 0x22, 0x9b, 0xa4, 0xb6, 0xab, 0xc3, 0xb6, 0x2e, 0x78, 0x6a, 0x0a, 0x3b, 0x8f,
+	0xca, 0x63, 0xa7, 0xeb, 0x99, 0xcf, 0x49, 0xfb, 0x57, 0x79, 0x08, 0x29, 0xd7, 0xef, 0x04, 0xe5,
+	0xf8, 0x9b, 0xe4, 0xc4, 0xe5, 0x95, 0x74, 0x70, 0x92, 0x02, 0x71, 0x92, 0x3d, 0x38, 0x3d, 0x72,
+	0x71, 0x8a, 0xd1, 0xb3, 0xde, 0x1e, 0xa7, 0xb1, 0x5d, 0xb4, 0x76, 0x3d, 0x68, 0xc5, 0xc3, 0x2a,
+	0xeb, 0x6b, 0x35, 0x11, 0xb3, 0x6d, 0x58, 0xa9, 0x61, 0xfb, 0x37, 0x86, 0x79, 0x51, 0xe9, 0xda,
+	0xd8, 0x3c, 0xd5, 0x9a, 0x63, 0xce, 0x8c, 0x3b, 0x30, 0xc7, 0x0d, 0x07, 0xd3, 0x82, 0xa3, 0x2a,
+	0x79, 0x50, 0xbd, 0x05, 0x0b, 0x2f, 0x75, 0xd3, 0xee, 0x6b, 0xed, 0xca, 0x0b, 0xae, 0x3a, 0x0f,
+	0xb2, 0xde, 0xe3, 0x6a, 0xb2, 0xde, 0x53, 0xfe, 0x2e, 0x0d, 0x67, 0x31, 0x02, 0xcb, 0xef, 0x60,
+	0xba, 0xcb, 0xb4, 0x79, 0x33, 0xdf, 0x1c, 0x3e, 0xb2, 0x27, 0x37, 0xd5, 0xd1, 0x27, 0x77, 0x54,
+	0xef, 0xb1, 0xd9, 0x94, 0x52, 0xc9, 0x23, 0x81, 0xf0, 0x92, 0xa5, 0xd7, 0xd0, 0x7b, 0xe1, 0x10,
+	0xfa, 0x8e, 0xa0, 0xa6, 0xb8, 0x51, 0xa5, 0xa7, 0xfc, 0x45, 0x86, 0x8c, 0x3f, 0xfb, 0x1f, 0xfe,
+	0x62, 0x0a, 0x20, 0xc5, 0x3f, 0x0c, 0xa4, 0x44, 0x18, 0x48, 0xc9, 0x0f, 0x00, 0xe9, 0x36, 0xcc,
+	0x57, 0xce, 0xba, 0xba, 0xad, 0x1b, 0xdd, 0x41, 0x65, 0xe9, 0xb1, 0x25, 0x3a, 0x1b, 0xe9, 0xb3,
+	0xf2, 0x0f, 0x09, 0xe6, 0xf8, 0x69, 0x79, 0x17, 0x92, 0x56, 0x69, 0xb9, 0xad, 0xd2, 0x42, 0x3f,
+	0x83, 0xf9, 0xb6, 0x76, 0x82, 0xdb, 0x0d, 0x0b, 0xb7, 0x71, 0xd3, 0x36, 0xcc, 0xac, 0x4c, 0x09,
+	0x61, 0x2b, 0x14, 0x36, 0xe6, 0xa8, 0x58, 0x25, 0x56, 0x47, 0xdc, 0x88, 0xd1, 0xc1, 0x5c, 0x5b,
+	0x94, 0xe5, 0x76, 0x01, 0x0d, 0x2b, 0x4d, 0x42, 0x0a, 0x4a, 0x1d, 0x16, 0x7c, 0xb5, 0x42, 0x5f,
+	0x40, 0x8a, 0x94, 0xc3, 0xea, 0x69, 0x4d, 0xa7, 0x89, 0x07, 0x02, 0xb7, 0x70, 0xb2, 0x50, 0xb8,
+	0x0c, 0xc4, 0xfa, 0x7a, 0x8b, 0xd7, 0x92, 0x3c, 0x2a, 0x2a, 0x64, 0xb8, 0x5b, 0x15, 0x5b, 0x46,
+	0xdf, 0x6c, 0x62, 0x0b, 0xad, 0x42, 0xaa, 0xd9, 0xeb, 0x37, 0x9a, 0x46, 0xbf, 0x6b, 0x53, 0xbf,
+	0x09, 0x75, 0xa6, 0xd9, 0xeb, 0xef, 0x93, 0x77, 0x74, 0x0b, 0x66, 0x3b, 0xb8, 0x63, 0x98, 0x57,
+	0x7c, 0x6e, 0xc9, 0x74, 0x6e, 0xa5, 0x99, 0x8c, 0x0d, 0xad, 0x3f, 0x24, 0x5c, 0xa4, 0x79, 0x3d,
+	0x76, 0x60, 0xc6, 0x6d, 0x45, 0x69, 0xdc, 0x56, 0x74, 0x4d, 0x08, 0x2a, 0x7a, 0x47, 0x3b, 0x73,
+	0x51, 0xa1, 0x2f, 0x68, 0x17, 0x52, 0xa6, 0x93, 0x33, 0x9f, 0x70, 0x4a, 0xa8, 0x57, 0xf7, 0x74,
+	0xea, 0xc0, 0x08, 0x3d, 0x82, 0x19, 0x9d, 0x37, 0x0e, 0x6f, 0xe4, 0xb5, 0x61, 0x07, 0xde, 0xd6,
+	0x52, 0x5d, 0x0b, 0xf4, 0x2d, 0x4c, 0x5f, 0xd2, 0xf1, 0xc9, 0xda, 0x79, 0x04, 0x0f, 0x39, 0x97,
+	0x80, 0xab, 0xa3, 0x57, 0x80, 0xf8, 0x7d, 0x68, 0xe8, 0xce, 0xad, 0xb6, 0xb2, 0x49, 0xea, 0x64,
+	0x23, 0xf4, 0x2a, 0xf9, 0xc6, 0x97, 0xfa, 0x59, 0xd7, 0x27, 0xb7, 0x90, 0x0a, 0x69, 0xad, 0xdb,
+	0x35, 0x6c, 0x8d, 0x24, 0x68, 0x65, 0xa7, 0xa9, 0xc7, 0x7b, 0xa1, 0xa0, 0x38, 0x1b, 0xd2, 0xc0,
+	0x84, 0x35, 0xaf, 0xe8, 0x04, 0xed, 0x43, 0x92, 0xf6, 0xb2, 0x95, 0x9d, 0xa1, 0xee, 0x7e, 0x14,
+	0xe5, 0x8e, 0x36, 0x3a, 0xf7, 0xc4, 0x4d, 0x73, 0x8f, 0x21, 0xe3, 0x8f, 0x32, 0xd1, 0x4a, 0xf4,
+	0x1d, 0xa4, 0x05, 0xb7, 0x13, 0x5d, 0x9c, 0xb7, 0x32, 0x4c, 0xf3, 0x04, 0x87, 0x6e, 0xbc, 0xd8,
+	0x97, 0xf2, 0xe4, 0x7d, 0x59, 0xf5, 0xc2, 0xcd, 0xb6, 0xd2, 0xbb, 0xa1, 0x1e, 0x22, 0x80, 0xde,
+	0x71, 0x81, 0x66, 0x7b, 0xe8, 0x97, 0xe1, 0x8e, 0x3e, 0x31, 0x88, 0x4b, 0xde, 0x15, 0xff, 0xc8,
+	0xd6, 0xec, 0xfe, 0xe4, 0x2b, 0xd2, 0x3d, 0x61, 0x6f, 0xe5, 0x2e, 0xf2, 0x00, 0x74, 0x51, 0x12,
+	0x57, 0xa4, 0x14, 0x91, 0xb0, 0x41, 0xf3, 0xde, 0xdd, 0x8e, 0xb8, 0xfe, 0x24, 0xdb, 0xd1, 0x7d,
+	0x48, 0x58, 0xb6, 0x66, 0x33, 0x66, 0x9b, 0xdf, 0xca, 0x87, 0x5d, 0x5e, 0xe2, 0x1a, 0xab, 0x4c,
+	0x57, 0x58, 0xa9, 0xe2, 0xe3, 0xac, 0x54, 0x2c, 0xad, 0x90, 0x95, 0x2a, 0x11, 0xb9, 0x52, 0x71,
+	0x73, 0x61, 0xa5, 0x1a, 0x6c, 0x46, 0x03, 0x90, 0x23, 0x37, 0x23, 0xae, 0xea, 0xdf, 0x8c, 0xfe,
+	0x1b, 0xb0, 0x19, 0x8d, 0xc0, 0x71, 0x82, 0xcd, 0x88, 0xe7, 0xfd, 0x11, 0x37, 0x23, 0x07, 0x09,
+	0x97, 0xf4, 0xd1, 0x8e, 0x53, 0xbe, 0x04, 0x2d, 0xdf, 0x9d, 0xe8, 0xb1, 0x29, 0x16, 0x52, 0xf9,
+	0x4f, 0xdc, 0xe5, 0x28, 0x01, 0x9e, 0x8f, 0x38, 0x1b, 0x5c, 0xce, 0x8a, 0x89, 0x9c, 0xb5, 0x0a,
+	0x29, 0xfa, 0xd0, 0x30, 0xf1, 0x29, 0xff, 0xaa, 0x99, 0xa1, 0x02, 0x15, 0x9f, 0xa2, 0x07, 0xde,
+	0x23, 0x15, 0x42, 0xc3, 0x79, 0x5a, 0x52, 0xa0, 0xa1, 0xe4, 0x68, 0x1a, 0x72, 0xca, 0x32, 0x9a,
+	0x86, 0xa6, 0xc7, 0xa5, 0x21, 0xee, 0x2e, 0x9a, 0x86, 0x66, 0x22, 0x68, 0x88, 0x39, 0x1a, 0x9b,
+	0x86, 0x52, 0x11, 0x34, 0xc4, 0xdd, 0x7d, 0x62, 0x33, 0xb2, 0x06, 0x8b, 0x55, 0xdd, 0xb2, 0x79,
+	0x8e, 0x96, 0x8a, 0x7f, 0xdd, 0xc7, 0x96, 0x8d, 0xb6, 0x21, 0x79, 0x4a, 0x97, 0x48, 0xbe, 0x17,
+	0xdd, 0x8c, 0xd8, 0x35, 0x55, 0xae, 0xae, 0x1c, 0xc0, 0x92, 0xd7, 0x9f, 0xd5, 0x33, 0xba, 0x16,
+	0x46, 0x0f, 0x61, 0x86, 0xaf, 0xf0, 0x64, 0x60, 0x12, 0xa4, 0x6e, 0x84, 0x2f, 0x45, 0xae, 0xaa,
+	0x72, 0x08, 0x4b, 0xfb, 0x26, 0xd6, 0x6c, 0xec, 0xee, 0x4b, 0x6e, 0x7e, 0x4d, 0x4a, 0xeb, 0x91,
+	0xf9, 0x39, 0x9f, 0x8f, 0x4c, 0x5d, 0xa9, 0xc2, 0xb2, 0xcf, 0x21, 0x4f, 0xf0, 0x3e, 0x4c, 0xf3,
+	0xa8, 0xdc, 0xe5, 0x88, 0xfc, 0x1c, 0x4d, 0xe5, 0x21, 0x2c, 0x79, 0xaa, 0xeb, 0xa4, 0x17, 0xf1,
+	0x21, 0xf9, 0x02, 0x96, 0x7d, 0x66, 0x3c, 0x89, 0x6d, 0x48, 0x5a, 0x54, 0x12, 0x79, 0x2c, 0x67,
+	0x84, 0x33, 0x75, 0x92, 0x48, 0x09, 0xb7, 0xf1, 0x10, 0x4e, 0x11, 0x89, 0x7c, 0x0e, 0xcb, 0x3e,
+	0x33, 0x96, 0x88, 0x52, 0x05, 0x44, 0xca, 0xc8, 0x2e, 0xa8, 0x7b, 0xac, 0x6f, 0x7c, 0x5d, 0x11,
+	0x7a, 0xa5, 0x7d, 0x4d, 0x51, 0x61, 0x4d, 0xe6, 0x7a, 0xe3, 0xa7, 0xdd, 0x1a, 0x8c, 0x08, 0xd6,
+	0x12, 0xd9, 0x30, 0x7f, 0xee, 0x70, 0x50, 0xda, 0xb0, 0xc8, 0xea, 0xc7, 0x7f, 0x18, 0xeb, 0x9c,
+	0x24, 0x71, 0xde, 0x2e, 0xf2, 0xe8, 0xc4, 0x7d, 0xdd, 0xb2, 0xe2, 0xb4, 0x9f, 0x13, 0x8d, 0xc3,
+	0x53, 0x87, 0x45, 0x86, 0xdb, 0x44, 0x59, 0xdc, 0x84, 0x34, 0x3b, 0x46, 0x43, 0xf8, 0x02, 0x02,
+	0x26, 0xaa, 0x69, 0x1d, 0x4c, 0xc2, 0x79, 0xdd, 0xf2, 0x70, 0xbf, 0x82, 0x2f, 0x08, 0x7e, 0xfe,
+	0x49, 0xe7, 0xd6, 0x65, 0xd7, 0x57, 0x97, 0x31, 0xa6, 0xa4, 0xaf, 0x42, 0x26, 0xe4, 0x43, 0x22,
+	0xf0, 0x5a, 0xfd, 0x34, 0x70, 0x28, 0xb3, 0xb2, 0x29, 0xd1, 0xe1, 0x02, 0xc6, 0xb1, 0xf2, 0x5a,
+	0x82, 0x3c, 0x43, 0x77, 0x48, 0x7b, 0x3c, 0x3c, 0x77, 0x7d, 0x55, 0x1d, 0xff, 0x1b, 0xc5, 0xa9,
+	0xef, 0x1a, 0x14, 0xc2, 0x32, 0xe0, 0xd0, 0xbf, 0x91, 0x20, 0x5f, 0xef, 0xb5, 0x3e, 0x3c, 0xc9,
+	0x07, 0xb0, 0x32, 0x04, 0x9c, 0x58, 0xff, 0x25, 0x3f, 0x30, 0x35, 0xfe, 0x45, 0xfc, 0xd1, 0xff,
+	0x68, 0xb3, 0x06, 0x85, 0xb0, 0x93, 0xf0, 0xc3, 0xda, 0x90, 0x67, 0xfd, 0xf7, 0xff, 0x3c, 0x2b,
+	0xc9, 0x2b, 0x2c, 0x2a, 0xcb, 0xeb, 0xee, 0x2f, 0x21, 0x2d, 0x2c, 0xbd, 0x08, 0xc1, 0xfc, 0xcb,
+	0xc3, 0x6a, 0xfd, 0xa0, 0xdc, 0x78, 0x51, 0xae, 0x95, 0x2a, 0xb5, 0x9f, 0x64, 0xa6, 0xd0, 0x22,
+	0x2c, 0x70, 0xd9, 0xde, 0xf1, 0xf1, 0xde, 0xfe, 0xb3, 0x72, 0x29, 0x23, 0x09, 0xc2, 0x52, 0x99,
+	0x0b, 0x65, 0x94, 0x81, 0x59, 0x2e, 0x2c, 0xab, 0xea, 0xa1, 0x9a, 0x89, 0xdd, 0xfd, 0x93, 0x04,
+	0xcb, 0x81, 0x5b, 0x19, 0xca, 0xc3, 0x8d, 0x5a, 0xf9, 0xf8, 0xd5, 0xa1, 0xfa, 0xbc, 0x51, 0xa9,
+	0x1d, 0x97, 0xd5, 0xa7, 0x7b, 0xfb, 0x62, 0xd0, 0x02, 0xe4, 0x86, 0x7f, 0x16, 0xe2, 0x07, 0xfe,
+	0x2e, 0xa4, 0xb2, 0x0a, 0x9f, 0x0f, 0xff, 0xee, 0x64, 0x75, 0x09, 0xb3, 0xe2, 0x5e, 0x45, 0x0e,
+	0x73, 0xb0, 0xb7, 0xff, 0xac, 0x52, 0xf3, 0x1d, 0xdb, 0x11, 0xaa, 0xf5, 0x5a, 0x8d, 0x08, 0x25,
+	0xb4, 0x04, 0x19, 0x47, 0x78, 0xf4, 0xac, 0x7e, 0x5c, 0x3a, 0x7c, 0x55, 0xcb, 0xc8, 0xe8, 0x33,
+	0x98, 0x73, 0xa4, 0x3c, 0x84, 0x68, 0x5d, 0xaf, 0x3d, 0xaf, 0x11, 0xbd, 0xf8, 0xd6, 0x5f, 0x53,
+	0x30, 0xef, 0xd0, 0x01, 0xeb, 0x2e, 0xd4, 0x80, 0x59, 0x91, 0xd4, 0x51, 0xc0, 0x27, 0x60, 0xc0,
+	0x12, 0x91, 0x5b, 0x8f, 0x52, 0xe3, 0x6d, 0x37, 0x85, 0x4e, 0x60, 0xce, 0xc3, 0xca, 0x28, 0xc0,
+	0x34, 0x68, 0x0f, 0xc8, 0xdd, 0x89, 0xd4, 0x13, 0x63, 0x78, 0x37, 0xeb, 0xf5, 0x28, 0x72, 0x0d,
+	0x8f, 0x11, 0xc8, 0xde, 0x2c, 0x86, 0x87, 0x4f, 0x83, 0x62, 0x04, 0xf1, 0x74, 0x50, 0x8c, 0x60,
+	0x62, 0x9e, 0x42, 0xbf, 0x80, 0xb4, 0x40, 0xa6, 0xe8, 0x76, 0x30, 0xc8, 0x5e, 0xe6, 0xce, 0x7d,
+	0x19, 0xa1, 0xe5, 0x7a, 0x6f, 0xc0, 0xac, 0xc8, 0x78, 0x41, 0xa5, 0x0e, 0xe0, 0xdf, 0xdc, 0x7a,
+	0x94, 0x9a, 0x18, 0x40, 0xe4, 0xb8, 0xa0, 0x00, 0x01, 0xd4, 0x9a, 0x5b, 0x8f, 0x52, 0x73, 0x03,
+	0xfc, 0x16, 0x96, 0x03, 0xa9, 0x0c, 0x15, 0x83, 0x31, 0x08, 0x63, 0xd5, 0xdc, 0xe6, 0xd8, 0xfa,
+	0x9c, 0x23, 0x7f, 0x0f, 0x2b, 0xc1, 0x6c, 0x82, 0x36, 0xc3, 0xe0, 0x09, 0x19, 0xb4, 0xb9, 0x7b,
+	0xe3, 0x1b, 0x0c, 0x82, 0x07, 0x4f, 0xf7, 0xa0, 0xe0, 0x23, 0x19, 0x2d, 0x28, 0xf8, 0x68, 0xe2,
+	0x20, 0xc1, 0x83, 0x47, 0x78, 0x50, 0xf0, 0x91, 0x14, 0x13, 0x14, 0x7c, 0x34, 0x3b, 0x3c, 0xd9,
+	0x7e, 0xf3, 0xae, 0x20, 0xfd, 0xeb, 0x5d, 0x61, 0xea, 0xf5, 0x75, 0x41, 0x7a, 0x73, 0x5d, 0x90,
+	0xfe, 0x79, 0x5d, 0x90, 0xde, 0x5e, 0x17, 0xa4, 0x3f, 0xfe, 0xbb, 0x30, 0xf5, 0xf3, 0x1b, 0x86,
+	0xa9, 0x6f, 0x6a, 0x3d, 0xdd, 0xda, 0xe4, 0x7e, 0x37, 0x1d, 0xbf, 0x27, 0x49, 0xfa, 0x9f, 0xe3,
+	0xfb, 0xff, 0x0b, 0x00, 0x00, 0xff, 0xff, 0xb9, 0x90, 0xce, 0x7e, 0x87, 0x1e, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -3006,14 +2863,12 @@ type MachineRuntimeClient interface {
 	MachineStatus(ctx context.Context, in *MachineStatusRequest, opts ...grpc.CallOption) (*MachineStatusResponse, error)
 	DeleteMachine(ctx context.Context, in *DeleteMachineRequest, opts ...grpc.CallOption) (*DeleteMachineResponse, error)
 	ListVolumes(ctx context.Context, in *ListVolumesRequest, opts ...grpc.CallOption) (*ListVolumesResponse, error)
-	ConfirmVolume(ctx context.Context, in *ConfirmVolumeRequest, opts ...grpc.CallOption) (*ConfirmVolumeResponse, error)
-	AttachVolume(ctx context.Context, in *AttachVolumeRequest, opts ...grpc.CallOption) (*AttachVolumeResponse, error)
-	UpdateVolume(ctx context.Context, in *UpdateVolumeRequest, opts ...grpc.CallOption) (*UpdateVolumeResponse, error)
-	DetachVolume(ctx context.Context, in *DetachVolumeRequest, opts ...grpc.CallOption) (*DetachVolumeResponse, error)
+	CreateVolume(ctx context.Context, in *CreateVolumeRequest, opts ...grpc.CallOption) (*CreateVolumeResponse, error)
+	DeleteVolume(ctx context.Context, in *DeleteVolumeRequest, opts ...grpc.CallOption) (*DeleteVolumeResponse, error)
 	ListNetworkInterfaces(ctx context.Context, in *ListNetworkInterfacesRequest, opts ...grpc.CallOption) (*ListNetworkInterfacesResponse, error)
-	AttachNetworkInterface(ctx context.Context, in *AttachNetworkInterfaceRequest, opts ...grpc.CallOption) (*AttachNetworkInterfaceResponse, error)
+	CreateNetworkInterface(ctx context.Context, in *CreateNetworkInterfaceRequest, opts ...grpc.CallOption) (*CreateNetworkInterfaceResponse, error)
 	UpdateNetworkInterface(ctx context.Context, in *UpdateNetworkInterfaceRequest, opts ...grpc.CallOption) (*UpdateNetworkInterfaceResponse, error)
-	DetachNetworkInterface(ctx context.Context, in *DetachNetworkInterfaceRequest, opts ...grpc.CallOption) (*DetachNetworkInterfaceResponse, error)
+	DeleteNetworkInterface(ctx context.Context, in *DeleteNetworkInterfaceRequest, opts ...grpc.CallOption) (*DeleteNetworkInterfaceResponse, error)
 }
 
 type machineRuntimeClient struct {
@@ -3069,36 +2924,18 @@ func (c *machineRuntimeClient) ListVolumes(ctx context.Context, in *ListVolumesR
 	return out, nil
 }
 
-func (c *machineRuntimeClient) ConfirmVolume(ctx context.Context, in *ConfirmVolumeRequest, opts ...grpc.CallOption) (*ConfirmVolumeResponse, error) {
-	out := new(ConfirmVolumeResponse)
-	err := c.cc.Invoke(ctx, "/runtime.v1alpha1.MachineRuntime/ConfirmVolume", in, out, opts...)
+func (c *machineRuntimeClient) CreateVolume(ctx context.Context, in *CreateVolumeRequest, opts ...grpc.CallOption) (*CreateVolumeResponse, error) {
+	out := new(CreateVolumeResponse)
+	err := c.cc.Invoke(ctx, "/runtime.v1alpha1.MachineRuntime/CreateVolume", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *machineRuntimeClient) AttachVolume(ctx context.Context, in *AttachVolumeRequest, opts ...grpc.CallOption) (*AttachVolumeResponse, error) {
-	out := new(AttachVolumeResponse)
-	err := c.cc.Invoke(ctx, "/runtime.v1alpha1.MachineRuntime/AttachVolume", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *machineRuntimeClient) UpdateVolume(ctx context.Context, in *UpdateVolumeRequest, opts ...grpc.CallOption) (*UpdateVolumeResponse, error) {
-	out := new(UpdateVolumeResponse)
-	err := c.cc.Invoke(ctx, "/runtime.v1alpha1.MachineRuntime/UpdateVolume", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *machineRuntimeClient) DetachVolume(ctx context.Context, in *DetachVolumeRequest, opts ...grpc.CallOption) (*DetachVolumeResponse, error) {
-	out := new(DetachVolumeResponse)
-	err := c.cc.Invoke(ctx, "/runtime.v1alpha1.MachineRuntime/DetachVolume", in, out, opts...)
+func (c *machineRuntimeClient) DeleteVolume(ctx context.Context, in *DeleteVolumeRequest, opts ...grpc.CallOption) (*DeleteVolumeResponse, error) {
+	out := new(DeleteVolumeResponse)
+	err := c.cc.Invoke(ctx, "/runtime.v1alpha1.MachineRuntime/DeleteVolume", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -3114,9 +2951,9 @@ func (c *machineRuntimeClient) ListNetworkInterfaces(ctx context.Context, in *Li
 	return out, nil
 }
 
-func (c *machineRuntimeClient) AttachNetworkInterface(ctx context.Context, in *AttachNetworkInterfaceRequest, opts ...grpc.CallOption) (*AttachNetworkInterfaceResponse, error) {
-	out := new(AttachNetworkInterfaceResponse)
-	err := c.cc.Invoke(ctx, "/runtime.v1alpha1.MachineRuntime/AttachNetworkInterface", in, out, opts...)
+func (c *machineRuntimeClient) CreateNetworkInterface(ctx context.Context, in *CreateNetworkInterfaceRequest, opts ...grpc.CallOption) (*CreateNetworkInterfaceResponse, error) {
+	out := new(CreateNetworkInterfaceResponse)
+	err := c.cc.Invoke(ctx, "/runtime.v1alpha1.MachineRuntime/CreateNetworkInterface", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -3132,9 +2969,9 @@ func (c *machineRuntimeClient) UpdateNetworkInterface(ctx context.Context, in *U
 	return out, nil
 }
 
-func (c *machineRuntimeClient) DetachNetworkInterface(ctx context.Context, in *DetachNetworkInterfaceRequest, opts ...grpc.CallOption) (*DetachNetworkInterfaceResponse, error) {
-	out := new(DetachNetworkInterfaceResponse)
-	err := c.cc.Invoke(ctx, "/runtime.v1alpha1.MachineRuntime/DetachNetworkInterface", in, out, opts...)
+func (c *machineRuntimeClient) DeleteNetworkInterface(ctx context.Context, in *DeleteNetworkInterfaceRequest, opts ...grpc.CallOption) (*DeleteNetworkInterfaceResponse, error) {
+	out := new(DeleteNetworkInterfaceResponse)
+	err := c.cc.Invoke(ctx, "/runtime.v1alpha1.MachineRuntime/DeleteNetworkInterface", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -3148,14 +2985,12 @@ type MachineRuntimeServer interface {
 	MachineStatus(context.Context, *MachineStatusRequest) (*MachineStatusResponse, error)
 	DeleteMachine(context.Context, *DeleteMachineRequest) (*DeleteMachineResponse, error)
 	ListVolumes(context.Context, *ListVolumesRequest) (*ListVolumesResponse, error)
-	ConfirmVolume(context.Context, *ConfirmVolumeRequest) (*ConfirmVolumeResponse, error)
-	AttachVolume(context.Context, *AttachVolumeRequest) (*AttachVolumeResponse, error)
-	UpdateVolume(context.Context, *UpdateVolumeRequest) (*UpdateVolumeResponse, error)
-	DetachVolume(context.Context, *DetachVolumeRequest) (*DetachVolumeResponse, error)
+	CreateVolume(context.Context, *CreateVolumeRequest) (*CreateVolumeResponse, error)
+	DeleteVolume(context.Context, *DeleteVolumeRequest) (*DeleteVolumeResponse, error)
 	ListNetworkInterfaces(context.Context, *ListNetworkInterfacesRequest) (*ListNetworkInterfacesResponse, error)
-	AttachNetworkInterface(context.Context, *AttachNetworkInterfaceRequest) (*AttachNetworkInterfaceResponse, error)
+	CreateNetworkInterface(context.Context, *CreateNetworkInterfaceRequest) (*CreateNetworkInterfaceResponse, error)
 	UpdateNetworkInterface(context.Context, *UpdateNetworkInterfaceRequest) (*UpdateNetworkInterfaceResponse, error)
-	DetachNetworkInterface(context.Context, *DetachNetworkInterfaceRequest) (*DetachNetworkInterfaceResponse, error)
+	DeleteNetworkInterface(context.Context, *DeleteNetworkInterfaceRequest) (*DeleteNetworkInterfaceResponse, error)
 }
 
 // UnimplementedMachineRuntimeServer can be embedded to have forward compatible implementations.
@@ -3177,29 +3012,23 @@ func (*UnimplementedMachineRuntimeServer) DeleteMachine(ctx context.Context, req
 func (*UnimplementedMachineRuntimeServer) ListVolumes(ctx context.Context, req *ListVolumesRequest) (*ListVolumesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListVolumes not implemented")
 }
-func (*UnimplementedMachineRuntimeServer) ConfirmVolume(ctx context.Context, req *ConfirmVolumeRequest) (*ConfirmVolumeResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ConfirmVolume not implemented")
+func (*UnimplementedMachineRuntimeServer) CreateVolume(ctx context.Context, req *CreateVolumeRequest) (*CreateVolumeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateVolume not implemented")
 }
-func (*UnimplementedMachineRuntimeServer) AttachVolume(ctx context.Context, req *AttachVolumeRequest) (*AttachVolumeResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AttachVolume not implemented")
-}
-func (*UnimplementedMachineRuntimeServer) UpdateVolume(ctx context.Context, req *UpdateVolumeRequest) (*UpdateVolumeResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateVolume not implemented")
-}
-func (*UnimplementedMachineRuntimeServer) DetachVolume(ctx context.Context, req *DetachVolumeRequest) (*DetachVolumeResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DetachVolume not implemented")
+func (*UnimplementedMachineRuntimeServer) DeleteVolume(ctx context.Context, req *DeleteVolumeRequest) (*DeleteVolumeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteVolume not implemented")
 }
 func (*UnimplementedMachineRuntimeServer) ListNetworkInterfaces(ctx context.Context, req *ListNetworkInterfacesRequest) (*ListNetworkInterfacesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListNetworkInterfaces not implemented")
 }
-func (*UnimplementedMachineRuntimeServer) AttachNetworkInterface(ctx context.Context, req *AttachNetworkInterfaceRequest) (*AttachNetworkInterfaceResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AttachNetworkInterface not implemented")
+func (*UnimplementedMachineRuntimeServer) CreateNetworkInterface(ctx context.Context, req *CreateNetworkInterfaceRequest) (*CreateNetworkInterfaceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateNetworkInterface not implemented")
 }
 func (*UnimplementedMachineRuntimeServer) UpdateNetworkInterface(ctx context.Context, req *UpdateNetworkInterfaceRequest) (*UpdateNetworkInterfaceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateNetworkInterface not implemented")
 }
-func (*UnimplementedMachineRuntimeServer) DetachNetworkInterface(ctx context.Context, req *DetachNetworkInterfaceRequest) (*DetachNetworkInterfaceResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DetachNetworkInterface not implemented")
+func (*UnimplementedMachineRuntimeServer) DeleteNetworkInterface(ctx context.Context, req *DeleteNetworkInterfaceRequest) (*DeleteNetworkInterfaceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteNetworkInterface not implemented")
 }
 
 func RegisterMachineRuntimeServer(s *grpc.Server, srv MachineRuntimeServer) {
@@ -3296,74 +3125,38 @@ func _MachineRuntime_ListVolumes_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MachineRuntime_ConfirmVolume_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ConfirmVolumeRequest)
+func _MachineRuntime_CreateVolume_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateVolumeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MachineRuntimeServer).ConfirmVolume(ctx, in)
+		return srv.(MachineRuntimeServer).CreateVolume(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/runtime.v1alpha1.MachineRuntime/ConfirmVolume",
+		FullMethod: "/runtime.v1alpha1.MachineRuntime/CreateVolume",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MachineRuntimeServer).ConfirmVolume(ctx, req.(*ConfirmVolumeRequest))
+		return srv.(MachineRuntimeServer).CreateVolume(ctx, req.(*CreateVolumeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MachineRuntime_AttachVolume_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AttachVolumeRequest)
+func _MachineRuntime_DeleteVolume_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteVolumeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MachineRuntimeServer).AttachVolume(ctx, in)
+		return srv.(MachineRuntimeServer).DeleteVolume(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/runtime.v1alpha1.MachineRuntime/AttachVolume",
+		FullMethod: "/runtime.v1alpha1.MachineRuntime/DeleteVolume",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MachineRuntimeServer).AttachVolume(ctx, req.(*AttachVolumeRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _MachineRuntime_UpdateVolume_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateVolumeRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MachineRuntimeServer).UpdateVolume(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/runtime.v1alpha1.MachineRuntime/UpdateVolume",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MachineRuntimeServer).UpdateVolume(ctx, req.(*UpdateVolumeRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _MachineRuntime_DetachVolume_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DetachVolumeRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MachineRuntimeServer).DetachVolume(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/runtime.v1alpha1.MachineRuntime/DetachVolume",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MachineRuntimeServer).DetachVolume(ctx, req.(*DetachVolumeRequest))
+		return srv.(MachineRuntimeServer).DeleteVolume(ctx, req.(*DeleteVolumeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -3386,20 +3179,20 @@ func _MachineRuntime_ListNetworkInterfaces_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MachineRuntime_AttachNetworkInterface_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AttachNetworkInterfaceRequest)
+func _MachineRuntime_CreateNetworkInterface_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateNetworkInterfaceRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MachineRuntimeServer).AttachNetworkInterface(ctx, in)
+		return srv.(MachineRuntimeServer).CreateNetworkInterface(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/runtime.v1alpha1.MachineRuntime/AttachNetworkInterface",
+		FullMethod: "/runtime.v1alpha1.MachineRuntime/CreateNetworkInterface",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MachineRuntimeServer).AttachNetworkInterface(ctx, req.(*AttachNetworkInterfaceRequest))
+		return srv.(MachineRuntimeServer).CreateNetworkInterface(ctx, req.(*CreateNetworkInterfaceRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -3422,20 +3215,20 @@ func _MachineRuntime_UpdateNetworkInterface_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MachineRuntime_DetachNetworkInterface_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DetachNetworkInterfaceRequest)
+func _MachineRuntime_DeleteNetworkInterface_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteNetworkInterfaceRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MachineRuntimeServer).DetachNetworkInterface(ctx, in)
+		return srv.(MachineRuntimeServer).DeleteNetworkInterface(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/runtime.v1alpha1.MachineRuntime/DetachNetworkInterface",
+		FullMethod: "/runtime.v1alpha1.MachineRuntime/DeleteNetworkInterface",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MachineRuntimeServer).DetachNetworkInterface(ctx, req.(*DetachNetworkInterfaceRequest))
+		return srv.(MachineRuntimeServer).DeleteNetworkInterface(ctx, req.(*DeleteNetworkInterfaceRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -3465,36 +3258,28 @@ var _MachineRuntime_serviceDesc = grpc.ServiceDesc{
 			Handler:    _MachineRuntime_ListVolumes_Handler,
 		},
 		{
-			MethodName: "ConfirmVolume",
-			Handler:    _MachineRuntime_ConfirmVolume_Handler,
+			MethodName: "CreateVolume",
+			Handler:    _MachineRuntime_CreateVolume_Handler,
 		},
 		{
-			MethodName: "AttachVolume",
-			Handler:    _MachineRuntime_AttachVolume_Handler,
-		},
-		{
-			MethodName: "UpdateVolume",
-			Handler:    _MachineRuntime_UpdateVolume_Handler,
-		},
-		{
-			MethodName: "DetachVolume",
-			Handler:    _MachineRuntime_DetachVolume_Handler,
+			MethodName: "DeleteVolume",
+			Handler:    _MachineRuntime_DeleteVolume_Handler,
 		},
 		{
 			MethodName: "ListNetworkInterfaces",
 			Handler:    _MachineRuntime_ListNetworkInterfaces_Handler,
 		},
 		{
-			MethodName: "AttachNetworkInterface",
-			Handler:    _MachineRuntime_AttachNetworkInterface_Handler,
+			MethodName: "CreateNetworkInterface",
+			Handler:    _MachineRuntime_CreateNetworkInterface_Handler,
 		},
 		{
 			MethodName: "UpdateNetworkInterface",
 			Handler:    _MachineRuntime_UpdateNetworkInterface_Handler,
 		},
 		{
-			MethodName: "DetachNetworkInterface",
-			Handler:    _MachineRuntime_DetachNetworkInterface_Handler,
+			MethodName: "DeleteNetworkInterface",
+			Handler:    _MachineRuntime_DeleteNetworkInterface_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -3569,7 +3354,7 @@ func (m *VolumeAccessConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0xa
 			i = encodeVarintApi(dAtA, i, uint64(baseI-i))
 			i--
-			dAtA[i] = 0x1a
+			dAtA[i] = 0x22
 		}
 	}
 	if len(m.Attributes) > 0 {
@@ -3588,8 +3373,15 @@ func (m *VolumeAccessConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0xa
 			i = encodeVarintApi(dAtA, i, uint64(baseI-i))
 			i--
-			dAtA[i] = 0x12
+			dAtA[i] = 0x1a
 		}
+	}
+	if len(m.Handle) > 0 {
+		i -= len(m.Handle)
+		copy(dAtA[i:], m.Handle)
+		i = encodeVarintApi(dAtA, i, uint64(len(m.Handle)))
+		i--
+		dAtA[i] = 0x12
 	}
 	if len(m.Driver) > 0 {
 		i -= len(m.Driver)
@@ -3625,50 +3417,6 @@ func (m *EmptyDiskConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i = encodeVarintApi(dAtA, i, uint64(m.SizeLimitBytes))
 		i--
 		dAtA[i] = 0x8
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *VolumeMachineMetadata) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *VolumeMachineMetadata) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *VolumeMachineMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Uid) > 0 {
-		i -= len(m.Uid)
-		copy(dAtA[i:], m.Uid)
-		i = encodeVarintApi(dAtA, i, uint64(len(m.Uid)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.Name) > 0 {
-		i -= len(m.Name)
-		copy(dAtA[i:], m.Name)
-		i = encodeVarintApi(dAtA, i, uint64(len(m.Name)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Namespace) > 0 {
-		i -= len(m.Namespace)
-		copy(dAtA[i:], m.Namespace)
-		i = encodeVarintApi(dAtA, i, uint64(len(m.Namespace)))
-		i--
-		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -3749,6 +3497,71 @@ func (m *Volume) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i = encodeVarintApi(dAtA, i, uint64(len(m.MachineId)))
 		i--
 		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *VolumeAccess) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *VolumeAccess) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *VolumeAccess) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Handle) > 0 {
+		i -= len(m.Handle)
+		copy(dAtA[i:], m.Handle)
+		i = encodeVarintApi(dAtA, i, uint64(len(m.Handle)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Driver) > 0 {
+		i -= len(m.Driver)
+		copy(dAtA[i:], m.Driver)
+		i = encodeVarintApi(dAtA, i, uint64(len(m.Driver)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *EmptyDisk) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *EmptyDisk) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *EmptyDisk) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.SizeLimitBytes != 0 {
+		i = encodeVarintApi(dAtA, i, uint64(m.SizeLimitBytes))
+		i--
+		dAtA[i] = 0x8
 	}
 	return len(dAtA) - i, nil
 }
@@ -3864,17 +3677,10 @@ func (m *NetworkConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.Uid) > 0 {
-		i -= len(m.Uid)
-		copy(dAtA[i:], m.Uid)
-		i = encodeVarintApi(dAtA, i, uint64(len(m.Uid)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Name) > 0 {
-		i -= len(m.Name)
-		copy(dAtA[i:], m.Name)
-		i = encodeVarintApi(dAtA, i, uint64(len(m.Name)))
+	if len(m.Handle) > 0 {
+		i -= len(m.Handle)
+		copy(dAtA[i:], m.Handle)
+		i = encodeVarintApi(dAtA, i, uint64(len(m.Handle)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -3968,50 +3774,6 @@ func (m *NetworkInterfaceConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 		i -= len(m.Name)
 		copy(dAtA[i:], m.Name)
 		i = encodeVarintApi(dAtA, i, uint64(len(m.Name)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *NetworkInterfaceMachineMetadata) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *NetworkInterfaceMachineMetadata) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *NetworkInterfaceMachineMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Uid) > 0 {
-		i -= len(m.Uid)
-		copy(dAtA[i:], m.Uid)
-		i = encodeVarintApi(dAtA, i, uint64(len(m.Uid)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.Name) > 0 {
-		i -= len(m.Name)
-		copy(dAtA[i:], m.Name)
-		i = encodeVarintApi(dAtA, i, uint64(len(m.Name)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Namespace) > 0 {
-		i -= len(m.Namespace)
-		copy(dAtA[i:], m.Namespace)
-		i = encodeVarintApi(dAtA, i, uint64(len(m.Namespace)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -4468,6 +4230,71 @@ func (m *Machine) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *VolumeAccessStatus) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *VolumeAccessStatus) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *VolumeAccessStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Handle) > 0 {
+		i -= len(m.Handle)
+		copy(dAtA[i:], m.Handle)
+		i = encodeVarintApi(dAtA, i, uint64(len(m.Handle)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Driver) > 0 {
+		i -= len(m.Driver)
+		copy(dAtA[i:], m.Driver)
+		i = encodeVarintApi(dAtA, i, uint64(len(m.Driver)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *EmptyDiskStatus) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *EmptyDiskStatus) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *EmptyDiskStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.SizeBytes != 0 {
+		i = encodeVarintApi(dAtA, i, uint64(m.SizeBytes))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *VolumeStatus) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -4488,13 +4315,6 @@ func (m *VolumeStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.DeviceId) > 0 {
-		i -= len(m.DeviceId)
-		copy(dAtA[i:], m.DeviceId)
-		i = encodeVarintApi(dAtA, i, uint64(len(m.DeviceId)))
-		i--
-		dAtA[i] = 0x2a
-	}
 	if m.EmptyDisk != nil {
 		{
 			size, err := m.EmptyDisk.MarshalToSizedBuffer(dAtA[:i])
@@ -4505,7 +4325,7 @@ func (m *VolumeStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			i = encodeVarintApi(dAtA, i, uint64(size))
 		}
 		i--
-		dAtA[i] = 0x22
+		dAtA[i] = 0x2a
 	}
 	if m.Access != nil {
 		{
@@ -4517,7 +4337,12 @@ func (m *VolumeStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			i = encodeVarintApi(dAtA, i, uint64(size))
 		}
 		i--
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x22
+	}
+	if m.State != 0 {
+		i = encodeVarintApi(dAtA, i, uint64(m.State))
+		i--
+		dAtA[i] = 0x18
 	}
 	if len(m.Device) > 0 {
 		i -= len(m.Device)
@@ -4556,17 +4381,10 @@ func (m *NetworkStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.Uid) > 0 {
-		i -= len(m.Uid)
-		copy(dAtA[i:], m.Uid)
-		i = encodeVarintApi(dAtA, i, uint64(len(m.Uid)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Name) > 0 {
-		i -= len(m.Name)
-		copy(dAtA[i:], m.Name)
-		i = encodeVarintApi(dAtA, i, uint64(len(m.Name)))
+	if len(m.Handle) > 0 {
+		i -= len(m.Handle)
+		copy(dAtA[i:], m.Handle)
+		i = encodeVarintApi(dAtA, i, uint64(len(m.Handle)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -4623,6 +4441,11 @@ func (m *NetworkInterfaceStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	_ = i
 	var l int
 	_ = l
+	if m.State != 0 {
+		i = encodeVarintApi(dAtA, i, uint64(m.State))
+		i--
+		dAtA[i] = 0x28
+	}
 	if m.VirtualIp != nil {
 		{
 			size, err := m.VirtualIp.MarshalToSizedBuffer(dAtA[:i])
@@ -5125,7 +4948,7 @@ func (m *ListVolumesResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *AttachVolumeRequest) Marshal() (dAtA []byte, err error) {
+func (m *CreateVolumeRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -5135,12 +4958,12 @@ func (m *AttachVolumeRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *AttachVolumeRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *CreateVolumeRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *AttachVolumeRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *CreateVolumeRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -5167,7 +4990,7 @@ func (m *AttachVolumeRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *AttachVolumeResponse) Marshal() (dAtA []byte, err error) {
+func (m *CreateVolumeResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -5177,27 +5000,20 @@ func (m *AttachVolumeResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *AttachVolumeResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *CreateVolumeResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *AttachVolumeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *CreateVolumeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.DeviceId) > 0 {
-		i -= len(m.DeviceId)
-		copy(dAtA[i:], m.DeviceId)
-		i = encodeVarintApi(dAtA, i, uint64(len(m.DeviceId)))
-		i--
-		dAtA[i] = 0xa
-	}
 	return len(dAtA) - i, nil
 }
 
-func (m *UpdateVolumeRequest) Marshal() (dAtA []byte, err error) {
+func (m *DeleteVolumeRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -5207,103 +5023,12 @@ func (m *UpdateVolumeRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *UpdateVolumeRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *DeleteVolumeRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *UpdateVolumeRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.EmptyDisk != nil {
-		{
-			size, err := m.EmptyDisk.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintApi(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x22
-	}
-	if m.Access != nil {
-		{
-			size, err := m.Access.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintApi(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.VolumeName) > 0 {
-		i -= len(m.VolumeName)
-		copy(dAtA[i:], m.VolumeName)
-		i = encodeVarintApi(dAtA, i, uint64(len(m.VolumeName)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.MachineId) > 0 {
-		i -= len(m.MachineId)
-		copy(dAtA[i:], m.MachineId)
-		i = encodeVarintApi(dAtA, i, uint64(len(m.MachineId)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *UpdateVolumeResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *UpdateVolumeResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *UpdateVolumeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.DeviceId) > 0 {
-		i -= len(m.DeviceId)
-		copy(dAtA[i:], m.DeviceId)
-		i = encodeVarintApi(dAtA, i, uint64(len(m.DeviceId)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *DetachVolumeRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *DetachVolumeRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *DetachVolumeRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *DeleteVolumeRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -5325,7 +5050,7 @@ func (m *DetachVolumeRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *DetachVolumeResponse) Marshal() (dAtA []byte, err error) {
+func (m *DeleteVolumeResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -5335,142 +5060,16 @@ func (m *DetachVolumeResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *DetachVolumeResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *DeleteVolumeResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *DetachVolumeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *DeleteVolumeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	return len(dAtA) - i, nil
-}
-
-func (m *ConfirmVolumeRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ConfirmVolumeRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *ConfirmVolumeRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.EmptyDisk != nil {
-		{
-			size, err := m.EmptyDisk.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintApi(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x22
-	}
-	if m.Access != nil {
-		{
-			size, err := m.Access.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintApi(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.VolumeName) > 0 {
-		i -= len(m.VolumeName)
-		copy(dAtA[i:], m.VolumeName)
-		i = encodeVarintApi(dAtA, i, uint64(len(m.VolumeName)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.MachineId) > 0 {
-		i -= len(m.MachineId)
-		copy(dAtA[i:], m.MachineId)
-		i = encodeVarintApi(dAtA, i, uint64(len(m.MachineId)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *VolumeConfirmation) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *VolumeConfirmation) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *VolumeConfirmation) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.DeviceId) > 0 {
-		i -= len(m.DeviceId)
-		copy(dAtA[i:], m.DeviceId)
-		i = encodeVarintApi(dAtA, i, uint64(len(m.DeviceId)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *ConfirmVolumeResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ConfirmVolumeResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *ConfirmVolumeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.Confirmation != nil {
-		{
-			size, err := m.Confirmation.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintApi(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
 	return len(dAtA) - i, nil
 }
 
@@ -5546,7 +5145,7 @@ func (m *ListNetworkInterfacesResponse) MarshalToSizedBuffer(dAtA []byte) (int, 
 	return len(dAtA) - i, nil
 }
 
-func (m *AttachNetworkInterfaceRequest) Marshal() (dAtA []byte, err error) {
+func (m *CreateNetworkInterfaceRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -5556,12 +5155,12 @@ func (m *AttachNetworkInterfaceRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *AttachNetworkInterfaceRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *CreateNetworkInterfaceRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *AttachNetworkInterfaceRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *CreateNetworkInterfaceRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -5588,7 +5187,7 @@ func (m *AttachNetworkInterfaceRequest) MarshalToSizedBuffer(dAtA []byte) (int, 
 	return len(dAtA) - i, nil
 }
 
-func (m *AttachNetworkInterfaceResponse) Marshal() (dAtA []byte, err error) {
+func (m *CreateNetworkInterfaceResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -5598,12 +5197,12 @@ func (m *AttachNetworkInterfaceResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *AttachNetworkInterfaceResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *CreateNetworkInterfaceResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *AttachNetworkInterfaceResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *CreateNetworkInterfaceResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -5692,7 +5291,7 @@ func (m *UpdateNetworkInterfaceResponse) MarshalToSizedBuffer(dAtA []byte) (int,
 	return len(dAtA) - i, nil
 }
 
-func (m *DetachNetworkInterfaceRequest) Marshal() (dAtA []byte, err error) {
+func (m *DeleteNetworkInterfaceRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -5702,12 +5301,12 @@ func (m *DetachNetworkInterfaceRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *DetachNetworkInterfaceRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *DeleteNetworkInterfaceRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *DetachNetworkInterfaceRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *DeleteNetworkInterfaceRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -5729,7 +5328,7 @@ func (m *DetachNetworkInterfaceRequest) MarshalToSizedBuffer(dAtA []byte) (int, 
 	return len(dAtA) - i, nil
 }
 
-func (m *DetachNetworkInterfaceResponse) Marshal() (dAtA []byte, err error) {
+func (m *DeleteNetworkInterfaceResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -5739,12 +5338,12 @@ func (m *DetachNetworkInterfaceResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *DetachNetworkInterfaceResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *DeleteNetworkInterfaceResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *DetachNetworkInterfaceResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *DeleteNetworkInterfaceResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -5786,6 +5385,10 @@ func (m *VolumeAccessConfig) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovApi(uint64(l))
 	}
+	l = len(m.Handle)
+	if l > 0 {
+		n += 1 + l + sovApi(uint64(l))
+	}
 	if len(m.Attributes) > 0 {
 		for k, v := range m.Attributes {
 			_ = k
@@ -5821,27 +5424,6 @@ func (m *EmptyDiskConfig) Size() (n int) {
 	return n
 }
 
-func (m *VolumeMachineMetadata) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Namespace)
-	if l > 0 {
-		n += 1 + l + sovApi(uint64(l))
-	}
-	l = len(m.Name)
-	if l > 0 {
-		n += 1 + l + sovApi(uint64(l))
-	}
-	l = len(m.Uid)
-	if l > 0 {
-		n += 1 + l + sovApi(uint64(l))
-	}
-	return n
-}
-
 func (m *Volume) Size() (n int) {
 	if m == nil {
 		return 0
@@ -5871,6 +5453,35 @@ func (m *Volume) Size() (n int) {
 	if m.EmptyDisk != nil {
 		l = m.EmptyDisk.Size()
 		n += 1 + l + sovApi(uint64(l))
+	}
+	return n
+}
+
+func (m *VolumeAccess) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Driver)
+	if l > 0 {
+		n += 1 + l + sovApi(uint64(l))
+	}
+	l = len(m.Handle)
+	if l > 0 {
+		n += 1 + l + sovApi(uint64(l))
+	}
+	return n
+}
+
+func (m *EmptyDisk) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.SizeLimitBytes != 0 {
+		n += 1 + sovApi(uint64(m.SizeLimitBytes))
 	}
 	return n
 }
@@ -5919,11 +5530,7 @@ func (m *NetworkConfig) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Name)
-	if l > 0 {
-		n += 1 + l + sovApi(uint64(l))
-	}
-	l = len(m.Uid)
+	l = len(m.Handle)
 	if l > 0 {
 		n += 1 + l + sovApi(uint64(l))
 	}
@@ -5965,27 +5572,6 @@ func (m *NetworkInterfaceConfig) Size() (n int) {
 	}
 	if m.VirtualIp != nil {
 		l = m.VirtualIp.Size()
-		n += 1 + l + sovApi(uint64(l))
-	}
-	return n
-}
-
-func (m *NetworkInterfaceMachineMetadata) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Namespace)
-	if l > 0 {
-		n += 1 + l + sovApi(uint64(l))
-	}
-	l = len(m.Name)
-	if l > 0 {
-		n += 1 + l + sovApi(uint64(l))
-	}
-	l = len(m.Uid)
-	if l > 0 {
 		n += 1 + l + sovApi(uint64(l))
 	}
 	return n
@@ -6182,6 +5768,35 @@ func (m *Machine) Size() (n int) {
 	return n
 }
 
+func (m *VolumeAccessStatus) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Driver)
+	if l > 0 {
+		n += 1 + l + sovApi(uint64(l))
+	}
+	l = len(m.Handle)
+	if l > 0 {
+		n += 1 + l + sovApi(uint64(l))
+	}
+	return n
+}
+
+func (m *EmptyDiskStatus) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.SizeBytes != 0 {
+		n += 1 + sovApi(uint64(m.SizeBytes))
+	}
+	return n
+}
+
 func (m *VolumeStatus) Size() (n int) {
 	if m == nil {
 		return 0
@@ -6196,16 +5811,15 @@ func (m *VolumeStatus) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovApi(uint64(l))
 	}
+	if m.State != 0 {
+		n += 1 + sovApi(uint64(m.State))
+	}
 	if m.Access != nil {
 		l = m.Access.Size()
 		n += 1 + l + sovApi(uint64(l))
 	}
 	if m.EmptyDisk != nil {
 		l = m.EmptyDisk.Size()
-		n += 1 + l + sovApi(uint64(l))
-	}
-	l = len(m.DeviceId)
-	if l > 0 {
 		n += 1 + l + sovApi(uint64(l))
 	}
 	return n
@@ -6217,11 +5831,7 @@ func (m *NetworkStatus) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Name)
-	if l > 0 {
-		n += 1 + l + sovApi(uint64(l))
-	}
-	l = len(m.Uid)
+	l = len(m.Handle)
 	if l > 0 {
 		n += 1 + l + sovApi(uint64(l))
 	}
@@ -6264,6 +5874,9 @@ func (m *NetworkInterfaceStatus) Size() (n int) {
 	if m.VirtualIp != nil {
 		l = m.VirtualIp.Size()
 		n += 1 + l + sovApi(uint64(l))
+	}
+	if m.State != 0 {
+		n += 1 + sovApi(uint64(m.State))
 	}
 	return n
 }
@@ -6454,7 +6067,7 @@ func (m *ListVolumesResponse) Size() (n int) {
 	return n
 }
 
-func (m *AttachVolumeRequest) Size() (n int) {
+func (m *CreateVolumeRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -6471,58 +6084,16 @@ func (m *AttachVolumeRequest) Size() (n int) {
 	return n
 }
 
-func (m *AttachVolumeResponse) Size() (n int) {
+func (m *CreateVolumeResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = len(m.DeviceId)
-	if l > 0 {
-		n += 1 + l + sovApi(uint64(l))
-	}
 	return n
 }
 
-func (m *UpdateVolumeRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.MachineId)
-	if l > 0 {
-		n += 1 + l + sovApi(uint64(l))
-	}
-	l = len(m.VolumeName)
-	if l > 0 {
-		n += 1 + l + sovApi(uint64(l))
-	}
-	if m.Access != nil {
-		l = m.Access.Size()
-		n += 1 + l + sovApi(uint64(l))
-	}
-	if m.EmptyDisk != nil {
-		l = m.EmptyDisk.Size()
-		n += 1 + l + sovApi(uint64(l))
-	}
-	return n
-}
-
-func (m *UpdateVolumeResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.DeviceId)
-	if l > 0 {
-		n += 1 + l + sovApi(uint64(l))
-	}
-	return n
-}
-
-func (m *DetachVolumeRequest) Size() (n int) {
+func (m *DeleteVolumeRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -6539,63 +6110,12 @@ func (m *DetachVolumeRequest) Size() (n int) {
 	return n
 }
 
-func (m *DetachVolumeResponse) Size() (n int) {
+func (m *DeleteVolumeResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	return n
-}
-
-func (m *ConfirmVolumeRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.MachineId)
-	if l > 0 {
-		n += 1 + l + sovApi(uint64(l))
-	}
-	l = len(m.VolumeName)
-	if l > 0 {
-		n += 1 + l + sovApi(uint64(l))
-	}
-	if m.Access != nil {
-		l = m.Access.Size()
-		n += 1 + l + sovApi(uint64(l))
-	}
-	if m.EmptyDisk != nil {
-		l = m.EmptyDisk.Size()
-		n += 1 + l + sovApi(uint64(l))
-	}
-	return n
-}
-
-func (m *VolumeConfirmation) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.DeviceId)
-	if l > 0 {
-		n += 1 + l + sovApi(uint64(l))
-	}
-	return n
-}
-
-func (m *ConfirmVolumeResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Confirmation != nil {
-		l = m.Confirmation.Size()
-		n += 1 + l + sovApi(uint64(l))
-	}
 	return n
 }
 
@@ -6627,7 +6147,7 @@ func (m *ListNetworkInterfacesResponse) Size() (n int) {
 	return n
 }
 
-func (m *AttachNetworkInterfaceRequest) Size() (n int) {
+func (m *CreateNetworkInterfaceRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -6644,7 +6164,7 @@ func (m *AttachNetworkInterfaceRequest) Size() (n int) {
 	return n
 }
 
-func (m *AttachNetworkInterfaceResponse) Size() (n int) {
+func (m *CreateNetworkInterfaceResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -6689,7 +6209,7 @@ func (m *UpdateNetworkInterfaceResponse) Size() (n int) {
 	return n
 }
 
-func (m *DetachNetworkInterfaceRequest) Size() (n int) {
+func (m *DeleteNetworkInterfaceRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -6706,7 +6226,7 @@ func (m *DetachNetworkInterfaceRequest) Size() (n int) {
 	return n
 }
 
-func (m *DetachNetworkInterfaceResponse) Size() (n int) {
+func (m *DeleteNetworkInterfaceResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -6757,6 +6277,7 @@ func (this *VolumeAccessConfig) String() string {
 	mapStringForSecretData += "}"
 	s := strings.Join([]string{`&VolumeAccessConfig{`,
 		`Driver:` + fmt.Sprintf("%v", this.Driver) + `,`,
+		`Handle:` + fmt.Sprintf("%v", this.Handle) + `,`,
 		`Attributes:` + mapStringForAttributes + `,`,
 		`SecretData:` + mapStringForSecretData + `,`,
 		`}`,
@@ -6773,29 +6294,38 @@ func (this *EmptyDiskConfig) String() string {
 	}, "")
 	return s
 }
-func (this *VolumeMachineMetadata) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&VolumeMachineMetadata{`,
-		`Namespace:` + fmt.Sprintf("%v", this.Namespace) + `,`,
-		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
-		`Uid:` + fmt.Sprintf("%v", this.Uid) + `,`,
-		`}`,
-	}, "")
-	return s
-}
 func (this *Volume) String() string {
 	if this == nil {
 		return "nil"
 	}
 	s := strings.Join([]string{`&Volume{`,
 		`MachineId:` + fmt.Sprintf("%v", this.MachineId) + `,`,
-		`MachineMetadata:` + strings.Replace(this.MachineMetadata.String(), "VolumeMachineMetadata", "VolumeMachineMetadata", 1) + `,`,
+		`MachineMetadata:` + strings.Replace(this.MachineMetadata.String(), "MachineMetadata", "MachineMetadata", 1) + `,`,
 		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`Device:` + fmt.Sprintf("%v", this.Device) + `,`,
-		`Access:` + strings.Replace(this.Access.String(), "VolumeAccessConfig", "VolumeAccessConfig", 1) + `,`,
-		`EmptyDisk:` + strings.Replace(this.EmptyDisk.String(), "EmptyDiskConfig", "EmptyDiskConfig", 1) + `,`,
+		`Access:` + strings.Replace(this.Access.String(), "VolumeAccess", "VolumeAccess", 1) + `,`,
+		`EmptyDisk:` + strings.Replace(this.EmptyDisk.String(), "EmptyDisk", "EmptyDisk", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *VolumeAccess) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&VolumeAccess{`,
+		`Driver:` + fmt.Sprintf("%v", this.Driver) + `,`,
+		`Handle:` + fmt.Sprintf("%v", this.Handle) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *EmptyDisk) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&EmptyDisk{`,
+		`SizeLimitBytes:` + fmt.Sprintf("%v", this.SizeLimitBytes) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -6828,8 +6358,7 @@ func (this *NetworkConfig) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&NetworkConfig{`,
-		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
-		`Uid:` + fmt.Sprintf("%v", this.Uid) + `,`,
+		`Handle:` + fmt.Sprintf("%v", this.Handle) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -6857,25 +6386,13 @@ func (this *NetworkInterfaceConfig) String() string {
 	}, "")
 	return s
 }
-func (this *NetworkInterfaceMachineMetadata) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&NetworkInterfaceMachineMetadata{`,
-		`Namespace:` + fmt.Sprintf("%v", this.Namespace) + `,`,
-		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
-		`Uid:` + fmt.Sprintf("%v", this.Uid) + `,`,
-		`}`,
-	}, "")
-	return s
-}
 func (this *NetworkInterface) String() string {
 	if this == nil {
 		return "nil"
 	}
 	s := strings.Join([]string{`&NetworkInterface{`,
 		`MachineId:` + fmt.Sprintf("%v", this.MachineId) + `,`,
-		`MachineMetadata:` + strings.Replace(this.MachineMetadata.String(), "NetworkInterfaceMachineMetadata", "NetworkInterfaceMachineMetadata", 1) + `,`,
+		`MachineMetadata:` + strings.Replace(this.MachineMetadata.String(), "MachineMetadata", "MachineMetadata", 1) + `,`,
 		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`Network:` + strings.Replace(this.Network.String(), "NetworkConfig", "NetworkConfig", 1) + `,`,
 		`Ips:` + fmt.Sprintf("%v", this.Ips) + `,`,
@@ -7018,6 +6535,27 @@ func (this *Machine) String() string {
 	}, "")
 	return s
 }
+func (this *VolumeAccessStatus) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&VolumeAccessStatus{`,
+		`Driver:` + fmt.Sprintf("%v", this.Driver) + `,`,
+		`Handle:` + fmt.Sprintf("%v", this.Handle) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *EmptyDiskStatus) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&EmptyDiskStatus{`,
+		`SizeBytes:` + fmt.Sprintf("%v", this.SizeBytes) + `,`,
+		`}`,
+	}, "")
+	return s
+}
 func (this *VolumeStatus) String() string {
 	if this == nil {
 		return "nil"
@@ -7025,9 +6563,9 @@ func (this *VolumeStatus) String() string {
 	s := strings.Join([]string{`&VolumeStatus{`,
 		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`Device:` + fmt.Sprintf("%v", this.Device) + `,`,
-		`Access:` + strings.Replace(this.Access.String(), "VolumeAccessConfig", "VolumeAccessConfig", 1) + `,`,
-		`EmptyDisk:` + strings.Replace(this.EmptyDisk.String(), "EmptyDiskConfig", "EmptyDiskConfig", 1) + `,`,
-		`DeviceId:` + fmt.Sprintf("%v", this.DeviceId) + `,`,
+		`State:` + fmt.Sprintf("%v", this.State) + `,`,
+		`Access:` + strings.Replace(this.Access.String(), "VolumeAccessStatus", "VolumeAccessStatus", 1) + `,`,
+		`EmptyDisk:` + strings.Replace(this.EmptyDisk.String(), "EmptyDiskStatus", "EmptyDiskStatus", 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -7037,8 +6575,7 @@ func (this *NetworkStatus) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&NetworkStatus{`,
-		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
-		`Uid:` + fmt.Sprintf("%v", this.Uid) + `,`,
+		`Handle:` + fmt.Sprintf("%v", this.Handle) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -7062,6 +6599,7 @@ func (this *NetworkInterfaceStatus) String() string {
 		`Network:` + strings.Replace(this.Network.String(), "NetworkStatus", "NetworkStatus", 1) + `,`,
 		`Ips:` + fmt.Sprintf("%v", this.Ips) + `,`,
 		`VirtualIp:` + strings.Replace(this.VirtualIp.String(), "VirtualIPStatus", "VirtualIPStatus", 1) + `,`,
+		`State:` + fmt.Sprintf("%v", this.State) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -7223,99 +6761,42 @@ func (this *ListVolumesResponse) String() string {
 	}, "")
 	return s
 }
-func (this *AttachVolumeRequest) String() string {
+func (this *CreateVolumeRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&AttachVolumeRequest{`,
+	s := strings.Join([]string{`&CreateVolumeRequest{`,
 		`MachineId:` + fmt.Sprintf("%v", this.MachineId) + `,`,
 		`Config:` + strings.Replace(this.Config.String(), "VolumeConfig", "VolumeConfig", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
-func (this *AttachVolumeResponse) String() string {
+func (this *CreateVolumeResponse) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&AttachVolumeResponse{`,
-		`DeviceId:` + fmt.Sprintf("%v", this.DeviceId) + `,`,
+	s := strings.Join([]string{`&CreateVolumeResponse{`,
 		`}`,
 	}, "")
 	return s
 }
-func (this *UpdateVolumeRequest) String() string {
+func (this *DeleteVolumeRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&UpdateVolumeRequest{`,
-		`MachineId:` + fmt.Sprintf("%v", this.MachineId) + `,`,
-		`VolumeName:` + fmt.Sprintf("%v", this.VolumeName) + `,`,
-		`Access:` + strings.Replace(this.Access.String(), "VolumeAccessConfig", "VolumeAccessConfig", 1) + `,`,
-		`EmptyDisk:` + strings.Replace(this.EmptyDisk.String(), "EmptyDiskConfig", "EmptyDiskConfig", 1) + `,`,
-		`}`,
-	}, "")
-	return s
-}
-func (this *UpdateVolumeResponse) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&UpdateVolumeResponse{`,
-		`DeviceId:` + fmt.Sprintf("%v", this.DeviceId) + `,`,
-		`}`,
-	}, "")
-	return s
-}
-func (this *DetachVolumeRequest) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&DetachVolumeRequest{`,
+	s := strings.Join([]string{`&DeleteVolumeRequest{`,
 		`MachineId:` + fmt.Sprintf("%v", this.MachineId) + `,`,
 		`VolumeName:` + fmt.Sprintf("%v", this.VolumeName) + `,`,
 		`}`,
 	}, "")
 	return s
 }
-func (this *DetachVolumeResponse) String() string {
+func (this *DeleteVolumeResponse) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&DetachVolumeResponse{`,
-		`}`,
-	}, "")
-	return s
-}
-func (this *ConfirmVolumeRequest) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&ConfirmVolumeRequest{`,
-		`MachineId:` + fmt.Sprintf("%v", this.MachineId) + `,`,
-		`VolumeName:` + fmt.Sprintf("%v", this.VolumeName) + `,`,
-		`Access:` + strings.Replace(this.Access.String(), "VolumeAccessConfig", "VolumeAccessConfig", 1) + `,`,
-		`EmptyDisk:` + strings.Replace(this.EmptyDisk.String(), "EmptyDiskConfig", "EmptyDiskConfig", 1) + `,`,
-		`}`,
-	}, "")
-	return s
-}
-func (this *VolumeConfirmation) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&VolumeConfirmation{`,
-		`DeviceId:` + fmt.Sprintf("%v", this.DeviceId) + `,`,
-		`}`,
-	}, "")
-	return s
-}
-func (this *ConfirmVolumeResponse) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&ConfirmVolumeResponse{`,
-		`Confirmation:` + strings.Replace(this.Confirmation.String(), "VolumeConfirmation", "VolumeConfirmation", 1) + `,`,
+	s := strings.Join([]string{`&DeleteVolumeResponse{`,
 		`}`,
 	}, "")
 	return s
@@ -7345,22 +6826,22 @@ func (this *ListNetworkInterfacesResponse) String() string {
 	}, "")
 	return s
 }
-func (this *AttachNetworkInterfaceRequest) String() string {
+func (this *CreateNetworkInterfaceRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&AttachNetworkInterfaceRequest{`,
+	s := strings.Join([]string{`&CreateNetworkInterfaceRequest{`,
 		`MachineId:` + fmt.Sprintf("%v", this.MachineId) + `,`,
 		`Config:` + strings.Replace(this.Config.String(), "NetworkInterfaceConfig", "NetworkInterfaceConfig", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
-func (this *AttachNetworkInterfaceResponse) String() string {
+func (this *CreateNetworkInterfaceResponse) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&AttachNetworkInterfaceResponse{`,
+	s := strings.Join([]string{`&CreateNetworkInterfaceResponse{`,
 		`}`,
 	}, "")
 	return s
@@ -7387,22 +6868,22 @@ func (this *UpdateNetworkInterfaceResponse) String() string {
 	}, "")
 	return s
 }
-func (this *DetachNetworkInterfaceRequest) String() string {
+func (this *DeleteNetworkInterfaceRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&DetachNetworkInterfaceRequest{`,
+	s := strings.Join([]string{`&DeleteNetworkInterfaceRequest{`,
 		`MachineId:` + fmt.Sprintf("%v", this.MachineId) + `,`,
 		`NetworkInterfaceName:` + fmt.Sprintf("%v", this.NetworkInterfaceName) + `,`,
 		`}`,
 	}, "")
 	return s
 }
-func (this *DetachNetworkInterfaceResponse) String() string {
+func (this *DeleteNetworkInterfaceResponse) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&DetachNetworkInterfaceResponse{`,
+	s := strings.Join([]string{`&DeleteNetworkInterfaceResponse{`,
 		`}`,
 	}, "")
 	return s
@@ -7560,6 +7041,38 @@ func (m *VolumeAccessConfig) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Handle", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApi
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthApi
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthApi
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Handle = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Attributes", wireType)
 			}
 			var msglen int
@@ -7685,7 +7198,7 @@ func (m *VolumeAccessConfig) Unmarshal(dAtA []byte) error {
 			}
 			m.Attributes[mapkey] = mapvalue
 			iNdEx = postIndex
-		case 3:
+		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SecretData", wireType)
 			}
@@ -7903,152 +7416,6 @@ func (m *EmptyDiskConfig) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *VolumeMachineMetadata) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowApi
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: VolumeMachineMetadata: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: VolumeMachineMetadata: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Namespace = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Name = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Uid", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Uid = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipApi(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthApi
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
 func (m *Volume) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -8140,7 +7507,7 @@ func (m *Volume) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.MachineMetadata == nil {
-				m.MachineMetadata = &VolumeMachineMetadata{}
+				m.MachineMetadata = &MachineMetadata{}
 			}
 			if err := m.MachineMetadata.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -8240,7 +7607,7 @@ func (m *Volume) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Access == nil {
-				m.Access = &VolumeAccessConfig{}
+				m.Access = &VolumeAccess{}
 			}
 			if err := m.Access.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -8276,12 +7643,195 @@ func (m *Volume) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.EmptyDisk == nil {
-				m.EmptyDisk = &EmptyDiskConfig{}
+				m.EmptyDisk = &EmptyDisk{}
 			}
 			if err := m.EmptyDisk.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipApi(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthApi
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *VolumeAccess) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowApi
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: VolumeAccess: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: VolumeAccess: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Driver", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApi
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthApi
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthApi
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Driver = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Handle", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApi
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthApi
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthApi
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Handle = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipApi(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthApi
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *EmptyDisk) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowApi
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: EmptyDisk: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: EmptyDisk: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SizeLimitBytes", wireType)
+			}
+			m.SizeLimitBytes = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApi
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.SizeLimitBytes |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipApi(dAtA[iNdEx:])
@@ -8602,7 +8152,7 @@ func (m *NetworkConfig) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Handle", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -8630,39 +8180,7 @@ func (m *NetworkConfig) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Name = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Uid", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Uid = string(dAtA[iNdEx:postIndex])
+			m.Handle = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -8953,152 +8471,6 @@ func (m *NetworkInterfaceConfig) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *NetworkInterfaceMachineMetadata) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowApi
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: NetworkInterfaceMachineMetadata: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: NetworkInterfaceMachineMetadata: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Namespace = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Name = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Uid", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Uid = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipApi(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthApi
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
 func (m *NetworkInterface) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -9190,7 +8562,7 @@ func (m *NetworkInterface) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.MachineMetadata == nil {
-				m.MachineMetadata = &NetworkInterfaceMachineMetadata{}
+				m.MachineMetadata = &MachineMetadata{}
 			}
 			if err := m.MachineMetadata.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -10764,6 +10136,189 @@ func (m *Machine) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *VolumeAccessStatus) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowApi
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: VolumeAccessStatus: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: VolumeAccessStatus: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Driver", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApi
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthApi
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthApi
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Driver = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Handle", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApi
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthApi
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthApi
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Handle = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipApi(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthApi
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *EmptyDiskStatus) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowApi
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: EmptyDiskStatus: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: EmptyDiskStatus: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SizeBytes", wireType)
+			}
+			m.SizeBytes = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApi
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.SizeBytes |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipApi(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthApi
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func (m *VolumeStatus) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -10858,6 +10413,25 @@ func (m *VolumeStatus) Unmarshal(dAtA []byte) error {
 			m.Device = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field State", wireType)
+			}
+			m.State = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApi
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.State |= VolumeState(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Access", wireType)
 			}
@@ -10887,13 +10461,13 @@ func (m *VolumeStatus) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Access == nil {
-				m.Access = &VolumeAccessConfig{}
+				m.Access = &VolumeAccessStatus{}
 			}
 			if err := m.Access.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
-		case 4:
+		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field EmptyDisk", wireType)
 			}
@@ -10923,43 +10497,11 @@ func (m *VolumeStatus) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.EmptyDisk == nil {
-				m.EmptyDisk = &EmptyDiskConfig{}
+				m.EmptyDisk = &EmptyDiskStatus{}
 			}
 			if err := m.EmptyDisk.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DeviceId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.DeviceId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -11013,7 +10555,7 @@ func (m *NetworkStatus) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Handle", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -11041,39 +10583,7 @@ func (m *NetworkStatus) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Name = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Uid", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Uid = string(dAtA[iNdEx:postIndex])
+			m.Handle = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -11343,6 +10853,25 @@ func (m *NetworkInterfaceStatus) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field State", wireType)
+			}
+			m.State = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApi
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.State |= NetworkInterfaceState(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipApi(dAtA[iNdEx:])
@@ -12699,7 +12228,7 @@ func (m *ListVolumesResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *AttachVolumeRequest) Unmarshal(dAtA []byte) error {
+func (m *CreateVolumeRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -12722,10 +12251,10 @@ func (m *AttachVolumeRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: AttachVolumeRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: CreateVolumeRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: AttachVolumeRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: CreateVolumeRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -12817,7 +12346,7 @@ func (m *AttachVolumeRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *AttachVolumeResponse) Unmarshal(dAtA []byte) error {
+func (m *CreateVolumeResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -12840,44 +12369,12 @@ func (m *AttachVolumeResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: AttachVolumeResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: CreateVolumeResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: AttachVolumeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: CreateVolumeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DeviceId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.DeviceId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipApi(dAtA[iNdEx:])
@@ -12899,7 +12396,7 @@ func (m *AttachVolumeResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *UpdateVolumeRequest) Unmarshal(dAtA []byte) error {
+func (m *DeleteVolumeRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -12922,278 +12419,10 @@ func (m *UpdateVolumeRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: UpdateVolumeRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: DeleteVolumeRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: UpdateVolumeRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MachineId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.MachineId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field VolumeName", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.VolumeName = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Access", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Access == nil {
-				m.Access = &VolumeAccessConfig{}
-			}
-			if err := m.Access.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field EmptyDisk", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.EmptyDisk == nil {
-				m.EmptyDisk = &EmptyDiskConfig{}
-			}
-			if err := m.EmptyDisk.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipApi(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthApi
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *UpdateVolumeResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowApi
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: UpdateVolumeResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: UpdateVolumeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DeviceId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.DeviceId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipApi(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthApi
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *DetachVolumeRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowApi
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: DetachVolumeRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: DetachVolumeRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: DeleteVolumeRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -13281,7 +12510,7 @@ func (m *DetachVolumeRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *DetachVolumeResponse) Unmarshal(dAtA []byte) error {
+func (m *DeleteVolumeResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -13304,366 +12533,12 @@ func (m *DetachVolumeResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: DetachVolumeResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: DeleteVolumeResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: DetachVolumeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: DeleteVolumeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		default:
-			iNdEx = preIndex
-			skippy, err := skipApi(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthApi
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ConfirmVolumeRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowApi
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ConfirmVolumeRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ConfirmVolumeRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MachineId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.MachineId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field VolumeName", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.VolumeName = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Access", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Access == nil {
-				m.Access = &VolumeAccessConfig{}
-			}
-			if err := m.Access.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field EmptyDisk", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.EmptyDisk == nil {
-				m.EmptyDisk = &EmptyDiskConfig{}
-			}
-			if err := m.EmptyDisk.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipApi(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthApi
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *VolumeConfirmation) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowApi
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: VolumeConfirmation: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: VolumeConfirmation: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DeviceId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.DeviceId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipApi(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthApi
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ConfirmVolumeResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowApi
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ConfirmVolumeResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ConfirmVolumeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Confirmation", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Confirmation == nil {
-				m.Confirmation = &VolumeConfirmation{}
-			}
-			if err := m.Confirmation.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipApi(dAtA[iNdEx:])
@@ -13855,7 +12730,7 @@ func (m *ListNetworkInterfacesResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *AttachNetworkInterfaceRequest) Unmarshal(dAtA []byte) error {
+func (m *CreateNetworkInterfaceRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -13878,10 +12753,10 @@ func (m *AttachNetworkInterfaceRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: AttachNetworkInterfaceRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: CreateNetworkInterfaceRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: AttachNetworkInterfaceRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: CreateNetworkInterfaceRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -13973,7 +12848,7 @@ func (m *AttachNetworkInterfaceRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *AttachNetworkInterfaceResponse) Unmarshal(dAtA []byte) error {
+func (m *CreateNetworkInterfaceResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -13996,10 +12871,10 @@ func (m *AttachNetworkInterfaceResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: AttachNetworkInterfaceResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: CreateNetworkInterfaceResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: AttachNetworkInterfaceResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: CreateNetworkInterfaceResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
@@ -14255,7 +13130,7 @@ func (m *UpdateNetworkInterfaceResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *DetachNetworkInterfaceRequest) Unmarshal(dAtA []byte) error {
+func (m *DeleteNetworkInterfaceRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -14278,10 +13153,10 @@ func (m *DetachNetworkInterfaceRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: DetachNetworkInterfaceRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: DeleteNetworkInterfaceRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: DetachNetworkInterfaceRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: DeleteNetworkInterfaceRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -14369,7 +13244,7 @@ func (m *DetachNetworkInterfaceRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *DetachNetworkInterfaceResponse) Unmarshal(dAtA []byte) error {
+func (m *DeleteNetworkInterfaceResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -14392,10 +13267,10 @@ func (m *DetachNetworkInterfaceResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: DetachNetworkInterfaceResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: DeleteNetworkInterfaceResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: DetachNetworkInterfaceResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: DeleteNetworkInterfaceResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:

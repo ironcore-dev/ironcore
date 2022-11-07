@@ -59,6 +59,8 @@ type VolumeAccess struct {
 	SecretRef *corev1.LocalObjectReference `json:"secretRef,omitempty"`
 	// Driver is the name of the drive to use for this volume. Required.
 	Driver string `json:"driver"`
+	// Handle is the unique handle of the volume.
+	Handle string `json:"handle"`
 	// VolumeAttributes are attributes of the volume to use.
 	VolumeAttributes map[string]string `json:"volumeAttributes,omitempty"`
 }

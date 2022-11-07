@@ -59,6 +59,8 @@ type VolumeAccess struct {
 	SecretRef *corev1.LocalObjectReference
 	// Driver is the name of the drive to use for this volume. Required.
 	Driver string
+	// Handle is the unique handle of the volume.
+	Handle string
 	// VolumeAttributes are attributes of the volume to use.
 	VolumeAttributes map[string]string
 }

@@ -1198,6 +1198,7 @@ func Convert_networking_NetworkInterfaceSpec_To_v1alpha1_NetworkInterfaceSpec(in
 }
 
 func autoConvert_v1alpha1_NetworkInterfaceStatus_To_networking_NetworkInterfaceStatus(in *NetworkInterfaceStatus, out *networking.NetworkInterfaceStatus, s conversion.Scope) error {
+	out.NetworkHandle = in.NetworkHandle
 	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
 	out.VirtualIP = (*commonv1alpha1.IP)(unsafe.Pointer(in.VirtualIP))
 	out.Phase = networking.NetworkInterfacePhase(in.Phase)
@@ -1211,6 +1212,7 @@ func Convert_v1alpha1_NetworkInterfaceStatus_To_networking_NetworkInterfaceStatu
 }
 
 func autoConvert_networking_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStatus(in *networking.NetworkInterfaceStatus, out *NetworkInterfaceStatus, s conversion.Scope) error {
+	out.NetworkHandle = in.NetworkHandle
 	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
 	out.VirtualIP = (*commonv1alpha1.IP)(unsafe.Pointer(in.VirtualIP))
 	out.Phase = NetworkInterfacePhase(in.Phase)
