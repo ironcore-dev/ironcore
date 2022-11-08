@@ -15,7 +15,7 @@ require (
 	github.com/onmetal/controller-utils v0.6.4
 	github.com/onmetal/vgopath v0.0.2
 	github.com/onsi/ginkgo/v2 v2.4.0
-	github.com/onsi/gomega v1.23.0
+	github.com/onsi/gomega v1.24.0
 	github.com/spf13/cobra v1.5.0
 	github.com/spf13/pflag v1.0.5
 	go.uber.org/atomic v1.10.0
