@@ -20,6 +20,7 @@ import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 // NetworkSpec defines the desired state of Network
 type NetworkSpec struct {
+	// ProviderID is the identifier of the network provider.
 	ProviderID string `json:"providerID"`
 }
 
