@@ -101,6 +101,18 @@ func (c *FakeNetworks) Update(ctx context.Context, network *v1alpha1.Network, op
 	return obj.(*v1alpha1.Network), err
 }
 
+// UpdateStatus was generated because the type contains a Status member.
+// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
+func (c *FakeNetworks) UpdateStatus(ctx context.Context, network *v1alpha1.Network, opts v1.UpdateOptions) (*v1alpha1.Network, error) {
+	obj, err := c.Fake.
+		Invokes(testing.NewUpdateSubresourceAction(networksResource, "status", c.ns, network), &v1alpha1.Network{})
+
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1alpha1.Network), err
+}
+
 // Delete takes name of the network and deletes it. Returns an error if one occurs.
 func (c *FakeNetworks) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.

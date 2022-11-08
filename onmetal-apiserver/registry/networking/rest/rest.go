@@ -75,6 +75,7 @@ func (p StorageProvider) v1alpha1Storage(restOptionsGetter generic.RESTOptionsGe
 	}
 
 	storageMap["networks"] = networkStorage.Network
+	storageMap["networks/status"] = networkStorage.Status
 
 	virtualIPStorage, err := virtualipstorage.NewStorage(restOptionsGetter)
 	if err != nil {

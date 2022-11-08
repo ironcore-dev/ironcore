@@ -108,6 +108,8 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.NetworkInterfaceStatus":       schema_onmetal_api_apis_networking_v1alpha1_NetworkInterfaceStatus(ref),
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.NetworkInterfaceTemplateSpec": schema_onmetal_api_apis_networking_v1alpha1_NetworkInterfaceTemplateSpec(ref),
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.NetworkList":                  schema_onmetal_api_apis_networking_v1alpha1_NetworkList(ref),
+		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.NetworkSpec":                  schema_onmetal_api_apis_networking_v1alpha1_NetworkSpec(ref),
+		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.NetworkStatus":                schema_onmetal_api_apis_networking_v1alpha1_NetworkStatus(ref),
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.PrefixSource":                 schema_onmetal_api_apis_networking_v1alpha1_PrefixSource(ref),
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.VirtualIP":                    schema_onmetal_api_apis_networking_v1alpha1_VirtualIP(ref),
 		"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.VirtualIPList":                schema_onmetal_api_apis_networking_v1alpha1_VirtualIPList(ref),
@@ -3271,11 +3273,23 @@ func schema_onmetal_api_apis_networking_v1alpha1_Network(ref common.ReferenceCal
 							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
 					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/onmetal/onmetal-api/apis/networking/v1alpha1.NetworkSpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/onmetal/onmetal-api/apis/networking/v1alpha1.NetworkStatus"),
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.NetworkSpec", "github.com/onmetal/onmetal-api/apis/networking/v1alpha1.NetworkStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 
@@ -3560,6 +3574,48 @@ func schema_onmetal_api_apis_networking_v1alpha1_NetworkList(ref common.Referenc
 		},
 		Dependencies: []string{
 			"github.com/onmetal/onmetal-api/apis/networking/v1alpha1.Network", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_onmetal_api_apis_networking_v1alpha1_NetworkSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkSpec defines the desired state of Network",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"providerID": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ProviderID is the identifier of the network provider.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"providerID"},
+			},
+		},
+	}
+}
+
+func schema_onmetal_api_apis_networking_v1alpha1_NetworkStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkStatus defines the observed state of Network",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"state": {
+						SchemaProps: spec.SchemaProps{
+							Description: "State is the state of the machine.\n\nPossible enum values:\n - `\"Available\"` means the network is ready to use.\n - `\"Error\"` means the network is in an error state.\n - `\"Pending\"` means the network is being provisioned.",
+							Type:        []string{"string"},
+							Format:      "",
+							Enum:        []interface{}{"Available", "Error", "Pending"}},
+					},
+				},
+			},
+		},
 	}
 }
 

@@ -18,6 +18,7 @@ package validation
 
 import (
 	"github.com/onmetal/onmetal-api/apis/networking"
+	onmetalapivalidation "github.com/onmetal/onmetal-api/onmetal-apiserver/api/validation"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
@@ -27,6 +28,13 @@ func ValidateNetwork(network *networking.Network) field.ErrorList {
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(network, true, apivalidation.NameIsDNSLabel, field.NewPath("metadata"))...)
+	allErrs = append(allErrs, validateNetworkSpec(&network.Spec, field.NewPath("spec"))...)
+
+	return allErrs
+}
+
+func validateNetworkSpec(networkSpec *networking.NetworkSpec, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
 
 	return allErrs
 }
@@ -36,7 +44,18 @@ func ValidateNetworkUpdate(newNetwork, oldNetwork *networking.Network) field.Err
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessorUpdate(newNetwork, oldNetwork, field.NewPath("metadata"))...)
+	allErrs = append(allErrs, validateNetworkSpecUpdate(&newNetwork.Spec, &oldNetwork.Spec, field.NewPath("spec"))...)
 	allErrs = append(allErrs, ValidateNetwork(newNetwork)...)
+
+	return allErrs
+}
+
+func validateNetworkSpecUpdate(newSpec, oldSpec *networking.NetworkSpec, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	if oldSpec.ProviderID != "" {
+		allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableField(newSpec.ProviderID, oldSpec.ProviderID, fldPath.Child("providerID"))...)
+	}
 
 	return allErrs
 }
