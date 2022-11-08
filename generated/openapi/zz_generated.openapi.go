@@ -3586,9 +3586,10 @@ func schema_onmetal_api_apis_networking_v1alpha1_NetworkSpec(ref common.Referenc
 				Properties: map[string]spec.Schema{
 					"providerID": {
 						SchemaProps: spec.SchemaProps{
-							Default: "",
-							Type:    []string{"string"},
-							Format:  "",
+							Description: "ProviderID is the identifier of the network provider.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
 						},
 					},
 				},
