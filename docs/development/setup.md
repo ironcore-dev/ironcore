@@ -103,8 +103,8 @@ To remove the APIs from your cluster, simply run
 make uninstall
 ```
 
-**Note** In case `make uninstall` got stuck while deleting `onmetal-system` namespace, check resources under `onmetal-system`
-namespace using below command and delete all resources present and then delete namespace.
+**Note** In case `make uninstall` got stuck while deleting `onmetal-system` namespace, delete all resources
+present in `onmetal-system` namespace and then delete `onmetal-system` namespace using the command below:
 
 ```shell
 kubectl api-resources --verbs=list --namespaced -o name | xargs -n 1 kubectl get --show-kind --ignore-not-found -n onmetal-system
