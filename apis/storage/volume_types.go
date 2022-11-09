@@ -32,7 +32,7 @@ var VolumeGK = schema.GroupKind{
 // VolumeSpec defines the desired state of Volume
 type VolumeSpec struct {
 	// VolumeClassRef is the volume class of a volume
-	VolumeClassRef corev1.LocalObjectReference
+	VolumeClassRef *corev1.LocalObjectReference
 	// VolumePoolSelector selects a suitable VolumePoolRef by the given labels.
 	VolumePoolSelector map[string]string
 	// VolumePoolRef indicates which volume pool to use for a volume.

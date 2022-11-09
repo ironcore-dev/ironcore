@@ -91,7 +91,7 @@ func (s *Server) getOnmetalMachineNetworkInterfaces(
 			}
 		}
 
-		networkInterface, err := OnmetalNetworkInterfaceToNetworkInterface(onmetalMachine.Name, machineMetadata, &onmetalNetworkInterface, onmetalNetworkingNetworkInterface)
+		networkInterface, err := s.convertOnmetalNetworkInterface(onmetalMachine.Name, machineMetadata, &onmetalNetworkInterface, onmetalNetworkingNetworkInterface)
 		if err != nil {
 			return nil, err
 		}
@@ -133,7 +133,7 @@ func (s *Server) ListNetworkInterfaces(ctx context.Context, req *ori.ListNetwork
 	if filter := req.Filter; filter != nil && filter.MachineId != "" {
 		networkInterfaces, err := s.getMachineNetworkInterfaces(ctx, filter.MachineId)
 		if err != nil {
-			if !errors.Is(err, ErrMachineNotFound) {
+			if !errors.As(err, new(*machineNotFoundError)) {
 				return nil, err
 			}
 			return &ori.ListNetworkInterfacesResponse{

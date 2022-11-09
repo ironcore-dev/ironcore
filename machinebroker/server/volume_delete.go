@@ -28,17 +28,19 @@ import (
 )
 
 func (s *Server) DeleteVolume(ctx context.Context, req *ori.DeleteVolumeRequest) (*ori.DeleteVolumeResponse, error) {
-	log := s.loggerFrom(ctx)
+	machineID := req.MachineId
+	volumeName := req.VolumeName
+	log := s.loggerFrom(ctx, "MachineID", machineID, "VolumeName", volumeName)
 
 	log.V(1).Info("Getting machine")
-	onmetalMachine, err := s.getOnmetalMachine(ctx, req.MachineId)
+	onmetalMachine, err := s.getOnmetalMachine(ctx, machineID)
 	if err != nil {
 		return nil, err
 	}
 
 	idx := slices.IndexFunc(onmetalMachine.Spec.Volumes,
 		func(volume computev1alpha1.Volume) bool {
-			return volume.Name == req.VolumeName
+			return volume.Name == volumeName
 		},
 	)
 	if idx < 0 {
@@ -57,8 +59,8 @@ func (s *Server) DeleteVolume(ctx context.Context, req *ori.DeleteVolumeRequest)
 	if err := s.client.DeleteAllOf(ctx, &storagev1alpha1.Volume{},
 		client.InNamespace(s.namespace),
 		client.MatchingLabels{
-			machinebrokerv1alpha1.MachineIDLabel:  req.MachineId,
-			machinebrokerv1alpha1.VolumeNameLabel: req.VolumeName,
+			machinebrokerv1alpha1.MachineIDLabel:  machineID,
+			machinebrokerv1alpha1.VolumeNameLabel: volumeName,
 		},
 	); err != nil {
 		return nil, fmt.Errorf("error deleting volume: %w", err)
@@ -68,8 +70,8 @@ func (s *Server) DeleteVolume(ctx context.Context, req *ori.DeleteVolumeRequest)
 	if err := s.client.DeleteAllOf(ctx, &corev1.Secret{},
 		client.InNamespace(s.namespace),
 		client.MatchingLabels{
-			machinebrokerv1alpha1.MachineIDLabel:  req.MachineId,
-			machinebrokerv1alpha1.VolumeNameLabel: req.VolumeName,
+			machinebrokerv1alpha1.MachineIDLabel:  machineID,
+			machinebrokerv1alpha1.VolumeNameLabel: volumeName,
 		},
 	); err != nil {
 		return nil, fmt.Errorf("error deleting secret: %w", err)

@@ -16,12 +16,15 @@ package server
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/go-logr/logr"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/machinebroker/api/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/runtime/v1alpha1"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
@@ -36,7 +39,7 @@ func (s *Server) getOnmetalNetworkInterface(ctx context.Context, machineID, netw
 		if !apierrors.IsNotFound(err) {
 			return nil, fmt.Errorf("error getting machine %s network interface %s: %w", machineID, networkInterfaceName, err)
 		}
-		return nil, ErrNetworkInterfaceNotFound
+		return nil, newNetworkInterfaceNotFoundError(machineID, networkInterfaceName)
 	}
 	return onmetalNetworkInterface, nil
 }
@@ -75,7 +78,7 @@ func (s *Server) UpdateNetworkInterface(ctx context.Context, req *ori.UpdateNetw
 	networkInterfaceName := req.NetworkInterfaceName
 	log := s.loggerFrom(ctx, "MachineID", machineID, "NetworkInterfaceName", networkInterfaceName)
 
-	ips, err := ParseIPs(req.Ips)
+	ips, err := s.parseIPs(req.Ips)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +92,11 @@ func (s *Server) UpdateNetworkInterface(ctx context.Context, req *ori.UpdateNetw
 	}
 
 	if err := s.updateOnmetalNetworkInterfaceVirtualIP(ctx, log, machineID, networkInterfaceName, onmetalVirtualIPConfig); err != nil {
-		return nil, err
+		var networkInterfaceNotFound *networkInterfaceNotFoundError
+		if !errors.As(err, &networkInterfaceNotFound) {
+			return nil, err
+		}
+		return nil, status.Error(codes.NotFound, networkInterfaceNotFound.Error())
 	}
 
 	onmetalNetworkInterface, err := s.getOnmetalNetworkInterface(ctx, machineID, networkInterfaceName)
@@ -99,7 +106,7 @@ func (s *Server) UpdateNetworkInterface(ctx context.Context, req *ori.UpdateNetw
 
 	log.V(1).Info("Patching network interface ips")
 	baseOnmetalNetworkInterface := onmetalNetworkInterface.DeepCopy()
-	onmetalNetworkInterface.Spec.IPs = IPsIPSource(ips)
+	onmetalNetworkInterface.Spec.IPs = s.onmetalIPsToOnmetalIPSources(ips)
 	if err := s.client.Patch(ctx, onmetalNetworkInterface, client.MergeFrom(baseOnmetalNetworkInterface)); err != nil {
 		return nil, fmt.Errorf("error patching network interface ips: %w", err)
 	}

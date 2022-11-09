@@ -15,7 +15,6 @@
 package server
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/go-logr/logr"
@@ -48,7 +47,6 @@ type Server struct {
 	client client.Client
 
 	namespace           string
-	volumePoolName      string
 	machinePoolName     string
 	machinePoolSelector map[string]string
 }
@@ -59,7 +57,6 @@ type Options struct {
 	Logger logr.Logger
 
 	Namespace           string
-	VolumePoolName      string
 	MachinePoolName     string
 	MachinePoolSelector map[string]string
 }
@@ -76,13 +73,6 @@ func setOptionsDefaults(o *Options) {
 func New(cfg *rest.Config, opts Options) (*Server, error) {
 	setOptionsDefaults(&opts)
 
-	if opts.MachinePoolName == "" {
-		return nil, fmt.Errorf("must specify MachinePoolName")
-	}
-	if opts.VolumePoolName == "" {
-		return nil, fmt.Errorf("must specify VolumePoolName")
-	}
-
 	c, err := client.New(cfg, client.Options{
 		Scheme: scheme,
 	})
@@ -94,12 +84,7 @@ func New(cfg *rest.Config, opts Options) (*Server, error) {
 		logger:              opts.Logger,
 		client:              c,
 		namespace:           opts.Namespace,
-		volumePoolName:      opts.VolumePoolName,
 		machinePoolName:     opts.MachinePoolName,
 		machinePoolSelector: opts.MachinePoolSelector,
 	}, nil
-}
-
-func (s *Server) loggerFrom(ctx context.Context, keysWithValues ...interface{}) logr.Logger {
-	return s.logger.WithValues(keysWithValues...)
 }

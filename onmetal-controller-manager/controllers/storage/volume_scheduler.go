@@ -149,16 +149,20 @@ func (s *VolumeScheduler) SetupWithManager(mgr manager.Manager) error {
 		return err
 	}
 
+	// Only schedule volumes that are not deleting, have no volume pool and no volume class set
+	filterVolume := func(volume *storagev1alpha1.Volume) bool {
+		return volume.DeletionTimestamp.IsZero() &&
+			volume.Spec.VolumePoolRef == nil &&
+			volume.Spec.VolumeClassRef != nil
+	}
+
 	return ctrl.NewControllerManagedBy(mgr).
 		Named("volume-scheduler").
-		// Enqueue unscheduled volumes.
 		For(&storagev1alpha1.Volume{},
-			builder.WithPredicates(
-				predicate.NewPredicateFuncs(func(object client.Object) bool {
-					volume := object.(*storagev1alpha1.Volume)
-					return volume.DeletionTimestamp.IsZero() && volume.Spec.VolumePoolRef == nil
-				}),
-			),
+			builder.WithPredicates(predicate.NewPredicateFuncs(func(object client.Object) bool {
+				volume := object.(*storagev1alpha1.Volume)
+				return filterVolume(volume)
+			})),
 		).
 		// Enqueue unscheduled volumes if a volume pool w/ required volume classes becomes available.
 		Watches(&source.Kind{Type: &storagev1alpha1.VolumePool{}},
@@ -181,10 +185,19 @@ func (s *VolumeScheduler) SetupWithManager(mgr manager.Manager) error {
 
 				var requests []ctrl.Request
 				for _, volume := range list.Items {
-					volumePoolSelector := labels.SelectorFromSet(volume.Spec.VolumePoolSelector)
-					if availableClassNames.Has(volume.Spec.VolumeClassRef.Name) && volumePoolSelector.Matches(labels.Set(pool.Labels)) {
-						requests = append(requests, ctrl.Request{NamespacedName: client.ObjectKeyFromObject(&volume)})
+					if !filterVolume(&volume) {
+						continue
 					}
+
+					if !availableClassNames.Has(volume.Spec.VolumeClassRef.Name) {
+						continue
+					}
+
+					if !labels.SelectorFromSet(volume.Spec.VolumePoolSelector).Matches(labels.Set(pool.Labels)) {
+						continue
+					}
+
+					requests = append(requests, ctrl.Request{NamespacedName: client.ObjectKeyFromObject(&volume)})
 				}
 				return requests
 			}),

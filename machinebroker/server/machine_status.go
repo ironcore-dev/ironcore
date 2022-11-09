@@ -19,11 +19,96 @@ import (
 	"errors"
 	"fmt"
 
+	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	"github.com/onmetal/onmetal-api/machinebroker/apiutils"
 	ori "github.com/onmetal/onmetal-api/ori/apis/runtime/v1alpha1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
+
+var onmetalVolumeStateToVolumeState = map[computev1alpha1.VolumeState]ori.VolumeState{
+	computev1alpha1.VolumeStatePending:  ori.VolumeState_VOLUME_PENDING,
+	computev1alpha1.VolumeStateAttached: ori.VolumeState_VOLUME_ATTACHED,
+	computev1alpha1.VolumeStateDetached: ori.VolumeState_VOLUME_DETACHED,
+	computev1alpha1.VolumeStateError:    ori.VolumeState_VOLUME_ERROR,
+}
+
+func (s *Server) convertOnmetalVolumeState(state computev1alpha1.VolumeState) ori.VolumeState {
+	return onmetalVolumeStateToVolumeState[state]
+}
+
+func (s *Server) convertOnmetalVolumeStatus(onmetalVolumeStatus computev1alpha1.VolumeStatus) (*ori.VolumeStatus, error) {
+	var emptyDisk *ori.EmptyDiskStatus
+	if onmetalEmptyDiskStatus := onmetalVolumeStatus.EmptyDisk; onmetalEmptyDiskStatus != nil {
+		var sizeBytes uint64
+		if size := onmetalEmptyDiskStatus.Size; size != nil {
+			sizeBytes = uint64(size.Value())
+		}
+
+		emptyDisk = &ori.EmptyDiskStatus{
+			SizeBytes: sizeBytes,
+		}
+	}
+
+	var access *ori.VolumeAccessStatus
+	if referenced := onmetalVolumeStatus.Referenced; referenced != nil {
+		access = &ori.VolumeAccessStatus{
+			Driver: referenced.Driver,
+			Handle: referenced.Handle,
+		}
+	}
+
+	return &ori.VolumeStatus{
+		Name:      onmetalVolumeStatus.Name,
+		Device:    onmetalVolumeStatus.Device,
+		State:     s.convertOnmetalVolumeState(onmetalVolumeStatus.State),
+		Access:    access,
+		EmptyDisk: emptyDisk,
+	}, nil
+}
+
+var onmetalNetworkInterfaceStateToNetworkInterfaceState = map[computev1alpha1.NetworkInterfaceState]ori.NetworkInterfaceState{
+	computev1alpha1.NetworkInterfaceStatePending:  ori.NetworkInterfaceState_NETWORK_INTERFACE_PENDING,
+	computev1alpha1.NetworkInterfaceStateAttached: ori.NetworkInterfaceState_NETWORK_INTERFACE_ATTACHED,
+	computev1alpha1.NetworkInterfaceStateDetached: ori.NetworkInterfaceState_NETWORK_INTERFACE_DETACHED,
+	computev1alpha1.NetworkInterfaceStateError:    ori.NetworkInterfaceState_NETWORK_INTERFACE_ERROR,
+}
+
+func (s *Server) convertOnmetalNetworkInterfaceState(state computev1alpha1.NetworkInterfaceState) ori.NetworkInterfaceState {
+	return onmetalNetworkInterfaceStateToNetworkInterfaceState[state]
+}
+
+func (s *Server) convertOnmetalNetworkInterfaceStatus(onmetalNetworkInterfaceStatus computev1alpha1.NetworkInterfaceStatus) (*ori.NetworkInterfaceStatus, error) {
+	var virtualIP *ori.VirtualIPStatus
+	if onmetalVirtualIP := onmetalNetworkInterfaceStatus.VirtualIP; onmetalVirtualIP != nil {
+		virtualIP = &ori.VirtualIPStatus{
+			Ip: onmetalVirtualIP.String(),
+		}
+	}
+
+	return &ori.NetworkInterfaceStatus{
+		Name:      onmetalNetworkInterfaceStatus.Name,
+		Network:   &ori.NetworkStatus{Handle: onmetalNetworkInterfaceStatus.NetworkHandle},
+		Ips:       s.convertOnmetalIPs(onmetalNetworkInterfaceStatus.IPs),
+		VirtualIp: virtualIP,
+		State:     s.convertOnmetalNetworkInterfaceState(onmetalNetworkInterfaceStatus.State),
+	}, nil
+}
+
+var onmetalMachineStateToORIState = map[computev1alpha1.MachineState]ori.MachineState{
+	computev1alpha1.MachineStatePending:  ori.MachineState_MACHINE_PENDING,
+	computev1alpha1.MachineStateRunning:  ori.MachineState_MACHINE_RUNNING,
+	computev1alpha1.MachineStateShutdown: ori.MachineState_MACHINE_SHUTDOWN,
+	computev1alpha1.MachineStateError:    ori.MachineState_MACHINE_ERROR,
+	computev1alpha1.MachineStateUnknown:  ori.MachineState_MACHINE_UNKNOWN,
+}
+
+func (s *Server) convertOnmetalMachineState(state computev1alpha1.MachineState) ori.MachineState {
+	if oriState, ok := onmetalMachineStateToORIState[state]; ok {
+		return oriState
+	}
+	return ori.MachineState_MACHINE_UNKNOWN
+}
 
 func (s *Server) MachineStatus(ctx context.Context, req *ori.MachineStatusRequest) (*ori.MachineStatusResponse, error) {
 	log := s.loggerFrom(ctx)
@@ -33,10 +118,11 @@ func (s *Server) MachineStatus(ctx context.Context, req *ori.MachineStatusReques
 	log.V(1).Info("Getting machine")
 	onmetalMachine, err := s.getOnmetalMachine(ctx, id)
 	if err != nil {
-		if !errors.Is(err, ErrMachineNotFound) {
+		var machineNotFound *machineNotFoundError
+		if !errors.As(err, &machineNotFound) {
 			return nil, fmt.Errorf("error getting onmetal machine: %w", err)
 		}
-		return nil, status.Error(codes.NotFound, fmt.Sprintf("Requested machine %s not found", id))
+		return nil, status.Error(codes.NotFound, machineNotFound.Error())
 	}
 
 	metadata, err := apiutils.GetMetadataAnnotation(onmetalMachine)
@@ -54,55 +140,26 @@ func (s *Server) MachineStatus(ctx context.Context, req *ori.MachineStatusReques
 		return nil, fmt.Errorf("error getting labels: %w", err)
 	}
 
-	state := OnmetalMachineStateToORIState(onmetalMachine.Status.State)
+	state := s.convertOnmetalMachineState(onmetalMachine.Status.State)
 
 	var volumeStates []*ori.VolumeStatus
 	for _, onmetalVolumeStatus := range onmetalMachine.Status.Volumes {
-		var emptyDisk *ori.EmptyDiskStatus
-		if onmetalEmptyDiskStatus := onmetalVolumeStatus.EmptyDisk; onmetalEmptyDiskStatus != nil {
-			var sizeBytes uint64
-			if size := onmetalEmptyDiskStatus.Size; size != nil {
-				sizeBytes = uint64(size.Value())
-			}
-
-			emptyDisk = &ori.EmptyDiskStatus{
-				SizeBytes: sizeBytes,
-			}
+		volumeStatus, err := s.convertOnmetalVolumeStatus(onmetalVolumeStatus)
+		if err != nil {
+			return nil, err
 		}
 
-		var access *ori.VolumeAccessStatus
-		if referenced := onmetalVolumeStatus.Referenced; referenced != nil {
-			access = &ori.VolumeAccessStatus{
-				Driver: referenced.Driver,
-				Handle: referenced.Handle,
-			}
-		}
-
-		volumeStates = append(volumeStates, &ori.VolumeStatus{
-			Name:      onmetalVolumeStatus.Name,
-			Device:    onmetalVolumeStatus.Device,
-			State:     OnmetalVolumeStateToVolumeState(onmetalVolumeStatus.State),
-			Access:    access,
-			EmptyDisk: emptyDisk,
-		})
+		volumeStates = append(volumeStates, volumeStatus)
 	}
 
 	var networkInterfaceStates []*ori.NetworkInterfaceStatus
 	for _, onmetalNetworkInterfaceStatus := range onmetalMachine.Status.NetworkInterfaces {
-		var virtualIP *ori.VirtualIPStatus
-		if onmetalVirtualIP := onmetalNetworkInterfaceStatus.VirtualIP; onmetalVirtualIP != nil {
-			virtualIP = &ori.VirtualIPStatus{
-				Ip: onmetalVirtualIP.String(),
-			}
+		networkInterfaceStatus, err := s.convertOnmetalNetworkInterfaceStatus(onmetalNetworkInterfaceStatus)
+		if err != nil {
+			return nil, err
 		}
 
-		networkInterfaceStates = append(networkInterfaceStates, &ori.NetworkInterfaceStatus{
-			Name:      onmetalNetworkInterfaceStatus.Name,
-			Network:   &ori.NetworkStatus{Handle: onmetalNetworkInterfaceStatus.NetworkHandle},
-			Ips:       OnmetalIPsToIPs(onmetalNetworkInterfaceStatus.IPs),
-			VirtualIp: virtualIP,
-			State:     OnmetalNetworkInterfaceStateToNetworkInterfaceState(onmetalNetworkInterfaceStatus.State),
-		})
+		networkInterfaceStates = append(networkInterfaceStates, networkInterfaceStatus)
 	}
 
 	return &ori.MachineStatusResponse{

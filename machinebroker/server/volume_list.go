@@ -91,7 +91,7 @@ func (s *Server) getOnmetalMachineVolumes(
 			}
 		}
 
-		volume, err := OnmetalVolumeToVolume(onmetalMachine.Name, machineMetadata, &onmetalVolume, onmetalStorageVolume)
+		volume, err := s.convertOnmetalVolume(onmetalMachine.Name, machineMetadata, &onmetalVolume, onmetalStorageVolume)
 		if err != nil {
 			return nil, err
 		}
@@ -133,7 +133,7 @@ func (s *Server) ListVolumes(ctx context.Context, req *ori.ListVolumesRequest) (
 	if filter := req.Filter; filter != nil && filter.MachineId != "" {
 		volumes, err := s.getMachineVolumes(ctx, filter.MachineId)
 		if err != nil {
-			if !errors.Is(err, ErrMachineNotFound) {
+			if !errors.As(err, new(*machineNotFoundError)) {
 				return nil, err
 			}
 			return &ori.ListVolumesResponse{

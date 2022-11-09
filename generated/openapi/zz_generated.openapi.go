@@ -4588,8 +4588,7 @@ func schema_onmetal_api_apis_storage_v1alpha1_VolumeSpec(ref common.ReferenceCal
 				Properties: map[string]spec.Schema{
 					"volumeClassRef": {
 						SchemaProps: spec.SchemaProps{
-							Description: "VolumeClassRef is the VolumeClass of a volume",
-							Default:     map[string]interface{}{},
+							Description: "VolumeClassRef is the VolumeClass of a volume If empty, an external controller has to provision the volume.",
 							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
 						},
 					},
@@ -4671,7 +4670,6 @@ func schema_onmetal_api_apis_storage_v1alpha1_VolumeSpec(ref common.ReferenceCal
 						},
 					},
 				},
-				Required: []string{"volumeClassRef"},
 			},
 		},
 		Dependencies: []string{

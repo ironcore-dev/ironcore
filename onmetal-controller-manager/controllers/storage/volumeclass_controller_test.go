@@ -50,9 +50,7 @@ var _ = Describe("VolumeClass controller", func() {
 				GenerateName: "volume-",
 			},
 			Spec: storagev1alpha1.VolumeSpec{
-				VolumeClassRef: corev1.LocalObjectReference{
-					Name: volumeClass.Name,
-				},
+				VolumeClassRef: &corev1.LocalObjectReference{Name: volumeClass.Name},
 				Resources: corev1.ResourceList{
 					corev1.ResourceStorage: resource.MustParse("1Gi"),
 				},
