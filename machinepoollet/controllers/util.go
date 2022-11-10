@@ -347,13 +347,6 @@ func CheckReferencedNetworkInterfaceBoundToMachine(machine *computev1alpha1.Mach
 	)
 }
 
-var workaroundNetworkHandle = func(network *networkingv1alpha1.Network) (string, bool) {
-	if vni, ok := network.Annotations["apinet.api.onmetal.de/vni"]; ok {
-		return vni, true
-	}
-	return "", false
-}
-
 func GetORINetworkInterfaceConfig(
 	ctx context.Context,
 	c client.Client,
@@ -383,8 +376,7 @@ func GetORINetworkInterfaceConfig(
 		)
 	}
 
-	handle, ok := workaroundNetworkHandle(network)
-	if !ok {
+	if network.Status.State != networkingv1alpha1.NetworkStateAvailable {
 		return nil, NewDependencyNotReadyError(
 			networkingv1alpha1.Resource("networks"),
 			networkKey.String(),
@@ -393,7 +385,7 @@ func GetORINetworkInterfaceConfig(
 	}
 
 	networkConfig := &ori.NetworkConfig{
-		Handle: handle,
+		Handle: network.Spec.ProviderID,
 	}
 
 	var virtualIPConfig *ori.VirtualIPConfig
