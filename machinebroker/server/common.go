@@ -16,7 +16,11 @@ package server
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
+	"math/rand"
+	"strconv"
 
 	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
@@ -26,6 +30,33 @@ import (
 
 func (s *Server) loggerFrom(ctx context.Context, keysWithValues ...interface{}) logr.Logger {
 	return s.logger.WithValues(keysWithValues...)
+}
+
+const idLength = 63
+
+func (s *Server) hashID(parts ...string) string {
+	h := sha256.New()
+	for _, part := range parts {
+		h.Write([]byte(part))
+	}
+	data := h.Sum(nil)
+	encoded := hex.EncodeToString(data)
+	return encoded[:idLength] // TODO: What about purely numerical IDs?
+}
+
+func (s *Server) generateID() string {
+	data := make([]byte, 32)
+	for {
+		_, _ = rand.Read(data)
+		id := hex.EncodeToString(data)
+
+		// Truncated versions of the id should not be numerical.
+		if _, err := strconv.ParseInt(id[:12], 10, 64); err != nil {
+			continue
+		}
+
+		return id[:idLength]
+	}
 }
 
 func (s *Server) convertOnmetalIPs(ips []commonv1alpha1.IP) []string {

@@ -16,11 +16,7 @@ package server
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
-	"math/rand"
-	"strconv"
-	"strings"
 
 	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
@@ -70,35 +66,20 @@ type OnmetalMachineConfig struct {
 	Machine           *computev1alpha1.Machine
 }
 
-func (s *Server) generateID() string {
-	data := make([]byte, 32)
-	for {
-		_, _ = rand.Read(data)
-		id := hex.EncodeToString(data)
-
-		// Truncated versions of the id should not be numerical.
-		if _, err := strconv.ParseInt(id[:12], 10, 64); err != nil {
-			continue
-		}
-
-		return id
-	}
-}
-
 func (s *Server) onmetalNetworkInterfaceName(id, networkInterfaceName string) string {
-	return fmt.Sprintf("%s-%s", id, networkInterfaceName)
+	return s.hashID(id, networkInterfaceName)
 }
 
 func (s *Server) onmetalVirtualIPName(id, networkInterfaceName string, ipFamily corev1.IPFamily) string {
-	return fmt.Sprintf("%s-%s-%s", id, networkInterfaceName, strings.ToLower(string(ipFamily)))
+	return s.hashID(id, networkInterfaceName, string(ipFamily))
 }
 
 func (s *Server) onmetalVolumeName(id, volumeName string) string {
-	return fmt.Sprintf("%s-%s", id, volumeName)
+	return s.hashID(id, volumeName)
 }
 
 func (s *Server) onmetalIgnitionSecretName(id string) string {
-	return fmt.Sprintf("%s-ignition", id)
+	return s.hashID(id, "ignition")
 }
 
 func (s *Server) findOnmetalMachineClass(ctx context.Context, resources *ori.MachineResources) (*computev1alpha1.MachineClass, error) {
@@ -177,6 +158,7 @@ func (s *Server) getOnmetalVolumeData(
 
 		onmetalVolumeAccess := &storagev1alpha1.VolumeAccess{
 			Driver:           volume.Access.Driver,
+			Handle:           volume.Access.Handle,
 			VolumeAttributes: volume.Access.Attributes,
 		}
 		if onmetalVolumeSecret != nil {
@@ -312,7 +294,6 @@ func (s *Server) getOnmetalNetworkInterfaceData(
 }
 
 func (s *Server) getOnmetalMachineConfig(ctx context.Context, cfg *ori.MachineConfig, machineID string) (*OnmetalMachineConfig, error) {
-
 	onmetalMachineClass, err := s.findOnmetalMachineClass(ctx, cfg.Resources)
 	if err != nil {
 		return nil, fmt.Errorf("error finding onmetal machine class: %w", err)
@@ -398,6 +379,7 @@ func (s *Server) getOnmetalMachineConfig(ctx context.Context, cfg *ori.MachineCo
 	}
 
 	return &OnmetalMachineConfig{
+		ID:                machineID,
 		IgnitionSecret:    ignitionSecret,
 		NetworkInterfaces: onmetalNetworkInterfaceConfigs,
 		Volumes:           onmetalVolumeConfigs,
@@ -613,6 +595,7 @@ func (s *Server) createOnmetalVolume(ctx context.Context, log logr.Logger, clean
 
 	log.V(1).Info("Patching volume access")
 	base := onmetalVolume.DeepCopy()
+	onmetalVolume.Status.State = storagev1alpha1.VolumeStateAvailable
 	onmetalVolume.Status.Access = onmetalVolumeCfg.Access
 	if err := s.client.Status().Patch(ctx, onmetalVolume, client.MergeFrom(base)); err != nil {
 		return fmt.Errorf("error patching volume %s access: %w", volumeName, err)
