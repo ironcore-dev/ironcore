@@ -27,6 +27,8 @@ service MachineRuntime {
   rpc CreateNetworkInterface(CreateNetworkInterfaceRequest) returns (CreateNetworkInterfaceResponse);
   rpc UpdateNetworkInterface(UpdateNetworkInterfaceRequest) returns (UpdateNetworkInterfaceResponse);
   rpc DeleteNetworkInterface(DeleteNetworkInterfaceRequest) returns (DeleteNetworkInterfaceResponse);
+
+  rpc SupportsMachineResources(SupportsMachineResourcesRequest) returns (SupportsMachineResourcesResponse);
 }
 
 message VolumeFilter {
@@ -204,6 +206,9 @@ message MachineStatus {
   map<string, string> labels = 9;
 }
 
+message MachineResourcesConfirmation {
+}
+
 message ListMachinesRequest {
   MachineFilter filter = 1;
 }
@@ -291,4 +296,12 @@ message DeleteNetworkInterfaceRequest {
 }
 
 message DeleteNetworkInterfaceResponse {
+}
+
+message SupportsMachineResourcesRequest {
+  MachineResources resources = 1;
+}
+
+message SupportsMachineResourcesResponse {
+  MachineResourcesConfirmation confirmation = 1;
 }

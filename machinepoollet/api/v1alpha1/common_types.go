@@ -18,4 +18,6 @@ const (
 	MachineUIDLabel       = "machinepoollet.api.onmetal.de/machine-uid"
 	MachineNamespaceLabel = "machinepoollet.api.onmetal.de/machine-namespace"
 	MachineNameLabel      = "machinepoollet.api.onmetal.de/machine-name"
+
+	FieldOwner = "machinepoollet.api.onmetal.de/field-owner"
 )

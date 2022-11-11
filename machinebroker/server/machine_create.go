@@ -26,7 +26,7 @@ import (
 	onmetalapiannotations "github.com/onmetal/onmetal-api/apiutils/annotations"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/machinebroker/api/v1alpha1"
 	"github.com/onmetal/onmetal-api/machinebroker/apiutils"
-	cleaner2 "github.com/onmetal/onmetal-api/machinebroker/cleaner"
+	"github.com/onmetal/onmetal-api/machinebroker/cleaner"
 	ori "github.com/onmetal/onmetal-api/ori/apis/runtime/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -80,6 +80,13 @@ func (s *Server) onmetalVolumeName(id, volumeName string) string {
 
 func (s *Server) onmetalIgnitionSecretName(id string) string {
 	return s.hashID(id, "ignition")
+}
+
+func (s *Server) getOnmetalResources(resources *ori.MachineResources) (corev1.ResourceList, error) {
+	return corev1.ResourceList{
+		corev1.ResourceCPU:    *resource.NewQuantity(int64(resources.CpuCount), resource.DecimalSI),
+		corev1.ResourceMemory: *resource.NewQuantity(int64(resources.MemoryBytes), resource.DecimalSI),
+	}, nil
 }
 
 func (s *Server) findOnmetalMachineClass(ctx context.Context, resources *ori.MachineResources) (*computev1alpha1.MachineClass, error) {
@@ -387,8 +394,8 @@ func (s *Server) getOnmetalMachineConfig(ctx context.Context, cfg *ori.MachineCo
 	}, nil
 }
 
-func (s *Server) setupCleaner(ctx context.Context, log logr.Logger, retErr *error) (cleaner *cleaner2.Cleaner, cleanup func()) {
-	cleaner = cleaner2.New()
+func (s *Server) setupCleaner(ctx context.Context, log logr.Logger, retErr *error) (c *cleaner.Cleaner, cleanup func()) {
+	c = cleaner.New()
 	cleanup = func() {
 		if *retErr != nil {
 			select {
@@ -396,13 +403,13 @@ func (s *Server) setupCleaner(ctx context.Context, log logr.Logger, retErr *erro
 				log.Info("Cannot do cleanup since context expired")
 				return
 			default:
-				if err := cleaner.Cleanup(ctx); err != nil {
+				if err := c.Cleanup(ctx); err != nil {
 					log.Error(err, "Error cleaning up")
 				}
 			}
 		}
 	}
-	return cleaner, cleanup
+	return c, cleanup
 }
 
 func (s *Server) CreateMachine(ctx context.Context, req *ori.CreateMachineRequest) (res *ori.CreateMachineResponse, retErr error) {
@@ -456,7 +463,7 @@ func (s *Server) CreateMachine(ctx context.Context, req *ori.CreateMachineReques
 	}, nil
 }
 
-func (s *Server) createOnmetalMachine(ctx context.Context, log logr.Logger, cleaner *cleaner2.Cleaner, onmetalMachineCfg *OnmetalMachineConfig) error {
+func (s *Server) createOnmetalMachine(ctx context.Context, log logr.Logger, cleaner *cleaner.Cleaner, onmetalMachineCfg *OnmetalMachineConfig) error {
 	log.V(1).Info("Creating machine")
 	onmetalMachine := onmetalMachineCfg.Machine
 	if err := s.client.Create(ctx, onmetalMachine); err != nil {
@@ -471,7 +478,7 @@ func (s *Server) createOnmetalMachine(ctx context.Context, log logr.Logger, clea
 	return nil
 }
 
-func (s *Server) createOnmetalNetwork(ctx context.Context, log logr.Logger, cleaner *cleaner2.Cleaner, onmetalNetworkCfg *OnmetalNetworkConfig) error {
+func (s *Server) createOnmetalNetwork(ctx context.Context, log logr.Logger, cleaner *cleaner.Cleaner, onmetalNetworkCfg *OnmetalNetworkConfig) error {
 	log.V(1).Info("Creating network")
 	onmetalNetwork := onmetalNetworkCfg.Network
 	if err := s.client.Create(ctx, onmetalNetwork); err != nil {
@@ -487,7 +494,7 @@ func (s *Server) createOnmetalNetwork(ctx context.Context, log logr.Logger, clea
 	return nil
 }
 
-func (s *Server) createOnmetalIgnitionSecret(ctx context.Context, log logr.Logger, cleaner *cleaner2.Cleaner, ignitionSecret *corev1.Secret) error {
+func (s *Server) createOnmetalIgnitionSecret(ctx context.Context, log logr.Logger, cleaner *cleaner.Cleaner, ignitionSecret *corev1.Secret) error {
 	log.V(1).Info("Creating ignition secret")
 	if err := s.client.Create(ctx, ignitionSecret); err != nil {
 		return fmt.Errorf("error creating ignition secret: %w", err)
@@ -502,7 +509,7 @@ func (s *Server) createOnmetalIgnitionSecret(ctx context.Context, log logr.Logge
 	return nil
 }
 
-func (s *Server) createOnmetalVirtualIP(ctx context.Context, log logr.Logger, cleaner *cleaner2.Cleaner, onmetalVirtualIPCfg *OnmetalVirtualIPConfig) (*networkingv1alpha1.VirtualIP, error) {
+func (s *Server) createOnmetalVirtualIP(ctx context.Context, log logr.Logger, cleaner *cleaner.Cleaner, onmetalVirtualIPCfg *OnmetalVirtualIPConfig) (*networkingv1alpha1.VirtualIP, error) {
 	log.V(1).Info("Creating virtual ip")
 	onmetalVirtualIP := onmetalVirtualIPCfg.VirtualIP
 	if err := s.client.Create(ctx, onmetalVirtualIP); err != nil {
@@ -528,7 +535,7 @@ func (s *Server) setOnmetalVirtualIPIP(ctx context.Context, log logr.Logger, onm
 	return nil
 }
 
-func (s *Server) createOnmetalNetworkInterface(ctx context.Context, log logr.Logger, cleaner *cleaner2.Cleaner, onmetalNetworkInterfaceCfg OnmetalNetworkInterfaceConfig) error {
+func (s *Server) createOnmetalNetworkInterface(ctx context.Context, log logr.Logger, cleaner *cleaner.Cleaner, onmetalNetworkInterfaceCfg OnmetalNetworkInterfaceConfig) error {
 	networkInterfaceName := onmetalNetworkInterfaceCfg.Name
 	log = log.WithValues("NetworkInterfaceName", networkInterfaceName)
 
@@ -562,7 +569,7 @@ func (s *Server) createOnmetalNetworkInterface(ctx context.Context, log logr.Log
 	return nil
 }
 
-func (s *Server) createOnmetalVolume(ctx context.Context, log logr.Logger, cleaner *cleaner2.Cleaner, onmetalVolumeCfg OnmetalVolumeConfig) error {
+func (s *Server) createOnmetalVolume(ctx context.Context, log logr.Logger, cleaner *cleaner.Cleaner, onmetalVolumeCfg OnmetalVolumeConfig) error {
 	volumeName := onmetalVolumeCfg.Name
 	log = log.WithValues("VolumeName", volumeName)
 

@@ -97,6 +97,10 @@ func (r *MachineReconciler) getORIMachineResources(ctx context.Context, machine 
 		)
 	}
 
+	return convertMachineClass(machineClass)
+}
+
+func convertMachineClass(machineClass *computev1alpha1.MachineClass) (*ori.MachineResources, error) {
 	cpuCount := machineClass.Capabilities.Cpu().Value()
 	memoryBytes := machineClass.Capabilities.Memory().Value()
 
