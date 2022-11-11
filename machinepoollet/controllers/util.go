@@ -18,7 +18,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/netip"
 
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
@@ -27,7 +26,6 @@ import (
 	ori "github.com/onmetal/onmetal-api/ori/apis/runtime/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -75,21 +73,18 @@ func NewDependencyNotReadyError(gr schema.GroupResource, name string, cause erro
 	}
 }
 
-func ORIMachineMetadata(machine *computev1alpha1.Machine) *ori.MachineMetadata {
+func (r *MachineReconciler) getORIMachineMetadata(machine *computev1alpha1.Machine) *ori.MachineMetadata {
 	return &ori.MachineMetadata{
 		Namespace: machine.Namespace,
 		Name:      machine.Name,
+		Uid:       string(machine.UID),
 	}
 }
 
-func GetORIMachineResources(
-	ctx context.Context,
-	c client.Client,
-	machine *computev1alpha1.Machine,
-) (*ori.MachineResources, error) {
+func (r *MachineReconciler) getORIMachineResources(ctx context.Context, machine *computev1alpha1.Machine) (*ori.MachineResources, error) {
 	machineClass := &computev1alpha1.MachineClass{}
 	machineClassKey := client.ObjectKey{Name: machine.Spec.MachineClassRef.Name}
-	if err := c.Get(ctx, machineClassKey, machineClass); err != nil {
+	if err := r.Get(ctx, machineClassKey, machineClass); err != nil {
 		err = fmt.Errorf("error getting machine class %s: %w", machineClassKey, err)
 		if !apierrors.IsNotFound(err) {
 			return nil, err
@@ -111,15 +106,10 @@ func GetORIMachineResources(
 	}, nil
 }
 
-func GetORIIgnitionConfig(
-	ctx context.Context,
-	c client.Client,
-	machine *computev1alpha1.Machine,
-	ignitionRef *commonv1alpha1.SecretKeySelector,
-) (*ori.IgnitionConfig, error) {
+func (r *MachineReconciler) getORIIgnitionConfig(ctx context.Context, machine *computev1alpha1.Machine, ignitionRef *commonv1alpha1.SecretKeySelector) (*ori.IgnitionConfig, error) {
 	ignitionSecret := &corev1.Secret{}
 	ignitionSecretKey := client.ObjectKey{Namespace: machine.Namespace, Name: ignitionRef.Name}
-	if err := c.Get(ctx, ignitionSecretKey, ignitionSecret); err != nil {
+	if err := r.Get(ctx, ignitionSecretKey, ignitionSecret); err != nil {
 		err = fmt.Errorf("error getting ignition secret %s: %w", ignitionSecretKey, err)
 		if !apierrors.IsNotFound(err) {
 			return nil, err
@@ -152,7 +142,15 @@ func GetORIIgnitionConfig(
 	}, nil
 }
 
-func GetORIVolumeAccessConfig(ctx context.Context, c client.Client, volume *storagev1alpha1.Volume) (*ori.VolumeAccessConfig, error) {
+func (r *MachineReconciler) getORIVolumeAccessConfig(ctx context.Context, volume *storagev1alpha1.Volume) (*ori.VolumeAccessConfig, error) {
+	if volume.Status.State != storagev1alpha1.VolumeStateAvailable {
+		return nil, NewDependencyNotReadyError(
+			storagev1alpha1.Resource("volumes"),
+			client.ObjectKeyFromObject(volume).String(),
+			fmt.Errorf("volume is not yet in state available"),
+		)
+	}
+
 	access := volume.Status.Access
 	if access == nil {
 		return nil, NewDependencyNotReadyError(
@@ -166,7 +164,7 @@ func GetORIVolumeAccessConfig(ctx context.Context, c client.Client, volume *stor
 	if secretRef := access.SecretRef; secretRef != nil {
 		secret := &corev1.Secret{}
 		secretKey := client.ObjectKey{Namespace: volume.Namespace, Name: secretRef.Name}
-		if err := c.Get(ctx, secretKey, secret); err != nil {
+		if err := r.Get(ctx, secretKey, secret); err != nil {
 			err = fmt.Errorf("error getting volume secret %s: %w", secretKey, err)
 			if !apierrors.IsNotFound(err) {
 				return nil, err
@@ -190,10 +188,10 @@ func GetORIVolumeAccessConfig(ctx context.Context, c client.Client, volume *stor
 	}, nil
 }
 
-// CheckReferencedVolumeBoundToMachine checks if the referenced volume is bound to the machine.
+// checkReferencedVolumeBoundToMachine checks if the referenced volume is bound to the machine.
 //
 // It is assumed that the caller verified that the machine points to the volume.
-func CheckReferencedVolumeBoundToMachine(machine *computev1alpha1.Machine, machineVolumeName string, referencedVolume *storagev1alpha1.Volume) error {
+func (r *MachineReconciler) checkReferencedVolumeBoundToMachine(machine *computev1alpha1.Machine, machineVolumeName string, referencedVolume *storagev1alpha1.Volume) error {
 	if volumePhase := referencedVolume.Status.Phase; volumePhase != storagev1alpha1.VolumePhaseBound {
 		return NewDependencyNotReadyError(
 			storagev1alpha1.Resource("volumes"),
@@ -238,48 +236,45 @@ func CheckReferencedVolumeBoundToMachine(machine *computev1alpha1.Machine, machi
 	)
 }
 
-func GetORIMachineVolumeConfig(
-	ctx context.Context,
-	c client.Client,
-	machine *computev1alpha1.Machine,
-	machineVolume *computev1alpha1.Volume,
-) (*ori.VolumeConfig, error) {
+func (r *MachineReconciler) getORIVolumeConfig(ctx context.Context, machine *computev1alpha1.Machine, machineVolume *computev1alpha1.Volume) (*ori.VolumeConfig, error) {
 	var (
 		emptyDiskConfig    *ori.EmptyDiskConfig
 		volumeAccessConfig *ori.VolumeAccessConfig
 	)
+
+	getReferencedVolumeORIAccessConfig := func(volumeKey client.ObjectKey) (*ori.VolumeAccessConfig, error) {
+		volume := &storagev1alpha1.Volume{}
+		if err := r.Get(ctx, volumeKey, volume); err != nil {
+			return nil, fmt.Errorf("error getting volume %s: %w", volumeKey, err)
+		}
+
+		if err := r.checkReferencedVolumeBoundToMachine(machine, machineVolume.Name, volume); err != nil {
+			return nil, err
+		}
+
+		volumeAccessConfig, err := r.getORIVolumeAccessConfig(ctx, volume)
+		if err != nil {
+			return nil, fmt.Errorf("error getting volume %s access config: %w", volumeKey, err)
+		}
+		return volumeAccessConfig, nil
+	}
+
 	switch {
 	case machineVolume.Ephemeral != nil:
-		volume := &storagev1alpha1.Volume{}
 		volumeKey := client.ObjectKey{Namespace: machine.Namespace, Name: computev1alpha1.MachineEphemeralVolumeName(machine.Name, machineVolume.Name)}
-		if err := c.Get(ctx, volumeKey, volume); err != nil {
-			return nil, fmt.Errorf("error getting volume %s: %w", volumeKey, err)
-		}
-
-		if err := CheckReferencedVolumeBoundToMachine(machine, machineVolume.Name, volume); err != nil {
-			return nil, err
-		}
 
 		var err error
-		volumeAccessConfig, err = GetORIVolumeAccessConfig(ctx, c, volume)
+		volumeAccessConfig, err = getReferencedVolumeORIAccessConfig(volumeKey)
 		if err != nil {
-			return nil, fmt.Errorf("error getting volume %s access config: %w", volumeKey, err)
+			return nil, err
 		}
 	case machineVolume.VolumeRef != nil:
-		volume := &storagev1alpha1.Volume{}
 		volumeKey := client.ObjectKey{Namespace: machine.Namespace, Name: machineVolume.VolumeRef.Name}
-		if err := c.Get(ctx, volumeKey, volume); err != nil {
-			return nil, fmt.Errorf("error getting volume %s: %w", volumeKey, err)
-		}
-
-		if err := CheckReferencedVolumeBoundToMachine(machine, machineVolume.Name, volume); err != nil {
-			return nil, err
-		}
 
 		var err error
-		volumeAccessConfig, err = GetORIVolumeAccessConfig(ctx, c, volume)
+		volumeAccessConfig, err = getReferencedVolumeORIAccessConfig(volumeKey)
 		if err != nil {
-			return nil, fmt.Errorf("error getting volume %s access config: %w", volumeKey, err)
+			return nil, err
 		}
 	case machineVolume.EmptyDisk != nil:
 		var sizeLimitBytes uint64
@@ -299,10 +294,10 @@ func GetORIMachineVolumeConfig(
 	}, nil
 }
 
-// CheckReferencedNetworkInterfaceBoundToMachine checks if the referenced network interface is bound to the machine.
+// checkReferencedNetworkInterfaceBoundToMachine checks if the referenced network interface is bound to the machine.
 //
 // It is assumed that the caller verified that the machine points to the network interface.
-func CheckReferencedNetworkInterfaceBoundToMachine(machine *computev1alpha1.Machine, machineNetworkInterfaceName string, referencedNetworkInterface *networkingv1alpha1.NetworkInterface) error {
+func (r *MachineReconciler) checkReferencedNetworkInterfaceBoundToMachine(machine *computev1alpha1.Machine, machineNetworkInterfaceName string, referencedNetworkInterface *networkingv1alpha1.NetworkInterface) error {
 	if networkInterfacePhase := referencedNetworkInterface.Status.Phase; networkInterfacePhase != networkingv1alpha1.NetworkInterfacePhaseBound {
 		return NewDependencyNotReadyError(
 			networkingv1alpha1.Resource("networkinterfaces"),
@@ -347,127 +342,72 @@ func CheckReferencedNetworkInterfaceBoundToMachine(machine *computev1alpha1.Mach
 	)
 }
 
-func GetORINetworkInterfaceConfig(
+func (r *MachineReconciler) getORINetworkInterfaceConfig(
 	ctx context.Context,
-	c client.Client,
-	machineNetworkInterfaceName string,
-	networkInterface *networkingv1alpha1.NetworkInterface,
-) (*ori.NetworkInterfaceConfig, error) {
-	if len(networkInterface.Spec.IPFamilies) != len(networkInterface.Status.IPs) {
-		return nil, NewDependencyNotReadyError(
-			networkingv1alpha1.Resource("networkinterfaces"),
-			client.ObjectKeyFromObject(networkInterface).String(),
-			fmt.Errorf("not all ips have been allocated"),
-		)
-	}
-
-	network := &networkingv1alpha1.Network{}
-	networkKey := client.ObjectKey{Namespace: networkInterface.Namespace, Name: networkInterface.Spec.NetworkRef.Name}
-	if err := c.Get(ctx, networkKey, network); err != nil {
-		err = fmt.Errorf("error getting network %s: %w", networkKey, err)
-		if !apierrors.IsNotFound(err) {
-			return nil, err
-		}
-
-		return nil, NewDependencyNotReadyError(
-			networkingv1alpha1.Resource("networks"),
-			networkKey.String(),
-			err,
-		)
-	}
-
-	if network.Status.State != networkingv1alpha1.NetworkStateAvailable {
-		return nil, NewDependencyNotReadyError(
-			networkingv1alpha1.Resource("networks"),
-			networkKey.String(),
-			fmt.Errorf("network does not yet provide a handle"),
-		)
-	}
-
-	networkConfig := &ori.NetworkConfig{
-		Handle: network.Spec.ProviderID,
-	}
-
-	var virtualIPConfig *ori.VirtualIPConfig
-	if virtualIP := networkInterface.Status.VirtualIP; virtualIP != nil {
-		virtualIPConfig = &ori.VirtualIPConfig{
-			Ip: virtualIP.Addr.String(),
-		}
-	}
-
-	return &ori.NetworkInterfaceConfig{
-		Name:      machineNetworkInterfaceName,
-		Network:   networkConfig,
-		Ips:       CommonV1Alpha1IPsToIPStrings(networkInterface.Status.IPs),
-		VirtualIp: virtualIPConfig,
-	}, nil
-}
-
-func GetORIMachineNetworkInterfaceConfig(
-	ctx context.Context,
-	c client.Client,
 	machine *computev1alpha1.Machine,
 	machineNetworkInterface *computev1alpha1.NetworkInterface,
 ) (*ori.NetworkInterfaceConfig, error) {
+	getReferencedNetworkInterfaceORINetworkInterfaceConfig := func(networkInterfaceKey client.ObjectKey) (*ori.NetworkInterfaceConfig, error) {
+		networkInterface := &networkingv1alpha1.NetworkInterface{}
+		if err := r.Get(ctx, networkInterfaceKey, networkInterface); err != nil {
+			if !apierrors.IsNotFound(err) {
+				return nil, fmt.Errorf("error getting network interface %s: %w", networkInterfaceKey, err)
+			}
+			return nil, NewDependencyNotReadyError(
+				networkingv1alpha1.Resource("networkinterfaces"),
+				client.ObjectKeyFromObject(networkInterface).String(),
+				err,
+			)
+		}
+
+		if err := r.checkReferencedNetworkInterfaceBoundToMachine(machine, machineNetworkInterface.Name, networkInterface); err != nil {
+			return nil, err
+		}
+
+		// TODO: The network interface should expose a ready state to avoid this lengthy check
+		if len(networkInterface.Spec.IPFamilies) != len(networkInterface.Status.IPs) || networkInterface.Status.NetworkHandle == "" {
+			return nil, NewDependencyNotReadyError(
+				networkingv1alpha1.Resource("networkinterfaces"),
+				client.ObjectKeyFromObject(networkInterface).String(),
+				fmt.Errorf("not all ips have been allocated"),
+			)
+		}
+
+		networkConfig := &ori.NetworkConfig{
+			Handle: networkInterface.Status.NetworkHandle,
+		}
+
+		var virtualIPConfig *ori.VirtualIPConfig
+		if virtualIP := networkInterface.Status.VirtualIP; virtualIP != nil {
+			virtualIPConfig = &ori.VirtualIPConfig{
+				Ip: virtualIP.Addr.String(),
+			}
+		}
+
+		return &ori.NetworkInterfaceConfig{
+			Name:      machineNetworkInterface.Name,
+			Network:   networkConfig,
+			Ips:       CommonV1Alpha1IPsToIPStrings(networkInterface.Status.IPs),
+			VirtualIp: virtualIPConfig,
+		}, nil
+	}
+
 	switch {
 	case machineNetworkInterface.Ephemeral != nil:
-		networkInterface := &networkingv1alpha1.NetworkInterface{}
 		networkInterfaceKey := client.ObjectKey{Namespace: machine.Namespace, Name: computev1alpha1.MachineEphemeralNetworkInterfaceName(machine.Name, machineNetworkInterface.Name)}
-		if err := c.Get(ctx, networkInterfaceKey, networkInterface); err != nil {
-			return nil, fmt.Errorf("error getting network interface %s: %w", networkInterfaceKey, err)
-		}
-
-		if err := CheckReferencedNetworkInterfaceBoundToMachine(machine, machineNetworkInterface.Name, networkInterface); err != nil {
-			return nil, err
-		}
-
-		return GetORINetworkInterfaceConfig(ctx, c, machineNetworkInterface.Name, networkInterface)
+		return getReferencedNetworkInterfaceORINetworkInterfaceConfig(networkInterfaceKey)
 	case machineNetworkInterface.NetworkInterfaceRef != nil:
-		networkInterface := &networkingv1alpha1.NetworkInterface{}
 		networkInterfaceKey := client.ObjectKey{Namespace: machine.Namespace, Name: machineNetworkInterface.NetworkInterfaceRef.Name}
-		if err := c.Get(ctx, networkInterfaceKey, networkInterface); err != nil {
-			return nil, fmt.Errorf("error getting network interface %s: %w", networkInterfaceKey, err)
-		}
-
-		if err := CheckReferencedNetworkInterfaceBoundToMachine(machine, machineNetworkInterface.Name, networkInterface); err != nil {
-			return nil, err
-		}
-
-		return GetORINetworkInterfaceConfig(ctx, c, machineNetworkInterface.Name, networkInterface)
+		return getReferencedNetworkInterfaceORINetworkInterfaceConfig(networkInterfaceKey)
 	default:
 		return nil, fmt.Errorf("unsupported network interface %#v", machineNetworkInterface)
 	}
-}
-
-func ToMap[V any, K comparable](slice []V, f func(v V) K) map[K]V {
-	res := make(map[K]V)
-	for _, v := range slice {
-		k := f(v)
-		res[k] = v
-	}
-	return res
-}
-
-func NetIPAddrsToCommonV1Alpha1IPs(addrs []netip.Addr) []commonv1alpha1.IP {
-	res := make([]commonv1alpha1.IP, len(addrs))
-	for i, addr := range addrs {
-		res[i] = commonv1alpha1.IP{Addr: addr}
-	}
-	return res
 }
 
 func CommonV1Alpha1IPsToIPStrings(ips []commonv1alpha1.IP) []string {
 	res := make([]string, len(ips))
 	for i, ip := range ips {
 		res[i] = ip.Addr.String()
-	}
-	return res
-}
-
-func CommonV1Alpha1IPsToNetIPAddrs(ips []commonv1alpha1.IP) []netip.Addr {
-	res := make([]netip.Addr, len(ips))
-	for i, ip := range ips {
-		res[i] = ip.Addr
 	}
 	return res
 }
@@ -480,7 +420,7 @@ var oriMachineStateToComputeV1Alpha1MachineState = map[ori.MachineState]computev
 	ori.MachineState_MACHINE_UNKNOWN:  computev1alpha1.MachineStateUnknown,
 }
 
-func ORIMachineStateToComputeV1Alpha1MachineState(oriState ori.MachineState) computev1alpha1.MachineState {
+func (r *MachineReconciler) oriMachineStateToComputeV1Alpha1MachineState(oriState ori.MachineState) computev1alpha1.MachineState {
 	if mapped, ok := oriMachineStateToComputeV1Alpha1MachineState[oriState]; ok {
 		return mapped
 	}
@@ -494,45 +434,6 @@ var oriVolumeStateToComputeV1Alpha1VolumeState = map[ori.VolumeState]computev1al
 	ori.VolumeState_VOLUME_PENDING:  computev1alpha1.VolumeStatePending,
 }
 
-func ORIVolumeStateToComputeV1Alpha1VolumeState(oriState ori.VolumeState) computev1alpha1.VolumeState {
+func (r *MachineReconciler) oriVolumeStateToComputeV1Alpha1VolumeState(oriState ori.VolumeState) computev1alpha1.VolumeState {
 	return oriVolumeStateToComputeV1Alpha1VolumeState[oriState]
-}
-
-func ErrorVolumeStatus(name string) computev1alpha1.VolumeStatus {
-	return computev1alpha1.VolumeStatus{
-		Name:  name,
-		State: computev1alpha1.VolumeStateError,
-	}
-}
-
-func ORIVolumeStatusToComputeV1Alpha1VolumeStatus(status *ori.VolumeStatus) computev1alpha1.VolumeStatus {
-	var emptyDisk *computev1alpha1.EmptyDiskVolumeStatus
-	if status.EmptyDisk != nil {
-		var size *resource.Quantity
-		if sizeBytes := status.EmptyDisk.SizeBytes; sizeBytes > 0 {
-			size = resource.NewQuantity(int64(sizeBytes), resource.DecimalSI)
-		}
-
-		emptyDisk = &computev1alpha1.EmptyDiskVolumeStatus{
-			Size: size,
-		}
-	}
-
-	var referenced *computev1alpha1.ReferencedVolumeStatus
-	if status.Access != nil {
-		referenced = &computev1alpha1.ReferencedVolumeStatus{
-			Driver: status.Access.Driver,
-			Handle: status.Access.Handle,
-		}
-	}
-
-	return computev1alpha1.VolumeStatus{
-		Name:   status.Name,
-		Device: status.Device,
-		VolumeSourceStatus: computev1alpha1.VolumeSourceStatus{
-			EmptyDisk:  emptyDisk,
-			Referenced: referenced,
-		},
-		State: ORIVolumeStateToComputeV1Alpha1VolumeState(status.State),
-	}
 }

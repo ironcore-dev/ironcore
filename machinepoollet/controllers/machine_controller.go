@@ -25,11 +25,15 @@ import (
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 	onmetalapiclient "github.com/onmetal/onmetal-api/apiutils/client"
+	machinepoolletv1alpha1 "github.com/onmetal/onmetal-api/machinepoollet/api/v1alpha1"
 	machinepoolletclient "github.com/onmetal/onmetal-api/machinepoollet/client"
 	"github.com/onmetal/onmetal-api/machinepoollet/controllers/events"
 	"github.com/onmetal/onmetal-api/machinepoollet/mleg"
 	ori "github.com/onmetal/onmetal-api/ori/apis/runtime/v1alpha1"
+	utilslices "github.com/onmetal/onmetal-api/utils/slices"
 	"golang.org/x/exp/slices"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -43,12 +47,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/source"
-)
-
-const (
-	MachineUIDLabel       = "machinepoollet.compute.api.onmetal.de/machine-uid"
-	MachineNamespaceLabel = "machinepoollet.compute.api.onmetal.de/machine-namespace"
-	MachineNameLabel      = "machinepoollet.compute.api.onmetal.de/machine-name"
 )
 
 type MachineReconciler struct {
@@ -80,8 +78,8 @@ func (r *MachineReconciler) deleteGone(ctx context.Context, log logr.Logger, mac
 	res, err := r.MachineRuntime.ListMachines(ctx, &ori.ListMachinesRequest{
 		Filter: &ori.MachineFilter{
 			LabelSelector: map[string]string{
-				MachineNamespaceLabel: machineKey.Namespace,
-				MachineNameLabel:      machineKey.Name,
+				machinepoolletv1alpha1.MachineNamespaceLabel: machineKey.Namespace,
+				machinepoolletv1alpha1.MachineNameLabel:      machineKey.Name,
 			},
 		},
 	})
@@ -97,7 +95,11 @@ func (r *MachineReconciler) deleteGone(ctx context.Context, log logr.Logger, mac
 		if _, err := r.MachineRuntime.DeleteMachine(ctx, &ori.DeleteMachineRequest{
 			MachineId: machine.Id,
 		}); err != nil {
-			errs = append(errs, fmt.Errorf("error deleting machine %s: %w", machine.Id, err))
+			if status.Code(err) != codes.NotFound {
+				errs = append(errs, fmt.Errorf("error deleting machine %s: %w", machine.Id, err))
+			} else {
+				log.V(1).Info("Machine is already gone")
+			}
 		}
 	}
 
@@ -130,7 +132,7 @@ func (r *MachineReconciler) delete(ctx context.Context, log logr.Logger, machine
 	res, err := r.MachineRuntime.ListMachines(ctx, &ori.ListMachinesRequest{
 		Filter: &ori.MachineFilter{
 			LabelSelector: map[string]string{
-				MachineUIDLabel: string(machine.UID),
+				machinepoolletv1alpha1.MachineUIDLabel: string(machine.UID),
 			},
 		},
 	})
@@ -147,7 +149,11 @@ func (r *MachineReconciler) delete(ctx context.Context, log logr.Logger, machine
 			MachineId: machine.Id,
 		})
 		if err != nil {
-			errs = append(errs, fmt.Errorf("error deleting machine %s: %w", machine.Id, err))
+			if status.Code(err) != codes.NotFound {
+				errs = append(errs, fmt.Errorf("error deleting machine %s: %w", machine.Id, err))
+			} else {
+				log.V(1).Info("Machine is already gone")
+			}
 		}
 	}
 
@@ -192,7 +198,7 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 	res, err := r.MachineRuntime.ListMachines(ctx, &ori.ListMachinesRequest{
 		Filter: &ori.MachineFilter{
 			LabelSelector: map[string]string{
-				MachineUIDLabel: string(machine.UID),
+				machinepoolletv1alpha1.MachineUIDLabel: string(machine.UID),
 			},
 		},
 	})
@@ -257,7 +263,7 @@ func (r *MachineReconciler) updateStatus(
 	now := metav1.Now()
 	runtimeStatus := res.Status
 
-	runtimeVolumeStatusByName := ToMap(runtimeStatus.Volumes, func(volumeStatus *ori.VolumeStatus) string { return volumeStatus.Name })
+	runtimeVolumeStatusByName := utilslices.ToMap(runtimeStatus.Volumes, func(volumeStatus *ori.VolumeStatus) string { return volumeStatus.Name })
 	for i := range machine.Status.Volumes {
 		volumeStatus := &machine.Status.Volumes[i]
 		runtimeVolumeStatus := runtimeVolumeStatusByName[volumeStatus.Name]
@@ -270,7 +276,7 @@ func (r *MachineReconciler) updateStatus(
 		machine.Status.Volumes = append(machine.Status.Volumes, *volumeStatus)
 	}
 
-	runtimeNetworkInterfaceStatusByName := ToMap(runtimeStatus.NetworkInterfaces, func(networkInterfaceStatus *ori.NetworkInterfaceStatus) string { return networkInterfaceStatus.Name })
+	runtimeNetworkInterfaceStatusByName := utilslices.ToMap(runtimeStatus.NetworkInterfaces, func(networkInterfaceStatus *ori.NetworkInterfaceStatus) string { return networkInterfaceStatus.Name })
 	for i := range machine.Status.NetworkInterfaces {
 		networkInterfaceStatus := &machine.Status.NetworkInterfaces[i]
 		runtimeNetworkInterfaceStatus := runtimeNetworkInterfaceStatusByName[networkInterfaceStatus.Name]
@@ -287,7 +293,7 @@ func (r *MachineReconciler) updateStatus(
 		machine.Status.NetworkInterfaces = append(machine.Status.NetworkInterfaces, *networkInterfaceStatus)
 	}
 
-	machine.Status.State = ORIMachineStateToComputeV1Alpha1MachineState(runtimeStatus.State)
+	machine.Status.State = r.oriMachineStateToComputeV1Alpha1MachineState(runtimeStatus.State)
 
 	if err := r.Status().Patch(ctx, machine, client.MergeFrom(base)); err != nil {
 		return fmt.Errorf("error patching status: %w", err)
@@ -304,7 +310,7 @@ func (r *MachineReconciler) updateVolumeStatus(volumeStatus *computev1alpha1.Vol
 	)
 
 	if runtimeVolumeStatus != nil {
-		newState = ORIVolumeStateToComputeV1Alpha1VolumeState(runtimeVolumeStatus.State)
+		newState = r.oriVolumeStateToComputeV1Alpha1VolumeState(runtimeVolumeStatus.State)
 		device = runtimeVolumeStatus.Device
 		if runtimeEmptyDisk := runtimeVolumeStatus.EmptyDisk; runtimeEmptyDisk != nil {
 			emptyDisk = &computev1alpha1.EmptyDiskVolumeStatus{
@@ -428,8 +434,8 @@ func (r *MachineReconciler) reconcileNetworkInterfaces(
 		return fmt.Errorf("error listing network interfaces: %w", err)
 	}
 
-	specNetworkInterfaceByName := ToMap(machine.Spec.NetworkInterfaces, func(v computev1alpha1.NetworkInterface) string { return v.Name })
-	existingNetworkInterfaceByName := ToMap(res.NetworkInterfaces, func(v *ori.NetworkInterface) string { return v.Name })
+	specNetworkInterfaceByName := utilslices.ToMap(machine.Spec.NetworkInterfaces, func(v computev1alpha1.NetworkInterface) string { return v.Name })
+	existingNetworkInterfaceByName := utilslices.ToMap(res.NetworkInterfaces, func(v *ori.NetworkInterface) string { return v.Name })
 
 	var errs []error
 
@@ -504,7 +510,10 @@ func (r *MachineReconciler) deleteNetworkInterface(
 		MachineId:            machineID,
 		NetworkInterfaceName: networkInterfaceName,
 	}); err != nil {
-		return fmt.Errorf("error detaching network interface: %w", err)
+		if status.Code(err) != codes.NotFound {
+			return fmt.Errorf("error detaching network interface: %w", err)
+		}
+		log.V(1).Info("Network interface is already gone")
 	}
 	return nil
 }
@@ -518,7 +527,7 @@ func (r *MachineReconciler) applyNetworkInterface(
 	existingNetworkInterface *ori.NetworkInterface,
 ) error {
 	log.V(1).Info("Getting network interface config")
-	config, err := GetORIMachineNetworkInterfaceConfig(ctx, r.Client, machine, &networkInterface)
+	config, err := r.getORINetworkInterfaceConfig(ctx, machine, &networkInterface)
 	if err != nil {
 		return fmt.Errorf("error getting machine network interface config: %w", err)
 	}
@@ -556,7 +565,8 @@ func (r *MachineReconciler) applyNetworkInterface(
 
 	log.V(1).Info("Creating network interface")
 	if _, err := r.MachineRuntime.CreateNetworkInterface(ctx, &ori.CreateNetworkInterfaceRequest{
-		Config: config,
+		MachineId: machineID,
+		Config:    config,
 	}); err != nil {
 		return fmt.Errorf("error attaching network interface: %w", err)
 	}
@@ -583,7 +593,7 @@ func (r *MachineReconciler) applyVolume(
 	existingVolume *ori.Volume,
 ) error {
 	log.V(1).Info("Getting volume config")
-	config, err := GetORIMachineVolumeConfig(ctx, r.Client, machine, &volume)
+	config, err := r.getORIVolumeConfig(ctx, machine, &volume)
 	if err != nil {
 		return fmt.Errorf("error getting machine volume config: %w", err)
 	}
@@ -599,7 +609,11 @@ func (r *MachineReconciler) applyVolume(
 			MachineId:  machineID,
 			VolumeName: volume.Name,
 		}); err != nil {
-			return fmt.Errorf("error deleting volume: %w", err)
+			if status.Code(err) != codes.NotFound {
+				return fmt.Errorf("error deleting volume: %w", err)
+			} else {
+				log.V(1).Info("Volume is already gone")
+			}
 		}
 	}
 
@@ -624,7 +638,10 @@ func (r *MachineReconciler) deleteVolume(
 		MachineId:  machineID,
 		VolumeName: volumeName,
 	}); err != nil {
-		return fmt.Errorf("error detaching volume: %w", err)
+		if status.Code(err) != codes.NotFound {
+			return fmt.Errorf("error detaching volume: %w", err)
+		}
+		log.V(1).Info("Volume is already gone")
 	}
 	return nil
 }
@@ -642,8 +659,8 @@ func (r *MachineReconciler) reconcileVolumes(
 		return fmt.Errorf("error listing volumes for machine: %w", err)
 	}
 
-	specVolumeByName := ToMap(machine.Spec.Volumes, func(v computev1alpha1.Volume) string { return v.Name })
-	existingVolumeByName := ToMap(res.Volumes, func(v *ori.Volume) string { return v.Name })
+	specVolumeByName := utilslices.ToMap(machine.Spec.Volumes, func(v computev1alpha1.Volume) string { return v.Name })
+	existingVolumeByName := utilslices.ToMap(res.Volumes, func(v *ori.Volume) string { return v.Name })
 
 	var errs []error
 
@@ -682,7 +699,7 @@ func (r *MachineReconciler) reconcileVolumes(
 
 func (r *MachineReconciler) getMachineConfig(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) (*ori.MachineConfig, error) {
 	log.V(1).Info("Getting machine resources")
-	machineResources, err := GetORIMachineResources(ctx, r.Client, machine)
+	machineResources, err := r.getORIMachineResources(ctx, machine)
 	if err != nil {
 		if !IsDependencyNotReadyError(err) {
 			r.EventRecorder.Eventf(machine, corev1.EventTypeWarning, events.ErrorGettingMachineResources, "Error getting machine resources: %v", err)
@@ -696,7 +713,7 @@ func (r *MachineReconciler) getMachineConfig(ctx context.Context, log logr.Logge
 	var ignitionConfig *ori.IgnitionConfig
 	if ignitionRef := machine.Spec.IgnitionRef; ignitionRef != nil {
 		log.V(1).Info("Getting machine ignition config")
-		ignitionConfig, err = GetORIIgnitionConfig(ctx, r.Client, machine, ignitionRef)
+		ignitionConfig, err = r.getORIIgnitionConfig(ctx, machine, ignitionRef)
 		if err != nil {
 			if !IsDependencyNotReadyError(err) {
 				r.EventRecorder.Eventf(machine, corev1.EventTypeWarning, events.ErrorGettingIgnitionConfig, "Error getting ignition config: %v", err)
@@ -711,7 +728,7 @@ func (r *MachineReconciler) getMachineConfig(ctx context.Context, log logr.Logge
 	var networkInterfaceConfigs []*ori.NetworkInterfaceConfig
 	for _, networkInterface := range machine.Spec.NetworkInterfaces {
 		log.V(1).Info("Getting network interface config", "MachineNetworkInterfaceName", networkInterface.Name)
-		networkInterfaceConfig, err := GetORIMachineNetworkInterfaceConfig(ctx, r.Client, machine, &networkInterface)
+		networkInterfaceConfig, err := r.getORINetworkInterfaceConfig(ctx, machine, &networkInterface)
 		if err != nil {
 			if !IsDependencyNotReadyError(err) {
 				r.EventRecorder.Eventf(machine, corev1.EventTypeWarning, events.ErrorGettingNetworkInterfaceConfig, "Error getting network interface %s config: %v", networkInterface.Name, err)
@@ -728,7 +745,7 @@ func (r *MachineReconciler) getMachineConfig(ctx context.Context, log logr.Logge
 	var volumeConfigs []*ori.VolumeConfig
 	for _, volume := range machine.Spec.Volumes {
 		log.V(1).Info("Getting machine volume config", "MachineVolumeName", volume.Name)
-		volumeConfig, err := GetORIMachineVolumeConfig(ctx, r.Client, machine, &volume)
+		volumeConfig, err := r.getORIVolumeConfig(ctx, machine, &volume)
 		if err != nil {
 			if !IsDependencyNotReadyError(err) {
 				r.EventRecorder.Eventf(machine, corev1.EventTypeWarning, events.ErrorGettingVolumeConfig, "Error getting volume %s config: %v", volume.Name, err)
@@ -742,19 +759,20 @@ func (r *MachineReconciler) getMachineConfig(ctx context.Context, log logr.Logge
 		volumeConfigs = append(volumeConfigs, volumeConfig)
 	}
 
-	machineMetadata := ORIMachineMetadata(machine)
+	machineMetadata := r.getORIMachineMetadata(machine)
 
 	return &ori.MachineConfig{
 		Metadata:          machineMetadata,
-		Resources:         machineResources,
 		Image:             machine.Spec.Image,
+		Resources:         machineResources,
 		Ignition:          ignitionConfig,
 		Volumes:           volumeConfigs,
 		NetworkInterfaces: networkInterfaceConfigs,
+		Annotations:       map[string]string{},
 		Labels: map[string]string{
-			MachineUIDLabel:       string(machine.UID),
-			MachineNamespaceLabel: machine.Namespace,
-			MachineNameLabel:      machine.Name,
+			machinepoolletv1alpha1.MachineUIDLabel:       string(machine.UID),
+			machinepoolletv1alpha1.MachineNamespaceLabel: machine.Namespace,
+			machinepoolletv1alpha1.MachineNameLabel:      machine.Name,
 		},
 	}, nil
 }
