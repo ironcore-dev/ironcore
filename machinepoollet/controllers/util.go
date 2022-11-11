@@ -27,6 +27,7 @@ import (
 	ori "github.com/onmetal/onmetal-api/ori/apis/runtime/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -183,6 +184,7 @@ func GetORIVolumeAccessConfig(ctx context.Context, c client.Client, volume *stor
 
 	return &ori.VolumeAccessConfig{
 		Driver:     access.Driver,
+		Handle:     access.Handle,
 		Attributes: access.VolumeAttributes,
 		SecretData: secretData,
 	}, nil
@@ -374,9 +376,16 @@ func GetORINetworkInterfaceConfig(
 		)
 	}
 
+	if network.Status.State != networkingv1alpha1.NetworkStateAvailable {
+		return nil, NewDependencyNotReadyError(
+			networkingv1alpha1.Resource("networks"),
+			networkKey.String(),
+			fmt.Errorf("network does not yet provide a handle"),
+		)
+	}
+
 	networkConfig := &ori.NetworkConfig{
-		Name: network.Name,
-		Uid:  string(network.UID),
+		Handle: network.Spec.ProviderID,
 	}
 
 	var virtualIPConfig *ori.VirtualIPConfig
@@ -430,7 +439,7 @@ func GetORIMachineNetworkInterfaceConfig(
 	}
 }
 
-func GroupBy[V any, K comparable](slice []V, f func(v V) K) map[K]V {
+func ToMap[V any, K comparable](slice []V, f func(v V) K) map[K]V {
 	res := make(map[K]V)
 	for _, v := range slice {
 		k := f(v)
@@ -476,4 +485,54 @@ func ORIMachineStateToComputeV1Alpha1MachineState(oriState ori.MachineState) com
 		return mapped
 	}
 	return computev1alpha1.MachineStateUnknown
+}
+
+var oriVolumeStateToComputeV1Alpha1VolumeState = map[ori.VolumeState]computev1alpha1.VolumeState{
+	ori.VolumeState_VOLUME_ATTACHED: computev1alpha1.VolumeStateAttached,
+	ori.VolumeState_VOLUME_DETACHED: computev1alpha1.VolumeStateDetached,
+	ori.VolumeState_VOLUME_ERROR:    computev1alpha1.VolumeStateError,
+	ori.VolumeState_VOLUME_PENDING:  computev1alpha1.VolumeStatePending,
+}
+
+func ORIVolumeStateToComputeV1Alpha1VolumeState(oriState ori.VolumeState) computev1alpha1.VolumeState {
+	return oriVolumeStateToComputeV1Alpha1VolumeState[oriState]
+}
+
+func ErrorVolumeStatus(name string) computev1alpha1.VolumeStatus {
+	return computev1alpha1.VolumeStatus{
+		Name:  name,
+		State: computev1alpha1.VolumeStateError,
+	}
+}
+
+func ORIVolumeStatusToComputeV1Alpha1VolumeStatus(status *ori.VolumeStatus) computev1alpha1.VolumeStatus {
+	var emptyDisk *computev1alpha1.EmptyDiskVolumeStatus
+	if status.EmptyDisk != nil {
+		var size *resource.Quantity
+		if sizeBytes := status.EmptyDisk.SizeBytes; sizeBytes > 0 {
+			size = resource.NewQuantity(int64(sizeBytes), resource.DecimalSI)
+		}
+
+		emptyDisk = &computev1alpha1.EmptyDiskVolumeStatus{
+			Size: size,
+		}
+	}
+
+	var referenced *computev1alpha1.ReferencedVolumeStatus
+	if status.Access != nil {
+		referenced = &computev1alpha1.ReferencedVolumeStatus{
+			Driver: status.Access.Driver,
+			Handle: status.Access.Handle,
+		}
+	}
+
+	return computev1alpha1.VolumeStatus{
+		Name:   status.Name,
+		Device: status.Device,
+		VolumeSourceStatus: computev1alpha1.VolumeSourceStatus{
+			EmptyDisk:  emptyDisk,
+			Referenced: referenced,
+		},
+		State: ORIVolumeStateToComputeV1Alpha1VolumeState(status.State),
+	}
 }

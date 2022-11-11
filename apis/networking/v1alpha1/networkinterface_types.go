@@ -56,6 +56,8 @@ type VirtualIPSource struct {
 
 // NetworkInterfaceStatus defines the observed state of NetworkInterface
 type NetworkInterfaceStatus struct {
+	// NetworkHandle is the handle of the network the network interface is part of.
+	NetworkHandle string `json:"networkHandle,omitempty"`
 	// IPs represent the effective IP addresses of the NetworkInterface
 	IPs []commonv1alpha1.IP `json:"ips,omitempty"`
 	// VirtualIP is any virtual ip assigned to the NetworkInterface.

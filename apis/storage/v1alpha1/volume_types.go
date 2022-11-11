@@ -32,7 +32,8 @@ var VolumeGK = schema.GroupKind{
 // VolumeSpec defines the desired state of Volume
 type VolumeSpec struct {
 	// VolumeClassRef is the VolumeClass of a volume
-	VolumeClassRef corev1.LocalObjectReference `json:"volumeClassRef"`
+	// If empty, an external controller has to provision the volume.
+	VolumeClassRef *corev1.LocalObjectReference `json:"volumeClassRef,omitempty"`
 	// VolumePoolSelector selects a suitable VolumePoolRef by the given labels.
 	VolumePoolSelector map[string]string `json:"volumePoolSelector,omitempty"`
 	// VolumePoolRef indicates which VolumePool to use for a volume.
@@ -59,6 +60,8 @@ type VolumeAccess struct {
 	SecretRef *corev1.LocalObjectReference `json:"secretRef,omitempty"`
 	// Driver is the name of the drive to use for this volume. Required.
 	Driver string `json:"driver"`
+	// Handle is the unique handle of the volume.
+	Handle string `json:"handle"`
 	// VolumeAttributes are attributes of the volume to use.
 	VolumeAttributes map[string]string `json:"volumeAttributes,omitempty"`
 }

@@ -30,6 +30,7 @@ import (
 var _ = Describe("NetworkInterfaceReconciler", func() {
 	ctx := testutils.SetupContext()
 	ns := SetupTest(ctx)
+	const networkProviderID = "foo"
 
 	It("should reconcile the ips and update the status", func() {
 		By("creating a network")
@@ -38,8 +39,16 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 				Namespace:    ns.Name,
 				GenerateName: "network-",
 			},
+			Spec: networkingv1alpha1.NetworkSpec{
+				ProviderID: networkProviderID,
+			},
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())
+
+		By("patching the network to be ready")
+		baseNetwork := network.DeepCopy()
+		network.Status.State = networkingv1alpha1.NetworkStateAvailable
+		Expect(k8sClient.Status().Patch(ctx, network, client.MergeFrom(baseNetwork))).To(Succeed())
 
 		By("creating a network interface")
 		nic := &networkingv1alpha1.NetworkInterface{
@@ -63,10 +72,13 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 
 		By("waiting for the network interface to report the correct ips")
 		nicKey := client.ObjectKeyFromObject(nic)
-		Eventually(func(g Gomega) []commonv1alpha1.IP {
+		Eventually(func(g Gomega) networkingv1alpha1.NetworkInterfaceStatus {
 			Expect(k8sClient.Get(ctx, nicKey, nic)).To(Succeed())
-			return nic.Status.IPs
-		}).Should(Equal([]commonv1alpha1.IP{commonv1alpha1.MustParseIP("10.0.0.1")}))
+			return nic.Status
+		}).Should(SatisfyAll(
+			HaveField("NetworkHandle", networkProviderID),
+			HaveField("IPs", []commonv1alpha1.IP{commonv1alpha1.MustParseIP("10.0.0.1")}),
+		))
 	})
 
 	It("should create ephemeral prefixes and report their IPs once allocated", func() {
@@ -89,8 +101,16 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 				Namespace:    ns.Name,
 				GenerateName: "network-",
 			},
+			Spec: networkingv1alpha1.NetworkSpec{
+				ProviderID: networkProviderID,
+			},
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())
+
+		By("patching the network to be ready")
+		baseNetwork := network.DeepCopy()
+		network.Status.State = networkingv1alpha1.NetworkStateAvailable
+		Expect(k8sClient.Status().Patch(ctx, network, client.MergeFrom(baseNetwork))).To(Succeed())
 
 		By("creating a network interface")
 		nic := &networkingv1alpha1.NetworkInterface{
@@ -152,8 +172,16 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 				Namespace:    ns.Name,
 				GenerateName: "network-",
 			},
+			Spec: networkingv1alpha1.NetworkSpec{
+				ProviderID: networkProviderID,
+			},
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())
+
+		By("patching the network to be ready")
+		baseNetwork := network.DeepCopy()
+		network.Status.State = networkingv1alpha1.NetworkStateAvailable
+		Expect(k8sClient.Status().Patch(ctx, network, client.MergeFrom(baseNetwork))).To(Succeed())
 
 		By("creating a network interface")
 		nic := &networkingv1alpha1.NetworkInterface{

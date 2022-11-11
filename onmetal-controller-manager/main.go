@@ -27,7 +27,7 @@ import (
 	onmetalapiclient "github.com/onmetal/onmetal-api/onmetal-controller-manager/client"
 	"github.com/onmetal/onmetal-api/onmetal-controller-manager/controllers/compute"
 	"github.com/onmetal/onmetal-api/onmetal-controller-manager/controllers/ipam"
-	networking2 "github.com/onmetal/onmetal-api/onmetal-controller-manager/controllers/networking"
+	networkingcontrollers "github.com/onmetal/onmetal-api/onmetal-controller-manager/controllers/networking"
 	"github.com/onmetal/onmetal-api/onmetal-controller-manager/controllers/storage"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
@@ -269,7 +269,7 @@ func main() {
 	}
 
 	if controllers.Enabled(networkProtectionController) {
-		if err = (&networking2.NetworkProtectionReconciler{
+		if err = (&networkingcontrollers.NetworkProtectionReconciler{
 			Client: mgr.GetClient(),
 			Scheme: mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
@@ -286,7 +286,12 @@ func main() {
 	}
 
 	if controllers.Enabled(networkInterfaceController) {
-		if err = (&networking2.NetworkInterfaceReconciler{
+		if err = onmetalapiclient.SetupNetworkInterfaceNetworkNameFieldIndexer(context.TODO(), mgr.GetFieldIndexer()); err != nil {
+			setupLog.Error(err, "unable to setup field indexer", "field", onmetalapiclient.NetworkInterfaceNetworkName)
+			os.Exit(1)
+		}
+
+		if err = (&networkingcontrollers.NetworkInterfaceReconciler{
 			EventRecorder: mgr.GetEventRecorderFor("networkinterfaces"),
 			Client:        mgr.GetClient(),
 			Scheme:        mgr.GetScheme(),
@@ -297,7 +302,7 @@ func main() {
 	}
 
 	if controllers.Enabled(networkInterfaceBindController) {
-		if err = (&networking2.NetworkInterfaceBindReconciler{
+		if err = (&networkingcontrollers.NetworkInterfaceBindReconciler{
 			EventRecorder: mgr.GetEventRecorderFor("networkinterfaces"),
 			Client:        mgr.GetClient(),
 			APIReader:     mgr.GetAPIReader(),
@@ -310,7 +315,7 @@ func main() {
 	}
 
 	if controllers.Enabled(virtualIPController) {
-		if err = (&networking2.VirtualIPReconciler{
+		if err = (&networkingcontrollers.VirtualIPReconciler{
 			EventRecorder: mgr.GetEventRecorderFor("virtualips"),
 			Client:        mgr.GetClient(),
 			APIReader:     mgr.GetAPIReader(),
@@ -323,7 +328,7 @@ func main() {
 	}
 
 	if controllers.Enabled(aliasPrefixController) {
-		if err = (&networking2.AliasPrefixReconciler{
+		if err = (&networkingcontrollers.AliasPrefixReconciler{
 			Client: mgr.GetClient(),
 			Scheme: mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {

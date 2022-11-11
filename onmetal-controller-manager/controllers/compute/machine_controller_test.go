@@ -45,8 +45,16 @@ var _ = Describe("MachineReconciler", func() {
 				Namespace:    ns.Name,
 				GenerateName: "network-",
 			},
+			Spec: networkingv1alpha1.NetworkSpec{
+				ProviderID: "foo",
+			},
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())
+
+		By("patching the network to be ready")
+		baseNetwork := network.DeepCopy()
+		network.Status.State = networkingv1alpha1.NetworkStateAvailable
+		Expect(k8sClient.Status().Patch(ctx, network, client.MergeFrom(baseNetwork))).To(Succeed())
 
 		By("creating a machine")
 		machine := &computev1alpha1.Machine{
@@ -79,7 +87,7 @@ var _ = Describe("MachineReconciler", func() {
 							Ephemeral: &computev1alpha1.EphemeralVolumeSource{
 								VolumeTemplate: &storagev1alpha1.VolumeTemplateSpec{
 									Spec: storagev1alpha1.VolumeSpec{
-										VolumeClassRef: corev1.LocalObjectReference{Name: "my-class"},
+										VolumeClassRef: &corev1.LocalObjectReference{Name: "my-class"},
 										VolumePoolRef:  &corev1.LocalObjectReference{Name: "my-pool"},
 										Resources: corev1.ResourceList{
 											"storage": resource.MustParse("10Gi"),

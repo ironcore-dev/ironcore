@@ -17,7 +17,6 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"net/netip"
 
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/clientutils"
@@ -33,6 +32,7 @@ import (
 	"golang.org/x/exp/slices"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -230,19 +230,152 @@ func (r *MachineReconciler) create(ctx context.Context, log logr.Logger, machine
 	}
 	log.V(1).Info("Created", "MachineID", res.Machine.Id)
 
-	log.V(1).Info("Patching status")
-	if err := r.patchStatus(
-		ctx,
-		machine,
-		computev1alpha1.MachineStatePending,
-		machine.Status.NetworkInterfaces,
-		machine.Status.Volumes,
-	); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error patching machine status: %w", err)
+	log.V(1).Info("Updating status")
+	if err := r.updateStatus(ctx, log, machine, res.Machine.Id); err != nil {
+		return ctrl.Result{}, fmt.Errorf("error updating machine status: %w", err)
 	}
 
 	log.V(1).Info("Created")
 	return ctrl.Result{Requeue: true}, nil
+}
+
+func (r *MachineReconciler) updateStatus(
+	ctx context.Context,
+	log logr.Logger,
+	machine *computev1alpha1.Machine,
+	machineID string,
+) error {
+	log.V(1).Info("Getting runtime status")
+	res, err := r.MachineRuntime.MachineStatus(ctx, &ori.MachineStatusRequest{
+		MachineId: machineID,
+	})
+	if err != nil {
+		return fmt.Errorf("error getting machine status: %w", err)
+	}
+
+	base := machine.DeepCopy()
+	now := metav1.Now()
+	runtimeStatus := res.Status
+
+	runtimeVolumeStatusByName := ToMap(runtimeStatus.Volumes, func(volumeStatus *ori.VolumeStatus) string { return volumeStatus.Name })
+	for i := range machine.Status.Volumes {
+		volumeStatus := &machine.Status.Volumes[i]
+		runtimeVolumeStatus := runtimeVolumeStatusByName[volumeStatus.Name]
+		r.updateVolumeStatus(volumeStatus, runtimeVolumeStatus, now)
+		delete(runtimeVolumeStatusByName, volumeStatus.Name)
+	}
+	for name, runtimeVolumeStatus := range runtimeVolumeStatusByName {
+		volumeStatus := &computev1alpha1.VolumeStatus{Name: name}
+		r.updateVolumeStatus(volumeStatus, runtimeVolumeStatus, now)
+		machine.Status.Volumes = append(machine.Status.Volumes, *volumeStatus)
+	}
+
+	runtimeNetworkInterfaceStatusByName := ToMap(runtimeStatus.NetworkInterfaces, func(networkInterfaceStatus *ori.NetworkInterfaceStatus) string { return networkInterfaceStatus.Name })
+	for i := range machine.Status.NetworkInterfaces {
+		networkInterfaceStatus := &machine.Status.NetworkInterfaces[i]
+		runtimeNetworkInterfaceStatus := runtimeNetworkInterfaceStatusByName[networkInterfaceStatus.Name]
+		if err := r.updateNetworkInterfaceStatus(networkInterfaceStatus, runtimeNetworkInterfaceStatus, now); err != nil {
+			return fmt.Errorf("error updating network interface %s status: %w", networkInterfaceStatus.Name, err)
+		}
+		delete(runtimeNetworkInterfaceStatusByName, networkInterfaceStatus.Name)
+	}
+	for name, runtimeNetworkInterfaceStatus := range runtimeNetworkInterfaceStatusByName {
+		networkInterfaceStatus := &computev1alpha1.NetworkInterfaceStatus{Name: name}
+		if err := r.updateNetworkInterfaceStatus(networkInterfaceStatus, runtimeNetworkInterfaceStatus, now); err != nil {
+			return fmt.Errorf("error updating network interface %s status: %w", networkInterfaceStatus.Name, err)
+		}
+		machine.Status.NetworkInterfaces = append(machine.Status.NetworkInterfaces, *networkInterfaceStatus)
+	}
+
+	machine.Status.State = ORIMachineStateToComputeV1Alpha1MachineState(runtimeStatus.State)
+
+	if err := r.Status().Patch(ctx, machine, client.MergeFrom(base)); err != nil {
+		return fmt.Errorf("error patching status: %w", err)
+	}
+	return nil
+}
+
+func (r *MachineReconciler) updateVolumeStatus(volumeStatus *computev1alpha1.VolumeStatus, runtimeVolumeStatus *ori.VolumeStatus, now metav1.Time) {
+	var (
+		newState   computev1alpha1.VolumeState
+		device     string
+		emptyDisk  *computev1alpha1.EmptyDiskVolumeStatus
+		referenced *computev1alpha1.ReferencedVolumeStatus
+	)
+
+	if runtimeVolumeStatus != nil {
+		newState = ORIVolumeStateToComputeV1Alpha1VolumeState(runtimeVolumeStatus.State)
+		device = runtimeVolumeStatus.Device
+		if runtimeEmptyDisk := runtimeVolumeStatus.EmptyDisk; runtimeEmptyDisk != nil {
+			emptyDisk = &computev1alpha1.EmptyDiskVolumeStatus{
+				Size: resource.NewQuantity(int64(runtimeEmptyDisk.SizeBytes), resource.DecimalSI),
+			}
+		}
+		if runtimeAccess := runtimeVolumeStatus.Access; runtimeAccess != nil {
+			referenced = &computev1alpha1.ReferencedVolumeStatus{
+				Driver: runtimeAccess.Driver,
+				Handle: runtimeAccess.Handle,
+			}
+		}
+	} else {
+		newState = computev1alpha1.VolumeStateDetached
+	}
+
+	if volumeStatus.State != newState {
+		volumeStatus.LastStateTransitionTime = &now
+	}
+
+	volumeStatus.State = newState
+	volumeStatus.Device = device
+	volumeStatus.EmptyDisk = emptyDisk
+	volumeStatus.Referenced = referenced
+}
+
+func (r *MachineReconciler) updateNetworkInterfaceStatus(
+	networkInterfaceStatus *computev1alpha1.NetworkInterfaceStatus,
+	runtimeNetworkInterfaceStatus *ori.NetworkInterfaceStatus,
+	now metav1.Time,
+) error {
+	var (
+		newState      computev1alpha1.NetworkInterfaceState
+		networkHandle string
+		ips           []commonv1alpha1.IP
+		virtualIP     *commonv1alpha1.IP
+	)
+
+	if runtimeNetworkInterfaceStatus != nil {
+		networkHandle = runtimeNetworkInterfaceStatus.Network.Handle
+
+		for _, ipString := range runtimeNetworkInterfaceStatus.Ips {
+			ip, err := commonv1alpha1.ParseIP(ipString)
+			if err != nil {
+				return fmt.Errorf("error parsing ip %s: %w", ipString, err)
+			}
+
+			ips = append(ips, ip)
+		}
+
+		if runtimeVirtualIP := runtimeNetworkInterfaceStatus.VirtualIp; runtimeVirtualIP != nil {
+			ip, err := commonv1alpha1.ParseIP(runtimeVirtualIP.Ip)
+			if err != nil {
+				return fmt.Errorf("error parsing virtual ip %s: %w", runtimeVirtualIP.Ip, err)
+			}
+
+			virtualIP = &ip
+		}
+	} else {
+		newState = computev1alpha1.NetworkInterfaceStateDetached
+	}
+
+	if networkInterfaceStatus.State != newState {
+		networkInterfaceStatus.LastStateTransitionTime = &now
+	}
+
+	networkInterfaceStatus.State = newState
+	networkInterfaceStatus.NetworkHandle = networkHandle
+	networkInterfaceStatus.IPs = ips
+	networkInterfaceStatus.VirtualIP = virtualIP
+	return nil
 }
 
 func (r *MachineReconciler) update(
@@ -253,36 +386,21 @@ func (r *MachineReconciler) update(
 ) (ctrl.Result, error) {
 	log.V(1).Info("Updating existing machine")
 
-	log.V(1).Info("Getting runtime machine status")
-	res, err := r.MachineRuntime.MachineStatus(ctx, &ori.MachineStatusRequest{
-		MachineId: runtimeMachine.Id,
-	})
-	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("error getting runtime machine status: %w", err)
-	}
-
 	var errs []error
 
 	log.V(1).Info("Reconciling network interfaces")
-	networkInterfaceStates, err := r.reconcileNetworkInterfaces(ctx, log, machine, runtimeMachine.Id, res.Status)
+	err := r.reconcileNetworkInterfaces(ctx, log, machine, runtimeMachine.Id)
 	if err != nil {
-		errs = append(errs, err)
+		errs = append(errs, fmt.Errorf("error reconciling network interfaces: %w", err))
 	}
 
 	log.V(1).Info("Reconciling volumes")
-	volumeStates, err := r.reconcileVolumes(ctx, log, machine, runtimeMachine.Id, res.Status)
-	if err != nil {
-		errs = append(errs, err)
+	if err := r.reconcileVolumes(ctx, log, machine, runtimeMachine.Id); err != nil {
+		errs = append(errs, fmt.Errorf("error reconciling volumes: %w", err))
 	}
 
-	log.V(1).Info("Patching status")
-	if err := r.patchStatus(
-		ctx,
-		machine,
-		ORIMachineStateToComputeV1Alpha1MachineState(res.Status.State),
-		networkInterfaceStates,
-		volumeStates,
-	); err != nil {
+	log.V(1).Info("Updating status")
+	if err := r.updateStatus(ctx, log, machine, runtimeMachine.Id); err != nil {
 		if len(errs) > 0 {
 			log.V(1).Info("Error(s) reconciling machine", "Errors", errs)
 		}
@@ -297,45 +415,30 @@ func (r *MachineReconciler) update(
 	return ctrl.Result{}, nil
 }
 
-func (r *MachineReconciler) patchStatus(
-	ctx context.Context,
-	machine *computev1alpha1.Machine,
-	state computev1alpha1.MachineState,
-	networkInterfaceStates []computev1alpha1.NetworkInterfaceStatus,
-	volumeStates []computev1alpha1.VolumeStatus,
-) error {
-	base := machine.DeepCopy()
-	machine.Status.State = state
-	machine.Status.NetworkInterfaces = networkInterfaceStates
-	machine.Status.Volumes = volumeStates
-	if err := r.Status().Patch(ctx, machine, client.MergeFrom(base)); err != nil {
-		return fmt.Errorf("error patching machine status: %w", err)
-	}
-	return nil
-}
-
 func (r *MachineReconciler) reconcileNetworkInterfaces(
 	ctx context.Context,
 	log logr.Logger,
 	machine *computev1alpha1.Machine,
 	machineID string,
-	status *ori.MachineStatus,
-) ([]computev1alpha1.NetworkInterfaceStatus, error) {
-	specNetworkInterfaceByName := GroupBy(machine.Spec.NetworkInterfaces, func(v computev1alpha1.NetworkInterface) string { return v.Name })
-	statusNetworkInterfaceByName := GroupBy(status.NetworkInterfaces, func(v *ori.NetworkInterfaceStatus) string { return v.Name })
-	runtimeNetworkInterfaceStateByName := make(map[string]networkInterfaceStatus)
+) error {
+	res, err := r.MachineRuntime.ListNetworkInterfaces(ctx, &ori.ListNetworkInterfacesRequest{
+		Filter: &ori.NetworkInterfaceFilter{MachineId: machineID},
+	})
+	if err != nil {
+		return fmt.Errorf("error listing network interfaces: %w", err)
+	}
+
+	specNetworkInterfaceByName := ToMap(machine.Spec.NetworkInterfaces, func(v computev1alpha1.NetworkInterface) string { return v.Name })
+	existingNetworkInterfaceByName := ToMap(res.NetworkInterfaces, func(v *ori.NetworkInterface) string { return v.Name })
+
 	var errs []error
 
 	for name, specNetworkInterface := range specNetworkInterfaceByName {
 		log := log.WithValues("NetworkInterfaceName", name)
 
-		var status *ori.NetworkInterfaceStatus
-		if statusNetworkInterface, ok := statusNetworkInterfaceByName[name]; ok {
-			status = statusNetworkInterface
-		}
+		existingNetworkInterface := existingNetworkInterfaceByName[name]
 
-		newStatus, err := r.applyNetworkInterface(ctx, log, machine, specNetworkInterface, machineID, status)
-		if err != nil {
+		if err := r.applyNetworkInterface(ctx, log, machine, specNetworkInterface, machineID, existingNetworkInterface); err != nil {
 			if !IsDependencyNotReadyError(err) {
 				r.EventRecorder.Eventf(machine, corev1.EventTypeWarning, events.ErrorApplyingNetworkInterface, "Error applying network interface %s: %v", name, err)
 				errs = append(errs, fmt.Errorf("[network interface %s] %w", name, err))
@@ -343,98 +446,42 @@ func (r *MachineReconciler) reconcileNetworkInterfaces(
 				r.EventRecorder.Eventf(machine, corev1.EventTypeNormal, events.NetworkInterfaceNotReady, "Network interface %s not ready: %v", name, err)
 			}
 		}
-
-		runtimeNetworkInterfaceStateByName[name] = newStatus
 	}
 
-	for name, statusNetworkInterface := range statusNetworkInterfaceByName {
+	for name := range existingNetworkInterfaceByName {
 		log := log.WithValues("NetworkInterfaceName", name)
 
 		if _, ok := specNetworkInterfaceByName[name]; ok {
 			continue
 		}
 
-		if err := r.detachNetworkInterface(ctx, log, machineID, name); err != nil {
+		if err := r.deleteNetworkInterface(ctx, log, machineID, name); err != nil {
 			r.EventRecorder.Eventf(machine, corev1.EventTypeWarning, events.ErrorDetachingNetworkInterface, "Error detaching network interface %s: %v", name, err)
 			errs = append(errs, fmt.Errorf("error detaching network interface %s: %w", name, err))
-			runtimeNetworkInterfaceStateByName[name] = networkInterfaceStatusFromStatus(statusNetworkInterface)
 		}
 	}
 
-	states := make([]computev1alpha1.NetworkInterfaceStatus, 0, len(machine.Status.NetworkInterfaces))
-	for _, state := range machine.Status.NetworkInterfaces {
-		status, ok := runtimeNetworkInterfaceStateByName[state.Name]
-		if ok {
-			state.IPs = NetIPAddrsToCommonV1Alpha1IPs(status.IPs)
-			if status.VirtualIP != nil {
-				state.VirtualIP = &commonv1alpha1.IP{Addr: *status.VirtualIP}
-			}
-		}
-
-		states = append(states, state)
-	}
 	if len(errs) > 0 {
-		return states, fmt.Errorf("error(s) reconciling network interfaces: %v", errs)
+		return fmt.Errorf("error(s) reconciling network interfaces: %v", errs)
 	}
-	return states, nil
+	return nil
 }
 
-type networkInterfaceStatus struct {
-	IPs       []netip.Addr
-	VirtualIP *netip.Addr
-}
-
-func networkInterfaceStatusFromStatus(status *ori.NetworkInterfaceStatus) networkInterfaceStatus {
-	var virtualIP *netip.Addr
-	if status.VirtualIp != nil {
-		ip := netip.MustParseAddr(status.VirtualIp.Ip) // TODO: Remove Must
-		virtualIP = &ip
-	}
-
-	var ips []netip.Addr
-	for _, ip := range status.Ips {
-		ips = append(ips, netip.MustParseAddr(ip)) // TODO: Remove Must
-	}
-
-	return networkInterfaceStatus{
-		IPs:       ips,
-		VirtualIP: virtualIP,
-	}
-}
-
-func networkInterfaceStatusFromConfig(config *ori.NetworkInterfaceConfig) networkInterfaceStatus {
-	var virtualIP *netip.Addr
-	if config.VirtualIp != nil {
-		ip := netip.MustParseAddr(config.VirtualIp.Ip) // TODO: Remove Must
-		virtualIP = &ip
-	}
-
-	var ips []netip.Addr
-	for _, ip := range config.Ips {
-		ips = append(ips, netip.MustParseAddr(ip)) // TODO: Remove must
-	}
-
-	return networkInterfaceStatus{
-		IPs:       ips,
-		VirtualIP: virtualIP,
-	}
-}
-
-func (r *MachineReconciler) networkInterfaceUpToDate(config ori.NetworkInterfaceConfig, status ori.NetworkInterfaceStatus) bool {
-	if !r.networkInterfaceNetworkCompatible(config, status.Network) {
+func (r *MachineReconciler) isNetworkInterfaceUpToDate(config *ori.NetworkInterfaceConfig, networkInterface *ori.NetworkInterface) bool {
+	if !r.networkInterfaceNetworkCompatible(config.Network, networkInterface.Network) {
 		return false
 	}
 
-	if !slices.Equal(config.Ips, status.Ips) {
+	if !slices.Equal(config.Ips, networkInterface.Ips) {
 		return false
 	}
 
 	if config.VirtualIp != nil {
-		if status.VirtualIp == nil {
+		if networkInterface.VirtualIp == nil {
 			return false
 		}
 
-		if config.VirtualIp.Ip != status.VirtualIp.Ip {
+		if config.VirtualIp.Ip != networkInterface.VirtualIp.Ip {
 			return false
 		}
 	}
@@ -442,23 +489,21 @@ func (r *MachineReconciler) networkInterfaceUpToDate(config ori.NetworkInterface
 	return true
 }
 
-func (r *MachineReconciler) networkInterfaceNetworkCompatible(config ori.NetworkInterfaceConfig, status *ori.NetworkStatus) bool {
-	return config.Network.Name == status.Name &&
-		config.Network.Uid == status.Uid
+func (r *MachineReconciler) networkInterfaceNetworkCompatible(config, current *ori.NetworkConfig) bool {
+	return config.Handle == current.Handle
 }
 
-func (r *MachineReconciler) detachNetworkInterface(
+func (r *MachineReconciler) deleteNetworkInterface(
 	ctx context.Context,
 	log logr.Logger,
 	machineID string,
 	networkInterfaceName string,
 ) error {
 	log.V(1).Info("Detaching network interface")
-	_, err := r.MachineRuntime.DetachNetworkInterface(ctx, &ori.DetachNetworkInterfaceRequest{
+	if _, err := r.MachineRuntime.DeleteNetworkInterface(ctx, &ori.DeleteNetworkInterfaceRequest{
 		MachineId:            machineID,
 		NetworkInterfaceName: networkInterfaceName,
-	})
-	if err != nil {
+	}); err != nil {
 		return fmt.Errorf("error detaching network interface: %w", err)
 	}
 	return nil
@@ -470,26 +515,21 @@ func (r *MachineReconciler) applyNetworkInterface(
 	machine *computev1alpha1.Machine,
 	networkInterface computev1alpha1.NetworkInterface,
 	machineID string,
-	status *ori.NetworkInterfaceStatus,
-) (networkInterfaceStatus, error) {
+	existingNetworkInterface *ori.NetworkInterface,
+) error {
 	log.V(1).Info("Getting network interface config")
 	config, err := GetORIMachineNetworkInterfaceConfig(ctx, r.Client, machine, &networkInterface)
 	if err != nil {
-		err = fmt.Errorf("error getting machine network interface config: %w", err)
-		if status != nil {
-			return networkInterfaceStatusFromStatus(status), err
-		}
-
-		return networkInterfaceStatus{}, err
+		return fmt.Errorf("error getting machine network interface config: %w", err)
 	}
 
-	if status != nil {
-		if r.networkInterfaceUpToDate(*config, *status) {
+	if existingNetworkInterface != nil {
+		if r.isNetworkInterfaceUpToDate(config, existingNetworkInterface) {
 			log.V(1).Info("Network interface is up-to-date")
-			return networkInterfaceStatusFromStatus(status), nil
+			return nil
 		}
 
-		if r.networkInterfaceNetworkCompatible(*config, status.Network) {
+		if r.networkInterfaceNetworkCompatible(config.Network, existingNetworkInterface.Network) {
 			log.V(1).Info("Network interface is not up-to-date but network is compatible, updating")
 			_, err := r.MachineRuntime.UpdateNetworkInterface(ctx, &ori.UpdateNetworkInterfaceRequest{
 				MachineId:            machineID,
@@ -498,44 +538,37 @@ func (r *MachineReconciler) applyNetworkInterface(
 				VirtualIp:            config.VirtualIp,
 			})
 			if err != nil {
-				err = fmt.Errorf("error updating network interface: %w", err)
-				return networkInterfaceStatusFromStatus(status), err
+				return fmt.Errorf("error updating network interface: %w", err)
 			}
 
-			return networkInterfaceStatusFromConfig(config), nil
+			return nil
 		}
 
-		log.V(1).Info("Network interface is not up-to-date and network is incompatible, detaching")
-		if _, err := r.MachineRuntime.DetachNetworkInterface(ctx, &ori.DetachNetworkInterfaceRequest{
+		log.V(1).Info("Network interface is not up-to-date and network is incompatible, deleting")
+		if _, err := r.MachineRuntime.DeleteNetworkInterface(ctx, &ori.DeleteNetworkInterfaceRequest{
 			MachineId:            machineID,
 			NetworkInterfaceName: networkInterface.Name,
 		}); err != nil {
-			err = fmt.Errorf("error detaching network interface: %w", err)
-			return networkInterfaceStatusFromStatus(status), err
+			err = fmt.Errorf("error deleting network interface: %w", err)
+			return err
 		}
 	}
 
-	log.V(1).Info("Attaching network interface")
-	_, err = r.MachineRuntime.AttachNetworkInterface(ctx, &ori.AttachNetworkInterfaceRequest{
+	log.V(1).Info("Creating network interface")
+	if _, err := r.MachineRuntime.CreateNetworkInterface(ctx, &ori.CreateNetworkInterfaceRequest{
 		Config: config,
-	})
-	if err != nil {
-		err = fmt.Errorf("error attaching network interface: %w", err)
-		return networkInterfaceStatus{}, err
+	}); err != nil {
+		return fmt.Errorf("error attaching network interface: %w", err)
 	}
-	return networkInterfaceStatusFromConfig(config), nil
+	return nil
 }
 
-func (r *MachineReconciler) canUpdateVolume(config ori.VolumeConfig, status ori.VolumeStatus) bool {
-	if config.Device != status.Device {
-		return false
-	}
-
+func (r *MachineReconciler) isVolumeUpToDate(config *ori.VolumeConfig, volume *ori.Volume) bool {
 	switch {
-	case config.Access != nil && status.Access != nil:
-		return config.Access.Driver == status.Access.Driver
-	case config.EmptyDisk != nil && status.EmptyDisk != nil:
-		return true
+	case config.EmptyDisk != nil && volume.EmptyDisk != nil:
+		return config.EmptyDisk.SizeLimitBytes == volume.EmptyDisk.SizeLimitBytes
+	case config.Access != nil && volume.Access != nil:
+		return config.Access.Driver == volume.Access.Driver && config.Access.Handle == volume.Access.Handle
 	default:
 		return false
 	}
@@ -547,86 +580,50 @@ func (r *MachineReconciler) applyVolume(
 	machine *computev1alpha1.Machine,
 	volume computev1alpha1.Volume,
 	machineID string,
-	status *ori.VolumeStatus,
-) (string, error) {
+	existingVolume *ori.Volume,
+) error {
 	log.V(1).Info("Getting volume config")
 	config, err := GetORIMachineVolumeConfig(ctx, r.Client, machine, &volume)
 	if err != nil {
-		err = fmt.Errorf("error getting machine volume config: %w", err)
-		if status != nil {
-			return status.DeviceId, err
-		}
-
-		return "", err
+		return fmt.Errorf("error getting machine volume config: %w", err)
 	}
 
-	if status != nil {
-		if r.canUpdateVolume(*config, *status) {
-			log.V(1).Info("Confirming volume")
-			confirmRes, err := r.MachineRuntime.ConfirmVolume(ctx, &ori.ConfirmVolumeRequest{
-				MachineId:  machineID,
-				VolumeName: volume.Name,
-				Access:     config.Access,
-				EmptyDisk:  config.EmptyDisk,
-			})
-			if err != nil {
-				err = fmt.Errorf("error confirming volume")
-				return status.DeviceId, err
-			}
-
-			if confirmRes.Confirmation != nil {
-				log.V(1).Info("Existing volume is valid")
-				return confirmRes.Confirmation.DeviceId, nil
-			}
-
-			log.V(1).Info("Updating existing volume")
-			res, err := r.MachineRuntime.UpdateVolume(ctx, &ori.UpdateVolumeRequest{
-				MachineId:  machineID,
-				VolumeName: volume.Name,
-				Access:     config.Access,
-				EmptyDisk:  config.EmptyDisk,
-			})
-			if err != nil {
-				err = fmt.Errorf("error updating volume: %w", err)
-				return status.DeviceId, err
-			}
-			return res.DeviceId, nil
+	if existingVolume != nil {
+		if r.isVolumeUpToDate(config, existingVolume) {
+			log.V(1).Info("Existing volume is up-to-date")
+			return nil
 		}
 
-		log.V(1).Info("Detaching existing volume")
-		if _, err := r.MachineRuntime.DetachVolume(ctx, &ori.DetachVolumeRequest{
+		log.V(1).Info("Existing volume is not up-to-date, deleting")
+		if _, err := r.MachineRuntime.DeleteVolume(ctx, &ori.DeleteVolumeRequest{
 			MachineId:  machineID,
 			VolumeName: volume.Name,
 		}); err != nil {
-			err = fmt.Errorf("error detaching volume: %w", err)
-			return status.DeviceId, err
+			return fmt.Errorf("error deleting volume: %w", err)
 		}
 	}
 
-	log.V(1).Info("Attaching volume")
-	res, err := r.MachineRuntime.AttachVolume(ctx, &ori.AttachVolumeRequest{
+	log.V(1).Info("Creating volume")
+	if _, err := r.MachineRuntime.CreateVolume(ctx, &ori.CreateVolumeRequest{
 		MachineId: machineID,
 		Config:    config,
-	})
-	if err != nil {
-		err = fmt.Errorf("error attaching volume: %w", err)
-		return "", err
+	}); err != nil {
+		return fmt.Errorf("error creating volume: %w", err)
 	}
-	return res.DeviceId, nil
+	return nil
 }
 
-func (r *MachineReconciler) detachVolume(
+func (r *MachineReconciler) deleteVolume(
 	ctx context.Context,
 	log logr.Logger,
 	machineID string,
 	volumeName string,
 ) error {
 	log.V(1).Info("Detaching volume")
-	_, err := r.MachineRuntime.DetachVolume(ctx, &ori.DetachVolumeRequest{
+	if _, err := r.MachineRuntime.DeleteVolume(ctx, &ori.DeleteVolumeRequest{
 		MachineId:  machineID,
 		VolumeName: volumeName,
-	})
-	if err != nil {
+	}); err != nil {
 		return fmt.Errorf("error detaching volume: %w", err)
 	}
 	return nil
@@ -637,23 +634,24 @@ func (r *MachineReconciler) reconcileVolumes(
 	log logr.Logger,
 	machine *computev1alpha1.Machine,
 	machineID string,
-	status *ori.MachineStatus,
-) ([]computev1alpha1.VolumeStatus, error) {
-	specVolumeByName := GroupBy(machine.Spec.Volumes, func(v computev1alpha1.Volume) string { return v.Name })
-	statusVolumeByName := GroupBy(status.Volumes, func(v *ori.VolumeStatus) string { return v.Name })
-	deviceIDByName := make(map[string]string)
+) error {
+	res, err := r.MachineRuntime.ListVolumes(ctx, &ori.ListVolumesRequest{
+		Filter: &ori.VolumeFilter{MachineId: machineID},
+	})
+	if err != nil {
+		return fmt.Errorf("error listing volumes for machine: %w", err)
+	}
+
+	specVolumeByName := ToMap(machine.Spec.Volumes, func(v computev1alpha1.Volume) string { return v.Name })
+	existingVolumeByName := ToMap(res.Volumes, func(v *ori.Volume) string { return v.Name })
+
 	var errs []error
 
 	for name, specVolume := range specVolumeByName {
 		log := log.WithValues("VolumeName", name)
 
-		var status *ori.VolumeStatus
-		if statusVolume, ok := statusVolumeByName[name]; ok {
-			status = statusVolume
-		}
-
-		deviceID, err := r.applyVolume(ctx, log, machine, specVolume, machineID, status)
-		if err != nil {
+		existingVolume := existingVolumeByName[name]
+		if err := r.applyVolume(ctx, log, machine, specVolume, machineID, existingVolume); err != nil {
 			if !IsDependencyNotReadyError(err) {
 				r.EventRecorder.Eventf(machine, corev1.EventTypeWarning, events.ErrorApplyingVolume, "Error applying volume %s: %w", name, err)
 				errs = append(errs, fmt.Errorf("error applying volume %s: %w", name, err))
@@ -661,37 +659,25 @@ func (r *MachineReconciler) reconcileVolumes(
 				r.EventRecorder.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady, "Volume %s not ready: %w", name, err)
 			}
 		}
-
-		deviceIDByName[name] = deviceID
 	}
 
-	for name, statusVolume := range statusVolumeByName {
+	for name := range existingVolumeByName {
 		log := log.WithValues("VolumeName", name)
 
 		if _, ok := specVolumeByName[name]; ok {
 			continue
 		}
 
-		if err := r.detachVolume(ctx, log, machineID, name); err != nil {
+		if err := r.deleteVolume(ctx, log, machineID, name); err != nil {
 			r.Eventf(machine, corev1.EventTypeWarning, events.ErrorDetachingVolume, "Error detaching volume %s: %w", name, err)
-			errs = append(errs, fmt.Errorf("error detaching volume %s: %w", name, err))
-			deviceIDByName[name] = statusVolume.Name
+			errs = append(errs, fmt.Errorf("error deleting volume %s: %w", name, err))
 		}
 	}
 
-	states := make([]computev1alpha1.VolumeStatus, 0, len(machine.Status.Volumes))
-	for _, state := range machine.Status.Volumes {
-		deviceID, ok := deviceIDByName[state.Name]
-		if ok {
-			state.DeviceID = deviceID
-		}
-
-		states = append(states, state)
-	}
 	if len(errs) > 0 {
-		return states, fmt.Errorf("error(s) reconciling volumes: %v", errs)
+		return fmt.Errorf("error(s) reconciling volumes: %v", errs)
 	}
-	return states, nil
+	return nil
 }
 
 func (r *MachineReconciler) getMachineConfig(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) (*ori.MachineConfig, error) {

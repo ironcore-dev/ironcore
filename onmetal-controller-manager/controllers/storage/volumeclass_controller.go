@@ -60,15 +60,19 @@ func (r *VolumeClassReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 func (r *VolumeClassReconciler) listReferencingVolumes(ctx context.Context, volumeClass *storagev1alpha1.VolumeClass) ([]storagev1alpha1.Volume, error) {
 	volumeList := &storagev1alpha1.VolumeList{}
-	if err := r.APIReader.List(ctx, volumeList, client.InNamespace(volumeClass.Namespace)); err != nil {
+	if err := r.APIReader.List(ctx, volumeList,
+		client.InNamespace(volumeClass.Namespace),
+	); err != nil {
 		return nil, fmt.Errorf("error listing the volumes using the volume class: %w", err)
 	}
 
 	var volumes []storagev1alpha1.Volume
 	for _, volume := range volumeList.Items {
-		if volume.Spec.VolumeClassRef.Name == volumeClass.Name {
-			volumes = append(volumes, volume)
+		if volumeClassRef := volume.Spec.VolumeClassRef; volumeClassRef == nil || volumeClassRef.Name != volumeClass.Name {
+			continue
 		}
+
+		volumes = append(volumes, volume)
 	}
 	return volumes, nil
 }
@@ -128,7 +132,12 @@ func (r *VolumeClassReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			handler.Funcs{
 				DeleteFunc: func(event event.DeleteEvent, queue workqueue.RateLimitingInterface) {
 					volume := event.Object.(*storagev1alpha1.Volume)
-					queue.Add(ctrl.Request{NamespacedName: types.NamespacedName{Name: volume.Spec.VolumeClassRef.Name}})
+					volumeClassRef := volume.Spec.VolumeClassRef
+					if volumeClassRef == nil {
+						return
+					}
+
+					queue.Add(ctrl.Request{NamespacedName: types.NamespacedName{Name: volumeClassRef.Name}})
 				},
 			},
 		).

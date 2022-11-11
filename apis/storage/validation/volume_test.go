@@ -47,12 +47,12 @@ var _ = Describe("Volume", func() {
 		),
 		Entry("no volume class ref",
 			&storage.Volume{},
-			ContainElement(RequiredField("spec.volumeClassRef")),
+			Not(ContainElement(RequiredField("spec.volumeClassRef"))),
 		),
-		Entry("invalid volume ref name",
+		Entry("invalid volume class ref name",
 			&storage.Volume{
 				Spec: storage.VolumeSpec{
-					VolumeClassRef: corev1.LocalObjectReference{Name: "foo*"},
+					VolumeClassRef: &corev1.LocalObjectReference{Name: "foo*"},
 				},
 			},
 			ContainElement(InvalidField("spec.volumeClassRef.name")),
@@ -82,21 +82,49 @@ var _ = Describe("Volume", func() {
 			},
 			ContainElement(ForbiddenField("spec.claimRef")),
 		),
-		Entry("invalid image pull secret ref name",
+		Entry("classless: image pull secret ref",
 			&storage.Volume{
 				Spec: storage.VolumeSpec{
+					ImagePullSecretRef: &corev1.LocalObjectReference{Name: "foo"},
+				},
+			},
+			ContainElement(ForbiddenField("spec.imagePullSecretRef")),
+		),
+		Entry("classful: invalid image pull secret ref name",
+			&storage.Volume{
+				Spec: storage.VolumeSpec{
+					VolumeClassRef:     &corev1.LocalObjectReference{Name: "foo"},
 					ImagePullSecretRef: &corev1.LocalObjectReference{Name: "foo*"},
 				},
 			},
 			ContainElement(InvalidField("spec.imagePullSecretRef.name")),
 		),
-		Entry("no resources[storage]",
+		Entry("classless: no resources[storage]",
 			&storage.Volume{},
-			ContainElement(RequiredField("spec.resources[storage]")),
+			Not(ContainElement(RequiredField("spec.resources[storage]"))),
 		),
-		Entry("negative resources[storage]",
+		Entry("classless: any resources",
 			&storage.Volume{
 				Spec: storage.VolumeSpec{
+					Resources: map[corev1.ResourceName]resource.Quantity{
+						corev1.ResourceStorage: resource.MustParse("1Gi"),
+					},
+				},
+			},
+			ContainElement(ForbiddenField("spec.resources")),
+		),
+		Entry("classful: no resources[storage]",
+			&storage.Volume{
+				Spec: storage.VolumeSpec{
+					VolumeClassRef: &corev1.LocalObjectReference{Name: "foo"},
+				},
+			},
+			ContainElement(RequiredField("spec.resources[storage]")),
+		),
+		Entry("classful: negative resources[storage]",
+			&storage.Volume{
+				Spec: storage.VolumeSpec{
+					VolumeClassRef: &corev1.LocalObjectReference{Name: "foo"},
 					Resources: map[corev1.ResourceName]resource.Quantity{
 						corev1.ResourceStorage: resource.MustParse("-1"),
 					},
@@ -114,36 +142,43 @@ var _ = Describe("Volume", func() {
 		Entry("immutable volumeClassRef",
 			&storage.Volume{
 				Spec: storage.VolumeSpec{
-					VolumeClassRef: corev1.LocalObjectReference{Name: "foo"},
+					VolumeClassRef: &corev1.LocalObjectReference{Name: "foo"},
 				},
 			},
 			&storage.Volume{
 				Spec: storage.VolumeSpec{
-					VolumeClassRef: corev1.LocalObjectReference{Name: "bar"},
+					VolumeClassRef: &corev1.LocalObjectReference{Name: "bar"},
 				},
 			},
 			ContainElement(ImmutableField("spec.volumeClassRef")),
 		),
-		Entry("immutable volumePoolRef if set",
+		Entry("classful: immutable volumePoolRef if set",
 			&storage.Volume{
 				Spec: storage.VolumeSpec{
-					VolumePoolRef: &corev1.LocalObjectReference{Name: "foo"},
+					VolumeClassRef: &corev1.LocalObjectReference{Name: "foo"},
+					VolumePoolRef:  &corev1.LocalObjectReference{Name: "foo"},
 				},
 			},
 			&storage.Volume{
 				Spec: storage.VolumeSpec{
-					VolumePoolRef: &corev1.LocalObjectReference{Name: "bar"},
+					VolumeClassRef: &corev1.LocalObjectReference{Name: "foo"},
+					VolumePoolRef:  &corev1.LocalObjectReference{Name: "bar"},
 				},
 			},
 			ContainElement(ImmutableField("spec.volumePoolRef")),
 		),
-		Entry("mutable volumePoolRef if not set",
+		Entry("classful: mutable volumePoolRef if not set",
 			&storage.Volume{
 				Spec: storage.VolumeSpec{
-					VolumePoolRef: &corev1.LocalObjectReference{Name: "foo"},
+					VolumeClassRef: &corev1.LocalObjectReference{Name: "foo"},
+					VolumePoolRef:  &corev1.LocalObjectReference{Name: "foo"},
 				},
 			},
-			&storage.Volume{},
+			&storage.Volume{
+				Spec: storage.VolumeSpec{
+					VolumeClassRef: &corev1.LocalObjectReference{Name: "foo"},
+				},
+			},
 			Not(ContainElement(ImmutableField("spec.volumePoolRef"))),
 		),
 	)

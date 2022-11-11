@@ -32,7 +32,7 @@ var VolumeGK = schema.GroupKind{
 // VolumeSpec defines the desired state of Volume
 type VolumeSpec struct {
 	// VolumeClassRef is the volume class of a volume
-	VolumeClassRef corev1.LocalObjectReference
+	VolumeClassRef *corev1.LocalObjectReference
 	// VolumePoolSelector selects a suitable VolumePoolRef by the given labels.
 	VolumePoolSelector map[string]string
 	// VolumePoolRef indicates which volume pool to use for a volume.
@@ -59,6 +59,8 @@ type VolumeAccess struct {
 	SecretRef *corev1.LocalObjectReference
 	// Driver is the name of the drive to use for this volume. Required.
 	Driver string
+	// Handle is the unique handle of the volume.
+	Handle string
 	// VolumeAttributes are attributes of the volume to use.
 	VolumeAttributes map[string]string
 }

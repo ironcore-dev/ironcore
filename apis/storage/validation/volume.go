@@ -15,6 +15,8 @@
 package validation
 
 import (
+	"fmt"
+
 	"github.com/onmetal/onmetal-api/apis/storage"
 	onmetalapivalidation "github.com/onmetal/onmetal-api/onmetal-apiserver/api/validation"
 	corev1 "k8s.io/api/core/v1"
@@ -35,18 +37,54 @@ func ValidateVolume(volume *storage.Volume) field.ErrorList {
 func validateVolumeSpec(spec *storage.VolumeSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	if spec.VolumeClassRef == (corev1.LocalObjectReference{}) {
-		allErrs = append(allErrs, field.Required(fldPath.Child("volumeClassRef"), "must specify a volume class ref"))
-	}
-	for _, msg := range apivalidation.NameIsDNSLabel(spec.VolumeClassRef.Name, false) {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("volumeClassRef").Child("name"), spec.VolumeClassRef.Name, msg))
-	}
+	if volumeClassRef := spec.VolumeClassRef; volumeClassRef != nil {
+		for _, msg := range apivalidation.NameIsDNSLabel(spec.VolumeClassRef.Name, false) {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("volumeClassRef").Child("name"), spec.VolumeClassRef.Name, msg))
+		}
 
-	allErrs = append(allErrs, metav1validation.ValidateLabels(spec.VolumePoolSelector, fldPath.Child("volumePoolSelector"))...)
+		allErrs = append(allErrs, metav1validation.ValidateLabels(spec.VolumePoolSelector, fldPath.Child("volumePoolSelector"))...)
 
-	if spec.VolumePoolRef != nil {
-		for _, msg := range ValidateVolumePoolName(spec.VolumePoolRef.Name, false) {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("volumePoolRef").Child("name"), spec.VolumePoolRef.Name, msg))
+		if spec.VolumePoolRef != nil {
+			for _, msg := range ValidateVolumePoolName(spec.VolumePoolRef.Name, false) {
+				allErrs = append(allErrs, field.Invalid(fldPath.Child("volumePoolRef").Child("name"), spec.VolumePoolRef.Name, msg))
+			}
+		}
+
+		storageValue, ok := spec.Resources[corev1.ResourceStorage]
+		if ok {
+			allErrs = append(allErrs, onmetalapivalidation.ValidatePositiveQuantity(storageValue, fldPath.Child("resources").Key(string(corev1.ResourceStorage)))...)
+		} else {
+			allErrs = append(allErrs, field.Required(fldPath.Child("resources").Key(string(corev1.ResourceStorage)), fmt.Sprintf("must specify %s", corev1.ResourceStorage)))
+		}
+
+		if spec.ImagePullSecretRef != nil {
+			for _, msg := range apivalidation.NameIsDNSLabel(spec.ImagePullSecretRef.Name, false) {
+				allErrs = append(allErrs, field.Invalid(fldPath.Child("imagePullSecretRef").Child("name"), spec.ImagePullSecretRef.Name, msg))
+			}
+		}
+	} else {
+		if spec.VolumePoolSelector != nil {
+			allErrs = append(allErrs, field.Forbidden(fldPath.Child("volumePoolSelector"), "must not specify if volume class is empty"))
+		}
+
+		if spec.VolumePoolRef != nil {
+			allErrs = append(allErrs, field.Forbidden(fldPath.Child("volumePoolRef"), "must not specify if volume class is empty"))
+		}
+
+		if spec.Resources != nil {
+			allErrs = append(allErrs, field.Forbidden(fldPath.Child("resources"), "must not specify if volume class is empty"))
+		}
+
+		if spec.Image != "" {
+			allErrs = append(allErrs, field.Forbidden(fldPath.Child("image"), "must not specify if volume class is empty"))
+		}
+
+		if spec.ImagePullSecretRef != nil {
+			allErrs = append(allErrs, field.Forbidden(fldPath.Child("imagePullSecretRef"), "must not specify if volume class is empty"))
+		}
+
+		if spec.Tolerations != nil {
+			allErrs = append(allErrs, field.Forbidden(fldPath.Child("tolerations"), "must not specify if volume class is empty"))
 		}
 	}
 
@@ -59,19 +97,6 @@ func validateVolumeSpec(spec *storage.VolumeSpec, fldPath *field.Path) field.Err
 			for _, msg := range apivalidation.NameIsDNSLabel(spec.ClaimRef.Name, false) {
 				allErrs = append(allErrs, field.Invalid(fldPath.Child("claimRef").Child("name"), spec.ClaimRef.Name, msg))
 			}
-		}
-	}
-
-	storageValue, ok := spec.Resources[corev1.ResourceStorage]
-	if !ok {
-		allErrs = append(allErrs, field.Required(fldPath.Child("resources").Key(string(corev1.ResourceStorage)), ""))
-	} else {
-		allErrs = append(allErrs, onmetalapivalidation.ValidatePositiveQuantity(storageValue, fldPath.Child("resources").Key(string(corev1.ResourceStorage)))...)
-	}
-
-	if spec.ImagePullSecretRef != nil {
-		for _, msg := range apivalidation.NameIsDNSLabel(spec.ImagePullSecretRef.Name, false) {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("imagePullSecretRef").Child("name"), spec.ImagePullSecretRef.Name, msg))
 		}
 	}
 
