@@ -24,6 +24,7 @@ import (
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
+	onmetalapiannotations "github.com/onmetal/onmetal-api/apiutils/annotations"
 	onmetalapiclient "github.com/onmetal/onmetal-api/apiutils/client"
 	"github.com/onmetal/onmetal-api/apiutils/predicates"
 	machinepoolletv1alpha1 "github.com/onmetal/onmetal-api/machinepoollet/api/v1alpha1"
@@ -185,7 +186,7 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 	}
 	if modified {
 		log.V(1).Info("Added finalizer, requeueing")
-		return ctrl.Result{}, nil
+		return ctrl.Result{Requeue: true}, nil
 	}
 	log.V(1).Info("Finalizer is present")
 
@@ -196,7 +197,7 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 	}
 	if modified {
 		log.V(1).Info("Removed reconcile annotation, requeueing")
-		return ctrl.Result{}, nil
+		return ctrl.Result{Requeue: true}, nil
 	}
 
 	log.V(1).Info("Listing machines")
@@ -247,7 +248,7 @@ func (r *MachineReconciler) create(ctx context.Context, log logr.Logger, machine
 	}
 
 	log.V(1).Info("Created")
-	return ctrl.Result{Requeue: true}, nil
+	return ctrl.Result{}, nil
 }
 
 func (r *MachineReconciler) updateStatus(
@@ -703,16 +704,16 @@ func (r *MachineReconciler) reconcileVolumes(
 }
 
 func (r *MachineReconciler) getMachineConfig(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) (*ori.MachineConfig, error) {
-	log.V(1).Info("Getting machine resources")
-	machineResources, err := r.getORIMachineClass(ctx, machine.Spec.MachineClassRef.Name)
+	log.V(1).Info("Getting machine class")
+	class, err := r.getORIMachineClass(ctx, machine.Spec.MachineClassRef.Name)
 	if err != nil {
 		if !IsDependencyNotReadyError(err) {
-			r.EventRecorder.Eventf(machine, corev1.EventTypeWarning, events.ErrorGettingMachineResources, "Error getting machine resources: %v", err)
-			return nil, fmt.Errorf("error getting machine resources: %w", err)
+			r.Eventf(machine, corev1.EventTypeWarning, events.ErrorGettingMachineClass, "Error getting machine class: %v", err)
+			return nil, fmt.Errorf("error getting machine class: %w", err)
 		}
 
-		r.EventRecorder.Eventf(machine, corev1.EventTypeNormal, events.MachineResourcesNotReady, "Machine resources not ready: %v", err)
-		return nil, fmt.Errorf("machine resources not ready: %w", err)
+		r.Eventf(machine, corev1.EventTypeNormal, events.MachineClassNotReady, "Machine class not ready: %v", err)
+		return nil, fmt.Errorf("machine class not ready: %w", err)
 	}
 
 	var ignitionConfig *ori.IgnitionConfig
@@ -769,7 +770,7 @@ func (r *MachineReconciler) getMachineConfig(ctx context.Context, log logr.Logge
 	return &ori.MachineConfig{
 		Metadata:          machineMetadata,
 		Image:             machine.Spec.Image,
-		Class:             machineResources,
+		Class:             class,
 		Ignition:          ignitionConfig,
 		Volumes:           volumeConfigs,
 		NetworkInterfaces: networkInterfaceConfigs,
@@ -798,13 +799,25 @@ func MachineRunsInMachinePoolPredicate(machinePoolName string) predicate.Predica
 	})
 }
 
+func (r *MachineReconciler) matchingWatchLabel() client.ListOption {
+	var labels map[string]string
+	if r.WatchFilterValue != "" {
+		labels = map[string]string{
+			commonv1alpha1.WatchLabel: r.WatchFilterValue,
+		}
+	}
+	return client.MatchingLabels(labels)
+}
+
 func (r *MachineReconciler) enqueueMachinesReferencingVolume(ctx context.Context, log logr.Logger) handler.EventHandler {
 	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
 		volume := obj.(*storagev1alpha1.Volume)
+
 		machineList := &computev1alpha1.MachineList{}
 		if err := r.List(ctx, machineList,
 			client.InNamespace(volume.Namespace),
 			client.MatchingFields{machinepoolletclient.MachineSpecVolumeNamesField: volume.Name},
+			r.matchingWatchLabel(),
 		); err != nil {
 			log.Error(err, "Error listing machines using volume", "VolumeKey", client.ObjectKeyFromObject(volume))
 			return nil
@@ -821,6 +834,7 @@ func (r *MachineReconciler) enqueueMachinesReferencingSecret(ctx context.Context
 		if err := r.List(ctx, machineList,
 			client.InNamespace(secret.Namespace),
 			client.MatchingFields{machinepoolletclient.MachineSpecSecretNamesField: secret.Name},
+			r.matchingWatchLabel(),
 		); err != nil {
 			log.Error(err, "Error listing machines using secret", "SecretKey", client.ObjectKeyFromObject(secret))
 			return nil
@@ -837,6 +851,7 @@ func (r *MachineReconciler) enqueueMachinesReferencingNetworkInterface(ctx conte
 		if err := r.List(ctx, machineList,
 			client.InNamespace(nic.Namespace),
 			client.MatchingFields{machinepoolletclient.MachineSpecNetworkInterfaceNamesField: nic.Name},
+			r.matchingWatchLabel(),
 		); err != nil {
 			log.Error(err, "Error listing machines using secret", "NetworkInterfaceKey", client.ObjectKeyFromObject(nic))
 			return nil
@@ -849,9 +864,14 @@ func (r *MachineReconciler) enqueueMachinesReferencingNetworkInterface(ctx conte
 func (r *MachineReconciler) makeRequestsForMachinesRunningInMachinePool(machineList *computev1alpha1.MachineList) []ctrl.Request {
 	var res []ctrl.Request
 	for _, machine := range machineList.Items {
-		if MachineRunsInMachinePool(&machine, r.MachinePoolName) {
-			res = append(res, ctrl.Request{NamespacedName: client.ObjectKeyFromObject(&machine)})
+		if !MachineRunsInMachinePool(&machine, r.MachinePoolName) {
+			continue
 		}
+		if onmetalapiannotations.IsExternallyManaged(&machine) {
+			continue
+		}
+
+		res = append(res, ctrl.Request{NamespacedName: client.ObjectKeyFromObject(&machine)})
 	}
 	return res
 }

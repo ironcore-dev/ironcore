@@ -12,23 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package mcm
+package v1alpha1
 
-import (
-	"context"
-	"errors"
+const (
+	VolumeUIDLabel       = "volumepoollet.api.onmetal.de/volume-uid"
+	VolumeNamespaceLabel = "volumepoollet.api.onmetal.de/volume-namespace"
+	VolumeNameLabel      = "volumepoollet.api.onmetal.de/volume-name"
 
-	ori "github.com/onmetal/onmetal-api/ori/apis/compute/v1alpha1"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
+	FieldOwner      = "volumepoollet.api.onmetal.de/field-owner"
+	VolumeFinalizer = "volumepoollet.api.onmetal.de/volume"
 )
-
-var (
-	ErrNoMatchingMachineClass        = errors.New("no matching machine class")
-	ErrAmbiguousMatchingMachineClass = errors.New("ambiguous matching machine classes")
-)
-
-type MachineClassMapper interface {
-	manager.Runnable
-	GetMachineClassFor(ctx context.Context, name string, capabilities *ori.MachineClassCapabilities) (*ori.MachineClass, error)
-	WaitForSync(ctx context.Context) error
-}

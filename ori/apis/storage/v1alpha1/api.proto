@@ -1,0 +1,126 @@
+syntax = "proto3";
+
+package compute.v1alpha1;
+option go_package = "ori/apis/storage/v1alpha1";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+
+option (gogoproto.goproto_stringer_all) = false;
+option (gogoproto.stringer_all) = true;
+option (gogoproto.goproto_getters_all) = true;
+option (gogoproto.marshaler_all) = true;
+option (gogoproto.sizer_all) = true;
+option (gogoproto.unmarshaler_all) = true;
+option (gogoproto.goproto_unrecognized_all) = false;
+
+service VolumeRuntime {
+  rpc ListVolumes(ListVolumesRequest) returns (ListVolumesResponse) {};
+  rpc CreateVolume(CreateVolumeRequest) returns (CreateVolumeResponse) {};
+  rpc VolumeStatus(VolumeStatusRequest) returns (VolumeStatusResponse) {};
+  rpc DeleteVolume(DeleteVolumeRequest) returns (DeleteVolumeResponse) {};
+
+  rpc ListVolumeClasses(ListVolumeClassesRequest) returns (ListVolumeClassesResponse) {};
+}
+
+message VolumeFilter {
+  string id = 1;
+  map<string, string> label_selector = 2;
+}
+
+message VolumeMetadata {
+  string namespace = 1;
+  string name = 2;
+  string uid = 3;
+}
+
+message VolumeResources {
+  uint64 storage_bytes = 1;
+}
+
+message VolumeConfig {
+  VolumeMetadata metadata = 1;
+  string image = 2;
+  string class = 3;
+  map<string, string> annotations = 4;
+  map<string, string> labels = 5;
+}
+
+message Volume {
+  string id = 1;
+  VolumeMetadata metadata = 2;
+  map<string, string> annotations = 3;
+  map<string, string> labels = 4;
+}
+
+message VolumeClassCapabilities {
+  int64 tps = 1;
+  int64 iops = 2;
+}
+
+message VolumeClass {
+  string name = 1;
+  VolumeClassCapabilities capabilities = 2;
+}
+
+message VolumeAccess {
+  string driver = 1;
+  string handle = 2;
+  map<string, string> attributes = 3;
+  map<string, bytes> secret_data = 4;
+}
+
+enum VolumeState {
+  VOLUME_PENDING = 0;
+  VOLUME_AVAILABLE = 1;
+  VOLUME_ERROR = 2;
+}
+
+message VolumeStatus {
+  string id = 1;
+  VolumeMetadata metadata = 2;
+  string image = 3;
+  string image_ref = 4;
+  VolumeState state = 5;
+  VolumeAccess access = 6;
+  map<string, string> annotations = 7;
+  map<string, string> labels = 8;
+}
+
+message ListVolumesRequest {
+  VolumeFilter filter = 1;
+}
+
+message ListVolumesResponse {
+  repeated Volume volumes = 1;
+}
+
+message CreateVolumeRequest {
+  string machine_id = 1;
+  VolumeConfig config = 2;
+}
+
+message CreateVolumeResponse {
+  Volume volume = 1;
+}
+
+message VolumeStatusRequest {
+  string volume_id = 1;
+}
+
+message VolumeStatusResponse {
+  VolumeStatus status = 1;
+}
+
+message DeleteVolumeRequest {
+  string volume_id = 1;
+}
+
+message DeleteVolumeResponse {
+}
+
+message ListVolumeClassesRequest {
+}
+
+message ListVolumeClassesResponse {
+  repeated VolumeClass volume_classes = 1;
+}

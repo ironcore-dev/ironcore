@@ -109,11 +109,11 @@ func (r *MachineReconciler) getORIMachineClass(ctx context.Context, machineClass
 	return class.Name, nil
 }
 
-func getORIMachineClassCapabilities(machineClass *computev1alpha1.MachineClass) (*ori.MachineResources, error) {
+func getORIMachineClassCapabilities(machineClass *computev1alpha1.MachineClass) (*ori.MachineClassCapabilities, error) {
 	cpu := machineClass.Capabilities.Cpu()
 	memory := machineClass.Capabilities.Memory()
 
-	return &ori.MachineResources{
+	return &ori.MachineClassCapabilities{
 		CpuMillis:   cpu.MilliValue(),
 		MemoryBytes: uint64(memory.Value()),
 	}, nil

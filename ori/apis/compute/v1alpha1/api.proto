@@ -116,7 +116,7 @@ message MachineMetadata {
   string uid = 3;
 }
 
-message MachineResources {
+message MachineClassCapabilities {
   int64 cpu_millis = 1;
   uint64 memory_bytes = 2;
 }
@@ -208,7 +208,7 @@ message MachineStatus {
 
 message MachineClass {
   string name = 1;
-  MachineResources capabilities = 2;
+  MachineClassCapabilities capabilities = 2;
 }
 
 message ListMachinesRequest {

@@ -15,12 +15,12 @@
 package events
 
 const (
-	MachineResourcesNotReady = "MachineResourcesNotReady"
+	MachineClassNotReady     = "MachineClassNotReady"
 	NetworkInterfaceNotReady = "NetworkInterfaceNotReady"
 	VolumeNotReady           = "VolumeNotReady"
 	IgnitionNotReady         = "IgnitionNotReady"
 
-	ErrorGettingMachineResources       = "ErrorGettingMachineResources"
+	ErrorGettingMachineClass           = "ErrorGettingMachineClass"
 	ErrorGettingNetworkInterfaceConfig = "ErrorGettingNetworkInterfaceConfig"
 	ErrorGettingVolumeConfig           = "ErrorGettingVolumeConfig"
 	ErrorGettingIgnitionConfig         = "ErrorGettingIgnitionConfig"

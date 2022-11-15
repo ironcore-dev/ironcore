@@ -3,9 +3,7 @@ metadata:
   name: my-machine
   uid: my-uid
 image: ghrcr.io/onmetal/onmetal-image/gardenlinux:latest
-resources:
-  cpu_count: 1
-  memory_bytes: 1073741824
+class: small
 volumes:
   - name: primary
     device: odb

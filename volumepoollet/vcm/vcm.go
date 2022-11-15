@@ -12,23 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package mcm
+package vcm
 
 import (
 	"context"
 	"errors"
 
-	ori "github.com/onmetal/onmetal-api/ori/apis/compute/v1alpha1"
+	ori "github.com/onmetal/onmetal-api/ori/apis/storage/v1alpha1"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 )
 
 var (
-	ErrNoMatchingMachineClass        = errors.New("no matching machine class")
-	ErrAmbiguousMatchingMachineClass = errors.New("ambiguous matching machine classes")
+	ErrNoMatchingVolumeClass        = errors.New("no matching volume class")
+	ErrAmbiguousMatchingVolumeClass = errors.New("ambiguous matching volume classes")
 )
 
-type MachineClassMapper interface {
+type VolumeClassMapper interface {
 	manager.Runnable
-	GetMachineClassFor(ctx context.Context, name string, capabilities *ori.MachineClassCapabilities) (*ori.MachineClass, error)
+	GetVolumeClassFor(ctx context.Context, name string, capabilities *ori.VolumeClassCapabilities) (*ori.VolumeClass, error)
 	WaitForSync(ctx context.Context) error
 }

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package mcm
+package vcm
 
 import (
 	"context"
@@ -21,21 +21,21 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	ori "github.com/onmetal/onmetal-api/ori/apis/compute/v1alpha1"
+	ori "github.com/onmetal/onmetal-api/ori/apis/storage/v1alpha1"
 	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/util/wait"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
 type capabilities struct {
-	cpuMillis   int64
-	memoryBytes uint64
+	tps  int64
+	iops int64
 }
 
-func getCapabilities(oriCaps *ori.MachineClassCapabilities) capabilities {
+func getCapabilities(oriCaps *ori.VolumeClassCapabilities) capabilities {
 	return capabilities{
-		cpuMillis:   oriCaps.CpuMillis,
-		memoryBytes: oriCaps.MemoryBytes,
+		tps:  oriCaps.Tps,
+		iops: oriCaps.Iops,
 	}
 }
 
@@ -45,34 +45,31 @@ type Generic struct {
 	sync   bool
 	synced chan struct{}
 
-	machineClassByName         map[string]*ori.MachineClass
-	machineClassByCapabilities map[capabilities][]*ori.MachineClass
+	volumeClassByName         map[string]*ori.VolumeClass
+	volumeClassByCapabilities map[capabilities][]*ori.VolumeClass
 
-	machineRuntime ori.MachineRuntimeClient
+	volumeRuntime ori.VolumeRuntimeClient
 
 	relistPeriod time.Duration
 }
 
 func (g *Generic) relist(ctx context.Context, log logr.Logger) error {
-	log.V(1).Info("Relisting machine classes")
-	res, err := g.machineRuntime.ListMachineClasses(ctx, &ori.ListMachineClassesRequest{})
+	log.V(1).Info("Relisting volume classes")
+	res, err := g.volumeRuntime.ListVolumeClasses(ctx, &ori.ListVolumeClassesRequest{})
 	if err != nil {
-		return fmt.Errorf("error listing machine classes: %w", err)
+		return fmt.Errorf("error listing volume classes: %w", err)
 	}
 
 	g.mu.Lock()
 	defer g.mu.Unlock()
 
-	maps.Clear(g.machineClassByName)
-	maps.Clear(g.machineClassByCapabilities)
+	maps.Clear(g.volumeClassByName)
+	maps.Clear(g.volumeClassByCapabilities)
 
-	for _, machineClass := range res.MachineClasses {
-		caps := capabilities{
-			cpuMillis:   machineClass.Capabilities.CpuMillis,
-			memoryBytes: machineClass.Capabilities.MemoryBytes,
-		}
-		g.machineClassByName[machineClass.Name] = machineClass
-		g.machineClassByCapabilities[caps] = append(g.machineClassByCapabilities[caps], machineClass)
+	for _, volumeClass := range res.VolumeClasses {
+		caps := getCapabilities(volumeClass.Capabilities)
+		g.volumeClassByName[volumeClass.Name] = volumeClass
+		g.volumeClassByCapabilities[caps] = append(g.volumeClassByCapabilities[caps], volumeClass)
 	}
 
 	if !g.sync {
@@ -84,7 +81,7 @@ func (g *Generic) relist(ctx context.Context, log logr.Logger) error {
 }
 
 func (g *Generic) Start(ctx context.Context) error {
-	log := ctrl.LoggerFrom(ctx).WithName("mcm")
+	log := ctrl.LoggerFrom(ctx).WithName("vcm")
 	wait.UntilWithContext(ctx, func(ctx context.Context) {
 		if err := g.relist(ctx, log); err != nil {
 			log.Error(err, "Error relisting")
@@ -93,28 +90,28 @@ func (g *Generic) Start(ctx context.Context) error {
 	return nil
 }
 
-func (g *Generic) GetMachineClassFor(ctx context.Context, name string, caps *ori.MachineClassCapabilities) (*ori.MachineClass, error) {
+func (g *Generic) GetVolumeClassFor(ctx context.Context, name string, caps *ori.VolumeClassCapabilities) (*ori.VolumeClass, error) {
 	g.mu.RLock()
 	defer g.mu.RUnlock()
 
 	expected := getCapabilities(caps)
-	if byName, ok := g.machineClassByName[name]; ok && getCapabilities(byName.Capabilities) == expected {
+	if byName, ok := g.volumeClassByName[name]; ok && getCapabilities(byName.Capabilities) == expected {
 		return byName, nil
 	}
 
-	if byCaps, ok := g.machineClassByCapabilities[expected]; ok {
+	if byCaps, ok := g.volumeClassByCapabilities[expected]; ok {
 		switch len(byCaps) {
 		case 0:
-			return nil, ErrNoMatchingMachineClass
+			return nil, ErrNoMatchingVolumeClass
 		case 1:
 			class := *byCaps[0]
 			return &class, nil
 		default:
-			return nil, ErrAmbiguousMatchingMachineClass
+			return nil, ErrAmbiguousMatchingVolumeClass
 		}
 	}
 
-	return nil, ErrNoMatchingMachineClass
+	return nil, ErrNoMatchingVolumeClass
 }
 
 func (g *Generic) WaitForSync(ctx context.Context) error {
@@ -136,13 +133,13 @@ func setGenericOptionsDefaults(o *GenericOptions) {
 	}
 }
 
-func NewGeneric(runtime ori.MachineRuntimeClient, opts GenericOptions) MachineClassMapper {
+func NewGeneric(runtime ori.VolumeRuntimeClient, opts GenericOptions) VolumeClassMapper {
 	setGenericOptionsDefaults(&opts)
 	return &Generic{
-		synced:                     make(chan struct{}),
-		machineClassByName:         map[string]*ori.MachineClass{},
-		machineClassByCapabilities: map[capabilities][]*ori.MachineClass{},
-		machineRuntime:             runtime,
-		relistPeriod:               opts.RelistPeriod,
+		synced:                    make(chan struct{}),
+		volumeClassByName:         map[string]*ori.VolumeClass{},
+		volumeClassByCapabilities: map[capabilities][]*ori.VolumeClass{},
+		volumeRuntime:             runtime,
+		relistPeriod:              opts.RelistPeriod,
 	}
 }

@@ -28,3 +28,12 @@ protoc \
   --gogo_out=plugins=grpc:"$REPO_ROOT" \
   ./ori/apis/compute/v1alpha1/api.proto
 )
+
+(
+cd "$REPO_ROOT"
+protoc \
+  --proto_path ./ori/apis/storage/v1alpha1 \
+  --proto_path "$VGOPATH/src" \
+  --gogo_out=plugins=grpc:"$REPO_ROOT" \
+  ./ori/apis/storage/v1alpha1/api.proto
+)

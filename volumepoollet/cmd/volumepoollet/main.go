@@ -12,23 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package mcm
+package main
 
 import (
-	"context"
-	"errors"
+	"os"
 
-	ori "github.com/onmetal/onmetal-api/ori/apis/compute/v1alpha1"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
+	"github.com/onmetal/onmetal-api/volumepoollet/cmd/volumepoollet/app"
+	ctrl "sigs.k8s.io/controller-runtime"
 )
 
-var (
-	ErrNoMatchingMachineClass        = errors.New("no matching machine class")
-	ErrAmbiguousMatchingMachineClass = errors.New("ambiguous matching machine classes")
-)
+func main() {
+	ctx := ctrl.SetupSignalHandler()
+	setupLog := ctrl.Log.WithName("setup")
 
-type MachineClassMapper interface {
-	manager.Runnable
-	GetMachineClassFor(ctx context.Context, name string, capabilities *ori.MachineClassCapabilities) (*ori.MachineClass, error)
-	WaitForSync(ctx context.Context) error
+	if err := app.Command().ExecuteContext(ctx); err != nil {
+		setupLog.Error(err, "Error running volumepoollet")
+		os.Exit(1)
+	}
 }

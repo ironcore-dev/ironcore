@@ -77,7 +77,7 @@ func (s *Server) convertOnmetalMachineClass(machineClass *computev1alpha1.Machin
 
 	return &ori.MachineClass{
 		Name: machineClass.Name,
-		Capabilities: &ori.MachineResources{
+		Capabilities: &ori.MachineClassCapabilities{
 			CpuMillis:   cpu.MilliValue(),
 			MemoryBytes: uint64(memory.Value()),
 		},
