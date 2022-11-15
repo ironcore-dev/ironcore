@@ -81,32 +81,41 @@ func (r *MachineReconciler) getORIMachineMetadata(machine *computev1alpha1.Machi
 	}
 }
 
-func (r *MachineReconciler) getORIMachineResources(ctx context.Context, machine *computev1alpha1.Machine) (*ori.MachineResources, error) {
+func (r *MachineReconciler) getORIMachineClass(ctx context.Context, machineClassName string) (string, error) {
 	machineClass := &computev1alpha1.MachineClass{}
-	machineClassKey := client.ObjectKey{Name: machine.Spec.MachineClassRef.Name}
+	machineClassKey := client.ObjectKey{Name: machineClassName}
 	if err := r.Get(ctx, machineClassKey, machineClass); err != nil {
 		err = fmt.Errorf("error getting machine class %s: %w", machineClassKey, err)
 		if !apierrors.IsNotFound(err) {
-			return nil, err
+			return "", err
 		}
 
-		return nil, NewDependencyNotReadyError(
+		return "", NewDependencyNotReadyError(
 			computev1alpha1.Resource("machineclasses"),
 			machineClassKey.Name,
 			err,
 		)
 	}
 
-	return convertMachineClass(machineClass)
+	caps, err := getORIMachineClassCapabilities(machineClass)
+	if err != nil {
+		return "", fmt.Errorf("error getting ori machine class capabilities: %w", err)
+	}
+
+	class, err := r.MachineClassMapper.GetMachineClassFor(ctx, machineClassName, caps)
+	if err != nil {
+		return "", fmt.Errorf("error getting matching machine class: %w", err)
+	}
+	return class.Name, nil
 }
 
-func convertMachineClass(machineClass *computev1alpha1.MachineClass) (*ori.MachineResources, error) {
-	cpuCount := machineClass.Capabilities.Cpu().Value()
-	memoryBytes := machineClass.Capabilities.Memory().Value()
+func getORIMachineClassCapabilities(machineClass *computev1alpha1.MachineClass) (*ori.MachineResources, error) {
+	cpu := machineClass.Capabilities.Cpu()
+	memory := machineClass.Capabilities.Memory()
 
 	return &ori.MachineResources{
-		CpuCount:    int32(cpuCount),
-		MemoryBytes: uint64(memoryBytes),
+		CpuMillis:   cpu.MilliValue(),
+		MemoryBytes: uint64(memory.Value()),
 	}, nil
 }
 

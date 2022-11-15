@@ -28,6 +28,7 @@ import (
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 	machinepoolletclient "github.com/onmetal/onmetal-api/machinepoollet/client"
 	"github.com/onmetal/onmetal-api/machinepoollet/controllers"
+	"github.com/onmetal/onmetal-api/machinepoollet/mcm"
 	ori "github.com/onmetal/onmetal-api/ori/apis/compute/v1alpha1"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -58,10 +59,13 @@ type Options struct {
 	EnableLeaderElection bool
 	ProbeAddr            string
 
-	MachinePoolName        string
-	ProviderID             string
-	MachineRuntimeEndpoint string
-	DialTimeout            time.Duration
+	MachinePoolName               string
+	ProviderID                    string
+	MachineRuntimeEndpoint        string
+	DialTimeout                   time.Duration
+	MachineClassMapperSyncTimeout time.Duration
+
+	WatchFilterValue string
 }
 
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
@@ -75,6 +79,9 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.ProviderID, "provider-id", "", "Provider id to announce on the machine pool.")
 	fs.StringVar(&o.MachineRuntimeEndpoint, "machine-runtime-endpoint", o.MachineRuntimeEndpoint, "Endpoint of the remote machine runtime service.")
 	fs.DurationVar(&o.DialTimeout, "dial-timeout", 1*time.Second, "Timeout for dialing to the machine runtime endpoint.")
+	fs.DurationVar(&o.MachineClassMapperSyncTimeout, "mcm-sync-timeout", 10*time.Second, "Timeout waiting for the machine class mapper to sync.")
+
+	fs.StringVar(&o.WatchFilterValue, "watch-filter", "", "Value to filter for while watching.")
 }
 
 func (o *Options) MarkFlagsRequired(cmd *cobra.Command) {
@@ -178,19 +185,34 @@ func Run(ctx context.Context, opts Options) error {
 	}
 
 	onInitialized := func(ctx context.Context) error {
+		machineClassMapper := mcm.NewGeneric(machineRuntime, mcm.GenericOptions{})
+		if err := mgr.Add(machineClassMapper); err != nil {
+			return fmt.Errorf("error adding machine class mapper: %w", err)
+		}
+
+		machineClassMapperSyncCtx, cancel := context.WithTimeout(ctx, opts.MachineClassMapperSyncTimeout)
+		defer cancel()
+
+		if err := machineClassMapper.WaitForSync(machineClassMapperSyncCtx); err != nil {
+			return fmt.Errorf("error waiting for machine class mapper to sync: %w", err)
+		}
+
 		if err := (&controllers.MachineReconciler{
-			EventRecorder:   mgr.GetEventRecorderFor("machines"),
-			Client:          mgr.GetClient(),
-			MachineRuntime:  machineRuntime,
-			MachinePoolName: opts.MachinePoolName,
+			EventRecorder:      mgr.GetEventRecorderFor("machines"),
+			Client:             mgr.GetClient(),
+			MachineRuntime:     machineRuntime,
+			MachineClassMapper: machineClassMapper,
+			MachinePoolName:    opts.MachinePoolName,
+			WatchFilterValue:   opts.WatchFilterValue,
 		}).SetupWithManager(mgr); err != nil {
 			return fmt.Errorf("error setting up machine reconciler with manager: %w", err)
 		}
 
 		if err := (&controllers.MachinePoolReconciler{
-			Client:          mgr.GetClient(),
-			MachinePoolName: opts.MachinePoolName,
-			MachineRuntime:  machineRuntime,
+			Client:             mgr.GetClient(),
+			MachinePoolName:    opts.MachinePoolName,
+			MachineClassMapper: machineClassMapper,
+			MachineRuntime:     machineRuntime,
 		}).SetupWithManager(mgr); err != nil {
 			return fmt.Errorf("error setting up machine pool reconciler with manager: %w", err)
 		}

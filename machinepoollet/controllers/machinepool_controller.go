@@ -16,10 +16,12 @@ package controllers
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/go-logr/logr"
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
+	"github.com/onmetal/onmetal-api/machinepoollet/mcm"
 	ori "github.com/onmetal/onmetal-api/ori/apis/compute/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -32,8 +34,9 @@ import (
 
 type MachinePoolReconciler struct {
 	client.Client
-	MachinePoolName string
-	MachineRuntime  ori.MachineRuntimeClient
+	MachinePoolName    string
+	MachineRuntime     ori.MachineRuntimeClient
+	MachineClassMapper mcm.MachineClassMapper
 }
 
 func (r *MachinePoolReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -60,19 +63,19 @@ func (r *MachinePoolReconciler) delete(ctx context.Context, log logr.Logger, mac
 }
 
 func (r *MachinePoolReconciler) supportsMachineClass(ctx context.Context, log logr.Logger, machineClass *computev1alpha1.MachineClass) (bool, error) {
-	oriMachineResources, err := convertMachineClass(machineClass)
+	oriCapabilities, err := getORIMachineClassCapabilities(machineClass)
 	if err != nil {
-		return false, fmt.Errorf("error converting machine class: %w", err)
+		return false, fmt.Errorf("error getting ori mahchine class capabilities: %w", err)
 	}
 
-	res, err := r.MachineRuntime.SupportsMachineResources(ctx, &ori.SupportsMachineResourcesRequest{
-		Resources: oriMachineResources,
-	})
+	_, err = r.MachineClassMapper.GetMachineClassFor(ctx, machineClass.Name, oriCapabilities)
 	if err != nil {
-		return false, fmt.Errorf("error checking whether resources are supported: %w", err)
+		if !errors.Is(err, mcm.ErrNoMatchingMachineClass) || !errors.Is(err, mcm.ErrAmbiguousMatchingMachineClass) {
+			return false, fmt.Errorf("error getting machine class for %s: %w", machineClass.Name, err)
+		}
+		return false, nil
 	}
-
-	return res.Confirmation != nil, nil
+	return true, nil
 }
 
 func (r *MachinePoolReconciler) reconcile(ctx context.Context, log logr.Logger, machinePool *computev1alpha1.MachinePool) (ctrl.Result, error) {

@@ -31,7 +31,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	quotav1 "k8s.io/apiserver/pkg/quota/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -80,45 +79,6 @@ func (s *Server) onmetalVolumeName(id, volumeName string) string {
 
 func (s *Server) onmetalIgnitionSecretName(id string) string {
 	return s.hashID(id, "ignition")
-}
-
-func (s *Server) getOnmetalResources(resources *ori.MachineResources) (corev1.ResourceList, error) {
-	return corev1.ResourceList{
-		corev1.ResourceCPU:    *resource.NewQuantity(int64(resources.CpuCount), resource.DecimalSI),
-		corev1.ResourceMemory: *resource.NewQuantity(int64(resources.MemoryBytes), resource.DecimalSI),
-	}, nil
-}
-
-func (s *Server) findOnmetalMachineClass(ctx context.Context, resources *ori.MachineResources) (*computev1alpha1.MachineClass, error) {
-	machineClassList := &computev1alpha1.MachineClassList{}
-	if err := s.client.List(ctx, machineClassList); err != nil {
-		return nil, fmt.Errorf("error listing machine classes: %w", err)
-	}
-
-	expectedResources := corev1.ResourceList{
-		corev1.ResourceCPU:    *resource.NewQuantity(int64(resources.CpuCount), resource.DecimalSI),
-		corev1.ResourceMemory: *resource.NewQuantity(int64(resources.MemoryBytes), resource.DecimalSI),
-	}
-
-	var matches []computev1alpha1.MachineClass
-	for _, machineClass := range machineClassList.Items {
-		actualResources := quotav1.Mask(machineClass.Capabilities, []corev1.ResourceName{corev1.ResourceCPU, corev1.ResourceMemory})
-		if !quotav1.Equals(actualResources, expectedResources) {
-			continue
-		}
-
-		matches = append(matches, machineClass)
-	}
-
-	switch len(matches) {
-	case 0:
-		return nil, fmt.Errorf("no machine class found satisfying resource requirements")
-	case 1:
-		machineClass := matches[0]
-		return &machineClass, nil
-	default:
-		return nil, fmt.Errorf("ambiguous matches for requirements")
-	}
 }
 
 func (s *Server) getOnmetalVolumeData(
@@ -301,11 +261,6 @@ func (s *Server) getOnmetalNetworkInterfaceData(
 }
 
 func (s *Server) getOnmetalMachineConfig(ctx context.Context, cfg *ori.MachineConfig, machineID string) (*OnmetalMachineConfig, error) {
-	onmetalMachineClass, err := s.findOnmetalMachineClass(ctx, cfg.Resources)
-	if err != nil {
-		return nil, fmt.Errorf("error finding onmetal machine class: %w", err)
-	}
-
 	var ignitionSecret *corev1.Secret
 	if ignition := cfg.Ignition; ignition != nil {
 		ignitionSecret = &corev1.Secret{
@@ -357,7 +312,7 @@ func (s *Server) getOnmetalMachineConfig(ctx context.Context, cfg *ori.MachineCo
 			Name:      machineID,
 		},
 		Spec: computev1alpha1.MachineSpec{
-			MachineClassRef:     corev1.LocalObjectReference{Name: onmetalMachineClass.Name},
+			MachineClassRef:     corev1.LocalObjectReference{Name: cfg.Class},
 			MachinePoolSelector: s.machinePoolSelector,
 			Image:               cfg.Image,
 			ImagePullSecretRef:  nil, // TODO: Fill if necessary.

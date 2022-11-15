@@ -112,6 +112,7 @@ func init() {
 
 var (
 	MachineAliases          = []string{"machines", "mach", "machs"}
+	MachineClassAliases     = []string{"machineclasses", "mc", "mcs"}
 	VolumeAliases           = []string{"volumes", "vol", "vols"}
 	NetworkInterfaceAliases = []string{"networkinterfaces", "nic", "nics"}
 )

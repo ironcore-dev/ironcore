@@ -27,8 +27,6 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -37,18 +35,6 @@ var _ = Describe("CreateMachine", func() {
 	ns, srv := SetupTest(ctx)
 
 	It("Should correctly create a machine", func() {
-		By("creating an onmetal machine class")
-		onmetalMachineClass := &computev1alpha1.MachineClass{
-			ObjectMeta: metav1.ObjectMeta{
-				GenerateName: "onmetal-machine-class-",
-			},
-			Capabilities: corev1.ResourceList{
-				corev1.ResourceCPU:    resource.MustParse("2"),
-				corev1.ResourceMemory: resource.MustParse("10Gi"),
-			},
-		}
-		Expect(k8sClient.Create(ctx, onmetalMachineClass)).To(Succeed())
-
 		By("creating a machine")
 
 		var (
@@ -65,6 +51,7 @@ var _ = Describe("CreateMachine", func() {
 		)
 		const (
 			image         = "example.org/gardenlinux"
+			class         = "my-class"
 			networkHandle = "mynet"
 			volumeDriver  = "ceph"
 			volumeHandle  = "foobar"
@@ -73,10 +60,7 @@ var _ = Describe("CreateMachine", func() {
 			Config: &ori.MachineConfig{
 				Metadata: metadata,
 				Image:    image,
-				Resources: &ori.MachineResources{
-					CpuCount:    2,
-					MemoryBytes: 10 * 1024 * 1024 * 1024,
-				},
+				Class:    class,
 				Ignition: &ori.IgnitionConfig{
 					Data: ignitionData,
 				},
@@ -130,7 +114,7 @@ var _ = Describe("CreateMachine", func() {
 		Expect(apiutils.GetMetadataAnnotation(onmetalMachine)).To(Equal(metadata))
 		Expect(apiutils.GetAnnotationsAnnotation(onmetalMachine)).To(Equal(annotations))
 		Expect(apiutils.GetLabelsAnnotation(onmetalMachine)).To(Equal(labels))
-		Expect(onmetalMachine.Spec.MachineClassRef).To(Equal(corev1.LocalObjectReference{Name: onmetalMachineClass.Name}))
+		Expect(onmetalMachine.Spec.MachineClassRef).To(Equal(corev1.LocalObjectReference{Name: class}))
 		Expect(onmetalMachine.Spec.Image).To(Equal(image))
 		Expect(onmetalMachine.Spec.IgnitionRef).NotTo(BeNil())
 		Expect(onmetalMachine.Spec.Volumes).To(HaveLen(2))

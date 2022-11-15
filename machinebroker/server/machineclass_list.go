@@ -21,9 +21,7 @@ import (
 	"github.com/onmetal/controller-utils/set"
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/compute/v1alpha1"
-	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	quotav1 "k8s.io/apiserver/pkg/quota/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -58,31 +56,36 @@ func (s *Server) gatherAvailableMachineClassNames(onmetalMachinePools []computev
 	return res
 }
 
-func (s *Server) determineResourceListSupport(
-	resources corev1.ResourceList,
+func (s *Server) filterOnmetalMachineClasses(
 	availableMachineClassNames set.Set[string],
 	machineClasses []computev1alpha1.MachineClass,
-) bool {
+) []computev1alpha1.MachineClass {
+	var filtered []computev1alpha1.MachineClass
 	for _, machineClass := range machineClasses {
 		if !availableMachineClassNames.Has(machineClass.Name) {
 			continue
 		}
 
-		if quotav1.Equals(machineClass.Capabilities, resources) {
-			return true
-		}
+		filtered = append(filtered, machineClass)
 	}
-	return false
+	return filtered
 }
 
-func (s *Server) SupportsMachineResources(ctx context.Context, req *ori.SupportsMachineResourcesRequest) (*ori.SupportsMachineResourcesResponse, error) {
-	log := s.loggerFrom(ctx)
+func (s *Server) convertOnmetalMachineClass(machineClass *computev1alpha1.MachineClass) (*ori.MachineClass, error) {
+	cpu := machineClass.Capabilities.Cpu()
+	memory := machineClass.Capabilities.Memory()
 
-	log.V(1).Info("Getting onmetal resources")
-	resources, err := s.getOnmetalResources(req.Resources)
-	if err != nil {
-		return nil, fmt.Errorf("error getting onmetal resource list")
-	}
+	return &ori.MachineClass{
+		Name: machineClass.Name,
+		Capabilities: &ori.MachineResources{
+			CpuMillis:   cpu.MilliValue(),
+			MemoryBytes: uint64(memory.Value()),
+		},
+	}, nil
+}
+
+func (s *Server) ListMachineClasses(ctx context.Context, req *ori.ListMachineClassesRequest) (*ori.ListMachineClassesResponse, error) {
+	log := s.loggerFrom(ctx)
 
 	log.V(1).Info("Getting target onmetal machine pools")
 	onmetalMachinePools, err := s.getTargetOnmetalMachinePools(ctx)
@@ -95,7 +98,7 @@ func (s *Server) SupportsMachineResources(ctx context.Context, req *ori.Supports
 
 	if len(availableOnmetalMachineClassNames) == 0 {
 		log.V(1).Info("No available machine classes")
-		return &ori.SupportsMachineResourcesResponse{}, nil
+		return &ori.ListMachineClassesResponse{MachineClasses: []*ori.MachineClass{}}, nil
 	}
 
 	log.V(1).Info("Listing onmetal machine classes")
@@ -104,11 +107,19 @@ func (s *Server) SupportsMachineResources(ctx context.Context, req *ori.Supports
 		return nil, fmt.Errorf("error listing onmetal machine classes: %w", err)
 	}
 
-	if s.determineResourceListSupport(resources, availableOnmetalMachineClassNames, onmetalMachineClassList.Items) {
-		log.V(1).Info("Resources are supported")
-		return &ori.SupportsMachineResourcesResponse{Confirmation: &ori.MachineResourcesConfirmation{}}, nil
+	availableOnmetalMachineClasses := s.filterOnmetalMachineClasses(availableOnmetalMachineClassNames, onmetalMachineClassList.Items)
+	machineClasses := make([]*ori.MachineClass, 0, len(availableOnmetalMachineClasses))
+	for _, onmetalMachineClass := range availableOnmetalMachineClasses {
+		machineClass, err := s.convertOnmetalMachineClass(&onmetalMachineClass)
+		if err != nil {
+			return nil, fmt.Errorf("error converting onmetal machine class %s: %w", onmetalMachineClass.Name, err)
+		}
+
+		machineClasses = append(machineClasses, machineClass)
 	}
 
-	log.V(1).Info("Resources are not supported")
-	return &ori.SupportsMachineResourcesResponse{}, nil
+	log.V(1).Info("Returning machine classes")
+	return &ori.ListMachineClassesResponse{
+		MachineClasses: machineClasses,
+	}, nil
 }

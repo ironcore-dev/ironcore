@@ -29,6 +29,7 @@ import (
 	machinepoolletv1alpha1 "github.com/onmetal/onmetal-api/machinepoollet/api/v1alpha1"
 	machinepoolletclient "github.com/onmetal/onmetal-api/machinepoollet/client"
 	"github.com/onmetal/onmetal-api/machinepoollet/controllers/events"
+	"github.com/onmetal/onmetal-api/machinepoollet/mcm"
 	"github.com/onmetal/onmetal-api/machinepoollet/mleg"
 	ori "github.com/onmetal/onmetal-api/ori/apis/compute/v1alpha1"
 	utilslices "github.com/onmetal/onmetal-api/utils/slices"
@@ -55,6 +56,8 @@ type MachineReconciler struct {
 	client.Client
 
 	MachineRuntime ori.MachineRuntimeClient
+
+	MachineClassMapper mcm.MachineClassMapper
 
 	MachinePoolName string
 
@@ -701,7 +704,7 @@ func (r *MachineReconciler) reconcileVolumes(
 
 func (r *MachineReconciler) getMachineConfig(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) (*ori.MachineConfig, error) {
 	log.V(1).Info("Getting machine resources")
-	machineResources, err := r.getORIMachineResources(ctx, machine)
+	machineResources, err := r.getORIMachineClass(ctx, machine.Spec.MachineClassRef.Name)
 	if err != nil {
 		if !IsDependencyNotReadyError(err) {
 			r.EventRecorder.Eventf(machine, corev1.EventTypeWarning, events.ErrorGettingMachineResources, "Error getting machine resources: %v", err)
@@ -766,7 +769,7 @@ func (r *MachineReconciler) getMachineConfig(ctx context.Context, log logr.Logge
 	return &ori.MachineConfig{
 		Metadata:          machineMetadata,
 		Image:             machine.Spec.Image,
-		Resources:         machineResources,
+		Class:             machineResources,
 		Ignition:          ignitionConfig,
 		Volumes:           volumeConfigs,
 		NetworkInterfaces: networkInterfaceConfigs,
@@ -856,6 +859,12 @@ func (r *MachineReconciler) makeRequestsForMachinesRunningInMachinePool(machineL
 func (r *MachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	log := ctrl.Log.WithName("machinepoollet")
 	ctx := ctrl.LoggerInto(context.TODO(), log)
+
+	mapper := mcm.NewGeneric(r.MachineRuntime, mcm.GenericOptions{})
+
+	if err := mgr.Add(mapper); err != nil {
+		return fmt.Errorf("error adding machine class mapper: %w", err)
+	}
 
 	gen := mleg.NewGeneric(r.MachineRuntime, mleg.GenericOptions{})
 

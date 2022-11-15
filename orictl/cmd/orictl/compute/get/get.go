@@ -17,6 +17,7 @@ package get
 import (
 	"github.com/onmetal/onmetal-api/orictl/cmd/orictl/compute/common"
 	"github.com/onmetal/onmetal-api/orictl/cmd/orictl/compute/get/machine"
+	"github.com/onmetal/onmetal-api/orictl/cmd/orictl/compute/get/machineclass"
 	"github.com/onmetal/onmetal-api/orictl/cmd/orictl/compute/get/networkinterface"
 	"github.com/onmetal/onmetal-api/orictl/cmd/orictl/compute/get/volume"
 	"github.com/spf13/cobra"
@@ -29,6 +30,7 @@ func Command(streams common.Streams, clientFactory common.ClientFactory) *cobra.
 
 	cmd.AddCommand(
 		machine.Command(streams, clientFactory),
+		machineclass.Command(streams, clientFactory),
 		networkinterface.Command(streams, clientFactory),
 		volume.Command(streams, clientFactory),
 	)
