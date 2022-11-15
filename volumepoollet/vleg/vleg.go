@@ -22,7 +22,9 @@ import (
 type VolumeLifecycleEventType string
 
 const (
+	VolumePending   VolumeLifecycleEventType = "VolumePending"
 	VolumeAvailable VolumeLifecycleEventType = "VolumeAvailable"
+	VolumeError     VolumeLifecycleEventType = "VolumeError"
 	VolumeRemoved   VolumeLifecycleEventType = "VolumeRemoved"
 )
 

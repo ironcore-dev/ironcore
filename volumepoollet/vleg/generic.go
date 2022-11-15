@@ -36,6 +36,7 @@ type genericVolumeMetadata struct {
 type genericVolume struct {
 	id       string
 	metadata genericVolumeMetadata
+	state    ori.VolumeState
 }
 
 func (g genericVolume) key() string { //nolint:unused
@@ -102,6 +103,7 @@ func (g *Generic) list(ctx context.Context) ([]*genericVolume, error) {
 				namespace: volume.Metadata.Namespace,
 				name:      volume.Metadata.Name,
 			},
+			state: volume.State,
 		}
 	}
 
@@ -139,14 +141,30 @@ func (g *Generic) Start(ctx context.Context) error {
 	return nil
 }
 
+func oriVolumeStateToVolumeLifecycleEventType(state ori.VolumeState) VolumeLifecycleEventType {
+	switch state {
+	case ori.VolumeState_VOLUME_AVAILABLE:
+		return VolumeAvailable
+	case ori.VolumeState_VOLUME_ERROR:
+		return VolumeError
+	case ori.VolumeState_VOLUME_PENDING:
+		return VolumePending
+	default:
+		panic(fmt.Sprintf("unrecognized volume state %d", state))
+	}
+}
+
 func (g *Generic) inferEvents(id string, metadata VolumeLifecycleEventMetadata, oldVolume, newVolume *genericVolume) []*VolumeLifecycleEvent {
 	switch {
 	case oldVolume == nil && newVolume != nil:
-		return []*VolumeLifecycleEvent{{ID: id, Metadata: metadata, Type: VolumeAvailable}}
+		return []*VolumeLifecycleEvent{{ID: id, Metadata: metadata, Type: oriVolumeStateToVolumeLifecycleEventType(newVolume.state)}}
 	case oldVolume != nil && newVolume == nil:
 		return []*VolumeLifecycleEvent{{ID: id, Metadata: metadata, Type: VolumeRemoved}}
 	case oldVolume != nil && newVolume != nil:
 		var events []*VolumeLifecycleEvent
+		if oldVolume.state != newVolume.state {
+			events = append(events, &VolumeLifecycleEvent{ID: id, Metadata: metadata, Type: oriVolumeStateToVolumeLifecycleEventType(newVolume.state)})
+		}
 		return events
 	default:
 		panic("unhandled case")

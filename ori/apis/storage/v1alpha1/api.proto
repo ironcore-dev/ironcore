@@ -48,8 +48,9 @@ message VolumeConfig {
 message Volume {
   string id = 1;
   VolumeMetadata metadata = 2;
-  map<string, string> annotations = 3;
-  map<string, string> labels = 4;
+  VolumeState state = 3;
+  map<string, string> annotations = 4;
+  map<string, string> labels = 5;
 }
 
 message VolumeClassCapabilities {
