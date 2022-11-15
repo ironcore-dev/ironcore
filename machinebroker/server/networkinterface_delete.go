@@ -47,7 +47,7 @@ func (s *Server) DeleteNetworkInterface(ctx context.Context, req *ori.DeleteNetw
 
 	log.V(1).Info("Deleting network interface from machine")
 	baseOnmetalMachine := onmetalMachine.DeepCopy()
-	slices.Delete(onmetalMachine.Spec.NetworkInterfaces, idx, idx)
+	onmetalMachine.Spec.NetworkInterfaces = slices.Delete(onmetalMachine.Spec.NetworkInterfaces, idx, idx+1)
 	if err := s.client.Patch(ctx, onmetalMachine, client.MergeFrom(baseOnmetalMachine)); err != nil {
 		return nil, fmt.Errorf("error deleting network interface from machine: %w", err)
 	}

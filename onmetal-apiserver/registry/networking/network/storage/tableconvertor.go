@@ -61,14 +61,14 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 
 		cells = append(cells, name)
 
-		cells = append(cells, network.Spec.ProviderID)
-
 		switch state := network.Status.State; state {
 		case "":
 			cells = append(cells, "<unknown>")
 		default:
 			cells = append(cells, state)
 		}
+
+		cells = append(cells, network.Spec.ProviderID)
 
 		cells = append(cells, age)
 

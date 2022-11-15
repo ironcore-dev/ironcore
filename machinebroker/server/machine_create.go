@@ -485,6 +485,12 @@ func (s *Server) createOnmetalNetwork(ctx context.Context, log logr.Logger, clea
 		return fmt.Errorf("error creating network: %w", err)
 	}
 
+	baseOnmetalNetwork := onmetalNetwork.DeepCopy()
+	onmetalNetwork.Status.State = networkingv1alpha1.NetworkStateAvailable
+	if err := s.client.Status().Patch(ctx, onmetalNetwork, client.MergeFrom(baseOnmetalNetwork)); err != nil {
+		return fmt.Errorf("error patching onmetal network status state to available: %w", err)
+	}
+
 	cleaner.Add(func(ctx context.Context) error {
 		if err := s.client.Delete(ctx, onmetalNetwork); client.IgnoreNotFound(err) != nil {
 			return fmt.Errorf("error deleting network: %w", err)

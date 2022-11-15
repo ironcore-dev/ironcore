@@ -50,7 +50,7 @@ func (s *Server) DeleteVolume(ctx context.Context, req *ori.DeleteVolumeRequest)
 
 	log.V(1).Info("Deleting volume from machine")
 	baseOnmetalMachine := onmetalMachine.DeepCopy()
-	slices.Delete(onmetalMachine.Spec.Volumes, idx, idx)
+	onmetalMachine.Spec.Volumes = slices.Delete(onmetalMachine.Spec.Volumes, idx, idx+1)
 	if err := s.client.Patch(ctx, onmetalMachine, client.MergeFrom(baseOnmetalMachine)); err != nil {
 		return nil, fmt.Errorf("error deleting volume from machine: %w", err)
 	}

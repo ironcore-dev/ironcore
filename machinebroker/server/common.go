@@ -26,10 +26,11 @@ import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
+	ctrl "sigs.k8s.io/controller-runtime"
 )
 
 func (s *Server) loggerFrom(ctx context.Context, keysWithValues ...interface{}) logr.Logger {
-	return s.logger.WithValues(keysWithValues...)
+	return ctrl.LoggerFrom(ctx, keysWithValues...)
 }
 
 const idLength = 63

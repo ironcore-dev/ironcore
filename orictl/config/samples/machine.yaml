@@ -1,0 +1,25 @@
+metadata:
+  namespace: default
+  name: my-machine
+  uid: my-uid
+image: ghrcr.io/onmetal/onmetal-image/gardenlinux:latest
+resources:
+  cpu_count: 1
+  memory_bytes: 1073741824
+volumes:
+  - name: primary
+    device: odb
+    empty_disk:
+      size_limit_bytes: 1073741824
+  - name: secondary
+    device: odc
+    access:
+      driver: ceph
+      handle: cephhandle
+network_interfaces:
+  - name: primary
+    network:
+      handle: foo
+    ips:
+      - 10.0.0.1
+

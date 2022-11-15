@@ -16,11 +16,14 @@ package server
 
 import (
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
+	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/machinebroker/api/v1alpha1"
 	"github.com/onmetal/onmetal-api/machinebroker/apiutils"
 	ori "github.com/onmetal/onmetal-api/ori/apis/runtime/v1alpha1"
 )
 
 func (s *Server) convertOnmetalMachine(machine *computev1alpha1.Machine) (*ori.Machine, error) {
+	id := machine.Labels[machinebrokerv1alpha1.MachineIDLabel]
+
 	metadata, err := apiutils.GetMetadataAnnotation(machine)
 	if err != nil {
 		return nil, err
@@ -37,7 +40,7 @@ func (s *Server) convertOnmetalMachine(machine *computev1alpha1.Machine) (*ori.M
 	}
 
 	return &ori.Machine{
-		Id:          string(machine.UID),
+		Id:          id,
 		Metadata:    metadata,
 		Annotations: annotations,
 		Labels:      labels,
