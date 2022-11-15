@@ -25,6 +25,7 @@ import (
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 	onmetalapiclient "github.com/onmetal/onmetal-api/apiutils/client"
+	"github.com/onmetal/onmetal-api/apiutils/predicates"
 	machinepoolletv1alpha1 "github.com/onmetal/onmetal-api/machinepoollet/api/v1alpha1"
 	machinepoolletclient "github.com/onmetal/onmetal-api/machinepoollet/client"
 	"github.com/onmetal/onmetal-api/machinepoollet/controllers/events"
@@ -55,8 +56,9 @@ type MachineReconciler struct {
 
 	MachineRuntime ori.MachineRuntimeClient
 
-	MachineFinalizer string
-	MachinePoolName  string
+	MachinePoolName string
+
+	WatchFilterValue string
 }
 
 func (r *MachineReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -121,7 +123,7 @@ func (r *MachineReconciler) reconcileExists(ctx context.Context, log logr.Logger
 func (r *MachineReconciler) delete(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) (ctrl.Result, error) {
 	log.V(1).Info("Delete")
 
-	if !controllerutil.ContainsFinalizer(machine, r.MachineFinalizer) {
+	if !controllerutil.ContainsFinalizer(machine, machinepoolletv1alpha1.MachineFinalizer) {
 		log.V(1).Info("No finalizer present, nothing to do")
 		return ctrl.Result{}, nil
 	}
@@ -162,7 +164,7 @@ func (r *MachineReconciler) delete(ctx context.Context, log logr.Logger, machine
 	}
 
 	log.V(1).Info("Deleted all runtime machines, removing finalizer")
-	if err := clientutils.PatchRemoveFinalizer(ctx, r.Client, machine, r.MachineFinalizer); err != nil {
+	if err := clientutils.PatchRemoveFinalizer(ctx, r.Client, machine, machinepoolletv1alpha1.MachineFinalizer); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error removing finalizer: %w", err)
 	}
 
@@ -174,7 +176,7 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 	log.V(1).Info("Reconcile")
 
 	log.V(1).Info("Ensuring finalizer")
-	modified, err := clientutils.PatchEnsureFinalizer(ctx, r.Client, machine, r.MachineFinalizer)
+	modified, err := clientutils.PatchEnsureFinalizer(ctx, r.Client, machine, machinepoolletv1alpha1.MachineFinalizer)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error ensuring finalizer: %w", err)
 	}
@@ -851,7 +853,7 @@ func (r *MachineReconciler) makeRequestsForMachinesRunningInMachinePool(machineL
 	return res
 }
 
-func (r *MachineReconciler) SetupWithManager(mgr ctrl.Manager, prct ...predicate.Predicate) error {
+func (r *MachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	log := ctrl.Log.WithName("machinepoollet")
 	ctx := ctrl.LoggerInto(context.TODO(), log)
 
@@ -896,9 +898,9 @@ func (r *MachineReconciler) SetupWithManager(mgr ctrl.Manager, prct ...predicate
 		For(
 			&computev1alpha1.Machine{},
 			builder.WithPredicates(
-				append([]predicate.Predicate{
-					MachineRunsInMachinePoolPredicate(r.MachinePoolName),
-				}, prct...)...,
+				MachineRunsInMachinePoolPredicate(r.MachinePoolName),
+				predicates.ResourceHasFilterLabel(log, r.WatchFilterValue),
+				predicates.ResourceIsNotExternallyManaged(log),
 			),
 		).
 		Watches(

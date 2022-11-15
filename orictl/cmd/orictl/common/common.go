@@ -49,7 +49,7 @@ func (o *DialOptions) Dial(ctx context.Context) (ori.MachineRuntimeClient, func(
 	defer cancel()
 
 	if o.Address == "" {
-		o.Address = os.Getenv("ORICTL_ADDRESS")
+		o.Address = os.Getenv("ORI_MACHINE_RUNTIME")
 	}
 
 	conn, err := grpc.DialContext(dialCtx, o.Address,

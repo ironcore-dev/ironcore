@@ -245,9 +245,9 @@ func (g *Generic) inferVolumeEvents(
 func (g *Generic) inferEvents(id string, metadata MachineLifecycleEventMetadata, oldMachine, newMachine *genericMachine) []*MachineLifecycleEvent {
 	switch {
 	case oldMachine == nil && newMachine != nil:
-		return []*MachineLifecycleEvent{{ID: id, Type: MachineStarted}}
+		return []*MachineLifecycleEvent{{ID: id, Metadata: metadata, Type: MachineStarted}}
 	case oldMachine != nil && newMachine == nil:
-		return []*MachineLifecycleEvent{{ID: id, Type: MachineStopped}, {ID: id, Type: MachineRemoved}}
+		return []*MachineLifecycleEvent{{ID: id, Metadata: metadata, Type: MachineStopped}, {ID: id, Metadata: metadata, Type: MachineRemoved}}
 	case oldMachine != nil && newMachine != nil:
 		var events []*MachineLifecycleEvent
 
@@ -338,12 +338,12 @@ type keyed[K comparable] interface {
 	key() K
 }
 
-type oldNewMap[K comparable, V keyed[K]] map[K]oldNewMapEntry[*V]
+type oldNewMap[K comparable, V keyed[K]] map[K]*oldNewMapEntry[*V]
 
 func (m oldNewMap[K, V]) set(old, current []*V) {
 	for _, item := range old {
 		key := (*item).key()
-		m[key] = oldNewMapEntry[*V]{
+		m[key] = &oldNewMapEntry[*V]{
 			Old: item,
 		}
 	}
@@ -352,7 +352,7 @@ func (m oldNewMap[K, V]) set(old, current []*V) {
 		if r, ok := m[key]; ok {
 			r.Current = item
 		} else {
-			m[key] = oldNewMapEntry[*V]{
+			m[key] = &oldNewMapEntry[*V]{
 				Current: item,
 			}
 		}
@@ -369,7 +369,7 @@ func (m oldNewMap[K, V]) setCurrent(current []*V) {
 		if r, ok := m[key]; ok {
 			r.Current = item
 		} else {
-			m[key] = oldNewMapEntry[*V]{
+			m[key] = &oldNewMapEntry[*V]{
 				Current: item,
 			}
 		}

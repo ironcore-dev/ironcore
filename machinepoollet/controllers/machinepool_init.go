@@ -66,3 +66,7 @@ func (i *MachinePoolInit) Start(ctx context.Context) error {
 	}
 	return nil
 }
+
+func (i *MachinePoolInit) SetupWithManager(mgr ctrl.Manager) error {
+	return mgr.Add(i)
+}

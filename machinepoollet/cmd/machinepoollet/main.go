@@ -12,13 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package v1alpha1
+package main
 
-const (
-	MachineUIDLabel       = "machinepoollet.api.onmetal.de/machine-uid"
-	MachineNamespaceLabel = "machinepoollet.api.onmetal.de/machine-namespace"
-	MachineNameLabel      = "machinepoollet.api.onmetal.de/machine-name"
+import (
+	"os"
 
-	FieldOwner       = "machinepoollet.api.onmetal.de/field-owner"
-	MachineFinalizer = "machinepoollet.api.onmetal.de/machine"
+	"github.com/onmetal/onmetal-api/machinepoollet/cmd/machinepoollet/app"
+	ctrl "sigs.k8s.io/controller-runtime"
 )
+
+func main() {
+	ctx := ctrl.SetupSignalHandler()
+	setupLog := ctrl.Log.WithName("setup")
+
+	if err := app.Command().ExecuteContext(ctx); err != nil {
+		setupLog.Error(err, "Error running machinepoollet")
+		os.Exit(1)
+	}
+}
