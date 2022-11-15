@@ -18,7 +18,7 @@ import (
 	"context"
 	"fmt"
 
-	ori "github.com/onmetal/onmetal-api/ori/apis/runtime/v1alpha1"
+	ori "github.com/onmetal/onmetal-api/ori/apis/compute/v1alpha1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 

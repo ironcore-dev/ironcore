@@ -22,7 +22,7 @@ import (
 	"github.com/go-logr/logr"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/machinebroker/api/v1alpha1"
-	ori "github.com/onmetal/onmetal-api/ori/apis/runtime/v1alpha1"
+	ori "github.com/onmetal/onmetal-api/ori/apis/compute/v1alpha1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"

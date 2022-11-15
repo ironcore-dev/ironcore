@@ -23,8 +23,8 @@ export GO111MODULE=off
 (
 cd "$REPO_ROOT"
 protoc \
-  --proto_path ./ori/apis/runtime/v1alpha1 \
+  --proto_path ./ori/apis/compute/v1alpha1 \
   --proto_path "$VGOPATH/src" \
   --gogo_out=plugins=grpc:"$REPO_ROOT" \
-  ./ori/apis/runtime/v1alpha1/api.proto
+  ./ori/apis/compute/v1alpha1/api.proto
 )

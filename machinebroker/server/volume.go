@@ -19,7 +19,7 @@ import (
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
-	ori "github.com/onmetal/onmetal-api/ori/apis/runtime/v1alpha1"
+	ori "github.com/onmetal/onmetal-api/ori/apis/compute/v1alpha1"
 )
 
 func (s *Server) convertOnmetalVolume(

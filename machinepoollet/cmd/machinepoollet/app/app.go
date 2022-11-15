@@ -28,7 +28,7 @@ import (
 	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
 	machinepoolletclient "github.com/onmetal/onmetal-api/machinepoollet/client"
 	"github.com/onmetal/onmetal-api/machinepoollet/controllers"
-	ori "github.com/onmetal/onmetal-api/ori/apis/runtime/v1alpha1"
+	ori "github.com/onmetal/onmetal-api/ori/apis/compute/v1alpha1"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"google.golang.org/grpc"

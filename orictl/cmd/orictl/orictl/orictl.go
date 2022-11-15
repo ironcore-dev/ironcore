@@ -17,11 +17,8 @@ package orictl
 import (
 	goflag "flag"
 
-	"github.com/onmetal/onmetal-api/orictl/cmd/orictl/common"
-	"github.com/onmetal/onmetal-api/orictl/cmd/orictl/create"
-	"github.com/onmetal/onmetal-api/orictl/cmd/orictl/delete"
-	"github.com/onmetal/onmetal-api/orictl/cmd/orictl/get"
-	"github.com/onmetal/onmetal-api/orictl/cmd/orictl/update"
+	"github.com/onmetal/onmetal-api/orictl/cmd/orictl/compute"
+	"github.com/onmetal/onmetal-api/orictl/cmd/orictl/compute/common"
 	"github.com/spf13/cobra"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
@@ -29,9 +26,7 @@ import (
 
 func Command(streams common.Streams) *cobra.Command {
 	var (
-		zapOpts       zap.Options
-		dialOpts      common.DialOptions
-		clientFactory = dialOpts.Dial
+		zapOpts zap.Options
 	)
 
 	cmd := &cobra.Command{
@@ -47,13 +42,9 @@ func Command(streams common.Streams) *cobra.Command {
 	zapOpts.BindFlags(goFlags)
 
 	cmd.PersistentFlags().AddGoFlagSet(goFlags)
-	dialOpts.AddFlags(cmd.PersistentFlags())
 
 	cmd.AddCommand(
-		get.Command(streams, clientFactory),
-		create.Command(streams, clientFactory),
-		delete.Command(streams, clientFactory),
-		update.Command(streams, clientFactory),
+		compute.Command(streams),
 	)
 
 	return cmd

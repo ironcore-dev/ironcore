@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/onmetal/onmetal-api/orictl/cmd/orictl/common"
+	"github.com/onmetal/onmetal-api/orictl/cmd/orictl/compute/common"
 	"github.com/onmetal/onmetal-api/orictl/cmd/orictl/orictl"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
