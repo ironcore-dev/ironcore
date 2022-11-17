@@ -28,6 +28,11 @@ func (s *Server) convertOnmetalVolume(
 	onmetalVolume *computev1alpha1.Volume,
 	onmetalStorageVolume *storagev1alpha1.Volume,
 ) (*ori.Volume, error) {
+	device := onmetalVolume.Device
+	if device == nil {
+		return nil, fmt.Errorf("volume %s does not specify device", onmetalVolume.Name)
+	}
+
 	var access *ori.VolumeAccess
 	if onmetalVolume.VolumeRef != nil || onmetalVolume.Ephemeral != nil {
 		onmetalVolumeAccess := onmetalStorageVolume.Status.Access
@@ -57,7 +62,7 @@ func (s *Server) convertOnmetalVolume(
 		MachineId:       machineID,
 		MachineMetadata: machineMetadata,
 		Name:            onmetalVolume.Name,
-		Device:          onmetalVolume.Device,
+		Device:          *device,
 		Access:          access,
 		EmptyDisk:       emptyDisk,
 	}, nil

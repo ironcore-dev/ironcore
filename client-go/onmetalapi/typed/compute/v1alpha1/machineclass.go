@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 by the OnMetal authors.
+ * Copyright (c) 2022 by the OnMetal authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,12 @@ package v1alpha1
 
 import (
 	"context"
+	json "encoding/json"
+	"fmt"
 	"time"
 
 	v1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	computev1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/compute/v1alpha1"
 	scheme "github.com/onmetal/onmetal-api/client-go/onmetalapi/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -32,7 +35,7 @@ import (
 // MachineClassesGetter has a method to return a MachineClassInterface.
 // A group's client should implement this interface.
 type MachineClassesGetter interface {
-	MachineClasses(namespace string) MachineClassInterface
+	MachineClasses() MachineClassInterface
 }
 
 // MachineClassInterface has methods to work with MachineClass resources.
@@ -45,20 +48,19 @@ type MachineClassInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.MachineClassList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.MachineClass, err error)
+	Apply(ctx context.Context, machineClass *computev1alpha1.MachineClassApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.MachineClass, err error)
 	MachineClassExpansion
 }
 
 // machineClasses implements MachineClassInterface
 type machineClasses struct {
 	client rest.Interface
-	ns     string
 }
 
 // newMachineClasses returns a MachineClasses
-func newMachineClasses(c *ComputeV1alpha1Client, namespace string) *machineClasses {
+func newMachineClasses(c *ComputeV1alpha1Client) *machineClasses {
 	return &machineClasses{
 		client: c.RESTClient(),
-		ns:     namespace,
 	}
 }
 
@@ -66,7 +68,6 @@ func newMachineClasses(c *ComputeV1alpha1Client, namespace string) *machineClass
 func (c *machineClasses) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.MachineClass, err error) {
 	result = &v1alpha1.MachineClass{}
 	err = c.client.Get().
-		Namespace(c.ns).
 		Resource("machineclasses").
 		Name(name).
 		VersionedParams(&options, scheme.ParameterCodec).
@@ -83,7 +84,6 @@ func (c *machineClasses) List(ctx context.Context, opts v1.ListOptions) (result 
 	}
 	result = &v1alpha1.MachineClassList{}
 	err = c.client.Get().
-		Namespace(c.ns).
 		Resource("machineclasses").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
@@ -100,7 +100,6 @@ func (c *machineClasses) Watch(ctx context.Context, opts v1.ListOptions) (watch.
 	}
 	opts.Watch = true
 	return c.client.Get().
-		Namespace(c.ns).
 		Resource("machineclasses").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
@@ -111,7 +110,6 @@ func (c *machineClasses) Watch(ctx context.Context, opts v1.ListOptions) (watch.
 func (c *machineClasses) Create(ctx context.Context, machineClass *v1alpha1.MachineClass, opts v1.CreateOptions) (result *v1alpha1.MachineClass, err error) {
 	result = &v1alpha1.MachineClass{}
 	err = c.client.Post().
-		Namespace(c.ns).
 		Resource("machineclasses").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(machineClass).
@@ -124,7 +122,6 @@ func (c *machineClasses) Create(ctx context.Context, machineClass *v1alpha1.Mach
 func (c *machineClasses) Update(ctx context.Context, machineClass *v1alpha1.MachineClass, opts v1.UpdateOptions) (result *v1alpha1.MachineClass, err error) {
 	result = &v1alpha1.MachineClass{}
 	err = c.client.Put().
-		Namespace(c.ns).
 		Resource("machineclasses").
 		Name(machineClass.Name).
 		VersionedParams(&opts, scheme.ParameterCodec).
@@ -137,7 +134,6 @@ func (c *machineClasses) Update(ctx context.Context, machineClass *v1alpha1.Mach
 // Delete takes name of the machineClass and deletes it. Returns an error if one occurs.
 func (c *machineClasses) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	return c.client.Delete().
-		Namespace(c.ns).
 		Resource("machineclasses").
 		Name(name).
 		Body(&opts).
@@ -152,7 +148,6 @@ func (c *machineClasses) DeleteCollection(ctx context.Context, opts v1.DeleteOpt
 		timeout = time.Duration(*listOpts.TimeoutSeconds) * time.Second
 	}
 	return c.client.Delete().
-		Namespace(c.ns).
 		Resource("machineclasses").
 		VersionedParams(&listOpts, scheme.ParameterCodec).
 		Timeout(timeout).
@@ -165,11 +160,35 @@ func (c *machineClasses) DeleteCollection(ctx context.Context, opts v1.DeleteOpt
 func (c *machineClasses) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.MachineClass, err error) {
 	result = &v1alpha1.MachineClass{}
 	err = c.client.Patch(pt).
-		Namespace(c.ns).
 		Resource("machineclasses").
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied machineClass.
+func (c *machineClasses) Apply(ctx context.Context, machineClass *computev1alpha1.MachineClassApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.MachineClass, err error) {
+	if machineClass == nil {
+		return nil, fmt.Errorf("machineClass provided to Apply must not be nil")
+	}
+	patchOpts := opts.ToPatchOptions()
+	data, err := json.Marshal(machineClass)
+	if err != nil {
+		return nil, err
+	}
+	name := machineClass.Name
+	if name == nil {
+		return nil, fmt.Errorf("machineClass.Name must be provided to Apply")
+	}
+	result = &v1alpha1.MachineClass{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Resource("machineclasses").
+		Name(*name).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)

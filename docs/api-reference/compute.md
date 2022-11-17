@@ -146,6 +146,7 @@ Kubernetes core/v1.LocalObjectReference
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>NetworkInterfaces define a list of network interfaces present on the machine</p>
 </td>
 </tr>
@@ -159,6 +160,7 @@ Kubernetes core/v1.LocalObjectReference
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Volumes are volumes attached to this machine.</p>
 </td>
 </tr>
@@ -184,6 +186,7 @@ If key is empty, DefaultIgnitionKey will be used as fallback.</p>
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>EFIVars are variables to pass to EFI while booting up.</p>
 </td>
 </tr>
@@ -1159,6 +1162,7 @@ Kubernetes core/v1.LocalObjectReference
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>NetworkInterfaces define a list of network interfaces present on the machine</p>
 </td>
 </tr>
@@ -1172,6 +1176,7 @@ Kubernetes core/v1.LocalObjectReference
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Volumes are volumes attached to this machine.</p>
 </td>
 </tr>
@@ -1197,6 +1202,7 @@ If key is empty, DefaultIgnitionKey will be used as fallback.</p>
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>EFIVars are variables to pass to EFI while booting up.</p>
 </td>
 </tr>
@@ -1647,8 +1653,9 @@ string
 </em>
 </td>
 <td>
-<p>Device is the device name where the volume should be attached. If empty,
-an unused device name will be determined if possible.</p>
+<p>Device is the device name where the volume should be attached.
+Pointer to distinguish between explicit zero and not specified.
+If empty, an unused device name will be determined if possible.</p>
 </td>
 </tr>
 <tr>

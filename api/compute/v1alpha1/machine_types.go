@@ -39,14 +39,23 @@ type MachineSpec struct {
 	// ImagePullSecretRef is an optional secret for pulling the image of a machine.
 	ImagePullSecretRef *corev1.LocalObjectReference `json:"imagePullSecret,omitempty"`
 	// NetworkInterfaces define a list of network interfaces present on the machine
-	NetworkInterfaces []NetworkInterface `json:"networkInterfaces,omitempty"`
+	// +optional
+	// +patchMergeKey=name
+	// +patchStrategy=merge,retainKeys
+	NetworkInterfaces []NetworkInterface `json:"networkInterfaces,omitempty" patchStrategy:"merge,retainKeys" patchMergeKey:"name"`
 	// Volumes are volumes attached to this machine.
-	Volumes []Volume `json:"volumes,omitempty"`
+	// +optional
+	// +patchMergeKey=name
+	// +patchStrategy=merge,retainKeys
+	Volumes []Volume `json:"volumes,omitempty" patchStrategy:"merge,retainKeys" patchMergeKey:"name"`
 	// IgnitionRef is a reference to a secret containing the ignition YAML for the machine to boot up.
 	// If key is empty, DefaultIgnitionKey will be used as fallback.
 	IgnitionRef *commonv1alpha1.SecretKeySelector `json:"ignitionRef,omitempty"`
 	// EFIVars are variables to pass to EFI while booting up.
-	EFIVars []EFIVar `json:"efiVars,omitempty"`
+	// +optional
+	// +patchMergeKey=name
+	// +patchStrategy=merge,retainKeys
+	EFIVars []EFIVar `json:"efiVars,omitempty" patchStrategy:"merge,retainKeys" patchMergeKey:"name"`
 	// Tolerations define tolerations the Machine has. Only MachinePools whose taints
 	// covered by Tolerations will be considered to run the Machine.
 	Tolerations []commonv1alpha1.Toleration `json:"tolerations,omitempty"`
@@ -85,9 +94,10 @@ type NetworkInterfaceSource struct {
 type Volume struct {
 	// Name is the name of the Volume
 	Name string `json:"name"`
-	// Device is the device name where the volume should be attached. If empty,
-	// an unused device name will be determined if possible.
-	Device string `json:"device,omitempty"`
+	// Device is the device name where the volume should be attached.
+	// Pointer to distinguish between explicit zero and not specified.
+	// If empty, an unused device name will be determined if possible.
+	Device *string `json:"device,omitempty"`
 	// VolumeSource is the source where the storage for the Volume resides at.
 	VolumeSource `json:",inline"`
 }

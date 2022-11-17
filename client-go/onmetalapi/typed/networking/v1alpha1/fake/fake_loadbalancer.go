@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 by the OnMetal authors.
+ * Copyright (c) 2022 by the OnMetal authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,11 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
+	"fmt"
 
 	v1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/networking/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -133,6 +136,51 @@ func (c *FakeLoadBalancers) DeleteCollection(ctx context.Context, opts v1.Delete
 func (c *FakeLoadBalancers) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.LoadBalancer, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewPatchSubresourceAction(loadbalancersResource, c.ns, name, pt, data, subresources...), &v1alpha1.LoadBalancer{})
+
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1alpha1.LoadBalancer), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied loadBalancer.
+func (c *FakeLoadBalancers) Apply(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancerApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.LoadBalancer, err error) {
+	if loadBalancer == nil {
+		return nil, fmt.Errorf("loadBalancer provided to Apply must not be nil")
+	}
+	data, err := json.Marshal(loadBalancer)
+	if err != nil {
+		return nil, err
+	}
+	name := loadBalancer.Name
+	if name == nil {
+		return nil, fmt.Errorf("loadBalancer.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewPatchSubresourceAction(loadbalancersResource, c.ns, *name, types.ApplyPatchType, data), &v1alpha1.LoadBalancer{})
+
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1alpha1.LoadBalancer), err
+}
+
+// ApplyStatus was generated because the type contains a Status member.
+// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
+func (c *FakeLoadBalancers) ApplyStatus(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancerApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.LoadBalancer, err error) {
+	if loadBalancer == nil {
+		return nil, fmt.Errorf("loadBalancer provided to Apply must not be nil")
+	}
+	data, err := json.Marshal(loadBalancer)
+	if err != nil {
+		return nil, err
+	}
+	name := loadBalancer.Name
+	if name == nil {
+		return nil, fmt.Errorf("loadBalancer.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewPatchSubresourceAction(loadbalancersResource, c.ns, *name, types.ApplyPatchType, data, "status"), &v1alpha1.LoadBalancer{})
 
 	if obj == nil {
 		return nil, err

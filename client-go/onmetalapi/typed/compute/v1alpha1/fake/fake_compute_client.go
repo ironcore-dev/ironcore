@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 by the OnMetal authors.
+ * Copyright (c) 2022 by the OnMetal authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,12 +31,12 @@ func (c *FakeComputeV1alpha1) Machines(namespace string) v1alpha1.MachineInterfa
 	return &FakeMachines{c, namespace}
 }
 
-func (c *FakeComputeV1alpha1) MachineClasses(namespace string) v1alpha1.MachineClassInterface {
-	return &FakeMachineClasses{c, namespace}
+func (c *FakeComputeV1alpha1) MachineClasses() v1alpha1.MachineClassInterface {
+	return &FakeMachineClasses{c}
 }
 
-func (c *FakeComputeV1alpha1) MachinePools(namespace string) v1alpha1.MachinePoolInterface {
-	return &FakeMachinePools{c, namespace}
+func (c *FakeComputeV1alpha1) MachinePools() v1alpha1.MachinePoolInterface {
+	return &FakeMachinePools{c}
 }
 
 // RESTClient returns a RESTClient that is used to communicate

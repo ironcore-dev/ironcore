@@ -28,8 +28,8 @@ const (
 	// MaxIndex is the maximum index usable for Name / returned by ParseName.
 	MaxIndex = numLetters*numLetters + numLetters - 1
 
-	// VirtioPrefix is the device prefix used by virtio devices.
-	VirtioPrefix = "vd"
+	// OnmetalPrefix is the device prefix used by onmetal devices.
+	OnmetalPrefix = "od"
 )
 
 var (

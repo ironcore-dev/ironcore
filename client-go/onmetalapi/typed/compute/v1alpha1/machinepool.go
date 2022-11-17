@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 by the OnMetal authors.
+ * Copyright (c) 2022 by the OnMetal authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,12 @@ package v1alpha1
 
 import (
 	"context"
+	json "encoding/json"
+	"fmt"
 	"time"
 
 	v1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	computev1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/compute/v1alpha1"
 	scheme "github.com/onmetal/onmetal-api/client-go/onmetalapi/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -32,7 +35,7 @@ import (
 // MachinePoolsGetter has a method to return a MachinePoolInterface.
 // A group's client should implement this interface.
 type MachinePoolsGetter interface {
-	MachinePools(namespace string) MachinePoolInterface
+	MachinePools() MachinePoolInterface
 }
 
 // MachinePoolInterface has methods to work with MachinePool resources.
@@ -46,20 +49,20 @@ type MachinePoolInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.MachinePoolList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.MachinePool, err error)
+	Apply(ctx context.Context, machinePool *computev1alpha1.MachinePoolApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.MachinePool, err error)
+	ApplyStatus(ctx context.Context, machinePool *computev1alpha1.MachinePoolApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.MachinePool, err error)
 	MachinePoolExpansion
 }
 
 // machinePools implements MachinePoolInterface
 type machinePools struct {
 	client rest.Interface
-	ns     string
 }
 
 // newMachinePools returns a MachinePools
-func newMachinePools(c *ComputeV1alpha1Client, namespace string) *machinePools {
+func newMachinePools(c *ComputeV1alpha1Client) *machinePools {
 	return &machinePools{
 		client: c.RESTClient(),
-		ns:     namespace,
 	}
 }
 
@@ -67,7 +70,6 @@ func newMachinePools(c *ComputeV1alpha1Client, namespace string) *machinePools {
 func (c *machinePools) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.MachinePool, err error) {
 	result = &v1alpha1.MachinePool{}
 	err = c.client.Get().
-		Namespace(c.ns).
 		Resource("machinepools").
 		Name(name).
 		VersionedParams(&options, scheme.ParameterCodec).
@@ -84,7 +86,6 @@ func (c *machinePools) List(ctx context.Context, opts v1.ListOptions) (result *v
 	}
 	result = &v1alpha1.MachinePoolList{}
 	err = c.client.Get().
-		Namespace(c.ns).
 		Resource("machinepools").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
@@ -101,7 +102,6 @@ func (c *machinePools) Watch(ctx context.Context, opts v1.ListOptions) (watch.In
 	}
 	opts.Watch = true
 	return c.client.Get().
-		Namespace(c.ns).
 		Resource("machinepools").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
@@ -112,7 +112,6 @@ func (c *machinePools) Watch(ctx context.Context, opts v1.ListOptions) (watch.In
 func (c *machinePools) Create(ctx context.Context, machinePool *v1alpha1.MachinePool, opts v1.CreateOptions) (result *v1alpha1.MachinePool, err error) {
 	result = &v1alpha1.MachinePool{}
 	err = c.client.Post().
-		Namespace(c.ns).
 		Resource("machinepools").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(machinePool).
@@ -125,7 +124,6 @@ func (c *machinePools) Create(ctx context.Context, machinePool *v1alpha1.Machine
 func (c *machinePools) Update(ctx context.Context, machinePool *v1alpha1.MachinePool, opts v1.UpdateOptions) (result *v1alpha1.MachinePool, err error) {
 	result = &v1alpha1.MachinePool{}
 	err = c.client.Put().
-		Namespace(c.ns).
 		Resource("machinepools").
 		Name(machinePool.Name).
 		VersionedParams(&opts, scheme.ParameterCodec).
@@ -140,7 +138,6 @@ func (c *machinePools) Update(ctx context.Context, machinePool *v1alpha1.Machine
 func (c *machinePools) UpdateStatus(ctx context.Context, machinePool *v1alpha1.MachinePool, opts v1.UpdateOptions) (result *v1alpha1.MachinePool, err error) {
 	result = &v1alpha1.MachinePool{}
 	err = c.client.Put().
-		Namespace(c.ns).
 		Resource("machinepools").
 		Name(machinePool.Name).
 		SubResource("status").
@@ -154,7 +151,6 @@ func (c *machinePools) UpdateStatus(ctx context.Context, machinePool *v1alpha1.M
 // Delete takes name of the machinePool and deletes it. Returns an error if one occurs.
 func (c *machinePools) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	return c.client.Delete().
-		Namespace(c.ns).
 		Resource("machinepools").
 		Name(name).
 		Body(&opts).
@@ -169,7 +165,6 @@ func (c *machinePools) DeleteCollection(ctx context.Context, opts v1.DeleteOptio
 		timeout = time.Duration(*listOpts.TimeoutSeconds) * time.Second
 	}
 	return c.client.Delete().
-		Namespace(c.ns).
 		Resource("machinepools").
 		VersionedParams(&listOpts, scheme.ParameterCodec).
 		Timeout(timeout).
@@ -182,11 +177,64 @@ func (c *machinePools) DeleteCollection(ctx context.Context, opts v1.DeleteOptio
 func (c *machinePools) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.MachinePool, err error) {
 	result = &v1alpha1.MachinePool{}
 	err = c.client.Patch(pt).
-		Namespace(c.ns).
 		Resource("machinepools").
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied machinePool.
+func (c *machinePools) Apply(ctx context.Context, machinePool *computev1alpha1.MachinePoolApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.MachinePool, err error) {
+	if machinePool == nil {
+		return nil, fmt.Errorf("machinePool provided to Apply must not be nil")
+	}
+	patchOpts := opts.ToPatchOptions()
+	data, err := json.Marshal(machinePool)
+	if err != nil {
+		return nil, err
+	}
+	name := machinePool.Name
+	if name == nil {
+		return nil, fmt.Errorf("machinePool.Name must be provided to Apply")
+	}
+	result = &v1alpha1.MachinePool{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Resource("machinepools").
+		Name(*name).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// ApplyStatus was generated because the type contains a Status member.
+// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
+func (c *machinePools) ApplyStatus(ctx context.Context, machinePool *computev1alpha1.MachinePoolApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.MachinePool, err error) {
+	if machinePool == nil {
+		return nil, fmt.Errorf("machinePool provided to Apply must not be nil")
+	}
+	patchOpts := opts.ToPatchOptions()
+	data, err := json.Marshal(machinePool)
+	if err != nil {
+		return nil, err
+	}
+
+	name := machinePool.Name
+	if name == nil {
+		return nil, fmt.Errorf("machinePool.Name must be provided to Apply")
+	}
+
+	result = &v1alpha1.MachinePool{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Resource("machinepools").
+		Name(*name).
+		SubResource("status").
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)

@@ -37,7 +37,10 @@ type NATGatewaySpec struct {
 	// IPFamilies are the ip families the load balancer should have.
 	IPFamilies []corev1.IPFamily `json:"ipFamilies"`
 	// IPs are the ips the NAT gateway should allocate.
-	IPs []NATGatewayIP `json:"ips"`
+	// +optional
+	// +patchMergeKey=name
+	// +patchStrategy=merge,retainKeys
+	IPs []NATGatewayIP `json:"ips" patchStrategy:"merge,retainKeys" patchMergeKey:"name"`
 	// NetworkRef is the Network this NATGateway should belong to.
 	NetworkRef corev1.LocalObjectReference `json:"networkRef"`
 	// NetworkInterfaceSelector defines the NetworkInterfaces

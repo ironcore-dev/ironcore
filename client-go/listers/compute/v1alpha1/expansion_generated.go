@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 by the OnMetal authors.
+ * Copyright (c) 2022 by the OnMetal authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,14 +29,6 @@ type MachineNamespaceListerExpansion interface{}
 // MachineClassLister.
 type MachineClassListerExpansion interface{}
 
-// MachineClassNamespaceListerExpansion allows custom methods to be added to
-// MachineClassNamespaceLister.
-type MachineClassNamespaceListerExpansion interface{}
-
 // MachinePoolListerExpansion allows custom methods to be added to
 // MachinePoolLister.
 type MachinePoolListerExpansion interface{}
-
-// MachinePoolNamespaceListerExpansion allows custom methods to be added to
-// MachinePoolNamespaceLister.
-type MachinePoolNamespaceListerExpansion interface{}

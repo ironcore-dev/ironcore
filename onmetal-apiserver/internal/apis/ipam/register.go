@@ -15,7 +15,6 @@
  */
 
 // Package ipam contains API Schema definitions for the ipam internal API group
-// +kubebuilder:object:generate=true
 // +groupName=ipam.api.onmetal.de
 package ipam
 

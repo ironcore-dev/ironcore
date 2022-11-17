@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 by the OnMetal authors.
+ * Copyright (c) 2022 by the OnMetal authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,11 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
+	"fmt"
 
 	v1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
+	storagev1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/storage/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -125,6 +128,49 @@ func (c *FakeVolumePools) DeleteCollection(ctx context.Context, opts v1.DeleteOp
 func (c *FakeVolumePools) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.VolumePool, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewRootPatchSubresourceAction(volumepoolsResource, name, pt, data, subresources...), &v1alpha1.VolumePool{})
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1alpha1.VolumePool), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied volumePool.
+func (c *FakeVolumePools) Apply(ctx context.Context, volumePool *storagev1alpha1.VolumePoolApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.VolumePool, err error) {
+	if volumePool == nil {
+		return nil, fmt.Errorf("volumePool provided to Apply must not be nil")
+	}
+	data, err := json.Marshal(volumePool)
+	if err != nil {
+		return nil, err
+	}
+	name := volumePool.Name
+	if name == nil {
+		return nil, fmt.Errorf("volumePool.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewRootPatchSubresourceAction(volumepoolsResource, *name, types.ApplyPatchType, data), &v1alpha1.VolumePool{})
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1alpha1.VolumePool), err
+}
+
+// ApplyStatus was generated because the type contains a Status member.
+// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
+func (c *FakeVolumePools) ApplyStatus(ctx context.Context, volumePool *storagev1alpha1.VolumePoolApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.VolumePool, err error) {
+	if volumePool == nil {
+		return nil, fmt.Errorf("volumePool provided to Apply must not be nil")
+	}
+	data, err := json.Marshal(volumePool)
+	if err != nil {
+		return nil, err
+	}
+	name := volumePool.Name
+	if name == nil {
+		return nil, fmt.Errorf("volumePool.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewRootPatchSubresourceAction(volumepoolsResource, *name, types.ApplyPatchType, data, "status"), &v1alpha1.VolumePool{})
 	if obj == nil {
 		return nil, err
 	}

@@ -84,9 +84,10 @@ type NetworkInterfaceSource struct {
 type Volume struct {
 	// Name is the name of the Volume
 	Name string
-	// Device is the device name where the volume should be attached. If empty,
-	// an unused device name will be determined if possible.
-	Device string
+	// Device is the device name where the volume should be attached.
+	// Pointer to distinguish between explicit zero and not specified.
+	// If empty, an unused device name will be determined if possible.
+	Device *string
 	// VolumeSource is the source where the storage for the Volume resides at.
 	VolumeSource
 }

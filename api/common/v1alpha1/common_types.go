@@ -43,9 +43,11 @@ const (
 
 // ConfigMapKeySelector is a reference to a specific 'key' within a ConfigMap resource.
 // In some instances, `key` is a required field.
+// +structType=atomic
 type ConfigMapKeySelector struct {
-	// The name of the ConfigMap resource being referred to.
-	corev1.LocalObjectReference `json:",inline"`
+	// Name of the referent.
+	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+	Name string `json:"name,omitempty"`
 	// The key of the entry in the ConfigMap resource's `data` field to be used.
 	// Some instances of this field may be defaulted, in others it may be
 	// required.
@@ -55,9 +57,11 @@ type ConfigMapKeySelector struct {
 
 // SecretKeySelector is a reference to a specific 'key' within a Secret resource.
 // In some instances, `key` is a required field.
+// +structType=atomic
 type SecretKeySelector struct {
-	// The name of the Secret resource being referred to.
-	corev1.LocalObjectReference `json:",inline"`
+	// Name of the referent.
+	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+	Name string `json:"name,omitempty"`
 	// The key of the entry in the Secret resource's `data` field to be used.
 	// Some instances of this field may be defaulted, in others it may be
 	// required.
@@ -66,6 +70,7 @@ type SecretKeySelector struct {
 }
 
 // LocalUIDReference is a reference to another entity including its UID
+// +structType=atomic
 type LocalUIDReference struct {
 	// Name is the name of the referenced entity.
 	Name string `json:"name"`

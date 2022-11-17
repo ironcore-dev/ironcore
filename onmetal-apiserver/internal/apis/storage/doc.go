@@ -21,4 +21,4 @@
 // +groupName=storage.api.onmetal.de
 
 // Package storage is the internal version of the API.
-package storage // import "github.com/onmetal/onmetal-api/api/storage"
+package storage // import "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/storage"

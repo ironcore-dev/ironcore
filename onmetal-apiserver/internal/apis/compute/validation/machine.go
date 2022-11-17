@@ -90,10 +90,12 @@ func validateMachineSpec(machineSpec *compute.MachineSpec, fldPath *field.Path) 
 		} else {
 			seenNames.Insert(vol.Name)
 		}
-		if seenDevices.Has(vol.Device) {
-			allErrs = append(allErrs, field.Duplicate(fldPath.Child("volume").Index(i).Child("device"), vol.Device))
-		} else {
-			seenDevices.Insert(vol.Device)
+		if vol.Device != nil {
+			if seenDevices.Has(*vol.Device) {
+				allErrs = append(allErrs, field.Duplicate(fldPath.Child("volume").Index(i).Child("device"), vol.Device))
+			} else {
+				seenDevices.Insert(*vol.Device)
+			}
 		}
 		allErrs = append(allErrs, validateVolume(&vol, fldPath.Child("volume").Index(i))...)
 	}
@@ -103,10 +105,6 @@ func validateMachineSpec(machineSpec *compute.MachineSpec, fldPath *field.Path) 
 	return allErrs
 }
 
-func isReservedDeviceName(prefix string, idx int) bool {
-	return idx == 0
-}
-
 func validateVolume(volume *compute.Volume, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
@@ -114,17 +112,11 @@ func validateVolume(volume *compute.Volume, fldPath *field.Path) field.ErrorList
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), volume.Name, msg))
 	}
 
-	if volume.Device == "" {
+	if volume.Device == nil {
 		allErrs = append(allErrs, field.Required(fldPath.Child("device"), "must specify device"))
 	} else {
-		// TODO: Improve validation on prefix.
-		prefix, idx, err := device.ParseName(volume.Device)
-		if err != nil {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("device"), volume.Device, fmt.Sprintf("invalid device name: %v", err)))
-		} else {
-			if isReservedDeviceName(prefix, idx) {
-				allErrs = append(allErrs, field.Forbidden(fldPath.Child("device"), fmt.Sprintf("device name %s is reserved", volume.Device)))
-			}
+		if _, _, err := device.ParseName(*volume.Device); err != nil {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("device"), *volume.Device, fmt.Sprintf("invalid device name: %v", err)))
 		}
 	}
 

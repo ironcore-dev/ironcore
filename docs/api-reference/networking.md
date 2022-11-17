@@ -501,6 +501,7 @@ NATGatewayType
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>IPs are the ips the NAT gateway should allocate.</p>
 </td>
 </tr>
@@ -1360,15 +1361,24 @@ for which this LoadBalancer should be applied</p>
 <tbody>
 <tr>
 <td>
-<code>LocalUIDReference</code><br/>
+<code>name</code><br/>
 <em>
-github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
+string
 </em>
 </td>
 <td>
-<p>
-(Members of <code>LocalUIDReference</code> are embedded into this type.)
-</p>
+<p>Name is the name of the referenced entity.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>uid</code><br/>
+<em>
+k8s.io/apimachinery/pkg/types.UID
+</em>
+</td>
+<td>
+<p>UID is the UID of the referenced entity.</p>
 </td>
 </tr>
 <tr>
@@ -1553,6 +1563,7 @@ NATGatewayType
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>IPs are the ips the NAT gateway should allocate.</p>
 </td>
 </tr>

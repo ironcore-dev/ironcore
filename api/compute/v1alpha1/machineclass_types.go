@@ -28,8 +28,7 @@ var (
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +genclient
-// +genClient:nonNamespaced
-// +genClient:noStatus
+// +genclient:nonNamespaced
 
 // MachineClass is the Schema for the machineclasses API
 type MachineClass struct {

@@ -36,7 +36,6 @@ var (
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +genclient
 // +genclient:nonNamespaced
-// +genclient:noStatus
 
 // VolumeClass is the Schema for the volumeclasses API
 type VolumeClass struct {

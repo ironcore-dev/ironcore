@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 by the OnMetal authors.
+ * Copyright (c) 2022 by the OnMetal authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,12 +41,12 @@ func (c *ComputeV1alpha1Client) Machines(namespace string) MachineInterface {
 	return newMachines(c, namespace)
 }
 
-func (c *ComputeV1alpha1Client) MachineClasses(namespace string) MachineClassInterface {
-	return newMachineClasses(c, namespace)
+func (c *ComputeV1alpha1Client) MachineClasses() MachineClassInterface {
+	return newMachineClasses(c)
 }
 
-func (c *ComputeV1alpha1Client) MachinePools(namespace string) MachinePoolInterface {
-	return newMachinePools(c, namespace)
+func (c *ComputeV1alpha1Client) MachinePools() MachinePoolInterface {
+	return newMachinePools(c)
 }
 
 // NewForConfig creates a new ComputeV1alpha1Client for the given config.

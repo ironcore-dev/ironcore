@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 by the OnMetal authors.
+ * Copyright (c) 2022 by the OnMetal authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,11 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
+	"fmt"
 
 	v1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/networking/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -121,6 +124,28 @@ func (c *FakeAliasPrefixRoutings) DeleteCollection(ctx context.Context, opts v1.
 func (c *FakeAliasPrefixRoutings) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.AliasPrefixRouting, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewPatchSubresourceAction(aliasprefixroutingsResource, c.ns, name, pt, data, subresources...), &v1alpha1.AliasPrefixRouting{})
+
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1alpha1.AliasPrefixRouting), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied aliasPrefixRouting.
+func (c *FakeAliasPrefixRoutings) Apply(ctx context.Context, aliasPrefixRouting *networkingv1alpha1.AliasPrefixRoutingApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.AliasPrefixRouting, err error) {
+	if aliasPrefixRouting == nil {
+		return nil, fmt.Errorf("aliasPrefixRouting provided to Apply must not be nil")
+	}
+	data, err := json.Marshal(aliasPrefixRouting)
+	if err != nil {
+		return nil, err
+	}
+	name := aliasPrefixRouting.Name
+	if name == nil {
+		return nil, fmt.Errorf("aliasPrefixRouting.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewPatchSubresourceAction(aliasprefixroutingsResource, c.ns, *name, types.ApplyPatchType, data), &v1alpha1.AliasPrefixRouting{})
 
 	if obj == nil {
 		return nil, err

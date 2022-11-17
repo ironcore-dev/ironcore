@@ -250,6 +250,11 @@ func (r *MachineReconciler) checkReferencedVolumeBoundToMachine(machine *compute
 }
 
 func (r *MachineReconciler) getORIVolumeConfig(ctx context.Context, machine *computev1alpha1.Machine, machineVolume *computev1alpha1.Volume) (*ori.VolumeConfig, error) {
+	device := machineVolume.Device
+	if device == nil {
+		return nil, fmt.Errorf("volume %s does not specify a device", machineVolume.Name)
+	}
+
 	var (
 		emptyDiskConfig    *ori.EmptyDiskConfig
 		volumeAccessConfig *ori.VolumeAccessConfig
@@ -301,7 +306,7 @@ func (r *MachineReconciler) getORIVolumeConfig(ctx context.Context, machine *com
 
 	return &ori.VolumeConfig{
 		Name:      machineVolume.Name,
-		Device:    machineVolume.Device,
+		Device:    *device,
 		Access:    volumeAccessConfig,
 		EmptyDisk: emptyDiskConfig,
 	}, nil
