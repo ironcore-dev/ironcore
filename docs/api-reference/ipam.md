@@ -89,9 +89,7 @@ If unset but Prefix is set, this can be inferred.</p>
 <td>
 <code>prefix</code><br/>
 <em>
-<a href="/api-reference/common.md#ip">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
-</a>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
 </em>
 </td>
 <td>
@@ -229,9 +227,7 @@ If unset but Prefix is set, this can be inferred.</p>
 <td>
 <code>prefix</code><br/>
 <em>
-<a href="/api-reference/common.md#ip">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
-</a>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
 </em>
 </td>
 <td>
@@ -352,9 +348,7 @@ If unset but Prefix is set, this can be inferred.</p>
 <td>
 <code>prefix</code><br/>
 <em>
-<a href="/api-reference/common.md#ip">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
-</a>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
 </em>
 </td>
 <td>
@@ -420,9 +414,7 @@ Kubernetes meta/v1.LabelSelector
 <td>
 <code>prefix</code><br/>
 <em>
-<a href="/api-reference/common.md#ip">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
-</a>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
 </em>
 </td>
 <td>
@@ -514,9 +506,7 @@ If unset but Prefix is set, this can be inferred.</p>
 <td>
 <code>prefix</code><br/>
 <em>
-<a href="/api-reference/common.md#ip">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
-</a>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
 </em>
 </td>
 <td>
@@ -610,9 +600,7 @@ Kubernetes meta/v1.Time
 <td>
 <code>used</code><br/>
 <em>
-<a href="/api-reference/common.md#ip">
-[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
-</a>
+[]github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
 </em>
 </td>
 <td>
@@ -678,9 +666,7 @@ If unset but Prefix is set, this can be inferred.</p>
 <td>
 <code>prefix</code><br/>
 <em>
-<a href="/api-reference/common.md#ip">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
-</a>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
 </em>
 </td>
 <td>

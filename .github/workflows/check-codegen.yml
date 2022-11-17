@@ -18,7 +18,7 @@ jobs:
         run: make generate
       - name: Compare the expected and actual generated/* directories
         run: |
-          if [ "$(git diff --ignore-space-at-eol generated/ | wc -l)" -gt "0" ]; then
+          if [ "$(git diff --ignore-space-at-eol client-go/ | wc -l)" -gt "0" ]; then
             echo "Detected uncommitted changes after build. Consider running 'make generate'."
             echo "See status below:"
             git diff

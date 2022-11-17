@@ -10,9 +10,9 @@ COPY go.sum go.sum
 RUN go mod download
 
 # Copy the go source
-COPY apis/ apis/
+COPY api/ api/
 COPY apiutils/ apiutils/
-COPY generated/ generated/
+COPY client-go/ client-go/
 COPY machinepoollet/ machinepoollet/
 COPY onmetal-apiserver/ onmetal-apiserver/
 COPY onmetal-controller-manager/ onmetal-controller-manager/

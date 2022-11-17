@@ -19,7 +19,7 @@ import (
 	"errors"
 	"fmt"
 
-	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
+	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/machinebroker/api/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/compute/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"

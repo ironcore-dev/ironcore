@@ -17,7 +17,7 @@ package ipam
 import (
 	"context"
 
-	ipamv1alpha1 "github.com/onmetal/onmetal-api/apis/ipam/v1alpha1"
+	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 

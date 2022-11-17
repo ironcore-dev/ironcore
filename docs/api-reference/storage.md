@@ -83,7 +83,8 @@ Kubernetes core/v1.LocalObjectReference
 </em>
 </td>
 <td>
-<p>VolumeClassRef is the VolumeClass of a volume</p>
+<p>VolumeClassRef is the VolumeClass of a volume
+If empty, an external controller has to provision the volume.</p>
 </td>
 </tr>
 <tr>
@@ -115,9 +116,7 @@ If unset, the scheduler will figure out a suitable VolumePoolRef.</p>
 <td>
 <code>claimRef</code><br/>
 <em>
-<a href="/api-reference/common.md#localuidreference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
-</a>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </em>
 </td>
 <td>
@@ -176,9 +175,7 @@ bool
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="/api-reference/common.md#toleration">
-[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.Toleration
-</a>
+[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
 </em>
 </td>
 <td>
@@ -334,9 +331,7 @@ string
 <td>
 <code>taints</code><br/>
 <em>
-<a href="/api-reference/common.md#taint">
-[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.Taint
-</a>
+[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Taint
 </em>
 </td>
 <td>
@@ -399,6 +394,17 @@ string
 </td>
 <td>
 <p>Driver is the name of the drive to use for this volume. Required.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>handle</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Handle is the unique handle of the volume.</p>
 </td>
 </tr>
 <tr>
@@ -667,9 +673,7 @@ string
 <td>
 <code>taints</code><br/>
 <em>
-<a href="/api-reference/common.md#taint">
-[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.Taint
-</a>
+[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Taint
 </em>
 </td>
 <td>
@@ -808,7 +812,8 @@ Kubernetes core/v1.LocalObjectReference
 </em>
 </td>
 <td>
-<p>VolumeClassRef is the VolumeClass of a volume</p>
+<p>VolumeClassRef is the VolumeClass of a volume
+If empty, an external controller has to provision the volume.</p>
 </td>
 </tr>
 <tr>
@@ -840,9 +845,7 @@ If unset, the scheduler will figure out a suitable VolumePoolRef.</p>
 <td>
 <code>claimRef</code><br/>
 <em>
-<a href="/api-reference/common.md#localuidreference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
-</a>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </em>
 </td>
 <td>
@@ -901,9 +904,7 @@ bool
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="/api-reference/common.md#toleration">
-[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.Toleration
-</a>
+[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
 </em>
 </td>
 <td>
@@ -1086,7 +1087,8 @@ Kubernetes core/v1.LocalObjectReference
 </em>
 </td>
 <td>
-<p>VolumeClassRef is the VolumeClass of a volume</p>
+<p>VolumeClassRef is the VolumeClass of a volume
+If empty, an external controller has to provision the volume.</p>
 </td>
 </tr>
 <tr>
@@ -1118,9 +1120,7 @@ If unset, the scheduler will figure out a suitable VolumePoolRef.</p>
 <td>
 <code>claimRef</code><br/>
 <em>
-<a href="/api-reference/common.md#localuidreference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
-</a>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </em>
 </td>
 <td>
@@ -1179,9 +1179,7 @@ bool
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="/api-reference/common.md#toleration">
-[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.Toleration
-</a>
+[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
 </em>
 </td>
 <td>
