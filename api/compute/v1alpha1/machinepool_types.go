@@ -126,7 +126,7 @@ const (
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +genclient
-// +genClient:nonNamespaced
+// +genclient:nonNamespaced
 
 // MachinePool is the Schema for the machinepools API
 type MachinePool struct {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 by the OnMetal authors.
+ * Copyright (c) 2022 by the OnMetal authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,12 @@ package v1alpha1
 
 import (
 	"context"
+	json "encoding/json"
+	"fmt"
 	"time"
 
 	v1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
+	ipamv1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/ipam/v1alpha1"
 	scheme "github.com/onmetal/onmetal-api/client-go/onmetalapi/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -46,6 +49,8 @@ type PrefixAllocationInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.PrefixAllocationList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.PrefixAllocation, err error)
+	Apply(ctx context.Context, prefixAllocation *ipamv1alpha1.PrefixAllocationApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.PrefixAllocation, err error)
+	ApplyStatus(ctx context.Context, prefixAllocation *ipamv1alpha1.PrefixAllocationApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.PrefixAllocation, err error)
 	PrefixAllocationExpansion
 }
 
@@ -187,6 +192,62 @@ func (c *prefixAllocations) Patch(ctx context.Context, name string, pt types.Pat
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied prefixAllocation.
+func (c *prefixAllocations) Apply(ctx context.Context, prefixAllocation *ipamv1alpha1.PrefixAllocationApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.PrefixAllocation, err error) {
+	if prefixAllocation == nil {
+		return nil, fmt.Errorf("prefixAllocation provided to Apply must not be nil")
+	}
+	patchOpts := opts.ToPatchOptions()
+	data, err := json.Marshal(prefixAllocation)
+	if err != nil {
+		return nil, err
+	}
+	name := prefixAllocation.Name
+	if name == nil {
+		return nil, fmt.Errorf("prefixAllocation.Name must be provided to Apply")
+	}
+	result = &v1alpha1.PrefixAllocation{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Namespace(c.ns).
+		Resource("prefixallocations").
+		Name(*name).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// ApplyStatus was generated because the type contains a Status member.
+// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
+func (c *prefixAllocations) ApplyStatus(ctx context.Context, prefixAllocation *ipamv1alpha1.PrefixAllocationApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.PrefixAllocation, err error) {
+	if prefixAllocation == nil {
+		return nil, fmt.Errorf("prefixAllocation provided to Apply must not be nil")
+	}
+	patchOpts := opts.ToPatchOptions()
+	data, err := json.Marshal(prefixAllocation)
+	if err != nil {
+		return nil, err
+	}
+
+	name := prefixAllocation.Name
+	if name == nil {
+		return nil, fmt.Errorf("prefixAllocation.Name must be provided to Apply")
+	}
+
+	result = &v1alpha1.PrefixAllocation{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Namespace(c.ns).
+		Resource("prefixallocations").
+		Name(*name).
+		SubResource("status").
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)

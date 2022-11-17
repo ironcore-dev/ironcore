@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 by the OnMetal authors.
+ * Copyright (c) 2022 by the OnMetal authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,12 @@ package v1alpha1
 
 import (
 	"context"
+	json "encoding/json"
+	"fmt"
 	"time"
 
 	v1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/networking/v1alpha1"
 	scheme "github.com/onmetal/onmetal-api/client-go/onmetalapi/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -46,6 +49,8 @@ type VirtualIPInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.VirtualIPList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.VirtualIP, err error)
+	Apply(ctx context.Context, virtualIP *networkingv1alpha1.VirtualIPApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.VirtualIP, err error)
+	ApplyStatus(ctx context.Context, virtualIP *networkingv1alpha1.VirtualIPApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.VirtualIP, err error)
 	VirtualIPExpansion
 }
 
@@ -187,6 +192,62 @@ func (c *virtualIPs) Patch(ctx context.Context, name string, pt types.PatchType,
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied virtualIP.
+func (c *virtualIPs) Apply(ctx context.Context, virtualIP *networkingv1alpha1.VirtualIPApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.VirtualIP, err error) {
+	if virtualIP == nil {
+		return nil, fmt.Errorf("virtualIP provided to Apply must not be nil")
+	}
+	patchOpts := opts.ToPatchOptions()
+	data, err := json.Marshal(virtualIP)
+	if err != nil {
+		return nil, err
+	}
+	name := virtualIP.Name
+	if name == nil {
+		return nil, fmt.Errorf("virtualIP.Name must be provided to Apply")
+	}
+	result = &v1alpha1.VirtualIP{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Namespace(c.ns).
+		Resource("virtualips").
+		Name(*name).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// ApplyStatus was generated because the type contains a Status member.
+// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
+func (c *virtualIPs) ApplyStatus(ctx context.Context, virtualIP *networkingv1alpha1.VirtualIPApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.VirtualIP, err error) {
+	if virtualIP == nil {
+		return nil, fmt.Errorf("virtualIP provided to Apply must not be nil")
+	}
+	patchOpts := opts.ToPatchOptions()
+	data, err := json.Marshal(virtualIP)
+	if err != nil {
+		return nil, err
+	}
+
+	name := virtualIP.Name
+	if name == nil {
+		return nil, fmt.Errorf("virtualIP.Name must be provided to Apply")
+	}
+
+	result = &v1alpha1.VirtualIP{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Namespace(c.ns).
+		Resource("virtualips").
+		Name(*name).
+		SubResource("status").
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)

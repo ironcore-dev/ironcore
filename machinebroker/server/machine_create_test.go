@@ -27,6 +27,7 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -120,12 +121,12 @@ var _ = Describe("CreateMachine", func() {
 		Expect(onmetalMachine.Spec.Volumes).To(HaveLen(2))
 		Expect(onmetalMachine.Spec.Volumes[0]).To(MatchFields(IgnoreExtras|IgnoreMissing, Fields{
 			"Name":                 Equal("foo"),
-			"Device":               Equal("vdb"),
+			"Device":               Equal(pointer.String("vdb")),
 			"LocalObjectReference": Not(BeNil()),
 		}))
 		Expect(onmetalMachine.Spec.Volumes[1]).To(MatchFields(IgnoreExtras|IgnoreMissing, Fields{
 			"Name":      Equal("bar"),
-			"Device":    Equal("vdc"),
+			"Device":    Equal(pointer.String("vdc")),
 			"EmptyDisk": Not(BeNil()),
 		}))
 		Expect(onmetalMachine.Spec.NetworkInterfaces).To(HaveLen(1))

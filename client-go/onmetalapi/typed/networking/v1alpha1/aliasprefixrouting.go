@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 by the OnMetal authors.
+ * Copyright (c) 2022 by the OnMetal authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,12 @@ package v1alpha1
 
 import (
 	"context"
+	json "encoding/json"
+	"fmt"
 	"time"
 
 	v1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/networking/v1alpha1"
 	scheme "github.com/onmetal/onmetal-api/client-go/onmetalapi/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -45,6 +48,7 @@ type AliasPrefixRoutingInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.AliasPrefixRoutingList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.AliasPrefixRouting, err error)
+	Apply(ctx context.Context, aliasPrefixRouting *networkingv1alpha1.AliasPrefixRoutingApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.AliasPrefixRouting, err error)
 	AliasPrefixRoutingExpansion
 }
 
@@ -170,6 +174,32 @@ func (c *aliasPrefixRoutings) Patch(ctx context.Context, name string, pt types.P
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied aliasPrefixRouting.
+func (c *aliasPrefixRoutings) Apply(ctx context.Context, aliasPrefixRouting *networkingv1alpha1.AliasPrefixRoutingApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.AliasPrefixRouting, err error) {
+	if aliasPrefixRouting == nil {
+		return nil, fmt.Errorf("aliasPrefixRouting provided to Apply must not be nil")
+	}
+	patchOpts := opts.ToPatchOptions()
+	data, err := json.Marshal(aliasPrefixRouting)
+	if err != nil {
+		return nil, err
+	}
+	name := aliasPrefixRouting.Name
+	if name == nil {
+		return nil, fmt.Errorf("aliasPrefixRouting.Name must be provided to Apply")
+	}
+	result = &v1alpha1.AliasPrefixRouting{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Namespace(c.ns).
+		Resource("aliasprefixroutings").
+		Name(*name).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)

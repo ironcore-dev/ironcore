@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 by the OnMetal authors.
+ * Copyright (c) 2022 by the OnMetal authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,9 @@ type MachinePoolLister interface {
 	// List lists all MachinePools in the indexer.
 	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1alpha1.MachinePool, err error)
-	// MachinePools returns an object that can list and get MachinePools.
-	MachinePools(namespace string) MachinePoolNamespaceLister
+	// Get retrieves the MachinePool from the index for a given name.
+	// Objects returned here must be treated as read-only.
+	Get(name string) (*v1alpha1.MachinePool, error)
 	MachinePoolListerExpansion
 }
 
@@ -53,41 +54,9 @@ func (s *machinePoolLister) List(selector labels.Selector) (ret []*v1alpha1.Mach
 	return ret, err
 }
 
-// MachinePools returns an object that can list and get MachinePools.
-func (s *machinePoolLister) MachinePools(namespace string) MachinePoolNamespaceLister {
-	return machinePoolNamespaceLister{indexer: s.indexer, namespace: namespace}
-}
-
-// MachinePoolNamespaceLister helps list and get MachinePools.
-// All objects returned here must be treated as read-only.
-type MachinePoolNamespaceLister interface {
-	// List lists all MachinePools in the indexer for a given namespace.
-	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.MachinePool, err error)
-	// Get retrieves the MachinePool from the indexer for a given namespace and name.
-	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.MachinePool, error)
-	MachinePoolNamespaceListerExpansion
-}
-
-// machinePoolNamespaceLister implements the MachinePoolNamespaceLister
-// interface.
-type machinePoolNamespaceLister struct {
-	indexer   cache.Indexer
-	namespace string
-}
-
-// List lists all MachinePools in the indexer for a given namespace.
-func (s machinePoolNamespaceLister) List(selector labels.Selector) (ret []*v1alpha1.MachinePool, err error) {
-	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.MachinePool))
-	})
-	return ret, err
-}
-
-// Get retrieves the MachinePool from the indexer for a given namespace and name.
-func (s machinePoolNamespaceLister) Get(name string) (*v1alpha1.MachinePool, error) {
-	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
+// Get retrieves the MachinePool from the index for a given name.
+func (s *machinePoolLister) Get(name string) (*v1alpha1.MachinePool, error) {
+	obj, exists, err := s.indexer.GetByKey(name)
 	if err != nil {
 		return nil, err
 	}

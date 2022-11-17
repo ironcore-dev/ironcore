@@ -15,7 +15,6 @@
  */
 
 // Package networking contains API Schema definitions for the networking internal API group
-// +kubebuilder:object:generate=true
 // +groupName=networking.api.onmetal.de
 package networking
 

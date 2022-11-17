@@ -19,6 +19,7 @@ package v1alpha1
 import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 // +genclient
@@ -37,7 +38,10 @@ type NATGatewayRouting struct {
 }
 
 type NATGatewayDestination struct {
-	commonv1alpha1.LocalUIDReference `json:",inline"`
+	// Name is the name of the referenced entity.
+	Name string `json:"name"`
+	// UID is the UID of the referenced entity.
+	UID types.UID `json:"uid"`
 	// IPs are the nat gateway ips used.
 	IPs []NATGatewayDestinationIP `json:"ips"`
 }

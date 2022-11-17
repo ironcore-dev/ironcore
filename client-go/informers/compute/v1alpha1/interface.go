@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 by the OnMetal authors.
+ * Copyright (c) 2022 by the OnMetal authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,10 +49,10 @@ func (v *version) Machines() MachineInformer {
 
 // MachineClasses returns a MachineClassInformer.
 func (v *version) MachineClasses() MachineClassInformer {
-	return &machineClassInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+	return &machineClassInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
 // MachinePools returns a MachinePoolInformer.
 func (v *version) MachinePools() MachinePoolInformer {
-	return &machinePoolInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+	return &machinePoolInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }

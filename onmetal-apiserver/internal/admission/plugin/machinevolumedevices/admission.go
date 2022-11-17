@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/onmetal/onmetal-api/apiutils/equality"
 	"github.com/onmetal/onmetal-api/onmetal-apiserver/internal/admission/plugin/machinevolumedevices/device"
 	"github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis/compute"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -56,10 +55,6 @@ func (d *MachineVolumeDevices) Admit(ctx context.Context, a admission.Attributes
 		return apierrors.NewBadRequest("Resource was marked with kind Machine but was unable to be converted")
 	}
 
-	if err := d.reuseOldDevices(a, machine); err != nil {
-		return err
-	}
-
 	namer, err := deviceNamerFromMachineVolumes(machine)
 	if err != nil {
 		return apierrors.NewBadRequest("Machine has conflicting volume device names")
@@ -67,40 +62,18 @@ func (d *MachineVolumeDevices) Admit(ctx context.Context, a admission.Attributes
 
 	for i := range machine.Spec.Volumes {
 		volume := &machine.Spec.Volumes[i]
-		if volume.Device != "" {
+		if volume.Device != nil {
 			continue
 		}
 
-		volume.Device, err = namer.Generate(device.VirtioPrefix) // TODO: We should have a better way for a device prefix.
+		newDevice, err := namer.Generate(device.OnmetalPrefix) // TODO: We should have a better way for a device prefix.
 		if err != nil {
 			return apierrors.NewBadRequest("No device names left for machine")
 		}
+
+		volume.Device = &newDevice
 	}
 
-	return nil
-}
-
-func (d *MachineVolumeDevices) reuseOldDevices(a admission.Attributes, machine *compute.Machine) error {
-	if oldObj := a.GetOldObject(); oldObj != nil {
-		oldMachine, ok := oldObj.(*compute.Machine)
-		if !ok {
-			return apierrors.NewBadRequest("Resource was marked with kind Machine but was unable to be converted")
-		}
-
-		for i := range machine.Spec.Volumes {
-			volume := &machine.Spec.Volumes[i]
-			if volume.Device != "" {
-				continue
-			}
-
-			for _, oldVolume := range oldMachine.Spec.Volumes {
-				if oldVolume.Name == volume.Name && equality.Semantic.DeepEqual(volume.VolumeSource, oldVolume.VolumeSource) {
-					volume.Device = oldVolume.Device
-					break
-				}
-			}
-		}
-	}
 	return nil
 }
 
@@ -119,7 +92,7 @@ func shouldIgnore(a admission.Attributes) bool {
 
 func machineHasAnyVolumeWithoutDevice(machine *compute.Machine) bool {
 	for _, volume := range machine.Spec.Volumes {
-		if volume.Device == "" {
+		if volume.Device == nil {
 			return true
 		}
 	}
@@ -128,16 +101,10 @@ func machineHasAnyVolumeWithoutDevice(machine *compute.Machine) bool {
 
 func deviceNamerFromMachineVolumes(machine *compute.Machine) (*device.Namer, error) {
 	namer := device.NewNamer()
-
-	// Observe reserved names.
-	if err := namer.Observe(device.Name(device.VirtioPrefix, 0)); err != nil {
-		return nil, err
-	}
-
 	for _, volume := range machine.Spec.Volumes {
-		if dev := volume.Device; dev != "" {
-			if err := namer.Observe(dev); err != nil {
-				return nil, fmt.Errorf("error observing device %s: %w", dev, err)
+		if dev := volume.Device; dev != nil {
+			if err := namer.Observe(*dev); err != nil {
+				return nil, fmt.Errorf("error observing device %s: %w", *dev, err)
 			}
 		}
 	}

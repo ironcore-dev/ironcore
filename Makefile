@@ -49,9 +49,9 @@ manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and Cust
 	$(CONTROLLER_GEN) rbac:roleName=manager-role webhook paths="./onmetal-controller-manager/controllers/...;./api/..." output:rbac:artifacts:config=config/controller/rbac
 
 .PHONY: generate
-generate: vgopath deepcopy-gen client-gen lister-gen informer-gen defaulter-gen conversion-gen openapi-gen
-	go mod download
+generate: vgopath models-schema deepcopy-gen client-gen lister-gen informer-gen defaulter-gen conversion-gen openapi-gen applyconfiguration-gen
 	VGOPATH=$(VGOPATH) \
+	MODELS_SCHEMA=$(MODELS_SCHEMA) \
 	DEEPCOPY_GEN=$(DEEPCOPY_GEN) \
 	CLIENT_GEN=$(CLIENT_GEN) \
 	LISTER_GEN=$(LISTER_GEN) \
@@ -59,6 +59,7 @@ generate: vgopath deepcopy-gen client-gen lister-gen informer-gen defaulter-gen 
 	DEFAULTER_GEN=$(DEFAULTER_GEN) \
 	CONVERSION_GEN=$(CONVERSION_GEN) \
 	OPENAPI_GEN=$(OPENAPI_GEN) \
+	APPLYCONFIGURATION_GEN=$(APPLYCONFIGURATION_GEN) \
 	./hack/update-codegen.sh
 
 .PHONY: fmt
@@ -75,6 +76,7 @@ lint: ## Run golangci-lint on the code.
 
 .PHONY: clean
 clean: ## Clean any artifacts that can be regenerated.
+	rm -rf client-go/applyconfigurations
 	rm -rf client-go/informers
 	rm -rf client-go/listers
 	rm -rf client-go/onmetalapi
@@ -85,7 +87,7 @@ add-license: addlicense ## Add license headers to all go files.
 	find . -name '*.go' -exec $(ADDLICENSE) -c 'OnMetal authors' {} +
 
 .PHONY: check-license
-check-license: ## Check that every file has a license header present.
+check-license: addlicense ## Check that every file has a license header present.
 	find . -name '*.go' -exec $(ADDLICENSE) -check -c 'OnMetal authors' {} +
 
 .PHONY: check
@@ -245,9 +247,11 @@ INFORMER_GEN ?= $(LOCALBIN)/informer-gen
 DEFAULTER_GEN ?= $(LOCALBIN)/defaulter-gen
 CONVERSION_GEN ?= $(LOCALBIN)/conversion-gen
 OPENAPI_GEN ?= $(LOCALBIN)/openapi-gen
+APPLYCONFIGURATION_GEN ?= $(LOCALBIN)/applyconfiguration-gen
 VGOPATH ?= $(LOCALBIN)/vgopath
 GEN_CRD_API_REFERENCE_DOCS ?= $(LOCALBIN)/gen-crd-api-reference-docs
 ADDLICENSE ?= $(LOCALBIN)/addlicense
+MODELS_SCHEMA ?= $(LOCALBIN)/models-schema
 
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v3.8.7
@@ -308,6 +312,11 @@ openapi-gen: $(OPENAPI_GEN) ## Download openapi-gen locally if necessary.
 $(OPENAPI_GEN): $(LOCALBIN)
 	test -s $(LOCALBIN)/openapi-gen || GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/openapi-gen@$(CODE_GENERATOR_VERSION)
 
+.PHONY: applyconfiguration-gen
+applyconfiguration-gen: $(APPLYCONFIGURATION_GEN) ## Download applyconfiguration-gen locally if necessary.
+$(APPLYCONFIGURATION_GEN): $(LOCALBIN)
+	test -s $(LOCALBIN)/applyconfiguration-gen || GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/applyconfiguration-gen@$(CODE_GENERATOR_VERSION)
+
 .PHONY: vgopath
 vgopath: $(VGOPATH) ## Download vgopath locally if necessary.
 $(VGOPATH): $(LOCALBIN)
@@ -331,5 +340,10 @@ $(GEN_CRD_API_REFERENCE_DOCS): $(LOCALBIN)
 .PHONY: addlicense
 addlicense: $(ADDLICENSE) ## Download addlicense locally if necessary.
 $(ADDLICENSE): $(LOCALBIN)
-	test-s $(LOCALBIN)/addlicense || GOBIN=$(LOCALBIN) go install github.com/google/addlicense@$(ADDLICENSE_VERSION)
+	test -s $(LOCALBIN)/addlicense || GOBIN=$(LOCALBIN) go install github.com/google/addlicense@$(ADDLICENSE_VERSION)
+
+.PHONY: models-schema
+models-schema: $(MODELS_SCHEMA) ## Install models-schema locally if necessary.
+$(MODELS_SCHEMA): $(LOCALBIN)
+	test -s $(LOCALBIN)/models-schema || GOBIN=$(LOCALBIN) go install github.com/onmetal/onmetal-api/models-schema
 

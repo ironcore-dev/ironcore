@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 by the OnMetal authors.
+ * Copyright (c) 2022 by the OnMetal authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,9 @@ type MachineClassLister interface {
 	// List lists all MachineClasses in the indexer.
 	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1alpha1.MachineClass, err error)
-	// MachineClasses returns an object that can list and get MachineClasses.
-	MachineClasses(namespace string) MachineClassNamespaceLister
+	// Get retrieves the MachineClass from the index for a given name.
+	// Objects returned here must be treated as read-only.
+	Get(name string) (*v1alpha1.MachineClass, error)
 	MachineClassListerExpansion
 }
 
@@ -53,41 +54,9 @@ func (s *machineClassLister) List(selector labels.Selector) (ret []*v1alpha1.Mac
 	return ret, err
 }
 
-// MachineClasses returns an object that can list and get MachineClasses.
-func (s *machineClassLister) MachineClasses(namespace string) MachineClassNamespaceLister {
-	return machineClassNamespaceLister{indexer: s.indexer, namespace: namespace}
-}
-
-// MachineClassNamespaceLister helps list and get MachineClasses.
-// All objects returned here must be treated as read-only.
-type MachineClassNamespaceLister interface {
-	// List lists all MachineClasses in the indexer for a given namespace.
-	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.MachineClass, err error)
-	// Get retrieves the MachineClass from the indexer for a given namespace and name.
-	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.MachineClass, error)
-	MachineClassNamespaceListerExpansion
-}
-
-// machineClassNamespaceLister implements the MachineClassNamespaceLister
-// interface.
-type machineClassNamespaceLister struct {
-	indexer   cache.Indexer
-	namespace string
-}
-
-// List lists all MachineClasses in the indexer for a given namespace.
-func (s machineClassNamespaceLister) List(selector labels.Selector) (ret []*v1alpha1.MachineClass, err error) {
-	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.MachineClass))
-	})
-	return ret, err
-}
-
-// Get retrieves the MachineClass from the indexer for a given namespace and name.
-func (s machineClassNamespaceLister) Get(name string) (*v1alpha1.MachineClass, error) {
-	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
+// Get retrieves the MachineClass from the index for a given name.
+func (s *machineClassLister) Get(name string) (*v1alpha1.MachineClass, error) {
+	obj, exists, err := s.indexer.GetByKey(name)
 	if err != nil {
 		return nil, err
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 by the OnMetal authors.
+ * Copyright (c) 2022 by the OnMetal authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,12 @@ package v1alpha1
 
 import (
 	"context"
+	json "encoding/json"
+	"fmt"
 	"time"
 
 	v1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	computev1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/compute/v1alpha1"
 	scheme "github.com/onmetal/onmetal-api/client-go/onmetalapi/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -46,6 +49,8 @@ type MachineInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.MachineList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.Machine, err error)
+	Apply(ctx context.Context, machine *computev1alpha1.MachineApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.Machine, err error)
+	ApplyStatus(ctx context.Context, machine *computev1alpha1.MachineApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.Machine, err error)
 	MachineExpansion
 }
 
@@ -187,6 +192,62 @@ func (c *machines) Patch(ctx context.Context, name string, pt types.PatchType, d
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied machine.
+func (c *machines) Apply(ctx context.Context, machine *computev1alpha1.MachineApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.Machine, err error) {
+	if machine == nil {
+		return nil, fmt.Errorf("machine provided to Apply must not be nil")
+	}
+	patchOpts := opts.ToPatchOptions()
+	data, err := json.Marshal(machine)
+	if err != nil {
+		return nil, err
+	}
+	name := machine.Name
+	if name == nil {
+		return nil, fmt.Errorf("machine.Name must be provided to Apply")
+	}
+	result = &v1alpha1.Machine{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Namespace(c.ns).
+		Resource("machines").
+		Name(*name).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// ApplyStatus was generated because the type contains a Status member.
+// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
+func (c *machines) ApplyStatus(ctx context.Context, machine *computev1alpha1.MachineApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.Machine, err error) {
+	if machine == nil {
+		return nil, fmt.Errorf("machine provided to Apply must not be nil")
+	}
+	patchOpts := opts.ToPatchOptions()
+	data, err := json.Marshal(machine)
+	if err != nil {
+		return nil, err
+	}
+
+	name := machine.Name
+	if name == nil {
+		return nil, fmt.Errorf("machine.Name must be provided to Apply")
+	}
+
+	result = &v1alpha1.Machine{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Namespace(c.ns).
+		Resource("machines").
+		Name(*name).
+		SubResource("status").
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)

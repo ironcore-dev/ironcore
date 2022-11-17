@@ -143,7 +143,7 @@ func (s *Server) getOnmetalVolumeData(
 
 	onmetalMachineVolume := &computev1alpha1.Volume{
 		Name:         volume.Name,
-		Device:       volume.Device,
+		Device:       &volume.Device,
 		VolumeSource: src,
 	}
 	return onmetalMachineVolume, onmetalVolumeConfig, nil
@@ -336,7 +336,7 @@ func (s *Server) getOnmetalMachineConfig(ctx context.Context, cfg *ori.MachineCo
 	}
 	if ignitionSecret != nil {
 		onmetalMachine.Spec.IgnitionRef = &commonv1alpha1.SecretKeySelector{
-			LocalObjectReference: corev1.LocalObjectReference{Name: s.onmetalIgnitionSecretName(machineID)},
+			Name: s.onmetalIgnitionSecretName(machineID),
 		}
 	}
 

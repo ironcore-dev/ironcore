@@ -26,18 +26,14 @@ In some instances, <code>key</code> is a required field.</p>
 <tbody>
 <tr>
 <td>
-<code>LocalObjectReference</code><br/>
+<code>name</code><br/>
 <em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
+string
 </em>
 </td>
 <td>
-<p>
-(Members of <code>LocalObjectReference</code> are embedded into this type.)
-</p>
-<p>The name of the ConfigMap resource being referred to.</p>
+<p>Name of the referent.
+More info: <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names">https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names</a></p>
 </td>
 </tr>
 <tr>
@@ -207,18 +203,14 @@ In some instances, <code>key</code> is a required field.</p>
 <tbody>
 <tr>
 <td>
-<code>LocalObjectReference</code><br/>
+<code>name</code><br/>
 <em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
+string
 </em>
 </td>
 <td>
-<p>
-(Members of <code>LocalObjectReference</code> are embedded into this type.)
-</p>
-<p>The name of the Secret resource being referred to.</p>
+<p>Name of the referent.
+More info: <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names">https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names</a></p>
 </td>
 </tr>
 <tr>

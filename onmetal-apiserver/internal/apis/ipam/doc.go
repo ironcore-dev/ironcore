@@ -19,4 +19,4 @@
 // +groupName=ipam.api.onmetal.de
 
 // Package ipam is the internal version of the API.
-package ipam // import "github.com/onmetal/onmetal-api/api/ipam"
+package ipam // import "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/ipam"

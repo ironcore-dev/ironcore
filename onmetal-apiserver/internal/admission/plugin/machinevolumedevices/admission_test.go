@@ -24,6 +24,7 @@ import (
 	. "github.com/onsi/gomega"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apiserver/pkg/admission"
+	"k8s.io/utils/pointer"
 )
 
 var _ = Describe("Admission", func() {
@@ -72,7 +73,7 @@ var _ = Describe("Admission", func() {
 				Volumes: []compute.Volume{
 					{
 						Name:   "foo",
-						Device: "vdb",
+						Device: pointer.String("odb"),
 					},
 					{
 						Name: "bar",
@@ -104,121 +105,15 @@ var _ = Describe("Admission", func() {
 		Expect(machine.Spec.Volumes).To(Equal([]compute.Volume{
 			{
 				Name:   "foo",
-				Device: "vdb",
+				Device: pointer.String("odb"),
 			},
 			{
 				Name:   "bar",
-				Device: "vdc",
+				Device: pointer.String("oda"),
 			},
 			{
 				Name:   "baz",
-				Device: "vdd",
-			},
-		}))
-	})
-
-	It("should re-use old volume device names when available", func() {
-		oldMachine := &compute.Machine{
-			ObjectMeta: metav1.ObjectMeta{
-				Namespace: "foo",
-				Name:      "bar",
-			},
-			Spec: compute.MachineSpec{
-				Volumes: []compute.Volume{
-					{
-						Name:   "foo",
-						Device: "vdb",
-					},
-				},
-			},
-		}
-		newMachine := oldMachine.DeepCopy()
-		newMachine.Spec.Volumes[0].Device = ""
-
-		Expect(plugin.Admit(
-			context.TODO(),
-			admission.NewAttributesRecord(
-				newMachine,
-				oldMachine,
-				compute.Kind("Machine").WithVersion("version"),
-				oldMachine.Namespace,
-				oldMachine.Name,
-				compute.Resource("machines").WithVersion("version"),
-				"",
-				admission.Update,
-				&metav1.CreateOptions{},
-				false,
-				nil,
-			),
-			nil,
-		)).NotTo(HaveOccurred())
-
-		Expect(newMachine.Spec.Volumes).To(Equal([]compute.Volume{
-			{
-				Name:   "foo",
-				Device: "vdb",
-			},
-		}))
-	})
-
-	It("should allow adding a new volume with unset device", func() {
-		oldMachine := &compute.Machine{
-			ObjectMeta: metav1.ObjectMeta{
-				Namespace: "foo",
-				Name:      "bar",
-			},
-			Spec: compute.MachineSpec{
-				Volumes: []compute.Volume{
-					{
-						Name:   "foo",
-						Device: "vdb",
-					},
-				},
-			},
-		}
-		newMachine := &compute.Machine{
-			ObjectMeta: metav1.ObjectMeta{
-				Namespace: "foo",
-				Name:      "bar",
-			},
-			Spec: compute.MachineSpec{
-				Volumes: []compute.Volume{
-					{
-						Name: "foo",
-					},
-					{
-						Name: "bar",
-					},
-				},
-			},
-		}
-
-		Expect(plugin.Admit(
-			context.TODO(),
-			admission.NewAttributesRecord(
-				newMachine,
-				oldMachine,
-				compute.Kind("Machine").WithVersion("version"),
-				oldMachine.Namespace,
-				oldMachine.Name,
-				compute.Resource("machines").WithVersion("version"),
-				"",
-				admission.Update,
-				&metav1.CreateOptions{},
-				false,
-				nil,
-			),
-			nil,
-		)).NotTo(HaveOccurred())
-
-		Expect(newMachine.Spec.Volumes).To(Equal([]compute.Volume{
-			{
-				Name:   "foo",
-				Device: "vdb",
-			},
-			{
-				Name:   "bar",
-				Device: "vdc",
+				Device: pointer.String("odc"),
 			},
 		}))
 	})

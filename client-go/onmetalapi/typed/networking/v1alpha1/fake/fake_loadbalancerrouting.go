@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 by the OnMetal authors.
+ * Copyright (c) 2022 by the OnMetal authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,11 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
+	"fmt"
 
 	v1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/networking/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -121,6 +124,28 @@ func (c *FakeLoadBalancerRoutings) DeleteCollection(ctx context.Context, opts v1
 func (c *FakeLoadBalancerRoutings) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.LoadBalancerRouting, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewPatchSubresourceAction(loadbalancerroutingsResource, c.ns, name, pt, data, subresources...), &v1alpha1.LoadBalancerRouting{})
+
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1alpha1.LoadBalancerRouting), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied loadBalancerRouting.
+func (c *FakeLoadBalancerRoutings) Apply(ctx context.Context, loadBalancerRouting *networkingv1alpha1.LoadBalancerRoutingApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.LoadBalancerRouting, err error) {
+	if loadBalancerRouting == nil {
+		return nil, fmt.Errorf("loadBalancerRouting provided to Apply must not be nil")
+	}
+	data, err := json.Marshal(loadBalancerRouting)
+	if err != nil {
+		return nil, err
+	}
+	name := loadBalancerRouting.Name
+	if name == nil {
+		return nil, fmt.Errorf("loadBalancerRouting.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewPatchSubresourceAction(loadbalancerroutingsResource, c.ns, *name, types.ApplyPatchType, data), &v1alpha1.LoadBalancerRouting{})
 
 	if obj == nil {
 		return nil, err

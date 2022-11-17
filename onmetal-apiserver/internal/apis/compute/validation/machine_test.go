@@ -26,6 +26,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/utils/pointer"
 )
 
 func mustParseNewQuantity(s string) *resource.Quantity {
@@ -127,11 +128,11 @@ var _ = Describe("Machine", func() {
 					Volumes: []compute.Volume{
 						{
 							Name:   "foo",
-							Device: "vda",
+							Device: pointer.String("vda"),
 						},
 						{
 							Name:   "bar",
-							Device: "vda",
+							Device: pointer.String("vda"),
 						},
 					},
 				},
@@ -156,33 +157,18 @@ var _ = Describe("Machine", func() {
 					Volumes: []compute.Volume{
 						{
 							Name:   "foo",
-							Device: "foobar",
+							Device: pointer.String("foobar"),
 						},
 					},
 				},
 			},
 			ContainElement(InvalidField("spec.volume[0].device")),
 		),
-		Entry("reserved volume device",
-			&compute.Machine{
-				Spec: compute.MachineSpec{
-					Volumes: []compute.Volume{
-						{
-							Name:   "foo",
-							Device: "vda",
-						},
-					},
-				},
-			},
-			ContainElement(ForbiddenField("spec.volume[0].device")),
-		),
 		Entry("invalid ignition ref name",
 			&compute.Machine{
 				Spec: compute.MachineSpec{
 					IgnitionRef: &commonv1alpha1.SecretKeySelector{
-						LocalObjectReference: corev1.LocalObjectReference{
-							Name: "foo*",
-						},
+						Name: "foo*",
 					},
 				},
 			},

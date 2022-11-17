@@ -17,7 +17,6 @@
 package validation
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	"github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis/networking"
 	. "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/testutils/validation"
 	. "github.com/onsi/ginkgo/v2"
@@ -47,8 +46,8 @@ var _ = Describe("NATGatewayRouting", func() {
 		Entry("duplicate destination",
 			&networking.NATGatewayRouting{
 				Destinations: []networking.NATGatewayDestination{
-					{LocalUIDReference: commonv1alpha1.LocalUIDReference{Name: "foo"}},
-					{LocalUIDReference: commonv1alpha1.LocalUIDReference{Name: "foo"}},
+					{Name: "foo"},
+					{Name: "foo"},
 				},
 			},
 			ContainElement(DuplicateField("destinations[1]")),

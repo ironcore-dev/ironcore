@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 by the OnMetal authors.
+ * Copyright (c) 2022 by the OnMetal authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,33 +41,32 @@ type MachineClassInformer interface {
 type machineClassInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
 	tweakListOptions internalinterfaces.TweakListOptionsFunc
-	namespace        string
 }
 
 // NewMachineClassInformer constructs a new informer for MachineClass type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewMachineClassInformer(client onmetalapi.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
-	return NewFilteredMachineClassInformer(client, namespace, resyncPeriod, indexers, nil)
+func NewMachineClassInformer(client onmetalapi.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return NewFilteredMachineClassInformer(client, resyncPeriod, indexers, nil)
 }
 
 // NewFilteredMachineClassInformer constructs a new informer for MachineClass type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredMachineClassInformer(client onmetalapi.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
+func NewFilteredMachineClassInformer(client onmetalapi.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.ComputeV1alpha1().MachineClasses(namespace).List(context.TODO(), options)
+				return client.ComputeV1alpha1().MachineClasses().List(context.TODO(), options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.ComputeV1alpha1().MachineClasses(namespace).Watch(context.TODO(), options)
+				return client.ComputeV1alpha1().MachineClasses().Watch(context.TODO(), options)
 			},
 		},
 		&computev1alpha1.MachineClass{},
@@ -77,7 +76,7 @@ func NewFilteredMachineClassInformer(client onmetalapi.Interface, namespace stri
 }
 
 func (f *machineClassInformer) defaultInformer(client onmetalapi.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredMachineClassInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+	return NewFilteredMachineClassInformer(client, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
 func (f *machineClassInformer) Informer() cache.SharedIndexInformer {
