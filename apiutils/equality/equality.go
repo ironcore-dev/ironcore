@@ -15,7 +15,7 @@
 package equality
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
+	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	"k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/conversion"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"

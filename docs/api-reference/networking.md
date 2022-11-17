@@ -191,9 +191,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>destinations</code><br/>
 <em>
-<a href="/api-reference/common.md#localuidreference">
-[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
-</a>
+[]github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </em>
 </td>
 <td>
@@ -390,9 +388,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>networkRef</code><br/>
 <em>
-<a href="/api-reference/common.md#localuidreference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
-</a>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </em>
 </td>
 <td>
@@ -403,9 +399,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
 <td>
 <code>destinations</code><br/>
 <em>
-<a href="/api-reference/common.md#localuidreference">
-[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
-</a>
+[]github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </em>
 </td>
 <td>
@@ -614,9 +608,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>networkRef</code><br/>
 <em>
-<a href="/api-reference/common.md#localuidreference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
-</a>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </em>
 </td>
 <td>
@@ -680,6 +672,45 @@ Kubernetes meta/v1.ObjectMeta
 <td>
 Refer to the Kubernetes API documentation for the fields of the
 <code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NetworkSpec">
+NetworkSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>providerID</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>ProviderID is the identifier of the network provider.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NetworkStatus">
+NetworkStatus
+</a>
+</em>
+</td>
+<td>
 </td>
 </tr>
 </tbody>
@@ -758,9 +789,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>machineRef</code><br/>
 <em>
-<a href="/api-reference/common.md#localuidreference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
-</a>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </em>
 </td>
 <td>
@@ -911,9 +940,7 @@ Kubernetes core/v1.IPFamily
 <td>
 <code>targetRef</code><br/>
 <em>
-<a href="/api-reference/common.md#localuidreference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
-</a>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </em>
 </td>
 <td>
@@ -1016,9 +1043,7 @@ should be used by this AliasPrefix</p>
 <td>
 <code>prefix</code><br/>
 <em>
-<a href="/api-reference/common.md#ip">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
-</a>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
 </em>
 </td>
 <td>
@@ -1048,9 +1073,7 @@ surrounding object) Prefix.</p>
 <td>
 <code>prefixTemplate</code><br/>
 <em>
-<a href="/api-reference/ipam.md#ipam.api.onmetal.de/v1alpha1.PrefixTemplateSpec">
-github.com/onmetal/onmetal-api/apis/ipam/v1alpha1.PrefixTemplateSpec
-</a>
+github.com/onmetal/onmetal-api/api/ipam/v1alpha1.PrefixTemplateSpec
 </em>
 </td>
 <td>
@@ -1111,9 +1134,7 @@ VirtualIPTemplateSpec
 <td>
 <code>value</code><br/>
 <em>
-<a href="/api-reference/common.md#ip">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
-</a>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 </em>
 </td>
 <td>
@@ -1293,9 +1314,7 @@ for which this LoadBalancer should be applied</p>
 <td>
 <code>ips</code><br/>
 <em>
-<a href="/api-reference/common.md#ip">
-[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
-</a>
+[]github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 </em>
 </td>
 <td>
@@ -1343,9 +1362,7 @@ for which this LoadBalancer should be applied</p>
 <td>
 <code>LocalUIDReference</code><br/>
 <em>
-<a href="/api-reference/common.md#localuidreference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
-</a>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </em>
 </td>
 <td>
@@ -1388,9 +1405,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
 <td>
 <code>ip</code><br/>
 <em>
-<a href="/api-reference/common.md#ip">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
-</a>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 </em>
 </td>
 <td>
@@ -1478,9 +1493,7 @@ string
 <td>
 <code>ip</code><br/>
 <em>
-<a href="/api-reference/common.md#ip">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
-</a>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 </em>
 </td>
 <td>
@@ -1705,9 +1718,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>machineRef</code><br/>
 <em>
-<a href="/api-reference/common.md#localuidreference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
-</a>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </em>
 </td>
 <td>
@@ -1774,11 +1785,20 @@ VirtualIPSource
 <tbody>
 <tr>
 <td>
+<code>networkHandle</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>NetworkHandle is the handle of the network the network interface is part of.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>ips</code><br/>
 <em>
-<a href="/api-reference/common.md#ip">
-[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
-</a>
+[]github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 </em>
 </td>
 <td>
@@ -1789,9 +1809,7 @@ VirtualIPSource
 <td>
 <code>virtualIP</code><br/>
 <em>
-<a href="/api-reference/common.md#ip">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
-</a>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 </em>
 </td>
 <td>
@@ -1883,9 +1901,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>machineRef</code><br/>
 <em>
-<a href="/api-reference/common.md#localuidreference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
-</a>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </em>
 </td>
 <td>
@@ -1937,6 +1953,92 @@ VirtualIPSource
 </tr>
 </tbody>
 </table>
+<h3 id="networking.api.onmetal.de/v1alpha1.NetworkSpec">NetworkSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.Network">Network</a>)
+</p>
+<div>
+<p>NetworkSpec defines the desired state of Network</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>providerID</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>ProviderID is the identifier of the network provider.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.NetworkState">NetworkState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkStatus">NetworkStatus</a>)
+</p>
+<div>
+<p>NetworkState is the state of a network.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Available&#34;</p></td>
+<td><p>NetworkStateAvailable means the network is ready to use.</p>
+</td>
+</tr><tr><td><p>&#34;Error&#34;</p></td>
+<td><p>NetworkStateError means the network is in an error state.</p>
+</td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>NetworkStatePending means the network is being provisioned.</p>
+</td>
+</tr></tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.NetworkStatus">NetworkStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.Network">Network</a>)
+</p>
+<div>
+<p>NetworkStatus defines the observed state of Network</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>state</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NetworkState">
+NetworkState
+</a>
+</em>
+</td>
+<td>
+<p>State is the state of the machine.</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="networking.api.onmetal.de/v1alpha1.PrefixSource">PrefixSource
 </h3>
 <p>
@@ -1957,9 +2059,7 @@ VirtualIPSource
 <td>
 <code>value</code><br/>
 <em>
-<a href="/api-reference/common.md#ip">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.IPPrefix
-</a>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
 </em>
 </td>
 <td>
@@ -2098,9 +2198,7 @@ Kubernetes core/v1.IPFamily
 <td>
 <code>targetRef</code><br/>
 <em>
-<a href="/api-reference/common.md#localuidreference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
-</a>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </em>
 </td>
 <td>
@@ -2129,9 +2227,7 @@ github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
 <td>
 <code>ip</code><br/>
 <em>
-<a href="/api-reference/common.md#ip">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
-</a>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 </em>
 </td>
 <td>
@@ -2239,9 +2335,7 @@ Kubernetes core/v1.IPFamily
 <td>
 <code>targetRef</code><br/>
 <em>
-<a href="/api-reference/common.md#localuidreference">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.LocalUIDReference
-</a>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </em>
 </td>
 <td>

@@ -23,7 +23,7 @@ import (
 	"os"
 	"time"
 
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	onmetalapiclient "github.com/onmetal/onmetal-api/onmetal-controller-manager/client"
 	"github.com/onmetal/onmetal-api/onmetal-controller-manager/controllers/compute"
 	"github.com/onmetal/onmetal-api/onmetal-controller-manager/controllers/ipam"
@@ -43,9 +43,9 @@ import (
 
 	"github.com/onmetal/controller-utils/cmdutils/switches"
 
-	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
-	ipamv1alpha1 "github.com/onmetal/onmetal-api/apis/ipam/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/apis/storage/v1alpha1"
+	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
+	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	//+kubebuilder:scaffold:imports
 )
 

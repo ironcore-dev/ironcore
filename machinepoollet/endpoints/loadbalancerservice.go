@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"sync/atomic"
 
-	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
+	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	"github.com/onmetal/onmetal-api/apiutils/equality"
 	machinepoolletpredicate "github.com/onmetal/onmetal-api/machinepoollet/predicate"
 	corev1 "k8s.io/api/core/v1"

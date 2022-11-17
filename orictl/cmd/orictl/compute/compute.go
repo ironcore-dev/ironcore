@@ -19,7 +19,7 @@ import (
 
 	"github.com/onmetal/onmetal-api/orictl/cmd/orictl/compute/common"
 	"github.com/onmetal/onmetal-api/orictl/cmd/orictl/compute/create"
-	delete2 "github.com/onmetal/onmetal-api/orictl/cmd/orictl/compute/delete"
+	"github.com/onmetal/onmetal-api/orictl/cmd/orictl/compute/delete"
 	"github.com/onmetal/onmetal-api/orictl/cmd/orictl/compute/get"
 	"github.com/onmetal/onmetal-api/orictl/cmd/orictl/compute/update"
 	"github.com/spf13/cobra"
@@ -52,7 +52,7 @@ func Command(streams common.Streams) *cobra.Command {
 	cmd.AddCommand(
 		get.Command(streams, clientFactory),
 		create.Command(streams, clientFactory),
-		delete2.Command(streams, clientFactory),
+		delete.Command(streams, clientFactory),
 		update.Command(streams, clientFactory),
 	)
 

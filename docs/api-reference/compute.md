@@ -166,13 +166,11 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>ignitionRef</code><br/>
 <em>
-<a href="/api-reference/common.md#secretkeyselector">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.SecretKeySelector
-</a>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.SecretKeySelector
 </em>
 </td>
 <td>
-<p>IgnitionRef is a reference to a config map containing the ignition YAML for the machine to boot up.
+<p>IgnitionRef is a reference to a secret containing the ignition YAML for the machine to boot up.
 If key is empty, DefaultIgnitionKey will be used as fallback.</p>
 </td>
 </tr>
@@ -193,9 +191,7 @@ If key is empty, DefaultIgnitionKey will be used as fallback.</p>
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="/api-reference/common.md#toleration">
-[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.Toleration
-</a>
+[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
 </em>
 </td>
 <td>
@@ -350,9 +346,7 @@ string
 <td>
 <code>taints</code><br/>
 <em>
-<a href="/api-reference/common.md#taint">
-[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.Taint
-</a>
+[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Taint
 </em>
 </td>
 <td>
@@ -491,6 +485,37 @@ The default is nil which means that the limit is undefined.</p>
 </tr>
 </tbody>
 </table>
+<h3 id="compute.api.onmetal.de/v1alpha1.EmptyDiskVolumeStatus">EmptyDiskVolumeStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.VolumeSourceStatus">VolumeSourceStatus</a>)
+</p>
+<div>
+<p>EmptyDiskVolumeStatus is the status of an EmptyDiskVolumeSource Volume.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>size</code><br/>
+<em>
+<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/api/resource#Duration">
+k8s.io/apimachinery/pkg/api/resource.Quantity
+</a>
+</em>
+</td>
+<td>
+<p>Size is the current size of the volume, if any discrete size is available.</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="compute.api.onmetal.de/v1alpha1.EphemeralNetworkInterfaceSource">EphemeralNetworkInterfaceSource
 </h3>
 <p>
@@ -512,9 +537,7 @@ object) networking.NetworkInterface.</p>
 <td>
 <code>networkInterfaceTemplate</code><br/>
 <em>
-<a href="/api-reference/networking.md#networking.api.onmetal.de/v1alpha1.NetworkInterfaceTemplateSpec">
-github.com/onmetal/onmetal-api/apis/networking/v1alpha1.NetworkInterfaceTemplateSpec
-</a>
+github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkInterfaceTemplateSpec
 </em>
 </td>
 <td>
@@ -544,9 +567,7 @@ storage.Volume.</p>
 <td>
 <code>volumeTemplate</code><br/>
 <em>
-<a href="/api-reference/storage.md#storage.api.onmetal.de/v1alpha1.VolumeTemplateSpec">
-github.com/onmetal/onmetal-api/apis/storage/v1alpha1.VolumeTemplateSpec
-</a>
+github.com/onmetal/onmetal-api/api/storage/v1alpha1.VolumeTemplateSpec
 </em>
 </td>
 <td>
@@ -932,9 +953,7 @@ string
 <td>
 <code>taints</code><br/>
 <em>
-<a href="/api-reference/common.md#taint">
-[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.Taint
-</a>
+[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Taint
 </em>
 </td>
 <td>
@@ -1160,13 +1179,11 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>ignitionRef</code><br/>
 <em>
-<a href="/api-reference/common.md#secretkeyselector">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.SecretKeySelector
-</a>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.SecretKeySelector
 </em>
 </td>
 <td>
-<p>IgnitionRef is a reference to a config map containing the ignition YAML for the machine to boot up.
+<p>IgnitionRef is a reference to a secret containing the ignition YAML for the machine to boot up.
 If key is empty, DefaultIgnitionKey will be used as fallback.</p>
 </td>
 </tr>
@@ -1187,9 +1204,7 @@ If key is empty, DefaultIgnitionKey will be used as fallback.</p>
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="/api-reference/common.md#toleration">
-[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.Toleration
-</a>
+[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
 </em>
 </td>
 <td>
@@ -1415,6 +1430,35 @@ NetworkInterface to use.</p>
 </tr>
 </tbody>
 </table>
+<h3 id="compute.api.onmetal.de/v1alpha1.NetworkInterfaceState">NetworkInterfaceState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.NetworkInterfaceStatus">NetworkInterfaceStatus</a>)
+</p>
+<div>
+<p>NetworkInterfaceState is the infrastructure attachment state a NetworkInterface can be in.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Attached&#34;</p></td>
+<td><p>NetworkInterfaceStateAttached indicates that a network interface has been successfully attached.</p>
+</td>
+</tr><tr><td><p>&#34;Detached&#34;</p></td>
+<td><p>NetworkInterfaceStateDetached indicates that a network interface has been successfully detached.</p>
+</td>
+</tr><tr><td><p>&#34;Error&#34;</p></td>
+<td><p>NetworkInterfaceStateError indicates that there was an error during attaching a network interface.</p>
+</td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>NetworkInterfaceStatePending indicates that the attachment of a network interface is pending.</p>
+</td>
+</tr></tbody>
+</table>
 <h3 id="compute.api.onmetal.de/v1alpha1.NetworkInterfaceStatus">NetworkInterfaceStatus
 </h3>
 <p>
@@ -1444,6 +1488,65 @@ string
 </tr>
 <tr>
 <td>
+<code>networkHandle</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>NetworkHandle is the handle of the network the NetworkInterface is in.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ips</code><br/>
+<em>
+[]github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
+</em>
+</td>
+<td>
+<p>IPs are the ips allocated for the network interface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>virtualIP</code><br/>
+<em>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
+</em>
+</td>
+<td>
+<p>VirtualIP is the virtual ip allocated for the network interface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>state</code><br/>
+<em>
+<a href="#compute.api.onmetal.de/v1alpha1.NetworkInterfaceState">
+NetworkInterfaceState
+</a>
+</em>
+</td>
+<td>
+<p>State represents the attachment state of a NetworkInterface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastStateTransitionTime</code><br/>
+<em>
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastStateTransitionTime is the last time the State transitioned.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>phase</code><br/>
 <em>
 <a href="#compute.api.onmetal.de/v1alpha1.NetworkInterfacePhase">
@@ -1468,30 +1571,43 @@ Kubernetes meta/v1.Time
 <p>LastPhaseTransitionTime is the last time the Phase transitioned.</p>
 </td>
 </tr>
+</tbody>
+</table>
+<h3 id="compute.api.onmetal.de/v1alpha1.ReferencedVolumeStatus">ReferencedVolumeStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.VolumeSourceStatus">VolumeSourceStatus</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
 <tr>
 <td>
-<code>ips</code><br/>
+<code>driver</code><br/>
 <em>
-<a href="/api-reference/common.md#ip">
-[]github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
-</a>
+string
 </em>
 </td>
 <td>
-<p>IPs are the ips allocated for the network interface.</p>
+<p>Driver is the driver used for the volume.</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>virtualIP</code><br/>
+<code>handle</code><br/>
 <em>
-<a href="/api-reference/common.md#ip">
-github.com/onmetal/onmetal-api/apis/common/v1alpha1.IP
-</a>
+string
 </em>
 </td>
 <td>
-<p>VirtualIP is the virtual ip allocated for the network interface.</p>
+<p>Handle is the unique provider handle of the volume.</p>
 </td>
 </tr>
 </tbody>
@@ -1634,6 +1750,78 @@ Volume to use.</p>
 </tr>
 </tbody>
 </table>
+<h3 id="compute.api.onmetal.de/v1alpha1.VolumeSourceStatus">VolumeSourceStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.VolumeStatus">VolumeStatus</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>emptyDisk</code><br/>
+<em>
+<a href="#compute.api.onmetal.de/v1alpha1.EmptyDiskVolumeStatus">
+EmptyDiskVolumeStatus
+</a>
+</em>
+</td>
+<td>
+<p>EmptyDisk indicates the empty disk status of the volume if it&rsquo;s from an empty disk source.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>referenced</code><br/>
+<em>
+<a href="#compute.api.onmetal.de/v1alpha1.ReferencedVolumeStatus">
+ReferencedVolumeStatus
+</a>
+</em>
+</td>
+<td>
+<p>Referenced is the status of a referenced volume (either VolumeSource.Ephemeral or VolumeSource.VolumeRef).</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="compute.api.onmetal.de/v1alpha1.VolumeState">VolumeState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.VolumeStatus">VolumeStatus</a>)
+</p>
+<div>
+<p>VolumeState is the infrastructure attachment state a Volume can be in.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Attached&#34;</p></td>
+<td><p>VolumeStateAttached indicates that a volume has been successfully attached.</p>
+</td>
+</tr><tr><td><p>&#34;Detached&#34;</p></td>
+<td><p>VolumeStateDetached indicates that a volume has been successfully detached.</p>
+</td>
+</tr><tr><td><p>&#34;Error&#34;</p></td>
+<td><p>VolumeStateError indicates that there was an error during attaching a volume.</p>
+</td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>VolumeStatePending indicates that the attachment of a volume is pending.</p>
+</td>
+</tr></tbody>
+</table>
 <h3 id="compute.api.onmetal.de/v1alpha1.VolumeStatus">VolumeStatus
 </h3>
 <p>
@@ -1663,6 +1851,59 @@ string
 </tr>
 <tr>
 <td>
+<code>device</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Device is the device the volume is mounted with on the host.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>VolumeSourceStatus</code><br/>
+<em>
+<a href="#compute.api.onmetal.de/v1alpha1.VolumeSourceStatus">
+VolumeSourceStatus
+</a>
+</em>
+</td>
+<td>
+<p>
+(Members of <code>VolumeSourceStatus</code> are embedded into this type.)
+</p>
+<p>VolumeSourceStatus is the status of the configuration of the volume specified as source.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>state</code><br/>
+<em>
+<a href="#compute.api.onmetal.de/v1alpha1.VolumeState">
+VolumeState
+</a>
+</em>
+</td>
+<td>
+<p>State represents the attachment state of a Volume.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastStateTransitionTime</code><br/>
+<em>
+<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastStateTransitionTime is the last time the State transitioned.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>phase</code><br/>
 <em>
 <a href="#compute.api.onmetal.de/v1alpha1.VolumePhase">
@@ -1685,17 +1926,6 @@ Kubernetes meta/v1.Time
 </td>
 <td>
 <p>LastPhaseTransitionTime is the last time the Phase transitioned.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>deviceID</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>DeviceID is the disk device ID on the host.</p>
 </td>
 </tr>
 </tbody>

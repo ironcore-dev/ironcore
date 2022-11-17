@@ -17,7 +17,7 @@ package endpoints
 import (
 	"fmt"
 
-	computev1alpha1 "github.com/onmetal/onmetal-api/apis/compute/v1alpha1"
+	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 )
 
 type StaticHostName struct {

@@ -20,16 +20,6 @@
 package hack
 
 import (
-	// Use addlicense for adding license headers.
-	_ "github.com/google/addlicense"
-	// Use code-generator for generating aggregated-api code.
-	_ "k8s.io/code-generator"
-	// Use vgopath for setting up GOPATH to generate code with code-generator.
-	_ "github.com/onmetal/vgopath"
-	// Use gen-crd-api-reference-docs for generating API reference documentation.
-	_ "github.com/ahmetb/gen-crd-api-reference-docs"
-	// Use mockgen for generating mocks.
-	_ "github.com/golang/mock/mockgen"
 	// Use gogoproto for protobuf generation.
 	_ "github.com/gogo/protobuf/gogoproto"
 )
