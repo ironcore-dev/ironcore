@@ -16,33 +16,18 @@ package server
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/go-logr/logr"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/machinebroker/api/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/compute/v1alpha1"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/selection"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
-
-func (s *Server) getOnmetalNetworkInterface(ctx context.Context, machineID, networkInterfaceName string) (*networkingv1alpha1.NetworkInterface, error) {
-	onmetalNetworkInterface := &networkingv1alpha1.NetworkInterface{}
-	onmetalNetworkInterfaceKey := client.ObjectKey{Namespace: s.namespace, Name: s.onmetalNetworkInterfaceName(machineID, networkInterfaceName)}
-	if err := s.client.Get(ctx, onmetalNetworkInterfaceKey, onmetalNetworkInterface); err != nil {
-		if !apierrors.IsNotFound(err) {
-			return nil, fmt.Errorf("error getting machine %s network interface %s: %w", machineID, networkInterfaceName, err)
-		}
-		return nil, newNetworkInterfaceNotFoundError(machineID, networkInterfaceName)
-	}
-	return onmetalNetworkInterface, nil
-}
 
 // deleteOutdatedOnmetalNetworkInterfaceVirtualIPs deletes all ips of the network interface specified via
 // machineID / networkInterfaceName that don't have the specified ipFamily.
@@ -92,11 +77,7 @@ func (s *Server) UpdateNetworkInterface(ctx context.Context, req *ori.UpdateNetw
 	}
 
 	if err := s.updateOnmetalNetworkInterfaceVirtualIP(ctx, log, machineID, networkInterfaceName, onmetalVirtualIPConfig); err != nil {
-		var networkInterfaceNotFound *networkInterfaceNotFoundError
-		if !errors.As(err, &networkInterfaceNotFound) {
-			return nil, err
-		}
-		return nil, status.Error(codes.NotFound, networkInterfaceNotFound.Error())
+		return nil, err
 	}
 
 	onmetalNetworkInterface, err := s.getOnmetalNetworkInterface(ctx, machineID, networkInterfaceName)

@@ -102,6 +102,10 @@ func SetVolumeNameLabel(o metav1.Object, name string) {
 	metautils.SetLabel(o, machinebrokerv1alpha1.VolumeNameLabel, name)
 }
 
+func SetDeviceLabel(o metav1.Object, device string) {
+	metautils.SetLabel(o, machinebrokerv1alpha1.DeviceLabel, device)
+}
+
 func SetNetworkInterfaceNameLabel(o metav1.Object, name string) {
 	metautils.SetLabel(o, machinebrokerv1alpha1.NetworkInterfaceNameLabel, name)
 }

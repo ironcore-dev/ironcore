@@ -34,6 +34,7 @@ service MachineRuntime {
 message VolumeFilter {
   // ID of the machine.
   string machine_id = 1;
+  string name = 2;
 }
 
 message VolumeAccessConfig {
@@ -75,6 +76,7 @@ message VolumeConfig {
 message NetworkInterfaceFilter {
   // ID of the machine.
   string machine_id = 1;
+  string name = 2;
 }
 
 message NetworkConfig {

@@ -15,24 +15,50 @@
 package server
 
 import (
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	"context"
+	"fmt"
+
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/machinebroker/api/v1alpha1"
+	"github.com/onmetal/onmetal-api/machinebroker/apiutils"
 	ori "github.com/onmetal/onmetal-api/ori/apis/compute/v1alpha1"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
+func (s *Server) getOnmetalNetworkInterface(ctx context.Context, machineID, name string) (*networkingv1alpha1.NetworkInterface, error) {
+	onmetalNetworkInterface := &networkingv1alpha1.NetworkInterface{}
+	onmetalNetworkInterfaceKey := client.ObjectKey{Namespace: s.namespace, Name: s.onmetalNetworkInterfaceName(machineID, name)}
+	if err := s.client.Get(ctx, onmetalNetworkInterfaceKey, onmetalNetworkInterface); err != nil {
+		if !apierrors.IsNotFound(err) {
+			return nil, fmt.Errorf("error getting machine %s network interface %s: %w", machineID, name, err)
+		}
+		return nil, status.Errorf(codes.NotFound, "machine %s network interface %s not found", machineID, name)
+	}
+	return onmetalNetworkInterface, nil
+}
+
 func (s *Server) convertOnmetalNetworkInterface(
-	machineID string,
-	machineMetadata *ori.MachineMetadata,
-	onmetalNetworkInterface *computev1alpha1.NetworkInterface,
-	onmetalNetworkingNetworkInterface *networkingv1alpha1.NetworkInterface,
+	networkInterface *networkingv1alpha1.NetworkInterface,
 ) (*ori.NetworkInterface, error) {
-	ips := make([]string, len(onmetalNetworkingNetworkInterface.Status.IPs))
-	for i, ip := range onmetalNetworkingNetworkInterface.Status.IPs {
+	machineID := networkInterface.Labels[machinebrokerv1alpha1.MachineIDLabel]
+
+	metadata, err := apiutils.GetMetadataAnnotation(networkInterface)
+	if err != nil {
+		return nil, err
+	}
+
+	name := networkInterface.Labels[machinebrokerv1alpha1.NetworkInterfaceNameLabel]
+
+	ips := make([]string, len(networkInterface.Status.IPs))
+	for i, ip := range networkInterface.Status.IPs {
 		ips[i] = ip.String()
 	}
 
 	var virtualIPConfig *ori.VirtualIPConfig
-	if onmetalVirtualIP := onmetalNetworkingNetworkInterface.Status.VirtualIP; onmetalVirtualIP != nil {
+	if onmetalVirtualIP := networkInterface.Status.VirtualIP; onmetalVirtualIP != nil {
 		virtualIPConfig = &ori.VirtualIPConfig{
 			Ip: onmetalVirtualIP.String(),
 		}
@@ -40,10 +66,22 @@ func (s *Server) convertOnmetalNetworkInterface(
 
 	return &ori.NetworkInterface{
 		MachineId:       machineID,
-		MachineMetadata: machineMetadata,
-		Name:            onmetalNetworkInterface.Name,
-		Network:         &ori.NetworkConfig{Handle: onmetalNetworkingNetworkInterface.Status.NetworkHandle},
+		MachineMetadata: metadata,
+		Name:            name,
+		Network:         &ori.NetworkConfig{Handle: networkInterface.Status.NetworkHandle},
 		Ips:             ips,
 		VirtualIp:       virtualIPConfig,
 	}, nil
+}
+
+func (s *Server) getNetworkInterface(
+	ctx context.Context,
+	machineID, name string,
+) (*ori.NetworkInterface, error) {
+	onmetalNetworkInterface, err := s.getOnmetalNetworkInterface(ctx, machineID, name)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.convertOnmetalNetworkInterface(onmetalNetworkInterface)
 }

@@ -16,124 +16,108 @@ package server
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/machinebroker/api/v1alpha1"
-	"github.com/onmetal/onmetal-api/machinebroker/apiutils"
 	ori "github.com/onmetal/onmetal-api/ori/apis/compute/v1alpha1"
-	"github.com/onmetal/onmetal-api/utils/slices"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-type onmetalStorageVolumeFilter struct {
+type volumeFilter struct {
 	machineID string
+	name      string
 }
 
-func (s *Server) listOnmetalStorageVolumes(ctx context.Context, filter *onmetalStorageVolumeFilter) ([]storagev1alpha1.Volume, error) {
-	labels := map[string]string{}
-	if filter != nil {
+func (s *Server) listOnmetalVolumes(ctx context.Context, filter volumeFilter) ([]OnmetalVolume, error) {
+	opts := []client.ListOption{
+		client.InNamespace(s.namespace),
+	}
+	if filter.name != "" || filter.machineID != "" {
+		labels := map[string]string{}
 		if filter.machineID != "" {
 			labels[machinebrokerv1alpha1.MachineIDLabel] = filter.machineID
 		}
+		if filter.name != "" {
+			labels[machinebrokerv1alpha1.VolumeNameLabel] = filter.name
+		}
+
+		opts = append(opts, client.MatchingLabels(labels))
 	}
 
-	onmetalStorageVolumeList := &storagev1alpha1.VolumeList{}
-	if err := s.client.List(ctx, onmetalStorageVolumeList,
-		client.InNamespace(s.namespace),
-		client.MatchingLabels(labels),
-	); err != nil {
+	onmetalVolumeList := &storagev1alpha1.VolumeList{}
+	if err := s.client.List(ctx, onmetalVolumeList, opts...); err != nil {
 		return nil, fmt.Errorf("error listing onmetal storage volumes: %w", err)
 	}
 
-	return onmetalStorageVolumeList.Items, nil
-}
-
-func (s *Server) getMachineVolumes(ctx context.Context, machineID string) ([]*ori.Volume, error) {
-	onmetalMachine, err := s.getOnmetalMachine(ctx, machineID)
-	if err != nil {
-		return nil, err
+	var res []OnmetalVolume
+	for _, volume := range onmetalVolumeList.Items {
+		volume := volume
+		res = append(res, OnmetalVolume{Volume: &volume})
 	}
 
-	onmetalStorageVolumes, err := s.listOnmetalStorageVolumes(ctx, &onmetalStorageVolumeFilter{machineID: machineID})
-	if err != nil {
-		return nil, err
+	var onmetalMachines []computev1alpha1.Machine
+	if filter.machineID != "" {
+		onmetalMachine, err := s.getOnmetalMachine(ctx, filter.machineID)
+		if err != nil {
+			if status.Code(err) != codes.NotFound {
+				return nil, fmt.Errorf("error getting machine %s: %w", filter.machineID, err)
+			}
+		} else {
+			onmetalMachines = []computev1alpha1.Machine{*onmetalMachine}
+		}
+	} else {
+		var err error
+		onmetalMachines, err = s.listOnmetalMachines(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("error listing onmetal machines: %w", err)
+		}
 	}
 
-	onmetalStorageVolumeByName := slices.ToMap(onmetalStorageVolumes, func(onmetalStorageVolume storagev1alpha1.Volume) string {
-		return onmetalStorageVolume.Name
-	})
-
-	return s.getOnmetalMachineVolumes(ctx, onmetalMachine, onmetalStorageVolumeByName)
-}
-
-func (s *Server) getOnmetalMachineVolumes(
-	_ context.Context,
-	onmetalMachine *computev1alpha1.Machine,
-	onmetalStorageVolumeByName map[string]storagev1alpha1.Volume,
-) ([]*ori.Volume, error) {
-	machineMetadata, err := apiutils.GetMetadataAnnotation(onmetalMachine)
-	if err != nil {
-		return nil, err
-	}
-
-	var volumes []*ori.Volume
-	for _, onmetalVolume := range onmetalMachine.Spec.Volumes {
-		var onmetalStorageVolume *storagev1alpha1.Volume
-		if onmetalStorageVolumeName := computev1alpha1.MachineVolumeName(onmetalMachine.Name, onmetalVolume); onmetalStorageVolumeName != "" {
-			onmetalStorageVolume = &storagev1alpha1.Volume{}
-			var ok bool
-			*onmetalStorageVolume, ok = onmetalStorageVolumeByName[onmetalStorageVolumeName]
-			if !ok {
-				return nil, fmt.Errorf("onmetal storage volume %s not found", onmetalStorageVolumeName)
+	for _, onmetalMachine := range onmetalMachines {
+		onmetalMachine := onmetalMachine
+		for _, volume := range onmetalMachine.Spec.Volumes {
+			if volume.EmptyDisk != nil {
+				volume := volume
+				res = append(res, OnmetalVolume{
+					EmptyDisk: &OnmetalEmptyDiskVolume{
+						Machine: &onmetalMachine,
+						Volume:  &volume,
+					},
+				})
 			}
 		}
-
-		volume, err := s.convertOnmetalVolume(onmetalMachine.Name, machineMetadata, &onmetalVolume, onmetalStorageVolume)
-		if err != nil {
-			return nil, err
-		}
-
-		volumes = append(volumes, volume)
 	}
-	return volumes, nil
+
+	return res, nil
 }
 
-func (s *Server) listMachineVolumes(ctx context.Context) ([]*ori.Volume, error) {
-	onmetalMachines, err := s.listOnmetalMachines(ctx)
+func (s *Server) listVolumes(ctx context.Context, filter volumeFilter) ([]*ori.Volume, error) {
+	onmetalVolumes, err := s.listOnmetalVolumes(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
 
-	onmetalStorageVolumes, err := s.listOnmetalStorageVolumes(ctx, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	onmetalStorageVolumeByName := slices.ToMap(onmetalStorageVolumes, func(onmetalStorageVolume storagev1alpha1.Volume) string {
-		return onmetalStorageVolume.Name
-	})
-
-	var volumes []*ori.Volume
-	for _, onmetalMachine := range onmetalMachines {
-		machineVolumes, err := s.getOnmetalMachineVolumes(ctx, &onmetalMachine, onmetalStorageVolumeByName)
+	res := make([]*ori.Volume, len(onmetalVolumes))
+	for i, onmetalVolume := range onmetalVolumes {
+		volume, err := s.convertOnmetalVolume(&onmetalVolume)
 		if err != nil {
 			return nil, err
 		}
 
-		volumes = append(volumes, machineVolumes...)
+		res[i] = volume
 	}
-
-	return volumes, nil
+	return res, nil
 }
 
 func (s *Server) ListVolumes(ctx context.Context, req *ori.ListVolumesRequest) (*ori.ListVolumesResponse, error) {
-	if filter := req.Filter; filter != nil && filter.MachineId != "" {
-		volumes, err := s.getMachineVolumes(ctx, filter.MachineId)
+	if filter := req.Filter; filter != nil && filter.MachineId != "" && filter.Name != "" {
+		volume, err := s.getVolume(ctx, filter.MachineId, filter.Name)
 		if err != nil {
-			if !errors.As(err, new(*machineNotFoundError)) {
+			if status.Code(err) != codes.NotFound {
 				return nil, err
 			}
 			return &ori.ListVolumesResponse{
@@ -141,11 +125,14 @@ func (s *Server) ListVolumes(ctx context.Context, req *ori.ListVolumesRequest) (
 			}, nil
 		}
 		return &ori.ListVolumesResponse{
-			Volumes: volumes,
+			Volumes: []*ori.Volume{volume},
 		}, nil
 	}
 
-	volumes, err := s.listMachineVolumes(ctx)
+	volumes, err := s.listVolumes(ctx, volumeFilter{
+		machineID: req.GetFilter().GetMachineId(),
+		name:      req.GetFilter().GetName(),
+	})
 	if err != nil {
 		return nil, err
 	}

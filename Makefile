@@ -62,6 +62,12 @@ generate: vgopath models-schema deepcopy-gen client-gen lister-gen informer-gen 
 	APPLYCONFIGURATION_GEN=$(APPLYCONFIGURATION_GEN) \
 	./hack/update-codegen.sh
 
+.PHONY: proto
+proto: vgopath protoc-gen-gogo
+	VGOPATH=$(VGOPATH) \
+	PROTOC_GEN_GOGO=$(PROTOC_GEN_GOGO) \
+	./hack/update-proto.sh
+
 .PHONY: fmt
 fmt: ## Run go fmt against code.
 	go fmt ./...
@@ -251,6 +257,7 @@ APPLYCONFIGURATION_GEN ?= $(LOCALBIN)/applyconfiguration-gen
 VGOPATH ?= $(LOCALBIN)/vgopath
 GEN_CRD_API_REFERENCE_DOCS ?= $(LOCALBIN)/gen-crd-api-reference-docs
 ADDLICENSE ?= $(LOCALBIN)/addlicense
+PROTOC_GEN_GOGO ?= $(LOCALBIN)/protoc-gen-gogo
 MODELS_SCHEMA ?= $(LOCALBIN)/models-schema
 
 ## Tool Versions
@@ -260,6 +267,7 @@ CONTROLLER_TOOLS_VERSION ?= v0.9.0
 VGOPATH_VERSION ?= v0.0.2
 GEN_CRD_API_REFERENCE_DOCS_VERSION ?= v0.3.0
 ADDLICENSE_VERSION ?= v1.1.0
+PROTOC_GEN_GOGO_VERSION ?= v1.3.2
 
 KUSTOMIZE_INSTALL_SCRIPT ?= "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
 .PHONY: kustomize
@@ -341,6 +349,11 @@ $(GEN_CRD_API_REFERENCE_DOCS): $(LOCALBIN)
 addlicense: $(ADDLICENSE) ## Download addlicense locally if necessary.
 $(ADDLICENSE): $(LOCALBIN)
 	test -s $(LOCALBIN)/addlicense || GOBIN=$(LOCALBIN) go install github.com/google/addlicense@$(ADDLICENSE_VERSION)
+
+.PHONY: protoc-gen-gogo
+protoc-gen-gogo: $(PROTOC_GEN_GOGO) ## Download protoc-gen-gogo locally if necessary.
+$(PROTOC_GEN_GOGO): $(LOCALBIN)
+	test -s $(LOCALBIN)/protoc-gen-gogo || GOBIN=$(LOCALBIN) go install github.com/gogo/protobuf/protoc-gen-gogo@$(PROTOC_GEN_GOGO_VERSION)
 
 .PHONY: models-schema
 models-schema: $(MODELS_SCHEMA) ## Install models-schema locally if necessary.
