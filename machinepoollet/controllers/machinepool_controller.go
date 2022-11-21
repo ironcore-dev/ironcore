@@ -22,7 +22,7 @@ import (
 	"github.com/go-logr/logr"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	"github.com/onmetal/onmetal-api/machinepoollet/mcm"
-	ori "github.com/onmetal/onmetal-api/ori/apis/compute/v1alpha1"
+	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"

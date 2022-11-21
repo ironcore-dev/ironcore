@@ -32,7 +32,7 @@ import (
 	"github.com/onmetal/onmetal-api/machinepoollet/controllers/events"
 	"github.com/onmetal/onmetal-api/machinepoollet/mcm"
 	"github.com/onmetal/onmetal-api/machinepoollet/mleg"
-	ori "github.com/onmetal/onmetal-api/ori/apis/compute/v1alpha1"
+	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	utilslices "github.com/onmetal/onmetal-api/utils/slices"
 	"golang.org/x/exp/slices"
 	"google.golang.org/grpc/codes"

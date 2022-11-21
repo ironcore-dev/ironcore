@@ -29,7 +29,7 @@ import (
 	machinepoolletclient "github.com/onmetal/onmetal-api/machinepoollet/client"
 	"github.com/onmetal/onmetal-api/machinepoollet/controllers"
 	"github.com/onmetal/onmetal-api/machinepoollet/mcm"
-	ori "github.com/onmetal/onmetal-api/ori/apis/compute/v1alpha1"
+	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"google.golang.org/grpc"

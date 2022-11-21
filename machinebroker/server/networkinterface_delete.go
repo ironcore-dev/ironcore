@@ -21,7 +21,7 @@ import (
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/machinebroker/api/v1alpha1"
-	ori "github.com/onmetal/onmetal-api/ori/apis/compute/v1alpha1"
+	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	"golang.org/x/exp/slices"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )

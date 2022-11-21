@@ -20,7 +20,7 @@ import (
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	"github.com/onmetal/onmetal-api/machinebroker/apiutils"
-	ori "github.com/onmetal/onmetal-api/ori/apis/compute/v1alpha1"
+	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 )
 
 var onmetalVolumeStateToVolumeState = map[computev1alpha1.VolumeState]ori.VolumeState{

@@ -21,7 +21,7 @@ import (
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/machinebroker/api/v1alpha1"
 	"github.com/onmetal/onmetal-api/machinebroker/apiutils"
-	ori "github.com/onmetal/onmetal-api/ori/apis/compute/v1alpha1"
+	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	"github.com/onmetal/onmetal-api/testutils"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

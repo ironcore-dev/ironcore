@@ -29,12 +29,12 @@ export GO111MODULE=off
 (
 cd "$REPO_ROOT"
 export PATH="$PATH:$(dirname "$PROTOC_GEN_GOGO")"
-echo "Generating ${blue}ori/compute${normal}"
+echo "Generating ${blue}ori/machine${normal}"
 protoc \
-  --proto_path ./ori/apis/compute/v1alpha1 \
+  --proto_path ./ori/apis/machine/v1alpha1 \
   --proto_path "$TGOPATH/src" \
   --gogo_out=plugins=grpc:"$REPO_ROOT" \
-  ./ori/apis/compute/v1alpha1/api.proto
+  ./ori/apis/machine/v1alpha1/api.proto
 )
 
 (

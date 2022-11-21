@@ -20,7 +20,7 @@ import (
 
 	"github.com/onmetal/controller-utils/set"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	ori "github.com/onmetal/onmetal-api/ori/apis/compute/v1alpha1"
+	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
