@@ -28,7 +28,12 @@ func (s *Server) CreateNetworkInterface(ctx context.Context, req *ori.CreateNetw
 	cleaner, cleanup := s.setupCleaner(ctx, log, &retErr)
 	defer cleanup()
 
-	onmetalMachineNetworkInterface, onmetalNetworkInterfaceConfig, err := s.getOnmetalNetworkInterfaceData(req.MachineId, req.Config)
+	machine, err := s.getMachine(ctx, req.MachineId)
+	if err != nil {
+		return nil, err
+	}
+
+	onmetalMachineNetworkInterface, onmetalNetworkInterfaceConfig, err := s.getOnmetalNetworkInterfaceData(req.MachineId, machine.Metadata, req.Config)
 	if err != nil {
 		return nil, err
 	}
@@ -37,6 +42,7 @@ func (s *Server) CreateNetworkInterface(ctx context.Context, req *ori.CreateNetw
 		return nil, err
 	}
 
+	// TODO: We can do this via a single strategic-merge patch now, not requiring the additional fetch.
 	onmetalMachine, err := s.getOnmetalMachine(ctx, req.MachineId)
 	if err != nil {
 		return nil, err

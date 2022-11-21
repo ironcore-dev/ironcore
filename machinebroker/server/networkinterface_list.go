@@ -16,124 +16,69 @@ package server
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/machinebroker/api/v1alpha1"
-	"github.com/onmetal/onmetal-api/machinebroker/apiutils"
 	ori "github.com/onmetal/onmetal-api/ori/apis/compute/v1alpha1"
-	"github.com/onmetal/onmetal-api/utils/slices"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-type onmetalNetworkingNetworkInterfaceFilter struct {
+type networkInterfaceFilter struct {
 	machineID string
+	name      string
 }
 
-func (s *Server) listOnmetalNetworkingNetworkInterfaces(ctx context.Context, filter *onmetalNetworkingNetworkInterfaceFilter) ([]networkingv1alpha1.NetworkInterface, error) {
-	labels := map[string]string{}
-	if filter != nil {
+func (s *Server) listOnmetalNetworkInterfaces(ctx context.Context, filter networkInterfaceFilter) ([]networkingv1alpha1.NetworkInterface, error) {
+	opts := []client.ListOption{
+		client.InNamespace(s.namespace),
+	}
+
+	if filter.machineID != "" || filter.name != "" {
+		labels := make(map[string]string)
 		if filter.machineID != "" {
 			labels[machinebrokerv1alpha1.MachineIDLabel] = filter.machineID
 		}
+		if filter.name != "" {
+			labels[machinebrokerv1alpha1.NetworkInterfaceNameLabel] = filter.name
+		}
+
+		opts = append(opts, client.MatchingLabels(labels))
 	}
 
 	onmetalNetworkingNetworkInterfaceList := &networkingv1alpha1.NetworkInterfaceList{}
-	if err := s.client.List(ctx, onmetalNetworkingNetworkInterfaceList,
-		client.InNamespace(s.namespace),
-		client.MatchingLabels(labels),
-	); err != nil {
+	if err := s.client.List(ctx, onmetalNetworkingNetworkInterfaceList, opts...); err != nil {
 		return nil, fmt.Errorf("error listing onmetal networking network interfaces: %w", err)
 	}
 
 	return onmetalNetworkingNetworkInterfaceList.Items, nil
 }
 
-func (s *Server) getMachineNetworkInterfaces(ctx context.Context, machineID string) ([]*ori.NetworkInterface, error) {
-	onmetalMachine, err := s.getOnmetalMachine(ctx, machineID)
+func (s *Server) listNetworkInterfaces(ctx context.Context, filter networkInterfaceFilter) ([]*ori.NetworkInterface, error) {
+	onmetalNetworkInterfaces, err := s.listOnmetalNetworkInterfaces(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
 
-	onmetalNetworkingNetworkInterfaces, err := s.listOnmetalNetworkingNetworkInterfaces(ctx, &onmetalNetworkingNetworkInterfaceFilter{machineID: machineID})
-	if err != nil {
-		return nil, err
-	}
-
-	onmetalNetworkingNetworkInterfaceByName := slices.ToMap(onmetalNetworkingNetworkInterfaces, func(onmetalNetworkingNetworkInterface networkingv1alpha1.NetworkInterface) string {
-		return onmetalNetworkingNetworkInterface.Name
-	})
-
-	return s.getOnmetalMachineNetworkInterfaces(ctx, onmetalMachine, onmetalNetworkingNetworkInterfaceByName)
-}
-
-func (s *Server) getOnmetalMachineNetworkInterfaces(
-	_ context.Context,
-	onmetalMachine *computev1alpha1.Machine,
-	onmetalNetworkingNetworkInterfaceByName map[string]networkingv1alpha1.NetworkInterface,
-) ([]*ori.NetworkInterface, error) {
-	machineMetadata, err := apiutils.GetMetadataAnnotation(onmetalMachine)
-	if err != nil {
-		return nil, err
-	}
-
-	var networkInterfaces []*ori.NetworkInterface
-	for _, onmetalNetworkInterface := range onmetalMachine.Spec.NetworkInterfaces {
-		var onmetalNetworkingNetworkInterface *networkingv1alpha1.NetworkInterface
-		if onmetalNetworkingNetworkInterfaceName := computev1alpha1.MachineNetworkInterfaceName(onmetalMachine.Name, onmetalNetworkInterface); onmetalNetworkingNetworkInterfaceName != "" {
-			onmetalNetworkingNetworkInterface = &networkingv1alpha1.NetworkInterface{}
-			var ok bool
-			*onmetalNetworkingNetworkInterface, ok = onmetalNetworkingNetworkInterfaceByName[onmetalNetworkingNetworkInterfaceName]
-			if !ok {
-				return nil, fmt.Errorf("onmetal networking network interface %s not found", onmetalNetworkingNetworkInterfaceName)
-			}
-		}
-
-		networkInterface, err := s.convertOnmetalNetworkInterface(onmetalMachine.Name, machineMetadata, &onmetalNetworkInterface, onmetalNetworkingNetworkInterface)
+	res := make([]*ori.NetworkInterface, len(onmetalNetworkInterfaces))
+	for i, onmetalNetworkInterface := range onmetalNetworkInterfaces {
+		networkInterface, err := s.convertOnmetalNetworkInterface(&onmetalNetworkInterface)
 		if err != nil {
 			return nil, err
 		}
 
-		networkInterfaces = append(networkInterfaces, networkInterface)
+		res[i] = networkInterface
 	}
-	return networkInterfaces, nil
-}
-
-func (s *Server) listMachineNetworkInterfaces(ctx context.Context) ([]*ori.NetworkInterface, error) {
-	onmetalMachines, err := s.listOnmetalMachines(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	onmetalNetworkingNetworkInterfaces, err := s.listOnmetalNetworkingNetworkInterfaces(ctx, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	onmetalNetworkingNetworkInterfaceByName := slices.ToMap(onmetalNetworkingNetworkInterfaces, func(onmetalNetworkingNetworkInterface networkingv1alpha1.NetworkInterface) string {
-		return onmetalNetworkingNetworkInterface.Name
-	})
-
-	var networkInterfaces []*ori.NetworkInterface
-	for _, onmetalMachine := range onmetalMachines {
-		machineNetworkInterfaces, err := s.getOnmetalMachineNetworkInterfaces(ctx, &onmetalMachine, onmetalNetworkingNetworkInterfaceByName)
-		if err != nil {
-			return nil, err
-		}
-
-		networkInterfaces = append(networkInterfaces, machineNetworkInterfaces...)
-	}
-
-	return networkInterfaces, nil
+	return res, nil
 }
 
 func (s *Server) ListNetworkInterfaces(ctx context.Context, req *ori.ListNetworkInterfacesRequest) (*ori.ListNetworkInterfacesResponse, error) {
-	if filter := req.Filter; filter != nil && filter.MachineId != "" {
-		networkInterfaces, err := s.getMachineNetworkInterfaces(ctx, filter.MachineId)
+	if filter := req.Filter; filter != nil && filter.MachineId != "" && filter.Name != "" {
+		networkInterface, err := s.getNetworkInterface(ctx, filter.MachineId, filter.Name)
 		if err != nil {
-			if !errors.As(err, new(*machineNotFoundError)) {
+			if status.Code(err) != codes.NotFound {
 				return nil, err
 			}
 			return &ori.ListNetworkInterfacesResponse{
@@ -141,11 +86,14 @@ func (s *Server) ListNetworkInterfaces(ctx context.Context, req *ori.ListNetwork
 			}, nil
 		}
 		return &ori.ListNetworkInterfacesResponse{
-			NetworkInterfaces: networkInterfaces,
+			NetworkInterfaces: []*ori.NetworkInterface{networkInterface},
 		}, nil
 	}
 
-	networkInterfaces, err := s.listMachineNetworkInterfaces(ctx)
+	networkInterfaces, err := s.listNetworkInterfaces(ctx, networkInterfaceFilter{
+		machineID: req.GetFilter().GetMachineId(),
+		name:      req.GetFilter().GetName(),
+	})
 	if err != nil {
 		return nil, err
 	}

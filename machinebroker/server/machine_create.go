@@ -58,7 +58,6 @@ type OnmetalNetworkInterfaceConfig struct {
 }
 
 type OnmetalMachineConfig struct {
-	ID                string
 	IgnitionSecret    *corev1.Secret
 	NetworkInterfaces []OnmetalNetworkInterfaceConfig
 	Volumes           []OnmetalVolumeConfig
@@ -83,6 +82,7 @@ func (s *Server) onmetalIgnitionSecretName(id string) string {
 
 func (s *Server) getOnmetalVolumeData(
 	machineID string,
+	machineMetadata *ori.MachineMetadata,
 	volume *ori.VolumeConfig,
 ) (*computev1alpha1.Volume, *OnmetalVolumeConfig, error) {
 	var (
@@ -121,7 +121,11 @@ func (s *Server) getOnmetalVolumeData(
 		}
 		apiutils.SetMachineIDLabel(onmetalVolume, machineID)
 		apiutils.SetVolumeNameLabel(onmetalVolume, volume.Name)
+		apiutils.SetDeviceLabel(onmetalVolume, volume.Device)
 		onmetalapiannotations.SetExternallyMangedBy(onmetalVolume, machinebrokerv1alpha1.MachineBrokerManager)
+		if err := apiutils.SetMetadataAnnotation(onmetalVolume, machineMetadata); err != nil {
+			return nil, nil, err
+		}
 
 		onmetalVolumeAccess := &storagev1alpha1.VolumeAccess{
 			Driver:           volume.Access.Driver,
@@ -203,6 +207,7 @@ func (s *Server) getOnmetalNetworkConfig(
 
 func (s *Server) getOnmetalNetworkInterfaceData(
 	machineID string,
+	machineMetadata *ori.MachineMetadata,
 	networkInterface *ori.NetworkInterfaceConfig,
 ) (*computev1alpha1.NetworkInterface, *OnmetalNetworkInterfaceConfig, error) {
 	onmetalNetworkInterfaceName := s.onmetalNetworkInterfaceName(machineID, networkInterface.Name)
@@ -239,6 +244,9 @@ func (s *Server) getOnmetalNetworkInterfaceData(
 	}
 	apiutils.SetMachineIDLabel(onmetalNetworkInterface, machineID)
 	apiutils.SetNetworkInterfaceNameLabel(onmetalNetworkInterface, networkInterface.Name)
+	if err := apiutils.SetMetadataAnnotation(onmetalNetworkInterface, machineMetadata); err != nil {
+		return nil, nil, err
+	}
 	if onmetalVirtualIPConfig != nil {
 		onmetalNetworkInterface.Spec.VirtualIP = &networkingv1alpha1.VirtualIPSource{
 			VirtualIPRef: &corev1.LocalObjectReference{Name: onmetalVirtualIPConfig.VirtualIP.Name},
@@ -281,7 +289,7 @@ func (s *Server) getOnmetalMachineConfig(ctx context.Context, cfg *ori.MachineCo
 		onmetalVolumeConfigs  []OnmetalVolumeConfig
 	)
 	for _, volume := range cfg.Volumes {
-		onmetalMachineVolume, onmetalVolumeConfig, err := s.getOnmetalVolumeData(machineID, volume)
+		onmetalMachineVolume, onmetalVolumeConfig, err := s.getOnmetalVolumeData(machineID, cfg.Metadata, volume)
 		if err != nil {
 			return nil, err
 		}
@@ -297,7 +305,7 @@ func (s *Server) getOnmetalMachineConfig(ctx context.Context, cfg *ori.MachineCo
 		onmetalNetworkInterfaceConfigs  []OnmetalNetworkInterfaceConfig
 	)
 	for _, networkInterface := range cfg.NetworkInterfaces {
-		onmetalMachineNetworkInterface, onmetalNetworkInterfaceConfig, err := s.getOnmetalNetworkInterfaceData(machineID, networkInterface)
+		onmetalMachineNetworkInterface, onmetalNetworkInterfaceConfig, err := s.getOnmetalNetworkInterfaceData(machineID, cfg.Metadata, networkInterface)
 		if err != nil {
 			return nil, err
 		}
@@ -341,7 +349,6 @@ func (s *Server) getOnmetalMachineConfig(ctx context.Context, cfg *ori.MachineCo
 	}
 
 	return &OnmetalMachineConfig{
-		ID:                machineID,
 		IgnitionSecret:    ignitionSecret,
 		NetworkInterfaces: onmetalNetworkInterfaceConfigs,
 		Volumes:           onmetalVolumeConfigs,
@@ -410,7 +417,7 @@ func (s *Server) CreateMachine(ctx context.Context, req *ori.CreateMachineReques
 
 	return &ori.CreateMachineResponse{
 		Machine: &ori.Machine{
-			Id:          onmetalMachineCfg.ID,
+			Id:          machineID,
 			Metadata:    req.Config.Metadata,
 			Annotations: req.Config.Annotations,
 			Labels:      req.Config.Labels,

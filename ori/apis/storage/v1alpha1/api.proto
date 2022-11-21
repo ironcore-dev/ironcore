@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package compute.v1alpha1;
+package storage.v1alpha1;
 option go_package = "ori/apis/storage/v1alpha1";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
@@ -41,8 +41,9 @@ message VolumeConfig {
   VolumeMetadata metadata = 1;
   string image = 2;
   string class = 3;
-  map<string, string> annotations = 4;
-  map<string, string> labels = 5;
+  VolumeResources resources = 4;
+  map<string, string> annotations = 5;
+  map<string, string> labels = 6;
 }
 
 message Volume {
@@ -96,7 +97,6 @@ message ListVolumesResponse {
 }
 
 message CreateVolumeRequest {
-  string machine_id = 1;
   VolumeConfig config = 2;
 }
 

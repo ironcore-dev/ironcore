@@ -28,7 +28,12 @@ func (s *Server) CreateVolume(ctx context.Context, req *ori.CreateVolumeRequest)
 	cleaner, cleanup := s.setupCleaner(ctx, log, &retErr)
 	defer cleanup()
 
-	onmetalMachineVolume, onmetalVolumeConfig, err := s.getOnmetalVolumeData(req.MachineId, req.Config)
+	machine, err := s.getMachine(ctx, req.MachineId)
+	if err != nil {
+		return nil, err
+	}
+
+	onmetalMachineVolume, onmetalVolumeConfig, err := s.getOnmetalVolumeData(req.MachineId, machine.Metadata, req.Config)
 	if err != nil {
 		return nil, err
 	}

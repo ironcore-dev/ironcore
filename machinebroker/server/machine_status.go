@@ -16,14 +16,11 @@ package server
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	"github.com/onmetal/onmetal-api/machinebroker/apiutils"
 	ori "github.com/onmetal/onmetal-api/ori/apis/compute/v1alpha1"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 var onmetalVolumeStateToVolumeState = map[computev1alpha1.VolumeState]ori.VolumeState{
@@ -118,11 +115,7 @@ func (s *Server) MachineStatus(ctx context.Context, req *ori.MachineStatusReques
 	log.V(1).Info("Getting machine")
 	onmetalMachine, err := s.getOnmetalMachine(ctx, id)
 	if err != nil {
-		var machineNotFound *machineNotFoundError
-		if !errors.As(err, &machineNotFound) {
-			return nil, fmt.Errorf("error getting onmetal machine: %w", err)
-		}
-		return nil, status.Error(codes.NotFound, machineNotFound.Error())
+		return nil, err
 	}
 
 	metadata, err := apiutils.GetMetadataAnnotation(onmetalMachine)

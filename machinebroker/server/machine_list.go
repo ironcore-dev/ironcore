@@ -16,12 +16,13 @@ package server
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/machinebroker/api/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/compute/v1alpha1"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -84,7 +85,7 @@ func (s *Server) getOnmetalMachine(ctx context.Context, machineID string) (*comp
 		if !apierrors.IsNotFound(err) {
 			return nil, fmt.Errorf("error getting machine %s: %w", onmetalMachineKey, err)
 		}
-		return nil, newMachineNotFoundError(machineID)
+		return nil, status.Errorf(codes.NotFound, fmt.Sprintf("machine %s not found", machineID))
 	}
 	return onmetalMachine, nil
 }
@@ -102,7 +103,7 @@ func (s *Server) ListMachines(ctx context.Context, req *ori.ListMachinesRequest)
 	if filter := req.Filter; filter != nil && filter.Id != "" {
 		machine, err := s.getMachine(ctx, filter.Id)
 		if err != nil {
-			if !errors.As(err, new(*machineNotFoundError)) {
+			if status.Code(err) != codes.NotFound {
 				return nil, err
 			}
 			return &ori.ListMachinesResponse{

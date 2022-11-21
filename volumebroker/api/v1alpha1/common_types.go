@@ -15,27 +15,19 @@
 package v1alpha1
 
 const (
-	MetadataAnnotation = "machinebroker.api.onmetal.de/metadata"
+	MetadataAnnotation = "volumebroker.api.onmetal.de/metadata"
 
-	LabelsAnnotation = "machinebroker.api.onmetal.de/labels"
+	LabelsAnnotation = "volumebroker.api.onmetal.de/labels"
 
-	AnnotationsAnnotation = "machinebroker.api.onmetal.de/annotations"
+	AnnotationsAnnotation = "volumebroker.api.onmetal.de/annotations"
 )
 
 const (
-	MachineIDLabel = "machinebroker.api.onmetal.de/machine-id"
+	VolumeIDLabel = "volumebroker.api.onmetal.de/volume-id"
 
-	VolumeNameLabel = "machinebroker.api.onmetal.de/volume-name"
-
-	NetworkInterfaceNameLabel = "machinebroker.api.onmetal.de/network-interface"
-
-	IPFamilyLabel = "machinebroker.api.onmetal.de/ip-family"
-
-	MachineManagerLabel = "machinebroker.api.onmetal.de/machine-manager"
-
-	DeviceLabel = "machinebroker.api.onmetal.de/device"
+	VolumeManagerLabel = "volumebroker.api.onmetal.de/volume-manager"
 )
 
 const (
-	MachineBrokerManager = "machinebroker"
+	VolumeBrokerManager = "volumebroker"
 )
