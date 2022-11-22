@@ -193,7 +193,7 @@ func (s *Server) getOnmetalNetworkConfig(
 			Name:      s.onmetalNetworkInterfaceName(machineID, networkInterfaceName),
 		},
 		Spec: networkingv1alpha1.NetworkSpec{
-			ProviderID: network.Handle,
+			Handle: network.Handle,
 		},
 	}
 	apiutils.SetMachineIDLabel(onmetalNetwork, machineID)

@@ -1278,7 +1278,7 @@ func Convert_networking_NetworkList_To_v1alpha1_NetworkList(in *networking.Netwo
 }
 
 func autoConvert_v1alpha1_NetworkSpec_To_networking_NetworkSpec(in *v1alpha1.NetworkSpec, out *networking.NetworkSpec, s conversion.Scope) error {
-	out.ProviderID = in.ProviderID
+	out.Handle = in.Handle
 	return nil
 }
 
@@ -1288,7 +1288,7 @@ func Convert_v1alpha1_NetworkSpec_To_networking_NetworkSpec(in *v1alpha1.Network
 }
 
 func autoConvert_networking_NetworkSpec_To_v1alpha1_NetworkSpec(in *networking.NetworkSpec, out *v1alpha1.NetworkSpec, s conversion.Scope) error {
-	out.ProviderID = in.ProviderID
+	out.Handle = in.Handle
 	return nil
 }
 

@@ -1014,7 +1014,7 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkSpec
   map:
     fields:
-    - name: providerID
+    - name: handle
       type:
         scalar: string
       default: ""

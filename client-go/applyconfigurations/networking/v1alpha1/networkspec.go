@@ -20,7 +20,7 @@ package v1alpha1
 // NetworkSpecApplyConfiguration represents an declarative configuration of the NetworkSpec type for use
 // with apply.
 type NetworkSpecApplyConfiguration struct {
-	ProviderID *string `json:"providerID,omitempty"`
+	Handle *string `json:"handle,omitempty"`
 }
 
 // NetworkSpecApplyConfiguration constructs an declarative configuration of the NetworkSpec type for use with
@@ -29,10 +29,10 @@ func NetworkSpec() *NetworkSpecApplyConfiguration {
 	return &NetworkSpecApplyConfiguration{}
 }
 
-// WithProviderID sets the ProviderID field in the declarative configuration to the given value
+// WithHandle sets the Handle field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the ProviderID field is set to the value of the last call.
-func (b *NetworkSpecApplyConfiguration) WithProviderID(value string) *NetworkSpecApplyConfiguration {
-	b.ProviderID = &value
+// If called multiple times, the Handle field is set to the value of the last call.
+func (b *NetworkSpecApplyConfiguration) WithHandle(value string) *NetworkSpecApplyConfiguration {
+	b.Handle = &value
 	return b
 }

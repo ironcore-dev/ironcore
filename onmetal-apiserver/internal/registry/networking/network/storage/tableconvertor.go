@@ -32,7 +32,7 @@ var (
 	headers = []metav1.TableColumnDefinition{
 		{Name: "Name", Type: "string", Format: "name", Description: objectMetaSwaggerDoc["name"]},
 		{Name: "State", Type: "string", Description: "The state of the network"},
-		{Name: "ProviderID", Type: "string", Description: "The providerID of the network"},
+		{Name: "Handle", Type: "string", Description: "The providerID of the network"},
 		{Name: "Age", Type: "string", Format: "date", Description: objectMetaSwaggerDoc["creationTimestamp"]},
 	}
 )
@@ -68,7 +68,7 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 			cells = append(cells, state)
 		}
 
-		cells = append(cells, network.Spec.ProviderID)
+		cells = append(cells, network.Spec.Handle)
 
 		cells = append(cells, age)
 

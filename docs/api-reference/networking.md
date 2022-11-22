@@ -690,13 +690,13 @@ NetworkSpec
 <table>
 <tr>
 <td>
-<code>providerID</code><br/>
+<code>handle</code><br/>
 <em>
 string
 </em>
 </td>
 <td>
-<p>ProviderID is the identifier of the network provider.</p>
+<p>Handle is the identifier of the network provider.</p>
 </td>
 </tr>
 </table>
@@ -1982,13 +1982,13 @@ VirtualIPSource
 <tbody>
 <tr>
 <td>
-<code>providerID</code><br/>
+<code>handle</code><br/>
 <em>
 string
 </em>
 </td>
 <td>
-<p>ProviderID is the identifier of the network provider.</p>
+<p>Handle is the identifier of the network provider.</p>
 </td>
 </tr>
 </tbody>

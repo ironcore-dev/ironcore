@@ -53,8 +53,8 @@ func ValidateNetworkUpdate(newNetwork, oldNetwork *networking.Network) field.Err
 func validateNetworkSpecUpdate(newSpec, oldSpec *networking.NetworkSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	if oldSpec.ProviderID != "" {
-		allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableField(newSpec.ProviderID, oldSpec.ProviderID, fldPath.Child("providerID"))...)
+	if oldSpec.Handle != "" {
+		allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableField(newSpec.Handle, oldSpec.Handle, fldPath.Child("handle"))...)
 	}
 
 	return allErrs

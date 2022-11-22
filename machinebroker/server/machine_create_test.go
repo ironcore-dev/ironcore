@@ -188,7 +188,7 @@ var _ = Describe("CreateMachine", func() {
 		Expect(onmetalNetwork.Labels[machinebrokerv1alpha1.MachineIDLabel]).To(Equal(res.Machine.Id))
 		Expect(onmetalNetwork.Labels[machinebrokerv1alpha1.NetworkInterfaceNameLabel]).To(Equal("foo"))
 		Expect(onmetalNetwork.Annotations[commonv1alpha1.ManagedByAnnotation]).To(Equal(machinebrokerv1alpha1.MachineBrokerManager))
-		Expect(onmetalNetwork.Spec.ProviderID).To(Equal(networkHandle))
+		Expect(onmetalNetwork.Spec.Handle).To(Equal(networkHandle))
 
 		By("getting the referenced virtual ip")
 		onmetalVirtualIP := &networkingv1alpha1.VirtualIP{}

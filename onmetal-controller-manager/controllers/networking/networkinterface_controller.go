@@ -141,7 +141,7 @@ func (r *NetworkInterfaceReconciler) getNetworkHandle(ctx context.Context, nic *
 
 	switch state := network.Status.State; state {
 	case networkingv1alpha1.NetworkStateAvailable:
-		return network.Spec.ProviderID, nil
+		return network.Spec.Handle, nil
 	default:
 		return "", fmt.Errorf("%w: network is not in state %s but %s", errNetworkNotReady, networkingv1alpha1.NetworkStateAvailable, state)
 	}

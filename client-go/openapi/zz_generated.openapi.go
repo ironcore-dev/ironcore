@@ -3751,16 +3751,16 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkSpec(ref common.Reference
 				Description: "NetworkSpec defines the desired state of Network",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"providerID": {
+					"handle": {
 						SchemaProps: spec.SchemaProps{
-							Description: "ProviderID is the identifier of the network provider.",
+							Description: "Handle is the identifier of the network provider.",
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 				},
-				Required: []string{"providerID"},
+				Required: []string{"handle"},
 			},
 		},
 	}
