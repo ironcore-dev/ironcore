@@ -15,7 +15,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	clicommon "github.com/onmetal/onmetal-api/orictl/cli/common"
@@ -26,7 +25,7 @@ import (
 func main() {
 	ctx := ctrl.SetupSignalHandler()
 	if err := orictlmachine.Command(clicommon.OSStreams).ExecuteContext(ctx); err != nil {
-		fmt.Println(err.Error())
+		ctrl.Log.Error(err, "Error running command")
 		os.Exit(1)
 	}
 }

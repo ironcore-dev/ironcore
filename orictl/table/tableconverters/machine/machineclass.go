@@ -12,38 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package machinetableconverters
+package machine
 
 import (
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	"github.com/onmetal/onmetal-api/orictl/table"
 	"github.com/onmetal/onmetal-api/orictl/table/tableconverter"
+	"k8s.io/apimachinery/pkg/api/resource"
 )
 
 var (
-	volumeHeaders = []table.Header{
-		{Name: "Machine ID"},
+	machineClassHeaders = []table.Header{
 		{Name: "Name"},
-		{Name: "Device"},
-		{Name: "SizeLimitBytes"},
-		{Name: "Driver"},
-		{Name: "Handle"},
+		{Name: "CPU"},
+		{Name: "Memory"},
 	}
 )
 
-var Volume, VolumeSlice = tableconverter.ForType[*ori.Volume]( //nolint:revive
+var MachineClass, MachineClassSlice = tableconverter.ForType[*ori.MachineClass]( //nolint:revive
 	func() ([]table.Header, error) {
-		return volumeHeaders, nil
+		return machineClassHeaders, nil
 	},
-	func(volume *ori.Volume) ([]table.Row, error) {
+	func(class *ori.MachineClass) ([]table.Row, error) {
 		return []table.Row{
 			{
-				volume.MachineId,
-				volume.Name,
-				volume.Device,
-				volume.GetEmptyDisk().GetSizeLimitBytes(),
-				volume.GetAccess().GetDriver(),
-				volume.GetAccess().GetHandle(),
+				class.Name,
+				resource.NewMilliQuantity(class.Capabilities.CpuMillis, resource.DecimalSI).String(),
+				resource.NewQuantity(int64(class.Capabilities.MemoryBytes), resource.DecimalSI).String(),
 			},
 		}, nil
 	},
@@ -51,7 +46,7 @@ var Volume, VolumeSlice = tableconverter.ForType[*ori.Volume]( //nolint:revive
 
 func init() {
 	RegistryBuilder.Register(
-		tableconverter.ToTaggedAny(Volume),
-		tableconverter.ToTaggedAny(VolumeSlice),
+		tableconverter.ToTaggedAny(MachineClass),
+		tableconverter.ToTaggedAny(MachineClassSlice),
 	)
 }

@@ -12,33 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package machinetableconverters
+package machine
 
 import (
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	"github.com/onmetal/onmetal-api/orictl/table"
 	"github.com/onmetal/onmetal-api/orictl/table/tableconverter"
-	"k8s.io/apimachinery/pkg/api/resource"
 )
 
 var (
-	machineClassHeaders = []table.Header{
+	machineHeaders = []table.Header{
+		{Name: "ID"},
+		{Name: "Namespace"},
 		{Name: "Name"},
-		{Name: "CPU"},
-		{Name: "Memory"},
+		{Name: "UID"},
 	}
 )
 
-var MachineClass, MachineClassSlice = tableconverter.ForType[*ori.MachineClass]( //nolint:revive
+var Machine, MachineSlice = tableconverter.ForType[*ori.Machine]( //nolint:revive
 	func() ([]table.Header, error) {
-		return machineClassHeaders, nil
+		return machineHeaders, nil
 	},
-	func(class *ori.MachineClass) ([]table.Row, error) {
+	func(machine *ori.Machine) ([]table.Row, error) {
 		return []table.Row{
 			{
-				class.Name,
-				resource.NewMilliQuantity(class.Capabilities.CpuMillis, resource.DecimalSI).String(),
-				resource.NewQuantity(int64(class.Capabilities.MemoryBytes), resource.DecimalSI).String(),
+				machine.Id,
+				machine.Metadata.Namespace,
+				machine.Metadata.Name,
+				machine.Metadata.Uid,
 			},
 		}, nil
 	},
@@ -46,7 +47,7 @@ var MachineClass, MachineClassSlice = tableconverter.ForType[*ori.MachineClass](
 
 func init() {
 	RegistryBuilder.Register(
-		tableconverter.ToTaggedAny(MachineClass),
-		tableconverter.ToTaggedAny(MachineClassSlice),
+		tableconverter.ToTaggedAny(Machine),
+		tableconverter.ToTaggedAny(MachineSlice),
 	)
 }

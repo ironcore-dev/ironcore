@@ -12,23 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package vcm
+package delete
 
 import (
-	"context"
-	"errors"
-
-	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
+	clicommon "github.com/onmetal/onmetal-api/orictl/cli/common"
+	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-volume/orictlvolume/common"
+	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-volume/orictlvolume/delete/volume"
+	"github.com/spf13/cobra"
 )
 
-var (
-	ErrNoMatchingVolumeClass        = errors.New("no matching volume class")
-	ErrAmbiguousMatchingVolumeClass = errors.New("ambiguous matching volume classes")
-)
+func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cobra.Command {
+	cmd := &cobra.Command{
+		Use: "delete",
+	}
 
-type VolumeClassMapper interface {
-	manager.Runnable
-	GetVolumeClassFor(ctx context.Context, name string, capabilities *ori.VolumeClassCapabilities) (*ori.VolumeClass, error)
-	WaitForSync(ctx context.Context) error
+	cmd.AddCommand(
+		volume.Command(streams, clientFactory),
+	)
+
+	return cmd
 }

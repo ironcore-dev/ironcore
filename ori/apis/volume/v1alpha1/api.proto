@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package storage.v1alpha1;
-option go_package = "ori/apis/storage/v1alpha1";
+option go_package = "ori/apis/volume/v1alpha1";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 

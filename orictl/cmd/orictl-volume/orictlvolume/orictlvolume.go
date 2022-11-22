@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package orictlmachine
+package orictlvolume
 
 import (
 	goflag "flag"
 
 	clicommon "github.com/onmetal/onmetal-api/orictl/cli/common"
-	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-machine/orictlmachine/common"
-	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-machine/orictlmachine/create"
-	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-machine/orictlmachine/delete"
-	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-machine/orictlmachine/get"
-	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-machine/orictlmachine/update"
+	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-volume/orictlvolume/common"
+	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-volume/orictlvolume/create"
+	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-volume/orictlvolume/delete"
+	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-volume/orictlvolume/get"
 	"github.com/spf13/cobra"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
@@ -35,7 +34,7 @@ func Command(streams clicommon.Streams) *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use: "orictl-machine",
+		Use: "orictl-volume",
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			logger := zap.New(zap.UseFlagOptions(&zapOpts))
 			ctrl.SetLogger(logger)
@@ -51,9 +50,8 @@ func Command(streams clicommon.Streams) *cobra.Command {
 
 	cmd.AddCommand(
 		get.Command(streams, &clientOpts),
-		create.Command(streams, &clientOpts),
 		delete.Command(streams, &clientOpts),
-		update.Command(streams, &clientOpts),
+		create.Command(streams, &clientOpts),
 	)
 
 	return cmd

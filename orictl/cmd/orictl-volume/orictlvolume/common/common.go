@@ -17,27 +17,25 @@ package common
 import (
 	"fmt"
 
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	orimachineutils "github.com/onmetal/onmetal-api/ori/utils/machine"
+	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
+	orivolumeutils "github.com/onmetal/onmetal-api/ori/utils/volume"
 	"github.com/onmetal/onmetal-api/orictl/renderer"
-	"github.com/onmetal/onmetal-api/orictl/renderers/machine"
+	"github.com/onmetal/onmetal-api/orictl/renderers/volume"
 	"github.com/spf13/pflag"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-var (
-	Renderer = renderer.NewRegistry()
-)
+var Renderer = renderer.NewRegistry()
 
 func init() {
-	if err := machine.AddToRegistry(Renderer); err != nil {
+	if err := volume.AddToRegistry(Renderer); err != nil {
 		panic(err)
 	}
 }
 
 type ClientFactory interface {
-	New() (ori.MachineRuntimeClient, func() error, error)
+	New() (ori.VolumeRuntimeClient, func() error, error)
 }
 
 type ClientOptions struct {
@@ -48,8 +46,8 @@ func (o *ClientOptions) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.Address, "address", "", "Address to the ori server.")
 }
 
-func (o *ClientOptions) New() (ori.MachineRuntimeClient, func() error, error) {
-	address, err := orimachineutils.GetAddress(o.Address)
+func (o *ClientOptions) New() (ori.VolumeRuntimeClient, func() error, error) {
+	address, err := orivolumeutils.GetAddress(o.Address)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -59,7 +57,7 @@ func (o *ClientOptions) New() (ori.MachineRuntimeClient, func() error, error) {
 		return nil, nil, fmt.Errorf("error dialing: %w", err)
 	}
 
-	return ori.NewMachineRuntimeClient(conn), conn.Close, nil
+	return ori.NewVolumeRuntimeClient(conn), conn.Close, nil
 }
 
 type OutputOptions struct {
@@ -79,8 +77,6 @@ func (o *OutputOptions) Renderer(ifEmpty string) (renderer.Renderer, error) {
 }
 
 var (
-	MachineAliases          = []string{"machines", "mach", "machs"}
-	MachineClassAliases     = []string{"machineclasses", "mc", "mcs"}
-	VolumeAliases           = []string{"volumes", "vol", "vols"}
-	NetworkInterfaceAliases = []string{"networkinterfaces", "nic", "nics"}
+	VolumeAliases      = []string{"volumes", "vol", "vols"}
+	VolumeClassAliases = []string{"volumechineclasses", "vc", "vcs"}
 )

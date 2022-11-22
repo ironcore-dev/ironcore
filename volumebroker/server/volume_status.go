@@ -19,7 +19,7 @@ import (
 	"errors"
 	"fmt"
 
-	ori "github.com/onmetal/onmetal-api/ori/apis/storage/v1alpha1"
+	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
 	"github.com/onmetal/onmetal-api/volumebroker/apiutils"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

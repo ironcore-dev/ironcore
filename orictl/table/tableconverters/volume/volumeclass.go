@@ -12,34 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package machinetableconverters
+package volume
 
 import (
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
 	"github.com/onmetal/onmetal-api/orictl/table"
 	"github.com/onmetal/onmetal-api/orictl/table/tableconverter"
 )
 
 var (
-	machineHeaders = []table.Header{
-		{Name: "ID"},
-		{Name: "Namespace"},
+	volumeClassHeaders = []table.Header{
 		{Name: "Name"},
-		{Name: "UID"},
+		{Name: "TPS"},
+		{Name: "IOPS"},
 	}
 )
 
-var Machine, MachineSlice = tableconverter.ForType[*ori.Machine]( //nolint:revive
+var VolumeClass, VolumeClassSlice = tableconverter.ForType[*ori.VolumeClass]( //nolint:revive
 	func() ([]table.Header, error) {
-		return machineHeaders, nil
+		return volumeClassHeaders, nil
 	},
-	func(machine *ori.Machine) ([]table.Row, error) {
+	func(class *ori.VolumeClass) ([]table.Row, error) {
 		return []table.Row{
 			{
-				machine.Id,
-				machine.Metadata.Namespace,
-				machine.Metadata.Name,
-				machine.Metadata.Uid,
+				class.Name,
+				class.Capabilities.Tps,
+				class.Capabilities.Iops,
 			},
 		}, nil
 	},
@@ -47,7 +45,7 @@ var Machine, MachineSlice = tableconverter.ForType[*ori.Machine]( //nolint:reviv
 
 func init() {
 	RegistryBuilder.Register(
-		tableconverter.ToTaggedAny(Machine),
-		tableconverter.ToTaggedAny(MachineSlice),
+		tableconverter.ToTaggedAny(VolumeClass),
+		tableconverter.ToTaggedAny(VolumeClassSlice),
 	)
 }

@@ -12,23 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package vcm
+package main
 
 import (
-	"context"
-	"errors"
+	"os"
 
-	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
+	clicommon "github.com/onmetal/onmetal-api/orictl/cli/common"
+	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-volume/orictlvolume"
+	ctrl "sigs.k8s.io/controller-runtime"
 )
 
-var (
-	ErrNoMatchingVolumeClass        = errors.New("no matching volume class")
-	ErrAmbiguousMatchingVolumeClass = errors.New("ambiguous matching volume classes")
-)
-
-type VolumeClassMapper interface {
-	manager.Runnable
-	GetVolumeClassFor(ctx context.Context, name string, capabilities *ori.VolumeClassCapabilities) (*ori.VolumeClass, error)
-	WaitForSync(ctx context.Context) error
+func main() {
+	ctx := ctrl.SetupSignalHandler()
+	if err := orictlvolume.Command(clicommon.OSStreams).ExecuteContext(ctx); err != nil {
+		ctrl.Log.Error(err, "Error running command")
+		os.Exit(1)
+	}
 }

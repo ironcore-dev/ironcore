@@ -19,7 +19,7 @@ import (
 	"fmt"
 
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	ori "github.com/onmetal/onmetal-api/ori/apis/storage/v1alpha1"
+	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
 	volumebrokerv1alpha1 "github.com/onmetal/onmetal-api/volumebroker/api/v1alpha1"
 	"github.com/onmetal/onmetal-api/volumebroker/apiutils"
 	corev1 "k8s.io/api/core/v1"

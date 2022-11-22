@@ -20,7 +20,7 @@ import (
 
 	"github.com/go-logr/logr"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	ori "github.com/onmetal/onmetal-api/ori/apis/storage/v1alpha1"
+	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
 	volumebrokerv1alpha1 "github.com/onmetal/onmetal-api/volumebroker/api/v1alpha1"
 	"github.com/onmetal/onmetal-api/volumebroker/apiutils"
 	"github.com/onmetal/onmetal-api/volumebroker/cleaner"

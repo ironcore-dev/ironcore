@@ -25,7 +25,7 @@ import (
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	onmetalapiclient "github.com/onmetal/onmetal-api/apiutils/client"
 	"github.com/onmetal/onmetal-api/apiutils/predicates"
-	ori "github.com/onmetal/onmetal-api/ori/apis/storage/v1alpha1"
+	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
 	volumepoolletv1alpha1 "github.com/onmetal/onmetal-api/volumepoollet/api/v1alpha1"
 	"github.com/onmetal/onmetal-api/volumepoollet/controllers/events"
 	"github.com/onmetal/onmetal-api/volumepoollet/vcm"

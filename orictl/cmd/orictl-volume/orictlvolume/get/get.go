@@ -12,20 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package machinetableconverters
+package get
 
 import (
-	"github.com/onmetal/onmetal-api/orictl/table/tableconverter"
+	clicommon "github.com/onmetal/onmetal-api/orictl/cli/common"
+	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-volume/orictlvolume/common"
+	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-volume/orictlvolume/get/volume"
+	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-volume/orictlvolume/get/volumeclass"
+	"github.com/spf13/cobra"
 )
 
-var (
-	RegistryBuilder tableconverter.RegistryBuilder
-	AddToRegistry   = RegistryBuilder.AddToRegistry
-	Registry        = tableconverter.NewRegistry()
-)
-
-func init() {
-	if err := AddToRegistry(Registry); err != nil {
-		panic(err)
+func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cobra.Command {
+	cmd := &cobra.Command{
+		Use: "get",
 	}
+
+	cmd.AddCommand(
+		volume.Command(streams, clientFactory),
+		volumeclass.Command(streams, clientFactory),
+	)
+
+	return cmd
 }

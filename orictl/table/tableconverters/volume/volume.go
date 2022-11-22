@@ -12,37 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package machinetableconverters
+package volume
 
 import (
-	"strings"
-
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
 	"github.com/onmetal/onmetal-api/orictl/table"
 	"github.com/onmetal/onmetal-api/orictl/table/tableconverter"
 )
 
 var (
-	networkInterfaceHeaders = []table.Header{
-		{Name: "Machine ID"},
+	volumeHeaders = []table.Header{
+		{Name: "ID"},
+		{Name: "Namespace"},
 		{Name: "Name"},
-		{Name: "Network Handle"},
-		{Name: "IPs"},
+		{Name: "UID"},
 	}
 )
 
-var NetworkInterface, NetworkInterfaceSlice = tableconverter.ForType[*ori.NetworkInterface]( //nolint:revive
+var Volume, VolumeSlice = tableconverter.ForType[*ori.Volume]( //nolint:revive
 	func() ([]table.Header, error) {
-		return networkInterfaceHeaders, nil
+		return volumeHeaders, nil
 	},
-	func(networkInterface *ori.NetworkInterface) ([]table.Row, error) {
+	func(volume *ori.Volume) ([]table.Row, error) {
 		return []table.Row{
 			{
-				networkInterface.MachineId,
-				networkInterface.Name,
-				networkInterface.Network.Handle,
-				strings.Join(networkInterface.Ips, ","),
-				networkInterface.GetVirtualIp().GetIp(),
+				volume.Id,
+				volume.Metadata.Namespace,
+				volume.Metadata.Name,
+				volume.Metadata.Uid,
 			},
 		}, nil
 	},
@@ -50,7 +47,7 @@ var NetworkInterface, NetworkInterfaceSlice = tableconverter.ForType[*ori.Networ
 
 func init() {
 	RegistryBuilder.Register(
-		tableconverter.ToTaggedAny(NetworkInterface),
-		tableconverter.ToTaggedAny(NetworkInterfaceSlice),
+		tableconverter.ToTaggedAny(Volume),
+		tableconverter.ToTaggedAny(VolumeSlice),
 	)
 }

@@ -12,23 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package vcm
+package volume
 
 import (
-	"context"
-	"errors"
-
-	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
+	"github.com/onmetal/onmetal-api/orictl/renderer"
+	"github.com/onmetal/onmetal-api/orictl/table/tableconverter"
+	"github.com/onmetal/onmetal-api/orictl/table/tableconverters/volume"
 )
 
 var (
-	ErrNoMatchingVolumeClass        = errors.New("no matching volume class")
-	ErrAmbiguousMatchingVolumeClass = errors.New("ambiguous matching volume classes")
+	RegistryBuilder renderer.RegistryBuilder
+	AddToRegistry   = RegistryBuilder.AddToRegistry
 )
 
-type VolumeClassMapper interface {
-	manager.Runnable
-	GetVolumeClassFor(ctx context.Context, name string, capabilities *ori.VolumeClassCapabilities) (*ori.VolumeClass, error)
-	WaitForSync(ctx context.Context) error
+func init() {
+	RegistryBuilder.Add(renderer.AddToRegistry)
+	RegistryBuilder.Add(func(registry *renderer.Registry) error {
+		tableConverter := tableconverter.NewRegistry()
+		if err := volume.AddToRegistry(tableConverter); err != nil {
+			return err
+		}
+		return registry.Register("table", renderer.NewTable(tableConverter))
+	})
 }

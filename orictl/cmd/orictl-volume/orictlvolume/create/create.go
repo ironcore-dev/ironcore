@@ -12,27 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package machinerenderers
+package create
 
 import (
-	"github.com/onmetal/onmetal-api/orictl/renderer"
-	"github.com/onmetal/onmetal-api/orictl/table/machinetableconverters"
+	clicommon "github.com/onmetal/onmetal-api/orictl/cli/common"
+	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-volume/orictlvolume/common"
+	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-volume/orictlvolume/create/volume"
+	"github.com/spf13/cobra"
 )
 
-var (
-	RegistryBuilder renderer.RegistryBuilder
-	AddToRegistry   = RegistryBuilder.AddToRegistry
-	Registry        *renderer.Registry
-)
+func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cobra.Command {
+	cmd := &cobra.Command{
+		Use: "create",
+	}
 
-func init() {
-	RegistryBuilder.Add(renderer.AddToRegistry)
-	RegistryBuilder.Register(
-		"table", renderer.NewTable(machinetableconverters.Registry),
+	cmd.AddCommand(
+		volume.Command(streams, clientFactory),
 	)
 
-	Registry = renderer.NewRegistry()
-	if err := AddToRegistry(Registry); err != nil {
-		panic(err)
-	}
+	return cmd
 }
