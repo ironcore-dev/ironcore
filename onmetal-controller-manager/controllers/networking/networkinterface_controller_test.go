@@ -25,6 +25,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 )
 
 var _ = Describe("NetworkInterfaceReconciler", func() {
@@ -76,6 +77,7 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 			Expect(k8sClient.Get(ctx, nicKey, nic)).To(Succeed())
 			return nic.Status
 		}).Should(SatisfyAll(
+			HaveField("State", networkingv1alpha1.NetworkInterfaceStateAvailable),
 			HaveField("NetworkHandle", networkHandle),
 			HaveField("IPs", []commonv1alpha1.IP{commonv1alpha1.MustParseIP("10.0.0.1")}),
 		))
@@ -157,12 +159,11 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 			g.Expect(prefix.Status.Phase).To(Equal(ipamv1alpha1.PrefixPhaseAllocated))
 		}).Should(Succeed())
 
-		By("waiting for the network interface to report the correct ips")
-		nicKey := client.ObjectKeyFromObject(nic)
-		Eventually(func(g Gomega) []commonv1alpha1.IP {
-			Expect(k8sClient.Get(ctx, nicKey, nic)).To(Succeed())
-			return nic.Status.IPs
-		}).Should(Equal([]commonv1alpha1.IP{commonv1alpha1.MustParseIP("10.0.0.1")}))
+		By("waiting for the network interface to be available and report the correct ips")
+		Eventually(Object(nic)).Should(HaveField("Status", SatisfyAll(
+			HaveField("State", networkingv1alpha1.NetworkInterfaceStateAvailable),
+			HaveField("IPs", []commonv1alpha1.IP{commonv1alpha1.MustParseIP("10.0.0.1")}),
+		)))
 	})
 
 	It("should create and manage ephemeral virtual ips", func() {
@@ -234,10 +235,10 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 		Expect(k8sClient.Status().Patch(ctx, virtualIP, client.MergeFrom(baseVirtualIP))).To(Succeed())
 
 		By("waiting for the virtual ip to be reported in the network interface status")
-		nicKey := client.ObjectKeyFromObject(nic)
-		Eventually(func() *commonv1alpha1.IP {
-			Expect(k8sClient.Get(ctx, nicKey, nic)).To(Succeed())
-			return nic.Status.VirtualIP
-		}).Should(Equal(commonv1alpha1.MustParseNewIP("10.0.0.1")))
+		Eventually(Object(nic)).Should(HaveField("Status", SatisfyAll(
+			HaveField("State", networkingv1alpha1.NetworkInterfaceStateAvailable),
+			HaveField("IPs", []commonv1alpha1.IP{commonv1alpha1.MustParseIP("192.168.178.1")}),
+			HaveField("VirtualIP", commonv1alpha1.MustParseNewIP("10.0.0.1")),
+		)))
 	})
 })

@@ -21,6 +21,7 @@ import (
 
 	"github.com/go-logr/logr"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
+	onmetalapiclient "github.com/onmetal/onmetal-api/onmetal-controller-manager/client"
 	"go4.org/netipx"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -78,7 +79,7 @@ func (s *PrefixAllocationScheduler) prefixForAllocation(ctx context.Context, log
 	if err := s.List(ctx, list,
 		client.InNamespace(allocation.Namespace),
 		client.MatchingLabelsSelector{Selector: sel},
-		client.MatchingFields{PrefixSpecIPFamilyField: string(allocation.Spec.IPFamily)},
+		client.MatchingFields{onmetalapiclient.PrefixSpecIPFamilyField: string(allocation.Spec.IPFamily)},
 	); err != nil {
 		return "", fmt.Errorf("error listing prefixes: %w", err)
 	}
@@ -171,20 +172,9 @@ func (s *PrefixAllocationScheduler) reconcile(ctx context.Context, log logr.Logg
 	return ctrl.Result{}, nil
 }
 
-const (
-	prefixAllocationSpecIPFamilyField = "spec.ipFamily"
-)
-
 func (s *PrefixAllocationScheduler) SetupWithManager(mgr manager.Manager) error {
 	ctx := context.Background()
 	log := ctrl.Log.WithName("prefixallocationscheduler").WithName("setup")
-
-	if err := mgr.GetFieldIndexer().IndexField(ctx, &ipamv1alpha1.PrefixAllocation{}, prefixAllocationSpecIPFamilyField, func(obj client.Object) []string {
-		allocation := obj.(*ipamv1alpha1.PrefixAllocation)
-		return []string{string(allocation.Spec.IPFamily)}
-	}); err != nil {
-		return err
-	}
 
 	return ctrl.NewControllerManagedBy(mgr).
 		Named("prefixallocationscheduler").
@@ -204,7 +194,12 @@ func (s *PrefixAllocationScheduler) enqueueByMatchingPrefix(ctx context.Context,
 		}
 
 		list := &ipamv1alpha1.PrefixAllocationList{}
-		if err := s.List(ctx, list, client.MatchingFields{PrefixSpecIPFamilyField: string(prefix.Spec.IPFamily)}); err != nil {
+		if err := s.List(ctx, list,
+			client.InNamespace(prefix.Namespace),
+			client.MatchingFields{
+				onmetalapiclient.PrefixAllocationSpecIPFamilyField: string(prefix.Spec.IPFamily),
+			},
+		); err != nil {
 			log.Error(err, "Error listing prefix allocations")
 			return nil
 		}

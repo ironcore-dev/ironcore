@@ -181,17 +181,6 @@ rules:
 - apiGroups:
   - networking.api.onmetal.de
   resources:
-  - networkinterfacebindings
-  verbs:
-  - create
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - networking.api.onmetal.de
-  resources:
   - networkinterfaces
   verbs:
   - create

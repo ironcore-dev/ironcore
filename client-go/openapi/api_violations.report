@@ -160,7 +160,6 @@ API rule violation: names_match,github.com/onmetal/onmetal-api/api/networking/v1
 API rule violation: names_match,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NATGatewayStatus,IPs
 API rule violation: names_match,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NetworkInterfaceSpec,IPs
 API rule violation: names_match,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NetworkInterfaceStatus,IPs
-API rule violation: names_match,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NetworkInterfaceStatus,LastPhaseTransitionTime
 API rule violation: names_match,github.com/onmetal/onmetal-api/api/networking/v1alpha1,VirtualIPStatus,LastPhaseTransitionTime
 API rule violation: names_match,k8s.io/api/core/v1,AzureDiskVolumeSource,DataDiskURI
 API rule violation: names_match,k8s.io/api/core/v1,ContainerStatus,LastTerminationState

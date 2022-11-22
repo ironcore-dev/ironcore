@@ -15,8 +15,14 @@
 package events
 
 const (
+	ErrorGettingNetworkHandle = "ErrorGettingNetworkHandle"
+	ErrorApplyingIPs          = "ErrorApplyingIPs"
+	ErrorApplyingVirtualIP    = "ErrorApplyingVirtualIP"
+
+	NetworkNotReady   = "NetworkNotReady"
+	IPsNotReady       = "IPsNotReady"
+	VirtualIPNotReady = "VirtualIPNotReady"
+
 	FailedBindingNetworkInterface = "FailedBindingNetworkInterface"
 	FailedBindingMachine          = "FailedBindingMachine"
-	FailedApplyingIPs             = "FailedApplyingIPs"
-	FailedApplyingVirtualIP       = "FailedApplyingVirtualIP"
 )

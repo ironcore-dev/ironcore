@@ -56,6 +56,11 @@ type VirtualIPSource struct {
 
 // NetworkInterfaceStatus defines the observed state of NetworkInterface
 type NetworkInterfaceStatus struct {
+	// State is the NetworkInterfaceState of the NetworkInterface.
+	State NetworkInterfaceState `json:"state,omitempty"`
+	// LastStateTransitionTime is the last time the State transitioned from one value to another.
+	LastStateTransitionTime *metav1.Time `json:"lastStateTransitionTime,omitempty"`
+
 	// NetworkHandle is the handle of the network the network interface is part of.
 	NetworkHandle string `json:"networkHandle,omitempty"`
 	// IPs represent the effective IP addresses of the NetworkInterface
@@ -66,8 +71,20 @@ type NetworkInterfaceStatus struct {
 	// Phase is the NetworkInterfacePhase of the NetworkInterface.
 	Phase NetworkInterfacePhase `json:"phase,omitempty"`
 	// LastPhaseTransitionTime is the last time the Phase transitioned from one value to another.
-	LastPhaseTransitionTime *metav1.Time `json:"phaseLastTransitionTime,omitempty"`
+	LastPhaseTransitionTime *metav1.Time `json:"lastPhaseTransitionTime,omitempty"`
 }
+
+// NetworkInterfaceState is the onmetal-api state of a NetworkInterface.
+type NetworkInterfaceState string
+
+const (
+	// NetworkInterfaceStatePending is used for any NetworkInterface that is pending.
+	NetworkInterfaceStatePending NetworkInterfaceState = "Pending"
+	// NetworkInterfaceStateAvailable is used for any NetworkInterface where all properties are valid.
+	NetworkInterfaceStateAvailable NetworkInterfaceState = "Available"
+	// NetworkInterfaceStateError is used for any NetworkInterface where any property has an error.
+	NetworkInterfaceStateError NetworkInterfaceState = "Error"
+)
 
 // NetworkInterfacePhase is the binding phase of a NetworkInterface.
 type NetworkInterfacePhase string

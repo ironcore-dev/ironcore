@@ -988,15 +988,21 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IP
           elementRelationship: atomic
+    - name: lastPhaseTransitionTime
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
+    - name: lastStateTransitionTime
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
     - name: networkHandle
       type:
         scalar: string
     - name: phase
       type:
         scalar: string
-    - name: phaseLastTransitionTime
+    - name: state
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
+        scalar: string
     - name: virtualIP
       type:
         namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IP

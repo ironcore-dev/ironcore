@@ -3620,6 +3620,19 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkInterfaceStatus(ref commo
 				Description: "NetworkInterfaceStatus defines the observed state of NetworkInterface",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
+					"state": {
+						SchemaProps: spec.SchemaProps{
+							Description: "State is the NetworkInterfaceState of the NetworkInterface.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"lastStateTransitionTime": {
+						SchemaProps: spec.SchemaProps{
+							Description: "LastStateTransitionTime is the last time the State transitioned from one value to another.",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
+						},
+					},
 					"networkHandle": {
 						SchemaProps: spec.SchemaProps{
 							Description: "NetworkHandle is the handle of the network the network interface is part of.",
@@ -3654,7 +3667,7 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkInterfaceStatus(ref commo
 							Format:      "",
 						},
 					},
-					"phaseLastTransitionTime": {
+					"lastPhaseTransitionTime": {
 						SchemaProps: spec.SchemaProps{
 							Description: "LastPhaseTransitionTime is the last time the Phase transitioned from one value to another.",
 							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),

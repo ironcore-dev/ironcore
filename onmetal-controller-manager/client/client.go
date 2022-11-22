@@ -18,6 +18,7 @@ import (
 	"context"
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -28,6 +29,9 @@ const (
 
 	NetworkInterfaceVirtualIPNames = "networkinterface-virtual-ip-names"
 	NetworkInterfaceNetworkName    = "networkinterface-network-name"
+
+	PrefixSpecIPFamilyField           = "prefix-spec-ipfamily"
+	PrefixAllocationSpecIPFamilyField = "prefixallocation-spec-ipfamily"
 )
 
 func SetupMachineSpecNetworkInterfaceNamesFieldIndexer(ctx context.Context, indexer client.FieldIndexer) error {
@@ -72,5 +76,19 @@ func SetupNetworkInterfaceNetworkNameFieldIndexer(ctx context.Context, indexer c
 	return indexer.IndexField(ctx, &networkingv1alpha1.NetworkInterface{}, NetworkInterfaceNetworkName, func(obj client.Object) []string {
 		nic := obj.(*networkingv1alpha1.NetworkInterface)
 		return []string{nic.Spec.NetworkRef.Name}
+	})
+}
+
+func SetupPrefixSpecIPFamilyFieldIndexer(ctx context.Context, indexer client.FieldIndexer) error {
+	return indexer.IndexField(ctx, &ipamv1alpha1.Prefix{}, PrefixSpecIPFamilyField, func(obj client.Object) []string {
+		prefix := obj.(*ipamv1alpha1.Prefix)
+		return []string{string(prefix.Spec.IPFamily)}
+	})
+}
+
+func SetupPrefixAllocationSpecIPFamilyFieldIndexer(ctx context.Context, indexer client.FieldIndexer) error {
+	return indexer.IndexField(ctx, &ipamv1alpha1.PrefixAllocation{}, PrefixAllocationSpecIPFamilyField, func(obj client.Object) []string {
+		prefixAllocation := obj.(*ipamv1alpha1.PrefixAllocation)
+		return []string{string(prefixAllocation.Spec.IPFamily)}
 	})
 }

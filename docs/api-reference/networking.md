@@ -1778,6 +1778,32 @@ VirtualIPSource
 </tr>
 </tbody>
 </table>
+<h3 id="networking.api.onmetal.de/v1alpha1.NetworkInterfaceState">NetworkInterfaceState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceStatus">NetworkInterfaceStatus</a>)
+</p>
+<div>
+<p>NetworkInterfaceState is the onmetal-api state of a NetworkInterface.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Available&#34;</p></td>
+<td><p>NetworkInterfaceStateAvailable is used for any NetworkInterface where all properties are valid.</p>
+</td>
+</tr><tr><td><p>&#34;Error&#34;</p></td>
+<td><p>NetworkInterfaceStateError is used for any NetworkInterface where any property has an error.</p>
+</td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>NetworkInterfaceStatePending is used for any NetworkInterface that is pending.</p>
+</td>
+</tr></tbody>
+</table>
 <h3 id="networking.api.onmetal.de/v1alpha1.NetworkInterfaceStatus">NetworkInterfaceStatus
 </h3>
 <p>
@@ -1794,6 +1820,32 @@ VirtualIPSource
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<code>state</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceState">
+NetworkInterfaceState
+</a>
+</em>
+</td>
+<td>
+<p>State is the NetworkInterfaceState of the NetworkInterface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastStateTransitionTime</code><br/>
+<em>
+<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastStateTransitionTime is the last time the State transitioned from one value to another.</p>
+</td>
+</tr>
 <tr>
 <td>
 <code>networkHandle</code><br/>
@@ -1842,7 +1894,7 @@ NetworkInterfacePhase
 </tr>
 <tr>
 <td>
-<code>phaseLastTransitionTime</code><br/>
+<code>lastPhaseTransitionTime</code><br/>
 <em>
 <a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
 Kubernetes meta/v1.Time

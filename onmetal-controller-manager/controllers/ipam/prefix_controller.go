@@ -29,6 +29,7 @@ import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	"github.com/onmetal/onmetal-api/apiutils/equality"
+	onmetalapiclient "github.com/onmetal/onmetal-api/onmetal-controller-manager/client"
 	"go4.org/netipx"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -685,7 +686,7 @@ func (r *PrefixReconciler) enqueueByPrefixParentSelector(ctx context.Context, lo
 		list := &ipamv1alpha1.PrefixList{}
 		if err := r.List(ctx, list,
 			client.InNamespace(prefix.Namespace),
-			client.MatchingFields{PrefixSpecIPFamilyField: string(prefix.Spec.IPFamily)},
+			client.MatchingFields{onmetalapiclient.PrefixSpecIPFamilyField: string(prefix.Spec.IPFamily)},
 		); err != nil {
 			log.V(1).Error(err, "Error listing prefixes", "Namespace", prefix.Namespace, "IPFamily", prefix.Spec.IPFamily)
 			return nil

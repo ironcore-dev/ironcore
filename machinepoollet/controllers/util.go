@@ -382,12 +382,11 @@ func (r *MachineReconciler) getORINetworkInterfaceConfig(
 			return nil, err
 		}
 
-		// TODO: The network interface should expose a ready state to avoid this lengthy check
-		if len(networkInterface.Spec.IPFamilies) != len(networkInterface.Status.IPs) || networkInterface.Status.NetworkHandle == "" {
+		if networkInterface.Status.State != networkingv1alpha1.NetworkInterfaceStateAvailable {
 			return nil, NewDependencyNotReadyError(
 				networkingv1alpha1.Resource("networkinterfaces"),
 				client.ObjectKeyFromObject(networkInterface).String(),
-				fmt.Errorf("not all ips have been allocated"),
+				fmt.Errorf("network interface is not in state %s but %s", networkingv1alpha1.NetworkStateAvailable, networkInterface.Status.State),
 			)
 		}
 

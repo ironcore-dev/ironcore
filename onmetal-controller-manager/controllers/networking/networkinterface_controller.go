@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
@@ -38,23 +39,18 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
-var (
-	errNetworkNotReady = errors.New("network not ready")
-)
-
 type NetworkInterfaceReconciler struct {
 	record.EventRecorder
 	client.Client
 	Scheme *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networks,verbs=get;list;watch
+//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces,verbs=get;list;watch;update;patch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces/finalizers,verbs=update
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=virtualips,verbs=get;create;list;watch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfacebindings,verbs=get;list;watch;create;update;patch
 //+kubebuilder:rbac:groups=ipam.api.onmetal.de,resources=prefix,verbs=get;create;list;update;patch;watch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networks,verbs=get;list;watch
 
 func (r *NetworkInterfaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
@@ -78,47 +74,71 @@ func (r *NetworkInterfaceReconciler) delete(ctx context.Context, log logr.Logger
 }
 
 func (r *NetworkInterfaceReconciler) reconcile(ctx context.Context, log logr.Logger, nic *networkingv1alpha1.NetworkInterface) (ctrl.Result, error) {
+	var anyDependencyNotReady bool
+
 	log.V(1).Info("Getting network handle")
-	networkHandle, err := r.getNetworkHandle(ctx, nic)
+	networkHandle, networkNotReadyReason, err := r.getNetworkHandle(ctx, nic)
 	if err != nil {
-		if !errors.Is(err, errNetworkNotReady) {
-			return ctrl.Result{}, fmt.Errorf("error getting network handle: %w", err)
-		}
-		r.Eventf(nic, corev1.EventTypeNormal, "NetworkNotReady", "The network of the network interface is not ready")
+		r.Eventf(nic, corev1.EventTypeWarning, events.ErrorGettingNetworkHandle, "Error getting network handle: %v", err)
 		return ctrl.Result{}, nil
+	}
+	if networkNotReadyReason != "" {
+		anyDependencyNotReady = true
+		r.Event(nic, corev1.EventTypeNormal, events.NetworkNotReady, networkNotReadyReason)
 	}
 
 	log.V(1).Info("Applying IPs")
-	ips, err := r.applyIPs(ctx, nic)
+	ips, ipsNotReadyReason, err := r.applyIPs(ctx, nic)
 	if err != nil {
+		r.Eventf(nic, corev1.EventTypeWarning, events.ErrorApplyingIPs, "Error applying ips: %v", err)
 		return ctrl.Result{}, err
 	}
-	log.V(1).Info("Successfully applied IPs", "IPs", ips)
+	if ipsNotReadyReason != "" {
+		anyDependencyNotReady = true
+		r.Event(nic, corev1.EventTypeNormal, events.IPsNotReady, ipsNotReadyReason)
+	}
 
 	log.V(1).Info("Applying virtual IPs")
-	virtualIP, err := r.applyVirtualIP(ctx, log, nic)
+	virtualIP, virtualIPNotReadyReason, err := r.applyVirtualIP(ctx, log, nic)
 	if err != nil {
+		r.Eventf(nic, corev1.EventTypeWarning, events.ErrorApplyingVirtualIP, "Error applying virtual ip: %v", err)
 		return ctrl.Result{}, err
 	}
-	log.V(1).Info("Successfully applied virtual IP")
+	if virtualIPNotReadyReason != "" {
+		anyDependencyNotReady = true
+		r.Event(nic, corev1.EventTypeNormal, events.VirtualIPNotReady, virtualIPNotReadyReason)
+	}
 
-	log.V(1).Info("Patching status")
-	if err := r.patchStatus(ctx, nic, networkHandle, ips, virtualIP); err != nil {
+	var state networkingv1alpha1.NetworkInterfaceState
+	if anyDependencyNotReady {
+		state = networkingv1alpha1.NetworkInterfaceStatePending
+	} else {
+		state = networkingv1alpha1.NetworkInterfaceStateAvailable
+	}
+
+	log.V(1).Info("Updating network interface status", "State", state)
+	if err := r.updateStatus(ctx, nic, state, networkHandle, ips, virtualIP); err != nil {
 		return ctrl.Result{}, err
 	}
-	log.V(1).Info("Successfully patched status")
+	log.V(1).Info("Successfully updated network status", "State", state)
 	return ctrl.Result{}, nil
 }
 
-func (r *NetworkInterfaceReconciler) patchStatus(
+func (r *NetworkInterfaceReconciler) updateStatus(
 	ctx context.Context,
 	nic *networkingv1alpha1.NetworkInterface,
+	state networkingv1alpha1.NetworkInterfaceState,
 	networkHandle string,
 	ips []commonv1alpha1.IP,
 	virtualIP *commonv1alpha1.IP,
 ) error {
+	now := metav1.Now()
 	base := nic.DeepCopy()
 
+	if nic.Status.State != state {
+		nic.Status.LastStateTransitionTime = &now
+	}
+	nic.Status.State = state
 	nic.Status.NetworkHandle = networkHandle
 	nic.Status.IPs = ips
 	nic.Status.VirtualIP = virtualIP
@@ -129,53 +149,49 @@ func (r *NetworkInterfaceReconciler) patchStatus(
 	return nil
 }
 
-func (r *NetworkInterfaceReconciler) getNetworkHandle(ctx context.Context, nic *networkingv1alpha1.NetworkInterface) (string, error) {
+func (r *NetworkInterfaceReconciler) getNetworkHandle(ctx context.Context, nic *networkingv1alpha1.NetworkInterface) (networkHandle string, notReadyReason string, err error) {
 	network := &networkingv1alpha1.Network{}
 	networkKey := client.ObjectKey{Namespace: nic.Namespace, Name: nic.Spec.NetworkRef.Name}
 	if err := r.Get(ctx, networkKey, network); err != nil {
 		if !apierrors.IsNotFound(err) {
-			return "", fmt.Errorf("error getting network %s: %w", networkKey, err)
+			return "", "", fmt.Errorf("error getting network %s: %w", networkKey, err)
 		}
-		return "", fmt.Errorf("%w: network not found", errNetworkNotReady)
+		return "", fmt.Sprintf("Network %s not found", networkKey.Name), nil
 	}
 
 	switch state := network.Status.State; state {
 	case networkingv1alpha1.NetworkStateAvailable:
-		return network.Spec.Handle, nil
+		return network.Spec.Handle, "", nil
 	default:
-		return "", fmt.Errorf("%w: network is not in state %s but %s", errNetworkNotReady, networkingv1alpha1.NetworkStateAvailable, state)
+		return "", fmt.Sprintf("Network %s is not in state %s but %s", networkKey.Name, networkingv1alpha1.NetworkStateAvailable, state), nil
 	}
 }
 
-func (r *NetworkInterfaceReconciler) applyIPs(ctx context.Context, nic *networkingv1alpha1.NetworkInterface) ([]commonv1alpha1.IP, error) {
+func (r *NetworkInterfaceReconciler) applyIPs(ctx context.Context, nic *networkingv1alpha1.NetworkInterface) ([]commonv1alpha1.IP, string, error) {
 	var (
-		ips           []commonv1alpha1.IP
-		applyWarnings []string
+		ips             []commonv1alpha1.IP
+		notReadyReasons []string
 	)
 	for idx, ipSource := range nic.Spec.IPs {
-		ip, ok, applyWarning, err := r.applyIP(ctx, nic, ipSource, idx)
+		ip, notReadyReason, err := r.applyIP(ctx, nic, ipSource, idx)
 		if err != nil {
-			return nil, fmt.Errorf("[ip %d] %w", idx, err)
+			return nil, "", fmt.Errorf("[ip %d] %w", idx, err)
 		}
-		if ok {
-			ips = append(ips, ip)
+		if notReadyReason != "" {
+			notReadyReasons = append(notReadyReasons, fmt.Sprintf("[ip %d] %s", idx, notReadyReason))
+			continue
 		}
-		if applyWarning != "" {
-			applyWarnings = append(applyWarnings, applyWarning)
-		}
+
+		ips = append(ips, ip)
 	}
 
-	if len(applyWarnings) > 0 {
-		r.Eventf(nic, corev1.EventTypeWarning, events.FailedApplyingIPs, "Failed applying ip(s): %v", applyWarnings)
-	}
-
-	return ips, nil
+	return ips, strings.Join(notReadyReasons, ", "), nil
 }
 
-func (r *NetworkInterfaceReconciler) applyIP(ctx context.Context, nic *networkingv1alpha1.NetworkInterface, ipSource networkingv1alpha1.IPSource, idx int) (commonv1alpha1.IP, bool, string, error) {
+func (r *NetworkInterfaceReconciler) applyIP(ctx context.Context, nic *networkingv1alpha1.NetworkInterface, ipSource networkingv1alpha1.IPSource, idx int) (commonv1alpha1.IP, string, error) {
 	switch {
 	case ipSource.Value != nil:
-		return *ipSource.Value, true, "", nil
+		return *ipSource.Value, "", nil
 	case ipSource.Ephemeral != nil:
 		template := ipSource.Ephemeral.PrefixTemplate
 		prefix := &ipamv1alpha1.Prefix{
@@ -191,40 +207,40 @@ func (r *NetworkInterfaceReconciler) applyIP(ctx context.Context, nic *networkin
 			return nil
 		}); err != nil {
 			if !errors.Is(err, onmetalapiclientutils.ErrNotControlled) {
-				return commonv1alpha1.IP{}, false, "", fmt.Errorf("error managing ephemeral prefix %s: %w", prefix.Name, err)
+				return commonv1alpha1.IP{}, "", fmt.Errorf("error managing ephemeral prefix %s: %w", prefix.Name, err)
 			}
-			return commonv1alpha1.IP{}, false, fmt.Sprintf("prefix %s cannot be managed", prefix.Name), nil
+			return commonv1alpha1.IP{}, fmt.Sprintf("Prefix %s cannot be managed", prefix.Name), nil
 		}
 
-		if prefix.Status.Phase == ipamv1alpha1.PrefixPhaseAllocated {
-			return prefix.Spec.Prefix.IP(), true, "", nil
+		if prefix.Status.Phase != ipamv1alpha1.PrefixPhaseAllocated {
+			return commonv1alpha1.IP{}, fmt.Sprintf("Prefix %s is not in state %s but %s", prefix.Name, ipamv1alpha1.PrefixPhaseAllocated, prefix.Status.Phase), nil
 		}
-		return commonv1alpha1.IP{}, false, "", nil
+		return prefix.Spec.Prefix.IP(), "", nil
 	default:
-		return commonv1alpha1.IP{}, false, "", fmt.Errorf("unknown ip source %#v", ipSource)
+		return commonv1alpha1.IP{}, "", fmt.Errorf("unknown ip source %#v", ipSource)
 	}
 }
 
-func (r *NetworkInterfaceReconciler) applyVirtualIP(ctx context.Context, log logr.Logger, nic *networkingv1alpha1.NetworkInterface) (*commonv1alpha1.IP, error) {
+func (r *NetworkInterfaceReconciler) applyVirtualIP(ctx context.Context, log logr.Logger, nic *networkingv1alpha1.NetworkInterface) (*commonv1alpha1.IP, string, error) {
 	virtualIP := nic.Spec.VirtualIP
 	switch {
 	case virtualIP == nil:
 		log.V(1).Info("Network interface does not specify any virtual ip")
-		return nil, nil
+		return nil, "", nil
 	case virtualIP.VirtualIPRef != nil:
 		vip := &networkingv1alpha1.VirtualIP{}
 		vipKey := client.ObjectKey{Namespace: nic.Namespace, Name: virtualIP.VirtualIPRef.Name}
 		log.V(1).Info("Getting referenced virtual ip", "VirtualIPKey", vipKey)
 		if err := r.Get(ctx, vipKey, vip); err != nil {
 			if !apierrors.IsNotFound(err) {
-				return nil, fmt.Errorf("error getting referenced virtual ip claim %s: %w", vipKey, err)
+				return nil, "", fmt.Errorf("error getting referenced virtual ip claim %s: %w", vipKey, err)
 			}
 
-			r.Eventf(nic, corev1.EventTypeWarning, events.FailedApplyingVirtualIP, "Virtual IP %s not found", vipKey.Name)
-			return nil, nil
+			return nil, fmt.Sprintf("Virtual IP %s not found", vipKey.Name), nil
 		}
 
-		return r.getVirtualIPIP(log, nic, vip), nil
+		res, notReadyReason := r.getVirtualIPIP(nic, vip)
+		return res, notReadyReason, nil
 	case virtualIP.Ephemeral != nil:
 		log.V(1).Info("Managing ephemeral virtual ip claim")
 		vip := &networkingv1alpha1.VirtualIP{
@@ -242,31 +258,28 @@ func (r *NetworkInterfaceReconciler) applyVirtualIP(ctx context.Context, log log
 			return nil
 		}); err != nil {
 			if !errors.Is(onmetalapiclientutils.ErrNotControlled, err) {
-				return nil, fmt.Errorf("error managing ephemeral virtual ip: %w", err)
+				return nil, "", fmt.Errorf("error managing ephemeral virtual ip: %w", err)
 			}
 
-			r.Eventf(nic, corev1.EventTypeWarning, events.FailedApplyingVirtualIP, "Cannot manage virtual ip %s", vip.Name)
-			return nil, nil
+			return nil, fmt.Sprintf("Virtual IP %s cannot be managed", vip.Name), nil
 		}
-		return r.getVirtualIPIP(log, nic, vip), nil
+		res, notReadyReason := r.getVirtualIPIP(nic, vip)
+		return res, notReadyReason, nil
 	default:
-		return nil, fmt.Errorf("unknown virtual ip %#v", virtualIP)
+		return nil, "", fmt.Errorf("unknown virtual ip %#v", virtualIP)
 	}
 }
 
-func (r *NetworkInterfaceReconciler) getVirtualIPIP(log logr.Logger, nic *networkingv1alpha1.NetworkInterface, vip *networkingv1alpha1.VirtualIP) *commonv1alpha1.IP {
+func (r *NetworkInterfaceReconciler) getVirtualIPIP(nic *networkingv1alpha1.NetworkInterface, vip *networkingv1alpha1.VirtualIP) (*commonv1alpha1.IP, string) {
 	if !reflect.DeepEqual(vip.Spec.TargetRef, &commonv1alpha1.LocalUIDReference{Name: nic.Name, UID: nic.UID}) {
-		log.V(1).Info("Virtual ip does not target network interface", "TargetRef", vip.Spec.TargetRef)
-		return nil
+		return nil, fmt.Sprintf("Virtual IP %s does not target network interface", vip.Name)
 	}
 
 	if phase := vip.Status.Phase; phase != networkingv1alpha1.VirtualIPPhaseBound {
-		log.V(1).Info("Virtual ip is not bound", "Phase", phase)
-		return nil
+		return nil, fmt.Sprintf("Virtual IP %s is not bound", vip.Name)
 	}
 
-	log.V(1).Info("Virtual ip is up and bound", "IP", vip.Status.IP)
-	return vip.Status.IP
+	return vip.Status.IP, ""
 }
 
 func (r *NetworkInterfaceReconciler) SetupWithManager(mgr ctrl.Manager) error {

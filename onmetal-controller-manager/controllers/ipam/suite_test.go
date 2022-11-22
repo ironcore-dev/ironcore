@@ -21,6 +21,7 @@ import (
 	"testing"
 	"time"
 
+	onmetalapiclient "github.com/onmetal/onmetal-api/onmetal-controller-manager/client"
 	"github.com/onmetal/onmetal-api/testutils/envtestutils"
 	"github.com/onmetal/onmetal-api/testutils/envtestutils/apiserver"
 	. "github.com/onsi/ginkgo/v2"
@@ -116,6 +117,11 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	})
 	Expect(err).ToNot(HaveOccurred())
 
+	ctx, cancel := context.WithCancel(context.Background())
+	DeferCleanup(cancel)
+	Expect(onmetalapiclient.SetupPrefixSpecIPFamilyFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+	Expect(onmetalapiclient.SetupPrefixAllocationSpecIPFamilyFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+
 	// Register reconcilers
 	err = (&PrefixReconciler{
 		Client:                  k8sManager.GetClient(),
@@ -131,10 +137,6 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 		EventRecorder: &record.FakeRecorder{},
 	}).SetupWithManager(k8sManager)
 	Expect(err).NotTo(HaveOccurred())
-
-	ctx, cancel := context.WithCancel(context.Background())
-	DeferCleanup(cancel)
-	Expect(SetupPrefixSpecIPFamilyFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 
 	go func() {
 		defer GinkgoRecover()

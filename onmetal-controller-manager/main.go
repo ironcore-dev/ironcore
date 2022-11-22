@@ -239,8 +239,12 @@ func main() {
 	}
 
 	if controllers.Enabled(prefixController) || controllers.Enabled(prefixAllocationScheduler) {
-		if err = ipam.SetupPrefixSpecIPFamilyFieldIndexer(context.TODO(), mgr.GetFieldIndexer()); err != nil {
-			setupLog.Error(err, "unable to setup field indexer", "field", ipam.PrefixSpecIPFamilyField)
+		if err = onmetalapiclient.SetupPrefixSpecIPFamilyFieldIndexer(context.TODO(), mgr.GetFieldIndexer()); err != nil {
+			setupLog.Error(err, "unable to setup field indexer", "field", onmetalapiclient.PrefixSpecIPFamilyField)
+			os.Exit(1)
+		}
+		if err = onmetalapiclient.SetupPrefixAllocationSpecIPFamilyFieldIndexer(context.TODO(), mgr.GetFieldIndexer()); err != nil {
+			setupLog.Error(err, "unable to setup field indexer", "field", onmetalapiclient.PrefixAllocationSpecIPFamilyField)
 			os.Exit(1)
 		}
 	}
