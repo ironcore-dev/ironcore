@@ -20,6 +20,7 @@ import (
 	"github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis/storage"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/meta/table"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
@@ -32,6 +33,8 @@ var (
 	headers = []metav1.TableColumnDefinition{
 		{Name: "Name", Type: "string", Format: "name", Description: objectMetaSwaggerDoc["name"]},
 		{Name: "Age", Type: "string", Format: "date", Description: objectMetaSwaggerDoc["creationTimestamp"]},
+		{Name: "TPS", Type: "string", Description: "Amount of tps the volume class offers."},
+		{Name: "IOPS", Type: "string", Description: "Amount of iops the volume class offers."},
 	}
 )
 
@@ -55,10 +58,12 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 
 	var err error
 	tab.Rows, err = table.MetaToTableRow(obj, func(obj runtime.Object, m metav1.Object, name, age string) (cells []interface{}, err error) {
-		_ = obj.(*storage.VolumeClass)
+		volumeClass := obj.(*storage.VolumeClass)
 
 		cells = append(cells, name)
 		cells = append(cells, age)
+		cells = append(cells, volumeClass.Capabilities.Name(storage.ResourceTPS, resource.DecimalSI))
+		cells = append(cells, volumeClass.Capabilities.Name(storage.ResourceIOPS, resource.DecimalSI))
 
 		return cells, nil
 	})

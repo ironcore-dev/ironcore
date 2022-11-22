@@ -3,6 +3,5 @@ kind: MachineClass
 metadata:
   name: machineclass-sample
 capabilities:
-  onmetal.de/cpu_x86_64: 4
-  onmetal.de/ram_ecc: 16Gi
-  nvidia.com/gpu: 4
+  cpu: 4
+  memory: 16Gi

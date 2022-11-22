@@ -32,6 +32,8 @@ var (
 	headers = []metav1.TableColumnDefinition{
 		{Name: "Name", Type: "string", Format: "name", Description: objectMetaSwaggerDoc["name"]},
 		{Name: "Age", Type: "string", Format: "date", Description: objectMetaSwaggerDoc["creationTimestamp"]},
+		{Name: "CPU", Type: "string", Description: "Amount of cpu the machine class offers."},
+		{Name: "Memory", Type: "string", Description: "Amount of memory the machine class offers."},
 	}
 )
 
@@ -55,10 +57,12 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 
 	var err error
 	tab.Rows, err = table.MetaToTableRow(obj, func(obj runtime.Object, m metav1.Object, name, age string) (cells []interface{}, err error) {
-		_ = obj.(*compute.MachineClass)
+		machineClass := obj.(*compute.MachineClass)
 
 		cells = append(cells, name)
 		cells = append(cells, age)
+		cells = append(cells, machineClass.Capabilities.Cpu())
+		cells = append(cells, machineClass.Capabilities.Memory())
 
 		return cells, nil
 	})

@@ -41,6 +41,37 @@ var _ = Describe("MachineClass", func() {
 			&compute.MachineClass{ObjectMeta: metav1.ObjectMeta{Name: "foo*"}},
 			ContainElement(InvalidField("metadata.name")),
 		),
+		Entry("missing required capabilities",
+			&compute.MachineClass{},
+			ContainElements(
+				InvalidField("capabilities[cpu]"),
+				InvalidField("capabilities[memory]"),
+			),
+		),
+		Entry("invalid capabilities",
+			&compute.MachineClass{
+				Capabilities: map[corev1.ResourceName]resource.Quantity{
+					corev1.ResourceCPU:    resource.MustParse("-1"),
+					corev1.ResourceMemory: resource.MustParse("-1Gi"),
+				},
+			},
+			ContainElements(
+				InvalidField("capabilities[cpu]"),
+				InvalidField("capabilities[memory]"),
+			),
+		),
+		Entry("valid capabilities",
+			&compute.MachineClass{
+				Capabilities: map[corev1.ResourceName]resource.Quantity{
+					corev1.ResourceCPU:    resource.MustParse("300m"),
+					corev1.ResourceMemory: resource.MustParse("2Gi"),
+				},
+			},
+			Not(ContainElements(
+				InvalidField("capabilities[cpu]"),
+				InvalidField("capabilities[memory]"),
+			)),
+		),
 	)
 
 	DescribeTable("ValidateMachineClassUpdate",
@@ -51,7 +82,7 @@ var _ = Describe("MachineClass", func() {
 		Entry("immutable capabilities",
 			&compute.MachineClass{
 				Capabilities: map[corev1.ResourceName]resource.Quantity{
-					"ram": resource.MustParse("1Gi"),
+					corev1.ResourceMemory: resource.MustParse("1Gi"),
 				},
 			},
 			&compute.MachineClass{

@@ -40,6 +40,37 @@ var _ = Describe("VolumeClass", func() {
 			&storage.VolumeClass{ObjectMeta: metav1.ObjectMeta{Name: "foo*"}},
 			ContainElement(InvalidField("metadata.name")),
 		),
+		Entry("missing required capabilities",
+			&storage.VolumeClass{},
+			ContainElements(
+				InvalidField("capabilities[tps]"),
+				InvalidField("capabilities[iops]"),
+			),
+		),
+		Entry("invalid capabilities",
+			&storage.VolumeClass{
+				Capabilities: map[corev1.ResourceName]resource.Quantity{
+					storage.ResourceTPS:  resource.MustParse("-1"),
+					storage.ResourceIOPS: resource.MustParse("-1"),
+				},
+			},
+			ContainElements(
+				InvalidField("capabilities[tps]"),
+				InvalidField("capabilities[iops]"),
+			),
+		),
+		Entry("valid capabilities",
+			&storage.VolumeClass{
+				Capabilities: map[corev1.ResourceName]resource.Quantity{
+					storage.ResourceTPS:  resource.MustParse("500Mi"),
+					storage.ResourceIOPS: resource.MustParse("100"),
+				},
+			},
+			Not(ContainElements(
+				InvalidField("capabilities[tps]"),
+				InvalidField("capabilities[iops]"),
+			)),
+		),
 	)
 
 	DescribeTable("ValidateVolumeClassUpdate",
@@ -50,7 +81,7 @@ var _ = Describe("VolumeClass", func() {
 		Entry("immutable capabilities",
 			&storage.VolumeClass{
 				Capabilities: map[corev1.ResourceName]resource.Quantity{
-					"iops": resource.MustParse("1000"),
+					storage.ResourceIOPS: resource.MustParse("1000"),
 				},
 			},
 			&storage.VolumeClass{

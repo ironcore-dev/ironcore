@@ -17,6 +17,8 @@ package validation
 import (
 	onmetalapivalidation "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/api/validation"
 	"github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis/storage"
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
@@ -25,6 +27,20 @@ func ValidateVolumeClass(volumeClass *storage.VolumeClass) field.ErrorList {
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(volumeClass, false, apivalidation.NameIsDNSLabel, field.NewPath("metadata"))...)
+
+	allErrs = append(allErrs, validateVolumeClassCapabilities(volumeClass.Capabilities, field.NewPath("capabilities"))...)
+
+	return allErrs
+}
+
+func validateVolumeClassCapabilities(capabilities corev1.ResourceList, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	tps := capabilities.Name(storage.ResourceTPS, resource.DecimalSI)
+	allErrs = append(allErrs, onmetalapivalidation.ValidatePositiveQuantity(*tps, fldPath.Key(string(storage.ResourceTPS)))...)
+
+	iops := capabilities.Name(storage.ResourceIOPS, resource.DecimalSI)
+	allErrs = append(allErrs, onmetalapivalidation.ValidatePositiveQuantity(*iops, fldPath.Key(string(storage.ResourceIOPS)))...)
 
 	return allErrs
 }

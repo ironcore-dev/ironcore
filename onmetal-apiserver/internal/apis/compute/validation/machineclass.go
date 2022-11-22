@@ -19,6 +19,7 @@ package validation
 import (
 	onmetalapivalidation "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/api/validation"
 	"github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis/compute"
+	corev1 "k8s.io/api/core/v1"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
@@ -28,6 +29,20 @@ func ValidateMachineClass(machineClass *compute.MachineClass) field.ErrorList {
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(machineClass, false, apivalidation.NameIsDNSLabel, field.NewPath("metadata"))...)
+
+	allErrs = append(allErrs, validateMachineClassCapabilities(machineClass.Capabilities, field.NewPath("capabilities"))...)
+
+	return allErrs
+}
+
+func validateMachineClassCapabilities(capabilities corev1.ResourceList, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	cpu := capabilities.Cpu()
+	allErrs = append(allErrs, onmetalapivalidation.ValidatePositiveQuantity(*cpu, fldPath.Key(string(corev1.ResourceCPU)))...)
+
+	memory := capabilities.Memory()
+	allErrs = append(allErrs, onmetalapivalidation.ValidatePositiveQuantity(*memory, fldPath.Key(string(corev1.ResourceMemory)))...)
 
 	return allErrs
 }

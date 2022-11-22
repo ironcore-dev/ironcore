@@ -40,6 +40,10 @@ var _ = Describe("VolumeClass controller", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "volumeclass-",
 			},
+			Capabilities: corev1.ResourceList{
+				storagev1alpha1.ResourceTPS:  resource.MustParse("100Mi"),
+				storagev1alpha1.ResourceIOPS: resource.MustParse("100"),
+			},
 		}
 		Expect(k8sClient.Create(ctx, volumeClass)).Should(Succeed())
 
