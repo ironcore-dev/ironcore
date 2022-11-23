@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package compute.v1alpha1;
+package machine.v1alpha1;
 option go_package = "ori/apis/machine/v1alpha1";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
