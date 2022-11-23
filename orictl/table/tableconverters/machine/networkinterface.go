@@ -28,6 +28,7 @@ var (
 		{Name: "Name"},
 		{Name: "Network Handle"},
 		{Name: "IPs"},
+		{Name: "State"},
 	}
 )
 
@@ -43,6 +44,7 @@ var NetworkInterface, NetworkInterfaceSlice = tableconverter.ForType[*ori.Networ
 				networkInterface.Network.Handle,
 				strings.Join(networkInterface.Ips, ","),
 				networkInterface.GetVirtualIp().GetIp(),
+				networkInterface.State.String(),
 			},
 		}, nil
 	},

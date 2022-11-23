@@ -26,6 +26,7 @@ var (
 		{Name: "Namespace"},
 		{Name: "Name"},
 		{Name: "UID"},
+		{Name: "State"},
 	}
 )
 
@@ -40,6 +41,7 @@ var Machine, MachineSlice = tableconverter.ForType[*ori.Machine]( //nolint:reviv
 				machine.Metadata.Namespace,
 				machine.Metadata.Name,
 				machine.Metadata.Uid,
+				machine.State.String(),
 			},
 		}, nil
 	},

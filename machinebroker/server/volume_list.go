@@ -78,15 +78,10 @@ func (s *Server) listOnmetalVolumes(ctx context.Context, filter volumeFilter) ([
 	}
 
 	for _, onmetalMachine := range onmetalMachines {
-		onmetalMachine := onmetalMachine
 		for _, volume := range onmetalMachine.Spec.Volumes {
 			if volume.EmptyDisk != nil {
-				volume := volume
 				res = append(res, OnmetalVolume{
-					EmptyDisk: &OnmetalEmptyDiskVolume{
-						Machine: &onmetalMachine,
-						Volume:  &volume,
-					},
+					EmptyDisk: s.onmetalEmptyDiskVolume(&onmetalMachine, volume),
 				})
 			}
 		}
@@ -96,6 +91,11 @@ func (s *Server) listOnmetalVolumes(ctx context.Context, filter volumeFilter) ([
 }
 
 func (s *Server) listVolumes(ctx context.Context, filter volumeFilter) ([]*ori.Volume, error) {
+	onmetalMachinesById, err := s.getOrListOnmetalMachinesByID(ctx, filter.machineID)
+	if err != nil {
+		return nil, err
+	}
+
 	onmetalVolumes, err := s.listOnmetalVolumes(ctx, filter)
 	if err != nil {
 		return nil, err
@@ -103,7 +103,13 @@ func (s *Server) listVolumes(ctx context.Context, filter volumeFilter) ([]*ori.V
 
 	res := make([]*ori.Volume, len(onmetalVolumes))
 	for i, onmetalVolume := range onmetalVolumes {
-		volume, err := s.convertOnmetalVolume(&onmetalVolume)
+		machineID := onmetalVolume.MachineID()
+		onmetalMachine, ok := onmetalMachinesById[machineID]
+		if !ok {
+			continue
+		}
+
+		volume, err := s.convertOnmetalVolume(&onmetalMachine, &onmetalVolume)
 		if err != nil {
 			return nil, err
 		}

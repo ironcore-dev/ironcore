@@ -36,6 +36,7 @@ type genericMachineMetadata struct {
 type genericMachine struct {
 	id       string
 	metadata genericMachineMetadata
+	state    ori.MachineState
 
 	volumes           []*genericVolume
 	networkInterfaces []*genericNetworkInterface
@@ -46,7 +47,8 @@ func (g genericMachine) key() string { //nolint:unused
 }
 
 type genericVolume struct {
-	name string
+	name  string
+	state ori.VolumeState
 }
 
 func (g genericVolume) key() string { //nolint:unused
@@ -54,7 +56,8 @@ func (g genericVolume) key() string { //nolint:unused
 }
 
 type genericNetworkInterface struct {
-	name string
+	name  string
+	state ori.NetworkInterfaceState
 }
 
 func (g genericNetworkInterface) key() string { //nolint:unused
@@ -131,44 +134,31 @@ func (g *Generic) list(ctx context.Context) ([]*genericMachine, error) {
 				namespace: machine.Metadata.Namespace,
 				name:      machine.Metadata.Name,
 			},
+			state: machine.State,
 		}
 	}
 
 	for _, networkInterface := range listNetworkInterfacesRes.NetworkInterfaces {
 		machine, ok := machinesByID[networkInterface.MachineId]
 		if !ok {
-			machine = &genericMachine{
-				id: networkInterface.MachineId,
-				metadata: genericMachineMetadata{
-					uid:       networkInterface.MachineMetadata.Uid,
-					namespace: networkInterface.MachineMetadata.Namespace,
-					name:      networkInterface.MachineMetadata.Name,
-				},
-			}
-			machinesByID[networkInterface.MachineId] = machine
+			continue
 		}
 
 		machine.networkInterfaces = append(machine.networkInterfaces, &genericNetworkInterface{
-			name: networkInterface.Name,
+			name:  networkInterface.Name,
+			state: networkInterface.State,
 		})
 	}
 
 	for _, volume := range listVolumesRes.Volumes {
 		machine, ok := machinesByID[volume.MachineId]
 		if !ok {
-			machine = &genericMachine{
-				id: volume.MachineId,
-				metadata: genericMachineMetadata{
-					uid:       volume.MachineMetadata.Uid,
-					namespace: volume.MachineMetadata.Namespace,
-					name:      volume.MachineMetadata.Name,
-				},
-			}
-			machinesByID[volume.MachineId] = machine
+			continue
 		}
 
 		machine.volumes = append(machine.volumes, &genericVolume{
-			name: volume.Name,
+			name:  volume.Name,
+			state: volume.State,
 		})
 	}
 
@@ -206,61 +196,119 @@ func (g *Generic) Start(ctx context.Context) error {
 	return nil
 }
 
+var networkInterfaceStateToMachineLifecycleEventType = map[ori.NetworkInterfaceState]MachineLifecycleEventType{
+	ori.NetworkInterfaceState_NETWORK_INTERFACE_ATTACHED: NetworkInterfaceAttached,
+	ori.NetworkInterfaceState_NETWORK_INTERFACE_DETACHED: NetworkInterfaceDetached,
+}
+
+func (g *Generic) convertNetworkInterfaceState(state ori.NetworkInterfaceState) (MachineLifecycleEventType, bool) {
+	res, ok := networkInterfaceStateToMachineLifecycleEventType[state]
+	return res, ok
+}
+
 func (g *Generic) inferNetworkInterfaceEvents(
-	machineID string,
-	metadata MachineLifecycleEventMetadata,
+	newMachineEvent func(eventType MachineLifecycleEventType, data any) *MachineLifecycleEvent,
 	networkInterfaceName string,
 	oldNetworkInterface, newNetworkInterface *genericNetworkInterface,
 ) []*MachineLifecycleEvent {
+	newEvent := func(eventType MachineLifecycleEventType) *MachineLifecycleEvent {
+		return newMachineEvent(eventType, networkInterfaceName)
+	}
+
 	switch {
 	case oldNetworkInterface == nil && newNetworkInterface != nil:
-		return []*MachineLifecycleEvent{{ID: machineID, Metadata: metadata, Type: NetworkInterfaceAdded, Data: networkInterfaceName}}
+		return []*MachineLifecycleEvent{newEvent(NetworkInterfaceAdded)}
 	case oldNetworkInterface != nil && newNetworkInterface == nil:
-		return []*MachineLifecycleEvent{{ID: machineID, Metadata: metadata, Type: NetworkInterfaceRemoved, Data: networkInterfaceName}}
+		return []*MachineLifecycleEvent{newEvent(NetworkInterfaceDetached), newEvent(NetworkInterfaceRemoved)}
 	case oldNetworkInterface != nil && newNetworkInterface != nil:
-		return nil
+		var events []*MachineLifecycleEvent
+		if oldNetworkInterface.state != newNetworkInterface.state {
+			if eventType, ok := g.convertNetworkInterfaceState(newNetworkInterface.state); ok {
+				events = append(events, newEvent(eventType))
+			}
+		}
+		return events
 	default:
 		panic("unhandled case")
 	}
+}
+
+var volumeStateToMachineLifecycleEventType = map[ori.VolumeState]MachineLifecycleEventType{
+	ori.VolumeState_VOLUME_ATTACHED: VolumeAttached,
+	ori.VolumeState_VOLUME_DETACHED: VolumeDetached,
+}
+
+func (g *Generic) convertVolumeState(state ori.VolumeState) (MachineLifecycleEventType, bool) {
+	res, ok := volumeStateToMachineLifecycleEventType[state]
+	return res, ok
 }
 
 func (g *Generic) inferVolumeEvents(
-	machineID string,
-	metadata MachineLifecycleEventMetadata,
+	newMachineEvent func(eventType MachineLifecycleEventType, data any) *MachineLifecycleEvent,
 	volumeName string,
 	oldVolume, newVolume *genericVolume,
 ) []*MachineLifecycleEvent {
+	newEvent := func(eventType MachineLifecycleEventType) *MachineLifecycleEvent {
+		return newMachineEvent(eventType, volumeName)
+	}
 	switch {
 	case oldVolume == nil && newVolume != nil:
-		return []*MachineLifecycleEvent{{ID: machineID, Metadata: metadata, Type: VolumeAdded, Data: volumeName}}
+		return []*MachineLifecycleEvent{newEvent(VolumeAdded)}
 	case oldVolume != nil && newVolume == nil:
-		return []*MachineLifecycleEvent{{ID: machineID, Metadata: metadata, Type: VolumeRemoved, Data: volumeName}}
+		return []*MachineLifecycleEvent{newEvent(VolumeDetached), newEvent(VolumeRemoved)}
 	case oldVolume != nil && newVolume != nil:
-		return nil
+		var events []*MachineLifecycleEvent
+		if oldVolume.state != newVolume.state {
+			if eventType, ok := g.convertVolumeState(newVolume.state); ok {
+				events = append(events, newEvent(eventType))
+			}
+		}
+		return events
 	default:
 		panic("unhandled case")
 	}
 }
 
+var machineStateToMachineLifecycleEventType = map[ori.MachineState]MachineLifecycleEventType{
+	ori.MachineState_MACHINE_SHUTDOWN: MachineStopped,
+	ori.MachineState_MACHINE_RUNNING:  MachineStarted,
+	ori.MachineState_MACHINE_PENDING:  MachineCreated,
+}
+
+func (g *Generic) convertMachineState(state ori.MachineState) (MachineLifecycleEventType, bool) {
+	res, ok := machineStateToMachineLifecycleEventType[state]
+	return res, ok
+}
+
 func (g *Generic) inferEvents(id string, metadata MachineLifecycleEventMetadata, oldMachine, newMachine *genericMachine) []*MachineLifecycleEvent {
+	newEvent := func(eventType MachineLifecycleEventType, data any) *MachineLifecycleEvent {
+		return &MachineLifecycleEvent{ID: id, Metadata: metadata, Type: eventType, Data: data}
+	}
+
 	switch {
 	case oldMachine == nil && newMachine != nil:
-		return []*MachineLifecycleEvent{{ID: id, Metadata: metadata, Type: MachineStarted}}
+		return []*MachineLifecycleEvent{newEvent(MachineStarted, nil)}
 	case oldMachine != nil && newMachine == nil:
-		return []*MachineLifecycleEvent{{ID: id, Metadata: metadata, Type: MachineStopped}, {ID: id, Metadata: metadata, Type: MachineRemoved}}
+		return []*MachineLifecycleEvent{newEvent(MachineStopped, nil), newEvent(MachineRemoved, nil)}
 	case oldMachine != nil && newMachine != nil:
 		var events []*MachineLifecycleEvent
+
+		if oldMachine.state != newMachine.state {
+			if eventType, ok := g.convertMachineState(newMachine.state); ok {
+				events = append(events, newEvent(eventType, nil))
+			}
+		}
 
 		networkInterfaces := make(oldNewMap[string, genericNetworkInterface])
 		networkInterfaces.set(oldMachine.networkInterfaces, newMachine.networkInterfaces)
 		for name, entry := range networkInterfaces {
-			events = append(events, g.inferNetworkInterfaceEvents(id, metadata, name, entry.Old, entry.Current)...)
+			events = append(events, g.inferNetworkInterfaceEvents(newEvent, name, entry.Old, entry.Current)...)
 		}
 
 		volumes := make(oldNewMap[string, genericVolume])
 		volumes.set(oldMachine.volumes, newMachine.volumes)
 		for name, entry := range volumes {
-			events = append(events, g.inferVolumeEvents(id, metadata, name, entry.Old, entry.Current)...)
+			events = append(events, g.inferVolumeEvents(newEvent, name, entry.Old, entry.Current)...)
 		}
 
 		return events

@@ -18,29 +18,32 @@ import (
 	"context"
 	"fmt"
 
+	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/machinebroker/api/v1alpha1"
 	"github.com/onmetal/onmetal-api/machinebroker/apiutils"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	"golang.org/x/exp/slices"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func (s *Server) getOnmetalNetworkInterface(ctx context.Context, machineID, name string) (*networkingv1alpha1.NetworkInterface, error) {
+func (s *Server) getOnmetalNetworkInterface(ctx context.Context, onmetalMachine *computev1alpha1.Machine, name string) (*networkingv1alpha1.NetworkInterface, error) {
 	onmetalNetworkInterface := &networkingv1alpha1.NetworkInterface{}
-	onmetalNetworkInterfaceKey := client.ObjectKey{Namespace: s.namespace, Name: s.onmetalNetworkInterfaceName(machineID, name)}
+	onmetalNetworkInterfaceKey := client.ObjectKey{Namespace: s.namespace, Name: s.onmetalNetworkInterfaceName(onmetalMachine.Name, name)}
 	if err := s.client.Get(ctx, onmetalNetworkInterfaceKey, onmetalNetworkInterface); err != nil {
 		if !apierrors.IsNotFound(err) {
-			return nil, fmt.Errorf("error getting machine %s network interface %s: %w", machineID, name, err)
+			return nil, fmt.Errorf("error getting machine %s network interface %s: %w", onmetalMachine.Name, name, err)
 		}
-		return nil, status.Errorf(codes.NotFound, "machine %s network interface %s not found", machineID, name)
+		return nil, status.Errorf(codes.NotFound, "machine %s network interface %s not found", onmetalMachine.Name, name)
 	}
 	return onmetalNetworkInterface, nil
 }
 
 func (s *Server) convertOnmetalNetworkInterface(
+	machine *computev1alpha1.Machine,
 	networkInterface *networkingv1alpha1.NetworkInterface,
 ) (*ori.NetworkInterface, error) {
 	machineID := networkInterface.Labels[machinebrokerv1alpha1.MachineIDLabel]
@@ -64,6 +67,16 @@ func (s *Server) convertOnmetalNetworkInterface(
 		}
 	}
 
+	idx := slices.IndexFunc(machine.Status.NetworkInterfaces,
+		func(networkInterface computev1alpha1.NetworkInterfaceStatus) bool {
+			return networkInterface.Name == name
+		},
+	)
+	state := ori.NetworkInterfaceState_NETWORK_INTERFACE_DETACHED
+	if idx != -1 {
+		state = s.convertOnmetalNetworkInterfaceState(machine.Status.NetworkInterfaces[idx].State)
+	}
+
 	return &ori.NetworkInterface{
 		MachineId:       machineID,
 		MachineMetadata: metadata,
@@ -71,6 +84,7 @@ func (s *Server) convertOnmetalNetworkInterface(
 		Network:         &ori.NetworkConfig{Handle: networkInterface.Status.NetworkHandle},
 		Ips:             ips,
 		VirtualIp:       virtualIPConfig,
+		State:           state,
 	}, nil
 }
 
@@ -78,10 +92,15 @@ func (s *Server) getNetworkInterface(
 	ctx context.Context,
 	machineID, name string,
 ) (*ori.NetworkInterface, error) {
-	onmetalNetworkInterface, err := s.getOnmetalNetworkInterface(ctx, machineID, name)
+	onmetalMachine, err := s.getOnmetalMachine(ctx, machineID)
 	if err != nil {
 		return nil, err
 	}
 
-	return s.convertOnmetalNetworkInterface(onmetalNetworkInterface)
+	onmetalNetworkInterface, err := s.getOnmetalNetworkInterface(ctx, onmetalMachine, name)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.convertOnmetalNetworkInterface(onmetalMachine, onmetalNetworkInterface)
 }

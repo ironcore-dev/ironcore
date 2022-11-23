@@ -29,7 +29,9 @@ import (
 	machinepoolletclient "github.com/onmetal/onmetal-api/machinepoollet/client"
 	"github.com/onmetal/onmetal-api/machinepoollet/controllers"
 	"github.com/onmetal/onmetal-api/machinepoollet/mcm"
+	"github.com/onmetal/onmetal-api/machinepoollet/mleg"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	orimachineutils "github.com/onmetal/onmetal-api/ori/utils/machine"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"google.golang.org/grpc"
@@ -149,7 +151,7 @@ func Run(ctx context.Context, opts Options) error {
 	logger := ctrl.LoggerFrom(ctx)
 	setupLog := ctrl.Log.WithName("setup")
 
-	endpoint, err := DetectMachineRuntimeEndpoint(setupLog, opts.MachineRuntimeEndpoint)
+	endpoint, err := orimachineutils.GetAddress(opts.MachineRuntimeEndpoint)
 	if err != nil {
 		return fmt.Errorf("error detecting machine runtime endpoint: %w", err)
 	}
@@ -197,13 +199,23 @@ func Run(ctx context.Context, opts Options) error {
 			return fmt.Errorf("error waiting for machine class mapper to sync: %w", err)
 		}
 
+		machineLifecycleEventGenerator := mleg.NewGeneric(machineRuntime, mleg.GenericOptions{})
+		if err := mgr.Add(machineLifecycleEventGenerator); err != nil {
+			return fmt.Errorf("error adding machine lifecycle event generator: %w", err)
+		}
+
+		if err := mgr.AddHealthzCheck("mleg", machineLifecycleEventGenerator.Check); err != nil {
+			return fmt.Errorf("error adding mleg healthz check: %w", err)
+		}
+
 		if err := (&controllers.MachineReconciler{
-			EventRecorder:      mgr.GetEventRecorderFor("machines"),
-			Client:             mgr.GetClient(),
-			MachineRuntime:     machineRuntime,
-			MachineClassMapper: machineClassMapper,
-			MachinePoolName:    opts.MachinePoolName,
-			WatchFilterValue:   opts.WatchFilterValue,
+			EventRecorder:                  mgr.GetEventRecorderFor("machines"),
+			Client:                         mgr.GetClient(),
+			MachineRuntime:                 machineRuntime,
+			MachineClassMapper:             machineClassMapper,
+			MachineLifecycleEventGenerator: machineLifecycleEventGenerator,
+			MachinePoolName:                opts.MachinePoolName,
+			WatchFilterValue:               opts.WatchFilterValue,
 		}).SetupWithManager(mgr); err != nil {
 			return fmt.Errorf("error setting up machine reconciler with manager: %w", err)
 		}
@@ -239,7 +251,6 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error setting up machine pool init with manager: %w", err)
 	}
 
-	// TODO: Add mleg healthz check
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to set up health check")
 		os.Exit(1)

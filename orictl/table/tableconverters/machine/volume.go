@@ -28,6 +28,7 @@ var (
 		{Name: "SizeLimitBytes"},
 		{Name: "Driver"},
 		{Name: "Handle"},
+		{Name: "State"},
 	}
 )
 
@@ -44,6 +45,7 @@ var Volume, VolumeSlice = tableconverter.ForType[*ori.Volume]( //nolint:revive
 				volume.GetEmptyDisk().GetSizeLimitBytes(),
 				volume.GetAccess().GetDriver(),
 				volume.GetAccess().GetHandle(),
+				volume.State.String(),
 			},
 		}, nil
 	},

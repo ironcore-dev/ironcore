@@ -22,15 +22,20 @@ import (
 type MachineLifecycleEventType string
 
 const (
+	MachineCreated MachineLifecycleEventType = "MachineCreated"
 	MachineStarted MachineLifecycleEventType = "MachineStarted"
 	MachineStopped MachineLifecycleEventType = "MachineStopped"
 	MachineRemoved MachineLifecycleEventType = "MachineRemoved"
 
-	NetworkInterfaceAdded   MachineLifecycleEventType = "NetworkInterfaceAdded"
-	NetworkInterfaceRemoved MachineLifecycleEventType = "NetworkInterfaceRemoved"
+	NetworkInterfaceAdded    MachineLifecycleEventType = "NetworkInterfaceAdded"
+	NetworkInterfaceRemoved  MachineLifecycleEventType = "NetworkInterfaceRemoved"
+	NetworkInterfaceAttached MachineLifecycleEventType = "NetworkInterfaceAttached"
+	NetworkInterfaceDetached MachineLifecycleEventType = "NetworkInterfaceDetached"
 
-	VolumeAdded   MachineLifecycleEventType = "VolumeAdded"
-	VolumeRemoved MachineLifecycleEventType = "VolumeRemoved"
+	VolumeAdded    MachineLifecycleEventType = "VolumeAdded"
+	VolumeRemoved  MachineLifecycleEventType = "VolumeRemoved"
+	VolumeAttached MachineLifecycleEventType = "VolumeAttached"
+	VolumeDetached MachineLifecycleEventType = "VolumeDetached"
 )
 
 type MachineLifecycleEventMetadata struct {

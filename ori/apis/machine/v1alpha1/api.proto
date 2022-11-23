@@ -55,6 +55,7 @@ message Volume {
   string device = 4;
   VolumeAccess access = 5;
   EmptyDisk empty_disk = 6;
+  VolumeState state = 7;
 }
 
 message VolumeAccess {
@@ -101,6 +102,7 @@ message NetworkInterface {
   NetworkConfig network = 4;
   repeated string ips = 5;
   VirtualIPConfig virtual_ip = 6;
+  NetworkInterfaceState state = 7;
 }
 
 message IgnitionConfig {
@@ -137,8 +139,9 @@ message MachineConfig {
 message Machine {
   string id = 1;
   MachineMetadata metadata = 2;
-  map<string, string> annotations = 3;
-  map<string, string> labels = 4;
+  MachineState state = 3;
+  map<string, string> annotations = 4;
+  map<string, string> labels = 5;
 }
 
 message VolumeAccessStatus {

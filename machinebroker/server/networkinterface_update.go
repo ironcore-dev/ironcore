@@ -80,7 +80,12 @@ func (s *Server) UpdateNetworkInterface(ctx context.Context, req *ori.UpdateNetw
 		return nil, err
 	}
 
-	onmetalNetworkInterface, err := s.getOnmetalNetworkInterface(ctx, machineID, networkInterfaceName)
+	onmetalMachine, err := s.getOnmetalMachine(ctx, req.MachineId)
+	if err != nil {
+		return nil, err
+	}
+
+	onmetalNetworkInterface, err := s.getOnmetalNetworkInterface(ctx, onmetalMachine, networkInterfaceName)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +108,12 @@ func (s *Server) updateOnmetalNetworkInterfaceVirtualIP(
 	virtualIPConfig *OnmetalVirtualIPConfig,
 ) (retErr error) {
 	if virtualIPConfig == nil {
-		onmetalNetworkInterface, err := s.getOnmetalNetworkInterface(ctx, machineID, networkInterfaceName)
+		onmetalMachine, err := s.getOnmetalMachine(ctx, machineID)
+		if err != nil {
+			return err
+		}
+
+		onmetalNetworkInterface, err := s.getOnmetalNetworkInterface(ctx, onmetalMachine, networkInterfaceName)
 		if err != nil {
 			return err
 		}
@@ -150,7 +160,12 @@ func (s *Server) updateOnmetalNetworkInterfaceVirtualIP(
 		return err
 	}
 
-	onmetalNetworkInterface, err := s.getOnmetalNetworkInterface(ctx, machineID, networkInterfaceName)
+	onmetalMachine, err := s.getOnmetalMachine(ctx, machineID)
+	if err != nil {
+		return err
+	}
+
+	onmetalNetworkInterface, err := s.getOnmetalNetworkInterface(ctx, onmetalMachine, networkInterfaceName)
 	if err != nil {
 		return err
 	}

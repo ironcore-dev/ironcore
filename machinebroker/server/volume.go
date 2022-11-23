@@ -30,64 +30,107 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-type OnmetalEmptyDiskVolume struct {
-	Machine *computev1alpha1.Machine
-	Volume  *computev1alpha1.Volume
-}
-
 type OnmetalVolume struct {
 	Volume    *storagev1alpha1.Volume
 	EmptyDisk *OnmetalEmptyDiskVolume
 }
 
-func (s *Server) getOnmetalVolume(ctx context.Context, machineID, name string) (*OnmetalVolume, error) {
-	onmetalVolume := &storagev1alpha1.Volume{}
-	onmetalVolumeKey := client.ObjectKey{Namespace: s.namespace, Name: s.onmetalVolumeName(machineID, name)}
-	if err := s.client.Get(ctx, onmetalVolumeKey, onmetalVolume); err != nil {
-		if !apierrors.IsNotFound(err) {
-			return nil, fmt.Errorf("error getting onmetal volume %s: %w", onmetalVolumeKey, err)
+type OnmetalEmptyDiskVolume struct {
+	MachineID string
+	Name      string
+	Device    string
+	computev1alpha1.EmptyDiskVolumeSource
+}
+
+func (o *OnmetalVolume) Name() string {
+	switch {
+	case o.Volume != nil:
+		return o.Volume.Labels[machinebrokerv1alpha1.VolumeNameLabel]
+	case o.EmptyDisk != nil:
+		return o.EmptyDisk.Name
+	default:
+		panic("both volume and empty disk are unset")
+	}
+}
+
+func (o *OnmetalVolume) MachineID() string {
+	switch {
+	case o.Volume != nil:
+		return o.Volume.Labels[machinebrokerv1alpha1.MachineIDLabel]
+	case o.EmptyDisk != nil:
+		return o.EmptyDisk.MachineID
+	default:
+		panic("both volume and empty disk are unset")
+	}
+}
+
+func (s *Server) onmetalEmptyDiskVolume(
+	onmetalMachine *computev1alpha1.Machine,
+	onmetalMachineVolume computev1alpha1.Volume,
+) *OnmetalEmptyDiskVolume {
+	return &OnmetalEmptyDiskVolume{
+		MachineID:             onmetalMachine.Name,
+		Name:                  onmetalMachineVolume.Name,
+		Device:                *onmetalMachineVolume.Device,
+		EmptyDiskVolumeSource: *onmetalMachineVolume.EmptyDisk,
+	}
+}
+
+func (s *Server) getOnmetalVolume(ctx context.Context, onmetalMachine *computev1alpha1.Machine, name string) (*OnmetalVolume, error) {
+	idx := slices.IndexFunc(onmetalMachine.Spec.Volumes, func(volume computev1alpha1.Volume) bool {
+		return volume.Name == name
+	})
+	if idx == -1 {
+		return nil, status.Errorf(codes.NotFound, "machine %s volume %s not found", onmetalMachine.Name, name)
+	}
+
+	onmetalMachineVolume := onmetalMachine.Spec.Volumes[idx]
+	switch {
+	case onmetalMachineVolume.EmptyDisk != nil:
+		return &OnmetalVolume{
+			EmptyDisk: s.onmetalEmptyDiskVolume(onmetalMachine, onmetalMachineVolume),
+		}, nil
+	case onmetalMachineVolume.VolumeRef != nil:
+		onmetalVolume := &storagev1alpha1.Volume{}
+		onmetalVolumeKey := client.ObjectKey{Namespace: s.namespace, Name: s.onmetalVolumeName(onmetalMachine.Name, name)}
+		if err := s.client.Get(ctx, onmetalVolumeKey, onmetalVolume); err != nil {
+			if !apierrors.IsNotFound(err) {
+				return nil, fmt.Errorf("error getting onmetal volume %s: %w", onmetalVolumeKey, err)
+			}
+			return nil, status.Errorf(codes.NotFound, "machine %s volume %s not found", onmetalMachine.Name, name)
 		}
-	} else {
 		return &OnmetalVolume{
 			Volume: onmetalVolume,
 		}, nil
+	default:
+		return nil, fmt.Errorf("machine %s contains unrecognized volume %#v", onmetalMachine.Name, onmetalMachineVolume)
 	}
-
-	onmetalMachine, err := s.getOnmetalMachine(ctx, machineID)
-	if err != nil {
-		if status.Code(err) != codes.NotFound {
-			return nil, fmt.Errorf("error getting volume %s machine %s: %w", name, machineID, err)
-		}
-		return nil, status.Errorf(codes.NotFound, "machine %s volume %s not found", machineID, name)
-	}
-
-	idx := slices.IndexFunc(onmetalMachine.Spec.Volumes, func(volume computev1alpha1.Volume) bool {
-		return volume.Name == name && volume.EmptyDisk != nil
-	})
-	if idx < 0 {
-		return nil, status.Errorf(codes.NotFound, "machine %s volume %s not found", machineID, name)
-	}
-	volume := onmetalMachine.Spec.Volumes[idx]
-	return &OnmetalVolume{
-		EmptyDisk: &OnmetalEmptyDiskVolume{
-			Machine: onmetalMachine,
-			Volume:  &volume,
-		},
-	}, nil
 }
 
 func (s *Server) convertOnmetalVolume(
-	onmetalVolume *OnmetalVolume,
+	machine *computev1alpha1.Machine,
+	volume *OnmetalVolume,
 ) (*ori.Volume, error) {
-	switch {
-	case onmetalVolume.EmptyDisk != nil:
-		machineMetadata, err := apiutils.GetMetadataAnnotation(onmetalVolume.EmptyDisk.Machine)
-		if err != nil {
-			return nil, err
-		}
+	volumeName := volume.Name()
+	idx := slices.IndexFunc(machine.Status.Volumes,
+		func(volume computev1alpha1.VolumeStatus) bool {
+			return volume.Name == volumeName
+		},
+	)
+	state := ori.VolumeState_VOLUME_DETACHED
+	if idx >= 0 {
+		state = s.convertOnmetalVolumeState(machine.Status.Volumes[idx].State)
+	}
 
+	machineMetadata, err := apiutils.GetMetadataAnnotation(machine)
+	if err != nil {
+		return nil, err
+	}
+
+	switch {
+	case volume.EmptyDisk != nil:
 		var sizeLimitBytes uint64
-		if sizeLimit := onmetalVolume.EmptyDisk.Volume.EmptyDisk.SizeLimit; sizeLimit != nil {
+		if sizeLimit := volume.EmptyDisk.SizeLimit; sizeLimit != nil {
 			sizeLimitBytes = uint64(sizeLimit.Value())
 		}
 
@@ -95,25 +138,20 @@ func (s *Server) convertOnmetalVolume(
 			SizeLimitBytes: sizeLimitBytes,
 		}
 		return &ori.Volume{
-			MachineId:       onmetalVolume.EmptyDisk.Machine.Name,
+			MachineId:       machine.Name,
 			MachineMetadata: machineMetadata,
-			Name:            onmetalVolume.EmptyDisk.Volume.Name,
-			Device:          *onmetalVolume.EmptyDisk.Volume.Device,
+			Name:            volume.EmptyDisk.Name,
+			Device:          volume.EmptyDisk.Device,
 			EmptyDisk:       emptyDisk,
+			State:           state,
 		}, nil
-	case onmetalVolume.Volume != nil:
-		machineID := onmetalVolume.Volume.Labels[machinebrokerv1alpha1.MachineIDLabel]
-		name := onmetalVolume.Volume.Labels[machinebrokerv1alpha1.VolumeNameLabel]
-		device := onmetalVolume.Volume.Labels[machinebrokerv1alpha1.DeviceLabel]
+	case volume.Volume != nil:
+		name := volume.Volume.Labels[machinebrokerv1alpha1.VolumeNameLabel]
+		device := volume.Volume.Labels[machinebrokerv1alpha1.DeviceLabel]
 
-		machineMetadata, err := apiutils.GetMetadataAnnotation(onmetalVolume.Volume)
-		if err != nil {
-			return nil, err
-		}
-
-		onmetalVolumeAccess := onmetalVolume.Volume.Status.Access
+		onmetalVolumeAccess := volume.Volume.Status.Access
 		if onmetalVolumeAccess == nil {
-			return nil, fmt.Errorf("onmetal volume %s/%s does not specify access", onmetalVolume.Volume.Namespace, onmetalVolume.Volume.Name)
+			return nil, fmt.Errorf("onmetal volume %s/%s does not specify access", volume.Volume.Namespace, volume.Volume.Name)
 		}
 
 		access := &ori.VolumeAccess{
@@ -122,11 +160,12 @@ func (s *Server) convertOnmetalVolume(
 		}
 
 		return &ori.Volume{
-			MachineId:       machineID,
+			MachineId:       machine.Name,
 			MachineMetadata: machineMetadata,
 			Name:            name,
 			Device:          device,
 			Access:          access,
+			State:           state,
 		}, nil
 	default:
 		return nil, fmt.Errorf("both onmetal empty disk volume and onmetal volume are empty")
@@ -134,10 +173,15 @@ func (s *Server) convertOnmetalVolume(
 }
 
 func (s *Server) getVolume(ctx context.Context, machineID, name string) (*ori.Volume, error) {
-	onmetalVolume, err := s.getOnmetalVolume(ctx, machineID, name)
+	onmetalMachine, err := s.getOnmetalMachine(ctx, machineID)
 	if err != nil {
 		return nil, err
 	}
 
-	return s.convertOnmetalVolume(onmetalVolume)
+	onmetalVolume, err := s.getOnmetalVolume(ctx, onmetalMachine, name)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.convertOnmetalVolume(onmetalMachine, onmetalVolume)
 }

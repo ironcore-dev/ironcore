@@ -15,10 +15,16 @@
 package server
 
 import (
+	"context"
+	"fmt"
+
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/machinebroker/api/v1alpha1"
 	"github.com/onmetal/onmetal-api/machinebroker/apiutils"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	"github.com/onmetal/onmetal-api/utils/slices"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func (s *Server) convertOnmetalMachine(machine *computev1alpha1.Machine) (*ori.Machine, error) {
@@ -42,7 +48,35 @@ func (s *Server) convertOnmetalMachine(machine *computev1alpha1.Machine) (*ori.M
 	return &ori.Machine{
 		Id:          id,
 		Metadata:    metadata,
+		State:       s.convertOnmetalMachineState(machine.Status.State),
 		Annotations: annotations,
 		Labels:      labels,
 	}, nil
+}
+
+func (s *Server) getOrListOnmetalMachinesByID(ctx context.Context, machineID string) (map[string]computev1alpha1.Machine, error) {
+	var machinesByID map[string]computev1alpha1.Machine
+	if machineID != "" {
+		machine, err := s.getOnmetalMachine(ctx, machineID)
+		if err != nil {
+			if status.Code(err) != codes.NotFound {
+				return nil, fmt.Errorf("error getting machine %s: %w", machineID, err)
+			}
+			return nil, nil
+		}
+
+		machinesByID = map[string]computev1alpha1.Machine{
+			machine.Name: *machine,
+		}
+	} else {
+		machines, err := s.listOnmetalMachines(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("error listing machines: %w", err)
+		}
+
+		machinesByID = slices.ToMap(machines, func(machine computev1alpha1.Machine) string {
+			return machine.Name
+		})
+	}
+	return machinesByID, nil
 }

@@ -58,7 +58,8 @@ type MachineReconciler struct {
 
 	MachineRuntime ori.MachineRuntimeClient
 
-	MachineClassMapper mcm.MachineClassMapper
+	MachineClassMapper             mcm.MachineClassMapper
+	MachineLifecycleEventGenerator mleg.MachineLifecycleEventGenerator
 
 	MachinePoolName string
 
@@ -880,25 +881,13 @@ func (r *MachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	log := ctrl.Log.WithName("machinepoollet")
 	ctx := ctrl.LoggerInto(context.TODO(), log)
 
-	mapper := mcm.NewGeneric(r.MachineRuntime, mcm.GenericOptions{})
-
-	if err := mgr.Add(mapper); err != nil {
-		return fmt.Errorf("error adding machine class mapper: %w", err)
-	}
-
-	gen := mleg.NewGeneric(r.MachineRuntime, mleg.GenericOptions{})
-
-	if err := mgr.Add(gen); err != nil {
-		return fmt.Errorf("error adding machine lifecycle event generator: %w", err)
-	}
-
 	if err := mgr.Add(manager.RunnableFunc(func(ctx context.Context) error {
 		log := log.WithName("machine-lifecycle-event")
 		for {
 			select {
 			case <-ctx.Done():
 				return nil
-			case evt := <-gen.Watch():
+			case evt := <-r.MachineLifecycleEventGenerator.Watch():
 				log = log.WithValues(
 					"EventType", evt.Type,
 					"MachineID", evt.ID,

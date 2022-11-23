@@ -57,6 +57,11 @@ func (s *Server) listOnmetalNetworkInterfaces(ctx context.Context, filter networ
 }
 
 func (s *Server) listNetworkInterfaces(ctx context.Context, filter networkInterfaceFilter) ([]*ori.NetworkInterface, error) {
+	onmetalMachinesByID, err := s.getOrListOnmetalMachinesByID(ctx, filter.machineID)
+	if err != nil {
+		return nil, err
+	}
+
 	onmetalNetworkInterfaces, err := s.listOnmetalNetworkInterfaces(ctx, filter)
 	if err != nil {
 		return nil, err
@@ -64,7 +69,13 @@ func (s *Server) listNetworkInterfaces(ctx context.Context, filter networkInterf
 
 	res := make([]*ori.NetworkInterface, len(onmetalNetworkInterfaces))
 	for i, onmetalNetworkInterface := range onmetalNetworkInterfaces {
-		networkInterface, err := s.convertOnmetalNetworkInterface(&onmetalNetworkInterface)
+		machineID := onmetalNetworkInterface.Labels[machinebrokerv1alpha1.MachineIDLabel]
+		onmetalMachine, ok := onmetalMachinesByID[machineID]
+		if !ok {
+			continue
+		}
+
+		networkInterface, err := s.convertOnmetalNetworkInterface(&onmetalMachine, &onmetalNetworkInterface)
 		if err != nil {
 			return nil, err
 		}
