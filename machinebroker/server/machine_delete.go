@@ -23,7 +23,11 @@ import (
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/machinebroker/api/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -34,11 +38,16 @@ func (s *Server) DeleteMachine(ctx context.Context, req *ori.DeleteMachineReques
 	var errs []error
 
 	log.V(1).Info("Deleting machine")
-	if err := s.client.DeleteAllOf(ctx, &computev1alpha1.Machine{},
-		client.InNamespace(s.namespace),
-		client.MatchingLabels{machinebrokerv1alpha1.MachineIDLabel: machineID},
-	); err != nil {
-		errs = append(errs, fmt.Errorf("error deleting machine: %w", err))
+	if err := s.client.Delete(ctx, &computev1alpha1.Machine{
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: s.namespace,
+			Name:      machineID,
+		},
+	}); err != nil {
+		if !apierrors.IsNotFound(err) {
+			return nil, fmt.Errorf("error deleting machine: %w", err)
+		}
+		return nil, status.Errorf(codes.NotFound, "machine %s not found", machineID)
 	}
 
 	log.V(1).Info("Deleting network interfaces")

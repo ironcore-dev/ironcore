@@ -45,10 +45,17 @@ func (s *Server) convertOnmetalMachine(machine *computev1alpha1.Machine) (*ori.M
 		return nil, err
 	}
 
+	var deletedAt int64
+	if deletionTimestamp := machine.DeletionTimestamp; !deletionTimestamp.IsZero() {
+		deletedAt = deletionTimestamp.UnixNano()
+	}
+
 	return &ori.Machine{
 		Id:          id,
 		Metadata:    metadata,
 		State:       s.convertOnmetalMachineState(machine.Status.State),
+		CreatedAt:   machine.CreationTimestamp.UnixNano(),
+		DeletedAt:   deletedAt,
 		Annotations: annotations,
 		Labels:      labels,
 	}, nil

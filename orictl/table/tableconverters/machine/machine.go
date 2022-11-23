@@ -15,9 +15,12 @@
 package machine
 
 import (
+	"time"
+
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	"github.com/onmetal/onmetal-api/orictl/table"
 	"github.com/onmetal/onmetal-api/orictl/table/tableconverter"
+	"k8s.io/apimachinery/pkg/util/duration"
 )
 
 var (
@@ -27,6 +30,7 @@ var (
 		{Name: "Name"},
 		{Name: "UID"},
 		{Name: "State"},
+		{Name: "Age"},
 	}
 )
 
@@ -42,6 +46,7 @@ var Machine, MachineSlice = tableconverter.ForType[*ori.Machine]( //nolint:reviv
 				machine.Metadata.Name,
 				machine.Metadata.Uid,
 				machine.State.String(),
+				duration.HumanDuration(time.Since(time.Unix(0, machine.CreatedAt))),
 			},
 		}, nil
 	},

@@ -140,8 +140,10 @@ message Machine {
   string id = 1;
   MachineMetadata metadata = 2;
   MachineState state = 3;
-  map<string, string> annotations = 4;
-  map<string, string> labels = 5;
+  int64 created_at = 4;
+  int64 deleted_at = 5;
+  map<string, string> annotations = 6;
+  map<string, string> labels = 7;
 }
 
 message VolumeAccessStatus {
@@ -207,8 +209,10 @@ message MachineStatus {
   MachineState state = 5;
   repeated VolumeStatus volumes = 6;
   repeated NetworkInterfaceStatus network_interfaces = 7;
-  map<string, string> annotations = 8;
-  map<string, string> labels = 9;
+  int64 created_at = 8;
+  int64 deleted_at = 9;
+  map<string, string> annotations = 10;
+  map<string, string> labels = 11;
 }
 
 message MachineClass {

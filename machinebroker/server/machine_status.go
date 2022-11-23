@@ -155,6 +155,11 @@ func (s *Server) MachineStatus(ctx context.Context, req *ori.MachineStatusReques
 		networkInterfaceStates = append(networkInterfaceStates, networkInterfaceStatus)
 	}
 
+	var deletedAt int64
+	if deletionTimestamp := onmetalMachine.DeletionTimestamp; !deletionTimestamp.IsZero() {
+		deletedAt = deletionTimestamp.UnixNano()
+	}
+
 	return &ori.MachineStatusResponse{
 		Status: &ori.MachineStatus{
 			Id:                id,
@@ -164,6 +169,8 @@ func (s *Server) MachineStatus(ctx context.Context, req *ori.MachineStatusReques
 			State:             state,
 			Volumes:           volumeStates,
 			NetworkInterfaces: networkInterfaceStates,
+			CreatedAt:         onmetalMachine.CreationTimestamp.UnixNano(),
+			DeletedAt:         deletedAt,
 			Annotations:       annotations,
 			Labels:            labels,
 		},

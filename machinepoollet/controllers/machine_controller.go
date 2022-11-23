@@ -95,7 +95,9 @@ func (r *MachineReconciler) deleteGone(ctx context.Context, log logr.Logger, mac
 	}
 
 	log.V(1).Info("Listed machines matching key", "NoOfMachines", len(res.Machines))
-	var errs []error
+	var (
+		errs []error
+	)
 	for _, machine := range res.Machines {
 		log := log.WithValues("MachineID", machine.Id)
 		log.V(1).Info("Deleting matching machine")
@@ -148,7 +150,10 @@ func (r *MachineReconciler) delete(ctx context.Context, log logr.Logger, machine
 	}
 
 	log.V(1).Info("Listed machines", "NoOfMachines", len(res.Machines))
-	var errs []error
+	var (
+		errs               []error
+		machinesInDeletion []string
+	)
 	for _, machine := range res.Machines {
 		log := log.WithValues("MachineID", machine.Id)
 		log.V(1).Info("Deleting machine")
@@ -161,11 +166,18 @@ func (r *MachineReconciler) delete(ctx context.Context, log logr.Logger, machine
 			} else {
 				log.V(1).Info("Machine is already gone")
 			}
+		} else {
+			log.V(1).Info("Issued machine deletion")
+			machinesInDeletion = append(machinesInDeletion, machine.Id)
 		}
 	}
 
 	if len(errs) > 0 {
 		return ctrl.Result{}, fmt.Errorf("error(s) deleting machines: %v", errs)
+	}
+	if len(machinesInDeletion) > 0 {
+		log.V(1).Info("Machines are in deletion, requeueing", "MachinesInDeletion", machinesInDeletion)
+		return ctrl.Result{Requeue: true}, nil
 	}
 
 	log.V(1).Info("Deleted all runtime machines, removing finalizer")
