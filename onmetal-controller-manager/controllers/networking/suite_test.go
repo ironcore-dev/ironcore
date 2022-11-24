@@ -163,6 +163,12 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	}).SetupWithManager(k8sManager)
 	Expect(err).NotTo(HaveOccurred())
 
+	err = (&LoadBalancerReconciler{
+		Client: k8sManager.GetClient(),
+		Scheme: k8sManager.GetScheme(),
+	}).SetupWithManager(k8sManager)
+	Expect(err).NotTo(HaveOccurred())
+
 	err = (&ipam.PrefixReconciler{
 		Client:                  k8sManager.GetClient(),
 		APIReader:               k8sManager.GetAPIReader(),
