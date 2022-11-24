@@ -219,7 +219,7 @@ func (r *VirtualIPReconciler) getMatchingNetworkInterface(ctx context.Context, v
 	nicList := &networkingv1alpha1.NetworkInterfaceList{}
 	if err := r.List(ctx, nicList,
 		client.InNamespace(virtualIP.Namespace),
-		client.MatchingFields{onmetalapiclient.NetworkInterfaceVirtualIPNames: virtualIP.Name},
+		client.MatchingFields{onmetalapiclient.NetworkInterfaceVirtualIPNamesField: virtualIP.Name},
 	); err != nil {
 		return nil, fmt.Errorf("error listing suitable requesters: %w", err)
 	}

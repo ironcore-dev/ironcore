@@ -130,6 +130,8 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	Expect(onmetalapiclient.SetupNetworkInterfaceVirtualIPNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 	Expect(onmetalapiclient.SetupMachineSpecNetworkInterfaceNamesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 	Expect(onmetalapiclient.SetupPrefixSpecIPFamilyFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+	Expect(onmetalapiclient.SetupAliasPrefixNetworkNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+	Expect(onmetalapiclient.SetupLoadBalancerNetworkNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 
 	// Register reconcilers
 	err = (&NetworkInterfaceReconciler{
@@ -158,6 +160,12 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	Expect(err).NotTo(HaveOccurred())
 
 	err = (&AliasPrefixReconciler{
+		Client: k8sManager.GetClient(),
+		Scheme: k8sManager.GetScheme(),
+	}).SetupWithManager(k8sManager)
+	Expect(err).NotTo(HaveOccurred())
+
+	err = (&LoadBalancerReconciler{
 		Client: k8sManager.GetClient(),
 		Scheme: k8sManager.GetScheme(),
 	}).SetupWithManager(k8sManager)

@@ -73,6 +73,7 @@ const (
 	networkInterfaceBindController = "networkinterfacebind"
 	virtualIPController            = "virtualip"
 	aliasPrefixController          = "aliasprefix"
+	loadBalancerController         = "loadbalancer"
 )
 
 func init() {
@@ -110,7 +111,7 @@ func main() {
 		volumePoolController, volumeClassController, volumeController, volumeScheduler,
 
 		// Networking controllers
-		networkProtectionController, networkInterfaceController, networkInterfaceBindController, virtualIPController, aliasPrefixController,
+		networkProtectionController, networkInterfaceController, networkInterfaceBindController, virtualIPController, aliasPrefixController, loadBalancerController,
 
 		// IPAM controllers
 		prefixController, prefixAllocationScheduler,
@@ -289,12 +290,14 @@ func main() {
 		}
 	}
 
-	if controllers.Enabled(networkInterfaceController) {
+	if controllers.Enabled(networkInterfaceController) || controllers.Enabled(aliasPrefixController) || controllers.Enabled(loadBalancerController) {
 		if err = onmetalapiclient.SetupNetworkInterfaceNetworkNameFieldIndexer(context.TODO(), mgr.GetFieldIndexer()); err != nil {
-			setupLog.Error(err, "unable to setup field indexer", "field", onmetalapiclient.NetworkInterfaceNetworkName)
+			setupLog.Error(err, "unable to setup field indexer", "field", onmetalapiclient.NetworkInterfaceNetworkNameField)
 			os.Exit(1)
 		}
+	}
 
+	if controllers.Enabled(networkInterfaceController) {
 		if err = (&networkingcontrollers.NetworkInterfaceReconciler{
 			EventRecorder: mgr.GetEventRecorderFor("networkinterfaces"),
 			Client:        mgr.GetClient(),
@@ -332,11 +335,31 @@ func main() {
 	}
 
 	if controllers.Enabled(aliasPrefixController) {
+		if err = onmetalapiclient.SetupAliasPrefixNetworkNameFieldIndexer(context.TODO(), mgr.GetFieldIndexer()); err != nil {
+			setupLog.Error(err, "unable to setup field indexer", "field", onmetalapiclient.AliasPrefixNetworkNameField)
+			os.Exit(1)
+		}
+
 		if err = (&networkingcontrollers.AliasPrefixReconciler{
 			Client: mgr.GetClient(),
 			Scheme: mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "AliasPrefix")
+			os.Exit(1)
+		}
+	}
+
+	if controllers.Enabled(loadBalancerController) {
+		if err = onmetalapiclient.SetupLoadBalancerNetworkNameFieldIndexer(context.TODO(), mgr.GetFieldIndexer()); err != nil {
+			setupLog.Error(err, "unable to setup field indexer", "field", onmetalapiclient.LoadBalancerNetworkNameField)
+			os.Exit(1)
+		}
+
+		if err = (&networkingcontrollers.LoadBalancerReconciler{
+			Client: mgr.GetClient(),
+			Scheme: mgr.GetScheme(),
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "LoadBalancer")
 			os.Exit(1)
 		}
 	}
