@@ -181,6 +181,44 @@ rules:
 - apiGroups:
   - networking.api.onmetal.de
   resources:
+  - loadbalancerroutings
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - loadbalancers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - loadbalancers/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - loadbalancers/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
   - networkinterfaces
   verbs:
   - create

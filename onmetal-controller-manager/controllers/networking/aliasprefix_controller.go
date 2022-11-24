@@ -22,6 +22,7 @@ import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	onmetalapiclient "github.com/onmetal/onmetal-api/onmetal-controller-manager/client"
 	onmetalapiclientutils "github.com/onmetal/onmetal-api/onmetal-controller-manager/clientutils"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -162,7 +163,7 @@ func (r *AliasPrefixReconciler) findDestinations(ctx context.Context, log logr.L
 	if err := r.List(ctx, nicList,
 		client.InNamespace(aliasPrefix.Namespace),
 		client.MatchingLabelsSelector{Selector: sel},
-		client.MatchingFields{networkInterfaceSpecNetworkRefNameField: aliasPrefix.Spec.NetworkRef.Name},
+		client.MatchingFields{onmetalapiclient.NetworkInterfaceNetworkName: aliasPrefix.Spec.NetworkRef.Name},
 	); err != nil {
 		return nil, fmt.Errorf("error listing network interfaces: %w", err)
 	}
@@ -195,28 +196,9 @@ func (r *AliasPrefixReconciler) applyRouting(ctx context.Context, aliasPrefix *n
 	return nil
 }
 
-const (
-	networkInterfaceSpecNetworkRefNameField = ".spec.networkRef.name"
-	aliasPrefixSpecNetworkRefNameField      = ".spec.networkRef.name"
-)
-
 func (r *AliasPrefixReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	ctx := context.Background()
 	log := ctrl.Log.WithName("aliasprefix").WithName("setup")
-
-	if err := mgr.GetFieldIndexer().IndexField(ctx, &networkingv1alpha1.NetworkInterface{}, networkInterfaceSpecNetworkRefNameField, func(obj client.Object) []string {
-		nic := obj.(*networkingv1alpha1.NetworkInterface)
-		return []string{nic.Spec.NetworkRef.Name}
-	}); err != nil {
-		return err
-	}
-
-	if err := mgr.GetFieldIndexer().IndexField(ctx, &networkingv1alpha1.AliasPrefix{}, aliasPrefixSpecNetworkRefNameField, func(obj client.Object) []string {
-		aliasPrefix := obj.(*networkingv1alpha1.AliasPrefix)
-		return []string{aliasPrefix.Spec.NetworkRef.Name}
-	}); err != nil {
-		return err
-	}
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&networkingv1alpha1.AliasPrefix{}).
@@ -236,7 +218,7 @@ func (r *AliasPrefixReconciler) enqueueByAliasPrefixMatchingNetworkInterface(log
 		aliasPrefixList := &networkingv1alpha1.AliasPrefixList{}
 		if err := r.List(ctx, aliasPrefixList,
 			client.InNamespace(nic.Namespace),
-			client.MatchingFields{aliasPrefixSpecNetworkRefNameField: nic.Spec.NetworkRef.Name},
+			client.MatchingFields{onmetalapiclient.AliasPrefixNetworkName: nic.Spec.NetworkRef.Name},
 		); err != nil {
 			log.Error(err, "Error listing alias prefixes for network")
 			return nil

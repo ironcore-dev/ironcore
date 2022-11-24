@@ -27,6 +27,10 @@ const (
 	MachineSpecNetworkInterfaceNamesField = "machine-spec-network-interface-names"
 	MachineSpecVolumeNamesField           = "machine-spec-volume-names"
 
+	AliasPrefixNetworkName = "aliasprefix-network-name"
+
+	LoadBalancerNetworkName = "loadbalancer-network-name"
+
 	NetworkInterfaceVirtualIPNames = "networkinterface-virtual-ip-names"
 	NetworkInterfaceNetworkName    = "networkinterface-network-name"
 
@@ -90,5 +94,18 @@ func SetupPrefixAllocationSpecIPFamilyFieldIndexer(ctx context.Context, indexer 
 	return indexer.IndexField(ctx, &ipamv1alpha1.PrefixAllocation{}, PrefixAllocationSpecIPFamilyField, func(obj client.Object) []string {
 		prefixAllocation := obj.(*ipamv1alpha1.PrefixAllocation)
 		return []string{string(prefixAllocation.Spec.IPFamily)}
+	})
+}
+
+func SetupAliasPrefixNetworkNameFieldIndexer(ctx context.Context, indexer client.FieldIndexer) error {
+	return indexer.IndexField(ctx, &networkingv1alpha1.AliasPrefix{}, AliasPrefixNetworkName, func(obj client.Object) []string {
+		aliasPrefix := obj.(*networkingv1alpha1.AliasPrefix)
+		return []string{aliasPrefix.Spec.NetworkRef.Name}
+	})
+}
+func SetupLoadBalancerNetworkNameFieldIndexer(ctx context.Context, indexer client.FieldIndexer) error {
+	return indexer.IndexField(ctx, &networkingv1alpha1.LoadBalancer{}, LoadBalancerNetworkName, func(obj client.Object) []string {
+		loadBalancer := obj.(*networkingv1alpha1.LoadBalancer)
+		return []string{loadBalancer.Spec.NetworkRef.Name}
 	})
 }

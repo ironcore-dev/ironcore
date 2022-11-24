@@ -21,6 +21,7 @@ import (
 	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	onmetalapiclient "github.com/onmetal/onmetal-api/onmetal-controller-manager/client"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -102,7 +103,7 @@ func (r *LoadBalancerReconciler) findDestinations(ctx context.Context, log logr.
 	if err := r.List(ctx, nicList,
 		client.InNamespace(loadBalancer.Namespace),
 		client.MatchingLabelsSelector{Selector: sel},
-		client.MatchingFields{networkInterfaceSpecNetworkRefNameField: loadBalancer.Spec.NetworkRef.Name},
+		client.MatchingFields{onmetalapiclient.NetworkInterfaceNetworkName: loadBalancer.Spec.NetworkRef.Name},
 	); err != nil {
 		return nil, fmt.Errorf("error listing network interfaces: %w", err)
 	}
@@ -135,27 +136,9 @@ func (r *LoadBalancerReconciler) applyRouting(ctx context.Context, loadBalancer 
 	return nil
 }
 
-const (
-	loadBalancerSpecNetworkRefNameField = ".spec.networkRef.name"
-)
-
 func (r *LoadBalancerReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	ctx := context.Background()
 	log := ctrl.Log.WithName("loadbalancer").WithName("setup")
-
-	//if err := mgr.GetFieldIndexer().IndexField(ctx, &networkingv1alpha1.NetworkInterface{}, networkInterfaceSpecNetworkRefNameField, func(obj client.Object) []string {
-	//	nic := obj.(*networkingv1alpha1.NetworkInterface)
-	//	return []string{nic.Spec.NetworkRef.Name}
-	//}); err != nil {
-	//	return err
-	//}
-
-	if err := mgr.GetFieldIndexer().IndexField(ctx, &networkingv1alpha1.LoadBalancer{}, loadBalancerSpecNetworkRefNameField, func(obj client.Object) []string {
-		loadBalancer := obj.(*networkingv1alpha1.LoadBalancer)
-		return []string{loadBalancer.Spec.NetworkRef.Name}
-	}); err != nil {
-		return err
-	}
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&networkingv1alpha1.LoadBalancer{}).
@@ -175,7 +158,7 @@ func (r *LoadBalancerReconciler) enqueueByLoadBalancerMatchingNetworkInterface(l
 		loadBalancerList := &networkingv1alpha1.LoadBalancerList{}
 		if err := r.List(ctx, loadBalancerList,
 			client.InNamespace(nic.Namespace),
-			client.MatchingFields{loadBalancerSpecNetworkRefNameField: nic.Spec.NetworkRef.Name},
+			client.MatchingFields{onmetalapiclient.LoadBalancerNetworkName: nic.Spec.NetworkRef.Name},
 		); err != nil {
 			log.Error(err, "Error listing loadbalancers for network")
 			return nil

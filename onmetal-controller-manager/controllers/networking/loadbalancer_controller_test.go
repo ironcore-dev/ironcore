@@ -26,7 +26,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-var _ = FDescribe("LoadBalancerReconciler", func() {
+var _ = Describe("LoadBalancerReconciler", func() {
 	ctx := testutils.SetupContext()
 	ns := SetupTest(ctx)
 
