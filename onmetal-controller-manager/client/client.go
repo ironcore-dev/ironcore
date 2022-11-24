@@ -27,12 +27,12 @@ const (
 	MachineSpecNetworkInterfaceNamesField = "machine-spec-network-interface-names"
 	MachineSpecVolumeNamesField           = "machine-spec-volume-names"
 
-	AliasPrefixNetworkName = "aliasprefix-network-name"
+	AliasPrefixNetworkNameField = "aliasprefix-network-name"
 
-	LoadBalancerNetworkName = "loadbalancer-network-name"
+	LoadBalancerNetworkNameField = "loadbalancer-network-name"
 
-	NetworkInterfaceVirtualIPNames = "networkinterface-virtual-ip-names"
-	NetworkInterfaceNetworkName    = "networkinterface-network-name"
+	NetworkInterfaceVirtualIPNamesField = "networkinterface-virtual-ip-names"
+	NetworkInterfaceNetworkNameField    = "networkinterface-network-name"
 
 	PrefixSpecIPFamilyField           = "prefix-spec-ipfamily"
 	PrefixAllocationSpecIPFamilyField = "prefixallocation-spec-ipfamily"
@@ -59,7 +59,7 @@ func SetupMachineSpecVolumeNamesFieldIndexer(ctx context.Context, indexer client
 }
 
 func SetupNetworkInterfaceVirtualIPNameFieldIndexer(ctx context.Context, indexer client.FieldIndexer) error {
-	return indexer.IndexField(ctx, &networkingv1alpha1.NetworkInterface{}, NetworkInterfaceVirtualIPNames, func(obj client.Object) []string {
+	return indexer.IndexField(ctx, &networkingv1alpha1.NetworkInterface{}, NetworkInterfaceVirtualIPNamesField, func(obj client.Object) []string {
 		nic := obj.(*networkingv1alpha1.NetworkInterface)
 
 		virtualIP := nic.Spec.VirtualIP
@@ -77,7 +77,7 @@ func SetupNetworkInterfaceVirtualIPNameFieldIndexer(ctx context.Context, indexer
 }
 
 func SetupNetworkInterfaceNetworkNameFieldIndexer(ctx context.Context, indexer client.FieldIndexer) error {
-	return indexer.IndexField(ctx, &networkingv1alpha1.NetworkInterface{}, NetworkInterfaceNetworkName, func(obj client.Object) []string {
+	return indexer.IndexField(ctx, &networkingv1alpha1.NetworkInterface{}, NetworkInterfaceNetworkNameField, func(obj client.Object) []string {
 		nic := obj.(*networkingv1alpha1.NetworkInterface)
 		return []string{nic.Spec.NetworkRef.Name}
 	})
@@ -98,13 +98,13 @@ func SetupPrefixAllocationSpecIPFamilyFieldIndexer(ctx context.Context, indexer 
 }
 
 func SetupAliasPrefixNetworkNameFieldIndexer(ctx context.Context, indexer client.FieldIndexer) error {
-	return indexer.IndexField(ctx, &networkingv1alpha1.AliasPrefix{}, AliasPrefixNetworkName, func(obj client.Object) []string {
+	return indexer.IndexField(ctx, &networkingv1alpha1.AliasPrefix{}, AliasPrefixNetworkNameField, func(obj client.Object) []string {
 		aliasPrefix := obj.(*networkingv1alpha1.AliasPrefix)
 		return []string{aliasPrefix.Spec.NetworkRef.Name}
 	})
 }
 func SetupLoadBalancerNetworkNameFieldIndexer(ctx context.Context, indexer client.FieldIndexer) error {
-	return indexer.IndexField(ctx, &networkingv1alpha1.LoadBalancer{}, LoadBalancerNetworkName, func(obj client.Object) []string {
+	return indexer.IndexField(ctx, &networkingv1alpha1.LoadBalancer{}, LoadBalancerNetworkNameField, func(obj client.Object) []string {
 		loadBalancer := obj.(*networkingv1alpha1.LoadBalancer)
 		return []string{loadBalancer.Spec.NetworkRef.Name}
 	})

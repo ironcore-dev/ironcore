@@ -309,7 +309,7 @@ func (r *NetworkInterfaceReconciler) enqueueByNetworkInterfaceVirtualIPReference
 		nicList := &networkingv1alpha1.NetworkInterfaceList{}
 		if err := r.List(ctx, nicList,
 			client.InNamespace(vip.Namespace),
-			client.MatchingFields{onmetalapiclient.NetworkInterfaceVirtualIPNames: vip.Name},
+			client.MatchingFields{onmetalapiclient.NetworkInterfaceVirtualIPNamesField: vip.Name},
 		); err != nil {
 			log.Error(err, "Error listing network interfaces using virtual ip")
 			return nil
@@ -331,7 +331,7 @@ func (r *NetworkInterfaceReconciler) enqueueByNetworkInterfaceNetworkReferences(
 		nicList := &networkingv1alpha1.NetworkInterfaceList{}
 		if err := r.List(ctx, nicList,
 			client.InNamespace(network.Namespace),
-			client.MatchingFields{onmetalapiclient.NetworkInterfaceNetworkName: network.Name},
+			client.MatchingFields{onmetalapiclient.NetworkInterfaceNetworkNameField: network.Name},
 		); err != nil {
 			log.Error(err, "Error listing network interface using network")
 			return nil

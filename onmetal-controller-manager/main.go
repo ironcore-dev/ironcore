@@ -292,7 +292,7 @@ func main() {
 
 	if controllers.Enabled(networkInterfaceController) || controllers.Enabled(aliasPrefixController) || controllers.Enabled(loadBalancerController) {
 		if err = onmetalapiclient.SetupNetworkInterfaceNetworkNameFieldIndexer(context.TODO(), mgr.GetFieldIndexer()); err != nil {
-			setupLog.Error(err, "unable to setup field indexer", "field", onmetalapiclient.NetworkInterfaceNetworkName)
+			setupLog.Error(err, "unable to setup field indexer", "field", onmetalapiclient.NetworkInterfaceNetworkNameField)
 			os.Exit(1)
 		}
 	}
@@ -336,7 +336,7 @@ func main() {
 
 	if controllers.Enabled(aliasPrefixController) {
 		if err = onmetalapiclient.SetupAliasPrefixNetworkNameFieldIndexer(context.TODO(), mgr.GetFieldIndexer()); err != nil {
-			setupLog.Error(err, "unable to setup field indexer", "field", onmetalapiclient.AliasPrefixNetworkName)
+			setupLog.Error(err, "unable to setup field indexer", "field", onmetalapiclient.AliasPrefixNetworkNameField)
 			os.Exit(1)
 		}
 
@@ -351,7 +351,7 @@ func main() {
 
 	if controllers.Enabled(loadBalancerController) {
 		if err = onmetalapiclient.SetupLoadBalancerNetworkNameFieldIndexer(context.TODO(), mgr.GetFieldIndexer()); err != nil {
-			setupLog.Error(err, "unable to setup field indexer", "field", onmetalapiclient.LoadBalancerNetworkName)
+			setupLog.Error(err, "unable to setup field indexer", "field", onmetalapiclient.LoadBalancerNetworkNameField)
 			os.Exit(1)
 		}
 

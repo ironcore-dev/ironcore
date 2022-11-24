@@ -103,7 +103,7 @@ func (r *LoadBalancerReconciler) findDestinations(ctx context.Context, log logr.
 	if err := r.List(ctx, nicList,
 		client.InNamespace(loadBalancer.Namespace),
 		client.MatchingLabelsSelector{Selector: sel},
-		client.MatchingFields{onmetalapiclient.NetworkInterfaceNetworkName: loadBalancer.Spec.NetworkRef.Name},
+		client.MatchingFields{onmetalapiclient.NetworkInterfaceNetworkNameField: loadBalancer.Spec.NetworkRef.Name},
 	); err != nil {
 		return nil, fmt.Errorf("error listing network interfaces: %w", err)
 	}
@@ -145,12 +145,12 @@ func (r *LoadBalancerReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Owns(&networkingv1alpha1.LoadBalancerRouting{}).
 		Watches(
 			&source.Kind{Type: &networkingv1alpha1.NetworkInterface{}},
-			r.enqueueByLoadBalancerMatchingNetworkInterface(log, ctx),
+			r.enqueueByLoadBalancerMatchingNetworkInterface(ctx, log),
 		).
 		Complete(r)
 }
 
-func (r *LoadBalancerReconciler) enqueueByLoadBalancerMatchingNetworkInterface(log logr.Logger, ctx context.Context) handler.EventHandler {
+func (r *LoadBalancerReconciler) enqueueByLoadBalancerMatchingNetworkInterface(ctx context.Context, log logr.Logger) handler.EventHandler {
 	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
 		nic := obj.(*networkingv1alpha1.NetworkInterface)
 		log = log.WithValues("NetworkInterfaceKey", client.ObjectKeyFromObject(nic))
@@ -158,7 +158,7 @@ func (r *LoadBalancerReconciler) enqueueByLoadBalancerMatchingNetworkInterface(l
 		loadBalancerList := &networkingv1alpha1.LoadBalancerList{}
 		if err := r.List(ctx, loadBalancerList,
 			client.InNamespace(nic.Namespace),
-			client.MatchingFields{onmetalapiclient.LoadBalancerNetworkName: nic.Spec.NetworkRef.Name},
+			client.MatchingFields{onmetalapiclient.LoadBalancerNetworkNameField: nic.Spec.NetworkRef.Name},
 		); err != nil {
 			log.Error(err, "Error listing loadbalancers for network")
 			return nil

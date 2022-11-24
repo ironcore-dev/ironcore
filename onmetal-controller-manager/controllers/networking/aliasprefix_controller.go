@@ -163,7 +163,7 @@ func (r *AliasPrefixReconciler) findDestinations(ctx context.Context, log logr.L
 	if err := r.List(ctx, nicList,
 		client.InNamespace(aliasPrefix.Namespace),
 		client.MatchingLabelsSelector{Selector: sel},
-		client.MatchingFields{onmetalapiclient.NetworkInterfaceNetworkName: aliasPrefix.Spec.NetworkRef.Name},
+		client.MatchingFields{onmetalapiclient.NetworkInterfaceNetworkNameField: aliasPrefix.Spec.NetworkRef.Name},
 	); err != nil {
 		return nil, fmt.Errorf("error listing network interfaces: %w", err)
 	}
@@ -205,12 +205,12 @@ func (r *AliasPrefixReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Owns(&networkingv1alpha1.AliasPrefixRouting{}).
 		Watches(
 			&source.Kind{Type: &networkingv1alpha1.NetworkInterface{}},
-			r.enqueueByAliasPrefixMatchingNetworkInterface(log, ctx),
+			r.enqueueByAliasPrefixMatchingNetworkInterface(ctx, log),
 		).
 		Complete(r)
 }
 
-func (r *AliasPrefixReconciler) enqueueByAliasPrefixMatchingNetworkInterface(log logr.Logger, ctx context.Context) handler.EventHandler {
+func (r *AliasPrefixReconciler) enqueueByAliasPrefixMatchingNetworkInterface(ctx context.Context, log logr.Logger) handler.EventHandler {
 	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
 		nic := obj.(*networkingv1alpha1.NetworkInterface)
 		log = log.WithValues("NetworkInterfaceKey", client.ObjectKeyFromObject(nic))
@@ -218,7 +218,7 @@ func (r *AliasPrefixReconciler) enqueueByAliasPrefixMatchingNetworkInterface(log
 		aliasPrefixList := &networkingv1alpha1.AliasPrefixList{}
 		if err := r.List(ctx, aliasPrefixList,
 			client.InNamespace(nic.Namespace),
-			client.MatchingFields{onmetalapiclient.AliasPrefixNetworkName: nic.Spec.NetworkRef.Name},
+			client.MatchingFields{onmetalapiclient.AliasPrefixNetworkNameField: nic.Spec.NetworkRef.Name},
 		); err != nil {
 			log.Error(err, "Error listing alias prefixes for network")
 			return nil
