@@ -132,6 +132,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	Expect(onmetalapiclient.SetupPrefixSpecIPFamilyFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 	Expect(onmetalapiclient.SetupAliasPrefixNetworkNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 	Expect(onmetalapiclient.SetupLoadBalancerNetworkNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+	Expect(onmetalapiclient.SetupNATGatewayNetworkNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 
 	// Register reconcilers
 	err = (&NetworkInterfaceReconciler{
