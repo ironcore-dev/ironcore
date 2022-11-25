@@ -23,6 +23,7 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/clientutils"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	onmetalapiclient "github.com/onmetal/onmetal-api/onmetal-controller-manager/client"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -32,8 +33,7 @@ import (
 )
 
 const (
-	networkFinalizer     = "networking.api.onmetal.de/network"
-	networkNameFieldPath = ".spec.networkRef.name"
+	networkFinalizer = "networking.api.onmetal.de/network"
 )
 
 type NetworkProtectionReconciler struct {
@@ -97,7 +97,7 @@ func (r *NetworkProtectionReconciler) isNetworkInUse(ctx context.Context, log lo
 
 	// NetworkInterfaces
 	networkInterfaces := &networkingv1alpha1.NetworkInterfaceList{}
-	if err := r.List(ctx, networkInterfaces, client.MatchingFields{networkNameFieldPath: network.Name}); err != nil {
+	if err := r.List(ctx, networkInterfaces, client.MatchingFields{onmetalapiclient.NetworkInterfaceNetworkNameField: network.Name}); err != nil {
 		return false, fmt.Errorf("failed to list NetworkInterfaces: %w", err)
 	}
 	for _, networkInterface := range networkInterfaces.Items {
@@ -110,7 +110,7 @@ func (r *NetworkProtectionReconciler) isNetworkInUse(ctx context.Context, log lo
 
 	// AliasPrefixes
 	aliasPrefixes := &networkingv1alpha1.AliasPrefixList{}
-	if err := r.List(ctx, aliasPrefixes, client.MatchingFields{networkNameFieldPath: network.Name}); err != nil {
+	if err := r.List(ctx, aliasPrefixes, client.MatchingFields{onmetalapiclient.NetworkInterfaceNetworkNameField: network.Name}); err != nil {
 		return false, fmt.Errorf("failed to list NetworkInterfaces: %w", err)
 	}
 	for _, aliasPrefix := range aliasPrefixes.Items {
