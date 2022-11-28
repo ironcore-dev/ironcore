@@ -86,10 +86,10 @@ func (r *LoadBalancerReconciler) reconcile(ctx context.Context, log logr.Logger,
 	}
 	log.V(1).Info("Successfully found destinations", "Destinations", destinations)
 
-	log.V(1).Info("Finding network")
-	network, err := r.findNetwork(ctx, log, loadBalancer)
+	log.V(1).Info("Finding network", "Network", loadBalancer.Spec.NetworkRef.Name)
+	network, err := r.getNetwork(ctx, log, loadBalancer)
 	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("error finding network: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error getting network %s: %w", loadBalancer.Spec.NetworkRef.Name, err)
 	}
 	log.V(1).Info("Successfully found nework", "Network", network.Name)
 
@@ -123,10 +123,10 @@ func (r *LoadBalancerReconciler) findDestinations(ctx context.Context, log logr.
 	return destinations, nil
 }
 
-func (r *LoadBalancerReconciler) findNetwork(ctx context.Context, log logr.Logger, loadBalancer *networkingv1alpha1.LoadBalancer) (*networkingv1alpha1.Network, error) {
+func (r *LoadBalancerReconciler) getNetwork(ctx context.Context, log logr.Logger, loadBalancer *networkingv1alpha1.LoadBalancer) (*networkingv1alpha1.Network, error) {
 	network := &networkingv1alpha1.Network{}
 	if err := r.Get(ctx, types.NamespacedName{Name: loadBalancer.Spec.NetworkRef.Name, Namespace: loadBalancer.Namespace}, network); err != nil {
-		return nil, fmt.Errorf("error getting network: %w", err)
+		return nil, fmt.Errorf("error getting network %s: %w", loadBalancer.Spec.NetworkRef.Name, err)
 	}
 	return network, nil
 }
