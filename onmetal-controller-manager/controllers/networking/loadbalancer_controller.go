@@ -25,6 +25,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
@@ -85,8 +86,15 @@ func (r *LoadBalancerReconciler) reconcile(ctx context.Context, log logr.Logger,
 	}
 	log.V(1).Info("Successfully found destinations", "Destinations", destinations)
 
+	log.V(1).Info("Finding network", "Network", loadBalancer.Spec.NetworkRef.Name)
+	network, err := r.getNetwork(ctx, log, loadBalancer)
+	if err != nil {
+		return ctrl.Result{}, fmt.Errorf("error getting network %s: %w", loadBalancer.Spec.NetworkRef.Name, err)
+	}
+	log.V(1).Info("Successfully found nework", "Network", network.Name)
+
 	log.V(1).Info("Applying routing")
-	if err := r.applyRouting(ctx, loadBalancer, destinations); err != nil {
+	if err := r.applyRouting(ctx, loadBalancer, destinations, network); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error applying routing: %w", err)
 	}
 	log.V(1).Info("Successfully applied routing")
@@ -115,7 +123,15 @@ func (r *LoadBalancerReconciler) findDestinations(ctx context.Context, log logr.
 	return destinations, nil
 }
 
-func (r *LoadBalancerReconciler) applyRouting(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancer, destinations []commonv1alpha1.LocalUIDReference) error {
+func (r *LoadBalancerReconciler) getNetwork(ctx context.Context, log logr.Logger, loadBalancer *networkingv1alpha1.LoadBalancer) (*networkingv1alpha1.Network, error) {
+	network := &networkingv1alpha1.Network{}
+	if err := r.Get(ctx, types.NamespacedName{Name: loadBalancer.Spec.NetworkRef.Name, Namespace: loadBalancer.Namespace}, network); err != nil {
+		return nil, fmt.Errorf("error getting network %s: %w", loadBalancer.Spec.NetworkRef.Name, err)
+	}
+	return network, nil
+}
+
+func (r *LoadBalancerReconciler) applyRouting(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancer, destinations []commonv1alpha1.LocalUIDReference, network *networkingv1alpha1.Network) error {
 	loadBalancerRouting := &networkingv1alpha1.LoadBalancerRouting{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "LoadBalancerRouting",
@@ -126,6 +142,10 @@ func (r *LoadBalancerReconciler) applyRouting(ctx context.Context, loadBalancer 
 			Name:      loadBalancer.Name,
 		},
 		Destinations: destinations,
+		NetworkRef: commonv1alpha1.LocalUIDReference{
+			Name: network.Name,
+			UID:  network.UID,
+		},
 	}
 	if err := ctrl.SetControllerReference(loadBalancer, loadBalancerRouting, r.Scheme); err != nil {
 		return fmt.Errorf("error setting controller reference: %w", err)
