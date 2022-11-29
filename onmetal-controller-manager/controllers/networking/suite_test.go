@@ -47,8 +47,8 @@ import (
 
 const (
 	pollingInterval      = 50 * time.Millisecond
-	eventuallyTimeout    = 3 * time.Second
-	consistentlyDuration = 1 * time.Second
+	eventuallyTimeout    = 30 * time.Second
+	consistentlyDuration = 10 * time.Second
 	apiServiceTimeout    = 5 * time.Minute
 )
 
@@ -61,7 +61,7 @@ var (
 
 func TestAPIs(t *testing.T) {
 	_, reporterConfig := GinkgoConfiguration()
-	reporterConfig.SlowSpecThreshold = 10 * time.Second
+	reporterConfig.SlowSpecThreshold = 1000 * time.Second
 	SetDefaultConsistentlyPollingInterval(pollingInterval)
 	SetDefaultEventuallyPollingInterval(pollingInterval)
 	SetDefaultEventuallyTimeout(eventuallyTimeout)
@@ -167,6 +167,12 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	Expect(err).NotTo(HaveOccurred())
 
 	err = (&LoadBalancerReconciler{
+		Client: k8sManager.GetClient(),
+		Scheme: k8sManager.GetScheme(),
+	}).SetupWithManager(k8sManager)
+	Expect(err).NotTo(HaveOccurred())
+
+	err = (&NatGatewayReconciler{
 		Client: k8sManager.GetClient(),
 		Scheme: k8sManager.GetScheme(),
 	}).SetupWithManager(k8sManager)

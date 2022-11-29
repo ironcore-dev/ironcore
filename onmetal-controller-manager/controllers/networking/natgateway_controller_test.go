@@ -23,6 +23,8 @@ import (
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/utils/pointer"
+	"net/netip"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -48,12 +50,22 @@ var _ = Describe("NatGatewayReconciler", func() {
 			},
 			Spec: networkingv1alpha1.NATGatewaySpec{
 				//ToDo
-				Type:                     "",
-				IPFamilies:               nil,
-				IPs:                      nil,
-				NetworkRef:               corev1.LocalObjectReference{},
-				NetworkInterfaceSelector: nil,
-				PortsPerNetworkInterface: nil,
+				Type: networkingv1alpha1.NATGatewayTypePublic,
+				IPFamilies: []corev1.IPFamily{
+					corev1.IPv4Protocol,
+				},
+				IPs: []networkingv1alpha1.NATGatewayIP{
+					{
+						Name: "ip1",
+					},
+				},
+				NetworkRef: corev1.LocalObjectReference{
+					Name: network.Name,
+				},
+				NetworkInterfaceSelector: &metav1.LabelSelector{
+					MatchLabels: map[string]string{"foo": "bar"},
+				},
+				PortsPerNetworkInterface: pointer.Int32(2),
 			},
 		}
 		Expect(k8sClient.Create(ctx, natGateway)).To(Succeed())
@@ -69,6 +81,18 @@ var _ = Describe("NatGatewayReconciler", func() {
 			g.Expect(metav1.IsControlledBy(natGatewayRouting, natGateway)).To(BeTrue(), "nat gateway routing is not controlled by nat gateway: %#v", natGatewayRouting.OwnerReferences)
 			g.Expect(natGatewayRouting.Destinations).To(BeEmpty())
 		}).Should(Succeed())
+
+		natGatewayBase := natGateway.DeepCopy()
+		ip := netip.IPv4Unspecified()
+		for _, v := range natGateway.Spec.IPs {
+			natGateway.Status.IPs = append(natGateway.Status.IPs, networkingv1alpha1.NATGatewayIPStatus{
+				Name: v.Name,
+				IP: commonv1alpha1.IP{
+					Addr: ip.Next(),
+				},
+			})
+		}
+		Expect(k8sClient.Patch(ctx, natGateway, client.MergeFrom(natGatewayBase))).To(Succeed())
 
 		By("creating a network interface")
 		nic := &networkingv1alpha1.NetworkInterface{
@@ -95,9 +119,138 @@ var _ = Describe("NatGatewayReconciler", func() {
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, natGatewayKey, natGatewayRouting)).To(Succeed())
 
-			g.Expect(natGatewayRouting.Destinations).To(Equal([]commonv1alpha1.LocalUIDReference{
-				{Name: nic.Name, UID: nic.UID},
-			}))
+			g.Expect(natGatewayRouting.Destinations).To(HaveLen(1))
+
+			g.Expect(natGatewayRouting.Destinations[0].Name).To(BeEquivalentTo(nic.Name))
+			g.Expect(natGatewayRouting.Destinations[0].UID).To(BeEquivalentTo(nic.UID))
+			g.Expect(natGatewayRouting.Destinations[0].IPs).To(HaveLen(1))
+			g.Expect(natGatewayRouting.Destinations[0].IPs[0].IP).To(BeEquivalentTo(natGateway.Status.IPs[0].IP))
 		}).Should(Succeed())
+	})
+	FIt("should reconcile the nattateway and routing destinations", func() {
+		By("creating a network")
+		network := &networkingv1alpha1.Network{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "network-",
+			},
+		}
+		Expect(k8sClient.Create(ctx, network)).To(Succeed())
+
+		By("creating a nat gateway")
+		natGateway := &networkingv1alpha1.NATGateway{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "nat-gateway-",
+			},
+			Spec: networkingv1alpha1.NATGatewaySpec{
+				//ToDo
+				Type: networkingv1alpha1.NATGatewayTypePublic,
+				IPFamilies: []corev1.IPFamily{
+					corev1.IPv4Protocol,
+				},
+				IPs: []networkingv1alpha1.NATGatewayIP{
+					{
+						Name: "ip1",
+					},
+					{
+						Name: "ip2",
+					},
+				},
+				NetworkRef: corev1.LocalObjectReference{
+					Name: network.Name,
+				},
+				NetworkInterfaceSelector: &metav1.LabelSelector{
+					MatchLabels: map[string]string{"foo": "bar"},
+				},
+				PortsPerNetworkInterface: pointer.Int32(1024),
+			},
+		}
+		Expect(k8sClient.Create(ctx, natGateway)).To(Succeed())
+
+		By("waiting for the nat gateway routing to exist with no destinations")
+		natGatewayKey := client.ObjectKeyFromObject(natGateway)
+		natGatewayRouting := &networkingv1alpha1.NATGatewayRouting{}
+		Eventually(func(g Gomega) {
+			err := k8sClient.Get(ctx, natGatewayKey, natGatewayRouting)
+			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
+			g.Expect(err).NotTo(HaveOccurred())
+
+			g.Expect(metav1.IsControlledBy(natGatewayRouting, natGateway)).To(BeTrue(), "nat gateway routing is not controlled by nat gateway: %#v", natGatewayRouting.OwnerReferences)
+			g.Expect(natGatewayRouting.Destinations).To(BeEmpty())
+		}).Should(Succeed())
+
+		natGatewayBase := natGateway.DeepCopy()
+		ip := netip.IPv4Unspecified()
+		for _, v := range natGateway.Spec.IPs {
+			ip = ip.Next()
+			natGateway.Status.IPs = append(natGateway.Status.IPs, networkingv1alpha1.NATGatewayIPStatus{
+				Name: v.Name,
+				IP: commonv1alpha1.IP{
+					Addr: ip,
+				},
+			})
+		}
+		Expect(k8sClient.Patch(ctx, natGateway, client.MergeFrom(natGatewayBase))).To(Succeed())
+
+		By("creating a network interfaces")
+
+		nics := 60
+		for i := 0; i < nics; i++ {
+			nic := &networkingv1alpha1.NetworkInterface{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace:    ns.Name,
+					GenerateName: "nic-",
+					Labels:       map[string]string{"foo": "bar"},
+				},
+				Spec: networkingv1alpha1.NetworkInterfaceSpec{
+					NetworkRef: corev1.LocalObjectReference{Name: network.Name},
+					IPFamilies: []corev1.IPFamily{
+						corev1.IPv4Protocol,
+					},
+					IPs: []networkingv1alpha1.IPSource{
+						{
+							Value: commonv1alpha1.MustParseNewIP("10.0.0.1"),
+						},
+					},
+				},
+			}
+			Expect(k8sClient.Create(ctx, nic)).To(Succeed())
+		}
+
+		By("waiting for the nat gateway routing to be updated")
+		Eventually(func(g Gomega) {
+			Expect(k8sClient.Get(ctx, natGatewayKey, natGatewayRouting)).To(Succeed())
+			g.Expect(natGatewayRouting.Destinations).To(HaveLen(nics))
+		}).Should(Succeed())
+
+		for i := 0; i < nics; i++ {
+			nic := &networkingv1alpha1.NetworkInterface{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace:    ns.Name,
+					GenerateName: "nic-",
+					Labels:       map[string]string{"foo": "bar"},
+				},
+				Spec: networkingv1alpha1.NetworkInterfaceSpec{
+					NetworkRef: corev1.LocalObjectReference{Name: network.Name},
+					IPFamilies: []corev1.IPFamily{
+						corev1.IPv4Protocol,
+					},
+					IPs: []networkingv1alpha1.IPSource{
+						{
+							Value: commonv1alpha1.MustParseNewIP("10.0.0.1"),
+						},
+					},
+				},
+			}
+			Expect(k8sClient.Create(ctx, nic)).To(Succeed())
+		}
+
+		By("waiting for the nat gateway routing to be updated")
+		Eventually(func(g Gomega) {
+			Expect(k8sClient.Get(ctx, natGatewayKey, natGatewayRouting)).To(Succeed())
+			g.Expect(natGatewayRouting.Destinations).To(HaveLen(2 * nics))
+		}).Should(Succeed())
+
 	})
 })
