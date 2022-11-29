@@ -16,6 +16,8 @@
 package networking
 
 import (
+	"net/netip"
+
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	"github.com/onmetal/onmetal-api/testutils"
@@ -24,7 +26,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/utils/pointer"
-	"net/netip"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -32,7 +33,7 @@ var _ = Describe("NatGatewayReconciler", func() {
 	ctx := testutils.SetupContext()
 	ns := SetupTest(ctx)
 
-	It("should reconcile the prefix and routing destinations", func() {
+	It("should reconcile the natgateway and routing destinations", func() {
 		By("creating a network")
 		network := &networkingv1alpha1.Network{
 			ObjectMeta: metav1.ObjectMeta{
@@ -49,7 +50,6 @@ var _ = Describe("NatGatewayReconciler", func() {
 				GenerateName: "nat-gateway-",
 			},
 			Spec: networkingv1alpha1.NATGatewaySpec{
-				//ToDo
 				Type: networkingv1alpha1.NATGatewayTypePublic,
 				IPFamilies: []corev1.IPFamily{
 					corev1.IPv4Protocol,
@@ -119,6 +119,9 @@ var _ = Describe("NatGatewayReconciler", func() {
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, natGatewayKey, natGatewayRouting)).To(Succeed())
 
+			g.Expect(natGatewayRouting.NetworkRef.Name).To(BeEquivalentTo(network.Name))
+			g.Expect(natGatewayRouting.NetworkRef.UID).To(BeEquivalentTo(network.UID))
+
 			g.Expect(natGatewayRouting.Destinations).To(HaveLen(1))
 
 			g.Expect(natGatewayRouting.Destinations[0].Name).To(BeEquivalentTo(nic.Name))
@@ -127,7 +130,9 @@ var _ = Describe("NatGatewayReconciler", func() {
 			g.Expect(natGatewayRouting.Destinations[0].IPs[0].IP).To(BeEquivalentTo(natGateway.Status.IPs[0].IP))
 		}).Should(Succeed())
 	})
-	FIt("should reconcile the nattateway and routing destinations", func() {
+
+	It("should reconcile the nattateway and routing destinations, with to little ports", func() {
+		portsPerNetworkInterface := int32(1024)
 		By("creating a network")
 		network := &networkingv1alpha1.Network{
 			ObjectMeta: metav1.ObjectMeta{
@@ -163,7 +168,7 @@ var _ = Describe("NatGatewayReconciler", func() {
 				NetworkInterfaceSelector: &metav1.LabelSelector{
 					MatchLabels: map[string]string{"foo": "bar"},
 				},
-				PortsPerNetworkInterface: pointer.Int32(1024),
+				PortsPerNetworkInterface: pointer.Int32(portsPerNetworkInterface),
 			},
 		}
 		Expect(k8sClient.Create(ctx, natGateway)).To(Succeed())
@@ -195,7 +200,7 @@ var _ = Describe("NatGatewayReconciler", func() {
 
 		By("creating a network interfaces")
 
-		nics := 60
+		nics := 64
 		for i := 0; i < nics; i++ {
 			nic := &networkingv1alpha1.NetworkInterface{
 				ObjectMeta: metav1.ObjectMeta{
@@ -246,10 +251,27 @@ var _ = Describe("NatGatewayReconciler", func() {
 			Expect(k8sClient.Create(ctx, nic)).To(Succeed())
 		}
 
+		totalSlots := int(((MAX_PORT-MIN_PORT)/portsPerNetworkInterface)+1) * 2
 		By("waiting for the nat gateway routing to be updated")
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, natGatewayKey, natGatewayRouting)).To(Succeed())
 			g.Expect(natGatewayRouting.Destinations).To(HaveLen(2 * nics))
+			var assigned, unassigned int
+			for _, v := range natGatewayRouting.Destinations {
+				if len(v.IPs) == 0 {
+					unassigned++
+				} else {
+					assigned++
+				}
+			}
+			g.Expect(assigned).To(BeEquivalentTo(totalSlots))
+			g.Expect(unassigned).To(BeEquivalentTo(nics*2 - totalSlots))
+		}).Should(Succeed())
+
+		By("waiting for natgateway status to be updated")
+		Eventually(func(g Gomega) {
+			Expect(k8sClient.Get(ctx, natGatewayKey, natGateway)).To(Succeed())
+			g.Expect(natGateway.Status.PortsUsed).To(BeEquivalentTo(pointer.Int32((MAX_PORT - MIN_PORT + 1) * 2)))
 		}).Should(Succeed())
 
 	})

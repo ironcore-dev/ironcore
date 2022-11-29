@@ -372,8 +372,9 @@ func main() {
 		}
 
 		if err = (&networkingcontrollers.NatGatewayReconciler{
-			Client: mgr.GetClient(),
-			Scheme: mgr.GetScheme(),
+			Client:        mgr.GetClient(),
+			Scheme:        mgr.GetScheme(),
+			EventRecorder: mgr.GetEventRecorderFor("nat-gateway-scheduler"),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "NATGateway")
 			os.Exit(1)
