@@ -99,6 +99,9 @@ var _ = Describe("LoadBalancerReconciler", func() {
 			g.Expect(loadBalancerRouting.Destinations).To(Equal([]commonv1alpha1.LocalUIDReference{
 				{Name: nic.Name, UID: nic.UID},
 			}))
+
+			g.Expect(loadBalancerRouting.NetworkRef.Name).To(BeEquivalentTo(network.Name))
+			g.Expect(loadBalancerRouting.NetworkRef.UID).To(BeEquivalentTo(network.UID))
 		}).Should(Succeed())
 	})
 })
