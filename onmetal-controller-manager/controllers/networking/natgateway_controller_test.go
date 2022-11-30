@@ -269,7 +269,7 @@ var _ = Describe("NatGatewayReconciler", func() {
 			Expect(k8sClient.Create(ctx, nic)).To(Succeed())
 		}
 
-		totalSlots := int(((MAX_PORT-MIN_PORT)/portsPerNetworkInterface)+1) * 2
+		totalSlots := int(((MaxEphemeralPort-MinEphemeralPort)/portsPerNetworkInterface)+1) * 2
 		By("waiting for the nat gateway routing to be updated")
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, natGatewayKey, natGatewayRouting)).To(Succeed())
@@ -289,7 +289,7 @@ var _ = Describe("NatGatewayReconciler", func() {
 		By("waiting for natgateway status to be updated")
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, natGatewayKey, natGateway)).To(Succeed())
-			g.Expect(natGateway.Status.PortsUsed).To(BeEquivalentTo(pointer.Int32((MAX_PORT - MIN_PORT + 1) * 2)))
+			g.Expect(natGateway.Status.PortsUsed).To(BeEquivalentTo(pointer.Int32((MaxEphemeralPort - MinEphemeralPort + 1) * 2)))
 		}).Should(Succeed())
 
 	})
