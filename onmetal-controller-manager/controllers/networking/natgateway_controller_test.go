@@ -149,7 +149,7 @@ var _ = Describe("NatGatewayReconciler", func() {
 		}).Should(Succeed())
 	})
 
-	It("should reconcile the nattateway and routing destinations, with to little ports", func() {
+	It("should reconcile the nat gateway and routing destinations not enough ports", func() {
 		portsPerNetworkInterface := int32(1024)
 		By("creating a network")
 		network := &networkingv1alpha1.Network{
@@ -167,7 +167,6 @@ var _ = Describe("NatGatewayReconciler", func() {
 				GenerateName: "nat-gateway-",
 			},
 			Spec: networkingv1alpha1.NATGatewaySpec{
-				//ToDo
 				Type: networkingv1alpha1.NATGatewayTypePublic,
 				IPFamilies: []corev1.IPFamily{
 					corev1.IPv4Protocol,
@@ -216,7 +215,7 @@ var _ = Describe("NatGatewayReconciler", func() {
 		}
 		Expect(k8sClient.Patch(ctx, natGateway, client.MergeFrom(natGatewayBase))).To(Succeed())
 
-		By("creating a network interfaces")
+		By("creating network interfaces to exhaust the nat gateway's IPs")
 
 		nics := 64
 		for i := 0; i < nics; i++ {
