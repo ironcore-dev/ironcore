@@ -247,6 +247,7 @@ var _ = Describe("NatGatewayReconciler", func() {
 			g.Expect(natGatewayRouting.Destinations).To(HaveLen(nics))
 		}).Should(Succeed())
 
+		By("creating more network interfaces that cannot be allocated in the nat gateway anymore")
 		for i := 0; i < nics; i++ {
 			nic := &networkingv1alpha1.NetworkInterface{
 				ObjectMeta: metav1.ObjectMeta{
