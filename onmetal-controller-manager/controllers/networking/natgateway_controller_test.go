@@ -1,18 +1,17 @@
-/*
- * Copyright (c) 2021 by the OnMetal authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2022 OnMetal authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package networking
 
 import (
@@ -128,6 +127,25 @@ var _ = Describe("NatGatewayReconciler", func() {
 			g.Expect(natGatewayRouting.Destinations[0].UID).To(BeEquivalentTo(nic.UID))
 			g.Expect(natGatewayRouting.Destinations[0].IPs).To(HaveLen(1))
 			g.Expect(natGatewayRouting.Destinations[0].IPs[0].IP).To(BeEquivalentTo(natGateway.Status.IPs[0].IP))
+		}).Should(Succeed())
+
+		By("deleting a network interface")
+		Expect(k8sClient.Delete(ctx, nic)).To(Succeed())
+
+		By("waiting for the nat gateway routing to be updated")
+		Eventually(func(g Gomega) {
+			Expect(k8sClient.Get(ctx, natGatewayKey, natGatewayRouting)).To(Succeed())
+
+			g.Expect(natGatewayRouting.NetworkRef.Name).To(BeEquivalentTo(network.Name))
+			g.Expect(natGatewayRouting.NetworkRef.UID).To(BeEquivalentTo(network.UID))
+
+			g.Expect(natGatewayRouting.Destinations).To(HaveLen(0))
+		}).Should(Succeed())
+
+		By("waiting for natgateway status to be updated")
+		Eventually(func(g Gomega) {
+			Expect(k8sClient.Get(ctx, natGatewayKey, natGateway)).To(Succeed())
+			g.Expect(natGateway.Status.PortsUsed).To(BeEquivalentTo(pointer.Int32(0)))
 		}).Should(Succeed())
 	})
 

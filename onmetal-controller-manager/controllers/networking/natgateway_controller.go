@@ -79,7 +79,7 @@ func (r *NatGatewayReconciler) delete(ctx context.Context, log logr.Logger, natG
 	return ctrl.Result{}, nil
 }
 
-func hash(ip *networkingv1alpha1.NATGatewayDestinationIP) string {
+func getMapKey(ip *networkingv1alpha1.NATGatewayDestinationIP) string {
 	return fmt.Sprintf("%s/%d/%d", ip.IP, ip.Port, ip.EndPort)
 }
 
@@ -94,7 +94,7 @@ func (r *NatGatewayReconciler) assignPorts(ctx context.Context, log logr.Logger,
 		if v, found := destinations[dest.UID]; found {
 			v.IPs = dest.IPs
 			for _, ip := range v.IPs {
-				used[hash(&ip)] = true
+				used[getMapKey(&ip)] = true
 			}
 		}
 	}
@@ -128,8 +128,8 @@ func (r *NatGatewayReconciler) assignPorts(ctx context.Context, log logr.Logger,
 				EndPort: port + portsPerNetworkInterface - 1,
 			}
 
-			if _, allocated := used[hash(candidate)]; !allocated {
-				used[hash(candidate)] = true
+			if _, allocated := used[getMapKey(candidate)]; !allocated {
+				used[getMapKey(candidate)] = true
 				log.V(2).Info("found port range for destination", "destination", v.Name, "start", candidate.Port, "end", candidate.EndPort, "ip", candidate.IP.String())
 				break
 			}
@@ -178,7 +178,7 @@ func (r *NatGatewayReconciler) reconcile(ctx context.Context, log logr.Logger, n
 	neededIps := int(math.Ceil(float64(len(destinations)) / float64(slotsPerIP)))
 
 	if len(natGateway.Spec.IPs) < neededIps {
-		log.Info(fmt.Sprintf("Got %d ips but %d are needed", len(natGateway.Spec.IPs), neededIps))
+		log.Info("Not enough ips provided", "available ips", len(natGateway.Spec.IPs), "needed ips", neededIps)
 	}
 
 	log.V(1).Info("Assigning ports")
