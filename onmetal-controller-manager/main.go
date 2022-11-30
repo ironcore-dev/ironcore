@@ -250,6 +250,13 @@ func main() {
 		}
 	}
 
+	if controllers.Enabled(networkInterfaceController) || controllers.Enabled(networkProtectionController) || controllers.Enabled(aliasPrefixController) || controllers.Enabled(loadBalancerController) {
+		if err = onmetalapiclient.SetupNetworkInterfaceNetworkNameFieldIndexer(context.TODO(), mgr.GetFieldIndexer()); err != nil {
+			setupLog.Error(err, "unable to setup field indexer", "field", onmetalapiclient.NetworkInterfaceNetworkNameField)
+			os.Exit(1)
+		}
+	}
+
 	if controllers.Enabled(prefixController) {
 		if err = (&ipam.PrefixReconciler{
 			Client:                  mgr.GetClient(),
@@ -286,13 +293,6 @@ func main() {
 	if controllers.Enabled(networkInterfaceController) || controllers.Enabled(virtualIPController) {
 		if err = onmetalapiclient.SetupNetworkInterfaceVirtualIPNameFieldIndexer(context.TODO(), mgr.GetFieldIndexer()); err != nil {
 			setupLog.Error(err, "unable to setup field indexer", "field", "NetworkInterfaceVirtualIPName")
-			os.Exit(1)
-		}
-	}
-
-	if controllers.Enabled(networkInterfaceController) || controllers.Enabled(networkProtectionController) || controllers.Enabled(aliasPrefixController) || controllers.Enabled(loadBalancerController) {
-		if err = onmetalapiclient.SetupNetworkInterfaceNetworkNameFieldIndexer(context.TODO(), mgr.GetFieldIndexer()); err != nil {
-			setupLog.Error(err, "unable to setup field indexer", "field", onmetalapiclient.NetworkInterfaceNetworkNameField)
 			os.Exit(1)
 		}
 	}
