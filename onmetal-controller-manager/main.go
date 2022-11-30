@@ -334,12 +334,14 @@ func main() {
 		}
 	}
 
-	if controllers.Enabled(aliasPrefixController) {
+	if controllers.Enabled(aliasPrefixController) || controllers.Enabled(networkProtectionController) {
 		if err = onmetalapiclient.SetupAliasPrefixNetworkNameFieldIndexer(context.TODO(), mgr.GetFieldIndexer()); err != nil {
 			setupLog.Error(err, "unable to setup field indexer", "field", onmetalapiclient.AliasPrefixNetworkNameField)
 			os.Exit(1)
 		}
+	}
 
+	if controllers.Enabled(aliasPrefixController) {
 		if err = (&networkingcontrollers.AliasPrefixReconciler{
 			Client: mgr.GetClient(),
 			Scheme: mgr.GetScheme(),
