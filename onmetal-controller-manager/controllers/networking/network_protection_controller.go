@@ -110,7 +110,7 @@ func (r *NetworkProtectionReconciler) isNetworkInUse(ctx context.Context, log lo
 
 	// AliasPrefixes
 	aliasPrefixes := &networkingv1alpha1.AliasPrefixList{}
-	if err := r.List(ctx, aliasPrefixes, client.MatchingFields{onmetalapiclient.NetworkInterfaceNetworkNameField: network.Name}); err != nil {
+	if err := r.List(ctx, aliasPrefixes, client.MatchingFields{onmetalapiclient.AliasPrefixNetworkNameField: network.Name}); err != nil {
 		return false, fmt.Errorf("failed to list NetworkInterfaces: %w", err)
 	}
 	for _, aliasPrefix := range aliasPrefixes.Items {
