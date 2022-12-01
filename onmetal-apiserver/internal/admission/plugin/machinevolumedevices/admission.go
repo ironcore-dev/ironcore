@@ -62,7 +62,7 @@ func (d *MachineVolumeDevices) Admit(ctx context.Context, a admission.Attributes
 
 	for i := range machine.Spec.Volumes {
 		volume := &machine.Spec.Volumes[i]
-		if volume.Device != nil {
+		if volume.Device != "" {
 			continue
 		}
 
@@ -71,7 +71,7 @@ func (d *MachineVolumeDevices) Admit(ctx context.Context, a admission.Attributes
 			return apierrors.NewBadRequest("No device names left for machine")
 		}
 
-		volume.Device = &newDevice
+		volume.Device = newDevice
 	}
 
 	return nil
@@ -92,7 +92,7 @@ func shouldIgnore(a admission.Attributes) bool {
 
 func machineHasAnyVolumeWithoutDevice(machine *compute.Machine) bool {
 	for _, volume := range machine.Spec.Volumes {
-		if volume.Device == nil {
+		if volume.Device == "" {
 			return true
 		}
 	}
@@ -102,9 +102,9 @@ func machineHasAnyVolumeWithoutDevice(machine *compute.Machine) bool {
 func deviceNamerFromMachineVolumes(machine *compute.Machine) (*device.Namer, error) {
 	namer := device.NewNamer()
 	for _, volume := range machine.Spec.Volumes {
-		if dev := volume.Device; dev != nil {
-			if err := namer.Observe(*dev); err != nil {
-				return nil, fmt.Errorf("error observing device %s: %w", *dev, err)
+		if dev := volume.Device; dev != "" {
+			if err := namer.Observe(dev); err != nil {
+				return nil, fmt.Errorf("error observing device %s: %w", dev, err)
 			}
 		}
 	}

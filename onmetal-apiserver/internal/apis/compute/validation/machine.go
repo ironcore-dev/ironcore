@@ -90,12 +90,10 @@ func validateMachineSpec(machineSpec *compute.MachineSpec, fldPath *field.Path) 
 		} else {
 			seenNames.Insert(vol.Name)
 		}
-		if vol.Device != nil {
-			if seenDevices.Has(*vol.Device) {
-				allErrs = append(allErrs, field.Duplicate(fldPath.Child("volume").Index(i).Child("device"), vol.Device))
-			} else {
-				seenDevices.Insert(*vol.Device)
-			}
+		if seenDevices.Has(vol.Device) {
+			allErrs = append(allErrs, field.Duplicate(fldPath.Child("volume").Index(i).Child("device"), vol.Device))
+		} else {
+			seenDevices.Insert(vol.Device)
 		}
 		allErrs = append(allErrs, validateVolume(&vol, fldPath.Child("volume").Index(i))...)
 	}
@@ -112,12 +110,8 @@ func validateVolume(volume *compute.Volume, fldPath *field.Path) field.ErrorList
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), volume.Name, msg))
 	}
 
-	if volume.Device == nil {
-		allErrs = append(allErrs, field.Required(fldPath.Child("device"), "must specify device"))
-	} else {
-		if _, _, err := device.ParseName(*volume.Device); err != nil {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("device"), *volume.Device, fmt.Sprintf("invalid device name: %v", err)))
-		}
+	if _, _, err := device.ParseName(volume.Device); err != nil {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("device"), volume.Device, fmt.Sprintf("invalid device name: %v", err)))
 	}
 
 	allErrs = append(allErrs, validateVolumeSource(&volume.VolumeSource, fldPath)...)

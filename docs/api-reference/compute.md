@@ -488,37 +488,6 @@ The default is nil which means that the limit is undefined.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.EmptyDiskVolumeStatus">EmptyDiskVolumeStatus
-</h3>
-<p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.VolumeSourceStatus">VolumeSourceStatus</a>)
-</p>
-<div>
-<p>EmptyDiskVolumeStatus is the status of an EmptyDiskVolumeSource Volume.</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>size</code><br/>
-<em>
-<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/api/resource#Duration">
-k8s.io/apimachinery/pkg/api/resource.Quantity
-</a>
-</em>
-</td>
-<td>
-<p>Size is the current size of the volume, if any discrete size is available.</p>
-</td>
-</tr>
-</tbody>
-</table>
 <h3 id="compute.api.onmetal.de/v1alpha1.EphemeralNetworkInterfaceSource">EphemeralNetworkInterfaceSource
 </h3>
 <p>
@@ -578,116 +547,6 @@ github.com/onmetal/onmetal-api/api/storage/v1alpha1.VolumeTemplateSpec
 </td>
 </tr>
 </tbody>
-</table>
-<h3 id="compute.api.onmetal.de/v1alpha1.MachineCondition">MachineCondition
-</h3>
-<p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachineStatus">MachineStatus</a>)
-</p>
-<div>
-<p>MachineCondition is one of the conditions of a volume.</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>type</code><br/>
-<em>
-<a href="#compute.api.onmetal.de/v1alpha1.MachineConditionType">
-MachineConditionType
-</a>
-</em>
-</td>
-<td>
-<p>Type is the type of the condition.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>status</code><br/>
-<em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#conditionstatus-v1-core">
-Kubernetes core/v1.ConditionStatus
-</a>
-</em>
-</td>
-<td>
-<p>Status is the status of the condition.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>reason</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Reason is a machine-readable indication of why the condition is in a certain state.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>message</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Message is a human-readable explanation of why the condition has a certain reason / state.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>observedGeneration</code><br/>
-<em>
-int64
-</em>
-</td>
-<td>
-<p>ObservedGeneration represents the .metadata.generation that the condition was set based upon.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>lastTransitionTime</code><br/>
-<em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#time-v1-meta">
-Kubernetes meta/v1.Time
-</a>
-</em>
-</td>
-<td>
-<p>LastTransitionTime is the last time the status of a condition has transitioned from one state to another.</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="compute.api.onmetal.de/v1alpha1.MachineConditionType">MachineConditionType
-(<code>string</code> alias)</h3>
-<p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachineCondition">MachineCondition</a>)
-</p>
-<div>
-<p>MachineConditionType is a type a MachineCondition can have.</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Value</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody><tr><td><p>&#34;Synced&#34;</p></td>
-<td><p>MachineSynced represents the condition of a machine being synced with its backing resources</p>
-</td>
-</tr></tbody>
 </table>
 <h3 id="compute.api.onmetal.de/v1alpha1.MachineExecOptions">MachineExecOptions
 </h3>
@@ -1235,10 +1094,7 @@ covered by Tolerations will be considered to run the Machine.</p>
 <th>Description</th>
 </tr>
 </thead>
-<tbody><tr><td><p>&#34;Error&#34;</p></td>
-<td><p>MachineStateError means the machine is in an error state.</p>
-</td>
-</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<tbody><tr><td><p>&#34;Pending&#34;</p></td>
 <td><p>MachineStatePending means the Machine has been accepted by the system, but not yet completely started.
 This includes time before being bound to a MachinePool, as well as time spent setting up the Machine on that
 MachinePool.</p>
@@ -1248,9 +1104,6 @@ MachinePool.</p>
 </td>
 </tr><tr><td><p>&#34;Shutdown&#34;</p></td>
 <td><p>MachineStateShutdown means the machine is shut down.</p>
-</td>
-</tr><tr><td><p>&#34;Unknown&#34;</p></td>
-<td><p>MachineStateUnknown means the machine is in an unknown state.</p>
 </td>
 </tr></tbody>
 </table>
@@ -1272,6 +1125,17 @@ MachinePool.</p>
 <tbody>
 <tr>
 <td>
+<code>machinePoolObservedGeneration</code><br/>
+<em>
+int64
+</em>
+</td>
+<td>
+<p>MachinePoolObservedGeneration is the last generation the MachinePool observed of the Machine.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>state</code><br/>
 <em>
 <a href="#compute.api.onmetal.de/v1alpha1.MachineState">
@@ -1280,20 +1144,7 @@ MachineState
 </em>
 </td>
 <td>
-<p>State is the state of the machine.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>conditions</code><br/>
-<em>
-<a href="#compute.api.onmetal.de/v1alpha1.MachineCondition">
-[]MachineCondition
-</a>
-</em>
-</td>
-<td>
-<p>Conditions are the conditions of the machines.</p>
+<p>State is the infrastructure state of the machine.</p>
 </td>
 </tr>
 <tr>
@@ -1457,9 +1308,6 @@ NetworkInterface to use.</p>
 </tr><tr><td><p>&#34;Detached&#34;</p></td>
 <td><p>NetworkInterfaceStateDetached indicates that a network interface has been successfully detached.</p>
 </td>
-</tr><tr><td><p>&#34;Error&#34;</p></td>
-<td><p>NetworkInterfaceStateError indicates that there was an error during attaching a network interface.</p>
-</td>
 </tr><tr><td><p>&#34;Pending&#34;</p></td>
 <td><p>NetworkInterfaceStatePending indicates that the attachment of a network interface is pending.</p>
 </td>
@@ -1490,6 +1338,17 @@ string
 </td>
 <td>
 <p>Name is the name of the NetworkInterface to whom the status belongs to.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>handle</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Handle is the MachinePool internal handle of the NetworkInterface.</p>
 </td>
 </tr>
 <tr>
@@ -1575,45 +1434,6 @@ Kubernetes meta/v1.Time
 </td>
 <td>
 <p>LastPhaseTransitionTime is the last time the Phase transitioned.</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="compute.api.onmetal.de/v1alpha1.ReferencedVolumeStatus">ReferencedVolumeStatus
-</h3>
-<p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.VolumeSourceStatus">VolumeSourceStatus</a>)
-</p>
-<div>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>driver</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Driver is the driver used for the volume.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>handle</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Handle is the unique provider handle of the volume.</p>
 </td>
 </tr>
 </tbody>
@@ -1757,49 +1577,6 @@ Volume to use.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.VolumeSourceStatus">VolumeSourceStatus
-</h3>
-<p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.VolumeStatus">VolumeStatus</a>)
-</p>
-<div>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>emptyDisk</code><br/>
-<em>
-<a href="#compute.api.onmetal.de/v1alpha1.EmptyDiskVolumeStatus">
-EmptyDiskVolumeStatus
-</a>
-</em>
-</td>
-<td>
-<p>EmptyDisk indicates the empty disk status of the volume if it&rsquo;s from an empty disk source.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>referenced</code><br/>
-<em>
-<a href="#compute.api.onmetal.de/v1alpha1.ReferencedVolumeStatus">
-ReferencedVolumeStatus
-</a>
-</em>
-</td>
-<td>
-<p>Referenced is the status of a referenced volume (either VolumeSource.Ephemeral or VolumeSource.VolumeRef).</p>
-</td>
-</tr>
-</tbody>
-</table>
 <h3 id="compute.api.onmetal.de/v1alpha1.VolumeState">VolumeState
 (<code>string</code> alias)</h3>
 <p>
@@ -1820,9 +1597,6 @@ ReferencedVolumeStatus
 </td>
 </tr><tr><td><p>&#34;Detached&#34;</p></td>
 <td><p>VolumeStateDetached indicates that a volume has been successfully detached.</p>
-</td>
-</tr><tr><td><p>&#34;Error&#34;</p></td>
-<td><p>VolumeStateError indicates that there was an error during attaching a volume.</p>
 </td>
 </tr><tr><td><p>&#34;Pending&#34;</p></td>
 <td><p>VolumeStatePending indicates that the attachment of a volume is pending.</p>
@@ -1858,29 +1632,13 @@ string
 </tr>
 <tr>
 <td>
-<code>device</code><br/>
+<code>handle</code><br/>
 <em>
 string
 </em>
 </td>
 <td>
-<p>Device is the device the volume is mounted with on the host.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>VolumeSourceStatus</code><br/>
-<em>
-<a href="#compute.api.onmetal.de/v1alpha1.VolumeSourceStatus">
-VolumeSourceStatus
-</a>
-</em>
-</td>
-<td>
-<p>
-(Members of <code>VolumeSourceStatus</code> are embedded into this type.)
-</p>
-<p>VolumeSourceStatus is the status of the configuration of the volume specified as source.</p>
+<p>Handle is the MachinePool internal handle of the volume.</p>
 </td>
 </tr>
 <tr>

@@ -23,27 +23,28 @@ import (
 	clicommon "github.com/onmetal/onmetal-api/orictl/cli/common"
 	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-machine/orictlmachine/common"
 	"github.com/onmetal/onmetal-api/orictl/decoder"
+	"github.com/onmetal/onmetal-api/orictl/renderer"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
 type Options struct {
-	MachineID string
-	Filename  string
+	Filename string
 }
 
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
-	fs.StringVar(&o.MachineID, "machine-id", "", "ID of the machine to create the volume in.")
 	fs.StringVarP(&o.Filename, "filename", "f", o.Filename, "Path to a file to read.")
 }
 
 func (o *Options) MarkFlagsRequired(cmd *cobra.Command) {
-	_ = cmd.MarkFlagRequired("machine-id")
 }
 
 func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cobra.Command {
-	var opts Options
+	var (
+		outputOpts common.OutputOptions
+		opts       Options
+	)
 
 	cmd := &cobra.Command{
 		Use:     "volume",
@@ -62,37 +63,45 @@ func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cob
 				}
 			}()
 
-			return Run(ctx, streams, client, opts)
+			r, err := outputOpts.RendererOrNil()
+			if err != nil {
+				return err
+			}
+
+			return Run(ctx, streams, client, r, opts)
 		},
 	}
 
+	outputOpts.AddFlags(cmd.Flags())
 	opts.AddFlags(cmd.Flags())
 	opts.MarkFlagsRequired(cmd)
 
 	return cmd
 }
 
-func Run(ctx context.Context, streams clicommon.Streams, client ori.MachineRuntimeClient, opts Options) error {
+func Run(ctx context.Context, streams clicommon.Streams, client ori.MachineRuntimeClient, r renderer.Renderer, opts Options) error {
 	data, err := clicommon.ReadFileOrReader(opts.Filename, os.Stdin)
 	if err != nil {
 		return err
 	}
 
-	networkInterfaceConfig := &ori.VolumeConfig{}
-	if err := decoder.Decode(data, networkInterfaceConfig); err != nil {
+	volume := &ori.Volume{}
+	if err := decoder.Decode(data, volume); err != nil {
 		return err
 	}
 
-	_, err = client.CreateVolume(ctx,
+	res, err := client.CreateVolume(ctx,
 		&ori.CreateVolumeRequest{
-			MachineId: opts.MachineID,
-			Config:    networkInterfaceConfig,
+			Volume: volume,
 		},
 	)
 	if err != nil {
 		return err
 	}
 
-	_, _ = fmt.Fprintln(streams.Out, networkInterfaceConfig.Name)
+	if r != nil {
+		return r.Render(res.Volume, streams.Out)
+	}
+	_, _ = fmt.Fprintf(streams.Out, "Created volume %s\n", res.Volume.Metadata.Id)
 	return nil
 }

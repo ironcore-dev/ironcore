@@ -24,7 +24,6 @@ import (
 	. "github.com/onsi/gomega"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apiserver/pkg/admission"
-	"k8s.io/utils/pointer"
 )
 
 var _ = Describe("Admission", func() {
@@ -72,15 +71,10 @@ var _ = Describe("Admission", func() {
 			Spec: compute.MachineSpec{
 				Volumes: []compute.Volume{
 					{
-						Name:   "foo",
-						Device: pointer.String("odb"),
+						Device: "odb",
 					},
-					{
-						Name: "bar",
-					},
-					{
-						Name: "baz",
-					},
+					{},
+					{},
 				},
 			},
 		}
@@ -104,16 +98,13 @@ var _ = Describe("Admission", func() {
 
 		Expect(machine.Spec.Volumes).To(Equal([]compute.Volume{
 			{
-				Name:   "foo",
-				Device: pointer.String("odb"),
+				Device: "odb",
 			},
 			{
-				Name:   "bar",
-				Device: pointer.String("oda"),
+				Device: "oda",
 			},
 			{
-				Name:   "baz",
-				Device: pointer.String("odc"),
+				Device: "odc",
 			},
 		}))
 	})

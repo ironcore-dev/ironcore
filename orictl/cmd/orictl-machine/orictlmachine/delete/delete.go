@@ -20,6 +20,7 @@ import (
 	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-machine/orictlmachine/delete/machine"
 	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-machine/orictlmachine/delete/networkinterface"
 	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-machine/orictlmachine/delete/volume"
+	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-machine/orictlmachine/delete/volumeattachment"
 	"github.com/spf13/cobra"
 )
 
@@ -32,6 +33,7 @@ func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cob
 		machine.Command(streams, clientFactory),
 		networkinterface.Command(streams, clientFactory),
 		volume.Command(streams, clientFactory),
+		volumeattachment.Command(streams, clientFactory),
 	)
 
 	return cmd

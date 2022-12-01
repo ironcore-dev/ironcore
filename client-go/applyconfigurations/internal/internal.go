@@ -121,12 +121,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: sizeLimit
       type:
         namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
-- name: com.github.onmetal.onmetal-api.api.compute.v1alpha1.EmptyDiskVolumeStatus
-  map:
-    fields:
-    - name: size
-      type:
-        namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
 - name: com.github.onmetal.onmetal-api.api.compute.v1alpha1.EphemeralNetworkInterfaceSource
   map:
     fields:
@@ -178,30 +172,6 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       default: {}
-- name: com.github.onmetal.onmetal-api.api.compute.v1alpha1.MachineCondition
-  map:
-    fields:
-    - name: lastTransitionTime
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
-      default: {}
-    - name: message
-      type:
-        scalar: string
-    - name: observedGeneration
-      type:
-        scalar: numeric
-    - name: reason
-      type:
-        scalar: string
-    - name: status
-      type:
-        scalar: string
-      default: ""
-    - name: type
-      type:
-        scalar: string
-      default: ""
 - name: com.github.onmetal.onmetal-api.api.compute.v1alpha1.MachinePool
   map:
     fields:
@@ -365,12 +335,9 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: com.github.onmetal.onmetal-api.api.compute.v1alpha1.MachineStatus
   map:
     fields:
-    - name: conditions
+    - name: machinePoolObservedGeneration
       type:
-        list:
-          elementType:
-            namedType: com.github.onmetal.onmetal-api.api.compute.v1alpha1.MachineCondition
-          elementRelationship: atomic
+        scalar: numeric
     - name: networkInterfaces
       type:
         list:
@@ -402,6 +369,9 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: com.github.onmetal.onmetal-api.api.compute.v1alpha1.NetworkInterfaceStatus
   map:
     fields:
+    - name: handle
+      type:
+        scalar: string
     - name: ips
       type:
         list:
@@ -430,15 +400,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: virtualIP
       type:
         namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IP
-- name: com.github.onmetal.onmetal-api.api.compute.v1alpha1.ReferencedVolumeStatus
-  map:
-    fields:
-    - name: driver
-      type:
-        scalar: string
-    - name: handle
-      type:
-        scalar: string
 - name: com.github.onmetal.onmetal-api.api.compute.v1alpha1.Volume
   map:
     fields:
@@ -461,12 +422,9 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: com.github.onmetal.onmetal-api.api.compute.v1alpha1.VolumeStatus
   map:
     fields:
-    - name: device
+    - name: handle
       type:
         scalar: string
-    - name: emptyDisk
-      type:
-        namedType: com.github.onmetal.onmetal-api.api.compute.v1alpha1.EmptyDiskVolumeStatus
     - name: lastPhaseTransitionTime
       type:
         namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
@@ -480,9 +438,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: phase
       type:
         scalar: string
-    - name: referenced
-      type:
-        namedType: com.github.onmetal.onmetal-api.api.compute.v1alpha1.ReferencedVolumeStatus
     - name: state
       type:
         scalar: string

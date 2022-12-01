@@ -15,20 +15,20 @@
 package machine
 
 import (
+	"time"
+
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	"github.com/onmetal/onmetal-api/orictl/table"
 	"github.com/onmetal/onmetal-api/orictl/table/tableconverter"
+	"k8s.io/apimachinery/pkg/util/duration"
 )
 
 var (
 	volumeHeaders = []table.Header{
-		{Name: "Machine ID"},
-		{Name: "Name"},
-		{Name: "Device"},
-		{Name: "SizeLimitBytes"},
+		{Name: "ID"},
 		{Name: "Driver"},
 		{Name: "Handle"},
-		{Name: "State"},
+		{Name: "Age"},
 	}
 )
 
@@ -39,13 +39,10 @@ var Volume, VolumeSlice = tableconverter.ForType[*ori.Volume]( //nolint:revive
 	func(volume *ori.Volume) ([]table.Row, error) {
 		return []table.Row{
 			{
-				volume.MachineId,
-				volume.Name,
-				volume.Device,
-				volume.GetEmptyDisk().GetSizeLimitBytes(),
-				volume.GetAccess().GetDriver(),
-				volume.GetAccess().GetHandle(),
-				volume.State.String(),
+				volume.Metadata.Id,
+				volume.Spec.Driver,
+				volume.Spec.Handle,
+				duration.HumanDuration(time.Since(time.Unix(0, volume.Metadata.CreatedAt))),
 			},
 		}, nil
 	},

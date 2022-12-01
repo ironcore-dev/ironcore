@@ -87,7 +87,7 @@ type Volume struct {
 	// Device is the device name where the volume should be attached.
 	// Pointer to distinguish between explicit zero and not specified.
 	// If empty, an unused device name will be determined if possible.
-	Device *string
+	Device string
 	// VolumeSource is the source where the storage for the Volume resides at.
 	VolumeSource
 }
@@ -116,6 +116,8 @@ type EmptyDiskVolumeSource struct {
 type NetworkInterfaceStatus struct {
 	// Name is the name of the NetworkInterface to whom the status belongs to.
 	Name string
+	// Handle is the MachinePool internal handle of the NetworkInterface.
+	Handle string
 	// NetworkHandle is the handle of the network the NetworkInterface is in.
 	NetworkHandle string
 	// IPs are the ips allocated for the network interface.
@@ -140,8 +142,6 @@ const (
 	NetworkInterfaceStatePending NetworkInterfaceState = "Pending"
 	// NetworkInterfaceStateAttached indicates that a network interface has been successfully attached.
 	NetworkInterfaceStateAttached NetworkInterfaceState = "Attached"
-	// NetworkInterfaceStateError indicates that there was an error during attaching a network interface.
-	NetworkInterfaceStateError NetworkInterfaceState = "Error"
 	// NetworkInterfaceStateDetached indicates that a network interface has been successfully detached.
 	NetworkInterfaceStateDetached NetworkInterfaceState = "Detached"
 )
@@ -156,34 +156,12 @@ const (
 	NetworkInterfacePhaseBound NetworkInterfacePhase = "Bound"
 )
 
-// EmptyDiskVolumeStatus is the status of an EmptyDiskVolumeSource Volume.
-type EmptyDiskVolumeStatus struct {
-	// Size is the current size of the volume, if any discrete size is available.
-	Size *resource.Quantity
-}
-
-type ReferencedVolumeStatus struct {
-	// Driver is the driver used for the volume.
-	Driver string
-	// Handle is the unique provider handle of the volume.
-	Handle string
-}
-
-type VolumeSourceStatus struct {
-	// EmptyDisk indicates the empty disk status of the volume if it's from an empty disk source.
-	EmptyDisk *EmptyDiskVolumeStatus
-	// Referenced is the status of a referenced volume (either VolumeSource.Ephemeral or VolumeSource.VolumeRef).
-	Referenced *ReferencedVolumeStatus
-}
-
 // VolumeStatus is the status of a Volume.
 type VolumeStatus struct {
 	// Name is the name of a volume attachment.
 	Name string
-	// Device is the device the volume is mounted with on the host.
-	Device string
-	// VolumeSourceStatus is the status of the configuration of the volume specified as source.
-	VolumeSourceStatus
+	// Handle is the MachinePool internal handle of the volume.
+	Handle string
 	// State represents the attachment state of a Volume.
 	State VolumeState
 	// LastStateTransitionTime is the last time the State transitioned.
@@ -202,8 +180,6 @@ const (
 	VolumeStatePending VolumeState = "Pending"
 	// VolumeStateAttached indicates that a volume has been successfully attached.
 	VolumeStateAttached VolumeState = "Attached"
-	// VolumeStateError indicates that there was an error during attaching a volume.
-	VolumeStateError VolumeState = "Error"
 	// VolumeStateDetached indicates that a volume has been successfully detached.
 	VolumeStateDetached VolumeState = "Detached"
 )
@@ -220,10 +196,10 @@ const (
 
 // MachineStatus defines the observed state of Machine
 type MachineStatus struct {
-	// State is the state of the machine.
+	// MachinePoolObservedGeneration is the last generation the MachinePool observed of the Machine.
+	MachinePoolObservedGeneration int64
+	// State is the infrastructure state of the machine.
 	State MachineState
-	// Conditions are the conditions of the machines.
-	Conditions []MachineCondition
 	// NetworkInterfaces is the list of network interface states for the machine.
 	NetworkInterfaces []NetworkInterfaceStatus
 	// Volumes is the list of volume states for the machine.
@@ -243,35 +219,7 @@ const (
 	MachineStateRunning MachineState = "Running"
 	// MachineStateShutdown means the machine is shut down.
 	MachineStateShutdown MachineState = "Shutdown"
-	// MachineStateError means the machine is in an error state.
-	MachineStateError MachineState = "Error"
-	// MachineStateUnknown means the machine is in an unknown state.
-	MachineStateUnknown MachineState = "Unknown"
 )
-
-// MachineConditionType is a type a MachineCondition can have.
-type MachineConditionType string
-
-const (
-	// MachineSynced represents the condition of a machine being synced with its backing resources
-	MachineSynced MachineConditionType = "Synced"
-)
-
-// MachineCondition is one of the conditions of a volume.
-type MachineCondition struct {
-	// Type is the type of the condition.
-	Type MachineConditionType
-	// Status is the status of the condition.
-	Status corev1.ConditionStatus
-	// Reason is a machine-readable indication of why the condition is in a certain state.
-	Reason string
-	// Message is a human-readable explanation of why the condition has a certain reason / state.
-	Message string
-	// ObservedGeneration represents the .metadata.generation that the condition was set based upon.
-	ObservedGeneration int64
-	// LastTransitionTime is the last time the status of a condition has transitioned from one state to another.
-	LastTransitionTime metav1.Time
-}
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +genclient

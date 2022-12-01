@@ -43,13 +43,11 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.DaemonEndpoint":                  schema_onmetal_api_api_compute_v1alpha1_DaemonEndpoint(ref),
 		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.EFIVar":                          schema_onmetal_api_api_compute_v1alpha1_EFIVar(ref),
 		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.EmptyDiskVolumeSource":           schema_onmetal_api_api_compute_v1alpha1_EmptyDiskVolumeSource(ref),
-		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.EmptyDiskVolumeStatus":           schema_onmetal_api_api_compute_v1alpha1_EmptyDiskVolumeStatus(ref),
 		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.EphemeralNetworkInterfaceSource": schema_onmetal_api_api_compute_v1alpha1_EphemeralNetworkInterfaceSource(ref),
 		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.EphemeralVolumeSource":           schema_onmetal_api_api_compute_v1alpha1_EphemeralVolumeSource(ref),
 		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.Machine":                         schema_onmetal_api_api_compute_v1alpha1_Machine(ref),
 		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.MachineClass":                    schema_onmetal_api_api_compute_v1alpha1_MachineClass(ref),
 		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.MachineClassList":                schema_onmetal_api_api_compute_v1alpha1_MachineClassList(ref),
-		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.MachineCondition":                schema_onmetal_api_api_compute_v1alpha1_MachineCondition(ref),
 		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.MachineExecOptions":              schema_onmetal_api_api_compute_v1alpha1_MachineExecOptions(ref),
 		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.MachineList":                     schema_onmetal_api_api_compute_v1alpha1_MachineList(ref),
 		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.MachinePool":                     schema_onmetal_api_api_compute_v1alpha1_MachinePool(ref),
@@ -64,10 +62,8 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.NetworkInterface":                schema_onmetal_api_api_compute_v1alpha1_NetworkInterface(ref),
 		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.NetworkInterfaceSource":          schema_onmetal_api_api_compute_v1alpha1_NetworkInterfaceSource(ref),
 		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.NetworkInterfaceStatus":          schema_onmetal_api_api_compute_v1alpha1_NetworkInterfaceStatus(ref),
-		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.ReferencedVolumeStatus":          schema_onmetal_api_api_compute_v1alpha1_ReferencedVolumeStatus(ref),
 		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.Volume":                          schema_onmetal_api_api_compute_v1alpha1_Volume(ref),
 		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.VolumeSource":                    schema_onmetal_api_api_compute_v1alpha1_VolumeSource(ref),
-		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.VolumeSourceStatus":              schema_onmetal_api_api_compute_v1alpha1_VolumeSourceStatus(ref),
 		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.VolumeStatus":                    schema_onmetal_api_api_compute_v1alpha1_VolumeStatus(ref),
 		"github.com/onmetal/onmetal-api/api/ipam/v1alpha1.Prefix":                             schema_onmetal_api_api_ipam_v1alpha1_Prefix(ref),
 		"github.com/onmetal/onmetal-api/api/ipam/v1alpha1.PrefixAllocation":                   schema_onmetal_api_api_ipam_v1alpha1_PrefixAllocation(ref),
@@ -710,27 +706,6 @@ func schema_onmetal_api_api_compute_v1alpha1_EmptyDiskVolumeSource(ref common.Re
 	}
 }
 
-func schema_onmetal_api_api_compute_v1alpha1_EmptyDiskVolumeStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "EmptyDiskVolumeStatus is the status of an EmptyDiskVolumeSource Volume.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"size": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Size is the current size of the volume, if any discrete size is available.",
-							Ref:         ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/api/resource.Quantity"},
-	}
-}
-
 func schema_onmetal_api_api_compute_v1alpha1_EphemeralNetworkInterfaceSource(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -915,66 +890,6 @@ func schema_onmetal_api_api_compute_v1alpha1_MachineClassList(ref common.Referen
 		},
 		Dependencies: []string{
 			"github.com/onmetal/onmetal-api/api/compute/v1alpha1.MachineClass", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
-	}
-}
-
-func schema_onmetal_api_api_compute_v1alpha1_MachineCondition(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "MachineCondition is one of the conditions of a volume.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"type": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Type is the type of the condition.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"status": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Status is the status of the condition.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"reason": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Reason is a machine-readable indication of why the condition is in a certain state.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"message": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Message is a human-readable explanation of why the condition has a certain reason / state.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"observedGeneration": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ObservedGeneration represents the .metadata.generation that the condition was set based upon.",
-							Type:        []string{"integer"},
-							Format:      "int64",
-						},
-					},
-					"lastTransitionTime": {
-						SchemaProps: spec.SchemaProps{
-							Description: "LastTransitionTime is the last time the status of a condition has transitioned from one state to another.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
-						},
-					},
-				},
-				Required: []string{"type", "status"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
 	}
 }
 
@@ -1517,26 +1432,19 @@ func schema_onmetal_api_api_compute_v1alpha1_MachineStatus(ref common.ReferenceC
 				Description: "MachineStatus defines the observed state of Machine",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
+					"machinePoolObservedGeneration": {
+						SchemaProps: spec.SchemaProps{
+							Description: "MachinePoolObservedGeneration is the last generation the MachinePool observed of the Machine.",
+							Type:        []string{"integer"},
+							Format:      "int64",
+						},
+					},
 					"state": {
 						SchemaProps: spec.SchemaProps{
-							Description: "State is the state of the machine.\n\nPossible enum values:\n - `\"Error\"` means the machine is in an error state.\n - `\"Pending\"` means the Machine has been accepted by the system, but not yet completely started. This includes time before being bound to a MachinePool, as well as time spent setting up the Machine on that MachinePool.\n - `\"Running\"` means the machine is running on a MachinePool.\n - `\"Shutdown\"` means the machine is shut down.\n - `\"Unknown\"` means the machine is in an unknown state.",
+							Description: "State is the infrastructure state of the machine.\n\nPossible enum values:\n - `\"Pending\"` means the Machine has been accepted by the system, but not yet completely started. This includes time before being bound to a MachinePool, as well as time spent setting up the Machine on that MachinePool.\n - `\"Running\"` means the machine is running on a MachinePool.\n - `\"Shutdown\"` means the machine is shut down.",
 							Type:        []string{"string"},
 							Format:      "",
-							Enum:        []interface{}{"Error", "Pending", "Running", "Shutdown", "Unknown"}},
-					},
-					"conditions": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Conditions are the conditions of the machines.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("github.com/onmetal/onmetal-api/api/compute/v1alpha1.MachineCondition"),
-									},
-								},
-							},
-						},
+							Enum:        []interface{}{"Pending", "Running", "Shutdown"}},
 					},
 					"networkInterfaces": {
 						SchemaProps: spec.SchemaProps{
@@ -1570,7 +1478,7 @@ func schema_onmetal_api_api_compute_v1alpha1_MachineStatus(ref common.ReferenceC
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/api/compute/v1alpha1.MachineCondition", "github.com/onmetal/onmetal-api/api/compute/v1alpha1.NetworkInterfaceStatus", "github.com/onmetal/onmetal-api/api/compute/v1alpha1.VolumeStatus"},
+			"github.com/onmetal/onmetal-api/api/compute/v1alpha1.NetworkInterfaceStatus", "github.com/onmetal/onmetal-api/api/compute/v1alpha1.VolumeStatus"},
 	}
 }
 
@@ -1651,6 +1559,13 @@ func schema_onmetal_api_api_compute_v1alpha1_NetworkInterfaceStatus(ref common.R
 							Format:      "",
 						},
 					},
+					"handle": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Handle is the MachinePool internal handle of the NetworkInterface.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 					"networkHandle": {
 						SchemaProps: spec.SchemaProps{
 							Description: "NetworkHandle is the handle of the network the NetworkInterface is in.",
@@ -1710,32 +1625,6 @@ func schema_onmetal_api_api_compute_v1alpha1_NetworkInterfaceStatus(ref common.R
 		},
 		Dependencies: []string{
 			"github.com/onmetal/onmetal-api/api/common/v1alpha1.IP", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
-	}
-}
-
-func schema_onmetal_api_api_compute_v1alpha1_ReferencedVolumeStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"driver": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Driver is the driver used for the volume.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"handle": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Handle is the unique provider handle of the volume.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-			},
-		},
 	}
 }
 
@@ -1821,32 +1710,6 @@ func schema_onmetal_api_api_compute_v1alpha1_VolumeSource(ref common.ReferenceCa
 	}
 }
 
-func schema_onmetal_api_api_compute_v1alpha1_VolumeSourceStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"emptyDisk": {
-						SchemaProps: spec.SchemaProps{
-							Description: "EmptyDisk indicates the empty disk status of the volume if it's from an empty disk source.",
-							Ref:         ref("github.com/onmetal/onmetal-api/api/compute/v1alpha1.EmptyDiskVolumeStatus"),
-						},
-					},
-					"referenced": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Referenced is the status of a referenced volume (either VolumeSource.Ephemeral or VolumeSource.VolumeRef).",
-							Ref:         ref("github.com/onmetal/onmetal-api/api/compute/v1alpha1.ReferencedVolumeStatus"),
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/api/compute/v1alpha1.EmptyDiskVolumeStatus", "github.com/onmetal/onmetal-api/api/compute/v1alpha1.ReferencedVolumeStatus"},
-	}
-}
-
 func schema_onmetal_api_api_compute_v1alpha1_VolumeStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -1862,23 +1725,11 @@ func schema_onmetal_api_api_compute_v1alpha1_VolumeStatus(ref common.ReferenceCa
 							Format:      "",
 						},
 					},
-					"device": {
+					"handle": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Device is the device the volume is mounted with on the host.",
+							Description: "Handle is the MachinePool internal handle of the volume.",
 							Type:        []string{"string"},
 							Format:      "",
-						},
-					},
-					"emptyDisk": {
-						SchemaProps: spec.SchemaProps{
-							Description: "EmptyDisk indicates the empty disk status of the volume if it's from an empty disk source.",
-							Ref:         ref("github.com/onmetal/onmetal-api/api/compute/v1alpha1.EmptyDiskVolumeStatus"),
-						},
-					},
-					"referenced": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Referenced is the status of a referenced volume (either VolumeSource.Ephemeral or VolumeSource.VolumeRef).",
-							Ref:         ref("github.com/onmetal/onmetal-api/api/compute/v1alpha1.ReferencedVolumeStatus"),
 						},
 					},
 					"state": {
@@ -1912,7 +1763,7 @@ func schema_onmetal_api_api_compute_v1alpha1_VolumeStatus(ref common.ReferenceCa
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/api/compute/v1alpha1.EmptyDiskVolumeStatus", "github.com/onmetal/onmetal-api/api/compute/v1alpha1.ReferencedVolumeStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+			"k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
 	}
 }
 

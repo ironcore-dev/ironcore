@@ -28,11 +28,9 @@ import (
 )
 
 type Options struct {
-	MachineID string
 }
 
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
-	fs.StringVar(&o.MachineID, "machine-id", "", "Filter network interfaces by machine id.")
 }
 
 func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cobra.Command {
@@ -42,8 +40,9 @@ func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cob
 	)
 
 	cmd := &cobra.Command{
-		Use:     "networkinterface",
+		Use:     "networkinterface name",
 		Aliases: common.NetworkInterfaceAliases,
+		Args:    cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
 			log := ctrl.LoggerFrom(ctx)
@@ -63,7 +62,12 @@ func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cob
 				return err
 			}
 
-			return Run(cmd.Context(), streams, client, render, opts)
+			var name string
+			if len(args) > 0 {
+				name = args[0]
+			}
+
+			return Run(cmd.Context(), streams, client, render, name, opts)
 		},
 	}
 
@@ -73,11 +77,11 @@ func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cob
 	return cmd
 }
 
-func Run(ctx context.Context, streams clicommon.Streams, client ori.MachineRuntimeClient, render renderer.Renderer, opts Options) error {
+func Run(ctx context.Context, streams clicommon.Streams, client ori.MachineRuntimeClient, render renderer.Renderer, name string, opts Options) error {
 	var filter *ori.NetworkInterfaceFilter
-	if opts.MachineID != "" {
+	if name != "" {
 		filter = &ori.NetworkInterfaceFilter{
-			MachineId: opts.MachineID,
+			Id: name,
 		}
 	}
 

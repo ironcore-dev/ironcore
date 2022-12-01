@@ -15,37 +15,82 @@
 package apiutils
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
 	"github.com/onmetal/controller-utils/metautils"
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/machinebroker/api/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func SetMetadataAnnotation(o metav1.Object, metadata *ori.MachineMetadata) error {
-	data, err := json.Marshal(metadata)
+func GetObjectMetadata(o metav1.Object) (*ori.ObjectMetadata, error) {
+	annotations, err := GetAnnotationsAnnotation(o)
 	if err != nil {
-		return fmt.Errorf("error marshalling metadata: %w", err)
+		return nil, err
 	}
-	metautils.SetAnnotation(o, machinebrokerv1alpha1.MetadataAnnotation, string(data))
+
+	labels, err := GetLabelsAnnotation(o)
+	if err != nil {
+		return nil, err
+	}
+
+	var deletedAt int64
+	if !o.GetDeletionTimestamp().IsZero() {
+		deletedAt = o.GetDeletionTimestamp().UnixNano()
+	}
+
+	return &ori.ObjectMetadata{
+		Id:          o.GetName(),
+		Annotations: annotations,
+		Labels:      labels,
+		Generation:  o.GetGeneration(),
+		CreatedAt:   o.GetCreationTimestamp().UnixNano(),
+		DeletedAt:   deletedAt,
+	}, nil
+}
+
+func SetObjectMetadata(o metav1.Object, metadata *ori.ObjectMetadata) error {
+	if err := SetAnnotationsAnnotation(o, metadata.Annotations); err != nil {
+		return err
+	}
+	if err := SetLabelsAnnotation(o, metadata.Labels); err != nil {
+		return err
+	}
 	return nil
 }
 
-func GetMetadataAnnotation(o metav1.Object) (*ori.MachineMetadata, error) {
-	data, ok := o.GetAnnotations()[machinebrokerv1alpha1.MetadataAnnotation]
-	if !ok {
-		return nil, fmt.Errorf("object has no metadata at %s", machinebrokerv1alpha1.MetadataAnnotation)
+func SetCreatedLabel(o metav1.Object) {
+	metautils.SetLabel(o, machinebrokerv1alpha1.CreatedLabel, "true")
+}
+
+func IsCreated(o metav1.Object) bool {
+	return metautils.HasLabel(o, machinebrokerv1alpha1.CreatedLabel)
+}
+
+func PatchControlledBy(ctx context.Context, c client.Client, owner, controlled client.Object) error {
+	base := controlled.DeepCopyObject().(client.Object)
+	if err := ctrl.SetControllerReference(owner, controlled, c.Scheme()); err != nil {
+		return err
 	}
 
-	metadata := &ori.MachineMetadata{}
-	if err := json.Unmarshal([]byte(data), metadata); err != nil {
-		return nil, err
+	if err := c.Patch(ctx, controlled, client.MergeFrom(base)); err != nil {
+		return fmt.Errorf("error patching object to be controlled: %w", err)
 	}
-	return metadata, nil
+	return nil
+}
+
+func PatchCreated(ctx context.Context, c client.Client, o client.Object) error {
+	base := o.DeepCopyObject().(client.Object)
+	SetCreatedLabel(o)
+	if err := c.Patch(ctx, o, client.MergeFrom(base)); err != nil {
+		return fmt.Errorf("error patching object to created: %w", err)
+	}
+	return nil
 }
 
 func SetLabelsAnnotation(o metav1.Object, labels map[string]string) error {
@@ -110,15 +155,23 @@ func SetNetworkInterfaceNameLabel(o metav1.Object, name string) {
 	metautils.SetLabel(o, machinebrokerv1alpha1.NetworkInterfaceNameLabel, name)
 }
 
-func SetMachineManagerLabel(machine *computev1alpha1.Machine, manager string) {
-	metautils.SetLabel(machine, machinebrokerv1alpha1.MachineManagerLabel, manager)
+func SetManagerLabel(o metav1.Object, manager string) {
+	metautils.SetLabel(o, machinebrokerv1alpha1.ManagerLabel, manager)
 }
 
 func SetIPFamilyLabel(o metav1.Object, ipFamily corev1.IPFamily) {
 	metautils.SetLabel(o, machinebrokerv1alpha1.IPFamilyLabel, string(ipFamily))
 }
 
-func IsMachineManagedBy(machine *computev1alpha1.Machine, manager string) bool {
-	actual, ok := machine.Labels[machinebrokerv1alpha1.MachineManagerLabel]
+func SetPurpose(o metav1.Object, purpose string) {
+	metautils.SetLabel(o, machinebrokerv1alpha1.PurposeLabel, purpose)
+}
+
+func GetPurpose(o metav1.Object) string {
+	return o.GetLabels()[machinebrokerv1alpha1.PurposeLabel]
+}
+
+func IsManagedBy(o metav1.Object, manager string) bool {
+	actual, ok := o.GetLabels()[machinebrokerv1alpha1.ManagerLabel]
 	return ok && actual == manager
 }

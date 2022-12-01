@@ -23,6 +23,7 @@ import (
 	clicommon "github.com/onmetal/onmetal-api/orictl/cli/common"
 	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-machine/orictlmachine/common"
 	"github.com/onmetal/onmetal-api/orictl/decoder"
+	"github.com/onmetal/onmetal-api/orictl/renderer"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -37,7 +38,10 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 }
 
 func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cobra.Command {
-	var opts Options
+	var (
+		outputOpts common.OutputOptions
+		opts       Options
+	)
 
 	cmd := &cobra.Command{
 		Use:     "machine",
@@ -56,7 +60,12 @@ func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cob
 				}
 			}()
 
-			return Run(ctx, streams, client, opts)
+			r, err := outputOpts.RendererOrNil()
+			if err != nil {
+				return err
+			}
+
+			return Run(ctx, streams, client, r, opts)
 		},
 	}
 
@@ -65,22 +74,25 @@ func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cob
 	return cmd
 }
 
-func Run(ctx context.Context, streams clicommon.Streams, client ori.MachineRuntimeClient, opts Options) error {
+func Run(ctx context.Context, streams clicommon.Streams, client ori.MachineRuntimeClient, r renderer.Renderer, opts Options) error {
 	data, err := clicommon.ReadFileOrReader(opts.Filename, os.Stdin)
 	if err != nil {
 		return err
 	}
 
-	machineConfig := &ori.MachineConfig{}
-	if err := decoder.Decode(data, machineConfig); err != nil {
+	machine := &ori.Machine{}
+	if err := decoder.Decode(data, machine); err != nil {
 		return err
 	}
 
-	res, err := client.CreateMachine(ctx, &ori.CreateMachineRequest{Config: machineConfig})
+	res, err := client.CreateMachine(ctx, &ori.CreateMachineRequest{Machine: machine})
 	if err != nil {
 		return err
 	}
 
-	_, _ = fmt.Fprintln(streams.Out, res.Machine.Id)
+	if r != nil {
+		return r.Render(res.Machine, streams.Out)
+	}
+	_, _ = fmt.Fprintf(streams.Out, "Created machine %s\n", res.Machine.Metadata.Id)
 	return nil
 }

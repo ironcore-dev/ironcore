@@ -29,7 +29,7 @@ import (
 	machinepoolletclient "github.com/onmetal/onmetal-api/machinepoollet/client"
 	"github.com/onmetal/onmetal-api/machinepoollet/controllers"
 	"github.com/onmetal/onmetal-api/machinepoollet/mcm"
-	"github.com/onmetal/onmetal-api/machinepoollet/mleg"
+	orievent "github.com/onmetal/onmetal-api/machinepoollet/orievent"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	orimachineutils "github.com/onmetal/onmetal-api/ori/utils/machine"
 	"github.com/spf13/cobra"
@@ -199,25 +199,66 @@ func Run(ctx context.Context, opts Options) error {
 			return fmt.Errorf("error waiting for machine class mapper to sync: %w", err)
 		}
 
-		machineLifecycleEventGenerator := mleg.NewGeneric(machineRuntime, mleg.GenericOptions{})
-		if err := mgr.Add(machineLifecycleEventGenerator); err != nil {
-			return fmt.Errorf("error adding machine lifecycle event generator: %w", err)
+		machineEvents := orievent.NewGenerator(func(ctx context.Context) ([]*ori.Machine, error) {
+			res, err := machineRuntime.ListMachines(ctx, &ori.ListMachinesRequest{})
+			if err != nil {
+				return nil, err
+			}
+			return res.Machines, nil
+		}, orievent.GeneratorOptions{})
+		if err := mgr.Add(machineEvents); err != nil {
+			return fmt.Errorf("error adding machine event generator: %w", err)
+		}
+		if err := mgr.AddHealthzCheck("machine-events", machineEvents.Check); err != nil {
+			return fmt.Errorf("error adding machine event generator healthz check")
 		}
 
-		if err := mgr.AddHealthzCheck("mleg", machineLifecycleEventGenerator.Check); err != nil {
-			return fmt.Errorf("error adding mleg healthz check: %w", err)
+		volumeEvents := orievent.NewGenerator(func(ctx context.Context) ([]*ori.Volume, error) {
+			res, err := machineRuntime.ListVolumes(ctx, &ori.ListVolumesRequest{})
+			if err != nil {
+				return nil, err
+			}
+			return res.Volumes, nil
+		}, orievent.GeneratorOptions{})
+		if err := mgr.Add(volumeEvents); err != nil {
+			return fmt.Errorf("error adding volume event generator: %w", err)
+		}
+		if err := mgr.AddHealthzCheck("volume-events", volumeEvents.Check); err != nil {
+			return fmt.Errorf("error adding volume event generator healthz check")
+		}
+
+		networkInterfaceEvents := orievent.NewGenerator(func(ctx context.Context) ([]*ori.NetworkInterface, error) {
+			res, err := machineRuntime.ListNetworkInterfaces(ctx, &ori.ListNetworkInterfacesRequest{})
+			if err != nil {
+				return nil, err
+			}
+			return res.NetworkInterfaces, nil
+		}, orievent.GeneratorOptions{})
+		if err := mgr.Add(networkInterfaceEvents); err != nil {
+			return fmt.Errorf("error adding network interface event generator: %w", err)
+		}
+		if err := mgr.AddHealthzCheck("networkinterface-events", networkInterfaceEvents.Check); err != nil {
+			return fmt.Errorf("error adding network interface event generator healthz check")
 		}
 
 		if err := (&controllers.MachineReconciler{
-			EventRecorder:                  mgr.GetEventRecorderFor("machines"),
-			Client:                         mgr.GetClient(),
-			MachineRuntime:                 machineRuntime,
-			MachineClassMapper:             machineClassMapper,
-			MachineLifecycleEventGenerator: machineLifecycleEventGenerator,
-			MachinePoolName:                opts.MachinePoolName,
-			WatchFilterValue:               opts.WatchFilterValue,
+			EventRecorder:      mgr.GetEventRecorderFor("machines"),
+			Client:             mgr.GetClient(),
+			MachineRuntime:     machineRuntime,
+			MachineClassMapper: machineClassMapper,
+			MachinePoolName:    opts.MachinePoolName,
+			WatchFilterValue:   opts.WatchFilterValue,
 		}).SetupWithManager(mgr); err != nil {
 			return fmt.Errorf("error setting up machine reconciler with manager: %w", err)
+		}
+
+		if err := (&controllers.MachineAnnotatorReconciler{
+			Client:                 mgr.GetClient(),
+			MachineEvents:          machineEvents,
+			VolumeEvents:           volumeEvents,
+			NetworkInterfaceEvents: networkInterfaceEvents,
+		}).SetupWithManager(mgr); err != nil {
+			return fmt.Errorf("error setting up machine annotator reconciler with manager: %w", err)
 		}
 
 		if err := (&controllers.MachinePoolReconciler{
