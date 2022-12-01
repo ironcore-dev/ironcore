@@ -74,6 +74,7 @@ const (
 	virtualIPController            = "virtualip"
 	aliasPrefixController          = "aliasprefix"
 	loadBalancerController         = "loadbalancer"
+	natGatewayController           = "natgateway"
 )
 
 func init() {
@@ -111,7 +112,7 @@ func main() {
 		volumePoolController, volumeClassController, volumeController, volumeScheduler,
 
 		// Networking controllers
-		networkProtectionController, networkInterfaceController, networkInterfaceBindController, virtualIPController, aliasPrefixController, loadBalancerController,
+		networkProtectionController, networkInterfaceController, networkInterfaceBindController, virtualIPController, aliasPrefixController, loadBalancerController, natGatewayController,
 
 		// IPAM controllers
 		prefixController, prefixAllocationScheduler,
@@ -250,7 +251,7 @@ func main() {
 		}
 	}
 
-	if controllers.Enabled(networkInterfaceController) || controllers.Enabled(networkProtectionController) || controllers.Enabled(aliasPrefixController) || controllers.Enabled(loadBalancerController) {
+	if controllers.Enabled(networkInterfaceController) || controllers.Enabled(natGatewayController) || controllers.Enabled(networkProtectionController) || controllers.Enabled(aliasPrefixController) || controllers.Enabled(loadBalancerController) {
 		if err = onmetalapiclient.SetupNetworkInterfaceNetworkNameFieldIndexer(context.TODO(), mgr.GetFieldIndexer()); err != nil {
 			setupLog.Error(err, "unable to setup field indexer", "field", onmetalapiclient.NetworkInterfaceNetworkNameField)
 			os.Exit(1)
@@ -362,6 +363,22 @@ func main() {
 			Scheme: mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "LoadBalancer")
+			os.Exit(1)
+		}
+	}
+
+	if controllers.Enabled(natGatewayController) {
+		if err = onmetalapiclient.SetupNATGatewayNetworkNameFieldIndexer(context.TODO(), mgr.GetFieldIndexer()); err != nil {
+			setupLog.Error(err, "unable to setup field indexer", "field", onmetalapiclient.NATGatewayNetworkNameField)
+			os.Exit(1)
+		}
+
+		if err = (&networkingcontrollers.NatGatewayReconciler{
+			Client:        mgr.GetClient(),
+			Scheme:        mgr.GetScheme(),
+			EventRecorder: mgr.GetEventRecorderFor("natgateways"),
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "NATGateway")
 			os.Exit(1)
 		}
 	}

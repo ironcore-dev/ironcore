@@ -31,6 +31,8 @@ const (
 
 	LoadBalancerNetworkNameField = "loadbalancer-network-name"
 
+	NATGatewayNetworkNameField = "natgateway-network-name"
+
 	NetworkInterfaceVirtualIPNamesField = "networkinterface-virtual-ip-names"
 	NetworkInterfaceNetworkNameField    = "networkinterface-network-name"
 
@@ -107,5 +109,12 @@ func SetupLoadBalancerNetworkNameFieldIndexer(ctx context.Context, indexer clien
 	return indexer.IndexField(ctx, &networkingv1alpha1.LoadBalancer{}, LoadBalancerNetworkNameField, func(obj client.Object) []string {
 		loadBalancer := obj.(*networkingv1alpha1.LoadBalancer)
 		return []string{loadBalancer.Spec.NetworkRef.Name}
+	})
+}
+
+func SetupNATGatewayNetworkNameFieldIndexer(ctx context.Context, indexer client.FieldIndexer) error {
+	return indexer.IndexField(ctx, &networkingv1alpha1.NATGateway{}, NATGatewayNetworkNameField, func(obj client.Object) []string {
+		natGateway := obj.(*networkingv1alpha1.NATGateway)
+		return []string{natGateway.Spec.NetworkRef.Name}
 	})
 }

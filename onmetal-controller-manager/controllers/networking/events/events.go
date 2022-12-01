@@ -19,6 +19,8 @@ const (
 	ErrorApplyingIPs          = "ErrorApplyingIPs"
 	ErrorApplyingVirtualIP    = "ErrorApplyingVirtualIP"
 
+	ErrorNoPortsLeft = "ErrorNoPortsLeft"
+
 	NetworkNotReady   = "NetworkNotReady"
 	IPsNotReady       = "IPsNotReady"
 	VirtualIPNotReady = "VirtualIPNotReady"
