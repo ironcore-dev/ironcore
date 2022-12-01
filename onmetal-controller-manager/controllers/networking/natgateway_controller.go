@@ -80,6 +80,32 @@ func (r *NatGatewayReconciler) delete(ctx context.Context, log logr.Logger, natG
 	return ctrl.Result{}, nil
 }
 
+func (r *NatGatewayReconciler) findNextFreeSlot(natGateway *networkingv1alpha1.NATGateway, currentIp, currentPort, portsPerNetworkInterface int32, slotsPerIP int, used set.Set[networkingv1alpha1.NATGatewayDestinationIP]) (*networkingv1alpha1.NATGatewayDestinationIP, int32, int32) {
+	for {
+		if int(currentIp) >= len(natGateway.Status.IPs) {
+			return nil, currentIp, currentPort
+		}
+
+		port := currentPort*portsPerNetworkInterface + MinEphemeralPort
+		candidate := &networkingv1alpha1.NATGatewayDestinationIP{
+			IP:      natGateway.Status.IPs[currentIp].IP,
+			Port:    port,
+			EndPort: port + portsPerNetworkInterface - 1,
+		}
+
+		if !used.Has(*candidate) {
+			used.Insert(*candidate)
+			return candidate, currentIp, currentPort
+		}
+
+		currentPort++
+		if int(currentPort) >= slotsPerIP {
+			currentPort = 0
+			currentIp++
+		}
+	}
+}
+
 func (r *NatGatewayReconciler) assignPorts(ctx context.Context, log logr.Logger, natGateway *networkingv1alpha1.NATGateway, destinations map[types.UID]*networkingv1alpha1.NATGatewayDestination, slotsPerIP int, portsPerNetworkInterface int32) ([]networkingv1alpha1.NATGatewayDestination, int32, error) {
 	natGatewayRouting := &networkingv1alpha1.NATGatewayRouting{}
 	natGatewayRoutingKey := client.ObjectKey{Namespace: natGateway.Namespace, Name: natGateway.Name}
@@ -87,62 +113,38 @@ func (r *NatGatewayReconciler) assignPorts(ctx context.Context, log logr.Logger,
 		return nil, 0, fmt.Errorf("unable to get natgateway routing %s: %w", natGatewayRoutingKey, err)
 	}
 
-	used := set.Set[networkingv1alpha1.NATGatewayDestinationIP]{}
-	//reuse ip/port combinations if still needed
+	var (
+		used                         = set.Set[networkingv1alpha1.NATGatewayDestinationIP]{}
+		currentIp, currentPort int32 = 0, 0
+		newDestinations        []networkingv1alpha1.NATGatewayDestination
+		candidate              *networkingv1alpha1.NATGatewayDestinationIP
+	)
+
+	log.V(2).Info("Start processing previous destinations")
 	for _, destination := range natGatewayRouting.Destinations {
 		if v, found := destinations[destination.UID]; found {
+			log.V(2).Info("Keep IP and port for destination", "destination", destination.Name)
 			v.IPs = destination.IPs
 			for _, ip := range v.IPs {
 				used.Insert(ip)
 			}
+			newDestinations = append(newDestinations, *v)
+			delete(destinations, destination.UID)
 		}
 	}
 
-	var (
-		currentIp, currentPort int32 = 0, 0
-		newDestinations        []networkingv1alpha1.NATGatewayDestination
-	)
+	log.V(2).Info("Start processing new destinations")
 	for _, destination := range destinations {
-		log.V(2).Info("Start processing destination", "destination", destination.Name)
-		if len(destination.IPs) != 0 {
-			log.V(2).Info("keep previous port assignment of destination", "destination", destination.Name)
-			newDestinations = append(newDestinations, *destination)
-			continue
+		log.V(2).Info("Find free port for destination", "destination", destination.Name)
+		candidate, currentIp, currentPort = r.findNextFreeSlot(natGateway, currentIp, currentPort, portsPerNetworkInterface, slotsPerIP, used)
+		if candidate == nil {
+			log.V(2).Info("No ports left: Skipping destination", "name", destination.Name, "UID", destination.UID)
+			r.Eventf(natGateway, corev1.EventTypeWarning, events.ErrorNoPortsLeft, "no ports left: needed ips %d", int(math.Ceil(float64(len(destinations))/float64(slotsPerIP))))
+			break
 		}
+		log.V(2).Info("Found free port for destination", "destination", destination.Name, "start", candidate.Port, "end", candidate.EndPort, "ip", candidate.IP.String())
 
-		log.V(2).Info("find free port for destination", "destination", destination.Name)
-		var candidate *networkingv1alpha1.NATGatewayDestinationIP
-		for {
-			if int(currentIp) >= len(natGateway.Status.IPs) {
-				log.V(1).Info("No ports left: Skipping destination", "name", destination.Name, "UID", destination.UID)
-				r.Eventf(natGateway, corev1.EventTypeWarning, events.ErrorNoPortsLeft, "no ports left: skipping destination %s %s", destination.Name, destination.UID, "neededIps", int(math.Ceil(float64(len(destinations))/float64(slotsPerIP))))
-				candidate = nil
-				break
-			}
-
-			port := currentPort*portsPerNetworkInterface + MinEphemeralPort
-			candidate = &networkingv1alpha1.NATGatewayDestinationIP{
-				IP:      natGateway.Status.IPs[currentIp].IP,
-				Port:    port,
-				EndPort: port + portsPerNetworkInterface - 1,
-			}
-
-			if !used.Has(*candidate) {
-				used.Insert(*candidate)
-				log.V(2).Info("found port range for destination", "destination", destination.Name, "start", candidate.Port, "end", candidate.EndPort, "ip", candidate.IP.String())
-				break
-			}
-
-			currentPort++
-			if int(currentPort) > slotsPerIP {
-				currentPort = 0
-				currentIp++
-			}
-		}
-
-		if candidate != nil {
-			destination.IPs = []networkingv1alpha1.NATGatewayDestinationIP{*candidate}
-		}
+		destination.IPs = []networkingv1alpha1.NATGatewayDestinationIP{*candidate}
 		newDestinations = append(newDestinations, *destination)
 	}
 
@@ -173,7 +175,7 @@ func (r *NatGatewayReconciler) reconcile(ctx context.Context, log logr.Logger, n
 	}
 	log.V(1).Info("Successfully found destinations", "Destinations", destinations)
 
-	slotsPerIP := int((MaxEphemeralPort - MinEphemeralPort) / portsPerNetworkInterface)
+	slotsPerIP := int((MaxEphemeralPort - MinEphemeralPort + 1) / portsPerNetworkInterface)
 
 	log.V(1).Info("Assigning ports")
 	updatedDestinations, slotsInUse, err := r.assignPorts(ctx, log, natGateway, destinations, slotsPerIP, portsPerNetworkInterface)
