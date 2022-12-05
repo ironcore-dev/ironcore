@@ -28,7 +28,7 @@ import (
 
 func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cobra.Command {
 	var (
-		outputOpts common.OutputOptions
+		outputOpts = common.NewOutputOptions()
 	)
 
 	cmd := &cobra.Command{

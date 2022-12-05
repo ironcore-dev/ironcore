@@ -15,17 +15,21 @@
 package volume
 
 import (
+	"time"
+
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
 	"github.com/onmetal/onmetal-api/orictl/table"
 	"github.com/onmetal/onmetal-api/orictl/table/tableconverter"
+	"k8s.io/apimachinery/pkg/util/duration"
 )
 
 var (
 	volumeHeaders = []table.Header{
 		{Name: "ID"},
-		{Name: "Namespace"},
-		{Name: "Name"},
-		{Name: "UID"},
+		{Name: "Class"},
+		{Name: "Image"},
+		{Name: "State"},
+		{Name: "Age"},
 	}
 )
 
@@ -36,10 +40,11 @@ var Volume, VolumeSlice = tableconverter.ForType[*ori.Volume]( //nolint:revive
 	func(volume *ori.Volume) ([]table.Row, error) {
 		return []table.Row{
 			{
-				volume.Id,
-				volume.Metadata.Namespace,
-				volume.Metadata.Name,
-				volume.Metadata.Uid,
+				volume.Metadata.Id,
+				volume.Spec.Class,
+				volume.Spec.Image,
+				volume.Status.State.String(),
+				duration.HumanDuration(time.Since(time.Unix(0, volume.Metadata.CreatedAt))),
 			},
 		}, nil
 	},

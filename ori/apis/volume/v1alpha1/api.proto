@@ -1,9 +1,10 @@
 syntax = "proto3";
 
 package volume.v1alpha1;
-option go_package = "ori/apis/volume/v1alpha1";
+option go_package = "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1/api.proto";
 
 option (gogoproto.goproto_stringer_all) = false;
 option (gogoproto.stringer_all) = true;
@@ -16,7 +17,6 @@ option (gogoproto.goproto_unrecognized_all) = false;
 service VolumeRuntime {
   rpc ListVolumes(ListVolumesRequest) returns (ListVolumesResponse) {};
   rpc CreateVolume(CreateVolumeRequest) returns (CreateVolumeResponse) {};
-  rpc VolumeStatus(VolumeStatusRequest) returns (VolumeStatusResponse) {};
   rpc DeleteVolume(DeleteVolumeRequest) returns (DeleteVolumeResponse) {};
 
   rpc ListVolumeClasses(ListVolumeClassesRequest) returns (ListVolumeClassesResponse) {};
@@ -27,31 +27,25 @@ message VolumeFilter {
   map<string, string> label_selector = 2;
 }
 
-message VolumeMetadata {
-  string namespace = 1;
-  string name = 2;
-  string uid = 3;
-}
-
 message VolumeResources {
   uint64 storage_bytes = 1;
 }
 
-message VolumeConfig {
-  VolumeMetadata metadata = 1;
-  string image = 2;
-  string class = 3;
-  VolumeResources resources = 4;
-  map<string, string> annotations = 5;
-  map<string, string> labels = 6;
+message VolumeSpec {
+  string image = 1;
+  string class = 2;
+  VolumeResources resources = 3;
+}
+
+message VolumeStatus {
+  VolumeState state = 1;
+  VolumeAccess access = 2;
 }
 
 message Volume {
-  string id = 1;
-  VolumeMetadata metadata = 2;
-  VolumeState state = 3;
-  map<string, string> annotations = 4;
-  map<string, string> labels = 5;
+  meta.v1alpha1.ObjectMetadata metadata = 1;
+  VolumeSpec spec = 2;
+  VolumeStatus status = 3;
 }
 
 message VolumeClassCapabilities {
@@ -77,17 +71,6 @@ enum VolumeState {
   VOLUME_ERROR = 2;
 }
 
-message VolumeStatus {
-  string id = 1;
-  VolumeMetadata metadata = 2;
-  string image = 3;
-  string image_ref = 4;
-  VolumeState state = 5;
-  VolumeAccess access = 6;
-  map<string, string> annotations = 7;
-  map<string, string> labels = 8;
-}
-
 message ListVolumesRequest {
   VolumeFilter filter = 1;
 }
@@ -97,19 +80,11 @@ message ListVolumesResponse {
 }
 
 message CreateVolumeRequest {
-  VolumeConfig config = 2;
+  Volume volume = 1;
 }
 
 message CreateVolumeResponse {
   Volume volume = 1;
-}
-
-message VolumeStatusRequest {
-  string volume_id = 1;
-}
-
-message VolumeStatusResponse {
-  VolumeStatus status = 1;
 }
 
 message DeleteVolumeRequest {

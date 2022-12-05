@@ -26,24 +26,20 @@ cd "$REPO_ROOT"
 export GOPATH="$TGOPATH"
 export GO111MODULE=off
 
-(
-cd "$REPO_ROOT"
-export PATH="$PATH:$(dirname "$PROTOC_GEN_GOGO")"
-echo "Generating ${blue}ori/machine${normal}"
-protoc \
-  --proto_path ./ori/apis/machine/v1alpha1 \
-  --proto_path "$TGOPATH/src" \
-  --gogo_out=plugins=grpc:"$REPO_ROOT" \
-  ./ori/apis/machine/v1alpha1/api.proto
-)
+function generate() {
+  package="$1"
+  (
+  cd "$TGOPATH/src"
+  export PATH="$PATH:$(dirname "$PROTOC_GEN_GOGO")"
+  echo "Generating ${blue}$package${normal}"
+  protoc \
+    --proto_path "./github.com/onmetal/onmetal-api/$package" \
+    --proto_path "$TGOPATH/src" \
+    --gogo_out=plugins=grpc:"$TGOPATH/src" \
+    "./github.com/onmetal/onmetal-api/$package/api.proto"
+  )
+}
 
-(
-cd "$REPO_ROOT"
-export PATH="$PATH:$(dirname "$PROTOC_GEN_GOGO")"
-echo "Generating ${blue}ori/volume${normal}"
-protoc \
-  --proto_path ./ori/apis/volume/v1alpha1 \
-  --proto_path "$TGOPATH/src" \
-  --gogo_out=plugins=grpc:"$REPO_ROOT" \
-  ./ori/apis/volume/v1alpha1/api.proto
-)
+generate "ori/apis/meta/v1alpha1"
+generate "ori/apis/machine/v1alpha1"
+generate "ori/apis/volume/v1alpha1"

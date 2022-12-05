@@ -9,6 +9,7 @@ import (
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
 	github_com_gogo_protobuf_sortkeys "github.com/gogo/protobuf/sortkeys"
+	v1alpha1 "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -111,67 +112,6 @@ func (m *VolumeFilter) GetLabelSelector() map[string]string {
 	return nil
 }
 
-type VolumeMetadata struct {
-	Namespace            string   `protobuf:"bytes,1,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Uid                  string   `protobuf:"bytes,3,opt,name=uid,proto3" json:"uid,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *VolumeMetadata) Reset()      { *m = VolumeMetadata{} }
-func (*VolumeMetadata) ProtoMessage() {}
-func (*VolumeMetadata) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{1}
-}
-func (m *VolumeMetadata) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *VolumeMetadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_VolumeMetadata.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *VolumeMetadata) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_VolumeMetadata.Merge(m, src)
-}
-func (m *VolumeMetadata) XXX_Size() int {
-	return m.Size()
-}
-func (m *VolumeMetadata) XXX_DiscardUnknown() {
-	xxx_messageInfo_VolumeMetadata.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_VolumeMetadata proto.InternalMessageInfo
-
-func (m *VolumeMetadata) GetNamespace() string {
-	if m != nil {
-		return m.Namespace
-	}
-	return ""
-}
-
-func (m *VolumeMetadata) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
-func (m *VolumeMetadata) GetUid() string {
-	if m != nil {
-		return m.Uid
-	}
-	return ""
-}
-
 type VolumeResources struct {
 	StorageBytes         uint64   `protobuf:"varint,1,opt,name=storage_bytes,json=storageBytes,proto3" json:"storage_bytes,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -181,7 +121,7 @@ type VolumeResources struct {
 func (m *VolumeResources) Reset()      { *m = VolumeResources{} }
 func (*VolumeResources) ProtoMessage() {}
 func (*VolumeResources) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{2}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{1}
 }
 func (m *VolumeResources) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -217,28 +157,25 @@ func (m *VolumeResources) GetStorageBytes() uint64 {
 	return 0
 }
 
-type VolumeConfig struct {
-	Metadata             *VolumeMetadata   `protobuf:"bytes,1,opt,name=metadata,proto3" json:"metadata,omitempty"`
-	Image                string            `protobuf:"bytes,2,opt,name=image,proto3" json:"image,omitempty"`
-	Class                string            `protobuf:"bytes,3,opt,name=class,proto3" json:"class,omitempty"`
-	Resources            *VolumeResources  `protobuf:"bytes,4,opt,name=resources,proto3" json:"resources,omitempty"`
-	Annotations          map[string]string `protobuf:"bytes,5,rep,name=annotations,proto3" json:"annotations,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	Labels               map[string]string `protobuf:"bytes,6,rep,name=labels,proto3" json:"labels,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
-	XXX_sizecache        int32             `json:"-"`
+type VolumeSpec struct {
+	Image                string           `protobuf:"bytes,1,opt,name=image,proto3" json:"image,omitempty"`
+	Class                string           `protobuf:"bytes,2,opt,name=class,proto3" json:"class,omitempty"`
+	Resources            *VolumeResources `protobuf:"bytes,3,opt,name=resources,proto3" json:"resources,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
+	XXX_sizecache        int32            `json:"-"`
 }
 
-func (m *VolumeConfig) Reset()      { *m = VolumeConfig{} }
-func (*VolumeConfig) ProtoMessage() {}
-func (*VolumeConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{3}
+func (m *VolumeSpec) Reset()      { *m = VolumeSpec{} }
+func (*VolumeSpec) ProtoMessage() {}
+func (*VolumeSpec) Descriptor() ([]byte, []int) {
+	return fileDescriptor_00212fb1f9d3bf1c, []int{2}
 }
-func (m *VolumeConfig) XXX_Unmarshal(b []byte) error {
+func (m *VolumeSpec) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *VolumeConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *VolumeSpec) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_VolumeConfig.Marshal(b, m, deterministic)
+		return xxx_messageInfo_VolumeSpec.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -248,68 +185,98 @@ func (m *VolumeConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error)
 		return b[:n], nil
 	}
 }
-func (m *VolumeConfig) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_VolumeConfig.Merge(m, src)
+func (m *VolumeSpec) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_VolumeSpec.Merge(m, src)
 }
-func (m *VolumeConfig) XXX_Size() int {
+func (m *VolumeSpec) XXX_Size() int {
 	return m.Size()
 }
-func (m *VolumeConfig) XXX_DiscardUnknown() {
-	xxx_messageInfo_VolumeConfig.DiscardUnknown(m)
+func (m *VolumeSpec) XXX_DiscardUnknown() {
+	xxx_messageInfo_VolumeSpec.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_VolumeConfig proto.InternalMessageInfo
+var xxx_messageInfo_VolumeSpec proto.InternalMessageInfo
 
-func (m *VolumeConfig) GetMetadata() *VolumeMetadata {
-	if m != nil {
-		return m.Metadata
-	}
-	return nil
-}
-
-func (m *VolumeConfig) GetImage() string {
+func (m *VolumeSpec) GetImage() string {
 	if m != nil {
 		return m.Image
 	}
 	return ""
 }
 
-func (m *VolumeConfig) GetClass() string {
+func (m *VolumeSpec) GetClass() string {
 	if m != nil {
 		return m.Class
 	}
 	return ""
 }
 
-func (m *VolumeConfig) GetResources() *VolumeResources {
+func (m *VolumeSpec) GetResources() *VolumeResources {
 	if m != nil {
 		return m.Resources
 	}
 	return nil
 }
 
-func (m *VolumeConfig) GetAnnotations() map[string]string {
-	if m != nil {
-		return m.Annotations
-	}
-	return nil
+type VolumeStatus struct {
+	State                VolumeState   `protobuf:"varint,1,opt,name=state,proto3,enum=volume.v1alpha1.VolumeState" json:"state,omitempty"`
+	Access               *VolumeAccess `protobuf:"bytes,2,opt,name=access,proto3" json:"access,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
+	XXX_sizecache        int32         `json:"-"`
 }
 
-func (m *VolumeConfig) GetLabels() map[string]string {
+func (m *VolumeStatus) Reset()      { *m = VolumeStatus{} }
+func (*VolumeStatus) ProtoMessage() {}
+func (*VolumeStatus) Descriptor() ([]byte, []int) {
+	return fileDescriptor_00212fb1f9d3bf1c, []int{3}
+}
+func (m *VolumeStatus) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *VolumeStatus) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_VolumeStatus.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *VolumeStatus) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_VolumeStatus.Merge(m, src)
+}
+func (m *VolumeStatus) XXX_Size() int {
+	return m.Size()
+}
+func (m *VolumeStatus) XXX_DiscardUnknown() {
+	xxx_messageInfo_VolumeStatus.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_VolumeStatus proto.InternalMessageInfo
+
+func (m *VolumeStatus) GetState() VolumeState {
 	if m != nil {
-		return m.Labels
+		return m.State
+	}
+	return VolumeState_VOLUME_PENDING
+}
+
+func (m *VolumeStatus) GetAccess() *VolumeAccess {
+	if m != nil {
+		return m.Access
 	}
 	return nil
 }
 
 type Volume struct {
-	Id                   string            `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Metadata             *VolumeMetadata   `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
-	State                VolumeState       `protobuf:"varint,3,opt,name=state,proto3,enum=volume.v1alpha1.VolumeState" json:"state,omitempty"`
-	Annotations          map[string]string `protobuf:"bytes,4,rep,name=annotations,proto3" json:"annotations,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	Labels               map[string]string `protobuf:"bytes,5,rep,name=labels,proto3" json:"labels,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
-	XXX_sizecache        int32             `json:"-"`
+	Metadata             *v1alpha1.ObjectMetadata `protobuf:"bytes,1,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	Spec                 *VolumeSpec              `protobuf:"bytes,2,opt,name=spec,proto3" json:"spec,omitempty"`
+	Status               *VolumeStatus            `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                 `json:"-"`
+	XXX_sizecache        int32                    `json:"-"`
 }
 
 func (m *Volume) Reset()      { *m = Volume{} }
@@ -344,37 +311,23 @@ func (m *Volume) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Volume proto.InternalMessageInfo
 
-func (m *Volume) GetId() string {
-	if m != nil {
-		return m.Id
-	}
-	return ""
-}
-
-func (m *Volume) GetMetadata() *VolumeMetadata {
+func (m *Volume) GetMetadata() *v1alpha1.ObjectMetadata {
 	if m != nil {
 		return m.Metadata
 	}
 	return nil
 }
 
-func (m *Volume) GetState() VolumeState {
+func (m *Volume) GetSpec() *VolumeSpec {
 	if m != nil {
-		return m.State
-	}
-	return VolumeState_VOLUME_PENDING
-}
-
-func (m *Volume) GetAnnotations() map[string]string {
-	if m != nil {
-		return m.Annotations
+		return m.Spec
 	}
 	return nil
 }
 
-func (m *Volume) GetLabels() map[string]string {
+func (m *Volume) GetStatus() *VolumeStatus {
 	if m != nil {
-		return m.Labels
+		return m.Status
 	}
 	return nil
 }
@@ -554,107 +507,6 @@ func (m *VolumeAccess) GetSecretData() map[string][]byte {
 	return nil
 }
 
-type VolumeStatus struct {
-	Id                   string            `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Metadata             *VolumeMetadata   `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
-	Image                string            `protobuf:"bytes,3,opt,name=image,proto3" json:"image,omitempty"`
-	ImageRef             string            `protobuf:"bytes,4,opt,name=image_ref,json=imageRef,proto3" json:"image_ref,omitempty"`
-	State                VolumeState       `protobuf:"varint,5,opt,name=state,proto3,enum=volume.v1alpha1.VolumeState" json:"state,omitempty"`
-	Access               *VolumeAccess     `protobuf:"bytes,6,opt,name=access,proto3" json:"access,omitempty"`
-	Annotations          map[string]string `protobuf:"bytes,7,rep,name=annotations,proto3" json:"annotations,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	Labels               map[string]string `protobuf:"bytes,8,rep,name=labels,proto3" json:"labels,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
-	XXX_sizecache        int32             `json:"-"`
-}
-
-func (m *VolumeStatus) Reset()      { *m = VolumeStatus{} }
-func (*VolumeStatus) ProtoMessage() {}
-func (*VolumeStatus) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{8}
-}
-func (m *VolumeStatus) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *VolumeStatus) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_VolumeStatus.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *VolumeStatus) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_VolumeStatus.Merge(m, src)
-}
-func (m *VolumeStatus) XXX_Size() int {
-	return m.Size()
-}
-func (m *VolumeStatus) XXX_DiscardUnknown() {
-	xxx_messageInfo_VolumeStatus.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_VolumeStatus proto.InternalMessageInfo
-
-func (m *VolumeStatus) GetId() string {
-	if m != nil {
-		return m.Id
-	}
-	return ""
-}
-
-func (m *VolumeStatus) GetMetadata() *VolumeMetadata {
-	if m != nil {
-		return m.Metadata
-	}
-	return nil
-}
-
-func (m *VolumeStatus) GetImage() string {
-	if m != nil {
-		return m.Image
-	}
-	return ""
-}
-
-func (m *VolumeStatus) GetImageRef() string {
-	if m != nil {
-		return m.ImageRef
-	}
-	return ""
-}
-
-func (m *VolumeStatus) GetState() VolumeState {
-	if m != nil {
-		return m.State
-	}
-	return VolumeState_VOLUME_PENDING
-}
-
-func (m *VolumeStatus) GetAccess() *VolumeAccess {
-	if m != nil {
-		return m.Access
-	}
-	return nil
-}
-
-func (m *VolumeStatus) GetAnnotations() map[string]string {
-	if m != nil {
-		return m.Annotations
-	}
-	return nil
-}
-
-func (m *VolumeStatus) GetLabels() map[string]string {
-	if m != nil {
-		return m.Labels
-	}
-	return nil
-}
-
 type ListVolumesRequest struct {
 	Filter               *VolumeFilter `protobuf:"bytes,1,opt,name=filter,proto3" json:"filter,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
@@ -664,7 +516,7 @@ type ListVolumesRequest struct {
 func (m *ListVolumesRequest) Reset()      { *m = ListVolumesRequest{} }
 func (*ListVolumesRequest) ProtoMessage() {}
 func (*ListVolumesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{9}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{8}
 }
 func (m *ListVolumesRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -709,7 +561,7 @@ type ListVolumesResponse struct {
 func (m *ListVolumesResponse) Reset()      { *m = ListVolumesResponse{} }
 func (*ListVolumesResponse) ProtoMessage() {}
 func (*ListVolumesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{10}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{9}
 }
 func (m *ListVolumesResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -746,15 +598,15 @@ func (m *ListVolumesResponse) GetVolumes() []*Volume {
 }
 
 type CreateVolumeRequest struct {
-	Config               *VolumeConfig `protobuf:"bytes,2,opt,name=config,proto3" json:"config,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
-	XXX_sizecache        int32         `json:"-"`
+	Volume               *Volume  `protobuf:"bytes,1,opt,name=volume,proto3" json:"volume,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *CreateVolumeRequest) Reset()      { *m = CreateVolumeRequest{} }
 func (*CreateVolumeRequest) ProtoMessage() {}
 func (*CreateVolumeRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{11}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{10}
 }
 func (m *CreateVolumeRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -783,9 +635,9 @@ func (m *CreateVolumeRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_CreateVolumeRequest proto.InternalMessageInfo
 
-func (m *CreateVolumeRequest) GetConfig() *VolumeConfig {
+func (m *CreateVolumeRequest) GetVolume() *Volume {
 	if m != nil {
-		return m.Config
+		return m.Volume
 	}
 	return nil
 }
@@ -799,7 +651,7 @@ type CreateVolumeResponse struct {
 func (m *CreateVolumeResponse) Reset()      { *m = CreateVolumeResponse{} }
 func (*CreateVolumeResponse) ProtoMessage() {}
 func (*CreateVolumeResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{12}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{11}
 }
 func (m *CreateVolumeResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -835,96 +687,6 @@ func (m *CreateVolumeResponse) GetVolume() *Volume {
 	return nil
 }
 
-type VolumeStatusRequest struct {
-	VolumeId             string   `protobuf:"bytes,1,opt,name=volume_id,json=volumeId,proto3" json:"volume_id,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *VolumeStatusRequest) Reset()      { *m = VolumeStatusRequest{} }
-func (*VolumeStatusRequest) ProtoMessage() {}
-func (*VolumeStatusRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{13}
-}
-func (m *VolumeStatusRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *VolumeStatusRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_VolumeStatusRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *VolumeStatusRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_VolumeStatusRequest.Merge(m, src)
-}
-func (m *VolumeStatusRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *VolumeStatusRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_VolumeStatusRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_VolumeStatusRequest proto.InternalMessageInfo
-
-func (m *VolumeStatusRequest) GetVolumeId() string {
-	if m != nil {
-		return m.VolumeId
-	}
-	return ""
-}
-
-type VolumeStatusResponse struct {
-	Status               *VolumeStatus `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
-	XXX_sizecache        int32         `json:"-"`
-}
-
-func (m *VolumeStatusResponse) Reset()      { *m = VolumeStatusResponse{} }
-func (*VolumeStatusResponse) ProtoMessage() {}
-func (*VolumeStatusResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{14}
-}
-func (m *VolumeStatusResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *VolumeStatusResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_VolumeStatusResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *VolumeStatusResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_VolumeStatusResponse.Merge(m, src)
-}
-func (m *VolumeStatusResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *VolumeStatusResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_VolumeStatusResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_VolumeStatusResponse proto.InternalMessageInfo
-
-func (m *VolumeStatusResponse) GetStatus() *VolumeStatus {
-	if m != nil {
-		return m.Status
-	}
-	return nil
-}
-
 type DeleteVolumeRequest struct {
 	VolumeId             string   `protobuf:"bytes,1,opt,name=volume_id,json=volumeId,proto3" json:"volume_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -934,7 +696,7 @@ type DeleteVolumeRequest struct {
 func (m *DeleteVolumeRequest) Reset()      { *m = DeleteVolumeRequest{} }
 func (*DeleteVolumeRequest) ProtoMessage() {}
 func (*DeleteVolumeRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{15}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{12}
 }
 func (m *DeleteVolumeRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -978,7 +740,7 @@ type DeleteVolumeResponse struct {
 func (m *DeleteVolumeResponse) Reset()      { *m = DeleteVolumeResponse{} }
 func (*DeleteVolumeResponse) ProtoMessage() {}
 func (*DeleteVolumeResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{16}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{13}
 }
 func (m *DeleteVolumeResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1015,7 +777,7 @@ type ListVolumeClassesRequest struct {
 func (m *ListVolumeClassesRequest) Reset()      { *m = ListVolumeClassesRequest{} }
 func (*ListVolumeClassesRequest) ProtoMessage() {}
 func (*ListVolumeClassesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{17}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{14}
 }
 func (m *ListVolumeClassesRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1053,7 +815,7 @@ type ListVolumeClassesResponse struct {
 func (m *ListVolumeClassesResponse) Reset()      { *m = ListVolumeClassesResponse{} }
 func (*ListVolumeClassesResponse) ProtoMessage() {}
 func (*ListVolumeClassesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{18}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{15}
 }
 func (m *ListVolumeClassesResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1093,28 +855,19 @@ func init() {
 	proto.RegisterEnum("volume.v1alpha1.VolumeState", VolumeState_name, VolumeState_value)
 	proto.RegisterType((*VolumeFilter)(nil), "volume.v1alpha1.VolumeFilter")
 	proto.RegisterMapType((map[string]string)(nil), "volume.v1alpha1.VolumeFilter.LabelSelectorEntry")
-	proto.RegisterType((*VolumeMetadata)(nil), "volume.v1alpha1.VolumeMetadata")
 	proto.RegisterType((*VolumeResources)(nil), "volume.v1alpha1.VolumeResources")
-	proto.RegisterType((*VolumeConfig)(nil), "volume.v1alpha1.VolumeConfig")
-	proto.RegisterMapType((map[string]string)(nil), "volume.v1alpha1.VolumeConfig.AnnotationsEntry")
-	proto.RegisterMapType((map[string]string)(nil), "volume.v1alpha1.VolumeConfig.LabelsEntry")
+	proto.RegisterType((*VolumeSpec)(nil), "volume.v1alpha1.VolumeSpec")
+	proto.RegisterType((*VolumeStatus)(nil), "volume.v1alpha1.VolumeStatus")
 	proto.RegisterType((*Volume)(nil), "volume.v1alpha1.Volume")
-	proto.RegisterMapType((map[string]string)(nil), "volume.v1alpha1.Volume.AnnotationsEntry")
-	proto.RegisterMapType((map[string]string)(nil), "volume.v1alpha1.Volume.LabelsEntry")
 	proto.RegisterType((*VolumeClassCapabilities)(nil), "volume.v1alpha1.VolumeClassCapabilities")
 	proto.RegisterType((*VolumeClass)(nil), "volume.v1alpha1.VolumeClass")
 	proto.RegisterType((*VolumeAccess)(nil), "volume.v1alpha1.VolumeAccess")
 	proto.RegisterMapType((map[string]string)(nil), "volume.v1alpha1.VolumeAccess.AttributesEntry")
 	proto.RegisterMapType((map[string][]byte)(nil), "volume.v1alpha1.VolumeAccess.SecretDataEntry")
-	proto.RegisterType((*VolumeStatus)(nil), "volume.v1alpha1.VolumeStatus")
-	proto.RegisterMapType((map[string]string)(nil), "volume.v1alpha1.VolumeStatus.AnnotationsEntry")
-	proto.RegisterMapType((map[string]string)(nil), "volume.v1alpha1.VolumeStatus.LabelsEntry")
 	proto.RegisterType((*ListVolumesRequest)(nil), "volume.v1alpha1.ListVolumesRequest")
 	proto.RegisterType((*ListVolumesResponse)(nil), "volume.v1alpha1.ListVolumesResponse")
 	proto.RegisterType((*CreateVolumeRequest)(nil), "volume.v1alpha1.CreateVolumeRequest")
 	proto.RegisterType((*CreateVolumeResponse)(nil), "volume.v1alpha1.CreateVolumeResponse")
-	proto.RegisterType((*VolumeStatusRequest)(nil), "volume.v1alpha1.VolumeStatusRequest")
-	proto.RegisterType((*VolumeStatusResponse)(nil), "volume.v1alpha1.VolumeStatusResponse")
 	proto.RegisterType((*DeleteVolumeRequest)(nil), "volume.v1alpha1.DeleteVolumeRequest")
 	proto.RegisterType((*DeleteVolumeResponse)(nil), "volume.v1alpha1.DeleteVolumeResponse")
 	proto.RegisterType((*ListVolumeClassesRequest)(nil), "volume.v1alpha1.ListVolumeClassesRequest")
@@ -1124,76 +877,65 @@ func init() {
 func init() { proto.RegisterFile("api.proto", fileDescriptor_00212fb1f9d3bf1c) }
 
 var fileDescriptor_00212fb1f9d3bf1c = []byte{
-	// 1101 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x57, 0x4f, 0x6f, 0x1b, 0x45,
-	0x14, 0xcf, 0xda, 0x8e, 0x1b, 0x3f, 0x3b, 0x8e, 0x99, 0x46, 0xed, 0xe2, 0x26, 0x26, 0xda, 0x16,
-	0x29, 0xad, 0x54, 0x9b, 0x18, 0xb5, 0x02, 0xaa, 0x16, 0x9c, 0x3f, 0x94, 0x80, 0x93, 0x56, 0x13,
-	0x08, 0x52, 0x25, 0x64, 0xc6, 0xeb, 0x89, 0x33, 0x62, 0xed, 0x35, 0x3b, 0xb3, 0x91, 0x72, 0xe3,
-	0xca, 0x01, 0x89, 0xaf, 0xc3, 0x27, 0xa0, 0x47, 0x8e, 0x48, 0x5c, 0x68, 0xf8, 0x0e, 0x9c, 0xd1,
-	0xce, 0xcc, 0xae, 0xd7, 0x7f, 0x76, 0x93, 0x48, 0x1c, 0x7a, 0x9b, 0x79, 0x7e, 0xbf, 0xdf, 0x7b,
-	0xf3, 0xde, 0x6f, 0xde, 0xac, 0xa1, 0x40, 0x46, 0xac, 0x3e, 0xf2, 0x5c, 0xe1, 0xa2, 0x95, 0x33,
-	0xd7, 0xf1, 0x07, 0xb4, 0x7e, 0xb6, 0x45, 0x9c, 0xd1, 0x29, 0xd9, 0xaa, 0x3e, 0xec, 0x33, 0x71,
-	0xea, 0x77, 0xeb, 0xb6, 0x3b, 0x68, 0xf4, 0xdd, 0xbe, 0xdb, 0x90, 0x7e, 0x5d, 0xff, 0x44, 0xee,
-	0xe4, 0x46, 0xae, 0x14, 0xde, 0xfa, 0xcd, 0x80, 0xd2, 0xb1, 0xa4, 0xf8, 0x9c, 0x39, 0x82, 0x7a,
-	0xa8, 0x0c, 0x19, 0xd6, 0x33, 0x8d, 0x0d, 0x63, 0xb3, 0x80, 0x33, 0xac, 0x87, 0xbe, 0x85, 0xb2,
-	0x43, 0xba, 0xd4, 0xe9, 0x70, 0xea, 0x50, 0x5b, 0xb8, 0x9e, 0x99, 0xd9, 0xc8, 0x6e, 0x16, 0x9b,
-	0x1f, 0xd4, 0xa7, 0x22, 0xd7, 0xe3, 0x34, 0xf5, 0x76, 0x80, 0x39, 0xd2, 0x90, 0xbd, 0xa1, 0xf0,
-	0xce, 0xf1, 0xb2, 0x13, 0xb7, 0x55, 0x3f, 0x03, 0x34, 0xeb, 0x84, 0x2a, 0x90, 0xfd, 0x81, 0x9e,
-	0xeb, 0xf8, 0xc1, 0x12, 0xad, 0xc2, 0xe2, 0x19, 0x71, 0x7c, 0x6a, 0x66, 0xa4, 0x4d, 0x6d, 0x3e,
-	0xc9, 0x7c, 0x64, 0x58, 0x5f, 0x43, 0x59, 0xc5, 0x3c, 0xa0, 0x82, 0xf4, 0x88, 0x20, 0x68, 0x0d,
-	0x0a, 0x43, 0x32, 0xa0, 0x7c, 0x44, 0x6c, 0xaa, 0x39, 0xc6, 0x06, 0x84, 0x20, 0x17, 0x6c, 0x34,
-	0x91, 0x5c, 0x07, 0xf1, 0x7c, 0xd6, 0x33, 0xb3, 0x2a, 0x9e, 0xcf, 0x7a, 0xd6, 0x63, 0x58, 0x51,
-	0xac, 0x98, 0x72, 0xd7, 0xf7, 0x6c, 0xca, 0xd1, 0x5d, 0x58, 0xe6, 0xc2, 0xf5, 0x48, 0x9f, 0x76,
-	0xba, 0xe7, 0x82, 0x72, 0x49, 0x9d, 0xc3, 0x25, 0x6d, 0xdc, 0x0e, 0x6c, 0xd6, 0xef, 0xd9, 0xb0,
-	0x92, 0x3b, 0xee, 0xf0, 0x84, 0xf5, 0xd1, 0x13, 0x58, 0x1a, 0xe8, 0xc4, 0x24, 0xa0, 0xd8, 0x7c,
-	0x2f, 0xa1, 0x66, 0x61, 0xfe, 0x38, 0x02, 0x04, 0xa7, 0x66, 0x03, 0xd2, 0x8f, 0x4e, 0x2d, 0x37,
-	0x81, 0xd5, 0x76, 0x08, 0xe7, 0x3a, 0x5f, 0xb5, 0x41, 0xcf, 0xa0, 0xe0, 0x85, 0xb9, 0x9a, 0x39,
-	0x19, 0x69, 0x23, 0x21, 0x52, 0x74, 0x26, 0x3c, 0x86, 0xa0, 0x97, 0x50, 0x24, 0xc3, 0xa1, 0x2b,
-	0x88, 0x60, 0xee, 0x90, 0x9b, 0x8b, 0xb2, 0xbf, 0xf5, 0x04, 0x06, 0x75, 0xb8, 0x7a, 0x6b, 0x0c,
-	0x50, 0xdd, 0x8d, 0x53, 0xa0, 0x16, 0xe4, 0x65, 0xb3, 0xb9, 0x99, 0x97, 0x64, 0xf7, 0xd3, 0xc9,
-	0xa4, 0x0e, 0x34, 0x8f, 0x06, 0x56, 0x9f, 0x41, 0x65, 0x3a, 0xc6, 0x75, 0xc4, 0x51, 0xfd, 0x18,
-	0x8a, 0x31, 0xda, 0x6b, 0xe9, 0xea, 0x97, 0x2c, 0xe4, 0x55, 0x7e, 0x33, 0xb7, 0x21, 0xde, 0xd3,
-	0xcc, 0x75, 0x7b, 0xda, 0x84, 0x45, 0x2e, 0x88, 0xa0, 0xb2, 0x7b, 0xe5, 0xe6, 0x5a, 0x02, 0xf2,
-	0x28, 0xf0, 0xc1, 0xca, 0x15, 0x7d, 0x39, 0xd9, 0x9b, 0x9c, 0x2c, 0xe7, 0x66, 0x02, 0xf2, 0x92,
-	0xae, 0x3c, 0x89, 0xba, 0xa2, 0x5a, 0x7c, 0x37, 0x89, 0xe6, 0x2d, 0xeb, 0xc7, 0xa7, 0x70, 0x5b,
-	0xcb, 0x25, 0x90, 0xfb, 0x0e, 0x19, 0x91, 0x2e, 0x73, 0x98, 0x60, 0x94, 0x07, 0x34, 0x62, 0xa4,
-	0xee, 0x63, 0x16, 0x07, 0xcb, 0xe0, 0x92, 0x33, 0x77, 0xc4, 0x25, 0x4b, 0x16, 0xcb, 0xb5, 0xe5,
-	0x42, 0x31, 0x46, 0x10, 0xcd, 0x01, 0x23, 0x36, 0x07, 0xda, 0x50, 0xb2, 0x63, 0xc4, 0xba, 0xb9,
-	0x49, 0x85, 0x9e, 0x49, 0x04, 0x4f, 0xa0, 0xad, 0xbf, 0x32, 0xe1, 0x2c, 0x68, 0xd9, 0x36, 0xe5,
-	0x1c, 0xdd, 0x82, 0x7c, 0xcf, 0x63, 0x67, 0xd4, 0xd3, 0x41, 0xf5, 0x2e, 0xb0, 0x9f, 0x92, 0x61,
-	0xcf, 0x09, 0x4f, 0xad, 0x77, 0xe8, 0x00, 0x80, 0x08, 0xe1, 0xb1, 0xae, 0x1f, 0x8c, 0x9b, 0xac,
-	0x6c, 0xd7, 0xc3, 0x84, 0x64, 0x54, 0x88, 0x7a, 0x2b, 0xf2, 0x57, 0x8d, 0x8b, 0x11, 0xa0, 0x43,
-	0x28, 0x72, 0x6a, 0x7b, 0x54, 0x74, 0xa4, 0x72, 0x73, 0x57, 0xe1, 0x3b, 0x92, 0x80, 0x5d, 0x22,
-	0x88, 0xe6, 0xe3, 0x91, 0xa1, 0xfa, 0x14, 0x56, 0xa6, 0xc2, 0x5d, 0x4b, 0x0b, 0x4f, 0x61, 0x65,
-	0x8a, 0xfd, 0x32, 0x78, 0x29, 0xae, 0x87, 0x9f, 0x73, 0x61, 0x75, 0x83, 0xab, 0xe2, 0xf3, 0xff,
-	0xf7, 0x96, 0x46, 0x93, 0x37, 0x1b, 0x9f, 0xbc, 0x77, 0xa0, 0x20, 0x17, 0x1d, 0x8f, 0x9e, 0xc8,
-	0x19, 0x5b, 0xc0, 0x4b, 0xd2, 0x80, 0xe9, 0xc9, 0xf8, 0x62, 0x2f, 0x5e, 0xfd, 0x62, 0x3f, 0x82,
-	0x3c, 0x91, 0x85, 0x36, 0xf3, 0x32, 0xc3, 0xf5, 0xd4, 0x6e, 0x60, 0xed, 0x3c, 0x3d, 0xab, 0x6f,
-	0xa4, 0xce, 0x6a, 0x55, 0x9e, 0x2b, 0xcf, 0xea, 0xa5, 0xd4, 0x59, 0xad, 0xc9, 0xde, 0xb2, 0xd9,
-	0xf0, 0x15, 0xa0, 0x36, 0xe3, 0x42, 0xa5, 0xc8, 0x31, 0xfd, 0xd1, 0xa7, 0x5c, 0x04, 0xc5, 0x3d,
-	0x91, 0xdf, 0x21, 0xfa, 0xe1, 0x5d, 0x4f, 0xfd, 0x58, 0xc1, 0xda, 0xd9, 0xfa, 0x02, 0x6e, 0x4e,
-	0x90, 0xf1, 0x91, 0x3b, 0xe4, 0x14, 0x6d, 0xc1, 0x0d, 0x05, 0x0f, 0x06, 0x4d, 0x50, 0xa2, 0xdb,
-	0x49, 0xaf, 0x6b, 0xe8, 0x67, 0xb5, 0xe1, 0xe6, 0x8e, 0x47, 0x89, 0xa0, 0xe1, 0xb3, 0x1b, 0xe5,
-	0x65, 0xcb, 0x27, 0x4f, 0xcb, 0x72, 0x3d, 0xf5, 0x5d, 0xc4, 0xda, 0xd9, 0x7a, 0x0e, 0xab, 0x93,
-	0x6c, 0x3a, 0xb1, 0x06, 0xe4, 0x15, 0x5e, 0x1f, 0x33, 0x31, 0x2f, 0xed, 0x66, 0x35, 0xe1, 0x66,
-	0xbc, 0x99, 0x61, 0x5a, 0x77, 0xa0, 0xa0, 0x1c, 0x3a, 0xd1, 0x35, 0x5a, 0x52, 0x86, 0xfd, 0x9e,
-	0x75, 0x00, 0xab, 0x93, 0x18, 0x1d, 0xfc, 0x11, 0xe4, 0xb9, 0xb4, 0x5c, 0x52, 0x63, 0x0d, 0xd3,
-	0xce, 0x41, 0x0a, 0xbb, 0xd4, 0xa1, 0xd3, 0x95, 0x49, 0x4d, 0xe1, 0x16, 0xac, 0x4e, 0x62, 0x54,
-	0x0a, 0x56, 0x15, 0xcc, 0x71, 0xbf, 0xe4, 0x4c, 0x8e, 0x24, 0x60, 0x7d, 0x0f, 0xef, 0xce, 0xf9,
-	0x4d, 0xe7, 0xbe, 0x03, 0x65, 0x1d, 0xcd, 0x56, 0xbf, 0xe8, 0xc6, 0xae, 0xa5, 0xcd, 0x7b, 0xbc,
-	0x7c, 0x16, 0x27, 0x7b, 0xb0, 0x1f, 0xbe, 0x2a, 0xf2, 0x5e, 0x23, 0x04, 0xe5, 0xe3, 0x17, 0xed,
-	0x6f, 0x0e, 0xf6, 0x3a, 0x2f, 0xf7, 0x0e, 0x77, 0xf7, 0x0f, 0x9f, 0x57, 0x16, 0xd0, 0x2a, 0x54,
-	0xb4, 0xad, 0x75, 0xdc, 0xda, 0x6f, 0xb7, 0xb6, 0xdb, 0x7b, 0x15, 0x03, 0x55, 0xa0, 0xa4, 0xad,
-	0x7b, 0x18, 0xbf, 0xc0, 0x95, 0x4c, 0xf3, 0xdf, 0x2c, 0x2c, 0xeb, 0xb3, 0xf9, 0x43, 0xc1, 0x06,
-	0x14, 0xbd, 0x82, 0x62, 0x4c, 0x8a, 0x68, 0xf6, 0xa9, 0x9e, 0x55, 0x7d, 0xf5, 0x5e, 0xba, 0x93,
-	0x2e, 0xda, 0x02, 0xfa, 0x0e, 0x4a, 0x71, 0x39, 0xa1, 0x59, 0xdc, 0x1c, 0xed, 0x56, 0xdf, 0xbf,
-	0xc4, 0x2b, 0x4e, 0x3f, 0x31, 0x9d, 0xef, 0xa5, 0x0b, 0x23, 0x91, 0x7e, 0x9e, 0xea, 0x14, 0x7d,
-	0x5c, 0x0c, 0x73, 0xe8, 0xe7, 0xe8, 0x6b, 0x0e, 0xfd, 0x5c, 0x45, 0x2d, 0x20, 0x07, 0xde, 0x99,
-	0xd1, 0x0d, 0xba, 0x9f, 0x52, 0xd9, 0x49, 0xdd, 0x55, 0x1f, 0x5c, 0xc5, 0x35, 0x8c, 0xb6, 0xfd,
-	0xf8, 0xf5, 0x9b, 0x9a, 0xf1, 0xe7, 0x9b, 0xda, 0xc2, 0x4f, 0x17, 0x35, 0xe3, 0xf5, 0x45, 0xcd,
-	0xf8, 0xe3, 0xa2, 0x66, 0xfc, 0x7d, 0x51, 0x33, 0x7e, 0xfd, 0xa7, 0xb6, 0xf0, 0xca, 0x74, 0x3d,
-	0xd6, 0x20, 0x23, 0xc6, 0x1b, 0x8a, 0xb3, 0x11, 0x72, 0x76, 0xf3, 0xf2, 0xdf, 0xdb, 0x87, 0xff,
-	0x05, 0x00, 0x00, 0xff, 0xff, 0x58, 0x53, 0x25, 0xe3, 0x0a, 0x0e, 0x00, 0x00,
+	// 924 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x56, 0xdd, 0x6e, 0x1b, 0x45,
+	0x14, 0xf6, 0xda, 0xa9, 0x69, 0x8e, 0x1d, 0xc7, 0x4c, 0xa2, 0xd6, 0x6c, 0x5b, 0x2b, 0xda, 0x82,
+	0x14, 0x2a, 0xc5, 0x4b, 0x8c, 0xf8, 0x95, 0xa0, 0x38, 0x89, 0x5b, 0x22, 0x9c, 0x04, 0x4d, 0xd4,
+	0x20, 0x55, 0x42, 0x66, 0x76, 0x3d, 0x75, 0x06, 0xd6, 0xde, 0x65, 0x67, 0xd6, 0x22, 0x77, 0x3c,
+	0x02, 0x77, 0x3c, 0x04, 0x4f, 0xc0, 0x1b, 0xf4, 0x92, 0x4b, 0x24, 0x6e, 0x68, 0x78, 0x11, 0x34,
+	0x3f, 0xbb, 0x59, 0xc7, 0x3f, 0x4d, 0xaf, 0x3c, 0x73, 0xfc, 0x9d, 0xef, 0xfb, 0xe6, 0x9c, 0x33,
+	0xa3, 0x85, 0x55, 0x12, 0xb1, 0x56, 0x14, 0x87, 0x22, 0x44, 0xeb, 0x93, 0x30, 0x48, 0x46, 0xb4,
+	0x35, 0xd9, 0x25, 0x41, 0x74, 0x4e, 0x76, 0xed, 0x9d, 0x21, 0x13, 0xe7, 0x89, 0xd7, 0xf2, 0xc3,
+	0x91, 0x3b, 0x0c, 0x87, 0xa1, 0xab, 0x70, 0x5e, 0xf2, 0x42, 0xed, 0xd4, 0x46, 0xad, 0x74, 0xbe,
+	0xfd, 0x38, 0x07, 0x0f, 0xc7, 0x23, 0x2a, 0x48, 0x90, 0xfe, 0xee, 0x90, 0x88, 0xb9, 0x61, 0xcc,
+	0x5c, 0x12, 0x31, 0xee, 0xca, 0x90, 0x9b, 0xaa, 0xb8, 0x99, 0x01, 0xe7, 0x4f, 0x0b, 0xaa, 0x67,
+	0xca, 0xc3, 0x13, 0x16, 0x08, 0x1a, 0xa3, 0x1a, 0x14, 0xd9, 0xa0, 0x61, 0x6d, 0x59, 0xdb, 0xab,
+	0xb8, 0xc8, 0x06, 0xe8, 0x3b, 0xa8, 0x05, 0xc4, 0xa3, 0x41, 0x9f, 0xd3, 0x80, 0xfa, 0x22, 0x8c,
+	0x1b, 0xc5, 0xad, 0xd2, 0x76, 0xa5, 0xfd, 0x41, 0xeb, 0x9a, 0xf5, 0x56, 0x9e, 0xa6, 0xd5, 0x93,
+	0x39, 0xa7, 0x26, 0xa5, 0x3b, 0x16, 0xf1, 0x05, 0x5e, 0x0b, 0xf2, 0x31, 0xfb, 0x2b, 0x40, 0xb3,
+	0x20, 0x54, 0x87, 0xd2, 0x4f, 0xf4, 0xc2, 0xe8, 0xcb, 0x25, 0xda, 0x84, 0x5b, 0x13, 0x12, 0x24,
+	0xb4, 0x51, 0x54, 0x31, 0xbd, 0xf9, 0xbc, 0xf8, 0xa9, 0xe5, 0x7c, 0x0c, 0xeb, 0x5a, 0x13, 0x53,
+	0x1e, 0x26, 0xb1, 0x4f, 0x39, 0x7a, 0x08, 0x6b, 0x5c, 0x84, 0x31, 0x19, 0xd2, 0xbe, 0x77, 0x21,
+	0x28, 0x57, 0x44, 0x2b, 0xb8, 0x6a, 0x82, 0x7b, 0x32, 0xe6, 0xfc, 0x02, 0xa0, 0xf3, 0x4e, 0x23,
+	0xea, 0x4b, 0x7e, 0x36, 0x22, 0x43, 0x6a, 0x34, 0xf5, 0x46, 0x46, 0xfd, 0x80, 0x70, 0x9e, 0xaa,
+	0xaa, 0x0d, 0xfa, 0x12, 0x56, 0xe3, 0x54, 0xab, 0x51, 0xda, 0xb2, 0xb6, 0x2b, 0xed, 0xad, 0x05,
+	0x75, 0xc8, 0x3c, 0xe1, 0xab, 0x14, 0xe7, 0x22, 0x2d, 0xf6, 0xa9, 0x20, 0x22, 0xe1, 0xa8, 0x0d,
+	0xb7, 0xb8, 0x20, 0x42, 0x6b, 0xd7, 0xda, 0xf7, 0x17, 0x70, 0x49, 0x34, 0xc5, 0x1a, 0x8a, 0x3e,
+	0x82, 0x32, 0xf1, 0x7d, 0x6a, 0xac, 0x55, 0xda, 0x0f, 0x16, 0x24, 0x75, 0x14, 0x08, 0x1b, 0xb0,
+	0xf3, 0x87, 0x05, 0x65, 0xfd, 0x07, 0xfa, 0x0c, 0x6e, 0xcb, 0x71, 0x18, 0x10, 0x41, 0x94, 0xb0,
+	0xe4, 0x90, 0x81, 0x2b, 0x86, 0x13, 0xef, 0x47, 0xea, 0x8b, 0x23, 0x03, 0xc2, 0x19, 0x1c, 0xb9,
+	0xb0, 0xc2, 0x23, 0xea, 0x1b, 0xe9, 0x7b, 0x8b, 0xfc, 0x46, 0xd4, 0xc7, 0x0a, 0x28, 0xdd, 0x72,
+	0x75, 0x56, 0x53, 0xae, 0x07, 0x4b, 0x8e, 0x98, 0x70, 0x6c, 0xc0, 0xce, 0x63, 0xb8, 0xab, 0xe3,
+	0xfb, 0xb2, 0xee, 0xfb, 0x24, 0x22, 0x1e, 0x0b, 0x98, 0x60, 0x94, 0xcb, 0x09, 0x11, 0x91, 0x6e,
+	0x6c, 0x09, 0xcb, 0x25, 0x42, 0xb0, 0xc2, 0xc2, 0x48, 0xd7, 0xa3, 0x84, 0xd5, 0xda, 0x09, 0xa1,
+	0x92, 0x23, 0x90, 0x90, 0x31, 0x19, 0xa5, 0x3d, 0x56, 0x6b, 0xd4, 0x83, 0xaa, 0x9f, 0x23, 0x36,
+	0x67, 0xda, 0x5e, 0x60, 0x70, 0xc6, 0x08, 0x9e, 0xca, 0x76, 0xfe, 0x29, 0xa6, 0xbd, 0xd5, 0x85,
+	0x47, 0x77, 0xa0, 0x3c, 0x88, 0xd9, 0x84, 0xc6, 0x46, 0xd4, 0xec, 0x64, 0xfc, 0x9c, 0x8c, 0x07,
+	0x41, 0x3a, 0xd0, 0x66, 0x87, 0x8e, 0x00, 0x88, 0x10, 0x31, 0xf3, 0x12, 0xa1, 0x86, 0x4b, 0x5e,
+	0xb2, 0x9d, 0xa5, 0xbd, 0x6d, 0x75, 0x32, 0xbc, 0xbe, 0x61, 0x39, 0x02, 0x74, 0x0c, 0x15, 0x4e,
+	0xfd, 0x98, 0x8a, 0xbe, 0xea, 0xf3, 0xca, 0x4d, 0xf8, 0x4e, 0x55, 0xc2, 0x01, 0x11, 0xc4, 0xf0,
+	0xf1, 0x2c, 0x60, 0x7f, 0x01, 0xeb, 0xd7, 0xe4, 0xde, 0xe4, 0xae, 0xca, 0xf4, 0x6b, 0xec, 0xaf,
+	0x4b, 0xaf, 0xe6, 0xaf, 0xfa, 0x37, 0x80, 0x7a, 0x8c, 0x0b, 0xed, 0x96, 0x63, 0xfa, 0x73, 0x42,
+	0xb9, 0x90, 0xc3, 0xf5, 0x42, 0x3d, 0x37, 0xd9, 0x18, 0x2f, 0x7b, 0x93, 0xb0, 0x01, 0x3b, 0x5f,
+	0xc3, 0xc6, 0x14, 0x19, 0x8f, 0xc2, 0x31, 0xa7, 0x68, 0x17, 0xde, 0xd2, 0xe9, 0x72, 0xb8, 0x64,
+	0xb5, 0xee, 0x2e, 0xba, 0xda, 0x29, 0xce, 0x79, 0x02, 0x1b, 0xfb, 0x31, 0x25, 0x82, 0xa6, 0x77,
+	0x5e, 0xfb, 0x72, 0xa1, 0xac, 0x11, 0xc6, 0xd7, 0x42, 0x22, 0x03, 0x73, 0x9e, 0xc2, 0xe6, 0x34,
+	0x8f, 0xb1, 0xf4, 0xc6, 0x44, 0x6d, 0xd8, 0x38, 0xa0, 0x01, 0xbd, 0x6e, 0xe8, 0x1e, 0xac, 0x6a,
+	0x40, 0x3f, 0x7b, 0xdb, 0x6f, 0xeb, 0xc0, 0xe1, 0xc0, 0xb9, 0x03, 0x9b, 0xd3, 0x39, 0x5a, 0xdc,
+	0xb1, 0xa1, 0x71, 0x55, 0x26, 0x35, 0xfe, 0x59, 0xe5, 0x9d, 0x1f, 0xe0, 0x9d, 0x39, 0xff, 0x19,
+	0xd7, 0xfb, 0x50, 0x33, 0x6a, 0xbe, 0xfe, 0xc7, 0xd4, 0xf3, 0xfe, 0xb2, 0xab, 0x85, 0xd7, 0x26,
+	0x79, 0xb2, 0x47, 0x87, 0xe9, 0x05, 0x56, 0x8f, 0x1f, 0x42, 0x50, 0x3b, 0x3b, 0xe9, 0x3d, 0x3b,
+	0xea, 0xf6, 0xbf, 0xed, 0x1e, 0x1f, 0x1c, 0x1e, 0x3f, 0xad, 0x17, 0xd0, 0x26, 0xd4, 0x4d, 0xac,
+	0x73, 0xd6, 0x39, 0xec, 0x75, 0xf6, 0x7a, 0xdd, 0xba, 0x85, 0xea, 0x50, 0x35, 0xd1, 0x2e, 0xc6,
+	0x27, 0xb8, 0x5e, 0x6c, 0xff, 0x5e, 0x82, 0x35, 0x73, 0xb6, 0x64, 0x2c, 0xd8, 0x88, 0xa2, 0xe7,
+	0x50, 0xc9, 0x4d, 0x00, 0x7a, 0x38, 0x63, 0x6c, 0x76, 0xd8, 0xec, 0x77, 0x97, 0x83, 0x4c, 0xd1,
+	0x0a, 0xe8, 0x7b, 0xa8, 0xe6, 0x7b, 0x89, 0x66, 0xf3, 0xe6, 0x8c, 0x8c, 0xfd, 0xde, 0x6b, 0x50,
+	0x79, 0xfa, 0x7c, 0xb7, 0xe6, 0xd0, 0xcf, 0x19, 0x80, 0x39, 0xf4, 0x73, 0x5b, 0x5e, 0x40, 0x01,
+	0xbc, 0x3d, 0xd3, 0x58, 0xf4, 0xfe, 0x92, 0xa3, 0x4f, 0x0f, 0x86, 0xfd, 0xe8, 0x26, 0xd0, 0x54,
+	0x6d, 0xef, 0xd9, 0xcb, 0x57, 0x4d, 0xeb, 0xef, 0x57, 0xcd, 0xc2, 0xaf, 0x97, 0x4d, 0xeb, 0xe5,
+	0x65, 0xd3, 0xfa, 0xeb, 0xb2, 0x69, 0xfd, 0x7b, 0xd9, 0xb4, 0x7e, 0xfb, 0xaf, 0x59, 0x78, 0xfe,
+	0xc9, 0x4d, 0x3f, 0x6e, 0xb4, 0x64, 0xf6, 0x79, 0xe3, 0x95, 0xd5, 0xb7, 0xcd, 0x87, 0xff, 0x07,
+	0x00, 0x00, 0xff, 0xff, 0xe6, 0x8b, 0x5c, 0x26, 0x69, 0x09, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1210,7 +952,6 @@ const _ = grpc.SupportPackageIsVersion4
 type VolumeRuntimeClient interface {
 	ListVolumes(ctx context.Context, in *ListVolumesRequest, opts ...grpc.CallOption) (*ListVolumesResponse, error)
 	CreateVolume(ctx context.Context, in *CreateVolumeRequest, opts ...grpc.CallOption) (*CreateVolumeResponse, error)
-	VolumeStatus(ctx context.Context, in *VolumeStatusRequest, opts ...grpc.CallOption) (*VolumeStatusResponse, error)
 	DeleteVolume(ctx context.Context, in *DeleteVolumeRequest, opts ...grpc.CallOption) (*DeleteVolumeResponse, error)
 	ListVolumeClasses(ctx context.Context, in *ListVolumeClassesRequest, opts ...grpc.CallOption) (*ListVolumeClassesResponse, error)
 }
@@ -1241,15 +982,6 @@ func (c *volumeRuntimeClient) CreateVolume(ctx context.Context, in *CreateVolume
 	return out, nil
 }
 
-func (c *volumeRuntimeClient) VolumeStatus(ctx context.Context, in *VolumeStatusRequest, opts ...grpc.CallOption) (*VolumeStatusResponse, error) {
-	out := new(VolumeStatusResponse)
-	err := c.cc.Invoke(ctx, "/volume.v1alpha1.VolumeRuntime/VolumeStatus", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *volumeRuntimeClient) DeleteVolume(ctx context.Context, in *DeleteVolumeRequest, opts ...grpc.CallOption) (*DeleteVolumeResponse, error) {
 	out := new(DeleteVolumeResponse)
 	err := c.cc.Invoke(ctx, "/volume.v1alpha1.VolumeRuntime/DeleteVolume", in, out, opts...)
@@ -1272,7 +1004,6 @@ func (c *volumeRuntimeClient) ListVolumeClasses(ctx context.Context, in *ListVol
 type VolumeRuntimeServer interface {
 	ListVolumes(context.Context, *ListVolumesRequest) (*ListVolumesResponse, error)
 	CreateVolume(context.Context, *CreateVolumeRequest) (*CreateVolumeResponse, error)
-	VolumeStatus(context.Context, *VolumeStatusRequest) (*VolumeStatusResponse, error)
 	DeleteVolume(context.Context, *DeleteVolumeRequest) (*DeleteVolumeResponse, error)
 	ListVolumeClasses(context.Context, *ListVolumeClassesRequest) (*ListVolumeClassesResponse, error)
 }
@@ -1286,9 +1017,6 @@ func (*UnimplementedVolumeRuntimeServer) ListVolumes(ctx context.Context, req *L
 }
 func (*UnimplementedVolumeRuntimeServer) CreateVolume(ctx context.Context, req *CreateVolumeRequest) (*CreateVolumeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateVolume not implemented")
-}
-func (*UnimplementedVolumeRuntimeServer) VolumeStatus(ctx context.Context, req *VolumeStatusRequest) (*VolumeStatusResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method VolumeStatus not implemented")
 }
 func (*UnimplementedVolumeRuntimeServer) DeleteVolume(ctx context.Context, req *DeleteVolumeRequest) (*DeleteVolumeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteVolume not implemented")
@@ -1333,24 +1061,6 @@ func _VolumeRuntime_CreateVolume_Handler(srv interface{}, ctx context.Context, d
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(VolumeRuntimeServer).CreateVolume(ctx, req.(*CreateVolumeRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _VolumeRuntime_VolumeStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(VolumeStatusRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(VolumeRuntimeServer).VolumeStatus(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/volume.v1alpha1.VolumeRuntime/VolumeStatus",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(VolumeRuntimeServer).VolumeStatus(ctx, req.(*VolumeStatusRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1402,10 +1112,6 @@ var _VolumeRuntime_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateVolume",
 			Handler:    _VolumeRuntime_CreateVolume_Handler,
-		},
-		{
-			MethodName: "VolumeStatus",
-			Handler:    _VolumeRuntime_VolumeStatus_Handler,
 		},
 		{
 			MethodName: "DeleteVolume",
@@ -1469,50 +1175,6 @@ func (m *VolumeFilter) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *VolumeMetadata) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *VolumeMetadata) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *VolumeMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Uid) > 0 {
-		i -= len(m.Uid)
-		copy(dAtA[i:], m.Uid)
-		i = encodeVarintApi(dAtA, i, uint64(len(m.Uid)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.Name) > 0 {
-		i -= len(m.Name)
-		copy(dAtA[i:], m.Name)
-		i = encodeVarintApi(dAtA, i, uint64(len(m.Name)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Namespace) > 0 {
-		i -= len(m.Namespace)
-		copy(dAtA[i:], m.Namespace)
-		i = encodeVarintApi(dAtA, i, uint64(len(m.Namespace)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
 func (m *VolumeResources) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -1541,7 +1203,7 @@ func (m *VolumeResources) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *VolumeConfig) Marshal() (dAtA []byte, err error) {
+func (m *VolumeSpec) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1551,54 +1213,16 @@ func (m *VolumeConfig) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *VolumeConfig) MarshalTo(dAtA []byte) (int, error) {
+func (m *VolumeSpec) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *VolumeConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *VolumeSpec) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Labels) > 0 {
-		for k := range m.Labels {
-			v := m.Labels[k]
-			baseI := i
-			i -= len(v)
-			copy(dAtA[i:], v)
-			i = encodeVarintApi(dAtA, i, uint64(len(v)))
-			i--
-			dAtA[i] = 0x12
-			i -= len(k)
-			copy(dAtA[i:], k)
-			i = encodeVarintApi(dAtA, i, uint64(len(k)))
-			i--
-			dAtA[i] = 0xa
-			i = encodeVarintApi(dAtA, i, uint64(baseI-i))
-			i--
-			dAtA[i] = 0x32
-		}
-	}
-	if len(m.Annotations) > 0 {
-		for k := range m.Annotations {
-			v := m.Annotations[k]
-			baseI := i
-			i -= len(v)
-			copy(dAtA[i:], v)
-			i = encodeVarintApi(dAtA, i, uint64(len(v)))
-			i--
-			dAtA[i] = 0x12
-			i -= len(k)
-			copy(dAtA[i:], k)
-			i = encodeVarintApi(dAtA, i, uint64(len(k)))
-			i--
-			dAtA[i] = 0xa
-			i = encodeVarintApi(dAtA, i, uint64(baseI-i))
-			i--
-			dAtA[i] = 0x2a
-		}
-	}
 	if m.Resources != nil {
 		{
 			size, err := m.Resources.MarshalToSizedBuffer(dAtA[:i])
@@ -1609,25 +1233,48 @@ func (m *VolumeConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			i = encodeVarintApi(dAtA, i, uint64(size))
 		}
 		i--
-		dAtA[i] = 0x22
+		dAtA[i] = 0x1a
 	}
 	if len(m.Class) > 0 {
 		i -= len(m.Class)
 		copy(dAtA[i:], m.Class)
 		i = encodeVarintApi(dAtA, i, uint64(len(m.Class)))
 		i--
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x12
 	}
 	if len(m.Image) > 0 {
 		i -= len(m.Image)
 		copy(dAtA[i:], m.Image)
 		i = encodeVarintApi(dAtA, i, uint64(len(m.Image)))
 		i--
-		dAtA[i] = 0x12
+		dAtA[i] = 0xa
 	}
-	if m.Metadata != nil {
+	return len(dAtA) - i, nil
+}
+
+func (m *VolumeStatus) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *VolumeStatus) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *VolumeStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Access != nil {
 		{
-			size, err := m.Metadata.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.Access.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -1635,7 +1282,12 @@ func (m *VolumeConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			i = encodeVarintApi(dAtA, i, uint64(size))
 		}
 		i--
-		dAtA[i] = 0xa
+		dAtA[i] = 0x12
+	}
+	if m.State != 0 {
+		i = encodeVarintApi(dAtA, i, uint64(m.State))
+		i--
+		dAtA[i] = 0x8
 	}
 	return len(dAtA) - i, nil
 }
@@ -1660,48 +1312,29 @@ func (m *Volume) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.Labels) > 0 {
-		for k := range m.Labels {
-			v := m.Labels[k]
-			baseI := i
-			i -= len(v)
-			copy(dAtA[i:], v)
-			i = encodeVarintApi(dAtA, i, uint64(len(v)))
-			i--
-			dAtA[i] = 0x12
-			i -= len(k)
-			copy(dAtA[i:], k)
-			i = encodeVarintApi(dAtA, i, uint64(len(k)))
-			i--
-			dAtA[i] = 0xa
-			i = encodeVarintApi(dAtA, i, uint64(baseI-i))
-			i--
-			dAtA[i] = 0x2a
+	if m.Status != nil {
+		{
+			size, err := m.Status.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApi(dAtA, i, uint64(size))
 		}
-	}
-	if len(m.Annotations) > 0 {
-		for k := range m.Annotations {
-			v := m.Annotations[k]
-			baseI := i
-			i -= len(v)
-			copy(dAtA[i:], v)
-			i = encodeVarintApi(dAtA, i, uint64(len(v)))
-			i--
-			dAtA[i] = 0x12
-			i -= len(k)
-			copy(dAtA[i:], k)
-			i = encodeVarintApi(dAtA, i, uint64(len(k)))
-			i--
-			dAtA[i] = 0xa
-			i = encodeVarintApi(dAtA, i, uint64(baseI-i))
-			i--
-			dAtA[i] = 0x22
-		}
-	}
-	if m.State != 0 {
-		i = encodeVarintApi(dAtA, i, uint64(m.State))
 		i--
-		dAtA[i] = 0x18
+		dAtA[i] = 0x1a
+	}
+	if m.Spec != nil {
+		{
+			size, err := m.Spec.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApi(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
 	}
 	if m.Metadata != nil {
 		{
@@ -1712,13 +1345,6 @@ func (m *Volume) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			i -= size
 			i = encodeVarintApi(dAtA, i, uint64(size))
 		}
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Id) > 0 {
-		i -= len(m.Id)
-		copy(dAtA[i:], m.Id)
-		i = encodeVarintApi(dAtA, i, uint64(len(m.Id)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -1877,117 +1503,6 @@ func (m *VolumeAccess) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *VolumeStatus) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *VolumeStatus) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *VolumeStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Labels) > 0 {
-		for k := range m.Labels {
-			v := m.Labels[k]
-			baseI := i
-			i -= len(v)
-			copy(dAtA[i:], v)
-			i = encodeVarintApi(dAtA, i, uint64(len(v)))
-			i--
-			dAtA[i] = 0x12
-			i -= len(k)
-			copy(dAtA[i:], k)
-			i = encodeVarintApi(dAtA, i, uint64(len(k)))
-			i--
-			dAtA[i] = 0xa
-			i = encodeVarintApi(dAtA, i, uint64(baseI-i))
-			i--
-			dAtA[i] = 0x42
-		}
-	}
-	if len(m.Annotations) > 0 {
-		for k := range m.Annotations {
-			v := m.Annotations[k]
-			baseI := i
-			i -= len(v)
-			copy(dAtA[i:], v)
-			i = encodeVarintApi(dAtA, i, uint64(len(v)))
-			i--
-			dAtA[i] = 0x12
-			i -= len(k)
-			copy(dAtA[i:], k)
-			i = encodeVarintApi(dAtA, i, uint64(len(k)))
-			i--
-			dAtA[i] = 0xa
-			i = encodeVarintApi(dAtA, i, uint64(baseI-i))
-			i--
-			dAtA[i] = 0x3a
-		}
-	}
-	if m.Access != nil {
-		{
-			size, err := m.Access.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintApi(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x32
-	}
-	if m.State != 0 {
-		i = encodeVarintApi(dAtA, i, uint64(m.State))
-		i--
-		dAtA[i] = 0x28
-	}
-	if len(m.ImageRef) > 0 {
-		i -= len(m.ImageRef)
-		copy(dAtA[i:], m.ImageRef)
-		i = encodeVarintApi(dAtA, i, uint64(len(m.ImageRef)))
-		i--
-		dAtA[i] = 0x22
-	}
-	if len(m.Image) > 0 {
-		i -= len(m.Image)
-		copy(dAtA[i:], m.Image)
-		i = encodeVarintApi(dAtA, i, uint64(len(m.Image)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if m.Metadata != nil {
-		{
-			size, err := m.Metadata.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintApi(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Id) > 0 {
-		i -= len(m.Id)
-		copy(dAtA[i:], m.Id)
-		i = encodeVarintApi(dAtA, i, uint64(len(m.Id)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
 func (m *ListVolumesRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -2080,9 +1595,9 @@ func (m *CreateVolumeRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.Config != nil {
+	if m.Volume != nil {
 		{
-			size, err := m.Config.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.Volume.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -2090,7 +1605,7 @@ func (m *CreateVolumeRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			i = encodeVarintApi(dAtA, i, uint64(size))
 		}
 		i--
-		dAtA[i] = 0x12
+		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -2118,71 +1633,6 @@ func (m *CreateVolumeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	if m.Volume != nil {
 		{
 			size, err := m.Volume.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintApi(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *VolumeStatusRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *VolumeStatusRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *VolumeStatusRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.VolumeId) > 0 {
-		i -= len(m.VolumeId)
-		copy(dAtA[i:], m.VolumeId)
-		i = encodeVarintApi(dAtA, i, uint64(len(m.VolumeId)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *VolumeStatusResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *VolumeStatusResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *VolumeStatusResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.Status != nil {
-		{
-			size, err := m.Status.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -2340,27 +1790,6 @@ func (m *VolumeFilter) Size() (n int) {
 	return n
 }
 
-func (m *VolumeMetadata) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Namespace)
-	if l > 0 {
-		n += 1 + l + sovApi(uint64(l))
-	}
-	l = len(m.Name)
-	if l > 0 {
-		n += 1 + l + sovApi(uint64(l))
-	}
-	l = len(m.Uid)
-	if l > 0 {
-		n += 1 + l + sovApi(uint64(l))
-	}
-	return n
-}
-
 func (m *VolumeResources) Size() (n int) {
 	if m == nil {
 		return 0
@@ -2373,16 +1802,12 @@ func (m *VolumeResources) Size() (n int) {
 	return n
 }
 
-func (m *VolumeConfig) Size() (n int) {
+func (m *VolumeSpec) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.Metadata != nil {
-		l = m.Metadata.Size()
-		n += 1 + l + sovApi(uint64(l))
-	}
 	l = len(m.Image)
 	if l > 0 {
 		n += 1 + l + sovApi(uint64(l))
@@ -2395,21 +1820,21 @@ func (m *VolumeConfig) Size() (n int) {
 		l = m.Resources.Size()
 		n += 1 + l + sovApi(uint64(l))
 	}
-	if len(m.Annotations) > 0 {
-		for k, v := range m.Annotations {
-			_ = k
-			_ = v
-			mapEntrySize := 1 + len(k) + sovApi(uint64(len(k))) + 1 + len(v) + sovApi(uint64(len(v)))
-			n += mapEntrySize + 1 + sovApi(uint64(mapEntrySize))
-		}
+	return n
+}
+
+func (m *VolumeStatus) Size() (n int) {
+	if m == nil {
+		return 0
 	}
-	if len(m.Labels) > 0 {
-		for k, v := range m.Labels {
-			_ = k
-			_ = v
-			mapEntrySize := 1 + len(k) + sovApi(uint64(len(k))) + 1 + len(v) + sovApi(uint64(len(v)))
-			n += mapEntrySize + 1 + sovApi(uint64(mapEntrySize))
-		}
+	var l int
+	_ = l
+	if m.State != 0 {
+		n += 1 + sovApi(uint64(m.State))
+	}
+	if m.Access != nil {
+		l = m.Access.Size()
+		n += 1 + l + sovApi(uint64(l))
 	}
 	return n
 }
@@ -2420,32 +1845,17 @@ func (m *Volume) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Id)
-	if l > 0 {
-		n += 1 + l + sovApi(uint64(l))
-	}
 	if m.Metadata != nil {
 		l = m.Metadata.Size()
 		n += 1 + l + sovApi(uint64(l))
 	}
-	if m.State != 0 {
-		n += 1 + sovApi(uint64(m.State))
+	if m.Spec != nil {
+		l = m.Spec.Size()
+		n += 1 + l + sovApi(uint64(l))
 	}
-	if len(m.Annotations) > 0 {
-		for k, v := range m.Annotations {
-			_ = k
-			_ = v
-			mapEntrySize := 1 + len(k) + sovApi(uint64(len(k))) + 1 + len(v) + sovApi(uint64(len(v)))
-			n += mapEntrySize + 1 + sovApi(uint64(mapEntrySize))
-		}
-	}
-	if len(m.Labels) > 0 {
-		for k, v := range m.Labels {
-			_ = k
-			_ = v
-			mapEntrySize := 1 + len(k) + sovApi(uint64(len(k))) + 1 + len(v) + sovApi(uint64(len(v)))
-			n += mapEntrySize + 1 + sovApi(uint64(mapEntrySize))
-		}
+	if m.Status != nil {
+		l = m.Status.Size()
+		n += 1 + l + sovApi(uint64(l))
 	}
 	return n
 }
@@ -2519,54 +1929,6 @@ func (m *VolumeAccess) Size() (n int) {
 	return n
 }
 
-func (m *VolumeStatus) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Id)
-	if l > 0 {
-		n += 1 + l + sovApi(uint64(l))
-	}
-	if m.Metadata != nil {
-		l = m.Metadata.Size()
-		n += 1 + l + sovApi(uint64(l))
-	}
-	l = len(m.Image)
-	if l > 0 {
-		n += 1 + l + sovApi(uint64(l))
-	}
-	l = len(m.ImageRef)
-	if l > 0 {
-		n += 1 + l + sovApi(uint64(l))
-	}
-	if m.State != 0 {
-		n += 1 + sovApi(uint64(m.State))
-	}
-	if m.Access != nil {
-		l = m.Access.Size()
-		n += 1 + l + sovApi(uint64(l))
-	}
-	if len(m.Annotations) > 0 {
-		for k, v := range m.Annotations {
-			_ = k
-			_ = v
-			mapEntrySize := 1 + len(k) + sovApi(uint64(len(k))) + 1 + len(v) + sovApi(uint64(len(v)))
-			n += mapEntrySize + 1 + sovApi(uint64(mapEntrySize))
-		}
-	}
-	if len(m.Labels) > 0 {
-		for k, v := range m.Labels {
-			_ = k
-			_ = v
-			mapEntrySize := 1 + len(k) + sovApi(uint64(len(k))) + 1 + len(v) + sovApi(uint64(len(v)))
-			n += mapEntrySize + 1 + sovApi(uint64(mapEntrySize))
-		}
-	}
-	return n
-}
-
 func (m *ListVolumesRequest) Size() (n int) {
 	if m == nil {
 		return 0
@@ -2601,8 +1963,8 @@ func (m *CreateVolumeRequest) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Config != nil {
-		l = m.Config.Size()
+	if m.Volume != nil {
+		l = m.Volume.Size()
 		n += 1 + l + sovApi(uint64(l))
 	}
 	return n
@@ -2616,32 +1978,6 @@ func (m *CreateVolumeResponse) Size() (n int) {
 	_ = l
 	if m.Volume != nil {
 		l = m.Volume.Size()
-		n += 1 + l + sovApi(uint64(l))
-	}
-	return n
-}
-
-func (m *VolumeStatusRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.VolumeId)
-	if l > 0 {
-		n += 1 + l + sovApi(uint64(l))
-	}
-	return n
-}
-
-func (m *VolumeStatusResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Status != nil {
-		l = m.Status.Size()
 		n += 1 + l + sovApi(uint64(l))
 	}
 	return n
@@ -2720,18 +2056,6 @@ func (this *VolumeFilter) String() string {
 	}, "")
 	return s
 }
-func (this *VolumeMetadata) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&VolumeMetadata{`,
-		`Namespace:` + fmt.Sprintf("%v", this.Namespace) + `,`,
-		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
-		`Uid:` + fmt.Sprintf("%v", this.Uid) + `,`,
-		`}`,
-	}, "")
-	return s
-}
 func (this *VolumeResources) String() string {
 	if this == nil {
 		return "nil"
@@ -2742,37 +2066,25 @@ func (this *VolumeResources) String() string {
 	}, "")
 	return s
 }
-func (this *VolumeConfig) String() string {
+func (this *VolumeSpec) String() string {
 	if this == nil {
 		return "nil"
 	}
-	keysForAnnotations := make([]string, 0, len(this.Annotations))
-	for k, _ := range this.Annotations {
-		keysForAnnotations = append(keysForAnnotations, k)
-	}
-	github_com_gogo_protobuf_sortkeys.Strings(keysForAnnotations)
-	mapStringForAnnotations := "map[string]string{"
-	for _, k := range keysForAnnotations {
-		mapStringForAnnotations += fmt.Sprintf("%v: %v,", k, this.Annotations[k])
-	}
-	mapStringForAnnotations += "}"
-	keysForLabels := make([]string, 0, len(this.Labels))
-	for k, _ := range this.Labels {
-		keysForLabels = append(keysForLabels, k)
-	}
-	github_com_gogo_protobuf_sortkeys.Strings(keysForLabels)
-	mapStringForLabels := "map[string]string{"
-	for _, k := range keysForLabels {
-		mapStringForLabels += fmt.Sprintf("%v: %v,", k, this.Labels[k])
-	}
-	mapStringForLabels += "}"
-	s := strings.Join([]string{`&VolumeConfig{`,
-		`Metadata:` + strings.Replace(this.Metadata.String(), "VolumeMetadata", "VolumeMetadata", 1) + `,`,
+	s := strings.Join([]string{`&VolumeSpec{`,
 		`Image:` + fmt.Sprintf("%v", this.Image) + `,`,
 		`Class:` + fmt.Sprintf("%v", this.Class) + `,`,
 		`Resources:` + strings.Replace(this.Resources.String(), "VolumeResources", "VolumeResources", 1) + `,`,
-		`Annotations:` + mapStringForAnnotations + `,`,
-		`Labels:` + mapStringForLabels + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *VolumeStatus) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&VolumeStatus{`,
+		`State:` + fmt.Sprintf("%v", this.State) + `,`,
+		`Access:` + strings.Replace(this.Access.String(), "VolumeAccess", "VolumeAccess", 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2781,32 +2093,10 @@ func (this *Volume) String() string {
 	if this == nil {
 		return "nil"
 	}
-	keysForAnnotations := make([]string, 0, len(this.Annotations))
-	for k, _ := range this.Annotations {
-		keysForAnnotations = append(keysForAnnotations, k)
-	}
-	github_com_gogo_protobuf_sortkeys.Strings(keysForAnnotations)
-	mapStringForAnnotations := "map[string]string{"
-	for _, k := range keysForAnnotations {
-		mapStringForAnnotations += fmt.Sprintf("%v: %v,", k, this.Annotations[k])
-	}
-	mapStringForAnnotations += "}"
-	keysForLabels := make([]string, 0, len(this.Labels))
-	for k, _ := range this.Labels {
-		keysForLabels = append(keysForLabels, k)
-	}
-	github_com_gogo_protobuf_sortkeys.Strings(keysForLabels)
-	mapStringForLabels := "map[string]string{"
-	for _, k := range keysForLabels {
-		mapStringForLabels += fmt.Sprintf("%v: %v,", k, this.Labels[k])
-	}
-	mapStringForLabels += "}"
 	s := strings.Join([]string{`&Volume{`,
-		`Id:` + fmt.Sprintf("%v", this.Id) + `,`,
-		`Metadata:` + strings.Replace(this.Metadata.String(), "VolumeMetadata", "VolumeMetadata", 1) + `,`,
-		`State:` + fmt.Sprintf("%v", this.State) + `,`,
-		`Annotations:` + mapStringForAnnotations + `,`,
-		`Labels:` + mapStringForLabels + `,`,
+		`Metadata:` + strings.Replace(fmt.Sprintf("%v", this.Metadata), "ObjectMetadata", "v1alpha1.ObjectMetadata", 1) + `,`,
+		`Spec:` + strings.Replace(this.Spec.String(), "VolumeSpec", "VolumeSpec", 1) + `,`,
+		`Status:` + strings.Replace(this.Status.String(), "VolumeStatus", "VolumeStatus", 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2866,43 +2156,6 @@ func (this *VolumeAccess) String() string {
 	}, "")
 	return s
 }
-func (this *VolumeStatus) String() string {
-	if this == nil {
-		return "nil"
-	}
-	keysForAnnotations := make([]string, 0, len(this.Annotations))
-	for k, _ := range this.Annotations {
-		keysForAnnotations = append(keysForAnnotations, k)
-	}
-	github_com_gogo_protobuf_sortkeys.Strings(keysForAnnotations)
-	mapStringForAnnotations := "map[string]string{"
-	for _, k := range keysForAnnotations {
-		mapStringForAnnotations += fmt.Sprintf("%v: %v,", k, this.Annotations[k])
-	}
-	mapStringForAnnotations += "}"
-	keysForLabels := make([]string, 0, len(this.Labels))
-	for k, _ := range this.Labels {
-		keysForLabels = append(keysForLabels, k)
-	}
-	github_com_gogo_protobuf_sortkeys.Strings(keysForLabels)
-	mapStringForLabels := "map[string]string{"
-	for _, k := range keysForLabels {
-		mapStringForLabels += fmt.Sprintf("%v: %v,", k, this.Labels[k])
-	}
-	mapStringForLabels += "}"
-	s := strings.Join([]string{`&VolumeStatus{`,
-		`Id:` + fmt.Sprintf("%v", this.Id) + `,`,
-		`Metadata:` + strings.Replace(this.Metadata.String(), "VolumeMetadata", "VolumeMetadata", 1) + `,`,
-		`Image:` + fmt.Sprintf("%v", this.Image) + `,`,
-		`ImageRef:` + fmt.Sprintf("%v", this.ImageRef) + `,`,
-		`State:` + fmt.Sprintf("%v", this.State) + `,`,
-		`Access:` + strings.Replace(this.Access.String(), "VolumeAccess", "VolumeAccess", 1) + `,`,
-		`Annotations:` + mapStringForAnnotations + `,`,
-		`Labels:` + mapStringForLabels + `,`,
-		`}`,
-	}, "")
-	return s
-}
 func (this *ListVolumesRequest) String() string {
 	if this == nil {
 		return "nil"
@@ -2933,7 +2186,7 @@ func (this *CreateVolumeRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&CreateVolumeRequest{`,
-		`Config:` + strings.Replace(this.Config.String(), "VolumeConfig", "VolumeConfig", 1) + `,`,
+		`Volume:` + strings.Replace(this.Volume.String(), "Volume", "Volume", 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2944,26 +2197,6 @@ func (this *CreateVolumeResponse) String() string {
 	}
 	s := strings.Join([]string{`&CreateVolumeResponse{`,
 		`Volume:` + strings.Replace(this.Volume.String(), "Volume", "Volume", 1) + `,`,
-		`}`,
-	}, "")
-	return s
-}
-func (this *VolumeStatusRequest) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&VolumeStatusRequest{`,
-		`VolumeId:` + fmt.Sprintf("%v", this.VolumeId) + `,`,
-		`}`,
-	}, "")
-	return s
-}
-func (this *VolumeStatusResponse) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&VolumeStatusResponse{`,
-		`Status:` + strings.Replace(this.Status.String(), "VolumeStatus", "VolumeStatus", 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -3228,152 +2461,6 @@ func (m *VolumeFilter) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *VolumeMetadata) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowApi
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: VolumeMetadata: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: VolumeMetadata: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Namespace = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Name = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Uid", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Uid = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipApi(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthApi
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
 func (m *VolumeResources) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -3443,7 +2530,7 @@ func (m *VolumeResources) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *VolumeConfig) Unmarshal(dAtA []byte) error {
+func (m *VolumeSpec) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -3466,49 +2553,13 @@ func (m *VolumeConfig) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: VolumeConfig: wiretype end group for non-group")
+			return fmt.Errorf("proto: VolumeSpec: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: VolumeConfig: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: VolumeSpec: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Metadata", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Metadata == nil {
-				m.Metadata = &VolumeMetadata{}
-			}
-			if err := m.Metadata.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Image", wireType)
 			}
@@ -3540,7 +2591,7 @@ func (m *VolumeConfig) Unmarshal(dAtA []byte) error {
 			}
 			m.Image = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 3:
+		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Class", wireType)
 			}
@@ -3572,7 +2623,7 @@ func (m *VolumeConfig) Unmarshal(dAtA []byte) error {
 			}
 			m.Class = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 4:
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Resources", wireType)
 			}
@@ -3608,9 +2659,78 @@ func (m *VolumeConfig) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 5:
+		default:
+			iNdEx = preIndex
+			skippy, err := skipApi(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthApi
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *VolumeStatus) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowApi
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: VolumeStatus: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: VolumeStatus: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field State", wireType)
+			}
+			m.State = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApi
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.State |= VolumeState(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Annotations", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Access", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3637,230 +2757,12 @@ func (m *VolumeConfig) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Annotations == nil {
-				m.Annotations = make(map[string]string)
+			if m.Access == nil {
+				m.Access = &VolumeAccess{}
 			}
-			var mapkey string
-			var mapvalue string
-			for iNdEx < postIndex {
-				entryPreIndex := iNdEx
-				var wire uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowApi
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					wire |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				fieldNum := int32(wire >> 3)
-				if fieldNum == 1 {
-					var stringLenmapkey uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowApi
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapkey |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapkey := int(stringLenmapkey)
-					if intStringLenmapkey < 0 {
-						return ErrInvalidLengthApi
-					}
-					postStringIndexmapkey := iNdEx + intStringLenmapkey
-					if postStringIndexmapkey < 0 {
-						return ErrInvalidLengthApi
-					}
-					if postStringIndexmapkey > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
-					iNdEx = postStringIndexmapkey
-				} else if fieldNum == 2 {
-					var stringLenmapvalue uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowApi
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapvalue |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapvalue := int(stringLenmapvalue)
-					if intStringLenmapvalue < 0 {
-						return ErrInvalidLengthApi
-					}
-					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
-					if postStringIndexmapvalue < 0 {
-						return ErrInvalidLengthApi
-					}
-					if postStringIndexmapvalue > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
-					iNdEx = postStringIndexmapvalue
-				} else {
-					iNdEx = entryPreIndex
-					skippy, err := skipApi(dAtA[iNdEx:])
-					if err != nil {
-						return err
-					}
-					if (skippy < 0) || (iNdEx+skippy) < 0 {
-						return ErrInvalidLengthApi
-					}
-					if (iNdEx + skippy) > postIndex {
-						return io.ErrUnexpectedEOF
-					}
-					iNdEx += skippy
-				}
+			if err := m.Access.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
 			}
-			m.Annotations[mapkey] = mapvalue
-			iNdEx = postIndex
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Labels", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Labels == nil {
-				m.Labels = make(map[string]string)
-			}
-			var mapkey string
-			var mapvalue string
-			for iNdEx < postIndex {
-				entryPreIndex := iNdEx
-				var wire uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowApi
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					wire |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				fieldNum := int32(wire >> 3)
-				if fieldNum == 1 {
-					var stringLenmapkey uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowApi
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapkey |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapkey := int(stringLenmapkey)
-					if intStringLenmapkey < 0 {
-						return ErrInvalidLengthApi
-					}
-					postStringIndexmapkey := iNdEx + intStringLenmapkey
-					if postStringIndexmapkey < 0 {
-						return ErrInvalidLengthApi
-					}
-					if postStringIndexmapkey > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
-					iNdEx = postStringIndexmapkey
-				} else if fieldNum == 2 {
-					var stringLenmapvalue uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowApi
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapvalue |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapvalue := int(stringLenmapvalue)
-					if intStringLenmapvalue < 0 {
-						return ErrInvalidLengthApi
-					}
-					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
-					if postStringIndexmapvalue < 0 {
-						return ErrInvalidLengthApi
-					}
-					if postStringIndexmapvalue > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
-					iNdEx = postStringIndexmapvalue
-				} else {
-					iNdEx = entryPreIndex
-					skippy, err := skipApi(dAtA[iNdEx:])
-					if err != nil {
-						return err
-					}
-					if (skippy < 0) || (iNdEx+skippy) < 0 {
-						return ErrInvalidLengthApi
-					}
-					if (iNdEx + skippy) > postIndex {
-						return io.ErrUnexpectedEOF
-					}
-					iNdEx += skippy
-				}
-			}
-			m.Labels[mapkey] = mapvalue
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -3914,38 +2816,6 @@ func (m *Volume) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Id = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Metadata", wireType)
 			}
 			var msglen int
@@ -3974,34 +2844,15 @@ func (m *Volume) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Metadata == nil {
-				m.Metadata = &VolumeMetadata{}
+				m.Metadata = &v1alpha1.ObjectMetadata{}
 			}
 			if err := m.Metadata.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field State", wireType)
-			}
-			m.State = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.State |= VolumeState(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 4:
+		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Annotations", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Spec", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4028,107 +2879,16 @@ func (m *Volume) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Annotations == nil {
-				m.Annotations = make(map[string]string)
+			if m.Spec == nil {
+				m.Spec = &VolumeSpec{}
 			}
-			var mapkey string
-			var mapvalue string
-			for iNdEx < postIndex {
-				entryPreIndex := iNdEx
-				var wire uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowApi
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					wire |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				fieldNum := int32(wire >> 3)
-				if fieldNum == 1 {
-					var stringLenmapkey uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowApi
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapkey |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapkey := int(stringLenmapkey)
-					if intStringLenmapkey < 0 {
-						return ErrInvalidLengthApi
-					}
-					postStringIndexmapkey := iNdEx + intStringLenmapkey
-					if postStringIndexmapkey < 0 {
-						return ErrInvalidLengthApi
-					}
-					if postStringIndexmapkey > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
-					iNdEx = postStringIndexmapkey
-				} else if fieldNum == 2 {
-					var stringLenmapvalue uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowApi
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapvalue |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapvalue := int(stringLenmapvalue)
-					if intStringLenmapvalue < 0 {
-						return ErrInvalidLengthApi
-					}
-					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
-					if postStringIndexmapvalue < 0 {
-						return ErrInvalidLengthApi
-					}
-					if postStringIndexmapvalue > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
-					iNdEx = postStringIndexmapvalue
-				} else {
-					iNdEx = entryPreIndex
-					skippy, err := skipApi(dAtA[iNdEx:])
-					if err != nil {
-						return err
-					}
-					if (skippy < 0) || (iNdEx+skippy) < 0 {
-						return ErrInvalidLengthApi
-					}
-					if (iNdEx + skippy) > postIndex {
-						return io.ErrUnexpectedEOF
-					}
-					iNdEx += skippy
-				}
+			if err := m.Spec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
 			}
-			m.Annotations[mapkey] = mapvalue
 			iNdEx = postIndex
-		case 5:
+		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Labels", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4155,103 +2915,12 @@ func (m *Volume) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Labels == nil {
-				m.Labels = make(map[string]string)
+			if m.Status == nil {
+				m.Status = &VolumeStatus{}
 			}
-			var mapkey string
-			var mapvalue string
-			for iNdEx < postIndex {
-				entryPreIndex := iNdEx
-				var wire uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowApi
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					wire |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				fieldNum := int32(wire >> 3)
-				if fieldNum == 1 {
-					var stringLenmapkey uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowApi
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapkey |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapkey := int(stringLenmapkey)
-					if intStringLenmapkey < 0 {
-						return ErrInvalidLengthApi
-					}
-					postStringIndexmapkey := iNdEx + intStringLenmapkey
-					if postStringIndexmapkey < 0 {
-						return ErrInvalidLengthApi
-					}
-					if postStringIndexmapkey > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
-					iNdEx = postStringIndexmapkey
-				} else if fieldNum == 2 {
-					var stringLenmapvalue uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowApi
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapvalue |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapvalue := int(stringLenmapvalue)
-					if intStringLenmapvalue < 0 {
-						return ErrInvalidLengthApi
-					}
-					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
-					if postStringIndexmapvalue < 0 {
-						return ErrInvalidLengthApi
-					}
-					if postStringIndexmapvalue > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
-					iNdEx = postStringIndexmapvalue
-				} else {
-					iNdEx = entryPreIndex
-					skippy, err := skipApi(dAtA[iNdEx:])
-					if err != nil {
-						return err
-					}
-					if (skippy < 0) || (iNdEx+skippy) < 0 {
-						return ErrInvalidLengthApi
-					}
-					if (iNdEx + skippy) > postIndex {
-						return io.ErrUnexpectedEOF
-					}
-					iNdEx += skippy
-				}
+			if err := m.Status.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
 			}
-			m.Labels[mapkey] = mapvalue
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -4849,497 +3518,6 @@ func (m *VolumeAccess) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *VolumeStatus) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowApi
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: VolumeStatus: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: VolumeStatus: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Id = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Metadata", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Metadata == nil {
-				m.Metadata = &VolumeMetadata{}
-			}
-			if err := m.Metadata.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Image", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Image = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ImageRef", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ImageRef = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 5:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field State", wireType)
-			}
-			m.State = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.State |= VolumeState(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Access", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Access == nil {
-				m.Access = &VolumeAccess{}
-			}
-			if err := m.Access.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 7:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Annotations", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Annotations == nil {
-				m.Annotations = make(map[string]string)
-			}
-			var mapkey string
-			var mapvalue string
-			for iNdEx < postIndex {
-				entryPreIndex := iNdEx
-				var wire uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowApi
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					wire |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				fieldNum := int32(wire >> 3)
-				if fieldNum == 1 {
-					var stringLenmapkey uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowApi
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapkey |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapkey := int(stringLenmapkey)
-					if intStringLenmapkey < 0 {
-						return ErrInvalidLengthApi
-					}
-					postStringIndexmapkey := iNdEx + intStringLenmapkey
-					if postStringIndexmapkey < 0 {
-						return ErrInvalidLengthApi
-					}
-					if postStringIndexmapkey > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
-					iNdEx = postStringIndexmapkey
-				} else if fieldNum == 2 {
-					var stringLenmapvalue uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowApi
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapvalue |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapvalue := int(stringLenmapvalue)
-					if intStringLenmapvalue < 0 {
-						return ErrInvalidLengthApi
-					}
-					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
-					if postStringIndexmapvalue < 0 {
-						return ErrInvalidLengthApi
-					}
-					if postStringIndexmapvalue > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
-					iNdEx = postStringIndexmapvalue
-				} else {
-					iNdEx = entryPreIndex
-					skippy, err := skipApi(dAtA[iNdEx:])
-					if err != nil {
-						return err
-					}
-					if (skippy < 0) || (iNdEx+skippy) < 0 {
-						return ErrInvalidLengthApi
-					}
-					if (iNdEx + skippy) > postIndex {
-						return io.ErrUnexpectedEOF
-					}
-					iNdEx += skippy
-				}
-			}
-			m.Annotations[mapkey] = mapvalue
-			iNdEx = postIndex
-		case 8:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Labels", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Labels == nil {
-				m.Labels = make(map[string]string)
-			}
-			var mapkey string
-			var mapvalue string
-			for iNdEx < postIndex {
-				entryPreIndex := iNdEx
-				var wire uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowApi
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					wire |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				fieldNum := int32(wire >> 3)
-				if fieldNum == 1 {
-					var stringLenmapkey uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowApi
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapkey |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapkey := int(stringLenmapkey)
-					if intStringLenmapkey < 0 {
-						return ErrInvalidLengthApi
-					}
-					postStringIndexmapkey := iNdEx + intStringLenmapkey
-					if postStringIndexmapkey < 0 {
-						return ErrInvalidLengthApi
-					}
-					if postStringIndexmapkey > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
-					iNdEx = postStringIndexmapkey
-				} else if fieldNum == 2 {
-					var stringLenmapvalue uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowApi
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapvalue |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapvalue := int(stringLenmapvalue)
-					if intStringLenmapvalue < 0 {
-						return ErrInvalidLengthApi
-					}
-					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
-					if postStringIndexmapvalue < 0 {
-						return ErrInvalidLengthApi
-					}
-					if postStringIndexmapvalue > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
-					iNdEx = postStringIndexmapvalue
-				} else {
-					iNdEx = entryPreIndex
-					skippy, err := skipApi(dAtA[iNdEx:])
-					if err != nil {
-						return err
-					}
-					if (skippy < 0) || (iNdEx+skippy) < 0 {
-						return ErrInvalidLengthApi
-					}
-					if (iNdEx + skippy) > postIndex {
-						return io.ErrUnexpectedEOF
-					}
-					iNdEx += skippy
-				}
-			}
-			m.Labels[mapkey] = mapvalue
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipApi(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthApi
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
 func (m *ListVolumesRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -5539,9 +3717,9 @@ func (m *CreateVolumeRequest) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: CreateVolumeRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 2:
+		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Config", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Volume", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -5568,10 +3746,10 @@ func (m *CreateVolumeRequest) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Config == nil {
-				m.Config = &VolumeConfig{}
+			if m.Volume == nil {
+				m.Volume = &Volume{}
 			}
-			if err := m.Config.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.Volume.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -5658,174 +3836,6 @@ func (m *CreateVolumeResponse) Unmarshal(dAtA []byte) error {
 				m.Volume = &Volume{}
 			}
 			if err := m.Volume.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipApi(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthApi
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *VolumeStatusRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowApi
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: VolumeStatusRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: VolumeStatusRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field VolumeId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.VolumeId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipApi(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthApi
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *VolumeStatusResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowApi
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: VolumeStatusResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: VolumeStatusResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApi
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthApi
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthApi
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Status == nil {
-				m.Status = &VolumeStatus{}
-			}
-			if err := m.Status.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

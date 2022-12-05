@@ -36,7 +36,7 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cobra.Command {
 	var (
 		opts       Options
-		outputOpts common.OutputOptions
+		outputOpts = common.NewOutputOptions()
 	)
 
 	cmd := &cobra.Command{

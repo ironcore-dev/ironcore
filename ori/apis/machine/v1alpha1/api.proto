@@ -1,9 +1,10 @@
 syntax = "proto3";
 
 package machine.v1alpha1;
-option go_package = "ori/apis/machine/v1alpha1";
+option go_package = "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1/api.proto";
 
 option (gogoproto.goproto_stringer_all) = false;
 option (gogoproto.stringer_all) = true;
@@ -38,15 +39,6 @@ service MachineRuntime {
   rpc ListMachineClasses(ListMachineClassesRequest) returns (ListMachineClassesResponse);
 }
 
-message ObjectMetadata {
-  string id = 1;
-  map<string, string> annotations = 2;
-  map<string, string> labels = 3;
-  int64 generation = 4;
-  int64 created_at = 5;
-  int64 deleted_at = 6;
-}
-
 message VolumeFilter {
   string id = 1;
   map<string, string> label_selector = 2;
@@ -60,7 +52,7 @@ message VolumeSpec {
 }
 
 message Volume {
-  ObjectMetadata metadata = 1;
+  meta.v1alpha1.ObjectMetadata metadata = 1;
   VolumeSpec spec = 2;
 }
 
@@ -84,7 +76,7 @@ message NetworkInterfaceSpec {
 }
 
 message NetworkInterface {
-  ObjectMetadata metadata = 1;
+  meta.v1alpha1.ObjectMetadata metadata = 1;
   NetworkInterfaceSpec spec = 2;
 }
 
@@ -103,7 +95,7 @@ message MachineClassCapabilities {
 }
 
 message Machine {
-  ObjectMetadata metadata = 1;
+  meta.v1alpha1.ObjectMetadata metadata = 1;
   MachineSpec spec = 2;
   MachineStatus status = 3;
 }
