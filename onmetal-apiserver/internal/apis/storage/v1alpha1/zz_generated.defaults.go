@@ -21,6 +21,7 @@
 package v1alpha1
 
 import (
+	v1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -28,5 +29,18 @@ import (
 // Public to allow building arbitrary schemes.
 // All generated defaulters are covering - they call all nested defaulters.
 func RegisterDefaults(scheme *runtime.Scheme) error {
+	scheme.AddTypeDefaultingFunc(&v1alpha1.Volume{}, func(obj interface{}) { SetObjectDefaults_Volume(obj.(*v1alpha1.Volume)) })
+	scheme.AddTypeDefaultingFunc(&v1alpha1.VolumeList{}, func(obj interface{}) { SetObjectDefaults_VolumeList(obj.(*v1alpha1.VolumeList)) })
 	return nil
+}
+
+func SetObjectDefaults_Volume(in *v1alpha1.Volume) {
+	SetDefaults_VolumeStatus(&in.Status)
+}
+
+func SetObjectDefaults_VolumeList(in *v1alpha1.VolumeList) {
+	for i := range in.Items {
+		a := &in.Items[i]
+		SetObjectDefaults_Volume(a)
+	}
 }

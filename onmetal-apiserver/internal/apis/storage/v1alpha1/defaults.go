@@ -12,20 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package server
+package v1alpha1
 
-import "fmt"
+import (
+	"github.com/onmetal/onmetal-api/api/storage/v1alpha1"
+	"k8s.io/apimachinery/pkg/runtime"
+)
 
-type volumeNotFoundError struct {
-	volumeID string
+func addDefaultingFuncs(scheme *runtime.Scheme) error {
+	return RegisterDefaults(scheme)
 }
 
-func (m *volumeNotFoundError) Error() string {
-	return fmt.Sprintf("Volume %s not found", m.volumeID)
-}
-
-func newVolumeNotFoundError(volumeID string) *volumeNotFoundError {
-	return &volumeNotFoundError{
-		volumeID: volumeID,
+func SetDefaults_VolumeStatus(status *v1alpha1.VolumeStatus) {
+	if status.State == "" {
+		status.State = v1alpha1.VolumeStatePending
 	}
 }

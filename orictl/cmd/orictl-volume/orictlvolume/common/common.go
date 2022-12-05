@@ -19,6 +19,7 @@ import (
 
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
 	orivolumeutils "github.com/onmetal/onmetal-api/ori/utils/volume"
+	clicommon "github.com/onmetal/onmetal-api/orictl/cli/common"
 	"github.com/onmetal/onmetal-api/orictl/renderer"
 	"github.com/onmetal/onmetal-api/orictl/renderers/volume"
 	"github.com/spf13/pflag"
@@ -60,20 +61,10 @@ func (o *ClientOptions) New() (ori.VolumeRuntimeClient, func() error, error) {
 	return ori.NewVolumeRuntimeClient(conn), conn.Close, nil
 }
 
-type OutputOptions struct {
-	Output string
-}
-
-func (o *OutputOptions) AddFlags(fs *pflag.FlagSet) {
-	fs.StringVarP(&o.Output, "output", "o", o.Output, "Output format.")
-}
-
-func (o *OutputOptions) Renderer(ifEmpty string) (renderer.Renderer, error) {
-	output := o.Output
-	if output == "" {
-		output = ifEmpty
+func NewOutputOptions() *clicommon.OutputOptions {
+	return &clicommon.OutputOptions{
+		Registry: Renderer,
 	}
-	return Renderer.Get(output)
 }
 
 var (

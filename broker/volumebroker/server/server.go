@@ -26,14 +26,20 @@ import (
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	"github.com/onmetal/onmetal-api/broker/volumebroker/cleaner"
+	"github.com/onmetal/onmetal-api/broker/common/cleaner"
+	volumebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/volumebroker/api/v1alpha1"
+	"github.com/onmetal/onmetal-api/broker/volumebroker/apiutils"
+	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	kubernetes "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 )
 
 var scheme = runtime.NewScheme()
@@ -105,6 +111,8 @@ func setOptionsDefaults(o *Options) {
 	}
 }
 
+var _ ori.VolumeRuntimeServer = (*Server)(nil)
+
 func New(cfg *rest.Config, opts Options) (*Server, error) {
 	setOptionsDefaults(&opts)
 
@@ -121,4 +129,23 @@ func New(cfg *rest.Config, opts Options) (*Server, error) {
 		volumePoolName:     opts.VolumePoolName,
 		volumePoolSelector: opts.VolumePoolSelector,
 	}, nil
+}
+
+func (s *Server) getManagedAndCreated(ctx context.Context, name string, obj client.Object) error {
+	key := client.ObjectKey{Namespace: s.namespace, Name: name}
+	if err := s.client.Get(ctx, key, obj); err != nil {
+		return err
+	}
+	if !apiutils.IsManagedBy(obj, volumebrokerv1alpha1.VolumeBrokerManager) || !apiutils.IsCreated(obj) {
+		gvk, err := apiutil.GVKForObject(obj, s.client.Scheme())
+		if err != nil {
+			return err
+		}
+
+		return apierrors.NewNotFound(schema.GroupResource{
+			Group:    gvk.Group,
+			Resource: gvk.Kind, // Yes, kind is good enough here
+		}, key.Name)
+	}
+	return nil
 }

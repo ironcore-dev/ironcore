@@ -19,6 +19,7 @@ import (
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/apiutils"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
 	"github.com/onmetal/onmetal-api/testutils"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -54,7 +55,7 @@ var _ = Describe("CreateVolume", func() {
 
 		res, err := srv.CreateVolume(ctx, &ori.CreateVolumeRequest{
 			Volume: &ori.Volume{
-				Metadata: &ori.ObjectMetadata{
+				Metadata: &orimeta.ObjectMetadata{
 					Annotations: annotations,
 					Labels:      labels,
 				},

@@ -29,6 +29,7 @@ import (
 	onmetalapiclient "github.com/onmetal/onmetal-api/apiutils/client"
 	"github.com/onmetal/onmetal-api/apiutils/predicates"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
 	machinepoolletv1alpha1 "github.com/onmetal/onmetal-api/poollet/machinepoollet/api/v1alpha1"
 	machinepoolletclient "github.com/onmetal/onmetal-api/poollet/machinepoollet/client"
 	"github.com/onmetal/onmetal-api/poollet/machinepoollet/controllers/events"
@@ -651,7 +652,7 @@ func (r *MachineReconciler) prepareORIMachine(ctx context.Context, log logr.Logg
 		return nil, false, nil
 	default:
 		return &ori.Machine{
-			Metadata: &ori.ObjectMetadata{
+			Metadata: &orimeta.ObjectMetadata{
 				Labels:      r.oriMachineLabels(machine),
 				Annotations: r.oriMachineAnnotations(machine),
 			},

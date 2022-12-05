@@ -23,6 +23,7 @@ import (
 	clicommon "github.com/onmetal/onmetal-api/orictl/cli/common"
 	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-volume/orictlvolume/common"
 	"github.com/onmetal/onmetal-api/orictl/decoder"
+	"github.com/onmetal/onmetal-api/orictl/renderer"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -37,7 +38,10 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 }
 
 func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cobra.Command {
-	var opts Options
+	var (
+		outputOpts = common.NewOutputOptions()
+		opts       Options
+	)
 
 	cmd := &cobra.Command{
 		Use:     "volume",
@@ -56,31 +60,41 @@ func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cob
 				}
 			}()
 
-			return Run(ctx, streams, client, opts)
+			r, err := outputOpts.RendererOrNil()
+			if err != nil {
+				return err
+			}
+
+			return Run(ctx, streams, client, r, opts)
 		},
 	}
 
+	outputOpts.AddFlags(cmd.Flags())
 	opts.AddFlags(cmd.Flags())
 
 	return cmd
 }
 
-func Run(ctx context.Context, streams clicommon.Streams, client ori.VolumeRuntimeClient, opts Options) error {
+func Run(ctx context.Context, streams clicommon.Streams, client ori.VolumeRuntimeClient, r renderer.Renderer, opts Options) error {
 	data, err := clicommon.ReadFileOrReader(opts.Filename, os.Stdin)
 	if err != nil {
 		return err
 	}
 
-	volumeConfig := &ori.VolumeConfig{}
-	if err := decoder.Decode(data, volumeConfig); err != nil {
+	volume := &ori.Volume{}
+	if err := decoder.Decode(data, volume); err != nil {
 		return err
 	}
 
-	res, err := client.CreateVolume(ctx, &ori.CreateVolumeRequest{Config: volumeConfig})
+	res, err := client.CreateVolume(ctx, &ori.CreateVolumeRequest{Volume: volume})
 	if err != nil {
 		return err
 	}
 
-	_, _ = fmt.Fprintln(streams.Out, res.Volume.Id)
+	if r != nil {
+		return r.Render(res.Volume, streams.Out)
+	}
+
+	_, _ = fmt.Fprintf(streams.Out, "Created volume %s\n", res.Volume.Metadata.Id)
 	return nil
 }

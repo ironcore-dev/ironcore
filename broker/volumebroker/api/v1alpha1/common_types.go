@@ -15,17 +15,15 @@
 package v1alpha1
 
 const (
-	MetadataAnnotation = "volumebroker.api.onmetal.de/metadata"
-
 	LabelsAnnotation = "volumebroker.api.onmetal.de/labels"
 
 	AnnotationsAnnotation = "volumebroker.api.onmetal.de/annotations"
+
+	CreatedLabel = "volumebroker.api.onmetal.de/created"
 )
 
 const (
-	VolumeIDLabel = "volumebroker.api.onmetal.de/volume-id"
-
-	VolumeManagerLabel = "volumebroker.api.onmetal.de/volume-manager"
+	ManagerLabel = "volumebroker.api.onmetal.de/manager"
 )
 
 const (

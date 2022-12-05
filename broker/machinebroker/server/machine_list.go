@@ -48,7 +48,7 @@ func (s *Server) listAggregateOnmetalMachines(ctx context.Context) ([]AggregateO
 		onmetalMachine := &onmetalMachineList.Items[i]
 		aggregateOnmetalMachine, err := s.aggregateOnmetalMachine(onmetalMachine, getIgnitionSecret)
 		if err != nil {
-			return nil, fmt.Errorf("error assembling onmetal machine %s: %w", onmetalMachine.Name, err)
+			return nil, fmt.Errorf("error aggregating onmetal machine %s: %w", onmetalMachine.Name, err)
 		}
 
 		res = append(res, *aggregateOnmetalMachine)

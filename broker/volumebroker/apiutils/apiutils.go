@@ -15,36 +15,82 @@
 package apiutils
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
 	"github.com/onmetal/controller-utils/metautils"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	volumebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/volumebroker/api/v1alpha1"
-	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
+	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func SetMetadataAnnotation(o metav1.Object, metadata *ori.VolumeMetadata) error {
-	data, err := json.Marshal(metadata)
+func GetObjectMetadata(o metav1.Object) (*orimeta.ObjectMetadata, error) {
+	annotations, err := GetAnnotationsAnnotation(o)
 	if err != nil {
-		return fmt.Errorf("error marshalling metadata: %w", err)
+		return nil, err
 	}
-	metautils.SetAnnotation(o, volumebrokerv1alpha1.MetadataAnnotation, string(data))
+
+	labels, err := GetLabelsAnnotation(o)
+	if err != nil {
+		return nil, err
+	}
+
+	var deletedAt int64
+	if !o.GetDeletionTimestamp().IsZero() {
+		deletedAt = o.GetDeletionTimestamp().UnixNano()
+	}
+
+	return &orimeta.ObjectMetadata{
+		Id:          o.GetName(),
+		Annotations: annotations,
+		Labels:      labels,
+		Generation:  o.GetGeneration(),
+		CreatedAt:   o.GetCreationTimestamp().UnixNano(),
+		DeletedAt:   deletedAt,
+	}, nil
+}
+
+func SetObjectMetadata(o metav1.Object, metadata *orimeta.ObjectMetadata) error {
+	if err := SetAnnotationsAnnotation(o, metadata.Annotations); err != nil {
+		return err
+	}
+	if err := SetLabelsAnnotation(o, metadata.Labels); err != nil {
+		return err
+	}
 	return nil
 }
 
-func GetMetadataAnnotation(o metav1.Object) (*ori.VolumeMetadata, error) {
-	data, ok := o.GetAnnotations()[volumebrokerv1alpha1.MetadataAnnotation]
-	if !ok {
-		return nil, fmt.Errorf("object has no metadata at %s", volumebrokerv1alpha1.MetadataAnnotation)
+func SetCreatedLabel(o metav1.Object) {
+	metautils.SetLabel(o, volumebrokerv1alpha1.CreatedLabel, "true")
+}
+
+func IsCreated(o metav1.Object) bool {
+	return metautils.HasLabel(o, volumebrokerv1alpha1.CreatedLabel)
+}
+
+func PatchControlledBy(ctx context.Context, c client.Client, owner, controlled client.Object) error {
+	base := controlled.DeepCopyObject().(client.Object)
+	if err := ctrl.SetControllerReference(owner, controlled, c.Scheme()); err != nil {
+		return err
 	}
 
-	metadata := &ori.VolumeMetadata{}
-	if err := json.Unmarshal([]byte(data), metadata); err != nil {
-		return nil, err
+	if err := c.Patch(ctx, controlled, client.MergeFrom(base)); err != nil {
+		return fmt.Errorf("error patching object to be controlled: %w", err)
 	}
-	return metadata, nil
+	return nil
+}
+
+func PatchCreated(ctx context.Context, c client.Client, o client.Object) error {
+	base := o.DeepCopyObject().(client.Object)
+	SetCreatedLabel(o)
+	if err := c.Patch(ctx, o, client.MergeFrom(base)); err != nil {
+		return fmt.Errorf("error patching object to created: %w", err)
+	}
+	return nil
 }
 
 func SetLabelsAnnotation(o metav1.Object, labels map[string]string) error {
@@ -93,10 +139,11 @@ func GetAnnotationsAnnotation(o metav1.Object) (map[string]string, error) {
 	return annotations, nil
 }
 
-func SetVolumeIDLabel(o metav1.Object, id string) {
-	metautils.SetLabel(o, volumebrokerv1alpha1.VolumeIDLabel, id)
+func SetVolumeManagerLabel(volume *storagev1alpha1.Volume, manager string) {
+	metautils.SetLabel(volume, volumebrokerv1alpha1.ManagerLabel, manager)
 }
 
-func SetVolumeManagerLabel(volume *storagev1alpha1.Volume, manager string) {
-	metautils.SetLabel(volume, volumebrokerv1alpha1.VolumeManagerLabel, manager)
+func IsManagedBy(o metav1.Object, manager string) bool {
+	actual, ok := o.GetLabels()[volumebrokerv1alpha1.ManagerLabel]
+	return ok && actual == manager
 }

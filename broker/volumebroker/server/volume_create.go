@@ -22,7 +22,6 @@ import (
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	volumebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/volumebroker/api/v1alpha1"
 	"github.com/onmetal/onmetal-api/broker/volumebroker/apiutils"
-	"github.com/onmetal/onmetal-api/broker/volumebroker/cleaner"
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -30,93 +29,95 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-type OnmetalVolumeConfig struct {
-	Volume *storagev1alpha1.Volume
+type AggregateOnmetalVolume struct {
+	Volume       *storagev1alpha1.Volume
+	AccessSecret *corev1.Secret
 }
 
-func (s *Server) getOnmetalVolumeConfig(_ context.Context, cfg *ori.VolumeConfig, volumeID string) (*OnmetalVolumeConfig, error) {
+func (s *Server) getOnmetalVolumeConfig(_ context.Context, volume *ori.Volume) (*AggregateOnmetalVolume, error) {
+	var volumePoolRef *corev1.LocalObjectReference
+	if s.volumePoolName != "" {
+		volumePoolRef = &corev1.LocalObjectReference{
+			Name: s.volumePoolName,
+		}
+	}
 	onmetalVolume := &storagev1alpha1.Volume{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: s.namespace,
-			Name:      volumeID,
+			Name:      s.generateID(),
 		},
 		Spec: storagev1alpha1.VolumeSpec{
-			VolumeClassRef:     &corev1.LocalObjectReference{Name: cfg.Class},
+			VolumeClassRef:     &corev1.LocalObjectReference{Name: volume.Spec.Class},
+			VolumePoolRef:      volumePoolRef,
 			VolumePoolSelector: s.volumePoolSelector,
 			Resources: corev1.ResourceList{
-				corev1.ResourceStorage: *resource.NewQuantity(int64(cfg.Resources.StorageBytes), resource.DecimalSI),
+				corev1.ResourceStorage: *resource.NewQuantity(int64(volume.Spec.Resources.StorageBytes), resource.DecimalSI),
 			},
-			Image:              cfg.Image,
+			Image:              volume.Spec.Image,
 			ImagePullSecretRef: nil, // TODO: Fill if necessary
 		},
 	}
-	apiutils.SetVolumeIDLabel(onmetalVolume, volumeID)
+	if err := apiutils.SetObjectMetadata(onmetalVolume, volume.Metadata); err != nil {
+		return nil, err
+	}
 	apiutils.SetVolumeManagerLabel(onmetalVolume, volumebrokerv1alpha1.VolumeBrokerManager)
-	if err := apiutils.SetMetadataAnnotation(onmetalVolume, cfg.Metadata); err != nil {
-		return nil, err
-	}
-	if err := apiutils.SetAnnotationsAnnotation(onmetalVolume, cfg.Annotations); err != nil {
-		return nil, err
-	}
-	if err := apiutils.SetLabelsAnnotation(onmetalVolume, cfg.Labels); err != nil {
-		return nil, err
-	}
-	if s.volumePoolName != "" {
-		onmetalVolume.Spec.VolumePoolRef = &corev1.LocalObjectReference{Name: s.volumePoolName}
-	}
 
-	return &OnmetalVolumeConfig{
+	return &AggregateOnmetalVolume{
 		Volume: onmetalVolume,
 	}, nil
 }
 
-func (s *Server) createOnmetalVolume(ctx context.Context, log logr.Logger, cleaner *cleaner.Cleaner, cfg *OnmetalVolumeConfig) (ori.VolumeState, error) {
-	log.V(1).Info("Creating volume")
-	onmetalVolume := cfg.Volume
-	if err := s.client.Create(ctx, onmetalVolume); err != nil {
-		return 0, fmt.Errorf("error creating volume: %w", err)
-	}
+func (s *Server) createOnmetalVolume(ctx context.Context, log logr.Logger, volume *AggregateOnmetalVolume) (retErr error) {
+	c, cleanup := s.setupCleaner(ctx, log, &retErr)
+	defer cleanup()
 
-	cleaner.Add(func(ctx context.Context) error {
-		if err := s.client.Delete(ctx, onmetalVolume); client.IgnoreNotFound(err) != nil {
-			return fmt.Errorf("error deleting volume: %w", err)
+	log.V(1).Info("Creating onmetal volume")
+	if err := s.client.Create(ctx, volume.Volume); err != nil {
+		return fmt.Errorf("error creating onmetal volume: %w", err)
+	}
+	c.Add(func(ctx context.Context) error {
+		if err := s.client.Delete(ctx, volume.Volume); client.IgnoreNotFound(err) != nil {
+			return fmt.Errorf("error deleting onmetal volume: %w", err)
 		}
 		return nil
 	})
-	return s.convertOnmetalVolumeState(onmetalVolume.Status.State), nil
+
+	log.V(1).Info("Patching onmetal volume as created")
+	if err := apiutils.PatchCreated(ctx, s.client, volume.Volume); err != nil {
+		return fmt.Errorf("error patching onmetal machine as created: %w", err)
+	}
+
+	// Reset cleaner since everything from now on operates on a consistent volume
+	c.Reset()
+
+	accessSecret, err := s.getOnmetalVolumeAccessSecretIfRequired(volume.Volume, s.clientGetSecretFunc(ctx))
+	if err != nil {
+		return err
+	}
+
+	volume.AccessSecret = accessSecret
+	return nil
 }
 
 func (s *Server) CreateVolume(ctx context.Context, req *ori.CreateVolumeRequest) (res *ori.CreateVolumeResponse, retErr error) {
 	log := s.loggerFrom(ctx)
 
-	log.V(1).Info("Generating volume id")
-	volumeID := s.generateID()
-	log = log.WithValues("VolumeID", volumeID)
-	log.V(1).Info("Generated volume id")
-
-	cfg := req.Config
-
 	log.V(1).Info("Getting volume configuration")
-	onmetalVolumeCfg, err := s.getOnmetalVolumeConfig(ctx, cfg, volumeID)
+	cfg, err := s.getOnmetalVolumeConfig(ctx, req.Volume)
 	if err != nil {
 		return nil, fmt.Errorf("error getting onmetal volume config: %w", err)
 	}
 
-	c, cleanup := s.setupCleaner(ctx, log, &retErr)
-	defer cleanup()
+	if err := s.createOnmetalVolume(ctx, log, cfg); err != nil {
+		return nil, fmt.Errorf("error creating onmetal volume: %w", err)
+	}
 
-	state, err := s.createOnmetalVolume(ctx, log, c, onmetalVolumeCfg)
+	v, err := s.convertAggregateOnmetalVolume(cfg)
 	if err != nil {
 		return nil, err
 	}
 
 	return &ori.CreateVolumeResponse{
-		Volume: &ori.Volume{
-			Id:          volumeID,
-			Metadata:    req.Config.Metadata,
-			State:       state,
-			Annotations: req.Config.Annotations,
-			Labels:      req.Config.Labels,
-		},
+		Volume: v,
 	}, nil
 }

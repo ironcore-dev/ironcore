@@ -24,6 +24,7 @@ import (
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
 	machinepoolletv1alpha1 "github.com/onmetal/onmetal-api/poollet/machinepoollet/api/v1alpha1"
 	"github.com/onmetal/onmetal-api/poollet/machinepoollet/controllers/events"
 	utilslices "github.com/onmetal/onmetal-api/utils/slices"
@@ -252,7 +253,7 @@ func (r *MachineReconciler) createORIVolume(
 ) (*ori.Volume, error) {
 	res, err := r.MachineRuntime.CreateVolume(ctx, &ori.CreateVolumeRequest{
 		Volume: &ori.Volume{
-			Metadata: &ori.ObjectMetadata{
+			Metadata: &orimeta.ObjectMetadata{
 				Labels: r.oriVolumeLabels(machine, name),
 			},
 			Spec: spec,

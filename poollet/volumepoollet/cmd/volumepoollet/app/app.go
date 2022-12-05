@@ -21,12 +21,13 @@ import (
 	"os"
 	"time"
 
-	"github.com/go-logr/logr"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
-	controllers2 "github.com/onmetal/onmetal-api/poollet/volumepoollet/controllers"
+	orivolumeutils "github.com/onmetal/onmetal-api/ori/utils/volume"
+	"github.com/onmetal/onmetal-api/poollet/orievent"
+	"github.com/onmetal/onmetal-api/poollet/volumepoollet/controllers"
 	"github.com/onmetal/onmetal-api/poollet/volumepoollet/vcm"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -116,46 +117,16 @@ func Command() *cobra.Command {
 	return cmd
 }
 
-var wellKnownVolumeRuntimeEndpoints = []string{
-	"/var/run/ori-volumebroker.sock",
-	"/var/run/ori-cephd.sock",
-}
-
-func DetectVolumeRuntimeEndpoint(log logr.Logger, endpoint string) (string, error) {
-	if endpoint != "" {
-		log.V(1).Info("Using explicitly defined endpoint", "Endpoint", endpoint)
-		return endpoint, nil
-	}
-
-	endpoint = os.Getenv("ORI_VOLUME_RUNTIME")
-	if endpoint != "" {
-		log.V(1).Info("Using volume runtime endpoint from environment variable", "Endpoint", endpoint)
-		return endpoint, nil
-	}
-
-	for _, wellKnownEndpoint := range wellKnownVolumeRuntimeEndpoints {
-		if stat, err := os.Stat(wellKnownEndpoint); err == nil && stat.Mode().Type()&os.ModeSocket != 0 {
-			log.V(1).Info("Detected and using well-known endpoint", "Endpoint", wellKnownEndpoint)
-			return wellKnownEndpoint, nil
-		}
-	}
-
-	return "", fmt.Errorf("error detecting volume runtime endpoint")
-}
-
 func Run(ctx context.Context, opts Options) error {
 	logger := ctrl.LoggerFrom(ctx)
 	setupLog := ctrl.Log.WithName("setup")
 
-	endpoint, err := DetectVolumeRuntimeEndpoint(setupLog, opts.VolumeRuntimeEndpoint)
+	endpoint, err := orivolumeutils.GetAddress(opts.VolumeRuntimeEndpoint)
 	if err != nil {
 		return fmt.Errorf("error detecting volume runtime endpoint: %w", err)
 	}
 
-	dialCtx, cancel := context.WithTimeout(ctx, opts.DialTimeout)
-	defer cancel()
-	conn, err := grpc.DialContext(dialCtx, endpoint,
-		grpc.WithReturnConnectionError(),
+	conn, err := grpc.Dial(endpoint,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
@@ -176,7 +147,7 @@ func Run(ctx context.Context, opts Options) error {
 		Port:                   9443,
 		HealthProbeBindAddress: opts.ProbeAddr,
 		LeaderElection:         opts.EnableLeaderElection,
-		LeaderElectionID:       "bfafcebe.api.onmetal.de",
+		LeaderElectionID:       "dfffbeaa.api.onmetal.de",
 	})
 	if err != nil {
 		return fmt.Errorf("error creating manager: %w", err)
@@ -195,7 +166,21 @@ func Run(ctx context.Context, opts Options) error {
 			return fmt.Errorf("error waiting for volume class mapper to sync: %w", err)
 		}
 
-		if err := (&controllers2.VolumeReconciler{
+		volumeEvents := orievent.NewGenerator(func(ctx context.Context) ([]*ori.Volume, error) {
+			res, err := volumeRuntime.ListVolumes(ctx, &ori.ListVolumesRequest{})
+			if err != nil {
+				return nil, err
+			}
+			return res.Volumes, nil
+		}, orievent.GeneratorOptions{})
+		if err := mgr.Add(volumeEvents); err != nil {
+			return fmt.Errorf("error adding volume event generator: %w", err)
+		}
+		if err := mgr.AddHealthzCheck("volume-events", volumeEvents.Check); err != nil {
+			return fmt.Errorf("error adding volume event generator healthz check: %w", err)
+		}
+
+		if err := (&controllers.VolumeReconciler{
 			EventRecorder:     mgr.GetEventRecorderFor("volumes"),
 			Client:            mgr.GetClient(),
 			VolumeRuntime:     volumeRuntime,
@@ -206,7 +191,14 @@ func Run(ctx context.Context, opts Options) error {
 			return fmt.Errorf("error setting up volume reconciler with manager: %w", err)
 		}
 
-		if err := (&controllers2.VolumePoolReconciler{
+		if err := (&controllers.VolumeAnnotatorReconciler{
+			Client:       mgr.GetClient(),
+			VolumeEvents: volumeEvents,
+		}).SetupWithManager(mgr); err != nil {
+			return fmt.Errorf("error setting up volume annotator reconciler with manager: %w", err)
+		}
+
+		if err := (&controllers.VolumePoolReconciler{
 			Client:            mgr.GetClient(),
 			VolumePoolName:    opts.VolumePoolName,
 			VolumeClassMapper: volumeClassMapper,
@@ -218,7 +210,7 @@ func Run(ctx context.Context, opts Options) error {
 		return nil
 	}
 
-	if err := (&controllers2.VolumePoolInit{
+	if err := (&controllers.VolumePoolInit{
 		Client:         mgr.GetClient(),
 		VolumePoolName: opts.VolumePoolName,
 		ProviderID:     opts.ProviderID,
@@ -227,7 +219,6 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error setting up volume pool init with manager: %w", err)
 	}
 
-	// TODO: Add vleg healthz check
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to set up health check")
 		os.Exit(1)

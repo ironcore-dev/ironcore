@@ -21,7 +21,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/go-logr/logr"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
@@ -29,7 +28,7 @@ import (
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	orimachineutils "github.com/onmetal/onmetal-api/ori/utils/machine"
 	machinepoolletclient "github.com/onmetal/onmetal-api/poollet/machinepoollet/client"
-	controllers2 "github.com/onmetal/onmetal-api/poollet/machinepoollet/controllers"
+	"github.com/onmetal/onmetal-api/poollet/machinepoollet/controllers"
 	"github.com/onmetal/onmetal-api/poollet/machinepoollet/mcm"
 	"github.com/onmetal/onmetal-api/poollet/orievent"
 	"github.com/spf13/cobra"
@@ -120,33 +119,6 @@ func Command() *cobra.Command {
 	return cmd
 }
 
-var wellKnownMachineRuntimeEndpoints = []string{
-	"/var/run/ori-machinebroker.sock",
-	"/var/run/ori-virtd.sock",
-}
-
-func DetectMachineRuntimeEndpoint(log logr.Logger, endpoint string) (string, error) {
-	if endpoint != "" {
-		log.V(1).Info("Using explicitly defined endpoint", "Endpoint", endpoint)
-		return endpoint, nil
-	}
-
-	endpoint = os.Getenv("ORI_MACHINE_RUNTIME")
-	if endpoint != "" {
-		log.V(1).Info("Using machine runtime endpoint from environment variable", "Endpoint", endpoint)
-		return endpoint, nil
-	}
-
-	for _, wellKnownEndpoint := range wellKnownMachineRuntimeEndpoints {
-		if stat, err := os.Stat(wellKnownEndpoint); err == nil && stat.Mode().Type()&os.ModeSocket != 0 {
-			log.V(1).Info("Detected and using well-known endpoint", "Endpoint", wellKnownEndpoint)
-			return wellKnownEndpoint, nil
-		}
-	}
-
-	return "", fmt.Errorf("error detecting machine runtime endpoint")
-}
-
 func Run(ctx context.Context, opts Options) error {
 	logger := ctrl.LoggerFrom(ctx)
 	setupLog := ctrl.Log.WithName("setup")
@@ -156,10 +128,7 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error detecting machine runtime endpoint: %w", err)
 	}
 
-	dialCtx, cancel := context.WithTimeout(ctx, opts.DialTimeout)
-	defer cancel()
-	conn, err := grpc.DialContext(dialCtx, endpoint,
-		grpc.WithReturnConnectionError(),
+	conn, err := grpc.Dial(endpoint,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
@@ -210,7 +179,7 @@ func Run(ctx context.Context, opts Options) error {
 			return fmt.Errorf("error adding machine event generator: %w", err)
 		}
 		if err := mgr.AddHealthzCheck("machine-events", machineEvents.Check); err != nil {
-			return fmt.Errorf("error adding machine event generator healthz check")
+			return fmt.Errorf("error adding machine event generator healthz check: %w", err)
 		}
 
 		volumeEvents := orievent.NewGenerator(func(ctx context.Context) ([]*ori.Volume, error) {
@@ -224,7 +193,7 @@ func Run(ctx context.Context, opts Options) error {
 			return fmt.Errorf("error adding volume event generator: %w", err)
 		}
 		if err := mgr.AddHealthzCheck("volume-events", volumeEvents.Check); err != nil {
-			return fmt.Errorf("error adding volume event generator healthz check")
+			return fmt.Errorf("error adding volume event generator healthz check: %w", err)
 		}
 
 		networkInterfaceEvents := orievent.NewGenerator(func(ctx context.Context) ([]*ori.NetworkInterface, error) {
@@ -238,10 +207,10 @@ func Run(ctx context.Context, opts Options) error {
 			return fmt.Errorf("error adding network interface event generator: %w", err)
 		}
 		if err := mgr.AddHealthzCheck("networkinterface-events", networkInterfaceEvents.Check); err != nil {
-			return fmt.Errorf("error adding network interface event generator healthz check")
+			return fmt.Errorf("error adding network interface event generator healthz check: %w", err)
 		}
 
-		if err := (&controllers2.MachineReconciler{
+		if err := (&controllers.MachineReconciler{
 			EventRecorder:      mgr.GetEventRecorderFor("machines"),
 			Client:             mgr.GetClient(),
 			MachineRuntime:     machineRuntime,
@@ -252,7 +221,7 @@ func Run(ctx context.Context, opts Options) error {
 			return fmt.Errorf("error setting up machine reconciler with manager: %w", err)
 		}
 
-		if err := (&controllers2.MachineAnnotatorReconciler{
+		if err := (&controllers.MachineAnnotatorReconciler{
 			Client:                 mgr.GetClient(),
 			MachineEvents:          machineEvents,
 			VolumeEvents:           volumeEvents,
@@ -261,7 +230,7 @@ func Run(ctx context.Context, opts Options) error {
 			return fmt.Errorf("error setting up machine annotator reconciler with manager: %w", err)
 		}
 
-		if err := (&controllers2.MachinePoolReconciler{
+		if err := (&controllers.MachinePoolReconciler{
 			Client:             mgr.GetClient(),
 			MachinePoolName:    opts.MachinePoolName,
 			MachineClassMapper: machineClassMapper,
@@ -283,7 +252,7 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.MachineSpecVolumeNamesField, err)
 	}
 
-	if err := (&controllers2.MachinePoolInit{
+	if err := (&controllers.MachinePoolInit{
 		Client:          mgr.GetClient(),
 		MachinePoolName: opts.MachinePoolName,
 		ProviderID:      opts.ProviderID,

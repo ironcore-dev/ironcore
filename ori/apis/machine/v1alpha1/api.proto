@@ -4,7 +4,7 @@ package machine.v1alpha1;
 option go_package = "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
-import public "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1/api.proto";
+import "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1/api.proto";
 
 option (gogoproto.goproto_stringer_all) = false;
 option (gogoproto.stringer_all) = true;

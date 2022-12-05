@@ -18,28 +18,28 @@ import (
 	"context"
 	"fmt"
 
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	volumebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/volumebroker/api/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
-	"sigs.k8s.io/controller-runtime/pkg/client"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
 func (s *Server) DeleteVolume(ctx context.Context, req *ori.DeleteVolumeRequest) (*ori.DeleteVolumeResponse, error) {
 	volumeID := req.VolumeId
 	log := s.loggerFrom(ctx, "VolumeID", volumeID)
 
-	var errs []error
+	onmetalVolume, err := s.getAggregateOnmetalVolume(ctx, req.VolumeId)
+	if err != nil {
+		return nil, err
+	}
 
 	log.V(1).Info("Deleting volume")
-	if err := s.client.DeleteAllOf(ctx, &storagev1alpha1.Volume{},
-		client.InNamespace(s.namespace),
-		client.MatchingLabels{volumebrokerv1alpha1.VolumeIDLabel: volumeID},
-	); err != nil {
-		errs = append(errs, fmt.Errorf("error deleting volume: %w", err))
+	if err := s.client.Delete(ctx, onmetalVolume.Volume); err != nil {
+		if !apierrors.IsNotFound(err) {
+			return nil, fmt.Errorf("error deleting onmetal volume: %w", err)
+		}
+		return nil, status.Errorf(codes.NotFound, "volume %s not found", volumeID)
 	}
 
-	if len(errs) > 0 {
-		return &ori.DeleteVolumeResponse{}, fmt.Errorf("error(s) deleting volume: %v", errs)
-	}
 	return &ori.DeleteVolumeResponse{}, nil
 }

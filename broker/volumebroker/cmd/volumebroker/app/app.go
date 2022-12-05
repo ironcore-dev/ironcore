@@ -114,10 +114,12 @@ func Run(ctx context.Context, opts Options) error {
 
 	setupLog.Info("Starting server", "Address", l.Addr().String())
 	go func() {
+		defer func() {
+			setupLog.Info("Shutting down server")
+			grpcSrv.Stop()
+			setupLog.Info("Shut down server")
+		}()
 		<-ctx.Done()
-		setupLog.Info("Shutting down server")
-		grpcSrv.Stop()
-		setupLog.Info("Shut down server")
 	}()
 	if err := grpcSrv.Serve(l); err != nil {
 		return fmt.Errorf("error serving: %w", err)

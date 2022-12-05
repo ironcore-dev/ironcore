@@ -15,6 +15,5 @@
 package events
 
 const (
-	ErrorGettingVolumeClass = "ErrorGettingVolumeClass"
-	VolumeClassNotReady     = "VolumeClassNotReady"
+	VolumeClassNotReady = "VolumeClassNotReady"
 )

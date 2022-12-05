@@ -23,19 +23,9 @@ const (
 )
 
 const (
-	MachineIDLabel = "machinebroker.api.onmetal.de/machine-id"
-
 	PurposeLabel = "machinebroker.api.onmetal.de/purpose"
 
-	VolumeNameLabel = "machinebroker.api.onmetal.de/volume-name"
-
-	NetworkInterfaceNameLabel = "machinebroker.api.onmetal.de/network-interface"
-
-	IPFamilyLabel = "machinebroker.api.onmetal.de/ip-family"
-
 	ManagerLabel = "machinebroker.api.onmetal.de/manager"
-
-	DeviceLabel = "machinebroker.api.onmetal.de/device"
 )
 
 const (

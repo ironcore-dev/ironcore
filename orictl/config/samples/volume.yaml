@@ -4,7 +4,7 @@ metadata:
   labels:
     bar: baz
 spec:
-  driver: local
-  handle: deadbeef
-  attributes:
-    size_limit_bytes: "1024"
+  class: volumeclass-sample
+  image: ghcr.io/onmetal/onmetal-image/gardenlinux:latest
+  resources:
+    storage_bytes: 1073741824

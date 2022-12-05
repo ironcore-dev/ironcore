@@ -25,6 +25,7 @@ import (
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
 	machinepoolletv1alpha1 "github.com/onmetal/onmetal-api/poollet/machinepoollet/api/v1alpha1"
 	"github.com/onmetal/onmetal-api/poollet/machinepoollet/controllers/events"
 	utilslices "github.com/onmetal/onmetal-api/utils/slices"
@@ -166,7 +167,7 @@ func (r *MachineReconciler) createORINetworkInterface(
 ) (*ori.NetworkInterface, error) {
 	res, err := r.MachineRuntime.CreateNetworkInterface(ctx, &ori.CreateNetworkInterfaceRequest{
 		NetworkInterface: &ori.NetworkInterface{
-			Metadata: &ori.ObjectMetadata{
+			Metadata: &orimeta.ObjectMetadata{
 				Labels: r.oriNetworkInterfaceLabels(machine, name),
 			},
 			Spec: spec,

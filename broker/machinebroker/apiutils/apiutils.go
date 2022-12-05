@@ -21,14 +21,13 @@ import (
 
 	"github.com/onmetal/controller-utils/metautils"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	corev1 "k8s.io/api/core/v1"
+	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func GetObjectMetadata(o metav1.Object) (*ori.ObjectMetadata, error) {
+func GetObjectMetadata(o metav1.Object) (*orimeta.ObjectMetadata, error) {
 	annotations, err := GetAnnotationsAnnotation(o)
 	if err != nil {
 		return nil, err
@@ -44,7 +43,7 @@ func GetObjectMetadata(o metav1.Object) (*ori.ObjectMetadata, error) {
 		deletedAt = o.GetDeletionTimestamp().UnixNano()
 	}
 
-	return &ori.ObjectMetadata{
+	return &orimeta.ObjectMetadata{
 		Id:          o.GetName(),
 		Annotations: annotations,
 		Labels:      labels,
@@ -54,7 +53,7 @@ func GetObjectMetadata(o metav1.Object) (*ori.ObjectMetadata, error) {
 	}, nil
 }
 
-func SetObjectMetadata(o metav1.Object, metadata *ori.ObjectMetadata) error {
+func SetObjectMetadata(o metav1.Object, metadata *orimeta.ObjectMetadata) error {
 	if err := SetAnnotationsAnnotation(o, metadata.Annotations); err != nil {
 		return err
 	}
@@ -139,28 +138,8 @@ func GetAnnotationsAnnotation(o metav1.Object) (map[string]string, error) {
 	return annotations, nil
 }
 
-func SetMachineIDLabel(o metav1.Object, id string) {
-	metautils.SetLabel(o, machinebrokerv1alpha1.MachineIDLabel, id)
-}
-
-func SetVolumeNameLabel(o metav1.Object, name string) {
-	metautils.SetLabel(o, machinebrokerv1alpha1.VolumeNameLabel, name)
-}
-
-func SetDeviceLabel(o metav1.Object, device string) {
-	metautils.SetLabel(o, machinebrokerv1alpha1.DeviceLabel, device)
-}
-
-func SetNetworkInterfaceNameLabel(o metav1.Object, name string) {
-	metautils.SetLabel(o, machinebrokerv1alpha1.NetworkInterfaceNameLabel, name)
-}
-
 func SetManagerLabel(o metav1.Object, manager string) {
 	metautils.SetLabel(o, machinebrokerv1alpha1.ManagerLabel, manager)
-}
-
-func SetIPFamilyLabel(o metav1.Object, ipFamily corev1.IPFamily) {
-	metautils.SetLabel(o, machinebrokerv1alpha1.IPFamilyLabel, string(ipFamily))
 }
 
 func SetPurpose(o metav1.Object, purpose string) {

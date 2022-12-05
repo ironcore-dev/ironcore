@@ -43,3 +43,8 @@ func (c *Cleaner) Cleanup(ctx context.Context) error {
 	}
 	return nil
 }
+
+// Reset removes all cleanup functions from the cleaner.
+func (c *Cleaner) Reset() {
+	c.funcs = nil
+}
