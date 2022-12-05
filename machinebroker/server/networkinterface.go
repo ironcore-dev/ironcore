@@ -18,89 +18,57 @@ import (
 	"context"
 	"fmt"
 
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/machinebroker/api/v1alpha1"
 	"github.com/onmetal/onmetal-api/machinebroker/apiutils"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	"golang.org/x/exp/slices"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func (s *Server) getOnmetalNetworkInterface(ctx context.Context, onmetalMachine *computev1alpha1.Machine, name string) (*networkingv1alpha1.NetworkInterface, error) {
-	onmetalNetworkInterface := &networkingv1alpha1.NetworkInterface{}
-	onmetalNetworkInterfaceKey := client.ObjectKey{Namespace: s.namespace, Name: s.onmetalNetworkInterfaceName(onmetalMachine.Name, name)}
-	if err := s.client.Get(ctx, onmetalNetworkInterfaceKey, onmetalNetworkInterface); err != nil {
-		if !apierrors.IsNotFound(err) {
-			return nil, fmt.Errorf("error getting machine %s network interface %s: %w", onmetalMachine.Name, name, err)
-		}
-		return nil, status.Errorf(codes.NotFound, "machine %s network interface %s not found", onmetalMachine.Name, name)
-	}
-	return onmetalNetworkInterface, nil
+type AggregateOnmetalNetworkInterface struct {
+	NetworkInterface *networkingv1alpha1.NetworkInterface
+	Network          *networkingv1alpha1.Network
+	VirtualIP        *networkingv1alpha1.VirtualIP
 }
 
-func (s *Server) convertOnmetalNetworkInterface(
-	machine *computev1alpha1.Machine,
-	networkInterface *networkingv1alpha1.NetworkInterface,
-) (*ori.NetworkInterface, error) {
-	machineID := networkInterface.Labels[machinebrokerv1alpha1.MachineIDLabel]
-
-	metadata, err := apiutils.GetMetadataAnnotation(networkInterface)
+func (s *Server) convertAggregateOnmetalNetworkInterface(networkInterface *AggregateOnmetalNetworkInterface) (*ori.NetworkInterface, error) {
+	metadata, err := apiutils.GetObjectMetadata(networkInterface.NetworkInterface)
 	if err != nil {
 		return nil, err
 	}
 
-	name := networkInterface.Labels[machinebrokerv1alpha1.NetworkInterfaceNameLabel]
-
-	ips := make([]string, len(networkInterface.Status.IPs))
-	for i, ip := range networkInterface.Status.IPs {
-		ips[i] = ip.String()
+	ips, err := s.convertOnmetalIPSourcesToIPs(networkInterface.NetworkInterface.Spec.IPs)
+	if err != nil {
+		return nil, err
 	}
 
-	var virtualIPConfig *ori.VirtualIPConfig
-	if onmetalVirtualIP := networkInterface.Status.VirtualIP; onmetalVirtualIP != nil {
-		virtualIPConfig = &ori.VirtualIPConfig{
-			Ip: onmetalVirtualIP.String(),
+	var virtualIPSpec *ori.VirtualIPSpec
+	if networkInterface.VirtualIP != nil {
+		virtualIPSpec = &ori.VirtualIPSpec{
+			Ip: networkInterface.VirtualIP.Status.IP.String(),
 		}
-	}
-
-	idx := slices.IndexFunc(machine.Status.NetworkInterfaces,
-		func(networkInterface computev1alpha1.NetworkInterfaceStatus) bool {
-			return networkInterface.Name == name
-		},
-	)
-	state := ori.NetworkInterfaceState_NETWORK_INTERFACE_DETACHED
-	if idx != -1 {
-		state = s.convertOnmetalNetworkInterfaceState(machine.Status.NetworkInterfaces[idx].State)
 	}
 
 	return &ori.NetworkInterface{
-		MachineId:       machineID,
-		MachineMetadata: metadata,
-		Name:            name,
-		Network:         &ori.NetworkConfig{Handle: networkInterface.Status.NetworkHandle},
-		Ips:             ips,
-		VirtualIp:       virtualIPConfig,
-		State:           state,
+		Metadata: metadata,
+		Spec: &ori.NetworkInterfaceSpec{
+			Network: &ori.NetworkSpec{
+				Handle: networkInterface.Network.Spec.Handle,
+			},
+			Ips:       ips,
+			VirtualIp: virtualIPSpec,
+		},
 	}, nil
 }
 
-func (s *Server) getNetworkInterface(
+func (s *Server) setOnmetalNetworkInterfaceVirtualIPSource(
 	ctx context.Context,
-	machineID, name string,
-) (*ori.NetworkInterface, error) {
-	onmetalMachine, err := s.getOnmetalMachine(ctx, machineID)
-	if err != nil {
-		return nil, err
+	onmetalNetworkInterface *networkingv1alpha1.NetworkInterface,
+	virtualIPSrc *networkingv1alpha1.VirtualIPSource,
+) error {
+	baseOnmetalNetworkInterface := onmetalNetworkInterface.DeepCopy()
+	onmetalNetworkInterface.Spec.VirtualIP = virtualIPSrc
+	if err := s.client.Patch(ctx, onmetalNetworkInterface, client.MergeFrom(baseOnmetalNetworkInterface)); err != nil {
+		return fmt.Errorf("error setting virtual ip source: %w", err)
 	}
-
-	onmetalNetworkInterface, err := s.getOnmetalNetworkInterface(ctx, onmetalMachine, name)
-	if err != nil {
-		return nil, err
-	}
-
-	return s.convertOnmetalNetworkInterface(onmetalMachine, onmetalNetworkInterface)
+	return nil
 }

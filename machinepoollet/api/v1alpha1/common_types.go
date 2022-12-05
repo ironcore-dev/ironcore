@@ -19,6 +19,12 @@ const (
 	MachineNamespaceLabel = "machinepoollet.api.onmetal.de/machine-namespace"
 	MachineNameLabel      = "machinepoollet.api.onmetal.de/machine-name"
 
+	VolumeNameLabel = "machinepoollet.api.onmetal.de/volume-name"
+
+	NetworkInterfaceNameLabel = "machinepoollet.api.onmetal.de/networkinterface-name"
+
+	MachineGenerationAnnotation = "machinepoollet.api.onmetal.de/machine-generation"
+
 	FieldOwner       = "machinepoollet.api.onmetal.de/field-owner"
 	MachineFinalizer = "machinepoollet.api.onmetal.de/machine"
 )

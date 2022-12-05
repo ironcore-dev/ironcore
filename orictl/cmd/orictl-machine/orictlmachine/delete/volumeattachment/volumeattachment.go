@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package networkinterface
+package volumeattachment
 
 import (
 	"context"
@@ -23,33 +23,32 @@ import (
 	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-machine/orictlmachine/common"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
 type Options struct {
 	MachineID string
-	IPs       []string
-	VirtualIP string
 }
 
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
-	fs.StringVar(&o.MachineID, "machine-id", "", "ID of the machine to create the network interface in.")
-	fs.StringSliceVar(&o.IPs, "ips", o.IPs, "IPs to set on the network interface.")
-	fs.StringVar(&o.VirtualIP, "virtual-ip", o.VirtualIP, "Virtual ip to set on the network interface")
+	fs.StringVar(&o.MachineID, "machine-id", "", "ID of the machine to attach the volume to.")
 }
 
 func (o *Options) MarkFlagsRequired(cmd *cobra.Command) {
 	_ = cmd.MarkFlagRequired("machine-id")
-	_ = cmd.MarkFlagRequired("ips")
 }
 
 func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cobra.Command {
-	var opts Options
+	var (
+		opts Options
+	)
 
 	cmd := &cobra.Command{
-		Use:     "networkinterface name",
-		Aliases: common.NetworkInterfaceAliases,
-		Args:    cobra.ExactArgs(1),
+		Use:     "volumeattachment name [names...]",
+		Aliases: common.VolumeAliases,
+		Args:    cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
 			log := ctrl.LoggerFrom(ctx)
@@ -64,9 +63,9 @@ func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cob
 				}
 			}()
 
-			name := args[0]
+			names := args
 
-			return Run(ctx, streams, client, name, opts)
+			return Run(cmd.Context(), streams, client, names, opts)
 		},
 	}
 
@@ -76,26 +75,20 @@ func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cob
 	return cmd
 }
 
-func Run(ctx context.Context, streams clicommon.Streams, client ori.MachineRuntimeClient, networkInterfaceName string, opts Options) error {
-	var virtualIP *ori.VirtualIPConfig
-	if opts.VirtualIP != "" {
-		virtualIP = &ori.VirtualIPConfig{
-			Ip: opts.VirtualIP,
+func Run(ctx context.Context, streams clicommon.Streams, client ori.MachineRuntimeClient, names []string, opts Options) error {
+	for _, name := range names {
+		if _, err := client.DeleteVolumeAttachment(ctx, &ori.DeleteVolumeAttachmentRequest{
+			MachineId: opts.MachineID,
+			Name:      name,
+		}); err != nil {
+			if status.Code(err) != codes.NotFound {
+				return fmt.Errorf("error deleting machine %s volume %s: %w", opts.MachineID, name, err)
+			}
+
+			_, _ = fmt.Fprintf(streams.Out, "Machine %s volume %s not found\n", opts.MachineID, name)
+		} else {
+			_, _ = fmt.Fprintf(streams.Out, "Machine %s volume %s deleted\n", opts.MachineID, name)
 		}
 	}
-
-	_, err := client.UpdateNetworkInterface(ctx,
-		&ori.UpdateNetworkInterfaceRequest{
-			MachineId:            opts.MachineID,
-			NetworkInterfaceName: networkInterfaceName,
-			Ips:                  opts.IPs,
-			VirtualIp:            virtualIP,
-		},
-	)
-	if err != nil {
-		return err
-	}
-
-	_, _ = fmt.Fprintf(streams.Out, "Updated machine %s network interface %s\n", opts.MachineID, networkInterfaceName)
 	return nil
 }

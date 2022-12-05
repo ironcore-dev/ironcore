@@ -32,9 +32,9 @@ var (
 
 	headers = []metav1.TableColumnDefinition{
 		{Name: "Name", Type: "string", Format: "name", Description: objectMetaSwaggerDoc["name"]},
-		{Name: "Age", Type: "string", Format: "date", Description: objectMetaSwaggerDoc["creationTimestamp"]},
 		{Name: "TPS", Type: "string", Description: "Amount of tps the volume class offers."},
 		{Name: "IOPS", Type: "string", Description: "Amount of iops the volume class offers."},
+		{Name: "Age", Type: "string", Format: "date", Description: objectMetaSwaggerDoc["creationTimestamp"]},
 	}
 )
 
@@ -61,9 +61,9 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 		volumeClass := obj.(*storage.VolumeClass)
 
 		cells = append(cells, name)
-		cells = append(cells, age)
 		cells = append(cells, volumeClass.Capabilities.Name(storage.ResourceTPS, resource.DecimalSI))
 		cells = append(cells, volumeClass.Capabilities.Name(storage.ResourceIOPS, resource.DecimalSI))
+		cells = append(cells, age)
 
 		return cells, nil
 	})

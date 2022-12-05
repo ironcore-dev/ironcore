@@ -78,6 +78,14 @@ func (o *OutputOptions) Renderer(ifEmpty string) (renderer.Renderer, error) {
 	return Renderer.Get(output)
 }
 
+func (o *OutputOptions) RendererOrNil() (renderer.Renderer, error) {
+	output := o.Output
+	if output == "" {
+		return nil, nil
+	}
+	return Renderer.Get(output)
+}
+
 var (
 	MachineAliases          = []string{"machines", "mach", "machs"}
 	MachineClassAliases     = []string{"machineclasses", "mc", "mcs"}

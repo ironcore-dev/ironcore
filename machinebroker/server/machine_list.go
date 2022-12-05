@@ -23,33 +23,86 @@ import (
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func (s *Server) listOnmetalMachines(ctx context.Context) ([]computev1alpha1.Machine, error) {
+func (s *Server) listAggregateOnmetalMachines(ctx context.Context) ([]AggregateOnmetalMachine, error) {
 	onmetalMachineList := &computev1alpha1.MachineList{}
-
-	if err := s.client.List(ctx, onmetalMachineList,
-		client.InNamespace(s.namespace),
-		client.MatchingLabels{machinebrokerv1alpha1.MachineManagerLabel: machinebrokerv1alpha1.MachineBrokerManager},
-	); err != nil {
-		return nil, fmt.Errorf("error listing machines: %w", err)
+	if err := s.listManagedAndCreated(ctx, onmetalMachineList); err != nil {
+		return nil, fmt.Errorf("error listing onmetal machines: %w", err)
 	}
 
-	return onmetalMachineList.Items, nil
+	ignitionSecretList := &corev1.SecretList{}
+	if err := s.listWithPurpose(ctx, ignitionSecretList, machinebrokerv1alpha1.IgnitionPurpose); err != nil {
+		return nil, fmt.Errorf("error listing ignition secrets: %w", err)
+	}
+
+	ignitionSecretByName := objectStructsToObjectPtrByNameMap(ignitionSecretList.Items)
+	getIgnitionSecret := objectByNameMapGetter(corev1.Resource("secrets"), ignitionSecretByName)
+
+	var res []AggregateOnmetalMachine
+	for i := range onmetalMachineList.Items {
+		onmetalMachine := &onmetalMachineList.Items[i]
+		aggregateOnmetalMachine, err := s.aggregateOnmetalMachine(onmetalMachine, getIgnitionSecret)
+		if err != nil {
+			return nil, fmt.Errorf("error assembling onmetal machine %s: %w", onmetalMachine.Name, err)
+		}
+
+		res = append(res, *aggregateOnmetalMachine)
+	}
+	return res, nil
+}
+
+func (s *Server) aggregateOnmetalMachine(
+	machine *computev1alpha1.Machine,
+	getIgnitionSecret func(name string) (*corev1.Secret, error),
+) (*AggregateOnmetalMachine, error) {
+	var ignitionSecret *corev1.Secret
+	if ignitionRef := machine.Spec.IgnitionRef; ignitionRef != nil {
+		secret, err := getIgnitionSecret(ignitionRef.Name)
+		if err != nil {
+			return nil, fmt.Errorf("error getting machine ignition secret %s: %w", ignitionRef.Name, err)
+		}
+
+		ignitionSecret = secret
+	}
+
+	return &AggregateOnmetalMachine{
+		IgnitionSecret: ignitionSecret,
+		Machine:        machine,
+	}, nil
+}
+
+func (s *Server) getAggregateOnmetalMachine(ctx context.Context, id string) (*AggregateOnmetalMachine, error) {
+	onmetalMachine := &computev1alpha1.Machine{}
+	if err := s.getManagedAndCreated(ctx, id, onmetalMachine); err != nil {
+		if !apierrors.IsNotFound(err) {
+			return nil, fmt.Errorf("error getting onmetal machine %s: %w", id, err)
+		}
+		return nil, status.Errorf(codes.NotFound, "machine %s not found", id)
+	}
+
+	return s.aggregateOnmetalMachine(onmetalMachine, func(name string) (*corev1.Secret, error) {
+		secret := &corev1.Secret{}
+		if err := s.client.Get(ctx, client.ObjectKey{Namespace: s.namespace, Name: name}, secret); err != nil {
+			return nil, err
+		}
+		return secret, nil
+	})
 }
 
 func (s *Server) listMachines(ctx context.Context) ([]*ori.Machine, error) {
-	onmetalMachines, err := s.listOnmetalMachines(ctx)
+	onmetalMachines, err := s.listAggregateOnmetalMachines(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error listing machines: %w", err)
 	}
 
 	var res []*ori.Machine
 	for _, onmetalMachine := range onmetalMachines {
-		machine, err := s.convertOnmetalMachine(&onmetalMachine)
+		machine, err := s.convertAggregateOnmetalMachine(&onmetalMachine)
 		if err != nil {
 			return nil, err
 		}
@@ -69,7 +122,7 @@ func (s *Server) filterMachines(machines []*ori.Machine, filter *ori.MachineFilt
 		sel = labels.SelectorFromSet(filter.LabelSelector)
 	)
 	for _, oriMachine := range machines {
-		if !sel.Matches(labels.Set(oriMachine.Labels)) {
+		if !sel.Matches(labels.Set(oriMachine.Metadata.Labels)) {
 			continue
 		}
 
@@ -78,25 +131,13 @@ func (s *Server) filterMachines(machines []*ori.Machine, filter *ori.MachineFilt
 	return res
 }
 
-func (s *Server) getOnmetalMachine(ctx context.Context, machineID string) (*computev1alpha1.Machine, error) {
-	onmetalMachine := &computev1alpha1.Machine{}
-	onmetalMachineKey := client.ObjectKey{Namespace: s.namespace, Name: machineID}
-	if err := s.client.Get(ctx, onmetalMachineKey, onmetalMachine); err != nil {
-		if !apierrors.IsNotFound(err) {
-			return nil, fmt.Errorf("error getting machine %s: %w", onmetalMachineKey, err)
-		}
-		return nil, status.Errorf(codes.NotFound, fmt.Sprintf("machine %s not found", machineID))
-	}
-	return onmetalMachine, nil
-}
-
 func (s *Server) getMachine(ctx context.Context, id string) (*ori.Machine, error) {
-	onmetalMachine, err := s.getOnmetalMachine(ctx, id)
+	aggregateOnmetalMachine, err := s.getAggregateOnmetalMachine(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	return s.convertOnmetalMachine(onmetalMachine)
+	return s.convertAggregateOnmetalMachine(aggregateOnmetalMachine)
 }
 
 func (s *Server) ListMachines(ctx context.Context, req *ori.ListMachinesRequest) (*ori.ListMachinesResponse, error) {

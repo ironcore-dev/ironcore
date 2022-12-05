@@ -16,19 +16,21 @@ package machine
 
 import (
 	"strings"
+	"time"
 
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	"github.com/onmetal/onmetal-api/orictl/table"
 	"github.com/onmetal/onmetal-api/orictl/table/tableconverter"
+	"k8s.io/apimachinery/pkg/util/duration"
 )
 
 var (
 	networkInterfaceHeaders = []table.Header{
-		{Name: "Machine ID"},
-		{Name: "Name"},
+		{Name: "ID"},
 		{Name: "Network Handle"},
 		{Name: "IPs"},
-		{Name: "State"},
+		{Name: "Virtual IP"},
+		{Name: "Age"},
 	}
 )
 
@@ -39,12 +41,11 @@ var NetworkInterface, NetworkInterfaceSlice = tableconverter.ForType[*ori.Networ
 	func(networkInterface *ori.NetworkInterface) ([]table.Row, error) {
 		return []table.Row{
 			{
-				networkInterface.MachineId,
-				networkInterface.Name,
-				networkInterface.Network.Handle,
-				strings.Join(networkInterface.Ips, ","),
-				networkInterface.GetVirtualIp().GetIp(),
-				networkInterface.State.String(),
+				networkInterface.Metadata.Id,
+				networkInterface.Spec.Network.Handle,
+				strings.Join(networkInterface.Spec.Ips, ","),
+				networkInterface.Spec.GetVirtualIp().GetIp(),
+				duration.HumanDuration(time.Since(time.Unix(0, networkInterface.Metadata.CreatedAt))),
 			},
 		}, nil
 	},

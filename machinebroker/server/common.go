@@ -16,7 +16,6 @@ package server
 
 import (
 	"context"
-	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
 	"math/rand"
@@ -25,25 +24,96 @@ import (
 	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/machinebroker/api/v1alpha1"
+	"github.com/onmetal/onmetal-api/machinebroker/apiutils"
+	"github.com/onmetal/onmetal-api/machinebroker/cleaner"
 	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 )
+
+func objectStructsToObjectPtrByNameMap[Obj any, ObjPtr ObjPtrable[Obj], S ~[]Obj](items S) map[string]*Obj {
+	res := make(map[string]*Obj)
+	for i := range items {
+		itemPtr := &items[i]
+		name := (ObjPtr(itemPtr)).GetName()
+		res[name] = itemPtr
+	}
+	return res
+}
+
+func objectByNameMapGetter[Obj client.Object](gr schema.GroupResource, m map[string]Obj) func(name string) (Obj, error) {
+	return func(name string) (Obj, error) {
+		obj, ok := m[name]
+		if ok {
+			return obj, nil
+		}
+		return obj, apierrors.NewNotFound(gr, name)
+	}
+}
+
+type ObjPtrable[E any] interface {
+	*E
+	client.Object
+}
+
+func clientGetter[Obj any, ObjPtr ObjPtrable[Obj]](ctx context.Context, c client.Client, namespace string) func(name string) (ObjPtr, error) {
+	return func(name string) (ObjPtr, error) {
+		obj := ObjPtr(new(Obj))
+		if err := c.Get(ctx, client.ObjectKey{Namespace: namespace, Name: name}, obj); err != nil {
+			return nil, err
+		}
+		return obj, nil
+	}
+}
 
 func (s *Server) loggerFrom(ctx context.Context, keysWithValues ...interface{}) logr.Logger {
 	return ctrl.LoggerFrom(ctx, keysWithValues...)
 }
 
-const idLength = 63
-
-func (s *Server) hashID(parts ...string) string {
-	h := sha256.New()
-	for _, part := range parts {
-		h.Write([]byte(part))
-	}
-	data := h.Sum(nil)
-	encoded := hex.EncodeToString(data)
-	return encoded[:idLength] // TODO: What about purely numerical IDs?
+func (s *Server) listManagedAndCreated(ctx context.Context, list client.ObjectList) error {
+	return s.client.List(ctx, list,
+		client.InNamespace(s.namespace),
+		client.MatchingLabels{
+			machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
+			machinebrokerv1alpha1.CreatedLabel: "true",
+		},
+	)
 }
+
+func (s *Server) listWithPurpose(ctx context.Context, list client.ObjectList, purpose string) error {
+	return s.client.List(ctx, list,
+		client.InNamespace(s.namespace),
+		client.MatchingLabels{
+			machinebrokerv1alpha1.PurposeLabel: purpose,
+		},
+	)
+}
+
+func (s *Server) getManagedAndCreated(ctx context.Context, name string, obj client.Object) error {
+	key := client.ObjectKey{Namespace: s.namespace, Name: name}
+	if err := s.client.Get(ctx, key, obj); err != nil {
+		return err
+	}
+	if !apiutils.IsManagedBy(obj, machinebrokerv1alpha1.MachineBrokerManager) || !apiutils.IsCreated(obj) {
+		gvk, err := apiutil.GVKForObject(obj, s.client.Scheme())
+		if err != nil {
+			return err
+		}
+
+		return apierrors.NewNotFound(schema.GroupResource{
+			Group:    gvk.Group,
+			Resource: gvk.Kind, // Yes, kind is good enough here
+		}, key.Name)
+	}
+	return nil
+}
+
+// idLength is 63 as this is the highest common denominator among resource name length limitations (e.g. k8s secret).
+const idLength = 63
 
 func (s *Server) generateID() string {
 	data := make([]byte, 32)
@@ -60,12 +130,33 @@ func (s *Server) generateID() string {
 	}
 }
 
-func (s *Server) convertOnmetalIPs(ips []commonv1alpha1.IP) []string {
-	res := make([]string, len(ips))
-	for i, ip := range ips {
-		res[i] = ip.String()
+func (s *Server) setupCleaner(ctx context.Context, log logr.Logger, retErr *error) (c *cleaner.Cleaner, cleanup func()) {
+	c = cleaner.New()
+	cleanup = func() {
+		if *retErr != nil {
+			select {
+			case <-ctx.Done():
+				log.Info("Cannot do cleanup since context expired")
+				return
+			default:
+				if err := c.Cleanup(ctx); err != nil {
+					log.Error(err, "Error cleaning up")
+				}
+			}
+		}
 	}
-	return res
+	return c, cleanup
+}
+
+func (s *Server) convertOnmetalIPSourcesToIPs(ipSources []networkingv1alpha1.IPSource) ([]string, error) {
+	res := make([]string, len(ipSources))
+	for i, ipSource := range ipSources {
+		if ipSource.Value == nil {
+			return nil, fmt.Errorf("ip source %d does not specify an ip literal", i)
+		}
+		res[i] = ipSource.Value.String()
+	}
+	return res, nil
 }
 
 func (s *Server) getOnmetalIPsIPFamilies(ips []commonv1alpha1.IP) []corev1.IPFamily {

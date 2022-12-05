@@ -21,3 +21,22 @@ func ToMap[S ~[]V, K comparable, V any](s S, f func(v V) K) map[K]V {
 	}
 	return res
 }
+
+func FindFunc[S ~[]V, V any](s S, f func(v V) bool) (V, bool) {
+	for _, v := range s {
+		if f(v) {
+			return v, true
+		}
+	}
+	var zero V
+	return zero, false
+}
+
+func FindRefFunc[S ~[]V, V any](s S, f func(v V) bool) *V {
+	for i, v := range s {
+		if f(v) {
+			return &s[i]
+		}
+	}
+	return nil
+}

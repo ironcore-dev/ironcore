@@ -20,7 +20,7 @@ import (
 )
 
 type Streams struct {
-	In  io.Writer
+	In  io.Reader
 	Out io.Writer
 	Err io.Writer
 }

@@ -21,6 +21,9 @@
 package v1alpha1
 
 import (
+	v1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	ipamv1alpha1 "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis/ipam/v1alpha1"
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis/networking/v1alpha1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -28,5 +31,42 @@ import (
 // Public to allow building arbitrary schemes.
 // All generated defaulters are covering - they call all nested defaulters.
 func RegisterDefaults(scheme *runtime.Scheme) error {
+	scheme.AddTypeDefaultingFunc(&v1alpha1.Machine{}, func(obj interface{}) { SetObjectDefaults_Machine(obj.(*v1alpha1.Machine)) })
+	scheme.AddTypeDefaultingFunc(&v1alpha1.MachineList{}, func(obj interface{}) { SetObjectDefaults_MachineList(obj.(*v1alpha1.MachineList)) })
 	return nil
+}
+
+func SetObjectDefaults_Machine(in *v1alpha1.Machine) {
+	for i := range in.Spec.NetworkInterfaces {
+		a := &in.Spec.NetworkInterfaces[i]
+		if a.NetworkInterfaceSource.Ephemeral != nil {
+			if a.NetworkInterfaceSource.Ephemeral.NetworkInterfaceTemplate != nil {
+				networkingv1alpha1.SetDefaults_NetworkInterfaceSpec(&a.NetworkInterfaceSource.Ephemeral.NetworkInterfaceTemplate.Spec)
+				for j := range a.NetworkInterfaceSource.Ephemeral.NetworkInterfaceTemplate.Spec.IPs {
+					b := &a.NetworkInterfaceSource.Ephemeral.NetworkInterfaceTemplate.Spec.IPs[j]
+					if b.Ephemeral != nil {
+						if b.Ephemeral.PrefixTemplate != nil {
+							ipamv1alpha1.SetDefaults_PrefixSpec(&b.Ephemeral.PrefixTemplate.Spec)
+						}
+					}
+				}
+			}
+		}
+	}
+	SetDefaults_MachineStatus(&in.Status)
+	for i := range in.Status.NetworkInterfaces {
+		a := &in.Status.NetworkInterfaces[i]
+		SetDefaults_NetworkInterfaceStatus(a)
+	}
+	for i := range in.Status.Volumes {
+		a := &in.Status.Volumes[i]
+		SetDefaults_VolumeStatus(a)
+	}
+}
+
+func SetObjectDefaults_MachineList(in *v1alpha1.MachineList) {
+	for i := range in.Items {
+		a := &in.Items[i]
+		SetObjectDefaults_Machine(a)
+	}
 }

@@ -29,15 +29,12 @@ import (
 )
 
 type Options struct {
-	MachineID string
 }
 
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
-	fs.StringVar(&o.MachineID, "machine-id", "", "ID of the machine to create the volume in.")
 }
 
 func (o *Options) MarkFlagsRequired(cmd *cobra.Command) {
-	_ = cmd.MarkFlagRequired("machine-id")
 }
 
 func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cobra.Command {
@@ -78,16 +75,15 @@ func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cob
 func Run(ctx context.Context, streams clicommon.Streams, client ori.MachineRuntimeClient, names []string, opts Options) error {
 	for _, name := range names {
 		if _, err := client.DeleteVolume(ctx, &ori.DeleteVolumeRequest{
-			MachineId:  opts.MachineID,
-			VolumeName: name,
+			VolumeId: name,
 		}); err != nil {
 			if status.Code(err) != codes.NotFound {
-				return fmt.Errorf("error deleting machine %s volume %s: %w", opts.MachineID, name, err)
+				return fmt.Errorf("error deleting volume %s: %w", name, err)
 			}
 
-			_, _ = fmt.Fprintf(streams.Out, "Machine %s volume %s not found\n", opts.MachineID, name)
+			_, _ = fmt.Fprintf(streams.Out, "Volume %s not found\n", name)
 		} else {
-			_, _ = fmt.Fprintf(streams.Out, "Machine %s volume %s deleted\n", opts.MachineID, name)
+			_, _ = fmt.Fprintf(streams.Out, "Volume %s deleted\n", name)
 		}
 	}
 	return nil

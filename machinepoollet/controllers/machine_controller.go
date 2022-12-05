@@ -17,6 +17,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/clientutils"
@@ -31,23 +32,19 @@ import (
 	machinepoolletclient "github.com/onmetal/onmetal-api/machinepoollet/client"
 	"github.com/onmetal/onmetal-api/machinepoollet/controllers/events"
 	"github.com/onmetal/onmetal-api/machinepoollet/mcm"
-	"github.com/onmetal/onmetal-api/machinepoollet/mleg"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	utilslices "github.com/onmetal/onmetal-api/utils/slices"
-	"golang.org/x/exp/slices"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
@@ -58,12 +55,24 @@ type MachineReconciler struct {
 
 	MachineRuntime ori.MachineRuntimeClient
 
-	MachineClassMapper             mcm.MachineClassMapper
-	MachineLifecycleEventGenerator mleg.MachineLifecycleEventGenerator
+	MachineClassMapper mcm.MachineClassMapper
 
 	MachinePoolName string
 
 	WatchFilterValue string
+}
+
+func (r *MachineReconciler) machineKeyLabelSelector(machineKey client.ObjectKey) map[string]string {
+	return map[string]string{
+		machinepoolletv1alpha1.MachineNamespaceLabel: machineKey.Namespace,
+		machinepoolletv1alpha1.MachineNameLabel:      machineKey.Name,
+	}
+}
+
+func (r *MachineReconciler) machineUIDLabelSelector(machineUID types.UID) map[string]string {
+	return map[string]string{
+		machinepoolletv1alpha1.MachineUIDLabel: string(machineUID),
+	}
 }
 
 func (r *MachineReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -78,46 +87,127 @@ func (r *MachineReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	return r.reconcileExists(ctx, log, machine)
 }
 
-func (r *MachineReconciler) deleteGone(ctx context.Context, log logr.Logger, machineKey client.ObjectKey) (ctrl.Result, error) {
-	log.V(1).Info("Delete gone")
-
-	log.V(1).Info("Listing machines matching key")
+func (r *MachineReconciler) listMachinesByMachineUID(ctx context.Context, machineUID types.UID) ([]*ori.Machine, error) {
 	res, err := r.MachineRuntime.ListMachines(ctx, &ori.ListMachinesRequest{
-		Filter: &ori.MachineFilter{
-			LabelSelector: map[string]string{
-				machinepoolletv1alpha1.MachineNamespaceLabel: machineKey.Namespace,
-				machinepoolletv1alpha1.MachineNameLabel:      machineKey.Name,
-			},
-		},
+		Filter: &ori.MachineFilter{LabelSelector: r.machineUIDLabelSelector(machineUID)},
 	})
 	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("error listing machines matching key: %w", err)
+		return nil, fmt.Errorf("error listing machines by machine uid: %w", err)
+	}
+	return res.Machines, nil
+}
+
+func (r *MachineReconciler) listMachinesByMachineKey(ctx context.Context, machineKey client.ObjectKey) ([]*ori.Machine, error) {
+	res, err := r.MachineRuntime.ListMachines(ctx, &ori.ListMachinesRequest{
+		Filter: &ori.MachineFilter{LabelSelector: r.machineKeyLabelSelector(machineKey)},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("error listing machines by machine key: %w", err)
+	}
+	return res.Machines, nil
+}
+
+func (r *MachineReconciler) getMachineByID(ctx context.Context, id string) (*ori.Machine, error) {
+	res, err := r.MachineRuntime.ListMachines(ctx, &ori.ListMachinesRequest{
+		Filter: &ori.MachineFilter{Id: id},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("error listing machines filtering by id: %w", err)
 	}
 
-	log.V(1).Info("Listed machines matching key", "NoOfMachines", len(res.Machines))
+	switch len(res.Machines) {
+	case 0:
+		return nil, status.Errorf(codes.NotFound, "machine %s not found", id)
+	case 1:
+		return res.Machines[0], nil
+	default:
+		return nil, fmt.Errorf("multiple machines found for id %s", id)
+	}
+}
+
+func (r *MachineReconciler) deleteMachines(ctx context.Context, log logr.Logger, machines []*ori.Machine) (bool, error) {
 	var (
-		errs []error
+		errs        []error
+		deletingIDs []string
 	)
-	for _, machine := range res.Machines {
-		log := log.WithValues("MachineID", machine.Id)
+	for _, machine := range machines {
+		machineID := machine.Metadata.Id
+		log := log.WithValues("MachineID", machineID)
 		log.V(1).Info("Deleting matching machine")
 		if _, err := r.MachineRuntime.DeleteMachine(ctx, &ori.DeleteMachineRequest{
-			MachineId: machine.Id,
+			MachineId: machineID,
 		}); err != nil {
 			if status.Code(err) != codes.NotFound {
-				errs = append(errs, fmt.Errorf("error deleting machine %s: %w", machine.Id, err))
+				errs = append(errs, fmt.Errorf("error deleting machine %s: %w", machineID, err))
 			} else {
 				log.V(1).Info("Machine is already gone")
 			}
+		} else {
+			log.V(1).Info("Issued machine deletion")
+			deletingIDs = append(deletingIDs, machineID)
 		}
 	}
 
-	if len(errs) > 0 {
-		return ctrl.Result{}, fmt.Errorf("error(s) deleting matching machine(s): %v", errs)
+	switch {
+	case len(errs) > 0:
+		return false, fmt.Errorf("error(s) deleting matching machine(s): %v", errs)
+	case len(deletingIDs) > 0:
+		log.V(1).Info("Machines are still deleting", "DeletingIDs", deletingIDs)
+		return false, nil
+	default:
+		log.V(1).Info("No machine present")
+		return true, nil
+	}
+}
+
+func (r *MachineReconciler) deleteGone(ctx context.Context, log logr.Logger, machineKey client.ObjectKey) (ctrl.Result, error) {
+	log.V(1).Info("Delete gone")
+
+	log.V(1).Info("Listing machines by machine key")
+	machines, err := r.listMachinesByMachineKey(ctx, machineKey)
+	if err != nil {
+		return ctrl.Result{}, fmt.Errorf("error listing machines: %w", err)
 	}
 
-	log.V(1).Info("Deleted gone")
-	return ctrl.Result{}, nil
+	ok, err := r.deleteMachines(ctx, log, machines)
+	if err != nil {
+		return ctrl.Result{}, fmt.Errorf("error deleting machines: %w", err)
+	}
+	if !ok {
+		log.V(1).Info("Not all machines are gone yet, requeueing")
+		return ctrl.Result{Requeue: true}, nil
+	}
+
+	var errs []error
+
+	log.V(1).Info("Deleting volumes by machine key")
+	allVolumesGone, err := r.deleteVolumesByMachineKey(ctx, log, machineKey)
+	switch {
+	case err != nil:
+		errs = append(errs, fmt.Errorf("error deleting volumes: %w", err))
+	case !allVolumesGone:
+		ok = false
+	}
+
+	log.V(1).Info("Deleting network interfaces by machine key")
+	allNetworkInterfacesGone, err := r.deleteNetworkInterfacesByMachineKey(ctx, log, machineKey)
+	switch {
+	case err != nil:
+		errs = append(errs, fmt.Errorf("error deleting network interfaces: %w", err))
+	case !allNetworkInterfacesGone:
+		ok = false
+	}
+
+	switch {
+	case len(errs) > 0:
+		return ctrl.Result{}, fmt.Errorf("error(s) deleting dependents: %v", errs)
+	case !ok:
+		log.V(1).Info("Dependents are still deleting, requeueing")
+		return ctrl.Result{Requeue: true}, nil
+	default:
+		log.V(1).Info("Deleted")
+		return ctrl.Result{}, nil
+	}
 }
 
 func (r *MachineReconciler) reconcileExists(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) (ctrl.Result, error) {
@@ -137,56 +227,103 @@ func (r *MachineReconciler) delete(ctx context.Context, log logr.Logger, machine
 
 	log.V(1).Info("Finalizer present")
 
+	log.V(1).Info("Deleting machines by UID")
+	allGone, err := r.deleteMachinesByMachineUID(ctx, log, machine.UID)
+	if err != nil {
+		return ctrl.Result{}, fmt.Errorf("error deleting machines: %w", err)
+	}
+	if !allGone {
+		log.V(1).Info("Not all machines are gone, requeueing")
+		return ctrl.Result{Requeue: true}, nil
+	}
+
+	var (
+		errs []error
+		ok   = true
+	)
+
+	log.V(1).Info("Deleting volumes by UID")
+	allVolumesGone, err := r.deleteVolumesByMachineUID(ctx, log, machine.UID)
+	switch {
+	case err != nil:
+		errs = append(errs, fmt.Errorf("error deleting volumes: %w", err))
+	case !allVolumesGone:
+		ok = false
+	}
+
+	log.V(1).Info("Deleting network interfaces by UID")
+	allNetworkInterfacesGone, err := r.deleteNetworkInterfacesByMachineUID(ctx, log, machine.UID)
+	switch {
+	case err != nil:
+		errs = append(errs, fmt.Errorf("error deleting network interfaces: %w", err))
+	case !allNetworkInterfacesGone:
+		ok = false
+	}
+
+	switch {
+	case len(errs) > 0:
+		return ctrl.Result{}, fmt.Errorf("error(s) deleting dependents: %v", errs)
+	case !ok:
+		log.V(1).Info("Dependents are still deleting, requeueing")
+		return ctrl.Result{Requeue: true}, nil
+	default:
+		log.V(1).Info("Deleted all parts, removing finalizer")
+		if err := clientutils.PatchRemoveFinalizer(ctx, r.Client, machine, machinepoolletv1alpha1.MachineFinalizer); err != nil {
+			return ctrl.Result{}, fmt.Errorf("error removing finalizer: %w", err)
+		}
+
+		log.V(1).Info("Deleted")
+		return ctrl.Result{}, nil
+	}
+}
+
+func (r *MachineReconciler) deleteMachinesByMachineUID(ctx context.Context, log logr.Logger, machineUID types.UID) (bool, error) {
 	log.V(1).Info("Listing machines")
 	res, err := r.MachineRuntime.ListMachines(ctx, &ori.ListMachinesRequest{
 		Filter: &ori.MachineFilter{
 			LabelSelector: map[string]string{
-				machinepoolletv1alpha1.MachineUIDLabel: string(machine.UID),
+				machinepoolletv1alpha1.MachineUIDLabel: string(machineUID),
 			},
 		},
 	})
 	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("error listing machines: %w", err)
+		return false, fmt.Errorf("error listing machines: %w", err)
 	}
 
 	log.V(1).Info("Listed machines", "NoOfMachines", len(res.Machines))
 	var (
 		errs               []error
-		machinesInDeletion []string
+		deletingMachineIDs []string
 	)
 	for _, machine := range res.Machines {
-		log := log.WithValues("MachineID", machine.Id)
+		machineID := machine.Metadata.Id
+		log := log.WithValues("MachineID", machineID)
 		log.V(1).Info("Deleting machine")
 		_, err := r.MachineRuntime.DeleteMachine(ctx, &ori.DeleteMachineRequest{
-			MachineId: machine.Id,
+			MachineId: machineID,
 		})
 		if err != nil {
 			if status.Code(err) != codes.NotFound {
-				errs = append(errs, fmt.Errorf("error deleting machine %s: %w", machine.Id, err))
+				errs = append(errs, fmt.Errorf("error deleting machine %s: %w", machineID, err))
 			} else {
 				log.V(1).Info("Machine is already gone")
 			}
 		} else {
 			log.V(1).Info("Issued machine deletion")
-			machinesInDeletion = append(machinesInDeletion, machine.Id)
+			deletingMachineIDs = append(deletingMachineIDs, machineID)
 		}
 	}
 
-	if len(errs) > 0 {
-		return ctrl.Result{}, fmt.Errorf("error(s) deleting machines: %v", errs)
+	switch {
+	case len(errs) > 0:
+		return false, fmt.Errorf("error(s) deleting machine(s): %v", errs)
+	case len(deletingMachineIDs) > 0:
+		log.V(1).Info("Machines are in deletion", "DeletingMachineIDs", deletingMachineIDs)
+		return false, nil
+	default:
+		log.V(1).Info("All machines are gone")
+		return true, nil
 	}
-	if len(machinesInDeletion) > 0 {
-		log.V(1).Info("Machines are in deletion, requeueing", "MachinesInDeletion", machinesInDeletion)
-		return ctrl.Result{Requeue: true}, nil
-	}
-
-	log.V(1).Info("Deleted all runtime machines, removing finalizer")
-	if err := clientutils.PatchRemoveFinalizer(ctx, r.Client, machine, machinepoolletv1alpha1.MachineFinalizer); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error removing finalizer: %w", err)
-	}
-
-	log.V(1).Info("Deleted")
-	return ctrl.Result{}, nil
 }
 
 func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) (ctrl.Result, error) {
@@ -214,25 +351,33 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 	}
 
 	log.V(1).Info("Listing machines")
-	res, err := r.MachineRuntime.ListMachines(ctx, &ori.ListMachinesRequest{
-		Filter: &ori.MachineFilter{
-			LabelSelector: map[string]string{
-				machinepoolletv1alpha1.MachineUIDLabel: string(machine.UID),
-			},
-		},
-	})
+	machines, err := r.listMachinesByMachineUID(ctx, machine.UID)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error listing machines: %w", err)
 	}
 
-	switch len(res.Machines) {
+	switch len(machines) {
 	case 0:
 		return r.create(ctx, log, machine)
 	case 1:
-		runtimeMachine := res.Machines[0]
+		runtimeMachine := machines[0]
 		return r.update(ctx, log, machine, runtimeMachine)
 	default:
 		panic("unhandled: multiple machines")
+	}
+}
+
+func (r *MachineReconciler) oriMachineLabels(machine *computev1alpha1.Machine) map[string]string {
+	return map[string]string{
+		machinepoolletv1alpha1.MachineUIDLabel:       string(machine.UID),
+		machinepoolletv1alpha1.MachineNamespaceLabel: machine.Namespace,
+		machinepoolletv1alpha1.MachineNameLabel:      machine.Name,
+	}
+}
+
+func (r *MachineReconciler) oriMachineAnnotations(machine *computev1alpha1.Machine) map[string]string {
+	return map[string]string{
+		machinepoolletv1alpha1.MachineGenerationAnnotation: strconv.FormatInt(machine.Generation, 10),
 	}
 }
 
@@ -240,23 +385,26 @@ func (r *MachineReconciler) create(ctx context.Context, log logr.Logger, machine
 	log.V(1).Info("Create")
 
 	log.V(1).Info("Getting machine config")
-	machineConfig, err := r.getMachineConfig(ctx, log, machine)
+	oriMachine, ok, err := r.prepareORIMachine(ctx, log, machine)
 	if err != nil {
-		err = fmt.Errorf("error getting machine config: %w", err)
-		return ctrl.Result{}, IgnoreDependencyNotReadyError(err)
+		return ctrl.Result{}, fmt.Errorf("error preparing ori machine: %w", err)
+	}
+	if !ok {
+		log.V(1).Info("Machine is not yet ready")
+		return ctrl.Result{}, nil
 	}
 
 	log.V(1).Info("Creating machine")
 	res, err := r.MachineRuntime.CreateMachine(ctx, &ori.CreateMachineRequest{
-		Config: machineConfig,
+		Machine: oriMachine,
 	})
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error creating machine: %w", err)
 	}
-	log.V(1).Info("Created", "MachineID", res.Machine.Id)
+	log.V(1).Info("Created", "MachineID", res.Machine.Metadata.Id)
 
 	log.V(1).Info("Updating status")
-	if err := r.updateStatus(ctx, log, machine, res.Machine.Id); err != nil {
+	if err := r.updateStatus(ctx, log, machine, res.Machine); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error updating machine status: %w", err)
 	}
 
@@ -264,55 +412,57 @@ func (r *MachineReconciler) create(ctx context.Context, log logr.Logger, machine
 	return ctrl.Result{}, nil
 }
 
-func (r *MachineReconciler) updateStatus(
-	ctx context.Context,
-	log logr.Logger,
-	machine *computev1alpha1.Machine,
-	machineID string,
-) error {
-	log.V(1).Info("Getting runtime status")
-	res, err := r.MachineRuntime.MachineStatus(ctx, &ori.MachineStatusRequest{
-		MachineId: machineID,
-	})
+func (r *MachineReconciler) getMachineGeneration(oriMachine *ori.Machine) (int64, error) {
+	observedGenerationData, ok := oriMachine.Metadata.Annotations[machinepoolletv1alpha1.MachineGenerationAnnotation]
+	if !ok {
+		return 0, fmt.Errorf("ori machine has no machine generation data at %s", machinepoolletv1alpha1.MachineGenerationAnnotation)
+	}
+
+	generation, err := strconv.ParseInt(observedGenerationData, 10, 64)
 	if err != nil {
-		return fmt.Errorf("error getting machine status: %w", err)
+		return 0, fmt.Errorf("error parsing machine generation annotation %s data %s: %w",
+			machinepoolletv1alpha1.MachineGenerationAnnotation,
+			observedGenerationData,
+			err,
+		)
+	}
+
+	return generation, nil
+}
+
+func (r *MachineReconciler) updateStatus(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine, oriMachine *ori.Machine) error {
+	if actualORIGeneration, observedORIGeneration := oriMachine.Metadata.Generation, oriMachine.Status.ObservedGeneration; actualORIGeneration != observedORIGeneration {
+		log.V(1).Info("ORI machine was not observed at the latest generation",
+			"ActualGeneration", actualORIGeneration,
+			"ObservedGeneration", observedORIGeneration,
+		)
+		return nil
 	}
 
 	base := machine.DeepCopy()
 	now := metav1.Now()
-	runtimeStatus := res.Status
 
-	runtimeVolumeStatusByName := utilslices.ToMap(runtimeStatus.Volumes, func(volumeStatus *ori.VolumeStatus) string { return volumeStatus.Name })
-	for i := range machine.Status.Volumes {
-		volumeStatus := &machine.Status.Volumes[i]
-		runtimeVolumeStatus := runtimeVolumeStatusByName[volumeStatus.Name]
-		r.updateVolumeStatus(volumeStatus, runtimeVolumeStatus, now)
-		delete(runtimeVolumeStatusByName, volumeStatus.Name)
-	}
-	for name, runtimeVolumeStatus := range runtimeVolumeStatusByName {
-		volumeStatus := &computev1alpha1.VolumeStatus{Name: name}
-		r.updateVolumeStatus(volumeStatus, runtimeVolumeStatus, now)
-		machine.Status.Volumes = append(machine.Status.Volumes, *volumeStatus)
+	generation, err := r.getMachineGeneration(oriMachine)
+	if err != nil {
+		return err
 	}
 
-	runtimeNetworkInterfaceStatusByName := utilslices.ToMap(runtimeStatus.NetworkInterfaces, func(networkInterfaceStatus *ori.NetworkInterfaceStatus) string { return networkInterfaceStatus.Name })
-	for i := range machine.Status.NetworkInterfaces {
-		networkInterfaceStatus := &machine.Status.NetworkInterfaces[i]
-		runtimeNetworkInterfaceStatus := runtimeNetworkInterfaceStatusByName[networkInterfaceStatus.Name]
-		if err := r.updateNetworkInterfaceStatus(networkInterfaceStatus, runtimeNetworkInterfaceStatus, now); err != nil {
-			return fmt.Errorf("error updating network interface %s status: %w", networkInterfaceStatus.Name, err)
-		}
-		delete(runtimeNetworkInterfaceStatusByName, networkInterfaceStatus.Name)
-	}
-	for name, runtimeNetworkInterfaceStatus := range runtimeNetworkInterfaceStatusByName {
-		networkInterfaceStatus := &computev1alpha1.NetworkInterfaceStatus{Name: name}
-		if err := r.updateNetworkInterfaceStatus(networkInterfaceStatus, runtimeNetworkInterfaceStatus, now); err != nil {
-			return fmt.Errorf("error updating network interface %s status: %w", networkInterfaceStatus.Name, err)
-		}
-		machine.Status.NetworkInterfaces = append(machine.Status.NetworkInterfaces, *networkInterfaceStatus)
+	machine.Status.MachinePoolObservedGeneration = generation
+
+	state, err := r.convertORIMachineState(oriMachine.Status.State)
+	if err != nil {
+		return err
 	}
 
-	machine.Status.State = r.oriMachineStateToComputeV1Alpha1MachineState(runtimeStatus.State)
+	machine.Status.State = state
+
+	if err := r.updateVolumeStates(machine, oriMachine, now); err != nil {
+		return fmt.Errorf("error updating volume states: %w", err)
+	}
+
+	if err := r.updateNetworkInterfaceStates(machine, oriMachine, now); err != nil {
+		return fmt.Errorf("error updating network interface states: %w", err)
+	}
 
 	if err := r.Status().Patch(ctx, machine, client.MergeFrom(base)); err != nil {
 		return fmt.Errorf("error patching status: %w", err)
@@ -320,480 +470,200 @@ func (r *MachineReconciler) updateStatus(
 	return nil
 }
 
-func (r *MachineReconciler) updateVolumeStatus(volumeStatus *computev1alpha1.VolumeStatus, runtimeVolumeStatus *ori.VolumeStatus, now metav1.Time) {
-	var (
-		newState   computev1alpha1.VolumeState
-		device     string
-		emptyDisk  *computev1alpha1.EmptyDiskVolumeStatus
-		referenced *computev1alpha1.ReferencedVolumeStatus
-	)
-
-	if runtimeVolumeStatus != nil {
-		newState = r.oriVolumeStateToComputeV1Alpha1VolumeState(runtimeVolumeStatus.State)
-		device = runtimeVolumeStatus.Device
-		if runtimeEmptyDisk := runtimeVolumeStatus.EmptyDisk; runtimeEmptyDisk != nil {
-			emptyDisk = &computev1alpha1.EmptyDiskVolumeStatus{
-				Size: resource.NewQuantity(int64(runtimeEmptyDisk.SizeBytes), resource.DecimalSI),
-			}
-		}
-		if runtimeAccess := runtimeVolumeStatus.Access; runtimeAccess != nil {
-			referenced = &computev1alpha1.ReferencedVolumeStatus{
-				Driver: runtimeAccess.Driver,
-				Handle: runtimeAccess.Handle,
-			}
-		}
-	} else {
-		newState = computev1alpha1.VolumeStateDetached
-	}
-
-	if volumeStatus.State != newState {
-		volumeStatus.LastStateTransitionTime = &now
-	}
-
-	volumeStatus.State = newState
-	volumeStatus.Device = device
-	volumeStatus.EmptyDisk = emptyDisk
-	volumeStatus.Referenced = referenced
-}
-
-func (r *MachineReconciler) updateNetworkInterfaceStatus(
-	networkInterfaceStatus *computev1alpha1.NetworkInterfaceStatus,
-	runtimeNetworkInterfaceStatus *ori.NetworkInterfaceStatus,
-	now metav1.Time,
-) error {
-	var (
-		newState      computev1alpha1.NetworkInterfaceState
-		networkHandle string
-		ips           []commonv1alpha1.IP
-		virtualIP     *commonv1alpha1.IP
-	)
-
-	if runtimeNetworkInterfaceStatus != nil {
-		networkHandle = runtimeNetworkInterfaceStatus.Network.Handle
-
-		for _, ipString := range runtimeNetworkInterfaceStatus.Ips {
-			ip, err := commonv1alpha1.ParseIP(ipString)
-			if err != nil {
-				return fmt.Errorf("error parsing ip %s: %w", ipString, err)
-			}
-
-			ips = append(ips, ip)
-		}
-
-		if runtimeVirtualIP := runtimeNetworkInterfaceStatus.VirtualIp; runtimeVirtualIP != nil {
-			ip, err := commonv1alpha1.ParseIP(runtimeVirtualIP.Ip)
-			if err != nil {
-				return fmt.Errorf("error parsing virtual ip %s: %w", runtimeVirtualIP.Ip, err)
-			}
-
-			virtualIP = &ip
-		}
-	} else {
-		newState = computev1alpha1.NetworkInterfaceStateDetached
-	}
-
-	if networkInterfaceStatus.State != newState {
-		networkInterfaceStatus.LastStateTransitionTime = &now
-	}
-
-	networkInterfaceStatus.State = newState
-	networkInterfaceStatus.NetworkHandle = networkHandle
-	networkInterfaceStatus.IPs = ips
-	networkInterfaceStatus.VirtualIP = virtualIP
-	return nil
-}
-
 func (r *MachineReconciler) update(
 	ctx context.Context,
 	log logr.Logger,
 	machine *computev1alpha1.Machine,
-	runtimeMachine *ori.Machine,
+	oriMachine *ori.Machine,
 ) (ctrl.Result, error) {
 	log.V(1).Info("Updating existing machine")
 
 	var errs []error
 
-	log.V(1).Info("Reconciling network interfaces")
-	err := r.reconcileNetworkInterfaces(ctx, log, machine, runtimeMachine.Id)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("error reconciling network interfaces: %w", err))
+	log.V(1).Info("Updating volumes")
+	if err := r.updateORIVolumes(ctx, log, machine, oriMachine); err != nil {
+		errs = append(errs, fmt.Errorf("error updating volumes: %w", err))
 	}
 
-	log.V(1).Info("Reconciling volumes")
-	if err := r.reconcileVolumes(ctx, log, machine, runtimeMachine.Id); err != nil {
-		errs = append(errs, fmt.Errorf("error reconciling volumes: %w", err))
-	}
-
-	log.V(1).Info("Updating status")
-	if err := r.updateStatus(ctx, log, machine, runtimeMachine.Id); err != nil {
-		if len(errs) > 0 {
-			log.V(1).Info("Error(s) reconciling machine", "Errors", errs)
-		}
-		return ctrl.Result{}, fmt.Errorf("error patching status: %w", err)
+	log.V(1).Info("Updating network interfaces")
+	if err := r.updateORINetworkInterfaces(ctx, log, machine, oriMachine); err != nil {
+		errs = append(errs, fmt.Errorf("error updating network interfaces: %w", err))
 	}
 
 	if len(errs) > 0 {
-		return ctrl.Result{}, fmt.Errorf("error(s) reconciling machine: %v", errs)
+		return ctrl.Result{}, fmt.Errorf("error(s) updating machine: %v", errs)
+	}
+
+	log.V(1).Info("Updating ori machine annotations")
+	if _, err := r.MachineRuntime.UpdateMachineAnnotations(ctx, &ori.UpdateMachineAnnotationsRequest{
+		MachineId:   oriMachine.Metadata.Id,
+		Annotations: r.oriMachineAnnotations(machine),
+	}); err != nil {
+		return ctrl.Result{}, fmt.Errorf("error updating machine annotations")
+	}
+
+	log.V(1).Info("Getting ori machine")
+	m, err := r.getMachineByID(ctx, oriMachine.Metadata.Id)
+	if err != nil {
+		return ctrl.Result{}, fmt.Errorf("error getting ori machine: %w", err)
+	}
+	oriMachine = m
+
+	log.V(1).Info("Updating machine status")
+	if err := r.updateStatus(ctx, log, machine, oriMachine); err != nil {
+		return ctrl.Result{}, fmt.Errorf("error updating status")
 	}
 
 	log.V(1).Info("Updated existing machine")
 	return ctrl.Result{}, nil
 }
 
-func (r *MachineReconciler) reconcileNetworkInterfaces(
-	ctx context.Context,
-	log logr.Logger,
-	machine *computev1alpha1.Machine,
-	machineID string,
-) error {
-	res, err := r.MachineRuntime.ListNetworkInterfaces(ctx, &ori.ListNetworkInterfacesRequest{
-		Filter: &ori.NetworkInterfaceFilter{MachineId: machineID},
-	})
+var oriMachineStateToMachineState = map[ori.MachineState]computev1alpha1.MachineState{
+	ori.MachineState_MACHINE_PENDING:   computev1alpha1.MachineStatePending,
+	ori.MachineState_MACHINE_RUNNING:   computev1alpha1.MachineStateRunning,
+	ori.MachineState_MACHINE_SUSPENDED: computev1alpha1.MachineStateShutdown,
+}
+
+func (r *MachineReconciler) convertORIMachineState(state ori.MachineState) (computev1alpha1.MachineState, error) {
+	if res, ok := oriMachineStateToMachineState[state]; ok {
+		return res, nil
+	}
+	return "", fmt.Errorf("unknown machine state %v", state)
+}
+
+func (r *MachineReconciler) prepareORIMachineClass(ctx context.Context, machine *computev1alpha1.Machine, machineClassName string) (string, bool, error) {
+	machineClass := &computev1alpha1.MachineClass{}
+	machineClassKey := client.ObjectKey{Name: machineClassName}
+	if err := r.Get(ctx, machineClassKey, machineClass); err != nil {
+		if !apierrors.IsNotFound(err) {
+			return "", false, fmt.Errorf("error getting machine class: %w", err)
+		}
+
+		r.Eventf(machine, corev1.EventTypeNormal, events.MachineClassNotReady, "Machine class %s is not ready: %v", err)
+		return "", false, nil
+	}
+
+	caps, err := getORIMachineClassCapabilities(machineClass)
 	if err != nil {
-		return fmt.Errorf("error listing network interfaces: %w", err)
+		return "", false, fmt.Errorf("error getting ori machine class capabilities: %w", err)
 	}
 
-	specNetworkInterfaceByName := utilslices.ToMap(machine.Spec.NetworkInterfaces, func(v computev1alpha1.NetworkInterface) string { return v.Name })
-	existingNetworkInterfaceByName := utilslices.ToMap(res.NetworkInterfaces, func(v *ori.NetworkInterface) string { return v.Name })
-
-	var errs []error
-
-	for name, specNetworkInterface := range specNetworkInterfaceByName {
-		log := log.WithValues("NetworkInterfaceName", name)
-
-		existingNetworkInterface := existingNetworkInterfaceByName[name]
-
-		if err := r.applyNetworkInterface(ctx, log, machine, specNetworkInterface, machineID, existingNetworkInterface); err != nil {
-			if !IsDependencyNotReadyError(err) {
-				r.EventRecorder.Eventf(machine, corev1.EventTypeWarning, events.ErrorApplyingNetworkInterface, "Error applying network interface %s: %v", name, err)
-				errs = append(errs, fmt.Errorf("[network interface %s] %w", name, err))
-			} else {
-				r.EventRecorder.Eventf(machine, corev1.EventTypeNormal, events.NetworkInterfaceNotReady, "Network interface %s not ready: %v", name, err)
-			}
-		}
-	}
-
-	for name := range existingNetworkInterfaceByName {
-		log := log.WithValues("NetworkInterfaceName", name)
-
-		if _, ok := specNetworkInterfaceByName[name]; ok {
-			continue
-		}
-
-		if err := r.deleteNetworkInterface(ctx, log, machineID, name); err != nil {
-			r.EventRecorder.Eventf(machine, corev1.EventTypeWarning, events.ErrorDetachingNetworkInterface, "Error detaching network interface %s: %v", name, err)
-			errs = append(errs, fmt.Errorf("error detaching network interface %s: %w", name, err))
-		}
-	}
-
-	if len(errs) > 0 {
-		return fmt.Errorf("error(s) reconciling network interfaces: %v", errs)
-	}
-	return nil
-}
-
-func (r *MachineReconciler) isNetworkInterfaceUpToDate(config *ori.NetworkInterfaceConfig, networkInterface *ori.NetworkInterface) bool {
-	if !r.networkInterfaceNetworkCompatible(config.Network, networkInterface.Network) {
-		return false
-	}
-
-	if !slices.Equal(config.Ips, networkInterface.Ips) {
-		return false
-	}
-
-	if config.VirtualIp != nil {
-		if networkInterface.VirtualIp == nil {
-			return false
-		}
-
-		if config.VirtualIp.Ip != networkInterface.VirtualIp.Ip {
-			return false
-		}
-	}
-
-	return true
-}
-
-func (r *MachineReconciler) networkInterfaceNetworkCompatible(config, current *ori.NetworkConfig) bool {
-	return config.Handle == current.Handle
-}
-
-func (r *MachineReconciler) deleteNetworkInterface(
-	ctx context.Context,
-	log logr.Logger,
-	machineID string,
-	networkInterfaceName string,
-) error {
-	log.V(1).Info("Detaching network interface")
-	if _, err := r.MachineRuntime.DeleteNetworkInterface(ctx, &ori.DeleteNetworkInterfaceRequest{
-		MachineId:            machineID,
-		NetworkInterfaceName: networkInterfaceName,
-	}); err != nil {
-		if status.Code(err) != codes.NotFound {
-			return fmt.Errorf("error detaching network interface: %w", err)
-		}
-		log.V(1).Info("Network interface is already gone")
-	}
-	return nil
-}
-
-func (r *MachineReconciler) applyNetworkInterface(
-	ctx context.Context,
-	log logr.Logger,
-	machine *computev1alpha1.Machine,
-	networkInterface computev1alpha1.NetworkInterface,
-	machineID string,
-	existingNetworkInterface *ori.NetworkInterface,
-) error {
-	log.V(1).Info("Getting network interface config")
-	config, err := r.getORINetworkInterfaceConfig(ctx, machine, &networkInterface)
+	class, err := r.MachineClassMapper.GetMachineClassFor(ctx, machineClassName, caps)
 	if err != nil {
-		return fmt.Errorf("error getting machine network interface config: %w", err)
+		return "", false, fmt.Errorf("error getting matching machine class: %w", err)
 	}
-
-	if existingNetworkInterface != nil {
-		if r.isNetworkInterfaceUpToDate(config, existingNetworkInterface) {
-			log.V(1).Info("Network interface is up-to-date")
-			return nil
-		}
-
-		if r.networkInterfaceNetworkCompatible(config.Network, existingNetworkInterface.Network) {
-			log.V(1).Info("Network interface is not up-to-date but network is compatible, updating")
-			_, err := r.MachineRuntime.UpdateNetworkInterface(ctx, &ori.UpdateNetworkInterfaceRequest{
-				MachineId:            machineID,
-				NetworkInterfaceName: networkInterface.Name,
-				Ips:                  config.Ips,
-				VirtualIp:            config.VirtualIp,
-			})
-			if err != nil {
-				return fmt.Errorf("error updating network interface: %w", err)
-			}
-
-			return nil
-		}
-
-		log.V(1).Info("Network interface is not up-to-date and network is incompatible, deleting")
-		if _, err := r.MachineRuntime.DeleteNetworkInterface(ctx, &ori.DeleteNetworkInterfaceRequest{
-			MachineId:            machineID,
-			NetworkInterfaceName: networkInterface.Name,
-		}); err != nil {
-			err = fmt.Errorf("error deleting network interface: %w", err)
-			return err
-		}
-	}
-
-	log.V(1).Info("Creating network interface")
-	if _, err := r.MachineRuntime.CreateNetworkInterface(ctx, &ori.CreateNetworkInterfaceRequest{
-		MachineId: machineID,
-		Config:    config,
-	}); err != nil {
-		return fmt.Errorf("error attaching network interface: %w", err)
-	}
-	return nil
+	return class.Name, true, nil
 }
 
-func (r *MachineReconciler) isVolumeUpToDate(config *ori.VolumeConfig, volume *ori.Volume) bool {
-	switch {
-	case config.EmptyDisk != nil && volume.EmptyDisk != nil:
-		return config.EmptyDisk.SizeLimitBytes == volume.EmptyDisk.SizeLimitBytes
-	case config.Access != nil && volume.Access != nil:
-		return config.Access.Driver == volume.Access.Driver && config.Access.Handle == volume.Access.Handle
-	default:
-		return false
-	}
-}
+func getORIMachineClassCapabilities(machineClass *computev1alpha1.MachineClass) (*ori.MachineClassCapabilities, error) {
+	cpu := machineClass.Capabilities.Cpu()
+	memory := machineClass.Capabilities.Memory()
 
-func (r *MachineReconciler) applyVolume(
-	ctx context.Context,
-	log logr.Logger,
-	machine *computev1alpha1.Machine,
-	volume computev1alpha1.Volume,
-	machineID string,
-	existingVolume *ori.Volume,
-) error {
-	log.V(1).Info("Getting volume config")
-	config, err := r.getORIVolumeConfig(ctx, machine, &volume)
-	if err != nil {
-		return fmt.Errorf("error getting machine volume config: %w", err)
-	}
-
-	if existingVolume != nil {
-		if r.isVolumeUpToDate(config, existingVolume) {
-			log.V(1).Info("Existing volume is up-to-date")
-			return nil
-		}
-
-		log.V(1).Info("Existing volume is not up-to-date, deleting")
-		if _, err := r.MachineRuntime.DeleteVolume(ctx, &ori.DeleteVolumeRequest{
-			MachineId:  machineID,
-			VolumeName: volume.Name,
-		}); err != nil {
-			if status.Code(err) != codes.NotFound {
-				return fmt.Errorf("error deleting volume: %w", err)
-			} else {
-				log.V(1).Info("Volume is already gone")
-			}
-		}
-	}
-
-	log.V(1).Info("Creating volume")
-	if _, err := r.MachineRuntime.CreateVolume(ctx, &ori.CreateVolumeRequest{
-		MachineId: machineID,
-		Config:    config,
-	}); err != nil {
-		return fmt.Errorf("error creating volume: %w", err)
-	}
-	return nil
-}
-
-func (r *MachineReconciler) deleteVolume(
-	ctx context.Context,
-	log logr.Logger,
-	machineID string,
-	volumeName string,
-) error {
-	log.V(1).Info("Detaching volume")
-	if _, err := r.MachineRuntime.DeleteVolume(ctx, &ori.DeleteVolumeRequest{
-		MachineId:  machineID,
-		VolumeName: volumeName,
-	}); err != nil {
-		if status.Code(err) != codes.NotFound {
-			return fmt.Errorf("error detaching volume: %w", err)
-		}
-		log.V(1).Info("Volume is already gone")
-	}
-	return nil
-}
-
-func (r *MachineReconciler) reconcileVolumes(
-	ctx context.Context,
-	log logr.Logger,
-	machine *computev1alpha1.Machine,
-	machineID string,
-) error {
-	res, err := r.MachineRuntime.ListVolumes(ctx, &ori.ListVolumesRequest{
-		Filter: &ori.VolumeFilter{MachineId: machineID},
-	})
-	if err != nil {
-		return fmt.Errorf("error listing volumes for machine: %w", err)
-	}
-
-	specVolumeByName := utilslices.ToMap(machine.Spec.Volumes, func(v computev1alpha1.Volume) string { return v.Name })
-	existingVolumeByName := utilslices.ToMap(res.Volumes, func(v *ori.Volume) string { return v.Name })
-
-	var errs []error
-
-	for name, specVolume := range specVolumeByName {
-		log := log.WithValues("VolumeName", name)
-
-		existingVolume := existingVolumeByName[name]
-		if err := r.applyVolume(ctx, log, machine, specVolume, machineID, existingVolume); err != nil {
-			if !IsDependencyNotReadyError(err) {
-				r.EventRecorder.Eventf(machine, corev1.EventTypeWarning, events.ErrorApplyingVolume, "Error applying volume %s: %w", name, err)
-				errs = append(errs, fmt.Errorf("error applying volume %s: %w", name, err))
-			} else {
-				r.EventRecorder.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady, "Volume %s not ready: %w", name, err)
-			}
-		}
-	}
-
-	for name := range existingVolumeByName {
-		log := log.WithValues("VolumeName", name)
-
-		if _, ok := specVolumeByName[name]; ok {
-			continue
-		}
-
-		if err := r.deleteVolume(ctx, log, machineID, name); err != nil {
-			r.Eventf(machine, corev1.EventTypeWarning, events.ErrorDetachingVolume, "Error detaching volume %s: %w", name, err)
-			errs = append(errs, fmt.Errorf("error deleting volume %s: %w", name, err))
-		}
-	}
-
-	if len(errs) > 0 {
-		return fmt.Errorf("error(s) reconciling volumes: %v", errs)
-	}
-	return nil
-}
-
-func (r *MachineReconciler) getMachineConfig(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) (*ori.MachineConfig, error) {
-	log.V(1).Info("Getting machine class")
-	class, err := r.getORIMachineClass(ctx, machine.Spec.MachineClassRef.Name)
-	if err != nil {
-		if !IsDependencyNotReadyError(err) {
-			r.Eventf(machine, corev1.EventTypeWarning, events.ErrorGettingMachineClass, "Error getting machine class: %v", err)
-			return nil, fmt.Errorf("error getting machine class: %w", err)
-		}
-
-		r.Eventf(machine, corev1.EventTypeNormal, events.MachineClassNotReady, "Machine class not ready: %v", err)
-		return nil, fmt.Errorf("machine class not ready: %w", err)
-	}
-
-	var ignitionConfig *ori.IgnitionConfig
-	if ignitionRef := machine.Spec.IgnitionRef; ignitionRef != nil {
-		log.V(1).Info("Getting machine ignition config")
-		ignitionConfig, err = r.getORIIgnitionConfig(ctx, machine, ignitionRef)
-		if err != nil {
-			if !IsDependencyNotReadyError(err) {
-				r.EventRecorder.Eventf(machine, corev1.EventTypeWarning, events.ErrorGettingIgnitionConfig, "Error getting ignition config: %v", err)
-				return nil, fmt.Errorf("error getting machine ignition config: %w", err)
-			}
-
-			r.EventRecorder.Eventf(machine, corev1.EventTypeNormal, events.IgnitionNotReady, "Ignition is not ready: %v", err)
-			return nil, fmt.Errorf("ignition is not ready: %w", err)
-		}
-	}
-
-	var networkInterfaceConfigs []*ori.NetworkInterfaceConfig
-	for _, networkInterface := range machine.Spec.NetworkInterfaces {
-		log.V(1).Info("Getting network interface config", "MachineNetworkInterfaceName", networkInterface.Name)
-		networkInterfaceConfig, err := r.getORINetworkInterfaceConfig(ctx, machine, &networkInterface)
-		if err != nil {
-			if !IsDependencyNotReadyError(err) {
-				r.EventRecorder.Eventf(machine, corev1.EventTypeWarning, events.ErrorGettingNetworkInterfaceConfig, "Error getting network interface %s config: %v", networkInterface.Name, err)
-				return nil, fmt.Errorf("error getting machine network interface %s config: %w", networkInterface.Name, err)
-			}
-
-			r.EventRecorder.Eventf(machine, corev1.EventTypeNormal, events.NetworkInterfaceNotReady, "Network interface %s not ready: %v", networkInterface.Name, err)
-			return nil, fmt.Errorf("network interface %s not ready: %w", networkInterface.Name, err)
-		}
-
-		networkInterfaceConfigs = append(networkInterfaceConfigs, networkInterfaceConfig)
-	}
-
-	var volumeConfigs []*ori.VolumeConfig
-	for _, volume := range machine.Spec.Volumes {
-		log.V(1).Info("Getting machine volume config", "MachineVolumeName", volume.Name)
-		volumeConfig, err := r.getORIVolumeConfig(ctx, machine, &volume)
-		if err != nil {
-			if !IsDependencyNotReadyError(err) {
-				r.EventRecorder.Eventf(machine, corev1.EventTypeWarning, events.ErrorGettingVolumeConfig, "Error getting volume %s config: %v", volume.Name, err)
-				return nil, fmt.Errorf("error getting machine volume %s config: %w", volume.Name, err)
-			}
-
-			r.EventRecorder.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady, "Volume %s not ready: %v", volume.Name, err)
-			return nil, fmt.Errorf("volume %s not ready: %w", volume.Name, err)
-		}
-
-		volumeConfigs = append(volumeConfigs, volumeConfig)
-	}
-
-	machineMetadata := r.getORIMachineMetadata(machine)
-
-	return &ori.MachineConfig{
-		Metadata:          machineMetadata,
-		Image:             machine.Spec.Image,
-		Class:             class,
-		Ignition:          ignitionConfig,
-		Volumes:           volumeConfigs,
-		NetworkInterfaces: networkInterfaceConfigs,
-		Annotations:       map[string]string{},
-		Labels: map[string]string{
-			machinepoolletv1alpha1.MachineUIDLabel:       string(machine.UID),
-			machinepoolletv1alpha1.MachineNamespaceLabel: machine.Namespace,
-			machinepoolletv1alpha1.MachineNameLabel:      machine.Name,
-		},
+	return &ori.MachineClassCapabilities{
+		CpuMillis:   cpu.MilliValue(),
+		MemoryBytes: uint64(memory.Value()),
 	}, nil
+}
+
+func (r *MachineReconciler) prepareORIIgnitionSpec(ctx context.Context, machine *computev1alpha1.Machine, ignitionRef *commonv1alpha1.SecretKeySelector) (*ori.IgnitionSpec, bool, error) {
+	ignitionSecret := &corev1.Secret{}
+	ignitionSecretKey := client.ObjectKey{Namespace: machine.Namespace, Name: ignitionRef.Name}
+	if err := r.Get(ctx, ignitionSecretKey, ignitionSecret); err != nil {
+		if !apierrors.IsNotFound(err) {
+			return nil, false, err
+		}
+
+		r.Eventf(machine, corev1.EventTypeNormal, events.IgnitionNotReady, "Ignition not ready: %v", err)
+		return nil, false, nil
+	}
+
+	ignitionKey := ignitionRef.Key
+	if ignitionKey == "" {
+		ignitionKey = computev1alpha1.DefaultIgnitionKey
+	}
+
+	data, ok := ignitionSecret.Data[ignitionKey]
+	if !ok {
+		err := fmt.Errorf("ignition has no data at key %s", ignitionKey)
+		r.Eventf(machine, corev1.EventTypeNormal, events.IgnitionNotReady, "Ignition not ready: %v", err)
+		return nil, false, nil
+	}
+
+	return &ori.IgnitionSpec{
+		Data: data,
+	}, true, nil
+}
+
+func (r *MachineReconciler) prepareORIMachine(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) (*ori.Machine, bool, error) {
+	var (
+		ok   = true
+		errs []error
+	)
+
+	class, classOK, err := r.prepareORIMachineClass(ctx, machine, machine.Spec.MachineClassRef.Name)
+	switch {
+	case err != nil:
+		errs = append(errs, fmt.Errorf("error preparing ori machine class: %w", err))
+	case !classOK:
+		ok = false
+	}
+
+	var imageSpec *ori.ImageSpec
+	if image := machine.Spec.Image; image != "" {
+		imageSpec = &ori.ImageSpec{
+			Image: image,
+		}
+	}
+
+	var ignitionSpec *ori.IgnitionSpec
+	if ignitionRef := machine.Spec.IgnitionRef; ignitionRef != nil {
+		i, ignitionSpecOK, err := r.prepareORIIgnitionSpec(ctx, machine, ignitionRef)
+		switch {
+		case err != nil:
+			errs = append(errs, fmt.Errorf("error preparing ori ignition spec: %w", err))
+		case !ignitionSpecOK:
+			ok = false
+		default:
+			ignitionSpec = i
+		}
+	}
+
+	machineNetworkInterfaceSpecs, machineNetworkInterfaceSpecsOK, err := r.prepareORINetworkInterfaceAttachments(ctx, log, machine)
+	switch {
+	case err != nil:
+		errs = append(errs, fmt.Errorf("error preparing ori machine network interfaces: %w", err))
+	case !machineNetworkInterfaceSpecsOK:
+		ok = false
+	}
+
+	machineVolumeSpecs, machineVolumeSpecsOK, err := r.prepareORIVolumeAttachments(ctx, log, machine)
+	switch {
+	case err != nil:
+		errs = append(errs, fmt.Errorf("error preparing ori machine volumes: %w", err))
+	case !machineVolumeSpecsOK:
+		ok = false
+	}
+
+	switch {
+	case len(errs) > 0:
+		return nil, false, fmt.Errorf("error(s) preparing machine: %v", errs)
+	case !ok:
+		return nil, false, nil
+	default:
+		return &ori.Machine{
+			Metadata: &ori.ObjectMetadata{
+				Labels:      r.oriMachineLabels(machine),
+				Annotations: r.oriMachineAnnotations(machine),
+			},
+			Spec: &ori.MachineSpec{
+				Image:             imageSpec,
+				Class:             class,
+				Ignition:          ignitionSpec,
+				Volumes:           machineVolumeSpecs,
+				NetworkInterfaces: machineNetworkInterfaceSpecs,
+			},
+		}, true, nil
+	}
 }
 
 func MachineRunsInMachinePool(machine *computev1alpha1.Machine, machinePoolName string) bool {
@@ -892,37 +762,6 @@ func (r *MachineReconciler) makeRequestsForMachinesRunningInMachinePool(machineL
 func (r *MachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	log := ctrl.Log.WithName("machinepoollet")
 	ctx := ctrl.LoggerInto(context.TODO(), log)
-
-	if err := mgr.Add(manager.RunnableFunc(func(ctx context.Context) error {
-		log := log.WithName("machine-lifecycle-event")
-		for {
-			select {
-			case <-ctx.Done():
-				return nil
-			case evt := <-r.MachineLifecycleEventGenerator.Watch():
-				log = log.WithValues(
-					"EventType", evt.Type,
-					"MachineID", evt.ID,
-					"Namespace", evt.Metadata.Namespace,
-					"Name", evt.Metadata.Name,
-					"UID", evt.Metadata.UID,
-				)
-				log.V(5).Info("Received lifecycle event")
-
-				machine := &computev1alpha1.Machine{
-					ObjectMeta: metav1.ObjectMeta{
-						Namespace: evt.Metadata.Namespace,
-						Name:      evt.Metadata.Name,
-					},
-				}
-				if err := onmetalapiclient.PatchAddReconcileAnnotation(ctx, r.Client, machine); client.IgnoreNotFound(err) != nil {
-					log.Error(err, "Error adding reconcile annotation")
-				}
-			}
-		}
-	})); err != nil {
-		return fmt.Errorf("error adding machine lifecycle event handler: %w", err)
-	}
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(

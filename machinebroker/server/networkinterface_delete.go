@@ -18,71 +18,28 @@ import (
 	"context"
 	"fmt"
 
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/machinebroker/api/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	"golang.org/x/exp/slices"
-	"sigs.k8s.io/controller-runtime/pkg/client"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
 func (s *Server) DeleteNetworkInterface(ctx context.Context, req *ori.DeleteNetworkInterfaceRequest) (*ori.DeleteNetworkInterfaceResponse, error) {
-	log := s.loggerFrom(ctx)
+	networkInterfaceID := req.NetworkInterfaceId
+	log := s.loggerFrom(ctx, "NetworkInterfaceID", networkInterfaceID)
 
-	log.V(1).Info("Getting machine")
-	onmetalMachine, err := s.getOnmetalMachine(ctx, req.MachineId)
+	log.V(1).Info("Getting aggregate onmetal network interface")
+	aggOnmetalNetworkInterface, err := s.getAggregateOnmetalNetworkInterface(ctx, networkInterfaceID)
 	if err != nil {
 		return nil, err
 	}
 
-	idx := slices.IndexFunc(onmetalMachine.Spec.NetworkInterfaces,
-		func(networkInterface computev1alpha1.NetworkInterface) bool {
-			return networkInterface.Name == req.NetworkInterfaceName
-		},
-	)
-	if idx < 0 {
-		log.V(1).Info("Network interface not present in machine")
-		return &ori.DeleteNetworkInterfaceResponse{}, nil
-	}
-
-	log.V(1).Info("Deleting network interface from machine")
-	baseOnmetalMachine := onmetalMachine.DeepCopy()
-	onmetalMachine.Spec.NetworkInterfaces = slices.Delete(onmetalMachine.Spec.NetworkInterfaces, idx, idx+1)
-	if err := s.client.Patch(ctx, onmetalMachine, client.MergeFrom(baseOnmetalMachine)); err != nil {
-		return nil, fmt.Errorf("error deleting network interface from machine: %w", err)
-	}
-
-	log.V(1).Info("Deleting network interface")
-	if err := s.client.DeleteAllOf(ctx, &networkingv1alpha1.NetworkInterface{},
-		client.InNamespace(s.namespace),
-		client.MatchingLabels{
-			machinebrokerv1alpha1.MachineIDLabel:            req.MachineId,
-			machinebrokerv1alpha1.NetworkInterfaceNameLabel: req.NetworkInterfaceName,
-		},
-	); err != nil {
-		return nil, fmt.Errorf("error deleting network interface: %w", err)
-	}
-
-	log.V(1).Info("Deleting network")
-	if err := s.client.DeleteAllOf(ctx, &networkingv1alpha1.Network{},
-		client.InNamespace(s.namespace),
-		client.MatchingLabels{
-			machinebrokerv1alpha1.MachineIDLabel:            req.MachineId,
-			machinebrokerv1alpha1.NetworkInterfaceNameLabel: req.NetworkInterfaceName,
-		},
-	); err != nil {
-		return nil, fmt.Errorf("error deleting network interface: %w", err)
-	}
-
-	log.V(1).Info("Deleting virtual ip")
-	if err := s.client.DeleteAllOf(ctx, &networkingv1alpha1.VirtualIP{},
-		client.InNamespace(s.namespace),
-		client.MatchingLabels{
-			machinebrokerv1alpha1.MachineIDLabel:            req.MachineId,
-			machinebrokerv1alpha1.NetworkInterfaceNameLabel: req.NetworkInterfaceName,
-		},
-	); err != nil {
-		return nil, fmt.Errorf("error deleting virtual ip: %w", err)
+	log.V(1).Info("Deleting onmetal network interface")
+	if err := s.client.Delete(ctx, aggOnmetalNetworkInterface.NetworkInterface); err != nil {
+		if !apierrors.IsNotFound(err) {
+			return nil, fmt.Errorf("error deleting onmetal network interface: %w", err)
+		}
+		return nil, status.Errorf(codes.NotFound, "network interface %s not found", networkInterfaceID)
 	}
 
 	return &ori.DeleteNetworkInterfaceResponse{}, nil

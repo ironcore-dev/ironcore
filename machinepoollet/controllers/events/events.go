@@ -19,15 +19,4 @@ const (
 	NetworkInterfaceNotReady = "NetworkInterfaceNotReady"
 	VolumeNotReady           = "VolumeNotReady"
 	IgnitionNotReady         = "IgnitionNotReady"
-
-	ErrorGettingMachineClass           = "ErrorGettingMachineClass"
-	ErrorGettingNetworkInterfaceConfig = "ErrorGettingNetworkInterfaceConfig"
-	ErrorGettingVolumeConfig           = "ErrorGettingVolumeConfig"
-	ErrorGettingIgnitionConfig         = "ErrorGettingIgnitionConfig"
-
-	ErrorApplyingNetworkInterface = "ErrorApplyingNetworkInterface"
-	ErrorApplyingVolume           = "ErrorApplyingVolume"
-
-	ErrorDetachingNetworkInterface = "ErrorDetachingNetworkInterface"
-	ErrorDetachingVolume           = "ErrorDetachingVolume"
 )

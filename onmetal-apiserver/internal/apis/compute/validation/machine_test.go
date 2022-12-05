@@ -26,7 +26,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/utils/pointer"
 )
 
 func mustParseNewQuantity(s string) *resource.Quantity {
@@ -99,8 +98,12 @@ var _ = Describe("Machine", func() {
 			&compute.Machine{
 				Spec: compute.MachineSpec{
 					Volumes: []compute.Volume{
-						{Name: "foo", VolumeSource: compute.VolumeSource{
-							VolumeRef: &corev1.LocalObjectReference{Name: "foo*"}},
+						{
+							Name:   "foo",
+							Device: "oda",
+							VolumeSource: compute.VolumeSource{
+								VolumeRef: &corev1.LocalObjectReference{Name: "foo*"},
+							},
 						},
 					},
 				},
@@ -112,7 +115,8 @@ var _ = Describe("Machine", func() {
 				Spec: compute.MachineSpec{
 					Volumes: []compute.Volume{
 						{
-							Name: "foo",
+							Name:   "foo",
+							Device: "oda",
 							VolumeSource: compute.VolumeSource{
 								EmptyDisk: &compute.EmptyDiskVolumeSource{SizeLimit: mustParseNewQuantity("-1Gi")},
 							},
@@ -127,12 +131,10 @@ var _ = Describe("Machine", func() {
 				Spec: compute.MachineSpec{
 					Volumes: []compute.Volume{
 						{
-							Name:   "foo",
-							Device: pointer.String("vda"),
+							Device: "vda",
 						},
 						{
-							Name:   "bar",
-							Device: pointer.String("vda"),
+							Device: "vda",
 						},
 					},
 				},
@@ -143,21 +145,18 @@ var _ = Describe("Machine", func() {
 			&compute.Machine{
 				Spec: compute.MachineSpec{
 					Volumes: []compute.Volume{
-						{
-							Name: "foo",
-						},
+						{},
 					},
 				},
 			},
-			ContainElement(RequiredField("spec.volume[0].device")),
+			ContainElement(InvalidField("spec.volume[0].device")),
 		),
 		Entry("invalid volume device",
 			&compute.Machine{
 				Spec: compute.MachineSpec{
 					Volumes: []compute.Volume{
 						{
-							Name:   "foo",
-							Device: pointer.String("foobar"),
+							Device: "foobar",
 						},
 					},
 				},

@@ -24,10 +24,10 @@ import (
 // MachineStatusApplyConfiguration represents an declarative configuration of the MachineStatus type for use
 // with apply.
 type MachineStatusApplyConfiguration struct {
-	State             *v1alpha1.MachineState                     `json:"state,omitempty"`
-	Conditions        []MachineConditionApplyConfiguration       `json:"conditions,omitempty"`
-	NetworkInterfaces []NetworkInterfaceStatusApplyConfiguration `json:"networkInterfaces,omitempty"`
-	Volumes           []VolumeStatusApplyConfiguration           `json:"volumes,omitempty"`
+	MachinePoolObservedGeneration *int64                                     `json:"machinePoolObservedGeneration,omitempty"`
+	State                         *v1alpha1.MachineState                     `json:"state,omitempty"`
+	NetworkInterfaces             []NetworkInterfaceStatusApplyConfiguration `json:"networkInterfaces,omitempty"`
+	Volumes                       []VolumeStatusApplyConfiguration           `json:"volumes,omitempty"`
 }
 
 // MachineStatusApplyConfiguration constructs an declarative configuration of the MachineStatus type for use with
@@ -36,24 +36,19 @@ func MachineStatus() *MachineStatusApplyConfiguration {
 	return &MachineStatusApplyConfiguration{}
 }
 
+// WithMachinePoolObservedGeneration sets the MachinePoolObservedGeneration field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the MachinePoolObservedGeneration field is set to the value of the last call.
+func (b *MachineStatusApplyConfiguration) WithMachinePoolObservedGeneration(value int64) *MachineStatusApplyConfiguration {
+	b.MachinePoolObservedGeneration = &value
+	return b
+}
+
 // WithState sets the State field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the State field is set to the value of the last call.
 func (b *MachineStatusApplyConfiguration) WithState(value v1alpha1.MachineState) *MachineStatusApplyConfiguration {
 	b.State = &value
-	return b
-}
-
-// WithConditions adds the given value to the Conditions field in the declarative configuration
-// and returns the receiver, so that objects can be build by chaining "With" function invocations.
-// If called multiple times, values provided by each call will be appended to the Conditions field.
-func (b *MachineStatusApplyConfiguration) WithConditions(values ...*MachineConditionApplyConfiguration) *MachineStatusApplyConfiguration {
-	for i := range values {
-		if values[i] == nil {
-			panic("nil value passed to WithConditions")
-		}
-		b.Conditions = append(b.Conditions, *values[i])
-	}
 	return b
 }
 

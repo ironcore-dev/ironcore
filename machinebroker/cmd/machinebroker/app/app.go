@@ -26,6 +26,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
@@ -97,6 +99,11 @@ func Run(ctx context.Context, opts Options) error {
 	if err != nil {
 		return fmt.Errorf("failed to listen: %w", err)
 	}
+	defer func() {
+		if err := l.Close(); err != nil {
+			log.Error(err, "Error closing socket")
+		}
+	}()
 
 	grpcSrv := grpc.NewServer(
 		grpc.UnaryInterceptor(func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
@@ -105,7 +112,9 @@ func Run(ctx context.Context, opts Options) error {
 			log.V(1).Info("Request")
 			resp, err = handler(ctx, req)
 			if err != nil {
-				log.Error(err, "Error handling request")
+				if code := status.Code(err); code == codes.Unknown {
+					log.Error(err, "Unknown error handling request")
+				}
 			}
 			return resp, err
 		}),

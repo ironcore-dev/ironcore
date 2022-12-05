@@ -54,8 +54,6 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &applyconfigurationscomputev1alpha1.EFIVarApplyConfiguration{}
 	case computev1alpha1.SchemeGroupVersion.WithKind("EmptyDiskVolumeSource"):
 		return &applyconfigurationscomputev1alpha1.EmptyDiskVolumeSourceApplyConfiguration{}
-	case computev1alpha1.SchemeGroupVersion.WithKind("EmptyDiskVolumeStatus"):
-		return &applyconfigurationscomputev1alpha1.EmptyDiskVolumeStatusApplyConfiguration{}
 	case computev1alpha1.SchemeGroupVersion.WithKind("EphemeralNetworkInterfaceSource"):
 		return &applyconfigurationscomputev1alpha1.EphemeralNetworkInterfaceSourceApplyConfiguration{}
 	case computev1alpha1.SchemeGroupVersion.WithKind("EphemeralVolumeSource"):
@@ -64,8 +62,6 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &applyconfigurationscomputev1alpha1.MachineApplyConfiguration{}
 	case computev1alpha1.SchemeGroupVersion.WithKind("MachineClass"):
 		return &applyconfigurationscomputev1alpha1.MachineClassApplyConfiguration{}
-	case computev1alpha1.SchemeGroupVersion.WithKind("MachineCondition"):
-		return &applyconfigurationscomputev1alpha1.MachineConditionApplyConfiguration{}
 	case computev1alpha1.SchemeGroupVersion.WithKind("MachinePool"):
 		return &applyconfigurationscomputev1alpha1.MachinePoolApplyConfiguration{}
 	case computev1alpha1.SchemeGroupVersion.WithKind("MachinePoolAddress"):
@@ -88,14 +84,10 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &applyconfigurationscomputev1alpha1.NetworkInterfaceSourceApplyConfiguration{}
 	case computev1alpha1.SchemeGroupVersion.WithKind("NetworkInterfaceStatus"):
 		return &applyconfigurationscomputev1alpha1.NetworkInterfaceStatusApplyConfiguration{}
-	case computev1alpha1.SchemeGroupVersion.WithKind("ReferencedVolumeStatus"):
-		return &applyconfigurationscomputev1alpha1.ReferencedVolumeStatusApplyConfiguration{}
 	case computev1alpha1.SchemeGroupVersion.WithKind("Volume"):
 		return &applyconfigurationscomputev1alpha1.VolumeApplyConfiguration{}
 	case computev1alpha1.SchemeGroupVersion.WithKind("VolumeSource"):
 		return &applyconfigurationscomputev1alpha1.VolumeSourceApplyConfiguration{}
-	case computev1alpha1.SchemeGroupVersion.WithKind("VolumeSourceStatus"):
-		return &applyconfigurationscomputev1alpha1.VolumeSourceStatusApplyConfiguration{}
 	case computev1alpha1.SchemeGroupVersion.WithKind("VolumeStatus"):
 		return &applyconfigurationscomputev1alpha1.VolumeStatusApplyConfiguration{}
 

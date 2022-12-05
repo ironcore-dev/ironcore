@@ -18,20 +18,19 @@
 package v1alpha1
 
 import (
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	v1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // VolumeStatusApplyConfiguration represents an declarative configuration of the VolumeStatus type for use
 // with apply.
 type VolumeStatusApplyConfiguration struct {
-	Name                                 *string `json:"name,omitempty"`
-	Device                               *string `json:"device,omitempty"`
-	VolumeSourceStatusApplyConfiguration `json:",omitempty,inline"`
-	State                                *computev1alpha1.VolumeState `json:"state,omitempty"`
-	LastStateTransitionTime              *v1.Time                     `json:"lastStateTransitionTime,omitempty"`
-	Phase                                *computev1alpha1.VolumePhase `json:"phase,omitempty"`
-	LastPhaseTransitionTime              *v1.Time                     `json:"lastPhaseTransitionTime,omitempty"`
+	Name                    *string               `json:"name,omitempty"`
+	Handle                  *string               `json:"handle,omitempty"`
+	State                   *v1alpha1.VolumeState `json:"state,omitempty"`
+	LastStateTransitionTime *v1.Time              `json:"lastStateTransitionTime,omitempty"`
+	Phase                   *v1alpha1.VolumePhase `json:"phase,omitempty"`
+	LastPhaseTransitionTime *v1.Time              `json:"lastPhaseTransitionTime,omitempty"`
 }
 
 // VolumeStatusApplyConfiguration constructs an declarative configuration of the VolumeStatus type for use with
@@ -48,34 +47,18 @@ func (b *VolumeStatusApplyConfiguration) WithName(value string) *VolumeStatusApp
 	return b
 }
 
-// WithDevice sets the Device field in the declarative configuration to the given value
+// WithHandle sets the Handle field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the Device field is set to the value of the last call.
-func (b *VolumeStatusApplyConfiguration) WithDevice(value string) *VolumeStatusApplyConfiguration {
-	b.Device = &value
-	return b
-}
-
-// WithEmptyDisk sets the EmptyDisk field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the EmptyDisk field is set to the value of the last call.
-func (b *VolumeStatusApplyConfiguration) WithEmptyDisk(value *EmptyDiskVolumeStatusApplyConfiguration) *VolumeStatusApplyConfiguration {
-	b.EmptyDisk = value
-	return b
-}
-
-// WithReferenced sets the Referenced field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the Referenced field is set to the value of the last call.
-func (b *VolumeStatusApplyConfiguration) WithReferenced(value *ReferencedVolumeStatusApplyConfiguration) *VolumeStatusApplyConfiguration {
-	b.Referenced = value
+// If called multiple times, the Handle field is set to the value of the last call.
+func (b *VolumeStatusApplyConfiguration) WithHandle(value string) *VolumeStatusApplyConfiguration {
+	b.Handle = &value
 	return b
 }
 
 // WithState sets the State field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the State field is set to the value of the last call.
-func (b *VolumeStatusApplyConfiguration) WithState(value computev1alpha1.VolumeState) *VolumeStatusApplyConfiguration {
+func (b *VolumeStatusApplyConfiguration) WithState(value v1alpha1.VolumeState) *VolumeStatusApplyConfiguration {
 	b.State = &value
 	return b
 }
@@ -91,7 +74,7 @@ func (b *VolumeStatusApplyConfiguration) WithLastStateTransitionTime(value v1.Ti
 // WithPhase sets the Phase field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Phase field is set to the value of the last call.
-func (b *VolumeStatusApplyConfiguration) WithPhase(value computev1alpha1.VolumePhase) *VolumeStatusApplyConfiguration {
+func (b *VolumeStatusApplyConfiguration) WithPhase(value v1alpha1.VolumePhase) *VolumeStatusApplyConfiguration {
 	b.Phase = &value
 	return b
 }

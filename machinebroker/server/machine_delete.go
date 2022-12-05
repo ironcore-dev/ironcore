@@ -18,80 +18,28 @@ import (
 	"context"
 	"fmt"
 
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/machinebroker/api/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func (s *Server) DeleteMachine(ctx context.Context, req *ori.DeleteMachineRequest) (*ori.DeleteMachineResponse, error) {
 	machineID := req.MachineId
 	log := s.loggerFrom(ctx, "MachineID", machineID)
 
-	var errs []error
+	onmetalMachine, err := s.getAggregateOnmetalMachine(ctx, machineID)
+	if err != nil {
+		return nil, err
+	}
 
-	log.V(1).Info("Deleting machine")
-	if err := s.client.Delete(ctx, &computev1alpha1.Machine{
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: s.namespace,
-			Name:      machineID,
-		},
-	}); err != nil {
+	log.V(1).Info("Deleting onmetal machine")
+	if err := s.client.Delete(ctx, onmetalMachine.Machine); err != nil {
 		if !apierrors.IsNotFound(err) {
-			return nil, fmt.Errorf("error deleting machine: %w", err)
+			return nil, fmt.Errorf("error deleting onmetal machine: %w", err)
 		}
 		return nil, status.Errorf(codes.NotFound, "machine %s not found", machineID)
 	}
 
-	log.V(1).Info("Deleting network interfaces")
-	if err := s.client.DeleteAllOf(ctx, &networkingv1alpha1.NetworkInterface{},
-		client.InNamespace(s.namespace),
-		client.MatchingLabels{machinebrokerv1alpha1.MachineIDLabel: machineID},
-	); err != nil {
-		errs = append(errs, fmt.Errorf("error deleting network interfaces: %w", err))
-	}
-
-	log.V(1).Info("Deleting virtual ips")
-	if err := s.client.DeleteAllOf(ctx, &networkingv1alpha1.VirtualIP{},
-		client.InNamespace(s.namespace),
-		client.MatchingLabels{machinebrokerv1alpha1.MachineIDLabel: machineID},
-	); err != nil {
-		errs = append(errs, fmt.Errorf("error deleting virtual ips"))
-	}
-
-	log.V(1).Info("Deleting networks")
-	if err := s.client.DeleteAllOf(ctx, &networkingv1alpha1.Network{},
-		client.InNamespace(s.namespace),
-		client.MatchingLabels{machinebrokerv1alpha1.MachineIDLabel: machineID},
-	); err != nil {
-		errs = append(errs, fmt.Errorf("error deleting networks: %w", err))
-	}
-
-	log.V(1).Info("Deleting volumes")
-	if err := s.client.DeleteAllOf(ctx, &storagev1alpha1.Volume{},
-		client.InNamespace(s.namespace),
-		client.MatchingLabels{machinebrokerv1alpha1.MachineIDLabel: machineID},
-	); err != nil {
-		errs = append(errs, fmt.Errorf("error deleting volumes: %w", err))
-	}
-
-	log.V(1).Info("Deleting secrets")
-	if err := s.client.DeleteAllOf(ctx, &corev1.Secret{},
-		client.InNamespace(s.namespace),
-		client.MatchingLabels{machinebrokerv1alpha1.MachineIDLabel: machineID},
-	); err != nil {
-		errs = append(errs, fmt.Errorf("error deleting secrets: %w", err))
-	}
-
-	if len(errs) > 0 {
-		return &ori.DeleteMachineResponse{}, fmt.Errorf("error(s) deleting machine: %v", errs)
-	}
 	return &ori.DeleteMachineResponse{}, nil
 }

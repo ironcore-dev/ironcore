@@ -17,7 +17,6 @@ package update
 import (
 	clicommon "github.com/onmetal/onmetal-api/orictl/cli/common"
 	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-machine/orictlmachine/common"
-	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-machine/orictlmachine/update/networkinterface"
 	"github.com/spf13/cobra"
 )
 
@@ -26,9 +25,7 @@ func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cob
 		Use: "update",
 	}
 
-	cmd.AddCommand(
-		networkinterface.Command(streams, clientFactory),
-	)
+	cmd.AddCommand()
 
 	return cmd
 }

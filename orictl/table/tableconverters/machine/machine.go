@@ -26,9 +26,8 @@ import (
 var (
 	machineHeaders = []table.Header{
 		{Name: "ID"},
-		{Name: "Namespace"},
-		{Name: "Name"},
-		{Name: "UID"},
+		{Name: "Class"},
+		{Name: "Image"},
 		{Name: "State"},
 		{Name: "Age"},
 	}
@@ -41,12 +40,11 @@ var Machine, MachineSlice = tableconverter.ForType[*ori.Machine]( //nolint:reviv
 	func(machine *ori.Machine) ([]table.Row, error) {
 		return []table.Row{
 			{
-				machine.Id,
-				machine.Metadata.Namespace,
-				machine.Metadata.Name,
-				machine.Metadata.Uid,
-				machine.State.String(),
-				duration.HumanDuration(time.Since(time.Unix(0, machine.CreatedAt))),
+				machine.Metadata.Id,
+				machine.Spec.Class,
+				machine.Spec.GetImage().GetImage(),
+				machine.Status.State.String(),
+				duration.HumanDuration(time.Since(time.Unix(0, machine.Metadata.CreatedAt))),
 			},
 		}, nil
 	},

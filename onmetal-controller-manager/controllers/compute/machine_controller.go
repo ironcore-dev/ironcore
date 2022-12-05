@@ -229,14 +229,14 @@ func (r *MachineReconciler) bindNetworkInterfaces(ctx context.Context, log logr.
 	return res, nil
 }
 
-func (r *MachineReconciler) getOrInitVolumeStatus(machine *computev1alpha1.Machine, machineVolumeName string) computev1alpha1.VolumeStatus {
+func (r *MachineReconciler) getOrInitVolumeStatus(machine *computev1alpha1.Machine, name string) computev1alpha1.VolumeStatus {
 	for _, status := range machine.Status.Volumes {
-		if status.Name == machineVolumeName {
+		if status.Name == name {
 			return status
 		}
 	}
 	return computev1alpha1.VolumeStatus{
-		Name: machineVolumeName,
+		Name: name,
 	}
 }
 
@@ -287,15 +287,16 @@ func (r *MachineReconciler) bindVolumes(ctx context.Context, log logr.Logger, ma
 		now          = metav1.Now()
 	)
 	for _, machineVolume := range machine.Spec.Volumes {
+		name := machineVolume.Name
 		phase, bindWarning, err := r.bindVolume(ctx, log, machine, &machineVolume)
 		if err != nil {
-			return nil, fmt.Errorf("[volume %s] %w", machineVolume.Name, err)
+			return nil, fmt.Errorf("[volume %s] %w", name, err)
 		}
 		if bindWarning != "" {
 			bindWarnings = append(bindWarnings, bindWarning)
 		}
 
-		status := r.getOrInitVolumeStatus(machine, machineVolume.Name)
+		status := r.getOrInitVolumeStatus(machine, name)
 		if phase != status.Phase {
 			status.LastPhaseTransitionTime = &now
 		}
@@ -382,7 +383,7 @@ func (r *MachineReconciler) bindVolume(
 		volume := &storagev1alpha1.Volume{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: machine.Namespace,
-				Name:      fmt.Sprintf("%s-%s", machine.Name, machineVolume.Name),
+				Name:      computev1alpha1.MachineEphemeralVolumeName(machine.Name, machineVolume.Name),
 			},
 		}
 		volumeKey := client.ObjectKeyFromObject(volume)

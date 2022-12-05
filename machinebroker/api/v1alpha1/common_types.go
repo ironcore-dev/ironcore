@@ -20,10 +20,14 @@ const (
 	LabelsAnnotation = "machinebroker.api.onmetal.de/labels"
 
 	AnnotationsAnnotation = "machinebroker.api.onmetal.de/annotations"
+
+	CreatedLabel = "machinebroker.api.onmetal.de/created"
 )
 
 const (
 	MachineIDLabel = "machinebroker.api.onmetal.de/machine-id"
+
+	PurposeLabel = "machinebroker.api.onmetal.de/purpose"
 
 	VolumeNameLabel = "machinebroker.api.onmetal.de/volume-name"
 
@@ -31,11 +35,17 @@ const (
 
 	IPFamilyLabel = "machinebroker.api.onmetal.de/ip-family"
 
-	MachineManagerLabel = "machinebroker.api.onmetal.de/machine-manager"
+	ManagerLabel = "machinebroker.api.onmetal.de/manager"
 
 	DeviceLabel = "machinebroker.api.onmetal.de/device"
 )
 
 const (
 	MachineBrokerManager = "machinebroker"
+
+	VolumeAccessPurpose = "volume-access"
+
+	IgnitionPurpose = "ignition"
+
+	NetworkInterfacePurpose = "network-interface"
 )
