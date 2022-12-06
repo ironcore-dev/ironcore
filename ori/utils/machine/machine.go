@@ -39,7 +39,7 @@ func GetAddress(explicitAddress string) (string, error) {
 
 	for _, wellKnownEndpoint := range WellKnownEndpoints {
 		if stat, err := os.Stat(wellKnownEndpoint); err == nil && stat.Mode().Type()&os.ModeSocket != 0 {
-			return wellKnownEndpoint, nil
+			return fmt.Sprintf("unix://%s", wellKnownEndpoint), nil
 		}
 	}
 	return "", fmt.Errorf("could not determine address to use")

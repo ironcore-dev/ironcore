@@ -28,6 +28,18 @@ jobs:
             target: manager
           - name: onmetal-api-apiserver
             target: apiserver
+          - name: machinepoollet
+            target: machinepoollet
+          - name: machinebroker
+            target: machinebroker
+          - name: orictl-machine
+            target: orictl-machine
+          - name: volumepoollet
+            target: volumepoollet
+          - name: volumebroker
+            target: volumebroker
+          - name: orictl-volume
+            target: orictl-volume
     if: ${{ github.event.label.name == 'ok-to-image' }} || ${{ github.event.label.name == 'ok-to-🐳' }} || ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     steps:
@@ -79,3 +91,5 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           target: ${{ matrix.image.target }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

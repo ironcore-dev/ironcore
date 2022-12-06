@@ -35,6 +35,8 @@ type MachinePoolInit struct {
 	OnFailed      func(ctx context.Context, reason error) error
 }
 
+//+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machinepools,verbs=get;list;create;update;patch
+
 func (i *MachinePoolInit) Start(ctx context.Context) error {
 	log := ctrl.LoggerFrom(ctx).WithName("machinepool").WithName("init")
 

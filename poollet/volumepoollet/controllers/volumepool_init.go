@@ -35,6 +35,8 @@ type VolumePoolInit struct {
 	OnFailed      func(ctx context.Context, reason error) error
 }
 
+//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumepools,verbs=get;list;create;update;patch
+
 func (i *VolumePoolInit) Start(ctx context.Context) error {
 	log := ctrl.LoggerFrom(ctx).WithName("volumepool").WithName("init")
 

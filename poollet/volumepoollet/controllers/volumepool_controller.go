@@ -39,6 +39,10 @@ type VolumePoolReconciler struct {
 	VolumeClassMapper vcm.VolumeClassMapper
 }
 
+//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumepools,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumepools/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumeclasses,verbs=get;list;watch
+
 func (r *VolumePoolReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
 	volumePool := &storagev1alpha1.VolumePool{}

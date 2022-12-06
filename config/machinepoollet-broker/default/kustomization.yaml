@@ -1,0 +1,113 @@
+# Adds namespace to all resources.
+namespace: machinepoollet-system
+
+# Value of this field is prepended to the
+# names of all resources, e.g. a deployment named
+# "wordpress" becomes "alices-wordpress".
+# Note that it should also match with the prefix (text before '-') of the namespace
+# field above.
+namePrefix: machinepoollet-
+
+# Labels to add to all resources and selectors.
+#commonLabels:
+#  someName: someValue
+
+resources:
+  - ../rbac
+  - ../manager
+#  - ../webhook
+#  - ../certmanager
+# [PROMETHEUS] To enable prometheus monitor, uncomment all sections with 'PROMETHEUS'.
+#- ../prometheus
+
+patchesStrategicMerge:
+  - manager_auth_proxy_patch.yaml
+  
+  # Mount the controller config file for loading manager configurations
+  # through a ComponentConfig type
+  #- manager_config_patch.yaml
+  
+  #- manager_webhook_patch.yaml
+  #- webhookcainjection_patch.yaml
+
+#replacements:
+#  - source:
+#      kind: Certificate
+#      group: cert-manager.io
+#      version: v1
+#      name: serving-cert
+#      fieldPath: .metadata.namespace
+#    targets:
+#      - select:
+#          kind: ValidatingWebhookConfiguration
+#        fieldPaths:
+#          - .metadata.annotations.[cert-manager.io/inject-ca-from]
+#        options:
+#          delimiter: '/'
+#          index: 0
+#          create: true
+#      - select:
+#          kind: MutatingWebhookConfiguration
+#        fieldPaths:
+#          - .metadata.annotations.[cert-manager.io/inject-ca-from]
+#        options:
+#          delimiter: '/'
+#          index: 0
+#          create: true
+#  - source:
+#      kind: Certificate
+#      group: cert-manager.io
+#      version: v1
+#      name: serving-cert
+#      fieldPath: .metadata.name
+#    targets:
+#      - select:
+#          kind: ValidatingWebhookConfiguration
+#        fieldPaths:
+#          - .metadata.annotations.[cert-manager.io/inject-ca-from]
+#        options:
+#          delimiter: '/'
+#          index: 1
+#          create: true
+#      - select:
+#          kind: MutatingWebhookConfiguration
+#        fieldPaths:
+#          - .metadata.annotations.[cert-manager.io/inject-ca-from]
+#        options:
+#          delimiter: '/'
+#          index: 1
+#          create: true
+#  - source:
+#      kind: Service
+#      version: v1
+#      name: webhook-service
+#      fieldPath: .metadata.name
+#    targets:
+#      - select:
+#          kind: Certificate
+#          group: cert-manager.io
+#          version: v1
+#        fieldPaths:
+#          - .spec.dnsNames.0
+#          - .spec.dnsNames.1
+#        options:
+#          delimiter: '.'
+#          index: 0
+#          create: true
+#  - source:
+#      kind: Service
+#      version: v1
+#      name: webhook-service
+#      fieldPath: .metadata.namespace
+#    targets:
+#      - select:
+#          kind: Certificate
+#          group: cert-manager.io
+#          version: v1
+#        fieldPaths:
+#          - .spec.dnsNames.0
+#          - .spec.dnsNames.1
+#        options:
+#          delimiter: '.'
+#          index: 1
+#          create: true

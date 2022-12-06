@@ -86,6 +86,15 @@ func Run(ctx context.Context, opts Options) error {
 		return err
 	}
 
+	if opts.Namespace == "" {
+		return fmt.Errorf("must specify namespace")
+	}
+
+	log.V(1).Info("Creating server",
+		"Namespace", opts.Namespace,
+		"MachinePoolName", opts.MachinePoolName,
+		"MachinePoolSelector", opts.MachinePoolSelector,
+	)
 	srv, err := server.New(cfg, server.Options{
 		Namespace:           opts.Namespace,
 		MachinePoolName:     opts.MachinePoolName,
@@ -95,6 +104,7 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error creating server: %w", err)
 	}
 
+	log.V(1).Info("Start listening on unix socket", "Address", opts.Address)
 	l, err := net.Listen("unix", opts.Address)
 	if err != nil {
 		return fmt.Errorf("failed to listen: %w", err)
