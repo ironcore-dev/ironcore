@@ -2,6 +2,10 @@
 # Image URL to use all building/pushing image targets
 CONTROLLER_IMG ?= controller:latest
 APISERVER_IMG ?= apiserver:latest
+MACHINEPOOLLET_IMG ?= machinepoollet:latest
+MACHINEBROKER_IMG ?= machinebroker:latest
+VOLUMEPOOLLET_IMG ?= volumepoollet:latest
+VOLUMEBROKER_IMG ?= volumebroker:latest
 
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
 ENVTEST_K8S_VERSION = 1.24.1
@@ -45,8 +49,20 @@ help: ## Display this help.
 ##@ Development
 
 .PHONY: manifests
+FILE="config/machinepoollet-broker/broker-rbac/role.yaml"
 manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
+	# onmetal-controller-manager
 	$(CONTROLLER_GEN) rbac:roleName=manager-role webhook paths="./onmetal-controller-manager/controllers/...;./api/..." output:rbac:artifacts:config=config/controller/rbac
+
+	# machinepoollet-broker
+	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./poollet/machinepoollet/controllers/..." output:rbac:artifacts:config=config/machinepoollet-broker/rbac
+	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./broker/machinebroker/..." output:rbac:artifacts:config=config/machinepoollet-broker/broker-rbac
+	./hack/replace.sh config/machinepoollet-broker/broker-rbac/role.yaml 's/ClusterRole/Role/g;s/manager-role/broker-role/g'
+
+	# volumepoollet-broker
+	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./poollet/volumepoollet/controllers/..." output:rbac:artifacts:config=config/volumepoollet-broker/rbac
+	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./broker/volumebroker/..." output:rbac:artifacts:config=config/volumepoollet-broker/broker-rbac
+	./hack/replace.sh config/volumepoollet-broker/broker-rbac/role.yaml 's/ClusterRole/Role/g;s/manager-role/broker-role/g'
 
 .PHONY: generate
 generate: vgopath models-schema deepcopy-gen client-gen lister-gen informer-gen defaulter-gen conversion-gen openapi-gen applyconfiguration-gen
@@ -139,9 +155,25 @@ run: manifests generate fmt vet ## Run a controller from your host.
 	go run ./onmetal-controller-manager/main.go
 
 .PHONY: docker-build
-docker-build: test ## Build docker image with the manager.
+docker-build: test docker-build-machinepoollet docker-build-machinebroker ## Build docker image with the manager.
 	docker build --target apiserver -t ${APISERVER_IMG} .
 	docker build --target manager -t ${CONTROLLER_IMG} .
+
+.PHONY: docker-build-machinepoollet
+docker-build-machinepoollet: ## Build machinepoollet image.
+	docker build --target machinepoollet -t ${MACHINEPOOLLET_IMG} .
+
+.PHONY: docker-build-machinebroker
+docker-build-machinebroker: ## Build machinebroker image.
+	docker build --target machinebroker -t ${MACHINEBROKER_IMG} .
+
+.PHONY: docker-build-volumepoollet
+docker-build-volumepoollet: ## Build volumepoollet image.
+	docker build --target volumepoollet -t ${VOLUMEPOOLLET_IMG} .
+
+.PHONY: docker-build-volumebroker
+docker-build-volumebroker: ## Build volumebroker image.
+	docker build --target volumebroker -t ${VOLUMEBROKER_IMG} .
 
 .PHONY: docker-push
 docker-push: ## Push docker image with the manager.
@@ -188,6 +220,22 @@ kind-load-apiserver: ## Load the apiserver image into the kind cluster.
 .PHONY: kind-load-controller
 kind-load-controller: ## Load the controller image into the kind cluster.
 	kind load docker-image controller
+
+.PHONY: kind-load-machinepoollet
+kind-load-machinepoollet:
+	kind load docker-image ${MACHINEPOOLLET_IMG}
+
+.PHONY: kind-load-machinebroker
+kind-load-machinebroker:
+	kind load docker-image ${MACHINEBROKER_IMG}
+
+.PHONY: kind-load-volumepoollet
+kind-load-volumepoollet:
+	kind load docker-image ${VOLUMEPOOLLET_IMG}
+
+.PHONY: kind-load-volumebroker
+kind-load-volumebroker:
+	kind load docker-image ${VOLUMEBROKER_IMG}
 
 .PHONY: kind-load
 kind-load: kind-load-apiserver kind-load-controller ## Load the apiserver and controller in kind.
@@ -359,4 +407,3 @@ $(PROTOC_GEN_GOGO): $(LOCALBIN)
 models-schema: $(MODELS_SCHEMA) ## Install models-schema locally if necessary.
 $(MODELS_SCHEMA): $(LOCALBIN)
 	test -s $(LOCALBIN)/models-schema || GOBIN=$(LOCALBIN) go install github.com/onmetal/onmetal-api/models-schema
-

@@ -113,6 +113,9 @@ func setOptionsDefaults(o *Options) {
 
 var _ ori.VolumeRuntimeServer = (*Server)(nil)
 
+//+kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes,verbs=get;list;watch;create;update;patch;delete
+
 func New(cfg *rest.Config, opts Options) (*Server, error) {
 	setOptionsDefaults(&opts)
 

@@ -1,0 +1,14 @@
+- op: add
+  path: /spec/template/spec/containers/0/args/-
+  value: --volume-pool-name=broker
+- op: add
+  path: /spec/template/spec/containers/0/args/-
+  value: --provider-id=broker
+- op: add
+  path: /spec/template/spec/containers/0/args/-
+  value: --provider-id=broker
+- op: add
+  path: /spec/template/spec/containers/1/args
+  value:
+    - --namespace=volumepoollet-system
+    - --volume-pool-name=virtual
