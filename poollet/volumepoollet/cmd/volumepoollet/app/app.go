@@ -110,6 +110,7 @@ func Command() *cobra.Command {
 	goFlags := goflag.NewFlagSet("", 0)
 	zapOpts.BindFlags(goFlags)
 	cmd.PersistentFlags().AddGoFlagSet(goFlags)
+	cmd.PersistentFlags().AddGoFlagSet(goflag.CommandLine)
 
 	opts.AddFlags(cmd.Flags())
 	opts.MarkFlagsRequired(cmd)
