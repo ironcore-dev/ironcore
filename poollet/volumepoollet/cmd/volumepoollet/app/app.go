@@ -21,6 +21,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/onmetal/controller-utils/configutils"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
@@ -54,10 +55,11 @@ func init() {
 }
 
 type Options struct {
-	MetricsAddr             string
-	EnableLeaderElection    bool
-	LeaderElectionNamespace string
-	ProbeAddr               string
+	MetricsAddr              string
+	EnableLeaderElection     bool
+	LeaderElectionNamespace  string
+	LeaderElectionKubeconfig string
+	ProbeAddr                string
 
 	VolumePoolName               string
 	ProviderID                   string
@@ -75,6 +77,7 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
 	fs.StringVar(&o.LeaderElectionNamespace, "leader-election-namespace", "", "Namespace to do leader election in.")
+	fs.StringVar(&o.LeaderElectionKubeconfig, "leader-election-kubeconfig", "", "Path pointing to a kubeconfig to use for leader election.")
 
 	fs.StringVar(&o.VolumePoolName, "volume-pool-name", o.VolumePoolName, "Name of the volume pool to announce / watch")
 	fs.StringVar(&o.ProviderID, "provider-id", "", "Provider id to announce on the volume pool.")
@@ -143,6 +146,11 @@ func Run(ctx context.Context, opts Options) error {
 
 	volumeRuntime := ori.NewVolumeRuntimeClient(conn)
 
+	leaderElectionCfg, err := configutils.GetConfig(configutils.Kubeconfig(opts.LeaderElectionKubeconfig))
+	if err != nil {
+		return fmt.Errorf("error creating leader election kubeconfig: %w", err)
+	}
+
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Logger:                  logger,
 		Scheme:                  scheme,
@@ -152,6 +160,7 @@ func Run(ctx context.Context, opts Options) error {
 		LeaderElection:          opts.EnableLeaderElection,
 		LeaderElectionID:        "dfffbeaa.api.onmetal.de",
 		LeaderElectionNamespace: opts.LeaderElectionNamespace,
+		LeaderElectionConfig:    leaderElectionCfg,
 	})
 	if err != nil {
 		return fmt.Errorf("error creating manager: %w", err)
