@@ -114,6 +114,7 @@ func (s *Server) convertOnmetalVolumeAttachment(volume computev1alpha1.Volume) (
 	}
 
 	return &ori.VolumeAttachment{
+		Name:      volume.Name,
 		Device:    *volume.Device,
 		VolumeId:  volumeID,
 		EmptyDisk: emptyDisk,

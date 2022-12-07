@@ -45,3 +45,15 @@ func SetDefaults_PrefixAllocationSpec(spec *v1alpha1.PrefixAllocationSpec) {
 		}
 	}
 }
+
+func SetDefaults_PrefixAllocationStatus(status *v1alpha1.PrefixAllocationStatus) {
+	if status.Phase == "" {
+		status.Phase = v1alpha1.PrefixAllocationPhasePending
+	}
+}
+
+func SetDefaults_PrefixStatus(status *v1alpha1.PrefixStatus) {
+	if status.Phase == "" {
+		status.Phase = v1alpha1.PrefixPhasePending
+	}
+}

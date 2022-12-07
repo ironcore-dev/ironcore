@@ -62,6 +62,7 @@ func SetObjectDefaults_NetworkInterface(in *v1alpha1.NetworkInterface) {
 			}
 		}
 	}
+	SetDefaults_NetworkInterfaceStatus(&in.Status)
 }
 
 func SetObjectDefaults_NetworkInterfaceList(in *v1alpha1.NetworkInterfaceList) {

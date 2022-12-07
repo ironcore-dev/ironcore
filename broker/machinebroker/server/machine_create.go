@@ -103,6 +103,7 @@ func (s *Server) getOnmetalMachineConfig(machine *ori.Machine) (*OnmetalMachineC
 				computev1alpha1.DefaultIgnitionKey: ignition.Data,
 			},
 		}
+		apiutils.SetPurpose(onmetalIgnitionSecret, machinebrokerv1alpha1.IgnitionPurpose)
 	}
 
 	var onmetalImage string

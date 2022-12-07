@@ -27,4 +27,7 @@ func SetDefaults_VolumeStatus(status *v1alpha1.VolumeStatus) {
 	if status.State == "" {
 		status.State = v1alpha1.VolumeStatePending
 	}
+	if status.Phase == "" {
+		status.Phase = v1alpha1.VolumePhaseUnbound
+	}
 }

@@ -38,10 +38,12 @@ func RegisterDefaults(scheme *runtime.Scheme) error {
 
 func SetObjectDefaults_Prefix(in *v1alpha1.Prefix) {
 	SetDefaults_PrefixSpec(&in.Spec)
+	SetDefaults_PrefixStatus(&in.Status)
 }
 
 func SetObjectDefaults_PrefixAllocation(in *v1alpha1.PrefixAllocation) {
 	SetDefaults_PrefixAllocationSpec(&in.Spec)
+	SetDefaults_PrefixAllocationStatus(&in.Status)
 }
 
 func SetObjectDefaults_PrefixAllocationList(in *v1alpha1.PrefixAllocationList) {
