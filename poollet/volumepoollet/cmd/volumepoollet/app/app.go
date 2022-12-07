@@ -54,9 +54,10 @@ func init() {
 }
 
 type Options struct {
-	MetricsAddr          string
-	EnableLeaderElection bool
-	ProbeAddr            string
+	MetricsAddr             string
+	EnableLeaderElection    bool
+	LeaderElectionNamespace string
+	ProbeAddr               string
 
 	VolumePoolName               string
 	ProviderID                   string
@@ -73,6 +74,7 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.BoolVar(&o.EnableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
+	fs.StringVar(&o.LeaderElectionNamespace, "leader-election-namespace", "", "Namespace to do leader election in.")
 
 	fs.StringVar(&o.VolumePoolName, "volume-pool-name", o.VolumePoolName, "Name of the volume pool to announce / watch")
 	fs.StringVar(&o.ProviderID, "provider-id", "", "Provider id to announce on the volume pool.")
@@ -142,13 +144,14 @@ func Run(ctx context.Context, opts Options) error {
 	volumeRuntime := ori.NewVolumeRuntimeClient(conn)
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		Logger:                 logger,
-		Scheme:                 scheme,
-		MetricsBindAddress:     opts.MetricsAddr,
-		Port:                   9443,
-		HealthProbeBindAddress: opts.ProbeAddr,
-		LeaderElection:         opts.EnableLeaderElection,
-		LeaderElectionID:       "dfffbeaa.api.onmetal.de",
+		Logger:                  logger,
+		Scheme:                  scheme,
+		MetricsBindAddress:      opts.MetricsAddr,
+		Port:                    9443,
+		HealthProbeBindAddress:  opts.ProbeAddr,
+		LeaderElection:          opts.EnableLeaderElection,
+		LeaderElectionID:        "dfffbeaa.api.onmetal.de",
+		LeaderElectionNamespace: opts.LeaderElectionNamespace,
 	})
 	if err != nil {
 		return fmt.Errorf("error creating manager: %w", err)

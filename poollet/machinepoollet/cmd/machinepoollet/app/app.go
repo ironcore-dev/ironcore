@@ -56,9 +56,10 @@ func init() {
 }
 
 type Options struct {
-	MetricsAddr          string
-	EnableLeaderElection bool
-	ProbeAddr            string
+	MetricsAddr             string
+	EnableLeaderElection    bool
+	LeaderElectionNamespace string
+	ProbeAddr               string
 
 	MachinePoolName               string
 	ProviderID                    string
@@ -75,6 +76,7 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.BoolVar(&o.EnableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
+	fs.StringVar(&o.LeaderElectionNamespace, "leader-election-namespace", "", "Namespace to do leader election in.")
 
 	fs.StringVar(&o.MachinePoolName, "machine-pool-name", o.MachinePoolName, "Name of the machine pool to announce / watch")
 	fs.StringVar(&o.ProviderID, "provider-id", "", "Provider id to announce on the machine pool.")
@@ -144,13 +146,14 @@ func Run(ctx context.Context, opts Options) error {
 	machineRuntime := ori.NewMachineRuntimeClient(conn)
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		Logger:                 logger,
-		Scheme:                 scheme,
-		MetricsBindAddress:     opts.MetricsAddr,
-		Port:                   9443,
-		HealthProbeBindAddress: opts.ProbeAddr,
-		LeaderElection:         opts.EnableLeaderElection,
-		LeaderElectionID:       "bfafcebe.api.onmetal.de",
+		Logger:                  logger,
+		Scheme:                  scheme,
+		MetricsBindAddress:      opts.MetricsAddr,
+		Port:                    9443,
+		HealthProbeBindAddress:  opts.ProbeAddr,
+		LeaderElection:          opts.EnableLeaderElection,
+		LeaderElectionID:        "bfafcebe.api.onmetal.de",
+		LeaderElectionNamespace: opts.LeaderElectionNamespace,
 	})
 	if err != nil {
 		return fmt.Errorf("error creating manager: %w", err)
