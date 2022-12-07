@@ -1,0 +1,23 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: broker-role
+rules:
+  - apiGroups:
+      - compute.api.onmetal.de
+    resources:
+      - machineclasses
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - compute.api.onmetal.de
+    resources:
+      - machinepools
+    verbs:
+      - get
+      - list
+      - watch

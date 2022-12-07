@@ -3,7 +3,7 @@ kind: Kustomization
 
 resources:
   - ../default
-  - broker-rbac
+  - poollet-rbac
 
 patchesStrategicMerge:
   - patch-manager.yaml
