@@ -28,17 +28,17 @@ jobs:
             target: manager
           - name: onmetal-api-apiserver
             target: apiserver
-          - name: machinepoollet
+          - name: onmetal-api-machinepoollet
             target: machinepoollet
-          - name: machinebroker
+          - name: onmetal-api-machinebroker
             target: machinebroker
-          - name: orictl-machine
+          - name: onmetal-api-orictl-machine
             target: orictl-machine
-          - name: volumepoollet
+          - name: onmetal-api-volumepoollet
             target: volumepoollet
-          - name: volumebroker
+          - name: onmetal-api-volumebroker
             target: volumebroker
-          - name: orictl-volume
+          - name: onmetal-api-orictl-volume
             target: orictl-volume
     if: ${{ github.event.label.name == 'ok-to-image' }} || ${{ github.event.label.name == 'ok-to-🐳' }} || ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
