@@ -13,7 +13,7 @@ namePrefix: machinepoollet-
 #  someName: someValue
 
 resources:
-  - ../rbac
+  - ../broker-rbac
   - ../manager
 #  - ../webhook
 #  - ../certmanager

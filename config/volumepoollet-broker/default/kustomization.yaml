@@ -13,7 +13,7 @@ namePrefix: volumepoollet-
 #  someName: someValue
 
 resources:
-  - ../rbac
+  - ../broker-rbac
   - ../manager
 #  - ../webhook
 #  - ../certmanager

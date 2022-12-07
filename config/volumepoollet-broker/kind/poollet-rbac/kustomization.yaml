@@ -5,7 +5,7 @@ namespace: volumepoollet-system
 namePrefix: volumepoollet-
 
 resources:
-  - ../../broker-rbac
+  - ../../poollet-rbac
 
 patchesStrategicMerge:
   - delete_service_account.yaml
