@@ -74,7 +74,7 @@ func (r *VolumePoolReconciler) supportsVolumeClass(ctx context.Context, log logr
 
 	_, err = r.VolumeClassMapper.GetVolumeClassFor(ctx, volumeClass.Name, oriCapabilities)
 	if err != nil {
-		if !errors.Is(err, vcm.ErrNoMatchingVolumeClass) || !errors.Is(err, vcm.ErrAmbiguousMatchingVolumeClass) {
+		if !errors.Is(err, vcm.ErrNoMatchingVolumeClass) && !errors.Is(err, vcm.ErrAmbiguousMatchingVolumeClass) {
 			return false, fmt.Errorf("error getting volume class for %s: %w", volumeClass.Name, err)
 		}
 		return false, nil

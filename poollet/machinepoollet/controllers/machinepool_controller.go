@@ -74,7 +74,7 @@ func (r *MachinePoolReconciler) supportsMachineClass(ctx context.Context, log lo
 
 	_, err = r.MachineClassMapper.GetMachineClassFor(ctx, machineClass.Name, oriCapabilities)
 	if err != nil {
-		if !errors.Is(err, mcm.ErrNoMatchingMachineClass) || !errors.Is(err, mcm.ErrAmbiguousMatchingMachineClass) {
+		if !errors.Is(err, mcm.ErrNoMatchingMachineClass) && !errors.Is(err, mcm.ErrAmbiguousMatchingMachineClass) {
 			return false, fmt.Errorf("error getting machine class for %s: %w", machineClass.Name, err)
 		}
 		return false, nil
