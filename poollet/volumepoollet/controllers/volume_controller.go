@@ -432,7 +432,7 @@ func (r *VolumeReconciler) updateStatus(ctx context.Context, log logr.Logger, vo
 						Namespace: volume.Namespace,
 						Name:      r.volumeSecretName(volume.Name, oriAccess.Handle),
 						Labels: map[string]string{
-							volumepoolletv1alpha1.VolumeUIDLabel: string(volume.UID[:63]),
+							volumepoolletv1alpha1.VolumeUIDLabel: string(volume.UID),
 						},
 					},
 					Data: oriAccess.SecretData,
@@ -447,7 +447,7 @@ func (r *VolumeReconciler) updateStatus(ctx context.Context, log logr.Logger, vo
 				if err := r.DeleteAllOf(ctx, &corev1.Secret{},
 					client.InNamespace(volume.Namespace),
 					client.MatchingLabels{
-						volumepoolletv1alpha1.VolumeUIDLabel: string(volume.UID[:63]),
+						volumepoolletv1alpha1.VolumeUIDLabel: string(volume.UID),
 					},
 				); err != nil {
 					return fmt.Errorf("error deleting any corresponding volume secret: %w", err)
