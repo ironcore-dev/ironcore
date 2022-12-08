@@ -19,6 +19,10 @@ import (
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 )
 
+const (
+	MachineMachinePoolRefNameField = "spec.machinePoolRef.name"
+)
+
 // EphemeralNetworkInterfaceSource is a definition for an ephemeral (i.e. coupled to the lifetime of the surrounding
 // object) networking.NetworkInterface.
 type EphemeralNetworkInterfaceSource struct {

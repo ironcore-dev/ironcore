@@ -22,6 +22,8 @@ linters-settings:
     severity: error
     rules:
       - name: exported
+        arguments:
+          - disableStutteringCheck
       - name: if-return
         disabled: true
   importas:

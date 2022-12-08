@@ -151,5 +151,80 @@ var _ = Describe("App", func() {
 				},
 			}))
 		})
+
+		It("should allow listing machines filtering by machine pool name", func() {
+			const (
+				machinePool1 = "machine-pool-1"
+				machinePool2 = "machine-pool-2"
+			)
+
+			By("creating a machine on machine pool 1")
+			machine1 := &computev1alpha1.Machine{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace:    ns.Name,
+					GenerateName: "machine-",
+				},
+				Spec: computev1alpha1.MachineSpec{
+					MachineClassRef: corev1.LocalObjectReference{Name: "my-class"},
+					MachinePoolRef:  &corev1.LocalObjectReference{Name: machinePool1},
+				},
+			}
+			Expect(k8sClient.Create(ctx, machine1)).To(Succeed())
+
+			By("creating a machine on machine pool 2")
+			machine2 := &computev1alpha1.Machine{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace:    ns.Name,
+					GenerateName: "machine-",
+				},
+				Spec: computev1alpha1.MachineSpec{
+					MachineClassRef: corev1.LocalObjectReference{Name: "my-class"},
+					MachinePoolRef:  &corev1.LocalObjectReference{Name: machinePool2},
+				},
+			}
+			Expect(k8sClient.Create(ctx, machine2)).To(Succeed())
+
+			By("creating a machine on no machine pool")
+			machine3 := &computev1alpha1.Machine{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace:    ns.Name,
+					GenerateName: "machine-",
+				},
+				Spec: computev1alpha1.MachineSpec{
+					MachineClassRef: corev1.LocalObjectReference{Name: "my-class"},
+				},
+			}
+			Expect(k8sClient.Create(ctx, machine3)).To(Succeed())
+
+			By("listing all machines on machine pool 1")
+			machinesOnMachinePool1List := &computev1alpha1.MachineList{}
+			Expect(k8sClient.List(ctx, machinesOnMachinePool1List,
+				client.InNamespace(ns.Name),
+				client.MatchingFields{computev1alpha1.MachineMachinePoolRefNameField: machinePool1},
+			))
+
+			By("inspecting the items")
+			Expect(machinesOnMachinePool1List.Items).To(ConsistOf(*machine1))
+
+			By("listing all machines on machine pool 2")
+			machinesOnMachinePool2List := &computev1alpha1.MachineList{}
+			Expect(k8sClient.List(ctx, machinesOnMachinePool2List,
+				client.InNamespace(ns.Name),
+				client.MatchingFields{computev1alpha1.MachineMachinePoolRefNameField: machinePool2},
+			))
+
+			By("inspecting the items")
+			Expect(machinesOnMachinePool2List.Items).To(ConsistOf(*machine2))
+
+			By("listing all machines on no machine pool")
+			machinesOnNoMachinePoolList := &computev1alpha1.MachineList{}
+			Expect(k8sClient.List(ctx, machinesOnNoMachinePoolList,
+				client.InNamespace(ns.Name),
+				client.MatchingFields{computev1alpha1.MachineMachinePoolRefNameField: ""},
+			))
+
+			By("inspecting the items")
+			Expect(machinesOnNoMachinePoolList.Items).To(ConsistOf(*machine3))
+		})
 	})
 })

@@ -38,5 +38,5 @@ func Resource(resource string) schema.GroupResource {
 }
 
 func init() {
-	localSchemeBuilder.Register(addDefaultingFuncs)
+	localSchemeBuilder.Register(addDefaultingFuncs, addConversionFuncs)
 }
