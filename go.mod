@@ -10,7 +10,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/moby/term v0.0.0-20210619224110-3f7ff695adc6
 	github.com/onmetal/controller-utils v0.6.5
-	github.com/onsi/ginkgo/v2 v2.5.0
+	github.com/onsi/ginkgo/v2 v2.5.1
 	github.com/onsi/gomega v1.24.0
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
