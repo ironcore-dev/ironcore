@@ -76,7 +76,7 @@ type Options struct {
 }
 
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
-	fs.StringVar(&o.Kubeconfig, "kubconfig", "", "Path pointing to a kubeconfig to use.")
+	fs.StringVar(&o.Kubeconfig, "kubeconfig", "", "Path pointing to a kubeconfig to use.")
 	fs.StringVar(&o.EgressSelectorConfig, "egress-selector-config", "", "Path pointing to an egress selector config to use.")
 	fs.StringVar(&o.MetricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	fs.StringVar(&o.ProbeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
