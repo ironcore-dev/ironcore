@@ -57,6 +57,8 @@ func init() {
 }
 
 type Options struct {
+	Kubeconfig               string
+	EgressSelectorConfig     string
 	MetricsAddr              string
 	EnableLeaderElection     bool
 	LeaderElectionNamespace  string
@@ -74,6 +76,8 @@ type Options struct {
 }
 
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
+	fs.StringVar(&o.Kubeconfig, "kubconfig", "", "Path pointing to a kubeconfig to use.")
+	fs.StringVar(&o.EgressSelectorConfig, "egress-selector-config", "", "Path pointing to an egress selector config to use.")
 	fs.StringVar(&o.MetricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	fs.StringVar(&o.ProbeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	fs.BoolVar(&o.EnableLeaderElection, "leader-elect", false,
@@ -119,7 +123,6 @@ func Command() *cobra.Command {
 	goFlags := goflag.NewFlagSet("", 0)
 	zapOpts.BindFlags(goFlags)
 	cmd.PersistentFlags().AddGoFlagSet(goFlags)
-	cmd.PersistentFlags().AddGoFlagSet(goflag.CommandLine)
 
 	opts.AddFlags(cmd.Flags())
 	opts.MarkFlagsRequired(cmd)
@@ -150,12 +153,23 @@ func Run(ctx context.Context, opts Options) error {
 
 	machineRuntime := ori.NewMachineRuntimeClient(conn)
 
-	leaderElectionCfg, err := configutils.GetConfig(configutils.Kubeconfig(opts.LeaderElectionKubeconfig))
+	cfg, err := configutils.GetConfig(
+		configutils.Kubeconfig(opts.Kubeconfig),
+		configutils.EgressSelectorConfig(opts.EgressSelectorConfig),
+		configutils.WithEgressSelectionName(configutils.EgressSelectionNameControlPlane),
+	)
+	if err != nil {
+		return fmt.Errorf("error getting config: %w", err)
+	}
+
+	leaderElectionCfg, err := configutils.GetConfig(
+		configutils.Kubeconfig(opts.LeaderElectionKubeconfig),
+	)
 	if err != nil {
 		return fmt.Errorf("error creating leader election kubeconfig: %w", err)
 	}
 
-	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
+	mgr, err := ctrl.NewManager(cfg, ctrl.Options{
 		Logger:                  logger,
 		Scheme:                  scheme,
 		MetricsBindAddress:      opts.MetricsAddr,

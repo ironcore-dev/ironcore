@@ -55,8 +55,6 @@ var (
 )
 
 func TestAPIs(t *testing.T) {
-	_, reporterConfig := GinkgoConfiguration()
-	reporterConfig.SlowSpecThreshold = 10 * time.Second
 	SetDefaultConsistentlyPollingInterval(pollingInterval)
 	SetDefaultEventuallyPollingInterval(pollingInterval)
 	SetDefaultEventuallyTimeout(eventuallyTimeout)

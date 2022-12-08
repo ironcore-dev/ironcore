@@ -57,8 +57,6 @@ const (
 )
 
 func TestServer(t *testing.T) {
-	_, reporterConfig := GinkgoConfiguration()
-	reporterConfig.SlowSpecThreshold = slowSpecThreshold
 	SetDefaultConsistentlyPollingInterval(pollingInterval)
 	SetDefaultEventuallyPollingInterval(pollingInterval)
 	SetDefaultEventuallyTimeout(eventuallyTimeout)
