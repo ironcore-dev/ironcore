@@ -198,6 +198,7 @@ func Run(ctx context.Context, opts Options) error {
 		if err := (&controllers.VolumeReconciler{
 			EventRecorder:     mgr.GetEventRecorderFor("volumes"),
 			Client:            mgr.GetClient(),
+			Scheme:            scheme,
 			VolumeRuntime:     volumeRuntime,
 			VolumeClassMapper: volumeClassMapper,
 			VolumePoolName:    opts.VolumePoolName,
