@@ -61,11 +61,12 @@ type Options struct {
 	LeaderElectionKubeconfig string
 	ProbeAddr                string
 
-	VolumePoolName               string
-	ProviderID                   string
-	VolumeRuntimeEndpoint        string
-	DialTimeout                  time.Duration
-	VolumeClassMapperSyncTimeout time.Duration
+	VolumePoolName                      string
+	ProviderID                          string
+	VolumeRuntimeEndpoint               string
+	DialTimeout                         time.Duration
+	VolumeRuntimeSocketDiscoveryTimeout time.Duration
+	VolumeClassMapperSyncTimeout        time.Duration
 
 	WatchFilterValue string
 }
@@ -83,6 +84,7 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.ProviderID, "provider-id", "", "Provider id to announce on the volume pool.")
 	fs.StringVar(&o.VolumeRuntimeEndpoint, "volume-runtime-endpoint", o.VolumeRuntimeEndpoint, "Endpoint of the remote volume runtime service.")
 	fs.DurationVar(&o.DialTimeout, "dial-timeout", 1*time.Second, "Timeout for dialing to the volume runtime endpoint.")
+	fs.DurationVar(&o.VolumeRuntimeSocketDiscoveryTimeout, "volume-runtime-discovery-timeout", 20*time.Second, "Timeout for discovering the volume runtime socket.")
 	fs.DurationVar(&o.VolumeClassMapperSyncTimeout, "vcm-sync-timeout", 10*time.Second, "Timeout waiting for the volume class mapper to sync.")
 
 	fs.StringVar(&o.WatchFilterValue, "watch-filter", "", "Value to filter for while watching.")
@@ -127,7 +129,7 @@ func Run(ctx context.Context, opts Options) error {
 	logger := ctrl.LoggerFrom(ctx)
 	setupLog := ctrl.Log.WithName("setup")
 
-	endpoint, err := orivolumeutils.GetAddress(opts.VolumeRuntimeEndpoint)
+	endpoint, err := orivolumeutils.GetAddressWithTimeout(opts.VolumeRuntimeSocketDiscoveryTimeout, opts.VolumeRuntimeEndpoint)
 	if err != nil {
 		return fmt.Errorf("error detecting volume runtime endpoint: %w", err)
 	}

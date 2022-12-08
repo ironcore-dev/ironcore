@@ -63,11 +63,12 @@ type Options struct {
 	LeaderElectionKubeconfig string
 	ProbeAddr                string
 
-	MachinePoolName               string
-	ProviderID                    string
-	MachineRuntimeEndpoint        string
-	DialTimeout                   time.Duration
-	MachineClassMapperSyncTimeout time.Duration
+	MachinePoolName                      string
+	ProviderID                           string
+	MachineRuntimeEndpoint               string
+	MachineRuntimeSocketDiscoveryTimeout time.Duration
+	DialTimeout                          time.Duration
+	MachineClassMapperSyncTimeout        time.Duration
 
 	WatchFilterValue string
 }
@@ -84,6 +85,7 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.MachinePoolName, "machine-pool-name", o.MachinePoolName, "Name of the machine pool to announce / watch")
 	fs.StringVar(&o.ProviderID, "provider-id", "", "Provider id to announce on the machine pool.")
 	fs.StringVar(&o.MachineRuntimeEndpoint, "machine-runtime-endpoint", o.MachineRuntimeEndpoint, "Endpoint of the remote machine runtime service.")
+	fs.DurationVar(&o.MachineRuntimeSocketDiscoveryTimeout, "machine-runtime-socket-discovery-timeout", 20*time.Second, "Timeout for discovering the machine runtime socket.")
 	fs.DurationVar(&o.DialTimeout, "dial-timeout", 1*time.Second, "Timeout for dialing to the machine runtime endpoint.")
 	fs.DurationVar(&o.MachineClassMapperSyncTimeout, "mcm-sync-timeout", 10*time.Second, "Timeout waiting for the machine class mapper to sync.")
 
@@ -129,7 +131,7 @@ func Run(ctx context.Context, opts Options) error {
 	logger := ctrl.LoggerFrom(ctx)
 	setupLog := ctrl.Log.WithName("setup")
 
-	endpoint, err := orimachineutils.GetAddress(opts.MachineRuntimeEndpoint)
+	endpoint, err := orimachineutils.GetAddressWithTimeout(opts.MachineRuntimeSocketDiscoveryTimeout, opts.MachineRuntimeEndpoint)
 	if err != nil {
 		return fmt.Errorf("error detecting machine runtime endpoint: %w", err)
 	}

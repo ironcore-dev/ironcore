@@ -16,6 +16,7 @@ package common
 
 import (
 	"fmt"
+	"time"
 
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
 	orivolumeutils "github.com/onmetal/onmetal-api/ori/utils/volume"
@@ -48,7 +49,7 @@ func (o *ClientOptions) AddFlags(fs *pflag.FlagSet) {
 }
 
 func (o *ClientOptions) New() (ori.VolumeRuntimeClient, func() error, error) {
-	address, err := orivolumeutils.GetAddress(o.Address)
+	address, err := orivolumeutils.GetAddressWithTimeout(3*time.Second, o.Address)
 	if err != nil {
 		return nil, nil, err
 	}

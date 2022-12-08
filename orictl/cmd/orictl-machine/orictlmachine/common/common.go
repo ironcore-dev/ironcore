@@ -16,6 +16,7 @@ package common
 
 import (
 	"fmt"
+	"time"
 
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	orimachineutils "github.com/onmetal/onmetal-api/ori/utils/machine"
@@ -49,7 +50,7 @@ func (o *ClientOptions) AddFlags(fs *pflag.FlagSet) {
 }
 
 func (o *ClientOptions) New() (ori.MachineRuntimeClient, func() error, error) {
-	address, err := orimachineutils.GetAddress(o.Address)
+	address, err := orimachineutils.GetAddressWithTimeout(3*time.Second, o.Address)
 	if err != nil {
 		return nil, nil, err
 	}
