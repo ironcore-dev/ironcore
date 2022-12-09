@@ -2278,6 +2278,13 @@ func schema_onmetal_api_api_networking_v1alpha1_AliasPrefixRouting(ref common.Re
 							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
 					},
+					"networkRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "NetworkRef is the network the load balancer is assigned to.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference"),
+						},
+					},
 					"destinations": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Destinations are the destinations for an AliasPrefix.",
@@ -2293,7 +2300,7 @@ func schema_onmetal_api_api_networking_v1alpha1_AliasPrefixRouting(ref common.Re
 						},
 					},
 				},
-				Required: []string{"destinations"},
+				Required: []string{"networkRef", "destinations"},
 			},
 		},
 		Dependencies: []string{

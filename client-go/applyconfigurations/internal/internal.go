@@ -597,6 +597,10 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       default: {}
+    - name: networkRef
+      type:
+        namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.LocalUIDReference
+      default: {}
 - name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.AliasPrefixSpec
   map:
     fields:

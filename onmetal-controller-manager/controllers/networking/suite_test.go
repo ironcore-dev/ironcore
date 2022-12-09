@@ -159,8 +159,9 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	Expect(err).NotTo(HaveOccurred())
 
 	err = (&AliasPrefixReconciler{
-		Client: k8sManager.GetClient(),
-		Scheme: k8sManager.GetScheme(),
+		EventRecorder: &record.FakeRecorder{},
+		Client:        k8sManager.GetClient(),
+		Scheme:        k8sManager.GetScheme(),
 	}).SetupWithManager(k8sManager)
 	Expect(err).NotTo(HaveOccurred())
 
