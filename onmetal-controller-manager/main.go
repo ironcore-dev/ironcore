@@ -344,8 +344,9 @@ func main() {
 
 	if controllers.Enabled(aliasPrefixController) {
 		if err = (&networkingcontrollers.AliasPrefixReconciler{
-			Client: mgr.GetClient(),
-			Scheme: mgr.GetScheme(),
+			EventRecorder: mgr.GetEventRecorderFor("aliasprefixes"),
+			Client:        mgr.GetClient(),
+			Scheme:        mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "AliasPrefix")
 			os.Exit(1)

@@ -49,7 +49,6 @@ var (
 )
 
 const (
-	slowSpecThreshold    = 10 * time.Second
 	eventuallyTimeout    = 3 * time.Second
 	pollingInterval      = 50 * time.Millisecond
 	consistentlyDuration = 1 * time.Second

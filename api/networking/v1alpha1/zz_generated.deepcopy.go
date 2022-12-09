@@ -94,6 +94,7 @@ func (in *AliasPrefixRouting) DeepCopyInto(out *AliasPrefixRouting) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
 	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
+	out.NetworkRef = in.NetworkRef
 	if in.Destinations != nil {
 		in, out := &in.Destinations, &out.Destinations
 		*out = make([]commonv1alpha1.LocalUIDReference, len(*in))

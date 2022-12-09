@@ -24,9 +24,12 @@ import (
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	onmetalapiclient "github.com/onmetal/onmetal-api/onmetal-controller-manager/client"
 	onmetalapiclientutils "github.com/onmetal/onmetal-api/onmetal-controller-manager/clientutils"
+	"github.com/onmetal/onmetal-api/onmetal-controller-manager/controllers/networking/events"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
@@ -38,6 +41,7 @@ var (
 )
 
 type AliasPrefixReconciler struct {
+	record.EventRecorder
 	client.Client
 	Scheme *runtime.Scheme
 }
@@ -67,6 +71,21 @@ func (r *AliasPrefixReconciler) reconcileExists(ctx context.Context, log logr.Lo
 
 func (r *AliasPrefixReconciler) delete(ctx context.Context, log logr.Logger, aliasPrefix *networkingv1alpha1.AliasPrefix) (ctrl.Result, error) {
 	return ctrl.Result{}, nil
+}
+
+func (r *AliasPrefixReconciler) getNetwork(ctx context.Context, aliasPrefix *networkingv1alpha1.AliasPrefix) (*networkingv1alpha1.Network, bool, error) {
+	network := &networkingv1alpha1.Network{}
+	networkName := aliasPrefix.Spec.NetworkRef.Name
+	if err := r.Get(ctx, client.ObjectKey{Namespace: aliasPrefix.Namespace, Name: networkName}, network); err != nil {
+		return nil, false, fmt.Errorf("error getting network %s: %w", networkName, err)
+	}
+
+	if networkState := network.Status.State; networkState != networkingv1alpha1.NetworkStateAvailable {
+		r.Eventf(aliasPrefix, corev1.EventTypeNormal, events.NetworkNotReady, "Network %s is in state %s", network.Name, networkState)
+		return nil, false, nil
+	}
+
+	return network, true, nil
 }
 
 func (r *AliasPrefixReconciler) applyPrefix(ctx context.Context, log logr.Logger, aliasPrefix *networkingv1alpha1.AliasPrefix) (*commonv1alpha1.IPPrefix, error) {
@@ -129,15 +148,26 @@ func (r *AliasPrefixReconciler) reconcile(ctx context.Context, log logr.Logger, 
 
 	log.V(1).Info("Network interface selector is present, managing routing")
 
+	log.V(1).Info("Getting network")
+	network, ok, err := r.getNetwork(ctx, aliasPrefix)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+	if !ok {
+		log.V(1).Info("Network not yet ready")
+		return ctrl.Result{}, nil
+	}
+	log.V(1).Info("Successfully got network")
+
 	log.V(1).Info("Finding destinations")
-	destinations, err := r.findDestinations(ctx, log, aliasPrefix)
+	destinations, err := r.findDestinations(ctx, log, aliasPrefix, network)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error finding destinations: %w", err)
 	}
 	log.V(1).Info("Successfully found destinations", "Destinations", destinations)
 
 	log.V(1).Info("Applying routing")
-	if err := r.applyRouting(ctx, aliasPrefix, destinations); err != nil {
+	if err := r.applyRouting(ctx, aliasPrefix, network, destinations); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error applying routing: %w", err)
 	}
 	log.V(1).Info("Successfully applied routing")
@@ -153,7 +183,7 @@ func (r *AliasPrefixReconciler) patchStatus(ctx context.Context, aliasPrefix *ne
 	return nil
 }
 
-func (r *AliasPrefixReconciler) findDestinations(ctx context.Context, log logr.Logger, aliasPrefix *networkingv1alpha1.AliasPrefix) ([]commonv1alpha1.LocalUIDReference, error) {
+func (r *AliasPrefixReconciler) findDestinations(ctx context.Context, log logr.Logger, aliasPrefix *networkingv1alpha1.AliasPrefix, network *networkingv1alpha1.Network) ([]commonv1alpha1.LocalUIDReference, error) {
 	sel, err := metav1.LabelSelectorAsSelector(aliasPrefix.Spec.NetworkInterfaceSelector)
 	if err != nil {
 		return nil, err
@@ -163,7 +193,7 @@ func (r *AliasPrefixReconciler) findDestinations(ctx context.Context, log logr.L
 	if err := r.List(ctx, nicList,
 		client.InNamespace(aliasPrefix.Namespace),
 		client.MatchingLabelsSelector{Selector: sel},
-		client.MatchingFields{onmetalapiclient.NetworkInterfaceNetworkNameField: aliasPrefix.Spec.NetworkRef.Name},
+		client.MatchingFields{onmetalapiclient.NetworkInterfaceNetworkNameField: network.Name},
 	); err != nil {
 		return nil, fmt.Errorf("error listing network interfaces: %w", err)
 	}
@@ -175,7 +205,7 @@ func (r *AliasPrefixReconciler) findDestinations(ctx context.Context, log logr.L
 	return destinations, nil
 }
 
-func (r *AliasPrefixReconciler) applyRouting(ctx context.Context, aliasPrefix *networkingv1alpha1.AliasPrefix, destinations []commonv1alpha1.LocalUIDReference) error {
+func (r *AliasPrefixReconciler) applyRouting(ctx context.Context, aliasPrefix *networkingv1alpha1.AliasPrefix, network *networkingv1alpha1.Network, destinations []commonv1alpha1.LocalUIDReference) error {
 	aliasPrefixRouting := &networkingv1alpha1.AliasPrefixRouting{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "AliasPrefixRouting",
@@ -184,6 +214,10 @@ func (r *AliasPrefixReconciler) applyRouting(ctx context.Context, aliasPrefix *n
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: aliasPrefix.Namespace,
 			Name:      aliasPrefix.Name,
+		},
+		NetworkRef: commonv1alpha1.LocalUIDReference{
+			Name: network.Name,
+			UID:  network.UID,
 		},
 		Destinations: destinations,
 	}
@@ -204,13 +238,17 @@ func (r *AliasPrefixReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		For(&networkingv1alpha1.AliasPrefix{}).
 		Owns(&networkingv1alpha1.AliasPrefixRouting{}).
 		Watches(
+			&source.Kind{Type: &networkingv1alpha1.Network{}},
+			r.enqueueByNetwork(ctx, log),
+		).
+		Watches(
 			&source.Kind{Type: &networkingv1alpha1.NetworkInterface{}},
-			r.enqueueByAliasPrefixMatchingNetworkInterface(ctx, log),
+			r.enqueueByNetworkInterface(ctx, log),
 		).
 		Complete(r)
 }
 
-func (r *AliasPrefixReconciler) enqueueByAliasPrefixMatchingNetworkInterface(ctx context.Context, log logr.Logger) handler.EventHandler {
+func (r *AliasPrefixReconciler) enqueueByNetworkInterface(ctx context.Context, log logr.Logger) handler.EventHandler {
 	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
 		nic := obj.(*networkingv1alpha1.NetworkInterface)
 		log = log.WithValues("NetworkInterfaceKey", client.ObjectKeyFromObject(nic))
@@ -244,5 +282,23 @@ func (r *AliasPrefixReconciler) enqueueByAliasPrefixMatchingNetworkInterface(ctx
 			}
 		}
 		return res
+	})
+}
+
+func (r *AliasPrefixReconciler) enqueueByNetwork(ctx context.Context, log logr.Logger) handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+		network := obj.(*networkingv1alpha1.Network)
+		log := log.WithValues("NetworkKey", client.ObjectKeyFromObject(network))
+
+		aliasPrefixList := &networkingv1alpha1.AliasPrefixList{}
+		if err := r.List(ctx, aliasPrefixList,
+			client.InNamespace(network.Namespace),
+			client.MatchingFields{onmetalapiclient.AliasPrefixNetworkNameField: network.Name},
+		); err != nil {
+			log.Error(err, "Error listing alias prefixes for network")
+			return nil
+		}
+
+		return onmetalapiclientutils.ReconcileRequestsFromObjectSlice(aliasPrefixList.Items)
 	})
 }

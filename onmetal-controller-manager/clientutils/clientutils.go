@@ -24,6 +24,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
 // ErrNotControlled is returned if the actual object is not controlled by the specified owner.
@@ -52,4 +53,18 @@ func ControlledCreateOrGet(ctx context.Context, c client.Client, owner client.Ob
 			ErrNotControlled, key, client.ObjectKeyFromObject(owner))
 	}
 	return nil
+}
+
+func ReconcileRequestsFromObjectSlice[S ~[]O, ObjPtr interface {
+	client.Object
+	*O
+}, O any](objs S) []reconcile.Request {
+	res := make([]reconcile.Request, len(objs))
+	for i := range objs {
+		obj := ObjPtr(&objs[i])
+		res[i] = reconcile.Request{
+			NamespacedName: client.ObjectKeyFromObject(obj),
+		}
+	}
+	return res
 }

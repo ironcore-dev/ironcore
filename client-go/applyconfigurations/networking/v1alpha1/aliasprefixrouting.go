@@ -32,6 +32,7 @@ import (
 type AliasPrefixRoutingApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
+	NetworkRef                       *v1alpha1.LocalUIDReferenceApplyConfiguration  `json:"networkRef,omitempty"`
 	Destinations                     []v1alpha1.LocalUIDReferenceApplyConfiguration `json:"destinations,omitempty"`
 }
 
@@ -238,6 +239,14 @@ func (b *AliasPrefixRoutingApplyConfiguration) ensureObjectMetaApplyConfiguratio
 	if b.ObjectMetaApplyConfiguration == nil {
 		b.ObjectMetaApplyConfiguration = &v1.ObjectMetaApplyConfiguration{}
 	}
+}
+
+// WithNetworkRef sets the NetworkRef field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the NetworkRef field is set to the value of the last call.
+func (b *AliasPrefixRoutingApplyConfiguration) WithNetworkRef(value *v1alpha1.LocalUIDReferenceApplyConfiguration) *AliasPrefixRoutingApplyConfiguration {
+	b.NetworkRef = value
+	return b
 }
 
 // WithDestinations adds the given value to the Destinations field in the declarative configuration

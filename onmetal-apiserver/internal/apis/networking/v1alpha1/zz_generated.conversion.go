@@ -521,6 +521,7 @@ func Convert_networking_AliasPrefixList_To_v1alpha1_AliasPrefixList(in *networki
 
 func autoConvert_v1alpha1_AliasPrefixRouting_To_networking_AliasPrefixRouting(in *v1alpha1.AliasPrefixRouting, out *networking.AliasPrefixRouting, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
+	out.NetworkRef = in.NetworkRef
 	out.Destinations = *(*[]commonv1alpha1.LocalUIDReference)(unsafe.Pointer(&in.Destinations))
 	return nil
 }
@@ -532,6 +533,7 @@ func Convert_v1alpha1_AliasPrefixRouting_To_networking_AliasPrefixRouting(in *v1
 
 func autoConvert_networking_AliasPrefixRouting_To_v1alpha1_AliasPrefixRouting(in *networking.AliasPrefixRouting, out *v1alpha1.AliasPrefixRouting, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
+	out.NetworkRef = in.NetworkRef
 	out.Destinations = *(*[]commonv1alpha1.LocalUIDReference)(unsafe.Pointer(&in.Destinations))
 	return nil
 }

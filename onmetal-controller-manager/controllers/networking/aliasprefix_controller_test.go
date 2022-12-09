@@ -37,8 +37,16 @@ var _ = Describe("AliasPrefixReconciler", func() {
 				Namespace:    ns.Name,
 				GenerateName: "network-",
 			},
+			Spec: networkingv1alpha1.NetworkSpec{
+				Handle: "foo",
+			},
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())
+
+		By("patching the network to be available")
+		networkBase := network.DeepCopy()
+		network.Status.State = networkingv1alpha1.NetworkStateAvailable
+		Expect(k8sClient.Status().Patch(ctx, network, client.MergeFrom(networkBase))).To(Succeed())
 
 		By("creating an alias prefix")
 		aliasPrefix := &networkingv1alpha1.AliasPrefix{
@@ -73,6 +81,10 @@ var _ = Describe("AliasPrefixReconciler", func() {
 			g.Expect(err).NotTo(HaveOccurred())
 
 			g.Expect(metav1.IsControlledBy(aliasPrefixRouting, aliasPrefix)).To(BeTrue(), "alias prefix routing is not controlled by alias prefix: %#v", aliasPrefixRouting.OwnerReferences)
+			g.Expect(aliasPrefixRouting.NetworkRef).To(Equal(commonv1alpha1.LocalUIDReference{
+				Name: network.Name,
+				UID:  network.UID,
+			}))
 			g.Expect(aliasPrefixRouting.Destinations).To(BeEmpty())
 		}).Should(Succeed())
 
@@ -101,6 +113,10 @@ var _ = Describe("AliasPrefixReconciler", func() {
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, aliasPrefixKey, aliasPrefixRouting)).To(Succeed())
 
+			g.Expect(aliasPrefixRouting.NetworkRef).To(Equal(commonv1alpha1.LocalUIDReference{
+				Name: network.Name,
+				UID:  network.UID,
+			}))
 			g.Expect(aliasPrefixRouting.Destinations).To(Equal([]commonv1alpha1.LocalUIDReference{
 				{Name: nic.Name, UID: nic.UID},
 			}))

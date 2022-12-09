@@ -29,6 +29,9 @@ type AliasPrefixRouting struct {
 	metav1.TypeMeta
 	metav1.ObjectMeta
 
+	// NetworkRef is the network the load balancer is assigned to.
+	NetworkRef commonv1alpha1.LocalUIDReference
+
 	// Destinations are the destinations for an AliasPrefix.
 	Destinations []commonv1alpha1.LocalUIDReference
 }
