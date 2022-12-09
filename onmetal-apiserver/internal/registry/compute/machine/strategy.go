@@ -34,6 +34,7 @@ import (
 	"k8s.io/apiserver/pkg/registry/generic"
 	apisrvstorage "k8s.io/apiserver/pkg/storage"
 	"k8s.io/apiserver/pkg/storage/names"
+	"k8s.io/client-go/tools/cache"
 	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 )
 
@@ -47,14 +48,42 @@ func GetAttrs(obj runtime.Object) (labels.Set, fields.Set, error) {
 
 func MatchMachine(label labels.Selector, field fields.Selector) apisrvstorage.SelectionPredicate {
 	return apisrvstorage.SelectionPredicate{
-		Label:    label,
-		Field:    field,
-		GetAttrs: GetAttrs,
+		Label:       label,
+		Field:       field,
+		GetAttrs:    GetAttrs,
+		IndexFields: []string{compute.MachineMachinePoolRefNameField},
 	}
 }
 
+func machineMachinePoolRefName(machine *compute.Machine) string {
+	if machinePoolRef := machine.Spec.MachinePoolRef; machinePoolRef != nil {
+		return machinePoolRef.Name
+	}
+	return ""
+}
+
 func SelectableFields(machine *compute.Machine) fields.Set {
-	return generic.ObjectMetaFieldsSet(&machine.ObjectMeta, true)
+	fieldsSet := make(fields.Set)
+	fieldsSet[compute.MachineMachinePoolRefNameField] = machineMachinePoolRefName(machine)
+	return generic.AddObjectMetaFieldsSet(fieldsSet, &machine.ObjectMeta, true)
+}
+
+func MachinePoolRefNameIndexFunc(obj any) ([]string, error) {
+	machine, ok := obj.(*compute.Machine)
+	if !ok {
+		return nil, fmt.Errorf("not a machine")
+	}
+	return []string{machineMachinePoolRefName(machine)}, nil
+}
+
+func MachinePoolRefNameTriggerFunc(obj runtime.Object) string {
+	return machineMachinePoolRefName(obj.(*compute.Machine))
+}
+
+func Indexers() *cache.Indexers {
+	return &cache.Indexers{
+		apisrvstorage.FieldIndex(compute.MachineMachinePoolRefNameField): MachinePoolRefNameIndexFunc,
+	}
 }
 
 type machineStrategy struct {

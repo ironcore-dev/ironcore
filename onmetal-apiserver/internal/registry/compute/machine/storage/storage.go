@@ -29,6 +29,7 @@ import (
 	"k8s.io/apiserver/pkg/registry/generic"
 	genericregistry "k8s.io/apiserver/pkg/registry/generic/registry"
 	"k8s.io/apiserver/pkg/registry/rest"
+	"k8s.io/apiserver/pkg/storage"
 	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 )
 
@@ -60,7 +61,14 @@ func NewStorage(optsGetter generic.RESTOptionsGetter, k client.ConnectionInfoGet
 		TableConvertor: newTableConvertor(),
 	}
 
-	options := &generic.StoreOptions{RESTOptions: optsGetter, AttrFunc: machine.GetAttrs}
+	options := &generic.StoreOptions{
+		RESTOptions: optsGetter,
+		AttrFunc:    machine.GetAttrs,
+		TriggerFunc: map[string]storage.IndexerFunc{
+			compute.MachineMachinePoolRefNameField: machine.MachinePoolRefNameTriggerFunc,
+		},
+		Indexers: machine.Indexers(),
+	}
 	if err := store.CompleteWithOptions(options); err != nil {
 		return MachineStorage{}, err
 	}
