@@ -28,6 +28,7 @@ import (
 	"k8s.io/apiserver/pkg/registry/generic"
 	apisrvstorage "k8s.io/apiserver/pkg/storage"
 	"k8s.io/apiserver/pkg/storage/names"
+	"k8s.io/client-go/tools/cache"
 	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 )
 
@@ -41,14 +42,42 @@ func GetAttrs(obj runtime.Object) (labels.Set, fields.Set, error) {
 
 func MatchVolume(label labels.Selector, field fields.Selector) apisrvstorage.SelectionPredicate {
 	return apisrvstorage.SelectionPredicate{
-		Label:    label,
-		Field:    field,
-		GetAttrs: GetAttrs,
+		Label:       label,
+		Field:       field,
+		GetAttrs:    GetAttrs,
+		IndexFields: []string{storage.VolumeVolumePoolRefNameField},
 	}
 }
 
+func volumeVolumePoolRefName(volume *storage.Volume) string {
+	if volumePoolRef := volume.Spec.VolumePoolRef; volumePoolRef != nil {
+		return volumePoolRef.Name
+	}
+	return ""
+}
+
 func SelectableFields(volume *storage.Volume) fields.Set {
-	return generic.ObjectMetaFieldsSet(&volume.ObjectMeta, true)
+	fieldsSet := make(fields.Set)
+	fieldsSet[storage.VolumeVolumePoolRefNameField] = volumeVolumePoolRefName(volume)
+	return generic.AddObjectMetaFieldsSet(fieldsSet, &volume.ObjectMeta, true)
+}
+
+func VolumePoolRefNameIndexFunc(obj any) ([]string, error) {
+	volume, ok := obj.(*storage.Volume)
+	if !ok {
+		return nil, fmt.Errorf("not a volume")
+	}
+	return []string{volumeVolumePoolRefName(volume)}, nil
+}
+
+func VolumePoolRefNameTriggerFunc(obj runtime.Object) string {
+	return volumeVolumePoolRefName(obj.(*storage.Volume))
+}
+
+func Indexers() *cache.Indexers {
+	return &cache.Indexers{
+		apisrvstorage.FieldIndex(storage.VolumeVolumePoolRefNameField): VolumePoolRefNameIndexFunc,
+	}
 }
 
 type volumeStrategy struct {

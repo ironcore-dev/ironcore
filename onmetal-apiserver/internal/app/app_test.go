@@ -16,10 +16,12 @@ package app_test
 
 import (
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	. "github.com/onmetal/onmetal-api/testutils"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -225,6 +227,90 @@ var _ = Describe("App", func() {
 
 			By("inspecting the items")
 			Expect(machinesOnNoMachinePoolList.Items).To(ConsistOf(*machine3))
+		})
+
+		It("should allow listing volumes filtering by volume pool name", func() {
+			const (
+				volumePool1 = "volume-pool-1"
+				volumePool2 = "volume-pool-2"
+			)
+
+			By("creating a volume on volume pool 1")
+			volume1 := &storagev1alpha1.Volume{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace:    ns.Name,
+					GenerateName: "volume-",
+				},
+				Spec: storagev1alpha1.VolumeSpec{
+					VolumeClassRef: &corev1.LocalObjectReference{Name: "my-class"},
+					VolumePoolRef:  &corev1.LocalObjectReference{Name: volumePool1},
+					Resources: corev1.ResourceList{
+						corev1.ResourceStorage: resource.MustParse("10Gi"),
+					},
+				},
+			}
+			Expect(k8sClient.Create(ctx, volume1)).To(Succeed())
+
+			By("creating a volume on volume pool 2")
+			volume2 := &storagev1alpha1.Volume{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace:    ns.Name,
+					GenerateName: "volume-",
+				},
+				Spec: storagev1alpha1.VolumeSpec{
+					VolumeClassRef: &corev1.LocalObjectReference{Name: "my-class"},
+					VolumePoolRef:  &corev1.LocalObjectReference{Name: volumePool2},
+					Resources: corev1.ResourceList{
+						corev1.ResourceStorage: resource.MustParse("10Gi"),
+					},
+				},
+			}
+			Expect(k8sClient.Create(ctx, volume2)).To(Succeed())
+
+			By("creating a volume on no volume pool")
+			volume3 := &storagev1alpha1.Volume{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace:    ns.Name,
+					GenerateName: "volume-",
+				},
+				Spec: storagev1alpha1.VolumeSpec{
+					VolumeClassRef: &corev1.LocalObjectReference{Name: "my-class"},
+					Resources: corev1.ResourceList{
+						corev1.ResourceStorage: resource.MustParse("10Gi"),
+					},
+				},
+			}
+			Expect(k8sClient.Create(ctx, volume3)).To(Succeed())
+
+			By("listing all volumes on volume pool 1")
+			volumesOnVolumePool1List := &storagev1alpha1.VolumeList{}
+			Expect(k8sClient.List(ctx, volumesOnVolumePool1List,
+				client.InNamespace(ns.Name),
+				client.MatchingFields{storagev1alpha1.VolumeVolumePoolRefNameField: volumePool1},
+			))
+
+			By("inspecting the items")
+			Expect(volumesOnVolumePool1List.Items).To(ConsistOf(*volume1))
+
+			By("listing all volumes on volume pool 2")
+			volumesOnVolumePool2List := &storagev1alpha1.VolumeList{}
+			Expect(k8sClient.List(ctx, volumesOnVolumePool2List,
+				client.InNamespace(ns.Name),
+				client.MatchingFields{storagev1alpha1.VolumeVolumePoolRefNameField: volumePool2},
+			))
+
+			By("inspecting the items")
+			Expect(volumesOnVolumePool2List.Items).To(ConsistOf(*volume2))
+
+			By("listing all volumes on no volume pool")
+			volumesOnNoVolumePoolList := &storagev1alpha1.VolumeList{}
+			Expect(k8sClient.List(ctx, volumesOnNoVolumePoolList,
+				client.InNamespace(ns.Name),
+				client.MatchingFields{storagev1alpha1.VolumeVolumePoolRefNameField: ""},
+			))
+
+			By("inspecting the items")
+			Expect(volumesOnNoVolumePoolList.Items).To(ConsistOf(*volume3))
 		})
 	})
 })

@@ -24,6 +24,7 @@ import (
 	"k8s.io/apiserver/pkg/registry/generic"
 	genericregistry "k8s.io/apiserver/pkg/registry/generic/registry"
 	"k8s.io/apiserver/pkg/registry/rest"
+	apisrvstorage "k8s.io/apiserver/pkg/storage"
 	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 )
 
@@ -54,7 +55,14 @@ func NewStorage(optsGetter generic.RESTOptionsGetter) (VolumeStorage, error) {
 		TableConvertor: newTableConvertor(),
 	}
 
-	options := &generic.StoreOptions{RESTOptions: optsGetter, AttrFunc: volume.GetAttrs}
+	options := &generic.StoreOptions{
+		RESTOptions: optsGetter,
+		AttrFunc:    volume.GetAttrs,
+		TriggerFunc: map[string]apisrvstorage.IndexerFunc{
+			storage.VolumeVolumePoolRefNameField: volume.VolumePoolRefNameTriggerFunc,
+		},
+		Indexers: volume.Indexers(),
+	}
 	if err := store.CompleteWithOptions(options); err != nil {
 		return VolumeStorage{}, err
 	}
