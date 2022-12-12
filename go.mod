@@ -11,7 +11,7 @@ require (
 	github.com/moby/term v0.0.0-20210619224110-3f7ff695adc6
 	github.com/onmetal/controller-utils v0.6.5
 	github.com/onsi/ginkgo/v2 v2.6.0
-	github.com/onsi/gomega v1.24.0
+	github.com/onsi/gomega v1.24.1
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
 	go.uber.org/atomic v1.10.0
