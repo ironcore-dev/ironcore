@@ -90,9 +90,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	var err error
 
 	By("bootstrapping test environment")
-	testEnv = &envtest.Environment{
-		AttachControlPlaneOutput: true,
-	}
+	testEnv = &envtest.Environment{}
 	testEnvExt = &envtestutils.EnvironmentExtensions{
 		APIServiceDirectoryPaths:       []string{filepath.Join("..", "..", "..", "config", "apiserver", "apiservice", "bases")},
 		ErrorIfAPIServicePathIsMissing: true,
