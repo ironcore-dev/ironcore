@@ -97,6 +97,11 @@ func Run(ctx context.Context, opts Options) error {
 	if err != nil {
 		return fmt.Errorf("failed to listen: %w", err)
 	}
+	defer func() {
+		if err := l.Close(); err != nil {
+			log.Error(err, "Error closing socket")
+		}
+	}()
 
 	grpcSrv := grpc.NewServer(
 		grpc.UnaryInterceptor(func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
