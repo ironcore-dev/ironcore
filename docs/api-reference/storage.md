@@ -116,7 +116,9 @@ If unset, the scheduler will figure out a suitable VolumePoolRef.</p>
 <td>
 <code>claimRef</code><br/>
 <em>
+<a href="/api-reference/common.md#localuidreference">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
+</a>
 </em>
 </td>
 <td>
@@ -175,7 +177,9 @@ bool
 <td>
 <code>tolerations</code><br/>
 <em>
+<a href="/api-reference/common.md#toleration">
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
+</a>
 </em>
 </td>
 <td>
@@ -331,7 +335,9 @@ string
 <td>
 <code>taints</code><br/>
 <em>
+<a href="/api-reference/common.md#taint">
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.Taint
+</a>
 </em>
 </td>
 <td>
@@ -673,7 +679,9 @@ string
 <td>
 <code>taints</code><br/>
 <em>
+<a href="/api-reference/common.md#taint">
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.Taint
+</a>
 </em>
 </td>
 <td>
@@ -845,7 +853,9 @@ If unset, the scheduler will figure out a suitable VolumePoolRef.</p>
 <td>
 <code>claimRef</code><br/>
 <em>
+<a href="/api-reference/common.md#localuidreference">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
+</a>
 </em>
 </td>
 <td>
@@ -904,7 +914,9 @@ bool
 <td>
 <code>tolerations</code><br/>
 <em>
+<a href="/api-reference/common.md#toleration">
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
+</a>
 </em>
 </td>
 <td>
@@ -1120,7 +1132,9 @@ If unset, the scheduler will figure out a suitable VolumePoolRef.</p>
 <td>
 <code>claimRef</code><br/>
 <em>
+<a href="/api-reference/common.md#localuidreference">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
+</a>
 </em>
 </td>
 <td>
@@ -1179,7 +1193,9 @@ bool
 <td>
 <code>tolerations</code><br/>
 <em>
+<a href="/api-reference/common.md#toleration">
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
+</a>
 </em>
 </td>
 <td>

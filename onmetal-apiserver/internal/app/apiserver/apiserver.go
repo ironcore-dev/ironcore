@@ -24,6 +24,7 @@ import (
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
+	apiequality "github.com/onmetal/onmetal-api/apiutils/equality"
 	"github.com/onmetal/onmetal-api/client-go/informers"
 	clientset "github.com/onmetal/onmetal-api/client-go/onmetalapi"
 	onmetalopenapi "github.com/onmetal/onmetal-api/client-go/openapi"
@@ -34,9 +35,11 @@ import (
 	"github.com/onmetal/onmetal-api/onmetal-apiserver/internal/machinepoollet/client"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
+	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apiserver/pkg/admission"
 	"k8s.io/apiserver/pkg/endpoints/openapi"
 	"k8s.io/apiserver/pkg/features"
@@ -48,6 +51,10 @@ import (
 )
 
 const defaultEtcdPathPrefix = "/registry/onmetal.de"
+
+func init() {
+	utilruntime.Must(apiequality.AddFuncs(equality.Semantic))
+}
 
 func NewResourceConfig() *serverstorage.ResourceConfig {
 	cfg := serverstorage.NewResourceConfig()

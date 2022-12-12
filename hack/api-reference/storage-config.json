@@ -20,23 +20,23 @@
       "docsURLTemplate": "https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#{{lower .TypeIdentifier}}-{{arrIndex .PackageSegments -1}}-{{arrIndex .PackageSegments -2}}"
     },
     {
-      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.Toleration",
+      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/api/common/v1alpha1\\.Toleration",
       "docsURLTemplate": "/api-reference/common.md#toleration"
     },
     {
-      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.Taint",
+      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/api/common/v1alpha1\\.Taint",
       "docsURLTemplate": "/api-reference/common.md#taint"
     },
     {
-      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.SecretKeySelector$",
+      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/api/common/v1alpha1\\.SecretKeySelector$",
       "docsURLTemplate": "/api-reference/common.md#secretkeyselector"
     },
     {
-      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.ConfigMapKeySelector$",
+      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/api/common/v1alpha1\\.ConfigMapKeySelector$",
       "docsURLTemplate": "/api-reference/common.md#configmapkeyselector"
     },
     {
-      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/apis/common/v1alpha1\\.LocalUIDReference",
+      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/api/common/v1alpha1\\.LocalUIDReference",
       "docsURLTemplate": "/api-reference/common.md#localuidreference"
     }
   ],
