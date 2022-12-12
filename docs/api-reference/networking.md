@@ -189,6 +189,17 @@ Refer to the Kubernetes API documentation for the fields of the
 </tr>
 <tr>
 <td>
+<code>networkRef</code><br/>
+<em>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
+</em>
+</td>
+<td>
+<p>NetworkRef is the network the load balancer is assigned to.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>destinations</code><br/>
 <em>
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference

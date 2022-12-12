@@ -25580,6 +25580,7 @@
 				"description": "AliasPrefixRouting is the Schema for the aliasprefixrouting API",
 				"type": "object",
 				"required": [
+					"networkRef",
 					"destinations"
 				],
 				"properties": {
@@ -25600,6 +25601,14 @@
 					},
 					"metadata": {
 						"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+					},
+					"networkRef": {
+						"description": "NetworkRef is the network the load balancer is assigned to.",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.LocalUIDReference"
+							}
+						]
 					}
 				},
 				"x-kubernetes-group-version-kind": [

@@ -32,8 +32,13 @@ func init() {
 		base[k] = v
 	}
 	Semantic = conversion.Equalities{Equalities: base}
-	utilruntime.Must(Semantic.AddFuncs(
+	utilruntime.Must(AddFuncs(Semantic))
+}
+
+func AddFuncs(equality conversion.Equalities) error {
+	return equality.AddFuncs(
 		commonv1alpha1.EqualIPs,
 		commonv1alpha1.EqualIPPrefixes,
-	))
+		commonv1alpha1.EqualIPRanges,
+	)
 }
