@@ -21,6 +21,7 @@ import (
 	"net"
 
 	"github.com/onmetal/controller-utils/configutils"
+	"github.com/onmetal/onmetal-api/broker/common"
 	"github.com/onmetal/onmetal-api/broker/volumebroker/server"
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
 	"github.com/spf13/cobra"
@@ -93,6 +94,12 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error creating server: %w", err)
 	}
 
+	log.V(1).Info("Cleaning up any previous socket")
+	if err := common.CleanupSocketIfExists(opts.Address); err != nil {
+		return fmt.Errorf("error cleaning up socket: %w", err)
+	}
+
+	log.V(1).Info("Start listening on unix socket", "Address", opts.Address)
 	l, err := net.Listen("unix", opts.Address)
 	if err != nil {
 		return fmt.Errorf("failed to listen: %w", err)
