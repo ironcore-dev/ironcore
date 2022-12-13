@@ -221,7 +221,9 @@ func validateNetworkInterfaceSpecUpdate(newSpec, oldSpec *networking.NetworkInte
 	newSpecCopy := newSpec.DeepCopy()
 	oldSpecCopy := oldSpec.DeepCopy()
 
+	oldSpecCopy.IPs = newSpec.IPs
 	oldSpecCopy.MachineRef = newSpec.MachineRef
+	oldSpecCopy.VirtualIP = newSpec.VirtualIP
 	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableFieldWithDiff(newSpecCopy, oldSpecCopy, fldPath)...)
 
 	return allErrs

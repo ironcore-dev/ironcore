@@ -217,5 +217,37 @@ var _ = Describe("NetworkInterface", func() {
 			},
 			Not(ContainElement(ForbiddenField("spec"))),
 		),
+		Entry("mutable ips",
+			&networking.NetworkInterface{
+				Spec: networking.NetworkInterfaceSpec{
+					IPs: []networking.IPSource{
+						{
+							Value: commonv1alpha1.MustParseNewIP("10.0.0.1"),
+						},
+					},
+				},
+			},
+			&networking.NetworkInterface{
+				Spec: networking.NetworkInterfaceSpec{
+					IPs: []networking.IPSource{
+						{
+							Value: commonv1alpha1.MustParseNewIP("10.0.0.2"),
+						},
+					},
+				},
+			},
+			Not(ContainElement(ForbiddenField("spec"))),
+		),
+		Entry("mutable virtual ip",
+			&networking.NetworkInterface{
+				Spec: networking.NetworkInterfaceSpec{
+					VirtualIP: &networking.VirtualIPSource{
+						VirtualIPRef: &corev1.LocalObjectReference{Name: "my-virtualip"},
+					},
+				},
+			},
+			&networking.NetworkInterface{},
+			Not(ContainElement(ForbiddenField("spec"))),
+		),
 	)
 })

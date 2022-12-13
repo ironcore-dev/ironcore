@@ -18,7 +18,6 @@ import (
 	"context"
 	"fmt"
 
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/apiutils"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
@@ -47,15 +46,6 @@ func (s *Server) CreateNetworkInterfaceVirtualIP(ctx context.Context, req *ori.C
 	if actualVirtualIP != nil {
 		return nil, status.Errorf(codes.AlreadyExists, "network interface %s already has a virtual ip", networkInterfaceID)
 	}
-	ip, err := commonv1alpha1.ParseIP(desiredVirtualIP.Ip)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing ip: %w", err)
-	}
-
-	log.V(1).Info("Setting virtual ip status ip")
-	if err := s.setOnmetalVirtualIPStatusIP(ctx, onmetalNetworkInterface.VirtualIP, &ip); err != nil {
-		return nil, fmt.Errorf("error setting virtual ip status ip: %w", err)
-	}
 
 	newOnmetalVirtualIP, err := s.prepareOnmetalVirtualIP(desiredVirtualIP)
 	if err != nil {
@@ -71,7 +61,7 @@ func (s *Server) CreateNetworkInterfaceVirtualIP(ctx context.Context, req *ori.C
 	}
 
 	log.V(1).Info("Patching new onmetal virtual ip as controlled by network interface")
-	if err := apiutils.PatchCreated(ctx, s.client, onmetalNetworkInterface.NetworkInterface); err != nil {
+	if err := apiutils.PatchControlledBy(ctx, s.client, onmetalNetworkInterface.NetworkInterface, newOnmetalVirtualIP); err != nil {
 		return nil, fmt.Errorf("error patching new onmetal virtual ip as controlled by network interface: %w", err)
 	}
 
