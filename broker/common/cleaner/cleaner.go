@@ -14,7 +14,13 @@
 
 package cleaner
 
-import "context"
+import (
+	"context"
+	"fmt"
+
+	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+)
 
 // Cleaner is an entity that allows tracking and executing cleanup methods.
 type Cleaner struct {
@@ -24,6 +30,29 @@ type Cleaner struct {
 // New instantiates a new Cleaner.
 func New() *Cleaner {
 	return &Cleaner{}
+}
+
+func DeleteObjectIfExistsFunc(c client.Client, object client.Object) func(ctx context.Context) error {
+	// Create a copy so subsequent writes cannot change the object.
+	object = object.DeepCopyObject().(client.Object)
+	return func(ctx context.Context) error {
+		if err := c.Delete(ctx, object); client.IgnoreNotFound(err) != nil {
+			return fmt.Errorf("error deleting object: %w", err)
+		}
+		return nil
+	}
+}
+
+func CleanupOnError(ctx context.Context, c *Cleaner, err *error) {
+	log := ctrl.LoggerFrom(ctx)
+
+	if *err == nil {
+		return
+	}
+
+	if err := c.Cleanup(ctx); err != nil {
+		log.Error(err, "Error cleaning up")
+	}
 }
 
 // Add adds the given function to the cleanup stack.

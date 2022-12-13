@@ -25,15 +25,17 @@ import (
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	onmetalapiannotations "github.com/onmetal/onmetal-api/apiutils/annotations"
 	onmetalapiclient "github.com/onmetal/onmetal-api/apiutils/client"
 	"github.com/onmetal/onmetal-api/apiutils/predicates"
+	onmetalapiclientutils "github.com/onmetal/onmetal-api/onmetal-controller-manager/clientutils"
+	"github.com/onmetal/onmetal-api/ori/apis/machine"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
 	machinepoolletv1alpha1 "github.com/onmetal/onmetal-api/poollet/machinepoollet/api/v1alpha1"
 	machinepoolletclient "github.com/onmetal/onmetal-api/poollet/machinepoollet/client"
 	"github.com/onmetal/onmetal-api/poollet/machinepoollet/controllers/events"
 	"github.com/onmetal/onmetal-api/poollet/machinepoollet/mcm"
+	utilslices "github.com/onmetal/onmetal-api/utils/slices"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
@@ -47,6 +49,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
@@ -54,7 +57,7 @@ type MachineReconciler struct {
 	record.EventRecorder
 	client.Client
 
-	MachineRuntime ori.MachineRuntimeClient
+	MachineRuntime machine.RuntimeService
 
 	MachineClassMapper mcm.MachineClassMapper
 
@@ -549,7 +552,7 @@ func (r *MachineReconciler) prepareORIMachineClass(ctx context.Context, machine 
 			return "", false, fmt.Errorf("error getting machine class: %w", err)
 		}
 
-		r.Eventf(machine, corev1.EventTypeNormal, events.MachineClassNotReady, "Machine class %s is not ready: %v", err)
+		r.Eventf(machine, corev1.EventTypeNormal, events.MachineClassNotReady, "Machine class %s is not ready: %v", machineClassName, err)
 		return "", false, nil
 	}
 
@@ -709,14 +712,16 @@ func (r *MachineReconciler) enqueueMachinesReferencingVolume(ctx context.Context
 		machineList := &computev1alpha1.MachineList{}
 		if err := r.List(ctx, machineList,
 			client.InNamespace(volume.Namespace),
-			client.MatchingFields{machinepoolletclient.MachineSpecVolumeNamesField: volume.Name},
+			client.MatchingFields{
+				machinepoolletclient.MachineSpecVolumeNamesField: volume.Name,
+			},
 			r.matchingWatchLabel(),
 		); err != nil {
 			log.Error(err, "Error listing machines using volume", "VolumeKey", client.ObjectKeyFromObject(volume))
 			return nil
 		}
 
-		return r.makeRequestsForMachinesRunningInMachinePool(machineList)
+		return onmetalapiclientutils.ReconcileRequestsFromObjectSlice(machineList.Items)
 	})
 }
 
@@ -726,14 +731,16 @@ func (r *MachineReconciler) enqueueMachinesReferencingSecret(ctx context.Context
 		machineList := &computev1alpha1.MachineList{}
 		if err := r.List(ctx, machineList,
 			client.InNamespace(secret.Namespace),
-			client.MatchingFields{machinepoolletclient.MachineSpecSecretNamesField: secret.Name},
+			client.MatchingFields{
+				machinepoolletclient.MachineSpecSecretNamesField: secret.Name,
+			},
 			r.matchingWatchLabel(),
 		); err != nil {
 			log.Error(err, "Error listing machines using secret", "SecretKey", client.ObjectKeyFromObject(secret))
 			return nil
 		}
 
-		return r.makeRequestsForMachinesRunningInMachinePool(machineList)
+		return onmetalapiclientutils.ReconcileRequestsFromObjectSlice(machineList.Items)
 	})
 }
 
@@ -743,30 +750,72 @@ func (r *MachineReconciler) enqueueMachinesReferencingNetworkInterface(ctx conte
 		machineList := &computev1alpha1.MachineList{}
 		if err := r.List(ctx, machineList,
 			client.InNamespace(nic.Namespace),
-			client.MatchingFields{machinepoolletclient.MachineSpecNetworkInterfaceNamesField: nic.Name},
+			client.MatchingFields{
+				machinepoolletclient.MachineSpecNetworkInterfaceNamesField: nic.Name,
+			},
 			r.matchingWatchLabel(),
 		); err != nil {
 			log.Error(err, "Error listing machines using secret", "NetworkInterfaceKey", client.ObjectKeyFromObject(nic))
 			return nil
 		}
 
-		return r.makeRequestsForMachinesRunningInMachinePool(machineList)
+		return onmetalapiclientutils.ReconcileRequestsFromObjectSlice(machineList.Items)
 	})
 }
 
-func (r *MachineReconciler) makeRequestsForMachinesRunningInMachinePool(machineList *computev1alpha1.MachineList) []ctrl.Request {
-	var res []ctrl.Request
-	for _, machine := range machineList.Items {
-		if !MachineRunsInMachinePool(&machine, r.MachinePoolName) {
-			continue
-		}
-		if onmetalapiannotations.IsExternallyManaged(&machine) {
-			continue
+func (r *MachineReconciler) enqueueMachinesReferencingAliasPrefixRouting(ctx context.Context, log logr.Logger) handler.EventHandler { //nolint:unused
+	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []reconcile.Request {
+		aliasPrefixRouting := obj.(*networkingv1alpha1.AliasPrefixRouting)
+		destinationSet := utilslices.ToSetFunc(
+			aliasPrefixRouting.Destinations,
+			func(d commonv1alpha1.LocalUIDReference) types.UID { return d.UID },
+		)
+
+		networkRef := aliasPrefixRouting.NetworkRef
+
+		network := &networkingv1alpha1.Network{}
+		networkKey := client.ObjectKey{Namespace: aliasPrefixRouting.Namespace, Name: networkRef.Name}
+		if err := r.Get(ctx, networkKey, network); err != nil {
+			log.Error(err, "Error getting alias prefix routing network", "NetworkKey", networkKey)
+			return nil
 		}
 
-		res = append(res, ctrl.Request{NamespacedName: client.ObjectKeyFromObject(&machine)})
-	}
-	return res
+		if network.UID != networkRef.UID {
+			log.V(1).Info("Network uid does not match", "Expected", networkRef.UID, "Actual", network.UID)
+			return nil
+		}
+
+		networkInterfaceList := &networkingv1alpha1.NetworkInterfaceList{}
+		networkInterfaceMachinePoolID := machinepoolletclient.NetworkNameAndHandle(network.Name, network.Spec.Handle)
+		if err := r.List(ctx, networkInterfaceList,
+			client.InNamespace(aliasPrefixRouting.Namespace),
+			client.MatchingFields{
+				machinepoolletclient.NetworkInterfaceNetworkNameAndHandle: networkInterfaceMachinePoolID,
+			},
+		); err != nil {
+			log.Error(err, "Error listing network interfaces")
+			return nil
+		}
+
+		var res []ctrl.Request
+		for _, networkInterface := range networkInterfaceList.Items {
+			if !destinationSet.Has(networkInterface.UID) {
+				continue
+			}
+			machineRef := networkInterface.Spec.MachineRef
+			if machineRef == nil {
+				continue
+			}
+
+			res = append(res, ctrl.Request{
+				NamespacedName: client.ObjectKey{
+					Namespace: aliasPrefixRouting.Namespace,
+					Name:      machineRef.Name,
+				},
+			})
+		}
+		return res
+	})
 }
 
 func (r *MachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
@@ -793,6 +842,10 @@ func (r *MachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Watches(
 			&source.Kind{Type: &storagev1alpha1.Volume{}},
 			r.enqueueMachinesReferencingVolume(ctx, log),
+		).
+		Watches(
+			&source.Kind{Type: &networkingv1alpha1.AliasPrefixRouting{}},
+			r.enqueueMachinesReferencingAliasPrefixRouting(ctx, log),
 		).
 		Complete(r)
 }

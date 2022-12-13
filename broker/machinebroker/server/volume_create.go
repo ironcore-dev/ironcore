@@ -41,8 +41,8 @@ func (s *Server) getOnmetalVolumeConfig(volume *ori.Volume) (*OnmetalVolumeConfi
 	if secretData := volume.Spec.SecretData; secretData != nil {
 		onmetalVolumeSecret = &corev1.Secret{
 			ObjectMeta: metav1.ObjectMeta{
-				Namespace: s.namespace,
-				Name:      s.generateID(),
+				Namespace: s.cluster.Namespace(),
+				Name:      s.cluster.IDGen().Generate(),
 			},
 			Type: corev1.SecretTypeOpaque,
 			Data: secretData,
@@ -52,8 +52,8 @@ func (s *Server) getOnmetalVolumeConfig(volume *ori.Volume) (*OnmetalVolumeConfi
 
 	onmetalVolume := &storagev1alpha1.Volume{
 		ObjectMeta: metav1.ObjectMeta{
-			Namespace: s.namespace,
-			Name:      s.generateID(),
+			Namespace: s.cluster.Namespace(),
+			Name:      s.cluster.IDGen().Generate(),
 		},
 		Spec: storagev1alpha1.VolumeSpec{},
 	}
@@ -86,11 +86,11 @@ func (s *Server) createOnmetalVolume(ctx context.Context, log logr.Logger, cfg *
 	defer cleanup()
 
 	log.V(1).Info("Creating onmetal volume")
-	if err := s.client.Create(ctx, cfg.Volume); err != nil {
+	if err := s.cluster.Client().Create(ctx, cfg.Volume); err != nil {
 		return nil, fmt.Errorf("error creating onmetal volume: %w", err)
 	}
 	c.Add(func(ctx context.Context) error {
-		if err := s.client.Delete(ctx, cfg.Volume); client.IgnoreNotFound(err) != nil {
+		if err := s.cluster.Client().Delete(ctx, cfg.Volume); client.IgnoreNotFound(err) != nil {
 			return fmt.Errorf("error deleting onmetal volume: %w", err)
 		}
 		return nil
@@ -98,8 +98,8 @@ func (s *Server) createOnmetalVolume(ctx context.Context, log logr.Logger, cfg *
 
 	if cfg.AccessSecret != nil {
 		log.V(1).Info("Creating onmetal volume secret")
-		_ = ctrl.SetControllerReference(cfg.Volume, cfg.AccessSecret, s.client.Scheme())
-		if err := s.client.Create(ctx, cfg.AccessSecret); err != nil {
+		_ = ctrl.SetControllerReference(cfg.Volume, cfg.AccessSecret, s.cluster.Client().Scheme())
+		if err := s.cluster.Client().Create(ctx, cfg.AccessSecret); err != nil {
 			return nil, fmt.Errorf("error creating onmetal volume secret: %w", err)
 		}
 	}
@@ -108,12 +108,12 @@ func (s *Server) createOnmetalVolume(ctx context.Context, log logr.Logger, cfg *
 	baseVolume := cfg.Volume.DeepCopy()
 	cfg.Volume.Status.State = storagev1alpha1.VolumeStateAvailable
 	cfg.Volume.Status.Access = cfg.Access
-	if err := s.client.Status().Patch(ctx, cfg.Volume, client.MergeFrom(baseVolume)); err != nil {
+	if err := s.cluster.Client().Status().Patch(ctx, cfg.Volume, client.MergeFrom(baseVolume)); err != nil {
 		return nil, fmt.Errorf("error patching onmetal volume access: %w", err)
 	}
 
 	log.V(1).Info("Patching onmetal volume to created")
-	if err := apiutils.PatchCreated(ctx, s.client, cfg.Volume); err != nil {
+	if err := apiutils.PatchCreated(ctx, s.cluster.Client(), cfg.Volume); err != nil {
 		return nil, fmt.Errorf("error patching onmetal volume to created: %w", err)
 	}
 

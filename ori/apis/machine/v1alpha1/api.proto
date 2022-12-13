@@ -31,10 +31,15 @@ service MachineRuntime {
   rpc ListNetworkInterfaces(ListNetworkInterfacesRequest) returns (ListNetworkInterfacesResponse);
   rpc CreateNetworkInterface(CreateNetworkInterfaceRequest) returns (CreateNetworkInterfaceResponse);
   rpc DeleteNetworkInterface(DeleteNetworkInterfaceRequest) returns (DeleteNetworkInterfaceResponse);
+
   rpc UpdateNetworkInterfaceIPs(UpdateNetworkInterfaceIPsRequest) returns (UpdateNetworkInterfaceIPsResponse);
+
   rpc CreateNetworkInterfaceVirtualIP(CreateNetworkInterfaceVirtualIPRequest) returns (CreateNetworkInterfaceVirtualIPResponse);
   rpc UpdateNetworkInterfaceVirtualIP(UpdateNetworkInterfaceVirtualIPRequest) returns (UpdateNetworkInterfaceVirtualIPResponse);
   rpc DeleteNetworkInterfaceVirtualIP(DeleteNetworkInterfaceVirtualIPRequest) returns (DeleteNetworkInterfaceVirtualIPResponse);
+
+  rpc CreateNetworkInterfacePrefix(CreateNetworkInterfacePrefixRequest) returns (CreateNetworkInterfacePrefixResponse);
+  rpc DeleteNetworkInterfacePrefix(DeleteNetworkInterfacePrefixRequest) returns (DeleteNetworkInterfacePrefixResponse);
 
   rpc ListMachineClasses(ListMachineClassesRequest) returns (ListMachineClassesResponse);
 }
@@ -73,6 +78,7 @@ message NetworkInterfaceSpec {
   NetworkSpec network = 1;
   repeated string ips = 2;
   VirtualIPSpec virtual_ip = 3;
+  repeated string prefixes = 4;
 }
 
 message NetworkInterface {
@@ -302,6 +308,22 @@ message UpdateNetworkInterfaceVirtualIPRequest {
 }
 
 message UpdateNetworkInterfaceVirtualIPResponse {
+}
+
+message CreateNetworkInterfacePrefixRequest {
+  string network_interface_id = 1;
+  string prefix = 2;
+}
+
+message CreateNetworkInterfacePrefixResponse {
+}
+
+message DeleteNetworkInterfacePrefixRequest {
+  string network_interface_id = 1;
+  string prefix = 2;
+}
+
+message DeleteNetworkInterfacePrefixResponse {
 }
 
 message DeleteNetworkInterfaceVirtualIPRequest {

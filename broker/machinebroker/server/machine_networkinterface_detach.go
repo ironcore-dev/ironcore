@@ -35,7 +35,7 @@ func (s *Server) deleteOnmetalNetworkInterfaceAttachment(ctx context.Context, on
 		},
 	)
 	onmetalMachine.Spec.NetworkInterfaces = slices.Delete(onmetalMachine.Spec.NetworkInterfaces, idx, idx+1)
-	if err := s.client.Patch(ctx, onmetalMachine, client.StrategicMergeFrom(baseOnmetalMachine)); err != nil {
+	if err := s.cluster.Client().Patch(ctx, onmetalMachine, client.StrategicMergeFrom(baseOnmetalMachine)); err != nil {
 		return fmt.Errorf("error patching onmetal machine network interfaces: %w", err)
 	}
 	return nil

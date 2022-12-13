@@ -26,20 +26,20 @@ import (
 )
 
 func (s *Server) getTargetOnmetalMachinePools(ctx context.Context) ([]computev1alpha1.MachinePool, error) {
-	if s.machinePoolName != "" {
+	if s.cluster.MachinePoolName() != "" {
 		onmetalMachinePool := &computev1alpha1.MachinePool{}
-		onmetalMachinePoolKey := client.ObjectKey{Name: s.machinePoolName}
-		if err := s.client.Get(ctx, onmetalMachinePoolKey, onmetalMachinePool); err != nil {
+		onmetalMachinePoolKey := client.ObjectKey{Name: s.cluster.MachinePoolName()}
+		if err := s.cluster.Client().Get(ctx, onmetalMachinePoolKey, onmetalMachinePool); err != nil {
 			if !apierrors.IsNotFound(err) {
-				return nil, fmt.Errorf("error getting machine pool %s: %w", s.machinePoolName, err)
+				return nil, fmt.Errorf("error getting machine pool %s: %w", s.cluster.MachinePoolName(), err)
 			}
 			return nil, nil
 		}
 	}
 
 	machinePoolList := &computev1alpha1.MachinePoolList{}
-	if err := s.client.List(ctx, machinePoolList,
-		client.MatchingLabels(s.machinePoolSelector),
+	if err := s.cluster.Client().List(ctx, machinePoolList,
+		client.MatchingLabels(s.cluster.MachinePoolSelector()),
 	); err != nil {
 		return nil, fmt.Errorf("error listing machine pools: %w", err)
 	}
@@ -103,7 +103,7 @@ func (s *Server) ListMachineClasses(ctx context.Context, req *ori.ListMachineCla
 
 	log.V(1).Info("Listing onmetal machine classes")
 	onmetalMachineClassList := &computev1alpha1.MachineClassList{}
-	if err := s.client.List(ctx, onmetalMachineClassList); err != nil {
+	if err := s.cluster.Client().List(ctx, onmetalMachineClassList); err != nil {
 		return nil, fmt.Errorf("error listing onmetal machine classes: %w", err)
 	}
 

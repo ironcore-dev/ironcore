@@ -885,6 +885,11 @@ func (in *NetworkInterfaceStatus) DeepCopyInto(out *NetworkInterfaceStatus) {
 		in, out := &in.VirtualIP, &out.VirtualIP
 		*out = (*in).DeepCopy()
 	}
+	if in.MachinePoolRef != nil {
+		in, out := &in.MachinePoolRef, &out.MachinePoolRef
+		*out = new(corev1.LocalObjectReference)
+		**out = **in
+	}
 	if in.LastPhaseTransitionTime != nil {
 		in, out := &in.LastPhaseTransitionTime, &out.LastPhaseTransitionTime
 		*out = (*in).DeepCopy()

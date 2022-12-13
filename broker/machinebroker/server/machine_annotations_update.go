@@ -39,7 +39,7 @@ func (s *Server) UpdateMachineAnnotations(ctx context.Context, req *ori.UpdateMa
 	}
 
 	log.V(1).Info("Patching onmetal machine annotations")
-	if err := s.client.Patch(ctx, aggOnmetalMachine.Machine, client.MergeFrom(base)); err != nil {
+	if err := s.cluster.Client().Patch(ctx, aggOnmetalMachine.Machine, client.MergeFrom(base)); err != nil {
 		return nil, fmt.Errorf("error patching onmetal machine annotations: %w", err)
 	}
 

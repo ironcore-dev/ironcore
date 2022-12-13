@@ -96,8 +96,7 @@ func Run(ctx context.Context, opts Options) error {
 		"MachinePoolName", opts.MachinePoolName,
 		"MachinePoolSelector", opts.MachinePoolSelector,
 	)
-	srv, err := server.New(cfg, server.Options{
-		Namespace:           opts.Namespace,
+	srv, err := server.New(cfg, opts.Namespace, server.Options{
 		MachinePoolName:     opts.MachinePoolName,
 		MachinePoolSelector: opts.MachinePoolSelector,
 	})

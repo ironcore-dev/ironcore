@@ -70,6 +70,8 @@ type NetworkInterfaceStatus struct {
 
 	// Phase is the NetworkInterfacePhase of the NetworkInterface.
 	Phase NetworkInterfacePhase `json:"phase,omitempty"`
+	// MachinePoolRef is the machine pool the network interface is currently on, if any.
+	MachinePoolRef *corev1.LocalObjectReference `json:"machinePoolRef,omitempty"`
 	// LastPhaseTransitionTime is the last time the Phase transitioned from one value to another.
 	LastPhaseTransitionTime *metav1.Time `json:"lastPhaseTransitionTime,omitempty"`
 }

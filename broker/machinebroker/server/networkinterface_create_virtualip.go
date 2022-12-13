@@ -61,7 +61,7 @@ func (s *Server) CreateNetworkInterfaceVirtualIP(ctx context.Context, req *ori.C
 	}
 
 	log.V(1).Info("Patching new onmetal virtual ip as controlled by network interface")
-	if err := apiutils.PatchControlledBy(ctx, s.client, onmetalNetworkInterface.NetworkInterface, newOnmetalVirtualIP); err != nil {
+	if err := apiutils.PatchControlledBy(ctx, s.cluster.Client(), onmetalNetworkInterface.NetworkInterface, newOnmetalVirtualIP); err != nil {
 		return nil, fmt.Errorf("error patching new onmetal virtual ip as controlled by network interface: %w", err)
 	}
 

@@ -126,9 +126,7 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *server.Server) {
 		Expect(k8sClient.Create(ctx, ns)).To(Succeed(), "failed to create test namespace")
 		DeferCleanup(k8sClient.Delete, ctx, ns)
 
-		newSrv, err := server.New(cfg, server.Options{
-			Namespace: ns.Name,
-		})
+		newSrv, err := server.New(cfg, ns.Name, server.Options{})
 		Expect(err).NotTo(HaveOccurred())
 		*srv = *newSrv
 	})

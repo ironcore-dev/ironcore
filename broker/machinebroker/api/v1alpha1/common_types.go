@@ -19,13 +19,19 @@ const (
 
 	AnnotationsAnnotation = "machinebroker.api.onmetal.de/annotations"
 
-	CreatedLabel = "machinebroker.api.onmetal.de/created"
+	DependentsAnnotation = "machinebrokerlet.api.onmetal.de/dependents"
 )
 
 const (
 	PurposeLabel = "machinebroker.api.onmetal.de/purpose"
 
 	ManagerLabel = "machinebroker.api.onmetal.de/manager"
+
+	CreatedLabel = "machinebroker.api.onmetal.de/created"
+
+	NetworkHandleLabel = "machinebrokerlet.api.onmetal.de/network-handle"
+
+	PrefixLabel = "machinebrokerlet.api.onmetal.de/prefix"
 )
 
 const (

@@ -16,10 +16,7 @@ package server
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
-	"math/rand"
-	"strconv"
 
 	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
@@ -27,6 +24,7 @@ import (
 	"github.com/onmetal/onmetal-api/broker/common/cleaner"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/apiutils"
+	"github.com/onmetal/onmetal-api/broker/machinebroker/transaction"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -35,48 +33,13 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 )
 
-func objectStructsToObjectPtrByNameMap[Obj any, ObjPtr ObjPtrable[Obj], S ~[]Obj](items S) map[string]*Obj {
-	res := make(map[string]*Obj)
-	for i := range items {
-		itemPtr := &items[i]
-		name := (ObjPtr(itemPtr)).GetName()
-		res[name] = itemPtr
-	}
-	return res
-}
-
-func objectByNameMapGetter[Obj client.Object](gr schema.GroupResource, m map[string]Obj) func(name string) (Obj, error) {
-	return func(name string) (Obj, error) {
-		obj, ok := m[name]
-		if ok {
-			return obj, nil
-		}
-		return obj, apierrors.NewNotFound(gr, name)
-	}
-}
-
-type ObjPtrable[E any] interface {
-	*E
-	client.Object
-}
-
-func clientGetter[Obj any, ObjPtr ObjPtrable[Obj]](ctx context.Context, c client.Client, namespace string) func(name string) (ObjPtr, error) {
-	return func(name string) (ObjPtr, error) {
-		obj := ObjPtr(new(Obj))
-		if err := c.Get(ctx, client.ObjectKey{Namespace: namespace, Name: name}, obj); err != nil {
-			return nil, err
-		}
-		return obj, nil
-	}
-}
-
 func (s *Server) loggerFrom(ctx context.Context, keysWithValues ...interface{}) logr.Logger {
 	return ctrl.LoggerFrom(ctx, keysWithValues...)
 }
 
 func (s *Server) listManagedAndCreated(ctx context.Context, list client.ObjectList) error {
-	return s.client.List(ctx, list,
-		client.InNamespace(s.namespace),
+	return s.cluster.Client().List(ctx, list,
+		client.InNamespace(s.cluster.Namespace()),
 		client.MatchingLabels{
 			machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
 			machinebrokerv1alpha1.CreatedLabel: "true",
@@ -85,8 +48,8 @@ func (s *Server) listManagedAndCreated(ctx context.Context, list client.ObjectLi
 }
 
 func (s *Server) listWithPurpose(ctx context.Context, list client.ObjectList, purpose string) error {
-	return s.client.List(ctx, list,
-		client.InNamespace(s.namespace),
+	return s.cluster.Client().List(ctx, list,
+		client.InNamespace(s.cluster.Namespace()),
 		client.MatchingLabels{
 			machinebrokerv1alpha1.PurposeLabel: purpose,
 		},
@@ -94,12 +57,12 @@ func (s *Server) listWithPurpose(ctx context.Context, list client.ObjectList, pu
 }
 
 func (s *Server) getManagedAndCreated(ctx context.Context, name string, obj client.Object) error {
-	key := client.ObjectKey{Namespace: s.namespace, Name: name}
-	if err := s.client.Get(ctx, key, obj); err != nil {
+	key := client.ObjectKey{Namespace: s.cluster.Namespace(), Name: name}
+	if err := s.cluster.Client().Get(ctx, key, obj); err != nil {
 		return err
 	}
 	if !apiutils.IsManagedBy(obj, machinebrokerv1alpha1.MachineBrokerManager) || !apiutils.IsCreated(obj) {
-		gvk, err := apiutil.GVKForObject(obj, s.client.Scheme())
+		gvk, err := apiutil.GVKForObject(obj, s.cluster.Client().Scheme())
 		if err != nil {
 			return err
 		}
@@ -110,24 +73,6 @@ func (s *Server) getManagedAndCreated(ctx context.Context, name string, obj clie
 		}, key.Name)
 	}
 	return nil
-}
-
-// idLength is 63 as this is the highest common denominator among resource name length limitations (e.g. k8s secret).
-const idLength = 63
-
-func (s *Server) generateID() string {
-	data := make([]byte, 32)
-	for {
-		_, _ = rand.Read(data)
-		id := hex.EncodeToString(data)
-
-		// Truncated versions of the id should not be numerical.
-		if _, err := strconv.ParseInt(id[:12], 10, 64); err != nil {
-			continue
-		}
-
-		return id[:idLength]
-	}
 }
 
 func (s *Server) setupCleaner(ctx context.Context, log logr.Logger, retErr *error) (c *cleaner.Cleaner, cleanup func()) {
@@ -188,4 +133,23 @@ func (s *Server) parseIPs(ipStrings []string) ([]commonv1alpha1.IP, error) {
 		ips = append(ips, ip)
 	}
 	return ips, nil
+}
+
+func (s *Server) parseIPPrefixes(prefixStrings []string) ([]commonv1alpha1.IPPrefix, error) {
+	var ipPrefixes []commonv1alpha1.IPPrefix
+	for _, prefixString := range prefixStrings {
+		ipPrefix, err := commonv1alpha1.ParseIPPrefix(prefixString)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing ip prefix %q: %w", prefixString, err)
+		}
+
+		ipPrefixes = append(ipPrefixes, ipPrefix)
+	}
+	return ipPrefixes, nil
+}
+
+func RollbackTransactionIgnoreClosedFunc[E any](t transaction.Transaction[E]) func(ctx context.Context) error {
+	return func(ctx context.Context) error {
+		return transaction.IgnoreClosedError(t.Rollback())
+	}
 }

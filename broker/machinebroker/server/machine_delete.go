@@ -34,7 +34,7 @@ func (s *Server) DeleteMachine(ctx context.Context, req *ori.DeleteMachineReques
 	}
 
 	log.V(1).Info("Deleting onmetal machine")
-	if err := s.client.Delete(ctx, onmetalMachine.Machine); err != nil {
+	if err := s.cluster.Client().Delete(ctx, onmetalMachine.Machine); err != nil {
 		if !apierrors.IsNotFound(err) {
 			return nil, fmt.Errorf("error deleting onmetal machine: %w", err)
 		}

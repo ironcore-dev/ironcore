@@ -70,6 +70,8 @@ type NetworkInterfaceStatus struct {
 
 	// Phase is the NetworkInterfacePhase of the NetworkInterface.
 	Phase NetworkInterfacePhase
+	// MachinePoolRef is the machine pool the network interface is currently on, if any.
+	MachinePoolRef *corev1.LocalObjectReference
 	// LastPhaseTransitionTime is the last time the Phase transitioned from one value to another.
 	LastPhaseTransitionTime *metav1.Time
 }

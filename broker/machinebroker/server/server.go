@@ -15,29 +15,14 @@
 package server
 
 import (
-	"fmt"
-
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
+	"github.com/onmetal/onmetal-api/broker/machinebroker/aliasprefixes"
+	"github.com/onmetal/onmetal-api/broker/machinebroker/cluster"
+	"github.com/onmetal/onmetal-api/broker/machinebroker/networks"
 	"github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	"k8s.io/apimachinery/pkg/runtime"
-	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
-	kubernetes "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-var scheme = runtime.NewScheme()
-
-func init() {
-	utilruntime.Must(kubernetes.AddToScheme(scheme))
-	utilruntime.Must(computev1alpha1.AddToScheme(scheme))
-	utilruntime.Must(networkingv1alpha1.AddToScheme(scheme))
-	utilruntime.Must(storagev1alpha1.AddToScheme(scheme))
-	utilruntime.Must(ipamv1alpha1.AddToScheme(scheme))
-}
+var _ v1alpha1.MachineRuntimeServer = (*Server)(nil)
 
 //+kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machines,verbs=get;list;watch;create;update;patch;delete
@@ -50,42 +35,40 @@ func init() {
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=virtualips/status,verbs=get;update;patch
 
 type Server struct {
-	client client.Client
-
-	namespace           string
-	machinePoolName     string
-	machinePoolSelector map[string]string
+	cluster       cluster.Cluster
+	networks      *networks.Networks
+	aliasPrefixes *aliasprefixes.AliasPrefixes
 }
 
-var _ v1alpha1.MachineRuntimeServer = (*Server)(nil)
-
 type Options struct {
-	Namespace           string
 	MachinePoolName     string
 	MachinePoolSelector map[string]string
 }
 
-func setOptionsDefaults(_ *Options) {
-}
-
-func New(cfg *rest.Config, opts Options) (*Server, error) {
-	setOptionsDefaults(&opts)
-
-	if opts.Namespace == "" {
-		return nil, fmt.Errorf("must specify namespace")
-	}
-
-	c, err := client.New(cfg, client.Options{
-		Scheme: scheme,
+func New(cfg *rest.Config, namespace string, opts Options) (*Server, error) {
+	c, err := cluster.New(cfg, namespace, cluster.Options{
+		MachinePoolName:     opts.MachinePoolName,
+		MachinePoolSelector: opts.MachinePoolSelector,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("error creating client: %w", err)
+		return nil, err
 	}
 
 	return &Server{
-		client:              c,
-		namespace:           opts.Namespace,
-		machinePoolName:     opts.MachinePoolName,
-		machinePoolSelector: opts.MachinePoolSelector,
+		cluster:       c,
+		networks:      networks.New(c),
+		aliasPrefixes: aliasprefixes.New(c),
 	}, nil
+}
+
+func (s *Server) Cluster() cluster.Cluster {
+	return s.cluster
+}
+
+func (s *Server) Networks() *networks.Networks {
+	return s.networks
+}
+
+func (s *Server) AliasPrefixes() *aliasprefixes.AliasPrefixes {
+	return s.aliasPrefixes
 }

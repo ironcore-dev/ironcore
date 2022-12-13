@@ -22,6 +22,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func (s *Server) DeleteNetworkInterface(ctx context.Context, req *ori.DeleteNetworkInterfaceRequest) (*ori.DeleteNetworkInterfaceResponse, error) {
@@ -35,11 +36,16 @@ func (s *Server) DeleteNetworkInterface(ctx context.Context, req *ori.DeleteNetw
 	}
 
 	log.V(1).Info("Deleting onmetal network interface")
-	if err := s.client.Delete(ctx, aggOnmetalNetworkInterface.NetworkInterface); err != nil {
+	if err := s.cluster.Client().Delete(ctx, aggOnmetalNetworkInterface.NetworkInterface); err != nil {
 		if !apierrors.IsNotFound(err) {
 			return nil, fmt.Errorf("error deleting onmetal network interface: %w", err)
 		}
 		return nil, status.Errorf(codes.NotFound, "network interface %s not found", networkInterfaceID)
+	}
+
+	networkHandle := aggOnmetalNetworkInterface.Network.Spec.Handle
+	if err := s.networks.Delete(ctx, networkHandle, networkInterfaceID); client.IgnoreNotFound(err) != nil {
+		log.Error(err, "Error deleting network", "NetworkHandle", networkHandle)
 	}
 
 	return &ori.DeleteNetworkInterfaceResponse{}, nil

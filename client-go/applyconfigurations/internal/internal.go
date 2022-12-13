@@ -953,6 +953,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: lastStateTransitionTime
       type:
         namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
+    - name: machinePoolRef
+      type:
+        namedType: io.k8s.api.core.v1.LocalObjectReference
     - name: networkHandle
       type:
         scalar: string

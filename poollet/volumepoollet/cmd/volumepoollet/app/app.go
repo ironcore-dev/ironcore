@@ -26,7 +26,7 @@ import (
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
-	orivolumeutils "github.com/onmetal/onmetal-api/ori/utils/volume"
+	oriremotevolume "github.com/onmetal/onmetal-api/ori/remote/volume"
 	"github.com/onmetal/onmetal-api/poollet/orievent"
 	"github.com/onmetal/onmetal-api/poollet/volumepoollet/controllers"
 	"github.com/onmetal/onmetal-api/poollet/volumepoollet/vcm"
@@ -132,7 +132,7 @@ func Run(ctx context.Context, opts Options) error {
 	logger := ctrl.LoggerFrom(ctx)
 	setupLog := ctrl.Log.WithName("setup")
 
-	endpoint, err := orivolumeutils.GetAddressWithTimeout(opts.VolumeRuntimeSocketDiscoveryTimeout, opts.VolumeRuntimeEndpoint)
+	endpoint, err := oriremotevolume.GetAddressWithTimeout(opts.VolumeRuntimeSocketDiscoveryTimeout, opts.VolumeRuntimeEndpoint)
 	if err != nil {
 		return fmt.Errorf("error detecting volume runtime endpoint: %w", err)
 	}
