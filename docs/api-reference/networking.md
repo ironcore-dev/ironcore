@@ -62,7 +62,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -89,7 +89,7 @@ AliasPrefixSpec
 <td>
 <code>networkRef</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -102,7 +102,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>networkInterfaceSelector</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#labelselector-v1-meta">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#labelselector-v1-meta">
 Kubernetes meta/v1.LabelSelector
 </a>
 </em>
@@ -177,7 +177,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -191,7 +191,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>networkRef</code><br/>
 <em>
-<a href="/api-reference/common.md#localuidreference">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -204,7 +204,7 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 <td>
 <code>destinations</code><br/>
 <em>
-<a href="/api-reference/common.md#localuidreference">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -249,7 +249,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -289,7 +289,7 @@ LoadBalancerType
 <td>
 <code>ipFamilies</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#ipfamily-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#ipfamily-v1-core">
 []Kubernetes core/v1.IPFamily
 </a>
 </em>
@@ -302,7 +302,7 @@ LoadBalancerType
 <td>
 <code>networkRef</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -315,7 +315,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>networkInterfaceSelector</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#labelselector-v1-meta">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#labelselector-v1-meta">
 Kubernetes meta/v1.LabelSelector
 </a>
 </em>
@@ -389,7 +389,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -403,7 +403,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>networkRef</code><br/>
 <em>
-<a href="/api-reference/common.md#localuidreference">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -416,7 +416,7 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 <td>
 <code>destinations</code><br/>
 <em>
-<a href="/api-reference/common.md#localuidreference">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -461,7 +461,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -501,7 +501,7 @@ NATGatewayType
 <td>
 <code>ipFamilies</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#ipfamily-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#ipfamily-v1-core">
 []Kubernetes core/v1.IPFamily
 </a>
 </em>
@@ -528,7 +528,7 @@ NATGatewayType
 <td>
 <code>networkRef</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -541,7 +541,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>networkInterfaceSelector</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#labelselector-v1-meta">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#labelselector-v1-meta">
 Kubernetes meta/v1.LabelSelector
 </a>
 </em>
@@ -614,7 +614,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -628,7 +628,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>networkRef</code><br/>
 <em>
-<a href="/api-reference/common.md#localuidreference">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -686,7 +686,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -771,7 +771,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -798,7 +798,7 @@ NetworkInterfaceSpec
 <td>
 <code>networkRef</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -811,7 +811,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>machineRef</code><br/>
 <em>
-<a href="/api-reference/common.md#localuidreference">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -824,7 +824,7 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 <td>
 <code>ipFamilies</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#ipfamily-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#ipfamily-v1-core">
 []Kubernetes core/v1.IPFamily
 </a>
 </em>
@@ -911,7 +911,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -951,7 +951,7 @@ VirtualIPType
 <td>
 <code>ipFamily</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#ipfamily-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#ipfamily-v1-core">
 Kubernetes core/v1.IPFamily
 </a>
 </em>
@@ -964,7 +964,7 @@ Kubernetes core/v1.IPFamily
 <td>
 <code>targetRef</code><br/>
 <em>
-<a href="/api-reference/common.md#localuidreference">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -1010,7 +1010,7 @@ VirtualIPStatus
 <td>
 <code>networkRef</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1023,7 +1023,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>networkInterfaceSelector</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#labelselector-v1-meta">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#labelselector-v1-meta">
 Kubernetes meta/v1.LabelSelector
 </a>
 </em>
@@ -1069,7 +1069,7 @@ should be used by this AliasPrefix</p>
 <td>
 <code>prefix</code><br/>
 <em>
-<a href="/api-reference/common.md#ip">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
 </a>
 </em>
@@ -1101,7 +1101,7 @@ surrounding object) Prefix.</p>
 <td>
 <code>prefixTemplate</code><br/>
 <em>
-<a href="/api-reference/ipam.md#ipam.api.onmetal.de/v1alpha1.PrefixTemplateSpec">
+<a href="/api-reference/ipam/#ipam.api.onmetal.de/v1alpha1.PrefixTemplateSpec">
 github.com/onmetal/onmetal-api/api/ipam/v1alpha1.PrefixTemplateSpec
 </a>
 </em>
@@ -1164,7 +1164,7 @@ VirtualIPTemplateSpec
 <td>
 <code>value</code><br/>
 <em>
-<a href="/api-reference/common.md#ip">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 </a>
 </em>
@@ -1207,7 +1207,7 @@ EphemeralPrefixSource
 <td>
 <code>protocol</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#protocol-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#protocol-v1-core">
 Kubernetes core/v1.Protocol
 </a>
 </em>
@@ -1275,7 +1275,7 @@ LoadBalancerType
 <td>
 <code>ipFamilies</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#ipfamily-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#ipfamily-v1-core">
 []Kubernetes core/v1.IPFamily
 </a>
 </em>
@@ -1288,7 +1288,7 @@ LoadBalancerType
 <td>
 <code>networkRef</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1301,7 +1301,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>networkInterfaceSelector</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#labelselector-v1-meta">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#labelselector-v1-meta">
 Kubernetes meta/v1.LabelSelector
 </a>
 </em>
@@ -1346,7 +1346,7 @@ for which this LoadBalancer should be applied</p>
 <td>
 <code>ips</code><br/>
 <em>
-<a href="/api-reference/common.md#ip">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.IP">
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 </a>
 </em>
@@ -1407,7 +1407,9 @@ string
 <td>
 <code>uid</code><br/>
 <em>
+<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/types#UID">
 k8s.io/apimachinery/pkg/types.UID
+</a>
 </em>
 </td>
 <td>
@@ -1448,7 +1450,7 @@ k8s.io/apimachinery/pkg/types.UID
 <td>
 <code>ip</code><br/>
 <em>
-<a href="/api-reference/common.md#ip">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 </a>
 </em>
@@ -1538,7 +1540,7 @@ string
 <td>
 <code>ip</code><br/>
 <em>
-<a href="/api-reference/common.md#ip">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 </a>
 </em>
@@ -1581,7 +1583,7 @@ NATGatewayType
 <td>
 <code>ipFamilies</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#ipfamily-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#ipfamily-v1-core">
 []Kubernetes core/v1.IPFamily
 </a>
 </em>
@@ -1608,7 +1610,7 @@ NATGatewayType
 <td>
 <code>networkRef</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1621,7 +1623,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>networkInterfaceSelector</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#labelselector-v1-meta">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#labelselector-v1-meta">
 Kubernetes meta/v1.LabelSelector
 </a>
 </em>
@@ -1753,7 +1755,7 @@ int32
 <td>
 <code>networkRef</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1766,7 +1768,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>machineRef</code><br/>
 <em>
-<a href="/api-reference/common.md#localuidreference">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -1779,7 +1781,7 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 <td>
 <code>ipFamilies</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#ipfamily-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#ipfamily-v1-core">
 []Kubernetes core/v1.IPFamily
 </a>
 </em>
@@ -1876,7 +1878,7 @@ NetworkInterfaceState
 <td>
 <code>lastStateTransitionTime</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -1900,7 +1902,7 @@ string
 <td>
 <code>ips</code><br/>
 <em>
-<a href="/api-reference/common.md#ip">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.IP">
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 </a>
 </em>
@@ -1913,7 +1915,7 @@ string
 <td>
 <code>virtualIP</code><br/>
 <em>
-<a href="/api-reference/common.md#ip">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 </a>
 </em>
@@ -1939,7 +1941,7 @@ NetworkInterfacePhase
 <td>
 <code>lastPhaseTransitionTime</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -1967,7 +1969,7 @@ Kubernetes meta/v1.Time
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -1994,7 +1996,7 @@ NetworkInterfaceSpec
 <td>
 <code>networkRef</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -2007,7 +2009,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>machineRef</code><br/>
 <em>
-<a href="/api-reference/common.md#localuidreference">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -2020,7 +2022,7 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 <td>
 <code>ipFamilies</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#ipfamily-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#ipfamily-v1-core">
 []Kubernetes core/v1.IPFamily
 </a>
 </em>
@@ -2167,7 +2169,7 @@ NetworkState
 <td>
 <code>value</code><br/>
 <em>
-<a href="/api-reference/common.md#ip">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
 </a>
 </em>
@@ -2237,7 +2239,7 @@ EphemeralPrefixSource
 <td>
 <code>virtualIPRef</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -2295,7 +2297,7 @@ VirtualIPType
 <td>
 <code>ipFamily</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#ipfamily-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#ipfamily-v1-core">
 Kubernetes core/v1.IPFamily
 </a>
 </em>
@@ -2308,7 +2310,7 @@ Kubernetes core/v1.IPFamily
 <td>
 <code>targetRef</code><br/>
 <em>
-<a href="/api-reference/common.md#localuidreference">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -2339,7 +2341,7 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 <td>
 <code>ip</code><br/>
 <em>
-<a href="/api-reference/common.md#ip">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 </a>
 </em>
@@ -2365,7 +2367,7 @@ VirtualIPPhase
 <td>
 <code>phaseLastTransitionTime</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -2396,7 +2398,7 @@ Kubernetes meta/v1.Time
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -2436,7 +2438,7 @@ VirtualIPType
 <td>
 <code>ipFamily</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#ipfamily-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#ipfamily-v1-core">
 Kubernetes core/v1.IPFamily
 </a>
 </em>
@@ -2449,7 +2451,7 @@ Kubernetes core/v1.IPFamily
 <td>
 <code>targetRef</code><br/>
 <em>
-<a href="/api-reference/common.md#localuidreference">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
