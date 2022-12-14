@@ -1,6 +1,6 @@
 # onmetal-api
 
-![Gardener on Metal Logo](docs/assets/logo.png)
+![Gardener on Metal Logo](docs/assets/logo_small.png)
 
 This project contains the _CustomResourceDefinitions_ and controller for the user-facing API of the Gardener 
 on Metal project. It is meant to be a Kubernetes based Infrastructure-as-a-Service front-end of the OnMetal 
