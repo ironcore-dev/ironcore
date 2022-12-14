@@ -50,7 +50,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -77,7 +77,7 @@ VolumeSpec
 <td>
 <code>volumeClassRef</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -102,7 +102,7 @@ map[string]string
 <td>
 <code>volumePoolRef</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -116,7 +116,7 @@ If unset, the scheduler will figure out a suitable VolumePoolRef.</p>
 <td>
 <code>claimRef</code><br/>
 <em>
-<a href="/api-reference/common.md#localuidreference">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -129,7 +129,7 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 <td>
 <code>resources</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#resourcelist-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#resourcelist-v1-core">
 Kubernetes core/v1.ResourceList
 </a>
 </em>
@@ -153,7 +153,7 @@ string
 <td>
 <code>imagePullSecretRef</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -177,7 +177,7 @@ bool
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="/api-reference/common.md#toleration">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.Toleration">
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
 </a>
 </em>
@@ -238,7 +238,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -252,7 +252,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>capabilities</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#resourcelist-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#resourcelist-v1-core">
 Kubernetes core/v1.ResourceList
 </a>
 </em>
@@ -297,7 +297,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -335,7 +335,7 @@ string
 <td>
 <code>taints</code><br/>
 <em>
-<a href="/api-reference/common.md#taint">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.Taint">
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.Taint
 </a>
 </em>
@@ -382,7 +382,7 @@ VolumePoolStatus
 <td>
 <code>secretRef</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -459,7 +459,7 @@ VolumeConditionType
 <td>
 <code>status</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#conditionstatus-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#conditionstatus-v1-core">
 Kubernetes core/v1.ConditionStatus
 </a>
 </em>
@@ -505,7 +505,7 @@ int64
 <td>
 <code>lastTransitionTime</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -583,7 +583,7 @@ VolumePoolConditionType
 <td>
 <code>status</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#conditionstatus-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#conditionstatus-v1-core">
 Kubernetes core/v1.ConditionStatus
 </a>
 </em>
@@ -629,7 +629,7 @@ int64
 <td>
 <code>lastTransitionTime</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -679,7 +679,7 @@ string
 <td>
 <code>taints</code><br/>
 <em>
-<a href="/api-reference/common.md#taint">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.Taint">
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.Taint
 </a>
 </em>
@@ -757,7 +757,7 @@ VolumePoolState
 <td>
 <code>availableVolumeClasses</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
 []Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -770,7 +770,7 @@ VolumePoolState
 <td>
 <code>available</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#resourcelist-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#resourcelist-v1-core">
 Kubernetes core/v1.ResourceList
 </a>
 </em>
@@ -783,7 +783,7 @@ Kubernetes core/v1.ResourceList
 <td>
 <code>used</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#resourcelist-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#resourcelist-v1-core">
 Kubernetes core/v1.ResourceList
 </a>
 </em>
@@ -814,7 +814,7 @@ Kubernetes core/v1.ResourceList
 <td>
 <code>volumeClassRef</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -839,7 +839,7 @@ map[string]string
 <td>
 <code>volumePoolRef</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -853,7 +853,7 @@ If unset, the scheduler will figure out a suitable VolumePoolRef.</p>
 <td>
 <code>claimRef</code><br/>
 <em>
-<a href="/api-reference/common.md#localuidreference">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -866,7 +866,7 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 <td>
 <code>resources</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#resourcelist-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#resourcelist-v1-core">
 Kubernetes core/v1.ResourceList
 </a>
 </em>
@@ -890,7 +890,7 @@ string
 <td>
 <code>imagePullSecretRef</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -914,7 +914,7 @@ bool
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="/api-reference/common.md#toleration">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.Toleration">
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
 </a>
 </em>
@@ -985,7 +985,7 @@ VolumeState
 <td>
 <code>lastStateTransitionTime</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -1011,7 +1011,7 @@ VolumePhase
 <td>
 <code>lastPhaseTransitionTime</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#time-v1-meta">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -1066,7 +1066,7 @@ This is set by the volume provider when the volume is provisioned.</p>
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#objectmeta-v1-meta">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -1093,7 +1093,7 @@ VolumeSpec
 <td>
 <code>volumeClassRef</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1118,7 +1118,7 @@ map[string]string
 <td>
 <code>volumePoolRef</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1132,7 +1132,7 @@ If unset, the scheduler will figure out a suitable VolumePoolRef.</p>
 <td>
 <code>claimRef</code><br/>
 <em>
-<a href="/api-reference/common.md#localuidreference">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -1145,7 +1145,7 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 <td>
 <code>resources</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#resourcelist-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#resourcelist-v1-core">
 Kubernetes core/v1.ResourceList
 </a>
 </em>
@@ -1169,7 +1169,7 @@ string
 <td>
 <code>imagePullSecretRef</code><br/>
 <em>
-<a href="https://v1-21.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#localobjectreference-v1-core">
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1193,7 +1193,7 @@ bool
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="/api-reference/common.md#toleration">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.Toleration">
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
 </a>
 </em>

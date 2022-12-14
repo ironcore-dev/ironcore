@@ -8,5 +8,6 @@ in the documentation development guide.
 
 * [IPAM](../ipam)
 * [Compute](../compute)
+* [Networking](../networking)
 * [Storage](../storage)
 * [Common](../common)

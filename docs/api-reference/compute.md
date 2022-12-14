@@ -168,7 +168,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>ignitionRef</code><br/>
 <em>
-<a href="/api-reference/common.md#secretkeyselector">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.SecretKeySelector">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.SecretKeySelector
 </a>
 </em>
@@ -196,7 +196,7 @@ If key is empty, DefaultIgnitionKey will be used as fallback.</p>
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="/api-reference/common.md#toleration">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.Toleration">
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
 </a>
 </em>
@@ -353,7 +353,7 @@ string
 <td>
 <code>taints</code><br/>
 <em>
-<a href="/api-reference/common.md#taint">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.Taint">
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.Taint
 </a>
 </em>
@@ -515,7 +515,7 @@ object) networking.NetworkInterface.</p>
 <td>
 <code>networkInterfaceTemplate</code><br/>
 <em>
-<a href="/api-reference/networking.md#networking.api.onmetal.de/v1alpha1.NetworkInterfaceTemplateSpec">
+<a href="/api-reference/networking/#networking.api.onmetal.de/v1alpha1.NetworkInterfaceTemplateSpec">
 github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkInterfaceTemplateSpec
 </a>
 </em>
@@ -547,7 +547,7 @@ storage.Volume.</p>
 <td>
 <code>volumeTemplate</code><br/>
 <em>
-<a href="/api-reference/storage.md#storage.api.onmetal.de/v1alpha1.VolumeTemplateSpec">
+<a href="/api-reference/storage/#storage.api.onmetal.de/v1alpha1.VolumeTemplateSpec">
 github.com/onmetal/onmetal-api/api/storage/v1alpha1.VolumeTemplateSpec
 </a>
 </em>
@@ -825,7 +825,7 @@ string
 <td>
 <code>taints</code><br/>
 <em>
-<a href="/api-reference/common.md#taint">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.Taint">
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.Taint
 </a>
 </em>
@@ -1055,7 +1055,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>ignitionRef</code><br/>
 <em>
-<a href="/api-reference/common.md#secretkeyselector">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.SecretKeySelector">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.SecretKeySelector
 </a>
 </em>
@@ -1083,7 +1083,7 @@ If key is empty, DefaultIgnitionKey will be used as fallback.</p>
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="/api-reference/common.md#toleration">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.Toleration">
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
 </a>
 </em>
@@ -1382,7 +1382,7 @@ string
 <td>
 <code>ips</code><br/>
 <em>
-<a href="/api-reference/common.md#ip">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.IP">
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 </a>
 </em>
@@ -1395,7 +1395,7 @@ string
 <td>
 <code>virtualIP</code><br/>
 <em>
-<a href="/api-reference/common.md#ip">
+<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 </a>
 </em>
