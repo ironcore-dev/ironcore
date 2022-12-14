@@ -191,7 +191,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>networkRef</code><br/>
 <em>
-<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
+<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -204,7 +204,7 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 <td>
 <code>destinations</code><br/>
 <em>
-<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
+<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -403,7 +403,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>networkRef</code><br/>
 <em>
-<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
+<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -416,7 +416,7 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 <td>
 <code>destinations</code><br/>
 <em>
-<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
+<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -628,7 +628,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>networkRef</code><br/>
 <em>
-<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
+<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -811,7 +811,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>machineRef</code><br/>
 <em>
-<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
+<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -964,7 +964,7 @@ Kubernetes core/v1.IPFamily
 <td>
 <code>targetRef</code><br/>
 <em>
-<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
+<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -1069,7 +1069,7 @@ should be used by this AliasPrefix</p>
 <td>
 <code>prefix</code><br/>
 <em>
-<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.IP">
+<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
 </a>
 </em>
@@ -1101,7 +1101,7 @@ surrounding object) Prefix.</p>
 <td>
 <code>prefixTemplate</code><br/>
 <em>
-<a href="/api-reference/ipam/#ipam.api.onmetal.de/v1alpha1.PrefixTemplateSpec">
+<a href="../ipam/#ipam.api.onmetal.de/v1alpha1.PrefixTemplateSpec">
 github.com/onmetal/onmetal-api/api/ipam/v1alpha1.PrefixTemplateSpec
 </a>
 </em>
@@ -1164,7 +1164,7 @@ VirtualIPTemplateSpec
 <td>
 <code>value</code><br/>
 <em>
-<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.IP">
+<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 </a>
 </em>
@@ -1346,7 +1346,7 @@ for which this LoadBalancer should be applied</p>
 <td>
 <code>ips</code><br/>
 <em>
-<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.IP">
+<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 </a>
 </em>
@@ -1450,7 +1450,7 @@ k8s.io/apimachinery/pkg/types.UID
 <td>
 <code>ip</code><br/>
 <em>
-<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.IP">
+<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 </a>
 </em>
@@ -1540,7 +1540,7 @@ string
 <td>
 <code>ip</code><br/>
 <em>
-<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.IP">
+<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 </a>
 </em>
@@ -1768,7 +1768,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>machineRef</code><br/>
 <em>
-<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
+<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -1902,7 +1902,7 @@ string
 <td>
 <code>ips</code><br/>
 <em>
-<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.IP">
+<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 </a>
 </em>
@@ -1915,7 +1915,7 @@ string
 <td>
 <code>virtualIP</code><br/>
 <em>
-<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.IP">
+<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 </a>
 </em>
@@ -2009,7 +2009,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>machineRef</code><br/>
 <em>
-<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
+<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -2169,7 +2169,7 @@ NetworkState
 <td>
 <code>value</code><br/>
 <em>
-<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.IP">
+<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
 </a>
 </em>
@@ -2310,7 +2310,7 @@ Kubernetes core/v1.IPFamily
 <td>
 <code>targetRef</code><br/>
 <em>
-<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
+<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -2341,7 +2341,7 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 <td>
 <code>ip</code><br/>
 <em>
-<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.IP">
+<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 </a>
 </em>
@@ -2451,7 +2451,7 @@ Kubernetes core/v1.IPFamily
 <td>
 <code>targetRef</code><br/>
 <em>
-<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
+<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>

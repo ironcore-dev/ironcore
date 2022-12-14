@@ -17,27 +17,27 @@
     },
     {
       "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/api/common/v1alpha1\\.SecretKeySelector$",
-      "docsURLTemplate": "/api-reference/common/#common.api.onmetal.de/v1alpha1.SecretKeySelector"
+      "docsURLTemplate": "../common/#common.api.onmetal.de/v1alpha1.SecretKeySelector"
     },
     {
       "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/api/networking/v1alpha1\\.NetworkInterfaceTemplateSpec",
-      "docsURLTemplate": "/api-reference/networking/#networking.api.onmetal.de/v1alpha1.NetworkInterfaceTemplateSpec"
+      "docsURLTemplate": "../networking/#networking.api.onmetal.de/v1alpha1.NetworkInterfaceTemplateSpec"
     },
     {
       "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/api/storage/v1alpha1\\.VolumeTemplateSpec",
-      "docsURLTemplate": "/api-reference/storage/#storage.api.onmetal.de/v1alpha1.VolumeTemplateSpec"
+      "docsURLTemplate": "../storage/#storage.api.onmetal.de/v1alpha1.VolumeTemplateSpec"
     },
     {
       "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/api/common/v1alpha1\\.IP",
-      "docsURLTemplate": "/api-reference/common/#common.api.onmetal.de/v1alpha1.IP"
+      "docsURLTemplate": "../common/#common.api.onmetal.de/v1alpha1.IP"
     },
     {
       "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/api/common/v1alpha1\\.Toleration",
-      "docsURLTemplate": "/api-reference/common/#common.api.onmetal.de/v1alpha1.Toleration"
+      "docsURLTemplate": "../common/#common.api.onmetal.de/v1alpha1.Toleration"
     },
     {
       "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/api/common/v1alpha1\\.Taint",
-      "docsURLTemplate": "/api-reference/common/#common.api.onmetal.de/v1alpha1.Taint"
+      "docsURLTemplate": "../common/#common.api.onmetal.de/v1alpha1.Taint"
     }
   ],
   "typeDisplayNamePrefixOverrides": {

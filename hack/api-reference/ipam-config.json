@@ -17,19 +17,19 @@
     },
     {
       "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/api/common/v1alpha1\\.IP",
-      "docsURLTemplate": "/api-reference/common/#common.api.onmetal.de/v1alpha1.IP"
+      "docsURLTemplate": "../common/#common.api.onmetal.de/v1alpha1.IP"
     },
     {
       "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/api/common/v1alpha1\\.IPPrefix",
-      "docsURLTemplate": "/api-reference/common/#common.api.onmetal.de/v1alpha1.IPPrefix"
+      "docsURLTemplate": "../common/#common.api.onmetal.de/v1alpha1.IPPrefix"
     },
     {
       "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/api/common/v1alpha1\\.SecretKeySelector$",
-      "docsURLTemplate": "/api-reference/common/#common.api.onmetal.de/v1alpha1.SecretKeySelector"
+      "docsURLTemplate": "../common/#common.api.onmetal.de/v1alpha1.SecretKeySelector"
     },
     {
       "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/api/common/v1alpha1\\.ConfigMapKeySelector$",
-      "docsURLTemplate": "/api-reference/common/#common.api.onmetal.de/v1alpha1.ConfigMapKeySelector"
+      "docsURLTemplate": "../common/#common.api.onmetal.de/v1alpha1.ConfigMapKeySelector"
     }
   ],
   "typeDisplayNamePrefixOverrides": {

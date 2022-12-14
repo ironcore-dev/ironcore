@@ -116,7 +116,7 @@ If unset, the scheduler will figure out a suitable VolumePoolRef.</p>
 <td>
 <code>claimRef</code><br/>
 <em>
-<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
+<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -177,7 +177,7 @@ bool
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.Toleration">
+<a href="../common/#common.api.onmetal.de/v1alpha1.Toleration">
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
 </a>
 </em>
@@ -335,7 +335,7 @@ string
 <td>
 <code>taints</code><br/>
 <em>
-<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.Taint">
+<a href="../common/#common.api.onmetal.de/v1alpha1.Taint">
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.Taint
 </a>
 </em>
@@ -679,7 +679,7 @@ string
 <td>
 <code>taints</code><br/>
 <em>
-<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.Taint">
+<a href="../common/#common.api.onmetal.de/v1alpha1.Taint">
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.Taint
 </a>
 </em>
@@ -853,7 +853,7 @@ If unset, the scheduler will figure out a suitable VolumePoolRef.</p>
 <td>
 <code>claimRef</code><br/>
 <em>
-<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
+<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -914,7 +914,7 @@ bool
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.Toleration">
+<a href="../common/#common.api.onmetal.de/v1alpha1.Toleration">
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
 </a>
 </em>
@@ -1132,7 +1132,7 @@ If unset, the scheduler will figure out a suitable VolumePoolRef.</p>
 <td>
 <code>claimRef</code><br/>
 <em>
-<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
+<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
@@ -1193,7 +1193,7 @@ bool
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="/api-reference/common/#common.api.onmetal.de/v1alpha1.Toleration">
+<a href="../common/#common.api.onmetal.de/v1alpha1.Toleration">
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
 </a>
 </em>

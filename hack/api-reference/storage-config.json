@@ -21,19 +21,19 @@
     },
     {
       "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/api/common/v1alpha1\\.Toleration",
-      "docsURLTemplate": "/api-reference/common/#common.api.onmetal.de/v1alpha1.Toleration"
+      "docsURLTemplate": "../common/#common.api.onmetal.de/v1alpha1.Toleration"
     },
     {
       "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/api/common/v1alpha1\\.Taint",
-      "docsURLTemplate": "/api-reference/common/#common.api.onmetal.de/v1alpha1.Taint"
+      "docsURLTemplate": "../common/#common.api.onmetal.de/v1alpha1.Taint"
     },
     {
       "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/api/common/v1alpha1\\.SecretKeySelector$",
-      "docsURLTemplate": "/api-reference/common.md#secretkeyselector"
+      "docsURLTemplate": "../common.md#secretkeyselector"
     },
     {
       "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/api/common/v1alpha1\\.LocalUIDReference",
-      "docsURLTemplate": "/api-reference/common/#common.api.onmetal.de/v1alpha1.LocalUIDReference"
+      "docsURLTemplate": "../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference"
     }
   ],
   "typeDisplayNamePrefixOverrides": {
