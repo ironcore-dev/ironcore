@@ -12,7 +12,7 @@ authors:
 - @lukasfrank
 - @gehoern
 
-  reviewers:
+reviewers:
 
 - @adracus
 - @MalteJ
