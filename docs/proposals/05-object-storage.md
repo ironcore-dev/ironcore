@@ -32,20 +32,20 @@ reviewers:
 
 ## Summary
 Object storage builds the basis for many cloud applications. An Object Storage provides a simplified object 
-model for files, but has a reduced set of security and access features (non-posix). This functionality is build on top 
+model for files, but has a reduced set of security and access features (non-posix). This functionality is built on top 
 of the HTTP protocol. The current market standard is [S3](https://docs.aws.amazon.com/AmazonS3/latest/API/Type_API_Reference.html). 
 This document describes how to integrate simplified S3 buckets into the OnMetal API without taking too many details of 
 the S3 feature completeness itself.
 
 ## Motivation
 Object Storage is demanded by cloud native applications, therefore, OnMetal needs to provide it for a complete solution.
-The Object Storage service should be integrated into OnMetal and use all available optimizations. It is not designed 
+The Object Storage service should be integrated into OnMetal and is not designed 
 to be _just_ a service on top of OnMetal. The used protocol is called [S3](https://docs.aws.amazon.com/AmazonS3/latest/API/Type_API_Reference.html)
 which introduces a storage entity called bucket. For the beginning only the bucket creation and removal is covered.
 
 ### Goals
 - S3-compatible object storage implementation
-- Automatic assigned public storage endpoint (addressed via DNS)
+- Automatic assigned public storage endpoint 
 - Providing a REST-API endpoint to address the bucket
 
 ### Non-Goals
@@ -66,8 +66,7 @@ block device with a specific driver.
 ### Bucket
 
 A `Bucket` is a *namespaced* resource to request S3-compatible object storage. 
-`Bucket`s with the `type` `Public` set (only valid type for now) are accessible from the internet. 
-In the future, the `Bucket`s can be extended with a `networkRef` to support other types. 
+`Bucket`s with the `type` `Public` set (only valid type for now) are accessible from the internet.
 The desired `BucketClass` is referenced by the `bucketClassRef`. If no pool is pre-defined, 
 the `bucketPoolSelector` will be used to find a suitable `BucketPool`.  The desired pool, either pre-defined or 
 set by another controller, is stated in the `bucketPoolRef`.
@@ -124,7 +123,7 @@ capabilities:
 A `BucketPool` is a *non-namespaced* logical unit and accommodates a collection of `Bucket`s. 
 The `provider`'s id (the implementor's id) of the `BucketPool` is stated in the `providerID` field. 
 Only `Bucket`s who tolerate all the taints, will land in the `BucketPool`. `BucketClasses` which can be fulfilled by 
-the provider of the`BucketPool`, are listed in the status field `availableBucketClasses`. The `state` in the status 
+the provider of the `BucketPool`, are listed in the status field `availableBucketClasses`. The `state` in the status 
 indicates if the pool is `Available`, `Pending` or `Unavailable`.
 
 [//]: # (@formatter:off)
