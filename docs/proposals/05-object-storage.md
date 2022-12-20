@@ -65,8 +65,7 @@ block device with a specific driver.
 
 ### Bucket
 
-A `Bucket` is a *namespaced* resource to request S3-compatible object storage. 
-`Bucket`s with the `type` `Public` set (only valid type for now) are accessible from the internet.
+A `Bucket` is a *namespaced* resource to request S3-compatible object storage.
 The desired `BucketClass` is referenced by the `bucketClassRef`. If no pool is pre-defined, 
 the `bucketPoolSelector` will be used to find a suitable `BucketPool`.  The desired pool, either pre-defined or 
 set by another controller, is stated in the `bucketPoolRef`.
@@ -82,8 +81,6 @@ kind: Bucket
 metadata:
   name: bucket-1
 spec:
-  # currently only type public is defined
-  type: Public
   bucketClassRef:
     name: slow
   bucketPoolSelector:
