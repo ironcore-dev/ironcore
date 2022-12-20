@@ -29,7 +29,7 @@ import (
 func (s *Server) addOnmetalNetworkInterfaceAttachment(ctx context.Context, onmetalMachine *computev1alpha1.Machine, networkInterface computev1alpha1.NetworkInterface) error {
 	baseOnmetalMachine := onmetalMachine.DeepCopy()
 	onmetalMachine.Spec.NetworkInterfaces = append(onmetalMachine.Spec.NetworkInterfaces, networkInterface)
-	if err := s.client.Patch(ctx, onmetalMachine, client.StrategicMergeFrom(baseOnmetalMachine)); err != nil {
+	if err := s.cluster.Client().Patch(ctx, onmetalMachine, client.StrategicMergeFrom(baseOnmetalMachine)); err != nil {
 		return fmt.Errorf("error patching onmetal machine network interfaces: %w", err)
 	}
 	return nil

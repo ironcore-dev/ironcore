@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
+	"github.com/onmetal/onmetal-api/ori/apis/machine"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -48,7 +49,7 @@ type Generic struct {
 	machineClassByName         map[string]*ori.MachineClass
 	machineClassByCapabilities map[capabilities][]*ori.MachineClass
 
-	machineRuntime ori.MachineRuntimeClient
+	machineRuntime machine.RuntimeService
 
 	relistPeriod time.Duration
 }
@@ -136,7 +137,7 @@ func setGenericOptionsDefaults(o *GenericOptions) {
 	}
 }
 
-func NewGeneric(runtime ori.MachineRuntimeClient, opts GenericOptions) MachineClassMapper {
+func NewGeneric(runtime machine.RuntimeService, opts GenericOptions) MachineClassMapper {
 	setGenericOptionsDefaults(&opts)
 	return &Generic{
 		synced:                     make(chan struct{}),

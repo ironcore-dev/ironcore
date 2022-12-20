@@ -38,10 +38,10 @@ type OnmetalMachineConfig struct {
 }
 
 func (s *Server) onmetalMachinePoolRef() *corev1.LocalObjectReference {
-	if s.machinePoolName == "" {
+	if s.cluster.MachinePoolName() == "" {
 		return nil
 	}
-	return &corev1.LocalObjectReference{Name: s.machinePoolName}
+	return &corev1.LocalObjectReference{Name: s.cluster.MachinePoolName()}
 }
 
 func (s *Server) prepareOnmetalVolumeAttachment(volumeSpec *ori.VolumeAttachment) (computev1alpha1.Volume, error) {
@@ -95,8 +95,8 @@ func (s *Server) getOnmetalMachineConfig(machine *ori.Machine) (*OnmetalMachineC
 	if ignition := machine.Spec.Ignition; ignition != nil {
 		onmetalIgnitionSecret = &corev1.Secret{
 			ObjectMeta: metav1.ObjectMeta{
-				Namespace: s.namespace,
-				Name:      s.generateID(),
+				Namespace: s.cluster.Namespace(),
+				Name:      s.cluster.IDGen().Generate(),
 			},
 			Type: corev1.SecretTypeOpaque,
 			Data: map[string][]byte{
@@ -141,12 +141,12 @@ func (s *Server) getOnmetalMachineConfig(machine *ori.Machine) (*OnmetalMachineC
 
 	onmetalMachine := &computev1alpha1.Machine{
 		ObjectMeta: metav1.ObjectMeta{
-			Namespace: s.namespace,
-			Name:      s.generateID(),
+			Namespace: s.cluster.Namespace(),
+			Name:      s.cluster.IDGen().Generate(),
 		},
 		Spec: computev1alpha1.MachineSpec{
 			MachineClassRef:     corev1.LocalObjectReference{Name: machine.Spec.Class},
-			MachinePoolSelector: s.machinePoolSelector,
+			MachinePoolSelector: s.cluster.MachinePoolSelector(),
 			MachinePoolRef:      s.onmetalMachinePoolRef(),
 			Image:               onmetalImage,
 			ImagePullSecretRef:  nil, // TODO: Specify if required.
@@ -172,12 +172,12 @@ func (s *Server) createOnmetalMachine(ctx context.Context, log logr.Logger, cfg 
 
 	if cfg.IgnitionSecret != nil {
 		log.V(1).Info("Creating onmetal ignition secret")
-		if err := s.client.Create(ctx, cfg.IgnitionSecret); err != nil {
+		if err := s.cluster.Client().Create(ctx, cfg.IgnitionSecret); err != nil {
 			return nil, fmt.Errorf("error onmetal creating ignition secret: %w", err)
 		}
 
 		c.Add(func(ctx context.Context) error {
-			if err := s.client.Delete(ctx, cfg.IgnitionSecret); client.IgnoreNotFound(err) != nil {
+			if err := s.cluster.Client().Delete(ctx, cfg.IgnitionSecret); client.IgnoreNotFound(err) != nil {
 				return fmt.Errorf("error onmetal deleting ignition secret: %w", err)
 			}
 			return nil
@@ -185,11 +185,11 @@ func (s *Server) createOnmetalMachine(ctx context.Context, log logr.Logger, cfg 
 	}
 
 	log.V(1).Info("Creating onmetal machine")
-	if err := s.client.Create(ctx, cfg.Machine); err != nil {
+	if err := s.cluster.Client().Create(ctx, cfg.Machine); err != nil {
 		return nil, fmt.Errorf("error creating onmetal machine: %w", err)
 	}
 	c.Add(func(ctx context.Context) error {
-		if err := s.client.Delete(ctx, cfg.Machine); client.IgnoreNotFound(err) != nil {
+		if err := s.cluster.Client().Delete(ctx, cfg.Machine); client.IgnoreNotFound(err) != nil {
 			return fmt.Errorf("error deleting onmetal machine: %w", err)
 		}
 		return nil
@@ -197,13 +197,13 @@ func (s *Server) createOnmetalMachine(ctx context.Context, log logr.Logger, cfg 
 
 	if cfg.IgnitionSecret != nil {
 		log.V(1).Info("Patching ignition secret to be controlled by onmetal machine")
-		if err := apiutils.PatchControlledBy(ctx, s.client, cfg.Machine, cfg.IgnitionSecret); err != nil {
+		if err := apiutils.PatchControlledBy(ctx, s.cluster.Client(), cfg.Machine, cfg.IgnitionSecret); err != nil {
 			return nil, fmt.Errorf("error patching ignition secret to be controlled by onmetal machine: %w", err)
 		}
 	}
 
 	log.V(1).Info("Patching onmetal machine as created")
-	if err := apiutils.PatchCreated(ctx, s.client, cfg.Machine); err != nil {
+	if err := apiutils.PatchCreated(ctx, s.cluster.Client(), cfg.Machine); err != nil {
 		return nil, fmt.Errorf("error patching onmetal machine as created: %w", err)
 	}
 

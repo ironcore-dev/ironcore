@@ -31,7 +31,7 @@ func (s *Server) setOnmetalNetworkInterfaceIPs(
 ) error {
 	baseOnmetalNetworkInterface := onmetalNetworkInterface.DeepCopy()
 	onmetalNetworkInterface.Spec.IPs = s.onmetalIPsToOnmetalIPSources(ips)
-	if err := s.client.Patch(ctx, onmetalNetworkInterface, client.MergeFrom(baseOnmetalNetworkInterface)); err != nil {
+	if err := s.cluster.Client().Patch(ctx, onmetalNetworkInterface, client.MergeFrom(baseOnmetalNetworkInterface)); err != nil {
 		return fmt.Errorf("error setting ips: %w", err)
 	}
 	return nil

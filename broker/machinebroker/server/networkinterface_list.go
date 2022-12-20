@@ -18,7 +18,10 @@ import (
 	"context"
 	"fmt"
 
+	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	"github.com/onmetal/onmetal-api/broker/common/utils"
+	"github.com/onmetal/onmetal-api/broker/machinebroker/aliasprefixes"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	"google.golang.org/grpc/codes"
@@ -27,6 +30,16 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 )
 
+func (s *Server) buildIDToAliasPrefixesMap(aliasPrefixes []aliasprefixes.AliasPrefix) map[string][]aliasprefixes.AliasPrefix {
+	res := make(map[string][]aliasprefixes.AliasPrefix)
+	for _, aliasPrefix := range aliasPrefixes {
+		for destination := range aliasPrefix.Destinations {
+			res[destination] = append(res[destination], aliasPrefix)
+		}
+	}
+	return res
+}
+
 func (s *Server) listAggregateOnmetalNetworkInterfaces(ctx context.Context) ([]AggregateOnmetalNetworkInterface, error) {
 	onmetalNetworkInterfaceList := &networkingv1alpha1.NetworkInterfaceList{}
 	if err := s.listManagedAndCreated(ctx, onmetalNetworkInterfaceList); err != nil {
@@ -34,7 +47,7 @@ func (s *Server) listAggregateOnmetalNetworkInterfaces(ctx context.Context) ([]A
 	}
 
 	onmetalNetworkList := &networkingv1alpha1.NetworkList{}
-	if err := s.listWithPurpose(ctx, onmetalNetworkList, machinebrokerv1alpha1.NetworkInterfacePurpose); err != nil {
+	if err := s.listManagedAndCreated(ctx, onmetalNetworkList); err != nil {
 		return nil, fmt.Errorf("error listing onmetal networks: %w", err)
 	}
 
@@ -43,16 +56,26 @@ func (s *Server) listAggregateOnmetalNetworkInterfaces(ctx context.Context) ([]A
 		return nil, fmt.Errorf("error listing onmetal virtual ips: %w", err)
 	}
 
-	onmetalNetworkByName := objectStructsToObjectPtrByNameMap(onmetalNetworkList.Items)
-	onmetalVirtualIPByName := objectStructsToObjectPtrByNameMap(onmetalVirtualIPList.Items)
+	onmetalAliasPrefixes, err := s.aliasPrefixes.List(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("error listing onmetal alias prefixes: %w", err)
+	}
 
-	getNetwork := objectByNameMapGetter(networkingv1alpha1.Resource("networks"), onmetalNetworkByName)
-	getVirtualIP := objectByNameMapGetter(networkingv1alpha1.Resource("virtualips"), onmetalVirtualIPByName)
+	idToAliasPrefixes := s.buildIDToAliasPrefixesMap(onmetalAliasPrefixes)
+	getNetwork := utils.ObjectSliceToByNameGetter(networkingv1alpha1.Resource("networks"), onmetalNetworkList.Items)
+	getVirtualIP := utils.ObjectSliceToByNameGetter(networkingv1alpha1.Resource("virtualips"), onmetalVirtualIPList.Items)
 
 	var res []AggregateOnmetalNetworkInterface
 	for i := range onmetalNetworkInterfaceList.Items {
 		onmetalNetworkInterface := &onmetalNetworkInterfaceList.Items[i]
-		networkInterface, err := s.aggregateOnmetalNetworkInterface(onmetalNetworkInterface, getNetwork, getVirtualIP)
+		networkInterface, err := s.aggregateOnmetalNetworkInterface(
+			onmetalNetworkInterface,
+			getNetwork,
+			getVirtualIP,
+			func() ([]aliasprefixes.AliasPrefix, error) {
+				return idToAliasPrefixes[onmetalNetworkInterface.Name], nil
+			},
+		)
 		if err != nil {
 			return nil, fmt.Errorf("error assembling onmetal network interface %s: %w", onmetalNetworkInterface.Name, err)
 		}
@@ -66,6 +89,7 @@ func (s *Server) aggregateOnmetalNetworkInterface(
 	onmetalNetworkInterface *networkingv1alpha1.NetworkInterface,
 	getNetwork func(name string) (*networkingv1alpha1.Network, error),
 	getVirtualIP func(name string) (*networkingv1alpha1.VirtualIP, error),
+	listAliasPrefixes func() ([]aliasprefixes.AliasPrefix, error),
 ) (*AggregateOnmetalNetworkInterface, error) {
 	network, err := getNetwork(onmetalNetworkInterface.Spec.NetworkRef.Name)
 	if err != nil {
@@ -87,10 +111,25 @@ func (s *Server) aggregateOnmetalNetworkInterface(
 		virtualIP = v
 	}
 
+	aliasPrefixes, err := listAliasPrefixes()
+	if err != nil {
+		return nil, fmt.Errorf("error listing alias prefixes: %w", err)
+	}
+
+	var prefixes []commonv1alpha1.IPPrefix
+	for _, aliasPrefix := range aliasPrefixes {
+		if !aliasPrefix.Destinations.Has(onmetalNetworkInterface.Name) {
+			continue
+		}
+
+		prefixes = append(prefixes, aliasPrefix.Prefix)
+	}
+
 	return &AggregateOnmetalNetworkInterface{
 		NetworkInterface: onmetalNetworkInterface,
 		Network:          network,
 		VirtualIP:        virtualIP,
+		Prefixes:         prefixes,
 	}, nil
 }
 
@@ -105,8 +144,11 @@ func (s *Server) getAggregateOnmetalNetworkInterface(ctx context.Context, id str
 
 	return s.aggregateOnmetalNetworkInterface(
 		onmetalNetworkInterface,
-		clientGetter[networkingv1alpha1.Network](ctx, s.client, s.namespace),
-		clientGetter[networkingv1alpha1.VirtualIP](ctx, s.client, s.namespace),
+		utils.ClientObjectGetter[*networkingv1alpha1.Network](ctx, s.cluster.Client(), s.cluster.Namespace()),
+		utils.ClientObjectGetter[*networkingv1alpha1.VirtualIP](ctx, s.cluster.Client(), s.cluster.Namespace()),
+		func() ([]aliasprefixes.AliasPrefix, error) {
+			return s.aliasPrefixes.ListByDependent(ctx, id)
+		},
 	)
 }
 

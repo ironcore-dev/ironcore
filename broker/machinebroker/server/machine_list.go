@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	"github.com/onmetal/onmetal-api/broker/common/utils"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	"google.golang.org/grpc/codes"
@@ -40,8 +41,7 @@ func (s *Server) listAggregateOnmetalMachines(ctx context.Context) ([]AggregateO
 		return nil, fmt.Errorf("error listing ignition secrets: %w", err)
 	}
 
-	ignitionSecretByName := objectStructsToObjectPtrByNameMap(ignitionSecretList.Items)
-	getIgnitionSecret := objectByNameMapGetter(corev1.Resource("secrets"), ignitionSecretByName)
+	getIgnitionSecret := utils.ObjectSliceToByNameGetter(corev1.Resource("secrets"), ignitionSecretList.Items)
 
 	var res []AggregateOnmetalMachine
 	for i := range onmetalMachineList.Items {
@@ -87,7 +87,7 @@ func (s *Server) getAggregateOnmetalMachine(ctx context.Context, id string) (*Ag
 
 	return s.aggregateOnmetalMachine(onmetalMachine, func(name string) (*corev1.Secret, error) {
 		secret := &corev1.Secret{}
-		if err := s.client.Get(ctx, client.ObjectKey{Namespace: s.namespace, Name: name}, secret); err != nil {
+		if err := s.cluster.Client().Get(ctx, client.ObjectKey{Namespace: s.cluster.Namespace(), Name: name}, secret); err != nil {
 			return nil, err
 		}
 		return secret, nil

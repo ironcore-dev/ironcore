@@ -3525,6 +3525,12 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkInterfaceStatus(ref commo
 							Format:      "",
 						},
 					},
+					"machinePoolRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "MachinePoolRef is the machine pool the network interface is currently on, if any.",
+							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
+						},
+					},
 					"lastPhaseTransitionTime": {
 						SchemaProps: spec.SchemaProps{
 							Description: "LastPhaseTransitionTime is the last time the Phase transitioned from one value to another.",
@@ -3535,7 +3541,7 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkInterfaceStatus(ref commo
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/api/common/v1alpha1.IP", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+			"github.com/onmetal/onmetal-api/api/common/v1alpha1.IP", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
 	}
 }
 

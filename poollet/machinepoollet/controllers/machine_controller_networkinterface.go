@@ -27,6 +27,7 @@ import (
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
 	machinepoolletv1alpha1 "github.com/onmetal/onmetal-api/poollet/machinepoollet/api/v1alpha1"
+	machinepoolletclient "github.com/onmetal/onmetal-api/poollet/machinepoollet/client"
 	"github.com/onmetal/onmetal-api/poollet/machinepoollet/controllers/events"
 	utilslices "github.com/onmetal/onmetal-api/utils/slices"
 	"golang.org/x/exp/slices"
@@ -352,6 +353,50 @@ func (r *MachineReconciler) updateORINetworkInterface(
 			return fmt.Errorf("error deleting ori network interface virtual ip: %w", err)
 		}
 	}
+
+	if err := r.updateORINetworkInterfacePrefixes(ctx, log, oriNetworkInterface, oriNetworkInterfaceSpec); err != nil {
+		return fmt.Errorf("error updating ori network interface prefixes: %w", err)
+	}
+
+	return nil
+}
+
+func (r *MachineReconciler) updateORINetworkInterfacePrefixes(
+	ctx context.Context,
+	log logr.Logger,
+	oriNetworkInterface *ori.NetworkInterface,
+	oriNetworkInterfaceSpec *ori.NetworkInterfaceSpec,
+) error {
+	id := oriNetworkInterface.Metadata.Id
+	actualPrefixes := set.New(oriNetworkInterface.Spec.Prefixes...)
+	desiredPrefixes := set.New(oriNetworkInterfaceSpec.Prefixes...)
+
+	delPrefixes := actualPrefixes.Difference(desiredPrefixes)
+	newPrefixes := desiredPrefixes.Difference(actualPrefixes)
+
+	var errs []error
+	for delPrefix := range delPrefixes {
+		log.V(1).Info("Deleting outdated ori network interface prefix", "Prefix", delPrefix)
+		if _, err := r.MachineRuntime.DeleteNetworkInterfacePrefix(ctx, &ori.DeleteNetworkInterfacePrefixRequest{
+			NetworkInterfaceId: id,
+			Prefix:             delPrefix,
+		}); err != nil {
+			errs = append(errs, fmt.Errorf("error deleting ori network interface prefix %s: %w", delPrefix, err))
+		}
+	}
+	for newPrefix := range newPrefixes {
+		log.V(1).Info("Creating new ori network interface prefix", "Prefix", newPrefix)
+		if _, err := r.MachineRuntime.CreateNetworkInterfacePrefix(ctx, &ori.CreateNetworkInterfacePrefixRequest{
+			NetworkInterfaceId: id,
+			Prefix:             newPrefix,
+		}); err != nil {
+			errs = append(errs, fmt.Errorf("error creating ori network interface prefix %s: %w", newPrefix, err))
+		}
+	}
+
+	if len(errs) > 0 {
+		return fmt.Errorf("error(s) updating ori network interface prefixes: %v", errs)
+	}
 	return nil
 }
 
@@ -386,13 +431,68 @@ func (r *MachineReconciler) prepareORINetworkInterfaceSpec(
 		}
 	}
 
+	prefixes, err := r.aliasPrefixesForNetworkInterface(ctx, networkInterface)
+	if err != nil {
+		return nil, false, fmt.Errorf("error getting alias prefixes for network interface: %w", err)
+	}
+
 	return &ori.NetworkInterfaceSpec{
 		Network: &ori.NetworkSpec{
 			Handle: networkInterface.Status.NetworkHandle,
 		},
 		Ips:       r.ipsToStrings(networkInterface.Status.IPs),
 		VirtualIp: virtualIPSpec,
+		Prefixes:  prefixes,
 	}, true, nil
+}
+
+func (r *MachineReconciler) aliasPrefixesForNetworkInterface(
+	ctx context.Context,
+	networkInterface *networkingv1alpha1.NetworkInterface,
+) ([]string, error) {
+	aliasPrefixList := &networkingv1alpha1.AliasPrefixList{}
+	if err := r.List(ctx, aliasPrefixList,
+		client.InNamespace(networkInterface.Namespace),
+	); err != nil {
+		return nil, fmt.Errorf("error listing alias prefixes: %w", err)
+	}
+
+	aliasPrefixRoutingList := &networkingv1alpha1.AliasPrefixRoutingList{}
+	if err := r.List(ctx, aliasPrefixRoutingList,
+		client.InNamespace(networkInterface.Namespace),
+		client.MatchingFields{
+			machinepoolletclient.AliasPrefixRoutingNetworkRefNameField: networkInterface.Spec.NetworkRef.Name,
+		},
+	); err != nil {
+		return nil, fmt.Errorf("error listing alias prefix routings: %w", err)
+	}
+
+	aliasPrefixRoutingsByName := utilslices.ToMap(
+		aliasPrefixRoutingList.Items,
+		func(apr networkingv1alpha1.AliasPrefixRouting) string { return apr.Name },
+	)
+
+	prefixes := set.New[string]()
+
+	for _, aliasPrefix := range aliasPrefixList.Items {
+		prefix := aliasPrefix.Status.Prefix
+		if prefix == nil {
+			continue
+		}
+
+		aliasPrefixRouting, ok := aliasPrefixRoutingsByName[aliasPrefix.Name]
+		if !ok {
+			continue
+		}
+
+		if slices.ContainsFunc(
+			aliasPrefixRouting.Destinations,
+			func(ref commonv1alpha1.LocalUIDReference) bool { return ref.UID == networkInterface.UID },
+		) {
+			prefixes.Insert(prefix.String())
+		}
+	}
+	return set.SortedSlice(prefixes), nil
 }
 
 func (r *MachineReconciler) updateNetworkInterface(

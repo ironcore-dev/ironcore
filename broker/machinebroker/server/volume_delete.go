@@ -31,7 +31,7 @@ func (s *Server) DeleteVolume(ctx context.Context, req *ori.DeleteVolumeRequest)
 	}
 
 	log.V(1).Info("Deleting onmetal volume")
-	if err := s.client.Delete(ctx, onmetalVolume.Volume); err != nil {
+	if err := s.cluster.Client().Delete(ctx, onmetalVolume.Volume); err != nil {
 		return nil, fmt.Errorf("error deleting onmetal volume: %w", err)
 	}
 

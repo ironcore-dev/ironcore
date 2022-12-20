@@ -31,21 +31,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func (s *Server) prepareOnmetalNetwork(networkSpec *ori.NetworkSpec) (*networkingv1alpha1.Network, error) {
-	onmetalNetwork := &networkingv1alpha1.Network{
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: s.namespace,
-			Name:      s.generateID(),
-		},
-		Spec: networkingv1alpha1.NetworkSpec{
-			Handle: networkSpec.Handle,
-		},
-	}
-	onmetalapiannotations.SetExternallyMangedBy(onmetalNetwork, machinebrokerv1alpha1.MachineBrokerManager)
-	apiutils.SetPurpose(onmetalNetwork, machinebrokerv1alpha1.NetworkInterfacePurpose)
-	return onmetalNetwork, nil
-}
-
 func (s *Server) prepareOnmetalVirtualIP(virtualIPSpec *ori.VirtualIPSpec) (*networkingv1alpha1.VirtualIP, error) {
 	ip, err := commonv1alpha1.ParseIP(virtualIPSpec.Ip)
 	if err != nil {
@@ -54,8 +39,8 @@ func (s *Server) prepareOnmetalVirtualIP(virtualIPSpec *ori.VirtualIPSpec) (*net
 
 	onmetalVirtualIP := &networkingv1alpha1.VirtualIP{
 		ObjectMeta: metav1.ObjectMeta{
-			Namespace: s.namespace,
-			Name:      s.generateID(),
+			Namespace: s.cluster.Namespace(),
+			Name:      s.cluster.IDGen().Generate(),
 		},
 		Spec: networkingv1alpha1.VirtualIPSpec{
 			Type:     networkingv1alpha1.VirtualIPTypePublic,
@@ -71,11 +56,6 @@ func (s *Server) prepareOnmetalVirtualIP(virtualIPSpec *ori.VirtualIPSpec) (*net
 }
 
 func (s *Server) prepareAggregateOnmetalNetworkInterface(networkInterface *ori.NetworkInterface) (*AggregateOnmetalNetworkInterface, error) {
-	onmetalNetwork, err := s.prepareOnmetalNetwork(networkInterface.Spec.Network)
-	if err != nil {
-		return nil, fmt.Errorf("error preparing onmetal network: %w", err)
-	}
-
 	var onmetalVirtualIP *networkingv1alpha1.VirtualIP
 	if virtualIPSpec := networkInterface.Spec.VirtualIp; virtualIPSpec != nil {
 		v, err := s.prepareOnmetalVirtualIP(virtualIPSpec)
@@ -91,6 +71,11 @@ func (s *Server) prepareAggregateOnmetalNetworkInterface(networkInterface *ori.N
 		return nil, err
 	}
 
+	prefixes, err := s.parseIPPrefixes(networkInterface.Spec.Prefixes)
+	if err != nil {
+		return nil, err
+	}
+
 	var virtualIPSource *networkingv1alpha1.VirtualIPSource
 	if onmetalVirtualIP != nil {
 		virtualIPSource = &networkingv1alpha1.VirtualIPSource{
@@ -99,11 +84,10 @@ func (s *Server) prepareAggregateOnmetalNetworkInterface(networkInterface *ori.N
 	}
 	onmetalNetworkInterface := &networkingv1alpha1.NetworkInterface{
 		ObjectMeta: metav1.ObjectMeta{
-			Namespace: s.namespace,
-			Name:      s.generateID(),
+			Namespace: s.cluster.Namespace(),
+			Name:      s.cluster.IDGen().Generate(),
 		},
 		Spec: networkingv1alpha1.NetworkInterfaceSpec{
-			NetworkRef: corev1.LocalObjectReference{Name: onmetalNetwork.Name},
 			IPFamilies: s.getOnmetalIPsIPFamilies(ips),
 			IPs:        s.onmetalIPsToOnmetalIPSources(ips),
 			VirtualIP:  virtualIPSource,
@@ -115,38 +99,20 @@ func (s *Server) prepareAggregateOnmetalNetworkInterface(networkInterface *ori.N
 	apiutils.SetManagerLabel(onmetalNetworkInterface, machinebrokerv1alpha1.MachineBrokerManager)
 
 	onmetalNetworkInterfaceConfig := &AggregateOnmetalNetworkInterface{
-		Network:          onmetalNetwork,
-		VirtualIP:        onmetalVirtualIP,
 		NetworkInterface: onmetalNetworkInterface,
+		Network: &networkingv1alpha1.Network{
+			Spec: networkingv1alpha1.NetworkSpec{Handle: networkInterface.Spec.Network.Handle},
+		},
+		VirtualIP: onmetalVirtualIP,
+		Prefixes:  prefixes,
 	}
 	return onmetalNetworkInterfaceConfig, nil
-}
-
-func (s *Server) createOnmetalNetwork(ctx context.Context, log logr.Logger, cleaner *cleaner.Cleaner, onmetalNetwork *networkingv1alpha1.Network) error {
-	log.V(1).Info("Creating onmetal network")
-	if err := s.client.Create(ctx, onmetalNetwork); err != nil {
-		return fmt.Errorf("error creating onmetal network: %w", err)
-	}
-	cleaner.Add(func(ctx context.Context) error {
-		if err := s.client.Delete(ctx, onmetalNetwork); client.IgnoreNotFound(err) != nil {
-			return fmt.Errorf("error deleting onmetal network: %w", err)
-		}
-		return nil
-	})
-
-	baseOnmetalNetwork := onmetalNetwork.DeepCopy()
-	onmetalNetwork.Status.State = networkingv1alpha1.NetworkStateAvailable
-	if err := s.client.Status().Patch(ctx, onmetalNetwork, client.MergeFrom(baseOnmetalNetwork)); err != nil {
-		return fmt.Errorf("error patching onmetal network status state to available: %w", err)
-	}
-
-	return nil
 }
 
 func (s *Server) setOnmetalVirtualIPStatusIP(ctx context.Context, onmetalVirtualIP *networkingv1alpha1.VirtualIP, ip *commonv1alpha1.IP) error {
 	baseOnmetalVirtualIP := onmetalVirtualIP.DeepCopy()
 	onmetalVirtualIP.Status.IP = ip
-	if err := s.client.Status().Patch(ctx, onmetalVirtualIP, client.MergeFrom(baseOnmetalVirtualIP)); err != nil {
+	if err := s.cluster.Client().Status().Patch(ctx, onmetalVirtualIP, client.MergeFrom(baseOnmetalVirtualIP)); err != nil {
 		return fmt.Errorf("error patching onmetal virtual ip status: %w", err)
 	}
 	return nil
@@ -156,11 +122,11 @@ func (s *Server) createOnmetalVirtualIP(ctx context.Context, log logr.Logger, c 
 	ip := *onmetalVirtualIP.Status.IP
 
 	log.V(1).Info("Creating onmetal virtual ip")
-	if err := s.client.Create(ctx, onmetalVirtualIP); err != nil {
+	if err := s.cluster.Client().Create(ctx, onmetalVirtualIP); err != nil {
 		return fmt.Errorf("error creating onmetal virtual ip: %w", err)
 	}
 	c.Add(func(ctx context.Context) error {
-		if err := s.client.Delete(ctx, onmetalVirtualIP); client.IgnoreNotFound(err) != nil {
+		if err := s.cluster.Client().Delete(ctx, onmetalVirtualIP); client.IgnoreNotFound(err) != nil {
 			return fmt.Errorf("error deleting virtual ip: %w", err)
 		}
 		return nil
@@ -175,12 +141,17 @@ func (s *Server) createOnmetalVirtualIP(ctx context.Context, log logr.Logger, c 
 }
 
 func (s *Server) createOnmetalNetworkInterface(ctx context.Context, log logr.Logger, onmetalNetworkInterface *AggregateOnmetalNetworkInterface) (retErr error) {
-	c, cleanup := s.setupCleaner(ctx, log, &retErr)
-	defer cleanup()
+	c := cleaner.New()
+	defer cleaner.CleanupOnError(ctx, c, &retErr)
 
-	if err := s.createOnmetalNetwork(ctx, log, c, onmetalNetworkInterface.Network); err != nil {
-		return err
+	network, networkTransaction, err := s.networks.BeginCreate(ctx, onmetalNetworkInterface.Network.Spec.Handle)
+	if err != nil {
+		return fmt.Errorf("error getting network: %w", err)
 	}
+	c.Add(RollbackTransactionIgnoreClosedFunc(networkTransaction))
+	onmetalNetworkInterface.Network = network
+
+	onmetalNetworkInterface.NetworkInterface.Spec.NetworkRef = corev1.LocalObjectReference{Name: network.Name}
 
 	if onmetalVirtualIP := onmetalNetworkInterface.VirtualIP; onmetalVirtualIP != nil {
 		if err := s.createOnmetalVirtualIP(ctx, log, c, onmetalVirtualIP); err != nil {
@@ -189,30 +160,37 @@ func (s *Server) createOnmetalNetworkInterface(ctx context.Context, log logr.Log
 	}
 
 	log.V(1).Info("Creating onmetal network interface")
-	if err := s.client.Create(ctx, onmetalNetworkInterface.NetworkInterface); err != nil {
+	if err := s.cluster.Client().Create(ctx, onmetalNetworkInterface.NetworkInterface); err != nil {
 		return fmt.Errorf("error creating onmetal network interface: %w", err)
 	}
-	c.Add(func(ctx context.Context) error {
-		if err := s.client.Delete(ctx, onmetalNetworkInterface.NetworkInterface); client.IgnoreNotFound(err) != nil {
-			return fmt.Errorf("error deleting onmetal network interface: %w", err)
-		}
-		return nil
-	})
+	c.Add(cleaner.DeleteObjectIfExistsFunc(s.cluster.Client(), onmetalNetworkInterface.NetworkInterface))
 
-	log.V(1).Info("Patching onmetal network to be controlled by onmetal network interface")
-	if err := apiutils.PatchControlledBy(ctx, s.client, onmetalNetworkInterface.NetworkInterface, onmetalNetworkInterface.Network); err != nil {
-		return fmt.Errorf("error patching onmetal network to be controlled by onmetal network interface: %w", err)
+	if err := networkTransaction.Commit(onmetalNetworkInterface.NetworkInterface); err != nil {
+		return fmt.Errorf("error committing network: %w", err)
 	}
+	c.Add(func(ctx context.Context) error {
+		return s.networks.Delete(ctx, onmetalNetworkInterface.Network.Spec.Handle, onmetalNetworkInterface.NetworkInterface.Name)
+	})
 
 	if onmetalNetworkInterface.VirtualIP != nil {
 		log.V(1).Info("Patching onmetal virtual ip to be controlled by onmetal network interface")
-		if err := apiutils.PatchControlledBy(ctx, s.client, onmetalNetworkInterface.NetworkInterface, onmetalNetworkInterface.VirtualIP); err != nil {
+		if err := apiutils.PatchControlledBy(ctx, s.cluster.Client(), onmetalNetworkInterface.NetworkInterface, onmetalNetworkInterface.VirtualIP); err != nil {
 			return fmt.Errorf("error patching onmetal virtual ip to be controlled by onmetal network interface: %w", err)
 		}
 	}
 
+	log.V(1).Info("Creating alias prefixes")
+	for _, prefix := range onmetalNetworkInterface.Prefixes {
+		if err := s.aliasPrefixes.Create(ctx, network, prefix, onmetalNetworkInterface.NetworkInterface); err != nil {
+			return fmt.Errorf("error creating alias prefix %s: %w", prefix, err)
+		}
+		c.Add(func(ctx context.Context) error {
+			return s.aliasPrefixes.Delete(ctx, network.Spec.Handle, prefix, onmetalNetworkInterface.NetworkInterface)
+		})
+	}
+
 	log.V(1).Info("Patching onmetal network interface as created")
-	if err := apiutils.PatchCreated(ctx, s.client, onmetalNetworkInterface.NetworkInterface); err != nil {
+	if err := apiutils.PatchCreated(ctx, s.cluster.Client(), onmetalNetworkInterface.NetworkInterface); err != nil {
 		return fmt.Errorf("error patching onmetal network interface as created: %w", err)
 	}
 

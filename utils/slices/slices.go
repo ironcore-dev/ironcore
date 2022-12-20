@@ -14,10 +14,20 @@
 
 package slices
 
+import "github.com/onmetal/controller-utils/set"
+
 func ToMap[S ~[]V, K comparable, V any](s S, f func(v V) K) map[K]V {
 	res := make(map[K]V)
 	for _, v := range s {
 		res[f(v)] = v
+	}
+	return res
+}
+
+func ToSetFunc[S ~[]V, K comparable, V any](s S, f func(v V) K) set.Set[K] {
+	res := set.New[K]()
+	for _, v := range s {
+		res.Insert(f(v))
 	}
 	return res
 }

@@ -102,7 +102,7 @@ func (s *Server) getAggregateOnmetalVolume(ctx context.Context, id string) (*Agg
 
 	return s.aggregateOnmetalVolume(onmetalVolume, func(name string) (*corev1.Secret, error) {
 		secret := &corev1.Secret{}
-		if err := s.client.Get(ctx, client.ObjectKey{Namespace: s.namespace, Name: name}, secret); err != nil {
+		if err := s.cluster.Client().Get(ctx, client.ObjectKey{Namespace: s.cluster.Namespace(), Name: name}, secret); err != nil {
 			return nil, err
 		}
 		return secret, nil

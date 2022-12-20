@@ -21,7 +21,7 @@ import (
 
 	"github.com/go-logr/logr"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	"github.com/onmetal/onmetal-api/ori/apis/machine"
 	"github.com/onmetal/onmetal-api/poollet/machinepoollet/mcm"
 	corev1 "k8s.io/api/core/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -35,7 +35,7 @@ import (
 type MachinePoolReconciler struct {
 	client.Client
 	MachinePoolName    string
-	MachineRuntime     ori.MachineRuntimeClient
+	MachineRuntime     machine.RuntimeService
 	MachineClassMapper mcm.MachineClassMapper
 }
 

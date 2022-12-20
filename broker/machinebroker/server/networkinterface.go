@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 
+	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/apiutils"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
@@ -28,6 +29,7 @@ type AggregateOnmetalNetworkInterface struct {
 	NetworkInterface *networkingv1alpha1.NetworkInterface
 	Network          *networkingv1alpha1.Network
 	VirtualIP        *networkingv1alpha1.VirtualIP
+	Prefixes         []commonv1alpha1.IPPrefix
 }
 
 func (s *Server) convertAggregateOnmetalNetworkInterface(networkInterface *AggregateOnmetalNetworkInterface) (*ori.NetworkInterface, error) {
@@ -67,7 +69,7 @@ func (s *Server) setOnmetalNetworkInterfaceVirtualIPSource(
 ) error {
 	baseOnmetalNetworkInterface := onmetalNetworkInterface.DeepCopy()
 	onmetalNetworkInterface.Spec.VirtualIP = virtualIPSrc
-	if err := s.client.Patch(ctx, onmetalNetworkInterface, client.MergeFrom(baseOnmetalNetworkInterface)); err != nil {
+	if err := s.cluster.Client().Patch(ctx, onmetalNetworkInterface, client.MergeFrom(baseOnmetalNetworkInterface)); err != nil {
 		return fmt.Errorf("error setting virtual ip source: %w", err)
 	}
 	return nil

@@ -324,6 +324,12 @@ func (o *APIServiceInstallOptions) ApplyAPIServices(cfg *rest.Config) error {
 	return nil
 }
 
+type AdditionalService struct {
+	Name string
+	Host string
+	Port int
+}
+
 type EnvironmentExtensions struct {
 	APIServiceInstallOptions APIServiceInstallOptions
 	APIServices              []*apiregistrationv1.APIService
@@ -334,6 +340,35 @@ type EnvironmentExtensions struct {
 	APIServiceDirectoryPaths []string
 
 	ErrorIfAPIServicePathIsMissing bool
+
+	AdditionalServices []AdditionalService
+}
+
+func (e *EnvironmentExtensions) GetAdditionalServiceHost(name string) string {
+	for _, svc := range e.AdditionalServices {
+		if svc.Name == name {
+			return svc.Host
+		}
+	}
+	return ""
+}
+
+func (e *EnvironmentExtensions) GetAdditionalServicePort(name string) int {
+	for _, svc := range e.AdditionalServices {
+		if svc.Name == name {
+			return svc.Port
+		}
+	}
+	return 0
+}
+
+func (e *EnvironmentExtensions) GetAdditionalServiceHostPort(name string) (string, int) {
+	for _, svc := range e.AdditionalServices {
+		if svc.Name == name {
+			return svc.Host, svc.Port
+		}
+	}
+	return "", 0
 }
 
 func envUsesExistingCluster(env *envtest.Environment) bool {
@@ -352,6 +387,20 @@ func configureAPIServerAggregation(env *envtest.Environment, ext *EnvironmentExt
 		Set("requestheader-extra-headers-prefix", "X-Remote-Extra-").
 		Set("requestheader-group-headers", "X-Remote-Group").
 		Set("requestheader-username-headers", "X-Remote-User")
+}
+
+func prepareAdditionalServices(additionalServices []AdditionalService) error {
+	for i := range additionalServices {
+		additionalService := &additionalServices[i]
+		port, host, err := addr.Suggest(additionalService.Host)
+		if err != nil {
+			return fmt.Errorf("[additional service %s] error suggesting host / port: %w", additionalService.Name, err)
+		}
+
+		additionalService.Host = host
+		additionalService.Port = port
+	}
+	return nil
 }
 
 func StartWithExtensions(env *envtest.Environment, ext *EnvironmentExtensions) (*rest.Config, error) {
@@ -373,6 +422,13 @@ func StartWithExtensions(env *envtest.Environment, ext *EnvironmentExtensions) (
 	}
 
 	if err := ext.APIServiceInstallOptions.Install(cfg); err != nil {
+		if err := env.Stop(); err != nil {
+			log.Error(err, "Error stopping test-env")
+		}
+		return nil, err
+	}
+
+	if err := prepareAdditionalServices(ext.AdditionalServices); err != nil {
 		if err := env.Stop(); err != nil {
 			log.Error(err, "Error stopping test-env")
 		}

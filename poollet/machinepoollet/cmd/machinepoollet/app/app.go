@@ -27,19 +27,20 @@ import (
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	orimachineutils "github.com/onmetal/onmetal-api/ori/utils/machine"
+	oriremotemachine "github.com/onmetal/onmetal-api/ori/remote/machine"
 	machinepoolletclient "github.com/onmetal/onmetal-api/poollet/machinepoollet/client"
 	"github.com/onmetal/onmetal-api/poollet/machinepoollet/controllers"
 	"github.com/onmetal/onmetal-api/poollet/machinepoollet/mcm"
 	"github.com/onmetal/onmetal-api/poollet/orievent"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
@@ -134,24 +135,15 @@ func Run(ctx context.Context, opts Options) error {
 	logger := ctrl.LoggerFrom(ctx)
 	setupLog := ctrl.Log.WithName("setup")
 
-	endpoint, err := orimachineutils.GetAddressWithTimeout(opts.MachineRuntimeSocketDiscoveryTimeout, opts.MachineRuntimeEndpoint)
+	endpoint, err := oriremotemachine.GetAddressWithTimeout(opts.MachineRuntimeSocketDiscoveryTimeout, opts.MachineRuntimeEndpoint)
 	if err != nil {
 		return fmt.Errorf("error detecting machine runtime endpoint: %w", err)
 	}
 
-	conn, err := grpc.Dial(endpoint,
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
+	machineRuntime, err := oriremotemachine.NewRemoteRuntime(endpoint)
 	if err != nil {
-		return fmt.Errorf("error dialing: %w", err)
+		return fmt.Errorf("error creating remote machine runtime: %w", err)
 	}
-	defer func() {
-		if err := conn.Close(); err != nil {
-			setupLog.Error(err, "Error closing machine runtime connection")
-		}
-	}()
-
-	machineRuntime := ori.NewMachineRuntimeClient(conn)
 
 	cfg, err := configutils.GetConfig(
 		configutils.Kubeconfig(opts.Kubeconfig),
@@ -179,6 +171,16 @@ func Run(ctx context.Context, opts Options) error {
 		LeaderElectionID:        "bfafcebe.api.onmetal.de",
 		LeaderElectionNamespace: opts.LeaderElectionNamespace,
 		LeaderElectionConfig:    leaderElectionCfg,
+		NewCache: func(config *rest.Config, cacheOpts cache.Options) (cache.Cache, error) {
+			cacheOpts.SelectorsByObject = cache.SelectorsByObject{
+				&computev1alpha1.Machine{}: cache.ObjectSelector{
+					Field: fields.SelectorFromSet(fields.Set{
+						computev1alpha1.MachineMachinePoolRefNameField: opts.MachinePoolName,
+					}),
+				},
+			}
+			return cache.New(config, cacheOpts)
+		},
 	})
 	if err != nil {
 		return fmt.Errorf("error creating manager: %w", err)
@@ -271,14 +273,21 @@ func Run(ctx context.Context, opts Options) error {
 		return nil
 	}
 
-	if err := machinepoolletclient.SetupMachineSpecNetworkInterfaceNamesField(ctx, mgr.GetFieldIndexer()); err != nil {
+	indexer := mgr.GetFieldIndexer()
+	if err := machinepoolletclient.SetupMachineSpecNetworkInterfaceNamesField(ctx, indexer, opts.MachinePoolName); err != nil {
 		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.MachineSpecNetworkInterfaceNamesField, err)
 	}
-	if err := machinepoolletclient.SetupMachineSpecSecretNamesField(ctx, mgr.GetFieldIndexer()); err != nil {
+	if err := machinepoolletclient.SetupMachineSpecSecretNamesField(ctx, indexer, opts.MachinePoolName); err != nil {
 		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.MachineSpecSecretNamesField, err)
 	}
-	if err := machinepoolletclient.SetupMachineSpecVolumeNamesField(ctx, mgr.GetFieldIndexer()); err != nil {
+	if err := machinepoolletclient.SetupMachineSpecVolumeNamesField(ctx, indexer, opts.MachinePoolName); err != nil {
 		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.MachineSpecVolumeNamesField, err)
+	}
+	if err := machinepoolletclient.SetupAliasPrefixRoutingNetworkRefNameField(ctx, indexer); err != nil {
+		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.AliasPrefixRoutingNetworkRefNameField, err)
+	}
+	if err := machinepoolletclient.SetupNetworkInterfaceNetworkMachinePoolID(ctx, indexer, opts.MachinePoolName); err != nil {
+		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.NetworkInterfaceNetworkNameAndHandle, err)
 	}
 
 	if err := (&controllers.MachinePoolInit{

@@ -19,7 +19,7 @@ import (
 	"time"
 
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	orimachineutils "github.com/onmetal/onmetal-api/ori/utils/machine"
+	oriremotemachine "github.com/onmetal/onmetal-api/ori/remote/machine"
 	"github.com/onmetal/onmetal-api/orictl/renderer"
 	"github.com/onmetal/onmetal-api/orictl/renderers/machine"
 	"github.com/spf13/pflag"
@@ -50,7 +50,7 @@ func (o *ClientOptions) AddFlags(fs *pflag.FlagSet) {
 }
 
 func (o *ClientOptions) New() (ori.MachineRuntimeClient, func() error, error) {
-	address, err := orimachineutils.GetAddressWithTimeout(3*time.Second, o.Address)
+	address, err := oriremotemachine.GetAddressWithTimeout(3*time.Second, o.Address)
 	if err != nil {
 		return nil, nil, err
 	}

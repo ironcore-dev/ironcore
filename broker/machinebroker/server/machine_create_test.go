@@ -23,6 +23,6 @@ var _ = Describe("CreateMachine", func() {
 	ctx := testutils.SetupContext()
 	_, _ = SetupTest(ctx)
 
-	It("Should correctly create a machine", func() {
+	It("should correctly create a machine", func() {
 	})
 })

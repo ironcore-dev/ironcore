@@ -29,7 +29,7 @@ import (
 func (s *Server) deleteOnmetalVolumeAttachment(ctx context.Context, onmetalMachine *computev1alpha1.Machine, idx int) error {
 	baseOnmetalMachine := onmetalMachine.DeepCopy()
 	onmetalMachine.Spec.Volumes = slices.Delete(onmetalMachine.Spec.Volumes, idx, idx+1)
-	if err := s.client.Patch(ctx, onmetalMachine, client.StrategicMergeFrom(baseOnmetalMachine)); err != nil {
+	if err := s.cluster.Client().Patch(ctx, onmetalMachine, client.StrategicMergeFrom(baseOnmetalMachine)); err != nil {
 		return fmt.Errorf("error patching onmetal machine volumes: %w", err)
 	}
 	return nil

@@ -19,7 +19,7 @@ import (
 	"time"
 
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
-	orivolumeutils "github.com/onmetal/onmetal-api/ori/utils/volume"
+	oriremotevolume "github.com/onmetal/onmetal-api/ori/remote/volume"
 	clicommon "github.com/onmetal/onmetal-api/orictl/cli/common"
 	"github.com/onmetal/onmetal-api/orictl/renderer"
 	"github.com/onmetal/onmetal-api/orictl/renderers/volume"
@@ -49,7 +49,7 @@ func (o *ClientOptions) AddFlags(fs *pflag.FlagSet) {
 }
 
 func (o *ClientOptions) New() (ori.VolumeRuntimeClient, func() error, error) {
-	address, err := orivolumeutils.GetAddressWithTimeout(3*time.Second, o.Address)
+	address, err := oriremotevolume.GetAddressWithTimeout(3*time.Second, o.Address)
 	if err != nil {
 		return nil, nil, err
 	}

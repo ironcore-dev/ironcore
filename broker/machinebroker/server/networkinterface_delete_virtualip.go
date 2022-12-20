@@ -59,7 +59,7 @@ func (s *Server) deleteOnmetalVirtualIP(ctx context.Context, log logr.Logger, on
 	}
 
 	log.V(1).Info("Deleting outdated onmetal virtual ip")
-	if err := s.client.Delete(ctx, onmetalNetworkInterface.VirtualIP); client.IgnoreNotFound(err) != nil {
+	if err := s.cluster.Client().Delete(ctx, onmetalNetworkInterface.VirtualIP); client.IgnoreNotFound(err) != nil {
 		log.Error(err, "Error deleting outdated onmetal network interface virtual ip")
 	}
 	return nil
