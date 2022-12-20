@@ -14,6 +14,11 @@
 
 package v1alpha1
 
+import (
+	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
+)
+
 const (
 	LabelsAnnotation = "machinebroker.api.onmetal.de/labels"
 
@@ -32,6 +37,8 @@ const (
 	NetworkHandleLabel = "machinebrokerlet.api.onmetal.de/network-handle"
 
 	PrefixLabel = "machinebrokerlet.api.onmetal.de/prefix"
+
+	IPLabel = "machinebrokerlet.api.onmetal.de/ip"
 )
 
 const (
@@ -43,3 +50,14 @@ const (
 
 	NetworkInterfacePurpose = "network-interface"
 )
+
+type LoadBalancerTarget struct {
+	IP    commonv1alpha1.IP
+	Ports []LoadBalancerTargetPort
+}
+
+type LoadBalancerTargetPort struct {
+	Protocol corev1.Protocol
+	Port     int32
+	EndPort  int32
+}

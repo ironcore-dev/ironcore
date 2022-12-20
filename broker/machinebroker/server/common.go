@@ -25,6 +25,7 @@ import (
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/apiutils"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/transaction"
+	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -104,6 +105,61 @@ func (s *Server) convertOnmetalIPSourcesToIPs(ipSources []networkingv1alpha1.IPS
 	return res, nil
 }
 
+func (s *Server) convertOnmetalPrefixes(prefixes []commonv1alpha1.IPPrefix) []string {
+	res := make([]string, len(prefixes))
+	for i, prefix := range prefixes {
+		res[i] = prefix.String()
+	}
+	return res
+}
+
+func (s *Server) convertOnmetalProtocol(protocol corev1.Protocol) (ori.Protocol, error) {
+	switch protocol {
+	case corev1.ProtocolTCP:
+		return ori.Protocol_TCP, nil
+	case corev1.ProtocolSCTP:
+		return ori.Protocol_SCTP, nil
+	case corev1.ProtocolUDP:
+		return ori.Protocol_UDP, nil
+	default:
+		return 0, fmt.Errorf("unrecognized protocol %q", protocol)
+	}
+}
+
+func (s *Server) convertOnmetalLoadBalancerTargetPort(port machinebrokerv1alpha1.LoadBalancerTargetPort) (*ori.LoadBalancerPort, error) {
+	protocol, err := s.convertOnmetalProtocol(port.Protocol)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ori.LoadBalancerPort{
+		Protocol: protocol,
+		Port:     port.Port,
+		EndPort:  port.EndPort,
+	}, nil
+}
+
+func (s *Server) convertOnmetalLoadBalancerTargets(loadBalancerTargets []machinebrokerv1alpha1.LoadBalancerTarget) ([]*ori.LoadBalancerTargetSpec, error) {
+	res := make([]*ori.LoadBalancerTargetSpec, len(loadBalancerTargets))
+	for i, loadBalancerTarget := range loadBalancerTargets {
+		ports := make([]*ori.LoadBalancerPort, len(loadBalancerTarget.Ports))
+		for _, port := range loadBalancerTarget.Ports {
+			p, err := s.convertOnmetalLoadBalancerTargetPort(port)
+			if err != nil {
+				return nil, err
+			}
+
+			ports[i] = p
+		}
+
+		res[i] = &ori.LoadBalancerTargetSpec{
+			Ip:    loadBalancerTarget.IP.String(),
+			Ports: ports,
+		}
+	}
+	return res, nil
+}
+
 func (s *Server) getOnmetalIPsIPFamilies(ips []commonv1alpha1.IP) []corev1.IPFamily {
 	res := make([]corev1.IPFamily, len(ips))
 	for i, ip := range ips {
@@ -133,6 +189,19 @@ func (s *Server) parseIPs(ipStrings []string) ([]commonv1alpha1.IP, error) {
 		ips = append(ips, ip)
 	}
 	return ips, nil
+}
+
+func (s *Server) convertORIProtocol(protocol ori.Protocol) (corev1.Protocol, error) {
+	switch protocol {
+	case ori.Protocol_TCP:
+		return corev1.ProtocolTCP, nil
+	case ori.Protocol_UDP:
+		return corev1.ProtocolUDP, nil
+	case ori.Protocol_SCTP:
+		return corev1.ProtocolSCTP, nil
+	default:
+		return "", fmt.Errorf("unknown protocol %d", protocol)
+	}
 }
 
 func (s *Server) parseIPPrefixes(prefixStrings []string) ([]commonv1alpha1.IPPrefix, error) {

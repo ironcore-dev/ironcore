@@ -74,11 +74,29 @@ message VirtualIPSpec {
   string ip = 1;
 }
 
+enum Protocol {
+  TCP = 0;
+  UDP = 1;
+  SCTP = 2;
+}
+
+message LoadBalancerPort {
+  Protocol protocol = 1;
+  int32 port = 2;
+  int32 endPort = 3;
+}
+
+message LoadBalancerTargetSpec {
+  string ip = 1;
+  repeated LoadBalancerPort ports = 2;
+}
+
 message NetworkInterfaceSpec {
   NetworkSpec network = 1;
   repeated string ips = 2;
   VirtualIPSpec virtual_ip = 3;
   repeated string prefixes = 4;
+  repeated LoadBalancerTargetSpec load_balancer_targets = 5;
 }
 
 message NetworkInterface {

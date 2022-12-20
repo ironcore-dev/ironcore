@@ -17,6 +17,7 @@ package server
 import (
 	"github.com/onmetal/onmetal-api/broker/machinebroker/aliasprefixes"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/cluster"
+	"github.com/onmetal/onmetal-api/broker/machinebroker/loadbalancers"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/networks"
 	"github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	"k8s.io/client-go/rest"
@@ -38,6 +39,7 @@ type Server struct {
 	cluster       cluster.Cluster
 	networks      *networks.Networks
 	aliasPrefixes *aliasprefixes.AliasPrefixes
+	loadBalancers *loadbalancers.LoadBalancers
 }
 
 type Options struct {
@@ -58,6 +60,7 @@ func New(cfg *rest.Config, namespace string, opts Options) (*Server, error) {
 		cluster:       c,
 		networks:      networks.New(c),
 		aliasPrefixes: aliasprefixes.New(c),
+		loadBalancers: loadbalancers.New(c),
 	}, nil
 }
 
@@ -71,4 +74,8 @@ func (s *Server) Networks() *networks.Networks {
 
 func (s *Server) AliasPrefixes() *aliasprefixes.AliasPrefixes {
 	return s.aliasPrefixes
+}
+
+func (s *Server) LoadBalancers() *loadbalancers.LoadBalancers {
+	return s.loadBalancers
 }

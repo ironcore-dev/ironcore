@@ -23,6 +23,7 @@ import (
 	"github.com/onmetal/onmetal-api/broker/common/utils"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/aliasprefixes"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
+	"github.com/onmetal/onmetal-api/broker/machinebroker/loadbalancers"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -35,6 +36,16 @@ func (s *Server) buildIDToAliasPrefixesMap(aliasPrefixes []aliasprefixes.AliasPr
 	for _, aliasPrefix := range aliasPrefixes {
 		for destination := range aliasPrefix.Destinations {
 			res[destination] = append(res[destination], aliasPrefix)
+		}
+	}
+	return res
+}
+
+func (s *Server) buildIDToLoadBalancersMap(loadBalancers []loadbalancers.LoadBalancer) map[string][]loadbalancers.LoadBalancer {
+	res := make(map[string][]loadbalancers.LoadBalancer)
+	for _, loadBalancer := range loadBalancers {
+		for destination := range loadBalancer.Destinations {
+			res[destination] = append(res[destination], loadBalancer)
 		}
 	}
 	return res
@@ -61,7 +72,13 @@ func (s *Server) listAggregateOnmetalNetworkInterfaces(ctx context.Context) ([]A
 		return nil, fmt.Errorf("error listing onmetal alias prefixes: %w", err)
 	}
 
+	onmetalLoadBalancers, err := s.loadBalancers.List(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("error listing onmetal load balancers: %w", err)
+	}
+
 	idToAliasPrefixes := s.buildIDToAliasPrefixesMap(onmetalAliasPrefixes)
+	idToLoadBalancers := s.buildIDToLoadBalancersMap(onmetalLoadBalancers)
 	getNetwork := utils.ObjectSliceToByNameGetter(networkingv1alpha1.Resource("networks"), onmetalNetworkList.Items)
 	getVirtualIP := utils.ObjectSliceToByNameGetter(networkingv1alpha1.Resource("virtualips"), onmetalVirtualIPList.Items)
 
@@ -74,6 +91,9 @@ func (s *Server) listAggregateOnmetalNetworkInterfaces(ctx context.Context) ([]A
 			getVirtualIP,
 			func() ([]aliasprefixes.AliasPrefix, error) {
 				return idToAliasPrefixes[onmetalNetworkInterface.Name], nil
+			},
+			func() ([]loadbalancers.LoadBalancer, error) {
+				return idToLoadBalancers[onmetalNetworkInterface.Name], nil
 			},
 		)
 		if err != nil {
@@ -90,6 +110,7 @@ func (s *Server) aggregateOnmetalNetworkInterface(
 	getNetwork func(name string) (*networkingv1alpha1.Network, error),
 	getVirtualIP func(name string) (*networkingv1alpha1.VirtualIP, error),
 	listAliasPrefixes func() ([]aliasprefixes.AliasPrefix, error),
+	listLoadBalancers func() ([]loadbalancers.LoadBalancer, error),
 ) (*AggregateOnmetalNetworkInterface, error) {
 	network, err := getNetwork(onmetalNetworkInterface.Spec.NetworkRef.Name)
 	if err != nil {
@@ -125,11 +146,29 @@ func (s *Server) aggregateOnmetalNetworkInterface(
 		prefixes = append(prefixes, aliasPrefix.Prefix)
 	}
 
+	loadBalancers, err := listLoadBalancers()
+	if err != nil {
+		return nil, fmt.Errorf("error listing load balancers: %w", err)
+	}
+
+	var lbTgts []machinebrokerv1alpha1.LoadBalancerTarget
+	for _, loadBalancer := range loadBalancers {
+		if !loadBalancer.Destinations.Has(onmetalNetworkInterface.Name) {
+			continue
+		}
+
+		lbTgts = append(lbTgts, machinebrokerv1alpha1.LoadBalancerTarget{
+			IP:    loadBalancer.IP,
+			Ports: loadBalancer.Ports,
+		})
+	}
+
 	return &AggregateOnmetalNetworkInterface{
-		NetworkInterface: onmetalNetworkInterface,
-		Network:          network,
-		VirtualIP:        virtualIP,
-		Prefixes:         prefixes,
+		NetworkInterface:    onmetalNetworkInterface,
+		Network:             network,
+		VirtualIP:           virtualIP,
+		Prefixes:            prefixes,
+		LoadBalancerTargets: lbTgts,
 	}, nil
 }
 
@@ -148,6 +187,9 @@ func (s *Server) getAggregateOnmetalNetworkInterface(ctx context.Context, id str
 		utils.ClientObjectGetter[*networkingv1alpha1.VirtualIP](ctx, s.cluster.Client(), s.cluster.Namespace()),
 		func() ([]aliasprefixes.AliasPrefix, error) {
 			return s.aliasPrefixes.ListByDependent(ctx, id)
+		},
+		func() ([]loadbalancers.LoadBalancer, error) {
+			return s.loadBalancers.ListByDependent(ctx, id)
 		},
 	)
 }

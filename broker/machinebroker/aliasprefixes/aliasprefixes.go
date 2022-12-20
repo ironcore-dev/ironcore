@@ -85,7 +85,7 @@ func (m *AliasPrefixes) getAliasPrefixByKey(ctx context.Context, key aliasPrefix
 
 	aliasPrefixes := m.filterAliasPrefixes(aliasPrefixList.Items)
 
-	switch len(aliasPrefixList.Items) {
+	switch len(aliasPrefixes) {
 	case 0:
 		return nil, nil, false, nil
 	case 1:
@@ -122,7 +122,7 @@ func (m *AliasPrefixes) createAliasPrefix(
 	}
 	apiutils.SetManagerLabel(aliasPrefix, machinebrokerv1alpha1.MachineBrokerManager)
 	apiutils.SetNetworkHandle(aliasPrefix, key.networkHandle)
-	apiutils.SetPrefix(aliasPrefix, key.prefix)
+	apiutils.SetPrefixLabel(aliasPrefix, key.prefix)
 
 	if err := m.cluster.Client().Create(ctx, aliasPrefix); err != nil {
 		return nil, nil, fmt.Errorf("error creating alias prefix: %w", err)
@@ -132,16 +132,16 @@ func (m *AliasPrefixes) createAliasPrefix(
 	aliasPrefixRouting := &networkingv1alpha1.AliasPrefixRouting{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: m.cluster.Namespace(),
-			Name:      m.cluster.IDGen().Generate(),
+			Name:      aliasPrefix.Name,
 		},
 		NetworkRef: commonv1alpha1.LocalUIDReference{
 			Name: network.Name,
 			UID:  network.UID,
 		},
 	}
-	apiutils.SetManagerLabel(aliasPrefix, machinebrokerv1alpha1.MachineBrokerManager)
-	apiutils.SetNetworkHandle(aliasPrefix, key.networkHandle)
-	apiutils.SetPrefix(aliasPrefix, key.prefix)
+	apiutils.SetManagerLabel(aliasPrefixRouting, machinebrokerv1alpha1.MachineBrokerManager)
+	apiutils.SetNetworkHandle(aliasPrefixRouting, key.networkHandle)
+	apiutils.SetPrefixLabel(aliasPrefixRouting, key.prefix)
 	if err := ctrl.SetControllerReference(aliasPrefix, aliasPrefixRouting, m.cluster.Scheme()); err != nil {
 		return nil, nil, fmt.Errorf("error setting alias prefix routing to be controlled by alias prefix: %w", err)
 	}
@@ -336,8 +336,8 @@ func (m *AliasPrefixes) joinAliasPrefixesAndRoutings(
 	for i := range aliasPrefixes {
 		aliasPrefix := &aliasPrefixes[i]
 
-		prefix := aliasPrefix.Status.Prefix
-		if prefix == nil {
+		prefixSrc := aliasPrefix.Spec.Prefix
+		if prefixSrc.Value == nil {
 			continue
 		}
 
@@ -360,7 +360,7 @@ func (m *AliasPrefixes) joinAliasPrefixesAndRoutings(
 
 		res = append(res, AliasPrefix{
 			NetworkHandle: networkHandle,
-			Prefix:        *aliasPrefix.Status.Prefix,
+			Prefix:        *prefixSrc.Value,
 			Destinations:  destinations,
 		})
 	}
