@@ -47,9 +47,9 @@ type VolumePoolStatus struct {
 type VolumePoolState string
 
 const (
-	VolumePoolStateAvailable    VolumePoolState = "Available"
-	VolumePoolStatePending      VolumePoolState = "Pending"
-	VolumePoolStateNotAvailable VolumePoolState = "NotAvailable"
+	VolumePoolStateAvailable   VolumePoolState = "Available"
+	VolumePoolStatePending     VolumePoolState = "Pending"
+	VolumePoolStateUnavailable VolumePoolState = "Unavailable"
 )
 
 // VolumePoolConditionType is a type a VolumePoolCondition can have.
