@@ -53,5 +53,8 @@ type RuntimeService interface {
 	CreateNetworkInterfaceLoadBalancerTarget(context.Context, *api.CreateNetworkInterfaceLoadBalancerTargetRequest) (*api.CreateNetworkInterfaceLoadBalancerTargetResponse, error)
 	DeleteNetworkInterfaceLoadBalancerTarget(context.Context, *api.DeleteNetworkInterfaceLoadBalancerTargetRequest) (*api.DeleteNetworkInterfaceLoadBalancerTargetResponse, error)
 
+	CreateNetworkInterfaceNAT(context.Context, *api.CreateNetworkInterfaceNATRequest) (*api.CreateNetworkInterfaceNATResponse, error)
+	DeleteNetworkInterfaceNAT(context.Context, *api.DeleteNetworkInterfaceNATRequest) (*api.DeleteNetworkInterfaceNATResponse, error)
+
 	ListMachineClasses(context.Context, *api.ListMachineClassesRequest) (*api.ListMachineClassesResponse, error)
 }

@@ -407,6 +407,10 @@ func (r *MachineReconciler) updateORINetworkInterface(
 		return fmt.Errorf("error updating ori network interface load balancer targets: %w", err)
 	}
 
+	if err := r.updateORINetworkInterfaceNATs(ctx, log, oriNetworkInterface, oriNetworkInterfaceSpec); err != nil {
+		return fmt.Errorf("error updating ori network interface nats: %w", err)
+	}
+
 	return nil
 }
 
@@ -490,6 +494,48 @@ func (r *MachineReconciler) updateORINetworkInterfacePrefixes(
 	return nil
 }
 
+func (r *MachineReconciler) updateORINetworkInterfaceNATs(
+	ctx context.Context,
+	log logr.Logger,
+	oriNetworkInterface *ori.NetworkInterface,
+	oriNetworkInterfaceSpec *ori.NetworkInterfaceSpec,
+) error {
+	id := oriNetworkInterface.Metadata.Id
+	actualNATs := r.buildNATsMap(oriNetworkInterface.Spec.Nats)
+	desiredNATs := r.buildNATsMap(oriNetworkInterfaceSpec.Nats)
+
+	delNats := utilmaps.KeysDifference(actualNATs, desiredNATs)
+	newNats := utilmaps.KeysDifference(desiredNATs, actualNATs)
+
+	var errs []error
+	for key := range delNats {
+		delNat := actualNATs[key]
+		log.V(1).Info("Deleting outdated ori network interface nat", "NAT", key)
+		if _, err := r.MachineRuntime.DeleteNetworkInterfaceNAT(ctx, &ori.DeleteNetworkInterfaceNATRequest{
+			NetworkInterfaceId: id,
+			NatIp:              delNat.Ip,
+		}); err != nil {
+			errs = append(errs, fmt.Errorf("error deleting ori network interface nat %s: %w", key, err))
+		}
+	}
+
+	for key := range newNats {
+		newNat := desiredNATs[key]
+		log.V(1).Info("Creating new ori network interface nat", "NAT", key)
+		if _, err := r.MachineRuntime.CreateNetworkInterfaceNAT(ctx, &ori.CreateNetworkInterfaceNATRequest{
+			NetworkInterfaceId: id,
+			Nat:                newNat,
+		}); err != nil {
+			errs = append(errs, fmt.Errorf("error creating ori network interface nat %s: %w", key, err))
+		}
+	}
+
+	if len(errs) > 0 {
+		return fmt.Errorf("error(s) updating ori network interface nats: %v", errs)
+	}
+	return nil
+}
+
 func (r *MachineReconciler) prepareORINetworkInterfaceSpec(
 	ctx context.Context,
 	machine *computev1alpha1.Machine,
@@ -531,6 +577,11 @@ func (r *MachineReconciler) prepareORINetworkInterfaceSpec(
 		return nil, false, fmt.Errorf("error getting load balancer targets for network interface: %w", err)
 	}
 
+	nats, err := r.natsForNetworkInterface(ctx, networkInterface)
+	if err != nil {
+		return nil, false, fmt.Errorf("error getting nats for network interface: %w", err)
+	}
+
 	return &ori.NetworkInterfaceSpec{
 		Network: &ori.NetworkSpec{
 			Handle: networkInterface.Status.NetworkHandle,
@@ -539,6 +590,7 @@ func (r *MachineReconciler) prepareORINetworkInterfaceSpec(
 		VirtualIp:           virtualIPSpec,
 		Prefixes:            prefixes,
 		LoadBalancerTargets: loadBalancerTargets,
+		Nats:                nats,
 	}, true, nil
 }
 
@@ -664,6 +716,67 @@ func (r *MachineReconciler) buildLoadBalancerTargetMap(tgts []*ori.LoadBalancerT
 		res[tgt.Key()] = tgt
 	}
 	return res
+}
+
+func (r *MachineReconciler) buildNATsMap(nats []*ori.NATSpec) map[string]*ori.NATSpec {
+	res := make(map[string]*ori.NATSpec)
+	for _, nat := range nats {
+		res[nat.Ip] = nat
+	}
+	return res
+}
+
+func (r *MachineReconciler) natsForNetworkInterface(
+	ctx context.Context,
+	networkInterface *networkingv1alpha1.NetworkInterface,
+) ([]*ori.NATSpec, error) {
+	natGatewayList := &networkingv1alpha1.NATGatewayList{}
+	if err := r.List(ctx, natGatewayList,
+		client.InNamespace(networkInterface.Namespace),
+	); err != nil {
+		return nil, fmt.Errorf("error listing nat gateways: %w", err)
+	}
+
+	natGatewayRoutingList := &networkingv1alpha1.NATGatewayRoutingList{}
+	if err := r.List(ctx, natGatewayRoutingList,
+		client.InNamespace(networkInterface.Namespace),
+		client.MatchingFields{
+			machinepoolletclient.NATGatewayRoutingNetworkRefNameField: networkInterface.Spec.NetworkRef.Name,
+		},
+	); err != nil {
+		return nil, fmt.Errorf("error listing nat gateway routings: %w", err)
+	}
+
+	natGatewayRoutingsByName := utilslices.ToMap(
+		natGatewayRoutingList.Items,
+		func(ngwr networkingv1alpha1.NATGatewayRouting) string { return ngwr.Name },
+	)
+
+	var nats []*ori.NATSpec
+	for _, natGateway := range natGatewayList.Items {
+		natGatewayRouting, ok := natGatewayRoutingsByName[natGateway.Name]
+		if !ok {
+			continue
+		}
+
+		idx := slices.IndexFunc(
+			natGatewayRouting.Destinations,
+			func(dst networkingv1alpha1.NATGatewayDestination) bool { return dst.UID == networkInterface.UID },
+		)
+		if idx < 0 {
+			continue
+		}
+
+		dst := natGatewayRouting.Destinations[idx]
+		for _, ip := range dst.IPs {
+			nats = append(nats, &ori.NATSpec{
+				Ip:      ip.IP.String(),
+				Port:    ip.Port,
+				EndPort: ip.EndPort,
+			})
+		}
+	}
+	return nats, nil
 }
 
 func (r *MachineReconciler) updateNetworkInterface(

@@ -59,6 +59,18 @@ func (s *Server) DeleteNetworkInterface(ctx context.Context, req *ori.DeleteNetw
 		}
 	}
 
+	log.V(1).Info("Deleting nat gateways")
+	for _, natGatewayTgt := range aggOnmetalNetworkInterface.NATGatewayTargets {
+		if err := s.natGateways.Delete(
+			ctx,
+			aggOnmetalNetworkInterface.Network.Spec.Handle,
+			natGatewayTgt.IP,
+			aggOnmetalNetworkInterface.NetworkInterface,
+		); err != nil {
+			return nil, fmt.Errorf("error deleting nat gateway %s: %w", natGatewayTgt.IP, err)
+		}
+	}
+
 	log.V(1).Info("Deleting onmetal network interface")
 	if err := s.cluster.Client().Delete(ctx, aggOnmetalNetworkInterface.NetworkInterface); err != nil {
 		if !apierrors.IsNotFound(err) {

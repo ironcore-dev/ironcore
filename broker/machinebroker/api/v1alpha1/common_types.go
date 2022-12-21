@@ -89,3 +89,21 @@ type LoadBalancer struct {
 	Ports         []LoadBalancerPort
 	Destinations  []string
 }
+
+type NATGatewayTarget struct {
+	IP      commonv1alpha1.IP
+	Port    int32
+	EndPort int32
+}
+
+type NATGatewayDestination struct {
+	ID      string
+	Port    int32
+	EndPort int32
+}
+
+type NATGateway struct {
+	NetworkHandle string
+	IP            commonv1alpha1.IP
+	Destinations  []NATGatewayDestination
+}

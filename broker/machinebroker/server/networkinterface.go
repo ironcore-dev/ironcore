@@ -32,6 +32,7 @@ type AggregateOnmetalNetworkInterface struct {
 	VirtualIP           *networkingv1alpha1.VirtualIP
 	Prefixes            []commonv1alpha1.IPPrefix
 	LoadBalancerTargets []machinebrokerv1alpha1.LoadBalancerTarget
+	NATGatewayTargets   []machinebrokerv1alpha1.NATGatewayTarget
 }
 
 func (s *Server) convertAggregateOnmetalNetworkInterface(networkInterface *AggregateOnmetalNetworkInterface) (*ori.NetworkInterface, error) {
@@ -57,6 +58,11 @@ func (s *Server) convertAggregateOnmetalNetworkInterface(networkInterface *Aggre
 		return nil, err
 	}
 
+	nats, err := s.convertOnmetalNATGatewayTargets(networkInterface.NATGatewayTargets)
+	if err != nil {
+		return nil, err
+	}
+
 	return &ori.NetworkInterface{
 		Metadata: metadata,
 		Spec: &ori.NetworkInterfaceSpec{
@@ -67,6 +73,7 @@ func (s *Server) convertAggregateOnmetalNetworkInterface(networkInterface *Aggre
 			VirtualIp:           virtualIPSpec,
 			Prefixes:            s.convertOnmetalPrefixes(networkInterface.Prefixes),
 			LoadBalancerTargets: loadBalancerTargets,
+			Nats:                nats,
 		},
 	}, nil
 }

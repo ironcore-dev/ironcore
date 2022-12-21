@@ -818,6 +818,116 @@ func (r *MachineReconciler) enqueueMachinesReferencingAliasPrefixRouting(ctx con
 	})
 }
 
+func (r *MachineReconciler) enqueueMachinesReferencingLoadBalancerRouting(ctx context.Context, log logr.Logger) handler.EventHandler { //nolint:unused
+	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []reconcile.Request {
+		loadBalancerRouting := obj.(*networkingv1alpha1.LoadBalancerRouting)
+		destinationSet := utilslices.ToSetFunc(
+			loadBalancerRouting.Destinations,
+			func(d commonv1alpha1.LocalUIDReference) types.UID { return d.UID },
+		)
+
+		networkRef := loadBalancerRouting.NetworkRef
+
+		network := &networkingv1alpha1.Network{}
+		networkKey := client.ObjectKey{Namespace: loadBalancerRouting.Namespace, Name: networkRef.Name}
+		if err := r.Get(ctx, networkKey, network); err != nil {
+			log.Error(err, "Error getting alias prefix routing network", "NetworkKey", networkKey)
+			return nil
+		}
+
+		if network.UID != networkRef.UID {
+			log.V(1).Info("Network uid does not match", "Expected", networkRef.UID, "Actual", network.UID)
+			return nil
+		}
+
+		networkInterfaceList := &networkingv1alpha1.NetworkInterfaceList{}
+		networkInterfaceMachinePoolID := machinepoolletclient.NetworkNameAndHandle(network.Name, network.Spec.Handle)
+		if err := r.List(ctx, networkInterfaceList,
+			client.InNamespace(loadBalancerRouting.Namespace),
+			client.MatchingFields{
+				machinepoolletclient.NetworkInterfaceNetworkNameAndHandle: networkInterfaceMachinePoolID,
+			},
+		); err != nil {
+			log.Error(err, "Error listing network interfaces")
+			return nil
+		}
+
+		var res []ctrl.Request
+		for _, networkInterface := range networkInterfaceList.Items {
+			if !destinationSet.Has(networkInterface.UID) {
+				continue
+			}
+			machineRef := networkInterface.Spec.MachineRef
+			if machineRef == nil {
+				continue
+			}
+
+			res = append(res, ctrl.Request{
+				NamespacedName: client.ObjectKey{
+					Namespace: loadBalancerRouting.Namespace,
+					Name:      machineRef.Name,
+				},
+			})
+		}
+		return res
+	})
+}
+
+func (r *MachineReconciler) enqueueMachinesReferencingNATGatewayRouting(ctx context.Context, log logr.Logger) handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []reconcile.Request {
+		natGatewayRouting := obj.(*networkingv1alpha1.NATGatewayRouting)
+		destinationSet := utilslices.ToSetFunc(
+			natGatewayRouting.Destinations,
+			func(d networkingv1alpha1.NATGatewayDestination) types.UID { return d.UID },
+		)
+
+		networkRef := natGatewayRouting.NetworkRef
+
+		network := &networkingv1alpha1.Network{}
+		networkKey := client.ObjectKey{Namespace: natGatewayRouting.Namespace, Name: networkRef.Name}
+		if err := r.Get(ctx, networkKey, network); err != nil {
+			log.Error(err, "Error getting alias prefix routing network", "NetworkKey", networkKey)
+			return nil
+		}
+
+		if network.UID != networkRef.UID {
+			log.V(1).Info("Network uid does not match", "Expected", networkRef.UID, "Actual", network.UID)
+			return nil
+		}
+
+		networkInterfaceList := &networkingv1alpha1.NetworkInterfaceList{}
+		networkInterfaceMachinePoolID := machinepoolletclient.NetworkNameAndHandle(network.Name, network.Spec.Handle)
+		if err := r.List(ctx, networkInterfaceList,
+			client.InNamespace(natGatewayRouting.Namespace),
+			client.MatchingFields{
+				machinepoolletclient.NetworkInterfaceNetworkNameAndHandle: networkInterfaceMachinePoolID,
+			},
+		); err != nil {
+			log.Error(err, "Error listing network interfaces")
+			return nil
+		}
+
+		var res []ctrl.Request
+		for _, networkInterface := range networkInterfaceList.Items {
+			if !destinationSet.Has(networkInterface.UID) {
+				continue
+			}
+			machineRef := networkInterface.Spec.MachineRef
+			if machineRef == nil {
+				continue
+			}
+
+			res = append(res, ctrl.Request{
+				NamespacedName: client.ObjectKey{
+					Namespace: natGatewayRouting.Namespace,
+					Name:      machineRef.Name,
+				},
+			})
+		}
+		return res
+	})
+}
+
 func (r *MachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	log := ctrl.Log.WithName("machinepoollet")
 	ctx := ctrl.LoggerInto(context.TODO(), log)
@@ -846,6 +956,14 @@ func (r *MachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Watches(
 			&source.Kind{Type: &networkingv1alpha1.AliasPrefixRouting{}},
 			r.enqueueMachinesReferencingAliasPrefixRouting(ctx, log),
+		).
+		Watches(
+			&source.Kind{Type: &networkingv1alpha1.LoadBalancerRouting{}},
+			r.enqueueMachinesReferencingLoadBalancerRouting(ctx, log),
+		).
+		Watches(
+			&source.Kind{Type: &networkingv1alpha1.NATGatewayRouting{}},
+			r.enqueueMachinesReferencingNATGatewayRouting(ctx, log),
 		).
 		Complete(r)
 }

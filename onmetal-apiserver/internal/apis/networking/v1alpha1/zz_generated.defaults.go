@@ -32,6 +32,8 @@ import (
 func RegisterDefaults(scheme *runtime.Scheme) error {
 	scheme.AddTypeDefaultingFunc(&v1alpha1.AliasPrefix{}, func(obj interface{}) { SetObjectDefaults_AliasPrefix(obj.(*v1alpha1.AliasPrefix)) })
 	scheme.AddTypeDefaultingFunc(&v1alpha1.AliasPrefixList{}, func(obj interface{}) { SetObjectDefaults_AliasPrefixList(obj.(*v1alpha1.AliasPrefixList)) })
+	scheme.AddTypeDefaultingFunc(&v1alpha1.NATGateway{}, func(obj interface{}) { SetObjectDefaults_NATGateway(obj.(*v1alpha1.NATGateway)) })
+	scheme.AddTypeDefaultingFunc(&v1alpha1.NATGatewayList{}, func(obj interface{}) { SetObjectDefaults_NATGatewayList(obj.(*v1alpha1.NATGatewayList)) })
 	scheme.AddTypeDefaultingFunc(&v1alpha1.NetworkInterface{}, func(obj interface{}) { SetObjectDefaults_NetworkInterface(obj.(*v1alpha1.NetworkInterface)) })
 	scheme.AddTypeDefaultingFunc(&v1alpha1.NetworkInterfaceList{}, func(obj interface{}) { SetObjectDefaults_NetworkInterfaceList(obj.(*v1alpha1.NetworkInterfaceList)) })
 	return nil
@@ -49,6 +51,17 @@ func SetObjectDefaults_AliasPrefixList(in *v1alpha1.AliasPrefixList) {
 	for i := range in.Items {
 		a := &in.Items[i]
 		SetObjectDefaults_AliasPrefix(a)
+	}
+}
+
+func SetObjectDefaults_NATGateway(in *v1alpha1.NATGateway) {
+	SetDefaults_NATGatewaySpec(&in.Spec)
+}
+
+func SetObjectDefaults_NATGatewayList(in *v1alpha1.NATGatewayList) {
+	for i := range in.Items {
+		a := &in.Items[i]
+		SetObjectDefaults_NATGateway(a)
 	}
 }
 

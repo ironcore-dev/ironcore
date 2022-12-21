@@ -24,6 +24,7 @@ import (
 	"github.com/onmetal/onmetal-api/broker/machinebroker/aliasprefixes"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	utilslices "github.com/onmetal/onmetal-api/utils/slices"
 	"golang.org/x/exp/slices"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -46,6 +47,16 @@ func (s *Server) buildIDToLoadBalancersMap(loadBalancers []machinebrokerv1alpha1
 	for _, loadBalancer := range loadBalancers {
 		for _, destination := range loadBalancer.Destinations {
 			res[destination] = append(res[destination], loadBalancer)
+		}
+	}
+	return res
+}
+
+func (s *Server) buildIDToNATGatewaysMap(natGateways []machinebrokerv1alpha1.NATGateway) map[string][]machinebrokerv1alpha1.NATGateway {
+	res := make(map[string][]machinebrokerv1alpha1.NATGateway)
+	for _, natGateway := range natGateways {
+		for _, destination := range natGateway.Destinations {
+			res[destination.ID] = append(res[destination.ID], natGateway)
 		}
 	}
 	return res
@@ -77,8 +88,14 @@ func (s *Server) listAggregateOnmetalNetworkInterfaces(ctx context.Context) ([]A
 		return nil, fmt.Errorf("error listing onmetal load balancers: %w", err)
 	}
 
+	onmetalNATGateways, err := s.natGateways.List(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("error listing onmetal nat gateways: %w", err)
+	}
+
 	idToAliasPrefixes := s.buildIDToAliasPrefixesMap(onmetalAliasPrefixes)
 	idToLoadBalancers := s.buildIDToLoadBalancersMap(onmetalLoadBalancers)
+	idToNATGateways := s.buildIDToNATGatewaysMap(onmetalNATGateways)
 	getNetwork := utils.ObjectSliceToByNameGetter(networkingv1alpha1.Resource("networks"), onmetalNetworkList.Items)
 	getVirtualIP := utils.ObjectSliceToByNameGetter(networkingv1alpha1.Resource("virtualips"), onmetalVirtualIPList.Items)
 
@@ -94,6 +111,9 @@ func (s *Server) listAggregateOnmetalNetworkInterfaces(ctx context.Context) ([]A
 			},
 			func() ([]machinebrokerv1alpha1.LoadBalancer, error) {
 				return idToLoadBalancers[onmetalNetworkInterface.Name], nil
+			},
+			func() ([]machinebrokerv1alpha1.NATGateway, error) {
+				return idToNATGateways[onmetalNetworkInterface.Name], nil
 			},
 		)
 		if err != nil {
@@ -111,6 +131,7 @@ func (s *Server) aggregateOnmetalNetworkInterface(
 	getVirtualIP func(name string) (*networkingv1alpha1.VirtualIP, error),
 	listAliasPrefixes func() ([]aliasprefixes.AliasPrefix, error),
 	listLoadBalancers func() ([]machinebrokerv1alpha1.LoadBalancer, error),
+	listNATGateways func() ([]machinebrokerv1alpha1.NATGateway, error),
 ) (*AggregateOnmetalNetworkInterface, error) {
 	network, err := getNetwork(onmetalNetworkInterface.Spec.NetworkRef.Name)
 	if err != nil {
@@ -163,12 +184,36 @@ func (s *Server) aggregateOnmetalNetworkInterface(
 		})
 	}
 
+	natGateways, err := listNATGateways()
+	if err != nil {
+		return nil, fmt.Errorf("error listing nat gateways: %w", err)
+	}
+
+	var natGatewayTgts []machinebrokerv1alpha1.NATGatewayTarget
+	for _, natGateway := range natGateways {
+		dst, ok := utilslices.FindFunc(natGateway.Destinations,
+			func(dest machinebrokerv1alpha1.NATGatewayDestination) bool {
+				return dest.ID == onmetalNetworkInterface.Name
+			},
+		)
+		if !ok {
+			continue
+		}
+
+		natGatewayTgts = append(natGatewayTgts, machinebrokerv1alpha1.NATGatewayTarget{
+			IP:      natGateway.IP,
+			Port:    dst.Port,
+			EndPort: dst.EndPort,
+		})
+	}
+
 	return &AggregateOnmetalNetworkInterface{
 		NetworkInterface:    onmetalNetworkInterface,
 		Network:             network,
 		VirtualIP:           virtualIP,
 		Prefixes:            prefixes,
 		LoadBalancerTargets: lbTgts,
+		NATGatewayTargets:   natGatewayTgts,
 	}, nil
 }
 
@@ -190,6 +235,9 @@ func (s *Server) getAggregateOnmetalNetworkInterface(ctx context.Context, id str
 		},
 		func() ([]machinebrokerv1alpha1.LoadBalancer, error) {
 			return s.loadBalancers.ListByDependent(ctx, id)
+		},
+		func() ([]machinebrokerv1alpha1.NATGateway, error) {
+			return s.natGateways.ListByDependent(ctx, id)
 		},
 	)
 }

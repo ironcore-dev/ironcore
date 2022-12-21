@@ -134,6 +134,66 @@ var _ = Describe("CreateNetworkInterface", func() {
 		}))
 	})
 
+	It("should correctly create a network with a nat gateway target", func() {
+		By("creating a network interface")
+		const (
+			ip                = "192.168.178.1"
+			networkHandle     = "foo"
+			natGatewayIP      = "10.0.0.1"
+			natGatewayPort    = 80
+			natGatewayEndPort = 8000
+		)
+		res, err := srv.CreateNetworkInterface(ctx, &ori.CreateNetworkInterfaceRequest{
+			NetworkInterface: &ori.NetworkInterface{
+				Metadata: &orimeta.ObjectMetadata{},
+				Spec: &ori.NetworkInterfaceSpec{
+					Network: &ori.NetworkSpec{
+						Handle: networkHandle,
+					},
+					Ips: []string{ip},
+					Nats: []*ori.NATSpec{
+						{
+							Ip:      natGatewayIP,
+							Port:    natGatewayPort,
+							EndPort: natGatewayEndPort,
+						},
+					},
+				},
+			},
+		})
+		Expect(err).NotTo(HaveOccurred())
+		networkInterface := res.NetworkInterface
+		networkInterfaceID := networkInterface.Metadata.Id
+
+		By("inspecting the kubernetes network interface")
+		k8sNetworkInterface := &networkingv1alpha1.NetworkInterface{}
+		k8sNetworkInterfaceKey := client.ObjectKey{Namespace: ns.Name, Name: networkInterfaceID}
+		Expect(k8sClient.Get(ctx, k8sNetworkInterfaceKey, k8sNetworkInterface)).To(Succeed())
+
+		Expect(k8sNetworkInterface.Spec.IPs).To(Equal([]networkingv1alpha1.IPSource{
+			{
+				Value: commonv1alpha1.MustParseNewIP(ip),
+			},
+		}))
+
+		By("listing nat gateways for network interface")
+		natGateways, err := srv.NATGateways().ListByDependent(ctx, networkInterfaceID)
+		Expect(err).NotTo(HaveOccurred())
+
+		By("inspecting the nat gateways")
+		Expect(natGateways).To(ConsistOf(machinebrokerv1alpha1.NATGateway{
+			NetworkHandle: networkHandle,
+			IP:            commonv1alpha1.MustParseIP(natGatewayIP),
+			Destinations: []machinebrokerv1alpha1.NATGatewayDestination{
+				{
+					ID:      networkInterfaceID,
+					Port:    natGatewayPort,
+					EndPort: natGatewayEndPort,
+				},
+			},
+		}))
+	})
+
 	It("should re-use kubernetes networks and delete them only if no dependents exist", func() {
 		const handle = "foo"
 		const noOfNetworkInterfaces = 6

@@ -545,6 +545,44 @@ func (r *FakeRuntimeService) DeleteNetworkInterfaceLoadBalancerTarget(ctx contex
 	return &ori.DeleteNetworkInterfaceLoadBalancerTargetResponse{}, nil
 }
 
+func (r *FakeRuntimeService) CreateNetworkInterfaceNAT(ctx context.Context, req *ori.CreateNetworkInterfaceNATRequest) (*ori.CreateNetworkInterfaceNATResponse, error) {
+	r.Lock()
+	defer r.Unlock()
+
+	networkInterfaceID := req.NetworkInterfaceId
+	networkInterface, ok := r.NetworkInterfaces[networkInterfaceID]
+	if !ok {
+		return nil, status.Errorf(codes.NotFound, "network interface %q not found", networkInterfaceID)
+	}
+
+	natIP := req.Nat.Ip
+	if slices.ContainsFunc(networkInterface.Spec.Nats, func(n *ori.NATSpec) bool { return n.Ip == natIP }) {
+		return nil, status.Errorf(codes.AlreadyExists, "network interface %q nat %q already exists", networkInterfaceID, natIP)
+	}
+
+	networkInterface.Spec.Nats = append(networkInterface.Spec.Nats, req.Nat)
+	return &ori.CreateNetworkInterfaceNATResponse{}, nil
+}
+
+func (r *FakeRuntimeService) DeleteNetworkInterfaceNAT(ctx context.Context, req *ori.DeleteNetworkInterfaceNATRequest) (*ori.DeleteNetworkInterfaceNATResponse, error) {
+	r.Lock()
+	defer r.Unlock()
+
+	networkInterfaceID := req.NetworkInterfaceId
+	networkInterface, ok := r.NetworkInterfaces[networkInterfaceID]
+	if !ok {
+		return nil, status.Errorf(codes.NotFound, "network interface %q not found", networkInterfaceID)
+	}
+
+	idx := slices.IndexFunc(networkInterface.Spec.Nats, func(n *ori.NATSpec) bool { return n.Ip == req.NatIp })
+	if idx < 0 {
+		return nil, status.Errorf(codes.NotFound, "network interface %q nat %q not found", networkInterfaceID, req.NatIp)
+	}
+
+	networkInterface.Spec.Nats = slices.Delete(networkInterface.Spec.Nats, idx, idx+1)
+	return &ori.DeleteNetworkInterfaceNATResponse{}, nil
+}
+
 func (r *FakeRuntimeService) ListMachineClasses(ctx context.Context, req *ori.ListMachineClassesRequest) (*ori.ListMachineClassesResponse, error) {
 	r.Lock()
 	defer r.Unlock()

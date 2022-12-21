@@ -94,6 +94,32 @@ func (s *Server) prepareOnmetalLoadBalancerTargets(lbTargets []*ori.LoadBalancer
 	return res, nil
 }
 
+func (s *Server) prepareOnmetalNATGatewayTarget(nat *ori.NATSpec) (*machinebrokerv1alpha1.NATGatewayTarget, error) {
+	ip, err := commonv1alpha1.ParseIP(nat.Ip)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing nat ip: %w", err)
+	}
+
+	return &machinebrokerv1alpha1.NATGatewayTarget{
+		IP:      ip,
+		Port:    nat.Port,
+		EndPort: nat.EndPort,
+	}, nil
+}
+
+func (s *Server) prepareOnmetalNATGatewayTargets(nats []*ori.NATSpec) ([]machinebrokerv1alpha1.NATGatewayTarget, error) {
+	var res []machinebrokerv1alpha1.NATGatewayTarget
+	for _, nat := range nats {
+		tgt, err := s.prepareOnmetalNATGatewayTarget(nat)
+		if err != nil {
+			return nil, fmt.Errorf("error preparing nat target: %w", err)
+		}
+
+		res = append(res, *tgt)
+	}
+	return res, nil
+}
+
 func (s *Server) prepareAggregateOnmetalNetworkInterface(networkInterface *ori.NetworkInterface) (*AggregateOnmetalNetworkInterface, error) {
 	var onmetalVirtualIP *networkingv1alpha1.VirtualIP
 	if virtualIPSpec := networkInterface.Spec.VirtualIp; virtualIPSpec != nil {
@@ -116,6 +142,11 @@ func (s *Server) prepareAggregateOnmetalNetworkInterface(networkInterface *ori.N
 	}
 
 	lbTgts, err := s.prepareOnmetalLoadBalancerTargets(networkInterface.Spec.LoadBalancerTargets)
+	if err != nil {
+		return nil, err
+	}
+
+	natGatewayTgts, err := s.prepareOnmetalNATGatewayTargets(networkInterface.Spec.Nats)
 	if err != nil {
 		return nil, err
 	}
@@ -150,6 +181,7 @@ func (s *Server) prepareAggregateOnmetalNetworkInterface(networkInterface *ori.N
 		VirtualIP:           onmetalVirtualIP,
 		Prefixes:            prefixes,
 		LoadBalancerTargets: lbTgts,
+		NATGatewayTargets:   natGatewayTgts,
 	}
 	return onmetalNetworkInterfaceConfig, nil
 }
@@ -241,6 +273,16 @@ func (s *Server) createOnmetalNetworkInterface(ctx context.Context, log logr.Log
 		}
 		c.Add(func(ctx context.Context) error {
 			return s.loadBalancers.Delete(ctx, network.Spec.Handle, lbTgt, onmetalNetworkInterface.NetworkInterface)
+		})
+	}
+
+	log.V(1).Info("Creating nat gateways")
+	for _, natGatewayTgt := range onmetalNetworkInterface.NATGatewayTargets {
+		if err := s.natGateways.Create(ctx, network, natGatewayTgt, onmetalNetworkInterface.NetworkInterface); err != nil {
+			return fmt.Errorf("error creating nat gateway: %w", err)
+		}
+		c.Add(func(ctx context.Context) error {
+			return s.natGateways.Delete(ctx, network.Spec.Handle, natGatewayTgt.IP, onmetalNetworkInterface.NetworkInterface)
 		})
 	}
 

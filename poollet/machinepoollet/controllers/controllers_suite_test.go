@@ -124,6 +124,8 @@ var _ = BeforeSuite(func() {
 	Expect(apiSrv.Start()).To(Succeed())
 	DeferCleanup(apiSrv.Stop)
 
+	Expect(envtestutils.WaitUntilAPIServicesReadyWithTimeout(apiServiceTimeout, testEnvExt, k8sClient, scheme.Scheme)).To(Succeed())
+
 	ctrlMgr, err := controllermanager.New(cfg, controllermanager.Options{
 		Args:         process.EmptyArgs().Set("controllers", "*"),
 		MainPath:     "github.com/onmetal/onmetal-api/onmetal-controller-manager",
@@ -135,8 +137,6 @@ var _ = BeforeSuite(func() {
 
 	Expect(ctrlMgr.Start()).To(Succeed())
 	DeferCleanup(ctrlMgr.Stop)
-
-	Expect(envtestutils.WaitUntilAPIServicesReadyWithTimeout(apiServiceTimeout, testEnvExt, k8sClient, scheme.Scheme)).To(Succeed())
 })
 
 func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.MachinePool, *computev1alpha1.MachineClass, *machine.FakeRuntimeService) {
@@ -202,6 +202,7 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 		Expect(machinepoolletclient.SetupMachineSpecSecretNamesField(ctx, indexer, mp.Name)).To(Succeed())
 		Expect(machinepoolletclient.SetupAliasPrefixRoutingNetworkRefNameField(ctx, indexer)).To(Succeed())
 		Expect(machinepoolletclient.SetupLoadBalancerRoutingNetworkRefNameField(ctx, indexer)).To(Succeed())
+		Expect(machinepoolletclient.SetupNATGatewayRoutingNetworkRefNameField(ctx, indexer)).To(Succeed())
 		Expect(machinepoolletclient.SetupNetworkInterfaceNetworkMachinePoolID(ctx, indexer, mp.Name)).To(Succeed())
 
 		machineClassMapper := mcm.NewGeneric(srv, mcm.GenericOptions{})
