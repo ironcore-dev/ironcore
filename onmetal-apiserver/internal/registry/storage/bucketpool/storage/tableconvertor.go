@@ -33,7 +33,7 @@ var (
 
 	headers = []metav1.TableColumnDefinition{
 		{Name: "Name", Type: "string", Format: "name", Description: objectMetaSwaggerDoc["name"]},
-		{Name: "VolumeClasses", Type: "string", Description: "Volume classes available on this volume pool."},
+		{Name: "BucketClasses", Type: "string", Description: "Bucket classes available on this bucket pool."},
 		{Name: "Age", Type: "string", Format: "date", Description: objectMetaSwaggerDoc["creationTimestamp"]},
 	}
 )
@@ -42,10 +42,10 @@ func newTableConvertor() *convertor {
 	return &convertor{}
 }
 
-func volumePoolVolumeClassNames(volumePool *storage.VolumePool) []string {
-	names := make([]string, 0, len(volumePool.Status.AvailableVolumeClasses))
-	for _, volumeClassRef := range volumePool.Status.AvailableVolumeClasses {
-		names = append(names, volumeClassRef.Name)
+func bucketPoolBucketClassNames(bucketPool *storage.BucketPool) []string {
+	names := make([]string, 0, len(bucketPool.Status.AvailableBucketClasses))
+	for _, bucketClassRef := range bucketPool.Status.AvailableBucketClasses {
+		names = append(names, bucketClassRef.Name)
 	}
 	sort.Strings(names)
 	return names
@@ -67,14 +67,14 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 
 	var err error
 	tab.Rows, err = table.MetaToTableRow(obj, func(obj runtime.Object, m metav1.Object, name, age string) (cells []interface{}, err error) {
-		volumePool := obj.(*storage.VolumePool)
+		bucketPool := obj.(*storage.BucketPool)
 
 		cells = append(cells, name)
-		volumeClassNames := volumePoolVolumeClassNames(volumePool)
-		if len(volumeClassNames) == 0 {
+		bucketClassNames := bucketPoolBucketClassNames(bucketPool)
+		if len(bucketClassNames) == 0 {
 			cells = append(cells, "<none>")
 		} else {
-			cells = append(cells, strings.Join(volumeClassNames, ","))
+			cells = append(cells, strings.Join(bucketClassNames, ","))
 		}
 		cells = append(cells, age)
 
