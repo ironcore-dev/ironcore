@@ -22,43 +22,14 @@ import (
 
 	"github.com/onmetal/controller-utils/metautils"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
 	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
 	"golang.org/x/exp/slices"
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
-
-func ConvertNetworkingLoadBalancerPort(port networkingv1alpha1.LoadBalancerPort) machinebrokerv1alpha1.LoadBalancerTargetPort {
-	protocol := port.Protocol
-	if protocol == nil {
-		tcpProtocol := corev1.ProtocolTCP
-		protocol = &tcpProtocol
-	}
-
-	endPort := port.EndPort
-	if endPort == nil {
-		endPort = &port.Port
-	}
-
-	return machinebrokerv1alpha1.LoadBalancerTargetPort{
-		Protocol: *protocol,
-		Port:     port.Port,
-		EndPort:  *endPort,
-	}
-}
-
-func ConvertNetworkingLoadBalancerPorts(ports []networkingv1alpha1.LoadBalancerPort) []machinebrokerv1alpha1.LoadBalancerTargetPort {
-	res := make([]machinebrokerv1alpha1.LoadBalancerTargetPort, len(ports))
-	for i, port := range ports {
-		res[i] = ConvertNetworkingLoadBalancerPort(port)
-	}
-	return res
-}
 
 func GetObjectMetadata(o metav1.Object) (*orimeta.ObjectMetadata, error) {
 	annotations, err := GetAnnotationsAnnotation(o)

@@ -24,22 +24,34 @@ type RuntimeService interface {
 	ListMachines(context.Context, *api.ListMachinesRequest) (*api.ListMachinesResponse, error)
 	CreateMachine(context.Context, *api.CreateMachineRequest) (*api.CreateMachineResponse, error)
 	DeleteMachine(context.Context, *api.DeleteMachineRequest) (*api.DeleteMachineResponse, error)
+
 	UpdateMachineAnnotations(context.Context, *api.UpdateMachineAnnotationsRequest) (*api.UpdateMachineAnnotationsResponse, error)
+
 	CreateVolumeAttachment(context.Context, *api.CreateVolumeAttachmentRequest) (*api.CreateVolumeAttachmentResponse, error)
 	DeleteVolumeAttachment(context.Context, *api.DeleteVolumeAttachmentRequest) (*api.DeleteVolumeAttachmentResponse, error)
+
 	CreateNetworkInterfaceAttachment(context.Context, *api.CreateNetworkInterfaceAttachmentRequest) (*api.CreateNetworkInterfaceAttachmentResponse, error)
 	DeleteNetworkInterfaceAttachment(context.Context, *api.DeleteNetworkInterfaceAttachmentRequest) (*api.DeleteNetworkInterfaceAttachmentResponse, error)
+
 	ListVolumes(context.Context, *api.ListVolumesRequest) (*api.ListVolumesResponse, error)
 	CreateVolume(context.Context, *api.CreateVolumeRequest) (*api.CreateVolumeResponse, error)
 	DeleteVolume(context.Context, *api.DeleteVolumeRequest) (*api.DeleteVolumeResponse, error)
+
 	ListNetworkInterfaces(context.Context, *api.ListNetworkInterfacesRequest) (*api.ListNetworkInterfacesResponse, error)
 	CreateNetworkInterface(context.Context, *api.CreateNetworkInterfaceRequest) (*api.CreateNetworkInterfaceResponse, error)
 	DeleteNetworkInterface(context.Context, *api.DeleteNetworkInterfaceRequest) (*api.DeleteNetworkInterfaceResponse, error)
+
 	UpdateNetworkInterfaceIPs(context.Context, *api.UpdateNetworkInterfaceIPsRequest) (*api.UpdateNetworkInterfaceIPsResponse, error)
+
 	CreateNetworkInterfaceVirtualIP(context.Context, *api.CreateNetworkInterfaceVirtualIPRequest) (*api.CreateNetworkInterfaceVirtualIPResponse, error)
 	UpdateNetworkInterfaceVirtualIP(context.Context, *api.UpdateNetworkInterfaceVirtualIPRequest) (*api.UpdateNetworkInterfaceVirtualIPResponse, error)
 	DeleteNetworkInterfaceVirtualIP(context.Context, *api.DeleteNetworkInterfaceVirtualIPRequest) (*api.DeleteNetworkInterfaceVirtualIPResponse, error)
+
 	CreateNetworkInterfacePrefix(context.Context, *api.CreateNetworkInterfacePrefixRequest) (*api.CreateNetworkInterfacePrefixResponse, error)
 	DeleteNetworkInterfacePrefix(context.Context, *api.DeleteNetworkInterfacePrefixRequest) (*api.DeleteNetworkInterfacePrefixResponse, error)
+
+	CreateNetworkInterfaceLoadBalancerTarget(context.Context, *api.CreateNetworkInterfaceLoadBalancerTargetRequest) (*api.CreateNetworkInterfaceLoadBalancerTargetResponse, error)
+	DeleteNetworkInterfaceLoadBalancerTarget(context.Context, *api.DeleteNetworkInterfaceLoadBalancerTargetRequest) (*api.DeleteNetworkInterfaceLoadBalancerTargetResponse, error)
+
 	ListMachineClasses(context.Context, *api.ListMachineClassesRequest) (*api.ListMachineClassesResponse, error)
 }

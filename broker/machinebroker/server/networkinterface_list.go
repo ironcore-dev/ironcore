@@ -23,8 +23,8 @@ import (
 	"github.com/onmetal/onmetal-api/broker/common/utils"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/aliasprefixes"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
-	"github.com/onmetal/onmetal-api/broker/machinebroker/loadbalancers"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	"golang.org/x/exp/slices"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -41,10 +41,10 @@ func (s *Server) buildIDToAliasPrefixesMap(aliasPrefixes []aliasprefixes.AliasPr
 	return res
 }
 
-func (s *Server) buildIDToLoadBalancersMap(loadBalancers []loadbalancers.LoadBalancer) map[string][]loadbalancers.LoadBalancer {
-	res := make(map[string][]loadbalancers.LoadBalancer)
+func (s *Server) buildIDToLoadBalancersMap(loadBalancers []machinebrokerv1alpha1.LoadBalancer) map[string][]machinebrokerv1alpha1.LoadBalancer {
+	res := make(map[string][]machinebrokerv1alpha1.LoadBalancer)
 	for _, loadBalancer := range loadBalancers {
-		for destination := range loadBalancer.Destinations {
+		for _, destination := range loadBalancer.Destinations {
 			res[destination] = append(res[destination], loadBalancer)
 		}
 	}
@@ -92,7 +92,7 @@ func (s *Server) listAggregateOnmetalNetworkInterfaces(ctx context.Context) ([]A
 			func() ([]aliasprefixes.AliasPrefix, error) {
 				return idToAliasPrefixes[onmetalNetworkInterface.Name], nil
 			},
-			func() ([]loadbalancers.LoadBalancer, error) {
+			func() ([]machinebrokerv1alpha1.LoadBalancer, error) {
 				return idToLoadBalancers[onmetalNetworkInterface.Name], nil
 			},
 		)
@@ -110,7 +110,7 @@ func (s *Server) aggregateOnmetalNetworkInterface(
 	getNetwork func(name string) (*networkingv1alpha1.Network, error),
 	getVirtualIP func(name string) (*networkingv1alpha1.VirtualIP, error),
 	listAliasPrefixes func() ([]aliasprefixes.AliasPrefix, error),
-	listLoadBalancers func() ([]loadbalancers.LoadBalancer, error),
+	listLoadBalancers func() ([]machinebrokerv1alpha1.LoadBalancer, error),
 ) (*AggregateOnmetalNetworkInterface, error) {
 	network, err := getNetwork(onmetalNetworkInterface.Spec.NetworkRef.Name)
 	if err != nil {
@@ -153,7 +153,7 @@ func (s *Server) aggregateOnmetalNetworkInterface(
 
 	var lbTgts []machinebrokerv1alpha1.LoadBalancerTarget
 	for _, loadBalancer := range loadBalancers {
-		if !loadBalancer.Destinations.Has(onmetalNetworkInterface.Name) {
+		if !slices.Contains(loadBalancer.Destinations, onmetalNetworkInterface.Name) {
 			continue
 		}
 
@@ -188,7 +188,7 @@ func (s *Server) getAggregateOnmetalNetworkInterface(ctx context.Context, id str
 		func() ([]aliasprefixes.AliasPrefix, error) {
 			return s.aliasPrefixes.ListByDependent(ctx, id)
 		},
-		func() ([]loadbalancers.LoadBalancer, error) {
+		func() ([]machinebrokerv1alpha1.LoadBalancer, error) {
 			return s.loadBalancers.ListByDependent(ctx, id)
 		},
 	)

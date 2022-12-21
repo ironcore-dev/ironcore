@@ -41,6 +41,9 @@ service MachineRuntime {
   rpc CreateNetworkInterfacePrefix(CreateNetworkInterfacePrefixRequest) returns (CreateNetworkInterfacePrefixResponse);
   rpc DeleteNetworkInterfacePrefix(DeleteNetworkInterfacePrefixRequest) returns (DeleteNetworkInterfacePrefixResponse);
 
+  rpc CreateNetworkInterfaceLoadBalancerTarget(CreateNetworkInterfaceLoadBalancerTargetRequest) returns (CreateNetworkInterfaceLoadBalancerTargetResponse);
+  rpc DeleteNetworkInterfaceLoadBalancerTarget(DeleteNetworkInterfaceLoadBalancerTargetRequest) returns (DeleteNetworkInterfaceLoadBalancerTargetResponse);
+
   rpc ListMachineClasses(ListMachineClassesRequest) returns (ListMachineClassesResponse);
 }
 
@@ -342,6 +345,22 @@ message DeleteNetworkInterfacePrefixRequest {
 }
 
 message DeleteNetworkInterfacePrefixResponse {
+}
+
+message CreateNetworkInterfaceLoadBalancerTargetRequest {
+  string network_interface_id = 1;
+  LoadBalancerTargetSpec load_balancer_target = 2;
+}
+
+message CreateNetworkInterfaceLoadBalancerTargetResponse {
+}
+
+message DeleteNetworkInterfaceLoadBalancerTargetRequest {
+  string network_interface_id = 1;
+  LoadBalancerTargetSpec load_balancer_target = 2;
+}
+
+message DeleteNetworkInterfaceLoadBalancerTargetResponse {
 }
 
 message DeleteNetworkInterfaceVirtualIPRequest {

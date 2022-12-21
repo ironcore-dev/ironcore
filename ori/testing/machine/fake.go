@@ -496,6 +496,55 @@ func (r *FakeRuntimeService) DeleteNetworkInterfacePrefix(ctx context.Context, r
 	return &ori.DeleteNetworkInterfacePrefixResponse{}, nil
 }
 
+func (r *FakeRuntimeService) CreateNetworkInterfaceLoadBalancerTarget(ctx context.Context, req *ori.CreateNetworkInterfaceLoadBalancerTargetRequest) (*ori.CreateNetworkInterfaceLoadBalancerTargetResponse, error) {
+	r.Lock()
+	defer r.Unlock()
+
+	networkInterfaceID := req.NetworkInterfaceId
+	networkInterface, ok := r.NetworkInterfaces[networkInterfaceID]
+	if !ok {
+		return nil, status.Errorf(codes.NotFound, "network interface %q not found", networkInterfaceID)
+	}
+
+	loadBalancerTarget := req.LoadBalancerTarget
+	if slices.ContainsFunc(
+		networkInterface.Spec.LoadBalancerTargets,
+		func(tgt *ori.LoadBalancerTargetSpec) bool {
+			return tgt.Key() == loadBalancerTarget.Key()
+		},
+	) {
+		return nil, status.Errorf(codes.AlreadyExists, "network interface %q load balancer target %q already exists", networkInterfaceID, loadBalancerTarget)
+	}
+
+	networkInterface.Spec.LoadBalancerTargets = append(networkInterface.Spec.LoadBalancerTargets, loadBalancerTarget)
+	return &ori.CreateNetworkInterfaceLoadBalancerTargetResponse{}, nil
+}
+
+func (r *FakeRuntimeService) DeleteNetworkInterfaceLoadBalancerTarget(ctx context.Context, req *ori.DeleteNetworkInterfaceLoadBalancerTargetRequest) (*ori.DeleteNetworkInterfaceLoadBalancerTargetResponse, error) {
+	r.Lock()
+	defer r.Unlock()
+
+	networkInterfaceID := req.NetworkInterfaceId
+	networkInterface, ok := r.NetworkInterfaces[networkInterfaceID]
+	if !ok {
+		return nil, status.Errorf(codes.NotFound, "network interface %q not found", networkInterfaceID)
+	}
+
+	loadBalancerTarget := req.LoadBalancerTarget
+	idx := slices.IndexFunc(
+		networkInterface.Spec.LoadBalancerTargets,
+		func(tgt *ori.LoadBalancerTargetSpec) bool {
+			return tgt.Key() == loadBalancerTarget.Key()
+		},
+	)
+	if idx < 0 {
+		return nil, status.Errorf(codes.NotFound, "network interface %q load balancer target %q not found", networkInterfaceID, loadBalancerTarget)
+	}
+
+	networkInterface.Spec.LoadBalancerTargets = slices.Delete(networkInterface.Spec.LoadBalancerTargets, idx, idx+1)
+	return &ori.DeleteNetworkInterfaceLoadBalancerTargetResponse{}, nil
+}
+
 func (r *FakeRuntimeService) ListMachineClasses(ctx context.Context, req *ori.ListMachineClassesRequest) (*ori.ListMachineClassesResponse, error) {
 	r.Lock()
 	defer r.Unlock()

@@ -29,6 +29,7 @@ import (
 	machinepoolletv1alpha1 "github.com/onmetal/onmetal-api/poollet/machinepoollet/api/v1alpha1"
 	machinepoolletclient "github.com/onmetal/onmetal-api/poollet/machinepoollet/client"
 	"github.com/onmetal/onmetal-api/poollet/machinepoollet/controllers/events"
+	utilmaps "github.com/onmetal/onmetal-api/utils/maps"
 	utilslices "github.com/onmetal/onmetal-api/utils/slices"
 	"golang.org/x/exp/slices"
 	"google.golang.org/grpc/codes"
@@ -46,6 +47,50 @@ func (r *MachineReconciler) ipsToStrings(ips []commonv1alpha1.IP) []string {
 		res[i] = ip.Addr.String()
 	}
 	return res
+}
+
+func (r *MachineReconciler) convertProtocol(protocol corev1.Protocol) (ori.Protocol, error) {
+	switch protocol {
+	case corev1.ProtocolTCP:
+		return ori.Protocol_TCP, nil
+	case corev1.ProtocolUDP:
+		return ori.Protocol_UDP, nil
+	case corev1.ProtocolSCTP:
+		return ori.Protocol_SCTP, nil
+	default:
+		return 0, fmt.Errorf("unknown protocol %q", protocol)
+	}
+}
+
+func (r *MachineReconciler) convertLoadBalancerPorts(ports []networkingv1alpha1.LoadBalancerPort) ([]*ori.LoadBalancerPort, error) {
+	res := make([]*ori.LoadBalancerPort, len(ports))
+	for i, port := range ports {
+		var protocol corev1.Protocol
+		if port.Protocol != nil {
+			protocol = *port.Protocol
+		} else {
+			protocol = corev1.ProtocolTCP
+		}
+
+		var endPort int32
+		if port.EndPort != nil {
+			endPort = *port.EndPort
+		} else {
+			endPort = port.Port
+		}
+
+		oriProtocol, err := r.convertProtocol(protocol)
+		if err != nil {
+			return nil, err
+		}
+
+		res[i] = &ori.LoadBalancerPort{
+			Protocol: oriProtocol,
+			Port:     port.Port,
+			EndPort:  endPort,
+		}
+	}
+	return res, nil
 }
 
 func (r *MachineReconciler) listORINetworkInterfacesByMachineUID(ctx context.Context, machineUID types.UID) ([]*ori.NetworkInterface, error) {
@@ -358,6 +403,51 @@ func (r *MachineReconciler) updateORINetworkInterface(
 		return fmt.Errorf("error updating ori network interface prefixes: %w", err)
 	}
 
+	if err := r.updateORINetworkInterfaceLoadBalancerTargets(ctx, log, oriNetworkInterface, oriNetworkInterfaceSpec); err != nil {
+		return fmt.Errorf("error updating ori network interface load balancer targets: %w", err)
+	}
+
+	return nil
+}
+
+func (r *MachineReconciler) updateORINetworkInterfaceLoadBalancerTargets(
+	ctx context.Context,
+	log logr.Logger,
+	oriNetworkInterface *ori.NetworkInterface,
+	oriNetworkInterfaceSpec *ori.NetworkInterfaceSpec,
+) error {
+	id := oriNetworkInterface.Metadata.Id
+	actualLoadBalancerTargets := r.buildLoadBalancerTargetMap(oriNetworkInterface.Spec.LoadBalancerTargets)
+	desiredLoadBalancerTargets := r.buildLoadBalancerTargetMap(oriNetworkInterfaceSpec.LoadBalancerTargets)
+
+	delLoadBalancerTargets := utilmaps.KeysDifference(actualLoadBalancerTargets, desiredLoadBalancerTargets)
+	newLoadBalancerTargets := utilmaps.KeysDifference(desiredLoadBalancerTargets, actualLoadBalancerTargets)
+
+	var errs []error
+	for key := range delLoadBalancerTargets {
+		delTgt := actualLoadBalancerTargets[key]
+		log.V(1).Info("Deleting outdated ori network interface load balancer target", "LoadBalancerTarget", key)
+		if _, err := r.MachineRuntime.DeleteNetworkInterfaceLoadBalancerTarget(ctx, &ori.DeleteNetworkInterfaceLoadBalancerTargetRequest{
+			NetworkInterfaceId: id,
+			LoadBalancerTarget: delTgt,
+		}); err != nil {
+			errs = append(errs, fmt.Errorf("error deleting ori network interface load balancer target %s: %w", key, err))
+		}
+	}
+	for key := range newLoadBalancerTargets {
+		newTgt := desiredLoadBalancerTargets[key]
+		log.V(1).Info("Creating new ori network interface load balancer target", "LoadBalancerTarget", key)
+		if _, err := r.MachineRuntime.CreateNetworkInterfaceLoadBalancerTarget(ctx, &ori.CreateNetworkInterfaceLoadBalancerTargetRequest{
+			NetworkInterfaceId: id,
+			LoadBalancerTarget: newTgt,
+		}); err != nil {
+			errs = append(errs, fmt.Errorf("error creating ori network interface load balancer target %s: %w", key, err))
+		}
+	}
+
+	if len(errs) > 0 {
+		return fmt.Errorf("error(s) updating ori network interface load balancer targets: %v", errs)
+	}
 	return nil
 }
 
@@ -436,13 +526,19 @@ func (r *MachineReconciler) prepareORINetworkInterfaceSpec(
 		return nil, false, fmt.Errorf("error getting alias prefixes for network interface: %w", err)
 	}
 
+	loadBalancerTargets, err := r.loadBalancerTargetsForNetworkInterface(ctx, networkInterface)
+	if err != nil {
+		return nil, false, fmt.Errorf("error getting load balancer targets for network interface: %w", err)
+	}
+
 	return &ori.NetworkInterfaceSpec{
 		Network: &ori.NetworkSpec{
 			Handle: networkInterface.Status.NetworkHandle,
 		},
-		Ips:       r.ipsToStrings(networkInterface.Status.IPs),
-		VirtualIp: virtualIPSpec,
-		Prefixes:  prefixes,
+		Ips:                 r.ipsToStrings(networkInterface.Status.IPs),
+		VirtualIp:           virtualIPSpec,
+		Prefixes:            prefixes,
+		LoadBalancerTargets: loadBalancerTargets,
 	}, true, nil
 }
 
@@ -493,6 +589,81 @@ func (r *MachineReconciler) aliasPrefixesForNetworkInterface(
 		}
 	}
 	return set.SortedSlice(prefixes), nil
+}
+
+func (r *MachineReconciler) loadBalancerTargetsForNetworkInterface(
+	ctx context.Context,
+	networkInterface *networkingv1alpha1.NetworkInterface,
+) ([]*ori.LoadBalancerTargetSpec, error) {
+	loadBalancerList := &networkingv1alpha1.LoadBalancerList{}
+	if err := r.List(ctx, loadBalancerList,
+		client.InNamespace(networkInterface.Namespace),
+	); err != nil {
+		return nil, fmt.Errorf("error listing load balancers: %w", err)
+	}
+
+	loadBalancerRoutingList := &networkingv1alpha1.LoadBalancerRoutingList{}
+	if err := r.List(ctx, loadBalancerRoutingList,
+		client.InNamespace(networkInterface.Namespace),
+		client.MatchingFields{
+			machinepoolletclient.LoadBalancerRoutingNetworkRefNameField: networkInterface.Spec.NetworkRef.Name,
+		},
+	); err != nil {
+		return nil, fmt.Errorf("error listing load balancer routings: %w", err)
+	}
+
+	loadBalancerRoutingsByName := utilslices.ToMap(
+		loadBalancerRoutingList.Items,
+		func(apr networkingv1alpha1.LoadBalancerRouting) string { return apr.Name },
+	)
+
+	// Construct a map by the key / hash code of the load balancer target to eliminate duplicates.
+	loadBalancerTargetsByKey := make(map[string]*ori.LoadBalancerTargetSpec)
+	for _, loadBalancer := range loadBalancerList.Items {
+		loadBalancerRouting, ok := loadBalancerRoutingsByName[loadBalancer.Name]
+		if !ok {
+			continue
+		}
+
+		if len(loadBalancer.Status.IPs) == 0 {
+			continue
+		}
+
+		if !slices.ContainsFunc(
+			loadBalancerRouting.Destinations,
+			func(r commonv1alpha1.LocalUIDReference) bool { return r.UID == networkInterface.UID },
+		) {
+			continue
+		}
+
+		for _, ip := range loadBalancer.Status.IPs {
+			ports, err := r.convertLoadBalancerPorts(loadBalancer.Spec.Ports)
+			if err != nil {
+				return nil, err
+			}
+
+			loadBalancerTarget := &ori.LoadBalancerTargetSpec{
+				Ip:    ip.String(),
+				Ports: ports,
+			}
+
+			loadBalancerTargetsByKey[loadBalancerTarget.Key()] = loadBalancerTarget
+		}
+	}
+
+	res := make([]*ori.LoadBalancerTargetSpec, 0, len(loadBalancerTargetsByKey))
+	for _, loadBalancerTarget := range loadBalancerTargetsByKey {
+		res = append(res, loadBalancerTarget)
+	}
+	return res, nil
+}
+
+func (r *MachineReconciler) buildLoadBalancerTargetMap(tgts []*ori.LoadBalancerTargetSpec) map[string]*ori.LoadBalancerTargetSpec {
+	res := make(map[string]*ori.LoadBalancerTargetSpec)
+	for _, tgt := range tgts {
+		res[tgt.Key()] = tgt
+	}
+	return res
 }
 
 func (r *MachineReconciler) updateNetworkInterface(

@@ -23,3 +23,13 @@ func KeySet[M ~map[K]V, K comparable, V any](m M) set.Set[K] {
 	}
 	return s
 }
+
+func KeysDifference[M ~map[K]V, K comparable, V any](m1, m2 M) set.Set[K] {
+	result := set.New[K]()
+	for key := range m1 {
+		if _, ok := m2[key]; !ok {
+			result.Insert(key)
+		}
+	}
+	return result
+}
