@@ -120,16 +120,18 @@ var _ = Describe("CreateNetworkInterface", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		By("inspecting the load balancer list")
-		Expect(loadBalancers).To(HaveLen(1))
-		loadBalancer := loadBalancers[0]
-		Expect(loadBalancer.NetworkHandle).To(Equal(networkHandle))
-		Expect(loadBalancer.IP).To(Equal(commonv1alpha1.MustParseIP(loadBalancerIP)))
-		Expect(loadBalancer.Ports).To(ConsistOf(machinebrokerv1alpha1.LoadBalancerTargetPort{
-			Protocol: corev1.ProtocolTCP,
-			Port:     80,
-			EndPort:  80,
+		Expect(loadBalancers).To(ConsistOf(machinebrokerv1alpha1.LoadBalancer{
+			NetworkHandle: networkHandle,
+			IP:            commonv1alpha1.MustParseIP(loadBalancerIP),
+			Ports: []machinebrokerv1alpha1.LoadBalancerPort{
+				{
+					Protocol: corev1.ProtocolTCP,
+					Port:     80,
+					EndPort:  80,
+				},
+			},
+			Destinations: []string{networkInterfaceID},
 		}))
-		Expect(loadBalancer.Destinations.Equal(set.New(networkInterfaceID))).To(BeTrue())
 	})
 
 	It("should re-use kubernetes networks and delete them only if no dependents exist", func() {

@@ -14,7 +14,17 @@
 
 package slices
 
-import "github.com/onmetal/controller-utils/set"
+import (
+	"github.com/onmetal/controller-utils/set"
+)
+
+func Map[S ~[]E, E, F any](s S, f func(e E) F) []F {
+	res := make([]F, len(s))
+	for i, e := range s {
+		res[i] = f(e)
+	}
+	return res
+}
 
 func ToMap[S ~[]V, K comparable, V any](s S, f func(v V) K) map[K]V {
 	res := make(map[K]V)

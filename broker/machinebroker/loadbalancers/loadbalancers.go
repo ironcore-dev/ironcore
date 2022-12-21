@@ -18,7 +18,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/onmetal/controller-utils/set"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	"github.com/onmetal/onmetal-api/apiutils/annotations"
@@ -60,9 +59,9 @@ func New(cluster cluster.Cluster) *LoadBalancers {
 
 func (m *LoadBalancers) filterLoadBalancers(
 	loadBalancers []networkingv1alpha1.LoadBalancer,
-	ports []machinebrokerv1alpha1.LoadBalancerTargetPort,
+	ports []machinebrokerv1alpha1.LoadBalancerPort,
 ) []networkingv1alpha1.LoadBalancer {
-	portSet := set.New(ports...)
+	portsKey := machinebrokerv1alpha1.LoadBalancerPortsKey(ports)
 
 	var filtered []networkingv1alpha1.LoadBalancer
 	for _, loadBalancer := range loadBalancers {
@@ -70,8 +69,8 @@ func (m *LoadBalancers) filterLoadBalancers(
 			continue
 		}
 
-		targetPorts := apiutils.ConvertNetworkingLoadBalancerPorts(loadBalancer.Spec.Ports)
-		if !set.New(targetPorts...).Equal(portSet) {
+		targetPorts := apiutils.ConvertNetworkingLoadBalancerPortsToLoadBalancerPorts(loadBalancer.Spec.Ports)
+		if machinebrokerv1alpha1.LoadBalancerPortsKey(targetPorts) != portsKey {
 			continue
 		}
 
@@ -119,16 +118,7 @@ func (m *LoadBalancers) createLoadBalancer(
 	c := cleaner.New()
 	defer cleaner.CleanupOnError(ctx, c, &retErr)
 
-	var ports []networkingv1alpha1.LoadBalancerPort
-	for _, port := range key.target.Ports {
-		protocol := port.Protocol
-		endPort := port.EndPort
-		ports = append(ports, networkingv1alpha1.LoadBalancerPort{
-			Protocol: &protocol,
-			Port:     port.Port,
-			EndPort:  &endPort,
-		})
-	}
+	ports := apiutils.ConvertLoadBalancerPortsToNetworkingLoadBalancerPorts(key.target.Ports)
 
 	loadBalancer := &networkingv1alpha1.LoadBalancer{
 		ObjectMeta: metav1.ObjectMeta{
@@ -303,13 +293,6 @@ func (m *LoadBalancers) Delete(
 	return nil
 }
 
-type LoadBalancer struct {
-	NetworkHandle string
-	IP            commonv1alpha1.IP
-	Ports         []machinebrokerv1alpha1.LoadBalancerTargetPort
-	Destinations  set.Set[string]
-}
-
 func (m *LoadBalancers) listLoadBalancers(ctx context.Context, dependent string) ([]networkingv1alpha1.LoadBalancer, error) {
 	loadBalancerList := &networkingv1alpha1.LoadBalancerList{}
 	if err := m.cluster.Client().List(ctx, loadBalancerList,
@@ -347,7 +330,7 @@ func (m *LoadBalancers) listLoadBalancerRoutings(ctx context.Context) ([]network
 	return loadBalancerRoutingList.Items, nil
 }
 
-func (m *LoadBalancers) List(ctx context.Context) ([]LoadBalancer, error) {
+func (m *LoadBalancers) List(ctx context.Context) ([]machinebrokerv1alpha1.LoadBalancer, error) {
 	loadBalancers, err := m.listLoadBalancers(ctx, "")
 	if err != nil {
 		return nil, err
@@ -364,10 +347,10 @@ func (m *LoadBalancers) List(ctx context.Context) ([]LoadBalancer, error) {
 func (m *LoadBalancers) joinLoadBalancersAndRoutings(
 	loadBalancers []networkingv1alpha1.LoadBalancer,
 	loadBalancerRoutings []networkingv1alpha1.LoadBalancerRouting,
-) []LoadBalancer {
+) []machinebrokerv1alpha1.LoadBalancer {
 	loadBalancerRoutingByName := utils.ObjectSliceToMapByName(loadBalancerRoutings)
 
-	var res []LoadBalancer
+	var res []machinebrokerv1alpha1.LoadBalancer
 	for i := range loadBalancers {
 		loadBalancer := &loadBalancers[i]
 
@@ -386,24 +369,24 @@ func (m *LoadBalancers) joinLoadBalancersAndRoutings(
 			continue
 		}
 
-		destinations := utilslices.ToSetFunc(
+		destinations := utilslices.Map(
 			loadBalancerRouting.Destinations,
 			func(dest commonv1alpha1.LocalUIDReference) string {
 				return dest.Name
 			},
 		)
 
-		res = append(res, LoadBalancer{
+		res = append(res, machinebrokerv1alpha1.LoadBalancer{
 			NetworkHandle: networkHandle,
 			IP:            ip,
-			Ports:         apiutils.ConvertNetworkingLoadBalancerPorts(loadBalancer.Spec.Ports),
+			Ports:         apiutils.ConvertNetworkingLoadBalancerPortsToLoadBalancerPorts(loadBalancer.Spec.Ports),
 			Destinations:  destinations,
 		})
 	}
 	return res
 }
 
-func (m *LoadBalancers) ListByDependent(ctx context.Context, dependent string) ([]LoadBalancer, error) {
+func (m *LoadBalancers) ListByDependent(ctx context.Context, dependent string) ([]machinebrokerv1alpha1.LoadBalancer, error) {
 	loadBalancers, err := m.listLoadBalancers(ctx, dependent)
 	if err != nil {
 		return nil, err

@@ -126,7 +126,7 @@ func (s *Server) convertOnmetalProtocol(protocol corev1.Protocol) (ori.Protocol,
 	}
 }
 
-func (s *Server) convertOnmetalLoadBalancerTargetPort(port machinebrokerv1alpha1.LoadBalancerTargetPort) (*ori.LoadBalancerPort, error) {
+func (s *Server) convertOnmetalLoadBalancerTargetPort(port machinebrokerv1alpha1.LoadBalancerPort) (*ori.LoadBalancerPort, error) {
 	protocol, err := s.convertOnmetalProtocol(port.Protocol)
 	if err != nil {
 		return nil, err
@@ -143,13 +143,13 @@ func (s *Server) convertOnmetalLoadBalancerTargets(loadBalancerTargets []machine
 	res := make([]*ori.LoadBalancerTargetSpec, len(loadBalancerTargets))
 	for i, loadBalancerTarget := range loadBalancerTargets {
 		ports := make([]*ori.LoadBalancerPort, len(loadBalancerTarget.Ports))
-		for _, port := range loadBalancerTarget.Ports {
+		for j, port := range loadBalancerTarget.Ports {
 			p, err := s.convertOnmetalLoadBalancerTargetPort(port)
 			if err != nil {
 				return nil, err
 			}
 
-			ports[i] = p
+			ports[j] = p
 		}
 
 		res[i] = &ori.LoadBalancerTargetSpec{

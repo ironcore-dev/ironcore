@@ -156,10 +156,10 @@ func (m *AliasPrefixes) createAliasPrefix(
 func (m *AliasPrefixes) removeAliasPrefixRoutingDestination(
 	ctx context.Context,
 	aliasPrefixRouting *networkingv1alpha1.AliasPrefixRouting,
-	obj client.Object,
+	networkInterface *networkingv1alpha1.NetworkInterface,
 ) error {
 	idx := slices.IndexFunc(aliasPrefixRouting.Destinations,
-		func(ref commonv1alpha1.LocalUIDReference) bool { return ref.UID == obj.GetUID() },
+		func(ref commonv1alpha1.LocalUIDReference) bool { return ref.UID == networkInterface.UID },
 	)
 	if idx == -1 {
 		return nil
@@ -176,10 +176,10 @@ func (m *AliasPrefixes) removeAliasPrefixRoutingDestination(
 func (m *AliasPrefixes) addAliasPrefixRoutingDestination(
 	ctx context.Context,
 	aliasPrefixRouting *networkingv1alpha1.AliasPrefixRouting,
-	obj client.Object,
+	networkInterface *networkingv1alpha1.NetworkInterface,
 ) error {
 	idx := slices.IndexFunc(aliasPrefixRouting.Destinations,
-		func(ref commonv1alpha1.LocalUIDReference) bool { return ref.UID == obj.GetUID() },
+		func(ref commonv1alpha1.LocalUIDReference) bool { return ref.UID == networkInterface.UID },
 	)
 	if idx >= 0 {
 		return nil
@@ -187,8 +187,8 @@ func (m *AliasPrefixes) addAliasPrefixRoutingDestination(
 
 	base := aliasPrefixRouting.DeepCopy()
 	aliasPrefixRouting.Destinations = append(aliasPrefixRouting.Destinations, commonv1alpha1.LocalUIDReference{
-		Name: obj.GetName(),
-		UID:  obj.GetUID(),
+		Name: networkInterface.Name,
+		UID:  networkInterface.UID,
 	})
 	if err := m.cluster.Client().Patch(ctx, aliasPrefixRouting, client.MergeFrom(base)); err != nil {
 		return fmt.Errorf("error adding alias prefix routing destination: %w", err)
@@ -239,7 +239,12 @@ func (m *AliasPrefixes) Create(
 	return nil
 }
 
-func (m *AliasPrefixes) Delete(ctx context.Context, networkHandle string, prefix commonv1alpha1.IPPrefix, obj client.Object) error {
+func (m *AliasPrefixes) Delete(
+	ctx context.Context,
+	networkHandle string,
+	prefix commonv1alpha1.IPPrefix,
+	networkInterface *networkingv1alpha1.NetworkInterface,
+) error {
 	key := aliasPrefixKey{
 		networkHandle: networkHandle,
 		prefix:        prefix,
@@ -256,10 +261,10 @@ func (m *AliasPrefixes) Delete(ctx context.Context, networkHandle string, prefix
 	}
 
 	var errs []error
-	if err := m.removeAliasPrefixRoutingDestination(ctx, aliasPrefixRouting, obj); err != nil {
+	if err := m.removeAliasPrefixRoutingDestination(ctx, aliasPrefixRouting, networkInterface); err != nil {
 		errs = append(errs, fmt.Errorf("error removing alias prefix routing destination: %w", err))
 	}
-	if err := apiutils.DeleteAndGarbageCollect(ctx, m.cluster.Client(), aliasPrefix, obj.GetName()); err != nil {
+	if err := apiutils.DeleteAndGarbageCollect(ctx, m.cluster.Client(), aliasPrefix, networkInterface.Name); err != nil {
 		errs = append(errs, fmt.Errorf("error deleting / garbage collecting: %w", err))
 	}
 

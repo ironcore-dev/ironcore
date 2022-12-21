@@ -121,6 +121,14 @@ func (r *remoteRuntime) DeleteNetworkInterfacePrefix(ctx context.Context, req *o
 	return r.client.DeleteNetworkInterfacePrefix(ctx, req)
 }
 
+func (r *remoteRuntime) CreateNetworkInterfaceLoadBalancerTarget(ctx context.Context, req *ori.CreateNetworkInterfaceLoadBalancerTargetRequest) (*ori.CreateNetworkInterfaceLoadBalancerTargetResponse, error) {
+	return r.client.CreateNetworkInterfaceLoadBalancerTarget(ctx, req)
+}
+
+func (r *remoteRuntime) DeleteNetworkInterfaceLoadBalancerTarget(ctx context.Context, req *ori.DeleteNetworkInterfaceLoadBalancerTargetRequest) (*ori.DeleteNetworkInterfaceLoadBalancerTargetResponse, error) {
+	return r.client.DeleteNetworkInterfaceLoadBalancerTarget(ctx, req)
+}
+
 func (r *remoteRuntime) ListMachineClasses(ctx context.Context, req *ori.ListMachineClassesRequest) (*ori.ListMachineClassesResponse, error) {
 	return r.client.ListMachineClasses(ctx, req)
 }

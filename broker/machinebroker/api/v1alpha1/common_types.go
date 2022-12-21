@@ -15,6 +15,9 @@
 package v1alpha1
 
 import (
+	"fmt"
+	"sort"
+
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 )
@@ -51,13 +54,38 @@ const (
 	NetworkInterfacePurpose = "network-interface"
 )
 
-type LoadBalancerTarget struct {
-	IP    commonv1alpha1.IP
-	Ports []LoadBalancerTargetPort
-}
-
-type LoadBalancerTargetPort struct {
+type LoadBalancerPort struct {
 	Protocol corev1.Protocol
 	Port     int32
 	EndPort  int32
+}
+
+func (p LoadBalancerPort) Key() string {
+	return fmt.Sprintf("%s:%d-%d", p.Protocol, p.Port, p.EndPort)
+}
+
+func LoadBalancerPortsKey(ports []LoadBalancerPort) string {
+	portKeys := make([]string, len(ports))
+	for i, port := range ports {
+		portKeys[i] = port.Key()
+	}
+	sort.Strings(portKeys)
+	return fmt.Sprintf("%v", portKeys)
+}
+
+type LoadBalancerTarget struct {
+	IP    commonv1alpha1.IP
+	Ports []LoadBalancerPort
+}
+
+func (t LoadBalancerTarget) Key() string {
+	portKeys := LoadBalancerPortsKey(t.Ports)
+	return fmt.Sprintf("%s%s", t.IP, portKeys)
+}
+
+type LoadBalancer struct {
+	NetworkHandle string
+	IP            commonv1alpha1.IP
+	Ports         []LoadBalancerPort
+	Destinations  []string
 }

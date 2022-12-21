@@ -35,6 +35,30 @@ func (s *Server) DeleteNetworkInterface(ctx context.Context, req *ori.DeleteNetw
 		return nil, err
 	}
 
+	log.V(1).Info("Deleting alias prefixes")
+	for _, prefix := range aggOnmetalNetworkInterface.Prefixes {
+		if err := s.aliasPrefixes.Delete(
+			ctx,
+			aggOnmetalNetworkInterface.Network.Spec.Handle,
+			prefix,
+			aggOnmetalNetworkInterface.NetworkInterface,
+		); err != nil {
+			return nil, fmt.Errorf("error deleting prefix %s: %w", prefix, err)
+		}
+	}
+
+	log.V(1).Info("Deleting load balancers")
+	for _, lbTgt := range aggOnmetalNetworkInterface.LoadBalancerTargets {
+		if err := s.loadBalancers.Delete(
+			ctx,
+			aggOnmetalNetworkInterface.Network.Spec.Handle,
+			lbTgt,
+			aggOnmetalNetworkInterface.NetworkInterface,
+		); err != nil {
+			return nil, fmt.Errorf("error deleting load balancer %s: %w", lbTgt.Key(), err)
+		}
+	}
+
 	log.V(1).Info("Deleting onmetal network interface")
 	if err := s.cluster.Client().Delete(ctx, aggOnmetalNetworkInterface.NetworkInterface); err != nil {
 		if !apierrors.IsNotFound(err) {

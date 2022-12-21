@@ -55,32 +55,41 @@ func (s *Server) prepareOnmetalVirtualIP(virtualIPSpec *ori.VirtualIPSpec) (*net
 	return onmetalVirtualIP, nil
 }
 
-func (s *Server) prepareOnmetalLoadBalancerTargets(lbTargets []*ori.LoadBalancerTargetSpec) ([]machinebrokerv1alpha1.LoadBalancerTarget, error) {
-	var res []machinebrokerv1alpha1.LoadBalancerTarget
-	for _, lbTgt := range lbTargets {
-		ip, err := commonv1alpha1.ParseIP(lbTgt.Ip)
+func (s *Server) prepareOnmetalLoadBalancerTarget(lbTgt *ori.LoadBalancerTargetSpec) (*machinebrokerv1alpha1.LoadBalancerTarget, error) {
+	ip, err := commonv1alpha1.ParseIP(lbTgt.Ip)
+	if err != nil {
+		return nil, err
+	}
+
+	var ports []machinebrokerv1alpha1.LoadBalancerPort
+	for _, port := range lbTgt.Ports {
+		protocol, err := s.convertORIProtocol(port.Protocol)
 		if err != nil {
 			return nil, err
 		}
 
-		var ports []machinebrokerv1alpha1.LoadBalancerTargetPort
-		for _, port := range lbTgt.Ports {
-			protocol, err := s.convertORIProtocol(port.Protocol)
-			if err != nil {
-				return nil, err
-			}
+		ports = append(ports, machinebrokerv1alpha1.LoadBalancerPort{
+			Protocol: protocol,
+			Port:     port.Port,
+			EndPort:  port.EndPort,
+		})
+	}
 
-			ports = append(ports, machinebrokerv1alpha1.LoadBalancerTargetPort{
-				Protocol: protocol,
-				Port:     port.Port,
-				EndPort:  port.EndPort,
-			})
+	return &machinebrokerv1alpha1.LoadBalancerTarget{
+		IP:    ip,
+		Ports: ports,
+	}, nil
+}
+
+func (s *Server) prepareOnmetalLoadBalancerTargets(lbTargets []*ori.LoadBalancerTargetSpec) ([]machinebrokerv1alpha1.LoadBalancerTarget, error) {
+	var res []machinebrokerv1alpha1.LoadBalancerTarget
+	for _, lbTgt := range lbTargets {
+		tgt, err := s.prepareOnmetalLoadBalancerTarget(lbTgt)
+		if err != nil {
+			return nil, err
 		}
 
-		res = append(res, machinebrokerv1alpha1.LoadBalancerTarget{
-			IP:    ip,
-			Ports: ports,
-		})
+		res = append(res, *tgt)
 	}
 	return res, nil
 }

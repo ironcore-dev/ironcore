@@ -99,6 +99,20 @@ func SetupAliasPrefixRoutingNetworkRefNameField(ctx context.Context, indexer cli
 	)
 }
 
+const LoadBalancerRoutingNetworkRefNameField = "loadbalancerrouting-networkref-name"
+
+func SetupLoadBalancerRoutingNetworkRefNameField(ctx context.Context, indexer client.FieldIndexer) error {
+	return indexer.IndexField(
+		ctx,
+		&networkingv1alpha1.LoadBalancerRouting{},
+		LoadBalancerRoutingNetworkRefNameField,
+		func(object client.Object) []string {
+			loadBalancerRouting := object.(*networkingv1alpha1.LoadBalancerRouting)
+			return []string{loadBalancerRouting.NetworkRef.Name}
+		},
+	)
+}
+
 const NetworkInterfaceNetworkNameAndHandle = "networkinterface-network-name-and-handle"
 
 func networkInterfaceNetworkNameAndHandle(networkInterface *networkingv1alpha1.NetworkInterface) *string {
