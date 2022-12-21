@@ -44,6 +44,9 @@ service MachineRuntime {
   rpc CreateNetworkInterfaceLoadBalancerTarget(CreateNetworkInterfaceLoadBalancerTargetRequest) returns (CreateNetworkInterfaceLoadBalancerTargetResponse);
   rpc DeleteNetworkInterfaceLoadBalancerTarget(DeleteNetworkInterfaceLoadBalancerTargetRequest) returns (DeleteNetworkInterfaceLoadBalancerTargetResponse);
 
+  rpc CreateNetworkInterfaceNAT(CreateNetworkInterfaceNATRequest) returns (CreateNetworkInterfaceNATResponse);
+  rpc DeleteNetworkInterfaceNAT(DeleteNetworkInterfaceNATRequest) returns (DeleteNetworkInterfaceNATResponse);
+
   rpc ListMachineClasses(ListMachineClassesRequest) returns (ListMachineClassesResponse);
 }
 
@@ -77,6 +80,12 @@ message VirtualIPSpec {
   string ip = 1;
 }
 
+message NATSpec {
+  string ip = 1;
+  int32 port = 2;
+  int32 endPort = 3;
+}
+
 enum Protocol {
   TCP = 0;
   UDP = 1;
@@ -100,6 +109,7 @@ message NetworkInterfaceSpec {
   VirtualIPSpec virtual_ip = 3;
   repeated string prefixes = 4;
   repeated LoadBalancerTargetSpec load_balancer_targets = 5;
+  repeated NATSpec nats = 6;
 }
 
 message NetworkInterface {
@@ -361,6 +371,22 @@ message DeleteNetworkInterfaceLoadBalancerTargetRequest {
 }
 
 message DeleteNetworkInterfaceLoadBalancerTargetResponse {
+}
+
+message CreateNetworkInterfaceNATRequest {
+  string network_interface_id = 1;
+  NATSpec nat = 2;
+}
+
+message CreateNetworkInterfaceNATResponse {
+}
+
+message DeleteNetworkInterfaceNATRequest {
+  string network_interface_id = 1;
+  string nat_ip = 2;
+}
+
+message DeleteNetworkInterfaceNATResponse {
 }
 
 message DeleteNetworkInterfaceVirtualIPRequest {

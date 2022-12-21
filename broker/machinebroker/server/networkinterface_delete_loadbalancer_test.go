@@ -15,21 +15,18 @@
 package server_test
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
-	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
 	"github.com/onmetal/onmetal-api/testutils"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	corev1 "k8s.io/api/core/v1"
 )
 
-var _ = Describe("NetworkInterfaceCreateLoadBalancerTarget", func() {
+var _ = Describe("NetworkInterfaceDeleteLoadBalancer", func() {
 	ctx := testutils.SetupContext()
 	_, srv := SetupTest(ctx)
 
-	It("should correctly create a load balancer target for a network interface", func() {
+	It("should correctly delete a load balancer target for a network interface", func() {
 		By("creating a network interface")
 		res, err := srv.CreateNetworkInterface(ctx, &ori.CreateNetworkInterfaceRequest{
 			NetworkInterface: &ori.NetworkInterface{
@@ -37,6 +34,17 @@ var _ = Describe("NetworkInterfaceCreateLoadBalancerTarget", func() {
 				Spec: &ori.NetworkInterfaceSpec{
 					Network: &ori.NetworkSpec{Handle: "foo"},
 					Ips:     []string{"192.168.178.1"},
+					LoadBalancerTargets: []*ori.LoadBalancerTargetSpec{
+						{
+							Ip: "10.0.0.1",
+							Ports: []*ori.LoadBalancerPort{
+								{
+									Port:    80,
+									EndPort: 8080,
+								},
+							},
+						},
+					},
 				},
 			},
 		})
@@ -44,39 +52,36 @@ var _ = Describe("NetworkInterfaceCreateLoadBalancerTarget", func() {
 
 		By("inspecting the created network interface")
 		networkInterface := res.NetworkInterface
-		Expect(networkInterface.Spec.LoadBalancerTargets).To(BeEmpty())
+		Expect(networkInterface.Spec.LoadBalancerTargets).To(ConsistOf(&ori.LoadBalancerTargetSpec{
+			Ip: "10.0.0.1",
+			Ports: []*ori.LoadBalancerPort{
+				{
+					Port:    80,
+					EndPort: 8080,
+				},
+			},
+		}))
 
-		By("creating a load balancer target for the network interface")
-		_, err = srv.CreateNetworkInterfaceLoadBalancerTarget(ctx, &ori.CreateNetworkInterfaceLoadBalancerTargetRequest{
+		By("deleting the load balancer target")
+		_, err = srv.DeleteNetworkInterfaceLoadBalancerTarget(ctx, &ori.DeleteNetworkInterfaceLoadBalancerTargetRequest{
 			NetworkInterfaceId: networkInterface.Metadata.Id,
 			LoadBalancerTarget: &ori.LoadBalancerTargetSpec{
 				Ip: "10.0.0.1",
 				Ports: []*ori.LoadBalancerPort{
 					{
-						Protocol: ori.Protocol_TCP,
-						Port:     80,
-						EndPort:  80,
+						Port:    80,
+						EndPort: 8080,
 					},
 				},
 			},
 		})
 		Expect(err).NotTo(HaveOccurred())
 
-		By("listing the load balancers for the network interface")
+		By("listing load balancers for the network interface")
 		loadBalancers, err := srv.LoadBalancers().ListByDependent(ctx, networkInterface.Metadata.Id)
 		Expect(err).NotTo(HaveOccurred())
 
-		Expect(loadBalancers).To(ConsistOf(machinebrokerv1alpha1.LoadBalancer{
-			NetworkHandle: "foo",
-			IP:            commonv1alpha1.MustParseIP("10.0.0.1"),
-			Ports: []machinebrokerv1alpha1.LoadBalancerPort{
-				{
-					Protocol: corev1.ProtocolTCP,
-					Port:     80,
-					EndPort:  80,
-				},
-			},
-			Destinations: []string{networkInterface.Metadata.Id},
-		}))
+		By("inspecting the retrieved list")
+		Expect(loadBalancers).To(BeEmpty())
 	})
 })

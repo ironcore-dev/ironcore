@@ -65,7 +65,7 @@ func (m *LoadBalancers) filterLoadBalancers(
 
 	var filtered []networkingv1alpha1.LoadBalancer
 	for _, loadBalancer := range loadBalancers {
-		if loadBalancer.DeletionTimestamp.IsZero() {
+		if !loadBalancer.DeletionTimestamp.IsZero() {
 			continue
 		}
 

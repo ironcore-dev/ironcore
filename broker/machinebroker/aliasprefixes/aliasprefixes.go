@@ -60,7 +60,7 @@ func New(cluster cluster.Cluster) *AliasPrefixes {
 func (m *AliasPrefixes) filterAliasPrefixes(aliasPrefixes []networkingv1alpha1.AliasPrefix) []networkingv1alpha1.AliasPrefix {
 	var filtered []networkingv1alpha1.AliasPrefix
 	for _, aliasPrefix := range aliasPrefixes {
-		if aliasPrefix.DeletionTimestamp.IsZero() {
+		if !aliasPrefix.DeletionTimestamp.IsZero() {
 			continue
 		}
 

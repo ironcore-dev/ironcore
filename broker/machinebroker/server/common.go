@@ -160,6 +160,27 @@ func (s *Server) convertOnmetalLoadBalancerTargets(loadBalancerTargets []machine
 	return res, nil
 }
 
+func (s *Server) convertOnmetalNATGatewayTarget(natGatewayTarget machinebrokerv1alpha1.NATGatewayTarget) (*ori.NATSpec, error) {
+	return &ori.NATSpec{
+		Ip:      natGatewayTarget.IP.String(),
+		Port:    natGatewayTarget.Port,
+		EndPort: natGatewayTarget.EndPort,
+	}, nil
+}
+
+func (s *Server) convertOnmetalNATGatewayTargets(natGatewayTargets []machinebrokerv1alpha1.NATGatewayTarget) ([]*ori.NATSpec, error) {
+	res := make([]*ori.NATSpec, len(natGatewayTargets))
+	for i, natGatewayTarget := range natGatewayTargets {
+		nat, err := s.convertOnmetalNATGatewayTarget(natGatewayTarget)
+		if err != nil {
+			return nil, err
+		}
+
+		res[i] = nat
+	}
+	return res, nil
+}
+
 func (s *Server) getOnmetalIPsIPFamilies(ips []commonv1alpha1.IP) []corev1.IPFamily {
 	res := make([]corev1.IPFamily, len(ips))
 	for i, ip := range ips {

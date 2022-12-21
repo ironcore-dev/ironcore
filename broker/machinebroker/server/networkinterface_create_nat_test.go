@@ -22,14 +22,13 @@ import (
 	"github.com/onmetal/onmetal-api/testutils"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	corev1 "k8s.io/api/core/v1"
 )
 
-var _ = Describe("NetworkInterfaceCreateLoadBalancerTarget", func() {
+var _ = Describe("NetworkInterfaceCreateNAT", func() {
 	ctx := testutils.SetupContext()
 	_, srv := SetupTest(ctx)
 
-	It("should correctly create a load balancer target for a network interface", func() {
+	It("should correctly create nat for a network interface", func() {
 		By("creating a network interface")
 		res, err := srv.CreateNetworkInterface(ctx, &ori.CreateNetworkInterfaceRequest{
 			NetworkInterface: &ori.NetworkInterface{
@@ -44,39 +43,33 @@ var _ = Describe("NetworkInterfaceCreateLoadBalancerTarget", func() {
 
 		By("inspecting the created network interface")
 		networkInterface := res.NetworkInterface
-		Expect(networkInterface.Spec.LoadBalancerTargets).To(BeEmpty())
+		Expect(networkInterface.Spec.Nats).To(BeEmpty())
 
-		By("creating a load balancer target for the network interface")
-		_, err = srv.CreateNetworkInterfaceLoadBalancerTarget(ctx, &ori.CreateNetworkInterfaceLoadBalancerTargetRequest{
+		By("creating a nat gateway target for the network interface")
+		_, err = srv.CreateNetworkInterfaceNAT(ctx, &ori.CreateNetworkInterfaceNATRequest{
 			NetworkInterfaceId: networkInterface.Metadata.Id,
-			LoadBalancerTarget: &ori.LoadBalancerTargetSpec{
-				Ip: "10.0.0.1",
-				Ports: []*ori.LoadBalancerPort{
-					{
-						Protocol: ori.Protocol_TCP,
-						Port:     80,
-						EndPort:  80,
-					},
-				},
+			Nat: &ori.NATSpec{
+				Ip:      "10.0.0.1",
+				Port:    80,
+				EndPort: 8080,
 			},
 		})
 		Expect(err).NotTo(HaveOccurred())
 
-		By("listing the load balancers for the network interface")
-		loadBalancers, err := srv.LoadBalancers().ListByDependent(ctx, networkInterface.Metadata.Id)
+		By("listing the nat gateways for the network interface")
+		nats, err := srv.NATGateways().ListByDependent(ctx, networkInterface.Metadata.Id)
 		Expect(err).NotTo(HaveOccurred())
 
-		Expect(loadBalancers).To(ConsistOf(machinebrokerv1alpha1.LoadBalancer{
+		Expect(nats).To(ConsistOf(machinebrokerv1alpha1.NATGateway{
 			NetworkHandle: "foo",
 			IP:            commonv1alpha1.MustParseIP("10.0.0.1"),
-			Ports: []machinebrokerv1alpha1.LoadBalancerPort{
+			Destinations: []machinebrokerv1alpha1.NATGatewayDestination{
 				{
-					Protocol: corev1.ProtocolTCP,
-					Port:     80,
-					EndPort:  80,
+					ID:      networkInterface.Metadata.Id,
+					Port:    80,
+					EndPort: 8080,
 				},
 			},
-			Destinations: []string{networkInterface.Metadata.Id},
 		}))
 	})
 })

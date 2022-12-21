@@ -18,6 +18,7 @@ import (
 	"github.com/onmetal/onmetal-api/broker/machinebroker/aliasprefixes"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/cluster"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/loadbalancers"
+	"github.com/onmetal/onmetal-api/broker/machinebroker/natgateways"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/networks"
 	"github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	"k8s.io/client-go/rest"
@@ -40,6 +41,7 @@ type Server struct {
 	networks      *networks.Networks
 	aliasPrefixes *aliasprefixes.AliasPrefixes
 	loadBalancers *loadbalancers.LoadBalancers
+	natGateways   *natgateways.NATGateways
 }
 
 type Options struct {
@@ -61,6 +63,7 @@ func New(cfg *rest.Config, namespace string, opts Options) (*Server, error) {
 		networks:      networks.New(c),
 		aliasPrefixes: aliasprefixes.New(c),
 		loadBalancers: loadbalancers.New(c),
+		natGateways:   natgateways.New(c),
 	}, nil
 }
 
@@ -78,4 +81,8 @@ func (s *Server) AliasPrefixes() *aliasprefixes.AliasPrefixes {
 
 func (s *Server) LoadBalancers() *loadbalancers.LoadBalancers {
 	return s.loadBalancers
+}
+
+func (s *Server) NATGateways() *natgateways.NATGateways {
+	return s.natGateways
 }

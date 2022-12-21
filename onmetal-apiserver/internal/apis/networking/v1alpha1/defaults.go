@@ -20,6 +20,7 @@ import (
 	"github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/utils/pointer"
 )
 
 var (
@@ -75,5 +76,11 @@ func SetDefaults_NetworkInterfaceStatus(status *v1alpha1.NetworkInterfaceStatus)
 	}
 	if status.Phase == "" {
 		status.Phase = v1alpha1.NetworkInterfacePhaseUnbound
+	}
+}
+
+func SetDefaults_NATGatewaySpec(spec *v1alpha1.NATGatewaySpec) {
+	if spec.PortsPerNetworkInterface == nil {
+		spec.PortsPerNetworkInterface = pointer.Int32(64)
 	}
 }

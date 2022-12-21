@@ -293,7 +293,7 @@ var _ = Describe("MachineController", func() {
 		loadBalancer := &networkingv1alpha1.LoadBalancer{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
-				GenerateName: "aliasprefix-",
+				GenerateName: "loadbalancer-",
 			},
 			Spec: networkingv1alpha1.LoadBalancerSpec{
 				Type:       networkingv1alpha1.LoadBalancerTypePublic,
@@ -338,6 +338,106 @@ var _ = Describe("MachineController", func() {
 						EndPort:  80,
 					},
 				},
+			}))
+		}).Should(Succeed())
+	})
+
+	It("should correctly reconcile nats", func() {
+		By("creating a network")
+		network := &networkingv1alpha1.Network{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "network-",
+			},
+			Spec: networkingv1alpha1.NetworkSpec{
+				Handle: "foo",
+			},
+		}
+		Expect(k8sClient.Create(ctx, network)).To(Succeed())
+
+		By("patching the network to be available")
+		baseNetwork := network.DeepCopy()
+		network.Status.State = networkingv1alpha1.NetworkStateAvailable
+		Expect(k8sClient.Status().Patch(ctx, network, client.MergeFrom(baseNetwork))).To(Succeed())
+
+		By("creating a machine")
+		machine := &computev1alpha1.Machine{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "machine-",
+			},
+			Spec: computev1alpha1.MachineSpec{
+				MachineClassRef: corev1.LocalObjectReference{Name: mc.Name},
+				MachinePoolRef:  &corev1.LocalObjectReference{Name: mp.Name},
+				NetworkInterfaces: []computev1alpha1.NetworkInterface{
+					{
+						Name: "primary",
+						NetworkInterfaceSource: computev1alpha1.NetworkInterfaceSource{
+							Ephemeral: &computev1alpha1.EphemeralNetworkInterfaceSource{
+								NetworkInterfaceTemplate: &networkingv1alpha1.NetworkInterfaceTemplateSpec{
+									ObjectMeta: metav1.ObjectMeta{
+										Labels: map[string]string{"foo": "bar"},
+									},
+									Spec: networkingv1alpha1.NetworkInterfaceSpec{
+										NetworkRef: corev1.LocalObjectReference{Name: network.Name},
+										IPs: []networkingv1alpha1.IPSource{
+											{Value: commonv1alpha1.MustParseNewIP("192.168.178.1")},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+
+		By("creating a nat gateway targeting the network interface")
+		natGateway := &networkingv1alpha1.NATGateway{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "natgateway-",
+			},
+			Spec: networkingv1alpha1.NATGatewaySpec{
+				Type:       networkingv1alpha1.NATGatewayTypePublic,
+				IPFamilies: []corev1.IPFamily{corev1.IPv4Protocol},
+				NetworkRef: corev1.LocalObjectReference{Name: network.Name},
+				IPs:        []networkingv1alpha1.NATGatewayIP{{Name: "primary"}},
+				NetworkInterfaceSelector: &metav1.LabelSelector{
+					MatchLabels: map[string]string{"foo": "bar"},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, natGateway)).To(Succeed())
+
+		By("adding an ip to the nat gateway")
+		baseNATGateway := natGateway.DeepCopy()
+		natGateway.Status.IPs = []networkingv1alpha1.NATGatewayIPStatus{
+			{
+				Name: "primary",
+				IP:   commonv1alpha1.MustParseIP("10.0.0.1"),
+			},
+		}
+		Expect(k8sClient.Status().Patch(ctx, natGateway, client.MergeFrom(baseNATGateway))).To(Succeed())
+
+		By("waiting for the runtime to report the machine and network interface")
+		Eventually(func(g Gomega) {
+			g.Expect(srv.Machines).To(HaveLen(1))
+			g.Expect(srv.NetworkInterfaces).To(HaveLen(1))
+
+			_, oriMachine := GetSingleMapEntry(srv.Machines)
+			_, oriNetworkInterface := GetSingleMapEntry(srv.NetworkInterfaces)
+
+			g.Expect(oriMachine.Spec.NetworkInterfaces).To(ConsistOf(&ori.NetworkInterfaceAttachment{
+				Name:               "primary",
+				NetworkInterfaceId: oriNetworkInterface.Metadata.Id,
+			}))
+
+			g.Expect(oriNetworkInterface.Spec.Nats).To(ConsistOf(&ori.NATSpec{
+				Ip:      "10.0.0.1",
+				Port:    1024,
+				EndPort: 1087,
 			}))
 		}).Should(Succeed())
 	})
