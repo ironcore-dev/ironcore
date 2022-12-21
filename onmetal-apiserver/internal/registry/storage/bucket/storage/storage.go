@@ -16,6 +16,7 @@ package storage
 
 import (
 	"context"
+
 	"github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis/storage"
 	"github.com/onmetal/onmetal-api/onmetal-apiserver/internal/registry/storage/bucket"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
