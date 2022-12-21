@@ -22,27 +22,27 @@ import (
 )
 
 var (
-	// VolumeClassFinalizer is the finalizer for VolumeClass.
-	VolumeClassFinalizer = SchemeGroupVersion.Group + "/volumeclass"
+	// BucketClassFinalizer is the finalizer for BucketClass.
+	BucketClassFinalizer = SchemeGroupVersion.Group + "/bucketclass"
 )
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +genclient
 // +genclient:nonNamespaced
 
-// VolumeClass is the Schema for the volumeclasses API
-type VolumeClass struct {
+// BucketClass is the Schema for the bucketclasses API
+type BucketClass struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-	// Capabilities describes the capabilities of a VolumeClass.
+	// Capabilities describes the capabilities of a BucketClass.
 	Capabilities corev1.ResourceList `json:"capabilities,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// VolumeClassList contains a list of VolumeClass
-type VolumeClassList struct {
+// BucketClassList contains a list of BucketClass
+type BucketClassList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []VolumeClass `json:"items"`
+	Items           []BucketClass `json:"items"`
 }
