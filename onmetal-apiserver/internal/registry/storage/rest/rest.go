@@ -18,6 +18,9 @@ import (
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	"github.com/onmetal/onmetal-api/onmetal-apiserver/internal/api"
 	"github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis/storage"
+	bucketstorage "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/registry/storage/bucket/storage"
+	bucketclassstore "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/registry/storage/bucketclass/storage"
+	bucketpoolstorage "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/registry/storage/bucketpool/storage"
 	volumestorage "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/registry/storage/volume/storage"
 	volumeclassstore "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/registry/storage/volumeclass/storage"
 	volumepoolstorage "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/registry/storage/volumepool/storage"
@@ -75,6 +78,29 @@ func (p StorageProvider) v1alpha1Storage(restOptionsGetter generic.RESTOptionsGe
 
 	storageMap["volumes"] = volumeStorage.Volume
 	storageMap["volumes/status"] = volumeStorage.Status
+
+	bucketClassStorage, err := bucketclassstore.NewStorage(restOptionsGetter)
+	if err != nil {
+		return storageMap, err
+	}
+
+	storageMap["bucketclasses"] = bucketClassStorage.BucketClass
+
+	bucketPoolStorage, err := bucketpoolstorage.NewStorage(restOptionsGetter)
+	if err != nil {
+		return storageMap, err
+	}
+
+	storageMap["bucketpools"] = bucketPoolStorage.BucketPool
+	storageMap["bucketpools/status"] = bucketPoolStorage.Status
+
+	bucketStorage, err := bucketstorage.NewStorage(restOptionsGetter)
+	if err != nil {
+		return storageMap, err
+	}
+
+	storageMap["buckets"] = bucketStorage.Bucket
+	storageMap["buckets/status"] = bucketStorage.Status
 
 	return storageMap, nil
 }

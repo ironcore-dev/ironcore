@@ -17,6 +17,22 @@
 
 package v1alpha1
 
+// BucketListerExpansion allows custom methods to be added to
+// BucketLister.
+type BucketListerExpansion interface{}
+
+// BucketNamespaceListerExpansion allows custom methods to be added to
+// BucketNamespaceLister.
+type BucketNamespaceListerExpansion interface{}
+
+// BucketClassListerExpansion allows custom methods to be added to
+// BucketClassLister.
+type BucketClassListerExpansion interface{}
+
+// BucketPoolListerExpansion allows custom methods to be added to
+// BucketPoolLister.
+type BucketPoolListerExpansion interface{}
+
 // VolumeListerExpansion allows custom methods to be added to
 // VolumeLister.
 type VolumeListerExpansion interface{}

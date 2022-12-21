@@ -50,6 +50,12 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&VolumePoolList{},
 		&Volume{},
 		&VolumeList{},
+		&BucketClass{},
+		&BucketClassList{},
+		&BucketPool{},
+		&BucketPoolList{},
+		&Bucket{},
+		&BucketList{},
 	)
 	return nil
 }

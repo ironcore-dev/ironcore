@@ -190,6 +190,26 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &applyconfigurationsnetworkingv1alpha1.VirtualIPTemplateSpecApplyConfiguration{}
 
 		// Group=storage.api.onmetal.de, Version=v1alpha1
+	case storagev1alpha1.SchemeGroupVersion.WithKind("Bucket"):
+		return &applyconfigurationsstoragev1alpha1.BucketApplyConfiguration{}
+	case storagev1alpha1.SchemeGroupVersion.WithKind("BucketAccess"):
+		return &applyconfigurationsstoragev1alpha1.BucketAccessApplyConfiguration{}
+	case storagev1alpha1.SchemeGroupVersion.WithKind("BucketClass"):
+		return &applyconfigurationsstoragev1alpha1.BucketClassApplyConfiguration{}
+	case storagev1alpha1.SchemeGroupVersion.WithKind("BucketCondition"):
+		return &applyconfigurationsstoragev1alpha1.BucketConditionApplyConfiguration{}
+	case storagev1alpha1.SchemeGroupVersion.WithKind("BucketPool"):
+		return &applyconfigurationsstoragev1alpha1.BucketPoolApplyConfiguration{}
+	case storagev1alpha1.SchemeGroupVersion.WithKind("BucketPoolCondition"):
+		return &applyconfigurationsstoragev1alpha1.BucketPoolConditionApplyConfiguration{}
+	case storagev1alpha1.SchemeGroupVersion.WithKind("BucketPoolSpec"):
+		return &applyconfigurationsstoragev1alpha1.BucketPoolSpecApplyConfiguration{}
+	case storagev1alpha1.SchemeGroupVersion.WithKind("BucketPoolStatus"):
+		return &applyconfigurationsstoragev1alpha1.BucketPoolStatusApplyConfiguration{}
+	case storagev1alpha1.SchemeGroupVersion.WithKind("BucketSpec"):
+		return &applyconfigurationsstoragev1alpha1.BucketSpecApplyConfiguration{}
+	case storagev1alpha1.SchemeGroupVersion.WithKind("BucketStatus"):
+		return &applyconfigurationsstoragev1alpha1.BucketStatusApplyConfiguration{}
 	case storagev1alpha1.SchemeGroupVersion.WithKind("Volume"):
 		return &applyconfigurationsstoragev1alpha1.VolumeApplyConfiguration{}
 	case storagev1alpha1.SchemeGroupVersion.WithKind("VolumeAccess"):

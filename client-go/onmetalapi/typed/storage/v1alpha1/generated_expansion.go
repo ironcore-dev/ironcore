@@ -17,6 +17,12 @@
 
 package v1alpha1
 
+type BucketExpansion interface{}
+
+type BucketClassExpansion interface{}
+
+type BucketPoolExpansion interface{}
+
 type VolumeExpansion interface{}
 
 type VolumeClassExpansion interface{}

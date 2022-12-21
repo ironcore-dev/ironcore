@@ -27,6 +27,9 @@ import (
 
 type StorageV1alpha1Interface interface {
 	RESTClient() rest.Interface
+	BucketsGetter
+	BucketClassesGetter
+	BucketPoolsGetter
 	VolumesGetter
 	VolumeClassesGetter
 	VolumePoolsGetter
@@ -35,6 +38,18 @@ type StorageV1alpha1Interface interface {
 // StorageV1alpha1Client is used to interact with features provided by the storage.api.onmetal.de group.
 type StorageV1alpha1Client struct {
 	restClient rest.Interface
+}
+
+func (c *StorageV1alpha1Client) Buckets(namespace string) BucketInterface {
+	return newBuckets(c, namespace)
+}
+
+func (c *StorageV1alpha1Client) BucketClasses() BucketClassInterface {
+	return newBucketClasses(c)
+}
+
+func (c *StorageV1alpha1Client) BucketPools() BucketPoolInterface {
+	return newBucketPools(c)
 }
 
 func (c *StorageV1alpha1Client) Volumes(namespace string) VolumeInterface {

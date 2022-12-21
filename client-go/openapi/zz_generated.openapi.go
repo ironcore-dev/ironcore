@@ -116,6 +116,20 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.VirtualIPSpec":                schema_onmetal_api_api_networking_v1alpha1_VirtualIPSpec(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.VirtualIPStatus":              schema_onmetal_api_api_networking_v1alpha1_VirtualIPStatus(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.VirtualIPTemplateSpec":        schema_onmetal_api_api_networking_v1alpha1_VirtualIPTemplateSpec(ref),
+		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.Bucket":                          schema_onmetal_api_api_storage_v1alpha1_Bucket(ref),
+		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketAccess":                    schema_onmetal_api_api_storage_v1alpha1_BucketAccess(ref),
+		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketClass":                     schema_onmetal_api_api_storage_v1alpha1_BucketClass(ref),
+		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketClassList":                 schema_onmetal_api_api_storage_v1alpha1_BucketClassList(ref),
+		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketCondition":                 schema_onmetal_api_api_storage_v1alpha1_BucketCondition(ref),
+		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketList":                      schema_onmetal_api_api_storage_v1alpha1_BucketList(ref),
+		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketPool":                      schema_onmetal_api_api_storage_v1alpha1_BucketPool(ref),
+		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketPoolCondition":             schema_onmetal_api_api_storage_v1alpha1_BucketPoolCondition(ref),
+		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketPoolList":                  schema_onmetal_api_api_storage_v1alpha1_BucketPoolList(ref),
+		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketPoolSpec":                  schema_onmetal_api_api_storage_v1alpha1_BucketPoolSpec(ref),
+		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketPoolStatus":                schema_onmetal_api_api_storage_v1alpha1_BucketPoolStatus(ref),
+		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketSpec":                      schema_onmetal_api_api_storage_v1alpha1_BucketSpec(ref),
+		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketStatus":                    schema_onmetal_api_api_storage_v1alpha1_BucketStatus(ref),
+		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketTemplateSpec":              schema_onmetal_api_api_storage_v1alpha1_BucketTemplateSpec(ref),
 		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.Volume":                          schema_onmetal_api_api_storage_v1alpha1_Volume(ref),
 		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.VolumeAccess":                    schema_onmetal_api_api_storage_v1alpha1_VolumeAccess(ref),
 		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.VolumeClass":                     schema_onmetal_api_api_storage_v1alpha1_VolumeClass(ref),
@@ -3909,6 +3923,697 @@ func schema_onmetal_api_api_networking_v1alpha1_VirtualIPTemplateSpec(ref common
 		},
 		Dependencies: []string{
 			"github.com/onmetal/onmetal-api/api/networking/v1alpha1.VirtualIPSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_onmetal_api_api_storage_v1alpha1_Bucket(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "Bucket is the Schema for the buckets API",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketSpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketStatus"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketSpec", "github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_onmetal_api_api_storage_v1alpha1_BucketAccess(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BucketAccess represents information on how to access a bucket.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"secretRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SecretRef references the Secret containing the access credentials to consume a Bucket.",
+							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
+						},
+					},
+					"endpoint": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Endpoint defines address of the Bucket REST-API.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"endpoint"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/api/core/v1.LocalObjectReference"},
+	}
+}
+
+func schema_onmetal_api_api_storage_v1alpha1_BucketClass(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BucketClass is the Schema for the bucketclasses API",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"capabilities": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Capabilities describes the capabilities of a BucketClass.",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/api/resource.Quantity", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_onmetal_api_api_storage_v1alpha1_BucketClassList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BucketClassList contains a list of BucketClass",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketClass"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketClass", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_onmetal_api_api_storage_v1alpha1_BucketCondition(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BucketCondition is one of the conditions of a bucket.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Type is the type of the condition.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Status is the status of the condition.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"reason": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Reason is a machine-readable indication of why the condition is in a certain state.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"message": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Message is a human-readable explanation of why the condition has a certain reason / state.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"observedGeneration": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ObservedGeneration represents the .metadata.generation that the condition was set based upon.",
+							Type:        []string{"integer"},
+							Format:      "int64",
+						},
+					},
+					"lastTransitionTime": {
+						SchemaProps: spec.SchemaProps{
+							Description: "LastTransitionTime is the last time the status of a condition has transitioned from one state to another.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
+						},
+					},
+				},
+				Required: []string{"type", "status"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+	}
+}
+
+func schema_onmetal_api_api_storage_v1alpha1_BucketList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BucketList contains a list of Bucket",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/api/storage/v1alpha1.Bucket"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/api/storage/v1alpha1.Bucket", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_onmetal_api_api_storage_v1alpha1_BucketPool(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BucketPool is the Schema for the bucketpools API",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketPoolSpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketPoolStatus"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketPoolSpec", "github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketPoolStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_onmetal_api_api_storage_v1alpha1_BucketPoolCondition(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BucketPoolCondition is one of the conditions of a bucket.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Type is the type of the condition.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Status is the status of the condition.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"reason": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Reason is a machine-readable indication of why the condition is in a certain state.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"message": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Message is a human-readable explanation of why the condition has a certain reason / state.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"observedGeneration": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ObservedGeneration represents the .metadata.generation that the condition was set based upon.",
+							Type:        []string{"integer"},
+							Format:      "int64",
+						},
+					},
+					"lastTransitionTime": {
+						SchemaProps: spec.SchemaProps{
+							Description: "LastTransitionTime is the last time the status of a condition has transitioned from one state to another.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
+						},
+					},
+				},
+				Required: []string{"type", "status", "reason", "message"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+	}
+}
+
+func schema_onmetal_api_api_storage_v1alpha1_BucketPoolList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BucketPoolList contains a list of BucketPool",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketPool"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketPool", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_onmetal_api_api_storage_v1alpha1_BucketPoolSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BucketPoolSpec defines the desired state of BucketPool",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"providerID": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ProviderID identifies the BucketPool on provider side.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"taints": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Taints of the BucketPool. Only Buckets who tolerate all the taints will land in the BucketPool.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/api/common/v1alpha1.Taint"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"providerID"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/api/common/v1alpha1.Taint"},
+	}
+}
+
+func schema_onmetal_api_api_storage_v1alpha1_BucketPoolStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BucketPoolStatus defines the observed state of BucketPool",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"state": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"conditions": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketPoolCondition"),
+									},
+								},
+							},
+						},
+					},
+					"availableBucketClasses": {
+						SchemaProps: spec.SchemaProps{
+							Description: "AvailableBucketClasses list the references of any supported BucketClass of this pool",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/api/core/v1.LocalObjectReference"),
+									},
+								},
+							},
+						},
+					},
+					"available": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Available list the available capacity of a BucketPool.",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
+									},
+								},
+							},
+						},
+					},
+					"used": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Used indicates how much capacity has been used in a BucketPool.",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketPoolCondition", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/api/resource.Quantity"},
+	}
+}
+
+func schema_onmetal_api_api_storage_v1alpha1_BucketSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BucketSpec defines the desired state of Bucket",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"bucketClassRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "BucketClassRef is the BucketClass of a bucket If empty, an external controller has to provision the bucket.",
+							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
+						},
+					},
+					"bucketPoolSelector": {
+						SchemaProps: spec.SchemaProps{
+							Description: "BucketPoolSelector selects a suitable BucketPoolRef by the given labels.",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"bucketPoolRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "BucketPoolRef indicates which BucketPool to use for a bucket. If unset, the scheduler will figure out a suitable BucketPoolRef.",
+							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
+						},
+					},
+					"tolerations": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Tolerations define tolerations the Bucket has. Only any BucketPool whose taints covered by Tolerations will be considered to host the Bucket.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration", "k8s.io/api/core/v1.LocalObjectReference"},
+	}
+}
+
+func schema_onmetal_api_api_storage_v1alpha1_BucketStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BucketStatus defines the observed state of Bucket",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"state": {
+						SchemaProps: spec.SchemaProps{
+							Description: "State represents the infrastructure state of a Bucket.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"lastStateTransitionTime": {
+						SchemaProps: spec.SchemaProps{
+							Description: "LastStateTransitionTime is the last time the State transitioned between values.",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
+						},
+					},
+					"access": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Access specifies how to access a Bucket. This is set by the bucket provider when the bucket is provisioned.",
+							Ref:         ref("github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketAccess"),
+						},
+					},
+					"conditions": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Conditions are the conditions of a bucket.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketCondition"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketAccess", "github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketCondition", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+	}
+}
+
+func schema_onmetal_api_api_storage_v1alpha1_BucketTemplateSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BucketTemplateSpec is the specification of a Bucket template.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketSpec"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 
