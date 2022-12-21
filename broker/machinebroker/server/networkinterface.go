@@ -20,16 +20,18 @@ import (
 
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/apiutils"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 type AggregateOnmetalNetworkInterface struct {
-	NetworkInterface *networkingv1alpha1.NetworkInterface
-	Network          *networkingv1alpha1.Network
-	VirtualIP        *networkingv1alpha1.VirtualIP
-	Prefixes         []commonv1alpha1.IPPrefix
+	NetworkInterface    *networkingv1alpha1.NetworkInterface
+	Network             *networkingv1alpha1.Network
+	VirtualIP           *networkingv1alpha1.VirtualIP
+	Prefixes            []commonv1alpha1.IPPrefix
+	LoadBalancerTargets []machinebrokerv1alpha1.LoadBalancerTarget
 }
 
 func (s *Server) convertAggregateOnmetalNetworkInterface(networkInterface *AggregateOnmetalNetworkInterface) (*ori.NetworkInterface, error) {
@@ -50,14 +52,21 @@ func (s *Server) convertAggregateOnmetalNetworkInterface(networkInterface *Aggre
 		}
 	}
 
+	loadBalancerTargets, err := s.convertOnmetalLoadBalancerTargets(networkInterface.LoadBalancerTargets)
+	if err != nil {
+		return nil, err
+	}
+
 	return &ori.NetworkInterface{
 		Metadata: metadata,
 		Spec: &ori.NetworkInterfaceSpec{
 			Network: &ori.NetworkSpec{
 				Handle: networkInterface.Network.Spec.Handle,
 			},
-			Ips:       ips,
-			VirtualIp: virtualIPSpec,
+			Ips:                 ips,
+			VirtualIp:           virtualIPSpec,
+			Prefixes:            s.convertOnmetalPrefixes(networkInterface.Prefixes),
+			LoadBalancerTargets: loadBalancerTargets,
 		},
 	}, nil
 }

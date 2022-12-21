@@ -22,14 +22,43 @@ import (
 
 	"github.com/onmetal/controller-utils/metautils"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
 	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
 	"golang.org/x/exp/slices"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
+
+func ConvertNetworkingLoadBalancerPort(port networkingv1alpha1.LoadBalancerPort) machinebrokerv1alpha1.LoadBalancerTargetPort {
+	protocol := port.Protocol
+	if protocol == nil {
+		tcpProtocol := corev1.ProtocolTCP
+		protocol = &tcpProtocol
+	}
+
+	endPort := port.EndPort
+	if endPort == nil {
+		endPort = &port.Port
+	}
+
+	return machinebrokerv1alpha1.LoadBalancerTargetPort{
+		Protocol: *protocol,
+		Port:     port.Port,
+		EndPort:  *endPort,
+	}
+}
+
+func ConvertNetworkingLoadBalancerPorts(ports []networkingv1alpha1.LoadBalancerPort) []machinebrokerv1alpha1.LoadBalancerTargetPort {
+	res := make([]machinebrokerv1alpha1.LoadBalancerTargetPort, len(ports))
+	for i, port := range ports {
+		res[i] = ConvertNetworkingLoadBalancerPort(port)
+	}
+	return res
+}
 
 func GetObjectMetadata(o metav1.Object) (*orimeta.ObjectMetadata, error) {
 	annotations, err := GetAnnotationsAnnotation(o)
@@ -154,26 +183,49 @@ func GetAnnotationsAnnotation(o metav1.Object) (map[string]string, error) {
 	return annotations, nil
 }
 
+var (
+	ipAndPrefixReplacer        = strings.NewReplacer("/", "-", ":", "_")
+	reverseIPAndPrefixReplacer = strings.NewReplacer("-", "/", "_", ":")
+)
+
 func SetNetworkHandle(o metav1.Object, handle string) {
 	metautils.SetLabel(o, machinebrokerv1alpha1.NetworkHandleLabel, handle)
 }
 
 func EscapePrefix(prefix commonv1alpha1.IPPrefix) string {
-	return strings.NewReplacer("/", "-").Replace(prefix.String())
+	return ipAndPrefixReplacer.Replace(prefix.String())
 }
 
 func UnescapePrefix(escapedPrefix string) (commonv1alpha1.IPPrefix, error) {
-	unescaped := strings.NewReplacer("-", "/").Replace(escapedPrefix)
+	unescaped := reverseIPAndPrefixReplacer.Replace(escapedPrefix)
 	return commonv1alpha1.ParseIPPrefix(unescaped)
 }
 
-func SetPrefix(o metav1.Object, prefix commonv1alpha1.IPPrefix) {
+func SetPrefixLabel(o metav1.Object, prefix commonv1alpha1.IPPrefix) {
 	metautils.SetLabel(o, machinebrokerv1alpha1.PrefixLabel, EscapePrefix(prefix))
 }
 
-func GetPrefix(o metav1.Object) (commonv1alpha1.IPPrefix, error) {
+func GetPrefixLabel(o metav1.Object) (commonv1alpha1.IPPrefix, error) {
 	escapedPrefix := o.GetLabels()[machinebrokerv1alpha1.PrefixLabel]
 	return UnescapePrefix(escapedPrefix)
+}
+
+func EscapeIP(ip commonv1alpha1.IP) string {
+	return ipAndPrefixReplacer.Replace(ip.String())
+}
+
+func UnescapeIP(escaped string) (commonv1alpha1.IP, error) {
+	unescaped := reverseIPAndPrefixReplacer.Replace(escaped)
+	return commonv1alpha1.ParseIP(unescaped)
+}
+
+func SetIPLabel(o metav1.Object, ip commonv1alpha1.IP) {
+	metautils.SetLabel(o, machinebrokerv1alpha1.IPLabel, EscapeIP(ip))
+}
+
+func GetIPLabel(o metav1.Object) (commonv1alpha1.IP, error) {
+	escaped := o.GetLabels()[machinebrokerv1alpha1.IPLabel]
+	return UnescapeIP(escaped)
 }
 
 func SetManagerLabel(o metav1.Object, manager string) {

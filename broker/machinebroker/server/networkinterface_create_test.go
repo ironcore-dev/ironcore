@@ -15,14 +15,17 @@
 package server_test
 
 import (
+	"github.com/onmetal/controller-utils/set"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/apiutils"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
 	"github.com/onmetal/onmetal-api/testutils"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -34,10 +37,11 @@ var _ = Describe("CreateNetworkInterface", func() {
 	It("should correctly create a network interface", func() {
 		By("creating a network interface")
 		const (
-			ip            = "192.168.178.1"
-			prefix        = "192.168.178.1/24"
-			virtualIP     = "10.0.0.1"
-			networkHandle = "foo"
+			ip             = "192.168.178.1"
+			prefix         = "192.168.178.1/24"
+			virtualIP      = "10.0.0.1"
+			loadBalancerIP = "10.0.0.2"
+			networkHandle  = "foo"
 		)
 		res, err := srv.CreateNetworkInterface(ctx, &ori.CreateNetworkInterfaceRequest{
 			NetworkInterface: &ori.NetworkInterface{
@@ -49,14 +53,28 @@ var _ = Describe("CreateNetworkInterface", func() {
 					Ips:       []string{ip},
 					VirtualIp: &ori.VirtualIPSpec{Ip: virtualIP},
 					Prefixes:  []string{prefix},
+					LoadBalancerTargets: []*ori.LoadBalancerTargetSpec{
+						{
+							Ip: loadBalancerIP,
+							Ports: []*ori.LoadBalancerPort{
+								{
+									Protocol: ori.Protocol_TCP,
+									Port:     80,
+									EndPort:  80,
+								},
+							},
+						},
+					},
 				},
 			},
 		})
 		Expect(err).NotTo(HaveOccurred())
+		networkInterface := res.NetworkInterface
+		networkInterfaceID := networkInterface.Metadata.Id
 
 		By("inspecting the kubernetes network interface")
 		k8sNetworkInterface := &networkingv1alpha1.NetworkInterface{}
-		k8sNetworkInterfaceKey := client.ObjectKey{Namespace: ns.Name, Name: res.NetworkInterface.Metadata.Id}
+		k8sNetworkInterfaceKey := client.ObjectKey{Namespace: ns.Name, Name: networkInterfaceID}
 		Expect(k8sClient.Get(ctx, k8sNetworkInterfaceKey, k8sNetworkInterface)).To(Succeed())
 
 		Expect(k8sNetworkInterface.Spec.IPs).To(Equal([]networkingv1alpha1.IPSource{
@@ -71,7 +89,7 @@ var _ = Describe("CreateNetworkInterface", func() {
 		Expect(k8sClient.Get(ctx, k8sNetworkKey, k8sNetwork)).To(Succeed())
 
 		By("inspecting the referenced kubernetes network")
-		Expect(apiutils.GetDependents(k8sNetwork)).To(ContainElement(res.NetworkInterface.Metadata.Id))
+		Expect(apiutils.GetDependents(k8sNetwork)).To(ContainElement(networkInterfaceID))
 		Expect(k8sNetwork.Spec.Handle).To(Equal(networkHandle))
 
 		By("inspecting the virtual ip reference")
@@ -86,12 +104,32 @@ var _ = Describe("CreateNetworkInterface", func() {
 		By("inspecting the referenced kubernetes virtual ip")
 		Expect(k8sVirtualIP.Status.IP).To(Equal(commonv1alpha1.MustParseNewIP(virtualIP)))
 
-		By("listing all kubernetes alias prefixes")
-		k8sAliasPrefixList := &networkingv1alpha1.AliasPrefixList{}
-		Expect(k8sClient.List(ctx, k8sAliasPrefixList, client.InNamespace(ns.Name))).To(Succeed())
+		By("listing alias prefixes for network interface")
+		aliasPrefixes, err := srv.AliasPrefixes().ListByDependent(ctx, networkInterfaceID)
+		Expect(err).NotTo(HaveOccurred())
 
-		By("inspecting the list of kubernetes alias prefixes")
-		Expect(k8sAliasPrefixList.Items).ShouldNot(BeEmpty())
+		By("inspecting the alias prefix list")
+		Expect(aliasPrefixes).To(HaveLen(1))
+		aliasPrefix := aliasPrefixes[0]
+		Expect(aliasPrefix.NetworkHandle).To(Equal(networkHandle))
+		Expect(aliasPrefix.Prefix).To(Equal(commonv1alpha1.MustParseIPPrefix(prefix)))
+		Expect(aliasPrefix.Destinations.Equal(set.New(networkInterfaceID))).To(BeTrue())
+
+		By("listing load balancers for network interface")
+		loadBalancers, err := srv.LoadBalancers().ListByDependent(ctx, networkInterfaceID)
+		Expect(err).NotTo(HaveOccurred())
+
+		By("inspecting the load balancer list")
+		Expect(loadBalancers).To(HaveLen(1))
+		loadBalancer := loadBalancers[0]
+		Expect(loadBalancer.NetworkHandle).To(Equal(networkHandle))
+		Expect(loadBalancer.IP).To(Equal(commonv1alpha1.MustParseIP(loadBalancerIP)))
+		Expect(loadBalancer.Ports).To(ConsistOf(machinebrokerv1alpha1.LoadBalancerTargetPort{
+			Protocol: corev1.ProtocolTCP,
+			Port:     80,
+			EndPort:  80,
+		}))
+		Expect(loadBalancer.Destinations.Equal(set.New(networkInterfaceID))).To(BeTrue())
 	})
 
 	It("should re-use kubernetes networks and delete them only if no dependents exist", func() {

@@ -55,6 +55,36 @@ func (s *Server) prepareOnmetalVirtualIP(virtualIPSpec *ori.VirtualIPSpec) (*net
 	return onmetalVirtualIP, nil
 }
 
+func (s *Server) prepareOnmetalLoadBalancerTargets(lbTargets []*ori.LoadBalancerTargetSpec) ([]machinebrokerv1alpha1.LoadBalancerTarget, error) {
+	var res []machinebrokerv1alpha1.LoadBalancerTarget
+	for _, lbTgt := range lbTargets {
+		ip, err := commonv1alpha1.ParseIP(lbTgt.Ip)
+		if err != nil {
+			return nil, err
+		}
+
+		var ports []machinebrokerv1alpha1.LoadBalancerTargetPort
+		for _, port := range lbTgt.Ports {
+			protocol, err := s.convertORIProtocol(port.Protocol)
+			if err != nil {
+				return nil, err
+			}
+
+			ports = append(ports, machinebrokerv1alpha1.LoadBalancerTargetPort{
+				Protocol: protocol,
+				Port:     port.Port,
+				EndPort:  port.EndPort,
+			})
+		}
+
+		res = append(res, machinebrokerv1alpha1.LoadBalancerTarget{
+			IP:    ip,
+			Ports: ports,
+		})
+	}
+	return res, nil
+}
+
 func (s *Server) prepareAggregateOnmetalNetworkInterface(networkInterface *ori.NetworkInterface) (*AggregateOnmetalNetworkInterface, error) {
 	var onmetalVirtualIP *networkingv1alpha1.VirtualIP
 	if virtualIPSpec := networkInterface.Spec.VirtualIp; virtualIPSpec != nil {
@@ -72,6 +102,11 @@ func (s *Server) prepareAggregateOnmetalNetworkInterface(networkInterface *ori.N
 	}
 
 	prefixes, err := s.parseIPPrefixes(networkInterface.Spec.Prefixes)
+	if err != nil {
+		return nil, err
+	}
+
+	lbTgts, err := s.prepareOnmetalLoadBalancerTargets(networkInterface.Spec.LoadBalancerTargets)
 	if err != nil {
 		return nil, err
 	}
@@ -103,8 +138,9 @@ func (s *Server) prepareAggregateOnmetalNetworkInterface(networkInterface *ori.N
 		Network: &networkingv1alpha1.Network{
 			Spec: networkingv1alpha1.NetworkSpec{Handle: networkInterface.Spec.Network.Handle},
 		},
-		VirtualIP: onmetalVirtualIP,
-		Prefixes:  prefixes,
+		VirtualIP:           onmetalVirtualIP,
+		Prefixes:            prefixes,
+		LoadBalancerTargets: lbTgts,
 	}
 	return onmetalNetworkInterfaceConfig, nil
 }
@@ -186,6 +222,16 @@ func (s *Server) createOnmetalNetworkInterface(ctx context.Context, log logr.Log
 		}
 		c.Add(func(ctx context.Context) error {
 			return s.aliasPrefixes.Delete(ctx, network.Spec.Handle, prefix, onmetalNetworkInterface.NetworkInterface)
+		})
+	}
+
+	log.V(1).Info("Creating load balancers")
+	for _, lbTgt := range onmetalNetworkInterface.LoadBalancerTargets {
+		if err := s.loadBalancers.Create(ctx, network, lbTgt, onmetalNetworkInterface.NetworkInterface); err != nil {
+			return fmt.Errorf("error creating load balancer: %w", err)
+		}
+		c.Add(func(ctx context.Context) error {
+			return s.loadBalancers.Delete(ctx, network.Spec.Handle, lbTgt, onmetalNetworkInterface.NetworkInterface)
 		})
 	}
 
