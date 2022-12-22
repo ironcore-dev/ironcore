@@ -67,6 +67,54 @@ rules:
 - apiGroups:
   - networking.api.onmetal.de
   resources:
+  - aliasprefixes
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - aliasprefixroutings
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - loadbalancerroutings
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - loadbalancers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - natgatewayroutings
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - natgateways
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
   - networkinterfaces
   verbs:
   - get
