@@ -32,6 +32,7 @@ var (
 	headers = []metav1.TableColumnDefinition{
 		{Name: "Name", Type: "string", Format: "name", Description: objectMetaSwaggerDoc["name"]},
 		{Name: "VolumePoolRef", Type: "string", Description: "The volume pool this volume is hosted on"},
+		{Name: "Image", Type: "string", Description: "The image the volume should be populated from"},
 		{Name: "VolumeClass", Type: "string", Description: "The volume class of this volume"},
 		{Name: "State", Type: "string", Description: "The state of the volume on the underlying volume pool"},
 		{Name: "Phase", Type: "string", Description: "The binding phase of the volume"},
@@ -64,6 +65,11 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 		cells = append(cells, name)
 		if volumePoolRef := volume.Spec.VolumePoolRef; volumePoolRef != nil {
 			cells = append(cells, volumePoolRef.Name)
+		} else {
+			cells = append(cells, "<none>")
+		}
+		if image := volume.Spec.Image; image != "" {
+			cells = append(cells, image)
 		} else {
 			cells = append(cells, "<none>")
 		}
