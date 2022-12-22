@@ -22,12 +22,14 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/clientutils"
+	"github.com/onmetal/controller-utils/metautils"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	onmetalapiclient "github.com/onmetal/onmetal-api/onmetal-controller-manager/client"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
@@ -46,6 +48,8 @@ type NetworkProtectionReconciler struct {
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networks/finalizers,verbs=update
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces,verbs=get;list;watch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=aliasprefixes,verbs=get;list;watch
+//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=loadbalancers,verbs=get;list;watch
+//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=natgateways,verbs=get;list;watch
 
 func (r *NetworkProtectionReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
@@ -92,32 +96,79 @@ func (r *NetworkProtectionReconciler) reconcile(ctx context.Context, log logr.Lo
 	return ctrl.Result{}, nil
 }
 
-func (r *NetworkProtectionReconciler) isNetworkInUse(ctx context.Context, log logr.Logger, network *networkingv1alpha1.Network) (bool, error) {
-	log.V(1).Info("Checking if the Network is in use")
-
-	// NetworkInterfaces
-	networkInterfaces := &networkingv1alpha1.NetworkInterfaceList{}
-	if err := r.List(ctx, networkInterfaces, client.MatchingFields{onmetalapiclient.NetworkInterfaceNetworkNameField: network.Name}); err != nil {
-		return false, fmt.Errorf("failed to list NetworkInterfaces: %w", err)
+func (r *NetworkProtectionReconciler) isNetworkInUseByType(
+	ctx context.Context,
+	log logr.Logger,
+	network *networkingv1alpha1.Network,
+	obj client.Object,
+	networkField string,
+) (bool, error) {
+	gvk, err := apiutil.GVKForObject(network, r.Scheme)
+	if err != nil {
+		return false, fmt.Errorf("error getting gvk for object: %w", err)
 	}
-	for _, networkInterface := range networkInterfaces.Items {
-		// Skip NetworkInterfaces which are deletion candidates
-		if networkInterface.DeletionTimestamp.IsZero() {
-			log.V(1).Info("Network is in use by NetworkInterface", "NetworkInterface", client.ObjectKeyFromObject(&networkInterface))
-			return true, nil
+
+	list, err := metautils.NewListForObject(r.Scheme, obj)
+	if err != nil {
+		return false, fmt.Errorf("error creating list for object: %w", err)
+	}
+
+	if err := r.List(ctx, list,
+		client.InNamespace(network.Namespace),
+		client.MatchingFields{networkField: network.Name},
+	); err != nil {
+		return false, fmt.Errorf("failed to list : %w", err)
+	}
+
+	var names []string
+	if err := metautils.EachListItem(list, func(obj client.Object) error {
+		if obj.GetDeletionTimestamp().IsZero() {
+			names = append(names, obj.GetName())
 		}
+		return nil
+	}); err != nil {
+		return false, fmt.Errorf("error iterating list: %w", err)
 	}
 
-	// AliasPrefixes
-	aliasPrefixes := &networkingv1alpha1.AliasPrefixList{}
-	if err := r.List(ctx, aliasPrefixes, client.MatchingFields{onmetalapiclient.AliasPrefixNetworkNameField: network.Name}); err != nil {
-		return false, fmt.Errorf("failed to list NetworkInterfaces: %w", err)
+	if len(names) > 0 {
+		log.V(1).Info("Network is in use", "GVK", gvk, "Names", names)
+		return true, nil
 	}
-	for _, aliasPrefix := range aliasPrefixes.Items {
-		// Skip AliasPrefixes which are deletion candidates
-		if aliasPrefix.DeletionTimestamp.IsZero() {
-			log.V(1).Info("Network is in use by AliasPrefix", "AliasPrefix", client.ObjectKeyFromObject(&aliasPrefix))
-			return true, nil
+	return false, nil
+}
+
+func (r *NetworkProtectionReconciler) isNetworkInUse(ctx context.Context, log logr.Logger, network *networkingv1alpha1.Network) (bool, error) {
+	log.V(1).Info("Checking if the network is in use")
+
+	typesAndFields := []struct {
+		Type  client.Object
+		Field string
+	}{
+		{
+			Type:  &networkingv1alpha1.NetworkInterface{},
+			Field: onmetalapiclient.NetworkInterfaceNetworkNameField,
+		},
+		{
+			Type:  &networkingv1alpha1.AliasPrefix{},
+			Field: onmetalapiclient.AliasPrefixNetworkNameField,
+		},
+		{
+			Type:  &networkingv1alpha1.LoadBalancer{},
+			Field: onmetalapiclient.LoadBalancerNetworkNameField,
+		},
+		{
+			Type:  &networkingv1alpha1.NATGateway{},
+			Field: onmetalapiclient.NATGatewayNetworkNameField,
+		},
+	}
+
+	for _, typeAndField := range typesAndFields {
+		ok, err := r.isNetworkInUseByType(ctx, log, network, typeAndField.Type, typeAndField.Field)
+		if err != nil {
+			return false, fmt.Errorf("error checking if network is in use by %T: %w", typeAndField.Type, err)
+		}
+		if err != nil || ok {
+			return ok, err
 		}
 	}
 
@@ -129,16 +180,24 @@ func (r *NetworkProtectionReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		For(&networkingv1alpha1.Network{}).
 		Watches(
 			&source.Kind{Type: &networkingv1alpha1.NetworkInterface{}},
-			r.enqueueNetworkUsedByNetworkInterface(),
+			r.enqueueByNetworkInterface(),
 		).
 		Watches(
 			&source.Kind{Type: &networkingv1alpha1.AliasPrefix{}},
-			r.enqueueNetworkUsedByAliasPrefix(),
+			r.enqueueByAliasPrefix(),
+		).
+		Watches(
+			&source.Kind{Type: &networkingv1alpha1.LoadBalancer{}},
+			r.enqueueByLoadBalancer(),
+		).
+		Watches(
+			&source.Kind{Type: &networkingv1alpha1.NATGateway{}},
+			r.enqueueByNATGateway(),
 		).
 		Complete(r)
 }
 
-func (r *NetworkProtectionReconciler) enqueueNetworkUsedByNetworkInterface() handler.EventHandler {
+func (r *NetworkProtectionReconciler) enqueueByNetworkInterface() handler.EventHandler {
 	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
 		nic := obj.(*networkingv1alpha1.NetworkInterface)
 
@@ -153,7 +212,7 @@ func (r *NetworkProtectionReconciler) enqueueNetworkUsedByNetworkInterface() han
 	})
 }
 
-func (r *NetworkProtectionReconciler) enqueueNetworkUsedByAliasPrefix() handler.EventHandler {
+func (r *NetworkProtectionReconciler) enqueueByAliasPrefix() handler.EventHandler {
 	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
 		aliasPrefix := obj.(*networkingv1alpha1.AliasPrefix)
 
@@ -161,6 +220,36 @@ func (r *NetworkProtectionReconciler) enqueueNetworkUsedByAliasPrefix() handler.
 		networkKey := types.NamespacedName{
 			Namespace: aliasPrefix.Namespace,
 			Name:      aliasPrefix.Spec.NetworkRef.Name,
+		}
+		res = append(res, ctrl.Request{NamespacedName: networkKey})
+
+		return res
+	})
+}
+
+func (r *NetworkProtectionReconciler) enqueueByLoadBalancer() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+		loadBalancer := obj.(*networkingv1alpha1.LoadBalancer)
+
+		var res []ctrl.Request
+		networkKey := types.NamespacedName{
+			Namespace: loadBalancer.Namespace,
+			Name:      loadBalancer.Spec.NetworkRef.Name,
+		}
+		res = append(res, ctrl.Request{NamespacedName: networkKey})
+
+		return res
+	})
+}
+
+func (r *NetworkProtectionReconciler) enqueueByNATGateway() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+		natGateway := obj.(*networkingv1alpha1.NATGateway)
+
+		var res []ctrl.Request
+		networkKey := types.NamespacedName{
+			Namespace: natGateway.Namespace,
+			Name:      natGateway.Spec.NetworkRef.Name,
 		}
 		res = append(res, ctrl.Request{NamespacedName: networkKey})
 

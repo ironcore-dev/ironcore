@@ -28,7 +28,7 @@ import (
 	onmetalapiclient "github.com/onmetal/onmetal-api/apiutils/client"
 	"github.com/onmetal/onmetal-api/apiutils/predicates"
 	onmetalapiclientutils "github.com/onmetal/onmetal-api/onmetal-controller-manager/clientutils"
-	"github.com/onmetal/onmetal-api/ori/apis/machine"
+	orimachine "github.com/onmetal/onmetal-api/ori/apis/machine"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
 	machinepoolletv1alpha1 "github.com/onmetal/onmetal-api/poollet/machinepoollet/api/v1alpha1"
@@ -57,7 +57,7 @@ type MachineReconciler struct {
 	record.EventRecorder
 	client.Client
 
-	MachineRuntime machine.RuntimeService
+	MachineRuntime orimachine.RuntimeService
 
 	MachineClassMapper mcm.MachineClassMapper
 
