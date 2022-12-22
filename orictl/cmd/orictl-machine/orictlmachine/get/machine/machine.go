@@ -23,16 +23,27 @@ import (
 	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-machine/orictlmachine/common"
 	"github.com/onmetal/onmetal-api/orictl/renderer"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
+type Options struct {
+	Labels map[string]string
+}
+
+func (o *Options) AddFlags(fs *pflag.FlagSet) {
+	fs.StringToStringVarP(&o.Labels, "labels", "l", o.Labels, "Labels to filter the machines by.")
+}
+
 func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cobra.Command {
 	var (
+		opts       Options
 		outputOpts common.OutputOptions
 	)
 
 	cmd := &cobra.Command{
-		Use:     "machine",
+		Use:     "machine name",
+		Args:    cobra.MaximumNArgs(1),
 		Aliases: common.MachineAliases,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
@@ -53,17 +64,38 @@ func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cob
 				return err
 			}
 
-			return Run(cmd.Context(), streams, client, render)
+			var name string
+			if len(args) > 0 {
+				name = args[0]
+			}
+
+			return Run(cmd.Context(), streams, client, render, name, opts)
 		},
 	}
 
 	outputOpts.AddFlags(cmd.Flags())
+	opts.AddFlags(cmd.Flags())
 
 	return cmd
 }
 
-func Run(ctx context.Context, streams clicommon.Streams, client ori.MachineRuntimeClient, render renderer.Renderer) error {
-	res, err := client.ListMachines(ctx, &ori.ListMachinesRequest{})
+func Run(
+	ctx context.Context,
+	streams clicommon.Streams,
+	client ori.MachineRuntimeClient,
+	render renderer.Renderer,
+	name string,
+	opts Options,
+) error {
+	var filter *ori.MachineFilter
+	if name != "" || opts.Labels != nil {
+		filter = &ori.MachineFilter{
+			Id:            name,
+			LabelSelector: opts.Labels,
+		}
+	}
+
+	res, err := client.ListMachines(ctx, &ori.ListMachinesRequest{Filter: filter})
 	if err != nil {
 		return fmt.Errorf("error listing machines: %w", err)
 	}
