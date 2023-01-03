@@ -13,7 +13,7 @@ authors:
 - "@ushabelgur"
   
 reviewers:
-- "@manuel"
+- "@ManuStoessel"
 
 ---
 
