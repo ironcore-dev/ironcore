@@ -9,13 +9,13 @@ status: implementable
 
 authors:
 
-- "@Ashughorla"
-- "@kasabe28"
-- "@ushabelgur"
+- @Ashughorla
+- @kasabe28
+- @ushabelgur
   
 reviewers:
 
-- "@manuel"
+- @manuel
 
 ---
 
