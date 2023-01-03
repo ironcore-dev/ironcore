@@ -28,24 +28,24 @@ reviewers:
 - [Proposal](#proposal)
 
 ## Summary
-One of the important feature of Cloud Native IaS is to provide secure storage. This functionality is built on top of Ceph-CSI supported individual RBD PersistentVolumeClaim encryption, more information can be found here https://rook.io/docs/rook/v1.9/ceph-csi-drivers.html#enable-rbd-encryption-support . This proposal focuses on providing option to enable encryption for individual Volume.
+One of the important feature of Cloud Native IaS is to provide secure storage. This functionality is built on top of Ceph-CSI supported individual RBD PersistentVolumeClaim encryption, more information can be found here https://rook.io/docs/rook/v1.9/ceph-csi-drivers.html#enable-rbd-encryption-support. This proposal focuses on providing option to enable encryption for individual Volume.
 
 ## Motivation
 As part of Storage encryption feature Onmetal API to support option to enable encryption of Volumes.
-Each volume can set encryption enabled flag and pass encryption key(Optional). If encryption key is not passed, default eccrypted storage class will be used.
+Each `Volume` can set encryption enabled flag and provide secret reference holding encryption key(Optional). If encryption key is not passed, then encryption key is fetched from storage class secrets.
 
 ### Goals
-  - Volume should allow to specify encryption enabled or not
-  - Volume should allow to specify encryption key to be be used
-  - Validation for encryptionPassphrase provided by user
+  - Volume should provide encryption enabled flag
+  - Volume should provide secret name holding `encryptionPassphrase`
 
-### Non-Goals
-  - CephCSI can generate unique passphrase (DEK Data-Encryption-Key) for each volume to be used to encrypt/decrypt data. The passphrase (DEK) is encrypted by encryptionPassphrase (KEK Key-Encryption-Key) and stored in the image metadata of the volume.
-  - Encryption KMS to be used ? Like HashiCorp Vault -> https://github.com/ceph/ceph-csi/blob/v3.6.0/docs/deploy-rbd.md#encryption-for-rbd-volumes
-    Or we have to consider simple passpharse ?
+### Details
+  - By default encryption enabled flag will be set to false
+  - Generate random string corresponding to `encryptionPassphrase` key using `encoding/base64` golang package
+  - Create secret holding `encryptionPassphrase` as key and generated random string as value.
+  - Provide secret name from previous step for Volume encryption.
 
 ## Proposal
-The proposal to provide storage encryption introduces new fields `encryption.enabled` and `encryption.secretRef.name` in existing `Volume` type. `encryption.enabled` is boolean field indicating whether encryption to be enabled or not for the `Volume`. `ecnryption.secretRef.name` is an optional secret for specifying encryptionPassphrase for storage class.
+The proposal to provide storage encryption introduces new fields `encryption.enabled` and `encryption.secretRef.name` in existing `Volume` type. `encryption.enabled` is boolean field indicating whether encryption to be enabled or not for the `Volume`. `ecnryption.secretRef.name` is an secret for specifying `encryptionPassphrase` for storage class.
 
 [//]: # (@formatter:off)
 ```yaml
