@@ -42,7 +42,7 @@ Each `Volume` can set encryption enabled flag and provide secret reference holdi
   - By default encryption enabled flag will be set to false
   - Generate random string corresponding to `encryptionPassphrase` key using `encoding/base64` golang package
   - Create secret holding `encryptionPassphrase` as key and generated random string as value.
-  - Provide secret name from previous step for Volume encryption.
+  - Provide secret name for Volume encryption.
 
 ## Proposal
 The proposal to provide storage encryption introduces new fields `encryption.enabled` and `encryption.secretRef.name` in existing `Volume` type. `encryption.enabled` is boolean field indicating whether encryption to be enabled or not for the `Volume`. `ecnryption.secretRef.name` is an secret for specifying `encryptionPassphrase` for storage class.
