@@ -1,5 +1,6 @@
 ---
-title: OEP Title
+
+title: Storage Encryption
 
 oep-number: 6
 
