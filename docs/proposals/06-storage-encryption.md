@@ -24,7 +24,7 @@ reviewers:
 - [Summary](#summary)
 - [Motivation](#motivation)
     - [Goals](#goals)
-    - [Non-Goals](#non-goals)
+    - [Details](#Details)
 - [Proposal](#proposal)
 
 ## Summary
