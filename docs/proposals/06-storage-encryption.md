@@ -32,35 +32,29 @@ One of the important feature of Cloud Native IaS is to provide secure storage. T
 
 ## Motivation
 As part of Storage encryption feature Onmetal API to support option to enable encryption of Volumes.
-Each `Volume` can set encryption enabled flag and provide secret reference holding encryption key(Optional). If encryption key is not passed, then encryption key is fetched from storage class secrets.
+Each `VolumePool` can set encryption enabled flag and provide secret reference holding encryption key(Optional). If encryption key is not passed, then encryption key is fetched from storage class secrets.
 
 ### Goals
-  - Volume should provide encryption enabled flag
-  - Volume should provide secret name holding `encryptionPassphrase`
+  - VolumePool should provide encryption enabled flag
+  - VolumePool should provide secret name holding `encryptionPassphrase`
 
 ### Details
   - By default encryption enabled flag will be set to false
-  - Generate random string corresponding to `encryptionPassphrase` key using `encoding/base64` golang package
+  - Generate random string corresponding to `encryptionPassphrase` key using `math/rand` package. `encryptionPassphrase` must consist of `alphanumeric characters`, `-`, `_` or `.`
   - Create secret holding `encryptionPassphrase` as key and generated random string as value.
-  - Provide secret name for Volume encryption.
+  - Provide secret name in VolumePool configuration.
 
 ## Proposal
-The proposal to provide storage encryption introduces new fields `encryption.enabled` and `encryption.secretRef.name` in existing `Volume` type. `encryption.enabled` is boolean field indicating whether encryption to be enabled or not for the `Volume`. `ecnryption.secretRef.name` is an secret for specifying `encryptionPassphrase` for storage class.
+The proposal to provide storage encryption introduces new fields `encryption.enabled` and `encryption.secretRef.name` in existing `VolumePool` type. `encryption.enabled` is boolean field indicating whether encryption to be enabled or not for the `Volume`. `ecnryption.secretRef.name` is an secret for specifying `encryptionPassphrase` for storage class.
 
 [//]: # (@formatter:off)
 ```yaml
 apiVersion: storage.api.onmetal.de/v1alpha1
-kind: Volume
+kind: VolumePool
 metadata:
-  name: sample-volume
-  namespace: default
+  name: volumepool-sample
 spec:
-  volumeClassRef:
-    name: fast
-  volumePoolRef:
-    name: ceph
-  resources:
-    storage: 1Gi
+  providerID: onmetal://shared
   encryption:
     enabled: true
     secretRef:
