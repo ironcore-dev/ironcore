@@ -40,3 +40,9 @@ func SetDefaults_MachineStatus(status *v1alpha1.MachineStatus) {
 		status.State = v1alpha1.MachineStatePending
 	}
 }
+
+func SetDefaults_MachineSpec(spec *v1alpha1.MachineSpec) {
+	if spec.Power == "" {
+		spec.Power = v1alpha1.MachinePowerOn
+	}
+}

@@ -55,6 +55,22 @@ var _ = Describe("Machine", func() {
 			&compute.Machine{},
 			ContainElement(RequiredField("spec.machineClassRef")),
 		),
+		Entry("invalid machine power",
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					Power: "invalid",
+				},
+			},
+			ContainElement(NotSupportedField("spec.power")),
+		),
+		Entry("valid machine power",
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					Power: compute.MachinePowerOn,
+				},
+			},
+			Not(ContainElement(NotSupportedField("spec.power"))),
+		),
 		Entry("no image",
 			&compute.Machine{},
 			Not(ContainElement(RequiredField("spec.image"))),

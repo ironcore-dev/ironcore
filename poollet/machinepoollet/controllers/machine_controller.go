@@ -538,9 +538,10 @@ func (r *MachineReconciler) update(
 }
 
 var oriMachineStateToMachineState = map[ori.MachineState]computev1alpha1.MachineState{
-	ori.MachineState_MACHINE_PENDING:   computev1alpha1.MachineStatePending,
-	ori.MachineState_MACHINE_RUNNING:   computev1alpha1.MachineStateRunning,
-	ori.MachineState_MACHINE_SUSPENDED: computev1alpha1.MachineStateShutdown,
+	ori.MachineState_MACHINE_PENDING:    computev1alpha1.MachineStatePending,
+	ori.MachineState_MACHINE_RUNNING:    computev1alpha1.MachineStateRunning,
+	ori.MachineState_MACHINE_SUSPENDED:  computev1alpha1.MachineStateShutdown,
+	ori.MachineState_MACHINE_TERMINATED: computev1alpha1.MachineStateTerminated,
 }
 
 func (r *MachineReconciler) convertORIMachineState(state ori.MachineState) (computev1alpha1.MachineState, error) {

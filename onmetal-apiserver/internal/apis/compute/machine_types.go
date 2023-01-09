@@ -33,6 +33,9 @@ type MachineSpec struct {
 	// MachinePoolRef defines machine pool to run the machine in.
 	// If empty, a scheduler will figure out an appropriate pool to run the machine in.
 	MachinePoolRef *corev1.LocalObjectReference
+	// Power ist the desired machine power state.
+	// Defaults to MachinePowerOn.
+	Power MachinePower
 	// Image is the optional URL providing the operating system image of the machine.
 	Image string
 	// ImagePullSecretRef is an optional secret for pulling the image of a machine.
@@ -50,6 +53,16 @@ type MachineSpec struct {
 	// covered by Tolerations will be considered to run the Machine.
 	Tolerations []commonv1alpha1.Toleration
 }
+
+// MachinePower is the desired power state of a Machine.
+type MachinePower string
+
+const (
+	// MachinePowerOn indicates that a Machine should be powered on.
+	MachinePowerOn MachinePower = "On"
+	// MachinePowerOff indicates that a Machine should be powered off.
+	MachinePowerOff MachinePower = "Off"
+)
 
 // EFIVar is a variable to pass to EFI while booting up.
 type EFIVar struct {
@@ -219,6 +232,8 @@ const (
 	MachineStateRunning MachineState = "Running"
 	// MachineStateShutdown means the machine is shut down.
 	MachineStateShutdown MachineState = "Shutdown"
+	// MachineStateTerminated means the machine has been permanently stopped and cannot be started.
+	MachineStateTerminated MachineState = "Terminated"
 )
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

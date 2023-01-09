@@ -1341,6 +1341,13 @@ func schema_onmetal_api_api_compute_v1alpha1_MachineSpec(ref common.ReferenceCal
 							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
 						},
 					},
+					"power": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Power ist the desired machine power state. Defaults to MachinePowerOn.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 					"image": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Image is the optional URL providing the operating system image of the machine.",
@@ -1459,10 +1466,10 @@ func schema_onmetal_api_api_compute_v1alpha1_MachineStatus(ref common.ReferenceC
 					},
 					"state": {
 						SchemaProps: spec.SchemaProps{
-							Description: "State is the infrastructure state of the machine.\n\nPossible enum values:\n - `\"Pending\"` means the Machine has been accepted by the system, but not yet completely started. This includes time before being bound to a MachinePool, as well as time spent setting up the Machine on that MachinePool.\n - `\"Running\"` means the machine is running on a MachinePool.\n - `\"Shutdown\"` means the machine is shut down.",
+							Description: "State is the infrastructure state of the machine.\n\nPossible enum values:\n - `\"Pending\"` means the Machine has been accepted by the system, but not yet completely started. This includes time before being bound to a MachinePool, as well as time spent setting up the Machine on that MachinePool.\n - `\"Running\"` means the machine is running on a MachinePool.\n - `\"Shutdown\"` means the machine is shut down.\n - `\"Terminated\"` means the machine has been permanently stopped and cannot be started.",
 							Type:        []string{"string"},
 							Format:      "",
-							Enum:        []interface{}{"Pending", "Running", "Shutdown"}},
+							Enum:        []interface{}{"Pending", "Running", "Shutdown", "Terminated"}},
 					},
 					"networkInterfaces": {
 						SchemaProps: spec.SchemaProps{

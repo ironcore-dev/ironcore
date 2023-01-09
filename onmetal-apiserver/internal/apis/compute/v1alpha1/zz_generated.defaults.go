@@ -37,6 +37,7 @@ func RegisterDefaults(scheme *runtime.Scheme) error {
 }
 
 func SetObjectDefaults_Machine(in *v1alpha1.Machine) {
+	SetDefaults_MachineSpec(&in.Spec)
 	for i := range in.Spec.NetworkInterfaces {
 		a := &in.Spec.NetworkInterfaces[i]
 		if a.NetworkInterfaceSource.Ephemeral != nil {

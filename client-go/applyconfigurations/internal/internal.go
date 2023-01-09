@@ -318,6 +318,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementRelationship: associative
           keys:
           - name
+    - name: power
+      type:
+        scalar: string
     - name: tolerations
       type:
         list:
