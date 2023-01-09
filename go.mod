@@ -17,7 +17,7 @@ require (
 	go.uber.org/atomic v1.10.0
 	go4.org/netipx v0.0.0-20220812043211-3cc044ffd68d
 	golang.org/x/exp v0.0.0-20221212164502-fae10dda9338
-	golang.org/x/sys v0.3.0
+	golang.org/x/sys v0.4.0
 	google.golang.org/grpc v1.51.0
 	gopkg.in/inf.v0 v0.9.1
 	k8s.io/api v0.26.0
