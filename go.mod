@@ -114,5 +114,3 @@ require (
 	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.0.33 // indirect
 	sigs.k8s.io/json v0.0.0-20220713155537-f223a00ba0e2 // indirect
 )
-
-replace k8s.io/api v0.0.0 => k8s.io/api v1.24.1
