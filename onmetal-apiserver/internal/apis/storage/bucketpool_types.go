@@ -34,14 +34,10 @@ type BucketPoolSpec struct {
 
 // BucketPoolStatus defines the observed state of BucketPool
 type BucketPoolStatus struct {
-	State      BucketPoolState
-	Conditions []BucketPoolCondition
+	// State represents the infrastructure state of a BucketPool.
+	State BucketPoolState
 	// AvailableBucketClasses list the references of any supported BucketClass of this pool
 	AvailableBucketClasses []corev1.LocalObjectReference
-	// Available list the available capacity of a BucketPool.
-	Available corev1.ResourceList
-	// Used indicates how much capacity has been used in a BucketPool.
-	Used corev1.ResourceList
 }
 
 type BucketPoolState string
@@ -51,25 +47,6 @@ const (
 	BucketPoolStatePending     BucketPoolState = "Pending"
 	BucketPoolStateUnavailable BucketPoolState = "Unavailable"
 )
-
-// BucketPoolConditionType is a type a BucketPoolCondition can have.
-type BucketPoolConditionType string
-
-// BucketPoolCondition is one of the conditions of a bucket.
-type BucketPoolCondition struct {
-	// Type is the type of the condition.
-	Type BucketPoolConditionType
-	// Status is the status of the condition.
-	Status corev1.ConditionStatus
-	// Reason is a machine-readable indication of why the condition is in a certain state.
-	Reason string
-	// Message is a human-readable explanation of why the condition has a certain reason / state.
-	Message string
-	// ObservedGeneration represents the .metadata.generation that the condition was set based upon.
-	ObservedGeneration int64
-	// LastTransitionTime is the last time the status of a condition has transitioned from one state to another.
-	LastTransitionTime metav1.Time
-}
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +genclient

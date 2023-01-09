@@ -31,9 +31,9 @@ var (
 
 	headers = []metav1.TableColumnDefinition{
 		{Name: "Name", Type: "string", Format: "name", Description: objectMetaSwaggerDoc["name"]},
-		{Name: "BucketPoolRef", Type: "string", Description: "The volume pool this volume is hosted on"},
-		{Name: "BucketClass", Type: "string", Description: "The volume class of this volume"},
-		{Name: "State", Type: "string", Description: "The state of the volume on the underlying volume pool"},
+		{Name: "BucketPoolRef", Type: "string", Description: "The bucket pool this bucket is hosted on"},
+		{Name: "BucketClass", Type: "string", Description: "The bucket class of this bucket"},
+		{Name: "State", Type: "string", Description: "The state of the bucket on the underlying bucket pool"},
 		{Name: "Age", Type: "string", Format: "date", Description: objectMetaSwaggerDoc["creationTimestamp"]},
 	}
 )
@@ -58,20 +58,20 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 
 	var err error
 	tab.Rows, err = table.MetaToTableRow(obj, func(obj runtime.Object, m metav1.Object, name, age string) (cells []interface{}, err error) {
-		volume := obj.(*storage.Bucket)
+		bucket := obj.(*storage.Bucket)
 
 		cells = append(cells, name)
-		if volumePoolRef := volume.Spec.BucketPoolRef; volumePoolRef != nil {
-			cells = append(cells, volumePoolRef.Name)
+		if bucketPoolRef := bucket.Spec.BucketPoolRef; bucketPoolRef != nil {
+			cells = append(cells, bucketPoolRef.Name)
 		} else {
 			cells = append(cells, "<none>")
 		}
-		if volumeClassRef := volume.Spec.BucketClassRef; volumeClassRef != nil {
-			cells = append(cells, volumeClassRef.Name)
+		if bucketClassRef := bucket.Spec.BucketClassRef; bucketClassRef != nil {
+			cells = append(cells, bucketClassRef.Name)
 		} else {
 			cells = append(cells, "<none>")
 		}
-		if state := volume.Status.State; state != "" {
+		if state := bucket.Status.State; state != "" {
 			cells = append(cells, state)
 		} else {
 			cells = append(cells, "<unknown>")

@@ -25,11 +25,8 @@ import (
 // BucketPoolStatusApplyConfiguration represents an declarative configuration of the BucketPoolStatus type for use
 // with apply.
 type BucketPoolStatusApplyConfiguration struct {
-	State                  *v1alpha1.BucketPoolState               `json:"state,omitempty"`
-	Conditions             []BucketPoolConditionApplyConfiguration `json:"conditions,omitempty"`
-	AvailableBucketClasses []v1.LocalObjectReference               `json:"availableBucketClasses,omitempty"`
-	Available              *v1.ResourceList                        `json:"available,omitempty"`
-	Used                   *v1.ResourceList                        `json:"used,omitempty"`
+	State                  *v1alpha1.BucketPoolState `json:"state,omitempty"`
+	AvailableBucketClasses []v1.LocalObjectReference `json:"availableBucketClasses,omitempty"`
 }
 
 // BucketPoolStatusApplyConfiguration constructs an declarative configuration of the BucketPoolStatus type for use with
@@ -46,19 +43,6 @@ func (b *BucketPoolStatusApplyConfiguration) WithState(value v1alpha1.BucketPool
 	return b
 }
 
-// WithConditions adds the given value to the Conditions field in the declarative configuration
-// and returns the receiver, so that objects can be build by chaining "With" function invocations.
-// If called multiple times, values provided by each call will be appended to the Conditions field.
-func (b *BucketPoolStatusApplyConfiguration) WithConditions(values ...*BucketPoolConditionApplyConfiguration) *BucketPoolStatusApplyConfiguration {
-	for i := range values {
-		if values[i] == nil {
-			panic("nil value passed to WithConditions")
-		}
-		b.Conditions = append(b.Conditions, *values[i])
-	}
-	return b
-}
-
 // WithAvailableBucketClasses adds the given value to the AvailableBucketClasses field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the AvailableBucketClasses field.
@@ -66,21 +50,5 @@ func (b *BucketPoolStatusApplyConfiguration) WithAvailableBucketClasses(values .
 	for i := range values {
 		b.AvailableBucketClasses = append(b.AvailableBucketClasses, values[i])
 	}
-	return b
-}
-
-// WithAvailable sets the Available field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the Available field is set to the value of the last call.
-func (b *BucketPoolStatusApplyConfiguration) WithAvailable(value v1.ResourceList) *BucketPoolStatusApplyConfiguration {
-	b.Available = &value
-	return b
-}
-
-// WithUsed sets the Used field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the Used field is set to the value of the last call.
-func (b *BucketPoolStatusApplyConfiguration) WithUsed(value v1.ResourceList) *BucketPoolStatusApplyConfiguration {
-	b.Used = &value
 	return b
 }

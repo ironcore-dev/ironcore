@@ -200,8 +200,6 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &applyconfigurationsstoragev1alpha1.BucketConditionApplyConfiguration{}
 	case storagev1alpha1.SchemeGroupVersion.WithKind("BucketPool"):
 		return &applyconfigurationsstoragev1alpha1.BucketPoolApplyConfiguration{}
-	case storagev1alpha1.SchemeGroupVersion.WithKind("BucketPoolCondition"):
-		return &applyconfigurationsstoragev1alpha1.BucketPoolConditionApplyConfiguration{}
 	case storagev1alpha1.SchemeGroupVersion.WithKind("BucketPoolSpec"):
 		return &applyconfigurationsstoragev1alpha1.BucketPoolSpecApplyConfiguration{}
 	case storagev1alpha1.SchemeGroupVersion.WithKind("BucketPoolStatus"):

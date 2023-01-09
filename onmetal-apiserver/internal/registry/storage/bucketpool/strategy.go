@@ -35,7 +35,7 @@ import (
 func GetAttrs(obj runtime.Object) (labels.Set, fields.Set, error) {
 	bucketPool, ok := obj.(*storage.BucketPool)
 	if !ok {
-		return nil, nil, fmt.Errorf("given object is not a BucketPoolRef")
+		return nil, nil, fmt.Errorf("given object is not a BucketPool")
 	}
 	return bucketPool.Labels, SelectableFields(bucketPool), nil
 }

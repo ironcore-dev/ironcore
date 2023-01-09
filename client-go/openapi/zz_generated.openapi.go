@@ -123,7 +123,6 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketCondition":                 schema_onmetal_api_api_storage_v1alpha1_BucketCondition(ref),
 		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketList":                      schema_onmetal_api_api_storage_v1alpha1_BucketList(ref),
 		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketPool":                      schema_onmetal_api_api_storage_v1alpha1_BucketPool(ref),
-		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketPoolCondition":             schema_onmetal_api_api_storage_v1alpha1_BucketPoolCondition(ref),
 		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketPoolList":                  schema_onmetal_api_api_storage_v1alpha1_BucketPoolList(ref),
 		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketPoolSpec":                  schema_onmetal_api_api_storage_v1alpha1_BucketPoolSpec(ref),
 		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketPoolStatus":                schema_onmetal_api_api_storage_v1alpha1_BucketPoolStatus(ref),
@@ -4258,68 +4257,6 @@ func schema_onmetal_api_api_storage_v1alpha1_BucketPool(ref common.ReferenceCall
 	}
 }
 
-func schema_onmetal_api_api_storage_v1alpha1_BucketPoolCondition(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "BucketPoolCondition is one of the conditions of a bucket.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"type": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Type is the type of the condition.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"status": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Status is the status of the condition.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"reason": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Reason is a machine-readable indication of why the condition is in a certain state.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"message": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Message is a human-readable explanation of why the condition has a certain reason / state.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"observedGeneration": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ObservedGeneration represents the .metadata.generation that the condition was set based upon.",
-							Type:        []string{"integer"},
-							Format:      "int64",
-						},
-					},
-					"lastTransitionTime": {
-						SchemaProps: spec.SchemaProps{
-							Description: "LastTransitionTime is the last time the status of a condition has transitioned from one state to another.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
-						},
-					},
-				},
-				Required: []string{"type", "status", "reason", "message"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
-	}
-}
-
 func schema_onmetal_api_api_storage_v1alpha1_BucketPoolList(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -4416,21 +4353,9 @@ func schema_onmetal_api_api_storage_v1alpha1_BucketPoolStatus(ref common.Referen
 				Properties: map[string]spec.Schema{
 					"state": {
 						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"conditions": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketPoolCondition"),
-									},
-								},
-							},
+							Description: "State represents the infrastructure state of a BucketPool.",
+							Type:        []string{"string"},
+							Format:      "",
 						},
 					},
 					"availableBucketClasses": {
@@ -4447,41 +4372,11 @@ func schema_onmetal_api_api_storage_v1alpha1_BucketPoolStatus(ref common.Referen
 							},
 						},
 					},
-					"available": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Available list the available capacity of a BucketPool.",
-							Type:        []string{"object"},
-							AdditionalProperties: &spec.SchemaOrBool{
-								Allows: true,
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
-									},
-								},
-							},
-						},
-					},
-					"used": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Used indicates how much capacity has been used in a BucketPool.",
-							Type:        []string{"object"},
-							AdditionalProperties: &spec.SchemaOrBool{
-								Allows: true,
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
-									},
-								},
-							},
-						},
-					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/api/storage/v1alpha1.BucketPoolCondition", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/api/resource.Quantity"},
+			"k8s.io/api/core/v1.LocalObjectReference"},
 	}
 }
 

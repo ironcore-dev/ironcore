@@ -1162,32 +1162,6 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: com.github.onmetal.onmetal-api.api.storage.v1alpha1.BucketPoolStatus
       default: {}
-- name: com.github.onmetal.onmetal-api.api.storage.v1alpha1.BucketPoolCondition
-  map:
-    fields:
-    - name: lastTransitionTime
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
-      default: {}
-    - name: message
-      type:
-        scalar: string
-      default: ""
-    - name: observedGeneration
-      type:
-        scalar: numeric
-    - name: reason
-      type:
-        scalar: string
-      default: ""
-    - name: status
-      type:
-        scalar: string
-      default: ""
-    - name: type
-      type:
-        scalar: string
-      default: ""
 - name: com.github.onmetal.onmetal-api.api.storage.v1alpha1.BucketPoolSpec
   map:
     fields:
@@ -1204,31 +1178,15 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: com.github.onmetal.onmetal-api.api.storage.v1alpha1.BucketPoolStatus
   map:
     fields:
-    - name: available
-      type:
-        map:
-          elementType:
-            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
     - name: availableBucketClasses
       type:
         list:
           elementType:
             namedType: io.k8s.api.core.v1.LocalObjectReference
           elementRelationship: atomic
-    - name: conditions
-      type:
-        list:
-          elementType:
-            namedType: com.github.onmetal.onmetal-api.api.storage.v1alpha1.BucketPoolCondition
-          elementRelationship: atomic
     - name: state
       type:
         scalar: string
-    - name: used
-      type:
-        map:
-          elementType:
-            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
 - name: com.github.onmetal.onmetal-api.api.storage.v1alpha1.BucketSpec
   map:
     fields:
