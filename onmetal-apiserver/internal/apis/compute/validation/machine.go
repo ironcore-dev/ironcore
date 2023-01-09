@@ -54,11 +54,11 @@ func ValidateMachineUpdate(newMachine, oldMachine *compute.Machine) field.ErrorL
 }
 
 var supportedMachinePowers = set.New(
-	compute.MachinePowerOn,
-	compute.MachinePowerOff,
+	compute.PowerOn,
+	compute.PowerOff,
 )
 
-func validateMachinePower(power compute.MachinePower, fldPath *field.Path) field.ErrorList {
+func validateMachinePower(power compute.Power, fldPath *field.Path) field.ErrorList {
 	return onmetalapivalidation.ValidateEnum(supportedMachinePowers, power, fldPath, "must specify machine power")
 }
 

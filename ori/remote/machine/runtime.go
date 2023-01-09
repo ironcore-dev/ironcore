@@ -57,6 +57,10 @@ func (r *remoteRuntime) UpdateMachineAnnotations(ctx context.Context, req *ori.U
 	return r.client.UpdateMachineAnnotations(ctx, req)
 }
 
+func (r *remoteRuntime) UpdateMachinePower(ctx context.Context, req *ori.UpdateMachinePowerRequest) (*ori.UpdateMachinePowerResponse, error) {
+	return r.client.UpdateMachinePower(ctx, req)
+}
+
 func (r *remoteRuntime) CreateVolumeAttachment(ctx context.Context, req *ori.CreateVolumeAttachmentRequest) (*ori.CreateVolumeAttachmentResponse, error) {
 	return r.client.CreateVolumeAttachment(ctx, req)
 }

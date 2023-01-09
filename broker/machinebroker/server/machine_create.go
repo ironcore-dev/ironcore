@@ -44,6 +44,17 @@ func (s *Server) onmetalMachinePoolRef() *corev1.LocalObjectReference {
 	return &corev1.LocalObjectReference{Name: s.cluster.MachinePoolName()}
 }
 
+func (s *Server) prepareOnmetalMachinePower(power ori.Power) (computev1alpha1.Power, error) {
+	switch power {
+	case ori.Power_POWER_ON:
+		return computev1alpha1.PowerOn, nil
+	case ori.Power_POWER_OFF:
+		return computev1alpha1.PowerOff, nil
+	default:
+		return "", fmt.Errorf("unknown power state %v", power)
+	}
+}
+
 func (s *Server) prepareOnmetalVolumeAttachment(volumeSpec *ori.VolumeAttachment) (computev1alpha1.Volume, error) {
 	var src computev1alpha1.VolumeSource
 	switch {
@@ -91,6 +102,11 @@ func (s *Server) prepareOnmetalNetworkInterfaceAttachment(networkInterfaceSpec *
 }
 
 func (s *Server) getOnmetalMachineConfig(machine *ori.Machine) (*OnmetalMachineConfig, error) {
+	power, err := s.prepareOnmetalMachinePower(machine.Spec.Power)
+	if err != nil {
+		return nil, err
+	}
+
 	var onmetalIgnitionSecret *corev1.Secret
 	if ignition := machine.Spec.Ignition; ignition != nil {
 		onmetalIgnitionSecret = &corev1.Secret{
@@ -148,6 +164,7 @@ func (s *Server) getOnmetalMachineConfig(machine *ori.Machine) (*OnmetalMachineC
 			MachineClassRef:     corev1.LocalObjectReference{Name: machine.Spec.Class},
 			MachinePoolSelector: s.cluster.MachinePoolSelector(),
 			MachinePoolRef:      s.onmetalMachinePoolRef(),
+			Power:               power,
 			Image:               onmetalImage,
 			ImagePullSecretRef:  nil, // TODO: Specify if required.
 			NetworkInterfaces:   onmetalNetworkInterfaceAttachments,

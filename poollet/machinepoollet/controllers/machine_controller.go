@@ -17,6 +17,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"strconv"
 
 	"github.com/go-logr/logr"
@@ -489,6 +490,37 @@ func (r *MachineReconciler) updateStatus(ctx context.Context, log logr.Logger, m
 	return nil
 }
 
+func (r *MachineReconciler) prepareORIPower(power computev1alpha1.Power) (ori.Power, error) {
+	switch power {
+	case computev1alpha1.PowerOn:
+		return ori.Power_POWER_ON, nil
+	case computev1alpha1.PowerOff:
+		return ori.Power_POWER_OFF, nil
+	default:
+		return 0, fmt.Errorf("unknown power %q", power)
+	}
+}
+
+func (r *MachineReconciler) updateORIPower(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine, oriMachine *ori.Machine) error {
+	actualPower := oriMachine.Spec.Power
+	desiredPower, err := r.prepareORIPower(machine.Spec.Power)
+	if err != nil {
+		return fmt.Errorf("error preparing ori power state: %w", err)
+	}
+
+	if actualPower == desiredPower {
+		return nil
+	}
+
+	if _, err := r.MachineRuntime.UpdateMachinePower(ctx, &ori.UpdateMachinePowerRequest{
+		MachineId: oriMachine.Metadata.Id,
+		Power:     desiredPower,
+	}); err != nil {
+		return fmt.Errorf("error updating machine power state: %w", err)
+	}
+	return nil
+}
+
 func (r *MachineReconciler) update(
 	ctx context.Context,
 	log logr.Logger,
@@ -509,16 +541,18 @@ func (r *MachineReconciler) update(
 		errs = append(errs, fmt.Errorf("error updating network interfaces: %w", err))
 	}
 
+	log.V(1).Info("Updating power state")
+	if err := r.updateORIPower(ctx, log, machine, oriMachine); err != nil {
+		errs = append(errs, fmt.Errorf("error updating power state: %w", err))
+	}
+
 	if len(errs) > 0 {
 		return ctrl.Result{}, fmt.Errorf("error(s) updating machine: %v", errs)
 	}
 
-	log.V(1).Info("Updating ori machine annotations")
-	if _, err := r.MachineRuntime.UpdateMachineAnnotations(ctx, &ori.UpdateMachineAnnotationsRequest{
-		MachineId:   oriMachine.Metadata.Id,
-		Annotations: r.oriMachineAnnotations(machine),
-	}); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error updating machine annotations")
+	log.V(1).Info("Updating annotations")
+	if err := r.updateORIAnnotations(ctx, log, machine, oriMachine); err != nil {
+		return ctrl.Result{}, fmt.Errorf("error updating annotations: %w", err)
 	}
 
 	log.V(1).Info("Getting ori machine")
@@ -535,6 +569,23 @@ func (r *MachineReconciler) update(
 
 	log.V(1).Info("Updated existing machine")
 	return ctrl.Result{}, nil
+}
+
+func (r *MachineReconciler) updateORIAnnotations(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine, oriMachine *ori.Machine) error {
+	desiredAnnotations := r.oriMachineAnnotations(machine)
+	actualAnnotations := oriMachine.Metadata.Annotations
+
+	if reflect.DeepEqual(desiredAnnotations, actualAnnotations) {
+		return nil
+	}
+
+	if _, err := r.MachineRuntime.UpdateMachineAnnotations(ctx, &ori.UpdateMachineAnnotationsRequest{
+		MachineId:   oriMachine.Metadata.Id,
+		Annotations: r.oriMachineAnnotations(machine),
+	}); err != nil {
+		return fmt.Errorf("error updating machine annotations: %w", err)
+	}
+	return nil
 }
 
 var oriMachineStateToMachineState = map[ori.MachineState]computev1alpha1.MachineState{

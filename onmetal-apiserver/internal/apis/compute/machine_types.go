@@ -34,8 +34,8 @@ type MachineSpec struct {
 	// If empty, a scheduler will figure out an appropriate pool to run the machine in.
 	MachinePoolRef *corev1.LocalObjectReference
 	// Power ist the desired machine power state.
-	// Defaults to MachinePowerOn.
-	Power MachinePower
+	// Defaults to PowerOn.
+	Power Power
 	// Image is the optional URL providing the operating system image of the machine.
 	Image string
 	// ImagePullSecretRef is an optional secret for pulling the image of a machine.
@@ -54,14 +54,14 @@ type MachineSpec struct {
 	Tolerations []commonv1alpha1.Toleration
 }
 
-// MachinePower is the desired power state of a Machine.
-type MachinePower string
+// Power is the desired power state of a Machine.
+type Power string
 
 const (
-	// MachinePowerOn indicates that a Machine should be powered on.
-	MachinePowerOn MachinePower = "On"
-	// MachinePowerOff indicates that a Machine should be powered off.
-	MachinePowerOff MachinePower = "Off"
+	// PowerOn indicates that a Machine should be powered on.
+	PowerOn Power = "On"
+	// PowerOff indicates that a Machine should be powered off.
+	PowerOff Power = "Off"
 )
 
 // EFIVar is a variable to pass to EFI while booting up.
