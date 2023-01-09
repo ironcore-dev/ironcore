@@ -37,15 +37,19 @@ Each `VolumePool` can set encryption enabled flag and provide secret reference h
 ### Goals
   - VolumePool should provide encryption enabled flag
   - VolumePool should provide secret name holding `encryptionPassphrase`
+  - Volume should update staus with encrypted flag
 
 ### Details
-  - By default encryption enabled flag will be set to false
-  - Generate random string corresponding to `encryptionPassphrase` key using `math/rand` package. `encryptionPassphrase` must consist of `alphanumeric characters`, `-`, `_` or `.`
+  - By default encryption enabled flag and encrypted flag will be set to false
+  - Generate random string corresponding to `encryptionPassphrase` key using `math/rand` package. An `encryptionPassphrase` should have at least 20 characters and should be difficult to guess. It should contain upper case letters, lower case letters, digits and at least one punctuation character.
   - Create secret holding `encryptionPassphrase` as key and generated random string as value.
-  - Provide secret name in VolumePool configuration.
+  - Provide secret name in VolumePool configuration and pass secret towards Storage Cluster.
+  - Once the `Volume` gets encrypted with provided secret, update `Volume.status` with `encrypted: true`.
 
 ## Proposal
-The proposal to provide storage encryption introduces new fields `encryption.enabled` and `encryption.secretRef.name` in existing `VolumePool` type. `encryption.enabled` is boolean field indicating whether encryption to be enabled or not for the `Volume`. `ecnryption.secretRef.name` is an secret for specifying `encryptionPassphrase` for storage class.
+The proposal to provide storage encryption introduces new fields `encryption.enabled`, `encryption.secretRef.name` in existing `VolumePool` type and `status.encrypted` in existing `Volume` type. `encryption.enabled` is boolean field indicating whether encryption to be enabled or not for the `Volume`. `encryption.secretRef.name` is an secret for specifying `encryptionPassphrase` for storage class. `status.encrypted` is boolean field indicating whether `Volume` is encrypted or not.
+
+VolumePool with encryption configuration:
 
 [//]: # (@formatter:off)
 ```yaml
@@ -62,7 +66,7 @@ spec:
 ```
 [//]: # (@formatter:on)
 
-Secret for passphrase
+Secret for encryption passphrase:
 
 [//]: # (@formatter:off)
 ```yaml
@@ -73,5 +77,26 @@ metadata:
   namespace: rook-ceph
 stringData:
   encryptionPassphrase: test-encryption
-  ```
+```
+[//]: # (@formatter:on)
+
+Volume with status encrypted:
+
+[//]: # (@formatter:off)
+```yaml
+apiVersion: storage.api.onmetal.de/v1alpha1
+kind: Volume
+metadata:
+  name: sample-volume
+  namespace: default
+spec:
+  volumeClassRef:
+    name: fast
+  volumePoolRef:
+    name: ceph
+  resources:
+    storage: 1Gi
+status:
+  encrypted: true
+```
 [//]: # (@formatter:on)
