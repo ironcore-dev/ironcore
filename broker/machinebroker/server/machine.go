@@ -29,9 +29,10 @@ type AggregateOnmetalMachine struct {
 }
 
 var onmetalMachineStateToMachineState = map[computev1alpha1.MachineState]ori.MachineState{
-	computev1alpha1.MachineStatePending:  ori.MachineState_MACHINE_PENDING,
-	computev1alpha1.MachineStateRunning:  ori.MachineState_MACHINE_RUNNING,
-	computev1alpha1.MachineStateShutdown: ori.MachineState_MACHINE_SUSPENDED,
+	computev1alpha1.MachineStatePending:    ori.MachineState_MACHINE_PENDING,
+	computev1alpha1.MachineStateRunning:    ori.MachineState_MACHINE_RUNNING,
+	computev1alpha1.MachineStateShutdown:   ori.MachineState_MACHINE_SUSPENDED,
+	computev1alpha1.MachineStateTerminated: ori.MachineState_MACHINE_TERMINATED,
 }
 
 func (s *Server) convertOnmetalMachineState(state computev1alpha1.MachineState) (ori.MachineState, error) {

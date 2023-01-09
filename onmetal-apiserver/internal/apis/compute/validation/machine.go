@@ -19,6 +19,7 @@ package validation
 import (
 	"fmt"
 
+	"github.com/onmetal/controller-utils/set"
 	"github.com/onmetal/onmetal-api/onmetal-apiserver/internal/admission/plugin/machinevolumedevices/device"
 	onmetalapivalidation "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/api/validation"
 	"github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis/compute"
@@ -52,6 +53,15 @@ func ValidateMachineUpdate(newMachine, oldMachine *compute.Machine) field.ErrorL
 	return allErrs
 }
 
+var supportedMachinePowers = set.New(
+	compute.MachinePowerOn,
+	compute.MachinePowerOff,
+)
+
+func validateMachinePower(power compute.MachinePower, fldPath *field.Path) field.ErrorList {
+	return onmetalapivalidation.ValidateEnum(supportedMachinePowers, power, fldPath, "must specify machine power")
+}
+
 // validateMachineSpec validates the spec of a Machine object.
 func validateMachineSpec(machineSpec *compute.MachineSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
@@ -69,6 +79,8 @@ func validateMachineSpec(machineSpec *compute.MachineSpec, fldPath *field.Path) 
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("machinePoolRef").Child("name"), machineSpec.MachinePoolRef.Name, msg))
 		}
 	}
+
+	allErrs = append(allErrs, validateMachinePower(machineSpec.Power, fldPath.Child("power"))...)
 
 	if machineSpec.IgnitionRef != nil && machineSpec.IgnitionRef.Name != "" {
 		for _, msg := range apivalidation.NameIsDNSLabel(machineSpec.IgnitionRef.Name, false) {
