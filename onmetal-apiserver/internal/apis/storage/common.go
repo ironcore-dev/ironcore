@@ -16,4 +16,5 @@ package storage
 
 const (
 	VolumeVolumePoolRefNameField = "spec.volumePoolRef.name"
+	BucketBucketPoolRefNameField = "spec.bucketPoolRef.name"
 )

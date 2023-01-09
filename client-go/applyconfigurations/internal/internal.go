@@ -1068,6 +1068,163 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: com.github.onmetal.onmetal-api.api.networking.v1alpha1.VirtualIPSpec
       default: {}
+- name: com.github.onmetal.onmetal-api.api.storage.v1alpha1.Bucket
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: com.github.onmetal.onmetal-api.api.storage.v1alpha1.BucketSpec
+      default: {}
+    - name: status
+      type:
+        namedType: com.github.onmetal.onmetal-api.api.storage.v1alpha1.BucketStatus
+      default: {}
+- name: com.github.onmetal.onmetal-api.api.storage.v1alpha1.BucketAccess
+  map:
+    fields:
+    - name: endpoint
+      type:
+        scalar: string
+      default: ""
+    - name: secretRef
+      type:
+        namedType: io.k8s.api.core.v1.LocalObjectReference
+- name: com.github.onmetal.onmetal-api.api.storage.v1alpha1.BucketClass
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: capabilities
+      type:
+        map:
+          elementType:
+            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+- name: com.github.onmetal.onmetal-api.api.storage.v1alpha1.BucketCondition
+  map:
+    fields:
+    - name: lastTransitionTime
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
+      default: {}
+    - name: message
+      type:
+        scalar: string
+    - name: observedGeneration
+      type:
+        scalar: numeric
+    - name: reason
+      type:
+        scalar: string
+    - name: status
+      type:
+        scalar: string
+      default: ""
+    - name: type
+      type:
+        scalar: string
+      default: ""
+- name: com.github.onmetal.onmetal-api.api.storage.v1alpha1.BucketPool
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: com.github.onmetal.onmetal-api.api.storage.v1alpha1.BucketPoolSpec
+      default: {}
+    - name: status
+      type:
+        namedType: com.github.onmetal.onmetal-api.api.storage.v1alpha1.BucketPoolStatus
+      default: {}
+- name: com.github.onmetal.onmetal-api.api.storage.v1alpha1.BucketPoolSpec
+  map:
+    fields:
+    - name: providerID
+      type:
+        scalar: string
+      default: ""
+    - name: taints
+      type:
+        list:
+          elementType:
+            namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.Taint
+          elementRelationship: atomic
+- name: com.github.onmetal.onmetal-api.api.storage.v1alpha1.BucketPoolStatus
+  map:
+    fields:
+    - name: availableBucketClasses
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.api.core.v1.LocalObjectReference
+          elementRelationship: atomic
+    - name: state
+      type:
+        scalar: string
+- name: com.github.onmetal.onmetal-api.api.storage.v1alpha1.BucketSpec
+  map:
+    fields:
+    - name: bucketClassRef
+      type:
+        namedType: io.k8s.api.core.v1.LocalObjectReference
+    - name: bucketPoolRef
+      type:
+        namedType: io.k8s.api.core.v1.LocalObjectReference
+    - name: bucketPoolSelector
+      type:
+        map:
+          elementType:
+            scalar: string
+    - name: tolerations
+      type:
+        list:
+          elementType:
+            namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.Toleration
+          elementRelationship: atomic
+- name: com.github.onmetal.onmetal-api.api.storage.v1alpha1.BucketStatus
+  map:
+    fields:
+    - name: access
+      type:
+        namedType: com.github.onmetal.onmetal-api.api.storage.v1alpha1.BucketAccess
+    - name: conditions
+      type:
+        list:
+          elementType:
+            namedType: com.github.onmetal.onmetal-api.api.storage.v1alpha1.BucketCondition
+          elementRelationship: atomic
+    - name: lastStateTransitionTime
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
+    - name: state
+      type:
+        scalar: string
 - name: com.github.onmetal.onmetal-api.api.storage.v1alpha1.Volume
   map:
     fields:

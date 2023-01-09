@@ -27,6 +27,18 @@ type FakeStorageV1alpha1 struct {
 	*testing.Fake
 }
 
+func (c *FakeStorageV1alpha1) Buckets(namespace string) v1alpha1.BucketInterface {
+	return &FakeBuckets{c, namespace}
+}
+
+func (c *FakeStorageV1alpha1) BucketClasses() v1alpha1.BucketClassInterface {
+	return &FakeBucketClasses{c}
+}
+
+func (c *FakeStorageV1alpha1) BucketPools() v1alpha1.BucketPoolInterface {
+	return &FakeBucketPools{c}
+}
+
 func (c *FakeStorageV1alpha1) Volumes(namespace string) v1alpha1.VolumeInterface {
 	return &FakeVolumes{c, namespace}
 }

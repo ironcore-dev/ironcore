@@ -23,6 +23,12 @@ import (
 
 // Interface provides access to all the informers in this group version.
 type Interface interface {
+	// Buckets returns a BucketInformer.
+	Buckets() BucketInformer
+	// BucketClasses returns a BucketClassInformer.
+	BucketClasses() BucketClassInformer
+	// BucketPools returns a BucketPoolInformer.
+	BucketPools() BucketPoolInformer
 	// Volumes returns a VolumeInformer.
 	Volumes() VolumeInformer
 	// VolumeClasses returns a VolumeClassInformer.
@@ -40,6 +46,21 @@ type version struct {
 // New returns a new Interface.
 func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakListOptions internalinterfaces.TweakListOptionsFunc) Interface {
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
+}
+
+// Buckets returns a BucketInformer.
+func (v *version) Buckets() BucketInformer {
+	return &bucketInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// BucketClasses returns a BucketClassInformer.
+func (v *version) BucketClasses() BucketClassInformer {
+	return &bucketClassInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
+// BucketPools returns a BucketPoolInformer.
+func (v *version) BucketPools() BucketPoolInformer {
+	return &bucketPoolInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
 // Volumes returns a VolumeInformer.
