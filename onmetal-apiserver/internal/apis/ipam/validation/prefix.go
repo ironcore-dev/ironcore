@@ -101,7 +101,7 @@ func ValidatePrefixSpec(spec *ipam.PrefixSpec, fldPath *field.Path) field.ErrorL
 		}
 
 		allErrs = append(allErrs, validateOptionalRef(spec.ParentRef, fldPath.Child("parentRef"))...)
-		allErrs = append(allErrs, metav1validation.ValidateLabelSelector(spec.ParentSelector, fldPath.Child("parentSelector"))...)
+		allErrs = append(allErrs, metav1validation.ValidateLabelSelector(spec.ParentSelector, metav1validation.LabelSelectorValidationOptions{}, fldPath.Child("parentSelector"))...)
 	}
 
 	return allErrs

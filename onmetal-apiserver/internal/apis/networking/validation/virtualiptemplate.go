@@ -15,16 +15,16 @@
 package validation
 
 import (
+	"github.com/onmetal/controller-utils/set"
 	onmetalapivalidation "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/api/validation"
 	"github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis/networking"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	metav1validation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
-	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
-var allowedPrefixTemplateObjectMetaFields = sets.NewString(
+var allowedPrefixTemplateObjectMetaFields = set.New(
 	"Annotations",
 	"Labels",
 )

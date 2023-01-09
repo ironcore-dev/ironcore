@@ -17,7 +17,7 @@ package endpoints_test
 
 import (
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	. "github.com/onmetal/onmetal-api/poollet/machinepoollet/endpoints"
+	"github.com/onmetal/onmetal-api/poollet/machinepoollet/endpoints"
 	"github.com/onmetal/onmetal-api/testutils"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -52,7 +52,7 @@ var _ = Describe("NodePortService", func() {
 		Expect(k8sClient.Create(ctx, svc)).To(Succeed())
 
 		By("creating the node port endpoints")
-		eps, err := NewNodePortServiceEndpoints(ctx, cfg, NodePortServiceEndpointsOptions{
+		eps, err := endpoints.NewNodePortServiceEndpoints(ctx, cfg, endpoints.NodePortServiceEndpointsOptions{
 			Namespace:   ns.Name,
 			ServiceName: svc.Name,
 			PortName:    portName,
@@ -77,7 +77,7 @@ var _ = Describe("NodePortService", func() {
 
 		By("adding a listener")
 		var notifyCount atomic.Int32
-		eps.AddListener(ListenerFunc(func() {
+		eps.AddListener(endpoints.ListenerFunc(func() {
 			notifyCount.Inc()
 		}))
 

@@ -50,7 +50,7 @@ func validateLoadBalancerSpec(spec *networking.LoadBalancerSpec, fldPath *field.
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("networkRef").Child("name"), spec.NetworkRef.Name, msg))
 	}
 
-	allErrs = append(allErrs, metav1validation.ValidateLabelSelector(spec.NetworkInterfaceSelector, fldPath.Child("networkInterfaceSelector"))...)
+	allErrs = append(allErrs, metav1validation.ValidateLabelSelector(spec.NetworkInterfaceSelector, metav1validation.LabelSelectorValidationOptions{}, fldPath.Child("networkInterfaceSelector"))...)
 
 	var (
 		portRangesByProtocol = make(map[corev1.Protocol][][2]int32)

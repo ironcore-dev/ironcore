@@ -40,7 +40,7 @@ func validatePrefixAllocationSpec(spec *ipam.PrefixAllocationSpec, fldPath *fiel
 
 	allErrs = append(allErrs, validateIPFamilyAndOptionalPrefixAndLength(spec.IPFamily, spec.Prefix, spec.PrefixLength, fldPath)...)
 	allErrs = append(allErrs, validateOptionalRef(spec.PrefixRef, fldPath.Child("prefixRef"))...)
-	allErrs = append(allErrs, metav1validation.ValidateLabelSelector(spec.PrefixSelector, fldPath.Child("prefixSelector"))...)
+	allErrs = append(allErrs, metav1validation.ValidateLabelSelector(spec.PrefixSelector, metav1validation.LabelSelectorValidationOptions{}, fldPath.Child("prefixSelector"))...)
 
 	var numRequests int
 	if spec.Prefix != nil {

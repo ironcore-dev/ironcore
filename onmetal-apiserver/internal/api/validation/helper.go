@@ -27,7 +27,6 @@ import (
 	"github.com/onmetal/onmetal-api/apiutils/equality"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/api/validation"
-	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
@@ -104,7 +103,7 @@ func ValidateEnum[E comparable](allowed set.Set[E], value E, fldPath *field.Path
 
 // ValidateFieldAllowList checks that only allowed fields are set.
 // The value must be a struct (not a pointer to a struct!).
-func ValidateFieldAllowList(value interface{}, allowedFields sets.String, errorText string, fldPath *field.Path) field.ErrorList {
+func ValidateFieldAllowList(value interface{}, allowedFields set.Set[string], errorText string, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
 	reflectType, reflectValue := reflect.TypeOf(value), reflect.ValueOf(value)

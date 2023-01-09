@@ -49,7 +49,7 @@ func validateAliasPrefixSpec(spec *networking.AliasPrefixSpec, fldPath *field.Pa
 		}
 	}
 
-	allErrs = append(allErrs, metav1validation.ValidateLabelSelector(spec.NetworkInterfaceSelector, fldPath.Child("networkInterfaceSelector"))...)
+	allErrs = append(allErrs, metav1validation.ValidateLabelSelector(spec.NetworkInterfaceSelector, metav1validation.LabelSelectorValidationOptions{}, fldPath.Child("networkInterfaceSelector"))...)
 	allErrs = append(allErrs, validateAliasPrefixSources(spec.Prefix, fldPath.Child("prefix"))...)
 
 	return allErrs

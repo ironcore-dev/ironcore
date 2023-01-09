@@ -61,7 +61,7 @@ func validateNATGatewaySpec(spec *networking.NATGatewaySpec, fldPath *field.Path
 		allErrs = append(allErrs, onmetalapivalidation.ValidatePowerOfTwo(int64(*spec.PortsPerNetworkInterface), fldPath.Child("portsPerNetworkInterface"))...)
 	}
 
-	allErrs = append(allErrs, metav1validation.ValidateLabelSelector(spec.NetworkInterfaceSelector, fldPath.Child("networkInterfaceSelector"))...)
+	allErrs = append(allErrs, metav1validation.ValidateLabelSelector(spec.NetworkInterfaceSelector, metav1validation.LabelSelectorValidationOptions{}, fldPath.Child("networkInterfaceSelector"))...)
 
 	return allErrs
 }

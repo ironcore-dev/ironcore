@@ -17,7 +17,7 @@ package endpoints_test
 
 import (
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	. "github.com/onmetal/onmetal-api/poollet/machinepoollet/endpoints"
+	"github.com/onmetal/onmetal-api/poollet/machinepoollet/endpoints"
 	"github.com/onmetal/onmetal-api/testutils"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -52,7 +52,7 @@ var _ = Describe("LoadBalancerService", func() {
 		Expect(k8sClient.Create(ctx, svc)).To(Succeed())
 
 		By("creating the loadbalancerservice endpoints")
-		eps, err := NewLoadBalancerServiceEndpoints(ctx, cfg, LoadBalancerServiceEndpointsOptions{
+		eps, err := endpoints.NewLoadBalancerServiceEndpoints(ctx, cfg, endpoints.LoadBalancerServiceEndpointsOptions{
 			Namespace:   ns.Name,
 			ServiceName: svc.Name,
 			PortName:    portName,
@@ -82,7 +82,7 @@ var _ = Describe("LoadBalancerService", func() {
 
 		By("adding a listener")
 		var notifyCount atomic.Int32
-		eps.AddListener(ListenerFunc(func() {
+		eps.AddListener(endpoints.ListenerFunc(func() {
 			notifyCount.Inc()
 		}))
 
