@@ -187,6 +187,11 @@ func Run(ctx context.Context, opts Options) error {
 	}
 
 	onInitialized := func(ctx context.Context) error {
+		version, err := machineRuntime.Version(ctx, &ori.VersionRequest{})
+		if err != nil {
+			return fmt.Errorf("error getting machine runtime version: %w", err)
+		}
+
 		machineClassMapper := mcm.NewGeneric(machineRuntime, mcm.GenericOptions{})
 		if err := mgr.Add(machineClassMapper); err != nil {
 			return fmt.Errorf("error adding machine class mapper: %w", err)
@@ -242,12 +247,14 @@ func Run(ctx context.Context, opts Options) error {
 		}
 
 		if err := (&controllers.MachineReconciler{
-			EventRecorder:      mgr.GetEventRecorderFor("machines"),
-			Client:             mgr.GetClient(),
-			MachineRuntime:     machineRuntime,
-			MachineClassMapper: machineClassMapper,
-			MachinePoolName:    opts.MachinePoolName,
-			WatchFilterValue:   opts.WatchFilterValue,
+			EventRecorder:         mgr.GetEventRecorderFor("machines"),
+			Client:                mgr.GetClient(),
+			MachineRuntime:        machineRuntime,
+			MachineRuntimeName:    version.RuntimeName,
+			MachineRuntimeVersion: version.RuntimeVersion,
+			MachineClassMapper:    machineClassMapper,
+			MachinePoolName:       opts.MachinePoolName,
+			WatchFilterValue:      opts.WatchFilterValue,
 		}).SetupWithManager(mgr); err != nil {
 			return fmt.Errorf("error setting up machine reconciler with manager: %w", err)
 		}

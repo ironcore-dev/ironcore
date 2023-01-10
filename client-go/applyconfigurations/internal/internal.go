@@ -338,6 +338,9 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: com.github.onmetal.onmetal-api.api.compute.v1alpha1.MachineStatus
   map:
     fields:
+    - name: machineID
+      type:
+        scalar: string
     - name: machinePoolObservedGeneration
       type:
         scalar: numeric

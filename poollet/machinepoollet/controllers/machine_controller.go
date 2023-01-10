@@ -35,6 +35,7 @@ import (
 	machinepoolletv1alpha1 "github.com/onmetal/onmetal-api/poollet/machinepoollet/api/v1alpha1"
 	machinepoolletclient "github.com/onmetal/onmetal-api/poollet/machinepoollet/client"
 	"github.com/onmetal/onmetal-api/poollet/machinepoollet/controllers/events"
+	machinepoolletmachine "github.com/onmetal/onmetal-api/poollet/machinepoollet/machine"
 	"github.com/onmetal/onmetal-api/poollet/machinepoollet/mcm"
 	utilslices "github.com/onmetal/onmetal-api/utils/slices"
 	"google.golang.org/grpc/codes"
@@ -58,7 +59,9 @@ type MachineReconciler struct {
 	record.EventRecorder
 	client.Client
 
-	MachineRuntime orimachine.RuntimeService
+	MachineRuntime        orimachine.RuntimeService
+	MachineRuntimeName    string
+	MachineRuntimeVersion string
 
 	MachineClassMapper mcm.MachineClassMapper
 
@@ -467,6 +470,8 @@ func (r *MachineReconciler) updateStatus(ctx context.Context, log logr.Logger, m
 		return err
 	}
 
+	machineID := machinepoolletmachine.MakeID(r.MachineRuntimeName, oriMachine.Metadata.Id)
+	machine.Status.MachineID = machineID.String()
 	machine.Status.MachinePoolObservedGeneration = generation
 
 	state, err := r.convertORIMachineState(oriMachine.Status.State)

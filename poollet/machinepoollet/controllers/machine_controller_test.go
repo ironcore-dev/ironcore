@@ -22,12 +22,15 @@ import (
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	testingmachine "github.com/onmetal/onmetal-api/ori/testing/machine"
+	machinepoolletmachine "github.com/onmetal/onmetal-api/poollet/machinepoollet/machine"
 	. "github.com/onmetal/onmetal-api/testutils"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 )
 
 var _ = Describe("MachineController", func() {
@@ -151,6 +154,13 @@ var _ = Describe("MachineController", func() {
 			Prefixes:            []string{},
 			LoadBalancerTargets: []*ori.LoadBalancerTargetSpec{},
 		}))
+
+		By("waiting for the onmetal machine status to be up-to-date")
+		expectedMachineID := machinepoolletmachine.MakeID(testingmachine.FakeRuntimeName, oriMachine.Metadata.Id)
+		Eventually(Object(machine)).Should(SatisfyAll(
+			HaveField("Status.MachineID", expectedMachineID.String()),
+			HaveField("Status.MachinePoolObservedGeneration", machine.Generation),
+		))
 	})
 
 	It("should correctly manage the power state of a machine", func() {
