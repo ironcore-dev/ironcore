@@ -41,6 +41,10 @@ func NewRemoteRuntime(endpoint string) (machine.RuntimeService, error) {
 	}, nil
 }
 
+func (r *remoteRuntime) Version(ctx context.Context, req *ori.VersionRequest) (*ori.VersionResponse, error) {
+	return r.client.Version(ctx, req)
+}
+
 func (r *remoteRuntime) ListMachines(ctx context.Context, req *ori.ListMachinesRequest) (*ori.ListMachinesResponse, error) {
 	return r.client.ListMachines(ctx, req)
 }

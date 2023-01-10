@@ -29,6 +29,14 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 )
 
+var (
+	// FakeVersion is the version of the fake runtime.
+	FakeVersion = "0.1.0"
+
+	// FakeRuntimeName is the name of the fake runtime.
+	FakeRuntimeName = "fakeRuntime"
+)
+
 func filterInLabels(labelSelector, lbls map[string]string) bool {
 	return labels.SelectorFromSet(labelSelector).Matches(labels.Set(lbls))
 }
@@ -122,6 +130,13 @@ func (r *FakeRuntimeService) SetMachineClasses(machineClasses []*FakeMachineClas
 	for _, machineClass := range machineClasses {
 		r.MachineClasses[machineClass.Name] = machineClass
 	}
+}
+
+func (r *FakeRuntimeService) Version(ctx context.Context, req *ori.VersionRequest) (*ori.VersionResponse, error) {
+	return &ori.VersionResponse{
+		RuntimeName:    FakeRuntimeName,
+		RuntimeVersion: FakeVersion,
+	}, nil
 }
 
 func (r *FakeRuntimeService) ListMachines(ctx context.Context, req *ori.ListMachinesRequest) (*ori.ListMachinesResponse, error) {

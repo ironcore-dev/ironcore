@@ -1457,6 +1457,13 @@ func schema_onmetal_api_api_compute_v1alpha1_MachineStatus(ref common.ReferenceC
 				Description: "MachineStatus defines the observed state of Machine",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
+					"machineID": {
+						SchemaProps: spec.SchemaProps{
+							Description: "MachineID is the provider specific machine ID in the format '<type>://<machine_id>'.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 					"machinePoolObservedGeneration": {
 						SchemaProps: spec.SchemaProps{
 							Description: "MachinePoolObservedGeneration is the last generation the MachinePool observed of the Machine.",

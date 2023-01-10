@@ -212,11 +212,13 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 		DeferCleanup(cancel)
 
 		Expect((&controllers.MachineReconciler{
-			EventRecorder:      &record.FakeRecorder{},
-			Client:             k8sManager.GetClient(),
-			MachineRuntime:     srv,
-			MachineClassMapper: machineClassMapper,
-			MachinePoolName:    mp.Name,
+			EventRecorder:         &record.FakeRecorder{},
+			Client:                k8sManager.GetClient(),
+			MachineRuntime:        srv,
+			MachineRuntimeName:    machine.FakeRuntimeName,
+			MachineRuntimeVersion: machine.FakeVersion,
+			MachineClassMapper:    machineClassMapper,
+			MachinePoolName:       mp.Name,
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		go func() {

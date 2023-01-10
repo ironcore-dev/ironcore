@@ -808,6 +808,7 @@ func Convert_compute_MachineSpec_To_v1alpha1_MachineSpec(in *compute.MachineSpec
 }
 
 func autoConvert_v1alpha1_MachineStatus_To_compute_MachineStatus(in *v1alpha1.MachineStatus, out *compute.MachineStatus, s conversion.Scope) error {
+	out.MachineID = in.MachineID
 	out.MachinePoolObservedGeneration = in.MachinePoolObservedGeneration
 	out.State = compute.MachineState(in.State)
 	out.NetworkInterfaces = *(*[]compute.NetworkInterfaceStatus)(unsafe.Pointer(&in.NetworkInterfaces))
@@ -821,6 +822,7 @@ func Convert_v1alpha1_MachineStatus_To_compute_MachineStatus(in *v1alpha1.Machin
 }
 
 func autoConvert_compute_MachineStatus_To_v1alpha1_MachineStatus(in *compute.MachineStatus, out *v1alpha1.MachineStatus, s conversion.Scope) error {
+	out.MachineID = in.MachineID
 	out.MachinePoolObservedGeneration = in.MachinePoolObservedGeneration
 	out.State = v1alpha1.MachineState(in.State)
 	out.NetworkInterfaces = *(*[]v1alpha1.NetworkInterfaceStatus)(unsafe.Pointer(&in.NetworkInterfaces))

@@ -24,6 +24,7 @@ import (
 // MachineStatusApplyConfiguration represents an declarative configuration of the MachineStatus type for use
 // with apply.
 type MachineStatusApplyConfiguration struct {
+	MachineID                     *string                                    `json:"machineID,omitempty"`
 	MachinePoolObservedGeneration *int64                                     `json:"machinePoolObservedGeneration,omitempty"`
 	State                         *v1alpha1.MachineState                     `json:"state,omitempty"`
 	NetworkInterfaces             []NetworkInterfaceStatusApplyConfiguration `json:"networkInterfaces,omitempty"`
@@ -34,6 +35,14 @@ type MachineStatusApplyConfiguration struct {
 // apply.
 func MachineStatus() *MachineStatusApplyConfiguration {
 	return &MachineStatusApplyConfiguration{}
+}
+
+// WithMachineID sets the MachineID field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the MachineID field is set to the value of the last call.
+func (b *MachineStatusApplyConfiguration) WithMachineID(value string) *MachineStatusApplyConfiguration {
+	b.MachineID = &value
+	return b
 }
 
 // WithMachinePoolObservedGeneration sets the MachinePoolObservedGeneration field in the declarative configuration to the given value
