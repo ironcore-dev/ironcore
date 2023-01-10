@@ -194,6 +194,20 @@ func (r *FakeRuntimeService) UpdateMachineAnnotations(ctx context.Context, req *
 	return &ori.UpdateMachineAnnotationsResponse{}, nil
 }
 
+func (r *FakeRuntimeService) UpdateMachinePower(ctx context.Context, req *ori.UpdateMachinePowerRequest) (*ori.UpdateMachinePowerResponse, error) {
+	r.Lock()
+	defer r.Unlock()
+
+	machineID := req.MachineId
+	machine, ok := r.Machines[machineID]
+	if !ok {
+		return nil, status.Errorf(codes.NotFound, "machine %q not found", machineID)
+	}
+
+	machine.Spec.Power = req.Power
+	return &ori.UpdateMachinePowerResponse{}, nil
+}
+
 func (r *FakeRuntimeService) CreateVolumeAttachment(ctx context.Context, req *ori.CreateVolumeAttachmentRequest) (*ori.CreateVolumeAttachmentResponse, error) {
 	r.Lock()
 	defer r.Unlock()

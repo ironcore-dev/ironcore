@@ -29,7 +29,7 @@ type MachineSpecApplyConfiguration struct {
 	MachineClassRef     *v1.LocalObjectReference                            `json:"machineClassRef,omitempty"`
 	MachinePoolSelector map[string]string                                   `json:"machinePoolSelector,omitempty"`
 	MachinePoolRef      *v1.LocalObjectReference                            `json:"machinePoolRef,omitempty"`
-	Power               *v1alpha1.MachinePower                              `json:"power,omitempty"`
+	Power               *v1alpha1.Power                                     `json:"power,omitempty"`
 	Image               *string                                             `json:"image,omitempty"`
 	ImagePullSecretRef  *v1.LocalObjectReference                            `json:"imagePullSecret,omitempty"`
 	NetworkInterfaces   []NetworkInterfaceApplyConfiguration                `json:"networkInterfaces,omitempty"`
@@ -78,7 +78,7 @@ func (b *MachineSpecApplyConfiguration) WithMachinePoolRef(value v1.LocalObjectR
 // WithPower sets the Power field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Power field is set to the value of the last call.
-func (b *MachineSpecApplyConfiguration) WithPower(value v1alpha1.MachinePower) *MachineSpecApplyConfiguration {
+func (b *MachineSpecApplyConfiguration) WithPower(value v1alpha1.Power) *MachineSpecApplyConfiguration {
 	b.Power = &value
 	return b
 }

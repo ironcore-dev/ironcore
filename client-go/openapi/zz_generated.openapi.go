@@ -1343,7 +1343,7 @@ func schema_onmetal_api_api_compute_v1alpha1_MachineSpec(ref common.ReferenceCal
 					},
 					"power": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Power ist the desired machine power state. Defaults to MachinePowerOn.",
+							Description: "Power ist the desired machine power state. Defaults to PowerOn.",
 							Type:        []string{"string"},
 							Format:      "",
 						},

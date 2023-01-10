@@ -19,6 +19,7 @@ service MachineRuntime {
   rpc CreateMachine(CreateMachineRequest) returns (CreateMachineResponse) {};
   rpc DeleteMachine(DeleteMachineRequest) returns (DeleteMachineResponse) {};
   rpc UpdateMachineAnnotations(UpdateMachineAnnotationsRequest) returns (UpdateMachineAnnotationsResponse);
+  rpc UpdateMachinePower(UpdateMachinePowerRequest) returns (UpdateMachinePowerResponse);
   rpc CreateVolumeAttachment(CreateVolumeAttachmentRequest) returns (CreateVolumeAttachmentResponse) {};
   rpc DeleteVolumeAttachment(DeleteVolumeAttachmentRequest) returns (DeleteVolumeAttachmentResponse) {};
   rpc CreateNetworkInterfaceAttachment(CreateNetworkInterfaceAttachmentRequest) returns (CreateNetworkInterfaceAttachmentResponse) {};
@@ -157,12 +158,18 @@ message NetworkInterfaceAttachment {
   string network_interface_id = 2;
 }
 
+enum Power {
+  POWER_ON = 0;
+  POWER_OFF = 1;
+}
+
 message MachineSpec {
-  ImageSpec image = 1;
-  string class = 2;
-  IgnitionSpec ignition = 3;
-  repeated VolumeAttachment volumes = 4;
-  repeated NetworkInterfaceAttachment network_interfaces = 5;
+  Power power = 1;
+  ImageSpec image = 2;
+  string class = 3;
+  IgnitionSpec ignition = 4;
+  repeated VolumeAttachment volumes = 5;
+  repeated NetworkInterfaceAttachment network_interfaces = 6;
 }
 
 message MachineStatus {
@@ -238,6 +245,14 @@ message UpdateMachineAnnotationsRequest {
 }
 
 message UpdateMachineAnnotationsResponse {
+}
+
+message UpdateMachinePowerRequest {
+  string machine_id = 1;
+  Power power = 2;
+}
+
+message UpdateMachinePowerResponse {
 }
 
 message CreateVolumeAttachmentRequest {

@@ -127,6 +127,7 @@ var _ = Describe("MachineController", func() {
 
 		By("inspecting the ori machine")
 		Expect(oriMachine.Spec.Class).To(Equal(mc.Name))
+		Expect(oriMachine.Spec.Power).To(Equal(ori.Power_POWER_ON))
 		Expect(oriMachine.Spec.Volumes).To(ConsistOf(&ori.VolumeAttachment{
 			Name:     "primary",
 			Device:   "oda",
@@ -150,6 +151,36 @@ var _ = Describe("MachineController", func() {
 			Prefixes:            []string{},
 			LoadBalancerTargets: []*ori.LoadBalancerTargetSpec{},
 		}))
+	})
+
+	It("should correctly manage the power state of a machine", func() {
+		By("creating a machine")
+		machine := &computev1alpha1.Machine{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "machine-",
+			},
+			Spec: computev1alpha1.MachineSpec{
+				MachineClassRef: corev1.LocalObjectReference{Name: mc.Name},
+				MachinePoolRef:  &corev1.LocalObjectReference{Name: mp.Name},
+			},
+		}
+		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+
+		By("waiting for the machine to be created")
+		Eventually(srv).Should(HaveField("Machines", HaveLen(1)))
+
+		By("inspecting the machine")
+		_, oriMachine := GetSingleMapEntry(srv.Machines)
+		Expect(oriMachine.Spec.Power).To(Equal(ori.Power_POWER_ON))
+
+		By("updating the machine power")
+		base := machine.DeepCopy()
+		machine.Spec.Power = computev1alpha1.PowerOff
+		Expect(k8sClient.Patch(ctx, machine, client.MergeFrom(base))).To(Succeed())
+
+		By("waiting for the ori machine to be updated")
+		Eventually(oriMachine).Should(HaveField("Spec.Power", Equal(ori.Power_POWER_OFF)))
 	})
 
 	It("should correctly reconcile alias prefixes", func() {

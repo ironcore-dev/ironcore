@@ -26,6 +26,7 @@ type RuntimeService interface {
 	DeleteMachine(context.Context, *api.DeleteMachineRequest) (*api.DeleteMachineResponse, error)
 
 	UpdateMachineAnnotations(context.Context, *api.UpdateMachineAnnotationsRequest) (*api.UpdateMachineAnnotationsResponse, error)
+	UpdateMachinePower(context.Context, *api.UpdateMachinePowerRequest) (*api.UpdateMachinePowerResponse, error)
 
 	CreateVolumeAttachment(context.Context, *api.CreateVolumeAttachmentRequest) (*api.CreateVolumeAttachmentResponse, error)
 	DeleteVolumeAttachment(context.Context, *api.DeleteVolumeAttachmentRequest) (*api.DeleteVolumeAttachmentResponse, error)

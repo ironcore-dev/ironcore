@@ -66,7 +66,7 @@ var _ = Describe("Machine", func() {
 		Entry("valid machine power",
 			&compute.Machine{
 				Spec: compute.MachineSpec{
-					Power: compute.MachinePowerOn,
+					Power: compute.PowerOn,
 				},
 			},
 			Not(ContainElement(NotSupportedField("spec.power"))),
