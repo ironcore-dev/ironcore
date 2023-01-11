@@ -24,7 +24,7 @@ import (
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	testingmachine "github.com/onmetal/onmetal-api/ori/testing/machine"
 	machinepoolletmachine "github.com/onmetal/onmetal-api/poollet/machinepoollet/machine"
-	. "github.com/onmetal/onmetal-api/testutils"
+	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"

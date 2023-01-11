@@ -18,7 +18,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/onmetal/onmetal-api/apiutils/annotations"
+	"github.com/onmetal/onmetal-api/utils/annotations"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 

@@ -24,7 +24,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/onmetal/controller-utils/set"
 	"github.com/onmetal/onmetal-api/api/common/v1alpha1"
-	"github.com/onmetal/onmetal-api/apiutils/equality"
+	"github.com/onmetal/onmetal-api/utils/equality"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"

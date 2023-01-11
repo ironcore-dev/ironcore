@@ -20,8 +20,8 @@ import (
 	"sync/atomic"
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	"github.com/onmetal/onmetal-api/apiutils/equality"
 	machinepoolletpredicate "github.com/onmetal/onmetal-api/poollet/machinepoollet/predicate"
+	"github.com/onmetal/onmetal-api/utils/equality"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"

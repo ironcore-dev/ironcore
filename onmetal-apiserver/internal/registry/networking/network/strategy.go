@@ -18,10 +18,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/onmetal/onmetal-api/apiutils/equality"
 	"github.com/onmetal/onmetal-api/onmetal-apiserver/internal/api"
 	"github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis/networking"
 	"github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis/networking/validation"
+	"github.com/onmetal/onmetal-api/utils/equality"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"

@@ -25,8 +25,8 @@ import (
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	onmetalapiclient "github.com/onmetal/onmetal-api/onmetal-controller-manager/client"
 	"github.com/onmetal/onmetal-api/onmetal-controller-manager/controllers/ipam"
-	"github.com/onmetal/onmetal-api/testutils/envtestutils"
-	"github.com/onmetal/onmetal-api/testutils/envtestutils/apiserver"
+	utilsenvtest "github.com/onmetal/onmetal-api/utils/envtest"
+	"github.com/onmetal/onmetal-api/utils/envtest/apiserver"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
@@ -56,7 +56,7 @@ var (
 	apiServerBinary string
 	k8sClient       client.Client
 	testEnv         *envtest.Environment
-	testEnvExt      *envtestutils.EnvironmentExtensions
+	testEnvExt      *utilsenvtest.EnvironmentExtensions
 )
 
 func TestAPIs(t *testing.T) {
@@ -81,16 +81,16 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 
 	By("bootstrapping test environment")
 	testEnv = &envtest.Environment{}
-	testEnvExt = &envtestutils.EnvironmentExtensions{
+	testEnvExt = &utilsenvtest.EnvironmentExtensions{
 		APIServiceDirectoryPaths:       []string{filepath.Join("..", "..", "..", "config", "apiserver", "apiservice", "bases")},
 		ErrorIfAPIServicePathIsMissing: true,
 	}
 
-	cfg, err := envtestutils.StartWithExtensions(testEnv, testEnvExt)
+	cfg, err := utilsenvtest.StartWithExtensions(testEnv, testEnvExt)
 	Expect(err).NotTo(HaveOccurred())
 	Expect(cfg).NotTo(BeNil())
 
-	DeferCleanup(envtestutils.StopWithExtensions, testEnv, testEnvExt)
+	DeferCleanup(utilsenvtest.StopWithExtensions, testEnv, testEnvExt)
 
 	Expect(ipamv1alpha1.AddToScheme(scheme.Scheme)).Should(Succeed())
 	Expect(networkingv1alpha1.AddToScheme(scheme.Scheme)).Should(Succeed())
@@ -114,7 +114,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	Expect(apiSrv.Start()).To(Succeed())
 	DeferCleanup(apiSrv.Stop)
 
-	Expect(envtestutils.WaitUntilAPIServicesReadyWithTimeout(apiServiceTimeout, testEnvExt, k8sClient, scheme.Scheme)).To(Succeed())
+	Expect(utilsenvtest.WaitUntilAPIServicesReadyWithTimeout(apiServiceTimeout, testEnvExt, k8sClient, scheme.Scheme)).To(Succeed())
 
 	k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
 		Scheme:             scheme.Scheme,

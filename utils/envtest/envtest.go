@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package envtestutils
+package envtest
 
 import (
 	"context"
@@ -25,8 +25,8 @@ import (
 	"time"
 
 	"github.com/onmetal/controller-utils/conditionutils"
-	"github.com/onmetal/onmetal-api/testutils/envtestutils/internal/testing/addr"
-	"github.com/onmetal/onmetal-api/testutils/envtestutils/internal/testing/certs"
+	"github.com/onmetal/onmetal-api/utils/envtest/internal/testing/addr"
+	"github.com/onmetal/onmetal-api/utils/envtest/internal/testing/certs"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

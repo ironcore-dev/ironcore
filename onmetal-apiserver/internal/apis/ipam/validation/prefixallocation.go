@@ -17,10 +17,10 @@ package validation
 import (
 	"fmt"
 
-	"github.com/onmetal/onmetal-api/apiutils/equality"
 	onmetalapivalidation "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/api/validation"
 	commonvalidation "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis/common/validation"
 	"github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis/ipam"
+	"github.com/onmetal/onmetal-api/utils/equality"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1validation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"

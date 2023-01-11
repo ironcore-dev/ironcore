@@ -20,11 +20,11 @@ import (
 
 	"github.com/go-logr/logr"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	onmetalapiclient "github.com/onmetal/onmetal-api/apiutils/client"
 	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
 	"github.com/onmetal/onmetal-api/poollet/orievent"
 	volumepoolletv1alpha1 "github.com/onmetal/onmetal-api/poollet/volumepoollet/api/v1alpha1"
+	onmetalapiclient "github.com/onmetal/onmetal-api/utils/client"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"

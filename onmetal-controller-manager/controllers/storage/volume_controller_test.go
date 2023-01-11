@@ -20,7 +20,7 @@ import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	"github.com/onmetal/onmetal-api/testutils"
+	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -30,7 +30,7 @@ import (
 )
 
 var _ = Describe("VolumeReconciler", func() {
-	ctx := testutils.SetupContext()
+	ctx := SetupContext()
 	ns := SetupTest(ctx)
 
 	It("should schedule, bind and unbind a volume to a machine", func() {

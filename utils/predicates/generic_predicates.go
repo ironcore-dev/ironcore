@@ -18,8 +18,8 @@ import (
 	"strings"
 
 	"github.com/go-logr/logr"
-	"github.com/onmetal/onmetal-api/apiutils/annotations"
-	"github.com/onmetal/onmetal-api/apiutils/labels"
+	"github.com/onmetal/onmetal-api/utils/annotations"
+	"github.com/onmetal/onmetal-api/utils/labels"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
