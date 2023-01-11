@@ -19,14 +19,14 @@ import (
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
-	"github.com/onmetal/onmetal-api/testutils"
+	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 )
 
 var _ = Describe("NetworkInterfaceCreateLoadBalancerTarget", func() {
-	ctx := testutils.SetupContext()
+	ctx := SetupContext()
 	_, srv := SetupTest(ctx)
 
 	It("should correctly create a load balancer target for a network interface", func() {

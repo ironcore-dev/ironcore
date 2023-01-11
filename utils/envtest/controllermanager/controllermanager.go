@@ -22,8 +22,8 @@ import (
 	"time"
 
 	"github.com/onmetal/controller-utils/buildutils"
-	"github.com/onmetal/onmetal-api/testutils/envtestutils/internal/testing/controlplane"
-	"github.com/onmetal/onmetal-api/testutils/envtestutils/process"
+	"github.com/onmetal/onmetal-api/utils/envtest/internal/testing/controlplane"
+	"github.com/onmetal/onmetal-api/utils/envtest/process"
 	"k8s.io/client-go/rest"
 )
 

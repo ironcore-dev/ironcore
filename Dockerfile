@@ -11,7 +11,6 @@ RUN go mod download
 
 # Copy the go source
 COPY api/ api/
-COPY apiutils/ apiutils/
 COPY broker/ broker/
 COPY client-go/ client-go/
 COPY onmetal-apiserver/ onmetal-apiserver/
@@ -19,7 +18,6 @@ COPY onmetal-controller-manager/ onmetal-controller-manager/
 COPY ori/ ori/
 COPY orictl/ orictl/
 COPY poollet/ poollet/
-COPY testutils/ testutils/
 COPY utils/ utils/
 
 ARG TARGETOS

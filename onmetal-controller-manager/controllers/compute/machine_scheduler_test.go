@@ -15,7 +15,7 @@
 package compute
 
 import (
-	"github.com/onmetal/onmetal-api/testutils"
+	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -27,7 +27,7 @@ import (
 )
 
 var _ = Describe("MachineScheduler", func() {
-	ctx := testutils.SetupContext()
+	ctx := SetupContext()
 	ns := SetupTest(ctx)
 
 	It("should schedule machines on machine pools", func() {

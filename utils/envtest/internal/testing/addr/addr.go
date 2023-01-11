@@ -26,7 +26,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/onmetal/onmetal-api/testutils/envtestutils/internal/testing/flock"
+	flock2 "github.com/onmetal/onmetal-api/utils/envtest/internal/testing/flock"
 )
 
 // TODO(directxman12): interface / release functionality for external port managers
@@ -78,7 +78,7 @@ func (c *portCache) add(port int) (bool, error) {
 	}
 	// Try allocating new port, by acquiring a file.
 	path := fmt.Sprintf("%s/%s%d", cacheDir, portFilePrefix, port)
-	if err := flock.Acquire(path); errors.Is(err, flock.ErrAlreadyLocked) {
+	if err := flock2.Acquire(path); errors.Is(err, flock2.ErrAlreadyLocked) {
 		return false, nil
 	} else if err != nil {
 		return false, err

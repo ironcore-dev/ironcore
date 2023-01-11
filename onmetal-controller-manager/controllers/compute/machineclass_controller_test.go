@@ -17,7 +17,7 @@
 package compute
 
 import (
-	"github.com/onmetal/onmetal-api/testutils"
+	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -30,7 +30,7 @@ import (
 )
 
 var _ = Describe("machineclass controller", func() {
-	ctx := testutils.SetupContext()
+	ctx := SetupContext()
 	ns := SetupTest(ctx)
 	It("removes the finalizer from machineclass only if there's no machine still using the machineclass", func() {
 		By("creating the machineclass consumed by the machine")

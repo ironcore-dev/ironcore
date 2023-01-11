@@ -31,7 +31,7 @@ import (
 	"time"
 
 	"github.com/onmetal/controller-utils/buildutils"
-	"github.com/onmetal/onmetal-api/testutils/envtestutils/internal/testing/controlplane"
+	"github.com/onmetal/onmetal-api/utils/envtest/internal/testing/controlplane"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/rest"

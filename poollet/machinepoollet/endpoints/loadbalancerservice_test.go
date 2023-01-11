@@ -18,7 +18,7 @@ package endpoints_test
 import (
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	"github.com/onmetal/onmetal-api/poollet/machinepoollet/endpoints"
-	"github.com/onmetal/onmetal-api/testutils"
+	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"go.uber.org/atomic"
@@ -29,7 +29,7 @@ import (
 )
 
 var _ = Describe("LoadBalancerService", func() {
-	ctx := testutils.SetupContext()
+	ctx := SetupContext()
 	ns := SetupTest(ctx)
 
 	It("should correctly report and update the endpoints", func() {

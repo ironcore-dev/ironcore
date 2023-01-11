@@ -20,13 +20,13 @@ import (
 	"sync"
 
 	. "github.com/onmetal/onmetal-api/broker/common/sync"
-	"github.com/onmetal/onmetal-api/testutils"
+	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Sync", func() {
-	ctx := testutils.SetupContext()
+	ctx := SetupContext()
 
 	Context("MutexMap", func() {
 		const (

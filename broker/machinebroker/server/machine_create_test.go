@@ -15,12 +15,12 @@
 package server_test
 
 import (
-	"github.com/onmetal/onmetal-api/testutils"
+	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 )
 
 var _ = Describe("CreateMachine", func() {
-	ctx := testutils.SetupContext()
+	ctx := SetupContext()
 	_, _ = SetupTest(ctx)
 
 	It("should correctly create a machine", func() {

@@ -17,13 +17,13 @@ package server_test
 import (
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
-	"github.com/onmetal/onmetal-api/testutils"
+	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("NetworkInterfaceDeletePrefix", func() {
-	ctx := testutils.SetupContext()
+	ctx := SetupContext()
 	_, srv := SetupTest(ctx)
 
 	It("should correctly delete a prefix for a network interface", func() {
