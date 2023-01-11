@@ -186,64 +186,87 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error creating manager: %w", err)
 	}
 
-	onInitialized := func(ctx context.Context) error {
-		version, err := machineRuntime.Version(ctx, &ori.VersionRequest{})
+	version, err := machineRuntime.Version(ctx, &ori.VersionRequest{})
+	if err != nil {
+		return fmt.Errorf("error getting machine runtime version: %w", err)
+	}
+
+	machineClassMapper := mcm.NewGeneric(machineRuntime, mcm.GenericOptions{})
+	if err := mgr.Add(machineClassMapper); err != nil {
+		return fmt.Errorf("error adding machine class mapper: %w", err)
+	}
+
+	machineEvents := orievent.NewGenerator(func(ctx context.Context) ([]*ori.Machine, error) {
+		res, err := machineRuntime.ListMachines(ctx, &ori.ListMachinesRequest{})
 		if err != nil {
-			return fmt.Errorf("error getting machine runtime version: %w", err)
+			return nil, err
 		}
+		return res.Machines, nil
+	}, orievent.GeneratorOptions{})
+	if err := mgr.Add(machineEvents); err != nil {
+		return fmt.Errorf("error adding machine event generator: %w", err)
+	}
+	if err := mgr.AddHealthzCheck("machine-events", machineEvents.Check); err != nil {
+		return fmt.Errorf("error adding machine event generator healthz check: %w", err)
+	}
 
-		machineClassMapper := mcm.NewGeneric(machineRuntime, mcm.GenericOptions{})
-		if err := mgr.Add(machineClassMapper); err != nil {
-			return fmt.Errorf("error adding machine class mapper: %w", err)
+	volumeEvents := orievent.NewGenerator(func(ctx context.Context) ([]*ori.Volume, error) {
+		res, err := machineRuntime.ListVolumes(ctx, &ori.ListVolumesRequest{})
+		if err != nil {
+			return nil, err
 		}
+		return res.Volumes, nil
+	}, orievent.GeneratorOptions{})
+	if err := mgr.Add(volumeEvents); err != nil {
+		return fmt.Errorf("error adding volume event generator: %w", err)
+	}
+	if err := mgr.AddHealthzCheck("volume-events", volumeEvents.Check); err != nil {
+		return fmt.Errorf("error adding volume event generator healthz check: %w", err)
+	}
 
+	networkInterfaceEvents := orievent.NewGenerator(func(ctx context.Context) ([]*ori.NetworkInterface, error) {
+		res, err := machineRuntime.ListNetworkInterfaces(ctx, &ori.ListNetworkInterfacesRequest{})
+		if err != nil {
+			return nil, err
+		}
+		return res.NetworkInterfaces, nil
+	}, orievent.GeneratorOptions{})
+	if err := mgr.Add(networkInterfaceEvents); err != nil {
+		return fmt.Errorf("error adding network interface event generator: %w", err)
+	}
+	if err := mgr.AddHealthzCheck("networkinterface-events", networkInterfaceEvents.Check); err != nil {
+		return fmt.Errorf("error adding network interface event generator healthz check: %w", err)
+	}
+
+	indexer := mgr.GetFieldIndexer()
+	if err := machinepoolletclient.SetupMachineSpecNetworkInterfaceNamesField(ctx, indexer, opts.MachinePoolName); err != nil {
+		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.MachineSpecNetworkInterfaceNamesField, err)
+	}
+	if err := machinepoolletclient.SetupMachineSpecSecretNamesField(ctx, indexer, opts.MachinePoolName); err != nil {
+		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.MachineSpecSecretNamesField, err)
+	}
+	if err := machinepoolletclient.SetupMachineSpecVolumeNamesField(ctx, indexer, opts.MachinePoolName); err != nil {
+		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.MachineSpecVolumeNamesField, err)
+	}
+	if err := machinepoolletclient.SetupAliasPrefixRoutingNetworkRefNameField(ctx, indexer); err != nil {
+		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.AliasPrefixRoutingNetworkRefNameField, err)
+	}
+	if err := machinepoolletclient.SetupLoadBalancerRoutingNetworkRefNameField(ctx, indexer); err != nil {
+		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.LoadBalancerRoutingNetworkRefNameField, err)
+	}
+	if err := machinepoolletclient.SetupNATGatewayRoutingNetworkRefNameField(ctx, indexer); err != nil {
+		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.NATGatewayRoutingNetworkRefNameField, err)
+	}
+	if err := machinepoolletclient.SetupNetworkInterfaceNetworkMachinePoolID(ctx, indexer, opts.MachinePoolName); err != nil {
+		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.NetworkInterfaceNetworkNameAndHandle, err)
+	}
+
+	onInitialized := func(ctx context.Context) error {
 		machineClassMapperSyncCtx, cancel := context.WithTimeout(ctx, opts.MachineClassMapperSyncTimeout)
 		defer cancel()
 
 		if err := machineClassMapper.WaitForSync(machineClassMapperSyncCtx); err != nil {
 			return fmt.Errorf("error waiting for machine class mapper to sync: %w", err)
-		}
-
-		machineEvents := orievent.NewGenerator(func(ctx context.Context) ([]*ori.Machine, error) {
-			res, err := machineRuntime.ListMachines(ctx, &ori.ListMachinesRequest{})
-			if err != nil {
-				return nil, err
-			}
-			return res.Machines, nil
-		}, orievent.GeneratorOptions{})
-		if err := mgr.Add(machineEvents); err != nil {
-			return fmt.Errorf("error adding machine event generator: %w", err)
-		}
-		if err := mgr.AddHealthzCheck("machine-events", machineEvents.Check); err != nil {
-			return fmt.Errorf("error adding machine event generator healthz check: %w", err)
-		}
-
-		volumeEvents := orievent.NewGenerator(func(ctx context.Context) ([]*ori.Volume, error) {
-			res, err := machineRuntime.ListVolumes(ctx, &ori.ListVolumesRequest{})
-			if err != nil {
-				return nil, err
-			}
-			return res.Volumes, nil
-		}, orievent.GeneratorOptions{})
-		if err := mgr.Add(volumeEvents); err != nil {
-			return fmt.Errorf("error adding volume event generator: %w", err)
-		}
-		if err := mgr.AddHealthzCheck("volume-events", volumeEvents.Check); err != nil {
-			return fmt.Errorf("error adding volume event generator healthz check: %w", err)
-		}
-
-		networkInterfaceEvents := orievent.NewGenerator(func(ctx context.Context) ([]*ori.NetworkInterface, error) {
-			res, err := machineRuntime.ListNetworkInterfaces(ctx, &ori.ListNetworkInterfacesRequest{})
-			if err != nil {
-				return nil, err
-			}
-			return res.NetworkInterfaces, nil
-		}, orievent.GeneratorOptions{})
-		if err := mgr.Add(networkInterfaceEvents); err != nil {
-			return fmt.Errorf("error adding network interface event generator: %w", err)
-		}
-		if err := mgr.AddHealthzCheck("networkinterface-events", networkInterfaceEvents.Check); err != nil {
-			return fmt.Errorf("error adding network interface event generator healthz check: %w", err)
 		}
 
 		if err := (&controllers.MachineReconciler{
@@ -278,29 +301,6 @@ func Run(ctx context.Context, opts Options) error {
 		}
 
 		return nil
-	}
-
-	indexer := mgr.GetFieldIndexer()
-	if err := machinepoolletclient.SetupMachineSpecNetworkInterfaceNamesField(ctx, indexer, opts.MachinePoolName); err != nil {
-		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.MachineSpecNetworkInterfaceNamesField, err)
-	}
-	if err := machinepoolletclient.SetupMachineSpecSecretNamesField(ctx, indexer, opts.MachinePoolName); err != nil {
-		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.MachineSpecSecretNamesField, err)
-	}
-	if err := machinepoolletclient.SetupMachineSpecVolumeNamesField(ctx, indexer, opts.MachinePoolName); err != nil {
-		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.MachineSpecVolumeNamesField, err)
-	}
-	if err := machinepoolletclient.SetupAliasPrefixRoutingNetworkRefNameField(ctx, indexer); err != nil {
-		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.AliasPrefixRoutingNetworkRefNameField, err)
-	}
-	if err := machinepoolletclient.SetupLoadBalancerRoutingNetworkRefNameField(ctx, indexer); err != nil {
-		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.LoadBalancerRoutingNetworkRefNameField, err)
-	}
-	if err := machinepoolletclient.SetupNATGatewayRoutingNetworkRefNameField(ctx, indexer); err != nil {
-		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.NATGatewayRoutingNetworkRefNameField, err)
-	}
-	if err := machinepoolletclient.SetupNetworkInterfaceNetworkMachinePoolID(ctx, indexer, opts.MachinePoolName); err != nil {
-		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.NetworkInterfaceNetworkNameAndHandle, err)
 	}
 
 	if err := (&controllers.MachinePoolInit{
