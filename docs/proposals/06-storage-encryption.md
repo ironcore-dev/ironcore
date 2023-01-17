@@ -47,7 +47,7 @@ As part of Storage encryption feature Onmetal API to support option to enable en
   - User can provide `volumePoolSelector` label to look for encrypted `VolumePool`
 
 ## Proposal
-The proposal to provide storage encryption introduces new field `encryption.enabled` and `encryption.keySecretRef` in existing `Volume` type. `encryption.enabled` is boolean field indicating whether encryption to be enabled or not for the `Volume`. `encryption.keySecretRef` is an optional field for encryption key secret reference.
+The proposal to provide storage encryption introduces new field `encryption.enabled` and `encryption.secretRef` in existing `Volume` type. `encryption.enabled` is boolean field indicating whether encryption to be enabled or not for the `Volume`. `encryption.secretRef` is an optional field for encryption key secret reference.
 
 Volume with encryption enabled flag:
 
@@ -67,7 +67,7 @@ spec:
     storage: 1Gi
   encryption:
     enabled: true
-    keySecretRef: encryption-key-secret    # this is optional
+    secretRef: encryption-key-secret    # this is optional
 ```
 [//]: # (@formatter:on)
 
