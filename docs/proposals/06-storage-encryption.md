@@ -37,13 +37,13 @@ One of the important feature of Cloud Native IaaS is to provide secure storage. 
 As part of Storage encryption feature Onmetal API to support option to enable encryption of Volumes. Each `Volume`  provide encryption key secret reference(Optional).
 
 ### Goals
-  - Allow user to enable/disable volume encryption bu providing secret reference
+  - Allow user to enable/disable volume encryption by providing secret reference
   - Encrypt volume with user provided encryption key
 
 ### Details
   - User can provide encryption key via `encryption.secretRef` to encrypt onmetal `Volume`
-  - Presence of `encryption.secretRef` indicates `volume` has to be encrypted.
-  - If `encryption.secretRef` is not provided by user, then onmetal `volume` remains unencrypted
+  - Presence of `encryption.secretRef` indicates `Volume` has to be encrypted.
+  - If `encryption.secretRef` is not provided by user, then onmetal `Volume` remains unencrypted
 
 ## Proposal
 The proposal to provide storage encryption introduces new field `encryption.secretRef` in existing `Volume` type. `encryption.secretRef` is an optional field for encryption key secret reference.
