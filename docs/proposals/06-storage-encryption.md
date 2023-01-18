@@ -27,26 +27,47 @@ reviewers:
 - [Summary](#summary)
 - [Motivation](#motivation)
     - [Goals](#goals)
-    - [Details](#Details)
+    - [Non-Goals](#Non-Goals)
 - [Proposal](#proposal)
 
 ## Summary
 One of the important feature of Cloud Native IaaS is to provide secure storage. This proposal focuses on providing option to enable encryption for individual onmetal Volume.
 
 ## Motivation
-As part of Storage encryption feature Onmetal API to support option to enable encryption of Volumes. Each `Volume`  provide encryption key secret reference(Optional).
+As part of Storage encryption feature Onmetal API supports option to enable encryption of Volumes. Volume level encryption helps protect users from data theft or accidental loss, by rendering data stored on hard drives unreadable when an unauthorized user tries to gain access. The loss of encryption keys is a major concern, as it can render any encrypted data useless. 
 
 ### Goals
-  - Allow user to enable/disable volume encryption by providing secret reference
-  - Encrypt volume with user provided encryption key
+  - Allow user to enable volume encryption by providing encryption key via secret reference
 
-### Details
-  - User can provide encryption key via `encryption.secretRef` to encrypt onmetal `Volume`
-  - Presence of `encryption.secretRef` indicates `Volume` has to be encrypted.
-  - If `encryption.secretRef` is not provided by user, then onmetal `Volume` remains unencrypted
+### Non-Goals
+  - Add a new attribute to provide source of encryption key like None/UserProvidedKey/DefaultMasterKey
+  - Add KMS support to manage user provided encryption keys
 
 ## Proposal
-The proposal to provide storage encryption introduces new field `encryption.secretRef` in existing `Volume` type. `encryption.secretRef` is an optional field for encryption key secret reference.
+ - The proposal introduces a new field `encryption` with currently the single attribute `secretRef`, referencing a secret to use for encryption, in existing `Volume` type. 
+ - `encryption` is an optional field.
+ - If `encryption` field is not provided by user, then onmetal `Volume` remains unencrypted
+ - To encrypt onmetal `Volume`, user has to first create kubernetes secret of Opaque type with key-value pair as below:
+    - key = `encryptionKey` 
+    - value = base64 encoded encryption key of user's choice meeting below expectations: 
+        - at least 15 characters long but 20 or more is better 
+        - a combination of uppercase letters, lowercase letters, numbers and symbols
+ - Then provide this secret name to `encryption.secretRef` attribute of `Volume` type.
+
+Secret for encryption key
+
+[//]: # (@formatter:off)
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: encryption-key-secret
+  namespace: default
+type: Opaque
+data:
+  encryptionKey: VGVzdC1lbmNyeXB0aW9uQDEyMw==
+```
+[//]: # (@formatter:on)
 
 Volume with encryption key secret reference:
 
@@ -65,20 +86,6 @@ spec:
   resources:
     storage: 1Gi
   encryption:
-    secretRef: encryption-key-secret    # this is optional
-```
-[//]: # (@formatter:on)
-
-Secret for encryption key
-
-[//]: # (@formatter:off)
-```yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: encryption-key-secret
-  namespace: default
-stringData:
-  encryptionKey: test-encryption
+    secretRef: encryption-key-secret
 ```
 [//]: # (@formatter:on)
