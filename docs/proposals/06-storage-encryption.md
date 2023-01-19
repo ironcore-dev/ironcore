@@ -49,9 +49,7 @@ As part of Storage encryption feature Onmetal API supports option to enable encr
  - If `encryption` field is not provided by user, then onmetal `Volume` remains unencrypted
  - To encrypt onmetal `Volume`, user has to first create kubernetes secret of Opaque type with key-value pair as below:
     - key = `encryptionKey` 
-    - value = base64 encoded encryption key of user's choice meeting below expectations: 
-        - at least 15 characters long but 20 or more is better 
-        - a combination of uppercase letters, lowercase letters, numbers and symbols
+    - value = base64-encoded 256 bit encryption key
  - Then provide this secret name to `encryption.secretRef` attribute of `Volume` type.
 
 Secret for encryption key
@@ -65,7 +63,7 @@ metadata:
   namespace: default
 type: Opaque
 data:
-  encryptionKey: VGVzdC1lbmNyeXB0aW9uQDEyMw==
+  encryptionKey: QW9zejI4Y0xIR3pjR3M2UGltdHZVSnVSSGt6aWZiVTU4V3NIZElIL09idz0=
 ```
 [//]: # (@formatter:on)
 
