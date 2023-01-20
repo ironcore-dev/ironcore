@@ -21,12 +21,12 @@ require (
 	golang.org/x/sys v0.4.0
 	google.golang.org/grpc v1.51.0
 	gopkg.in/inf.v0 v0.9.1
-	k8s.io/api v0.26.0
-	k8s.io/apimachinery v0.26.0
-	k8s.io/apiserver v0.26.0
-	k8s.io/client-go v0.26.0
-	k8s.io/component-base v0.26.0
-	k8s.io/kube-aggregator v0.26.0
+	k8s.io/api v0.26.1
+	k8s.io/apimachinery v0.26.1
+	k8s.io/apiserver v0.26.1
+	k8s.io/client-go v0.26.1
+	k8s.io/component-base v0.26.1
+	k8s.io/kube-aggregator v0.26.1
 	k8s.io/kube-openapi v0.0.0-20221012153701-172d655c2280
 	k8s.io/utils v0.0.0-20221128185143-99ec85e7a448
 	sigs.k8s.io/controller-runtime v0.14.1
@@ -56,7 +56,7 @@ require (
 	github.com/go-openapi/swag v0.22.3 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/google/cel-go v0.12.5 // indirect
+	github.com/google/cel-go v0.12.6 // indirect
 	github.com/google/gnostic v0.5.7-v3refs // indirect
 	github.com/google/gofuzz v1.1.0 // indirect
 	github.com/google/uuid v1.1.2 // indirect
@@ -108,9 +108,9 @@ require (
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/apiextensions-apiserver v0.26.0 // indirect
+	k8s.io/apiextensions-apiserver v0.26.1 // indirect
 	k8s.io/klog/v2 v2.80.1 // indirect
-	k8s.io/kms v0.26.0 // indirect
-	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.0.33 // indirect
+	k8s.io/kms v0.26.1 // indirect
+	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.0.35 // indirect
 	sigs.k8s.io/json v0.0.0-20220713155537-f223a00ba0e2 // indirect
 )
