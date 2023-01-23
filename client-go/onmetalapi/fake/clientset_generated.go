@@ -21,6 +21,8 @@ import (
 	clientset "github.com/onmetal/onmetal-api/client-go/onmetalapi"
 	computev1alpha1 "github.com/onmetal/onmetal-api/client-go/onmetalapi/typed/compute/v1alpha1"
 	fakecomputev1alpha1 "github.com/onmetal/onmetal-api/client-go/onmetalapi/typed/compute/v1alpha1/fake"
+	corev1alpha1 "github.com/onmetal/onmetal-api/client-go/onmetalapi/typed/core/v1alpha1"
+	fakecorev1alpha1 "github.com/onmetal/onmetal-api/client-go/onmetalapi/typed/core/v1alpha1/fake"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/client-go/onmetalapi/typed/ipam/v1alpha1"
 	fakeipamv1alpha1 "github.com/onmetal/onmetal-api/client-go/onmetalapi/typed/ipam/v1alpha1/fake"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/client-go/onmetalapi/typed/networking/v1alpha1"
@@ -87,6 +89,11 @@ var (
 // ComputeV1alpha1 retrieves the ComputeV1alpha1Client
 func (c *Clientset) ComputeV1alpha1() computev1alpha1.ComputeV1alpha1Interface {
 	return &fakecomputev1alpha1.FakeComputeV1alpha1{Fake: &c.Fake}
+}
+
+// CoreV1alpha1 retrieves the CoreV1alpha1Client
+func (c *Clientset) CoreV1alpha1() corev1alpha1.CoreV1alpha1Interface {
+	return &fakecorev1alpha1.FakeCoreV1alpha1{Fake: &c.Fake}
 }
 
 // IpamV1alpha1 retrieves the IpamV1alpha1Client

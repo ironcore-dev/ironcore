@@ -19,6 +19,7 @@ import (
 
 	"github.com/onmetal/onmetal-api/onmetal-apiserver/internal/machinepoollet/client"
 	computerest "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/registry/compute/rest"
+	corerest "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/registry/core/rest"
 	ipamrest "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/registry/ipam/rest"
 	networkingrest "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/registry/networking/rest"
 	storagerest "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/registry/storage/rest"
@@ -94,6 +95,7 @@ func (c completedConfig) New() (*OnmetalAPIServer, error) {
 	apiResourceConfigSource := c.ExtraConfig.APIResourceConfigSource
 	restStorageProviders := []RESTStorageProvider{
 		ipamrest.StorageProvider{},
+		corerest.StorageProvider{},
 		computerest.StorageProvider{
 			MachinePoolletClientConfig: c.ExtraConfig.MachinePoolletConfig,
 		},

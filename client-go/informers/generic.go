@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	v1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
@@ -61,6 +62,10 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Compute().V1alpha1().MachineClasses().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("machinepools"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Compute().V1alpha1().MachinePools().Informer()}, nil
+
+		// Group=core.api.onmetal.de, Version=v1alpha1
+	case corev1alpha1.SchemeGroupVersion.WithResource("resourcequotas"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Core().V1alpha1().ResourceQuotas().Informer()}, nil
 
 		// Group=ipam.api.onmetal.de, Version=v1alpha1
 	case ipamv1alpha1.SchemeGroupVersion.WithResource("prefixes"):

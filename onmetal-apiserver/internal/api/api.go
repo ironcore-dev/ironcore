@@ -16,6 +16,7 @@ package api
 
 import (
 	computeinstall "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis/compute/install"
+	coreinstall "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis/core/install"
 	ipaminstall "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis/ipam/install"
 	networkinginstall "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis/networking/install"
 	storageinstall "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis/storage/install"
@@ -39,6 +40,7 @@ var (
 func init() {
 	ipaminstall.Install(Scheme)
 	computeinstall.Install(Scheme)
+	coreinstall.Install(Scheme)
 	networkinginstall.Install(Scheme)
 	storageinstall.Install(Scheme)
 

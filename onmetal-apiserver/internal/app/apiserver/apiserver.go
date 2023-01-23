@@ -21,6 +21,7 @@ import (
 	"time"
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
@@ -60,6 +61,7 @@ func NewResourceConfig() *serverstorage.ResourceConfig {
 	cfg := serverstorage.NewResourceConfig()
 	cfg.EnableVersions(
 		computev1alpha1.SchemeGroupVersion,
+		corev1alpha1.SchemeGroupVersion,
 		storagev1alpha1.SchemeGroupVersion,
 		networkingv1alpha1.SchemeGroupVersion,
 		ipamv1alpha1.SchemeGroupVersion,
@@ -100,6 +102,7 @@ func NewOnmetalAPIServerOptions() *OnmetalAPIServerOptions {
 			defaultEtcdPathPrefix,
 			api.Codecs.LegacyCodec(
 				computev1alpha1.SchemeGroupVersion,
+				corev1alpha1.SchemeGroupVersion,
 				storagev1alpha1.SchemeGroupVersion,
 				networkingv1alpha1.SchemeGroupVersion,
 				ipamv1alpha1.SchemeGroupVersion,
@@ -125,6 +128,7 @@ func NewOnmetalAPIServerOptions() *OnmetalAPIServerOptions {
 	o.RecommendedOptions.Etcd.StorageConfig.EncodeVersioner = runtime.NewMultiGroupVersioner(
 		computev1alpha1.SchemeGroupVersion,
 		schema.GroupKind{Group: computev1alpha1.SchemeGroupVersion.Group},
+		schema.GroupKind{Group: corev1alpha1.SchemeGroupVersion.Group},
 		schema.GroupKind{Group: storagev1alpha1.SchemeGroupVersion.Group},
 		schema.GroupKind{Group: networkingv1alpha1.SchemeGroupVersion.Group},
 		schema.GroupKind{Group: ipamv1alpha1.SchemeGroupVersion.Group},

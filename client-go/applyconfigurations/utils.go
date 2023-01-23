@@ -20,11 +20,13 @@ package applyconfigurations
 import (
 	v1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/common/v1alpha1"
 	applyconfigurationscomputev1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/compute/v1alpha1"
+	applyconfigurationscorev1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/core/v1alpha1"
 	applyconfigurationsipamv1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/ipam/v1alpha1"
 	metav1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/meta/v1"
 	applyconfigurationsnetworkingv1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/networking/v1alpha1"
@@ -90,6 +92,18 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &applyconfigurationscomputev1alpha1.VolumeSourceApplyConfiguration{}
 	case computev1alpha1.SchemeGroupVersion.WithKind("VolumeStatus"):
 		return &applyconfigurationscomputev1alpha1.VolumeStatusApplyConfiguration{}
+
+		// Group=core.api.onmetal.de, Version=v1alpha1
+	case corev1alpha1.SchemeGroupVersion.WithKind("ResourceQuota"):
+		return &applyconfigurationscorev1alpha1.ResourceQuotaApplyConfiguration{}
+	case corev1alpha1.SchemeGroupVersion.WithKind("ResourceQuotaSpec"):
+		return &applyconfigurationscorev1alpha1.ResourceQuotaSpecApplyConfiguration{}
+	case corev1alpha1.SchemeGroupVersion.WithKind("ResourceQuotaStatus"):
+		return &applyconfigurationscorev1alpha1.ResourceQuotaStatusApplyConfiguration{}
+	case corev1alpha1.SchemeGroupVersion.WithKind("ResourceScopeSelector"):
+		return &applyconfigurationscorev1alpha1.ResourceScopeSelectorApplyConfiguration{}
+	case corev1alpha1.SchemeGroupVersion.WithKind("ResourceScopeSelectorRequirement"):
+		return &applyconfigurationscorev1alpha1.ResourceScopeSelectorRequirementApplyConfiguration{}
 
 		// Group=ipam.api.onmetal.de, Version=v1alpha1
 	case ipamv1alpha1.SchemeGroupVersion.WithKind("Prefix"):

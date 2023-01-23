@@ -1,0 +1,9 @@
+apiVersion: core.api.onmetal.de/v1alpha1
+kind: ResourceQuota
+metadata:
+  name: resource-quota-sample
+spec:
+  hard: # Hard is the mapping of strictly enforced resource limits.
+    requests.cpu: "10"
+    requests.memory: 100Gi
+    requests.storage: 10Ti
