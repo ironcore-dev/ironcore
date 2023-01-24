@@ -216,6 +216,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &applyconfigurationsstoragev1alpha1.VolumeClassApplyConfiguration{}
 	case storagev1alpha1.SchemeGroupVersion.WithKind("VolumeCondition"):
 		return &applyconfigurationsstoragev1alpha1.VolumeConditionApplyConfiguration{}
+	case storagev1alpha1.SchemeGroupVersion.WithKind("VolumeEncryption"):
+		return &applyconfigurationsstoragev1alpha1.VolumeEncryptionApplyConfiguration{}
 	case storagev1alpha1.SchemeGroupVersion.WithKind("VolumePool"):
 		return &applyconfigurationsstoragev1alpha1.VolumePoolApplyConfiguration{}
 	case storagev1alpha1.SchemeGroupVersion.WithKind("VolumePoolCondition"):

@@ -134,6 +134,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.VolumeClass":                     schema_onmetal_api_api_storage_v1alpha1_VolumeClass(ref),
 		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.VolumeClassList":                 schema_onmetal_api_api_storage_v1alpha1_VolumeClassList(ref),
 		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.VolumeCondition":                 schema_onmetal_api_api_storage_v1alpha1_VolumeCondition(ref),
+		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.VolumeEncryption":                schema_onmetal_api_api_storage_v1alpha1_VolumeEncryption(ref),
 		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.VolumeList":                      schema_onmetal_api_api_storage_v1alpha1_VolumeList(ref),
 		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.VolumePool":                      schema_onmetal_api_api_storage_v1alpha1_VolumePool(ref),
 		"github.com/onmetal/onmetal-api/api/storage/v1alpha1.VolumePoolCondition":             schema_onmetal_api_api_storage_v1alpha1_VolumePoolCondition(ref),
@@ -4791,6 +4792,27 @@ func schema_onmetal_api_api_storage_v1alpha1_VolumeCondition(ref common.Referenc
 	}
 }
 
+func schema_onmetal_api_api_storage_v1alpha1_VolumeEncryption(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "VolumeEncryption represents information to encrypt a volume.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"secretRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SecretRef references the Secret containing the encryption key to encrypt a Volume.",
+							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/api/core/v1.LocalObjectReference"},
+	}
+}
+
 func schema_onmetal_api_api_storage_v1alpha1_VolumeList(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -5204,11 +5226,17 @@ func schema_onmetal_api_api_storage_v1alpha1_VolumeSpec(ref common.ReferenceCall
 							},
 						},
 					},
+					"encryption": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Encryption is an optional field to specify encryption key secret reference to encrypt a Volume. This secret is created by user with encryptionKey as Key and base64 encoded 256-bit encryption key as Value.",
+							Ref:         ref("github.com/onmetal/onmetal-api/api/storage/v1alpha1.VolumeEncryption"),
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference", "github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/api/resource.Quantity"},
+			"github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference", "github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration", "github.com/onmetal/onmetal-api/api/storage/v1alpha1.VolumeEncryption", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/api/resource.Quantity"},
 	}
 }
 

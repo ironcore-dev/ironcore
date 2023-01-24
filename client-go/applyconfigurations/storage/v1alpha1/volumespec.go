@@ -34,6 +34,7 @@ type VolumeSpecApplyConfiguration struct {
 	ImagePullSecretRef *v1.LocalObjectReference                      `json:"imagePullSecretRef,omitempty"`
 	Unclaimable        *bool                                         `json:"unclaimable,omitempty"`
 	Tolerations        []v1alpha1.TolerationApplyConfiguration       `json:"tolerations,omitempty"`
+	Encryption         *VolumeEncryptionApplyConfiguration           `json:"encryption,omitempty"`
 }
 
 // VolumeSpecApplyConfiguration constructs an declarative configuration of the VolumeSpec type for use with
@@ -122,5 +123,13 @@ func (b *VolumeSpecApplyConfiguration) WithTolerations(values ...*v1alpha1.Toler
 		}
 		b.Tolerations = append(b.Tolerations, *values[i])
 	}
+	return b
+}
+
+// WithEncryption sets the Encryption field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the Encryption field is set to the value of the last call.
+func (b *VolumeSpecApplyConfiguration) WithEncryption(value *VolumeEncryptionApplyConfiguration) *VolumeSpecApplyConfiguration {
+	b.Encryption = value
 	return b
 }

@@ -17,16 +17,23 @@
 package storage
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+
+	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 )
 
 // VolumeGK is a helper to easily access the GroupKind information of an Volume
 var VolumeGK = schema.GroupKind{
 	Group: SchemeGroupVersion.Group,
 	Kind:  "Volume",
+}
+
+// VolumeEncryption represents information to encrypt a volume.
+type VolumeEncryption struct {
+	// SecretRef references the Secret containing the encryption key to encrypt a Volume.
+	SecretRef *corev1.LocalObjectReference
 }
 
 // VolumeSpec defines the desired state of Volume
@@ -51,6 +58,9 @@ type VolumeSpec struct {
 	// Tolerations define tolerations the Volume has. Only a VolumePool whose taints
 	// covered by Tolerations will be considered to host the Volume.
 	Tolerations []commonv1alpha1.Toleration
+	// Encryption is an optional field to specify encryption key secret reference to encrypt a Volume.
+	// This secret is created by user with encryptionKey as Key and base64 encoded 256-bit encryption key as Value.
+	Encryption *VolumeEncryption
 }
 
 // VolumeAccess represents information on how to access a volume.

@@ -1313,6 +1313,12 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
+- name: com.github.onmetal.onmetal-api.api.storage.v1alpha1.VolumeEncryption
+  map:
+    fields:
+    - name: secretRef
+      type:
+        namedType: io.k8s.api.core.v1.LocalObjectReference
 - name: com.github.onmetal.onmetal-api.api.storage.v1alpha1.VolumePool
   map:
     fields:
@@ -1407,6 +1413,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: claimRef
       type:
         namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.LocalUIDReference
+    - name: encryption
+      type:
+        namedType: com.github.onmetal.onmetal-api.api.storage.v1alpha1.VolumeEncryption
     - name: image
       type:
         scalar: string
