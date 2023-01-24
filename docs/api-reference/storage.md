@@ -488,8 +488,8 @@ VolumeEncryption
 </em>
 </td>
 <td>
-<p>Encryption is an optional field to specify encryption key secret reference to encrypt a Volume.
-This secret is created by user with encryptionKey as Key and base64 encoded 256-bit encryption key as Value.</p>
+<p>Encryption is an optional field.
+Encryption makes a Volume encrypted by the supplied attributes.</p>
 </td>
 </tr>
 </table>
@@ -1785,8 +1785,8 @@ VolumeEncryption
 </em>
 </td>
 <td>
-<p>Encryption is an optional field to specify encryption key secret reference to encrypt a Volume.
-This secret is created by user with encryptionKey as Key and base64 encoded 256-bit encryption key as Value.</p>
+<p>Encryption is an optional field.
+Encryption makes a Volume encrypted by the supplied attributes.</p>
 </td>
 </tr>
 </tbody>
@@ -2078,8 +2078,8 @@ VolumeEncryption
 </em>
 </td>
 <td>
-<p>Encryption is an optional field to specify encryption key secret reference to encrypt a Volume.
-This secret is created by user with encryptionKey as Key and base64 encoded 256-bit encryption key as Value.</p>
+<p>Encryption is an optional field.
+Encryption makes a Volume encrypted by the supplied attributes.</p>
 </td>
 </tr>
 </table>

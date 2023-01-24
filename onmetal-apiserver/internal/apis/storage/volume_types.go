@@ -33,7 +33,7 @@ var VolumeGK = schema.GroupKind{
 // VolumeEncryption represents information to encrypt a volume.
 type VolumeEncryption struct {
 	// SecretRef references the Secret containing the encryption key to encrypt a Volume.
-	SecretRef *corev1.LocalObjectReference
+	SecretRef corev1.LocalObjectReference
 }
 
 // VolumeSpec defines the desired state of Volume
@@ -58,8 +58,8 @@ type VolumeSpec struct {
 	// Tolerations define tolerations the Volume has. Only a VolumePool whose taints
 	// covered by Tolerations will be considered to host the Volume.
 	Tolerations []commonv1alpha1.Toleration
-	// Encryption is an optional field to specify encryption key secret reference to encrypt a Volume.
-	// This secret is created by user with encryptionKey as Key and base64 encoded 256-bit encryption key as Value.
+	// Encryption is an optional field.
+	// Encryption makes a Volume encrypted by the supplied attributes.
 	Encryption *VolumeEncryption
 }
 

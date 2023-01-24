@@ -126,7 +126,7 @@ func validateVolumeSpecUpdate(newSpec, oldSpec *storage.VolumeSpec, fldPath *fie
 	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableField(newSpec.VolumeClassRef, oldSpec.VolumeClassRef, fldPath.Child("volumeClassRef"))...)
 	allErrs = append(allErrs, onmetalapivalidation.ValidateSetOnceField(newSpec.VolumePoolRef, oldSpec.VolumePoolRef, fldPath.Child("volumePoolRef"))...)
 	if newSpec.Encryption != nil {
-		allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableField(newSpec.Encryption.SecretRef, oldSpec.Encryption.SecretRef, fldPath.Child("encryption").Child("secretRef"))...)
+		allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableField(newSpec.Encryption, oldSpec.Encryption, fldPath.Child("encryption"))...)
 	}
 
 	return allErrs

@@ -137,7 +137,7 @@ var _ = Describe("Volume", func() {
 			&storage.Volume{
 				Spec: storage.VolumeSpec{
 					VolumeClassRef: &corev1.LocalObjectReference{Name: "foo"},
-					Encryption:     &storage.VolumeEncryption{SecretRef: &corev1.LocalObjectReference{Name: "foo"}},
+					Encryption:     &storage.VolumeEncryption{SecretRef: corev1.LocalObjectReference{Name: "foo"}},
 				},
 			},
 			Not(ContainElement(InvalidField("spec.encryption.secretRef.name"))),
@@ -191,20 +191,20 @@ var _ = Describe("Volume", func() {
 			},
 			Not(ContainElement(ImmutableField("spec.volumePoolRef"))),
 		),
-		Entry("immutable encryption secretRef",
+		Entry("immutable encryption",
 			&storage.Volume{
 				Spec: storage.VolumeSpec{
 					VolumeClassRef: &corev1.LocalObjectReference{Name: "foo"},
-					Encryption:     &storage.VolumeEncryption{SecretRef: &corev1.LocalObjectReference{Name: "foo"}},
+					Encryption:     &storage.VolumeEncryption{SecretRef: corev1.LocalObjectReference{Name: "foo"}},
 				},
 			},
 			&storage.Volume{
 				Spec: storage.VolumeSpec{
 					VolumeClassRef: &corev1.LocalObjectReference{Name: "foo"},
-					Encryption:     &storage.VolumeEncryption{SecretRef: &corev1.LocalObjectReference{Name: "bar"}},
+					Encryption:     &storage.VolumeEncryption{SecretRef: corev1.LocalObjectReference{Name: "bar"}},
 				},
 			},
-			ContainElement(ImmutableField("spec.encryption.secretRef")),
+			ContainElement(ImmutableField("spec.encryption")),
 		),
 	)
 })

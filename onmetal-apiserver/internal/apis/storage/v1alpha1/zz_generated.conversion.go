@@ -781,7 +781,7 @@ func Convert_storage_VolumeCondition_To_v1alpha1_VolumeCondition(in *storage.Vol
 }
 
 func autoConvert_v1alpha1_VolumeEncryption_To_storage_VolumeEncryption(in *v1alpha1.VolumeEncryption, out *storage.VolumeEncryption, s conversion.Scope) error {
-	out.SecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = in.SecretRef
 	return nil
 }
 
@@ -791,7 +791,7 @@ func Convert_v1alpha1_VolumeEncryption_To_storage_VolumeEncryption(in *v1alpha1.
 }
 
 func autoConvert_storage_VolumeEncryption_To_v1alpha1_VolumeEncryption(in *storage.VolumeEncryption, out *v1alpha1.VolumeEncryption, s conversion.Scope) error {
-	out.SecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = in.SecretRef
 	return nil
 }
 
