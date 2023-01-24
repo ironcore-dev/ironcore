@@ -10,12 +10,303 @@
 </div>
 Resource Types:
 <ul><li>
+<a href="#storage.api.onmetal.de/v1alpha1.Bucket">Bucket</a>
+</li><li>
+<a href="#storage.api.onmetal.de/v1alpha1.BucketClass">BucketClass</a>
+</li><li>
+<a href="#storage.api.onmetal.de/v1alpha1.BucketPool">BucketPool</a>
+</li><li>
 <a href="#storage.api.onmetal.de/v1alpha1.Volume">Volume</a>
 </li><li>
 <a href="#storage.api.onmetal.de/v1alpha1.VolumeClass">VolumeClass</a>
 </li><li>
 <a href="#storage.api.onmetal.de/v1alpha1.VolumePool">VolumePool</a>
 </li></ul>
+<h3 id="storage.api.onmetal.de/v1alpha1.Bucket">Bucket
+</h3>
+<div>
+<p>Bucket is the Schema for the buckets API</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+storage.api.onmetal.de/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>Bucket</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#storage.api.onmetal.de/v1alpha1.BucketSpec">
+BucketSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>bucketClassRef</code><br/>
+<em>
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>BucketClassRef is the BucketClass of a bucket
+If empty, an external controller has to provision the bucket.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>bucketPoolSelector</code><br/>
+<em>
+map[string]string
+</em>
+</td>
+<td>
+<p>BucketPoolSelector selects a suitable BucketPoolRef by the given labels.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>bucketPoolRef</code><br/>
+<em>
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>BucketPoolRef indicates which BucketPool to use for a bucket.
+If unset, the scheduler will figure out a suitable BucketPoolRef.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>tolerations</code><br/>
+<em>
+<a href="../common/#common.api.onmetal.de/v1alpha1.Toleration">
+[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
+</a>
+</em>
+</td>
+<td>
+<p>Tolerations define tolerations the Bucket has. Only any BucketPool whose taints
+covered by Tolerations will be considered to host the Bucket.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="#storage.api.onmetal.de/v1alpha1.BucketStatus">
+BucketStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="storage.api.onmetal.de/v1alpha1.BucketClass">BucketClass
+</h3>
+<div>
+<p>BucketClass is the Schema for the bucketclasses API</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+storage.api.onmetal.de/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>BucketClass</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>capabilities</code><br/>
+<em>
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#resourcelist-v1-core">
+Kubernetes core/v1.ResourceList
+</a>
+</em>
+</td>
+<td>
+<p>Capabilities describes the capabilities of a BucketClass.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="storage.api.onmetal.de/v1alpha1.BucketPool">BucketPool
+</h3>
+<div>
+<p>BucketPool is the Schema for the bucketpools API</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+storage.api.onmetal.de/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>BucketPool</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#storage.api.onmetal.de/v1alpha1.BucketPoolSpec">
+BucketPoolSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>providerID</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>ProviderID identifies the BucketPool on provider side.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>taints</code><br/>
+<em>
+<a href="../common/#common.api.onmetal.de/v1alpha1.Taint">
+[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Taint
+</a>
+</em>
+</td>
+<td>
+<p>Taints of the BucketPool. Only Buckets who tolerate all the taints
+will land in the BucketPool.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="#storage.api.onmetal.de/v1alpha1.BucketPoolStatus">
+BucketPoolStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="storage.api.onmetal.de/v1alpha1.Volume">Volume
 </h3>
 <div>
@@ -185,6 +476,20 @@ bool
 <td>
 <p>Tolerations define tolerations the Volume has. Only any VolumePool whose taints
 covered by Tolerations will be considered to host the Volume.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>encryption</code><br/>
+<em>
+<a href="#storage.api.onmetal.de/v1alpha1.VolumeEncryption">
+VolumeEncryption
+</a>
+</em>
+</td>
+<td>
+<p>Encryption is an optional field to specify encryption key secret reference to encrypt a Volume.
+This secret is created by user with encryptionKey as Key and base64 encoded 256-bit encryption key as Value.</p>
 </td>
 </tr>
 </table>
@@ -362,6 +667,521 @@ VolumePoolStatus
 </tr>
 </tbody>
 </table>
+<h3 id="storage.api.onmetal.de/v1alpha1.BucketAccess">BucketAccess
+</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.BucketStatus">BucketStatus</a>)
+</p>
+<div>
+<p>BucketAccess represents information on how to access a bucket.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>secretRef</code><br/>
+<em>
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>SecretRef references the Secret containing the access credentials to consume a Bucket.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>endpoint</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Endpoint defines address of the Bucket REST-API.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="storage.api.onmetal.de/v1alpha1.BucketCondition">BucketCondition
+</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.BucketStatus">BucketStatus</a>)
+</p>
+<div>
+<p>BucketCondition is one of the conditions of a bucket.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>type</code><br/>
+<em>
+<a href="#storage.api.onmetal.de/v1alpha1.BucketConditionType">
+BucketConditionType
+</a>
+</em>
+</td>
+<td>
+<p>Type is the type of the condition.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#conditionstatus-v1-core">
+Kubernetes core/v1.ConditionStatus
+</a>
+</em>
+</td>
+<td>
+<p>Status is the status of the condition.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>reason</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Reason is a machine-readable indication of why the condition is in a certain state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>message</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Message is a human-readable explanation of why the condition has a certain reason / state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>observedGeneration</code><br/>
+<em>
+int64
+</em>
+</td>
+<td>
+<p>ObservedGeneration represents the .metadata.generation that the condition was set based upon.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastTransitionTime</code><br/>
+<em>
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastTransitionTime is the last time the status of a condition has transitioned from one state to another.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="storage.api.onmetal.de/v1alpha1.BucketConditionType">BucketConditionType
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.BucketCondition">BucketCondition</a>)
+</p>
+<div>
+<p>BucketConditionType is a type a BucketCondition can have.</p>
+</div>
+<h3 id="storage.api.onmetal.de/v1alpha1.BucketPoolSpec">BucketPoolSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.BucketPool">BucketPool</a>)
+</p>
+<div>
+<p>BucketPoolSpec defines the desired state of BucketPool</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>providerID</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>ProviderID identifies the BucketPool on provider side.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>taints</code><br/>
+<em>
+<a href="../common/#common.api.onmetal.de/v1alpha1.Taint">
+[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Taint
+</a>
+</em>
+</td>
+<td>
+<p>Taints of the BucketPool. Only Buckets who tolerate all the taints
+will land in the BucketPool.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="storage.api.onmetal.de/v1alpha1.BucketPoolState">BucketPoolState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.BucketPoolStatus">BucketPoolStatus</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Available&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Unavailable&#34;</p></td>
+<td></td>
+</tr></tbody>
+</table>
+<h3 id="storage.api.onmetal.de/v1alpha1.BucketPoolStatus">BucketPoolStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.BucketPool">BucketPool</a>)
+</p>
+<div>
+<p>BucketPoolStatus defines the observed state of BucketPool</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>state</code><br/>
+<em>
+<a href="#storage.api.onmetal.de/v1alpha1.BucketPoolState">
+BucketPoolState
+</a>
+</em>
+</td>
+<td>
+<p>State represents the infrastructure state of a BucketPool.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>availableBucketClasses</code><br/>
+<em>
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+[]Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>AvailableBucketClasses list the references of any supported BucketClass of this pool</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="storage.api.onmetal.de/v1alpha1.BucketSpec">BucketSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.Bucket">Bucket</a>, <a href="#storage.api.onmetal.de/v1alpha1.BucketTemplateSpec">BucketTemplateSpec</a>)
+</p>
+<div>
+<p>BucketSpec defines the desired state of Bucket</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>bucketClassRef</code><br/>
+<em>
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>BucketClassRef is the BucketClass of a bucket
+If empty, an external controller has to provision the bucket.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>bucketPoolSelector</code><br/>
+<em>
+map[string]string
+</em>
+</td>
+<td>
+<p>BucketPoolSelector selects a suitable BucketPoolRef by the given labels.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>bucketPoolRef</code><br/>
+<em>
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>BucketPoolRef indicates which BucketPool to use for a bucket.
+If unset, the scheduler will figure out a suitable BucketPoolRef.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>tolerations</code><br/>
+<em>
+<a href="../common/#common.api.onmetal.de/v1alpha1.Toleration">
+[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
+</a>
+</em>
+</td>
+<td>
+<p>Tolerations define tolerations the Bucket has. Only any BucketPool whose taints
+covered by Tolerations will be considered to host the Bucket.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="storage.api.onmetal.de/v1alpha1.BucketState">BucketState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.BucketStatus">BucketStatus</a>)
+</p>
+<div>
+<p>BucketState represents the infrastructure state of a Bucket.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Available&#34;</p></td>
+<td><p>BucketStateAvailable reports whether a Bucket is available to be used.</p>
+</td>
+</tr><tr><td><p>&#34;Error&#34;</p></td>
+<td><p>BucketStateError reports that a Bucket is in an error state.</p>
+</td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>BucketStatePending reports whether a Bucket is about to be ready.</p>
+</td>
+</tr></tbody>
+</table>
+<h3 id="storage.api.onmetal.de/v1alpha1.BucketStatus">BucketStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.Bucket">Bucket</a>)
+</p>
+<div>
+<p>BucketStatus defines the observed state of Bucket</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>state</code><br/>
+<em>
+<a href="#storage.api.onmetal.de/v1alpha1.BucketState">
+BucketState
+</a>
+</em>
+</td>
+<td>
+<p>State represents the infrastructure state of a Bucket.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastStateTransitionTime</code><br/>
+<em>
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastStateTransitionTime is the last time the State transitioned between values.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>access</code><br/>
+<em>
+<a href="#storage.api.onmetal.de/v1alpha1.BucketAccess">
+BucketAccess
+</a>
+</em>
+</td>
+<td>
+<p>Access specifies how to access a Bucket.
+This is set by the bucket provider when the bucket is provisioned.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>conditions</code><br/>
+<em>
+<a href="#storage.api.onmetal.de/v1alpha1.BucketCondition">
+[]BucketCondition
+</a>
+</em>
+</td>
+<td>
+<p>Conditions are the conditions of a bucket.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="storage.api.onmetal.de/v1alpha1.BucketTemplateSpec">BucketTemplateSpec
+</h3>
+<div>
+<p>BucketTemplateSpec is the specification of a Bucket template.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#storage.api.onmetal.de/v1alpha1.BucketSpec">
+BucketSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>bucketClassRef</code><br/>
+<em>
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>BucketClassRef is the BucketClass of a bucket
+If empty, an external controller has to provision the bucket.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>bucketPoolSelector</code><br/>
+<em>
+map[string]string
+</em>
+</td>
+<td>
+<p>BucketPoolSelector selects a suitable BucketPoolRef by the given labels.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>bucketPoolRef</code><br/>
+<em>
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>BucketPoolRef indicates which BucketPool to use for a bucket.
+If unset, the scheduler will figure out a suitable BucketPoolRef.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>tolerations</code><br/>
+<em>
+<a href="../common/#common.api.onmetal.de/v1alpha1.Toleration">
+[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
+</a>
+</em>
+</td>
+<td>
+<p>Tolerations define tolerations the Bucket has. Only any BucketPool whose taints
+covered by Tolerations will be considered to host the Bucket.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="storage.api.onmetal.de/v1alpha1.VolumeAccess">VolumeAccess
 </h3>
 <p>
@@ -524,6 +1344,37 @@ Kubernetes meta/v1.Time
 <div>
 <p>VolumeConditionType is a type a VolumeCondition can have.</p>
 </div>
+<h3 id="storage.api.onmetal.de/v1alpha1.VolumeEncryption">VolumeEncryption
+</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.VolumeSpec">VolumeSpec</a>)
+</p>
+<div>
+<p>VolumeEncryption represents information to encrypt a volume.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>secretRef</code><br/>
+<em>
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>SecretRef references the Secret containing the encryption key to encrypt a Volume.</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="storage.api.onmetal.de/v1alpha1.VolumePhase">VolumePhase
 (<code>string</code> alias)</h3>
 <p>
@@ -707,9 +1558,9 @@ will land in the VolumePool.</p>
 </thead>
 <tbody><tr><td><p>&#34;Available&#34;</p></td>
 <td></td>
-</tr><tr><td><p>&#34;NotAvailable&#34;</p></td>
-<td></td>
 </tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Unavailable&#34;</p></td>
 <td></td>
 </tr></tbody>
 </table>
@@ -922,6 +1773,20 @@ bool
 <td>
 <p>Tolerations define tolerations the Volume has. Only any VolumePool whose taints
 covered by Tolerations will be considered to host the Volume.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>encryption</code><br/>
+<em>
+<a href="#storage.api.onmetal.de/v1alpha1.VolumeEncryption">
+VolumeEncryption
+</a>
+</em>
+</td>
+<td>
+<p>Encryption is an optional field to specify encryption key secret reference to encrypt a Volume.
+This secret is created by user with encryptionKey as Key and base64 encoded 256-bit encryption key as Value.</p>
 </td>
 </tr>
 </tbody>
@@ -1201,6 +2066,20 @@ bool
 <td>
 <p>Tolerations define tolerations the Volume has. Only any VolumePool whose taints
 covered by Tolerations will be considered to host the Volume.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>encryption</code><br/>
+<em>
+<a href="#storage.api.onmetal.de/v1alpha1.VolumeEncryption">
+VolumeEncryption
+</a>
+</em>
+</td>
+<td>
+<p>Encryption is an optional field to specify encryption key secret reference to encrypt a Volume.
+This secret is created by user with encryptionKey as Key and base64 encoded 256-bit encryption key as Value.</p>
 </td>
 </tr>
 </table>

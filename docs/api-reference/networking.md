@@ -1939,6 +1939,19 @@ NetworkInterfacePhase
 </tr>
 <tr>
 <td>
+<code>machinePoolRef</code><br/>
+<em>
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>MachinePoolRef is the machine pool the network interface is currently on, if any.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>lastPhaseTransitionTime</code><br/>
 <em>
 <a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#time-v1-meta">

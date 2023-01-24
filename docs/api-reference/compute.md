@@ -113,6 +113,20 @@ If empty, a scheduler will figure out an appropriate pool to run the machine in.
 </tr>
 <tr>
 <td>
+<code>power</code><br/>
+<em>
+<a href="#compute.api.onmetal.de/v1alpha1.Power">
+Power
+</a>
+</em>
+</td>
+<td>
+<p>Power ist the desired machine power state.
+Defaults to PowerOn.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>image</code><br/>
 <em>
 string
@@ -1000,6 +1014,20 @@ If empty, a scheduler will figure out an appropriate pool to run the machine in.
 </tr>
 <tr>
 <td>
+<code>power</code><br/>
+<em>
+<a href="#compute.api.onmetal.de/v1alpha1.Power">
+Power
+</a>
+</em>
+</td>
+<td>
+<p>Power ist the desired machine power state.
+Defaults to PowerOn.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>image</code><br/>
 <em>
 string
@@ -1121,6 +1149,9 @@ MachinePool.</p>
 </tr><tr><td><p>&#34;Shutdown&#34;</p></td>
 <td><p>MachineStateShutdown means the machine is shut down.</p>
 </td>
+</tr><tr><td><p>&#34;Terminated&#34;</p></td>
+<td><p>MachineStateTerminated means the machine has been permanently stopped and cannot be started.</p>
+</td>
 </tr></tbody>
 </table>
 <h3 id="compute.api.onmetal.de/v1alpha1.MachineStatus">MachineStatus
@@ -1139,6 +1170,17 @@ MachinePool.</p>
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<code>machineID</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>MachineID is the provider specific machine ID in the format &lsquo;<type>://<machine_id>&rsquo;.</p>
+</td>
+</tr>
 <tr>
 <td>
 <code>machinePoolObservedGeneration</code><br/>
@@ -1457,6 +1499,29 @@ Kubernetes meta/v1.Time
 </td>
 </tr>
 </tbody>
+</table>
+<h3 id="compute.api.onmetal.de/v1alpha1.Power">Power
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachineSpec">MachineSpec</a>)
+</p>
+<div>
+<p>Power is the desired power state of a Machine.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Off&#34;</p></td>
+<td><p>PowerOff indicates that a Machine should be powered off.</p>
+</td>
+</tr><tr><td><p>&#34;On&#34;</p></td>
+<td><p>PowerOn indicates that a Machine should be powered on.</p>
+</td>
+</tr></tbody>
 </table>
 <h3 id="compute.api.onmetal.de/v1alpha1.Volume">Volume
 </h3>
