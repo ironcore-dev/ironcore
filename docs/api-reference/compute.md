@@ -121,7 +121,7 @@ Power
 </em>
 </td>
 <td>
-<p>Power ist the desired machine power state.
+<p>Power is the desired machine power state.
 Defaults to PowerOn.</p>
 </td>
 </tr>
@@ -1022,7 +1022,7 @@ Power
 </em>
 </td>
 <td>
-<p>Power ist the desired machine power state.
+<p>Power is the desired machine power state.
 Defaults to PowerOn.</p>
 </td>
 </tr>

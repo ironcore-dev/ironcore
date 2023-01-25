@@ -33,7 +33,7 @@ type MachineSpec struct {
 	// MachinePoolRef defines machine pool to run the machine in.
 	// If empty, a scheduler will figure out an appropriate pool to run the machine in.
 	MachinePoolRef *corev1.LocalObjectReference
-	// Power ist the desired machine power state.
+	// Power is the desired machine power state.
 	// Defaults to PowerOn.
 	Power Power
 	// Image is the optional URL providing the operating system image of the machine.
