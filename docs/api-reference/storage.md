@@ -488,8 +488,7 @@ VolumeEncryption
 </em>
 </td>
 <td>
-<p>Encryption is an optional field.
-Encryption makes a Volume encrypted by the supplied attributes.</p>
+<p>Encryption is an optional field which provides attributes to encrypt Volume.</p>
 </td>
 </tr>
 </table>
@@ -1370,7 +1369,8 @@ Kubernetes core/v1.LocalObjectReference
 </em>
 </td>
 <td>
-<p>SecretRef references the Secret containing the encryption key to encrypt a Volume.</p>
+<p>SecretRef references the Secret containing the encryption key to encrypt a Volume.
+This secret is created by user with encryptionKey as Key and base64 encoded 256-bit encryption key as Value.</p>
 </td>
 </tr>
 </tbody>
@@ -1785,8 +1785,7 @@ VolumeEncryption
 </em>
 </td>
 <td>
-<p>Encryption is an optional field.
-Encryption makes a Volume encrypted by the supplied attributes.</p>
+<p>Encryption is an optional field which provides attributes to encrypt Volume.</p>
 </td>
 </tr>
 </tbody>
@@ -2078,8 +2077,7 @@ VolumeEncryption
 </em>
 </td>
 <td>
-<p>Encryption is an optional field.
-Encryption makes a Volume encrypted by the supplied attributes.</p>
+<p>Encryption is an optional field which provides attributes to encrypt Volume.</p>
 </td>
 </tr>
 </table>

@@ -4801,7 +4801,7 @@ func schema_onmetal_api_api_storage_v1alpha1_VolumeEncryption(ref common.Referen
 				Properties: map[string]spec.Schema{
 					"secretRef": {
 						SchemaProps: spec.SchemaProps{
-							Description: "SecretRef references the Secret containing the encryption key to encrypt a Volume.",
+							Description: "SecretRef references the Secret containing the encryption key to encrypt a Volume. This secret is created by user with encryptionKey as Key and base64 encoded 256-bit encryption key as Value.",
 							Default:     map[string]interface{}{},
 							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
 						},
@@ -5230,7 +5230,7 @@ func schema_onmetal_api_api_storage_v1alpha1_VolumeSpec(ref common.ReferenceCall
 					},
 					"encryption": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Encryption is an optional field. Encryption makes a Volume encrypted by the supplied attributes.",
+							Description: "Encryption is an optional field which provides attributes to encrypt Volume.",
 							Ref:         ref("github.com/onmetal/onmetal-api/api/storage/v1alpha1.VolumeEncryption"),
 						},
 					},
