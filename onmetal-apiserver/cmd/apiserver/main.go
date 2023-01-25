@@ -17,7 +17,7 @@ package main
 import (
 	"os"
 
-	"github.com/onmetal/onmetal-api/onmetal-apiserver/internal/app/apiserver"
+	"github.com/onmetal/onmetal-api/internal/app/apiserver"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	"k8s.io/component-base/cli"
 )

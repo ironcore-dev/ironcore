@@ -28,7 +28,7 @@ import (
 
 var _ = Describe("LoadBalancerReconciler", func() {
 	ctx := SetupContext()
-	ns := SetupTest(ctx)
+	ns, _ := SetupTest(ctx)
 
 	It("should reconcile the prefix and routing destinations", func() {
 		By("creating a network")

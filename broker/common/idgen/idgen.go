@@ -15,9 +15,9 @@
 package idgen
 
 import (
+	"crypto/rand"
 	"encoding/hex"
 	"io"
-	"math/rand"
 	"strconv"
 )
 

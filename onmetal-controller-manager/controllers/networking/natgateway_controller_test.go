@@ -44,7 +44,7 @@ func addIPsToStatus(natGateway *networkingv1alpha1.NATGateway, num int) {
 
 var _ = Describe("NatGatewayReconciler", func() {
 	ctx := SetupContext()
-	ns := SetupTest(ctx)
+	ns, _ := SetupTest(ctx)
 
 	It("should reconcile the natgateway and routing destinations", func() {
 		By("creating a network")

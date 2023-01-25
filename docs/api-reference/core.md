@@ -297,6 +297,23 @@ ResourceList
 <div>
 <p>ResourceScopeSelectorOperator is an operator to compare a ResourceScope with values.</p>
 </div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;DoesNotExist&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Exists&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;In&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;NotIn&#34;</p></td>
+<td></td>
+</tr></tbody>
+</table>
 <h3 id="core.api.onmetal.de/v1alpha1.ResourceScopeSelectorRequirement">ResourceScopeSelectorRequirement
 </h3>
 <p>

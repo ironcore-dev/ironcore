@@ -23,12 +23,18 @@ import (
 	"os"
 	"time"
 
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	quotaevaluatoronmetal "github.com/onmetal/onmetal-api/internal/quota/evaluator/onmetal"
 	onmetalapiclient "github.com/onmetal/onmetal-api/onmetal-controller-manager/client"
 	"github.com/onmetal/onmetal-api/onmetal-controller-manager/controllers/compute"
+	corecontrollers "github.com/onmetal/onmetal-api/onmetal-controller-manager/controllers/core"
+	quotacontrollergeneric "github.com/onmetal/onmetal-api/onmetal-controller-manager/controllers/core/quota/generic"
+	quotacontrolleronmetal "github.com/onmetal/onmetal-api/onmetal-controller-manager/controllers/core/quota/onmetal"
 	"github.com/onmetal/onmetal-api/onmetal-controller-manager/controllers/ipam"
 	networkingcontrollers "github.com/onmetal/onmetal-api/onmetal-controller-manager/controllers/networking"
 	"github.com/onmetal/onmetal-api/onmetal-controller-manager/controllers/storage"
+	"github.com/onmetal/onmetal-api/utils/quota"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
@@ -75,10 +81,13 @@ const (
 	aliasPrefixController          = "aliasprefix"
 	loadBalancerController         = "loadbalancer"
 	natGatewayController           = "natgateway"
+
+	resourceQuotaController = "resourcequota"
 )
 
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
+	utilruntime.Must(corev1alpha1.AddToScheme(scheme))
 	utilruntime.Must(computev1alpha1.AddToScheme(scheme))
 	utilruntime.Must(storagev1alpha1.AddToScheme(scheme))
 	utilruntime.Must(networkingv1alpha1.AddToScheme(scheme))
@@ -116,6 +125,9 @@ func main() {
 
 		// IPAM controllers
 		prefixController, prefixAllocationScheduler,
+
+		// Core controllers
+		resourceQuotaController,
 	)
 	flag.Var(controllers, "controllers", fmt.Sprintf("Controllers to enable. All controllers: %v. Disabled-by-default controllers: %v", controllers.All(), controllers.DisabledByDefault()))
 
@@ -380,6 +392,34 @@ func main() {
 			EventRecorder: mgr.GetEventRecorderFor("natgateways"),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "NATGateway")
+			os.Exit(1)
+		}
+	}
+
+	if controllers.Enabled(resourceQuotaController) {
+		registry := quota.NewRegistry(mgr.GetScheme())
+		if err := quota.AddAllToRegistry(registry, quotaevaluatoronmetal.NewEvaluatorsForControllers(mgr.GetClient())); err != nil {
+			setupLog.Error(err, "unable to add evaluators to registry")
+			os.Exit(1)
+		}
+
+		if err := (&corecontrollers.ResourceQuotaReconciler{
+			Client:    mgr.GetClient(),
+			APIReader: mgr.GetAPIReader(),
+			Scheme:    mgr.GetScheme(),
+			Registry:  registry,
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "ResourceQuota")
+		}
+
+		replenishReconcilers, err := quotacontrolleronmetal.NewReplenishReconcilers(mgr.GetClient(), registry)
+		if err != nil {
+			setupLog.Error(err, "unable to create quota replenish controllers")
+			os.Exit(1)
+		}
+
+		if err := quotacontrollergeneric.SetupReplenishReconcilersWithManager(mgr, replenishReconcilers); err != nil {
+			setupLog.Error(err, "unable to create replenish controllers")
 			os.Exit(1)
 		}
 	}

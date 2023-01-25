@@ -13,7 +13,7 @@ BUCKETBROKER_IMG ?= bucketbroker:latest
 ORICTL_BUCKET_IMG ?= orictl-bucket:latest
 
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
-ENVTEST_K8S_VERSION = 1.24.1
+ENVTEST_K8S_VERSION = 1.26.1
 
 # Docker image name for the mkdocs based local development setup
 IMAGE=onmetal-api/documentation

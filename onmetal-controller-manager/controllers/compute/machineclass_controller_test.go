@@ -31,7 +31,7 @@ import (
 
 var _ = Describe("machineclass controller", func() {
 	ctx := SetupContext()
-	ns := SetupTest(ctx)
+	ns, _ := SetupTest(ctx)
 	It("removes the finalizer from machineclass only if there's no machine still using the machineclass", func() {
 		By("creating the machineclass consumed by the machine")
 		machineClass := &computev1alpha1.MachineClass{

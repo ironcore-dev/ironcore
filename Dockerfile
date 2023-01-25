@@ -13,6 +13,7 @@ RUN go mod download
 COPY api/ api/
 COPY broker/ broker/
 COPY client-go/ client-go/
+COPY internal/ internal/
 COPY onmetal-apiserver/ onmetal-apiserver/
 COPY onmetal-controller-manager/ onmetal-controller-manager/
 COPY ori/ ori/

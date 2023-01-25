@@ -46,6 +46,13 @@ const (
 // ResourceScopeSelectorOperator is an operator to compare a ResourceScope with values.
 type ResourceScopeSelectorOperator string
 
+const (
+	ResourceScopeSelectorOperatorIn           ResourceScopeSelectorOperator = "In"
+	ResourceScopeSelectorOperatorNotIn        ResourceScopeSelectorOperator = "NotIn"
+	ResourceScopeSelectorOperatorExists       ResourceScopeSelectorOperator = "Exists"
+	ResourceScopeSelectorOperatorDoesNotExist ResourceScopeSelectorOperator = "DoesNotExist"
+)
+
 // ResourceScopeSelectorRequirement is a requirement for a resource using a ResourceScope alongside
 // a ResourceScopeSelectorOperator with Values (depending on the ResourceScopeSelectorOperator).
 type ResourceScopeSelectorRequirement struct {

@@ -134,20 +134,20 @@ echo "Generating ${blue}deepcopy${normal}"
 "$DEEPCOPY_GEN" \
   --output-base "$GOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gs "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis" "$CLIENT_GROUPS")" \
+  --input-dirs "$(qualify-gs "github.com/onmetal/onmetal-api/internal/apis" "$CLIENT_GROUPS")" \
   -O zz_generated.deepcopy
 
 echo "Generating ${blue}defaulter${normal}"
 "$DEFAULTER_GEN" \
   --output-base "$GOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gvs "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis" "$CLIENT_VERSION_GROUPS")" \
+  --input-dirs "$(qualify-gvs "github.com/onmetal/onmetal-api/internal/apis" "$CLIENT_VERSION_GROUPS")" \
   -O zz_generated.defaults
 
 echo "Generating ${blue}conversion${normal}"
 "$CONVERSION_GEN" \
   --output-base "$GOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gs "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis" "$CLIENT_GROUPS")" \
-  --input-dirs "$(qualify-gvs "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis" "$CLIENT_VERSION_GROUPS")" \
+  --input-dirs "$(qualify-gs "github.com/onmetal/onmetal-api/internal/apis" "$CLIENT_GROUPS")" \
+  --input-dirs "$(qualify-gvs "github.com/onmetal/onmetal-api/internal/apis" "$CLIENT_VERSION_GROUPS")" \
   -O zz_generated.conversion

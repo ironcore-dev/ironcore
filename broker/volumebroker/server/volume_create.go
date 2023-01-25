@@ -44,7 +44,7 @@ func (s *Server) getOnmetalVolumeConfig(_ context.Context, volume *ori.Volume) (
 	onmetalVolume := &storagev1alpha1.Volume{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: s.namespace,
-			Name:      s.generateID(),
+			Name:      s.idGen.Generate(),
 		},
 		Spec: storagev1alpha1.VolumeSpec{
 			VolumeClassRef:     &corev1.LocalObjectReference{Name: volume.Spec.Class},
