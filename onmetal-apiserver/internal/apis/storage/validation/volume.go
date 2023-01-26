@@ -17,12 +17,13 @@ package validation
 import (
 	"fmt"
 
-	onmetalapivalidation "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/api/validation"
-	"github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis/storage"
 	corev1 "k8s.io/api/core/v1"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1validation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+
+	onmetalapivalidation "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/api/validation"
+	"github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis/storage"
 )
 
 func ValidateVolume(volume *storage.Volume) field.ErrorList {
@@ -100,6 +101,12 @@ func validateVolumeSpec(spec *storage.VolumeSpec, fldPath *field.Path) field.Err
 		}
 	}
 
+	if spec.Encryption != nil {
+		for _, msg := range apivalidation.NameIsDNSLabel(spec.Encryption.SecretRef.Name, false) {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("encryption").Child("secretRef").Child("name"), spec.Encryption.SecretRef.Name, msg))
+		}
+	}
+
 	return allErrs
 }
 
@@ -118,6 +125,7 @@ func validateVolumeSpecUpdate(newSpec, oldSpec *storage.VolumeSpec, fldPath *fie
 
 	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableField(newSpec.VolumeClassRef, oldSpec.VolumeClassRef, fldPath.Child("volumeClassRef"))...)
 	allErrs = append(allErrs, onmetalapivalidation.ValidateSetOnceField(newSpec.VolumePoolRef, oldSpec.VolumePoolRef, fldPath.Child("volumePoolRef"))...)
+	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableField(newSpec.Encryption, oldSpec.Encryption, fldPath.Child("encryption"))...)
 
 	return allErrs
 }

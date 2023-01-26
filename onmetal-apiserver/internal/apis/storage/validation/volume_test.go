@@ -15,16 +15,17 @@
 package validation_test
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
-	"github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis/storage"
-	. "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis/storage/validation"
-	. "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/testutils/validation"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	"github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis/storage"
+	. "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis/storage/validation"
+	. "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/testutils/validation"
 )
 
 var _ = Describe("Volume", func() {
@@ -132,6 +133,15 @@ var _ = Describe("Volume", func() {
 			},
 			ContainElement(InvalidField("spec.resources[storage]")),
 		),
+		Entry("valid encryption secret ref name",
+			&storage.Volume{
+				Spec: storage.VolumeSpec{
+					VolumeClassRef: &corev1.LocalObjectReference{Name: "foo"},
+					Encryption:     &storage.VolumeEncryption{SecretRef: corev1.LocalObjectReference{Name: "foo"}},
+				},
+			},
+			Not(ContainElement(InvalidField("spec.encryption.secretRef.name"))),
+		),
 	)
 
 	DescribeTable("ValidateVolumeUpdate",
@@ -180,6 +190,49 @@ var _ = Describe("Volume", func() {
 				},
 			},
 			Not(ContainElement(ImmutableField("spec.volumePoolRef"))),
+		),
+		Entry("immutable encryption: modify encryption field",
+			&storage.Volume{
+				Spec: storage.VolumeSpec{
+					VolumeClassRef: &corev1.LocalObjectReference{Name: "foo"},
+					Encryption:     &storage.VolumeEncryption{SecretRef: corev1.LocalObjectReference{Name: "foo"}},
+				},
+			},
+			&storage.Volume{
+				Spec: storage.VolumeSpec{
+					VolumeClassRef: &corev1.LocalObjectReference{Name: "foo"},
+					Encryption:     &storage.VolumeEncryption{SecretRef: corev1.LocalObjectReference{Name: "bar"}},
+				},
+			},
+			ContainElement(ImmutableField("spec.encryption")),
+		),
+		Entry("immutable encryption: add encryption field",
+			&storage.Volume{
+				Spec: storage.VolumeSpec{
+					VolumeClassRef: &corev1.LocalObjectReference{Name: "foo"},
+				},
+			},
+			&storage.Volume{
+				Spec: storage.VolumeSpec{
+					VolumeClassRef: &corev1.LocalObjectReference{Name: "foo"},
+					Encryption:     &storage.VolumeEncryption{SecretRef: corev1.LocalObjectReference{Name: "foo"}},
+				},
+			},
+			ContainElement(ImmutableField("spec.encryption")),
+		),
+		Entry("immutable encryption: remove encryption field",
+			&storage.Volume{
+				Spec: storage.VolumeSpec{
+					VolumeClassRef: &corev1.LocalObjectReference{Name: "foo"},
+					Encryption:     &storage.VolumeEncryption{SecretRef: corev1.LocalObjectReference{Name: "foo"}},
+				},
+			},
+			&storage.Volume{
+				Spec: storage.VolumeSpec{
+					VolumeClassRef: &corev1.LocalObjectReference{Name: "foo"},
+				},
+			},
+			ContainElement(ImmutableField("spec.encryption")),
 		),
 	)
 })
