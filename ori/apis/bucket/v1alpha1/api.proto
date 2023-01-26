@@ -1,0 +1,94 @@
+syntax = "proto3";
+
+package bucket.v1alpha1;
+option go_package = "github.com/onmetal/onmetal-api/ori/apis/bucket/v1alpha1";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1/api.proto";
+
+option (gogoproto.goproto_stringer_all) = false;
+option (gogoproto.stringer_all) = true;
+option (gogoproto.goproto_getters_all) = true;
+option (gogoproto.marshaler_all) = true;
+option (gogoproto.sizer_all) = true;
+option (gogoproto.unmarshaler_all) = true;
+option (gogoproto.goproto_unrecognized_all) = false;
+
+service BucketRuntime {
+  rpc ListBuckets(ListBucketsRequest) returns (ListBucketsResponse) {};
+  rpc CreateBucket(CreateBucketRequest) returns (CreateBucketResponse) {};
+  rpc DeleteBucket(DeleteBucketRequest) returns (DeleteBucketResponse) {};
+
+  rpc ListBucketClasses(ListBucketClassesRequest) returns (ListBucketClassesResponse) {};
+}
+
+message BucketFilter {
+  string id = 1;
+  map<string, string> label_selector = 2;
+}
+
+message BucketSpec {
+  string class = 2;
+}
+
+message BucketStatus {
+  BucketState state = 1;
+  BucketAccess access = 2;
+}
+
+message Bucket {
+  meta.v1alpha1.ObjectMetadata metadata = 1;
+  BucketSpec spec = 2;
+  BucketStatus status = 3;
+}
+
+message BucketClassCapabilities {
+  int64 tps = 1;
+  int64 iops = 2;
+}
+
+message BucketClass {
+  string name = 1;
+  BucketClassCapabilities capabilities = 2;
+}
+
+message BucketAccess {
+  string endpoint = 1;
+  map<string, bytes> secret_data = 2;
+}
+
+enum BucketState {
+  BUCKET_PENDING = 0;
+  BUCKET_AVAILABLE = 1;
+  BUCKET_ERROR = 2;
+}
+
+message ListBucketsRequest {
+  BucketFilter filter = 1;
+}
+
+message ListBucketsResponse {
+  repeated Bucket buckets = 1;
+}
+
+message CreateBucketRequest {
+  Bucket bucket = 1;
+}
+
+message CreateBucketResponse {
+  Bucket bucket = 1;
+}
+
+message DeleteBucketRequest {
+  string bucket_id = 1;
+}
+
+message DeleteBucketResponse {
+}
+
+message ListBucketClassesRequest {
+}
+
+message ListBucketClassesResponse {
+  repeated BucketClass bucket_classes = 1;
+}
