@@ -3,7 +3,7 @@ module github.com/onmetal/onmetal-api
 go 1.19
 
 require (
-	github.com/bits-and-blooms/bitset v1.4.0
+	github.com/bits-and-blooms/bitset v1.5.0
 	github.com/blang/semver/v4 v4.0.0
 	github.com/go-logr/logr v1.2.3
 	github.com/gogo/protobuf v1.3.2
