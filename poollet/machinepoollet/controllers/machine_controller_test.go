@@ -482,6 +482,102 @@ var _ = Describe("MachineController", func() {
 			}))
 		}).Should(Succeed())
 	})
+
+	It("should correctly tear down network interfaces of machines", func() {
+		By("creating a network")
+		network := &networkingv1alpha1.Network{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "network-",
+			},
+			Spec: networkingv1alpha1.NetworkSpec{
+				Handle: "foo",
+			},
+		}
+		Expect(k8sClient.Create(ctx, network)).To(Succeed())
+
+		By("patching the network to be available")
+		baseNetwork := network.DeepCopy()
+		network.Status.State = networkingv1alpha1.NetworkStateAvailable
+		Expect(k8sClient.Status().Patch(ctx, network, client.MergeFrom(baseNetwork))).To(Succeed())
+
+		By("creating two machines")
+		machine1 := &computev1alpha1.Machine{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "machine-",
+			},
+			Spec: computev1alpha1.MachineSpec{
+				MachineClassRef: corev1.LocalObjectReference{Name: mc.Name},
+				MachinePoolRef:  &corev1.LocalObjectReference{Name: mp.Name},
+				NetworkInterfaces: []computev1alpha1.NetworkInterface{
+					{
+						Name: "primary",
+						NetworkInterfaceSource: computev1alpha1.NetworkInterfaceSource{
+							Ephemeral: &computev1alpha1.EphemeralNetworkInterfaceSource{
+								NetworkInterfaceTemplate: &networkingv1alpha1.NetworkInterfaceTemplateSpec{
+									Spec: networkingv1alpha1.NetworkInterfaceSpec{
+										NetworkRef: corev1.LocalObjectReference{Name: network.Name},
+										IPs: []networkingv1alpha1.IPSource{
+											{Value: commonv1alpha1.MustParseNewIP("192.168.178.1")},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, machine1)).To(Succeed())
+
+		machine2 := &computev1alpha1.Machine{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "machine-",
+			},
+			Spec: computev1alpha1.MachineSpec{
+				MachineClassRef: corev1.LocalObjectReference{Name: mc.Name},
+				MachinePoolRef:  &corev1.LocalObjectReference{Name: mp.Name},
+				NetworkInterfaces: []computev1alpha1.NetworkInterface{
+					{
+						Name: "primary",
+						NetworkInterfaceSource: computev1alpha1.NetworkInterfaceSource{
+							Ephemeral: &computev1alpha1.EphemeralNetworkInterfaceSource{
+								NetworkInterfaceTemplate: &networkingv1alpha1.NetworkInterfaceTemplateSpec{
+									Spec: networkingv1alpha1.NetworkInterfaceSpec{
+										NetworkRef: corev1.LocalObjectReference{Name: network.Name},
+										IPs: []networkingv1alpha1.IPSource{
+											{Value: commonv1alpha1.MustParseNewIP("192.168.178.2")},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, machine2)).To(Succeed())
+
+		By("waiting for the runtime to report the network interfaces")
+		Eventually(srv).Should(SatisfyAll(
+			HaveField("NetworkInterfaces", HaveLen(2)),
+		))
+
+		By("deleting the first machine")
+		Expect(k8sClient.Delete(ctx, machine1)).To(Succeed())
+
+		By("waiting for the runtime to report a single network interface")
+		Eventually(srv).Should(SatisfyAll(
+			HaveField("NetworkInterfaces", HaveLen(1)),
+		))
+
+		By("asserting it stays that way")
+		Consistently(srv).Should(SatisfyAll(
+			HaveField("NetworkInterfaces", HaveLen(1)),
+		))
+	})
 })
 
 func GetSingleMapEntry[K comparable, V any](m map[K]V) (K, V) {
