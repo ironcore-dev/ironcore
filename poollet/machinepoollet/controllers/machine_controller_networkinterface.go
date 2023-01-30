@@ -110,9 +110,7 @@ func (r *MachineReconciler) listORINetworkInterfacesByMachineUID(ctx context.Con
 func (r *MachineReconciler) listORINetworkInterfacesByMachineKey(ctx context.Context, machineKey client.ObjectKey) ([]*ori.NetworkInterface, error) {
 	res, err := r.MachineRuntime.ListNetworkInterfaces(ctx, &ori.ListNetworkInterfacesRequest{
 		Filter: &ori.NetworkInterfaceFilter{
-			LabelSelector: map[string]string{
-				machinepoolletv1alpha1.MachineNamespaceLabel: machineKey.Namespace,
-			},
+			LabelSelector: r.machineKeyLabelSelector(machineKey),
 		},
 	})
 	if err != nil {
