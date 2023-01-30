@@ -182,31 +182,31 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error creating manager: %w", err)
 	}
 
-	onInitialized := func(ctx context.Context) error {
-		volumeClassMapper := vcm.NewGeneric(volumeRuntime, vcm.GenericOptions{})
-		if err := mgr.Add(volumeClassMapper); err != nil {
-			return fmt.Errorf("error adding volume class mapper: %w", err)
-		}
+	volumeClassMapper := vcm.NewGeneric(volumeRuntime, vcm.GenericOptions{})
+	if err := mgr.Add(volumeClassMapper); err != nil {
+		return fmt.Errorf("error adding volume class mapper: %w", err)
+	}
 
+	volumeEvents := orievent.NewGenerator(func(ctx context.Context) ([]*ori.Volume, error) {
+		res, err := volumeRuntime.ListVolumes(ctx, &ori.ListVolumesRequest{})
+		if err != nil {
+			return nil, err
+		}
+		return res.Volumes, nil
+	}, orievent.GeneratorOptions{})
+	if err := mgr.Add(volumeEvents); err != nil {
+		return fmt.Errorf("error adding volume event generator: %w", err)
+	}
+	if err := mgr.AddHealthzCheck("volume-events", volumeEvents.Check); err != nil {
+		return fmt.Errorf("error adding volume event generator healthz check: %w", err)
+	}
+
+	onInitialized := func(ctx context.Context) error {
 		volumeClassMapperSyncCtx, cancel := context.WithTimeout(ctx, opts.VolumeClassMapperSyncTimeout)
 		defer cancel()
 
 		if err := volumeClassMapper.WaitForSync(volumeClassMapperSyncCtx); err != nil {
 			return fmt.Errorf("error waiting for volume class mapper to sync: %w", err)
-		}
-
-		volumeEvents := orievent.NewGenerator(func(ctx context.Context) ([]*ori.Volume, error) {
-			res, err := volumeRuntime.ListVolumes(ctx, &ori.ListVolumesRequest{})
-			if err != nil {
-				return nil, err
-			}
-			return res.Volumes, nil
-		}, orievent.GeneratorOptions{})
-		if err := mgr.Add(volumeEvents); err != nil {
-			return fmt.Errorf("error adding volume event generator: %w", err)
-		}
-		if err := mgr.AddHealthzCheck("volume-events", volumeEvents.Check); err != nil {
-			return fmt.Errorf("error adding volume event generator healthz check: %w", err)
 		}
 
 		if err := (&controllers.VolumeReconciler{
