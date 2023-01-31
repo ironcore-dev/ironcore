@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: bucketpoollet-system
+  name: bucketpoollet-controller-manager
+spec:
+  template:
+    spec:
+      containers:
+        - name: manager
+          imagePullPolicy: Never
+        - name: broker
+          imagePullPolicy: Never

@@ -182,31 +182,31 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error creating manager: %w", err)
 	}
 
-	onInitialized := func(ctx context.Context) error {
-		bucketClassMapper := bcm.NewGeneric(bucketRuntime, bcm.GenericOptions{})
-		if err := mgr.Add(bucketClassMapper); err != nil {
-			return fmt.Errorf("error adding bucket class mapper: %w", err)
-		}
+	bucketClassMapper := bcm.NewGeneric(bucketRuntime, bcm.GenericOptions{})
+	if err := mgr.Add(bucketClassMapper); err != nil {
+		return fmt.Errorf("error adding bucket class mapper: %w", err)
+	}
 
+	bucketEvents := orievent.NewGenerator(func(ctx context.Context) ([]*ori.Bucket, error) {
+		res, err := bucketRuntime.ListBuckets(ctx, &ori.ListBucketsRequest{})
+		if err != nil {
+			return nil, err
+		}
+		return res.Buckets, nil
+	}, orievent.GeneratorOptions{})
+	if err := mgr.Add(bucketEvents); err != nil {
+		return fmt.Errorf("error adding bucket event generator: %w", err)
+	}
+	if err := mgr.AddHealthzCheck("bucket-events", bucketEvents.Check); err != nil {
+		return fmt.Errorf("error adding bucket event generator healthz check: %w", err)
+	}
+
+	onInitialized := func(ctx context.Context) error {
 		bucketClassMapperSyncCtx, cancel := context.WithTimeout(ctx, opts.BucketClassMapperSyncTimeout)
 		defer cancel()
 
 		if err := bucketClassMapper.WaitForSync(bucketClassMapperSyncCtx); err != nil {
 			return fmt.Errorf("error waiting for bucket class mapper to sync: %w", err)
-		}
-
-		bucketEvents := orievent.NewGenerator(func(ctx context.Context) ([]*ori.Bucket, error) {
-			res, err := bucketRuntime.ListBuckets(ctx, &ori.ListBucketsRequest{})
-			if err != nil {
-				return nil, err
-			}
-			return res.Buckets, nil
-		}, orievent.GeneratorOptions{})
-		if err := mgr.Add(bucketEvents); err != nil {
-			return fmt.Errorf("error adding bucket event generator: %w", err)
-		}
-		if err := mgr.AddHealthzCheck("bucket-events", bucketEvents.Check); err != nil {
-			return fmt.Errorf("error adding bucket event generator healthz check: %w", err)
 		}
 
 		if err := (&controllers.BucketReconciler{
