@@ -8,7 +8,7 @@ rules:
   - apiGroups:
       - storage.api.onmetal.de
     resources:
-      - volumeclasses
+      - bucketclasses
     verbs:
       - get
       - list
@@ -16,7 +16,7 @@ rules:
   - apiGroups:
       - storage.api.onmetal.de
     resources:
-      - volumepools
+      - bucketpools
     verbs:
       - get
       - list
