@@ -78,6 +78,27 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
     CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/orictl-volume ./orictl/cmd/orictl-volume/main.go
 
+FROM builder as bucketpoollet-builder
+
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/go/pkg \
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/bucketpoollet ./poollet/bucketpoollet/cmd/bucketpoollet/main.go
+
+
+FROM builder as bucketbroker-builder
+
+# TODO: Remove orictl-bucket once debug containers are more broadly available.
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/go/pkg \
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/bucketbroker ./broker/bucketbroker/cmd/bucketbroker/main.go && \
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/orictl-bucket ./orictl/cmd/orictl-bucket/main.go
+
+FROM builder as orictl-bucket-builder
+
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/go/pkg \
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/orictl-bucket ./orictl/cmd/orictl-bucket/main.go
+
 # Use distroless as minimal base image to package the manager binary
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
 FROM gcr.io/distroless/static:nonroot as manager
@@ -136,4 +157,26 @@ ENTRYPOINT ["/volumebroker"]
 FROM debian:bullseye-slim as orictl-volume
 WORKDIR /
 COPY --from=orictl-volume-builder /workspace/bin/orictl-volume .
+USER 65532:65532
+
+FROM gcr.io/distroless/static:nonroot as bucketpoollet
+WORKDIR /
+COPY --from=bucketpoollet-builder /workspace/bin/bucketpoollet .
+USER 65532:65532
+
+ENTRYPOINT ["/bucketpoollet"]
+
+# TODO: Switch to distroless as soon as ephemeral debug containers are more broadly available.
+FROM debian:bullseye-slim as bucketbroker
+WORKDIR /
+COPY --from=bucketbroker-builder /workspace/bin/bucketbroker .
+# TODO: Remove orictl-bucket as soon as ephemeral debug containers are more broadly available.
+COPY --from=bucketbroker-builder /workspace/bin/orictl-bucket .
+USER 65532:65532
+
+ENTRYPOINT ["/bucketbroker"]
+
+FROM debian:bullseye-slim as orictl-bucket
+WORKDIR /
+COPY --from=orictl-bucket-builder /workspace/bin/orictl-bucket .
 USER 65532:65532

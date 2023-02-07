@@ -1,0 +1,14 @@
+- op: add
+  path: /spec/template/spec/containers/0/args/-
+  value: --bucket-pool-name=broker
+- op: add
+  path: /spec/template/spec/containers/0/args/-
+  value: --provider-id=broker
+- op: add
+  path: /spec/template/spec/containers/0/args/-
+  value: --provider-id=broker
+- op: add
+  path: /spec/template/spec/containers/1/args
+  value:
+    - --namespace=bucketpoollet-system
+    - --bucket-pool-name=virtual

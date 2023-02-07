@@ -40,6 +40,12 @@ jobs:
             target: volumebroker
           - name: onmetal-api-orictl-volume
             target: orictl-volume
+          - name: onmetal-api-bucketpoollet
+            target: bucketpoollet
+          - name: onmetal-api-bucketbroker
+            target: bucketbroker
+          - name: onmetal-api-orictl-bucket
+            target: orictl-bucket
     if: ${{ github.event.label.name == 'ok-to-image' }} || ${{ github.event.label.name == 'ok-to-🐳' }} || ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     steps:

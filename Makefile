@@ -8,6 +8,9 @@ ORICTL_MACHINE_IMG ?= orictl-machine:latest
 VOLUMEPOOLLET_IMG ?= volumepoollet:latest
 VOLUMEBROKER_IMG ?= volumebroker:latest
 ORICTL_VOLUME_IMG ?= orictl-volume:latest
+BUCKETPOOLLET_IMG ?= bucketpoollet:latest
+BUCKETBROKER_IMG ?= bucketbroker:latest
+ORICTL_BUCKET_IMG ?= orictl-bucket:latest
 
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
 ENVTEST_K8S_VERSION = 1.24.1
@@ -65,6 +68,11 @@ manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and Cust
 	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./poollet/volumepoollet/controllers/..." output:rbac:artifacts:config=config/volumepoollet-broker/poollet-rbac
 	$(CONTROLLER_GEN) rbac:roleName=broker-role paths="./broker/volumebroker/..." output:rbac:artifacts:config=config/volumepoollet-broker/broker-rbac
 	./hack/replace.sh config/volumepoollet-broker/broker-rbac/role.yaml 's/ClusterRole/Role/g'
+
+	# bucketpoollet-broker
+	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./poollet/bucketpoollet/controllers/..." output:rbac:artifacts:config=config/bucketpoollet-broker/poollet-rbac
+	$(CONTROLLER_GEN) rbac:roleName=broker-role paths="./broker/bucketbroker/..." output:rbac:artifacts:config=config/bucketpoollet-broker/broker-rbac
+	./hack/replace.sh config/bucketpoollet-broker/broker-rbac/role.yaml 's/ClusterRole/Role/g'
 
 .PHONY: generate
 generate: vgopath models-schema deepcopy-gen client-gen lister-gen informer-gen defaulter-gen conversion-gen openapi-gen applyconfiguration-gen
@@ -160,7 +168,8 @@ run: manifests generate fmt vet ## Run a controller from your host.
 docker-build: \
 	docker-build-onmetal-apiserver docker-build-onmetal-controller-manager \
 	docker-build-machinepoollet docker-build-machinebroker docker-build-orictl-machine \
-	docker-build-volumepoollet docker-build-volumebroker docker-build-orictl-volume ## Build docker image with the manager.
+	docker-build-volumepoollet docker-build-volumebroker docker-build-orictl-volume |
+	docker-build-bucketpoollet docker-build-bucketbroker docker-build-orictl-bucket ## Build docker image with the manager.
 
 .PHONY: docker-build-onmetal-apiserver
 docker-build-onmetal-apiserver: ## Build onmetal-apiserver.
@@ -193,6 +202,18 @@ docker-build-volumebroker: ## Build volumebroker image.
 .PHONY: docker-build-orictl-volume
 docker-build-orictl-volume: ## Build orictl-volume image.
 	docker build --target orictl-volume -t ${ORICTL_VOLUME_IMG} .
+
+.PHONY: docker-build-bucketpoollet
+docker-build-bucketpoollet: ## Build bucketpoollet image.
+	docker build --target bucketpoollet -t ${BUCKETPOOLLET_IMG} .
+
+.PHONY: docker-build-bucketbroker
+docker-build-bucketbroker: ## Build bucketbroker image.
+	docker build --target bucketbroker -t ${BUCKETBROKER_IMG} .
+
+.PHONY: docker-build-orictl-bucket
+docker-build-orictl-bucket: ## Build orictl-bucket image.
+	docker build --target orictl-bucket -t ${ORICTL_BUCKET_IMG} .
 
 .PHONY: docker-push
 docker-push: ## Push docker image with the manager.
@@ -255,6 +276,14 @@ kind-load-volumepoollet:
 .PHONY: kind-load-volumebroker
 kind-load-volumebroker:
 	kind load docker-image ${VOLUMEBROKER_IMG}
+
+.PHONY: kind-load-bucketpoollet
+kind-load-bucketpoollet:
+	kind load docker-image ${BUCKETPOOLLET_IMG}
+
+.PHONY: kind-load-bucketbroker
+kind-load-bucketbroker:
+	kind load docker-image ${BUCKETBROKER_IMG}
 
 .PHONY: kind-load
 kind-load: kind-load-apiserver kind-load-controller ## Load the apiserver and controller in kind.
