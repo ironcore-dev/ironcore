@@ -174,7 +174,7 @@ func Run(ctx context.Context, opts Options) error {
 		Port:                    9443,
 		HealthProbeBindAddress:  opts.ProbeAddr,
 		LeaderElection:          opts.EnableLeaderElection,
-		LeaderElectionID:        "dfffbeaa.api.onmetal.de",
+		LeaderElectionID:        "dwfepysc.api.onmetal.de",
 		LeaderElectionNamespace: opts.LeaderElectionNamespace,
 		LeaderElectionConfig:    leaderElectionCfg,
 	})
