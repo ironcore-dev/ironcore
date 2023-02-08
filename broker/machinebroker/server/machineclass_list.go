@@ -72,7 +72,7 @@ func (s *Server) filterOnmetalMachineClasses(
 }
 
 func (s *Server) convertOnmetalMachineClass(machineClass *computev1alpha1.MachineClass) (*ori.MachineClass, error) {
-	cpu := machineClass.Capabilities.Cpu()
+	cpu := machineClass.Capabilities.CPU()
 	memory := machineClass.Capabilities.Memory()
 
 	return &ori.MachineClass{

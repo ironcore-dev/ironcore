@@ -22,6 +22,7 @@ import (
 	"github.com/onmetal/controller-utils/buildutils"
 	"github.com/onmetal/controller-utils/modutils"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
@@ -168,9 +169,9 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "test-mc-",
 			},
-			Capabilities: map[corev1.ResourceName]resource.Quantity{
-				corev1.ResourceCPU:    resource.MustParse("1"),
-				corev1.ResourceMemory: resource.MustParse("1Gi"),
+			Capabilities: corev1alpha1.ResourceList{
+				corev1alpha1.ResourceCPU:    resource.MustParse("1"),
+				corev1alpha1.ResourceMemory: resource.MustParse("1Gi"),
 			},
 		}
 		Expect(k8sClient.Create(ctx, mc)).To(Succeed(), "failed to create test machine class")
@@ -182,7 +183,7 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 				MachineClass: ori.MachineClass{
 					Name: mc.Name,
 					Capabilities: &ori.MachineClassCapabilities{
-						CpuMillis:   mc.Capabilities.Cpu().MilliValue(),
+						CpuMillis:   mc.Capabilities.CPU().MilliValue(),
 						MemoryBytes: mc.Capabilities.Memory().AsDec().UnscaledBig().Uint64(),
 					},
 				},

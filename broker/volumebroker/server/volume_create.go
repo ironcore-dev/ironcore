@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	volumebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/volumebroker/api/v1alpha1"
 	"github.com/onmetal/onmetal-api/broker/volumebroker/apiutils"
@@ -50,8 +51,8 @@ func (s *Server) getOnmetalVolumeConfig(_ context.Context, volume *ori.Volume) (
 			VolumeClassRef:     &corev1.LocalObjectReference{Name: volume.Spec.Class},
 			VolumePoolRef:      volumePoolRef,
 			VolumePoolSelector: s.volumePoolSelector,
-			Resources: corev1.ResourceList{
-				corev1.ResourceStorage: *resource.NewQuantity(int64(volume.Spec.Resources.StorageBytes), resource.DecimalSI),
+			Resources: corev1alpha1.ResourceList{
+				corev1alpha1.ResourceStorage: *resource.NewQuantity(int64(volume.Spec.Resources.StorageBytes), resource.DecimalSI),
 			},
 			Image:              volume.Spec.Image,
 			ImagePullSecretRef: nil, // TODO: Fill if necessary

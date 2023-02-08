@@ -128,6 +128,9 @@ ResourceQuotaStatus
 <tbody><tr><td><p>&#34;cpu&#34;</p></td>
 <td><p>ResourceCPU is the amount of cpu in cores.</p>
 </td>
+</tr><tr><td><p>&#34;iops&#34;</p></td>
+<td><p>ResourceIOPS defines max IOPS in input/output operations per second.</p>
+</td>
 </tr><tr><td><p>&#34;memory&#34;</p></td>
 <td><p>ResourceMemory is the amount of memory in bytes.</p>
 </td>
@@ -142,6 +145,9 @@ ResourceQuotaStatus
 </td>
 </tr><tr><td><p>&#34;storage&#34;</p></td>
 <td><p>ResourceStorage is the amount of storage, in bytes.</p>
+</td>
+</tr><tr><td><p>&#34;tps&#34;</p></td>
+<td><p>ResourceTPS defines max throughput per second. (e.g. 1Gi)</p>
 </td>
 </tr></tbody>
 </table>

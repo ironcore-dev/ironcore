@@ -22,7 +22,6 @@ import (
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/api/resource"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -73,8 +72,8 @@ func (s *Server) filterOnmetalVolumeClasses(
 }
 
 func (s *Server) convertOnmetalVolumeClass(volumeClass *storagev1alpha1.VolumeClass) (*ori.VolumeClass, error) {
-	tps := volumeClass.Capabilities.Name(storagev1alpha1.ResourceTPS, resource.DecimalSI)
-	iops := volumeClass.Capabilities.Name(storagev1alpha1.ResourceIOPS, resource.DecimalSI)
+	tps := volumeClass.Capabilities.TPS()
+	iops := volumeClass.Capabilities.IOPS()
 
 	return &ori.VolumeClass{
 		Name: volumeClass.Name,

@@ -18,10 +18,10 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
+	v1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
+	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	internal "github.com/onmetal/onmetal-api/client-go/applyconfigurations/internal"
 	v1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/meta/v1"
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	managedfields "k8s.io/apimachinery/pkg/util/managedfields"
@@ -32,7 +32,7 @@ import (
 type VolumeClassApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Capabilities                     *corev1.ResourceList `json:"capabilities,omitempty"`
+	Capabilities                     *v1alpha1.ResourceList `json:"capabilities,omitempty"`
 }
 
 // VolumeClass constructs an declarative configuration of the VolumeClass type for use with
@@ -56,18 +56,18 @@ func VolumeClass(name string) *VolumeClassApplyConfiguration {
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
 // Experimental!
-func ExtractVolumeClass(volumeClass *v1alpha1.VolumeClass, fieldManager string) (*VolumeClassApplyConfiguration, error) {
+func ExtractVolumeClass(volumeClass *storagev1alpha1.VolumeClass, fieldManager string) (*VolumeClassApplyConfiguration, error) {
 	return extractVolumeClass(volumeClass, fieldManager, "")
 }
 
 // ExtractVolumeClassStatus is the same as ExtractVolumeClass except
 // that it extracts the status subresource applied configuration.
 // Experimental!
-func ExtractVolumeClassStatus(volumeClass *v1alpha1.VolumeClass, fieldManager string) (*VolumeClassApplyConfiguration, error) {
+func ExtractVolumeClassStatus(volumeClass *storagev1alpha1.VolumeClass, fieldManager string) (*VolumeClassApplyConfiguration, error) {
 	return extractVolumeClass(volumeClass, fieldManager, "status")
 }
 
-func extractVolumeClass(volumeClass *v1alpha1.VolumeClass, fieldManager string, subresource string) (*VolumeClassApplyConfiguration, error) {
+func extractVolumeClass(volumeClass *storagev1alpha1.VolumeClass, fieldManager string, subresource string) (*VolumeClassApplyConfiguration, error) {
 	b := &VolumeClassApplyConfiguration{}
 	err := managedfields.ExtractInto(volumeClass, internal.Parser().Type("com.github.onmetal.onmetal-api.api.storage.v1alpha1.VolumeClass"), fieldManager, b, subresource)
 	if err != nil {
@@ -241,7 +241,7 @@ func (b *VolumeClassApplyConfiguration) ensureObjectMetaApplyConfigurationExists
 // WithCapabilities sets the Capabilities field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Capabilities field is set to the value of the last call.
-func (b *VolumeClassApplyConfiguration) WithCapabilities(value corev1.ResourceList) *VolumeClassApplyConfiguration {
+func (b *VolumeClassApplyConfiguration) WithCapabilities(value v1alpha1.ResourceList) *VolumeClassApplyConfiguration {
 	b.Capabilities = &value
 	return b
 }

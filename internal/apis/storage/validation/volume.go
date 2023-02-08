@@ -17,6 +17,7 @@ package validation
 import (
 	"fmt"
 
+	"github.com/onmetal/onmetal-api/internal/apis/core"
 	corev1 "k8s.io/api/core/v1"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1validation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
@@ -51,11 +52,11 @@ func validateVolumeSpec(spec *storage.VolumeSpec, fldPath *field.Path) field.Err
 			}
 		}
 
-		storageValue, ok := spec.Resources[corev1.ResourceStorage]
+		storageValue, ok := spec.Resources[core.ResourceStorage]
 		if ok {
 			allErrs = append(allErrs, onmetalapivalidation.ValidatePositiveQuantity(storageValue, fldPath.Child("resources").Key(string(corev1.ResourceStorage)))...)
 		} else {
-			allErrs = append(allErrs, field.Required(fldPath.Child("resources").Key(string(corev1.ResourceStorage)), fmt.Sprintf("must specify %s", corev1.ResourceStorage)))
+			allErrs = append(allErrs, field.Required(fldPath.Child("resources").Key(string(core.ResourceStorage)), fmt.Sprintf("must specify %s", core.ResourceStorage)))
 		}
 
 		if spec.ImagePullSecretRef != nil {

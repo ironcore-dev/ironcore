@@ -17,6 +17,7 @@
 package compute
 
 import (
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -38,9 +39,9 @@ var _ = Describe("machineclass controller", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "machineclass-",
 			},
-			Capabilities: map[corev1.ResourceName]resource.Quantity{
-				corev1.ResourceCPU:    resource.MustParse("300m"),
-				corev1.ResourceMemory: resource.MustParse("1Gi"),
+			Capabilities: corev1alpha1.ResourceList{
+				corev1alpha1.ResourceCPU:    resource.MustParse("300m"),
+				corev1alpha1.ResourceMemory: resource.MustParse("1Gi"),
 			},
 		}
 		Expect(k8sClient.Create(ctx, machineClass)).Should(Succeed())

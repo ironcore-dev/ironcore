@@ -18,11 +18,11 @@ package validation
 
 import (
 	"github.com/onmetal/onmetal-api/internal/apis/compute"
+	"github.com/onmetal/onmetal-api/internal/apis/core"
 	. "github.com/onmetal/onmetal-api/internal/testutils/validation"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"
-	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -50,9 +50,9 @@ var _ = Describe("MachineClass", func() {
 		),
 		Entry("invalid capabilities",
 			&compute.MachineClass{
-				Capabilities: map[corev1.ResourceName]resource.Quantity{
-					corev1.ResourceCPU:    resource.MustParse("-1"),
-					corev1.ResourceMemory: resource.MustParse("-1Gi"),
+				Capabilities: core.ResourceList{
+					core.ResourceCPU:    resource.MustParse("-1"),
+					core.ResourceMemory: resource.MustParse("-1Gi"),
 				},
 			},
 			ContainElements(
@@ -62,9 +62,9 @@ var _ = Describe("MachineClass", func() {
 		),
 		Entry("valid capabilities",
 			&compute.MachineClass{
-				Capabilities: map[corev1.ResourceName]resource.Quantity{
-					corev1.ResourceCPU:    resource.MustParse("300m"),
-					corev1.ResourceMemory: resource.MustParse("2Gi"),
+				Capabilities: core.ResourceList{
+					core.ResourceCPU:    resource.MustParse("300m"),
+					core.ResourceMemory: resource.MustParse("2Gi"),
 				},
 			},
 			Not(ContainElements(
@@ -81,12 +81,12 @@ var _ = Describe("MachineClass", func() {
 		},
 		Entry("immutable capabilities",
 			&compute.MachineClass{
-				Capabilities: map[corev1.ResourceName]resource.Quantity{
-					corev1.ResourceMemory: resource.MustParse("1Gi"),
+				Capabilities: core.ResourceList{
+					core.ResourceMemory: resource.MustParse("1Gi"),
 				},
 			},
 			&compute.MachineClass{
-				Capabilities: map[corev1.ResourceName]resource.Quantity{},
+				Capabilities: core.ResourceList{},
 			},
 			ContainElement(ImmutableField("capabilities")),
 		),

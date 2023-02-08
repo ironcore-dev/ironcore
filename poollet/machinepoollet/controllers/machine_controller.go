@@ -631,7 +631,7 @@ func (r *MachineReconciler) prepareORIMachineClass(ctx context.Context, machine 
 }
 
 func getORIMachineClassCapabilities(machineClass *computev1alpha1.MachineClass) (*ori.MachineClassCapabilities, error) {
-	cpu := machineClass.Capabilities.Cpu()
+	cpu := machineClass.Capabilities.CPU()
 	memory := machineClass.Capabilities.Memory()
 
 	return &ori.MachineClassCapabilities{

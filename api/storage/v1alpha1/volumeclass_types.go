@@ -17,7 +17,7 @@
 package v1alpha1
 
 import (
-	corev1 "k8s.io/api/core/v1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -35,7 +35,7 @@ type VolumeClass struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 	// Capabilities describes the capabilities of a VolumeClass.
-	Capabilities corev1.ResourceList `json:"capabilities,omitempty"`
+	Capabilities corev1alpha1.ResourceList `json:"capabilities,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

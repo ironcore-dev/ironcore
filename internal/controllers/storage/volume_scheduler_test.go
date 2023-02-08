@@ -15,6 +15,7 @@
 package storage
 
 import (
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -54,8 +55,8 @@ var _ = Describe("VolumeScheduler", func() {
 			},
 			Spec: storagev1alpha1.VolumeSpec{
 				VolumeClassRef: &corev1.LocalObjectReference{Name: "my-volumeclass"},
-				Resources: corev1.ResourceList{
-					corev1.ResourceStorage: resource.MustParse("1Gi"),
+				Resources: corev1alpha1.ResourceList{
+					corev1alpha1.ResourceStorage: resource.MustParse("1Gi"),
 				},
 			},
 		}
@@ -78,8 +79,8 @@ var _ = Describe("VolumeScheduler", func() {
 			},
 			Spec: storagev1alpha1.VolumeSpec{
 				VolumeClassRef: &corev1.LocalObjectReference{Name: "my-volumeclass"},
-				Resources: corev1.ResourceList{
-					corev1.ResourceStorage: resource.MustParse("1Gi"),
+				Resources: corev1alpha1.ResourceList{
+					corev1alpha1.ResourceStorage: resource.MustParse("1Gi"),
 				},
 			},
 		}
@@ -156,8 +157,8 @@ var _ = Describe("VolumeScheduler", func() {
 					"foo": "bar",
 				},
 				VolumeClassRef: &corev1.LocalObjectReference{Name: "my-volumeclass"},
-				Resources: corev1.ResourceList{
-					corev1.ResourceStorage: resource.MustParse("1Gi"),
+				Resources: corev1alpha1.ResourceList{
+					corev1alpha1.ResourceStorage: resource.MustParse("1Gi"),
 				},
 			},
 		}
@@ -207,8 +208,8 @@ var _ = Describe("VolumeScheduler", func() {
 			},
 			Spec: storagev1alpha1.VolumeSpec{
 				VolumeClassRef: &corev1.LocalObjectReference{Name: "my-volumeclass"},
-				Resources: corev1.ResourceList{
-					corev1.ResourceStorage: resource.MustParse("1Gi"),
+				Resources: corev1alpha1.ResourceList{
+					corev1alpha1.ResourceStorage: resource.MustParse("1Gi"),
 				},
 			},
 		}

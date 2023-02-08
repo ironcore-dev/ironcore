@@ -15,13 +15,13 @@
 package validation_test
 
 import (
+	"github.com/onmetal/onmetal-api/internal/apis/core"
 	"github.com/onmetal/onmetal-api/internal/apis/storage"
 	. "github.com/onmetal/onmetal-api/internal/apis/storage/validation"
 	. "github.com/onmetal/onmetal-api/internal/testutils/validation"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"
-	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -49,9 +49,9 @@ var _ = Describe("VolumeClass", func() {
 		),
 		Entry("invalid capabilities",
 			&storage.VolumeClass{
-				Capabilities: map[corev1.ResourceName]resource.Quantity{
-					storage.ResourceTPS:  resource.MustParse("-1"),
-					storage.ResourceIOPS: resource.MustParse("-1"),
+				Capabilities: core.ResourceList{
+					core.ResourceTPS:  resource.MustParse("-1"),
+					core.ResourceIOPS: resource.MustParse("-1"),
 				},
 			},
 			ContainElements(
@@ -61,9 +61,9 @@ var _ = Describe("VolumeClass", func() {
 		),
 		Entry("valid capabilities",
 			&storage.VolumeClass{
-				Capabilities: map[corev1.ResourceName]resource.Quantity{
-					storage.ResourceTPS:  resource.MustParse("500Mi"),
-					storage.ResourceIOPS: resource.MustParse("100"),
+				Capabilities: core.ResourceList{
+					core.ResourceTPS:  resource.MustParse("500Mi"),
+					core.ResourceIOPS: resource.MustParse("100"),
 				},
 			},
 			Not(ContainElements(
@@ -80,12 +80,12 @@ var _ = Describe("VolumeClass", func() {
 		},
 		Entry("immutable capabilities",
 			&storage.VolumeClass{
-				Capabilities: map[corev1.ResourceName]resource.Quantity{
-					storage.ResourceIOPS: resource.MustParse("1000"),
+				Capabilities: core.ResourceList{
+					core.ResourceIOPS: resource.MustParse("1000"),
 				},
 			},
 			&storage.VolumeClass{
-				Capabilities: map[corev1.ResourceName]resource.Quantity{},
+				Capabilities: core.ResourceList{},
 			},
 			ContainElement(ImmutableField("capabilities")),
 		),

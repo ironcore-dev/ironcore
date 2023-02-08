@@ -17,10 +17,10 @@ package server
 import (
 	"fmt"
 
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	"github.com/onmetal/onmetal-api/broker/volumebroker/apiutils"
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
-	corev1 "k8s.io/api/core/v1"
 )
 
 func (s *Server) convertAggregateOnmetalVolume(volume *AggregateOnmetalVolume) (*ori.Volume, error) {
@@ -71,7 +71,7 @@ func (s *Server) convertOnmetalVolumeState(state storagev1alpha1.VolumeState) (o
 	return 0, fmt.Errorf("unknown onmetal volume state %q", state)
 }
 
-func (s *Server) convertOnmetalVolumeResources(resources corev1.ResourceList) (*ori.VolumeResources, error) {
+func (s *Server) convertOnmetalVolumeResources(resources corev1alpha1.ResourceList) (*ori.VolumeResources, error) {
 	storage := resources.Storage()
 	if storage.IsZero() {
 		return nil, fmt.Errorf("volume does not specify storage resource")

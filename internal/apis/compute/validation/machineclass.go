@@ -19,7 +19,7 @@ package validation
 import (
 	onmetalapivalidation "github.com/onmetal/onmetal-api/internal/api/validation"
 	"github.com/onmetal/onmetal-api/internal/apis/compute"
-	corev1 "k8s.io/api/core/v1"
+	"github.com/onmetal/onmetal-api/internal/apis/core"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
@@ -35,14 +35,14 @@ func ValidateMachineClass(machineClass *compute.MachineClass) field.ErrorList {
 	return allErrs
 }
 
-func validateMachineClassCapabilities(capabilities corev1.ResourceList, fldPath *field.Path) field.ErrorList {
+func validateMachineClassCapabilities(capabilities core.ResourceList, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	cpu := capabilities.Cpu()
-	allErrs = append(allErrs, onmetalapivalidation.ValidatePositiveQuantity(*cpu, fldPath.Key(string(corev1.ResourceCPU)))...)
+	cpu := capabilities.CPU()
+	allErrs = append(allErrs, onmetalapivalidation.ValidatePositiveQuantity(*cpu, fldPath.Key(string(core.ResourceCPU)))...)
 
 	memory := capabilities.Memory()
-	allErrs = append(allErrs, onmetalapivalidation.ValidatePositiveQuantity(*memory, fldPath.Key(string(corev1.ResourceMemory)))...)
+	allErrs = append(allErrs, onmetalapivalidation.ValidatePositiveQuantity(*memory, fldPath.Key(string(core.ResourceMemory)))...)
 
 	return allErrs
 }

@@ -17,7 +17,7 @@
 package storage
 
 import (
-	corev1 "k8s.io/api/core/v1"
+	"github.com/onmetal/onmetal-api/internal/apis/core"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -35,7 +35,7 @@ type BucketClass struct {
 	metav1.TypeMeta
 	metav1.ObjectMeta
 	// Capabilities describes the capabilities of a BucketClass.
-	Capabilities corev1.ResourceList
+	Capabilities core.ResourceList
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

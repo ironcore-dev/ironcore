@@ -60,7 +60,7 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 		machineClass := obj.(*compute.MachineClass)
 
 		cells = append(cells, name)
-		cells = append(cells, machineClass.Capabilities.Cpu())
+		cells = append(cells, machineClass.Capabilities.CPU())
 		cells = append(cells, machineClass.Capabilities.Memory())
 		cells = append(cells, age)
 

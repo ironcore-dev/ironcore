@@ -20,7 +20,6 @@ import (
 	"github.com/onmetal/onmetal-api/internal/apis/storage"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/meta/table"
-	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
@@ -61,8 +60,8 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 		volumeClass := obj.(*storage.VolumeClass)
 
 		cells = append(cells, name)
-		cells = append(cells, volumeClass.Capabilities.Name(storage.ResourceTPS, resource.DecimalSI))
-		cells = append(cells, volumeClass.Capabilities.Name(storage.ResourceIOPS, resource.DecimalSI))
+		cells = append(cells, volumeClass.Capabilities.TPS())
+		cells = append(cells, volumeClass.Capabilities.IOPS())
 		cells = append(cells, age)
 
 		return cells, nil

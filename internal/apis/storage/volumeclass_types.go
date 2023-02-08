@@ -17,15 +17,8 @@
 package storage
 
 import (
-	corev1 "k8s.io/api/core/v1"
+	"github.com/onmetal/onmetal-api/internal/apis/core"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-)
-
-const (
-	// ResourceTPS defines max throughput per second. (e.g. 1Gi)
-	ResourceTPS corev1.ResourceName = "tps"
-	// ResourceIOPS defines max IOPS in input/output operations per second.
-	ResourceIOPS corev1.ResourceName = "iops"
 )
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -39,7 +32,7 @@ type VolumeClass struct {
 	metav1.ObjectMeta
 
 	// Capabilities describes the capabilities of a volume class
-	Capabilities corev1.ResourceList
+	Capabilities core.ResourceList
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

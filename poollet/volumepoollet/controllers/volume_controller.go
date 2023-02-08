@@ -22,6 +22,7 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/clientutils"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
@@ -34,7 +35,6 @@ import (
 	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
@@ -219,8 +219,8 @@ func (r *VolumeReconciler) delete(ctx context.Context, log logr.Logger, volume *
 }
 
 func getORIVolumeClassCapabilities(volumeClass *storagev1alpha1.VolumeClass) (*ori.VolumeClassCapabilities, error) {
-	tps := volumeClass.Capabilities.Name(storagev1alpha1.ResourceTPS, resource.DecimalSI)
-	iops := volumeClass.Capabilities.Name(storagev1alpha1.ResourceIOPS, resource.DecimalSI)
+	tps := volumeClass.Capabilities.TPS()
+	iops := volumeClass.Capabilities.IOPS()
 
 	return &ori.VolumeClassCapabilities{
 		Tps:  tps.Value(),
@@ -260,7 +260,7 @@ func (r *VolumeReconciler) prepareORIVolumeClass(ctx context.Context, volume *st
 	return class.Name, true, nil
 }
 
-func (r *VolumeReconciler) prepareORIVolumeResources(_ context.Context, _ *storagev1alpha1.Volume, resources corev1.ResourceList) (*ori.VolumeResources, bool, error) {
+func (r *VolumeReconciler) prepareORIVolumeResources(_ context.Context, _ *storagev1alpha1.Volume, resources corev1alpha1.ResourceList) (*ori.VolumeResources, bool, error) {
 	storageBytes := resources.Storage().AsDec().UnscaledBig().Uint64()
 
 	return &ori.VolumeResources{
