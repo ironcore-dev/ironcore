@@ -1,18 +1,20 @@
-// Copyright 2022 OnMetal authors
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ * Copyright (c) 2021 by the OnMetal authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-package app_test
+package storage
 
 import (
 	"context"
@@ -22,25 +24,31 @@ import (
 
 	"github.com/onmetal/controller-utils/buildutils"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
-	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
+	onmetalapiclient "github.com/onmetal/onmetal-api/internal/client"
 	utilsenvtest "github.com/onmetal/onmetal-api/utils/envtest"
 	"github.com/onmetal/onmetal-api/utils/envtest/apiserver"
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/tools/record"
+	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/envtest/komega"
+
+	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
-	"sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	//+kubebuilder:scaffold:imports
 )
+
+// These tests use Ginkgo (BDD-style Go testing framework). Refer to
+// http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
 
 const (
 	pollingInterval      = 50 * time.Millisecond
@@ -61,10 +69,9 @@ func TestAPIs(t *testing.T) {
 	SetDefaultEventuallyPollingInterval(pollingInterval)
 	SetDefaultEventuallyTimeout(eventuallyTimeout)
 	SetDefaultConsistentlyDuration(consistentlyDuration)
-
 	RegisterFailHandler(Fail)
 
-	RunSpecs(t, "Compute Controller Suite")
+	RunSpecs(t, "Controller Suite")
 }
 
 var _ = BeforeSuite(func() {
@@ -75,20 +82,20 @@ var _ = BeforeSuite(func() {
 	By("bootstrapping test environment")
 	testEnv = &envtest.Environment{}
 	testEnvExt = &utilsenvtest.EnvironmentExtensions{
-		APIServiceDirectoryPaths:       []string{filepath.Join("..", "..", "config", "apiserver", "apiservice", "bases")},
+		APIServiceDirectoryPaths:       []string{filepath.Join("..", "..", "..", "config", "apiserver", "apiservice", "bases")},
 		ErrorIfAPIServicePathIsMissing: true,
 	}
 
 	cfg, err = utilsenvtest.StartWithExtensions(testEnv, testEnvExt)
 	Expect(err).NotTo(HaveOccurred())
 	Expect(cfg).NotTo(BeNil())
+
 	DeferCleanup(utilsenvtest.StopWithExtensions, testEnv, testEnvExt)
 
-	Expect(corev1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
-	Expect(computev1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
 	Expect(storagev1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
-	Expect(ipamv1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
-	Expect(networkingv1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
+	Expect(computev1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
+
+	//+kubebuilder:scaffold:scheme
 
 	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
 	Expect(err).NotTo(HaveOccurred())
@@ -109,25 +116,24 @@ var _ = BeforeSuite(func() {
 	Expect(apiSrv.Start()).To(Succeed())
 	DeferCleanup(apiSrv.Stop)
 
-	err = utilsenvtest.WaitUntilAPIServicesReadyWithTimeout(apiServiceTimeout, testEnvExt, k8sClient, scheme.Scheme)
-	Expect(err).NotTo(HaveOccurred())
+	Expect(utilsenvtest.WaitUntilAPIServicesReadyWithTimeout(apiServiceTimeout, testEnvExt, k8sClient, scheme.Scheme)).To(Succeed())
 })
 
 func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.MachineClass) {
 	var (
+		cancel       context.CancelFunc
 		ns           = &corev1.Namespace{}
 		machineClass = &computev1alpha1.MachineClass{}
 	)
-
 	BeforeEach(func() {
+		var mgrCtx context.Context
+		mgrCtx, cancel = context.WithCancel(ctx)
 		*ns = corev1.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "testns-",
 			},
 		}
 		Expect(k8sClient.Create(ctx, ns)).To(Succeed(), "failed to create test namespace")
-
-		DeferCleanup(k8sClient.Delete, ctx, ns)
 
 		*machineClass = computev1alpha1.MachineClass{
 			ObjectMeta: metav1.ObjectMeta{
@@ -139,7 +145,48 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 			},
 		}
 		Expect(k8sClient.Create(ctx, machineClass)).To(Succeed(), "failed to create test machine class")
-		DeferCleanup(k8sClient.Delete, ctx, machineClass)
+
+		k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
+			Scheme:             scheme.Scheme,
+			Host:               "127.0.0.1",
+			MetricsBindAddress: "0",
+		})
+		Expect(err).ToNot(HaveOccurred())
+
+		// index fields here
+		Expect(onmetalapiclient.SetupMachineSpecVolumeNamesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+
+		// register reconciler here
+		Expect((&VolumeReconciler{
+			EventRecorder: &record.FakeRecorder{},
+			Client:        k8sManager.GetClient(),
+			APIReader:     k8sManager.GetAPIReader(),
+			Scheme:        k8sManager.GetScheme(),
+			BindTimeout:   1 * time.Second,
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
+		Expect((&VolumeClassReconciler{
+			Client:    k8sManager.GetClient(),
+			APIReader: k8sManager.GetAPIReader(),
+			Scheme:    k8sManager.GetScheme(),
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
+		Expect((&VolumeScheduler{
+			Client:        k8sManager.GetClient(),
+			EventRecorder: &record.FakeRecorder{},
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
+		go func() {
+			defer GinkgoRecover()
+			Expect(k8sManager.Start(mgrCtx)).To(Succeed(), "failed to start manager")
+		}()
+	})
+
+	AfterEach(func() {
+		cancel()
+		Expect(k8sClient.Delete(ctx, ns)).To(Succeed(), "failed to delete test namespace")
+		Expect(k8sClient.DeleteAllOf(ctx, &storagev1alpha1.VolumePool{})).To(Succeed())
+		Expect(k8sClient.DeleteAllOf(ctx, &computev1alpha1.MachineClass{})).To(Succeed())
 	})
 
 	return ns, machineClass

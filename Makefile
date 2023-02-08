@@ -57,7 +57,7 @@ help: ## Display this help.
 FILE="config/machinepoollet-broker/broker-rbac/role.yaml"
 manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
 	# onmetal-controller-manager
-	$(CONTROLLER_GEN) rbac:roleName=manager-role webhook paths="./onmetal-controller-manager/controllers/...;./api/..." output:rbac:artifacts:config=config/controller/rbac
+	$(CONTROLLER_GEN) rbac:roleName=manager-role webhook paths="./internal/controllers/...;./api/..." output:rbac:artifacts:config=config/controller/rbac
 
 	# machinepoollet-broker
 	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./poollet/machinepoollet/controllers/..." output:rbac:artifacts:config=config/machinepoollet-broker/poollet-rbac
@@ -95,8 +95,8 @@ proto: vgopath protoc-gen-gogo
 	./hack/update-proto.sh
 
 .PHONY: fmt
-fmt: ## Run go fmt against code.
-	go fmt ./...
+fmt: goimports ## Run goimports against code.
+	$(GOIMPORTS) -w .
 
 .PHONY: vet
 vet: ## Run go vet against code.
@@ -123,7 +123,7 @@ check-license: addlicense ## Check that every file has a license header present.
 	find . -name '*.go' -exec $(ADDLICENSE) -check -c 'OnMetal authors' {} +
 
 .PHONY: check
-check: manifests generate add-license lint test # Generate manifests, code, lint, add licenses, test
+check: manifests generate add-license fmt lint test # Generate manifests, code, lint, add licenses, test
 
 .PHONY: docs
 docs: gen-crd-api-reference-docs ## Run go generate to generate API reference documentation.
@@ -154,7 +154,7 @@ test-only: envtest ## Run *only* the tests - no generation, linting etc.
 .PHONY: openapi-extractor
 extract-openapi: envtest openapi-extractor
 	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" $(OPENAPI_EXTRACTOR) \
-		--apiserver-package="github.com/onmetal/onmetal-api/onmetal-apiserver/cmd/apiserver" \
+		--apiserver-package="github.com/onmetal/onmetal-api/cmd/onmetal-apiserver" \
 		--apiserver-build-opts=mod \
 		--apiservices="./config/apiserver/apiservice/bases" \
 		--output="./gen"
@@ -163,11 +163,11 @@ extract-openapi: envtest openapi-extractor
 
 .PHONY: build
 build: generate fmt vet ## Build manager binary.
-	go build -o bin/manager ./onmetal-controller-manager/main.go
+	go build -o bin/manager ./cmd/onmetal-controller-manager
 
 .PHONY: run
 run: manifests generate fmt vet ## Run a controller from your host.
-	go run ./onmetal-controller-manager/main.go
+	go run ./cmd/onmetal-controller-manager
 
 .PHONY: docker-build
 docker-build: \
@@ -360,6 +360,7 @@ GEN_CRD_API_REFERENCE_DOCS ?= $(LOCALBIN)/gen-crd-api-reference-docs
 ADDLICENSE ?= $(LOCALBIN)/addlicense
 PROTOC_GEN_GOGO ?= $(LOCALBIN)/protoc-gen-gogo
 MODELS_SCHEMA ?= $(LOCALBIN)/models-schema
+GOIMPORTS ?= $(LOCALBIN)/goimports
 
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v3.8.7
@@ -369,6 +370,7 @@ VGOPATH_VERSION ?= v0.0.2
 GEN_CRD_API_REFERENCE_DOCS_VERSION ?= v0.3.0
 ADDLICENSE_VERSION ?= v1.1.0
 PROTOC_GEN_GOGO_VERSION ?= v1.3.2
+GOIMPORTS_VERSION ?= v0.5.0
 
 KUSTOMIZE_INSTALL_SCRIPT ?= "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
 .PHONY: kustomize
@@ -460,3 +462,8 @@ $(PROTOC_GEN_GOGO): $(LOCALBIN)
 models-schema: $(MODELS_SCHEMA) ## Install models-schema locally if necessary.
 $(MODELS_SCHEMA): $(LOCALBIN)
 	test -s $(LOCALBIN)/models-schema || GOBIN=$(LOCALBIN) go install github.com/onmetal/onmetal-api/models-schema
+
+.PHONY: goimports
+goimports: $(GOIMPORTS) ## Download goimports locally if necessary.
+$(GOIMPORTS): $(LOCALBIN)
+	test -s $(LOCALBIN)/goimports || GOBIN=$(LOCALBIN) go install golang.org/x/tools/cmd/goimports@$(GOIMPORTS_VERSION)
