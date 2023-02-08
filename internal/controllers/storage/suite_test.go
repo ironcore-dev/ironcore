@@ -156,6 +156,8 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 
 		// index fields here
 		Expect(onmetalapiclient.SetupMachineSpecVolumeNamesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+		Expect(onmetalapiclient.SetupVolumeSpecVolumeClassRefNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+		Expect(onmetalapiclient.SetupBucketSpecBucketClassRefNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 
 		// register reconciler here
 		Expect((&VolumeReconciler{
@@ -169,7 +171,11 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 		Expect((&VolumeClassReconciler{
 			Client:    k8sManager.GetClient(),
 			APIReader: k8sManager.GetAPIReader(),
-			Scheme:    k8sManager.GetScheme(),
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
+		Expect((&BucketClassReconciler{
+			Client:    k8sManager.GetClient(),
+			APIReader: k8sManager.GetAPIReader(),
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		Expect((&VolumeScheduler{
@@ -180,7 +186,6 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 		Expect((&BucketClassReconciler{
 			Client:    k8sManager.GetClient(),
 			APIReader: k8sManager.GetAPIReader(),
-			Scheme:    k8sManager.GetScheme(),
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		Expect((&BucketScheduler{

@@ -143,6 +143,7 @@ func main() {
 
 	logger := zap.New(zap.UseFlagOptions(&opts))
 	ctrl.SetLogger(logger)
+	ctx := ctrl.SetupSignalHandler()
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Logger:                 logger,
@@ -163,7 +164,6 @@ func main() {
 		if err = (&computecontrollers.MachineClassReconciler{
 			Client:    mgr.GetClient(),
 			APIReader: mgr.GetAPIReader(),
-			Scheme:    mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "MachineClassRef")
 			os.Exit(1)
@@ -204,7 +204,6 @@ func main() {
 		if err = (&storagecontrollers.VolumeClassReconciler{
 			Client:    mgr.GetClient(),
 			APIReader: mgr.GetAPIReader(),
-			Scheme:    mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "VolumeClass")
 			os.Exit(1)
@@ -229,20 +228,10 @@ func main() {
 		}
 	}
 
-	if controllers.Enabled(volumeScheduler) {
-		if err = (&storagecontrollers.VolumeScheduler{
-			EventRecorder: mgr.GetEventRecorderFor("volume-scheduler"),
-			Client:        mgr.GetClient(),
-		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "VolumeScheduler")
-		}
-	}
-
 	if controllers.Enabled(bucketClassController) {
-		if err = (&storagecontrollers.BucketClassReconciler{
+		if err := (&storagecontrollers.BucketClassReconciler{
 			Client:    mgr.GetClient(),
 			APIReader: mgr.GetAPIReader(),
-			Scheme:    mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "BucketClass")
 			os.Exit(1)
@@ -258,6 +247,15 @@ func main() {
 		}
 	}
 
+	if controllers.Enabled(volumeScheduler) {
+		if err = (&storagecontrollers.VolumeScheduler{
+			EventRecorder: mgr.GetEventRecorderFor("volume-scheduler"),
+			Client:        mgr.GetClient(),
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "VolumeScheduler")
+		}
+	}
+
 	if controllers.Enabled(machineController) {
 		if err = (&computecontrollers.MachineReconciler{
 			EventRecorder: mgr.GetEventRecorderFor("machines"),
@@ -265,6 +263,27 @@ func main() {
 			Scheme:        mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "Machine")
+			os.Exit(1)
+		}
+	}
+
+	if controllers.Enabled(machineClassController) {
+		if err := onmetalapiclient.SetupMachineSpecMachineClassRefNameFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
+			setupLog.Error(err, "unable to setup field indexer", "field", onmetalapiclient.MachineSpecMachineClassRefNameField)
+			os.Exit(1)
+		}
+	}
+
+	if controllers.Enabled(volumeClassController) {
+		if err := onmetalapiclient.SetupVolumeSpecVolumeClassRefNameFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
+			setupLog.Error(err, "unable to setup field indexer", "field", onmetalapiclient.VolumeSpecVolumeClassRefNameField)
+			os.Exit(1)
+		}
+	}
+
+	if controllers.Enabled(bucketClassController) {
+		if err := onmetalapiclient.SetupBucketSpecBucketClassRefNameFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
+			setupLog.Error(err, "unable to setup field indexer", "field", onmetalapiclient.BucketSpecBucketClassRefNameField)
 			os.Exit(1)
 		}
 	}
@@ -463,7 +482,7 @@ func main() {
 	}
 
 	setupLog.Info("starting manager")
-	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
+	if err := mgr.Start(ctx); err != nil {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}

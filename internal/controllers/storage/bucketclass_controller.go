@@ -19,10 +19,11 @@ package storage
 import (
 	"context"
 	"fmt"
+	"sort"
 
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/clientutils"
-	"k8s.io/apimachinery/pkg/runtime"
+	"github.com/onmetal/onmetal-api/utils/slices"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/util/workqueue"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -39,7 +40,6 @@ import (
 type BucketClassReconciler struct {
 	client.Client
 	APIReader client.Reader
-	Scheme    *runtime.Scheme
 }
 
 //+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=bucketclasses,verbs=get;list;watch;create;update;patch;delete
@@ -58,23 +58,27 @@ func (r *BucketClassReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	return r.reconcileExists(ctx, log, bucketClass)
 }
 
-func (r *BucketClassReconciler) listReferencingBuckets(ctx context.Context, bucketClass *storagev1alpha1.BucketClass) ([]storagev1alpha1.Bucket, error) {
+func (r *BucketClassReconciler) listReferencingBucketsWithReader(
+	ctx context.Context,
+	rd client.Reader,
+	bucketClass *storagev1alpha1.BucketClass,
+) ([]storagev1alpha1.Bucket, error) {
 	bucketList := &storagev1alpha1.BucketList{}
-	if err := r.APIReader.List(ctx, bucketList,
+	if err := rd.List(ctx, bucketList,
 		client.InNamespace(bucketClass.Namespace),
+		client.MatchingFields{storagev1alpha1.BucketBucketClassRefNameField: bucketClass.Name},
 	); err != nil {
 		return nil, fmt.Errorf("error listing the buckets using the bucket class: %w", err)
 	}
+	return bucketList.Items, nil
+}
 
-	var buckets []storagev1alpha1.Bucket
-	for _, bucket := range bucketList.Items {
-		if bucketClassRef := bucket.Spec.BucketClassRef; bucketClassRef == nil || bucketClassRef.Name != bucketClass.Name {
-			continue
-		}
-
-		buckets = append(buckets, bucket)
-	}
-	return buckets, nil
+func (r *BucketClassReconciler) collectBucketNames(buckets []storagev1alpha1.Bucket) []string {
+	bucketNames := slices.MapRef(buckets, func(bucket *storagev1alpha1.Bucket) string {
+		return bucket.Name
+	})
+	sort.Strings(bucketNames)
+	return bucketNames
 }
 
 func (r *BucketClassReconciler) delete(ctx context.Context, log logr.Logger, bucketClass *storagev1alpha1.BucketClass) (ctrl.Result, error) {
@@ -82,19 +86,22 @@ func (r *BucketClassReconciler) delete(ctx context.Context, log logr.Logger, buc
 		return ctrl.Result{}, nil
 	}
 
-	buckets, err := r.listReferencingBuckets(ctx, bucketClass)
+	buckets, err := r.listReferencingBucketsWithReader(ctx, r.Client, bucketClass)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
+	if len(buckets) > 0 {
+		log.V(1).Info("Bucket class is still in use", "ReferencingBucketNames", r.collectBucketNames(buckets))
+		return ctrl.Result{Requeue: true}, nil
+	}
 
-	if len(buckets) != 0 {
-		bucketNames := make([]string, 0, len(buckets))
-		for _, bucket := range buckets {
-			bucketNames = append(bucketNames, bucket.Name)
-		}
-
-		log.Info("Bucket Class is still in use", "ReferencingBucketNames", bucketNames)
-		return ctrl.Result{}, nil
+	buckets, err = r.listReferencingBucketsWithReader(ctx, r.APIReader, bucketClass)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+	if len(buckets) > 0 {
+		log.V(1).Info("Bucket class is still in use", "ReferencingBucketNames", r.collectBucketNames(buckets))
+		return ctrl.Result{Requeue: true}, nil
 	}
 
 	log.V(1).Info("Bucket Class is not used anymore, removing finalizer")
