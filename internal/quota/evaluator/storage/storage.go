@@ -29,9 +29,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func NewEvaluators(capabilities generic.CapabilitiesReader) []quota.Evaluator {
+func NewEvaluators(volumeClassCapabilities, bucketClassCapabilities generic.CapabilitiesReader) []quota.Evaluator {
 	return []quota.Evaluator{
-		NewVolumeEvaluator(capabilities),
+		NewVolumeEvaluator(volumeClassCapabilities),
+		NewBucketEvaluator(bucketClassCapabilities),
 	}
 }
 
@@ -57,4 +58,28 @@ func NewPrimeLRUVolumeClassCapabilitiesReader(c onmetalapi.Interface, f informer
 		},
 	)
 	return generic.NewGetterCapabilitiesReader(getter, extractVolumeClassCapabilities, utilsgeneric.Identity[string])
+}
+
+func extractBucketClassCapabilities(bucketClass *storagev1alpha1.BucketClass) corev1alpha1.ResourceList {
+	return bucketClass.Capabilities
+}
+
+func NewClientBucketCapabilitiesReader(c client.Client) generic.CapabilitiesReader {
+	getter := resourceaccess.NewTypedClientGetter[storagev1alpha1.BucketClass](c)
+	return generic.NewGetterCapabilitiesReader(getter,
+		extractBucketClassCapabilities,
+		func(s string) client.ObjectKey { return client.ObjectKey{Name: s} },
+	)
+}
+
+func NewPrimeLRUBucketClassCapabilitiesReader(c onmetalapi.Interface, f informers.SharedInformerFactory) generic.CapabilitiesReader {
+	getter := resourceaccess.NewPrimeLRUGetter[*storagev1alpha1.BucketClass, string](
+		func(ctx context.Context, className string) (*storagev1alpha1.BucketClass, error) {
+			return c.StorageV1alpha1().BucketClasses().Get(ctx, className, metav1.GetOptions{})
+		},
+		func(ctx context.Context, className string) (*storagev1alpha1.BucketClass, error) {
+			return f.Storage().V1alpha1().BucketClasses().Lister().Get(className)
+		},
+	)
+	return generic.NewGetterCapabilitiesReader(getter, extractBucketClassCapabilities, utilsgeneric.Identity[string])
 }

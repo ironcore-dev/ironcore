@@ -26,12 +26,13 @@ import (
 
 func NewEvaluators(
 	machineClassCapabilities,
-	volumeClassCapabilities generic.CapabilitiesReader,
+	volumeClassCapabilities,
+	bucketClassCapabilities generic.CapabilitiesReader,
 ) []quota.Evaluator {
 	var evaluators []quota.Evaluator
 
 	evaluators = append(evaluators, compute.NewEvaluators(machineClassCapabilities)...)
-	evaluators = append(evaluators, storage.NewEvaluators(volumeClassCapabilities)...)
+	evaluators = append(evaluators, storage.NewEvaluators(volumeClassCapabilities, bucketClassCapabilities)...)
 
 	return evaluators
 }
@@ -39,11 +40,13 @@ func NewEvaluators(
 func NewEvaluatorsForAdmission(c onmetalapi.Interface, f informers.SharedInformerFactory) []quota.Evaluator {
 	machineClassCapabilities := compute.NewPrimeLRUMachineClassCapabilitiesReader(c, f)
 	volumeClassCapabilities := storage.NewPrimeLRUVolumeClassCapabilitiesReader(c, f)
-	return NewEvaluators(machineClassCapabilities, volumeClassCapabilities)
+	bucketClassCapabilities := storage.NewPrimeLRUBucketClassCapabilitiesReader(c, f)
+	return NewEvaluators(machineClassCapabilities, volumeClassCapabilities, bucketClassCapabilities)
 }
 
 func NewEvaluatorsForControllers(c client.Client) []quota.Evaluator {
 	machineClassCapabilities := compute.NewClientMachineCapabilitiesReader(c)
 	volumeClassCapabilities := storage.NewClientVolumeCapabilitiesReader(c)
-	return NewEvaluators(machineClassCapabilities, volumeClassCapabilities)
+	bucketClassCapabilities := storage.NewClientBucketCapabilitiesReader(c)
+	return NewEvaluators(machineClassCapabilities, volumeClassCapabilities, bucketClassCapabilities)
 }
