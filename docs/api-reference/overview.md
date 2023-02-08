@@ -6,6 +6,7 @@ and how it can be updated please refer to
 the [Updating API Reference Documentation](/development/documentation/#api-reference-documentation)
 in the documentation development guide.
 
+* [Core](../core)
 * [IPAM](../ipam)
 * [Compute](../compute)
 * [Networking](../networking)

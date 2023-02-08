@@ -30460,7 +30460,7 @@
 						"x-kubernetes-patch-strategy": "merge,retainKeys"
 					},
 					"power": {
-						"description": "Power ist the desired machine power state. Defaults to PowerOn.",
+						"description": "Power is the desired machine power state. Defaults to PowerOn.",
 						"type": "string"
 					},
 					"tolerations": {
@@ -32820,6 +32820,23 @@
 					}
 				}
 			},
+			"com.github.onmetal.onmetal-api.api.storage.v1alpha1.VolumeEncryption": {
+				"description": "VolumeEncryption represents information to encrypt a volume.",
+				"type": "object",
+				"required": [
+					"secretRef"
+				],
+				"properties": {
+					"secretRef": {
+						"description": "SecretRef references the Secret containing the encryption key to encrypt a Volume. This secret is created by user with encryptionKey as Key and base64 encoded 256-bit encryption key as Value.",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/io.k8s.api.core.v1.LocalObjectReference"
+							}
+						]
+					}
+				}
+			},
 			"com.github.onmetal.onmetal-api.api.storage.v1alpha1.VolumeList": {
 				"description": "VolumeList contains a list of Volume",
 				"type": "object",
@@ -33022,6 +33039,14 @@
 						"allOf": [
 							{
 								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.LocalUIDReference"
+							}
+						]
+					},
+					"encryption": {
+						"description": "Encryption is an optional field which provides attributes to encrypt Volume.",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.storage.v1alpha1.VolumeEncryption"
 							}
 						]
 					},

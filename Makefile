@@ -146,7 +146,6 @@ clean-docs: ## Remove all local mkdocs Docker images (cleanup).
 .PHONY: test
 test: manifests generate fmt vet test-only ## Run tests.
 
-ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
 .PHONY: test-only
 test-only: envtest ## Run *only* the tests - no generation, linting etc.
 	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" go test ./... -coverprofile cover.out
@@ -363,9 +362,9 @@ MODELS_SCHEMA ?= $(LOCALBIN)/models-schema
 GOIMPORTS ?= $(LOCALBIN)/goimports
 
 ## Tool Versions
-KUSTOMIZE_VERSION ?= v3.8.7
-CODE_GENERATOR_VERSION ?= v0.25.5
-CONTROLLER_TOOLS_VERSION ?= v0.9.0
+KUSTOMIZE_VERSION ?= v5.0.0
+CODE_GENERATOR_VERSION ?= v0.26.1
+CONTROLLER_TOOLS_VERSION ?= v0.11.3
 VGOPATH_VERSION ?= v0.0.2
 GEN_CRD_API_REFERENCE_DOCS_VERSION ?= v0.3.0
 ADDLICENSE_VERSION ?= v1.1.0
