@@ -19,10 +19,12 @@ package compute
 import (
 	"context"
 	"fmt"
+	"sort"
 
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/clientutils"
-	"k8s.io/apimachinery/pkg/runtime"
+	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	"github.com/onmetal/onmetal-api/utils/slices"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/util/workqueue"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -31,15 +33,12 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/source"
-
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 )
 
 // MachineClassReconciler reconciles a MachineClassRef object
 type MachineClassReconciler struct {
 	client.Client
 	APIReader client.Reader
-	Scheme    *runtime.Scheme
 }
 
 //+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machineclasses,verbs=get;list;watch;create;update;patch;delete
@@ -58,35 +57,28 @@ func (r *MachineClassReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	return r.reconcileExists(ctx, log, machineClass)
 }
 
-// SetupWithManager sets up the controller with the Manager.
-func (r *MachineClassReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewControllerManagedBy(mgr).
-		For(&computev1alpha1.MachineClass{}).
-		Watches(
-			&source.Kind{Type: &computev1alpha1.Machine{}},
-			handler.Funcs{
-				DeleteFunc: func(event event.DeleteEvent, queue workqueue.RateLimitingInterface) {
-					machine := event.Object.(*computev1alpha1.Machine)
-					queue.Add(ctrl.Request{NamespacedName: types.NamespacedName{Name: machine.Spec.MachineClassRef.Name}})
-				},
-			},
-		).
-		Complete(r)
-}
-
-func (r *MachineClassReconciler) listReferencingMachines(ctx context.Context, machineClass *computev1alpha1.MachineClass) ([]computev1alpha1.Machine, error) {
+func (r *MachineClassReconciler) listReferencingMachinesWithReader(
+	ctx context.Context,
+	rd client.Reader,
+	machineClass *computev1alpha1.MachineClass,
+) ([]computev1alpha1.Machine, error) {
 	machineList := &computev1alpha1.MachineList{}
-	if err := r.APIReader.List(ctx, machineList, client.InNamespace(machineClass.Namespace)); err != nil {
+	if err := rd.List(ctx, machineList,
+		client.InNamespace(machineClass.Namespace),
+		client.MatchingFields{computev1alpha1.MachineMachineClassRefNameField: machineClass.Name},
+	); err != nil {
 		return nil, fmt.Errorf("error listing the machines using the machine class: %w", err)
 	}
 
-	var machines []computev1alpha1.Machine
-	for _, machine := range machineList.Items {
-		if machine.Spec.MachineClassRef.Name == machineClass.Name {
-			machines = append(machines, machine)
-		}
-	}
-	return machines, nil
+	return machineList.Items, nil
+}
+
+func (r *MachineClassReconciler) collectMachineNames(machines []computev1alpha1.Machine) []string {
+	machineNames := slices.MapRef(machines, func(machine *computev1alpha1.Machine) string {
+		return machine.Name
+	})
+	sort.Strings(machineNames)
+	return machineNames
 }
 
 func (r *MachineClassReconciler) delete(ctx context.Context, log logr.Logger, machineClass *computev1alpha1.MachineClass) (ctrl.Result, error) {
@@ -94,19 +86,22 @@ func (r *MachineClassReconciler) delete(ctx context.Context, log logr.Logger, ma
 		return ctrl.Result{}, nil
 	}
 
-	machines, err := r.listReferencingMachines(ctx, machineClass)
+	machines, err := r.listReferencingMachinesWithReader(ctx, r.Client, machineClass)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
+	if len(machines) > 0 {
+		log.V(1).Info("Machine class is still in use", "ReferencingMachineNames", r.collectMachineNames(machines))
+		return ctrl.Result{Requeue: true}, nil
+	}
 
-	if len(machines) != 0 {
-		machineNames := make([]string, 0, len(machines))
-		for _, machine := range machines {
-			machineNames = append(machineNames, machine.Name)
-		}
-
-		log.V(1).Info("Machine class is still in use", "ReferencingMachineNames", machineNames)
-		return ctrl.Result{}, nil
+	machines, err = r.listReferencingMachinesWithReader(ctx, r.APIReader, machineClass)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+	if len(machines) > 0 {
+		log.V(1).Info("Machine class is still in use", "ReferencingMachineNames", r.collectMachineNames(machines))
+		return ctrl.Result{Requeue: true}, nil
 	}
 
 	log.V(1).Info("Machine class is not in use anymore, removing finalizer")
@@ -133,4 +128,20 @@ func (r *MachineClassReconciler) reconcileExists(ctx context.Context, log logr.L
 		return r.delete(ctx, log, machineClass)
 	}
 	return r.reconcile(ctx, log, machineClass)
+}
+
+// SetupWithManager sets up the controller with the Manager.
+func (r *MachineClassReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	return ctrl.NewControllerManagedBy(mgr).
+		For(&computev1alpha1.MachineClass{}).
+		Watches(
+			&source.Kind{Type: &computev1alpha1.Machine{}},
+			handler.Funcs{
+				DeleteFunc: func(event event.DeleteEvent, queue workqueue.RateLimitingInterface) {
+					machine := event.Object.(*computev1alpha1.Machine)
+					queue.Add(ctrl.Request{NamespacedName: types.NamespacedName{Name: machine.Spec.MachineClassRef.Name}})
+				},
+			},
+		).
+		Complete(r)
 }

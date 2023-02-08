@@ -19,10 +19,11 @@ package storage
 import (
 	"context"
 	"fmt"
+	"sort"
 
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/clientutils"
-	"k8s.io/apimachinery/pkg/runtime"
+	"github.com/onmetal/onmetal-api/utils/slices"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/util/workqueue"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -39,7 +40,6 @@ import (
 type VolumeClassReconciler struct {
 	client.Client
 	APIReader client.Reader
-	Scheme    *runtime.Scheme
 }
 
 //+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumeclasses,verbs=get;list;watch;create;update;patch;delete
@@ -58,23 +58,27 @@ func (r *VolumeClassReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	return r.reconcileExists(ctx, log, volumeClass)
 }
 
-func (r *VolumeClassReconciler) listReferencingVolumes(ctx context.Context, volumeClass *storagev1alpha1.VolumeClass) ([]storagev1alpha1.Volume, error) {
+func (r *VolumeClassReconciler) listReferencingVolumesWithReader(
+	ctx context.Context,
+	rd client.Reader,
+	volumeClass *storagev1alpha1.VolumeClass,
+) ([]storagev1alpha1.Volume, error) {
 	volumeList := &storagev1alpha1.VolumeList{}
-	if err := r.APIReader.List(ctx, volumeList,
+	if err := rd.List(ctx, volumeList,
 		client.InNamespace(volumeClass.Namespace),
+		client.MatchingFields{storagev1alpha1.VolumeVolumeClassRefNameField: volumeClass.Name},
 	); err != nil {
 		return nil, fmt.Errorf("error listing the volumes using the volume class: %w", err)
 	}
+	return volumeList.Items, nil
+}
 
-	var volumes []storagev1alpha1.Volume
-	for _, volume := range volumeList.Items {
-		if volumeClassRef := volume.Spec.VolumeClassRef; volumeClassRef == nil || volumeClassRef.Name != volumeClass.Name {
-			continue
-		}
-
-		volumes = append(volumes, volume)
-	}
-	return volumes, nil
+func (r *VolumeClassReconciler) collectVolumeNames(volumes []storagev1alpha1.Volume) []string {
+	volumeNames := slices.MapRef(volumes, func(volume *storagev1alpha1.Volume) string {
+		return volume.Name
+	})
+	sort.Strings(volumeNames)
+	return volumeNames
 }
 
 func (r *VolumeClassReconciler) delete(ctx context.Context, log logr.Logger, volumeClass *storagev1alpha1.VolumeClass) (ctrl.Result, error) {
@@ -82,19 +86,22 @@ func (r *VolumeClassReconciler) delete(ctx context.Context, log logr.Logger, vol
 		return ctrl.Result{}, nil
 	}
 
-	volumes, err := r.listReferencingVolumes(ctx, volumeClass)
+	volumes, err := r.listReferencingVolumesWithReader(ctx, r.Client, volumeClass)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
+	if len(volumes) > 0 {
+		log.V(1).Info("Volume class is still in use", "ReferencingVolumeNames", r.collectVolumeNames(volumes))
+		return ctrl.Result{Requeue: true}, nil
+	}
 
-	if len(volumes) != 0 {
-		volumeNames := make([]string, 0, len(volumes))
-		for _, volume := range volumes {
-			volumeNames = append(volumeNames, volume.Name)
-		}
-
-		log.Info("Volume Class is still in use", "ReferencingVolumeNames", volumeNames)
-		return ctrl.Result{}, nil
+	volumes, err = r.listReferencingVolumesWithReader(ctx, r.APIReader, volumeClass)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+	if len(volumes) > 0 {
+		log.V(1).Info("Volume class is still in use", "ReferencingVolumeNames", r.collectVolumeNames(volumes))
+		return ctrl.Result{Requeue: true}, nil
 	}
 
 	log.V(1).Info("Volume Class is not used anymore, removing finalizer")

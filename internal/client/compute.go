@@ -24,6 +24,7 @@ import (
 )
 
 const (
+	MachineSpecMachineClassRefNameField   = computev1alpha1.MachineMachineClassRefNameField
 	MachineSpecNetworkInterfaceNamesField = "machine-spec-network-interface-names"
 	MachineSpecVolumeNamesField           = "machine-spec-volume-names"
 
@@ -39,6 +40,13 @@ const (
 	PrefixSpecIPFamilyField           = "prefix-spec-ipfamily"
 	PrefixAllocationSpecIPFamilyField = "prefixallocation-spec-ipfamily"
 )
+
+func SetupMachineSpecMachineClassRefNameFieldIndexer(ctx context.Context, indexer client.FieldIndexer) error {
+	return indexer.IndexField(ctx, &computev1alpha1.Machine{}, MachineSpecMachineClassRefNameField, func(obj client.Object) []string {
+		machine := obj.(*computev1alpha1.Machine)
+		return []string{machine.Spec.MachineClassRef.Name}
+	})
+}
 
 func SetupMachineSpecNetworkInterfaceNamesFieldIndexer(ctx context.Context, indexer client.FieldIndexer) error {
 	return indexer.IndexField(ctx, &computev1alpha1.Machine{}, MachineSpecNetworkInterfaceNamesField, func(obj client.Object) []string {
