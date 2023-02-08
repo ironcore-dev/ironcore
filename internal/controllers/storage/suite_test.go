@@ -177,6 +177,17 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 			EventRecorder: &record.FakeRecorder{},
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
+		Expect((&BucketClassReconciler{
+			Client:    k8sManager.GetClient(),
+			APIReader: k8sManager.GetAPIReader(),
+			Scheme:    k8sManager.GetScheme(),
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
+		Expect((&BucketScheduler{
+			Client:        k8sManager.GetClient(),
+			EventRecorder: &record.FakeRecorder{},
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
 		go func() {
 			defer GinkgoRecover()
 			Expect(k8sManager.Start(mgrCtx)).To(Succeed(), "failed to start manager")
@@ -187,6 +198,7 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 		cancel()
 		Expect(k8sClient.Delete(ctx, ns)).To(Succeed(), "failed to delete test namespace")
 		Expect(k8sClient.DeleteAllOf(ctx, &storagev1alpha1.VolumePool{})).To(Succeed())
+		Expect(k8sClient.DeleteAllOf(ctx, &storagev1alpha1.BucketPool{})).To(Succeed())
 		Expect(k8sClient.DeleteAllOf(ctx, &computev1alpha1.MachineClass{})).To(Succeed())
 	})
 

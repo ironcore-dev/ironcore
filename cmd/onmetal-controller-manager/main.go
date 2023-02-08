@@ -71,6 +71,9 @@ const (
 	volumeController      = "volume"
 	volumeScheduler       = "volumescheduler"
 
+	bucketClassController = "bucketclass"
+	bucketScheduler       = "bucketscheduler"
+
 	prefixController          = "prefix"
 	prefixAllocationScheduler = "prefixallocationscheduler"
 
@@ -119,6 +122,7 @@ func main() {
 
 		// Storage controllers
 		volumePoolController, volumeClassController, volumeController, volumeScheduler,
+		bucketClassController, bucketScheduler,
 
 		// Networking controllers
 		networkProtectionController, networkInterfaceController, networkInterfaceBindController, virtualIPController, aliasPrefixController, loadBalancerController, natGatewayController,
@@ -231,6 +235,26 @@ func main() {
 			Client:        mgr.GetClient(),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "VolumeScheduler")
+		}
+	}
+
+	if controllers.Enabled(bucketClassController) {
+		if err = (&storagecontrollers.BucketClassReconciler{
+			Client:    mgr.GetClient(),
+			APIReader: mgr.GetAPIReader(),
+			Scheme:    mgr.GetScheme(),
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "BucketClass")
+			os.Exit(1)
+		}
+	}
+
+	if controllers.Enabled(bucketScheduler) {
+		if err = (&storagecontrollers.BucketScheduler{
+			EventRecorder: mgr.GetEventRecorderFor("bucket-scheduler"),
+			Client:        mgr.GetClient(),
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "BucketScheduler")
 		}
 	}
 

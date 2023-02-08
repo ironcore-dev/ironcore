@@ -31,3 +31,9 @@ func SetDefaults_VolumeStatus(status *v1alpha1.VolumeStatus) {
 		status.Phase = v1alpha1.VolumePhaseUnbound
 	}
 }
+
+func SetDefaults_BucketStatus(status *v1alpha1.BucketStatus) {
+	if status.State == "" {
+		status.State = v1alpha1.BucketStatePending
+	}
+}

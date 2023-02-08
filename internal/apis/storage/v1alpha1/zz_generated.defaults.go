@@ -29,9 +29,22 @@ import (
 // Public to allow building arbitrary schemes.
 // All generated defaulters are covering - they call all nested defaulters.
 func RegisterDefaults(scheme *runtime.Scheme) error {
+	scheme.AddTypeDefaultingFunc(&v1alpha1.Bucket{}, func(obj interface{}) { SetObjectDefaults_Bucket(obj.(*v1alpha1.Bucket)) })
+	scheme.AddTypeDefaultingFunc(&v1alpha1.BucketList{}, func(obj interface{}) { SetObjectDefaults_BucketList(obj.(*v1alpha1.BucketList)) })
 	scheme.AddTypeDefaultingFunc(&v1alpha1.Volume{}, func(obj interface{}) { SetObjectDefaults_Volume(obj.(*v1alpha1.Volume)) })
 	scheme.AddTypeDefaultingFunc(&v1alpha1.VolumeList{}, func(obj interface{}) { SetObjectDefaults_VolumeList(obj.(*v1alpha1.VolumeList)) })
 	return nil
+}
+
+func SetObjectDefaults_Bucket(in *v1alpha1.Bucket) {
+	SetDefaults_BucketStatus(&in.Status)
+}
+
+func SetObjectDefaults_BucketList(in *v1alpha1.BucketList) {
+	for i := range in.Items {
+		a := &in.Items[i]
+		SetObjectDefaults_Bucket(a)
+	}
 }
 
 func SetObjectDefaults_Volume(in *v1alpha1.Volume) {
