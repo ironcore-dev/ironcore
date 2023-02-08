@@ -17,6 +17,7 @@
 package storage
 
 import (
+	"github.com/onmetal/onmetal-api/internal/apis/core"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -49,7 +50,7 @@ type VolumeSpec struct {
 	// ClaimRef is the reference to the claiming entity of the Volume.
 	ClaimRef *commonv1alpha1.LocalUIDReference
 	// Resources is a description of the volume's resources and capacity.
-	Resources corev1.ResourceList
+	Resources core.ResourceList
 	// Image is an optional image to bootstrap the volume with.
 	Image string
 	// ImagePullSecretRef is an optional secret for pulling the image of a volume.

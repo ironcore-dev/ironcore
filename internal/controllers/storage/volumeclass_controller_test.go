@@ -18,6 +18,7 @@ package storage
 
 import (
 	. "github.com/onmetal/controller-utils/testutils"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -40,9 +41,9 @@ var _ = Describe("VolumeClass controller", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "volumeclass-",
 			},
-			Capabilities: corev1.ResourceList{
-				storagev1alpha1.ResourceTPS:  resource.MustParse("100Mi"),
-				storagev1alpha1.ResourceIOPS: resource.MustParse("100"),
+			Capabilities: corev1alpha1.ResourceList{
+				corev1alpha1.ResourceTPS:  resource.MustParse("100Mi"),
+				corev1alpha1.ResourceIOPS: resource.MustParse("100"),
 			},
 		}
 		Expect(k8sClient.Create(ctx, volumeClass)).Should(Succeed())
@@ -55,8 +56,8 @@ var _ = Describe("VolumeClass controller", func() {
 			},
 			Spec: storagev1alpha1.VolumeSpec{
 				VolumeClassRef: &corev1.LocalObjectReference{Name: volumeClass.Name},
-				Resources: corev1.ResourceList{
-					corev1.ResourceStorage: resource.MustParse("1Gi"),
+				Resources: corev1alpha1.ResourceList{
+					corev1alpha1.ResourceStorage: resource.MustParse("1Gi"),
 				},
 			},
 		}

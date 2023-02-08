@@ -22,6 +22,7 @@ package v1alpha1
 
 import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	v1 "k8s.io/api/core/v1"
@@ -158,7 +159,7 @@ func (in *MachineClass) DeepCopyInto(out *MachineClass) {
 	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
 	if in.Capabilities != nil {
 		in, out := &in.Capabilities, &out.Capabilities
-		*out = make(v1.ResourceList, len(*in))
+		*out = make(corev1alpha1.ResourceList, len(*in))
 		for key, val := range *in {
 			(*out)[key] = val.DeepCopy()
 		}

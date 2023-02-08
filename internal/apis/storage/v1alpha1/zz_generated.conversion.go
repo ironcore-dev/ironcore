@@ -24,7 +24,9 @@ import (
 	unsafe "unsafe"
 
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	v1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
+	core "github.com/onmetal/onmetal-api/internal/apis/core"
 	storage "github.com/onmetal/onmetal-api/internal/apis/storage"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -378,7 +380,7 @@ func Convert_storage_BucketAccess_To_v1alpha1_BucketAccess(in *storage.BucketAcc
 
 func autoConvert_v1alpha1_BucketClass_To_storage_BucketClass(in *v1alpha1.BucketClass, out *storage.BucketClass, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
-	out.Capabilities = *(*v1.ResourceList)(unsafe.Pointer(&in.Capabilities))
+	out.Capabilities = *(*core.ResourceList)(unsafe.Pointer(&in.Capabilities))
 	return nil
 }
 
@@ -389,7 +391,7 @@ func Convert_v1alpha1_BucketClass_To_storage_BucketClass(in *v1alpha1.BucketClas
 
 func autoConvert_storage_BucketClass_To_v1alpha1_BucketClass(in *storage.BucketClass, out *v1alpha1.BucketClass, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
-	out.Capabilities = *(*v1.ResourceList)(unsafe.Pointer(&in.Capabilities))
+	out.Capabilities = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Capabilities))
 	return nil
 }
 
@@ -708,7 +710,7 @@ func Convert_storage_VolumeAccess_To_v1alpha1_VolumeAccess(in *storage.VolumeAcc
 
 func autoConvert_v1alpha1_VolumeClass_To_storage_VolumeClass(in *v1alpha1.VolumeClass, out *storage.VolumeClass, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
-	out.Capabilities = *(*v1.ResourceList)(unsafe.Pointer(&in.Capabilities))
+	out.Capabilities = *(*core.ResourceList)(unsafe.Pointer(&in.Capabilities))
 	return nil
 }
 
@@ -719,7 +721,7 @@ func Convert_v1alpha1_VolumeClass_To_storage_VolumeClass(in *v1alpha1.VolumeClas
 
 func autoConvert_storage_VolumeClass_To_v1alpha1_VolumeClass(in *storage.VolumeClass, out *v1alpha1.VolumeClass, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
-	out.Capabilities = *(*v1.ResourceList)(unsafe.Pointer(&in.Capabilities))
+	out.Capabilities = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Capabilities))
 	return nil
 }
 
@@ -932,8 +934,8 @@ func autoConvert_v1alpha1_VolumePoolStatus_To_storage_VolumePoolStatus(in *v1alp
 	out.State = storage.VolumePoolState(in.State)
 	out.Conditions = *(*[]storage.VolumePoolCondition)(unsafe.Pointer(&in.Conditions))
 	out.AvailableVolumeClasses = *(*[]v1.LocalObjectReference)(unsafe.Pointer(&in.AvailableVolumeClasses))
-	out.Available = *(*v1.ResourceList)(unsafe.Pointer(&in.Available))
-	out.Used = *(*v1.ResourceList)(unsafe.Pointer(&in.Used))
+	out.Available = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Available))
+	out.Used = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Used))
 	return nil
 }
 
@@ -946,8 +948,8 @@ func autoConvert_storage_VolumePoolStatus_To_v1alpha1_VolumePoolStatus(in *stora
 	out.State = v1alpha1.VolumePoolState(in.State)
 	out.Conditions = *(*[]v1alpha1.VolumePoolCondition)(unsafe.Pointer(&in.Conditions))
 	out.AvailableVolumeClasses = *(*[]v1.LocalObjectReference)(unsafe.Pointer(&in.AvailableVolumeClasses))
-	out.Available = *(*v1.ResourceList)(unsafe.Pointer(&in.Available))
-	out.Used = *(*v1.ResourceList)(unsafe.Pointer(&in.Used))
+	out.Available = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Available))
+	out.Used = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Used))
 	return nil
 }
 
@@ -961,7 +963,7 @@ func autoConvert_v1alpha1_VolumeSpec_To_storage_VolumeSpec(in *v1alpha1.VolumeSp
 	out.VolumePoolSelector = *(*map[string]string)(unsafe.Pointer(&in.VolumePoolSelector))
 	out.VolumePoolRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumePoolRef))
 	out.ClaimRef = (*commonv1alpha1.LocalUIDReference)(unsafe.Pointer(in.ClaimRef))
-	out.Resources = *(*v1.ResourceList)(unsafe.Pointer(&in.Resources))
+	out.Resources = *(*core.ResourceList)(unsafe.Pointer(&in.Resources))
 	out.Image = in.Image
 	out.ImagePullSecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.ImagePullSecretRef))
 	out.Unclaimable = in.Unclaimable
@@ -980,7 +982,7 @@ func autoConvert_storage_VolumeSpec_To_v1alpha1_VolumeSpec(in *storage.VolumeSpe
 	out.VolumePoolSelector = *(*map[string]string)(unsafe.Pointer(&in.VolumePoolSelector))
 	out.VolumePoolRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumePoolRef))
 	out.ClaimRef = (*commonv1alpha1.LocalUIDReference)(unsafe.Pointer(in.ClaimRef))
-	out.Resources = *(*v1.ResourceList)(unsafe.Pointer(&in.Resources))
+	out.Resources = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Resources))
 	out.Image = in.Image
 	out.ImagePullSecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.ImagePullSecretRef))
 	out.Unclaimable = in.Unclaimable

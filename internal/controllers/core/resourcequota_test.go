@@ -39,9 +39,9 @@ var _ = Describe("ResourceNamespaceController", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "machine-class-",
 			},
-			Capabilities: map[corev1.ResourceName]resource.Quantity{
-				corev1.ResourceCPU:    resource.MustParse("1"),
-				corev1.ResourceMemory: resource.MustParse("1Gi"),
+			Capabilities: corev1alpha1.ResourceList{
+				corev1alpha1.ResourceCPU:    resource.MustParse("1"),
+				corev1alpha1.ResourceMemory: resource.MustParse("1Gi"),
 			},
 		}
 		Expect(k8sClient.Create(ctx, machineClass)).To(Succeed())

@@ -18,6 +18,7 @@
 package v1alpha1
 
 import (
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	v1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/common/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 )
@@ -29,7 +30,7 @@ type VolumeSpecApplyConfiguration struct {
 	VolumePoolSelector map[string]string                             `json:"volumePoolSelector,omitempty"`
 	VolumePoolRef      *v1.LocalObjectReference                      `json:"volumePoolRef,omitempty"`
 	ClaimRef           *v1alpha1.LocalUIDReferenceApplyConfiguration `json:"claimRef,omitempty"`
-	Resources          *v1.ResourceList                              `json:"resources,omitempty"`
+	Resources          *corev1alpha1.ResourceList                    `json:"resources,omitempty"`
 	Image              *string                                       `json:"image,omitempty"`
 	ImagePullSecretRef *v1.LocalObjectReference                      `json:"imagePullSecretRef,omitempty"`
 	Unclaimable        *bool                                         `json:"unclaimable,omitempty"`
@@ -84,7 +85,7 @@ func (b *VolumeSpecApplyConfiguration) WithClaimRef(value *v1alpha1.LocalUIDRefe
 // WithResources sets the Resources field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Resources field is set to the value of the last call.
-func (b *VolumeSpecApplyConfiguration) WithResources(value v1.ResourceList) *VolumeSpecApplyConfiguration {
+func (b *VolumeSpecApplyConfiguration) WithResources(value corev1alpha1.ResourceList) *VolumeSpecApplyConfiguration {
 	b.Resources = &value
 	return b
 }

@@ -22,7 +22,6 @@ import (
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/bucket/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/api/resource"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -73,8 +72,8 @@ func (s *Server) filterOnmetalBucketClasses(
 }
 
 func (s *Server) convertOnmetalBucketClass(bucketClass *storagev1alpha1.BucketClass) (*ori.BucketClass, error) {
-	tps := bucketClass.Capabilities.Name(storagev1alpha1.ResourceTPS, resource.DecimalSI)
-	iops := bucketClass.Capabilities.Name(storagev1alpha1.ResourceIOPS, resource.DecimalSI)
+	tps := bucketClass.Capabilities.TPS()
+	iops := bucketClass.Capabilities.IOPS()
 
 	return &ori.BucketClass{
 		Name: bucketClass.Name,

@@ -285,9 +285,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>capabilities</code><br/>
 <em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#resourcelist-v1-core">
-Kubernetes core/v1.ResourceList
-</a>
+github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
 </em>
 </td>
 <td>

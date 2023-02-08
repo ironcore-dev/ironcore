@@ -26,9 +26,11 @@ import (
 
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	v1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	compute "github.com/onmetal/onmetal-api/internal/apis/compute"
+	core "github.com/onmetal/onmetal-api/internal/apis/core"
 	networking "github.com/onmetal/onmetal-api/internal/apis/networking"
 	storage "github.com/onmetal/onmetal-api/internal/apis/storage"
 	v1 "k8s.io/api/core/v1"
@@ -441,7 +443,7 @@ func Convert_compute_Machine_To_v1alpha1_Machine(in *compute.Machine, out *v1alp
 
 func autoConvert_v1alpha1_MachineClass_To_compute_MachineClass(in *v1alpha1.MachineClass, out *compute.MachineClass, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
-	out.Capabilities = *(*v1.ResourceList)(unsafe.Pointer(&in.Capabilities))
+	out.Capabilities = *(*core.ResourceList)(unsafe.Pointer(&in.Capabilities))
 	return nil
 }
 
@@ -452,7 +454,7 @@ func Convert_v1alpha1_MachineClass_To_compute_MachineClass(in *v1alpha1.MachineC
 
 func autoConvert_compute_MachineClass_To_v1alpha1_MachineClass(in *compute.MachineClass, out *v1alpha1.MachineClass, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
-	out.Capabilities = *(*v1.ResourceList)(unsafe.Pointer(&in.Capabilities))
+	out.Capabilities = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Capabilities))
 	return nil
 }
 

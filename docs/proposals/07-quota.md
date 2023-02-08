@@ -64,7 +64,7 @@ by a given dimension (e.g. number of `Machine`s for a given `MachineClass`).
 
 Introduce a new namespaced type `ResourceQuota` in the new `core` group.
 A `ResourceQuota` allows defining hard resource limits that cannot be exceeded.
-The limits are defined via `spec.hard` as a `corev1.ResourceList`.
+The limits are defined via `spec.hard` as a `corev1alpha1.ResourceList`.
 The currently enforced limits are shown in `status.hard` and the currently used
 limits in `status.used`.
 Requests to create / update resources that would exceed the quota will fail

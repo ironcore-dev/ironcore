@@ -36,7 +36,7 @@ func NewEvaluators(capabilities generic.CapabilitiesReader) []quota.Evaluator {
 }
 
 func extractVolumeClassCapabilities(volumeClass *storagev1alpha1.VolumeClass) corev1alpha1.ResourceList {
-	return quota.KubernetesResourceListToResourceList(volumeClass.Capabilities)
+	return volumeClass.Capabilities
 }
 
 func NewClientVolumeCapabilitiesReader(c client.Client) generic.CapabilitiesReader {

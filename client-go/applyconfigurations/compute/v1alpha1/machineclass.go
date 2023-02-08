@@ -18,10 +18,10 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	v1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	internal "github.com/onmetal/onmetal-api/client-go/applyconfigurations/internal"
 	v1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/meta/v1"
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	managedfields "k8s.io/apimachinery/pkg/util/managedfields"
@@ -32,7 +32,7 @@ import (
 type MachineClassApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Capabilities                     *corev1.ResourceList `json:"capabilities,omitempty"`
+	Capabilities                     *v1alpha1.ResourceList `json:"capabilities,omitempty"`
 }
 
 // MachineClass constructs an declarative configuration of the MachineClass type for use with
@@ -56,18 +56,18 @@ func MachineClass(name string) *MachineClassApplyConfiguration {
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
 // Experimental!
-func ExtractMachineClass(machineClass *v1alpha1.MachineClass, fieldManager string) (*MachineClassApplyConfiguration, error) {
+func ExtractMachineClass(machineClass *computev1alpha1.MachineClass, fieldManager string) (*MachineClassApplyConfiguration, error) {
 	return extractMachineClass(machineClass, fieldManager, "")
 }
 
 // ExtractMachineClassStatus is the same as ExtractMachineClass except
 // that it extracts the status subresource applied configuration.
 // Experimental!
-func ExtractMachineClassStatus(machineClass *v1alpha1.MachineClass, fieldManager string) (*MachineClassApplyConfiguration, error) {
+func ExtractMachineClassStatus(machineClass *computev1alpha1.MachineClass, fieldManager string) (*MachineClassApplyConfiguration, error) {
 	return extractMachineClass(machineClass, fieldManager, "status")
 }
 
-func extractMachineClass(machineClass *v1alpha1.MachineClass, fieldManager string, subresource string) (*MachineClassApplyConfiguration, error) {
+func extractMachineClass(machineClass *computev1alpha1.MachineClass, fieldManager string, subresource string) (*MachineClassApplyConfiguration, error) {
 	b := &MachineClassApplyConfiguration{}
 	err := managedfields.ExtractInto(machineClass, internal.Parser().Type("com.github.onmetal.onmetal-api.api.compute.v1alpha1.MachineClass"), fieldManager, b, subresource)
 	if err != nil {
@@ -241,7 +241,7 @@ func (b *MachineClassApplyConfiguration) ensureObjectMetaApplyConfigurationExist
 // WithCapabilities sets the Capabilities field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Capabilities field is set to the value of the last call.
-func (b *MachineClassApplyConfiguration) WithCapabilities(value corev1.ResourceList) *MachineClassApplyConfiguration {
+func (b *MachineClassApplyConfiguration) WithCapabilities(value v1alpha1.ResourceList) *MachineClassApplyConfiguration {
 	b.Capabilities = &value
 	return b
 }

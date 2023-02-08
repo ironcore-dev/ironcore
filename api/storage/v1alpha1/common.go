@@ -14,16 +14,7 @@
 
 package v1alpha1
 
-import corev1 "k8s.io/api/core/v1"
-
 const (
 	VolumeVolumePoolRefNameField = "spec.volumePoolRef.name"
 	BucketBucketPoolRefNameField = "spec.bucketPoolRef.name"
-)
-
-const (
-	// ResourceTPS defines max throughput per second. (e.g. 1Gi)
-	ResourceTPS corev1.ResourceName = "tps"
-	// ResourceIOPS defines max IOPS in input/output operations per second.
-	ResourceIOPS corev1.ResourceName = "iops"
 )

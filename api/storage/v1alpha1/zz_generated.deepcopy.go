@@ -22,6 +22,7 @@ package v1alpha1
 
 import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
@@ -82,7 +83,7 @@ func (in *BucketClass) DeepCopyInto(out *BucketClass) {
 	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
 	if in.Capabilities != nil {
 		in, out := &in.Capabilities, &out.Capabilities
-		*out = make(v1.ResourceList, len(*in))
+		*out = make(corev1alpha1.ResourceList, len(*in))
 		for key, val := range *in {
 			(*out)[key] = val.DeepCopy()
 		}
@@ -445,7 +446,7 @@ func (in *VolumeClass) DeepCopyInto(out *VolumeClass) {
 	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
 	if in.Capabilities != nil {
 		in, out := &in.Capabilities, &out.Capabilities
-		*out = make(v1.ResourceList, len(*in))
+		*out = make(corev1alpha1.ResourceList, len(*in))
 		for key, val := range *in {
 			(*out)[key] = val.DeepCopy()
 		}
@@ -687,14 +688,14 @@ func (in *VolumePoolStatus) DeepCopyInto(out *VolumePoolStatus) {
 	}
 	if in.Available != nil {
 		in, out := &in.Available, &out.Available
-		*out = make(v1.ResourceList, len(*in))
+		*out = make(corev1alpha1.ResourceList, len(*in))
 		for key, val := range *in {
 			(*out)[key] = val.DeepCopy()
 		}
 	}
 	if in.Used != nil {
 		in, out := &in.Used, &out.Used
-		*out = make(v1.ResourceList, len(*in))
+		*out = make(corev1alpha1.ResourceList, len(*in))
 		for key, val := range *in {
 			(*out)[key] = val.DeepCopy()
 		}
@@ -739,7 +740,7 @@ func (in *VolumeSpec) DeepCopyInto(out *VolumeSpec) {
 	}
 	if in.Resources != nil {
 		in, out := &in.Resources, &out.Resources
-		*out = make(v1.ResourceList, len(*in))
+		*out = make(corev1alpha1.ResourceList, len(*in))
 		for key, val := range *in {
 			(*out)[key] = val.DeepCopy()
 		}

@@ -18,6 +18,7 @@
 package v1alpha1
 
 import (
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	v1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 )
@@ -28,8 +29,8 @@ type VolumePoolStatusApplyConfiguration struct {
 	State                  *v1alpha1.VolumePoolState               `json:"state,omitempty"`
 	Conditions             []VolumePoolConditionApplyConfiguration `json:"conditions,omitempty"`
 	AvailableVolumeClasses []v1.LocalObjectReference               `json:"availableVolumeClasses,omitempty"`
-	Available              *v1.ResourceList                        `json:"available,omitempty"`
-	Used                   *v1.ResourceList                        `json:"used,omitempty"`
+	Available              *corev1alpha1.ResourceList              `json:"available,omitempty"`
+	Used                   *corev1alpha1.ResourceList              `json:"used,omitempty"`
 }
 
 // VolumePoolStatusApplyConfiguration constructs an declarative configuration of the VolumePoolStatus type for use with
@@ -72,7 +73,7 @@ func (b *VolumePoolStatusApplyConfiguration) WithAvailableVolumeClasses(values .
 // WithAvailable sets the Available field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Available field is set to the value of the last call.
-func (b *VolumePoolStatusApplyConfiguration) WithAvailable(value v1.ResourceList) *VolumePoolStatusApplyConfiguration {
+func (b *VolumePoolStatusApplyConfiguration) WithAvailable(value corev1alpha1.ResourceList) *VolumePoolStatusApplyConfiguration {
 	b.Available = &value
 	return b
 }
@@ -80,7 +81,7 @@ func (b *VolumePoolStatusApplyConfiguration) WithAvailable(value v1.ResourceList
 // WithUsed sets the Used field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Used field is set to the value of the last call.
-func (b *VolumePoolStatusApplyConfiguration) WithUsed(value v1.ResourceList) *VolumePoolStatusApplyConfiguration {
+func (b *VolumePoolStatusApplyConfiguration) WithUsed(value corev1alpha1.ResourceList) *VolumePoolStatusApplyConfiguration {
 	b.Used = &value
 	return b
 }

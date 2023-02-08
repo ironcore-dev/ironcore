@@ -17,6 +17,7 @@
 package storage
 
 import (
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -39,9 +40,9 @@ type VolumePoolStatus struct {
 	// AvailableVolumeClasses list the references of any supported VolumeClass of this pool
 	AvailableVolumeClasses []corev1.LocalObjectReference
 	// Available list the available capacity of a volume pool
-	Available corev1.ResourceList
+	Available corev1alpha1.ResourceList
 	// Used indicates how much capacity has been used in a volume pool
-	Used corev1.ResourceList
+	Used corev1alpha1.ResourceList
 }
 
 type VolumePoolState string

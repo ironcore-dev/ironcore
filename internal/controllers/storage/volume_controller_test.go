@@ -19,6 +19,7 @@ package storage
 import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
@@ -43,8 +44,8 @@ var _ = Describe("VolumeReconciler", func() {
 			Spec: storagev1alpha1.VolumeSpec{
 				VolumeClassRef: &corev1.LocalObjectReference{Name: "my-class"},
 				VolumePoolRef:  &corev1.LocalObjectReference{Name: "my-pool"},
-				Resources: corev1.ResourceList{
-					"storage": resource.MustParse("1Gi"),
+				Resources: corev1alpha1.ResourceList{
+					corev1alpha1.ResourceStorage: resource.MustParse("1Gi"),
 				},
 			},
 		}
@@ -102,8 +103,8 @@ var _ = Describe("VolumeReconciler", func() {
 				VolumeClassRef: &corev1.LocalObjectReference{Name: "my-class"},
 				VolumePoolRef:  &corev1.LocalObjectReference{Name: "my-pool"},
 				Unclaimable:    true,
-				Resources: corev1.ResourceList{
-					"storage": resource.MustParse("1Gi"),
+				Resources: corev1alpha1.ResourceList{
+					corev1alpha1.ResourceStorage: resource.MustParse("1Gi"),
 				},
 			},
 		}

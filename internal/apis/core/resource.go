@@ -29,6 +29,10 @@ const (
 	ResourceMemory ResourceName = "memory"
 	// ResourceStorage is the amount of storage, in bytes.
 	ResourceStorage ResourceName = "storage"
+	// ResourceTPS defines max throughput per second. (e.g. 1Gi)
+	ResourceTPS ResourceName = "tps"
+	// ResourceIOPS defines max IOPS in input/output operations per second.
+	ResourceIOPS ResourceName = "iops"
 
 	// ResourcesRequestsPrefix is the prefix used for limiting resource requests in ResourceQuota.
 	ResourcesRequestsPrefix = "requests."
@@ -76,4 +80,14 @@ func (rl *ResourceList) Memory() *resource.Quantity {
 // CPU is a shorthand for getting the quantity associated with ResourceCPU.
 func (rl *ResourceList) CPU() *resource.Quantity {
 	return rl.Name(ResourceCPU, resource.DecimalSI)
+}
+
+// TPS is a shorthand for getting the quantity associated with ResourceTPS.
+func (rl *ResourceList) TPS() *resource.Quantity {
+	return rl.Name(ResourceTPS, resource.DecimalSI)
+}
+
+// IOPS is a shorthand for getting the quantity associated with ResourceIOPS.
+func (rl *ResourceList) IOPS() *resource.Quantity {
+	return rl.Name(ResourceIOPS, resource.DecimalSI)
 }

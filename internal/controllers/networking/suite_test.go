@@ -23,6 +23,7 @@ import (
 
 	"github.com/onmetal/controller-utils/buildutils"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	onmetalapiclient "github.com/onmetal/onmetal-api/internal/client"
 	"github.com/onmetal/onmetal-api/internal/controllers/ipam"
@@ -210,9 +211,9 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "machine-class-",
 			},
-			Capabilities: corev1.ResourceList{
-				corev1.ResourceCPU:    resource.MustParse("1"),
-				corev1.ResourceMemory: resource.MustParse("1Gi"),
+			Capabilities: corev1alpha1.ResourceList{
+				corev1alpha1.ResourceCPU:    resource.MustParse("1"),
+				corev1alpha1.ResourceMemory: resource.MustParse("1Gi"),
 			},
 		}
 		Expect(k8sClient.Create(ctx, machineClass)).To(Succeed(), "failed to create test machine class")

@@ -16,6 +16,7 @@ package validation_test
 
 import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	"github.com/onmetal/onmetal-api/internal/apis/core"
 	"github.com/onmetal/onmetal-api/internal/apis/storage"
 	. "github.com/onmetal/onmetal-api/internal/apis/storage/validation"
 	. "github.com/onmetal/onmetal-api/internal/testutils/validation"
@@ -106,8 +107,8 @@ var _ = Describe("Volume", func() {
 		Entry("classless: any resources",
 			&storage.Volume{
 				Spec: storage.VolumeSpec{
-					Resources: map[corev1.ResourceName]resource.Quantity{
-						corev1.ResourceStorage: resource.MustParse("1Gi"),
+					Resources: core.ResourceList{
+						core.ResourceStorage: resource.MustParse("1Gi"),
 					},
 				},
 			},
@@ -125,8 +126,8 @@ var _ = Describe("Volume", func() {
 			&storage.Volume{
 				Spec: storage.VolumeSpec{
 					VolumeClassRef: &corev1.LocalObjectReference{Name: "foo"},
-					Resources: map[corev1.ResourceName]resource.Quantity{
-						corev1.ResourceStorage: resource.MustParse("-1"),
+					Resources: core.ResourceList{
+						core.ResourceStorage: resource.MustParse("-1"),
 					},
 				},
 			},
