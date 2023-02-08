@@ -122,7 +122,6 @@ func main() {
 
 		// Storage controllers
 		volumePoolController, volumeClassController, volumeController, volumeScheduler,
-
 		bucketClassController, bucketScheduler,
 
 		// Networking controllers
