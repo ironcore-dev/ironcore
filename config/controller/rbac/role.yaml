@@ -371,6 +371,58 @@ rules:
 - apiGroups:
   - storage.api.onmetal.de
   resources:
+  - bucketclasses
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - storage.api.onmetal.de
+  resources:
+  - bucketclasses/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - storage.api.onmetal.de
+  resources:
+  - bucketclasses/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - storage.api.onmetal.de
+  resources:
+  - bucketpools
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - storage.api.onmetal.de
+  resources:
+  - buckets
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - storage.api.onmetal.de
+  resources:
+  - buckets/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - storage.api.onmetal.de
+  resources:
   - volumeclasses
   verbs:
   - create
