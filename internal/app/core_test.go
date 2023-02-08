@@ -27,8 +27,25 @@ import (
 )
 
 var _ = Describe("Core", func() {
-	ctx := SetupContext()
-	ns, machineClass := SetupTest(ctx)
+	var (
+		ctx          = SetupContext()
+		ns           = SetupTest(ctx)
+		machineClass = &computev1alpha1.MachineClass{}
+	)
+
+	BeforeEach(func() {
+		*machineClass = computev1alpha1.MachineClass{
+			ObjectMeta: metav1.ObjectMeta{
+				GenerateName: "machine-class-",
+			},
+			Capabilities: corev1alpha1.ResourceList{
+				corev1alpha1.ResourceCPU:    resource.MustParse("1"),
+				corev1alpha1.ResourceMemory: resource.MustParse("1Gi"),
+			},
+		}
+		Expect(k8sClient.Create(ctx, machineClass)).To(Succeed(), "failed to create test machine class")
+		DeferCleanup(k8sClient.Delete, ctx, machineClass)
+	})
 
 	Context("ResourceQuota", func() {
 		It("should update the resource quota on creation of a new entity", func() {

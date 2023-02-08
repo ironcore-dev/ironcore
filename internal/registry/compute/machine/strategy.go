@@ -62,9 +62,14 @@ func machineMachinePoolRefName(machine *compute.Machine) string {
 	return ""
 }
 
+func machineMachineClassRefName(machine *compute.Machine) string {
+	return machine.Spec.MachineClassRef.Name
+}
+
 func SelectableFields(machine *compute.Machine) fields.Set {
 	fieldsSet := make(fields.Set)
 	fieldsSet[compute.MachineMachinePoolRefNameField] = machineMachinePoolRefName(machine)
+	fieldsSet[compute.MachineMachineClassRefNameField] = machineMachineClassRefName(machine)
 	return generic.AddObjectMetaFieldsSet(fieldsSet, &machine.ObjectMeta, true)
 }
 

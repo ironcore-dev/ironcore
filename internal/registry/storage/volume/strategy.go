@@ -56,9 +56,17 @@ func volumeVolumePoolRefName(volume *storage.Volume) string {
 	return ""
 }
 
+func volumeVolumeClassRefName(volume *storage.Volume) string {
+	if volumeClassRef := volume.Spec.VolumeClassRef; volumeClassRef != nil {
+		return volumeClassRef.Name
+	}
+	return ""
+}
+
 func SelectableFields(volume *storage.Volume) fields.Set {
 	fieldsSet := make(fields.Set)
 	fieldsSet[storage.VolumeVolumePoolRefNameField] = volumeVolumePoolRefName(volume)
+	fieldsSet[storage.VolumeVolumeClassRefNameField] = volumeVolumeClassRefName(volume)
 	return generic.AddObjectMetaFieldsSet(fieldsSet, &volume.ObjectMeta, true)
 }
 
