@@ -31,7 +31,6 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
@@ -113,10 +112,9 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 })
 
-func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.MachineClass) {
+func SetupTest(ctx context.Context) *corev1.Namespace {
 	var (
-		ns           = &corev1.Namespace{}
-		machineClass = &computev1alpha1.MachineClass{}
+		ns = &corev1.Namespace{}
 	)
 
 	BeforeEach(func() {
@@ -126,21 +124,8 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 			},
 		}
 		Expect(k8sClient.Create(ctx, ns)).To(Succeed(), "failed to create test namespace")
-
 		DeferCleanup(k8sClient.Delete, ctx, ns)
-
-		*machineClass = computev1alpha1.MachineClass{
-			ObjectMeta: metav1.ObjectMeta{
-				GenerateName: "machine-class-",
-			},
-			Capabilities: corev1alpha1.ResourceList{
-				corev1alpha1.ResourceCPU:    resource.MustParse("1"),
-				corev1alpha1.ResourceMemory: resource.MustParse("1Gi"),
-			},
-		}
-		Expect(k8sClient.Create(ctx, machineClass)).To(Succeed(), "failed to create test machine class")
-		DeferCleanup(k8sClient.Delete, ctx, machineClass)
 	})
 
-	return ns, machineClass
+	return ns
 }

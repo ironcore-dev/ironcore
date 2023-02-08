@@ -256,7 +256,10 @@ ResourceList
 <th>Description</th>
 </tr>
 </thead>
-<tbody><tr><td><p>&#34;MachineClass&#34;</p></td>
+<tbody><tr><td><p>&#34;BucketClass&#34;</p></td>
+<td><p>ResourceScopeBucketClass refers to the bucket class of a resource.</p>
+</td>
+</tr><tr><td><p>&#34;MachineClass&#34;</p></td>
 <td><p>ResourceScopeMachineClass refers to the machine class of a resource.</p>
 </td>
 </tr><tr><td><p>&#34;VolumeClass&#34;</p></td>

@@ -15,6 +15,9 @@
 package v1alpha1
 
 const (
-	VolumeVolumePoolRefNameField = "spec.volumePoolRef.name"
-	BucketBucketPoolRefNameField = "spec.bucketPoolRef.name"
+	VolumeVolumePoolRefNameField  = "spec.volumePoolRef.name"
+	VolumeVolumeClassRefNameField = "spec.volumeClassRef.name"
+
+	BucketBucketPoolRefNameField  = "spec.bucketPoolRef.name"
+	BucketBucketClassRefNameField = "spec.bucketClassRef.name"
 )

@@ -20,7 +20,8 @@ import (
 )
 
 const (
-	MachineMachinePoolRefNameField = "spec.machinePoolRef.name"
+	MachineMachinePoolRefNameField  = "spec.machinePoolRef.name"
+	MachineMachineClassRefNameField = "spec.machineClassRef.name"
 )
 
 // EphemeralNetworkInterfaceSource is a definition for an ephemeral (i.e. coupled to the lifetime of the surrounding

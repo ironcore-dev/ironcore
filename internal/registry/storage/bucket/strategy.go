@@ -56,9 +56,17 @@ func bucketBucketPoolRefName(bucket *storage.Bucket) string {
 	return ""
 }
 
+func bucketBucketClassRefName(bucket *storage.Bucket) string {
+	if bucketClassRef := bucket.Spec.BucketClassRef; bucketClassRef != nil {
+		return bucketClassRef.Name
+	}
+	return ""
+}
+
 func SelectableFields(bucket *storage.Bucket) fields.Set {
 	fieldsSet := make(fields.Set)
 	fieldsSet[storage.BucketBucketPoolRefNameField] = bucketBucketPoolRefName(bucket)
+	fieldsSet[storage.BucketBucketClassRefNameField] = bucketBucketClassRefName(bucket)
 	return generic.AddObjectMetaFieldsSet(fieldsSet, &bucket.ObjectMeta, true)
 }
 

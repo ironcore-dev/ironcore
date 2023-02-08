@@ -26,7 +26,24 @@ func addConversionFuncs(scheme *runtime.Scheme) error {
 		SchemeGroupVersion.WithKind("Volume"),
 		func(label, value string) (internalLabel, internalValue string, err error) {
 			switch label {
-			case "metadata.name", "metadata.namespace", v1alpha1.VolumeVolumePoolRefNameField:
+			case "metadata.name", "metadata.namespace",
+				v1alpha1.VolumeVolumePoolRefNameField,
+				v1alpha1.VolumeVolumeClassRefNameField:
+				return label, value, nil
+			default:
+				return "", "", fmt.Errorf("field label not supported: %s", label)
+			}
+		},
+	); err != nil {
+		return err
+	}
+	if err := scheme.AddFieldLabelConversionFunc(
+		SchemeGroupVersion.WithKind("Bucket"),
+		func(label, value string) (internalLabel, internalValue string, err error) {
+			switch label {
+			case "metadata.name", "metadata.namespace",
+				v1alpha1.BucketBucketPoolRefNameField,
+				v1alpha1.BucketBucketClassRefNameField:
 				return label, value, nil
 			default:
 				return "", "", fmt.Errorf("field label not supported: %s", label)

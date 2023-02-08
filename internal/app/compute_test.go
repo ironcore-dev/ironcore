@@ -17,7 +17,6 @@ package app_test
 import (
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -29,10 +28,29 @@ import (
 )
 
 var _ = Describe("Compute", func() {
-	ctx := SetupContext()
-	ns, machineClass := SetupTest(ctx)
+	var (
+		ctx          = SetupContext()
+		ns           = SetupTest(ctx)
+		machineClass = &computev1alpha1.MachineClass{}
+	)
 
-	const fieldOwner = client.FieldOwner("fieldowner.test.api.onmetal.de/onmetal-apiserver")
+	const (
+		fieldOwner = client.FieldOwner("fieldowner.test.api.onmetal.de/onmetal-apiserver")
+	)
+
+	BeforeEach(func() {
+		*machineClass = computev1alpha1.MachineClass{
+			ObjectMeta: metav1.ObjectMeta{
+				GenerateName: "machine-class-",
+			},
+			Capabilities: corev1alpha1.ResourceList{
+				corev1alpha1.ResourceCPU:    resource.MustParse("1"),
+				corev1alpha1.ResourceMemory: resource.MustParse("1Gi"),
+			},
+		}
+		Expect(k8sClient.Create(ctx, machineClass)).To(Succeed(), "failed to create test machine class")
+		DeferCleanup(k8sClient.Delete, ctx, machineClass)
+	})
 
 	Context("Machine", func() {
 		It("should correctly apply machines with volumes and default devices", func() {
@@ -230,88 +248,60 @@ var _ = Describe("Compute", func() {
 			Expect(machinesOnNoMachinePoolList.Items).To(ConsistOf(*machine3))
 		})
 
-		It("should allow listing volumes filtering by volume pool name", func() {
-			const (
-				volumePool1 = "volume-pool-1"
-				volumePool2 = "volume-pool-2"
-			)
-
-			By("creating a volume on volume pool 1")
-			volume1 := &storagev1alpha1.Volume{
+		It("should allow listing machines by machine class name", func() {
+			By("creating another machine class")
+			machineClass2 := &computev1alpha1.MachineClass{
 				ObjectMeta: metav1.ObjectMeta{
-					Namespace:    ns.Name,
-					GenerateName: "volume-",
+					GenerateName: "machine-class-",
 				},
-				Spec: storagev1alpha1.VolumeSpec{
-					VolumeClassRef: &corev1.LocalObjectReference{Name: "my-class"},
-					VolumePoolRef:  &corev1.LocalObjectReference{Name: volumePool1},
-					Resources: corev1alpha1.ResourceList{
-						corev1alpha1.ResourceStorage: resource.MustParse("10Gi"),
-					},
+				Capabilities: corev1alpha1.ResourceList{
+					corev1alpha1.ResourceCPU:    resource.MustParse("3"),
+					corev1alpha1.ResourceMemory: resource.MustParse("10Gi"),
 				},
 			}
-			Expect(k8sClient.Create(ctx, volume1)).To(Succeed())
+			Expect(k8sClient.Create(ctx, machineClass2)).To(Succeed())
+			DeferCleanup(k8sClient.Delete, ctx, machineClass2)
 
-			By("creating a volume on volume pool 2")
-			volume2 := &storagev1alpha1.Volume{
+			By("creating a machine")
+			machine1 := &computev1alpha1.Machine{
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace:    ns.Name,
-					GenerateName: "volume-",
+					GenerateName: "machine-",
 				},
-				Spec: storagev1alpha1.VolumeSpec{
-					VolumeClassRef: &corev1.LocalObjectReference{Name: "my-class"},
-					VolumePoolRef:  &corev1.LocalObjectReference{Name: volumePool2},
-					Resources: corev1alpha1.ResourceList{
-						corev1alpha1.ResourceStorage: resource.MustParse("10Gi"),
-					},
+				Spec: computev1alpha1.MachineSpec{
+					MachineClassRef: corev1.LocalObjectReference{Name: machineClass.Name},
 				},
 			}
-			Expect(k8sClient.Create(ctx, volume2)).To(Succeed())
+			Expect(k8sClient.Create(ctx, machine1)).To(Succeed())
 
-			By("creating a volume on no volume pool")
-			volume3 := &storagev1alpha1.Volume{
+			By("creating a machine with the other machine class")
+			machine2 := &computev1alpha1.Machine{
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace:    ns.Name,
-					GenerateName: "volume-",
+					GenerateName: "machine-",
 				},
-				Spec: storagev1alpha1.VolumeSpec{
-					VolumeClassRef: &corev1.LocalObjectReference{Name: "my-class"},
-					Resources: corev1alpha1.ResourceList{
-						corev1alpha1.ResourceStorage: resource.MustParse("10Gi"),
-					},
+				Spec: computev1alpha1.MachineSpec{
+					MachineClassRef: corev1.LocalObjectReference{Name: machineClass2.Name},
 				},
 			}
-			Expect(k8sClient.Create(ctx, volume3)).To(Succeed())
+			Expect(k8sClient.Create(ctx, machine2)).To(Succeed())
 
-			By("listing all volumes on volume pool 1")
-			volumesOnVolumePool1List := &storagev1alpha1.VolumeList{}
-			Expect(k8sClient.List(ctx, volumesOnVolumePool1List,
-				client.InNamespace(ns.Name),
-				client.MatchingFields{storagev1alpha1.VolumeVolumePoolRefNameField: volumePool1},
-			))
+			By("listing machines with the first machine class name")
+			machineList := &computev1alpha1.MachineList{}
+			Expect(k8sClient.List(ctx, machineList, client.MatchingFields{
+				computev1alpha1.MachineMachineClassRefNameField: machineClass.Name,
+			})).To(Succeed())
 
-			By("inspecting the items")
-			Expect(volumesOnVolumePool1List.Items).To(ConsistOf(*volume1))
+			By("inspecting the retrieved list to only have the machine with the correct machine class")
+			Expect(machineList.Items).To(ConsistOf(HaveField("UID", machine1.UID)))
 
-			By("listing all volumes on volume pool 2")
-			volumesOnVolumePool2List := &storagev1alpha1.VolumeList{}
-			Expect(k8sClient.List(ctx, volumesOnVolumePool2List,
-				client.InNamespace(ns.Name),
-				client.MatchingFields{storagev1alpha1.VolumeVolumePoolRefNameField: volumePool2},
-			))
+			By("listing machines with the second machine class name")
+			Expect(k8sClient.List(ctx, machineList, client.MatchingFields{
+				computev1alpha1.MachineMachineClassRefNameField: machineClass2.Name,
+			})).To(Succeed())
 
-			By("inspecting the items")
-			Expect(volumesOnVolumePool2List.Items).To(ConsistOf(*volume2))
-
-			By("listing all volumes on no volume pool")
-			volumesOnNoVolumePoolList := &storagev1alpha1.VolumeList{}
-			Expect(k8sClient.List(ctx, volumesOnNoVolumePoolList,
-				client.InNamespace(ns.Name),
-				client.MatchingFields{storagev1alpha1.VolumeVolumePoolRefNameField: ""},
-			))
-
-			By("inspecting the items")
-			Expect(volumesOnNoVolumePoolList.Items).To(ConsistOf(*volume3))
+			By("inspecting the retrieved list to only have the machine with the correct machine class")
+			Expect(machineList.Items).To(ConsistOf(HaveField("UID", machine2.UID)))
 		})
 	})
 })
