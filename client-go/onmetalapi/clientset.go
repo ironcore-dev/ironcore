@@ -22,6 +22,7 @@ import (
 	"net/http"
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/client-go/onmetalapi/typed/compute/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/client-go/onmetalapi/typed/core/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/client-go/onmetalapi/typed/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/client-go/onmetalapi/typed/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/client-go/onmetalapi/typed/storage/v1alpha1"
@@ -33,6 +34,7 @@ import (
 type Interface interface {
 	Discovery() discovery.DiscoveryInterface
 	ComputeV1alpha1() computev1alpha1.ComputeV1alpha1Interface
+	CoreV1alpha1() corev1alpha1.CoreV1alpha1Interface
 	IpamV1alpha1() ipamv1alpha1.IpamV1alpha1Interface
 	NetworkingV1alpha1() networkingv1alpha1.NetworkingV1alpha1Interface
 	StorageV1alpha1() storagev1alpha1.StorageV1alpha1Interface
@@ -43,6 +45,7 @@ type Interface interface {
 type Clientset struct {
 	*discovery.DiscoveryClient
 	computeV1alpha1    *computev1alpha1.ComputeV1alpha1Client
+	coreV1alpha1       *corev1alpha1.CoreV1alpha1Client
 	ipamV1alpha1       *ipamv1alpha1.IpamV1alpha1Client
 	networkingV1alpha1 *networkingv1alpha1.NetworkingV1alpha1Client
 	storageV1alpha1    *storagev1alpha1.StorageV1alpha1Client
@@ -51,6 +54,11 @@ type Clientset struct {
 // ComputeV1alpha1 retrieves the ComputeV1alpha1Client
 func (c *Clientset) ComputeV1alpha1() computev1alpha1.ComputeV1alpha1Interface {
 	return c.computeV1alpha1
+}
+
+// CoreV1alpha1 retrieves the CoreV1alpha1Client
+func (c *Clientset) CoreV1alpha1() corev1alpha1.CoreV1alpha1Interface {
+	return c.coreV1alpha1
 }
 
 // IpamV1alpha1 retrieves the IpamV1alpha1Client
@@ -116,6 +124,10 @@ func NewForConfigAndClient(c *rest.Config, httpClient *http.Client) (*Clientset,
 	if err != nil {
 		return nil, err
 	}
+	cs.coreV1alpha1, err = corev1alpha1.NewForConfigAndClient(&configShallowCopy, httpClient)
+	if err != nil {
+		return nil, err
+	}
 	cs.ipamV1alpha1, err = ipamv1alpha1.NewForConfigAndClient(&configShallowCopy, httpClient)
 	if err != nil {
 		return nil, err
@@ -150,6 +162,7 @@ func NewForConfigOrDie(c *rest.Config) *Clientset {
 func New(c rest.Interface) *Clientset {
 	var cs Clientset
 	cs.computeV1alpha1 = computev1alpha1.New(c)
+	cs.coreV1alpha1 = corev1alpha1.New(c)
 	cs.ipamV1alpha1 = ipamv1alpha1.New(c)
 	cs.networkingV1alpha1 = networkingv1alpha1.New(c)
 	cs.storageV1alpha1 = storagev1alpha1.New(c)

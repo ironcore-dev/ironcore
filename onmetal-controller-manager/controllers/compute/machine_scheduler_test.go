@@ -28,7 +28,7 @@ import (
 
 var _ = Describe("MachineScheduler", func() {
 	ctx := SetupContext()
-	ns := SetupTest(ctx)
+	ns, machineClass := SetupTest(ctx)
 
 	It("should schedule machines on machine pools", func() {
 		By("creating a machine pool")
@@ -41,7 +41,7 @@ var _ = Describe("MachineScheduler", func() {
 
 		By("patching the machine pool status to contain a machine class")
 		machinePoolBase := machinePool.DeepCopy()
-		machinePool.Status.AvailableMachineClasses = []corev1.LocalObjectReference{{Name: "my-machineclass"}}
+		machinePool.Status.AvailableMachineClasses = []corev1.LocalObjectReference{{Name: machineClass.Name}}
 		Expect(k8sClient.Status().Patch(ctx, machinePool, client.MergeFrom(machinePoolBase))).
 			To(Succeed(), "failed to patch machine pool status")
 
@@ -52,10 +52,8 @@ var _ = Describe("MachineScheduler", func() {
 				GenerateName: "test-machine-",
 			},
 			Spec: computev1alpha1.MachineSpec{
-				Image: "my-image",
-				MachineClassRef: corev1.LocalObjectReference{
-					Name: "my-machineclass",
-				},
+				Image:           "my-image",
+				MachineClassRef: corev1.LocalObjectReference{Name: machineClass.Name},
 			},
 		}
 		Expect(k8sClient.Create(ctx, machine)).To(Succeed(), "failed to create machine")
@@ -77,10 +75,8 @@ var _ = Describe("MachineScheduler", func() {
 				GenerateName: "test-machine-",
 			},
 			Spec: computev1alpha1.MachineSpec{
-				Image: "my-image",
-				MachineClassRef: corev1.LocalObjectReference{
-					Name: "my-machineclass",
-				},
+				Image:           "my-image",
+				MachineClassRef: corev1.LocalObjectReference{Name: machineClass.Name},
 			},
 		}
 		Expect(k8sClient.Create(ctx, machine)).To(Succeed(), "failed to create machine")
@@ -103,7 +99,7 @@ var _ = Describe("MachineScheduler", func() {
 
 		By("patching the machine pool status to contain a machine class")
 		machinePoolBase := machinePool.DeepCopy()
-		machinePool.Status.AvailableMachineClasses = []corev1.LocalObjectReference{{Name: "my-machineclass"}}
+		machinePool.Status.AvailableMachineClasses = []corev1.LocalObjectReference{{Name: machineClass.Name}}
 		Expect(k8sClient.Status().Patch(ctx, machinePool, client.MergeFrom(machinePoolBase))).
 			To(Succeed(), "failed to patch machine pool status")
 
@@ -125,7 +121,7 @@ var _ = Describe("MachineScheduler", func() {
 
 		By("patching the machine pool status to contain a machine class")
 		machinePoolNoMatchingLabelsBase := machinePoolNoMatchingLabels.DeepCopy()
-		machinePoolNoMatchingLabels.Status.AvailableMachineClasses = []corev1.LocalObjectReference{{Name: "my-machineclass"}}
+		machinePoolNoMatchingLabels.Status.AvailableMachineClasses = []corev1.LocalObjectReference{{Name: machineClass.Name}}
 		Expect(k8sClient.Status().Patch(ctx, machinePoolNoMatchingLabels, client.MergeFrom(machinePoolNoMatchingLabelsBase))).
 			To(Succeed(), "failed to patch machine pool status")
 
@@ -142,7 +138,7 @@ var _ = Describe("MachineScheduler", func() {
 
 		By("patching the machine pool status to contain a machine class")
 		machinePoolMatchingLabelsBase := machinePoolMatchingLabels.DeepCopy()
-		machinePoolMatchingLabels.Status.AvailableMachineClasses = []corev1.LocalObjectReference{{Name: "my-machineclass"}}
+		machinePoolMatchingLabels.Status.AvailableMachineClasses = []corev1.LocalObjectReference{{Name: machineClass.Name}}
 		Expect(k8sClient.Status().Patch(ctx, machinePoolMatchingLabels, client.MergeFrom(machinePoolMatchingLabelsBase))).
 			To(Succeed(), "failed to patch machine pool status")
 
@@ -158,7 +154,7 @@ var _ = Describe("MachineScheduler", func() {
 					"foo": "bar",
 				},
 				MachineClassRef: corev1.LocalObjectReference{
-					Name: "my-machineclass",
+					Name: machineClass.Name,
 				},
 			},
 		}
@@ -197,7 +193,7 @@ var _ = Describe("MachineScheduler", func() {
 
 		By("patching the machine pool status to contain a machine class")
 		machinePoolBase := taintedMachinePool.DeepCopy()
-		taintedMachinePool.Status.AvailableMachineClasses = []corev1.LocalObjectReference{{Name: "my-machineclass"}}
+		taintedMachinePool.Status.AvailableMachineClasses = []corev1.LocalObjectReference{{Name: machineClass.Name}}
 		Expect(k8sClient.Status().Patch(ctx, taintedMachinePool, client.MergeFrom(machinePoolBase))).
 			To(Succeed(), "failed to patch the machine pool status")
 
@@ -210,7 +206,7 @@ var _ = Describe("MachineScheduler", func() {
 			Spec: computev1alpha1.MachineSpec{
 				Image: "my-image",
 				MachineClassRef: corev1.LocalObjectReference{
-					Name: "my-machineclass",
+					Name: machineClass.Name,
 				},
 			},
 		}

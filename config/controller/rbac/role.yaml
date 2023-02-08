@@ -6,6 +6,16 @@ metadata:
   name: manager-role
 rules:
 - apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
   - compute.api.onmetal.de
   resources:
   - machineclasses
@@ -79,6 +89,32 @@ rules:
   - compute.api.onmetal.de
   resources:
   - machines/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - core.api.onmetal.de
+  resources:
+  - resourcequotas
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.api.onmetal.de
+  resources:
+  - resourcequotas/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - core.api.onmetal.de
+  resources:
+  - resourcequotas/status
   verbs:
   - get
   - patch

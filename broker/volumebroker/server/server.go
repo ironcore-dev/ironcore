@@ -16,10 +16,7 @@ package server
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
-	"math/rand"
-	"strconv"
 
 	"github.com/go-logr/logr"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
@@ -27,6 +24,7 @@ import (
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	"github.com/onmetal/onmetal-api/broker/common/cleaner"
+	"github.com/onmetal/onmetal-api/broker/common/idgen"
 	volumebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/volumebroker/api/v1alpha1"
 	"github.com/onmetal/onmetal-api/broker/volumebroker/apiutils"
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
@@ -54,6 +52,7 @@ func init() {
 
 type Server struct {
 	client client.Client
+	idGen  idgen.IDGen
 
 	namespace          string
 	volumePoolName     string
@@ -62,23 +61,6 @@ type Server struct {
 
 func (s *Server) loggerFrom(ctx context.Context, keysWithValues ...interface{}) logr.Logger {
 	return ctrl.LoggerFrom(ctx, keysWithValues...)
-}
-
-const idLength = 63
-
-func (s *Server) generateID() string {
-	data := make([]byte, 32)
-	for {
-		_, _ = rand.Read(data)
-		id := hex.EncodeToString(data)
-
-		// Truncated versions of the id should not be numerical.
-		if _, err := strconv.ParseInt(id[:12], 10, 64); err != nil {
-			continue
-		}
-
-		return id[:idLength]
-	}
 }
 
 func (s *Server) setupCleaner(ctx context.Context, log logr.Logger, retErr *error) (c *cleaner.Cleaner, cleanup func()) {
@@ -103,11 +85,15 @@ type Options struct {
 	Namespace          string
 	VolumePoolName     string
 	VolumePoolSelector map[string]string
+	IDGen              idgen.IDGen
 }
 
 func setOptionsDefaults(o *Options) {
 	if o.Namespace == "" {
 		o.Namespace = corev1.NamespaceDefault
+	}
+	if o.IDGen == nil {
+		o.IDGen = idgen.Default
 	}
 }
 
@@ -128,6 +114,7 @@ func New(cfg *rest.Config, opts Options) (*Server, error) {
 
 	return &Server{
 		client:             c,
+		idGen:              opts.IDGen,
 		namespace:          opts.Namespace,
 		volumePoolName:     opts.VolumePoolName,
 		volumePoolSelector: opts.VolumePoolSelector,

@@ -32,7 +32,7 @@ import (
 
 var _ = Describe("VolumeClass controller", func() {
 	ctx := SetupContext()
-	ns := SetupTest(ctx)
+	ns, _ := SetupTest(ctx)
 
 	It("should finalize the volume class if no volume is using it", func() {
 		By("creating the volume class consumed by the volume")

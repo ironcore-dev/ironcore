@@ -16,9 +16,9 @@ package server
 
 import (
 	"context"
+	"crypto/rand"
 	"encoding/hex"
 	"fmt"
-	"math/rand"
 	"strconv"
 
 	"github.com/go-logr/logr"

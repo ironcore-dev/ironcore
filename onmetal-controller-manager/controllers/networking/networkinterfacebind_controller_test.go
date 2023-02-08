@@ -29,7 +29,7 @@ import (
 
 var _ = Describe("NetworkInterfaceBindReconciler", func() {
 	ctx := SetupContext()
-	ns := SetupTest(ctx)
+	ns, machineClass := SetupTest(ctx)
 
 	It("should reconcile the binding phase", func() {
 		By("creating a network")
@@ -75,7 +75,7 @@ var _ = Describe("NetworkInterfaceBindReconciler", func() {
 				GenerateName: "machine-",
 			},
 			Spec: computev1alpha1.MachineSpec{
-				MachineClassRef: corev1.LocalObjectReference{Name: "machine-class"},
+				MachineClassRef: corev1.LocalObjectReference{Name: machineClass.Name},
 				Image:           "my-image:latest",
 				NetworkInterfaces: []computev1alpha1.NetworkInterface{
 					{

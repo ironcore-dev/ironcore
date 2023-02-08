@@ -23,6 +23,7 @@ import (
 	time "time"
 
 	compute "github.com/onmetal/onmetal-api/client-go/informers/compute"
+	core "github.com/onmetal/onmetal-api/client-go/informers/core"
 	internalinterfaces "github.com/onmetal/onmetal-api/client-go/informers/internalinterfaces"
 	ipam "github.com/onmetal/onmetal-api/client-go/informers/ipam"
 	networking "github.com/onmetal/onmetal-api/client-go/informers/networking"
@@ -175,6 +176,7 @@ type SharedInformerFactory interface {
 	WaitForCacheSync(stopCh <-chan struct{}) map[reflect.Type]bool
 
 	Compute() compute.Interface
+	Core() core.Interface
 	Ipam() ipam.Interface
 	Networking() networking.Interface
 	Storage() storage.Interface
@@ -182,6 +184,10 @@ type SharedInformerFactory interface {
 
 func (f *sharedInformerFactory) Compute() compute.Interface {
 	return compute.New(f, f.namespace, f.tweakListOptions)
+}
+
+func (f *sharedInformerFactory) Core() core.Interface {
+	return core.New(f, f.namespace, f.tweakListOptions)
 }
 
 func (f *sharedInformerFactory) Ipam() ipam.Interface {

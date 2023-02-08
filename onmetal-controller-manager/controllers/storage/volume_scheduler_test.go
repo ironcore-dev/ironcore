@@ -29,7 +29,7 @@ import (
 
 var _ = Describe("VolumeScheduler", func() {
 	ctx := SetupContext()
-	ns := SetupTest(ctx)
+	ns, _ := SetupTest(ctx)
 
 	It("should schedule volumes on volume pools", func() {
 		By("creating a volume pool")

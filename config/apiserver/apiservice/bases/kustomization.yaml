@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - v1alpha1.compute.api.onmetal.de.yaml
+  - v1alpha1.core.api.onmetal.de.yaml
   - v1alpha1.storage.api.onmetal.de.yaml
   - v1alpha1.networking.api.onmetal.de.yaml
   - v1alpha1.ipam.api.onmetal.de.yaml

@@ -13,7 +13,7 @@ BUCKETBROKER_IMG ?= bucketbroker:latest
 ORICTL_BUCKET_IMG ?= orictl-bucket:latest
 
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
-ENVTEST_K8S_VERSION = 1.24.1
+ENVTEST_K8S_VERSION = 1.26.1
 
 # Docker image name for the mkdocs based local development setup
 IMAGE=onmetal-api/documentation
@@ -128,6 +128,7 @@ check: manifests generate add-license lint test # Generate manifests, code, lint
 .PHONY: docs
 docs: gen-crd-api-reference-docs ## Run go generate to generate API reference documentation.
 	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/common/v1alpha1 -config ./hack/api-reference/common-config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/common.md
+	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/core/v1alpha1 -config ./hack/api-reference/core-config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/core.md
 	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/compute/v1alpha1 -config ./hack/api-reference/compute-config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/compute.md
 	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/storage/v1alpha1 -config ./hack/api-reference/storage-config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/storage.md
 	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/networking/v1alpha1 -config ./hack/api-reference/networking-config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/networking.md
@@ -150,9 +151,13 @@ ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
 test-only: envtest ## Run *only* the tests - no generation, linting etc.
 	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" go test ./... -coverprofile cover.out
 
-.PHONEY: openapi-extractor
-extract-openapi: openapi-extractor
-	$(OPENAPI_EXTRACTOR) --apiserver-package="github.com/onmetal/onmetal-api/onmetal-apiserver/cmd/apiserver" --apiserver-build-opts=mod --apiservices="./config/apiserver/apiservice/bases" --output="./gen"
+.PHONY: openapi-extractor
+extract-openapi: envtest openapi-extractor
+	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" $(OPENAPI_EXTRACTOR) \
+		--apiserver-package="github.com/onmetal/onmetal-api/onmetal-apiserver/cmd/apiserver" \
+		--apiserver-build-opts=mod \
+		--apiservices="./config/apiserver/apiservice/bases" \
+		--output="./gen"
 
 ##@ Build
 

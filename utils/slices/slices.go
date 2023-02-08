@@ -26,10 +26,29 @@ func Map[S ~[]E, E, F any](s S, f func(e E) F) []F {
 	return res
 }
 
+// MapRef maps the references of the values of the slice to a result type.
+func MapRef[S ~[]E, E, F any](s S, f func(e *E) F) []F {
+	res := make([]F, len(s))
+	for i := range s {
+		res[i] = f(&s[i])
+	}
+	return res
+}
+
 func ToMap[S ~[]V, K comparable, V any](s S, f func(v V) K) map[K]V {
 	res := make(map[K]V)
 	for _, v := range s {
 		res[f(v)] = v
+	}
+	return res
+}
+
+func Filter[S ~[]E, E any](s S, f func(e E) bool) []E {
+	var res []E
+	for i := range s {
+		if f(s[i]) {
+			res = append(res, s[i])
+		}
 	}
 	return res
 }

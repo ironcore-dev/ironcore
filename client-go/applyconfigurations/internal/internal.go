@@ -447,6 +447,77 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: state
       type:
         scalar: string
+- name: com.github.onmetal.onmetal-api.api.core.v1alpha1.ResourceQuota
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.ResourceQuotaSpec
+      default: {}
+    - name: status
+      type:
+        namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.ResourceQuotaStatus
+      default: {}
+- name: com.github.onmetal.onmetal-api.api.core.v1alpha1.ResourceQuotaSpec
+  map:
+    fields:
+    - name: hard
+      type:
+        map:
+          elementType:
+            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
+    - name: scopeSelector
+      type:
+        namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.ResourceScopeSelector
+- name: com.github.onmetal.onmetal-api.api.core.v1alpha1.ResourceQuotaStatus
+  map:
+    fields:
+    - name: hard
+      type:
+        map:
+          elementType:
+            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
+    - name: used
+      type:
+        map:
+          elementType:
+            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
+- name: com.github.onmetal.onmetal-api.api.core.v1alpha1.ResourceScopeSelector
+  map:
+    fields:
+    - name: matchExpressions
+      type:
+        list:
+          elementType:
+            namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.ResourceScopeSelectorRequirement
+          elementRelationship: atomic
+- name: com.github.onmetal.onmetal-api.api.core.v1alpha1.ResourceScopeSelectorRequirement
+  map:
+    fields:
+    - name: operator
+      type:
+        scalar: string
+      default: ""
+    - name: scopeName
+      type:
+        scalar: string
+      default: ""
+    - name: values
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: atomic
 - name: com.github.onmetal.onmetal-api.api.ipam.v1alpha1.Prefix
   map:
     fields:

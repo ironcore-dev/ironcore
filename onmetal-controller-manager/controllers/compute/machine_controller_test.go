@@ -35,12 +35,15 @@ import (
 )
 
 var _ = Describe("MachineReconciler", func() {
-	ctx := SetupContext()
-	ns := SetupTest(ctx)
+	var (
+		ctx              = SetupContext()
+		ns, machineClass = SetupTest(ctx)
+		network          = &networkingv1alpha1.Network{}
+	)
 
-	It("should manage ephemeral objects", func() {
+	BeforeEach(func() {
 		By("creating a network")
-		network := &networkingv1alpha1.Network{
+		*network = networkingv1alpha1.Network{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
 				GenerateName: "network-",
@@ -51,11 +54,13 @@ var _ = Describe("MachineReconciler", func() {
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())
 
-		By("patching the network to be ready")
+		By("patching the network to be available")
 		baseNetwork := network.DeepCopy()
 		network.Status.State = networkingv1alpha1.NetworkStateAvailable
 		Expect(k8sClient.Status().Patch(ctx, network, client.MergeFrom(baseNetwork))).To(Succeed())
+	})
 
+	It("should manage ephemeral objects", func() {
 		By("creating a machine")
 		machine := &computev1alpha1.Machine{
 			ObjectMeta: metav1.ObjectMeta{
@@ -63,7 +68,7 @@ var _ = Describe("MachineReconciler", func() {
 				GenerateName: "machine-",
 			},
 			Spec: computev1alpha1.MachineSpec{
-				MachineClassRef: corev1.LocalObjectReference{Name: "machine-class"},
+				MachineClassRef: corev1.LocalObjectReference{Name: machineClass.Name},
 				Image:           "my-image:latest",
 				NetworkInterfaces: []computev1alpha1.NetworkInterface{
 					{

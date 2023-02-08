@@ -65,6 +65,12 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.Volume":                          schema_onmetal_api_api_compute_v1alpha1_Volume(ref),
 		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.VolumeSource":                    schema_onmetal_api_api_compute_v1alpha1_VolumeSource(ref),
 		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.VolumeStatus":                    schema_onmetal_api_api_compute_v1alpha1_VolumeStatus(ref),
+		"github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceQuota":                      schema_onmetal_api_api_core_v1alpha1_ResourceQuota(ref),
+		"github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceQuotaList":                  schema_onmetal_api_api_core_v1alpha1_ResourceQuotaList(ref),
+		"github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceQuotaSpec":                  schema_onmetal_api_api_core_v1alpha1_ResourceQuotaSpec(ref),
+		"github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceQuotaStatus":                schema_onmetal_api_api_core_v1alpha1_ResourceQuotaStatus(ref),
+		"github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceScopeSelector":              schema_onmetal_api_api_core_v1alpha1_ResourceScopeSelector(ref),
+		"github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceScopeSelectorRequirement":   schema_onmetal_api_api_core_v1alpha1_ResourceScopeSelectorRequirement(ref),
 		"github.com/onmetal/onmetal-api/api/ipam/v1alpha1.Prefix":                             schema_onmetal_api_api_ipam_v1alpha1_Prefix(ref),
 		"github.com/onmetal/onmetal-api/api/ipam/v1alpha1.PrefixAllocation":                   schema_onmetal_api_api_ipam_v1alpha1_PrefixAllocation(ref),
 		"github.com/onmetal/onmetal-api/api/ipam/v1alpha1.PrefixAllocationList":               schema_onmetal_api_api_ipam_v1alpha1_PrefixAllocationList(ref),
@@ -1797,6 +1803,257 @@ func schema_onmetal_api_api_compute_v1alpha1_VolumeStatus(ref common.ReferenceCa
 		},
 		Dependencies: []string{
 			"k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+	}
+}
+
+func schema_onmetal_api_api_core_v1alpha1_ResourceQuota(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ResourceQuota is the Schema for the resourcequotas API",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceQuotaSpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceQuotaStatus"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceQuotaSpec", "github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceQuotaStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_onmetal_api_api_core_v1alpha1_ResourceQuotaList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ResourceQuotaList contains a list of ResourceQuota",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceQuota"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceQuota", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_onmetal_api_api_core_v1alpha1_ResourceQuotaSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ResourceQuotaSpec defines the desired state of ResourceQuotaSpec",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"hard": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Hard is a ResourceList of the strictly enforced amount of resources.",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
+									},
+								},
+							},
+						},
+					},
+					"scopeSelector": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ScopeSelector selects the resources that are subject to this quota. Note: By using certain ScopeSelectors, only certain resources may be tracked.",
+							Ref:         ref("github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceScopeSelector"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceScopeSelector", "k8s.io/apimachinery/pkg/api/resource.Quantity"},
+	}
+}
+
+func schema_onmetal_api_api_core_v1alpha1_ResourceQuotaStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ResourceQuotaStatus is the status of a ResourceQuota.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"hard": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Hard are the currently enforced hard resource limits. Hard may be less than used in case the limits were introduced / updated after more than allowed resources were already present.",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
+									},
+								},
+							},
+						},
+					},
+					"used": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Used is the amount of currently used resources.",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/api/resource.Quantity"},
+	}
+}
+
+func schema_onmetal_api_api_core_v1alpha1_ResourceScopeSelector(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ResourceScopeSelector selects",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"matchExpressions": {
+						SchemaProps: spec.SchemaProps{
+							Description: "MatchExpressions is a list of ResourceScopeSelectorRequirement to match resources by.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceScopeSelectorRequirement"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceScopeSelectorRequirement"},
+	}
+}
+
+func schema_onmetal_api_api_core_v1alpha1_ResourceScopeSelectorRequirement(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ResourceScopeSelectorRequirement is a requirement for a resource using a ResourceScope alongside a ResourceScopeSelectorOperator with Values (depending on the ResourceScopeSelectorOperator).",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"scopeName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ScopeName is the ResourceScope to make a requirement for.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"operator": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Operator is the ResourceScopeSelectorOperator to check the ScopeName with in a resource.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"values": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Values are the values to compare the Operator with the ScopeName. May be optional.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"scopeName", "operator"},
+			},
+		},
 	}
 }
 

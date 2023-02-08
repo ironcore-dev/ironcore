@@ -31,7 +31,7 @@ import (
 
 var _ = Describe("VolumeReconciler", func() {
 	ctx := SetupContext()
-	ns := SetupTest(ctx)
+	ns, machineClass := SetupTest(ctx)
 
 	It("should schedule, bind and unbind a volume to a machine", func() {
 		By("creating a volume")
@@ -57,7 +57,7 @@ var _ = Describe("VolumeReconciler", func() {
 				GenerateName: "machine-",
 			},
 			Spec: computev1alpha1.MachineSpec{
-				MachineClassRef: corev1.LocalObjectReference{Name: "my-class"},
+				MachineClassRef: corev1.LocalObjectReference{Name: machineClass.Name},
 				MachinePoolRef:  &corev1.LocalObjectReference{Name: "my-pool"},
 				Image:           "my-image",
 				Volumes: []computev1alpha1.Volume{
@@ -122,7 +122,7 @@ var _ = Describe("VolumeReconciler", func() {
 				GenerateName: "machine-",
 			},
 			Spec: computev1alpha1.MachineSpec{
-				MachineClassRef: corev1.LocalObjectReference{Name: "my-class"},
+				MachineClassRef: corev1.LocalObjectReference{Name: machineClass.Name},
 				MachinePoolRef:  &corev1.LocalObjectReference{Name: "my-pool"},
 				Image:           "my-image",
 				Volumes: []computev1alpha1.Volume{

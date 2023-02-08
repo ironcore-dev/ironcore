@@ -65,20 +65,24 @@ export GOROOT="${GOROOT:-"$(go env GOROOT)"}"
 export GOPATH="$VIRTUAL_GOPATH"
 export GO111MODULE=off
 
+CLIENT_GROUPS="core compute ipam networking storage"
+CLIENT_VERSION_GROUPS="core:v1alpha1 compute:v1alpha1 ipam:v1alpha1 networking:v1alpha1 storage:v1alpha1"
+ALL_VERSION_GROUPS="common:v1alpha1 $CLIENT_VERSION_GROUPS"
+
 echo "${bold}Public types${normal}"
 
 echo "Generating ${blue}deepcopy${normal}"
 "$DEEPCOPY_GEN" \
   --output-base "$GOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gvs "github.com/onmetal/onmetal-api/api" "common:v1alpha1 compute:v1alpha1 ipam:v1alpha1 networking:v1alpha1 storage:v1alpha1")" \
+  --input-dirs "$(qualify-gvs "github.com/onmetal/onmetal-api/api" "$ALL_VERSION_GROUPS")" \
   -O zz_generated.deepcopy
 
 echo "Generating ${blue}openapi${normal}"
 "$OPENAPI_GEN" \
   --output-base "$GOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gvs "github.com/onmetal/onmetal-api/api" "common:v1alpha1 compute:v1alpha1 ipam:v1alpha1 networking:v1alpha1 storage:v1alpha1")" \
+  --input-dirs "$(qualify-gvs "github.com/onmetal/onmetal-api/api" "$ALL_VERSION_GROUPS")" \
   --input-dirs "k8s.io/apimachinery/pkg/apis/meta/v1,k8s.io/apimachinery/pkg/runtime,k8s.io/apimachinery/pkg/version" \
   --input-dirs "k8s.io/api/core/v1" \
   --input-dirs "k8s.io/apimachinery/pkg/api/resource" \
@@ -88,7 +92,7 @@ echo "Generating ${blue}openapi${normal}"
 
 echo "Generating ${blue}applyconfiguration${normal}"
 applyconfigurationgen_external_apis+=("k8s.io/apimachinery/pkg/apis/meta/v1")
-applyconfigurationgen_external_apis+=("$(qualify-gvs "github.com/onmetal/onmetal-api/api" "common:v1alpha1 compute:v1alpha1 ipam:v1alpha1 networking:v1alpha1 storage:v1alpha1")")
+applyconfigurationgen_external_apis+=("$(qualify-gvs "github.com/onmetal/onmetal-api/api" "$ALL_VERSION_GROUPS")")
 applyconfigurationgen_external_apis_csv=$(IFS=,; echo "${applyconfigurationgen_external_apis[*]}")
 "$APPLYCONFIGURATION_GEN" \
   --output-base "$GOPATH/src" \
@@ -101,7 +105,7 @@ echo "Generating ${blue}client${normal}"
 "$CLIENT_GEN" \
   --output-base "$GOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input "$(qualify-gvs "github.com/onmetal/onmetal-api/api" "compute:v1alpha1 ipam:v1alpha1 networking:v1alpha1 storage:v1alpha1")" \
+  --input "$(qualify-gvs "github.com/onmetal/onmetal-api/api" "$CLIENT_VERSION_GROUPS")" \
   --output-package "github.com/onmetal/onmetal-api/client-go" \
   --apply-configuration-package "github.com/onmetal/onmetal-api/client-go/applyconfigurations" \
   --clientset-name "onmetalapi" \
@@ -111,14 +115,14 @@ echo "Generating ${blue}lister${normal}"
 "$LISTER_GEN" \
   --output-base "$GOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gvs "github.com/onmetal/onmetal-api/api" "compute:v1alpha1 ipam:v1alpha1 networking:v1alpha1 storage:v1alpha1")" \
+  --input-dirs "$(qualify-gvs "github.com/onmetal/onmetal-api/api" "$CLIENT_VERSION_GROUPS")" \
   --output-package "github.com/onmetal/onmetal-api/client-go/listers"
 
 echo "Generating ${blue}informer${normal}"
 "$INFORMER_GEN" \
   --output-base "$GOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gvs "github.com/onmetal/onmetal-api/api" "compute:v1alpha1 ipam:v1alpha1 networking:v1alpha1 storage:v1alpha1")" \
+  --input-dirs "$(qualify-gvs "github.com/onmetal/onmetal-api/api" "$CLIENT_VERSION_GROUPS")" \
   --versioned-clientset-package "github.com/onmetal/onmetal-api/client-go/onmetalapi" \
   --listers-package "github.com/onmetal/onmetal-api/client-go/listers" \
   --output-package "github.com/onmetal/onmetal-api/client-go/informers" \
@@ -130,20 +134,20 @@ echo "Generating ${blue}deepcopy${normal}"
 "$DEEPCOPY_GEN" \
   --output-base "$GOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gs "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis" "compute ipam networking storage")" \
+  --input-dirs "$(qualify-gs "github.com/onmetal/onmetal-api/internal/apis" "$CLIENT_GROUPS")" \
   -O zz_generated.deepcopy
 
 echo "Generating ${blue}defaulter${normal}"
 "$DEFAULTER_GEN" \
   --output-base "$GOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gvs "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis" "compute:v1alpha1 ipam:v1alpha1 networking:v1alpha1 storage:v1alpha1")" \
+  --input-dirs "$(qualify-gvs "github.com/onmetal/onmetal-api/internal/apis" "$CLIENT_VERSION_GROUPS")" \
   -O zz_generated.defaults
 
 echo "Generating ${blue}conversion${normal}"
 "$CONVERSION_GEN" \
   --output-base "$GOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gs "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis" "compute ipam networking storage")" \
-  --input-dirs "$(qualify-gvs "github.com/onmetal/onmetal-api/onmetal-apiserver/internal/apis" "compute:v1alpha1 ipam:v1alpha1 networking:v1alpha1 storage:v1alpha1")" \
+  --input-dirs "$(qualify-gs "github.com/onmetal/onmetal-api/internal/apis" "$CLIENT_GROUPS")" \
+  --input-dirs "$(qualify-gvs "github.com/onmetal/onmetal-api/internal/apis" "$CLIENT_VERSION_GROUPS")" \
   -O zz_generated.conversion

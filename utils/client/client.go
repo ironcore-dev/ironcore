@@ -20,6 +20,7 @@ import (
 
 	"github.com/onmetal/onmetal-api/utils/annotations"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
 func PatchEnsureNoReconcileAnnotation(ctx context.Context, c client.Client, obj client.Object) (modified bool, err error) {
@@ -53,4 +54,18 @@ func PatchRemoveReconcileAnnotation(ctx context.Context, c client.Client, obj cl
 		return fmt.Errorf("error removing reconcile annotation: %w", err)
 	}
 	return nil
+}
+
+func ReconcileRequestsFromObjectSlice[S ~[]O, ObjPtr interface {
+	client.Object
+	*O
+}, O any](objs S) []reconcile.Request {
+	res := make([]reconcile.Request, len(objs))
+	for i := range objs {
+		obj := ObjPtr(&objs[i])
+		res[i] = reconcile.Request{
+			NamespacedName: client.ObjectKeyFromObject(obj),
+		}
+	}
+	return res
 }
