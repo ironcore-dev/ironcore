@@ -112,7 +112,7 @@ var _ = BeforeSuite(func() {
 	SetClient(k8sClient)
 
 	apiSrv, err := apiserver.New(cfg, apiserver.Options{
-		MainPath:     "github.com/onmetal/onmetal-api/onmetal-apiserver/cmd/apiserver",
+		MainPath:     "github.com/onmetal/onmetal-api/cmd/onmetal-apiserver",
 		BuildOptions: []buildutils.BuildOption{buildutils.ModModeMod},
 		ETCDServers:  []string{testEnv.ControlPlane.Etcd.URL.String()},
 		Host:         testEnvExt.APIServiceInstallOptions.LocalServingHost,
@@ -128,7 +128,7 @@ var _ = BeforeSuite(func() {
 
 	ctrlMgr, err := controllermanager.New(cfg, controllermanager.Options{
 		Args:         process.EmptyArgs().Set("controllers", "*"),
-		MainPath:     "github.com/onmetal/onmetal-api/onmetal-controller-manager",
+		MainPath:     "github.com/onmetal/onmetal-api/cmd/onmetal-controller-manager",
 		BuildOptions: []buildutils.BuildOption{buildutils.ModModeMod},
 		Host:         testEnvExt.GetAdditionalServiceHost(controllerManagerService),
 		Port:         testEnvExt.GetAdditionalServicePort(controllerManagerService),

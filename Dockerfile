@@ -13,9 +13,8 @@ RUN go mod download
 COPY api/ api/
 COPY broker/ broker/
 COPY client-go/ client-go/
+COPY cmd/ cmd/
 COPY internal/ internal/
-COPY onmetal-apiserver/ onmetal-apiserver/
-COPY onmetal-controller-manager/ onmetal-controller-manager/
 COPY ori/ ori/
 COPY orictl/ orictl/
 COPY poollet/ poollet/
@@ -30,13 +29,13 @@ FROM builder as apiserver-builder
 
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/onmetal-apiserver ./onmetal-apiserver/cmd/apiserver
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/onmetal-apiserver ./cmd/onmetal-apiserver
 
 FROM builder as manager-builder
 
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/onmetal-controller-manager ./onmetal-controller-manager/main.go
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/onmetal-controller-manager ./cmd/onmetal-controller-manager
 
 FROM builder as machinepoollet-builder
 

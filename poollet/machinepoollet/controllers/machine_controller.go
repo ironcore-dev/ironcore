@@ -26,7 +26,6 @@ import (
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	onmetalapiclientutils "github.com/onmetal/onmetal-api/onmetal-controller-manager/clientutils"
 	orimachine "github.com/onmetal/onmetal-api/ori/apis/machine"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
@@ -784,7 +783,7 @@ func (r *MachineReconciler) enqueueMachinesReferencingVolume(ctx context.Context
 			return nil
 		}
 
-		return onmetalapiclientutils.ReconcileRequestsFromObjectSlice(machineList.Items)
+		return onmetalapiclient.ReconcileRequestsFromObjectSlice(machineList.Items)
 	})
 }
 
@@ -803,7 +802,7 @@ func (r *MachineReconciler) enqueueMachinesReferencingSecret(ctx context.Context
 			return nil
 		}
 
-		return onmetalapiclientutils.ReconcileRequestsFromObjectSlice(machineList.Items)
+		return onmetalapiclient.ReconcileRequestsFromObjectSlice(machineList.Items)
 	})
 }
 
@@ -822,7 +821,7 @@ func (r *MachineReconciler) enqueueMachinesReferencingNetworkInterface(ctx conte
 			return nil
 		}
 
-		return onmetalapiclientutils.ReconcileRequestsFromObjectSlice(machineList.Items)
+		return onmetalapiclient.ReconcileRequestsFromObjectSlice(machineList.Items)
 	})
 }
 
