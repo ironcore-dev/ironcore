@@ -27,5 +27,6 @@ var (
 func init() {
 	replenishReconcilersBuilder.Register(
 		&storagev1alpha1.Volume{},
+		&storagev1alpha1.Bucket{},
 	)
 }

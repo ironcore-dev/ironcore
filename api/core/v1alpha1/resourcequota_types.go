@@ -41,6 +41,8 @@ const (
 	ResourceScopeMachineClass ResourceScope = "MachineClass"
 	// ResourceScopeVolumeClass refers to the volume class of a resource.
 	ResourceScopeVolumeClass ResourceScope = "VolumeClass"
+	// ResourceScopeBucketClass refers to the bucket class of a resource.
+	ResourceScopeBucketClass ResourceScope = "BucketClass"
 )
 
 // ResourceScopeSelectorOperator is an operator to compare a ResourceScope with values.
