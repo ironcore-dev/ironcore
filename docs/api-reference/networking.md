@@ -560,7 +560,7 @@ int32
 </td>
 <td>
 <p>PortsPerNetworkInterface defines the number of concurrent connections per target network interface.
-Has to be a power of 2. If empty, 64 is the default.</p>
+Has to be a power of 2. If empty, 2048 (DefaultPortsPerNetworkInterface) is the default.</p>
 </td>
 </tr>
 </table>
@@ -1642,7 +1642,7 @@ int32
 </td>
 <td>
 <p>PortsPerNetworkInterface defines the number of concurrent connections per target network interface.
-Has to be a power of 2. If empty, 64 is the default.</p>
+Has to be a power of 2. If empty, 2048 (DefaultPortsPerNetworkInterface) is the default.</p>
 </td>
 </tr>
 </tbody>
