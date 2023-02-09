@@ -3504,7 +3504,7 @@ func schema_onmetal_api_api_networking_v1alpha1_NATGatewaySpec(ref common.Refere
 					},
 					"portsPerNetworkInterface": {
 						SchemaProps: spec.SchemaProps{
-							Description: "PortsPerNetworkInterface defines the number of concurrent connections per target network interface. Has to be a power of 2. If empty, 64 is the default.",
+							Description: "PortsPerNetworkInterface defines the number of concurrent connections per target network interface. Has to be a power of 2. If empty, 2048 (DefaultPortsPerNetworkInterface) is the default.",
 							Type:        []string{"integer"},
 							Format:      "int32",
 						},

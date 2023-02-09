@@ -478,7 +478,7 @@ var _ = Describe("MachineController", func() {
 			g.Expect(oriNetworkInterface.Spec.Nats).To(ConsistOf(&ori.NATSpec{
 				Ip:      "10.0.0.1",
 				Port:    1024,
-				EndPort: 1087,
+				EndPort: 1024 + networkingv1alpha1.DefaultPortsPerNetworkInterface - 1,
 			}))
 		}).Should(Succeed())
 	})

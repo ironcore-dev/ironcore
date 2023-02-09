@@ -22,6 +22,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+const (
+	// DefaultPortsPerNetworkInterface is the default number of ports per network interface.
+	DefaultPortsPerNetworkInterface int32 = 2048
+)
+
 // NATGatewayType is a type of NATGateway.
 type NATGatewayType string
 
@@ -47,7 +52,7 @@ type NATGatewaySpec struct {
 	// for which this NATGateway should be applied
 	NetworkInterfaceSelector *metav1.LabelSelector `json:"networkInterfaceSelector,omitempty"`
 	// PortsPerNetworkInterface defines the number of concurrent connections per target network interface.
-	// Has to be a power of 2. If empty, 2048 is the default.
+	// Has to be a power of 2. If empty, 2048 (DefaultPortsPerNetworkInterface) is the default.
 	PortsPerNetworkInterface *int32 `json:"portsPerNetworkInterface,omitempty"`
 }
 
