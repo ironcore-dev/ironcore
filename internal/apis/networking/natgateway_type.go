@@ -44,7 +44,7 @@ type NATGatewaySpec struct {
 	// for which this NATGateway should be applied
 	NetworkInterfaceSelector *metav1.LabelSelector
 	// PortsPerNetworkInterface defines the number of concurrent connections per target network interface.
-	// Has to be a power of 2. If empty, 64 is the default.
+	// Has to be a power of 2. If empty, 2048 is the default.
 	PortsPerNetworkInterface *int32
 }
 

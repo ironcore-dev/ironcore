@@ -81,6 +81,6 @@ func SetDefaults_NetworkInterfaceStatus(status *v1alpha1.NetworkInterfaceStatus)
 
 func SetDefaults_NATGatewaySpec(spec *v1alpha1.NATGatewaySpec) {
 	if spec.PortsPerNetworkInterface == nil {
-		spec.PortsPerNetworkInterface = pointer.Int32(64)
+		spec.PortsPerNetworkInterface = pointer.Int32(2048)
 	}
 }
