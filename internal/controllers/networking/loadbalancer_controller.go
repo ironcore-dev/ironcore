@@ -21,7 +21,7 @@ import (
 	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	onmetalapiclient "github.com/onmetal/onmetal-api/internal/client"
+	"github.com/onmetal/onmetal-api/internal/client/networking"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -111,7 +111,7 @@ func (r *LoadBalancerReconciler) findDestinations(ctx context.Context, log logr.
 	if err := r.List(ctx, nicList,
 		client.InNamespace(loadBalancer.Namespace),
 		client.MatchingLabelsSelector{Selector: sel},
-		client.MatchingFields{onmetalapiclient.NetworkInterfaceNetworkNameField: loadBalancer.Spec.NetworkRef.Name},
+		client.MatchingFields{networking.NetworkInterfaceSpecNetworkRefNameField: loadBalancer.Spec.NetworkRef.Name},
 	); err != nil {
 		return nil, fmt.Errorf("error listing network interfaces: %w", err)
 	}
@@ -178,7 +178,7 @@ func (r *LoadBalancerReconciler) enqueueByLoadBalancerMatchingNetworkInterface(c
 		loadBalancerList := &networkingv1alpha1.LoadBalancerList{}
 		if err := r.List(ctx, loadBalancerList,
 			client.InNamespace(nic.Namespace),
-			client.MatchingFields{onmetalapiclient.LoadBalancerNetworkNameField: nic.Spec.NetworkRef.Name},
+			client.MatchingFields{networking.LoadBalancerNetworkNameField: nic.Spec.NetworkRef.Name},
 		); err != nil {
 			log.Error(err, "Error listing loadbalancers for network")
 			return nil

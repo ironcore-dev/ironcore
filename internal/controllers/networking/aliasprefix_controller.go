@@ -22,7 +22,7 @@ import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	onmetalapiclient "github.com/onmetal/onmetal-api/internal/client"
+	"github.com/onmetal/onmetal-api/internal/client/networking"
 	"github.com/onmetal/onmetal-api/internal/controllers/networking/events"
 	clientutils "github.com/onmetal/onmetal-api/utils/client"
 	corev1 "k8s.io/api/core/v1"
@@ -46,6 +46,7 @@ type AliasPrefixReconciler struct {
 	Scheme *runtime.Scheme
 }
 
+//+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=aliasprefixes,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=aliasprefixes/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=aliasprefixes/finalizers,verbs=update
@@ -193,7 +194,7 @@ func (r *AliasPrefixReconciler) findDestinations(ctx context.Context, log logr.L
 	if err := r.List(ctx, nicList,
 		client.InNamespace(aliasPrefix.Namespace),
 		client.MatchingLabelsSelector{Selector: sel},
-		client.MatchingFields{onmetalapiclient.NetworkInterfaceNetworkNameField: network.Name},
+		client.MatchingFields{networking.NetworkInterfaceSpecNetworkRefNameField: network.Name},
 	); err != nil {
 		return nil, fmt.Errorf("error listing network interfaces: %w", err)
 	}
@@ -256,7 +257,7 @@ func (r *AliasPrefixReconciler) enqueueByNetworkInterface(ctx context.Context, l
 		aliasPrefixList := &networkingv1alpha1.AliasPrefixList{}
 		if err := r.List(ctx, aliasPrefixList,
 			client.InNamespace(nic.Namespace),
-			client.MatchingFields{onmetalapiclient.AliasPrefixNetworkNameField: nic.Spec.NetworkRef.Name},
+			client.MatchingFields{networking.AliasPrefixNetworkNameField: nic.Spec.NetworkRef.Name},
 		); err != nil {
 			log.Error(err, "Error listing alias prefixes for network")
 			return nil
@@ -293,7 +294,7 @@ func (r *AliasPrefixReconciler) enqueueByNetwork(ctx context.Context, log logr.L
 		aliasPrefixList := &networkingv1alpha1.AliasPrefixList{}
 		if err := r.List(ctx, aliasPrefixList,
 			client.InNamespace(network.Namespace),
-			client.MatchingFields{onmetalapiclient.AliasPrefixNetworkNameField: network.Name},
+			client.MatchingFields{networking.AliasPrefixNetworkNameField: network.Name},
 		); err != nil {
 			log.Error(err, "Error listing alias prefixes for network")
 			return nil

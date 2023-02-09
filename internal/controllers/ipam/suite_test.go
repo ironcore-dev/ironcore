@@ -22,7 +22,7 @@ import (
 	"time"
 
 	"github.com/onmetal/controller-utils/buildutils"
-	onmetalapiclient "github.com/onmetal/onmetal-api/internal/client"
+	ipamclient "github.com/onmetal/onmetal-api/internal/client/ipam"
 	utilsenvtest "github.com/onmetal/onmetal-api/utils/envtest"
 	"github.com/onmetal/onmetal-api/utils/envtest/apiserver"
 	. "github.com/onsi/ginkgo/v2"
@@ -110,8 +110,10 @@ var _ = BeforeSuite(func() {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	DeferCleanup(cancel)
-	Expect(onmetalapiclient.SetupPrefixSpecIPFamilyFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
-	Expect(onmetalapiclient.SetupPrefixAllocationSpecIPFamilyFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+	Expect(ipamclient.SetupPrefixSpecIPFamilyFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+	Expect(ipamclient.SetupPrefixSpecParentRefFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+	Expect(ipamclient.SetupPrefixAllocationSpecIPFamilyFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+	Expect(ipamclient.SetupPrefixAllocationSpecPrefixRefNameField(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 
 	// Register reconcilers
 	err = (&PrefixReconciler{

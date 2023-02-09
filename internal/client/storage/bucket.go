@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package client
+package storage
 
 import (
 	"context"
@@ -22,28 +22,28 @@ import (
 )
 
 const (
-	VolumeSpecVolumeClassRefNameField = storagev1alpha1.VolumeVolumeClassRefNameField
 	BucketSpecBucketClassRefNameField = storagev1alpha1.BucketBucketClassRefNameField
+	BucketSpecBucketPoolRefNameField  = storagev1alpha1.BucketBucketPoolRefNameField
 )
-
-func SetupVolumeSpecVolumeClassRefNameFieldIndexer(ctx context.Context, indexer client.FieldIndexer) error {
-	return indexer.IndexField(ctx, &storagev1alpha1.Volume{}, VolumeSpecVolumeClassRefNameField, func(obj client.Object) []string {
-		volume := obj.(*storagev1alpha1.Volume)
-		volumeClassRef := volume.Spec.VolumeClassRef
-		if volumeClassRef == nil {
-			return nil
-		}
-		return []string{volumeClassRef.Name}
-	})
-}
 
 func SetupBucketSpecBucketClassRefNameFieldIndexer(ctx context.Context, indexer client.FieldIndexer) error {
 	return indexer.IndexField(ctx, &storagev1alpha1.Bucket{}, BucketSpecBucketClassRefNameField, func(obj client.Object) []string {
 		bucket := obj.(*storagev1alpha1.Bucket)
 		bucketClassRef := bucket.Spec.BucketClassRef
 		if bucketClassRef == nil {
-			return nil
+			return []string{""}
 		}
 		return []string{bucketClassRef.Name}
+	})
+}
+
+func SetupBucketSpecBucketPoolRefNameFieldIndexer(ctx context.Context, indexer client.FieldIndexer) error {
+	return indexer.IndexField(ctx, &storagev1alpha1.Bucket{}, BucketSpecBucketPoolRefNameField, func(obj client.Object) []string {
+		bucket := obj.(*storagev1alpha1.Bucket)
+		bucketPoolRef := bucket.Spec.BucketPoolRef
+		if bucketPoolRef == nil {
+			return []string{""}
+		}
+		return []string{bucketPoolRef.Name}
 	})
 }

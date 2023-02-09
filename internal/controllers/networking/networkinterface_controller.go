@@ -25,7 +25,7 @@ import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	onmetalapiclient "github.com/onmetal/onmetal-api/internal/client"
+	networkingclient "github.com/onmetal/onmetal-api/internal/client/networking"
 	"github.com/onmetal/onmetal-api/internal/controllers/networking/events"
 	client2 "github.com/onmetal/onmetal-api/utils/client"
 	corev1 "k8s.io/api/core/v1"
@@ -45,6 +45,7 @@ type NetworkInterfaceReconciler struct {
 	Scheme *runtime.Scheme
 }
 
+//+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networks,verbs=get;list;watch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces,verbs=get;list;watch;update;patch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces/status,verbs=get;update;patch
@@ -309,7 +310,7 @@ func (r *NetworkInterfaceReconciler) enqueueByNetworkInterfaceVirtualIPReference
 		nicList := &networkingv1alpha1.NetworkInterfaceList{}
 		if err := r.List(ctx, nicList,
 			client.InNamespace(vip.Namespace),
-			client.MatchingFields{onmetalapiclient.NetworkInterfaceVirtualIPNamesField: vip.Name},
+			client.MatchingFields{networkingclient.NetworkInterfaceVirtualIPNamesField: vip.Name},
 		); err != nil {
 			log.Error(err, "Error listing network interfaces using virtual ip")
 			return nil
@@ -331,7 +332,7 @@ func (r *NetworkInterfaceReconciler) enqueueByNetworkInterfaceNetworkReferences(
 		nicList := &networkingv1alpha1.NetworkInterfaceList{}
 		if err := r.List(ctx, nicList,
 			client.InNamespace(network.Namespace),
-			client.MatchingFields{onmetalapiclient.NetworkInterfaceNetworkNameField: network.Name},
+			client.MatchingFields{networkingclient.NetworkInterfaceSpecNetworkRefNameField: network.Name},
 		); err != nil {
 			log.Error(err, "Error listing network interface using network")
 			return nil

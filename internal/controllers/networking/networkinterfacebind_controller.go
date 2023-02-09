@@ -24,7 +24,8 @@ import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	onmetalapiclient "github.com/onmetal/onmetal-api/internal/client"
+	"github.com/onmetal/onmetal-api/internal/client/compute"
+	networkingclient "github.com/onmetal/onmetal-api/internal/client/networking"
 	"github.com/onmetal/onmetal-api/internal/controllers/networking/events"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -45,6 +46,7 @@ type NetworkInterfaceBindReconciler struct {
 	BindTimeout time.Duration
 }
 
+//+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces/finalizers,verbs=update
@@ -185,7 +187,7 @@ func (r *NetworkInterfaceBindReconciler) getRequestingMachine(ctx context.Contex
 	if err := r.List(ctx, machineList,
 		client.InNamespace(nic.Namespace),
 		client.MatchingFields{
-			onmetalapiclient.MachineSpecNetworkInterfaceNamesField: nic.Name,
+			compute.MachineSpecNetworkInterfaceNamesField: nic.Name,
 		},
 	); err != nil {
 		return nil, fmt.Errorf("error listing matching machines: %w", err)
@@ -261,24 +263,9 @@ func (r *NetworkInterfaceBindReconciler) patchStatus(
 	return nil
 }
 
-const networkInterfaceSpecMachineRefNameField = ".spec.machineRef.name"
-
 func (r *NetworkInterfaceBindReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	ctx := context.Background()
 	log := ctrl.Log.WithName("networkinterfacebind").WithName("setup")
-
-	if err := mgr.GetFieldIndexer().IndexField(ctx, &networkingv1alpha1.NetworkInterface{}, networkInterfaceSpecMachineRefNameField, func(obj client.Object) []string {
-		nic := obj.(*networkingv1alpha1.NetworkInterface)
-
-		machineRef := nic.Spec.MachineRef
-		if machineRef == nil {
-			return []string{""}
-		}
-
-		return []string{machineRef.Name}
-	}); err != nil {
-		return err
-	}
 
 	return ctrl.NewControllerManagedBy(mgr).
 		Named("networkinterfacebind").
@@ -315,7 +302,7 @@ func (r *NetworkInterfaceBindReconciler) enqueueByMachineNameEqualNetworkInterfa
 		if err := r.List(ctx, nicList,
 			client.InNamespace(machine.Namespace),
 			client.MatchingFields{
-				networkInterfaceSpecMachineRefNameField: machine.Name,
+				networkingclient.NetworkInterfaceSpecMachineRefNameField: machine.Name,
 			},
 		); err != nil {
 			log.Error(err, "Error listing network interfaces targeting machine")

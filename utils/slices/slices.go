@@ -15,7 +15,7 @@
 package slices
 
 import (
-	"github.com/onmetal/controller-utils/set"
+	"k8s.io/apimachinery/pkg/util/sets"
 )
 
 func Map[S ~[]E, E, F any](s S, f func(e E) F) []F {
@@ -53,8 +53,8 @@ func Filter[S ~[]E, E any](s S, f func(e E) bool) []E {
 	return res
 }
 
-func ToSetFunc[S ~[]V, K comparable, V any](s S, f func(v V) K) set.Set[K] {
-	res := set.New[K]()
+func ToSetFunc[S ~[]V, K comparable, V any](s S, f func(v V) K) sets.Set[K] {
+	res := sets.New[K]()
 	for _, v := range s {
 		res.Insert(f(v))
 	}

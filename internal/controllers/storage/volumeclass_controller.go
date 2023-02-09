@@ -23,6 +23,7 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/clientutils"
+	storageclient "github.com/onmetal/onmetal-api/internal/client/storage"
 	"github.com/onmetal/onmetal-api/utils/slices"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/util/workqueue"
@@ -66,7 +67,7 @@ func (r *VolumeClassReconciler) listReferencingVolumesWithReader(
 	volumeList := &storagev1alpha1.VolumeList{}
 	if err := rd.List(ctx, volumeList,
 		client.InNamespace(volumeClass.Namespace),
-		client.MatchingFields{storagev1alpha1.VolumeVolumeClassRefNameField: volumeClass.Name},
+		client.MatchingFields{storageclient.VolumeSpecVolumeClassRefNameField: volumeClass.Name},
 	); err != nil {
 		return nil, fmt.Errorf("error listing the volumes using the volume class: %w", err)
 	}

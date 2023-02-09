@@ -24,6 +24,7 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/clientutils"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	computeclient "github.com/onmetal/onmetal-api/internal/client/compute"
 	"github.com/onmetal/onmetal-api/utils/slices"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/util/workqueue"
@@ -65,7 +66,7 @@ func (r *MachineClassReconciler) listReferencingMachinesWithReader(
 	machineList := &computev1alpha1.MachineList{}
 	if err := rd.List(ctx, machineList,
 		client.InNamespace(machineClass.Namespace),
-		client.MatchingFields{computev1alpha1.MachineMachineClassRefNameField: machineClass.Name},
+		client.MatchingFields{computeclient.MachineSpecMachineClassRefNameField: machineClass.Name},
 	); err != nil {
 		return nil, fmt.Errorf("error listing the machines using the machine class: %w", err)
 	}

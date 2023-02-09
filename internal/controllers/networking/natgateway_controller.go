@@ -20,16 +20,16 @@ import (
 	"math"
 
 	"github.com/go-logr/logr"
-	"github.com/onmetal/controller-utils/set"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	onmetalapiclient "github.com/onmetal/onmetal-api/internal/client"
+	"github.com/onmetal/onmetal-api/internal/client/networking"
 	"github.com/onmetal/onmetal-api/internal/controllers/networking/events"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/utils/pointer"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -53,6 +53,7 @@ type NatGatewayReconciler struct {
 	Scheme *runtime.Scheme
 }
 
+//+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=natgateways,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=natgateways/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=natgateways/finalizers,verbs=update
@@ -80,7 +81,12 @@ func (r *NatGatewayReconciler) delete(ctx context.Context, log logr.Logger, natG
 	return ctrl.Result{}, nil
 }
 
-func (r *NatGatewayReconciler) findNextFreeSlot(natGateway *networkingv1alpha1.NATGateway, currentIp, currentPort, portsPerNetworkInterface int32, slotsPerIP int, used set.Set[networkingv1alpha1.NATGatewayDestinationIP]) (*networkingv1alpha1.NATGatewayDestinationIP, int32, int32) {
+func (r *NatGatewayReconciler) findNextFreeSlot(
+	natGateway *networkingv1alpha1.NATGateway,
+	currentIp, currentPort, portsPerNetworkInterface int32,
+	slotsPerIP int,
+	used sets.Set[networkingv1alpha1.NATGatewayDestinationIP],
+) (*networkingv1alpha1.NATGatewayDestinationIP, int32, int32) {
 	for {
 		if int(currentIp) >= len(natGateway.Status.IPs) {
 			return nil, currentIp, currentPort
@@ -114,7 +120,7 @@ func (r *NatGatewayReconciler) assignPorts(ctx context.Context, log logr.Logger,
 	}
 
 	var (
-		used                         = set.Set[networkingv1alpha1.NATGatewayDestinationIP]{}
+		used                         = sets.Set[networkingv1alpha1.NATGatewayDestinationIP]{}
 		currentIp, currentPort int32 = 0, 0
 		newDestinations        []networkingv1alpha1.NATGatewayDestination
 		candidate              *networkingv1alpha1.NATGatewayDestinationIP
@@ -219,7 +225,7 @@ func (r *NatGatewayReconciler) findDestinations(ctx context.Context, log logr.Lo
 	if err := r.List(ctx, nicList,
 		client.InNamespace(natGateway.Namespace),
 		client.MatchingLabelsSelector{Selector: sel},
-		client.MatchingFields{onmetalapiclient.NetworkInterfaceNetworkNameField: natGateway.Spec.NetworkRef.Name},
+		client.MatchingFields{networking.NetworkInterfaceSpecNetworkRefNameField: natGateway.Spec.NetworkRef.Name},
 	); err != nil {
 		return nil, fmt.Errorf("error listing network interfaces: %w", err)
 	}
@@ -288,7 +294,7 @@ func (r *NatGatewayReconciler) enqueueByNatGatewayMatchingNetworkInterface(ctx c
 		natGatewayList := &networkingv1alpha1.NATGatewayList{}
 		if err := r.List(ctx, natGatewayList,
 			client.InNamespace(nic.Namespace),
-			client.MatchingFields{onmetalapiclient.NATGatewayNetworkNameField: nic.Spec.NetworkRef.Name},
+			client.MatchingFields{networking.NATGatewayNetworkNameField: nic.Spec.NetworkRef.Name},
 		); err != nil {
 			log.Error(err, "Error listing natgateways for network")
 			return nil

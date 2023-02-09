@@ -22,11 +22,11 @@ import (
 	"unicode/utf8"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/onmetal/controller-utils/set"
 	"github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	"github.com/onmetal/onmetal-api/utils/equality"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/api/validation"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
@@ -84,7 +84,7 @@ func ValidateImmutableFieldWithDiff(newVal, oldVal interface{}, fldPath *field.P
 	return allErrs
 }
 
-func ValidateEnum[E comparable](allowed set.Set[E], value E, fldPath *field.Path, requiredDetail string) field.ErrorList {
+func ValidateEnum[E comparable](allowed sets.Set[E], value E, fldPath *field.Path, requiredDetail string) field.ErrorList {
 	var allErrs field.ErrorList
 	var zero E
 	if value == zero && !allowed.Has(zero) {
@@ -103,7 +103,7 @@ func ValidateEnum[E comparable](allowed set.Set[E], value E, fldPath *field.Path
 
 // ValidateFieldAllowList checks that only allowed fields are set.
 // The value must be a struct (not a pointer to a struct!).
-func ValidateFieldAllowList(value interface{}, allowedFields set.Set[string], errorText string, fldPath *field.Path) field.ErrorList {
+func ValidateFieldAllowList(value interface{}, allowedFields sets.Set[string], errorText string, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
 	reflectType, reflectValue := reflect.TypeOf(value), reflect.ValueOf(value)

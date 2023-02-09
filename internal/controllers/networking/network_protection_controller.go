@@ -24,7 +24,7 @@ import (
 	"github.com/onmetal/controller-utils/clientutils"
 	"github.com/onmetal/controller-utils/metautils"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	onmetalapiclient "github.com/onmetal/onmetal-api/internal/client"
+	"github.com/onmetal/onmetal-api/internal/client/networking"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -108,7 +108,7 @@ func (r *NetworkProtectionReconciler) isNetworkInUseByType(
 		return false, fmt.Errorf("error getting gvk for object: %w", err)
 	}
 
-	list, err := metautils.NewListForObject(r.Scheme, obj)
+	_, list, err := metautils.NewListForObject(r.Scheme, obj)
 	if err != nil {
 		return false, fmt.Errorf("error creating list for object: %w", err)
 	}
@@ -146,19 +146,19 @@ func (r *NetworkProtectionReconciler) isNetworkInUse(ctx context.Context, log lo
 	}{
 		{
 			Type:  &networkingv1alpha1.NetworkInterface{},
-			Field: onmetalapiclient.NetworkInterfaceNetworkNameField,
+			Field: networking.NetworkInterfaceSpecNetworkRefNameField,
 		},
 		{
 			Type:  &networkingv1alpha1.AliasPrefix{},
-			Field: onmetalapiclient.AliasPrefixNetworkNameField,
+			Field: networking.AliasPrefixNetworkNameField,
 		},
 		{
 			Type:  &networkingv1alpha1.LoadBalancer{},
-			Field: onmetalapiclient.LoadBalancerNetworkNameField,
+			Field: networking.LoadBalancerNetworkNameField,
 		},
 		{
 			Type:  &networkingv1alpha1.NATGateway{},
-			Field: onmetalapiclient.NATGatewayNetworkNameField,
+			Field: networking.NATGatewayNetworkNameField,
 		},
 	}
 

@@ -20,6 +20,7 @@ import (
 	"math/rand"
 
 	"github.com/go-logr/logr"
+	storageclient "github.com/onmetal/onmetal-api/internal/client/storage"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -36,16 +37,12 @@ import (
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 )
 
-const (
-	bucketPoolStatusAvailableBucketClassesNameField = ".status.availableBucketClasses[*].name"
-	bucketSpecBucketPoolNameField                   = ".spec.bucketPool.name"
-)
-
 type BucketScheduler struct {
 	record.EventRecorder
 	client.Client
 }
 
+//+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 //+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=buckets,verbs=get;list;watch;update;patch
 //+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=buckets/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=bucketpools,verbs=get;list;watch
@@ -74,7 +71,7 @@ func (s *BucketScheduler) schedule(ctx context.Context, log logr.Logger, bucket 
 	log.Info("Scheduling bucket")
 	list := &storagev1alpha1.BucketPoolList{}
 	if err := s.List(ctx, list,
-		client.MatchingFields{bucketPoolStatusAvailableBucketClassesNameField: bucket.Spec.BucketClassRef.Name},
+		client.MatchingFields{storageclient.BucketPoolAvailableBucketClassesField: bucket.Spec.BucketClassRef.Name},
 		client.MatchingLabels(bucket.Spec.BucketPoolSelector),
 	); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error listing bucket pools: %w", err)
@@ -127,28 +124,6 @@ func (s *BucketScheduler) SetupWithManager(mgr manager.Manager) error {
 	log := ctrl.Log.WithName("bucket-scheduler").WithName("setup")
 	ctx = ctrl.LoggerInto(ctx, log)
 
-	if err := mgr.GetFieldIndexer().IndexField(ctx, &storagev1alpha1.BucketPool{}, bucketPoolStatusAvailableBucketClassesNameField, func(obj client.Object) []string {
-		pool := obj.(*storagev1alpha1.BucketPool)
-		names := make([]string, 0, len(pool.Status.AvailableBucketClasses))
-		for _, availableBucketClass := range pool.Status.AvailableBucketClasses {
-			names = append(names, availableBucketClass.Name)
-		}
-		return names
-	}); err != nil {
-		return err
-	}
-
-	if err := mgr.GetFieldIndexer().IndexField(ctx, &storagev1alpha1.Bucket{}, bucketSpecBucketPoolNameField, func(obj client.Object) []string {
-		bucket := obj.(*storagev1alpha1.Bucket)
-		bucketPoolRef := bucket.Spec.BucketPoolRef
-		if bucketPoolRef == nil {
-			return []string{""}
-		}
-		return []string{bucketPoolRef.Name}
-	}); err != nil {
-		return err
-	}
-
 	// Only schedule buckets that are not deleting, have no bucket pool and no bucket class set
 	filterBucket := func(bucket *storagev1alpha1.Bucket) bool {
 		return bucket.DeletionTimestamp.IsZero() &&
@@ -173,7 +148,7 @@ func (s *BucketScheduler) SetupWithManager(mgr manager.Manager) error {
 				}
 
 				list := &storagev1alpha1.BucketList{}
-				if err := s.List(ctx, list, client.MatchingFields{bucketSpecBucketPoolNameField: ""}); err != nil {
+				if err := s.List(ctx, list, client.MatchingFields{storageclient.BucketSpecBucketPoolRefNameField: ""}); err != nil {
 					log.Error(err, "error listing unscheduled buckets")
 					return nil
 				}

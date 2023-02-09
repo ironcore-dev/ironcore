@@ -15,13 +15,12 @@
 package apivalidation
 
 import (
-	"github.com/onmetal/controller-utils/set"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
-var supportedIPFamilies = set.New(
+var supportedIPFamilies = sets.New(
 	corev1.IPv4Protocol,
 	corev1.IPv6Protocol,
 )
@@ -55,7 +54,7 @@ func ValidateIPFamilies(ipFamilies []corev1.IPFamily, fldPath *field.Path) field
 	return allErrs
 }
 
-var supportedProtocols = set.New(
+var supportedProtocols = sets.New(
 	corev1.ProtocolTCP,
 	corev1.ProtocolUDP,
 	corev1.ProtocolSCTP,

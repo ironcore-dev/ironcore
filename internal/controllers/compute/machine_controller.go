@@ -24,18 +24,18 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/metautils"
-	"github.com/onmetal/controller-utils/set"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	onmetalapiclient "github.com/onmetal/onmetal-api/internal/client"
+	"github.com/onmetal/onmetal-api/internal/client/compute"
 	"github.com/onmetal/onmetal-api/internal/controllers/compute/events"
 	client2 "github.com/onmetal/onmetal-api/utils/client"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -54,6 +54,7 @@ type MachineReconciler struct {
 	Scheme *runtime.Scheme
 }
 
+//+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 //+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machines,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machines/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machines/finalizers,verbs=update
@@ -169,7 +170,7 @@ func (r *MachineReconciler) pruneEphemeralNetworkInterfaces(ctx context.Context,
 	}
 
 	var (
-		activeNames = set.New(computev1alpha1.MachineNetworkInterfaceNames(machine)...)
+		activeNames = sets.New(computev1alpha1.MachineNetworkInterfaceNames(machine)...)
 		errs        []error
 	)
 
@@ -252,7 +253,7 @@ func (r *MachineReconciler) pruneEphemeralVolumes(ctx context.Context, machine *
 	}
 
 	var (
-		activeNames = set.New(computev1alpha1.MachineVolumeNames(machine)...)
+		activeNames = sets.New(computev1alpha1.MachineVolumeNames(machine)...)
 		errs        []error
 	)
 
@@ -440,7 +441,7 @@ func (r *MachineReconciler) enqueueByMachineNetworkInterfaceReferences(ctx conte
 		if err := r.List(ctx, machineList,
 			client.InNamespace(nic.Namespace),
 			client.MatchingFields{
-				onmetalapiclient.MachineSpecNetworkInterfaceNamesField: nic.Name,
+				compute.MachineSpecNetworkInterfaceNamesField: nic.Name,
 			},
 		); err != nil {
 			log.Error(err, "Error listing machines using network interface")
@@ -464,7 +465,7 @@ func (r *MachineReconciler) enqueueByMachineVolumeReferences(ctx context.Context
 		if err := r.List(ctx, machineList,
 			client.InNamespace(volume.Namespace),
 			client.MatchingFields{
-				onmetalapiclient.MachineSpecVolumeNamesField: volume.Name,
+				compute.MachineSpecVolumeNamesField: volume.Name,
 			},
 		); err != nil {
 			log.Error(err, "Error listing machines using volume")

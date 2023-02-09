@@ -26,8 +26,8 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/gogo/protobuf/proto"
-	"github.com/onmetal/controller-utils/set"
 	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apiserver/pkg/server/healthz"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
@@ -117,7 +117,7 @@ type generator[O orimeta.Object] struct {
 
 	eventChannel chan *event[O]
 
-	handlers set.Set[*handler[O]]
+	handlers sets.Set[*handler[O]]
 
 	// relistPeriod is the period for relisting.
 	relistPeriod time.Duration
@@ -162,7 +162,7 @@ func NewGenerator[O orimeta.Object](list func(ctx context.Context) ([]O, error),
 		firstListTime:   time.Time{},
 		items:           make(oldNewMap[O]),
 		list:            list,
-		handlers:        set.New[*handler[O]](),
+		handlers:        sets.New[*handler[O]](),
 	}
 }
 
@@ -191,7 +191,7 @@ func (g *generator[O]) Check(_ *http.Request) error {
 func (g *generator[O]) readHandlers() []*handler[O] {
 	g.mu.RLock()
 	defer g.mu.RUnlock()
-	return g.handlers.Slice()
+	return g.handlers.UnsortedList()
 }
 
 func (g *generator[O]) Start(ctx context.Context) error {
