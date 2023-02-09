@@ -20,7 +20,6 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/gogo/protobuf/proto"
-	"github.com/onmetal/controller-utils/set"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
@@ -35,6 +34,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -281,7 +281,7 @@ func (r *MachineReconciler) prepareORIVolumeAttachments(
 		oriVolumeAttachments []*ori.VolumeAttachment
 		ok                   = true
 		errs                 []error
-		usedIDs              = set.New[string]()
+		usedIDs              = sets.New[string]()
 	)
 
 	for _, volume := range machine.Spec.Volumes {
@@ -459,7 +459,7 @@ func (r *MachineReconciler) updateORIVolumes(ctx context.Context, log logr.Logge
 		findVolume              = r.machineVolumeFinder(machine.Spec.Volumes)
 		findORIVolume           = r.oriVolumeFinder(oriVolumes)
 		findORIVolumeAttachment = r.oriVolumeAttachmentFinder(oriMachine.Spec.Volumes)
-		usedORIVolumeIDs        = set.New[string]()
+		usedORIVolumeIDs        = sets.New[string]()
 	)
 
 	for _, oriVolume := range oriMachine.Spec.Volumes {
@@ -513,7 +513,7 @@ func (r *MachineReconciler) updateORIVolumes(ctx context.Context, log logr.Logge
 }
 
 func (r *MachineReconciler) updateVolumeStates(machine *computev1alpha1.Machine, oriMachine *ori.Machine, now metav1.Time) error {
-	seenNames := set.New[string]()
+	seenNames := sets.New[string]()
 	for _, oriVolumeAttachmentStatus := range oriMachine.Status.Volumes {
 		seenNames.Insert(oriVolumeAttachmentStatus.Name)
 		newVolumeStatus, err := r.convertORIVolumeAttachmentStatus(oriVolumeAttachmentStatus)

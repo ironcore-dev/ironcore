@@ -18,7 +18,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/onmetal/controller-utils/set"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	"github.com/onmetal/onmetal-api/broker/common/cleaner"
@@ -31,6 +30,7 @@ import (
 	"golang.org/x/exp/slices"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/sets"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -277,7 +277,7 @@ func (m *AliasPrefixes) Delete(
 type AliasPrefix struct {
 	NetworkHandle string
 	Prefix        commonv1alpha1.IPPrefix
-	Destinations  set.Set[string]
+	Destinations  sets.Set[string]
 }
 
 func (m *AliasPrefixes) listAliasPrefixes(ctx context.Context, dependent string) ([]networkingv1alpha1.AliasPrefix, error) {

@@ -18,10 +18,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/onmetal/controller-utils/set"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/bucket/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -46,8 +46,8 @@ func (s *Server) getTargetOnmetalBucketPools(ctx context.Context) ([]storagev1al
 	return bucketPoolList.Items, nil
 }
 
-func (s *Server) gatherAvailableBucketClassNames(onmetalBucketPools []storagev1alpha1.BucketPool) set.Set[string] {
-	res := set.New[string]()
+func (s *Server) gatherAvailableBucketClassNames(onmetalBucketPools []storagev1alpha1.BucketPool) sets.Set[string] {
+	res := sets.New[string]()
 	for _, onmetalBucketPool := range onmetalBucketPools {
 		for _, availableBucketClass := range onmetalBucketPool.Status.AvailableBucketClasses {
 			res.Insert(availableBucketClass.Name)
@@ -57,7 +57,7 @@ func (s *Server) gatherAvailableBucketClassNames(onmetalBucketPools []storagev1a
 }
 
 func (s *Server) filterOnmetalBucketClasses(
-	availableBucketClassNames set.Set[string],
+	availableBucketClassNames sets.Set[string],
 	bucketClasses []storagev1alpha1.BucketClass,
 ) []storagev1alpha1.BucketClass {
 	var filtered []storagev1alpha1.BucketClass

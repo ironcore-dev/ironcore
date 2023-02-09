@@ -19,12 +19,12 @@ package validation
 import (
 	"fmt"
 
-	"github.com/onmetal/controller-utils/set"
 	onmetalapivalidation "github.com/onmetal/onmetal-api/internal/api/validation"
 	"github.com/onmetal/onmetal-api/internal/apis/networking"
 	corev1 "k8s.io/api/core/v1"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1validation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
@@ -92,7 +92,7 @@ func portRangesOverlap(x, y [2]int32) bool {
 	return x[0] <= y[1] && y[0] <= x[1]
 }
 
-var supportedLoadBalancerTypes = set.New(
+var supportedLoadBalancerTypes = sets.New(
 	networking.LoadBalancerTypePublic,
 )
 

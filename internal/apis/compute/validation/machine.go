@@ -19,7 +19,6 @@ package validation
 import (
 	"fmt"
 
-	"github.com/onmetal/controller-utils/set"
 	"github.com/onmetal/onmetal-api/internal/admission/plugin/machinevolumedevices/device"
 	onmetalapivalidation "github.com/onmetal/onmetal-api/internal/api/validation"
 	"github.com/onmetal/onmetal-api/internal/apis/compute"
@@ -53,7 +52,7 @@ func ValidateMachineUpdate(newMachine, oldMachine *compute.Machine) field.ErrorL
 	return allErrs
 }
 
-var supportedMachinePowers = set.New(
+var supportedMachinePowers = sets.New(
 	compute.PowerOn,
 	compute.PowerOff,
 )

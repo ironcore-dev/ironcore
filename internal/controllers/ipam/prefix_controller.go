@@ -28,7 +28,7 @@ import (
 	"github.com/onmetal/controller-utils/clientutils"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
-	onmetalapiclient "github.com/onmetal/onmetal-api/internal/client"
+	ipamclient "github.com/onmetal/onmetal-api/internal/client/ipam"
 	"github.com/onmetal/onmetal-api/utils/equality"
 	"go4.org/netipx"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -475,7 +475,7 @@ func (r *PrefixReconciler) processAllocations(ctx context.Context, log logr.Logg
 	log.V(1).Info("Listing referencing allocations")
 	if err := r.List(ctx, list,
 		client.InNamespace(prefix.Namespace),
-		client.MatchingFields{prefixAllocationSpecPrefixRefNameField: prefix.Name},
+		client.MatchingFields{ipamclient.PrefixAllocationSpecPrefixRefNameField: prefix.Name},
 	); err != nil {
 		return nil, fmt.Errorf("error listing allocations: %w", err)
 	}
@@ -606,39 +606,12 @@ func (r *PrefixReconciler) reconcile(ctx context.Context, log logr.Logger, prefi
 	return ctrl.Result{}, nil
 }
 
-const (
-	prefixAllocationSpecPrefixRefNameField = "spec.prefixRef.name"
-	prefixSpecParentRefNameField           = "spec.parentRef.name"
-)
-
 // SetupWithManager sets up the controller with the Manager.
 func (r *PrefixReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	ctx := context.Background()
 	log := ctrl.Log.WithName("prefix").WithName("setup")
 
 	r.allocationLimiter = workqueue.NewItemExponentialFailureRateLimiter(5*time.Millisecond, 1000*time.Second)
-
-	if err := mgr.GetFieldIndexer().IndexField(ctx, &ipamv1alpha1.PrefixAllocation{}, prefixAllocationSpecPrefixRefNameField, func(obj client.Object) []string {
-		allocation := obj.(*ipamv1alpha1.PrefixAllocation)
-		prefixRef := allocation.Spec.PrefixRef
-		if prefixRef == nil {
-			return nil
-		}
-		return []string{prefixRef.Name}
-	}); err != nil {
-		return err
-	}
-
-	if err := mgr.GetFieldIndexer().IndexField(ctx, &ipamv1alpha1.Prefix{}, prefixSpecParentRefNameField, func(obj client.Object) []string {
-		prefix := obj.(*ipamv1alpha1.Prefix)
-		parentRef := prefix.Spec.ParentRef
-		if parentRef == nil {
-			return nil
-		}
-		return []string{parentRef.Name}
-	}); err != nil {
-		return err
-	}
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&ipamv1alpha1.Prefix{}).
@@ -686,7 +659,7 @@ func (r *PrefixReconciler) enqueueByPrefixParentSelector(ctx context.Context, lo
 		list := &ipamv1alpha1.PrefixList{}
 		if err := r.List(ctx, list,
 			client.InNamespace(prefix.Namespace),
-			client.MatchingFields{onmetalapiclient.PrefixSpecIPFamilyField: string(prefix.Spec.IPFamily)},
+			client.MatchingFields{ipamclient.PrefixSpecIPFamilyField: string(prefix.Spec.IPFamily)},
 		); err != nil {
 			log.V(1).Error(err, "Error listing prefixes", "Namespace", prefix.Namespace, "IPFamily", prefix.Spec.IPFamily)
 			return nil
@@ -725,7 +698,7 @@ func (r *PrefixReconciler) enqueueByPrefixParentRef(ctx context.Context, log log
 		list := &ipamv1alpha1.PrefixList{}
 		if err := r.List(ctx, list,
 			client.InNamespace(prefix.Namespace),
-			client.MatchingFields{prefixSpecParentRefNameField: prefix.Name},
+			client.MatchingFields{ipamclient.PrefixSpecParentRefNameField: prefix.Name},
 		); err != nil {
 			log.Error(err, "Error listing prefixes with parent", "Key", client.ObjectKeyFromObject(prefix))
 			return nil

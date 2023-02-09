@@ -10,7 +10,7 @@ require (
 	github.com/google/go-cmp v0.5.9
 	github.com/gorilla/mux v1.8.0
 	github.com/moby/term v0.0.0-20220808134915-39b0c02b01ae
-	github.com/onmetal/controller-utils v0.6.7
+	github.com/onmetal/controller-utils v0.7.0
 	github.com/onsi/ginkgo/v2 v2.8.0
 	github.com/onsi/gomega v1.26.0
 	github.com/spf13/cobra v1.6.1
@@ -27,7 +27,7 @@ require (
 	k8s.io/client-go v0.26.1
 	k8s.io/component-base v0.26.1
 	k8s.io/kube-aggregator v0.26.1
-	k8s.io/kube-openapi v0.0.0-20221012153701-172d655c2280
+	k8s.io/kube-openapi v0.0.0-20230109183929-3758b55a6596
 	k8s.io/utils v0.0.0-20221128185143-99ec85e7a448
 	sigs.k8s.io/controller-runtime v0.14.4
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3
@@ -51,8 +51,8 @@ require (
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-logr/zapr v1.2.3 // indirect
-	github.com/go-openapi/jsonpointer v0.19.5 // indirect
-	github.com/go-openapi/jsonreference v0.20.0 // indirect
+	github.com/go-openapi/jsonpointer v0.19.6 // indirect
+	github.com/go-openapi/jsonreference v0.20.1 // indirect
 	github.com/go-openapi/swag v0.22.3 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect

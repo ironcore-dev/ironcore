@@ -25,7 +25,8 @@ import (
 	"github.com/onmetal/controller-utils/buildutils"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
-	onmetalapiclient "github.com/onmetal/onmetal-api/internal/client"
+	computeclient "github.com/onmetal/onmetal-api/internal/client/compute"
+	storageclient "github.com/onmetal/onmetal-api/internal/client/storage"
 	utilsenvtest "github.com/onmetal/onmetal-api/utils/envtest"
 	"github.com/onmetal/onmetal-api/utils/envtest/apiserver"
 	corev1 "k8s.io/api/core/v1"
@@ -155,9 +156,14 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 		Expect(err).ToNot(HaveOccurred())
 
 		// index fields here
-		Expect(onmetalapiclient.SetupMachineSpecVolumeNamesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
-		Expect(onmetalapiclient.SetupVolumeSpecVolumeClassRefNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
-		Expect(onmetalapiclient.SetupBucketSpecBucketClassRefNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+		Expect(computeclient.SetupMachineSpecVolumeNamesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+
+		Expect(storageclient.SetupVolumeSpecVolumeClassRefNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+		Expect(storageclient.SetupVolumeSpecVolumePoolRefNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+		Expect(storageclient.SetupVolumePoolAvailableVolumeClassesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+		Expect(storageclient.SetupBucketSpecBucketClassRefNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+		Expect(storageclient.SetupBucketPoolAvailableBucketClassesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+		Expect(storageclient.SetupBucketSpecBucketPoolRefNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 
 		// register reconciler here
 		Expect((&VolumeReconciler{

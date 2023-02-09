@@ -15,7 +15,6 @@
 package server_test
 
 import (
-	"github.com/onmetal/controller-utils/set"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
@@ -27,6 +26,7 @@ import (
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -113,7 +113,7 @@ var _ = Describe("CreateNetworkInterface", func() {
 		aliasPrefix := aliasPrefixes[0]
 		Expect(aliasPrefix.NetworkHandle).To(Equal(networkHandle))
 		Expect(aliasPrefix.Prefix).To(Equal(commonv1alpha1.MustParseIPPrefix(prefix)))
-		Expect(aliasPrefix.Destinations.Equal(set.New(networkInterfaceID))).To(BeTrue())
+		Expect(aliasPrefix.Destinations.Equal(sets.New(networkInterfaceID))).To(BeTrue())
 
 		By("listing load balancers for network interface")
 		loadBalancers, err := srv.LoadBalancers().ListByDependent(ctx, networkInterfaceID)

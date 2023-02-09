@@ -20,7 +20,6 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/gogo/protobuf/proto"
-	"github.com/onmetal/controller-utils/set"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
@@ -38,6 +37,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -303,7 +303,7 @@ func (r *MachineReconciler) prepareORINetworkInterfaceAttachments(
 		oriNetworkInterfaceAttachments []*ori.NetworkInterfaceAttachment
 		ok                             = true
 		errs                           []error
-		usedIDs                        = set.New[string]()
+		usedIDs                        = sets.New[string]()
 	)
 
 	for _, networkInterface := range machine.Spec.NetworkInterfaces {
@@ -460,8 +460,8 @@ func (r *MachineReconciler) updateORINetworkInterfacePrefixes(
 	oriNetworkInterfaceSpec *ori.NetworkInterfaceSpec,
 ) error {
 	id := oriNetworkInterface.Metadata.Id
-	actualPrefixes := set.New(oriNetworkInterface.Spec.Prefixes...)
-	desiredPrefixes := set.New(oriNetworkInterfaceSpec.Prefixes...)
+	actualPrefixes := sets.New(oriNetworkInterface.Spec.Prefixes...)
+	desiredPrefixes := sets.New(oriNetworkInterfaceSpec.Prefixes...)
 
 	delPrefixes := actualPrefixes.Difference(desiredPrefixes)
 	newPrefixes := desiredPrefixes.Difference(actualPrefixes)
@@ -618,7 +618,7 @@ func (r *MachineReconciler) aliasPrefixesForNetworkInterface(
 		func(apr networkingv1alpha1.AliasPrefixRouting) string { return apr.Name },
 	)
 
-	prefixes := set.New[string]()
+	prefixes := sets.New[string]()
 
 	for _, aliasPrefix := range aliasPrefixList.Items {
 		prefix := aliasPrefix.Status.Prefix
@@ -638,7 +638,7 @@ func (r *MachineReconciler) aliasPrefixesForNetworkInterface(
 			prefixes.Insert(prefix.String())
 		}
 	}
-	return set.SortedSlice(prefixes), nil
+	return sets.List(prefixes), nil
 }
 
 func (r *MachineReconciler) loadBalancerTargetsForNetworkInterface(
@@ -880,7 +880,7 @@ func (r *MachineReconciler) updateORINetworkInterfaces(ctx context.Context, log 
 		findNetworkInterface              = r.machineNetworkInterfaceFinder(machine.Spec.NetworkInterfaces)
 		findORINetworkInterface           = r.oriNetworkInterfaceFinder(oriNetworkInterfaces)
 		findORINetworkInterfaceAttachment = r.oriNetworkInterfaceAttachmentFinder(oriMachine.Spec.NetworkInterfaces)
-		usedORINetworkInterfaceIDs        = set.New[string]()
+		usedORINetworkInterfaceIDs        = sets.New[string]()
 	)
 
 	for _, oriNetworkInterface := range oriMachine.Spec.NetworkInterfaces {
@@ -961,7 +961,7 @@ func (r *MachineReconciler) convertORINetworkInterfaceAttachmentStatus(status *o
 }
 
 func (r *MachineReconciler) updateNetworkInterfaceStates(machine *computev1alpha1.Machine, oriMachine *ori.Machine, now metav1.Time) error {
-	seenNames := set.New[string]()
+	seenNames := sets.New[string]()
 	for _, oriNetworkInterfaceAttachmentStatus := range oriMachine.Status.NetworkInterfaces {
 		name := oriNetworkInterfaceAttachmentStatus.Name
 		seenNames.Insert(name)

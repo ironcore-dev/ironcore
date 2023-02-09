@@ -26,7 +26,7 @@ import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	onmetalapiclient "github.com/onmetal/onmetal-api/internal/client"
+	computeclient "github.com/onmetal/onmetal-api/internal/client/compute"
 	"github.com/onmetal/onmetal-api/internal/controllers/storage/events"
 	apiequality "github.com/onmetal/onmetal-api/utils/equality"
 	corev1 "k8s.io/api/core/v1"
@@ -53,6 +53,7 @@ type VolumeReconciler struct {
 	BindTimeout time.Duration
 }
 
+//+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 //+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes/finalizers,verbs=update
@@ -153,7 +154,7 @@ func (r *VolumeReconciler) getRequestingMachine(ctx context.Context, volume *sto
 	machineList := &computev1alpha1.MachineList{}
 	if err := r.List(ctx, machineList,
 		client.InNamespace(volume.Namespace),
-		client.MatchingFields{onmetalapiclient.MachineSpecVolumeNamesField: volume.Name},
+		client.MatchingFields{computeclient.MachineSpecVolumeNamesField: volume.Name},
 	); err != nil {
 		return nil, fmt.Errorf("error listing machines specifying volume: %w", err)
 	}

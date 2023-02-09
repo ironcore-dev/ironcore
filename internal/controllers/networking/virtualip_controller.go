@@ -25,7 +25,7 @@ import (
 	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	onmetalapiclient "github.com/onmetal/onmetal-api/internal/client"
+	networkingclient "github.com/onmetal/onmetal-api/internal/client/networking"
 	"github.com/onmetal/onmetal-api/internal/controllers/networking/events"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -48,6 +48,7 @@ type VirtualIPReconciler struct {
 	BindTimeout time.Duration
 }
 
+//+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=virtualips,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=virtualips/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=virtualips/finalizers,verbs=update
@@ -219,7 +220,7 @@ func (r *VirtualIPReconciler) getMatchingNetworkInterface(ctx context.Context, v
 	nicList := &networkingv1alpha1.NetworkInterfaceList{}
 	if err := r.List(ctx, nicList,
 		client.InNamespace(virtualIP.Namespace),
-		client.MatchingFields{onmetalapiclient.NetworkInterfaceVirtualIPNamesField: virtualIP.Name},
+		client.MatchingFields{networkingclient.NetworkInterfaceVirtualIPNamesField: virtualIP.Name},
 	); err != nil {
 		return nil, fmt.Errorf("error listing suitable requesters: %w", err)
 	}
@@ -297,25 +298,10 @@ func (r *VirtualIPReconciler) patchStatus(ctx context.Context, virtualIP *networ
 	return r.Status().Patch(ctx, virtualIP, client.MergeFrom(virtualIPBase))
 }
 
-const (
-	virtualIPSpecTargetRefNameField = ".spec.targetRef.name"
-)
-
 // SetupWithManager sets up the controller with the Manager.
 func (r *VirtualIPReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	ctx := context.Background()
 	log := ctrl.Log.WithName("virtualip").WithName("setup")
-
-	if err := mgr.GetFieldIndexer().IndexField(ctx, &networkingv1alpha1.VirtualIP{}, virtualIPSpecTargetRefNameField, func(object client.Object) []string {
-		virtualIP := object.(*networkingv1alpha1.VirtualIP)
-		targetRef := virtualIP.Spec.TargetRef
-		if targetRef == nil {
-			return []string{""}
-		}
-		return []string{targetRef.Name}
-	}); err != nil {
-		return err
-	}
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&networkingv1alpha1.VirtualIP{}).
@@ -336,7 +322,7 @@ func (r *VirtualIPReconciler) enqueueByTargetNameReferencingNetworkInterface(ctx
 
 		virtualIPs := &networkingv1alpha1.VirtualIPList{}
 		if err := r.List(ctx, virtualIPs, client.InNamespace(nic.Namespace), client.MatchingFields{
-			virtualIPSpecTargetRefNameField: nic.Name,
+			networkingclient.VirtualIPSpecTargetRefNameField: nic.Name,
 		}); err != nil {
 			log.Error(err, "Error listing virtual ips targeting network interface")
 			return []ctrl.Request{}

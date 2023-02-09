@@ -17,10 +17,10 @@
 package validation
 
 import (
-	"github.com/onmetal/controller-utils/set"
 	onmetalapivalidation "github.com/onmetal/onmetal-api/internal/api/validation"
 	"github.com/onmetal/onmetal-api/internal/apis/networking"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
@@ -45,7 +45,7 @@ func ValidateVirtualIPUpdate(newVirtualIP, oldVirtualIP *networking.VirtualIP) f
 	return allErrs
 }
 
-var supportedVirtualIPTypes = set.New(
+var supportedVirtualIPTypes = sets.New(
 	networking.VirtualIPTypePublic,
 )
 

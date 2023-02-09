@@ -20,6 +20,7 @@ import (
 	"math/rand"
 
 	"github.com/go-logr/logr"
+	computeclient "github.com/onmetal/onmetal-api/internal/client/compute"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -38,16 +39,12 @@ import (
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 )
 
-const (
-	machinePoolStatusAvailableMachineClassesNameField = ".status.availableMachineClasses[*].name"
-	machineSpecMachinePoolNameField                   = ".spec.machinePool.name"
-)
-
 type MachineScheduler struct {
 	record.EventRecorder
 	client.Client
 }
 
+//+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 //+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machines,verbs=get;list;watch;update;patch
 //+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machines/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machinepools,verbs=get;list;watch
@@ -85,7 +82,7 @@ func (s *MachineScheduler) schedule(ctx context.Context, log logr.Logger, machin
 
 	list := &computev1alpha1.MachinePoolList{}
 	if err := s.List(ctx, list,
-		client.MatchingFields{machinePoolStatusAvailableMachineClassesNameField: machine.Spec.MachineClassRef.Name},
+		client.MatchingFields{computeclient.MachinePoolAvailableMachineClassesField: machine.Spec.MachineClassRef.Name},
 		client.MatchingLabels(machine.Spec.MachinePoolSelector),
 	); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error listing machine pools: %w", err)
@@ -136,7 +133,7 @@ func (s *MachineScheduler) schedule(ctx context.Context, log logr.Logger, machin
 func (s *MachineScheduler) enqueueMatchingUnscheduledMachines(ctx context.Context, pool *computev1alpha1.MachinePool, queue workqueue.RateLimitingInterface) {
 	log := ctrl.LoggerFrom(ctx)
 	list := &computev1alpha1.MachineList{}
-	if err := s.List(ctx, list, client.MatchingFields{machineSpecMachinePoolNameField: ""}); err != nil {
+	if err := s.List(ctx, list, client.MatchingFields{computeclient.MachineSpecMachinePoolRefNameField: ""}); err != nil {
 		log.Error(fmt.Errorf("could not list machines w/o machine pool: %w", err), "Error listing machine pools")
 		return
 	}
@@ -158,29 +155,6 @@ func (s *MachineScheduler) SetupWithManager(mgr manager.Manager) error {
 	ctx := context.Background()
 	ctx = ctrl.LoggerInto(ctx, ctrl.Log.WithName("machine-scheduler").WithName("setup"))
 
-	if err := mgr.GetFieldIndexer().IndexField(ctx, &computev1alpha1.MachinePool{}, machinePoolStatusAvailableMachineClassesNameField, func(object client.Object) []string {
-		machinePool := object.(*computev1alpha1.MachinePool)
-		names := make([]string, 0, len(machinePool.Status.AvailableMachineClasses))
-		for _, availableMachineClass := range machinePool.Status.AvailableMachineClasses {
-			names = append(names, availableMachineClass.Name)
-		}
-		return names
-	}); err != nil {
-		return fmt.Errorf("could not setup field indexer for %s: %w", machinePoolStatusAvailableMachineClassesNameField, err)
-	}
-
-	if err := mgr.GetFieldIndexer().IndexField(ctx, &computev1alpha1.Machine{}, machineSpecMachinePoolNameField, func(object client.Object) []string {
-		machine := object.(*computev1alpha1.Machine)
-		machinePoolRef := machine.Spec.MachinePoolRef
-		if machinePoolRef == nil {
-			return []string{""}
-		}
-
-		return []string{machinePoolRef.Name}
-	}); err != nil {
-		return fmt.Errorf("could not setup field indexer for %s: %w", machineSpecMachinePoolNameField, err)
-	}
-
 	return ctrl.NewControllerManagedBy(mgr).
 		Named("machine-scheduler").
 		// Enqueue unscheduled machines.
@@ -193,7 +167,8 @@ func (s *MachineScheduler) SetupWithManager(mgr manager.Manager) error {
 			),
 		).
 		// Enqueue unscheduled machines if a machine pool w/ required machine classes becomes available.
-		Watches(&source.Kind{Type: &computev1alpha1.MachinePool{}},
+		Watches(
+			&source.Kind{Type: &computev1alpha1.MachinePool{}},
 			handler.Funcs{
 				CreateFunc: func(event event.CreateEvent, queue workqueue.RateLimitingInterface) {
 					pool := event.Object.(*computev1alpha1.MachinePool)

@@ -26,15 +26,11 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/resource"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/sets"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/source"
@@ -123,31 +119,6 @@ func (r *ResourceQuotaReconciler) getMatchingEvaluators(resourceQuota *corev1alp
 	return evaluators, coveredResourceNames
 }
 
-func (r *ResourceQuotaReconciler) newList(obj client.Object) (schema.GroupVersionKind, client.ObjectList, error) {
-	switch obj.(type) {
-	case *unstructured.Unstructured:
-		gvk := obj.GetObjectKind().GroupVersionKind()
-		list := &unstructured.UnstructuredList{}
-		list.SetGroupVersionKind(gvk)
-		return gvk, list, nil
-	case *metav1.PartialObjectMetadata:
-		gvk := obj.GetObjectKind().GroupVersionKind()
-		list := &metav1.PartialObjectMetadataList{}
-		list.SetGroupVersionKind(gvk)
-		return gvk, list, nil
-	default:
-		gvk, err := apiutil.GVKForObject(obj, r.Scheme)
-		if err != nil {
-			return schema.GroupVersionKind{}, nil, fmt.Errorf("error getting gvk for %T: %w", obj, err)
-		}
-		list, err := metautils.NewListForGVK(r.Scheme, gvk)
-		if err != nil {
-			return schema.GroupVersionKind{}, nil, fmt.Errorf("error creating list for %s: %w", gvk, err)
-		}
-		return gvk, list, nil
-	}
-}
-
 func (r *ResourceQuotaReconciler) calculateUsage(
 	ctx context.Context,
 	log logr.Logger,
@@ -162,7 +133,7 @@ func (r *ResourceQuotaReconciler) calculateUsage(
 	}
 
 	for _, evaluator := range evaluators {
-		gvk, list, err := r.newList(evaluator.Type())
+		gvk, list, err := metautils.NewListForObject(r.Scheme, evaluator.Type())
 		if err != nil {
 			return nil, fmt.Errorf("error creating list for type %T: %w", evaluator.Type, err)
 		}

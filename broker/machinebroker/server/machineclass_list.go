@@ -18,10 +18,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/onmetal/controller-utils/set"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -46,8 +46,8 @@ func (s *Server) getTargetOnmetalMachinePools(ctx context.Context) ([]computev1a
 	return machinePoolList.Items, nil
 }
 
-func (s *Server) gatherAvailableMachineClassNames(onmetalMachinePools []computev1alpha1.MachinePool) set.Set[string] {
-	res := set.New[string]()
+func (s *Server) gatherAvailableMachineClassNames(onmetalMachinePools []computev1alpha1.MachinePool) sets.Set[string] {
+	res := sets.New[string]()
 	for _, onmetalMachinePool := range onmetalMachinePools {
 		for _, availableMachineClass := range onmetalMachinePool.Status.AvailableMachineClasses {
 			res.Insert(availableMachineClass.Name)
@@ -57,7 +57,7 @@ func (s *Server) gatherAvailableMachineClassNames(onmetalMachinePools []computev
 }
 
 func (s *Server) filterOnmetalMachineClasses(
-	availableMachineClassNames set.Set[string],
+	availableMachineClassNames sets.Set[string],
 	machineClasses []computev1alpha1.MachineClass,
 ) []computev1alpha1.MachineClass {
 	var filtered []computev1alpha1.MachineClass

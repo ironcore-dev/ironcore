@@ -23,6 +23,7 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/clientutils"
+	storageclient "github.com/onmetal/onmetal-api/internal/client/storage"
 	"github.com/onmetal/onmetal-api/utils/slices"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/util/workqueue"
@@ -66,7 +67,7 @@ func (r *BucketClassReconciler) listReferencingBucketsWithReader(
 	bucketList := &storagev1alpha1.BucketList{}
 	if err := rd.List(ctx, bucketList,
 		client.InNamespace(bucketClass.Namespace),
-		client.MatchingFields{storagev1alpha1.BucketBucketClassRefNameField: bucketClass.Name},
+		client.MatchingFields{storageclient.BucketSpecBucketClassRefNameField: bucketClass.Name},
 	); err != nil {
 		return nil, fmt.Errorf("error listing the buckets using the bucket class: %w", err)
 	}

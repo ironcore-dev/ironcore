@@ -18,10 +18,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/onmetal/controller-utils/set"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -46,8 +46,8 @@ func (s *Server) getTargetOnmetalVolumePools(ctx context.Context) ([]storagev1al
 	return volumePoolList.Items, nil
 }
 
-func (s *Server) gatherAvailableVolumeClassNames(onmetalVolumePools []storagev1alpha1.VolumePool) set.Set[string] {
-	res := set.New[string]()
+func (s *Server) gatherAvailableVolumeClassNames(onmetalVolumePools []storagev1alpha1.VolumePool) sets.Set[string] {
+	res := sets.New[string]()
 	for _, onmetalVolumePool := range onmetalVolumePools {
 		for _, availableVolumeClass := range onmetalVolumePool.Status.AvailableVolumeClasses {
 			res.Insert(availableVolumeClass.Name)
@@ -57,7 +57,7 @@ func (s *Server) gatherAvailableVolumeClassNames(onmetalVolumePools []storagev1a
 }
 
 func (s *Server) filterOnmetalVolumeClasses(
-	availableVolumeClassNames set.Set[string],
+	availableVolumeClassNames sets.Set[string],
 	volumeClasses []storagev1alpha1.VolumeClass,
 ) []storagev1alpha1.VolumeClass {
 	var filtered []storagev1alpha1.VolumeClass

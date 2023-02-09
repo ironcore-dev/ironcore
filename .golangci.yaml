@@ -32,6 +32,8 @@ linters-settings:
         alias: $1$2
       - pkg: github.com/onmetal/onmetal-api/internal/apis/(\w+)
         alias: $1
+      - pkg: github.com/onmetal/onmetal-api/internal/client/(\w+)
+        alias: ${1}client
 
 issues:
   exclude: # Exclude stutter issues (for now)

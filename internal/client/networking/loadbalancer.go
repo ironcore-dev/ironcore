@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2023 OnMetal authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,18 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package maps
+package networking
 
 import (
-	"k8s.io/apimachinery/pkg/util/sets"
+	"context"
+
+	"github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func KeysDifference[M ~map[K]V, K comparable, V any](m1, m2 M) sets.Set[K] {
-	result := sets.New[K]()
-	for key := range m1 {
-		if _, ok := m2[key]; !ok {
-			result.Insert(key)
-		}
-	}
-	return result
+const LoadBalancerNetworkNameField = "loadbalancer-network-name"
+
+func SetupLoadBalancerNetworkNameFieldIndexer(ctx context.Context, indexer client.FieldIndexer) error {
+	return indexer.IndexField(ctx, &v1alpha1.LoadBalancer{}, LoadBalancerNetworkNameField, func(obj client.Object) []string {
+		loadBalancer := obj.(*v1alpha1.LoadBalancer)
+		return []string{loadBalancer.Spec.NetworkRef.Name}
+	})
 }

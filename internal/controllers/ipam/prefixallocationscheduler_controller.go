@@ -21,7 +21,7 @@ import (
 
 	"github.com/go-logr/logr"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
-	onmetalapiclient "github.com/onmetal/onmetal-api/internal/client"
+	"github.com/onmetal/onmetal-api/internal/client/ipam"
 	"go4.org/netipx"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -41,6 +41,7 @@ type PrefixAllocationScheduler struct {
 	Scheme *runtime.Scheme
 }
 
+//+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 //+kubebuilder:rbac:groups=ipam.api.onmetal.de,resources=prefixes,verbs=get;list;watch
 //+kubebuilder:rbac:groups=ipam.api.onmetal.de,resources=prefixallocations,verbs=get;list;watch;update;patch
 //+kubebuilder:rbac:groups=ipam.api.onmetal.de,resources=prefixallocations/status,verbs=get;update;patch
@@ -79,7 +80,7 @@ func (s *PrefixAllocationScheduler) prefixForAllocation(ctx context.Context, log
 	if err := s.List(ctx, list,
 		client.InNamespace(allocation.Namespace),
 		client.MatchingLabelsSelector{Selector: sel},
-		client.MatchingFields{onmetalapiclient.PrefixSpecIPFamilyField: string(allocation.Spec.IPFamily)},
+		client.MatchingFields{ipam.PrefixSpecIPFamilyField: string(allocation.Spec.IPFamily)},
 	); err != nil {
 		return "", fmt.Errorf("error listing prefixes: %w", err)
 	}
@@ -197,7 +198,7 @@ func (s *PrefixAllocationScheduler) enqueueByMatchingPrefix(ctx context.Context,
 		if err := s.List(ctx, list,
 			client.InNamespace(prefix.Namespace),
 			client.MatchingFields{
-				onmetalapiclient.PrefixAllocationSpecIPFamilyField: string(prefix.Spec.IPFamily),
+				ipam.PrefixAllocationSpecIPFamilyField: string(prefix.Spec.IPFamily),
 			},
 		); err != nil {
 			log.Error(err, "Error listing prefix allocations")
