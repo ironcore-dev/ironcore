@@ -172,7 +172,7 @@ run: manifests generate fmt vet ## Run a controller from your host.
 docker-build: \
 	docker-build-onmetal-apiserver docker-build-onmetal-controller-manager \
 	docker-build-machinepoollet docker-build-machinebroker docker-build-orictl-machine \
-	docker-build-volumepoollet docker-build-volumebroker docker-build-orictl-volume |
+	docker-build-volumepoollet docker-build-volumebroker docker-build-orictl-volume \
 	docker-build-bucketpoollet docker-build-bucketbroker docker-build-orictl-bucket ## Build docker image with the manager.
 
 .PHONY: docker-build-onmetal-apiserver
