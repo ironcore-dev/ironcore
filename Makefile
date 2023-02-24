@@ -74,6 +74,14 @@ manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and Cust
 	$(CONTROLLER_GEN) rbac:roleName=broker-role paths="./broker/bucketbroker/..." output:rbac:artifacts:config=config/bucketpoollet-broker/broker-rbac
 	./hack/replace.sh config/bucketpoollet-broker/broker-rbac/role.yaml 's/ClusterRole/Role/g'
 
+	# poollet system roles
+	cp config/machinepoollet-broker/poollet-rbac/role.yaml config/apiserver/rbac/machinepool_role.yaml
+	./hack/replace.sh config/apiserver/rbac/machinepool_role.yaml 's/manager-role/compute.api.onmetal.de:system:machinepools/g'
+	cp config/volumepoollet-broker/poollet-rbac/role.yaml config/apiserver/rbac/volumepool_role.yaml
+	./hack/replace.sh config/apiserver/rbac/volumepool_role.yaml 's/manager-role/storage.api.onmetal.de:system:volumepools/g'
+	cp config/bucketpoollet-broker/poollet-rbac/role.yaml config/apiserver/rbac/bucketpool_role.yaml
+	./hack/replace.sh config/apiserver/rbac/bucketpool_role.yaml 's/manager-role/storage.api.onmetal.de:system:bucketpools/g'
+
 .PHONY: generate
 generate: vgopath models-schema deepcopy-gen client-gen lister-gen informer-gen defaulter-gen conversion-gen openapi-gen applyconfiguration-gen
 	VGOPATH=$(VGOPATH) \

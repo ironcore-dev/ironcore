@@ -1610,7 +1610,7 @@ func (m *VersionRequest) GetVersion() string {
 }
 
 type VersionResponse struct {
-	// Name of the machine runtime.
+	// RotatorName of the machine runtime.
 	RuntimeName string `protobuf:"bytes,1,opt,name=runtime_name,json=runtimeName,proto3" json:"runtime_name,omitempty"`
 	// Version of the machine runtime. The string must be
 	// semver-compatible.
@@ -9612,7 +9612,7 @@ func (this *VolumeAttachment) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&VolumeAttachment{`,
-		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
+		`RotatorName:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`Device:` + fmt.Sprintf("%v", this.Device) + `,`,
 		`VolumeId:` + fmt.Sprintf("%v", this.VolumeId) + `,`,
 		`EmptyDisk:` + strings.Replace(this.EmptyDisk.String(), "EmptyDiskSpec", "EmptyDiskSpec", 1) + `,`,
@@ -9625,7 +9625,7 @@ func (this *NetworkInterfaceAttachment) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&NetworkInterfaceAttachment{`,
-		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
+		`RotatorName:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`NetworkInterfaceId:` + fmt.Sprintf("%v", this.NetworkInterfaceId) + `,`,
 		`}`,
 	}, "")
@@ -9685,7 +9685,7 @@ func (this *VolumeAttachmentStatus) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&VolumeAttachmentStatus{`,
-		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
+		`RotatorName:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`VolumeHandle:` + fmt.Sprintf("%v", this.VolumeHandle) + `,`,
 		`State:` + fmt.Sprintf("%v", this.State) + `,`,
 		`}`,
@@ -9697,7 +9697,7 @@ func (this *NetworkInterfaceAttachmentStatus) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&NetworkInterfaceAttachmentStatus{`,
-		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
+		`RotatorName:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`NetworkInterfaceHandle:` + fmt.Sprintf("%v", this.NetworkInterfaceHandle) + `,`,
 		`State:` + fmt.Sprintf("%v", this.State) + `,`,
 		`}`,
@@ -9709,7 +9709,7 @@ func (this *MachineClass) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&MachineClass{`,
-		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
+		`RotatorName:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`Capabilities:` + strings.Replace(this.Capabilities.String(), "MachineClassCapabilities", "MachineClassCapabilities", 1) + `,`,
 		`}`,
 	}, "")
@@ -9876,7 +9876,7 @@ func (this *DeleteVolumeAttachmentRequest) String() string {
 	}
 	s := strings.Join([]string{`&DeleteVolumeAttachmentRequest{`,
 		`MachineId:` + fmt.Sprintf("%v", this.MachineId) + `,`,
-		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
+		`RotatorName:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -9916,7 +9916,7 @@ func (this *DeleteNetworkInterfaceAttachmentRequest) String() string {
 	}
 	s := strings.Join([]string{`&DeleteNetworkInterfaceAttachmentRequest{`,
 		`MachineId:` + fmt.Sprintf("%v", this.MachineId) + `,`,
-		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
+		`RotatorName:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -12802,7 +12802,7 @@ func (m *VolumeAttachment) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field RotatorName", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -12984,7 +12984,7 @@ func (m *NetworkInterfaceAttachment) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field RotatorName", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -13527,7 +13527,7 @@ func (m *VolumeAttachmentStatus) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field RotatorName", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -13660,7 +13660,7 @@ func (m *NetworkInterfaceAttachmentStatus) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field RotatorName", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -13793,7 +13793,7 @@ func (m *MachineClass) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field RotatorName", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -15191,7 +15191,7 @@ func (m *DeleteVolumeAttachmentRequest) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field RotatorName", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -15523,7 +15523,7 @@ func (m *DeleteNetworkInterfaceAttachmentRequest) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field RotatorName", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {

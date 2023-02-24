@@ -1,4 +1,24 @@
 resources:
+  
+  # API Server roles
   - apiserver_service_account.yaml
   - apiserver_role.yaml
   - apiserver_role_binding.yaml
+  
+  # MachinePool (bootstrapper) roles
+  - machinepool_role.yaml
+  - machinepool_rolebinding.yaml
+  - machinepool_bootstrapper_role.yaml
+  - machinepool_bootstrapper_rolebinding.yaml
+  
+  # VolumePool (bootstrapper) roles
+  - volumepool_role.yaml
+  - volumepool_rolebinding.yaml
+  - volumepool_bootstrapper_role.yaml
+  - volumepool_bootstrapper_rolebinding.yaml
+  
+  # BucketPool (bootstrapper) roles
+  - bucketpool_role.yaml
+  - bucketpool_rolebinding.yaml
+  - bucketpool_bootstrapper_role.yaml
+  - bucketpool_bootstrapper_rolebinding.yaml

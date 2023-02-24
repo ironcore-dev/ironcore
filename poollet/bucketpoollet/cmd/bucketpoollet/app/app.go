@@ -28,8 +28,10 @@ import (
 	ori "github.com/onmetal/onmetal-api/ori/apis/bucket/v1alpha1"
 	oriremotebucket "github.com/onmetal/onmetal-api/ori/remote/bucket"
 	"github.com/onmetal/onmetal-api/poollet/bucketpoollet/bcm"
+	bucketpoolletconfig "github.com/onmetal/onmetal-api/poollet/bucketpoollet/client/config"
 	"github.com/onmetal/onmetal-api/poollet/bucketpoollet/controllers"
 	"github.com/onmetal/onmetal-api/poollet/orievent"
+	"github.com/onmetal/onmetal-api/utils/client/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"google.golang.org/grpc"
@@ -55,8 +57,7 @@ func init() {
 }
 
 type Options struct {
-	Kubeconfig               string
-	EgressSelectorConfig     string
+	GetConfigOptions         config.GetConfigOptions
 	MetricsAddr              string
 	EnableLeaderElection     bool
 	LeaderElectionNamespace  string
@@ -74,8 +75,7 @@ type Options struct {
 }
 
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
-	fs.StringVar(&o.Kubeconfig, "kubeconfig", "", "Path pointing to a kubeconfig to use.")
-	fs.StringVar(&o.EgressSelectorConfig, "egress-selector-config", "", "Path pointing to an egress selector config to use.")
+	o.GetConfigOptions.BindFlags(fs)
 	fs.StringVar(&o.MetricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	fs.StringVar(&o.ProbeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	fs.BoolVar(&o.EnableLeaderElection, "leader-elect", false,
@@ -132,6 +132,12 @@ func Run(ctx context.Context, opts Options) error {
 	logger := ctrl.LoggerFrom(ctx)
 	setupLog := ctrl.Log.WithName("setup")
 
+	getter, err := bucketpoolletconfig.NewGetter(opts.BucketPoolName)
+	if err != nil {
+		setupLog.Error(err, "Error creating new getter")
+		os.Exit(1)
+	}
+
 	endpoint, err := oriremotebucket.GetAddressWithTimeout(opts.BucketRuntimeSocketDiscoveryTimeout, opts.BucketRuntimeEndpoint)
 	if err != nil {
 		return fmt.Errorf("error detecting bucket runtime endpoint: %w", err)
@@ -151,10 +157,9 @@ func Run(ctx context.Context, opts Options) error {
 
 	bucketRuntime := ori.NewBucketRuntimeClient(conn)
 
-	cfg, err := configutils.GetConfig(
-		configutils.Kubeconfig(opts.Kubeconfig),
-		configutils.EgressSelectorConfig(opts.EgressSelectorConfig),
-		configutils.WithEgressSelectionName(configutils.EgressSelectionNameControlPlane),
+	cfg, configCtrl, err := getter.GetConfig(ctx,
+		&opts.GetConfigOptions,
+		config.WithEgressSelectionName(configutils.EgressSelectionNameControlPlane),
 	)
 	if err != nil {
 		return fmt.Errorf("error getting config: %w", err)
@@ -180,6 +185,9 @@ func Run(ctx context.Context, opts Options) error {
 	})
 	if err != nil {
 		return fmt.Errorf("error creating manager: %w", err)
+	}
+	if err := config.SetupControllerWithManager(mgr, configCtrl); err != nil {
+		return err
 	}
 
 	bucketClassMapper := bcm.NewGeneric(bucketRuntime, bcm.GenericOptions{})

@@ -20,4 +20,26 @@ const (
 
 	BucketBucketPoolRefNameField  = "spec.bucketPoolRef.name"
 	BucketBucketClassRefNameField = "spec.bucketClassRef.name"
+
+	// VolumePoolsGroup is the system rbac group all volume pools are in.
+	VolumePoolsGroup = "storage.api.onmetal.de:system:volumepools"
+
+	// VolumePoolUserNamePrefix is the prefix all volume pool users should have.
+	VolumePoolUserNamePrefix = "storage.api.onmetal.de:system:volumepool:"
+
+	// BucketPoolsGroup is the system rbac group all bucket pools are in.
+	BucketPoolsGroup = "storage.api.onmetal.de:system:bucketpools"
+
+	// BucketPoolUserNamePrefix is the prefix all bucket pool users should have.
+	BucketPoolUserNamePrefix = "storage.api.onmetal.de:system:bucketpool:"
 )
+
+// VolumePoolCommonName constructs the common name for a certificate of a volume pool user.
+func VolumePoolCommonName(name string) string {
+	return VolumePoolUserNamePrefix + name
+}
+
+// BucketPoolCommonName constructs the common name for a certificate of a bucket pool user.
+func BucketPoolCommonName(name string) string {
+	return BucketPoolUserNamePrefix + name
+}

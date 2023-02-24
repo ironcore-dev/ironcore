@@ -25,6 +25,7 @@ import (
 	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	"github.com/onmetal/onmetal-api/internal/controllers/core"
+	certificateonmetal "github.com/onmetal/onmetal-api/internal/controllers/core/certificate/onmetal"
 	quotacontrollergeneric "github.com/onmetal/onmetal-api/internal/controllers/core/quota/generic"
 	quotacontrolleronmetal "github.com/onmetal/onmetal-api/internal/controllers/core/quota/onmetal"
 	quotaevaluatoronmetal "github.com/onmetal/onmetal-api/internal/quota/evaluator/onmetal"
@@ -126,6 +127,11 @@ var _ = BeforeSuite(func() {
 		APIReader: k8sManager.GetAPIReader(),
 		Scheme:    scheme.Scheme,
 		Registry:  registry,
+	}).SetupWithManager(k8sManager)).To(Succeed())
+
+	Expect((&core.CertificateApprovalReconciler{
+		Client:      k8sManager.GetClient(),
+		Recognizers: certificateonmetal.Recognizers,
 	}).SetupWithManager(k8sManager)).To(Succeed())
 
 	mgrCtx, cancel := context.WithCancel(context.Background())
