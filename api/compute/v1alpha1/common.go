@@ -22,7 +22,18 @@ import (
 const (
 	MachineMachinePoolRefNameField  = "spec.machinePoolRef.name"
 	MachineMachineClassRefNameField = "spec.machineClassRef.name"
+
+	// MachinePoolsGroup is the system rbac group all machine pools are in.
+	MachinePoolsGroup = "compute.api.onmetal.de:system:machinepools"
+
+	// MachinePoolUserNamePrefix is the prefix all machine pool users should have.
+	MachinePoolUserNamePrefix = "compute.api.onmetal.de:system:machinepool:"
 )
+
+// MachinePoolCommonName constructs the common name for a certificate of a machine pool user.
+func MachinePoolCommonName(name string) string {
+	return MachinePoolUserNamePrefix + name
+}
 
 // EphemeralNetworkInterfaceSource is a definition for an ephemeral (i.e. coupled to the lifetime of the surrounding
 // object) networking.NetworkInterface.

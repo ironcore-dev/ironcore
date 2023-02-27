@@ -30,6 +30,7 @@ import (
 	storageclient "github.com/onmetal/onmetal-api/internal/client/storage"
 	computecontrollers "github.com/onmetal/onmetal-api/internal/controllers/compute"
 	corecontrollers "github.com/onmetal/onmetal-api/internal/controllers/core"
+	certificateonmetal "github.com/onmetal/onmetal-api/internal/controllers/core/certificate/onmetal"
 	quotacontrollergeneric "github.com/onmetal/onmetal-api/internal/controllers/core/quota/generic"
 	quotacontrolleronmetal "github.com/onmetal/onmetal-api/internal/controllers/core/quota/onmetal"
 	ipamcontrollers "github.com/onmetal/onmetal-api/internal/controllers/ipam"
@@ -87,7 +88,8 @@ const (
 	loadBalancerController         = "loadbalancer"
 	natGatewayController           = "natgateway"
 
-	resourceQuotaController = "resourcequota"
+	resourceQuotaController       = "resourcequota"
+	certificateApprovalController = "certificateapproval"
 )
 
 func init() {
@@ -133,7 +135,7 @@ func main() {
 		prefixController, prefixAllocationScheduler,
 
 		// Core controllers
-		resourceQuotaController,
+		resourceQuotaController, certificateApprovalController,
 	)
 	flag.Var(controllers, "controllers",
 		fmt.Sprintf("Controllers to enable. All controllers: %v. Disabled-by-default controllers: %v",
@@ -385,6 +387,7 @@ func main() {
 			Registry:  registry,
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "ResourceQuota")
+			os.Exit(1)
 		}
 
 		replenishReconcilers, err := quotacontrolleronmetal.NewReplenishReconcilers(mgr.GetClient(), registry)
@@ -395,6 +398,16 @@ func main() {
 
 		if err := quotacontrollergeneric.SetupReplenishReconcilersWithManager(mgr, replenishReconcilers); err != nil {
 			setupLog.Error(err, "unable to create replenish controllers")
+			os.Exit(1)
+		}
+	}
+
+	if controllers.Enabled(certificateApprovalController) {
+		if err := (&corecontrollers.CertificateApprovalReconciler{
+			Client:      mgr.GetClient(),
+			Recognizers: certificateonmetal.Recognizers,
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "CertificateApproval")
 			os.Exit(1)
 		}
 	}

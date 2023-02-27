@@ -1916,7 +1916,7 @@ func (this *BucketClass) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&BucketClass{`,
-		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
+		`RotatorName:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`Capabilities:` + strings.Replace(this.Capabilities.String(), "BucketClassCapabilities", "BucketClassCapabilities", 1) + `,`,
 		`}`,
 	}, "")
@@ -2712,7 +2712,7 @@ func (m *BucketClass) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field RotatorName", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {

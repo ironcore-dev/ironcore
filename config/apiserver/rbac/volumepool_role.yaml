@@ -1,0 +1,66 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: storage.api.onmetal.de:system:volumepools
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - storage.api.onmetal.de
+  resources:
+  - volumeclasses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - storage.api.onmetal.de
+  resources:
+  - volumepools
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - storage.api.onmetal.de
+  resources:
+  - volumepools/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - storage.api.onmetal.de
+  resources:
+  - volumes
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - storage.api.onmetal.de
+  resources:
+  - volumes/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - storage.api.onmetal.de
+  resources:
+  - volumes/status
+  verbs:
+  - get
+  - patch
+  - update
