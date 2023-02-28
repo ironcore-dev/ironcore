@@ -301,14 +301,25 @@ func (g *Getter) getAndBootstrapConfigIfNecessary(ctx context.Context, o *GetCon
 		return nil, nil, fmt.Errorf("must specify either kubeconfig or kubeconfig-secret-name when bootstrap is enabled")
 	}
 
+	dialFunc, err := GetEgressSelectorDial(o.EgressSelectorConfig, o.EgressSelectionName)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	cfg, err := store.Get(ctx)
 	if IgnoreErrConfigNotFound(err) != nil {
 		return nil, nil, fmt.Errorf("error getting kubeconfig: %w", err)
+	}
+	if cfg != nil {
+		cfg.Dial = dialFunc
 	}
 
 	bootstrapCfg, err := FileLoader(o.BootstrapKubeconfig).Load(ctx, nil)
 	if IgnoreErrConfigNotFound(err) != nil {
 		return nil, nil, fmt.Errorf("error loading bootstrap kubeconfig: %w", err)
+	}
+	if bootstrapCfg != nil {
+		cfg.Dial = dialFunc
 	}
 
 	if cfg == nil && bootstrapCfg == nil {
@@ -323,11 +334,6 @@ func (g *Getter) getAndBootstrapConfigIfNecessary(ctx context.Context, o *GetCon
 		if err := store.Set(ctx, cfg); err != nil {
 			return nil, nil, fmt.Errorf("error persisting new config: %w", err)
 		}
-	}
-
-	dialFunc, err := GetEgressSelectorDial(o.EgressSelectorConfig, o.EgressSelectionName)
-	if err != nil {
-		return nil, nil, err
 	}
 
 	cfg.Dial = dialFunc
@@ -351,6 +357,9 @@ func (g *Getter) getConfigAndController(ctx context.Context, o *GetConfigOptions
 	bootstrapCfg, err := FileLoader(o.BootstrapKubeconfig).Load(ctx, nil)
 	if IgnoreErrConfigNotFound(err) != nil {
 		return nil, nil, fmt.Errorf("error loading bootstrap kubeconfig: %w", err)
+	}
+	if bootstrapCfg != nil {
+		bootstrapCfg.Dial = dialFunc
 	}
 
 	c, err := g.newController(ctx, store, bootstrapCfg, ControllerOptions{

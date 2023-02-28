@@ -76,10 +76,6 @@ func DynamicCertificateConfig(
 	getCertificate func() *tls.Certificate,
 	dialFunc utilnet.DialFunc,
 ) (*rest.Config, func(), error) {
-	if cfg.Transport != nil || cfg.Dial != nil {
-		return nil, nil, fmt.Errorf("cannot override preconfigured transport / dialer for dynamic certificate config")
-	}
-
 	cfg = rest.AnonymousClientConfig(cfg)
 	tlsConfig, err := rest.TLSConfigFor(cfg)
 	if err != nil {

@@ -100,6 +100,9 @@ func NewController(ctx context.Context, store Store, bootstrapCfg *rest.Config, 
 	if IgnoreErrConfigNotFound(err) != nil {
 		return nil, fmt.Errorf("error getting config from store: %w", err)
 	}
+	if cfg != nil {
+		cfg.Dial = opts.DialFunc
+	}
 
 	configRotator, err := opts.NewRESTConfigRotator(cfg, bootstrapCfg, utilrest.ConfigRotatorOptions{
 		Name:              opts.Name,
