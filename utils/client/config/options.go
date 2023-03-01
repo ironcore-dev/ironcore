@@ -41,14 +41,11 @@ type GetConfigOptions struct {
 	// The bootstrap kubeconfig will be used to request an up-to-date certificate for the kube-apiserver.
 	BootstrapKubeconfig string
 
-	// Rotate specifies whether kubeconfig should be automatically rotated.
-	Rotate bool
+	// RotateCertificates specifies whether kubeconfig should be automatically rotated.
+	RotateCertificates bool
 
 	// EgressSelectorConfig is the path to an egress selector config to load.
 	EgressSelectorConfig string
-	// EgressSelectionName is the name of the egress configuration to use.
-	// Defaults to EgressSelectionNameControlPlane.
-	EgressSelectionName EgressSelectionName
 }
 
 func (o *GetConfigOptions) BindFlags(fs *pflag.FlagSet) {
@@ -56,7 +53,7 @@ func (o *GetConfigOptions) BindFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.KubeconfigSecretName, KubeconfigSecretNameFlagName, "", "Name of a kubeconfig secret to use.")
 	fs.StringVar(&o.KubeconfigSecretNamespace, KubeconfigSecretNamespaceFlagName, "", "Namespace of the kubeconfig secret to use. If empty, use in-cluster namespace.")
 	fs.StringVar(&o.BootstrapKubeconfig, BootstrapKubeconfigFlagName, "", "Path to a bootstrap kubeconfig.")
-	fs.BoolVar(&o.Rotate, RotateFlagName, false, "Whether to use automatic certificate / config rotation.")
+	fs.BoolVar(&o.RotateCertificates, RotateCertificatesFlagName, false, "Whether to use automatic certificate / config rotation.")
 	fs.StringVar(&o.EgressSelectorConfig, EgressSelectorConfigFlagName, "", "Path pointing to an egress selector config to use.")
 }
 
@@ -77,14 +74,11 @@ func (o *GetConfigOptions) ApplyToGetConfig(o2 *GetConfigOptions) {
 	if o.BootstrapKubeconfig != "" {
 		o2.BootstrapKubeconfig = o.BootstrapKubeconfig
 	}
-	if o.Rotate {
-		o2.Rotate = o.Rotate
+	if o.RotateCertificates {
+		o2.RotateCertificates = o.RotateCertificates
 	}
 	if o.EgressSelectorConfig != "" {
 		o2.EgressSelectorConfig = o.EgressSelectorConfig
-	}
-	if o.EgressSelectionName != "" {
-		o2.EgressSelectionName = o.EgressSelectionName
 	}
 }
 
@@ -106,15 +100,9 @@ func (c Context) ApplyToGetConfig(o *GetConfigOptions) {
 // EgressSelectorConfig allows specifying the path to an egress selector config to use.
 type EgressSelectorConfig string
 
+// ApplyToGetConfig implements GetConfigOption.
 func (c EgressSelectorConfig) ApplyToGetConfig(o *GetConfigOptions) {
 	o.EgressSelectorConfig = string(c)
-}
-
-type WithEgressSelectionName EgressSelectionName
-
-// ApplyToGetConfig implements GetConfigOption.
-func (w WithEgressSelectionName) ApplyToGetConfig(o *GetConfigOptions) {
-	o.EgressSelectionName = EgressSelectionName(w)
 }
 
 // GetConfigOption are options to a GetConfig call.
@@ -123,10 +111,13 @@ type GetConfigOption interface {
 	ApplyToGetConfig(o *GetConfigOptions)
 }
 
+// WithRotate sets GetConfigOptions.RotateCertificates to the specified boolean.
 type WithRotate bool
 
+// ApplyToGetConfig implements GetConfigOption.
 func (w WithRotate) ApplyToGetConfig(o *GetConfigOptions) {
-	o.Rotate = bool(w)
+	o.RotateCertificates = bool(w)
 }
 
-var Rotate = WithRotate(true)
+// RotateCertificates enables certificate rotation.
+var RotateCertificates = WithRotate(true)

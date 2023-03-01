@@ -23,6 +23,7 @@ import (
 	utilcertificate "github.com/onmetal/onmetal-api/utils/certificate"
 	"github.com/onmetal/onmetal-api/utils/client/config"
 	certificatesv1 "k8s.io/api/certificates/v1"
+	"k8s.io/apiserver/pkg/server/egressselector"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
@@ -38,7 +39,8 @@ func NewGetter(volumePoolName string) (*config.Getter, error) {
 				Organization: []string{storagev1alpha1.VolumePoolsGroup},
 			},
 		},
-		GetUsages: utilcertificate.DefaultKubeAPIServerClientGetUsages,
+		GetUsages:      utilcertificate.DefaultKubeAPIServerClientGetUsages,
+		NetworkContext: egressselector.ControlPlane.AsNetworkContext(),
 	})
 }
 
