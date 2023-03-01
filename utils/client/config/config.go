@@ -50,8 +50,8 @@ const (
 	// BootstrapKubeconfigFlagName is the name of the bootstrap-kubeconfig flag.
 	BootstrapKubeconfigFlagName = "bootstrap-kubeconfig"
 
-	// RotateFlagName is the name of the rotate flag.
-	RotateFlagName = "rotate"
+	// RotateCertificatesFlagName is the name of the rotate flag.
+	RotateCertificatesFlagName = "rotate-certificates"
 
 	// EgressSelectorConfigFlagName is the name of the egress-selector-config flag.
 	EgressSelectorConfigFlagName = "egress-selector-config"
@@ -87,12 +87,6 @@ func (n EgressSelectionName) NetworkContext() (egressselector.NetworkContext, er
 	}
 }
 
-func setGetConfigOptionsDefaults(o *GetConfigOptions) {
-	if o.EgressSelectionName == "" {
-		o.EgressSelectionName = EgressSelectionNameControlPlane
-	}
-}
-
 type NewControllerFunc func(ctx context.Context, store Store, bootstrapCfg *rest.Config, opts ControllerOptions) (Controller, error)
 
 type GetterOptions struct {
@@ -104,6 +98,7 @@ type GetterOptions struct {
 	LogConstructor    func() logr.Logger
 	NewController     NewControllerFunc
 	ForceInitial      bool
+	NetworkContext    egressselector.NetworkContext
 }
 
 func setGetterOptionsDefaults(o *GetterOptions) {
@@ -127,6 +122,7 @@ type Getter struct {
 	logConstructor    func() logr.Logger
 	newController     NewControllerFunc
 	forceInitial      bool
+	networkContext    egressselector.NetworkContext
 }
 
 func NewGetter(opts GetterOptions) (*Getter, error) {
@@ -246,14 +242,13 @@ func LoaderFromOptions(o *GetConfigOptions) (Loader, error) {
 func (g *Getter) GetConfig(ctx context.Context, opts ...GetConfigOption) (*rest.Config, Controller, error) {
 	o := &GetConfigOptions{}
 	o.ApplyOptions(opts)
-	setGetConfigOptionsDefaults(o)
 
 	if o.Kubeconfig != "" && o.KubeconfigSecretName != "" {
 		return nil, nil, fmt.Errorf("cannot specify kubeconfig and kubeconfig-secret-name")
 	}
 
 	switch {
-	case o.Rotate:
+	case o.RotateCertificates:
 		g.logConstructor().Info("Getting config and initializing rotation")
 		return g.getConfigAndController(ctx, o)
 	case o.BootstrapKubeconfig != "":
@@ -283,7 +278,7 @@ func (g *Getter) getConfig(ctx context.Context, o *GetConfigOptions) (*rest.Conf
 		return nil, nil, err
 	}
 
-	dialFunc, err := GetEgressSelectorDial(o.EgressSelectorConfig, o.EgressSelectionName)
+	dialFunc, err := GetEgressSelectorDial(g.networkContext, o.EgressSelectorConfig)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -301,7 +296,7 @@ func (g *Getter) getAndBootstrapConfigIfNecessary(ctx context.Context, o *GetCon
 		return nil, nil, fmt.Errorf("must specify either kubeconfig or kubeconfig-secret-name when bootstrap is enabled")
 	}
 
-	dialFunc, err := GetEgressSelectorDial(o.EgressSelectorConfig, o.EgressSelectionName)
+	dialFunc, err := GetEgressSelectorDial(g.networkContext, o.EgressSelectorConfig)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -349,7 +344,7 @@ func (g *Getter) getConfigAndController(ctx context.Context, o *GetConfigOptions
 		return nil, nil, fmt.Errorf("must specify either kubeconfig or kubeconfig-secret-name when rotate is enabled")
 	}
 
-	dialFunc, err := GetEgressSelectorDial(o.EgressSelectorConfig, o.EgressSelectionName)
+	dialFunc, err := GetEgressSelectorDial(g.networkContext, o.EgressSelectorConfig)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -434,14 +429,9 @@ func LoadDefaultConfig(context string) (*rest.Config, error) {
 	return loadConfigWithContext("", loadingRules, context)
 }
 
-func GetEgressSelectorDial(egressSelectorConfig string, egressSelectionName EgressSelectionName) (utilnet.DialFunc, error) {
+func GetEgressSelectorDial(networkContext egressselector.NetworkContext, egressSelectorConfig string) (utilnet.DialFunc, error) {
 	if egressSelectorConfig == "" {
 		return nil, nil
-	}
-
-	networkContext, err := egressSelectionName.NetworkContext()
-	if err != nil {
-		return nil, fmt.Errorf("error obtaining network context: %w", err)
 	}
 
 	egressSelectorCfg, err := egressselector.ReadEgressSelectorConfiguration(egressSelectorConfig)

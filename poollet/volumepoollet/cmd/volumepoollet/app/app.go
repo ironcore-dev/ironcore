@@ -157,10 +157,7 @@ func Run(ctx context.Context, opts Options) error {
 
 	volumeRuntime := ori.NewVolumeRuntimeClient(conn)
 
-	cfg, configCtrl, err := getter.GetConfig(ctx,
-		&opts.GetConfigOptions,
-		config.WithEgressSelectionName(configutils.EgressSelectionNameControlPlane),
-	)
+	cfg, configCtrl, err := getter.GetConfig(ctx, &opts.GetConfigOptions)
 	if err != nil {
 		return fmt.Errorf("error getting config: %w", err)
 	}
