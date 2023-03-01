@@ -19,6 +19,8 @@ import (
 	"crypto/x509/pkix"
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	utilcertificate "github.com/onmetal/onmetal-api/utils/certificate"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -28,29 +30,47 @@ import (
 )
 
 var _ = Describe("CertificateApprovalController", func() {
-	It("should approve the certificate", func(ctx SpecContext) {
-		By("creating a certificate signing request")
-		csr, _, _, err := utilcertificate.GenerateAndCreateCertificateSigningRequest(
-			ctx,
-			k8sClient,
-			certificatesv1.KubeAPIServerClientSignerName,
-			&x509.CertificateRequest{
-				Subject: pkix.Name{
-					CommonName:   computev1alpha1.MachinePoolCommonName("my-pool"),
-					Organization: []string{computev1alpha1.MachinePoolsGroup},
+	DescribeTable("certificate approval",
+		func(ctx SpecContext, commonName, organization string) {
+			By("creating a certificate signing request")
+			csr, _, _, err := utilcertificate.GenerateAndCreateCertificateSigningRequest(
+				ctx,
+				k8sClient,
+				certificatesv1.KubeAPIServerClientSignerName,
+				&x509.CertificateRequest{
+					Subject: pkix.Name{
+						CommonName:   commonName,
+						Organization: []string{organization},
+					},
 				},
-			},
-			utilcertificate.DefaultKubeAPIServerClientGetUsages,
-			nil,
-		)
-		Expect(err).NotTo(HaveOccurred())
+				utilcertificate.DefaultKubeAPIServerClientGetUsages,
+				nil,
+			)
+			Expect(err).NotTo(HaveOccurred())
 
-		By("waiting for the csr to be approved and a certificate to be available")
-		Eventually(ctx, Object(csr)).Should(
-			HaveField("Status.Conditions", ContainElement(SatisfyAll(
-				HaveField("Type", certificatesv1.CertificateApproved),
-				HaveField("Status", corev1.ConditionTrue),
-			))),
-		)
-	})
+			By("waiting for the csr to be approved and a certificate to be available")
+			Eventually(ctx, Object(csr)).Should(
+				HaveField("Status.Conditions", ContainElement(SatisfyAll(
+					HaveField("Type", certificatesv1.CertificateApproved),
+					HaveField("Status", corev1.ConditionTrue),
+				))),
+			)
+		},
+		Entry("machine pool",
+			computev1alpha1.MachinePoolCommonName("my-pool"),
+			computev1alpha1.MachinePoolsGroup,
+		),
+		Entry("volume pool",
+			storagev1alpha1.VolumePoolCommonName("my-pool"),
+			storagev1alpha1.VolumePoolsGroup,
+		),
+		Entry("bucket pool",
+			storagev1alpha1.BucketPoolCommonName("my-pool"),
+			storagev1alpha1.BucketPoolsGroup,
+		),
+		Entry("network plugin",
+			networkingv1alpha1.NetworkPluginCommonName("my-plugin"),
+			networkingv1alpha1.NetworkPluginsGroup,
+		),
+	)
 })
