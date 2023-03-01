@@ -12,19 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package onmetal
+package networking
 
-import (
-	"github.com/onmetal/onmetal-api/internal/controllers/core/certificate/compute"
-	"github.com/onmetal/onmetal-api/internal/controllers/core/certificate/generic"
-	"github.com/onmetal/onmetal-api/internal/controllers/core/certificate/networking"
-	"github.com/onmetal/onmetal-api/internal/controllers/core/certificate/storage"
-)
+import "github.com/onmetal/onmetal-api/internal/controllers/core/certificate/generic"
 
 var Recognizers []generic.CertificateSigningRequestRecognizer
-
-func init() {
-	Recognizers = append(Recognizers, compute.Recognizers...)
-	Recognizers = append(Recognizers, storage.Recognizers...)
-	Recognizers = append(Recognizers, networking.Recognizers...)
-}

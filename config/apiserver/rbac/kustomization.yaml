@@ -22,3 +22,9 @@ resources:
   - bucketpool_rolebinding.yaml
   - bucketpool_bootstrapper_role.yaml
   - bucketpool_bootstrapper_rolebinding.yaml
+  
+  # Network Plugin (bootstrapper) roles
+  - networkplugin_role.yaml
+  - networkplugin_rolebinding.yaml
+  - networkplugin_bootstrapper_role.yaml
+  - networkplugin_bootstrapper_rolebinding.yaml

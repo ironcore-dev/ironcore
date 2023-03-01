@@ -20,6 +20,19 @@ import (
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 )
 
+const (
+	// NetworkPluginsGroup is the system rbac group all network plugins are in.
+	NetworkPluginsGroup = "networking.api.onmetal.de:system:networkplugins"
+
+	// NetworkPluginUserNamePrefix is the prefix all network plugin users should have.
+	NetworkPluginUserNamePrefix = "networking.api.onmetal.de:system:networkplugin:"
+)
+
+// NetworkPluginCommonName constructs the common name for a certificate of a network plugin user.
+func NetworkPluginCommonName(name string) string {
+	return NetworkPluginUserNamePrefix + name
+}
+
 // EphemeralPrefixSource contains the definition to create an ephemeral (i.e. coupled to the lifetime of the
 // surrounding object) Prefix.
 type EphemeralPrefixSource struct {
