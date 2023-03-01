@@ -62,7 +62,7 @@ func SetDefaults_NetworkInterfaceSpec(spec *v1alpha1.NetworkInterfaceSpec) {
 
 	for _, ip := range spec.IPs {
 		if ip.Ephemeral != nil && ip.Ephemeral.PrefixTemplate != nil {
-			templateSpec := ip.Ephemeral.PrefixTemplate.Spec
+			templateSpec := &ip.Ephemeral.PrefixTemplate.Spec
 			if templateSpec.Prefix == nil && templateSpec.PrefixLength == 0 {
 				templateSpec.PrefixLength = ipFamilyToPrefixLength[templateSpec.IPFamily]
 			}
