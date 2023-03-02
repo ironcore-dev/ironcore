@@ -1,5 +1,5 @@
 ---
-title: VNet Peering
+title: Network Peering
 
 oep-number: 8
 
@@ -19,7 +19,7 @@ reviewers:
 
 ---
 
-# OEP-NNNN: Your short, descriptive title
+# OEP-8: Peering of OnMetal Networks
 
 ## Table of Contents
 
@@ -32,17 +32,16 @@ reviewers:
 
 ## Summary
 
-Network peering is a crucial feature to allow users to route traffic between two onmetal networks. This OEP introduces a new API that allows the owner of both networks to express the consent to peering the networks explicitely and extends the existing `Network` API to reflect an active peering.
+Network peering is a crucial feature to allow users to route traffic between two onmetal networks. This OEP introduces a new API that allows the users that created of the networks to express the consent to peering the networks explicitely and extends the existing `Network` API to reflect an active peering.
 
-- peering connects whole networks together 
-(vf get both network route set announced)
+- peering connects whole networks together
 - clear separation from transit gateways
-- we need peering requests on both partners
+- we need peering requests for both networks to ensure consent on both sides
 - peering request should have a ttl so they get removed if not matched
 
 ## Motivation
 
-Without peering, users of onmetal would need to run all services via public IPs or via complicated VPN solutions if they are located in seperate networks.
+Without peering, users of onmetal would need to run all services via public IPs or via complicated VPN solutions if they are located in separate networks.
 We want to implement the basic use case of allowing services running in two distinct onmetal networks to be able to reach eachother without any additional installation from the user and without exposing said services to the public internet.
 
 ### Goals
@@ -50,6 +49,7 @@ We want to implement the basic use case of allowing services running in two dist
 * Define API for requesting and acknowledging peering of two network
 * Peering request should have a TTL that allows for garbage collection of unanswered requests
 * Peering should result in one network's prefixes should be fully routeable from the other network's prefixes and vice versa (vf get both network route sets announced)
+* On conflicts (e.g. overlapping IP ranges) both peering requests should enter a failed state
 
 ### Non-Goals
 
@@ -75,15 +75,15 @@ spec:
     namespace: customer-andre #optional could be another network of the same namespace
 status:
   ttl: 2023-02-15T19:00:00Z # omit if empty
-  state: -> pending because missing match
-         -> failed overlapping ip range
-         -> success when found a match and peered
+  state: -> Pending because missing match
+         -> Failed overlapping ip range
+         -> Success when found a match and peered
 ```
 
 * `localNetworkRef`: reference to the network that the creator of this `NetworkPeeringRequest` owns and intends to peer, needs to reside in the same namespace as the referenced `Network`object
 * `remoteNetworkRef`: reference to the network that should be peered with the one referenced in the `localNetworkRef`, namespace can be omited if this `Network`object resides in the same namespace as the `NetworkPeeringRequest``
 * `status.ttl`: ISO timestamp that reflects the point in time when this peering request is being deleted if the `status.state`is still `pending` or `failed` before. If `status.state`is `success`, this will be ignored and the object will not be deleted
-* `status.state`: can be either `pending`, `success` or `failed`. State is `pending` as long as there is no matching `NetworkPeeringRequest` present. State is `success`when there is a matching `NetworkPeeringRequest` present. State is `failed` when certain parameters stop the matching from succeeding, like e.g. overlapping IP ranges of the two referenced networks
+* `status.state`: can be either `Pending`, `Success` or `Failed`. State is `Pending` as long as there is no matching `NetworkPeeringRequest` present. State is `Success`when there is a matching `NetworkPeeringRequest` present. State is `Failed` when certain parameters stop the matching from succeeding, like e.g. overlapping IP ranges of the two referenced networks
 
 ### The updated `Network` type
 
@@ -103,20 +103,20 @@ status:
 
 ### Example
 
-Let's suppose Manuel wants to peer his `Network` `manuels-network` with André's `Network` `mysupernetwork`. Let's also assume that Manuel's namespace is `customer-manuel` and André's namespace is called `customer-andre`. With that we get the following two `NetworkPeeringRequest`objects reflecting a successful peering of the two `Network`objects presented at the end.
+Let's suppose User-1 wants to peer his `Network` `network-1` with User-2's `Network` `network-2`. Let's also assume that User-1's namespace is `namespace-1` and User-2's namespace is called `namespace-2`. With that we get the following two `NetworkPeeringRequest`objects reflecting a successful peering of the two `Network` objects presented at the end.
 
 ```yaml
 apiVersion: networking.api.onmetal.de/v1alpha1
 kind: NetworkPeeringRequest
 metadata:
-  namespace: customer-manuel
-  name: peer-with-andre
+  namespace: namespace-1
+  name: peer-with-network-2
 spec:
   localNetworkRef:
-    name: manuels-network
+    name: network-1
   remoteNetworkRef:
-    name: mysupernetwork
-    namespace: customer-andre
+    name: network-2
+    namespace: namespace-2
 status:
   ttl: 2023-02-15T19:00:00Z 
   state: success
@@ -126,14 +126,14 @@ status:
 apiVersion: networking.api.onmetal.de/v1alpha1
 kind: NetworkPeeringRequest
 metadata:
-  namespace: customer-andre
-  name: peer-with-manuel
+  namespace: namespace-2
+  name: peer-with-network-1
 spec:
   localNetworkRef:
-    name: mysupernetwork
+    name: network-2
   remoteNetworkRef:
-    name: manuels-network
-    namespace: customer-manuel
+    name: network-1
+    namespace: namespace-1
 status:
   ttl: 2023-02-16T20:00:00Z 
   state: success
@@ -143,24 +143,24 @@ status:
 apiVersion: networking.api.onmetal.de/v1alpha1
 kind: Network
 metadata:
-  namespace: customer-manuel
-  name: manuels-network
+  namespace: namespace-1
+  name: network-1
 status:
   peeredNetworks:
-    - name: mysupernetwork
-      namespace: customer-andre
+    - name: network-2
+      namespace: namespace-2
 ```
 
 ```yaml
 apiVersion: networking.api.onmetal.de/v1alpha1
 kind: Network
 metadata:
-  namespace: customer-andre
-  name: mysupernetwork
+  namespace: namespace-2
+  name: network-2
 status:
   peeredNetworks:
-    - name: manuels-network
-      namespace: customer-manuel
+    - name: network-1
+      namespace: namespace-1
 ```
 
 ## Alternatives
