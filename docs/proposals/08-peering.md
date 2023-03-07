@@ -46,33 +46,33 @@ We want to implement the basic use case of allowing services running in two dist
 
 ### Goals
 
-* Define API for requesting and acknowledging peering of two network
-* Peering request should have a TTL that allows for garbage collection of unanswered requests
-* Peering should result in one network's prefixes should be fully routeable from the other network's prefixes and vice versa (vf get both network route sets announced)
+* Define API for requesting and acknowledging peering of two networks
+* Peering request should have a TTL that allows for garbage collection of unanswered requests to mitigate flooding of non-matching peering requests
+* Peering should result in one network's prefixes should be fully routeable from the other network's prefixes and vice versa, meaning all IP addresses are abailable in all peered networks
 * On conflicts (e.g. overlapping IP ranges) both peering requests should enter a failed state
 
 ### Non-Goals
 
-* We do not want to implement a transit gateway
+We do not want to implement a transit gateway. When we peer networks we expect to make all IP addresses available in the peered networks. With a transit gateway we would be able to only share networks selectively. When peered networks have overlapping IP address ranges we can either fail the peering or have some precedence to routing rules (e.g. local first) but the transit gateway would be able to e.g. define a transit IP range to enable routing between overlapping IP ranges.
 
 ## Proposal
 
-We propose using a new API called `NetworkPeeringRequests` and extending the `Network` API with a `status` reflecting the peering. For a peering to succeed, both owners of the two `Networks` that should peer, have to create a matching `NetworkPeeringRequest`. On successful peering, the `status` of the corresponding `Network` objects should be updated with the other `Network`s details. A `NetworkPeeringRequest` will also have a set time-to-live (ttl), so the system will be able to automatically clean up vacant or unmatched `NetworkPeeringRequest`objects. Always two matching `NetworkPeeringRequests` are required to enable peering. Important: `localNetworkRef` must match to other `remoteNetworkRef` and vice versa.
+We propose using a new API called `NetworkPeering` and extending the `Network` API with a `status` reflecting the peering. For a peering to succeed, both owners of the two `Networks` that should peer, have to create a matching `NetworkPeering`. On successful peering, the `status` of the corresponding `Network` objects should be updated with the other `Network`s details. A `NetworkPeering` will also have a set time-to-live (ttl), so the system will be able to automatically clean up vacant or unmatched `NetworkPeering`objects. Always two matching `NetworkPeering` are required to enable peering. Important: `localNetworkRef` must match to other `remoteNetworkRef` and vice versa.
 
-### The `NetworkPeeringRequest`type
+### The `NetworkPeering`type
 
 ```yaml
 apiVersion: networking.api.onmetal.de/v1alpha1
-kind: NetworkPeeringRequest
+kind: NetworkPeering
 metadata:
-  namespace: customer-manuel
-  name: network-sample-request
+  namespace: my-namespace
+  name: network-sample-peering
 spec:
   localNetworkRef:
-    name: manuels-network
+    name: network-a
   remoteNetworkRef:
-    name: mysupernetwork
-    namespace: customer-andre #optional could be another network of the same namespace
+    name: network-b
+    namespace: other-namespace #optional could be another network of the same namespace
 status:
   ttl: 2023-02-15T19:00:00Z # omit if empty
   state: -> Pending because missing match
@@ -80,10 +80,10 @@ status:
          -> Success when found a match and peered
 ```
 
-* `localNetworkRef`: reference to the network that the creator of this `NetworkPeeringRequest` owns and intends to peer, needs to reside in the same namespace as the referenced `Network`object
+* `localNetworkRef`: reference to the network that the creator of this `NetworkPeering` owns and intends to peer, needs to reside in the same namespace as the referenced `Network`object
 * `remoteNetworkRef`: reference to the network that should be peered with the one referenced in the `localNetworkRef`, namespace can be omited if this `Network`object resides in the same namespace as the `NetworkPeeringRequest``
 * `status.ttl`: ISO timestamp that reflects the point in time when this peering request is being deleted if the `status.state`is still `pending` or `failed` before. If `status.state`is `success`, this will be ignored and the object will not be deleted
-* `status.state`: can be either `Pending`, `Success` or `Failed`. State is `Pending` as long as there is no matching `NetworkPeeringRequest` present. State is `Success`when there is a matching `NetworkPeeringRequest` present. State is `Failed` when certain parameters stop the matching from succeeding, like e.g. overlapping IP ranges of the two referenced networks
+* `status.state`: can be either `Pending`, `Success` or `Failed`. State is `Pending` as long as there is no matching `NetworkPeering` present. State is `Success`when there is a matching `NetworkPeering` present. State is `Failed` when certain parameters stop the matching from succeeding, like e.g. overlapping IP ranges of the two referenced networks
 
 ### The updated `Network` type
 
@@ -91,23 +91,23 @@ status:
 apiVersion: networking.api.onmetal.de/v1alpha1
 kind: Network
 metadata:
-  namespace: customer-manuel
-  name: manuels-network
+  namespace: my-namespace
+  name: network-a
 status:
   peeredNetworks:
-    - name: mysupernetwork
-      namespace: customer-andre
+    - name: network-b
+      namespace: other-namespace
 ```
 
 * `status.peeredNetworks`: is a list of successfully peered `Networks`
 
 ### Example
 
-Let's suppose User-1 wants to peer his `Network` `network-1` with User-2's `Network` `network-2`. Let's also assume that User-1's namespace is `namespace-1` and User-2's namespace is called `namespace-2`. With that we get the following two `NetworkPeeringRequest`objects reflecting a successful peering of the two `Network` objects presented at the end.
+Let's suppose User-1 wants to peer his `Network` `network-1` with User-2's `Network` `network-2`. Let's also assume that User-1's namespace is `namespace-1` and User-2's namespace is called `namespace-2`. With that we get the following two `NetworkPeering`objects reflecting a successful peering of the two `Network` objects presented at the end.
 
 ```yaml
 apiVersion: networking.api.onmetal.de/v1alpha1
-kind: NetworkPeeringRequest
+kind: NetworkPeering
 metadata:
   namespace: namespace-1
   name: peer-with-network-2
@@ -124,7 +124,7 @@ status:
 
 ```yaml
 apiVersion: networking.api.onmetal.de/v1alpha1
-kind: NetworkPeeringRequest
+kind: NetworkPeering
 metadata:
   namespace: namespace-2
   name: peer-with-network-1
