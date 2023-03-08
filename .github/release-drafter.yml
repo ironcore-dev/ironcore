@@ -5,6 +5,7 @@ categories:
     labels:
       - 'feature'
       - 'enhancement'
+      - 'api-change'
   - title: '🐛 Bug Fixes'
     labels:
       - 'fix'
@@ -69,6 +70,12 @@ autolabeler:
       - '/feature\/.+/'
     body:
       - '/JIRA-[0-9]{1,4}/'
+  - label: 'enhancement'
+    branch:
+      - '/enh\/.+/'
+  - label: 'chore'
+    branch:
+      - '/chore\/.+/'
 template: |
   ## Changes
   $CHANGES
