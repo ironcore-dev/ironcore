@@ -57,7 +57,10 @@ We do not want to implement a transit gateway. When we peer networks we expect t
 
 ## Proposal
 
-We propose using a new API called `NetworkPeering` and extending the `Network` API with a `status` reflecting the peering. For a peering to succeed, both owners of the two `Networks` that should peer, have to create a matching `NetworkPeering`. On successful peering, the `status` of the corresponding `Network` objects should be updated with the other `Network`s details. A `NetworkPeering` will also have a set time-to-live (ttl), so the system will be able to automatically clean up vacant or unmatched `NetworkPeering`objects. Always two matching `NetworkPeering` are required to enable peering. Important: `localNetworkRef` must match to other `remoteNetworkRef` and vice versa.
+We propose using a new API called `NetworkPeering` and extending the `Network` API with a `status` reflecting the peering. The change in the `Network` API will need the enhancement of the `Network`controller to check for matching `NetworkPeering`resources.
+For a peering to succeed, both owners of the two `Networks` that should peer, have to create a matching `NetworkPeering`. On successful peering, the `status` of the corresponding `Network` objects should be updated with the other `Network`s details.
+A `NetworkPeering` will also have a set time-to-live (ttl), so the system will be able to automatically clean up vacant or unmatched `NetworkPeering`objects. The `status-ttl` field will reflect the end date before the object gets deleted. The actual trigger for garbage collection will be inferred from the `LastTransistionTime` plus a sensible amount of time (e.g. 7 days). Also the garbage collection can only happen if the `NetworkPeering` does NOT have `status.state` set to `Success`.
+Always two matching `NetworkPeering` are required to enable peering. Important: `localNetworkRef` must match to other `remoteNetworkRef` and vice versa.
 
 ### The `NetworkPeering`type
 
