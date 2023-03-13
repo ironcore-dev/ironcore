@@ -15,6 +15,9 @@
 package config
 
 import (
+	"fmt"
+
+	"github.com/onmetal/onmetal-api/utils/generic"
 	"github.com/spf13/pflag"
 )
 
@@ -48,13 +51,46 @@ type GetConfigOptions struct {
 	EgressSelectorConfig string
 }
 
-func (o *GetConfigOptions) BindFlags(fs *pflag.FlagSet) {
-	fs.StringVar(&o.Kubeconfig, KubeconfigFlagName, "", "Paths to a kubeconfig. Only required if out-of-cluster.")
-	fs.StringVar(&o.KubeconfigSecretName, KubeconfigSecretNameFlagName, "", "Name of a kubeconfig secret to use.")
-	fs.StringVar(&o.KubeconfigSecretNamespace, KubeconfigSecretNamespaceFlagName, "", "Namespace of the kubeconfig secret to use. If empty, use in-cluster namespace.")
-	fs.StringVar(&o.BootstrapKubeconfig, BootstrapKubeconfigFlagName, "", "Path to a bootstrap kubeconfig.")
-	fs.BoolVar(&o.RotateCertificates, RotateCertificatesFlagName, false, "Whether to use automatic certificate / config rotation.")
-	fs.StringVar(&o.EgressSelectorConfig, EgressSelectorConfigFlagName, "", "Path pointing to an egress selector config to use.")
+// BindFlagOptions are options for GetConfigOptions.BindFlags.
+type BindFlagOptions struct {
+	// NameFunc can modify the flag names if non-nil.
+	NameFunc func(string) string
+}
+
+// WithNamePrefix adds a flag name prefix to all flags.
+func WithNamePrefix(prefix string) func(*BindFlagOptions) {
+	return func(options *BindFlagOptions) {
+		options.NameFunc = func(name string) string {
+			return fmt.Sprintf("%s%s", prefix, name)
+		}
+	}
+}
+
+// WithNameSuffix adds a flag name suffix to all flags.
+func WithNameSuffix(suffix string) func(*BindFlagOptions) {
+	return func(options *BindFlagOptions) {
+		options.NameFunc = func(name string) string {
+			return fmt.Sprintf("%s%s", name, suffix)
+		}
+	}
+}
+
+// BindFlags binds values of GetConfigOptions as flags to the given flag set.
+func (o *GetConfigOptions) BindFlags(fs *pflag.FlagSet, opts ...func(*BindFlagOptions)) {
+	bo := &BindFlagOptions{}
+	for _, opt := range opts {
+		opt(bo)
+	}
+	if bo.NameFunc == nil {
+		bo.NameFunc = generic.Identity[string]
+	}
+
+	fs.StringVar(&o.Kubeconfig, bo.NameFunc(KubeconfigFlagName), "", "Paths to a kubeconfig. Only required if out-of-cluster.")
+	fs.StringVar(&o.KubeconfigSecretName, bo.NameFunc(KubeconfigSecretNameFlagName), "", "Name of a kubeconfig secret to use.")
+	fs.StringVar(&o.KubeconfigSecretNamespace, bo.NameFunc(KubeconfigSecretNamespaceFlagName), "", "Namespace of the kubeconfig secret to use. If empty, use in-cluster namespace.")
+	fs.StringVar(&o.BootstrapKubeconfig, bo.NameFunc(BootstrapKubeconfigFlagName), "", "Path to a bootstrap kubeconfig.")
+	fs.BoolVar(&o.RotateCertificates, bo.NameFunc(RotateCertificatesFlagName), false, "Whether to use automatic certificate / config rotation.")
+	fs.StringVar(&o.EgressSelectorConfig, bo.NameFunc(EgressSelectorConfigFlagName), "", "Path pointing to an egress selector config to use.")
 }
 
 // ApplyToGetConfig implements GetConfigOption.
