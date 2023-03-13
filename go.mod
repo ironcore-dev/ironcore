@@ -12,7 +12,7 @@ require (
 	github.com/moby/term v0.0.0-20220808134915-39b0c02b01ae
 	github.com/onmetal/controller-utils v0.7.0
 	github.com/onsi/ginkgo/v2 v2.9.0
-	github.com/onsi/gomega v1.27.2
+	github.com/onsi/gomega v1.27.3
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
 	go.uber.org/atomic v1.10.0
@@ -56,7 +56,7 @@ require (
 	github.com/go-openapi/swag v0.22.3 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20210107165309-348f09dbbbc0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
-	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/cel-go v0.12.6 // indirect
 	github.com/google/gnostic v0.5.7-v3refs // indirect
 	github.com/google/gofuzz v1.1.0 // indirect
