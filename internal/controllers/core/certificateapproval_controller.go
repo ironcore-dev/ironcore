@@ -80,6 +80,9 @@ func (r *CertificateApprovalReconciler) Reconcile(ctx context.Context, req ctrl.
 			if err := r.Client.SubResource("approval").Update(ctx, csr); err != nil {
 				return ctrl.Result{}, fmt.Errorf("error updating approval for certificate signing request: %w", err)
 			}
+
+			log.V(1).Info("Approved certificate", "Subresource", permission.Subresource)
+			return ctrl.Result{}, nil
 		}
 	}
 	if len(tried) > 0 {
