@@ -122,7 +122,7 @@ spec:
     namespace: namespace-2
 status:
   ttl: 2023-02-15T19:00:00Z 
-  state: success
+  state: Success
 ```
 
 ```yaml
@@ -139,7 +139,7 @@ spec:
     namespace: namespace-1
 status:
   ttl: 2023-02-16T20:00:00Z 
-  state: success
+  state: Success
 ```
 
 ```yaml
