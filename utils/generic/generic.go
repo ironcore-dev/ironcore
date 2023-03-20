@@ -18,3 +18,29 @@ package generic
 func Identity[E any](e E) E {
 	return e
 }
+
+// Zero returns the zero value for the given type.
+func Zero[E any]() E {
+	var zero E
+	return zero
+}
+
+// Pointer returns a pointer for the given value.
+func Pointer[E any](e E) *E {
+	return &e
+}
+
+// DerefFunc returns the value e points to if it's non-nil. Otherwise, it returns the result of calling defaultFunc.
+func DerefFunc[E any](e *E, defaultFunc func() E) E {
+	if e != nil {
+		return *e
+	}
+	return defaultFunc()
+}
+
+// Deref returns the value e points to if it's non-nil. Otherwise, it returns the defaultValue.
+func Deref[E any](e *E, defaultValue E) E {
+	return DerefFunc(e, func() E {
+		return defaultValue
+	})
+}

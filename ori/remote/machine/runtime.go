@@ -148,3 +148,7 @@ func (r *remoteRuntime) DeleteNetworkInterfaceNAT(ctx context.Context, req *ori.
 func (r *remoteRuntime) ListMachineClasses(ctx context.Context, req *ori.ListMachineClassesRequest) (*ori.ListMachineClassesResponse, error) {
 	return r.client.ListMachineClasses(ctx, req)
 }
+
+func (r *remoteRuntime) Exec(ctx context.Context, req *ori.ExecRequest) (*ori.ExecResponse, error) {
+	return r.client.Exec(ctx, req)
+}

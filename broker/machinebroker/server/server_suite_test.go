@@ -55,6 +55,10 @@ const (
 	apiServiceTimeout    = 5 * time.Minute
 )
 
+const (
+	baseURL = "http://localhost:8080"
+)
+
 func TestServer(t *testing.T) {
 	SetDefaultConsistentlyPollingInterval(pollingInterval)
 	SetDefaultEventuallyPollingInterval(pollingInterval)
@@ -126,7 +130,9 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *server.Server) {
 		Expect(k8sClient.Create(ctx, ns)).To(Succeed(), "failed to create test namespace")
 		DeferCleanup(k8sClient.Delete, ctx, ns)
 
-		newSrv, err := server.New(cfg, ns.Name, server.Options{})
+		newSrv, err := server.New(cfg, ns.Name, server.Options{
+			BaseURL: baseURL,
+		})
 		Expect(err).NotTo(HaveOccurred())
 		*srv = *newSrv
 	})

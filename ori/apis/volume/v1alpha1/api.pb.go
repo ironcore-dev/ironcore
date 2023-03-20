@@ -2118,7 +2118,7 @@ func (this *VolumeClass) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&VolumeClass{`,
-		`RotatorName:` + fmt.Sprintf("%v", this.Name) + `,`,
+		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`Capabilities:` + strings.Replace(this.Capabilities.String(), "VolumeClassCapabilities", "VolumeClassCapabilities", 1) + `,`,
 		`}`,
 	}, "")
@@ -3063,7 +3063,7 @@ func (m *VolumeClass) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RotatorName", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
