@@ -81,6 +81,7 @@ type FakeRuntimeService struct {
 	Volumes           map[string]*FakeVolume
 	NetworkInterfaces map[string]*FakeNetworkInterface
 	MachineClasses    map[string]*FakeMachineClass
+	GetExecURL        func(req *ori.ExecRequest) string
 }
 
 func NewFakeRuntimeService() *FakeRuntimeService {
@@ -130,6 +131,13 @@ func (r *FakeRuntimeService) SetMachineClasses(machineClasses []*FakeMachineClas
 	for _, machineClass := range machineClasses {
 		r.MachineClasses[machineClass.Name] = machineClass
 	}
+}
+
+func (r *FakeRuntimeService) SetGetExecURL(f func(req *ori.ExecRequest) string) {
+	r.Lock()
+	defer r.Unlock()
+
+	r.GetExecURL = f
 }
 
 func (r *FakeRuntimeService) Version(ctx context.Context, req *ori.VersionRequest) (*ori.VersionResponse, error) {
@@ -622,4 +630,15 @@ func (r *FakeRuntimeService) ListMachineClasses(ctx context.Context, req *ori.Li
 		res = append(res, &machineClass)
 	}
 	return &ori.ListMachineClassesResponse{MachineClasses: res}, nil
+}
+
+func (r *FakeRuntimeService) Exec(ctx context.Context, req *ori.ExecRequest) (*ori.ExecResponse, error) {
+	r.Lock()
+	defer r.Unlock()
+
+	var url string
+	if r.GetExecURL != nil {
+		url = r.GetExecURL(req)
+	}
+	return &ori.ExecResponse{Url: url}, nil
 }

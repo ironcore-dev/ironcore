@@ -41,6 +41,7 @@ func init() {
 
 type Cluster interface {
 	Namespace() string
+	Config() *rest.Config
 	Client() client.Client
 	Scheme() *runtime.Scheme
 	IDGen() idgen.IDGen
@@ -50,6 +51,7 @@ type Cluster interface {
 
 type cluster struct {
 	namespace           string
+	config              *rest.Config
 	client              client.Client
 	scheme              *runtime.Scheme
 	idGen               idgen.IDGen
@@ -81,6 +83,7 @@ func New(cfg *rest.Config, namespace string, opts Options) (Cluster, error) {
 
 	return &cluster{
 		namespace:           namespace,
+		config:              cfg,
 		client:              c,
 		scheme:              scheme,
 		idGen:               opts.IDGen,
@@ -91,6 +94,10 @@ func New(cfg *rest.Config, namespace string, opts Options) (Cluster, error) {
 
 func (c *cluster) Namespace() string {
 	return c.namespace
+}
+
+func (c *cluster) Config() *rest.Config {
+	return c.config
 }
 
 func (c *cluster) Client() client.Client {

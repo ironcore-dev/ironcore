@@ -51,6 +51,8 @@ service MachineRuntime {
   rpc DeleteNetworkInterfaceNAT(DeleteNetworkInterfaceNATRequest) returns (DeleteNetworkInterfaceNATResponse);
 
   rpc ListMachineClasses(ListMachineClassesRequest) returns (ListMachineClassesResponse);
+
+  rpc Exec(ExecRequest) returns (ExecResponse);
 }
 
 message VolumeFilter {
@@ -431,4 +433,12 @@ message ListMachineClassesRequest {
 
 message ListMachineClassesResponse {
   repeated MachineClass machine_classes = 1;
+}
+
+message ExecRequest {
+  string machine_id = 1;
+}
+
+message ExecResponse {
+  string url = 1;
 }

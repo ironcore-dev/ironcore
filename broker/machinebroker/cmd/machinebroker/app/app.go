@@ -16,26 +16,38 @@ package app
 
 import (
 	"context"
+	"errors"
 	goflag "flag"
 	"fmt"
 	"net"
+	"net/http"
+	"net/url"
 
+	"github.com/gin-gonic/gin"
+	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/configutils"
 	"github.com/onmetal/onmetal-api/broker/common"
+	commongrpc "github.com/onmetal/onmetal-api/broker/common/grpc"
+	machinebrokerhttp "github.com/onmetal/onmetal-api/broker/machinebroker/http"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/server"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
 
+func init() {
+	gin.SetMode(gin.ReleaseMode)
+}
+
 type Options struct {
-	Kubeconfig string
-	Address    string
+	Kubeconfig       string
+	Address          string
+	StreamingAddress string
+	BaseURL          string
 
 	Namespace           string
 	MachinePoolName     string
@@ -45,6 +57,9 @@ type Options struct {
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.Kubeconfig, "kubeconfig", o.Kubeconfig, "Path pointing to a kubeconfig file to use.")
 	fs.StringVar(&o.Address, "address", "/var/run/ori-machinebroker.sock", "Address to listen on.")
+	fs.StringVar(&o.StreamingAddress, "streaming-address", "127.0.0.1:20251", "Address to run the streaming server on")
+	fs.StringVar(&o.BaseURL, "base-url", "", "The base url to construct urls for streaming from. If empty it will be "+
+		"constructed from the streaming-address")
 
 	fs.StringVar(&o.Namespace, "namespace", o.Namespace, "Target Kubernetes namespace to use.")
 	fs.StringVar(&o.MachinePoolName, "machine-pool-name", o.MachinePoolName, "Name of the target machine pool to pin machines to, if any.")
@@ -91,12 +106,24 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("must specify namespace")
 	}
 
+	baseURL := opts.BaseURL
+	if baseURL == "" {
+		u := &url.URL{
+			Scheme: "http",
+			Host:   opts.StreamingAddress,
+		}
+		baseURL = u.String()
+	}
+
 	log.V(1).Info("Creating server",
 		"Namespace", opts.Namespace,
 		"MachinePoolName", opts.MachinePoolName,
 		"MachinePoolSelector", opts.MachinePoolSelector,
+		"BaseURL", baseURL,
 	)
+
 	srv, err := server.New(cfg, opts.Namespace, server.Options{
+		BaseURL:             baseURL,
 		MachinePoolName:     opts.MachinePoolName,
 		MachinePoolSelector: opts.MachinePoolSelector,
 	})
@@ -104,47 +131,70 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error creating server: %w", err)
 	}
 
+	g, ctx := errgroup.WithContext(ctx)
+	g.Go(func() error {
+		return runGRPCServer(ctx, setupLog, log, srv, opts)
+	})
+	g.Go(func() error {
+		return runStreamingServer(ctx, setupLog, log, srv, opts)
+	})
+	return g.Wait()
+}
+
+func runGRPCServer(ctx context.Context, setupLog logr.Logger, log logr.Logger, srv *server.Server, opts Options) error {
 	log.V(1).Info("Cleaning up any previous socket")
 	if err := common.CleanupSocketIfExists(opts.Address); err != nil {
 		return fmt.Errorf("error cleaning up socket: %w", err)
 	}
+
+	grpcSrv := grpc.NewServer(
+		grpc.ChainUnaryInterceptor(
+			commongrpc.InjectLogger(log),
+			commongrpc.LogRequest,
+		),
+	)
+	ori.RegisterMachineRuntimeServer(grpcSrv, srv)
 
 	log.V(1).Info("Start listening on unix socket", "Address", opts.Address)
 	l, err := net.Listen("unix", opts.Address)
 	if err != nil {
 		return fmt.Errorf("failed to listen: %w", err)
 	}
-	defer func() {
-		if err := l.Close(); err != nil {
-			log.Error(err, "Error closing socket")
-		}
-	}()
-
-	grpcSrv := grpc.NewServer(
-		grpc.UnaryInterceptor(func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
-			log := log.WithName(info.FullMethod)
-			ctx = ctrl.LoggerInto(ctx, log)
-			log.V(1).Info("Request")
-			resp, err = handler(ctx, req)
-			if err != nil {
-				if code := status.Code(err); code == codes.Unknown {
-					log.Error(err, "Unknown error handling request")
-				}
-			}
-			return resp, err
-		}),
-	)
-	ori.RegisterMachineRuntimeServer(grpcSrv, srv)
 
 	setupLog.Info("Starting server", "Address", l.Addr().String())
 	go func() {
 		<-ctx.Done()
 		setupLog.Info("Shutting down server")
-		grpcSrv.Stop()
+		grpcSrv.GracefulStop()
 		setupLog.Info("Shut down server")
 	}()
 	if err := grpcSrv.Serve(l); err != nil {
 		return fmt.Errorf("error serving: %w", err)
 	}
+	return nil
+}
+
+func runStreamingServer(ctx context.Context, setupLog, log logr.Logger, srv *server.Server, opts Options) error {
+	httpHandler := machinebrokerhttp.NewHandler(srv, machinebrokerhttp.HandlerOptions{
+		Log: log.WithName("server"),
+	})
+
+	httpSrv := &http.Server{
+		Addr:    opts.StreamingAddress,
+		Handler: httpHandler,
+	}
+
+	go func() {
+		<-ctx.Done()
+		setupLog.Info("Shutting down http server")
+		_ = httpSrv.Close()
+		setupLog.Info("Shut down http server")
+	}()
+
+	log.V(1).Info("Starting streaming server", "Address", opts.StreamingAddress)
+	if err := httpSrv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		return fmt.Errorf("error listening / serving streaming server: %w", err)
+	}
+	log.V(1).Info("Server finished")
 	return nil
 }

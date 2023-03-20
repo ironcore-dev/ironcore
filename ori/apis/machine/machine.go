@@ -60,4 +60,6 @@ type RuntimeService interface {
 	DeleteNetworkInterfaceNAT(context.Context, *api.DeleteNetworkInterfaceNATRequest) (*api.DeleteNetworkInterfaceNATResponse, error)
 
 	ListMachineClasses(context.Context, *api.ListMachineClassesRequest) (*api.ListMachineClassesResponse, error)
+
+	Exec(context.Context, *api.ExecRequest) (*api.ExecResponse, error)
 }

@@ -21,6 +21,7 @@ import (
 	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-machine/orictlmachine/common"
 	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-machine/orictlmachine/create"
 	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-machine/orictlmachine/delete"
+	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-machine/orictlmachine/exec"
 	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-machine/orictlmachine/get"
 	"github.com/onmetal/onmetal-api/orictl/cmd/orictl-machine/orictlmachine/update"
 	"github.com/spf13/cobra"
@@ -54,6 +55,7 @@ func Command(streams clicommon.Streams) *cobra.Command {
 		create.Command(streams, &clientOpts),
 		delete.Command(streams, &clientOpts),
 		update.Command(streams, &clientOpts),
+		exec.Command(streams, &clientOpts),
 	)
 
 	return cmd

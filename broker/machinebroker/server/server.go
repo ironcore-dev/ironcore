@@ -15,16 +15,21 @@
 package server
 
 import (
+	"fmt"
+	"net/url"
+	"path"
+
+	"github.com/onmetal/onmetal-api/broker/common/request"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/aliasprefixes"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/cluster"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/loadbalancers"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/natgateways"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/networks"
-	"github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	"k8s.io/client-go/rest"
 )
 
-var _ v1alpha1.MachineRuntimeServer = (*Server)(nil)
+var _ ori.MachineRuntimeServer = (*Server)(nil)
 
 //+kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machines,verbs=get;list;watch;create;update;patch;delete
@@ -46,19 +51,28 @@ var _ v1alpha1.MachineRuntimeServer = (*Server)(nil)
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=natgatewayroutings,verbs=get;list;watch;create;update;patch;delete
 
 type Server struct {
-	cluster       cluster.Cluster
-	networks      *networks.Networks
-	aliasPrefixes *aliasprefixes.AliasPrefixes
-	loadBalancers *loadbalancers.LoadBalancers
-	natGateways   *natgateways.NATGateways
+	baseURL          *url.URL
+	cluster          cluster.Cluster
+	networks         *networks.Networks
+	aliasPrefixes    *aliasprefixes.AliasPrefixes
+	loadBalancers    *loadbalancers.LoadBalancers
+	natGateways      *natgateways.NATGateways
+	execRequestCache request.Cache[*ori.ExecRequest]
 }
 
 type Options struct {
+	// BaseURL is the base URL in form http(s)://host:port/path?query to produce request URLs relative to.
+	BaseURL             string
 	MachinePoolName     string
 	MachinePoolSelector map[string]string
 }
 
 func New(cfg *rest.Config, namespace string, opts Options) (*Server, error) {
+	baseURL, err := url.ParseRequestURI(opts.BaseURL)
+	if err != nil {
+		return nil, fmt.Errorf("invalid base url %q: %w", opts.BaseURL, err)
+	}
+
 	c, err := cluster.New(cfg, namespace, cluster.Options{
 		MachinePoolName:     opts.MachinePoolName,
 		MachinePoolSelector: opts.MachinePoolSelector,
@@ -68,11 +82,13 @@ func New(cfg *rest.Config, namespace string, opts Options) (*Server, error) {
 	}
 
 	return &Server{
-		cluster:       c,
-		networks:      networks.New(c),
-		aliasPrefixes: aliasprefixes.New(c),
-		loadBalancers: loadbalancers.New(c),
-		natGateways:   natgateways.New(c),
+		baseURL:          baseURL,
+		cluster:          c,
+		networks:         networks.New(c),
+		aliasPrefixes:    aliasprefixes.New(c),
+		loadBalancers:    loadbalancers.New(c),
+		natGateways:      natgateways.New(c),
+		execRequestCache: request.NewCache[*ori.ExecRequest](),
 	}, nil
 }
 
@@ -94,4 +110,10 @@ func (s *Server) LoadBalancers() *loadbalancers.LoadBalancers {
 
 func (s *Server) NATGateways() *natgateways.NATGateways {
 	return s.natGateways
+}
+
+func (s *Server) buildURL(method string, token string) string {
+	return s.baseURL.ResolveReference(&url.URL{
+		Path: path.Join(method, token),
+	}).String()
 }
