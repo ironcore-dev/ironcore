@@ -11,7 +11,9 @@ authors:
 
 - "@you"
 - "@maybe-another-author"
-  reviewers:
+
+reviewers:
+
 - "@main-reviewer-1"
 - "@main-reviewer-2"
 
