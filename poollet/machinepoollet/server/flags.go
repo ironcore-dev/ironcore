@@ -12,42 +12,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cmd
+package server
 
 import (
 	"time"
 
-	"github.com/onmetal/onmetal-api/poollet/machinepoollet/server"
+	orimachine "github.com/onmetal/onmetal-api/ori/apis/machine"
 	"github.com/spf13/pflag"
 )
 
-// AuthOptions are options for configuring server.Options.AuthOptions.
-type AuthOptions struct {
+// AuthFlags are options for configuring server.Options.AuthFlags.
+type AuthFlags struct {
 	ClientCAFile string
 	Anonymous    bool
 }
 
-// AddFlags adds the flags to the pflag.FlagSet.
-func (o *AuthOptions) AddFlags(fs *pflag.FlagSet) {
+// BindFlags adds the flags to the pflag.FlagSet.
+func (o *AuthFlags) BindFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.ClientCAFile, "client-ca-file", o.ClientCAFile, "Path pointing to a PEM-encoded CA file for verifying client requests.")
 	fs.BoolVar(&o.Anonymous, "anonymous", o.Anonymous, "Whether to authenticate unknown users as 'system:anonymous' or not.")
 }
 
 // AuthOptions produces the server.AuthOptions.
-func (o *AuthOptions) AuthOptions(machinePoolName string) server.AuthOptions {
-	return server.AuthOptions{
+func (o *AuthFlags) AuthOptions(machinePoolName string) AuthOptions {
+	return AuthOptions{
 		MachinePoolName: machinePoolName,
-		Authentication: server.AuthenticationOptions{
+		Authentication: AuthenticationOptions{
 			ClientCAFile: o.ClientCAFile,
 		},
-		Authorization: server.AuthorizationOptions{
+		Authorization: AuthorizationOptions{
 			Anonymous: o.Anonymous,
 		},
 	}
 }
 
-// ServingOptions are options for configuring the serving part of server.Options.
-type ServingOptions struct {
+// ServingFlags are options for configuring the serving part of server.Options.
+type ServingFlags struct {
 	DisableAuth      bool
 	HostnameOverride string
 	Address          string
@@ -58,20 +58,20 @@ type ServingOptions struct {
 	ShutdownTimeout       time.Duration
 }
 
-func NewServingOptions() *ServingOptions {
-	return &ServingOptions{
+func NewServingOptions() *ServingFlags {
+	return &ServingFlags{
 		Address: ":20250",
 	}
 }
 
-// AddFlags adds the flags to the pflag.FlagSet.
-func (o *ServingOptions) AddFlags(fs *pflag.FlagSet) {
+// BindFlags adds the flags to the pflag.FlagSet.
+func (o *ServingFlags) BindFlags(fs *pflag.FlagSet) {
 	fs.BoolVar(&o.DisableAuth, "insecure-disable-auth", o.DisableAuth, "whether to completely disable authN/Z. Insecure and discouraged.")
 	fs.StringVar(&o.HostnameOverride, "hostname-override", o.HostnameOverride, "Override for the hostname.")
 	fs.StringVar(&o.Address, "address", o.Address, "Address to listen / serve on.")
 	fs.StringVar(&o.CertDir, "cert-dir", o.CertDir, "The directory that contains the server key and certificate."+
 		"The files have to be named 'tls.crt' and 'tls.key'. If unset, "+
-		"{TempDir}/onmetal-api-machinepool-server/serving-certs will be looked up for the certificates.")
+		"{TempDir}/machinepoollet-server/serving-certs will be looked up for the certificates.")
 
 	fs.DurationVar(&o.StreamCreationTimeout, "stream-creation-timeout", o.StreamCreationTimeout, "Timeout for creating streams.")
 	fs.DurationVar(&o.StreamIdleTimeout, "stream-idle-timeout", o.StreamIdleTimeout, "Timeout for idle streams to be considered closed.")
@@ -79,9 +79,9 @@ func (o *ServingOptions) AddFlags(fs *pflag.FlagSet) {
 }
 
 // ServerOptions produces server.Options.
-func (o *ServingOptions) ServerOptions(exec server.MachineExec, authOpts server.AuthOptions) server.Options {
-	return server.Options{
-		MachineExec:           exec,
+func (o *ServingFlags) ServerOptions(machineRuntime orimachine.RuntimeService, authOpts AuthOptions) Options {
+	return Options{
+		MachineRuntime:        machineRuntime,
 		HostnameOverride:      o.HostnameOverride,
 		Address:               o.Address,
 		CertDir:               o.CertDir,
@@ -93,26 +93,26 @@ func (o *ServingOptions) ServerOptions(exec server.MachineExec, authOpts server.
 	}
 }
 
-// ServerOptions couples together all options required to create server.Options.
-type ServerOptions struct {
-	Serving ServingOptions
-	Auth    AuthOptions
+// Flags couples together all options required to create server.Options.
+type Flags struct {
+	Serving ServingFlags
+	Auth    AuthFlags
 }
 
-func NewServerOptions() *ServerOptions {
-	return &ServerOptions{
+func NewServerFlags() *Flags {
+	return &Flags{
 		Serving: *NewServingOptions(),
-		Auth:    AuthOptions{},
+		Auth:    AuthFlags{},
 	}
 }
 
-// AddFlags adds the flags to the pflag.FlagSet.
-func (o *ServerOptions) AddFlags(fs *pflag.FlagSet) {
-	o.Serving.AddFlags(fs)
-	o.Auth.AddFlags(fs)
+// BindFlags adds the flags to the pflag.FlagSet.
+func (o *Flags) BindFlags(fs *pflag.FlagSet) {
+	o.Serving.BindFlags(fs)
+	o.Auth.BindFlags(fs)
 }
 
 // ServerOptions produces server.Options.
-func (o *ServerOptions) ServerOptions(machinePoolName string, exec server.MachineExec) server.Options {
-	return o.Serving.ServerOptions(exec, o.Auth.AuthOptions(machinePoolName))
+func (o *Flags) ServerOptions(machinePoolName string, machineRuntime orimachine.RuntimeService) Options {
+	return o.Serving.ServerOptions(machineRuntime, o.Auth.AuthOptions(machinePoolName))
 }

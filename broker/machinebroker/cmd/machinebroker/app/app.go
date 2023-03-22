@@ -23,7 +23,6 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/gin-gonic/gin"
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/configutils"
 	"github.com/onmetal/onmetal-api/broker/common"
@@ -38,10 +37,6 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
-
-func init() {
-	gin.SetMode(gin.ReleaseMode)
-}
 
 type Options struct {
 	Kubeconfig       string

@@ -31,6 +31,9 @@ type MachinePoolInit struct {
 	MachinePoolName string
 	ProviderID      string
 
+	// TODO: Remove OnInitialized / OnFailed as soon as the controller-runtime provides support for pre-start hooks:
+	// https://github.com/kubernetes-sigs/controller-runtime/pull/2044
+
 	OnInitialized func(ctx context.Context) error
 	OnFailed      func(ctx context.Context, reason error) error
 }

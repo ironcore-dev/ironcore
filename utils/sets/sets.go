@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2023 OnMetal authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package terminal
+package sets
 
 import (
-	"io"
-
-	"k8s.io/client-go/tools/remotecommand"
+	"golang.org/x/exp/slices"
+	"k8s.io/apimachinery/pkg/util/sets"
 )
 
-// Terminal is a terminal to run.
-type Terminal interface {
-	// Run runs the terminal with the given streams. At least one of in, out and/or err has to be specified.
-	// Depending on the underlying implementation some streams might have to be omitted / set to nil
-	// (e.g. in case of a tty-terminal, err has to be nil).
-	Run(in io.Reader, out, err io.WriteCloser, resize <-chan remotecommand.TerminalSize) error
+// ListFunc returns an ordered slice of the given set by applying the given less func as comparator.
+func ListFunc[T comparable](set sets.Set[T], less func(v1, v2 T) bool) []T {
+	items := set.UnsortedList()
+	slices.SortFunc(items, less)
+	return items
 }

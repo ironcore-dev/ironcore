@@ -34,7 +34,14 @@ import (
 
 type MachinePoolReconciler struct {
 	client.Client
-	MachinePoolName    string
+
+	// MachinePoolName is the name of the computev1alpha1.MachinePool to report / update.
+	MachinePoolName string
+	// Addresses are the addresses the machinepoollet server is available on.
+	Addresses []computev1alpha1.MachinePoolAddress
+	// Port is the port the machinepoollet server is available on.
+	Port int32
+
 	MachineRuntime     machine.RuntimeService
 	MachineClassMapper mcm.MachineClassMapper
 }
@@ -107,9 +114,12 @@ func (r *MachinePoolReconciler) reconcile(ctx context.Context, log logr.Logger, 
 
 	log.V(1).Info("Updating machine pool status")
 	base := machinePool.DeepCopy()
+	machinePool.Status.State = computev1alpha1.MachinePoolStateReady
 	machinePool.Status.AvailableMachineClasses = supported
+	machinePool.Status.Addresses = r.Addresses
+	machinePool.Status.DaemonEndpoints.MachinepoolletEndpoint.Port = r.Port
 	if err := r.Status().Patch(ctx, machinePool, client.MergeFrom(base)); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error patchign machine pool status: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error patching machine pool status: %w", err)
 	}
 
 	log.V(1).Info("Reconciled")

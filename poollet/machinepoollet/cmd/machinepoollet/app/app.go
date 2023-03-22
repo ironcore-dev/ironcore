@@ -18,7 +18,8 @@ import (
 	"context"
 	goflag "flag"
 	"fmt"
-	"os"
+	"net"
+	"strconv"
 	"time"
 
 	"github.com/onmetal/controller-utils/configutils"
@@ -28,10 +29,12 @@ import (
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	oriremotemachine "github.com/onmetal/onmetal-api/ori/remote/machine"
+	"github.com/onmetal/onmetal-api/poollet/machinepoollet/addresses"
 	machinepoolletclient "github.com/onmetal/onmetal-api/poollet/machinepoollet/client"
 	machinepoolletconfig "github.com/onmetal/onmetal-api/poollet/machinepoollet/client/config"
 	"github.com/onmetal/onmetal-api/poollet/machinepoollet/controllers"
 	"github.com/onmetal/onmetal-api/poollet/machinepoollet/mcm"
+	"github.com/onmetal/onmetal-api/poollet/machinepoollet/server"
 	"github.com/onmetal/onmetal-api/poollet/orievent"
 	"github.com/onmetal/onmetal-api/utils/client/config"
 	"github.com/spf13/cobra"
@@ -74,6 +77,10 @@ type Options struct {
 	DialTimeout                          time.Duration
 	MachineClassMapperSyncTimeout        time.Duration
 
+	ServerFlags server.Flags
+
+	AddressesOptions addresses.GetOptions
+
 	WatchFilterValue string
 }
 
@@ -94,6 +101,10 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.DurationVar(&o.DialTimeout, "dial-timeout", 1*time.Second, "Timeout for dialing to the machine runtime endpoint.")
 	fs.DurationVar(&o.MachineClassMapperSyncTimeout, "mcm-sync-timeout", 10*time.Second, "Timeout waiting for the machine class mapper to sync.")
 
+	o.ServerFlags.BindFlags(fs)
+
+	o.AddressesOptions.BindFlags(fs)
+
 	fs.StringVar(&o.WatchFilterValue, "watch-filter", "", "Value to filter for while watching.")
 }
 
@@ -102,10 +113,16 @@ func (o *Options) MarkFlagsRequired(cmd *cobra.Command) {
 	_ = cmd.MarkFlagRequired("provider-id")
 }
 
+func NewOptions() *Options {
+	return &Options{
+		ServerFlags: *server.NewServerFlags(),
+	}
+}
+
 func Command() *cobra.Command {
 	var (
 		zapOpts = zap.Options{Development: true}
-		opts    Options
+		opts    = NewOptions()
 	)
 
 	cmd := &cobra.Command{
@@ -117,7 +134,7 @@ func Command() *cobra.Command {
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
-			return Run(ctx, opts)
+			return Run(ctx, *opts)
 		},
 	}
 
@@ -131,20 +148,48 @@ func Command() *cobra.Command {
 	return cmd
 }
 
+func getPort(address string) (int32, error) {
+	_, portString, err := net.SplitHostPort(address)
+	if err != nil {
+		return 0, fmt.Errorf("error splitting serving address into host / port: %w", err)
+	}
+
+	portInt64, err := strconv.ParseInt(portString, 10, 32)
+	if err != nil {
+		return 0, fmt.Errorf("error parsing port %q: %w", portString, err)
+	}
+
+	if portInt64 == 0 {
+		return 0, fmt.Errorf("cannot specify dynamic port")
+	}
+	return int32(portInt64), nil
+}
+
 func Run(ctx context.Context, opts Options) error {
 	logger := ctrl.LoggerFrom(ctx)
 	setupLog := ctrl.Log.WithName("setup")
 
+	port, err := getPort(opts.ServerFlags.Serving.Address)
+	if err != nil {
+		return fmt.Errorf("error getting port from address: %w", err)
+	}
+
 	getter, err := machinepoolletconfig.NewGetter(opts.MachinePoolName)
 	if err != nil {
-		setupLog.Error(err, "Error creating new getter")
-		os.Exit(1)
+		return fmt.Errorf("error creating new getter: %w", err)
 	}
 
 	endpoint, err := oriremotemachine.GetAddressWithTimeout(opts.MachineRuntimeSocketDiscoveryTimeout, opts.MachineRuntimeEndpoint)
 	if err != nil {
 		return fmt.Errorf("error detecting machine runtime endpoint: %w", err)
 	}
+
+	machinePoolAddresses, err := addresses.Get(&opts.AddressesOptions)
+	if err != nil {
+		return fmt.Errorf("error getting machine pool endpoints: %w", err)
+	}
+
+	setupLog.V(1).Info("Discovered addresses to report", "MachinePoolAddresses", machinePoolAddresses)
 
 	machineRuntime, err := oriremotemachine.NewRemoteRuntime(endpoint)
 	if err != nil {
@@ -176,9 +221,10 @@ func Run(ctx context.Context, opts Options) error {
 		NewCache: func(config *rest.Config, cacheOpts cache.Options) (cache.Cache, error) {
 			cacheOpts.SelectorsByObject = cache.SelectorsByObject{
 				&computev1alpha1.Machine{}: cache.ObjectSelector{
-					Field: fields.SelectorFromSet(fields.Set{
-						computev1alpha1.MachineMachinePoolRefNameField: opts.MachinePoolName,
-					}),
+					Field: fields.OneTermEqualSelector(
+						computev1alpha1.MachineMachinePoolRefNameField,
+						opts.MachinePoolName,
+					),
 				},
 			}
 			return cache.New(config, cacheOpts)
@@ -194,6 +240,16 @@ func Run(ctx context.Context, opts Options) error {
 	version, err := machineRuntime.Version(ctx, &ori.VersionRequest{})
 	if err != nil {
 		return fmt.Errorf("error getting machine runtime version: %w", err)
+	}
+
+	srvOpts := opts.ServerFlags.ServerOptions(opts.MachinePoolName, machineRuntime)
+	srv, err := server.New(cfg, srvOpts)
+	if err != nil {
+		return fmt.Errorf("error creating machinepoollet server: %w", err)
+	}
+
+	if err := mgr.Add(srv); err != nil {
+		return fmt.Errorf("error adding machinepoollet server to manager: %w", err)
 	}
 
 	machineClassMapper := mcm.NewGeneric(machineRuntime, mcm.GenericOptions{})
@@ -299,8 +355,10 @@ func Run(ctx context.Context, opts Options) error {
 		if err := (&controllers.MachinePoolReconciler{
 			Client:             mgr.GetClient(),
 			MachinePoolName:    opts.MachinePoolName,
-			MachineClassMapper: machineClassMapper,
+			Addresses:          machinePoolAddresses,
+			Port:               port,
 			MachineRuntime:     machineRuntime,
+			MachineClassMapper: machineClassMapper,
 		}).SetupWithManager(mgr); err != nil {
 			return fmt.Errorf("error setting up machine pool reconciler with manager: %w", err)
 		}
@@ -318,13 +376,11 @@ func Run(ctx context.Context, opts Options) error {
 	}
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
-		setupLog.Error(err, "unable to set up health check")
-		os.Exit(1)
+		return fmt.Errorf("error adding healthz check: %w", err)
 	}
 
 	if err := mgr.AddReadyzCheck("readyz", healthz.Ping); err != nil {
-		setupLog.Error(err, "unable to set up ready check")
-		os.Exit(1)
+		return fmt.Errorf("error adding readyz check: %w", err)
 	}
 
 	setupLog.Info("starting manager")

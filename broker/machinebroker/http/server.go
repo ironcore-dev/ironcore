@@ -17,7 +17,7 @@ package http
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-logr/logr"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/server"
 	utilshttp "github.com/onmetal/onmetal-api/utils/http"
@@ -39,17 +39,16 @@ func setHandlerOptionsDefaults(opts *HandlerOptions) {
 func NewHandler(srv *server.Server, opts HandlerOptions) http.Handler {
 	setHandlerOptionsDefaults(&opts)
 
-	r := gin.New()
+	r := chi.NewRouter()
 
-	r.Match(
-		[]string{http.MethodHead, http.MethodGet, http.MethodPost},
-		"/exec/:token",
-		func(c *gin.Context) {
-			srv.ServeExec(c.Writer, c.Request, c.Param("token"))
-		},
-	)
+	r.Use(utilshttp.InjectLogger(opts.Log))
 
-	return utilshttp.UseMiddleware(r,
-		utilshttp.InjectLogger(opts.Log),
-	)
+	for _, method := range []string{http.MethodHead, http.MethodGet, http.MethodPost} {
+		r.MethodFunc(method, "/exec/{token}", func(w http.ResponseWriter, req *http.Request) {
+			token := chi.URLParam(req, "token")
+			srv.ServeExec(w, req, token)
+		})
+	}
+
+	return r
 }
