@@ -131,7 +131,7 @@ check-license: addlicense ## Check that every file has a license header present.
 	find . -name '*.go' -exec $(ADDLICENSE) -check -c 'OnMetal authors' {} +
 
 .PHONY: check
-check: manifests generate add-license fmt lint test # Generate manifests, code, lint, add licenses, test
+check: generate manifests add-license fmt lint test # Generate manifests, code, lint, add licenses, test
 
 .PHONY: docs
 docs: gen-crd-api-reference-docs ## Run go generate to generate API reference documentation.
@@ -371,7 +371,7 @@ GOIMPORTS ?= $(LOCALBIN)/goimports
 
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v5.0.0
-CODE_GENERATOR_VERSION ?= v0.26.1
+CODE_GENERATOR_VERSION ?= v0.26.3
 CONTROLLER_TOOLS_VERSION ?= v0.11.3
 VGOPATH_VERSION ?= v0.0.2
 GEN_CRD_API_REFERENCE_DOCS_VERSION ?= v0.3.0
