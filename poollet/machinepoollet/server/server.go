@@ -18,21 +18,21 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"errors"
 	"fmt"
-	"io"
 	"net"
 	"net/http"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-logr/logr"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	"github.com/onmetal/onmetal-api/poollet/machinepoollet/terminal"
-	http2 "github.com/onmetal/onmetal-api/poollet/machinepoollet/terminal/http"
+	orimachine "github.com/onmetal/onmetal-api/ori/apis/machine"
+	utilshttp "github.com/onmetal/onmetal-api/utils/http"
 	"k8s.io/apiserver/pkg/authentication/authenticator"
 	"k8s.io/apiserver/pkg/authentication/authenticatorfactory"
 	"k8s.io/apiserver/pkg/authentication/user"
@@ -42,26 +42,22 @@ import (
 	"k8s.io/apiserver/pkg/server/options"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/remotecommand"
 	certutil "k8s.io/client-go/util/cert"
 	"k8s.io/client-go/util/keyutil"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
-	"sigs.k8s.io/controller-runtime/pkg/runtime/inject"
 )
 
 var log = logf.Log.WithName("machinepoollet").WithName("server")
 
-// MachineExec is an interface a provider needs to implement in order to provide exec-functionality.
-type MachineExec interface {
-	// Exec execs into the target machine.
-	Exec(ctx context.Context, namespace, name string, in io.Reader, out, err io.WriteCloser, resize <-chan remotecommand.TerminalSize) error
-}
-
 type Options struct {
-	// MachineExec allows exec-ing onto a Machine.
-	MachineExec MachineExec
+	// MachineRuntime is the ori-machine runtime service.
+	MachineRuntime orimachine.RuntimeService
+
+	// Log is the logger to use in the server.
+	// If unset, a package-global router will be used.
+	Log logr.Logger
 
 	// HostnameOverride is an optional hostname override to supply for self-signed certificate generation.
 	HostnameOverride string
@@ -85,6 +81,7 @@ type Options struct {
 	StreamCreationTimeout time.Duration
 	StreamIdleTimeout     time.Duration
 	ShutdownTimeout       time.Duration
+	CacheTTL              time.Duration
 }
 
 type AuthOptions struct {
@@ -106,14 +103,16 @@ type Server struct {
 
 	started bool
 
+	log logr.Logger
+
 	auth Auth
 
-	machineExec MachineExec
+	machineRuntime orimachine.RuntimeService
+
+	cacheTTL time.Duration
 
 	address string
 
-	host                    string
-	port                    int
 	certDir                 string
 	clientCACertificateFile string
 
@@ -123,8 +122,12 @@ type Server struct {
 }
 
 func setOptionsDefaults(opts *Options) {
+	if opts.Log.GetSink() == nil {
+		opts.Log = log
+	}
+
 	if opts.CertDir == "" {
-		opts.CertDir = filepath.Join(os.TempDir(), "onmetal-api-machinepool-server", "serving-certs")
+		opts.CertDir = filepath.Join(os.TempDir(), "machinepoollet-server", "serving-certs")
 	}
 
 	if opts.StreamCreationTimeout == 0 {
@@ -135,6 +138,9 @@ func setOptionsDefaults(opts *Options) {
 	}
 	if opts.ShutdownTimeout == 0 {
 		opts.ShutdownTimeout = 3 * time.Second
+	}
+	if opts.CacheTTL == 0 {
+		opts.CacheTTL = 1 * time.Minute
 	}
 }
 
@@ -235,8 +241,8 @@ func New(cfg *rest.Config, opts Options) (*Server, error) {
 	if cfg == nil {
 		return nil, fmt.Errorf("must specify config")
 	}
-	if opts.MachineExec == nil {
-		return nil, fmt.Errorf("must specify MachineExec")
+	if opts.MachineRuntime == nil {
+		return nil, fmt.Errorf("must specify MachineRuntime")
 	}
 
 	setOptionsDefaults(&opts)
@@ -251,14 +257,16 @@ func New(cfg *rest.Config, opts Options) (*Server, error) {
 	}
 
 	return &Server{
+		log:                     opts.Log,
 		auth:                    auth,
-		machineExec:             opts.MachineExec,
+		machineRuntime:          opts.MachineRuntime,
 		address:                 opts.Address,
 		certDir:                 opts.CertDir,
 		clientCACertificateFile: caCertificateFile,
 		streamCreationTimeout:   opts.StreamCreationTimeout,
 		streamIdleTimeout:       opts.StreamIdleTimeout,
 		shutdownTimeout:         opts.ShutdownTimeout,
+		cacheTTL:                opts.CacheTTL,
 	}, nil
 }
 
@@ -310,41 +318,28 @@ func getKeyPath(certDir string) string {
 	return filepath.Join(certDir, "tls.key")
 }
 
-// InjectFunc implements inject.Injector.
-func (s *Server) InjectFunc(f inject.Func) error {
-	if err := f(s.machineExec); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (s *Server) router() http.Handler {
-	m := mux.NewRouter()
+	r := chi.NewRouter()
 
-	m.Use(s.logMiddleware)
+	r.Use(utilshttp.InjectLogger(s.log))
 
-	computeRouter := m.PathPrefix("/apis/compute.api.onmetal.de").Subrouter()
-	if s.auth != nil {
-		computeRouter.Use(s.authMiddleware)
-	}
-	s.registerComputeRoutes(computeRouter)
-
-	m.Methods(http.MethodGet).Path("/healthz").Handler(healthz.CheckHandler{Checker: healthz.Ping})
-	m.Methods(http.MethodGet).Path("/readyz").Handler(healthz.CheckHandler{Checker: healthz.Ping})
-
-	return m
-}
-
-func (s *Server) logMiddleware(handler http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		req = req.WithContext(ctrl.LoggerInto(req.Context(), log))
-		handler.ServeHTTP(w, req)
+	r.Route("/apis/compute.api.onmetal.de", func(r chi.Router) {
+		if s.auth != nil {
+			r.Use(s.authMiddleware)
+		}
+		s.registerComputeRoutes(r)
 	})
+
+	r.Get("/healthz", healthz.CheckHandler{Checker: healthz.Ping}.ServeHTTP)
+	r.Get("/readyz", healthz.CheckHandler{Checker: healthz.Ping}.ServeHTTP)
+
+	return r
 }
 
 func (s *Server) authMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		ctx := req.Context()
+		log := ctrl.LoggerFrom(ctx)
 
 		info, ok, err := s.auth.AuthenticateRequest(req)
 		if err != nil || !ok {
@@ -355,7 +350,7 @@ func (s *Server) authMiddleware(handler http.Handler) http.Handler {
 			return
 		}
 
-		log := log.WithValues(
+		log = log.WithValues(
 			"user-name", info.User.GetName(),
 			"user-id", info.User.GetUID(),
 		)
@@ -395,64 +390,20 @@ func getAPIVerb(method string) string {
 	}
 }
 
-type machineExecTerminal struct {
-	machineExec MachineExec
-
-	ctx       context.Context
-	namespace string
-	name      string
-}
-
-func (m *machineExecTerminal) Run(in io.Reader, out, err io.WriteCloser, resize <-chan remotecommand.TerminalSize) error {
-	return m.machineExec.Exec(m.ctx, m.namespace, m.name, in, out, err, resize)
-}
-
-func NewMachineExecTerminal(ctx context.Context, exec MachineExec, namespace, name string) terminal.Terminal {
-	return &machineExecTerminal{exec, ctx, namespace, name}
-}
-
-func (s *Server) registerComputeRoutes(r *mux.Router) {
-	r.Methods(http.MethodGet, http.MethodPost).Path("/namespaces/{namespace}/machines/{name}/exec").HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		ctx := req.Context()
-		vars := mux.Vars(req)
-		namespace := vars["namespace"]
-		name := vars["name"]
-
-		supportedStreamProtocols := strings.Split(req.Header.Get("X-Stream-Protocol-Version"), ",")
-
-		term := NewMachineExecTerminal(ctx, s.machineExec, namespace, name)
-		streamOpts := &http2.Options{
-			Stdin:  true,
-			Stdout: true,
-			TTY:    true,
-		}
-		http2.Serve(w, req, term, streamOpts, s.streamIdleTimeout, s.streamCreationTimeout, supportedStreamProtocols)
-	})
-}
-
-func (s *Server) Port() int {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	return s.port
-}
-
-func (s *Server) Host() string {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	return s.host
-}
-
-func (s *Server) Started() bool {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	return s.started
+func (s *Server) registerComputeRoutes(r chi.Router) {
+	for _, method := range []string{http.MethodGet, http.MethodPost} {
+		r.MethodFunc(method, "/namespaces/{namespace}/machines/{name}/exec", func(w http.ResponseWriter, req *http.Request) {
+			namespace := chi.URLParam(req, "namespace")
+			name := chi.URLParam(req, "name")
+			s.serveExec(w, req, namespace, name)
+		})
+	}
 }
 
 func (s *Server) tlsConfig() (*tls.Config, error) {
 	cfg := &tls.Config{
-		MinVersion:               tls.VersionTLS12,
-		PreferServerCipherSuites: true,
-		ClientAuth:               tls.RequestClientCert,
+		MinVersion: tls.VersionTLS12,
+		ClientAuth: tls.RequestClientCert,
 	}
 
 	if s.clientCACertificateFile != "" {
@@ -488,14 +439,11 @@ func (s *Server) Start(ctx context.Context) error {
 		return err
 	}
 
-	ln, host, port, err := s.listen()
+	ln, err := net.Listen("tcp", s.address)
 	if err != nil {
 		s.mu.Unlock()
-		return err
+		return fmt.Errorf("error listening: %w", err)
 	}
-
-	s.host = host
-	s.port = port
 
 	var (
 		srvErr  error
@@ -511,12 +459,14 @@ func (s *Server) Start(ctx context.Context) error {
 		defer close(srvDone)
 		defer func() { _ = ln.Close() }()
 
-		log.Info("Start serving", "Host", s.host, "Port", port)
-		srvErr = srv.ServeTLS(
+		s.log.Info("Start serving", "Address", ln.Addr())
+		if err := srv.ServeTLS(
 			ln,
 			getCertPath(s.certDir),
 			getKeyPath(s.certDir),
-		)
+		); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			srvErr = err
+		}
 	}()
 
 	s.mu.Unlock()
@@ -531,30 +481,9 @@ func (s *Server) Start(ctx context.Context) error {
 			if srvErr == nil {
 				return shutdownErr
 			}
-			log.Error(shutdownErr, "Error shutting down server")
+			s.log.Error(shutdownErr, "Error shutting down server")
 		}
 
 		return srvErr
 	}
-}
-
-func (s *Server) listen() (ln net.Listener, host string, port int, err error) {
-	ln, err = net.Listen("tcp", s.address)
-	if err != nil {
-		return nil, "", 0, err
-	}
-
-	var portString string
-	host, portString, err = net.SplitHostPort(ln.Addr().String())
-	if err != nil {
-		_ = ln.Close()
-		return nil, "", 0, err
-	}
-
-	port, err = strconv.Atoi(portString)
-	if err != nil {
-		_ = ln.Close()
-		return nil, "", 0, err
-	}
-	return ln, host, port, nil
 }
