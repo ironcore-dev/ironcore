@@ -333,10 +333,13 @@ func (r *rotator) Init(ctx context.Context, force bool) error {
 	defer cancel()
 
 	if time.Until(r.nextRotationDeadline(force)) <= 0 {
+		r.logConstructor().Info("Initial certificate rotation required")
+
 		var lastErr error
 		if err := wait.PollImmediateInfiniteWithContext(ctx, 1*time.Second, func(ctx context.Context) (done bool, err error) {
 			lastErr = r.rotate(ctx)
 			if lastErr != nil {
+				r.logConstructor().Error(lastErr, "Error initially rotating certificates")
 				return false, nil
 			}
 			return true, nil

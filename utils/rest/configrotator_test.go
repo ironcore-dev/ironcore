@@ -18,6 +18,7 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"sync/atomic"
 	"time"
 
 	"github.com/go-logr/logr"
@@ -86,6 +87,12 @@ var _ = Describe("ConfigRotator", func() {
 		})
 		Expect(err).NotTo(HaveOccurred())
 
+		By("setting up a listener that increments a counter")
+		var enqueueCt atomic.Int32
+		r.AddListener(ConfigRotatorListenerFunc(func() {
+			enqueueCt.Add(1)
+		}))
+
 		By("running the rotator")
 		rotatorDone := make(chan struct{})
 		rotatorCtx, cancelRotator := context.WithCancel(ctx)
@@ -139,6 +146,9 @@ var _ = Describe("ConfigRotator", func() {
 			},
 		}, metav1.CreateOptions{})
 		Expect(err).NotTo(HaveOccurred())
+
+		By("inspecting that the listener has been called")
+		Expect(enqueueCt.Load()).To(Equal(int32(1)))
 
 		By("stopping the rotator")
 		cancelRotator()
