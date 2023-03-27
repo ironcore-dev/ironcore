@@ -146,7 +146,12 @@ func NewConfigRotator(cfg, bootstrapCfg *rest.Config, opts ConfigRotatorOptions)
 		NewClient: func(cert *tls.Certificate) (client.WithWatch, error) {
 			cfg := certCfg
 			if cert != nil {
-				cfg = r.clientConfig.Load()
+				newCfg, err := ConfigWithCertificate(cfg, cert)
+				if err != nil {
+					return nil, fmt.Errorf("error creating config with certificate: %w", err)
+				}
+
+				cfg = newCfg
 			}
 
 			return client.NewWithWatch(cfg, client.Options{})

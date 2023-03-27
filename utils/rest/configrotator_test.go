@@ -35,28 +35,39 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/utils/pointer"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 )
 
 var _ = Describe("ConfigRotator", func() {
-	It("should rotate the certificates", func(ctx SpecContext) {
+	var (
+		bootstrapUser, authenticatedUser                    *envtest.AuthenticatedUser
+		authenticatedUserCertData, authenticatedUserKeyData []byte
+		authenticatedUserCert                               tls.Certificate
+	)
+	BeforeEach(func() {
+		var err error
+
 		By("initializing a bootstrap kubeconfig and a kubeconfig store filepath")
-		bootstrapUser, err := testEnv.AddUser(envtest.User{
+		bootstrapUser, err = testEnv.AddUser(envtest.User{
 			Name:   "Bootstrap",
 			Groups: []string{"system:authenticated"},
 		}, cfg)
 		Expect(err).NotTo(HaveOccurred())
 
 		By("creating an authenticated user")
-		authenticatedUser, err := testEnv.AddUser(envtest.User{
+		authenticatedUser, err = testEnv.AddUser(envtest.User{
 			Name:   "Authenticated",
 			Groups: []string{"system:authenticated", "system:masters"},
 		}, cfg)
 		Expect(err).NotTo(HaveOccurred())
-		authenticatedUserCertData, authenticatedUserKeyData := authenticatedUser.Config().CertData, authenticatedUser.Config().KeyData
-		authenticatedUserCert, err := tls.X509KeyPair(authenticatedUserCertData, authenticatedUserKeyData)
-		Expect(err).NotTo(HaveOccurred())
 
+		authenticatedUserCertData, authenticatedUserKeyData = authenticatedUser.Config().CertData, authenticatedUser.Config().KeyData
+		authenticatedUserCert, err = tls.X509KeyPair(authenticatedUserCertData, authenticatedUserKeyData)
+		Expect(err).NotTo(HaveOccurred())
+	})
+
+	It("should rotate the certificates", func(ctx SpecContext) {
 		certRotator := certificatetesting.NewFakeRotator()
 
 		By("creating a rotator")
@@ -82,6 +93,7 @@ var _ = Describe("ConfigRotator", func() {
 				Expect(opts.RequestedDuration).To(Equal(requestedDuration))
 				Expect(opts.ForceInitial).To(BeFalse())
 				Expect(opts.InitCertificate).To(BeNil())
+				Expect(opts.NewClient).NotTo(BeNil())
 				return certRotator, nil
 			},
 		})
@@ -155,5 +167,47 @@ var _ = Describe("ConfigRotator", func() {
 
 		By("waiting for the rotator to stop")
 		Eventually(rotatorDone).Should(BeClosed())
+	})
+
+	It("should create a client with an existing certificate if available", func() {
+		certRotator := certificatetesting.NewFakeRotator()
+		certRotator.SetCertificate(&authenticatedUserCert)
+
+		By("creating a rotator")
+		template := &x509.CertificateRequest{}
+		signerName := "rotator-signer.api.onmetal.de"
+		requestedDuration := pointer.Duration(1 * time.Hour)
+		rotatorName := "rotator"
+
+		var newClient func(*tls.Certificate) (client.WithWatch, error)
+		_, err := NewConfigRotator(nil, bootstrapUser.Config(), ConfigRotatorOptions{
+			Name:              rotatorName,
+			SignerName:        signerName,
+			Template:          template,
+			RequestedDuration: requestedDuration,
+			GetUsages: func(privateKey any) []certificatesv1.KeyUsage {
+				return []certificatesv1.KeyUsage{certificatesv1.UsageKeyEncipherment}
+			},
+			LogConstructor: func() logr.Logger {
+				return GinkgoLogr
+			},
+			NewCertificateRotator: func(opts certificate.RotatorOptions) (certificate.Rotator, error) {
+				Expect(opts.Name).To(Equal(rotatorName))
+				Expect(opts.SignerName).To(Equal(signerName))
+				Expect(opts.Template).To(Equal(template))
+				Expect(opts.RequestedDuration).To(Equal(requestedDuration))
+				Expect(opts.ForceInitial).To(BeFalse())
+				Expect(opts.InitCertificate).To(BeNil())
+				Expect(opts.NewClient).NotTo(BeNil())
+				newClient = opts.NewClient
+				return certRotator, nil
+			},
+		})
+		Expect(err).NotTo(HaveOccurred())
+
+		By("instantiating a client with a certificate available")
+		certClient, err := newClient(&authenticatedUserCert)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(certClient).NotTo(BeNil())
 	})
 })
