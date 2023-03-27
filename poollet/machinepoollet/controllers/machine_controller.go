@@ -82,6 +82,7 @@ func (r *MachineReconciler) machineUIDLabelSelector(machineUID types.UID) map[st
 	}
 }
 
+//+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 //+kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch
 //+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machines,verbs=get;list;watch;update;patch
 //+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machines/status,verbs=get;update;patch

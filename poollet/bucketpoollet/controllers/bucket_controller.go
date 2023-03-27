@@ -100,6 +100,7 @@ func (r *BucketReconciler) listORIBucketsByUID(ctx context.Context, bucketUID ty
 	return res.Buckets, nil
 }
 
+//+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 //+kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch
 //+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=buckets,verbs=get;list;watch;update;patch
 //+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=buckets/status,verbs=get;update;patch
