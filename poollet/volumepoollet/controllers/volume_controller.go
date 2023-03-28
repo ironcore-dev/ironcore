@@ -261,6 +261,27 @@ func (r *VolumeReconciler) prepareORIVolumeClass(ctx context.Context, volume *st
 	return class.Name, true, nil
 }
 
+func (r *VolumeReconciler) prepareORIVolumeEncryption(ctx context.Context, encryption *storagev1alpha1.VolumeEncryption) (*ori.EncryptionSpec, bool, error) {
+	if encryption == nil {
+		return nil, true, nil
+	}
+
+	encryptionSecret := &corev1.Secret{}
+	encryptionSecretKey := client.ObjectKey{Name: encryption.SecretRef.Name}
+	if err := r.Get(ctx, encryptionSecretKey, encryptionSecret); err != nil {
+		err = fmt.Errorf("error getting volume encryption secret %s: %w", encryptionSecretKey, err)
+		if !apierrors.IsNotFound(err) {
+			return nil, false, fmt.Errorf("error getting volume encryption secret %s: %w", encryption.SecretRef.Name, err)
+		}
+		return nil, false, nil
+	}
+
+	return &ori.EncryptionSpec{
+		//Todo: null check needed?
+		SecretData: encryptionSecret.Data,
+	}, true, nil
+}
+
 func (r *VolumeReconciler) prepareORIVolumeResources(_ context.Context, _ *storagev1alpha1.Volume, resources corev1alpha1.ResourceList) (*ori.VolumeResources, bool, error) {
 	storageBytes := resources.Storage().AsDec().UnscaledBig().Uint64()
 
@@ -284,6 +305,15 @@ func (r *VolumeReconciler) prepareORIVolume(ctx context.Context, log logr.Logger
 		ok = false
 	}
 
+	log.V(1).Info("Getting encryption secret")
+	encryption, encryptionOK, err := r.prepareORIVolumeEncryption(ctx, volume.Spec.Encryption)
+	switch {
+	case err != nil:
+		errs = append(errs, fmt.Errorf("error preparing ori volume class: %w", err))
+	case !encryptionOK:
+		ok = false
+	}
+
 	resources, resourcesOK, err := r.prepareORIVolumeResources(ctx, volume, volume.Spec.Resources)
 	switch {
 	case err != nil:
@@ -304,9 +334,10 @@ func (r *VolumeReconciler) prepareORIVolume(ctx context.Context, log logr.Logger
 	return &ori.Volume{
 		Metadata: metadata,
 		Spec: &ori.VolumeSpec{
-			Image:     volume.Spec.Image,
-			Class:     class,
-			Resources: resources,
+			Image:      volume.Spec.Image,
+			Class:      class,
+			Resources:  resources,
+			Encryption: encryption,
 		},
 	}, true, nil
 }

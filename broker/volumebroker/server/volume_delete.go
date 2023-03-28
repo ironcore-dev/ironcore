@@ -21,7 +21,9 @@ import (
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func (s *Server) DeleteVolume(ctx context.Context, req *ori.DeleteVolumeRequest) (*ori.DeleteVolumeResponse, error) {
@@ -31,6 +33,19 @@ func (s *Server) DeleteVolume(ctx context.Context, req *ori.DeleteVolumeRequest)
 	onmetalVolume, err := s.getAggregateOnmetalVolume(ctx, req.VolumeId)
 	if err != nil {
 		return nil, err
+	}
+
+	log.V(1).Info("Deleting encryption secret")
+	if encryption := onmetalVolume.Volume.Spec.Encryption; encryption != nil {
+		if err := s.client.Delete(ctx, &corev1.Secret{ObjectMeta: metav1.ObjectMeta{
+			Name:      encryption.SecretRef.Name,
+			Namespace: s.namespace,
+		}}); err != nil {
+			if !apierrors.IsNotFound(err) {
+				return nil, fmt.Errorf("error deleting onmetal encryption secret: %w", err)
+			}
+			return nil, status.Errorf(codes.NotFound, "secret %s not found", encryption.SecretRef.Name)
+		}
 	}
 
 	log.V(1).Info("Deleting volume")

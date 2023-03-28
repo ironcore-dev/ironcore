@@ -31,8 +31,9 @@ import (
 )
 
 type AggregateOnmetalVolume struct {
-	Volume       *storagev1alpha1.Volume
-	AccessSecret *corev1.Secret
+	Volume           *storagev1alpha1.Volume
+	EncryptionSecret *corev1.Secret
+	AccessSecret     *corev1.Secret
 }
 
 func (s *Server) getOnmetalVolumeConfig(_ context.Context, volume *ori.Volume) (*AggregateOnmetalVolume, error) {
@@ -42,6 +43,28 @@ func (s *Server) getOnmetalVolumeConfig(_ context.Context, volume *ori.Volume) (
 			Name: s.volumePoolName,
 		}
 	}
+
+	var encryptionSecret *corev1.Secret
+	if encryption := volume.Spec.Encryption; encryption != nil {
+		encryptionSecret = &corev1.Secret{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: s.namespace,
+				Name:      s.idGen.Generate(),
+			},
+			Type: corev1.SecretTypeOpaque,
+			Data: encryption.SecretData,
+		}
+	}
+
+	var encryption *storagev1alpha1.VolumeEncryption
+	if encryptionSecret != nil {
+		encryption = &storagev1alpha1.VolumeEncryption{
+			SecretRef: corev1.LocalObjectReference{
+				Name: encryptionSecret.Name,
+			},
+		}
+	}
+
 	onmetalVolume := &storagev1alpha1.Volume{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: s.namespace,
@@ -49,13 +72,14 @@ func (s *Server) getOnmetalVolumeConfig(_ context.Context, volume *ori.Volume) (
 		},
 		Spec: storagev1alpha1.VolumeSpec{
 			VolumeClassRef:     &corev1.LocalObjectReference{Name: volume.Spec.Class},
-			VolumePoolRef:      volumePoolRef,
 			VolumePoolSelector: s.volumePoolSelector,
+			VolumePoolRef:      volumePoolRef,
 			Resources: corev1alpha1.ResourceList{
 				corev1alpha1.ResourceStorage: *resource.NewQuantity(int64(volume.Spec.Resources.StorageBytes), resource.DecimalSI),
 			},
 			Image:              volume.Spec.Image,
 			ImagePullSecretRef: nil, // TODO: Fill if necessary
+			Encryption:         encryption,
 		},
 	}
 	if err := apiutils.SetObjectMetadata(onmetalVolume, volume.Metadata); err != nil {
@@ -64,13 +88,27 @@ func (s *Server) getOnmetalVolumeConfig(_ context.Context, volume *ori.Volume) (
 	apiutils.SetVolumeManagerLabel(onmetalVolume, volumebrokerv1alpha1.VolumeBrokerManager)
 
 	return &AggregateOnmetalVolume{
-		Volume: onmetalVolume,
+		Volume:           onmetalVolume,
+		EncryptionSecret: encryptionSecret,
 	}, nil
 }
 
 func (s *Server) createOnmetalVolume(ctx context.Context, log logr.Logger, volume *AggregateOnmetalVolume) (retErr error) {
 	c, cleanup := s.setupCleaner(ctx, log, &retErr)
 	defer cleanup()
+
+	if volume.EncryptionSecret != nil {
+		log.V(1).Info("Creating onmetal encryption secret")
+		if err := s.client.Create(ctx, volume.EncryptionSecret); err != nil {
+			return fmt.Errorf("error creating onmetal encryption secret: %w", err)
+		}
+		c.Add(func(ctx context.Context) error {
+			if err := s.client.Delete(ctx, volume.EncryptionSecret); client.IgnoreNotFound(err) != nil {
+				return fmt.Errorf("error deleting onmetal encryption secret: %w", err)
+			}
+			return nil
+		})
+	}
 
 	log.V(1).Info("Creating onmetal volume")
 	if err := s.client.Create(ctx, volume.Volume); err != nil {

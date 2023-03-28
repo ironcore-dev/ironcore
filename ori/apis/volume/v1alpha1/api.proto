@@ -31,10 +31,15 @@ message VolumeResources {
   uint64 storage_bytes = 1;
 }
 
+message EncryptionSpec {
+  map<string, bytes> secret_data = 1;
+}
+
 message VolumeSpec {
   string image = 1;
   string class = 2;
   VolumeResources resources = 3;
+  EncryptionSpec encryption = 4;
 }
 
 message VolumeStatus {

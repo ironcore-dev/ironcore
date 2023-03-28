@@ -47,9 +47,10 @@ func (s *Server) convertAggregateOnmetalVolume(volume *AggregateOnmetalVolume) (
 	return &ori.Volume{
 		Metadata: metadata,
 		Spec: &ori.VolumeSpec{
-			Image:     volume.Volume.Spec.Image,
-			Class:     volume.Volume.Spec.VolumeClassRef.Name,
-			Resources: resources,
+			Image:      volume.Volume.Spec.Image,
+			Class:      volume.Volume.Spec.VolumeClassRef.Name,
+			Resources:  resources,
+			Encryption: s.getOnmetalEncryption(volume),
 		},
 		Status: &ori.VolumeStatus{
 			State:  state,
@@ -80,6 +81,16 @@ func (s *Server) convertOnmetalVolumeResources(resources corev1alpha1.ResourceLi
 	return &ori.VolumeResources{
 		StorageBytes: storage.AsDec().UnscaledBig().Uint64(),
 	}, nil
+}
+
+func (s *Server) getOnmetalEncryption(volume *AggregateOnmetalVolume) *ori.EncryptionSpec {
+	if volume.EncryptionSecret == nil {
+		return nil
+	}
+
+	return &ori.EncryptionSpec{
+		SecretData: volume.EncryptionSecret.Data,
+	}
 }
 
 func (s *Server) convertOnmetalVolumeAccess(volume *AggregateOnmetalVolume) (*ori.VolumeAccess, error) {
