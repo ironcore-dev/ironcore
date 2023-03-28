@@ -1,0 +1,5 @@
+addresses:
+- type: Hostname
+  address: foo.bar
+- type: InternalIP
+  address: 10.0.0.1

@@ -16,7 +16,6 @@ package addresses
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -28,11 +27,18 @@ import (
 )
 
 const (
-	KubernetesPodIPEnvVar = "KUBERNETES_POD_IP"
+	KubernetesServiceName         = "KUBERNETES_SERVICE_NAME"
+	KubernetesPodNamespaceEnvVar  = "KUBERNETES_POD_NAMESPACE"
+	KubernetesClusterDomainEnvVar = "KUBERNETES_CLUSTER_DOMAIN"
+)
+
+const (
+	DefaultKubernetesClusterDomain = "cluster.local"
 )
 
 var (
-	ErrNotInCluster = errors.New("unable to load in-cluster addresses, KUBERNETES_POD_IP must be defined")
+	ErrNotInCluster = fmt.Errorf("unable to load in-cluster addresses, %s and %s must be defined",
+		KubernetesServiceName, KubernetesPodNamespaceEnvVar)
 )
 
 type GetOptions struct {
@@ -115,7 +121,7 @@ func LocalIP() (string, error) {
 }
 
 func IsInCluster() bool {
-	podIP := os.Getenv(KubernetesPodIPEnvVar)
+	podIP := os.Getenv(KubernetesServiceName)
 	return podIP != ""
 }
 
@@ -168,26 +174,28 @@ func Get(opts ...GetOption) ([]computev1alpha1.MachinePoolAddress, error) {
 }
 
 func InCluster() ([]computev1alpha1.MachinePoolAddress, error) {
-	podIP := os.Getenv(KubernetesPodIPEnvVar)
-	if podIP == "" {
+	serviceName := os.Getenv(KubernetesServiceName)
+	namespace := os.Getenv(KubernetesPodNamespaceEnvVar)
+	clusterDomain := os.Getenv(KubernetesClusterDomainEnvVar)
+
+	if serviceName == "" || namespace == "" {
 		return nil, ErrNotInCluster
 	}
 
-	hostname, err := os.Hostname()
-	if err != nil {
-		return nil, fmt.Errorf("error getting hostname: %w", err)
+	if clusterDomain == "" {
+		clusterDomain = DefaultKubernetesClusterDomain
 	}
 
-	hostname = strings.TrimSpace(hostname)
+	internalDNS := fmt.Sprintf("%s.%s.svc.%s", serviceName, namespace, clusterDomain)
 
 	return []computev1alpha1.MachinePoolAddress{
 		{
 			Type:    computev1alpha1.MachinePoolInternalIP,
-			Address: podIP,
+			Address: serviceName,
 		},
 		{
 			Type:    computev1alpha1.MachinePoolInternalDNS,
-			Address: hostname,
+			Address: internalDNS,
 		},
 	}, nil
 }

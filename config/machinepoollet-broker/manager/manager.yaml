@@ -33,10 +33,12 @@ spec:
         - --leader-elect
         image: machinepoollet:latest
         env:
-        - name: KUBERNETES_POD_IP
+        - name: KUBERNETES_SERVICE_NAME
+          value: server
+        - name: KUBERNETES_POD_NAMESPACE
           valueFrom:
             fieldRef:
-              fieldPath: status.podIP
+              fieldPath: metadata.namespace
         name: manager
         securityContext:
           allowPrivilegeEscalation: false
@@ -62,6 +64,10 @@ spec:
         volumeMounts:
         - name: var-run
           mountPath: /var/run
+        ports:
+        - containerPort: 20250
+          name: server
+          protocol: TCP
       - command:
         - /machinebroker
         image: machinebroker:latest
