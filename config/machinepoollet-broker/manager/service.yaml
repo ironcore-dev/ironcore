@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: server
+spec:
+  type: ClusterIP
+  selector:
+    control-plane: controller-manager
+  ports:
+  - name: server
+    port: 20250
+    targetPort: server

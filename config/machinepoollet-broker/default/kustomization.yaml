@@ -13,22 +13,38 @@ namePrefix: machinepoollet-
 #  someName: someValue
 
 resources:
-  - ../broker-rbac
-  - ../manager
+- ../broker-rbac
+- ../manager
 #  - ../webhook
 #  - ../certmanager
 # [PROMETHEUS] To enable prometheus monitor, uncomment all sections with 'PROMETHEUS'.
 #- ../prometheus
 
 patchesStrategicMerge:
-  - manager_auth_proxy_patch.yaml
-  
-  # Mount the controller config file for loading manager configurations
-  # through a ComponentConfig type
-  #- manager_config_patch.yaml
-  
-  #- manager_webhook_patch.yaml
-  #- webhookcainjection_patch.yaml
+- manager_auth_proxy_patch.yaml
+
+# Mount the controller config file for loading manager configurations
+# through a ComponentConfig type
+#- manager_config_patch.yaml
+
+#- manager_webhook_patch.yaml
+#- webhookcainjection_patch.yaml
+
+replacements:
+- source:
+    kind: Service
+    group: ""
+    version: v1
+    name: server
+    fieldPath: metadata.name
+  targets:
+  - select:
+      kind: Deployment
+      group: apps
+      version: v1
+      name: controller-manager
+    fieldPaths:
+    - spec.template.spec.containers.[name=manager].env.[name=KUBERNETES_SERVICE_NAME].value
 
 #replacements:
 #  - source:
