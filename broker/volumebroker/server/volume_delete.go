@@ -35,8 +35,8 @@ func (s *Server) DeleteVolume(ctx context.Context, req *ori.DeleteVolumeRequest)
 		return nil, err
 	}
 
-	log.V(1).Info("Deleting encryption secret")
 	if encryption := onmetalVolume.Volume.Spec.Encryption; encryption != nil {
+		log.V(1).Info("Deleting encryption secret")
 		if err := s.client.Delete(ctx, &corev1.Secret{ObjectMeta: metav1.ObjectMeta{
 			Name:      encryption.SecretRef.Name,
 			Namespace: s.namespace,

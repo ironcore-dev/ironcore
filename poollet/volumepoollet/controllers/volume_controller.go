@@ -261,7 +261,8 @@ func (r *VolumeReconciler) prepareORIVolumeClass(ctx context.Context, volume *st
 	return class.Name, true, nil
 }
 
-func (r *VolumeReconciler) prepareORIVolumeEncryption(ctx context.Context, encryption *storagev1alpha1.VolumeEncryption) (*ori.EncryptionSpec, bool, error) {
+func (r *VolumeReconciler) prepareORIVolumeEncryption(ctx context.Context, volume *storagev1alpha1.Volume) (*ori.EncryptionSpec, bool, error) {
+	encryption := volume.Spec.Encryption
 	if encryption == nil {
 		return nil, true, nil
 	}
@@ -273,11 +274,12 @@ func (r *VolumeReconciler) prepareORIVolumeEncryption(ctx context.Context, encry
 		if !apierrors.IsNotFound(err) {
 			return nil, false, fmt.Errorf("error getting volume encryption secret %s: %w", encryption.SecretRef.Name, err)
 		}
+
+		r.Eventf(volume, corev1.EventTypeNormal, events.VolumeEncryptionSecretNotReady, "Volume encryption secret %s not found", encryption.SecretRef.Name)
 		return nil, false, nil
 	}
 
 	return &ori.EncryptionSpec{
-		//Todo: null check needed?
 		SecretData: encryptionSecret.Data,
 	}, true, nil
 }
@@ -306,7 +308,7 @@ func (r *VolumeReconciler) prepareORIVolume(ctx context.Context, log logr.Logger
 	}
 
 	log.V(1).Info("Getting encryption secret")
-	encryption, encryptionOK, err := r.prepareORIVolumeEncryption(ctx, volume.Spec.Encryption)
+	encryption, encryptionOK, err := r.prepareORIVolumeEncryption(ctx, volume)
 	switch {
 	case err != nil:
 		errs = append(errs, fmt.Errorf("error preparing ori volume class: %w", err))
