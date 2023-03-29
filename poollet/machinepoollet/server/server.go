@@ -322,6 +322,7 @@ func (s *Server) router() http.Handler {
 	r := chi.NewRouter()
 
 	r.Use(utilshttp.InjectLogger(s.log))
+	r.Use(utilshttp.LogRequest)
 
 	r.Route("/apis/compute.api.onmetal.de", func(r chi.Router) {
 		if s.auth != nil {

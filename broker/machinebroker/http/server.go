@@ -42,6 +42,7 @@ func NewHandler(srv *server.Server, opts HandlerOptions) http.Handler {
 	r := chi.NewRouter()
 
 	r.Use(utilshttp.InjectLogger(opts.Log))
+	r.Use(utilshttp.LogRequest)
 
 	for _, method := range []string{http.MethodHead, http.MethodGet, http.MethodPost} {
 		r.MethodFunc(method, "/exec/{token}", func(w http.ResponseWriter, req *http.Request) {

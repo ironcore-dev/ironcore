@@ -34,3 +34,12 @@ func InjectLogger(log logr.Logger) Middleware {
 		})
 	}
 }
+
+// LogRequest logs incoming requests (method and URL).
+func LogRequest(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		log := logr.FromContextOrDiscard(req.Context())
+		log.V(1).Info("Request", "Method", req.Method, "URL", req.URL)
+		next.ServeHTTP(w, req)
+	})
+}
