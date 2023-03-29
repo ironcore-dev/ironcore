@@ -342,23 +342,31 @@ func (s *Server) authMiddleware(handler http.Handler) http.Handler {
 		ctx := req.Context()
 		log := ctrl.LoggerFrom(ctx)
 
+		log.V(2).Info("Authenticating")
 		info, ok, err := s.auth.AuthenticateRequest(req)
-		if err != nil || !ok {
-			if err != nil {
-				log.Error(err, "Authorization error")
-			}
+		if err != nil {
+			log.Error(err, "Authentication error")
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		if !ok {
+			log.V(1).Info("Unauthorized")
 			return
 		}
 
 		log = log.WithValues(
 			"user-name", info.User.GetName(),
 			"user-id", info.User.GetUID(),
+			"user-groups", info.User.GetGroups(),
 		)
+		log.V(2).Info("Authenticated")
+
 		ctx = ctrl.LoggerInto(ctx, log)
 		req = req.WithContext(ctx)
 
-		decision, _, err := s.auth.Authorize(ctx, s.auth.GetRequestAttributes(info.User, req))
+		attributes := s.auth.GetRequestAttributes(info.User, req)
+		log.V(2).Info("Authorizing", "Attributes", attributes)
+		decision, _, err := s.auth.Authorize(ctx, attributes)
 		if err != nil {
 			log.Error(err, "Authorization error")
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -366,10 +374,12 @@ func (s *Server) authMiddleware(handler http.Handler) http.Handler {
 		}
 
 		if decision != authorizer.DecisionAllow {
+			log.V(1).Info("Authorization denied", "Decision", decision)
 			http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
 			return
 		}
 
+		log.V(2).Info("Authorized")
 		handler.ServeHTTP(w, req)
 	})
 }
