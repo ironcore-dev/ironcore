@@ -5,19 +5,26 @@ metadata:
   creationTimestamp: null
   name: broker-role
 rules:
-  - apiGroups:
-      - compute.api.onmetal.de
-    resources:
-      - machineclasses
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups:
-      - compute.api.onmetal.de
-    resources:
-      - machinepools
-    verbs:
-      - get
-      - list
-      - watch
+- apiGroups:
+  - compute.api.onmetal.de
+  resources:
+  - machineclasses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - compute.api.onmetal.de
+  resources:
+  - machinepools
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - compute.api.onmetal.de
+  resources:
+  - machinepools/proxy
+  verbs:
+  - get
+  - create
