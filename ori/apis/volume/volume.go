@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2023 OnMetal authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,26 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package v1alpha1
+package volume
 
-const (
-	LabelsAnnotation = "volumebroker.api.onmetal.de/labels"
+import (
+	"context"
 
-	AnnotationsAnnotation = "volumebroker.api.onmetal.de/annotations"
-
-	CreatedLabel = "volumebroker.api.onmetal.de/created"
-
-	PurposeLabel = "machinebroker.api.onmetal.de/purpose"
+	api "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
 )
 
-const (
-	VolumeEncryptionPurpose = "volume-encryption"
-)
+type RuntimeService interface {
+	ListVolumes(context.Context, *api.ListVolumesRequest) (*api.ListVolumesResponse, error)
+	CreateVolume(context.Context, *api.CreateVolumeRequest) (*api.CreateVolumeResponse, error)
+	DeleteVolume(context.Context, *api.DeleteVolumeRequest) (*api.DeleteVolumeResponse, error)
 
-const (
-	ManagerLabel = "volumebroker.api.onmetal.de/manager"
-)
-
-const (
-	VolumeBrokerManager = "volumebroker"
-)
+	ListVolumeClasses(context.Context, *api.ListVolumeClassesRequest) (*api.ListVolumeClassesResponse, error)
+}

@@ -54,6 +54,7 @@ func (s *Server) getOnmetalVolumeConfig(_ context.Context, volume *ori.Volume) (
 			Type: corev1.SecretTypeOpaque,
 			Data: encryption.SecretData,
 		}
+		apiutils.SetPurpose(encryptionSecret, volumebrokerv1alpha1.VolumeEncryptionPurpose)
 	}
 
 	var encryption *storagev1alpha1.VolumeEncryption
@@ -120,6 +121,13 @@ func (s *Server) createOnmetalVolume(ctx context.Context, log logr.Logger, volum
 		}
 		return nil
 	})
+
+	if volume.EncryptionSecret != nil {
+		log.V(1).Info("Patching encryption secret to be controlled by onmetal volume")
+		if err := apiutils.PatchControlledBy(ctx, s.client, volume.Volume, volume.EncryptionSecret); err != nil {
+			return fmt.Errorf("error patching encryption secret to be controlled by onmetal volume: %w", err)
+		}
+	}
 
 	log.V(1).Info("Patching onmetal volume as created")
 	if err := apiutils.PatchCreated(ctx, s.client, volume.Volume); err != nil {

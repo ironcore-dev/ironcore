@@ -16,13 +16,12 @@ package volume
 
 import (
 	"context"
-	"crypto/rand"
-	"encoding/hex"
-	"strconv"
 	"sync"
 	"time"
 
+	"github.com/onmetal/onmetal-api/broker/common/idgen"
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"k8s.io/apimachinery/pkg/labels"
@@ -30,23 +29,6 @@ import (
 
 func filterInLabels(labelSelector, lbls map[string]string) bool {
 	return labels.SelectorFromSet(labelSelector).Matches(labels.Set(lbls))
-}
-
-const defaultIDLength = 63
-
-func generateID(length int) string {
-	data := make([]byte, (length/2)+1)
-	for {
-		_, _ = rand.Read(data)
-		id := hex.EncodeToString(data)
-
-		// Truncated versions of the id should not be numerical.
-		if _, err := strconv.ParseInt(id[:12], 10, 64); err != nil {
-			continue
-		}
-
-		return id[:length]
-	}
 }
 
 type FakeVolume struct {
@@ -60,12 +42,16 @@ type FakeVolumeClass struct {
 type FakeRuntimeService struct {
 	sync.Mutex
 
+	idGen idgen.IDGen
+
 	Volumes       map[string]*FakeVolume
 	VolumeClasses map[string]*FakeVolumeClass
 }
 
 func NewFakeRuntimeService() *FakeRuntimeService {
 	return &FakeRuntimeService{
+		idGen: idgen.Default,
+
 		Volumes:       make(map[string]*FakeVolume),
 		VolumeClasses: make(map[string]*FakeVolumeClass),
 	}
@@ -91,7 +77,7 @@ func (r *FakeRuntimeService) SetVolumeClasses(volumeClasses []*FakeVolumeClass) 
 	}
 }
 
-func (r *FakeRuntimeService) ListVolumes(ctx context.Context, req *ori.ListVolumesRequest) (*ori.ListVolumesResponse, error) {
+func (r *FakeRuntimeService) ListVolumes(ctx context.Context, req *ori.ListVolumesRequest, opts ...grpc.CallOption) (*ori.ListVolumesResponse, error) {
 	r.Lock()
 	defer r.Unlock()
 
@@ -114,13 +100,14 @@ func (r *FakeRuntimeService) ListVolumes(ctx context.Context, req *ori.ListVolum
 	return &ori.ListVolumesResponse{Volumes: res}, nil
 }
 
-func (r *FakeRuntimeService) CreateVolume(ctx context.Context, req *ori.CreateVolumeRequest) (*ori.CreateVolumeResponse, error) {
+func (r *FakeRuntimeService) CreateVolume(ctx context.Context, req *ori.CreateVolumeRequest, opts ...grpc.CallOption) (*ori.CreateVolumeResponse, error) {
 	r.Lock()
 	defer r.Unlock()
 
 	volume := *req.Volume
-	volume.Metadata.Id = generateID(defaultIDLength)
+	volume.Metadata.Id = r.idGen.Generate()
 	volume.Metadata.CreatedAt = time.Now().UnixNano()
+	volume.Status = &ori.VolumeStatus{}
 
 	r.Volumes[volume.Metadata.Id] = &FakeVolume{
 		Volume: volume,
@@ -131,7 +118,7 @@ func (r *FakeRuntimeService) CreateVolume(ctx context.Context, req *ori.CreateVo
 	}, nil
 }
 
-func (r *FakeRuntimeService) DeleteVolume(ctx context.Context, req *ori.DeleteVolumeRequest) (*ori.DeleteVolumeResponse, error) {
+func (r *FakeRuntimeService) DeleteVolume(ctx context.Context, req *ori.DeleteVolumeRequest, opts ...grpc.CallOption) (*ori.DeleteVolumeResponse, error) {
 	r.Lock()
 	defer r.Unlock()
 
@@ -144,7 +131,7 @@ func (r *FakeRuntimeService) DeleteVolume(ctx context.Context, req *ori.DeleteVo
 	return &ori.DeleteVolumeResponse{}, nil
 }
 
-func (r *FakeRuntimeService) ListVolumeClasses(ctx context.Context, req *ori.ListVolumeClassesRequest) (*ori.ListVolumeClassesResponse, error) {
+func (r *FakeRuntimeService) ListVolumeClasses(ctx context.Context, req *ori.ListVolumeClassesRequest, opts ...grpc.CallOption) (*ori.ListVolumeClassesResponse, error) {
 	r.Lock()
 	defer r.Unlock()
 

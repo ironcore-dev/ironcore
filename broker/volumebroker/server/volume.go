@@ -50,7 +50,7 @@ func (s *Server) convertAggregateOnmetalVolume(volume *AggregateOnmetalVolume) (
 			Image:      volume.Volume.Spec.Image,
 			Class:      volume.Volume.Spec.VolumeClassRef.Name,
 			Resources:  resources,
-			Encryption: s.getOnmetalEncryption(volume),
+			Encryption: s.convertOnmetalVolumeEncryption(volume),
 		},
 		Status: &ori.VolumeStatus{
 			State:  state,
@@ -83,7 +83,7 @@ func (s *Server) convertOnmetalVolumeResources(resources corev1alpha1.ResourceLi
 	}, nil
 }
 
-func (s *Server) getOnmetalEncryption(volume *AggregateOnmetalVolume) *ori.EncryptionSpec {
+func (s *Server) convertOnmetalVolumeEncryption(volume *AggregateOnmetalVolume) *ori.EncryptionSpec {
 	if volume.EncryptionSecret == nil {
 		return nil
 	}

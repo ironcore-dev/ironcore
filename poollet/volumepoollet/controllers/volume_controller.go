@@ -268,7 +268,7 @@ func (r *VolumeReconciler) prepareORIVolumeEncryption(ctx context.Context, volum
 	}
 
 	encryptionSecret := &corev1.Secret{}
-	encryptionSecretKey := client.ObjectKey{Name: encryption.SecretRef.Name}
+	encryptionSecretKey := client.ObjectKey{Name: encryption.SecretRef.Name, Namespace: volume.Namespace}
 	if err := r.Get(ctx, encryptionSecretKey, encryptionSecret); err != nil {
 		err = fmt.Errorf("error getting volume encryption secret %s: %w", encryptionSecretKey, err)
 		if !apierrors.IsNotFound(err) {
