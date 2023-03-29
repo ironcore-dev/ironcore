@@ -17,6 +17,7 @@ package server
 import (
 	"time"
 
+	"github.com/go-logr/logr"
 	orimachine "github.com/onmetal/onmetal-api/ori/apis/machine"
 	"github.com/spf13/pflag"
 )
@@ -79,9 +80,10 @@ func (o *ServingFlags) BindFlags(fs *pflag.FlagSet) {
 }
 
 // ServerOptions produces server.Options.
-func (o *ServingFlags) ServerOptions(machineRuntime orimachine.RuntimeService, authOpts AuthOptions) Options {
+func (o *ServingFlags) ServerOptions(machineRuntime orimachine.RuntimeService, log logr.Logger, authOpts AuthOptions) Options {
 	return Options{
 		MachineRuntime:        machineRuntime,
+		Log:                   log,
 		HostnameOverride:      o.HostnameOverride,
 		Address:               o.Address,
 		CertDir:               o.CertDir,
@@ -113,6 +115,6 @@ func (o *Flags) BindFlags(fs *pflag.FlagSet) {
 }
 
 // ServerOptions produces server.Options.
-func (o *Flags) ServerOptions(machinePoolName string, machineRuntime orimachine.RuntimeService) Options {
-	return o.Serving.ServerOptions(machineRuntime, o.Auth.AuthOptions(machinePoolName))
+func (o *Flags) ServerOptions(machinePoolName string, machineRuntime orimachine.RuntimeService, log logr.Logger) Options {
+	return o.Serving.ServerOptions(machineRuntime, log, o.Auth.AuthOptions(machinePoolName))
 }

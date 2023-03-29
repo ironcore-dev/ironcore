@@ -242,7 +242,11 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error getting machine runtime version: %w", err)
 	}
 
-	srvOpts := opts.ServerFlags.ServerOptions(opts.MachinePoolName, machineRuntime)
+	srvOpts := opts.ServerFlags.ServerOptions(
+		opts.MachinePoolName,
+		machineRuntime,
+		logger.WithName("server"),
+	)
 	srv, err := server.New(cfg, srvOpts)
 	if err != nil {
 		return fmt.Errorf("error creating machinepoollet server: %w", err)

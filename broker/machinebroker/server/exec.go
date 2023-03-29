@@ -16,15 +16,16 @@ package server
 
 import (
 	"context"
+	"io"
 	"net/http"
-	"net/url"
 
 	"github.com/go-logr/logr"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	"github.com/onmetal/onmetal-api/client-go/onmetalapi"
 	onmetalapiclientgoscheme "github.com/onmetal/onmetal-api/client-go/onmetalapi/scheme"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	"k8s.io/apimachinery/pkg/util/proxy"
-	"k8s.io/client-go/rest"
+	remotecommandserver "github.com/onmetal/onmetal-api/poollet/machinepoollet/ori/streaming/remotecommand"
+	"k8s.io/client-go/tools/remotecommand"
 )
 
 func (s *Server) Exec(ctx context.Context, req *ori.ExecRequest) (*ori.ExecResponse, error) {
@@ -54,24 +55,16 @@ func (s *Server) ServeExec(w http.ResponseWriter, req *http.Request, token strin
 		return
 	}
 
-	cfgShallowCopy := s.cluster.Config()
-	cfgShallowCopy.GroupVersion = &computev1alpha1.SchemeGroupVersion
-	cfgShallowCopy.APIPath = "/apis"
-	cfgShallowCopy.NegotiatedSerializer = onmetalapiclientgoscheme.Codecs.WithoutConversion()
-	if cfgShallowCopy.UserAgent == "" {
-		cfgShallowCopy.UserAgent = rest.DefaultKubernetesUserAgent()
-	}
-
-	restClient, err := rest.RESTClientFor(cfgShallowCopy)
+	onmetalClientset, err := onmetalapi.NewForConfig(s.cluster.Config())
 	if err != nil {
-		log.Error(err, "Error getting rest client for cluster")
+		log.Error(err, "Error getting onmetal api clientset for config")
 		code := http.StatusInternalServerError
 		http.Error(w, http.StatusText(code), code)
 		return
 	}
 
-	targetURL := restClient.
-		Verb(req.Method).
+	reqURL := onmetalClientset.ComputeV1alpha1().RESTClient().
+		Post().
 		Namespace(s.cluster.Namespace()).
 		Resource("machines").
 		Name(request.MachineId).
@@ -79,18 +72,36 @@ func (s *Server) ServeExec(w http.ResponseWriter, req *http.Request, token strin
 		VersionedParams(&computev1alpha1.MachineExecOptions{}, onmetalapiclientgoscheme.ParameterCodec).
 		URL()
 
-	proxyStream(w, req, targetURL, restClient.Client.Transport)
+	executor, err := remotecommand.NewSPDYExecutor(s.cluster.Config(), http.MethodGet, reqURL)
+	if err != nil {
+		log.Error(err, "Error creating remote command executor")
+		code := http.StatusInternalServerError
+		http.Error(w, http.StatusText(code), code)
+		return
+	}
+
+	exec := executorExec{executor}
+	handler, err := remotecommandserver.NewExecHandler(exec, remotecommandserver.ExecHandlerOptions{})
+	if err != nil {
+		log.Error(err, "Error creating exec handler")
+		code := http.StatusInternalServerError
+		http.Error(w, http.StatusText(code), code)
+		return
+	}
+
+	handler.Handle(w, req, remotecommandserver.ExecOptions{})
 }
 
-func proxyStream(w http.ResponseWriter, req *http.Request, url *url.URL, transport http.RoundTripper) {
-	handler := proxy.NewUpgradeAwareHandler(url, transport, false, false, &responder{})
-	handler.ServeHTTP(w, req)
+type executorExec struct {
+	executor remotecommand.Executor
 }
 
-type responder struct{}
-
-func (r *responder) Error(w http.ResponseWriter, req *http.Request, err error) {
-	log := logr.FromContextOrDiscard(req.Context())
-	log.Error(err, "Error while proxying request")
-	http.Error(w, err.Error(), http.StatusInternalServerError)
+func (e executorExec) Exec(ctx context.Context, in io.Reader, out io.WriteCloser, resize remotecommand.TerminalSizeQueue) error {
+	return e.executor.StreamWithContext(ctx, remotecommand.StreamOptions{
+		Stdin:             in,
+		Stdout:            out,
+		Stderr:            nil,
+		Tty:               true, // TODO: Obtain this value properly
+		TerminalSizeQueue: resize,
+	})
 }

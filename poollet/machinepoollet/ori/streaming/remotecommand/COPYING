@@ -1,0 +1,3 @@
+Copied this package adding some adaptations from
+https://github.com/kubernetes/kubernetes/tree/9e644106593f3f4aa98f8a84b23db5fa378900bd/pkg/kubelet/cri/streaming/remotecommand
+to avoid a direct dependency on kubernetes/kubernetes.
