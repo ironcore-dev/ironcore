@@ -34,8 +34,8 @@ rules:
   resources:
   - machines/exec
   verbs:
+  - create
   - get
-  - post
 - apiGroups:
   - networking.api.onmetal.de
   resources:
