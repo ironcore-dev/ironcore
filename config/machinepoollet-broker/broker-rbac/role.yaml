@@ -30,6 +30,13 @@ rules:
   - update
   - watch
 - apiGroups:
+  - compute.api.onmetal.de
+  resources:
+  - machines/exec
+  verbs:
+  - get
+  - post
+- apiGroups:
   - networking.api.onmetal.de
   resources:
   - aliasprefixes
