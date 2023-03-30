@@ -6,7 +6,7 @@ require (
 	github.com/bits-and-blooms/bitset v1.5.0
 	github.com/blang/semver/v4 v4.0.0
 	github.com/go-chi/chi/v5 v5.0.8
-	github.com/go-logr/logr v1.2.3
+	github.com/go-logr/logr v1.2.4
 	github.com/gogo/protobuf v1.3.2
 	github.com/google/go-cmp v0.5.9
 	github.com/onmetal/controller-utils v0.7.0
@@ -25,6 +25,7 @@ require (
 	k8s.io/apiserver v0.26.3
 	k8s.io/client-go v0.26.3
 	k8s.io/component-base v0.26.3
+	k8s.io/klog/v2 v2.80.1
 	k8s.io/kube-aggregator v0.26.3
 	k8s.io/kube-openapi v0.0.0-20230109183929-3758b55a6596
 	k8s.io/kubectl v0.26.3
@@ -117,7 +118,6 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/apiextensions-apiserver v0.26.1 // indirect
-	k8s.io/klog/v2 v2.80.1 // indirect
 	k8s.io/kms v0.26.3 // indirect
 	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.0.36 // indirect
 	sigs.k8s.io/json v0.0.0-20220713155537-f223a00ba0e2 // indirect
