@@ -93,6 +93,20 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: value
       type:
         scalar: string
+- name: com.github.onmetal.onmetal-api.api.common.v1alpha1.UIDReference
+  map:
+    fields:
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: namespace
+      type:
+        scalar: string
+    - name: uid
+      type:
+        scalar: string
+    elementRelationship: atomic
 - name: com.github.onmetal.onmetal-api.api.compute.v1alpha1.DaemonEndpoint
   map:
     fields:
@@ -1056,6 +1070,33 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkInterfaceSpec
       default: {}
+- name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPeering
+  map:
+    fields:
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: networkRef
+      type:
+        namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.UIDReference
+      default: {}
+- name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPeeringStatus
+  map:
+    fields:
+    - name: lastPhaseTransitionTime
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: networkHandle
+      type:
+        scalar: string
+    - name: phase
+      type:
+        scalar: string
 - name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkSpec
   map:
     fields:
@@ -1063,9 +1104,25 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
+    - name: peerings
+      type:
+        list:
+          elementType:
+            namedType: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPeering
+          elementRelationship: associative
+          keys:
+          - name
 - name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkStatus
   map:
     fields:
+    - name: peerings
+      type:
+        list:
+          elementType:
+            namedType: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPeeringStatus
+          elementRelationship: associative
+          keys:
+          - name
     - name: state
       type:
         scalar: string

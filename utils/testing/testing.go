@@ -22,6 +22,10 @@ import (
 	"time"
 
 	"github.com/onsi/ginkgo/v2"
+	"github.com/onsi/gomega"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 type DelegatingContext struct {
@@ -138,4 +142,21 @@ func RandomString(n int, opts ...RandomStringOption) string {
 		sb.WriteRune(rune(charset[rand.Intn(len(charset))]))
 	}
 	return sb.String()
+}
+
+// SetupNamespace sets up a namespace before each test and tears the namespace down after each test.
+func SetupNamespace(c *client.Client) *corev1.Namespace {
+	ns := &corev1.Namespace{}
+	ginkgo.BeforeEach(func(ctx ginkgo.SpecContext) {
+		*ns = corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
+				GenerateName: "test-ns-",
+			},
+		}
+		gomega.Expect((*c).Create(ctx, ns)).To(gomega.Succeed())
+		ginkgo.DeferCleanup(func(ctx context.Context) error {
+			return client.IgnoreNotFound((*c).Delete(ctx, ns))
+		})
+	})
+	return ns
 }

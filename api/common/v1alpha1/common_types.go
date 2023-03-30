@@ -78,6 +78,18 @@ type LocalUIDReference struct {
 	UID types.UID `json:"uid"`
 }
 
+// UIDReference is a reference to another entity in a potentially different namespace including its UID.
+// +structType=atomic
+type UIDReference struct {
+	// Namespace is the namespace of the referenced entity. If empty,
+	// the same namespace as the referring resource is implied.
+	Namespace string `json:"namespace,omitempty"`
+	// Name is the name of the referenced entity.
+	Name string `json:"name"`
+	// UID is the UID of the referenced entity.
+	UID types.UID `json:"uid,omitempty"`
+}
+
 // IP is an IP address.
 type IP struct {
 	netip.Addr `json:"-"`

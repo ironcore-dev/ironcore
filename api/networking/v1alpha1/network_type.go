@@ -16,23 +16,68 @@
 
 package v1alpha1
 
-import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+import (
+	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+)
 
 // NetworkSpec defines the desired state of Network
 type NetworkSpec struct {
 	// Handle is the identifier of the network provider.
 	Handle string `json:"handle"`
+	// Peerings are the network peerings with this network.
+	// +optional
+	// +patchMergeKey=name
+	// +patchStrategy=merge,retainKeys
+	Peerings []NetworkPeering `json:"peerings,omitempty" patchStrategy:"merge,retainKeys" patchMergeKey:"name"`
+}
+
+// NetworkPeering defines a network peering with another network.
+type NetworkPeering struct {
+	// Name is the semantical name of the network peering.
+	Name string `json:"name"`
+	// NetworkRef is the reference to the network to peer with.
+	// If the UID is empty, it will be populated once when the peering is successfully bound.
+	// If namespace is empty it is implied that the target network resides in the same network.
+	NetworkRef commonv1alpha1.UIDReference `json:"networkRef"`
 }
 
 // NetworkStatus defines the observed state of Network
 type NetworkStatus struct {
 	// State is the state of the machine.
 	State NetworkState `json:"state,omitempty"`
+	// Peerings contains the states of the network peerings for the network.
+	// +optional
+	// +patchMergeKey=name
+	// +patchStrategy=merge,retainKeys
+	Peerings []NetworkPeeringStatus `json:"peerings,omitempty" patchStrategy:"merge,retainKeys" patchMergeKey:"name"`
 }
 
 // NetworkState is the state of a network.
 // +enum
 type NetworkState string
+
+// NetworkPeeringPhase is the phase a NetworkPeering can be in.
+type NetworkPeeringPhase string
+
+const (
+	// NetworkPeeringPhasePending signals that the network peering is not bound.
+	NetworkPeeringPhasePending NetworkPeeringPhase = "Pending"
+	// NetworkPeeringPhaseBound signals that the network peering is bound.
+	NetworkPeeringPhaseBound NetworkPeeringPhase = "Bound"
+)
+
+// NetworkPeeringStatus is the status of a network peering.
+type NetworkPeeringStatus struct {
+	// Name is the name of the network peering.
+	Name string `json:"name"`
+	// NetworkHandle is the handle of the peered network.
+	NetworkHandle string `json:"networkHandle,omitempty"`
+	// Phase represents the binding phase of a network peering.
+	Phase NetworkPeeringPhase `json:"phase,omitempty"`
+	// LastPhaseTransitionTime is the last time the Phase transitioned.
+	LastPhaseTransitionTime *metav1.Time `json:"lastPhaseTransitionTime,omitempty"`
+}
 
 const (
 	// NetworkStatePending means the network is being provisioned.

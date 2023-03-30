@@ -29996,6 +29996,28 @@
 					}
 				}
 			},
+			"com.github.onmetal.onmetal-api.api.common.v1alpha1.UIDReference": {
+				"description": "UIDReference is a reference to another entity in a potentially different namespace including its UID.",
+				"type": "object",
+				"required": [
+					"name"
+				],
+				"properties": {
+					"name": {
+						"description": "Name is the name of the referenced entity.",
+						"type": "string"
+					},
+					"namespace": {
+						"description": "Namespace is the namespace of the referenced entity. If empty, the same namespace as the referring resource is implied.",
+						"type": "string"
+					},
+					"uid": {
+						"description": "UID is the UID of the referenced entity.",
+						"type": "string"
+					}
+				},
+				"x-kubernetes-map-type": "atomic"
+			},
 			"com.github.onmetal.onmetal-api.api.compute.v1alpha1.DaemonEndpoint": {
 				"description": "DaemonEndpoint contains information about a single Daemon endpoint.",
 				"type": "object",
@@ -31823,7 +31845,7 @@
 						]
 					},
 					"portsPerNetworkInterface": {
-						"description": "PortsPerNetworkInterface defines the number of concurrent connections per target network interface. Has to be a power of 2. If empty, 64 is the default.",
+						"description": "PortsPerNetworkInterface defines the number of concurrent connections per target network interface. Has to be a power of 2. If empty, 2048 (DefaultPortsPerNetworkInterface) is the default.",
 						"type": "integer",
 						"format": "int32"
 					},
@@ -32095,6 +32117,57 @@
 					}
 				]
 			},
+			"com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPeering": {
+				"description": "NetworkPeering defines a network peering with another network.",
+				"type": "object",
+				"required": [
+					"name",
+					"networkRef"
+				],
+				"properties": {
+					"name": {
+						"description": "Name is the semantical name of the network peering.",
+						"type": "string"
+					},
+					"networkRef": {
+						"description": "NetworkRef is the reference to the network to peer with. If the UID is empty, it will be populated once when the peering is successfully bound. If namespace is empty it is implied that the target network resides in the same network.",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.UIDReference"
+							}
+						]
+					}
+				}
+			},
+			"com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPeeringStatus": {
+				"description": "NetworkPeeringStatus is the status of a network peering.",
+				"type": "object",
+				"required": [
+					"name"
+				],
+				"properties": {
+					"lastPhaseTransitionTime": {
+						"description": "LastPhaseTransitionTime is the last time the Phase transitioned.",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Time"
+							}
+						]
+					},
+					"name": {
+						"description": "Name is the name of the network peering.",
+						"type": "string"
+					},
+					"networkHandle": {
+						"description": "NetworkHandle is the handle of the peered network.",
+						"type": "string"
+					},
+					"phase": {
+						"description": "Phase represents the binding phase of a network peering.",
+						"type": "string"
+					}
+				}
+			},
 			"com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkSpec": {
 				"description": "NetworkSpec defines the desired state of Network",
 				"type": "object",
@@ -32105,6 +32178,15 @@
 					"handle": {
 						"description": "Handle is the identifier of the network provider.",
 						"type": "string"
+					},
+					"peerings": {
+						"description": "Peerings are the network peerings with this network.",
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPeering"
+						},
+						"x-kubernetes-patch-merge-key": "name",
+						"x-kubernetes-patch-strategy": "merge,retainKeys"
 					}
 				}
 			},
@@ -32112,6 +32194,15 @@
 				"description": "NetworkStatus defines the observed state of Network",
 				"type": "object",
 				"properties": {
+					"peerings": {
+						"description": "Peerings contains the states of the network peerings for the network.",
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPeeringStatus"
+						},
+						"x-kubernetes-patch-merge-key": "name",
+						"x-kubernetes-patch-strategy": "merge,retainKeys"
+					},
 					"state": {
 						"description": "State is the state of the machine.\n\nPossible enum values:\n - `\"Available\"` means the network is ready to use.\n - `\"Error\"` means the network is in an error state.\n - `\"Pending\"` means the network is being provisioned.",
 						"type": "string",

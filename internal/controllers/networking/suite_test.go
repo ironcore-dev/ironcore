@@ -136,6 +136,7 @@ var _ = BeforeSuite(func() {
 	Expect(networkingclient.SetupAliasPrefixNetworkNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 	Expect(networkingclient.SetupLoadBalancerNetworkNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 	Expect(networkingclient.SetupNATGatewayNetworkNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+	Expect(networkingclient.SetupNetworkPeeringKeysFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 	Expect(networkingclient.SetupVirtualIPSpecTargetRefNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 
 	// Register reconcilers
@@ -187,6 +188,12 @@ var _ = BeforeSuite(func() {
 	err = (&NetworkProtectionReconciler{
 		Client: k8sManager.GetClient(),
 		Scheme: k8sManager.GetScheme(),
+	}).SetupWithManager(k8sManager)
+	Expect(err).NotTo(HaveOccurred())
+
+	err = (&NetworkBindReconciler{
+		EventRecorder: &record.FakeRecorder{},
+		Client:        k8sManager.GetClient(),
 	}).SetupWithManager(k8sManager)
 	Expect(err).NotTo(HaveOccurred())
 
