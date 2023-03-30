@@ -65,6 +65,7 @@ func (s *Server) listAggregateOnmetalVolumes(ctx context.Context) ([]AggregateOn
 	var res []AggregateOnmetalVolume
 	for i := range onmetalVolumeList.Items {
 		onmetalVolume := &onmetalVolumeList.Items[i]
+
 		aggregateOnmetalVolume, err := s.aggregateOnmetalVolume(onmetalVolume, secretByNameGetter.Get)
 		if err != nil {
 			return nil, fmt.Errorf("error aggregating onmetal volume %s: %w", onmetalVolume.Name, err)
@@ -108,6 +109,18 @@ func (s *Server) getOnmetalVolumeAccessSecretIfRequired(
 	return getSecret(secretName)
 }
 
+func (s *Server) getOnmetalVolumeEncryptionSecretIfRequired(
+	onmetalVolume *storagev1alpha1.Volume,
+	getSecret func(string) (*corev1.Secret, error),
+) (*corev1.Secret, error) {
+	if onmetalVolume.Spec.Encryption == nil {
+		return nil, nil
+	}
+
+	secretName := onmetalVolume.Spec.Encryption.SecretRef.Name
+	return getSecret(secretName)
+}
+
 func (s *Server) aggregateOnmetalVolume(
 	onmetalVolume *storagev1alpha1.Volume,
 	getSecret func(string) (*corev1.Secret, error),
@@ -117,9 +130,15 @@ func (s *Server) aggregateOnmetalVolume(
 		return nil, fmt.Errorf("error getting onmetal volume access secret: %w", err)
 	}
 
+	encryptionSecret, err := s.getOnmetalVolumeEncryptionSecretIfRequired(onmetalVolume, getSecret)
+	if err != nil {
+		return nil, fmt.Errorf("error getting onmetal volume access secret: %w", err)
+	}
+
 	return &AggregateOnmetalVolume{
-		Volume:       onmetalVolume,
-		AccessSecret: accessSecret,
+		Volume:           onmetalVolume,
+		EncryptionSecret: encryptionSecret,
+		AccessSecret:     accessSecret,
 	}, nil
 }
 

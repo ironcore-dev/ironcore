@@ -72,6 +72,10 @@ func IsCreated(o metav1.Object) bool {
 	return metautils.HasLabel(o, volumebrokerv1alpha1.CreatedLabel)
 }
 
+func SetPurpose(o metav1.Object, purpose string) {
+	metautils.SetLabel(o, volumebrokerv1alpha1.PurposeLabel, purpose)
+}
+
 func PatchControlledBy(ctx context.Context, c client.Client, owner, controlled client.Object) error {
 	base := controlled.DeepCopyObject().(client.Object)
 	if err := ctrl.SetControllerReference(owner, controlled, c.Scheme()); err != nil {
