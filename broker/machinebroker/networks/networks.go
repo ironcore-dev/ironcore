@@ -97,7 +97,7 @@ func (m *Networks) createNetwork(ctx context.Context, handle string) (res *netwo
 	}
 	annotations.SetExternallyMangedBy(network, machinebrokerv1alpha1.MachineBrokerManager)
 	apiutils.SetManagerLabel(network, machinebrokerv1alpha1.MachineBrokerManager)
-	apiutils.SetNetworkHandle(network, handle)
+	apiutils.SetNetworkHandleLabel(network, handle)
 
 	if err := m.cluster.Client().Create(ctx, network); err != nil {
 		return nil, fmt.Errorf("error creating network: %w", err)

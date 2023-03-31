@@ -20,7 +20,6 @@ import (
 	"fmt"
 
 	onmetalapivalidation "github.com/onmetal/onmetal-api/internal/api/validation"
-	commonvalidation "github.com/onmetal/onmetal-api/internal/apis/common/validation"
 	"github.com/onmetal/onmetal-api/internal/apis/ipam"
 	ipamvalidation "github.com/onmetal/onmetal-api/internal/apis/ipam/validation"
 	"github.com/onmetal/onmetal-api/internal/apis/networking"
@@ -93,35 +92,6 @@ func validateNetworkInterfaceIPSources(ipSources []networking.IPSource, ipFamili
 		}
 
 		allErrs = append(allErrs, validateIPSource(ip, i, ipFamily, nicMeta, fldPath.Index(i))...)
-	}
-
-	return allErrs
-}
-
-func validateIPSource(ipSource networking.IPSource, idx int, ipFamily corev1.IPFamily, nicMeta *metav1.ObjectMeta, fldPath *field.Path) field.ErrorList {
-	var allErrs field.ErrorList
-
-	var numSources int
-	if ip := ipSource.Value; ip.IsValid() {
-		numSources++
-		allErrs = append(allErrs, commonvalidation.ValidateIP(ipFamily, *ip, fldPath.Child("value"))...)
-	}
-	if ephemeral := ipSource.Ephemeral; ephemeral != nil {
-		if numSources > 0 {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("ephemeral"), ephemeral, "cannot specify multiple ip sources"))
-		} else {
-			numSources++
-			allErrs = append(allErrs, validateEphemeralPrefixSource(ipFamily, ephemeral, fldPath.Child("ephemeral"))...)
-			if nicMeta != nil && nicMeta.Name != "" {
-				prefixName := fmt.Sprintf("%s-%d", nicMeta.Name, idx)
-				for _, msg := range apivalidation.NameIsDNSLabel(prefixName, false) {
-					allErrs = append(allErrs, field.Invalid(fldPath, prefixName, fmt.Sprintf("resulting prefix name %q is invalid: %s", prefixName, msg)))
-				}
-			}
-		}
-	}
-	if numSources == 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath, ipSource, "must specify an ip source"))
 	}
 
 	return allErrs

@@ -19,6 +19,7 @@ import (
 	"sort"
 
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -40,6 +41,8 @@ const (
 	NetworkHandleLabel = "machinebrokerlet.api.onmetal.de/network-handle"
 
 	PrefixLabel = "machinebrokerlet.api.onmetal.de/prefix"
+
+	LoadBalancerTypeLabel = "machinebrokerlet.api.onmetal.de/load-balancer-type"
 
 	IPLabel = "machinebrokerlet.api.onmetal.de/ip"
 )
@@ -74,16 +77,18 @@ func LoadBalancerPortsKey(ports []LoadBalancerPort) string {
 }
 
 type LoadBalancerTarget struct {
-	IP    commonv1alpha1.IP
-	Ports []LoadBalancerPort
+	LoadBalancerType networkingv1alpha1.LoadBalancerType
+	IP               commonv1alpha1.IP
+	Ports            []LoadBalancerPort
 }
 
 func (t LoadBalancerTarget) Key() string {
 	portKeys := LoadBalancerPortsKey(t.Ports)
-	return fmt.Sprintf("%s%s", t.IP, portKeys)
+	return fmt.Sprintf("%s-%s%s", t.LoadBalancerType, t.IP, portKeys)
 }
 
 type LoadBalancer struct {
+	Type          networkingv1alpha1.LoadBalancerType
 	NetworkHandle string
 	IP            commonv1alpha1.IP
 	Ports         []LoadBalancerPort

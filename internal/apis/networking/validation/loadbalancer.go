@@ -23,6 +23,7 @@ import (
 	"github.com/onmetal/onmetal-api/internal/apis/networking"
 	corev1 "k8s.io/api/core/v1"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	metav1validation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation"
@@ -34,17 +35,19 @@ func ValidateLoadBalancer(loadBalancer *networking.LoadBalancer) field.ErrorList
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(loadBalancer, true, apivalidation.NameIsDNSLabel, field.NewPath("metadata"))...)
-	allErrs = append(allErrs, validateLoadBalancerSpec(&loadBalancer.Spec, field.NewPath("spec"))...)
+	allErrs = append(allErrs, validateLoadBalancerSpec(&loadBalancer.Spec, &loadBalancer.ObjectMeta, field.NewPath("spec"))...)
 
 	return allErrs
 }
 
-func validateLoadBalancerSpec(spec *networking.LoadBalancerSpec, fldPath *field.Path) field.ErrorList {
+func validateLoadBalancerSpec(spec *networking.LoadBalancerSpec, lbMeta *metav1.ObjectMeta, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, validateLoadBalancerType(spec.Type, fldPath.Child("type"))...)
 
 	allErrs = append(allErrs, onmetalapivalidation.ValidateIPFamilies(spec.IPFamilies, fldPath.Child("ipFamilies"))...)
+
+	allErrs = append(allErrs, validateNetworkInterfaceIPSources(spec.IPs, spec.IPFamilies, lbMeta, fldPath.Child("ips"))...)
 
 	for _, msg := range apivalidation.NameIsDNSLabel(spec.NetworkRef.Name, false) {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("networkRef").Child("name"), spec.NetworkRef.Name, msg))
@@ -94,6 +97,7 @@ func portRangesOverlap(x, y [2]int32) bool {
 
 var supportedLoadBalancerTypes = sets.New(
 	networking.LoadBalancerTypePublic,
+	networking.LoadBalancerTypeInternal,
 )
 
 func validateLoadBalancerType(loadBalancerType networking.LoadBalancerType, fldPath *field.Path) field.ErrorList {
@@ -128,14 +132,14 @@ func ValidateLoadBalancerUpdate(newLoadBalancer, oldLoadBalancer *networking.Loa
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessorUpdate(newLoadBalancer, oldLoadBalancer, field.NewPath("metadata"))...)
-	allErrs = append(allErrs, validateLoadBalancerSpecPrefixUpdate(&newLoadBalancer.Spec, &oldLoadBalancer.Spec, field.NewPath("spec"))...)
+	allErrs = append(allErrs, validateLoadBalancerSpecUpdate(&newLoadBalancer.Spec, &oldLoadBalancer.Spec, field.NewPath("spec"))...)
 	allErrs = append(allErrs, ValidateLoadBalancer(newLoadBalancer)...)
 
 	return allErrs
 }
 
-// validateLoadBalancerSpecPrefixUpdate validates the spec of a loadBalancer object before an update.
-func validateLoadBalancerSpecPrefixUpdate(newSpec, oldSpec *networking.LoadBalancerSpec, fldPath *field.Path) field.ErrorList {
+// validateLoadBalancerSpecUpdate validates the spec of a loadBalancer object before an update.
+func validateLoadBalancerSpecUpdate(newSpec, oldSpec *networking.LoadBalancerSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableField(newSpec.NetworkRef, oldSpec.NetworkRef, fldPath.Child("networkRef"))...)

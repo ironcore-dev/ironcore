@@ -84,10 +84,11 @@ func (m *LoadBalancers) getLoadBalancerByKey(ctx context.Context, key loadBalanc
 	if err := m.cluster.Client().List(ctx, loadBalancerList,
 		client.InNamespace(m.cluster.Namespace()),
 		client.MatchingLabels{
-			machinebrokerv1alpha1.ManagerLabel:       machinebrokerv1alpha1.MachineBrokerManager,
-			machinebrokerv1alpha1.CreatedLabel:       "true",
-			machinebrokerv1alpha1.NetworkHandleLabel: key.networkHandle,
-			machinebrokerv1alpha1.IPLabel:            apiutils.EscapeIP(key.target.IP),
+			machinebrokerv1alpha1.ManagerLabel:          machinebrokerv1alpha1.MachineBrokerManager,
+			machinebrokerv1alpha1.CreatedLabel:          "true",
+			machinebrokerv1alpha1.NetworkHandleLabel:    key.networkHandle,
+			machinebrokerv1alpha1.LoadBalancerTypeLabel: string(key.target.LoadBalancerType),
+			machinebrokerv1alpha1.IPLabel:               apiutils.EscapeIP(key.target.IP),
 		},
 	); err != nil {
 		return nil, nil, false, fmt.Errorf("error listing load balanceres by key: %w", err)
@@ -134,7 +135,8 @@ func (m *LoadBalancers) createLoadBalancer(
 	}
 	annotations.SetExternallyMangedBy(loadBalancer, machinebrokerv1alpha1.MachineBrokerManager)
 	apiutils.SetManagerLabel(loadBalancer, machinebrokerv1alpha1.MachineBrokerManager)
-	apiutils.SetNetworkHandle(loadBalancer, key.networkHandle)
+	apiutils.SetNetworkHandleLabel(loadBalancer, key.networkHandle)
+	apiutils.SetLoadBalancerTypeLabel(loadBalancer, key.target.LoadBalancerType)
 	apiutils.SetIPLabel(loadBalancer, key.target.IP)
 
 	if err := m.cluster.Client().Create(ctx, loadBalancer); err != nil {
@@ -159,7 +161,7 @@ func (m *LoadBalancers) createLoadBalancer(
 		},
 	}
 	apiutils.SetManagerLabel(loadBalancerRouting, machinebrokerv1alpha1.MachineBrokerManager)
-	apiutils.SetNetworkHandle(loadBalancerRouting, key.networkHandle)
+	apiutils.SetNetworkHandleLabel(loadBalancerRouting, key.networkHandle)
 	apiutils.SetIPLabel(loadBalancerRouting, key.target.IP)
 	if err := ctrl.SetControllerReference(loadBalancer, loadBalancerRouting, m.cluster.Scheme()); err != nil {
 		return nil, nil, fmt.Errorf("error setting load balancer routing to be controlled by load balancer: %w", err)
@@ -377,6 +379,7 @@ func (m *LoadBalancers) joinLoadBalancersAndRoutings(
 		)
 
 		res = append(res, machinebrokerv1alpha1.LoadBalancer{
+			Type:          loadBalancer.Spec.Type,
 			NetworkHandle: networkHandle,
 			IP:            ip,
 			Ports:         apiutils.ConvertNetworkingLoadBalancerPortsToLoadBalancerPorts(loadBalancer.Spec.Ports),

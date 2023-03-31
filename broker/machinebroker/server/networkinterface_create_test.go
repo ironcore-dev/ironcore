@@ -121,6 +121,7 @@ var _ = Describe("CreateNetworkInterface", func() {
 
 		By("inspecting the load balancer list")
 		Expect(loadBalancers).To(ConsistOf(machinebrokerv1alpha1.LoadBalancer{
+			Type:          networkingv1alpha1.LoadBalancerTypePublic,
 			NetworkHandle: networkHandle,
 			IP:            commonv1alpha1.MustParseIP(loadBalancerIP),
 			Ports: []machinebrokerv1alpha1.LoadBalancerPort{

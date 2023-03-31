@@ -28,6 +28,7 @@ import (
 type LoadBalancerSpecApplyConfiguration struct {
 	Type                     *v1alpha1.LoadBalancerType              `json:"type,omitempty"`
 	IPFamilies               []v1.IPFamily                           `json:"ipFamilies,omitempty"`
+	IPs                      []IPSourceApplyConfiguration            `json:"ips,omitempty"`
 	NetworkRef               *v1.LocalObjectReference                `json:"networkRef,omitempty"`
 	NetworkInterfaceSelector *metav1.LabelSelectorApplyConfiguration `json:"networkInterfaceSelector,omitempty"`
 	Ports                    []LoadBalancerPortApplyConfiguration    `json:"ports,omitempty"`
@@ -53,6 +54,19 @@ func (b *LoadBalancerSpecApplyConfiguration) WithType(value v1alpha1.LoadBalance
 func (b *LoadBalancerSpecApplyConfiguration) WithIPFamilies(values ...v1.IPFamily) *LoadBalancerSpecApplyConfiguration {
 	for i := range values {
 		b.IPFamilies = append(b.IPFamilies, values[i])
+	}
+	return b
+}
+
+// WithIPs adds the given value to the IPs field in the declarative configuration
+// and returns the receiver, so that objects can be build by chaining "With" function invocations.
+// If called multiple times, values provided by each call will be appended to the IPs field.
+func (b *LoadBalancerSpecApplyConfiguration) WithIPs(values ...*IPSourceApplyConfiguration) *LoadBalancerSpecApplyConfiguration {
+	for i := range values {
+		if values[i] == nil {
+			panic("nil value passed to WithIPs")
+		}
+		b.IPs = append(b.IPs, *values[i])
 	}
 	return b
 }

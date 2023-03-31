@@ -126,7 +126,7 @@ func (m *NATGateways) createNATGateway(
 	}
 	annotations.SetExternallyMangedBy(natGateway, machinebrokerv1alpha1.MachineBrokerManager)
 	apiutils.SetManagerLabel(natGateway, machinebrokerv1alpha1.MachineBrokerManager)
-	apiutils.SetNetworkHandle(natGateway, network.Spec.Handle)
+	apiutils.SetNetworkHandleLabel(natGateway, network.Spec.Handle)
 	apiutils.SetIPLabel(natGateway, key.ip)
 
 	if err := m.cluster.Client().Create(ctx, natGateway); err != nil {
@@ -153,7 +153,7 @@ func (m *NATGateways) createNATGateway(
 		},
 	}
 	apiutils.SetManagerLabel(natGatewayRouting, machinebrokerv1alpha1.MachineBrokerManager)
-	apiutils.SetNetworkHandle(natGatewayRouting, network.Spec.Handle)
+	apiutils.SetNetworkHandleLabel(natGatewayRouting, network.Spec.Handle)
 	apiutils.SetIPLabel(natGateway, key.ip)
 	if err := ctrl.SetControllerReference(natGateway, natGatewayRouting, m.cluster.Scheme()); err != nil {
 		return nil, nil, fmt.Errorf("error setting nat gateway routing to be controlled by nat gateway: %w", err)

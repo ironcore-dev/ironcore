@@ -16,6 +16,7 @@ package server_test
 
 import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
@@ -67,6 +68,7 @@ var _ = Describe("NetworkInterfaceCreateLoadBalancerTarget", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(loadBalancers).To(ConsistOf(machinebrokerv1alpha1.LoadBalancer{
+			Type:          networkingv1alpha1.LoadBalancerTypePublic,
 			NetworkHandle: "foo",
 			IP:            commonv1alpha1.MustParseIP("10.0.0.1"),
 			Ports: []machinebrokerv1alpha1.LoadBalancerPort{

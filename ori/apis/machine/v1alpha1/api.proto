@@ -97,6 +97,11 @@ enum Protocol {
   SCTP = 2;
 }
 
+enum LoadBalancerType {
+  PUBLIC = 0;
+  INTERNAL = 1;
+}
+
 message LoadBalancerPort {
   Protocol protocol = 1;
   int32 port = 2;
@@ -104,8 +109,9 @@ message LoadBalancerPort {
 }
 
 message LoadBalancerTargetSpec {
-  string ip = 1;
-  repeated LoadBalancerPort ports = 2;
+  LoadBalancerType load_balancer_type = 1;
+  string ip = 2;
+  repeated LoadBalancerPort ports = 3;
 }
 
 message NetworkInterfaceSpec {
