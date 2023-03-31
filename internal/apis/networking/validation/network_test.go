@@ -17,6 +17,7 @@
 package validation
 
 import (
+	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	"github.com/onmetal/onmetal-api/internal/apis/networking"
 	. "github.com/onmetal/onmetal-api/internal/testutils/validation"
 	. "github.com/onsi/ginkgo/v2"
@@ -42,6 +43,44 @@ var _ = Describe("Network", func() {
 		Entry("bad name",
 			&networking.Network{ObjectMeta: metav1.ObjectMeta{Name: "foo*"}},
 			ContainElement(InvalidField("metadata.name")),
+		),
+		Entry("peering references itself",
+			&networking.Network{
+				ObjectMeta: metav1.ObjectMeta{Namespace: "ns", Name: "foo"},
+				Spec: networking.NetworkSpec{
+					Peerings: []networking.NetworkPeering{
+						{
+							Name: "peering",
+							NetworkRef: commonv1alpha1.UIDReference{
+								Name: "foo",
+							},
+						},
+					},
+				},
+			},
+			ContainElement(ForbiddenField("spec.peerings[0].networkRef")),
+		),
+		Entry("duplicate peering name",
+			&networking.Network{
+				Spec: networking.NetworkSpec{
+					Peerings: []networking.NetworkPeering{
+						{Name: "peering"},
+						{Name: "peering"},
+					},
+				},
+			},
+			ContainElement(DuplicateField("spec.peerings[1].name")),
+		),
+		Entry("duplicate network ref",
+			&networking.Network{
+				Spec: networking.NetworkSpec{
+					Peerings: []networking.NetworkPeering{
+						{NetworkRef: commonv1alpha1.UIDReference{Name: "bar"}},
+						{NetworkRef: commonv1alpha1.UIDReference{Name: "bar"}},
+					},
+				},
+			},
+			ContainElement(DuplicateField("spec.peerings[1].networkRef")),
 		),
 	)
 

@@ -720,6 +720,20 @@ string
 <p>Handle is the identifier of the network provider.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>peerings</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NetworkPeering">
+[]NetworkPeering
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Peerings are the network peerings with this network.</p>
+</td>
+</tr>
 </table>
 </td>
 </tr>
@@ -2076,6 +2090,137 @@ VirtualIPSource
 </tr>
 </tbody>
 </table>
+<h3 id="networking.api.onmetal.de/v1alpha1.NetworkPeering">NetworkPeering
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkSpec">NetworkSpec</a>)
+</p>
+<div>
+<p>NetworkPeering defines a network peering with another network.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the semantical name of the network peering.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+github.com/onmetal/onmetal-api/api/common/v1alpha1.UIDReference
+</em>
+</td>
+<td>
+<p>NetworkRef is the reference to the network to peer with.
+If the UID is empty, it will be populated once when the peering is successfully bound.
+If namespace is empty it is implied that the target network resides in the same network.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.NetworkPeeringPhase">NetworkPeeringPhase
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkPeeringStatus">NetworkPeeringStatus</a>)
+</p>
+<div>
+<p>NetworkPeeringPhase is the phase a NetworkPeering can be in.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Bound&#34;</p></td>
+<td><p>NetworkPeeringPhaseBound signals that the network peering is bound.</p>
+</td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>NetworkPeeringPhasePending signals that the network peering is not bound.</p>
+</td>
+</tr></tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.NetworkPeeringStatus">NetworkPeeringStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkStatus">NetworkStatus</a>)
+</p>
+<div>
+<p>NetworkPeeringStatus is the status of a network peering.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the network peering.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkHandle</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>NetworkHandle is the handle of the peered network.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>phase</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NetworkPeeringPhase">
+NetworkPeeringPhase
+</a>
+</em>
+</td>
+<td>
+<p>Phase represents the binding phase of a network peering.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastPhaseTransitionTime</code><br/>
+<em>
+<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastPhaseTransitionTime is the last time the Phase transitioned.</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="networking.api.onmetal.de/v1alpha1.NetworkSpec">NetworkSpec
 </h3>
 <p>
@@ -2101,6 +2246,20 @@ string
 </td>
 <td>
 <p>Handle is the identifier of the network provider.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>peerings</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NetworkPeering">
+[]NetworkPeering
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Peerings are the network peerings with this network.</p>
 </td>
 </tr>
 </tbody>
@@ -2158,6 +2317,20 @@ NetworkState
 </td>
 <td>
 <p>State is the state of the machine.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>peerings</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NetworkPeeringStatus">
+[]NetworkPeeringStatus
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Peerings contains the states of the network peerings for the network.</p>
 </td>
 </tr>
 </tbody>

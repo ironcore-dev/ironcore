@@ -177,6 +177,7 @@ func (r *NetworkProtectionReconciler) isNetworkInUse(ctx context.Context, log lo
 
 func (r *NetworkProtectionReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
+		Named("networkprotection").
 		For(&networkingv1alpha1.Network{}).
 		Watches(
 			&source.Kind{Type: &networkingv1alpha1.NetworkInterface{}},

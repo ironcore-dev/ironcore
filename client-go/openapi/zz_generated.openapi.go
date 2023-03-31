@@ -40,6 +40,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/api/common/v1alpha1.SecretKeySelector":                schema_onmetal_api_api_common_v1alpha1_SecretKeySelector(ref),
 		"github.com/onmetal/onmetal-api/api/common/v1alpha1.Taint":                            schema_onmetal_api_api_common_v1alpha1_Taint(ref),
 		"github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration":                       schema_onmetal_api_api_common_v1alpha1_Toleration(ref),
+		"github.com/onmetal/onmetal-api/api/common/v1alpha1.UIDReference":                     schema_onmetal_api_api_common_v1alpha1_UIDReference(ref),
 		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.DaemonEndpoint":                  schema_onmetal_api_api_compute_v1alpha1_DaemonEndpoint(ref),
 		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.EFIVar":                          schema_onmetal_api_api_compute_v1alpha1_EFIVar(ref),
 		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.EmptyDiskVolumeSource":           schema_onmetal_api_api_compute_v1alpha1_EmptyDiskVolumeSource(ref),
@@ -113,6 +114,8 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkInterfaceStatus":       schema_onmetal_api_api_networking_v1alpha1_NetworkInterfaceStatus(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkInterfaceTemplateSpec": schema_onmetal_api_api_networking_v1alpha1_NetworkInterfaceTemplateSpec(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkList":                  schema_onmetal_api_api_networking_v1alpha1_NetworkList(ref),
+		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPeering":               schema_onmetal_api_api_networking_v1alpha1_NetworkPeering(ref),
+		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPeeringStatus":         schema_onmetal_api_api_networking_v1alpha1_NetworkPeeringStatus(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkSpec":                  schema_onmetal_api_api_networking_v1alpha1_NetworkSpec(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkStatus":                schema_onmetal_api_api_networking_v1alpha1_NetworkStatus(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.PrefixSource":                 schema_onmetal_api_api_networking_v1alpha1_PrefixSource(ref),
@@ -644,6 +647,47 @@ func schema_onmetal_api_api_common_v1alpha1_Toleration(ref common.ReferenceCallb
 							Format:      "",
 						},
 					},
+				},
+			},
+		},
+	}
+}
+
+func schema_onmetal_api_api_common_v1alpha1_UIDReference(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "UIDReference is a reference to another entity in a potentially different namespace including its UID.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"namespace": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Namespace is the namespace of the referenced entity. If empty, the same namespace as the referring resource is implied.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the name of the referenced entity.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"uid": {
+						SchemaProps: spec.SchemaProps{
+							Description: "UID is the UID of the referenced entity.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"name"},
+			},
+			VendorExtensible: spec.VendorExtensible{
+				Extensions: spec.Extensions{
+					"x-kubernetes-map-type": "atomic",
 				},
 			},
 		},
@@ -3911,6 +3955,81 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkList(ref common.Reference
 	}
 }
 
+func schema_onmetal_api_api_networking_v1alpha1_NetworkPeering(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkPeering defines a network peering with another network.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the semantical name of the network peering.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"networkRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "NetworkRef is the reference to the network to peer with. If the UID is empty, it will be populated once when the peering is successfully bound. If namespace is empty it is implied that the target network resides in the same network.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/onmetal/onmetal-api/api/common/v1alpha1.UIDReference"),
+						},
+					},
+				},
+				Required: []string{"name", "networkRef"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/api/common/v1alpha1.UIDReference"},
+	}
+}
+
+func schema_onmetal_api_api_networking_v1alpha1_NetworkPeeringStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkPeeringStatus is the status of a network peering.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the name of the network peering.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"networkHandle": {
+						SchemaProps: spec.SchemaProps{
+							Description: "NetworkHandle is the handle of the peered network.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"phase": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Phase represents the binding phase of a network peering.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"lastPhaseTransitionTime": {
+						SchemaProps: spec.SchemaProps{
+							Description: "LastPhaseTransitionTime is the last time the Phase transitioned.",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
+						},
+					},
+				},
+				Required: []string{"name"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+	}
+}
+
 func schema_onmetal_api_api_networking_v1alpha1_NetworkSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -3926,10 +4045,32 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkSpec(ref common.Reference
 							Format:      "",
 						},
 					},
+					"peerings": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-patch-merge-key": "name",
+								"x-kubernetes-patch-strategy":  "merge,retainKeys",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "Peerings are the network peerings with this network.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPeering"),
+									},
+								},
+							},
+						},
+					},
 				},
 				Required: []string{"handle"},
 			},
 		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPeering"},
 	}
 }
 
@@ -3947,9 +4088,31 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkStatus(ref common.Referen
 							Format:      "",
 							Enum:        []interface{}{"Available", "Error", "Pending"}},
 					},
+					"peerings": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-patch-merge-key": "name",
+								"x-kubernetes-patch-strategy":  "merge,retainKeys",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "Peerings contains the states of the network peerings for the network.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPeeringStatus"),
+									},
+								},
+							},
+						},
+					},
 				},
 			},
 		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPeeringStatus"},
 	}
 }
 

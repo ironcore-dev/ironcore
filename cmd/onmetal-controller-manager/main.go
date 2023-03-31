@@ -80,6 +80,7 @@ const (
 	prefixController          = "prefix"
 	prefixAllocationScheduler = "prefixallocationscheduler"
 
+	networkBindController          = "networkbind"
 	networkProtectionController    = "networkprotection"
 	networkInterfaceController     = "networkinterface"
 	networkInterfaceBindController = "networkinterfacebind"
@@ -129,7 +130,8 @@ func main() {
 		bucketClassController, bucketScheduler,
 
 		// Networking controllers
-		networkProtectionController, networkInterfaceController, networkInterfaceBindController, virtualIPController, aliasPrefixController, loadBalancerController, natGatewayController,
+		networkBindController, networkProtectionController,
+		networkInterfaceController, networkInterfaceBindController, virtualIPController, aliasPrefixController, loadBalancerController, natGatewayController,
 
 		// IPAM controllers
 		prefixController, prefixAllocationScheduler,
@@ -290,6 +292,16 @@ func main() {
 			EventRecorder: mgr.GetEventRecorderFor("prefix-allocation-scheduler"),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "PrefixAllocationScheduler")
+			os.Exit(1)
+		}
+	}
+
+	if controllers.Enabled(networkBindController) {
+		if err := (&networkingcontrollers.NetworkBindReconciler{
+			EventRecorder: mgr.GetEventRecorderFor("networkbind"),
+			Client:        mgr.GetClient(),
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "NetworkBind")
 			os.Exit(1)
 		}
 	}
@@ -498,6 +510,13 @@ func main() {
 	if controllers.AnyEnabled(natGatewayController, networkProtectionController) {
 		if err := networkingclient.SetupNATGatewayNetworkNameFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
 			setupLog.Error(err, "unable to setup field indexer", "field", networkingclient.NATGatewayNetworkNameField)
+			os.Exit(1)
+		}
+	}
+
+	if controllers.AnyEnabled(networkBindController) {
+		if err := networkingclient.SetupNetworkPeeringKeysFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
+			setupLog.Error(err, "unable to setup field indexer", "field", networkingclient.NetworkPeeringKeysField)
 			os.Exit(1)
 		}
 	}

@@ -16,23 +16,62 @@
 
 package networking
 
-import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+import (
+	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+)
 
 // NetworkSpec defines the desired state of Network
 type NetworkSpec struct {
 	// Handle is the identifier of the network provider.
 	Handle string
+	// Peerings are the network peerings with this network.
+	Peerings []NetworkPeering
+}
+
+// NetworkPeering defines a network peering with another network.
+type NetworkPeering struct {
+	// Name is the semantical name of the network peering.
+	Name string
+	// NetworkRef is the reference to the network to peer with.
+	// If the UID is empty, it will be populated once when the peering is successfully bound.
+	// If namespace is empty it is implied that the target network resides in the same network.
+	NetworkRef commonv1alpha1.UIDReference
 }
 
 // NetworkStatus defines the observed state of Network
 type NetworkStatus struct {
 	// State is the state of the machine.
 	State NetworkState
+	// Peerings contains the states of the network peerings for the network.
+	Peerings []NetworkPeeringStatus
 }
 
 // NetworkState is the state of a network.
 // +enum
 type NetworkState string
+
+// NetworkPeeringPhase is the phase a NetworkPeering can be in.
+type NetworkPeeringPhase string
+
+const (
+	// NetworkPeeringPhasePending signals that the network peering is not bound.
+	NetworkPeeringPhasePending NetworkPeeringPhase = "Pending"
+	// NetworkPeeringPhaseBound signals that the network peering is bound.
+	NetworkPeeringPhaseBound NetworkPeeringPhase = "Bound"
+)
+
+// NetworkPeeringStatus is the status of a network peering.
+type NetworkPeeringStatus struct {
+	// Name is the name of the network peering.
+	Name string
+	// NetworkHandle is the handle of the peered network.
+	NetworkHandle string
+	// Phase represents the binding phase of a network peering.
+	Phase NetworkPeeringPhase
+	// LastPhaseTransitionTime is the last time the Phase transitioned.
+	LastPhaseTransitionTime *metav1.Time
+}
 
 const (
 	// NetworkStatePending means the network is being provisioned.
