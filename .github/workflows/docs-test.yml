@@ -1,0 +1,14 @@
+name: Pull Request Docs test
+
+on:
+  pull_request:
+    paths:
+    - 'docs/**'
+    - '**/*.md'
+
+jobs:
+  checks:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+    - run: 'echo "No test required"'

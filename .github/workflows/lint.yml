@@ -1,4 +1,4 @@
-name: Lint Golang Codebase
+name: Lint
 
 on:
   pull_request:

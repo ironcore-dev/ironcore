@@ -1,0 +1,13 @@
+name: Lint Docs
+
+on:
+  pull_request:
+    paths:
+    - 'docs/**'
+    - '**/*.md'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - run: 'echo "No lint required"'
