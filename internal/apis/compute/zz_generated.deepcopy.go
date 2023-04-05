@@ -429,6 +429,20 @@ func (in *MachinePoolStatus) DeepCopyInto(out *MachinePoolStatus) {
 		copy(*out, *in)
 	}
 	out.DaemonEndpoints = in.DaemonEndpoints
+	if in.Capacity != nil {
+		in, out := &in.Capacity, &out.Capacity
+		*out = make(core.ResourceList, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val.DeepCopy()
+		}
+	}
+	if in.Allocatable != nil {
+		in, out := &in.Allocatable, &out.Allocatable
+		*out = make(core.ResourceList, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val.DeepCopy()
+		}
+	}
 	return
 }
 

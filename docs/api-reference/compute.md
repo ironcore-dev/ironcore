@@ -954,6 +954,28 @@ MachinePoolDaemonEndpoints
 <td>
 </td>
 </tr>
+<tr>
+<td>
+<code>capacity</code><br/>
+<em>
+github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
+</em>
+</td>
+<td>
+<p>Capacity represents the total resources of a machine pool.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>allocatable</code><br/>
+<em>
+github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
+</em>
+</td>
+<td>
+<p>Allocatable represents the resources of a machine pool that are available for scheduling.</p>
+</td>
+</tr>
 </tbody>
 </table>
 <h3 id="compute.api.onmetal.de/v1alpha1.MachineSpec">MachineSpec

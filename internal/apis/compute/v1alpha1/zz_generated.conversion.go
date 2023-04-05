@@ -725,6 +725,8 @@ func autoConvert_v1alpha1_MachinePoolStatus_To_compute_MachinePoolStatus(in *v1a
 	if err := Convert_v1alpha1_MachinePoolDaemonEndpoints_To_compute_MachinePoolDaemonEndpoints(&in.DaemonEndpoints, &out.DaemonEndpoints, s); err != nil {
 		return err
 	}
+	out.Capacity = *(*core.ResourceList)(unsafe.Pointer(&in.Capacity))
+	out.Allocatable = *(*core.ResourceList)(unsafe.Pointer(&in.Allocatable))
 	return nil
 }
 
@@ -741,6 +743,8 @@ func autoConvert_compute_MachinePoolStatus_To_v1alpha1_MachinePoolStatus(in *com
 	if err := Convert_compute_MachinePoolDaemonEndpoints_To_v1alpha1_MachinePoolDaemonEndpoints(&in.DaemonEndpoints, &out.DaemonEndpoints, s); err != nil {
 		return err
 	}
+	out.Capacity = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Capacity))
+	out.Allocatable = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Allocatable))
 	return nil
 }
 

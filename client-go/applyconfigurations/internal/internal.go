@@ -273,12 +273,22 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: com.github.onmetal.onmetal-api.api.compute.v1alpha1.MachinePoolAddress
           elementRelationship: atomic
+    - name: allocatable
+      type:
+        map:
+          elementType:
+            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
     - name: availableMachineClasses
       type:
         list:
           elementType:
             namedType: io.k8s.api.core.v1.LocalObjectReference
           elementRelationship: atomic
+    - name: capacity
+      type:
+        map:
+          elementType:
+            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
     - name: conditions
       type:
         list:
