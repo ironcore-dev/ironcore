@@ -113,6 +113,17 @@ func (s *Server) convertOnmetalPrefixes(prefixes []commonv1alpha1.IPPrefix) []st
 	return res
 }
 
+func (s *Server) convertOnmetalLoadBalancerType(typ networkingv1alpha1.LoadBalancerType) (ori.LoadBalancerType, error) {
+	switch typ {
+	case networkingv1alpha1.LoadBalancerTypePublic:
+		return ori.LoadBalancerType_PUBLIC, nil
+	case networkingv1alpha1.LoadBalancerTypeInternal:
+		return ori.LoadBalancerType_INTERNAL, nil
+	default:
+		return 0, fmt.Errorf("unrecognized load balancer type %q", typ)
+	}
+}
+
 func (s *Server) convertOnmetalProtocol(protocol corev1.Protocol) (ori.Protocol, error) {
 	switch protocol {
 	case corev1.ProtocolTCP:
@@ -142,6 +153,11 @@ func (s *Server) convertOnmetalLoadBalancerTargetPort(port machinebrokerv1alpha1
 func (s *Server) convertOnmetalLoadBalancerTargets(loadBalancerTargets []machinebrokerv1alpha1.LoadBalancerTarget) ([]*ori.LoadBalancerTargetSpec, error) {
 	res := make([]*ori.LoadBalancerTargetSpec, len(loadBalancerTargets))
 	for i, loadBalancerTarget := range loadBalancerTargets {
+		typ, err := s.convertOnmetalLoadBalancerType(loadBalancerTarget.LoadBalancerType)
+		if err != nil {
+			return nil, err
+		}
+
 		ports := make([]*ori.LoadBalancerPort, len(loadBalancerTarget.Ports))
 		for j, port := range loadBalancerTarget.Ports {
 			p, err := s.convertOnmetalLoadBalancerTargetPort(port)
@@ -153,8 +169,9 @@ func (s *Server) convertOnmetalLoadBalancerTargets(loadBalancerTargets []machine
 		}
 
 		res[i] = &ori.LoadBalancerTargetSpec{
-			Ip:    loadBalancerTarget.IP.String(),
-			Ports: ports,
+			LoadBalancerType: typ,
+			Ip:               loadBalancerTarget.IP.String(),
+			Ports:            ports,
 		}
 	}
 	return res, nil
@@ -222,6 +239,17 @@ func (s *Server) convertORIProtocol(protocol ori.Protocol) (corev1.Protocol, err
 		return corev1.ProtocolSCTP, nil
 	default:
 		return "", fmt.Errorf("unknown protocol %d", protocol)
+	}
+}
+
+func (s *Server) convertORILoadBalancerType(typ ori.LoadBalancerType) (networkingv1alpha1.LoadBalancerType, error) {
+	switch typ {
+	case ori.LoadBalancerType_PUBLIC:
+		return networkingv1alpha1.LoadBalancerTypePublic, nil
+	case ori.LoadBalancerType_INTERNAL:
+		return networkingv1alpha1.LoadBalancerTypeInternal, nil
+	default:
+		return "", fmt.Errorf("unknown load balancer type %d", typ)
 	}
 }
 

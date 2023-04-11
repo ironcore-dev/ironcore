@@ -56,6 +56,11 @@ func (s *Server) prepareOnmetalVirtualIP(virtualIPSpec *ori.VirtualIPSpec) (*net
 }
 
 func (s *Server) prepareOnmetalLoadBalancerTarget(lbTgt *ori.LoadBalancerTargetSpec) (*machinebrokerv1alpha1.LoadBalancerTarget, error) {
+	typ, err := s.convertORILoadBalancerType(lbTgt.LoadBalancerType)
+	if err != nil {
+		return nil, err
+	}
+
 	ip, err := commonv1alpha1.ParseIP(lbTgt.Ip)
 	if err != nil {
 		return nil, err
@@ -76,8 +81,9 @@ func (s *Server) prepareOnmetalLoadBalancerTarget(lbTgt *ori.LoadBalancerTargetS
 	}
 
 	return &machinebrokerv1alpha1.LoadBalancerTarget{
-		IP:    ip,
-		Ports: ports,
+		LoadBalancerType: typ,
+		IP:               ip,
+		Ports:            ports,
 	}, nil
 }
 

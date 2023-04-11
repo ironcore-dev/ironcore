@@ -300,6 +300,19 @@ LoadBalancerType
 </tr>
 <tr>
 <td>
+<code>ips</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.IPSource">
+[]IPSource
+</a>
+</em>
+</td>
+<td>
+<p>IPs are the ips to use. Can only be used when Type is LoadBalancerTypeInternal.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>networkRef</code><br/>
 <em>
 <a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
@@ -1161,7 +1174,7 @@ VirtualIPTemplateSpec
 <h3 id="networking.api.onmetal.de/v1alpha1.IPSource">IPSource
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceSpec">NetworkInterfaceSpec</a>)
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerSpec">LoadBalancerSpec</a>, <a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceSpec">NetworkInterfaceSpec</a>)
 </p>
 <div>
 <p>IPSource is the definition of how to obtain an IP.</p>
@@ -1300,6 +1313,19 @@ LoadBalancerType
 </tr>
 <tr>
 <td>
+<code>ips</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.IPSource">
+[]IPSource
+</a>
+</em>
+</td>
+<td>
+<p>IPs are the ips to use. Can only be used when Type is LoadBalancerTypeInternal.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>networkRef</code><br/>
 <em>
 <a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
@@ -1386,7 +1412,10 @@ for which this LoadBalancer should be applied</p>
 <th>Description</th>
 </tr>
 </thead>
-<tbody><tr><td><p>&#34;Public&#34;</p></td>
+<tbody><tr><td><p>&#34;Internal&#34;</p></td>
+<td><p>LoadBalancerTypeInternal is a LoadBalancer that allocates and routes network-internal, stable IPs.</p>
+</td>
+</tr><tr><td><p>&#34;Public&#34;</p></td>
 <td><p>LoadBalancerTypePublic is a LoadBalancer that allocates and routes a stable public IP.</p>
 </td>
 </tr></tbody>

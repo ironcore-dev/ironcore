@@ -3084,6 +3084,20 @@ func schema_onmetal_api_api_networking_v1alpha1_LoadBalancerSpec(ref common.Refe
 							},
 						},
 					},
+					"ips": {
+						SchemaProps: spec.SchemaProps{
+							Description: "IPs are the ips to use. Can only be used when Type is LoadBalancerTypeInternal.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/api/networking/v1alpha1.IPSource"),
+									},
+								},
+							},
+						},
+					},
 					"networkRef": {
 						SchemaProps: spec.SchemaProps{
 							Description: "NetworkRef is the Network this LoadBalancer should belong to.",
@@ -3116,7 +3130,7 @@ func schema_onmetal_api_api_networking_v1alpha1_LoadBalancerSpec(ref common.Refe
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/api/networking/v1alpha1.LoadBalancerPort", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"},
+			"github.com/onmetal/onmetal-api/api/networking/v1alpha1.IPSource", "github.com/onmetal/onmetal-api/api/networking/v1alpha1.LoadBalancerPort", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"},
 	}
 }
 

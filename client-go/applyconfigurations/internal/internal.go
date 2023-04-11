@@ -799,6 +799,12 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             scalar: string
           elementRelationship: atomic
+    - name: ips
+      type:
+        list:
+          elementType:
+            namedType: com.github.onmetal.onmetal-api.api.networking.v1alpha1.IPSource
+          elementRelationship: atomic
     - name: networkInterfaceSelector
       type:
         namedType: io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector

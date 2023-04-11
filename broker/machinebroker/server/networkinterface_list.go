@@ -179,8 +179,9 @@ func (s *Server) aggregateOnmetalNetworkInterface(
 		}
 
 		lbTgts = append(lbTgts, machinebrokerv1alpha1.LoadBalancerTarget{
-			IP:    loadBalancer.IP,
-			Ports: loadBalancer.Ports,
+			LoadBalancerType: loadBalancer.Type,
+			IP:               loadBalancer.IP,
+			Ports:            loadBalancer.Ports,
 		})
 	}
 

@@ -822,6 +822,7 @@ func Convert_networking_LoadBalancerRoutingList_To_v1alpha1_LoadBalancerRoutingL
 func autoConvert_v1alpha1_LoadBalancerSpec_To_networking_LoadBalancerSpec(in *v1alpha1.LoadBalancerSpec, out *networking.LoadBalancerSpec, s conversion.Scope) error {
 	out.Type = networking.LoadBalancerType(in.Type)
 	out.IPFamilies = *(*[]corev1.IPFamily)(unsafe.Pointer(&in.IPFamilies))
+	out.IPs = *(*[]networking.IPSource)(unsafe.Pointer(&in.IPs))
 	out.NetworkRef = in.NetworkRef
 	out.NetworkInterfaceSelector = (*v1.LabelSelector)(unsafe.Pointer(in.NetworkInterfaceSelector))
 	out.Ports = *(*[]networking.LoadBalancerPort)(unsafe.Pointer(&in.Ports))
@@ -836,6 +837,7 @@ func Convert_v1alpha1_LoadBalancerSpec_To_networking_LoadBalancerSpec(in *v1alph
 func autoConvert_networking_LoadBalancerSpec_To_v1alpha1_LoadBalancerSpec(in *networking.LoadBalancerSpec, out *v1alpha1.LoadBalancerSpec, s conversion.Scope) error {
 	out.Type = v1alpha1.LoadBalancerType(in.Type)
 	out.IPFamilies = *(*[]corev1.IPFamily)(unsafe.Pointer(&in.IPFamilies))
+	out.IPs = *(*[]v1alpha1.IPSource)(unsafe.Pointer(&in.IPs))
 	out.NetworkRef = in.NetworkRef
 	out.NetworkInterfaceSelector = (*v1.LabelSelector)(unsafe.Pointer(in.NetworkInterfaceSelector))
 	out.Ports = *(*[]v1alpha1.LoadBalancerPort)(unsafe.Pointer(&in.Ports))

@@ -61,6 +61,14 @@ var _ = Describe("LoadBalancer", func() {
 			&networking.LoadBalancer{},
 			ContainElement(RequiredField("spec.type")),
 		),
+		Entry("load balancer type public",
+			&networking.LoadBalancer{Spec: networking.LoadBalancerSpec{Type: networking.LoadBalancerTypePublic}},
+			Not(ContainElement(RequiredField("spec.type"))),
+		),
+		Entry("load balancer type internal",
+			&networking.LoadBalancer{Spec: networking.LoadBalancerSpec{Type: networking.LoadBalancerTypeInternal}},
+			Not(ContainElement(RequiredField("spec.type"))),
+		),
 		Entry("duplicate ip family",
 			&networking.LoadBalancer{
 				Spec: networking.LoadBalancerSpec{

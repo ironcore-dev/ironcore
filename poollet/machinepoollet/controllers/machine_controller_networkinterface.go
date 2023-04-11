@@ -62,6 +62,17 @@ func (r *MachineReconciler) convertProtocol(protocol corev1.Protocol) (ori.Proto
 	}
 }
 
+func (r *MachineReconciler) convertLoadBalancerType(loadBalancerType networkingv1alpha1.LoadBalancerType) (ori.LoadBalancerType, error) {
+	switch loadBalancerType {
+	case networkingv1alpha1.LoadBalancerTypePublic:
+		return ori.LoadBalancerType_PUBLIC, nil
+	case networkingv1alpha1.LoadBalancerTypeInternal:
+		return ori.LoadBalancerType_INTERNAL, nil
+	default:
+		return 0, fmt.Errorf("unknown load balancer type %q", loadBalancerType)
+	}
+}
+
 func (r *MachineReconciler) convertLoadBalancerPorts(ports []networkingv1alpha1.LoadBalancerPort) ([]*ori.LoadBalancerPort, error) {
 	res := make([]*ori.LoadBalancerPort, len(ports))
 	for i, port := range ports {
@@ -687,14 +698,20 @@ func (r *MachineReconciler) loadBalancerTargetsForNetworkInterface(
 		}
 
 		for _, ip := range loadBalancer.Status.IPs {
+			loadBalancerType, err := r.convertLoadBalancerType(loadBalancer.Spec.Type)
+			if err != nil {
+				return nil, err
+			}
+
 			ports, err := r.convertLoadBalancerPorts(loadBalancer.Spec.Ports)
 			if err != nil {
 				return nil, err
 			}
 
 			loadBalancerTarget := &ori.LoadBalancerTargetSpec{
-				Ip:    ip.String(),
-				Ports: ports,
+				LoadBalancerType: loadBalancerType,
+				Ip:               ip.String(),
+				Ports:            ports,
 			}
 
 			loadBalancerTargetsByKey[loadBalancerTarget.Key()] = loadBalancerTarget

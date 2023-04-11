@@ -424,6 +424,13 @@ func (in *LoadBalancerSpec) DeepCopyInto(out *LoadBalancerSpec) {
 		*out = make([]corev1.IPFamily, len(*in))
 		copy(*out, *in)
 	}
+	if in.IPs != nil {
+		in, out := &in.IPs, &out.IPs
+		*out = make([]IPSource, len(*in))
+		for i := range *in {
+			(*in)[i].DeepCopyInto(&(*out)[i])
+		}
+	}
 	out.NetworkRef = in.NetworkRef
 	if in.NetworkInterfaceSelector != nil {
 		in, out := &in.NetworkInterfaceSelector, &out.NetworkInterfaceSelector

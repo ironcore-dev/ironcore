@@ -65,9 +65,16 @@ func (loadBalancerStrategy) NamespaceScoped() bool {
 }
 
 func (loadBalancerStrategy) PrepareForCreate(ctx context.Context, obj runtime.Object) {
+	loadBalancer := obj.(*networking.LoadBalancer)
+	loadBalancer.Status = networking.LoadBalancerStatus{}
+	dropTypeDependentFields(loadBalancer)
 }
 
 func (loadBalancerStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Object) {
+	newLoadBalancer := obj.(*networking.LoadBalancer)
+	oldLoadBalancer := old.(*networking.LoadBalancer)
+	newLoadBalancer.Status = oldLoadBalancer.Status
+	dropTypeDependentFields(newLoadBalancer)
 }
 
 func (loadBalancerStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
@@ -125,4 +132,19 @@ func (loadBalancerStatusStrategy) ValidateUpdate(ctx context.Context, obj, old r
 
 func (loadBalancerStatusStrategy) WarningsOnUpdate(cxt context.Context, obj, old runtime.Object) []string {
 	return nil
+}
+
+func needsIPs(loadBalancer *networking.LoadBalancer) bool {
+	switch loadBalancer.Spec.Type {
+	case networking.LoadBalancerTypeInternal:
+		return true
+	default:
+		return false
+	}
+}
+
+func dropTypeDependentFields(loadBalancer *networking.LoadBalancer) {
+	if !needsIPs(loadBalancer) {
+		loadBalancer.Spec.IPs = nil
+	}
 }

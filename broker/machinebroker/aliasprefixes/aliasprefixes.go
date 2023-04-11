@@ -121,7 +121,7 @@ func (m *AliasPrefixes) createAliasPrefix(
 		},
 	}
 	apiutils.SetManagerLabel(aliasPrefix, machinebrokerv1alpha1.MachineBrokerManager)
-	apiutils.SetNetworkHandle(aliasPrefix, key.networkHandle)
+	apiutils.SetNetworkHandleLabel(aliasPrefix, key.networkHandle)
 	apiutils.SetPrefixLabel(aliasPrefix, key.prefix)
 
 	if err := m.cluster.Client().Create(ctx, aliasPrefix); err != nil {
@@ -140,7 +140,7 @@ func (m *AliasPrefixes) createAliasPrefix(
 		},
 	}
 	apiutils.SetManagerLabel(aliasPrefixRouting, machinebrokerv1alpha1.MachineBrokerManager)
-	apiutils.SetNetworkHandle(aliasPrefixRouting, key.networkHandle)
+	apiutils.SetNetworkHandleLabel(aliasPrefixRouting, key.networkHandle)
 	apiutils.SetPrefixLabel(aliasPrefixRouting, key.prefix)
 	if err := ctrl.SetControllerReference(aliasPrefix, aliasPrefixRouting, m.cluster.Scheme()); err != nil {
 		return nil, nil, fmt.Errorf("error setting alias prefix routing to be controlled by alias prefix: %w", err)

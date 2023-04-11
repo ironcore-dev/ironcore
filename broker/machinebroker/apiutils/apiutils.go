@@ -22,6 +22,7 @@ import (
 
 	"github.com/onmetal/controller-utils/metautils"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
 	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
 	"golang.org/x/exp/slices"
@@ -159,7 +160,7 @@ var (
 	reverseIPAndPrefixReplacer = strings.NewReplacer("-", "/", "_", ":")
 )
 
-func SetNetworkHandle(o metav1.Object, handle string) {
+func SetNetworkHandleLabel(o metav1.Object, handle string) {
 	metautils.SetLabel(o, machinebrokerv1alpha1.NetworkHandleLabel, handle)
 }
 
@@ -179,6 +180,10 @@ func SetPrefixLabel(o metav1.Object, prefix commonv1alpha1.IPPrefix) {
 func GetPrefixLabel(o metav1.Object) (commonv1alpha1.IPPrefix, error) {
 	escapedPrefix := o.GetLabels()[machinebrokerv1alpha1.PrefixLabel]
 	return UnescapePrefix(escapedPrefix)
+}
+
+func SetLoadBalancerTypeLabel(o metav1.Object, typ networkingv1alpha1.LoadBalancerType) {
+	metautils.SetLabel(o, machinebrokerv1alpha1.LoadBalancerTypeLabel, string(typ))
 }
 
 func EscapeIP(ip commonv1alpha1.IP) string {
