@@ -96,6 +96,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &applyconfigurationscomputev1alpha1.VolumeStatusApplyConfiguration{}
 
 		// Group=core.api.onmetal.de, Version=v1alpha1
+	case corev1alpha1.SchemeGroupVersion.WithKind("ObjectSelector"):
+		return &applyconfigurationscorev1alpha1.ObjectSelectorApplyConfiguration{}
 	case corev1alpha1.SchemeGroupVersion.WithKind("ResourceQuota"):
 		return &applyconfigurationscorev1alpha1.ResourceQuotaApplyConfiguration{}
 	case corev1alpha1.SchemeGroupVersion.WithKind("ResourceQuotaSpec"):
@@ -150,6 +152,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &applyconfigurationsnetworkingv1alpha1.EphemeralPrefixSourceApplyConfiguration{}
 	case networkingv1alpha1.SchemeGroupVersion.WithKind("EphemeralVirtualIPSource"):
 		return &applyconfigurationsnetworkingv1alpha1.EphemeralVirtualIPSourceApplyConfiguration{}
+	case networkingv1alpha1.SchemeGroupVersion.WithKind("IPBlock"):
+		return &applyconfigurationsnetworkingv1alpha1.IPBlockApplyConfiguration{}
 	case networkingv1alpha1.SchemeGroupVersion.WithKind("IPSource"):
 		return &applyconfigurationsnetworkingv1alpha1.IPSourceApplyConfiguration{}
 	case networkingv1alpha1.SchemeGroupVersion.WithKind("LoadBalancer"):
@@ -192,6 +196,22 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &applyconfigurationsnetworkingv1alpha1.NetworkPeeringApplyConfiguration{}
 	case networkingv1alpha1.SchemeGroupVersion.WithKind("NetworkPeeringStatus"):
 		return &applyconfigurationsnetworkingv1alpha1.NetworkPeeringStatusApplyConfiguration{}
+	case networkingv1alpha1.SchemeGroupVersion.WithKind("NetworkPolicy"):
+		return &applyconfigurationsnetworkingv1alpha1.NetworkPolicyApplyConfiguration{}
+	case networkingv1alpha1.SchemeGroupVersion.WithKind("NetworkPolicyCondition"):
+		return &applyconfigurationsnetworkingv1alpha1.NetworkPolicyConditionApplyConfiguration{}
+	case networkingv1alpha1.SchemeGroupVersion.WithKind("NetworkPolicyEgressRule"):
+		return &applyconfigurationsnetworkingv1alpha1.NetworkPolicyEgressRuleApplyConfiguration{}
+	case networkingv1alpha1.SchemeGroupVersion.WithKind("NetworkPolicyIngressRule"):
+		return &applyconfigurationsnetworkingv1alpha1.NetworkPolicyIngressRuleApplyConfiguration{}
+	case networkingv1alpha1.SchemeGroupVersion.WithKind("NetworkPolicyPeer"):
+		return &applyconfigurationsnetworkingv1alpha1.NetworkPolicyPeerApplyConfiguration{}
+	case networkingv1alpha1.SchemeGroupVersion.WithKind("NetworkPolicyPort"):
+		return &applyconfigurationsnetworkingv1alpha1.NetworkPolicyPortApplyConfiguration{}
+	case networkingv1alpha1.SchemeGroupVersion.WithKind("NetworkPolicySpec"):
+		return &applyconfigurationsnetworkingv1alpha1.NetworkPolicySpecApplyConfiguration{}
+	case networkingv1alpha1.SchemeGroupVersion.WithKind("NetworkPolicyStatus"):
+		return &applyconfigurationsnetworkingv1alpha1.NetworkPolicyStatusApplyConfiguration{}
 	case networkingv1alpha1.SchemeGroupVersion.WithKind("NetworkSpec"):
 		return &applyconfigurationsnetworkingv1alpha1.NetworkSpecApplyConfiguration{}
 	case networkingv1alpha1.SchemeGroupVersion.WithKind("NetworkStatus"):

@@ -1,0 +1,22 @@
+apiVersion: networking.api.onmetal.de/v1alpha1
+kind: NetworkPolicy
+metadata:
+  namespace: default
+  name: networkpolicy-sample
+spec:
+  networkRef:
+    name: network-sample
+  networkInterfaceSelector:
+    matchLabels:
+      app: db
+  ingress:
+  - from:
+    - objectSelector:
+        kind: NetworkInterface
+        matchLabels:
+          app: web
+  egress:
+  - to:
+    - ipBlock:
+        cidr: 10.0.0.0/16
+  

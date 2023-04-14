@@ -26,6 +26,7 @@ import (
 	natgatewayroutingstorage "github.com/onmetal/onmetal-api/internal/registry/networking/natgatewayrouting/storage"
 	networkstorage "github.com/onmetal/onmetal-api/internal/registry/networking/network/storage"
 	networkinterfacestorage "github.com/onmetal/onmetal-api/internal/registry/networking/networkinterface/storage"
+	networkpolicystorage "github.com/onmetal/onmetal-api/internal/registry/networking/networkpolicy/storage"
 	virtualipstorage "github.com/onmetal/onmetal-api/internal/registry/networking/virtualip/storage"
 	onmetalapiserializer "github.com/onmetal/onmetal-api/internal/serializer"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -76,6 +77,14 @@ func (p StorageProvider) v1alpha1Storage(restOptionsGetter generic.RESTOptionsGe
 
 	storageMap["networks"] = networkStorage.Network
 	storageMap["networks/status"] = networkStorage.Status
+
+	networkPolicyStorage, err := networkpolicystorage.NewStorage(restOptionsGetter)
+	if err != nil {
+		return storageMap, err
+	}
+
+	storageMap["networkpolicies"] = networkPolicyStorage.NetworkPolicy
+	storageMap["networkpolicies/status"] = networkPolicyStorage.Status
 
 	virtualIPStorage, err := virtualipstorage.NewStorage(restOptionsGetter)
 	if err != nil {

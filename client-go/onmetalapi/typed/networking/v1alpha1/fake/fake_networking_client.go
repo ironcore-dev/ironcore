@@ -59,6 +59,10 @@ func (c *FakeNetworkingV1alpha1) NetworkInterfaces(namespace string) v1alpha1.Ne
 	return &FakeNetworkInterfaces{c, namespace}
 }
 
+func (c *FakeNetworkingV1alpha1) NetworkPolicies(namespace string) v1alpha1.NetworkPolicyInterface {
+	return &FakeNetworkPolicies{c, namespace}
+}
+
 func (c *FakeNetworkingV1alpha1) VirtualIPs(namespace string) v1alpha1.VirtualIPInterface {
 	return &FakeVirtualIPs{c, namespace}
 }

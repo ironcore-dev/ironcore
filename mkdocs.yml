@@ -5,67 +5,68 @@ theme:
   icon:
     repo: fontawesome/brands/github
   features:
-    - navigation.instant
-    - navigation.tracking
-    - navigation.expand
-    - navigation.indexes
-    - navigation.top
+  - navigation.instant
+  - navigation.tracking
+  - navigation.expand
+  - navigation.indexes
+  - navigation.top
   name: material
   logo: assets/logo.png
   favicon: assets/favicon.png
   palette:
-    - media: "(prefers-color-scheme: light)"
-      scheme: default
-      primary: white
-      toggle:
-        icon: material/weather-night
-        name: Switch to dark mode
-    - media: "(prefers-color-scheme: dark)"
-      scheme: slate
-      primary: black
-      toggle:
-        icon: material/weather-sunny
-        name: Switch to light mode
+  - media: "(prefers-color-scheme: light)"
+    scheme: default
+    primary: white
+    toggle:
+      icon: material/weather-night
+      name: Switch to dark mode
+  - media: "(prefers-color-scheme: dark)"
+    scheme: slate
+    primary: black
+    toggle:
+      icon: material/weather-sunny
+      name: Switch to light mode
   font:
     text: 'Work Sans'
 
 plugins:
-  - search
+- search
 
 markdown_extensions:
-  - pymdownx.highlight
-  - pymdownx.superfences:
-      custom_fences:
-        - name: mermaid
-          class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_code_format
-  - pymdownx.snippets
-  - codehilite
-  - admonition
-  - abbr
-  - toc:
-      permalink: true
+- pymdownx.highlight
+- pymdownx.superfences:
+    custom_fences:
+    - name: mermaid
+      class: mermaid
+      format: !!python/name:pymdownx.superfences.fence_code_format
+- pymdownx.snippets
+- codehilite
+- admonition
+- abbr
+- toc:
+    permalink: true
 
 nav:
-  - Home: README.md
-  - Concepts: README.md
-  - Architecture: README.md
-  - Usage: README.md
-  - Developer Guide:
-      - Local Setup: development/setup.md
-      - Documentation: development/documentation.md
-      - Testing: development/testing.md
-      - Contribution Guide: development/contribution.md
-  - Proposals: proposals/README.md
-  - API Reference:
-      - Overview: api-reference/overview.md
-      - IPAM: api-reference/ipam.md
-      - Compute: api-reference/compute.md
-      - Networking: api-reference/networking.md
-      - Storage: api-reference/storage.md
-      - Common: api-reference/common.md
+- Home: README.md
+- Concepts: README.md
+- Architecture: README.md
+- Usage: README.md
+- Developer Guide:
+  - Local Setup: development/setup.md
+  - Documentation: development/documentation.md
+  - Testing: development/testing.md
+  - Contribution Guide: development/contribution.md
+- Proposals: proposals/README.md
+- API Reference:
+  - Overview: api-reference/overview.md
+  - IPAM: api-reference/ipam.md
+  - Core: api-reference/core.md
+  - Compute: api-reference/compute.md
+  - Networking: api-reference/networking.md
+  - Storage: api-reference/storage.md
+  - Common: api-reference/common.md
 
 extra:
   social:
-    - icon: fontawesome/brands/github
-      link: https://github.com/onmetal/onmetal-api
+  - icon: fontawesome/brands/github
+    link: https://github.com/onmetal/onmetal-api

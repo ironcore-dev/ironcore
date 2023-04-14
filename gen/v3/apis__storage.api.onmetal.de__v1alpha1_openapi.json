@@ -15680,6 +15680,1013 @@
 				}
 			]
 		},
+		"/apis/networking.api.onmetal.de/v1alpha1/namespaces/{namespace}/networkpolicies": {
+			"get": {
+				"tags": [
+					"networkingApiOnmetalDe_v1alpha1"
+				],
+				"description": "list or watch objects of kind NetworkPolicy",
+				"operationId": "listNetworkingApiOnmetalDeV1alpha1NamespacedNetworkPolicy",
+				"parameters": [
+					{
+						"name": "allowWatchBookmarks",
+						"in": "query",
+						"description": "allowWatchBookmarks requests watch events with type \"BOOKMARK\". Servers that do not implement bookmarks may ignore this flag and bookmarks are sent at the server's discretion. Clients should not assume bookmarks are returned at any specific interval, nor may they assume the server will send any BOOKMARK event during a session. If this is not a watch, this field is ignored.",
+						"schema": {
+							"type": "boolean",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "continue",
+						"in": "query",
+						"description": "The continue option should be set when retrieving more results from the server. Since this value is server defined, clients may only use the continue value from a previous query result with identical query parameters (except for the value of continue) and the server may reject a continue value it does not recognize. If the specified continue value is no longer valid whether due to expiration (generally five to fifteen minutes) or a configuration change on the server, the server will respond with a 410 ResourceExpired error together with a continue token. If the client needs a consistent list, it must restart their list without the continue field. Otherwise, the client may send another list request with the token received with the 410 error, the server will respond with a list starting from the next key, but from the latest snapshot, which is inconsistent from the previous list results - objects that are created, modified, or deleted after the first list request will be included in the response, as long as their keys are after the \"next key\".\n\nThis field is not supported when watch is true. Clients may start a watch from the last resourceVersion value returned by the server and not miss any modifications.",
+						"schema": {
+							"type": "string",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "fieldSelector",
+						"in": "query",
+						"description": "A selector to restrict the list of returned objects by their fields. Defaults to everything.",
+						"schema": {
+							"type": "string",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "labelSelector",
+						"in": "query",
+						"description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
+						"schema": {
+							"type": "string",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "limit",
+						"in": "query",
+						"description": "limit is a maximum number of responses to return for a list call. If more items exist, the server will set the `continue` field on the list metadata to a value that can be used with the same initial query to retrieve the next set of results. Setting a limit may return fewer than the requested amount of items (up to zero items) in the event all requested objects are filtered out and clients should only use the presence of the continue field to determine whether more results are available. Servers may choose not to support the limit argument and will return all of the available results. If limit is specified and the continue field is empty, clients may assume that no more results are available. This field is not supported if watch is true.\n\nThe server guarantees that the objects returned when using continue will be identical to issuing a single list call without a limit - that is, no objects created, modified, or deleted after the first request is issued will be included in any subsequent continued requests. This is sometimes referred to as a consistent snapshot, and ensures that a client that is using limit to receive smaller chunks of a very large result can ensure they see all possible objects. If objects are updated during a chunked list the version of the object that was present at the time the first list result was calculated is returned.",
+						"schema": {
+							"type": "integer",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "resourceVersion",
+						"in": "query",
+						"description": "resourceVersion sets a constraint on what resource versions a request may be served from. See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for details.\n\nDefaults to unset",
+						"schema": {
+							"type": "string",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "resourceVersionMatch",
+						"in": "query",
+						"description": "resourceVersionMatch determines how resourceVersion is applied to list calls. It is highly recommended that resourceVersionMatch be set for list calls where resourceVersion is set See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for details.\n\nDefaults to unset",
+						"schema": {
+							"type": "string",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "timeoutSeconds",
+						"in": "query",
+						"description": "Timeout for the list/watch call. This limits the duration of the call, regardless of any activity or inactivity.",
+						"schema": {
+							"type": "integer",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "watch",
+						"in": "query",
+						"description": "Watch for changes to the described resources and return them as a stream of add, update, and remove notifications. Specify resourceVersion.",
+						"schema": {
+							"type": "boolean",
+							"uniqueItems": true
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicyList"
+								}
+							},
+							"application/json;stream=watch": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicyList"
+								}
+							},
+							"application/yaml": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicyList"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "list",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.api.onmetal.de",
+					"kind": "NetworkPolicy",
+					"version": "v1alpha1"
+				}
+			},
+			"post": {
+				"tags": [
+					"networkingApiOnmetalDe_v1alpha1"
+				],
+				"description": "create a NetworkPolicy",
+				"operationId": "createNetworkingApiOnmetalDeV1alpha1NamespacedNetworkPolicy",
+				"parameters": [
+					{
+						"name": "dryRun",
+						"in": "query",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"schema": {
+							"type": "string",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "fieldManager",
+						"in": "query",
+						"description": "fieldManager is a name associated with the actor or entity that is making these changes. The value must be less than or 128 characters long, and only contain printable characters, as defined by https://golang.org/pkg/unicode/#IsPrint.",
+						"schema": {
+							"type": "string",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "fieldValidation",
+						"in": "query",
+						"description": "fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields, provided that the `ServerSideFieldValidation` feature gate is also enabled. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23 and is the default behavior when the `ServerSideFieldValidation` feature gate is disabled. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default when the `ServerSideFieldValidation` feature gate is enabled. - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.",
+						"schema": {
+							"type": "string",
+							"uniqueItems": true
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"*/*": {
+							"schema": {
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+								}
+							},
+							"application/yaml": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+								}
+							}
+						}
+					},
+					"201": {
+						"description": "Created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+								}
+							},
+							"application/yaml": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+								}
+							}
+						}
+					},
+					"202": {
+						"description": "Accepted",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+								}
+							},
+							"application/yaml": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "post",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.api.onmetal.de",
+					"kind": "NetworkPolicy",
+					"version": "v1alpha1"
+				}
+			},
+			"delete": {
+				"tags": [
+					"networkingApiOnmetalDe_v1alpha1"
+				],
+				"description": "delete collection of NetworkPolicy",
+				"operationId": "deleteNetworkingApiOnmetalDeV1alpha1CollectionNamespacedNetworkPolicy",
+				"parameters": [
+					{
+						"name": "continue",
+						"in": "query",
+						"description": "The continue option should be set when retrieving more results from the server. Since this value is server defined, clients may only use the continue value from a previous query result with identical query parameters (except for the value of continue) and the server may reject a continue value it does not recognize. If the specified continue value is no longer valid whether due to expiration (generally five to fifteen minutes) or a configuration change on the server, the server will respond with a 410 ResourceExpired error together with a continue token. If the client needs a consistent list, it must restart their list without the continue field. Otherwise, the client may send another list request with the token received with the 410 error, the server will respond with a list starting from the next key, but from the latest snapshot, which is inconsistent from the previous list results - objects that are created, modified, or deleted after the first list request will be included in the response, as long as their keys are after the \"next key\".\n\nThis field is not supported when watch is true. Clients may start a watch from the last resourceVersion value returned by the server and not miss any modifications.",
+						"schema": {
+							"type": "string",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "dryRun",
+						"in": "query",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"schema": {
+							"type": "string",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "fieldSelector",
+						"in": "query",
+						"description": "A selector to restrict the list of returned objects by their fields. Defaults to everything.",
+						"schema": {
+							"type": "string",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "gracePeriodSeconds",
+						"in": "query",
+						"description": "The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately.",
+						"schema": {
+							"type": "integer",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "labelSelector",
+						"in": "query",
+						"description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
+						"schema": {
+							"type": "string",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "limit",
+						"in": "query",
+						"description": "limit is a maximum number of responses to return for a list call. If more items exist, the server will set the `continue` field on the list metadata to a value that can be used with the same initial query to retrieve the next set of results. Setting a limit may return fewer than the requested amount of items (up to zero items) in the event all requested objects are filtered out and clients should only use the presence of the continue field to determine whether more results are available. Servers may choose not to support the limit argument and will return all of the available results. If limit is specified and the continue field is empty, clients may assume that no more results are available. This field is not supported if watch is true.\n\nThe server guarantees that the objects returned when using continue will be identical to issuing a single list call without a limit - that is, no objects created, modified, or deleted after the first request is issued will be included in any subsequent continued requests. This is sometimes referred to as a consistent snapshot, and ensures that a client that is using limit to receive smaller chunks of a very large result can ensure they see all possible objects. If objects are updated during a chunked list the version of the object that was present at the time the first list result was calculated is returned.",
+						"schema": {
+							"type": "integer",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "orphanDependents",
+						"in": "query",
+						"description": "Deprecated: please use the PropagationPolicy, this field will be deprecated in 1.7. Should the dependent objects be orphaned. If true/false, the \"orphan\" finalizer will be added to/removed from the object's finalizers list. Either this field or PropagationPolicy may be set, but not both.",
+						"schema": {
+							"type": "boolean",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "propagationPolicy",
+						"in": "query",
+						"description": "Whether and how garbage collection will be performed. Either this field or OrphanDependents may be set, but not both. The default policy is decided by the existing finalizer set in the metadata.finalizers and the resource-specific default policy. Acceptable values are: 'Orphan' - orphan the dependents; 'Background' - allow the garbage collector to delete the dependents in the background; 'Foreground' - a cascading policy that deletes all dependents in the foreground.",
+						"schema": {
+							"type": "string",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "resourceVersion",
+						"in": "query",
+						"description": "resourceVersion sets a constraint on what resource versions a request may be served from. See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for details.\n\nDefaults to unset",
+						"schema": {
+							"type": "string",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "resourceVersionMatch",
+						"in": "query",
+						"description": "resourceVersionMatch determines how resourceVersion is applied to list calls. It is highly recommended that resourceVersionMatch be set for list calls where resourceVersion is set See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for details.\n\nDefaults to unset",
+						"schema": {
+							"type": "string",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "timeoutSeconds",
+						"in": "query",
+						"description": "Timeout for the list/watch call. This limits the duration of the call, regardless of any activity or inactivity.",
+						"schema": {
+							"type": "integer",
+							"uniqueItems": true
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"*/*": {
+							"schema": {
+								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.DeleteOptions"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+								}
+							},
+							"application/yaml": {
+								"schema": {
+									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "deletecollection",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.api.onmetal.de",
+					"kind": "NetworkPolicy",
+					"version": "v1alpha1"
+				}
+			},
+			"parameters": [
+				{
+					"name": "namespace",
+					"in": "path",
+					"description": "object name and auth scope, such as for teams and projects",
+					"required": true,
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "pretty",
+					"in": "query",
+					"description": "If 'true', then the output is pretty printed.",
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				}
+			]
+		},
+		"/apis/networking.api.onmetal.de/v1alpha1/namespaces/{namespace}/networkpolicies/{name}": {
+			"get": {
+				"tags": [
+					"networkingApiOnmetalDe_v1alpha1"
+				],
+				"description": "read the specified NetworkPolicy",
+				"operationId": "readNetworkingApiOnmetalDeV1alpha1NamespacedNetworkPolicy",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+								}
+							},
+							"application/yaml": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "get",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.api.onmetal.de",
+					"kind": "NetworkPolicy",
+					"version": "v1alpha1"
+				}
+			},
+			"put": {
+				"tags": [
+					"networkingApiOnmetalDe_v1alpha1"
+				],
+				"description": "replace the specified NetworkPolicy",
+				"operationId": "replaceNetworkingApiOnmetalDeV1alpha1NamespacedNetworkPolicy",
+				"parameters": [
+					{
+						"name": "dryRun",
+						"in": "query",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"schema": {
+							"type": "string",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "fieldManager",
+						"in": "query",
+						"description": "fieldManager is a name associated with the actor or entity that is making these changes. The value must be less than or 128 characters long, and only contain printable characters, as defined by https://golang.org/pkg/unicode/#IsPrint.",
+						"schema": {
+							"type": "string",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "fieldValidation",
+						"in": "query",
+						"description": "fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields, provided that the `ServerSideFieldValidation` feature gate is also enabled. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23 and is the default behavior when the `ServerSideFieldValidation` feature gate is disabled. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default when the `ServerSideFieldValidation` feature gate is enabled. - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.",
+						"schema": {
+							"type": "string",
+							"uniqueItems": true
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"*/*": {
+							"schema": {
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+								}
+							},
+							"application/yaml": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+								}
+							}
+						}
+					},
+					"201": {
+						"description": "Created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+								}
+							},
+							"application/yaml": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "put",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.api.onmetal.de",
+					"kind": "NetworkPolicy",
+					"version": "v1alpha1"
+				}
+			},
+			"delete": {
+				"tags": [
+					"networkingApiOnmetalDe_v1alpha1"
+				],
+				"description": "delete a NetworkPolicy",
+				"operationId": "deleteNetworkingApiOnmetalDeV1alpha1NamespacedNetworkPolicy",
+				"parameters": [
+					{
+						"name": "dryRun",
+						"in": "query",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"schema": {
+							"type": "string",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "gracePeriodSeconds",
+						"in": "query",
+						"description": "The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately.",
+						"schema": {
+							"type": "integer",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "orphanDependents",
+						"in": "query",
+						"description": "Deprecated: please use the PropagationPolicy, this field will be deprecated in 1.7. Should the dependent objects be orphaned. If true/false, the \"orphan\" finalizer will be added to/removed from the object's finalizers list. Either this field or PropagationPolicy may be set, but not both.",
+						"schema": {
+							"type": "boolean",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "propagationPolicy",
+						"in": "query",
+						"description": "Whether and how garbage collection will be performed. Either this field or OrphanDependents may be set, but not both. The default policy is decided by the existing finalizer set in the metadata.finalizers and the resource-specific default policy. Acceptable values are: 'Orphan' - orphan the dependents; 'Background' - allow the garbage collector to delete the dependents in the background; 'Foreground' - a cascading policy that deletes all dependents in the foreground.",
+						"schema": {
+							"type": "string",
+							"uniqueItems": true
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"*/*": {
+							"schema": {
+								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.DeleteOptions"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+								}
+							},
+							"application/yaml": {
+								"schema": {
+									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+								}
+							}
+						}
+					},
+					"202": {
+						"description": "Accepted",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+								}
+							},
+							"application/yaml": {
+								"schema": {
+									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "delete",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.api.onmetal.de",
+					"kind": "NetworkPolicy",
+					"version": "v1alpha1"
+				}
+			},
+			"patch": {
+				"tags": [
+					"networkingApiOnmetalDe_v1alpha1"
+				],
+				"description": "partially update the specified NetworkPolicy",
+				"operationId": "patchNetworkingApiOnmetalDeV1alpha1NamespacedNetworkPolicy",
+				"parameters": [
+					{
+						"name": "dryRun",
+						"in": "query",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"schema": {
+							"type": "string",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "fieldManager",
+						"in": "query",
+						"description": "fieldManager is a name associated with the actor or entity that is making these changes. The value must be less than or 128 characters long, and only contain printable characters, as defined by https://golang.org/pkg/unicode/#IsPrint. This field is required for apply requests (application/apply-patch) but optional for non-apply patch types (JsonPatch, MergePatch, StrategicMergePatch).",
+						"schema": {
+							"type": "string",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "fieldValidation",
+						"in": "query",
+						"description": "fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields, provided that the `ServerSideFieldValidation` feature gate is also enabled. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23 and is the default behavior when the `ServerSideFieldValidation` feature gate is disabled. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default when the `ServerSideFieldValidation` feature gate is enabled. - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.",
+						"schema": {
+							"type": "string",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "force",
+						"in": "query",
+						"description": "Force is going to \"force\" Apply requests. It means user will re-acquire conflicting fields owned by other people. Force flag must be unset for non-apply patch requests.",
+						"schema": {
+							"type": "boolean",
+							"uniqueItems": true
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/apply-patch+yaml": {
+							"schema": {
+								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
+							}
+						},
+						"application/json-patch+json": {
+							"schema": {
+								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
+							}
+						},
+						"application/merge-patch+json": {
+							"schema": {
+								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
+							}
+						},
+						"application/strategic-merge-patch+json": {
+							"schema": {
+								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+								}
+							},
+							"application/yaml": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+								}
+							}
+						}
+					},
+					"201": {
+						"description": "Created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+								}
+							},
+							"application/yaml": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "patch",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.api.onmetal.de",
+					"kind": "NetworkPolicy",
+					"version": "v1alpha1"
+				}
+			},
+			"parameters": [
+				{
+					"name": "name",
+					"in": "path",
+					"description": "name of the NetworkPolicy",
+					"required": true,
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "namespace",
+					"in": "path",
+					"description": "object name and auth scope, such as for teams and projects",
+					"required": true,
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "pretty",
+					"in": "query",
+					"description": "If 'true', then the output is pretty printed.",
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				}
+			]
+		},
+		"/apis/networking.api.onmetal.de/v1alpha1/namespaces/{namespace}/networkpolicies/{name}/status": {
+			"get": {
+				"tags": [
+					"networkingApiOnmetalDe_v1alpha1"
+				],
+				"description": "read status of the specified NetworkPolicy",
+				"operationId": "readNetworkingApiOnmetalDeV1alpha1NamespacedNetworkPolicyStatus",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+								}
+							},
+							"application/yaml": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "get",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.api.onmetal.de",
+					"kind": "NetworkPolicy",
+					"version": "v1alpha1"
+				}
+			},
+			"put": {
+				"tags": [
+					"networkingApiOnmetalDe_v1alpha1"
+				],
+				"description": "replace status of the specified NetworkPolicy",
+				"operationId": "replaceNetworkingApiOnmetalDeV1alpha1NamespacedNetworkPolicyStatus",
+				"parameters": [
+					{
+						"name": "dryRun",
+						"in": "query",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"schema": {
+							"type": "string",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "fieldManager",
+						"in": "query",
+						"description": "fieldManager is a name associated with the actor or entity that is making these changes. The value must be less than or 128 characters long, and only contain printable characters, as defined by https://golang.org/pkg/unicode/#IsPrint.",
+						"schema": {
+							"type": "string",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "fieldValidation",
+						"in": "query",
+						"description": "fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields, provided that the `ServerSideFieldValidation` feature gate is also enabled. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23 and is the default behavior when the `ServerSideFieldValidation` feature gate is disabled. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default when the `ServerSideFieldValidation` feature gate is enabled. - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.",
+						"schema": {
+							"type": "string",
+							"uniqueItems": true
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"*/*": {
+							"schema": {
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+								}
+							},
+							"application/yaml": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+								}
+							}
+						}
+					},
+					"201": {
+						"description": "Created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+								}
+							},
+							"application/yaml": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "put",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.api.onmetal.de",
+					"kind": "NetworkPolicy",
+					"version": "v1alpha1"
+				}
+			},
+			"patch": {
+				"tags": [
+					"networkingApiOnmetalDe_v1alpha1"
+				],
+				"description": "partially update status of the specified NetworkPolicy",
+				"operationId": "patchNetworkingApiOnmetalDeV1alpha1NamespacedNetworkPolicyStatus",
+				"parameters": [
+					{
+						"name": "dryRun",
+						"in": "query",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"schema": {
+							"type": "string",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "fieldManager",
+						"in": "query",
+						"description": "fieldManager is a name associated with the actor or entity that is making these changes. The value must be less than or 128 characters long, and only contain printable characters, as defined by https://golang.org/pkg/unicode/#IsPrint. This field is required for apply requests (application/apply-patch) but optional for non-apply patch types (JsonPatch, MergePatch, StrategicMergePatch).",
+						"schema": {
+							"type": "string",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "fieldValidation",
+						"in": "query",
+						"description": "fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields, provided that the `ServerSideFieldValidation` feature gate is also enabled. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23 and is the default behavior when the `ServerSideFieldValidation` feature gate is disabled. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default when the `ServerSideFieldValidation` feature gate is enabled. - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.",
+						"schema": {
+							"type": "string",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "force",
+						"in": "query",
+						"description": "Force is going to \"force\" Apply requests. It means user will re-acquire conflicting fields owned by other people. Force flag must be unset for non-apply patch requests.",
+						"schema": {
+							"type": "boolean",
+							"uniqueItems": true
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/apply-patch+yaml": {
+							"schema": {
+								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
+							}
+						},
+						"application/json-patch+json": {
+							"schema": {
+								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
+							}
+						},
+						"application/merge-patch+json": {
+							"schema": {
+								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
+							}
+						},
+						"application/strategic-merge-patch+json": {
+							"schema": {
+								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+								}
+							},
+							"application/yaml": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+								}
+							}
+						}
+					},
+					"201": {
+						"description": "Created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+								}
+							},
+							"application/yaml": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "patch",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.api.onmetal.de",
+					"kind": "NetworkPolicy",
+					"version": "v1alpha1"
+				}
+			},
+			"parameters": [
+				{
+					"name": "name",
+					"in": "path",
+					"description": "name of the NetworkPolicy",
+					"required": true,
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "namespace",
+					"in": "path",
+					"description": "object name and auth scope, such as for teams and projects",
+					"required": true,
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "pretty",
+					"in": "query",
+					"description": "If 'true', then the output is pretty printed.",
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				}
+			]
+		},
 		"/apis/networking.api.onmetal.de/v1alpha1/namespaces/{namespace}/networks": {
 			"get": {
 				"tags": [
@@ -17994,6 +19001,138 @@
 				"x-kubernetes-group-version-kind": {
 					"group": "networking.api.onmetal.de",
 					"kind": "NetworkInterface",
+					"version": "v1alpha1"
+				}
+			},
+			"parameters": [
+				{
+					"name": "allowWatchBookmarks",
+					"in": "query",
+					"description": "allowWatchBookmarks requests watch events with type \"BOOKMARK\". Servers that do not implement bookmarks may ignore this flag and bookmarks are sent at the server's discretion. Clients should not assume bookmarks are returned at any specific interval, nor may they assume the server will send any BOOKMARK event during a session. If this is not a watch, this field is ignored.",
+					"schema": {
+						"type": "boolean",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "continue",
+					"in": "query",
+					"description": "The continue option should be set when retrieving more results from the server. Since this value is server defined, clients may only use the continue value from a previous query result with identical query parameters (except for the value of continue) and the server may reject a continue value it does not recognize. If the specified continue value is no longer valid whether due to expiration (generally five to fifteen minutes) or a configuration change on the server, the server will respond with a 410 ResourceExpired error together with a continue token. If the client needs a consistent list, it must restart their list without the continue field. Otherwise, the client may send another list request with the token received with the 410 error, the server will respond with a list starting from the next key, but from the latest snapshot, which is inconsistent from the previous list results - objects that are created, modified, or deleted after the first list request will be included in the response, as long as their keys are after the \"next key\".\n\nThis field is not supported when watch is true. Clients may start a watch from the last resourceVersion value returned by the server and not miss any modifications.",
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "fieldSelector",
+					"in": "query",
+					"description": "A selector to restrict the list of returned objects by their fields. Defaults to everything.",
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "labelSelector",
+					"in": "query",
+					"description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "limit",
+					"in": "query",
+					"description": "limit is a maximum number of responses to return for a list call. If more items exist, the server will set the `continue` field on the list metadata to a value that can be used with the same initial query to retrieve the next set of results. Setting a limit may return fewer than the requested amount of items (up to zero items) in the event all requested objects are filtered out and clients should only use the presence of the continue field to determine whether more results are available. Servers may choose not to support the limit argument and will return all of the available results. If limit is specified and the continue field is empty, clients may assume that no more results are available. This field is not supported if watch is true.\n\nThe server guarantees that the objects returned when using continue will be identical to issuing a single list call without a limit - that is, no objects created, modified, or deleted after the first request is issued will be included in any subsequent continued requests. This is sometimes referred to as a consistent snapshot, and ensures that a client that is using limit to receive smaller chunks of a very large result can ensure they see all possible objects. If objects are updated during a chunked list the version of the object that was present at the time the first list result was calculated is returned.",
+					"schema": {
+						"type": "integer",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "pretty",
+					"in": "query",
+					"description": "If 'true', then the output is pretty printed.",
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "resourceVersion",
+					"in": "query",
+					"description": "resourceVersion sets a constraint on what resource versions a request may be served from. See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for details.\n\nDefaults to unset",
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "resourceVersionMatch",
+					"in": "query",
+					"description": "resourceVersionMatch determines how resourceVersion is applied to list calls. It is highly recommended that resourceVersionMatch be set for list calls where resourceVersion is set See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for details.\n\nDefaults to unset",
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "timeoutSeconds",
+					"in": "query",
+					"description": "Timeout for the list/watch call. This limits the duration of the call, regardless of any activity or inactivity.",
+					"schema": {
+						"type": "integer",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "watch",
+					"in": "query",
+					"description": "Watch for changes to the described resources and return them as a stream of add, update, and remove notifications. Specify resourceVersion.",
+					"schema": {
+						"type": "boolean",
+						"uniqueItems": true
+					}
+				}
+			]
+		},
+		"/apis/networking.api.onmetal.de/v1alpha1/networkpolicies": {
+			"get": {
+				"tags": [
+					"networkingApiOnmetalDe_v1alpha1"
+				],
+				"description": "list or watch objects of kind NetworkPolicy",
+				"operationId": "listNetworkingApiOnmetalDeV1alpha1NetworkPolicyForAllNamespaces",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicyList"
+								}
+							},
+							"application/json;stream=watch": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicyList"
+								}
+							},
+							"application/yaml": {
+								"schema": {
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicyList"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "list",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.api.onmetal.de",
+					"kind": "NetworkPolicy",
 					"version": "v1alpha1"
 				}
 			},
@@ -20940,6 +22079,300 @@
 				}
 			]
 		},
+		"/apis/networking.api.onmetal.de/v1alpha1/watch/namespaces/{namespace}/networkpolicies": {
+			"get": {
+				"tags": [
+					"networkingApiOnmetalDe_v1alpha1"
+				],
+				"description": "watch individual changes to a list of NetworkPolicy. deprecated: use the 'watch' parameter with a list operation instead.",
+				"operationId": "watchNetworkingApiOnmetalDeV1alpha1NamespacedNetworkPolicyList",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+								}
+							},
+							"application/json;stream=watch": {
+								"schema": {
+									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+								}
+							},
+							"application/yaml": {
+								"schema": {
+									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "watchlist",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.api.onmetal.de",
+					"kind": "NetworkPolicy",
+					"version": "v1alpha1"
+				}
+			},
+			"parameters": [
+				{
+					"name": "allowWatchBookmarks",
+					"in": "query",
+					"description": "allowWatchBookmarks requests watch events with type \"BOOKMARK\". Servers that do not implement bookmarks may ignore this flag and bookmarks are sent at the server's discretion. Clients should not assume bookmarks are returned at any specific interval, nor may they assume the server will send any BOOKMARK event during a session. If this is not a watch, this field is ignored.",
+					"schema": {
+						"type": "boolean",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "continue",
+					"in": "query",
+					"description": "The continue option should be set when retrieving more results from the server. Since this value is server defined, clients may only use the continue value from a previous query result with identical query parameters (except for the value of continue) and the server may reject a continue value it does not recognize. If the specified continue value is no longer valid whether due to expiration (generally five to fifteen minutes) or a configuration change on the server, the server will respond with a 410 ResourceExpired error together with a continue token. If the client needs a consistent list, it must restart their list without the continue field. Otherwise, the client may send another list request with the token received with the 410 error, the server will respond with a list starting from the next key, but from the latest snapshot, which is inconsistent from the previous list results - objects that are created, modified, or deleted after the first list request will be included in the response, as long as their keys are after the \"next key\".\n\nThis field is not supported when watch is true. Clients may start a watch from the last resourceVersion value returned by the server and not miss any modifications.",
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "fieldSelector",
+					"in": "query",
+					"description": "A selector to restrict the list of returned objects by their fields. Defaults to everything.",
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "labelSelector",
+					"in": "query",
+					"description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "limit",
+					"in": "query",
+					"description": "limit is a maximum number of responses to return for a list call. If more items exist, the server will set the `continue` field on the list metadata to a value that can be used with the same initial query to retrieve the next set of results. Setting a limit may return fewer than the requested amount of items (up to zero items) in the event all requested objects are filtered out and clients should only use the presence of the continue field to determine whether more results are available. Servers may choose not to support the limit argument and will return all of the available results. If limit is specified and the continue field is empty, clients may assume that no more results are available. This field is not supported if watch is true.\n\nThe server guarantees that the objects returned when using continue will be identical to issuing a single list call without a limit - that is, no objects created, modified, or deleted after the first request is issued will be included in any subsequent continued requests. This is sometimes referred to as a consistent snapshot, and ensures that a client that is using limit to receive smaller chunks of a very large result can ensure they see all possible objects. If objects are updated during a chunked list the version of the object that was present at the time the first list result was calculated is returned.",
+					"schema": {
+						"type": "integer",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "namespace",
+					"in": "path",
+					"description": "object name and auth scope, such as for teams and projects",
+					"required": true,
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "pretty",
+					"in": "query",
+					"description": "If 'true', then the output is pretty printed.",
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "resourceVersion",
+					"in": "query",
+					"description": "resourceVersion sets a constraint on what resource versions a request may be served from. See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for details.\n\nDefaults to unset",
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "resourceVersionMatch",
+					"in": "query",
+					"description": "resourceVersionMatch determines how resourceVersion is applied to list calls. It is highly recommended that resourceVersionMatch be set for list calls where resourceVersion is set See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for details.\n\nDefaults to unset",
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "timeoutSeconds",
+					"in": "query",
+					"description": "Timeout for the list/watch call. This limits the duration of the call, regardless of any activity or inactivity.",
+					"schema": {
+						"type": "integer",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "watch",
+					"in": "query",
+					"description": "Watch for changes to the described resources and return them as a stream of add, update, and remove notifications. Specify resourceVersion.",
+					"schema": {
+						"type": "boolean",
+						"uniqueItems": true
+					}
+				}
+			]
+		},
+		"/apis/networking.api.onmetal.de/v1alpha1/watch/namespaces/{namespace}/networkpolicies/{name}": {
+			"get": {
+				"tags": [
+					"networkingApiOnmetalDe_v1alpha1"
+				],
+				"description": "watch changes to an object of kind NetworkPolicy. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.",
+				"operationId": "watchNetworkingApiOnmetalDeV1alpha1NamespacedNetworkPolicy",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+								}
+							},
+							"application/json;stream=watch": {
+								"schema": {
+									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+								}
+							},
+							"application/yaml": {
+								"schema": {
+									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "watch",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.api.onmetal.de",
+					"kind": "NetworkPolicy",
+					"version": "v1alpha1"
+				}
+			},
+			"parameters": [
+				{
+					"name": "allowWatchBookmarks",
+					"in": "query",
+					"description": "allowWatchBookmarks requests watch events with type \"BOOKMARK\". Servers that do not implement bookmarks may ignore this flag and bookmarks are sent at the server's discretion. Clients should not assume bookmarks are returned at any specific interval, nor may they assume the server will send any BOOKMARK event during a session. If this is not a watch, this field is ignored.",
+					"schema": {
+						"type": "boolean",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "continue",
+					"in": "query",
+					"description": "The continue option should be set when retrieving more results from the server. Since this value is server defined, clients may only use the continue value from a previous query result with identical query parameters (except for the value of continue) and the server may reject a continue value it does not recognize. If the specified continue value is no longer valid whether due to expiration (generally five to fifteen minutes) or a configuration change on the server, the server will respond with a 410 ResourceExpired error together with a continue token. If the client needs a consistent list, it must restart their list without the continue field. Otherwise, the client may send another list request with the token received with the 410 error, the server will respond with a list starting from the next key, but from the latest snapshot, which is inconsistent from the previous list results - objects that are created, modified, or deleted after the first list request will be included in the response, as long as their keys are after the \"next key\".\n\nThis field is not supported when watch is true. Clients may start a watch from the last resourceVersion value returned by the server and not miss any modifications.",
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "fieldSelector",
+					"in": "query",
+					"description": "A selector to restrict the list of returned objects by their fields. Defaults to everything.",
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "labelSelector",
+					"in": "query",
+					"description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "limit",
+					"in": "query",
+					"description": "limit is a maximum number of responses to return for a list call. If more items exist, the server will set the `continue` field on the list metadata to a value that can be used with the same initial query to retrieve the next set of results. Setting a limit may return fewer than the requested amount of items (up to zero items) in the event all requested objects are filtered out and clients should only use the presence of the continue field to determine whether more results are available. Servers may choose not to support the limit argument and will return all of the available results. If limit is specified and the continue field is empty, clients may assume that no more results are available. This field is not supported if watch is true.\n\nThe server guarantees that the objects returned when using continue will be identical to issuing a single list call without a limit - that is, no objects created, modified, or deleted after the first request is issued will be included in any subsequent continued requests. This is sometimes referred to as a consistent snapshot, and ensures that a client that is using limit to receive smaller chunks of a very large result can ensure they see all possible objects. If objects are updated during a chunked list the version of the object that was present at the time the first list result was calculated is returned.",
+					"schema": {
+						"type": "integer",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "name",
+					"in": "path",
+					"description": "name of the NetworkPolicy",
+					"required": true,
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "namespace",
+					"in": "path",
+					"description": "object name and auth scope, such as for teams and projects",
+					"required": true,
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "pretty",
+					"in": "query",
+					"description": "If 'true', then the output is pretty printed.",
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "resourceVersion",
+					"in": "query",
+					"description": "resourceVersion sets a constraint on what resource versions a request may be served from. See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for details.\n\nDefaults to unset",
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "resourceVersionMatch",
+					"in": "query",
+					"description": "resourceVersionMatch determines how resourceVersion is applied to list calls. It is highly recommended that resourceVersionMatch be set for list calls where resourceVersion is set See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for details.\n\nDefaults to unset",
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "timeoutSeconds",
+					"in": "query",
+					"description": "Timeout for the list/watch call. This limits the duration of the call, regardless of any activity or inactivity.",
+					"schema": {
+						"type": "integer",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "watch",
+					"in": "query",
+					"description": "Watch for changes to the described resources and return them as a stream of add, update, and remove notifications. Specify resourceVersion.",
+					"schema": {
+						"type": "boolean",
+						"uniqueItems": true
+					}
+				}
+			]
+		},
 		"/apis/networking.api.onmetal.de/v1alpha1/watch/namespaces/{namespace}/networks": {
 			"get": {
 				"tags": [
@@ -21828,6 +23261,138 @@
 				"x-kubernetes-group-version-kind": {
 					"group": "networking.api.onmetal.de",
 					"kind": "NetworkInterface",
+					"version": "v1alpha1"
+				}
+			},
+			"parameters": [
+				{
+					"name": "allowWatchBookmarks",
+					"in": "query",
+					"description": "allowWatchBookmarks requests watch events with type \"BOOKMARK\". Servers that do not implement bookmarks may ignore this flag and bookmarks are sent at the server's discretion. Clients should not assume bookmarks are returned at any specific interval, nor may they assume the server will send any BOOKMARK event during a session. If this is not a watch, this field is ignored.",
+					"schema": {
+						"type": "boolean",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "continue",
+					"in": "query",
+					"description": "The continue option should be set when retrieving more results from the server. Since this value is server defined, clients may only use the continue value from a previous query result with identical query parameters (except for the value of continue) and the server may reject a continue value it does not recognize. If the specified continue value is no longer valid whether due to expiration (generally five to fifteen minutes) or a configuration change on the server, the server will respond with a 410 ResourceExpired error together with a continue token. If the client needs a consistent list, it must restart their list without the continue field. Otherwise, the client may send another list request with the token received with the 410 error, the server will respond with a list starting from the next key, but from the latest snapshot, which is inconsistent from the previous list results - objects that are created, modified, or deleted after the first list request will be included in the response, as long as their keys are after the \"next key\".\n\nThis field is not supported when watch is true. Clients may start a watch from the last resourceVersion value returned by the server and not miss any modifications.",
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "fieldSelector",
+					"in": "query",
+					"description": "A selector to restrict the list of returned objects by their fields. Defaults to everything.",
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "labelSelector",
+					"in": "query",
+					"description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "limit",
+					"in": "query",
+					"description": "limit is a maximum number of responses to return for a list call. If more items exist, the server will set the `continue` field on the list metadata to a value that can be used with the same initial query to retrieve the next set of results. Setting a limit may return fewer than the requested amount of items (up to zero items) in the event all requested objects are filtered out and clients should only use the presence of the continue field to determine whether more results are available. Servers may choose not to support the limit argument and will return all of the available results. If limit is specified and the continue field is empty, clients may assume that no more results are available. This field is not supported if watch is true.\n\nThe server guarantees that the objects returned when using continue will be identical to issuing a single list call without a limit - that is, no objects created, modified, or deleted after the first request is issued will be included in any subsequent continued requests. This is sometimes referred to as a consistent snapshot, and ensures that a client that is using limit to receive smaller chunks of a very large result can ensure they see all possible objects. If objects are updated during a chunked list the version of the object that was present at the time the first list result was calculated is returned.",
+					"schema": {
+						"type": "integer",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "pretty",
+					"in": "query",
+					"description": "If 'true', then the output is pretty printed.",
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "resourceVersion",
+					"in": "query",
+					"description": "resourceVersion sets a constraint on what resource versions a request may be served from. See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for details.\n\nDefaults to unset",
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "resourceVersionMatch",
+					"in": "query",
+					"description": "resourceVersionMatch determines how resourceVersion is applied to list calls. It is highly recommended that resourceVersionMatch be set for list calls where resourceVersion is set See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for details.\n\nDefaults to unset",
+					"schema": {
+						"type": "string",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "timeoutSeconds",
+					"in": "query",
+					"description": "Timeout for the list/watch call. This limits the duration of the call, regardless of any activity or inactivity.",
+					"schema": {
+						"type": "integer",
+						"uniqueItems": true
+					}
+				},
+				{
+					"name": "watch",
+					"in": "query",
+					"description": "Watch for changes to the described resources and return them as a stream of add, update, and remove notifications. Specify resourceVersion.",
+					"schema": {
+						"type": "boolean",
+						"uniqueItems": true
+					}
+				}
+			]
+		},
+		"/apis/networking.api.onmetal.de/v1alpha1/watch/networkpolicies": {
+			"get": {
+				"tags": [
+					"networkingApiOnmetalDe_v1alpha1"
+				],
+				"description": "watch individual changes to a list of NetworkPolicy. deprecated: use the 'watch' parameter with a list operation instead.",
+				"operationId": "watchNetworkingApiOnmetalDeV1alpha1NetworkPolicyListForAllNamespaces",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+								}
+							},
+							"application/json;stream=watch": {
+								"schema": {
+									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+								}
+							},
+							"application/yaml": {
+								"schema": {
+									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "watchlist",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.api.onmetal.de",
+					"kind": "NetworkPolicy",
 					"version": "v1alpha1"
 				}
 			},
@@ -30713,6 +32278,33 @@
 					}
 				}
 			},
+			"com.github.onmetal.onmetal-api.api.core.v1alpha1.ObjectSelector": {
+				"description": "ObjectSelector specifies how to select objects of a certain kind.",
+				"type": "object",
+				"required": [
+					"kind"
+				],
+				"properties": {
+					"kind": {
+						"description": "Kind is the kind of object to select.",
+						"type": "string"
+					},
+					"matchExpressions": {
+						"description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelectorRequirement"
+						}
+					},
+					"matchLabels": {
+						"description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+						"type": "object",
+						"additionalProperties": {
+							"type": "string"
+						}
+					}
+				}
+			},
 			"com.github.onmetal.onmetal-api.api.core.v1alpha1.ResourceQuota": {
 				"description": "ResourceQuota is the Schema for the resourcequotas API",
 				"type": "object",
@@ -31343,6 +32935,30 @@
 					}
 				}
 			},
+			"com.github.onmetal.onmetal-api.api.networking.v1alpha1.IPBlock": {
+				"description": "IPBlock specifies an ip block with optional exceptions.",
+				"type": "object",
+				"required": [
+					"cidr"
+				],
+				"properties": {
+					"cidr": {
+						"description": "CIDR is a string representing the ip block.",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.IPPrefix"
+							}
+						]
+					},
+					"except": {
+						"description": "Except is a slice of CIDRs that should not be included within the specified CIDR. Values will be rejected if they are outside CIDR.",
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.IPPrefix"
+						}
+					}
+				}
+			},
 			"com.github.onmetal.onmetal-api.api.networking.v1alpha1.IPSource": {
 				"description": "IPSource is the definition of how to obtain an IP.",
 				"type": "object",
@@ -31540,6 +33156,13 @@
 						"type": "array",
 						"items": {
 							"type": "string"
+						}
+					},
+					"ips": {
+						"description": "IPs are the ips to use. Can only be used when Type is LoadBalancerTypeInternal.",
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.IPSource"
 						}
 					},
 					"networkInterfaceSelector": {
@@ -32165,6 +33788,252 @@
 					"phase": {
 						"description": "Phase represents the binding phase of a network peering.",
 						"type": "string"
+					}
+				}
+			},
+			"com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy": {
+				"description": "NetworkPolicy is the Schema for the networkpolicies API",
+				"type": "object",
+				"properties": {
+					"apiVersion": {
+						"description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+						"type": "string"
+					},
+					"kind": {
+						"description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+						"type": "string"
+					},
+					"metadata": {
+						"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+					},
+					"spec": {
+						"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicySpec"
+					},
+					"status": {
+						"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicyStatus"
+					}
+				},
+				"x-kubernetes-group-version-kind": [
+					{
+						"group": "networking.api.onmetal.de",
+						"kind": "NetworkPolicy",
+						"version": "v1alpha1"
+					}
+				]
+			},
+			"com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicyCondition": {
+				"description": "NetworkPolicyCondition is one of the conditions of a network policy.",
+				"type": "object",
+				"required": [
+					"type",
+					"status",
+					"reason",
+					"message"
+				],
+				"properties": {
+					"lastTransitionTime": {
+						"description": "LastTransitionTime is the last time the status of a condition has transitioned from one state to another.",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Time"
+							}
+						]
+					},
+					"message": {
+						"description": "Message is a human-readable explanation of why the condition has a certain reason / state.",
+						"type": "string"
+					},
+					"observedGeneration": {
+						"description": "ObservedGeneration represents the .metadata.generation that the condition was set based upon.",
+						"type": "integer",
+						"format": "int64"
+					},
+					"reason": {
+						"description": "Reason is a machine-readable indication of why the condition is in a certain state.",
+						"type": "string"
+					},
+					"status": {
+						"description": "Status is the status of the condition.",
+						"type": "string"
+					},
+					"type": {
+						"description": "Type is the type of the condition.",
+						"type": "string"
+					}
+				}
+			},
+			"com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicyEgressRule": {
+				"description": "NetworkPolicyEgressRule describes a rule to regulate egress traffic with.",
+				"type": "object",
+				"properties": {
+					"ports": {
+						"description": "Ports specifies the list of destination ports that can be called with this rule. Each item in this list is combined using a logical OR. Empty matches all ports. As soon as a single item is present, only these ports are allowed.",
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicyPort"
+						}
+					},
+					"to": {
+						"description": "To specifies the list of destinations which the selected network interfaces should be able to send traffic to. Fields are combined using a logical OR. Empty matches all destinations. As soon as a single item is present, only these peers are allowed.",
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicyPeer"
+						}
+					}
+				}
+			},
+			"com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicyIngressRule": {
+				"description": "NetworkPolicyIngressRule describes a rule to regulate ingress traffic with.",
+				"type": "object",
+				"properties": {
+					"from": {
+						"description": "From specifies the list of sources which should be able to send traffic to the selected network interfaces. Fields are combined using a logical OR. Empty matches all sources. As soon as a single item is present, only these peers are allowed.",
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicyPeer"
+						}
+					},
+					"ports": {
+						"description": "Ports specifies the list of ports which should be made accessible for this rule. Each item in this list is combined using a logical OR. Empty matches all ports. As soon as a single item is present, only these ports are allowed.",
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicyPort"
+						}
+					}
+				}
+			},
+			"com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicyList": {
+				"description": "NetworkPolicyList contains a list of NetworkPolicy.",
+				"type": "object",
+				"required": [
+					"items"
+				],
+				"properties": {
+					"apiVersion": {
+						"description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+						"type": "string"
+					},
+					"items": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy"
+						}
+					},
+					"kind": {
+						"description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+						"type": "string"
+					},
+					"metadata": {
+						"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+					}
+				},
+				"x-kubernetes-group-version-kind": [
+					{
+						"group": "networking.api.onmetal.de",
+						"kind": "NetworkPolicyList",
+						"version": "v1alpha1"
+					}
+				]
+			},
+			"com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicyPeer": {
+				"description": "NetworkPolicyPeer describes a peer to allow traffic to / from.",
+				"type": "object",
+				"properties": {
+					"ipBlock": {
+						"description": "IPBlock specifies the ip block from or to which network traffic may come.",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.IPBlock"
+							}
+						]
+					},
+					"objectSelector": {
+						"description": "ObjectSelector selects peers with the given kind matching the label selector. Exclusive with other peer specifiers.",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.ObjectSelector"
+							}
+						]
+					}
+				}
+			},
+			"com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicyPort": {
+				"description": "NetworkPolicyPort describes a port to allow traffic on",
+				"type": "object",
+				"properties": {
+					"endPort": {
+						"description": "EndPort indicates that the range of ports from Port to EndPort, inclusive, should be allowed by the policy. This field cannot be defined if the port field is not defined. The endPort must be equal or greater than port.",
+						"type": "integer",
+						"format": "int32"
+					},
+					"port": {
+						"description": "The port on the given protocol. If this field is not provided, this matches all port names and numbers. If present, only traffic on the specified protocol AND port will be matched.",
+						"type": "integer",
+						"format": "int32"
+					},
+					"protocol": {
+						"description": "Protocol (TCP, UDP, or SCTP) which traffic must match. If not specified, this field defaults to TCP.",
+						"type": "string"
+					}
+				}
+			},
+			"com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicySpec": {
+				"description": "NetworkPolicySpec defines the desired state of NetworkPolicy.",
+				"type": "object",
+				"required": [
+					"networkRef",
+					"networkInterfaceSelector"
+				],
+				"properties": {
+					"egress": {
+						"description": "Egress specifies rules for egress traffic.",
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicyEgressRule"
+						}
+					},
+					"ingress": {
+						"description": "Ingress specifies rules for ingress traffic.",
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicyIngressRule"
+						}
+					},
+					"networkInterfaceSelector": {
+						"description": "NetworkInterfaceSelector selects the network interfaces that are subject to this policy.",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector"
+							}
+						]
+					},
+					"networkRef": {
+						"description": "NetworkRef is the network to regulate using this policy.",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/io.k8s.api.core.v1.LocalObjectReference"
+							}
+						]
+					},
+					"policyTypes": {
+						"description": "PolicyTypes specifies the types of policies this network policy contains.",
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					}
+				}
+			},
+			"com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicyStatus": {
+				"description": "NetworkPolicyStatus defines the observed state of NetworkPolicy.",
+				"type": "object",
+				"properties": {
+					"conditions": {
+						"description": "Conditions are various conditions of the NetworkPolicy.",
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicyCondition"
+						}
 					}
 				}
 			},

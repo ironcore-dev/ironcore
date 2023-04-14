@@ -20,6 +20,7 @@ import (
 	"github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/utils/pointer"
 )
 
@@ -32,6 +33,17 @@ var (
 
 func addDefaultingFuncs(scheme *runtime.Scheme) error {
 	return RegisterDefaults(scheme)
+}
+
+func SetDefaults_NetworkPolicySpec(spec *v1alpha1.NetworkPolicySpec) {
+	policyTypes := sets.New[v1alpha1.PolicyType](spec.PolicyTypes...)
+	if len(spec.Ingress) > 0 {
+		policyTypes.Insert(v1alpha1.PolicyTypeIngress)
+	}
+	if len(spec.Egress) > 0 {
+		policyTypes.Insert(v1alpha1.PolicyTypeEgress)
+	}
+	spec.PolicyTypes = sets.List(policyTypes)
 }
 
 func SetDefaults_NetworkInterfaceSpec(spec *v1alpha1.NetworkInterfaceSpec) {
