@@ -4,7 +4,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/onmetal/onmetal-api?style=flat-square)](https://goreportcard.com/report/github.com/onmetal/onmetal-api)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://makeapullrequest.com)
 
-![Gardener on Metal Logo](docs/assets/logo_small.png)
+<img src="docs/assets/logo.svg" alt="onmetal Logo" width="200" />
 
 onmetal-api is an open source system for managing compute and storage workloads across multiple
 providers.
