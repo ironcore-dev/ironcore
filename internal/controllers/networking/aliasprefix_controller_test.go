@@ -16,7 +16,7 @@
 package networking
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
@@ -57,7 +57,7 @@ var _ = Describe("AliasPrefixReconciler", func() {
 			Spec: networkingv1alpha1.AliasPrefixSpec{
 				NetworkRef: corev1.LocalObjectReference{Name: network.Name},
 				Prefix: networkingv1alpha1.PrefixSource{
-					Value: commonv1alpha1.MustParseNewIPPrefix("10.0.0.0/28"),
+					Value: corev1alpha1.MustParseNewIPPrefix("10.0.0.0/28"),
 				},
 				NetworkInterfaceSelector: &metav1.LabelSelector{
 					MatchLabels: map[string]string{"foo": "bar"},
@@ -68,10 +68,10 @@ var _ = Describe("AliasPrefixReconciler", func() {
 
 		By("waiting for the alias prefix to report the prefix")
 		aliasPrefixKey := client.ObjectKeyFromObject(aliasPrefix)
-		Eventually(func() *commonv1alpha1.IPPrefix {
+		Eventually(func() *corev1alpha1.IPPrefix {
 			Expect(k8sClient.Get(ctx, aliasPrefixKey, aliasPrefix)).To(Succeed())
 			return aliasPrefix.Status.Prefix
-		}).Should(Equal(commonv1alpha1.MustParseNewIPPrefix("10.0.0.0/28")))
+		}).Should(Equal(corev1alpha1.MustParseNewIPPrefix("10.0.0.0/28")))
 
 		By("waiting for the alias prefix routing to exist with no destinations")
 		aliasPrefixRouting := &networkingv1alpha1.AliasPrefixRouting{}
@@ -81,7 +81,7 @@ var _ = Describe("AliasPrefixReconciler", func() {
 			g.Expect(err).NotTo(HaveOccurred())
 
 			g.Expect(metav1.IsControlledBy(aliasPrefixRouting, aliasPrefix)).To(BeTrue(), "alias prefix routing is not controlled by alias prefix: %#v", aliasPrefixRouting.OwnerReferences)
-			g.Expect(aliasPrefixRouting.NetworkRef).To(Equal(commonv1alpha1.LocalUIDReference{
+			g.Expect(aliasPrefixRouting.NetworkRef).To(Equal(corev1alpha1.LocalUIDReference{
 				Name: network.Name,
 				UID:  network.UID,
 			}))
@@ -102,7 +102,7 @@ var _ = Describe("AliasPrefixReconciler", func() {
 				},
 				IPs: []networkingv1alpha1.IPSource{
 					{
-						Value: commonv1alpha1.MustParseNewIP("10.0.0.1"),
+						Value: corev1alpha1.MustParseNewIP("10.0.0.1"),
 					},
 				},
 			},
@@ -113,11 +113,11 @@ var _ = Describe("AliasPrefixReconciler", func() {
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, aliasPrefixKey, aliasPrefixRouting)).To(Succeed())
 
-			g.Expect(aliasPrefixRouting.NetworkRef).To(Equal(commonv1alpha1.LocalUIDReference{
+			g.Expect(aliasPrefixRouting.NetworkRef).To(Equal(corev1alpha1.LocalUIDReference{
 				Name: network.Name,
 				UID:  network.UID,
 			}))
-			g.Expect(aliasPrefixRouting.Destinations).To(Equal([]commonv1alpha1.LocalUIDReference{
+			g.Expect(aliasPrefixRouting.Destinations).To(Equal([]corev1alpha1.LocalUIDReference{
 				{Name: nic.Name, UID: nic.UID},
 			}))
 		}).Should(Succeed())

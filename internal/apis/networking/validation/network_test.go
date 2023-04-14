@@ -17,7 +17,7 @@
 package validation
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	"github.com/onmetal/onmetal-api/internal/apis/networking"
 	. "github.com/onmetal/onmetal-api/internal/testutils/validation"
 	. "github.com/onsi/ginkgo/v2"
@@ -51,7 +51,7 @@ var _ = Describe("Network", func() {
 					Peerings: []networking.NetworkPeering{
 						{
 							Name: "peering",
-							NetworkRef: commonv1alpha1.UIDReference{
+							NetworkRef: corev1alpha1.UIDReference{
 								Name: "foo",
 							},
 						},
@@ -75,8 +75,8 @@ var _ = Describe("Network", func() {
 			&networking.Network{
 				Spec: networking.NetworkSpec{
 					Peerings: []networking.NetworkPeering{
-						{NetworkRef: commonv1alpha1.UIDReference{Name: "bar"}},
-						{NetworkRef: commonv1alpha1.UIDReference{Name: "bar"}},
+						{NetworkRef: corev1alpha1.UIDReference{Name: "bar"}},
+						{NetworkRef: corev1alpha1.UIDReference{Name: "bar"}},
 					},
 				},
 			},

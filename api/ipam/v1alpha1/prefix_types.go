@@ -17,7 +17,7 @@
 package v1alpha1
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -32,7 +32,7 @@ type PrefixSpec struct {
 	// If unset but Prefix is set, this can be inferred.
 	IPFamily corev1.IPFamily `json:"ipFamily,omitempty"`
 	// Prefix is the prefix to allocate for this Prefix.
-	Prefix *commonv1alpha1.IPPrefix `json:"prefix,omitempty"`
+	Prefix *corev1alpha1.IPPrefix `json:"prefix,omitempty"`
 	// PrefixLength is the length of prefix to allocate for this Prefix.
 	PrefixLength int32 `json:"prefixLength,omitempty"`
 
@@ -52,7 +52,7 @@ type PrefixStatus struct {
 	LastPhaseTransitionTime *metav1.Time `json:"lastPhaseTransitionTime,omitempty"`
 
 	// Used is a list of used prefixes.
-	Used []commonv1alpha1.IPPrefix `json:"used,omitempty"`
+	Used []corev1alpha1.IPPrefix `json:"used,omitempty"`
 }
 
 // PrefixPhase is a phase a Prefix can be in.

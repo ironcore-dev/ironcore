@@ -17,7 +17,7 @@
 package storage
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -41,7 +41,7 @@ type BucketSpec struct {
 	BucketPoolRef *corev1.LocalObjectReference
 	// Tolerations define tolerations the Bucket has. Only any BucketPool whose taints
 	// covered by Tolerations will be considered to host the Bucket.
-	Tolerations []commonv1alpha1.Toleration
+	Tolerations []corev1alpha1.Toleration
 }
 
 // BucketAccess represents information on how to access a bucket.

@@ -20,7 +20,7 @@ import (
 	"math"
 
 	"github.com/go-logr/logr"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	"github.com/onmetal/onmetal-api/internal/client/networking"
 	"github.com/onmetal/onmetal-api/internal/controllers/networking/events"
@@ -112,7 +112,7 @@ func (r *NatGatewayReconciler) findNextFreeSlot(
 	}
 }
 
-func (r *NatGatewayReconciler) assignPorts(ctx context.Context, log logr.Logger, natGateway *networkingv1alpha1.NATGateway, destinations map[types.UID]commonv1alpha1.LocalUIDReference, slotsPerIP int, portsPerNetworkInterface int32) ([]networkingv1alpha1.NATGatewayDestination, int32, error) {
+func (r *NatGatewayReconciler) assignPorts(ctx context.Context, log logr.Logger, natGateway *networkingv1alpha1.NATGateway, destinations map[types.UID]corev1alpha1.LocalUIDReference, slotsPerIP int, portsPerNetworkInterface int32) ([]networkingv1alpha1.NATGatewayDestination, int32, error) {
 	natGatewayRouting := &networkingv1alpha1.NATGatewayRouting{}
 	natGatewayRoutingKey := client.ObjectKey{Namespace: natGateway.Namespace, Name: natGateway.Name}
 	if err := r.Get(ctx, natGatewayRoutingKey, natGatewayRouting); client.IgnoreNotFound(err) != nil {
@@ -215,7 +215,7 @@ func (r *NatGatewayReconciler) patchStatus(ctx context.Context, natGateway *netw
 	return r.Patch(ctx, natGateway, client.MergeFrom(natGatewayBase))
 }
 
-func (r *NatGatewayReconciler) findDestinations(ctx context.Context, log logr.Logger, natGateway *networkingv1alpha1.NATGateway) (map[types.UID]commonv1alpha1.LocalUIDReference, error) {
+func (r *NatGatewayReconciler) findDestinations(ctx context.Context, log logr.Logger, natGateway *networkingv1alpha1.NATGateway) (map[types.UID]corev1alpha1.LocalUIDReference, error) {
 	sel, err := metav1.LabelSelectorAsSelector(natGateway.Spec.NetworkInterfaceSelector)
 	if err != nil {
 		return nil, err
@@ -230,14 +230,14 @@ func (r *NatGatewayReconciler) findDestinations(ctx context.Context, log logr.Lo
 		return nil, fmt.Errorf("error listing network interfaces: %w", err)
 	}
 
-	destinations := map[types.UID]commonv1alpha1.LocalUIDReference{}
+	destinations := map[types.UID]corev1alpha1.LocalUIDReference{}
 	for _, nic := range nicList.Items {
 		if nic.Spec.VirtualIP != nil {
 			log.V(1).Info("Ignored network interface because it is exposed through a VirtualIP", "NetworkInterfaceKey", client.ObjectKeyFromObject(&nic))
 			continue
 		}
 
-		destinations[nic.UID] = commonv1alpha1.LocalUIDReference{Name: nic.Name, UID: nic.UID}
+		destinations[nic.UID] = corev1alpha1.LocalUIDReference{Name: nic.Name, UID: nic.UID}
 	}
 	return destinations, nil
 }
@@ -257,7 +257,7 @@ func (r *NatGatewayReconciler) applyRouting(ctx context.Context, natGateway *net
 			Namespace: natGateway.Namespace,
 			Name:      natGateway.Name,
 		},
-		NetworkRef: commonv1alpha1.LocalUIDReference{
+		NetworkRef: corev1alpha1.LocalUIDReference{
 			Name: network.Name,
 			UID:  network.UID,
 		},

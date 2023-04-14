@@ -182,8 +182,8 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>ignitionRef</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.SecretKeySelector">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.SecretKeySelector
+<a href="../core/#core.api.onmetal.de/v1alpha1.SecretKeySelector">
+github.com/onmetal/onmetal-api/api/core/v1alpha1.SecretKeySelector
 </a>
 </em>
 </td>
@@ -210,8 +210,8 @@ If key is empty, DefaultIgnitionKey will be used as fallback.</p>
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.Toleration">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
+<a href="../core/#core.api.onmetal.de/v1alpha1.Toleration">
+[]github.com/onmetal/onmetal-api/api/core/v1alpha1.Toleration
 </a>
 </em>
 </td>
@@ -367,8 +367,8 @@ string
 <td>
 <code>taints</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.Taint">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Taint
+<a href="../core/#core.api.onmetal.de/v1alpha1.Taint">
+[]github.com/onmetal/onmetal-api/api/core/v1alpha1.Taint
 </a>
 </em>
 </td>
@@ -839,8 +839,8 @@ string
 <td>
 <code>taints</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.Taint">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Taint
+<a href="../core/#core.api.onmetal.de/v1alpha1.Taint">
+[]github.com/onmetal/onmetal-api/api/core/v1alpha1.Taint
 </a>
 </em>
 </td>
@@ -1083,8 +1083,8 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>ignitionRef</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.SecretKeySelector">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.SecretKeySelector
+<a href="../core/#core.api.onmetal.de/v1alpha1.SecretKeySelector">
+github.com/onmetal/onmetal-api/api/core/v1alpha1.SecretKeySelector
 </a>
 </em>
 </td>
@@ -1111,8 +1111,8 @@ If key is empty, DefaultIgnitionKey will be used as fallback.</p>
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.Toleration">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
+<a href="../core/#core.api.onmetal.de/v1alpha1.Toleration">
+[]github.com/onmetal/onmetal-api/api/core/v1alpha1.Toleration
 </a>
 </em>
 </td>
@@ -1424,8 +1424,8 @@ string
 <td>
 <code>ips</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
+<a href="../core/#core.api.onmetal.de/v1alpha1.IP">
+[]github.com/onmetal/onmetal-api/api/core/v1alpha1.IP
 </a>
 </em>
 </td>
@@ -1437,8 +1437,8 @@ string
 <td>
 <code>virtualIP</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
+<a href="../core/#core.api.onmetal.de/v1alpha1.IP">
+github.com/onmetal/onmetal-api/api/core/v1alpha1.IP
 </a>
 </em>
 </td>

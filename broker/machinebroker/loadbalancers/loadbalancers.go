@@ -18,7 +18,7 @@ import (
 	"context"
 	"fmt"
 
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	"github.com/onmetal/onmetal-api/broker/common/cleaner"
 	commonsync "github.com/onmetal/onmetal-api/broker/common/sync"
@@ -145,7 +145,7 @@ func (m *LoadBalancers) createLoadBalancer(
 	c.Add(cleaner.DeleteObjectIfExistsFunc(m.cluster.Client(), loadBalancer))
 
 	baseLoadBalancer := loadBalancer.DeepCopy()
-	loadBalancer.Status.IPs = []commonv1alpha1.IP{key.target.IP}
+	loadBalancer.Status.IPs = []corev1alpha1.IP{key.target.IP}
 	if err := m.cluster.Client().Status().Patch(ctx, loadBalancer, client.MergeFrom(baseLoadBalancer)); err != nil {
 		return nil, nil, fmt.Errorf("error patching load balancer status ips: %w", err)
 	}
@@ -155,7 +155,7 @@ func (m *LoadBalancers) createLoadBalancer(
 			Namespace: m.cluster.Namespace(),
 			Name:      loadBalancer.Name,
 		},
-		NetworkRef: commonv1alpha1.LocalUIDReference{
+		NetworkRef: corev1alpha1.LocalUIDReference{
 			Name: network.Name,
 			UID:  network.UID,
 		},
@@ -180,7 +180,7 @@ func (m *LoadBalancers) removeLoadBalancerRoutingDestination(
 	obj client.Object,
 ) error {
 	idx := slices.IndexFunc(loadBalancerRouting.Destinations,
-		func(ref commonv1alpha1.LocalUIDReference) bool { return ref.UID == obj.GetUID() },
+		func(ref corev1alpha1.LocalUIDReference) bool { return ref.UID == obj.GetUID() },
 	)
 	if idx == -1 {
 		return nil
@@ -200,14 +200,14 @@ func (m *LoadBalancers) addLoadBalancerRoutingDestination(
 	obj client.Object,
 ) error {
 	idx := slices.IndexFunc(loadBalancerRouting.Destinations,
-		func(ref commonv1alpha1.LocalUIDReference) bool { return ref.UID == obj.GetUID() },
+		func(ref corev1alpha1.LocalUIDReference) bool { return ref.UID == obj.GetUID() },
 	)
 	if idx >= 0 {
 		return nil
 	}
 
 	base := loadBalancerRouting.DeepCopy()
-	loadBalancerRouting.Destinations = append(loadBalancerRouting.Destinations, commonv1alpha1.LocalUIDReference{
+	loadBalancerRouting.Destinations = append(loadBalancerRouting.Destinations, corev1alpha1.LocalUIDReference{
 		Name: obj.GetName(),
 		UID:  obj.GetUID(),
 	})
@@ -373,7 +373,7 @@ func (m *LoadBalancers) joinLoadBalancersAndRoutings(
 
 		destinations := utilslices.Map(
 			loadBalancerRouting.Destinations,
-			func(dest commonv1alpha1.LocalUIDReference) string {
+			func(dest corev1alpha1.LocalUIDReference) string {
 				return dest.Name
 			},
 		)

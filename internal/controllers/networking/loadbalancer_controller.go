@@ -19,7 +19,7 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	"github.com/onmetal/onmetal-api/internal/client/networking"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -101,7 +101,7 @@ func (r *LoadBalancerReconciler) reconcile(ctx context.Context, log logr.Logger,
 	return ctrl.Result{}, nil
 }
 
-func (r *LoadBalancerReconciler) findDestinations(ctx context.Context, log logr.Logger, loadBalancer *networkingv1alpha1.LoadBalancer) ([]commonv1alpha1.LocalUIDReference, error) {
+func (r *LoadBalancerReconciler) findDestinations(ctx context.Context, log logr.Logger, loadBalancer *networkingv1alpha1.LoadBalancer) ([]corev1alpha1.LocalUIDReference, error) {
 	sel, err := metav1.LabelSelectorAsSelector(loadBalancer.Spec.NetworkInterfaceSelector)
 	if err != nil {
 		return nil, err
@@ -116,9 +116,9 @@ func (r *LoadBalancerReconciler) findDestinations(ctx context.Context, log logr.
 		return nil, fmt.Errorf("error listing network interfaces: %w", err)
 	}
 
-	destinations := make([]commonv1alpha1.LocalUIDReference, 0, len(nicList.Items))
+	destinations := make([]corev1alpha1.LocalUIDReference, 0, len(nicList.Items))
 	for _, nic := range nicList.Items {
-		destinations = append(destinations, commonv1alpha1.LocalUIDReference{Name: nic.Name, UID: nic.UID})
+		destinations = append(destinations, corev1alpha1.LocalUIDReference{Name: nic.Name, UID: nic.UID})
 	}
 	return destinations, nil
 }
@@ -131,7 +131,7 @@ func (r *LoadBalancerReconciler) getNetwork(ctx context.Context, log logr.Logger
 	return network, nil
 }
 
-func (r *LoadBalancerReconciler) applyRouting(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancer, destinations []commonv1alpha1.LocalUIDReference, network *networkingv1alpha1.Network) error {
+func (r *LoadBalancerReconciler) applyRouting(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancer, destinations []corev1alpha1.LocalUIDReference, network *networkingv1alpha1.Network) error {
 	loadBalancerRouting := &networkingv1alpha1.LoadBalancerRouting{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "LoadBalancerRouting",
@@ -142,7 +142,7 @@ func (r *LoadBalancerReconciler) applyRouting(ctx context.Context, loadBalancer 
 			Name:      loadBalancer.Name,
 		},
 		Destinations: destinations,
-		NetworkRef: commonv1alpha1.LocalUIDReference{
+		NetworkRef: corev1alpha1.LocalUIDReference{
 			Name: network.Name,
 			UID:  network.UID,
 		},

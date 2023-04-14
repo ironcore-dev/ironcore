@@ -20,7 +20,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 )
 
 // MachinePoolSpec defines the desired state of MachinePool
@@ -29,7 +29,7 @@ type MachinePoolSpec struct {
 	ProviderID string `json:"providerID"`
 	// Taints of the MachinePool. Only Machines who tolerate all the taints
 	// will land in the MachinePool.
-	Taints []commonv1alpha1.Taint `json:"taints,omitempty"`
+	Taints []corev1alpha1.Taint `json:"taints,omitempty"`
 }
 
 // MachinePoolStatus defines the observed state of MachinePool

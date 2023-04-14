@@ -19,7 +19,7 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	"github.com/onmetal/onmetal-api/broker/common/cleaner"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
@@ -105,7 +105,7 @@ func (s *Server) convertOnmetalIPSourcesToIPs(ipSources []networkingv1alpha1.IPS
 	return res, nil
 }
 
-func (s *Server) convertOnmetalPrefixes(prefixes []commonv1alpha1.IPPrefix) []string {
+func (s *Server) convertOnmetalPrefixes(prefixes []corev1alpha1.IPPrefix) []string {
 	res := make([]string, len(prefixes))
 	for i, prefix := range prefixes {
 		res[i] = prefix.String()
@@ -198,7 +198,7 @@ func (s *Server) convertOnmetalNATGatewayTargets(natGatewayTargets []machinebrok
 	return res, nil
 }
 
-func (s *Server) getOnmetalIPsIPFamilies(ips []commonv1alpha1.IP) []corev1.IPFamily {
+func (s *Server) getOnmetalIPsIPFamilies(ips []corev1alpha1.IP) []corev1.IPFamily {
 	res := make([]corev1.IPFamily, len(ips))
 	for i, ip := range ips {
 		res[i] = ip.Family()
@@ -206,7 +206,7 @@ func (s *Server) getOnmetalIPsIPFamilies(ips []commonv1alpha1.IP) []corev1.IPFam
 	return res
 }
 
-func (s *Server) onmetalIPsToOnmetalIPSources(ips []commonv1alpha1.IP) []networkingv1alpha1.IPSource {
+func (s *Server) onmetalIPsToOnmetalIPSources(ips []corev1alpha1.IP) []networkingv1alpha1.IPSource {
 	res := make([]networkingv1alpha1.IPSource, len(ips))
 	for i := range ips {
 		res[i] = networkingv1alpha1.IPSource{
@@ -216,10 +216,10 @@ func (s *Server) onmetalIPsToOnmetalIPSources(ips []commonv1alpha1.IP) []network
 	return res
 }
 
-func (s *Server) parseIPs(ipStrings []string) ([]commonv1alpha1.IP, error) {
-	var ips []commonv1alpha1.IP
+func (s *Server) parseIPs(ipStrings []string) ([]corev1alpha1.IP, error) {
+	var ips []corev1alpha1.IP
 	for _, ipString := range ipStrings {
-		ip, err := commonv1alpha1.ParseIP(ipString)
+		ip, err := corev1alpha1.ParseIP(ipString)
 		if err != nil {
 			return nil, fmt.Errorf("error parsing ip %q: %w", ipString, err)
 		}
@@ -253,10 +253,10 @@ func (s *Server) convertORILoadBalancerType(typ ori.LoadBalancerType) (networkin
 	}
 }
 
-func (s *Server) parseIPPrefixes(prefixStrings []string) ([]commonv1alpha1.IPPrefix, error) {
-	var ipPrefixes []commonv1alpha1.IPPrefix
+func (s *Server) parseIPPrefixes(prefixStrings []string) ([]corev1alpha1.IPPrefix, error) {
+	var ipPrefixes []corev1alpha1.IPPrefix
 	for _, prefixString := range prefixStrings {
-		ipPrefix, err := commonv1alpha1.ParseIPPrefix(prefixString)
+		ipPrefix, err := corev1alpha1.ParseIPPrefix(prefixString)
 		if err != nil {
 			return nil, fmt.Errorf("error parsing ip prefix %q: %w", prefixString, err)
 		}

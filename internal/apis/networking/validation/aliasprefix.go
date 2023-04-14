@@ -17,7 +17,7 @@
 package validation
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	onmetalapivalidation "github.com/onmetal/onmetal-api/internal/api/validation"
 	"github.com/onmetal/onmetal-api/internal/apis/ipam"
 	ipamvalidation "github.com/onmetal/onmetal-api/internal/apis/ipam/validation"
@@ -91,7 +91,7 @@ func ValidatePrefixTemplateForAliasPrefix(template *ipam.PrefixTemplateSpec, fld
 	return allErrs
 }
 
-func validateValuePrefixSource(value *commonv1alpha1.IPPrefix, fldPath *field.Path) field.ErrorList {
+func validateValuePrefixSource(value *corev1alpha1.IPPrefix, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
 	if value != nil && !value.IsValid() {

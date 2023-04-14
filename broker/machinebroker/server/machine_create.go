@@ -20,8 +20,8 @@ import (
 	"math/big"
 
 	"github.com/go-logr/logr"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/apiutils"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
@@ -147,9 +147,9 @@ func (s *Server) getOnmetalMachineConfig(machine *ori.Machine) (*OnmetalMachineC
 		onmetalVolumeAttachments[i] = onmetalVolumeAttachment
 	}
 
-	var onmetalMachineIgnitionRef *commonv1alpha1.SecretKeySelector
+	var onmetalMachineIgnitionRef *corev1alpha1.SecretKeySelector
 	if onmetalIgnitionSecret != nil {
-		onmetalMachineIgnitionRef = &commonv1alpha1.SecretKeySelector{
+		onmetalMachineIgnitionRef = &corev1alpha1.SecretKeySelector{
 			Name: onmetalIgnitionSecret.Name,
 			Key:  computev1alpha1.DefaultIgnitionKey,
 		}

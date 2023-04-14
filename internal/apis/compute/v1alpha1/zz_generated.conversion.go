@@ -24,7 +24,6 @@ import (
 	url "net/url"
 	unsafe "unsafe"
 
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	v1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
@@ -697,7 +696,7 @@ func Convert_compute_MachinePoolList_To_v1alpha1_MachinePoolList(in *compute.Mac
 
 func autoConvert_v1alpha1_MachinePoolSpec_To_compute_MachinePoolSpec(in *v1alpha1.MachinePoolSpec, out *compute.MachinePoolSpec, s conversion.Scope) error {
 	out.ProviderID = in.ProviderID
-	out.Taints = *(*[]commonv1alpha1.Taint)(unsafe.Pointer(&in.Taints))
+	out.Taints = *(*[]corev1alpha1.Taint)(unsafe.Pointer(&in.Taints))
 	return nil
 }
 
@@ -708,7 +707,7 @@ func Convert_v1alpha1_MachinePoolSpec_To_compute_MachinePoolSpec(in *v1alpha1.Ma
 
 func autoConvert_compute_MachinePoolSpec_To_v1alpha1_MachinePoolSpec(in *compute.MachinePoolSpec, out *v1alpha1.MachinePoolSpec, s conversion.Scope) error {
 	out.ProviderID = in.ProviderID
-	out.Taints = *(*[]commonv1alpha1.Taint)(unsafe.Pointer(&in.Taints))
+	out.Taints = *(*[]corev1alpha1.Taint)(unsafe.Pointer(&in.Taints))
 	return nil
 }
 
@@ -768,9 +767,9 @@ func autoConvert_v1alpha1_MachineSpec_To_compute_MachineSpec(in *v1alpha1.Machin
 	} else {
 		out.Volumes = nil
 	}
-	out.IgnitionRef = (*commonv1alpha1.SecretKeySelector)(unsafe.Pointer(in.IgnitionRef))
+	out.IgnitionRef = (*corev1alpha1.SecretKeySelector)(unsafe.Pointer(in.IgnitionRef))
 	out.EFIVars = *(*[]compute.EFIVar)(unsafe.Pointer(&in.EFIVars))
-	out.Tolerations = *(*[]commonv1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
+	out.Tolerations = *(*[]corev1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
 	return nil
 }
 
@@ -798,9 +797,9 @@ func autoConvert_compute_MachineSpec_To_v1alpha1_MachineSpec(in *compute.Machine
 	} else {
 		out.Volumes = nil
 	}
-	out.IgnitionRef = (*commonv1alpha1.SecretKeySelector)(unsafe.Pointer(in.IgnitionRef))
+	out.IgnitionRef = (*corev1alpha1.SecretKeySelector)(unsafe.Pointer(in.IgnitionRef))
 	out.EFIVars = *(*[]v1alpha1.EFIVar)(unsafe.Pointer(&in.EFIVars))
-	out.Tolerations = *(*[]commonv1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
+	out.Tolerations = *(*[]corev1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
 	return nil
 }
 
@@ -889,8 +888,8 @@ func autoConvert_v1alpha1_NetworkInterfaceStatus_To_compute_NetworkInterfaceStat
 	out.Name = in.Name
 	out.Handle = in.Handle
 	out.NetworkHandle = in.NetworkHandle
-	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
-	out.VirtualIP = (*commonv1alpha1.IP)(unsafe.Pointer(in.VirtualIP))
+	out.IPs = *(*[]corev1alpha1.IP)(unsafe.Pointer(&in.IPs))
+	out.VirtualIP = (*corev1alpha1.IP)(unsafe.Pointer(in.VirtualIP))
 	out.State = compute.NetworkInterfaceState(in.State)
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
 	out.Phase = compute.NetworkInterfacePhase(in.Phase)
@@ -907,8 +906,8 @@ func autoConvert_compute_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStat
 	out.Name = in.Name
 	out.Handle = in.Handle
 	out.NetworkHandle = in.NetworkHandle
-	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
-	out.VirtualIP = (*commonv1alpha1.IP)(unsafe.Pointer(in.VirtualIP))
+	out.IPs = *(*[]corev1alpha1.IP)(unsafe.Pointer(&in.IPs))
+	out.VirtualIP = (*corev1alpha1.IP)(unsafe.Pointer(in.VirtualIP))
 	out.State = v1alpha1.NetworkInterfaceState(in.State)
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
 	out.Phase = v1alpha1.NetworkInterfacePhase(in.Phase)

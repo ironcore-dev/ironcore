@@ -24,8 +24,8 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/metautils"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	"github.com/onmetal/onmetal-api/internal/client/compute"
@@ -84,8 +84,8 @@ func (r *MachineReconciler) delete(ctx context.Context, log logr.Logger, machine
 	return ctrl.Result{}, nil
 }
 
-func (r *MachineReconciler) computeNetworkInterfaceStatusValues(machine *computev1alpha1.Machine, nic *networkingv1alpha1.NetworkInterface) (phase computev1alpha1.NetworkInterfacePhase, ips []commonv1alpha1.IP, virtualIP *commonv1alpha1.IP) {
-	if !reflect.DeepEqual(nic.Spec.MachineRef, &commonv1alpha1.LocalUIDReference{Name: machine.Name, UID: machine.UID}) {
+func (r *MachineReconciler) computeNetworkInterfaceStatusValues(machine *computev1alpha1.Machine, nic *networkingv1alpha1.NetworkInterface) (phase computev1alpha1.NetworkInterfacePhase, ips []corev1alpha1.IP, virtualIP *corev1alpha1.IP) {
+	if !reflect.DeepEqual(nic.Spec.MachineRef, &corev1alpha1.LocalUIDReference{Name: machine.Name, UID: machine.UID}) {
 		return computev1alpha1.NetworkInterfacePhasePending, nil, nil
 	}
 	return computev1alpha1.NetworkInterfacePhaseBound, nic.Status.IPs, nic.Status.VirtualIP
@@ -96,7 +96,7 @@ func (r *MachineReconciler) applyNetworkInterface(
 	log logr.Logger,
 	machine *computev1alpha1.Machine,
 	machineNic *computev1alpha1.NetworkInterface,
-) (phase computev1alpha1.NetworkInterfacePhase, ips []commonv1alpha1.IP, virtualIP *commonv1alpha1.IP, bindWarning string, err error) {
+) (phase computev1alpha1.NetworkInterfacePhase, ips []corev1alpha1.IP, virtualIP *corev1alpha1.IP, bindWarning string, err error) {
 	switch {
 	case machineNic.NetworkInterfaceRef != nil:
 		nic := &networkingv1alpha1.NetworkInterface{}
@@ -130,7 +130,7 @@ func (r *MachineReconciler) applyNetworkInterface(
 			metautils.SetLabel(nic, ephemeralSourceMachineUIDLabel, string(machine.UID))
 
 			nic.Spec = template.Spec
-			nic.Spec.MachineRef = &commonv1alpha1.LocalUIDReference{Name: machine.Name, UID: machine.UID}
+			nic.Spec.MachineRef = &corev1alpha1.LocalUIDReference{Name: machine.Name, UID: machine.UID}
 			return nil
 		}); err != nil {
 			if !errors.Is(err, client2.ErrNotControlled) {
@@ -352,7 +352,7 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 }
 
 func (r *MachineReconciler) computeVolumePhase(machine *computev1alpha1.Machine, volume *storagev1alpha1.Volume) computev1alpha1.VolumePhase {
-	if !reflect.DeepEqual(volume.Spec.ClaimRef, &commonv1alpha1.LocalUIDReference{Name: machine.Name, UID: machine.UID}) {
+	if !reflect.DeepEqual(volume.Spec.ClaimRef, &corev1alpha1.LocalUIDReference{Name: machine.Name, UID: machine.UID}) {
 		return computev1alpha1.VolumePhasePending
 	}
 	return computev1alpha1.VolumePhaseBound
@@ -396,7 +396,7 @@ func (r *MachineReconciler) bindVolume(
 			metav1.SetMetaDataLabel(&volume.ObjectMeta, ephemeralSourceMachineUIDLabel, string(machine.UID))
 
 			volume.Spec = template.Spec
-			volume.Spec.ClaimRef = &commonv1alpha1.LocalUIDReference{Name: machine.Name, UID: machine.UID}
+			volume.Spec.ClaimRef = &corev1alpha1.LocalUIDReference{Name: machine.Name, UID: machine.UID}
 			return nil
 		}); err != nil {
 			if !errors.Is(err, client2.ErrNotControlled) {

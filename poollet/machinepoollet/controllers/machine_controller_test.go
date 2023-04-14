@@ -17,8 +17,8 @@ package controllers_test
 import (
 	"fmt"
 
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
@@ -64,7 +64,7 @@ var _ = Describe("MachineController", func() {
 			Spec: networkingv1alpha1.NetworkInterfaceSpec{
 				NetworkRef: corev1.LocalObjectReference{Name: network.Name},
 				IPs: []networkingv1alpha1.IPSource{
-					{Value: commonv1alpha1.MustParseNewIP("10.0.0.1")},
+					{Value: corev1alpha1.MustParseNewIP("10.0.0.1")},
 				},
 			},
 		}
@@ -232,7 +232,7 @@ var _ = Describe("MachineController", func() {
 									Spec: networkingv1alpha1.NetworkInterfaceSpec{
 										NetworkRef: corev1.LocalObjectReference{Name: network.Name},
 										IPs: []networkingv1alpha1.IPSource{
-											{Value: commonv1alpha1.MustParseNewIP("10.0.0.1")},
+											{Value: corev1alpha1.MustParseNewIP("10.0.0.1")},
 										},
 									},
 								},
@@ -253,7 +253,7 @@ var _ = Describe("MachineController", func() {
 			Spec: networkingv1alpha1.AliasPrefixSpec{
 				NetworkRef: corev1.LocalObjectReference{Name: network.Name},
 				Prefix: networkingv1alpha1.PrefixSource{
-					Value: commonv1alpha1.MustParseNewIPPrefix("10.0.1.0/24"),
+					Value: corev1alpha1.MustParseNewIPPrefix("10.0.1.0/24"),
 				},
 				NetworkInterfaceSelector: &metav1.LabelSelector{
 					MatchLabels: map[string]string{"foo": "bar"},
@@ -318,7 +318,7 @@ var _ = Describe("MachineController", func() {
 									Spec: networkingv1alpha1.NetworkInterfaceSpec{
 										NetworkRef: corev1.LocalObjectReference{Name: network.Name},
 										IPs: []networkingv1alpha1.IPSource{
-											{Value: commonv1alpha1.MustParseNewIP("192.168.178.1")},
+											{Value: corev1alpha1.MustParseNewIP("192.168.178.1")},
 										},
 									},
 								},
@@ -354,7 +354,7 @@ var _ = Describe("MachineController", func() {
 
 		By("adding an ip to the load balancer")
 		baseLoadBalancer := loadBalancer.DeepCopy()
-		loadBalancer.Status.IPs = []commonv1alpha1.IP{commonv1alpha1.MustParseIP("10.0.0.1")}
+		loadBalancer.Status.IPs = []corev1alpha1.IP{corev1alpha1.MustParseIP("10.0.0.1")}
 		Expect(k8sClient.Status().Patch(ctx, loadBalancer, client.MergeFrom(baseLoadBalancer))).To(Succeed())
 
 		By("waiting for the runtime to report the machine and network interface")
@@ -422,7 +422,7 @@ var _ = Describe("MachineController", func() {
 									Spec: networkingv1alpha1.NetworkInterfaceSpec{
 										NetworkRef: corev1.LocalObjectReference{Name: network.Name},
 										IPs: []networkingv1alpha1.IPSource{
-											{Value: commonv1alpha1.MustParseNewIP("192.168.178.1")},
+											{Value: corev1alpha1.MustParseNewIP("192.168.178.1")},
 										},
 									},
 								},
@@ -457,7 +457,7 @@ var _ = Describe("MachineController", func() {
 		natGateway.Status.IPs = []networkingv1alpha1.NATGatewayIPStatus{
 			{
 				Name: "primary",
-				IP:   commonv1alpha1.MustParseIP("10.0.0.1"),
+				IP:   corev1alpha1.MustParseIP("10.0.0.1"),
 			},
 		}
 		Expect(k8sClient.Status().Patch(ctx, natGateway, client.MergeFrom(baseNATGateway))).To(Succeed())
@@ -519,7 +519,7 @@ var _ = Describe("MachineController", func() {
 									Spec: networkingv1alpha1.NetworkInterfaceSpec{
 										NetworkRef: corev1.LocalObjectReference{Name: network.Name},
 										IPs: []networkingv1alpha1.IPSource{
-											{Value: commonv1alpha1.MustParseNewIP("192.168.178.1")},
+											{Value: corev1alpha1.MustParseNewIP("192.168.178.1")},
 										},
 									},
 								},
@@ -548,7 +548,7 @@ var _ = Describe("MachineController", func() {
 									Spec: networkingv1alpha1.NetworkInterfaceSpec{
 										NetworkRef: corev1.LocalObjectReference{Name: network.Name},
 										IPs: []networkingv1alpha1.IPSource{
-											{Value: commonv1alpha1.MustParseNewIP("192.168.178.2")},
+											{Value: corev1alpha1.MustParseNewIP("192.168.178.2")},
 										},
 									},
 								},

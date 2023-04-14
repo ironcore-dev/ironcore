@@ -15,7 +15,7 @@
 package server_test
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/apiutils"
@@ -79,7 +79,7 @@ var _ = Describe("CreateNetworkInterface", func() {
 
 		Expect(k8sNetworkInterface.Spec.IPs).To(Equal([]networkingv1alpha1.IPSource{
 			{
-				Value: commonv1alpha1.MustParseNewIP(ip),
+				Value: corev1alpha1.MustParseNewIP(ip),
 			},
 		}))
 
@@ -102,7 +102,7 @@ var _ = Describe("CreateNetworkInterface", func() {
 		Expect(k8sClient.Get(ctx, k8sVirtualIPKey, k8sVirtualIP)).To(Succeed())
 
 		By("inspecting the referenced kubernetes virtual ip")
-		Expect(k8sVirtualIP.Status.IP).To(Equal(commonv1alpha1.MustParseNewIP(virtualIP)))
+		Expect(k8sVirtualIP.Status.IP).To(Equal(corev1alpha1.MustParseNewIP(virtualIP)))
 
 		By("listing alias prefixes for network interface")
 		aliasPrefixes, err := srv.AliasPrefixes().ListByDependent(ctx, networkInterfaceID)
@@ -112,7 +112,7 @@ var _ = Describe("CreateNetworkInterface", func() {
 		Expect(aliasPrefixes).To(HaveLen(1))
 		aliasPrefix := aliasPrefixes[0]
 		Expect(aliasPrefix.NetworkHandle).To(Equal(networkHandle))
-		Expect(aliasPrefix.Prefix).To(Equal(commonv1alpha1.MustParseIPPrefix(prefix)))
+		Expect(aliasPrefix.Prefix).To(Equal(corev1alpha1.MustParseIPPrefix(prefix)))
 		Expect(aliasPrefix.Destinations.Equal(sets.New(networkInterfaceID))).To(BeTrue())
 
 		By("listing load balancers for network interface")
@@ -123,7 +123,7 @@ var _ = Describe("CreateNetworkInterface", func() {
 		Expect(loadBalancers).To(ConsistOf(machinebrokerv1alpha1.LoadBalancer{
 			Type:          networkingv1alpha1.LoadBalancerTypePublic,
 			NetworkHandle: networkHandle,
-			IP:            commonv1alpha1.MustParseIP(loadBalancerIP),
+			IP:            corev1alpha1.MustParseIP(loadBalancerIP),
 			Ports: []machinebrokerv1alpha1.LoadBalancerPort{
 				{
 					Protocol: corev1.ProtocolTCP,
@@ -173,7 +173,7 @@ var _ = Describe("CreateNetworkInterface", func() {
 
 		Expect(k8sNetworkInterface.Spec.IPs).To(Equal([]networkingv1alpha1.IPSource{
 			{
-				Value: commonv1alpha1.MustParseNewIP(ip),
+				Value: corev1alpha1.MustParseNewIP(ip),
 			},
 		}))
 
@@ -184,7 +184,7 @@ var _ = Describe("CreateNetworkInterface", func() {
 		By("inspecting the nat gateways")
 		Expect(natGateways).To(ConsistOf(machinebrokerv1alpha1.NATGateway{
 			NetworkHandle: networkHandle,
-			IP:            commonv1alpha1.MustParseIP(natGatewayIP),
+			IP:            corev1alpha1.MustParseIP(natGatewayIP),
 			Destinations: []machinebrokerv1alpha1.NATGatewayDestination{
 				{
 					ID:      networkInterfaceID,

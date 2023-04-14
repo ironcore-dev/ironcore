@@ -19,7 +19,7 @@ package v1alpha1
 
 import (
 	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
-	v1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/common/v1alpha1"
+	v1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/core/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 )
 

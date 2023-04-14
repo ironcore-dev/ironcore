@@ -17,7 +17,7 @@
 package ipam
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -28,7 +28,7 @@ type PrefixAllocationSpec struct {
 	// If unset but Prefix is set, this can be inferred.
 	IPFamily corev1.IPFamily
 	// Prefix is the prefix to allocate for this Prefix.
-	Prefix *commonv1alpha1.IPPrefix
+	Prefix *corev1alpha1.IPPrefix
 	// PrefixLength is the length of prefix to allocate for this Prefix.
 	PrefixLength int32
 
@@ -53,7 +53,7 @@ const (
 // PrefixAllocationStatus is the status of a PrefixAllocation.
 type PrefixAllocationStatus struct {
 	// Prefix is the allocated prefix, if any
-	Prefix *commonv1alpha1.IPPrefix
+	Prefix *corev1alpha1.IPPrefix
 	// LastPhaseTransitionTime is the last time the Phase changed values.
 	LastPhaseTransitionTime *metav1.Time
 

@@ -18,7 +18,7 @@ import (
 	"fmt"
 
 	onmetalapivalidation "github.com/onmetal/onmetal-api/internal/api/validation"
-	commonvalidation "github.com/onmetal/onmetal-api/internal/apis/common/validation"
+	corevalidation "github.com/onmetal/onmetal-api/internal/apis/core/validation"
 	"github.com/onmetal/onmetal-api/internal/apis/ipam"
 	"github.com/onmetal/onmetal-api/utils/equality"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
@@ -100,7 +100,7 @@ func ValidatePrefixAllocationStatus(status *ipam.PrefixAllocationStatus, fldPath
 	var allErrs field.ErrorList
 
 	if status.Prefix != nil {
-		allErrs = append(allErrs, commonvalidation.ValidateIPPrefix(status.Prefix.IP().Family(), *status.Prefix, fldPath.Child("prefix"))...)
+		allErrs = append(allErrs, corevalidation.ValidateIPPrefix(status.Prefix.IP().Family(), *status.Prefix, fldPath.Child("prefix"))...)
 	}
 
 	switch status.Phase {
@@ -133,7 +133,7 @@ func ValidatePrefixAllocationStatusUpdate(newPrefixAllocation, oldPrefixAllocati
 
 	statusPrefixField := statusField.Child("prefix")
 	if newStatusPrefix := newPrefixAllocation.Status.Prefix; newStatusPrefix != nil {
-		allErrs = append(allErrs, commonvalidation.ValidateIPPrefix(newPrefixAllocation.Spec.IPFamily, *newStatusPrefix, statusPrefixField)...)
+		allErrs = append(allErrs, corevalidation.ValidateIPPrefix(newPrefixAllocation.Spec.IPFamily, *newStatusPrefix, statusPrefixField)...)
 
 		if newSpecPrefix := newPrefixAllocation.Spec.Prefix; newSpecPrefix.IsValid() {
 			if !equality.Semantic.DeepEqual(newStatusPrefix, newSpecPrefix) {

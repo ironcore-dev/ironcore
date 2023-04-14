@@ -23,7 +23,7 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	networkingclient "github.com/onmetal/onmetal-api/internal/client/networking"
 	"github.com/onmetal/onmetal-api/internal/controllers/networking/events"
@@ -209,7 +209,7 @@ func (r *VirtualIPReconciler) reconcileUnbound(ctx context.Context, log logr.Log
 
 func (r *VirtualIPReconciler) assign(ctx context.Context, virtualIP *networkingv1alpha1.VirtualIP, nic *networkingv1alpha1.NetworkInterface) error {
 	base := virtualIP.DeepCopy()
-	virtualIP.Spec.TargetRef = &commonv1alpha1.LocalUIDReference{Name: nic.Name, UID: nic.UID}
+	virtualIP.Spec.TargetRef = &corev1alpha1.LocalUIDReference{Name: nic.Name, UID: nic.UID}
 	if err := r.Patch(ctx, virtualIP, client.MergeFrom(base)); err != nil {
 		return fmt.Errorf("error assigning to network interface: %w", err)
 	}

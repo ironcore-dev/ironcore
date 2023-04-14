@@ -17,9 +17,9 @@ package validation
 import (
 	"fmt"
 
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	onmetalapivalidation "github.com/onmetal/onmetal-api/internal/api/validation"
-	commonvalidation "github.com/onmetal/onmetal-api/internal/apis/common/validation"
+	corevalidation "github.com/onmetal/onmetal-api/internal/apis/core/validation"
 	"github.com/onmetal/onmetal-api/internal/apis/ipam"
 	"go4.org/netipx"
 	corev1 "k8s.io/api/core/v1"
@@ -38,16 +38,16 @@ func ValidatePrefix(prefix *ipam.Prefix) field.ErrorList {
 	return allErrs
 }
 
-func validateIPFamilyAndOptionalPrefixAndLength(ipFamily corev1.IPFamily, prefix *commonv1alpha1.IPPrefix, prefixLength int32, fldPath *field.Path) field.ErrorList {
+func validateIPFamilyAndOptionalPrefixAndLength(ipFamily corev1.IPFamily, prefix *corev1alpha1.IPPrefix, prefixLength int32, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, onmetalapivalidation.ValidateIPFamily(ipFamily, fldPath.Child("ipFamily"))...)
 
 	if prefix != nil {
-		allErrs = append(allErrs, commonvalidation.ValidateIPPrefix(ipFamily, *prefix, fldPath.Child("prefix"))...)
+		allErrs = append(allErrs, corevalidation.ValidateIPPrefix(ipFamily, *prefix, fldPath.Child("prefix"))...)
 	}
 	if prefixLength != 0 {
-		allErrs = append(allErrs, commonvalidation.ValidatePrefixLength(ipFamily, prefixLength, fldPath.Child("prefixLength"))...)
+		allErrs = append(allErrs, corevalidation.ValidatePrefixLength(ipFamily, prefixLength, fldPath.Child("prefixLength"))...)
 	}
 
 	return allErrs
@@ -74,7 +74,7 @@ func ValidatePrefixSpec(spec *ipam.PrefixSpec, fldPath *field.Path) field.ErrorL
 	var allErrs field.ErrorList
 
 	if spec.Prefix != nil {
-		allErrs = append(allErrs, commonvalidation.ValidateIPPrefix(spec.IPFamily, *spec.Prefix, fldPath.Child("prefix"))...)
+		allErrs = append(allErrs, corevalidation.ValidateIPPrefix(spec.IPFamily, *spec.Prefix, fldPath.Child("prefix"))...)
 	}
 	allErrs = append(allErrs, validateIPFamilyAndOptionalPrefixAndLength(spec.IPFamily, spec.Prefix, spec.PrefixLength, fldPath)...)
 
@@ -156,7 +156,7 @@ func ValidatePrefixStatus(status *ipam.PrefixStatus, fldPath *field.Path) field.
 		)
 		for i, used := range status.Used {
 			usedField := fldPath.Child("used").Index(i)
-			allErrs = append(allErrs, commonvalidation.ValidateIPPrefix(used.IP().Family(), used, usedField)...)
+			allErrs = append(allErrs, corevalidation.ValidateIPPrefix(used.IP().Family(), used, usedField)...)
 			seenFamilies.Insert(string(used.IP().Family()))
 
 			if !overlapSeen {

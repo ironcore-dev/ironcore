@@ -15,7 +15,7 @@
 package server_test
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
@@ -62,7 +62,7 @@ var _ = Describe("NetworkInterfaceCreateNAT", func() {
 
 		Expect(nats).To(ConsistOf(machinebrokerv1alpha1.NATGateway{
 			NetworkHandle: "foo",
-			IP:            commonv1alpha1.MustParseIP("10.0.0.1"),
+			IP:            corev1alpha1.MustParseIP("10.0.0.1"),
 			Destinations: []machinebrokerv1alpha1.NATGatewayDestination{
 				{
 					ID:      networkInterface.Metadata.Id,

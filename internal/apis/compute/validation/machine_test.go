@@ -17,7 +17,7 @@
 package validation
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	"github.com/onmetal/onmetal-api/internal/apis/compute"
 	. "github.com/onmetal/onmetal-api/internal/testutils/validation"
 	. "github.com/onsi/ginkgo/v2"
@@ -182,7 +182,7 @@ var _ = Describe("Machine", func() {
 		Entry("invalid ignition ref name",
 			&compute.Machine{
 				Spec: compute.MachineSpec{
-					IgnitionRef: &commonv1alpha1.SecretKeySelector{
+					IgnitionRef: &corev1alpha1.SecretKeySelector{
 						Name: "foo*",
 					},
 				},

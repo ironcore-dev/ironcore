@@ -89,8 +89,8 @@ If unset but Prefix is set, this can be inferred.</p>
 <td>
 <code>prefix</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
+<a href="../core/#core.api.onmetal.de/v1alpha1.IPPrefix">
+github.com/onmetal/onmetal-api/api/core/v1alpha1.IPPrefix
 </a>
 </em>
 </td>
@@ -229,8 +229,8 @@ If unset but Prefix is set, this can be inferred.</p>
 <td>
 <code>prefix</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
+<a href="../core/#core.api.onmetal.de/v1alpha1.IPPrefix">
+github.com/onmetal/onmetal-api/api/core/v1alpha1.IPPrefix
 </a>
 </em>
 </td>
@@ -352,8 +352,8 @@ If unset but Prefix is set, this can be inferred.</p>
 <td>
 <code>prefix</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
+<a href="../core/#core.api.onmetal.de/v1alpha1.IPPrefix">
+github.com/onmetal/onmetal-api/api/core/v1alpha1.IPPrefix
 </a>
 </em>
 </td>
@@ -420,8 +420,8 @@ Kubernetes meta/v1.LabelSelector
 <td>
 <code>prefix</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
+<a href="../core/#core.api.onmetal.de/v1alpha1.IPPrefix">
+github.com/onmetal/onmetal-api/api/core/v1alpha1.IPPrefix
 </a>
 </em>
 </td>
@@ -514,8 +514,8 @@ If unset but Prefix is set, this can be inferred.</p>
 <td>
 <code>prefix</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
+<a href="../core/#core.api.onmetal.de/v1alpha1.IPPrefix">
+github.com/onmetal/onmetal-api/api/core/v1alpha1.IPPrefix
 </a>
 </em>
 </td>
@@ -610,8 +610,8 @@ Kubernetes meta/v1.Time
 <td>
 <code>used</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
+<a href="../core/#core.api.onmetal.de/v1alpha1.IPPrefix">
+[]github.com/onmetal/onmetal-api/api/core/v1alpha1.IPPrefix
 </a>
 </em>
 </td>
@@ -678,8 +678,8 @@ If unset but Prefix is set, this can be inferred.</p>
 <td>
 <code>prefix</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
+<a href="../core/#core.api.onmetal.de/v1alpha1.IPPrefix">
+github.com/onmetal/onmetal-api/api/core/v1alpha1.IPPrefix
 </a>
 </em>
 </td>

@@ -18,7 +18,7 @@ package networking
 
 import (
 	"github.com/google/go-cmp/cmp/cmpopts"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
@@ -49,7 +49,7 @@ var _ = Describe("NetworkBindReconciler", func() {
 				Peerings: []networkingv1alpha1.NetworkPeering{
 					{
 						Name: "peering",
-						NetworkRef: commonv1alpha1.UIDReference{
+						NetworkRef: corev1alpha1.UIDReference{
 							Name: "network-2",
 						},
 					},
@@ -74,7 +74,7 @@ var _ = Describe("NetworkBindReconciler", func() {
 				Peerings: []networkingv1alpha1.NetworkPeering{
 					{
 						Name: "peering",
-						NetworkRef: commonv1alpha1.UIDReference{
+						NetworkRef: corev1alpha1.UIDReference{
 							Name: "network-1",
 						},
 					},
@@ -97,14 +97,14 @@ var _ = Describe("NetworkBindReconciler", func() {
 
 			g.Expect(network1.Spec.Peerings).To(ConsistOf(networkingv1alpha1.NetworkPeering{
 				Name: "peering",
-				NetworkRef: commonv1alpha1.UIDReference{
+				NetworkRef: corev1alpha1.UIDReference{
 					Name: network2.Name,
 					UID:  network2.UID,
 				},
 			}))
 			g.Expect(network2.Spec.Peerings).To(ConsistOf(networkingv1alpha1.NetworkPeering{
 				Name: "peering",
-				NetworkRef: commonv1alpha1.UIDReference{
+				NetworkRef: corev1alpha1.UIDReference{
 					Name: network1.Name,
 					UID:  network1.UID,
 				},
@@ -135,7 +135,7 @@ var _ = Describe("NetworkBindReconciler", func() {
 				Peerings: []networkingv1alpha1.NetworkPeering{
 					{
 						Name: "peering",
-						NetworkRef: commonv1alpha1.UIDReference{
+						NetworkRef: corev1alpha1.UIDReference{
 							Name: "network-2",
 						},
 					},
@@ -160,7 +160,7 @@ var _ = Describe("NetworkBindReconciler", func() {
 				Peerings: []networkingv1alpha1.NetworkPeering{
 					{
 						Name: "peering",
-						NetworkRef: commonv1alpha1.UIDReference{
+						NetworkRef: corev1alpha1.UIDReference{
 							Name: "network-other",
 						},
 					},
@@ -184,13 +184,13 @@ var _ = Describe("NetworkBindReconciler", func() {
 
 			g.Expect(network1.Spec.Peerings).To(ConsistOf(networkingv1alpha1.NetworkPeering{
 				Name: "peering",
-				NetworkRef: commonv1alpha1.UIDReference{
+				NetworkRef: corev1alpha1.UIDReference{
 					Name: "network-2",
 				},
 			}))
 			g.Expect(network2.Spec.Peerings).To(ConsistOf(networkingv1alpha1.NetworkPeering{
 				Name: "peering",
-				NetworkRef: commonv1alpha1.UIDReference{
+				NetworkRef: corev1alpha1.UIDReference{
 					Name: "network-other",
 				},
 			}))
@@ -224,7 +224,7 @@ var _ = Describe("NetworkBindReconciler", func() {
 				Peerings: []networkingv1alpha1.NetworkPeering{
 					{
 						Name: "peering",
-						NetworkRef: commonv1alpha1.UIDReference{
+						NetworkRef: corev1alpha1.UIDReference{
 							Namespace: ns2.Name,
 							Name:      "network-2",
 						},
@@ -250,7 +250,7 @@ var _ = Describe("NetworkBindReconciler", func() {
 				Peerings: []networkingv1alpha1.NetworkPeering{
 					{
 						Name: "peering",
-						NetworkRef: commonv1alpha1.UIDReference{
+						NetworkRef: corev1alpha1.UIDReference{
 							Namespace: ns1.Name,
 							Name:      "network-1",
 						},
@@ -274,7 +274,7 @@ var _ = Describe("NetworkBindReconciler", func() {
 
 			g.Expect(network1.Spec.Peerings).To(ConsistOf(networkingv1alpha1.NetworkPeering{
 				Name: "peering",
-				NetworkRef: commonv1alpha1.UIDReference{
+				NetworkRef: corev1alpha1.UIDReference{
 					Namespace: ns2.Name,
 					Name:      network2.Name,
 					UID:       network2.UID,
@@ -282,7 +282,7 @@ var _ = Describe("NetworkBindReconciler", func() {
 			}))
 			g.Expect(network2.Spec.Peerings).To(ConsistOf(networkingv1alpha1.NetworkPeering{
 				Name: "peering",
-				NetworkRef: commonv1alpha1.UIDReference{
+				NetworkRef: corev1alpha1.UIDReference{
 					Namespace: ns1.Name,
 					Name:      network1.Name,
 					UID:       network1.UID,

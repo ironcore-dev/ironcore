@@ -15,7 +15,7 @@
 package validation_test
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	"github.com/onmetal/onmetal-api/internal/apis/ipam"
 	. "github.com/onmetal/onmetal-api/internal/apis/ipam/validation"
 	. "github.com/onmetal/onmetal-api/internal/testutils/validation"
@@ -68,7 +68,7 @@ var _ = Describe("PrefixAllocation", func() {
 		Entry("empty prefix",
 			&ipam.PrefixAllocation{
 				Spec: ipam.PrefixAllocationSpec{
-					Prefix: &commonv1alpha1.IPPrefix{},
+					Prefix: &corev1alpha1.IPPrefix{},
 				},
 			},
 			ContainElement(InvalidField("spec.prefix")),
@@ -102,7 +102,7 @@ var _ = Describe("PrefixAllocation", func() {
 		Entry("multiple requests",
 			&ipam.PrefixAllocation{
 				Spec: ipam.PrefixAllocationSpec{
-					Prefix:       commonv1alpha1.PtrToIPPrefix(commonv1alpha1.MustParseIPPrefix("10.0.0.0/8")),
+					Prefix:       corev1alpha1.PtrToIPPrefix(corev1alpha1.MustParseIPPrefix("10.0.0.0/8")),
 					PrefixLength: 8,
 				},
 			},
@@ -111,7 +111,7 @@ var _ = Describe("PrefixAllocation", func() {
 		Entry("no source",
 			&ipam.PrefixAllocation{
 				Spec: ipam.PrefixAllocationSpec{
-					Prefix:       commonv1alpha1.PtrToIPPrefix(commonv1alpha1.MustParseIPPrefix("10.0.0.0/8")),
+					Prefix:       corev1alpha1.PtrToIPPrefix(corev1alpha1.MustParseIPPrefix("10.0.0.0/8")),
 					PrefixLength: 8,
 				},
 			},
@@ -196,13 +196,13 @@ var _ = Describe("PrefixAllocation", func() {
 		),
 		Entry("not allocated but result",
 			&ipam.PrefixAllocationStatus{
-				Prefix: commonv1alpha1.MustParseNewIPPrefix("10.0.0.0/8"),
+				Prefix: corev1alpha1.MustParseNewIPPrefix("10.0.0.0/8"),
 			},
 			ContainElement(ForbiddenField("status.prefix")),
 		),
 		Entry("allocated with result",
 			&ipam.PrefixAllocationStatus{
-				Prefix: commonv1alpha1.MustParseNewIPPrefix("10.0.0.0/8"),
+				Prefix: corev1alpha1.MustParseNewIPPrefix("10.0.0.0/8"),
 				Phase:  ipam.PrefixAllocationPhaseAllocated,
 			},
 			Not(ContainElement(ForbiddenField("status.prefix"))),
@@ -239,17 +239,17 @@ var _ = Describe("PrefixAllocation", func() {
 		Entry("prefix mismatch with spec.prefix",
 			&ipam.PrefixAllocation{
 				Spec: ipam.PrefixAllocationSpec{
-					Prefix:    commonv1alpha1.MustParseNewIPPrefix("10.0.0.8/32"),
+					Prefix:    corev1alpha1.MustParseNewIPPrefix("10.0.0.8/32"),
 					PrefixRef: &corev1.LocalObjectReference{Name: "foo"},
 				},
 				Status: ipam.PrefixAllocationStatus{
 					Phase:  ipam.PrefixAllocationPhaseAllocated,
-					Prefix: commonv1alpha1.MustParseNewIPPrefix("10.0.0.9/32"),
+					Prefix: corev1alpha1.MustParseNewIPPrefix("10.0.0.9/32"),
 				},
 			},
 			&ipam.PrefixAllocation{
 				Spec: ipam.PrefixAllocationSpec{
-					Prefix:    commonv1alpha1.MustParseNewIPPrefix("10.0.0.8/32"),
+					Prefix:    corev1alpha1.MustParseNewIPPrefix("10.0.0.8/32"),
 					PrefixRef: &corev1.LocalObjectReference{Name: "foo"},
 				},
 				Status: ipam.PrefixAllocationStatus{},
@@ -264,7 +264,7 @@ var _ = Describe("PrefixAllocation", func() {
 				},
 				Status: ipam.PrefixAllocationStatus{
 					Phase:  ipam.PrefixAllocationPhaseAllocated,
-					Prefix: commonv1alpha1.MustParseNewIPPrefix("10.0.0.9/32"),
+					Prefix: corev1alpha1.MustParseNewIPPrefix("10.0.0.9/32"),
 				},
 			},
 			&ipam.PrefixAllocation{
@@ -285,7 +285,7 @@ var _ = Describe("PrefixAllocation", func() {
 				},
 				Status: ipam.PrefixAllocationStatus{
 					Phase:  ipam.PrefixAllocationPhaseAllocated,
-					Prefix: commonv1alpha1.MustParseNewIPPrefix("beef::/8"),
+					Prefix: corev1alpha1.MustParseNewIPPrefix("beef::/8"),
 				},
 			},
 			&ipam.PrefixAllocation{
@@ -304,7 +304,7 @@ var _ = Describe("PrefixAllocation", func() {
 				},
 				Status: ipam.PrefixAllocationStatus{
 					Phase:  ipam.PrefixAllocationPhaseAllocated,
-					Prefix: commonv1alpha1.MustParseNewIPPrefix("10.0.0.9/32"),
+					Prefix: corev1alpha1.MustParseNewIPPrefix("10.0.0.9/32"),
 				},
 			},
 			&ipam.PrefixAllocation{

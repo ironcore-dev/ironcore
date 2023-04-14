@@ -16,7 +16,7 @@
 package networking
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
@@ -78,7 +78,7 @@ var _ = Describe("VirtualIPReconciler", func() {
 
 		By("updating the virtual ip to have an ip allocated")
 		baseVirtualIP := virtualIP.DeepCopy()
-		virtualIP.Status.IP = commonv1alpha1.MustParseNewIP("10.0.0.1")
+		virtualIP.Status.IP = corev1alpha1.MustParseNewIP("10.0.0.1")
 		Expect(k8sClient.Status().Patch(ctx, virtualIP, client.MergeFrom(baseVirtualIP))).To(Succeed())
 
 		By("creating a network interface referencing the virtual ip")
@@ -95,7 +95,7 @@ var _ = Describe("VirtualIPReconciler", func() {
 					corev1.IPv4Protocol,
 				},
 				IPs: []networkingv1alpha1.IPSource{
-					{Value: commonv1alpha1.MustParseNewIP("192.168.178.1")},
+					{Value: corev1alpha1.MustParseNewIP("192.168.178.1")},
 				},
 				VirtualIP: &networkingv1alpha1.VirtualIPSource{
 					VirtualIPRef: &corev1.LocalObjectReference{
@@ -112,7 +112,7 @@ var _ = Describe("VirtualIPReconciler", func() {
 			Expect(k8sClient.Get(ctx, virtualIPKey, virtualIP)).To(Succeed())
 
 			g.Expect(virtualIP.Status.Phase).To(Equal(networkingv1alpha1.VirtualIPPhaseBound))
-			g.Expect(virtualIP.Spec.TargetRef).To(Equal(&commonv1alpha1.LocalUIDReference{
+			g.Expect(virtualIP.Spec.TargetRef).To(Equal(&corev1alpha1.LocalUIDReference{
 				Name: nic.Name,
 				UID:  nic.UID,
 			}))
@@ -155,7 +155,7 @@ var _ = Describe("VirtualIPReconciler", func() {
 
 		By("updating the virtual ip to have an ip allocated")
 		baseVirtualIP := virtualIP.DeepCopy()
-		virtualIP.Status.IP = commonv1alpha1.MustParseNewIP("10.0.0.1")
+		virtualIP.Status.IP = corev1alpha1.MustParseNewIP("10.0.0.1")
 		Expect(k8sClient.Status().Patch(ctx, virtualIP, client.MergeFrom(baseVirtualIP))).To(Succeed())
 
 		By("creating a network interface referencing the virtual ip")
@@ -172,7 +172,7 @@ var _ = Describe("VirtualIPReconciler", func() {
 					corev1.IPv4Protocol,
 				},
 				IPs: []networkingv1alpha1.IPSource{
-					{Value: commonv1alpha1.MustParseNewIP("192.168.178.1")},
+					{Value: corev1alpha1.MustParseNewIP("192.168.178.1")},
 				},
 				VirtualIP: &networkingv1alpha1.VirtualIPSource{
 					VirtualIPRef: &corev1.LocalObjectReference{
@@ -185,7 +185,7 @@ var _ = Describe("VirtualIPReconciler", func() {
 
 		By("updating only the target ref name but not the uid")
 		baseVirtualIP = virtualIP.DeepCopy()
-		virtualIP.Spec.TargetRef = &commonv1alpha1.LocalUIDReference{Name: nic.Name}
+		virtualIP.Spec.TargetRef = &corev1alpha1.LocalUIDReference{Name: nic.Name}
 		Expect(k8sClient.Patch(ctx, virtualIP, client.MergeFrom(baseVirtualIP))).To(Succeed())
 
 		By("waiting for the uid to be patched into the target ref")

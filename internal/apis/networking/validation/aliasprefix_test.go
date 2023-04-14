@@ -17,7 +17,7 @@
 package validation
 
 import (
-	"github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	"github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	"github.com/onmetal/onmetal-api/internal/apis/networking"
 	. "github.com/onmetal/onmetal-api/internal/testutils/validation"
 	. "github.com/onsi/ginkgo/v2"

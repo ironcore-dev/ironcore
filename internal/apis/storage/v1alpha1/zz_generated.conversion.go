@@ -23,7 +23,6 @@ package v1alpha1
 import (
 	unsafe "unsafe"
 
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	v1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	core "github.com/onmetal/onmetal-api/internal/apis/core"
@@ -530,7 +529,7 @@ func Convert_storage_BucketPoolList_To_v1alpha1_BucketPoolList(in *storage.Bucke
 
 func autoConvert_v1alpha1_BucketPoolSpec_To_storage_BucketPoolSpec(in *v1alpha1.BucketPoolSpec, out *storage.BucketPoolSpec, s conversion.Scope) error {
 	out.ProviderID = in.ProviderID
-	out.Taints = *(*[]commonv1alpha1.Taint)(unsafe.Pointer(&in.Taints))
+	out.Taints = *(*[]corev1alpha1.Taint)(unsafe.Pointer(&in.Taints))
 	return nil
 }
 
@@ -541,7 +540,7 @@ func Convert_v1alpha1_BucketPoolSpec_To_storage_BucketPoolSpec(in *v1alpha1.Buck
 
 func autoConvert_storage_BucketPoolSpec_To_v1alpha1_BucketPoolSpec(in *storage.BucketPoolSpec, out *v1alpha1.BucketPoolSpec, s conversion.Scope) error {
 	out.ProviderID = in.ProviderID
-	out.Taints = *(*[]commonv1alpha1.Taint)(unsafe.Pointer(&in.Taints))
+	out.Taints = *(*[]corev1alpha1.Taint)(unsafe.Pointer(&in.Taints))
 	return nil
 }
 
@@ -576,7 +575,7 @@ func autoConvert_v1alpha1_BucketSpec_To_storage_BucketSpec(in *v1alpha1.BucketSp
 	out.BucketClassRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.BucketClassRef))
 	out.BucketPoolSelector = *(*map[string]string)(unsafe.Pointer(&in.BucketPoolSelector))
 	out.BucketPoolRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.BucketPoolRef))
-	out.Tolerations = *(*[]commonv1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
+	out.Tolerations = *(*[]corev1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
 	return nil
 }
 
@@ -589,7 +588,7 @@ func autoConvert_storage_BucketSpec_To_v1alpha1_BucketSpec(in *storage.BucketSpe
 	out.BucketClassRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.BucketClassRef))
 	out.BucketPoolSelector = *(*map[string]string)(unsafe.Pointer(&in.BucketPoolSelector))
 	out.BucketPoolRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.BucketPoolRef))
-	out.Tolerations = *(*[]commonv1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
+	out.Tolerations = *(*[]corev1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
 	return nil
 }
 
@@ -910,7 +909,7 @@ func Convert_storage_VolumePoolList_To_v1alpha1_VolumePoolList(in *storage.Volum
 
 func autoConvert_v1alpha1_VolumePoolSpec_To_storage_VolumePoolSpec(in *v1alpha1.VolumePoolSpec, out *storage.VolumePoolSpec, s conversion.Scope) error {
 	out.ProviderID = in.ProviderID
-	out.Taints = *(*[]commonv1alpha1.Taint)(unsafe.Pointer(&in.Taints))
+	out.Taints = *(*[]corev1alpha1.Taint)(unsafe.Pointer(&in.Taints))
 	return nil
 }
 
@@ -921,7 +920,7 @@ func Convert_v1alpha1_VolumePoolSpec_To_storage_VolumePoolSpec(in *v1alpha1.Volu
 
 func autoConvert_storage_VolumePoolSpec_To_v1alpha1_VolumePoolSpec(in *storage.VolumePoolSpec, out *v1alpha1.VolumePoolSpec, s conversion.Scope) error {
 	out.ProviderID = in.ProviderID
-	out.Taints = *(*[]commonv1alpha1.Taint)(unsafe.Pointer(&in.Taints))
+	out.Taints = *(*[]corev1alpha1.Taint)(unsafe.Pointer(&in.Taints))
 	return nil
 }
 
@@ -962,12 +961,12 @@ func autoConvert_v1alpha1_VolumeSpec_To_storage_VolumeSpec(in *v1alpha1.VolumeSp
 	out.VolumeClassRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeClassRef))
 	out.VolumePoolSelector = *(*map[string]string)(unsafe.Pointer(&in.VolumePoolSelector))
 	out.VolumePoolRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumePoolRef))
-	out.ClaimRef = (*commonv1alpha1.LocalUIDReference)(unsafe.Pointer(in.ClaimRef))
+	out.ClaimRef = (*corev1alpha1.LocalUIDReference)(unsafe.Pointer(in.ClaimRef))
 	out.Resources = *(*core.ResourceList)(unsafe.Pointer(&in.Resources))
 	out.Image = in.Image
 	out.ImagePullSecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.ImagePullSecretRef))
 	out.Unclaimable = in.Unclaimable
-	out.Tolerations = *(*[]commonv1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
+	out.Tolerations = *(*[]corev1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
 	out.Encryption = (*storage.VolumeEncryption)(unsafe.Pointer(in.Encryption))
 	return nil
 }
@@ -981,12 +980,12 @@ func autoConvert_storage_VolumeSpec_To_v1alpha1_VolumeSpec(in *storage.VolumeSpe
 	out.VolumeClassRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeClassRef))
 	out.VolumePoolSelector = *(*map[string]string)(unsafe.Pointer(&in.VolumePoolSelector))
 	out.VolumePoolRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumePoolRef))
-	out.ClaimRef = (*commonv1alpha1.LocalUIDReference)(unsafe.Pointer(in.ClaimRef))
+	out.ClaimRef = (*corev1alpha1.LocalUIDReference)(unsafe.Pointer(in.ClaimRef))
 	out.Resources = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Resources))
 	out.Image = in.Image
 	out.ImagePullSecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.ImagePullSecretRef))
 	out.Unclaimable = in.Unclaimable
-	out.Tolerations = *(*[]commonv1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
+	out.Tolerations = *(*[]corev1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
 	out.Encryption = (*v1alpha1.VolumeEncryption)(unsafe.Pointer(in.Encryption))
 	return nil
 }

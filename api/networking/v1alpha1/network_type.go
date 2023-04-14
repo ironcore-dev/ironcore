@@ -17,7 +17,7 @@
 package v1alpha1
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -39,7 +39,7 @@ type NetworkPeering struct {
 	// NetworkRef is the reference to the network to peer with.
 	// If the UID is empty, it will be populated once when the peering is successfully bound.
 	// If namespace is empty it is implied that the target network resides in the same network.
-	NetworkRef commonv1alpha1.UIDReference `json:"networkRef"`
+	NetworkRef corev1alpha1.UIDReference `json:"networkRef"`
 }
 
 // NetworkStatus defines the observed state of Network

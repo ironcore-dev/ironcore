@@ -19,7 +19,7 @@ import (
 	"fmt"
 
 	"github.com/gogo/protobuf/proto"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -50,7 +50,7 @@ func (s *Server) UpdateNetworkInterfaceVirtualIP(ctx context.Context, req *ori.U
 		return nil, status.Errorf(codes.NotFound, "network interface %s does not have a virtual ip", networkInterfaceID)
 	}
 
-	ip, err := commonv1alpha1.ParseIP(desiredVirtualIP.Ip)
+	ip, err := corev1alpha1.ParseIP(desiredVirtualIP.Ip)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing ip: %w", err)
 	}

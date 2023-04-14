@@ -38,75 +38,6 @@ func Parser() *typed.Parser {
 var parserOnce sync.Once
 var parser *typed.Parser
 var schemaYAML = typed.YAMLObject(`types:
-- name: com.github.onmetal.onmetal-api.api.common.v1alpha1.IP
-  scalar: untyped
-- name: com.github.onmetal.onmetal-api.api.common.v1alpha1.IPPrefix
-  scalar: untyped
-- name: com.github.onmetal.onmetal-api.api.common.v1alpha1.LocalUIDReference
-  map:
-    fields:
-    - name: name
-      type:
-        scalar: string
-      default: ""
-    - name: uid
-      type:
-        scalar: string
-      default: ""
-    elementRelationship: atomic
-- name: com.github.onmetal.onmetal-api.api.common.v1alpha1.SecretKeySelector
-  map:
-    fields:
-    - name: key
-      type:
-        scalar: string
-    - name: name
-      type:
-        scalar: string
-    elementRelationship: atomic
-- name: com.github.onmetal.onmetal-api.api.common.v1alpha1.Taint
-  map:
-    fields:
-    - name: effect
-      type:
-        scalar: string
-      default: ""
-    - name: key
-      type:
-        scalar: string
-      default: ""
-    - name: value
-      type:
-        scalar: string
-- name: com.github.onmetal.onmetal-api.api.common.v1alpha1.Toleration
-  map:
-    fields:
-    - name: effect
-      type:
-        scalar: string
-    - name: key
-      type:
-        scalar: string
-    - name: operator
-      type:
-        scalar: string
-    - name: value
-      type:
-        scalar: string
-- name: com.github.onmetal.onmetal-api.api.common.v1alpha1.UIDReference
-  map:
-    fields:
-    - name: name
-      type:
-        scalar: string
-      default: ""
-    - name: namespace
-      type:
-        scalar: string
-    - name: uid
-      type:
-        scalar: string
-    elementRelationship: atomic
 - name: com.github.onmetal.onmetal-api.api.compute.v1alpha1.DaemonEndpoint
   map:
     fields:
@@ -262,7 +193,7 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         list:
           elementType:
-            namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.Taint
+            namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.Taint
           elementRelationship: atomic
 - name: com.github.onmetal.onmetal-api.api.compute.v1alpha1.MachinePoolStatus
   map:
@@ -305,7 +236,7 @@ var schemaYAML = typed.YAMLObject(`types:
           - name
     - name: ignitionRef
       type:
-        namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.SecretKeySelector
+        namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.SecretKeySelector
     - name: image
       type:
         scalar: string
@@ -339,7 +270,7 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         list:
           elementType:
-            namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.Toleration
+            namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.Toleration
           elementRelationship: atomic
     - name: volumes
       type:
@@ -396,7 +327,7 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         list:
           elementType:
-            namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IP
+            namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.IP
           elementRelationship: atomic
     - name: lastPhaseTransitionTime
       type:
@@ -419,7 +350,7 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: virtualIP
       type:
-        namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IP
+        namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.IP
 - name: com.github.onmetal.onmetal-api.api.compute.v1alpha1.Volume
   map:
     fields:
@@ -461,6 +392,22 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: state
       type:
         scalar: string
+- name: com.github.onmetal.onmetal-api.api.core.v1alpha1.IP
+  scalar: untyped
+- name: com.github.onmetal.onmetal-api.api.core.v1alpha1.IPPrefix
+  scalar: untyped
+- name: com.github.onmetal.onmetal-api.api.core.v1alpha1.LocalUIDReference
+  map:
+    fields:
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: uid
+      type:
+        scalar: string
+      default: ""
+    elementRelationship: atomic
 - name: com.github.onmetal.onmetal-api.api.core.v1alpha1.ObjectSelector
   map:
     fields:
@@ -550,6 +497,59 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             scalar: string
           elementRelationship: atomic
+- name: com.github.onmetal.onmetal-api.api.core.v1alpha1.SecretKeySelector
+  map:
+    fields:
+    - name: key
+      type:
+        scalar: string
+    - name: name
+      type:
+        scalar: string
+    elementRelationship: atomic
+- name: com.github.onmetal.onmetal-api.api.core.v1alpha1.Taint
+  map:
+    fields:
+    - name: effect
+      type:
+        scalar: string
+      default: ""
+    - name: key
+      type:
+        scalar: string
+      default: ""
+    - name: value
+      type:
+        scalar: string
+- name: com.github.onmetal.onmetal-api.api.core.v1alpha1.Toleration
+  map:
+    fields:
+    - name: effect
+      type:
+        scalar: string
+    - name: key
+      type:
+        scalar: string
+    - name: operator
+      type:
+        scalar: string
+    - name: value
+      type:
+        scalar: string
+- name: com.github.onmetal.onmetal-api.api.core.v1alpha1.UIDReference
+  map:
+    fields:
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: namespace
+      type:
+        scalar: string
+    - name: uid
+      type:
+        scalar: string
+    elementRelationship: atomic
 - name: com.github.onmetal.onmetal-api.api.ipam.v1alpha1.Prefix
   map:
     fields:
@@ -600,7 +600,7 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: prefix
       type:
-        namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IPPrefix
+        namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.IPPrefix
     - name: prefixLength
       type:
         scalar: numeric
@@ -621,7 +621,7 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: prefix
       type:
-        namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IPPrefix
+        namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.IPPrefix
 - name: com.github.onmetal.onmetal-api.api.ipam.v1alpha1.PrefixSpec
   map:
     fields:
@@ -636,7 +636,7 @@ var schemaYAML = typed.YAMLObject(`types:
         namedType: io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector
     - name: prefix
       type:
-        namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IPPrefix
+        namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.IPPrefix
     - name: prefixLength
       type:
         scalar: numeric
@@ -653,7 +653,7 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         list:
           elementType:
-            namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IPPrefix
+            namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.IPPrefix
           elementRelationship: atomic
 - name: com.github.onmetal.onmetal-api.api.ipam.v1alpha1.PrefixTemplateSpec
   map:
@@ -697,7 +697,7 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         list:
           elementType:
-            namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.LocalUIDReference
+            namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.LocalUIDReference
           elementRelationship: atomic
     - name: kind
       type:
@@ -708,7 +708,7 @@ var schemaYAML = typed.YAMLObject(`types:
       default: {}
     - name: networkRef
       type:
-        namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.LocalUIDReference
+        namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.LocalUIDReference
       default: {}
 - name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.AliasPrefixSpec
   map:
@@ -729,7 +729,7 @@ var schemaYAML = typed.YAMLObject(`types:
     fields:
     - name: prefix
       type:
-        namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IPPrefix
+        namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.IPPrefix
 - name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.EphemeralPrefixSource
   map:
     fields:
@@ -747,13 +747,13 @@ var schemaYAML = typed.YAMLObject(`types:
     fields:
     - name: cidr
       type:
-        namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IPPrefix
+        namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.IPPrefix
       default: {}
     - name: except
       type:
         list:
           elementType:
-            namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IPPrefix
+            namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.IPPrefix
           elementRelationship: atomic
 - name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.IPSource
   map:
@@ -763,7 +763,7 @@ var schemaYAML = typed.YAMLObject(`types:
         namedType: com.github.onmetal.onmetal-api.api.networking.v1alpha1.EphemeralPrefixSource
     - name: value
       type:
-        namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IP
+        namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.IP
 - name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.LoadBalancer
   map:
     fields:
@@ -808,7 +808,7 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         list:
           elementType:
-            namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.LocalUIDReference
+            namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.LocalUIDReference
           elementRelationship: atomic
     - name: kind
       type:
@@ -819,7 +819,7 @@ var schemaYAML = typed.YAMLObject(`types:
       default: {}
     - name: networkRef
       type:
-        namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.LocalUIDReference
+        namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.LocalUIDReference
       default: {}
 - name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.LoadBalancerSpec
   map:
@@ -860,7 +860,7 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         list:
           elementType:
-            namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IP
+            namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.IP
           elementRelationship: atomic
 - name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NATGateway
   map:
@@ -909,7 +909,7 @@ var schemaYAML = typed.YAMLObject(`types:
       default: 0
     - name: ip
       type:
-        namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IP
+        namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.IP
       default: {}
     - name: port
       type:
@@ -927,7 +927,7 @@ var schemaYAML = typed.YAMLObject(`types:
     fields:
     - name: ip
       type:
-        namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IP
+        namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.IP
       default: {}
     - name: name
       type:
@@ -954,7 +954,7 @@ var schemaYAML = typed.YAMLObject(`types:
       default: {}
     - name: networkRef
       type:
-        namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.LocalUIDReference
+        namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.LocalUIDReference
       default: {}
 - name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NATGatewaySpec
   map:
@@ -1058,7 +1058,7 @@ var schemaYAML = typed.YAMLObject(`types:
           elementRelationship: atomic
     - name: machineRef
       type:
-        namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.LocalUIDReference
+        namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.LocalUIDReference
     - name: networkRef
       type:
         namedType: io.k8s.api.core.v1.LocalObjectReference
@@ -1073,7 +1073,7 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         list:
           elementType:
-            namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IP
+            namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.IP
           elementRelationship: atomic
     - name: lastPhaseTransitionTime
       type:
@@ -1095,7 +1095,7 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: virtualIP
       type:
-        namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IP
+        namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.IP
 - name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkInterfaceTemplateSpec
   map:
     fields:
@@ -1116,7 +1116,7 @@ var schemaYAML = typed.YAMLObject(`types:
       default: ""
     - name: networkRef
       type:
-        namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.UIDReference
+        namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.UIDReference
       default: {}
 - name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPeeringStatus
   map:
@@ -1307,7 +1307,7 @@ var schemaYAML = typed.YAMLObject(`types:
         namedType: com.github.onmetal.onmetal-api.api.networking.v1alpha1.EphemeralPrefixSource
     - name: value
       type:
-        namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IPPrefix
+        namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.IPPrefix
 - name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.VirtualIP
   map:
     fields:
@@ -1347,7 +1347,7 @@ var schemaYAML = typed.YAMLObject(`types:
       default: ""
     - name: targetRef
       type:
-        namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.LocalUIDReference
+        namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.LocalUIDReference
     - name: type
       type:
         scalar: string
@@ -1357,7 +1357,7 @@ var schemaYAML = typed.YAMLObject(`types:
     fields:
     - name: ip
       type:
-        namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IP
+        namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.IP
     - name: phase
       type:
         scalar: string
@@ -1480,7 +1480,7 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         list:
           elementType:
-            namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.Taint
+            namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.Taint
           elementRelationship: atomic
 - name: com.github.onmetal.onmetal-api.api.storage.v1alpha1.BucketPoolStatus
   map:
@@ -1512,7 +1512,7 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         list:
           elementType:
-            namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.Toleration
+            namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.Toleration
           elementRelationship: atomic
 - name: com.github.onmetal.onmetal-api.api.storage.v1alpha1.BucketStatus
   map:
@@ -1679,7 +1679,7 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         list:
           elementType:
-            namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.Taint
+            namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.Taint
           elementRelationship: atomic
 - name: com.github.onmetal.onmetal-api.api.storage.v1alpha1.VolumePoolStatus
   map:
@@ -1714,7 +1714,7 @@ var schemaYAML = typed.YAMLObject(`types:
     fields:
     - name: claimRef
       type:
-        namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.LocalUIDReference
+        namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.LocalUIDReference
     - name: encryption
       type:
         namedType: com.github.onmetal.onmetal-api.api.storage.v1alpha1.VolumeEncryption
@@ -1733,7 +1733,7 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         list:
           elementType:
-            namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.Toleration
+            namedType: com.github.onmetal.onmetal-api.api.core.v1alpha1.Toleration
           elementRelationship: atomic
     - name: unclaimable
       type:

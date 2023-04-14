@@ -15,7 +15,7 @@
 package validation_test
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	"github.com/onmetal/onmetal-api/internal/apis/core"
 	"github.com/onmetal/onmetal-api/internal/apis/storage"
 	. "github.com/onmetal/onmetal-api/internal/apis/storage/validation"
@@ -69,7 +69,7 @@ var _ = Describe("Volume", func() {
 		Entry("invalid claim ref name",
 			&storage.Volume{
 				Spec: storage.VolumeSpec{
-					ClaimRef: &commonv1alpha1.LocalUIDReference{Name: "foo*"},
+					ClaimRef: &corev1alpha1.LocalUIDReference{Name: "foo*"},
 				},
 			},
 			ContainElement(InvalidField("spec.claimRef.name")),
@@ -78,7 +78,7 @@ var _ = Describe("Volume", func() {
 			&storage.Volume{
 				Spec: storage.VolumeSpec{
 					Unclaimable: true,
-					ClaimRef:    &commonv1alpha1.LocalUIDReference{Name: "foo"},
+					ClaimRef:    &corev1alpha1.LocalUIDReference{Name: "foo"},
 				},
 			},
 			ContainElement(ForbiddenField("spec.claimRef")),

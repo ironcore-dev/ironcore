@@ -26,7 +26,7 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/clientutils"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	ipamclient "github.com/onmetal/onmetal-api/internal/client/ipam"
 	"github.com/onmetal/onmetal-api/utils/equality"
@@ -205,7 +205,7 @@ func (r *PrefixReconciler) allocationMatchesPrefix(allocation *ipamv1alpha1.Pref
 		return false
 	}
 
-	equalPrefixPointers := func(p1, p2 *commonv1alpha1.IPPrefix) bool {
+	equalPrefixPointers := func(p1, p2 *corev1alpha1.IPPrefix) bool {
 		return (p1 == nil) == (p2 == nil) && (p1 == nil || *p1 == *p2)
 	}
 
@@ -245,7 +245,7 @@ func (r *PrefixReconciler) prefixAllocationLess(allocation, other *ipamv1alpha1.
 
 func (r *PrefixReconciler) newAllocationForPrefix(prefix *ipamv1alpha1.Prefix) (*ipamv1alpha1.PrefixAllocation, error) {
 	var (
-		allocationPrefix       *commonv1alpha1.IPPrefix
+		allocationPrefix       *corev1alpha1.IPPrefix
 		allocationPrefixLength int32
 	)
 	if prefixPrefix := prefix.Spec.Prefix; prefixPrefix.IsValid() {
@@ -470,7 +470,7 @@ func (r *PrefixReconciler) assignPrefix(ctx context.Context, prefix *ipamv1alpha
 	return nil
 }
 
-func (r *PrefixReconciler) processAllocations(ctx context.Context, log logr.Logger, prefix *ipamv1alpha1.Prefix) (used []commonv1alpha1.IPPrefix, err error) {
+func (r *PrefixReconciler) processAllocations(ctx context.Context, log logr.Logger, prefix *ipamv1alpha1.Prefix) (used []corev1alpha1.IPPrefix, err error) {
 	list := &ipamv1alpha1.PrefixAllocationList{}
 	log.V(1).Info("Listing referencing allocations")
 	if err := r.List(ctx, list,
@@ -510,7 +510,7 @@ func (r *PrefixReconciler) processAllocations(ctx context.Context, log logr.Logg
 
 		availableSet = newAvailableSet
 		if res.IsValid() {
-			used = append(used, commonv1alpha1.IPPrefix{Prefix: res})
+			used = append(used, corev1alpha1.IPPrefix{Prefix: res})
 		}
 	}
 
@@ -522,7 +522,7 @@ func (r *PrefixReconciler) processAllocations(ctx context.Context, log logr.Logg
 func (r *PrefixReconciler) patchAllocationStatus(
 	ctx context.Context,
 	allocation *ipamv1alpha1.PrefixAllocation,
-	prefix *commonv1alpha1.IPPrefix,
+	prefix *corev1alpha1.IPPrefix,
 	phase ipamv1alpha1.PrefixAllocationPhase,
 ) error {
 	now := metav1.Now()
@@ -567,7 +567,7 @@ func (r *PrefixReconciler) processAllocation(
 		return available, netip.Prefix{}, nil
 	default:
 		log.V(1).Info("Marking allocation as allocated")
-		if err := r.patchAllocationStatus(ctx, allocation, commonv1alpha1.NewIPPrefix(res), ipamv1alpha1.PrefixAllocationPhaseAllocated); err != nil {
+		if err := r.patchAllocationStatus(ctx, allocation, corev1alpha1.NewIPPrefix(res), ipamv1alpha1.PrefixAllocationPhaseAllocated); err != nil {
 			return available, netip.Prefix{}, fmt.Errorf("error marking allocation as succeeded: %w", err)
 		}
 		return newAvailableSet, res, nil

@@ -15,7 +15,6 @@
 package v1alpha1
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -55,10 +54,10 @@ type NetworkPolicyPort struct {
 // IPBlock specifies an ip block with optional exceptions.
 type IPBlock struct {
 	// CIDR is a string representing the ip block.
-	CIDR commonv1alpha1.IPPrefix `json:"cidr"`
+	CIDR corev1alpha1.IPPrefix `json:"cidr"`
 	// Except is a slice of CIDRs that should not be included within the specified CIDR.
 	// Values will be rejected if they are outside CIDR.
-	Except []commonv1alpha1.IPPrefix `json:"except,omitempty"`
+	Except []corev1alpha1.IPPrefix `json:"except,omitempty"`
 }
 
 // NetworkPolicyPeer describes a peer to allow traffic to / from.

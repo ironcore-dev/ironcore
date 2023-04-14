@@ -18,7 +18,7 @@ import (
 	"context"
 	"fmt"
 
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	"golang.org/x/exp/slices"
@@ -30,7 +30,7 @@ func (s *Server) DeleteNetworkInterfaceNAT(ctx context.Context, req *ori.DeleteN
 	networkInterfaceID := req.NetworkInterfaceId
 	log := s.loggerFrom(ctx, "NetworkInterfaceID", networkInterfaceID)
 
-	natIP, err := commonv1alpha1.ParseIP(req.NatIp)
+	natIP, err := corev1alpha1.ParseIP(req.NatIp)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing nat ip: %w", err)
 	}

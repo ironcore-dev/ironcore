@@ -18,7 +18,7 @@ import (
 	"context"
 	"fmt"
 
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/apiutils"
@@ -30,7 +30,7 @@ type AggregateOnmetalNetworkInterface struct {
 	NetworkInterface    *networkingv1alpha1.NetworkInterface
 	Network             *networkingv1alpha1.Network
 	VirtualIP           *networkingv1alpha1.VirtualIP
-	Prefixes            []commonv1alpha1.IPPrefix
+	Prefixes            []corev1alpha1.IPPrefix
 	LoadBalancerTargets []machinebrokerv1alpha1.LoadBalancerTarget
 	NATGatewayTargets   []machinebrokerv1alpha1.NATGatewayTarget
 }

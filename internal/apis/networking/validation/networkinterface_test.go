@@ -17,7 +17,7 @@
 package validation
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	"github.com/onmetal/onmetal-api/internal/apis/ipam"
 	"github.com/onmetal/onmetal-api/internal/apis/networking"
 	. "github.com/onmetal/onmetal-api/internal/testutils/validation"
@@ -61,7 +61,7 @@ var _ = Describe("NetworkInterface", func() {
 		Entry("invalid machine ref name",
 			&networking.NetworkInterface{
 				Spec: networking.NetworkInterfaceSpec{
-					MachineRef: &commonv1alpha1.LocalUIDReference{Name: "foo*"},
+					MachineRef: &corev1alpha1.LocalUIDReference{Name: "foo*"},
 				},
 			},
 			ContainElement(InvalidField("spec.machineRef.name")),
@@ -207,12 +207,12 @@ var _ = Describe("NetworkInterface", func() {
 		Entry("mutable machine ref",
 			&networking.NetworkInterface{
 				Spec: networking.NetworkInterfaceSpec{
-					MachineRef: &commonv1alpha1.LocalUIDReference{Name: "bar"},
+					MachineRef: &corev1alpha1.LocalUIDReference{Name: "bar"},
 				},
 			},
 			&networking.NetworkInterface{
 				Spec: networking.NetworkInterfaceSpec{
-					MachineRef: &commonv1alpha1.LocalUIDReference{Name: "foo"},
+					MachineRef: &corev1alpha1.LocalUIDReference{Name: "foo"},
 				},
 			},
 			Not(ContainElement(ForbiddenField("spec"))),
@@ -222,7 +222,7 @@ var _ = Describe("NetworkInterface", func() {
 				Spec: networking.NetworkInterfaceSpec{
 					IPs: []networking.IPSource{
 						{
-							Value: commonv1alpha1.MustParseNewIP("10.0.0.1"),
+							Value: corev1alpha1.MustParseNewIP("10.0.0.1"),
 						},
 					},
 				},
@@ -231,7 +231,7 @@ var _ = Describe("NetworkInterface", func() {
 				Spec: networking.NetworkInterfaceSpec{
 					IPs: []networking.IPSource{
 						{
-							Value: commonv1alpha1.MustParseNewIP("10.0.0.2"),
+							Value: corev1alpha1.MustParseNewIP("10.0.0.2"),
 						},
 					},
 				},

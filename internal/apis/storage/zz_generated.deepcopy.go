@@ -21,8 +21,7 @@
 package storage
 
 import (
-	v1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
-	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
+	v1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	core "github.com/onmetal/onmetal-api/internal/apis/core"
 	v1 "k8s.io/api/core/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
@@ -689,14 +688,14 @@ func (in *VolumePoolStatus) DeepCopyInto(out *VolumePoolStatus) {
 	}
 	if in.Available != nil {
 		in, out := &in.Available, &out.Available
-		*out = make(corev1alpha1.ResourceList, len(*in))
+		*out = make(v1alpha1.ResourceList, len(*in))
 		for key, val := range *in {
 			(*out)[key] = val.DeepCopy()
 		}
 	}
 	if in.Used != nil {
 		in, out := &in.Used, &out.Used
-		*out = make(corev1alpha1.ResourceList, len(*in))
+		*out = make(v1alpha1.ResourceList, len(*in))
 		for key, val := range *in {
 			(*out)[key] = val.DeepCopy()
 		}

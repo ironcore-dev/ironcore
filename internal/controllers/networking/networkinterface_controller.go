@@ -22,7 +22,7 @@ import (
 	"strings"
 
 	"github.com/go-logr/logr"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	networkingclient "github.com/onmetal/onmetal-api/internal/client/networking"
@@ -130,8 +130,8 @@ func (r *NetworkInterfaceReconciler) updateStatus(
 	nic *networkingv1alpha1.NetworkInterface,
 	state networkingv1alpha1.NetworkInterfaceState,
 	networkHandle string,
-	ips []commonv1alpha1.IP,
-	virtualIP *commonv1alpha1.IP,
+	ips []corev1alpha1.IP,
+	virtualIP *corev1alpha1.IP,
 ) error {
 	now := metav1.Now()
 	base := nic.DeepCopy()
@@ -168,9 +168,9 @@ func (r *NetworkInterfaceReconciler) getNetworkHandle(ctx context.Context, nic *
 	}
 }
 
-func (r *NetworkInterfaceReconciler) applyIPs(ctx context.Context, nic *networkingv1alpha1.NetworkInterface) ([]commonv1alpha1.IP, string, error) {
+func (r *NetworkInterfaceReconciler) applyIPs(ctx context.Context, nic *networkingv1alpha1.NetworkInterface) ([]corev1alpha1.IP, string, error) {
 	var (
-		ips             []commonv1alpha1.IP
+		ips             []corev1alpha1.IP
 		notReadyReasons []string
 	)
 	for idx, ipSource := range nic.Spec.IPs {
@@ -189,7 +189,7 @@ func (r *NetworkInterfaceReconciler) applyIPs(ctx context.Context, nic *networki
 	return ips, strings.Join(notReadyReasons, ", "), nil
 }
 
-func (r *NetworkInterfaceReconciler) applyIP(ctx context.Context, nic *networkingv1alpha1.NetworkInterface, ipSource networkingv1alpha1.IPSource, idx int) (commonv1alpha1.IP, string, error) {
+func (r *NetworkInterfaceReconciler) applyIP(ctx context.Context, nic *networkingv1alpha1.NetworkInterface, ipSource networkingv1alpha1.IPSource, idx int) (corev1alpha1.IP, string, error) {
 	switch {
 	case ipSource.Value != nil:
 		return *ipSource.Value, "", nil
@@ -208,21 +208,21 @@ func (r *NetworkInterfaceReconciler) applyIP(ctx context.Context, nic *networkin
 			return nil
 		}); err != nil {
 			if !errors.Is(err, client2.ErrNotControlled) {
-				return commonv1alpha1.IP{}, "", fmt.Errorf("error managing ephemeral prefix %s: %w", prefix.Name, err)
+				return corev1alpha1.IP{}, "", fmt.Errorf("error managing ephemeral prefix %s: %w", prefix.Name, err)
 			}
-			return commonv1alpha1.IP{}, fmt.Sprintf("Prefix %s cannot be managed", prefix.Name), nil
+			return corev1alpha1.IP{}, fmt.Sprintf("Prefix %s cannot be managed", prefix.Name), nil
 		}
 
 		if prefix.Status.Phase != ipamv1alpha1.PrefixPhaseAllocated {
-			return commonv1alpha1.IP{}, fmt.Sprintf("Prefix %s is not in state %s but %s", prefix.Name, ipamv1alpha1.PrefixPhaseAllocated, prefix.Status.Phase), nil
+			return corev1alpha1.IP{}, fmt.Sprintf("Prefix %s is not in state %s but %s", prefix.Name, ipamv1alpha1.PrefixPhaseAllocated, prefix.Status.Phase), nil
 		}
 		return prefix.Spec.Prefix.IP(), "", nil
 	default:
-		return commonv1alpha1.IP{}, "", fmt.Errorf("unknown ip source %#v", ipSource)
+		return corev1alpha1.IP{}, "", fmt.Errorf("unknown ip source %#v", ipSource)
 	}
 }
 
-func (r *NetworkInterfaceReconciler) applyVirtualIP(ctx context.Context, log logr.Logger, nic *networkingv1alpha1.NetworkInterface) (*commonv1alpha1.IP, string, error) {
+func (r *NetworkInterfaceReconciler) applyVirtualIP(ctx context.Context, log logr.Logger, nic *networkingv1alpha1.NetworkInterface) (*corev1alpha1.IP, string, error) {
 	virtualIP := nic.Spec.VirtualIP
 	switch {
 	case virtualIP == nil:
@@ -255,7 +255,7 @@ func (r *NetworkInterfaceReconciler) applyVirtualIP(ctx context.Context, log log
 			vip.Labels = ephemeral.VirtualIPTemplate.Labels
 			vip.Annotations = ephemeral.VirtualIPTemplate.Annotations
 			vip.Spec = ephemeral.VirtualIPTemplate.Spec
-			vip.Spec.TargetRef = &commonv1alpha1.LocalUIDReference{Name: nic.Name, UID: nic.UID}
+			vip.Spec.TargetRef = &corev1alpha1.LocalUIDReference{Name: nic.Name, UID: nic.UID}
 			return nil
 		}); err != nil {
 			if !errors.Is(client2.ErrNotControlled, err) {
@@ -271,8 +271,8 @@ func (r *NetworkInterfaceReconciler) applyVirtualIP(ctx context.Context, log log
 	}
 }
 
-func (r *NetworkInterfaceReconciler) getVirtualIPIP(nic *networkingv1alpha1.NetworkInterface, vip *networkingv1alpha1.VirtualIP) (*commonv1alpha1.IP, string) {
-	if !reflect.DeepEqual(vip.Spec.TargetRef, &commonv1alpha1.LocalUIDReference{Name: nic.Name, UID: nic.UID}) {
+func (r *NetworkInterfaceReconciler) getVirtualIPIP(nic *networkingv1alpha1.NetworkInterface, vip *networkingv1alpha1.VirtualIP) (*corev1alpha1.IP, string) {
+	if !reflect.DeepEqual(vip.Spec.TargetRef, &corev1alpha1.LocalUIDReference{Name: nic.Name, UID: nic.UID}) {
 		return nil, fmt.Sprintf("Virtual IP %s does not target network interface", vip.Name)
 	}
 

@@ -21,7 +21,6 @@
 package v1alpha1
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
@@ -98,7 +97,7 @@ func (in *AliasPrefixRouting) DeepCopyInto(out *AliasPrefixRouting) {
 	out.NetworkRef = in.NetworkRef
 	if in.Destinations != nil {
 		in, out := &in.Destinations, &out.Destinations
-		*out = make([]commonv1alpha1.LocalUIDReference, len(*in))
+		*out = make([]corev1alpha1.LocalUIDReference, len(*in))
 		copy(*out, *in)
 	}
 	return
@@ -246,7 +245,7 @@ func (in *IPBlock) DeepCopyInto(out *IPBlock) {
 	in.CIDR.DeepCopyInto(&out.CIDR)
 	if in.Except != nil {
 		in, out := &in.Except, &out.Except
-		*out = make([]commonv1alpha1.IPPrefix, len(*in))
+		*out = make([]corev1alpha1.IPPrefix, len(*in))
 		for i := range *in {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
@@ -384,7 +383,7 @@ func (in *LoadBalancerRouting) DeepCopyInto(out *LoadBalancerRouting) {
 	out.NetworkRef = in.NetworkRef
 	if in.Destinations != nil {
 		in, out := &in.Destinations, &out.Destinations
-		*out = make([]commonv1alpha1.LocalUIDReference, len(*in))
+		*out = make([]corev1alpha1.LocalUIDReference, len(*in))
 		copy(*out, *in)
 	}
 	return
@@ -487,7 +486,7 @@ func (in *LoadBalancerStatus) DeepCopyInto(out *LoadBalancerStatus) {
 	*out = *in
 	if in.IPs != nil {
 		in, out := &in.IPs, &out.IPs
-		*out = make([]commonv1alpha1.IP, len(*in))
+		*out = make([]corev1alpha1.IP, len(*in))
 		for i := range *in {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
@@ -866,7 +865,7 @@ func (in *NetworkInterfaceSpec) DeepCopyInto(out *NetworkInterfaceSpec) {
 	out.NetworkRef = in.NetworkRef
 	if in.MachineRef != nil {
 		in, out := &in.MachineRef, &out.MachineRef
-		*out = new(commonv1alpha1.LocalUIDReference)
+		*out = new(corev1alpha1.LocalUIDReference)
 		**out = **in
 	}
 	if in.IPFamilies != nil {
@@ -908,7 +907,7 @@ func (in *NetworkInterfaceStatus) DeepCopyInto(out *NetworkInterfaceStatus) {
 	}
 	if in.IPs != nil {
 		in, out := &in.IPs, &out.IPs
-		*out = make([]commonv1alpha1.IP, len(*in))
+		*out = make([]corev1alpha1.IP, len(*in))
 		for i := range *in {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
@@ -1438,7 +1437,7 @@ func (in *VirtualIPSpec) DeepCopyInto(out *VirtualIPSpec) {
 	*out = *in
 	if in.TargetRef != nil {
 		in, out := &in.TargetRef, &out.TargetRef
-		*out = new(commonv1alpha1.LocalUIDReference)
+		*out = new(corev1alpha1.LocalUIDReference)
 		**out = **in
 	}
 	return

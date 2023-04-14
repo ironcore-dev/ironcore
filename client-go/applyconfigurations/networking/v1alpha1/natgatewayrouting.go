@@ -19,7 +19,7 @@ package v1alpha1
 
 import (
 	apinetworkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	v1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/common/v1alpha1"
+	v1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/core/v1alpha1"
 	internal "github.com/onmetal/onmetal-api/client-go/applyconfigurations/internal"
 	v1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/meta/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

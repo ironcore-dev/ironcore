@@ -17,7 +17,6 @@
 package storage
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
@@ -76,7 +75,7 @@ var _ = Describe("VolumeReconciler", func() {
 		By("waiting for the volume to be bound to the machine")
 		Eventually(Object(volume)).Should(SatisfyAll(
 			HaveField("Status.Phase", Equal(storagev1alpha1.VolumePhaseBound)),
-			HaveField("Spec.ClaimRef", Equal(&commonv1alpha1.LocalUIDReference{
+			HaveField("Spec.ClaimRef", Equal(&corev1alpha1.LocalUIDReference{
 				Name: machine.Name,
 				UID:  machine.UID,
 			})),

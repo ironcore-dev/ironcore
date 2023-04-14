@@ -20,8 +20,8 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/gogo/protobuf/proto"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
@@ -41,7 +41,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func (r *MachineReconciler) ipsToStrings(ips []commonv1alpha1.IP) []string {
+func (r *MachineReconciler) ipsToStrings(ips []corev1alpha1.IP) []string {
 	res := make([]string, len(ips))
 	for i, ip := range ips {
 		res[i] = ip.Addr.String()
@@ -644,7 +644,7 @@ func (r *MachineReconciler) aliasPrefixesForNetworkInterface(
 
 		if slices.ContainsFunc(
 			aliasPrefixRouting.Destinations,
-			func(ref commonv1alpha1.LocalUIDReference) bool { return ref.UID == networkInterface.UID },
+			func(ref corev1alpha1.LocalUIDReference) bool { return ref.UID == networkInterface.UID },
 		) {
 			prefixes.Insert(prefix.String())
 		}
@@ -692,7 +692,7 @@ func (r *MachineReconciler) loadBalancerTargetsForNetworkInterface(
 
 		if !slices.ContainsFunc(
 			loadBalancerRouting.Destinations,
-			func(r commonv1alpha1.LocalUIDReference) bool { return r.UID == networkInterface.UID },
+			func(r corev1alpha1.LocalUIDReference) bool { return r.UID == networkInterface.UID },
 		) {
 			continue
 		}

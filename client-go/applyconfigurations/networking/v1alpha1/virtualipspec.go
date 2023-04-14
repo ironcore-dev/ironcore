@@ -19,16 +19,16 @@ package v1alpha1
 
 import (
 	v1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/core/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 )
 
 // VirtualIPSpecApplyConfiguration represents an declarative configuration of the VirtualIPSpec type for use
 // with apply.
 type VirtualIPSpecApplyConfiguration struct {
-	Type      *v1alpha1.VirtualIPType                             `json:"type,omitempty"`
-	IPFamily  *v1.IPFamily                                        `json:"ipFamily,omitempty"`
-	TargetRef *commonv1alpha1.LocalUIDReferenceApplyConfiguration `json:"targetRef,omitempty"`
+	Type      *v1alpha1.VirtualIPType                           `json:"type,omitempty"`
+	IPFamily  *v1.IPFamily                                      `json:"ipFamily,omitempty"`
+	TargetRef *corev1alpha1.LocalUIDReferenceApplyConfiguration `json:"targetRef,omitempty"`
 }
 
 // VirtualIPSpecApplyConfiguration constructs an declarative configuration of the VirtualIPSpec type for use with
@@ -56,7 +56,7 @@ func (b *VirtualIPSpecApplyConfiguration) WithIPFamily(value v1.IPFamily) *Virtu
 // WithTargetRef sets the TargetRef field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the TargetRef field is set to the value of the last call.
-func (b *VirtualIPSpecApplyConfiguration) WithTargetRef(value *commonv1alpha1.LocalUIDReferenceApplyConfiguration) *VirtualIPSpecApplyConfiguration {
+func (b *VirtualIPSpecApplyConfiguration) WithTargetRef(value *corev1alpha1.LocalUIDReferenceApplyConfiguration) *VirtualIPSpecApplyConfiguration {
 	b.TargetRef = value
 	return b
 }

@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"sort"
 
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 )
@@ -78,7 +78,7 @@ func LoadBalancerPortsKey(ports []LoadBalancerPort) string {
 
 type LoadBalancerTarget struct {
 	LoadBalancerType networkingv1alpha1.LoadBalancerType
-	IP               commonv1alpha1.IP
+	IP               corev1alpha1.IP
 	Ports            []LoadBalancerPort
 }
 
@@ -90,13 +90,13 @@ func (t LoadBalancerTarget) Key() string {
 type LoadBalancer struct {
 	Type          networkingv1alpha1.LoadBalancerType
 	NetworkHandle string
-	IP            commonv1alpha1.IP
+	IP            corev1alpha1.IP
 	Ports         []LoadBalancerPort
 	Destinations  []string
 }
 
 type NATGatewayTarget struct {
-	IP      commonv1alpha1.IP
+	IP      corev1alpha1.IP
 	Port    int32
 	EndPort int32
 }
@@ -109,6 +109,6 @@ type NATGatewayDestination struct {
 
 type NATGateway struct {
 	NetworkHandle string
-	IP            commonv1alpha1.IP
+	IP            corev1alpha1.IP
 	Destinations  []NATGatewayDestination
 }

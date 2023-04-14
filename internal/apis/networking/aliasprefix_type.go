@@ -17,7 +17,7 @@
 package networking
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -37,7 +37,7 @@ type AliasPrefixSpec struct {
 // PrefixSource is the source of the Prefix definition in an AliasPrefix
 type PrefixSource struct {
 	// Value is a single IPPrefix value as defined in the AliasPrefix
-	Value *commonv1alpha1.IPPrefix
+	Value *corev1alpha1.IPPrefix
 	// EphemeralPrefix defines the Prefix which should be allocated by the AliasPrefix
 	Ephemeral *EphemeralPrefixSource
 }
@@ -45,7 +45,7 @@ type PrefixSource struct {
 // AliasPrefixStatus defines the observed state of AliasPrefix
 type AliasPrefixStatus struct {
 	// Prefix is the Prefix reserved by this AliasPrefix
-	Prefix *commonv1alpha1.IPPrefix
+	Prefix *corev1alpha1.IPPrefix
 }
 
 // +genclient

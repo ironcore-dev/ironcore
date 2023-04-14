@@ -21,7 +21,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 )
 
 // MachineSpec defines the desired state of Machine
@@ -46,12 +46,12 @@ type MachineSpec struct {
 	Volumes []Volume
 	// IgnitionRef is a reference to a secret containing the ignition YAML for the machine to boot up.
 	// If key is empty, DefaultIgnitionKey will be used as fallback.
-	IgnitionRef *commonv1alpha1.SecretKeySelector
+	IgnitionRef *corev1alpha1.SecretKeySelector
 	// EFIVars are variables to pass to EFI while booting up.
 	EFIVars []EFIVar
 	// Tolerations define tolerations the Machine has. Only MachinePools whose taints
 	// covered by Tolerations will be considered to run the Machine.
-	Tolerations []commonv1alpha1.Toleration
+	Tolerations []corev1alpha1.Toleration
 }
 
 // Power is the desired power state of a Machine.
@@ -134,9 +134,9 @@ type NetworkInterfaceStatus struct {
 	// NetworkHandle is the handle of the network the NetworkInterface is in.
 	NetworkHandle string
 	// IPs are the ips allocated for the network interface.
-	IPs []commonv1alpha1.IP
+	IPs []corev1alpha1.IP
 	// VirtualIP is the virtual ip allocated for the network interface.
-	VirtualIP *commonv1alpha1.IP
+	VirtualIP *corev1alpha1.IP
 	// State represents the attachment state of a NetworkInterface.
 	State NetworkInterfaceState
 	// LastStateTransitionTime is the last time the State transitioned.

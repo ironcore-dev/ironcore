@@ -17,7 +17,7 @@
 package networking
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 )
@@ -31,7 +31,7 @@ type NATGatewayRouting struct {
 	metav1.ObjectMeta
 
 	// NetworkRef is the network the NAT gateway is assigned to.
-	NetworkRef commonv1alpha1.LocalUIDReference
+	NetworkRef corev1alpha1.LocalUIDReference
 
 	// Destinations are the destinations for an NATGateway.
 	Destinations []NATGatewayDestination
@@ -48,7 +48,7 @@ type NATGatewayDestination struct {
 
 type NATGatewayDestinationIP struct {
 	// IP is the ip used for the NAT gateway.
-	IP commonv1alpha1.IP
+	IP corev1alpha1.IP
 	// Port is the first port used by the destination.
 	Port int32
 	// EndPort is the last port used by the destination.

@@ -17,7 +17,7 @@
 package v1alpha1
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -30,10 +30,10 @@ type AliasPrefixRouting struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	// NetworkRef is the network the load balancer is assigned to.
-	NetworkRef commonv1alpha1.LocalUIDReference `json:"networkRef"`
+	NetworkRef corev1alpha1.LocalUIDReference `json:"networkRef"`
 
 	// Destinations are the destinations for an AliasPrefix.
-	Destinations []commonv1alpha1.LocalUIDReference `json:"destinations"`
+	Destinations []corev1alpha1.LocalUIDReference `json:"destinations"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

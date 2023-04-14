@@ -18,7 +18,7 @@
 package v1alpha1
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	v1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -30,8 +30,8 @@ type NetworkInterfaceStatusApplyConfiguration struct {
 	State                   *v1alpha1.NetworkInterfaceState `json:"state,omitempty"`
 	LastStateTransitionTime *v1.Time                        `json:"lastStateTransitionTime,omitempty"`
 	NetworkHandle           *string                         `json:"networkHandle,omitempty"`
-	IPs                     []commonv1alpha1.IP             `json:"ips,omitempty"`
-	VirtualIP               *commonv1alpha1.IP              `json:"virtualIP,omitempty"`
+	IPs                     []corev1alpha1.IP               `json:"ips,omitempty"`
+	VirtualIP               *corev1alpha1.IP                `json:"virtualIP,omitempty"`
 	Phase                   *v1alpha1.NetworkInterfacePhase `json:"phase,omitempty"`
 	MachinePoolRef          *corev1.LocalObjectReference    `json:"machinePoolRef,omitempty"`
 	LastPhaseTransitionTime *v1.Time                        `json:"lastPhaseTransitionTime,omitempty"`
@@ -70,7 +70,7 @@ func (b *NetworkInterfaceStatusApplyConfiguration) WithNetworkHandle(value strin
 // WithIPs adds the given value to the IPs field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the IPs field.
-func (b *NetworkInterfaceStatusApplyConfiguration) WithIPs(values ...commonv1alpha1.IP) *NetworkInterfaceStatusApplyConfiguration {
+func (b *NetworkInterfaceStatusApplyConfiguration) WithIPs(values ...corev1alpha1.IP) *NetworkInterfaceStatusApplyConfiguration {
 	for i := range values {
 		b.IPs = append(b.IPs, values[i])
 	}
@@ -80,7 +80,7 @@ func (b *NetworkInterfaceStatusApplyConfiguration) WithIPs(values ...commonv1alp
 // WithVirtualIP sets the VirtualIP field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the VirtualIP field is set to the value of the last call.
-func (b *NetworkInterfaceStatusApplyConfiguration) WithVirtualIP(value commonv1alpha1.IP) *NetworkInterfaceStatusApplyConfiguration {
+func (b *NetworkInterfaceStatusApplyConfiguration) WithVirtualIP(value corev1alpha1.IP) *NetworkInterfaceStatusApplyConfiguration {
 	b.VirtualIP = &value
 	return b
 }

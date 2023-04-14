@@ -18,7 +18,7 @@ import (
 	"context"
 	"fmt"
 
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	"github.com/onmetal/onmetal-api/broker/common/utils"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/aliasprefixes"
@@ -158,7 +158,7 @@ func (s *Server) aggregateOnmetalNetworkInterface(
 		return nil, fmt.Errorf("error listing alias prefixes: %w", err)
 	}
 
-	var prefixes []commonv1alpha1.IPPrefix
+	var prefixes []corev1alpha1.IPPrefix
 	for _, aliasPrefix := range aliasPrefixes {
 		if !aliasPrefix.Destinations.Has(onmetalNetworkInterface.Name) {
 			continue

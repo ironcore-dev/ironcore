@@ -16,8 +16,8 @@
 package networking
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
@@ -54,7 +54,7 @@ var _ = Describe("NetworkInterfaceBindReconciler", func() {
 				},
 				IPs: []networkingv1alpha1.IPSource{
 					{
-						Value: commonv1alpha1.MustParseNewIP("10.0.0.1"),
+						Value: corev1alpha1.MustParseNewIP("10.0.0.1"),
 					},
 				},
 			},
@@ -95,7 +95,7 @@ var _ = Describe("NetworkInterfaceBindReconciler", func() {
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, nicKey, nic)).To(Succeed())
 
-			g.Expect(nic.Spec.MachineRef).To(Equal(&commonv1alpha1.LocalUIDReference{Name: machine.Name, UID: machine.UID}))
+			g.Expect(nic.Spec.MachineRef).To(Equal(&corev1alpha1.LocalUIDReference{Name: machine.Name, UID: machine.UID}))
 			g.Expect(nic.Status.Phase).To(Equal(networkingv1alpha1.NetworkInterfacePhaseBound))
 		}).Should(Succeed())
 

@@ -18,7 +18,7 @@ import (
 	"context"
 	"fmt"
 
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -27,7 +27,7 @@ import (
 func (s *Server) setOnmetalNetworkInterfaceIPs(
 	ctx context.Context,
 	onmetalNetworkInterface *networkingv1alpha1.NetworkInterface,
-	ips []commonv1alpha1.IP,
+	ips []corev1alpha1.IP,
 ) error {
 	baseOnmetalNetworkInterface := onmetalNetworkInterface.DeepCopy()
 	onmetalNetworkInterface.Spec.IPs = s.onmetalIPsToOnmetalIPSources(ips)

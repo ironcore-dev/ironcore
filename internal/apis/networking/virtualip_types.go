@@ -17,7 +17,7 @@
 package networking
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -30,7 +30,7 @@ type VirtualIPSpec struct {
 	IPFamily corev1.IPFamily
 
 	// TargetRef references the target for this VirtualIP (currently only NetworkInterface).
-	TargetRef *commonv1alpha1.LocalUIDReference
+	TargetRef *corev1alpha1.LocalUIDReference
 }
 
 // VirtualIPType is a type of VirtualIP.
@@ -44,7 +44,7 @@ const (
 // VirtualIPStatus defines the observed state of VirtualIP
 type VirtualIPStatus struct {
 	// IP is the allocated IP, if any.
-	IP *commonv1alpha1.IP
+	IP *corev1alpha1.IP
 
 	// Phase is the VirtualIPPhase of the VirtualIP.
 	Phase VirtualIPPhase

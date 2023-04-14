@@ -21,8 +21,8 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	"github.com/onmetal/onmetal-api/internal/client/compute"
 	networkingclient "github.com/onmetal/onmetal-api/internal/client/networking"
@@ -175,7 +175,7 @@ func (r *NetworkInterfaceBindReconciler) reconcileUnbound(ctx context.Context, l
 
 func (r *NetworkInterfaceBindReconciler) assign(ctx context.Context, nic *networkingv1alpha1.NetworkInterface, machine *computev1alpha1.Machine) error {
 	base := nic.DeepCopy()
-	nic.Spec.MachineRef = &commonv1alpha1.LocalUIDReference{Name: machine.Name, UID: machine.UID}
+	nic.Spec.MachineRef = &corev1alpha1.LocalUIDReference{Name: machine.Name, UID: machine.UID}
 	if err := r.Patch(ctx, nic, client.MergeFrom(base)); err != nil {
 		return fmt.Errorf("error assigning: %w", err)
 	}

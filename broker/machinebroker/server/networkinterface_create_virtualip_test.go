@@ -15,7 +15,7 @@
 package server_test
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
@@ -77,7 +77,7 @@ var _ = Describe("NetworkInterfaceCreateVirtualIP", func() {
 			Type:     networkingv1alpha1.VirtualIPTypePublic,
 			IPFamily: corev1.IPv4Protocol,
 		}))
-		Expect(k8sVirtualIP.Status.IP).To(Equal(commonv1alpha1.MustParseNewIP("10.0.0.1")))
+		Expect(k8sVirtualIP.Status.IP).To(Equal(corev1alpha1.MustParseNewIP("10.0.0.1")))
 	})
 })
 

@@ -19,24 +19,24 @@ package v1alpha1
 
 import (
 	v1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/core/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 )
 
 // MachineSpecApplyConfiguration represents an declarative configuration of the MachineSpec type for use
 // with apply.
 type MachineSpecApplyConfiguration struct {
-	MachineClassRef     *v1.LocalObjectReference                            `json:"machineClassRef,omitempty"`
-	MachinePoolSelector map[string]string                                   `json:"machinePoolSelector,omitempty"`
-	MachinePoolRef      *v1.LocalObjectReference                            `json:"machinePoolRef,omitempty"`
-	Power               *v1alpha1.Power                                     `json:"power,omitempty"`
-	Image               *string                                             `json:"image,omitempty"`
-	ImagePullSecretRef  *v1.LocalObjectReference                            `json:"imagePullSecret,omitempty"`
-	NetworkInterfaces   []NetworkInterfaceApplyConfiguration                `json:"networkInterfaces,omitempty"`
-	Volumes             []VolumeApplyConfiguration                          `json:"volumes,omitempty"`
-	IgnitionRef         *commonv1alpha1.SecretKeySelectorApplyConfiguration `json:"ignitionRef,omitempty"`
-	EFIVars             []EFIVarApplyConfiguration                          `json:"efiVars,omitempty"`
-	Tolerations         []commonv1alpha1.TolerationApplyConfiguration       `json:"tolerations,omitempty"`
+	MachineClassRef     *v1.LocalObjectReference                          `json:"machineClassRef,omitempty"`
+	MachinePoolSelector map[string]string                                 `json:"machinePoolSelector,omitempty"`
+	MachinePoolRef      *v1.LocalObjectReference                          `json:"machinePoolRef,omitempty"`
+	Power               *v1alpha1.Power                                   `json:"power,omitempty"`
+	Image               *string                                           `json:"image,omitempty"`
+	ImagePullSecretRef  *v1.LocalObjectReference                          `json:"imagePullSecret,omitempty"`
+	NetworkInterfaces   []NetworkInterfaceApplyConfiguration              `json:"networkInterfaces,omitempty"`
+	Volumes             []VolumeApplyConfiguration                        `json:"volumes,omitempty"`
+	IgnitionRef         *corev1alpha1.SecretKeySelectorApplyConfiguration `json:"ignitionRef,omitempty"`
+	EFIVars             []EFIVarApplyConfiguration                        `json:"efiVars,omitempty"`
+	Tolerations         []corev1alpha1.TolerationApplyConfiguration       `json:"tolerations,omitempty"`
 }
 
 // MachineSpecApplyConfiguration constructs an declarative configuration of the MachineSpec type for use with
@@ -128,7 +128,7 @@ func (b *MachineSpecApplyConfiguration) WithVolumes(values ...*VolumeApplyConfig
 // WithIgnitionRef sets the IgnitionRef field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the IgnitionRef field is set to the value of the last call.
-func (b *MachineSpecApplyConfiguration) WithIgnitionRef(value *commonv1alpha1.SecretKeySelectorApplyConfiguration) *MachineSpecApplyConfiguration {
+func (b *MachineSpecApplyConfiguration) WithIgnitionRef(value *corev1alpha1.SecretKeySelectorApplyConfiguration) *MachineSpecApplyConfiguration {
 	b.IgnitionRef = value
 	return b
 }
@@ -149,7 +149,7 @@ func (b *MachineSpecApplyConfiguration) WithEFIVars(values ...*EFIVarApplyConfig
 // WithTolerations adds the given value to the Tolerations field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the Tolerations field.
-func (b *MachineSpecApplyConfiguration) WithTolerations(values ...*commonv1alpha1.TolerationApplyConfiguration) *MachineSpecApplyConfiguration {
+func (b *MachineSpecApplyConfiguration) WithTolerations(values ...*corev1alpha1.TolerationApplyConfiguration) *MachineSpecApplyConfiguration {
 	for i := range values {
 		if values[i] == nil {
 			panic("nil value passed to WithTolerations")

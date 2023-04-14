@@ -122,8 +122,8 @@ If unset, the scheduler will figure out a suitable BucketPoolRef.</p>
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.Toleration">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
+<a href="../core/#core.api.onmetal.de/v1alpha1.Toleration">
+[]github.com/onmetal/onmetal-api/api/core/v1alpha1.Toleration
 </a>
 </em>
 </td>
@@ -280,8 +280,8 @@ string
 <td>
 <code>taints</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.Taint">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Taint
+<a href="../core/#core.api.onmetal.de/v1alpha1.Taint">
+[]github.com/onmetal/onmetal-api/api/core/v1alpha1.Taint
 </a>
 </em>
 </td>
@@ -407,8 +407,8 @@ If unset, the scheduler will figure out a suitable VolumePoolRef.</p>
 <td>
 <code>claimRef</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
+<a href="../core/#core.api.onmetal.de/v1alpha1.LocalUIDReference">
+github.com/onmetal/onmetal-api/api/core/v1alpha1.LocalUIDReference
 </a>
 </em>
 </td>
@@ -468,8 +468,8 @@ bool
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.Toleration">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
+<a href="../core/#core.api.onmetal.de/v1alpha1.Toleration">
+[]github.com/onmetal/onmetal-api/api/core/v1alpha1.Toleration
 </a>
 </em>
 </td>
@@ -639,8 +639,8 @@ string
 <td>
 <code>taints</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.Taint">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Taint
+<a href="../core/#core.api.onmetal.de/v1alpha1.Taint">
+[]github.com/onmetal/onmetal-api/api/core/v1alpha1.Taint
 </a>
 </em>
 </td>
@@ -837,8 +837,8 @@ string
 <td>
 <code>taints</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.Taint">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Taint
+<a href="../core/#core.api.onmetal.de/v1alpha1.Taint">
+[]github.com/onmetal/onmetal-api/api/core/v1alpha1.Taint
 </a>
 </em>
 </td>
@@ -974,8 +974,8 @@ If unset, the scheduler will figure out a suitable BucketPoolRef.</p>
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.Toleration">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
+<a href="../core/#core.api.onmetal.de/v1alpha1.Toleration">
+[]github.com/onmetal/onmetal-api/api/core/v1alpha1.Toleration
 </a>
 </em>
 </td>
@@ -1166,8 +1166,8 @@ If unset, the scheduler will figure out a suitable BucketPoolRef.</p>
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.Toleration">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
+<a href="../core/#core.api.onmetal.de/v1alpha1.Toleration">
+[]github.com/onmetal/onmetal-api/api/core/v1alpha1.Toleration
 </a>
 </em>
 </td>
@@ -1530,8 +1530,8 @@ string
 <td>
 <code>taints</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.Taint">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Taint
+<a href="../core/#core.api.onmetal.de/v1alpha1.Taint">
+[]github.com/onmetal/onmetal-api/api/core/v1alpha1.Taint
 </a>
 </em>
 </td>
@@ -1704,8 +1704,8 @@ If unset, the scheduler will figure out a suitable VolumePoolRef.</p>
 <td>
 <code>claimRef</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
+<a href="../core/#core.api.onmetal.de/v1alpha1.LocalUIDReference">
+github.com/onmetal/onmetal-api/api/core/v1alpha1.LocalUIDReference
 </a>
 </em>
 </td>
@@ -1765,8 +1765,8 @@ bool
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.Toleration">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
+<a href="../core/#core.api.onmetal.de/v1alpha1.Toleration">
+[]github.com/onmetal/onmetal-api/api/core/v1alpha1.Toleration
 </a>
 </em>
 </td>
@@ -1996,8 +1996,8 @@ If unset, the scheduler will figure out a suitable VolumePoolRef.</p>
 <td>
 <code>claimRef</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
+<a href="../core/#core.api.onmetal.de/v1alpha1.LocalUIDReference">
+github.com/onmetal/onmetal-api/api/core/v1alpha1.LocalUIDReference
 </a>
 </em>
 </td>
@@ -2057,8 +2057,8 @@ bool
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.Toleration">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
+<a href="../core/#core.api.onmetal.de/v1alpha1.Toleration">
+[]github.com/onmetal/onmetal-api/api/core/v1alpha1.Toleration
 </a>
 </em>
 </td>

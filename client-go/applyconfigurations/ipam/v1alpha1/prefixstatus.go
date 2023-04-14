@@ -18,7 +18,7 @@
 package v1alpha1
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	v1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -26,9 +26,9 @@ import (
 // PrefixStatusApplyConfiguration represents an declarative configuration of the PrefixStatus type for use
 // with apply.
 type PrefixStatusApplyConfiguration struct {
-	Phase                   *v1alpha1.PrefixPhase     `json:"phase,omitempty"`
-	LastPhaseTransitionTime *v1.Time                  `json:"lastPhaseTransitionTime,omitempty"`
-	Used                    []commonv1alpha1.IPPrefix `json:"used,omitempty"`
+	Phase                   *v1alpha1.PrefixPhase   `json:"phase,omitempty"`
+	LastPhaseTransitionTime *v1.Time                `json:"lastPhaseTransitionTime,omitempty"`
+	Used                    []corev1alpha1.IPPrefix `json:"used,omitempty"`
 }
 
 // PrefixStatusApplyConfiguration constructs an declarative configuration of the PrefixStatus type for use with
@@ -56,7 +56,7 @@ func (b *PrefixStatusApplyConfiguration) WithLastPhaseTransitionTime(value v1.Ti
 // WithUsed adds the given value to the Used field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the Used field.
-func (b *PrefixStatusApplyConfiguration) WithUsed(values ...commonv1alpha1.IPPrefix) *PrefixStatusApplyConfiguration {
+func (b *PrefixStatusApplyConfiguration) WithUsed(values ...corev1alpha1.IPPrefix) *PrefixStatusApplyConfiguration {
 	for i := range values {
 		b.Used = append(b.Used, values[i])
 	}

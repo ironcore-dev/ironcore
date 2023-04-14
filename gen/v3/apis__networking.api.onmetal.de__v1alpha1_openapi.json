@@ -31473,116 +31473,6 @@
 	},
 	"components": {
 		"schemas": {
-			"com.github.onmetal.onmetal-api.api.common.v1alpha1.IP": {
-				"description": "IP is an IP address.",
-				"type": "string",
-				"format": "ip"
-			},
-			"com.github.onmetal.onmetal-api.api.common.v1alpha1.IPPrefix": {
-				"description": "IPPrefix represents a network prefix.",
-				"type": "string",
-				"format": "ip-prefix"
-			},
-			"com.github.onmetal.onmetal-api.api.common.v1alpha1.LocalUIDReference": {
-				"description": "LocalUIDReference is a reference to another entity including its UID",
-				"type": "object",
-				"required": [
-					"name",
-					"uid"
-				],
-				"properties": {
-					"name": {
-						"description": "Name is the name of the referenced entity.",
-						"type": "string"
-					},
-					"uid": {
-						"description": "UID is the UID of the referenced entity.",
-						"type": "string"
-					}
-				},
-				"x-kubernetes-map-type": "atomic"
-			},
-			"com.github.onmetal.onmetal-api.api.common.v1alpha1.SecretKeySelector": {
-				"description": "SecretKeySelector is a reference to a specific 'key' within a Secret resource. In some instances, `key` is a required field.",
-				"type": "object",
-				"properties": {
-					"key": {
-						"description": "The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be defaulted, in others it may be required.",
-						"type": "string"
-					},
-					"name": {
-						"description": "Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
-						"type": "string"
-					}
-				},
-				"x-kubernetes-map-type": "atomic"
-			},
-			"com.github.onmetal.onmetal-api.api.common.v1alpha1.Taint": {
-				"description": "The resource pool this Taint is attached to has the \"effect\" on any resource that does not tolerate the Taint.",
-				"type": "object",
-				"required": [
-					"key",
-					"effect"
-				],
-				"properties": {
-					"effect": {
-						"description": "The effect of the taint on resources that do not tolerate the taint. Valid effects are NoSchedule, PreferNoSchedule and NoExecute.",
-						"type": "string"
-					},
-					"key": {
-						"description": "The taint key to be applied to a resource pool.",
-						"type": "string"
-					},
-					"value": {
-						"description": "The taint value corresponding to the taint key.",
-						"type": "string"
-					}
-				}
-			},
-			"com.github.onmetal.onmetal-api.api.common.v1alpha1.Toleration": {
-				"description": "The resource this Toleration is attached to tolerates any taint that matches the triple \u003ckey,value,effect\u003e using the matching operator \u003coperator\u003e.",
-				"type": "object",
-				"properties": {
-					"effect": {
-						"description": "Effect indicates the taint effect to match. Empty means match all taint effects. When specified, allowed values are NoSchedule.",
-						"type": "string"
-					},
-					"key": {
-						"description": "Key is the taint key that the toleration applies to. Empty means match all taint keys. If the key is empty, operator must be Exists; this combination means to match all values and all keys.",
-						"type": "string"
-					},
-					"operator": {
-						"description": "Operator represents a key's relationship to the value. Valid operators are Exists and Equal. Defaults to Equal. Exists is equivalent to wildcard for value, so that a resource can tolerate all taints of a particular category.",
-						"type": "string"
-					},
-					"value": {
-						"description": "Value is the taint value the toleration matches to. If the operator is Exists, the value should be empty, otherwise just a regular string.",
-						"type": "string"
-					}
-				}
-			},
-			"com.github.onmetal.onmetal-api.api.common.v1alpha1.UIDReference": {
-				"description": "UIDReference is a reference to another entity in a potentially different namespace including its UID.",
-				"type": "object",
-				"required": [
-					"name"
-				],
-				"properties": {
-					"name": {
-						"description": "Name is the name of the referenced entity.",
-						"type": "string"
-					},
-					"namespace": {
-						"description": "Namespace is the namespace of the referenced entity. If empty, the same namespace as the referring resource is implied.",
-						"type": "string"
-					},
-					"uid": {
-						"description": "UID is the UID of the referenced entity.",
-						"type": "string"
-					}
-				},
-				"x-kubernetes-map-type": "atomic"
-			},
 			"com.github.onmetal.onmetal-api.api.compute.v1alpha1.DaemonEndpoint": {
 				"description": "DaemonEndpoint contains information about a single Daemon endpoint.",
 				"type": "object",
@@ -31936,7 +31826,7 @@
 						"description": "Taints of the MachinePool. Only Machines who tolerate all the taints will land in the MachinePool.",
 						"type": "array",
 						"items": {
-							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.Taint"
+							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.Taint"
 						}
 					}
 				}
@@ -31998,7 +31888,7 @@
 						"description": "IgnitionRef is a reference to a secret containing the ignition YAML for the machine to boot up. If key is empty, DefaultIgnitionKey will be used as fallback.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.SecretKeySelector"
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.SecretKeySelector"
 							}
 						]
 					},
@@ -32054,7 +31944,7 @@
 						"description": "Tolerations define tolerations the Machine has. Only MachinePools whose taints covered by Tolerations will be considered to run the Machine.",
 						"type": "array",
 						"items": {
-							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.Toleration"
+							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.Toleration"
 						}
 					},
 					"volumes": {
@@ -32151,7 +32041,7 @@
 						"description": "IPs are the ips allocated for the network interface.",
 						"type": "array",
 						"items": {
-							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.IP"
+							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.IP"
 						}
 					},
 					"lastPhaseTransitionTime": {
@@ -32190,7 +32080,7 @@
 						"description": "VirtualIP is the virtual ip allocated for the network interface.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.IP"
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.IP"
 							}
 						]
 					}
@@ -32277,6 +32167,35 @@
 						"type": "string"
 					}
 				}
+			},
+			"com.github.onmetal.onmetal-api.api.core.v1alpha1.IP": {
+				"description": "IP is an IP address.",
+				"type": "string",
+				"format": "ip"
+			},
+			"com.github.onmetal.onmetal-api.api.core.v1alpha1.IPPrefix": {
+				"description": "IPPrefix represents a network prefix.",
+				"type": "string",
+				"format": "ip-prefix"
+			},
+			"com.github.onmetal.onmetal-api.api.core.v1alpha1.LocalUIDReference": {
+				"description": "LocalUIDReference is a reference to another entity including its UID",
+				"type": "object",
+				"required": [
+					"name",
+					"uid"
+				],
+				"properties": {
+					"name": {
+						"description": "Name is the name of the referenced entity.",
+						"type": "string"
+					},
+					"uid": {
+						"description": "UID is the UID of the referenced entity.",
+						"type": "string"
+					}
+				},
+				"x-kubernetes-map-type": "atomic"
 			},
 			"com.github.onmetal.onmetal-api.api.core.v1alpha1.ObjectSelector": {
 				"description": "ObjectSelector specifies how to select objects of a certain kind.",
@@ -32447,6 +32366,87 @@
 					}
 				}
 			},
+			"com.github.onmetal.onmetal-api.api.core.v1alpha1.SecretKeySelector": {
+				"description": "SecretKeySelector is a reference to a specific 'key' within a Secret resource. In some instances, `key` is a required field.",
+				"type": "object",
+				"properties": {
+					"key": {
+						"description": "The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be defaulted, in others it may be required.",
+						"type": "string"
+					},
+					"name": {
+						"description": "Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
+						"type": "string"
+					}
+				},
+				"x-kubernetes-map-type": "atomic"
+			},
+			"com.github.onmetal.onmetal-api.api.core.v1alpha1.Taint": {
+				"description": "Taint is attached to a resource pool. It has the specified Effect on any resource that does not tolerate the Taint.",
+				"type": "object",
+				"required": [
+					"key",
+					"effect"
+				],
+				"properties": {
+					"effect": {
+						"description": "The effect of the taint on resources that do not tolerate the taint. Valid effects are NoSchedule, PreferNoSchedule and NoExecute.",
+						"type": "string"
+					},
+					"key": {
+						"description": "The taint key to be applied to a resource pool.",
+						"type": "string"
+					},
+					"value": {
+						"description": "The taint value corresponding to the taint key.",
+						"type": "string"
+					}
+				}
+			},
+			"com.github.onmetal.onmetal-api.api.core.v1alpha1.Toleration": {
+				"description": "Toleration makes the resource the toleration is attached to tolerate any taint that matches the triple \u003ckey,value,effect\u003e using the matching operator \u003coperator\u003e.",
+				"type": "object",
+				"properties": {
+					"effect": {
+						"description": "Effect indicates the taint effect to match. Empty means match all taint effects. When specified, allowed values are NoSchedule.",
+						"type": "string"
+					},
+					"key": {
+						"description": "Key is the taint key that the toleration applies to. Empty means match all taint keys. If the key is empty, operator must be Exists; this combination means to match all values and all keys.",
+						"type": "string"
+					},
+					"operator": {
+						"description": "Operator represents a key's relationship to the value. Valid operators are Exists and Equal. Defaults to Equal. Exists is equivalent to wildcard for value, so that a resource can tolerate all taints of a particular category.",
+						"type": "string"
+					},
+					"value": {
+						"description": "Value is the taint value the toleration matches to. If the operator is Exists, the value should be empty, otherwise just a regular string.",
+						"type": "string"
+					}
+				}
+			},
+			"com.github.onmetal.onmetal-api.api.core.v1alpha1.UIDReference": {
+				"description": "UIDReference is a reference to another entity in a potentially different namespace including its UID.",
+				"type": "object",
+				"required": [
+					"name"
+				],
+				"properties": {
+					"name": {
+						"description": "Name is the name of the referenced entity.",
+						"type": "string"
+					},
+					"namespace": {
+						"description": "Namespace is the namespace of the referenced entity. If empty, the same namespace as the referring resource is implied.",
+						"type": "string"
+					},
+					"uid": {
+						"description": "UID is the UID of the referenced entity.",
+						"type": "string"
+					}
+				},
+				"x-kubernetes-map-type": "atomic"
+			},
 			"com.github.onmetal.onmetal-api.api.ipam.v1alpha1.Prefix": {
 				"description": "Prefix is the Schema for the prefixes API",
 				"type": "object",
@@ -32556,7 +32556,7 @@
 						"description": "Prefix is the prefix to allocate for this Prefix.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.IPPrefix"
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.IPPrefix"
 							}
 						]
 					},
@@ -32603,7 +32603,7 @@
 						"description": "Prefix is the allocated prefix, if any",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.IPPrefix"
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.IPPrefix"
 							}
 						]
 					}
@@ -32674,7 +32674,7 @@
 						"description": "Prefix is the prefix to allocate for this Prefix.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.IPPrefix"
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.IPPrefix"
 							}
 						]
 					},
@@ -32705,7 +32705,7 @@
 						"description": "Used is a list of used prefixes.",
 						"type": "array",
 						"items": {
-							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.IPPrefix"
+							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.IPPrefix"
 						}
 					}
 				}
@@ -32800,7 +32800,7 @@
 						"description": "Destinations are the destinations for an AliasPrefix.",
 						"type": "array",
 						"items": {
-							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.LocalUIDReference"
+							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.LocalUIDReference"
 						}
 					},
 					"kind": {
@@ -32814,7 +32814,7 @@
 						"description": "NetworkRef is the network the load balancer is assigned to.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.LocalUIDReference"
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.LocalUIDReference"
 							}
 						]
 					}
@@ -32901,7 +32901,7 @@
 						"description": "Prefix is the Prefix reserved by this AliasPrefix",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.IPPrefix"
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.IPPrefix"
 							}
 						]
 					}
@@ -32946,7 +32946,7 @@
 						"description": "CIDR is a string representing the ip block.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.IPPrefix"
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.IPPrefix"
 							}
 						]
 					},
@@ -32954,7 +32954,7 @@
 						"description": "Except is a slice of CIDRs that should not be included within the specified CIDR. Values will be rejected if they are outside CIDR.",
 						"type": "array",
 						"items": {
-							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.IPPrefix"
+							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.IPPrefix"
 						}
 					}
 				}
@@ -32975,7 +32975,7 @@
 						"description": "Value specifies an IP by using an IP literal.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.IP"
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.IP"
 							}
 						]
 					}
@@ -33082,7 +33082,7 @@
 						"description": "Destinations are the destinations for an LoadBalancer.",
 						"type": "array",
 						"items": {
-							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.LocalUIDReference"
+							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.LocalUIDReference"
 						}
 					},
 					"kind": {
@@ -33096,7 +33096,7 @@
 						"description": "NetworkRef is the network the load balancer is assigned to.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.LocalUIDReference"
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.LocalUIDReference"
 							}
 						]
 					}
@@ -33202,7 +33202,7 @@
 						"description": "IPs are the IPs allocated for the load balancer.",
 						"type": "array",
 						"items": {
-							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.IP"
+							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.IP"
 						}
 					}
 				}
@@ -33279,7 +33279,7 @@
 						"description": "IP is the ip used for the NAT gateway.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.IP"
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.IP"
 							}
 						]
 					},
@@ -33310,7 +33310,7 @@
 				],
 				"properties": {
 					"ip": {
-						"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.IP"
+						"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.IP"
 					},
 					"name": {
 						"type": "string"
@@ -33380,7 +33380,7 @@
 						"description": "NetworkRef is the network the NAT gateway is assigned to.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.LocalUIDReference"
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.LocalUIDReference"
 							}
 						]
 					}
@@ -33616,7 +33616,7 @@
 						"description": "MachineRef is the Machine this NetworkInterface is used by",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.LocalUIDReference"
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.LocalUIDReference"
 							}
 						]
 					},
@@ -33646,7 +33646,7 @@
 						"description": "IPs represent the effective IP addresses of the NetworkInterface",
 						"type": "array",
 						"items": {
-							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.IP"
+							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.IP"
 						}
 					},
 					"lastPhaseTransitionTime": {
@@ -33689,7 +33689,7 @@
 						"description": "VirtualIP is any virtual ip assigned to the NetworkInterface.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.IP"
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.IP"
 							}
 						]
 					}
@@ -33756,7 +33756,7 @@
 						"description": "NetworkRef is the reference to the network to peer with. If the UID is empty, it will be populated once when the peering is successfully bound. If namespace is empty it is implied that the target network resides in the same network.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.UIDReference"
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.UIDReference"
 							}
 						]
 					}
@@ -34099,7 +34099,7 @@
 						"description": "Value is a single IPPrefix value as defined in the AliasPrefix",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.IPPrefix"
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.IPPrefix"
 							}
 						]
 					}
@@ -34210,7 +34210,7 @@
 						"description": "TargetRef references the target for this VirtualIP (currently only NetworkInterface).",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.LocalUIDReference"
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.LocalUIDReference"
 							}
 						]
 					},
@@ -34228,7 +34228,7 @@
 						"description": "IP is the allocated IP, if any.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.IP"
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.IP"
 							}
 						]
 					},
@@ -34523,7 +34523,7 @@
 						"description": "Taints of the BucketPool. Only Buckets who tolerate all the taints will land in the BucketPool.",
 						"type": "array",
 						"items": {
-							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.Taint"
+							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.Taint"
 						}
 					}
 				}
@@ -34576,7 +34576,7 @@
 						"description": "Tolerations define tolerations the Bucket has. Only any BucketPool whose taints covered by Tolerations will be considered to host the Bucket.",
 						"type": "array",
 						"items": {
-							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.Toleration"
+							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.Toleration"
 						}
 					}
 				}
@@ -34949,7 +34949,7 @@
 						"description": "Taints of the VolumePool. Only Volumes who tolerate all the taints will land in the VolumePool.",
 						"type": "array",
 						"items": {
-							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.Taint"
+							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.Taint"
 						}
 					}
 				}
@@ -34998,7 +34998,7 @@
 						"description": "ClaimRef is the reference to the claiming entity of the Volume.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.LocalUIDReference"
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.LocalUIDReference"
 							}
 						]
 					},
@@ -35033,7 +35033,7 @@
 						"description": "Tolerations define tolerations the Volume has. Only any VolumePool whose taints covered by Tolerations will be considered to host the Volume.",
 						"type": "array",
 						"items": {
-							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.Toleration"
+							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.core.v1alpha1.Toleration"
 						}
 					},
 					"unclaimable": {

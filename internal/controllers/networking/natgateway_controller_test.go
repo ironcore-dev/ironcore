@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"net/netip"
 
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
@@ -35,7 +35,7 @@ func addIPsToStatus(natGateway *networkingv1alpha1.NATGateway, num int) {
 		ip = ip.Next()
 		natGateway.Status.IPs = append(natGateway.Status.IPs, networkingv1alpha1.NATGatewayIPStatus{
 			Name: fmt.Sprintf("ip%d", i),
-			IP: commonv1alpha1.IP{
+			IP: corev1alpha1.IP{
 				Addr: ip,
 			},
 		})
@@ -108,7 +108,7 @@ var _ = Describe("NatGatewayReconciler", func() {
 				},
 				IPs: []networkingv1alpha1.IPSource{
 					{
-						Value: commonv1alpha1.MustParseNewIP("10.0.0.1"),
+						Value: corev1alpha1.MustParseNewIP("10.0.0.1"),
 					},
 				},
 			},
@@ -216,7 +216,7 @@ var _ = Describe("NatGatewayReconciler", func() {
 					},
 					IPs: []networkingv1alpha1.IPSource{
 						{
-							Value: commonv1alpha1.MustParseNewIP("10.0.0.1"),
+							Value: corev1alpha1.MustParseNewIP("10.0.0.1"),
 						},
 					},
 				},
@@ -253,7 +253,7 @@ var _ = Describe("NatGatewayReconciler", func() {
 					},
 					IPs: []networkingv1alpha1.IPSource{
 						{
-							Value: commonv1alpha1.MustParseNewIP("10.0.0.1"),
+							Value: corev1alpha1.MustParseNewIP("10.0.0.1"),
 						},
 					},
 				},

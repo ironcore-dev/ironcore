@@ -21,7 +21,7 @@
 package networking
 
 import (
-	v1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	v1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	core "github.com/onmetal/onmetal-api/internal/apis/core"
 	ipam "github.com/onmetal/onmetal-api/internal/apis/ipam"
 	corev1 "k8s.io/api/core/v1"

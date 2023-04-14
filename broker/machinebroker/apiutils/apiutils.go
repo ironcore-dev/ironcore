@@ -21,7 +21,7 @@ import (
 	"strings"
 
 	"github.com/onmetal/controller-utils/metautils"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
 	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
@@ -164,20 +164,20 @@ func SetNetworkHandleLabel(o metav1.Object, handle string) {
 	metautils.SetLabel(o, machinebrokerv1alpha1.NetworkHandleLabel, handle)
 }
 
-func EscapePrefix(prefix commonv1alpha1.IPPrefix) string {
+func EscapePrefix(prefix corev1alpha1.IPPrefix) string {
 	return ipAndPrefixReplacer.Replace(prefix.String())
 }
 
-func UnescapePrefix(escapedPrefix string) (commonv1alpha1.IPPrefix, error) {
+func UnescapePrefix(escapedPrefix string) (corev1alpha1.IPPrefix, error) {
 	unescaped := reverseIPAndPrefixReplacer.Replace(escapedPrefix)
-	return commonv1alpha1.ParseIPPrefix(unescaped)
+	return corev1alpha1.ParseIPPrefix(unescaped)
 }
 
-func SetPrefixLabel(o metav1.Object, prefix commonv1alpha1.IPPrefix) {
+func SetPrefixLabel(o metav1.Object, prefix corev1alpha1.IPPrefix) {
 	metautils.SetLabel(o, machinebrokerv1alpha1.PrefixLabel, EscapePrefix(prefix))
 }
 
-func GetPrefixLabel(o metav1.Object) (commonv1alpha1.IPPrefix, error) {
+func GetPrefixLabel(o metav1.Object) (corev1alpha1.IPPrefix, error) {
 	escapedPrefix := o.GetLabels()[machinebrokerv1alpha1.PrefixLabel]
 	return UnescapePrefix(escapedPrefix)
 }
@@ -186,20 +186,20 @@ func SetLoadBalancerTypeLabel(o metav1.Object, typ networkingv1alpha1.LoadBalanc
 	metautils.SetLabel(o, machinebrokerv1alpha1.LoadBalancerTypeLabel, string(typ))
 }
 
-func EscapeIP(ip commonv1alpha1.IP) string {
+func EscapeIP(ip corev1alpha1.IP) string {
 	return ipAndPrefixReplacer.Replace(ip.String())
 }
 
-func UnescapeIP(escaped string) (commonv1alpha1.IP, error) {
+func UnescapeIP(escaped string) (corev1alpha1.IP, error) {
 	unescaped := reverseIPAndPrefixReplacer.Replace(escaped)
-	return commonv1alpha1.ParseIP(unescaped)
+	return corev1alpha1.ParseIP(unescaped)
 }
 
-func SetIPLabel(o metav1.Object, ip commonv1alpha1.IP) {
+func SetIPLabel(o metav1.Object, ip corev1alpha1.IP) {
 	metautils.SetLabel(o, machinebrokerv1alpha1.IPLabel, EscapeIP(ip))
 }
 
-func GetIPLabel(o metav1.Object) (commonv1alpha1.IP, error) {
+func GetIPLabel(o metav1.Object) (corev1alpha1.IP, error) {
 	escaped := o.GetLabels()[machinebrokerv1alpha1.IPLabel]
 	return UnescapeIP(escaped)
 }

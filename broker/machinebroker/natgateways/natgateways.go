@@ -18,7 +18,7 @@ import (
 	"context"
 	"fmt"
 
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	"github.com/onmetal/onmetal-api/broker/common/cleaner"
 	commonsync "github.com/onmetal/onmetal-api/broker/common/sync"
@@ -47,7 +47,7 @@ type NATGateways struct {
 
 type natGatewayKey struct {
 	networkHandle string
-	ip            commonv1alpha1.IP
+	ip            corev1alpha1.IP
 }
 
 func (k natGatewayKey) String() string {
@@ -147,7 +147,7 @@ func (m *NATGateways) createNATGateway(
 			Namespace: m.cluster.Namespace(),
 			Name:      natGateway.Name,
 		},
-		NetworkRef: commonv1alpha1.LocalUIDReference{
+		NetworkRef: corev1alpha1.LocalUIDReference{
 			Name: network.Name,
 			UID:  network.UID,
 		},
@@ -263,7 +263,7 @@ func (m *NATGateways) Create(
 func (m *NATGateways) Delete(
 	ctx context.Context,
 	networkHandle string,
-	ip commonv1alpha1.IP,
+	ip corev1alpha1.IP,
 	networkInterface *networkingv1alpha1.NetworkInterface,
 ) error {
 	key := natGatewayKey{
@@ -346,14 +346,14 @@ func (m *NATGateways) List(ctx context.Context) ([]machinebrokerv1alpha1.NATGate
 	return m.joinNATGatewaysAndRoutings(natGateways, natGatewayRoutings), nil
 }
 
-func (m *NATGateways) getNATGatewayIP(natGateway *networkingv1alpha1.NATGateway) (commonv1alpha1.IP, bool) {
+func (m *NATGateways) getNATGatewayIP(natGateway *networkingv1alpha1.NATGateway) (corev1alpha1.IP, bool) {
 	natGatewayIP, ok := utilslices.FindFunc(natGateway.Status.IPs,
 		func(ip networkingv1alpha1.NATGatewayIPStatus) bool {
 			return ip.Name == natGatewayIPName
 		},
 	)
 	if !ok {
-		return commonv1alpha1.IP{}, false
+		return corev1alpha1.IP{}, false
 	}
 	return natGatewayIP.IP, true
 }

@@ -135,7 +135,6 @@ check: generate manifests add-license fmt lint test # Generate manifests, code, 
 
 .PHONY: docs
 docs: gen-crd-api-reference-docs ## Run go generate to generate API reference documentation.
-	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/common/v1alpha1 -config ./hack/api-reference/config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/common.md
 	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/core/v1alpha1 -config ./hack/api-reference/config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/core.md
 	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/storage/v1alpha1 -config ./hack/api-reference/config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/storage.md
 	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/networking/v1alpha1 -config ./hack/api-reference/config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/networking.md

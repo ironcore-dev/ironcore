@@ -18,7 +18,7 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/common/v1alpha1"
+	v1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/core/v1alpha1"
 )
 
 // MachinePoolSpecApplyConfiguration represents an declarative configuration of the MachinePoolSpec type for use

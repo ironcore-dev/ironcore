@@ -17,7 +17,7 @@
 package networking
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -67,8 +67,8 @@ type NATGatewayStatus struct {
 }
 
 type NATGatewayIPStatus struct {
-	Name string            `json:"name"`
-	IP   commonv1alpha1.IP `json:"ip"`
+	Name string          `json:"name"`
+	IP   corev1alpha1.IP `json:"ip"`
 }
 
 // +genclient

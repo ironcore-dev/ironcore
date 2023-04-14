@@ -18,7 +18,7 @@ import (
 	"context"
 	"fmt"
 
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	"golang.org/x/exp/slices"
 	"google.golang.org/grpc/codes"
@@ -29,7 +29,7 @@ func (s *Server) CreateNetworkInterfacePrefix(ctx context.Context, req *ori.Crea
 	networkInterfaceID := req.NetworkInterfaceId
 	log := s.loggerFrom(ctx, "NetworkInterfaceID", networkInterfaceID)
 
-	prefix, err := commonv1alpha1.ParseIPPrefix(req.Prefix)
+	prefix, err := corev1alpha1.ParseIPPrefix(req.Prefix)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing prefix: %w", err)
 	}

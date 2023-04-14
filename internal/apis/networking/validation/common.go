@@ -17,7 +17,7 @@ package validation
 import (
 	"fmt"
 
-	commonvalidation "github.com/onmetal/onmetal-api/internal/apis/common/validation"
+	corevalidation "github.com/onmetal/onmetal-api/internal/apis/core/validation"
 	"github.com/onmetal/onmetal-api/internal/apis/networking"
 	corev1 "k8s.io/api/core/v1"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
@@ -31,7 +31,7 @@ func validateIPSource(ipSource networking.IPSource, idx int, ipFamily corev1.IPF
 	var numSources int
 	if ip := ipSource.Value; ip.IsValid() {
 		numSources++
-		allErrs = append(allErrs, commonvalidation.ValidateIP(ipFamily, *ip, fldPath.Child("value"))...)
+		allErrs = append(allErrs, corevalidation.ValidateIP(ipFamily, *ip, fldPath.Child("value"))...)
 	}
 	if ephemeral := ipSource.Ephemeral; ephemeral != nil {
 		if numSources > 0 {

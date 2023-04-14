@@ -22,8 +22,8 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/clientutils"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	orimachine "github.com/onmetal/onmetal-api/ori/apis/machine"
@@ -641,7 +641,7 @@ func getORIMachineClassCapabilities(machineClass *computev1alpha1.MachineClass) 
 	}, nil
 }
 
-func (r *MachineReconciler) prepareORIIgnitionSpec(ctx context.Context, machine *computev1alpha1.Machine, ignitionRef *commonv1alpha1.SecretKeySelector) (*ori.IgnitionSpec, bool, error) {
+func (r *MachineReconciler) prepareORIIgnitionSpec(ctx context.Context, machine *computev1alpha1.Machine, ignitionRef *corev1alpha1.SecretKeySelector) (*ori.IgnitionSpec, bool, error) {
 	ignitionSecret := &corev1.Secret{}
 	ignitionSecretKey := client.ObjectKey{Namespace: machine.Namespace, Name: ignitionRef.Name}
 	if err := r.Get(ctx, ignitionSecretKey, ignitionSecret); err != nil {
@@ -762,7 +762,7 @@ func (r *MachineReconciler) matchingWatchLabel() client.ListOption {
 	var labels map[string]string
 	if r.WatchFilterValue != "" {
 		labels = map[string]string{
-			commonv1alpha1.WatchLabel: r.WatchFilterValue,
+			corev1alpha1.WatchLabel: r.WatchFilterValue,
 		}
 	}
 	return client.MatchingLabels(labels)
@@ -831,7 +831,7 @@ func (r *MachineReconciler) enqueueMachinesReferencingAliasPrefixRouting(ctx con
 		aliasPrefixRouting := obj.(*networkingv1alpha1.AliasPrefixRouting)
 		destinationSet := utilslices.ToSetFunc(
 			aliasPrefixRouting.Destinations,
-			func(d commonv1alpha1.LocalUIDReference) types.UID { return d.UID },
+			func(d corev1alpha1.LocalUIDReference) types.UID { return d.UID },
 		)
 
 		networkRef := aliasPrefixRouting.NetworkRef
@@ -886,7 +886,7 @@ func (r *MachineReconciler) enqueueMachinesReferencingLoadBalancerRouting(ctx co
 		loadBalancerRouting := obj.(*networkingv1alpha1.LoadBalancerRouting)
 		destinationSet := utilslices.ToSetFunc(
 			loadBalancerRouting.Destinations,
-			func(d commonv1alpha1.LocalUIDReference) types.UID { return d.UID },
+			func(d corev1alpha1.LocalUIDReference) types.UID { return d.UID },
 		)
 
 		networkRef := loadBalancerRouting.NetworkRef

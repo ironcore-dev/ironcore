@@ -19,7 +19,7 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	"github.com/onmetal/onmetal-api/broker/common/cleaner"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
@@ -32,7 +32,7 @@ import (
 )
 
 func (s *Server) prepareOnmetalVirtualIP(virtualIPSpec *ori.VirtualIPSpec) (*networkingv1alpha1.VirtualIP, error) {
-	ip, err := commonv1alpha1.ParseIP(virtualIPSpec.Ip)
+	ip, err := corev1alpha1.ParseIP(virtualIPSpec.Ip)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func (s *Server) prepareOnmetalLoadBalancerTarget(lbTgt *ori.LoadBalancerTargetS
 		return nil, err
 	}
 
-	ip, err := commonv1alpha1.ParseIP(lbTgt.Ip)
+	ip, err := corev1alpha1.ParseIP(lbTgt.Ip)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ func (s *Server) prepareOnmetalLoadBalancerTargets(lbTargets []*ori.LoadBalancer
 }
 
 func (s *Server) prepareOnmetalNATGatewayTarget(nat *ori.NATSpec) (*machinebrokerv1alpha1.NATGatewayTarget, error) {
-	ip, err := commonv1alpha1.ParseIP(nat.Ip)
+	ip, err := corev1alpha1.ParseIP(nat.Ip)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing nat ip: %w", err)
 	}
@@ -192,7 +192,7 @@ func (s *Server) prepareAggregateOnmetalNetworkInterface(networkInterface *ori.N
 	return onmetalNetworkInterfaceConfig, nil
 }
 
-func (s *Server) setOnmetalVirtualIPStatusIP(ctx context.Context, onmetalVirtualIP *networkingv1alpha1.VirtualIP, ip *commonv1alpha1.IP) error {
+func (s *Server) setOnmetalVirtualIPStatusIP(ctx context.Context, onmetalVirtualIP *networkingv1alpha1.VirtualIP, ip *corev1alpha1.IP) error {
 	baseOnmetalVirtualIP := onmetalVirtualIP.DeepCopy()
 	onmetalVirtualIP.Status.IP = ip
 	if err := s.cluster.Client().Status().Patch(ctx, onmetalVirtualIP, client.MergeFrom(baseOnmetalVirtualIP)); err != nil {

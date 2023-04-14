@@ -17,7 +17,6 @@
 package compute
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
@@ -79,7 +78,7 @@ var _ = Describe("MachineReconciler", func() {
 								NetworkInterfaceTemplate: &networkingv1alpha1.NetworkInterfaceTemplateSpec{
 									Spec: networkingv1alpha1.NetworkInterfaceSpec{
 										NetworkRef: corev1.LocalObjectReference{Name: network.Name},
-										IPs:        []networkingv1alpha1.IPSource{{Value: commonv1alpha1.MustParseNewIP("10.0.0.1")}},
+										IPs:        []networkingv1alpha1.IPSource{{Value: corev1alpha1.MustParseNewIP("10.0.0.1")}},
 									},
 								},
 							},
@@ -124,7 +123,7 @@ var _ = Describe("MachineReconciler", func() {
 				Controller:         pointer.Bool(true),
 				BlockOwnerDeletion: pointer.Bool(true),
 			})),
-			HaveField("Spec.MachineRef", &commonv1alpha1.LocalUIDReference{
+			HaveField("Spec.MachineRef", &corev1alpha1.LocalUIDReference{
 				Name: machine.Name,
 				UID:  machine.UID,
 			}),
@@ -146,7 +145,7 @@ var _ = Describe("MachineReconciler", func() {
 				Controller:         pointer.Bool(true),
 				BlockOwnerDeletion: pointer.Bool(true),
 			})),
-			HaveField("Spec.ClaimRef", &commonv1alpha1.LocalUIDReference{
+			HaveField("Spec.ClaimRef", &corev1alpha1.LocalUIDReference{
 				Name: machine.Name,
 				UID:  machine.UID,
 			}),
@@ -158,7 +157,7 @@ var _ = Describe("MachineReconciler", func() {
 				MatchFields(IgnoreMissing|IgnoreExtras, Fields{
 					"Name":  Equal("interface"),
 					"Phase": Equal(computev1alpha1.NetworkInterfacePhaseBound),
-					"IPs":   ConsistOf(commonv1alpha1.MustParseIP("10.0.0.1")),
+					"IPs":   ConsistOf(corev1alpha1.MustParseIP("10.0.0.1")),
 				}),
 			)),
 			HaveField("Status.Volumes", ConsistOf(

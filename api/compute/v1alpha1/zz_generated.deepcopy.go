@@ -21,7 +21,6 @@
 package v1alpha1
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
@@ -392,7 +391,7 @@ func (in *MachinePoolSpec) DeepCopyInto(out *MachinePoolSpec) {
 	*out = *in
 	if in.Taints != nil {
 		in, out := &in.Taints, &out.Taints
-		*out = make([]commonv1alpha1.Taint, len(*in))
+		*out = make([]corev1alpha1.Taint, len(*in))
 		copy(*out, *in)
 	}
 	return
@@ -479,7 +478,7 @@ func (in *MachineSpec) DeepCopyInto(out *MachineSpec) {
 	}
 	if in.IgnitionRef != nil {
 		in, out := &in.IgnitionRef, &out.IgnitionRef
-		*out = new(commonv1alpha1.SecretKeySelector)
+		*out = new(corev1alpha1.SecretKeySelector)
 		**out = **in
 	}
 	if in.EFIVars != nil {
@@ -489,7 +488,7 @@ func (in *MachineSpec) DeepCopyInto(out *MachineSpec) {
 	}
 	if in.Tolerations != nil {
 		in, out := &in.Tolerations, &out.Tolerations
-		*out = make([]commonv1alpha1.Toleration, len(*in))
+		*out = make([]corev1alpha1.Toleration, len(*in))
 		copy(*out, *in)
 	}
 	return
@@ -583,7 +582,7 @@ func (in *NetworkInterfaceStatus) DeepCopyInto(out *NetworkInterfaceStatus) {
 	*out = *in
 	if in.IPs != nil {
 		in, out := &in.IPs, &out.IPs
-		*out = make([]commonv1alpha1.IP, len(*in))
+		*out = make([]corev1alpha1.IP, len(*in))
 		for i := range *in {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}

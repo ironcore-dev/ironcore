@@ -22,7 +22,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 )
 
@@ -171,15 +171,15 @@ var _ = Describe("BucketScheduler", func() {
 				GenerateName: "test-pool-",
 			},
 			Spec: storagev1alpha1.BucketPoolSpec{
-				Taints: []commonv1alpha1.Taint{
+				Taints: []corev1alpha1.Taint{
 					{
 						Key:    "key",
 						Value:  "value",
-						Effect: commonv1alpha1.TaintEffectNoSchedule,
+						Effect: corev1alpha1.TaintEffectNoSchedule,
 					},
 					{
 						Key:    "key1",
-						Effect: commonv1alpha1.TaintEffectNoSchedule,
+						Effect: corev1alpha1.TaintEffectNoSchedule,
 					},
 				},
 			},
@@ -213,11 +213,11 @@ var _ = Describe("BucketScheduler", func() {
 
 		By("patching the bucket to contain only one of the corresponding tolerations")
 		bucketBase := bucket.DeepCopy()
-		bucket.Spec.Tolerations = append(bucket.Spec.Tolerations, commonv1alpha1.Toleration{
+		bucket.Spec.Tolerations = append(bucket.Spec.Tolerations, corev1alpha1.Toleration{
 			Key:      "key",
 			Value:    "value",
-			Effect:   commonv1alpha1.TaintEffectNoSchedule,
-			Operator: commonv1alpha1.TolerationOpEqual,
+			Effect:   corev1alpha1.TaintEffectNoSchedule,
+			Operator: corev1alpha1.TolerationOpEqual,
 		})
 		Expect(k8sClient.Patch(ctx, bucket, client.MergeFrom(bucketBase))).To(Succeed(), "failed to patch the bucket's spec")
 
@@ -229,10 +229,10 @@ var _ = Describe("BucketScheduler", func() {
 
 		By("patching the bucket to contain all of the corresponding tolerations")
 		bucketBase = bucket.DeepCopy()
-		bucket.Spec.Tolerations = append(bucket.Spec.Tolerations, commonv1alpha1.Toleration{
+		bucket.Spec.Tolerations = append(bucket.Spec.Tolerations, corev1alpha1.Toleration{
 			Key:      "key1",
-			Effect:   commonv1alpha1.TaintEffectNoSchedule,
-			Operator: commonv1alpha1.TolerationOpExists,
+			Effect:   corev1alpha1.TaintEffectNoSchedule,
+			Operator: corev1alpha1.TolerationOpExists,
 		})
 		Expect(k8sClient.Patch(ctx, bucket, client.MergeFrom(bucketBase))).To(Succeed(), "failed to patch the bucket's spec")
 

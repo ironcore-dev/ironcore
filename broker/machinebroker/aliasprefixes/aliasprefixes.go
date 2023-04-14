@@ -18,7 +18,7 @@ import (
 	"context"
 	"fmt"
 
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	"github.com/onmetal/onmetal-api/broker/common/cleaner"
 	commonsync "github.com/onmetal/onmetal-api/broker/common/sync"
@@ -37,7 +37,7 @@ import (
 
 type aliasPrefixKey struct {
 	networkHandle string
-	prefix        commonv1alpha1.IPPrefix
+	prefix        corev1alpha1.IPPrefix
 }
 
 func (k aliasPrefixKey) String() string {
@@ -134,7 +134,7 @@ func (m *AliasPrefixes) createAliasPrefix(
 			Namespace: m.cluster.Namespace(),
 			Name:      aliasPrefix.Name,
 		},
-		NetworkRef: commonv1alpha1.LocalUIDReference{
+		NetworkRef: corev1alpha1.LocalUIDReference{
 			Name: network.Name,
 			UID:  network.UID,
 		},
@@ -159,7 +159,7 @@ func (m *AliasPrefixes) removeAliasPrefixRoutingDestination(
 	networkInterface *networkingv1alpha1.NetworkInterface,
 ) error {
 	idx := slices.IndexFunc(aliasPrefixRouting.Destinations,
-		func(ref commonv1alpha1.LocalUIDReference) bool { return ref.UID == networkInterface.UID },
+		func(ref corev1alpha1.LocalUIDReference) bool { return ref.UID == networkInterface.UID },
 	)
 	if idx == -1 {
 		return nil
@@ -179,14 +179,14 @@ func (m *AliasPrefixes) addAliasPrefixRoutingDestination(
 	networkInterface *networkingv1alpha1.NetworkInterface,
 ) error {
 	idx := slices.IndexFunc(aliasPrefixRouting.Destinations,
-		func(ref commonv1alpha1.LocalUIDReference) bool { return ref.UID == networkInterface.UID },
+		func(ref corev1alpha1.LocalUIDReference) bool { return ref.UID == networkInterface.UID },
 	)
 	if idx >= 0 {
 		return nil
 	}
 
 	base := aliasPrefixRouting.DeepCopy()
-	aliasPrefixRouting.Destinations = append(aliasPrefixRouting.Destinations, commonv1alpha1.LocalUIDReference{
+	aliasPrefixRouting.Destinations = append(aliasPrefixRouting.Destinations, corev1alpha1.LocalUIDReference{
 		Name: networkInterface.Name,
 		UID:  networkInterface.UID,
 	})
@@ -199,7 +199,7 @@ func (m *AliasPrefixes) addAliasPrefixRoutingDestination(
 func (m *AliasPrefixes) Create(
 	ctx context.Context,
 	network *networkingv1alpha1.Network,
-	prefix commonv1alpha1.IPPrefix,
+	prefix corev1alpha1.IPPrefix,
 	networkInterface *networkingv1alpha1.NetworkInterface,
 ) error {
 	key := aliasPrefixKey{
@@ -242,7 +242,7 @@ func (m *AliasPrefixes) Create(
 func (m *AliasPrefixes) Delete(
 	ctx context.Context,
 	networkHandle string,
-	prefix commonv1alpha1.IPPrefix,
+	prefix corev1alpha1.IPPrefix,
 	networkInterface *networkingv1alpha1.NetworkInterface,
 ) error {
 	key := aliasPrefixKey{
@@ -276,7 +276,7 @@ func (m *AliasPrefixes) Delete(
 
 type AliasPrefix struct {
 	NetworkHandle string
-	Prefix        commonv1alpha1.IPPrefix
+	Prefix        corev1alpha1.IPPrefix
 	Destinations  sets.Set[string]
 }
 
@@ -358,7 +358,7 @@ func (m *AliasPrefixes) joinAliasPrefixesAndRoutings(
 
 		destinations := utilslices.ToSetFunc(
 			aliasPrefixRouting.Destinations,
-			func(dest commonv1alpha1.LocalUIDReference) string {
+			func(dest corev1alpha1.LocalUIDReference) string {
 				return dest.Name
 			},
 		)

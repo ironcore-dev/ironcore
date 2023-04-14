@@ -16,7 +16,7 @@
 package networking
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	. "github.com/onmetal/onmetal-api/utils/testing"
@@ -64,7 +64,7 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 				},
 				IPs: []networkingv1alpha1.IPSource{
 					{
-						Value: commonv1alpha1.MustParseNewIP("10.0.0.1"),
+						Value: corev1alpha1.MustParseNewIP("10.0.0.1"),
 					},
 				},
 			},
@@ -79,7 +79,7 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 		}).Should(SatisfyAll(
 			HaveField("State", networkingv1alpha1.NetworkInterfaceStateAvailable),
 			HaveField("NetworkHandle", networkHandle),
-			HaveField("IPs", []commonv1alpha1.IP{commonv1alpha1.MustParseIP("10.0.0.1")}),
+			HaveField("IPs", []corev1alpha1.IP{corev1alpha1.MustParseIP("10.0.0.1")}),
 		))
 	})
 
@@ -92,7 +92,7 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 			},
 			Spec: ipamv1alpha1.PrefixSpec{
 				IPFamily: corev1.IPv4Protocol,
-				Prefix:   commonv1alpha1.MustParseNewIPPrefix("10.0.0.0/24"),
+				Prefix:   corev1alpha1.MustParseNewIPPrefix("10.0.0.0/24"),
 			},
 		}
 		Expect(k8sClient.Create(ctx, rootPrefix)).To(Succeed())
@@ -132,7 +132,7 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 								Spec: ipamv1alpha1.PrefixSpec{
 									IPFamily:  corev1.IPv4Protocol,
 									ParentRef: &corev1.LocalObjectReference{Name: rootPrefix.Name},
-									Prefix:    commonv1alpha1.MustParseNewIPPrefix("10.0.0.1/32"),
+									Prefix:    corev1alpha1.MustParseNewIPPrefix("10.0.0.1/32"),
 								},
 							},
 						},
@@ -154,7 +154,7 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 			g.Expect(prefix.Spec).To(Equal(ipamv1alpha1.PrefixSpec{
 				IPFamily:  corev1.IPv4Protocol,
 				ParentRef: &corev1.LocalObjectReference{Name: rootPrefix.Name},
-				Prefix:    commonv1alpha1.MustParseNewIPPrefix("10.0.0.1/32"),
+				Prefix:    corev1alpha1.MustParseNewIPPrefix("10.0.0.1/32"),
 			}))
 			g.Expect(prefix.Status.Phase).To(Equal(ipamv1alpha1.PrefixPhaseAllocated))
 		}).Should(Succeed())
@@ -162,7 +162,7 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 		By("waiting for the network interface to be available and report the correct ips")
 		Eventually(Object(nic)).Should(HaveField("Status", SatisfyAll(
 			HaveField("State", networkingv1alpha1.NetworkInterfaceStateAvailable),
-			HaveField("IPs", []commonv1alpha1.IP{commonv1alpha1.MustParseIP("10.0.0.1")}),
+			HaveField("IPs", []corev1alpha1.IP{corev1alpha1.MustParseIP("10.0.0.1")}),
 		)))
 	})
 
@@ -196,7 +196,7 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 					corev1.IPv4Protocol,
 				},
 				IPs: []networkingv1alpha1.IPSource{
-					{Value: commonv1alpha1.MustParseNewIP("192.168.178.1")},
+					{Value: corev1alpha1.MustParseNewIP("192.168.178.1")},
 				},
 				VirtualIP: &networkingv1alpha1.VirtualIPSource{
 					Ephemeral: &networkingv1alpha1.EphemeralVirtualIPSource{
@@ -224,21 +224,21 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 			g.Expect(virtualIP.Spec).To(Equal(networkingv1alpha1.VirtualIPSpec{
 				Type:      networkingv1alpha1.VirtualIPTypePublic,
 				IPFamily:  corev1.IPv4Protocol,
-				TargetRef: &commonv1alpha1.LocalUIDReference{Name: virtualIP.Name, UID: nic.UID},
+				TargetRef: &corev1alpha1.LocalUIDReference{Name: virtualIP.Name, UID: nic.UID},
 			}))
 			g.Expect(virtualIP.Status.Phase).To(Equal(networkingv1alpha1.VirtualIPPhaseBound))
 		}).Should(Succeed())
 
 		By("updating the virtual ip ip")
 		baseVirtualIP := virtualIP.DeepCopy()
-		virtualIP.Status.IP = commonv1alpha1.MustParseNewIP("10.0.0.1")
+		virtualIP.Status.IP = corev1alpha1.MustParseNewIP("10.0.0.1")
 		Expect(k8sClient.Status().Patch(ctx, virtualIP, client.MergeFrom(baseVirtualIP))).To(Succeed())
 
 		By("waiting for the virtual ip to be reported in the network interface status")
 		Eventually(Object(nic)).Should(HaveField("Status", SatisfyAll(
 			HaveField("State", networkingv1alpha1.NetworkInterfaceStateAvailable),
-			HaveField("IPs", []commonv1alpha1.IP{commonv1alpha1.MustParseIP("192.168.178.1")}),
-			HaveField("VirtualIP", commonv1alpha1.MustParseNewIP("10.0.0.1")),
+			HaveField("IPs", []corev1alpha1.IP{corev1alpha1.MustParseIP("192.168.178.1")}),
+			HaveField("VirtualIP", corev1alpha1.MustParseNewIP("10.0.0.1")),
 		)))
 	})
 })

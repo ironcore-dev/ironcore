@@ -24,7 +24,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 )
 
@@ -179,15 +178,15 @@ var _ = Describe("VolumeScheduler", func() {
 				GenerateName: "test-pool-",
 			},
 			Spec: storagev1alpha1.VolumePoolSpec{
-				Taints: []commonv1alpha1.Taint{
+				Taints: []corev1alpha1.Taint{
 					{
 						Key:    "key",
 						Value:  "value",
-						Effect: commonv1alpha1.TaintEffectNoSchedule,
+						Effect: corev1alpha1.TaintEffectNoSchedule,
 					},
 					{
 						Key:    "key1",
-						Effect: commonv1alpha1.TaintEffectNoSchedule,
+						Effect: corev1alpha1.TaintEffectNoSchedule,
 					},
 				},
 			},
@@ -224,11 +223,11 @@ var _ = Describe("VolumeScheduler", func() {
 
 		By("patching the volume to contain only one of the corresponding tolerations")
 		volumeBase := volume.DeepCopy()
-		volume.Spec.Tolerations = append(volume.Spec.Tolerations, commonv1alpha1.Toleration{
+		volume.Spec.Tolerations = append(volume.Spec.Tolerations, corev1alpha1.Toleration{
 			Key:      "key",
 			Value:    "value",
-			Effect:   commonv1alpha1.TaintEffectNoSchedule,
-			Operator: commonv1alpha1.TolerationOpEqual,
+			Effect:   corev1alpha1.TaintEffectNoSchedule,
+			Operator: corev1alpha1.TolerationOpEqual,
 		})
 		Expect(k8sClient.Patch(ctx, volume, client.MergeFrom(volumeBase))).To(Succeed(), "failed to patch the volume's spec")
 
@@ -240,10 +239,10 @@ var _ = Describe("VolumeScheduler", func() {
 
 		By("patching the volume to contain all of the corresponding tolerations")
 		volumeBase = volume.DeepCopy()
-		volume.Spec.Tolerations = append(volume.Spec.Tolerations, commonv1alpha1.Toleration{
+		volume.Spec.Tolerations = append(volume.Spec.Tolerations, corev1alpha1.Toleration{
 			Key:      "key1",
-			Effect:   commonv1alpha1.TaintEffectNoSchedule,
-			Operator: commonv1alpha1.TolerationOpExists,
+			Effect:   corev1alpha1.TaintEffectNoSchedule,
+			Operator: corev1alpha1.TolerationOpExists,
 		})
 		Expect(k8sClient.Patch(ctx, volume, client.MergeFrom(volumeBase))).To(Succeed(), "failed to patch the volume's spec")
 

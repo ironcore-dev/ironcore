@@ -21,7 +21,7 @@
 package compute
 
 import (
-	v1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	v1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	core "github.com/onmetal/onmetal-api/internal/apis/core"
 	networking "github.com/onmetal/onmetal-api/internal/apis/networking"
 	storage "github.com/onmetal/onmetal-api/internal/apis/storage"

@@ -17,7 +17,7 @@ package ipam
 
 import (
 	"github.com/onmetal/controller-utils/clientutils"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
@@ -33,7 +33,7 @@ var _ = Describe("PrefixReconciler", func() {
 
 	It("should mark root prefixes as ready", func() {
 		By("creating a root prefix")
-		prefixValue := commonv1alpha1.MustParseNewIPPrefix("10.0.0.0/24")
+		prefixValue := corev1alpha1.MustParseNewIPPrefix("10.0.0.0/24")
 		prefix := &ipamv1alpha1.Prefix{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
@@ -63,7 +63,7 @@ var _ = Describe("PrefixReconciler", func() {
 
 	It("should allocate child prefixes", func() {
 		By("creating a root prefix")
-		prefixValue := commonv1alpha1.MustParseNewIPPrefix("10.0.0.0/24")
+		prefixValue := corev1alpha1.MustParseNewIPPrefix("10.0.0.0/24")
 		rootPrefix := &ipamv1alpha1.Prefix{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
@@ -92,7 +92,7 @@ var _ = Describe("PrefixReconciler", func() {
 		Expect(k8sClient.Create(ctx, childPrefix)).To(Succeed())
 
 		By("waiting for the child prefix to be marked as ready and report its available ranges")
-		expectedChildPrefix := commonv1alpha1.MustParseIPPrefix("10.0.0.0/28")
+		expectedChildPrefix := corev1alpha1.MustParseIPPrefix("10.0.0.0/28")
 		childPrefixKey := client.ObjectKeyFromObject(childPrefix)
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, childPrefixKey, childPrefix)).To(Succeed())
@@ -126,7 +126,7 @@ var _ = Describe("PrefixReconciler", func() {
 
 	It("should leave prefixes in pending state when they can't be allocated", func() {
 		By("creating a root prefix")
-		prefixValue := commonv1alpha1.MustParseNewIPPrefix("10.0.0.0/24")
+		prefixValue := corev1alpha1.MustParseNewIPPrefix("10.0.0.0/24")
 		rootPrefix := &ipamv1alpha1.Prefix{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
@@ -199,7 +199,7 @@ var _ = Describe("PrefixReconciler", func() {
 		}).Should(Succeed())
 
 		By("creating a root prefix that would fit but does not match")
-		prefixValue := commonv1alpha1.MustParseNewIPPrefix("10.0.0.0/24")
+		prefixValue := corev1alpha1.MustParseNewIPPrefix("10.0.0.0/24")
 		notMatchingRootPrefix := &ipamv1alpha1.Prefix{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
@@ -234,7 +234,7 @@ var _ = Describe("PrefixReconciler", func() {
 		Expect(k8sClient.Create(ctx, rootPrefix)).To(Succeed())
 
 		By("waiting for the child prefix to be marked as ready and report its available ranges")
-		expectedChildPrefix := commonv1alpha1.MustParseIPPrefix("10.0.0.0/28")
+		expectedChildPrefix := corev1alpha1.MustParseIPPrefix("10.0.0.0/28")
 		Eventually(func(g Gomega) {
 			Expect(k8sClient.Get(ctx, childPrefixKey, childPrefix)).To(Succeed())
 			g.Expect(childPrefix.Status.Phase).To(Equal(ipamv1alpha1.PrefixPhaseAllocated))
@@ -278,7 +278,7 @@ var _ = Describe("PrefixReconciler", func() {
 				GenerateName: "root-",
 			},
 			Spec: ipamv1alpha1.PrefixSpec{
-				Prefix: commonv1alpha1.MustParseNewIPPrefix("10.0.0.0/8"),
+				Prefix: corev1alpha1.MustParseNewIPPrefix("10.0.0.0/8"),
 			},
 		}
 		Expect(k8sClient.Create(ctx, rootPrefix)).To(Succeed())
@@ -290,7 +290,7 @@ var _ = Describe("PrefixReconciler", func() {
 				GenerateName: "child-",
 			},
 			Spec: ipamv1alpha1.PrefixSpec{
-				Prefix:    commonv1alpha1.MustParseNewIPPrefix("10.0.0.0/9"),
+				Prefix:    corev1alpha1.MustParseNewIPPrefix("10.0.0.0/9"),
 				ParentRef: &corev1.LocalObjectReference{Name: rootPrefix.Name},
 			},
 		}
@@ -312,7 +312,7 @@ var _ = Describe("PrefixReconciler", func() {
 				GenerateName: "root-",
 			},
 			Spec: ipamv1alpha1.PrefixSpec{
-				Prefix: commonv1alpha1.MustParseNewIPPrefix("10.0.0.0/8"),
+				Prefix: corev1alpha1.MustParseNewIPPrefix("10.0.0.0/8"),
 			},
 		}
 		Expect(k8sClient.Create(ctx, rootPrefix)).To(Succeed())
@@ -324,7 +324,7 @@ var _ = Describe("PrefixReconciler", func() {
 				GenerateName: "child-",
 			},
 			Spec: ipamv1alpha1.PrefixSpec{
-				Prefix:    commonv1alpha1.MustParseNewIPPrefix("10.0.0.0/8"),
+				Prefix:    corev1alpha1.MustParseNewIPPrefix("10.0.0.0/8"),
 				ParentRef: &corev1.LocalObjectReference{Name: rootPrefix.Name},
 			},
 		}
@@ -346,7 +346,7 @@ var _ = Describe("PrefixReconciler", func() {
 				GenerateName: "root-",
 			},
 			Spec: ipamv1alpha1.PrefixSpec{
-				Prefix: commonv1alpha1.MustParseNewIPPrefix("10.0.0.0/8"),
+				Prefix: corev1alpha1.MustParseNewIPPrefix("10.0.0.0/8"),
 			},
 		}
 		Expect(k8sClient.Create(ctx, rootPrefix)).To(Succeed())

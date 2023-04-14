@@ -22,7 +22,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 )
 
 // VolumeGK is a helper to easily access the GroupKind information of an Volume
@@ -48,7 +48,7 @@ type VolumeSpec struct {
 	// If unset, the scheduler will figure out a suitable VolumePoolRef.
 	VolumePoolRef *corev1.LocalObjectReference
 	// ClaimRef is the reference to the claiming entity of the Volume.
-	ClaimRef *commonv1alpha1.LocalUIDReference
+	ClaimRef *corev1alpha1.LocalUIDReference
 	// Resources is a description of the volume's resources and capacity.
 	Resources core.ResourceList
 	// Image is an optional image to bootstrap the volume with.
@@ -59,7 +59,7 @@ type VolumeSpec struct {
 	Unclaimable bool
 	// Tolerations define tolerations the Volume has. Only a VolumePool whose taints
 	// covered by Tolerations will be considered to host the Volume.
-	Tolerations []commonv1alpha1.Toleration
+	Tolerations []corev1alpha1.Toleration
 	// Encryption is an optional field which provides attributes to encrypt Volume.
 	Encryption *VolumeEncryption
 }

@@ -23,8 +23,8 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	computeclient "github.com/onmetal/onmetal-api/internal/client/compute"
 	"github.com/onmetal/onmetal-api/internal/controllers/storage/events"
@@ -96,7 +96,7 @@ func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volum
 	return r.reconcileBound(ctx, log, volume)
 }
 
-func (r *VolumeReconciler) assign(ctx context.Context, volume *storagev1alpha1.Volume, claimRef commonv1alpha1.LocalUIDReference) error {
+func (r *VolumeReconciler) assign(ctx context.Context, volume *storagev1alpha1.Volume, claimRef corev1alpha1.LocalUIDReference) error {
 	base := volume.DeepCopy()
 	volume.Spec.ClaimRef = &claimRef
 	if err := r.Patch(ctx, volume, client.MergeFrom(base)); err != nil {
@@ -137,7 +137,7 @@ func (r *VolumeReconciler) reconcileUnbound(ctx context.Context, log logr.Logger
 	machineKey := client.ObjectKeyFromObject(machine)
 	log = log.WithValues("MachineKey", machineKey)
 
-	claimRef := commonv1alpha1.LocalUIDReference{
+	claimRef := corev1alpha1.LocalUIDReference{
 		Name: machine.Name,
 		UID:  machine.UID,
 	}

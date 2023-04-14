@@ -17,7 +17,7 @@
 package validation
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	"github.com/onmetal/onmetal-api/internal/apis/networking"
 	. "github.com/onmetal/onmetal-api/internal/testutils/validation"
 	. "github.com/onsi/ginkgo/v2"
@@ -72,7 +72,7 @@ var _ = Describe("VirtualIP", func() {
 		Entry("invalid target ref name",
 			&networking.VirtualIP{
 				Spec: networking.VirtualIPSpec{
-					TargetRef: &commonv1alpha1.LocalUIDReference{
+					TargetRef: &corev1alpha1.LocalUIDReference{
 						Name: "foo*",
 					},
 				},
@@ -88,7 +88,7 @@ var _ = Describe("VirtualIP", func() {
 				Spec: networking.VirtualIPSpec{
 					Type:     networking.VirtualIPTypePublic,
 					IPFamily: corev1.IPv4Protocol,
-					TargetRef: &commonv1alpha1.LocalUIDReference{
+					TargetRef: &corev1alpha1.LocalUIDReference{
 						Name: "foo",
 					},
 				},
@@ -131,14 +131,14 @@ var _ = Describe("VirtualIP", func() {
 		Entry("mutable target reference",
 			&networking.VirtualIP{
 				Spec: networking.VirtualIPSpec{
-					TargetRef: &commonv1alpha1.LocalUIDReference{
+					TargetRef: &corev1alpha1.LocalUIDReference{
 						Name: "bar",
 					},
 				},
 			},
 			&networking.VirtualIP{
 				Spec: networking.VirtualIPSpec{
-					TargetRef: &commonv1alpha1.LocalUIDReference{
+					TargetRef: &corev1alpha1.LocalUIDReference{
 						Name: "foo",
 					},
 				},

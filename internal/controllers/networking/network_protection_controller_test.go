@@ -17,7 +17,7 @@
 package networking
 
 import (
-	"github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	"github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"

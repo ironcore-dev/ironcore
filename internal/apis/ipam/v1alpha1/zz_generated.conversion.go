@@ -23,7 +23,7 @@ package v1alpha1
 import (
 	unsafe "unsafe"
 
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	v1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	ipam "github.com/onmetal/onmetal-api/internal/apis/ipam"
 	v1 "k8s.io/api/core/v1"
@@ -240,7 +240,7 @@ func Convert_ipam_PrefixAllocationList_To_v1alpha1_PrefixAllocationList(in *ipam
 
 func autoConvert_v1alpha1_PrefixAllocationSpec_To_ipam_PrefixAllocationSpec(in *v1alpha1.PrefixAllocationSpec, out *ipam.PrefixAllocationSpec, s conversion.Scope) error {
 	out.IPFamily = v1.IPFamily(in.IPFamily)
-	out.Prefix = (*commonv1alpha1.IPPrefix)(unsafe.Pointer(in.Prefix))
+	out.Prefix = (*corev1alpha1.IPPrefix)(unsafe.Pointer(in.Prefix))
 	out.PrefixLength = in.PrefixLength
 	out.PrefixRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.PrefixRef))
 	out.PrefixSelector = (*metav1.LabelSelector)(unsafe.Pointer(in.PrefixSelector))
@@ -254,7 +254,7 @@ func Convert_v1alpha1_PrefixAllocationSpec_To_ipam_PrefixAllocationSpec(in *v1al
 
 func autoConvert_ipam_PrefixAllocationSpec_To_v1alpha1_PrefixAllocationSpec(in *ipam.PrefixAllocationSpec, out *v1alpha1.PrefixAllocationSpec, s conversion.Scope) error {
 	out.IPFamily = v1.IPFamily(in.IPFamily)
-	out.Prefix = (*commonv1alpha1.IPPrefix)(unsafe.Pointer(in.Prefix))
+	out.Prefix = (*corev1alpha1.IPPrefix)(unsafe.Pointer(in.Prefix))
 	out.PrefixLength = in.PrefixLength
 	out.PrefixRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.PrefixRef))
 	out.PrefixSelector = (*metav1.LabelSelector)(unsafe.Pointer(in.PrefixSelector))
@@ -267,7 +267,7 @@ func Convert_ipam_PrefixAllocationSpec_To_v1alpha1_PrefixAllocationSpec(in *ipam
 }
 
 func autoConvert_v1alpha1_PrefixAllocationStatus_To_ipam_PrefixAllocationStatus(in *v1alpha1.PrefixAllocationStatus, out *ipam.PrefixAllocationStatus, s conversion.Scope) error {
-	out.Prefix = (*commonv1alpha1.IPPrefix)(unsafe.Pointer(in.Prefix))
+	out.Prefix = (*corev1alpha1.IPPrefix)(unsafe.Pointer(in.Prefix))
 	out.Phase = ipam.PrefixAllocationPhase(in.Phase)
 	out.LastPhaseTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastPhaseTransitionTime))
 	return nil
@@ -279,7 +279,7 @@ func Convert_v1alpha1_PrefixAllocationStatus_To_ipam_PrefixAllocationStatus(in *
 }
 
 func autoConvert_ipam_PrefixAllocationStatus_To_v1alpha1_PrefixAllocationStatus(in *ipam.PrefixAllocationStatus, out *v1alpha1.PrefixAllocationStatus, s conversion.Scope) error {
-	out.Prefix = (*commonv1alpha1.IPPrefix)(unsafe.Pointer(in.Prefix))
+	out.Prefix = (*corev1alpha1.IPPrefix)(unsafe.Pointer(in.Prefix))
 	out.LastPhaseTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastPhaseTransitionTime))
 	out.Phase = v1alpha1.PrefixAllocationPhase(in.Phase)
 	return nil
@@ -314,7 +314,7 @@ func Convert_ipam_PrefixList_To_v1alpha1_PrefixList(in *ipam.PrefixList, out *v1
 
 func autoConvert_v1alpha1_PrefixSpec_To_ipam_PrefixSpec(in *v1alpha1.PrefixSpec, out *ipam.PrefixSpec, s conversion.Scope) error {
 	out.IPFamily = v1.IPFamily(in.IPFamily)
-	out.Prefix = (*commonv1alpha1.IPPrefix)(unsafe.Pointer(in.Prefix))
+	out.Prefix = (*corev1alpha1.IPPrefix)(unsafe.Pointer(in.Prefix))
 	out.PrefixLength = in.PrefixLength
 	out.ParentRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.ParentRef))
 	out.ParentSelector = (*metav1.LabelSelector)(unsafe.Pointer(in.ParentSelector))
@@ -328,7 +328,7 @@ func Convert_v1alpha1_PrefixSpec_To_ipam_PrefixSpec(in *v1alpha1.PrefixSpec, out
 
 func autoConvert_ipam_PrefixSpec_To_v1alpha1_PrefixSpec(in *ipam.PrefixSpec, out *v1alpha1.PrefixSpec, s conversion.Scope) error {
 	out.IPFamily = v1.IPFamily(in.IPFamily)
-	out.Prefix = (*commonv1alpha1.IPPrefix)(unsafe.Pointer(in.Prefix))
+	out.Prefix = (*corev1alpha1.IPPrefix)(unsafe.Pointer(in.Prefix))
 	out.PrefixLength = in.PrefixLength
 	out.ParentRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.ParentRef))
 	out.ParentSelector = (*metav1.LabelSelector)(unsafe.Pointer(in.ParentSelector))
@@ -343,7 +343,7 @@ func Convert_ipam_PrefixSpec_To_v1alpha1_PrefixSpec(in *ipam.PrefixSpec, out *v1
 func autoConvert_v1alpha1_PrefixStatus_To_ipam_PrefixStatus(in *v1alpha1.PrefixStatus, out *ipam.PrefixStatus, s conversion.Scope) error {
 	out.Phase = ipam.PrefixPhase(in.Phase)
 	out.LastPhaseTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastPhaseTransitionTime))
-	out.Used = *(*[]commonv1alpha1.IPPrefix)(unsafe.Pointer(&in.Used))
+	out.Used = *(*[]corev1alpha1.IPPrefix)(unsafe.Pointer(&in.Used))
 	return nil
 }
 
@@ -355,7 +355,7 @@ func Convert_v1alpha1_PrefixStatus_To_ipam_PrefixStatus(in *v1alpha1.PrefixStatu
 func autoConvert_ipam_PrefixStatus_To_v1alpha1_PrefixStatus(in *ipam.PrefixStatus, out *v1alpha1.PrefixStatus, s conversion.Scope) error {
 	out.Phase = v1alpha1.PrefixPhase(in.Phase)
 	out.LastPhaseTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastPhaseTransitionTime))
-	out.Used = *(*[]commonv1alpha1.IPPrefix)(unsafe.Pointer(&in.Used))
+	out.Used = *(*[]corev1alpha1.IPPrefix)(unsafe.Pointer(&in.Used))
 	return nil
 }
 
