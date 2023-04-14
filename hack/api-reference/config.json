@@ -1,0 +1,36 @@
+{
+  "hideMemberFields": [
+    "TypeMeta"
+  ],
+  "hideTypePatterns": [
+    "ParseError$",
+    "List$"
+  ],
+  "externalPackages": [
+    {
+      "typeMatchPrefix": "^net/netip",
+      "docsURLTemplate": "https://pkg.go.dev/net/netip#{{.TypeIdentifier}}"
+    },
+    {
+      "typeMatchPrefix": "^k8s\\.io/apimachinery/pkg/api/resource",
+      "docsURLTemplate": "https://pkg.go.dev/k8s.io/apimachinery/pkg/api/resource#{{.TypeIdentifier}}"
+    },
+    {
+      "typeMatchPrefix": "^k8s\\.io/apimachinery/pkg/types",
+      "docsURLTemplate": "https://pkg.go.dev/k8s.io/apimachinery/pkg/types#{{.TypeIdentifier}}"
+    },
+    {
+      "typeMatchPrefix": "^k8s\\.io/(api|apimachinery/pkg/apis)/",
+      "docsURLTemplate": "https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#{{lower .TypeIdentifier}}-{{arrIndex .PackageSegments -1}}-{{arrIndex .PackageSegments -2}}"
+    },
+    {
+      "typeMatchPrefix": "^github\\.com/onmetal/onmetal-api/api/",
+      "docsURLTemplate": "../{{arrIndex .PackageSegments -2}}/#{{arrIndex .PackageSegments -2}}.api.onmetal.de/{{arrIndex .PackageSegments -1}}.{{.TypeIdentifier}}"
+    }
+  ],
+  "typeDisplayNamePrefixOverrides": {
+    "k8s.io/api/": "Kubernetes ",
+    "k8s.io/apimachinery/pkg/apis/": "Kubernetes "
+  },
+  "markdownDisabled": false
+}

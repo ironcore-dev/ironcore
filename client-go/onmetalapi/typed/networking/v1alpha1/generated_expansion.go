@@ -33,4 +33,6 @@ type NetworkExpansion interface{}
 
 type NetworkInterfaceExpansion interface{}
 
+type NetworkPolicyExpansion interface{}
+
 type VirtualIPExpansion interface{}

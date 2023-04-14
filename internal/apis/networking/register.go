@@ -45,6 +45,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion,
 		&Network{},
 		&NetworkList{},
+		&NetworkPolicy{},
+		&NetworkPolicyList{},
 		&NetworkInterface{},
 		&NetworkInterfaceList{},
 		&VirtualIP{},

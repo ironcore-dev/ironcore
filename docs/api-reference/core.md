@@ -46,7 +46,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -109,6 +109,48 @@ ResourceQuotaStatus
 </em>
 </td>
 <td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.api.onmetal.de/v1alpha1.ObjectSelector">ObjectSelector
+</h3>
+<div>
+<p>ObjectSelector specifies how to select objects of a certain kind.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>kind</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Kind is the kind of object to select.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>LabelSelector</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#labelselector-v1-meta">
+Kubernetes meta/v1.LabelSelector
+</a>
+</em>
+</td>
+<td>
+<p>
+(Members of <code>LabelSelector</code> are embedded into this type.)
+</p>
+<p>LabelSelector is the label selector to select objects of the specified Kind by.</p>
 </td>
 </tr>
 </tbody>

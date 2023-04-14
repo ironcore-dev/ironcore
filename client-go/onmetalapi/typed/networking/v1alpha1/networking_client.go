@@ -35,6 +35,7 @@ type NetworkingV1alpha1Interface interface {
 	NATGatewayRoutingsGetter
 	NetworksGetter
 	NetworkInterfacesGetter
+	NetworkPoliciesGetter
 	VirtualIPsGetter
 }
 
@@ -73,6 +74,10 @@ func (c *NetworkingV1alpha1Client) Networks(namespace string) NetworkInterface {
 
 func (c *NetworkingV1alpha1Client) NetworkInterfaces(namespace string) NetworkInterfaceInterface {
 	return newNetworkInterfaces(c, namespace)
+}
+
+func (c *NetworkingV1alpha1Client) NetworkPolicies(namespace string) NetworkPolicyInterface {
+	return newNetworkPolicies(c, namespace)
 }
 
 func (c *NetworkingV1alpha1Client) VirtualIPs(namespace string) VirtualIPInterface {

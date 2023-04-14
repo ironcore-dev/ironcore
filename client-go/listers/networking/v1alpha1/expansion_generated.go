@@ -81,6 +81,14 @@ type NetworkInterfaceListerExpansion interface{}
 // NetworkInterfaceNamespaceLister.
 type NetworkInterfaceNamespaceListerExpansion interface{}
 
+// NetworkPolicyListerExpansion allows custom methods to be added to
+// NetworkPolicyLister.
+type NetworkPolicyListerExpansion interface{}
+
+// NetworkPolicyNamespaceListerExpansion allows custom methods to be added to
+// NetworkPolicyNamespaceLister.
+type NetworkPolicyNamespaceListerExpansion interface{}
+
 // VirtualIPListerExpansion allows custom methods to be added to
 // VirtualIPLister.
 type VirtualIPListerExpansion interface{}

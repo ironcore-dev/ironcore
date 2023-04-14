@@ -66,6 +66,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.Volume":                          schema_onmetal_api_api_compute_v1alpha1_Volume(ref),
 		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.VolumeSource":                    schema_onmetal_api_api_compute_v1alpha1_VolumeSource(ref),
 		"github.com/onmetal/onmetal-api/api/compute/v1alpha1.VolumeStatus":                    schema_onmetal_api_api_compute_v1alpha1_VolumeStatus(ref),
+		"github.com/onmetal/onmetal-api/api/core/v1alpha1.ObjectSelector":                     schema_onmetal_api_api_core_v1alpha1_ObjectSelector(ref),
 		"github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceQuota":                      schema_onmetal_api_api_core_v1alpha1_ResourceQuota(ref),
 		"github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceQuotaList":                  schema_onmetal_api_api_core_v1alpha1_ResourceQuotaList(ref),
 		"github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceQuotaSpec":                  schema_onmetal_api_api_core_v1alpha1_ResourceQuotaSpec(ref),
@@ -89,6 +90,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.AliasPrefixStatus":            schema_onmetal_api_api_networking_v1alpha1_AliasPrefixStatus(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.EphemeralPrefixSource":        schema_onmetal_api_api_networking_v1alpha1_EphemeralPrefixSource(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.EphemeralVirtualIPSource":     schema_onmetal_api_api_networking_v1alpha1_EphemeralVirtualIPSource(ref),
+		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.IPBlock":                      schema_onmetal_api_api_networking_v1alpha1_IPBlock(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.IPSource":                     schema_onmetal_api_api_networking_v1alpha1_IPSource(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.LoadBalancer":                 schema_onmetal_api_api_networking_v1alpha1_LoadBalancer(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.LoadBalancerList":             schema_onmetal_api_api_networking_v1alpha1_LoadBalancerList(ref),
@@ -116,6 +118,15 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkList":                  schema_onmetal_api_api_networking_v1alpha1_NetworkList(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPeering":               schema_onmetal_api_api_networking_v1alpha1_NetworkPeering(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPeeringStatus":         schema_onmetal_api_api_networking_v1alpha1_NetworkPeeringStatus(ref),
+		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicy":                schema_onmetal_api_api_networking_v1alpha1_NetworkPolicy(ref),
+		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicyCondition":       schema_onmetal_api_api_networking_v1alpha1_NetworkPolicyCondition(ref),
+		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicyEgressRule":      schema_onmetal_api_api_networking_v1alpha1_NetworkPolicyEgressRule(ref),
+		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicyIngressRule":     schema_onmetal_api_api_networking_v1alpha1_NetworkPolicyIngressRule(ref),
+		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicyList":            schema_onmetal_api_api_networking_v1alpha1_NetworkPolicyList(ref),
+		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicyPeer":            schema_onmetal_api_api_networking_v1alpha1_NetworkPolicyPeer(ref),
+		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicyPort":            schema_onmetal_api_api_networking_v1alpha1_NetworkPolicyPort(ref),
+		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicySpec":            schema_onmetal_api_api_networking_v1alpha1_NetworkPolicySpec(ref),
+		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicyStatus":          schema_onmetal_api_api_networking_v1alpha1_NetworkPolicyStatus(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkSpec":                  schema_onmetal_api_api_networking_v1alpha1_NetworkSpec(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkStatus":                schema_onmetal_api_api_networking_v1alpha1_NetworkStatus(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.PrefixSource":                 schema_onmetal_api_api_networking_v1alpha1_PrefixSource(ref),
@@ -1850,6 +1861,60 @@ func schema_onmetal_api_api_compute_v1alpha1_VolumeStatus(ref common.ReferenceCa
 	}
 }
 
+func schema_onmetal_api_api_core_v1alpha1_ObjectSelector(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ObjectSelector specifies how to select objects of a certain kind.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is the kind of object to select.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"matchLabels": {
+						SchemaProps: spec.SchemaProps{
+							Description: "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"matchExpressions": {
+						SchemaProps: spec.SchemaProps{
+							Description: "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelectorRequirement"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"kind"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelectorRequirement"},
+	}
+}
+
 func schema_onmetal_api_api_core_v1alpha1_ResourceQuota(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -2787,6 +2852,43 @@ func schema_onmetal_api_api_networking_v1alpha1_EphemeralVirtualIPSource(ref com
 		},
 		Dependencies: []string{
 			"github.com/onmetal/onmetal-api/api/networking/v1alpha1.VirtualIPTemplateSpec"},
+	}
+}
+
+func schema_onmetal_api_api_networking_v1alpha1_IPBlock(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "IPBlock specifies an ip block with optional exceptions.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"cidr": {
+						SchemaProps: spec.SchemaProps{
+							Description: "CIDR is a string representing the ip block.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix"),
+						},
+					},
+					"except": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Except is a slice of CIDRs that should not be included within the specified CIDR. Values will be rejected if they are outside CIDR.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"cidr"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix"},
 	}
 }
 
@@ -4041,6 +4143,413 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkPeeringStatus(ref common.
 		},
 		Dependencies: []string{
 			"k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+	}
+}
+
+func schema_onmetal_api_api_networking_v1alpha1_NetworkPolicy(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkPolicy is the Schema for the networkpolicies API",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicySpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicyStatus"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicySpec", "github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicyStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_onmetal_api_api_networking_v1alpha1_NetworkPolicyCondition(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkPolicyCondition is one of the conditions of a network policy.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Type is the type of the condition.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Status is the status of the condition.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"reason": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Reason is a machine-readable indication of why the condition is in a certain state.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"message": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Message is a human-readable explanation of why the condition has a certain reason / state.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"observedGeneration": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ObservedGeneration represents the .metadata.generation that the condition was set based upon.",
+							Type:        []string{"integer"},
+							Format:      "int64",
+						},
+					},
+					"lastTransitionTime": {
+						SchemaProps: spec.SchemaProps{
+							Description: "LastTransitionTime is the last time the status of a condition has transitioned from one state to another.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
+						},
+					},
+				},
+				Required: []string{"type", "status", "reason", "message"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+	}
+}
+
+func schema_onmetal_api_api_networking_v1alpha1_NetworkPolicyEgressRule(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkPolicyEgressRule describes a rule to regulate egress traffic with.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"ports": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Ports specifies the list of destination ports that can be called with this rule. Each item in this list is combined using a logical OR. Empty matches all ports. As soon as a single item is present, only these ports are allowed.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicyPort"),
+									},
+								},
+							},
+						},
+					},
+					"to": {
+						SchemaProps: spec.SchemaProps{
+							Description: "To specifies the list of destinations which the selected network interfaces should be able to send traffic to. Fields are combined using a logical OR. Empty matches all destinations. As soon as a single item is present, only these peers are allowed.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicyPeer"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicyPeer", "github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicyPort"},
+	}
+}
+
+func schema_onmetal_api_api_networking_v1alpha1_NetworkPolicyIngressRule(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkPolicyIngressRule describes a rule to regulate ingress traffic with.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"ports": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Ports specifies the list of ports which should be made accessible for this rule. Each item in this list is combined using a logical OR. Empty matches all ports. As soon as a single item is present, only these ports are allowed.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicyPort"),
+									},
+								},
+							},
+						},
+					},
+					"from": {
+						SchemaProps: spec.SchemaProps{
+							Description: "From specifies the list of sources which should be able to send traffic to the selected network interfaces. Fields are combined using a logical OR. Empty matches all sources. As soon as a single item is present, only these peers are allowed.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicyPeer"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicyPeer", "github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicyPort"},
+	}
+}
+
+func schema_onmetal_api_api_networking_v1alpha1_NetworkPolicyList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkPolicyList contains a list of NetworkPolicy.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicy"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicy", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_onmetal_api_api_networking_v1alpha1_NetworkPolicyPeer(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkPolicyPeer describes a peer to allow traffic to / from.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"objectSelector": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ObjectSelector selects peers with the given kind matching the label selector. Exclusive with other peer specifiers.",
+							Ref:         ref("github.com/onmetal/onmetal-api/api/core/v1alpha1.ObjectSelector"),
+						},
+					},
+					"ipBlock": {
+						SchemaProps: spec.SchemaProps{
+							Description: "IPBlock specifies the ip block from or to which network traffic may come.",
+							Ref:         ref("github.com/onmetal/onmetal-api/api/networking/v1alpha1.IPBlock"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/api/core/v1alpha1.ObjectSelector", "github.com/onmetal/onmetal-api/api/networking/v1alpha1.IPBlock"},
+	}
+}
+
+func schema_onmetal_api_api_networking_v1alpha1_NetworkPolicyPort(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkPolicyPort describes a port to allow traffic on",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"protocol": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Protocol (TCP, UDP, or SCTP) which traffic must match. If not specified, this field defaults to TCP.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"port": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The port on the given protocol. If this field is not provided, this matches all port names and numbers. If present, only traffic on the specified protocol AND port will be matched.",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"endPort": {
+						SchemaProps: spec.SchemaProps{
+							Description: "EndPort indicates that the range of ports from Port to EndPort, inclusive, should be allowed by the policy. This field cannot be defined if the port field is not defined. The endPort must be equal or greater than port.",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func schema_onmetal_api_api_networking_v1alpha1_NetworkPolicySpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkPolicySpec defines the desired state of NetworkPolicy.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"networkRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "NetworkRef is the network to regulate using this policy.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
+						},
+					},
+					"networkInterfaceSelector": {
+						SchemaProps: spec.SchemaProps{
+							Description: "NetworkInterfaceSelector selects the network interfaces that are subject to this policy.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"),
+						},
+					},
+					"ingress": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Ingress specifies rules for ingress traffic.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicyIngressRule"),
+									},
+								},
+							},
+						},
+					},
+					"egress": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Egress specifies rules for egress traffic.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicyEgressRule"),
+									},
+								},
+							},
+						},
+					},
+					"policyTypes": {
+						SchemaProps: spec.SchemaProps{
+							Description: "PolicyTypes specifies the types of policies this network policy contains.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"networkRef", "networkInterfaceSelector"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicyEgressRule", "github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicyIngressRule", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"},
+	}
+}
+
+func schema_onmetal_api_api_networking_v1alpha1_NetworkPolicyStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkPolicyStatus defines the observed state of NetworkPolicy.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"conditions": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Conditions are various conditions of the NetworkPolicy.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicyCondition"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicyCondition"},
 	}
 }
 
