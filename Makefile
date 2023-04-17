@@ -372,6 +372,7 @@ GOIMPORTS ?= $(LOCALBIN)/goimports
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v5.0.0
 CODE_GENERATOR_VERSION ?= v0.26.3
+VGOPATH_VERSION ?= v0.1.1
 CONTROLLER_TOOLS_VERSION ?= v0.11.3
 VGOPATH_VERSION ?= v0.0.2
 GEN_CRD_API_REFERENCE_DOCS_VERSION ?= v0.3.0
@@ -437,7 +438,12 @@ $(APPLYCONFIGURATION_GEN): $(LOCALBIN)
 
 .PHONY: vgopath
 vgopath: $(VGOPATH) ## Download vgopath locally if necessary.
+.PHONY: $(VGOPATH)
 $(VGOPATH): $(LOCALBIN)
+	@if test -x $(LOCALBIN)/vgopath && ! $(LOCALBIN)/vgopath version | grep -q $(VGOPATH_VERSION); then \
+		echo "$(LOCALBIN)/vgopath version is not expected $(VGOPATH_VERSION). Removing it before installing."; \
+		rm -rf $(LOCALBIN)/vgopath; \
+	fi
 	test -s $(LOCALBIN)/vgopath || GOBIN=$(LOCALBIN) go install github.com/onmetal/vgopath@$(VGOPATH_VERSION)
 
 .PHONY: envtest

@@ -59,7 +59,7 @@ VIRTUAL_GOPATH="$(mktemp -d)"
 trap 'rm -rf "$GOPATH"' EXIT
 
 # Setup virtual GOPATH so the codegen tools work as expected.
-(cd "$SCRIPT_DIR/.."; go mod download && "$VGOPATH" "$VIRTUAL_GOPATH")
+(cd "$SCRIPT_DIR/.."; go mod download && "$VGOPATH" -o "$VIRTUAL_GOPATH")
 
 export GOROOT="${GOROOT:-"$(go env GOROOT)"}"
 export GOPATH="$VIRTUAL_GOPATH"
