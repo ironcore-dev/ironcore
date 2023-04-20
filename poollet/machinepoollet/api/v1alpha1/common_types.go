@@ -27,4 +27,17 @@ const (
 
 	FieldOwner       = "machinepoollet.api.onmetal.de/field-owner"
 	MachineFinalizer = "machinepoollet.api.onmetal.de/machine"
+
+	// DownwardAPIPrefix is the prefix for any downward label.
+	DownwardAPIPrefix = "downward-api.machinepoollet.api.onmetal.de/"
 )
+
+// DownwardAPILabel makes a downward api label name from the given name.
+func DownwardAPILabel(name string) string {
+	return DownwardAPIPrefix + name
+}
+
+// DownwardAPIAnnotation makes a downward api annotation name from the given name.
+func DownwardAPIAnnotation(name string) string {
+	return DownwardAPIPrefix + name
+}

@@ -17,7 +17,6 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"reflect"
 	"strconv"
 
 	"github.com/go-logr/logr"
@@ -37,6 +36,7 @@ import (
 	onmetalapiclient "github.com/onmetal/onmetal-api/utils/client"
 	"github.com/onmetal/onmetal-api/utils/predicates"
 	utilslices "github.com/onmetal/onmetal-api/utils/slices"
+	"golang.org/x/exp/maps"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
@@ -44,6 +44,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
+	"k8s.io/kubectl/pkg/util/fieldpath"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -65,6 +66,9 @@ type MachineReconciler struct {
 	MachineClassMapper mcm.MachineClassMapper
 
 	MachinePoolName string
+
+	DownwardAPILabels      map[string]string
+	DownwardAPIAnnotations map[string]string
 
 	WatchFilterValue string
 }
@@ -390,18 +394,39 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 	}
 }
 
-func (r *MachineReconciler) oriMachineLabels(machine *computev1alpha1.Machine) map[string]string {
-	return map[string]string{
+func (r *MachineReconciler) oriMachineLabels(machine *computev1alpha1.Machine) (map[string]string, error) {
+	annotations := map[string]string{
 		machinepoolletv1alpha1.MachineUIDLabel:       string(machine.UID),
 		machinepoolletv1alpha1.MachineNamespaceLabel: machine.Namespace,
 		machinepoolletv1alpha1.MachineNameLabel:      machine.Name,
 	}
+
+	for name, fieldPath := range r.DownwardAPILabels {
+		value, err := fieldpath.ExtractFieldPathAsString(machine, fieldPath)
+		if err != nil {
+			return nil, fmt.Errorf("error extracting downward api label %q: %w", name, err)
+		}
+
+		annotations[machinepoolletv1alpha1.DownwardAPILabel(name)] = value
+	}
+	return annotations, nil
 }
 
-func (r *MachineReconciler) oriMachineAnnotations(machine *computev1alpha1.Machine) map[string]string {
-	return map[string]string{
+func (r *MachineReconciler) oriMachineAnnotations(machine *computev1alpha1.Machine) (map[string]string, error) {
+	annotations := map[string]string{
 		machinepoolletv1alpha1.MachineGenerationAnnotation: strconv.FormatInt(machine.Generation, 10),
 	}
+
+	for name, fieldPath := range r.DownwardAPIAnnotations {
+		value, err := fieldpath.ExtractFieldPathAsString(machine, fieldPath)
+		if err != nil {
+			return nil, fmt.Errorf("error extracting downward api annotation %q: %w", name, err)
+		}
+
+		annotations[machinepoolletv1alpha1.DownwardAPIAnnotation(name)] = value
+	}
+
+	return annotations, nil
 }
 
 func (r *MachineReconciler) create(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) (ctrl.Result, error) {
@@ -577,16 +602,20 @@ func (r *MachineReconciler) update(
 }
 
 func (r *MachineReconciler) updateORIAnnotations(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine, oriMachine *ori.Machine) error {
-	desiredAnnotations := r.oriMachineAnnotations(machine)
+	desiredAnnotations, err := r.oriMachineAnnotations(machine)
+	if err != nil {
+		return fmt.Errorf("error getting ori machine annotations: %w", err)
+	}
+
 	actualAnnotations := oriMachine.Metadata.Annotations
 
-	if reflect.DeepEqual(desiredAnnotations, actualAnnotations) {
+	if !maps.Equal(desiredAnnotations, actualAnnotations) {
 		return nil
 	}
 
 	if _, err := r.MachineRuntime.UpdateMachineAnnotations(ctx, &ori.UpdateMachineAnnotationsRequest{
 		MachineId:   oriMachine.Metadata.Id,
-		Annotations: r.oriMachineAnnotations(machine),
+		Annotations: desiredAnnotations,
 	}); err != nil {
 		return fmt.Errorf("error updating machine annotations: %w", err)
 	}
@@ -720,6 +749,16 @@ func (r *MachineReconciler) prepareORIMachine(ctx context.Context, log logr.Logg
 		ok = false
 	}
 
+	labels, err := r.oriMachineLabels(machine)
+	if err != nil {
+		errs = append(errs, fmt.Errorf("error preparing ori machine labels: %w", err))
+	}
+
+	annotations, err := r.oriMachineAnnotations(machine)
+	if err != nil {
+		errs = append(errs, fmt.Errorf("error preparing ori machine annotations: %w", err))
+	}
+
 	switch {
 	case len(errs) > 0:
 		return nil, false, fmt.Errorf("error(s) preparing machine: %v", errs)
@@ -728,8 +767,8 @@ func (r *MachineReconciler) prepareORIMachine(ctx context.Context, log logr.Logg
 	default:
 		return &ori.Machine{
 			Metadata: &orimeta.ObjectMetadata{
-				Labels:      r.oriMachineLabels(machine),
-				Annotations: r.oriMachineAnnotations(machine),
+				Labels:      labels,
+				Annotations: annotations,
 			},
 			Spec: &ori.MachineSpec{
 				Image:             imageSpec,

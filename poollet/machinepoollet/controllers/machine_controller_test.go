@@ -23,6 +23,7 @@ import (
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	testingmachine "github.com/onmetal/onmetal-api/ori/testing/machine"
+	machinepoolletv1alpha1 "github.com/onmetal/onmetal-api/poollet/machinepoollet/api/v1alpha1"
 	machinepoolletmachine "github.com/onmetal/onmetal-api/poollet/machinepoollet/machine"
 	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
@@ -90,10 +91,14 @@ var _ = Describe("MachineController", func() {
 		Expect(k8sClient.Status().Patch(ctx, volume, client.MergeFrom(baseVolume))).To(Succeed())
 
 		By("creating a machine")
+		const fooAnnotationValue = "bar"
 		machine := &computev1alpha1.Machine{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
 				GenerateName: "machine-",
+				Annotations: map[string]string{
+					fooAnnotation: fooAnnotationValue,
+				},
 			},
 			Spec: computev1alpha1.MachineSpec{
 				MachineClassRef: corev1.LocalObjectReference{Name: mc.Name},
@@ -129,6 +134,7 @@ var _ = Describe("MachineController", func() {
 		_, oriNetworkInterface := GetSingleMapEntry(srv.NetworkInterfaces)
 
 		By("inspecting the ori machine")
+		Expect(oriMachine.Metadata.Labels).To(HaveKeyWithValue(machinepoolletv1alpha1.DownwardAPILabel(fooDownwardAPILabel), fooAnnotationValue))
 		Expect(oriMachine.Spec.Class).To(Equal(mc.Name))
 		Expect(oriMachine.Spec.Power).To(Equal(ori.Power_POWER_ON))
 		Expect(oriMachine.Spec.Volumes).To(ConsistOf(&ori.VolumeAttachment{
