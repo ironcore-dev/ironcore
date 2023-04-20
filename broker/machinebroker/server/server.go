@@ -52,20 +52,27 @@ var _ ori.MachineRuntimeServer = (*Server)(nil)
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=natgatewayroutings,verbs=get;list;watch;create;update;patch;delete
 
 type Server struct {
-	baseURL          *url.URL
-	cluster          cluster.Cluster
-	networks         *networks.Networks
-	aliasPrefixes    *aliasprefixes.AliasPrefixes
-	loadBalancers    *loadbalancers.LoadBalancers
-	natGateways      *natgateways.NATGateways
+	baseURL                    *url.URL
+	defaultRootMachineUIDLabel string
+
+	cluster cluster.Cluster
+
+	networks      *networks.Networks
+	aliasPrefixes *aliasprefixes.AliasPrefixes
+	loadBalancers *loadbalancers.LoadBalancers
+	natGateways   *natgateways.NATGateways
+
 	execRequestCache request.Cache[*ori.ExecRequest]
 }
 
 type Options struct {
 	// BaseURL is the base URL in form http(s)://host:port/path?query to produce request URLs relative to.
-	BaseURL             string
-	MachinePoolName     string
-	MachinePoolSelector map[string]string
+	BaseURL string
+	// DefaultRootMachineUIDLabel specifies the label to obtain the root machine UID from if the
+	// v1alpha1.DownwardAPIRootMachineUIDLabel does not provide a UID.
+	DefaultRootMachineUIDLabel string
+	MachinePoolName            string
+	MachinePoolSelector        map[string]string
 }
 
 func New(cfg *rest.Config, namespace string, opts Options) (*Server, error) {
@@ -83,13 +90,14 @@ func New(cfg *rest.Config, namespace string, opts Options) (*Server, error) {
 	}
 
 	return &Server{
-		baseURL:          baseURL,
-		cluster:          c,
-		networks:         networks.New(c),
-		aliasPrefixes:    aliasprefixes.New(c),
-		loadBalancers:    loadbalancers.New(c),
-		natGateways:      natgateways.New(c),
-		execRequestCache: request.NewCache[*ori.ExecRequest](),
+		baseURL:                    baseURL,
+		defaultRootMachineUIDLabel: opts.DefaultRootMachineUIDLabel,
+		cluster:                    c,
+		networks:                   networks.New(c),
+		aliasPrefixes:              aliasprefixes.New(c),
+		loadBalancers:              loadbalancers.New(c),
+		natGateways:                natgateways.New(c),
+		execRequestCache:           request.NewCache[*ori.ExecRequest](),
 	}, nil
 }
 

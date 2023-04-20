@@ -22,15 +22,18 @@ import (
 	"github.com/onmetal/controller-utils/buildutils"
 	"github.com/onmetal/controller-utils/modutils"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/server"
+	machinepoolletv1alpha1 "github.com/onmetal/onmetal-api/poollet/machinepoollet/api/v1alpha1"
 	utilsenvtest "github.com/onmetal/onmetal-api/utils/envtest"
 	"github.com/onmetal/onmetal-api/utils/envtest/apiserver"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
@@ -115,27 +118,50 @@ var _ = BeforeSuite(func() {
 	Expect(utilsenvtest.WaitUntilAPIServicesReadyWithTimeout(apiServiceTimeout, testEnvExt, k8sClient, scheme.Scheme)).To(Succeed())
 })
 
-func SetupTest(ctx context.Context) (*corev1.Namespace, *server.Server) {
+func SetupTest() (*corev1.Namespace, *server.Server) {
 	var (
 		ns  = &corev1.Namespace{}
 		srv = &server.Server{}
 	)
 
-	BeforeEach(func() {
+	BeforeEach(func(ctx SpecContext) {
 		*ns = corev1.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "test-ns-",
 			},
 		}
 		Expect(k8sClient.Create(ctx, ns)).To(Succeed(), "failed to create test namespace")
-		DeferCleanup(k8sClient.Delete, ctx, ns)
+		DeferCleanup(k8sClient.Delete, ns)
 
 		newSrv, err := server.New(cfg, ns.Name, server.Options{
-			BaseURL: baseURL,
+			BaseURL:                    baseURL,
+			DefaultRootMachineUIDLabel: machinepoolletv1alpha1.MachineUIDLabel,
 		})
 		Expect(err).NotTo(HaveOccurred())
 		*srv = *newSrv
 	})
 
 	return ns, srv
+}
+
+func SetupMachineClass() *computev1alpha1.MachineClass {
+	machineClass := &computev1alpha1.MachineClass{}
+
+	BeforeEach(func(ctx SpecContext) {
+		*machineClass = computev1alpha1.MachineClass{
+			ObjectMeta: metav1.ObjectMeta{
+				GenerateName: "machine-class-",
+			},
+			Capabilities: corev1alpha1.ResourceList{
+				corev1alpha1.ResourceCPU:    resource.MustParse("1"),
+				corev1alpha1.ResourceMemory: resource.MustParse("1Gi"),
+			},
+		}
+		Expect(k8sClient.Create(ctx, machineClass)).To(Succeed())
+		DeferCleanup(func(ctx context.Context) error {
+			return client.IgnoreNotFound(k8sClient.Delete(ctx, machineClass))
+		})
+	})
+
+	return machineClass
 }

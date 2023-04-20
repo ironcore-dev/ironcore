@@ -19,7 +19,6 @@ import (
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
-	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -28,10 +27,9 @@ import (
 )
 
 var _ = Describe("NetworkInterfaceCreateVirtualIP", func() {
-	ctx := SetupContext()
-	ns, srv := SetupTest(ctx)
+	ns, srv := SetupTest()
 
-	It("should correctly create a virtual ip for a network interface", func() {
+	It("should correctly create a virtual ip for a network interface", func(ctx SpecContext) {
 		By("creating a network interface")
 		res, err := srv.CreateNetworkInterface(ctx, &ori.CreateNetworkInterfaceRequest{
 			NetworkInterface: &ori.NetworkInterface{
