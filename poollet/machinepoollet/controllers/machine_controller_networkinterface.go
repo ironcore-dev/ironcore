@@ -130,10 +130,14 @@ func (r *MachineReconciler) listORINetworkInterfacesByMachineKey(ctx context.Con
 	return res.NetworkInterfaces, nil
 }
 
-func (r *MachineReconciler) oriNetworkInterfaceLabels(machine *computev1alpha1.Machine, name string) map[string]string {
-	lbls := r.oriMachineLabels(machine)
+func (r *MachineReconciler) oriNetworkInterfaceLabels(machine *computev1alpha1.Machine, name string) (map[string]string, error) {
+	lbls, err := r.oriMachineLabels(machine)
+	if err != nil {
+		return nil, err
+	}
+
 	lbls[machinepoolletv1alpha1.NetworkInterfaceNameLabel] = name
-	return lbls
+	return lbls, nil
 }
 
 func (r *MachineReconciler) oriNetworkInterfaceFinder(networkInterfaces []*ori.NetworkInterface) func(name, networkHandle string) *ori.NetworkInterface {
@@ -216,17 +220,10 @@ func (r *MachineReconciler) isNetworkInterfaceBoundToMachine(machine *computev1a
 
 func (r *MachineReconciler) createORINetworkInterface(
 	ctx context.Context,
-	machine *computev1alpha1.Machine,
-	name string,
-	spec *ori.NetworkInterfaceSpec,
+	networkInterface *ori.NetworkInterface,
 ) (*ori.NetworkInterface, error) {
 	res, err := r.MachineRuntime.CreateNetworkInterface(ctx, &ori.CreateNetworkInterfaceRequest{
-		NetworkInterface: &ori.NetworkInterface{
-			Metadata: &orimeta.ObjectMetadata{
-				Labels: r.oriNetworkInterfaceLabels(machine, name),
-			},
-			Spec: spec,
-		},
+		NetworkInterface: networkInterface,
 	})
 	if err != nil {
 		return nil, err
@@ -234,24 +231,24 @@ func (r *MachineReconciler) createORINetworkInterface(
 	return res.NetworkInterface, nil
 }
 
-func (r *MachineReconciler) prepareORINetworkInterfaceAttachmentAndSpec(
+func (r *MachineReconciler) prepareORINetworkInterfaceAndAttachment(
 	ctx context.Context,
 	machine *computev1alpha1.Machine,
 	networkInterface computev1alpha1.NetworkInterface,
-) (*ori.NetworkInterfaceAttachment, *ori.NetworkInterfaceSpec, bool, error) {
+) (*ori.NetworkInterfaceAttachment, *ori.NetworkInterface, bool, error) {
 	name := networkInterface.Name
 	switch {
 	case networkInterface.NetworkInterfaceRef != nil || networkInterface.Ephemeral != nil:
 		networkInterfaceName := computev1alpha1.MachineNetworkInterfaceName(machine.Name, networkInterface)
 
-		oriNetworkInterfaceSpec, ok, err := r.prepareORINetworkInterfaceSpec(ctx, machine, name, networkInterfaceName)
+		oriNetworkInterface, ok, err := r.prepareORINetworkInterface(ctx, machine, name, networkInterfaceName)
 		if err != nil || !ok {
 			return nil, nil, ok, err
 		}
 
 		return &ori.NetworkInterfaceAttachment{
 			Name: networkInterface.Name,
-		}, oriNetworkInterfaceSpec, true, nil
+		}, oriNetworkInterface, true, nil
 	default:
 		return nil, nil, false, fmt.Errorf("unrecognized network interface %#v", networkInterface)
 	}
@@ -265,7 +262,7 @@ func (r *MachineReconciler) prepareORINetworkInterfaceAttachmentAndCreateNetwork
 	findORINetworkInterface func(name, networkHandle string) *ori.NetworkInterface,
 ) (networkInterfaceAttachment *ori.NetworkInterfaceAttachment, usedNetworkInterfaceIDs []string, ok bool, err error) {
 	name := networkInterface.Name
-	oriNetworkInterfaceAttachment, oriNetworkInterfaceSpec, ok, err := r.prepareORINetworkInterfaceAttachmentAndSpec(ctx, machine, networkInterface)
+	oriNetworkInterfaceAttachment, desiredORINetworkInterface, ok, err := r.prepareORINetworkInterfaceAndAttachment(ctx, machine, networkInterface)
 	if err != nil {
 		return nil, nil, false, fmt.Errorf("error preparing ori network interface attachment: %w", err)
 	}
@@ -273,18 +270,18 @@ func (r *MachineReconciler) prepareORINetworkInterfaceAttachmentAndCreateNetwork
 		return nil, nil, false, nil
 	}
 
-	if oriNetworkInterfaceSpec != nil {
-		oriNetworkInterface := findORINetworkInterface(name, oriNetworkInterfaceSpec.Network.Handle)
+	if desiredORINetworkInterface != nil {
+		oriNetworkInterface := findORINetworkInterface(name, desiredORINetworkInterface.Spec.Network.Handle)
 		if oriNetworkInterface == nil {
 			log.V(1).Info("Creating ori network interface")
-			n, err := r.createORINetworkInterface(ctx, machine, name, oriNetworkInterfaceSpec)
+			created, err := r.createORINetworkInterface(ctx, desiredORINetworkInterface)
 			if err != nil {
 				return nil, nil, false, fmt.Errorf("error creating ori network interface: %w", err)
 			}
 
-			oriNetworkInterface = n
+			oriNetworkInterface = created
 		} else {
-			if err := r.updateORINetworkInterface(ctx, log, oriNetworkInterface, oriNetworkInterfaceSpec); err != nil {
+			if err := r.updateORINetworkInterface(ctx, log, oriNetworkInterface, oriNetworkInterface.Spec); err != nil {
 				usedNetworkInterfaceIDs = append(usedNetworkInterfaceIDs, oriNetworkInterface.Metadata.Id)
 				return nil, usedNetworkInterfaceIDs, false, fmt.Errorf("error updating ori network interface: %w", err)
 			}
@@ -545,11 +542,11 @@ func (r *MachineReconciler) updateORINetworkInterfaceNATs(
 	return nil
 }
 
-func (r *MachineReconciler) prepareORINetworkInterfaceSpec(
+func (r *MachineReconciler) prepareORINetworkInterface(
 	ctx context.Context,
 	machine *computev1alpha1.Machine,
 	name, networkInterfaceName string,
-) (*ori.NetworkInterfaceSpec, bool, error) {
+) (*ori.NetworkInterface, bool, error) {
 	networkInterface := &networkingv1alpha1.NetworkInterface{}
 	networkInterfaceKey := client.ObjectKey{Namespace: machine.Namespace, Name: networkInterfaceName}
 	if err := r.Get(ctx, networkInterfaceKey, networkInterface); err != nil {
@@ -591,15 +588,25 @@ func (r *MachineReconciler) prepareORINetworkInterfaceSpec(
 		return nil, false, fmt.Errorf("error getting nats for network interface: %w", err)
 	}
 
-	return &ori.NetworkInterfaceSpec{
-		Network: &ori.NetworkSpec{
-			Handle: networkInterface.Status.NetworkHandle,
+	labels, err := r.oriNetworkInterfaceLabels(machine, name)
+	if err != nil {
+		return nil, false, fmt.Errorf("error getting labels for network interface: %w", err)
+	}
+
+	return &ori.NetworkInterface{
+		Metadata: &orimeta.ObjectMetadata{
+			Labels: labels,
 		},
-		Ips:                 r.ipsToStrings(networkInterface.Status.IPs),
-		VirtualIp:           virtualIPSpec,
-		Prefixes:            prefixes,
-		LoadBalancerTargets: loadBalancerTargets,
-		Nats:                nats,
+		Spec: &ori.NetworkInterfaceSpec{
+			Network: &ori.NetworkSpec{
+				Handle: networkInterface.Status.NetworkHandle,
+			},
+			Ips:                 r.ipsToStrings(networkInterface.Status.IPs),
+			VirtualIp:           virtualIPSpec,
+			Prefixes:            prefixes,
+			LoadBalancerTargets: loadBalancerTargets,
+			Nats:                nats,
+		},
 	}, true, nil
 }
 
@@ -814,7 +821,7 @@ func (r *MachineReconciler) updateNetworkInterface(
 		}
 	}
 
-	oriNetworkInterfaceAttachment, oriNetworkInterfaceSpec, ok, err := r.prepareORINetworkInterfaceAttachmentAndSpec(ctx, machine, networkInterface)
+	oriNetworkInterfaceAttachment, desiredORINetworkInterface, ok, err := r.prepareORINetworkInterfaceAndAttachment(ctx, machine, networkInterface)
 	if err != nil {
 		addExistingNetworkInterfaceIDIfPresent()
 		return usedNetworkInterfaceIDs, fmt.Errorf("error preparing ori network interface attachment: %w", err)
@@ -833,18 +840,18 @@ func (r *MachineReconciler) updateNetworkInterface(
 		return nil, nil
 	}
 
-	if oriNetworkInterfaceSpec != nil {
-		oriNetworkInterface := findORINetworkInterface(name, oriNetworkInterfaceSpec.Network.Handle)
+	if desiredORINetworkInterface != nil {
+		oriNetworkInterface := findORINetworkInterface(name, desiredORINetworkInterface.Spec.Network.Handle)
 		if oriNetworkInterface == nil {
-			n, err := r.createORINetworkInterface(ctx, machine, name, oriNetworkInterfaceSpec)
+			created, err := r.createORINetworkInterface(ctx, desiredORINetworkInterface)
 			if err != nil {
 				addExistingNetworkInterfaceIDIfPresent()
 				return usedNetworkInterfaceIDs, fmt.Errorf("error creating ori network interface: %w", err)
 			}
 
-			oriNetworkInterface = n
+			oriNetworkInterface = created
 		} else {
-			if err := r.updateORINetworkInterface(ctx, log, oriNetworkInterface, oriNetworkInterfaceSpec); err != nil {
+			if err := r.updateORINetworkInterface(ctx, log, oriNetworkInterface, desiredORINetworkInterface.Spec); err != nil {
 				addExistingNetworkInterfaceIDIfPresent()
 				usedNetworkInterfaceIDs = append(usedNetworkInterfaceIDs, oriNetworkInterface.Metadata.Id)
 				return usedNetworkInterfaceIDs, fmt.Errorf("error updating ori network interface: %w", err)

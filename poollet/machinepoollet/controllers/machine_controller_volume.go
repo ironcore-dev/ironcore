@@ -62,10 +62,14 @@ func (r *MachineReconciler) listORIVolumesByMachineKey(ctx context.Context, mach
 	return res.Volumes, nil
 }
 
-func (r *MachineReconciler) oriVolumeLabels(machine *computev1alpha1.Machine, name string) map[string]string {
-	lbls := r.oriMachineLabels(machine)
+func (r *MachineReconciler) oriVolumeLabels(machine *computev1alpha1.Machine, name string) (map[string]string, error) {
+	lbls, err := r.oriMachineLabels(machine)
+	if err != nil {
+		return nil, err
+	}
+
 	lbls[machinepoolletv1alpha1.VolumeNameLabel] = name
-	return lbls
+	return lbls, nil
 }
 
 func (r *MachineReconciler) machineVolumeFinder(machineVolumes []computev1alpha1.Volume) func(name string) *computev1alpha1.Volume {
@@ -150,12 +154,12 @@ func (r *MachineReconciler) isVolumeBoundToMachine(machine *computev1alpha1.Mach
 	return false
 }
 
-func (r *MachineReconciler) prepareORIVolumeSpec(
+func (r *MachineReconciler) prepareORIVolume(
 	ctx context.Context,
 	machine *computev1alpha1.Machine,
 	name string,
 	volumeName string,
-) (*ori.VolumeSpec, bool, error) {
+) (*ori.Volume, bool, error) {
 	volume := &storagev1alpha1.Volume{}
 	volumeKey := client.ObjectKey{Namespace: machine.Namespace, Name: volumeName}
 	if err := r.Get(ctx, volumeKey, volume); err != nil {
@@ -201,19 +205,29 @@ func (r *MachineReconciler) prepareORIVolumeSpec(
 		secretData = secret.Data
 	}
 
-	return &ori.VolumeSpec{
-		Driver:     access.Driver,
-		Handle:     access.Handle,
-		Attributes: access.VolumeAttributes,
-		SecretData: secretData,
+	labels, err := r.oriVolumeLabels(machine, name)
+	if err != nil {
+		return nil, false, fmt.Errorf("error preparing ori volume labels: %w", err)
+	}
+
+	return &ori.Volume{
+		Metadata: &orimeta.ObjectMetadata{
+			Labels: labels,
+		},
+		Spec: &ori.VolumeSpec{
+			Driver:     access.Driver,
+			Handle:     access.Handle,
+			Attributes: access.VolumeAttributes,
+			SecretData: secretData,
+		},
 	}, true, nil
 }
 
-func (r *MachineReconciler) prepareORIVolumeAttachmentAndVolumeSpec(
+func (r *MachineReconciler) prepareORIVolumeAndAttachment(
 	ctx context.Context,
 	machine *computev1alpha1.Machine,
 	volume computev1alpha1.Volume,
-) (*ori.VolumeAttachment, *ori.VolumeSpec, bool, error) {
+) (*ori.VolumeAttachment, *ori.Volume, bool, error) {
 	name := volume.Name
 	switch {
 	case volume.EmptyDisk != nil:
@@ -231,7 +245,7 @@ func (r *MachineReconciler) prepareORIVolumeAttachmentAndVolumeSpec(
 	case volume.VolumeRef != nil || volume.Ephemeral != nil:
 		volumeName := computev1alpha1.MachineVolumeName(machine.Name, volume)
 
-		oriVolumeSpec, ok, err := r.prepareORIVolumeSpec(ctx, machine, name, volumeName)
+		oriVolume, ok, err := r.prepareORIVolume(ctx, machine, name, volumeName)
 		if err != nil || !ok {
 			return nil, nil, ok, err
 		}
@@ -239,7 +253,7 @@ func (r *MachineReconciler) prepareORIVolumeAttachmentAndVolumeSpec(
 		return &ori.VolumeAttachment{
 			Name:   name,
 			Device: *volume.Device,
-		}, oriVolumeSpec, true, nil
+		}, oriVolume, true, nil
 	default:
 		return nil, nil, false, fmt.Errorf("unrecognized volume %#v", volume)
 	}
@@ -247,17 +261,10 @@ func (r *MachineReconciler) prepareORIVolumeAttachmentAndVolumeSpec(
 
 func (r *MachineReconciler) createORIVolume(
 	ctx context.Context,
-	machine *computev1alpha1.Machine,
-	name string,
-	spec *ori.VolumeSpec,
+	volume *ori.Volume,
 ) (*ori.Volume, error) {
 	res, err := r.MachineRuntime.CreateVolume(ctx, &ori.CreateVolumeRequest{
-		Volume: &ori.Volume{
-			Metadata: &orimeta.ObjectMetadata{
-				Labels: r.oriVolumeLabels(machine, name),
-			},
-			Spec: spec,
-		},
+		Volume: volume,
 	})
 	if err != nil {
 		return nil, err
@@ -334,7 +341,7 @@ func (r *MachineReconciler) prepareORIVolumeAttachmentAndCreateVolumeIfRequired(
 	findORIVolume func(name string, driver string, handle string) *ori.Volume,
 ) (volumeAttachment *ori.VolumeAttachment, usedVolumeIDs []string, ok bool, err error) {
 	name := volume.Name
-	oriVolumeAttachment, oriVolumeSpec, volumeOK, err := r.prepareORIVolumeAttachmentAndVolumeSpec(ctx, machine, volume)
+	oriVolumeAttachment, desiredORIVolume, volumeOK, err := r.prepareORIVolumeAndAttachment(ctx, machine, volume)
 	if err != nil {
 		return nil, nil, false, fmt.Errorf("error preparing ori volume attachment: %w", err)
 	}
@@ -342,16 +349,16 @@ func (r *MachineReconciler) prepareORIVolumeAttachmentAndCreateVolumeIfRequired(
 		return nil, nil, false, nil
 	}
 
-	if oriVolumeSpec != nil {
-		oriVolume := findORIVolume(name, oriVolumeSpec.Driver, oriVolumeSpec.Handle)
+	if desiredORIVolume != nil {
+		oriVolume := findORIVolume(name, desiredORIVolume.Spec.Driver, desiredORIVolume.Spec.Handle)
 		if oriVolume == nil {
 			log.V(1).Info("Creating ori volume")
-			v, err := r.createORIVolume(ctx, machine, name, oriVolumeSpec)
+			created, err := r.createORIVolume(ctx, desiredORIVolume)
 			if err != nil {
 				return nil, nil, false, fmt.Errorf("error creating ori ori volume: %w", err)
 			}
 
-			oriVolume = v
+			oriVolume = created
 		}
 
 		oriVolumeID := oriVolume.Metadata.Id
@@ -382,7 +389,7 @@ func (r *MachineReconciler) updateORIVolume(
 		}
 	}
 
-	oriVolumeAttachment, oriVolumeSpec, volumeOK, err := r.prepareORIVolumeAttachmentAndVolumeSpec(ctx, machine, volume)
+	oriVolumeAttachment, desiredORIVolume, volumeOK, err := r.prepareORIVolumeAndAttachment(ctx, machine, volume)
 	if err != nil {
 		addExistingVolumeIDIfPresent()
 		return usedVolumeIDs, fmt.Errorf("error preparing ori volume attachment: %w", err)
@@ -401,16 +408,16 @@ func (r *MachineReconciler) updateORIVolume(
 		return nil, nil
 	}
 
-	if oriVolumeSpec != nil {
-		oriVolume := findORIVolume(name, oriVolumeSpec.Driver, oriVolumeSpec.Handle)
+	if desiredORIVolume != nil {
+		oriVolume := findORIVolume(name, desiredORIVolume.Spec.Driver, desiredORIVolume.Spec.Handle)
 		if oriVolume == nil {
-			v, err := r.createORIVolume(ctx, machine, name, oriVolumeSpec)
+			created, err := r.createORIVolume(ctx, desiredORIVolume)
 			if err != nil {
 				addExistingVolumeIDIfPresent()
 				return usedVolumeIDs, fmt.Errorf("error creating ori volume: %w", err)
 			}
 
-			oriVolume = v
+			oriVolume = created
 		}
 
 		oriVolumeID := oriVolume.Metadata.Id

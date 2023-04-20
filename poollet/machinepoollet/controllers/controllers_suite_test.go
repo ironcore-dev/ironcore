@@ -16,6 +16,7 @@ package controllers_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -65,6 +66,9 @@ const (
 	apiServiceTimeout    = 5 * time.Minute
 
 	controllerManagerService = "controller-manager"
+
+	fooDownwardAPILabel = "custom-downward-api-label"
+	fooAnnotation       = "foo"
 )
 
 func TestControllers(t *testing.T) {
@@ -220,6 +224,9 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 			MachineRuntimeVersion: machine.FakeVersion,
 			MachineClassMapper:    machineClassMapper,
 			MachinePoolName:       mp.Name,
+			DownwardAPILabels: map[string]string{
+				fooDownwardAPILabel: fmt.Sprintf("metadata.annotations['%s']", fooAnnotation),
+			},
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		go func() {
