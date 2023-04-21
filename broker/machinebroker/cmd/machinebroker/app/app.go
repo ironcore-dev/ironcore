@@ -39,10 +39,11 @@ import (
 )
 
 type Options struct {
-	Kubeconfig       string
-	Address          string
-	StreamingAddress string
-	BaseURL          string
+	Kubeconfig                 string
+	Address                    string
+	StreamingAddress           string
+	BaseURL                    string
+	DefaultRootMachineUIDLabel string
 
 	Namespace           string
 	MachinePoolName     string
@@ -55,6 +56,7 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.StreamingAddress, "streaming-address", "127.0.0.1:20251", "Address to run the streaming server on")
 	fs.StringVar(&o.BaseURL, "base-url", "", "The base url to construct urls for streaming from. If empty it will be "+
 		"constructed from the streaming-address")
+	fs.StringVar(&o.DefaultRootMachineUIDLabel, "default-root-machine-uid-label", "", "The default label to look up the root UID from.")
 
 	fs.StringVar(&o.Namespace, "namespace", o.Namespace, "Target Kubernetes namespace to use.")
 	fs.StringVar(&o.MachinePoolName, "machine-pool-name", o.MachinePoolName, "Name of the target machine pool to pin machines to, if any.")
@@ -115,12 +117,14 @@ func Run(ctx context.Context, opts Options) error {
 		"MachinePoolName", opts.MachinePoolName,
 		"MachinePoolSelector", opts.MachinePoolSelector,
 		"BaseURL", baseURL,
+		"DefaultRootMachineUIDLabel", opts.DefaultRootMachineUIDLabel,
 	)
 
 	srv, err := server.New(cfg, opts.Namespace, server.Options{
-		BaseURL:             baseURL,
-		MachinePoolName:     opts.MachinePoolName,
-		MachinePoolSelector: opts.MachinePoolSelector,
+		BaseURL:                    baseURL,
+		DefaultRootMachineUIDLabel: opts.DefaultRootMachineUIDLabel,
+		MachinePoolName:            opts.MachinePoolName,
+		MachinePoolSelector:        opts.MachinePoolSelector,
 	})
 	if err != nil {
 		return fmt.Errorf("error creating server: %w", err)

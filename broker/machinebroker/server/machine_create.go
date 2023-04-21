@@ -101,6 +101,42 @@ func (s *Server) prepareOnmetalNetworkInterfaceAttachment(networkInterfaceSpec *
 	}, nil
 }
 
+func (s *Server) prepareOnmetalMachineLabels(machine *ori.Machine) (map[string]string, error) {
+	labels := map[string]string{
+		machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
+	}
+
+	var rootMachineUID string
+	if s.defaultRootMachineUIDLabel != "" {
+		rootMachineUID = machine.GetMetadata().GetLabels()[machinebrokerv1alpha1.DownwardAPIRootMachineUIDLabel]
+		if rootMachineUID == "" {
+			rootMachineUID = machine.GetMetadata().GetLabels()[s.defaultRootMachineUIDLabel]
+		}
+	}
+
+	if rootMachineUID != "" {
+		labels[machinebrokerv1alpha1.DownwardAPIRootMachineUIDLabel] = rootMachineUID
+	}
+	return labels, nil
+}
+
+func (s *Server) prepareOnmetalMachineAnnotations(machine *ori.Machine) (map[string]string, error) {
+	annotationsValue, err := apiutils.EncodeAnnotationsAnnotation(machine.GetMetadata().GetAnnotations())
+	if err != nil {
+		return nil, fmt.Errorf("error encoding annotations: %w", err)
+	}
+
+	labelsValue, err := apiutils.EncodeLabelsAnnotation(machine.GetMetadata().GetLabels())
+	if err != nil {
+		return nil, fmt.Errorf("error encoding labels: %w", err)
+	}
+
+	return map[string]string{
+		machinebrokerv1alpha1.AnnotationsAnnotation: annotationsValue,
+		machinebrokerv1alpha1.LabelsAnnotation:      labelsValue,
+	}, nil
+}
+
 func (s *Server) getOnmetalMachineConfig(machine *ori.Machine) (*OnmetalMachineConfig, error) {
 	power, err := s.prepareOnmetalMachinePower(machine.Spec.Power)
 	if err != nil {
@@ -155,10 +191,22 @@ func (s *Server) getOnmetalMachineConfig(machine *ori.Machine) (*OnmetalMachineC
 		}
 	}
 
+	labels, err := s.prepareOnmetalMachineLabels(machine)
+	if err != nil {
+		return nil, fmt.Errorf("error preparing onmetal machine labels: %w", err)
+	}
+
+	annotations, err := s.prepareOnmetalMachineAnnotations(machine)
+	if err != nil {
+		return nil, fmt.Errorf("error preparing onmetal machine annotations: %w", err)
+	}
+
 	onmetalMachine := &computev1alpha1.Machine{
 		ObjectMeta: metav1.ObjectMeta{
-			Namespace: s.cluster.Namespace(),
-			Name:      s.cluster.IDGen().Generate(),
+			Namespace:   s.cluster.Namespace(),
+			Name:        s.cluster.IDGen().Generate(),
+			Labels:      labels,
+			Annotations: annotations,
 		},
 		Spec: computev1alpha1.MachineSpec{
 			MachineClassRef:     corev1.LocalObjectReference{Name: machine.Spec.Class},
@@ -172,10 +220,6 @@ func (s *Server) getOnmetalMachineConfig(machine *ori.Machine) (*OnmetalMachineC
 			IgnitionRef:         onmetalMachineIgnitionRef,
 		},
 	}
-	if err := apiutils.SetObjectMetadata(onmetalMachine, machine.Metadata); err != nil {
-		return nil, err
-	}
-	apiutils.SetManagerLabel(onmetalMachine, machinebrokerv1alpha1.MachineBrokerManager)
 
 	return &OnmetalMachineConfig{
 		IgnitionSecret: onmetalIgnitionSecret,

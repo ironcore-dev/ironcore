@@ -20,6 +20,7 @@ import (
 
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	machinepoolletv1alpha1 "github.com/onmetal/onmetal-api/poollet/machinepoollet/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -55,6 +56,10 @@ const (
 	IgnitionPurpose = "ignition"
 
 	NetworkInterfacePurpose = "network-interface"
+)
+
+const (
+	DownwardAPIRootMachineUIDLabel = machinepoolletv1alpha1.DownwardAPIPrefix + "root-machine-uid"
 )
 
 type LoadBalancerPort struct {

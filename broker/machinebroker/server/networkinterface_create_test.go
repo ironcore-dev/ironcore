@@ -21,7 +21,6 @@ import (
 	"github.com/onmetal/onmetal-api/broker/machinebroker/apiutils"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
-	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -31,10 +30,9 @@ import (
 )
 
 var _ = Describe("CreateNetworkInterface", func() {
-	ctx := SetupContext()
-	ns, srv := SetupTest(ctx)
+	ns, srv := SetupTest()
 
-	It("should correctly create a network interface", func() {
+	It("should correctly create a network interface", func(ctx SpecContext) {
 		By("creating a network interface")
 		const (
 			ip             = "192.168.178.1"
@@ -135,7 +133,7 @@ var _ = Describe("CreateNetworkInterface", func() {
 		}))
 	})
 
-	It("should correctly create a network with a nat gateway target", func() {
+	It("should correctly create a network with a nat gateway target", func(ctx SpecContext) {
 		By("creating a network interface")
 		const (
 			ip                = "192.168.178.1"
@@ -195,7 +193,7 @@ var _ = Describe("CreateNetworkInterface", func() {
 		}))
 	})
 
-	It("should re-use kubernetes networks and delete them only if no dependents exist", func() {
+	It("should re-use kubernetes networks and delete them only if no dependents exist", func(ctx SpecContext) {
 		const handle = "foo"
 		const noOfNetworkInterfaces = 6
 

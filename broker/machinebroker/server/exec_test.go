@@ -18,14 +18,12 @@ import (
 	"net/url"
 
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Exec", func() {
-	ctx := SetupContext()
-	_, srv := SetupTest(ctx)
+	_, srv := SetupTest()
 
 	It("should return an exec-url with a token", func(ctx SpecContext) {
 		By("issuing exec for an arbitrary machine id")
