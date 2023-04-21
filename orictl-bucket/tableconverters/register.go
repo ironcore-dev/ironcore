@@ -12,38 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package renderer
+package tableconverters
 
 import (
-	"fmt"
-	"io"
-
-	oritable "github.com/onmetal/onmetal-api/orictl/api"
 	"github.com/onmetal/onmetal-api/orictl/tableconverter"
-	"github.com/onmetal/onmetal-api/orictl/tabwriter"
 )
 
-type table struct {
-	converter tableconverter.TableConverter[any]
-}
-
-func NewTable(converter tableconverter.TableConverter[any]) Renderer {
-	return &table{converter: converter}
-}
-
-func (t *table) Render(v any, w io.Writer) error {
-	tw := tabwriter.New(w)
-
-	tab, err := t.converter.ConvertToTable(v)
-	if err != nil {
-		return err
-	}
-
-	if tab == nil || len(tab.Headers) == 0 && len(tab.Rows) == 0 {
-		_, err := fmt.Fprintln(w, "No resources found")
-		return err
-	}
-
-	oritable.Write(tab, tw)
-	return tw.Flush()
-}
+var (
+	RegistryBuilder tableconverter.RegistryBuilder
+	AddToRegistry   = RegistryBuilder.AddToRegistry
+)

@@ -17,6 +17,9 @@ COPY cmd/ cmd/
 COPY internal/ internal/
 COPY ori/ ori/
 COPY orictl/ orictl/
+COPY orictl-bucket/ orictl-bucket/
+COPY orictl-machine/ orictl-machine/
+COPY orictl-volume/ orictl-volume/
 COPY poollet/ poollet/
 COPY utils/ utils/
 
@@ -49,13 +52,13 @@ FROM builder as machinebroker-builder
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
     CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/machinebroker ./broker/machinebroker/cmd/machinebroker/main.go && \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/orictl-machine ./orictl/cmd/orictl-machine/main.go
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/orictl-machine ./orictl-machine/cmd/orictl-machine/main.go
 
 FROM builder as orictl-machine-builder
 
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/orictl-machine ./orictl/cmd/orictl-machine/main.go
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/orictl-machine ./orictl-machine/cmd/orictl-machine/main.go
 
 FROM builder as volumepoollet-builder
 
@@ -70,13 +73,13 @@ FROM builder as volumebroker-builder
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
     CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/volumebroker ./broker/volumebroker/cmd/volumebroker/main.go && \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/orictl-volume ./orictl/cmd/orictl-volume/main.go
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/orictl-volume ./orictl-volume/cmd/orictl-volume/main.go
 
 FROM builder as orictl-volume-builder
 
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/orictl-volume ./orictl/cmd/orictl-volume/main.go
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/orictl-volume ./orictl-volume/cmd/orictl-volume/main.go
 
 FROM builder as bucketpoollet-builder
 
@@ -91,13 +94,13 @@ FROM builder as bucketbroker-builder
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
     CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/bucketbroker ./broker/bucketbroker/cmd/bucketbroker/main.go && \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/orictl-bucket ./orictl/cmd/orictl-bucket/main.go
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/orictl-bucket ./orictl-bucket/cmd/orictl-bucket/main.go
 
 FROM builder as orictl-bucket-builder
 
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/orictl-bucket ./orictl/cmd/orictl-bucket/main.go
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/orictl-bucket ./orictl-bucket/cmd/orictl-bucket/main.go
 
 # Use distroless as minimal base image to package the manager binary
 # Refer to https://github.com/GoogleContainerTools/distroless for more details

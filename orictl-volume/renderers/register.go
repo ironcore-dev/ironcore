@@ -12,38 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package renderer
+package renderers
 
 import (
-	"fmt"
-	"io"
-
-	oritable "github.com/onmetal/onmetal-api/orictl/api"
+	"github.com/onmetal/onmetal-api/orictl-volume/tableconverters"
+	"github.com/onmetal/onmetal-api/orictl/renderer"
 	"github.com/onmetal/onmetal-api/orictl/tableconverter"
-	"github.com/onmetal/onmetal-api/orictl/tabwriter"
 )
 
-type table struct {
-	converter tableconverter.TableConverter[any]
-}
+var (
+	RegistryBuilder renderer.RegistryBuilder
+	AddToRegistry   = RegistryBuilder.AddToRegistry
+)
 
-func NewTable(converter tableconverter.TableConverter[any]) Renderer {
-	return &table{converter: converter}
-}
-
-func (t *table) Render(v any, w io.Writer) error {
-	tw := tabwriter.New(w)
-
-	tab, err := t.converter.ConvertToTable(v)
-	if err != nil {
-		return err
-	}
-
-	if tab == nil || len(tab.Headers) == 0 && len(tab.Rows) == 0 {
-		_, err := fmt.Fprintln(w, "No resources found")
-		return err
-	}
-
-	oritable.Write(tab, tw)
-	return tw.Flush()
+func init() {
+	RegistryBuilder.Add(renderer.AddToRegistry)
+	RegistryBuilder.Add(func(registry *renderer.Registry) error {
+		tableConverter := tableconverter.NewRegistry()
+		if err := tableconverters.AddToRegistry(tableConverter); err != nil {
+			return err
+		}
+		return registry.Register("table", renderer.NewTable(tableConverter))
+	})
 }
