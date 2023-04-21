@@ -1,0 +1,5 @@
+tableConfig:
+  wellKnownMachineLabels:
+    RNamespace: downward-api.machinepoollet.api.onmetal.de/root-machine-namespace
+    RName: downward-api.machinepoollet.api.onmetal.de/root-machine-name
+    RUID: downward-api.machinepoollet.api.onmetal.de/root-machine-uid

@@ -25,6 +25,7 @@ import (
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/apiutils"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	machinepoolletv1alpha1 "github.com/onmetal/onmetal-api/poollet/machinepoollet/api/v1alpha1"
 	"gopkg.in/inf.v0"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -106,17 +107,16 @@ func (s *Server) prepareOnmetalMachineLabels(machine *ori.Machine) (map[string]s
 		machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
 	}
 
-	var rootMachineUID string
-	if s.defaultRootMachineUIDLabel != "" {
-		rootMachineUID = machine.GetMetadata().GetLabels()[machinebrokerv1alpha1.DownwardAPIRootMachineUIDLabel]
-		if rootMachineUID == "" {
-			rootMachineUID = machine.GetMetadata().GetLabels()[s.defaultRootMachineUIDLabel]
+	for downwardAPILabelName, defaultLabelName := range s.brokerDownwardAPILabels {
+		value := machine.GetMetadata().GetLabels()[machinepoolletv1alpha1.DownwardAPILabel(downwardAPILabelName)]
+		if value == "" {
+			value = machine.GetMetadata().GetLabels()[defaultLabelName]
+		}
+		if value != "" {
+			labels[machinepoolletv1alpha1.DownwardAPILabel(downwardAPILabelName)] = value
 		}
 	}
 
-	if rootMachineUID != "" {
-		labels[machinebrokerv1alpha1.DownwardAPIRootMachineUIDLabel] = rootMachineUID
-	}
 	return labels, nil
 }
 

@@ -39,11 +39,11 @@ import (
 )
 
 type Options struct {
-	Kubeconfig                 string
-	Address                    string
-	StreamingAddress           string
-	BaseURL                    string
-	DefaultRootMachineUIDLabel string
+	Kubeconfig              string
+	Address                 string
+	StreamingAddress        string
+	BaseURL                 string
+	BrokerDownwardAPILabels map[string]string
 
 	Namespace           string
 	MachinePoolName     string
@@ -56,7 +56,8 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.StreamingAddress, "streaming-address", "127.0.0.1:20251", "Address to run the streaming server on")
 	fs.StringVar(&o.BaseURL, "base-url", "", "The base url to construct urls for streaming from. If empty it will be "+
 		"constructed from the streaming-address")
-	fs.StringVar(&o.DefaultRootMachineUIDLabel, "default-root-machine-uid-label", "", "The default label to look up the root UID from.")
+	fs.StringToStringVar(&o.BrokerDownwardAPILabels, "broker-downward-api-label", nil, "The labels to broker via downward API. "+
+		"Example is for instance to broker \"root-machine-uid\" initially obtained via \"machinepoollet.api.onmetal.de/machine-uid\".")
 
 	fs.StringVar(&o.Namespace, "namespace", o.Namespace, "Target Kubernetes namespace to use.")
 	fs.StringVar(&o.MachinePoolName, "machine-pool-name", o.MachinePoolName, "Name of the target machine pool to pin machines to, if any.")
@@ -117,14 +118,14 @@ func Run(ctx context.Context, opts Options) error {
 		"MachinePoolName", opts.MachinePoolName,
 		"MachinePoolSelector", opts.MachinePoolSelector,
 		"BaseURL", baseURL,
-		"DefaultRootMachineUIDLabel", opts.DefaultRootMachineUIDLabel,
+		"BrokerDownwardAPILabels", opts.BrokerDownwardAPILabels,
 	)
 
 	srv, err := server.New(cfg, opts.Namespace, server.Options{
-		BaseURL:                    baseURL,
-		DefaultRootMachineUIDLabel: opts.DefaultRootMachineUIDLabel,
-		MachinePoolName:            opts.MachinePoolName,
-		MachinePoolSelector:        opts.MachinePoolSelector,
+		BaseURL:                 baseURL,
+		BrokerDownwardAPILabels: opts.BrokerDownwardAPILabels,
+		MachinePoolName:         opts.MachinePoolName,
+		MachinePoolSelector:     opts.MachinePoolSelector,
 	})
 	if err != nil {
 		return fmt.Errorf("error creating server: %w", err)
