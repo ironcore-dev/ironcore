@@ -14,6 +14,11 @@
 
 package generic
 
+import (
+	"fmt"
+	"reflect"
+)
+
 // Identity is a function that returns its given parameters.
 func Identity[E any](e E) E {
 	return e
@@ -23,6 +28,19 @@ func Identity[E any](e E) E {
 func Zero[E any]() E {
 	var zero E
 	return zero
+}
+
+func Cast[E any](v any) (E, error) {
+	e, ok := v.(E)
+	if !ok {
+		return Zero[E](), fmt.Errorf("expected %T but got %T", e, v)
+	}
+	return e, nil
+}
+
+func ReflectType[E any]() reflect.Type {
+	var ePtr *E // use a pointer to avoid initializing the entire type
+	return reflect.TypeOf(ePtr).Elem()
 }
 
 // Pointer returns a pointer for the given value.
@@ -43,4 +61,11 @@ func Deref[E any](e *E, defaultValue E) E {
 	return DerefFunc(e, func() E {
 		return defaultValue
 	})
+}
+
+func PipeMap[E any](e E, fs ...func(E) E) E {
+	for _, f := range fs {
+		e = f(e)
+	}
+	return e
 }
