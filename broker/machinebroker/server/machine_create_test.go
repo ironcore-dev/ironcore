@@ -16,7 +16,6 @@ package server_test
 
 import (
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
 	machinepoolletv1alpha1 "github.com/onmetal/onmetal-api/poollet/machinepoollet/api/v1alpha1"
@@ -35,7 +34,7 @@ var _ = Describe("CreateMachine", func() {
 			Machine: &ori.Machine{
 				Metadata: &orimeta.ObjectMetadata{
 					Labels: map[string]string{
-						machinepoolletv1alpha1.MachineUIDLabel: "root-uid",
+						machinepoolletv1alpha1.MachineUIDLabel: "foobar",
 					},
 				},
 				Spec: &ori.MachineSpec{
@@ -52,6 +51,6 @@ var _ = Describe("CreateMachine", func() {
 
 		machine := &computev1alpha1.Machine{}
 		Expect(k8sClient.Get(ctx, client.ObjectKey{Namespace: ns.Name, Name: res.Machine.Metadata.Id}, machine)).To(Succeed())
-		Expect(machine.Labels).To(HaveKeyWithValue(machinebrokerv1alpha1.DownwardAPIRootMachineUIDLabel, "root-uid"))
+		Expect(machine.Labels).To(HaveKeyWithValue(machinepoolletv1alpha1.DownwardAPILabel("root-machine-uid"), "foobar"))
 	})
 })

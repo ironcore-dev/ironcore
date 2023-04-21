@@ -31,6 +31,9 @@ spec:
         - /machinepoollet
         args:
         - --leader-elect
+        - --machine-downward-api-label=downward-api.machinepoollet.api.onmetal.de/root-machine-namespace
+        - --machine-downward-api-label=downward-api.machinepoollet.api.onmetal.de/root-machine-name
+        - --machine-downward-api-label=downward-api.machinepoollet.api.onmetal.de/root-machine-uid
         image: machinepoollet:latest
         env:
         - name: KUBERNETES_SERVICE_NAME
@@ -64,6 +67,8 @@ spec:
         volumeMounts:
         - name: var-run
           mountPath: /var/run
+        - name: orictl-machine-config
+          mountPath: /.orictl-machine
         ports:
         - containerPort: 20250
           name: server
@@ -72,6 +77,10 @@ spec:
         - /machinebroker
         image: machinebroker:latest
         name: broker
+        args:
+        - --broker-downward-api-label=root-machine-namespace=machinepoollet.api.onmetal.de/machine-namespace
+        - --broker-downward-api-label=root-machine-name=machinepoollet.api.onmetal.de/machine-name
+        - --broker-downward-api-label=root-machine-uid=machinepoollet.api.onmetal.de/machine-uid
         securityContext:
           allowPrivilegeEscalation: false
         livenessProbe:
@@ -101,3 +110,6 @@ spec:
       volumes:
       - name: var-run
         emptyDir: { }
+      - name: orictl-machine-config
+        configMap:
+          name: orictl-machine-config

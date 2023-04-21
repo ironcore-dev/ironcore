@@ -51,9 +51,15 @@ var _ ori.MachineRuntimeServer = (*Server)(nil)
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=natgateways/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=natgatewayroutings,verbs=get;list;watch;create;update;patch;delete
 
+type BrokerLabel struct {
+	DefaultLabel     string
+	DownwardAPILabel string
+}
+
 type Server struct {
-	baseURL                    *url.URL
-	defaultRootMachineUIDLabel string
+	baseURL *url.URL
+
+	brokerDownwardAPILabels map[string]string
 
 	cluster cluster.Cluster
 
@@ -68,11 +74,13 @@ type Server struct {
 type Options struct {
 	// BaseURL is the base URL in form http(s)://host:port/path?query to produce request URLs relative to.
 	BaseURL string
-	// DefaultRootMachineUIDLabel specifies the label to obtain the root machine UID from if the
-	// v1alpha1.DownwardAPIRootMachineUIDLabel does not provide a UID.
-	DefaultRootMachineUIDLabel string
-	MachinePoolName            string
-	MachinePoolSelector        map[string]string
+	// BrokerDownwardAPILabels specifies which labels to broker via downward API and what the default
+	// label name is to obtain the value in case there is no value for the downward API.
+	// Example usage is e.g. to broker the root UID (map "root-machine-uid" to machinepoollet's
+	// "machinepoollet.api.onmetal.de/machine-uid")
+	BrokerDownwardAPILabels map[string]string
+	MachinePoolName         string
+	MachinePoolSelector     map[string]string
 }
 
 func New(cfg *rest.Config, namespace string, opts Options) (*Server, error) {
@@ -90,14 +98,14 @@ func New(cfg *rest.Config, namespace string, opts Options) (*Server, error) {
 	}
 
 	return &Server{
-		baseURL:                    baseURL,
-		defaultRootMachineUIDLabel: opts.DefaultRootMachineUIDLabel,
-		cluster:                    c,
-		networks:                   networks.New(c),
-		aliasPrefixes:              aliasprefixes.New(c),
-		loadBalancers:              loadbalancers.New(c),
-		natGateways:                natgateways.New(c),
-		execRequestCache:           request.NewCache[*ori.ExecRequest](),
+		baseURL:                 baseURL,
+		brokerDownwardAPILabels: opts.BrokerDownwardAPILabels,
+		cluster:                 c,
+		networks:                networks.New(c),
+		aliasPrefixes:           aliasprefixes.New(c),
+		loadBalancers:           loadbalancers.New(c),
+		natGateways:             natgateways.New(c),
+		execRequestCache:        request.NewCache[*ori.ExecRequest](),
 	}, nil
 }
 

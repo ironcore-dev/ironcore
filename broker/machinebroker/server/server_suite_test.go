@@ -134,8 +134,10 @@ func SetupTest() (*corev1.Namespace, *server.Server) {
 		DeferCleanup(k8sClient.Delete, ns)
 
 		newSrv, err := server.New(cfg, ns.Name, server.Options{
-			BaseURL:                    baseURL,
-			DefaultRootMachineUIDLabel: machinepoolletv1alpha1.MachineUIDLabel,
+			BaseURL: baseURL,
+			BrokerDownwardAPILabels: map[string]string{
+				"root-machine-uid": machinepoolletv1alpha1.MachineUIDLabel,
+			},
 		})
 		Expect(err).NotTo(HaveOccurred())
 		*srv = *newSrv
