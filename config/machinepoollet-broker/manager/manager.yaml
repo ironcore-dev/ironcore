@@ -67,8 +67,6 @@ spec:
         volumeMounts:
         - name: var-run
           mountPath: /var/run
-        - name: orictl-machine-config
-          mountPath: /.orictl-machine
         ports:
         - containerPort: 20250
           name: server
@@ -105,6 +103,8 @@ spec:
         volumeMounts:
         - name: var-run
           mountPath: /var/run
+        - name: orictl-machine-config
+          mountPath: /.orictl-machine
       serviceAccountName: controller-manager
       terminationGracePeriodSeconds: 10
       volumes:
