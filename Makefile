@@ -97,10 +97,11 @@ generate: vgopath models-schema deepcopy-gen client-gen lister-gen informer-gen 
 	./hack/update-codegen.sh
 
 .PHONY: proto
-proto: vgopath protoc-gen-gogo
+proto: goimports vgopath protoc-gen-gogo
 	VGOPATH=$(VGOPATH) \
 	PROTOC_GEN_GOGO=$(PROTOC_GEN_GOGO) \
 	./hack/update-proto.sh
+	$(GOIMPORTS) -w ./ori
 
 .PHONY: fmt
 fmt: goimports ## Run goimports against code.

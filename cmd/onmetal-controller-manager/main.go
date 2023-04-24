@@ -375,7 +375,7 @@ func main() {
 	}
 
 	if controllers.Enabled(natGatewayController) {
-		if err := (&networkingcontrollers.NatGatewayReconciler{
+		if err := (&networkingcontrollers.NATGatewayReconciler{
 			Client:        mgr.GetClient(),
 			Scheme:        mgr.GetScheme(),
 			EventRecorder: mgr.GetEventRecorderFor("natgateways"),

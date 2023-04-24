@@ -17,13 +17,15 @@ package networking
 import (
 	"context"
 	"fmt"
-	"math"
 
+	"github.com/bits-and-blooms/bitset"
 	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	"github.com/onmetal/onmetal-api/internal/client/networking"
-	"github.com/onmetal/onmetal-api/internal/controllers/networking/events"
+	"github.com/onmetal/onmetal-api/utils/generic"
+	"golang.org/x/exp/maps"
+	"golang.org/x/exp/slices"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -33,21 +35,24 @@ import (
 	"k8s.io/client-go/tools/record"
 	"k8s.io/utils/pointer"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
 const (
-	MinEphemeralPort int32 = 1024
-	MaxEphemeralPort int32 = 65535
+	MinEphemeralPort   int32 = 1024
+	MaxEphemeralPort   int32 = 65535
+	NoOfEphemeralPorts       = MaxEphemeralPort + 1 - MinEphemeralPort
 )
 
 var (
 	natGatewayFieldOwner = client.FieldOwner(networkingv1alpha1.Resource("natgateways").String())
 )
 
-type NatGatewayReconciler struct {
+type NATGatewayReconciler struct {
 	record.EventRecorder
 	client.Client
 	Scheme *runtime.Scheme
@@ -60,7 +65,7 @@ type NatGatewayReconciler struct {
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces,verbs=get;list;watch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=natgatewayroutings,verbs=get;list;watch;create;update;patch;delete
 
-func (r *NatGatewayReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+func (r *NATGatewayReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
 	natGateway := &networkingv1alpha1.NATGateway{}
 	if err := r.Get(ctx, req.NamespacedName, natGateway); err != nil {
@@ -70,49 +75,126 @@ func (r *NatGatewayReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	return r.reconcileExists(ctx, log, natGateway)
 }
 
-func (r *NatGatewayReconciler) reconcileExists(ctx context.Context, log logr.Logger, natGateway *networkingv1alpha1.NATGateway) (ctrl.Result, error) {
+func (r *NATGatewayReconciler) reconcileExists(ctx context.Context, log logr.Logger, natGateway *networkingv1alpha1.NATGateway) (ctrl.Result, error) {
 	if !natGateway.DeletionTimestamp.IsZero() {
 		return r.delete(ctx, log, natGateway)
 	}
 	return r.reconcile(ctx, log, natGateway)
 }
 
-func (r *NatGatewayReconciler) delete(ctx context.Context, log logr.Logger, natGateway *networkingv1alpha1.NATGateway) (ctrl.Result, error) {
+func (r *NATGatewayReconciler) delete(ctx context.Context, log logr.Logger, natGateway *networkingv1alpha1.NATGateway) (ctrl.Result, error) {
 	return ctrl.Result{}, nil
 }
 
-func (r *NatGatewayReconciler) findNextFreeSlot(
-	natGateway *networkingv1alpha1.NATGateway,
-	currentIp, currentPort, portsPerNetworkInterface int32,
-	slotsPerIP int,
-	used sets.Set[networkingv1alpha1.NATGatewayDestinationIP],
-) (*networkingv1alpha1.NATGatewayDestinationIP, int32, int32) {
-	for {
-		if int(currentIp) >= len(natGateway.Status.IPs) {
-			return nil, currentIp, currentPort
+type slots struct {
+	numOfIPs             uint
+	slotsPerIP           uint
+	used                 uint
+	slotsByIPFamilyAndIP map[corev1.IPFamily]map[commonv1alpha1.IP]*bitset.BitSet
+}
+
+func newSlots(slotsPerIP uint, ips []commonv1alpha1.IP) *slots {
+	var l uint
+	slotsByIPFamilyAndIP := make(map[corev1.IPFamily]map[commonv1alpha1.IP]*bitset.BitSet)
+	for _, ip := range ips {
+		slotsByIP := slotsByIPFamilyAndIP[ip.Family()]
+		if slotsByIP == nil {
+			slotsByIP = make(map[commonv1alpha1.IP]*bitset.BitSet)
+			slotsByIPFamilyAndIP[ip.Family()] = slotsByIP
 		}
 
-		port := currentPort*portsPerNetworkInterface + MinEphemeralPort
-		candidate := &networkingv1alpha1.NATGatewayDestinationIP{
-			IP:      natGateway.Status.IPs[currentIp].IP,
-			Port:    port,
-			EndPort: port + portsPerNetworkInterface - 1,
+		if _, ok := slotsByIP[ip]; ok {
+			// don't re-initialize on duplicate ips
+			continue
 		}
+		slotsByIP[ip] = bitset.New(slotsPerIP)
+		l++
+	}
 
-		if !used.Has(*candidate) {
-			used.Insert(*candidate)
-			return candidate, currentIp, currentPort
-		}
-
-		currentPort++
-		if int(currentPort) >= slotsPerIP {
-			currentPort = 0
-			currentIp++
-		}
+	return &slots{
+		numOfIPs:             l,
+		slotsPerIP:           slotsPerIP,
+		slotsByIPFamilyAndIP: slotsByIPFamilyAndIP,
 	}
 }
 
-func (r *NatGatewayReconciler) assignPorts(ctx context.Context, log logr.Logger, natGateway *networkingv1alpha1.NATGateway, destinations map[types.UID]commonv1alpha1.LocalUIDReference, slotsPerIP int, portsPerNetworkInterface int32) ([]networkingv1alpha1.NATGatewayDestination, int32, error) {
+func (s *slots) Total() uint {
+	return s.numOfIPs * s.slotsPerIP
+}
+
+func (s *slots) Used() uint {
+	return s.used
+}
+
+func (s *slots) Use(ip commonv1alpha1.IP, slot uint) bool {
+	slotsByIP := s.slotsByIPFamilyAndIP[ip.Family()]
+	slots := slotsByIP[ip]
+	if slots == nil || slot >= slots.Len() || slots.Test(slot) {
+		return false
+	}
+
+	slots.Set(slot)
+	s.used++
+	if slots.All() {
+		delete(slotsByIP, ip)
+		if len(slotsByIP) == 0 {
+			delete(s.slotsByIPFamilyAndIP, ip.Family())
+		}
+	}
+	return true
+}
+
+func (s *slots) TryUseNextFree(ipFamily corev1.IPFamily) (ip commonv1alpha1.IP, slot uint, ok bool) {
+	slotsByIP := s.slotsByIPFamilyAndIP[ipFamily]
+	for ip, slots := range slotsByIP {
+		ip := ip
+		slot, ok = slots.NextClear(0)
+		if ok {
+			s.Use(ip, slot)
+			return ip, slot, true
+		}
+	}
+	return commonv1alpha1.IP{}, 0, false
+}
+
+type slotPortMapper struct {
+	portsPerNetworkInterface int32
+}
+
+func newSlotPortMapper(portsPerNetworkInterface int32) *slotPortMapper {
+	return &slotPortMapper{portsPerNetworkInterface}
+}
+
+func (m *slotPortMapper) SlotsPerIP() uint {
+	return uint(NoOfEphemeralPorts / m.portsPerNetworkInterface)
+}
+
+func (m *slotPortMapper) EndPort(port int32) int32 {
+	return port + m.portsPerNetworkInterface - 1
+}
+
+func (m *slotPortMapper) SlotForPorts(port, endPort int32) (uint, bool) {
+	if port < MinEphemeralPort || port >= endPort || endPort > MaxEphemeralPort {
+		return 0, false
+	}
+	if m.EndPort(port) != endPort {
+		return 0, false
+	}
+	return uint((port - MinEphemeralPort) / m.portsPerNetworkInterface), true
+}
+
+func (m *slotPortMapper) PortsForSlot(slot uint) (port, endPort int32) {
+	port = int32(slot)*m.portsPerNetworkInterface + MinEphemeralPort
+	endPort = m.EndPort(port)
+	return port, endPort
+}
+
+func (r *NATGatewayReconciler) assignPorts(
+	ctx context.Context,
+	log logr.Logger,
+	natGateway *networkingv1alpha1.NATGateway,
+	targetNameByUID map[types.UID]string,
+) ([]networkingv1alpha1.NATGatewayDestination, int32, error) {
 	natGatewayRouting := &networkingv1alpha1.NATGatewayRouting{}
 	natGatewayRoutingKey := client.ObjectKey{Namespace: natGateway.Namespace, Name: natGateway.Name}
 	if err := r.Get(ctx, natGatewayRoutingKey, natGatewayRouting); client.IgnoreNotFound(err) != nil {
@@ -120,51 +202,124 @@ func (r *NatGatewayReconciler) assignPorts(ctx context.Context, log logr.Logger,
 	}
 
 	var (
-		used                         = sets.Set[networkingv1alpha1.NATGatewayDestinationIP]{}
-		currentIp, currentPort int32 = 0, 0
-		newDestinations        []networkingv1alpha1.NATGatewayDestination
-		candidate              *networkingv1alpha1.NATGatewayDestinationIP
+		portsPerNetworkInterface = generic.Deref(natGateway.Spec.PortsPerNetworkInterface, networkingv1alpha1.DefaultPortsPerNetworkInterface)
+		mapper                   = newSlotPortMapper(portsPerNetworkInterface)
 	)
 
-	log.V(2).Info("Start processing previous destinations")
+	ips := make([]commonv1alpha1.IP, 0, len(natGateway.Status.IPs))
+	for _, ip := range natGateway.Status.IPs {
+		ips = append(ips, ip.IP)
+	}
+
+	slots := newSlots(mapper.SlotsPerIP(), ips)
+
+	var (
+		destinationsByUID = make(map[types.UID]networkingv1alpha1.NATGatewayDestination)
+	)
+
+	log.V(2).Info("Determining destinations to re-use")
 	for _, destination := range natGatewayRouting.Destinations {
-		if v, found := destinations[destination.UID]; found {
-			log.V(2).Info("Keep IP and port for destination", "destination", destination.Name)
-			for _, ip := range destination.IPs {
-				used.Insert(ip)
+		targetUID := destination.UID
+		if targetName, found := targetNameByUID[targetUID]; found {
+			log := log.WithValues("Destination", destination)
+			log.V(2).Info("Found existing destination")
+			var (
+				dstIPs         []networkingv1alpha1.NATGatewayDestinationIP
+				seenIPFamilies = sets.New[corev1.IPFamily]()
+			)
+			for _, dstIP := range destination.IPs {
+				log := log.WithValues("DestinationIP", dstIP)
+				ip := dstIP.IP
+
+				if seenIPFamilies.Has(ip.Family()) {
+					log.V(2).Info("Dropping duplicate ip-family ip", "IP", ip)
+					continue
+				}
+
+				slot, ok := mapper.SlotForPorts(dstIP.Port, dstIP.EndPort)
+				if !ok {
+					log.V(2).Info("Dropping invalid destination ip")
+					continue
+				}
+
+				seenIPFamilies.Insert(ip.Family())
+				if !slots.Use(ip, slot) {
+					log.V(2).Info("Dropping non-available ip", "IP", ip)
+					continue
+				}
+
+				log.V(2).Info("Re-using ip")
+				dstIPs = append(dstIPs, dstIP)
 			}
 
-			newDestinations = append(newDestinations, networkingv1alpha1.NATGatewayDestination{
-				Name: v.Name,
-				UID:  v.UID,
-				IPs:  destination.IPs,
+			if len(dstIPs) > 0 {
+				destinationsByUID[targetUID] = networkingv1alpha1.NATGatewayDestination{
+					Name: targetName,
+					UID:  targetUID,
+					IPs:  dstIPs,
+				}
+
+				if len(dstIPs) == len(natGateway.Spec.IPFamilies) {
+					log.V(2).Info("Re-using all previous destination ips", "IPs", dstIPs)
+				} else {
+					log.V(2).Info("Re-using some previous destination ips", "IPs", dstIPs)
+				}
+			} else {
+				log.V(2).Info("Not re-using any previous destination ip")
+			}
+		}
+	}
+
+	log.V(2).Info("Calculating new required destinations")
+	for targetUID, targetName := range targetNameByUID {
+		log := log.WithValues("TargetUID", targetUID, "TargetName", targetName)
+		destination := destinationsByUID[targetUID]
+		destination.Name = targetName
+		destination.UID = targetUID
+
+		for _, ipFamily := range natGateway.Spec.IPFamilies {
+			log := log.WithValues("IPFamily", ipFamily)
+			if slices.ContainsFunc(destination.IPs, func(dstIP networkingv1alpha1.NATGatewayDestinationIP) bool {
+				return dstIP.IP.Family() == ipFamily
+			}) {
+				log.V(2).Info("IP family already satisfied")
+				continue
+			}
+
+			ip, slot, ok := slots.TryUseNextFree(ipFamily)
+			if !ok {
+				log.V(2).Info("No slots available for ip family")
+				continue
+			}
+
+			port, endPort := mapper.PortsForSlot(slot)
+			destination.IPs = append(destination.IPs, networkingv1alpha1.NATGatewayDestinationIP{
+				IP:      ip,
+				Port:    port,
+				EndPort: endPort,
 			})
-			delete(destinations, destination.UID)
+		}
+
+		if len(destination.IPs) > 0 {
+			destinationsByUID[targetUID] = destination
+			slices.SortFunc(destination.IPs, func(a, b networkingv1alpha1.NATGatewayDestinationIP) bool {
+				return a.IP.Family() < b.IP.Family()
+			})
+		} else {
+			log.V(2).Info("Could not create destination for target")
 		}
 	}
 
-	log.V(2).Info("Start processing new destinations")
-	for _, destination := range destinations {
-		log.V(2).Info("Find free port for destination", "destination", destination.Name)
-		candidate, currentIp, currentPort = r.findNextFreeSlot(natGateway, currentIp, currentPort, portsPerNetworkInterface, slotsPerIP, used)
-		if candidate == nil {
-			log.V(2).Info("No ports left: Skipping destination", "name", destination.Name, "UID", destination.UID)
-			r.Eventf(natGateway, corev1.EventTypeWarning, events.ErrorNoPortsLeft, "no ports left: needed ips %d", int(math.Ceil(float64(len(destinations))/float64(slotsPerIP))))
-			break
-		}
-		log.V(2).Info("Found free port for destination", "destination", destination.Name, "start", candidate.Port, "end", candidate.EndPort, "ip", candidate.IP.String())
+	res := maps.Values(destinationsByUID)
+	slices.SortFunc(res, func(a, b networkingv1alpha1.NATGatewayDestination) bool {
+		return a.UID < b.UID
+	})
 
-		newDestinations = append(newDestinations, networkingv1alpha1.NATGatewayDestination{
-			Name: destination.Name,
-			UID:  destination.UID,
-			IPs:  []networkingv1alpha1.NATGatewayDestinationIP{*candidate},
-		})
-	}
-
-	return newDestinations, int32(used.Len()), nil
+	portsUsed := int32(slots.Used()) * portsPerNetworkInterface
+	return res, portsUsed, nil
 }
 
-func (r *NatGatewayReconciler) reconcile(ctx context.Context, log logr.Logger, natGateway *networkingv1alpha1.NATGateway) (ctrl.Result, error) {
+func (r *NATGatewayReconciler) reconcile(ctx context.Context, log logr.Logger, natGateway *networkingv1alpha1.NATGateway) (ctrl.Result, error) {
 	log.V(1).Info("Reconcile")
 
 	nicSelector := natGateway.Spec.NetworkInterfaceSelector
@@ -174,24 +329,15 @@ func (r *NatGatewayReconciler) reconcile(ctx context.Context, log logr.Logger, n
 	}
 	log.V(1).Info("Network interface selector is present, managing routing")
 
-	if natGateway.Spec.PortsPerNetworkInterface == nil {
-		log.V(1).Info("PortsPerNetworkInterface is empty")
-		return ctrl.Result{}, nil
-	}
-	log.V(1).Info("PortsPerNetworkInterface is present")
-	portsPerNetworkInterface := *natGateway.Spec.PortsPerNetworkInterface
-
-	log.V(1).Info("Finding destinations")
-	destinations, err := r.findDestinations(ctx, log, natGateway)
+	log.V(1).Info("Selecting targets")
+	targetNameByUID, err := r.selectTargets(ctx, log, natGateway)
 	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("error finding destinations: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error selecting targets: %w", err)
 	}
-	log.V(1).Info("Successfully found destinations", "Destinations", destinations)
-
-	slotsPerIP := int((MaxEphemeralPort - MinEphemeralPort + 1) / portsPerNetworkInterface)
+	log.V(1).Info("Selected targets", "TargetNameByUID", targetNameByUID)
 
 	log.V(1).Info("Assigning ports")
-	updatedDestinations, slotsInUse, err := r.assignPorts(ctx, log, natGateway, destinations, slotsPerIP, portsPerNetworkInterface)
+	updatedDestinations, portsInUse, err := r.assignPorts(ctx, log, natGateway, targetNameByUID)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error assigning ports: %w", err)
 	}
@@ -202,20 +348,20 @@ func (r *NatGatewayReconciler) reconcile(ctx context.Context, log logr.Logger, n
 	}
 	log.V(1).Info("Successfully applied routing")
 
-	if err := r.patchStatus(ctx, natGateway, slotsInUse*portsPerNetworkInterface); err != nil {
+	if err := r.patchStatus(ctx, natGateway, portsInUse); err != nil {
 		return ctrl.Result{}, fmt.Errorf("unable to patch status: %w", err)
 	}
 
 	return ctrl.Result{}, nil
 }
 
-func (r *NatGatewayReconciler) patchStatus(ctx context.Context, natGateway *networkingv1alpha1.NATGateway, portsInUse int32) error {
+func (r *NATGatewayReconciler) patchStatus(ctx context.Context, natGateway *networkingv1alpha1.NATGateway, portsInUse int32) error {
 	natGatewayBase := natGateway.DeepCopy()
 	natGateway.Status.PortsUsed = pointer.Int32(portsInUse)
 	return r.Patch(ctx, natGateway, client.MergeFrom(natGatewayBase))
 }
 
-func (r *NatGatewayReconciler) findDestinations(ctx context.Context, log logr.Logger, natGateway *networkingv1alpha1.NATGateway) (map[types.UID]commonv1alpha1.LocalUIDReference, error) {
+func (r *NATGatewayReconciler) selectTargets(ctx context.Context, log logr.Logger, natGateway *networkingv1alpha1.NATGateway) (map[types.UID]string, error) {
 	sel, err := metav1.LabelSelectorAsSelector(natGateway.Spec.NetworkInterfaceSelector)
 	if err != nil {
 		return nil, err
@@ -230,19 +376,19 @@ func (r *NatGatewayReconciler) findDestinations(ctx context.Context, log logr.Lo
 		return nil, fmt.Errorf("error listing network interfaces: %w", err)
 	}
 
-	destinations := map[types.UID]commonv1alpha1.LocalUIDReference{}
+	networkInterfaceNameByUID := make(map[types.UID]string)
 	for _, nic := range nicList.Items {
 		if nic.Spec.VirtualIP != nil {
 			log.V(1).Info("Ignored network interface because it is exposed through a VirtualIP", "NetworkInterfaceKey", client.ObjectKeyFromObject(&nic))
 			continue
 		}
 
-		destinations[nic.UID] = commonv1alpha1.LocalUIDReference{Name: nic.Name, UID: nic.UID}
+		networkInterfaceNameByUID[nic.UID] = nic.Name
 	}
-	return destinations, nil
+	return networkInterfaceNameByUID, nil
 }
 
-func (r *NatGatewayReconciler) applyRouting(ctx context.Context, natGateway *networkingv1alpha1.NATGateway, destinations []networkingv1alpha1.NATGatewayDestination) error {
+func (r *NATGatewayReconciler) applyRouting(ctx context.Context, natGateway *networkingv1alpha1.NATGateway, destinations []networkingv1alpha1.NATGatewayDestination) error {
 	network := &networkingv1alpha1.Network{}
 	if err := r.Get(ctx, types.NamespacedName{Name: natGateway.Spec.NetworkRef.Name, Namespace: natGateway.Namespace}, network); err != nil {
 		return fmt.Errorf("error getting network %s: %w", natGateway.Spec.NetworkRef.Name, err)
@@ -272,21 +418,24 @@ func (r *NatGatewayReconciler) applyRouting(ctx context.Context, natGateway *net
 	return nil
 }
 
-func (r *NatGatewayReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *NATGatewayReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	ctx := context.Background()
 	log := ctrl.Log.WithName("natgateway").WithName("setup")
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&networkingv1alpha1.NATGateway{}).
-		Owns(&networkingv1alpha1.NATGatewayRouting{}).
+		Owns(
+			&networkingv1alpha1.NATGatewayRouting{},
+			builder.WithPredicates(&predicate.ResourceVersionChangedPredicate{}),
+		).
 		Watches(
 			&source.Kind{Type: &networkingv1alpha1.NetworkInterface{}},
-			r.enqueueByNatGatewayMatchingNetworkInterface(ctx, log),
+			r.enqueueByNetworkInterface(ctx, log),
 		).
 		Complete(r)
 }
 
-func (r *NatGatewayReconciler) enqueueByNatGatewayMatchingNetworkInterface(ctx context.Context, log logr.Logger) handler.EventHandler {
+func (r *NATGatewayReconciler) enqueueByNetworkInterface(ctx context.Context, log logr.Logger) handler.EventHandler {
 	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
 		nic := obj.(*networkingv1alpha1.NetworkInterface)
 		log = log.WithValues("NetworkInterfaceKey", client.ObjectKeyFromObject(nic))
@@ -296,7 +445,7 @@ func (r *NatGatewayReconciler) enqueueByNatGatewayMatchingNetworkInterface(ctx c
 			client.InNamespace(nic.Namespace),
 			client.MatchingFields{networking.NATGatewayNetworkNameField: nic.Spec.NetworkRef.Name},
 		); err != nil {
-			log.Error(err, "Error listing natgateways for network")
+			log.Error(err, "Error listing NAT gateways for network")
 			return nil
 		}
 

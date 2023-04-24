@@ -30,7 +30,7 @@ import (
 
 var _ = Describe("NetworkProtectionReconciler", func() {
 	ctx := SetupContext()
-	ns, _ := SetupTest(ctx)
+	ns, _ := SetupTest()
 
 	var (
 		network *networkingv1alpha1.Network
