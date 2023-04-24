@@ -31,9 +31,9 @@ spec:
         - /machinepoollet
         args:
         - --leader-elect
-        - --machine-downward-api-label=downward-api.machinepoollet.api.onmetal.de/root-machine-namespace=metadata.labels['downward-api.machinepoollet.api.onmetal.de/root-machine-namespace']
-        - --machine-downward-api-label=downward-api.machinepoollet.api.onmetal.de/root-machine-name=metadata.labels['downward-api.machinepoollet.api.onmetal.de/root-machine-name']
-        - --machine-downward-api-label=downward-api.machinepoollet.api.onmetal.de/root-machine-uid=metadata.labels['downward-api.machinepoollet.api.onmetal.de/root-machine-uid']
+        - --machine-downward-api-label=root-machine-namespace=metadata.labels['downward-api.machinepoollet.api.onmetal.de/root-machine-namespace']
+        - --machine-downward-api-label=root-machine-name=metadata.labels['downward-api.machinepoollet.api.onmetal.de/root-machine-name']
+        - --machine-downward-api-label=root-machine-uid=metadata.labels['downward-api.machinepoollet.api.onmetal.de/root-machine-uid']
         image: machinepoollet:latest
         env:
         - name: KUBERNETES_SERVICE_NAME

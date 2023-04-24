@@ -46,3 +46,10 @@ var (
 	}
 	VolumeSlice = tableconverter.SliceFuncs[*ori.Volume](Volume)
 )
+
+func init() {
+	RegistryBuilder.Register(
+		tableconverter.ToTagAndTypedAny[*ori.Volume](Volume),
+		tableconverter.ToTagAndTypedAny[[]*ori.Volume](VolumeSlice),
+	)
+}

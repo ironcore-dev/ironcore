@@ -49,3 +49,10 @@ var (
 	}
 	NetworkInterfaceSlice = tableconverter.SliceFuncs[*ori.NetworkInterface](NetworkInterface)
 )
+
+func init() {
+	RegistryBuilder.Register(
+		tableconverter.ToTagAndTypedAny[*ori.NetworkInterface](NetworkInterface),
+		tableconverter.ToTagAndTypedAny[[]*ori.NetworkInterface](NetworkInterfaceSlice),
+	)
+}

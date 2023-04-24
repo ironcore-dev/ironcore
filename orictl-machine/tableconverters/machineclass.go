@@ -41,3 +41,10 @@ var (
 
 	MachineClassSlice = tableconverter.SliceFuncs[*ori.MachineClass](MachineClass)
 )
+
+func init() {
+	RegistryBuilder.Register(
+		tableconverter.ToTagAndTypedAny[*ori.MachineClass](MachineClass),
+		tableconverter.ToTagAndTypedAny[[]*ori.MachineClass](MachineClassSlice),
+	)
+}

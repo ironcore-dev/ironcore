@@ -15,11 +15,15 @@
 package tableconverter
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
+	"strings"
+	"text/template"
 
 	"github.com/onmetal/onmetal-api/orictl/api"
 	"github.com/onmetal/onmetal-api/utils/generic"
+	"golang.org/x/exp/slices"
 )
 
 type TableConverter[E any] interface {
@@ -99,93 +103,64 @@ func (f SliceFuncs[E]) ConvertToTable(es []E) (*api.Table, error) {
 	}, nil
 }
 
-func Table[E any](table *api.Table) TableConverter[E] {
+func StaticTable[E any](table *api.Table) TableConverter[E] {
 	return Func[E](func(E) (*api.Table, error) {
 		return table, nil
 	})
 }
 
-func MergeFuncs[E any](funcs ...Funcs[E]) Funcs[E] {
-	if len(funcs) == 1 {
-		return funcs[0]
+func ZipTables(tables ...*api.Table) (*api.Table, error) {
+	if len(tables) == 0 {
+		return &api.Table{}, nil
+	}
+	if len(tables) == 1 {
+		return tables[1], nil
 	}
 
-	return Funcs[E]{
-		Headers: func() ([]api.Header, error) {
-			var headers []api.Header
-			for _, f := range funcs {
-				h, err := f.Headers()
-				if err != nil {
-					return nil, err
-				}
-				headers = append(headers, h...)
-			}
-			return headers, nil
-		},
-		Rows: func(e E) ([]api.Row, error) {
-			var rows []api.Row
-			for _, f := range funcs {
-				r, err := f.Rows(e)
-				if err != nil {
-					return nil, err
-				}
-
-				rows = permuteRows(rows, r)
-			}
-			return rows, nil
-		},
-	}
-}
-
-func permuteRows(r1, r2 []api.Row) []api.Row {
-	if len(r1) == 0 {
-		return r2
-	}
-	if len(r2) == 0 {
-		return r1
+	res := &api.Table{
+		Headers: slices.Clone(tables[0].Headers),
+		Rows:    slices.Clone(tables[0].Rows),
 	}
 
-	perm := make([]api.Row, 0, len(r1)*len(r2))
-	for i := 0; i < len(r1); i++ {
-		for j := 0; j < len(r2); j++ {
-			perm = append(perm, append(append(make(api.Row, 0, len(r1[i])+len(r2[j])), r1[i]...), r2[j]...))
+	for _, table := range tables[1:] {
+		if len(res.Rows) != len(table.Rows) {
+			return nil, fmt.Errorf("row length mismatch: expected %d but got %d", res.Rows, table.Rows)
+		}
+
+		res.Headers = append(res.Headers, table.Headers...)
+		for i := 0; i < len(res.Rows); i++ {
+			res.Rows[i] = append(res.Rows[i], table.Rows[i]...)
 		}
 	}
-	return perm
+	return res, nil
 }
 
-func Merge[E any](convs ...TableConverter[E]) TableConverter[E] {
+func Zip[E any](convs ...TableConverter[E]) TableConverter[E] {
 	if len(convs) == 0 {
-		return Table[E](nil)
+		return StaticTable[E](&api.Table{})
 	}
 	if len(convs) == 1 {
 		return convs[0]
 	}
-
 	return Func[E](func(e E) (*api.Table, error) {
-		var (
-			headers []api.Header
-			rows    []api.Row
-		)
+		tab, err := convs[0].ConvertToTable(e)
+		if err != nil {
+			return nil, err
+		}
 
-		for _, conv := range convs {
-			tab, err := conv.ConvertToTable(e)
+		for _, conv := range convs[1:] {
+			newTab, err := conv.ConvertToTable(e)
 			if err != nil {
 				return nil, err
 			}
 
-			if tab == nil {
-				continue
+			tab, err = ZipTables(tab, newTab)
+			if err != nil {
+				return nil, err
 			}
-
-			headers = append(headers, tab.Headers...)
-			rows = permuteRows(rows, tab.Rows)
 		}
 
-		return &api.Table{
-			Headers: headers,
-			Rows:    rows,
-		}, nil
+		return tab, nil
 	})
 }
 
@@ -199,38 +174,6 @@ func (c TypedAnyConverter[E, TC]) ConvertToTable(v any) (*api.Table, error) {
 		return nil, err
 	}
 	return c.Converter.ConvertToTable(e)
-}
-
-type Registry struct {
-	convertersByTag map[reflect.Type]TableConverter[any]
-}
-
-func NewRegistry() *Registry {
-	return &Registry{
-		convertersByTag: map[reflect.Type]TableConverter[any]{},
-	}
-}
-
-func (r *Registry) ConvertToTable(e any) (*api.Table, error) {
-	tag := reflect.TypeOf(e)
-	converter, ok := r.convertersByTag[tag]
-	if !ok {
-		return nil, fmt.Errorf("no converter found for type %T", e)
-	}
-	return converter.ConvertToTable(e)
-}
-
-func (r *Registry) Register(tag reflect.Type, conv TableConverter[any]) error {
-	if _, ok := r.convertersByTag[tag]; ok {
-		return fmt.Errorf("converter for type %s already registered", tag)
-	}
-
-	r.convertersByTag[tag] = conv
-	return nil
-}
-
-func (r *Registry) RegisterTagged(conv TaggedAnyTableConverter) error {
-	return r.Register(conv.Tag(), conv)
 }
 
 type RegistryBuilder []func(*Registry) error
@@ -248,6 +191,46 @@ func ToTagAndTypedAny[E any](conv TableConverter[E]) TagAndAnyConverter {
 	return TagAndAnyConverter{
 		Tag:       generic.ReflectType[E](),
 		Converter: TypedAnyConverter[E, TableConverter[E]]{conv},
+	}
+}
+
+type TemplateTableColumn struct {
+	Name     string
+	Template *template.Template
+}
+
+func TemplateTableBuilder[E any](columns ...TemplateTableColumn) Funcs[E] {
+	headers := make([]api.Header, len(columns))
+	for i, col := range columns {
+		headers[i] = api.Header{Name: col.Name}
+	}
+
+	return Funcs[E]{
+		Headers: Headers(headers),
+		Rows: SingleRowFrom(func(e E) (api.Row, error) {
+			data, err := json.Marshal(e)
+			if err != nil {
+				return nil, err
+			}
+
+			var jsonV any
+			if err := json.Unmarshal(data, &jsonV); err != nil {
+				return nil, err
+			}
+
+			var sb strings.Builder
+			row := make(api.Row, len(columns))
+			for i, col := range columns {
+				if err := col.Template.Execute(&sb, jsonV); err != nil {
+					return nil, fmt.Errorf("[column %s] error executing template: %w", col.Name, err)
+				}
+
+				row[i] = sb.String()
+				sb.Reset()
+			}
+
+			return row, nil
+		}),
 	}
 }
 
