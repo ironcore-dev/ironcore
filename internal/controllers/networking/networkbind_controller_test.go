@@ -33,8 +33,7 @@ var IgnoreNetworkPeeringStatusVolatileFields = cmpopts.IgnoreFields(
 )
 
 var _ = Describe("NetworkBindReconciler", func() {
-	ctx := SetupContext()
-	ns1, _ := SetupTest(ctx)
+	ns1, _ := SetupTest()
 	ns2 := SetupNamespace(&k8sClient)
 
 	It("should bind two networks in the same namespace referencing each other", func(ctx SpecContext) {

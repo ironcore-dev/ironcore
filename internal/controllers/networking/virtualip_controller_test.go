@@ -29,7 +29,7 @@ import (
 
 var _ = Describe("VirtualIPReconciler", func() {
 	ctx := SetupContext()
-	ns, _ := SetupTest(ctx)
+	ns, _ := SetupTest()
 
 	It("should set a virtual ip to unbound if nothing binds it", func() {
 		By("creating a virtual ip")

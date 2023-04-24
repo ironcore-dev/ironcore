@@ -178,7 +178,7 @@ var _ = BeforeSuite(func() {
 	}).SetupWithManager(k8sManager)
 	Expect(err).NotTo(HaveOccurred())
 
-	err = (&NatGatewayReconciler{
+	err = (&NATGatewayReconciler{
 		EventRecorder: &record.FakeRecorder{},
 		Client:        k8sManager.GetClient(),
 		Scheme:        k8sManager.GetScheme(),
@@ -212,18 +212,20 @@ var _ = BeforeSuite(func() {
 	}()
 })
 
-func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.MachineClass) {
+func SetupTest() (*corev1.Namespace, *computev1alpha1.MachineClass) {
 	var (
 		ns           = &corev1.Namespace{}
 		machineClass = &computev1alpha1.MachineClass{}
 	)
 
-	BeforeEach(func() {
+	BeforeEach(func(ctx SpecContext) {
 		*ns = corev1.Namespace{
 			ObjectMeta: metav1.ObjectMeta{GenerateName: "testns-"},
 		}
 		Expect(k8sClient.Create(ctx, ns)).NotTo(HaveOccurred(), "failed to create test namespace")
-		DeferCleanup(k8sClient.Delete, ctx, ns)
+		DeferCleanup(func(ctx context.Context) error {
+			return client.IgnoreNotFound(k8sClient.Delete(ctx, ns))
+		})
 
 		*machineClass = computev1alpha1.MachineClass{
 			ObjectMeta: metav1.ObjectMeta{
@@ -235,7 +237,9 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 			},
 		}
 		Expect(k8sClient.Create(ctx, machineClass)).To(Succeed(), "failed to create test machine class")
-		DeferCleanup(k8sClient.Delete, ctx, machineClass)
+		DeferCleanup(func(ctx context.Context) error {
+			return client.IgnoreNotFound(k8sClient.Delete(ctx, machineClass))
+		})
 	})
 
 	return ns, machineClass

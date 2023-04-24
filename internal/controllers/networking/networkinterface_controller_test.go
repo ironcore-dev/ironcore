@@ -30,7 +30,7 @@ import (
 
 var _ = Describe("NetworkInterfaceReconciler", func() {
 	ctx := SetupContext()
-	ns, _ := SetupTest(ctx)
+	ns, _ := SetupTest()
 	const networkHandle = "foo"
 
 	It("should reconcile the ips and update the status", func() {

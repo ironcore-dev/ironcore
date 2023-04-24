@@ -29,7 +29,7 @@ import (
 
 var _ = Describe("NetworkInterfaceBindReconciler", func() {
 	ctx := SetupContext()
-	ns, machineClass := SetupTest(ctx)
+	ns, machineClass := SetupTest()
 
 	It("should reconcile the binding phase", func() {
 		By("creating a network")
