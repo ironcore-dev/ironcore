@@ -711,6 +711,7 @@ func Convert_storage_VolumeAccess_To_v1alpha1_VolumeAccess(in *storage.VolumeAcc
 func autoConvert_v1alpha1_VolumeClass_To_storage_VolumeClass(in *v1alpha1.VolumeClass, out *storage.VolumeClass, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	out.Capabilities = *(*core.ResourceList)(unsafe.Pointer(&in.Capabilities))
+	out.ResizePolicy = storage.ResizePolicy(in.ResizePolicy)
 	return nil
 }
 
@@ -722,6 +723,7 @@ func Convert_v1alpha1_VolumeClass_To_storage_VolumeClass(in *v1alpha1.VolumeClas
 func autoConvert_storage_VolumeClass_To_v1alpha1_VolumeClass(in *storage.VolumeClass, out *v1alpha1.VolumeClass, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	out.Capabilities = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Capabilities))
+	out.ResizePolicy = v1alpha1.ResizePolicy(in.ResizePolicy)
 	return nil
 }
 

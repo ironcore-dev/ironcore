@@ -20,6 +20,8 @@ import (
 	"net"
 	"time"
 
+	"github.com/onmetal/onmetal-api/internal/admission/plugin/volumeresize"
+
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
@@ -174,11 +176,13 @@ func (o *OnmetalAPIServerOptions) Validate(args []string) error {
 func (o *OnmetalAPIServerOptions) Complete() error {
 	machinevolumedevices.Register(o.RecommendedOptions.Admission.Plugins)
 	resourcequota.Register(o.RecommendedOptions.Admission.Plugins)
+	volumeresize.Register(o.RecommendedOptions.Admission.Plugins)
 
 	o.RecommendedOptions.Admission.RecommendedPluginOrder = append(
 		o.RecommendedOptions.Admission.RecommendedPluginOrder,
 		machinevolumedevices.PluginName,
 		resourcequota.PluginName,
+		volumeresize.PluginName,
 	)
 
 	return nil
