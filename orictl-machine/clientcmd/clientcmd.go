@@ -36,8 +36,14 @@ var (
 	RecommendedHomeFile  = filepath.Join(RecommendedConfigDir, RecommendedFileName)
 )
 
+type Column struct {
+	Name     string `json:"name"`
+	Template string `json:"template"`
+}
+
 type TableConfig struct {
-	WellKnownMachineLabels map[string]string `json:"wellKnownMachineLabels,omitempty"`
+	PrependMachineColumns []Column `json:"prependMachineColumns,omitempty"`
+	AppendMachineColumns  []Column `json:"appendMachineColumns,omitempty"`
 }
 
 type Config struct {

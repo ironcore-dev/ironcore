@@ -1,5 +1,11 @@
 tableConfig:
-  wellKnownMachineLabels:
-    RNamespace: downward-api.machinepoollet.api.onmetal.de/root-machine-namespace
-    RName: downward-api.machinepoollet.api.onmetal.de/root-machine-name
-    RUID: downward-api.machinepoollet.api.onmetal.de/root-machine-uid
+  prependMachineColumns:
+  - name: RNamespace
+    template: >-
+      {{ with index .metadata.labels "downward-api.machinepoollet.api.onmetal.de/root-machine-namespace" }}{{.}}{{ else }}{{ index .metadata.labels "machinepoollet.api.onmetal.de/machine-namespace" }}{{ end }}
+  - name: RName
+    template: >-
+      {{ with index .metadata.labels "downward-api.machinepoollet.api.onmetal.de/root-machine-name" }}{{.}}{{ else }}{{ index .metadata.labels "machinepoollet.api.onmetal.de/machine-name" }}{{ end }}
+  - name: RUID
+    template: >-
+      {{ with index .metadata.labels "downward-api.machinepoollet.api.onmetal.de/root-machine-uid" }}{{.}}{{ else }}{{ index .metadata.labels "machinepoollet.api.onmetal.de/machine-uid" }}{{ end }}

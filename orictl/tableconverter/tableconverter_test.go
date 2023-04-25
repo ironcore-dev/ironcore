@@ -22,8 +22,8 @@ import (
 )
 
 var _ = Describe("Tableconverter", func() {
-	Describe("Merge", func() {
-		It("should return the permutation of both table converters", func() {
+	Describe("Zip", func() {
+		It("should zip the two table converters", func() {
 			h1 := []api.Header{{Name: "foo"}}
 			f1 := Funcs[int]{
 				Headers: Headers(h1),
@@ -40,15 +40,13 @@ var _ = Describe("Tableconverter", func() {
 				},
 			}
 
-			f := Merge[int](f1, f2)
+			f := Zip[int](f1, f2)
 			table, err := f.ConvertToTable(2)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(table).To(Equal(&api.Table{
 				Headers: []api.Header{{Name: "foo"}, {Name: "bar"}},
 				Rows: []api.Row{
 					{2, 2},
-					{2, 4},
-					{3, 2},
 					{3, 4},
 				},
 			}))

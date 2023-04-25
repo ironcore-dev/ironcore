@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2023 OnMetal authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,13 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package tableconverters
+package tableconverter
 
-import (
-	"github.com/onmetal/onmetal-api/orictl/tableconverter"
-)
+import "errors"
 
 var (
-	RegistryBuilder tableconverter.RegistryBuilder
-	AddToRegistry   = RegistryBuilder.AddToRegistry
+	ErrNotFound      = errors.New("not found")
+	ErrAlreadyExists = errors.New("already exists")
 )

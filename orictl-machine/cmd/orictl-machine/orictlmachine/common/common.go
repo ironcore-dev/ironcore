@@ -16,6 +16,7 @@ package common
 
 import (
 	"fmt"
+	"text/template"
 	"time"
 
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
@@ -24,6 +25,7 @@ import (
 	"github.com/onmetal/onmetal-api/orictl-machine/tableconverters"
 	"github.com/onmetal/onmetal-api/orictl/renderer"
 	"github.com/onmetal/onmetal-api/orictl/tableconverter"
+	"github.com/onmetal/onmetal-api/utils/generic"
 	"github.com/spf13/pflag"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -50,32 +52,123 @@ func (o *Options) Config() (*clientcmd.Config, error) {
 	return clientcmd.GetConfig(o.ConfigFile)
 }
 
-func (o *Options) tableConvertersOptions(cfg *clientcmd.Config) tableconverters.Options {
-	tableCfg := cfg.TableConfig
-	if tableCfg == nil {
-		return tableconverters.Options{}
-	}
-
-	opts := tableconverters.Options{}
-	if len(tableCfg.WellKnownMachineLabels) > 0 {
-		opts.TransformMachine = func(funcs tableconverter.Funcs[*ori.Machine]) tableconverter.TableConverter[*ori.Machine] {
-			return tableconverter.Merge[*ori.Machine](
-				tableconverter.WellKnownLabels[*ori.Machine](tableCfg.WellKnownMachineLabels),
-				funcs,
-			)
+func TemplateTableBuilderFromColumns[E any](columns []clientcmd.Column) (tableconverter.Funcs[E], error) {
+	tColumns := make([]tableconverter.TemplateTableColumn, len(columns))
+	for i, col := range columns {
+		tmpl, err := template.New(col.Name).Parse(col.Template)
+		if err != nil {
+			return tableconverter.Funcs[E]{}, fmt.Errorf("[column %s] error parsing template: %w", col.Name, err)
 		}
 
-		opts.TransformMachineSlice = func(funcs tableconverter.SliceFuncs[*ori.Machine]) tableconverter.TableConverter[[]*ori.Machine] {
-			itemFuncs := tableconverter.Funcs[*ori.Machine](funcs)
-			merged := tableconverter.MergeFuncs[*ori.Machine](
-				tableconverter.WellKnownLabels[*ori.Machine](tableCfg.WellKnownMachineLabels),
-				itemFuncs,
-			)
-			return tableconverter.SliceFuncs[*ori.Machine](merged)
+		tColumns[i] = tableconverter.TemplateTableColumn{
+			Name:     col.Name,
+			Template: tmpl,
 		}
 	}
 
-	return opts
+	return tableconverter.TemplateTableBuilder[E](tColumns...), nil
+}
+
+func modifyTableConverter[E any](
+	reg *tableconverter.Registry,
+	modifyFunc func(conv tableconverter.TableConverter[any]) tableconverter.TableConverter[any],
+) error {
+	tag := generic.ReflectType[E]()
+	conv, err := reg.Lookup(tag)
+	if err != nil {
+		return err
+	}
+
+	oldConv := conv
+	conv = modifyFunc(conv)
+
+	// Fast track: no modification
+	if conv == oldConv {
+		return nil
+	}
+
+	if err := reg.Delete(tag); err != nil {
+		return err
+	}
+
+	return reg.Register(tag, conv)
+}
+
+func applyTableConverterOverlay[E any](
+	reg *tableconverter.Registry,
+	prependColumns, appendColumns []clientcmd.Column,
+) error {
+	if len(prependColumns) == 0 && len(appendColumns) == 0 {
+		return nil
+	}
+
+	var (
+		toPrepend      tableconverter.Funcs[E]
+		toPrependSlice tableconverter.SliceFuncs[E]
+	)
+	if len(prependColumns) > 0 {
+		conv, err := TemplateTableBuilderFromColumns[E](prependColumns)
+		if err != nil {
+			return err
+		}
+
+		toPrepend = conv
+		toPrependSlice = tableconverter.SliceFuncs[E](toPrepend)
+	}
+
+	var (
+		toAppend      tableconverter.Funcs[E]
+		toAppendSlice tableconverter.SliceFuncs[E]
+	)
+	if len(appendColumns) > 0 {
+		conv, err := TemplateTableBuilderFromColumns[E](appendColumns)
+		if err != nil {
+			return err
+		}
+
+		toAppend = conv
+		toAppendSlice = tableconverter.SliceFuncs[E](toAppend)
+	}
+
+	if err := modifyTableConverter[E](reg, func(conv tableconverter.TableConverter[any]) tableconverter.TableConverter[any] {
+		var convs []tableconverter.TableConverter[any]
+		if len(prependColumns) > 0 {
+			convs = append(convs, tableconverter.TypedAnyConverter[E, tableconverter.Funcs[E]]{Converter: toPrepend})
+		}
+		convs = append(convs, conv)
+		if len(appendColumns) > 0 {
+			convs = append(convs, tableconverter.TypedAnyConverter[E, tableconverter.Funcs[E]]{Converter: toAppend})
+		}
+
+		return tableconverter.Zip(convs...)
+	}); err != nil {
+		return err
+	}
+
+	if err := modifyTableConverter[[]E](reg, func(conv tableconverter.TableConverter[any]) tableconverter.TableConverter[any] {
+		var convs []tableconverter.TableConverter[any]
+		if len(prependColumns) > 0 {
+			convs = append(convs, tableconverter.TypedAnyConverter[[]E, tableconverter.SliceFuncs[E]]{Converter: toPrependSlice})
+		}
+		convs = append(convs, conv)
+		if len(appendColumns) > 0 {
+			convs = append(convs, tableconverter.TypedAnyConverter[[]E, tableconverter.SliceFuncs[E]]{Converter: toAppendSlice})
+		}
+
+		return tableconverter.Zip(convs...)
+	}); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o *Options) applyTableConvertersOverlay(cfg *clientcmd.TableConfig, reg *tableconverter.Registry) error {
+	if err := applyTableConverterOverlay[*ori.Machine](reg, cfg.PrependMachineColumns, cfg.AppendMachineColumns); err != nil {
+		return fmt.Errorf("error applying machine table converter overlay: %w", err)
+	}
+
+	return nil
 }
 
 func (o *Options) Registry() (*renderer.Registry, error) {
@@ -89,12 +182,18 @@ func (o *Options) Registry() (*renderer.Registry, error) {
 		return nil, err
 	}
 
-	tableConv := tableconverter.NewRegistry()
-	if err := tableconverters.MakeAddToRegistry(o.tableConvertersOptions(cfg))(tableConv); err != nil {
+	tableConvRegistry := tableconverter.NewRegistry()
+	if err := tableconverters.AddToRegistry(tableConvRegistry); err != nil {
 		return nil, err
 	}
 
-	if err := registry.Register("table", renderer.NewTable(tableConv)); err != nil {
+	if tableCfg := cfg.TableConfig; tableCfg != nil {
+		if err := o.applyTableConvertersOverlay(tableCfg, tableConvRegistry); err != nil {
+			return nil, err
+		}
+	}
+
+	if err := registry.Register("table", renderer.NewTable(tableConvRegistry)); err != nil {
 		return nil, err
 	}
 
