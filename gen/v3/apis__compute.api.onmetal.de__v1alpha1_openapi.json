@@ -34698,6 +34698,10 @@
 					},
 					"metadata": {
 						"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+					},
+					"resizePolicy": {
+						"description": "ResizePolicy describes the supported expansion policy of a VolumeClass. If not set default to Static expansion policy.",
+						"type": "string"
 					}
 				},
 				"x-kubernetes-group-version-kind": [

@@ -30,6 +30,16 @@ func ValidateVolumeClass(volumeClass *storage.VolumeClass) field.ErrorList {
 
 	allErrs = append(allErrs, validateVolumeClassCapabilities(volumeClass.Capabilities, field.NewPath("capabilities"))...)
 
+	allErrs = append(allErrs, validateVolumeClassResizePolicy(volumeClass.ResizePolicy, field.NewPath("resizePolicy"))...)
+
+	return allErrs
+}
+
+func validateVolumeClassResizePolicy(policy storage.ResizePolicy, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	allErrs = append(allErrs, onmetalapivalidation.ValidateResizePolicy(policy, fldPath)...)
+
 	return allErrs
 }
 

@@ -131,7 +131,7 @@ func (s *Server) createOnmetalVolume(ctx context.Context, log logr.Logger, volum
 
 	log.V(1).Info("Patching onmetal volume as created")
 	if err := apiutils.PatchCreated(ctx, s.client, volume.Volume); err != nil {
-		return fmt.Errorf("error patching onmetal machine as created: %w", err)
+		return fmt.Errorf("error patching onmetal volume as created: %w", err)
 	}
 
 	// Reset cleaner since everything from now on operates on a consistent volume

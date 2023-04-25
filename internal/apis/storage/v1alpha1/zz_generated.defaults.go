@@ -32,6 +32,8 @@ func RegisterDefaults(scheme *runtime.Scheme) error {
 	scheme.AddTypeDefaultingFunc(&v1alpha1.Bucket{}, func(obj interface{}) { SetObjectDefaults_Bucket(obj.(*v1alpha1.Bucket)) })
 	scheme.AddTypeDefaultingFunc(&v1alpha1.BucketList{}, func(obj interface{}) { SetObjectDefaults_BucketList(obj.(*v1alpha1.BucketList)) })
 	scheme.AddTypeDefaultingFunc(&v1alpha1.Volume{}, func(obj interface{}) { SetObjectDefaults_Volume(obj.(*v1alpha1.Volume)) })
+	scheme.AddTypeDefaultingFunc(&v1alpha1.VolumeClass{}, func(obj interface{}) { SetObjectDefaults_VolumeClass(obj.(*v1alpha1.VolumeClass)) })
+	scheme.AddTypeDefaultingFunc(&v1alpha1.VolumeClassList{}, func(obj interface{}) { SetObjectDefaults_VolumeClassList(obj.(*v1alpha1.VolumeClassList)) })
 	scheme.AddTypeDefaultingFunc(&v1alpha1.VolumeList{}, func(obj interface{}) { SetObjectDefaults_VolumeList(obj.(*v1alpha1.VolumeList)) })
 	return nil
 }
@@ -49,6 +51,17 @@ func SetObjectDefaults_BucketList(in *v1alpha1.BucketList) {
 
 func SetObjectDefaults_Volume(in *v1alpha1.Volume) {
 	SetDefaults_VolumeStatus(&in.Status)
+}
+
+func SetObjectDefaults_VolumeClass(in *v1alpha1.VolumeClass) {
+	SetDefaults_VolumeClass(in)
+}
+
+func SetObjectDefaults_VolumeClassList(in *v1alpha1.VolumeClassList) {
+	for i := range in.Items {
+		a := &in.Items[i]
+		SetObjectDefaults_VolumeClass(a)
+	}
 }
 
 func SetObjectDefaults_VolumeList(in *v1alpha1.VolumeList) {

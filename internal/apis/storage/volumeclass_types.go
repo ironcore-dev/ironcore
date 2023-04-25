@@ -33,7 +33,20 @@ type VolumeClass struct {
 
 	// Capabilities describes the capabilities of a volume class
 	Capabilities core.ResourceList
+	// ResizePolicy describes the supported expansion policy of a VolumeClass.
+	// If not set default to Static expansion policy.
+	ResizePolicy ResizePolicy `json:"resizePolicy,omitempty"`
 }
+
+// ResizePolicy is a type of policy.
+type ResizePolicy string
+
+const (
+	// ResizePolicyStatic is a policy that does not allow the expansion of a Volume.
+	ResizePolicyStatic ResizePolicy = "Static"
+	// ResizePolicyExpandOnly is a policy that only allows the expansion of a Volume.
+	ResizePolicyExpandOnly ResizePolicy = "ExpandOnly"
+)
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 

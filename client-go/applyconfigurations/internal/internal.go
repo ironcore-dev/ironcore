@@ -1590,6 +1590,9 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       default: {}
+    - name: resizePolicy
+      type:
+        scalar: string
 - name: com.github.onmetal.onmetal-api.api.storage.v1alpha1.VolumeCondition
   map:
     fields:

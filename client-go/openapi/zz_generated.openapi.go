@@ -5618,6 +5618,13 @@ func schema_onmetal_api_api_storage_v1alpha1_VolumeClass(ref common.ReferenceCal
 							},
 						},
 					},
+					"resizePolicy": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ResizePolicy describes the supported expansion policy of a VolumeClass. If not set default to Static expansion policy.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 				},
 			},
 		},
