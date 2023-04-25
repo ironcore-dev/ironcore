@@ -565,6 +565,20 @@ github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
 <p>Capabilities describes the capabilities of a VolumeClass.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>resizePolicy</code><br/>
+<em>
+<a href="#storage.api.onmetal.de/v1alpha1.ResizePolicy">
+ResizePolicy
+</a>
+</em>
+</td>
+<td>
+<p>ResizePolicy describes the supported expansion policy of a VolumeClass.
+If not set default to Static expansion policy.</p>
+</td>
+</tr>
 </tbody>
 </table>
 <h3 id="storage.api.onmetal.de/v1alpha1.VolumePool">VolumePool
@@ -1180,6 +1194,29 @@ covered by Tolerations will be considered to host the Bucket.</p>
 </td>
 </tr>
 </tbody>
+</table>
+<h3 id="storage.api.onmetal.de/v1alpha1.ResizePolicy">ResizePolicy
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.VolumeClass">VolumeClass</a>)
+</p>
+<div>
+<p>ResizePolicy is a type of policy.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;ExpandOnly&#34;</p></td>
+<td><p>ResizePolicyExpandOnly is a policy that only allows the expansion of a Volume.</p>
+</td>
+</tr><tr><td><p>&#34;Static&#34;</p></td>
+<td><p>ResizePolicyStatic is a policy that does not allow the expansion of a Volume.</p>
+</td>
+</tr></tbody>
 </table>
 <h3 id="storage.api.onmetal.de/v1alpha1.VolumeAccess">VolumeAccess
 </h3>
