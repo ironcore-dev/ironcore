@@ -15,6 +15,7 @@
 package apivalidation
 
 import (
+	"github.com/onmetal/onmetal-api/internal/apis/storage"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -25,12 +26,21 @@ var supportedIPFamilies = sets.New(
 	corev1.IPv6Protocol,
 )
 
+var supportedResizePolicies = sets.New(
+	storage.ResizePolicyStatic,
+	storage.ResizePolicyExpandOnly,
+)
+
 func IsSupportedIPFamily(ipFamily corev1.IPFamily) bool {
 	return supportedIPFamilies.Has(ipFamily)
 }
 
 func ValidateIPFamily(ipFamily corev1.IPFamily, fldPath *field.Path) field.ErrorList {
 	return ValidateEnum(supportedIPFamilies, ipFamily, fldPath, "must specify ipFamily")
+}
+
+func ValidateResizePolicy(policy storage.ResizePolicy, fldPath *field.Path) field.ErrorList {
+	return ValidateEnum(supportedResizePolicies, policy, fldPath, "must specify resizePolicy")
 }
 
 func ValidateIPFamilies(ipFamilies []corev1.IPFamily, fldPath *field.Path) field.ErrorList {

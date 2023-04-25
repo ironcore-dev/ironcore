@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package volumeresize_test
+package volumeresizepolicy_test
 
 import (
+	"context"
+
 	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -29,15 +30,14 @@ import (
 )
 
 var _ = Describe("Admission", func() {
-	ctx := SetupContext()
-	ns, volumePool := SetupTest(ctx)
+	ns, volumePool := SetupTest()
 
 	var (
 		volumeClassStatic     = &storagev1alpha1.VolumeClass{}
 		volumeClassExpandOnly = &storagev1alpha1.VolumeClass{}
 	)
 
-	BeforeEach(func() {
+	BeforeEach(func(ctx SpecContext) {
 		By("creating an expand only VolumeClass")
 		volumeClassExpandOnly = &storagev1alpha1.VolumeClass{
 			ObjectMeta: metav1.ObjectMeta{
@@ -50,6 +50,9 @@ var _ = Describe("Admission", func() {
 			ResizePolicy: storagev1alpha1.ResizePolicyExpandOnly,
 		}
 		Expect(k8sClient.Create(ctx, volumeClassExpandOnly)).To(Succeed())
+		DeferCleanup(func(ctx context.Context) error {
+			return client.IgnoreNotFound(k8sClient.Delete(ctx, volumeClassExpandOnly))
+		})
 
 		By("creating a static VolumeClass")
 		volumeClassStatic = &storagev1alpha1.VolumeClass{
@@ -63,9 +66,12 @@ var _ = Describe("Admission", func() {
 			ResizePolicy: storagev1alpha1.ResizePolicyStatic,
 		}
 		Expect(k8sClient.Create(ctx, volumeClassStatic)).To(Succeed())
+		DeferCleanup(func(ctx context.Context) error {
+			return client.IgnoreNotFound(k8sClient.Delete(ctx, volumeClassStatic))
+		})
 	})
 
-	It("should allow the resizing of a Volume if the VolumeClass supports it", func() {
+	It("should allow the resizing of a Volume if the VolumeClass supports it", func(ctx SpecContext) {
 		By("creating a Volume")
 		volume := &storagev1alpha1.Volume{
 			ObjectMeta: metav1.ObjectMeta{
@@ -95,7 +101,7 @@ var _ = Describe("Admission", func() {
 		))
 	})
 
-	It("should not allow the resizing of a Volume if the VolumeClass does not support it", func() {
+	It("should not allow the resizing of a Volume if the VolumeClass does not support it", func(ctx SpecContext) {
 		By("creating a Volume")
 		volume := &storagev1alpha1.Volume{
 			ObjectMeta: metav1.ObjectMeta{
@@ -126,7 +132,7 @@ var _ = Describe("Admission", func() {
 		))
 	})
 
-	It("should not allow the shrinking of a Volume if the VolumeClass does not support it", func() {
+	It("should not allow the shrinking of a Volume if the VolumeClass does not support it", func(ctx SpecContext) {
 		By("creating a Volume")
 		volume := &storagev1alpha1.Volume{
 			ObjectMeta: metav1.ObjectMeta{
@@ -155,9 +161,5 @@ var _ = Describe("Admission", func() {
 				corev1alpha1.ResourceStorage: resource.MustParse("2Gi"),
 			})),
 		))
-	})
-
-	AfterEach(func() {
-		Expect(k8sClient.DeleteAllOf(ctx, &storagev1alpha1.VolumeClass{})).To(Succeed())
 	})
 })

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package volumeresize_test
+package volumeresizepolicy_test
 
 import (
 	"context"
@@ -108,18 +108,21 @@ var _ = BeforeSuite(func() {
 	Expect(utilsenvtest.WaitUntilAPIServicesReadyWithTimeout(apiServiceTimeout, testEnvExt, k8sClient, scheme.Scheme)).To(Succeed())
 })
 
-func SetupTest(ctx context.Context) (*corev1.Namespace, *storagev1alpha1.VolumePool) {
+func SetupTest() (*corev1.Namespace, *storagev1alpha1.VolumePool) {
 	var (
 		ns         = &corev1.Namespace{}
 		volumePool = &storagev1alpha1.VolumePool{}
 	)
-	BeforeEach(func() {
+	BeforeEach(func(ctx SpecContext) {
 		*ns = corev1.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "testns-",
 			},
 		}
 		Expect(k8sClient.Create(ctx, ns)).To(Succeed(), "failed to create test namespace")
+		DeferCleanup(func(ctx context.Context) error {
+			return client.IgnoreNotFound(k8sClient.Delete(ctx, ns))
+		})
 
 		*volumePool = storagev1alpha1.VolumePool{
 			ObjectMeta: metav1.ObjectMeta{
@@ -129,11 +132,9 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *storagev1alpha1.VolumeP
 				ProviderID: "foo",
 			},
 		}
-	})
-
-	AfterEach(func() {
-		Expect(k8sClient.Delete(ctx, ns)).To(Succeed(), "failed to delete test namespace")
-		Expect(k8sClient.DeleteAllOf(ctx, &storagev1alpha1.VolumePool{})).To(Succeed())
+		DeferCleanup(func(ctx context.Context) error {
+			return client.IgnoreNotFound(k8sClient.Delete(ctx, volumePool))
+		})
 	})
 
 	return ns, volumePool
