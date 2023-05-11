@@ -133,12 +133,13 @@ var _ = BeforeSuite(func() {
 	DeferCleanup(ctrlMgr.Stop)
 })
 
-func SetupTest(ctx context.Context) (*corev1.Namespace, *storagev1alpha1.VolumePool, *storagev1alpha1.VolumeClass, *volume.FakeRuntimeService) {
+func SetupTest(ctx context.Context) (*corev1.Namespace, *storagev1alpha1.VolumePool, *storagev1alpha1.VolumeClass, *storagev1alpha1.VolumeClass, *volume.FakeRuntimeService) {
 	var (
-		ns  = &corev1.Namespace{}
-		vp  = &storagev1alpha1.VolumePool{}
-		vc  = &storagev1alpha1.VolumeClass{}
-		srv = &volume.FakeRuntimeService{}
+		ns           = &corev1.Namespace{}
+		vp           = &storagev1alpha1.VolumePool{}
+		vc           = &storagev1alpha1.VolumeClass{}
+		expandableVc = &storagev1alpha1.VolumeClass{}
+		srv          = &volume.FakeRuntimeService{}
 	)
 
 	BeforeEach(func() {
@@ -169,6 +170,19 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *storagev1alpha1.VolumeP
 		}
 		Expect(k8sClient.Create(ctx, vc)).To(Succeed(), "failed to create test volume class")
 		DeferCleanup(k8sClient.Delete, ctx, vc)
+
+		*expandableVc = storagev1alpha1.VolumeClass{
+			ObjectMeta: metav1.ObjectMeta{
+				GenerateName: "test-vc-",
+			},
+			ResizePolicy: storagev1alpha1.ResizePolicyExpandOnly,
+			Capabilities: corev1alpha1.ResourceList{
+				corev1alpha1.ResourceTPS:  resource.MustParse("250Mi"),
+				corev1alpha1.ResourceIOPS: resource.MustParse("15000"),
+			},
+		}
+		Expect(k8sClient.Create(ctx, expandableVc)).To(Succeed(), "failed to create test volume class")
+		DeferCleanup(k8sClient.Delete, ctx, expandableVc)
 
 		*srv = *volume.NewFakeRuntimeService()
 		srv.SetVolumeClasses([]*volume.FakeVolumeClass{
@@ -211,5 +225,5 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *storagev1alpha1.VolumeP
 		}()
 	})
 
-	return ns, vp, vc, srv
+	return ns, vp, vc, expandableVc, srv
 }

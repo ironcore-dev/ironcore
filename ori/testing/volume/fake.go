@@ -16,6 +16,7 @@ package volume
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"time"
 
@@ -116,6 +117,20 @@ func (r *FakeRuntimeService) CreateVolume(ctx context.Context, req *ori.CreateVo
 	return &ori.CreateVolumeResponse{
 		Volume: &volume,
 	}, nil
+}
+
+func (r *FakeRuntimeService) ExpandVolume(ctx context.Context, req *ori.ExpandVolumeRequest, opts ...grpc.CallOption) (*ori.ExpandVolumeResponse, error) {
+	r.Lock()
+	defer r.Unlock()
+
+	volume, ok := r.Volumes[req.VolumeId]
+	if !ok {
+		return nil, fmt.Errorf("volume with id %s not found", req.VolumeId)
+	}
+
+	volume.Spec.Resources.StorageBytes = req.Resources.StorageBytes
+
+	return &ori.ExpandVolumeResponse{}, nil
 }
 
 func (r *FakeRuntimeService) DeleteVolume(ctx context.Context, req *ori.DeleteVolumeRequest, opts ...grpc.CallOption) (*ori.DeleteVolumeResponse, error) {

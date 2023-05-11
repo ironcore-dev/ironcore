@@ -385,6 +385,10 @@ func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volum
 		return r.create(ctx, log, volume)
 	case 1:
 		oriVolume := res.Volumes[0]
+		if err := r.update(ctx, log, volume, oriVolume); err != nil {
+			return ctrl.Result{}, fmt.Errorf("error updating volume: %w", err)
+		}
+
 		if err := r.updateStatus(ctx, log, volume, oriVolume); err != nil {
 			return ctrl.Result{}, fmt.Errorf("error updating volume status: %w", err)
 		}
@@ -428,6 +432,24 @@ func (r *VolumeReconciler) create(ctx context.Context, log logr.Logger, volume *
 
 	log.V(1).Info("Created")
 	return ctrl.Result{}, nil
+}
+
+func (r *VolumeReconciler) update(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume, oriVolume *ori.Volume) error {
+	storageBytes := volume.Spec.Resources.Storage().AsDec().UnscaledBig().Uint64()
+	oldStorageBytes := oriVolume.Spec.Resources.StorageBytes
+	if storageBytes != oldStorageBytes {
+		log.V(1).Info("Expanding volume", "StorageBytes", storageBytes, "OldStorageBytes", oldStorageBytes)
+		if _, err := r.VolumeRuntime.ExpandVolume(ctx, &ori.ExpandVolumeRequest{
+			VolumeId: oriVolume.Metadata.Id,
+			Resources: &ori.VolumeResources{
+				StorageBytes: storageBytes,
+			},
+		}); err != nil {
+			return fmt.Errorf("failed to expand volume: %w", err)
+		}
+	}
+
+	return nil
 }
 
 func (r *VolumeReconciler) volumeSecretName(volumeName string, volumeHandle string) string {
