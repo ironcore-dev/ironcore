@@ -190,7 +190,9 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *storagev1alpha1.VolumeP
 		})
 		Expect(err).ToNot(HaveOccurred())
 
-		volumeClassMapper := vcm.NewGeneric(srv, vcm.GenericOptions{})
+		volumeClassMapper := vcm.NewGeneric(srv, vcm.GenericOptions{
+			RelistPeriod: 1 * time.Second,
+		})
 		Expect(k8sManager.Add(volumeClassMapper)).To(Succeed())
 
 		mgrCtx, cancel := context.WithCancel(ctx)
@@ -203,6 +205,14 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *storagev1alpha1.VolumeP
 			VolumeRuntime:     srv,
 			VolumeClassMapper: volumeClassMapper,
 			VolumePoolName:    vp.Name,
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
+		Expect((&controllers.VolumePoolReconciler{
+			Client:            k8sManager.GetClient(),
+			VolumeRuntime:     srv,
+			VolumeClassMapper: volumeClassMapper,
+			RelistPeriod:      1 * time.Second,
+			VolumePoolName:    TestVolumePool,
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		go func() {

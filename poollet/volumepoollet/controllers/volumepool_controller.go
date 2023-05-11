@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/go-logr/logr"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
@@ -34,6 +35,9 @@ import (
 
 type VolumePoolReconciler struct {
 	client.Client
+
+	RelistPeriod time.Duration
+
 	VolumePoolName    string
 	VolumeRuntime     ori.VolumeRuntimeClient
 	VolumeClassMapper vcm.VolumeClassMapper
@@ -113,10 +117,11 @@ func (r *VolumePoolReconciler) reconcile(ctx context.Context, log logr.Logger, v
 	}
 
 	log.V(1).Info("Reconciled")
-	return ctrl.Result{}, nil
+	return ctrl.Result{RequeueAfter: r.RelistPeriod}, nil
 }
 
 func (r *VolumePoolReconciler) SetupWithManager(mgr ctrl.Manager) error {
+
 	return ctrl.NewControllerManagedBy(mgr).
 		For(
 			&storagev1alpha1.VolumePool{},
