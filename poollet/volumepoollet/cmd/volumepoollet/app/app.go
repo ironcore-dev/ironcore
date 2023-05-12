@@ -242,7 +242,6 @@ func Run(ctx context.Context, opts Options) error {
 			VolumePoolName:    opts.VolumePoolName,
 			VolumeClassMapper: volumeClassMapper,
 			VolumeRuntime:     volumeRuntime,
-			RelistPeriod:      opts.VolumePoolVolumeClassRelistPeriod,
 		}).SetupWithManager(mgr); err != nil {
 			return fmt.Errorf("error setting up volume pool reconciler with manager: %w", err)
 		}

@@ -19,6 +19,7 @@ import (
 	"errors"
 
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
+	"github.com/onmetal/onmetal-api/poollet/orievent"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 )
 
@@ -31,4 +32,5 @@ type VolumeClassMapper interface {
 	manager.Runnable
 	GetVolumeClassFor(ctx context.Context, name string, capabilities *ori.VolumeClassCapabilities) (*ori.VolumeClass, error)
 	WaitForSync(ctx context.Context) error
+	AddNotifier(handler orievent.Notifier) (orievent.NotifierRegistration, error)
 }

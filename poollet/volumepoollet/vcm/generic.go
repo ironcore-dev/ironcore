@@ -22,7 +22,9 @@ import (
 
 	"github.com/go-logr/logr"
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
+	"github.com/onmetal/onmetal-api/poollet/orievent"
 	"golang.org/x/exp/maps"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
@@ -45,12 +47,49 @@ type Generic struct {
 	sync   bool
 	synced chan struct{}
 
+	notifier sets.Set[*notifier]
+
 	volumeClassByName         map[string]*ori.VolumeClass
 	volumeClassByCapabilities map[capabilities][]*ori.VolumeClass
 
 	volumeRuntime ori.VolumeRuntimeClient
 
 	relistPeriod time.Duration
+}
+
+func (g *Generic) AddNotifier(classNotifier orievent.Notifier) (orievent.NotifierRegistration, error) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
+	h := &notifier{Notifier: classNotifier}
+
+	g.notifier.Insert(h)
+	return &notifierRegistration{
+		vcm:      g,
+		notifier: h,
+	}, nil
+}
+
+func (g *Generic) notify(classes []*ori.VolumeClass) {
+	oldClasses := maps.Keys(g.volumeClassByName)
+	if len(classes) != len(oldClasses) {
+		return
+	}
+
+	sameNames := true
+	for _, class := range classes {
+		if _, found := g.volumeClassByName[class.Name]; !found {
+			sameNames = false
+			break
+		}
+	}
+	if sameNames {
+		return
+	}
+
+	for _, n := range g.notifier.UnsortedList() {
+		n.Notify()
+	}
 }
 
 func (g *Generic) relist(ctx context.Context, log logr.Logger) error {
@@ -62,6 +101,8 @@ func (g *Generic) relist(ctx context.Context, log logr.Logger) error {
 
 	g.mu.Lock()
 	defer g.mu.Unlock()
+
+	g.notify(res.VolumeClasses)
 
 	maps.Clear(g.volumeClassByName)
 	maps.Clear(g.volumeClassByCapabilities)
@@ -139,7 +180,25 @@ func NewGeneric(runtime ori.VolumeRuntimeClient, opts GenericOptions) VolumeClas
 		synced:                    make(chan struct{}),
 		volumeClassByName:         map[string]*ori.VolumeClass{},
 		volumeClassByCapabilities: map[capabilities][]*ori.VolumeClass{},
+		notifier:                  sets.New[*notifier](),
 		volumeRuntime:             runtime,
 		relistPeriod:              opts.RelistPeriod,
 	}
+}
+
+type notifier struct {
+	orievent.Notifier
+}
+
+type notifierRegistration struct {
+	vcm      *Generic
+	notifier *notifier
+}
+
+func (r *notifierRegistration) Remove() error {
+	r.vcm.mu.Lock()
+	defer r.vcm.mu.Unlock()
+
+	r.vcm.notifier.Delete(r.notifier)
+	return nil
 }

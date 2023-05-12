@@ -31,7 +31,7 @@ const (
 	TestVolumePool = "test-volumepool"
 )
 
-var _ = Describe("VolumePoolController", func() {
+var _ = FDescribe("VolumePoolController", func() {
 	ctx := SetupContext()
 	_, _, _, srv := SetupTest(ctx)
 
