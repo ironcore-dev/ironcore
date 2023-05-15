@@ -17,10 +17,6 @@
 
 package v1alpha1
 
-type AliasPrefixExpansion interface{}
-
-type AliasPrefixRoutingExpansion interface{}
-
 type LoadBalancerExpansion interface{}
 
 type LoadBalancerRoutingExpansion interface{}

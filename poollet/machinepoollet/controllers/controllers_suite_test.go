@@ -205,7 +205,6 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 		Expect(machinepoolletclient.SetupMachineSpecNetworkInterfaceNamesField(ctx, indexer, mp.Name)).To(Succeed())
 		Expect(machinepoolletclient.SetupMachineSpecVolumeNamesField(ctx, indexer, mp.Name)).To(Succeed())
 		Expect(machinepoolletclient.SetupMachineSpecSecretNamesField(ctx, indexer, mp.Name)).To(Succeed())
-		Expect(machinepoolletclient.SetupAliasPrefixRoutingNetworkRefNameField(ctx, indexer)).To(Succeed())
 		Expect(machinepoolletclient.SetupLoadBalancerRoutingNetworkRefNameField(ctx, indexer)).To(Succeed())
 		Expect(machinepoolletclient.SetupNATGatewayRoutingNetworkRefNameField(ctx, indexer)).To(Succeed())
 		Expect(machinepoolletclient.SetupNetworkInterfaceNetworkMachinePoolID(ctx, indexer, mp.Name)).To(Succeed())

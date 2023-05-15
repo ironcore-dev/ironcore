@@ -27,7 +27,7 @@ import (
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	networkingclient "github.com/onmetal/onmetal-api/internal/client/networking"
 	"github.com/onmetal/onmetal-api/internal/controllers/networking/events"
-	client2 "github.com/onmetal/onmetal-api/utils/client"
+	onmetalapiclient "github.com/onmetal/onmetal-api/utils/client"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -99,6 +99,15 @@ func (r *NetworkInterfaceReconciler) reconcile(ctx context.Context, log logr.Log
 		r.Event(nic, corev1.EventTypeNormal, events.IPsNotReady, ipsNotReadyReason)
 	}
 
+	log.V(1).Info("Applying Prefixes")
+	prefixes, prefixesOK, err := r.applyPrefixes(ctx, log, nic)
+	if err != nil {
+		return ctrl.Result{}, fmt.Errorf("error applying prefixes: %w", err)
+	}
+	if !prefixesOK {
+		anyDependencyNotReady = true
+	}
+
 	log.V(1).Info("Applying virtual IPs")
 	virtualIP, virtualIPNotReadyReason, err := r.applyVirtualIP(ctx, log, nic)
 	if err != nil {
@@ -118,7 +127,7 @@ func (r *NetworkInterfaceReconciler) reconcile(ctx context.Context, log logr.Log
 	}
 
 	log.V(1).Info("Updating network interface status", "State", state)
-	if err := r.updateStatus(ctx, nic, state, networkHandle, ips, virtualIP); err != nil {
+	if err := r.updateStatus(ctx, nic, state, networkHandle, ips, prefixes, virtualIP); err != nil {
 		return ctrl.Result{}, err
 	}
 	log.V(1).Info("Successfully updated network status", "State", state)
@@ -131,6 +140,7 @@ func (r *NetworkInterfaceReconciler) updateStatus(
 	state networkingv1alpha1.NetworkInterfaceState,
 	networkHandle string,
 	ips []commonv1alpha1.IP,
+	prefixes []commonv1alpha1.IPPrefix,
 	virtualIP *commonv1alpha1.IP,
 ) error {
 	now := metav1.Now()
@@ -142,6 +152,7 @@ func (r *NetworkInterfaceReconciler) updateStatus(
 	nic.Status.State = state
 	nic.Status.NetworkHandle = networkHandle
 	nic.Status.IPs = ips
+	nic.Status.Prefixes = prefixes
 	nic.Status.VirtualIP = virtualIP
 
 	if err := r.Status().Patch(ctx, nic, client.MergeFrom(base)); err != nil {
@@ -189,7 +200,12 @@ func (r *NetworkInterfaceReconciler) applyIPs(ctx context.Context, nic *networki
 	return ips, strings.Join(notReadyReasons, ", "), nil
 }
 
-func (r *NetworkInterfaceReconciler) applyIP(ctx context.Context, nic *networkingv1alpha1.NetworkInterface, ipSource networkingv1alpha1.IPSource, idx int) (commonv1alpha1.IP, string, error) {
+func (r *NetworkInterfaceReconciler) applyIP(
+	ctx context.Context,
+	nic *networkingv1alpha1.NetworkInterface,
+	ipSource networkingv1alpha1.IPSource,
+	idx int,
+) (commonv1alpha1.IP, string, error) {
 	switch {
 	case ipSource.Value != nil:
 		return *ipSource.Value, "", nil
@@ -198,16 +214,16 @@ func (r *NetworkInterfaceReconciler) applyIP(ctx context.Context, nic *networkin
 		prefix := &ipamv1alpha1.Prefix{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: nic.Namespace,
-				Name:      networkingv1alpha1.NetworkInterfaceIPSourceEphemeralPrefixName(nic.Name, idx),
+				Name:      networkingv1alpha1.NetworkInterfaceIPIPAMPrefixName(nic.Name, idx),
 			},
 		}
-		if err := client2.ControlledCreateOrGet(ctx, r.Client, nic, prefix, func() error {
+		if err := onmetalapiclient.ControlledCreateOrGet(ctx, r.Client, nic, prefix, func() error {
 			prefix.Labels = template.Labels
 			prefix.Annotations = template.Annotations
 			prefix.Spec = template.Spec
 			return nil
 		}); err != nil {
-			if !errors.Is(err, client2.ErrNotControlled) {
+			if !errors.Is(err, onmetalapiclient.ErrNotControlled) {
 				return commonv1alpha1.IP{}, "", fmt.Errorf("error managing ephemeral prefix %s: %w", prefix.Name, err)
 			}
 			return commonv1alpha1.IP{}, fmt.Sprintf("Prefix %s cannot be managed", prefix.Name), nil
@@ -219,6 +235,72 @@ func (r *NetworkInterfaceReconciler) applyIP(ctx context.Context, nic *networkin
 		return prefix.Spec.Prefix.IP(), "", nil
 	default:
 		return commonv1alpha1.IP{}, "", fmt.Errorf("unknown ip source %#v", ipSource)
+	}
+}
+
+func (r *NetworkInterfaceReconciler) applyPrefixes(
+	ctx context.Context,
+	log logr.Logger,
+	nic *networkingv1alpha1.NetworkInterface,
+) ([]commonv1alpha1.IPPrefix, bool, error) {
+	var (
+		prefixes []commonv1alpha1.IPPrefix
+		allOK    = true
+	)
+	for idx, prefixSrc := range nic.Spec.Prefixes {
+		prefix, prefixOK, err := r.applyPrefix(ctx, log, nic, &prefixSrc, idx)
+		if err != nil {
+			return nil, false, fmt.Errorf("[prefix %d] %w", idx, err)
+		}
+		if !prefixOK {
+			allOK = false
+			continue
+		}
+
+		prefixes = append(prefixes, prefix)
+	}
+
+	return prefixes, allOK, nil
+}
+
+func (r *NetworkInterfaceReconciler) applyPrefix(
+	ctx context.Context,
+	log logr.Logger,
+	nic *networkingv1alpha1.NetworkInterface,
+	src *networkingv1alpha1.PrefixSource,
+	idx int,
+) (commonv1alpha1.IPPrefix, bool, error) {
+	switch {
+	case src.Value != nil:
+		return *src.Value, true, nil
+	case src.Ephemeral != nil:
+		template := src.Ephemeral.PrefixTemplate
+		prefix := &ipamv1alpha1.Prefix{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: nic.Namespace,
+				Name:      networkingv1alpha1.NetworkInterfacePrefixIPAMPrefixName(nic.Name, idx),
+			},
+		}
+		if err := onmetalapiclient.ControlledCreateOrGet(ctx, r.Client, nic, prefix, func() error {
+			prefix.Labels = template.Labels
+			prefix.Annotations = template.Annotations
+			prefix.Spec = template.Spec
+			return nil
+		}); err != nil {
+			if !errors.Is(err, onmetalapiclient.ErrNotControlled) {
+				return commonv1alpha1.IPPrefix{}, false, fmt.Errorf("error managing ephemeral prefix %s: %w", prefix.Name, err)
+			}
+			r.Eventf(nic, corev1.EventTypeNormal, events.PrefixNotReady, "Prefix %s cannot be managed", prefix.Name)
+			return commonv1alpha1.IPPrefix{}, false, nil
+		}
+
+		if prefix.Status.Phase != ipamv1alpha1.PrefixPhaseAllocated {
+			r.Eventf(nic, corev1.EventTypeNormal, events.PrefixNotReady, "Prefix %s is not in state %s but %s", prefix.Name, ipamv1alpha1.PrefixPhaseAllocated, prefix.Status.Phase)
+			return commonv1alpha1.IPPrefix{}, false, nil
+		}
+		return *prefix.Spec.Prefix, true, nil
+	default:
+		return commonv1alpha1.IPPrefix{}, false, fmt.Errorf("unknown prefix source %#v", src)
 	}
 }
 
@@ -250,7 +332,7 @@ func (r *NetworkInterfaceReconciler) applyVirtualIP(ctx context.Context, log log
 				Name:      nic.Name,
 			},
 		}
-		if err := client2.ControlledCreateOrGet(ctx, r.Client, nic, vip, func() error {
+		if err := onmetalapiclient.ControlledCreateOrGet(ctx, r.Client, nic, vip, func() error {
 			ephemeral := nic.Spec.VirtualIP.Ephemeral
 			vip.Labels = ephemeral.VirtualIPTemplate.Labels
 			vip.Annotations = ephemeral.VirtualIPTemplate.Annotations
@@ -258,7 +340,7 @@ func (r *NetworkInterfaceReconciler) applyVirtualIP(ctx context.Context, log log
 			vip.Spec.TargetRef = &commonv1alpha1.LocalUIDReference{Name: nic.Name, UID: nic.UID}
 			return nil
 		}); err != nil {
-			if !errors.Is(client2.ErrNotControlled, err) {
+			if !errors.Is(onmetalapiclient.ErrNotControlled, err) {
 				return nil, "", fmt.Errorf("error managing ephemeral virtual ip: %w", err)
 			}
 

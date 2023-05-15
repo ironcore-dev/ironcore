@@ -18,10 +18,8 @@ import (
 	"context"
 	"fmt"
 
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	"github.com/onmetal/onmetal-api/broker/common/utils"
-	"github.com/onmetal/onmetal-api/broker/machinebroker/aliasprefixes"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	utilslices "github.com/onmetal/onmetal-api/utils/slices"
@@ -31,16 +29,6 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 )
-
-func (s *Server) buildIDToAliasPrefixesMap(aliasPrefixes []aliasprefixes.AliasPrefix) map[string][]aliasprefixes.AliasPrefix {
-	res := make(map[string][]aliasprefixes.AliasPrefix)
-	for _, aliasPrefix := range aliasPrefixes {
-		for destination := range aliasPrefix.Destinations {
-			res[destination] = append(res[destination], aliasPrefix)
-		}
-	}
-	return res
-}
 
 func (s *Server) buildIDToLoadBalancersMap(loadBalancers []machinebrokerv1alpha1.LoadBalancer) map[string][]machinebrokerv1alpha1.LoadBalancer {
 	res := make(map[string][]machinebrokerv1alpha1.LoadBalancer)
@@ -78,11 +66,6 @@ func (s *Server) listAggregateOnmetalNetworkInterfaces(ctx context.Context) ([]A
 		return nil, fmt.Errorf("error listing onmetal virtual ips: %w", err)
 	}
 
-	onmetalAliasPrefixes, err := s.aliasPrefixes.List(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("error listing onmetal alias prefixes: %w", err)
-	}
-
 	onmetalLoadBalancers, err := s.loadBalancers.List(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error listing onmetal load balancers: %w", err)
@@ -93,7 +76,6 @@ func (s *Server) listAggregateOnmetalNetworkInterfaces(ctx context.Context) ([]A
 		return nil, fmt.Errorf("error listing onmetal nat gateways: %w", err)
 	}
 
-	idToAliasPrefixes := s.buildIDToAliasPrefixesMap(onmetalAliasPrefixes)
 	idToLoadBalancers := s.buildIDToLoadBalancersMap(onmetalLoadBalancers)
 	idToNATGateways := s.buildIDToNATGatewaysMap(onmetalNATGateways)
 	getNetwork := utils.ObjectSliceToByNameGetter(networkingv1alpha1.Resource("networks"), onmetalNetworkList.Items)
@@ -106,9 +88,6 @@ func (s *Server) listAggregateOnmetalNetworkInterfaces(ctx context.Context) ([]A
 			onmetalNetworkInterface,
 			getNetwork,
 			getVirtualIP,
-			func() ([]aliasprefixes.AliasPrefix, error) {
-				return idToAliasPrefixes[onmetalNetworkInterface.Name], nil
-			},
 			func() ([]machinebrokerv1alpha1.LoadBalancer, error) {
 				return idToLoadBalancers[onmetalNetworkInterface.Name], nil
 			},
@@ -129,7 +108,6 @@ func (s *Server) aggregateOnmetalNetworkInterface(
 	onmetalNetworkInterface *networkingv1alpha1.NetworkInterface,
 	getNetwork func(name string) (*networkingv1alpha1.Network, error),
 	getVirtualIP func(name string) (*networkingv1alpha1.VirtualIP, error),
-	listAliasPrefixes func() ([]aliasprefixes.AliasPrefix, error),
 	listLoadBalancers func() ([]machinebrokerv1alpha1.LoadBalancer, error),
 	listNATGateways func() ([]machinebrokerv1alpha1.NATGateway, error),
 ) (*AggregateOnmetalNetworkInterface, error) {
@@ -151,20 +129,6 @@ func (s *Server) aggregateOnmetalNetworkInterface(
 		}
 
 		virtualIP = v
-	}
-
-	aliasPrefixes, err := listAliasPrefixes()
-	if err != nil {
-		return nil, fmt.Errorf("error listing alias prefixes: %w", err)
-	}
-
-	var prefixes []commonv1alpha1.IPPrefix
-	for _, aliasPrefix := range aliasPrefixes {
-		if !aliasPrefix.Destinations.Has(onmetalNetworkInterface.Name) {
-			continue
-		}
-
-		prefixes = append(prefixes, aliasPrefix.Prefix)
 	}
 
 	loadBalancers, err := listLoadBalancers()
@@ -212,7 +176,6 @@ func (s *Server) aggregateOnmetalNetworkInterface(
 		NetworkInterface:    onmetalNetworkInterface,
 		Network:             network,
 		VirtualIP:           virtualIP,
-		Prefixes:            prefixes,
 		LoadBalancerTargets: lbTgts,
 		NATGatewayTargets:   natGatewayTgts,
 	}, nil
@@ -231,9 +194,6 @@ func (s *Server) getAggregateOnmetalNetworkInterface(ctx context.Context, id str
 		onmetalNetworkInterface,
 		utils.ClientObjectGetter[*networkingv1alpha1.Network](ctx, s.cluster.Client(), s.cluster.Namespace()),
 		utils.ClientObjectGetter[*networkingv1alpha1.VirtualIP](ctx, s.cluster.Client(), s.cluster.Namespace()),
-		func() ([]aliasprefixes.AliasPrefix, error) {
-			return s.aliasPrefixes.ListByDependent(ctx, id)
-		},
 		func() ([]machinebrokerv1alpha1.LoadBalancer, error) {
 			return s.loadBalancers.ListByDependent(ctx, id)
 		},

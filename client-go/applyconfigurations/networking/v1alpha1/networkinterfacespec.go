@@ -29,6 +29,7 @@ type NetworkInterfaceSpecApplyConfiguration struct {
 	MachineRef *v1alpha1.LocalUIDReferenceApplyConfiguration `json:"machineRef,omitempty"`
 	IPFamilies []v1.IPFamily                                 `json:"ipFamilies,omitempty"`
 	IPs        []IPSourceApplyConfiguration                  `json:"ips,omitempty"`
+	Prefixes   []PrefixSourceApplyConfiguration              `json:"prefixes,omitempty"`
 	VirtualIP  *VirtualIPSourceApplyConfiguration            `json:"virtualIP,omitempty"`
 }
 
@@ -73,6 +74,19 @@ func (b *NetworkInterfaceSpecApplyConfiguration) WithIPs(values ...*IPSourceAppl
 			panic("nil value passed to WithIPs")
 		}
 		b.IPs = append(b.IPs, *values[i])
+	}
+	return b
+}
+
+// WithPrefixes adds the given value to the Prefixes field in the declarative configuration
+// and returns the receiver, so that objects can be build by chaining "With" function invocations.
+// If called multiple times, values provided by each call will be appended to the Prefixes field.
+func (b *NetworkInterfaceSpecApplyConfiguration) WithPrefixes(values ...*PrefixSourceApplyConfiguration) *NetworkInterfaceSpecApplyConfiguration {
+	for i := range values {
+		if values[i] == nil {
+			panic("nil value passed to WithPrefixes")
+		}
+		b.Prefixes = append(b.Prefixes, *values[i])
 	}
 	return b
 }

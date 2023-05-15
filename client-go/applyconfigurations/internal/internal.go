@@ -666,70 +666,6 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: com.github.onmetal.onmetal-api.api.ipam.v1alpha1.PrefixSpec
       default: {}
-- name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.AliasPrefix
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: spec
-      type:
-        namedType: com.github.onmetal.onmetal-api.api.networking.v1alpha1.AliasPrefixSpec
-      default: {}
-    - name: status
-      type:
-        namedType: com.github.onmetal.onmetal-api.api.networking.v1alpha1.AliasPrefixStatus
-      default: {}
-- name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.AliasPrefixRouting
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: destinations
-      type:
-        list:
-          elementType:
-            namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.LocalUIDReference
-          elementRelationship: atomic
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: networkRef
-      type:
-        namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.LocalUIDReference
-      default: {}
-- name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.AliasPrefixSpec
-  map:
-    fields:
-    - name: networkInterfaceSelector
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector
-    - name: networkRef
-      type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
-      default: {}
-    - name: prefix
-      type:
-        namedType: com.github.onmetal.onmetal-api.api.networking.v1alpha1.PrefixSource
-      default: {}
-- name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.AliasPrefixStatus
-  map:
-    fields:
-    - name: prefix
-      type:
-        namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IPPrefix
 - name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.EphemeralPrefixSource
   map:
     fields:
@@ -1063,6 +999,12 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: io.k8s.api.core.v1.LocalObjectReference
       default: {}
+    - name: prefixes
+      type:
+        list:
+          elementType:
+            namedType: com.github.onmetal.onmetal-api.api.networking.v1alpha1.PrefixSource
+          elementRelationship: atomic
     - name: virtualIP
       type:
         namedType: com.github.onmetal.onmetal-api.api.networking.v1alpha1.VirtualIPSource
@@ -1090,6 +1032,12 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: phase
       type:
         scalar: string
+    - name: prefixes
+      type:
+        list:
+          elementType:
+            namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IPPrefix
+          elementRelationship: atomic
     - name: state
       type:
         scalar: string

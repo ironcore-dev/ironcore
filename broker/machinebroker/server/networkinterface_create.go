@@ -171,6 +171,7 @@ func (s *Server) prepareAggregateOnmetalNetworkInterface(networkInterface *ori.N
 		Spec: networkingv1alpha1.NetworkInterfaceSpec{
 			IPFamilies: s.getOnmetalIPsIPFamilies(ips),
 			IPs:        s.onmetalIPsToOnmetalIPSources(ips),
+			Prefixes:   s.onmetalPrefixesToOnmetalPrefixSources(prefixes),
 			VirtualIP:  virtualIPSource,
 		},
 	}
@@ -185,7 +186,6 @@ func (s *Server) prepareAggregateOnmetalNetworkInterface(networkInterface *ori.N
 			Spec: networkingv1alpha1.NetworkSpec{Handle: networkInterface.Spec.Network.Handle},
 		},
 		VirtualIP:           onmetalVirtualIP,
-		Prefixes:            prefixes,
 		LoadBalancerTargets: lbTgts,
 		NATGatewayTargets:   natGatewayTgts,
 	}
@@ -260,16 +260,6 @@ func (s *Server) createOnmetalNetworkInterface(ctx context.Context, log logr.Log
 		if err := apiutils.PatchControlledBy(ctx, s.cluster.Client(), onmetalNetworkInterface.NetworkInterface, onmetalNetworkInterface.VirtualIP); err != nil {
 			return fmt.Errorf("error patching onmetal virtual ip to be controlled by onmetal network interface: %w", err)
 		}
-	}
-
-	log.V(1).Info("Creating alias prefixes")
-	for _, prefix := range onmetalNetworkInterface.Prefixes {
-		if err := s.aliasPrefixes.Create(ctx, network, prefix, onmetalNetworkInterface.NetworkInterface); err != nil {
-			return fmt.Errorf("error creating alias prefix %s: %w", prefix, err)
-		}
-		c.Add(func(ctx context.Context) error {
-			return s.aliasPrefixes.Delete(ctx, network.Spec.Handle, prefix, onmetalNetworkInterface.NetworkInterface)
-		})
 	}
 
 	log.V(1).Info("Creating load balancers")
