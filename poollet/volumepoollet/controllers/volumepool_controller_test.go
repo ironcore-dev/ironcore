@@ -19,9 +19,9 @@ import (
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
 	"github.com/onmetal/onmetal-api/ori/testing/volume"
-	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
@@ -31,11 +31,11 @@ const (
 	TestVolumePool = "test-volumepool"
 )
 
-var _ = FDescribe("VolumePoolController", func() {
-	ctx := SetupContext()
-	_, _, _, srv := SetupTest(ctx)
+var _ = Describe("VolumePoolController", func() {
+	_, _, _, srv := SetupTest()
 
-	It("should add volume classes to pool", func() {
+	It("should add volume classes to pool", func(ctx SpecContext) {
+		srv.SetVolumeClasses([]*volume.FakeVolumeClass{})
 
 		By("creating a volume class")
 		vc := &storagev1alpha1.VolumeClass{
@@ -71,7 +71,11 @@ var _ = FDescribe("VolumePoolController", func() {
 
 		By("checking if the default volume class is present")
 		Eventually(Object(volumePool)).Should(SatisfyAll(
-			HaveField("Status.AvailableVolumeClasses", HaveLen(1))),
+			HaveField("Status.AvailableVolumeClasses", Equal([]corev1.LocalObjectReference{
+				{
+					Name: vc.Name,
+				},
+			}))),
 		)
 
 		By("creating a second volume class")
@@ -113,7 +117,14 @@ var _ = FDescribe("VolumePoolController", func() {
 
 		By("checking if the second volume class is present")
 		Eventually(Object(volumePool)).Should(SatisfyAll(
-			HaveField("Status.AvailableVolumeClasses", HaveLen(2))),
+			HaveField("Status.AvailableVolumeClasses", Equal([]corev1.LocalObjectReference{
+				{
+					Name: vc.Name,
+				},
+				{
+					Name: vc2.Name,
+				},
+			}))),
 		)
 	})
 })

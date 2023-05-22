@@ -22,23 +22,19 @@ import (
 	"github.com/go-logr/logr"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
-	"github.com/onmetal/onmetal-api/poollet/orievent"
 	"github.com/onmetal/onmetal-api/poollet/volumepoollet/vcm"
+	onmetalapiclient "github.com/onmetal/onmetal-api/utils/client"
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
 type VolumePoolReconciler struct {
 	client.Client
-
 	VolumePoolName    string
 	VolumeRuntime     ori.VolumeRuntimeClient
 	VolumeClassMapper vcm.VolumeClassMapper
@@ -90,6 +86,16 @@ func (r *VolumePoolReconciler) supportsVolumeClass(ctx context.Context, log logr
 func (r *VolumePoolReconciler) reconcile(ctx context.Context, log logr.Logger, volumePool *storagev1alpha1.VolumePool) (ctrl.Result, error) {
 	log.V(1).Info("Reconcile")
 
+	log.V(1).Info("Ensuring no reconcile annotation")
+	modified, err := onmetalapiclient.PatchEnsureNoReconcileAnnotation(ctx, r.Client, volumePool)
+	if err != nil {
+		return ctrl.Result{}, fmt.Errorf("error ensuring no reconcile annotation: %w", err)
+	}
+	if modified {
+		log.V(1).Info("Removed reconcile annotation, requeueing")
+		return ctrl.Result{Requeue: true}, nil
+	}
+
 	log.V(1).Info("Listing volume classes")
 	volumeClassList := &storagev1alpha1.VolumeClassList{}
 	if err := r.List(ctx, volumeClassList); err != nil {
@@ -121,61 +127,7 @@ func (r *VolumePoolReconciler) reconcile(ctx context.Context, log logr.Logger, v
 	return ctrl.Result{}, nil
 }
 
-func (r *VolumePoolReconciler) oriClassEventSource(mgr ctrl.Manager) (source.Source, error) {
-	ch := make(chan event.GenericEvent, 1024)
-
-	if err := mgr.Add(manager.RunnableFunc(func(ctx context.Context) error {
-		log := ctrl.LoggerFrom(ctx).WithName("volumepool").WithName("orieventhandlers")
-
-		notifierFuncs := []func() (orievent.NotifierRegistration, error){
-			func() (orievent.NotifierRegistration, error) {
-				return r.VolumeClassMapper.AddNotifier(orievent.NotifierFunc{NotifyFunc: func() {
-					select {
-					case ch <- event.GenericEvent{Object: &storagev1alpha1.VolumePool{ObjectMeta: metav1.ObjectMeta{
-						Name: r.VolumePoolName,
-					}}}:
-					default:
-						log.V(5).Info("Channel full, discarding event")
-					}
-				}})
-			},
-		}
-
-		var notifier []orievent.NotifierRegistration
-		defer func() {
-			log.V(1).Info("Removing notifier")
-			for _, n := range notifier {
-				if err := n.Remove(); err != nil {
-					log.Error(err, "Error removing handle")
-				}
-			}
-		}()
-
-		for _, notifierFunc := range notifierFuncs {
-			ntf, err := notifierFunc()
-			if err != nil {
-				return err
-			}
-
-			notifier = append(notifier, ntf)
-		}
-
-		<-ctx.Done()
-		return nil
-	})); err != nil {
-		return nil, err
-	}
-
-	return &source.Channel{Source: ch}, nil
-}
-
 func (r *VolumePoolReconciler) SetupWithManager(mgr ctrl.Manager) error {
-
-	src, err := r.oriClassEventSource(mgr)
-	if err != nil {
-		return err
-	}
-
 	return ctrl.NewControllerManagedBy(mgr).
 		For(
 			&storagev1alpha1.VolumePool{},
@@ -191,6 +143,5 @@ func (r *VolumePoolReconciler) SetupWithManager(mgr ctrl.Manager) error {
 				return []ctrl.Request{{NamespacedName: client.ObjectKey{Name: r.VolumePoolName}}}
 			}),
 		).
-		Watches(src, &handler.EnqueueRequestForObject{}).
 		Complete(r)
 }

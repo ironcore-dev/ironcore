@@ -32,5 +32,6 @@ type VolumeClassMapper interface {
 	manager.Runnable
 	GetVolumeClassFor(ctx context.Context, name string, capabilities *ori.VolumeClassCapabilities) (*ori.VolumeClass, error)
 	WaitForSync(ctx context.Context) error
-	AddNotifier(handler orievent.Notifier) (orievent.NotifierRegistration, error)
+	AddListener(listener orievent.Listener) (orievent.ListenerRegistration, error)
+	RemoveListener(reg orievent.ListenerRegistration) error
 }

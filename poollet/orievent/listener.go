@@ -14,24 +14,18 @@
 
 package orievent
 
-type Notifier interface {
-	Notify()
+type Listener interface {
+	Enqueue()
 }
 
-type NotifierFunc struct {
-	NotifyFunc func()
+type EnqueueFunc struct {
+	EnqueueFunc func()
 }
 
-func (n NotifierFunc) Notify() {
-	if n.NotifyFunc != nil {
-		n.NotifyFunc()
+func (n EnqueueFunc) Enqueue() {
+	if n.EnqueueFunc != nil {
+		n.EnqueueFunc()
 	}
 }
 
-type NotifierRegistration interface {
-	Remove() error
-}
-
-type ClassSource interface {
-	AddNotifier(notifier Notifier) (NotifierRegistration, error)
-}
+type ListenerRegistration interface{}
