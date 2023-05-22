@@ -197,6 +197,7 @@ var _ = Describe("VolumeController", func() {
 		Expect(oriVolume.Spec.Class).To(Equal(vc.Name))
 		Expect(oriVolume.Spec.Resources.StorageBytes).To(Equal(uint64(size.Value())))
 
+		By("update increasing the storage resource")
 		baseVolume := volume.DeepCopy()
 		volume.Spec.Resources = corev1alpha1.ResourceList{
 			corev1alpha1.ResourceStorage: newSize,
@@ -208,8 +209,10 @@ var _ = Describe("VolumeController", func() {
 			HaveField("Volumes", HaveLen(1)),
 		))
 
-		_, oriVolume = GetSingleMapEntry(srv.Volumes)
-		Eventually(oriVolume.Spec.Resources.StorageBytes).Should(Equal(uint64(newSize.Value())))
+		Eventually(func() uint64 {
+			_, oriVolume = GetSingleMapEntry(srv.Volumes)
+			return oriVolume.Spec.Resources.StorageBytes
+		}).Should(Equal(uint64(newSize.Value())))
 	})
 
 })

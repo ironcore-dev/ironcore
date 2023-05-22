@@ -16,7 +16,6 @@ package volume
 
 import (
 	"context"
-	"fmt"
 	"sync"
 	"time"
 
@@ -125,7 +124,7 @@ func (r *FakeRuntimeService) ExpandVolume(ctx context.Context, req *ori.ExpandVo
 
 	volume, ok := r.Volumes[req.VolumeId]
 	if !ok {
-		return nil, fmt.Errorf("volume with id %s not found", req.VolumeId)
+		return nil, status.Errorf(codes.NotFound, "volume %q not found", req.VolumeId)
 	}
 
 	volume.Spec.Resources.StorageBytes = req.Resources.StorageBytes
