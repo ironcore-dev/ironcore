@@ -23,6 +23,7 @@ import (
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
 	"github.com/onmetal/onmetal-api/poollet/volumepoollet/vcm"
+	onmetalapiclient "github.com/onmetal/onmetal-api/utils/client"
 	corev1 "k8s.io/api/core/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
@@ -84,6 +85,16 @@ func (r *VolumePoolReconciler) supportsVolumeClass(ctx context.Context, log logr
 
 func (r *VolumePoolReconciler) reconcile(ctx context.Context, log logr.Logger, volumePool *storagev1alpha1.VolumePool) (ctrl.Result, error) {
 	log.V(1).Info("Reconcile")
+
+	log.V(1).Info("Ensuring no reconcile annotation")
+	modified, err := onmetalapiclient.PatchEnsureNoReconcileAnnotation(ctx, r.Client, volumePool)
+	if err != nil {
+		return ctrl.Result{}, fmt.Errorf("error ensuring no reconcile annotation: %w", err)
+	}
+	if modified {
+		log.V(1).Info("Removed reconcile annotation, requeueing")
+		return ctrl.Result{Requeue: true}, nil
+	}
 
 	log.V(1).Info("Listing volume classes")
 	volumeClassList := &storagev1alpha1.VolumeClassList{}

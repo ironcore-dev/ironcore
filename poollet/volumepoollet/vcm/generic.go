@@ -21,8 +21,11 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
+	"github.com/gogo/protobuf/proto"
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
+	"github.com/onmetal/onmetal-api/poollet/orievent"
 	"golang.org/x/exp/maps"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
@@ -45,12 +48,50 @@ type Generic struct {
 	sync   bool
 	synced chan struct{}
 
+	listener sets.Set[*listener]
+
 	volumeClassByName         map[string]*ori.VolumeClass
 	volumeClassByCapabilities map[capabilities][]*ori.VolumeClass
 
 	volumeRuntime ori.VolumeRuntimeClient
 
 	relistPeriod time.Duration
+}
+
+func (g *Generic) AddListener(handler orievent.Listener) (orievent.ListenerRegistration, error) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
+	h := &listener{Listener: handler}
+
+	g.listener.Insert(h)
+	return &listenerRegistration{
+		vcm:      g,
+		listener: h,
+	}, nil
+}
+
+func (g *Generic) RemoveListener(listener orievent.ListenerRegistration) error {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
+	reg, ok := listener.(*listenerRegistration)
+	if !ok {
+		return fmt.Errorf("invalid listener registration")
+	}
+
+	g.listener.Delete(reg.listener)
+
+	return nil
+}
+
+func shouldNotify(oldVolumeClassByName map[string]*ori.VolumeClass, class *ori.VolumeClass) bool {
+	oldVolumeClass, ok := oldVolumeClassByName[class.Name]
+	if !ok {
+		return true
+	}
+
+	return proto.Equal(class, oldVolumeClass)
 }
 
 func (g *Generic) relist(ctx context.Context, log logr.Logger) error {
@@ -63,13 +104,25 @@ func (g *Generic) relist(ctx context.Context, log logr.Logger) error {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 
+	oldVolumeClassByName := maps.Clone(g.volumeClassByName)
+
 	maps.Clear(g.volumeClassByName)
 	maps.Clear(g.volumeClassByCapabilities)
 
+	var notify bool
 	for _, volumeClass := range res.VolumeClasses {
+		notify = notify || shouldNotify(oldVolumeClassByName, volumeClass)
+
 		caps := getCapabilities(volumeClass.Capabilities)
 		g.volumeClassByName[volumeClass.Name] = volumeClass
 		g.volumeClassByCapabilities[caps] = append(g.volumeClassByCapabilities[caps], volumeClass)
+	}
+
+	if notify {
+		log.V(1).Info("Notify")
+		for _, n := range g.listener.UnsortedList() {
+			n.Enqueue()
+		}
 	}
 
 	if !g.sync {
@@ -139,7 +192,17 @@ func NewGeneric(runtime ori.VolumeRuntimeClient, opts GenericOptions) VolumeClas
 		synced:                    make(chan struct{}),
 		volumeClassByName:         map[string]*ori.VolumeClass{},
 		volumeClassByCapabilities: map[capabilities][]*ori.VolumeClass{},
+		listener:                  sets.New[*listener](),
 		volumeRuntime:             runtime,
 		relistPeriod:              opts.RelistPeriod,
 	}
+}
+
+type listener struct {
+	orievent.Listener
+}
+
+type listenerRegistration struct {
+	vcm      *Generic
+	listener *listener
 }
