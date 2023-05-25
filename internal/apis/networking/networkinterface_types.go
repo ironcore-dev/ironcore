@@ -30,9 +30,12 @@ type NetworkInterfaceSpec struct {
 	MachineRef *commonv1alpha1.LocalUIDReference
 	// IPFamilies defines which IPFamilies this NetworkInterface is supporting
 	IPFamilies []corev1.IPFamily
-	// IPs is the list of provided IPs or EphemeralIPs which should be assigned to
-	// this NetworkInterface
+	// IPs is the list of provided IPs or ephemeral IPs which should be assigned to
+	// this NetworkInterface.
 	IPs []IPSource
+	// Prefixes is the list of provided prefixes or ephemeral prefixes which should be assigned to
+	// this NetworkInterface.
+	Prefixes []PrefixSource
 	// VirtualIP specifies the virtual ip that should be assigned to this NetworkInterface.
 	VirtualIP *VirtualIPSource
 }
@@ -43,6 +46,13 @@ type IPSource struct {
 	Value *commonv1alpha1.IP
 	// Ephemeral specifies an IP by creating an ephemeral Prefix to allocate the IP with.
 	Ephemeral *EphemeralPrefixSource
+}
+
+type PrefixSource struct {
+	// Value specifies a static prefix to use.
+	Value *commonv1alpha1.IPPrefix `json:"value,omitempty"`
+	// Ephemeral specifies a prefix by creating an ephemeral ipam.Prefix to allocate the prefix with.
+	Ephemeral *EphemeralPrefixSource `json:"ephemeral,omitempty"`
 }
 
 // VirtualIPSource is the definition of how to obtain a VirtualIP.
@@ -65,6 +75,8 @@ type NetworkInterfaceStatus struct {
 	NetworkHandle string
 	// IPs represent the effective IP addresses of the NetworkInterface
 	IPs []commonv1alpha1.IP
+	// Prefixes represent the prefixes routed to the NetworkInterface.
+	Prefixes []commonv1alpha1.IPPrefix
 	// VirtualIP is any virtual ip assigned to the NetworkInterface.
 	VirtualIP *commonv1alpha1.IP
 

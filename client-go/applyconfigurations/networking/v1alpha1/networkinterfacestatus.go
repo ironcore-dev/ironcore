@@ -31,6 +31,7 @@ type NetworkInterfaceStatusApplyConfiguration struct {
 	LastStateTransitionTime *v1.Time                        `json:"lastStateTransitionTime,omitempty"`
 	NetworkHandle           *string                         `json:"networkHandle,omitempty"`
 	IPs                     []commonv1alpha1.IP             `json:"ips,omitempty"`
+	Prefixes                []commonv1alpha1.IPPrefix       `json:"prefixes,omitempty"`
 	VirtualIP               *commonv1alpha1.IP              `json:"virtualIP,omitempty"`
 	Phase                   *v1alpha1.NetworkInterfacePhase `json:"phase,omitempty"`
 	MachinePoolRef          *corev1.LocalObjectReference    `json:"machinePoolRef,omitempty"`
@@ -73,6 +74,16 @@ func (b *NetworkInterfaceStatusApplyConfiguration) WithNetworkHandle(value strin
 func (b *NetworkInterfaceStatusApplyConfiguration) WithIPs(values ...commonv1alpha1.IP) *NetworkInterfaceStatusApplyConfiguration {
 	for i := range values {
 		b.IPs = append(b.IPs, values[i])
+	}
+	return b
+}
+
+// WithPrefixes adds the given value to the Prefixes field in the declarative configuration
+// and returns the receiver, so that objects can be build by chaining "With" function invocations.
+// If called multiple times, values provided by each call will be appended to the Prefixes field.
+func (b *NetworkInterfaceStatusApplyConfiguration) WithPrefixes(values ...commonv1alpha1.IPPrefix) *NetworkInterfaceStatusApplyConfiguration {
+	for i := range values {
+		b.Prefixes = append(b.Prefixes, values[i])
 	}
 	return b
 }

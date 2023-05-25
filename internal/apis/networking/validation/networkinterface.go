@@ -74,6 +74,7 @@ func validateNetworkInterfaceSpec(spec *networking.NetworkInterfaceSpec, nicMeta
 	}
 
 	allErrs = append(allErrs, validateNetworkInterfaceIPSources(spec.IPs, spec.IPFamilies, nicMeta, fldPath.Child("ips"))...)
+	allErrs = append(allErrs, validateNetworkInterfacePrefixSources(spec.Prefixes, nicMeta, fldPath.Child("prefixes"))...)
 
 	if virtualIP := spec.VirtualIP; virtualIP != nil {
 		allErrs = append(allErrs, validateVirtualIPSource(virtualIP, fldPath.Child("virtualIP"))...)
@@ -92,6 +93,16 @@ func validateNetworkInterfaceIPSources(ipSources []networking.IPSource, ipFamili
 		}
 
 		allErrs = append(allErrs, validateIPSource(ip, i, ipFamily, nicMeta, fldPath.Index(i))...)
+	}
+
+	return allErrs
+}
+
+func validateNetworkInterfacePrefixSources(prefixSources []networking.PrefixSource, nicMeta *metav1.ObjectMeta, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	for i, src := range prefixSources {
+		allErrs = append(allErrs, validatePrefixSource(src, i, nicMeta, fldPath.Index(i))...)
 	}
 
 	return allErrs
@@ -127,7 +138,7 @@ var ipFamilyToBits = map[corev1.IPFamily]int32{
 	corev1.IPv6Protocol: 128,
 }
 
-func ValidatePrefixTemplateForNetworkInterface(template *ipam.PrefixTemplateSpec, ipFamily corev1.IPFamily, fldPath *field.Path) field.ErrorList {
+func ValidateIPPrefixTemplate(template *ipam.PrefixTemplateSpec, ipFamily corev1.IPFamily, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
 	if template == nil {
@@ -156,10 +167,22 @@ func ValidatePrefixTemplateForNetworkInterface(template *ipam.PrefixTemplateSpec
 	return allErrs
 }
 
+func ValidatePrefixPrefixTemplate(template *ipam.PrefixTemplateSpec, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	if template == nil {
+		allErrs = append(allErrs, field.Required(fldPath, "must specify template"))
+	} else {
+		allErrs = append(allErrs, ipamvalidation.ValidatePrefixTemplateSpec(template, fldPath)...)
+	}
+
+	return allErrs
+}
+
 func validateEphemeralPrefixSource(ipFamily corev1.IPFamily, source *networking.EphemeralPrefixSource, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, ValidatePrefixTemplateForNetworkInterface(source.PrefixTemplate, ipFamily, fldPath.Child("prefixTemplate"))...)
+	allErrs = append(allErrs, ValidateIPPrefixTemplate(source.PrefixTemplate, ipFamily, fldPath.Child("prefixTemplate"))...)
 
 	return allErrs
 }
@@ -192,6 +215,7 @@ func validateNetworkInterfaceSpecUpdate(newSpec, oldSpec *networking.NetworkInte
 	oldSpecCopy := oldSpec.DeepCopy()
 
 	oldSpecCopy.IPs = newSpec.IPs
+	oldSpecCopy.Prefixes = newSpec.Prefixes
 	oldSpecCopy.MachineRef = newSpec.MachineRef
 	oldSpecCopy.VirtualIP = newSpec.VirtualIP
 	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableFieldWithDiff(newSpecCopy, oldSpecCopy, fldPath)...)

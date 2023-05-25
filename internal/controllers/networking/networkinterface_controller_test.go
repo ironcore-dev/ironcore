@@ -143,7 +143,7 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
 
 		By("waiting for the prefix to be created with the correct ips and become ready")
-		prefixKey := client.ObjectKey{Namespace: ns.Name, Name: networkingv1alpha1.NetworkInterfaceIPSourceEphemeralPrefixName(nic.Name, 0)}
+		prefixKey := client.ObjectKey{Namespace: ns.Name, Name: networkingv1alpha1.NetworkInterfaceIPIPAMPrefixName(nic.Name, 0)}
 		Eventually(func(g Gomega) {
 			prefix := &ipamv1alpha1.Prefix{}
 			err := k8sClient.Get(ctx, prefixKey, prefix)

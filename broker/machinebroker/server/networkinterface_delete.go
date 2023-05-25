@@ -35,18 +35,6 @@ func (s *Server) DeleteNetworkInterface(ctx context.Context, req *ori.DeleteNetw
 		return nil, err
 	}
 
-	log.V(1).Info("Deleting alias prefixes")
-	for _, prefix := range aggOnmetalNetworkInterface.Prefixes {
-		if err := s.aliasPrefixes.Delete(
-			ctx,
-			aggOnmetalNetworkInterface.Network.Spec.Handle,
-			prefix,
-			aggOnmetalNetworkInterface.NetworkInterface,
-		); err != nil {
-			return nil, fmt.Errorf("error deleting prefix %s: %w", prefix, err)
-		}
-	}
-
 	log.V(1).Info("Deleting load balancers")
 	for _, lbTgt := range aggOnmetalNetworkInterface.LoadBalancerTargets {
 		if err := s.loadBalancers.Delete(

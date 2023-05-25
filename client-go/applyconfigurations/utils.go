@@ -140,14 +140,6 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &metav1.TypeMetaApplyConfiguration{}
 
 		// Group=networking.api.onmetal.de, Version=v1alpha1
-	case networkingv1alpha1.SchemeGroupVersion.WithKind("AliasPrefix"):
-		return &applyconfigurationsnetworkingv1alpha1.AliasPrefixApplyConfiguration{}
-	case networkingv1alpha1.SchemeGroupVersion.WithKind("AliasPrefixRouting"):
-		return &applyconfigurationsnetworkingv1alpha1.AliasPrefixRoutingApplyConfiguration{}
-	case networkingv1alpha1.SchemeGroupVersion.WithKind("AliasPrefixSpec"):
-		return &applyconfigurationsnetworkingv1alpha1.AliasPrefixSpecApplyConfiguration{}
-	case networkingv1alpha1.SchemeGroupVersion.WithKind("AliasPrefixStatus"):
-		return &applyconfigurationsnetworkingv1alpha1.AliasPrefixStatusApplyConfiguration{}
 	case networkingv1alpha1.SchemeGroupVersion.WithKind("EphemeralPrefixSource"):
 		return &applyconfigurationsnetworkingv1alpha1.EphemeralPrefixSourceApplyConfiguration{}
 	case networkingv1alpha1.SchemeGroupVersion.WithKind("EphemeralVirtualIPSource"):

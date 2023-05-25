@@ -41,10 +41,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func (r *MachineReconciler) ipsToStrings(ips []commonv1alpha1.IP) []string {
-	res := make([]string, len(ips))
-	for i, ip := range ips {
-		res[i] = ip.Addr.String()
+func stringersToStrings[E fmt.Stringer](stringers []E) []string {
+	res := make([]string, len(stringers))
+	for i, s := range stringers {
+		res[i] = s.String()
 	}
 	return res
 }
@@ -573,11 +573,6 @@ func (r *MachineReconciler) prepareORINetworkInterface(
 		}
 	}
 
-	prefixes, err := r.aliasPrefixesForNetworkInterface(ctx, networkInterface)
-	if err != nil {
-		return nil, false, fmt.Errorf("error getting alias prefixes for network interface: %w", err)
-	}
-
 	loadBalancerTargets, err := r.loadBalancerTargetsForNetworkInterface(ctx, networkInterface)
 	if err != nil {
 		return nil, false, fmt.Errorf("error getting load balancer targets for network interface: %w", err)
@@ -601,62 +596,13 @@ func (r *MachineReconciler) prepareORINetworkInterface(
 			Network: &ori.NetworkSpec{
 				Handle: networkInterface.Status.NetworkHandle,
 			},
-			Ips:                 r.ipsToStrings(networkInterface.Status.IPs),
+			Ips:                 stringersToStrings(networkInterface.Status.IPs),
 			VirtualIp:           virtualIPSpec,
-			Prefixes:            prefixes,
+			Prefixes:            stringersToStrings(networkInterface.Status.Prefixes),
 			LoadBalancerTargets: loadBalancerTargets,
 			Nats:                nats,
 		},
 	}, true, nil
-}
-
-func (r *MachineReconciler) aliasPrefixesForNetworkInterface(
-	ctx context.Context,
-	networkInterface *networkingv1alpha1.NetworkInterface,
-) ([]string, error) {
-	aliasPrefixList := &networkingv1alpha1.AliasPrefixList{}
-	if err := r.List(ctx, aliasPrefixList,
-		client.InNamespace(networkInterface.Namespace),
-	); err != nil {
-		return nil, fmt.Errorf("error listing alias prefixes: %w", err)
-	}
-
-	aliasPrefixRoutingList := &networkingv1alpha1.AliasPrefixRoutingList{}
-	if err := r.List(ctx, aliasPrefixRoutingList,
-		client.InNamespace(networkInterface.Namespace),
-		client.MatchingFields{
-			machinepoolletclient.AliasPrefixRoutingNetworkRefNameField: networkInterface.Spec.NetworkRef.Name,
-		},
-	); err != nil {
-		return nil, fmt.Errorf("error listing alias prefix routings: %w", err)
-	}
-
-	aliasPrefixRoutingsByName := utilslices.ToMap(
-		aliasPrefixRoutingList.Items,
-		func(apr networkingv1alpha1.AliasPrefixRouting) string { return apr.Name },
-	)
-
-	prefixes := sets.New[string]()
-
-	for _, aliasPrefix := range aliasPrefixList.Items {
-		prefix := aliasPrefix.Status.Prefix
-		if prefix == nil {
-			continue
-		}
-
-		aliasPrefixRouting, ok := aliasPrefixRoutingsByName[aliasPrefix.Name]
-		if !ok {
-			continue
-		}
-
-		if slices.ContainsFunc(
-			aliasPrefixRouting.Destinations,
-			func(ref commonv1alpha1.LocalUIDReference) bool { return ref.UID == networkInterface.UID },
-		) {
-			prefixes.Insert(prefix.String())
-		}
-	}
-	return sets.List(prefixes), nil
 }
 
 func (r *MachineReconciler) loadBalancerTargetsForNetworkInterface(

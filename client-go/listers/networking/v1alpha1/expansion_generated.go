@@ -17,22 +17,6 @@
 
 package v1alpha1
 
-// AliasPrefixListerExpansion allows custom methods to be added to
-// AliasPrefixLister.
-type AliasPrefixListerExpansion interface{}
-
-// AliasPrefixNamespaceListerExpansion allows custom methods to be added to
-// AliasPrefixNamespaceLister.
-type AliasPrefixNamespaceListerExpansion interface{}
-
-// AliasPrefixRoutingListerExpansion allows custom methods to be added to
-// AliasPrefixRoutingLister.
-type AliasPrefixRoutingListerExpansion interface{}
-
-// AliasPrefixRoutingNamespaceListerExpansion allows custom methods to be added to
-// AliasPrefixRoutingNamespaceLister.
-type AliasPrefixRoutingNamespaceListerExpansion interface{}
-
 // LoadBalancerListerExpansion allows custom methods to be added to
 // LoadBalancerLister.
 type LoadBalancerListerExpansion interface{}

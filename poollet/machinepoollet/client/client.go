@@ -85,20 +85,6 @@ func SetupMachineSpecSecretNamesField(ctx context.Context, indexer client.FieldI
 	)
 }
 
-const AliasPrefixRoutingNetworkRefNameField = "aliasprefixrouting-networkref-name"
-
-func SetupAliasPrefixRoutingNetworkRefNameField(ctx context.Context, indexer client.FieldIndexer) error {
-	return indexer.IndexField(
-		ctx,
-		&networkingv1alpha1.AliasPrefixRouting{},
-		AliasPrefixRoutingNetworkRefNameField,
-		func(object client.Object) []string {
-			aliasPrefixRouting := object.(*networkingv1alpha1.AliasPrefixRouting)
-			return []string{aliasPrefixRouting.NetworkRef.Name}
-		},
-	)
-}
-
 const LoadBalancerRoutingNetworkRefNameField = "loadbalancerrouting-networkref-name"
 
 func SetupLoadBalancerRoutingNetworkRefNameField(ctx context.Context, indexer client.FieldIndexer) error {

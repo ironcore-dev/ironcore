@@ -133,7 +133,6 @@ var _ = BeforeSuite(func() {
 	Expect(networkingclient.SetupNetworkInterfaceNetworkNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 	Expect(networkingclient.SetupNetworkInterfaceVirtualIPNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 	Expect(networkingclient.SetupNetworkInterfaceSpecMachineRefNameField(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
-	Expect(networkingclient.SetupAliasPrefixNetworkNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 	Expect(networkingclient.SetupLoadBalancerNetworkNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 	Expect(networkingclient.SetupNATGatewayNetworkNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 	Expect(networkingclient.SetupNetworkPeeringKeysFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
@@ -162,13 +161,6 @@ var _ = BeforeSuite(func() {
 		APIReader:     k8sManager.GetAPIReader(),
 		Scheme:        k8sManager.GetScheme(),
 		BindTimeout:   1 * time.Second,
-	}).SetupWithManager(k8sManager)
-	Expect(err).NotTo(HaveOccurred())
-
-	err = (&AliasPrefixReconciler{
-		EventRecorder: &record.FakeRecorder{},
-		Client:        k8sManager.GetClient(),
-		Scheme:        k8sManager.GetScheme(),
 	}).SetupWithManager(k8sManager)
 	Expect(err).NotTo(HaveOccurred())
 

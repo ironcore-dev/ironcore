@@ -18,7 +18,6 @@ import (
 	"context"
 	"fmt"
 
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/apiutils"
@@ -30,7 +29,6 @@ type AggregateOnmetalNetworkInterface struct {
 	NetworkInterface    *networkingv1alpha1.NetworkInterface
 	Network             *networkingv1alpha1.Network
 	VirtualIP           *networkingv1alpha1.VirtualIP
-	Prefixes            []commonv1alpha1.IPPrefix
 	LoadBalancerTargets []machinebrokerv1alpha1.LoadBalancerTarget
 	NATGatewayTargets   []machinebrokerv1alpha1.NATGatewayTarget
 }
@@ -42,6 +40,11 @@ func (s *Server) convertAggregateOnmetalNetworkInterface(networkInterface *Aggre
 	}
 
 	ips, err := s.convertOnmetalIPSourcesToIPs(networkInterface.NetworkInterface.Spec.IPs)
+	if err != nil {
+		return nil, err
+	}
+
+	prefixes, err := s.convertOnmetalPrefixSourcesToPrefixes(networkInterface.NetworkInterface.Spec.Prefixes)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +74,7 @@ func (s *Server) convertAggregateOnmetalNetworkInterface(networkInterface *Aggre
 			},
 			Ips:                 ips,
 			VirtualIp:           virtualIPSpec,
-			Prefixes:            s.convertOnmetalPrefixes(networkInterface.Prefixes),
+			Prefixes:            prefixes,
 			LoadBalancerTargets: loadBalancerTargets,
 			Nats:                nats,
 		},

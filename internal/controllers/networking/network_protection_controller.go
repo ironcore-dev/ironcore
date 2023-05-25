@@ -47,7 +47,6 @@ type NetworkProtectionReconciler struct {
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networks/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networks/finalizers,verbs=update
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces,verbs=get;list;watch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=aliasprefixes,verbs=get;list;watch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=loadbalancers,verbs=get;list;watch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=natgateways,verbs=get;list;watch
 
@@ -149,10 +148,6 @@ func (r *NetworkProtectionReconciler) isNetworkInUse(ctx context.Context, log lo
 			Field: networking.NetworkInterfaceSpecNetworkRefNameField,
 		},
 		{
-			Type:  &networkingv1alpha1.AliasPrefix{},
-			Field: networking.AliasPrefixNetworkNameField,
-		},
-		{
 			Type:  &networkingv1alpha1.LoadBalancer{},
 			Field: networking.LoadBalancerNetworkNameField,
 		},
@@ -184,10 +179,6 @@ func (r *NetworkProtectionReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			r.enqueueByNetworkInterface(),
 		).
 		Watches(
-			&source.Kind{Type: &networkingv1alpha1.AliasPrefix{}},
-			r.enqueueByAliasPrefix(),
-		).
-		Watches(
 			&source.Kind{Type: &networkingv1alpha1.LoadBalancer{}},
 			r.enqueueByLoadBalancer(),
 		).
@@ -206,21 +197,6 @@ func (r *NetworkProtectionReconciler) enqueueByNetworkInterface() handler.EventH
 		networkKey := types.NamespacedName{
 			Namespace: nic.Namespace,
 			Name:      nic.Spec.NetworkRef.Name,
-		}
-		res = append(res, ctrl.Request{NamespacedName: networkKey})
-
-		return res
-	})
-}
-
-func (r *NetworkProtectionReconciler) enqueueByAliasPrefix() handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
-		aliasPrefix := obj.(*networkingv1alpha1.AliasPrefix)
-
-		var res []ctrl.Request
-		networkKey := types.NamespacedName{
-			Namespace: aliasPrefix.Namespace,
-			Name:      aliasPrefix.Spec.NetworkRef.Name,
 		}
 		res = append(res, ctrl.Request{NamespacedName: networkKey})
 

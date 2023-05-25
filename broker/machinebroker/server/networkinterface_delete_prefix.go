@@ -19,11 +19,32 @@ import (
 	"fmt"
 
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	utilslices "github.com/onmetal/onmetal-api/utils/slices"
 	"golang.org/x/exp/slices"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
+
+func (s *Server) deleteOnmetalNetworkInterfacePrefix(
+	ctx context.Context,
+	nic *networkingv1alpha1.NetworkInterface,
+	prefix commonv1alpha1.IPPrefix,
+) error {
+	baseNic := nic.DeepCopy()
+	nic.Spec.Prefixes = utilslices.Filter(nic.Spec.Prefixes, func(e networkingv1alpha1.PrefixSource) bool {
+		if e.Value == nil {
+			return true
+		}
+		return *e.Value != prefix
+	})
+	if err := s.cluster.Client().Patch(ctx, nic, client.MergeFrom(baseNic)); err != nil {
+		return fmt.Errorf("error adding prefix: %w", err)
+	}
+	return nil
+}
 
 func (s *Server) DeleteNetworkInterfacePrefix(ctx context.Context, req *ori.DeleteNetworkInterfacePrefixRequest) (res *ori.DeleteNetworkInterfacePrefixResponse, retErr error) {
 	networkInterfaceID := req.NetworkInterfaceId
@@ -49,8 +70,8 @@ func (s *Server) DeleteNetworkInterfacePrefix(ctx context.Context, req *ori.Dele
 		return nil, status.Errorf(codes.NotFound, "network interface %s prefix %s not found", networkInterfaceID, req.Prefix)
 	}
 
-	if err := s.aliasPrefixes.Delete(ctx, onmetalNetworkInterface.Network.Spec.Handle, prefix, onmetalNetworkInterface.NetworkInterface); err != nil {
-		return nil, fmt.Errorf("error creating prefix: %w", err)
+	if err := s.deleteOnmetalNetworkInterfacePrefix(ctx, onmetalNetworkInterface.NetworkInterface, prefix); err != nil {
+		return nil, err
 	}
 
 	return &ori.DeleteNetworkInterfacePrefixResponse{}, nil

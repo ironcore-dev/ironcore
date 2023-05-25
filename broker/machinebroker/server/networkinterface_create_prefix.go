@@ -19,11 +19,26 @@ import (
 	"fmt"
 
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	"golang.org/x/exp/slices"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
+
+func (s *Server) addOnmetalNetworkInterfacePrefix(
+	ctx context.Context,
+	nic *networkingv1alpha1.NetworkInterface,
+	prefix commonv1alpha1.IPPrefix,
+) error {
+	baseNic := nic.DeepCopy()
+	nic.Spec.Prefixes = append(nic.Spec.Prefixes, networkingv1alpha1.PrefixSource{Value: &prefix})
+	if err := s.cluster.Client().Patch(ctx, nic, client.MergeFrom(baseNic)); err != nil {
+		return fmt.Errorf("error adding prefix: %w", err)
+	}
+	return nil
+}
 
 func (s *Server) CreateNetworkInterfacePrefix(ctx context.Context, req *ori.CreateNetworkInterfacePrefixRequest) (res *ori.CreateNetworkInterfacePrefixResponse, retErr error) {
 	networkInterfaceID := req.NetworkInterfaceId
@@ -49,8 +64,8 @@ func (s *Server) CreateNetworkInterfacePrefix(ctx context.Context, req *ori.Crea
 		return nil, status.Errorf(codes.AlreadyExists, "network interface %s already has prefix %s", networkInterfaceID, req.Prefix)
 	}
 
-	if err := s.aliasPrefixes.Create(ctx, onmetalNetworkInterface.Network, prefix, onmetalNetworkInterface.NetworkInterface); err != nil {
-		return nil, fmt.Errorf("error creating prefix: %w", err)
+	if err := s.addOnmetalNetworkInterfacePrefix(ctx, onmetalNetworkInterface.NetworkInterface, prefix); err != nil {
+		return nil, err
 	}
 
 	return &ori.CreateNetworkInterfacePrefixResponse{}, nil

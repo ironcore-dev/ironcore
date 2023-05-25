@@ -51,6 +51,14 @@ func SetObjectDefaults_Machine(in *v1alpha1.Machine) {
 						}
 					}
 				}
+				for j := range a.NetworkInterfaceSource.Ephemeral.NetworkInterfaceTemplate.Spec.Prefixes {
+					b := &a.NetworkInterfaceSource.Ephemeral.NetworkInterfaceTemplate.Spec.Prefixes[j]
+					if b.Ephemeral != nil {
+						if b.Ephemeral.PrefixTemplate != nil {
+							ipamv1alpha1.SetDefaults_PrefixSpec(&b.Ephemeral.PrefixTemplate.Spec)
+						}
+					}
+				}
 			}
 		}
 	}

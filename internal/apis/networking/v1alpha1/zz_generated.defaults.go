@@ -30,8 +30,6 @@ import (
 // Public to allow building arbitrary schemes.
 // All generated defaulters are covering - they call all nested defaulters.
 func RegisterDefaults(scheme *runtime.Scheme) error {
-	scheme.AddTypeDefaultingFunc(&v1alpha1.AliasPrefix{}, func(obj interface{}) { SetObjectDefaults_AliasPrefix(obj.(*v1alpha1.AliasPrefix)) })
-	scheme.AddTypeDefaultingFunc(&v1alpha1.AliasPrefixList{}, func(obj interface{}) { SetObjectDefaults_AliasPrefixList(obj.(*v1alpha1.AliasPrefixList)) })
 	scheme.AddTypeDefaultingFunc(&v1alpha1.LoadBalancer{}, func(obj interface{}) { SetObjectDefaults_LoadBalancer(obj.(*v1alpha1.LoadBalancer)) })
 	scheme.AddTypeDefaultingFunc(&v1alpha1.LoadBalancerList{}, func(obj interface{}) { SetObjectDefaults_LoadBalancerList(obj.(*v1alpha1.LoadBalancerList)) })
 	scheme.AddTypeDefaultingFunc(&v1alpha1.NATGateway{}, func(obj interface{}) { SetObjectDefaults_NATGateway(obj.(*v1alpha1.NATGateway)) })
@@ -41,21 +39,6 @@ func RegisterDefaults(scheme *runtime.Scheme) error {
 	scheme.AddTypeDefaultingFunc(&v1alpha1.NetworkPolicy{}, func(obj interface{}) { SetObjectDefaults_NetworkPolicy(obj.(*v1alpha1.NetworkPolicy)) })
 	scheme.AddTypeDefaultingFunc(&v1alpha1.NetworkPolicyList{}, func(obj interface{}) { SetObjectDefaults_NetworkPolicyList(obj.(*v1alpha1.NetworkPolicyList)) })
 	return nil
-}
-
-func SetObjectDefaults_AliasPrefix(in *v1alpha1.AliasPrefix) {
-	if in.Spec.Prefix.Ephemeral != nil {
-		if in.Spec.Prefix.Ephemeral.PrefixTemplate != nil {
-			ipamv1alpha1.SetDefaults_PrefixSpec(&in.Spec.Prefix.Ephemeral.PrefixTemplate.Spec)
-		}
-	}
-}
-
-func SetObjectDefaults_AliasPrefixList(in *v1alpha1.AliasPrefixList) {
-	for i := range in.Items {
-		a := &in.Items[i]
-		SetObjectDefaults_AliasPrefix(a)
-	}
 }
 
 func SetObjectDefaults_LoadBalancer(in *v1alpha1.LoadBalancer) {
@@ -92,6 +75,14 @@ func SetObjectDefaults_NetworkInterface(in *v1alpha1.NetworkInterface) {
 	SetDefaults_NetworkInterfaceSpec(&in.Spec)
 	for i := range in.Spec.IPs {
 		a := &in.Spec.IPs[i]
+		if a.Ephemeral != nil {
+			if a.Ephemeral.PrefixTemplate != nil {
+				ipamv1alpha1.SetDefaults_PrefixSpec(&a.Ephemeral.PrefixTemplate.Spec)
+			}
+		}
+	}
+	for i := range in.Spec.Prefixes {
+		a := &in.Spec.Prefixes[i]
 		if a.Ephemeral != nil {
 			if a.Ephemeral.PrefixTemplate != nil {
 				ipamv1alpha1.SetDefaults_PrefixSpec(&a.Ephemeral.PrefixTemplate.Spec)
