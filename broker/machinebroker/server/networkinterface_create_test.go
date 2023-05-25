@@ -25,7 +25,6 @@ import (
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/util/sets"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -101,17 +100,6 @@ var _ = Describe("CreateNetworkInterface", func() {
 
 		By("inspecting the referenced kubernetes virtual ip")
 		Expect(k8sVirtualIP.Status.IP).To(Equal(commonv1alpha1.MustParseNewIP(virtualIP)))
-
-		By("listing alias prefixes for network interface")
-		aliasPrefixes, err := srv.AliasPrefixes().ListByDependent(ctx, networkInterfaceID)
-		Expect(err).NotTo(HaveOccurred())
-
-		By("inspecting the alias prefix list")
-		Expect(aliasPrefixes).To(HaveLen(1))
-		aliasPrefix := aliasPrefixes[0]
-		Expect(aliasPrefix.NetworkHandle).To(Equal(networkHandle))
-		Expect(aliasPrefix.Prefix).To(Equal(commonv1alpha1.MustParseIPPrefix(prefix)))
-		Expect(aliasPrefix.Destinations.Equal(sets.New(networkInterfaceID))).To(BeTrue())
 
 		By("listing load balancers for network interface")
 		loadBalancers, err := srv.LoadBalancers().ListByDependent(ctx, networkInterfaceID)

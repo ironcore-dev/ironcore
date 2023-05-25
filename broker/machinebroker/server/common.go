@@ -105,12 +105,15 @@ func (s *Server) convertOnmetalIPSourcesToIPs(ipSources []networkingv1alpha1.IPS
 	return res, nil
 }
 
-func (s *Server) convertOnmetalPrefixes(prefixes []commonv1alpha1.IPPrefix) []string {
-	res := make([]string, len(prefixes))
-	for i, prefix := range prefixes {
-		res[i] = prefix.String()
+func (s *Server) convertOnmetalPrefixSourcesToPrefixes(prefixSources []networkingv1alpha1.PrefixSource) ([]string, error) {
+	res := make([]string, len(prefixSources))
+	for i, prefixSource := range prefixSources {
+		if prefixSource.Value == nil {
+			return nil, fmt.Errorf("prefix source %d does not specify a prefix literal", i)
+		}
+		res[i] = prefixSource.Value.String()
 	}
-	return res
+	return res, nil
 }
 
 func (s *Server) convertOnmetalLoadBalancerType(typ networkingv1alpha1.LoadBalancerType) (ori.LoadBalancerType, error) {
@@ -211,6 +214,16 @@ func (s *Server) onmetalIPsToOnmetalIPSources(ips []commonv1alpha1.IP) []network
 	for i := range ips {
 		res[i] = networkingv1alpha1.IPSource{
 			Value: &ips[i],
+		}
+	}
+	return res
+}
+
+func (s *Server) onmetalPrefixesToOnmetalPrefixSources(prefixes []commonv1alpha1.IPPrefix) []networkingv1alpha1.PrefixSource {
+	res := make([]networkingv1alpha1.PrefixSource, len(prefixes))
+	for i := range prefixes {
+		res[i] = networkingv1alpha1.PrefixSource{
+			Value: &prefixes[i],
 		}
 	}
 	return res

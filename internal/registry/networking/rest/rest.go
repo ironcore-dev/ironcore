@@ -18,8 +18,6 @@ import (
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	"github.com/onmetal/onmetal-api/internal/api"
 	"github.com/onmetal/onmetal-api/internal/apis/networking"
-	aliasprefixstorage "github.com/onmetal/onmetal-api/internal/registry/networking/aliasprefix/storage"
-	aliasprefixroutingstoratge "github.com/onmetal/onmetal-api/internal/registry/networking/aliasprefixrouting/storage"
 	loadbalancerstorage "github.com/onmetal/onmetal-api/internal/registry/networking/loadbalancer/storage"
 	loadbalancerroutingstorage "github.com/onmetal/onmetal-api/internal/registry/networking/loadbalancerrouting/storage"
 	natgatewaystorage "github.com/onmetal/onmetal-api/internal/registry/networking/natgateway/storage"
@@ -93,21 +91,6 @@ func (p StorageProvider) v1alpha1Storage(restOptionsGetter generic.RESTOptionsGe
 
 	storageMap["virtualips"] = virtualIPStorage.VirtualIP
 	storageMap["virtualips/status"] = virtualIPStorage.Status
-
-	aliasPrefixStorage, err := aliasprefixstorage.NewStorage(restOptionsGetter)
-	if err != nil {
-		return storageMap, err
-	}
-
-	storageMap["aliasprefixes"] = aliasPrefixStorage.AliasPrefix
-	storageMap["aliasprefixes/status"] = aliasPrefixStorage.Status
-
-	aliasPrefixRoutingStorage, err := aliasprefixroutingstoratge.NewStorage(restOptionsGetter)
-	if err != nil {
-		return storageMap, err
-	}
-
-	storageMap["aliasprefixroutings"] = aliasPrefixRoutingStorage.AliasPrefixRouting
 
 	loadBalancerStorage, err := loadbalancerstorage.NewStorage(restOptionsGetter)
 	if err != nil {

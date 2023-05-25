@@ -95,8 +95,6 @@ func (r *MachineReconciler) machineUIDLabelSelector(machineUID types.UID) map[st
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces,verbs=get;list;watch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networks,verbs=get;list;watch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=virtualips,verbs=get;list;watch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=aliasprefixes,verbs=get;list;watch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=aliasprefixroutings,verbs=get;list;watch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=loadbalancers,verbs=get;list;watch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=loadbalancerroutings,verbs=get;list;watch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=natgateways,verbs=get;list;watch
@@ -865,61 +863,6 @@ func (r *MachineReconciler) enqueueMachinesReferencingNetworkInterface(ctx conte
 	})
 }
 
-func (r *MachineReconciler) enqueueMachinesReferencingAliasPrefixRouting(ctx context.Context, log logr.Logger) handler.EventHandler { //nolint:unused
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []reconcile.Request {
-		aliasPrefixRouting := obj.(*networkingv1alpha1.AliasPrefixRouting)
-		destinationSet := utilslices.ToSetFunc(
-			aliasPrefixRouting.Destinations,
-			func(d commonv1alpha1.LocalUIDReference) types.UID { return d.UID },
-		)
-
-		networkRef := aliasPrefixRouting.NetworkRef
-
-		network := &networkingv1alpha1.Network{}
-		networkKey := client.ObjectKey{Namespace: aliasPrefixRouting.Namespace, Name: networkRef.Name}
-		if err := r.Get(ctx, networkKey, network); err != nil {
-			log.Error(err, "Error getting alias prefix routing network", "NetworkKey", networkKey)
-			return nil
-		}
-
-		if network.UID != networkRef.UID {
-			log.V(1).Info("Network uid does not match", "Expected", networkRef.UID, "Actual", network.UID)
-			return nil
-		}
-
-		networkInterfaceList := &networkingv1alpha1.NetworkInterfaceList{}
-		networkInterfaceMachinePoolID := machinepoolletclient.NetworkNameAndHandle(network.Name, network.Spec.Handle)
-		if err := r.List(ctx, networkInterfaceList,
-			client.InNamespace(aliasPrefixRouting.Namespace),
-			client.MatchingFields{
-				machinepoolletclient.NetworkInterfaceNetworkNameAndHandle: networkInterfaceMachinePoolID,
-			},
-		); err != nil {
-			log.Error(err, "Error listing network interfaces")
-			return nil
-		}
-
-		var res []ctrl.Request
-		for _, networkInterface := range networkInterfaceList.Items {
-			if !destinationSet.Has(networkInterface.UID) {
-				continue
-			}
-			machineRef := networkInterface.Spec.MachineRef
-			if machineRef == nil {
-				continue
-			}
-
-			res = append(res, ctrl.Request{
-				NamespacedName: client.ObjectKey{
-					Namespace: aliasPrefixRouting.Namespace,
-					Name:      machineRef.Name,
-				},
-			})
-		}
-		return res
-	})
-}
-
 func (r *MachineReconciler) enqueueMachinesReferencingLoadBalancerRouting(ctx context.Context, log logr.Logger) handler.EventHandler { //nolint:unused
 	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []reconcile.Request {
 		loadBalancerRouting := obj.(*networkingv1alpha1.LoadBalancerRouting)
@@ -1054,10 +997,6 @@ func (r *MachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Watches(
 			&source.Kind{Type: &storagev1alpha1.Volume{}},
 			r.enqueueMachinesReferencingVolume(ctx, log),
-		).
-		Watches(
-			&source.Kind{Type: &networkingv1alpha1.AliasPrefixRouting{}},
-			r.enqueueMachinesReferencingAliasPrefixRouting(ctx, log),
 		).
 		Watches(
 			&source.Kind{Type: &networkingv1alpha1.LoadBalancerRouting{}},

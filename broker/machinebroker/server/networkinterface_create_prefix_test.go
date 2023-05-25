@@ -15,6 +15,7 @@
 package server_test
 
 import (
+	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
@@ -32,9 +33,8 @@ var _ = Describe("NetworkInterfaceDeletePrefix", func() {
 			NetworkInterface: &ori.NetworkInterface{
 				Metadata: &orimeta.ObjectMetadata{},
 				Spec: &ori.NetworkInterfaceSpec{
-					Network:  &ori.NetworkSpec{Handle: "foo"},
-					Ips:      []string{"192.168.178.1"},
-					Prefixes: []string{"10.0.0.0/24"},
+					Network: &ori.NetworkSpec{Handle: "foo"},
+					Ips:     []string{"192.168.178.1"},
 				},
 			},
 		})
@@ -42,10 +42,10 @@ var _ = Describe("NetworkInterfaceDeletePrefix", func() {
 
 		By("inspecting the created network interface")
 		networkInterface := res.NetworkInterface
-		Expect(networkInterface.Spec.Prefixes).To(ConsistOf("10.0.0.0/24"))
+		Expect(networkInterface.Spec.Prefixes).To(BeEmpty())
 
-		By("deleting the prefix")
-		_, err = srv.DeleteNetworkInterfacePrefix(ctx, &ori.DeleteNetworkInterfacePrefixRequest{
+		By("creating the prefix")
+		_, err = srv.CreateNetworkInterfacePrefix(ctx, &ori.CreateNetworkInterfacePrefixRequest{
 			NetworkInterfaceId: networkInterface.Metadata.Id,
 			Prefix:             "10.0.0.0/24",
 		})
@@ -56,7 +56,9 @@ var _ = Describe("NetworkInterfaceDeletePrefix", func() {
 		onmetalNicKey := client.ObjectKey{Namespace: ns.Name, Name: networkInterface.Metadata.Id}
 		Expect(k8sClient.Get(ctx, onmetalNicKey, onmetalNic)).To(Succeed())
 
-		By("inspecting the retrieved network interface prefixes")
-		Expect(onmetalNic.Spec.Prefixes).To(BeEmpty())
+		By("inspecting the retrieved network interface")
+		Expect(onmetalNic.Spec.Prefixes).To(Equal([]networkingv1alpha1.PrefixSource{
+			{Value: commonv1alpha1.MustParseNewIPPrefix("10.0.0.0/24")},
+		}))
 	})
 })
