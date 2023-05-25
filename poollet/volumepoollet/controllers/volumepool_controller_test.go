@@ -32,7 +32,7 @@ const (
 )
 
 var _ = Describe("VolumePoolController", func() {
-	_, _, _, srv := SetupTest()
+	_, _, _, _, srv := SetupTest()
 
 	It("should add volume classes to pool", func(ctx SpecContext) {
 		srv.SetVolumeClasses([]*volume.FakeVolumeClass{})

@@ -26,6 +26,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 )
 
@@ -37,7 +38,7 @@ const (
 )
 
 var _ = Describe("VolumeController", func() {
-	ns, vp, vc, srv := SetupTest()
+	ns, vp, vc, expandableVc, srv := SetupTest()
 
 	It("should create a basic volume", func(ctx SpecContext) {
 		size := resource.MustParse("10Mi")
@@ -161,6 +162,55 @@ var _ = Describe("VolumeController", func() {
 		Expect(oriVolume.Spec.Resources.StorageBytes).To(Equal(uint64(size.Value())))
 		Expect(oriVolume.Spec.Encryption.SecretData).NotTo(HaveKeyWithValue(encryptionDataKey, encryptionData))
 
+	})
+
+	It("should expand a volume", func(ctx SpecContext) {
+		size := resource.MustParse("100Mi")
+		newSize := resource.MustParse("200Mi")
+
+		By("creating a volume")
+		volume := &storagev1alpha1.Volume{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "volume-",
+			},
+			Spec: storagev1alpha1.VolumeSpec{
+				VolumeClassRef: &corev1.LocalObjectReference{Name: expandableVc.Name},
+				VolumePoolRef:  &corev1.LocalObjectReference{Name: vp.Name},
+				Resources: corev1alpha1.ResourceList{
+					corev1alpha1.ResourceStorage: size,
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, volume)).To(Succeed())
+
+		By("waiting for the runtime to report the volume")
+		Eventually(srv).Should(SatisfyAll(
+			HaveField("Volumes", HaveLen(1)),
+		))
+
+		_, oriVolume := GetSingleMapEntry(srv.Volumes)
+
+		Expect(oriVolume.Spec.Image).To(Equal(""))
+		Expect(oriVolume.Spec.Class).To(Equal(vc.Name))
+		Expect(oriVolume.Spec.Resources.StorageBytes).To(Equal(uint64(size.Value())))
+
+		By("update increasing the storage resource")
+		baseVolume := volume.DeepCopy()
+		volume.Spec.Resources = corev1alpha1.ResourceList{
+			corev1alpha1.ResourceStorage: newSize,
+		}
+		Expect(k8sClient.Patch(ctx, volume, client.MergeFrom(baseVolume))).To(Succeed())
+
+		By("waiting for the runtime to report the volume")
+		Eventually(srv).Should(SatisfyAll(
+			HaveField("Volumes", HaveLen(1)),
+		))
+
+		Eventually(func() uint64 {
+			_, oriVolume = GetSingleMapEntry(srv.Volumes)
+			return oriVolume.Spec.Resources.StorageBytes
+		}).Should(Equal(uint64(newSize.Value())))
 	})
 
 })

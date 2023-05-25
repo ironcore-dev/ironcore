@@ -23,6 +23,7 @@ import (
 type RuntimeService interface {
 	ListVolumes(context.Context, *api.ListVolumesRequest) (*api.ListVolumesResponse, error)
 	CreateVolume(context.Context, *api.CreateVolumeRequest) (*api.CreateVolumeResponse, error)
+	ExpandVolume(ctx context.Context, request *api.ExpandVolumeRequest) (*api.ExpandVolumeResponse, error)
 	DeleteVolume(context.Context, *api.DeleteVolumeRequest) (*api.DeleteVolumeResponse, error)
 
 	ListVolumeClasses(context.Context, *api.ListVolumeClassesRequest) (*api.ListVolumeClassesResponse, error)
