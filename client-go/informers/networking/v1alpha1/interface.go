@@ -23,10 +23,6 @@ import (
 
 // Interface provides access to all the informers in this group version.
 type Interface interface {
-	// AliasPrefixes returns a AliasPrefixInformer.
-	AliasPrefixes() AliasPrefixInformer
-	// AliasPrefixRoutings returns a AliasPrefixRoutingInformer.
-	AliasPrefixRoutings() AliasPrefixRoutingInformer
 	// LoadBalancers returns a LoadBalancerInformer.
 	LoadBalancers() LoadBalancerInformer
 	// LoadBalancerRoutings returns a LoadBalancerRoutingInformer.
@@ -54,16 +50,6 @@ type version struct {
 // New returns a new Interface.
 func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakListOptions internalinterfaces.TweakListOptionsFunc) Interface {
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
-}
-
-// AliasPrefixes returns a AliasPrefixInformer.
-func (v *version) AliasPrefixes() AliasPrefixInformer {
-	return &aliasPrefixInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
-}
-
-// AliasPrefixRoutings returns a AliasPrefixRoutingInformer.
-func (v *version) AliasPrefixRoutings() AliasPrefixRoutingInformer {
-	return &aliasPrefixRoutingInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // LoadBalancers returns a LoadBalancerInformer.

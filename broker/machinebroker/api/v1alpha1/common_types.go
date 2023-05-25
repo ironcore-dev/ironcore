@@ -14,101 +14,19 @@
 
 package v1alpha1
 
-import (
-	"fmt"
-	"sort"
-
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	corev1 "k8s.io/api/core/v1"
-)
-
 const (
-	LabelsAnnotation = "machinebroker.api.onmetal.de/labels"
-
+	LabelsAnnotation      = "machinebroker.api.onmetal.de/labels"
 	AnnotationsAnnotation = "machinebroker.api.onmetal.de/annotations"
-
-	DependentsAnnotation = "machinebrokerlet.api.onmetal.de/dependents"
 )
 
 const (
-	PurposeLabel = "machinebroker.api.onmetal.de/purpose"
-
 	ManagerLabel = "machinebroker.api.onmetal.de/manager"
 
 	CreatedLabel = "machinebroker.api.onmetal.de/created"
-
-	NetworkHandleLabel = "machinebrokerlet.api.onmetal.de/network-handle"
-
-	PrefixLabel = "machinebrokerlet.api.onmetal.de/prefix"
-
-	LoadBalancerTypeLabel = "machinebrokerlet.api.onmetal.de/load-balancer-type"
-
-	IPLabel = "machinebrokerlet.api.onmetal.de/ip"
 )
 
 const (
 	MachineBrokerManager = "machinebroker"
 
 	VolumeAccessPurpose = "volume-access"
-
-	IgnitionPurpose = "ignition"
-
-	NetworkInterfacePurpose = "network-interface"
 )
-
-type LoadBalancerPort struct {
-	Protocol corev1.Protocol
-	Port     int32
-	EndPort  int32
-}
-
-func (p LoadBalancerPort) Key() string {
-	return fmt.Sprintf("%s:%d-%d", p.Protocol, p.Port, p.EndPort)
-}
-
-func LoadBalancerPortsKey(ports []LoadBalancerPort) string {
-	portKeys := make([]string, len(ports))
-	for i, port := range ports {
-		portKeys[i] = port.Key()
-	}
-	sort.Strings(portKeys)
-	return fmt.Sprintf("%v", portKeys)
-}
-
-type LoadBalancerTarget struct {
-	LoadBalancerType networkingv1alpha1.LoadBalancerType
-	IP               commonv1alpha1.IP
-	Ports            []LoadBalancerPort
-}
-
-func (t LoadBalancerTarget) Key() string {
-	portKeys := LoadBalancerPortsKey(t.Ports)
-	return fmt.Sprintf("%s-%s%s", t.LoadBalancerType, t.IP, portKeys)
-}
-
-type LoadBalancer struct {
-	Type          networkingv1alpha1.LoadBalancerType
-	NetworkHandle string
-	IP            commonv1alpha1.IP
-	Ports         []LoadBalancerPort
-	Destinations  []string
-}
-
-type NATGatewayTarget struct {
-	IP      commonv1alpha1.IP
-	Port    int32
-	EndPort int32
-}
-
-type NATGatewayDestination struct {
-	ID      string
-	Port    int32
-	EndPort int32
-}
-
-type NATGateway struct {
-	NetworkHandle string
-	IP            commonv1alpha1.IP
-	Destinations  []NATGatewayDestination
-}

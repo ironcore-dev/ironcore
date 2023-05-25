@@ -85,7 +85,6 @@ const (
 	networkInterfaceController     = "networkinterface"
 	networkInterfaceBindController = "networkinterfacebind"
 	virtualIPController            = "virtualip"
-	aliasPrefixController          = "aliasprefix"
 	loadBalancerController         = "loadbalancer"
 	natGatewayController           = "natgateway"
 
@@ -131,7 +130,7 @@ func main() {
 
 		// Networking controllers
 		networkBindController, networkProtectionController,
-		networkInterfaceController, networkInterfaceBindController, virtualIPController, aliasPrefixController, loadBalancerController, natGatewayController,
+		networkInterfaceController, networkInterfaceBindController, virtualIPController, loadBalancerController, natGatewayController,
 
 		// IPAM controllers
 		prefixController, prefixAllocationScheduler,
@@ -353,17 +352,6 @@ func main() {
 		}
 	}
 
-	if controllers.Enabled(aliasPrefixController) {
-		if err := (&networkingcontrollers.AliasPrefixReconciler{
-			EventRecorder: mgr.GetEventRecorderFor("aliasprefixes"),
-			Client:        mgr.GetClient(),
-			Scheme:        mgr.GetScheme(),
-		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "AliasPrefix")
-			os.Exit(1)
-		}
-	}
-
 	if controllers.Enabled(loadBalancerController) {
 		if err := (&networkingcontrollers.LoadBalancerReconciler{
 			Client: mgr.GetClient(),
@@ -493,13 +481,6 @@ func main() {
 
 	// networking indexers
 
-	if controllers.AnyEnabled(aliasPrefixController, networkProtectionController) {
-		if err := networkingclient.SetupAliasPrefixNetworkNameFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
-			setupLog.Error(err, "unable to setup field indexer", "field", networkingclient.AliasPrefixNetworkNameField)
-			os.Exit(1)
-		}
-	}
-
 	if controllers.AnyEnabled(loadBalancerController, networkProtectionController) {
 		if err := networkingclient.SetupLoadBalancerNetworkNameFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
 			setupLog.Error(err, "unable to setup field indexer", "field", networkingclient.LoadBalancerNetworkNameField)
@@ -528,7 +509,7 @@ func main() {
 		}
 	}
 
-	if controllers.AnyEnabled(aliasPrefixController, loadBalancerController, natGatewayController, networkProtectionController, networkInterfaceController) {
+	if controllers.AnyEnabled(loadBalancerController, natGatewayController, networkProtectionController, networkInterfaceController) {
 		if err := networkingclient.SetupNetworkInterfaceNetworkNameFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
 			setupLog.Error(err, "unable to setup field indexer", "field", networkingclient.NetworkInterfaceSpecNetworkRefNameField)
 			os.Exit(1)

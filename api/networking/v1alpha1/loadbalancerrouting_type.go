@@ -24,7 +24,7 @@ import (
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// LoadBalancerRouting is the Schema for the aliasprefixrouting API
+// LoadBalancerRouting is the Schema for the loadbalancerroutings API
 type LoadBalancerRouting struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

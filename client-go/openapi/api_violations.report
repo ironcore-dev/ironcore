@@ -12,7 +12,6 @@ API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/compute
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/core/v1alpha1,ResourceScopeSelector,MatchExpressions
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/core/v1alpha1,ResourceScopeSelectorRequirement,Values
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/ipam/v1alpha1,PrefixStatus,Used
-API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,AliasPrefixRouting,Destinations
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,IPBlock,Except
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,LoadBalancerRouting,Destinations
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,LoadBalancerSpec,IPFamilies
@@ -26,7 +25,9 @@ API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/network
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NATGatewayStatus,IPs
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NetworkInterfaceSpec,IPFamilies
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NetworkInterfaceSpec,IPs
+API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NetworkInterfaceSpec,Prefixes
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NetworkInterfaceStatus,IPs
+API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NetworkInterfaceStatus,Prefixes
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NetworkPolicyEgressRule,Ports
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NetworkPolicyEgressRule,To
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NetworkPolicyIngressRule,From

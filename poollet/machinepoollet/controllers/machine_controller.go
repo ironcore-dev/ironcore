@@ -35,7 +35,6 @@ import (
 	"github.com/onmetal/onmetal-api/poollet/machinepoollet/mcm"
 	onmetalapiclient "github.com/onmetal/onmetal-api/utils/client"
 	"github.com/onmetal/onmetal-api/utils/predicates"
-	utilslices "github.com/onmetal/onmetal-api/utils/slices"
 	"golang.org/x/exp/maps"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -51,7 +50,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
-	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
@@ -95,8 +93,6 @@ func (r *MachineReconciler) machineUIDLabelSelector(machineUID types.UID) map[st
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces,verbs=get;list;watch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networks,verbs=get;list;watch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=virtualips,verbs=get;list;watch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=aliasprefixes,verbs=get;list;watch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=aliasprefixroutings,verbs=get;list;watch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=loadbalancers,verbs=get;list;watch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=loadbalancerroutings,verbs=get;list;watch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=natgateways,verbs=get;list;watch
@@ -204,37 +200,8 @@ func (r *MachineReconciler) deleteGone(ctx context.Context, log logr.Logger, mac
 		log.V(1).Info("Not all machines are gone yet, requeueing")
 		return ctrl.Result{Requeue: true}, nil
 	}
-
-	var errs []error
-
-	log.V(1).Info("Deleting volumes by machine key")
-	allVolumesGone, err := r.deleteVolumesByMachineKey(ctx, log, machineKey)
-	switch {
-	case err != nil:
-		errs = append(errs, fmt.Errorf("error deleting volumes: %w", err))
-	case !allVolumesGone:
-		ok = false
-	}
-
-	log.V(1).Info("Deleting network interfaces by machine key")
-	allNetworkInterfacesGone, err := r.deleteNetworkInterfacesByMachineKey(ctx, log, machineKey)
-	switch {
-	case err != nil:
-		errs = append(errs, fmt.Errorf("error deleting network interfaces: %w", err))
-	case !allNetworkInterfacesGone:
-		ok = false
-	}
-
-	switch {
-	case len(errs) > 0:
-		return ctrl.Result{}, fmt.Errorf("error(s) deleting dependents: %v", errs)
-	case !ok:
-		log.V(1).Info("Dependents are still deleting, requeueing")
-		return ctrl.Result{Requeue: true}, nil
-	default:
-		log.V(1).Info("Deleted")
-		return ctrl.Result{}, nil
-	}
+	log.V(1).Info("Deleted gone")
+	return ctrl.Result{}, nil
 }
 
 func (r *MachineReconciler) reconcileExists(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) (ctrl.Result, error) {
@@ -255,53 +222,22 @@ func (r *MachineReconciler) delete(ctx context.Context, log logr.Logger, machine
 	log.V(1).Info("Finalizer present")
 
 	log.V(1).Info("Deleting machines by UID")
-	allGone, err := r.deleteMachinesByMachineUID(ctx, log, machine.UID)
+	ok, err := r.deleteMachinesByMachineUID(ctx, log, machine.UID)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error deleting machines: %w", err)
 	}
-	if !allGone {
+	if !ok {
 		log.V(1).Info("Not all machines are gone, requeueing")
 		return ctrl.Result{Requeue: true}, nil
 	}
 
-	var (
-		errs []error
-		ok   = true
-	)
-
-	log.V(1).Info("Deleting volumes by UID")
-	allVolumesGone, err := r.deleteVolumesByMachineUID(ctx, log, machine.UID)
-	switch {
-	case err != nil:
-		errs = append(errs, fmt.Errorf("error deleting volumes: %w", err))
-	case !allVolumesGone:
-		ok = false
+	log.V(1).Info("Deleted ori machines by UID, removing finalizer")
+	if err := clientutils.PatchRemoveFinalizer(ctx, r.Client, machine, machinepoolletv1alpha1.MachineFinalizer); err != nil {
+		return ctrl.Result{}, fmt.Errorf("error removing finalizer: %w", err)
 	}
 
-	log.V(1).Info("Deleting network interfaces by UID")
-	allNetworkInterfacesGone, err := r.deleteNetworkInterfacesByMachineUID(ctx, log, machine.UID)
-	switch {
-	case err != nil:
-		errs = append(errs, fmt.Errorf("error deleting network interfaces: %w", err))
-	case !allNetworkInterfacesGone:
-		ok = false
-	}
-
-	switch {
-	case len(errs) > 0:
-		return ctrl.Result{}, fmt.Errorf("error(s) deleting dependents: %v", errs)
-	case !ok:
-		log.V(1).Info("Dependents are still deleting, requeueing")
-		return ctrl.Result{Requeue: true}, nil
-	default:
-		log.V(1).Info("Deleted all parts, removing finalizer")
-		if err := clientutils.PatchRemoveFinalizer(ctx, r.Client, machine, machinepoolletv1alpha1.MachineFinalizer); err != nil {
-			return ctrl.Result{}, fmt.Errorf("error removing finalizer: %w", err)
-		}
-
-		log.V(1).Info("Deleted")
-		return ctrl.Result{}, nil
-	}
+	log.V(1).Info("Deleted")
+	return ctrl.Result{}, nil
 }
 
 func (r *MachineReconciler) deleteMachinesByMachineUID(ctx context.Context, log logr.Logger, machineUID types.UID) (bool, error) {
@@ -506,13 +442,18 @@ func (r *MachineReconciler) updateStatus(ctx context.Context, log logr.Logger, m
 
 	machine.Status.State = state
 
-	if err := r.updateVolumeStates(machine, oriMachine, now); err != nil {
-		return fmt.Errorf("error updating volume states: %w", err)
+	volumeStatuses, err := r.getVolumeStatusesForMachine(machine, oriMachine, now)
+	if err != nil {
+		return fmt.Errorf("error getting volume statuses: %w", err)
 	}
 
-	if err := r.updateNetworkInterfaceStates(machine, oriMachine, now); err != nil {
-		return fmt.Errorf("error updating network interface states: %w", err)
+	nicStatuses, err := r.getNetworkInterfaceStatusesForMachine(ctx, log, machine, oriMachine, now)
+	if err != nil {
+		return fmt.Errorf("error getting network interface statuses: %w", err)
 	}
+
+	machine.Status.Volumes = volumeStatuses
+	machine.Status.NetworkInterfaces = nicStatuses
 
 	if err := r.Status().Patch(ctx, machine, client.MergeFrom(base)); err != nil {
 		return fmt.Errorf("error patching status: %w", err)
@@ -539,6 +480,7 @@ func (r *MachineReconciler) updateORIPower(ctx context.Context, log logr.Logger,
 	}
 
 	if actualPower == desiredPower {
+		log.V(1).Info("Power is up-to-date", "Power", actualPower)
 		return nil
 	}
 
@@ -610,6 +552,7 @@ func (r *MachineReconciler) updateORIAnnotations(ctx context.Context, log logr.L
 	actualAnnotations := oriMachine.Metadata.Annotations
 
 	if !maps.Equal(desiredAnnotations, actualAnnotations) {
+		log.V(1).Info("Annotations are up-to-date", "Annotations", desiredAnnotations)
 		return nil
 	}
 
@@ -670,7 +613,7 @@ func getORIMachineClassCapabilities(machineClass *computev1alpha1.MachineClass) 
 	}, nil
 }
 
-func (r *MachineReconciler) prepareORIIgnitionSpec(ctx context.Context, machine *computev1alpha1.Machine, ignitionRef *commonv1alpha1.SecretKeySelector) (*ori.IgnitionSpec, bool, error) {
+func (r *MachineReconciler) prepareORIIgnitionData(ctx context.Context, machine *computev1alpha1.Machine, ignitionRef *commonv1alpha1.SecretKeySelector) ([]byte, bool, error) {
 	ignitionSecret := &corev1.Secret{}
 	ignitionSecretKey := client.ObjectKey{Namespace: machine.Namespace, Name: ignitionRef.Name}
 	if err := r.Get(ctx, ignitionSecretKey, ignitionSecret); err != nil {
@@ -689,14 +632,11 @@ func (r *MachineReconciler) prepareORIIgnitionSpec(ctx context.Context, machine 
 
 	data, ok := ignitionSecret.Data[ignitionKey]
 	if !ok {
-		err := fmt.Errorf("ignition has no data at key %s", ignitionKey)
-		r.Eventf(machine, corev1.EventTypeNormal, events.IgnitionNotReady, "Ignition not ready: %v", err)
+		r.Eventf(machine, corev1.EventTypeNormal, events.IgnitionNotReady, "Ignition has no data at key %s", ignitionKey)
 		return nil, false, nil
 	}
 
-	return &ori.IgnitionSpec{
-		Data: data,
-	}, true, nil
+	return data, true, nil
 }
 
 func (r *MachineReconciler) prepareORIMachine(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) (*ori.Machine, bool, error) {
@@ -720,32 +660,32 @@ func (r *MachineReconciler) prepareORIMachine(ctx context.Context, log logr.Logg
 		}
 	}
 
-	var ignitionSpec *ori.IgnitionSpec
+	var ignitionData []byte
 	if ignitionRef := machine.Spec.IgnitionRef; ignitionRef != nil {
-		i, ignitionSpecOK, err := r.prepareORIIgnitionSpec(ctx, machine, ignitionRef)
+		data, ignitionSpecOK, err := r.prepareORIIgnitionData(ctx, machine, ignitionRef)
 		switch {
 		case err != nil:
 			errs = append(errs, fmt.Errorf("error preparing ori ignition spec: %w", err))
 		case !ignitionSpecOK:
 			ok = false
 		default:
-			ignitionSpec = i
+			ignitionData = data
 		}
 	}
 
-	machineNetworkInterfaceSpecs, machineNetworkInterfaceSpecsOK, err := r.prepareORINetworkInterfaceAttachments(ctx, log, machine)
+	machineNics, nonReadyNics, err := r.prepareORINetworkInterfaces(ctx, log, machine)
 	switch {
 	case err != nil:
 		errs = append(errs, fmt.Errorf("error preparing ori machine network interfaces: %w", err))
-	case !machineNetworkInterfaceSpecsOK:
+	case len(nonReadyNics) > 0:
 		ok = false
 	}
 
-	machineVolumeSpecs, machineVolumeSpecsOK, err := r.prepareORIVolumeAttachments(ctx, log, machine)
+	machineVolumes, machineVolumesOK, err := r.prepareORIVolumes(ctx, log, machine)
 	switch {
 	case err != nil:
 		errs = append(errs, fmt.Errorf("error preparing ori machine volumes: %w", err))
-	case !machineVolumeSpecsOK:
+	case !machineVolumesOK:
 		ok = false
 	}
 
@@ -773,9 +713,9 @@ func (r *MachineReconciler) prepareORIMachine(ctx context.Context, log logr.Logg
 			Spec: &ori.MachineSpec{
 				Image:             imageSpec,
 				Class:             class,
-				Ignition:          ignitionSpec,
-				Volumes:           machineVolumeSpecs,
-				NetworkInterfaces: machineNetworkInterfaceSpecs,
+				IgnitionData:      ignitionData,
+				Volumes:           machineVolumes,
+				NetworkInterfaces: machineNics,
 			},
 		}, true, nil
 	}
@@ -865,171 +805,6 @@ func (r *MachineReconciler) enqueueMachinesReferencingNetworkInterface(ctx conte
 	})
 }
 
-func (r *MachineReconciler) enqueueMachinesReferencingAliasPrefixRouting(ctx context.Context, log logr.Logger) handler.EventHandler { //nolint:unused
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []reconcile.Request {
-		aliasPrefixRouting := obj.(*networkingv1alpha1.AliasPrefixRouting)
-		destinationSet := utilslices.ToSetFunc(
-			aliasPrefixRouting.Destinations,
-			func(d commonv1alpha1.LocalUIDReference) types.UID { return d.UID },
-		)
-
-		networkRef := aliasPrefixRouting.NetworkRef
-
-		network := &networkingv1alpha1.Network{}
-		networkKey := client.ObjectKey{Namespace: aliasPrefixRouting.Namespace, Name: networkRef.Name}
-		if err := r.Get(ctx, networkKey, network); err != nil {
-			log.Error(err, "Error getting alias prefix routing network", "NetworkKey", networkKey)
-			return nil
-		}
-
-		if network.UID != networkRef.UID {
-			log.V(1).Info("Network uid does not match", "Expected", networkRef.UID, "Actual", network.UID)
-			return nil
-		}
-
-		networkInterfaceList := &networkingv1alpha1.NetworkInterfaceList{}
-		networkInterfaceMachinePoolID := machinepoolletclient.NetworkNameAndHandle(network.Name, network.Spec.Handle)
-		if err := r.List(ctx, networkInterfaceList,
-			client.InNamespace(aliasPrefixRouting.Namespace),
-			client.MatchingFields{
-				machinepoolletclient.NetworkInterfaceNetworkNameAndHandle: networkInterfaceMachinePoolID,
-			},
-		); err != nil {
-			log.Error(err, "Error listing network interfaces")
-			return nil
-		}
-
-		var res []ctrl.Request
-		for _, networkInterface := range networkInterfaceList.Items {
-			if !destinationSet.Has(networkInterface.UID) {
-				continue
-			}
-			machineRef := networkInterface.Spec.MachineRef
-			if machineRef == nil {
-				continue
-			}
-
-			res = append(res, ctrl.Request{
-				NamespacedName: client.ObjectKey{
-					Namespace: aliasPrefixRouting.Namespace,
-					Name:      machineRef.Name,
-				},
-			})
-		}
-		return res
-	})
-}
-
-func (r *MachineReconciler) enqueueMachinesReferencingLoadBalancerRouting(ctx context.Context, log logr.Logger) handler.EventHandler { //nolint:unused
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []reconcile.Request {
-		loadBalancerRouting := obj.(*networkingv1alpha1.LoadBalancerRouting)
-		destinationSet := utilslices.ToSetFunc(
-			loadBalancerRouting.Destinations,
-			func(d commonv1alpha1.LocalUIDReference) types.UID { return d.UID },
-		)
-
-		networkRef := loadBalancerRouting.NetworkRef
-
-		network := &networkingv1alpha1.Network{}
-		networkKey := client.ObjectKey{Namespace: loadBalancerRouting.Namespace, Name: networkRef.Name}
-		if err := r.Get(ctx, networkKey, network); err != nil {
-			log.Error(err, "Error getting alias prefix routing network", "NetworkKey", networkKey)
-			return nil
-		}
-
-		if network.UID != networkRef.UID {
-			log.V(1).Info("Network uid does not match", "Expected", networkRef.UID, "Actual", network.UID)
-			return nil
-		}
-
-		networkInterfaceList := &networkingv1alpha1.NetworkInterfaceList{}
-		networkInterfaceMachinePoolID := machinepoolletclient.NetworkNameAndHandle(network.Name, network.Spec.Handle)
-		if err := r.List(ctx, networkInterfaceList,
-			client.InNamespace(loadBalancerRouting.Namespace),
-			client.MatchingFields{
-				machinepoolletclient.NetworkInterfaceNetworkNameAndHandle: networkInterfaceMachinePoolID,
-			},
-		); err != nil {
-			log.Error(err, "Error listing network interfaces")
-			return nil
-		}
-
-		var res []ctrl.Request
-		for _, networkInterface := range networkInterfaceList.Items {
-			if !destinationSet.Has(networkInterface.UID) {
-				continue
-			}
-			machineRef := networkInterface.Spec.MachineRef
-			if machineRef == nil {
-				continue
-			}
-
-			res = append(res, ctrl.Request{
-				NamespacedName: client.ObjectKey{
-					Namespace: loadBalancerRouting.Namespace,
-					Name:      machineRef.Name,
-				},
-			})
-		}
-		return res
-	})
-}
-
-func (r *MachineReconciler) enqueueMachinesReferencingNATGatewayRouting(ctx context.Context, log logr.Logger) handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []reconcile.Request {
-		natGatewayRouting := obj.(*networkingv1alpha1.NATGatewayRouting)
-		destinationSet := utilslices.ToSetFunc(
-			natGatewayRouting.Destinations,
-			func(d networkingv1alpha1.NATGatewayDestination) types.UID { return d.UID },
-		)
-
-		networkRef := natGatewayRouting.NetworkRef
-
-		network := &networkingv1alpha1.Network{}
-		networkKey := client.ObjectKey{Namespace: natGatewayRouting.Namespace, Name: networkRef.Name}
-		if err := r.Get(ctx, networkKey, network); err != nil {
-			log.Error(err, "Error getting alias prefix routing network", "NetworkKey", networkKey)
-			return nil
-		}
-
-		if network.UID != networkRef.UID {
-			log.V(1).Info("Network uid does not match", "Expected", networkRef.UID, "Actual", network.UID)
-			return nil
-		}
-
-		networkInterfaceList := &networkingv1alpha1.NetworkInterfaceList{}
-		networkInterfaceMachinePoolID := machinepoolletclient.NetworkNameAndHandle(network.Name, network.Spec.Handle)
-		if err := r.List(ctx, networkInterfaceList,
-			client.InNamespace(natGatewayRouting.Namespace),
-			client.MatchingFields{
-				machinepoolletclient.NetworkInterfaceNetworkNameAndHandle: networkInterfaceMachinePoolID,
-			},
-		); err != nil {
-			log.Error(err, "Error listing network interfaces")
-			return nil
-		}
-
-		var res []ctrl.Request
-		for _, networkInterface := range networkInterfaceList.Items {
-			if !destinationSet.Has(networkInterface.UID) {
-				continue
-			}
-			machineRef := networkInterface.Spec.MachineRef
-			if machineRef == nil {
-				continue
-			}
-
-			res = append(res, ctrl.Request{
-				NamespacedName: client.ObjectKey{
-					Namespace: natGatewayRouting.Namespace,
-					Name:      machineRef.Name,
-				},
-			})
-		}
-		return res
-	})
-}
-
 func (r *MachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	log := ctrl.Log.WithName("machinepoollet")
 	ctx := ctrl.LoggerInto(context.TODO(), log)
@@ -1054,18 +829,6 @@ func (r *MachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Watches(
 			&source.Kind{Type: &storagev1alpha1.Volume{}},
 			r.enqueueMachinesReferencingVolume(ctx, log),
-		).
-		Watches(
-			&source.Kind{Type: &networkingv1alpha1.AliasPrefixRouting{}},
-			r.enqueueMachinesReferencingAliasPrefixRouting(ctx, log),
-		).
-		Watches(
-			&source.Kind{Type: &networkingv1alpha1.LoadBalancerRouting{}},
-			r.enqueueMachinesReferencingLoadBalancerRouting(ctx, log),
-		).
-		Watches(
-			&source.Kind{Type: &networkingv1alpha1.NATGatewayRouting{}},
-			r.enqueueMachinesReferencingNATGatewayRouting(ctx, log),
 		).
 		Complete(r)
 }

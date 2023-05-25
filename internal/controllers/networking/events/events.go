@@ -24,6 +24,7 @@ const (
 	NetworkNotReady   = "NetworkNotReady"
 	IPsNotReady       = "IPsNotReady"
 	VirtualIPNotReady = "VirtualIPNotReady"
+	PrefixNotReady    = "PrefixNotReady"
 
 	FailedBindingNetworkInterface = "FailedBindingNetworkInterface"
 	FailedBindingMachine          = "FailedBindingMachine"

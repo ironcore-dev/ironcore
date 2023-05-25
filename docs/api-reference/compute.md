@@ -1363,9 +1363,6 @@ NetworkInterface to use.</p>
 <tbody><tr><td><p>&#34;Attached&#34;</p></td>
 <td><p>NetworkInterfaceStateAttached indicates that a network interface has been successfully attached.</p>
 </td>
-</tr><tr><td><p>&#34;Detached&#34;</p></td>
-<td><p>NetworkInterfaceStateDetached indicates that a network interface has been successfully detached.</p>
-</td>
 </tr><tr><td><p>&#34;Pending&#34;</p></td>
 <td><p>NetworkInterfaceStatePending indicates that the attachment of a network interface is pending.</p>
 </td>
@@ -1679,9 +1676,6 @@ Volume to use.</p>
 </thead>
 <tbody><tr><td><p>&#34;Attached&#34;</p></td>
 <td><p>VolumeStateAttached indicates that a volume has been successfully attached.</p>
-</td>
-</tr><tr><td><p>&#34;Detached&#34;</p></td>
-<td><p>VolumeStateDetached indicates that a volume has been successfully detached.</p>
 </td>
 </tr><tr><td><p>&#34;Pending&#34;</p></td>
 <td><p>VolumeStatePending indicates that the attachment of a volume is pending.</p>

@@ -76,7 +76,6 @@ var supportedIngressObjectSelectorKinds = sets.New[string](
 	"NetworkInterface",
 	"LoadBalancer",
 	"VirtualIP",
-	"AliasPrefix",
 )
 
 func validateNetworkPolicyIngressRule(rule *networking.NetworkPolicyIngressRule, fldPath *field.Path) field.ErrorList {
@@ -101,7 +100,6 @@ var supportedEgressObjectSelectorKinds = sets.New[string](
 	"NetworkInterface",
 	"LoadBalancer",
 	"VirtualIP",
-	"AliasPrefix",
 )
 
 func validateNetworkPolicyEgressRule(rule *networking.NetworkPolicyEgressRule, fldPath *field.Path) field.ErrorList {

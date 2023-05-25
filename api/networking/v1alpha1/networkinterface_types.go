@@ -30,9 +30,12 @@ type NetworkInterfaceSpec struct {
 	MachineRef *commonv1alpha1.LocalUIDReference `json:"machineRef,omitempty"`
 	// IPFamilies defines which IPFamilies this NetworkInterface is supporting
 	IPFamilies []corev1.IPFamily `json:"ipFamilies"`
-	// IPs is the list of provided IPs or EphemeralIPs which should be assigned to
-	// this NetworkInterface
+	// IPs is the list of provided IPs or ephemeral IPs which should be assigned to
+	// this NetworkInterface.
 	IPs []IPSource `json:"ips"`
+	// Prefixes is the list of provided prefixes or ephemeral prefixes which should be assigned to
+	// this NetworkInterface.
+	Prefixes []PrefixSource `json:"prefixes,omitempty"`
 	// VirtualIP specifies the virtual ip that should be assigned to this NetworkInterface.
 	VirtualIP *VirtualIPSource `json:"virtualIP,omitempty"`
 }
@@ -42,6 +45,13 @@ type IPSource struct {
 	// Value specifies an IP by using an IP literal.
 	Value *commonv1alpha1.IP `json:"value,omitempty"`
 	// Ephemeral specifies an IP by creating an ephemeral Prefix to allocate the IP with.
+	Ephemeral *EphemeralPrefixSource `json:"ephemeral,omitempty"`
+}
+
+type PrefixSource struct {
+	// Value specifies a static prefix to use.
+	Value *commonv1alpha1.IPPrefix `json:"value,omitempty"`
+	// Ephemeral specifies a prefix by creating an ephemeral ipam.Prefix to allocate the prefix with.
 	Ephemeral *EphemeralPrefixSource `json:"ephemeral,omitempty"`
 }
 
@@ -63,8 +73,12 @@ type NetworkInterfaceStatus struct {
 
 	// NetworkHandle is the handle of the network the network interface is part of.
 	NetworkHandle string `json:"networkHandle,omitempty"`
-	// IPs represent the effective IP addresses of the NetworkInterface
+	// ProviderID is the provider-internal ID of the network interface.
+	ProviderID string `json:"providerID,omitempty"`
+	// IPs represent the effective IP addresses of the NetworkInterface.
 	IPs []commonv1alpha1.IP `json:"ips,omitempty"`
+	// Prefixes represent the prefixes routed to the NetworkInterface.
+	Prefixes []commonv1alpha1.IPPrefix `json:"prefixes,omitempty"`
 	// VirtualIP is any virtual ip assigned to the NetworkInterface.
 	VirtualIP *commonv1alpha1.IP `json:"virtualIP,omitempty"`
 

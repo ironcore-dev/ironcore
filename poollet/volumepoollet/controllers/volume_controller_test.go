@@ -21,7 +21,6 @@ import (
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
 	onmetalapiclient "github.com/onmetal/onmetal-api/utils/client"
-	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -39,10 +38,9 @@ const (
 )
 
 var _ = Describe("VolumeController", func() {
-	ctx := SetupContext()
-	ns, vp, vc, expandableVc, srv := SetupTest(ctx)
+	ns, vp, vc, expandableVc, srv := SetupTest()
 
-	It("should create a basic volume", func() {
+	It("should create a basic volume", func(ctx SpecContext) {
 		size := resource.MustParse("10Mi")
 		volumeMonitors := "test-monotors"
 		volumeImage := "test-image"
@@ -115,7 +113,7 @@ var _ = Describe("VolumeController", func() {
 
 	})
 
-	It("should create a volume with encryption secret", func() {
+	It("should create a volume with encryption secret", func(ctx SpecContext) {
 		size := resource.MustParse("99Mi")
 
 		encryptionDataKey := "encryptionKey"
@@ -166,7 +164,7 @@ var _ = Describe("VolumeController", func() {
 
 	})
 
-	It("should expand a volume", func() {
+	It("should expand a volume", func(ctx SpecContext) {
 		size := resource.MustParse("100Mi")
 		newSize := resource.MustParse("200Mi")
 

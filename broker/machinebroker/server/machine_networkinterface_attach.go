@@ -18,58 +18,140 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/go-logr/logr"
+	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	"github.com/onmetal/onmetal-api/broker/common/cleaner"
+	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
+	"github.com/onmetal/onmetal-api/broker/machinebroker/apiutils"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	"golang.org/x/exp/slices"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	grpcstatus "google.golang.org/grpc/status"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func (s *Server) addOnmetalNetworkInterfaceAttachment(ctx context.Context, onmetalMachine *computev1alpha1.Machine, networkInterface computev1alpha1.NetworkInterface) error {
-	baseOnmetalMachine := onmetalMachine.DeepCopy()
-	onmetalMachine.Spec.NetworkInterfaces = append(onmetalMachine.Spec.NetworkInterfaces, networkInterface)
-	if err := s.cluster.Client().Patch(ctx, onmetalMachine, client.StrategicMergeFrom(baseOnmetalMachine)); err != nil {
+type OnmetalNetworkInterfaceConfig struct {
+	Name      string
+	NetworkID string
+	IPs       []commonv1alpha1.IP
+}
+
+func (s *Server) getOnmetalNetworkInterfaceConfig(nic *ori.NetworkInterface) (*OnmetalNetworkInterfaceConfig, error) {
+	ips, err := s.parseIPs(nic.Ips)
+	if err != nil {
+		return nil, err
+	}
+
+	return &OnmetalNetworkInterfaceConfig{
+		Name:      nic.Name,
+		NetworkID: nic.NetworkId,
+		IPs:       ips,
+	}, nil
+}
+
+func (s *Server) createOnmetalNetworkInterface(
+	ctx context.Context,
+	log logr.Logger,
+	c *cleaner.Cleaner,
+	optOnmetalMachine client.Object,
+	cfg *OnmetalNetworkInterfaceConfig,
+) (onmetalMachineNic *computev1alpha1.NetworkInterface, aggOnmetalNic *AggregateOnmetalNetworkInterface, retErr error) {
+	log.V(1).Info("Getting network for handle")
+	onmetalNetwork, err := s.networks.GetNetwork(ctx, cfg.NetworkID)
+	if err != nil {
+		return nil, nil, fmt.Errorf("error getting network: %w", err)
+	}
+
+	onmetalNic := &networkingv1alpha1.NetworkInterface{
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: s.cluster.Namespace(),
+			Name:      s.cluster.IDGen().Generate(),
+			Annotations: map[string]string{
+				commonv1alpha1.ManagedByAnnotation: machinebrokerv1alpha1.MachineBrokerManager,
+			},
+			Labels: map[string]string{
+				machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
+			},
+			OwnerReferences: s.optionalOwnerReferences(onmetalMachineGVK, optOnmetalMachine),
+		},
+		Spec: networkingv1alpha1.NetworkInterfaceSpec{
+			NetworkRef: corev1.LocalObjectReference{Name: onmetalNetwork.Name},
+			MachineRef: s.optionalLocalUIDReference(optOnmetalMachine),
+			IPFamilies: s.getOnmetalIPsIPFamilies(cfg.IPs),
+			IPs:        s.onmetalIPsToOnmetalIPSources(cfg.IPs),
+		},
+	}
+	log.V(1).Info("Creating onmetal network interface")
+	if err := s.cluster.Client().Create(ctx, onmetalNic); err != nil {
+		return nil, nil, fmt.Errorf("error creating onmetal network interface: %w", err)
+	}
+	c.Add(cleaner.CleanupObject(s.cluster.Client(), onmetalNic))
+
+	log.V(1).Info("Patching onmetal network to be owned by onmetal network interface")
+	if err := apiutils.PatchOwnedBy(ctx, s.cluster.Client(), onmetalNic, onmetalNetwork); err != nil {
+		return nil, nil, fmt.Errorf("error patching network to be owned by network interface: %w", err)
+	}
+
+	return &computev1alpha1.NetworkInterface{
+			Name: cfg.Name,
+			NetworkInterfaceSource: computev1alpha1.NetworkInterfaceSource{
+				NetworkInterfaceRef: &corev1.LocalObjectReference{Name: onmetalNic.Name},
+			},
+		}, &AggregateOnmetalNetworkInterface{
+			Network:          onmetalNetwork,
+			NetworkInterface: onmetalNic,
+		}, nil
+}
+
+func (s *Server) attachOnmetalNetworkInterface(
+	ctx context.Context,
+	log logr.Logger,
+	onmetalMachine *computev1alpha1.Machine,
+	onmetalMachineNic *computev1alpha1.NetworkInterface,
+) error {
+	baseMachine := onmetalMachine.DeepCopy()
+	onmetalMachine.Spec.NetworkInterfaces = append(onmetalMachine.Spec.NetworkInterfaces, *onmetalMachineNic)
+	if err := s.cluster.Client().Patch(ctx, onmetalMachine, client.StrategicMergeFrom(baseMachine)); err != nil {
 		return fmt.Errorf("error patching onmetal machine network interfaces: %w", err)
 	}
 	return nil
 }
 
-func (s *Server) CreateNetworkInterfaceAttachment(ctx context.Context, req *ori.CreateNetworkInterfaceAttachmentRequest) (*ori.CreateNetworkInterfaceAttachmentResponse, error) {
+func (s *Server) AttachNetworkInterface(ctx context.Context, req *ori.AttachNetworkInterfaceRequest) (res *ori.AttachNetworkInterfaceResponse, retErr error) {
 	machineID := req.MachineId
 	networkInterfaceName := req.NetworkInterface.Name
 	log := s.loggerFrom(ctx, "MachineID", machineID, "NetworkInterfaceName", networkInterfaceName)
 
-	log.V(1).Info("Getting aggregated onmetal machine")
-	aggOnmetalMachine, err := s.getAggregateOnmetalMachine(ctx, machineID)
+	log.V(1).Info("Getting aggregate onmetal machine")
+	onmetalMachine, err := s.getOnmetalMachine(ctx, req.MachineId)
 	if err != nil {
 		return nil, err
 	}
 
-	machine, err := s.convertAggregateOnmetalMachine(aggOnmetalMachine)
-	if err != nil {
-		return nil, err
-	}
-
-	idx := slices.IndexFunc(
-		machine.Spec.NetworkInterfaces,
-		func(networkInterface *ori.NetworkInterfaceAttachment) bool {
-			return networkInterface.Name == networkInterfaceName
-		},
-	)
+	idx := onmetalMachineNetworkInterfaceIndex(onmetalMachine, networkInterfaceName)
 	if idx >= 0 {
-		return nil, status.Errorf(codes.AlreadyExists, "machine %s already attaches network interface %s", machineID, networkInterfaceName)
+		return nil, grpcstatus.Errorf(codes.AlreadyExists, "machine %s network interface %s already exists", req.MachineId, req.NetworkInterface.Name)
 	}
 
-	onmetalNetworkInterfaceAttachment, err := s.prepareOnmetalNetworkInterfaceAttachment(req.NetworkInterface)
+	cfg, err := s.getOnmetalNetworkInterfaceConfig(req.NetworkInterface)
+	if err != nil {
+		return nil, fmt.Errorf("error getting onmetal network interface config: %w", err)
+	}
+
+	c, cleanup := s.setupCleaner(ctx, log, &retErr)
+	defer cleanup()
+
+	onmetalMachineNic, _, err := s.createOnmetalNetworkInterface(ctx, log, c, onmetalMachine, cfg)
 	if err != nil {
 		return nil, err
 	}
 
-	log.V(1).Info("Adding onmetal machine network interface")
-	if err := s.addOnmetalNetworkInterfaceAttachment(ctx, aggOnmetalMachine.Machine, onmetalNetworkInterfaceAttachment); err != nil {
-		return nil, fmt.Errorf("error adding onmetal machine network interface: %w", err)
+	if err := s.attachOnmetalNetworkInterface(ctx, log, onmetalMachine, onmetalMachineNic); err != nil {
+		return nil, fmt.Errorf("error creating onmetal network interface: %w", err)
 	}
 
-	return &ori.CreateNetworkInterfaceAttachmentResponse{}, nil
+	return &ori.AttachNetworkInterfaceResponse{}, nil
 }

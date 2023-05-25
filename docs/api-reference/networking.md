@@ -10,10 +10,6 @@
 </div>
 Resource Types:
 <ul><li>
-<a href="#networking.api.onmetal.de/v1alpha1.AliasPrefix">AliasPrefix</a>
-</li><li>
-<a href="#networking.api.onmetal.de/v1alpha1.AliasPrefixRouting">AliasPrefixRouting</a>
-</li><li>
 <a href="#networking.api.onmetal.de/v1alpha1.LoadBalancer">LoadBalancer</a>
 </li><li>
 <a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerRouting">LoadBalancerRouting</a>
@@ -30,193 +26,6 @@ Resource Types:
 </li><li>
 <a href="#networking.api.onmetal.de/v1alpha1.VirtualIP">VirtualIP</a>
 </li></ul>
-<h3 id="networking.api.onmetal.de/v1alpha1.AliasPrefix">AliasPrefix
-</h3>
-<div>
-<p>AliasPrefix is the Schema for the AliasPrefix API</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>apiVersion</code><br/>
-string</td>
-<td>
-<code>
-networking.api.onmetal.de/v1alpha1
-</code>
-</td>
-</tr>
-<tr>
-<td>
-<code>kind</code><br/>
-string
-</td>
-<td><code>AliasPrefix</code></td>
-</tr>
-<tr>
-<td>
-<code>metadata</code><br/>
-<em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#objectmeta-v1-meta">
-Kubernetes meta/v1.ObjectMeta
-</a>
-</em>
-</td>
-<td>
-Refer to the Kubernetes API documentation for the fields of the
-<code>metadata</code> field.
-</td>
-</tr>
-<tr>
-<td>
-<code>spec</code><br/>
-<em>
-<a href="#networking.api.onmetal.de/v1alpha1.AliasPrefixSpec">
-AliasPrefixSpec
-</a>
-</em>
-</td>
-<td>
-<br/>
-<br/>
-<table>
-<tr>
-<td>
-<code>networkRef</code><br/>
-<em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>NetworkRef is the Network this AliasPrefix should belong to</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>networkInterfaceSelector</code><br/>
-<em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#labelselector-v1-meta">
-Kubernetes meta/v1.LabelSelector
-</a>
-</em>
-</td>
-<td>
-<p>NetworkInterfaceSelector defines the NetworkInterfaces
-for which this AliasPrefix should be applied</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>prefix</code><br/>
-<em>
-<a href="#networking.api.onmetal.de/v1alpha1.PrefixSource">
-PrefixSource
-</a>
-</em>
-</td>
-<td>
-<p>Prefix is the provided Prefix or Ephemeral which
-should be used by this AliasPrefix</p>
-</td>
-</tr>
-</table>
-</td>
-</tr>
-<tr>
-<td>
-<code>status</code><br/>
-<em>
-<a href="#networking.api.onmetal.de/v1alpha1.AliasPrefixStatus">
-AliasPrefixStatus
-</a>
-</em>
-</td>
-<td>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="networking.api.onmetal.de/v1alpha1.AliasPrefixRouting">AliasPrefixRouting
-</h3>
-<div>
-<p>AliasPrefixRouting is the Schema for the aliasprefixrouting API</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>apiVersion</code><br/>
-string</td>
-<td>
-<code>
-networking.api.onmetal.de/v1alpha1
-</code>
-</td>
-</tr>
-<tr>
-<td>
-<code>kind</code><br/>
-string
-</td>
-<td><code>AliasPrefixRouting</code></td>
-</tr>
-<tr>
-<td>
-<code>metadata</code><br/>
-<em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#objectmeta-v1-meta">
-Kubernetes meta/v1.ObjectMeta
-</a>
-</em>
-</td>
-<td>
-Refer to the Kubernetes API documentation for the fields of the
-<code>metadata</code> field.
-</td>
-</tr>
-<tr>
-<td>
-<code>networkRef</code><br/>
-<em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
-</a>
-</em>
-</td>
-<td>
-<p>NetworkRef is the network the load balancer is assigned to.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>destinations</code><br/>
-<em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
-</a>
-</em>
-</td>
-<td>
-<p>Destinations are the destinations for an AliasPrefix.</p>
-</td>
-</tr>
-</tbody>
-</table>
 <h3 id="networking.api.onmetal.de/v1alpha1.LoadBalancer">LoadBalancer
 </h3>
 <div>
@@ -373,7 +182,7 @@ LoadBalancerStatus
 <h3 id="networking.api.onmetal.de/v1alpha1.LoadBalancerRouting">LoadBalancerRouting
 </h3>
 <div>
-<p>LoadBalancerRouting is the Schema for the aliasprefixrouting API</p>
+<p>LoadBalancerRouting is the Schema for the loadbalancerroutings API</p>
 </div>
 <table>
 <thead>
@@ -598,7 +407,7 @@ NATGatewayStatus
 <h3 id="networking.api.onmetal.de/v1alpha1.NATGatewayRouting">NATGatewayRouting
 </h3>
 <div>
-<p>NATGatewayRouting is the Schema for the aliasprefixrouting API</p>
+<p>NATGatewayRouting is the Schema for the natgatewayroutings API</p>
 </div>
 <table>
 <thead>
@@ -872,8 +681,22 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </em>
 </td>
 <td>
-<p>IPs is the list of provided IPs or EphemeralIPs which should be assigned to
-this NetworkInterface</p>
+<p>IPs is the list of provided IPs or ephemeral IPs which should be assigned to
+this NetworkInterface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>prefixes</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.PrefixSource">
+[]PrefixSource
+</a>
+</em>
+</td>
+<td>
+<p>Prefixes is the list of provided prefixes or ephemeral prefixes which should be assigned to
+this NetworkInterface.</p>
 </td>
 </tr>
 <tr>
@@ -1154,96 +977,6 @@ VirtualIPStatus
 </em>
 </td>
 <td>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="networking.api.onmetal.de/v1alpha1.AliasPrefixSpec">AliasPrefixSpec
-</h3>
-<p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.AliasPrefix">AliasPrefix</a>)
-</p>
-<div>
-<p>AliasPrefixSpec defines the desired state of AliasPrefix</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>networkRef</code><br/>
-<em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>NetworkRef is the Network this AliasPrefix should belong to</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>networkInterfaceSelector</code><br/>
-<em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#labelselector-v1-meta">
-Kubernetes meta/v1.LabelSelector
-</a>
-</em>
-</td>
-<td>
-<p>NetworkInterfaceSelector defines the NetworkInterfaces
-for which this AliasPrefix should be applied</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>prefix</code><br/>
-<em>
-<a href="#networking.api.onmetal.de/v1alpha1.PrefixSource">
-PrefixSource
-</a>
-</em>
-</td>
-<td>
-<p>Prefix is the provided Prefix or Ephemeral which
-should be used by this AliasPrefix</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="networking.api.onmetal.de/v1alpha1.AliasPrefixStatus">AliasPrefixStatus
-</h3>
-<p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.AliasPrefix">AliasPrefix</a>)
-</p>
-<div>
-<p>AliasPrefixStatus defines the observed state of AliasPrefix</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>prefix</code><br/>
-<em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
-</a>
-</em>
-</td>
-<td>
-<p>Prefix is the Prefix reserved by this AliasPrefix</p>
 </td>
 </tr>
 </tbody>
@@ -2029,8 +1762,22 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </em>
 </td>
 <td>
-<p>IPs is the list of provided IPs or EphemeralIPs which should be assigned to
-this NetworkInterface</p>
+<p>IPs is the list of provided IPs or ephemeral IPs which should be assigned to
+this NetworkInterface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>prefixes</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.PrefixSource">
+[]PrefixSource
+</a>
+</em>
+</td>
+<td>
+<p>Prefixes is the list of provided prefixes or ephemeral prefixes which should be assigned to
+this NetworkInterface.</p>
 </td>
 </tr>
 <tr>
@@ -2129,6 +1876,17 @@ string
 </tr>
 <tr>
 <td>
+<code>providerID</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>ProviderID is the provider-internal ID of the network interface.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>ips</code><br/>
 <em>
 <a href="../common/#common.api.onmetal.de/v1alpha1.IP">
@@ -2137,7 +1895,20 @@ string
 </em>
 </td>
 <td>
-<p>IPs represent the effective IP addresses of the NetworkInterface</p>
+<p>IPs represent the effective IP addresses of the NetworkInterface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>prefixes</code><br/>
+<em>
+<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
+[]github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
+</a>
+</em>
+</td>
+<td>
+<p>Prefixes represent the prefixes routed to the NetworkInterface.</p>
 </td>
 </tr>
 <tr>
@@ -2283,8 +2054,22 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </em>
 </td>
 <td>
-<p>IPs is the list of provided IPs or EphemeralIPs which should be assigned to
-this NetworkInterface</p>
+<p>IPs is the list of provided IPs or ephemeral IPs which should be assigned to
+this NetworkInterface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>prefixes</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.PrefixSource">
+[]PrefixSource
+</a>
+</em>
+</td>
+<td>
+<p>Prefixes is the list of provided prefixes or ephemeral prefixes which should be assigned to
+this NetworkInterface.</p>
 </td>
 </tr>
 <tr>
@@ -2989,10 +2774,9 @@ NetworkState
 <h3 id="networking.api.onmetal.de/v1alpha1.PrefixSource">PrefixSource
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.AliasPrefixSpec">AliasPrefixSpec</a>)
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceSpec">NetworkInterfaceSpec</a>)
 </p>
 <div>
-<p>PrefixSource is the source of the Prefix definition in an AliasPrefix</p>
 </div>
 <table>
 <thead>
@@ -3012,7 +2796,7 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
 </em>
 </td>
 <td>
-<p>Value is a single IPPrefix value as defined in the AliasPrefix</p>
+<p>Value specifies a static prefix to use.</p>
 </td>
 </tr>
 <tr>
@@ -3025,7 +2809,7 @@ EphemeralPrefixSource
 </em>
 </td>
 <td>
-<p>Ephemeral defines the Prefix which should be allocated by the AliasPrefix</p>
+<p>Ephemeral specifies a prefix by creating an ephemeral ipam.Prefix to allocate the prefix with.</p>
 </td>
 </tr>
 </tbody>

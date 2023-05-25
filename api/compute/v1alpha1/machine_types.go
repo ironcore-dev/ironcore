@@ -165,8 +165,6 @@ const (
 	NetworkInterfaceStatePending NetworkInterfaceState = "Pending"
 	// NetworkInterfaceStateAttached indicates that a network interface has been successfully attached.
 	NetworkInterfaceStateAttached NetworkInterfaceState = "Attached"
-	// NetworkInterfaceStateDetached indicates that a network interface has been successfully detached.
-	NetworkInterfaceStateDetached NetworkInterfaceState = "Detached"
 )
 
 // NetworkInterfacePhase represents the binding phase a NetworkInterface can be in.
@@ -203,8 +201,6 @@ const (
 	VolumeStatePending VolumeState = "Pending"
 	// VolumeStateAttached indicates that a volume has been successfully attached.
 	VolumeStateAttached VolumeState = "Attached"
-	// VolumeStateDetached indicates that a volume has been successfully detached.
-	VolumeStateDetached VolumeState = "Detached"
 )
 
 // VolumePhase represents the binding phase a Volume can be in.

@@ -133,7 +133,7 @@ var _ = BeforeSuite(func() {
 	DeferCleanup(ctrlMgr.Stop)
 })
 
-func SetupTest(ctx context.Context) (*corev1.Namespace, *storagev1alpha1.VolumePool, *storagev1alpha1.VolumeClass, *storagev1alpha1.VolumeClass, *volume.FakeRuntimeService) {
+func SetupTest() (*corev1.Namespace, *storagev1alpha1.VolumePool, *storagev1alpha1.VolumeClass, *storagev1alpha1.VolumeClass, *volume.FakeRuntimeService) {
 	var (
 		ns           = &corev1.Namespace{}
 		vp           = &storagev1alpha1.VolumePool{}
@@ -142,14 +142,14 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *storagev1alpha1.VolumeP
 		srv          = &volume.FakeRuntimeService{}
 	)
 
-	BeforeEach(func() {
+	BeforeEach(func(ctx SpecContext) {
 		*ns = corev1.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "test-ns-",
 			},
 		}
 		Expect(k8sClient.Create(ctx, ns)).To(Succeed(), "failed to create test namespace")
-		DeferCleanup(k8sClient.Delete, ctx, ns)
+		DeferCleanup(k8sClient.Delete, ns)
 
 		*vp = storagev1alpha1.VolumePool{
 			ObjectMeta: metav1.ObjectMeta{
@@ -157,7 +157,7 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *storagev1alpha1.VolumeP
 			},
 		}
 		Expect(k8sClient.Create(ctx, vp)).To(Succeed(), "failed to create test volume pool")
-		DeferCleanup(k8sClient.Delete, ctx, vp)
+		DeferCleanup(k8sClient.Delete, vp)
 
 		*vc = storagev1alpha1.VolumeClass{
 			ObjectMeta: metav1.ObjectMeta{
@@ -169,7 +169,7 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *storagev1alpha1.VolumeP
 			},
 		}
 		Expect(k8sClient.Create(ctx, vc)).To(Succeed(), "failed to create test volume class")
-		DeferCleanup(k8sClient.Delete, ctx, vc)
+		DeferCleanup(k8sClient.Delete, vc)
 
 		*expandableVc = storagev1alpha1.VolumeClass{
 			ObjectMeta: metav1.ObjectMeta{
@@ -182,7 +182,7 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *storagev1alpha1.VolumeP
 			},
 		}
 		Expect(k8sClient.Create(ctx, expandableVc)).To(Succeed(), "failed to create test volume class")
-		DeferCleanup(k8sClient.Delete, ctx, expandableVc)
+		DeferCleanup(k8sClient.Delete, expandableVc)
 
 		*srv = *volume.NewFakeRuntimeService()
 		srv.SetVolumeClasses([]*volume.FakeVolumeClass{
@@ -204,10 +204,12 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *storagev1alpha1.VolumeP
 		})
 		Expect(err).ToNot(HaveOccurred())
 
-		volumeClassMapper := vcm.NewGeneric(srv, vcm.GenericOptions{})
+		volumeClassMapper := vcm.NewGeneric(srv, vcm.GenericOptions{
+			RelistPeriod: 2 * time.Second,
+		})
 		Expect(k8sManager.Add(volumeClassMapper)).To(Succeed())
 
-		mgrCtx, cancel := context.WithCancel(ctx)
+		mgrCtx, cancel := context.WithCancel(context.Background())
 		DeferCleanup(cancel)
 
 		Expect((&controllers.VolumeReconciler{
@@ -217,6 +219,19 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *storagev1alpha1.VolumeP
 			VolumeRuntime:     srv,
 			VolumeClassMapper: volumeClassMapper,
 			VolumePoolName:    vp.Name,
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
+		Expect((&controllers.VolumePoolReconciler{
+			Client:            k8sManager.GetClient(),
+			VolumeRuntime:     srv,
+			VolumeClassMapper: volumeClassMapper,
+			VolumePoolName:    TestVolumePool,
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
+		Expect((&controllers.VolumePoolAnnotatorReconciler{
+			Client:            k8sManager.GetClient(),
+			VolumeClassMapper: volumeClassMapper,
+			VolumePoolName:    TestVolumePool,
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		go func() {
