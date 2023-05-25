@@ -14,6 +14,8 @@
 
 package v1alpha1
 
+import corev1 "k8s.io/api/core/v1"
+
 const (
 	VolumeVolumePoolRefNameField  = "spec.volumePoolRef.name"
 	VolumeVolumeClassRefNameField = "spec.volumeClassRef.name"
@@ -32,6 +34,8 @@ const (
 
 	// BucketPoolUserNamePrefix is the prefix all bucket pool users should have.
 	BucketPoolUserNamePrefix = "storage.api.onmetal.de:system:bucketpool:"
+
+	SecretTypeVolumeAuth = corev1.SecretType("storage.api.onmetal.de/volume-auth")
 )
 
 // VolumePoolCommonName constructs the common name for a certificate of a volume pool user.

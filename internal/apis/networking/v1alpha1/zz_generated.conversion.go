@@ -1147,6 +1147,7 @@ func autoConvert_v1alpha1_NetworkInterfaceStatus_To_networking_NetworkInterfaceS
 	out.State = networking.NetworkInterfaceState(in.State)
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
 	out.NetworkHandle = in.NetworkHandle
+	out.ProviderID = in.ProviderID
 	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
 	out.Prefixes = *(*[]commonv1alpha1.IPPrefix)(unsafe.Pointer(&in.Prefixes))
 	out.VirtualIP = (*commonv1alpha1.IP)(unsafe.Pointer(in.VirtualIP))
@@ -1165,6 +1166,7 @@ func autoConvert_networking_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceS
 	out.State = v1alpha1.NetworkInterfaceState(in.State)
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
 	out.NetworkHandle = in.NetworkHandle
+	out.ProviderID = in.ProviderID
 	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
 	out.Prefixes = *(*[]commonv1alpha1.IPPrefix)(unsafe.Pointer(&in.Prefixes))
 	out.VirtualIP = (*commonv1alpha1.IP)(unsafe.Pointer(in.VirtualIP))

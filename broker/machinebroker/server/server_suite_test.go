@@ -140,6 +140,12 @@ func SetupTest() (*corev1.Namespace, *server.Server) {
 			},
 		})
 		Expect(err).NotTo(HaveOccurred())
+		srvCtx, cancel := context.WithCancel(context.Background())
+		DeferCleanup(cancel)
+		go func() {
+			defer GinkgoRecover()
+			Expect(newSrv.Start(srvCtx)).To(Succeed())
+		}()
 		*srv = *newSrv
 	})
 

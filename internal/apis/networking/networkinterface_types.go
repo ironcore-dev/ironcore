@@ -50,9 +50,9 @@ type IPSource struct {
 
 type PrefixSource struct {
 	// Value specifies a static prefix to use.
-	Value *commonv1alpha1.IPPrefix `json:"value,omitempty"`
+	Value *commonv1alpha1.IPPrefix
 	// Ephemeral specifies a prefix by creating an ephemeral ipam.Prefix to allocate the prefix with.
-	Ephemeral *EphemeralPrefixSource `json:"ephemeral,omitempty"`
+	Ephemeral *EphemeralPrefixSource
 }
 
 // VirtualIPSource is the definition of how to obtain a VirtualIP.
@@ -73,6 +73,8 @@ type NetworkInterfaceStatus struct {
 
 	// NetworkHandle is the handle of the network the network interface is part of.
 	NetworkHandle string
+	// ProviderID is the provider-internal ID of the network interface.
+	ProviderID string
 	// IPs represent the effective IP addresses of the NetworkInterface
 	IPs []commonv1alpha1.IP
 	// Prefixes represent the prefixes routed to the NetworkInterface.

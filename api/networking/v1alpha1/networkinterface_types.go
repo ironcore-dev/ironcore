@@ -73,6 +73,8 @@ type NetworkInterfaceStatus struct {
 
 	// NetworkHandle is the handle of the network the network interface is part of.
 	NetworkHandle string `json:"networkHandle,omitempty"`
+	// ProviderID is the provider-internal ID of the network interface.
+	ProviderID string `json:"providerID,omitempty"`
 	// IPs represent the effective IP addresses of the NetworkInterface.
 	IPs []commonv1alpha1.IP `json:"ips,omitempty"`
 	// Prefixes represent the prefixes routed to the NetworkInterface.

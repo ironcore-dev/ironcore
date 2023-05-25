@@ -17,153 +17,224 @@ package networks
 import (
 	"context"
 	"fmt"
+	"hash/fnv"
+	"sync"
 
+	"github.com/go-logr/logr"
+	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	"github.com/onmetal/onmetal-api/broker/common/cleaner"
-	commonsync "github.com/onmetal/onmetal-api/broker/common/sync"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
-	"github.com/onmetal/onmetal-api/broker/machinebroker/apiutils"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/cluster"
-	"github.com/onmetal/onmetal-api/broker/machinebroker/transaction"
-	"github.com/onmetal/onmetal-api/utils/annotations"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/rand"
+	"k8s.io/client-go/util/workqueue"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-type Networks struct {
-	mu commonsync.MutexMap[string]
+type Manager struct {
+	started   bool
+	startedMu sync.Mutex
 
 	cluster cluster.Cluster
+
+	queue workqueue.RateLimitingInterface
+
+	waitersByHandleMu sync.Mutex
+	waitersByHandle   map[string]*waiter
 }
 
-func New(cluster cluster.Cluster) *Networks {
-	return &Networks{
-		mu:      *commonsync.NewMutexMap[string](),
-		cluster: cluster,
+func NewManager(cluster cluster.Cluster) *Manager {
+	return &Manager{
+		cluster:         cluster,
+		queue:           workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter()),
+		waitersByHandle: make(map[string]*waiter),
 	}
 }
 
-func (m *Networks) filterNetworks(networks []networkingv1alpha1.Network) []networkingv1alpha1.Network {
-	var filtered []networkingv1alpha1.Network
-	for _, network := range networks {
+type waiter struct {
+	network *networkingv1alpha1.Network
+	error   error
+	done    chan struct{}
+}
+
+func (e *Manager) getNetworkForHandle(ctx context.Context, handle string) (*networkingv1alpha1.Network, error) {
+	networkList := &networkingv1alpha1.NetworkList{}
+	if err := e.cluster.Client().List(ctx, networkList,
+		client.InNamespace(e.cluster.Namespace()),
+		client.MatchingLabels{machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager},
+	); err != nil {
+		return nil, fmt.Errorf("error listing networks: %w", err)
+	}
+
+	var matching *networkingv1alpha1.Network
+	for i := range networkList.Items {
+		network := &networkList.Items[i]
+		if network.Spec.Handle != handle {
+			// Ignore if the handle doesn't match.
+			continue
+		}
 		if !network.DeletionTimestamp.IsZero() {
+			// Ignore if the network is already deleting.
 			continue
 		}
 
-		filtered = append(filtered, network)
+		if matching == nil || network.CreationTimestamp.Before(&matching.CreationTimestamp) {
+			matching = network
+		}
 	}
-	return filtered
+	return matching, nil
 }
 
-func (m *Networks) getNetworkByHandle(ctx context.Context, handle string) (*networkingv1alpha1.Network, bool, error) {
-	networkList := &networkingv1alpha1.NetworkList{}
-	if err := m.cluster.Client().List(ctx, networkList,
-		client.InNamespace(m.cluster.Namespace()),
-		client.MatchingLabels{
-			machinebrokerv1alpha1.ManagerLabel:       machinebrokerv1alpha1.MachineBrokerManager,
-			machinebrokerv1alpha1.CreatedLabel:       "true",
-			machinebrokerv1alpha1.NetworkHandleLabel: handle,
-		},
-	); err != nil {
-		return nil, false, fmt.Errorf("error listing networks by handle: %w", err)
-	}
-
-	networks := m.filterNetworks(networkList.Items)
-
-	switch len(networks) {
-	case 0:
-		return nil, false, nil
-	case 1:
-		network := networks[0]
-		return &network, true, nil
-	default:
-		return nil, false, fmt.Errorf("multiple networks found for handle %s", handle)
-	}
+func (e *Manager) handleHash(handle string) string {
+	h := fnv.New32a()
+	_, _ = h.Write([]byte(handle))
+	return rand.SafeEncodeString(fmt.Sprint(h.Sum32()))
 }
 
-func (m *Networks) createNetwork(ctx context.Context, handle string) (res *networkingv1alpha1.Network, retErr error) {
-	c := cleaner.New()
-	defer cleaner.CleanupOnError(ctx, c, &retErr)
+func (e *Manager) getOrCreateNetworkForHandle(ctx context.Context, log logr.Logger, handle string) (*networkingv1alpha1.Network, error) {
+	network, err := e.getNetworkForHandle(ctx, handle)
+	if err != nil {
+		return nil, fmt.Errorf("error getting network for handle: %w", err)
+	}
+	if network != nil {
+		log.V(1).Info("Found existing network for handle", "Name", network.Name)
+		return network, nil
+	}
 
-	network := &networkingv1alpha1.Network{
+	log.V(1).Info("No network found for handle, creating a new one")
+	network = &networkingv1alpha1.Network{
 		ObjectMeta: metav1.ObjectMeta{
-			Namespace: m.cluster.Namespace(),
-			Name:      m.cluster.IDGen().Generate(),
+			Namespace: e.cluster.Namespace(),
+			// TODO: Make this evaluator use a cache and include a collision count in the handle hash, use
+			// name instead of generateName. This makes it possible to handle fast resyncs similar to
+			// Kubernetes' deployment controller.
+			GenerateName: fmt.Sprintf("net-%s-", e.handleHash(handle)),
+			Annotations: map[string]string{
+				commonv1alpha1.ManagedByAnnotation: machinebrokerv1alpha1.MachineBrokerManager,
+			},
+			Labels: map[string]string{
+				machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
+			},
 		},
 		Spec: networkingv1alpha1.NetworkSpec{
 			Handle: handle,
 		},
 	}
-	annotations.SetExternallyMangedBy(network, machinebrokerv1alpha1.MachineBrokerManager)
-	apiutils.SetManagerLabel(network, machinebrokerv1alpha1.MachineBrokerManager)
-	apiutils.SetNetworkHandleLabel(network, handle)
-
-	if err := m.cluster.Client().Create(ctx, network); err != nil {
+	if err := e.cluster.Client().Create(ctx, network); err != nil {
 		return nil, fmt.Errorf("error creating network: %w", err)
 	}
-	c.Add(cleaner.DeleteObjectIfExistsFunc(m.cluster.Client(), network))
-
-	base := network.DeepCopy()
-	network.Status.State = networkingv1alpha1.NetworkStateAvailable
-	if err := m.cluster.Client().Status().Patch(ctx, network, client.MergeFrom(base)); err != nil {
-		return nil, fmt.Errorf("error setting network to available: %w", err)
-	}
-
 	return network, nil
 }
 
-func (m *Networks) BeginCreate(ctx context.Context, handle string) (*networkingv1alpha1.Network, transaction.Transaction[client.Object], error) {
-	log := ctrl.LoggerFrom(ctx)
-
-	var network *networkingv1alpha1.Network
-	t, err := transaction.Build(func(cb transaction.Callback[client.Object]) error {
-		m.mu.Lock(handle)
-		defer m.mu.Unlock(handle)
-
-		c := cleaner.New()
-
-		n, ok, err := m.getNetworkByHandle(ctx, handle)
-		if err != nil {
-			return fmt.Errorf("error getting network by handle %s: %w", handle, err)
-		}
-		if !ok {
-			newNetwork, err := m.createNetwork(ctx, handle)
-			if err != nil {
-				return fmt.Errorf("error creating network: %w", err)
-			}
-
-			c.Add(cleaner.DeleteObjectIfExistsFunc(m.cluster.Client(), newNetwork))
-			n = newNetwork
-		}
-		network = n
-
-		obj, rollback := cb()
-		if rollback {
-			return c.Cleanup(ctx)
-		}
-		if err := apiutils.PatchCreatedWithDependent(ctx, m.cluster.Client(), network, obj.GetName()); err != nil {
-			if err := c.Cleanup(ctx); err != nil {
-				log.Error(err, "Error cleaning up")
-			}
-			return err
-		}
-		return nil
-	})
-	return network, t, err
+func (e *Manager) setNetworkAsAvailable(ctx context.Context, network *networkingv1alpha1.Network) error {
+	baseNetwork := network.DeepCopy()
+	network.Status.State = networkingv1alpha1.NetworkStateAvailable
+	if err := e.cluster.Client().Status().Patch(ctx, network, client.MergeFrom(baseNetwork)); err != nil {
+		return fmt.Errorf("error patching network status: %w", err)
+	}
+	return nil
 }
 
-func (m *Networks) Delete(ctx context.Context, handle, id string) error {
-	m.mu.Lock(handle)
-	defer m.mu.Unlock(handle)
-
-	network, ok, err := m.getNetworkByHandle(ctx, handle)
+func (e *Manager) doWork(ctx context.Context, handle string) (*networkingv1alpha1.Network, error) {
+	log := ctrl.LoggerFrom(ctx)
+	network, err := e.getOrCreateNetworkForHandle(ctx, log, handle)
 	if err != nil {
-		return fmt.Errorf("error getting network by handle: %w", err)
-	}
-	if !ok {
-		return nil
+		return nil, fmt.Errorf("error getting / creating network for handle: %w", err)
 	}
 
-	return apiutils.DeleteAndGarbageCollect(ctx, m.cluster.Client(), network, id)
+	if network.Status.State != networkingv1alpha1.NetworkStateAvailable {
+		log.V(1).Info("Setting network state to available")
+		if err := e.setNetworkAsAvailable(ctx, network); err != nil {
+			return nil, fmt.Errorf("error setting network as available: %w", err)
+		}
+	}
+
+	log.V(1).Info("Returning available network")
+	return network, nil
+}
+
+func (e *Manager) processNextWorkItem(ctx context.Context) bool {
+	uncastHandle, quit := e.queue.Get()
+	if quit {
+		return false
+	}
+	defer e.queue.Done(uncastHandle)
+
+	handle := uncastHandle.(string)
+	network, err := e.doWork(ctx, handle)
+	e.emit(handle, network, err)
+	e.queue.Forget(handle)
+	return true
+}
+
+func (e *Manager) Start(ctx context.Context) error {
+	e.startedMu.Lock()
+	if e.started {
+		e.startedMu.Unlock()
+		return fmt.Errorf("manager already started")
+	}
+
+	var wg sync.WaitGroup
+	func() {
+		defer e.startedMu.Unlock()
+
+		go func() {
+			<-ctx.Done()
+			e.queue.ShutDown()
+		}()
+
+		const maxConcurrentWork = 10
+		wg.Add(maxConcurrentWork)
+		for i := 0; i < maxConcurrentWork; i++ {
+			go func() {
+				defer wg.Done()
+
+				for e.processNextWorkItem(ctx) {
+				}
+			}()
+		}
+	}()
+
+	wg.Wait()
+	return nil
+}
+
+func (e *Manager) getOrCreateWaiter(handle string) *waiter {
+	e.waitersByHandleMu.Lock()
+	defer e.waitersByHandleMu.Unlock()
+
+	w, ok := e.waitersByHandle[handle]
+	if ok {
+		return w
+	}
+
+	w = &waiter{done: make(chan struct{})}
+	e.waitersByHandle[handle] = w
+	e.queue.Add(handle)
+	return w
+}
+
+func (e *Manager) emit(handle string, network *networkingv1alpha1.Network, err error) {
+	e.waitersByHandleMu.Lock()
+	defer e.waitersByHandleMu.Unlock()
+
+	w, ok := e.waitersByHandle[handle]
+	if !ok {
+		return
+	}
+
+	w.network = network
+	w.error = err
+	close(w.done)
+}
+
+func (e *Manager) GetNetwork(ctx context.Context, handle string) (*networkingv1alpha1.Network, error) {
+	w := e.getOrCreateWaiter(handle)
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	case <-w.done:
+		return w.network, w.error
+	}
 }

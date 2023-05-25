@@ -32,7 +32,7 @@ func New() *Cleaner {
 	return &Cleaner{}
 }
 
-func DeleteObjectIfExistsFunc(c client.Client, object client.Object) func(ctx context.Context) error {
+func CleanupObject(c client.Client, object client.Object) func(ctx context.Context) error {
 	// Create a copy so subsequent writes cannot change the object.
 	object = object.DeepCopyObject().(client.Object)
 	return func(ctx context.Context) error {

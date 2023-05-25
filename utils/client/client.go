@@ -61,18 +61,37 @@ func PatchRemoveReconcileAnnotation(ctx context.Context, c client.Client, obj cl
 	return nil
 }
 
-func ReconcileRequestsFromObjectSlice[S ~[]O, ObjPtr interface {
+type ObjectPointer[O any] interface {
 	client.Object
 	*O
-}, O any](objs S) []reconcile.Request {
+}
+
+func ReconcileRequestsFromObjectSlice[S ~[]O, OP ObjectPointer[O], O any](objs S) []reconcile.Request {
 	res := make([]reconcile.Request, len(objs))
 	for i := range objs {
-		obj := ObjPtr(&objs[i])
+		obj := OP(&objs[i])
 		res[i] = reconcile.Request{
 			NamespacedName: client.ObjectKeyFromObject(obj),
 		}
 	}
 	return res
+}
+
+func ByObjectCreationTimestamp[OP ObjectPointer[O], O any](obj1, obj2 O) bool {
+	t1 := OP(&obj1).GetCreationTimestamp().Time
+	t2 := OP(&obj2).GetCreationTimestamp().Time
+	return t1.Before(t2)
+}
+
+func ObjectSliceOldestObjectIndex[S ~[]O, OP ObjectPointer[O], O any](objs []O) int {
+	idx := -1
+	for i := range objs {
+		obj := OP(&objs[i])
+		if idx < 0 || obj.GetCreationTimestamp().Time.Before(OP(&objs[idx]).GetCreationTimestamp().Time) {
+			idx = i
+		}
+	}
+	return idx
 }
 
 // ErrNotControlled is returned if the actual object is not controlled by the specified owner.
