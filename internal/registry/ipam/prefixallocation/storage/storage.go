@@ -44,8 +44,9 @@ func NewStorage(optsGetter generic.RESTOptionsGetter) (PrefixAllocationStorage, 
 		NewListFunc: func() runtime.Object {
 			return &ipam.PrefixAllocationList{}
 		},
-		PredicateFunc:            prefixallocation.MatchPrefixAllocation,
-		DefaultQualifiedResource: ipam.Resource("prefixallocations"),
+		PredicateFunc:             prefixallocation.MatchPrefixAllocation,
+		DefaultQualifiedResource:  ipam.Resource("prefixallocations"),
+		SingularQualifiedResource: ipam.Resource("prefixallocation"),
 
 		CreateStrategy: prefixallocation.Strategy,
 		UpdateStrategy: prefixallocation.Strategy,

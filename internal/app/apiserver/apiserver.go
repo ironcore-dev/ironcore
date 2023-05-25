@@ -222,6 +222,12 @@ func (o *OnmetalAPIServerOptions) Config() (*apiserver.Config, error) {
 	serverConfig.OpenAPIConfig.Info.Title = "onmetal-api"
 	serverConfig.OpenAPIConfig.Info.Version = "0.1"
 
+	if utilfeature.DefaultFeatureGate.Enabled(features.OpenAPIV3) {
+		serverConfig.OpenAPIV3Config = genericapiserver.DefaultOpenAPIV3Config(onmetalopenapi.GetOpenAPIDefinitions, openapi.NewDefinitionNamer(api.Scheme))
+		serverConfig.OpenAPIV3Config.Info.Title = "onmetal-api"
+		serverConfig.OpenAPIV3Config.Info.Version = "0.1"
+	}
+
 	if err := o.RecommendedOptions.ApplyTo(serverConfig); err != nil {
 		return nil, err
 	}

@@ -40,7 +40,6 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
 const (
@@ -414,28 +413,25 @@ func (r *MachineReconciler) bindVolume(
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *MachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	ctx := context.Background()
-	log := ctrl.Log.WithName("machine").WithName("setup")
-
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&computev1alpha1.Machine{}).
 		Owns(&networkingv1alpha1.NetworkInterface{}).
 		Owns(&storagev1alpha1.Volume{}).
 		Watches(
-			&source.Kind{Type: &networkingv1alpha1.NetworkInterface{}},
-			r.enqueueByMachineNetworkInterfaceReferences(ctx, log),
+			&networkingv1alpha1.NetworkInterface{},
+			r.enqueueByMachineNetworkInterfaceReferences(),
 		).
 		Watches(
-			&source.Kind{Type: &storagev1alpha1.Volume{}},
-			r.enqueueByMachineVolumeReferences(ctx, log),
+			&storagev1alpha1.Volume{},
+			r.enqueueByMachineVolumeReferences(),
 		).
 		Complete(r)
 }
 
-func (r *MachineReconciler) enqueueByMachineNetworkInterfaceReferences(ctx context.Context, log logr.Logger) handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+func (r *MachineReconciler) enqueueByMachineNetworkInterfaceReferences() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		nic := obj.(*networkingv1alpha1.NetworkInterface)
-		log = log.WithValues("NetworkInterfaceKey", client.ObjectKeyFromObject(nic))
+		log := ctrl.LoggerFrom(ctx, "NetworkInterfaceKey", client.ObjectKeyFromObject(nic))
 
 		machineList := &computev1alpha1.MachineList{}
 		if err := r.List(ctx, machineList,
@@ -456,10 +452,10 @@ func (r *MachineReconciler) enqueueByMachineNetworkInterfaceReferences(ctx conte
 	})
 }
 
-func (r *MachineReconciler) enqueueByMachineVolumeReferences(ctx context.Context, log logr.Logger) handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+func (r *MachineReconciler) enqueueByMachineVolumeReferences() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		volume := obj.(*storagev1alpha1.Volume)
-		log = log.WithValues("VolumeKey", client.ObjectKeyFromObject(volume))
+		log := ctrl.LoggerFrom(ctx, "VolumeKey", client.ObjectKeyFromObject(volume))
 
 		machineList := &computev1alpha1.MachineList{}
 		if err := r.List(ctx, machineList,

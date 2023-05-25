@@ -30,7 +30,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
 type VolumePoolReconciler struct {
@@ -138,8 +137,8 @@ func (r *VolumePoolReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			),
 		).
 		Watches(
-			&source.Kind{Type: &storagev1alpha1.VolumeClass{}},
-			handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+			&storagev1alpha1.VolumeClass{},
+			handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 				return []ctrl.Request{{NamespacedName: client.ObjectKey{Name: r.VolumePoolName}}}
 			}),
 		).

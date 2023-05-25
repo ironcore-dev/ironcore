@@ -50,8 +50,9 @@ func NewStorage(optsGetter generic.RESTOptionsGetter) (NetworkPolicyStorage, err
 		NewListFunc: func() runtime.Object {
 			return &networking.NetworkPolicyList{}
 		},
-		PredicateFunc:            networkpolicy.MatchNetworkPolicy,
-		DefaultQualifiedResource: networking.Resource("networkpolicies"),
+		PredicateFunc:             networkpolicy.MatchNetworkPolicy,
+		DefaultQualifiedResource:  networking.Resource("networkpolicies"),
+		SingularQualifiedResource: networking.Resource("networkpolicy"),
 
 		CreateStrategy: networkpolicy.Strategy,
 		UpdateStrategy: networkpolicy.Strategy,

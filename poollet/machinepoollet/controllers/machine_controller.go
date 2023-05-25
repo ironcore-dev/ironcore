@@ -50,7 +50,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
 type MachineReconciler struct {
@@ -747,9 +746,10 @@ func (r *MachineReconciler) matchingWatchLabel() client.ListOption {
 	return client.MatchingLabels(labels)
 }
 
-func (r *MachineReconciler) enqueueMachinesReferencingVolume(ctx context.Context, log logr.Logger) handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+func (r *MachineReconciler) enqueueMachinesReferencingVolume() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		volume := obj.(*storagev1alpha1.Volume)
+		log := ctrl.LoggerFrom(ctx)
 
 		machineList := &computev1alpha1.MachineList{}
 		if err := r.List(ctx, machineList,
@@ -767,9 +767,11 @@ func (r *MachineReconciler) enqueueMachinesReferencingVolume(ctx context.Context
 	})
 }
 
-func (r *MachineReconciler) enqueueMachinesReferencingSecret(ctx context.Context, log logr.Logger) handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+func (r *MachineReconciler) enqueueMachinesReferencingSecret() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		secret := obj.(*corev1.Secret)
+		log := ctrl.LoggerFrom(ctx)
+
 		machineList := &computev1alpha1.MachineList{}
 		if err := r.List(ctx, machineList,
 			client.InNamespace(secret.Namespace),
@@ -786,9 +788,11 @@ func (r *MachineReconciler) enqueueMachinesReferencingSecret(ctx context.Context
 	})
 }
 
-func (r *MachineReconciler) enqueueMachinesReferencingNetworkInterface(ctx context.Context, log logr.Logger) handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+func (r *MachineReconciler) enqueueMachinesReferencingNetworkInterface() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		nic := obj.(*networkingv1alpha1.NetworkInterface)
+		log := ctrl.LoggerFrom(ctx)
+
 		machineList := &computev1alpha1.MachineList{}
 		if err := r.List(ctx, machineList,
 			client.InNamespace(nic.Namespace),
@@ -807,7 +811,6 @@ func (r *MachineReconciler) enqueueMachinesReferencingNetworkInterface(ctx conte
 
 func (r *MachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	log := ctrl.Log.WithName("machinepoollet")
-	ctx := ctrl.LoggerInto(context.TODO(), log)
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(
@@ -819,16 +822,16 @@ func (r *MachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			),
 		).
 		Watches(
-			&source.Kind{Type: &corev1.Secret{}},
-			r.enqueueMachinesReferencingSecret(ctx, log),
+			&corev1.Secret{},
+			r.enqueueMachinesReferencingSecret(),
 		).
 		Watches(
-			&source.Kind{Type: &networkingv1alpha1.NetworkInterface{}},
-			r.enqueueMachinesReferencingNetworkInterface(ctx, log),
+			&networkingv1alpha1.NetworkInterface{},
+			r.enqueueMachinesReferencingNetworkInterface(),
 		).
 		Watches(
-			&source.Kind{Type: &storagev1alpha1.Volume{}},
-			r.enqueueMachinesReferencingVolume(ctx, log),
+			&storagev1alpha1.Volume{},
+			r.enqueueMachinesReferencingVolume(),
 		).
 		Complete(r)
 }

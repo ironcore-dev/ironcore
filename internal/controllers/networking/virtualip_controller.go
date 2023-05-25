@@ -35,7 +35,6 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
 // VirtualIPReconciler reconciles a VirtualIP object
@@ -300,25 +299,23 @@ func (r *VirtualIPReconciler) patchStatus(ctx context.Context, virtualIP *networ
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *VirtualIPReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	ctx := context.Background()
-	log := ctrl.Log.WithName("virtualip").WithName("setup")
-
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&networkingv1alpha1.VirtualIP{}).
 		Watches(
-			&source.Kind{Type: &networkingv1alpha1.NetworkInterface{}},
-			r.enqueueByTargetNameReferencingNetworkInterface(ctx, log),
+			&networkingv1alpha1.NetworkInterface{},
+			r.enqueueByTargetNameReferencingNetworkInterface(),
 		).
 		Watches(
-			&source.Kind{Type: &networkingv1alpha1.NetworkInterface{}},
-			r.enqueueByNameEqualNetworkInterfaceVirtualIPName(ctx, log),
+			&networkingv1alpha1.NetworkInterface{},
+			r.enqueueByNameEqualNetworkInterfaceVirtualIPName(),
 		).
 		Complete(r)
 }
 
-func (r *VirtualIPReconciler) enqueueByTargetNameReferencingNetworkInterface(ctx context.Context, log logr.Logger) handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+func (r *VirtualIPReconciler) enqueueByTargetNameReferencingNetworkInterface() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		nic := obj.(*networkingv1alpha1.NetworkInterface)
+		log := ctrl.LoggerFrom(ctx)
 
 		virtualIPs := &networkingv1alpha1.VirtualIPList{}
 		if err := r.List(ctx, virtualIPs, client.InNamespace(nic.Namespace), client.MatchingFields{
@@ -341,8 +338,8 @@ func (r *VirtualIPReconciler) enqueueByTargetNameReferencingNetworkInterface(ctx
 	})
 }
 
-func (r *VirtualIPReconciler) enqueueByNameEqualNetworkInterfaceVirtualIPName(ctx context.Context, log logr.Logger) handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+func (r *VirtualIPReconciler) enqueueByNameEqualNetworkInterfaceVirtualIPName() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		nic := obj.(*networkingv1alpha1.NetworkInterface)
 
 		nicVirtualIP := nic.Spec.VirtualIP

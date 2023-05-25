@@ -26,7 +26,6 @@ import (
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/networking/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
@@ -38,9 +37,9 @@ type FakeLoadBalancers struct {
 	ns   string
 }
 
-var loadbalancersResource = schema.GroupVersionResource{Group: "networking.api.onmetal.de", Version: "v1alpha1", Resource: "loadbalancers"}
+var loadbalancersResource = v1alpha1.SchemeGroupVersion.WithResource("loadbalancers")
 
-var loadbalancersKind = schema.GroupVersionKind{Group: "networking.api.onmetal.de", Version: "v1alpha1", Kind: "LoadBalancer"}
+var loadbalancersKind = v1alpha1.SchemeGroupVersion.WithKind("LoadBalancer")
 
 // Get takes name of the loadBalancer, and returns the corresponding loadBalancer object, and an error if there is any.
 func (c *FakeLoadBalancers) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.LoadBalancer, err error) {

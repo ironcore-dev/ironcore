@@ -223,13 +223,11 @@ func Run(ctx context.Context, opts Options) error {
 		LeaderElectionNamespace: opts.LeaderElectionNamespace,
 		LeaderElectionConfig:    leaderElectionCfg,
 		NewCache: func(config *rest.Config, cacheOpts cache.Options) (cache.Cache, error) {
-			cacheOpts.SelectorsByObject = cache.SelectorsByObject{
-				&computev1alpha1.Machine{}: cache.ObjectSelector{
-					Field: fields.OneTermEqualSelector(
-						computev1alpha1.MachineMachinePoolRefNameField,
-						opts.MachinePoolName,
-					),
-				},
+			cacheOpts.ByObject[&computev1alpha1.Machine{}] = cache.ByObject{
+				Field: fields.OneTermEqualSelector(
+					computev1alpha1.MachineMachinePoolRefNameField,
+					opts.MachinePoolName,
+				),
 			}
 			return cache.New(config, cacheOpts)
 		},

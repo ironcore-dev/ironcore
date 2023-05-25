@@ -39,7 +39,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
 const (
@@ -419,9 +418,6 @@ func (r *NATGatewayReconciler) applyRouting(ctx context.Context, natGateway *net
 }
 
 func (r *NATGatewayReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	ctx := context.Background()
-	log := ctrl.Log.WithName("natgateway").WithName("setup")
-
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&networkingv1alpha1.NATGateway{}).
 		Owns(
@@ -429,16 +425,16 @@ func (r *NATGatewayReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			builder.WithPredicates(&predicate.ResourceVersionChangedPredicate{}),
 		).
 		Watches(
-			&source.Kind{Type: &networkingv1alpha1.NetworkInterface{}},
-			r.enqueueByNetworkInterface(ctx, log),
+			&networkingv1alpha1.NetworkInterface{},
+			r.enqueueByNetworkInterface(),
 		).
 		Complete(r)
 }
 
-func (r *NATGatewayReconciler) enqueueByNetworkInterface(ctx context.Context, log logr.Logger) handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+func (r *NATGatewayReconciler) enqueueByNetworkInterface() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		nic := obj.(*networkingv1alpha1.NetworkInterface)
-		log = log.WithValues("NetworkInterfaceKey", client.ObjectKeyFromObject(nic))
+		log := ctrl.LoggerFrom(ctx, "NetworkInterfaceKey", client.ObjectKeyFromObject(nic))
 
 		natGatewayList := &networkingv1alpha1.NATGatewayList{}
 		if err := r.List(ctx, natGatewayList,

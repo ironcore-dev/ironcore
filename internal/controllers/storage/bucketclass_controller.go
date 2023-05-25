@@ -23,6 +23,7 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/clientutils"
+	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	storageclient "github.com/onmetal/onmetal-api/internal/client/storage"
 	"github.com/onmetal/onmetal-api/utils/slices"
 	"k8s.io/apimachinery/pkg/types"
@@ -32,9 +33,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
-	"sigs.k8s.io/controller-runtime/pkg/source"
-
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 )
 
 // BucketClassReconciler reconciles a BucketClass object
@@ -136,9 +134,9 @@ func (r *BucketClassReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&storagev1alpha1.BucketClass{}).
 		Watches(
-			&source.Kind{Type: &storagev1alpha1.Bucket{}},
+			&storagev1alpha1.Bucket{},
 			handler.Funcs{
-				DeleteFunc: func(event event.DeleteEvent, queue workqueue.RateLimitingInterface) {
+				DeleteFunc: func(ctx context.Context, event event.DeleteEvent, queue workqueue.RateLimitingInterface) {
 					bucket := event.Object.(*storagev1alpha1.Bucket)
 					bucketClassRef := bucket.Spec.BucketClassRef
 					if bucketClassRef == nil {

@@ -66,7 +66,7 @@ func (r *VolumePoolAnnotatorReconciler) SetupWithManager(mgr ctrl.Manager) error
 		return err
 	}
 
-	if err := c.Watch(src, handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+	if err := c.Watch(src, handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		return []ctrl.Request{{NamespacedName: client.ObjectKey{Name: r.VolumePoolName}}}
 	})); err != nil {
 		return err

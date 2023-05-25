@@ -458,7 +458,7 @@ func WaitUntilTypesDiscoverableWithTimeout(timeout time.Duration, c client.Clien
 }
 
 func waitUntilGVKsDiscoverable(ctx context.Context, c client.Client, gvks map[schema.GroupVersionKind]struct{}) error {
-	if err := wait.PollImmediateInfiniteWithContext(ctx, 50*time.Millisecond, func(ctx context.Context) (done bool, err error) {
+	if err := wait.PollUntilContextCancel(ctx, 50*time.Millisecond, true, func(ctx context.Context) (done bool, err error) {
 		for gvk := range gvks {
 			mappings, err := c.RESTMapper().RESTMappings(gvk.GroupKind(), gvk.Version)
 			if err != nil {
@@ -540,7 +540,7 @@ func WaitUntilAPIServicesAvailable(ctx context.Context, c client.Client, service
 		apiServices = append(apiServices, service.DeepCopy())
 	}
 
-	if err := wait.PollImmediateInfiniteWithContext(ctx, 50*time.Millisecond, func(ctx context.Context) (done bool, err error) {
+	if err := wait.PollUntilContextCancel(ctx, 50*time.Millisecond, true, func(ctx context.Context) (done bool, err error) {
 		for i := len(apiServices) - 1; i >= 0; i-- {
 			apiService := apiServices[i]
 			key := client.ObjectKeyFromObject(apiService)

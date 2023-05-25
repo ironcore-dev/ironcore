@@ -117,14 +117,14 @@ var _ = Describe("VolumePoolController", func() {
 
 		By("checking if the second volume class is present")
 		Eventually(Object(volumePool)).Should(SatisfyAll(
-			HaveField("Status.AvailableVolumeClasses", Equal([]corev1.LocalObjectReference{
-				{
+			HaveField("Status.AvailableVolumeClasses", ConsistOf(
+				corev1.LocalObjectReference{
 					Name: vc.Name,
 				},
-				{
+				corev1.LocalObjectReference{
 					Name: vc2.Name,
 				},
-			}))),
+			))),
 		)
 	})
 })

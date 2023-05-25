@@ -40,7 +40,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
 // VolumeReconciler reconciles a Volume object
@@ -282,6 +281,24 @@ func (r *VolumeReconciler) patchStatus(ctx context.Context, volume *storagev1alp
 	return r.Status().Patch(ctx, volume, client.MergeFrom(volumeBase))
 }
 
+func (r *VolumeReconciler) enqueueRequestsByMachine() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
+		machine := obj.(*computev1alpha1.Machine)
+
+		volumeNames := computev1alpha1.MachineVolumeNames(machine)
+		res := make([]ctrl.Request, 0, len(volumeNames))
+		for _, volumeName := range volumeNames {
+			res = append(res, ctrl.Request{
+				NamespacedName: types.NamespacedName{
+					Namespace: machine.Namespace,
+					Name:      volumeName,
+				},
+			})
+		}
+		return res
+	})
+}
+
 // SetupWithManager sets up the controller with the Manager.
 func (r *VolumeReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
@@ -296,22 +313,9 @@ func (r *VolumeReconciler) SetupWithManager(mgr ctrl.Manager) error {
 				},
 			}),
 		).
-		Watches(&source.Kind{Type: &computev1alpha1.Machine{}},
-			handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
-				machine := obj.(*computev1alpha1.Machine)
-
-				volumeNames := computev1alpha1.MachineVolumeNames(machine)
-				res := make([]ctrl.Request, 0, len(volumeNames))
-				for _, volumeName := range volumeNames {
-					res = append(res, ctrl.Request{
-						NamespacedName: types.NamespacedName{
-							Namespace: machine.Namespace,
-							Name:      volumeName,
-						},
-					})
-				}
-				return res
-			}),
+		Watches(
+			&computev1alpha1.Machine{},
+			r.enqueueRequestsByMachine(),
 		).
 		Complete(r)
 }

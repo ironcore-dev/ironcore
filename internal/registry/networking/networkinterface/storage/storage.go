@@ -48,8 +48,9 @@ func NewStorage(optsGetter generic.RESTOptionsGetter) (NetworkInterfaceStorage, 
 		NewListFunc: func() runtime.Object {
 			return &networking.NetworkInterfaceList{}
 		},
-		PredicateFunc:            networkinterface.MatchNetworkInterface,
-		DefaultQualifiedResource: networking.Resource("networkinterfaces"),
+		PredicateFunc:             networkinterface.MatchNetworkInterface,
+		DefaultQualifiedResource:  networking.Resource("networkinterfaces"),
+		SingularQualifiedResource: networking.Resource("networkinterface"),
 
 		CreateStrategy: networkinterface.Strategy,
 		UpdateStrategy: networkinterface.Strategy,
