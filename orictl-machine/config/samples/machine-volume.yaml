@@ -1,10 +1,4 @@
-metadata:
-  annotations:
-    foo: bar
-  labels:
-    bar: baz
-spec:
-  driver: local
-  handle: deadbeef
-  attributes:
-    size_limit_bytes: "1024"
+name: my-volume
+device: oda
+empty_disk:
+  size_bytes: 1099511627776

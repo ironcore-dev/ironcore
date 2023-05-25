@@ -32,6 +32,7 @@ import (
 	machinepoolletclient "github.com/onmetal/onmetal-api/poollet/machinepoollet/client"
 	"github.com/onmetal/onmetal-api/poollet/machinepoollet/controllers"
 	"github.com/onmetal/onmetal-api/poollet/machinepoollet/mcm"
+	"github.com/onmetal/onmetal-api/poollet/orievent"
 	utilsenvtest "github.com/onmetal/onmetal-api/utils/envtest"
 	"github.com/onmetal/onmetal-api/utils/envtest/apiserver"
 	"github.com/onmetal/onmetal-api/utils/envtest/controllermanager"
@@ -226,6 +227,21 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 			DownwardAPILabels: map[string]string{
 				fooDownwardAPILabel: fmt.Sprintf("metadata.annotations['%s']", fooAnnotation),
 			},
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
+		machineEvents := orievent.NewGenerator(func(ctx context.Context) ([]*ori.Machine, error) {
+			res, err := srv.ListMachines(ctx, &ori.ListMachinesRequest{})
+			if err != nil {
+				return nil, err
+			}
+			return res.Machines, nil
+		}, orievent.GeneratorOptions{})
+
+		Expect(k8sManager.Add(machineEvents)).To(Succeed())
+
+		Expect((&controllers.MachineAnnotatorReconciler{
+			Client:        k8sManager.GetClient(),
+			MachineEvents: machineEvents,
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		go func() {

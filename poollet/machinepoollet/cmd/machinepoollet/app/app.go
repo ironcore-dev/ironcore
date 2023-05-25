@@ -279,34 +279,6 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error adding machine event generator healthz check: %w", err)
 	}
 
-	volumeEvents := orievent.NewGenerator(func(ctx context.Context) ([]*ori.Volume, error) {
-		res, err := machineRuntime.ListVolumes(ctx, &ori.ListVolumesRequest{})
-		if err != nil {
-			return nil, err
-		}
-		return res.Volumes, nil
-	}, orievent.GeneratorOptions{})
-	if err := mgr.Add(volumeEvents); err != nil {
-		return fmt.Errorf("error adding volume event generator: %w", err)
-	}
-	if err := mgr.AddHealthzCheck("volume-events", volumeEvents.Check); err != nil {
-		return fmt.Errorf("error adding volume event generator healthz check: %w", err)
-	}
-
-	networkInterfaceEvents := orievent.NewGenerator(func(ctx context.Context) ([]*ori.NetworkInterface, error) {
-		res, err := machineRuntime.ListNetworkInterfaces(ctx, &ori.ListNetworkInterfacesRequest{})
-		if err != nil {
-			return nil, err
-		}
-		return res.NetworkInterfaces, nil
-	}, orievent.GeneratorOptions{})
-	if err := mgr.Add(networkInterfaceEvents); err != nil {
-		return fmt.Errorf("error adding network interface event generator: %w", err)
-	}
-	if err := mgr.AddHealthzCheck("networkinterface-events", networkInterfaceEvents.Check); err != nil {
-		return fmt.Errorf("error adding network interface event generator healthz check: %w", err)
-	}
-
 	indexer := mgr.GetFieldIndexer()
 	if err := machinepoolletclient.SetupMachineSpecNetworkInterfaceNamesField(ctx, indexer, opts.MachinePoolName); err != nil {
 		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.MachineSpecNetworkInterfaceNamesField, err)
@@ -351,10 +323,8 @@ func Run(ctx context.Context, opts Options) error {
 		}
 
 		if err := (&controllers.MachineAnnotatorReconciler{
-			Client:                 mgr.GetClient(),
-			MachineEvents:          machineEvents,
-			VolumeEvents:           volumeEvents,
-			NetworkInterfaceEvents: networkInterfaceEvents,
+			Client:        mgr.GetClient(),
+			MachineEvents: machineEvents,
 		}).SetupWithManager(mgr); err != nil {
 			return fmt.Errorf("error setting up machine annotator reconciler with manager: %w", err)
 		}

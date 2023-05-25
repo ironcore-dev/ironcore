@@ -3697,6 +3697,13 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkInterfaceStatus(ref commo
 							Format:      "",
 						},
 					},
+					"providerID": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ProviderID is the provider-internal ID of the network interface.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 					"ips": {
 						SchemaProps: spec.SchemaProps{
 							Description: "IPs represent the effective IP addresses of the NetworkInterface.",

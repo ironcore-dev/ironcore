@@ -15,14 +15,13 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 	"path"
 
 	"github.com/onmetal/onmetal-api/broker/common/request"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/cluster"
-	"github.com/onmetal/onmetal-api/broker/machinebroker/loadbalancers"
-	"github.com/onmetal/onmetal-api/broker/machinebroker/natgateways"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/networks"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	"k8s.io/client-go/rest"
@@ -59,9 +58,7 @@ type Server struct {
 
 	cluster cluster.Cluster
 
-	networks      *networks.Networks
-	loadBalancers *loadbalancers.LoadBalancers
-	natGateways   *natgateways.NATGateways
+	networks *networks.Manager
 
 	execRequestCache request.Cache[*ori.ExecRequest]
 }
@@ -96,27 +93,13 @@ func New(cfg *rest.Config, namespace string, opts Options) (*Server, error) {
 		baseURL:                 baseURL,
 		brokerDownwardAPILabels: opts.BrokerDownwardAPILabels,
 		cluster:                 c,
-		networks:                networks.New(c),
-		loadBalancers:           loadbalancers.New(c),
-		natGateways:             natgateways.New(c),
+		networks:                networks.NewManager(c),
 		execRequestCache:        request.NewCache[*ori.ExecRequest](),
 	}, nil
 }
 
-func (s *Server) Cluster() cluster.Cluster {
-	return s.cluster
-}
-
-func (s *Server) Networks() *networks.Networks {
-	return s.networks
-}
-
-func (s *Server) LoadBalancers() *loadbalancers.LoadBalancers {
-	return s.loadBalancers
-}
-
-func (s *Server) NATGateways() *natgateways.NATGateways {
-	return s.natGateways
+func (s *Server) Start(ctx context.Context) error {
+	return s.networks.Start(ctx)
 }
 
 func (s *Server) buildURL(method string, token string) string {

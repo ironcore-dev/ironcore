@@ -30641,6 +30641,10 @@
 							"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.IPPrefix"
 						}
 					},
+					"providerID": {
+						"description": "ProviderID is the provider-internal ID of the network interface.",
+						"type": "string"
+					},
 					"state": {
 						"description": "State is the NetworkInterfaceState of the NetworkInterface.",
 						"type": "string"

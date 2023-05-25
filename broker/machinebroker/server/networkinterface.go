@@ -18,78 +18,49 @@ import (
 	"context"
 	"fmt"
 
+	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
-	"github.com/onmetal/onmetal-api/broker/machinebroker/apiutils"
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	"github.com/onmetal/onmetal-api/utils/generic"
+	"golang.org/x/exp/slices"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-type AggregateOnmetalNetworkInterface struct {
-	NetworkInterface    *networkingv1alpha1.NetworkInterface
-	Network             *networkingv1alpha1.Network
-	VirtualIP           *networkingv1alpha1.VirtualIP
-	LoadBalancerTargets []machinebrokerv1alpha1.LoadBalancerTarget
-	NATGatewayTargets   []machinebrokerv1alpha1.NATGatewayTarget
-}
-
-func (s *Server) convertAggregateOnmetalNetworkInterface(networkInterface *AggregateOnmetalNetworkInterface) (*ori.NetworkInterface, error) {
-	metadata, err := apiutils.GetObjectMetadata(networkInterface.NetworkInterface)
-	if err != nil {
-		return nil, err
-	}
-
-	ips, err := s.convertOnmetalIPSourcesToIPs(networkInterface.NetworkInterface.Spec.IPs)
-	if err != nil {
-		return nil, err
-	}
-
-	prefixes, err := s.convertOnmetalPrefixSourcesToPrefixes(networkInterface.NetworkInterface.Spec.Prefixes)
-	if err != nil {
-		return nil, err
-	}
-
-	var virtualIPSpec *ori.VirtualIPSpec
-	if networkInterface.VirtualIP != nil {
-		virtualIPSpec = &ori.VirtualIPSpec{
-			Ip: networkInterface.VirtualIP.Status.IP.String(),
-		}
-	}
-
-	loadBalancerTargets, err := s.convertOnmetalLoadBalancerTargets(networkInterface.LoadBalancerTargets)
-	if err != nil {
-		return nil, err
-	}
-
-	nats, err := s.convertOnmetalNATGatewayTargets(networkInterface.NATGatewayTargets)
-	if err != nil {
-		return nil, err
-	}
-
-	return &ori.NetworkInterface{
-		Metadata: metadata,
-		Spec: &ori.NetworkInterfaceSpec{
-			Network: &ori.NetworkSpec{
-				Handle: networkInterface.Network.Spec.Handle,
-			},
-			Ips:                 ips,
-			VirtualIp:           virtualIPSpec,
-			Prefixes:            prefixes,
-			LoadBalancerTargets: loadBalancerTargets,
-			Nats:                nats,
+func onmetalMachineNetworkInterfaceIndex(onmetalMachine *computev1alpha1.Machine, name string) int {
+	return slices.IndexFunc(
+		onmetalMachine.Spec.NetworkInterfaces,
+		func(nic computev1alpha1.NetworkInterface) bool {
+			return nic.Name == name
 		},
-	}, nil
+	)
 }
 
-func (s *Server) setOnmetalNetworkInterfaceVirtualIPSource(
+func (s *Server) bindOnmetalMachineNetworkInterface(
 	ctx context.Context,
+	onmetalMachine *computev1alpha1.Machine,
 	onmetalNetworkInterface *networkingv1alpha1.NetworkInterface,
-	virtualIPSrc *networkingv1alpha1.VirtualIPSource,
 ) error {
 	baseOnmetalNetworkInterface := onmetalNetworkInterface.DeepCopy()
-	onmetalNetworkInterface.Spec.VirtualIP = virtualIPSrc
-	if err := s.cluster.Client().Patch(ctx, onmetalNetworkInterface, client.MergeFrom(baseOnmetalNetworkInterface)); err != nil {
-		return fmt.Errorf("error setting virtual ip source: %w", err)
+	if err := ctrl.SetControllerReference(onmetalMachine, onmetalNetworkInterface, s.cluster.Scheme()); err != nil {
+		return err
 	}
-	return nil
+	onmetalNetworkInterface.Spec.MachineRef = generic.Pointer(s.localObjectReferenceTo(onmetalMachine))
+	return s.cluster.Client().Patch(ctx, onmetalNetworkInterface, client.StrategicMergeFrom(baseOnmetalNetworkInterface))
+}
+
+func (s *Server) aggregateOnmetalNetworkInterface(
+	ctx context.Context,
+	rd client.Reader,
+	onmetalNic *networkingv1alpha1.NetworkInterface,
+) (*AggregateOnmetalNetworkInterface, error) {
+	onmetalNetwork := &networkingv1alpha1.Network{}
+	onmetalNetworkKey := client.ObjectKey{Namespace: s.cluster.Namespace(), Name: onmetalNic.Spec.NetworkRef.Name}
+	if err := rd.Get(ctx, onmetalNetworkKey, onmetalNetwork); err != nil {
+		return nil, fmt.Errorf("error getting onmetal network %s: %w", onmetalNic.Name, err)
+	}
+
+	return &AggregateOnmetalNetworkInterface{
+		Network:          onmetalNetwork,
+		NetworkInterface: onmetalNic,
+	}, nil
 }

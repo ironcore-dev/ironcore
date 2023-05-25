@@ -1876,6 +1876,17 @@ string
 </tr>
 <tr>
 <td>
+<code>providerID</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>ProviderID is the provider-internal ID of the network interface.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>ips</code><br/>
 <em>
 <a href="../common/#common.api.onmetal.de/v1alpha1.IP">

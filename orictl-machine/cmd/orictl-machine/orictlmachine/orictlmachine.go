@@ -17,9 +17,11 @@ package orictlmachine
 import (
 	goflag "flag"
 
+	"github.com/onmetal/onmetal-api/orictl-machine/cmd/orictl-machine/orictlmachine/attach"
 	"github.com/onmetal/onmetal-api/orictl-machine/cmd/orictl-machine/orictlmachine/common"
 	"github.com/onmetal/onmetal-api/orictl-machine/cmd/orictl-machine/orictlmachine/create"
 	"github.com/onmetal/onmetal-api/orictl-machine/cmd/orictl-machine/orictlmachine/delete"
+	"github.com/onmetal/onmetal-api/orictl-machine/cmd/orictl-machine/orictlmachine/detach"
 	"github.com/onmetal/onmetal-api/orictl-machine/cmd/orictl-machine/orictlmachine/exec"
 	"github.com/onmetal/onmetal-api/orictl-machine/cmd/orictl-machine/orictlmachine/get"
 	"github.com/onmetal/onmetal-api/orictl-machine/cmd/orictl-machine/orictlmachine/update"
@@ -56,6 +58,8 @@ func Command(streams clicommon.Streams) *cobra.Command {
 		delete.Command(streams, &clientOpts),
 		update.Command(streams, &clientOpts),
 		exec.Command(streams, &clientOpts),
+		attach.Command(streams, &clientOpts),
+		detach.Command(streams, &clientOpts),
 	)
 
 	return cmd

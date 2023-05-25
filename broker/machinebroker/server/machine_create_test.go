@@ -16,6 +16,8 @@ package server_test
 
 import (
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
+	"github.com/onmetal/onmetal-api/broker/machinebroker/apiutils"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
 	machinepoolletv1alpha1 "github.com/onmetal/onmetal-api/poollet/machinepoollet/api/v1alpha1"
@@ -49,8 +51,29 @@ var _ = Describe("CreateMachine", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(res).NotTo(BeNil())
 
-		machine := &computev1alpha1.Machine{}
-		Expect(k8sClient.Get(ctx, client.ObjectKey{Namespace: ns.Name, Name: res.Machine.Metadata.Id}, machine)).To(Succeed())
-		Expect(machine.Labels).To(HaveKeyWithValue(machinepoolletv1alpha1.DownwardAPILabel("root-machine-uid"), "foobar"))
+		By("getting the onmetal machine")
+		onmetalMachine := &computev1alpha1.Machine{}
+		onmetalMachineKey := client.ObjectKey{Namespace: ns.Name, Name: res.Machine.Metadata.Id}
+		Expect(k8sClient.Get(ctx, onmetalMachineKey, onmetalMachine)).To(Succeed())
+
+		By("inspecting the onmetal machine")
+		Expect(onmetalMachine.Labels).To(Equal(map[string]string{
+			machinepoolletv1alpha1.DownwardAPILabel("root-machine-uid"): "foobar",
+			machinebrokerv1alpha1.CreatedLabel:                          "true",
+			machinebrokerv1alpha1.ManagerLabel:                          machinebrokerv1alpha1.MachineBrokerManager,
+		}))
+		encodedORIAnnotations, err := apiutils.EncodeAnnotationsAnnotation(nil)
+		Expect(err).NotTo(HaveOccurred())
+		encodedORILabels, err := apiutils.EncodeLabelsAnnotation(map[string]string{
+			machinepoolletv1alpha1.MachineUIDLabel: "foobar",
+		})
+		Expect(err).NotTo(HaveOccurred())
+		Expect(onmetalMachine.Annotations).To(Equal(map[string]string{
+			machinebrokerv1alpha1.AnnotationsAnnotation: encodedORIAnnotations,
+			machinebrokerv1alpha1.LabelsAnnotation:      encodedORILabels,
+		}))
+		Expect(onmetalMachine.Spec.Power).To(Equal(computev1alpha1.PowerOn))
+		Expect(onmetalMachine.Spec.Image).To(Equal("example.org/foo:latest"))
+		Expect(onmetalMachine.Spec.MachineClassRef.Name).To(Equal(machineClass.Name))
 	})
 })

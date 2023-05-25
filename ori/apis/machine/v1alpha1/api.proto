@@ -22,42 +22,14 @@ service MachineRuntime {
   rpc DeleteMachine(DeleteMachineRequest) returns (DeleteMachineResponse) {};
   rpc UpdateMachineAnnotations(UpdateMachineAnnotationsRequest) returns (UpdateMachineAnnotationsResponse);
   rpc UpdateMachinePower(UpdateMachinePowerRequest) returns (UpdateMachinePowerResponse);
-  rpc CreateVolumeAttachment(CreateVolumeAttachmentRequest) returns (CreateVolumeAttachmentResponse) {};
-  rpc DeleteVolumeAttachment(DeleteVolumeAttachmentRequest) returns (DeleteVolumeAttachmentResponse) {};
-  rpc CreateNetworkInterfaceAttachment(CreateNetworkInterfaceAttachmentRequest) returns (CreateNetworkInterfaceAttachmentResponse) {};
-  rpc DeleteNetworkInterfaceAttachment(DeleteNetworkInterfaceAttachmentRequest) returns (DeleteNetworkInterfaceAttachmentResponse) {};
-
-  rpc ListVolumes(ListVolumesRequest) returns (ListVolumesResponse) {};
-  rpc CreateVolume(CreateVolumeRequest) returns (CreateVolumeResponse) {};
-  rpc DeleteVolume(DeleteVolumeRequest) returns (DeleteVolumeResponse) {};
-
-  rpc ListNetworkInterfaces(ListNetworkInterfacesRequest) returns (ListNetworkInterfacesResponse);
-  rpc CreateNetworkInterface(CreateNetworkInterfaceRequest) returns (CreateNetworkInterfaceResponse);
-  rpc DeleteNetworkInterface(DeleteNetworkInterfaceRequest) returns (DeleteNetworkInterfaceResponse);
-
-  rpc UpdateNetworkInterfaceIPs(UpdateNetworkInterfaceIPsRequest) returns (UpdateNetworkInterfaceIPsResponse);
-
-  rpc CreateNetworkInterfaceVirtualIP(CreateNetworkInterfaceVirtualIPRequest) returns (CreateNetworkInterfaceVirtualIPResponse);
-  rpc UpdateNetworkInterfaceVirtualIP(UpdateNetworkInterfaceVirtualIPRequest) returns (UpdateNetworkInterfaceVirtualIPResponse);
-  rpc DeleteNetworkInterfaceVirtualIP(DeleteNetworkInterfaceVirtualIPRequest) returns (DeleteNetworkInterfaceVirtualIPResponse);
-
-  rpc CreateNetworkInterfacePrefix(CreateNetworkInterfacePrefixRequest) returns (CreateNetworkInterfacePrefixResponse);
-  rpc DeleteNetworkInterfacePrefix(DeleteNetworkInterfacePrefixRequest) returns (DeleteNetworkInterfacePrefixResponse);
-
-  rpc CreateNetworkInterfaceLoadBalancerTarget(CreateNetworkInterfaceLoadBalancerTargetRequest) returns (CreateNetworkInterfaceLoadBalancerTargetResponse);
-  rpc DeleteNetworkInterfaceLoadBalancerTarget(DeleteNetworkInterfaceLoadBalancerTargetRequest) returns (DeleteNetworkInterfaceLoadBalancerTargetResponse);
-
-  rpc CreateNetworkInterfaceNAT(CreateNetworkInterfaceNATRequest) returns (CreateNetworkInterfaceNATResponse);
-  rpc DeleteNetworkInterfaceNAT(DeleteNetworkInterfaceNATRequest) returns (DeleteNetworkInterfaceNATResponse);
+  rpc AttachVolume(AttachVolumeRequest) returns (AttachVolumeResponse) {};
+  rpc DetachVolume(DetachVolumeRequest) returns (DetachVolumeResponse) {};
+  rpc AttachNetworkInterface(AttachNetworkInterfaceRequest) returns (AttachNetworkInterfaceResponse);
+  rpc DetachNetworkInterface(DetachNetworkInterfaceRequest) returns (DetachNetworkInterfaceResponse);
 
   rpc ListMachineClasses(ListMachineClassesRequest) returns (ListMachineClassesResponse);
 
   rpc Exec(ExecRequest) returns (ExecResponse);
-}
-
-message VolumeFilter {
-  string id = 1;
-  map<string, string> label_selector = 2;
 }
 
 message VolumeSpec {
@@ -65,71 +37,6 @@ message VolumeSpec {
   string handle = 2;
   map<string, string> attributes = 3;
   map<string, bytes> secret_data = 4;
-}
-
-message Volume {
-  meta.v1alpha1.ObjectMetadata metadata = 1;
-  VolumeSpec spec = 2;
-}
-
-message NetworkInterfaceFilter {
-  string id = 1;
-  map<string, string> label_selector = 2;
-}
-
-message NetworkSpec {
-  string handle = 1;
-}
-
-message VirtualIPSpec {
-  string ip = 1;
-}
-
-message NATSpec {
-  string ip = 1;
-  int32 port = 2;
-  int32 endPort = 3;
-}
-
-enum Protocol {
-  TCP = 0;
-  UDP = 1;
-  SCTP = 2;
-}
-
-enum LoadBalancerType {
-  PUBLIC = 0;
-  INTERNAL = 1;
-}
-
-message LoadBalancerPort {
-  Protocol protocol = 1;
-  int32 port = 2;
-  int32 endPort = 3;
-}
-
-message LoadBalancerTargetSpec {
-  LoadBalancerType load_balancer_type = 1;
-  string ip = 2;
-  repeated LoadBalancerPort ports = 3;
-}
-
-message NetworkInterfaceSpec {
-  NetworkSpec network = 1;
-  repeated string ips = 2;
-  VirtualIPSpec virtual_ip = 3;
-  repeated string prefixes = 4;
-  repeated LoadBalancerTargetSpec load_balancer_targets = 5;
-  repeated NATSpec nats = 6;
-}
-
-message NetworkInterface {
-  meta.v1alpha1.ObjectMetadata metadata = 1;
-  NetworkInterfaceSpec spec = 2;
-}
-
-message IgnitionSpec {
-  bytes data = 1;
 }
 
 message MachineFilter {
@@ -152,20 +59,28 @@ message ImageSpec {
   string image = 1;
 }
 
-message EmptyDiskSpec {
+message EmptyDisk {
   uint64 size_bytes = 1;
 }
 
-message VolumeAttachment {
-  string name = 1;
-  string device = 2;
-  string volume_id = 3;
-  EmptyDiskSpec empty_disk = 4;
+message VolumeConnection {
+  string driver = 1;
+  string handle = 2;
+  map<string, string> attributes = 3;
+  map<string, bytes> secret_data = 4;
 }
 
-message NetworkInterfaceAttachment {
+message Volume {
   string name = 1;
-  string network_interface_id = 2;
+  string device = 2;
+  EmptyDisk empty_disk = 4;
+  VolumeConnection connection = 5;
+}
+
+message NetworkInterface {
+  string name = 1;
+  string network_id = 2;
+  repeated string ips = 3;
 }
 
 enum Power {
@@ -177,41 +92,39 @@ message MachineSpec {
   Power power = 1;
   ImageSpec image = 2;
   string class = 3;
-  IgnitionSpec ignition = 4;
-  repeated VolumeAttachment volumes = 5;
-  repeated NetworkInterfaceAttachment network_interfaces = 6;
+  bytes ignition_data = 4;
+  repeated Volume volumes = 5;
+  repeated NetworkInterface network_interfaces = 6;
 }
 
 message MachineStatus {
   int64 observed_generation = 1;
   MachineState state = 2;
   string image_ref = 3;
-  repeated VolumeAttachmentStatus volumes = 4;
-  repeated NetworkInterfaceAttachmentStatus network_interfaces = 5;
+  repeated VolumeStatus volumes = 4;
+  repeated NetworkInterfaceStatus network_interfaces = 5;
 }
 
-message VolumeAttachmentStatus {
+message VolumeStatus {
   string name = 1;
   string volume_handle = 2;
-  VolumeAttachmentState state = 3;
+  VolumeState state = 3;
 }
 
-enum VolumeAttachmentState {
-  VOLUME_ATTACHMENT_PENDING = 0;
-  VOLUME_ATTACHMENT_ATTACHED = 1;
-  VOLUME_ATTACHMENT_DETACHED = 2;
+enum VolumeState {
+  VOLUME_PENDING = 0;
+  VOLUME_ATTACHED = 1;
 }
 
-message NetworkInterfaceAttachmentStatus {
+message NetworkInterfaceStatus {
   string name = 1;
   string network_interface_handle = 2;
-  NetworkInterfaceAttachmentState state = 3;
+  NetworkInterfaceState state = 3;
 }
 
-enum NetworkInterfaceAttachmentState {
-  NETWORK_INTERFACE_ATTACHMENT_PENDING = 0;
-  NETWORK_INTERFACE_ATTACHMENT_ATTACHED = 1;
-  NETWORK_INTERFACE_ATTACHMENT_DETACHED = 2;
+enum NetworkInterfaceState {
+  NETWORK_INTERFACE_PENDING = 0;
+  NETWORK_INTERFACE_ATTACHED = 1;
 }
 
 enum MachineState {
@@ -277,161 +190,36 @@ message UpdateMachinePowerRequest {
 message UpdateMachinePowerResponse {
 }
 
-message CreateVolumeAttachmentRequest {
+message AttachVolumeRequest {
   string machine_id = 1;
-  VolumeAttachment volume = 2;
+  Volume volume = 2;
 }
 
-message CreateVolumeAttachmentResponse {
+message AttachVolumeResponse {
 }
 
-message DeleteVolumeAttachmentRequest {
-  string machine_id = 1;
-  string name = 2;
-}
-
-message DeleteVolumeAttachmentResponse {
-}
-
-message CreateNetworkInterfaceAttachmentRequest {
-  string machine_id = 1;
-  NetworkInterfaceAttachment network_interface = 2;
-}
-
-message CreateNetworkInterfaceAttachmentResponse {
-}
-
-message DeleteNetworkInterfaceAttachmentRequest {
+message DetachVolumeRequest {
   string machine_id = 1;
   string name = 2;
 }
 
-message DeleteNetworkInterfaceAttachmentResponse {
+message DetachVolumeResponse {
 }
 
-message ListVolumesRequest {
-  VolumeFilter filter = 1;
+message AttachNetworkInterfaceRequest {
+  string machine_id = 1;
+  NetworkInterface network_interface = 2;
 }
 
-message ListVolumesResponse {
-  repeated Volume volumes = 1;
+message AttachNetworkInterfaceResponse {
 }
 
-message CreateVolumeRequest {
-  Volume volume = 1;
+message DetachNetworkInterfaceRequest {
+  string machine_id = 1;
+  string name = 2;
 }
 
-message CreateVolumeResponse {
-  Volume volume = 1;
-}
-
-message DeleteVolumeRequest {
-  string volume_id = 1;
-}
-
-message DeleteVolumeResponse {
-}
-
-message ListNetworkInterfacesRequest {
-  NetworkInterfaceFilter filter = 1;
-}
-
-message ListNetworkInterfacesResponse {
-  repeated NetworkInterface network_interfaces = 1;
-}
-
-message CreateNetworkInterfaceRequest {
-  NetworkInterface network_interface = 1;
-}
-
-message CreateNetworkInterfaceResponse {
-  NetworkInterface network_interface = 1;
-}
-
-message DeleteNetworkInterfaceRequest {
-  string network_interface_id = 1;
-}
-
-message DeleteNetworkInterfaceResponse {
-}
-
-message UpdateNetworkInterfaceIPsRequest {
-  string network_interface_id = 1;
-  repeated string ips = 2;
-}
-
-message UpdateNetworkInterfaceIPsResponse {
-}
-
-message CreateNetworkInterfaceVirtualIPRequest {
-  string network_interface_id = 1;
-  VirtualIPSpec virtual_ip = 2;
-}
-
-message CreateNetworkInterfaceVirtualIPResponse {
-}
-
-message UpdateNetworkInterfaceVirtualIPRequest {
-  string network_interface_id = 1;
-  VirtualIPSpec virtual_ip = 2;
-}
-
-message UpdateNetworkInterfaceVirtualIPResponse {
-}
-
-message CreateNetworkInterfacePrefixRequest {
-  string network_interface_id = 1;
-  string prefix = 2;
-}
-
-message CreateNetworkInterfacePrefixResponse {
-}
-
-message DeleteNetworkInterfacePrefixRequest {
-  string network_interface_id = 1;
-  string prefix = 2;
-}
-
-message DeleteNetworkInterfacePrefixResponse {
-}
-
-message CreateNetworkInterfaceLoadBalancerTargetRequest {
-  string network_interface_id = 1;
-  LoadBalancerTargetSpec load_balancer_target = 2;
-}
-
-message CreateNetworkInterfaceLoadBalancerTargetResponse {
-}
-
-message DeleteNetworkInterfaceLoadBalancerTargetRequest {
-  string network_interface_id = 1;
-  LoadBalancerTargetSpec load_balancer_target = 2;
-}
-
-message DeleteNetworkInterfaceLoadBalancerTargetResponse {
-}
-
-message CreateNetworkInterfaceNATRequest {
-  string network_interface_id = 1;
-  NATSpec nat = 2;
-}
-
-message CreateNetworkInterfaceNATResponse {
-}
-
-message DeleteNetworkInterfaceNATRequest {
-  string network_interface_id = 1;
-  string nat_ip = 2;
-}
-
-message DeleteNetworkInterfaceNATResponse {
-}
-
-message DeleteNetworkInterfaceVirtualIPRequest {
-  string network_interface_id = 1;
-}
-
-message DeleteNetworkInterfaceVirtualIPResponse {
+message DetachNetworkInterfaceResponse {
 }
 
 message ListMachineClassesRequest {

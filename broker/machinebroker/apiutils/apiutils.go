@@ -18,14 +18,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"strings"
 
 	"github.com/onmetal/controller-utils/metautils"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
 	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
-	"golang.org/x/exp/slices"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -140,12 +136,7 @@ func GetLabelsAnnotation(o metav1.Object) (map[string]string, error) {
 		return nil, fmt.Errorf("object has no labels at %s", machinebrokerv1alpha1.LabelsAnnotation)
 	}
 
-	var labels map[string]string
-	if err := json.Unmarshal([]byte(data), &labels); err != nil {
-		return nil, err
-	}
-
-	return labels, nil
+	return DecodeLabelsAnnotations(data)
 }
 
 func EncodeAnnotationsAnnotation(annotations map[string]string) (string, error) {
@@ -183,212 +174,7 @@ func GetAnnotationsAnnotation(o metav1.Object) (map[string]string, error) {
 	return DecodeAnnotationsAnnotation(data)
 }
 
-var (
-	ipAndPrefixReplacer        = strings.NewReplacer("/", "-", ":", "_")
-	reverseIPAndPrefixReplacer = strings.NewReplacer("-", "/", "_", ":")
-)
-
-func SetNetworkHandleLabel(o metav1.Object, handle string) {
-	metautils.SetLabel(o, machinebrokerv1alpha1.NetworkHandleLabel, handle)
-}
-
-func EscapePrefix(prefix commonv1alpha1.IPPrefix) string {
-	return ipAndPrefixReplacer.Replace(prefix.String())
-}
-
-func UnescapePrefix(escapedPrefix string) (commonv1alpha1.IPPrefix, error) {
-	unescaped := reverseIPAndPrefixReplacer.Replace(escapedPrefix)
-	return commonv1alpha1.ParseIPPrefix(unescaped)
-}
-
-func SetPrefixLabel(o metav1.Object, prefix commonv1alpha1.IPPrefix) {
-	metautils.SetLabel(o, machinebrokerv1alpha1.PrefixLabel, EscapePrefix(prefix))
-}
-
-func GetPrefixLabel(o metav1.Object) (commonv1alpha1.IPPrefix, error) {
-	escapedPrefix := o.GetLabels()[machinebrokerv1alpha1.PrefixLabel]
-	return UnescapePrefix(escapedPrefix)
-}
-
-func SetLoadBalancerTypeLabel(o metav1.Object, typ networkingv1alpha1.LoadBalancerType) {
-	metautils.SetLabel(o, machinebrokerv1alpha1.LoadBalancerTypeLabel, string(typ))
-}
-
-func EscapeIP(ip commonv1alpha1.IP) string {
-	return ipAndPrefixReplacer.Replace(ip.String())
-}
-
-func UnescapeIP(escaped string) (commonv1alpha1.IP, error) {
-	unescaped := reverseIPAndPrefixReplacer.Replace(escaped)
-	return commonv1alpha1.ParseIP(unescaped)
-}
-
-func SetIPLabel(o metav1.Object, ip commonv1alpha1.IP) {
-	metautils.SetLabel(o, machinebrokerv1alpha1.IPLabel, EscapeIP(ip))
-}
-
-func GetIPLabel(o metav1.Object) (commonv1alpha1.IP, error) {
-	escaped := o.GetLabels()[machinebrokerv1alpha1.IPLabel]
-	return UnescapeIP(escaped)
-}
-
-func SetManagerLabel(o metav1.Object, manager string) {
-	metautils.SetLabel(o, machinebrokerv1alpha1.ManagerLabel, manager)
-}
-
-func SetPurpose(o metav1.Object, purpose string) {
-	metautils.SetLabel(o, machinebrokerv1alpha1.PurposeLabel, purpose)
-}
-
-func GetPurpose(o metav1.Object) string {
-	return o.GetLabels()[machinebrokerv1alpha1.PurposeLabel]
-}
-
 func IsManagedBy(o metav1.Object, manager string) bool {
 	actual, ok := o.GetLabels()[machinebrokerv1alpha1.ManagerLabel]
 	return ok && actual == manager
-}
-
-func GetDependents(o metav1.Object) ([]string, error) {
-	dependentsData, ok := o.GetAnnotations()[machinebrokerv1alpha1.DependentsAnnotation]
-	if !ok {
-		return nil, nil
-	}
-	var dependents []string
-	if err := json.Unmarshal([]byte(dependentsData), &dependents); err != nil {
-		return nil, fmt.Errorf("error unmarshalling dependents: %w", err)
-	}
-	return dependents, nil
-}
-
-func SetDependents(o metav1.Object, dependents []string) error {
-	dependentsData, err := json.Marshal(dependents)
-	if err != nil {
-		return fmt.Errorf("error marshalling dependents: %w", err)
-	}
-
-	metautils.SetAnnotation(o, machinebrokerv1alpha1.DependentsAnnotation, string(dependentsData))
-	return nil
-}
-
-func AddDependent(o metav1.Object, newDependent string) (bool, error) {
-	dependents, err := GetDependents(o)
-	if err != nil {
-		return false, fmt.Errorf("error getting dependents: %w", err)
-	}
-
-	for _, dependent := range dependents {
-		if dependent == newDependent {
-			return false, nil
-		}
-	}
-
-	if err := SetDependents(o, append(dependents, newDependent)); err != nil {
-		return false, fmt.Errorf("error setting dependents: %w", err)
-	}
-	return true, nil
-}
-
-func RemoveDependent(o metav1.Object, removeDependent string) (bool, error) {
-	dependents, err := GetDependents(o)
-	if err != nil {
-		return false, fmt.Errorf("error getting dependents: %w", err)
-	}
-
-	var updated bool
-	for i := 0; i < len(dependents); i++ {
-		if dependents[i] == removeDependent {
-			dependents = append(dependents[:i], dependents[i+1:]...)
-			i--
-			updated = true
-		}
-	}
-	if !updated {
-		return false, nil
-	}
-
-	if err := SetDependents(o, dependents); err != nil {
-		return false, fmt.Errorf("error setting dependents: %w", err)
-	}
-	return true, nil
-}
-
-func PatchCreatedWithDependent(ctx context.Context, c client.Client, o client.Object, dependent string) error {
-	base := o.DeepCopyObject().(client.Object)
-	SetCreatedLabel(o)
-	if _, err := AddDependent(o, dependent); err != nil {
-		return fmt.Errorf("error adding dependent: %w", err)
-	}
-	if err := c.Patch(ctx, o, client.MergeFrom(base)); err != nil {
-		return fmt.Errorf("error patching created / adding dependent: %w", err)
-	}
-	return nil
-}
-
-func DeleteAndGarbageCollect(ctx context.Context, c client.Client, o client.Object, dependent string) error {
-	dependents, err := GetDependents(o)
-	if err != nil {
-		return fmt.Errorf("error getting dependents: %w", err)
-	}
-
-	var updated bool
-	for i := 0; i < len(dependents); i++ {
-		if dependents[i] == dependent {
-			dependents = append(dependents[:i], dependents[i+1:]...)
-			i--
-			updated = true
-		}
-	}
-	if !updated {
-		return nil
-	}
-
-	if len(dependents) == 0 {
-		if err := c.Delete(ctx, o); client.IgnoreNotFound(err) != nil {
-			return fmt.Errorf("error deleting object: %w", err)
-		}
-		return nil
-	}
-
-	if !updated {
-		return nil
-	}
-	base := o.DeepCopyObject().(client.Object)
-	if err := SetDependents(o, dependents); err != nil {
-		return fmt.Errorf("error setting dependents: %w", err)
-	}
-	if err := c.Patch(ctx, o, client.MergeFrom(base)); err != nil {
-		return fmt.Errorf("error updating dependents: %w", err)
-	}
-	return nil
-}
-
-func HasDependent(obj client.Object, dependent string) (bool, error) {
-	dependents, err := GetDependents(obj)
-	if err != nil {
-		return false, fmt.Errorf("error getting dependents: %w", err)
-	}
-
-	return slices.Contains(dependents, dependent), nil
-}
-
-func FilterObjectListByDependent[S ~[]Obj, ObjPtr interface {
-	client.Object
-	*Obj
-}, Obj any](objs S, dependent string) ([]Obj, error) {
-	var filtered []Obj
-	for _, obj := range objs {
-		objPtr := ObjPtr(&obj)
-
-		ok, err := HasDependent(objPtr, dependent)
-		if err != nil {
-			return nil, fmt.Errorf("[object %s] %w", client.ObjectKeyFromObject(objPtr), err)
-		}
-		if !ok {
-			continue
-		}
-
-		filtered = append(filtered, obj)
-	}
-	return filtered, nil
 }

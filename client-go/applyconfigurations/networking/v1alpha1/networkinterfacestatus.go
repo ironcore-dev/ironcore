@@ -30,6 +30,7 @@ type NetworkInterfaceStatusApplyConfiguration struct {
 	State                   *v1alpha1.NetworkInterfaceState `json:"state,omitempty"`
 	LastStateTransitionTime *v1.Time                        `json:"lastStateTransitionTime,omitempty"`
 	NetworkHandle           *string                         `json:"networkHandle,omitempty"`
+	ProviderID              *string                         `json:"providerID,omitempty"`
 	IPs                     []commonv1alpha1.IP             `json:"ips,omitempty"`
 	Prefixes                []commonv1alpha1.IPPrefix       `json:"prefixes,omitempty"`
 	VirtualIP               *commonv1alpha1.IP              `json:"virtualIP,omitempty"`
@@ -65,6 +66,14 @@ func (b *NetworkInterfaceStatusApplyConfiguration) WithLastStateTransitionTime(v
 // If called multiple times, the NetworkHandle field is set to the value of the last call.
 func (b *NetworkInterfaceStatusApplyConfiguration) WithNetworkHandle(value string) *NetworkInterfaceStatusApplyConfiguration {
 	b.NetworkHandle = &value
+	return b
+}
+
+// WithProviderID sets the ProviderID field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the ProviderID field is set to the value of the last call.
+func (b *NetworkInterfaceStatusApplyConfiguration) WithProviderID(value string) *NetworkInterfaceStatusApplyConfiguration {
+	b.ProviderID = &value
 	return b
 }
 

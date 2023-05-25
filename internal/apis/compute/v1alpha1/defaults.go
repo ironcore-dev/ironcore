@@ -25,13 +25,13 @@ func addDefaultingFuncs(scheme *runtime.Scheme) error {
 
 func SetDefaults_VolumeStatus(status *v1alpha1.VolumeStatus) {
 	if status.State == "" {
-		status.State = v1alpha1.VolumeStateDetached
+		status.State = v1alpha1.VolumeStatePending
 	}
 }
 
 func SetDefaults_NetworkInterfaceStatus(status *v1alpha1.NetworkInterfaceStatus) {
 	if status.State == "" {
-		status.State = v1alpha1.NetworkInterfaceStateDetached
+		status.State = v1alpha1.NetworkInterfaceStatePending
 	}
 }
 
