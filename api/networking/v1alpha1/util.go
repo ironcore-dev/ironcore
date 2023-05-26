@@ -37,3 +37,8 @@ func NetworkInterfaceIPIPAMPrefixName(nicName string, idx int) string {
 func NetworkInterfacePrefixIPAMPrefixName(nicName string, idx int) string {
 	return fmt.Sprintf("%s-pf-%d", nicName, idx)
 }
+
+// NetworkInterfaceIPIPAMPrefixName returns the name of a Prefix for a network interface ephemeral prefix.
+func LoadBalancerIPIPAMPrefixName(loadBalancerName string, idx int) string {
+	return fmt.Sprintf("%s-%d", loadBalancerName, idx)
+}

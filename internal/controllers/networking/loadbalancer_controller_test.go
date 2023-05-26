@@ -16,14 +16,17 @@
 package networking
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
+
+	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	. "github.com/onmetal/onmetal-api/utils/testing"
 )
 
 var _ = Describe("LoadBalancerReconciler", func() {
@@ -103,5 +106,76 @@ var _ = Describe("LoadBalancerReconciler", func() {
 			g.Expect(loadBalancerRouting.NetworkRef.Name).To(BeEquivalentTo(network.Name))
 			g.Expect(loadBalancerRouting.NetworkRef.UID).To(BeEquivalentTo(network.UID))
 		}).Should(Succeed())
+	})
+
+	It("should allocate internal IPs for internal load balancers", func() {
+		By("creating a network")
+		network := &networkingv1alpha1.Network{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "network-",
+			},
+		}
+		Expect(k8sClient.Create(ctx, network)).To(Succeed())
+
+		By("creating a prefix")
+		rootPrefix := &ipamv1alpha1.Prefix{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "lb-",
+			},
+			Spec: ipamv1alpha1.PrefixSpec{
+				IPFamily: corev1.IPv4Protocol,
+				Prefix:   commonv1alpha1.MustParseNewIPPrefix("10.0.0.0/24"),
+			},
+		}
+		Expect(k8sClient.Create(ctx, rootPrefix)).To(Succeed())
+
+		By("creating an internal load balancer")
+		loadBalancer := &networkingv1alpha1.LoadBalancer{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "internal-lb-",
+			},
+			Spec: networkingv1alpha1.LoadBalancerSpec{
+				Type:       networkingv1alpha1.LoadBalancerTypeInternal,
+				NetworkRef: corev1.LocalObjectReference{Name: network.Name},
+				IPFamilies: []corev1.IPFamily{corev1.IPv4Protocol},
+				IPs: []networkingv1alpha1.IPSource{
+					{
+						Ephemeral: &networkingv1alpha1.EphemeralPrefixSource{
+							PrefixTemplate: &ipamv1alpha1.PrefixTemplateSpec{
+								Spec: ipamv1alpha1.PrefixSpec{
+									IPFamily:  corev1.IPv4Protocol,
+									ParentRef: &corev1.LocalObjectReference{Name: rootPrefix.Name},
+								},
+							},
+						},
+					},
+				},
+				NetworkInterfaceSelector: &metav1.LabelSelector{
+					MatchLabels: map[string]string{"foo": "bar"},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, loadBalancer)).To(Succeed())
+
+		By("waiting for the prefix to be created with the correct spec and become ready")
+		prefix := &ipamv1alpha1.Prefix{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: loadBalancer.Namespace,
+				Name:      networkingv1alpha1.LoadBalancerIPIPAMPrefixName(loadBalancer.Name, 0),
+			},
+		}
+		Eventually(Object(prefix)).Should(SatisfyAll(
+			HaveField("Spec.IPFamily", corev1.IPv4Protocol),
+			HaveField("Spec.ParentRef", &corev1.LocalObjectReference{Name: rootPrefix.Name}),
+			HaveField("Spec.PrefixLength", int32(32)),
+			HaveField("Spec.Prefix", commonv1alpha1.MustParseNewIPPrefix("10.0.0.0/32")),
+			HaveField("Status.Phase", ipamv1alpha1.PrefixPhaseAllocated),
+		))
+
+		By("asserting it get's an internal IP")
+		Eventually(Object(loadBalancer)).Should(HaveField("Status.IPs", ContainElements(*commonv1alpha1.MustParseNewIP("10.0.0.0"))))
 	})
 })
