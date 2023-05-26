@@ -38,8 +38,9 @@ func NewStorage(optsGetter generic.RESTOptionsGetter) (MachineClassStorage, erro
 		NewListFunc: func() runtime.Object {
 			return &compute.MachineClassList{}
 		},
-		PredicateFunc:            machineclass.MatchMachineClass,
-		DefaultQualifiedResource: compute.Resource("machineclasses"),
+		PredicateFunc:             machineclass.MatchMachineClass,
+		DefaultQualifiedResource:  compute.Resource("machineclasses"),
+		SingularQualifiedResource: compute.Resource("machineclass"),
 
 		CreateStrategy: machineclass.Strategy,
 		UpdateStrategy: machineclass.Strategy,

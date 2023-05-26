@@ -48,8 +48,9 @@ func NewStorage(optsGetter generic.RESTOptionsGetter) (NetworkStorage, error) {
 		NewListFunc: func() runtime.Object {
 			return &networking.NetworkList{}
 		},
-		PredicateFunc:            network.MatchNetwork,
-		DefaultQualifiedResource: networking.Resource("networks"),
+		PredicateFunc:             network.MatchNetwork,
+		DefaultQualifiedResource:  networking.Resource("networks"),
+		SingularQualifiedResource: networking.Resource("network"),
 
 		CreateStrategy: network.Strategy,
 		UpdateStrategy: network.Strategy,

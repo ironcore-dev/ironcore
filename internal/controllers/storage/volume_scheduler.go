@@ -20,6 +20,8 @@ import (
 	"math/rand"
 
 	"github.com/go-logr/logr"
+	"github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	storageclient "github.com/onmetal/onmetal-api/internal/client/storage"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -31,10 +33,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
-	"sigs.k8s.io/controller-runtime/pkg/source"
-
-	"github.com/onmetal/onmetal-api/api/common/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 )
 
 type VolumeScheduler struct {
@@ -119,18 +117,52 @@ func (s *VolumeScheduler) schedule(ctx context.Context, log logr.Logger, volume 
 	return ctrl.Result{}, nil
 }
 
+func filterVolume(volume *storagev1alpha1.Volume) bool {
+	return volume.DeletionTimestamp.IsZero() &&
+		volume.Spec.VolumePoolRef == nil &&
+		volume.Spec.VolumeClassRef != nil
+}
+
+func (s *VolumeScheduler) enqueueRequestsByVolumePool() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, object client.Object) []ctrl.Request {
+		pool := object.(*storagev1alpha1.VolumePool)
+		log := ctrl.LoggerFrom(ctx)
+		if !pool.DeletionTimestamp.IsZero() {
+			return nil
+		}
+
+		list := &storagev1alpha1.VolumeList{}
+		if err := s.List(ctx, list, client.MatchingFields{storageclient.VolumeSpecVolumePoolRefNameField: ""}); err != nil {
+			log.Error(err, "error listing unscheduled volumes")
+			return nil
+		}
+
+		availableClassNames := sets.NewString()
+		for _, availableVolumeClass := range pool.Status.AvailableVolumeClasses {
+			availableClassNames.Insert(availableVolumeClass.Name)
+		}
+
+		var requests []ctrl.Request
+		for _, volume := range list.Items {
+			if !filterVolume(&volume) {
+				continue
+			}
+
+			if !availableClassNames.Has(volume.Spec.VolumeClassRef.Name) {
+				continue
+			}
+
+			if !labels.SelectorFromSet(volume.Spec.VolumePoolSelector).Matches(labels.Set(pool.Labels)) {
+				continue
+			}
+
+			requests = append(requests, ctrl.Request{NamespacedName: client.ObjectKeyFromObject(&volume)})
+		}
+		return requests
+	})
+}
+
 func (s *VolumeScheduler) SetupWithManager(mgr manager.Manager) error {
-	ctx := context.Background()
-	log := ctrl.Log.WithName("volume-scheduler").WithName("setup")
-	ctx = ctrl.LoggerInto(ctx, log)
-
-	// Only schedule volumes that are not deleting, have no volume pool and no volume class set
-	filterVolume := func(volume *storagev1alpha1.Volume) bool {
-		return volume.DeletionTimestamp.IsZero() &&
-			volume.Spec.VolumePoolRef == nil &&
-			volume.Spec.VolumeClassRef != nil
-	}
-
 	return ctrl.NewControllerManagedBy(mgr).
 		Named("volume-scheduler").
 		For(&storagev1alpha1.Volume{},
@@ -140,42 +172,9 @@ func (s *VolumeScheduler) SetupWithManager(mgr manager.Manager) error {
 			})),
 		).
 		// Enqueue unscheduled volumes if a volume pool w/ required volume classes becomes available.
-		Watches(&source.Kind{Type: &storagev1alpha1.VolumePool{}},
-			handler.EnqueueRequestsFromMapFunc(func(object client.Object) []ctrl.Request {
-				pool := object.(*storagev1alpha1.VolumePool)
-				if !pool.DeletionTimestamp.IsZero() {
-					return nil
-				}
-
-				list := &storagev1alpha1.VolumeList{}
-				if err := s.List(ctx, list, client.MatchingFields{storageclient.VolumeSpecVolumePoolRefNameField: ""}); err != nil {
-					log.Error(err, "error listing unscheduled volumes")
-					return nil
-				}
-
-				availableClassNames := sets.NewString()
-				for _, availableVolumeClass := range pool.Status.AvailableVolumeClasses {
-					availableClassNames.Insert(availableVolumeClass.Name)
-				}
-
-				var requests []ctrl.Request
-				for _, volume := range list.Items {
-					if !filterVolume(&volume) {
-						continue
-					}
-
-					if !availableClassNames.Has(volume.Spec.VolumeClassRef.Name) {
-						continue
-					}
-
-					if !labels.SelectorFromSet(volume.Spec.VolumePoolSelector).Matches(labels.Set(pool.Labels)) {
-						continue
-					}
-
-					requests = append(requests, ctrl.Request{NamespacedName: client.ObjectKeyFromObject(&volume)})
-				}
-				return requests
-			}),
+		Watches(
+			&storagev1alpha1.VolumePool{},
+			s.enqueueRequestsByVolumePool(),
 		).
 		Complete(s)
 }

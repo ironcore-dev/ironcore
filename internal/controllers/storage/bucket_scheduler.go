@@ -20,6 +20,8 @@ import (
 	"math/rand"
 
 	"github.com/go-logr/logr"
+	"github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	storageclient "github.com/onmetal/onmetal-api/internal/client/storage"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -31,10 +33,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
-	"sigs.k8s.io/controller-runtime/pkg/source"
-
-	"github.com/onmetal/onmetal-api/api/common/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 )
 
 type BucketScheduler struct {
@@ -119,17 +117,53 @@ func (s *BucketScheduler) schedule(ctx context.Context, log logr.Logger, bucket 
 	return ctrl.Result{}, nil
 }
 
-func (s *BucketScheduler) SetupWithManager(mgr manager.Manager) error {
-	ctx := context.Background()
-	log := ctrl.Log.WithName("bucket-scheduler").WithName("setup")
-	ctx = ctrl.LoggerInto(ctx, log)
+func filterBucket(bucket *storagev1alpha1.Bucket) bool {
+	return bucket.DeletionTimestamp.IsZero() &&
+		bucket.Spec.BucketPoolRef == nil &&
+		bucket.Spec.BucketClassRef != nil
+}
 
+func (s *BucketScheduler) enqueueRequestsByBucketPool() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, object client.Object) []ctrl.Request {
+		pool := object.(*storagev1alpha1.BucketPool)
+		log := ctrl.LoggerFrom(ctx)
+		if !pool.DeletionTimestamp.IsZero() {
+			return nil
+		}
+
+		list := &storagev1alpha1.BucketList{}
+		if err := s.List(ctx, list, client.MatchingFields{storageclient.BucketSpecBucketPoolRefNameField: ""}); err != nil {
+			log.Error(err, "error listing unscheduled buckets")
+			return nil
+		}
+
+		availableClassNames := sets.NewString()
+		for _, availableBucketClass := range pool.Status.AvailableBucketClasses {
+			availableClassNames.Insert(availableBucketClass.Name)
+		}
+
+		var requests []ctrl.Request
+		for _, bucket := range list.Items {
+			if !filterBucket(&bucket) {
+				continue
+			}
+
+			if !availableClassNames.Has(bucket.Spec.BucketClassRef.Name) {
+				continue
+			}
+
+			if !labels.SelectorFromSet(bucket.Spec.BucketPoolSelector).Matches(labels.Set(pool.Labels)) {
+				continue
+			}
+
+			requests = append(requests, ctrl.Request{NamespacedName: client.ObjectKeyFromObject(&bucket)})
+		}
+		return requests
+	})
+}
+
+func (s *BucketScheduler) SetupWithManager(mgr manager.Manager) error {
 	// Only schedule buckets that are not deleting, have no bucket pool and no bucket class set
-	filterBucket := func(bucket *storagev1alpha1.Bucket) bool {
-		return bucket.DeletionTimestamp.IsZero() &&
-			bucket.Spec.BucketPoolRef == nil &&
-			bucket.Spec.BucketClassRef != nil
-	}
 
 	return ctrl.NewControllerManagedBy(mgr).
 		Named("bucket-scheduler").
@@ -140,42 +174,9 @@ func (s *BucketScheduler) SetupWithManager(mgr manager.Manager) error {
 			})),
 		).
 		// Enqueue unscheduled buckets if a bucket pool w/ required bucket classes becomes available.
-		Watches(&source.Kind{Type: &storagev1alpha1.BucketPool{}},
-			handler.EnqueueRequestsFromMapFunc(func(object client.Object) []ctrl.Request {
-				pool := object.(*storagev1alpha1.BucketPool)
-				if !pool.DeletionTimestamp.IsZero() {
-					return nil
-				}
-
-				list := &storagev1alpha1.BucketList{}
-				if err := s.List(ctx, list, client.MatchingFields{storageclient.BucketSpecBucketPoolRefNameField: ""}); err != nil {
-					log.Error(err, "error listing unscheduled buckets")
-					return nil
-				}
-
-				availableClassNames := sets.NewString()
-				for _, availableBucketClass := range pool.Status.AvailableBucketClasses {
-					availableClassNames.Insert(availableBucketClass.Name)
-				}
-
-				var requests []ctrl.Request
-				for _, bucket := range list.Items {
-					if !filterBucket(&bucket) {
-						continue
-					}
-
-					if !availableClassNames.Has(bucket.Spec.BucketClassRef.Name) {
-						continue
-					}
-
-					if !labels.SelectorFromSet(bucket.Spec.BucketPoolSelector).Matches(labels.Set(pool.Labels)) {
-						continue
-					}
-
-					requests = append(requests, ctrl.Request{NamespacedName: client.ObjectKeyFromObject(&bucket)})
-				}
-				return requests
-			}),
+		Watches(
+			&storagev1alpha1.BucketPool{},
+			s.enqueueRequestsByBucketPool(),
 		).
 		Complete(s)
 }

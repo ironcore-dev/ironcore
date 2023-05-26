@@ -48,8 +48,9 @@ func NewStorage(optsGetter generic.RESTOptionsGetter) (VirtualIPStorage, error) 
 		NewListFunc: func() runtime.Object {
 			return &networking.VirtualIPList{}
 		},
-		PredicateFunc:            virtualip.MatchVirtualIP,
-		DefaultQualifiedResource: networking.Resource("virtualips"),
+		PredicateFunc:             virtualip.MatchVirtualIP,
+		DefaultQualifiedResource:  networking.Resource("virtualips"),
+		SingularQualifiedResource: networking.Resource("virtualip"),
 
 		CreateStrategy: virtualip.Strategy,
 		UpdateStrategy: virtualip.Strategy,

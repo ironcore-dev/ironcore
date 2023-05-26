@@ -26,7 +26,6 @@ import (
 	computev1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/compute/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
@@ -38,9 +37,9 @@ type FakeMachines struct {
 	ns   string
 }
 
-var machinesResource = schema.GroupVersionResource{Group: "compute.api.onmetal.de", Version: "v1alpha1", Resource: "machines"}
+var machinesResource = v1alpha1.SchemeGroupVersion.WithResource("machines")
 
-var machinesKind = schema.GroupVersionKind{Group: "compute.api.onmetal.de", Version: "v1alpha1", Kind: "Machine"}
+var machinesKind = v1alpha1.SchemeGroupVersion.WithKind("Machine")
 
 // Get takes name of the machine, and returns the corresponding machine object, and an error if there is any.
 func (c *FakeMachines) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.Machine, err error) {

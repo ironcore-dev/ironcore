@@ -32,7 +32,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
 type PrefixAllocationScheduler struct {
@@ -174,22 +173,20 @@ func (s *PrefixAllocationScheduler) reconcile(ctx context.Context, log logr.Logg
 }
 
 func (s *PrefixAllocationScheduler) SetupWithManager(mgr manager.Manager) error {
-	ctx := context.Background()
-	log := ctrl.Log.WithName("prefixallocationscheduler").WithName("setup")
-
 	return ctrl.NewControllerManagedBy(mgr).
 		Named("prefixallocationscheduler").
 		For(&ipamv1alpha1.PrefixAllocation{}).
 		Watches(
-			&source.Kind{Type: &ipamv1alpha1.Prefix{}},
-			s.enqueueByMatchingPrefix(ctx, log),
+			&ipamv1alpha1.Prefix{},
+			s.enqueueByMatchingPrefix(),
 		).
 		Complete(s)
 }
 
-func (s *PrefixAllocationScheduler) enqueueByMatchingPrefix(ctx context.Context, log logr.Logger) handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+func (s *PrefixAllocationScheduler) enqueueByMatchingPrefix() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		prefix := obj.(*ipamv1alpha1.Prefix)
+		log := ctrl.LoggerFrom(ctx)
 		if !isPrefixAllocatedAndNotDeleting(prefix) {
 			return nil
 		}

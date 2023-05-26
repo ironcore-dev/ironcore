@@ -35,7 +35,6 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
 type NetworkInterfaceBindReconciler struct {
@@ -264,25 +263,22 @@ func (r *NetworkInterfaceBindReconciler) patchStatus(
 }
 
 func (r *NetworkInterfaceBindReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	ctx := context.Background()
-	log := ctrl.Log.WithName("networkinterfacebind").WithName("setup")
-
 	return ctrl.NewControllerManagedBy(mgr).
 		Named("networkinterfacebind").
 		For(&networkingv1alpha1.NetworkInterface{}).
 		Watches(
-			&source.Kind{Type: &computev1alpha1.Machine{}},
+			&computev1alpha1.Machine{},
 			r.enqueueByMachineNetworkInterfaceReference(),
 		).
 		Watches(
-			&source.Kind{Type: &computev1alpha1.Machine{}},
-			r.enqueueByMachineNameEqualNetworkInterfaceMachineRefName(ctx, log),
+			&computev1alpha1.Machine{},
+			r.enqueueByMachineNameEqualNetworkInterfaceMachineRefName(),
 		).
 		Complete(r)
 }
 
 func (r *NetworkInterfaceBindReconciler) enqueueByMachineNetworkInterfaceReference() handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		machine := obj.(*computev1alpha1.Machine)
 
 		var reqs []ctrl.Request
@@ -294,9 +290,10 @@ func (r *NetworkInterfaceBindReconciler) enqueueByMachineNetworkInterfaceReferen
 	})
 }
 
-func (r *NetworkInterfaceBindReconciler) enqueueByMachineNameEqualNetworkInterfaceMachineRefName(ctx context.Context, log logr.Logger) handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+func (r *NetworkInterfaceBindReconciler) enqueueByMachineNameEqualNetworkInterfaceMachineRefName() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		machine := obj.(*computev1alpha1.Machine)
+		log := ctrl.LoggerFrom(ctx)
 
 		nicList := &networkingv1alpha1.NetworkInterfaceList{}
 		if err := r.List(ctx, nicList,

@@ -36,7 +36,6 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
 type NetworkInterfaceReconciler struct {
@@ -366,28 +365,25 @@ func (r *NetworkInterfaceReconciler) getVirtualIPIP(nic *networkingv1alpha1.Netw
 }
 
 func (r *NetworkInterfaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	ctx := context.Background()
-	log := ctrl.Log.WithName("networkinterface").WithName("setup")
-
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&networkingv1alpha1.NetworkInterface{}).
 		Owns(&ipamv1alpha1.Prefix{}).
 		Owns(&networkingv1alpha1.VirtualIP{}).
 		Watches(
-			&source.Kind{Type: &networkingv1alpha1.Network{}},
-			r.enqueueByNetworkInterfaceNetworkReferences(ctx, log),
+			&networkingv1alpha1.Network{},
+			r.enqueueByNetworkInterfaceNetworkReferences(),
 		).
 		Watches(
-			&source.Kind{Type: &networkingv1alpha1.VirtualIP{}},
-			r.enqueueByNetworkInterfaceVirtualIPReferences(ctx, log),
+			&networkingv1alpha1.VirtualIP{},
+			r.enqueueByNetworkInterfaceVirtualIPReferences(),
 		).
 		Complete(r)
 }
 
-func (r *NetworkInterfaceReconciler) enqueueByNetworkInterfaceVirtualIPReferences(ctx context.Context, log logr.Logger) handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+func (r *NetworkInterfaceReconciler) enqueueByNetworkInterfaceVirtualIPReferences() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		vip := obj.(*networkingv1alpha1.VirtualIP)
-		log = log.WithValues("VirtualIPKey", client.ObjectKeyFromObject(vip))
+		log := ctrl.LoggerFrom(ctx, "VirtualIPKey", client.ObjectKeyFromObject(vip))
 
 		nicList := &networkingv1alpha1.NetworkInterfaceList{}
 		if err := r.List(ctx, nicList,
@@ -406,10 +402,10 @@ func (r *NetworkInterfaceReconciler) enqueueByNetworkInterfaceVirtualIPReference
 	})
 }
 
-func (r *NetworkInterfaceReconciler) enqueueByNetworkInterfaceNetworkReferences(ctx context.Context, log logr.Logger) handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+func (r *NetworkInterfaceReconciler) enqueueByNetworkInterfaceNetworkReferences() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		network := obj.(*networkingv1alpha1.Network)
-		log = log.WithValues("NetworkKey", client.ObjectKeyFromObject(network))
+		log := ctrl.LoggerFrom(ctx, "NetworkKey", client.ObjectKeyFromObject(network))
 
 		nicList := &networkingv1alpha1.NetworkInterfaceList{}
 		if err := r.List(ctx, nicList,

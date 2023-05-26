@@ -29,7 +29,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
 type MachinePoolReconciler struct {
@@ -137,8 +136,8 @@ func (r *MachinePoolReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			),
 		).
 		Watches(
-			&source.Kind{Type: &computev1alpha1.MachineClass{}},
-			handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+			&computev1alpha1.MachineClass{},
+			handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 				return []ctrl.Request{{NamespacedName: client.ObjectKey{Name: r.MachinePoolName}}}
 			}),
 		).

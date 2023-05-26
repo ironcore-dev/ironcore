@@ -44,8 +44,9 @@ func NewStorage(optsGetter generic.RESTOptionsGetter) (LoadBalancerRoutingStorag
 		NewListFunc: func() runtime.Object {
 			return &networking.LoadBalancerRoutingList{}
 		},
-		PredicateFunc:            loadbalancerrouting.MatchLoadBalancerRouting,
-		DefaultQualifiedResource: networking.Resource("loadbalancerroutings"),
+		PredicateFunc:             loadbalancerrouting.MatchLoadBalancerRouting,
+		DefaultQualifiedResource:  networking.Resource("loadbalancerroutings"),
+		SingularQualifiedResource: networking.Resource("loadbalancerrouting"),
 
 		CreateStrategy: loadbalancerrouting.Strategy,
 		UpdateStrategy: loadbalancerrouting.Strategy,
