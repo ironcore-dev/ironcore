@@ -40,15 +40,15 @@ type Manager struct {
 
 	queue workqueue.RateLimitingInterface
 
-	waitersByHandleMu sync.Mutex
-	waitersByHandle   map[string]*waiter
+	waitersByProviderIDMu sync.Mutex
+	waitersByProviderID   map[string]*waiter
 }
 
 func NewManager(cluster cluster.Cluster) *Manager {
 	return &Manager{
-		cluster:         cluster,
-		queue:           workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter()),
-		waitersByHandle: make(map[string]*waiter),
+		cluster:             cluster,
+		queue:               workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter()),
+		waitersByProviderID: make(map[string]*waiter),
 	}
 }
 
@@ -58,7 +58,7 @@ type waiter struct {
 	done    chan struct{}
 }
 
-func (e *Manager) getNetworkForHandle(ctx context.Context, handle string) (*networkingv1alpha1.Network, error) {
+func (e *Manager) getNetworkForProviderID(ctx context.Context, providerID string) (*networkingv1alpha1.Network, error) {
 	networkList := &networkingv1alpha1.NetworkList{}
 	if err := e.cluster.Client().List(ctx, networkList,
 		client.InNamespace(e.cluster.Namespace()),
@@ -70,8 +70,8 @@ func (e *Manager) getNetworkForHandle(ctx context.Context, handle string) (*netw
 	var matching *networkingv1alpha1.Network
 	for i := range networkList.Items {
 		network := &networkList.Items[i]
-		if network.Spec.Handle != handle {
-			// Ignore if the handle doesn't match.
+		if network.Spec.ProviderID != providerID {
+			// Ignore if the providerID doesn't match.
 			continue
 		}
 		if !network.DeletionTimestamp.IsZero() {
@@ -86,30 +86,30 @@ func (e *Manager) getNetworkForHandle(ctx context.Context, handle string) (*netw
 	return matching, nil
 }
 
-func (e *Manager) handleHash(handle string) string {
+func (e *Manager) providerIDHash(providerID string) string {
 	h := fnv.New32a()
-	_, _ = h.Write([]byte(handle))
+	_, _ = h.Write([]byte(providerID))
 	return rand.SafeEncodeString(fmt.Sprint(h.Sum32()))
 }
 
-func (e *Manager) getOrCreateNetworkForHandle(ctx context.Context, log logr.Logger, handle string) (*networkingv1alpha1.Network, error) {
-	network, err := e.getNetworkForHandle(ctx, handle)
+func (e *Manager) getOrCreateNetworkForProviderID(ctx context.Context, log logr.Logger, providerID string) (*networkingv1alpha1.Network, error) {
+	network, err := e.getNetworkForProviderID(ctx, providerID)
 	if err != nil {
-		return nil, fmt.Errorf("error getting network for handle: %w", err)
+		return nil, fmt.Errorf("error getting network for providerID: %w", err)
 	}
 	if network != nil {
-		log.V(1).Info("Found existing network for handle", "Name", network.Name)
+		log.V(1).Info("Found existing network for providerID", "Name", network.Name)
 		return network, nil
 	}
 
-	log.V(1).Info("No network found for handle, creating a new one")
+	log.V(1).Info("No network found for providerID, creating a new one")
 	network = &networkingv1alpha1.Network{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: e.cluster.Namespace(),
-			// TODO: Make this evaluator use a cache and include a collision count in the handle hash, use
-			// name instead of generateName. This makes it possible to handle fast resyncs similar to
+			// TODO: Make this evaluator use a cache and include a collision count in the providerID hash, use
+			// name instead of generateName. This makes it possible to providerID fast resyncs similar to
 			// Kubernetes' deployment controller.
-			GenerateName: fmt.Sprintf("net-%s-", e.handleHash(handle)),
+			GenerateName: fmt.Sprintf("net-%s-", e.providerIDHash(providerID)),
 			Annotations: map[string]string{
 				commonv1alpha1.ManagedByAnnotation: machinebrokerv1alpha1.MachineBrokerManager,
 			},
@@ -118,7 +118,7 @@ func (e *Manager) getOrCreateNetworkForHandle(ctx context.Context, log logr.Logg
 			},
 		},
 		Spec: networkingv1alpha1.NetworkSpec{
-			Handle: handle,
+			ProviderID: providerID,
 		},
 	}
 	if err := e.cluster.Client().Create(ctx, network); err != nil {
@@ -136,11 +136,11 @@ func (e *Manager) setNetworkAsAvailable(ctx context.Context, network *networking
 	return nil
 }
 
-func (e *Manager) doWork(ctx context.Context, handle string) (*networkingv1alpha1.Network, error) {
+func (e *Manager) doWork(ctx context.Context, providerID string) (*networkingv1alpha1.Network, error) {
 	log := ctrl.LoggerFrom(ctx)
-	network, err := e.getOrCreateNetworkForHandle(ctx, log, handle)
+	network, err := e.getOrCreateNetworkForProviderID(ctx, log, providerID)
 	if err != nil {
-		return nil, fmt.Errorf("error getting / creating network for handle: %w", err)
+		return nil, fmt.Errorf("error getting / creating network for providerID: %w", err)
 	}
 
 	if network.Status.State != networkingv1alpha1.NetworkStateAvailable {
@@ -155,16 +155,16 @@ func (e *Manager) doWork(ctx context.Context, handle string) (*networkingv1alpha
 }
 
 func (e *Manager) processNextWorkItem(ctx context.Context) bool {
-	uncastHandle, quit := e.queue.Get()
+	uncastProviderID, quit := e.queue.Get()
 	if quit {
 		return false
 	}
-	defer e.queue.Done(uncastHandle)
+	defer e.queue.Done(uncastProviderID)
 
-	handle := uncastHandle.(string)
-	network, err := e.doWork(ctx, handle)
-	e.emit(handle, network, err)
-	e.queue.Forget(handle)
+	providerID := uncastProviderID.(string)
+	network, err := e.doWork(ctx, providerID)
+	e.emit(providerID, network, err)
+	e.queue.Forget(providerID)
 	return true
 }
 
@@ -200,26 +200,26 @@ func (e *Manager) Start(ctx context.Context) error {
 	return nil
 }
 
-func (e *Manager) getOrCreateWaiter(handle string) *waiter {
-	e.waitersByHandleMu.Lock()
-	defer e.waitersByHandleMu.Unlock()
+func (e *Manager) getOrCreateWaiter(providerID string) *waiter {
+	e.waitersByProviderIDMu.Lock()
+	defer e.waitersByProviderIDMu.Unlock()
 
-	w, ok := e.waitersByHandle[handle]
+	w, ok := e.waitersByProviderID[providerID]
 	if ok {
 		return w
 	}
 
 	w = &waiter{done: make(chan struct{})}
-	e.waitersByHandle[handle] = w
-	e.queue.Add(handle)
+	e.waitersByProviderID[providerID] = w
+	e.queue.Add(providerID)
 	return w
 }
 
-func (e *Manager) emit(handle string, network *networkingv1alpha1.Network, err error) {
-	e.waitersByHandleMu.Lock()
-	defer e.waitersByHandleMu.Unlock()
+func (e *Manager) emit(providerID string, network *networkingv1alpha1.Network, err error) {
+	e.waitersByProviderIDMu.Lock()
+	defer e.waitersByProviderIDMu.Unlock()
 
-	w, ok := e.waitersByHandle[handle]
+	w, ok := e.waitersByProviderID[providerID]
 	if !ok {
 		return
 	}
@@ -229,8 +229,8 @@ func (e *Manager) emit(handle string, network *networkingv1alpha1.Network, err e
 	close(w.done)
 }
 
-func (e *Manager) GetNetwork(ctx context.Context, handle string) (*networkingv1alpha1.Network, error) {
-	w := e.getOrCreateWaiter(handle)
+func (e *Manager) GetNetwork(ctx context.Context, providerID string) (*networkingv1alpha1.Network, error) {
+	w := e.getOrCreateWaiter(providerID)
 	select {
 	case <-ctx.Done():
 		return nil, ctx.Err()

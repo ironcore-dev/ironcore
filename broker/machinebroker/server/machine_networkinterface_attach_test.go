@@ -88,7 +88,7 @@ var _ = Describe("AttachNetworkInterface", func() {
 
 		By("inspecting the onmetal network")
 		Expect(network.Spec).To(Equal(networkingv1alpha1.NetworkSpec{
-			Handle: "network-id",
+			ProviderID: "network-id",
 		}))
 		Expect(network.Status).To(Equal(networkingv1alpha1.NetworkStatus{
 			State: networkingv1alpha1.NetworkStateAvailable,

@@ -1146,13 +1146,11 @@ func Convert_networking_NetworkInterfaceSpec_To_v1alpha1_NetworkInterfaceSpec(in
 func autoConvert_v1alpha1_NetworkInterfaceStatus_To_networking_NetworkInterfaceStatus(in *v1alpha1.NetworkInterfaceStatus, out *networking.NetworkInterfaceStatus, s conversion.Scope) error {
 	out.State = networking.NetworkInterfaceState(in.State)
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
-	out.NetworkHandle = in.NetworkHandle
 	out.ProviderID = in.ProviderID
 	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
 	out.Prefixes = *(*[]commonv1alpha1.IPPrefix)(unsafe.Pointer(&in.Prefixes))
 	out.VirtualIP = (*commonv1alpha1.IP)(unsafe.Pointer(in.VirtualIP))
 	out.Phase = networking.NetworkInterfacePhase(in.Phase)
-	out.MachinePoolRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.MachinePoolRef))
 	out.LastPhaseTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastPhaseTransitionTime))
 	return nil
 }
@@ -1165,13 +1163,11 @@ func Convert_v1alpha1_NetworkInterfaceStatus_To_networking_NetworkInterfaceStatu
 func autoConvert_networking_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStatus(in *networking.NetworkInterfaceStatus, out *v1alpha1.NetworkInterfaceStatus, s conversion.Scope) error {
 	out.State = v1alpha1.NetworkInterfaceState(in.State)
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
-	out.NetworkHandle = in.NetworkHandle
 	out.ProviderID = in.ProviderID
 	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
 	out.Prefixes = *(*[]commonv1alpha1.IPPrefix)(unsafe.Pointer(&in.Prefixes))
 	out.VirtualIP = (*commonv1alpha1.IP)(unsafe.Pointer(in.VirtualIP))
 	out.Phase = v1alpha1.NetworkInterfacePhase(in.Phase)
-	out.MachinePoolRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.MachinePoolRef))
 	out.LastPhaseTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastPhaseTransitionTime))
 	return nil
 }
@@ -1253,7 +1249,6 @@ func Convert_networking_NetworkPeering_To_v1alpha1_NetworkPeering(in *networking
 
 func autoConvert_v1alpha1_NetworkPeeringStatus_To_networking_NetworkPeeringStatus(in *v1alpha1.NetworkPeeringStatus, out *networking.NetworkPeeringStatus, s conversion.Scope) error {
 	out.Name = in.Name
-	out.NetworkHandle = in.NetworkHandle
 	out.Phase = networking.NetworkPeeringPhase(in.Phase)
 	out.LastPhaseTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastPhaseTransitionTime))
 	return nil
@@ -1266,7 +1261,6 @@ func Convert_v1alpha1_NetworkPeeringStatus_To_networking_NetworkPeeringStatus(in
 
 func autoConvert_networking_NetworkPeeringStatus_To_v1alpha1_NetworkPeeringStatus(in *networking.NetworkPeeringStatus, out *v1alpha1.NetworkPeeringStatus, s conversion.Scope) error {
 	out.Name = in.Name
-	out.NetworkHandle = in.NetworkHandle
 	out.Phase = v1alpha1.NetworkPeeringPhase(in.Phase)
 	out.LastPhaseTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastPhaseTransitionTime))
 	return nil
@@ -1500,7 +1494,7 @@ func Convert_networking_NetworkPolicyStatus_To_v1alpha1_NetworkPolicyStatus(in *
 }
 
 func autoConvert_v1alpha1_NetworkSpec_To_networking_NetworkSpec(in *v1alpha1.NetworkSpec, out *networking.NetworkSpec, s conversion.Scope) error {
-	out.Handle = in.Handle
+	out.ProviderID = in.ProviderID
 	out.Peerings = *(*[]networking.NetworkPeering)(unsafe.Pointer(&in.Peerings))
 	return nil
 }
@@ -1511,7 +1505,7 @@ func Convert_v1alpha1_NetworkSpec_To_networking_NetworkSpec(in *v1alpha1.Network
 }
 
 func autoConvert_networking_NetworkSpec_To_v1alpha1_NetworkSpec(in *networking.NetworkSpec, out *v1alpha1.NetworkSpec, s conversion.Scope) error {
-	out.Handle = in.Handle
+	out.ProviderID = in.ProviderID
 	out.Peerings = *(*[]v1alpha1.NetworkPeering)(unsafe.Pointer(&in.Peerings))
 	return nil
 }

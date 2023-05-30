@@ -89,27 +89,27 @@ var _ = Describe("Network", func() {
 			errList := ValidateNetworkUpdate(newNetwork, oldNetwork)
 			Expect(errList).To(match)
 		},
-		Entry("immutable handle if set",
+		Entry("immutable providerID if set",
 			&networking.Network{
 				Spec: networking.NetworkSpec{
-					Handle: "foo",
+					ProviderID: "foo",
 				},
 			},
 			&networking.Network{
 				Spec: networking.NetworkSpec{
-					Handle: "bar",
+					ProviderID: "bar",
 				},
 			},
-			ContainElement(ImmutableField("spec.handle")),
+			ContainElement(ImmutableField("spec.providerID")),
 		),
-		Entry("mutable handle if not set",
+		Entry("mutable providerID if not set",
 			&networking.Network{
 				Spec: networking.NetworkSpec{
-					Handle: "foo",
+					ProviderID: "foo",
 				},
 			},
 			&networking.Network{},
-			Not(ContainElement(ImmutableField("spec.handle"))),
+			Not(ContainElement(ImmutableField("spec.providerID"))),
 		),
 	)
 })

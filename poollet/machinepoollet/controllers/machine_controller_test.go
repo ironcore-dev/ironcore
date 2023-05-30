@@ -29,6 +29,7 @@ import (
 	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gstruct"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -47,7 +48,7 @@ var _ = Describe("MachineController", func() {
 				GenerateName: "network-",
 			},
 			Spec: networkingv1alpha1.NetworkSpec{
-				Handle: "foo",
+				ProviderID: "foo",
 			},
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())
@@ -152,22 +153,26 @@ var _ = Describe("MachineController", func() {
 		expectedMachineID := machinepoolletmachine.MakeID(testingmachine.FakeRuntimeName, oriMachine.Metadata.Id)
 		Eventually(Object(machine)).Should(SatisfyAll(
 			HaveField("Status.MachineID", expectedMachineID.String()),
-			HaveField("Status.MachinePoolObservedGeneration", machine.Generation),
+			HaveField("Status.ObservedGeneration", machine.Generation),
 		))
 
 		By("setting the network interface id in the machine status")
 		oriMachine = &testingmachine.FakeMachine{Machine: *proto.Clone(&oriMachine.Machine).(*ori.Machine)}
 		oriMachine.Status.NetworkInterfaces = []*ori.NetworkInterfaceStatus{
 			{
-				Name:                   "primary",
-				NetworkInterfaceHandle: "primary-handle",
-				State:                  ori.NetworkInterfaceState_NETWORK_INTERFACE_ATTACHED,
+				Name:   "primary",
+				Handle: "primary-handle",
+				State:  ori.NetworkInterfaceState_NETWORK_INTERFACE_ATTACHED,
 			},
 		}
 		srv.SetMachines([]*testingmachine.FakeMachine{oriMachine})
 
 		By("waiting for the onmetal network interface to have a provider id set")
-		Eventually(Object(networkInterface)).Should(HaveField("Status.ProviderID", "primary-handle"))
+		Eventually(Object(machine)).Should(HaveField("Status.NetworkInterfaces", ConsistOf(MatchFields(IgnoreExtras, Fields{
+			"Name":   Equal("primary"),
+			"Handle": Equal("primary-handle"),
+			"State":  Equal(computev1alpha1.NetworkInterfaceStateAttached),
+		}))))
 	})
 
 	It("should correctly manage the power state of a machine", func() {

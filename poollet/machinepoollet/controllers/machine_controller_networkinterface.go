@@ -130,29 +130,39 @@ func (r *MachineReconciler) prepareORINetworkInterface(
 ) (*ori.NetworkInterface, bool, error) {
 	switch {
 	case machineNic.NetworkInterfaceRef != nil || machineNic.Ephemeral != nil:
-		networkInterface := &networkingv1alpha1.NetworkInterface{}
-		networkInterfaceKey := client.ObjectKey{Namespace: machine.Namespace, Name: computev1alpha1.MachineNetworkInterfaceName(machine.Name, *machineNic)}
-		if err := r.Get(ctx, networkInterfaceKey, networkInterface); err != nil {
+		nic := &networkingv1alpha1.NetworkInterface{}
+		nicKey := client.ObjectKey{Namespace: machine.Namespace, Name: computev1alpha1.MachineNetworkInterfaceName(machine.Name, *machineNic)}
+		if err := r.Get(ctx, nicKey, nic); err != nil {
 			if !apierrors.IsNotFound(err) {
 				return nil, false, fmt.Errorf("error getting network interface: %w", err)
 			}
-			r.Eventf(machine, corev1.EventTypeNormal, events.NetworkInterfaceNotReady, "Network interface %s not found", networkInterfaceKey.Name)
+			r.Eventf(machine, corev1.EventTypeNormal, events.NetworkInterfaceNotReady, "Network interface %s not found", nicKey.Name)
 			return nil, false, nil
 		}
 
-		if state := networkInterface.Status.State; state != networkingv1alpha1.NetworkInterfaceStateAvailable {
-			r.Eventf(machine, corev1.EventTypeNormal, events.NetworkInterfaceNotReady, "Network interface %s is in state %s", networkInterfaceKey.Name, state)
+		if state := nic.Status.State; state != networkingv1alpha1.NetworkInterfaceStateAvailable {
+			r.Eventf(machine, corev1.EventTypeNormal, events.NetworkInterfaceNotReady, "Network interface %s is in state %s", nicKey.Name, state)
 			return nil, false, nil
 		}
 
-		if !r.isNetworkInterfaceBoundToMachine(machine, machineNic.Name, networkInterface) {
+		if !r.isNetworkInterfaceBoundToMachine(machine, machineNic.Name, nic) {
+			return nil, false, nil
+		}
+
+		network := &networkingv1alpha1.Network{}
+		networkKey := client.ObjectKey{Namespace: machine.Namespace, Name: nic.Spec.NetworkRef.Name}
+		if err := r.Get(ctx, networkKey, network); err != nil {
+			if !apierrors.IsNotFound(err) {
+				return nil, false, fmt.Errorf("error getting network %s: %w", networkKey.Name, err)
+			}
+			r.Eventf(machine, corev1.EventTypeNormal, events.NetworkInterfaceNotReady, "Network interface %s network %s not found", nicKey.Name, networkKey.Name)
 			return nil, false, nil
 		}
 
 		return &ori.NetworkInterface{
 			Name:      machineNic.Name,
-			NetworkId: networkInterface.Status.NetworkHandle,
-			Ips:       stringersToStrings(networkInterface.Status.IPs),
+			NetworkId: network.Spec.ProviderID,
+			Ips:       stringersToStrings(nic.Status.IPs),
 		}, true, nil
 	default:
 		return nil, false, fmt.Errorf("unrecognized machine volume %#v", machineNic)
@@ -273,7 +283,7 @@ func (r *MachineReconciler) convertORINetworkInterfaceStatus(status *ori.Network
 
 	return computev1alpha1.NetworkInterfaceStatus{
 		Name:   status.Name,
-		Handle: status.NetworkInterfaceHandle,
+		Handle: status.Handle,
 		State:  state,
 	}, nil
 }
@@ -287,41 +297,7 @@ func (r *MachineReconciler) addNetworkInterfaceStatusValues(now metav1.Time, exi
 	existing.Handle = newValues.Handle
 }
 
-func (r *MachineReconciler) updateNetworkInterfaceProviderIDIfExists(
-	ctx context.Context,
-	machine *computev1alpha1.Machine,
-	machineNic *computev1alpha1.NetworkInterface,
-	providerID string,
-) error {
-	nic := &networkingv1alpha1.NetworkInterface{}
-	nicKey := client.ObjectKey{Namespace: machine.Namespace, Name: computev1alpha1.MachineNetworkInterfaceName(machine.Name, *machineNic)}
-	if err := r.Get(ctx, nicKey, nic); err != nil {
-		if !apierrors.IsNotFound(err) {
-			return fmt.Errorf("error getting network interface %s: %w", nicKey.Name, err)
-		}
-		// Be graceful if the actual network interface does not exist anymore.
-		return nil
-	}
-
-	if nic.Status.ProviderID == providerID {
-		return nil
-	}
-
-	baseNic := nic.DeepCopy()
-	nic.Status.ProviderID = providerID
-	if err := r.Status().Patch(ctx, nic, client.MergeFrom(baseNic)); err != nil {
-		// Be graceful if the actual network interface does not exist anymore.
-		if apierrors.IsNotFound(err) {
-			return nil
-		}
-		return fmt.Errorf("error patching network interface %s status: %w", nicKey.Name, err)
-	}
-	return nil
-}
-
 func (r *MachineReconciler) getNetworkInterfaceStatusesForMachine(
-	ctx context.Context,
-	log logr.Logger,
 	machine *computev1alpha1.Machine,
 	oriMachine *ori.Machine,
 	now metav1.Time,
@@ -349,11 +325,6 @@ func (r *MachineReconciler) getNetworkInterfaceStatusesForMachine(
 				Name:  machineNic.Name,
 				State: computev1alpha1.NetworkInterfaceStatePending,
 			}
-		}
-
-		if err := r.updateNetworkInterfaceProviderIDIfExists(ctx, machine, &machineNic, nicStatusValues.Handle); err != nil {
-			errs = append(errs, fmt.Errorf("[network interface %s] %w", machineNic.Name, err))
-			continue
 		}
 
 		nicStatus := existingNicStatusesByName[machineNic.Name]

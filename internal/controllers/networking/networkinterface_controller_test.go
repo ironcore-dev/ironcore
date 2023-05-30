@@ -31,7 +31,7 @@ import (
 var _ = Describe("NetworkInterfaceReconciler", func() {
 	ctx := SetupContext()
 	ns, _ := SetupTest()
-	const networkHandle = "foo"
+	const networkProviderID = "foo"
 
 	It("should reconcile the ips and update the status", func() {
 		By("creating a network")
@@ -41,7 +41,7 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 				GenerateName: "network-",
 			},
 			Spec: networkingv1alpha1.NetworkSpec{
-				Handle: networkHandle,
+				ProviderID: networkProviderID,
 			},
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())
@@ -78,7 +78,6 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 			return nic.Status
 		}).Should(SatisfyAll(
 			HaveField("State", networkingv1alpha1.NetworkInterfaceStateAvailable),
-			HaveField("NetworkHandle", networkHandle),
 			HaveField("IPs", []commonv1alpha1.IP{commonv1alpha1.MustParseIP("10.0.0.1")}),
 		))
 	})
@@ -104,7 +103,7 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 				GenerateName: "network-",
 			},
 			Spec: networkingv1alpha1.NetworkSpec{
-				Handle: networkHandle,
+				ProviderID: networkProviderID,
 			},
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())
@@ -174,7 +173,7 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 				GenerateName: "network-",
 			},
 			Spec: networkingv1alpha1.NetworkSpec{
-				Handle: networkHandle,
+				ProviderID: networkProviderID,
 			},
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())

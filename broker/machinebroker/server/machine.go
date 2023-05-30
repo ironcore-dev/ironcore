@@ -77,9 +77,9 @@ func (s *Server) convertOnmetalNetworkInterfaceStatus(status computev1alpha1.Net
 	}
 
 	return &ori.NetworkInterfaceStatus{
-		Name:                   status.Name,
-		NetworkInterfaceHandle: status.Handle,
-		State:                  state,
+		Name:   status.Name,
+		Handle: status.Handle,
+		State:  state,
 	}, nil
 }
 
@@ -102,9 +102,9 @@ func (s *Server) convertOnmetalVolumeStatus(status computev1alpha1.VolumeStatus)
 	}
 
 	return &ori.VolumeStatus{
-		Name:         status.Name,
-		VolumeHandle: status.Handle,
-		State:        state,
+		Name:   status.Name,
+		Handle: status.Handle,
+		State:  state,
 	}, nil
 }
 
@@ -164,7 +164,7 @@ func (s *Server) convertOnmetalNetworkInterfaceAttachment(
 
 		return &ori.NetworkInterface{
 			Name:      onmetalMachineNic.Name,
-			NetworkId: onmetalNic.Network.Spec.Handle,
+			NetworkId: onmetalNic.Network.Spec.ProviderID,
 			Ips:       ips,
 		}, nil
 	default:
@@ -247,7 +247,7 @@ func (s *Server) convertAggregateOnmetalMachine(aggOnmetalMachine *AggregateOnme
 			NetworkInterfaces: nics,
 		},
 		Status: &ori.MachineStatus{
-			ObservedGeneration: aggOnmetalMachine.Machine.Status.MachinePoolObservedGeneration,
+			ObservedGeneration: aggOnmetalMachine.Machine.Status.ObservedGeneration,
 			State:              state,
 			ImageRef:           "", // TODO: Fill
 			Volumes:            volumeAttachmentStates,

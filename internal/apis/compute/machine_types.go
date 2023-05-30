@@ -131,8 +131,6 @@ type NetworkInterfaceStatus struct {
 	Name string
 	// Handle is the MachinePool internal handle of the NetworkInterface.
 	Handle string
-	// NetworkHandle is the handle of the network the NetworkInterface is in.
-	NetworkHandle string
 	// IPs are the ips allocated for the network interface.
 	IPs []commonv1alpha1.IP
 	// VirtualIP is the virtual ip allocated for the network interface.
@@ -207,8 +205,8 @@ const (
 type MachineStatus struct {
 	// MachineID is the provider specific machine ID in the format '<type>://<machine_id>'.
 	MachineID string
-	// MachinePoolObservedGeneration is the last generation the MachinePool observed of the Machine.
-	MachinePoolObservedGeneration int64
+	// ObservedGeneration is the last generation the MachinePool observed of the Machine.
+	ObservedGeneration int64
 	// State is the infrastructure state of the machine.
 	State MachineState
 	// NetworkInterfaces is the list of network interface states for the machine.

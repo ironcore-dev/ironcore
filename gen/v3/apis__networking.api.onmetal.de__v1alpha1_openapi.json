@@ -13270,18 +13270,6 @@
 							}
 						]
 					},
-					"machinePoolRef": {
-						"description": "MachinePoolRef is the machine pool the network interface is currently on, if any.",
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/io.k8s.api.core.v1.LocalObjectReference"
-							}
-						]
-					},
-					"networkHandle": {
-						"description": "NetworkHandle is the handle of the network the network interface is part of.",
-						"type": "string"
-					},
 					"phase": {
 						"description": "Phase is the NetworkInterfacePhase of the NetworkInterface.",
 						"type": "string"
@@ -13402,10 +13390,6 @@
 						"description": "Name is the name of the network peering.",
 						"type": "string",
 						"default": ""
-					},
-					"networkHandle": {
-						"description": "NetworkHandle is the handle of the peered network.",
-						"type": "string"
 					},
 					"phase": {
 						"description": "Phase represents the binding phase of a network peering.",
@@ -13735,15 +13719,7 @@
 			"com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkSpec": {
 				"description": "NetworkSpec defines the desired state of Network",
 				"type": "object",
-				"required": [
-					"handle"
-				],
 				"properties": {
-					"handle": {
-						"description": "Handle is the identifier of the network provider.",
-						"type": "string",
-						"default": ""
-					},
 					"peerings": {
 						"description": "Peerings are the network peerings with this network.",
 						"type": "array",
@@ -13757,6 +13733,10 @@
 						},
 						"x-kubernetes-patch-merge-key": "name",
 						"x-kubernetes-patch-strategy": "merge,retainKeys"
+					},
+					"providerID": {
+						"description": "ProviderID is the provider-internal ID of the network.",
+						"type": "string"
 					}
 				}
 			},

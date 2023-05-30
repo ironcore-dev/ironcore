@@ -107,7 +107,7 @@ message MachineStatus {
 
 message VolumeStatus {
   string name = 1;
-  string volume_handle = 2;
+  string handle = 2;
   VolumeState state = 3;
 }
 
@@ -118,7 +118,7 @@ enum VolumeState {
 
 message NetworkInterfaceStatus {
   string name = 1;
-  string network_interface_handle = 2;
+  string handle = 2;
   NetworkInterfaceState state = 3;
 }
 

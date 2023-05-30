@@ -71,8 +71,6 @@ type NetworkInterfaceStatus struct {
 	// LastStateTransitionTime is the last time the State transitioned from one value to another.
 	LastStateTransitionTime *metav1.Time `json:"lastStateTransitionTime,omitempty"`
 
-	// NetworkHandle is the handle of the network the network interface is part of.
-	NetworkHandle string `json:"networkHandle,omitempty"`
 	// ProviderID is the provider-internal ID of the network interface.
 	ProviderID string `json:"providerID,omitempty"`
 	// IPs represent the effective IP addresses of the NetworkInterface.
@@ -84,8 +82,6 @@ type NetworkInterfaceStatus struct {
 
 	// Phase is the NetworkInterfacePhase of the NetworkInterface.
 	Phase NetworkInterfacePhase `json:"phase,omitempty"`
-	// MachinePoolRef is the machine pool the network interface is currently on, if any.
-	MachinePoolRef *corev1.LocalObjectReference `json:"machinePoolRef,omitempty"`
 	// LastPhaseTransitionTime is the last time the Phase transitioned from one value to another.
 	LastPhaseTransitionTime *metav1.Time `json:"lastPhaseTransitionTime,omitempty"`
 }
