@@ -16,12 +16,10 @@ package networking
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/go-logr/logr"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	"github.com/onmetal/onmetal-api/internal/client/networking"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -30,6 +28,12 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/source"
+
+	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	"github.com/onmetal/onmetal-api/internal/client/networking"
+	onmetalapiclient "github.com/onmetal/onmetal-api/utils/client"
 )
 
 var (
@@ -71,6 +75,15 @@ func (r *LoadBalancerReconciler) delete(ctx context.Context, log logr.Logger, lo
 func (r *LoadBalancerReconciler) reconcile(ctx context.Context, log logr.Logger, loadBalancer *networkingv1alpha1.LoadBalancer) (ctrl.Result, error) {
 	log.V(1).Info("Reconcile")
 
+	var ips []commonv1alpha1.IP
+	if loadBalancer.Spec.Type == networkingv1alpha1.LoadBalancerTypeInternal {
+		var err error
+		ips, err = r.applyInternalIPs(ctx, log, loadBalancer)
+		if err != nil {
+			return ctrl.Result{}, fmt.Errorf("error getting / applying internal ip: %w", err)
+		}
+	}
+
 	nicSelector := loadBalancer.Spec.NetworkInterfaceSelector
 	if nicSelector == nil {
 		log.V(1).Info("Network interface selector is empty")
@@ -98,7 +111,65 @@ func (r *LoadBalancerReconciler) reconcile(ctx context.Context, log logr.Logger,
 		return ctrl.Result{}, fmt.Errorf("error applying routing: %w", err)
 	}
 	log.V(1).Info("Successfully applied routing")
+
+	if err := r.updateStatus(ctx, log, loadBalancer, ips); err != nil {
+		return ctrl.Result{}, fmt.Errorf("error patching load balancer status: %w", err)
+	}
+	log.V(1).Info("Updated load balancer status")
 	return ctrl.Result{}, nil
+}
+
+func (r *LoadBalancerReconciler) applyInternalIPs(ctx context.Context, log logr.Logger, loadBalancer *networkingv1alpha1.LoadBalancer) ([]commonv1alpha1.IP, error) {
+	var ips []commonv1alpha1.IP
+	for idx, ipSource := range loadBalancer.Spec.IPs {
+		loadBalancerInternalIP, err := r.applyInternalIP(ctx, log, loadBalancer, ipSource, idx)
+		if err != nil {
+			return nil, fmt.Errorf("[ip %d] %w", idx, err)
+		}
+		ips = append(ips, loadBalancerInternalIP)
+	}
+	return ips, nil
+}
+
+func (r *LoadBalancerReconciler) applyInternalIP(ctx context.Context, log logr.Logger, loadBalancer *networkingv1alpha1.LoadBalancer, ipSource networkingv1alpha1.IPSource, idx int) (commonv1alpha1.IP, error) {
+	switch {
+	case ipSource.Value != nil:
+		return *ipSource.Value, nil
+	case ipSource.Ephemeral != nil:
+		template := ipSource.Ephemeral.PrefixTemplate
+		prefix := &ipamv1alpha1.Prefix{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: loadBalancer.Namespace,
+				Name:      networkingv1alpha1.LoadBalancerIPIPAMPrefixName(loadBalancer.Name, idx),
+			},
+		}
+		log.V(1).Info("Applying prefix for load balancer", "ipFamily", template.Spec.IPFamily)
+		if err := onmetalapiclient.ControlledCreateOrGet(ctx, r.Client, loadBalancer, prefix, func() error {
+			prefix.Labels = template.Labels
+			prefix.Annotations = template.Annotations
+			prefix.Spec = template.Spec
+			return nil
+		}); err != nil {
+			if !errors.Is(err, onmetalapiclient.ErrNotControlled) {
+				return commonv1alpha1.IP{}, fmt.Errorf("error managing ephemeral prefix %s: %w", prefix.Name, err)
+			}
+			return commonv1alpha1.IP{}, fmt.Errorf("prefix %s cannot be managed", prefix.Name)
+		}
+
+		if prefix.Status.Phase != ipamv1alpha1.PrefixPhaseAllocated {
+			return commonv1alpha1.IP{}, fmt.Errorf("prefix %s is not in state %s but %s", prefix.Name, ipamv1alpha1.PrefixPhaseAllocated, prefix.Status.Phase)
+		}
+
+		return prefix.Spec.Prefix.IP(), nil
+	default:
+		return commonv1alpha1.IP{}, fmt.Errorf("unknown ip source %#v", ipSource)
+	}
+}
+
+func (r *LoadBalancerReconciler) updateStatus(ctx context.Context, log logr.Logger, loadBalancer *networkingv1alpha1.LoadBalancer, ips []commonv1alpha1.IP) error {
+	base := loadBalancer.DeepCopy()
+	loadBalancer.Status.IPs = ips
+	return r.Status().Patch(ctx, loadBalancer, client.MergeFrom(base))
 }
 
 func (r *LoadBalancerReconciler) findDestinations(ctx context.Context, log logr.Logger, loadBalancer *networkingv1alpha1.LoadBalancer) ([]commonv1alpha1.LocalUIDReference, error) {
