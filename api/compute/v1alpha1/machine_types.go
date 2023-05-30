@@ -141,8 +141,6 @@ type NetworkInterfaceStatus struct {
 	Name string `json:"name"`
 	// Handle is the MachinePool internal handle of the NetworkInterface.
 	Handle string `json:"handle,omitempty"`
-	// NetworkHandle is the handle of the network the NetworkInterface is in.
-	NetworkHandle string `json:"networkHandle,omitempty"`
 	// IPs are the ips allocated for the network interface.
 	IPs []commonv1alpha1.IP `json:"ips,omitempty"`
 	// VirtualIP is the virtual ip allocated for the network interface.
@@ -217,8 +215,8 @@ const (
 type MachineStatus struct {
 	// MachineID is the provider specific machine ID in the format '<type>://<machine_id>'.
 	MachineID string `json:"machineID,omitempty"`
-	// MachinePoolObservedGeneration is the last generation the MachinePool observed of the Machine.
-	MachinePoolObservedGeneration int64 `json:"machinePoolObservedGeneration,omitempty"`
+	// ObservedGeneration is the last generation the MachinePool observed of the Machine.
+	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
 	// State is the infrastructure state of the machine.
 	State MachineState `json:"state,omitempty"`
 	// NetworkInterfaces is the list of network interface states for the machine.

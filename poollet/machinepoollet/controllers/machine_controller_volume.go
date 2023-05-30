@@ -366,7 +366,7 @@ func (r *MachineReconciler) convertORIVolumeStatus(oriVolumeStatus *ori.VolumeSt
 
 	return computev1alpha1.VolumeStatus{
 		Name:   oriVolumeStatus.Name,
-		Handle: oriVolumeStatus.VolumeHandle,
+		Handle: oriVolumeStatus.Handle,
 		State:  state,
 	}, nil
 }

@@ -35,7 +35,7 @@ type VolumeClass struct {
 	Capabilities core.ResourceList
 	// ResizePolicy describes the supported expansion policy of a VolumeClass.
 	// If not set default to Static expansion policy.
-	ResizePolicy ResizePolicy `json:"resizePolicy,omitempty"`
+	ResizePolicy ResizePolicy
 }
 
 // ResizePolicy is a type of policy.

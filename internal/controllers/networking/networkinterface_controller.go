@@ -77,14 +77,13 @@ func (r *NetworkInterfaceReconciler) reconcile(ctx context.Context, log logr.Log
 	var anyDependencyNotReady bool
 
 	log.V(1).Info("Getting network handle")
-	networkHandle, networkNotReadyReason, err := r.getNetworkHandle(ctx, nic)
+	networkOK, err := r.getNetworkAvailability(ctx, nic)
 	if err != nil {
 		r.Eventf(nic, corev1.EventTypeWarning, events.ErrorGettingNetworkHandle, "Error getting network handle: %v", err)
 		return ctrl.Result{}, nil
 	}
-	if networkNotReadyReason != "" {
+	if !networkOK {
 		anyDependencyNotReady = true
-		r.Event(nic, corev1.EventTypeNormal, events.NetworkNotReady, networkNotReadyReason)
 	}
 
 	log.V(1).Info("Applying IPs")
@@ -126,7 +125,7 @@ func (r *NetworkInterfaceReconciler) reconcile(ctx context.Context, log logr.Log
 	}
 
 	log.V(1).Info("Updating network interface status", "State", state)
-	if err := r.updateStatus(ctx, nic, state, networkHandle, ips, prefixes, virtualIP); err != nil {
+	if err := r.updateStatus(ctx, nic, state, ips, prefixes, virtualIP); err != nil {
 		return ctrl.Result{}, err
 	}
 	log.V(1).Info("Successfully updated network status", "State", state)
@@ -137,7 +136,6 @@ func (r *NetworkInterfaceReconciler) updateStatus(
 	ctx context.Context,
 	nic *networkingv1alpha1.NetworkInterface,
 	state networkingv1alpha1.NetworkInterfaceState,
-	networkHandle string,
 	ips []commonv1alpha1.IP,
 	prefixes []commonv1alpha1.IPPrefix,
 	virtualIP *commonv1alpha1.IP,
@@ -149,7 +147,6 @@ func (r *NetworkInterfaceReconciler) updateStatus(
 		nic.Status.LastStateTransitionTime = &now
 	}
 	nic.Status.State = state
-	nic.Status.NetworkHandle = networkHandle
 	nic.Status.IPs = ips
 	nic.Status.Prefixes = prefixes
 	nic.Status.VirtualIP = virtualIP
@@ -160,21 +157,23 @@ func (r *NetworkInterfaceReconciler) updateStatus(
 	return nil
 }
 
-func (r *NetworkInterfaceReconciler) getNetworkHandle(ctx context.Context, nic *networkingv1alpha1.NetworkInterface) (networkHandle string, notReadyReason string, err error) {
+func (r *NetworkInterfaceReconciler) getNetworkAvailability(ctx context.Context, nic *networkingv1alpha1.NetworkInterface) (bool, error) {
 	network := &networkingv1alpha1.Network{}
 	networkKey := client.ObjectKey{Namespace: nic.Namespace, Name: nic.Spec.NetworkRef.Name}
 	if err := r.Get(ctx, networkKey, network); err != nil {
 		if !apierrors.IsNotFound(err) {
-			return "", "", fmt.Errorf("error getting network %s: %w", networkKey, err)
+			return false, fmt.Errorf("error getting network %s: %w", networkKey, err)
 		}
-		return "", fmt.Sprintf("Network %s not found", networkKey.Name), nil
+		r.Eventf(nic, corev1.EventTypeNormal, events.NetworkNotReady, "Network %s not found", networkKey.Name)
+		return false, nil
 	}
 
 	switch state := network.Status.State; state {
 	case networkingv1alpha1.NetworkStateAvailable:
-		return network.Spec.Handle, "", nil
+		return true, nil
 	default:
-		return "", fmt.Sprintf("Network %s is not in state %s but %s", networkKey.Name, networkingv1alpha1.NetworkStateAvailable, state), nil
+		r.Eventf(nic, corev1.EventTypeNormal, events.NetworkNotReady, "Network %s not yet available", networkKey.Name)
+		return false, nil
 	}
 }
 

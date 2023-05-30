@@ -4667,11 +4667,6 @@
 						"description": "MachineID is the provider specific machine ID in the format '\u003ctype\u003e://\u003cmachine_id\u003e'.",
 						"type": "string"
 					},
-					"machinePoolObservedGeneration": {
-						"description": "MachinePoolObservedGeneration is the last generation the MachinePool observed of the Machine.",
-						"type": "integer",
-						"format": "int64"
-					},
 					"networkInterfaces": {
 						"description": "NetworkInterfaces is the list of network interface states for the machine.",
 						"type": "array",
@@ -4683,6 +4678,11 @@
 								}
 							]
 						}
+					},
+					"observedGeneration": {
+						"description": "ObservedGeneration is the last generation the MachinePool observed of the Machine.",
+						"type": "integer",
+						"format": "int64"
 					},
 					"state": {
 						"description": "State is the infrastructure state of the machine.\n\nPossible enum values:\n - `\"Pending\"` means the Machine has been accepted by the system, but not yet completely started. This includes time before being bound to a MachinePool, as well as time spent setting up the Machine on that MachinePool.\n - `\"Running\"` means the machine is running on a MachinePool.\n - `\"Shutdown\"` means the machine is shut down.\n - `\"Terminated\"` means the machine has been permanently stopped and cannot be started.",
@@ -4781,10 +4781,6 @@
 						"description": "Name is the name of the NetworkInterface to whom the status belongs to.",
 						"type": "string",
 						"default": ""
-					},
-					"networkHandle": {
-						"description": "NetworkHandle is the handle of the network the NetworkInterface is in.",
-						"type": "string"
 					},
 					"phase": {
 						"description": "Phase is the NetworkInterface binding phase of the NetworkInterface.",

@@ -432,7 +432,7 @@ func (r *MachineReconciler) updateStatus(ctx context.Context, log logr.Logger, m
 
 	machineID := machinepoolletmachine.MakeID(r.MachineRuntimeName, oriMachine.Metadata.Id)
 	machine.Status.MachineID = machineID.String()
-	machine.Status.MachinePoolObservedGeneration = generation
+	machine.Status.ObservedGeneration = generation
 
 	state, err := r.convertORIMachineState(oriMachine.Status.State)
 	if err != nil {
@@ -446,7 +446,7 @@ func (r *MachineReconciler) updateStatus(ctx context.Context, log logr.Logger, m
 		return fmt.Errorf("error getting volume statuses: %w", err)
 	}
 
-	nicStatuses, err := r.getNetworkInterfaceStatusesForMachine(ctx, log, machine, oriMachine, now)
+	nicStatuses, err := r.getNetworkInterfaceStatusesForMachine(machine, oriMachine, now)
 	if err != nil {
 		return fmt.Errorf("error getting network interface statuses: %w", err)
 	}

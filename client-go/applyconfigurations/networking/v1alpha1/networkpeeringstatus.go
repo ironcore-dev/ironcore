@@ -26,7 +26,6 @@ import (
 // with apply.
 type NetworkPeeringStatusApplyConfiguration struct {
 	Name                    *string                       `json:"name,omitempty"`
-	NetworkHandle           *string                       `json:"networkHandle,omitempty"`
 	Phase                   *v1alpha1.NetworkPeeringPhase `json:"phase,omitempty"`
 	LastPhaseTransitionTime *v1.Time                      `json:"lastPhaseTransitionTime,omitempty"`
 }
@@ -42,14 +41,6 @@ func NetworkPeeringStatus() *NetworkPeeringStatusApplyConfiguration {
 // If called multiple times, the Name field is set to the value of the last call.
 func (b *NetworkPeeringStatusApplyConfiguration) WithName(value string) *NetworkPeeringStatusApplyConfiguration {
 	b.Name = &value
-	return b
-}
-
-// WithNetworkHandle sets the NetworkHandle field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the NetworkHandle field is set to the value of the last call.
-func (b *NetworkPeeringStatusApplyConfiguration) WithNetworkHandle(value string) *NetworkPeeringStatusApplyConfiguration {
-	b.NetworkHandle = &value
 	return b
 }
 

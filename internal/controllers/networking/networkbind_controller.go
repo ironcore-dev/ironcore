@@ -33,8 +33,7 @@ import (
 )
 
 type peeringStatusData struct {
-	phase  networkingv1alpha1.NetworkPeeringPhase
-	handle string
+	phase networkingv1alpha1.NetworkPeeringPhase
 }
 
 type NetworkBindReconciler struct {
@@ -120,7 +119,6 @@ func (r *NetworkBindReconciler) updateStatus(ctx context.Context, log logr.Logge
 
 		newStatusPeerings = append(newStatusPeerings, networkingv1alpha1.NetworkPeeringStatus{
 			Name:                    peeringStatus.Name,
-			NetworkHandle:           data.handle,
 			Phase:                   data.phase,
 			LastPhaseTransitionTime: lastPhaseTransitionTime,
 		})
@@ -132,7 +130,6 @@ func (r *NetworkBindReconciler) updateStatus(ctx context.Context, log logr.Logge
 		}
 		newStatusPeerings = append(newStatusPeerings, networkingv1alpha1.NetworkPeeringStatus{
 			Name:                    name,
-			NetworkHandle:           data.handle,
 			Phase:                   data.phase,
 			LastPhaseTransitionTime: &now,
 		})
@@ -242,8 +239,7 @@ func (r *NetworkBindReconciler) reconcilePeering(
 		}
 
 		log.V(1).Info("Target network peering matches")
-		handle := targetNetwork.Spec.Handle
-		return "", &peeringStatusData{phase: networkingv1alpha1.NetworkPeeringPhaseBound, handle: handle}, nil
+		return "", &peeringStatusData{phase: networkingv1alpha1.NetworkPeeringPhaseBound}, nil
 	}
 
 	log.V(1).Info("No matching target peering found")

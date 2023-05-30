@@ -1522,9 +1522,9 @@ func schema_onmetal_api_api_compute_v1alpha1_MachineStatus(ref common.ReferenceC
 							Format:      "",
 						},
 					},
-					"machinePoolObservedGeneration": {
+					"observedGeneration": {
 						SchemaProps: spec.SchemaProps{
-							Description: "MachinePoolObservedGeneration is the last generation the MachinePool observed of the Machine.",
+							Description: "ObservedGeneration is the last generation the MachinePool observed of the Machine.",
 							Type:        []string{"integer"},
 							Format:      "int64",
 						},
@@ -1653,13 +1653,6 @@ func schema_onmetal_api_api_compute_v1alpha1_NetworkInterfaceStatus(ref common.R
 					"handle": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Handle is the MachinePool internal handle of the NetworkInterface.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"networkHandle": {
-						SchemaProps: spec.SchemaProps{
-							Description: "NetworkHandle is the handle of the network the NetworkInterface is in.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -3696,13 +3689,6 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkInterfaceStatus(ref commo
 							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
 						},
 					},
-					"networkHandle": {
-						SchemaProps: spec.SchemaProps{
-							Description: "NetworkHandle is the handle of the network the network interface is part of.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
 					"providerID": {
 						SchemaProps: spec.SchemaProps{
 							Description: "ProviderID is the provider-internal ID of the network interface.",
@@ -3751,12 +3737,6 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkInterfaceStatus(ref commo
 							Format:      "",
 						},
 					},
-					"machinePoolRef": {
-						SchemaProps: spec.SchemaProps{
-							Description: "MachinePoolRef is the machine pool the network interface is currently on, if any.",
-							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
-						},
-					},
 					"lastPhaseTransitionTime": {
 						SchemaProps: spec.SchemaProps{
 							Description: "LastPhaseTransitionTime is the last time the Phase transitioned from one value to another.",
@@ -3767,7 +3747,7 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkInterfaceStatus(ref commo
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/api/common/v1alpha1.IP", "github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+			"github.com/onmetal/onmetal-api/api/common/v1alpha1.IP", "github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
 	}
 }
 
@@ -3889,13 +3869,6 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkPeeringStatus(ref common.
 						SchemaProps: spec.SchemaProps{
 							Description: "Name is the name of the network peering.",
 							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"networkHandle": {
-						SchemaProps: spec.SchemaProps{
-							Description: "NetworkHandle is the handle of the peered network.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -4337,10 +4310,9 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkSpec(ref common.Reference
 				Description: "NetworkSpec defines the desired state of Network",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"handle": {
+					"providerID": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Handle is the identifier of the network provider.",
-							Default:     "",
+							Description: "ProviderID is the provider-internal ID of the network.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -4366,7 +4338,6 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkSpec(ref common.Reference
 						},
 					},
 				},
-				Required: []string{"handle"},
 			},
 		},
 		Dependencies: []string{

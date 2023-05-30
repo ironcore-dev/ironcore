@@ -535,13 +535,13 @@ NetworkSpec
 <table>
 <tr>
 <td>
-<code>handle</code><br/>
+<code>providerID</code><br/>
 <em>
 string
 </em>
 </td>
 <td>
-<p>Handle is the identifier of the network provider.</p>
+<p>ProviderID is the provider-internal ID of the network.</p>
 </td>
 </tr>
 <tr>
@@ -1865,17 +1865,6 @@ Kubernetes meta/v1.Time
 </tr>
 <tr>
 <td>
-<code>networkHandle</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>NetworkHandle is the handle of the network the network interface is part of.</p>
-</td>
-</tr>
-<tr>
-<td>
 <code>providerID</code><br/>
 <em>
 string
@@ -1935,19 +1924,6 @@ NetworkInterfacePhase
 </td>
 <td>
 <p>Phase is the NetworkInterfacePhase of the NetworkInterface.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>machinePoolRef</code><br/>
-<em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>MachinePoolRef is the machine pool the network interface is currently on, if any.</p>
 </td>
 </tr>
 <tr>
@@ -2182,17 +2158,6 @@ string
 </td>
 <td>
 <p>Name is the name of the network peering.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>networkHandle</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>NetworkHandle is the handle of the peered network.</p>
 </td>
 </tr>
 <tr>
@@ -2652,13 +2617,13 @@ Kubernetes meta/v1.LabelSelector
 <tbody>
 <tr>
 <td>
-<code>handle</code><br/>
+<code>providerID</code><br/>
 <em>
 string
 </em>
 </td>
 <td>
-<p>Handle is the identifier of the network provider.</p>
+<p>ProviderID is the provider-internal ID of the network.</p>
 </td>
 </tr>
 <tr>

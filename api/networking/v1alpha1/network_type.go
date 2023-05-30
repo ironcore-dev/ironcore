@@ -23,8 +23,8 @@ import (
 
 // NetworkSpec defines the desired state of Network
 type NetworkSpec struct {
-	// Handle is the identifier of the network provider.
-	Handle string `json:"handle"`
+	// ProviderID is the provider-internal ID of the network.
+	ProviderID string `json:"providerID,omitempty"`
 	// Peerings are the network peerings with this network.
 	// +optional
 	// +patchMergeKey=name
@@ -71,8 +71,6 @@ const (
 type NetworkPeeringStatus struct {
 	// Name is the name of the network peering.
 	Name string `json:"name"`
-	// NetworkHandle is the handle of the peered network.
-	NetworkHandle string `json:"networkHandle,omitempty"`
 	// Phase represents the binding phase of a network peering.
 	Phase NetworkPeeringPhase `json:"phase,omitempty"`
 	// LastPhaseTransitionTime is the last time the Phase transitioned.

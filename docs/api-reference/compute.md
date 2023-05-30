@@ -1183,13 +1183,13 @@ string
 </tr>
 <tr>
 <td>
-<code>machinePoolObservedGeneration</code><br/>
+<code>observedGeneration</code><br/>
 <em>
 int64
 </em>
 </td>
 <td>
-<p>MachinePoolObservedGeneration is the last generation the MachinePool observed of the Machine.</p>
+<p>ObservedGeneration is the last generation the MachinePool observed of the Machine.</p>
 </td>
 </tr>
 <tr>
@@ -1404,17 +1404,6 @@ string
 </td>
 <td>
 <p>Handle is the MachinePool internal handle of the NetworkInterface.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>networkHandle</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>NetworkHandle is the handle of the network the NetworkInterface is in.</p>
 </td>
 </tr>
 <tr>
