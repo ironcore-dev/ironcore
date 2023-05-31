@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package metrics.v1alpha1;
+option go_package = "github.com/onmetal/onmetal-api/ori/apis/metrics/v1alpha1";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+
+option (gogoproto.goproto_stringer_all) = false;
+option (gogoproto.stringer_all) = true;
+option (gogoproto.goproto_getters_all) = true;
+option (gogoproto.marshaler_all) = true;
+option (gogoproto.sizer_all) = true;
+option (gogoproto.unmarshaler_all) = true;
+option (gogoproto.goproto_unrecognized_all) = false;
+
+message MetricDescriptor {
+  // The name field will be used as a unique identifier of this MetricDescriptor,
+  // and be used in conjunction with the Metric structure to populate the full Metric.
+  string name = 1;
+  string help = 2;
+  // When a metric uses this metric descriptor, it should only define
+  // labels that have previously been declared in label_keys.
+  // It is the responsibility of the runtime to correctly keep sorted the keys and values.
+  // If the two slices have different length, the behavior is undefined.
+  repeated string label_keys = 3;
+}
+
+
+message Metric {
+  // Name must match a name previously returned in a MetricDescriptors call,
+  // otherwise, it will be ignored.
+  string name = 1;
+  // Timestamp should be 0 if the metric was gathered live.
+  // If it was cached, the Timestamp should reflect the time it was collected.
+  int64 timestamp = 2;
+  MetricType metric_type = 3;
+  // The corresponding LabelValues to the LabelKeys defined in the MetricDescriptor.
+  // It is the responsibility of the runtime to correctly keep sorted the keys and values.
+  // If the two slices have different length, the behavior is undefined.
+  repeated string label_values = 4;
+  uint64 value = 5;
+}
+
+enum MetricType {
+  COUNTER = 0;
+  GAUGE = 1;
+}
+

@@ -41,6 +41,7 @@ function generate() {
 }
 
 generate "ori/apis/meta/v1alpha1"
+generate "ori/apis/metrics/v1alpha1"
 generate "ori/apis/machine/v1alpha1"
 generate "ori/apis/volume/v1alpha1"
 generate "ori/apis/bucket/v1alpha1"
