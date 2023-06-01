@@ -25,11 +25,13 @@ import (
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
+	v1alpha11 "github.com/onmetal/onmetal-api/ori/apis/metrics/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
 	oriremotevolume "github.com/onmetal/onmetal-api/ori/remote/volume"
 	"github.com/onmetal/onmetal-api/poollet/orievent"
 	volumepoolletconfig "github.com/onmetal/onmetal-api/poollet/volumepoollet/client/config"
 	"github.com/onmetal/onmetal-api/poollet/volumepoollet/controllers"
+	"github.com/onmetal/onmetal-api/poollet/volumepoollet/metrics"
 	"github.com/onmetal/onmetal-api/poollet/volumepoollet/vcm"
 	"github.com/onmetal/onmetal-api/utils/client/config"
 	"github.com/spf13/cobra"
@@ -159,6 +161,22 @@ func Run(ctx context.Context, opts Options) error {
 	cfg, configCtrl, err := getter.GetConfig(ctx, &opts.GetConfigOptions)
 	if err != nil {
 		return fmt.Errorf("error getting config: %w", err)
+	}
+
+	collector := metrics.NewORIMetricsCollector(
+		ctx, logger,
+		func(ctx context.Context) ([]*v1alpha11.Metric, error) {
+			resp, err := volumeRuntime.ListMetrics(ctx, &ori.ListMetricsRequest{})
+			return resp.GetMetrics(), err
+		},
+		func(ctx context.Context) ([]*v1alpha11.MetricDescriptor, error) {
+			resp, err := volumeRuntime.ListMetricDescriptors(ctx, &ori.ListMetricDescriptorsRequest{})
+			return resp.GetDescriptors(), err
+		},
+	)
+
+	if err := metrics.Register(collector); err != nil {
+		return fmt.Errorf("error registering metrics: %w", err)
 	}
 
 	leaderElectionCfg, err := configutils.GetConfig(

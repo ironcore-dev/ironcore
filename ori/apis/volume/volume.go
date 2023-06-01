@@ -27,4 +27,7 @@ type RuntimeService interface {
 	DeleteVolume(context.Context, *api.DeleteVolumeRequest) (*api.DeleteVolumeResponse, error)
 
 	ListVolumeClasses(context.Context, *api.ListVolumeClassesRequest) (*api.ListVolumeClassesResponse, error)
+
+	ListMetricDescriptors(context.Context, *api.ListMetricDescriptorsRequest) (*api.ListMetricDescriptorsResponse, error)
+	ListMetrics(context.Context, *api.ListMetricsRequest) (*api.ListMetricsResponse, error)
 }

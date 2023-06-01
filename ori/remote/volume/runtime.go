@@ -60,3 +60,11 @@ func (r *remoteRuntime) DeleteVolume(ctx context.Context, request *ori.DeleteVol
 func (r *remoteRuntime) ListVolumeClasses(ctx context.Context, request *ori.ListVolumeClassesRequest) (*ori.ListVolumeClassesResponse, error) {
 	return r.client.ListVolumeClasses(ctx, request)
 }
+
+func (r *remoteRuntime) ListMetricDescriptors(ctx context.Context, request *ori.ListMetricDescriptorsRequest) (*ori.ListMetricDescriptorsResponse, error) {
+	return r.client.ListMetricDescriptors(ctx, request)
+}
+
+func (r *remoteRuntime) ListMetrics(ctx context.Context, request *ori.ListMetricsRequest) (*ori.ListMetricsResponse, error) {
+	return r.client.ListMetrics(ctx, request)
+}

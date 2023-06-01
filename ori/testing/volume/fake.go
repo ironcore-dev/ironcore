@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/onmetal/onmetal-api/broker/common/idgen"
+	orimetrics "github.com/onmetal/onmetal-api/ori/apis/metrics/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -39,6 +40,14 @@ type FakeVolumeClass struct {
 	ori.VolumeClass
 }
 
+type FakeMetric struct {
+	orimetrics.Metric
+}
+
+type FakeMetricDescriptor struct {
+	orimetrics.MetricDescriptor
+}
+
 type FakeRuntimeService struct {
 	sync.Mutex
 
@@ -46,6 +55,9 @@ type FakeRuntimeService struct {
 
 	Volumes       map[string]*FakeVolume
 	VolumeClasses map[string]*FakeVolumeClass
+
+	MetricDesc []*FakeMetricDescriptor
+	Metrics    []*FakeMetric
 }
 
 func NewFakeRuntimeService() *FakeRuntimeService {
@@ -155,4 +167,28 @@ func (r *FakeRuntimeService) ListVolumeClasses(ctx context.Context, req *ori.Lis
 		res = append(res, &volumeClass)
 	}
 	return &ori.ListVolumeClassesResponse{VolumeClasses: res}, nil
+}
+
+func (r *FakeRuntimeService) ListMetricDescriptors(ctx context.Context, req *ori.ListMetricDescriptorsRequest, opts ...grpc.CallOption) (*ori.ListMetricDescriptorsResponse, error) {
+	r.Lock()
+	defer r.Unlock()
+
+	var res []*orimetrics.MetricDescriptor
+	for _, m := range r.MetricDesc {
+		metricDescriptor := m.MetricDescriptor
+		res = append(res, &metricDescriptor)
+	}
+	return &ori.ListMetricDescriptorsResponse{Descriptors: res}, nil
+}
+
+func (r *FakeRuntimeService) ListMetrics(ctx context.Context, req *ori.ListMetricsRequest, opts ...grpc.CallOption) (*ori.ListMetricsResponse, error) {
+	r.Lock()
+	defer r.Unlock()
+
+	var res []*orimetrics.Metric
+	for _, m := range r.Metrics {
+		metric := m.Metric
+		res = append(res, &metric)
+	}
+	return &ori.ListMetricsResponse{Metrics: res}, nil
 }
