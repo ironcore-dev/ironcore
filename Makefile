@@ -24,6 +24,7 @@ GOBIN=$(shell go env GOPATH)/bin
 else
 GOBIN=$(shell go env GOBIN)
 endif
+BUILDARGS ?=
 
 # Setting SHELL to bash allows bash commands to be executed by recipes.
 # This is a requirement for 'setup-envtest.sh' in the test target.
@@ -186,47 +187,47 @@ docker-build: \
 
 .PHONY: docker-build-onmetal-apiserver
 docker-build-onmetal-apiserver: ## Build onmetal-apiserver.
-	docker build --target apiserver -t ${APISERVER_IMG} .
+	docker build $(BUILDARGS) --target apiserver -t ${APISERVER_IMG} .
 
 .PHONY: docker-build-onmetal-controller-manager
 docker-build-onmetal-controller-manager: ## Build onmetal-controller-manager.
-	docker build --target manager -t ${CONTROLLER_IMG} .
+	docker build $(BUILDARGS) --target manager -t ${CONTROLLER_IMG} .
 
 .PHONY: docker-build-machinepoollet
 docker-build-machinepoollet: ## Build machinepoollet image.
-	docker build --target machinepoollet -t ${MACHINEPOOLLET_IMG} .
+	docker build $(BUILDARGS) --target machinepoollet -t ${MACHINEPOOLLET_IMG} .
 
 .PHONY: docker-build-machinebroker
 docker-build-machinebroker: ## Build machinebroker image.
-	docker build --target machinebroker -t ${MACHINEBROKER_IMG} .
+	docker build $(BUILDARGS) --target machinebroker -t ${MACHINEBROKER_IMG} .
 
 .PHONY: docker-build-orictl-machine
 docker-build-orictl-machine: ## Build orictl-machine image.
-	docker build --target orictl-machine -t ${ORICTL_MACHINE_IMG} .
+	docker build $(BUILDARGS) --target orictl-machine -t ${ORICTL_MACHINE_IMG} .
 
 .PHONY: docker-build-volumepoollet
 docker-build-volumepoollet: ## Build volumepoollet image.
-	docker build --target volumepoollet -t ${VOLUMEPOOLLET_IMG} .
+	docker build $(BUILDARGS) --target volumepoollet -t ${VOLUMEPOOLLET_IMG} .
 
 .PHONY: docker-build-volumebroker
 docker-build-volumebroker: ## Build volumebroker image.
-	docker build --target volumebroker -t ${VOLUMEBROKER_IMG} .
+	docker build $(BUILDARGS) --target volumebroker -t ${VOLUMEBROKER_IMG} .
 
 .PHONY: docker-build-orictl-volume
 docker-build-orictl-volume: ## Build orictl-volume image.
-	docker build --target orictl-volume -t ${ORICTL_VOLUME_IMG} .
+	docker build $(BUILDARGS) --target orictl-volume -t ${ORICTL_VOLUME_IMG} .
 
 .PHONY: docker-build-bucketpoollet
 docker-build-bucketpoollet: ## Build bucketpoollet image.
-	docker build --target bucketpoollet -t ${BUCKETPOOLLET_IMG} .
+	docker build $(BUILDARGS) --target bucketpoollet -t ${BUCKETPOOLLET_IMG} .
 
 .PHONY: docker-build-bucketbroker
 docker-build-bucketbroker: ## Build bucketbroker image.
-	docker build --target bucketbroker -t ${BUCKETBROKER_IMG} .
+	docker build $(BUILDARGS) --target bucketbroker -t ${BUCKETBROKER_IMG} .
 
 .PHONY: docker-build-orictl-bucket
 docker-build-orictl-bucket: ## Build orictl-bucket image.
-	docker build --target orictl-bucket -t ${ORICTL_BUCKET_IMG} .
+	docker build $(BUILDARGS) --target orictl-bucket -t ${ORICTL_BUCKET_IMG} .
 
 .PHONY: docker-push
 docker-push: ## Push docker image with the manager.
@@ -257,11 +258,11 @@ undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/confi
 
 .PHONY: kind-build-apiserver
 kind-build-apiserver: ## Build the apiserver for usage in kind.
-	docker build --target apiserver -t apiserver .
+	docker build $(BUILDARGS) --target apiserver -t apiserver .
 
 .PHONY: kind-build-controller
 kind-build-controller: ## Build the controller for usage in kind.
-	docker build --target manager -t controller .
+	docker build $(BUILDARGS) --target manager -t controller .
 
 .PHONY: kind-build
 kind-build: kind-build-apiserver kind-build-controller ## Build the apiserver and controller for usage in kind.
