@@ -127,7 +127,7 @@ func (m *LoadBalancers) createLoadBalancer(
 			Name:      m.cluster.IDGen().Generate(),
 		},
 		Spec: networkingv1alpha1.LoadBalancerSpec{
-			Type:       networkingv1alpha1.LoadBalancerTypePublic,
+			Type:       key.target.LoadBalancerType,
 			IPFamilies: []corev1.IPFamily{key.target.IP.Family()},
 			NetworkRef: corev1.LocalObjectReference{Name: network.Name},
 			Ports:      ports,
