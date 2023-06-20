@@ -32,6 +32,7 @@ import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	machinebroker "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
 	"github.com/onmetal/onmetal-api/internal/client/networking"
 	onmetalapiclient "github.com/onmetal/onmetal-api/utils/client"
 )
@@ -75,47 +76,45 @@ func (r *LoadBalancerReconciler) delete(ctx context.Context, log logr.Logger, lo
 func (r *LoadBalancerReconciler) reconcile(ctx context.Context, log logr.Logger, loadBalancer *networkingv1alpha1.LoadBalancer) (ctrl.Result, error) {
 	log.V(1).Info("Reconcile")
 
+	nicSelector := loadBalancer.Spec.NetworkInterfaceSelector
+	if nicSelector != nil {
+		log.V(1).Info("Network interface selector is present, managing routing")
+		log.V(1).Info("Finding destinations")
+		destinations, err := r.findDestinations(ctx, log, loadBalancer)
+		if err != nil {
+			return ctrl.Result{}, fmt.Errorf("error finding destinations: %w", err)
+		}
+		log.V(1).Info("Successfully found destinations", "Destinations", destinations)
+
+		log.V(1).Info("Finding network", "Network", loadBalancer.Spec.NetworkRef.Name)
+		network, err := r.getNetwork(ctx, log, loadBalancer)
+		if err != nil {
+			return ctrl.Result{}, fmt.Errorf("error getting network %s: %w", loadBalancer.Spec.NetworkRef.Name, err)
+		}
+		log.V(1).Info("Successfully found nework", "Network", network.Name)
+
+		log.V(1).Info("Applying routing")
+		if err := r.applyRouting(ctx, loadBalancer, destinations, network); err != nil {
+			return ctrl.Result{}, fmt.Errorf("error applying routing: %w", err)
+		}
+		log.V(1).Info("Successfully applied routing")
+	}
+
 	var ips []commonv1alpha1.IP
-	if loadBalancer.Spec.Type == networkingv1alpha1.LoadBalancerTypeInternal {
+	_, exists := loadBalancer.Labels[machinebroker.ManagerLabel]
+	if loadBalancer.Spec.Type == networkingv1alpha1.LoadBalancerTypeInternal && !exists {
 		var err error
 		ips, err = r.applyInternalIPs(ctx, log, loadBalancer)
 		if err != nil {
 			return ctrl.Result{}, fmt.Errorf("error getting / applying internal ip: %w", err)
 		}
+
+		if err := r.updateStatus(ctx, log, loadBalancer, ips); err != nil {
+			return ctrl.Result{}, fmt.Errorf("error patching load balancer status: %w", err)
+		}
+		log.V(1).Info("Updated load balancer status")
 	}
 
-	nicSelector := loadBalancer.Spec.NetworkInterfaceSelector
-	if nicSelector == nil {
-		log.V(1).Info("Network interface selector is empty")
-		return ctrl.Result{}, nil
-	}
-
-	log.V(1).Info("Network interface selector is present, managing routing")
-
-	log.V(1).Info("Finding destinations")
-	destinations, err := r.findDestinations(ctx, log, loadBalancer)
-	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("error finding destinations: %w", err)
-	}
-	log.V(1).Info("Successfully found destinations", "Destinations", destinations)
-
-	log.V(1).Info("Finding network", "Network", loadBalancer.Spec.NetworkRef.Name)
-	network, err := r.getNetwork(ctx, log, loadBalancer)
-	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("error getting network %s: %w", loadBalancer.Spec.NetworkRef.Name, err)
-	}
-	log.V(1).Info("Successfully found nework", "Network", network.Name)
-
-	log.V(1).Info("Applying routing")
-	if err := r.applyRouting(ctx, loadBalancer, destinations, network); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error applying routing: %w", err)
-	}
-	log.V(1).Info("Successfully applied routing")
-
-	if err := r.updateStatus(ctx, log, loadBalancer, ips); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error patching load balancer status: %w", err)
-	}
-	log.V(1).Info("Updated load balancer status")
 	return ctrl.Result{}, nil
 }
 
