@@ -51,6 +51,8 @@ func (s *Server) buildIDToNATGatewaysMap(natGateways []machinebrokerv1alpha1.NAT
 }
 
 func (s *Server) listAggregateOnmetalNetworkInterfaces(ctx context.Context) ([]AggregateOnmetalNetworkInterface, error) {
+	log := s.loggerFrom(ctx)
+
 	onmetalNetworkInterfaceList := &networkingv1alpha1.NetworkInterfaceList{}
 	if err := s.listManagedAndCreated(ctx, onmetalNetworkInterfaceList); err != nil {
 		return nil, fmt.Errorf("error listing onmetal network interfaces: %w", err)
@@ -96,10 +98,12 @@ func (s *Server) listAggregateOnmetalNetworkInterfaces(ctx context.Context) ([]A
 			},
 		)
 		if err != nil {
-			return nil, fmt.Errorf("error assembling onmetal network interface %s: %w", onmetalNetworkInterface.Name, err)
+			log.Error(err, fmt.Sprintf("error assembling onmetal network interface %s", onmetalNetworkInterface.Name))
 		}
 
-		res = append(res, *networkInterface)
+		if networkInterface != nil {
+			res = append(res, *networkInterface)
+		}
 	}
 	return res, nil
 }
