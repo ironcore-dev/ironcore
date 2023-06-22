@@ -227,7 +227,7 @@ func (s *Server) createOnmetalNetworkInterface(ctx context.Context, log logr.Log
 	c := cleaner.New()
 	defer cleaner.CleanupOnError(ctx, c, &retErr)
 
-	network, networkTransaction, err := s.networks.BeginCreate(ctx, onmetalNetworkInterface.Network.Spec.Handle)
+	network, networkTransaction, err := s.networks.BeginCreate(ctx, onmetalNetworkInterface.Network)
 	if err != nil {
 		return fmt.Errorf("error getting network: %w", err)
 	}

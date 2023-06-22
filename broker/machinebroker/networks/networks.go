@@ -113,9 +113,11 @@ func (m *Networks) createNetwork(ctx context.Context, handle string) (res *netwo
 	return network, nil
 }
 
-func (m *Networks) BeginCreate(ctx context.Context, handle string) (*networkingv1alpha1.Network, transaction.Transaction[client.Object], error) {
+func (m *Networks) BeginCreate(ctx context.Context, nw *networkingv1alpha1.Network) (*networkingv1alpha1.Network, transaction.Transaction[client.Object], error) {
 	log := ctrl.LoggerFrom(ctx)
+	log.Info("beginning create network transaction", "network", nw)
 
+	handle := nw.Spec.Handle
 	var network *networkingv1alpha1.Network
 	t, err := transaction.Build(func(cb transaction.Callback[client.Object]) error {
 		m.mu.Lock(handle)
@@ -137,16 +139,27 @@ func (m *Networks) BeginCreate(ctx context.Context, handle string) (*networkingv
 			n = newNetwork
 		}
 		network = n
+		if len(nw.Status.Peerings) > 0 {
+			network.Status.Peerings = nw.Status.Peerings
+		}
 
+		log.Info("update network", "network", network)
 		obj, rollback := cb()
 		if rollback {
 			return c.Cleanup(ctx)
 		}
+
+		log.Info("update network2")
 		if err := apiutils.PatchCreatedWithDependent(ctx, m.cluster.Client(), network, obj.GetName()); err != nil {
 			if err := c.Cleanup(ctx); err != nil {
 				log.Error(err, "Error cleaning up")
 			}
 			return err
+		}
+
+		log.Info("update network3")
+		if err := m.cluster.Client().Status().Patch(ctx, network, client.MergeFrom(n)); err != nil {
+			return fmt.Errorf("error patching network status: %w", err)
 		}
 		return nil
 	})
