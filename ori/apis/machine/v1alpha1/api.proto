@@ -36,6 +36,7 @@ service MachineRuntime {
   rpc DeleteNetworkInterface(DeleteNetworkInterfaceRequest) returns (DeleteNetworkInterfaceResponse);
 
   rpc UpdateNetworkInterfaceIPs(UpdateNetworkInterfaceIPsRequest) returns (UpdateNetworkInterfaceIPsResponse);
+  rpc UpdateNetworkPeerings(UpdateNetworkPeeringsRequest) returns (UpdateNetworkPeeringsResponse);
 
   rpc CreateNetworkInterfaceVirtualIP(CreateNetworkInterfaceVirtualIPRequest) returns (CreateNetworkInterfaceVirtualIPResponse);
   rpc UpdateNetworkInterfaceVirtualIP(UpdateNetworkInterfaceVirtualIPRequest) returns (UpdateNetworkInterfaceVirtualIPResponse);
@@ -79,6 +80,7 @@ message NetworkInterfaceFilter {
 
 message NetworkSpec {
   string handle = 1;
+  repeated string peerings = 2;
 }
 
 message VirtualIPSpec {
@@ -377,6 +379,14 @@ message UpdateNetworkInterfaceVirtualIPRequest {
 }
 
 message UpdateNetworkInterfaceVirtualIPResponse {
+}
+
+message UpdateNetworkPeeringsRequest {
+  string handle = 1;
+  repeated string peerings = 2;
+}
+
+message UpdateNetworkPeeringsResponse {
 }
 
 message CreateNetworkInterfacePrefixRequest {

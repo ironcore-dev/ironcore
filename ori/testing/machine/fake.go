@@ -440,6 +440,14 @@ func (r *FakeRuntimeService) UpdateNetworkInterfaceIPs(ctx context.Context, req 
 	return &ori.UpdateNetworkInterfaceIPsResponse{}, nil
 }
 
+func (r *FakeRuntimeService) UpdateNetworkPeerings(ctx context.Context, req *ori.UpdateNetworkPeeringsRequest) (*ori.UpdateNetworkPeeringsResponse, error) {
+	r.Lock()
+	defer r.Unlock()
+
+	//TODO
+	return &ori.UpdateNetworkPeeringsResponse{}, nil
+}
+
 func (r *FakeRuntimeService) CreateNetworkInterfaceVirtualIP(ctx context.Context, req *ori.CreateNetworkInterfaceVirtualIPRequest) (*ori.CreateNetworkInterfaceVirtualIPResponse, error) {
 	r.Lock()
 	defer r.Unlock()

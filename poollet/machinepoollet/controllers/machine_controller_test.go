@@ -155,7 +155,7 @@ var _ = Describe("MachineController", func() {
 
 		By("inspecting the ori network interface")
 		Expect(oriNetworkInterface.Spec).To(Equal(&ori.NetworkInterfaceSpec{
-			Network:             &ori.NetworkSpec{Handle: "foo"},
+			Network:             &ori.NetworkSpec{Handle: "foo", Peerings: []string{}},
 			Ips:                 []string{"10.0.0.1"},
 			Prefixes:            []string{},
 			LoadBalancerTargets: []*ori.LoadBalancerTargetSpec{},

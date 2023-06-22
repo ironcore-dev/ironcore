@@ -365,6 +365,20 @@ func (r *MachineReconciler) updateORINetworkInterface(
 	id := oriNetworkInterface.Metadata.Id
 	log.V(1).Info("Found existing ori network interface", "ID", id)
 
+	if oriNetworkInterface.Spec.Network != nil && oriNetworkInterfaceSpec.Network != nil {
+		actualPeerings := oriNetworkInterface.Spec.Network.Peerings
+		desiredPeerings := oriNetworkInterfaceSpec.Network.Peerings
+		if !slices.Equal(actualPeerings, desiredPeerings) {
+			log.V(1).Info("Updating ori network peerings")
+			if _, err := r.MachineRuntime.UpdateNetworkPeerings(ctx, &ori.UpdateNetworkPeeringsRequest{
+				Handle:   oriNetworkInterfaceSpec.Network.Handle,
+				Peerings: desiredPeerings,
+			}); err != nil {
+				return fmt.Errorf("error updating ori network peerings: %w", err)
+			}
+		}
+	}
+
 	actualIPs := oriNetworkInterface.Spec.Ips
 	desiredIPs := oriNetworkInterfaceSpec.Ips
 	if !slices.Equal(actualIPs, desiredIPs) {
@@ -588,13 +602,32 @@ func (r *MachineReconciler) prepareORINetworkInterface(
 		return nil, false, fmt.Errorf("error getting labels for network interface: %w", err)
 	}
 
+	peerings := []string{}
+	network := &networkingv1alpha1.Network{}
+	networkKey := client.ObjectKey{Namespace: networkInterface.Namespace, Name: networkInterface.Spec.NetworkRef.Name}
+	if err := r.Get(ctx, networkKey, network); err != nil {
+		if !apierrors.IsNotFound(err) {
+			return nil, false, fmt.Errorf("error getting network %s: %w", networkKey, err)
+		}
+		return nil, false, fmt.Errorf("Network %s not found: %w", networkKey.Name, err)
+	}
+
+	if len(network.Status.Peerings) > 0 {
+		for _, peering := range network.Status.Peerings {
+			if peering.Phase == networkingv1alpha1.NetworkPeeringPhaseBound {
+				peerings = append(peerings, peering.NetworkHandle)
+			}
+		}
+	}
+
 	return &ori.NetworkInterface{
 		Metadata: &orimeta.ObjectMetadata{
 			Labels: labels,
 		},
 		Spec: &ori.NetworkInterfaceSpec{
 			Network: &ori.NetworkSpec{
-				Handle: networkInterface.Status.NetworkHandle,
+				Handle:   networkInterface.Status.NetworkHandle,
+				Peerings: peerings,
 			},
 			Ips:                 stringersToStrings(networkInterface.Status.IPs),
 			VirtualIp:           virtualIPSpec,

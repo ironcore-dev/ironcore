@@ -189,6 +189,20 @@ func (s *Server) prepareAggregateOnmetalNetworkInterface(networkInterface *ori.N
 		LoadBalancerTargets: lbTgts,
 		NATGatewayTargets:   natGatewayTgts,
 	}
+
+	peerings := []networkingv1alpha1.NetworkPeeringStatus{}
+	for _, networkHandle := range networkInterface.Spec.Network.Peerings {
+		peering := networkingv1alpha1.NetworkPeeringStatus{
+			NetworkHandle: networkHandle,
+			Phase:         networkingv1alpha1.NetworkPeeringPhaseBound,
+			Name:          networkHandle,
+		}
+		peerings = append(peerings, peering)
+	}
+
+	if len(peerings) > 0 {
+		onmetalNetworkInterfaceConfig.Network.Status.Peerings = peerings
+	}
 	return onmetalNetworkInterfaceConfig, nil
 }
 
