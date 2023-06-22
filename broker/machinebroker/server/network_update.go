@@ -24,7 +24,7 @@ import (
 
 func (s *Server) UpdateNetworkPeerings(ctx context.Context, req *ori.UpdateNetworkPeeringsRequest) (*ori.UpdateNetworkPeeringsResponse, error) {
 	handle := req.Handle
-	log := s.loggerFrom(ctx, "Handle", handle)
+	log := s.loggerFrom(ctx, "Handle", handle, "Peerings", req.Peerings)
 
 	nw := &networkingv1alpha1.Network{
 		Spec: networkingv1alpha1.NetworkSpec{
@@ -42,7 +42,8 @@ func (s *Server) UpdateNetworkPeerings(ctx context.Context, req *ori.UpdateNetwo
 		peerings = append(peerings, peering)
 	}
 
-	log.Info("updating network peerings")
+	nw.Status.Peerings = peerings
+	log.Info("Updating", "Network", nw)
 	_, networkTransaction, err := s.networks.BeginCreate(ctx, nw)
 	if err != nil {
 		return nil, fmt.Errorf("error getting network: %w", err)

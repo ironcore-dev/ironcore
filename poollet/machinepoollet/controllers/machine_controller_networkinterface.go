@@ -602,7 +602,6 @@ func (r *MachineReconciler) prepareORINetworkInterface(
 		return nil, false, fmt.Errorf("error getting labels for network interface: %w", err)
 	}
 
-	peerings := []string{}
 	network := &networkingv1alpha1.Network{}
 	networkKey := client.ObjectKey{Namespace: networkInterface.Namespace, Name: networkInterface.Spec.NetworkRef.Name}
 	if err := r.Get(ctx, networkKey, network); err != nil {
@@ -612,6 +611,23 @@ func (r *MachineReconciler) prepareORINetworkInterface(
 		return nil, false, fmt.Errorf("Network %s not found: %w", networkKey.Name, err)
 	}
 
+	onwi := &ori.NetworkInterface{
+		Metadata: &orimeta.ObjectMetadata{
+			Labels: labels,
+		},
+		Spec: &ori.NetworkInterfaceSpec{
+			Network: &ori.NetworkSpec{
+				Handle: networkInterface.Status.NetworkHandle,
+			},
+			Ips:                 stringersToStrings(networkInterface.Status.IPs),
+			VirtualIp:           virtualIPSpec,
+			Prefixes:            stringersToStrings(networkInterface.Status.Prefixes),
+			LoadBalancerTargets: loadBalancerTargets,
+			Nats:                nats,
+		},
+	}
+
+	peerings := []string{}
 	if len(network.Status.Peerings) > 0 {
 		for _, peering := range network.Status.Peerings {
 			if peering.Phase == networkingv1alpha1.NetworkPeeringPhaseBound {
@@ -620,22 +636,11 @@ func (r *MachineReconciler) prepareORINetworkInterface(
 		}
 	}
 
-	return &ori.NetworkInterface{
-		Metadata: &orimeta.ObjectMetadata{
-			Labels: labels,
-		},
-		Spec: &ori.NetworkInterfaceSpec{
-			Network: &ori.NetworkSpec{
-				Handle:   networkInterface.Status.NetworkHandle,
-				Peerings: peerings,
-			},
-			Ips:                 stringersToStrings(networkInterface.Status.IPs),
-			VirtualIp:           virtualIPSpec,
-			Prefixes:            stringersToStrings(networkInterface.Status.Prefixes),
-			LoadBalancerTargets: loadBalancerTargets,
-			Nats:                nats,
-		},
-	}, true, nil
+	if len(peerings) > 0 {
+		onwi.Spec.Network.Peerings = peerings
+	}
+
+	return onwi, true, nil
 }
 
 func (r *MachineReconciler) loadBalancerTargetsForNetworkInterface(

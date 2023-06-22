@@ -20,6 +20,7 @@ import (
 
 	"github.com/go-logr/logr"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
 	networkingclient "github.com/onmetal/onmetal-api/internal/client/networking"
 	clientutils "github.com/onmetal/onmetal-api/utils/client"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -53,6 +54,10 @@ func (r *NetworkBindReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
+	//TODO remove this once we have a better way to handle this
+	if _, exists := network.Labels[machinebrokerv1alpha1.CreatedLabel]; exists {
+		return ctrl.Result{}, nil
+	}
 	return r.reconcileExists(ctx, log, network)
 }
 

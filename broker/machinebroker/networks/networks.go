@@ -139,17 +139,12 @@ func (m *Networks) BeginCreate(ctx context.Context, nw *networkingv1alpha1.Netwo
 			n = newNetwork
 		}
 		network = n
-		if len(nw.Status.Peerings) > 0 {
-			network.Status.Peerings = nw.Status.Peerings
-		}
 
-		log.Info("update network", "network", network)
 		obj, rollback := cb()
 		if rollback {
 			return c.Cleanup(ctx)
 		}
 
-		log.Info("update network2")
 		if err := apiutils.PatchCreatedWithDependent(ctx, m.cluster.Client(), network, obj.GetName()); err != nil {
 			if err := c.Cleanup(ctx); err != nil {
 				log.Error(err, "Error cleaning up")
@@ -157,8 +152,13 @@ func (m *Networks) BeginCreate(ctx context.Context, nw *networkingv1alpha1.Netwo
 			return err
 		}
 
-		log.Info("update network3")
-		if err := m.cluster.Client().Status().Patch(ctx, network, client.MergeFrom(n)); err != nil {
+		networkBase := network.DeepCopy()
+		if len(nw.Status.Peerings) > 0 {
+			network.Status.Peerings = nw.Status.Peerings
+		}
+
+		log.Info("Update Status", "network", network)
+		if err := m.cluster.Client().Status().Patch(ctx, network, client.MergeFrom(networkBase)); err != nil {
 			return fmt.Errorf("error patching network status: %w", err)
 		}
 		return nil

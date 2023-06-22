@@ -21,6 +21,7 @@ import (
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
+	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	testingmachine "github.com/onmetal/onmetal-api/ori/testing/machine"
 	machinepoolletv1alpha1 "github.com/onmetal/onmetal-api/poollet/machinepoollet/api/v1alpha1"
@@ -44,7 +45,11 @@ var _ = Describe("MachineController", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
 				GenerateName: "network-",
+				Labels: map[string]string{
+					machinebrokerv1alpha1.CreatedLabel: "true",
+				},
 			},
+
 			Spec: networkingv1alpha1.NetworkSpec{
 				Handle: "foo",
 			},
@@ -54,6 +59,13 @@ var _ = Describe("MachineController", func() {
 		By("patching the network to be available")
 		baseNetwork := network.DeepCopy()
 		network.Status.State = networkingv1alpha1.NetworkStateAvailable
+		network.Status.Peerings = []networkingv1alpha1.NetworkPeeringStatus{
+			{
+				Name:          "bar",
+				NetworkHandle: "bar",
+				Phase:         networkingv1alpha1.NetworkPeeringPhaseBound,
+			},
+		}
 		Expect(k8sClient.Status().Patch(ctx, network, client.MergeFrom(baseNetwork))).To(Succeed())
 
 		By("creating a network interface")
@@ -155,7 +167,7 @@ var _ = Describe("MachineController", func() {
 
 		By("inspecting the ori network interface")
 		Expect(oriNetworkInterface.Spec).To(Equal(&ori.NetworkInterfaceSpec{
-			Network:             &ori.NetworkSpec{Handle: "foo", Peerings: []string{}},
+			Network:             &ori.NetworkSpec{Handle: "foo", Peerings: []string{"bar"}},
 			Ips:                 []string{"10.0.0.1"},
 			Prefixes:            []string{},
 			LoadBalancerTargets: []*ori.LoadBalancerTargetSpec{},
