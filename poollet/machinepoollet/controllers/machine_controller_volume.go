@@ -170,14 +170,50 @@ func (r *MachineReconciler) prepareORIVolume(
 			return nil, ok, err
 		}
 
+		oriVolumeResources, ok, err := r.prepareORIVolumeResources(ctx, machine, machineVolume)
+		if err != nil || !ok {
+			return nil, ok, err
+		}
+
 		return &ori.Volume{
 			Name:       name,
 			Device:     *machineVolume.Device,
 			Connection: oriVolumeConnection,
+			Resources:  oriVolumeResources,
 		}, true, nil
 	default:
 		return nil, false, fmt.Errorf("unrecognized volume %#v", machineVolume)
 	}
+}
+
+func (r *MachineReconciler) prepareORIVolumeResources(ctx context.Context, machine *computev1alpha1.Machine, machineVolume *computev1alpha1.Volume) (*ori.VolumeResources, bool, error) {
+	volume := &storagev1alpha1.Volume{}
+	volumeKey := client.ObjectKey{Namespace: machine.Namespace, Name: computev1alpha1.MachineVolumeName(machine.Name, *machineVolume)}
+
+	if err := r.Get(ctx, volumeKey, volume); err != nil {
+		if !apierrors.IsNotFound(err) {
+			return nil, false, fmt.Errorf("error getting volume: %w", err)
+		}
+		r.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady, "Volume %s not found", volumeKey.Name)
+		return nil, false, err
+	}
+
+	if state := volume.Status.State; state != storagev1alpha1.VolumeStateAvailable {
+		r.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady, "Volume %s is in state %s", volumeKey.Name, state)
+		return nil, false, nil
+	}
+
+	if !r.isVolumeBoundToMachine(machine, machineVolume.Name, volume) {
+		return nil, false, nil
+	}
+
+	var oriVolumeResources *ori.VolumeResources
+	if resources := volume.Spec.Resources; resources != nil && resources.Storage() != nil {
+		oriVolumeResources = &ori.VolumeResources{
+			StorageBytes: resources.Storage().AsDec().UnscaledBig().Uint64(),
+		}
+	}
+	return oriVolumeResources, true, nil
 }
 
 func (r *MachineReconciler) prepareORIVolumes(

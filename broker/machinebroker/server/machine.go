@@ -113,11 +113,18 @@ func (s *Server) convertOnmetalVolume(
 	onmetalVolume *AggregateOnmetalVolume,
 ) (*ori.Volume, error) {
 	var (
-		connection *ori.VolumeConnection
-		emptyDisk  *ori.EmptyDisk
+		connection         *ori.VolumeConnection
+		emptyDisk          *ori.EmptyDisk
+		oriVolumeResources *ori.VolumeResources
 	)
 	switch {
 	case onmetalMachineVolume.VolumeRef != nil:
+		if resources := onmetalVolume.Volume.Spec.Resources; resources != nil && resources.Storage() != nil {
+			oriVolumeResources = &ori.VolumeResources{
+				StorageBytes: resources.Storage().AsDec().UnscaledBig().Uint64(),
+			}
+		}
+
 		if access := onmetalVolume.Volume.Status.Access; access != nil {
 			var secretData map[string][]byte
 			if access.SecretRef != nil {
@@ -148,6 +155,7 @@ func (s *Server) convertOnmetalVolume(
 		Device:     *onmetalMachineVolume.Device,
 		EmptyDisk:  emptyDisk,
 		Connection: connection,
+		Resources:  oriVolumeResources,
 	}, nil
 }
 

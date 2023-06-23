@@ -75,6 +75,11 @@ message Volume {
   string device = 2;
   EmptyDisk empty_disk = 4;
   VolumeConnection connection = 5;
+  VolumeResources resources = 6;
+}
+
+message VolumeResources {
+  uint64 storage_bytes = 1;
 }
 
 message NetworkInterface {

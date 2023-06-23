@@ -21,6 +21,7 @@ import (
 	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	"github.com/onmetal/onmetal-api/broker/common/cleaner"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
@@ -48,6 +49,7 @@ type OnmetalVolumeRemoteConfig struct {
 	Handle     string
 	Attributes map[string]string
 	SecretData map[string][]byte
+	Resources  corev1alpha1.ResourceList
 }
 
 func (s *Server) getOnmetalVolumeConfig(volume *ori.Volume) (*OnmetalVolumeConfig, error) {
@@ -65,11 +67,18 @@ func (s *Server) getOnmetalVolumeConfig(volume *ori.Volume) (*OnmetalVolumeConfi
 			SizeLimit: sizeLimit,
 		}
 	case volume.Connection != nil:
+		var resources corev1alpha1.ResourceList
+		if res := volume.Resources; res != nil && res.StorageBytes > 0 {
+			resources = corev1alpha1.ResourceList{
+				corev1alpha1.ResourceStorage: *resource.NewQuantity(int64(res.StorageBytes), resource.DecimalSI),
+			}
+		}
 		remote = &OnmetalVolumeRemoteConfig{
 			Driver:     volume.Connection.Driver,
 			Handle:     volume.Connection.Handle,
 			Attributes: volume.Connection.Attributes,
 			SecretData: volume.Connection.SecretData,
+			Resources:  resources,
 		}
 	default:
 		return nil, fmt.Errorf("unrecognized volume %#v", volume)
@@ -108,7 +117,8 @@ func (s *Server) createOnmetalVolume(
 				},
 			},
 			Spec: storagev1alpha1.VolumeSpec{
-				ClaimRef: s.optionalLocalUIDReference(optOnmetalMachine),
+				ClaimRef:  s.optionalLocalUIDReference(optOnmetalMachine),
+				Resources: cfg.Remote.Resources,
 			},
 		}
 		if err := s.cluster.Client().Create(ctx, onmetalVolume); err != nil {

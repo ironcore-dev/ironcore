@@ -12482,13 +12482,8 @@
 						"default": 0
 					},
 					"protocol": {
-						"description": "Protocol is the protocol the load balancer should allow. If not specified, defaults to TCP.\n\nPossible enum values:\n - `\"SCTP\"` is the SCTP protocol.\n - `\"TCP\"` is the TCP protocol.\n - `\"UDP\"` is the UDP protocol.",
-						"type": "string",
-						"enum": [
-							"SCTP",
-							"TCP",
-							"UDP"
-						]
+						"description": "Protocol is the protocol the load balancer should allow. If not specified, defaults to TCP.",
+						"type": "string"
 					}
 				}
 			},
@@ -13628,13 +13623,8 @@
 						"format": "int32"
 					},
 					"protocol": {
-						"description": "Protocol (TCP, UDP, or SCTP) which traffic must match. If not specified, this field defaults to TCP.\n\nPossible enum values:\n - `\"SCTP\"` is the SCTP protocol.\n - `\"TCP\"` is the TCP protocol.\n - `\"UDP\"` is the UDP protocol.",
-						"type": "string",
-						"enum": [
-							"SCTP",
-							"TCP",
-							"UDP"
-						]
+						"description": "Protocol (TCP, UDP, or SCTP) which traffic must match. If not specified, this field defaults to TCP.",
+						"type": "string"
 					}
 				}
 			},
