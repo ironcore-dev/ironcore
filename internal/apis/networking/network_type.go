@@ -33,6 +33,8 @@ type NetworkSpec struct {
 type NetworkPeering struct {
 	// Name is the semantical name of the network peering.
 	Name string
+	// Prefixes is a list of CIDRs that we want only to be exposed to the peered network, if no prefixes are specified no filtering will be done.
+	Prefixes *[]commonv1alpha1.IPPrefix
 	// NetworkRef is the reference to the network to peer with.
 	// If the UID is empty, it will be populated once when the peering is successfully bound.
 	// If namespace is empty it is implied that the target network resides in the same network.
@@ -67,6 +69,8 @@ type NetworkPeeringStatus struct {
 	Name string
 	// NetworkHandle is the handle of the peered network.
 	NetworkHandle string
+	// Prefixes is a list of CIDRs that we want only to be exposed to the peered network, if no prefixes are specified no filtering will be done.
+	Prefixes *[]commonv1alpha1.IPPrefix
 	// Phase represents the binding phase of a network peering.
 	Phase NetworkPeeringPhase
 	// LastPhaseTransitionTime is the last time the Phase transitioned.

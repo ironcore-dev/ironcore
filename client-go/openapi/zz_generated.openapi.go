@@ -3849,6 +3849,20 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkPeering(ref common.Refere
 							Format:      "",
 						},
 					},
+					"prefixes": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Prefixes are the prefixes to peer with, if no prefixes are specified all prefixes are peered with.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix"),
+									},
+								},
+							},
+						},
+					},
 					"networkRef": {
 						SchemaProps: spec.SchemaProps{
 							Description: "NetworkRef is the reference to the network to peer with. If the UID is empty, it will be populated once when the peering is successfully bound. If namespace is empty it is implied that the target network resides in the same network.",
@@ -3861,7 +3875,7 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkPeering(ref common.Refere
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/api/common/v1alpha1.UIDReference"},
+			"github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix", "github.com/onmetal/onmetal-api/api/common/v1alpha1.UIDReference"},
 	}
 }
 
@@ -3887,6 +3901,20 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkPeeringStatus(ref common.
 							Format:      "",
 						},
 					},
+					"prefixes": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Prefixes are the prefixes to peer with.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix"),
+									},
+								},
+							},
+						},
+					},
 					"phase": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Phase represents the binding phase of a network peering.",
@@ -3905,7 +3933,7 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkPeeringStatus(ref common.
 			},
 		},
 		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+			"github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
 	}
 }
 

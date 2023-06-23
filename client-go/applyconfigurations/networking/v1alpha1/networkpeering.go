@@ -18,14 +18,16 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/common/v1alpha1"
+	v1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	commonv1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/common/v1alpha1"
 )
 
 // NetworkPeeringApplyConfiguration represents an declarative configuration of the NetworkPeering type for use
 // with apply.
 type NetworkPeeringApplyConfiguration struct {
-	Name       *string                                  `json:"name,omitempty"`
-	NetworkRef *v1alpha1.UIDReferenceApplyConfiguration `json:"networkRef,omitempty"`
+	Name       *string                                        `json:"name,omitempty"`
+	Prefixes   *[]v1alpha1.IPPrefix                           `json:"prefixes,omitempty"`
+	NetworkRef *commonv1alpha1.UIDReferenceApplyConfiguration `json:"networkRef,omitempty"`
 }
 
 // NetworkPeeringApplyConfiguration constructs an declarative configuration of the NetworkPeering type for use with
@@ -42,10 +44,18 @@ func (b *NetworkPeeringApplyConfiguration) WithName(value string) *NetworkPeerin
 	return b
 }
 
+// WithPrefixes sets the Prefixes field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the Prefixes field is set to the value of the last call.
+func (b *NetworkPeeringApplyConfiguration) WithPrefixes(value []v1alpha1.IPPrefix) *NetworkPeeringApplyConfiguration {
+	b.Prefixes = &value
+	return b
+}
+
 // WithNetworkRef sets the NetworkRef field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the NetworkRef field is set to the value of the last call.
-func (b *NetworkPeeringApplyConfiguration) WithNetworkRef(value *v1alpha1.UIDReferenceApplyConfiguration) *NetworkPeeringApplyConfiguration {
+func (b *NetworkPeeringApplyConfiguration) WithNetworkRef(value *commonv1alpha1.UIDReferenceApplyConfiguration) *NetworkPeeringApplyConfiguration {
 	b.NetworkRef = value
 	return b
 }

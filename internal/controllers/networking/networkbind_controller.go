@@ -18,6 +18,8 @@ import (
 	"context"
 	"fmt"
 
+	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+
 	"github.com/go-logr/logr"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
@@ -35,8 +37,9 @@ import (
 )
 
 type peeringStatusData struct {
-	phase  networkingv1alpha1.NetworkPeeringPhase
-	handle string
+	phase    networkingv1alpha1.NetworkPeeringPhase
+	handle   string
+	prefixes []commonv1alpha1.IPPrefix
 }
 
 type NetworkBindReconciler struct {
@@ -124,24 +127,32 @@ func (r *NetworkBindReconciler) updateStatus(ctx context.Context, log logr.Logge
 			lastPhaseTransitionTime = &now
 		}
 
-		newStatusPeerings = append(newStatusPeerings, networkingv1alpha1.NetworkPeeringStatus{
+		status := networkingv1alpha1.NetworkPeeringStatus{
 			Name:                    peeringStatus.Name,
 			NetworkHandle:           data.handle,
 			Phase:                   data.phase,
 			LastPhaseTransitionTime: lastPhaseTransitionTime,
-		})
+		}
+		if len(data.prefixes) > 0 {
+			status.Prefixes = &data.prefixes
+		}
+		newStatusPeerings = append(newStatusPeerings, status)
 		handledPeeringStatusDataNames.Insert(peeringStatus.Name)
 	}
 	for name, data := range peeringStatusDataByName {
 		if handledPeeringStatusDataNames.Has(name) {
 			continue
 		}
-		newStatusPeerings = append(newStatusPeerings, networkingv1alpha1.NetworkPeeringStatus{
+		status := networkingv1alpha1.NetworkPeeringStatus{
 			Name:                    name,
 			NetworkHandle:           data.handle,
 			Phase:                   data.phase,
 			LastPhaseTransitionTime: &now,
-		})
+		}
+		if len(data.prefixes) > 0 {
+			status.Prefixes = &data.prefixes
+		}
+		newStatusPeerings = append(newStatusPeerings, status)
 	}
 	network.Status.Peerings = newStatusPeerings
 
@@ -249,7 +260,11 @@ func (r *NetworkBindReconciler) reconcilePeering(
 
 		log.V(1).Info("Target network peering matches")
 		handle := targetNetwork.Spec.Handle
-		return "", &peeringStatusData{phase: networkingv1alpha1.NetworkPeeringPhaseBound, handle: handle}, nil
+		status := &peeringStatusData{phase: networkingv1alpha1.NetworkPeeringPhaseBound, handle: handle}
+		if targetPeering.Prefixes != nil && len(*targetPeering.Prefixes) > 0 {
+			status.prefixes = *targetPeering.Prefixes
+		}
+		return "", status, nil
 	}
 
 	log.V(1).Info("No matching target peering found")

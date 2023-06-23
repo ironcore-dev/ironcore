@@ -1066,6 +1066,12 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.UIDReference
       default: {}
+    - name: prefixes
+      type:
+        list:
+          elementType:
+            namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IPPrefix
+          elementRelationship: atomic
 - name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPeeringStatus
   map:
     fields:
@@ -1082,6 +1088,12 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: phase
       type:
         scalar: string
+    - name: prefixes
+      type:
+        list:
+          elementType:
+            namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IPPrefix
+          elementRelationship: atomic
 - name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy
   map:
     fields:

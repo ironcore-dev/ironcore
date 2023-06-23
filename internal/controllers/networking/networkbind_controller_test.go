@@ -17,7 +17,9 @@
 package networking
 
 import (
-	"github.com/google/go-cmp/cmp/cmpopts"
+	"reflect"
+
+	"github.com/google/go-cmp/cmp"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	. "github.com/onmetal/onmetal-api/utils/testing"
@@ -27,10 +29,22 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-var IgnoreNetworkPeeringStatusVolatileFields = cmpopts.IgnoreFields(
-	networkingv1alpha1.NetworkPeeringStatus{},
-	"LastPhaseTransitionTime",
-)
+var CompareNetworkPeeringStatus = func(x, y networkingv1alpha1.NetworkPeeringStatus) bool {
+	if x.Name != y.Name {
+		return false
+	}
+	if x.NetworkHandle != y.NetworkHandle {
+		return false
+	}
+	if x.Phase != y.Phase {
+		return false
+	}
+
+	if !reflect.DeepEqual(x.Prefixes, y.Prefixes) {
+		return false
+	}
+	return true
+}
 
 var _ = Describe("NetworkBindReconciler", func() {
 	ns1, _ := SetupTest()
@@ -38,6 +52,15 @@ var _ = Describe("NetworkBindReconciler", func() {
 
 	It("should bind two networks in the same namespace referencing each other", func(ctx SpecContext) {
 		By("creating the first network")
+		net1Prefixes := &[]commonv1alpha1.IPPrefix{
+			commonv1alpha1.MustParseIPPrefix("10.10.0.0/24"),
+			commonv1alpha1.MustParseIPPrefix("10.20.0.0/24"),
+		}
+
+		net2Prefixes := &[]commonv1alpha1.IPPrefix{
+			commonv1alpha1.MustParseIPPrefix("10.30.0.0/24"),
+			commonv1alpha1.MustParseIPPrefix("10.40.0.0/24"),
+		}
 		network1 := &networkingv1alpha1.Network{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: ns1.Name,
@@ -51,6 +74,7 @@ var _ = Describe("NetworkBindReconciler", func() {
 						NetworkRef: commonv1alpha1.UIDReference{
 							Name: "network-2",
 						},
+						Prefixes: net1Prefixes,
 					},
 				},
 			},
@@ -76,6 +100,7 @@ var _ = Describe("NetworkBindReconciler", func() {
 						NetworkRef: commonv1alpha1.UIDReference{
 							Name: "network-1",
 						},
+						Prefixes: net2Prefixes,
 					},
 				},
 			},
@@ -100,6 +125,7 @@ var _ = Describe("NetworkBindReconciler", func() {
 					Name: network2.Name,
 					UID:  network2.UID,
 				},
+				Prefixes: net1Prefixes,
 			}))
 			g.Expect(network2.Spec.Peerings).To(ConsistOf(networkingv1alpha1.NetworkPeering{
 				Name: "peering",
@@ -107,18 +133,23 @@ var _ = Describe("NetworkBindReconciler", func() {
 					Name: network1.Name,
 					UID:  network1.UID,
 				},
+				Prefixes: net2Prefixes,
 			}))
+
+			opt := cmp.Comparer(CompareNetworkPeeringStatus)
 
 			g.Expect(network1.Status.Peerings).To(ContainElement(BeComparableTo(networkingv1alpha1.NetworkPeeringStatus{
 				Name:          "peering",
 				NetworkHandle: "network-2-handle",
 				Phase:         networkingv1alpha1.NetworkPeeringPhaseBound,
-			}, IgnoreNetworkPeeringStatusVolatileFields)))
+				Prefixes:      net2Prefixes,
+			}, opt)))
 			g.Expect(network2.Status.Peerings).To(ContainElement(BeComparableTo(networkingv1alpha1.NetworkPeeringStatus{
 				Name:          "peering",
 				NetworkHandle: "network-1-handle",
 				Phase:         networkingv1alpha1.NetworkPeeringPhaseBound,
-			}, IgnoreNetworkPeeringStatusVolatileFields)))
+				Prefixes:      net1Prefixes,
+			}, opt)))
 		}).Should(Succeed())
 	})
 
@@ -194,14 +225,15 @@ var _ = Describe("NetworkBindReconciler", func() {
 				},
 			}))
 
+			opt := cmp.Comparer(CompareNetworkPeeringStatus)
 			g.Expect(network1.Status.Peerings).To(ContainElement(BeComparableTo(networkingv1alpha1.NetworkPeeringStatus{
 				Name:  "peering",
 				Phase: networkingv1alpha1.NetworkPeeringPhasePending,
-			}, IgnoreNetworkPeeringStatusVolatileFields)))
+			}, opt)))
 			g.Expect(network2.Status.Peerings).To(ContainElement(BeComparableTo(networkingv1alpha1.NetworkPeeringStatus{
 				Name:  "peering",
 				Phase: networkingv1alpha1.NetworkPeeringPhasePending,
-			}, IgnoreNetworkPeeringStatusVolatileFields)))
+			}, opt)))
 		}
 
 		By("waiting for both peerings to be reported as pending")
@@ -288,16 +320,17 @@ var _ = Describe("NetworkBindReconciler", func() {
 				},
 			}))
 
+			opt := cmp.Comparer(CompareNetworkPeeringStatus)
 			g.Expect(network1.Status.Peerings).To(ContainElement(BeComparableTo(networkingv1alpha1.NetworkPeeringStatus{
 				Name:          "peering",
 				NetworkHandle: "network-2-handle",
 				Phase:         networkingv1alpha1.NetworkPeeringPhaseBound,
-			}, IgnoreNetworkPeeringStatusVolatileFields)))
+			}, opt)))
 			g.Expect(network2.Status.Peerings).To(ContainElement(BeComparableTo(networkingv1alpha1.NetworkPeeringStatus{
 				Name:          "peering",
 				NetworkHandle: "network-1-handle",
 				Phase:         networkingv1alpha1.NetworkPeeringPhaseBound,
-			}, IgnoreNetworkPeeringStatusVolatileFields)))
+			}, opt)))
 		}).Should(Succeed())
 	})
 })

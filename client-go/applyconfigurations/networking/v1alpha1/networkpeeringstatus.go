@@ -18,17 +18,19 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	v1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // NetworkPeeringStatusApplyConfiguration represents an declarative configuration of the NetworkPeeringStatus type for use
 // with apply.
 type NetworkPeeringStatusApplyConfiguration struct {
-	Name                    *string                       `json:"name,omitempty"`
-	NetworkHandle           *string                       `json:"networkHandle,omitempty"`
-	Phase                   *v1alpha1.NetworkPeeringPhase `json:"phase,omitempty"`
-	LastPhaseTransitionTime *v1.Time                      `json:"lastPhaseTransitionTime,omitempty"`
+	Name                    *string                                 `json:"name,omitempty"`
+	NetworkHandle           *string                                 `json:"networkHandle,omitempty"`
+	Prefixes                *[]v1alpha1.IPPrefix                    `json:"prefixes,omitempty"`
+	Phase                   *networkingv1alpha1.NetworkPeeringPhase `json:"phase,omitempty"`
+	LastPhaseTransitionTime *v1.Time                                `json:"lastPhaseTransitionTime,omitempty"`
 }
 
 // NetworkPeeringStatusApplyConfiguration constructs an declarative configuration of the NetworkPeeringStatus type for use with
@@ -53,10 +55,18 @@ func (b *NetworkPeeringStatusApplyConfiguration) WithNetworkHandle(value string)
 	return b
 }
 
+// WithPrefixes sets the Prefixes field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the Prefixes field is set to the value of the last call.
+func (b *NetworkPeeringStatusApplyConfiguration) WithPrefixes(value []v1alpha1.IPPrefix) *NetworkPeeringStatusApplyConfiguration {
+	b.Prefixes = &value
+	return b
+}
+
 // WithPhase sets the Phase field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Phase field is set to the value of the last call.
-func (b *NetworkPeeringStatusApplyConfiguration) WithPhase(value v1alpha1.NetworkPeeringPhase) *NetworkPeeringStatusApplyConfiguration {
+func (b *NetworkPeeringStatusApplyConfiguration) WithPhase(value networkingv1alpha1.NetworkPeeringPhase) *NetworkPeeringStatusApplyConfiguration {
 	b.Phase = &value
 	return b
 }
