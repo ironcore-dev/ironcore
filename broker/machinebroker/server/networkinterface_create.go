@@ -126,7 +126,8 @@ func (s *Server) prepareOnmetalNATGatewayTargets(nats []*ori.NATSpec) ([]machine
 	return res, nil
 }
 
-func (s *Server) prepareAggregateOnmetalNetworkInterface(networkInterface *ori.NetworkInterface) (*AggregateOnmetalNetworkInterface, error) {
+func (s *Server) prepareAggregateOnmetalNetworkInterface(log logr.Logger, networkInterface *ori.NetworkInterface) (*AggregateOnmetalNetworkInterface, error) {
+
 	var onmetalVirtualIP *networkingv1alpha1.VirtualIP
 	if virtualIPSpec := networkInterface.Spec.VirtualIp; virtualIPSpec != nil {
 		v, err := s.prepareOnmetalVirtualIP(virtualIPSpec)
@@ -191,12 +192,25 @@ func (s *Server) prepareAggregateOnmetalNetworkInterface(networkInterface *ori.N
 	}
 
 	peerings := []networkingv1alpha1.NetworkPeeringStatus{}
-	for _, networkHandle := range networkInterface.Spec.Network.Peerings {
+	//TODO fix duplicate code
+	for _, peeringSpec := range networkInterface.Spec.Network.Peerings {
 		peering := networkingv1alpha1.NetworkPeeringStatus{
-			NetworkHandle: networkHandle,
-			Phase:         networkingv1alpha1.NetworkPeeringPhaseBound,
-			Name:          networkHandle,
+			Name:          peeringSpec.Name,
+			NetworkHandle: peeringSpec.Handle,
+			Phase:         networkingv1alpha1.NetworkPeeringPhase(peeringSpec.Phase),
 		}
+
+		prefixes := []commonv1alpha1.IPPrefix{}
+		if len(peeringSpec.Prefixes) > 0 {
+			for _, prefix := range peeringSpec.Prefixes {
+				prefixes = append(prefixes, commonv1alpha1.MustParseIPPrefix(prefix))
+			}
+		}
+
+		if len(prefixes) > 0 {
+			peering.Prefixes = &prefixes
+		}
+
 		peerings = append(peerings, peering)
 	}
 
@@ -307,7 +321,7 @@ func (s *Server) createOnmetalNetworkInterface(ctx context.Context, log logr.Log
 func (s *Server) CreateNetworkInterface(ctx context.Context, req *ori.CreateNetworkInterfaceRequest) (res *ori.CreateNetworkInterfaceResponse, retErr error) {
 	log := s.loggerFrom(ctx)
 
-	onmetalNetworkInterface, err := s.prepareAggregateOnmetalNetworkInterface(req.NetworkInterface)
+	onmetalNetworkInterface, err := s.prepareAggregateOnmetalNetworkInterface(log, req.NetworkInterface)
 	if err != nil {
 		return nil, fmt.Errorf("error getting onmetal network interface config: %w", err)
 	}

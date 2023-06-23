@@ -3851,7 +3851,7 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkPeering(ref common.Refere
 					},
 					"prefixes": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Prefixes are the prefixes to peer with, if no prefixes are specified all prefixes are peered with.",
+							Description: "Prefixes is a list of CIDRs that we want only to be exposed to the peered network, if no prefixes are specified no filtering will be done.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -3903,7 +3903,7 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkPeeringStatus(ref common.
 					},
 					"prefixes": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Prefixes are the prefixes to peer with.",
+							Description: "Prefixes is a list of CIDRs that we want only to be exposed to the peered network.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{

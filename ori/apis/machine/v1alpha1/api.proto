@@ -78,9 +78,16 @@ message NetworkInterfaceFilter {
   map<string, string> label_selector = 2;
 }
 
+message PeeringSpec {
+  string name = 1;
+  string handle = 2;
+  string phase = 3;
+  repeated string prefixes = 4;
+}
+
 message NetworkSpec {
   string handle = 1;
-  repeated string peerings = 2;
+  repeated PeeringSpec peerings = 2;
 }
 
 message VirtualIPSpec {
@@ -383,7 +390,7 @@ message UpdateNetworkInterfaceVirtualIPResponse {
 
 message UpdateNetworkPeeringsRequest {
   string handle = 1;
-  repeated string peerings = 2;
+  repeated PeeringSpec peerings = 2;
 }
 
 message UpdateNetworkPeeringsResponse {

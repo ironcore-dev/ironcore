@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 
+	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 )
@@ -33,11 +34,24 @@ func (s *Server) UpdateNetworkPeerings(ctx context.Context, req *ori.UpdateNetwo
 	}
 
 	peerings := []networkingv1alpha1.NetworkPeeringStatus{}
-	for _, networkHandle := range req.Peerings {
+	//TODO fix duplicate code
+	for _, peeringSpec := range req.Peerings {
+
 		peering := networkingv1alpha1.NetworkPeeringStatus{
-			NetworkHandle: networkHandle,
-			Phase:         networkingv1alpha1.NetworkPeeringPhaseBound,
-			Name:          networkHandle,
+			Name:          peeringSpec.Name,
+			NetworkHandle: peeringSpec.Handle,
+			Phase:         networkingv1alpha1.NetworkPeeringPhase(peeringSpec.Phase),
+		}
+
+		prefixes := []commonv1alpha1.IPPrefix{}
+		if len(peeringSpec.Prefixes) > 0 {
+			for _, prefix := range peeringSpec.Prefixes {
+				prefixes = append(prefixes, commonv1alpha1.MustParseIPPrefix(prefix))
+			}
+		}
+
+		if len(prefixes) > 0 {
+			peering.Prefixes = &prefixes
 		}
 		peerings = append(peerings, peering)
 	}

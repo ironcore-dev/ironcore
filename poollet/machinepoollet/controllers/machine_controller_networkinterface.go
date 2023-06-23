@@ -17,6 +17,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"reflect"
 
 	"github.com/go-logr/logr"
 	"github.com/gogo/protobuf/proto"
@@ -368,7 +369,7 @@ func (r *MachineReconciler) updateORINetworkInterface(
 	if oriNetworkInterface.Spec.Network != nil && oriNetworkInterfaceSpec.Network != nil {
 		actualPeerings := oriNetworkInterface.Spec.Network.Peerings
 		desiredPeerings := oriNetworkInterfaceSpec.Network.Peerings
-		if !slices.Equal(actualPeerings, desiredPeerings) {
+		if !reflect.DeepEqual(actualPeerings, desiredPeerings) {
 			log.V(1).Info("Updating ori network peerings")
 			if _, err := r.MachineRuntime.UpdateNetworkPeerings(ctx, &ori.UpdateNetworkPeeringsRequest{
 				Handle:   oriNetworkInterfaceSpec.Network.Handle,
@@ -627,11 +628,27 @@ func (r *MachineReconciler) prepareORINetworkInterface(
 		},
 	}
 
-	peerings := []string{}
+	peerings := []*ori.PeeringSpec{}
 	if len(network.Status.Peerings) > 0 {
 		for _, peering := range network.Status.Peerings {
 			if peering.Phase == networkingv1alpha1.NetworkPeeringPhaseBound {
-				peerings = append(peerings, peering.NetworkHandle)
+				peeringSpec := &ori.PeeringSpec{
+					Name:   peering.Name,
+					Handle: peering.NetworkHandle,
+					Phase:  string(networkingv1alpha1.NetworkPeeringPhaseBound),
+				}
+
+				prefixes := []string{}
+				if peering.Prefixes != nil && len(*peering.Prefixes) > 0 {
+					for _, prefix := range *peering.Prefixes {
+						prefixes = append(prefixes, prefix.String())
+					}
+				}
+
+				if len(prefixes) > 0 {
+					peeringSpec.Prefixes = prefixes
+				}
+				peerings = append(peerings, peeringSpec)
 			}
 		}
 	}

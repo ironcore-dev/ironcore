@@ -63,7 +63,10 @@ var _ = Describe("MachineController", func() {
 			{
 				Name:          "bar",
 				NetworkHandle: "bar",
-				Phase:         networkingv1alpha1.NetworkPeeringPhaseBound,
+				Prefixes: &[]commonv1alpha1.IPPrefix{
+					commonv1alpha1.MustParseIPPrefix("10.0.0.0/24"),
+				},
+				Phase: networkingv1alpha1.NetworkPeeringPhaseBound,
 			},
 		}
 		Expect(k8sClient.Status().Patch(ctx, network, client.MergeFrom(baseNetwork))).To(Succeed())
@@ -167,7 +170,19 @@ var _ = Describe("MachineController", func() {
 
 		By("inspecting the ori network interface")
 		Expect(oriNetworkInterface.Spec).To(Equal(&ori.NetworkInterfaceSpec{
-			Network:             &ori.NetworkSpec{Handle: "foo", Peerings: []string{"bar"}},
+			Network: &ori.NetworkSpec{
+				Handle: "foo",
+				Peerings: []*ori.PeeringSpec{
+					{
+						Name:   "bar",
+						Handle: "bar",
+						Phase:  "Bound",
+						Prefixes: []string{
+							"10.0.0.0/24",
+						},
+					},
+				},
+			},
 			Ips:                 []string{"10.0.0.1"},
 			Prefixes:            []string{},
 			LoadBalancerTargets: []*ori.LoadBalancerTargetSpec{},
