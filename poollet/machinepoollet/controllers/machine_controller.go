@@ -973,6 +973,40 @@ func (r *MachineReconciler) enqueueMachinesReferencingNATGatewayRouting(ctx cont
 	})
 }
 
+func (r *MachineReconciler) enqueueMachinesReferencingNetwork(ctx context.Context, log logr.Logger) handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []reconcile.Request {
+		network := obj.(*networkingv1alpha1.Network)
+
+		networkInterfaceMachinePoolID := machinepoolletclient.NetworkNameAndHandle(network.Name, network.Spec.Handle)
+		networkInterfaceList := &networkingv1alpha1.NetworkInterfaceList{}
+		if err := r.List(ctx, networkInterfaceList,
+			client.InNamespace(network.Namespace),
+			client.MatchingFields{
+				machinepoolletclient.NetworkInterfaceNetworkNameAndHandle: networkInterfaceMachinePoolID,
+			},
+		); err != nil {
+			log.Error(err, "Error listing network interfaces")
+			return nil
+		}
+
+		var res []ctrl.Request
+		for _, networkInterface := range networkInterfaceList.Items {
+			machineRef := networkInterface.Spec.MachineRef
+			if machineRef == nil {
+				continue
+			}
+
+			res = append(res, ctrl.Request{
+				NamespacedName: client.ObjectKey{
+					Namespace: network.Namespace,
+					Name:      machineRef.Name,
+				},
+			})
+		}
+		return res
+	})
+}
+
 func (r *MachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	log := ctrl.Log.WithName("machinepoollet")
 	ctx := ctrl.LoggerInto(context.TODO(), log)
@@ -1005,6 +1039,10 @@ func (r *MachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Watches(
 			&source.Kind{Type: &networkingv1alpha1.NATGatewayRouting{}},
 			r.enqueueMachinesReferencingNATGatewayRouting(ctx, log),
+		).
+		Watches(
+			&source.Kind{Type: &networkingv1alpha1.Network{}},
+			r.enqueueMachinesReferencingNetwork(ctx, log),
 		).
 		Complete(r)
 }
