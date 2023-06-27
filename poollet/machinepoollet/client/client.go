@@ -16,7 +16,6 @@ package client
 
 import (
 	"context"
-	"fmt"
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
@@ -85,20 +84,6 @@ func SetupMachineSpecSecretNamesField(ctx context.Context, indexer client.FieldI
 	)
 }
 
-const AliasPrefixRoutingNetworkRefNameField = "aliasprefixrouting-networkref-name"
-
-func SetupAliasPrefixRoutingNetworkRefNameField(ctx context.Context, indexer client.FieldIndexer) error {
-	return indexer.IndexField(
-		ctx,
-		&networkingv1alpha1.AliasPrefixRouting{},
-		AliasPrefixRoutingNetworkRefNameField,
-		func(object client.Object) []string {
-			aliasPrefixRouting := object.(*networkingv1alpha1.AliasPrefixRouting)
-			return []string{aliasPrefixRouting.NetworkRef.Name}
-		},
-	)
-}
-
 const LoadBalancerRoutingNetworkRefNameField = "loadbalancerrouting-networkref-name"
 
 func SetupLoadBalancerRoutingNetworkRefNameField(ctx context.Context, indexer client.FieldIndexer) error {
@@ -123,42 +108,6 @@ func SetupNATGatewayRoutingNetworkRefNameField(ctx context.Context, indexer clie
 		func(object client.Object) []string {
 			natGatewayRouting := object.(*networkingv1alpha1.NATGatewayRouting)
 			return []string{natGatewayRouting.NetworkRef.Name}
-		},
-	)
-}
-
-const NetworkInterfaceNetworkNameAndHandle = "networkinterface-network-name-and-handle"
-
-func networkInterfaceNetworkNameAndHandle(networkInterface *networkingv1alpha1.NetworkInterface) *string {
-	networkHandle := networkInterface.Status.NetworkHandle
-	networkName := networkInterface.Spec.NetworkRef.Name
-
-	res := NetworkNameAndHandle(networkName, networkHandle)
-	return &res
-}
-
-func NetworkNameAndHandle(networkName, networkHandle string) string {
-	return fmt.Sprintf("%s:%s", networkName, networkHandle)
-}
-
-func SetupNetworkInterfaceNetworkMachinePoolID(ctx context.Context, indexer client.FieldIndexer, machinePoolName string) error {
-	return indexer.IndexField(
-		ctx,
-		&networkingv1alpha1.NetworkInterface{},
-		NetworkInterfaceNetworkNameAndHandle,
-		func(object client.Object) []string {
-			networkInterface := object.(*networkingv1alpha1.NetworkInterface)
-			machinePoolRef := networkInterface.Status.MachinePoolRef
-			if machinePoolRef == nil || machinePoolRef.Name != machinePoolName {
-				return nil
-			}
-
-			networkInterfaceNetworkMachinePoolID := networkInterfaceNetworkNameAndHandle(networkInterface)
-			if networkInterfaceNetworkMachinePoolID == nil {
-				return nil
-			}
-
-			return []string{*networkInterfaceNetworkMachinePoolID}
 		},
 	)
 }

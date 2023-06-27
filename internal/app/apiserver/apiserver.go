@@ -20,6 +20,8 @@ import (
 	"net"
 	"time"
 
+	"github.com/onmetal/onmetal-api/internal/admission/plugin/volumeresizepolicy"
+
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
@@ -174,11 +176,13 @@ func (o *OnmetalAPIServerOptions) Validate(args []string) error {
 func (o *OnmetalAPIServerOptions) Complete() error {
 	machinevolumedevices.Register(o.RecommendedOptions.Admission.Plugins)
 	resourcequota.Register(o.RecommendedOptions.Admission.Plugins)
+	volumeresizepolicy.Register(o.RecommendedOptions.Admission.Plugins)
 
 	o.RecommendedOptions.Admission.RecommendedPluginOrder = append(
 		o.RecommendedOptions.Admission.RecommendedPluginOrder,
 		machinevolumedevices.PluginName,
 		resourcequota.PluginName,
+		volumeresizepolicy.PluginName,
 	)
 
 	return nil
@@ -217,6 +221,12 @@ func (o *OnmetalAPIServerOptions) Config() (*apiserver.Config, error) {
 	serverConfig.OpenAPIConfig = genericapiserver.DefaultOpenAPIConfig(onmetalopenapi.GetOpenAPIDefinitions, openapi.NewDefinitionNamer(api.Scheme))
 	serverConfig.OpenAPIConfig.Info.Title = "onmetal-api"
 	serverConfig.OpenAPIConfig.Info.Version = "0.1"
+
+	if utilfeature.DefaultFeatureGate.Enabled(features.OpenAPIV3) {
+		serverConfig.OpenAPIV3Config = genericapiserver.DefaultOpenAPIV3Config(onmetalopenapi.GetOpenAPIDefinitions, openapi.NewDefinitionNamer(api.Scheme))
+		serverConfig.OpenAPIV3Config.Info.Title = "onmetal-api"
+		serverConfig.OpenAPIV3Config.Info.Version = "0.1"
+	}
 
 	if err := o.RecommendedOptions.ApplyTo(serverConfig); err != nil {
 		return nil, err

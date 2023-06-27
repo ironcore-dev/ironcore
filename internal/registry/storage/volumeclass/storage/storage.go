@@ -38,8 +38,9 @@ func NewStorage(optsGetter generic.RESTOptionsGetter) (VolumeClassStorage, error
 		NewListFunc: func() runtime.Object {
 			return &storage.VolumeClassList{}
 		},
-		PredicateFunc:            registryvolumeclass.MatchVolumeClass,
-		DefaultQualifiedResource: storage.Resource("volumeclasses"),
+		PredicateFunc:             registryvolumeclass.MatchVolumeClass,
+		DefaultQualifiedResource:  storage.Resource("volumeclasses"),
+		SingularQualifiedResource: storage.Resource("volumeclass"),
 
 		CreateStrategy: registryvolumeclass.Strategy,
 		UpdateStrategy: registryvolumeclass.Strategy,

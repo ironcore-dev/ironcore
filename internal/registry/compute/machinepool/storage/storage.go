@@ -49,8 +49,9 @@ func NewStorage(optsGetter generic.RESTOptionsGetter, machinePoolletClientConfig
 		NewListFunc: func() runtime.Object {
 			return &compute.MachinePoolList{}
 		},
-		PredicateFunc:            machinepool.MatchMachinePool,
-		DefaultQualifiedResource: compute.Resource("machinepools"),
+		PredicateFunc:             machinepool.MatchMachinePool,
+		DefaultQualifiedResource:  compute.Resource("machinepools"),
+		SingularQualifiedResource: compute.Resource("machinepool"),
 
 		CreateStrategy: machinepool.Strategy,
 		UpdateStrategy: machinepool.Strategy,

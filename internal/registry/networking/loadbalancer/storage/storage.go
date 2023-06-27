@@ -50,8 +50,9 @@ func NewStorage(optsGetter generic.RESTOptionsGetter) (LoadBalancerStorage, erro
 		NewListFunc: func() runtime.Object {
 			return &networking.LoadBalancerList{}
 		},
-		PredicateFunc:            loadbalancer.MatchLoadBalancer,
-		DefaultQualifiedResource: networking.Resource("loadbalanceres"),
+		PredicateFunc:             loadbalancer.MatchLoadBalancer,
+		DefaultQualifiedResource:  networking.Resource("loadbalancers"),
+		SingularQualifiedResource: networking.Resource("loadbalancer"),
 
 		CreateStrategy: loadbalancer.Strategy,
 		UpdateStrategy: loadbalancer.Strategy,

@@ -12,9 +12,10 @@ API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/compute
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/core/v1alpha1,ResourceScopeSelector,MatchExpressions
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/core/v1alpha1,ResourceScopeSelectorRequirement,Values
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/ipam/v1alpha1,PrefixStatus,Used
-API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,AliasPrefixRouting,Destinations
+API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,IPBlock,Except
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,LoadBalancerRouting,Destinations
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,LoadBalancerSpec,IPFamilies
+API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,LoadBalancerSpec,IPs
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,LoadBalancerSpec,Ports
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,LoadBalancerStatus,IPs
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NATGatewayDestination,IPs
@@ -24,7 +25,17 @@ API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/network
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NATGatewayStatus,IPs
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NetworkInterfaceSpec,IPFamilies
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NetworkInterfaceSpec,IPs
+API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NetworkInterfaceSpec,Prefixes
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NetworkInterfaceStatus,IPs
+API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NetworkInterfaceStatus,Prefixes
+API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NetworkPolicyEgressRule,Ports
+API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NetworkPolicyEgressRule,To
+API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NetworkPolicyIngressRule,From
+API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NetworkPolicyIngressRule,Ports
+API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NetworkPolicySpec,Egress
+API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NetworkPolicySpec,Ingress
+API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NetworkPolicySpec,PolicyTypes
+API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NetworkPolicyStatus,Conditions
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NetworkSpec,Peerings
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NetworkStatus,Peerings
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api/api/storage/v1alpha1,BucketPoolSpec,Taints
@@ -161,6 +172,7 @@ API rule violation: list_type_missing,k8s.io/apimachinery/pkg/runtime,RawExtensi
 API rule violation: list_type_missing,k8s.io/apimachinery/pkg/runtime,Unknown,Raw
 API rule violation: names_match,github.com/onmetal/onmetal-api/api/compute/v1alpha1,MachineSpec,ImagePullSecretRef
 API rule violation: names_match,github.com/onmetal/onmetal-api/api/compute/v1alpha1,NetworkInterfaceStatus,IPs
+API rule violation: names_match,github.com/onmetal/onmetal-api/api/networking/v1alpha1,LoadBalancerSpec,IPs
 API rule violation: names_match,github.com/onmetal/onmetal-api/api/networking/v1alpha1,LoadBalancerStatus,IPs
 API rule violation: names_match,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NATGatewayDestination,IPs
 API rule violation: names_match,github.com/onmetal/onmetal-api/api/networking/v1alpha1,NATGatewaySpec,IPs
@@ -209,4 +221,3 @@ API rule violation: names_match,k8s.io/apimachinery/pkg/apis/meta/v1,StatusCause
 API rule violation: names_match,k8s.io/apimachinery/pkg/apis/meta/v1,Time,Time
 API rule violation: names_match,k8s.io/apimachinery/pkg/runtime,Unknown,ContentEncoding
 API rule violation: names_match,k8s.io/apimachinery/pkg/runtime,Unknown,ContentType
-API rule violation: names_match,k8s.io/apimachinery/pkg/runtime,Unknown,Raw

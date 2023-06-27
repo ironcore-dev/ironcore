@@ -26,7 +26,6 @@ import (
 	storagev1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/storage/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
@@ -37,9 +36,9 @@ type FakeBucketPools struct {
 	Fake *FakeStorageV1alpha1
 }
 
-var bucketpoolsResource = schema.GroupVersionResource{Group: "storage.api.onmetal.de", Version: "v1alpha1", Resource: "bucketpools"}
+var bucketpoolsResource = v1alpha1.SchemeGroupVersion.WithResource("bucketpools")
 
-var bucketpoolsKind = schema.GroupVersionKind{Group: "storage.api.onmetal.de", Version: "v1alpha1", Kind: "BucketPool"}
+var bucketpoolsKind = v1alpha1.SchemeGroupVersion.WithKind("BucketPool")
 
 // Get takes name of the bucketPool, and returns the corresponding bucketPool object, and an error if there is any.
 func (c *FakeBucketPools) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.BucketPool, err error) {

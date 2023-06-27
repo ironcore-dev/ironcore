@@ -30,7 +30,7 @@ import (
 
 var _ = Describe("NetworkProtectionReconciler", func() {
 	ctx := SetupContext()
-	ns, _ := SetupTest(ctx)
+	ns, _ := SetupTest()
 
 	var (
 		network *networkingv1alpha1.Network
@@ -207,106 +207,6 @@ var _ = Describe("NetworkProtectionReconciler", func() {
 
 		By("deleting the first network interface")
 		Expect(k8sClient.Delete(ctx, networkInterface)).To(Succeed())
-
-		By("deleting the network")
-		Expect(k8sClient.Delete(ctx, network)).To(Succeed())
-
-		By("ensuring that the network has a deletion timestamp set and finalizer still present")
-		Eventually(func(g Gomega) {
-			err := k8sClient.Get(ctx, networkKey, network)
-			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
-			g.Expect(err).NotTo(HaveOccurred())
-
-			g.Expect(network.DeletionTimestamp.IsZero()).To(BeFalse())
-			g.Expect(network.GetFinalizers()).To(ContainElement(networkFinalizer))
-		}).Should(Succeed())
-	})
-
-	It("should add/remove a finalizer for a network in use/not used by an alias prefix", func() {
-		By("creating an alias prefix referencing this network")
-		aliasPrefix := &networkingv1alpha1.AliasPrefix{
-			ObjectMeta: metav1.ObjectMeta{
-				Namespace:    ns.Name,
-				GenerateName: "my-aliasprefix-",
-			},
-			Spec: networkingv1alpha1.AliasPrefixSpec{
-				NetworkRef: corev1.LocalObjectReference{
-					Name: network.Name,
-				},
-			},
-		}
-		Expect(k8sClient.Create(ctx, aliasPrefix)).To(Succeed())
-
-		By("ensuring that the network finalizer has been set")
-		networkKey := types.NamespacedName{
-			Namespace: ns.Name,
-			Name:      network.Name,
-		}
-		Eventually(func(g Gomega) {
-			err := k8sClient.Get(ctx, networkKey, network)
-			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
-			g.Expect(err).NotTo(HaveOccurred())
-
-			g.Expect(network.GetFinalizers()).To(ContainElement(networkFinalizer))
-		}).Should(Succeed())
-
-		By("deleting the alias prefix")
-		Expect(k8sClient.Delete(ctx, aliasPrefix)).To(Succeed())
-
-		By("deleting the network")
-		Expect(k8sClient.Delete(ctx, network)).To(Succeed())
-
-		By("ensuring that the network has been deleted")
-		Eventually(func(g Gomega) {
-			err := k8sClient.Get(ctx, networkKey, network)
-			Expect(client.IgnoreNotFound(err)).To(BeNil())
-		}).Should(Succeed())
-	})
-
-	It("should keep a finalizer if one of two alias prefix is removed", func() {
-		By("creating the first alias prefix referencing this network")
-		aliasPrefix := &networkingv1alpha1.AliasPrefix{
-			ObjectMeta: metav1.ObjectMeta{
-				Namespace:    ns.Name,
-				GenerateName: "my-aliasprefix-",
-			},
-			Spec: networkingv1alpha1.AliasPrefixSpec{
-				NetworkRef: corev1.LocalObjectReference{
-					Name: network.Name,
-				},
-			},
-		}
-		Expect(k8sClient.Create(ctx, aliasPrefix)).To(Succeed())
-
-		By("creating a second alias prefix referencing this network")
-		aliasPrefix2 := &networkingv1alpha1.AliasPrefix{
-			ObjectMeta: metav1.ObjectMeta{
-				Namespace:    ns.Name,
-				GenerateName: "my-aliasprefix-",
-			},
-			Spec: networkingv1alpha1.AliasPrefixSpec{
-				NetworkRef: corev1.LocalObjectReference{
-					Name: network.Name,
-				},
-			},
-		}
-		Expect(k8sClient.Create(ctx, aliasPrefix2)).To(Succeed())
-
-		By("ensuring that the network finalizer has been set")
-		networkKey := types.NamespacedName{
-			Namespace: ns.Name,
-			Name:      network.Name,
-		}
-		Eventually(func(g Gomega) {
-			err := k8sClient.Get(ctx, networkKey, network)
-			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
-			g.Expect(err).NotTo(HaveOccurred())
-
-			g.Expect(network.GetFinalizers()).To(ContainElement(networkFinalizer))
-		}).Should(Succeed())
-
-		By("deleting the first alias prefix")
-		Expect(k8sClient.Delete(ctx, aliasPrefix)).To(Succeed())
 
 		By("deleting the network")
 		Expect(k8sClient.Delete(ctx, network)).To(Succeed())

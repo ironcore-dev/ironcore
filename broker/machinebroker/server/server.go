@@ -15,15 +15,13 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 	"path"
 
 	"github.com/onmetal/onmetal-api/broker/common/request"
-	"github.com/onmetal/onmetal-api/broker/machinebroker/aliasprefixes"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/cluster"
-	"github.com/onmetal/onmetal-api/broker/machinebroker/loadbalancers"
-	"github.com/onmetal/onmetal-api/broker/machinebroker/natgateways"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/networks"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	"k8s.io/client-go/rest"
@@ -41,9 +39,6 @@ var _ ori.MachineRuntimeServer = (*Server)(nil)
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networks/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=virtualips,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=virtualips/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=aliasprefixes,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=aliasprefixes/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=aliasprefixroutings,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=loadbalancers,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=loadbalancers/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=loadbalancerroutings,verbs=get;list;watch;create;update;patch;delete
@@ -51,21 +46,33 @@ var _ ori.MachineRuntimeServer = (*Server)(nil)
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=natgateways/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=natgatewayroutings,verbs=get;list;watch;create;update;patch;delete
 
+type BrokerLabel struct {
+	DefaultLabel     string
+	DownwardAPILabel string
+}
+
 type Server struct {
-	baseURL          *url.URL
-	cluster          cluster.Cluster
-	networks         *networks.Networks
-	aliasPrefixes    *aliasprefixes.AliasPrefixes
-	loadBalancers    *loadbalancers.LoadBalancers
-	natGateways      *natgateways.NATGateways
+	baseURL *url.URL
+
+	brokerDownwardAPILabels map[string]string
+
+	cluster cluster.Cluster
+
+	networks *networks.Manager
+
 	execRequestCache request.Cache[*ori.ExecRequest]
 }
 
 type Options struct {
 	// BaseURL is the base URL in form http(s)://host:port/path?query to produce request URLs relative to.
-	BaseURL             string
-	MachinePoolName     string
-	MachinePoolSelector map[string]string
+	BaseURL string
+	// BrokerDownwardAPILabels specifies which labels to broker via downward API and what the default
+	// label name is to obtain the value in case there is no value for the downward API.
+	// Example usage is e.g. to broker the root UID (map "root-machine-uid" to machinepoollet's
+	// "machinepoollet.api.onmetal.de/machine-uid")
+	BrokerDownwardAPILabels map[string]string
+	MachinePoolName         string
+	MachinePoolSelector     map[string]string
 }
 
 func New(cfg *rest.Config, namespace string, opts Options) (*Server, error) {
@@ -83,34 +90,16 @@ func New(cfg *rest.Config, namespace string, opts Options) (*Server, error) {
 	}
 
 	return &Server{
-		baseURL:          baseURL,
-		cluster:          c,
-		networks:         networks.New(c),
-		aliasPrefixes:    aliasprefixes.New(c),
-		loadBalancers:    loadbalancers.New(c),
-		natGateways:      natgateways.New(c),
-		execRequestCache: request.NewCache[*ori.ExecRequest](),
+		baseURL:                 baseURL,
+		brokerDownwardAPILabels: opts.BrokerDownwardAPILabels,
+		cluster:                 c,
+		networks:                networks.NewManager(c),
+		execRequestCache:        request.NewCache[*ori.ExecRequest](),
 	}, nil
 }
 
-func (s *Server) Cluster() cluster.Cluster {
-	return s.cluster
-}
-
-func (s *Server) Networks() *networks.Networks {
-	return s.networks
-}
-
-func (s *Server) AliasPrefixes() *aliasprefixes.AliasPrefixes {
-	return s.aliasPrefixes
-}
-
-func (s *Server) LoadBalancers() *loadbalancers.LoadBalancers {
-	return s.loadBalancers
-}
-
-func (s *Server) NATGateways() *natgateways.NATGateways {
-	return s.natGateways
+func (s *Server) Start(ctx context.Context) error {
+	return s.networks.Start(ctx)
 }
 
 func (s *Server) buildURL(method string, token string) string {

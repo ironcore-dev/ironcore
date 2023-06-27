@@ -15,11 +15,12 @@
 package renderer
 
 import (
+	"fmt"
 	"io"
 
-	oritable "github.com/onmetal/onmetal-api/orictl/table"
-	"github.com/onmetal/onmetal-api/orictl/table/tableconverter"
-	"github.com/onmetal/onmetal-api/orictl/table/tabwriter"
+	oritable "github.com/onmetal/onmetal-api/orictl/api"
+	"github.com/onmetal/onmetal-api/orictl/tableconverter"
+	"github.com/onmetal/onmetal-api/orictl/tabwriter"
 )
 
 type table struct {
@@ -35,6 +36,11 @@ func (t *table) Render(v any, w io.Writer) error {
 
 	tab, err := t.converter.ConvertToTable(v)
 	if err != nil {
+		return err
+	}
+
+	if tab == nil || len(tab.Headers) == 0 && len(tab.Rows) == 0 {
+		_, err := fmt.Fprintln(w, "No resources found")
 		return err
 	}
 

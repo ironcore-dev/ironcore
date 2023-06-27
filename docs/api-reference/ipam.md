@@ -48,7 +48,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -75,7 +75,7 @@ PrefixSpec
 <td>
 <code>ipFamily</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#ipfamily-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#ipfamily-v1-core">
 Kubernetes core/v1.IPFamily
 </a>
 </em>
@@ -89,7 +89,7 @@ If unset but Prefix is set, this can be inferred.</p>
 <td>
 <code>prefix</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
+<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
 </a>
 </em>
@@ -113,7 +113,7 @@ int32
 <td>
 <code>parentRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -128,7 +128,7 @@ allocated by itself.</p>
 <td>
 <code>parentSelector</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#labelselector-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#labelselector-v1-meta">
 Kubernetes meta/v1.LabelSelector
 </a>
 </em>
@@ -188,7 +188,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -215,7 +215,7 @@ PrefixAllocationSpec
 <td>
 <code>ipFamily</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#ipfamily-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#ipfamily-v1-core">
 Kubernetes core/v1.IPFamily
 </a>
 </em>
@@ -229,7 +229,7 @@ If unset but Prefix is set, this can be inferred.</p>
 <td>
 <code>prefix</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
+<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
 </a>
 </em>
@@ -253,7 +253,7 @@ int32
 <td>
 <code>prefixRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -266,7 +266,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>prefixSelector</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#labelselector-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#labelselector-v1-meta">
 Kubernetes meta/v1.LabelSelector
 </a>
 </em>
@@ -338,7 +338,7 @@ PrefixAllocationStatus
 <td>
 <code>ipFamily</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#ipfamily-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#ipfamily-v1-core">
 Kubernetes core/v1.IPFamily
 </a>
 </em>
@@ -352,7 +352,7 @@ If unset but Prefix is set, this can be inferred.</p>
 <td>
 <code>prefix</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
+<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
 </a>
 </em>
@@ -376,7 +376,7 @@ int32
 <td>
 <code>prefixRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -389,7 +389,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>prefixSelector</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#labelselector-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#labelselector-v1-meta">
 Kubernetes meta/v1.LabelSelector
 </a>
 </em>
@@ -420,7 +420,7 @@ Kubernetes meta/v1.LabelSelector
 <td>
 <code>prefix</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
+<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
 </a>
 </em>
@@ -446,7 +446,7 @@ PrefixAllocationPhase
 <td>
 <code>lastPhaseTransitionTime</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -500,7 +500,7 @@ Kubernetes meta/v1.Time
 <td>
 <code>ipFamily</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#ipfamily-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#ipfamily-v1-core">
 Kubernetes core/v1.IPFamily
 </a>
 </em>
@@ -514,7 +514,7 @@ If unset but Prefix is set, this can be inferred.</p>
 <td>
 <code>prefix</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
+<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
 </a>
 </em>
@@ -538,7 +538,7 @@ int32
 <td>
 <code>parentRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -553,7 +553,7 @@ allocated by itself.</p>
 <td>
 <code>parentSelector</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#labelselector-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#labelselector-v1-meta">
 Kubernetes meta/v1.LabelSelector
 </a>
 </em>
@@ -597,7 +597,7 @@ PrefixPhase
 <td>
 <code>lastPhaseTransitionTime</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -610,7 +610,7 @@ Kubernetes meta/v1.Time
 <td>
 <code>used</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
+<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
 []github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
 </a>
 </em>
@@ -637,7 +637,7 @@ Kubernetes meta/v1.Time
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -664,7 +664,7 @@ PrefixSpec
 <td>
 <code>ipFamily</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#ipfamily-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#ipfamily-v1-core">
 Kubernetes core/v1.IPFamily
 </a>
 </em>
@@ -678,7 +678,7 @@ If unset but Prefix is set, this can be inferred.</p>
 <td>
 <code>prefix</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
+<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
 </a>
 </em>
@@ -702,7 +702,7 @@ int32
 <td>
 <code>parentRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -717,7 +717,7 @@ allocated by itself.</p>
 <td>
 <code>parentSelector</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#labelselector-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#labelselector-v1-meta">
 Kubernetes meta/v1.LabelSelector
 </a>
 </em>

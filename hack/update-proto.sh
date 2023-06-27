@@ -20,7 +20,7 @@ trap 'rm -rf "$TGOPATH"' EXIT
 # Setup virtual GOPATH so the codegen tools work as expected.
 (
 cd "$REPO_ROOT"
-"$VGOPATH" "$TGOPATH"
+"$VGOPATH" -o "$TGOPATH"
 )
 
 export GOPATH="$TGOPATH"

@@ -49,6 +49,10 @@ func (r *remoteRuntime) CreateVolume(ctx context.Context, request *ori.CreateVol
 	return r.client.CreateVolume(ctx, request)
 }
 
+func (r *remoteRuntime) ExpandVolume(ctx context.Context, request *ori.ExpandVolumeRequest) (*ori.ExpandVolumeResponse, error) {
+	return r.client.ExpandVolume(ctx, request)
+}
+
 func (r *remoteRuntime) DeleteVolume(ctx context.Context, request *ori.DeleteVolumeRequest) (*ori.DeleteVolumeResponse, error) {
 	return r.client.DeleteVolume(ctx, request)
 }

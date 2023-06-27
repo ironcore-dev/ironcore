@@ -27,14 +27,6 @@ type FakeNetworkingV1alpha1 struct {
 	*testing.Fake
 }
 
-func (c *FakeNetworkingV1alpha1) AliasPrefixes(namespace string) v1alpha1.AliasPrefixInterface {
-	return &FakeAliasPrefixes{c, namespace}
-}
-
-func (c *FakeNetworkingV1alpha1) AliasPrefixRoutings(namespace string) v1alpha1.AliasPrefixRoutingInterface {
-	return &FakeAliasPrefixRoutings{c, namespace}
-}
-
 func (c *FakeNetworkingV1alpha1) LoadBalancers(namespace string) v1alpha1.LoadBalancerInterface {
 	return &FakeLoadBalancers{c, namespace}
 }
@@ -57,6 +49,10 @@ func (c *FakeNetworkingV1alpha1) Networks(namespace string) v1alpha1.NetworkInte
 
 func (c *FakeNetworkingV1alpha1) NetworkInterfaces(namespace string) v1alpha1.NetworkInterfaceInterface {
 	return &FakeNetworkInterfaces{c, namespace}
+}
+
+func (c *FakeNetworkingV1alpha1) NetworkPolicies(namespace string) v1alpha1.NetworkPolicyInterface {
+	return &FakeNetworkPolicies{c, namespace}
 }
 
 func (c *FakeNetworkingV1alpha1) VirtualIPs(namespace string) v1alpha1.VirtualIPInterface {

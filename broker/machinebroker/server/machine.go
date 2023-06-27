@@ -18,6 +18,8 @@ import (
 	"fmt"
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/apiutils"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
@@ -26,6 +28,20 @@ import (
 type AggregateOnmetalMachine struct {
 	IgnitionSecret *corev1.Secret
 	Machine        *computev1alpha1.Machine
+	// NetworkInterfaces is a mapping of machine network interface name to actual network interface.
+	NetworkInterfaces map[string]*AggregateOnmetalNetworkInterface
+	// Volumes is a mapping of machine volume name to actual volume.
+	Volumes map[string]*AggregateOnmetalVolume
+}
+
+type AggregateOnmetalVolume struct {
+	Volume       *storagev1alpha1.Volume
+	AccessSecret *corev1.Secret
+}
+
+type AggregateOnmetalNetworkInterface struct {
+	Network          *networkingv1alpha1.Network
+	NetworkInterface *networkingv1alpha1.NetworkInterface
 }
 
 var onmetalMachineStateToMachineState = map[computev1alpha1.MachineState]ori.MachineState{
@@ -42,140 +58,162 @@ func (s *Server) convertOnmetalMachineState(state computev1alpha1.MachineState) 
 	return 0, fmt.Errorf("unknown onmetal machine state %q", state)
 }
 
-var onmetalNetworkInterfaceStateToNetworkInterfaceAttachmentState = map[computev1alpha1.NetworkInterfaceState]ori.NetworkInterfaceAttachmentState{
-	computev1alpha1.NetworkInterfaceStatePending:  ori.NetworkInterfaceAttachmentState_NETWORK_INTERFACE_ATTACHMENT_PENDING,
-	computev1alpha1.NetworkInterfaceStateAttached: ori.NetworkInterfaceAttachmentState_NETWORK_INTERFACE_ATTACHMENT_ATTACHED,
-	computev1alpha1.NetworkInterfaceStateDetached: ori.NetworkInterfaceAttachmentState_NETWORK_INTERFACE_ATTACHMENT_DETACHED,
+var onmetalNetworkInterfaceStateToNetworkInterfaceAttachmentState = map[computev1alpha1.NetworkInterfaceState]ori.NetworkInterfaceState{
+	computev1alpha1.NetworkInterfaceStatePending:  ori.NetworkInterfaceState_NETWORK_INTERFACE_PENDING,
+	computev1alpha1.NetworkInterfaceStateAttached: ori.NetworkInterfaceState_NETWORK_INTERFACE_ATTACHED,
 }
 
-func (s *Server) convertOnmetalNetworkInterfaceState(state computev1alpha1.NetworkInterfaceState) (ori.NetworkInterfaceAttachmentState, error) {
+func (s *Server) convertOnmetalNetworkInterfaceState(state computev1alpha1.NetworkInterfaceState) (ori.NetworkInterfaceState, error) {
 	if res, ok := onmetalNetworkInterfaceStateToNetworkInterfaceAttachmentState[state]; ok {
 		return res, nil
 	}
 	return 0, fmt.Errorf("unknown onmetal network interface attachment state %q", state)
 }
 
-func (s *Server) convertOnmetalNetworkInterfaceStatus(status computev1alpha1.NetworkInterfaceStatus) (*ori.NetworkInterfaceAttachmentStatus, error) {
+func (s *Server) convertOnmetalNetworkInterfaceStatus(status computev1alpha1.NetworkInterfaceStatus) (*ori.NetworkInterfaceStatus, error) {
 	state, err := s.convertOnmetalNetworkInterfaceState(status.State)
 	if err != nil {
 		return nil, err
 	}
 
-	return &ori.NetworkInterfaceAttachmentStatus{
-		Name:                   status.Name,
-		NetworkInterfaceHandle: status.Handle,
-		State:                  state,
+	return &ori.NetworkInterfaceStatus{
+		Name:   status.Name,
+		Handle: status.Handle,
+		State:  state,
 	}, nil
 }
 
-var onmetalVolumeStateToVolumeAttachmentState = map[computev1alpha1.VolumeState]ori.VolumeAttachmentState{
-	computev1alpha1.VolumeStatePending:  ori.VolumeAttachmentState_VOLUME_ATTACHMENT_PENDING,
-	computev1alpha1.VolumeStateAttached: ori.VolumeAttachmentState_VOLUME_ATTACHMENT_ATTACHED,
-	computev1alpha1.VolumeStateDetached: ori.VolumeAttachmentState_VOLUME_ATTACHMENT_DETACHED,
+var onmetalVolumeStateToVolumeAttachmentState = map[computev1alpha1.VolumeState]ori.VolumeState{
+	computev1alpha1.VolumeStatePending:  ori.VolumeState_VOLUME_PENDING,
+	computev1alpha1.VolumeStateAttached: ori.VolumeState_VOLUME_ATTACHED,
 }
 
-func (s *Server) convertOnmetalVolumeState(state computev1alpha1.VolumeState) (ori.VolumeAttachmentState, error) {
+func (s *Server) convertOnmetalVolumeState(state computev1alpha1.VolumeState) (ori.VolumeState, error) {
 	if res, ok := onmetalVolumeStateToVolumeAttachmentState[state]; ok {
 		return res, nil
 	}
 	return 0, fmt.Errorf("unknown onmetal volume attachment state %q", state)
 }
 
-func (s *Server) convertOnmetalVolumeStatus(status computev1alpha1.VolumeStatus) (*ori.VolumeAttachmentStatus, error) {
+func (s *Server) convertOnmetalVolumeStatus(status computev1alpha1.VolumeStatus) (*ori.VolumeStatus, error) {
 	state, err := s.convertOnmetalVolumeState(status.State)
 	if err != nil {
 		return nil, err
 	}
 
-	return &ori.VolumeAttachmentStatus{
-		Name:         status.Name,
-		VolumeHandle: status.Handle,
-		State:        state,
+	return &ori.VolumeStatus{
+		Name:   status.Name,
+		Handle: status.Handle,
+		State:  state,
 	}, nil
 }
 
-func (s *Server) convertOnmetalVolumeAttachment(volume computev1alpha1.Volume) (*ori.VolumeAttachment, error) {
+func (s *Server) convertOnmetalVolume(
+	onmetalMachineVolume computev1alpha1.Volume,
+	onmetalVolume *AggregateOnmetalVolume,
+) (*ori.Volume, error) {
 	var (
-		volumeID  string
-		emptyDisk *ori.EmptyDiskSpec
+		connection *ori.VolumeConnection
+		emptyDisk  *ori.EmptyDisk
 	)
 	switch {
-	case volume.VolumeRef != nil:
-		volumeID = volume.VolumeRef.Name
-	case volume.EmptyDisk != nil:
+	case onmetalMachineVolume.VolumeRef != nil:
+		if access := onmetalVolume.Volume.Status.Access; access != nil {
+			var secretData map[string][]byte
+			if access.SecretRef != nil {
+				secretData = onmetalVolume.AccessSecret.Data
+			}
+
+			connection = &ori.VolumeConnection{
+				Driver:     access.Driver,
+				Handle:     access.Handle,
+				Attributes: access.VolumeAttributes,
+				SecretData: secretData,
+			}
+		}
+	case onmetalMachineVolume.EmptyDisk != nil:
 		var sizeBytes uint64
-		if sizeLimit := volume.EmptyDisk.SizeLimit; sizeLimit != nil {
+		if sizeLimit := onmetalMachineVolume.EmptyDisk.SizeLimit; sizeLimit != nil {
 			sizeBytes = sizeLimit.AsDec().UnscaledBig().Uint64()
 		}
-		emptyDisk = &ori.EmptyDiskSpec{
+		emptyDisk = &ori.EmptyDisk{
 			SizeBytes: sizeBytes,
 		}
 	default:
-		return nil, fmt.Errorf("volume %#v does neither specify volume ref nor empty disk", volume)
+		return nil, fmt.Errorf("machine volume %#v does neither specify volume ref nor empty disk", onmetalMachineVolume)
 	}
 
-	return &ori.VolumeAttachment{
-		Name:      volume.Name,
-		Device:    *volume.Device,
-		VolumeId:  volumeID,
-		EmptyDisk: emptyDisk,
+	return &ori.Volume{
+		Name:       onmetalMachineVolume.Name,
+		Device:     *onmetalMachineVolume.Device,
+		EmptyDisk:  emptyDisk,
+		Connection: connection,
 	}, nil
 }
 
-func (s *Server) convertOnmetalNetworkInterfaceAttachment(networkInterface computev1alpha1.NetworkInterface) (*ori.NetworkInterfaceAttachment, error) {
+func (s *Server) convertOnmetalNetworkInterfaceAttachment(
+	onmetalMachineNic computev1alpha1.NetworkInterface,
+	onmetalNic *AggregateOnmetalNetworkInterface,
+) (*ori.NetworkInterface, error) {
 	switch {
-	case networkInterface.NetworkInterfaceRef != nil:
-		return &ori.NetworkInterfaceAttachment{
-			Name:               networkInterface.Name,
-			NetworkInterfaceId: networkInterface.NetworkInterfaceRef.Name,
+	case onmetalMachineNic.NetworkInterfaceRef != nil:
+		ips, err := s.convertOnmetalIPSourcesToIPs(onmetalNic.NetworkInterface.Spec.IPs)
+		if err != nil {
+			return nil, err
+		}
+
+		return &ori.NetworkInterface{
+			Name:      onmetalMachineNic.Name,
+			NetworkId: onmetalNic.Network.Spec.ProviderID,
+			Ips:       ips,
 		}, nil
 	default:
-		return nil, fmt.Errorf("network interface %#v does not specify network interface ref", networkInterface)
+		return nil, fmt.Errorf("unrecognized onmetal machine network interface %#v", onmetalMachineNic)
 	}
 }
 
-func (s *Server) convertAggregateOnmetalMachine(machine *AggregateOnmetalMachine) (*ori.Machine, error) {
-	metadata, err := apiutils.GetObjectMetadata(machine.Machine)
+func (s *Server) convertAggregateOnmetalMachine(aggOnmetalMachine *AggregateOnmetalMachine) (*ori.Machine, error) {
+	metadata, err := apiutils.GetObjectMetadata(aggOnmetalMachine.Machine)
 	if err != nil {
 		return nil, err
 	}
 
-	var ignitionSpec *ori.IgnitionSpec
-	if ignitionSecret := machine.IgnitionSecret; ignitionSecret != nil {
-		ignitionSpec = &ori.IgnitionSpec{
-			Data: ignitionSecret.Data[computev1alpha1.DefaultIgnitionKey],
-		}
+	var ignitionData []byte
+	if ignitionSecret := aggOnmetalMachine.IgnitionSecret; ignitionSecret != nil {
+		ignitionData = ignitionSecret.Data[computev1alpha1.DefaultIgnitionKey]
 	}
 
 	var imageSpec *ori.ImageSpec
-	if image := machine.Machine.Spec.Image; image != "" {
+	if image := aggOnmetalMachine.Machine.Spec.Image; image != "" {
 		imageSpec = &ori.ImageSpec{
 			Image: image,
 		}
 	}
 
-	volumeAttachments := make([]*ori.VolumeAttachment, len(machine.Machine.Spec.Volumes))
-	for i, volume := range machine.Machine.Spec.Volumes {
-		volumeAttachment, err := s.convertOnmetalVolumeAttachment(volume)
+	volumes := make([]*ori.Volume, len(aggOnmetalMachine.Machine.Spec.Volumes))
+	for i, onmetalMachineVolume := range aggOnmetalMachine.Machine.Spec.Volumes {
+		onmetalVolume := aggOnmetalMachine.Volumes[onmetalMachineVolume.Name]
+		volume, err := s.convertOnmetalVolume(onmetalMachineVolume, onmetalVolume)
 		if err != nil {
-			return nil, fmt.Errorf("error converting machine volume %s: %w", *volume.Device, err)
+			return nil, fmt.Errorf("error converting machine volume %s: %w", *onmetalMachineVolume.Device, err)
 		}
 
-		volumeAttachments[i] = volumeAttachment
+		volumes[i] = volume
 	}
 
-	networkInterfaceAttachments := make([]*ori.NetworkInterfaceAttachment, len(machine.Machine.Spec.NetworkInterfaces))
-	for i, networkInterface := range machine.Machine.Spec.NetworkInterfaces {
-		networkInterfaceAttachment, err := s.convertOnmetalNetworkInterfaceAttachment(networkInterface)
+	nics := make([]*ori.NetworkInterface, len(aggOnmetalMachine.Machine.Spec.NetworkInterfaces))
+	for i, onmetalMachineNic := range aggOnmetalMachine.Machine.Spec.NetworkInterfaces {
+		onmetalNic := aggOnmetalMachine.NetworkInterfaces[onmetalMachineNic.Name]
+		nic, err := s.convertOnmetalNetworkInterfaceAttachment(onmetalMachineNic, onmetalNic)
 		if err != nil {
-			return nil, fmt.Errorf("error converting machine network interface %s: %w", networkInterface.Name, err)
+			return nil, fmt.Errorf("error converting machine network interface %s: %w", onmetalMachineNic.Name, err)
 		}
 
-		networkInterfaceAttachments[i] = networkInterfaceAttachment
+		nics[i] = nic
 	}
 
-	volumeAttachmentStates := make([]*ori.VolumeAttachmentStatus, len(machine.Machine.Status.Volumes))
-	for i, volume := range machine.Machine.Status.Volumes {
+	volumeAttachmentStates := make([]*ori.VolumeStatus, len(aggOnmetalMachine.Machine.Status.Volumes))
+	for i, volume := range aggOnmetalMachine.Machine.Status.Volumes {
 		volumeAttachmentStatus, err := s.convertOnmetalVolumeStatus(volume)
 		if err != nil {
 			return nil, fmt.Errorf("error converting machine volume status %s: %w", volume.Name, err)
@@ -184,8 +222,8 @@ func (s *Server) convertAggregateOnmetalMachine(machine *AggregateOnmetalMachine
 		volumeAttachmentStates[i] = volumeAttachmentStatus
 	}
 
-	networkInterfaceAttachmentStates := make([]*ori.NetworkInterfaceAttachmentStatus, len(machine.Machine.Status.NetworkInterfaces))
-	for i, networkInterface := range machine.Machine.Status.NetworkInterfaces {
+	networkInterfaceAttachmentStates := make([]*ori.NetworkInterfaceStatus, len(aggOnmetalMachine.Machine.Status.NetworkInterfaces))
+	for i, networkInterface := range aggOnmetalMachine.Machine.Status.NetworkInterfaces {
 		networkInterfaceAttachmentStatus, err := s.convertOnmetalNetworkInterfaceStatus(networkInterface)
 		if err != nil {
 			return nil, fmt.Errorf("error converting machine network interface status %s: %w", networkInterface.Name, err)
@@ -194,7 +232,7 @@ func (s *Server) convertAggregateOnmetalMachine(machine *AggregateOnmetalMachine
 		networkInterfaceAttachmentStates[i] = networkInterfaceAttachmentStatus
 	}
 
-	state, err := s.convertOnmetalMachineState(machine.Machine.Status.State)
+	state, err := s.convertOnmetalMachineState(aggOnmetalMachine.Machine.Status.State)
 	if err != nil {
 		return nil, err
 	}
@@ -203,13 +241,13 @@ func (s *Server) convertAggregateOnmetalMachine(machine *AggregateOnmetalMachine
 		Metadata: metadata,
 		Spec: &ori.MachineSpec{
 			Image:             imageSpec,
-			Class:             machine.Machine.Spec.MachineClassRef.Name,
-			Ignition:          ignitionSpec,
-			Volumes:           volumeAttachments,
-			NetworkInterfaces: networkInterfaceAttachments,
+			Class:             aggOnmetalMachine.Machine.Spec.MachineClassRef.Name,
+			IgnitionData:      ignitionData,
+			Volumes:           volumes,
+			NetworkInterfaces: nics,
 		},
 		Status: &ori.MachineStatus{
-			ObservedGeneration: machine.Machine.Status.MachinePoolObservedGeneration,
+			ObservedGeneration: aggOnmetalMachine.Machine.Status.ObservedGeneration,
 			State:              state,
 			ImageRef:           "", // TODO: Fill
 			Volumes:            volumeAttachmentStates,

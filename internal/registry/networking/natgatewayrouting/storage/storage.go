@@ -44,8 +44,9 @@ func NewStorage(optsGetter generic.RESTOptionsGetter) (NATGatewayRoutingStorage,
 		NewListFunc: func() runtime.Object {
 			return &networking.NATGatewayRoutingList{}
 		},
-		PredicateFunc:            natgatewayrouting.MatchNATGatewayRouting,
-		DefaultQualifiedResource: networking.Resource("natgatewayroutings"),
+		PredicateFunc:             natgatewayrouting.MatchNATGatewayRouting,
+		DefaultQualifiedResource:  networking.Resource("natgatewayroutings"),
+		SingularQualifiedResource: networking.Resource("natgatewayrouting"),
 
 		CreateStrategy: natgatewayrouting.Strategy,
 		UpdateStrategy: natgatewayrouting.Strategy,

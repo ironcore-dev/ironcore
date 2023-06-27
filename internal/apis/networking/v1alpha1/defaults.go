@@ -20,6 +20,7 @@ import (
 	"github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/utils/pointer"
 )
 
@@ -34,33 +35,52 @@ func addDefaultingFuncs(scheme *runtime.Scheme) error {
 	return RegisterDefaults(scheme)
 }
 
+func SetDefaults_NetworkPolicySpec(spec *v1alpha1.NetworkPolicySpec) {
+	policyTypes := sets.New[v1alpha1.PolicyType](spec.PolicyTypes...)
+	if len(spec.Ingress) > 0 {
+		policyTypes.Insert(v1alpha1.PolicyTypeIngress)
+	}
+	if len(spec.Egress) > 0 {
+		policyTypes.Insert(v1alpha1.PolicyTypeEgress)
+	}
+	spec.PolicyTypes = sets.List(policyTypes)
+}
+
 func SetDefaults_NetworkInterfaceSpec(spec *v1alpha1.NetworkInterfaceSpec) {
-	if len(spec.IPFamilies) > 0 {
-		if len(spec.IPFamilies) == len(spec.IPs) {
-			for i, ip := range spec.IPs {
+	setDefaults_IPFamiliesIPSources(&spec.IPFamilies, &spec.IPs)
+}
+
+func SetDefaults_LoadBalancerSpec(spec *v1alpha1.LoadBalancerSpec) {
+	setDefaults_IPFamiliesIPSources(&spec.IPFamilies, &spec.IPs)
+}
+
+func setDefaults_IPFamiliesIPSources(ipFamilies *[]corev1.IPFamily, ipSources *[]v1alpha1.IPSource) {
+	if len(*ipFamilies) > 0 {
+		if len(*ipFamilies) == len(*ipSources) {
+			for i, ip := range *ipSources {
 				if ip.Ephemeral != nil {
 					if ip.Ephemeral.PrefixTemplate != nil {
 						ephemeralPrefixSpec := &ip.Ephemeral.PrefixTemplate.Spec
 
 						if ephemeralPrefixSpec.IPFamily == "" {
-							ephemeralPrefixSpec.IPFamily = spec.IPFamilies[i]
+							ephemeralPrefixSpec.IPFamily = (*ipFamilies)[i]
 						}
 					}
 				}
 			}
 		}
-	} else if len(spec.IPs) > 0 {
-		for _, ip := range spec.IPs {
+	} else if len(*ipSources) > 0 {
+		for _, ip := range *ipSources {
 			switch {
 			case ip.Value != nil:
-				spec.IPFamilies = append(spec.IPFamilies, ip.Value.Family())
+				*ipFamilies = append(*ipFamilies, ip.Value.Family())
 			case ip.Ephemeral != nil && ip.Ephemeral.PrefixTemplate != nil:
-				spec.IPFamilies = append(spec.IPFamilies, ip.Ephemeral.PrefixTemplate.Spec.IPFamily)
+				*ipFamilies = append(*ipFamilies, ip.Ephemeral.PrefixTemplate.Spec.IPFamily)
 			}
 		}
 	}
 
-	for _, ip := range spec.IPs {
+	for _, ip := range *ipSources {
 		if ip.Ephemeral != nil && ip.Ephemeral.PrefixTemplate != nil {
 			templateSpec := &ip.Ephemeral.PrefixTemplate.Spec
 			if templateSpec.Prefix == nil && templateSpec.PrefixLength == 0 {

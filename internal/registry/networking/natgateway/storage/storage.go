@@ -50,8 +50,9 @@ func NewStorage(optsGetter generic.RESTOptionsGetter) (NATGatewayStorage, error)
 		NewListFunc: func() runtime.Object {
 			return &networking.NATGatewayList{}
 		},
-		PredicateFunc:            natgateway.MatchNATGateway,
-		DefaultQualifiedResource: networking.Resource("natgatewayes"),
+		PredicateFunc:             natgateway.MatchNATGateway,
+		DefaultQualifiedResource:  networking.Resource("natgateways"),
+		SingularQualifiedResource: networking.Resource("natgateway"),
 
 		CreateStrategy: natgateway.Strategy,
 		UpdateStrategy: natgateway.Strategy,

@@ -17,6 +17,7 @@ package v1alpha1
 import (
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 )
 
 const (
@@ -28,6 +29,8 @@ const (
 
 	// MachinePoolUserNamePrefix is the prefix all machine pool users should have.
 	MachinePoolUserNamePrefix = "compute.api.onmetal.de:system:machinepool:"
+
+	SecretTypeIgnition = corev1.SecretType("compute.api.onmetal.de/ignition")
 )
 
 // MachinePoolCommonName constructs the common name for a certificate of a machine pool user.

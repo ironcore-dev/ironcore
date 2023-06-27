@@ -31,7 +31,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
 const (
@@ -47,7 +46,6 @@ type NetworkProtectionReconciler struct {
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networks/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networks/finalizers,verbs=update
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces,verbs=get;list;watch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=aliasprefixes,verbs=get;list;watch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=loadbalancers,verbs=get;list;watch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=natgateways,verbs=get;list;watch
 
@@ -149,10 +147,6 @@ func (r *NetworkProtectionReconciler) isNetworkInUse(ctx context.Context, log lo
 			Field: networking.NetworkInterfaceSpecNetworkRefNameField,
 		},
 		{
-			Type:  &networkingv1alpha1.AliasPrefix{},
-			Field: networking.AliasPrefixNetworkNameField,
-		},
-		{
 			Type:  &networkingv1alpha1.LoadBalancer{},
 			Field: networking.LoadBalancerNetworkNameField,
 		},
@@ -180,26 +174,22 @@ func (r *NetworkProtectionReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Named("networkprotection").
 		For(&networkingv1alpha1.Network{}).
 		Watches(
-			&source.Kind{Type: &networkingv1alpha1.NetworkInterface{}},
+			&networkingv1alpha1.NetworkInterface{},
 			r.enqueueByNetworkInterface(),
 		).
 		Watches(
-			&source.Kind{Type: &networkingv1alpha1.AliasPrefix{}},
-			r.enqueueByAliasPrefix(),
-		).
-		Watches(
-			&source.Kind{Type: &networkingv1alpha1.LoadBalancer{}},
+			&networkingv1alpha1.LoadBalancer{},
 			r.enqueueByLoadBalancer(),
 		).
 		Watches(
-			&source.Kind{Type: &networkingv1alpha1.NATGateway{}},
+			&networkingv1alpha1.NATGateway{},
 			r.enqueueByNATGateway(),
 		).
 		Complete(r)
 }
 
 func (r *NetworkProtectionReconciler) enqueueByNetworkInterface() handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		nic := obj.(*networkingv1alpha1.NetworkInterface)
 
 		var res []ctrl.Request
@@ -213,23 +203,8 @@ func (r *NetworkProtectionReconciler) enqueueByNetworkInterface() handler.EventH
 	})
 }
 
-func (r *NetworkProtectionReconciler) enqueueByAliasPrefix() handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
-		aliasPrefix := obj.(*networkingv1alpha1.AliasPrefix)
-
-		var res []ctrl.Request
-		networkKey := types.NamespacedName{
-			Namespace: aliasPrefix.Namespace,
-			Name:      aliasPrefix.Spec.NetworkRef.Name,
-		}
-		res = append(res, ctrl.Request{NamespacedName: networkKey})
-
-		return res
-	})
-}
-
 func (r *NetworkProtectionReconciler) enqueueByLoadBalancer() handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		loadBalancer := obj.(*networkingv1alpha1.LoadBalancer)
 
 		var res []ctrl.Request
@@ -244,7 +219,7 @@ func (r *NetworkProtectionReconciler) enqueueByLoadBalancer() handler.EventHandl
 }
 
 func (r *NetworkProtectionReconciler) enqueueByNATGateway() handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		natGateway := obj.(*networkingv1alpha1.NATGateway)
 
 		var res []ctrl.Request

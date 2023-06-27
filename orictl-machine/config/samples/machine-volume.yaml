@@ -1,0 +1,4 @@
+name: my-volume
+device: oda
+empty_disk:
+  size_bytes: 1099511627776

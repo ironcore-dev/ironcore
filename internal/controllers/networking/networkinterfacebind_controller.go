@@ -35,7 +35,6 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
 type NetworkInterfaceBindReconciler struct {
@@ -104,7 +103,6 @@ func (r *NetworkInterfaceBindReconciler) reconcileBound(ctx context.Context, log
 	validReferences := machineExists && r.validReferences(nic, machine)
 	phase := nic.Status.Phase
 	phaseLastTransitionTime := nic.Status.LastPhaseTransitionTime
-	machinePoolRef := machine.Spec.MachinePoolRef
 
 	log = log.WithValues(
 		"MachineExists", machineExists,
@@ -120,7 +118,7 @@ func (r *NetworkInterfaceBindReconciler) reconcileBound(ctx context.Context, log
 	switch {
 	case validReferences:
 		log.V(1).Info("Setting to bound")
-		if err := r.patchStatus(ctx, nic, networkingv1alpha1.NetworkInterfacePhaseBound, machinePoolRef); err != nil {
+		if err := r.patchStatus(ctx, nic, networkingv1alpha1.NetworkInterfacePhaseBound); err != nil {
 			return ctrl.Result{}, fmt.Errorf("error binding: %w", err)
 		}
 
@@ -136,7 +134,7 @@ func (r *NetworkInterfaceBindReconciler) reconcileBound(ctx context.Context, log
 		return ctrl.Result{}, nil
 	default:
 		log.V(1).Info("Bind is not ok and not yet timed out, setting to pending")
-		if err := r.patchStatus(ctx, nic, networkingv1alpha1.NetworkInterfacePhasePending, machinePoolRef); err != nil {
+		if err := r.patchStatus(ctx, nic, networkingv1alpha1.NetworkInterfacePhasePending); err != nil {
 			return ctrl.Result{}, fmt.Errorf("error setting phase to pending: %w", err)
 		}
 
@@ -156,7 +154,7 @@ func (r *NetworkInterfaceBindReconciler) reconcileUnbound(ctx context.Context, l
 
 	if machine == nil {
 		log.V(1).Info("No requester found, setting phase unbound")
-		if err := r.patchStatus(ctx, nic, networkingv1alpha1.NetworkInterfacePhaseUnbound, nil); err != nil {
+		if err := r.patchStatus(ctx, nic, networkingv1alpha1.NetworkInterfacePhaseUnbound); err != nil {
 			return ctrl.Result{}, err
 		}
 		log.V(1).Info("Successfully set phase to unbound")
@@ -246,7 +244,6 @@ func (r *NetworkInterfaceBindReconciler) patchStatus(
 	ctx context.Context,
 	nic *networkingv1alpha1.NetworkInterface,
 	phase networkingv1alpha1.NetworkInterfacePhase,
-	machinePoolRef *corev1.LocalObjectReference,
 ) error {
 	now := metav1.Now()
 	base := nic.DeepCopy()
@@ -255,7 +252,6 @@ func (r *NetworkInterfaceBindReconciler) patchStatus(
 		nic.Status.LastPhaseTransitionTime = &now
 	}
 	nic.Status.Phase = phase
-	nic.Status.MachinePoolRef = machinePoolRef
 
 	if err := r.Status().Patch(ctx, nic, client.MergeFrom(base)); err != nil {
 		return fmt.Errorf("error patching status: %w", err)
@@ -264,25 +260,22 @@ func (r *NetworkInterfaceBindReconciler) patchStatus(
 }
 
 func (r *NetworkInterfaceBindReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	ctx := context.Background()
-	log := ctrl.Log.WithName("networkinterfacebind").WithName("setup")
-
 	return ctrl.NewControllerManagedBy(mgr).
 		Named("networkinterfacebind").
 		For(&networkingv1alpha1.NetworkInterface{}).
 		Watches(
-			&source.Kind{Type: &computev1alpha1.Machine{}},
+			&computev1alpha1.Machine{},
 			r.enqueueByMachineNetworkInterfaceReference(),
 		).
 		Watches(
-			&source.Kind{Type: &computev1alpha1.Machine{}},
-			r.enqueueByMachineNameEqualNetworkInterfaceMachineRefName(ctx, log),
+			&computev1alpha1.Machine{},
+			r.enqueueByMachineNameEqualNetworkInterfaceMachineRefName(),
 		).
 		Complete(r)
 }
 
 func (r *NetworkInterfaceBindReconciler) enqueueByMachineNetworkInterfaceReference() handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		machine := obj.(*computev1alpha1.Machine)
 
 		var reqs []ctrl.Request
@@ -294,9 +287,10 @@ func (r *NetworkInterfaceBindReconciler) enqueueByMachineNetworkInterfaceReferen
 	})
 }
 
-func (r *NetworkInterfaceBindReconciler) enqueueByMachineNameEqualNetworkInterfaceMachineRefName(ctx context.Context, log logr.Logger) handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+func (r *NetworkInterfaceBindReconciler) enqueueByMachineNameEqualNetworkInterfaceMachineRefName() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		machine := obj.(*computev1alpha1.Machine)
+		log := ctrl.LoggerFrom(ctx)
 
 		nicList := &networkingv1alpha1.NetworkInterfaceList{}
 		if err := r.List(ctx, nicList,

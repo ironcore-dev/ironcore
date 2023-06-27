@@ -24,11 +24,11 @@ import (
 // MachineStatusApplyConfiguration represents an declarative configuration of the MachineStatus type for use
 // with apply.
 type MachineStatusApplyConfiguration struct {
-	MachineID                     *string                                    `json:"machineID,omitempty"`
-	MachinePoolObservedGeneration *int64                                     `json:"machinePoolObservedGeneration,omitempty"`
-	State                         *v1alpha1.MachineState                     `json:"state,omitempty"`
-	NetworkInterfaces             []NetworkInterfaceStatusApplyConfiguration `json:"networkInterfaces,omitempty"`
-	Volumes                       []VolumeStatusApplyConfiguration           `json:"volumes,omitempty"`
+	MachineID          *string                                    `json:"machineID,omitempty"`
+	ObservedGeneration *int64                                     `json:"observedGeneration,omitempty"`
+	State              *v1alpha1.MachineState                     `json:"state,omitempty"`
+	NetworkInterfaces  []NetworkInterfaceStatusApplyConfiguration `json:"networkInterfaces,omitempty"`
+	Volumes            []VolumeStatusApplyConfiguration           `json:"volumes,omitempty"`
 }
 
 // MachineStatusApplyConfiguration constructs an declarative configuration of the MachineStatus type for use with
@@ -45,11 +45,11 @@ func (b *MachineStatusApplyConfiguration) WithMachineID(value string) *MachineSt
 	return b
 }
 
-// WithMachinePoolObservedGeneration sets the MachinePoolObservedGeneration field in the declarative configuration to the given value
+// WithObservedGeneration sets the ObservedGeneration field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the MachinePoolObservedGeneration field is set to the value of the last call.
-func (b *MachineStatusApplyConfiguration) WithMachinePoolObservedGeneration(value int64) *MachineStatusApplyConfiguration {
-	b.MachinePoolObservedGeneration = &value
+// If called multiple times, the ObservedGeneration field is set to the value of the last call.
+func (b *MachineStatusApplyConfiguration) WithObservedGeneration(value int64) *MachineStatusApplyConfiguration {
+	b.ObservedGeneration = &value
 	return b
 }
 

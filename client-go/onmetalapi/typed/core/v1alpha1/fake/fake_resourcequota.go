@@ -26,7 +26,6 @@ import (
 	corev1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/core/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
@@ -38,9 +37,9 @@ type FakeResourceQuotas struct {
 	ns   string
 }
 
-var resourcequotasResource = schema.GroupVersionResource{Group: "core.api.onmetal.de", Version: "v1alpha1", Resource: "resourcequotas"}
+var resourcequotasResource = v1alpha1.SchemeGroupVersion.WithResource("resourcequotas")
 
-var resourcequotasKind = schema.GroupVersionKind{Group: "core.api.onmetal.de", Version: "v1alpha1", Kind: "ResourceQuota"}
+var resourcequotasKind = v1alpha1.SchemeGroupVersion.WithKind("ResourceQuota")
 
 // Get takes name of the resourceQuota, and returns the corresponding resourceQuota object, and an error if there is any.
 func (c *FakeResourceQuotas) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.ResourceQuota, err error) {

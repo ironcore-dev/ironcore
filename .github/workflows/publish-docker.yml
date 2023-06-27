@@ -3,97 +3,100 @@ name: Build and Publish Docker Image
 on:
   release:
     types:
-      - published
+    - published
   push:
     branches:
-      - main
+    - main
     tags:
-      - v*
+    - v*
     paths-ignore:
-      - 'docs/**'
-      - '**/*.md'
-  pull_request_target:
+    - 'docs/**'
+    - '**/*.md'
+  pull_request:
     types:
-      - labeled
+    - labeled
     paths-ignore:
-      - 'docs/**'
-      - '**/*.md'
+    - 'docs/**'
+    - '**/*.md'
 
 jobs:
   buildAndPush:
     strategy:
       matrix:
         image:
-          - name: onmetal-api-controller-manager
-            target: manager
-          - name: onmetal-api-apiserver
-            target: apiserver
-          - name: onmetal-api-machinepoollet
-            target: machinepoollet
-          - name: onmetal-api-machinebroker
-            target: machinebroker
-          - name: onmetal-api-orictl-machine
-            target: orictl-machine
-          - name: onmetal-api-volumepoollet
-            target: volumepoollet
-          - name: onmetal-api-volumebroker
-            target: volumebroker
-          - name: onmetal-api-orictl-volume
-            target: orictl-volume
-          - name: onmetal-api-bucketpoollet
-            target: bucketpoollet
-          - name: onmetal-api-bucketbroker
-            target: bucketbroker
-          - name: onmetal-api-orictl-bucket
-            target: orictl-bucket
+        - name: onmetal-api-controller-manager
+          target: manager
+        - name: onmetal-api-apiserver
+          target: apiserver
+        - name: onmetal-api-machinepoollet
+          target: machinepoollet
+        - name: onmetal-api-machinebroker
+          target: machinebroker
+        - name: onmetal-api-orictl-machine
+          target: orictl-machine
+        - name: onmetal-api-volumepoollet
+          target: volumepoollet
+        - name: onmetal-api-volumebroker
+          target: volumebroker
+        - name: onmetal-api-orictl-volume
+          target: orictl-volume
+        - name: onmetal-api-bucketpoollet
+          target: bucketpoollet
+        - name: onmetal-api-bucketbroker
+          target: bucketbroker
+        - name: onmetal-api-orictl-bucket
+          target: orictl-bucket
+    permissions:
+      contents: read
+      packages: write
     if: ${{ github.event.label.name == 'ok-to-image' }} || ${{ github.event.label.name == 'ok-to-🐳' }} || ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: docker/metadata-action@v4
-        id: meta
-        with:
-          images: |
-            ghcr.io/${{ github.repository_owner }}/${{ matrix.image.name }}
-          tags: |
-            type=semver,pattern={{version}}
-            type=schedule
-            type=ref,event=branch
-            type=ref,event=tag
-            type=ref,event=pr
-            type=sha
-          flavor: |
-            latest=${{ github.ref == 'refs/heads/main' }}
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-        with:
-          platforms: all
-      # workaround for self-hosted runner
-      # https://github.com/mumoshu/actions-runner-controller-ci/commit/e91c8c0f6ca82aa7618010c6d2f417aa46c4a4bf
-      - name: Set up Docker Context for Buildx
-        id: buildx-context
-        run: |
-          docker context create builders
-      - name: Set up Docker Buildx
-        timeout-minutes: 5
-        uses: docker/setup-buildx-action@v2
-        with:
-          version: latest
-          endpoint: builders # self-hosted
-      - name: Login to GHCR
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push
-        timeout-minutes: 40
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          platforms: linux/amd64,linux/arm64
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          target: ${{ matrix.image.target }}
+    - uses: actions/checkout@v3
+    - uses: docker/metadata-action@v4
+      id: meta
+      with:
+        images: |
+          ghcr.io/${{ github.repository_owner }}/${{ matrix.image.name }}
+        tags: |
+          type=semver,pattern={{version}}
+          type=schedule
+          type=ref,event=branch
+          type=ref,event=tag
+          type=ref,event=pr
+          type=sha
+        flavor: |
+          latest=${{ github.ref == 'refs/heads/main' }}
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+      with:
+        platforms: all
+    # workaround for self-hosted runner
+    # https://github.com/mumoshu/actions-runner-controller-ci/commit/e91c8c0f6ca82aa7618010c6d2f417aa46c4a4bf
+    - name: Set up Docker Context for Buildx
+      id: buildx-context
+      run: |
+        docker context create builders
+    - name: Set up Docker Buildx
+      timeout-minutes: 5
+      uses: docker/setup-buildx-action@v2
+      with:
+        version: latest
+        endpoint: builders # self-hosted
+    - name: Login to GHCR
+      if: github.event_name != 'pull_request'
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Build and push
+      timeout-minutes: 40
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        platforms: linux/amd64,linux/arm64
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        target: ${{ matrix.image.target }}

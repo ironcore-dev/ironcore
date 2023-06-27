@@ -71,6 +71,8 @@ type Options struct {
 	ProbeAddr                string
 
 	MachinePoolName                      string
+	MachineDownwardAPILabels             map[string]string
+	MachineDownwardAPIAnnotations        map[string]string
 	ProviderID                           string
 	MachineRuntimeEndpoint               string
 	MachineRuntimeSocketDiscoveryTimeout time.Duration
@@ -95,6 +97,8 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.LeaderElectionKubeconfig, "leader-election-kubeconfig", "", "Path pointing to a kubeconfig to use for leader election.")
 
 	fs.StringVar(&o.MachinePoolName, "machine-pool-name", o.MachinePoolName, "Name of the machine pool to announce / watch")
+	fs.StringToStringVar(&o.MachineDownwardAPILabels, "machine-downward-api-label", o.MachineDownwardAPILabels, "Downward-API labels to set on the ori machine.")
+	fs.StringToStringVar(&o.MachineDownwardAPIAnnotations, "machine-downward-api-annotation", o.MachineDownwardAPIAnnotations, "Downward-API annotations to set on the ori machine.")
 	fs.StringVar(&o.ProviderID, "provider-id", "", "Provider id to announce on the machine pool.")
 	fs.StringVar(&o.MachineRuntimeEndpoint, "machine-runtime-endpoint", o.MachineRuntimeEndpoint, "Endpoint of the remote machine runtime service.")
 	fs.DurationVar(&o.MachineRuntimeSocketDiscoveryTimeout, "machine-runtime-socket-discovery-timeout", 20*time.Second, "Timeout for discovering the machine runtime socket.")
@@ -219,13 +223,11 @@ func Run(ctx context.Context, opts Options) error {
 		LeaderElectionNamespace: opts.LeaderElectionNamespace,
 		LeaderElectionConfig:    leaderElectionCfg,
 		NewCache: func(config *rest.Config, cacheOpts cache.Options) (cache.Cache, error) {
-			cacheOpts.SelectorsByObject = cache.SelectorsByObject{
-				&computev1alpha1.Machine{}: cache.ObjectSelector{
-					Field: fields.OneTermEqualSelector(
-						computev1alpha1.MachineMachinePoolRefNameField,
-						opts.MachinePoolName,
-					),
-				},
+			cacheOpts.ByObject[&computev1alpha1.Machine{}] = cache.ByObject{
+				Field: fields.OneTermEqualSelector(
+					computev1alpha1.MachineMachinePoolRefNameField,
+					opts.MachinePoolName,
+				),
 			}
 			return cache.New(config, cacheOpts)
 		},
@@ -275,34 +277,6 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error adding machine event generator healthz check: %w", err)
 	}
 
-	volumeEvents := orievent.NewGenerator(func(ctx context.Context) ([]*ori.Volume, error) {
-		res, err := machineRuntime.ListVolumes(ctx, &ori.ListVolumesRequest{})
-		if err != nil {
-			return nil, err
-		}
-		return res.Volumes, nil
-	}, orievent.GeneratorOptions{})
-	if err := mgr.Add(volumeEvents); err != nil {
-		return fmt.Errorf("error adding volume event generator: %w", err)
-	}
-	if err := mgr.AddHealthzCheck("volume-events", volumeEvents.Check); err != nil {
-		return fmt.Errorf("error adding volume event generator healthz check: %w", err)
-	}
-
-	networkInterfaceEvents := orievent.NewGenerator(func(ctx context.Context) ([]*ori.NetworkInterface, error) {
-		res, err := machineRuntime.ListNetworkInterfaces(ctx, &ori.ListNetworkInterfacesRequest{})
-		if err != nil {
-			return nil, err
-		}
-		return res.NetworkInterfaces, nil
-	}, orievent.GeneratorOptions{})
-	if err := mgr.Add(networkInterfaceEvents); err != nil {
-		return fmt.Errorf("error adding network interface event generator: %w", err)
-	}
-	if err := mgr.AddHealthzCheck("networkinterface-events", networkInterfaceEvents.Check); err != nil {
-		return fmt.Errorf("error adding network interface event generator healthz check: %w", err)
-	}
-
 	indexer := mgr.GetFieldIndexer()
 	if err := machinepoolletclient.SetupMachineSpecNetworkInterfaceNamesField(ctx, indexer, opts.MachinePoolName); err != nil {
 		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.MachineSpecNetworkInterfaceNamesField, err)
@@ -313,17 +287,11 @@ func Run(ctx context.Context, opts Options) error {
 	if err := machinepoolletclient.SetupMachineSpecVolumeNamesField(ctx, indexer, opts.MachinePoolName); err != nil {
 		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.MachineSpecVolumeNamesField, err)
 	}
-	if err := machinepoolletclient.SetupAliasPrefixRoutingNetworkRefNameField(ctx, indexer); err != nil {
-		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.AliasPrefixRoutingNetworkRefNameField, err)
-	}
 	if err := machinepoolletclient.SetupLoadBalancerRoutingNetworkRefNameField(ctx, indexer); err != nil {
 		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.LoadBalancerRoutingNetworkRefNameField, err)
 	}
 	if err := machinepoolletclient.SetupNATGatewayRoutingNetworkRefNameField(ctx, indexer); err != nil {
 		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.NATGatewayRoutingNetworkRefNameField, err)
-	}
-	if err := machinepoolletclient.SetupNetworkInterfaceNetworkMachinePoolID(ctx, indexer, opts.MachinePoolName); err != nil {
-		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.NetworkInterfaceNetworkNameAndHandle, err)
 	}
 
 	onInitialized := func(ctx context.Context) error {
@@ -335,23 +303,23 @@ func Run(ctx context.Context, opts Options) error {
 		}
 
 		if err := (&controllers.MachineReconciler{
-			EventRecorder:         mgr.GetEventRecorderFor("machines"),
-			Client:                mgr.GetClient(),
-			MachineRuntime:        machineRuntime,
-			MachineRuntimeName:    version.RuntimeName,
-			MachineRuntimeVersion: version.RuntimeVersion,
-			MachineClassMapper:    machineClassMapper,
-			MachinePoolName:       opts.MachinePoolName,
-			WatchFilterValue:      opts.WatchFilterValue,
+			EventRecorder:          mgr.GetEventRecorderFor("machines"),
+			Client:                 mgr.GetClient(),
+			MachineRuntime:         machineRuntime,
+			MachineRuntimeName:     version.RuntimeName,
+			MachineRuntimeVersion:  version.RuntimeVersion,
+			MachineClassMapper:     machineClassMapper,
+			MachinePoolName:        opts.MachinePoolName,
+			DownwardAPILabels:      opts.MachineDownwardAPILabels,
+			DownwardAPIAnnotations: opts.MachineDownwardAPIAnnotations,
+			WatchFilterValue:       opts.WatchFilterValue,
 		}).SetupWithManager(mgr); err != nil {
 			return fmt.Errorf("error setting up machine reconciler with manager: %w", err)
 		}
 
 		if err := (&controllers.MachineAnnotatorReconciler{
-			Client:                 mgr.GetClient(),
-			MachineEvents:          machineEvents,
-			VolumeEvents:           volumeEvents,
-			NetworkInterfaceEvents: networkInterfaceEvents,
+			Client:        mgr.GetClient(),
+			MachineEvents: machineEvents,
 		}).SetupWithManager(mgr); err != nil {
 			return fmt.Errorf("error setting up machine annotator reconciler with manager: %w", err)
 		}

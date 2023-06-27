@@ -10,10 +10,6 @@
 </div>
 Resource Types:
 <ul><li>
-<a href="#networking.api.onmetal.de/v1alpha1.AliasPrefix">AliasPrefix</a>
-</li><li>
-<a href="#networking.api.onmetal.de/v1alpha1.AliasPrefixRouting">AliasPrefixRouting</a>
-</li><li>
 <a href="#networking.api.onmetal.de/v1alpha1.LoadBalancer">LoadBalancer</a>
 </li><li>
 <a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerRouting">LoadBalancerRouting</a>
@@ -26,195 +22,10 @@ Resource Types:
 </li><li>
 <a href="#networking.api.onmetal.de/v1alpha1.NetworkInterface">NetworkInterface</a>
 </li><li>
+<a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicy">NetworkPolicy</a>
+</li><li>
 <a href="#networking.api.onmetal.de/v1alpha1.VirtualIP">VirtualIP</a>
 </li></ul>
-<h3 id="networking.api.onmetal.de/v1alpha1.AliasPrefix">AliasPrefix
-</h3>
-<div>
-<p>AliasPrefix is the Schema for the AliasPrefix API</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>apiVersion</code><br/>
-string</td>
-<td>
-<code>
-networking.api.onmetal.de/v1alpha1
-</code>
-</td>
-</tr>
-<tr>
-<td>
-<code>kind</code><br/>
-string
-</td>
-<td><code>AliasPrefix</code></td>
-</tr>
-<tr>
-<td>
-<code>metadata</code><br/>
-<em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
-Kubernetes meta/v1.ObjectMeta
-</a>
-</em>
-</td>
-<td>
-Refer to the Kubernetes API documentation for the fields of the
-<code>metadata</code> field.
-</td>
-</tr>
-<tr>
-<td>
-<code>spec</code><br/>
-<em>
-<a href="#networking.api.onmetal.de/v1alpha1.AliasPrefixSpec">
-AliasPrefixSpec
-</a>
-</em>
-</td>
-<td>
-<br/>
-<br/>
-<table>
-<tr>
-<td>
-<code>networkRef</code><br/>
-<em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>NetworkRef is the Network this AliasPrefix should belong to</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>networkInterfaceSelector</code><br/>
-<em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#labelselector-v1-meta">
-Kubernetes meta/v1.LabelSelector
-</a>
-</em>
-</td>
-<td>
-<p>NetworkInterfaceSelector defines the NetworkInterfaces
-for which this AliasPrefix should be applied</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>prefix</code><br/>
-<em>
-<a href="#networking.api.onmetal.de/v1alpha1.PrefixSource">
-PrefixSource
-</a>
-</em>
-</td>
-<td>
-<p>Prefix is the provided Prefix or Ephemeral which
-should be used by this AliasPrefix</p>
-</td>
-</tr>
-</table>
-</td>
-</tr>
-<tr>
-<td>
-<code>status</code><br/>
-<em>
-<a href="#networking.api.onmetal.de/v1alpha1.AliasPrefixStatus">
-AliasPrefixStatus
-</a>
-</em>
-</td>
-<td>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="networking.api.onmetal.de/v1alpha1.AliasPrefixRouting">AliasPrefixRouting
-</h3>
-<div>
-<p>AliasPrefixRouting is the Schema for the aliasprefixrouting API</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>apiVersion</code><br/>
-string</td>
-<td>
-<code>
-networking.api.onmetal.de/v1alpha1
-</code>
-</td>
-</tr>
-<tr>
-<td>
-<code>kind</code><br/>
-string
-</td>
-<td><code>AliasPrefixRouting</code></td>
-</tr>
-<tr>
-<td>
-<code>metadata</code><br/>
-<em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
-Kubernetes meta/v1.ObjectMeta
-</a>
-</em>
-</td>
-<td>
-Refer to the Kubernetes API documentation for the fields of the
-<code>metadata</code> field.
-</td>
-</tr>
-<tr>
-<td>
-<code>networkRef</code><br/>
-<em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
-</a>
-</em>
-</td>
-<td>
-<p>NetworkRef is the network the load balancer is assigned to.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>destinations</code><br/>
-<em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
-</a>
-</em>
-</td>
-<td>
-<p>Destinations are the destinations for an AliasPrefix.</p>
-</td>
-</tr>
-</tbody>
-</table>
 <h3 id="networking.api.onmetal.de/v1alpha1.LoadBalancer">LoadBalancer
 </h3>
 <div>
@@ -249,7 +60,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -289,7 +100,7 @@ LoadBalancerType
 <td>
 <code>ipFamilies</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#ipfamily-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#ipfamily-v1-core">
 []Kubernetes core/v1.IPFamily
 </a>
 </em>
@@ -300,9 +111,22 @@ LoadBalancerType
 </tr>
 <tr>
 <td>
+<code>ips</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.IPSource">
+[]IPSource
+</a>
+</em>
+</td>
+<td>
+<p>IPs are the ips to use. Can only be used when Type is LoadBalancerTypeInternal.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>networkRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -315,7 +139,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>networkInterfaceSelector</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#labelselector-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#labelselector-v1-meta">
 Kubernetes meta/v1.LabelSelector
 </a>
 </em>
@@ -358,7 +182,7 @@ LoadBalancerStatus
 <h3 id="networking.api.onmetal.de/v1alpha1.LoadBalancerRouting">LoadBalancerRouting
 </h3>
 <div>
-<p>LoadBalancerRouting is the Schema for the aliasprefixrouting API</p>
+<p>LoadBalancerRouting is the Schema for the loadbalancerroutings API</p>
 </div>
 <table>
 <thead>
@@ -389,7 +213,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -461,7 +285,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -501,7 +325,7 @@ NATGatewayType
 <td>
 <code>ipFamilies</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#ipfamily-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#ipfamily-v1-core">
 []Kubernetes core/v1.IPFamily
 </a>
 </em>
@@ -528,7 +352,7 @@ NATGatewayType
 <td>
 <code>networkRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -541,7 +365,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>networkInterfaceSelector</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#labelselector-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#labelselector-v1-meta">
 Kubernetes meta/v1.LabelSelector
 </a>
 </em>
@@ -583,7 +407,7 @@ NATGatewayStatus
 <h3 id="networking.api.onmetal.de/v1alpha1.NATGatewayRouting">NATGatewayRouting
 </h3>
 <div>
-<p>NATGatewayRouting is the Schema for the aliasprefixrouting API</p>
+<p>NATGatewayRouting is the Schema for the natgatewayroutings API</p>
 </div>
 <table>
 <thead>
@@ -614,7 +438,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -686,7 +510,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -711,13 +535,13 @@ NetworkSpec
 <table>
 <tr>
 <td>
-<code>handle</code><br/>
+<code>providerID</code><br/>
 <em>
 string
 </em>
 </td>
 <td>
-<p>Handle is the identifier of the network provider.</p>
+<p>ProviderID is the provider-internal ID of the network.</p>
 </td>
 </tr>
 <tr>
@@ -785,7 +609,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -812,7 +636,7 @@ NetworkInterfaceSpec
 <td>
 <code>networkRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -838,7 +662,7 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 <td>
 <code>ipFamilies</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#ipfamily-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#ipfamily-v1-core">
 []Kubernetes core/v1.IPFamily
 </a>
 </em>
@@ -857,8 +681,22 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </em>
 </td>
 <td>
-<p>IPs is the list of provided IPs or EphemeralIPs which should be assigned to
-this NetworkInterface</p>
+<p>IPs is the list of provided IPs or ephemeral IPs which should be assigned to
+this NetworkInterface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>prefixes</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.PrefixSource">
+[]PrefixSource
+</a>
+</em>
+</td>
+<td>
+<p>Prefixes is the list of provided prefixes or ephemeral prefixes which should be assigned to
+this NetworkInterface.</p>
 </td>
 </tr>
 <tr>
@@ -883,6 +721,145 @@ VirtualIPSource
 <em>
 <a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceStatus">
 NetworkInterfaceStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.NetworkPolicy">NetworkPolicy
+</h3>
+<div>
+<p>NetworkPolicy is the Schema for the networkpolicies API</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+networking.api.onmetal.de/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>NetworkPolicy</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicySpec">
+NetworkPolicySpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef is the network to regulate using this policy.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkInterfaceSelector</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#labelselector-v1-meta">
+Kubernetes meta/v1.LabelSelector
+</a>
+</em>
+</td>
+<td>
+<p>NetworkInterfaceSelector selects the network interfaces that are subject to this policy.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ingress</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyIngressRule">
+[]NetworkPolicyIngressRule
+</a>
+</em>
+</td>
+<td>
+<p>Ingress specifies rules for ingress traffic.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>egress</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyEgressRule">
+[]NetworkPolicyEgressRule
+</a>
+</em>
+</td>
+<td>
+<p>Egress specifies rules for egress traffic.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>policyTypes</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.PolicyType">
+[]PolicyType
+</a>
+</em>
+</td>
+<td>
+<p>PolicyTypes specifies the types of policies this network policy contains.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyStatus">
+NetworkPolicyStatus
 </a>
 </em>
 </td>
@@ -925,7 +902,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -965,7 +942,7 @@ VirtualIPType
 <td>
 <code>ipFamily</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#ipfamily-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#ipfamily-v1-core">
 Kubernetes core/v1.IPFamily
 </a>
 </em>
@@ -1000,96 +977,6 @@ VirtualIPStatus
 </em>
 </td>
 <td>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="networking.api.onmetal.de/v1alpha1.AliasPrefixSpec">AliasPrefixSpec
-</h3>
-<p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.AliasPrefix">AliasPrefix</a>)
-</p>
-<div>
-<p>AliasPrefixSpec defines the desired state of AliasPrefix</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>networkRef</code><br/>
-<em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>NetworkRef is the Network this AliasPrefix should belong to</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>networkInterfaceSelector</code><br/>
-<em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#labelselector-v1-meta">
-Kubernetes meta/v1.LabelSelector
-</a>
-</em>
-</td>
-<td>
-<p>NetworkInterfaceSelector defines the NetworkInterfaces
-for which this AliasPrefix should be applied</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>prefix</code><br/>
-<em>
-<a href="#networking.api.onmetal.de/v1alpha1.PrefixSource">
-PrefixSource
-</a>
-</em>
-</td>
-<td>
-<p>Prefix is the provided Prefix or Ephemeral which
-should be used by this AliasPrefix</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="networking.api.onmetal.de/v1alpha1.AliasPrefixStatus">AliasPrefixStatus
-</h3>
-<p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.AliasPrefix">AliasPrefix</a>)
-</p>
-<div>
-<p>AliasPrefixStatus defines the observed state of AliasPrefix</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>prefix</code><br/>
-<em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
-</a>
-</em>
-</td>
-<td>
-<p>Prefix is the Prefix reserved by this AliasPrefix</p>
 </td>
 </tr>
 </tbody>
@@ -1158,10 +1045,55 @@ VirtualIPTemplateSpec
 </tr>
 </tbody>
 </table>
+<h3 id="networking.api.onmetal.de/v1alpha1.IPBlock">IPBlock
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyPeer">NetworkPolicyPeer</a>)
+</p>
+<div>
+<p>IPBlock specifies an ip block with optional exceptions.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>cidr</code><br/>
+<em>
+<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
+github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
+</a>
+</em>
+</td>
+<td>
+<p>CIDR is a string representing the ip block.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>except</code><br/>
+<em>
+<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
+[]github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
+</a>
+</em>
+</td>
+<td>
+<p>Except is a slice of CIDRs that should not be included within the specified CIDR.
+Values will be rejected if they are outside CIDR.</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="networking.api.onmetal.de/v1alpha1.IPSource">IPSource
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceSpec">NetworkInterfaceSpec</a>)
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerSpec">LoadBalancerSpec</a>, <a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceSpec">NetworkInterfaceSpec</a>)
 </p>
 <div>
 <p>IPSource is the definition of how to obtain an IP.</p>
@@ -1221,7 +1153,7 @@ EphemeralPrefixSource
 <td>
 <code>protocol</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#protocol-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#protocol-v1-core">
 Kubernetes core/v1.Protocol
 </a>
 </em>
@@ -1289,7 +1221,7 @@ LoadBalancerType
 <td>
 <code>ipFamilies</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#ipfamily-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#ipfamily-v1-core">
 []Kubernetes core/v1.IPFamily
 </a>
 </em>
@@ -1300,9 +1232,22 @@ LoadBalancerType
 </tr>
 <tr>
 <td>
+<code>ips</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.IPSource">
+[]IPSource
+</a>
+</em>
+</td>
+<td>
+<p>IPs are the ips to use. Can only be used when Type is LoadBalancerTypeInternal.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>networkRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1315,7 +1260,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>networkInterfaceSelector</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#labelselector-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#labelselector-v1-meta">
 Kubernetes meta/v1.LabelSelector
 </a>
 </em>
@@ -1386,7 +1331,10 @@ for which this LoadBalancer should be applied</p>
 <th>Description</th>
 </tr>
 </thead>
-<tbody><tr><td><p>&#34;Public&#34;</p></td>
+<tbody><tr><td><p>&#34;Internal&#34;</p></td>
+<td><p>LoadBalancerTypeInternal is a LoadBalancer that allocates and routes network-internal, stable IPs.</p>
+</td>
+</tr><tr><td><p>&#34;Public&#34;</p></td>
 <td><p>LoadBalancerTypePublic is a LoadBalancer that allocates and routes a stable public IP.</p>
 </td>
 </tr></tbody>
@@ -1597,7 +1545,7 @@ NATGatewayType
 <td>
 <code>ipFamilies</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#ipfamily-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#ipfamily-v1-core">
 []Kubernetes core/v1.IPFamily
 </a>
 </em>
@@ -1624,7 +1572,7 @@ NATGatewayType
 <td>
 <code>networkRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1637,7 +1585,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>networkInterfaceSelector</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#labelselector-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#labelselector-v1-meta">
 Kubernetes meta/v1.LabelSelector
 </a>
 </em>
@@ -1769,7 +1717,7 @@ int32
 <td>
 <code>networkRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1795,7 +1743,7 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 <td>
 <code>ipFamilies</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#ipfamily-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#ipfamily-v1-core">
 []Kubernetes core/v1.IPFamily
 </a>
 </em>
@@ -1814,8 +1762,22 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </em>
 </td>
 <td>
-<p>IPs is the list of provided IPs or EphemeralIPs which should be assigned to
-this NetworkInterface</p>
+<p>IPs is the list of provided IPs or ephemeral IPs which should be assigned to
+this NetworkInterface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>prefixes</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.PrefixSource">
+[]PrefixSource
+</a>
+</em>
+</td>
+<td>
+<p>Prefixes is the list of provided prefixes or ephemeral prefixes which should be assigned to
+this NetworkInterface.</p>
 </td>
 </tr>
 <tr>
@@ -1892,7 +1854,7 @@ NetworkInterfaceState
 <td>
 <code>lastStateTransitionTime</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -1903,13 +1865,13 @@ Kubernetes meta/v1.Time
 </tr>
 <tr>
 <td>
-<code>networkHandle</code><br/>
+<code>providerID</code><br/>
 <em>
 string
 </em>
 </td>
 <td>
-<p>NetworkHandle is the handle of the network the network interface is part of.</p>
+<p>ProviderID is the provider-internal ID of the network interface.</p>
 </td>
 </tr>
 <tr>
@@ -1922,7 +1884,20 @@ string
 </em>
 </td>
 <td>
-<p>IPs represent the effective IP addresses of the NetworkInterface</p>
+<p>IPs represent the effective IP addresses of the NetworkInterface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>prefixes</code><br/>
+<em>
+<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
+[]github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
+</a>
+</em>
+</td>
+<td>
+<p>Prefixes represent the prefixes routed to the NetworkInterface.</p>
 </td>
 </tr>
 <tr>
@@ -1953,22 +1928,9 @@ NetworkInterfacePhase
 </tr>
 <tr>
 <td>
-<code>machinePoolRef</code><br/>
-<em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
-Kubernetes core/v1.LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>MachinePoolRef is the machine pool the network interface is currently on, if any.</p>
-</td>
-</tr>
-<tr>
-<td>
 <code>lastPhaseTransitionTime</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -1996,7 +1958,7 @@ Kubernetes meta/v1.Time
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -2023,7 +1985,7 @@ NetworkInterfaceSpec
 <td>
 <code>networkRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -2049,7 +2011,7 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 <td>
 <code>ipFamilies</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#ipfamily-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#ipfamily-v1-core">
 []Kubernetes core/v1.IPFamily
 </a>
 </em>
@@ -2068,8 +2030,22 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </em>
 </td>
 <td>
-<p>IPs is the list of provided IPs or EphemeralIPs which should be assigned to
-this NetworkInterface</p>
+<p>IPs is the list of provided IPs or ephemeral IPs which should be assigned to
+this NetworkInterface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>prefixes</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.PrefixSource">
+[]PrefixSource
+</a>
+</em>
+</td>
+<td>
+<p>Prefixes is the list of provided prefixes or ephemeral prefixes which should be assigned to
+this NetworkInterface.</p>
 </td>
 </tr>
 <tr>
@@ -2121,7 +2097,9 @@ string
 <td>
 <code>networkRef</code><br/>
 <em>
+<a href="../common/#common.api.onmetal.de/v1alpha1.UIDReference">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.UIDReference
+</a>
 </em>
 </td>
 <td>
@@ -2184,17 +2162,6 @@ string
 </tr>
 <tr>
 <td>
-<code>networkHandle</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>NetworkHandle is the handle of the peered network.</p>
-</td>
-</tr>
-<tr>
-<td>
 <code>phase</code><br/>
 <em>
 <a href="#networking.api.onmetal.de/v1alpha1.NetworkPeeringPhase">
@@ -2210,13 +2177,424 @@ NetworkPeeringPhase
 <td>
 <code>lastPhaseTransitionTime</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
 </td>
 <td>
 <p>LastPhaseTransitionTime is the last time the Phase transitioned.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.NetworkPolicyCondition">NetworkPolicyCondition
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyStatus">NetworkPolicyStatus</a>)
+</p>
+<div>
+<p>NetworkPolicyCondition is one of the conditions of a network policy.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>type</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyConditionType">
+NetworkPolicyConditionType
+</a>
+</em>
+</td>
+<td>
+<p>Type is the type of the condition.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#conditionstatus-v1-core">
+Kubernetes core/v1.ConditionStatus
+</a>
+</em>
+</td>
+<td>
+<p>Status is the status of the condition.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>reason</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Reason is a machine-readable indication of why the condition is in a certain state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>message</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Message is a human-readable explanation of why the condition has a certain reason / state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>observedGeneration</code><br/>
+<em>
+int64
+</em>
+</td>
+<td>
+<p>ObservedGeneration represents the .metadata.generation that the condition was set based upon.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastTransitionTime</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastTransitionTime is the last time the status of a condition has transitioned from one state to another.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.NetworkPolicyConditionType">NetworkPolicyConditionType
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyCondition">NetworkPolicyCondition</a>)
+</p>
+<div>
+<p>NetworkPolicyConditionType is a type a NetworkPolicyCondition can have.</p>
+</div>
+<h3 id="networking.api.onmetal.de/v1alpha1.NetworkPolicyEgressRule">NetworkPolicyEgressRule
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicySpec">NetworkPolicySpec</a>)
+</p>
+<div>
+<p>NetworkPolicyEgressRule describes a rule to regulate egress traffic with.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>ports</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyPort">
+[]NetworkPolicyPort
+</a>
+</em>
+</td>
+<td>
+<p>Ports specifies the list of destination ports that can be called with
+this rule. Each item in this list is combined using a logical OR. Empty matches all ports.
+As soon as a single item is present, only these ports are allowed.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>to</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyPeer">
+[]NetworkPolicyPeer
+</a>
+</em>
+</td>
+<td>
+<p>To specifies the list of destinations which the selected network interfaces should be
+able to send traffic to. Fields are combined using a logical OR. Empty matches all destinations.
+As soon as a single item is present, only these peers are allowed.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.NetworkPolicyIngressRule">NetworkPolicyIngressRule
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicySpec">NetworkPolicySpec</a>)
+</p>
+<div>
+<p>NetworkPolicyIngressRule describes a rule to regulate ingress traffic with.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>ports</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyPort">
+[]NetworkPolicyPort
+</a>
+</em>
+</td>
+<td>
+<p>Ports specifies the list of ports which should be made accessible for
+this rule. Each item in this list is combined using a logical OR. Empty matches all ports.
+As soon as a single item is present, only these ports are allowed.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>from</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyPeer">
+[]NetworkPolicyPeer
+</a>
+</em>
+</td>
+<td>
+<p>From specifies the list of sources which should be able to send traffic to the
+selected network interfaces. Fields are combined using a logical OR. Empty matches all sources.
+As soon as a single item is present, only these peers are allowed.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.NetworkPolicyPeer">NetworkPolicyPeer
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyEgressRule">NetworkPolicyEgressRule</a>, <a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyIngressRule">NetworkPolicyIngressRule</a>)
+</p>
+<div>
+<p>NetworkPolicyPeer describes a peer to allow traffic to / from.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>objectSelector</code><br/>
+<em>
+<a href="../core/#core.api.onmetal.de/v1alpha1.ObjectSelector">
+github.com/onmetal/onmetal-api/api/core/v1alpha1.ObjectSelector
+</a>
+</em>
+</td>
+<td>
+<p>ObjectSelector selects peers with the given kind matching the label selector.
+Exclusive with other peer specifiers.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ipBlock</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.IPBlock">
+IPBlock
+</a>
+</em>
+</td>
+<td>
+<p>IPBlock specifies the ip block from or to which network traffic may come.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.NetworkPolicyPort">NetworkPolicyPort
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyEgressRule">NetworkPolicyEgressRule</a>, <a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyIngressRule">NetworkPolicyIngressRule</a>)
+</p>
+<div>
+<p>NetworkPolicyPort describes a port to allow traffic on</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>protocol</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#protocol-v1-core">
+Kubernetes core/v1.Protocol
+</a>
+</em>
+</td>
+<td>
+<p>Protocol (TCP, UDP, or SCTP) which traffic must match. If not specified, this
+field defaults to TCP.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>port</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>The port on the given protocol. If this field is not provided, this matches
+all port names and numbers.
+If present, only traffic on the specified protocol AND port will be matched.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>endPort</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>EndPort indicates that the range of ports from Port to EndPort, inclusive,
+should be allowed by the policy. This field cannot be defined if the port field
+is not defined. The endPort must be equal or greater than port.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.NetworkPolicySpec">NetworkPolicySpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicy">NetworkPolicy</a>)
+</p>
+<div>
+<p>NetworkPolicySpec defines the desired state of NetworkPolicy.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef is the network to regulate using this policy.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkInterfaceSelector</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#labelselector-v1-meta">
+Kubernetes meta/v1.LabelSelector
+</a>
+</em>
+</td>
+<td>
+<p>NetworkInterfaceSelector selects the network interfaces that are subject to this policy.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ingress</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyIngressRule">
+[]NetworkPolicyIngressRule
+</a>
+</em>
+</td>
+<td>
+<p>Ingress specifies rules for ingress traffic.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>egress</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyEgressRule">
+[]NetworkPolicyEgressRule
+</a>
+</em>
+</td>
+<td>
+<p>Egress specifies rules for egress traffic.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>policyTypes</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.PolicyType">
+[]PolicyType
+</a>
+</em>
+</td>
+<td>
+<p>PolicyTypes specifies the types of policies this network policy contains.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.NetworkPolicyStatus">NetworkPolicyStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicy">NetworkPolicy</a>)
+</p>
+<div>
+<p>NetworkPolicyStatus defines the observed state of NetworkPolicy.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>conditions</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyCondition">
+[]NetworkPolicyCondition
+</a>
+</em>
+</td>
+<td>
+<p>Conditions are various conditions of the NetworkPolicy.</p>
 </td>
 </tr>
 </tbody>
@@ -2239,13 +2617,13 @@ Kubernetes meta/v1.Time
 <tbody>
 <tr>
 <td>
-<code>handle</code><br/>
+<code>providerID</code><br/>
 <em>
 string
 </em>
 </td>
 <td>
-<p>Handle is the identifier of the network provider.</p>
+<p>ProviderID is the provider-internal ID of the network.</p>
 </td>
 </tr>
 <tr>
@@ -2335,13 +2713,35 @@ NetworkState
 </tr>
 </tbody>
 </table>
+<h3 id="networking.api.onmetal.de/v1alpha1.PolicyType">PolicyType
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicySpec">NetworkPolicySpec</a>)
+</p>
+<div>
+<p>PolicyType is a type of policy.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Egress&#34;</p></td>
+<td><p>PolicyTypeEgress is a policy that describes egress traffic.</p>
+</td>
+</tr><tr><td><p>&#34;Ingress&#34;</p></td>
+<td><p>PolicyTypeIngress is a policy that describes ingress traffic.</p>
+</td>
+</tr></tbody>
+</table>
 <h3 id="networking.api.onmetal.de/v1alpha1.PrefixSource">PrefixSource
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.AliasPrefixSpec">AliasPrefixSpec</a>)
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceSpec">NetworkInterfaceSpec</a>)
 </p>
 <div>
-<p>PrefixSource is the source of the Prefix definition in an AliasPrefix</p>
 </div>
 <table>
 <thead>
@@ -2355,13 +2755,13 @@ NetworkState
 <td>
 <code>value</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
+<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
 github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
 </a>
 </em>
 </td>
 <td>
-<p>Value is a single IPPrefix value as defined in the AliasPrefix</p>
+<p>Value specifies a static prefix to use.</p>
 </td>
 </tr>
 <tr>
@@ -2374,7 +2774,7 @@ EphemeralPrefixSource
 </em>
 </td>
 <td>
-<p>Ephemeral defines the Prefix which should be allocated by the AliasPrefix</p>
+<p>Ephemeral specifies a prefix by creating an ephemeral ipam.Prefix to allocate the prefix with.</p>
 </td>
 </tr>
 </tbody>
@@ -2425,7 +2825,7 @@ EphemeralPrefixSource
 <td>
 <code>virtualIPRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -2483,7 +2883,7 @@ VirtualIPType
 <td>
 <code>ipFamily</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#ipfamily-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#ipfamily-v1-core">
 Kubernetes core/v1.IPFamily
 </a>
 </em>
@@ -2553,7 +2953,7 @@ VirtualIPPhase
 <td>
 <code>phaseLastTransitionTime</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -2584,7 +2984,7 @@ Kubernetes meta/v1.Time
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -2624,7 +3024,7 @@ VirtualIPType
 <td>
 <code>ipFamily</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#ipfamily-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#ipfamily-v1-core">
 Kubernetes core/v1.IPFamily
 </a>
 </em>

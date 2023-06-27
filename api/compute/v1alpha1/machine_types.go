@@ -141,8 +141,6 @@ type NetworkInterfaceStatus struct {
 	Name string `json:"name"`
 	// Handle is the MachinePool internal handle of the NetworkInterface.
 	Handle string `json:"handle,omitempty"`
-	// NetworkHandle is the handle of the network the NetworkInterface is in.
-	NetworkHandle string `json:"networkHandle,omitempty"`
 	// IPs are the ips allocated for the network interface.
 	IPs []commonv1alpha1.IP `json:"ips,omitempty"`
 	// VirtualIP is the virtual ip allocated for the network interface.
@@ -165,8 +163,6 @@ const (
 	NetworkInterfaceStatePending NetworkInterfaceState = "Pending"
 	// NetworkInterfaceStateAttached indicates that a network interface has been successfully attached.
 	NetworkInterfaceStateAttached NetworkInterfaceState = "Attached"
-	// NetworkInterfaceStateDetached indicates that a network interface has been successfully detached.
-	NetworkInterfaceStateDetached NetworkInterfaceState = "Detached"
 )
 
 // NetworkInterfacePhase represents the binding phase a NetworkInterface can be in.
@@ -203,8 +199,6 @@ const (
 	VolumeStatePending VolumeState = "Pending"
 	// VolumeStateAttached indicates that a volume has been successfully attached.
 	VolumeStateAttached VolumeState = "Attached"
-	// VolumeStateDetached indicates that a volume has been successfully detached.
-	VolumeStateDetached VolumeState = "Detached"
 )
 
 // VolumePhase represents the binding phase a Volume can be in.
@@ -221,8 +215,8 @@ const (
 type MachineStatus struct {
 	// MachineID is the provider specific machine ID in the format '<type>://<machine_id>'.
 	MachineID string `json:"machineID,omitempty"`
-	// MachinePoolObservedGeneration is the last generation the MachinePool observed of the Machine.
-	MachinePoolObservedGeneration int64 `json:"machinePoolObservedGeneration,omitempty"`
+	// ObservedGeneration is the last generation the MachinePool observed of the Machine.
+	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
 	// State is the infrastructure state of the machine.
 	State MachineState `json:"state,omitempty"`
 	// NetworkInterfaces is the list of network interface states for the machine.

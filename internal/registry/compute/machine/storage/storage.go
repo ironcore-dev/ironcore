@@ -51,8 +51,9 @@ func NewStorage(optsGetter generic.RESTOptionsGetter, k client.ConnectionInfoGet
 		NewListFunc: func() runtime.Object {
 			return &compute.MachineList{}
 		},
-		PredicateFunc:            machine.MatchMachine,
-		DefaultQualifiedResource: compute.Resource("machines"),
+		PredicateFunc:             machine.MatchMachine,
+		DefaultQualifiedResource:  compute.Resource("machines"),
+		SingularQualifiedResource: compute.Resource("machine"),
 
 		CreateStrategy: machine.Strategy,
 		UpdateStrategy: machine.Strategy,

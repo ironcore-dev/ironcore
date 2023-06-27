@@ -30,12 +30,10 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
 type peeringStatusData struct {
-	phase  networkingv1alpha1.NetworkPeeringPhase
-	handle string
+	phase networkingv1alpha1.NetworkPeeringPhase
 }
 
 type NetworkBindReconciler struct {
@@ -121,7 +119,6 @@ func (r *NetworkBindReconciler) updateStatus(ctx context.Context, log logr.Logge
 
 		newStatusPeerings = append(newStatusPeerings, networkingv1alpha1.NetworkPeeringStatus{
 			Name:                    peeringStatus.Name,
-			NetworkHandle:           data.handle,
 			Phase:                   data.phase,
 			LastPhaseTransitionTime: lastPhaseTransitionTime,
 		})
@@ -133,7 +130,6 @@ func (r *NetworkBindReconciler) updateStatus(ctx context.Context, log logr.Logge
 		}
 		newStatusPeerings = append(newStatusPeerings, networkingv1alpha1.NetworkPeeringStatus{
 			Name:                    name,
-			NetworkHandle:           data.handle,
 			Phase:                   data.phase,
 			LastPhaseTransitionTime: &now,
 		})
@@ -243,8 +239,7 @@ func (r *NetworkBindReconciler) reconcilePeering(
 		}
 
 		log.V(1).Info("Target network peering matches")
-		handle := targetNetwork.Spec.Handle
-		return "", &peeringStatusData{phase: networkingv1alpha1.NetworkPeeringPhaseBound, handle: handle}, nil
+		return "", &peeringStatusData{phase: networkingv1alpha1.NetworkPeeringPhaseBound}, nil
 	}
 
 	log.V(1).Info("No matching target peering found")
@@ -252,7 +247,7 @@ func (r *NetworkBindReconciler) reconcilePeering(
 }
 
 func (r *NetworkBindReconciler) enqueuePeeringReferencedNetworks() handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		network := obj.(*networkingv1alpha1.Network)
 		reqs := sets.New[ctrl.Request]()
 		for _, peering := range network.Spec.Peerings {
@@ -269,9 +264,10 @@ func (r *NetworkBindReconciler) enqueuePeeringReferencedNetworks() handler.Event
 	})
 }
 
-func (r *NetworkBindReconciler) enqueuePeeringUsingNetworks(ctx context.Context, log logr.Logger) handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+func (r *NetworkBindReconciler) enqueuePeeringUsingNetworks() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		network := obj.(*networkingv1alpha1.Network)
+		log := ctrl.LoggerFrom(ctx)
 
 		usingNetworkList := &networkingv1alpha1.NetworkList{}
 		if err := r.List(ctx, usingNetworkList,
@@ -286,20 +282,16 @@ func (r *NetworkBindReconciler) enqueuePeeringUsingNetworks(ctx context.Context,
 }
 
 func (r *NetworkBindReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	ctx := context.Background()
-	log := ctrl.Log.WithName("networkbind").WithName("setup")
-	ctx = ctrl.LoggerInto(ctx, log)
-
 	return ctrl.NewControllerManagedBy(mgr).
 		Named("networkbind").
 		For(&networkingv1alpha1.Network{}).
 		Watches(
-			&source.Kind{Type: &networkingv1alpha1.Network{}},
+			&networkingv1alpha1.Network{},
 			r.enqueuePeeringReferencedNetworks(),
 		).
 		Watches(
-			&source.Kind{Type: &networkingv1alpha1.Network{}},
-			r.enqueuePeeringUsingNetworks(ctx, log),
+			&networkingv1alpha1.Network{},
+			r.enqueuePeeringUsingNetworks(),
 		).
 		Complete(r)
 }

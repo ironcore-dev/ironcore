@@ -1,0 +1,4 @@
+name: my-nic
+network_id: my-network
+ips:
+- 192.168.178.1

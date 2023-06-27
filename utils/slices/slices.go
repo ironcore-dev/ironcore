@@ -35,12 +35,19 @@ func MapRef[S ~[]E, E, F any](s S, f func(e *E) F) []F {
 	return res
 }
 
-func ToMap[S ~[]V, K comparable, V any](s S, f func(v V) K) map[K]V {
+func ToMap[S ~[]E, E any, K comparable, V any](s S, f func(E) (K, V)) map[K]V {
 	res := make(map[K]V)
-	for _, v := range s {
-		res[f(v)] = v
+	for _, e := range s {
+		k, v := f(e)
+		res[k] = v
 	}
 	return res
+}
+
+func ToMapByKey[S ~[]V, K comparable, V any](s S, f func(v V) K) map[K]V {
+	return ToMap(s, func(v V) (K, V) {
+		return f(v), v
+	})
 }
 
 func Filter[S ~[]E, E any](s S, f func(e E) bool) []E {

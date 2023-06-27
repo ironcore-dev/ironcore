@@ -50,7 +50,7 @@ var _ = Describe("MachineReconciler", func() {
 				GenerateName: "network-",
 			},
 			Spec: networkingv1alpha1.NetworkSpec{
-				Handle: "foo",
+				ProviderID: "foo",
 			},
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())

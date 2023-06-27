@@ -301,7 +301,7 @@ func InsecurePollHealthCheck(address string) HealthCheckFunc {
 	}
 
 	return func(ctx context.Context) error {
-		return wait.PollImmediateInfiniteWithContext(ctx, 1*time.Second, func(ctx context.Context) (done bool, err error) {
+		return wait.PollUntilContextCancel(ctx, 1*time.Second, true, func(ctx context.Context) (done bool, err error) {
 			req, err := http.NewRequestWithContext(ctx, http.MethodGet, address, nil)
 			if err != nil {
 				return false, fmt.Errorf("error creating health request: %w", err)

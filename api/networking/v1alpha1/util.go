@@ -28,7 +28,17 @@ func NetworkInterfaceVirtualIPName(nicName string, vipSource VirtualIPSource) st
 	}
 }
 
-// NetworkInterfaceIPSourceEphemeralPrefixName returns the name of a Prefix for a network interface ephemeral prefix.
-func NetworkInterfaceIPSourceEphemeralPrefixName(nicName string, idx int) string {
+// NetworkInterfaceIPIPAMPrefixName returns the name of a Prefix for a network interface ephemeral prefix.
+func NetworkInterfaceIPIPAMPrefixName(nicName string, idx int) string {
 	return fmt.Sprintf("%s-%d", nicName, idx)
+}
+
+// NetworkInterfacePrefixIPAMPrefixName returns the name of a Prefix for a network interface ephemeral prefix.
+func NetworkInterfacePrefixIPAMPrefixName(nicName string, idx int) string {
+	return fmt.Sprintf("%s-pf-%d", nicName, idx)
+}
+
+// NetworkInterfaceIPIPAMPrefixName returns the name of a Prefix for a network interface ephemeral prefix.
+func LoadBalancerIPIPAMPrefixName(loadBalancerName string, idx int) string {
+	return fmt.Sprintf("%s-%d", loadBalancerName, idx)
 }

@@ -50,7 +50,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -77,7 +77,7 @@ MachineSpec
 <td>
 <code>machineClassRef</code><br/>
 <em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -101,7 +101,7 @@ map[string]string
 <td>
 <code>machinePoolRef</code><br/>
 <em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -141,7 +141,7 @@ string
 <td>
 <code>imagePullSecret</code><br/>
 <em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -271,7 +271,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -285,7 +285,9 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>capabilities</code><br/>
 <em>
+<a href="../core/#core.api.onmetal.de/v1alpha1.ResourceList">
 github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
+</a>
 </em>
 </td>
 <td>
@@ -327,7 +329,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -494,7 +496,7 @@ varying performance characteristics. Potentially not recoverable.</p>
 <td>
 <code>sizeLimit</code><br/>
 <em>
-<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/api/resource#Duration">
+<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/api/resource#Quantity">
 k8s.io/apimachinery/pkg/api/resource.Quantity
 </a>
 </em>
@@ -709,7 +711,7 @@ MachinePoolConditionType
 <td>
 <code>status</code><br/>
 <em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#conditionstatus-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#conditionstatus-v1-core">
 Kubernetes core/v1.ConditionStatus
 </a>
 </em>
@@ -755,7 +757,7 @@ int64
 <td>
 <code>lastTransitionTime</code><br/>
 <em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -922,7 +924,7 @@ MachinePoolState
 <td>
 <code>availableMachineClasses</code><br/>
 <em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 []Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -998,7 +1000,7 @@ github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
 <td>
 <code>machineClassRef</code><br/>
 <em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1022,7 +1024,7 @@ map[string]string
 <td>
 <code>machinePoolRef</code><br/>
 <em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1062,7 +1064,7 @@ string
 <td>
 <code>imagePullSecret</code><br/>
 <em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1203,13 +1205,13 @@ string
 </tr>
 <tr>
 <td>
-<code>machinePoolObservedGeneration</code><br/>
+<code>observedGeneration</code><br/>
 <em>
 int64
 </em>
 </td>
 <td>
-<p>MachinePoolObservedGeneration is the last generation the MachinePool observed of the Machine.</p>
+<p>ObservedGeneration is the last generation the MachinePool observed of the Machine.</p>
 </td>
 </tr>
 <tr>
@@ -1340,7 +1342,7 @@ NetworkInterfaceSource
 <td>
 <code>networkInterfaceRef</code><br/>
 <em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1382,9 +1384,6 @@ NetworkInterface to use.</p>
 </thead>
 <tbody><tr><td><p>&#34;Attached&#34;</p></td>
 <td><p>NetworkInterfaceStateAttached indicates that a network interface has been successfully attached.</p>
-</td>
-</tr><tr><td><p>&#34;Detached&#34;</p></td>
-<td><p>NetworkInterfaceStateDetached indicates that a network interface has been successfully detached.</p>
 </td>
 </tr><tr><td><p>&#34;Pending&#34;</p></td>
 <td><p>NetworkInterfaceStatePending indicates that the attachment of a network interface is pending.</p>
@@ -1431,17 +1430,6 @@ string
 </tr>
 <tr>
 <td>
-<code>networkHandle</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>NetworkHandle is the handle of the network the NetworkInterface is in.</p>
-</td>
-</tr>
-<tr>
-<td>
 <code>ips</code><br/>
 <em>
 <a href="../common/#common.api.onmetal.de/v1alpha1.IP">
@@ -1483,7 +1471,7 @@ NetworkInterfaceState
 <td>
 <code>lastStateTransitionTime</code><br/>
 <em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -1509,7 +1497,7 @@ NetworkInterfacePhase
 <td>
 <code>lastPhaseTransitionTime</code><br/>
 <em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -1644,7 +1632,7 @@ VolumeSource
 <td>
 <code>volumeRef</code><br/>
 <em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1699,9 +1687,6 @@ Volume to use.</p>
 </thead>
 <tbody><tr><td><p>&#34;Attached&#34;</p></td>
 <td><p>VolumeStateAttached indicates that a volume has been successfully attached.</p>
-</td>
-</tr><tr><td><p>&#34;Detached&#34;</p></td>
-<td><p>VolumeStateDetached indicates that a volume has been successfully detached.</p>
 </td>
 </tr><tr><td><p>&#34;Pending&#34;</p></td>
 <td><p>VolumeStatePending indicates that the attachment of a volume is pending.</p>
@@ -1763,7 +1748,7 @@ VolumeState
 <td>
 <code>lastStateTransitionTime</code><br/>
 <em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -1789,7 +1774,7 @@ VolumePhase
 <td>
 <code>lastPhaseTransitionTime</code><br/>
 <em>
-<a href="https://v1-23.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>

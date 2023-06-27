@@ -39,10 +39,11 @@ import (
 )
 
 type Options struct {
-	Kubeconfig       string
-	Address          string
-	StreamingAddress string
-	BaseURL          string
+	Kubeconfig              string
+	Address                 string
+	StreamingAddress        string
+	BaseURL                 string
+	BrokerDownwardAPILabels map[string]string
 
 	Namespace           string
 	MachinePoolName     string
@@ -55,6 +56,8 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.StreamingAddress, "streaming-address", "127.0.0.1:20251", "Address to run the streaming server on")
 	fs.StringVar(&o.BaseURL, "base-url", "", "The base url to construct urls for streaming from. If empty it will be "+
 		"constructed from the streaming-address")
+	fs.StringToStringVar(&o.BrokerDownwardAPILabels, "broker-downward-api-label", nil, "The labels to broker via downward API. "+
+		"Example is for instance to broker \"root-machine-uid\" initially obtained via \"machinepoollet.api.onmetal.de/machine-uid\".")
 
 	fs.StringVar(&o.Namespace, "namespace", o.Namespace, "Target Kubernetes namespace to use.")
 	fs.StringVar(&o.MachinePoolName, "machine-pool-name", o.MachinePoolName, "Name of the target machine pool to pin machines to, if any.")
@@ -115,12 +118,14 @@ func Run(ctx context.Context, opts Options) error {
 		"MachinePoolName", opts.MachinePoolName,
 		"MachinePoolSelector", opts.MachinePoolSelector,
 		"BaseURL", baseURL,
+		"BrokerDownwardAPILabels", opts.BrokerDownwardAPILabels,
 	)
 
 	srv, err := server.New(cfg, opts.Namespace, server.Options{
-		BaseURL:             baseURL,
-		MachinePoolName:     opts.MachinePoolName,
-		MachinePoolSelector: opts.MachinePoolSelector,
+		BaseURL:                 baseURL,
+		BrokerDownwardAPILabels: opts.BrokerDownwardAPILabels,
+		MachinePoolName:         opts.MachinePoolName,
+		MachinePoolSelector:     opts.MachinePoolSelector,
 	})
 	if err != nil {
 		return fmt.Errorf("error creating server: %w", err)
@@ -128,12 +133,24 @@ func Run(ctx context.Context, opts Options) error {
 
 	g, ctx := errgroup.WithContext(ctx)
 	g.Go(func() error {
+		return runServer(ctx, setupLog, log, srv)
+	})
+	g.Go(func() error {
 		return runGRPCServer(ctx, setupLog, log, srv, opts)
 	})
 	g.Go(func() error {
 		return runStreamingServer(ctx, setupLog, log, srv, opts)
 	})
 	return g.Wait()
+}
+
+func runServer(ctx context.Context, setupLog, log logr.Logger, srv *server.Server) error {
+	setupLog.V(1).Info("Starting server loops")
+	if err := srv.Start(ctx); err != nil {
+		return fmt.Errorf("error starting server loops: %w", err)
+	}
+	setupLog.V(1).Info("Stopped server loops")
+	return nil
 }
 
 func runGRPCServer(ctx context.Context, setupLog logr.Logger, log logr.Logger, srv *server.Server, opts Options) error {
@@ -156,15 +173,15 @@ func runGRPCServer(ctx context.Context, setupLog logr.Logger, log logr.Logger, s
 		return fmt.Errorf("failed to listen: %w", err)
 	}
 
-	setupLog.Info("Starting server", "Address", l.Addr().String())
+	setupLog.Info("Starting grpc server", "Address", l.Addr().String())
 	go func() {
 		<-ctx.Done()
-		setupLog.Info("Shutting down server")
+		setupLog.Info("Shutting down grpc server")
 		grpcSrv.GracefulStop()
-		setupLog.Info("Shut down server")
+		setupLog.Info("Shut down grpc server")
 	}()
 	if err := grpcSrv.Serve(l); err != nil {
-		return fmt.Errorf("error serving: %w", err)
+		return fmt.Errorf("error serving grpc: %w", err)
 	}
 	return nil
 }
@@ -181,15 +198,14 @@ func runStreamingServer(ctx context.Context, setupLog, log logr.Logger, srv *ser
 
 	go func() {
 		<-ctx.Done()
-		setupLog.Info("Shutting down http server")
+		setupLog.Info("Shutting down streaming server")
 		_ = httpSrv.Close()
-		setupLog.Info("Shut down http server")
+		setupLog.Info("Shut down streaming server")
 	}()
 
 	log.V(1).Info("Starting streaming server", "Address", opts.StreamingAddress)
 	if err := httpSrv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		return fmt.Errorf("error listening / serving streaming server: %w", err)
 	}
-	log.V(1).Info("Server finished")
 	return nil
 }

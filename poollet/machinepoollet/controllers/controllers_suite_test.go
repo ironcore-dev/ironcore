@@ -16,6 +16,7 @@ package controllers_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -31,6 +32,7 @@ import (
 	machinepoolletclient "github.com/onmetal/onmetal-api/poollet/machinepoollet/client"
 	"github.com/onmetal/onmetal-api/poollet/machinepoollet/controllers"
 	"github.com/onmetal/onmetal-api/poollet/machinepoollet/mcm"
+	"github.com/onmetal/onmetal-api/poollet/orievent"
 	utilsenvtest "github.com/onmetal/onmetal-api/utils/envtest"
 	"github.com/onmetal/onmetal-api/utils/envtest/apiserver"
 	"github.com/onmetal/onmetal-api/utils/envtest/controllermanager"
@@ -65,6 +67,9 @@ const (
 	apiServiceTimeout    = 5 * time.Minute
 
 	controllerManagerService = "controller-manager"
+
+	fooDownwardAPILabel = "custom-downward-api-label"
+	fooAnnotation       = "foo"
 )
 
 func TestControllers(t *testing.T) {
@@ -201,10 +206,8 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 		Expect(machinepoolletclient.SetupMachineSpecNetworkInterfaceNamesField(ctx, indexer, mp.Name)).To(Succeed())
 		Expect(machinepoolletclient.SetupMachineSpecVolumeNamesField(ctx, indexer, mp.Name)).To(Succeed())
 		Expect(machinepoolletclient.SetupMachineSpecSecretNamesField(ctx, indexer, mp.Name)).To(Succeed())
-		Expect(machinepoolletclient.SetupAliasPrefixRoutingNetworkRefNameField(ctx, indexer)).To(Succeed())
 		Expect(machinepoolletclient.SetupLoadBalancerRoutingNetworkRefNameField(ctx, indexer)).To(Succeed())
 		Expect(machinepoolletclient.SetupNATGatewayRoutingNetworkRefNameField(ctx, indexer)).To(Succeed())
-		Expect(machinepoolletclient.SetupNetworkInterfaceNetworkMachinePoolID(ctx, indexer, mp.Name)).To(Succeed())
 
 		machineClassMapper := mcm.NewGeneric(srv, mcm.GenericOptions{})
 		Expect(k8sManager.Add(machineClassMapper)).To(Succeed())
@@ -220,6 +223,24 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 			MachineRuntimeVersion: machine.FakeVersion,
 			MachineClassMapper:    machineClassMapper,
 			MachinePoolName:       mp.Name,
+			DownwardAPILabels: map[string]string{
+				fooDownwardAPILabel: fmt.Sprintf("metadata.annotations['%s']", fooAnnotation),
+			},
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
+		machineEvents := orievent.NewGenerator(func(ctx context.Context) ([]*ori.Machine, error) {
+			res, err := srv.ListMachines(ctx, &ori.ListMachinesRequest{})
+			if err != nil {
+				return nil, err
+			}
+			return res.Machines, nil
+		}, orievent.GeneratorOptions{})
+
+		Expect(k8sManager.Add(machineEvents)).To(Succeed())
+
+		Expect((&controllers.MachineAnnotatorReconciler{
+			Client:        k8sManager.GetClient(),
+			MachineEvents: machineEvents,
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		go func() {

@@ -13,7 +13,7 @@ BUCKETBROKER_IMG ?= bucketbroker:latest
 ORICTL_BUCKET_IMG ?= orictl-bucket:latest
 
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
-ENVTEST_K8S_VERSION = 1.26.1
+ENVTEST_K8S_VERSION = 1.27.1
 
 # Docker image name for the mkdocs based local development setup
 IMAGE=onmetal-api/documentation
@@ -97,10 +97,11 @@ generate: vgopath models-schema deepcopy-gen client-gen lister-gen informer-gen 
 	./hack/update-codegen.sh
 
 .PHONY: proto
-proto: vgopath protoc-gen-gogo
+proto: goimports vgopath protoc-gen-gogo
 	VGOPATH=$(VGOPATH) \
 	PROTOC_GEN_GOGO=$(PROTOC_GEN_GOGO) \
 	./hack/update-proto.sh
+	$(GOIMPORTS) -w ./ori
 
 .PHONY: fmt
 fmt: goimports ## Run goimports against code.
@@ -135,12 +136,12 @@ check: generate manifests add-license fmt lint test # Generate manifests, code, 
 
 .PHONY: docs
 docs: gen-crd-api-reference-docs ## Run go generate to generate API reference documentation.
-	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/common/v1alpha1 -config ./hack/api-reference/common-config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/common.md
-	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/core/v1alpha1 -config ./hack/api-reference/core-config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/core.md
-	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/compute/v1alpha1 -config ./hack/api-reference/compute-config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/compute.md
-	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/storage/v1alpha1 -config ./hack/api-reference/storage-config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/storage.md
-	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/networking/v1alpha1 -config ./hack/api-reference/networking-config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/networking.md
-	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/ipam/v1alpha1 -config ./hack/api-reference/ipam-config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/ipam.md
+	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/common/v1alpha1 -config ./hack/api-reference/config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/common.md
+	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/core/v1alpha1 -config ./hack/api-reference/config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/core.md
+	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/storage/v1alpha1 -config ./hack/api-reference/config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/storage.md
+	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/networking/v1alpha1 -config ./hack/api-reference/config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/networking.md
+	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/ipam/v1alpha1 -config ./hack/api-reference/config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/ipam.md
+	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/compute/v1alpha1 -config ./hack/api-reference/config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/compute.md
 
 .PHONY: start-docs
 start-docs: ## Start the local mkdocs based development environment.
@@ -371,7 +372,8 @@ GOIMPORTS ?= $(LOCALBIN)/goimports
 
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v5.0.0
-CODE_GENERATOR_VERSION ?= v0.26.3
+CODE_GENERATOR_VERSION ?= v0.27.2
+VGOPATH_VERSION ?= v0.1.1
 CONTROLLER_TOOLS_VERSION ?= v0.11.3
 VGOPATH_VERSION ?= v0.0.2
 GEN_CRD_API_REFERENCE_DOCS_VERSION ?= v0.3.0
@@ -437,7 +439,12 @@ $(APPLYCONFIGURATION_GEN): $(LOCALBIN)
 
 .PHONY: vgopath
 vgopath: $(VGOPATH) ## Download vgopath locally if necessary.
+.PHONY: $(VGOPATH)
 $(VGOPATH): $(LOCALBIN)
+	@if test -x $(LOCALBIN)/vgopath && ! $(LOCALBIN)/vgopath version | grep -q $(VGOPATH_VERSION); then \
+		echo "$(LOCALBIN)/vgopath version is not expected $(VGOPATH_VERSION). Removing it before installing."; \
+		rm -rf $(LOCALBIN)/vgopath; \
+	fi
 	test -s $(LOCALBIN)/vgopath || GOBIN=$(LOCALBIN) go install github.com/onmetal/vgopath@$(VGOPATH_VERSION)
 
 .PHONY: envtest

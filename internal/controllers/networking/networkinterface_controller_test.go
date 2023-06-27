@@ -30,8 +30,8 @@ import (
 
 var _ = Describe("NetworkInterfaceReconciler", func() {
 	ctx := SetupContext()
-	ns, _ := SetupTest(ctx)
-	const networkHandle = "foo"
+	ns, _ := SetupTest()
+	const networkProviderID = "foo"
 
 	It("should reconcile the ips and update the status", func() {
 		By("creating a network")
@@ -41,7 +41,7 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 				GenerateName: "network-",
 			},
 			Spec: networkingv1alpha1.NetworkSpec{
-				Handle: networkHandle,
+				ProviderID: networkProviderID,
 			},
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())
@@ -78,7 +78,6 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 			return nic.Status
 		}).Should(SatisfyAll(
 			HaveField("State", networkingv1alpha1.NetworkInterfaceStateAvailable),
-			HaveField("NetworkHandle", networkHandle),
 			HaveField("IPs", []commonv1alpha1.IP{commonv1alpha1.MustParseIP("10.0.0.1")}),
 		))
 	})
@@ -104,7 +103,7 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 				GenerateName: "network-",
 			},
 			Spec: networkingv1alpha1.NetworkSpec{
-				Handle: networkHandle,
+				ProviderID: networkProviderID,
 			},
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())
@@ -143,7 +142,7 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
 
 		By("waiting for the prefix to be created with the correct ips and become ready")
-		prefixKey := client.ObjectKey{Namespace: ns.Name, Name: networkingv1alpha1.NetworkInterfaceIPSourceEphemeralPrefixName(nic.Name, 0)}
+		prefixKey := client.ObjectKey{Namespace: ns.Name, Name: networkingv1alpha1.NetworkInterfaceIPIPAMPrefixName(nic.Name, 0)}
 		Eventually(func(g Gomega) {
 			prefix := &ipamv1alpha1.Prefix{}
 			err := k8sClient.Get(ctx, prefixKey, prefix)
@@ -174,7 +173,7 @@ var _ = Describe("NetworkInterfaceReconciler", func() {
 				GenerateName: "network-",
 			},
 			Spec: networkingv1alpha1.NetworkSpec{
-				Handle: networkHandle,
+				ProviderID: networkProviderID,
 			},
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())

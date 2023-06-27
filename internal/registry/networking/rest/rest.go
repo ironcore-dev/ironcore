@@ -18,14 +18,13 @@ import (
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	"github.com/onmetal/onmetal-api/internal/api"
 	"github.com/onmetal/onmetal-api/internal/apis/networking"
-	aliasprefixstorage "github.com/onmetal/onmetal-api/internal/registry/networking/aliasprefix/storage"
-	aliasprefixroutingstoratge "github.com/onmetal/onmetal-api/internal/registry/networking/aliasprefixrouting/storage"
 	loadbalancerstorage "github.com/onmetal/onmetal-api/internal/registry/networking/loadbalancer/storage"
 	loadbalancerroutingstorage "github.com/onmetal/onmetal-api/internal/registry/networking/loadbalancerrouting/storage"
 	natgatewaystorage "github.com/onmetal/onmetal-api/internal/registry/networking/natgateway/storage"
 	natgatewayroutingstorage "github.com/onmetal/onmetal-api/internal/registry/networking/natgatewayrouting/storage"
 	networkstorage "github.com/onmetal/onmetal-api/internal/registry/networking/network/storage"
 	networkinterfacestorage "github.com/onmetal/onmetal-api/internal/registry/networking/networkinterface/storage"
+	networkpolicystorage "github.com/onmetal/onmetal-api/internal/registry/networking/networkpolicy/storage"
 	virtualipstorage "github.com/onmetal/onmetal-api/internal/registry/networking/virtualip/storage"
 	onmetalapiserializer "github.com/onmetal/onmetal-api/internal/serializer"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -77,6 +76,14 @@ func (p StorageProvider) v1alpha1Storage(restOptionsGetter generic.RESTOptionsGe
 	storageMap["networks"] = networkStorage.Network
 	storageMap["networks/status"] = networkStorage.Status
 
+	networkPolicyStorage, err := networkpolicystorage.NewStorage(restOptionsGetter)
+	if err != nil {
+		return storageMap, err
+	}
+
+	storageMap["networkpolicies"] = networkPolicyStorage.NetworkPolicy
+	storageMap["networkpolicies/status"] = networkPolicyStorage.Status
+
 	virtualIPStorage, err := virtualipstorage.NewStorage(restOptionsGetter)
 	if err != nil {
 		return storageMap, err
@@ -84,21 +91,6 @@ func (p StorageProvider) v1alpha1Storage(restOptionsGetter generic.RESTOptionsGe
 
 	storageMap["virtualips"] = virtualIPStorage.VirtualIP
 	storageMap["virtualips/status"] = virtualIPStorage.Status
-
-	aliasPrefixStorage, err := aliasprefixstorage.NewStorage(restOptionsGetter)
-	if err != nil {
-		return storageMap, err
-	}
-
-	storageMap["aliasprefixes"] = aliasPrefixStorage.AliasPrefix
-	storageMap["aliasprefixes/status"] = aliasPrefixStorage.Status
-
-	aliasPrefixRoutingStorage, err := aliasprefixroutingstoratge.NewStorage(restOptionsGetter)
-	if err != nil {
-		return storageMap, err
-	}
-
-	storageMap["aliasprefixroutings"] = aliasPrefixRoutingStorage.AliasPrefixRouting
 
 	loadBalancerStorage, err := loadbalancerstorage.NewStorage(restOptionsGetter)
 	if err != nil {

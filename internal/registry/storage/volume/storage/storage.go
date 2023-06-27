@@ -45,8 +45,9 @@ func NewStorage(optsGetter generic.RESTOptionsGetter) (VolumeStorage, error) {
 		NewListFunc: func() runtime.Object {
 			return &storage.VolumeList{}
 		},
-		PredicateFunc:            volume.MatchVolume,
-		DefaultQualifiedResource: storage.Resource("volumes"),
+		PredicateFunc:             volume.MatchVolume,
+		DefaultQualifiedResource:  storage.Resource("volumes"),
+		SingularQualifiedResource: storage.Resource("volume"),
 
 		CreateStrategy: volume.Strategy,
 		UpdateStrategy: volume.Strategy,

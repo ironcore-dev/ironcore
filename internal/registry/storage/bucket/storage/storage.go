@@ -45,8 +45,9 @@ func NewStorage(optsGetter generic.RESTOptionsGetter) (BucketStorage, error) {
 		NewListFunc: func() runtime.Object {
 			return &storage.BucketList{}
 		},
-		PredicateFunc:            bucket.MatchBucket,
-		DefaultQualifiedResource: storage.Resource("buckets"),
+		PredicateFunc:             bucket.MatchBucket,
+		DefaultQualifiedResource:  storage.Resource("buckets"),
+		SingularQualifiedResource: storage.Resource("bucket"),
 
 		CreateStrategy: bucket.Strategy,
 		UpdateStrategy: bucket.Strategy,

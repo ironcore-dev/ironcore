@@ -26,7 +26,6 @@ import (
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/ipam/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
@@ -38,9 +37,9 @@ type FakePrefixes struct {
 	ns   string
 }
 
-var prefixesResource = schema.GroupVersionResource{Group: "ipam.api.onmetal.de", Version: "v1alpha1", Resource: "prefixes"}
+var prefixesResource = v1alpha1.SchemeGroupVersion.WithResource("prefixes")
 
-var prefixesKind = schema.GroupVersionKind{Group: "ipam.api.onmetal.de", Version: "v1alpha1", Kind: "Prefix"}
+var prefixesKind = v1alpha1.SchemeGroupVersion.WithKind("Prefix")
 
 // Get takes name of the prefix, and returns the corresponding prefix object, and an error if there is any.
 func (c *FakePrefixes) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.Prefix, err error) {

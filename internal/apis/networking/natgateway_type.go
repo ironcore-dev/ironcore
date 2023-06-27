@@ -67,8 +67,8 @@ type NATGatewayStatus struct {
 }
 
 type NATGatewayIPStatus struct {
-	Name string            `json:"name"`
-	IP   commonv1alpha1.IP `json:"ip"`
+	Name string
+	IP   commonv1alpha1.IP
 }
 
 // +genclient

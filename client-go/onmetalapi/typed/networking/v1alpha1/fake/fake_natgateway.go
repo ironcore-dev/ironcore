@@ -26,7 +26,6 @@ import (
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/networking/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
@@ -38,9 +37,9 @@ type FakeNATGateways struct {
 	ns   string
 }
 
-var natgatewaysResource = schema.GroupVersionResource{Group: "networking.api.onmetal.de", Version: "v1alpha1", Resource: "natgateways"}
+var natgatewaysResource = v1alpha1.SchemeGroupVersion.WithResource("natgateways")
 
-var natgatewaysKind = schema.GroupVersionKind{Group: "networking.api.onmetal.de", Version: "v1alpha1", Kind: "NATGateway"}
+var natgatewaysKind = v1alpha1.SchemeGroupVersion.WithKind("NATGateway")
 
 // Get takes name of the nATGateway, and returns the corresponding nATGateway object, and an error if there is any.
 func (c *FakeNATGateways) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.NATGateway, err error) {

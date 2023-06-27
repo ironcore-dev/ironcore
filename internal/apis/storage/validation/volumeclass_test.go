@@ -71,6 +71,22 @@ var _ = Describe("VolumeClass", func() {
 				InvalidField("capabilities[iops]"),
 			)),
 		),
+		Entry("valid resizePolicy",
+			&storage.VolumeClass{
+				ResizePolicy: storage.ResizePolicyStatic,
+			},
+			Not(ContainElements(
+				InvalidField("resizePolicy"),
+			)),
+		),
+		Entry("invalid resizePolicy",
+			&storage.VolumeClass{
+				ResizePolicy: "foo",
+			},
+			ContainElements(
+				NotSupportedField("resizePolicy"),
+			),
+		),
 	)
 
 	DescribeTable("ValidateVolumeClassUpdate",

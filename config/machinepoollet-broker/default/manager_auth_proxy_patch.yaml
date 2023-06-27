@@ -9,18 +9,21 @@ spec:
   template:
     spec:
       containers:
-        - name: kube-rbac-proxy
-          image: gcr.io/kubebuilder/kube-rbac-proxy:v0.8.0
-          args:
-            - "--secure-listen-address=0.0.0.0:8443"
-            - "--upstream=http://127.0.0.1:8080/"
-            - "--logtostderr=true"
-            - "--v=10"
-          ports:
-            - containerPort: 8443
-              name: https
-        - name: manager
-          args:
-            - "--health-probe-bind-address=:8081"
-            - "--metrics-bind-address=127.0.0.1:8080"
-            - "--leader-elect"
+      - name: kube-rbac-proxy
+        image: gcr.io/kubebuilder/kube-rbac-proxy:v0.8.0
+        args:
+        - "--secure-listen-address=0.0.0.0:8443"
+        - "--upstream=http://127.0.0.1:8080/"
+        - "--logtostderr=true"
+        - "--v=10"
+        ports:
+        - containerPort: 8443
+          name: https
+      - name: manager
+        args:
+        - "--health-probe-bind-address=:8081"
+        - "--metrics-bind-address=127.0.0.1:8080"
+        - "--leader-elect"
+        - "--machine-downward-api-label=root-machine-namespace=metadata.labels['downward-api.machinepoollet.api.onmetal.de/root-machine-namespace']"
+        - "--machine-downward-api-label=root-machine-name=metadata.labels['downward-api.machinepoollet.api.onmetal.de/root-machine-name']"
+        - "--machine-downward-api-label=root-machine-uid=metadata.labels['downward-api.machinepoollet.api.onmetal.de/root-machine-uid']"

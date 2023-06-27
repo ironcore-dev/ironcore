@@ -104,22 +104,6 @@ rules:
 - apiGroups:
   - networking.api.onmetal.de
   resources:
-  - aliasprefixes
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - networking.api.onmetal.de
-  resources:
-  - aliasprefixroutings
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - networking.api.onmetal.de
-  resources:
   - loadbalancerroutings
   verbs:
   - get

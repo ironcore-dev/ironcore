@@ -2,5 +2,10 @@ resources:
 - manager.yaml
 - service.yaml
 
+configMapGenerator:
+- name: orictl-machine-config
+  files:
+  - config=orictl-machine-config.yaml
+
 generatorOptions:
   disableNameSuffixHash: true

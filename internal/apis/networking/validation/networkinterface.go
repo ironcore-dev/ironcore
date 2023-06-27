@@ -20,7 +20,6 @@ import (
 	"fmt"
 
 	onmetalapivalidation "github.com/onmetal/onmetal-api/internal/api/validation"
-	commonvalidation "github.com/onmetal/onmetal-api/internal/apis/common/validation"
 	"github.com/onmetal/onmetal-api/internal/apis/ipam"
 	ipamvalidation "github.com/onmetal/onmetal-api/internal/apis/ipam/validation"
 	"github.com/onmetal/onmetal-api/internal/apis/networking"
@@ -75,6 +74,7 @@ func validateNetworkInterfaceSpec(spec *networking.NetworkInterfaceSpec, nicMeta
 	}
 
 	allErrs = append(allErrs, validateNetworkInterfaceIPSources(spec.IPs, spec.IPFamilies, nicMeta, fldPath.Child("ips"))...)
+	allErrs = append(allErrs, validateNetworkInterfacePrefixSources(spec.Prefixes, nicMeta, fldPath.Child("prefixes"))...)
 
 	if virtualIP := spec.VirtualIP; virtualIP != nil {
 		allErrs = append(allErrs, validateVirtualIPSource(virtualIP, fldPath.Child("virtualIP"))...)
@@ -98,30 +98,11 @@ func validateNetworkInterfaceIPSources(ipSources []networking.IPSource, ipFamili
 	return allErrs
 }
 
-func validateIPSource(ipSource networking.IPSource, idx int, ipFamily corev1.IPFamily, nicMeta *metav1.ObjectMeta, fldPath *field.Path) field.ErrorList {
+func validateNetworkInterfacePrefixSources(prefixSources []networking.PrefixSource, nicMeta *metav1.ObjectMeta, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	var numSources int
-	if ip := ipSource.Value; ip.IsValid() {
-		numSources++
-		allErrs = append(allErrs, commonvalidation.ValidateIP(ipFamily, *ip, fldPath.Child("value"))...)
-	}
-	if ephemeral := ipSource.Ephemeral; ephemeral != nil {
-		if numSources > 0 {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("ephemeral"), ephemeral, "cannot specify multiple ip sources"))
-		} else {
-			numSources++
-			allErrs = append(allErrs, validateEphemeralPrefixSource(ipFamily, ephemeral, fldPath.Child("ephemeral"))...)
-			if nicMeta != nil && nicMeta.Name != "" {
-				prefixName := fmt.Sprintf("%s-%d", nicMeta.Name, idx)
-				for _, msg := range apivalidation.NameIsDNSLabel(prefixName, false) {
-					allErrs = append(allErrs, field.Invalid(fldPath, prefixName, fmt.Sprintf("resulting prefix name %q is invalid: %s", prefixName, msg)))
-				}
-			}
-		}
-	}
-	if numSources == 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath, ipSource, "must specify an ip source"))
+	for i, src := range prefixSources {
+		allErrs = append(allErrs, validatePrefixSource(src, i, nicMeta, fldPath.Index(i))...)
 	}
 
 	return allErrs
@@ -157,7 +138,7 @@ var ipFamilyToBits = map[corev1.IPFamily]int32{
 	corev1.IPv6Protocol: 128,
 }
 
-func ValidatePrefixTemplateForNetworkInterface(template *ipam.PrefixTemplateSpec, ipFamily corev1.IPFamily, fldPath *field.Path) field.ErrorList {
+func ValidateIPPrefixTemplate(template *ipam.PrefixTemplateSpec, ipFamily corev1.IPFamily, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
 	if template == nil {
@@ -186,10 +167,22 @@ func ValidatePrefixTemplateForNetworkInterface(template *ipam.PrefixTemplateSpec
 	return allErrs
 }
 
+func ValidatePrefixPrefixTemplate(template *ipam.PrefixTemplateSpec, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	if template == nil {
+		allErrs = append(allErrs, field.Required(fldPath, "must specify template"))
+	} else {
+		allErrs = append(allErrs, ipamvalidation.ValidatePrefixTemplateSpec(template, fldPath)...)
+	}
+
+	return allErrs
+}
+
 func validateEphemeralPrefixSource(ipFamily corev1.IPFamily, source *networking.EphemeralPrefixSource, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, ValidatePrefixTemplateForNetworkInterface(source.PrefixTemplate, ipFamily, fldPath.Child("prefixTemplate"))...)
+	allErrs = append(allErrs, ValidateIPPrefixTemplate(source.PrefixTemplate, ipFamily, fldPath.Child("prefixTemplate"))...)
 
 	return allErrs
 }
@@ -222,6 +215,7 @@ func validateNetworkInterfaceSpecUpdate(newSpec, oldSpec *networking.NetworkInte
 	oldSpecCopy := oldSpec.DeepCopy()
 
 	oldSpecCopy.IPs = newSpec.IPs
+	oldSpecCopy.Prefixes = newSpec.Prefixes
 	oldSpecCopy.MachineRef = newSpec.MachineRef
 	oldSpecCopy.VirtualIP = newSpec.VirtualIP
 	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableFieldWithDiff(newSpecCopy, oldSpecCopy, fldPath)...)

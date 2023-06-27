@@ -38,9 +38,7 @@ import (
 type MachineAnnotatorReconciler struct {
 	client.Client
 
-	MachineEvents          orievent.Source[*ori.Machine]
-	VolumeEvents           orievent.Source[*ori.Volume]
-	NetworkInterfaceEvents orievent.Source[*ori.NetworkInterface]
+	MachineEvents orievent.Source[*ori.Machine]
 }
 
 func (r *MachineAnnotatorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -128,12 +126,6 @@ func (r *MachineAnnotatorReconciler) oriMachineEventSource(mgr ctrl.Manager) (so
 		registrationFuncs := []func() (orievent.HandlerRegistration, error){
 			func() (orievent.HandlerRegistration, error) {
 				return r.MachineEvents.AddHandler(machineAnnotatorEventHandler[*ori.Machine](log, ch))
-			},
-			func() (orievent.HandlerRegistration, error) {
-				return r.VolumeEvents.AddHandler(machineAnnotatorEventHandler[*ori.Volume](log, ch))
-			},
-			func() (orievent.HandlerRegistration, error) {
-				return r.NetworkInterfaceEvents.AddHandler(machineAnnotatorEventHandler[*ori.NetworkInterface](log, ch))
 			},
 		}
 

@@ -17,10 +17,6 @@
 
 package v1alpha1
 
-type AliasPrefixExpansion interface{}
-
-type AliasPrefixRoutingExpansion interface{}
-
 type LoadBalancerExpansion interface{}
 
 type LoadBalancerRoutingExpansion interface{}
@@ -32,5 +28,7 @@ type NATGatewayRoutingExpansion interface{}
 type NetworkExpansion interface{}
 
 type NetworkInterfaceExpansion interface{}
+
+type NetworkPolicyExpansion interface{}
 
 type VirtualIPExpansion interface{}

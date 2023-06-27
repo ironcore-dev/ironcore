@@ -30,27 +30,33 @@ import (
 // Public to allow building arbitrary schemes.
 // All generated defaulters are covering - they call all nested defaulters.
 func RegisterDefaults(scheme *runtime.Scheme) error {
-	scheme.AddTypeDefaultingFunc(&v1alpha1.AliasPrefix{}, func(obj interface{}) { SetObjectDefaults_AliasPrefix(obj.(*v1alpha1.AliasPrefix)) })
-	scheme.AddTypeDefaultingFunc(&v1alpha1.AliasPrefixList{}, func(obj interface{}) { SetObjectDefaults_AliasPrefixList(obj.(*v1alpha1.AliasPrefixList)) })
+	scheme.AddTypeDefaultingFunc(&v1alpha1.LoadBalancer{}, func(obj interface{}) { SetObjectDefaults_LoadBalancer(obj.(*v1alpha1.LoadBalancer)) })
+	scheme.AddTypeDefaultingFunc(&v1alpha1.LoadBalancerList{}, func(obj interface{}) { SetObjectDefaults_LoadBalancerList(obj.(*v1alpha1.LoadBalancerList)) })
 	scheme.AddTypeDefaultingFunc(&v1alpha1.NATGateway{}, func(obj interface{}) { SetObjectDefaults_NATGateway(obj.(*v1alpha1.NATGateway)) })
 	scheme.AddTypeDefaultingFunc(&v1alpha1.NATGatewayList{}, func(obj interface{}) { SetObjectDefaults_NATGatewayList(obj.(*v1alpha1.NATGatewayList)) })
 	scheme.AddTypeDefaultingFunc(&v1alpha1.NetworkInterface{}, func(obj interface{}) { SetObjectDefaults_NetworkInterface(obj.(*v1alpha1.NetworkInterface)) })
 	scheme.AddTypeDefaultingFunc(&v1alpha1.NetworkInterfaceList{}, func(obj interface{}) { SetObjectDefaults_NetworkInterfaceList(obj.(*v1alpha1.NetworkInterfaceList)) })
+	scheme.AddTypeDefaultingFunc(&v1alpha1.NetworkPolicy{}, func(obj interface{}) { SetObjectDefaults_NetworkPolicy(obj.(*v1alpha1.NetworkPolicy)) })
+	scheme.AddTypeDefaultingFunc(&v1alpha1.NetworkPolicyList{}, func(obj interface{}) { SetObjectDefaults_NetworkPolicyList(obj.(*v1alpha1.NetworkPolicyList)) })
 	return nil
 }
 
-func SetObjectDefaults_AliasPrefix(in *v1alpha1.AliasPrefix) {
-	if in.Spec.Prefix.Ephemeral != nil {
-		if in.Spec.Prefix.Ephemeral.PrefixTemplate != nil {
-			ipamv1alpha1.SetDefaults_PrefixSpec(&in.Spec.Prefix.Ephemeral.PrefixTemplate.Spec)
+func SetObjectDefaults_LoadBalancer(in *v1alpha1.LoadBalancer) {
+	SetDefaults_LoadBalancerSpec(&in.Spec)
+	for i := range in.Spec.IPs {
+		a := &in.Spec.IPs[i]
+		if a.Ephemeral != nil {
+			if a.Ephemeral.PrefixTemplate != nil {
+				ipamv1alpha1.SetDefaults_PrefixSpec(&a.Ephemeral.PrefixTemplate.Spec)
+			}
 		}
 	}
 }
 
-func SetObjectDefaults_AliasPrefixList(in *v1alpha1.AliasPrefixList) {
+func SetObjectDefaults_LoadBalancerList(in *v1alpha1.LoadBalancerList) {
 	for i := range in.Items {
 		a := &in.Items[i]
-		SetObjectDefaults_AliasPrefix(a)
+		SetObjectDefaults_LoadBalancer(a)
 	}
 }
 
@@ -75,6 +81,14 @@ func SetObjectDefaults_NetworkInterface(in *v1alpha1.NetworkInterface) {
 			}
 		}
 	}
+	for i := range in.Spec.Prefixes {
+		a := &in.Spec.Prefixes[i]
+		if a.Ephemeral != nil {
+			if a.Ephemeral.PrefixTemplate != nil {
+				ipamv1alpha1.SetDefaults_PrefixSpec(&a.Ephemeral.PrefixTemplate.Spec)
+			}
+		}
+	}
 	SetDefaults_NetworkInterfaceStatus(&in.Status)
 }
 
@@ -82,5 +96,16 @@ func SetObjectDefaults_NetworkInterfaceList(in *v1alpha1.NetworkInterfaceList) {
 	for i := range in.Items {
 		a := &in.Items[i]
 		SetObjectDefaults_NetworkInterface(a)
+	}
+}
+
+func SetObjectDefaults_NetworkPolicy(in *v1alpha1.NetworkPolicy) {
+	SetDefaults_NetworkPolicySpec(&in.Spec)
+}
+
+func SetObjectDefaults_NetworkPolicyList(in *v1alpha1.NetworkPolicyList) {
+	for i := range in.Items {
+		a := &in.Items[i]
+		SetObjectDefaults_NetworkPolicy(a)
 	}
 }

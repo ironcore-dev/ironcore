@@ -27,7 +27,7 @@ import (
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	networkingclient "github.com/onmetal/onmetal-api/internal/client/networking"
 	"github.com/onmetal/onmetal-api/internal/controllers/networking/events"
-	client2 "github.com/onmetal/onmetal-api/utils/client"
+	onmetalapiclient "github.com/onmetal/onmetal-api/utils/client"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -36,7 +36,6 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
 type NetworkInterfaceReconciler struct {
@@ -78,14 +77,13 @@ func (r *NetworkInterfaceReconciler) reconcile(ctx context.Context, log logr.Log
 	var anyDependencyNotReady bool
 
 	log.V(1).Info("Getting network handle")
-	networkHandle, networkNotReadyReason, err := r.getNetworkHandle(ctx, nic)
+	networkOK, err := r.getNetworkAvailability(ctx, nic)
 	if err != nil {
 		r.Eventf(nic, corev1.EventTypeWarning, events.ErrorGettingNetworkHandle, "Error getting network handle: %v", err)
 		return ctrl.Result{}, nil
 	}
-	if networkNotReadyReason != "" {
+	if !networkOK {
 		anyDependencyNotReady = true
-		r.Event(nic, corev1.EventTypeNormal, events.NetworkNotReady, networkNotReadyReason)
 	}
 
 	log.V(1).Info("Applying IPs")
@@ -97,6 +95,15 @@ func (r *NetworkInterfaceReconciler) reconcile(ctx context.Context, log logr.Log
 	if ipsNotReadyReason != "" {
 		anyDependencyNotReady = true
 		r.Event(nic, corev1.EventTypeNormal, events.IPsNotReady, ipsNotReadyReason)
+	}
+
+	log.V(1).Info("Applying Prefixes")
+	prefixes, prefixesOK, err := r.applyPrefixes(ctx, log, nic)
+	if err != nil {
+		return ctrl.Result{}, fmt.Errorf("error applying prefixes: %w", err)
+	}
+	if !prefixesOK {
+		anyDependencyNotReady = true
 	}
 
 	log.V(1).Info("Applying virtual IPs")
@@ -118,7 +125,7 @@ func (r *NetworkInterfaceReconciler) reconcile(ctx context.Context, log logr.Log
 	}
 
 	log.V(1).Info("Updating network interface status", "State", state)
-	if err := r.updateStatus(ctx, nic, state, networkHandle, ips, virtualIP); err != nil {
+	if err := r.updateStatus(ctx, nic, state, ips, prefixes, virtualIP); err != nil {
 		return ctrl.Result{}, err
 	}
 	log.V(1).Info("Successfully updated network status", "State", state)
@@ -129,8 +136,8 @@ func (r *NetworkInterfaceReconciler) updateStatus(
 	ctx context.Context,
 	nic *networkingv1alpha1.NetworkInterface,
 	state networkingv1alpha1.NetworkInterfaceState,
-	networkHandle string,
 	ips []commonv1alpha1.IP,
+	prefixes []commonv1alpha1.IPPrefix,
 	virtualIP *commonv1alpha1.IP,
 ) error {
 	now := metav1.Now()
@@ -140,8 +147,8 @@ func (r *NetworkInterfaceReconciler) updateStatus(
 		nic.Status.LastStateTransitionTime = &now
 	}
 	nic.Status.State = state
-	nic.Status.NetworkHandle = networkHandle
 	nic.Status.IPs = ips
+	nic.Status.Prefixes = prefixes
 	nic.Status.VirtualIP = virtualIP
 
 	if err := r.Status().Patch(ctx, nic, client.MergeFrom(base)); err != nil {
@@ -150,21 +157,23 @@ func (r *NetworkInterfaceReconciler) updateStatus(
 	return nil
 }
 
-func (r *NetworkInterfaceReconciler) getNetworkHandle(ctx context.Context, nic *networkingv1alpha1.NetworkInterface) (networkHandle string, notReadyReason string, err error) {
+func (r *NetworkInterfaceReconciler) getNetworkAvailability(ctx context.Context, nic *networkingv1alpha1.NetworkInterface) (bool, error) {
 	network := &networkingv1alpha1.Network{}
 	networkKey := client.ObjectKey{Namespace: nic.Namespace, Name: nic.Spec.NetworkRef.Name}
 	if err := r.Get(ctx, networkKey, network); err != nil {
 		if !apierrors.IsNotFound(err) {
-			return "", "", fmt.Errorf("error getting network %s: %w", networkKey, err)
+			return false, fmt.Errorf("error getting network %s: %w", networkKey, err)
 		}
-		return "", fmt.Sprintf("Network %s not found", networkKey.Name), nil
+		r.Eventf(nic, corev1.EventTypeNormal, events.NetworkNotReady, "Network %s not found", networkKey.Name)
+		return false, nil
 	}
 
 	switch state := network.Status.State; state {
 	case networkingv1alpha1.NetworkStateAvailable:
-		return network.Spec.Handle, "", nil
+		return true, nil
 	default:
-		return "", fmt.Sprintf("Network %s is not in state %s but %s", networkKey.Name, networkingv1alpha1.NetworkStateAvailable, state), nil
+		r.Eventf(nic, corev1.EventTypeNormal, events.NetworkNotReady, "Network %s not yet available", networkKey.Name)
+		return false, nil
 	}
 }
 
@@ -189,7 +198,12 @@ func (r *NetworkInterfaceReconciler) applyIPs(ctx context.Context, nic *networki
 	return ips, strings.Join(notReadyReasons, ", "), nil
 }
 
-func (r *NetworkInterfaceReconciler) applyIP(ctx context.Context, nic *networkingv1alpha1.NetworkInterface, ipSource networkingv1alpha1.IPSource, idx int) (commonv1alpha1.IP, string, error) {
+func (r *NetworkInterfaceReconciler) applyIP(
+	ctx context.Context,
+	nic *networkingv1alpha1.NetworkInterface,
+	ipSource networkingv1alpha1.IPSource,
+	idx int,
+) (commonv1alpha1.IP, string, error) {
 	switch {
 	case ipSource.Value != nil:
 		return *ipSource.Value, "", nil
@@ -198,16 +212,16 @@ func (r *NetworkInterfaceReconciler) applyIP(ctx context.Context, nic *networkin
 		prefix := &ipamv1alpha1.Prefix{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: nic.Namespace,
-				Name:      networkingv1alpha1.NetworkInterfaceIPSourceEphemeralPrefixName(nic.Name, idx),
+				Name:      networkingv1alpha1.NetworkInterfaceIPIPAMPrefixName(nic.Name, idx),
 			},
 		}
-		if err := client2.ControlledCreateOrGet(ctx, r.Client, nic, prefix, func() error {
+		if err := onmetalapiclient.ControlledCreateOrGet(ctx, r.Client, nic, prefix, func() error {
 			prefix.Labels = template.Labels
 			prefix.Annotations = template.Annotations
 			prefix.Spec = template.Spec
 			return nil
 		}); err != nil {
-			if !errors.Is(err, client2.ErrNotControlled) {
+			if !errors.Is(err, onmetalapiclient.ErrNotControlled) {
 				return commonv1alpha1.IP{}, "", fmt.Errorf("error managing ephemeral prefix %s: %w", prefix.Name, err)
 			}
 			return commonv1alpha1.IP{}, fmt.Sprintf("Prefix %s cannot be managed", prefix.Name), nil
@@ -219,6 +233,72 @@ func (r *NetworkInterfaceReconciler) applyIP(ctx context.Context, nic *networkin
 		return prefix.Spec.Prefix.IP(), "", nil
 	default:
 		return commonv1alpha1.IP{}, "", fmt.Errorf("unknown ip source %#v", ipSource)
+	}
+}
+
+func (r *NetworkInterfaceReconciler) applyPrefixes(
+	ctx context.Context,
+	log logr.Logger,
+	nic *networkingv1alpha1.NetworkInterface,
+) ([]commonv1alpha1.IPPrefix, bool, error) {
+	var (
+		prefixes []commonv1alpha1.IPPrefix
+		allOK    = true
+	)
+	for idx, prefixSrc := range nic.Spec.Prefixes {
+		prefix, prefixOK, err := r.applyPrefix(ctx, log, nic, &prefixSrc, idx)
+		if err != nil {
+			return nil, false, fmt.Errorf("[prefix %d] %w", idx, err)
+		}
+		if !prefixOK {
+			allOK = false
+			continue
+		}
+
+		prefixes = append(prefixes, prefix)
+	}
+
+	return prefixes, allOK, nil
+}
+
+func (r *NetworkInterfaceReconciler) applyPrefix(
+	ctx context.Context,
+	log logr.Logger,
+	nic *networkingv1alpha1.NetworkInterface,
+	src *networkingv1alpha1.PrefixSource,
+	idx int,
+) (commonv1alpha1.IPPrefix, bool, error) {
+	switch {
+	case src.Value != nil:
+		return *src.Value, true, nil
+	case src.Ephemeral != nil:
+		template := src.Ephemeral.PrefixTemplate
+		prefix := &ipamv1alpha1.Prefix{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: nic.Namespace,
+				Name:      networkingv1alpha1.NetworkInterfacePrefixIPAMPrefixName(nic.Name, idx),
+			},
+		}
+		if err := onmetalapiclient.ControlledCreateOrGet(ctx, r.Client, nic, prefix, func() error {
+			prefix.Labels = template.Labels
+			prefix.Annotations = template.Annotations
+			prefix.Spec = template.Spec
+			return nil
+		}); err != nil {
+			if !errors.Is(err, onmetalapiclient.ErrNotControlled) {
+				return commonv1alpha1.IPPrefix{}, false, fmt.Errorf("error managing ephemeral prefix %s: %w", prefix.Name, err)
+			}
+			r.Eventf(nic, corev1.EventTypeNormal, events.PrefixNotReady, "Prefix %s cannot be managed", prefix.Name)
+			return commonv1alpha1.IPPrefix{}, false, nil
+		}
+
+		if prefix.Status.Phase != ipamv1alpha1.PrefixPhaseAllocated {
+			r.Eventf(nic, corev1.EventTypeNormal, events.PrefixNotReady, "Prefix %s is not in state %s but %s", prefix.Name, ipamv1alpha1.PrefixPhaseAllocated, prefix.Status.Phase)
+			return commonv1alpha1.IPPrefix{}, false, nil
+		}
+		return *prefix.Spec.Prefix, true, nil
+	default:
+		return commonv1alpha1.IPPrefix{}, false, fmt.Errorf("unknown prefix source %#v", src)
 	}
 }
 
@@ -250,7 +330,7 @@ func (r *NetworkInterfaceReconciler) applyVirtualIP(ctx context.Context, log log
 				Name:      nic.Name,
 			},
 		}
-		if err := client2.ControlledCreateOrGet(ctx, r.Client, nic, vip, func() error {
+		if err := onmetalapiclient.ControlledCreateOrGet(ctx, r.Client, nic, vip, func() error {
 			ephemeral := nic.Spec.VirtualIP.Ephemeral
 			vip.Labels = ephemeral.VirtualIPTemplate.Labels
 			vip.Annotations = ephemeral.VirtualIPTemplate.Annotations
@@ -258,7 +338,7 @@ func (r *NetworkInterfaceReconciler) applyVirtualIP(ctx context.Context, log log
 			vip.Spec.TargetRef = &commonv1alpha1.LocalUIDReference{Name: nic.Name, UID: nic.UID}
 			return nil
 		}); err != nil {
-			if !errors.Is(client2.ErrNotControlled, err) {
+			if !errors.Is(onmetalapiclient.ErrNotControlled, err) {
 				return nil, "", fmt.Errorf("error managing ephemeral virtual ip: %w", err)
 			}
 
@@ -284,28 +364,25 @@ func (r *NetworkInterfaceReconciler) getVirtualIPIP(nic *networkingv1alpha1.Netw
 }
 
 func (r *NetworkInterfaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	ctx := context.Background()
-	log := ctrl.Log.WithName("networkinterface").WithName("setup")
-
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&networkingv1alpha1.NetworkInterface{}).
 		Owns(&ipamv1alpha1.Prefix{}).
 		Owns(&networkingv1alpha1.VirtualIP{}).
 		Watches(
-			&source.Kind{Type: &networkingv1alpha1.Network{}},
-			r.enqueueByNetworkInterfaceNetworkReferences(ctx, log),
+			&networkingv1alpha1.Network{},
+			r.enqueueByNetworkInterfaceNetworkReferences(),
 		).
 		Watches(
-			&source.Kind{Type: &networkingv1alpha1.VirtualIP{}},
-			r.enqueueByNetworkInterfaceVirtualIPReferences(ctx, log),
+			&networkingv1alpha1.VirtualIP{},
+			r.enqueueByNetworkInterfaceVirtualIPReferences(),
 		).
 		Complete(r)
 }
 
-func (r *NetworkInterfaceReconciler) enqueueByNetworkInterfaceVirtualIPReferences(ctx context.Context, log logr.Logger) handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+func (r *NetworkInterfaceReconciler) enqueueByNetworkInterfaceVirtualIPReferences() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		vip := obj.(*networkingv1alpha1.VirtualIP)
-		log = log.WithValues("VirtualIPKey", client.ObjectKeyFromObject(vip))
+		log := ctrl.LoggerFrom(ctx, "VirtualIPKey", client.ObjectKeyFromObject(vip))
 
 		nicList := &networkingv1alpha1.NetworkInterfaceList{}
 		if err := r.List(ctx, nicList,
@@ -324,10 +401,10 @@ func (r *NetworkInterfaceReconciler) enqueueByNetworkInterfaceVirtualIPReference
 	})
 }
 
-func (r *NetworkInterfaceReconciler) enqueueByNetworkInterfaceNetworkReferences(ctx context.Context, log logr.Logger) handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+func (r *NetworkInterfaceReconciler) enqueueByNetworkInterfaceNetworkReferences() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		network := obj.(*networkingv1alpha1.Network)
-		log = log.WithValues("NetworkKey", client.ObjectKeyFromObject(network))
+		log := ctrl.LoggerFrom(ctx, "NetworkKey", client.ObjectKeyFromObject(network))
 
 		nicList := &networkingv1alpha1.NetworkInterfaceList{}
 		if err := r.List(ctx, nicList,

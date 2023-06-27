@@ -37,3 +37,9 @@ func SetDefaults_BucketStatus(status *v1alpha1.BucketStatus) {
 		status.State = v1alpha1.BucketStatePending
 	}
 }
+
+func SetDefaults_VolumeClass(volumeClass *v1alpha1.VolumeClass) {
+	if volumeClass.ResizePolicy == "" {
+		volumeClass.ResizePolicy = v1alpha1.ResizePolicyStatic
+	}
+}

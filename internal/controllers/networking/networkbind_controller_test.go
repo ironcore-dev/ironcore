@@ -33,8 +33,7 @@ var IgnoreNetworkPeeringStatusVolatileFields = cmpopts.IgnoreFields(
 )
 
 var _ = Describe("NetworkBindReconciler", func() {
-	ctx := SetupContext()
-	ns1, _ := SetupTest(ctx)
+	ns1, _ := SetupTest()
 	ns2 := SetupNamespace(&k8sClient)
 
 	It("should bind two networks in the same namespace referencing each other", func(ctx SpecContext) {
@@ -45,7 +44,7 @@ var _ = Describe("NetworkBindReconciler", func() {
 				Name:      "network-1",
 			},
 			Spec: networkingv1alpha1.NetworkSpec{
-				Handle: "network-1-handle",
+				ProviderID: "network-1-handle",
 				Peerings: []networkingv1alpha1.NetworkPeering{
 					{
 						Name: "peering",
@@ -70,7 +69,7 @@ var _ = Describe("NetworkBindReconciler", func() {
 				Name:      "network-2",
 			},
 			Spec: networkingv1alpha1.NetworkSpec{
-				Handle: "network-2-handle",
+				ProviderID: "network-2-handle",
 				Peerings: []networkingv1alpha1.NetworkPeering{
 					{
 						Name: "peering",
@@ -111,14 +110,12 @@ var _ = Describe("NetworkBindReconciler", func() {
 			}))
 
 			g.Expect(network1.Status.Peerings).To(ContainElement(BeComparableTo(networkingv1alpha1.NetworkPeeringStatus{
-				Name:          "peering",
-				NetworkHandle: "network-2-handle",
-				Phase:         networkingv1alpha1.NetworkPeeringPhaseBound,
+				Name:  "peering",
+				Phase: networkingv1alpha1.NetworkPeeringPhaseBound,
 			}, IgnoreNetworkPeeringStatusVolatileFields)))
 			g.Expect(network2.Status.Peerings).To(ContainElement(BeComparableTo(networkingv1alpha1.NetworkPeeringStatus{
-				Name:          "peering",
-				NetworkHandle: "network-1-handle",
-				Phase:         networkingv1alpha1.NetworkPeeringPhaseBound,
+				Name:  "peering",
+				Phase: networkingv1alpha1.NetworkPeeringPhaseBound,
 			}, IgnoreNetworkPeeringStatusVolatileFields)))
 		}).Should(Succeed())
 	})
@@ -131,7 +128,7 @@ var _ = Describe("NetworkBindReconciler", func() {
 				Name:      "network-1",
 			},
 			Spec: networkingv1alpha1.NetworkSpec{
-				Handle: "network-1-handle",
+				ProviderID: "network-1-handle",
 				Peerings: []networkingv1alpha1.NetworkPeering{
 					{
 						Name: "peering",
@@ -156,7 +153,7 @@ var _ = Describe("NetworkBindReconciler", func() {
 				Name:      "network-2",
 			},
 			Spec: networkingv1alpha1.NetworkSpec{
-				Handle: "network-2-handle",
+				ProviderID: "network-2-handle",
 				Peerings: []networkingv1alpha1.NetworkPeering{
 					{
 						Name: "peering",
@@ -220,7 +217,7 @@ var _ = Describe("NetworkBindReconciler", func() {
 				Name:      "network-1",
 			},
 			Spec: networkingv1alpha1.NetworkSpec{
-				Handle: "network-1-handle",
+				ProviderID: "network-1-handle",
 				Peerings: []networkingv1alpha1.NetworkPeering{
 					{
 						Name: "peering",
@@ -246,7 +243,7 @@ var _ = Describe("NetworkBindReconciler", func() {
 				Name:      "network-2",
 			},
 			Spec: networkingv1alpha1.NetworkSpec{
-				Handle: "network-2-handle",
+				ProviderID: "network-2-handle",
 				Peerings: []networkingv1alpha1.NetworkPeering{
 					{
 						Name: "peering",
@@ -290,14 +287,12 @@ var _ = Describe("NetworkBindReconciler", func() {
 			}))
 
 			g.Expect(network1.Status.Peerings).To(ContainElement(BeComparableTo(networkingv1alpha1.NetworkPeeringStatus{
-				Name:          "peering",
-				NetworkHandle: "network-2-handle",
-				Phase:         networkingv1alpha1.NetworkPeeringPhaseBound,
+				Name:  "peering",
+				Phase: networkingv1alpha1.NetworkPeeringPhaseBound,
 			}, IgnoreNetworkPeeringStatusVolatileFields)))
 			g.Expect(network2.Status.Peerings).To(ContainElement(BeComparableTo(networkingv1alpha1.NetworkPeeringStatus{
-				Name:          "peering",
-				NetworkHandle: "network-1-handle",
-				Phase:         networkingv1alpha1.NetworkPeeringPhaseBound,
+				Name:  "peering",
+				Phase: networkingv1alpha1.NetworkPeeringPhaseBound,
 			}, IgnoreNetworkPeeringStatusVolatileFields)))
 		}).Should(Succeed())
 	})

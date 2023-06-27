@@ -26,7 +26,6 @@ import (
 	storagev1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/storage/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
@@ -37,9 +36,9 @@ type FakeVolumeClasses struct {
 	Fake *FakeStorageV1alpha1
 }
 
-var volumeclassesResource = schema.GroupVersionResource{Group: "storage.api.onmetal.de", Version: "v1alpha1", Resource: "volumeclasses"}
+var volumeclassesResource = v1alpha1.SchemeGroupVersion.WithResource("volumeclasses")
 
-var volumeclassesKind = schema.GroupVersionKind{Group: "storage.api.onmetal.de", Version: "v1alpha1", Kind: "VolumeClass"}
+var volumeclassesKind = v1alpha1.SchemeGroupVersion.WithKind("VolumeClass")
 
 // Get takes name of the volumeClass, and returns the corresponding volumeClass object, and an error if there is any.
 func (c *FakeVolumeClasses) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.VolumeClass, err error) {

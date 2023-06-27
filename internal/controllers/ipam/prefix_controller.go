@@ -40,7 +40,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
 const (
@@ -608,31 +607,28 @@ func (r *PrefixReconciler) reconcile(ctx context.Context, log logr.Logger, prefi
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *PrefixReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	ctx := context.Background()
-	log := ctrl.Log.WithName("prefix").WithName("setup")
-
 	r.allocationLimiter = workqueue.NewItemExponentialFailureRateLimiter(5*time.Millisecond, 1000*time.Second)
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&ipamv1alpha1.Prefix{}).
 		Owns(&ipamv1alpha1.PrefixAllocation{}).
 		Watches(
-			&source.Kind{Type: &ipamv1alpha1.PrefixAllocation{}},
+			&ipamv1alpha1.PrefixAllocation{},
 			r.enqueueByAllocationPrefixRef(),
 		).
 		Watches(
-			&source.Kind{Type: &ipamv1alpha1.Prefix{}},
-			r.enqueueByPrefixParentRef(ctx, log),
+			&ipamv1alpha1.Prefix{},
+			r.enqueueByPrefixParentRef(),
 		).
 		Watches(
-			&source.Kind{Type: &ipamv1alpha1.Prefix{}},
-			r.enqueueByPrefixParentSelector(ctx, log),
+			&ipamv1alpha1.Prefix{},
+			r.enqueueByPrefixParentSelector(),
 		).
 		Complete(r)
 }
 
 func (r *PrefixReconciler) enqueueByAllocationPrefixRef() handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		allocation := obj.(*ipamv1alpha1.PrefixAllocation)
 		prefixRef := allocation.Spec.PrefixRef
 		if prefixRef == nil {
@@ -649,9 +645,10 @@ func (r *PrefixReconciler) enqueueByAllocationPrefixRef() handler.EventHandler {
 	})
 }
 
-func (r *PrefixReconciler) enqueueByPrefixParentSelector(ctx context.Context, log logr.Logger) handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+func (r *PrefixReconciler) enqueueByPrefixParentSelector() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		prefix := obj.(*ipamv1alpha1.Prefix)
+		log := ctrl.LoggerFrom(ctx)
 		if !isPrefixAllocatedAndNotDeleting(prefix) {
 			return nil
 		}
@@ -688,9 +685,10 @@ func (r *PrefixReconciler) enqueueByPrefixParentSelector(ctx context.Context, lo
 	})
 }
 
-func (r *PrefixReconciler) enqueueByPrefixParentRef(ctx context.Context, log logr.Logger) handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+func (r *PrefixReconciler) enqueueByPrefixParentRef() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		prefix := obj.(*ipamv1alpha1.Prefix)
+		log := ctrl.LoggerFrom(ctx)
 		if !isPrefixAllocatedAndNotDeleting(prefix) {
 			return nil
 		}

@@ -28,7 +28,6 @@ import (
 type NetworkInterfaceStatusApplyConfiguration struct {
 	Name                    *string                                `json:"name,omitempty"`
 	Handle                  *string                                `json:"handle,omitempty"`
-	NetworkHandle           *string                                `json:"networkHandle,omitempty"`
 	IPs                     []v1alpha1.IP                          `json:"ips,omitempty"`
 	VirtualIP               *v1alpha1.IP                           `json:"virtualIP,omitempty"`
 	State                   *computev1alpha1.NetworkInterfaceState `json:"state,omitempty"`
@@ -56,14 +55,6 @@ func (b *NetworkInterfaceStatusApplyConfiguration) WithName(value string) *Netwo
 // If called multiple times, the Handle field is set to the value of the last call.
 func (b *NetworkInterfaceStatusApplyConfiguration) WithHandle(value string) *NetworkInterfaceStatusApplyConfiguration {
 	b.Handle = &value
-	return b
-}
-
-// WithNetworkHandle sets the NetworkHandle field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the NetworkHandle field is set to the value of the last call.
-func (b *NetworkInterfaceStatusApplyConfiguration) WithNetworkHandle(value string) *NetworkInterfaceStatusApplyConfiguration {
-	b.NetworkHandle = &value
 	return b
 }
 

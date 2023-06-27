@@ -28,6 +28,8 @@ type LoadBalancerType string
 const (
 	// LoadBalancerTypePublic is a LoadBalancer that allocates and routes a stable public IP.
 	LoadBalancerTypePublic LoadBalancerType = "Public"
+	// LoadBalancerTypeInternal is a LoadBalancer that allocates and routes network-internal, stable IPs.
+	LoadBalancerTypeInternal LoadBalancerType = "Internal"
 )
 
 // LoadBalancerSpec defines the desired state of LoadBalancer
@@ -36,6 +38,8 @@ type LoadBalancerSpec struct {
 	Type LoadBalancerType `json:"type"`
 	// IPFamilies are the ip families the load balancer should have.
 	IPFamilies []corev1.IPFamily `json:"ipFamilies"`
+	// IPs are the ips to use. Can only be used when Type is LoadBalancerTypeInternal.
+	IPs []IPSource `json:"ips,omitempty"`
 	// NetworkRef is the Network this LoadBalancer should belong to.
 	NetworkRef corev1.LocalObjectReference `json:"networkRef"`
 	// NetworkInterfaceSelector defines the NetworkInterfaces

@@ -56,7 +56,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -83,7 +83,7 @@ BucketSpec
 <td>
 <code>bucketClassRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -108,7 +108,7 @@ map[string]string
 <td>
 <code>bucketPoolRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -183,7 +183,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -197,7 +197,9 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>capabilities</code><br/>
 <em>
+<a href="../core/#core.api.onmetal.de/v1alpha1.ResourceList">
 github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
+</a>
 </em>
 </td>
 <td>
@@ -240,7 +242,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -339,7 +341,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -366,7 +368,7 @@ VolumeSpec
 <td>
 <code>volumeClassRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -391,7 +393,7 @@ map[string]string
 <td>
 <code>volumePoolRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -418,7 +420,9 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 <td>
 <code>resources</code><br/>
 <em>
+<a href="../core/#core.api.onmetal.de/v1alpha1.ResourceList">
 github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
+</a>
 </em>
 </td>
 <td>
@@ -440,7 +444,7 @@ string
 <td>
 <code>imagePullSecretRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -538,7 +542,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -552,11 +556,27 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>capabilities</code><br/>
 <em>
+<a href="../core/#core.api.onmetal.de/v1alpha1.ResourceList">
 github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
+</a>
 </em>
 </td>
 <td>
 <p>Capabilities describes the capabilities of a VolumeClass.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>resizePolicy</code><br/>
+<em>
+<a href="#storage.api.onmetal.de/v1alpha1.ResizePolicy">
+ResizePolicy
+</a>
+</em>
+</td>
+<td>
+<p>ResizePolicy describes the supported expansion policy of a VolumeClass.
+If not set default to Static expansion policy.</p>
 </td>
 </tr>
 </tbody>
@@ -595,7 +615,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -680,7 +700,7 @@ VolumePoolStatus
 <td>
 <code>secretRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -735,7 +755,7 @@ BucketConditionType
 <td>
 <code>status</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#conditionstatus-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#conditionstatus-v1-core">
 Kubernetes core/v1.ConditionStatus
 </a>
 </em>
@@ -781,7 +801,7 @@ int64
 <td>
 <code>lastTransitionTime</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -898,7 +918,7 @@ BucketPoolState
 <td>
 <code>availableBucketClasses</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 []Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -929,7 +949,7 @@ BucketPoolState
 <td>
 <code>bucketClassRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -954,7 +974,7 @@ map[string]string
 <td>
 <code>bucketPoolRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1039,7 +1059,7 @@ BucketState
 <td>
 <code>lastStateTransitionTime</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -1094,7 +1114,7 @@ This is set by the bucket provider when the bucket is provisioned.</p>
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -1121,7 +1141,7 @@ BucketSpec
 <td>
 <code>bucketClassRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1146,7 +1166,7 @@ map[string]string
 <td>
 <code>bucketPoolRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1175,6 +1195,29 @@ covered by Tolerations will be considered to host the Bucket.</p>
 </tr>
 </tbody>
 </table>
+<h3 id="storage.api.onmetal.de/v1alpha1.ResizePolicy">ResizePolicy
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.VolumeClass">VolumeClass</a>)
+</p>
+<div>
+<p>ResizePolicy is a type of policy.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;ExpandOnly&#34;</p></td>
+<td><p>ResizePolicyExpandOnly is a policy that only allows the expansion of a Volume.</p>
+</td>
+</tr><tr><td><p>&#34;Static&#34;</p></td>
+<td><p>ResizePolicyStatic is a policy that does not allow the expansion of a Volume.</p>
+</td>
+</tr></tbody>
+</table>
 <h3 id="storage.api.onmetal.de/v1alpha1.VolumeAccess">VolumeAccess
 </h3>
 <p>
@@ -1195,7 +1238,7 @@ covered by Tolerations will be considered to host the Bucket.</p>
 <td>
 <code>secretRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1272,7 +1315,7 @@ VolumeConditionType
 <td>
 <code>status</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#conditionstatus-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#conditionstatus-v1-core">
 Kubernetes core/v1.ConditionStatus
 </a>
 </em>
@@ -1318,7 +1361,7 @@ int64
 <td>
 <code>lastTransitionTime</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -1357,7 +1400,7 @@ Kubernetes meta/v1.Time
 <td>
 <code>secretRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1428,7 +1471,7 @@ VolumePoolConditionType
 <td>
 <code>status</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#conditionstatus-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#conditionstatus-v1-core">
 Kubernetes core/v1.ConditionStatus
 </a>
 </em>
@@ -1474,7 +1517,7 @@ int64
 <td>
 <code>lastTransitionTime</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -1602,7 +1645,7 @@ VolumePoolState
 <td>
 <code>availableVolumeClasses</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 []Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1615,7 +1658,9 @@ VolumePoolState
 <td>
 <code>available</code><br/>
 <em>
+<a href="../core/#core.api.onmetal.de/v1alpha1.ResourceList">
 github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
+</a>
 </em>
 </td>
 <td>
@@ -1626,7 +1671,9 @@ github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
 <td>
 <code>used</code><br/>
 <em>
+<a href="../core/#core.api.onmetal.de/v1alpha1.ResourceList">
 github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
+</a>
 </em>
 </td>
 <td>
@@ -1655,7 +1702,7 @@ github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
 <td>
 <code>volumeClassRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1680,7 +1727,7 @@ map[string]string
 <td>
 <code>volumePoolRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1707,7 +1754,9 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 <td>
 <code>resources</code><br/>
 <em>
+<a href="../core/#core.api.onmetal.de/v1alpha1.ResourceList">
 github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
+</a>
 </em>
 </td>
 <td>
@@ -1729,7 +1778,7 @@ string
 <td>
 <code>imagePullSecretRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1837,7 +1886,7 @@ VolumeState
 <td>
 <code>lastStateTransitionTime</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -1863,7 +1912,7 @@ VolumePhase
 <td>
 <code>lastPhaseTransitionTime</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -1918,7 +1967,7 @@ This is set by the volume provider when the volume is provisioned.</p>
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -1945,7 +1994,7 @@ VolumeSpec
 <td>
 <code>volumeClassRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1970,7 +2019,7 @@ map[string]string
 <td>
 <code>volumePoolRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1997,7 +2046,9 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 <td>
 <code>resources</code><br/>
 <em>
+<a href="../core/#core.api.onmetal.de/v1alpha1.ResourceList">
 github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
+</a>
 </em>
 </td>
 <td>
@@ -2019,7 +2070,7 @@ string
 <td>
 <code>imagePullSecretRef</code><br/>
 <em>
-<a href="https://v1-25.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>

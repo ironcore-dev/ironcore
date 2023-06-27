@@ -44,8 +44,9 @@ func NewStorage(optsGetter generic.RESTOptionsGetter) (ResourceQuotaStorage, err
 		NewListFunc: func() runtime.Object {
 			return &core.ResourceQuotaList{}
 		},
-		PredicateFunc:            resourcequota.MatchResourceQuota,
-		DefaultQualifiedResource: core.Resource("resourcequotas"),
+		PredicateFunc:             resourcequota.MatchResourceQuota,
+		DefaultQualifiedResource:  core.Resource("resourcequotas"),
+		SingularQualifiedResource: core.Resource("resourcequota"),
 
 		CreateStrategy: resourcequota.Strategy,
 		UpdateStrategy: resourcequota.Strategy,

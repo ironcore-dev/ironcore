@@ -32,7 +32,8 @@ import (
 type VolumeClassApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Capabilities                     *v1alpha1.ResourceList `json:"capabilities,omitempty"`
+	Capabilities                     *v1alpha1.ResourceList        `json:"capabilities,omitempty"`
+	ResizePolicy                     *storagev1alpha1.ResizePolicy `json:"resizePolicy,omitempty"`
 }
 
 // VolumeClass constructs an declarative configuration of the VolumeClass type for use with
@@ -243,5 +244,13 @@ func (b *VolumeClassApplyConfiguration) ensureObjectMetaApplyConfigurationExists
 // If called multiple times, the Capabilities field is set to the value of the last call.
 func (b *VolumeClassApplyConfiguration) WithCapabilities(value v1alpha1.ResourceList) *VolumeClassApplyConfiguration {
 	b.Capabilities = &value
+	return b
+}
+
+// WithResizePolicy sets the ResizePolicy field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the ResizePolicy field is set to the value of the last call.
+func (b *VolumeClassApplyConfiguration) WithResizePolicy(value storagev1alpha1.ResizePolicy) *VolumeClassApplyConfiguration {
+	b.ResizePolicy = &value
 	return b
 }

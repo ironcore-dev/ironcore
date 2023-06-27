@@ -48,7 +48,7 @@ func GetAddress(ctx context.Context, explicitAddress string) (string, error) {
 	}
 
 	var endpoint string
-	if err := wait.PollImmediateUntilWithContext(ctx, 1*time.Second, func(ctx context.Context) (done bool, err error) {
+	if err := wait.PollUntilContextCancel(ctx, 1*time.Second, true, func(ctx context.Context) (done bool, err error) {
 		for _, wellKnownEndpoint := range WellKnownEndpoints {
 			if stat, err := os.Stat(wellKnownEndpoint); err == nil && stat.Mode().Type()&os.ModeSocket != 0 {
 				endpoint = wellKnownEndpoint

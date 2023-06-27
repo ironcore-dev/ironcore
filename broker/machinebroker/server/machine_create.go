@@ -17,24 +17,29 @@ package server
 import (
 	"context"
 	"fmt"
-	"math/big"
 
 	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	"github.com/onmetal/onmetal-api/broker/common/cleaner"
 	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
 	"github.com/onmetal/onmetal-api/broker/machinebroker/apiutils"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	"gopkg.in/inf.v0"
+	machinepoolletv1alpha1 "github.com/onmetal/onmetal-api/poollet/machinepoollet/api/v1alpha1"
+	"github.com/onmetal/onmetal-api/utils/maps"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 type OnmetalMachineConfig struct {
-	IgnitionSecret *corev1.Secret
-	Machine        *computev1alpha1.Machine
+	Labels                  map[string]string
+	Annotations             map[string]string
+	Power                   computev1alpha1.Power
+	MachineClassName        string
+	Image                   string
+	IgnitionData            []byte
+	NetworkInterfaceConfigs []*OnmetalNetworkInterfaceConfig
+	VolumeConfigs           []*OnmetalVolumeConfig
 }
 
 func (s *Server) onmetalMachinePoolRef() *corev1.LocalObjectReference {
@@ -55,71 +60,43 @@ func (s *Server) prepareOnmetalMachinePower(power ori.Power) (computev1alpha1.Po
 	}
 }
 
-func (s *Server) prepareOnmetalVolumeAttachment(volumeSpec *ori.VolumeAttachment) (computev1alpha1.Volume, error) {
-	var src computev1alpha1.VolumeSource
-	switch {
-	case volumeSpec.VolumeId != "":
-		src = computev1alpha1.VolumeSource{
-			VolumeRef: &corev1.LocalObjectReference{Name: volumeSpec.VolumeId},
-		}
-	case volumeSpec.EmptyDisk != nil:
-		var sizeLimit *resource.Quantity
-		if sizeBytes := volumeSpec.EmptyDisk.SizeBytes; sizeBytes > 0 {
-			n := new(big.Int).SetUint64(sizeBytes)
-			b := inf.NewDecBig(n, 0)
-			sizeLimit = resource.NewDecimalQuantity(*b, resource.DecimalSI)
-		}
+func (s *Server) prepareOnmetalMachineLabels(machine *ori.Machine) (map[string]string, error) {
+	labels := make(map[string]string)
 
-		src = computev1alpha1.VolumeSource{
-			EmptyDisk: &computev1alpha1.EmptyDiskVolumeSource{
-				SizeLimit: sizeLimit,
-			},
+	for downwardAPILabelName, defaultLabelName := range s.brokerDownwardAPILabels {
+		value := machine.GetMetadata().GetLabels()[machinepoolletv1alpha1.DownwardAPILabel(downwardAPILabelName)]
+		if value == "" {
+			value = machine.GetMetadata().GetLabels()[defaultLabelName]
 		}
-	default:
-		return computev1alpha1.Volume{}, fmt.Errorf("volume does neither specify empty disk nor volume id")
+		if value != "" {
+			labels[machinepoolletv1alpha1.DownwardAPILabel(downwardAPILabelName)] = value
+		}
 	}
-	return computev1alpha1.Volume{
-		Name:         volumeSpec.Name,
-		Device:       &volumeSpec.Device,
-		VolumeSource: src,
-	}, nil
+
+	return labels, nil
 }
 
-func (s *Server) prepareOnmetalNetworkInterfaceAttachment(networkInterfaceSpec *ori.NetworkInterfaceAttachment) (computev1alpha1.NetworkInterface, error) {
-	var src computev1alpha1.NetworkInterfaceSource
-	switch {
-	case networkInterfaceSpec.NetworkInterfaceId != "":
-		src = computev1alpha1.NetworkInterfaceSource{
-			NetworkInterfaceRef: &corev1.LocalObjectReference{Name: networkInterfaceSpec.NetworkInterfaceId},
-		}
-	default:
-		return computev1alpha1.NetworkInterface{}, fmt.Errorf("network interface does not specify network interface id")
+func (s *Server) prepareOnmetalMachineAnnotations(machine *ori.Machine) (map[string]string, error) {
+	annotationsValue, err := apiutils.EncodeAnnotationsAnnotation(machine.GetMetadata().GetAnnotations())
+	if err != nil {
+		return nil, fmt.Errorf("error encoding annotations: %w", err)
 	}
-	return computev1alpha1.NetworkInterface{
-		Name:                   networkInterfaceSpec.Name,
-		NetworkInterfaceSource: src,
+
+	labelsValue, err := apiutils.EncodeLabelsAnnotation(machine.GetMetadata().GetLabels())
+	if err != nil {
+		return nil, fmt.Errorf("error encoding labels: %w", err)
+	}
+
+	return map[string]string{
+		machinebrokerv1alpha1.AnnotationsAnnotation: annotationsValue,
+		machinebrokerv1alpha1.LabelsAnnotation:      labelsValue,
 	}, nil
 }
 
 func (s *Server) getOnmetalMachineConfig(machine *ori.Machine) (*OnmetalMachineConfig, error) {
-	power, err := s.prepareOnmetalMachinePower(machine.Spec.Power)
+	onmetalPower, err := s.prepareOnmetalMachinePower(machine.Spec.Power)
 	if err != nil {
 		return nil, err
-	}
-
-	var onmetalIgnitionSecret *corev1.Secret
-	if ignition := machine.Spec.Ignition; ignition != nil {
-		onmetalIgnitionSecret = &corev1.Secret{
-			ObjectMeta: metav1.ObjectMeta{
-				Namespace: s.cluster.Namespace(),
-				Name:      s.cluster.IDGen().Generate(),
-			},
-			Type: corev1.SecretTypeOpaque,
-			Data: map[string][]byte{
-				computev1alpha1.DefaultIgnitionKey: ignition.Data,
-			},
-		}
-		apiutils.SetPurpose(onmetalIgnitionSecret, machinebrokerv1alpha1.IgnitionPurpose)
 	}
 
 	var onmetalImage string
@@ -127,106 +104,164 @@ func (s *Server) getOnmetalMachineConfig(machine *ori.Machine) (*OnmetalMachineC
 		onmetalImage = image.Image
 	}
 
-	onmetalNetworkInterfaceAttachments := make([]computev1alpha1.NetworkInterface, len(machine.Spec.NetworkInterfaces))
-	for i, networkInterface := range machine.Spec.NetworkInterfaces {
-		onmetalNetworkInterfaceAttachments[i] = computev1alpha1.NetworkInterface{
-			Name: networkInterface.Name,
-			NetworkInterfaceSource: computev1alpha1.NetworkInterfaceSource{
-				NetworkInterfaceRef: &corev1.LocalObjectReference{Name: networkInterface.NetworkInterfaceId},
+	onmetalNicCfgs := make([]*OnmetalNetworkInterfaceConfig, len(machine.Spec.NetworkInterfaces))
+	for i, nic := range machine.Spec.NetworkInterfaces {
+		onmetalNicCfg, err := s.getOnmetalNetworkInterfaceConfig(nic)
+		if err != nil {
+			return nil, fmt.Errorf("[network interface %s] %w", nic.Name, err)
+		}
+
+		onmetalNicCfgs[i] = onmetalNicCfg
+	}
+
+	onmetalVolumeCfgs := make([]*OnmetalVolumeConfig, len(machine.Spec.Volumes))
+	for i, volume := range machine.Spec.Volumes {
+		onmetalVolumeCfg, err := s.getOnmetalVolumeConfig(volume)
+		if err != nil {
+			return nil, fmt.Errorf("[volume %s]: %w", volume.Name, err)
+		}
+
+		onmetalVolumeCfgs[i] = onmetalVolumeCfg
+	}
+
+	labels, err := s.prepareOnmetalMachineLabels(machine)
+	if err != nil {
+		return nil, fmt.Errorf("error preparing onmetal machine labels: %w", err)
+	}
+
+	annotations, err := s.prepareOnmetalMachineAnnotations(machine)
+	if err != nil {
+		return nil, fmt.Errorf("error preparing onmetal machine annotations: %w", err)
+	}
+
+	return &OnmetalMachineConfig{
+		Labels:                  labels,
+		Annotations:             annotations,
+		Power:                   onmetalPower,
+		MachineClassName:        machine.Spec.Class,
+		Image:                   onmetalImage,
+		IgnitionData:            machine.Spec.IgnitionData,
+		NetworkInterfaceConfigs: onmetalNicCfgs,
+		VolumeConfigs:           onmetalVolumeCfgs,
+	}, nil
+}
+
+func (s *Server) createOnmetalMachine(
+	ctx context.Context,
+	log logr.Logger,
+	cfg *OnmetalMachineConfig,
+) (res *AggregateOnmetalMachine, retErr error) {
+	c, cleanup := s.setupCleaner(ctx, log, &retErr)
+	defer cleanup()
+
+	var (
+		ignitionRef    *commonv1alpha1.SecretKeySelector
+		ignitionSecret *corev1.Secret
+	)
+	if ignitionData := cfg.IgnitionData; len(ignitionData) > 0 {
+		log.V(1).Info("Creating onmetal ignition secret")
+		ignitionSecret = &corev1.Secret{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: s.cluster.Namespace(),
+				Name:      s.cluster.IDGen().Generate(),
+			},
+			Type: computev1alpha1.SecretTypeIgnition,
+			Data: map[string][]byte{
+				computev1alpha1.DefaultIgnitionKey: ignitionData,
 			},
 		}
+		if err := s.cluster.Client().Create(ctx, ignitionSecret); err != nil {
+			return nil, fmt.Errorf("error creating onmetal ignition secret: %w", err)
+		}
+		c.Add(cleaner.CleanupObject(s.cluster.Client(), ignitionSecret))
+
+		ignitionRef = &commonv1alpha1.SecretKeySelector{Name: ignitionSecret.Name}
 	}
 
-	onmetalVolumeAttachments := make([]computev1alpha1.Volume, len(machine.Spec.Volumes))
-	for i, volume := range machine.Spec.Volumes {
-		onmetalVolumeAttachment, err := s.prepareOnmetalVolumeAttachment(volume)
+	var (
+		onmetalMachineNics []computev1alpha1.NetworkInterface
+		aggOnmetalNics     = make(map[string]*AggregateOnmetalNetworkInterface)
+	)
+	for _, nicCfg := range cfg.NetworkInterfaceConfigs {
+		onmetalMachineNic, aggOnmetalNic, err := s.createOnmetalNetworkInterface(ctx, log, c, nil, nicCfg)
 		if err != nil {
-			return nil, fmt.Errorf("error preparing onmetal machine volume %s: %w", volume.Device, err)
+			return nil, fmt.Errorf("[network interface %s] error creating: %w", nicCfg.Name, err)
 		}
 
-		onmetalVolumeAttachments[i] = onmetalVolumeAttachment
+		onmetalMachineNics = append(onmetalMachineNics, *onmetalMachineNic)
+		aggOnmetalNics[nicCfg.Name] = aggOnmetalNic
 	}
 
-	var onmetalMachineIgnitionRef *commonv1alpha1.SecretKeySelector
-	if onmetalIgnitionSecret != nil {
-		onmetalMachineIgnitionRef = &commonv1alpha1.SecretKeySelector{
-			Name: onmetalIgnitionSecret.Name,
-			Key:  computev1alpha1.DefaultIgnitionKey,
+	var (
+		onmetalMachineVolumes []computev1alpha1.Volume
+		aggOnmetalVolumes     = make(map[string]*AggregateOnmetalVolume)
+	)
+	for _, volumeCfg := range cfg.VolumeConfigs {
+		onmetalMachineVolume, aggOnmetalVolume, err := s.createOnmetalVolume(ctx, log, c, nil, volumeCfg)
+		if err != nil {
+			return nil, fmt.Errorf("[volume %s] error creating: %w", volumeCfg.Name, err)
+		}
+
+		onmetalMachineVolumes = append(onmetalMachineVolumes, *onmetalMachineVolume)
+		if aggOnmetalVolume != nil {
+			aggOnmetalVolumes[volumeCfg.Name] = aggOnmetalVolume
 		}
 	}
 
 	onmetalMachine := &computev1alpha1.Machine{
 		ObjectMeta: metav1.ObjectMeta{
-			Namespace: s.cluster.Namespace(),
-			Name:      s.cluster.IDGen().Generate(),
+			Namespace:   s.cluster.Namespace(),
+			Name:        s.cluster.IDGen().Generate(),
+			Annotations: cfg.Annotations,
+			Labels: maps.AppendMap(cfg.Labels, map[string]string{
+				machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
+			}),
 		},
 		Spec: computev1alpha1.MachineSpec{
-			MachineClassRef:     corev1.LocalObjectReference{Name: machine.Spec.Class},
+			MachineClassRef:     corev1.LocalObjectReference{Name: cfg.MachineClassName},
 			MachinePoolSelector: s.cluster.MachinePoolSelector(),
 			MachinePoolRef:      s.onmetalMachinePoolRef(),
-			Power:               power,
-			Image:               onmetalImage,
-			ImagePullSecretRef:  nil, // TODO: Specify if required.
-			NetworkInterfaces:   onmetalNetworkInterfaceAttachments,
-			Volumes:             onmetalVolumeAttachments,
-			IgnitionRef:         onmetalMachineIgnitionRef,
+			Power:               cfg.Power,
+			Image:               cfg.Image,
+			ImagePullSecretRef:  nil, // TODO: Specify as soon as available.
+			NetworkInterfaces:   onmetalMachineNics,
+			Volumes:             onmetalMachineVolumes,
+			IgnitionRef:         ignitionRef,
 		},
 	}
-	if err := apiutils.SetObjectMetadata(onmetalMachine, machine.Metadata); err != nil {
-		return nil, err
-	}
-	apiutils.SetManagerLabel(onmetalMachine, machinebrokerv1alpha1.MachineBrokerManager)
-
-	return &OnmetalMachineConfig{
-		IgnitionSecret: onmetalIgnitionSecret,
-		Machine:        onmetalMachine,
-	}, nil
-}
-
-func (s *Server) createOnmetalMachine(ctx context.Context, log logr.Logger, cfg *OnmetalMachineConfig) (res *AggregateOnmetalMachine, retErr error) {
-	c, cleanup := s.setupCleaner(ctx, log, &retErr)
-	defer cleanup()
-
-	if cfg.IgnitionSecret != nil {
-		log.V(1).Info("Creating onmetal ignition secret")
-		if err := s.cluster.Client().Create(ctx, cfg.IgnitionSecret); err != nil {
-			return nil, fmt.Errorf("error onmetal creating ignition secret: %w", err)
-		}
-
-		c.Add(func(ctx context.Context) error {
-			if err := s.cluster.Client().Delete(ctx, cfg.IgnitionSecret); client.IgnoreNotFound(err) != nil {
-				return fmt.Errorf("error onmetal deleting ignition secret: %w", err)
-			}
-			return nil
-		})
-	}
-
 	log.V(1).Info("Creating onmetal machine")
-	if err := s.cluster.Client().Create(ctx, cfg.Machine); err != nil {
+	if err := s.cluster.Client().Create(ctx, onmetalMachine); err != nil {
 		return nil, fmt.Errorf("error creating onmetal machine: %w", err)
 	}
-	c.Add(func(ctx context.Context) error {
-		if err := s.cluster.Client().Delete(ctx, cfg.Machine); client.IgnoreNotFound(err) != nil {
-			return fmt.Errorf("error deleting onmetal machine: %w", err)
-		}
-		return nil
-	})
+	c.Add(cleaner.CleanupObject(s.cluster.Client(), onmetalMachine))
 
-	if cfg.IgnitionSecret != nil {
+	if ignitionSecret != nil {
 		log.V(1).Info("Patching ignition secret to be controlled by onmetal machine")
-		if err := apiutils.PatchControlledBy(ctx, s.cluster.Client(), cfg.Machine, cfg.IgnitionSecret); err != nil {
+		if err := apiutils.PatchControlledBy(ctx, s.cluster.Client(), onmetalMachine, ignitionSecret); err != nil {
 			return nil, fmt.Errorf("error patching ignition secret to be controlled by onmetal machine: %w", err)
+		}
+	}
+	for _, aggOnmetalNic := range aggOnmetalNics {
+		if err := s.bindOnmetalMachineNetworkInterface(ctx, onmetalMachine, aggOnmetalNic.NetworkInterface); err != nil {
+			return nil, fmt.Errorf("error binding onmetal network interface to onmetal machine: %w", err)
+		}
+	}
+	for _, aggOnmetalVolume := range aggOnmetalVolumes {
+		if err := s.bindOnmetalMachineVolume(ctx, onmetalMachine, aggOnmetalVolume.Volume); err != nil {
+			return nil, fmt.Errorf("error binding onmetal volume to onmetal machine: %w", err)
 		}
 	}
 
 	log.V(1).Info("Patching onmetal machine as created")
-	if err := apiutils.PatchCreated(ctx, s.cluster.Client(), cfg.Machine); err != nil {
+	if err := apiutils.PatchCreated(ctx, s.cluster.Client(), onmetalMachine); err != nil {
 		return nil, fmt.Errorf("error patching onmetal machine as created: %w", err)
 	}
 
 	return &AggregateOnmetalMachine{
-		IgnitionSecret: cfg.IgnitionSecret,
-		Machine:        cfg.Machine,
+		IgnitionSecret:    ignitionSecret,
+		Machine:           onmetalMachine,
+		NetworkInterfaces: aggOnmetalNics,
+		Volumes:           aggOnmetalVolumes,
 	}, nil
 }
 
