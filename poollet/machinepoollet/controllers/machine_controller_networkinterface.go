@@ -370,7 +370,7 @@ func (r *MachineReconciler) updateORINetworkInterface(
 		actualPeerings := oriNetworkInterface.Spec.Network.Peerings
 		desiredPeerings := oriNetworkInterfaceSpec.Network.Peerings
 		if !reflect.DeepEqual(actualPeerings, desiredPeerings) {
-			log.V(1).Info("Updating ori network peerings")
+			log.V(1).Info("Updating ori network peerings", "actualPeerings", actualPeerings, "desiredPeerings", desiredPeerings)
 			if _, err := r.MachineRuntime.UpdateNetworkPeerings(ctx, &ori.UpdateNetworkPeeringsRequest{
 				Handle:   oriNetworkInterfaceSpec.Network.Handle,
 				Peerings: desiredPeerings,
