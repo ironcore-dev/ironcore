@@ -214,9 +214,8 @@ func (s *Server) prepareAggregateOnmetalNetworkInterface(log logr.Logger, networ
 		peerings = append(peerings, peering)
 	}
 
-	if len(peerings) > 0 {
-		onmetalNetworkInterfaceConfig.Network.Status.Peerings = peerings
-	}
+	onmetalNetworkInterfaceConfig.Network.Status.Peerings = peerings
+
 	return onmetalNetworkInterfaceConfig, nil
 }
 

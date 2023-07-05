@@ -653,9 +653,7 @@ func (r *MachineReconciler) prepareORINetworkInterface(
 		}
 	}
 
-	if len(peerings) > 0 {
-		onwi.Spec.Network.Peerings = peerings
-	}
+	onwi.Spec.Network.Peerings = peerings
 
 	return onwi, true, nil
 }

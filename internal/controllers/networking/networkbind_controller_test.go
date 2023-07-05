@@ -142,13 +142,13 @@ var _ = Describe("NetworkBindReconciler", func() {
 				Name:          "peering",
 				NetworkHandle: "network-2-handle",
 				Phase:         networkingv1alpha1.NetworkPeeringPhaseBound,
-				Prefixes:      net2Prefixes,
+				Prefixes:      net1Prefixes,
 			}, opt)))
 			g.Expect(network2.Status.Peerings).To(ContainElement(BeComparableTo(networkingv1alpha1.NetworkPeeringStatus{
 				Name:          "peering",
 				NetworkHandle: "network-1-handle",
 				Phase:         networkingv1alpha1.NetworkPeeringPhaseBound,
-				Prefixes:      net1Prefixes,
+				Prefixes:      net2Prefixes,
 			}, opt)))
 		}).Should(Succeed())
 	})

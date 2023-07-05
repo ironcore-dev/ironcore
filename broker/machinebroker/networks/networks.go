@@ -153,6 +153,7 @@ func (m *Networks) BeginCreate(ctx context.Context, nw *networkingv1alpha1.Netwo
 		}
 
 		networkBase := network.DeepCopy()
+		network.Status.Peerings = []networkingv1alpha1.NetworkPeeringStatus{}
 		if len(nw.Status.Peerings) > 0 {
 			network.Status.Peerings = nw.Status.Peerings
 		}

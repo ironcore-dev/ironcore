@@ -261,8 +261,8 @@ func (r *NetworkBindReconciler) reconcilePeering(
 		log.V(1).Info("Target network peering matches")
 		handle := targetNetwork.Spec.Handle
 		status := &peeringStatusData{phase: networkingv1alpha1.NetworkPeeringPhaseBound, handle: handle}
-		if targetPeering.Prefixes != nil && len(*targetPeering.Prefixes) > 0 {
-			status.prefixes = *targetPeering.Prefixes
+		if peering.Prefixes != nil && len(*peering.Prefixes) > 0 {
+			status.prefixes = *peering.Prefixes
 		}
 		return "", status, nil
 	}
