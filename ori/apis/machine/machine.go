@@ -22,6 +22,7 @@ import (
 
 type RuntimeService interface {
 	Version(context.Context, *api.VersionRequest) (*api.VersionResponse, error)
+	PoolInfo(context.Context, *api.PoolInfoRequest) (*api.PoolInfoResponse, error)
 	ListMachines(context.Context, *api.ListMachinesRequest) (*api.ListMachinesResponse, error)
 	CreateMachine(context.Context, *api.CreateMachineRequest) (*api.CreateMachineResponse, error)
 	DeleteMachine(context.Context, *api.DeleteMachineRequest) (*api.DeleteMachineResponse, error)

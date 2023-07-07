@@ -37,6 +37,14 @@ const (
 	// ResourcesRequestsPrefix is the prefix used for limiting resource requests in ResourceQuota.
 	ResourcesRequestsPrefix = "requests."
 
+	// SharedResourcesPrefix is the prefix used for the shared (virtual) resources.
+	SharedResourcesPrefix = "shared-"
+
+	// SharedResourceCPU is the amount of virtual cpu in cores.
+	SharedResourceCPU ResourceName = SharedResourcesPrefix + ResourceCPU
+	// SharedResourceMemory is the amount of virtual memory in bytes.
+	SharedResourceMemory ResourceName = SharedResourcesPrefix + ResourceMemory
+
 	// ResourceRequestsCPU is the amount of requested cpu in cores.
 	ResourceRequestsCPU = ResourcesRequestsPrefix + ResourceCPU
 	// ResourceRequestsMemory is the amount of requested memory in bytes.

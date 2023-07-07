@@ -45,6 +45,10 @@ func (r *remoteRuntime) Version(ctx context.Context, req *ori.VersionRequest) (*
 	return r.client.Version(ctx, req)
 }
 
+func (r *remoteRuntime) PoolInfo(ctx context.Context, req *ori.PoolInfoRequest) (*ori.PoolInfoResponse, error) {
+	return r.client.PoolInfo(ctx, req)
+}
+
 func (r *remoteRuntime) ListMachines(ctx context.Context, req *ori.ListMachinesRequest) (*ori.ListMachinesResponse, error) {
 	return r.client.ListMachines(ctx, req)
 }

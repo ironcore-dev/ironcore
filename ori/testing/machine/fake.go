@@ -73,9 +73,17 @@ type FakeMachineClass struct {
 	ori.MachineClass
 }
 
+type FakePoolInfo struct {
+	SharedCpu    int64
+	StaticCpu    int64
+	SharedMemory uint64
+	StaticMemory uint64
+}
+
 type FakeRuntimeService struct {
 	sync.Mutex
 
+	FakePoolInfo   FakePoolInfo
 	Machines       map[string]*FakeMachine
 	MachineClasses map[string]*FakeMachineClass
 	GetExecURL     func(req *ori.ExecRequest) string
@@ -119,6 +127,22 @@ func (r *FakeRuntimeService) Version(ctx context.Context, req *ori.VersionReques
 	return &ori.VersionResponse{
 		RuntimeName:    FakeRuntimeName,
 		RuntimeVersion: FakeVersion,
+	}, nil
+}
+
+func (r *FakeRuntimeService) SetPoolInfo(poolInfo FakePoolInfo) {
+	r.Lock()
+	defer r.Unlock()
+
+	r.FakePoolInfo = poolInfo
+}
+
+func (r *FakeRuntimeService) PoolInfo(ctx context.Context, req *ori.PoolInfoRequest) (*ori.PoolInfoResponse, error) {
+	return &ori.PoolInfoResponse{
+		SharedCpu:    r.FakePoolInfo.SharedCpu,
+		StaticCpu:    r.FakePoolInfo.StaticCpu,
+		SharedMemory: r.FakePoolInfo.SharedMemory,
+		StaticMemory: r.FakePoolInfo.StaticMemory,
 	}, nil
 }
 

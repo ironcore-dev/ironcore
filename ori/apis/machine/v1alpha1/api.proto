@@ -16,6 +16,7 @@ option (gogoproto.goproto_unrecognized_all) = false;
 
 service MachineRuntime {
   rpc Version(VersionRequest) returns (VersionResponse) {};
+  rpc PoolInfo(PoolInfoRequest) returns (PoolInfoResponse) {};
 
   rpc ListMachines(ListMachinesRequest) returns (ListMachinesResponse) {};
   rpc CreateMachine(CreateMachineRequest) returns (CreateMachineResponse) {};
@@ -149,6 +150,16 @@ message VersionResponse {
   // Version of the machine runtime. The string must be
   // semver-compatible.
   string runtime_version = 2;
+}
+
+message PoolInfoRequest {}
+
+message PoolInfoResponse {
+  int64 static_cpu = 1;
+  uint64 static_memory = 2;
+
+  int64 shared_cpu = 3;
+  uint64 shared_memory = 4;
 }
 
 message ListMachinesRequest {

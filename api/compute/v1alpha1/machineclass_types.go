@@ -36,7 +36,15 @@ type MachineClass struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Capabilities corev1alpha1.ResourceList `json:"capabilities,omitempty"`
+	Mode         MachineClassMode          `json:"mode,omitempty"`
 }
+
+type MachineClassMode string
+
+const (
+	ModeShared   MachineClassMode = "Shared"
+	ModeDistinct MachineClassMode = "Distinct"
+)
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 

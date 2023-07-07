@@ -46,3 +46,9 @@ func SetDefaults_MachineSpec(spec *v1alpha1.MachineSpec) {
 		spec.Power = v1alpha1.PowerOn
 	}
 }
+
+func SetDefaults_MachineClass(machineClass *v1alpha1.MachineClass) {
+	if machineClass.Mode == "" {
+		machineClass.Mode = v1alpha1.ModeShared
+	}
+}

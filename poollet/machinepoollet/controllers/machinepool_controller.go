@@ -21,9 +21,13 @@ import (
 
 	"github.com/go-logr/logr"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	"github.com/onmetal/onmetal-api/ori/apis/machine"
+	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	machinepoolletclient "github.com/onmetal/onmetal-api/poollet/machinepoollet/client"
 	"github.com/onmetal/onmetal-api/poollet/machinepoollet/mcm"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -88,6 +92,58 @@ func (r *MachinePoolReconciler) supportsMachineClass(ctx context.Context, log lo
 	return true, nil
 }
 
+func (r *MachinePoolReconciler) updateResources(log logr.Logger, status *computev1alpha1.MachinePoolStatus, poolInfo *ori.PoolInfoResponse, machines []computev1alpha1.Machine, machineClasses []computev1alpha1.MachineClass) {
+	log.V(2).Info("Updating capacity resources")
+	status.Capacity = map[corev1alpha1.ResourceName]resource.Quantity{
+		corev1alpha1.ResourceCPU:          *resource.NewQuantity(poolInfo.StaticCpu, resource.DecimalSI),
+		corev1alpha1.SharedResourceCPU:    *resource.NewQuantity(poolInfo.SharedCpu, resource.DecimalSI),
+		corev1alpha1.ResourceMemory:       *resource.NewQuantity(int64(poolInfo.StaticMemory), resource.BinarySI),
+		corev1alpha1.SharedResourceMemory: *resource.NewQuantity(int64(poolInfo.SharedMemory), resource.BinarySI),
+	}
+
+	if len(machines) == 0 {
+		status.Allocatable = status.Capacity
+		return
+	}
+
+	log.V(2).Info("Updating allocatable resources")
+	machineClassCount := map[string]int{}
+	for _, onmetalMachine := range machines {
+		machineClassCount[onmetalMachine.Spec.MachineClassRef.Name]++
+	}
+
+	var (
+		sharedCPU, staticCPU       int64
+		sharedMemory, staticMemory uint64
+	)
+	for _, machineClass := range machineClasses {
+		count, found := machineClassCount[machineClass.Name]
+		if !found {
+			continue
+		}
+
+		switch machineClass.Mode {
+		case computev1alpha1.ModeDistinct:
+			staticCPU += machineClass.Capabilities.CPU().AsDec().UnscaledBig().Int64() * int64(count)
+			staticMemory += machineClass.Capabilities.Memory().AsDec().UnscaledBig().Uint64() * uint64(count)
+		case computev1alpha1.ModeShared:
+			sharedCPU += machineClass.Capabilities.CPU().AsDec().UnscaledBig().Int64() * int64(count)
+			sharedMemory += machineClass.Capabilities.Memory().AsDec().UnscaledBig().Uint64() * uint64(count)
+		default:
+			log.V(1).Info("Unknown machine class mode", "mode", machineClass.Mode)
+		}
+	}
+
+	status.Allocatable = map[corev1alpha1.ResourceName]resource.Quantity{
+		corev1alpha1.ResourceCPU:    *resource.NewQuantity(Max(0, poolInfo.StaticCpu-staticCPU), resource.DecimalSI),
+		corev1alpha1.ResourceMemory: *resource.NewQuantity(Max(0, int64(poolInfo.StaticMemory-staticMemory)), resource.BinarySI),
+
+		corev1alpha1.SharedResourceCPU:    *resource.NewQuantity(Max(0, poolInfo.SharedCpu-sharedCPU), resource.DecimalSI),
+		corev1alpha1.SharedResourceMemory: *resource.NewQuantity(Max(0, int64(poolInfo.SharedMemory-sharedMemory)), resource.BinarySI),
+	}
+
+}
+
 func (r *MachinePoolReconciler) reconcile(ctx context.Context, log logr.Logger, machinePool *computev1alpha1.MachinePool) (ctrl.Result, error) {
 	log.V(1).Info("Reconcile")
 
@@ -95,6 +151,20 @@ func (r *MachinePoolReconciler) reconcile(ctx context.Context, log logr.Logger, 
 	machineClassList := &computev1alpha1.MachineClassList{}
 	if err := r.List(ctx, machineClassList); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error listing machine classes: %w", err)
+	}
+
+	log.V(1).Info("Listing machines in pool")
+	machinesInPool := &computev1alpha1.MachineList{}
+	if err := r.List(ctx, machinesInPool, client.MatchingFields{
+		machinepoolletclient.MachineMachinePoolRefNameField: r.MachinePoolName,
+	}); err != nil {
+		return ctrl.Result{}, fmt.Errorf("failed to list machines in pool: %w", err)
+	}
+
+	log.V(1).Info("Fetching pool info")
+	poolInfo, err := r.MachineRuntime.PoolInfo(ctx, &ori.PoolInfoRequest{})
+	if err != nil {
+		return ctrl.Result{}, fmt.Errorf("failed to fetch pool info: %w", err)
 	}
 
 	log.V(1).Info("Determining supported machine classes")
@@ -117,6 +187,8 @@ func (r *MachinePoolReconciler) reconcile(ctx context.Context, log logr.Logger, 
 	machinePool.Status.AvailableMachineClasses = supported
 	machinePool.Status.Addresses = r.Addresses
 	machinePool.Status.DaemonEndpoints.MachinepoolletEndpoint.Port = r.Port
+	r.updateResources(log, &machinePool.Status, poolInfo, machinesInPool.Items, machineClassList.Items)
+
 	if err := r.Status().Patch(ctx, machinePool, client.MergeFrom(base)); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error patching machine pool status: %w", err)
 	}
@@ -140,6 +212,15 @@ func (r *MachinePoolReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 				return []ctrl.Request{{NamespacedName: client.ObjectKey{Name: r.MachinePoolName}}}
 			}),
+		).
+		Watches(
+			&computev1alpha1.Machine{},
+			handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
+				return []ctrl.Request{{NamespacedName: client.ObjectKey{Name: r.MachinePoolName}}}
+			}),
+			builder.WithPredicates(
+				MachineRunsInMachinePoolPredicate(r.MachinePoolName),
+			),
 		).
 		Complete(r)
 }

@@ -32,6 +32,8 @@ import (
 // All generated defaulters are covering - they call all nested defaulters.
 func RegisterDefaults(scheme *runtime.Scheme) error {
 	scheme.AddTypeDefaultingFunc(&v1alpha1.Machine{}, func(obj interface{}) { SetObjectDefaults_Machine(obj.(*v1alpha1.Machine)) })
+	scheme.AddTypeDefaultingFunc(&v1alpha1.MachineClass{}, func(obj interface{}) { SetObjectDefaults_MachineClass(obj.(*v1alpha1.MachineClass)) })
+	scheme.AddTypeDefaultingFunc(&v1alpha1.MachineClassList{}, func(obj interface{}) { SetObjectDefaults_MachineClassList(obj.(*v1alpha1.MachineClassList)) })
 	scheme.AddTypeDefaultingFunc(&v1alpha1.MachineList{}, func(obj interface{}) { SetObjectDefaults_MachineList(obj.(*v1alpha1.MachineList)) })
 	return nil
 }
@@ -70,6 +72,17 @@ func SetObjectDefaults_Machine(in *v1alpha1.Machine) {
 	for i := range in.Status.Volumes {
 		a := &in.Status.Volumes[i]
 		SetDefaults_VolumeStatus(a)
+	}
+}
+
+func SetObjectDefaults_MachineClass(in *v1alpha1.MachineClass) {
+	SetDefaults_MachineClass(in)
+}
+
+func SetObjectDefaults_MachineClassList(in *v1alpha1.MachineClassList) {
+	for i := range in.Items {
+		a := &in.Items[i]
+		SetObjectDefaults_MachineClass(a)
 	}
 }
 

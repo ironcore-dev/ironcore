@@ -145,7 +145,7 @@ var _ = BeforeSuite(func() {
 	DeferCleanup(ctrlMgr.Stop)
 })
 
-func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.MachinePool, *computev1alpha1.MachineClass, *machine.FakeRuntimeService) {
+func SetupTest() (*corev1.Namespace, *computev1alpha1.MachinePool, *computev1alpha1.MachineClass, *machine.FakeRuntimeService) {
 	var (
 		ns  = &corev1.Namespace{}
 		mp  = &computev1alpha1.MachinePool{}
@@ -153,14 +153,14 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 		srv = &machine.FakeRuntimeService{}
 	)
 
-	BeforeEach(func() {
+	BeforeEach(func(ctx SpecContext) {
 		*ns = corev1.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "test-ns-",
 			},
 		}
 		Expect(k8sClient.Create(ctx, ns)).To(Succeed(), "failed to create test namespace")
-		DeferCleanup(k8sClient.Delete, ctx, ns)
+		DeferCleanup(k8sClient.Delete, ns)
 
 		*mp = computev1alpha1.MachinePool{
 			ObjectMeta: metav1.ObjectMeta{
@@ -168,7 +168,7 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 			},
 		}
 		Expect(k8sClient.Create(ctx, mp)).To(Succeed(), "failed to create test machine pool")
-		DeferCleanup(k8sClient.Delete, ctx, mp)
+		DeferCleanup(k8sClient.Delete, mp)
 
 		*mc = computev1alpha1.MachineClass{
 			ObjectMeta: metav1.ObjectMeta{
@@ -178,9 +178,10 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 				corev1alpha1.ResourceCPU:    resource.MustParse("1"),
 				corev1alpha1.ResourceMemory: resource.MustParse("1Gi"),
 			},
+			Mode: computev1alpha1.ModeDistinct,
 		}
 		Expect(k8sClient.Create(ctx, mc)).To(Succeed(), "failed to create test machine class")
-		DeferCleanup(k8sClient.Delete, ctx, mc)
+		DeferCleanup(k8sClient.Delete, mc)
 
 		*srv = *machine.NewFakeRuntimeService()
 		srv.SetMachineClasses([]*machine.FakeMachineClass{
@@ -208,11 +209,12 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 		Expect(machinepoolletclient.SetupMachineSpecSecretNamesField(ctx, indexer, mp.Name)).To(Succeed())
 		Expect(machinepoolletclient.SetupLoadBalancerRoutingNetworkRefNameField(ctx, indexer)).To(Succeed())
 		Expect(machinepoolletclient.SetupNATGatewayRoutingNetworkRefNameField(ctx, indexer)).To(Succeed())
+		Expect(machinepoolletclient.SetupMachineMachinePoolRefNameField(ctx, indexer)).To(Succeed())
 
 		machineClassMapper := mcm.NewGeneric(srv, mcm.GenericOptions{})
 		Expect(k8sManager.Add(machineClassMapper)).To(Succeed())
 
-		mgrCtx, cancel := context.WithCancel(ctx)
+		mgrCtx, cancel := context.WithCancel(context.Background())
 		DeferCleanup(cancel)
 
 		Expect((&controllers.MachineReconciler{
@@ -241,6 +243,15 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 		Expect((&controllers.MachineAnnotatorReconciler{
 			Client:        k8sManager.GetClient(),
 			MachineEvents: machineEvents,
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
+		Expect((&controllers.MachinePoolReconciler{
+			Client:             k8sManager.GetClient(),
+			MachinePoolName:    TestMachinePool,
+			Addresses:          []computev1alpha1.MachinePoolAddress{},
+			Port:               8080,
+			MachineRuntime:     srv,
+			MachineClassMapper: machineClassMapper,
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		go func() {

@@ -444,6 +444,7 @@ func Convert_compute_Machine_To_v1alpha1_Machine(in *compute.Machine, out *v1alp
 func autoConvert_v1alpha1_MachineClass_To_compute_MachineClass(in *v1alpha1.MachineClass, out *compute.MachineClass, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	out.Capabilities = *(*core.ResourceList)(unsafe.Pointer(&in.Capabilities))
+	out.Mode = compute.MachineClassMode(in.Mode)
 	return nil
 }
 
@@ -455,6 +456,7 @@ func Convert_v1alpha1_MachineClass_To_compute_MachineClass(in *v1alpha1.MachineC
 func autoConvert_compute_MachineClass_To_v1alpha1_MachineClass(in *compute.MachineClass, out *v1alpha1.MachineClass, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	out.Capabilities = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Capabilities))
+	out.Mode = v1alpha1.MachineClassMode(in.Mode)
 	return nil
 }
 

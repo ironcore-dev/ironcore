@@ -19,6 +19,13 @@ import (
 	utilslices "github.com/onmetal/onmetal-api/utils/slices"
 )
 
+func Max[T uint64 | int64](x, y T) T {
+	if x < y {
+		return y
+	}
+	return x
+}
+
 func FindNewORINetworkInterfaces(desiredORINics, existingORINics []*ori.NetworkInterface) []*ori.NetworkInterface {
 	var (
 		existingORINicNames = utilslices.ToSetFunc(existingORINics, (*ori.NetworkInterface).GetName)

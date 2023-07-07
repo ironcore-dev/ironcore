@@ -111,3 +111,20 @@ func SetupNATGatewayRoutingNetworkRefNameField(ctx context.Context, indexer clie
 		},
 	)
 }
+
+const MachineMachinePoolRefNameField = "machine-machinepoolref-name"
+
+func SetupMachineMachinePoolRefNameField(ctx context.Context, indexer client.FieldIndexer) error {
+	return indexer.IndexField(
+		ctx,
+		&computev1alpha1.Machine{},
+		MachineMachinePoolRefNameField,
+		func(object client.Object) []string {
+			machine := object.(*computev1alpha1.Machine)
+			if machine.Spec.MachinePoolRef == nil {
+				return nil
+			}
+			return []string{machine.Spec.MachinePoolRef.Name}
+		},
+	)
+}

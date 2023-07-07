@@ -53,6 +53,7 @@ func ValidateMachineClassUpdate(newMachineClass, oldMachineClass *compute.Machin
 
 	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessorUpdate(newMachineClass, oldMachineClass, field.NewPath("metadata"))...)
 	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableField(newMachineClass.Capabilities, oldMachineClass.Capabilities, field.NewPath("capabilities"))...)
+	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableField(newMachineClass.Mode, oldMachineClass.Mode, field.NewPath("mode"))...)
 	allErrs = append(allErrs, ValidateMachineClass(newMachineClass)...)
 
 	return allErrs
