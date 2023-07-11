@@ -335,6 +335,14 @@ func Run(ctx context.Context, opts Options) error {
 			return fmt.Errorf("error setting up machine pool reconciler with manager: %w", err)
 		}
 
+		if err := (&controllers.MachinePoolAnnotatorReconciler{
+			Client:             mgr.GetClient(),
+			MachinePoolName:    opts.MachinePoolName,
+			MachineClassMapper: machineClassMapper,
+		}).SetupWithManager(mgr); err != nil {
+			return fmt.Errorf("error setting up machine pool annotator reconciler with manager: %w", err)
+		}
+
 		return nil
 	}
 

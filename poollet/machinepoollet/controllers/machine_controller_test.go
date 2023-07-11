@@ -26,7 +26,6 @@ import (
 	testingmachine "github.com/onmetal/onmetal-api/ori/testing/machine"
 	machinepoolletv1alpha1 "github.com/onmetal/onmetal-api/poollet/machinepoollet/api/v1alpha1"
 	machinepoolletmachine "github.com/onmetal/onmetal-api/poollet/machinepoollet/machine"
-	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
@@ -37,10 +36,9 @@ import (
 )
 
 var _ = Describe("MachineController", func() {
-	ctx := SetupContext()
-	ns, mp, mc, srv := SetupTest(ctx)
+	ns, mp, mc, srv := SetupTest()
 
-	It("should create a machine", func() {
+	It("should create a machine", func(ctx SpecContext) {
 		By("creating a network")
 		network := &networkingv1alpha1.Network{
 			ObjectMeta: metav1.ObjectMeta{
@@ -175,7 +173,7 @@ var _ = Describe("MachineController", func() {
 		}))))
 	})
 
-	It("should correctly manage the power state of a machine", func() {
+	It("should correctly manage the power state of a machine", func(ctx SpecContext) {
 		By("creating a machine")
 		machine := &computev1alpha1.Machine{
 			ObjectMeta: metav1.ObjectMeta{

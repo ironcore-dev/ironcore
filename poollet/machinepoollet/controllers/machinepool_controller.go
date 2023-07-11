@@ -23,6 +23,7 @@ import (
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	"github.com/onmetal/onmetal-api/ori/apis/machine"
 	"github.com/onmetal/onmetal-api/poollet/machinepoollet/mcm"
+	onmetalapiclient "github.com/onmetal/onmetal-api/utils/client"
 	corev1 "k8s.io/api/core/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
@@ -90,6 +91,16 @@ func (r *MachinePoolReconciler) supportsMachineClass(ctx context.Context, log lo
 
 func (r *MachinePoolReconciler) reconcile(ctx context.Context, log logr.Logger, machinePool *computev1alpha1.MachinePool) (ctrl.Result, error) {
 	log.V(1).Info("Reconcile")
+
+	log.V(1).Info("Ensuring no reconcile annotation")
+	modified, err := onmetalapiclient.PatchEnsureNoReconcileAnnotation(ctx, r.Client, machinePool)
+	if err != nil {
+		return ctrl.Result{}, fmt.Errorf("error ensuring no reconcile annotation: %w", err)
+	}
+	if modified {
+		log.V(1).Info("Removed reconcile annotation, requeueing")
+		return ctrl.Result{Requeue: true}, nil
+	}
 
 	log.V(1).Info("Listing machine classes")
 	machineClassList := &computev1alpha1.MachineClassList{}
