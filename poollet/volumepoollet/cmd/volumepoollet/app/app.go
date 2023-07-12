@@ -241,6 +241,14 @@ func Run(ctx context.Context, opts Options) error {
 			return fmt.Errorf("error setting up volume pool reconciler with manager: %w", err)
 		}
 
+		if err := (&controllers.VolumePoolAnnotatorReconciler{
+			Client:            mgr.GetClient(),
+			VolumeClassMapper: volumeClassMapper,
+			VolumePoolName:    opts.VolumePoolName,
+		}).SetupWithManager(mgr); err != nil {
+			return fmt.Errorf("error setting up volume pool annotator reconciler with manager: %w", err)
+		}
+
 		return nil
 	}
 

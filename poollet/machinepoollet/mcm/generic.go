@@ -21,9 +21,12 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
+	"github.com/gogo/protobuf/proto"
 	"github.com/onmetal/onmetal-api/ori/apis/machine"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	"github.com/onmetal/onmetal-api/poollet/orievent"
 	"golang.org/x/exp/maps"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
@@ -46,12 +49,50 @@ type Generic struct {
 	sync   bool
 	synced chan struct{}
 
+	listener sets.Set[*listener]
+
 	machineClassByName         map[string]*ori.MachineClass
 	machineClassByCapabilities map[capabilities][]*ori.MachineClass
 
 	machineRuntime machine.RuntimeService
 
 	relistPeriod time.Duration
+}
+
+func (g *Generic) AddListener(handler orievent.Listener) (orievent.ListenerRegistration, error) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
+	h := &listener{Listener: handler}
+
+	g.listener.Insert(h)
+	return &listenerRegistration{
+		mcm:      g,
+		listener: h,
+	}, nil
+}
+
+func (g *Generic) RemoveListener(listener orievent.ListenerRegistration) error {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
+	reg, ok := listener.(*listenerRegistration)
+	if !ok {
+		return fmt.Errorf("invalid listener registration")
+	}
+
+	g.listener.Delete(reg.listener)
+
+	return nil
+}
+
+func shouldNotify(oldMachineClassByName map[string]*ori.MachineClass, class *ori.MachineClass) bool {
+	oldMachineClass, ok := oldMachineClassByName[class.Name]
+	if !ok {
+		return true
+	}
+
+	return proto.Equal(class, oldMachineClass)
 }
 
 func (g *Generic) relist(ctx context.Context, log logr.Logger) error {
@@ -64,8 +105,29 @@ func (g *Generic) relist(ctx context.Context, log logr.Logger) error {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 
+	oldMachineClassByName := maps.Clone(g.machineClassByName)
+
 	maps.Clear(g.machineClassByName)
 	maps.Clear(g.machineClassByCapabilities)
+
+	var notify bool
+	for _, machineClass := range res.MachineClasses {
+		notify = notify || shouldNotify(oldMachineClassByName, machineClass)
+
+		caps := capabilities{
+			cpuMillis:   machineClass.Capabilities.CpuMillis,
+			memoryBytes: machineClass.Capabilities.MemoryBytes,
+		}
+		g.machineClassByName[machineClass.Name] = machineClass
+		g.machineClassByCapabilities[caps] = append(g.machineClassByCapabilities[caps], machineClass)
+	}
+
+	if notify {
+		log.V(1).Info("Notify")
+		for _, n := range g.listener.UnsortedList() {
+			n.Enqueue()
+		}
+	}
 
 	for _, machineClass := range res.MachineClasses {
 		caps := capabilities{
@@ -143,7 +205,17 @@ func NewGeneric(runtime machine.RuntimeService, opts GenericOptions) MachineClas
 		synced:                     make(chan struct{}),
 		machineClassByName:         map[string]*ori.MachineClass{},
 		machineClassByCapabilities: map[capabilities][]*ori.MachineClass{},
+		listener:                   sets.New[*listener](),
 		machineRuntime:             runtime,
 		relistPeriod:               opts.RelistPeriod,
 	}
+}
+
+type listener struct {
+	orievent.Listener
+}
+
+type listenerRegistration struct {
+	mcm      *Generic
+	listener *listener
 }
