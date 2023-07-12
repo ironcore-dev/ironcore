@@ -816,99 +816,13 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NATGatewayStatus
       default: {}
-- name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NATGatewayDestination
-  map:
-    fields:
-    - name: ips
-      type:
-        list:
-          elementType:
-            namedType: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NATGatewayDestinationIP
-          elementRelationship: atomic
-    - name: name
-      type:
-        scalar: string
-      default: ""
-    - name: uid
-      type:
-        scalar: string
-      default: ""
-- name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NATGatewayDestinationIP
-  map:
-    fields:
-    - name: endPort
-      type:
-        scalar: numeric
-      default: 0
-    - name: ip
-      type:
-        namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IP
-      default: {}
-    - name: port
-      type:
-        scalar: numeric
-      default: 0
-- name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NATGatewayIP
-  map:
-    fields:
-    - name: name
-      type:
-        scalar: string
-      default: ""
-- name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NATGatewayIPStatus
-  map:
-    fields:
-    - name: ip
-      type:
-        namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IP
-      default: {}
-    - name: name
-      type:
-        scalar: string
-      default: ""
-- name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NATGatewayRouting
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: destinations
-      type:
-        list:
-          elementType:
-            namedType: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NATGatewayDestination
-          elementRelationship: atomic
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: networkRef
-      type:
-        namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.LocalUIDReference
-      default: {}
 - name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NATGatewaySpec
   map:
     fields:
-    - name: ipFamilies
+    - name: ipFamily
       type:
-        list:
-          elementType:
-            scalar: string
-          elementRelationship: atomic
-    - name: ips
-      type:
-        list:
-          elementType:
-            namedType: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NATGatewayIP
-          elementRelationship: associative
-          keys:
-          - name
-    - name: networkInterfaceSelector
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector
+        scalar: string
+      default: ""
     - name: networkRef
       type:
         namedType: io.k8s.api.core.v1.LocalObjectReference
@@ -927,11 +841,8 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         list:
           elementType:
-            namedType: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NATGatewayIPStatus
+            namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IP
           elementRelationship: atomic
-    - name: portsUsed
-      type:
-        scalar: numeric
 - name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.Network
   map:
     fields:

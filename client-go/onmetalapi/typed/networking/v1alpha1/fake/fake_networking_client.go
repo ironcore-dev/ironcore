@@ -39,10 +39,6 @@ func (c *FakeNetworkingV1alpha1) NATGateways(namespace string) v1alpha1.NATGatew
 	return &FakeNATGateways{c, namespace}
 }
 
-func (c *FakeNetworkingV1alpha1) NATGatewayRoutings(namespace string) v1alpha1.NATGatewayRoutingInterface {
-	return &FakeNATGatewayRoutings{c, namespace}
-}
-
 func (c *FakeNetworkingV1alpha1) Networks(namespace string) v1alpha1.NetworkInterface {
 	return &FakeNetworks{c, namespace}
 }

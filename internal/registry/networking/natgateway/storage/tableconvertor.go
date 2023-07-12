@@ -66,7 +66,7 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 		if ips := natGateway.Status.IPs; len(ips) > 0 {
 			ipStrings := make([]string, len(ips))
 			for i, ip := range ips {
-				ipStrings[i] = ip.IP.String()
+				ipStrings[i] = ip.String()
 			}
 			cells = append(cells, strings.Join(ipStrings, ","))
 		} else {

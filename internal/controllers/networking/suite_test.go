@@ -170,13 +170,6 @@ var _ = BeforeSuite(func() {
 	}).SetupWithManager(k8sManager)
 	Expect(err).NotTo(HaveOccurred())
 
-	err = (&NATGatewayReconciler{
-		EventRecorder: &record.FakeRecorder{},
-		Client:        k8sManager.GetClient(),
-		Scheme:        k8sManager.GetScheme(),
-	}).SetupWithManager(k8sManager)
-	Expect(err).NotTo(HaveOccurred())
-
 	err = (&NetworkProtectionReconciler{
 		Client: k8sManager.GetClient(),
 		Scheme: k8sManager.GetScheme(),

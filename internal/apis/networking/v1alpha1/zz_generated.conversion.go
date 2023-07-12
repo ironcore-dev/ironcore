@@ -34,7 +34,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	conversion "k8s.io/apimachinery/pkg/conversion"
 	runtime "k8s.io/apimachinery/pkg/runtime"
-	types "k8s.io/apimachinery/pkg/types"
 )
 
 func init() {
@@ -164,46 +163,6 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.NATGatewayDestination)(nil), (*networking.NATGatewayDestination)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_NATGatewayDestination_To_networking_NATGatewayDestination(a.(*v1alpha1.NATGatewayDestination), b.(*networking.NATGatewayDestination), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*networking.NATGatewayDestination)(nil), (*v1alpha1.NATGatewayDestination)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_networking_NATGatewayDestination_To_v1alpha1_NATGatewayDestination(a.(*networking.NATGatewayDestination), b.(*v1alpha1.NATGatewayDestination), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.NATGatewayDestinationIP)(nil), (*networking.NATGatewayDestinationIP)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_NATGatewayDestinationIP_To_networking_NATGatewayDestinationIP(a.(*v1alpha1.NATGatewayDestinationIP), b.(*networking.NATGatewayDestinationIP), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*networking.NATGatewayDestinationIP)(nil), (*v1alpha1.NATGatewayDestinationIP)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_networking_NATGatewayDestinationIP_To_v1alpha1_NATGatewayDestinationIP(a.(*networking.NATGatewayDestinationIP), b.(*v1alpha1.NATGatewayDestinationIP), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.NATGatewayIP)(nil), (*networking.NATGatewayIP)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_NATGatewayIP_To_networking_NATGatewayIP(a.(*v1alpha1.NATGatewayIP), b.(*networking.NATGatewayIP), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*networking.NATGatewayIP)(nil), (*v1alpha1.NATGatewayIP)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_networking_NATGatewayIP_To_v1alpha1_NATGatewayIP(a.(*networking.NATGatewayIP), b.(*v1alpha1.NATGatewayIP), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.NATGatewayIPStatus)(nil), (*networking.NATGatewayIPStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_NATGatewayIPStatus_To_networking_NATGatewayIPStatus(a.(*v1alpha1.NATGatewayIPStatus), b.(*networking.NATGatewayIPStatus), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*networking.NATGatewayIPStatus)(nil), (*v1alpha1.NATGatewayIPStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_networking_NATGatewayIPStatus_To_v1alpha1_NATGatewayIPStatus(a.(*networking.NATGatewayIPStatus), b.(*v1alpha1.NATGatewayIPStatus), scope)
-	}); err != nil {
-		return err
-	}
 	if err := s.AddGeneratedConversionFunc((*v1alpha1.NATGatewayList)(nil), (*networking.NATGatewayList)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1alpha1_NATGatewayList_To_networking_NATGatewayList(a.(*v1alpha1.NATGatewayList), b.(*networking.NATGatewayList), scope)
 	}); err != nil {
@@ -211,26 +170,6 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}
 	if err := s.AddGeneratedConversionFunc((*networking.NATGatewayList)(nil), (*v1alpha1.NATGatewayList)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_networking_NATGatewayList_To_v1alpha1_NATGatewayList(a.(*networking.NATGatewayList), b.(*v1alpha1.NATGatewayList), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.NATGatewayRouting)(nil), (*networking.NATGatewayRouting)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_NATGatewayRouting_To_networking_NATGatewayRouting(a.(*v1alpha1.NATGatewayRouting), b.(*networking.NATGatewayRouting), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*networking.NATGatewayRouting)(nil), (*v1alpha1.NATGatewayRouting)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_networking_NATGatewayRouting_To_v1alpha1_NATGatewayRouting(a.(*networking.NATGatewayRouting), b.(*v1alpha1.NATGatewayRouting), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.NATGatewayRoutingList)(nil), (*networking.NATGatewayRoutingList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_NATGatewayRoutingList_To_networking_NATGatewayRoutingList(a.(*v1alpha1.NATGatewayRoutingList), b.(*networking.NATGatewayRoutingList), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*networking.NATGatewayRoutingList)(nil), (*v1alpha1.NATGatewayRoutingList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_networking_NATGatewayRoutingList_To_v1alpha1_NATGatewayRoutingList(a.(*networking.NATGatewayRoutingList), b.(*v1alpha1.NATGatewayRoutingList), scope)
 	}); err != nil {
 		return err
 	}
@@ -817,96 +756,6 @@ func Convert_networking_NATGateway_To_v1alpha1_NATGateway(in *networking.NATGate
 	return autoConvert_networking_NATGateway_To_v1alpha1_NATGateway(in, out, s)
 }
 
-func autoConvert_v1alpha1_NATGatewayDestination_To_networking_NATGatewayDestination(in *v1alpha1.NATGatewayDestination, out *networking.NATGatewayDestination, s conversion.Scope) error {
-	out.Name = in.Name
-	out.UID = types.UID(in.UID)
-	out.IPs = *(*[]networking.NATGatewayDestinationIP)(unsafe.Pointer(&in.IPs))
-	return nil
-}
-
-// Convert_v1alpha1_NATGatewayDestination_To_networking_NATGatewayDestination is an autogenerated conversion function.
-func Convert_v1alpha1_NATGatewayDestination_To_networking_NATGatewayDestination(in *v1alpha1.NATGatewayDestination, out *networking.NATGatewayDestination, s conversion.Scope) error {
-	return autoConvert_v1alpha1_NATGatewayDestination_To_networking_NATGatewayDestination(in, out, s)
-}
-
-func autoConvert_networking_NATGatewayDestination_To_v1alpha1_NATGatewayDestination(in *networking.NATGatewayDestination, out *v1alpha1.NATGatewayDestination, s conversion.Scope) error {
-	out.Name = in.Name
-	out.UID = types.UID(in.UID)
-	out.IPs = *(*[]v1alpha1.NATGatewayDestinationIP)(unsafe.Pointer(&in.IPs))
-	return nil
-}
-
-// Convert_networking_NATGatewayDestination_To_v1alpha1_NATGatewayDestination is an autogenerated conversion function.
-func Convert_networking_NATGatewayDestination_To_v1alpha1_NATGatewayDestination(in *networking.NATGatewayDestination, out *v1alpha1.NATGatewayDestination, s conversion.Scope) error {
-	return autoConvert_networking_NATGatewayDestination_To_v1alpha1_NATGatewayDestination(in, out, s)
-}
-
-func autoConvert_v1alpha1_NATGatewayDestinationIP_To_networking_NATGatewayDestinationIP(in *v1alpha1.NATGatewayDestinationIP, out *networking.NATGatewayDestinationIP, s conversion.Scope) error {
-	out.IP = in.IP
-	out.Port = in.Port
-	out.EndPort = in.EndPort
-	return nil
-}
-
-// Convert_v1alpha1_NATGatewayDestinationIP_To_networking_NATGatewayDestinationIP is an autogenerated conversion function.
-func Convert_v1alpha1_NATGatewayDestinationIP_To_networking_NATGatewayDestinationIP(in *v1alpha1.NATGatewayDestinationIP, out *networking.NATGatewayDestinationIP, s conversion.Scope) error {
-	return autoConvert_v1alpha1_NATGatewayDestinationIP_To_networking_NATGatewayDestinationIP(in, out, s)
-}
-
-func autoConvert_networking_NATGatewayDestinationIP_To_v1alpha1_NATGatewayDestinationIP(in *networking.NATGatewayDestinationIP, out *v1alpha1.NATGatewayDestinationIP, s conversion.Scope) error {
-	out.IP = in.IP
-	out.Port = in.Port
-	out.EndPort = in.EndPort
-	return nil
-}
-
-// Convert_networking_NATGatewayDestinationIP_To_v1alpha1_NATGatewayDestinationIP is an autogenerated conversion function.
-func Convert_networking_NATGatewayDestinationIP_To_v1alpha1_NATGatewayDestinationIP(in *networking.NATGatewayDestinationIP, out *v1alpha1.NATGatewayDestinationIP, s conversion.Scope) error {
-	return autoConvert_networking_NATGatewayDestinationIP_To_v1alpha1_NATGatewayDestinationIP(in, out, s)
-}
-
-func autoConvert_v1alpha1_NATGatewayIP_To_networking_NATGatewayIP(in *v1alpha1.NATGatewayIP, out *networking.NATGatewayIP, s conversion.Scope) error {
-	out.Name = in.Name
-	return nil
-}
-
-// Convert_v1alpha1_NATGatewayIP_To_networking_NATGatewayIP is an autogenerated conversion function.
-func Convert_v1alpha1_NATGatewayIP_To_networking_NATGatewayIP(in *v1alpha1.NATGatewayIP, out *networking.NATGatewayIP, s conversion.Scope) error {
-	return autoConvert_v1alpha1_NATGatewayIP_To_networking_NATGatewayIP(in, out, s)
-}
-
-func autoConvert_networking_NATGatewayIP_To_v1alpha1_NATGatewayIP(in *networking.NATGatewayIP, out *v1alpha1.NATGatewayIP, s conversion.Scope) error {
-	out.Name = in.Name
-	return nil
-}
-
-// Convert_networking_NATGatewayIP_To_v1alpha1_NATGatewayIP is an autogenerated conversion function.
-func Convert_networking_NATGatewayIP_To_v1alpha1_NATGatewayIP(in *networking.NATGatewayIP, out *v1alpha1.NATGatewayIP, s conversion.Scope) error {
-	return autoConvert_networking_NATGatewayIP_To_v1alpha1_NATGatewayIP(in, out, s)
-}
-
-func autoConvert_v1alpha1_NATGatewayIPStatus_To_networking_NATGatewayIPStatus(in *v1alpha1.NATGatewayIPStatus, out *networking.NATGatewayIPStatus, s conversion.Scope) error {
-	out.Name = in.Name
-	out.IP = in.IP
-	return nil
-}
-
-// Convert_v1alpha1_NATGatewayIPStatus_To_networking_NATGatewayIPStatus is an autogenerated conversion function.
-func Convert_v1alpha1_NATGatewayIPStatus_To_networking_NATGatewayIPStatus(in *v1alpha1.NATGatewayIPStatus, out *networking.NATGatewayIPStatus, s conversion.Scope) error {
-	return autoConvert_v1alpha1_NATGatewayIPStatus_To_networking_NATGatewayIPStatus(in, out, s)
-}
-
-func autoConvert_networking_NATGatewayIPStatus_To_v1alpha1_NATGatewayIPStatus(in *networking.NATGatewayIPStatus, out *v1alpha1.NATGatewayIPStatus, s conversion.Scope) error {
-	out.Name = in.Name
-	out.IP = in.IP
-	return nil
-}
-
-// Convert_networking_NATGatewayIPStatus_To_v1alpha1_NATGatewayIPStatus is an autogenerated conversion function.
-func Convert_networking_NATGatewayIPStatus_To_v1alpha1_NATGatewayIPStatus(in *networking.NATGatewayIPStatus, out *v1alpha1.NATGatewayIPStatus, s conversion.Scope) error {
-	return autoConvert_networking_NATGatewayIPStatus_To_v1alpha1_NATGatewayIPStatus(in, out, s)
-}
-
 func autoConvert_v1alpha1_NATGatewayList_To_networking_NATGatewayList(in *v1alpha1.NATGatewayList, out *networking.NATGatewayList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	out.Items = *(*[]networking.NATGateway)(unsafe.Pointer(&in.Items))
@@ -929,58 +778,10 @@ func Convert_networking_NATGatewayList_To_v1alpha1_NATGatewayList(in *networking
 	return autoConvert_networking_NATGatewayList_To_v1alpha1_NATGatewayList(in, out, s)
 }
 
-func autoConvert_v1alpha1_NATGatewayRouting_To_networking_NATGatewayRouting(in *v1alpha1.NATGatewayRouting, out *networking.NATGatewayRouting, s conversion.Scope) error {
-	out.ObjectMeta = in.ObjectMeta
-	out.NetworkRef = in.NetworkRef
-	out.Destinations = *(*[]networking.NATGatewayDestination)(unsafe.Pointer(&in.Destinations))
-	return nil
-}
-
-// Convert_v1alpha1_NATGatewayRouting_To_networking_NATGatewayRouting is an autogenerated conversion function.
-func Convert_v1alpha1_NATGatewayRouting_To_networking_NATGatewayRouting(in *v1alpha1.NATGatewayRouting, out *networking.NATGatewayRouting, s conversion.Scope) error {
-	return autoConvert_v1alpha1_NATGatewayRouting_To_networking_NATGatewayRouting(in, out, s)
-}
-
-func autoConvert_networking_NATGatewayRouting_To_v1alpha1_NATGatewayRouting(in *networking.NATGatewayRouting, out *v1alpha1.NATGatewayRouting, s conversion.Scope) error {
-	out.ObjectMeta = in.ObjectMeta
-	out.NetworkRef = in.NetworkRef
-	out.Destinations = *(*[]v1alpha1.NATGatewayDestination)(unsafe.Pointer(&in.Destinations))
-	return nil
-}
-
-// Convert_networking_NATGatewayRouting_To_v1alpha1_NATGatewayRouting is an autogenerated conversion function.
-func Convert_networking_NATGatewayRouting_To_v1alpha1_NATGatewayRouting(in *networking.NATGatewayRouting, out *v1alpha1.NATGatewayRouting, s conversion.Scope) error {
-	return autoConvert_networking_NATGatewayRouting_To_v1alpha1_NATGatewayRouting(in, out, s)
-}
-
-func autoConvert_v1alpha1_NATGatewayRoutingList_To_networking_NATGatewayRoutingList(in *v1alpha1.NATGatewayRoutingList, out *networking.NATGatewayRoutingList, s conversion.Scope) error {
-	out.ListMeta = in.ListMeta
-	out.Items = *(*[]networking.NATGatewayRouting)(unsafe.Pointer(&in.Items))
-	return nil
-}
-
-// Convert_v1alpha1_NATGatewayRoutingList_To_networking_NATGatewayRoutingList is an autogenerated conversion function.
-func Convert_v1alpha1_NATGatewayRoutingList_To_networking_NATGatewayRoutingList(in *v1alpha1.NATGatewayRoutingList, out *networking.NATGatewayRoutingList, s conversion.Scope) error {
-	return autoConvert_v1alpha1_NATGatewayRoutingList_To_networking_NATGatewayRoutingList(in, out, s)
-}
-
-func autoConvert_networking_NATGatewayRoutingList_To_v1alpha1_NATGatewayRoutingList(in *networking.NATGatewayRoutingList, out *v1alpha1.NATGatewayRoutingList, s conversion.Scope) error {
-	out.ListMeta = in.ListMeta
-	out.Items = *(*[]v1alpha1.NATGatewayRouting)(unsafe.Pointer(&in.Items))
-	return nil
-}
-
-// Convert_networking_NATGatewayRoutingList_To_v1alpha1_NATGatewayRoutingList is an autogenerated conversion function.
-func Convert_networking_NATGatewayRoutingList_To_v1alpha1_NATGatewayRoutingList(in *networking.NATGatewayRoutingList, out *v1alpha1.NATGatewayRoutingList, s conversion.Scope) error {
-	return autoConvert_networking_NATGatewayRoutingList_To_v1alpha1_NATGatewayRoutingList(in, out, s)
-}
-
 func autoConvert_v1alpha1_NATGatewaySpec_To_networking_NATGatewaySpec(in *v1alpha1.NATGatewaySpec, out *networking.NATGatewaySpec, s conversion.Scope) error {
 	out.Type = networking.NATGatewayType(in.Type)
-	out.IPFamilies = *(*[]v1.IPFamily)(unsafe.Pointer(&in.IPFamilies))
-	out.IPs = *(*[]networking.NATGatewayIP)(unsafe.Pointer(&in.IPs))
+	out.IPFamily = v1.IPFamily(in.IPFamily)
 	out.NetworkRef = in.NetworkRef
-	out.NetworkInterfaceSelector = (*metav1.LabelSelector)(unsafe.Pointer(in.NetworkInterfaceSelector))
 	out.PortsPerNetworkInterface = (*int32)(unsafe.Pointer(in.PortsPerNetworkInterface))
 	return nil
 }
@@ -992,10 +793,8 @@ func Convert_v1alpha1_NATGatewaySpec_To_networking_NATGatewaySpec(in *v1alpha1.N
 
 func autoConvert_networking_NATGatewaySpec_To_v1alpha1_NATGatewaySpec(in *networking.NATGatewaySpec, out *v1alpha1.NATGatewaySpec, s conversion.Scope) error {
 	out.Type = v1alpha1.NATGatewayType(in.Type)
-	out.IPFamilies = *(*[]v1.IPFamily)(unsafe.Pointer(&in.IPFamilies))
-	out.IPs = *(*[]v1alpha1.NATGatewayIP)(unsafe.Pointer(&in.IPs))
+	out.IPFamily = v1.IPFamily(in.IPFamily)
 	out.NetworkRef = in.NetworkRef
-	out.NetworkInterfaceSelector = (*metav1.LabelSelector)(unsafe.Pointer(in.NetworkInterfaceSelector))
 	out.PortsPerNetworkInterface = (*int32)(unsafe.Pointer(in.PortsPerNetworkInterface))
 	return nil
 }
@@ -1006,8 +805,7 @@ func Convert_networking_NATGatewaySpec_To_v1alpha1_NATGatewaySpec(in *networking
 }
 
 func autoConvert_v1alpha1_NATGatewayStatus_To_networking_NATGatewayStatus(in *v1alpha1.NATGatewayStatus, out *networking.NATGatewayStatus, s conversion.Scope) error {
-	out.IPs = *(*[]networking.NATGatewayIPStatus)(unsafe.Pointer(&in.IPs))
-	out.PortsUsed = (*int32)(unsafe.Pointer(in.PortsUsed))
+	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
 	return nil
 }
 
@@ -1017,8 +815,7 @@ func Convert_v1alpha1_NATGatewayStatus_To_networking_NATGatewayStatus(in *v1alph
 }
 
 func autoConvert_networking_NATGatewayStatus_To_v1alpha1_NATGatewayStatus(in *networking.NATGatewayStatus, out *v1alpha1.NATGatewayStatus, s conversion.Scope) error {
-	out.IPs = *(*[]v1alpha1.NATGatewayIPStatus)(unsafe.Pointer(&in.IPs))
-	out.PortsUsed = (*int32)(unsafe.Pointer(in.PortsUsed))
+	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
 	return nil
 }
 
