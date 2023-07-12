@@ -94,13 +94,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.LoadBalancerSpec":             schema_onmetal_api_api_networking_v1alpha1_LoadBalancerSpec(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.LoadBalancerStatus":           schema_onmetal_api_api_networking_v1alpha1_LoadBalancerStatus(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NATGateway":                   schema_onmetal_api_api_networking_v1alpha1_NATGateway(ref),
-		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NATGatewayDestination":        schema_onmetal_api_api_networking_v1alpha1_NATGatewayDestination(ref),
-		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NATGatewayDestinationIP":      schema_onmetal_api_api_networking_v1alpha1_NATGatewayDestinationIP(ref),
-		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NATGatewayIP":                 schema_onmetal_api_api_networking_v1alpha1_NATGatewayIP(ref),
-		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NATGatewayIPStatus":           schema_onmetal_api_api_networking_v1alpha1_NATGatewayIPStatus(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NATGatewayList":               schema_onmetal_api_api_networking_v1alpha1_NATGatewayList(ref),
-		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NATGatewayRouting":            schema_onmetal_api_api_networking_v1alpha1_NATGatewayRouting(ref),
-		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NATGatewayRoutingList":        schema_onmetal_api_api_networking_v1alpha1_NATGatewayRoutingList(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NATGatewaySpec":               schema_onmetal_api_api_networking_v1alpha1_NATGatewaySpec(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NATGatewayStatus":             schema_onmetal_api_api_networking_v1alpha1_NATGatewayStatus(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.Network":                      schema_onmetal_api_api_networking_v1alpha1_Network(ref),
@@ -3046,138 +3040,6 @@ func schema_onmetal_api_api_networking_v1alpha1_NATGateway(ref common.ReferenceC
 	}
 }
 
-func schema_onmetal_api_api_networking_v1alpha1_NATGatewayDestination(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"name": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Name is the name of the referenced entity.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"uid": {
-						SchemaProps: spec.SchemaProps{
-							Description: "UID is the UID of the referenced entity.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"ips": {
-						SchemaProps: spec.SchemaProps{
-							Description: "IPs are the nat gateway ips used.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("github.com/onmetal/onmetal-api/api/networking/v1alpha1.NATGatewayDestinationIP"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"name", "uid", "ips"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NATGatewayDestinationIP"},
-	}
-}
-
-func schema_onmetal_api_api_networking_v1alpha1_NATGatewayDestinationIP(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"ip": {
-						SchemaProps: spec.SchemaProps{
-							Description: "IP is the ip used for the NAT gateway.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("github.com/onmetal/onmetal-api/api/common/v1alpha1.IP"),
-						},
-					},
-					"port": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Port is the first port used by the destination.",
-							Default:     0,
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"endPort": {
-						SchemaProps: spec.SchemaProps{
-							Description: "EndPort is the last port used by the destination.",
-							Default:     0,
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-				},
-				Required: []string{"ip", "port", "endPort"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/api/common/v1alpha1.IP"},
-	}
-}
-
-func schema_onmetal_api_api_networking_v1alpha1_NATGatewayIP(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"name": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Name is the name to associate with the NAT gateway IP.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-				Required: []string{"name"},
-			},
-		},
-	}
-}
-
-func schema_onmetal_api_api_networking_v1alpha1_NATGatewayIPStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"name": {
-						SchemaProps: spec.SchemaProps{
-							Default: "",
-							Type:    []string{"string"},
-							Format:  "",
-						},
-					},
-					"ip": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("github.com/onmetal/onmetal-api/api/common/v1alpha1.IP"),
-						},
-					},
-				},
-				Required: []string{"name", "ip"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/api/common/v1alpha1.IP"},
-	}
-}
-
 func schema_onmetal_api_api_networking_v1alpha1_NATGatewayList(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -3227,112 +3089,6 @@ func schema_onmetal_api_api_networking_v1alpha1_NATGatewayList(ref common.Refere
 	}
 }
 
-func schema_onmetal_api_api_networking_v1alpha1_NATGatewayRouting(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "NATGatewayRouting is the Schema for the natgatewayroutings API",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"networkRef": {
-						SchemaProps: spec.SchemaProps{
-							Description: "NetworkRef is the network the NAT gateway is assigned to.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference"),
-						},
-					},
-					"destinations": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Destinations are the destinations for an NATGateway.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("github.com/onmetal/onmetal-api/api/networking/v1alpha1.NATGatewayDestination"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"networkRef", "destinations"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference", "github.com/onmetal/onmetal-api/api/networking/v1alpha1.NATGatewayDestination", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
-	}
-}
-
-func schema_onmetal_api_api_networking_v1alpha1_NATGatewayRoutingList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "NATGatewayRoutingList contains a list of NATGatewayRouting",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("github.com/onmetal/onmetal-api/api/networking/v1alpha1.NATGatewayRouting"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NATGatewayRouting", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
-	}
-}
-
 func schema_onmetal_api_api_networking_v1alpha1_NATGatewaySpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -3348,39 +3104,13 @@ func schema_onmetal_api_api_networking_v1alpha1_NATGatewaySpec(ref common.Refere
 							Format:      "",
 						},
 					},
-					"ipFamilies": {
+					"ipFamily": {
 						SchemaProps: spec.SchemaProps{
-							Description: "IPFamilies are the ip families the load balancer should have.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
-									},
-								},
-							},
-						},
-					},
-					"ips": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-patch-merge-key": "name",
-								"x-kubernetes-patch-strategy":  "merge,retainKeys",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Description: "IPs are the ips the NAT gateway should allocate.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("github.com/onmetal/onmetal-api/api/networking/v1alpha1.NATGatewayIP"),
-									},
-								},
-							},
+							Description: "IPFamily is the ip family the NAT gateway should have.\n\nPossible enum values:\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+							Enum:        []interface{}{"IPv4", "IPv6"},
 						},
 					},
 					"networkRef": {
@@ -3388,12 +3118,6 @@ func schema_onmetal_api_api_networking_v1alpha1_NATGatewaySpec(ref common.Refere
 							Description: "NetworkRef is the Network this NATGateway should belong to.",
 							Default:     map[string]interface{}{},
 							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
-						},
-					},
-					"networkInterfaceSelector": {
-						SchemaProps: spec.SchemaProps{
-							Description: "NetworkInterfaceSelector defines the NetworkInterfaces for which this NATGateway should be applied",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"),
 						},
 					},
 					"portsPerNetworkInterface": {
@@ -3404,11 +3128,11 @@ func schema_onmetal_api_api_networking_v1alpha1_NATGatewaySpec(ref common.Refere
 						},
 					},
 				},
-				Required: []string{"type", "ipFamilies", "networkRef"},
+				Required: []string{"type", "ipFamily", "networkRef"},
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NATGatewayIP", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"},
+			"k8s.io/api/core/v1.LocalObjectReference"},
 	}
 }
 
@@ -3427,24 +3151,17 @@ func schema_onmetal_api_api_networking_v1alpha1_NATGatewayStatus(ref common.Refe
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/onmetal/onmetal-api/api/networking/v1alpha1.NATGatewayIPStatus"),
+										Ref:     ref("github.com/onmetal/onmetal-api/api/common/v1alpha1.IP"),
 									},
 								},
 							},
-						},
-					},
-					"portsUsed": {
-						SchemaProps: spec.SchemaProps{
-							Description: "PortsUsed is the number of used ports.",
-							Type:        []string{"integer"},
-							Format:      "int32",
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NATGatewayIPStatus"},
+			"github.com/onmetal/onmetal-api/api/common/v1alpha1.IP"},
 	}
 }
 

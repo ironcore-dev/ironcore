@@ -20,7 +20,6 @@ import (
 	onmetalapivalidation "github.com/onmetal/onmetal-api/internal/api/validation"
 	"github.com/onmetal/onmetal-api/internal/apis/networking"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
-	metav1validation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
@@ -40,18 +39,7 @@ func validateNATGatewaySpec(spec *networking.NATGatewaySpec, fldPath *field.Path
 
 	allErrs = append(allErrs, validateNATGatewayType(spec.Type, fldPath.Child("type"))...)
 
-	allErrs = append(allErrs, onmetalapivalidation.ValidateIPFamilies(spec.IPFamilies, fldPath.Child("ipFamilies"))...)
-
-	seenIPNames := sets.New[string]()
-	for i, ip := range spec.IPs {
-		ipFieldPath := fldPath.Child("ips").Index(i)
-		if seenIPNames.Has(ip.Name) {
-			allErrs = append(allErrs, field.Duplicate(ipFieldPath.Child("name"), ip.Name))
-		} else {
-			seenIPNames.Insert(ip.Name)
-		}
-		allErrs = append(allErrs, validateNATGatewayIP(ip, ipFieldPath)...)
-	}
+	allErrs = append(allErrs, onmetalapivalidation.ValidateIPFamily(spec.IPFamily, fldPath.Child("ipFamily"))...)
 
 	for _, msg := range apivalidation.NameIsDNSLabel(spec.NetworkRef.Name, false) {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("networkRef").Child("name"), spec.NetworkRef.Name, msg))
@@ -60,8 +48,6 @@ func validateNATGatewaySpec(spec *networking.NATGatewaySpec, fldPath *field.Path
 	if spec.PortsPerNetworkInterface != nil {
 		allErrs = append(allErrs, onmetalapivalidation.ValidatePowerOfTwo(int64(*spec.PortsPerNetworkInterface), fldPath.Child("portsPerNetworkInterface"))...)
 	}
-
-	allErrs = append(allErrs, metav1validation.ValidateLabelSelector(spec.NetworkInterfaceSelector, metav1validation.LabelSelectorValidationOptions{}, fldPath.Child("networkInterfaceSelector"))...)
 
 	return allErrs
 }
@@ -72,16 +58,6 @@ var supportedNATGatewayTypes = sets.New(
 
 func validateNATGatewayType(natGatewayType networking.NATGatewayType, fldPath *field.Path) field.ErrorList {
 	return onmetalapivalidation.ValidateEnum(supportedNATGatewayTypes, natGatewayType, fldPath, "must specify type")
-}
-
-func validateNATGatewayIP(ip networking.NATGatewayIP, fldPath *field.Path) field.ErrorList {
-	var allErrs field.ErrorList
-
-	for _, msg := range apivalidation.NameIsDNSLabel(ip.Name, false) {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), ip.Name, msg))
-	}
-
-	return allErrs
 }
 
 // ValidateNATGatewayUpdate validates a NATGateway object before an update.

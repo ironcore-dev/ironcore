@@ -71,18 +71,6 @@ rules:
 - apiGroups:
   - networking.api.onmetal.de
   resources:
-  - natgatewayroutings
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - networking.api.onmetal.de
-  resources:
   - natgateways
   verbs:
   - create

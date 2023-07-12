@@ -39,39 +39,19 @@ const (
 type NATGatewaySpec struct {
 	// Type is the type of NATGateway.
 	Type NATGatewayType `json:"type"`
-	// IPFamilies are the ip families the load balancer should have.
-	IPFamilies []corev1.IPFamily `json:"ipFamilies"`
-	// IPs are the ips the NAT gateway should allocate.
-	// +optional
-	// +patchMergeKey=name
-	// +patchStrategy=merge,retainKeys
-	IPs []NATGatewayIP `json:"ips" patchStrategy:"merge,retainKeys" patchMergeKey:"name"`
+	// IPFamily is the ip family the NAT gateway should have.
+	IPFamily corev1.IPFamily `json:"ipFamily"`
 	// NetworkRef is the Network this NATGateway should belong to.
 	NetworkRef corev1.LocalObjectReference `json:"networkRef"`
-	// NetworkInterfaceSelector defines the NetworkInterfaces
-	// for which this NATGateway should be applied
-	NetworkInterfaceSelector *metav1.LabelSelector `json:"networkInterfaceSelector,omitempty"`
 	// PortsPerNetworkInterface defines the number of concurrent connections per target network interface.
 	// Has to be a power of 2. If empty, 2048 (DefaultPortsPerNetworkInterface) is the default.
 	PortsPerNetworkInterface *int32 `json:"portsPerNetworkInterface,omitempty"`
 }
 
-type NATGatewayIP struct {
-	// Name is the name to associate with the NAT gateway IP.
-	Name string `json:"name"`
-}
-
 // NATGatewayStatus defines the observed state of NATGateway
 type NATGatewayStatus struct {
 	// IPs are the IPs allocated for the NAT gateway.
-	IPs []NATGatewayIPStatus `json:"ips,omitempty"`
-	// PortsUsed is the number of used ports.
-	PortsUsed *int32 `json:"portsUsed,omitempty"`
-}
-
-type NATGatewayIPStatus struct {
-	Name string            `json:"name"`
-	IP   commonv1alpha1.IP `json:"ip"`
+	IPs []commonv1alpha1.IP `json:"ips,omitempty"`
 }
 
 // +genclient
