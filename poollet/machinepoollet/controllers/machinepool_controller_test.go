@@ -15,11 +15,10 @@
 package controllers_test
 
 import (
-	"time"
-
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	"github.com/onmetal/onmetal-api/ori/testing/machine"
 	testingmachine "github.com/onmetal/onmetal-api/ori/testing/machine"
 	"github.com/onmetal/onmetal-api/utils/quota"
 	. "github.com/onsi/ginkgo/v2"
@@ -30,12 +29,8 @@ import (
 	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 )
 
-const (
-	TestMachinePool = "test-machinepool"
-)
-
 var _ = Describe("MachinePoolController", func() {
-	ns, _, mc, srv := SetupTest()
+	ns, mp, mc, srv := SetupTest()
 
 	It("should calculate pool capacity", func(ctx SpecContext) {
 		var (
@@ -52,14 +47,6 @@ var _ = Describe("MachinePoolController", func() {
 			SharedMemory: sharedMemory.AsDec().UnscaledBig().Uint64(),
 			StaticMemory: staticMemory.AsDec().UnscaledBig().Uint64(),
 		})
-
-		By("creating a machine pool")
-		machinePool := &computev1alpha1.MachinePool{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: TestMachinePool,
-			},
-		}
-		Expect(k8sClient.Create(ctx, machinePool)).To(Succeed(), "failed to create machine pool")
 
 		By("creating a second machine class")
 		mc2 := &computev1alpha1.MachineClass{
@@ -96,7 +83,7 @@ var _ = Describe("MachinePoolController", func() {
 		})
 
 		By("checking if the capacity is correct")
-		Eventually(Object(machinePool)).Within(time.Second).Should(SatisfyAll(
+		Eventually(Object(mp)).Should(SatisfyAll(
 			HaveField("Status.Capacity", Satisfy(func(capacity corev1alpha1.ResourceList) bool {
 				return quota.Equals(capacity, corev1alpha1.ResourceList{
 					corev1alpha1.SharedResourceCPU:    sharedCpu,
@@ -118,14 +105,14 @@ var _ = Describe("MachinePoolController", func() {
 					Name: mc2.Name,
 				},
 				MachinePoolRef: &corev1.LocalObjectReference{
-					Name: machinePool.Name,
+					Name: mp.Name,
 				},
 			},
 		}
 		Expect(k8sClient.Create(ctx, machine)).To(Succeed(), "failed to create machine")
 
 		By("checking if the allocatable resources are correct")
-		Eventually(Object(machinePool)).Within(time.Second).Should(SatisfyAll(
+		Eventually(Object(mp)).Should(SatisfyAll(
 			HaveField("Status.Allocatable", Satisfy(func(allocatable corev1alpha1.ResourceList) bool {
 				return quota.Equals(allocatable, corev1alpha1.ResourceList{
 					corev1alpha1.SharedResourceCPU:    resource.MustParse("8"),
@@ -147,14 +134,14 @@ var _ = Describe("MachinePoolController", func() {
 					Name: mc.Name,
 				},
 				MachinePoolRef: &corev1.LocalObjectReference{
-					Name: machinePool.Name,
+					Name: mp.Name,
 				},
 			},
 		}
 		Expect(k8sClient.Create(ctx, machine2)).To(Succeed(), "failed to create test machine class")
 
 		By("checking if the allocatable resources are correct")
-		Eventually(Object(machinePool)).Within(time.Second).Should(SatisfyAll(
+		Eventually(Object(mp)).Should(SatisfyAll(
 			HaveField("Status.Allocatable", Satisfy(func(allocatable corev1alpha1.ResourceList) bool {
 				return quota.Equals(allocatable, corev1alpha1.ResourceList{
 					corev1alpha1.SharedResourceCPU:    resource.MustParse("8"),
@@ -165,4 +152,91 @@ var _ = Describe("MachinePoolController", func() {
 			})),
 		))
 	})
+
+	It("should add machine classes to pool", func(ctx SpecContext) {
+		srv.SetMachineClasses([]*machine.FakeMachineClass{})
+
+		By("creating a machine class")
+		mc := &computev1alpha1.MachineClass{
+			ObjectMeta: metav1.ObjectMeta{
+				GenerateName: "test-mc-1-",
+			},
+			Capabilities: corev1alpha1.ResourceList{
+				corev1alpha1.ResourceCPU:    resource.MustParse("2"),
+				corev1alpha1.ResourceMemory: resource.MustParse("2Gi"),
+			},
+		}
+		Expect(k8sClient.Create(ctx, mc)).To(Succeed(), "failed to create test machine class")
+
+		srv.SetMachineClasses([]*machine.FakeMachineClass{
+			{
+				MachineClass: ori.MachineClass{
+					Name: mc.Name,
+					Capabilities: &ori.MachineClassCapabilities{
+						CpuMillis:   mc.Capabilities.CPU().MilliValue(),
+						MemoryBytes: mc.Capabilities.Memory().AsDec().UnscaledBig().Uint64(),
+					},
+				},
+			},
+		})
+
+		By("checking if the default machine class is present")
+		Eventually(Object(mp)).Should(SatisfyAll(
+			HaveField("Status.AvailableMachineClasses", Equal([]corev1.LocalObjectReference{
+				{
+					Name: mc.Name,
+				},
+			}))),
+		)
+
+		By("creating a second machine class")
+		mc2 := &computev1alpha1.MachineClass{
+			ObjectMeta: metav1.ObjectMeta{
+				GenerateName: "test-mc-2-",
+			},
+			Capabilities: corev1alpha1.ResourceList{
+				corev1alpha1.ResourceCPU:    resource.MustParse("3"),
+				corev1alpha1.ResourceMemory: resource.MustParse("4Gi"),
+			},
+		}
+		Expect(k8sClient.Create(ctx, mc2)).To(Succeed(), "failed to create test machine class")
+
+		Eventually(Object(mp)).Should(SatisfyAll(
+			HaveField("Status.AvailableMachineClasses", HaveLen(1))),
+		)
+
+		srv.SetMachineClasses([]*machine.FakeMachineClass{
+			{
+				MachineClass: ori.MachineClass{
+					Name: mc.Name,
+					Capabilities: &ori.MachineClassCapabilities{
+						CpuMillis:   mc.Capabilities.CPU().MilliValue(),
+						MemoryBytes: mc.Capabilities.Memory().AsDec().UnscaledBig().Uint64(),
+					},
+				},
+			},
+			{
+				MachineClass: ori.MachineClass{
+					Name: mc2.Name,
+					Capabilities: &ori.MachineClassCapabilities{
+						CpuMillis:   mc2.Capabilities.CPU().MilliValue(),
+						MemoryBytes: mc2.Capabilities.Memory().AsDec().UnscaledBig().Uint64(),
+					},
+				},
+			},
+		})
+
+		By("checking if the second machine class is present")
+		Eventually(Object(mp)).Should(SatisfyAll(
+			HaveField("Status.AvailableMachineClasses", ConsistOf(
+				corev1.LocalObjectReference{
+					Name: mc.Name,
+				},
+				corev1.LocalObjectReference{
+					Name: mc2.Name,
+				},
+			))),
+		)
+	})
+
 })

@@ -211,7 +211,9 @@ func SetupTest() (*corev1.Namespace, *computev1alpha1.MachinePool, *computev1alp
 		Expect(machinepoolletclient.SetupNATGatewayRoutingNetworkRefNameField(ctx, indexer)).To(Succeed())
 		Expect(machinepoolletclient.SetupMachineMachinePoolRefNameField(ctx, indexer)).To(Succeed())
 
-		machineClassMapper := mcm.NewGeneric(srv, mcm.GenericOptions{})
+		machineClassMapper := mcm.NewGeneric(srv, mcm.GenericOptions{
+			RelistPeriod: 2 * time.Second,
+		})
 		Expect(k8sManager.Add(machineClassMapper)).To(Succeed())
 
 		mgrCtx, cancel := context.WithCancel(context.Background())
@@ -247,11 +249,15 @@ func SetupTest() (*corev1.Namespace, *computev1alpha1.MachinePool, *computev1alp
 
 		Expect((&controllers.MachinePoolReconciler{
 			Client:             k8sManager.GetClient(),
-			MachinePoolName:    TestMachinePool,
-			Addresses:          []computev1alpha1.MachinePoolAddress{},
-			Port:               8080,
 			MachineRuntime:     srv,
 			MachineClassMapper: machineClassMapper,
+			MachinePoolName:    mp.Name,
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
+		Expect((&controllers.MachinePoolAnnotatorReconciler{
+			Client:             k8sManager.GetClient(),
+			MachineClassMapper: machineClassMapper,
+			MachinePoolName:    mp.Name,
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		go func() {

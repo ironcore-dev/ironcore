@@ -17,9 +17,10 @@ package controllers
 import (
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	utilslices "github.com/onmetal/onmetal-api/utils/slices"
+	"golang.org/x/exp/constraints"
 )
 
-func Max[T uint64 | int64](x, y T) T {
+func Max[T constraints.Ordered](x, y T) T {
 	if x < y {
 		return y
 	}
