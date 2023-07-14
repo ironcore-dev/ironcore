@@ -21,7 +21,6 @@ import (
 	loadbalancerstorage "github.com/onmetal/onmetal-api/internal/registry/networking/loadbalancer/storage"
 	loadbalancerroutingstorage "github.com/onmetal/onmetal-api/internal/registry/networking/loadbalancerrouting/storage"
 	natgatewaystorage "github.com/onmetal/onmetal-api/internal/registry/networking/natgateway/storage"
-	natgatewayroutingstorage "github.com/onmetal/onmetal-api/internal/registry/networking/natgatewayrouting/storage"
 	networkstorage "github.com/onmetal/onmetal-api/internal/registry/networking/network/storage"
 	networkinterfacestorage "github.com/onmetal/onmetal-api/internal/registry/networking/networkinterface/storage"
 	networkpolicystorage "github.com/onmetal/onmetal-api/internal/registry/networking/networkpolicy/storage"
@@ -114,13 +113,6 @@ func (p StorageProvider) v1alpha1Storage(restOptionsGetter generic.RESTOptionsGe
 
 	storageMap["natgateways"] = natGatewayStorage.NATGateway
 	storageMap["natgateways/status"] = natGatewayStorage.Status
-
-	natGatewayRoutingStorage, err := natgatewayroutingstorage.NewStorage(restOptionsGetter)
-	if err != nil {
-		return storageMap, err
-	}
-
-	storageMap["natgatewayroutings"] = natGatewayRoutingStorage.NATGatewayRouting
 
 	return storageMap, nil
 }

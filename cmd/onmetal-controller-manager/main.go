@@ -86,7 +86,6 @@ const (
 	networkInterfaceBindController = "networkinterfacebind"
 	virtualIPController            = "virtualip"
 	loadBalancerController         = "loadbalancer"
-	natGatewayController           = "natgateway"
 
 	resourceQuotaController       = "resourcequota"
 	certificateApprovalController = "certificateapproval"
@@ -130,7 +129,7 @@ func main() {
 
 		// Networking controllers
 		networkBindController, networkProtectionController,
-		networkInterfaceController, networkInterfaceBindController, virtualIPController, loadBalancerController, natGatewayController,
+		networkInterfaceController, networkInterfaceBindController, virtualIPController, loadBalancerController,
 
 		// IPAM controllers
 		prefixController, prefixAllocationScheduler,
@@ -362,17 +361,6 @@ func main() {
 		}
 	}
 
-	if controllers.Enabled(natGatewayController) {
-		if err := (&networkingcontrollers.NATGatewayReconciler{
-			Client:        mgr.GetClient(),
-			Scheme:        mgr.GetScheme(),
-			EventRecorder: mgr.GetEventRecorderFor("natgateways"),
-		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "NATGateway")
-			os.Exit(1)
-		}
-	}
-
 	if controllers.Enabled(resourceQuotaController) {
 		registry := quota.NewRegistry(mgr.GetScheme())
 		if err := quota.AddAllToRegistry(registry, quotaevaluatoronmetal.NewEvaluatorsForControllers(mgr.GetClient())); err != nil {
@@ -488,7 +476,7 @@ func main() {
 		}
 	}
 
-	if controllers.AnyEnabled(natGatewayController, networkProtectionController) {
+	if controllers.AnyEnabled(networkProtectionController) {
 		if err := networkingclient.SetupNATGatewayNetworkNameFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
 			setupLog.Error(err, "unable to setup field indexer", "field", networkingclient.NATGatewayNetworkNameField)
 			os.Exit(1)
@@ -509,7 +497,7 @@ func main() {
 		}
 	}
 
-	if controllers.AnyEnabled(loadBalancerController, natGatewayController, networkProtectionController, networkInterfaceController) {
+	if controllers.AnyEnabled(loadBalancerController, networkProtectionController, networkInterfaceController) {
 		if err := networkingclient.SetupNetworkInterfaceNetworkNameFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
 			setupLog.Error(err, "unable to setup field indexer", "field", networkingclient.NetworkInterfaceSpecNetworkRefNameField)
 			os.Exit(1)

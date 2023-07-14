@@ -29,8 +29,6 @@ type Interface interface {
 	LoadBalancerRoutings() LoadBalancerRoutingInformer
 	// NATGateways returns a NATGatewayInformer.
 	NATGateways() NATGatewayInformer
-	// NATGatewayRoutings returns a NATGatewayRoutingInformer.
-	NATGatewayRoutings() NATGatewayRoutingInformer
 	// Networks returns a NetworkInformer.
 	Networks() NetworkInformer
 	// NetworkInterfaces returns a NetworkInterfaceInformer.
@@ -65,11 +63,6 @@ func (v *version) LoadBalancerRoutings() LoadBalancerRoutingInformer {
 // NATGateways returns a NATGatewayInformer.
 func (v *version) NATGateways() NATGatewayInformer {
 	return &nATGatewayInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
-}
-
-// NATGatewayRoutings returns a NATGatewayRoutingInformer.
-func (v *version) NATGatewayRoutings() NATGatewayRoutingInformer {
-	return &nATGatewayRoutingInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // Networks returns a NetworkInformer.
