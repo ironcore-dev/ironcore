@@ -8,6 +8,33 @@ The following parties are involved in implementing `exec`:
 * `machinepollet`
 * `ori-machine` implementor
 
+The connection flow between those components looks like the following:
+
+```mermaid
+sequenceDiagram
+    participant User as user
+    participant OA as onmetal-apiserver
+    participant MP as machinepoollet
+    participant OM as ori-machine implementor
+
+    User->>OA: exec request with machine name
+    Note over OA: Get machine by name
+    Note over OA: Get machine pool
+    Note over OA: Find suitable address & port
+    Note over OA: Create URL for exec request
+    OA->>MP: HTTP request to exec URL
+    Note over MP: Check authentication & authorization
+    MP->>OM: Call Exec method
+    Note over OM: Provide functioning Exec implementation
+    Note over OM: ori-machine implementor generates unique token
+    Note over OM: Token-associated URL is called
+    Note over OM: Calls exec on its target
+    Note over OM: Proxies response from the onmetal-apiserver to the requester
+    OM-->>MP: Returns URL for exec session
+    MP-->>OA: Proxy response
+    OA-->>User: Proxy response
+```
+
 ## `onmetal-apiserver`
 
 The `onmetal-apiserver` implements `exec` as a custom subresource

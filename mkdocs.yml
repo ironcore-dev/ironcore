@@ -48,7 +48,8 @@ markdown_extensions:
 
 nav:
 - Home: README.md
-- Concepts: README.md
+- Concepts:
+    - Machine Exec: concepts/machine-exec-flow.md
 - Architecture: README.md
 - Usage: README.md
 - Developer Guide:
