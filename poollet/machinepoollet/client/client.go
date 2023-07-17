@@ -98,20 +98,6 @@ func SetupLoadBalancerRoutingNetworkRefNameField(ctx context.Context, indexer cl
 	)
 }
 
-const NATGatewayRoutingNetworkRefNameField = "natgatewayrouting-networkref-name"
-
-func SetupNATGatewayRoutingNetworkRefNameField(ctx context.Context, indexer client.FieldIndexer) error {
-	return indexer.IndexField(
-		ctx,
-		&networkingv1alpha1.NATGatewayRouting{},
-		NATGatewayRoutingNetworkRefNameField,
-		func(object client.Object) []string {
-			natGatewayRouting := object.(*networkingv1alpha1.NATGatewayRouting)
-			return []string{natGatewayRouting.NetworkRef.Name}
-		},
-	)
-}
-
 const MachineMachinePoolRefNameField = "machine-machinepoolref-name"
 
 func SetupMachineMachinePoolRefNameField(ctx context.Context, indexer client.FieldIndexer) error {

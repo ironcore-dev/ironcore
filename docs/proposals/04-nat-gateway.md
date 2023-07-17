@@ -112,37 +112,3 @@ status:
   portsUsed: 128 # Equal to portsPerNetworkInterface * entries in routing destinations
 ```
 [//]: # (@formatter:on)
-
-### Routing State Object
-
-The actual routing of a `NATGateway` at a certain point in time is reflected via `NATGatewayRouting`
-(similar to `LoadBalancerRouting` / `AliasPrefixRouting`). It denotes the target `Network` instance (including
-the instance's `uid`) and the target `NetworkInterface`s alongside the used IPs and ports.
-
-[//]: # (@formatter:off)
-```yaml
-apiVersion: networking.api.onmetal.de/v1alpha1
-kind: NATGatewayRouting
-metadata: 
-  namespace: default
-  name: my-nat # Name is the same as the nat gateway the routing originates from.
-# networkRef is a reference to the network instance all network interfaces are part of.
-networkRef:
-  name: my-network
-# destinations lists the target network interface instances alongside the ip
-# and port range used for them.
-destinations:
-  - name: my-machine-interface-1
-    uid: 2020dcf9-e030-427e-b0fc-4fec2016e73a
-    ips:
-      - ip: 45.86.152.12
-        port: 1024
-        portEnd: 1087
-  - name: my-machine-interface-2
-    uid: 2020dcf9-e030-427e-b0fc-4fec2016e73d
-    ips:
-      - ip: 45.86.152.12
-        port: 1088
-        portEnd: 1151
-```
-[//]: # (@formatter:on)

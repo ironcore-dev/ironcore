@@ -292,9 +292,6 @@ func Run(ctx context.Context, opts Options) error {
 	if err := machinepoolletclient.SetupLoadBalancerRoutingNetworkRefNameField(ctx, indexer); err != nil {
 		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.LoadBalancerRoutingNetworkRefNameField, err)
 	}
-	if err := machinepoolletclient.SetupNATGatewayRoutingNetworkRefNameField(ctx, indexer); err != nil {
-		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.NATGatewayRoutingNetworkRefNameField, err)
-	}
 
 	if err := machinepoolletclient.SetupMachineMachinePoolRefNameField(ctx, indexer); err != nil {
 		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.MachineMachinePoolRefNameField, err)

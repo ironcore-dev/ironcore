@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/bits-and-blooms/bitset v1.8.0
 	github.com/blang/semver/v4 v4.0.0
-	github.com/go-chi/chi/v5 v5.0.8
+	github.com/go-chi/chi/v5 v5.0.10
 	github.com/go-logr/logr v1.2.4
 	github.com/gogo/protobuf v1.3.2
 	github.com/google/go-cmp v0.5.9
@@ -30,7 +30,7 @@ require (
 	k8s.io/kubectl v0.27.3
 	k8s.io/utils v0.0.0-20230209194617-a36077c30491
 	sigs.k8s.io/controller-runtime v0.15.0
-	sigs.k8s.io/structured-merge-diff/v4 v4.2.3
+	sigs.k8s.io/structured-merge-diff/v4 v4.3.0
 	sigs.k8s.io/yaml v1.3.0
 )
 

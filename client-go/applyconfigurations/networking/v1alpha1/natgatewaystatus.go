@@ -17,11 +17,14 @@
 
 package v1alpha1
 
+import (
+	v1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+)
+
 // NATGatewayStatusApplyConfiguration represents an declarative configuration of the NATGatewayStatus type for use
 // with apply.
 type NATGatewayStatusApplyConfiguration struct {
-	IPs       []NATGatewayIPStatusApplyConfiguration `json:"ips,omitempty"`
-	PortsUsed *int32                                 `json:"portsUsed,omitempty"`
+	IPs []v1alpha1.IP `json:"ips,omitempty"`
 }
 
 // NATGatewayStatusApplyConfiguration constructs an declarative configuration of the NATGatewayStatus type for use with
@@ -33,20 +36,9 @@ func NATGatewayStatus() *NATGatewayStatusApplyConfiguration {
 // WithIPs adds the given value to the IPs field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the IPs field.
-func (b *NATGatewayStatusApplyConfiguration) WithIPs(values ...*NATGatewayIPStatusApplyConfiguration) *NATGatewayStatusApplyConfiguration {
+func (b *NATGatewayStatusApplyConfiguration) WithIPs(values ...v1alpha1.IP) *NATGatewayStatusApplyConfiguration {
 	for i := range values {
-		if values[i] == nil {
-			panic("nil value passed to WithIPs")
-		}
-		b.IPs = append(b.IPs, *values[i])
+		b.IPs = append(b.IPs, values[i])
 	}
-	return b
-}
-
-// WithPortsUsed sets the PortsUsed field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the PortsUsed field is set to the value of the last call.
-func (b *NATGatewayStatusApplyConfiguration) WithPortsUsed(value int32) *NATGatewayStatusApplyConfiguration {
-	b.PortsUsed = &value
 	return b
 }

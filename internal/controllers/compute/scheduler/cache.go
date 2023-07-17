@@ -1,8 +1,11 @@
 package scheduler
 
 import (
+	"context"
 	"fmt"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"sync"
+	"time"
 
 	"github.com/go-logr/logr"
 	"github.com/onmetal/onmetal-api/api/compute/v1alpha1"
@@ -32,6 +35,9 @@ func (defaultCacheStrategy) Key(instance *v1alpha1.Machine) (types.UID, error) {
 }
 
 func (defaultCacheStrategy) ContainerKey(instance *v1alpha1.Machine) string {
+	if instance.Spec.MachinePoolRef == nil {
+		return ""
+	}
 	return instance.Spec.MachinePoolRef.Name
 }
 
@@ -184,6 +190,8 @@ func (c *Cache) IsAssumedInstance(instance *v1alpha1.Machine) (bool, error) {
 	}
 	log = log.WithValues("InstanceKey", key)
 
+	c.mu.RLock()
+	defer c.mu.RUnlock()
 	return c.assumedInstances.Has(key), nil
 }
 
@@ -237,8 +245,8 @@ func (c *Cache) FinishBinding(instance *v1alpha1.Machine) error {
 	}
 	log = log.WithValues("InstanceKey", key)
 
-	c.mu.Lock()
-	defer c.mu.Unlock()
+	c.mu.RLock()
+	defer c.mu.RUnlock()
 
 	log.V(5).Info("Finished binding for instance, can be expired")
 	currState, ok := c.instanceStates[key]
@@ -435,4 +443,35 @@ func (c *Cache) removeInstance(log logr.Logger, key types.UID, instance *v1alpha
 
 	c.assumedInstances.Delete(key)
 	delete(c.instanceStates, key)
+}
+
+func (c *Cache) cleanupAssumedInstances() {
+	log := c.log
+
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	for key := range c.assumedInstances {
+		log := log.WithValues("InstanceKey", key)
+		is, ok := c.instanceStates[key]
+		if !ok {
+			err := fmt.Errorf("instance key %s is assumed but no state recorded, potential logical error", key)
+			panic(err)
+		}
+
+		if !is.bindingFinished {
+			log.V(5).Info("Won't expire cache for an instance where binding is still in progress")
+			continue
+		}
+
+		log.V(5).Info("Removing expired instance")
+		c.removeInstance(log, key, is.instance)
+	}
+}
+
+func (c *Cache) Start(ctx context.Context) error {
+	wait.UntilWithContext(ctx, func(ctx context.Context) {
+		c.cleanupAssumedInstances()
+	}, 1*time.Second)
+	return nil
 }

@@ -174,13 +174,14 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 		Expect(networkingclient.SetupNetworkInterfaceNetworkNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 		Expect(networkingclient.SetupNetworkInterfaceVirtualIPNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 
-		log := ctrl.LoggerFrom(ctx)
+		schedulerCache := scheduler.NewCache(k8sManager.GetLogger(), scheduler.DefaultCacheStrategy)
+		Expect(k8sManager.Add(schedulerCache)).To(Succeed())
 
 		// register reconciler here
 		Expect((&MachineScheduler{
 			EventRecorder: &record.FakeRecorder{},
 			Client:        k8sManager.GetClient(),
-			Cache:         scheduler.NewCache(log, scheduler.DefaultCacheStrategy),
+			Cache:         schedulerCache,
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		Expect((&MachineReconciler{

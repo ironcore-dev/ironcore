@@ -228,7 +228,78 @@ func (s *MachineScheduler) enqueueUnscheduledMachines(ctx context.Context, queue
 		if !machine.DeletionTimestamp.IsZero() {
 			continue
 		}
+		if machine.Spec.MachinePoolRef != nil {
+			continue
+		}
 		queue.Add(ctrl.Request{NamespacedName: client.ObjectKeyFromObject(&machine)})
+	}
+}
+
+func (s *MachineScheduler) isMachineAssigned() predicate.Predicate {
+	return predicate.NewPredicateFuncs(func(obj client.Object) bool {
+		machine := obj.(*computev1alpha1.Machine)
+		return machine.Spec.MachinePoolRef != nil
+	})
+}
+
+func (s *MachineScheduler) isMachineNotAssigned() predicate.Predicate {
+	return predicate.NewPredicateFuncs(func(obj client.Object) bool {
+		machine := obj.(*computev1alpha1.Machine)
+		return machine.Spec.MachinePoolRef == nil
+	})
+}
+
+func (s *MachineScheduler) handleMachine() handler.EventHandler {
+	return handler.Funcs{
+		CreateFunc: func(ctx context.Context, evt event.CreateEvent, queue workqueue.RateLimitingInterface) {
+			machine := evt.Object.(*computev1alpha1.Machine)
+			log := ctrl.LoggerFrom(ctx)
+
+			if err := s.Cache.AddInstance(machine); err != nil {
+				log.Error(err, "Error adding machine to cache")
+			}
+		},
+		UpdateFunc: func(ctx context.Context, evt event.UpdateEvent, queue workqueue.RateLimitingInterface) {
+			log := ctrl.LoggerFrom(ctx)
+
+			oldInstance := evt.ObjectOld.(*computev1alpha1.Machine)
+			newInstance := evt.ObjectNew.(*computev1alpha1.Machine)
+			if err := s.Cache.UpdateInstance(oldInstance, newInstance); err != nil {
+				log.Error(err, "Error updating machine in cache")
+			}
+		},
+		DeleteFunc: func(ctx context.Context, evt event.DeleteEvent, queue workqueue.RateLimitingInterface) {
+			log := ctrl.LoggerFrom(ctx)
+
+			instance := evt.Object.(*computev1alpha1.Machine)
+			if err := s.Cache.RemoveInstance(instance); err != nil {
+				log.Error(err, "Error adding machine to cache")
+			}
+		},
+	}
+}
+
+func (s *MachineScheduler) handleMachinePool() handler.EventHandler {
+	return handler.Funcs{
+		CreateFunc: func(ctx context.Context, evt event.CreateEvent, queue workqueue.RateLimitingInterface) {
+			pool := evt.Object.(*computev1alpha1.MachinePool)
+			s.Cache.AddContainer(pool)
+			s.enqueueUnscheduledMachines(ctx, queue)
+		},
+		UpdateFunc: func(ctx context.Context, evt event.UpdateEvent, queue workqueue.RateLimitingInterface) {
+			oldPool := evt.ObjectOld.(*computev1alpha1.MachinePool)
+			newPool := evt.ObjectNew.(*computev1alpha1.MachinePool)
+			s.Cache.UpdateContainer(oldPool, newPool)
+			s.enqueueUnscheduledMachines(ctx, queue)
+		},
+		DeleteFunc: func(ctx context.Context, evt event.DeleteEvent, queue workqueue.RateLimitingInterface) {
+			log := ctrl.LoggerFrom(ctx)
+
+			pool := evt.Object.(*computev1alpha1.MachinePool)
+			if err := s.Cache.RemoveContainer(pool); err != nil {
+				log.Error(err, "Error removing machine pool from cache")
+			}
+		},
 	}
 }
 
@@ -242,35 +313,20 @@ func (s *MachineScheduler) SetupWithManager(mgr manager.Manager) error {
 		// Enqueue unscheduled machines.
 		For(&computev1alpha1.Machine{},
 			builder.WithPredicates(
-				predicate.NewPredicateFuncs(func(object client.Object) bool {
-					machine := object.(*computev1alpha1.Machine)
-					return machine.DeletionTimestamp.IsZero() && machine.Spec.MachinePoolRef == nil
-				}),
+				s.isMachineNotAssigned(),
+			),
+		).
+		Watches(
+			&computev1alpha1.Machine{},
+			s.handleMachine(),
+			builder.WithPredicates(
+				s.isMachineAssigned(),
 			),
 		).
 		// Enqueue unscheduled machines if a machine pool w/ required machine classes becomes available.
 		Watches(
 			&computev1alpha1.MachinePool{},
-			handler.Funcs{
-				CreateFunc: func(ctx context.Context, event event.CreateEvent, queue workqueue.RateLimitingInterface) {
-					pool := event.Object.(*computev1alpha1.MachinePool)
-					s.Cache.AddContainer(pool)
-					s.enqueueUnscheduledMachines(ctx, queue)
-				},
-				UpdateFunc: func(ctx context.Context, event event.UpdateEvent, queue workqueue.RateLimitingInterface) {
-					oldPool := event.ObjectOld.(*computev1alpha1.MachinePool)
-					newPool := event.ObjectNew.(*computev1alpha1.MachinePool)
-					s.Cache.UpdateContainer(oldPool, newPool)
-					s.enqueueUnscheduledMachines(ctx, queue)
-				},
-				GenericFunc: func(ctx context.Context, event event.GenericEvent, queue workqueue.RateLimitingInterface) {
-					log := ctrl.LoggerFrom(ctx)
-					pool := event.Object.(*computev1alpha1.MachinePool)
-					if err := s.Cache.RemoveContainer(pool); err != nil {
-						log.Error(err, "Error removing machine pool from cache")
-					}
-				},
-			},
+			s.handleMachinePool(),
 		).
 		Complete(s)
 }

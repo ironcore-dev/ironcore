@@ -120,14 +120,6 @@ rules:
 - apiGroups:
   - networking.api.onmetal.de
   resources:
-  - natgatewayroutings
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - networking.api.onmetal.de
-  resources:
   - natgateways
   verbs:
   - get

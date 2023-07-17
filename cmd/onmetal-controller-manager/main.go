@@ -29,6 +29,7 @@ import (
 	networkingclient "github.com/onmetal/onmetal-api/internal/client/networking"
 	storageclient "github.com/onmetal/onmetal-api/internal/client/storage"
 	computecontrollers "github.com/onmetal/onmetal-api/internal/controllers/compute"
+	"github.com/onmetal/onmetal-api/internal/controllers/compute/scheduler"
 	corecontrollers "github.com/onmetal/onmetal-api/internal/controllers/core"
 	certificateonmetal "github.com/onmetal/onmetal-api/internal/controllers/core/certificate/onmetal"
 	quotacontrollergeneric "github.com/onmetal/onmetal-api/internal/controllers/core/quota/generic"
@@ -86,7 +87,6 @@ const (
 	networkInterfaceBindController = "networkinterfacebind"
 	virtualIPController            = "virtualip"
 	loadBalancerController         = "loadbalancer"
-	natGatewayController           = "natgateway"
 
 	resourceQuotaController       = "resourcequota"
 	certificateApprovalController = "certificateapproval"
@@ -130,7 +130,7 @@ func main() {
 
 		// Networking controllers
 		networkBindController, networkProtectionController,
-		networkInterfaceController, networkInterfaceBindController, virtualIPController, loadBalancerController, natGatewayController,
+		networkInterfaceController, networkInterfaceBindController, virtualIPController, loadBalancerController,
 
 		// IPAM controllers
 		prefixController, prefixAllocationScheduler,
@@ -191,9 +191,16 @@ func main() {
 	}
 
 	if controllers.Enabled(machineSchedulerController) {
+		schedulerCache := scheduler.NewCache(mgr.GetLogger(), scheduler.DefaultCacheStrategy)
+		if mgr.Add(schedulerCache); err != nil {
+			setupLog.Error(err, "unable to create cache", "controller", "MachineSchedulerCache")
+			os.Exit(1)
+		}
+
 		if err := (&computecontrollers.MachineScheduler{
 			Client:        mgr.GetClient(),
 			EventRecorder: mgr.GetEventRecorderFor("machine-scheduler"),
+			Cache:         scheduler.NewCache(logger, scheduler.DefaultCacheStrategy),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "MachineScheduler")
 			os.Exit(1)
@@ -362,17 +369,6 @@ func main() {
 		}
 	}
 
-	if controllers.Enabled(natGatewayController) {
-		if err := (&networkingcontrollers.NATGatewayReconciler{
-			Client:        mgr.GetClient(),
-			Scheme:        mgr.GetScheme(),
-			EventRecorder: mgr.GetEventRecorderFor("natgateways"),
-		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "NATGateway")
-			os.Exit(1)
-		}
-	}
-
 	if controllers.Enabled(resourceQuotaController) {
 		registry := quota.NewRegistry(mgr.GetScheme())
 		if err := quota.AddAllToRegistry(registry, quotaevaluatoronmetal.NewEvaluatorsForControllers(mgr.GetClient())); err != nil {
@@ -488,7 +484,7 @@ func main() {
 		}
 	}
 
-	if controllers.AnyEnabled(natGatewayController, networkProtectionController) {
+	if controllers.AnyEnabled(networkProtectionController) {
 		if err := networkingclient.SetupNATGatewayNetworkNameFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
 			setupLog.Error(err, "unable to setup field indexer", "field", networkingclient.NATGatewayNetworkNameField)
 			os.Exit(1)
@@ -509,7 +505,7 @@ func main() {
 		}
 	}
 
-	if controllers.AnyEnabled(loadBalancerController, natGatewayController, networkProtectionController, networkInterfaceController) {
+	if controllers.AnyEnabled(loadBalancerController, networkProtectionController, networkInterfaceController) {
 		if err := networkingclient.SetupNetworkInterfaceNetworkNameFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
 			setupLog.Error(err, "unable to setup field indexer", "field", networkingclient.NetworkInterfaceSpecNetworkRefNameField)
 			os.Exit(1)

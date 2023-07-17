@@ -61,17 +61,6 @@ var _ = Describe("NATGateway", func() {
 			&networking.NATGateway{},
 			ContainElement(RequiredField("spec.type")),
 		),
-		Entry("duplicate ip name",
-			&networking.NATGateway{
-				Spec: networking.NATGatewaySpec{
-					IPs: []networking.NATGatewayIP{
-						{Name: "foo"},
-						{Name: "foo"},
-					},
-				},
-			},
-			ContainElement(DuplicateField("spec.ips[1].name")),
-		),
 		Entry("ports per nic not power of 2",
 			&networking.NATGateway{
 				Spec: networking.NATGatewaySpec{
@@ -99,23 +88,6 @@ var _ = Describe("NATGateway", func() {
 				},
 			},
 			ContainElement(ForbiddenField("spec.networkRef")),
-		),
-		Entry("mutable network interface selector",
-			&networking.NATGateway{
-				Spec: networking.NATGatewaySpec{
-					NetworkInterfaceSelector: &metav1.LabelSelector{
-						MatchLabels: map[string]string{"foo": "bar"},
-					},
-				},
-			},
-			&networking.NATGateway{
-				Spec: networking.NATGatewaySpec{
-					NetworkInterfaceSelector: &metav1.LabelSelector{
-						MatchLabels: map[string]string{"bar": "baz"},
-					},
-				},
-			},
-			Not(ContainElement(ForbiddenField("spec"))),
 		),
 	)
 })
