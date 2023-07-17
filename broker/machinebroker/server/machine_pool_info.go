@@ -39,10 +39,10 @@ func (s *Server) PoolInfo(ctx context.Context, req *ori.PoolInfoRequest) (*ori.P
 	)
 	for _, onmetalMachinePool := range onmetalMachinePoolList.Items {
 		staticCPU += onmetalMachinePool.Status.Capacity.Name(corev1alpha1.ResourceCPU, resource.DecimalSI).AsDec().UnscaledBig().Int64()
-		sharedCPU += onmetalMachinePool.Status.Capacity.Name(corev1alpha1.SharedResourceCPU, resource.DecimalSI).AsDec().UnscaledBig().Int64()
+		sharedCPU += onmetalMachinePool.Status.Capacity.Name(corev1alpha1.ResourceSharedCPU, resource.DecimalSI).AsDec().UnscaledBig().Int64()
 
 		staticMemory += onmetalMachinePool.Status.Capacity.Name(corev1alpha1.ResourceMemory, resource.BinarySI).AsDec().UnscaledBig().Uint64()
-		sharedMemory += onmetalMachinePool.Status.Capacity.Name(corev1alpha1.SharedResourceMemory, resource.BinarySI).AsDec().UnscaledBig().Uint64()
+		sharedMemory += onmetalMachinePool.Status.Capacity.Name(corev1alpha1.ResourceSharedMemory, resource.BinarySI).AsDec().UnscaledBig().Uint64()
 	}
 
 	return &ori.PoolInfoResponse{

@@ -97,9 +97,9 @@ func (r *MachinePoolReconciler) updateResources(log logr.Logger, status *compute
 	log.V(2).Info("Updating capacity resources")
 	status.Capacity = map[corev1alpha1.ResourceName]resource.Quantity{
 		corev1alpha1.ResourceCPU:          *resource.NewQuantity(poolInfo.StaticCpu, resource.DecimalSI),
-		corev1alpha1.SharedResourceCPU:    *resource.NewQuantity(poolInfo.SharedCpu, resource.DecimalSI),
+		corev1alpha1.ResourceSharedCPU:    *resource.NewQuantity(poolInfo.SharedCpu, resource.DecimalSI),
 		corev1alpha1.ResourceMemory:       *resource.NewQuantity(int64(poolInfo.StaticMemory), resource.BinarySI),
-		corev1alpha1.SharedResourceMemory: *resource.NewQuantity(int64(poolInfo.SharedMemory), resource.BinarySI),
+		corev1alpha1.ResourceSharedMemory: *resource.NewQuantity(int64(poolInfo.SharedMemory), resource.BinarySI),
 	}
 
 	if len(machines) == 0 {
@@ -139,8 +139,8 @@ func (r *MachinePoolReconciler) updateResources(log logr.Logger, status *compute
 		corev1alpha1.ResourceCPU:    *resource.NewQuantity(Max(0, poolInfo.StaticCpu-staticCPU), resource.DecimalSI),
 		corev1alpha1.ResourceMemory: *resource.NewQuantity(Max(0, int64(poolInfo.StaticMemory-staticMemory)), resource.BinarySI),
 
-		corev1alpha1.SharedResourceCPU:    *resource.NewQuantity(Max(0, poolInfo.SharedCpu-sharedCPU), resource.DecimalSI),
-		corev1alpha1.SharedResourceMemory: *resource.NewQuantity(Max(0, int64(poolInfo.SharedMemory-sharedMemory)), resource.BinarySI),
+		corev1alpha1.ResourceSharedCPU:    *resource.NewQuantity(Max(0, poolInfo.SharedCpu-sharedCPU), resource.DecimalSI),
+		corev1alpha1.ResourceSharedMemory: *resource.NewQuantity(Max(0, int64(poolInfo.SharedMemory-sharedMemory)), resource.BinarySI),
 	}
 
 }

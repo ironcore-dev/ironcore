@@ -40,10 +40,10 @@ const (
 	// SharedResourcesPrefix is the prefix used for the shared (virtual) resources.
 	SharedResourcesPrefix = "shared-"
 
-	// SharedResourceCPU is the amount of virtual cpu in cores.
-	SharedResourceCPU ResourceName = SharedResourcesPrefix + ResourceCPU
-	// SharedResourceMemory is the amount of virtual memory in bytes.
-	SharedResourceMemory ResourceName = SharedResourcesPrefix + ResourceMemory
+	// ResourceSharedCPU is the amount of virtual cpu in cores.
+	ResourceSharedCPU ResourceName = SharedResourcesPrefix + ResourceCPU
+	// ResourceSharedMemory is the amount of virtual memory in bytes.
+	ResourceSharedMemory ResourceName = SharedResourcesPrefix + ResourceMemory
 
 	// ResourceRequestsCPU is the amount of requested cpu in cores.
 	ResourceRequestsCPU = ResourcesRequestsPrefix + ResourceCPU

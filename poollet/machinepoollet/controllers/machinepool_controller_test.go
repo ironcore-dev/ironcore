@@ -86,9 +86,9 @@ var _ = Describe("MachinePoolController", func() {
 		Eventually(Object(mp)).Should(SatisfyAll(
 			HaveField("Status.Capacity", Satisfy(func(capacity corev1alpha1.ResourceList) bool {
 				return quota.Equals(capacity, corev1alpha1.ResourceList{
-					corev1alpha1.SharedResourceCPU:    sharedCpu,
+					corev1alpha1.ResourceSharedCPU:    sharedCpu,
 					corev1alpha1.ResourceCPU:          staticCpu,
-					corev1alpha1.SharedResourceMemory: sharedMemory,
+					corev1alpha1.ResourceSharedMemory: sharedMemory,
 					corev1alpha1.ResourceMemory:       staticMemory,
 				})
 			})),
@@ -115,9 +115,9 @@ var _ = Describe("MachinePoolController", func() {
 		Eventually(Object(mp)).Should(SatisfyAll(
 			HaveField("Status.Allocatable", Satisfy(func(allocatable corev1alpha1.ResourceList) bool {
 				return quota.Equals(allocatable, corev1alpha1.ResourceList{
-					corev1alpha1.SharedResourceCPU:    resource.MustParse("8"),
+					corev1alpha1.ResourceSharedCPU:    resource.MustParse("8"),
 					corev1alpha1.ResourceCPU:          staticCpu,
-					corev1alpha1.SharedResourceMemory: resource.MustParse("8Gi"),
+					corev1alpha1.ResourceSharedMemory: resource.MustParse("8Gi"),
 					corev1alpha1.ResourceMemory:       staticMemory,
 				})
 			})),
@@ -144,9 +144,9 @@ var _ = Describe("MachinePoolController", func() {
 		Eventually(Object(mp)).Should(SatisfyAll(
 			HaveField("Status.Allocatable", Satisfy(func(allocatable corev1alpha1.ResourceList) bool {
 				return quota.Equals(allocatable, corev1alpha1.ResourceList{
-					corev1alpha1.SharedResourceCPU:    resource.MustParse("8"),
+					corev1alpha1.ResourceSharedCPU:    resource.MustParse("8"),
 					corev1alpha1.ResourceCPU:          resource.MustParse("19"),
-					corev1alpha1.SharedResourceMemory: resource.MustParse("8Gi"),
+					corev1alpha1.ResourceSharedMemory: resource.MustParse("8Gi"),
 					corev1alpha1.ResourceMemory:       resource.MustParse("19Gi"),
 				})
 			})),

@@ -27,6 +27,7 @@ import (
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	computeclient "github.com/onmetal/onmetal-api/internal/client/compute"
 	networkingclient "github.com/onmetal/onmetal-api/internal/client/networking"
+	"github.com/onmetal/onmetal-api/internal/controllers/compute/scheduler"
 	"github.com/onmetal/onmetal-api/internal/controllers/networking"
 	"github.com/onmetal/onmetal-api/internal/controllers/storage"
 	utilsenvtest "github.com/onmetal/onmetal-api/utils/envtest"
@@ -153,6 +154,7 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 				corev1alpha1.ResourceCPU:    resource.MustParse("1"),
 				corev1alpha1.ResourceMemory: resource.MustParse("1Gi"),
 			},
+			Mode: computev1alpha1.ModeDistinct,
 		}
 		Expect(k8sClient.Create(ctx, machineClass)).To(Succeed(), "failed to create test machine class")
 
@@ -172,10 +174,13 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 		Expect(networkingclient.SetupNetworkInterfaceNetworkNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 		Expect(networkingclient.SetupNetworkInterfaceVirtualIPNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 
+		log := ctrl.LoggerFrom(ctx)
+
 		// register reconciler here
 		Expect((&MachineScheduler{
-			Client:        k8sManager.GetClient(),
 			EventRecorder: &record.FakeRecorder{},
+			Client:        k8sManager.GetClient(),
+			Cache:         scheduler.NewCache(log, scheduler.DefaultCacheStrategy),
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		Expect((&MachineReconciler{
