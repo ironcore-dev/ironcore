@@ -1503,6 +1503,7 @@ func Convert_networking_NetworkPolicyStatus_To_v1alpha1_NetworkPolicyStatus(in *
 
 func autoConvert_v1alpha1_NetworkSpec_To_networking_NetworkSpec(in *v1alpha1.NetworkSpec, out *networking.NetworkSpec, s conversion.Scope) error {
 	out.Handle = in.Handle
+	out.InternetGateway = in.InternetGateway
 	out.Peerings = *(*[]networking.NetworkPeering)(unsafe.Pointer(&in.Peerings))
 	return nil
 }
@@ -1514,6 +1515,7 @@ func Convert_v1alpha1_NetworkSpec_To_networking_NetworkSpec(in *v1alpha1.Network
 
 func autoConvert_networking_NetworkSpec_To_v1alpha1_NetworkSpec(in *networking.NetworkSpec, out *v1alpha1.NetworkSpec, s conversion.Scope) error {
 	out.Handle = in.Handle
+	out.InternetGateway = in.InternetGateway
 	out.Peerings = *(*[]v1alpha1.NetworkPeering)(unsafe.Pointer(&in.Peerings))
 	return nil
 }

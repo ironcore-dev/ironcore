@@ -369,11 +369,16 @@ func (r *MachineReconciler) updateORINetworkInterface(
 	if oriNetworkInterface.Spec.Network != nil && oriNetworkInterfaceSpec.Network != nil {
 		actualPeerings := oriNetworkInterface.Spec.Network.Peerings
 		desiredPeerings := oriNetworkInterfaceSpec.Network.Peerings
-		if !reflect.DeepEqual(actualPeerings, desiredPeerings) {
-			log.V(1).Info("Updating ori network peerings", "actualPeerings", actualPeerings, "desiredPeerings", desiredPeerings)
-			if _, err := r.MachineRuntime.UpdateNetworkPeerings(ctx, &ori.UpdateNetworkPeeringsRequest{
-				Handle:   oriNetworkInterfaceSpec.Network.Handle,
-				Peerings: desiredPeerings,
+		if !reflect.DeepEqual(actualPeerings, desiredPeerings) ||
+			oriNetworkInterface.Spec.Network.InternetGateway != oriNetworkInterfaceSpec.Network.InternetGateway {
+			log.V(1).Info("Updating ori network", "actualPeerings", actualPeerings,
+				"desiredPeerings", desiredPeerings,
+				"actualInternetGateway", oriNetworkInterface.Spec.Network.InternetGateway,
+				"desiredInternetGateway", oriNetworkInterfaceSpec.Network.InternetGateway)
+			if _, err := r.MachineRuntime.UpdateNetwork(ctx, &ori.UpdateNetworkRequest{
+				Handle:          oriNetworkInterfaceSpec.Network.Handle,
+				InternetGateway: oriNetworkInterfaceSpec.Network.InternetGateway,
+				Peerings:        desiredPeerings,
 			}); err != nil {
 				return fmt.Errorf("error updating ori network peerings: %w", err)
 			}
@@ -618,7 +623,8 @@ func (r *MachineReconciler) prepareORINetworkInterface(
 		},
 		Spec: &ori.NetworkInterfaceSpec{
 			Network: &ori.NetworkSpec{
-				Handle: networkInterface.Status.NetworkHandle,
+				Handle:          networkInterface.Status.NetworkHandle,
+				InternetGateway: network.Spec.InternetGateway,
 			},
 			Ips:                 stringersToStrings(networkInterface.Status.IPs),
 			VirtualIp:           virtualIPSpec,

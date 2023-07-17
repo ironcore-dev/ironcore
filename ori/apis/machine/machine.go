@@ -46,7 +46,7 @@ type RuntimeService interface {
 
 	UpdateNetworkInterfaceIPs(context.Context, *api.UpdateNetworkInterfaceIPsRequest) (*api.UpdateNetworkInterfaceIPsResponse, error)
 
-	UpdateNetworkPeerings(context.Context, *api.UpdateNetworkPeeringsRequest) (*api.UpdateNetworkPeeringsResponse, error)
+	UpdateNetwork(context.Context, *api.UpdateNetworkRequest) (*api.UpdateNetworkResponse, error)
 
 	CreateNetworkInterfaceVirtualIP(context.Context, *api.CreateNetworkInterfaceVirtualIPRequest) (*api.CreateNetworkInterfaceVirtualIPResponse, error)
 	UpdateNetworkInterfaceVirtualIP(context.Context, *api.UpdateNetworkInterfaceVirtualIPRequest) (*api.UpdateNetworkInterfaceVirtualIPResponse, error)

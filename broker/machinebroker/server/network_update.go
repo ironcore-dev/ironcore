@@ -23,9 +23,9 @@ import (
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 )
 
-func (s *Server) UpdateNetworkPeerings(ctx context.Context, req *ori.UpdateNetworkPeeringsRequest) (*ori.UpdateNetworkPeeringsResponse, error) {
+func (s *Server) UpdateNetwork(ctx context.Context, req *ori.UpdateNetworkRequest) (*ori.UpdateNetworkResponse, error) {
 	handle := req.Handle
-	log := s.loggerFrom(ctx, "Handle", handle, "Peerings", req.Peerings)
+	log := s.loggerFrom(ctx, "Handle", handle, "Peerings", req.Peerings, "InternetGateway", req.InternetGateway)
 
 	nw := &networkingv1alpha1.Network{
 		Spec: networkingv1alpha1.NetworkSpec{
@@ -57,6 +57,7 @@ func (s *Server) UpdateNetworkPeerings(ctx context.Context, req *ori.UpdateNetwo
 	}
 
 	nw.Status.Peerings = peerings
+	nw.Spec.InternetGateway = req.InternetGateway
 	log.Info("Updating", "Network", nw)
 	_, networkTransaction, err := s.networks.BeginCreate(ctx, nw)
 	if err != nil {
@@ -66,5 +67,5 @@ func (s *Server) UpdateNetworkPeerings(ctx context.Context, req *ori.UpdateNetwo
 		return nil, fmt.Errorf("error update network: %w", err)
 	}
 
-	return &ori.UpdateNetworkPeeringsResponse{}, nil
+	return &ori.UpdateNetworkResponse{}, nil
 }

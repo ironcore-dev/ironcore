@@ -153,9 +153,15 @@ func (m *Networks) BeginCreate(ctx context.Context, nw *networkingv1alpha1.Netwo
 		}
 
 		networkBase := network.DeepCopy()
+		network.Spec.InternetGateway = nw.Spec.InternetGateway
 		network.Status.Peerings = []networkingv1alpha1.NetworkPeeringStatus{}
 		if len(nw.Status.Peerings) > 0 {
 			network.Status.Peerings = nw.Status.Peerings
+		}
+
+		log.Info("Update", "network", network)
+		if err := m.cluster.Client().Patch(ctx, network, client.MergeFrom(networkBase)); err != nil {
+			return fmt.Errorf("error patching network status: %w", err)
 		}
 
 		log.Info("Update Status", "network", network)

@@ -20,8 +20,9 @@ package v1alpha1
 // NetworkSpecApplyConfiguration represents an declarative configuration of the NetworkSpec type for use
 // with apply.
 type NetworkSpecApplyConfiguration struct {
-	Handle   *string                            `json:"handle,omitempty"`
-	Peerings []NetworkPeeringApplyConfiguration `json:"peerings,omitempty"`
+	Handle          *string                            `json:"handle,omitempty"`
+	InternetGateway *bool                              `json:"internetGateway,omitempty"`
+	Peerings        []NetworkPeeringApplyConfiguration `json:"peerings,omitempty"`
 }
 
 // NetworkSpecApplyConfiguration constructs an declarative configuration of the NetworkSpec type for use with
@@ -35,6 +36,14 @@ func NetworkSpec() *NetworkSpecApplyConfiguration {
 // If called multiple times, the Handle field is set to the value of the last call.
 func (b *NetworkSpecApplyConfiguration) WithHandle(value string) *NetworkSpecApplyConfiguration {
 	b.Handle = &value
+	return b
+}
+
+// WithInternetGateway sets the InternetGateway field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the InternetGateway field is set to the value of the last call.
+func (b *NetworkSpecApplyConfiguration) WithInternetGateway(value bool) *NetworkSpecApplyConfiguration {
+	b.InternetGateway = &value
 	return b
 }
 

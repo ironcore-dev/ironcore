@@ -25,6 +25,8 @@ import (
 type NetworkSpec struct {
 	// Handle is the identifier of the network provider.
 	Handle string `json:"handle"`
+	// InternetGateway is a flag that indicates whether the network has an internet gateway.
+	InternetGateway bool `json:"internetGateway,omitempty"`
 	// Peerings are the network peerings with this network.
 	// +optional
 	// +patchMergeKey=name

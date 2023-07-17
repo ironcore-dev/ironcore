@@ -1237,6 +1237,9 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
+    - name: internetGateway
+      type:
+        scalar: boolean
     - name: peerings
       type:
         list:

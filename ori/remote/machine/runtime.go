@@ -109,8 +109,8 @@ func (r *remoteRuntime) UpdateNetworkInterfaceIPs(ctx context.Context, req *ori.
 	return r.client.UpdateNetworkInterfaceIPs(ctx, req)
 }
 
-func (r *remoteRuntime) UpdateNetworkPeerings(ctx context.Context, req *ori.UpdateNetworkPeeringsRequest) (*ori.UpdateNetworkPeeringsResponse, error) {
-	return r.client.UpdateNetworkPeerings(ctx, req)
+func (r *remoteRuntime) UpdateNetwork(ctx context.Context, req *ori.UpdateNetworkRequest) (*ori.UpdateNetworkResponse, error) {
+	return r.client.UpdateNetwork(ctx, req)
 }
 
 func (r *remoteRuntime) CreateNetworkInterfaceVirtualIP(ctx context.Context, req *ori.CreateNetworkInterfaceVirtualIPRequest) (*ori.CreateNetworkInterfaceVirtualIPResponse, error) {
