@@ -16,7 +16,6 @@ option (gogoproto.goproto_unrecognized_all) = false;
 
 service MachineRuntime {
   rpc Version(VersionRequest) returns (VersionResponse) {};
-  rpc PoolInfo(PoolInfoRequest) returns (PoolInfoResponse) {};
 
   rpc ListMachines(ListMachinesRequest) returns (ListMachinesResponse) {};
   rpc CreateMachine(CreateMachineRequest) returns (CreateMachineResponse) {};
@@ -28,7 +27,7 @@ service MachineRuntime {
   rpc AttachNetworkInterface(AttachNetworkInterfaceRequest) returns (AttachNetworkInterfaceResponse);
   rpc DetachNetworkInterface(DetachNetworkInterfaceRequest) returns (DetachNetworkInterfaceResponse);
 
-  rpc ListMachineClasses(ListMachineClassesRequest) returns (ListMachineClassesResponse);
+  rpc Status(StatusRequest) returns (StatusResponse);
 
   rpc Exec(ExecRequest) returns (ExecResponse);
 }
@@ -140,6 +139,11 @@ message MachineClass {
   MachineClassCapabilities capabilities = 2;
 }
 
+message MachineClassStatus {
+  MachineClass machine_class = 1;
+  int64 quantity = 2;
+}
+
 message VersionRequest {
   string version = 1;
 }
@@ -150,16 +154,6 @@ message VersionResponse {
   // Version of the machine runtime. The string must be
   // semver-compatible.
   string runtime_version = 2;
-}
-
-message PoolInfoRequest {}
-
-message PoolInfoResponse {
-  int64 static_cpu = 1;
-  uint64 static_memory = 2;
-
-  int64 shared_cpu = 3;
-  uint64 shared_memory = 4;
 }
 
 message ListMachinesRequest {
@@ -233,11 +227,11 @@ message DetachNetworkInterfaceRequest {
 message DetachNetworkInterfaceResponse {
 }
 
-message ListMachineClassesRequest {
+message StatusRequest {
 }
 
-message ListMachineClassesResponse {
-  repeated MachineClass machine_classes = 1;
+message StatusResponse {
+  repeated MachineClassStatus machine_class_status = 1;
 }
 
 message ExecRequest {

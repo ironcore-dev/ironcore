@@ -30,7 +30,7 @@ var (
 
 type MachineClassMapper interface {
 	manager.Runnable
-	GetMachineClassFor(ctx context.Context, name string, capabilities *ori.MachineClassCapabilities) (*ori.MachineClass, error)
+	GetMachineClassFor(ctx context.Context, name string, capabilities *ori.MachineClassCapabilities) (*ori.MachineClass, int64, error)
 	WaitForSync(ctx context.Context) error
 	AddListener(listener orievent.Listener) (orievent.ListenerRegistration, error)
 	RemoveListener(reg orievent.ListenerRegistration) error

@@ -27,6 +27,7 @@ import (
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
+	computeclient "github.com/onmetal/onmetal-api/internal/client/compute"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	"github.com/onmetal/onmetal-api/ori/testing/machine"
 	machinepoolletclient "github.com/onmetal/onmetal-api/poollet/machinepoollet/client"
@@ -178,19 +179,20 @@ func SetupTest() (*corev1.Namespace, *computev1alpha1.MachinePool, *computev1alp
 				corev1alpha1.ResourceCPU:    resource.MustParse("1"),
 				corev1alpha1.ResourceMemory: resource.MustParse("1Gi"),
 			},
-			Mode: computev1alpha1.ModeDistinct,
 		}
 		Expect(k8sClient.Create(ctx, mc)).To(Succeed(), "failed to create test machine class")
 		DeferCleanup(k8sClient.Delete, mc)
 
 		*srv = *machine.NewFakeRuntimeService()
-		srv.SetMachineClasses([]*machine.FakeMachineClass{
+		srv.SetMachineClasses([]*machine.FakeMachineClassStatus{
 			{
-				MachineClass: ori.MachineClass{
-					Name: mc.Name,
-					Capabilities: &ori.MachineClassCapabilities{
-						CpuMillis:   mc.Capabilities.CPU().MilliValue(),
-						MemoryBytes: mc.Capabilities.Memory().AsDec().UnscaledBig().Uint64(),
+				MachineClassStatus: ori.MachineClassStatus{
+					MachineClass: &ori.MachineClass{
+						Name: mc.Name,
+						Capabilities: &ori.MachineClassCapabilities{
+							CpuMillis:   mc.Capabilities.CPU().MilliValue(),
+							MemoryBytes: mc.Capabilities.Memory().AsDec().UnscaledBig().Uint64(),
+						},
 					},
 				},
 			},
@@ -208,7 +210,7 @@ func SetupTest() (*corev1.Namespace, *computev1alpha1.MachinePool, *computev1alp
 		Expect(machinepoolletclient.SetupMachineSpecVolumeNamesField(ctx, indexer, mp.Name)).To(Succeed())
 		Expect(machinepoolletclient.SetupMachineSpecSecretNamesField(ctx, indexer, mp.Name)).To(Succeed())
 		Expect(machinepoolletclient.SetupLoadBalancerRoutingNetworkRefNameField(ctx, indexer)).To(Succeed())
-		Expect(machinepoolletclient.SetupMachineMachinePoolRefNameField(ctx, indexer)).To(Succeed())
+		Expect(computeclient.SetupMachineSpecMachinePoolRefNameFieldIndexer(ctx, indexer)).To(Succeed())
 
 		machineClassMapper := mcm.NewGeneric(srv, mcm.GenericOptions{
 			RelistPeriod: 2 * time.Second,

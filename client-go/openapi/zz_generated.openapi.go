@@ -905,12 +905,6 @@ func schema_onmetal_api_api_compute_v1alpha1_MachineClass(ref common.ReferenceCa
 							},
 						},
 					},
-					"mode": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
 				},
 			},
 		},

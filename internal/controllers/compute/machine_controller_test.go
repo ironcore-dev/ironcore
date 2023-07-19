@@ -22,7 +22,6 @@ import (
 	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
@@ -37,12 +36,11 @@ import (
 
 var _ = Describe("MachineReconciler", func() {
 	var (
-		ctx              = SetupContext()
-		ns, machineClass = SetupTest(ctx)
+		ns, machineClass = SetupTest()
 		network          = &networkingv1alpha1.Network{}
 	)
 
-	BeforeEach(func() {
+	BeforeEach(func(ctx SpecContext) {
 		By("creating a network")
 		*network = networkingv1alpha1.Network{
 			ObjectMeta: metav1.ObjectMeta{
@@ -61,7 +59,7 @@ var _ = Describe("MachineReconciler", func() {
 		Expect(k8sClient.Status().Patch(ctx, network, client.MergeFrom(baseNetwork))).To(Succeed())
 	})
 
-	It("should manage ephemeral objects", func() {
+	It("should manage ephemeral objects", func(ctx SpecContext) {
 		By("creating a machine")
 		machine := &computev1alpha1.Machine{
 			ObjectMeta: metav1.ObjectMeta{

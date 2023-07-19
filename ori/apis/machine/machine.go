@@ -22,7 +22,6 @@ import (
 
 type RuntimeService interface {
 	Version(context.Context, *api.VersionRequest) (*api.VersionResponse, error)
-	PoolInfo(context.Context, *api.PoolInfoRequest) (*api.PoolInfoResponse, error)
 	ListMachines(context.Context, *api.ListMachinesRequest) (*api.ListMachinesResponse, error)
 	CreateMachine(context.Context, *api.CreateMachineRequest) (*api.CreateMachineResponse, error)
 	DeleteMachine(context.Context, *api.DeleteMachineRequest) (*api.DeleteMachineResponse, error)
@@ -32,6 +31,6 @@ type RuntimeService interface {
 	DetachVolume(context.Context, *api.DetachVolumeRequest) (*api.DetachVolumeResponse, error)
 	AttachNetworkInterface(context.Context, *api.AttachNetworkInterfaceRequest) (*api.AttachNetworkInterfaceResponse, error)
 	DetachNetworkInterface(context.Context, *api.DetachNetworkInterfaceRequest) (*api.DetachNetworkInterfaceResponse, error)
-	ListMachineClasses(context.Context, *api.ListMachineClassesRequest) (*api.ListMachineClassesResponse, error)
+	Status(context.Context, *api.StatusRequest) (*api.StatusResponse, error)
 	Exec(context.Context, *api.ExecRequest) (*api.ExecResponse, error)
 }

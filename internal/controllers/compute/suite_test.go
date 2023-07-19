@@ -43,7 +43,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
-	"sigs.k8s.io/controller-runtime/pkg/envtest/komega"
+	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
@@ -103,12 +103,10 @@ var _ = BeforeSuite(func() {
 	Expect(networkingv1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
 
 	//+kubebuilder:scaffold:scheme
-
 	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
 	Expect(err).NotTo(HaveOccurred())
 	Expect(k8sClient).NotTo(BeNil())
-
-	komega.SetClient(k8sClient)
+	SetClient(k8sClient)
 
 	apiSrv, err := apiserver.New(cfg, apiserver.Options{
 		MainPath:     "github.com/onmetal/onmetal-api/cmd/onmetal-apiserver",
@@ -129,22 +127,20 @@ var _ = BeforeSuite(func() {
 
 // SetupTest returns a namespace which will be created before each ginkgo `It` block and deleted at the end of `It`
 // so that each test case can run in an independent way
-func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.MachineClass) {
+func SetupTest() (*corev1.Namespace, *computev1alpha1.MachineClass) {
 	var (
-		cancel       context.CancelFunc
 		ns           = &corev1.Namespace{}
 		machineClass = &computev1alpha1.MachineClass{}
 	)
 
-	BeforeEach(func() {
-		var mgrCtx context.Context
-		mgrCtx, cancel = context.WithCancel(ctx)
+	BeforeEach(func(ctx SpecContext) {
 		*ns = corev1.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "testns-",
 			},
 		}
 		Expect(k8sClient.Create(ctx, ns)).To(Succeed(), "failed to create test namespace")
+		DeferCleanup(k8sClient.Delete, ns)
 
 		*machineClass = computev1alpha1.MachineClass{
 			ObjectMeta: metav1.ObjectMeta{
@@ -154,9 +150,12 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 				corev1alpha1.ResourceCPU:    resource.MustParse("1"),
 				corev1alpha1.ResourceMemory: resource.MustParse("1Gi"),
 			},
-			Mode: computev1alpha1.ModeDistinct,
 		}
 		Expect(k8sClient.Create(ctx, machineClass)).To(Succeed(), "failed to create test machine class")
+		DeferCleanup(k8sClient.Delete, machineClass)
+
+		DeferCleanup(k8sClient.DeleteAllOf, &computev1alpha1.MachinePool{})
+		DeferCleanup(k8sClient.DeleteAllOf, &computev1alpha1.MachineClass{})
 
 		k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
 			Scheme:             scheme.Scheme,
@@ -173,6 +172,9 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 
 		Expect(networkingclient.SetupNetworkInterfaceNetworkNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 		Expect(networkingclient.SetupNetworkInterfaceVirtualIPNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+
+		mgrCtx, cancel := context.WithCancel(context.Background())
+		DeferCleanup(cancel)
 
 		schedulerCache := scheduler.NewCache(k8sManager.GetLogger(), scheduler.DefaultCacheStrategy)
 		Expect(k8sManager.Add(schedulerCache)).To(Succeed())
@@ -213,13 +215,6 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.Machine
 			defer GinkgoRecover()
 			Expect(k8sManager.Start(mgrCtx)).To(Succeed(), "failed to start manager")
 		}()
-	})
-
-	AfterEach(func() {
-		cancel()
-		Expect(k8sClient.Delete(ctx, ns)).To(Succeed(), "failed to delete test namespace")
-		Expect(k8sClient.DeleteAllOf(ctx, &computev1alpha1.MachinePool{})).To(Succeed())
-		Expect(k8sClient.DeleteAllOf(ctx, &computev1alpha1.MachineClass{})).To(Succeed())
 	})
 
 	return ns, machineClass

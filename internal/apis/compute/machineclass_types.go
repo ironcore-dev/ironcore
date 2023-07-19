@@ -33,15 +33,7 @@ type MachineClass struct {
 
 	// Capabilities describes the resources a machine class can provide.
 	Capabilities core.ResourceList
-	Mode         MachineClassMode
 }
-
-type MachineClassMode string
-
-const (
-	ModeShared   MachineClassMode = "Shared"
-	ModeDistinct MachineClassMode = "Distinct"
-)
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 

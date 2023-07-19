@@ -32,8 +32,7 @@ import (
 type MachineClassApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Capabilities                     *v1alpha1.ResourceList            `json:"capabilities,omitempty"`
-	Mode                             *computev1alpha1.MachineClassMode `json:"mode,omitempty"`
+	Capabilities                     *v1alpha1.ResourceList `json:"capabilities,omitempty"`
 }
 
 // MachineClass constructs an declarative configuration of the MachineClass type for use with
@@ -244,13 +243,5 @@ func (b *MachineClassApplyConfiguration) ensureObjectMetaApplyConfigurationExist
 // If called multiple times, the Capabilities field is set to the value of the last call.
 func (b *MachineClassApplyConfiguration) WithCapabilities(value v1alpha1.ResourceList) *MachineClassApplyConfiguration {
 	b.Capabilities = &value
-	return b
-}
-
-// WithMode sets the Mode field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the Mode field is set to the value of the last call.
-func (b *MachineClassApplyConfiguration) WithMode(value computev1alpha1.MachineClassMode) *MachineClassApplyConfiguration {
-	b.Mode = &value
 	return b
 }

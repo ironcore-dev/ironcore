@@ -192,7 +192,7 @@ func main() {
 
 	if controllers.Enabled(machineSchedulerController) {
 		schedulerCache := scheduler.NewCache(mgr.GetLogger(), scheduler.DefaultCacheStrategy)
-		if mgr.Add(schedulerCache); err != nil {
+		if err := mgr.Add(schedulerCache); err != nil {
 			setupLog.Error(err, "unable to create cache", "controller", "MachineSchedulerCache")
 			os.Exit(1)
 		}

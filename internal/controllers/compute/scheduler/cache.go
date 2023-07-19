@@ -3,18 +3,17 @@ package scheduler
 import (
 	"context"
 	"fmt"
-	"k8s.io/apimachinery/pkg/util/wait"
 	"sync"
 	"time"
 
 	"github.com/go-logr/logr"
 	"github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/sets"
-	toolscache "k8s.io/client-go/tools/cache"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/klog/v2"
-	ccache "sigs.k8s.io/controller-runtime/pkg/cache"
 )
 
 type CacheStrategy interface {
@@ -60,6 +59,14 @@ func (n *ContainerInfo) Node() *v1alpha1.MachinePool {
 	return n.node
 }
 
+func (n *ContainerInfo) MaxAllocatable(className string) int64 {
+	class, ok := n.node.Status.Allocatable[corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, className)]
+	if !ok {
+		return 0
+	}
+	return class.AsDec().UnscaledBig().Int64()
+}
+
 func (n *ContainerInfo) NumInstances() int {
 	return len(n.instances)
 }
@@ -79,7 +86,6 @@ type instanceState struct {
 func NewCache(log logr.Logger, strategy CacheStrategy) *Cache {
 	return &Cache{
 		log:              log,
-		startWait:        make(chan struct{}),
 		assumedInstances: sets.New[types.UID](),
 		instanceStates:   make(map[types.UID]*instanceState),
 		nodes:            make(map[string]*ContainerInfo),
@@ -87,51 +93,14 @@ func NewCache(log logr.Logger, strategy CacheStrategy) *Cache {
 	}
 }
 
-type listener struct {
-	handler toolscache.ResourceEventHandler
-}
-
-type updateNotification struct {
-	oldObj any
-	newObj any
-}
-
-type addNotification struct {
-	newObj          any
-	isInInitialList bool
-}
-
-type deleteNotification struct {
-	oldObj any
-}
-
-func (r *listener) add(evt any) {
-	switch n := evt.(type) {
-	case addNotification:
-		r.handler.OnAdd(n, n.isInInitialList)
-	case updateNotification:
-		r.handler.OnUpdate(n.oldObj, n.newObj)
-	case deleteNotification:
-		r.handler.OnDelete(n.oldObj)
-	}
-}
-
 type Cache struct {
 	mu sync.RWMutex
 
-	startedMu sync.Mutex
-	started   bool
-	startWait chan struct{}
-
-	log   logr.Logger
-	cache ccache.Cache
+	log logr.Logger
 
 	assumedInstances sets.Set[types.UID]
 	instanceStates   map[types.UID]*instanceState
 	nodes            map[string]*ContainerInfo
-
-	containerListenersMu sync.RWMutex
-	containerListeners   sets.Set[*listener]
 
 	strategy CacheStrategy
 }
@@ -183,12 +152,10 @@ func (c *Cache) Snapshot() *Snapshot {
 }
 
 func (c *Cache) IsAssumedInstance(instance *v1alpha1.Machine) (bool, error) {
-	log := c.log.WithValues("Instance", klog.KObj(instance))
 	key, err := c.strategy.Key(instance)
 	if err != nil {
 		return false, err
 	}
-	log = log.WithValues("InstanceKey", key)
 
 	c.mu.RLock()
 	defer c.mu.RUnlock()
@@ -256,15 +223,6 @@ func (c *Cache) FinishBinding(instance *v1alpha1.Machine) error {
 	return nil
 }
 
-func (c *Cache) distributeContainerEvent(evt any) {
-	c.containerListenersMu.RLock()
-	defer c.containerListenersMu.RUnlock()
-
-	for l := range c.containerListeners {
-		l.add(evt)
-	}
-}
-
 func (c *Cache) AddContainer(node *v1alpha1.MachinePool) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -275,7 +233,6 @@ func (c *Cache) AddContainer(node *v1alpha1.MachinePool) {
 		c.nodes[node.Name] = n
 	}
 	n.node = node
-	return
 }
 
 func (c *Cache) UpdateContainer(_, newNode *v1alpha1.MachinePool) {
@@ -288,7 +245,6 @@ func (c *Cache) UpdateContainer(_, newNode *v1alpha1.MachinePool) {
 		c.nodes[newNode.Name] = n
 	}
 	n.node = newNode
-	return
 }
 
 func (c *Cache) RemoveContainer(node *v1alpha1.MachinePool) error {

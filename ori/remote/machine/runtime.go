@@ -45,10 +45,6 @@ func (r *remoteRuntime) Version(ctx context.Context, req *ori.VersionRequest) (*
 	return r.client.Version(ctx, req)
 }
 
-func (r *remoteRuntime) PoolInfo(ctx context.Context, req *ori.PoolInfoRequest) (*ori.PoolInfoResponse, error) {
-	return r.client.PoolInfo(ctx, req)
-}
-
 func (r *remoteRuntime) ListMachines(ctx context.Context, req *ori.ListMachinesRequest) (*ori.ListMachinesResponse, error) {
 	return r.client.ListMachines(ctx, req)
 }
@@ -85,8 +81,8 @@ func (r *remoteRuntime) DetachNetworkInterface(ctx context.Context, req *ori.Det
 	return r.client.DetachNetworkInterface(ctx, req)
 }
 
-func (r *remoteRuntime) ListMachineClasses(ctx context.Context, req *ori.ListMachineClassesRequest) (*ori.ListMachineClassesResponse, error) {
-	return r.client.ListMachineClasses(ctx, req)
+func (r *remoteRuntime) Status(ctx context.Context, req *ori.StatusRequest) (*ori.StatusResponse, error) {
+	return r.client.Status(ctx, req)
 }
 
 func (r *remoteRuntime) Exec(ctx context.Context, req *ori.ExecRequest) (*ori.ExecResponse, error) {

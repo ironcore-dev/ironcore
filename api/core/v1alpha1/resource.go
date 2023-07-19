@@ -15,6 +15,9 @@
 package v1alpha1
 
 import (
+	"fmt"
+	"strings"
+
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
@@ -37,14 +40,6 @@ const (
 	// ResourcesRequestsPrefix is the prefix used for limiting resource requests in ResourceQuota.
 	ResourcesRequestsPrefix = "requests."
 
-	// SharedResourcesPrefix is the prefix used for the shared (virtual) resources.
-	SharedResourcesPrefix = "shared-"
-
-	// ResourceSharedCPU is the amount of virtual cpu in cores.
-	ResourceSharedCPU ResourceName = SharedResourcesPrefix + ResourceCPU
-	// ResourceSharedMemory is the amount of virtual memory in bytes.
-	ResourceSharedMemory ResourceName = SharedResourcesPrefix + ResourceMemory
-
 	// ResourceRequestsCPU is the amount of requested cpu in cores.
 	ResourceRequestsCPU = ResourcesRequestsPrefix + ResourceCPU
 	// ResourceRequestsMemory is the amount of requested memory in bytes.
@@ -54,6 +49,9 @@ const (
 
 	// ResourceCountNamespacePrefix is resource namespace prefix for counting resources.
 	ResourceCountNamespacePrefix = "count/"
+
+	// ClassPrefix is the prefix for a resource to define the max amount how many times an instance of a class can be provisioned.
+	ClassPrefix = "class/"
 )
 
 // ObjectCountQuotaResourceNameFor returns the ResourceName for counting the given groupResource.
@@ -62,6 +60,20 @@ func ObjectCountQuotaResourceNameFor(groupResource schema.GroupResource) Resourc
 		return ResourceName("count/" + groupResource.Resource)
 	}
 	return ResourceName(ResourceCountNamespacePrefix + groupResource.Resource + "." + groupResource.Group)
+}
+
+func IsClassCountResource(resource ResourceName) bool {
+	return strings.HasPrefix(string(resource), ClassPrefix)
+}
+
+type ClassType string
+
+const (
+	ClassTypeMachineClass ClassType = "machine"
+)
+
+func ClassCountFor(classType ClassType, className string) ResourceName {
+	return ResourceName(fmt.Sprintf("%s%s.%s", ClassPrefix, classType, className))
 }
 
 // ResourceList is a list of ResourceName alongside their resource.Quantity.

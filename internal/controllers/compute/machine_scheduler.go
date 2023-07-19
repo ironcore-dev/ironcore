@@ -25,6 +25,7 @@ import (
 	computeclient "github.com/onmetal/onmetal-api/internal/client/compute"
 	"github.com/onmetal/onmetal-api/internal/controllers/compute/scheduler"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/workqueue"
@@ -97,28 +98,14 @@ func (s *MachineScheduler) tolerateTaints(ctx context.Context, pool *scheduler.C
 }
 
 func (s *MachineScheduler) fitsPool(ctx context.Context, pool *scheduler.ContainerInfo, machine *computev1alpha1.Machine) bool {
-	machineClass := &computev1alpha1.MachineClass{}
-	if err := s.Get(ctx, client.ObjectKey{Name: machine.Spec.MachineClassRef.Name}, machineClass); err != nil {
+	machineClassName := machine.Spec.MachineClassRef.Name
+
+	allocatable, ok := pool.Node().Status.Allocatable[corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClassName)]
+	if !ok {
 		return false
 	}
 
-	cpu := machineClass.Capabilities.CPU()
-	memory := machineClass.Capabilities.Memory()
-
-	switch machineClass.Mode {
-	case computev1alpha1.ModeShared:
-		if cpu.Cmp(pool.Node().Status.Allocatable[corev1alpha1.ResourceSharedCPU]) > 0 ||
-			(memory.Cmp(pool.Node().Status.Allocatable[corev1alpha1.ResourceSharedMemory]) > 0) {
-			return false
-		}
-	case computev1alpha1.ModeDistinct:
-		if cpu.Cmp(pool.Node().Status.Allocatable[corev1alpha1.ResourceCPU]) > 0 ||
-			memory.Cmp(pool.Node().Status.Allocatable[corev1alpha1.ResourceMemory]) > 0 {
-			return false
-		}
-	}
-
-	return true
+	return allocatable.Cmp(*resource.NewQuantity(1, resource.DecimalSI)) > 0
 }
 
 func (s *MachineScheduler) reconcileExists(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) (ctrl.Result, error) {
@@ -153,16 +140,16 @@ func (s *MachineScheduler) reconcileExists(ctx context.Context, log logr.Logger,
 		return ctrl.Result{}, nil
 	}
 
-	minUsedNode := filteredNodes[0]
+	maxAllocatableNode := filteredNodes[0]
 	for _, node := range filteredNodes[1:] {
-		if node.NumInstances() < minUsedNode.NumInstances() {
-			minUsedNode = node
+		if node.MaxAllocatable(machine.Spec.MachineClassRef.Name) > maxAllocatableNode.MaxAllocatable(machine.Spec.MachineClassRef.Name) {
+			maxAllocatableNode = node
 		}
 	}
-	log.V(1).Info("Determined node to schedule on", "NodeName", minUsedNode.Node().Name, "Usage", minUsedNode.NumInstances())
+	log.V(1).Info("Determined node to schedule on", "NodeName", maxAllocatableNode.Node().Name, "Instances", maxAllocatableNode.NumInstances(), "Allocatable", maxAllocatableNode.MaxAllocatable(machine.Spec.MachineClassRef.Name))
 
 	log.V(1).Info("Assuming machine to be on node")
-	if err := s.assume(machine, minUsedNode.Node().Name); err != nil {
+	if err := s.assume(machine, maxAllocatableNode.Node().Name); err != nil {
 		return ctrl.Result{}, err
 	}
 

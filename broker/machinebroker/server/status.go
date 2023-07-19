@@ -18,7 +18,10 @@ import (
 	"context"
 	"fmt"
 
+	"k8s.io/apimachinery/pkg/api/resource"
+
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -56,6 +59,18 @@ func (s *Server) gatherAvailableMachineClassNames(onmetalMachinePools []computev
 	return res
 }
 
+func (s *Server) gatherMachineClassQuantity(onmetalMachinePools []computev1alpha1.MachinePool) map[string]*resource.Quantity {
+	res := map[string]*resource.Quantity{}
+	for _, onmetalMachinePool := range onmetalMachinePools {
+		for resourceName, resourceQuantity := range onmetalMachinePool.Status.Capacity {
+			if corev1alpha1.IsClassCountResource(resourceName) {
+				res[string(resourceName)].Add(resourceQuantity)
+			}
+		}
+	}
+	return res
+}
+
 func (s *Server) filterOnmetalMachineClasses(
 	availableMachineClassNames sets.Set[string],
 	machineClasses []computev1alpha1.MachineClass,
@@ -71,20 +86,23 @@ func (s *Server) filterOnmetalMachineClasses(
 	return filtered
 }
 
-func (s *Server) convertOnmetalMachineClass(machineClass *computev1alpha1.MachineClass) (*ori.MachineClass, error) {
+func (s *Server) convertOnmetalMachineClassStatus(machineClass *computev1alpha1.MachineClass, quantity *resource.Quantity) (*ori.MachineClassStatus, error) {
 	cpu := machineClass.Capabilities.CPU()
 	memory := machineClass.Capabilities.Memory()
 
-	return &ori.MachineClass{
-		Name: machineClass.Name,
-		Capabilities: &ori.MachineClassCapabilities{
-			CpuMillis:   cpu.MilliValue(),
-			MemoryBytes: uint64(memory.Value()),
+	return &ori.MachineClassStatus{
+		MachineClass: &ori.MachineClass{
+			Name: machineClass.Name,
+			Capabilities: &ori.MachineClassCapabilities{
+				CpuMillis:   cpu.MilliValue(),
+				MemoryBytes: uint64(memory.Value()),
+			},
 		},
+		Quantity: quantity.AsDec().UnscaledBig().Int64(),
 	}, nil
 }
 
-func (s *Server) ListMachineClasses(ctx context.Context, req *ori.ListMachineClassesRequest) (*ori.ListMachineClassesResponse, error) {
+func (s *Server) Status(ctx context.Context, req *ori.StatusRequest) (*ori.StatusResponse, error) {
 	log := s.loggerFrom(ctx)
 
 	log.V(1).Info("Getting target onmetal machine pools")
@@ -96,9 +114,12 @@ func (s *Server) ListMachineClasses(ctx context.Context, req *ori.ListMachineCla
 	log.V(1).Info("Gathering available machine class names")
 	availableOnmetalMachineClassNames := s.gatherAvailableMachineClassNames(onmetalMachinePools)
 
+	log.V(1).Info("Gathering machine class quantity")
+	machineClassQuantity := s.gatherMachineClassQuantity(onmetalMachinePools)
+
 	if len(availableOnmetalMachineClassNames) == 0 {
 		log.V(1).Info("No available machine classes")
-		return &ori.ListMachineClassesResponse{MachineClasses: []*ori.MachineClass{}}, nil
+		return &ori.StatusResponse{MachineClassStatus: []*ori.MachineClassStatus{}}, nil
 	}
 
 	log.V(1).Info("Listing onmetal machine classes")
@@ -108,18 +129,18 @@ func (s *Server) ListMachineClasses(ctx context.Context, req *ori.ListMachineCla
 	}
 
 	availableOnmetalMachineClasses := s.filterOnmetalMachineClasses(availableOnmetalMachineClassNames, onmetalMachineClassList.Items)
-	machineClasses := make([]*ori.MachineClass, 0, len(availableOnmetalMachineClasses))
+	machineClassStatus := make([]*ori.MachineClassStatus, 0, len(availableOnmetalMachineClasses))
 	for _, onmetalMachineClass := range availableOnmetalMachineClasses {
-		machineClass, err := s.convertOnmetalMachineClass(&onmetalMachineClass)
+		machineClass, err := s.convertOnmetalMachineClassStatus(&onmetalMachineClass, machineClassQuantity[onmetalMachineClass.Name])
 		if err != nil {
 			return nil, fmt.Errorf("error converting onmetal machine class %s: %w", onmetalMachineClass.Name, err)
 		}
 
-		machineClasses = append(machineClasses, machineClass)
+		machineClassStatus = append(machineClassStatus, machineClass)
 	}
 
 	log.V(1).Info("Returning machine classes")
-	return &ori.ListMachineClassesResponse{
-		MachineClasses: machineClasses,
+	return &ori.StatusResponse{
+		MachineClassStatus: machineClassStatus,
 	}, nil
 }

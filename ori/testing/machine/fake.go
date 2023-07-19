@@ -69,30 +69,22 @@ type FakeNetworkInterface struct {
 	ori.NetworkInterface
 }
 
-type FakeMachineClass struct {
-	ori.MachineClass
-}
-
-type FakePoolInfo struct {
-	SharedCpu    int64
-	StaticCpu    int64
-	SharedMemory uint64
-	StaticMemory uint64
+type FakeMachineClassStatus struct {
+	ori.MachineClassStatus
 }
 
 type FakeRuntimeService struct {
 	sync.Mutex
 
-	FakePoolInfo   FakePoolInfo
-	Machines       map[string]*FakeMachine
-	MachineClasses map[string]*FakeMachineClass
-	GetExecURL     func(req *ori.ExecRequest) string
+	Machines           map[string]*FakeMachine
+	MachineClassStatus map[string]*FakeMachineClassStatus
+	GetExecURL         func(req *ori.ExecRequest) string
 }
 
 func NewFakeRuntimeService() *FakeRuntimeService {
 	return &FakeRuntimeService{
-		Machines:       make(map[string]*FakeMachine),
-		MachineClasses: make(map[string]*FakeMachineClass),
+		Machines:           make(map[string]*FakeMachine),
+		MachineClassStatus: make(map[string]*FakeMachineClassStatus),
 	}
 }
 
@@ -106,13 +98,13 @@ func (r *FakeRuntimeService) SetMachines(machines []*FakeMachine) {
 	}
 }
 
-func (r *FakeRuntimeService) SetMachineClasses(machineClasses []*FakeMachineClass) {
+func (r *FakeRuntimeService) SetMachineClasses(machineClassStatus []*FakeMachineClassStatus) {
 	r.Lock()
 	defer r.Unlock()
 
-	r.MachineClasses = make(map[string]*FakeMachineClass)
-	for _, machineClass := range machineClasses {
-		r.MachineClasses[machineClass.Name] = machineClass
+	r.MachineClassStatus = make(map[string]*FakeMachineClassStatus)
+	for _, status := range machineClassStatus {
+		r.MachineClassStatus[status.MachineClass.Name] = status
 	}
 }
 
@@ -127,22 +119,6 @@ func (r *FakeRuntimeService) Version(ctx context.Context, req *ori.VersionReques
 	return &ori.VersionResponse{
 		RuntimeName:    FakeRuntimeName,
 		RuntimeVersion: FakeVersion,
-	}, nil
-}
-
-func (r *FakeRuntimeService) SetPoolInfo(poolInfo FakePoolInfo) {
-	r.Lock()
-	defer r.Unlock()
-
-	r.FakePoolInfo = poolInfo
-}
-
-func (r *FakeRuntimeService) PoolInfo(ctx context.Context, req *ori.PoolInfoRequest) (*ori.PoolInfoResponse, error) {
-	return &ori.PoolInfoResponse{
-		SharedCpu:    r.FakePoolInfo.SharedCpu,
-		StaticCpu:    r.FakePoolInfo.StaticCpu,
-		SharedMemory: r.FakePoolInfo.SharedMemory,
-		StaticMemory: r.FakePoolInfo.StaticMemory,
 	}, nil
 }
 
@@ -318,16 +294,16 @@ func (r *FakeRuntimeService) DetachNetworkInterface(ctx context.Context, req *or
 	return &ori.DetachNetworkInterfaceResponse{}, nil
 }
 
-func (r *FakeRuntimeService) ListMachineClasses(ctx context.Context, req *ori.ListMachineClassesRequest) (*ori.ListMachineClassesResponse, error) {
+func (r *FakeRuntimeService) Status(ctx context.Context, req *ori.StatusRequest) (*ori.StatusResponse, error) {
 	r.Lock()
 	defer r.Unlock()
 
-	var res []*ori.MachineClass
-	for _, m := range r.MachineClasses {
-		machineClass := m.MachineClass
-		res = append(res, &machineClass)
+	var res []*ori.MachineClassStatus
+	for _, m := range r.MachineClassStatus {
+		machineClassStatus := m.MachineClassStatus
+		res = append(res, &machineClassStatus)
 	}
-	return &ori.ListMachineClassesResponse{MachineClasses: res}, nil
+	return &ori.StatusResponse{MachineClassStatus: res}, nil
 }
 
 func (r *FakeRuntimeService) Exec(ctx context.Context, req *ori.ExecRequest) (*ori.ExecResponse, error) {

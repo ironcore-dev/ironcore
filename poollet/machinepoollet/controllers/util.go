@@ -17,15 +17,7 @@ package controllers
 import (
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	utilslices "github.com/onmetal/onmetal-api/utils/slices"
-	"golang.org/x/exp/constraints"
 )
-
-func Max[T constraints.Ordered](x, y T) T {
-	if x < y {
-		return y
-	}
-	return x
-}
 
 func FindNewORINetworkInterfaces(desiredORINics, existingORINics []*ori.NetworkInterface) []*ori.NetworkInterface {
 	var (
