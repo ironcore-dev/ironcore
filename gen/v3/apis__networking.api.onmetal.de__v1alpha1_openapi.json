@@ -11097,6 +11097,32 @@
 					}
 				]
 			},
+			"com.github.onmetal.onmetal-api.api.networking.v1alpha1.LoadBalancerDestination": {
+				"description": "LoadBalancerDestination is the destination of the load balancer.",
+				"type": "object",
+				"required": [
+					"ip"
+				],
+				"properties": {
+					"ip": {
+						"description": "IP is the target IP.",
+						"default": {},
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.IP"
+							}
+						]
+					},
+					"targetRef": {
+						"description": "TargetRef is the target providing the destination.",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.LoadBalancerTargetRef"
+							}
+						]
+					}
+				}
+			},
 			"com.github.onmetal.onmetal-api.api.networking.v1alpha1.LoadBalancerList": {
 				"description": "LoadBalancerList contains a list of LoadBalancer",
 				"type": "object",
@@ -11187,7 +11213,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.LocalUIDReference"
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.LoadBalancerDestination"
 								}
 							]
 						}
@@ -11345,6 +11371,32 @@
 								}
 							]
 						}
+					}
+				}
+			},
+			"com.github.onmetal.onmetal-api.api.networking.v1alpha1.LoadBalancerTargetRef": {
+				"description": "LoadBalancerTargetRef is a load balancer target.",
+				"type": "object",
+				"required": [
+					"uid",
+					"name",
+					"providerID"
+				],
+				"properties": {
+					"name": {
+						"description": "Name is the name of the target.",
+						"type": "string",
+						"default": ""
+					},
+					"providerID": {
+						"description": "ProviderID is the provider internal id of the target.",
+						"type": "string",
+						"default": ""
+					},
+					"uid": {
+						"description": "UID is the UID of the target.",
+						"type": "string",
+						"default": ""
 					}
 				}
 			},

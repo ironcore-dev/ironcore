@@ -17,7 +17,6 @@
 package validation
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	"github.com/onmetal/onmetal-api/internal/apis/networking"
 	. "github.com/onmetal/onmetal-api/internal/testutils/validation"
 	. "github.com/onsi/ginkgo/v2"
@@ -44,14 +43,19 @@ var _ = Describe("LoadBalancerRouting", func() {
 			&networking.LoadBalancerRouting{ObjectMeta: metav1.ObjectMeta{Name: "foo*"}},
 			ContainElement(InvalidField("metadata.name")),
 		),
-		Entry("duplicate destination",
+		Entry("invalid destination ip",
 			&networking.LoadBalancerRouting{
-				Destinations: []commonv1alpha1.LocalUIDReference{
-					{Name: "foo"},
-					{Name: "foo"},
+				Destinations: []networking.LoadBalancerDestination{{}},
+			},
+			ContainElement(InvalidField("destinations[0].ip")),
+		),
+		Entry("invalid destination targetRef name",
+			&networking.LoadBalancerRouting{
+				Destinations: []networking.LoadBalancerDestination{
+					{TargetRef: &networking.LoadBalancerTargetRef{Name: "foo*"}},
 				},
 			},
-			ContainElement(DuplicateField("destinations[1]")),
+			ContainElement(InvalidField("destinations[0].targetRef.name")),
 		),
 	)
 })

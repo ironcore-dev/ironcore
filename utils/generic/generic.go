@@ -24,6 +24,13 @@ func Identity[E any](e E) E {
 	return e
 }
 
+// Const produces a function that takes an argument and returns the original argument, ignoring the passed-in value.
+func Const[E, F any](e E) func(F) E {
+	return func(F) E {
+		return e
+	}
+}
+
 // Zero returns the zero value for the given type.
 func Zero[E any]() E {
 	var zero E

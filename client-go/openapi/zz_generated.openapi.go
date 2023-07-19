@@ -87,12 +87,14 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.IPBlock":                      schema_onmetal_api_api_networking_v1alpha1_IPBlock(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.IPSource":                     schema_onmetal_api_api_networking_v1alpha1_IPSource(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.LoadBalancer":                 schema_onmetal_api_api_networking_v1alpha1_LoadBalancer(ref),
+		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.LoadBalancerDestination":      schema_onmetal_api_api_networking_v1alpha1_LoadBalancerDestination(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.LoadBalancerList":             schema_onmetal_api_api_networking_v1alpha1_LoadBalancerList(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.LoadBalancerPort":             schema_onmetal_api_api_networking_v1alpha1_LoadBalancerPort(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.LoadBalancerRouting":          schema_onmetal_api_api_networking_v1alpha1_LoadBalancerRouting(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.LoadBalancerRoutingList":      schema_onmetal_api_api_networking_v1alpha1_LoadBalancerRoutingList(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.LoadBalancerSpec":             schema_onmetal_api_api_networking_v1alpha1_LoadBalancerSpec(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.LoadBalancerStatus":           schema_onmetal_api_api_networking_v1alpha1_LoadBalancerStatus(ref),
+		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.LoadBalancerTargetRef":        schema_onmetal_api_api_networking_v1alpha1_LoadBalancerTargetRef(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NATGateway":                   schema_onmetal_api_api_networking_v1alpha1_NATGateway(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NATGatewayList":               schema_onmetal_api_api_networking_v1alpha1_NATGatewayList(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NATGatewaySpec":               schema_onmetal_api_api_networking_v1alpha1_NATGatewaySpec(ref),
@@ -2693,6 +2695,35 @@ func schema_onmetal_api_api_networking_v1alpha1_LoadBalancer(ref common.Referenc
 	}
 }
 
+func schema_onmetal_api_api_networking_v1alpha1_LoadBalancerDestination(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "LoadBalancerDestination is the destination of the load balancer.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"ip": {
+						SchemaProps: spec.SchemaProps{
+							Description: "IP is the target IP.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/onmetal/onmetal-api/api/common/v1alpha1.IP"),
+						},
+					},
+					"targetRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "TargetRef is the target providing the destination.",
+							Ref:         ref("github.com/onmetal/onmetal-api/api/networking/v1alpha1.LoadBalancerTargetRef"),
+						},
+					},
+				},
+				Required: []string{"ip"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/onmetal/onmetal-api/api/common/v1alpha1.IP", "github.com/onmetal/onmetal-api/api/networking/v1alpha1.LoadBalancerTargetRef"},
+	}
+}
+
 func schema_onmetal_api_api_networking_v1alpha1_LoadBalancerList(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -2820,7 +2851,7 @@ func schema_onmetal_api_api_networking_v1alpha1_LoadBalancerRouting(ref common.R
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference"),
+										Ref:     ref("github.com/onmetal/onmetal-api/api/networking/v1alpha1.LoadBalancerDestination"),
 									},
 								},
 							},
@@ -2831,7 +2862,7 @@ func schema_onmetal_api_api_networking_v1alpha1_LoadBalancerRouting(ref common.R
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			"github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference", "github.com/onmetal/onmetal-api/api/networking/v1alpha1.LoadBalancerDestination", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 
@@ -2990,6 +3021,44 @@ func schema_onmetal_api_api_networking_v1alpha1_LoadBalancerStatus(ref common.Re
 		},
 		Dependencies: []string{
 			"github.com/onmetal/onmetal-api/api/common/v1alpha1.IP"},
+	}
+}
+
+func schema_onmetal_api_api_networking_v1alpha1_LoadBalancerTargetRef(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "LoadBalancerTargetRef is a load balancer target.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"uid": {
+						SchemaProps: spec.SchemaProps{
+							Description: "UID is the UID of the target.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the name of the target.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"providerID": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ProviderID is the provider internal id of the target.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"uid", "name", "providerID"},
+			},
+		},
 	}
 }
 

@@ -718,6 +718,16 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: com.github.onmetal.onmetal-api.api.networking.v1alpha1.LoadBalancerStatus
       default: {}
+- name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.LoadBalancerDestination
+  map:
+    fields:
+    - name: ip
+      type:
+        namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IP
+      default: {}
+    - name: targetRef
+      type:
+        namedType: com.github.onmetal.onmetal-api.api.networking.v1alpha1.LoadBalancerTargetRef
 - name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.LoadBalancerPort
   map:
     fields:
@@ -741,7 +751,7 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         list:
           elementType:
-            namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.LocalUIDReference
+            namedType: com.github.onmetal.onmetal-api.api.networking.v1alpha1.LoadBalancerDestination
           elementRelationship: atomic
     - name: kind
       type:
@@ -795,6 +805,21 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IP
           elementRelationship: atomic
+- name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.LoadBalancerTargetRef
+  map:
+    fields:
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: providerID
+      type:
+        scalar: string
+      default: ""
+    - name: uid
+      type:
+        scalar: string
+      default: ""
 - name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NATGateway
   map:
     fields:
