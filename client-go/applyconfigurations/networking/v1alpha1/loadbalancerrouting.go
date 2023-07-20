@@ -18,7 +18,7 @@
 package v1alpha1
 
 import (
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	apinetworkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	v1alpha1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/common/v1alpha1"
 	internal "github.com/onmetal/onmetal-api/client-go/applyconfigurations/internal"
 	v1 "github.com/onmetal/onmetal-api/client-go/applyconfigurations/meta/v1"
@@ -32,8 +32,8 @@ import (
 type LoadBalancerRoutingApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	NetworkRef                       *v1alpha1.LocalUIDReferenceApplyConfiguration  `json:"networkRef,omitempty"`
-	Destinations                     []v1alpha1.LocalUIDReferenceApplyConfiguration `json:"destinations,omitempty"`
+	NetworkRef                       *v1alpha1.LocalUIDReferenceApplyConfiguration `json:"networkRef,omitempty"`
+	Destinations                     []LoadBalancerDestinationApplyConfiguration   `json:"destinations,omitempty"`
 }
 
 // LoadBalancerRouting constructs an declarative configuration of the LoadBalancerRouting type for use with
@@ -58,18 +58,18 @@ func LoadBalancerRouting(name, namespace string) *LoadBalancerRoutingApplyConfig
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
 // Experimental!
-func ExtractLoadBalancerRouting(loadBalancerRouting *networkingv1alpha1.LoadBalancerRouting, fieldManager string) (*LoadBalancerRoutingApplyConfiguration, error) {
+func ExtractLoadBalancerRouting(loadBalancerRouting *apinetworkingv1alpha1.LoadBalancerRouting, fieldManager string) (*LoadBalancerRoutingApplyConfiguration, error) {
 	return extractLoadBalancerRouting(loadBalancerRouting, fieldManager, "")
 }
 
 // ExtractLoadBalancerRoutingStatus is the same as ExtractLoadBalancerRouting except
 // that it extracts the status subresource applied configuration.
 // Experimental!
-func ExtractLoadBalancerRoutingStatus(loadBalancerRouting *networkingv1alpha1.LoadBalancerRouting, fieldManager string) (*LoadBalancerRoutingApplyConfiguration, error) {
+func ExtractLoadBalancerRoutingStatus(loadBalancerRouting *apinetworkingv1alpha1.LoadBalancerRouting, fieldManager string) (*LoadBalancerRoutingApplyConfiguration, error) {
 	return extractLoadBalancerRouting(loadBalancerRouting, fieldManager, "status")
 }
 
-func extractLoadBalancerRouting(loadBalancerRouting *networkingv1alpha1.LoadBalancerRouting, fieldManager string, subresource string) (*LoadBalancerRoutingApplyConfiguration, error) {
+func extractLoadBalancerRouting(loadBalancerRouting *apinetworkingv1alpha1.LoadBalancerRouting, fieldManager string, subresource string) (*LoadBalancerRoutingApplyConfiguration, error) {
 	b := &LoadBalancerRoutingApplyConfiguration{}
 	err := managedfields.ExtractInto(loadBalancerRouting, internal.Parser().Type("com.github.onmetal.onmetal-api.api.networking.v1alpha1.LoadBalancerRouting"), fieldManager, b, subresource)
 	if err != nil {
@@ -252,7 +252,7 @@ func (b *LoadBalancerRoutingApplyConfiguration) WithNetworkRef(value *v1alpha1.L
 // WithDestinations adds the given value to the Destinations field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the Destinations field.
-func (b *LoadBalancerRoutingApplyConfiguration) WithDestinations(values ...*v1alpha1.LocalUIDReferenceApplyConfiguration) *LoadBalancerRoutingApplyConfiguration {
+func (b *LoadBalancerRoutingApplyConfiguration) WithDestinations(values ...*LoadBalancerDestinationApplyConfiguration) *LoadBalancerRoutingApplyConfiguration {
 	for i := range values {
 		if values[i] == nil {
 			panic("nil value passed to WithDestinations")

@@ -354,7 +354,6 @@ func main() {
 	if controllers.Enabled(loadBalancerController) {
 		if err := (&networkingcontrollers.LoadBalancerReconciler{
 			Client: mgr.GetClient(),
-			Scheme: mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "LoadBalancer")
 			os.Exit(1)

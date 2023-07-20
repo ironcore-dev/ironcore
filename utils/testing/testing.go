@@ -21,8 +21,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/onmetal/onmetal-api/utils/klog"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
+	"github.com/onsi/gomega/gcustom"
+	"github.com/onsi/gomega/types"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -144,6 +147,13 @@ func RandomString(n int, opts ...RandomStringOption) string {
 	return sb.String()
 }
 
+// BeControlledBy matches any object that is controlled by the given owner.
+func BeControlledBy(owner client.Object) types.GomegaMatcher {
+	return gcustom.MakeMatcher(func(obj client.Object) (bool, error) {
+		return metav1.IsControlledBy(obj, owner), nil
+	}).WithTemplate("Expected:\n{{.FormattedActual}}\n{{.To}} be controlled by {{.Data 1}}", klog.KObjUID(owner))
+}
+
 // SetupNamespace sets up a namespace before each test and tears the namespace down after each test.
 func SetupNamespace(c *client.Client) *corev1.Namespace {
 	ns := &corev1.Namespace{}
@@ -154,9 +164,14 @@ func SetupNamespace(c *client.Client) *corev1.Namespace {
 			},
 		}
 		gomega.Expect((*c).Create(ctx, ns)).To(gomega.Succeed())
-		ginkgo.DeferCleanup(func(ctx context.Context) error {
-			return client.IgnoreNotFound((*c).Delete(ctx, ns))
-		})
+		ginkgo.DeferCleanup(DeleteIfExists(c, ns))
 	})
 	return ns
+}
+
+// DeleteIfExists returns a function to clean up an object if it exists.
+func DeleteIfExists(c *client.Client, obj client.Object) func(ctx context.Context) error {
+	return func(ctx context.Context) error {
+		return client.IgnoreNotFound((*c).Delete(ctx, obj))
+	}
 }

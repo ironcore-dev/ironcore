@@ -19,7 +19,6 @@ package storage
 import (
 	"context"
 
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	"github.com/onmetal/onmetal-api/internal/apis/networking"
 	"github.com/onmetal/onmetal-api/internal/tableconvertor"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -71,10 +70,10 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 	return tab, err
 }
 
-func formatDestinations(destinations []commonv1alpha1.LocalUIDReference) string {
+func formatDestinations(destinations []networking.LoadBalancerDestination) string {
 	var parts []string
 	for _, destination := range destinations {
-		parts = append(parts, destination.Name)
+		parts = append(parts, destination.IP.String())
 	}
 	return tableconvertor.JoinStringsMore(parts, ",", 3)
 }

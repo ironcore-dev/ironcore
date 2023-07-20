@@ -19,6 +19,7 @@ package v1alpha1
 import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 // +genclient
@@ -33,7 +34,25 @@ type LoadBalancerRouting struct {
 	NetworkRef commonv1alpha1.LocalUIDReference `json:"networkRef"`
 
 	// Destinations are the destinations for an LoadBalancer.
-	Destinations []commonv1alpha1.LocalUIDReference `json:"destinations"`
+	Destinations []LoadBalancerDestination `json:"destinations"`
+}
+
+// LoadBalancerDestination is the destination of the load balancer.
+type LoadBalancerDestination struct {
+	// IP is the target IP.
+	IP commonv1alpha1.IP `json:"ip"`
+	// TargetRef is the target providing the destination.
+	TargetRef *LoadBalancerTargetRef `json:"targetRef,omitempty"`
+}
+
+// LoadBalancerTargetRef is a load balancer target.
+type LoadBalancerTargetRef struct {
+	// UID is the UID of the target.
+	UID types.UID `json:"uid"`
+	// Name is the name of the target.
+	Name string `json:"name"`
+	// ProviderID is the provider internal id of the target.
+	ProviderID string `json:"providerID"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
