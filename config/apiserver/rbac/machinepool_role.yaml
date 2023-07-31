@@ -102,6 +102,14 @@ rules:
   - patch
   - update
 - apiGroups:
+  - ipam.api.onmetal.de
+  resources:
+  - prefixes
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
   - networking.api.onmetal.de
   resources:
   - loadbalancerroutings

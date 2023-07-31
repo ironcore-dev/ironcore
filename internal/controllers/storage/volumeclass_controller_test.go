@@ -32,10 +32,9 @@ import (
 )
 
 var _ = Describe("VolumeClass controller", func() {
-	ctx := SetupContext()
-	ns, _ := SetupTest(ctx)
+	ns := SetupNamespace(&k8sClient)
 
-	It("should finalize the volume class if no volume is using it", func() {
+	It("should finalize the volume class if no volume is using it", func(ctx SpecContext) {
 		By("creating the volume class consumed by the volume")
 		volumeClass := &storagev1alpha1.VolumeClass{
 			ObjectMeta: metav1.ObjectMeta{

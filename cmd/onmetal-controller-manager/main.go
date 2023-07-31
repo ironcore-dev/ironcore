@@ -39,6 +39,7 @@ import (
 	storagecontrollers "github.com/onmetal/onmetal-api/internal/controllers/storage"
 	quotaevaluatoronmetal "github.com/onmetal/onmetal-api/internal/quota/evaluator/onmetal"
 	"github.com/onmetal/onmetal-api/utils/quota"
+	"k8s.io/utils/lru"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
@@ -65,29 +66,34 @@ var (
 )
 
 const (
-	machineClassController     = "machineclass"
-	machinePoolController      = "machinepool"
-	machineSchedulerController = "machinescheduler"
-	machineController          = "machine"
+	// compute controllers
+	machineEphemeralNetworkInterfaceController = "machineephemeralnetworkinterface"
+	machineEphemeralVolumeController           = "machineephemeralvolume"
+	machineSchedulerController                 = "machinescheduler"
+	machineClassController                     = "machineclass"
 
-	volumePoolController  = "volumepool"
-	volumeClassController = "volumeclass"
-	volumeController      = "volume"
-	volumeScheduler       = "volumescheduler"
+	// storage controllers
+	bucketScheduler         = "bucketscheduler"
+	bucketClassController   = "bucketclass"
+	volumeReleaseController = "volumerelease"
+	volumeScheduler         = "volumescheduler"
+	volumeClassController   = "volumeclass"
 
-	bucketClassController = "bucketclass"
-	bucketScheduler       = "bucketscheduler"
-
+	// ipam controllers
 	prefixController          = "prefix"
 	prefixAllocationScheduler = "prefixallocationscheduler"
 
-	networkBindController          = "networkbind"
-	networkProtectionController    = "networkprotection"
-	networkInterfaceController     = "networkinterface"
-	networkInterfaceBindController = "networkinterfacebind"
-	virtualIPController            = "virtualip"
-	loadBalancerController         = "loadbalancer"
+	// networking controllers
+	loadBalancerController                       = "loadbalancer"
+	loadBalancerEphemeralPrefixController        = "loadbalancerephemeralprefix"
+	networkProtectionController                  = "networkprotection"
+	networkReleaseController                     = "networkrelease"
+	networkInterfaceEphemeralPrefixController    = "networkinterfaceephemeralprefix"
+	networkInterfaceEphemeralVirtualIPController = "networkinterfaceephemeralvirtualip"
+	networkInterfaceReleaseController            = "networkinterfacerelease"
+	virtualIPReleaseController                   = "virtualiprelease"
 
+	// core controllers
 	resourceQuotaController       = "resourcequota"
 	certificateApprovalController = "certificateapproval"
 )
@@ -121,22 +127,36 @@ func main() {
 	flag.DurationVar(&networkInterfaceBindTimeout, "network-interface-bind-timeout", 10*time.Second, "Time to wait until considering a network interface bind to be failed.")
 
 	controllers := switches.New(
-		// Compute controllers
-		machineClassController, machinePoolController, machineSchedulerController, machineController,
+		// compute controllers
+		machineEphemeralNetworkInterfaceController,
+		machineEphemeralVolumeController,
+		machineSchedulerController,
+		machineClassController,
 
-		// Storage controllers
-		volumePoolController, volumeClassController, volumeController, volumeScheduler,
-		bucketClassController, bucketScheduler,
+		// storage controllers
+		bucketScheduler,
+		bucketClassController,
+		volumeReleaseController,
+		volumeScheduler,
+		volumeClassController,
 
-		// Networking controllers
-		networkBindController, networkProtectionController,
-		networkInterfaceController, networkInterfaceBindController, virtualIPController, loadBalancerController,
+		// ipam controllers
+		prefixController,
+		prefixAllocationScheduler,
 
-		// IPAM controllers
-		prefixController, prefixAllocationScheduler,
+		// networking controllers
+		loadBalancerController,
+		loadBalancerEphemeralPrefixController,
+		networkProtectionController,
+		networkReleaseController,
+		networkInterfaceEphemeralPrefixController,
+		networkInterfaceEphemeralVirtualIPController,
+		networkInterfaceReleaseController,
+		virtualIPReleaseController,
 
-		// Core controllers
-		resourceQuotaController, certificateApprovalController,
+		// core controllers
+		resourceQuotaController,
+		certificateApprovalController,
 	)
 	flag.Var(controllers, "controllers",
 		fmt.Sprintf("Controllers to enable. All controllers: %v. Disabled-by-default controllers: %v",
@@ -159,7 +179,6 @@ func main() {
 		Logger:                 logger,
 		Scheme:                 scheme,
 		MetricsBindAddress:     metricsAddr,
-		Port:                   9443,
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       "d0ae00be.onmetal.de",
@@ -170,22 +189,23 @@ func main() {
 	}
 
 	// Register controllers
-	if controllers.Enabled(machineClassController) {
-		if err := (&computecontrollers.MachineClassReconciler{
-			Client:    mgr.GetClient(),
-			APIReader: mgr.GetAPIReader(),
+
+	// compute controllers
+
+	if controllers.Enabled(machineEphemeralNetworkInterfaceController) {
+		if err := (&computecontrollers.MachineEphemeralNetworkInterfaceReconciler{
+			Client: mgr.GetClient(),
 		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "MachineClassRef")
+			setupLog.Error(err, "unable to create controller", "controller", "MachineEphemeralNetworkInterface")
 			os.Exit(1)
 		}
 	}
 
-	if controllers.Enabled(machinePoolController) {
-		if err := (&computecontrollers.MachinePoolReconciler{
+	if controllers.Enabled(machineEphemeralVolumeController) {
+		if err := (&computecontrollers.MachineEphemeralVolumeReconciler{
 			Client: mgr.GetClient(),
-			Scheme: mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "MachinePoolRef")
+			setupLog.Error(err, "unable to create controller", "controller", "MachineEphemeralVolume")
 			os.Exit(1)
 		}
 	}
@@ -207,35 +227,24 @@ func main() {
 		}
 	}
 
-	if controllers.Enabled(volumePoolController) {
-		if err := (&storagecontrollers.VolumePoolReconciler{
-			Client: mgr.GetClient(),
-			Scheme: mgr.GetScheme(),
-		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "VolumePoolRef")
-			os.Exit(1)
-		}
-	}
-
-	if controllers.Enabled(volumeClassController) {
-		if err := (&storagecontrollers.VolumeClassReconciler{
+	if controllers.Enabled(machineClassController) {
+		if err := (&computecontrollers.MachineClassReconciler{
 			Client:    mgr.GetClient(),
 			APIReader: mgr.GetAPIReader(),
 		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "VolumeClass")
+			setupLog.Error(err, "unable to create controller", "controller", "MachineClass")
 			os.Exit(1)
 		}
 	}
 
-	if controllers.Enabled(volumeController) {
-		if err := (&storagecontrollers.VolumeReconciler{
-			EventRecorder: mgr.GetEventRecorderFor("volumes"),
+	// storage controllers
+
+	if controllers.Enabled(bucketScheduler) {
+		if err := (&storagecontrollers.BucketScheduler{
+			EventRecorder: mgr.GetEventRecorderFor("bucket-scheduler"),
 			Client:        mgr.GetClient(),
-			APIReader:     mgr.GetAPIReader(),
-			Scheme:        mgr.GetScheme(),
-			BindTimeout:   volumeBindTimeout,
 		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "Volume")
+			setupLog.Error(err, "unable to create controller", "controller", "BucketScheduler")
 			os.Exit(1)
 		}
 	}
@@ -250,12 +259,14 @@ func main() {
 		}
 	}
 
-	if controllers.Enabled(bucketScheduler) {
-		if err := (&storagecontrollers.BucketScheduler{
-			EventRecorder: mgr.GetEventRecorderFor("bucket-scheduler"),
-			Client:        mgr.GetClient(),
+	if controllers.Enabled(volumeReleaseController) {
+		if err := (&storagecontrollers.VolumeReleaseReconciler{
+			Client:       mgr.GetClient(),
+			APIReader:    mgr.GetAPIReader(),
+			AbsenceCache: lru.New(500),
 		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "BucketScheduler")
+			setupLog.Error(err, "unable to create controller", "controller", "VolumeRelease")
+			os.Exit(1)
 		}
 	}
 
@@ -265,19 +276,21 @@ func main() {
 			Client:        mgr.GetClient(),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "VolumeScheduler")
-		}
-	}
-
-	if controllers.Enabled(machineController) {
-		if err := (&computecontrollers.MachineReconciler{
-			EventRecorder: mgr.GetEventRecorderFor("machines"),
-			Client:        mgr.GetClient(),
-			Scheme:        mgr.GetScheme(),
-		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "Machine")
 			os.Exit(1)
 		}
 	}
+
+	if controllers.Enabled(volumeClassController) {
+		if err := (&storagecontrollers.VolumeClassReconciler{
+			Client:    mgr.GetClient(),
+			APIReader: mgr.GetAPIReader(),
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "VolumeClass")
+			os.Exit(1)
+		}
+	}
+
+	// ipam controllers
 
 	if controllers.Enabled(prefixController) {
 		if err := (&ipamcontrollers.PrefixReconciler{
@@ -302,12 +315,22 @@ func main() {
 		}
 	}
 
-	if controllers.Enabled(networkBindController) {
-		if err := (&networkingcontrollers.NetworkBindReconciler{
-			EventRecorder: mgr.GetEventRecorderFor("networkbind"),
-			Client:        mgr.GetClient(),
+	// networking controllers
+
+	if controllers.Enabled(loadBalancerController) {
+		if err := (&networkingcontrollers.LoadBalancerReconciler{
+			Client: mgr.GetClient(),
 		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "NetworkBind")
+			setupLog.Error(err, "unable to create controller", "controller", "LoadBalancer")
+			os.Exit(1)
+		}
+	}
+
+	if controllers.Enabled(loadBalancerEphemeralPrefixController) {
+		if err := (&networkingcontrollers.LoadBalancerEphemeralPrefixReconciler{
+			Client: mgr.GetClient(),
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "LoadBalancerEphemeralPrefix")
 			os.Exit(1)
 		}
 	}
@@ -322,51 +345,58 @@ func main() {
 		}
 	}
 
-	if controllers.Enabled(networkInterfaceController) {
-		if err := (&networkingcontrollers.NetworkInterfaceReconciler{
-			EventRecorder: mgr.GetEventRecorderFor("networkinterfaces"),
-			Client:        mgr.GetClient(),
-			Scheme:        mgr.GetScheme(),
+	if controllers.Enabled(networkReleaseController) {
+		if err := (&networkingcontrollers.NetworkReleaseReconciler{
+			Client:       mgr.GetClient(),
+			APIReader:    mgr.GetAPIReader(),
+			AbsenceCache: lru.New(500),
 		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "NetworkInterface")
+			setupLog.Error(err, "unable to create controller", "controller", "NetworkRelease")
 			os.Exit(1)
 		}
 	}
 
-	if controllers.Enabled(networkInterfaceBindController) {
-		if err := (&networkingcontrollers.NetworkInterfaceBindReconciler{
-			EventRecorder: mgr.GetEventRecorderFor("networkinterfaces"),
-			Client:        mgr.GetClient(),
-			APIReader:     mgr.GetAPIReader(),
-			Scheme:        mgr.GetScheme(),
-			BindTimeout:   networkInterfaceBindTimeout,
-		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "NetworkInterfaceBind")
-			os.Exit(1)
-		}
-	}
-
-	if controllers.Enabled(virtualIPController) {
-		if err := (&networkingcontrollers.VirtualIPReconciler{
-			EventRecorder: mgr.GetEventRecorderFor("virtualips"),
-			Client:        mgr.GetClient(),
-			APIReader:     mgr.GetAPIReader(),
-			Scheme:        mgr.GetScheme(),
-			BindTimeout:   virtualIPBindTimeout,
-		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "VirtualIP")
-			os.Exit(1)
-		}
-	}
-
-	if controllers.Enabled(loadBalancerController) {
-		if err := (&networkingcontrollers.LoadBalancerReconciler{
+	if controllers.Enabled(networkInterfaceEphemeralPrefixController) {
+		if err := (&networkingcontrollers.NetworkInterfaceEphemeralPrefixReconciler{
 			Client: mgr.GetClient(),
 		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "LoadBalancer")
+			setupLog.Error(err, "unable to create controller", "controller", "NetworkInterfaceEphemeralPrefix")
 			os.Exit(1)
 		}
 	}
+
+	if controllers.Enabled(networkInterfaceEphemeralVirtualIPController) {
+		if err := (&networkingcontrollers.NetworkInterfaceEphemeralVirtualIPReconciler{
+			Client: mgr.GetClient(),
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "NetworkInterfaceEphemeralVirtualIP")
+			os.Exit(1)
+		}
+	}
+
+	if controllers.Enabled(networkInterfaceReleaseController) {
+		if err := (&networkingcontrollers.NetworkInterfaceReleaseReconciler{
+			Client:       mgr.GetClient(),
+			APIReader:    mgr.GetAPIReader(),
+			AbsenceCache: lru.New(500),
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "NetworkInterfaceRelease")
+			os.Exit(1)
+		}
+	}
+
+	if controllers.Enabled(virtualIPReleaseController) {
+		if err := (&networkingcontrollers.VirtualIPReleaseReconciler{
+			Client:       mgr.GetClient(),
+			APIReader:    mgr.GetAPIReader(),
+			AbsenceCache: lru.New(500),
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "VirtualIPRelease")
+			os.Exit(1)
+		}
+	}
+
+	// core controllers
 
 	if controllers.Enabled(resourceQuotaController) {
 		registry := quota.NewRegistry(mgr.GetScheme())
@@ -409,6 +439,20 @@ func main() {
 
 	// compute indexers
 
+	if controllers.AnyEnabled(machineEphemeralNetworkInterfaceController) {
+		if err := computeclient.SetupMachineSpecNetworkInterfaceNamesFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
+			setupLog.Error(err, "unable to index field", "field", computeclient.MachineSpecNetworkInterfaceNamesField)
+			os.Exit(1)
+		}
+	}
+
+	if controllers.AnyEnabled(machineEphemeralVolumeController) {
+		if err := computeclient.SetupMachineSpecVolumeNamesFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
+			setupLog.Error(err, "unable to index field", "field", computeclient.MachineSpecVolumeNamesField)
+			os.Exit(1)
+		}
+	}
+
 	if controllers.AnyEnabled(machineSchedulerController) {
 		if err := computeclient.SetupMachineSpecMachinePoolRefNameFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
 			setupLog.Error(err, "unable to index field", "field", computeclient.MachineSpecMachinePoolRefNameField)
@@ -419,20 +463,6 @@ func main() {
 	if controllers.AnyEnabled(machineClassController) {
 		if err := computeclient.SetupMachineSpecMachineClassRefNameFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
 			setupLog.Error(err, "unable to setup field indexer", "field", computeclient.MachineSpecMachineClassRefNameField)
-			os.Exit(1)
-		}
-	}
-
-	if controllers.AnyEnabled(machineController, networkInterfaceBindController) {
-		if err := computeclient.SetupMachineSpecNetworkInterfaceNamesFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
-			setupLog.Error(err, "unable to setup field indexer", "field", computeclient.MachineSpecNetworkInterfaceNamesField)
-			os.Exit(1)
-		}
-	}
-
-	if controllers.AnyEnabled(machineController, volumeController) {
-		if err := computeclient.SetupMachineSpecVolumeNamesFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
-			setupLog.Error(err, "unable to index field", "field", computeclient.MachineSpecVolumeNamesField)
 			os.Exit(1)
 		}
 	}
@@ -483,6 +513,13 @@ func main() {
 		}
 	}
 
+	if controllers.AnyEnabled(loadBalancerEphemeralPrefixController) {
+		if err := networkingclient.SetupLoadBalancerPrefixNamesFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
+			setupLog.Error(err, "unable to setup field indexer", "field", networkingclient.LoadBalancerPrefixNamesField)
+			os.Exit(1)
+		}
+	}
+
 	if controllers.AnyEnabled(networkProtectionController) {
 		if err := networkingclient.SetupNATGatewayNetworkNameFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
 			setupLog.Error(err, "unable to setup field indexer", "field", networkingclient.NATGatewayNetworkNameField)
@@ -490,37 +527,23 @@ func main() {
 		}
 	}
 
-	if controllers.AnyEnabled(networkBindController) {
-		if err := networkingclient.SetupNetworkPeeringKeysFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
-			setupLog.Error(err, "unable to setup field indexer", "field", networkingclient.NetworkPeeringKeysField)
+	if controllers.AnyEnabled(networkInterfaceEphemeralPrefixController) {
+		if err := networkingclient.SetupNetworkInterfacePrefixNamesFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
+			setupLog.Error(err, "unable to setup field indexer", "field", networkingclient.NetworkInterfacePrefixNamesField)
 			os.Exit(1)
 		}
 	}
 
-	if controllers.AnyEnabled(networkInterfaceController, virtualIPController) {
+	if controllers.AnyEnabled(networkInterfaceEphemeralVirtualIPController) {
 		if err := networkingclient.SetupNetworkInterfaceVirtualIPNameFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
 			setupLog.Error(err, "unable to setup field indexer", "field", networkingclient.NetworkInterfaceVirtualIPNamesField)
 			os.Exit(1)
 		}
 	}
 
-	if controllers.AnyEnabled(loadBalancerController, networkProtectionController, networkInterfaceController) {
+	if controllers.AnyEnabled(loadBalancerController, networkProtectionController, networkInterfaceReleaseController) {
 		if err := networkingclient.SetupNetworkInterfaceNetworkNameFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
 			setupLog.Error(err, "unable to setup field indexer", "field", networkingclient.NetworkInterfaceSpecNetworkRefNameField)
-			os.Exit(1)
-		}
-	}
-
-	if controllers.AnyEnabled(networkInterfaceBindController) {
-		if err := networkingclient.SetupNetworkInterfaceSpecMachineRefNameField(ctx, mgr.GetFieldIndexer()); err != nil {
-			setupLog.Error(err, "unable to setup field indexer", "field", networkingclient.NetworkInterfaceSpecMachineRefNameField)
-			os.Exit(1)
-		}
-	}
-
-	if controllers.AnyEnabled(virtualIPController) {
-		if err := networkingclient.SetupVirtualIPSpecTargetRefNameFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
-			setupLog.Error(err, "unable to setup field indexer", "field", networkingclient.VirtualIPSpecTargetRefNameField)
 			os.Exit(1)
 		}
 	}

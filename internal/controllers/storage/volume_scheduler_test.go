@@ -23,16 +23,26 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 )
 
 var _ = Describe("VolumeScheduler", func() {
-	ctx := SetupContext()
-	ns, _ := SetupTest(ctx)
+	ns := SetupNamespace(&k8sClient)
 
-	It("should schedule volumes on volume pools", func() {
+	BeforeEach(func(ctx SpecContext) {
+		By("waiting for the cached client to report no volume pools")
+		Eventually(New(cacheK8sClient).ObjectList(&storagev1alpha1.VolumePoolList{})).Should(HaveField("Items", BeEmpty()))
+	})
+
+	AfterEach(func(ctx SpecContext) {
+		By("deleting all volume pools")
+		Expect(k8sClient.DeleteAllOf(ctx, &storagev1alpha1.VolumePool{})).To(Succeed())
+	})
+
+	It("should schedule volumes on volume pools", func(ctx SpecContext) {
 		By("creating a volume pool")
 		volumePool := &storagev1alpha1.VolumePool{
 			ObjectMeta: metav1.ObjectMeta{
@@ -70,7 +80,7 @@ var _ = Describe("VolumeScheduler", func() {
 		}).Should(Succeed())
 	})
 
-	It("should schedule schedule volumes onto volume pools if the pool becomes available later than the volume", func() {
+	It("should schedule schedule volumes onto volume pools if the pool becomes available later than the volume", func(ctx SpecContext) {
 		By("creating a volume w/ the requested volume class")
 		volume := &storagev1alpha1.Volume{
 			ObjectMeta: metav1.ObjectMeta{
@@ -114,7 +124,7 @@ var _ = Describe("VolumeScheduler", func() {
 		}).Should(Equal(&corev1.LocalObjectReference{Name: volumePool.Name}))
 	})
 
-	It("should schedule onto volume pools with matching labels", func() {
+	It("should schedule onto volume pools with matching labels", func(ctx SpecContext) {
 		By("creating a volume pool w/o matching labels")
 		volumePoolNoMatchingLabels := &storagev1alpha1.VolumePool{
 			ObjectMeta: metav1.ObjectMeta{
@@ -172,7 +182,7 @@ var _ = Describe("VolumeScheduler", func() {
 		}).Should(Succeed())
 	})
 
-	It("should schedule a volume with corresponding tolerations onto a volume pool with taints", func() {
+	It("should schedule a volume with corresponding tolerations onto a volume pool with taints", func(ctx SpecContext) {
 		By("creating a volume pool w/ taints")
 		taintedVolumePool := &storagev1alpha1.VolumePool{
 			ObjectMeta: metav1.ObjectMeta{

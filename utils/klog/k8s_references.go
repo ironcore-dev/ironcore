@@ -15,6 +15,8 @@
 package klog
 
 import (
+	"bytes"
+	"fmt"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/types"
@@ -75,5 +77,62 @@ func KObjUID(obj KUIDMetadata) ObjectUIDRef {
 		Name:      obj.GetName(),
 		Namespace: obj.GetNamespace(),
 		UID:       obj.GetUID(),
+	}
+}
+
+type kObjSliceLike struct {
+	len int
+	idx func(int) klog.KMetadata
+}
+
+func (ks kObjSliceLike) String() string {
+	objectRefs := ks.process()
+	return fmt.Sprintf("%v", objectRefs)
+}
+
+func (ks kObjSliceLike) MarshalLog() any {
+	return ks.process()
+}
+
+func (ks kObjSliceLike) process() []any {
+	refs := make([]any, 0, ks.len)
+	for i := 0; i < ks.len; i++ {
+		item := ks.idx(i)
+		if item == nil {
+			refs = append(refs, nil)
+		} else {
+			refs = append(refs, klog.KObj(item))
+		}
+	}
+	return refs
+}
+
+var nilToken = []byte("null")
+
+func (ks kObjSliceLike) WriteText(out *bytes.Buffer) {
+	out.WriteRune('[')
+	defer out.WriteRune(']')
+	for i := 0; i < ks.len; i++ {
+		if i > 0 {
+			out.WriteRune(',')
+		}
+		item := ks.idx(i)
+		if item == nil {
+			out.Write(nilToken)
+		} else {
+			klog.KObj(item).WriteText(out)
+		}
+	}
+}
+
+func KObjStructSlice[S ~[]OStruct, KMetadata interface {
+	klog.KMetadata
+	*OStruct
+}, OStruct any](s S) any {
+	return kObjSliceLike{
+		len: len(s),
+		idx: func(i int) klog.KMetadata {
+			return KMetadata(&s[i])
+		},
 	}
 }

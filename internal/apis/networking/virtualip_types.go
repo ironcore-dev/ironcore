@@ -45,24 +45,7 @@ const (
 type VirtualIPStatus struct {
 	// IP is the allocated IP, if any.
 	IP *commonv1alpha1.IP
-
-	// Phase is the VirtualIPPhase of the VirtualIP.
-	Phase VirtualIPPhase
-	// LastPhaseTransitionTime is the last time the Phase transitioned from one value to another.
-	LastPhaseTransitionTime *metav1.Time
 }
-
-// VirtualIPPhase is the binding phase of a VirtualIP.
-type VirtualIPPhase string
-
-const (
-	// VirtualIPPhaseUnbound is used for any VirtualIP that is not bound.
-	VirtualIPPhaseUnbound VirtualIPPhase = "Unbound"
-	// VirtualIPPhasePending is used for any VirtualIP that is currently awaiting binding.
-	VirtualIPPhasePending VirtualIPPhase = "Pending"
-	// VirtualIPPhaseBound is used for any VirtualIP that is properly bound.
-	VirtualIPPhaseBound VirtualIPPhase = "Bound"
-)
 
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

@@ -37,7 +37,6 @@ var (
 		{Name: "IPs", Type: "string", Description: "List of effective IPs of the network interface"},
 		{Name: "VirtualIP", Type: "string", Description: "The virtual IP assigned to this interface, if any"},
 		{Name: "State", Type: "string", Description: "The state of the network interface"},
-		{Name: "Phase", Type: "string", Description: "The binding phase of the network interface"},
 		{Name: "Age", Type: "string", Format: "date", Description: objectMetaSwaggerDoc["creationTimestamp"]},
 	}
 )
@@ -86,7 +85,6 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 			cells = append(cells, "<none>")
 		}
 		cells = append(cells, networkInterface.Status.State)
-		cells = append(cells, networkInterface.Status.Phase)
 		cells = append(cells, age)
 
 		return cells, nil

@@ -139,10 +139,6 @@ type NetworkInterfaceStatus struct {
 	State NetworkInterfaceState
 	// LastStateTransitionTime is the last time the State transitioned.
 	LastStateTransitionTime *metav1.Time
-	// Phase is the NetworkInterface binding phase of the NetworkInterface.
-	Phase NetworkInterfacePhase
-	// LastPhaseTransitionTime is the last time the Phase transitioned.
-	LastPhaseTransitionTime *metav1.Time
 }
 
 // NetworkInterfaceState is the infrastructure attachment state a NetworkInterface can be in.
@@ -155,16 +151,6 @@ const (
 	NetworkInterfaceStateAttached NetworkInterfaceState = "Attached"
 )
 
-// NetworkInterfacePhase represents the binding phase a NetworkInterface can be in.
-type NetworkInterfacePhase string
-
-const (
-	// NetworkInterfacePhasePending is used for a NetworkInterface that is not yet bound.
-	NetworkInterfacePhasePending NetworkInterfacePhase = "Pending"
-	// NetworkInterfacePhaseBound is used for a NetworkInterface that is bound.
-	NetworkInterfacePhaseBound NetworkInterfacePhase = "Bound"
-)
-
 // VolumeStatus is the status of a Volume.
 type VolumeStatus struct {
 	// Name is the name of a volume attachment.
@@ -175,10 +161,6 @@ type VolumeStatus struct {
 	State VolumeState
 	// LastStateTransitionTime is the last time the State transitioned.
 	LastStateTransitionTime *metav1.Time
-	// Phase represents the binding phase of a Volume.
-	Phase VolumePhase
-	// LastPhaseTransitionTime is the last time the Phase transitioned.
-	LastPhaseTransitionTime *metav1.Time
 }
 
 // VolumeState is the infrastructure attachment state a Volume can be in.
@@ -189,16 +171,6 @@ const (
 	VolumeStatePending VolumeState = "Pending"
 	// VolumeStateAttached indicates that a volume has been successfully attached.
 	VolumeStateAttached VolumeState = "Attached"
-)
-
-// VolumePhase represents the binding phase a Volume can be in.
-type VolumePhase string
-
-const (
-	// VolumePhasePending is used for a Volume that is not yet bound.
-	VolumePhasePending VolumePhase = "Pending"
-	// VolumePhaseBound is used for a Volume that is bound.
-	VolumePhaseBound VolumePhase = "Bound"
 )
 
 // MachineStatus defines the observed state of Machine

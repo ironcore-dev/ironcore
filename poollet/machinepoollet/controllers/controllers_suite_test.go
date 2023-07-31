@@ -200,7 +200,6 @@ func SetupTest() (*corev1.Namespace, *computev1alpha1.MachinePool, *computev1alp
 
 		k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
 			Scheme:             scheme.Scheme,
-			Host:               "127.0.0.1",
 			MetricsBindAddress: "0",
 		})
 		Expect(err).ToNot(HaveOccurred())

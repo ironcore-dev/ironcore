@@ -896,8 +896,6 @@ func autoConvert_v1alpha1_NetworkInterfaceStatus_To_compute_NetworkInterfaceStat
 	out.VirtualIP = (*commonv1alpha1.IP)(unsafe.Pointer(in.VirtualIP))
 	out.State = compute.NetworkInterfaceState(in.State)
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
-	out.Phase = compute.NetworkInterfacePhase(in.Phase)
-	out.LastPhaseTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastPhaseTransitionTime))
 	return nil
 }
 
@@ -913,8 +911,6 @@ func autoConvert_compute_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStat
 	out.VirtualIP = (*commonv1alpha1.IP)(unsafe.Pointer(in.VirtualIP))
 	out.State = v1alpha1.NetworkInterfaceState(in.State)
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
-	out.Phase = v1alpha1.NetworkInterfacePhase(in.Phase)
-	out.LastPhaseTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastPhaseTransitionTime))
 	return nil
 }
 
@@ -984,8 +980,6 @@ func autoConvert_v1alpha1_VolumeStatus_To_compute_VolumeStatus(in *v1alpha1.Volu
 	out.Handle = in.Handle
 	out.State = compute.VolumeState(in.State)
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
-	out.Phase = compute.VolumePhase(in.Phase)
-	out.LastPhaseTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastPhaseTransitionTime))
 	return nil
 }
 
@@ -999,8 +993,6 @@ func autoConvert_compute_VolumeStatus_To_v1alpha1_VolumeStatus(in *compute.Volum
 	out.Handle = in.Handle
 	out.State = v1alpha1.VolumeState(in.State)
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
-	out.Phase = v1alpha1.VolumePhase(in.Phase)
-	out.LastPhaseTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastPhaseTransitionTime))
 	return nil
 }
 

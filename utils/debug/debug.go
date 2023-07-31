@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2023 OnMetal authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,20 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package events
+package debug
 
-const (
-	ErrorGettingNetworkHandle = "ErrorGettingNetworkHandle"
-	ErrorApplyingIPs          = "ErrorApplyingIPs"
-	ErrorApplyingVirtualIP    = "ErrorApplyingVirtualIP"
+import ctrl "sigs.k8s.io/controller-runtime"
 
-	ErrorNoPortsLeft = "ErrorNoPortsLeft"
+var (
+	log = ctrl.Log.WithName("debug")
 
-	NetworkNotReady   = "NetworkNotReady"
-	IPsNotReady       = "IPsNotReady"
-	VirtualIPNotReady = "VirtualIPNotReady"
-	PrefixNotReady    = "PrefixNotReady"
+	handlerLog = log.WithName("handler")
 
-	FailedBindingNetworkInterface = "FailedBindingNetworkInterface"
-	FailedBindingMachine          = "FailedBindingMachine"
+	predicateLog = log.WithName("predicate")
 )

@@ -17,17 +17,10 @@
 
 package v1alpha1
 
-import (
-	v1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-)
-
 // NetworkPeeringStatusApplyConfiguration represents an declarative configuration of the NetworkPeeringStatus type for use
 // with apply.
 type NetworkPeeringStatusApplyConfiguration struct {
-	Name                    *string                       `json:"name,omitempty"`
-	Phase                   *v1alpha1.NetworkPeeringPhase `json:"phase,omitempty"`
-	LastPhaseTransitionTime *v1.Time                      `json:"lastPhaseTransitionTime,omitempty"`
+	Name *string `json:"name,omitempty"`
 }
 
 // NetworkPeeringStatusApplyConfiguration constructs an declarative configuration of the NetworkPeeringStatus type for use with
@@ -41,21 +34,5 @@ func NetworkPeeringStatus() *NetworkPeeringStatusApplyConfiguration {
 // If called multiple times, the Name field is set to the value of the last call.
 func (b *NetworkPeeringStatusApplyConfiguration) WithName(value string) *NetworkPeeringStatusApplyConfiguration {
 	b.Name = &value
-	return b
-}
-
-// WithPhase sets the Phase field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the Phase field is set to the value of the last call.
-func (b *NetworkPeeringStatusApplyConfiguration) WithPhase(value v1alpha1.NetworkPeeringPhase) *NetworkPeeringStatusApplyConfiguration {
-	b.Phase = &value
-	return b
-}
-
-// WithLastPhaseTransitionTime sets the LastPhaseTransitionTime field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the LastPhaseTransitionTime field is set to the value of the last call.
-func (b *NetworkPeeringStatusApplyConfiguration) WithLastPhaseTransitionTime(value v1.Time) *NetworkPeeringStatusApplyConfiguration {
-	b.LastPhaseTransitionTime = &value
 	return b
 }

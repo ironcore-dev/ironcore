@@ -17,19 +17,11 @@
 package storage
 
 import (
+	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	"github.com/onmetal/onmetal-api/internal/apis/core"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime/schema"
-
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 )
-
-// VolumeGK is a helper to easily access the GroupKind information of an Volume
-var VolumeGK = schema.GroupKind{
-	Group: SchemeGroupVersion.Group,
-	Kind:  "Volume",
-}
 
 // VolumeEncryption represents information to encrypt a volume.
 type VolumeEncryption struct {
@@ -83,11 +75,6 @@ type VolumeStatus struct {
 	// LastStateTransitionTime is the last time the State transitioned between values.
 	LastStateTransitionTime *metav1.Time
 
-	// Phase represents the binding phase of a Volume.
-	Phase VolumePhase
-	// LastPhaseTransitionTime is the last time the Phase transitioned between values.
-	LastPhaseTransitionTime *metav1.Time
-
 	// Access specifies how to access a Volume.
 	// This is set by the volume provider when the volume is provisioned.
 	Access *VolumeAccess
@@ -114,18 +101,6 @@ type VolumeCondition struct {
 	// LastTransitionTime is the last time the status of a condition has transitioned from one state to another.
 	LastTransitionTime metav1.Time
 }
-
-// VolumePhase represents the binding phase of a Volume.
-type VolumePhase string
-
-const (
-	// VolumePhaseUnbound is used for any Volume that not bound.
-	VolumePhaseUnbound VolumePhase = "Unbound"
-	// VolumePhasePending is used for any Volume that is currently awaiting binding.
-	VolumePhasePending VolumePhase = "Pending"
-	// VolumePhaseBound is used for any Volume that is properly bound.
-	VolumePhaseBound VolumePhase = "Bound"
-)
 
 // VolumeState represents the infrastructure state of a Volume.
 type VolumeState string

@@ -1300,29 +1300,6 @@ NetworkInterfaceSource
 </tr>
 </tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.NetworkInterfacePhase">NetworkInterfacePhase
-(<code>string</code> alias)</h3>
-<p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.NetworkInterfaceStatus">NetworkInterfaceStatus</a>)
-</p>
-<div>
-<p>NetworkInterfacePhase represents the binding phase a NetworkInterface can be in.</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Value</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody><tr><td><p>&#34;Bound&#34;</p></td>
-<td><p>NetworkInterfacePhaseBound is used for a NetworkInterface that is bound.</p>
-</td>
-</tr><tr><td><p>&#34;Pending&#34;</p></td>
-<td><p>NetworkInterfacePhasePending is used for a NetworkInterface that is not yet bound.</p>
-</td>
-</tr></tbody>
-</table>
 <h3 id="compute.api.onmetal.de/v1alpha1.NetworkInterfaceSource">NetworkInterfaceSource
 </h3>
 <p>
@@ -1480,32 +1457,6 @@ Kubernetes meta/v1.Time
 <p>LastStateTransitionTime is the last time the State transitioned.</p>
 </td>
 </tr>
-<tr>
-<td>
-<code>phase</code><br/>
-<em>
-<a href="#compute.api.onmetal.de/v1alpha1.NetworkInterfacePhase">
-NetworkInterfacePhase
-</a>
-</em>
-</td>
-<td>
-<p>Phase is the NetworkInterface binding phase of the NetworkInterface.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>lastPhaseTransitionTime</code><br/>
-<em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#time-v1-meta">
-Kubernetes meta/v1.Time
-</a>
-</em>
-</td>
-<td>
-<p>LastPhaseTransitionTime is the last time the Phase transitioned.</p>
-</td>
-</tr>
 </tbody>
 </table>
 <h3 id="compute.api.onmetal.de/v1alpha1.Power">Power
@@ -1588,29 +1539,6 @@ VolumeSource
 </td>
 </tr>
 </tbody>
-</table>
-<h3 id="compute.api.onmetal.de/v1alpha1.VolumePhase">VolumePhase
-(<code>string</code> alias)</h3>
-<p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.VolumeStatus">VolumeStatus</a>)
-</p>
-<div>
-<p>VolumePhase represents the binding phase a Volume can be in.</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Value</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody><tr><td><p>&#34;Bound&#34;</p></td>
-<td><p>VolumePhaseBound is used for a Volume that is bound.</p>
-</td>
-</tr><tr><td><p>&#34;Pending&#34;</p></td>
-<td><p>VolumePhasePending is used for a Volume that is not yet bound.</p>
-</td>
-</tr></tbody>
 </table>
 <h3 id="compute.api.onmetal.de/v1alpha1.VolumeSource">VolumeSource
 </h3>
@@ -1755,32 +1683,6 @@ Kubernetes meta/v1.Time
 </td>
 <td>
 <p>LastStateTransitionTime is the last time the State transitioned.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>phase</code><br/>
-<em>
-<a href="#compute.api.onmetal.de/v1alpha1.VolumePhase">
-VolumePhase
-</a>
-</em>
-</td>
-<td>
-<p>Phase represents the binding phase of a Volume.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>lastPhaseTransitionTime</code><br/>
-<em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#time-v1-meta">
-Kubernetes meta/v1.Time
-</a>
-</em>
-</td>
-<td>
-<p>LastPhaseTransitionTime is the last time the Phase transitioned.</p>
 </td>
 </tr>
 </tbody>

@@ -52,15 +52,15 @@ var _ = Describe("MachineController", func() {
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())
 
 		By("patching the network to be available")
-		baseNetwork := network.DeepCopy()
-		network.Status.State = networkingv1alpha1.NetworkStateAvailable
-		Expect(k8sClient.Status().Patch(ctx, network, client.MergeFrom(baseNetwork))).To(Succeed())
+		Eventually(UpdateStatus(network, func() {
+			network.Status.State = networkingv1alpha1.NetworkStateAvailable
+		})).Should(Succeed())
 
 		By("creating a network interface")
-		networkInterface := &networkingv1alpha1.NetworkInterface{
+		nic := &networkingv1alpha1.NetworkInterface{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
-				GenerateName: "networkinterface-",
+				GenerateName: "nic-",
 			},
 			Spec: networkingv1alpha1.NetworkInterfaceSpec{
 				NetworkRef: corev1.LocalObjectReference{Name: network.Name},
@@ -69,7 +69,7 @@ var _ = Describe("MachineController", func() {
 				},
 			},
 		}
-		Expect(k8sClient.Create(ctx, networkInterface)).To(Succeed())
+		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
 
 		By("creating a volume")
 		volume := &storagev1alpha1.Volume{
@@ -82,13 +82,13 @@ var _ = Describe("MachineController", func() {
 		Expect(k8sClient.Create(ctx, volume)).To(Succeed())
 
 		By("patching the volume to be available")
-		baseVolume := volume.DeepCopy()
-		volume.Status.State = storagev1alpha1.VolumeStateAvailable
-		volume.Status.Access = &storagev1alpha1.VolumeAccess{
-			Driver: "test",
-			Handle: "testhandle",
-		}
-		Expect(k8sClient.Status().Patch(ctx, volume, client.MergeFrom(baseVolume))).To(Succeed())
+		Eventually(UpdateStatus(volume, func() {
+			volume.Status.State = storagev1alpha1.VolumeStateAvailable
+			volume.Status.Access = &storagev1alpha1.VolumeAccess{
+				Driver: "test",
+				Handle: "testhandle",
+			}
+		})).Should(Succeed())
 
 		By("creating a machine")
 		const fooAnnotationValue = "bar"
@@ -115,7 +115,7 @@ var _ = Describe("MachineController", func() {
 					{
 						Name: "primary",
 						NetworkInterfaceSource: computev1alpha1.NetworkInterfaceSource{
-							NetworkInterfaceRef: &corev1.LocalObjectReference{Name: networkInterface.Name},
+							NetworkInterfaceRef: &corev1.LocalObjectReference{Name: nic.Name},
 						},
 					},
 				},

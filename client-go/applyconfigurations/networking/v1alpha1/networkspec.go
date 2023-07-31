@@ -20,8 +20,9 @@ package v1alpha1
 // NetworkSpecApplyConfiguration represents an declarative configuration of the NetworkSpec type for use
 // with apply.
 type NetworkSpecApplyConfiguration struct {
-	ProviderID *string                            `json:"providerID,omitempty"`
-	Peerings   []NetworkPeeringApplyConfiguration `json:"peerings,omitempty"`
+	ProviderID       *string                                    `json:"providerID,omitempty"`
+	Peerings         []NetworkPeeringApplyConfiguration         `json:"peerings,omitempty"`
+	PeeringClaimRefs []NetworkPeeringClaimRefApplyConfiguration `json:"incomingPeerings,omitempty"`
 }
 
 // NetworkSpecApplyConfiguration constructs an declarative configuration of the NetworkSpec type for use with
@@ -47,6 +48,19 @@ func (b *NetworkSpecApplyConfiguration) WithPeerings(values ...*NetworkPeeringAp
 			panic("nil value passed to WithPeerings")
 		}
 		b.Peerings = append(b.Peerings, *values[i])
+	}
+	return b
+}
+
+// WithPeeringClaimRefs adds the given value to the PeeringClaimRefs field in the declarative configuration
+// and returns the receiver, so that objects can be build by chaining "With" function invocations.
+// If called multiple times, values provided by each call will be appended to the PeeringClaimRefs field.
+func (b *NetworkSpecApplyConfiguration) WithPeeringClaimRefs(values ...*NetworkPeeringClaimRefApplyConfiguration) *NetworkSpecApplyConfiguration {
+	for i := range values {
+		if values[i] == nil {
+			panic("nil value passed to WithPeeringClaimRefs")
+		}
+		b.PeeringClaimRefs = append(b.PeeringClaimRefs, *values[i])
 	}
 	return b
 }

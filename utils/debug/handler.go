@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package handler
+package debug
 
 import (
 	"context"
@@ -21,14 +21,10 @@ import (
 
 	"github.com/go-logr/logr"
 	"k8s.io/client-go/util/workqueue"
-	"k8s.io/klog/v2"
-	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 )
-
-var log = ctrl.Log.WithName("debug").WithName("eventhandler")
 
 type loggingQueue struct {
 	mu sync.RWMutex
@@ -115,70 +111,11 @@ func (d *debugHandler) Generic(ctx context.Context, evt event.GenericEvent, queu
 	d.handler.Generic(ctx, evt, lQueue)
 }
 
-// HandlerOptions are options for construction a debug handler.
-type HandlerOptions struct {
-	// Log is the logger to use. If unspecified, the debug package logger will be used.
-	Log logr.Logger
-
-	// ObjectValue controls how an object will be represented as in the log values.
-	ObjectValue func(client.Object) any
-}
-
-func (o *HandlerOptions) ApplyToHandler(o2 *HandlerOptions) {
-	if o.Log.GetSink() != nil {
-		o2.Log = o.Log
-	}
-	if o.ObjectValue != nil {
-		o2.ObjectValue = DefaultObjectValue
-	}
-}
-
-func (o *HandlerOptions) ApplyOptions(opts []Option) *HandlerOptions {
-	for _, opt := range opts {
-		opt.ApplyToHandler(o)
-	}
-	return o
-}
-
-func setHandlerOptionsDefaults(o *HandlerOptions) {
-	if o.Log.GetSink() == nil {
-		o.Log = log
-	}
-	if o.ObjectValue == nil {
-		o.ObjectValue = DefaultObjectValue
-	}
-}
-
-// DefaultObjectValue provides object logging values by using klog.KObj.
-func DefaultObjectValue(obj client.Object) any {
-	return klog.KObj(obj)
-}
-
-type Option interface {
-	ApplyToHandler(o *HandlerOptions)
-}
-
-// WithLog specifies the logger to use.
-type WithLog struct {
-	Log logr.Logger
-}
-
-func (w WithLog) ApplyToHandler(o *HandlerOptions) {
-	o.Log = w.Log
-}
-
-// WithObjectValue specifies the function to log an client.Object's value with.
-type WithObjectValue func(obj client.Object) any
-
-func (w WithObjectValue) ApplyToHandler(o *HandlerOptions) {
-	o.ObjectValue = w
-}
-
 // Handler allows debugging a handler.EventHandler by wrapping it and logging each action it does.
 //
 // Caution: This has a heavy toll on runtime performance and should *not* be used in production code.
 // Use only for debugging handlers and remove once done.
-func Handler(name string, handler handler.EventHandler, opts ...Option) handler.EventHandler {
+func Handler(name string, handler handler.EventHandler, opts ...HandlerOption) handler.EventHandler {
 	o := (&HandlerOptions{}).ApplyOptions(opts)
 	setHandlerOptionsDefaults(o)
 
