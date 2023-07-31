@@ -17,9 +17,9 @@
 package validation
 
 import (
+	commonvalidation "github.com/onmetal/onmetal-api/internal/apis/common/validation"
 	"github.com/onmetal/onmetal-api/internal/apis/networking"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
-	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
@@ -36,16 +36,16 @@ func ValidateLoadBalancerRouting(loadBalancerRouting *networking.LoadBalancerRou
 func validateLoadBalancerRouting(loadBalancerRouting *networking.LoadBalancerRouting) field.ErrorList {
 	var allErrs field.ErrorList
 
-	seenNames := sets.NewString()
+	destinationsField := field.NewPath("destinations")
 	for idx := range loadBalancerRouting.Destinations {
+		fldPath := destinationsField.Index(idx)
 		destination := &loadBalancerRouting.Destinations[idx]
-		destinationPath := field.NewPath("destinations").Index(idx)
-		if seenNames.Has(destination.Name) {
-			allErrs = append(allErrs, field.Duplicate(destinationPath, destination))
-		} else {
-			seenNames.Insert(destination.Name)
-			for _, msg := range apivalidation.NameIsDNSLabel(destination.Name, false) {
-				allErrs = append(allErrs, field.Invalid(destinationPath.Child("name"), destination.Name, msg))
+
+		allErrs = append(allErrs, commonvalidation.ValidateIP(destination.IP.Family(), destination.IP, fldPath.Child("ip"))...)
+
+		if targetRef := destination.TargetRef; targetRef != nil {
+			for _, msg := range apivalidation.NameIsDNSLabel(targetRef.Name, false) {
+				allErrs = append(allErrs, field.Invalid(fldPath.Child("targetRef", "name"), targetRef.Name, msg))
 			}
 		}
 	}

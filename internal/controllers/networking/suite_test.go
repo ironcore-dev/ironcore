@@ -166,7 +166,6 @@ var _ = BeforeSuite(func() {
 
 	err = (&LoadBalancerReconciler{
 		Client: k8sManager.GetClient(),
-		Scheme: k8sManager.GetScheme(),
 	}).SetupWithManager(k8sManager)
 	Expect(err).NotTo(HaveOccurred())
 

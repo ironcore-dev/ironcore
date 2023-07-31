@@ -47,3 +47,18 @@ func AppendMap[M ~map[K]V, K comparable, V any](m M, ms ...M) map[K]V {
 	}
 	return m
 }
+
+// Deleted returns a map with the given keys deleted.
+// If the map is empty, nil is returned.
+func Deleted[M ~map[K]V, K comparable, V any](m M, keys ...K) map[K]V {
+	if m == nil {
+		return nil
+	}
+	for _, k := range keys {
+		delete(m, k)
+		if len(m) == 0 {
+			return nil
+		}
+	}
+	return m
+}

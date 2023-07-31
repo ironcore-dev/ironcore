@@ -16,24 +16,22 @@
 package networking
 
 import (
+	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	. "github.com/onmetal/onmetal-api/utils/testing"
 )
 
 var _ = Describe("LoadBalancerReconciler", func() {
-	ctx := SetupContext()
 	ns, _ := SetupTest()
 
-	It("should reconcile the prefix and routing destinations", func() {
+	It("should reconcile the prefix and routing destinations", func(ctx SpecContext) {
 		By("creating a network")
 		network := &networkingv1alpha1.Network{
 			ObjectMeta: metav1.ObjectMeta{
@@ -42,6 +40,11 @@ var _ = Describe("LoadBalancerReconciler", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())
+
+		By("setting the network to be available")
+		Eventually(UpdateStatus(network, func() {
+			network.Status.State = networkingv1alpha1.NetworkStateAvailable
+		})).Should(Succeed())
 
 		By("creating a load balancer")
 		loadBalancer := &networkingv1alpha1.LoadBalancer{
@@ -63,16 +66,16 @@ var _ = Describe("LoadBalancerReconciler", func() {
 		Expect(k8sClient.Create(ctx, loadBalancer)).To(Succeed())
 
 		By("waiting for the load balancer routing to exist with no destinations")
-		loadBalancerKey := client.ObjectKeyFromObject(loadBalancer)
-		loadBalancerRouting := &networkingv1alpha1.LoadBalancerRouting{}
-		Eventually(func(g Gomega) {
-			err := k8sClient.Get(ctx, loadBalancerKey, loadBalancerRouting)
-			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
-			g.Expect(err).NotTo(HaveOccurred())
-
-			g.Expect(metav1.IsControlledBy(loadBalancerRouting, loadBalancer)).To(BeTrue(), "load balancer routing is not controlled by load balancer: %#v", loadBalancerRouting.OwnerReferences)
-			g.Expect(loadBalancerRouting.Destinations).To(BeEmpty())
-		}).Should(Succeed())
+		loadBalancerRouting := &networkingv1alpha1.LoadBalancerRouting{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: loadBalancer.Namespace,
+				Name:      loadBalancer.Name,
+			},
+		}
+		Eventually(Object(loadBalancerRouting)).Should(SatisfyAll(
+			BeControlledBy(loadBalancer),
+			HaveField("Destinations", BeEmpty()),
+		))
 
 		By("creating a network interface")
 		nic := &networkingv1alpha1.NetworkInterface{
@@ -95,20 +98,37 @@ var _ = Describe("LoadBalancerReconciler", func() {
 		}
 		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
 
+		By("setting the network interface provider ID")
+		Eventually(UpdateStatus(nic, func() {
+			nic.Status.ProviderID = "my://provider-id"
+		})).Should(Succeed())
+
+		By("waiting for the network interface to be available and report IPs")
+		Eventually(Object(nic)).Should(HaveField("Status", SatisfyAll(
+			HaveField("State", networkingv1alpha1.NetworkInterfaceStateAvailable),
+			HaveField("IPs", []commonv1alpha1.IP{commonv1alpha1.MustParseIP("10.0.0.1")}),
+		)))
+
 		By("waiting for the load balancer routing to be updated")
-		Eventually(func(g Gomega) {
-			Expect(k8sClient.Get(ctx, loadBalancerKey, loadBalancerRouting)).To(Succeed())
-
-			g.Expect(loadBalancerRouting.Destinations).To(Equal([]commonv1alpha1.LocalUIDReference{
-				{Name: nic.Name, UID: nic.UID},
-			}))
-
-			g.Expect(loadBalancerRouting.NetworkRef.Name).To(BeEquivalentTo(network.Name))
-			g.Expect(loadBalancerRouting.NetworkRef.UID).To(BeEquivalentTo(network.UID))
-		}).Should(Succeed())
+		Eventually(Object(loadBalancerRouting)).Should(SatisfyAll(
+			HaveField("NetworkRef", commonv1alpha1.LocalUIDReference{
+				Name: network.Name,
+				UID:  network.UID,
+			}),
+			HaveField("Destinations", []networkingv1alpha1.LoadBalancerDestination{
+				{
+					IP: commonv1alpha1.MustParseIP("10.0.0.1"),
+					TargetRef: &networkingv1alpha1.LoadBalancerTargetRef{
+						Name:       nic.Name,
+						UID:        nic.UID,
+						ProviderID: "my://provider-id",
+					},
+				},
+			}),
+		))
 	})
 
-	It("should allocate internal IPs for internal load balancers", func() {
+	It("should allocate internal IPs for internal load balancers", func(ctx SpecContext) {
 		By("creating a network")
 		network := &networkingv1alpha1.Network{
 			ObjectMeta: metav1.ObjectMeta{

@@ -150,6 +150,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &applyconfigurationsnetworkingv1alpha1.IPSourceApplyConfiguration{}
 	case networkingv1alpha1.SchemeGroupVersion.WithKind("LoadBalancer"):
 		return &applyconfigurationsnetworkingv1alpha1.LoadBalancerApplyConfiguration{}
+	case networkingv1alpha1.SchemeGroupVersion.WithKind("LoadBalancerDestination"):
+		return &applyconfigurationsnetworkingv1alpha1.LoadBalancerDestinationApplyConfiguration{}
 	case networkingv1alpha1.SchemeGroupVersion.WithKind("LoadBalancerPort"):
 		return &applyconfigurationsnetworkingv1alpha1.LoadBalancerPortApplyConfiguration{}
 	case networkingv1alpha1.SchemeGroupVersion.WithKind("LoadBalancerRouting"):
@@ -158,6 +160,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &applyconfigurationsnetworkingv1alpha1.LoadBalancerSpecApplyConfiguration{}
 	case networkingv1alpha1.SchemeGroupVersion.WithKind("LoadBalancerStatus"):
 		return &applyconfigurationsnetworkingv1alpha1.LoadBalancerStatusApplyConfiguration{}
+	case networkingv1alpha1.SchemeGroupVersion.WithKind("LoadBalancerTargetRef"):
+		return &applyconfigurationsnetworkingv1alpha1.LoadBalancerTargetRefApplyConfiguration{}
 	case networkingv1alpha1.SchemeGroupVersion.WithKind("NATGateway"):
 		return &applyconfigurationsnetworkingv1alpha1.NATGatewayApplyConfiguration{}
 	case networkingv1alpha1.SchemeGroupVersion.WithKind("NATGatewaySpec"):

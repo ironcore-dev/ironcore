@@ -238,8 +238,8 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 <td>
 <code>destinations</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
+<a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerDestination">
+[]LoadBalancerDestination
 </a>
 </em>
 </td>
@@ -1032,6 +1032,50 @@ EphemeralPrefixSource
 </tr>
 </tbody>
 </table>
+<h3 id="networking.api.onmetal.de/v1alpha1.LoadBalancerDestination">LoadBalancerDestination
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerRouting">LoadBalancerRouting</a>)
+</p>
+<div>
+<p>LoadBalancerDestination is the destination of the load balancer.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>ip</code><br/>
+<em>
+<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
+github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
+</a>
+</em>
+</td>
+<td>
+<p>IP is the target IP.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>targetRef</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerTargetRef">
+LoadBalancerTargetRef
+</a>
+</em>
+</td>
+<td>
+<p>TargetRef is the target providing the destination.</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="networking.api.onmetal.de/v1alpha1.LoadBalancerPort">LoadBalancerPort
 </h3>
 <p>
@@ -1210,6 +1254,59 @@ for which this LoadBalancer should be applied</p>
 </td>
 <td>
 <p>IPs are the IPs allocated for the load balancer.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.LoadBalancerTargetRef">LoadBalancerTargetRef
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerDestination">LoadBalancerDestination</a>)
+</p>
+<div>
+<p>LoadBalancerTargetRef is a load balancer target.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>uid</code><br/>
+<em>
+<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/types#UID">
+k8s.io/apimachinery/pkg/types.UID
+</a>
+</em>
+</td>
+<td>
+<p>UID is the UID of the target.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the target.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>providerID</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>ProviderID is the provider internal id of the target.</p>
 </td>
 </tr>
 </tbody>
