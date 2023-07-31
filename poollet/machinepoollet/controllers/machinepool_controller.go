@@ -97,16 +97,12 @@ func (r *MachinePoolReconciler) supportsMachineClass(ctx context.Context, log lo
 func (r *MachinePoolReconciler) calculateCapacity(
 	ctx context.Context,
 	log logr.Logger,
-	machinePool *computev1alpha1.MachinePool,
 	machines []computev1alpha1.Machine,
 	machineClassList []computev1alpha1.MachineClass,
-) (corev1alpha1.ResourceList, corev1alpha1.ResourceList, []corev1.LocalObjectReference, error) {
+) (capacity, allocatable corev1alpha1.ResourceList, supported []corev1.LocalObjectReference, err error) {
 	log.V(1).Info("Determining supported machine classes, capacity and allocatable")
 
-	capacity := corev1alpha1.ResourceList{}
-	usedResources := corev1alpha1.ResourceList{}
-
-	var supported []corev1.LocalObjectReference
+	capacity = corev1alpha1.ResourceList{}
 	for _, machineClass := range machineClassList {
 		class, quantity, err := r.supportsMachineClass(ctx, log, &machineClass)
 		if err != nil {
@@ -120,6 +116,7 @@ func (r *MachinePoolReconciler) calculateCapacity(
 		capacity[corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass.Name)] = *resource.NewQuantity(quantity, resource.DecimalSI)
 	}
 
+	usedResources := corev1alpha1.ResourceList{}
 	for _, machine := range machines {
 		className := machine.Spec.MachineClassRef.Name
 		res, ok := usedResources[corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, className)]
@@ -135,10 +132,9 @@ func (r *MachinePoolReconciler) calculateCapacity(
 }
 
 func (r *MachinePoolReconciler) updateStatus(ctx context.Context, log logr.Logger, machinePool *computev1alpha1.MachinePool, machines []computev1alpha1.Machine, machineClassList []computev1alpha1.MachineClass) error {
-	capacity, allocatable, supported, err := r.calculateCapacity(ctx, log, machinePool, machines, machineClassList)
+	capacity, allocatable, supported, err := r.calculateCapacity(ctx, log, machines, machineClassList)
 	if err != nil {
-		//ToDo
-		return fmt.Errorf("failed to ... :%w", err)
+		return fmt.Errorf("error calculating pool resources:%w", err)
 	}
 
 	base := machinePool.DeepCopy()

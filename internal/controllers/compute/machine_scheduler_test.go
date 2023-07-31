@@ -15,6 +15,9 @@
 package compute
 
 import (
+	"fmt"
+	"math"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -320,6 +323,79 @@ var _ = Describe("MachineScheduler", func() {
 		Eventually(Object(machine)).Should(SatisfyAll(
 			HaveField("Spec.MachinePoolRef.Name", Equal(machinePool.Name)),
 		))
+	})
+
+	It("should schedule machines evenly on pools", func(ctx SpecContext) {
+		By("creating a machine pool")
+		machinePool := &computev1alpha1.MachinePool{
+			ObjectMeta: metav1.ObjectMeta{
+				GenerateName: "test-pool-",
+			},
+		}
+		Expect(k8sClient.Create(ctx, machinePool)).To(Succeed(), "failed to create machine pool")
+
+		By("patching the machine pool status to contain a machine class")
+		Eventually(UpdateStatus(machinePool, func() {
+			machinePool.Status.AvailableMachineClasses = []corev1.LocalObjectReference{{Name: machineClass.Name}}
+			machinePool.Status.Allocatable = corev1alpha1.ResourceList{
+				corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass.Name): resource.MustParse("50"),
+			}
+		})).Should(Succeed())
+
+		By("creating a second machine pool")
+		secondMachinePool := &computev1alpha1.MachinePool{
+			ObjectMeta: metav1.ObjectMeta{
+				GenerateName: "second-test-pool-",
+			},
+		}
+		Expect(k8sClient.Create(ctx, secondMachinePool)).To(Succeed(), "failed to create the second machine pool")
+
+		By("patching the second machine pool status to contain a both machine classes")
+		Eventually(UpdateStatus(secondMachinePool, func() {
+			secondMachinePool.Status.AvailableMachineClasses = []corev1.LocalObjectReference{
+				{Name: machineClass.Name},
+			}
+			secondMachinePool.Status.Allocatable = corev1alpha1.ResourceList{
+				corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass.Name): resource.MustParse("50"),
+			}
+		})).Should(Succeed())
+
+		By("creating machines")
+		var machines []*computev1alpha1.Machine
+		for i := 0; i < 50; i++ {
+			machine := &computev1alpha1.Machine{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace:    ns.Name,
+					GenerateName: fmt.Sprintf("test-machine-%d-", i),
+				},
+				Spec: computev1alpha1.MachineSpec{
+					Image: "my-image",
+					MachineClassRef: corev1.LocalObjectReference{
+						Name: machineClass.Name,
+					},
+				},
+			}
+			Expect(k8sClient.Create(ctx, machine)).To(Succeed(), "failed to create the machine")
+			machines = append(machines, machine)
+		}
+
+		By("checking that every machine is scheduled onto a machine pool")
+		var numInstancesPool1, numInstancesPool2 int64
+		for i := 0; i < 50; i++ {
+			Eventually(Object(machines[i])).Should(SatisfyAll(
+				HaveField("Spec.MachinePoolRef", Not(BeNil())),
+			))
+
+			switch machines[i].Spec.MachinePoolRef.Name {
+			case machinePool.Name:
+				numInstancesPool1++
+			case secondMachinePool.Name:
+				numInstancesPool2++
+			}
+		}
+
+		By("checking that machine are roughly distributed")
+		Expect(math.Abs(float64(numInstancesPool1 - numInstancesPool2))).To(BeNumerically("<", 5))
 	})
 
 	It("should schedule a machines once the capacity is sufficient", func(ctx SpecContext) {

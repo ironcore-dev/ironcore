@@ -17,7 +17,7 @@ package get
 import (
 	"github.com/onmetal/onmetal-api/orictl-machine/cmd/orictl-machine/orictlmachine/common"
 	"github.com/onmetal/onmetal-api/orictl-machine/cmd/orictl-machine/orictlmachine/get/machine"
-	"github.com/onmetal/onmetal-api/orictl-machine/cmd/orictl-machine/orictlmachine/get/machineclass"
+	"github.com/onmetal/onmetal-api/orictl-machine/cmd/orictl-machine/orictlmachine/get/status"
 	clicommon "github.com/onmetal/onmetal-api/orictl/cmd"
 	"github.com/spf13/cobra"
 )
@@ -29,7 +29,7 @@ func Command(streams clicommon.Streams, clientFactory common.Factory) *cobra.Com
 
 	cmd.AddCommand(
 		machine.Command(streams, clientFactory),
-		machineclass.Command(streams, clientFactory),
+		status.Command(streams, clientFactory),
 	)
 
 	return cmd

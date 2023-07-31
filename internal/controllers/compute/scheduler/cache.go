@@ -60,11 +60,19 @@ func (n *ContainerInfo) Node() *v1alpha1.MachinePool {
 }
 
 func (n *ContainerInfo) MaxAllocatable(className string) int64 {
+	var assigned int64
+	for _, instance := range n.instances {
+		if instance.instance.Spec.MachineClassRef.Name == className {
+			assigned++
+		}
+	}
+
 	class, ok := n.node.Status.Allocatable[corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, className)]
 	if !ok {
 		return 0
 	}
-	return class.AsDec().UnscaledBig().Int64()
+
+	return class.AsDec().UnscaledBig().Int64() - assigned
 }
 
 func (n *ContainerInfo) NumInstances() int {

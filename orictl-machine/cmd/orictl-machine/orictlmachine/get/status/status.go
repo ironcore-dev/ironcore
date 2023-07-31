@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package machineclass
+package status
 
 import (
 	"context"
@@ -32,7 +32,7 @@ func Command(streams clicommon.Streams, clientFactory common.Factory) *cobra.Com
 	)
 
 	cmd := &cobra.Command{
-		Use:     "machineclass",
+		Use:     "status",
 		Aliases: common.MachineClassAliases,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
