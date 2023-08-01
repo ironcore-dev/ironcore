@@ -145,7 +145,7 @@ docs: gen-crd-api-reference-docs ## Run go generate to generate API reference do
 
 .PHONY: start-docs
 start-docs: ## Start the local mkdocs based development environment.
-	docker build -t $(IMAGE) -f docs/Dockerfile .
+	docker build -t $(IMAGE) -f docs/Dockerfile . --load
 	docker run -p 8000:8000 -v `pwd`/:/docs $(IMAGE)
 
 .PHONY: clean-docs
