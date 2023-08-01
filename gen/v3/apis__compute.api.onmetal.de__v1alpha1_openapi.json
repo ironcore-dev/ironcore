@@ -4505,6 +4505,13 @@
 							]
 						}
 					},
+					"allocatable": {
+						"description": "Allocatable represents the resources of a machine pool that are available for scheduling.",
+						"type": "object",
+						"additionalProperties": {
+							"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
+						}
+					},
 					"availableMachineClasses": {
 						"type": "array",
 						"items": {
@@ -4514,6 +4521,13 @@
 									"$ref": "#/components/schemas/io.k8s.api.core.v1.LocalObjectReference"
 								}
 							]
+						}
+					},
+					"capacity": {
+						"description": "Capacity represents the total resources of a machine pool.",
+						"type": "object",
+						"additionalProperties": {
+							"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
 						}
 					},
 					"conditions": {

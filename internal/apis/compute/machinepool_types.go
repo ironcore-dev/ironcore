@@ -17,6 +17,7 @@
 package compute
 
 import (
+	"github.com/onmetal/onmetal-api/internal/apis/core"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -39,6 +40,10 @@ type MachinePoolStatus struct {
 	AvailableMachineClasses []corev1.LocalObjectReference
 	Addresses               []MachinePoolAddress
 	DaemonEndpoints         MachinePoolDaemonEndpoints
+	// Capacity represents the total resources of a machine pool.
+	Capacity core.ResourceList
+	// Allocatable represents the resources of a machine pool that are available for scheduling.
+	Allocatable core.ResourceList
 }
 
 // MachinePoolDaemonEndpoints lists ports opened by daemons running on the MachinePool.

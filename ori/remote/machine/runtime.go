@@ -81,8 +81,8 @@ func (r *remoteRuntime) DetachNetworkInterface(ctx context.Context, req *ori.Det
 	return r.client.DetachNetworkInterface(ctx, req)
 }
 
-func (r *remoteRuntime) ListMachineClasses(ctx context.Context, req *ori.ListMachineClassesRequest) (*ori.ListMachineClassesResponse, error) {
-	return r.client.ListMachineClasses(ctx, req)
+func (r *remoteRuntime) Status(ctx context.Context, req *ori.StatusRequest) (*ori.StatusResponse, error) {
+	return r.client.Status(ctx, req)
 }
 
 func (r *remoteRuntime) Exec(ctx context.Context, req *ori.ExecRequest) (*ori.ExecResponse, error) {

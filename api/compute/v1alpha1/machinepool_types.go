@@ -17,6 +17,7 @@
 package v1alpha1
 
 import (
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -39,6 +40,10 @@ type MachinePoolStatus struct {
 	AvailableMachineClasses []corev1.LocalObjectReference `json:"availableMachineClasses,omitempty"`
 	Addresses               []MachinePoolAddress          `json:"addresses,omitempty"`
 	DaemonEndpoints         MachinePoolDaemonEndpoints    `json:"daemonEndpoints,omitempty"`
+	// Capacity represents the total resources of a machine pool.
+	Capacity corev1alpha1.ResourceList `json:"capacity,omitempty"`
+	// Allocatable represents the resources of a machine pool that are available for scheduling.
+	Allocatable corev1alpha1.ResourceList `json:"allocatable,omitempty"`
 }
 
 // MachinePoolDaemonEndpoints lists ports opened by daemons running on the MachinePool.

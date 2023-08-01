@@ -31,6 +31,6 @@ type RuntimeService interface {
 	DetachVolume(context.Context, *api.DetachVolumeRequest) (*api.DetachVolumeResponse, error)
 	AttachNetworkInterface(context.Context, *api.AttachNetworkInterfaceRequest) (*api.AttachNetworkInterfaceResponse, error)
 	DetachNetworkInterface(context.Context, *api.DetachNetworkInterfaceRequest) (*api.DetachNetworkInterfaceResponse, error)
-	ListMachineClasses(context.Context, *api.ListMachineClassesRequest) (*api.ListMachineClassesResponse, error)
+	Status(context.Context, *api.StatusRequest) (*api.StatusResponse, error)
 	Exec(context.Context, *api.ExecRequest) (*api.ExecResponse, error)
 }

@@ -18,7 +18,6 @@ package compute
 
 import (
 	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
-	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -31,9 +30,8 @@ import (
 )
 
 var _ = Describe("machineclass controller", func() {
-	ctx := SetupContext()
-	ns, _ := SetupTest(ctx)
-	It("removes the finalizer from machineclass only if there's no machine still using the machineclass", func() {
+	ns, _ := SetupTest()
+	It("removes the finalizer from machineclass only if there's no machine still using the machineclass", func(ctx SpecContext) {
 		By("creating the machineclass consumed by the machine")
 		machineClass := &computev1alpha1.MachineClass{
 			ObjectMeta: metav1.ObjectMeta{

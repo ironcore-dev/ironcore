@@ -51,8 +51,8 @@ type Generic struct {
 
 	listener sets.Set[*listener]
 
-	machineClassByName         map[string]*ori.MachineClass
-	machineClassByCapabilities map[capabilities][]*ori.MachineClass
+	machineClassByName         map[string]*ori.MachineClassStatus
+	machineClassByCapabilities map[capabilities][]*ori.MachineClassStatus
 
 	machineRuntime machine.RuntimeService
 
@@ -86,8 +86,8 @@ func (g *Generic) RemoveListener(listener orievent.ListenerRegistration) error {
 	return nil
 }
 
-func shouldNotify(oldMachineClassByName map[string]*ori.MachineClass, class *ori.MachineClass) bool {
-	oldMachineClass, ok := oldMachineClassByName[class.Name]
+func shouldNotify(oldMachineClassByName map[string]*ori.MachineClassStatus, class *ori.MachineClassStatus) bool {
+	oldMachineClass, ok := oldMachineClassByName[class.MachineClass.Name]
 	if !ok {
 		return true
 	}
@@ -97,7 +97,7 @@ func shouldNotify(oldMachineClassByName map[string]*ori.MachineClass, class *ori
 
 func (g *Generic) relist(ctx context.Context, log logr.Logger) error {
 	log.V(1).Info("Relisting machine classes")
-	res, err := g.machineRuntime.ListMachineClasses(ctx, &ori.ListMachineClassesRequest{})
+	res, err := g.machineRuntime.Status(ctx, &ori.StatusRequest{})
 	if err != nil {
 		return fmt.Errorf("error listing machine classes: %w", err)
 	}
@@ -111,15 +111,16 @@ func (g *Generic) relist(ctx context.Context, log logr.Logger) error {
 	maps.Clear(g.machineClassByCapabilities)
 
 	var notify bool
-	for _, machineClass := range res.MachineClasses {
-		notify = notify || shouldNotify(oldMachineClassByName, machineClass)
+	for _, machineClassStatus := range res.MachineClassStatus {
+		machineClass := machineClassStatus.GetMachineClass()
+		notify = notify || shouldNotify(oldMachineClassByName, machineClassStatus)
 
 		caps := capabilities{
 			cpuMillis:   machineClass.Capabilities.CpuMillis,
 			memoryBytes: machineClass.Capabilities.MemoryBytes,
 		}
-		g.machineClassByName[machineClass.Name] = machineClass
-		g.machineClassByCapabilities[caps] = append(g.machineClassByCapabilities[caps], machineClass)
+		g.machineClassByName[machineClass.Name] = machineClassStatus
+		g.machineClassByCapabilities[caps] = append(g.machineClassByCapabilities[caps], machineClassStatus)
 	}
 
 	if notify {
@@ -129,13 +130,14 @@ func (g *Generic) relist(ctx context.Context, log logr.Logger) error {
 		}
 	}
 
-	for _, machineClass := range res.MachineClasses {
+	for _, machineClassStatus := range res.MachineClassStatus {
+		machineClass := machineClassStatus.GetMachineClass()
 		caps := capabilities{
 			cpuMillis:   machineClass.Capabilities.CpuMillis,
 			memoryBytes: machineClass.Capabilities.MemoryBytes,
 		}
-		g.machineClassByName[machineClass.Name] = machineClass
-		g.machineClassByCapabilities[caps] = append(g.machineClassByCapabilities[caps], machineClass)
+		g.machineClassByName[machineClass.Name] = machineClassStatus
+		g.machineClassByCapabilities[caps] = append(g.machineClassByCapabilities[caps], machineClassStatus)
 	}
 
 	if !g.sync {
@@ -156,28 +158,28 @@ func (g *Generic) Start(ctx context.Context) error {
 	return nil
 }
 
-func (g *Generic) GetMachineClassFor(ctx context.Context, name string, caps *ori.MachineClassCapabilities) (*ori.MachineClass, error) {
+func (g *Generic) GetMachineClassFor(ctx context.Context, name string, caps *ori.MachineClassCapabilities) (*ori.MachineClass, int64, error) {
 	g.mu.RLock()
 	defer g.mu.RUnlock()
 
 	expected := getCapabilities(caps)
-	if byName, ok := g.machineClassByName[name]; ok && getCapabilities(byName.Capabilities) == expected {
-		return byName, nil
+	if byName, ok := g.machineClassByName[name]; ok && getCapabilities(byName.MachineClass.Capabilities) == expected {
+		return byName.MachineClass, byName.Quantity, nil
 	}
 
 	if byCaps, ok := g.machineClassByCapabilities[expected]; ok {
 		switch len(byCaps) {
 		case 0:
-			return nil, ErrNoMatchingMachineClass
+			return nil, 0, ErrNoMatchingMachineClass
 		case 1:
-			class := *byCaps[0]
-			return &class, nil
+			classStatus := *byCaps[0]
+			return classStatus.MachineClass, classStatus.Quantity, nil
 		default:
-			return nil, ErrAmbiguousMatchingMachineClass
+			return nil, 0, ErrAmbiguousMatchingMachineClass
 		}
 	}
 
-	return nil, ErrNoMatchingMachineClass
+	return nil, 0, ErrNoMatchingMachineClass
 }
 
 func (g *Generic) WaitForSync(ctx context.Context) error {
@@ -203,8 +205,8 @@ func NewGeneric(runtime machine.RuntimeService, opts GenericOptions) MachineClas
 	setGenericOptionsDefaults(&opts)
 	return &Generic{
 		synced:                     make(chan struct{}),
-		machineClassByName:         map[string]*ori.MachineClass{},
-		machineClassByCapabilities: map[capabilities][]*ori.MachineClass{},
+		machineClassByName:         map[string]*ori.MachineClassStatus{},
+		machineClassByCapabilities: map[capabilities][]*ori.MachineClassStatus{},
 		listener:                   sets.New[*listener](),
 		machineRuntime:             runtime,
 		relistPeriod:               opts.RelistPeriod,

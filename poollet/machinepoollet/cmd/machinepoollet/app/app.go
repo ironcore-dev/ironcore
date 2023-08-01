@@ -46,6 +46,7 @@ import (
 	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
@@ -222,6 +223,7 @@ func Run(ctx context.Context, opts Options) error {
 		LeaderElectionID:        "bfafcebe.api.onmetal.de",
 		LeaderElectionNamespace: opts.LeaderElectionNamespace,
 		LeaderElectionConfig:    leaderElectionCfg,
+		Cache:                   cache.Options{ByObject: map[client.Object]cache.ByObject{}},
 		NewCache: func(config *rest.Config, cacheOpts cache.Options) (cache.Cache, error) {
 			cacheOpts.ByObject[&computev1alpha1.Machine{}] = cache.ByObject{
 				Field: fields.OneTermEqualSelector(

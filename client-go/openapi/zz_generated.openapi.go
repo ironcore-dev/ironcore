@@ -1351,11 +1351,41 @@ func schema_onmetal_api_api_compute_v1alpha1_MachinePoolStatus(ref common.Refere
 							Ref:     ref("github.com/onmetal/onmetal-api/api/compute/v1alpha1.MachinePoolDaemonEndpoints"),
 						},
 					},
+					"capacity": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Capacity represents the total resources of a machine pool.",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
+									},
+								},
+							},
+						},
+					},
+					"allocatable": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Allocatable represents the resources of a machine pool that are available for scheduling.",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
+									},
+								},
+							},
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/api/compute/v1alpha1.MachinePoolAddress", "github.com/onmetal/onmetal-api/api/compute/v1alpha1.MachinePoolCondition", "github.com/onmetal/onmetal-api/api/compute/v1alpha1.MachinePoolDaemonEndpoints", "k8s.io/api/core/v1.LocalObjectReference"},
+			"github.com/onmetal/onmetal-api/api/compute/v1alpha1.MachinePoolAddress", "github.com/onmetal/onmetal-api/api/compute/v1alpha1.MachinePoolCondition", "github.com/onmetal/onmetal-api/api/compute/v1alpha1.MachinePoolDaemonEndpoints", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/api/resource.Quantity"},
 	}
 }
 

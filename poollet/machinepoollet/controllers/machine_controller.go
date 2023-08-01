@@ -594,7 +594,7 @@ func (r *MachineReconciler) prepareORIMachineClass(ctx context.Context, machine 
 		return "", false, fmt.Errorf("error getting ori machine class capabilities: %w", err)
 	}
 
-	class, err := r.MachineClassMapper.GetMachineClassFor(ctx, machineClassName, caps)
+	class, _, err := r.MachineClassMapper.GetMachineClassFor(ctx, machineClassName, caps)
 	if err != nil {
 		return "", false, fmt.Errorf("error getting matching machine class: %w", err)
 	}
