@@ -19,16 +19,12 @@ package v1alpha1
 
 import (
 	v1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // VirtualIPStatusApplyConfiguration represents an declarative configuration of the VirtualIPStatus type for use
 // with apply.
 type VirtualIPStatusApplyConfiguration struct {
-	IP                      *v1alpha1.IP                       `json:"ip,omitempty"`
-	Phase                   *networkingv1alpha1.VirtualIPPhase `json:"phase,omitempty"`
-	LastPhaseTransitionTime *v1.Time                           `json:"phaseLastTransitionTime,omitempty"`
+	IP *v1alpha1.IP `json:"ip,omitempty"`
 }
 
 // VirtualIPStatusApplyConfiguration constructs an declarative configuration of the VirtualIPStatus type for use with
@@ -42,21 +38,5 @@ func VirtualIPStatus() *VirtualIPStatusApplyConfiguration {
 // If called multiple times, the IP field is set to the value of the last call.
 func (b *VirtualIPStatusApplyConfiguration) WithIP(value v1alpha1.IP) *VirtualIPStatusApplyConfiguration {
 	b.IP = &value
-	return b
-}
-
-// WithPhase sets the Phase field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the Phase field is set to the value of the last call.
-func (b *VirtualIPStatusApplyConfiguration) WithPhase(value networkingv1alpha1.VirtualIPPhase) *VirtualIPStatusApplyConfiguration {
-	b.Phase = &value
-	return b
-}
-
-// WithLastPhaseTransitionTime sets the LastPhaseTransitionTime field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the LastPhaseTransitionTime field is set to the value of the last call.
-func (b *VirtualIPStatusApplyConfiguration) WithLastPhaseTransitionTime(value v1.Time) *VirtualIPStatusApplyConfiguration {
-	b.LastPhaseTransitionTime = &value
 	return b
 }

@@ -32,10 +32,9 @@ import (
 )
 
 var _ = Describe("BucketClass controller", func() {
-	ctx := SetupContext()
-	ns, _ := SetupTest(ctx)
+	ns := SetupNamespace(&k8sClient)
 
-	It("should finalize the bucket class if no bucket is using it", func() {
+	It("should finalize the bucket class if no bucket is using it", func(ctx SpecContext) {
 		By("creating the bucket class consumed by the bucket")
 		bucketClass := &storagev1alpha1.BucketClass{
 			ObjectMeta: metav1.ObjectMeta{

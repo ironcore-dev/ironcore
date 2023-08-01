@@ -83,45 +83,19 @@ rules:
   resources:
   - machinepools
   verbs:
-  - create
-  - delete
   - get
   - list
-  - patch
-  - update
   - watch
-- apiGroups:
-  - compute.api.onmetal.de
-  resources:
-  - machinepools/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - compute.api.onmetal.de
-  resources:
-  - machinepools/status
-  verbs:
-  - get
-  - patch
-  - update
 - apiGroups:
   - compute.api.onmetal.de
   resources:
   - machines
   verbs:
-  - create
-  - delete
   - get
   - list
   - patch
   - update
   - watch
-- apiGroups:
-  - compute.api.onmetal.de
-  resources:
-  - machines/finalizers
-  verbs:
-  - update
 - apiGroups:
   - compute.api.onmetal.de
   resources:
@@ -156,17 +130,6 @@ rules:
   - get
   - patch
   - update
-- apiGroups:
-  - ipam.api.onmetal.de
-  resources:
-  - prefix
-  verbs:
-  - create
-  - get
-  - list
-  - patch
-  - update
-  - watch
 - apiGroups:
   - ipam.api.onmetal.de
   resources:
@@ -264,27 +227,12 @@ rules:
   resources:
   - networkinterfaces
   verbs:
-  - create
   - delete
   - get
   - list
   - patch
   - update
   - watch
-- apiGroups:
-  - networking.api.onmetal.de
-  resources:
-  - networkinterfaces/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - networking.api.onmetal.de
-  resources:
-  - networkinterfaces/status
-  verbs:
-  - get
-  - patch
-  - update
 - apiGroups:
   - networking.api.onmetal.de
   resources:
@@ -323,20 +271,6 @@ rules:
   - patch
   - update
   - watch
-- apiGroups:
-  - networking.api.onmetal.de
-  resources:
-  - virtualips/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - networking.api.onmetal.de
-  resources:
-  - virtualips/status
-  verbs:
-  - get
-  - patch
-  - update
 - apiGroups:
   - storage.api.onmetal.de
   resources:
@@ -420,45 +354,20 @@ rules:
   resources:
   - volumepools
   verbs:
-  - create
-  - delete
   - get
   - list
-  - patch
-  - update
   - watch
-- apiGroups:
-  - storage.api.onmetal.de
-  resources:
-  - volumepools/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - storage.api.onmetal.de
-  resources:
-  - volumepools/status
-  verbs:
-  - get
-  - patch
-  - update
 - apiGroups:
   - storage.api.onmetal.de
   resources:
   - volumes
   verbs:
-  - create
   - delete
   - get
   - list
   - patch
   - update
   - watch
-- apiGroups:
-  - storage.api.onmetal.de
-  resources:
-  - volumes/finalizers
-  verbs:
-  - update
 - apiGroups:
   - storage.api.onmetal.de
   resources:

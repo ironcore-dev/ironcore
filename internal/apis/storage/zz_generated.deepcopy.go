@@ -781,10 +781,6 @@ func (in *VolumeStatus) DeepCopyInto(out *VolumeStatus) {
 		in, out := &in.LastStateTransitionTime, &out.LastStateTransitionTime
 		*out = (*in).DeepCopy()
 	}
-	if in.LastPhaseTransitionTime != nil {
-		in, out := &in.LastPhaseTransitionTime, &out.LastPhaseTransitionTime
-		*out = (*in).DeepCopy()
-	}
 	if in.Access != nil {
 		in, out := &in.Access, &out.Access
 		*out = new(VolumeAccess)

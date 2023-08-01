@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"math"
 
+	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -32,7 +33,8 @@ import (
 )
 
 var _ = Describe("MachineScheduler", func() {
-	ns, machineClass := SetupTest()
+	ns := SetupNamespace(&k8sClient)
+	machineClass := SetupMachineClass()
 
 	It("should schedule machines on machine pools", func(ctx SpecContext) {
 		By("creating a machine pool")

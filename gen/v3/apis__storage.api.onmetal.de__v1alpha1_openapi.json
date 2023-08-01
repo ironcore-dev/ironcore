@@ -8823,14 +8823,6 @@
 							]
 						}
 					},
-					"lastPhaseTransitionTime": {
-						"description": "LastPhaseTransitionTime is the last time the Phase transitioned between values.",
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Time"
-							}
-						]
-					},
 					"lastStateTransitionTime": {
 						"description": "LastStateTransitionTime is the last time the State transitioned between values.",
 						"allOf": [
@@ -8838,10 +8830,6 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Time"
 							}
 						]
-					},
-					"phase": {
-						"description": "Phase represents the binding phase of a Volume.",
-						"type": "string"
 					},
 					"state": {
 						"description": "State represents the infrastructure state of a Volume.",

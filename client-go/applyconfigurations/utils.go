@@ -48,8 +48,6 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &commonv1alpha1.TaintApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("Toleration"):
 		return &commonv1alpha1.TolerationApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("UIDReference"):
-		return &commonv1alpha1.UIDReferenceApplyConfiguration{}
 
 		// Group=compute.api.onmetal.de, Version=v1alpha1
 	case computev1alpha1.SchemeGroupVersion.WithKind("DaemonEndpoint"):
@@ -180,6 +178,10 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &applyconfigurationsnetworkingv1alpha1.NetworkInterfaceTemplateSpecApplyConfiguration{}
 	case networkingv1alpha1.SchemeGroupVersion.WithKind("NetworkPeering"):
 		return &applyconfigurationsnetworkingv1alpha1.NetworkPeeringApplyConfiguration{}
+	case networkingv1alpha1.SchemeGroupVersion.WithKind("NetworkPeeringClaimRef"):
+		return &applyconfigurationsnetworkingv1alpha1.NetworkPeeringClaimRefApplyConfiguration{}
+	case networkingv1alpha1.SchemeGroupVersion.WithKind("NetworkPeeringNetworkRef"):
+		return &applyconfigurationsnetworkingv1alpha1.NetworkPeeringNetworkRefApplyConfiguration{}
 	case networkingv1alpha1.SchemeGroupVersion.WithKind("NetworkPeeringStatus"):
 		return &applyconfigurationsnetworkingv1alpha1.NetworkPeeringStatusApplyConfiguration{}
 	case networkingv1alpha1.SchemeGroupVersion.WithKind("NetworkPolicy"):

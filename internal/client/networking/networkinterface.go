@@ -22,10 +22,18 @@ import (
 )
 
 const (
+	NetworkInterfacePrefixNamesField        = "networkinterface-prefix-names"
 	NetworkInterfaceVirtualIPNamesField     = "networkinterface-virtual-ip-names"
 	NetworkInterfaceSpecNetworkRefNameField = "spec.networkRef.name"
 	NetworkInterfaceSpecMachineRefNameField = "spec.machineRef.name"
 )
+
+func SetupNetworkInterfacePrefixNamesFieldIndexer(ctx context.Context, indexer client.FieldIndexer) error {
+	return indexer.IndexField(ctx, &networkingv1alpha1.NetworkInterface{}, NetworkInterfacePrefixNamesField, func(obj client.Object) []string {
+		nic := obj.(*networkingv1alpha1.NetworkInterface)
+		return networkingv1alpha1.NetworkInterfacePrefixNames(nic)
+	})
+}
 
 func SetupNetworkInterfaceVirtualIPNameFieldIndexer(ctx context.Context, indexer client.FieldIndexer) error {
 	return indexer.IndexField(ctx, &networkingv1alpha1.NetworkInterface{}, NetworkInterfaceVirtualIPNamesField, func(obj client.Object) []string {

@@ -95,6 +95,7 @@ func (r *MachineReconciler) machineUIDLabelSelector(machineUID types.UID) map[st
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=loadbalancers,verbs=get;list;watch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=loadbalancerroutings,verbs=get;list;watch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=natgateways,verbs=get;list;watch
+//+kubebuilder:rbac:groups=ipam.api.onmetal.de,resources=prefixes,verbs=get;list;watch
 
 func (r *MachineReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
@@ -671,11 +672,11 @@ func (r *MachineReconciler) prepareORIMachine(ctx context.Context, log logr.Logg
 		}
 	}
 
-	machineNics, nonReadyNics, err := r.prepareORINetworkInterfaces(ctx, log, machine)
+	machineNics, machineNicsOK, err := r.prepareORINetworkInterfaces(ctx, machine)
 	switch {
 	case err != nil:
 		errs = append(errs, fmt.Errorf("error preparing ori machine network interfaces: %w", err))
-	case len(nonReadyNics) > 0:
+	case !machineNicsOK:
 		ok = false
 	}
 
@@ -762,7 +763,7 @@ func (r *MachineReconciler) enqueueMachinesReferencingVolume() handler.EventHand
 			return nil
 		}
 
-		return onmetalapiclient.ReconcileRequestsFromObjectSlice(machineList.Items)
+		return onmetalapiclient.ReconcileRequestsFromObjectStructSlice[*computev1alpha1.Machine](machineList.Items)
 	})
 }
 
@@ -783,7 +784,7 @@ func (r *MachineReconciler) enqueueMachinesReferencingSecret() handler.EventHand
 			return nil
 		}
 
-		return onmetalapiclient.ReconcileRequestsFromObjectSlice(machineList.Items)
+		return onmetalapiclient.ReconcileRequestsFromObjectStructSlice[*computev1alpha1.Machine](machineList.Items)
 	})
 }
 
@@ -804,7 +805,7 @@ func (r *MachineReconciler) enqueueMachinesReferencingNetworkInterface() handler
 			return nil
 		}
 
-		return onmetalapiclient.ReconcileRequestsFromObjectSlice(machineList.Items)
+		return onmetalapiclient.ReconcileRequestsFromObjectStructSlice[*computev1alpha1.Machine](machineList.Items)
 	})
 }
 

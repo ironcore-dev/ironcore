@@ -61,15 +61,15 @@ func PatchRemoveReconcileAnnotation(ctx context.Context, c client.Client, obj cl
 	return nil
 }
 
-type ObjectPointer[O any] interface {
+type Object[O any] interface {
 	client.Object
 	*O
 }
 
-func ReconcileRequestsFromObjectSlice[S ~[]O, OP ObjectPointer[O], O any](objs S) []reconcile.Request {
+func ReconcileRequestsFromObjectStructSlice[O Object[OStruct], S ~[]OStruct, OStruct any](objs S) []reconcile.Request {
 	res := make([]reconcile.Request, len(objs))
 	for i := range objs {
-		obj := OP(&objs[i])
+		obj := O(&objs[i])
 		res[i] = reconcile.Request{
 			NamespacedName: client.ObjectKeyFromObject(obj),
 		}
@@ -77,13 +77,13 @@ func ReconcileRequestsFromObjectSlice[S ~[]O, OP ObjectPointer[O], O any](objs S
 	return res
 }
 
-func ByObjectCreationTimestamp[OP ObjectPointer[O], O any](obj1, obj2 O) bool {
+func ByObjectCreationTimestamp[OP Object[O], O any](obj1, obj2 O) bool {
 	t1 := OP(&obj1).GetCreationTimestamp().Time
 	t2 := OP(&obj2).GetCreationTimestamp().Time
 	return t1.Before(t2)
 }
 
-func ObjectSliceOldestObjectIndex[S ~[]O, OP ObjectPointer[O], O any](objs []O) int {
+func ObjectSliceOldestObjectIndex[S ~[]O, OP Object[O], O any](objs []O) int {
 	idx := -1
 	for i := range objs {
 		obj := OP(&objs[i])

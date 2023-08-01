@@ -1001,8 +1001,6 @@ func Convert_storage_VolumeSpec_To_v1alpha1_VolumeSpec(in *storage.VolumeSpec, o
 func autoConvert_v1alpha1_VolumeStatus_To_storage_VolumeStatus(in *v1alpha1.VolumeStatus, out *storage.VolumeStatus, s conversion.Scope) error {
 	out.State = storage.VolumeState(in.State)
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
-	out.Phase = storage.VolumePhase(in.Phase)
-	out.LastPhaseTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastPhaseTransitionTime))
 	out.Access = (*storage.VolumeAccess)(unsafe.Pointer(in.Access))
 	out.Conditions = *(*[]storage.VolumeCondition)(unsafe.Pointer(&in.Conditions))
 	return nil
@@ -1016,8 +1014,6 @@ func Convert_v1alpha1_VolumeStatus_To_storage_VolumeStatus(in *v1alpha1.VolumeSt
 func autoConvert_storage_VolumeStatus_To_v1alpha1_VolumeStatus(in *storage.VolumeStatus, out *v1alpha1.VolumeStatus, s conversion.Scope) error {
 	out.State = v1alpha1.VolumeState(in.State)
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
-	out.Phase = v1alpha1.VolumePhase(in.Phase)
-	out.LastPhaseTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastPhaseTransitionTime))
 	out.Access = (*v1alpha1.VolumeAccess)(unsafe.Pointer(in.Access))
 	out.Conditions = *(*[]v1alpha1.VolumeCondition)(unsafe.Pointer(&in.Conditions))
 	return nil

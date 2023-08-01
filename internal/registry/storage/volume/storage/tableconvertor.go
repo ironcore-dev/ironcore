@@ -35,7 +35,6 @@ var (
 		{Name: "Image", Type: "string", Description: "The image the volume should be populated from"},
 		{Name: "VolumeClass", Type: "string", Description: "The volume class of this volume"},
 		{Name: "State", Type: "string", Description: "The state of the volume on the underlying volume pool"},
-		{Name: "Phase", Type: "string", Description: "The binding phase of the volume"},
 		{Name: "Age", Type: "string", Format: "date", Description: objectMetaSwaggerDoc["creationTimestamp"]},
 	}
 )
@@ -80,11 +79,6 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 		}
 		if state := volume.Status.State; state != "" {
 			cells = append(cells, state)
-		} else {
-			cells = append(cells, "<unknown>")
-		}
-		if phase := volume.Status.Phase; phase != "" {
-			cells = append(cells, phase)
 		} else {
 			cells = append(cells, "<unknown>")
 		}

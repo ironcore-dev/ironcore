@@ -29,14 +29,13 @@ import (
 )
 
 var _ = Describe("NetworkProtectionReconciler", func() {
-	ctx := SetupContext()
-	ns, _ := SetupTest()
+	ns := SetupNamespace(&k8sClient)
 
 	var (
 		network *networkingv1alpha1.Network
 	)
 
-	BeforeEach(func() {
+	BeforeEach(func(ctx SpecContext) {
 		By("creating a network")
 		network = &networkingv1alpha1.Network{
 			ObjectMeta: metav1.ObjectMeta{
@@ -47,7 +46,7 @@ var _ = Describe("NetworkProtectionReconciler", func() {
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())
 	})
 
-	It("should add and remove a finalizer for a network in use/not used by a network interface", func() {
+	It("should add and remove a finalizer for a network in use/not used by a network interface", func(ctx SpecContext) {
 		By("creating a network interface referencing this network")
 		networkInterface := &networkingv1alpha1.NetworkInterface{
 			ObjectMeta: metav1.ObjectMeta{
@@ -94,7 +93,7 @@ var _ = Describe("NetworkProtectionReconciler", func() {
 		}).Should(Succeed())
 	})
 
-	It("should remove a finalizer for a network in deletion state once the reference network interface is deleted", func() {
+	It("should remove a finalizer for a network in deletion state once the reference network interface is deleted", func(ctx SpecContext) {
 		By("creating a network interface referencing this network")
 		networkInterface := &networkingv1alpha1.NetworkInterface{
 			ObjectMeta: metav1.ObjectMeta{
@@ -151,7 +150,7 @@ var _ = Describe("NetworkProtectionReconciler", func() {
 		}).Should(Succeed())
 	})
 
-	It("should keep a finalizer if one of two network interfaces is removed", func() {
+	It("should keep a finalizer if one of two network interfaces is removed", func(ctx SpecContext) {
 		By("creating the first network interface referencing this network")
 		networkInterface := &networkingv1alpha1.NetworkInterface{
 			ObjectMeta: metav1.ObjectMeta{
@@ -222,7 +221,7 @@ var _ = Describe("NetworkProtectionReconciler", func() {
 		}).Should(Succeed())
 	})
 
-	It("should allow deletion of an unused network", func() {
+	It("should allow deletion of an unused network", func(ctx SpecContext) {
 		By("deleting the network")
 		Expect(k8sClient.Delete(ctx, network)).To(Succeed())
 

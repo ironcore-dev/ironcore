@@ -107,6 +107,8 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkInterfaceTemplateSpec": schema_onmetal_api_api_networking_v1alpha1_NetworkInterfaceTemplateSpec(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkList":                  schema_onmetal_api_api_networking_v1alpha1_NetworkList(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPeering":               schema_onmetal_api_api_networking_v1alpha1_NetworkPeering(ref),
+		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPeeringClaimRef":       schema_onmetal_api_api_networking_v1alpha1_NetworkPeeringClaimRef(ref),
+		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPeeringNetworkRef":     schema_onmetal_api_api_networking_v1alpha1_NetworkPeeringNetworkRef(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPeeringStatus":         schema_onmetal_api_api_networking_v1alpha1_NetworkPeeringStatus(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicy":                schema_onmetal_api_api_networking_v1alpha1_NetworkPolicy(ref),
 		"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPolicyCondition":       schema_onmetal_api_api_networking_v1alpha1_NetworkPolicyCondition(ref),
@@ -1716,19 +1718,6 @@ func schema_onmetal_api_api_compute_v1alpha1_NetworkInterfaceStatus(ref common.R
 							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
 						},
 					},
-					"phase": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Phase is the NetworkInterface binding phase of the NetworkInterface.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"lastPhaseTransitionTime": {
-						SchemaProps: spec.SchemaProps{
-							Description: "LastPhaseTransitionTime is the last time the Phase transitioned.",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
-						},
-					},
 				},
 				Required: []string{"name"},
 			},
@@ -1852,19 +1841,6 @@ func schema_onmetal_api_api_compute_v1alpha1_VolumeStatus(ref common.ReferenceCa
 					"lastStateTransitionTime": {
 						SchemaProps: spec.SchemaProps{
 							Description: "LastStateTransitionTime is the last time the State transitioned.",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
-						},
-					},
-					"phase": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Phase represents the binding phase of a Volume.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"lastPhaseTransitionTime": {
-						SchemaProps: spec.SchemaProps{
-							Description: "LastPhaseTransitionTime is the last time the Phase transitioned.",
 							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
 						},
 					},
@@ -3546,19 +3522,6 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkInterfaceStatus(ref commo
 							Ref:         ref("github.com/onmetal/onmetal-api/api/common/v1alpha1.IP"),
 						},
 					},
-					"phase": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Phase is the NetworkInterfacePhase of the NetworkInterface.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"lastPhaseTransitionTime": {
-						SchemaProps: spec.SchemaProps{
-							Description: "LastPhaseTransitionTime is the last time the Phase transitioned from one value to another.",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
-						},
-					},
 				},
 			},
 		},
@@ -3660,9 +3623,9 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkPeering(ref common.Refere
 					},
 					"networkRef": {
 						SchemaProps: spec.SchemaProps{
-							Description: "NetworkRef is the reference to the network to peer with. If the UID is empty, it will be populated once when the peering is successfully bound. If namespace is empty it is implied that the target network resides in the same network.",
+							Description: "NetworkRef is the reference to the network to peer with. An empty namespace indicates that the target network resides in the same namespace as the source network.",
 							Default:     map[string]interface{}{},
-							Ref:         ref("github.com/onmetal/onmetal-api/api/common/v1alpha1.UIDReference"),
+							Ref:         ref("github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPeeringNetworkRef"),
 						},
 					},
 				},
@@ -3670,7 +3633,71 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkPeering(ref common.Refere
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/api/common/v1alpha1.UIDReference"},
+			"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPeeringNetworkRef"},
+	}
+}
+
+func schema_onmetal_api_api_networking_v1alpha1_NetworkPeeringClaimRef(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"namespace": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Namespace is the namespace of the referenced entity. If empty, the same namespace as the referring resource is implied.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the name of the referenced entity.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"uid": {
+						SchemaProps: spec.SchemaProps{
+							Description: "UID is the UID of the referenced entity.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"name"},
+			},
+		},
+	}
+}
+
+func schema_onmetal_api_api_networking_v1alpha1_NetworkPeeringNetworkRef(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkPeeringNetworkRef is a reference to a network to peer with.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"namespace": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Namespace is the namespace of the referenced entity. If empty, the same namespace as the referring resource is implied.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the name of the referenced entity.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"name"},
+			},
+		},
 	}
 }
 
@@ -3689,25 +3716,10 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkPeeringStatus(ref common.
 							Format:      "",
 						},
 					},
-					"phase": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Phase represents the binding phase of a network peering.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"lastPhaseTransitionTime": {
-						SchemaProps: spec.SchemaProps{
-							Description: "LastPhaseTransitionTime is the last time the Phase transitioned.",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
-						},
-					},
 				},
 				Required: []string{"name"},
 			},
 		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
 	}
 }
 
@@ -4153,11 +4165,31 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkSpec(ref common.Reference
 							},
 						},
 					},
+					"incomingPeerings": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-patch-merge-key": "name",
+								"x-kubernetes-patch-strategy":  "merge,retainKeys",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "PeeringClaimRefs are the peering claim references of other networks.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPeeringClaimRef"),
+									},
+								},
+							},
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPeering"},
+			"github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPeering", "github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkPeeringClaimRef"},
 	}
 }
 
@@ -4405,24 +4437,11 @@ func schema_onmetal_api_api_networking_v1alpha1_VirtualIPStatus(ref common.Refer
 							Ref:         ref("github.com/onmetal/onmetal-api/api/common/v1alpha1.IP"),
 						},
 					},
-					"phase": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Phase is the VirtualIPPhase of the VirtualIP.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"phaseLastTransitionTime": {
-						SchemaProps: spec.SchemaProps{
-							Description: "LastPhaseTransitionTime is the last time the Phase transitioned from one value to another.",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
-						},
-					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api/api/common/v1alpha1.IP", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+			"github.com/onmetal/onmetal-api/api/common/v1alpha1.IP"},
 	}
 }
 
@@ -5774,19 +5793,6 @@ func schema_onmetal_api_api_storage_v1alpha1_VolumeStatus(ref common.ReferenceCa
 					"lastStateTransitionTime": {
 						SchemaProps: spec.SchemaProps{
 							Description: "LastStateTransitionTime is the last time the State transitioned between values.",
-							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
-						},
-					},
-					"phase": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Phase represents the binding phase of a Volume.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"lastPhaseTransitionTime": {
-						SchemaProps: spec.SchemaProps{
-							Description: "LastPhaseTransitionTime is the last time the Phase transitioned between values.",
 							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
 						},
 					},

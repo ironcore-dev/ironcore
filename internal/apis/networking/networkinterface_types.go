@@ -79,11 +79,6 @@ type NetworkInterfaceStatus struct {
 	Prefixes []commonv1alpha1.IPPrefix
 	// VirtualIP is any virtual ip assigned to the NetworkInterface.
 	VirtualIP *commonv1alpha1.IP
-
-	// Phase is the NetworkInterfacePhase of the NetworkInterface.
-	Phase NetworkInterfacePhase
-	// LastPhaseTransitionTime is the last time the Phase transitioned from one value to another.
-	LastPhaseTransitionTime *metav1.Time
 }
 
 // NetworkInterfaceState is the onmetal-api state of a NetworkInterface.
@@ -96,18 +91,6 @@ const (
 	NetworkInterfaceStateAvailable NetworkInterfaceState = "Available"
 	// NetworkInterfaceStateError is used for any NetworkInterface where any property has an error.
 	NetworkInterfaceStateError NetworkInterfaceState = "Error"
-)
-
-// NetworkInterfacePhase is the binding phase of a NetworkInterface.
-type NetworkInterfacePhase string
-
-const (
-	// NetworkInterfacePhaseUnbound is used for any NetworkInterface that is not bound.
-	NetworkInterfacePhaseUnbound NetworkInterfacePhase = "Unbound"
-	// NetworkInterfacePhasePending is used for any NetworkInterface that is currently awaiting binding.
-	NetworkInterfacePhasePending NetworkInterfacePhase = "Pending"
-	// NetworkInterfacePhaseBound is used for any NetworkInterface that is properly bound.
-	NetworkInterfacePhaseBound NetworkInterfacePhase = "Bound"
 )
 
 // +genclient

@@ -24,15 +24,12 @@ import (
 
 	"github.com/onmetal/controller-utils/buildutils"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	computeclient "github.com/onmetal/onmetal-api/internal/client/compute"
 	storageclient "github.com/onmetal/onmetal-api/internal/client/storage"
 	utilsenvtest "github.com/onmetal/onmetal-api/utils/envtest"
 	"github.com/onmetal/onmetal-api/utils/envtest/apiserver"
-	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/record"
+	"k8s.io/utils/lru"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 
@@ -60,10 +57,11 @@ const (
 )
 
 var (
-	cfg        *rest.Config
-	k8sClient  client.Client
-	testEnv    *envtest.Environment
-	testEnvExt *utilsenvtest.EnvironmentExtensions
+	cfg            *rest.Config
+	k8sClient      client.Client
+	cacheK8sClient client.Client
+	testEnv        *envtest.Environment
+	testEnvExt     *utilsenvtest.EnvironmentExtensions
 )
 
 func TestAPIs(t *testing.T) {
@@ -119,99 +117,61 @@ var _ = BeforeSuite(func() {
 	DeferCleanup(apiSrv.Stop)
 
 	Expect(utilsenvtest.WaitUntilAPIServicesReadyWithTimeout(apiServiceTimeout, testEnvExt, k8sClient, scheme.Scheme)).To(Succeed())
+	ctx, cancel := context.WithCancel(context.Background())
+	DeferCleanup(cancel)
+
+	k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
+		Scheme:             scheme.Scheme,
+		MetricsBindAddress: "0",
+	})
+	Expect(err).ToNot(HaveOccurred())
+
+	cacheK8sClient = k8sManager.GetClient()
+
+	// index fields here
+	Expect(computeclient.SetupMachineSpecVolumeNamesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+
+	Expect(storageclient.SetupVolumeSpecVolumeClassRefNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+	Expect(storageclient.SetupVolumeSpecVolumePoolRefNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+	Expect(storageclient.SetupVolumePoolAvailableVolumeClassesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+	Expect(storageclient.SetupBucketSpecBucketClassRefNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+	Expect(storageclient.SetupBucketPoolAvailableBucketClassesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+	Expect(storageclient.SetupBucketSpecBucketPoolRefNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+
+	// register reconciler here
+	Expect((&VolumeReleaseReconciler{
+		Client:       k8sManager.GetClient(),
+		APIReader:    k8sManager.GetAPIReader(),
+		AbsenceCache: lru.New(100),
+	}).SetupWithManager(k8sManager)).To(Succeed())
+
+	Expect((&VolumeClassReconciler{
+		Client:    k8sManager.GetClient(),
+		APIReader: k8sManager.GetAPIReader(),
+	}).SetupWithManager(k8sManager)).To(Succeed())
+
+	Expect((&BucketClassReconciler{
+		Client:    k8sManager.GetClient(),
+		APIReader: k8sManager.GetAPIReader(),
+	}).SetupWithManager(k8sManager)).To(Succeed())
+
+	Expect((&VolumeScheduler{
+		Client:        k8sManager.GetClient(),
+		EventRecorder: &record.FakeRecorder{},
+	}).SetupWithManager(k8sManager)).To(Succeed())
+
+	Expect((&BucketClassReconciler{
+		Client:    k8sManager.GetClient(),
+		APIReader: k8sManager.GetAPIReader(),
+	}).SetupWithManager(k8sManager)).To(Succeed())
+
+	Expect((&BucketScheduler{
+		Client:        k8sManager.GetClient(),
+		EventRecorder: &record.FakeRecorder{},
+	}).SetupWithManager(k8sManager)).To(Succeed())
+
+	go func() {
+		defer GinkgoRecover()
+		Expect(k8sManager.Start(ctx)).To(Succeed(), "failed to start manager")
+	}()
 })
-
-func SetupTest(ctx context.Context) (*corev1.Namespace, *computev1alpha1.MachineClass) {
-	var (
-		cancel       context.CancelFunc
-		ns           = &corev1.Namespace{}
-		machineClass = &computev1alpha1.MachineClass{}
-	)
-	BeforeEach(func() {
-		var mgrCtx context.Context
-		mgrCtx, cancel = context.WithCancel(ctx)
-		*ns = corev1.Namespace{
-			ObjectMeta: metav1.ObjectMeta{
-				GenerateName: "testns-",
-			},
-		}
-		Expect(k8sClient.Create(ctx, ns)).To(Succeed(), "failed to create test namespace")
-
-		*machineClass = computev1alpha1.MachineClass{
-			ObjectMeta: metav1.ObjectMeta{
-				GenerateName: "machine-class-",
-			},
-			Capabilities: corev1alpha1.ResourceList{
-				corev1alpha1.ResourceCPU:    resource.MustParse("1"),
-				corev1alpha1.ResourceMemory: resource.MustParse("1Gi"),
-			},
-		}
-		Expect(k8sClient.Create(ctx, machineClass)).To(Succeed(), "failed to create test machine class")
-
-		k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
-			Scheme:             scheme.Scheme,
-			Host:               "127.0.0.1",
-			MetricsBindAddress: "0",
-		})
-		Expect(err).ToNot(HaveOccurred())
-
-		// index fields here
-		Expect(computeclient.SetupMachineSpecVolumeNamesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
-
-		Expect(storageclient.SetupVolumeSpecVolumeClassRefNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
-		Expect(storageclient.SetupVolumeSpecVolumePoolRefNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
-		Expect(storageclient.SetupVolumePoolAvailableVolumeClassesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
-		Expect(storageclient.SetupBucketSpecBucketClassRefNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
-		Expect(storageclient.SetupBucketPoolAvailableBucketClassesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
-		Expect(storageclient.SetupBucketSpecBucketPoolRefNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
-
-		// register reconciler here
-		Expect((&VolumeReconciler{
-			EventRecorder: &record.FakeRecorder{},
-			Client:        k8sManager.GetClient(),
-			APIReader:     k8sManager.GetAPIReader(),
-			Scheme:        k8sManager.GetScheme(),
-			BindTimeout:   1 * time.Second,
-		}).SetupWithManager(k8sManager)).To(Succeed())
-
-		Expect((&VolumeClassReconciler{
-			Client:    k8sManager.GetClient(),
-			APIReader: k8sManager.GetAPIReader(),
-		}).SetupWithManager(k8sManager)).To(Succeed())
-
-		Expect((&BucketClassReconciler{
-			Client:    k8sManager.GetClient(),
-			APIReader: k8sManager.GetAPIReader(),
-		}).SetupWithManager(k8sManager)).To(Succeed())
-
-		Expect((&VolumeScheduler{
-			Client:        k8sManager.GetClient(),
-			EventRecorder: &record.FakeRecorder{},
-		}).SetupWithManager(k8sManager)).To(Succeed())
-
-		Expect((&BucketClassReconciler{
-			Client:    k8sManager.GetClient(),
-			APIReader: k8sManager.GetAPIReader(),
-		}).SetupWithManager(k8sManager)).To(Succeed())
-
-		Expect((&BucketScheduler{
-			Client:        k8sManager.GetClient(),
-			EventRecorder: &record.FakeRecorder{},
-		}).SetupWithManager(k8sManager)).To(Succeed())
-
-		go func() {
-			defer GinkgoRecover()
-			Expect(k8sManager.Start(mgrCtx)).To(Succeed(), "failed to start manager")
-		}()
-	})
-
-	AfterEach(func() {
-		cancel()
-		Expect(k8sClient.Delete(ctx, ns)).To(Succeed(), "failed to delete test namespace")
-		Expect(k8sClient.DeleteAllOf(ctx, &storagev1alpha1.VolumePool{})).To(Succeed())
-		Expect(k8sClient.DeleteAllOf(ctx, &storagev1alpha1.BucketPool{})).To(Succeed())
-		Expect(k8sClient.DeleteAllOf(ctx, &computev1alpha1.MachineClass{})).To(Succeed())
-	})
-
-	return ns, machineClass
-}

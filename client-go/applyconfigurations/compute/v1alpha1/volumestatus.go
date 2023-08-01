@@ -29,8 +29,6 @@ type VolumeStatusApplyConfiguration struct {
 	Handle                  *string               `json:"handle,omitempty"`
 	State                   *v1alpha1.VolumeState `json:"state,omitempty"`
 	LastStateTransitionTime *v1.Time              `json:"lastStateTransitionTime,omitempty"`
-	Phase                   *v1alpha1.VolumePhase `json:"phase,omitempty"`
-	LastPhaseTransitionTime *v1.Time              `json:"lastPhaseTransitionTime,omitempty"`
 }
 
 // VolumeStatusApplyConfiguration constructs an declarative configuration of the VolumeStatus type for use with
@@ -68,21 +66,5 @@ func (b *VolumeStatusApplyConfiguration) WithState(value v1alpha1.VolumeState) *
 // If called multiple times, the LastStateTransitionTime field is set to the value of the last call.
 func (b *VolumeStatusApplyConfiguration) WithLastStateTransitionTime(value v1.Time) *VolumeStatusApplyConfiguration {
 	b.LastStateTransitionTime = &value
-	return b
-}
-
-// WithPhase sets the Phase field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the Phase field is set to the value of the last call.
-func (b *VolumeStatusApplyConfiguration) WithPhase(value v1alpha1.VolumePhase) *VolumeStatusApplyConfiguration {
-	b.Phase = &value
-	return b
-}
-
-// WithLastPhaseTransitionTime sets the LastPhaseTransitionTime field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the LastPhaseTransitionTime field is set to the value of the last call.
-func (b *VolumeStatusApplyConfiguration) WithLastPhaseTransitionTime(value v1.Time) *VolumeStatusApplyConfiguration {
-	b.LastPhaseTransitionTime = &value
 	return b
 }

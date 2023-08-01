@@ -94,9 +94,6 @@ func SetDefaults_NetworkInterfaceStatus(status *v1alpha1.NetworkInterfaceStatus)
 	if status.State == "" {
 		status.State = v1alpha1.NetworkInterfaceStatePending
 	}
-	if status.Phase == "" {
-		status.Phase = v1alpha1.NetworkInterfacePhaseUnbound
-	}
 }
 
 func SetDefaults_NATGatewaySpec(spec *v1alpha1.NATGatewaySpec) {

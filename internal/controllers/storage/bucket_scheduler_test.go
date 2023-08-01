@@ -21,16 +21,26 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 )
 
 var _ = Describe("BucketScheduler", func() {
-	ctx := SetupContext()
-	ns, _ := SetupTest(ctx)
+	ns := SetupNamespace(&k8sClient)
 
-	It("should schedule buckets on bucket pools", func() {
+	BeforeEach(func(ctx SpecContext) {
+		By("waiting for the cached client to report no bucket pools")
+		Eventually(New(cacheK8sClient).ObjectList(&storagev1alpha1.BucketPoolList{})).Should(HaveField("Items", BeEmpty()))
+	})
+
+	AfterEach(func(ctx SpecContext) {
+		By("deleting all bucket pools")
+		Expect(k8sClient.DeleteAllOf(ctx, &storagev1alpha1.BucketPool{})).To(Succeed())
+	})
+
+	It("should schedule buckets on bucket pools", func(ctx SpecContext) {
 		By("creating a bucket pool")
 		bucketPool := &storagev1alpha1.BucketPool{
 			ObjectMeta: metav1.ObjectMeta{
@@ -65,7 +75,7 @@ var _ = Describe("BucketScheduler", func() {
 		}).Should(Succeed())
 	})
 
-	It("should schedule schedule buckets onto bucket pools if the pool becomes available later than the bucket", func() {
+	It("should schedule schedule buckets onto bucket pools if the pool becomes available later than the bucket", func(ctx SpecContext) {
 		By("creating a bucket w/ the requested bucket class")
 		bucket := &storagev1alpha1.Bucket{
 			ObjectMeta: metav1.ObjectMeta{
@@ -109,7 +119,7 @@ var _ = Describe("BucketScheduler", func() {
 		}).Should(Equal(&corev1.LocalObjectReference{Name: bucketPool.Name}))
 	})
 
-	It("should schedule onto bucket pools with matching labels", func() {
+	It("should schedule onto bucket pools with matching labels", func(ctx SpecContext) {
 		By("creating a bucket pool w/o matching labels")
 		bucketPoolNoMatchingLabels := &storagev1alpha1.BucketPool{
 			ObjectMeta: metav1.ObjectMeta{
@@ -164,7 +174,7 @@ var _ = Describe("BucketScheduler", func() {
 		}).Should(Succeed())
 	})
 
-	It("should schedule a bucket with corresponding tolerations onto a bucket pool with taints", func() {
+	It("should schedule a bucket with corresponding tolerations onto a bucket pool with taints", func(ctx SpecContext) {
 		By("creating a bucket pool w/ taints")
 		taintedBucketPool := &storagev1alpha1.BucketPool{
 			ObjectMeta: metav1.ObjectMeta{
