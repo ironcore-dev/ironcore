@@ -63,10 +63,15 @@ func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cob
 }
 
 func Run(ctx context.Context, streams clicommon.Streams, client ori.VolumeRuntimeClient, render renderer.Renderer) error {
-	res, err := client.ListVolumeClasses(ctx, &ori.ListVolumeClassesRequest{})
+	res, err := client.Status(ctx, &ori.StatusRequest{})
 	if err != nil {
 		return fmt.Errorf("error listing volume classes: %w", err)
 	}
 
-	return render.Render(res.VolumeClasses, streams.Out)
+	var volumeClasses []*ori.VolumeClass
+	for _, status := range res.VolumeClassStatus {
+		volumeClasses = append(volumeClasses, status.GetVolumeClass())
+	}
+
+	return render.Render(volumeClasses, streams.Out)
 }

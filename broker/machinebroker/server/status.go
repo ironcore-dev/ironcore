@@ -114,13 +114,13 @@ func (s *Server) Status(ctx context.Context, req *ori.StatusRequest) (*ori.Statu
 	log.V(1).Info("Gathering available machine class names")
 	availableOnmetalMachineClassNames := s.gatherAvailableMachineClassNames(onmetalMachinePools)
 
-	log.V(1).Info("Gathering machine class quantity")
-	machineClassQuantity := s.gatherMachineClassQuantity(onmetalMachinePools)
-
 	if len(availableOnmetalMachineClassNames) == 0 {
 		log.V(1).Info("No available machine classes")
 		return &ori.StatusResponse{MachineClassStatus: []*ori.MachineClassStatus{}}, nil
 	}
+
+	log.V(1).Info("Gathering machine class quantity")
+	machineClassQuantity := s.gatherMachineClassQuantity(onmetalMachinePools)
 
 	log.V(1).Info("Listing onmetal machine classes")
 	onmetalMachineClassList := &computev1alpha1.MachineClassList{}

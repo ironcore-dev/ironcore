@@ -686,15 +686,15 @@ func (in *VolumePoolStatus) DeepCopyInto(out *VolumePoolStatus) {
 		*out = make([]v1.LocalObjectReference, len(*in))
 		copy(*out, *in)
 	}
-	if in.Available != nil {
-		in, out := &in.Available, &out.Available
+	if in.Capacity != nil {
+		in, out := &in.Capacity, &out.Capacity
 		*out = make(corev1alpha1.ResourceList, len(*in))
 		for key, val := range *in {
 			(*out)[key] = val.DeepCopy()
 		}
 	}
-	if in.Used != nil {
-		in, out := &in.Used, &out.Used
+	if in.Allocatable != nil {
+		in, out := &in.Allocatable, &out.Allocatable
 		*out = make(corev1alpha1.ResourceList, len(*in))
 		for key, val := range *in {
 			(*out)[key] = val.DeepCopy()

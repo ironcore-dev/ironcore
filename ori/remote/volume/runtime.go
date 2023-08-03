@@ -57,6 +57,6 @@ func (r *remoteRuntime) DeleteVolume(ctx context.Context, request *ori.DeleteVol
 	return r.client.DeleteVolume(ctx, request)
 }
 
-func (r *remoteRuntime) ListVolumeClasses(ctx context.Context, request *ori.ListVolumeClassesRequest) (*ori.ListVolumeClassesResponse, error) {
-	return r.client.ListVolumeClasses(ctx, request)
+func (r *remoteRuntime) Status(ctx context.Context, request *ori.StatusRequest) (*ori.StatusResponse, error) {
+	return r.client.Status(ctx, request)
 }

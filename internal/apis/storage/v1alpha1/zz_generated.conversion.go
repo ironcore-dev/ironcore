@@ -936,8 +936,8 @@ func autoConvert_v1alpha1_VolumePoolStatus_To_storage_VolumePoolStatus(in *v1alp
 	out.State = storage.VolumePoolState(in.State)
 	out.Conditions = *(*[]storage.VolumePoolCondition)(unsafe.Pointer(&in.Conditions))
 	out.AvailableVolumeClasses = *(*[]v1.LocalObjectReference)(unsafe.Pointer(&in.AvailableVolumeClasses))
-	out.Available = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Available))
-	out.Used = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Used))
+	out.Capacity = *(*core.ResourceList)(unsafe.Pointer(&in.Capacity))
+	out.Allocatable = *(*core.ResourceList)(unsafe.Pointer(&in.Allocatable))
 	return nil
 }
 
@@ -950,8 +950,8 @@ func autoConvert_storage_VolumePoolStatus_To_v1alpha1_VolumePoolStatus(in *stora
 	out.State = v1alpha1.VolumePoolState(in.State)
 	out.Conditions = *(*[]v1alpha1.VolumePoolCondition)(unsafe.Pointer(&in.Conditions))
 	out.AvailableVolumeClasses = *(*[]v1.LocalObjectReference)(unsafe.Pointer(&in.AvailableVolumeClasses))
-	out.Available = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Available))
-	out.Used = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Used))
+	out.Capacity = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Capacity))
+	out.Allocatable = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Allocatable))
 	return nil
 }
 

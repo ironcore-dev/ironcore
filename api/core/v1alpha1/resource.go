@@ -70,6 +70,7 @@ type ClassType string
 
 const (
 	ClassTypeMachineClass ClassType = "machine"
+	ClassTypeVolumeClass  ClassType = "volume"
 )
 
 func ClassCountFor(classType ClassType, className string) ResourceName {

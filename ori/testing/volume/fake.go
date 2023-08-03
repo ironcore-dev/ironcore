@@ -35,8 +35,8 @@ type FakeVolume struct {
 	ori.Volume
 }
 
-type FakeVolumeClass struct {
-	ori.VolumeClass
+type FakeVolumeClassStatus struct {
+	ori.VolumeClassStatus
 }
 
 type FakeRuntimeService struct {
@@ -44,16 +44,16 @@ type FakeRuntimeService struct {
 
 	idGen idgen.IDGen
 
-	Volumes       map[string]*FakeVolume
-	VolumeClasses map[string]*FakeVolumeClass
+	Volumes             map[string]*FakeVolume
+	VolumeClassesStatus map[string]*FakeVolumeClassStatus
 }
 
 func NewFakeRuntimeService() *FakeRuntimeService {
 	return &FakeRuntimeService{
 		idGen: idgen.Default,
 
-		Volumes:       make(map[string]*FakeVolume),
-		VolumeClasses: make(map[string]*FakeVolumeClass),
+		Volumes:             make(map[string]*FakeVolume),
+		VolumeClassesStatus: make(map[string]*FakeVolumeClassStatus),
 	}
 }
 
@@ -67,13 +67,13 @@ func (r *FakeRuntimeService) SetVolumes(volumes []*FakeVolume) {
 	}
 }
 
-func (r *FakeRuntimeService) SetVolumeClasses(volumeClasses []*FakeVolumeClass) {
+func (r *FakeRuntimeService) SetVolumeClasses(volumeClassStatus []*FakeVolumeClassStatus) {
 	r.Lock()
 	defer r.Unlock()
 
-	r.VolumeClasses = make(map[string]*FakeVolumeClass)
-	for _, volumeClass := range volumeClasses {
-		r.VolumeClasses[volumeClass.Name] = volumeClass
+	r.VolumeClassesStatus = make(map[string]*FakeVolumeClassStatus)
+	for _, status := range volumeClassStatus {
+		r.VolumeClassesStatus[status.VolumeClass.Name] = status
 	}
 }
 
@@ -145,14 +145,14 @@ func (r *FakeRuntimeService) DeleteVolume(ctx context.Context, req *ori.DeleteVo
 	return &ori.DeleteVolumeResponse{}, nil
 }
 
-func (r *FakeRuntimeService) ListVolumeClasses(ctx context.Context, req *ori.ListVolumeClassesRequest, opts ...grpc.CallOption) (*ori.ListVolumeClassesResponse, error) {
+func (r *FakeRuntimeService) Status(ctx context.Context, req *ori.StatusRequest, opts ...grpc.CallOption) (*ori.StatusResponse, error) {
 	r.Lock()
 	defer r.Unlock()
 
-	var res []*ori.VolumeClass
-	for _, m := range r.VolumeClasses {
-		volumeClass := m.VolumeClass
-		res = append(res, &volumeClass)
+	var res []*ori.VolumeClassStatus
+	for _, m := range r.VolumeClassesStatus {
+		volumeClassStatus := m.VolumeClassStatus
+		res = append(res, &volumeClassStatus)
 	}
-	return &ori.ListVolumeClassesResponse{VolumeClasses: res}, nil
+	return &ori.StatusResponse{VolumeClassStatus: res}, nil
 }
