@@ -25,6 +25,7 @@ import (
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
 	"github.com/onmetal/onmetal-api/poollet/orievent"
 	"golang.org/x/exp/maps"
+	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -50,8 +51,8 @@ type Generic struct {
 
 	listener sets.Set[*listener]
 
-	volumeClassByName         map[string]*ori.VolumeClass
-	volumeClassByCapabilities map[capabilities][]*ori.VolumeClass
+	volumeClassByName         map[string]*ori.VolumeClassStatus
+	volumeClassByCapabilities map[capabilities][]*ori.VolumeClassStatus
 
 	volumeRuntime ori.VolumeRuntimeClient
 
@@ -85,8 +86,8 @@ func (g *Generic) RemoveListener(listener orievent.ListenerRegistration) error {
 	return nil
 }
 
-func shouldNotify(oldVolumeClassByName map[string]*ori.VolumeClass, class *ori.VolumeClass) bool {
-	oldVolumeClass, ok := oldVolumeClassByName[class.Name]
+func shouldNotify(oldVolumeClassByName map[string]*ori.VolumeClassStatus, class *ori.VolumeClassStatus) bool {
+	oldVolumeClass, ok := oldVolumeClassByName[class.VolumeClass.Name]
 	if !ok {
 		return true
 	}
@@ -96,7 +97,7 @@ func shouldNotify(oldVolumeClassByName map[string]*ori.VolumeClass, class *ori.V
 
 func (g *Generic) relist(ctx context.Context, log logr.Logger) error {
 	log.V(1).Info("Relisting volume classes")
-	res, err := g.volumeRuntime.ListVolumeClasses(ctx, &ori.ListVolumeClassesRequest{})
+	res, err := g.volumeRuntime.Status(ctx, &ori.StatusRequest{})
 	if err != nil {
 		return fmt.Errorf("error listing volume classes: %w", err)
 	}
@@ -110,12 +111,13 @@ func (g *Generic) relist(ctx context.Context, log logr.Logger) error {
 	maps.Clear(g.volumeClassByCapabilities)
 
 	var notify bool
-	for _, volumeClass := range res.VolumeClasses {
-		notify = notify || shouldNotify(oldVolumeClassByName, volumeClass)
+	for _, volumeClassStatus := range res.VolumeClassStatus {
+		volumeClass := volumeClassStatus.GetVolumeClass()
+		notify = notify || shouldNotify(oldVolumeClassByName, volumeClassStatus)
 
 		caps := getCapabilities(volumeClass.Capabilities)
-		g.volumeClassByName[volumeClass.Name] = volumeClass
-		g.volumeClassByCapabilities[caps] = append(g.volumeClassByCapabilities[caps], volumeClass)
+		g.volumeClassByName[volumeClass.Name] = volumeClassStatus
+		g.volumeClassByCapabilities[caps] = append(g.volumeClassByCapabilities[caps], volumeClassStatus)
 	}
 
 	if notify {
@@ -143,28 +145,28 @@ func (g *Generic) Start(ctx context.Context) error {
 	return nil
 }
 
-func (g *Generic) GetVolumeClassFor(ctx context.Context, name string, caps *ori.VolumeClassCapabilities) (*ori.VolumeClass, error) {
+func (g *Generic) GetVolumeClassFor(ctx context.Context, name string, caps *ori.VolumeClassCapabilities) (*ori.VolumeClass, *resource.Quantity, error) {
 	g.mu.RLock()
 	defer g.mu.RUnlock()
 
 	expected := getCapabilities(caps)
-	if byName, ok := g.volumeClassByName[name]; ok && getCapabilities(byName.Capabilities) == expected {
-		return byName, nil
+	if byName, ok := g.volumeClassByName[name]; ok && getCapabilities(byName.VolumeClass.Capabilities) == expected {
+		return byName.VolumeClass, resource.NewQuantity(byName.Quantity, resource.BinarySI), nil
 	}
 
 	if byCaps, ok := g.volumeClassByCapabilities[expected]; ok {
 		switch len(byCaps) {
 		case 0:
-			return nil, ErrNoMatchingVolumeClass
+			return nil, nil, ErrNoMatchingVolumeClass
 		case 1:
-			class := *byCaps[0]
-			return &class, nil
+			classStatus := *byCaps[0]
+			return classStatus.VolumeClass, resource.NewQuantity(classStatus.Quantity, resource.BinarySI), nil
 		default:
-			return nil, ErrAmbiguousMatchingVolumeClass
+			return nil, nil, ErrAmbiguousMatchingVolumeClass
 		}
 	}
 
-	return nil, ErrNoMatchingVolumeClass
+	return nil, nil, ErrNoMatchingVolumeClass
 }
 
 func (g *Generic) WaitForSync(ctx context.Context) error {
@@ -190,8 +192,8 @@ func NewGeneric(runtime ori.VolumeRuntimeClient, opts GenericOptions) VolumeClas
 	setGenericOptionsDefaults(&opts)
 	return &Generic{
 		synced:                    make(chan struct{}),
-		volumeClassByName:         map[string]*ori.VolumeClass{},
-		volumeClassByCapabilities: map[capabilities][]*ori.VolumeClass{},
+		volumeClassByName:         map[string]*ori.VolumeClassStatus{},
+		volumeClassByCapabilities: map[capabilities][]*ori.VolumeClassStatus{},
 		listener:                  sets.New[*listener](),
 		volumeRuntime:             runtime,
 		relistPeriod:              opts.RelistPeriod,

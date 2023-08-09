@@ -20,6 +20,7 @@ import (
 
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
 	"github.com/onmetal/onmetal-api/poollet/orievent"
+	"k8s.io/apimachinery/pkg/api/resource"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 )
 
@@ -30,7 +31,7 @@ var (
 
 type VolumeClassMapper interface {
 	manager.Runnable
-	GetVolumeClassFor(ctx context.Context, name string, capabilities *ori.VolumeClassCapabilities) (*ori.VolumeClass, error)
+	GetVolumeClassFor(ctx context.Context, name string, capabilities *ori.VolumeClassCapabilities) (*ori.VolumeClass, *resource.Quantity, error)
 	WaitForSync(ctx context.Context) error
 	AddListener(listener orievent.Listener) (orievent.ListenerRegistration, error)
 	RemoveListener(reg orievent.ListenerRegistration) error

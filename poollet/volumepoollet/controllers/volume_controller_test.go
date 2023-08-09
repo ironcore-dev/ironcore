@@ -64,6 +64,7 @@ var _ = Describe("VolumeController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, volume)).To(Succeed())
+		DeferCleanup(expectVolumeDeleted, volume)
 
 		By("waiting for the runtime to report the volume")
 		Eventually(srv).Should(SatisfyAll(
@@ -149,6 +150,7 @@ var _ = Describe("VolumeController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, volume)).To(Succeed())
+		DeferCleanup(expectVolumeDeleted, volume)
 
 		By("waiting for the runtime to report the volume")
 		Eventually(srv).Should(SatisfyAll(
@@ -183,6 +185,7 @@ var _ = Describe("VolumeController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, volume)).To(Succeed())
+		DeferCleanup(expectVolumeDeleted, volume)
 
 		By("waiting for the runtime to report the volume")
 		Eventually(srv).Should(SatisfyAll(
@@ -192,7 +195,7 @@ var _ = Describe("VolumeController", func() {
 		_, oriVolume := GetSingleMapEntry(srv.Volumes)
 
 		Expect(oriVolume.Spec.Image).To(Equal(""))
-		Expect(oriVolume.Spec.Class).To(Equal(vc.Name))
+		Expect(oriVolume.Spec.Class).To(Equal(expandableVc.Name))
 		Expect(oriVolume.Spec.Resources.StorageBytes).To(Equal(uint64(size.Value())))
 
 		By("update increasing the storage resource")

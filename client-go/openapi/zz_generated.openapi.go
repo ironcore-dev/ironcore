@@ -5634,9 +5634,9 @@ func schema_onmetal_api_api_storage_v1alpha1_VolumePoolStatus(ref common.Referen
 							},
 						},
 					},
-					"available": {
+					"capacity": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Available list the available capacity of a VolumePool.",
+							Description: "Capacity represents the total resources of a machine pool.",
 							Type:        []string{"object"},
 							AdditionalProperties: &spec.SchemaOrBool{
 								Allows: true,
@@ -5649,9 +5649,9 @@ func schema_onmetal_api_api_storage_v1alpha1_VolumePoolStatus(ref common.Referen
 							},
 						},
 					},
-					"used": {
+					"allocatable": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Used indicates how much capacity has been used in a VolumePool.",
+							Description: "Allocatable represents the resources of a machine pool that are available for scheduling.",
 							Type:        []string{"object"},
 							AdditionalProperties: &spec.SchemaOrBool{
 								Allows: true,

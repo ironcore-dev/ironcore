@@ -1558,7 +1558,7 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: com.github.onmetal.onmetal-api.api.storage.v1alpha1.VolumePoolStatus
   map:
     fields:
-    - name: available
+    - name: allocatable
       type:
         map:
           elementType:
@@ -1569,6 +1569,11 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.api.core.v1.LocalObjectReference
           elementRelationship: atomic
+    - name: capacity
+      type:
+        map:
+          elementType:
+            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
     - name: conditions
       type:
         list:
@@ -1578,11 +1583,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: state
       type:
         scalar: string
-    - name: used
-      type:
-        map:
-          elementType:
-            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
 - name: com.github.onmetal.onmetal-api.api.storage.v1alpha1.VolumeSpec
   map:
     fields:

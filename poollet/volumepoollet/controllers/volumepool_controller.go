@@ -19,6 +19,11 @@ import (
 	"errors"
 	"fmt"
 
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
+	storageclient "github.com/onmetal/onmetal-api/internal/client/storage"
+	"github.com/onmetal/onmetal-api/utils/quota"
+	"k8s.io/apimachinery/pkg/api/resource"
+
 	"github.com/go-logr/logr"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
@@ -66,20 +71,76 @@ func (r *VolumePoolReconciler) delete(ctx context.Context, log logr.Logger, volu
 	return ctrl.Result{}, nil
 }
 
-func (r *VolumePoolReconciler) supportsVolumeClass(ctx context.Context, log logr.Logger, volumeClass *storagev1alpha1.VolumeClass) (bool, error) {
+func (r *VolumePoolReconciler) supportsVolumeClass(ctx context.Context, log logr.Logger, volumeClass *storagev1alpha1.VolumeClass) (*ori.VolumeClass, *resource.Quantity, error) {
 	oriCapabilities, err := getORIVolumeClassCapabilities(volumeClass)
 	if err != nil {
-		return false, fmt.Errorf("error getting ori mahchine class capabilities: %w", err)
+		return nil, nil, fmt.Errorf("error getting ori mahchine class capabilities: %w", err)
 	}
 
-	_, err = r.VolumeClassMapper.GetVolumeClassFor(ctx, volumeClass.Name, oriCapabilities)
+	class, quantity, err := r.VolumeClassMapper.GetVolumeClassFor(ctx, volumeClass.Name, oriCapabilities)
 	if err != nil {
 		if !errors.Is(err, vcm.ErrNoMatchingVolumeClass) && !errors.Is(err, vcm.ErrAmbiguousMatchingVolumeClass) {
-			return false, fmt.Errorf("error getting volume class for %s: %w", volumeClass.Name, err)
+			return nil, nil, fmt.Errorf("error getting volume class for %s: %w", volumeClass.Name, err)
 		}
-		return false, nil
+		return nil, nil, nil
 	}
-	return true, nil
+	return class, quantity, nil
+}
+
+func (r *VolumePoolReconciler) calculateCapacity(
+	ctx context.Context,
+	log logr.Logger,
+	volumes []storagev1alpha1.Volume,
+	volumeClassList []storagev1alpha1.VolumeClass,
+) (capacity, allocatable corev1alpha1.ResourceList, supported []corev1.LocalObjectReference, err error) {
+	log.V(1).Info("Determining supported volume classes, capacity and allocatable")
+
+	capacity = corev1alpha1.ResourceList{}
+	for _, volumeClass := range volumeClassList {
+		class, quantity, err := r.supportsVolumeClass(ctx, log, &volumeClass)
+		if err != nil {
+			return nil, nil, nil, fmt.Errorf("error checking whether volume class %s is supported: %w", volumeClass.Name, err)
+		}
+		if class == nil {
+			continue
+		}
+
+		supported = append(supported, corev1.LocalObjectReference{Name: volumeClass.Name})
+		capacity[corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeVolumeClass, volumeClass.Name)] = *quantity
+	}
+
+	usedResources := corev1alpha1.ResourceList{}
+	for _, volume := range volumes {
+		className := volume.Spec.VolumeClassRef.Name
+		res, ok := usedResources[corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeVolumeClass, className)]
+		if !ok {
+			usedResources[corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeVolumeClass, className)] = *volume.Spec.Resources.Storage()
+			continue
+		}
+
+		res.Add(*volume.Spec.Resources.Storage())
+	}
+
+	return capacity, quota.SubtractWithNonNegativeResult(capacity, usedResources), supported, nil
+}
+
+func (r *VolumePoolReconciler) updateStatus(ctx context.Context, log logr.Logger, volumePool *storagev1alpha1.VolumePool, volumes []storagev1alpha1.Volume, volumeClassList []storagev1alpha1.VolumeClass) error {
+	capacity, allocatable, supported, err := r.calculateCapacity(ctx, log, volumes, volumeClassList)
+	if err != nil {
+		return fmt.Errorf("error calculating pool resources:%w", err)
+	}
+
+	base := volumePool.DeepCopy()
+	volumePool.Status.State = storagev1alpha1.VolumePoolStateAvailable
+	volumePool.Status.AvailableVolumeClasses = supported
+	volumePool.Status.Capacity = capacity
+	volumePool.Status.Allocatable = allocatable
+
+	if err := r.Status().Patch(ctx, volumePool, client.MergeFrom(base)); err != nil {
+		return fmt.Errorf("error patching volume pool status: %w", err)
+	}
+
+	return nil
 }
 
 func (r *VolumePoolReconciler) reconcile(ctx context.Context, log logr.Logger, volumePool *storagev1alpha1.VolumePool) (ctrl.Result, error) {
@@ -101,25 +162,17 @@ func (r *VolumePoolReconciler) reconcile(ctx context.Context, log logr.Logger, v
 		return ctrl.Result{}, fmt.Errorf("error listing volume classes: %w", err)
 	}
 
-	log.V(1).Info("Determining supported volume classes")
-	var supported []corev1.LocalObjectReference
-	for _, volumeClass := range volumeClassList.Items {
-		ok, err := r.supportsVolumeClass(ctx, log, &volumeClass)
-		if err != nil {
-			return ctrl.Result{}, fmt.Errorf("error checking whether volume class %s is supported: %w", volumeClass.Name, err)
-		}
-		if !ok {
-			continue
-		}
-
-		supported = append(supported, corev1.LocalObjectReference{Name: volumeClass.Name})
+	log.V(1).Info("Listing volumes in pool")
+	volumeList := &storagev1alpha1.VolumeList{}
+	if err := r.List(ctx, volumeList, client.MatchingFields{
+		storageclient.VolumeSpecVolumePoolRefNameField: r.VolumePoolName,
+	}); err != nil {
+		return ctrl.Result{}, fmt.Errorf("failed to list volumes in pool: %w", err)
 	}
 
 	log.V(1).Info("Updating volume pool status")
-	base := volumePool.DeepCopy()
-	volumePool.Status.AvailableVolumeClasses = supported
-	if err := r.Status().Patch(ctx, volumePool, client.MergeFrom(base)); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error patchign volume pool status: %w", err)
+	if err := r.updateStatus(ctx, log, volumePool, volumeList.Items, volumeClassList.Items); err != nil {
+		return ctrl.Result{}, fmt.Errorf("error updating status: %w", err)
 	}
 
 	log.V(1).Info("Reconciled")
