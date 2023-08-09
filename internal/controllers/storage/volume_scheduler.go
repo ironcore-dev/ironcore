@@ -17,27 +17,37 @@ package storage
 import (
 	"context"
 	"fmt"
-	"math/rand"
 
 	"github.com/go-logr/logr"
 	"github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	storageclient "github.com/onmetal/onmetal-api/internal/client/storage"
+	"github.com/onmetal/onmetal-api/internal/controllers/storage/scheduler"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/util/workqueue"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
+	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
 
+const (
+	outOfCapacity = "OutOfCapacity"
+)
+
 type VolumeScheduler struct {
 	record.EventRecorder
 	client.Client
+
+	Cache    *scheduler.Cache
+	snapshot *scheduler.Snapshot
 }
 
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
@@ -54,127 +64,263 @@ func (s *VolumeScheduler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	if !volume.DeletionTimestamp.IsZero() {
-		log.Info("Volume is already deleting")
+	if s.skipSchedule(log, volume) {
 		return ctrl.Result{}, nil
 	}
-	if volume.Spec.VolumePoolRef != nil {
-		log.Info("Volume is already assigned", "VolumePoolRef", volume.Spec.VolumePoolRef)
-		return ctrl.Result{}, nil
-	}
-	return s.schedule(ctx, log, volume)
+
+	return s.reconcileExists(ctx, log, volume)
 }
 
-func (s *VolumeScheduler) schedule(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume) (ctrl.Result, error) {
-	log.Info("Scheduling volume")
-	list := &storagev1alpha1.VolumePoolList{}
-	if err := s.List(ctx, list,
-		client.MatchingFields{storageclient.VolumePoolAvailableVolumeClassesField: volume.Spec.VolumeClassRef.Name},
-		client.MatchingLabels(volume.Spec.VolumePoolSelector),
-	); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error listing volume pools: %w", err)
+func (s *VolumeScheduler) skipSchedule(log logr.Logger, volume *storagev1alpha1.Volume) bool {
+	if !volume.DeletionTimestamp.IsZero() {
+		log.V(1).Info("Skipping scheduling for instance", "Reason", "Deleting")
+		return true
 	}
 
-	var available []storagev1alpha1.VolumePool
-	for _, volumePool := range list.Items {
-		if volumePool.DeletionTimestamp.IsZero() {
-			available = append(available, volumePool)
-		}
+	if volume.Spec.VolumeClassRef == nil {
+		log.V(1).Info("Skipping scheduling for instance", "Reason", "No VolumeClassRef")
+		return true
 	}
-	if len(available) == 0 {
-		log.Info("No volume pool available for volume class", "VolumeClass", volume.Spec.VolumeClassRef.Name)
-		s.Eventf(volume, corev1.EventTypeNormal, "CannotSchedule", "No VolumePoolRef found for VolumeClass %s", volume.Spec.VolumeClassRef.Name)
+
+	isAssumed, err := s.Cache.IsAssumedInstance(volume)
+	if err != nil {
+		log.Error(err, "Error checking whether volume has been assumed")
+		return false
+	}
+
+	log.V(1).Info("Skipping scheduling for instance", "Reason", "Assumed")
+	return isAssumed
+}
+
+func (s *VolumeScheduler) matchesLabels(ctx context.Context, pool *scheduler.ContainerInfo, volume *storagev1alpha1.Volume) bool {
+	nodeLabels := labels.Set(pool.Node().Labels)
+	volumePoolSelector := labels.SelectorFromSet(volume.Spec.VolumePoolSelector)
+
+	return volumePoolSelector.Matches(nodeLabels)
+}
+
+func (s *VolumeScheduler) tolerateTaints(ctx context.Context, pool *scheduler.ContainerInfo, volume *storagev1alpha1.Volume) bool {
+	return v1alpha1.TolerateTaints(volume.Spec.Tolerations, pool.Node().Spec.Taints)
+}
+
+func (s *VolumeScheduler) fitsPool(ctx context.Context, pool *scheduler.ContainerInfo, volume *storagev1alpha1.Volume) bool {
+	volumeClassName := volume.Spec.VolumeClassRef.Name
+
+	allocatable, ok := pool.Node().Status.Allocatable[corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeVolumeClass, volumeClassName)]
+	if !ok {
+		return false
+	}
+
+	return allocatable.Cmp(*volume.Spec.Resources.Storage()) > 0
+}
+
+func (s *VolumeScheduler) updateSnapshot() {
+	if s.snapshot == nil {
+		s.snapshot = s.Cache.Snapshot()
+	} else {
+		s.snapshot.Update()
+	}
+}
+
+func (s *VolumeScheduler) assume(assumed *storagev1alpha1.Volume, nodeName string) error {
+	assumed.Spec.VolumePoolRef = &corev1.LocalObjectReference{Name: nodeName}
+	if err := s.Cache.AssumeInstance(assumed); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *VolumeScheduler) bindingCycle(ctx context.Context, log logr.Logger, assumedInstance *storagev1alpha1.Volume) error {
+	if err := s.bind(ctx, log, assumedInstance); err != nil {
+		return fmt.Errorf("error binding: %w", err)
+	}
+	return nil
+}
+
+func (s *VolumeScheduler) bind(ctx context.Context, log logr.Logger, assumed *storagev1alpha1.Volume) error {
+	defer func() {
+		if err := s.Cache.FinishBinding(assumed); err != nil {
+			log.Error(err, "Error finishing cache binding")
+		}
+	}()
+
+	nonAssumed := assumed.DeepCopy()
+	nonAssumed.Spec.VolumePoolRef = nil
+
+	if err := s.Patch(ctx, assumed, client.MergeFrom(nonAssumed)); err != nil {
+		return fmt.Errorf("error patching instance: %w", err)
+	}
+	return nil
+}
+
+func (s *VolumeScheduler) reconcileExists(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume) (ctrl.Result, error) {
+	s.updateSnapshot()
+
+	nodes := s.snapshot.ListNodes()
+	if len(nodes) == 0 {
+		s.EventRecorder.Event(volume, corev1.EventTypeNormal, outOfCapacity, "No nodes available to schedule volume on")
 		return ctrl.Result{}, nil
 	}
 
-	// Filter volume pools by checking if the volume tolerates all the taints of a volume pool
-	var filtered []storagev1alpha1.VolumePool
-	for _, pool := range available {
-		if v1alpha1.TolerateTaints(volume.Spec.Tolerations, pool.Spec.Taints) {
-			filtered = append(filtered, pool)
+	var filteredNodes []*scheduler.ContainerInfo
+	for _, node := range nodes {
+		if !s.tolerateTaints(ctx, node, volume) {
+			log.Info("node filtered", "reason", "taints do not match")
+			continue
 		}
+		if !s.matchesLabels(ctx, node, volume) {
+			log.Info("node filtered", "reason", "label do not match")
+			continue
+		}
+		if !s.fitsPool(ctx, node, volume) {
+			log.Info("node filtered", "reason", "resources do not match")
+			continue
+		}
+
+		filteredNodes = append(filteredNodes, node)
 	}
-	if len(filtered) == 0 {
-		log.Info("No volume pool tolerated by the volume", "Tolerations", volume.Spec.Tolerations)
-		s.Eventf(volume, corev1.EventTypeNormal, "CannotSchedule", "No VolumePoolRef tolerated by %s", &volume.Spec.Tolerations)
+
+	if len(filteredNodes) == 0 {
+		s.EventRecorder.Event(volume, corev1.EventTypeNormal, outOfCapacity, "No nodes available after filtering to schedule volume on")
 		return ctrl.Result{}, nil
 	}
-	available = filtered
 
-	// Get a random pool to distribute evenly.
-	// TODO: Instead of random distribution, try to come up w/ metrics that include usage of each pool to
-	// avoid unfortunate random distribution of items.
-	pool := available[rand.Intn(len(available))]
-	log = log.WithValues("VolumePoolRef", pool.Name)
-	base := volume.DeepCopy()
-	volume.Spec.VolumePoolRef = &corev1.LocalObjectReference{Name: pool.Name}
-	log.Info("Patching volume")
-	if err := s.Patch(ctx, volume, client.MergeFrom(base)); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error scheduling volume on pool: %w", err)
+	maxAllocatableNode := filteredNodes[0]
+	for _, node := range filteredNodes[1:] {
+		current := node.MaxAllocatable(volume.Spec.VolumeClassRef.Name)
+		if current.Cmp(maxAllocatableNode.MaxAllocatable(volume.Spec.VolumeClassRef.Name)) == 1 {
+			maxAllocatableNode = node
+		}
+	}
+	log.V(1).Info("Determined node to schedule on", "NodeName", maxAllocatableNode.Node().Name, "Instances", maxAllocatableNode.NumInstances(), "Allocatable", maxAllocatableNode.MaxAllocatable(volume.Spec.VolumeClassRef.Name))
+
+	log.V(1).Info("Assuming volume to be on node")
+	if err := s.assume(volume, maxAllocatableNode.Node().Name); err != nil {
+		return ctrl.Result{}, err
 	}
 
-	log.Info("Successfully assigned volume")
+	log.V(1).Info("Running binding asynchronously")
+	go func() {
+		if err := s.bindingCycle(ctx, log, volume); err != nil {
+			if err := s.Cache.ForgetInstance(volume); err != nil {
+				log.Error(err, "Error forgetting instance")
+			}
+		}
+	}()
 	return ctrl.Result{}, nil
 }
 
-func filterVolume(volume *storagev1alpha1.Volume) bool {
-	return volume.DeletionTimestamp.IsZero() &&
-		volume.Spec.VolumePoolRef == nil &&
-		volume.Spec.VolumeClassRef != nil
+func (s *VolumeScheduler) enqueueUnscheduledVolumes(ctx context.Context, queue workqueue.RateLimitingInterface) {
+	log := ctrl.LoggerFrom(ctx)
+	volumeList := &storagev1alpha1.VolumeList{}
+	if err := s.List(ctx, volumeList, client.MatchingFields{storageclient.VolumeSpecVolumePoolRefNameField: ""}); err != nil {
+		log.Error(fmt.Errorf("could not list volumes w/o volume pool: %w", err), "Error listing volume pools")
+		return
+	}
+
+	for _, volume := range volumeList.Items {
+		if !volume.DeletionTimestamp.IsZero() {
+			continue
+		}
+		if volume.Spec.VolumePoolRef != nil {
+			continue
+		}
+		queue.Add(ctrl.Request{NamespacedName: client.ObjectKeyFromObject(&volume)})
+	}
 }
 
-func (s *VolumeScheduler) enqueueRequestsByVolumePool() handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, object client.Object) []ctrl.Request {
-		pool := object.(*storagev1alpha1.VolumePool)
-		log := ctrl.LoggerFrom(ctx)
-		if !pool.DeletionTimestamp.IsZero() {
-			return nil
-		}
-
-		list := &storagev1alpha1.VolumeList{}
-		if err := s.List(ctx, list, client.MatchingFields{storageclient.VolumeSpecVolumePoolRefNameField: ""}); err != nil {
-			log.Error(err, "error listing unscheduled volumes")
-			return nil
-		}
-
-		availableClassNames := sets.NewString()
-		for _, availableVolumeClass := range pool.Status.AvailableVolumeClasses {
-			availableClassNames.Insert(availableVolumeClass.Name)
-		}
-
-		var requests []ctrl.Request
-		for _, volume := range list.Items {
-			if !filterVolume(&volume) {
-				continue
-			}
-
-			if !availableClassNames.Has(volume.Spec.VolumeClassRef.Name) {
-				continue
-			}
-
-			if !labels.SelectorFromSet(volume.Spec.VolumePoolSelector).Matches(labels.Set(pool.Labels)) {
-				continue
-			}
-
-			requests = append(requests, ctrl.Request{NamespacedName: client.ObjectKeyFromObject(&volume)})
-		}
-		return requests
+func (s *VolumeScheduler) isVolumeAssigned() predicate.Predicate {
+	return predicate.NewPredicateFuncs(func(obj client.Object) bool {
+		volume := obj.(*storagev1alpha1.Volume)
+		return volume.Spec.VolumePoolRef != nil
 	})
+}
+
+func (s *VolumeScheduler) isVolumeNotAssigned() predicate.Predicate {
+	return predicate.NewPredicateFuncs(func(obj client.Object) bool {
+		volume := obj.(*storagev1alpha1.Volume)
+		return volume.Spec.VolumePoolRef == nil
+	})
+}
+
+func (s *VolumeScheduler) handleVolume() handler.EventHandler {
+	return handler.Funcs{
+		CreateFunc: func(ctx context.Context, evt event.CreateEvent, queue workqueue.RateLimitingInterface) {
+			volume := evt.Object.(*storagev1alpha1.Volume)
+			log := ctrl.LoggerFrom(ctx)
+
+			if err := s.Cache.AddInstance(volume); err != nil {
+				log.Error(err, "Error adding volume to cache")
+			}
+		},
+		UpdateFunc: func(ctx context.Context, evt event.UpdateEvent, queue workqueue.RateLimitingInterface) {
+			log := ctrl.LoggerFrom(ctx)
+
+			oldInstance := evt.ObjectOld.(*storagev1alpha1.Volume)
+			newInstance := evt.ObjectNew.(*storagev1alpha1.Volume)
+			if err := s.Cache.UpdateInstance(oldInstance, newInstance); err != nil {
+				log.Error(err, "Error updating volume in cache")
+			}
+		},
+		DeleteFunc: func(ctx context.Context, evt event.DeleteEvent, queue workqueue.RateLimitingInterface) {
+			log := ctrl.LoggerFrom(ctx)
+
+			instance := evt.Object.(*storagev1alpha1.Volume)
+			if err := s.Cache.RemoveInstance(instance); err != nil {
+				log.Error(err, "Error adding volume to cache")
+			}
+		},
+	}
+}
+
+func (s *VolumeScheduler) handleVolumePool() handler.EventHandler {
+	return handler.Funcs{
+		CreateFunc: func(ctx context.Context, evt event.CreateEvent, queue workqueue.RateLimitingInterface) {
+			pool := evt.Object.(*storagev1alpha1.VolumePool)
+			s.Cache.AddContainer(pool)
+			s.enqueueUnscheduledVolumes(ctx, queue)
+		},
+		UpdateFunc: func(ctx context.Context, evt event.UpdateEvent, queue workqueue.RateLimitingInterface) {
+			oldPool := evt.ObjectOld.(*storagev1alpha1.VolumePool)
+			newPool := evt.ObjectNew.(*storagev1alpha1.VolumePool)
+			s.Cache.UpdateContainer(oldPool, newPool)
+			s.enqueueUnscheduledVolumes(ctx, queue)
+		},
+		DeleteFunc: func(ctx context.Context, evt event.DeleteEvent, queue workqueue.RateLimitingInterface) {
+			log := ctrl.LoggerFrom(ctx)
+
+			pool := evt.Object.(*storagev1alpha1.VolumePool)
+			if err := s.Cache.RemoveContainer(pool); err != nil {
+				log.Error(err, "Error removing volume pool from cache")
+			}
+		},
+	}
 }
 
 func (s *VolumeScheduler) SetupWithManager(mgr manager.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		Named("volume-scheduler").
+		WithOptions(controller.Options{
+			// Only a single concurrent reconcile since it is serialized on the scheduling algorithm's node fitting.
+			MaxConcurrentReconciles: 1,
+		}).
+		// Enqueue unscheduled volumes.
 		For(&storagev1alpha1.Volume{},
-			builder.WithPredicates(predicate.NewPredicateFuncs(func(object client.Object) bool {
-				volume := object.(*storagev1alpha1.Volume)
-				return filterVolume(volume)
-			})),
+			builder.WithPredicates(
+				s.isVolumeNotAssigned(),
+			),
+		).
+		Watches(
+			&storagev1alpha1.Volume{},
+			s.handleVolume(),
+			builder.WithPredicates(
+				s.isVolumeAssigned(),
+			),
 		).
 		// Enqueue unscheduled volumes if a volume pool w/ required volume classes becomes available.
 		Watches(
 			&storagev1alpha1.VolumePool{},
-			s.enqueueRequestsByVolumePool(),
+			s.handleVolumePool(),
 		).
 		Complete(s)
 }
