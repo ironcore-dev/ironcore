@@ -897,6 +897,11 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkInterfaceSpec
   map:
     fields:
+    - name: attributes
+      type:
+        map:
+          elementType:
+            scalar: string
     - name: ipFamilies
       type:
         list:

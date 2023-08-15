@@ -163,9 +163,10 @@ func (s *Server) convertOnmetalNetworkInterfaceAttachment(
 		}
 
 		return &ori.NetworkInterface{
-			Name:      onmetalMachineNic.Name,
-			NetworkId: onmetalNic.Network.Spec.ProviderID,
-			Ips:       ips,
+			Name:       onmetalMachineNic.Name,
+			NetworkId:  onmetalNic.Network.Spec.ProviderID,
+			Ips:        ips,
+			Attributes: onmetalNic.NetworkInterface.Spec.Attributes,
 		}, nil
 	default:
 		return nil, fmt.Errorf("unrecognized onmetal machine network interface %#v", onmetalMachineNic)

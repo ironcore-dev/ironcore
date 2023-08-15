@@ -32,6 +32,7 @@ type NetworkInterfaceSpecApplyConfiguration struct {
 	IPs        []IPSourceApplyConfiguration                  `json:"ips,omitempty"`
 	Prefixes   []PrefixSourceApplyConfiguration              `json:"prefixes,omitempty"`
 	VirtualIP  *VirtualIPSourceApplyConfiguration            `json:"virtualIP,omitempty"`
+	Attributes map[string]string                             `json:"attributes,omitempty"`
 }
 
 // NetworkInterfaceSpecApplyConfiguration constructs an declarative configuration of the NetworkInterfaceSpec type for use with
@@ -105,5 +106,19 @@ func (b *NetworkInterfaceSpecApplyConfiguration) WithPrefixes(values ...*PrefixS
 // If called multiple times, the VirtualIP field is set to the value of the last call.
 func (b *NetworkInterfaceSpecApplyConfiguration) WithVirtualIP(value *VirtualIPSourceApplyConfiguration) *NetworkInterfaceSpecApplyConfiguration {
 	b.VirtualIP = value
+	return b
+}
+
+// WithAttributes puts the entries into the Attributes field in the declarative configuration
+// and returns the receiver, so that objects can be build by chaining "With" function invocations.
+// If called multiple times, the entries provided by each call will be put on the Attributes field,
+// overwriting an existing map entries in Attributes field with the same key.
+func (b *NetworkInterfaceSpecApplyConfiguration) WithAttributes(entries map[string]string) *NetworkInterfaceSpecApplyConfiguration {
+	if b.Attributes == nil && len(entries) > 0 {
+		b.Attributes = make(map[string]string, len(entries))
+	}
+	for k, v := range entries {
+		b.Attributes[k] = v
+	}
 	return b
 }

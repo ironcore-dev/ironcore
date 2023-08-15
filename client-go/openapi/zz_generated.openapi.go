@@ -3459,6 +3459,22 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkInterfaceSpec(ref common.
 							Ref:         ref("github.com/onmetal/onmetal-api/api/networking/v1alpha1.VirtualIPSource"),
 						},
 					},
+					"attributes": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Attributes are provider-specific attributes for the network interface.",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
 				},
 				Required: []string{"networkRef", "ipFamilies", "ips"},
 			},

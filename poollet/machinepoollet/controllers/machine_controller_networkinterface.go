@@ -239,9 +239,10 @@ func (r *MachineReconciler) prepareORINetworkInterface(
 	}
 
 	return &ori.NetworkInterface{
-		Name:      machineNicName,
-		NetworkId: network.Spec.ProviderID,
-		Ips:       utilslices.Map(ips, commonv1alpha1.IP.String),
+		Name:       machineNicName,
+		NetworkId:  network.Spec.ProviderID,
+		Ips:        utilslices.Map(ips, commonv1alpha1.IP.String),
+		Attributes: nic.Spec.Attributes,
 	}, true, nil
 }
 

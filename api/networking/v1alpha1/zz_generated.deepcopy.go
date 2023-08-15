@@ -604,6 +604,13 @@ func (in *NetworkInterfaceSpec) DeepCopyInto(out *NetworkInterfaceSpec) {
 		*out = new(VirtualIPSource)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.Attributes != nil {
+		in, out := &in.Attributes, &out.Attributes
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	}
 	return
 }
 
