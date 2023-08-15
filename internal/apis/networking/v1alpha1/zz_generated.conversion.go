@@ -1005,6 +1005,7 @@ func autoConvert_v1alpha1_NetworkInterfaceSpec_To_networking_NetworkInterfaceSpe
 	out.IPs = *(*[]networking.IPSource)(unsafe.Pointer(&in.IPs))
 	out.Prefixes = *(*[]networking.PrefixSource)(unsafe.Pointer(&in.Prefixes))
 	out.VirtualIP = (*networking.VirtualIPSource)(unsafe.Pointer(in.VirtualIP))
+	out.Attributes = *(*map[string]string)(unsafe.Pointer(&in.Attributes))
 	return nil
 }
 
@@ -1021,6 +1022,7 @@ func autoConvert_networking_NetworkInterfaceSpec_To_v1alpha1_NetworkInterfaceSpe
 	out.IPs = *(*[]v1alpha1.IPSource)(unsafe.Pointer(&in.IPs))
 	out.Prefixes = *(*[]v1alpha1.PrefixSource)(unsafe.Pointer(&in.Prefixes))
 	out.VirtualIP = (*v1alpha1.VirtualIPSource)(unsafe.Pointer(in.VirtualIP))
+	out.Attributes = *(*map[string]string)(unsafe.Pointer(&in.Attributes))
 	return nil
 }
 

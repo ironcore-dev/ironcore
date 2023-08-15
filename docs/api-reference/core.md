@@ -126,6 +126,8 @@ ResourceQuotaStatus
 </thead>
 <tbody><tr><td><p>&#34;machine&#34;</p></td>
 <td></td>
+</tr><tr><td><p>&#34;volume&#34;</p></td>
+<td></td>
 </tr></tbody>
 </table>
 <h3 id="core.api.onmetal.de/v1alpha1.ObjectSelector">ObjectSelector

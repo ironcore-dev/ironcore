@@ -40,6 +40,8 @@ type NetworkInterfaceSpec struct {
 	Prefixes []PrefixSource `json:"prefixes,omitempty"`
 	// VirtualIP specifies the virtual ip that should be assigned to this NetworkInterface.
 	VirtualIP *VirtualIPSource `json:"virtualIP,omitempty"`
+	// Attributes are provider-specific attributes for the network interface.
+	Attributes map[string]string `json:"attributes,omitempty"`
 }
 
 // IPSource is the definition of how to obtain an IP.

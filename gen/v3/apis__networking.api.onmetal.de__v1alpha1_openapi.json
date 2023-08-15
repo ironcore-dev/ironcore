@@ -11664,6 +11664,14 @@
 					"ips"
 				],
 				"properties": {
+					"attributes": {
+						"description": "Attributes are provider-specific attributes for the network interface.",
+						"type": "object",
+						"additionalProperties": {
+							"type": "string",
+							"default": ""
+						}
+					},
 					"ipFamilies": {
 						"description": "IPFamilies defines which IPFamilies this NetworkInterface is supporting",
 						"type": "array",

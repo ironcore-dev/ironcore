@@ -1630,7 +1630,7 @@ VolumePoolState
 </tr>
 <tr>
 <td>
-<code>available</code><br/>
+<code>capacity</code><br/>
 <em>
 <a href="../core/#core.api.onmetal.de/v1alpha1.ResourceList">
 github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
@@ -1638,12 +1638,12 @@ github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
 </em>
 </td>
 <td>
-<p>Available list the available capacity of a VolumePool.</p>
+<p>Capacity represents the total resources of a machine pool.</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>used</code><br/>
+<code>allocatable</code><br/>
 <em>
 <a href="../core/#core.api.onmetal.de/v1alpha1.ResourceList">
 github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
@@ -1651,7 +1651,7 @@ github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
 </em>
 </td>
 <td>
-<p>Used indicates how much capacity has been used in a VolumePool.</p>
+<p>Allocatable represents the resources of a machine pool that are available for scheduling.</p>
 </td>
 </tr>
 </tbody>

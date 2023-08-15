@@ -635,6 +635,17 @@ VirtualIPSource
 <p>VirtualIP specifies the virtual ip that should be assigned to this NetworkInterface.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>attributes</code><br/>
+<em>
+map[string]string
+</em>
+</td>
+<td>
+<p>Attributes are provider-specific attributes for the network interface.</p>
+</td>
+</tr>
 </table>
 </td>
 </tr>
@@ -1586,6 +1597,17 @@ VirtualIPSource
 <p>VirtualIP specifies the virtual ip that should be assigned to this NetworkInterface.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>attributes</code><br/>
+<em>
+map[string]string
+</em>
+</td>
+<td>
+<p>Attributes are provider-specific attributes for the network interface.</p>
+</td>
+</tr>
 </tbody>
 </table>
 <h3 id="networking.api.onmetal.de/v1alpha1.NetworkInterfaceState">NetworkInterfaceState
@@ -1826,6 +1848,17 @@ VirtualIPSource
 </td>
 <td>
 <p>VirtualIP specifies the virtual ip that should be assigned to this NetworkInterface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>attributes</code><br/>
+<em>
+map[string]string
+</em>
+</td>
+<td>
+<p>Attributes are provider-specific attributes for the network interface.</p>
 </td>
 </tr>
 </table>
