@@ -49,8 +49,13 @@ markdown_extensions:
 nav:
 - Home: README.md
 - Concepts:
-    - Machine Exec: concepts/machine-exec-flow.md
-- Architecture: README.md
+  - Machine Exec: concepts/machine-exec-flow.md
+- Architecture: architecture/README.md
+- Components:
+  - API Server: README.md
+  - Controller Manager: README.md
+  - Poollet: README.md
+  - Broker: README.md
 - Usage: README.md
 - Developer Guide:
   - Local Setup: development/setup.md
