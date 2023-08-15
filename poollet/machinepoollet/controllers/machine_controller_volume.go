@@ -44,8 +44,8 @@ func (s MachineVolumeSelector) Match(volume *storagev1alpha1.Volume) bool {
 	return ok
 }
 
-func (r *MachineReconciler) machineVolumeSelector(machine *computev1alpha1.Machine) MachineVolumeSelector {
-	sel := make(MachineVolumeSelector)
+func (r *MachineReconciler) volumeNameToMachineVolume(machine *computev1alpha1.Machine) map[string]computev1alpha1.Volume {
+	sel := make(map[string]computev1alpha1.Volume)
 	for _, machineVolume := range machine.Spec.Volumes {
 		volumeName := computev1alpha1.MachineVolumeName(machine.Name, machineVolume)
 		if volumeName == "" {
@@ -57,6 +57,13 @@ func (r *MachineReconciler) machineVolumeSelector(machine *computev1alpha1.Machi
 	return sel
 }
 
+func (r *MachineReconciler) machineVolumeSelector(machine *computev1alpha1.Machine) claimmanager.Selector[*storagev1alpha1.Volume] {
+	names := sets.New(computev1alpha1.MachineVolumeNames(machine)...)
+	return claimmanager.SelectorFunc[*storagev1alpha1.Volume](func(volume *storagev1alpha1.Volume) bool {
+		return names.Has(volume.Name)
+	})
+}
+
 func (r *MachineReconciler) volumeClaimStrategy() claimmanager.ClaimStrategy[*storagev1alpha1.Volume] {
 	return claimmanager.LocalUIDReferenceClaimStrategy(r.Client,
 		claimmanager.AccessViaLocalUIDReferenceField(func(volume *storagev1alpha1.Volume) **commonv1alpha1.LocalUIDReference {
@@ -65,7 +72,7 @@ func (r *MachineReconciler) volumeClaimStrategy() claimmanager.ClaimStrategy[*st
 	)
 }
 
-func (r *MachineReconciler) getVolumesForMachine(ctx context.Context, machine *computev1alpha1.Machine, sel MachineVolumeSelector) ([]storagev1alpha1.Volume, error) {
+func (r *MachineReconciler) getVolumesForMachine(ctx context.Context, machine *computev1alpha1.Machine) ([]storagev1alpha1.Volume, error) {
 	volumeList := &storagev1alpha1.VolumeList{}
 	if err := r.List(ctx, volumeList,
 		client.InNamespace(machine.Namespace),
@@ -74,6 +81,7 @@ func (r *MachineReconciler) getVolumesForMachine(ctx context.Context, machine *c
 	}
 
 	var (
+		sel      = r.machineVolumeSelector(machine)
 		claimMgr = claimmanager.New[*storagev1alpha1.Volume](machine, sel, r.volumeClaimStrategy())
 		volumes  []storagev1alpha1.Volume
 		errs     []error
@@ -158,21 +166,16 @@ func (r *MachineReconciler) prepareEmptyDiskORIVolume(machineVolume *computev1al
 
 func (r *MachineReconciler) prepareORIVolumes(
 	ctx context.Context,
-	log logr.Logger,
 	machine *computev1alpha1.Machine,
+	volumes []storagev1alpha1.Volume,
 ) ([]*ori.Volume, bool, error) {
-	sel := r.machineVolumeSelector(machine)
-	volumes, err := r.getVolumesForMachine(ctx, machine, sel)
-	if err != nil {
-		return nil, false, err
-	}
-
 	var (
-		oriVolumes []*ori.Volume
-		errs       []error
+		volumeNameToMachineVolume = r.volumeNameToMachineVolume(machine)
+		oriVolumes                []*ori.Volume
+		errs                      []error
 	)
 	for _, volume := range volumes {
-		machineVolume := sel[volume.Name]
+		machineVolume := volumeNameToMachineVolume[volume.Name]
 		oriVolume, ok, err := r.prepareRemoteORIVolume(ctx, machine, &machineVolume, &volume)
 		if err != nil {
 			errs = append(errs, err)
@@ -282,8 +285,9 @@ func (r *MachineReconciler) updateORIVolumes(
 	log logr.Logger,
 	machine *computev1alpha1.Machine,
 	oriMachine *ori.Machine,
+	volumes []storagev1alpha1.Volume,
 ) error {
-	desiredORIVolumes, _, err := r.prepareORIVolumes(ctx, log, machine)
+	desiredORIVolumes, _, err := r.prepareORIVolumes(ctx, machine, volumes)
 	if err != nil {
 		return fmt.Errorf("error preparing ori volumes: %w", err)
 	}

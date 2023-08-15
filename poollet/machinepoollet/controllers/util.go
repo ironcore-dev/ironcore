@@ -15,7 +15,11 @@
 package controllers
 
 import (
+	"fmt"
+	"strconv"
+
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	"github.com/onmetal/onmetal-api/utils/generic"
 	utilslices "github.com/onmetal/onmetal-api/utils/slices"
 )
 
@@ -47,4 +51,22 @@ func FindNewORIVolumes(desiredORIVolumes, existingORIVolumes []*ori.Volume) []*o
 		newORIVolumes = append(newORIVolumes, desiredORIVolume)
 	}
 	return newORIVolumes
+}
+
+func parseInt64(s string) (int64, error) {
+	return strconv.ParseInt(s, 10, 64)
+}
+
+func getAndParseFromStringMap[E any](annotations map[string]string, key string, parse func(string) (E, error)) (E, error) {
+	s, ok := annotations[key]
+	if !ok {
+		return generic.Zero[E](), fmt.Errorf("no value found at key %s", key)
+	}
+
+	e, err := parse(s)
+	if err != nil {
+		return e, fmt.Errorf("error parsing key %s data %s: %w", key, s, err)
+	}
+
+	return e, nil
 }

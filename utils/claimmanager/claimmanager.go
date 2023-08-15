@@ -38,6 +38,12 @@ type Selector[O client.Object] interface {
 	Match(obj O) bool
 }
 
+type SelectorFunc[O client.Object] func(O) bool
+
+func (f SelectorFunc[O]) Match(obj O) bool {
+	return f(obj)
+}
+
 type MatchingLabelSelector[O client.Object] struct {
 	Selector labels.Selector
 }

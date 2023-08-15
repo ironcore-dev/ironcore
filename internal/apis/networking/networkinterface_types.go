@@ -24,6 +24,8 @@ import (
 
 // NetworkInterfaceSpec defines the desired state of NetworkInterface
 type NetworkInterfaceSpec struct {
+	// ProviderID is the provider-internal ID of the network interface.
+	ProviderID string
 	// NetworkRef is the Network this NetworkInterface is connected to
 	NetworkRef corev1.LocalObjectReference
 	// MachineRef is the Machine this NetworkInterface is used by
@@ -71,8 +73,6 @@ type NetworkInterfaceStatus struct {
 	// LastStateTransitionTime is the last time the State transitioned from one value to another.
 	LastStateTransitionTime *metav1.Time
 
-	// ProviderID is the provider-internal ID of the network interface.
-	ProviderID string
 	// IPs represent the effective IP addresses of the NetworkInterface
 	IPs []commonv1alpha1.IP
 	// Prefixes represent the prefixes routed to the NetworkInterface.

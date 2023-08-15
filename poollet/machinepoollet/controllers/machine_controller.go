@@ -16,6 +16,7 @@ package controllers
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 
@@ -28,12 +29,13 @@ import (
 	orimachine "github.com/onmetal/onmetal-api/ori/apis/machine"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
-	machinepoolletv1alpha1 "github.com/onmetal/onmetal-api/poollet/machinepoollet/api/v1alpha1"
+	"github.com/onmetal/onmetal-api/poollet/machinepoollet/api/v1alpha1"
 	machinepoolletclient "github.com/onmetal/onmetal-api/poollet/machinepoollet/client"
 	"github.com/onmetal/onmetal-api/poollet/machinepoollet/controllers/events"
 	machinepoolletmachine "github.com/onmetal/onmetal-api/poollet/machinepoollet/machine"
 	"github.com/onmetal/onmetal-api/poollet/machinepoollet/mcm"
-	onmetalapiclient "github.com/onmetal/onmetal-api/utils/client"
+	utilclient "github.com/onmetal/onmetal-api/utils/client"
+	utilmaps "github.com/onmetal/onmetal-api/utils/maps"
 	"github.com/onmetal/onmetal-api/utils/predicates"
 	"golang.org/x/exp/maps"
 	"google.golang.org/grpc/codes"
@@ -72,14 +74,14 @@ type MachineReconciler struct {
 
 func (r *MachineReconciler) machineKeyLabelSelector(machineKey client.ObjectKey) map[string]string {
 	return map[string]string{
-		machinepoolletv1alpha1.MachineNamespaceLabel: machineKey.Namespace,
-		machinepoolletv1alpha1.MachineNameLabel:      machineKey.Name,
+		v1alpha1.MachineNamespaceLabel: machineKey.Namespace,
+		v1alpha1.MachineNameLabel:      machineKey.Name,
 	}
 }
 
 func (r *MachineReconciler) machineUIDLabelSelector(machineUID types.UID) map[string]string {
 	return map[string]string{
-		machinepoolletv1alpha1.MachineUIDLabel: string(machineUID),
+		v1alpha1.MachineUIDLabel: string(machineUID),
 	}
 }
 
@@ -88,13 +90,9 @@ func (r *MachineReconciler) machineUIDLabelSelector(machineUID types.UID) map[st
 //+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machines,verbs=get;list;watch;update;patch
 //+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machines/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machines/finalizers,verbs=update
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes,verbs=get;list;watch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces,verbs=get;list;watch
+//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces,verbs=get;list;watch;update;patch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networks,verbs=get;list;watch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=virtualips,verbs=get;list;watch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=loadbalancers,verbs=get;list;watch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=loadbalancerroutings,verbs=get;list;watch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=natgateways,verbs=get;list;watch
 //+kubebuilder:rbac:groups=ipam.api.onmetal.de,resources=prefixes,verbs=get;list;watch
 
 func (r *MachineReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -109,9 +107,9 @@ func (r *MachineReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	return r.reconcileExists(ctx, log, machine)
 }
 
-func (r *MachineReconciler) listMachinesByMachineUID(ctx context.Context, machineUID types.UID) ([]*ori.Machine, error) {
+func (r *MachineReconciler) getORIMachinesForMachine(ctx context.Context, machine *computev1alpha1.Machine) ([]*ori.Machine, error) {
 	res, err := r.MachineRuntime.ListMachines(ctx, &ori.ListMachinesRequest{
-		Filter: &ori.MachineFilter{LabelSelector: r.machineUIDLabelSelector(machineUID)},
+		Filter: &ori.MachineFilter{LabelSelector: r.machineUIDLabelSelector(machine.UID)},
 	})
 	if err != nil {
 		return nil, fmt.Errorf("error listing machines by machine uid: %w", err)
@@ -213,7 +211,7 @@ func (r *MachineReconciler) reconcileExists(ctx context.Context, log logr.Logger
 func (r *MachineReconciler) delete(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) (ctrl.Result, error) {
 	log.V(1).Info("Delete")
 
-	if !controllerutil.ContainsFinalizer(machine, machinepoolletv1alpha1.MachineFinalizer) {
+	if !controllerutil.ContainsFinalizer(machine, v1alpha1.MachineFinalizer) {
 		log.V(1).Info("No finalizer present, nothing to do")
 		return ctrl.Result{}, nil
 	}
@@ -231,7 +229,7 @@ func (r *MachineReconciler) delete(ctx context.Context, log logr.Logger, machine
 	}
 
 	log.V(1).Info("Deleted ori machines by UID, removing finalizer")
-	if err := clientutils.PatchRemoveFinalizer(ctx, r.Client, machine, machinepoolletv1alpha1.MachineFinalizer); err != nil {
+	if err := clientutils.PatchRemoveFinalizer(ctx, r.Client, machine, v1alpha1.MachineFinalizer); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error removing finalizer: %w", err)
 	}
 
@@ -244,7 +242,7 @@ func (r *MachineReconciler) deleteMachinesByMachineUID(ctx context.Context, log 
 	res, err := r.MachineRuntime.ListMachines(ctx, &ori.ListMachinesRequest{
 		Filter: &ori.MachineFilter{
 			LabelSelector: map[string]string{
-				machinepoolletv1alpha1.MachineUIDLabel: string(machineUID),
+				v1alpha1.MachineUIDLabel: string(machineUID),
 			},
 		},
 	})
@@ -292,7 +290,7 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 	log.V(1).Info("Reconcile")
 
 	log.V(1).Info("Ensuring finalizer")
-	modified, err := clientutils.PatchEnsureFinalizer(ctx, r.Client, machine, machinepoolletv1alpha1.MachineFinalizer)
+	modified, err := clientutils.PatchEnsureFinalizer(ctx, r.Client, machine, v1alpha1.MachineFinalizer)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error ensuring finalizer: %w", err)
 	}
@@ -303,7 +301,7 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 	log.V(1).Info("Finalizer is present")
 
 	log.V(1).Info("Ensuring no reconcile annotation")
-	modified, err = onmetalapiclient.PatchEnsureNoReconcileAnnotation(ctx, r.Client, machine)
+	modified, err = utilclient.PatchEnsureNoReconcileAnnotation(ctx, r.Client, machine)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error ensuring no reconcile annotation: %w", err)
 	}
@@ -312,28 +310,37 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 		return ctrl.Result{Requeue: true}, nil
 	}
 
-	log.V(1).Info("Listing machines")
-	machines, err := r.listMachinesByMachineUID(ctx, machine.UID)
+	nics, err := r.getNetworkInterfacesForMachine(ctx, machine)
 	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("error listing machines: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error getting network interfaces for machine: %w", err)
 	}
 
-	switch len(machines) {
+	volumes, err := r.getVolumesForMachine(ctx, machine)
+	if err != nil {
+		return ctrl.Result{}, fmt.Errorf("error getting volumes for machine: %w", err)
+	}
+
+	oriMachines, err := r.getORIMachinesForMachine(ctx, machine)
+	if err != nil {
+		return ctrl.Result{}, fmt.Errorf("error getting ORI machines for machine: %w", err)
+	}
+
+	switch len(oriMachines) {
 	case 0:
-		return r.create(ctx, log, machine)
+		return r.create(ctx, log, machine, nics, volumes)
 	case 1:
-		runtimeMachine := machines[0]
-		return r.update(ctx, log, machine, runtimeMachine)
+		oriMachine := oriMachines[0]
+		return r.update(ctx, log, machine, oriMachine, nics, volumes)
 	default:
-		panic("unhandled: multiple machines")
+		panic("unhandled: multiple ORI machines")
 	}
 }
 
 func (r *MachineReconciler) oriMachineLabels(machine *computev1alpha1.Machine) (map[string]string, error) {
 	annotations := map[string]string{
-		machinepoolletv1alpha1.MachineUIDLabel:       string(machine.UID),
-		machinepoolletv1alpha1.MachineNamespaceLabel: machine.Namespace,
-		machinepoolletv1alpha1.MachineNameLabel:      machine.Name,
+		v1alpha1.MachineUIDLabel:       string(machine.UID),
+		v1alpha1.MachineNamespaceLabel: machine.Namespace,
+		v1alpha1.MachineNameLabel:      machine.Name,
 	}
 
 	for name, fieldPath := range r.DownwardAPILabels {
@@ -342,14 +349,25 @@ func (r *MachineReconciler) oriMachineLabels(machine *computev1alpha1.Machine) (
 			return nil, fmt.Errorf("error extracting downward api label %q: %w", name, err)
 		}
 
-		annotations[machinepoolletv1alpha1.DownwardAPILabel(name)] = value
+		annotations[v1alpha1.DownwardAPILabel(name)] = value
 	}
 	return annotations, nil
 }
 
-func (r *MachineReconciler) oriMachineAnnotations(machine *computev1alpha1.Machine) (map[string]string, error) {
+func (r *MachineReconciler) oriMachineAnnotations(
+	machine *computev1alpha1.Machine,
+	oriMachineGeneration int64,
+	nicMappings map[string]v1alpha1.ObjectUIDRef,
+) (map[string]string, error) {
+	nicMappingString, err := v1alpha1.EncodeNetworkInterfaceMapping(nicMappings)
+	if err != nil {
+		return nil, err
+	}
+
 	annotations := map[string]string{
-		machinepoolletv1alpha1.MachineGenerationAnnotation: strconv.FormatInt(machine.Generation, 10),
+		v1alpha1.MachineGenerationAnnotation:       strconv.FormatInt(machine.Generation, 10),
+		v1alpha1.ORIMachineGenerationAnnotation:    strconv.FormatInt(oriMachineGeneration, 10),
+		v1alpha1.NetworkInterfaceMappingAnnotation: nicMappingString,
 	}
 
 	for name, fieldPath := range r.DownwardAPIAnnotations {
@@ -358,17 +376,23 @@ func (r *MachineReconciler) oriMachineAnnotations(machine *computev1alpha1.Machi
 			return nil, fmt.Errorf("error extracting downward api annotation %q: %w", name, err)
 		}
 
-		annotations[machinepoolletv1alpha1.DownwardAPIAnnotation(name)] = value
+		annotations[v1alpha1.DownwardAPIAnnotation(name)] = value
 	}
 
 	return annotations, nil
 }
 
-func (r *MachineReconciler) create(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) (ctrl.Result, error) {
+func (r *MachineReconciler) create(
+	ctx context.Context,
+	log logr.Logger,
+	machine *computev1alpha1.Machine,
+	nics []networkingv1alpha1.NetworkInterface,
+	volumes []storagev1alpha1.Volume,
+) (ctrl.Result, error) {
 	log.V(1).Info("Create")
 
 	log.V(1).Info("Getting machine config")
-	oriMachine, ok, err := r.prepareORIMachine(ctx, log, machine)
+	oriMachine, ok, err := r.prepareORIMachine(ctx, machine, nics, volumes)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error preparing ori machine: %w", err)
 	}
@@ -387,7 +411,7 @@ func (r *MachineReconciler) create(ctx context.Context, log logr.Logger, machine
 	log.V(1).Info("Created", "MachineID", res.Machine.Metadata.Id)
 
 	log.V(1).Info("Updating status")
-	if err := r.updateStatus(ctx, log, machine, res.Machine); err != nil {
+	if err := r.updateStatus(ctx, log, machine, res.Machine, nics); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error updating machine status: %w", err)
 	}
 
@@ -396,33 +420,120 @@ func (r *MachineReconciler) create(ctx context.Context, log logr.Logger, machine
 }
 
 func (r *MachineReconciler) getMachineGeneration(oriMachine *ori.Machine) (int64, error) {
-	observedGenerationData, ok := oriMachine.Metadata.Annotations[machinepoolletv1alpha1.MachineGenerationAnnotation]
-	if !ok {
-		return 0, fmt.Errorf("ori machine has no machine generation data at %s", machinepoolletv1alpha1.MachineGenerationAnnotation)
-	}
-
-	generation, err := strconv.ParseInt(observedGenerationData, 10, 64)
-	if err != nil {
-		return 0, fmt.Errorf("error parsing machine generation annotation %s data %s: %w",
-			machinepoolletv1alpha1.MachineGenerationAnnotation,
-			observedGenerationData,
-			err,
-		)
-	}
-
-	return generation, nil
+	return getAndParseFromStringMap(oriMachine.GetMetadata().GetAnnotations(),
+		v1alpha1.MachineGenerationAnnotation,
+		parseInt64,
+	)
 }
 
-func (r *MachineReconciler) updateStatus(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine, oriMachine *ori.Machine) error {
-	if actualORIGeneration, observedORIGeneration := oriMachine.Metadata.Generation, oriMachine.Status.ObservedGeneration; actualORIGeneration != observedORIGeneration {
+func (r *MachineReconciler) getORIMachineGeneration(oriMachine *ori.Machine) (int64, error) {
+	return getAndParseFromStringMap(oriMachine.GetMetadata().GetAnnotations(),
+		v1alpha1.ORIMachineGenerationAnnotation,
+		parseInt64,
+	)
+}
+
+func (r *MachineReconciler) getNetworkInterfaceMapping(oriMachine *ori.Machine) (map[string]v1alpha1.ObjectUIDRef, error) {
+	return getAndParseFromStringMap(oriMachine.GetMetadata().GetAnnotations(),
+		v1alpha1.NetworkInterfaceMappingAnnotation,
+		v1alpha1.DecodeNetworkInterfaceMapping,
+	)
+}
+
+func (r *MachineReconciler) updateStatus(
+	ctx context.Context,
+	log logr.Logger,
+	machine *computev1alpha1.Machine,
+	oriMachine *ori.Machine,
+	nics []networkingv1alpha1.NetworkInterface,
+) error {
+	requiredORIGeneration, err := r.getORIMachineGeneration(oriMachine)
+	if err != nil {
+		return err
+	}
+
+	oriGeneration := oriMachine.Metadata.Generation
+	observedORIGeneration := oriMachine.Status.ObservedGeneration
+
+	if observedORIGeneration < requiredORIGeneration {
 		log.V(1).Info("ORI machine was not observed at the latest generation",
-			"ActualGeneration", actualORIGeneration,
-			"ObservedGeneration", observedORIGeneration,
+			"ORIGeneration", oriGeneration,
+			"ObservedORIGeneration", observedORIGeneration,
+			"RequiredORIGeneration", requiredORIGeneration,
 		)
 		return nil
 	}
 
-	base := machine.DeepCopy()
+	var errs []error
+
+	if err := r.updateMachineStatus(ctx, machine, oriMachine); err != nil {
+		errs = append(errs, err)
+	}
+	if err := r.updateNetworkInterfaceStatus(ctx, oriMachine, nics); err != nil {
+		errs = append(errs, err)
+	}
+
+	return errors.Join(errs...)
+}
+
+func (r *MachineReconciler) updateNetworkInterfaceProviderID(
+	ctx context.Context,
+	nic *networkingv1alpha1.NetworkInterface,
+	providerID string,
+) error {
+	base := nic.DeepCopy()
+	nic.Spec.ProviderID = providerID
+	if err := r.Patch(ctx, nic, client.StrategicMergeFrom(base)); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *MachineReconciler) updateNetworkInterfaceStatus(
+	ctx context.Context,
+	oriMachine *ori.Machine,
+	nics []networkingv1alpha1.NetworkInterface,
+) error {
+	nicMapping, err := r.getNetworkInterfaceMapping(oriMachine)
+	if err != nil {
+		return err
+	}
+
+	var (
+		unhandledNicByUID = utilclient.ObjectStructSliceToObjectByUIDMap[*networkingv1alpha1.NetworkInterface](nics)
+		errs              []error
+	)
+
+	for _, oriNicStatus := range oriMachine.GetStatus().GetNetworkInterfaces() {
+		ref, ok := nicMapping[oriNicStatus.Name]
+		if !ok {
+			continue
+		}
+
+		nic, ok := utilmaps.Pop(unhandledNicByUID, ref.UID)
+		if !ok {
+			continue
+		}
+
+		if nic.Spec.ProviderID != oriNicStatus.Handle {
+			if err := r.updateNetworkInterfaceProviderID(ctx, nic, oriNicStatus.Handle); err != nil {
+				errs = append(errs, err)
+			}
+		}
+	}
+
+	for _, nic := range unhandledNicByUID {
+		if nic.Spec.ProviderID != "" {
+			if err := r.updateNetworkInterfaceProviderID(ctx, nic, ""); err != nil {
+				errs = append(errs, err)
+			}
+		}
+	}
+
+	return errors.Join(errs...)
+}
+
+func (r *MachineReconciler) updateMachineStatus(ctx context.Context, machine *computev1alpha1.Machine, oriMachine *ori.Machine) error {
 	now := metav1.Now()
 
 	generation, err := r.getMachineGeneration(oriMachine)
@@ -431,15 +542,11 @@ func (r *MachineReconciler) updateStatus(ctx context.Context, log logr.Logger, m
 	}
 
 	machineID := machinepoolletmachine.MakeID(r.MachineRuntimeName, oriMachine.Metadata.Id)
-	machine.Status.MachineID = machineID.String()
-	machine.Status.ObservedGeneration = generation
 
 	state, err := r.convertORIMachineState(oriMachine.Status.State)
 	if err != nil {
 		return err
 	}
-
-	machine.Status.State = state
 
 	volumeStatuses, err := r.getVolumeStatusesForMachine(machine, oriMachine, now)
 	if err != nil {
@@ -451,6 +558,11 @@ func (r *MachineReconciler) updateStatus(ctx context.Context, log logr.Logger, m
 		return fmt.Errorf("error getting network interface statuses: %w", err)
 	}
 
+	base := machine.DeepCopy()
+
+	machine.Status.State = state
+	machine.Status.MachineID = machineID.String()
+	machine.Status.ObservedGeneration = generation
 	machine.Status.Volumes = volumeStatuses
 	machine.Status.NetworkInterfaces = nicStatuses
 
@@ -497,19 +609,22 @@ func (r *MachineReconciler) update(
 	log logr.Logger,
 	machine *computev1alpha1.Machine,
 	oriMachine *ori.Machine,
+	nics []networkingv1alpha1.NetworkInterface,
+	volumes []storagev1alpha1.Volume,
 ) (ctrl.Result, error) {
 	log.V(1).Info("Updating existing machine")
 
 	var errs []error
 
-	log.V(1).Info("Updating volumes")
-	if err := r.updateORIVolumes(ctx, log, machine, oriMachine); err != nil {
-		errs = append(errs, fmt.Errorf("error updating volumes: %w", err))
+	log.V(1).Info("Updating network interfaces")
+	oriNics, err := r.updateORINetworkInterfaces(ctx, log, machine, oriMachine, nics)
+	if err != nil {
+		errs = append(errs, fmt.Errorf("error updating network interfaces: %w", err))
 	}
 
-	log.V(1).Info("Updating network interfaces")
-	if err := r.updateORINetworkInterfaces(ctx, log, machine, oriMachine); err != nil {
-		errs = append(errs, fmt.Errorf("error updating network interfaces: %w", err))
+	log.V(1).Info("Updating volumes")
+	if err := r.updateORIVolumes(ctx, log, machine, oriMachine, volumes); err != nil {
+		errs = append(errs, fmt.Errorf("error updating volumes: %w", err))
 	}
 
 	log.V(1).Info("Updating power state")
@@ -522,35 +637,41 @@ func (r *MachineReconciler) update(
 	}
 
 	log.V(1).Info("Updating annotations")
-	if err := r.updateORIAnnotations(ctx, log, machine, oriMachine); err != nil {
+	nicMapping := r.computeNetworkInterfaceMapping(machine, nics, oriNics)
+	if err := r.updateORIAnnotations(ctx, log, machine, oriMachine, nicMapping); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error updating annotations: %w", err)
 	}
 
 	log.V(1).Info("Getting ori machine")
-	m, err := r.getMachineByID(ctx, oriMachine.Metadata.Id)
+	oriMachine, err = r.getMachineByID(ctx, oriMachine.Metadata.Id)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error getting ori machine: %w", err)
 	}
-	oriMachine = m
 
 	log.V(1).Info("Updating machine status")
-	if err := r.updateStatus(ctx, log, machine, oriMachine); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error updating status")
+	if err := r.updateStatus(ctx, log, machine, oriMachine, nics); err != nil {
+		return ctrl.Result{}, fmt.Errorf("error updating status: %w", err)
 	}
 
 	log.V(1).Info("Updated existing machine")
 	return ctrl.Result{}, nil
 }
 
-func (r *MachineReconciler) updateORIAnnotations(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine, oriMachine *ori.Machine) error {
-	desiredAnnotations, err := r.oriMachineAnnotations(machine)
+func (r *MachineReconciler) updateORIAnnotations(
+	ctx context.Context,
+	log logr.Logger,
+	machine *computev1alpha1.Machine,
+	oriMachine *ori.Machine,
+	nicMapping map[string]v1alpha1.ObjectUIDRef,
+) error {
+	desiredAnnotations, err := r.oriMachineAnnotations(machine, oriMachine.GetMetadata().GetGeneration(), nicMapping)
 	if err != nil {
 		return fmt.Errorf("error getting ori machine annotations: %w", err)
 	}
 
 	actualAnnotations := oriMachine.Metadata.Annotations
 
-	if !maps.Equal(desiredAnnotations, actualAnnotations) {
+	if maps.Equal(desiredAnnotations, actualAnnotations) {
 		log.V(1).Info("Annotations are up-to-date", "Annotations", desiredAnnotations)
 		return nil
 	}
@@ -638,7 +759,12 @@ func (r *MachineReconciler) prepareORIIgnitionData(ctx context.Context, machine 
 	return data, true, nil
 }
 
-func (r *MachineReconciler) prepareORIMachine(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) (*ori.Machine, bool, error) {
+func (r *MachineReconciler) prepareORIMachine(
+	ctx context.Context,
+	machine *computev1alpha1.Machine,
+	nics []networkingv1alpha1.NetworkInterface,
+	volumes []storagev1alpha1.Volume,
+) (*ori.Machine, bool, error) {
 	var (
 		ok   = true
 		errs []error
@@ -672,7 +798,7 @@ func (r *MachineReconciler) prepareORIMachine(ctx context.Context, log logr.Logg
 		}
 	}
 
-	machineNics, machineNicsOK, err := r.prepareORINetworkInterfaces(ctx, machine)
+	machineNics, machineNicMappings, machineNicsOK, err := r.prepareORINetworkInterfacesForMachine(ctx, machine, nics)
 	switch {
 	case err != nil:
 		errs = append(errs, fmt.Errorf("error preparing ori machine network interfaces: %w", err))
@@ -680,7 +806,7 @@ func (r *MachineReconciler) prepareORIMachine(ctx context.Context, log logr.Logg
 		ok = false
 	}
 
-	machineVolumes, machineVolumesOK, err := r.prepareORIVolumes(ctx, log, machine)
+	machineVolumes, machineVolumesOK, err := r.prepareORIVolumes(ctx, machine, volumes)
 	switch {
 	case err != nil:
 		errs = append(errs, fmt.Errorf("error preparing ori machine volumes: %w", err))
@@ -693,7 +819,7 @@ func (r *MachineReconciler) prepareORIMachine(ctx context.Context, log logr.Logg
 		errs = append(errs, fmt.Errorf("error preparing ori machine labels: %w", err))
 	}
 
-	annotations, err := r.oriMachineAnnotations(machine)
+	annotations, err := r.oriMachineAnnotations(machine, 1, machineNicMappings)
 	if err != nil {
 		errs = append(errs, fmt.Errorf("error preparing ori machine annotations: %w", err))
 	}
@@ -763,7 +889,7 @@ func (r *MachineReconciler) enqueueMachinesReferencingVolume() handler.EventHand
 			return nil
 		}
 
-		return onmetalapiclient.ReconcileRequestsFromObjectStructSlice[*computev1alpha1.Machine](machineList.Items)
+		return utilclient.ReconcileRequestsFromObjectStructSlice[*computev1alpha1.Machine](machineList.Items)
 	})
 }
 
@@ -784,7 +910,7 @@ func (r *MachineReconciler) enqueueMachinesReferencingSecret() handler.EventHand
 			return nil
 		}
 
-		return onmetalapiclient.ReconcileRequestsFromObjectStructSlice[*computev1alpha1.Machine](machineList.Items)
+		return utilclient.ReconcileRequestsFromObjectStructSlice[*computev1alpha1.Machine](machineList.Items)
 	})
 }
 
@@ -805,7 +931,7 @@ func (r *MachineReconciler) enqueueMachinesReferencingNetworkInterface() handler
 			return nil
 		}
 
-		return onmetalapiclient.ReconcileRequestsFromObjectStructSlice[*computev1alpha1.Machine](machineList.Items)
+		return utilclient.ReconcileRequestsFromObjectStructSlice[*computev1alpha1.Machine](machineList.Items)
 	})
 }
 

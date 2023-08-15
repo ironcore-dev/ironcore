@@ -139,7 +139,7 @@ func (r *LoadBalancerReconciler) findDestinations(ctx context.Context, loadBalan
 				TargetRef: &networkingv1alpha1.LoadBalancerTargetRef{
 					UID:        nic.UID,
 					Name:       nic.Name,
-					ProviderID: nic.Status.ProviderID,
+					ProviderID: nic.Spec.ProviderID,
 				},
 			})
 		}

@@ -998,6 +998,7 @@ func Convert_networking_NetworkInterfaceList_To_v1alpha1_NetworkInterfaceList(in
 }
 
 func autoConvert_v1alpha1_NetworkInterfaceSpec_To_networking_NetworkInterfaceSpec(in *v1alpha1.NetworkInterfaceSpec, out *networking.NetworkInterfaceSpec, s conversion.Scope) error {
+	out.ProviderID = in.ProviderID
 	out.NetworkRef = in.NetworkRef
 	out.MachineRef = (*commonv1alpha1.LocalUIDReference)(unsafe.Pointer(in.MachineRef))
 	out.IPFamilies = *(*[]v1.IPFamily)(unsafe.Pointer(&in.IPFamilies))
@@ -1013,6 +1014,7 @@ func Convert_v1alpha1_NetworkInterfaceSpec_To_networking_NetworkInterfaceSpec(in
 }
 
 func autoConvert_networking_NetworkInterfaceSpec_To_v1alpha1_NetworkInterfaceSpec(in *networking.NetworkInterfaceSpec, out *v1alpha1.NetworkInterfaceSpec, s conversion.Scope) error {
+	out.ProviderID = in.ProviderID
 	out.NetworkRef = in.NetworkRef
 	out.MachineRef = (*commonv1alpha1.LocalUIDReference)(unsafe.Pointer(in.MachineRef))
 	out.IPFamilies = *(*[]v1.IPFamily)(unsafe.Pointer(&in.IPFamilies))
@@ -1030,7 +1032,6 @@ func Convert_networking_NetworkInterfaceSpec_To_v1alpha1_NetworkInterfaceSpec(in
 func autoConvert_v1alpha1_NetworkInterfaceStatus_To_networking_NetworkInterfaceStatus(in *v1alpha1.NetworkInterfaceStatus, out *networking.NetworkInterfaceStatus, s conversion.Scope) error {
 	out.State = networking.NetworkInterfaceState(in.State)
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
-	out.ProviderID = in.ProviderID
 	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
 	out.Prefixes = *(*[]commonv1alpha1.IPPrefix)(unsafe.Pointer(&in.Prefixes))
 	out.VirtualIP = (*commonv1alpha1.IP)(unsafe.Pointer(in.VirtualIP))
@@ -1045,7 +1046,6 @@ func Convert_v1alpha1_NetworkInterfaceStatus_To_networking_NetworkInterfaceStatu
 func autoConvert_networking_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStatus(in *networking.NetworkInterfaceStatus, out *v1alpha1.NetworkInterfaceStatus, s conversion.Scope) error {
 	out.State = v1alpha1.NetworkInterfaceState(in.State)
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
-	out.ProviderID = in.ProviderID
 	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
 	out.Prefixes = *(*[]commonv1alpha1.IPPrefix)(unsafe.Pointer(&in.Prefixes))
 	out.VirtualIP = (*commonv1alpha1.IP)(unsafe.Pointer(in.VirtualIP))
