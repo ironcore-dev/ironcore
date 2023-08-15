@@ -922,6 +922,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: com.github.onmetal.onmetal-api.api.networking.v1alpha1.PrefixSource
           elementRelationship: atomic
+    - name: providerID
+      type:
+        scalar: string
     - name: virtualIP
       type:
         namedType: com.github.onmetal.onmetal-api.api.networking.v1alpha1.VirtualIPSource
@@ -943,9 +946,6 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IPPrefix
           elementRelationship: atomic
-    - name: providerID
-      type:
-        scalar: string
     - name: state
       type:
         scalar: string

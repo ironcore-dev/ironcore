@@ -98,9 +98,11 @@ var _ = Describe("LoadBalancerReconciler", func() {
 		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
 
 		By("setting the network interface to be available with IP and provider ID")
+		Eventually(Update(nic, func() {
+			nic.Spec.ProviderID = "my://provider-id"
+		})).Should(Succeed())
 		Eventually(UpdateStatus(nic, func() {
 			nic.Status.State = networkingv1alpha1.NetworkInterfaceStateAvailable
-			nic.Status.ProviderID = "my://provider-id"
 			nic.Status.IPs = commonv1alpha1.MustParseIPs("10.0.0.1")
 		})).Should(Succeed())
 

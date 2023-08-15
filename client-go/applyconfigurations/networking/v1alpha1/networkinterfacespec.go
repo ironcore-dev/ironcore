@@ -25,6 +25,7 @@ import (
 // NetworkInterfaceSpecApplyConfiguration represents an declarative configuration of the NetworkInterfaceSpec type for use
 // with apply.
 type NetworkInterfaceSpecApplyConfiguration struct {
+	ProviderID *string                                       `json:"providerID,omitempty"`
 	NetworkRef *v1.LocalObjectReference                      `json:"networkRef,omitempty"`
 	MachineRef *v1alpha1.LocalUIDReferenceApplyConfiguration `json:"machineRef,omitempty"`
 	IPFamilies []v1.IPFamily                                 `json:"ipFamilies,omitempty"`
@@ -37,6 +38,14 @@ type NetworkInterfaceSpecApplyConfiguration struct {
 // apply.
 func NetworkInterfaceSpec() *NetworkInterfaceSpecApplyConfiguration {
 	return &NetworkInterfaceSpecApplyConfiguration{}
+}
+
+// WithProviderID sets the ProviderID field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the ProviderID field is set to the value of the last call.
+func (b *NetworkInterfaceSpecApplyConfiguration) WithProviderID(value string) *NetworkInterfaceSpecApplyConfiguration {
+	b.ProviderID = &value
+	return b
 }
 
 // WithNetworkRef sets the NetworkRef field in the declarative configuration to the given value

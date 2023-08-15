@@ -960,7 +960,9 @@ MachinePoolDaemonEndpoints
 <td>
 <code>capacity</code><br/>
 <em>
+<a href="../core/#core.api.onmetal.de/v1alpha1.ResourceList">
 github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
+</a>
 </em>
 </td>
 <td>
@@ -971,7 +973,9 @@ github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
 <td>
 <code>allocatable</code><br/>
 <em>
+<a href="../core/#core.api.onmetal.de/v1alpha1.ResourceList">
 github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
+</a>
 </em>
 </td>
 <td>

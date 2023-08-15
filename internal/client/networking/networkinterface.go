@@ -25,7 +25,6 @@ const (
 	NetworkInterfacePrefixNamesField        = "networkinterface-prefix-names"
 	NetworkInterfaceVirtualIPNamesField     = "networkinterface-virtual-ip-names"
 	NetworkInterfaceSpecNetworkRefNameField = "spec.networkRef.name"
-	NetworkInterfaceSpecMachineRefNameField = "spec.machineRef.name"
 )
 
 func SetupNetworkInterfacePrefixNamesFieldIndexer(ctx context.Context, indexer client.FieldIndexer) error {
@@ -57,18 +56,5 @@ func SetupNetworkInterfaceNetworkNameFieldIndexer(ctx context.Context, indexer c
 	return indexer.IndexField(ctx, &networkingv1alpha1.NetworkInterface{}, NetworkInterfaceSpecNetworkRefNameField, func(obj client.Object) []string {
 		nic := obj.(*networkingv1alpha1.NetworkInterface)
 		return []string{nic.Spec.NetworkRef.Name}
-	})
-}
-
-func SetupNetworkInterfaceSpecMachineRefNameField(ctx context.Context, indexer client.FieldIndexer) error {
-	return indexer.IndexField(ctx, &networkingv1alpha1.NetworkInterface{}, NetworkInterfaceSpecMachineRefNameField, func(obj client.Object) []string {
-		nic := obj.(*networkingv1alpha1.NetworkInterface)
-
-		machineRef := nic.Spec.MachineRef
-		if machineRef == nil {
-			return []string{""}
-		}
-
-		return []string{machineRef.Name}
 	})
 }
