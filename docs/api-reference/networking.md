@@ -456,6 +456,20 @@ string
 <p>Peerings are the network peerings with this network.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>incomingPeerings</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NetworkPeeringClaimRef">
+[]NetworkPeeringClaimRef
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>PeeringClaimRefs are the peering claim references of other networks.</p>
+</td>
+</tr>
 </table>
 </td>
 </tr>
@@ -530,6 +544,17 @@ NetworkInterfaceSpec
 <br/>
 <br/>
 <table>
+<tr>
+<td>
+<code>providerID</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>ProviderID is the provider-internal ID of the network interface.</p>
+</td>
+</tr>
 <tr>
 <td>
 <code>networkRef</code><br/>
@@ -608,6 +633,17 @@ VirtualIPSource
 </td>
 <td>
 <p>VirtualIP specifies the virtual ip that should be assigned to this NetworkInterface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>attributes</code><br/>
+<em>
+map[string]string
+</em>
+</td>
+<td>
+<p>Attributes are provider-specific attributes for the network interface.</p>
 </td>
 </tr>
 </table>
@@ -1454,32 +1490,6 @@ Has to be a power of 2. If empty, 2048 (DefaultPortsPerNetworkInterface) is the 
 </td>
 </tr></tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.NetworkInterfacePhase">NetworkInterfacePhase
-(<code>string</code> alias)</h3>
-<p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceStatus">NetworkInterfaceStatus</a>)
-</p>
-<div>
-<p>NetworkInterfacePhase is the binding phase of a NetworkInterface.</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Value</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody><tr><td><p>&#34;Bound&#34;</p></td>
-<td><p>NetworkInterfacePhaseBound is used for any NetworkInterface that is properly bound.</p>
-</td>
-</tr><tr><td><p>&#34;Pending&#34;</p></td>
-<td><p>NetworkInterfacePhasePending is used for any NetworkInterface that is currently awaiting binding.</p>
-</td>
-</tr><tr><td><p>&#34;Unbound&#34;</p></td>
-<td><p>NetworkInterfacePhaseUnbound is used for any NetworkInterface that is not bound.</p>
-</td>
-</tr></tbody>
-</table>
 <h3 id="networking.api.onmetal.de/v1alpha1.NetworkInterfaceSpec">NetworkInterfaceSpec
 </h3>
 <p>
@@ -1496,6 +1506,17 @@ Has to be a power of 2. If empty, 2048 (DefaultPortsPerNetworkInterface) is the 
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<code>providerID</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>ProviderID is the provider-internal ID of the network interface.</p>
+</td>
+</tr>
 <tr>
 <td>
 <code>networkRef</code><br/>
@@ -1574,6 +1595,17 @@ VirtualIPSource
 </td>
 <td>
 <p>VirtualIP specifies the virtual ip that should be assigned to this NetworkInterface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>attributes</code><br/>
+<em>
+map[string]string
+</em>
+</td>
+<td>
+<p>Attributes are provider-specific attributes for the network interface.</p>
 </td>
 </tr>
 </tbody>
@@ -1648,17 +1680,6 @@ Kubernetes meta/v1.Time
 </tr>
 <tr>
 <td>
-<code>providerID</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>ProviderID is the provider-internal ID of the network interface.</p>
-</td>
-</tr>
-<tr>
-<td>
 <code>ips</code><br/>
 <em>
 <a href="../common/#common.api.onmetal.de/v1alpha1.IP">
@@ -1694,32 +1715,6 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 </td>
 <td>
 <p>VirtualIP is any virtual ip assigned to the NetworkInterface.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>phase</code><br/>
-<em>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfacePhase">
-NetworkInterfacePhase
-</a>
-</em>
-</td>
-<td>
-<p>Phase is the NetworkInterfacePhase of the NetworkInterface.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>lastPhaseTransitionTime</code><br/>
-<em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#time-v1-meta">
-Kubernetes meta/v1.Time
-</a>
-</em>
-</td>
-<td>
-<p>LastPhaseTransitionTime is the last time the Phase transitioned from one value to another.</p>
 </td>
 </tr>
 </tbody>
@@ -1764,6 +1759,17 @@ NetworkInterfaceSpec
 <br/>
 <br/>
 <table>
+<tr>
+<td>
+<code>providerID</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>ProviderID is the provider-internal ID of the network interface.</p>
+</td>
+</tr>
 <tr>
 <td>
 <code>networkRef</code><br/>
@@ -1844,6 +1850,17 @@ VirtualIPSource
 <p>VirtualIP specifies the virtual ip that should be assigned to this NetworkInterface.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>attributes</code><br/>
+<em>
+map[string]string
+</em>
+</td>
+<td>
+<p>Attributes are provider-specific attributes for the network interface.</p>
+</td>
+</tr>
 </table>
 </td>
 </tr>
@@ -1880,41 +1897,111 @@ string
 <td>
 <code>networkRef</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.UIDReference">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.UIDReference
+<a href="#networking.api.onmetal.de/v1alpha1.NetworkPeeringNetworkRef">
+NetworkPeeringNetworkRef
 </a>
 </em>
 </td>
 <td>
 <p>NetworkRef is the reference to the network to peer with.
-If the UID is empty, it will be populated once when the peering is successfully bound.
-If namespace is empty it is implied that the target network resides in the same network.</p>
+An empty namespace indicates that the target network resides in the same namespace as the source network.</p>
 </td>
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.NetworkPeeringPhase">NetworkPeeringPhase
-(<code>string</code> alias)</h3>
+<h3 id="networking.api.onmetal.de/v1alpha1.NetworkPeeringClaimRef">NetworkPeeringClaimRef
+</h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkPeeringStatus">NetworkPeeringStatus</a>)
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkSpec">NetworkSpec</a>)
 </p>
 <div>
-<p>NetworkPeeringPhase is the phase a NetworkPeering can be in.</p>
 </div>
 <table>
 <thead>
 <tr>
-<th>Value</th>
+<th>Field</th>
 <th>Description</th>
 </tr>
 </thead>
-<tbody><tr><td><p>&#34;Bound&#34;</p></td>
-<td><p>NetworkPeeringPhaseBound signals that the network peering is bound.</p>
+<tbody>
+<tr>
+<td>
+<code>namespace</code><br/>
+<em>
+string
+</em>
 </td>
-</tr><tr><td><p>&#34;Pending&#34;</p></td>
-<td><p>NetworkPeeringPhasePending signals that the network peering is not bound.</p>
+<td>
+<p>Namespace is the namespace of the referenced entity. If empty,
+the same namespace as the referring resource is implied.</p>
 </td>
-</tr></tbody>
+</tr>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the referenced entity.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>uid</code><br/>
+<em>
+<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/types#UID">
+k8s.io/apimachinery/pkg/types.UID
+</a>
+</em>
+</td>
+<td>
+<p>UID is the UID of the referenced entity.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.api.onmetal.de/v1alpha1.NetworkPeeringNetworkRef">NetworkPeeringNetworkRef
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkPeering">NetworkPeering</a>)
+</p>
+<div>
+<p>NetworkPeeringNetworkRef is a reference to a network to peer with.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>namespace</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Namespace is the namespace of the referenced entity. If empty,
+the same namespace as the referring resource is implied.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the referenced entity.</p>
+</td>
+</tr>
+</tbody>
 </table>
 <h3 id="networking.api.onmetal.de/v1alpha1.NetworkPeeringStatus">NetworkPeeringStatus
 </h3>
@@ -1941,32 +2028,6 @@ string
 </td>
 <td>
 <p>Name is the name of the network peering.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>phase</code><br/>
-<em>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkPeeringPhase">
-NetworkPeeringPhase
-</a>
-</em>
-</td>
-<td>
-<p>Phase represents the binding phase of a network peering.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>lastPhaseTransitionTime</code><br/>
-<em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#time-v1-meta">
-Kubernetes meta/v1.Time
-</a>
-</em>
-</td>
-<td>
-<p>LastPhaseTransitionTime is the last time the Phase transitioned.</p>
 </td>
 </tr>
 </tbody>
@@ -2423,6 +2484,20 @@ string
 <p>Peerings are the network peerings with this network.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>incomingPeerings</code><br/>
+<em>
+<a href="#networking.api.onmetal.de/v1alpha1.NetworkPeeringClaimRef">
+[]NetworkPeeringClaimRef
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>PeeringClaimRefs are the peering claim references of other networks.</p>
+</td>
+</tr>
 </tbody>
 </table>
 <h3 id="networking.api.onmetal.de/v1alpha1.NetworkState">NetworkState
@@ -2562,32 +2637,6 @@ EphemeralPrefixSource
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.VirtualIPPhase">VirtualIPPhase
-(<code>string</code> alias)</h3>
-<p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.VirtualIPStatus">VirtualIPStatus</a>)
-</p>
-<div>
-<p>VirtualIPPhase is the binding phase of a VirtualIP.</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Value</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody><tr><td><p>&#34;Bound&#34;</p></td>
-<td><p>VirtualIPPhaseBound is used for any VirtualIP that is properly bound.</p>
-</td>
-</tr><tr><td><p>&#34;Pending&#34;</p></td>
-<td><p>VirtualIPPhasePending is used for any VirtualIP that is currently awaiting binding.</p>
-</td>
-</tr><tr><td><p>&#34;Unbound&#34;</p></td>
-<td><p>VirtualIPPhaseUnbound is used for any VirtualIP that is not bound.</p>
-</td>
-</tr></tbody>
-</table>
 <h3 id="networking.api.onmetal.de/v1alpha1.VirtualIPSource">VirtualIPSource
 </h3>
 <p>
@@ -2717,32 +2766,6 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 </td>
 <td>
 <p>IP is the allocated IP, if any.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>phase</code><br/>
-<em>
-<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPPhase">
-VirtualIPPhase
-</a>
-</em>
-</td>
-<td>
-<p>Phase is the VirtualIPPhase of the VirtualIP.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>phaseLastTransitionTime</code><br/>
-<em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#time-v1-meta">
-Kubernetes meta/v1.Time
-</a>
-</em>
-</td>
-<td>
-<p>LastPhaseTransitionTime is the last time the Phase transitioned from one value to another.</p>
 </td>
 </tr>
 </tbody>

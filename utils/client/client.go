@@ -22,6 +22,7 @@ import (
 	"github.com/onmetal/onmetal-api/utils/annotations"
 	errors2 "k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	controllerruntime "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -61,15 +62,15 @@ func PatchRemoveReconcileAnnotation(ctx context.Context, c client.Client, obj cl
 	return nil
 }
 
-type ObjectPointer[O any] interface {
+type Object[O any] interface {
 	client.Object
 	*O
 }
 
-func ReconcileRequestsFromObjectSlice[S ~[]O, OP ObjectPointer[O], O any](objs S) []reconcile.Request {
+func ReconcileRequestsFromObjectStructSlice[O Object[OStruct], S ~[]OStruct, OStruct any](objs S) []reconcile.Request {
 	res := make([]reconcile.Request, len(objs))
 	for i := range objs {
-		obj := OP(&objs[i])
+		obj := O(&objs[i])
 		res[i] = reconcile.Request{
 			NamespacedName: client.ObjectKeyFromObject(obj),
 		}
@@ -77,13 +78,39 @@ func ReconcileRequestsFromObjectSlice[S ~[]O, OP ObjectPointer[O], O any](objs S
 	return res
 }
 
-func ByObjectCreationTimestamp[OP ObjectPointer[O], O any](obj1, obj2 O) bool {
+func IterateObjectsInObjectStructSlice[O Object[OStruct], S ~[]OStruct, OStruct any](s S, yield func(O) bool) bool {
+	for i := range s {
+		obj := O(&s[i])
+		if !yield(obj) {
+			return false
+		}
+	}
+	return true
+}
+
+func ForEachObjectInObjectStructSlice[O Object[OStruct], S ~[]OStruct, OStruct any](s S, f func(O)) {
+	for i := range s {
+		obj := O(&s[i])
+		f(obj)
+	}
+}
+
+func ObjectStructSliceToObjectByUIDMap[O Object[OStruct], S ~[]OStruct, OStruct any](s S) map[types.UID]O {
+	m := make(map[types.UID]O)
+	for i := range s {
+		obj := O(&s[i])
+		m[obj.GetUID()] = obj
+	}
+	return m
+}
+
+func ByObjectCreationTimestamp[OP Object[O], O any](obj1, obj2 O) bool {
 	t1 := OP(&obj1).GetCreationTimestamp().Time
 	t2 := OP(&obj2).GetCreationTimestamp().Time
 	return t1.Before(t2)
 }
 
-func ObjectSliceOldestObjectIndex[S ~[]O, OP ObjectPointer[O], O any](objs []O) int {
+func ObjectSliceOldestObjectIndex[S ~[]O, OP Object[O], O any](objs []O) int {
 	idx := -1
 	for i := range objs {
 		obj := OP(&objs[i])

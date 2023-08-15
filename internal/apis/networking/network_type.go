@@ -17,8 +17,8 @@
 package networking
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 // NetworkSpec defines the desired state of Network
@@ -26,7 +26,35 @@ type NetworkSpec struct {
 	// ProviderID is the provider-internal ID of the network.
 	ProviderID string
 	// Peerings are the network peerings with this network.
+	// +optional
+	// +patchMergeKey=name
+	// +patchStrategy=merge,retainKeys
 	Peerings []NetworkPeering
+
+	// PeeringClaimRefs are the peering claim references of other networks.
+	// +optional
+	// +patchMergeKey=name
+	// +patchStrategy=merge,retainKeys
+	PeeringClaimRefs []NetworkPeeringClaimRef
+}
+
+type NetworkPeeringClaimRef struct {
+	// Namespace is the namespace of the referenced entity. If empty,
+	// the same namespace as the referring resource is implied.
+	Namespace string
+	// Name is the name of the referenced entity.
+	Name string
+	// UID is the UID of the referenced entity.
+	UID types.UID
+}
+
+// NetworkPeeringNetworkRef is a reference to a network to peer with.
+type NetworkPeeringNetworkRef struct {
+	// Namespace is the namespace of the referenced entity. If empty,
+	// the same namespace as the referring resource is implied.
+	Namespace string
+	// Name is the name of the referenced entity.
+	Name string
 }
 
 // NetworkPeering defines a network peering with another network.
@@ -34,9 +62,8 @@ type NetworkPeering struct {
 	// Name is the semantical name of the network peering.
 	Name string
 	// NetworkRef is the reference to the network to peer with.
-	// If the UID is empty, it will be populated once when the peering is successfully bound.
-	// If namespace is empty it is implied that the target network resides in the same network.
-	NetworkRef commonv1alpha1.UIDReference
+	// An empty namespace indicates that the target network resides in the same namespace as the source network.
+	NetworkRef NetworkPeeringNetworkRef
 }
 
 // NetworkStatus defines the observed state of Network
@@ -44,6 +71,9 @@ type NetworkStatus struct {
 	// State is the state of the machine.
 	State NetworkState
 	// Peerings contains the states of the network peerings for the network.
+	// +optional
+	// +patchMergeKey=name
+	// +patchStrategy=merge,retainKeys
 	Peerings []NetworkPeeringStatus
 }
 
@@ -51,24 +81,10 @@ type NetworkStatus struct {
 // +enum
 type NetworkState string
 
-// NetworkPeeringPhase is the phase a NetworkPeering can be in.
-type NetworkPeeringPhase string
-
-const (
-	// NetworkPeeringPhasePending signals that the network peering is not bound.
-	NetworkPeeringPhasePending NetworkPeeringPhase = "Pending"
-	// NetworkPeeringPhaseBound signals that the network peering is bound.
-	NetworkPeeringPhaseBound NetworkPeeringPhase = "Bound"
-)
-
 // NetworkPeeringStatus is the status of a network peering.
 type NetworkPeeringStatus struct {
 	// Name is the name of the network peering.
 	Name string
-	// Phase represents the binding phase of a network peering.
-	Phase NetworkPeeringPhase
-	// LastPhaseTransitionTime is the last time the Phase transitioned.
-	LastPhaseTransitionTime *metav1.Time
 }
 
 const (

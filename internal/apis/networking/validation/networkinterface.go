@@ -214,6 +214,7 @@ func validateNetworkInterfaceSpecUpdate(newSpec, oldSpec *networking.NetworkInte
 	newSpecCopy := newSpec.DeepCopy()
 	oldSpecCopy := oldSpec.DeepCopy()
 
+	oldSpecCopy.ProviderID = newSpec.ProviderID
 	oldSpecCopy.IPs = newSpec.IPs
 	oldSpecCopy.Prefixes = newSpec.Prefixes
 	oldSpecCopy.MachineRef = newSpec.MachineRef

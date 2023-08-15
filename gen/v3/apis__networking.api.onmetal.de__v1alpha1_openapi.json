@@ -10851,29 +10851,6 @@
 				},
 				"x-kubernetes-map-type": "atomic"
 			},
-			"com.github.onmetal.onmetal-api.api.common.v1alpha1.UIDReference": {
-				"description": "UIDReference is a reference to another entity in a potentially different namespace including its UID.",
-				"type": "object",
-				"required": [
-					"name"
-				],
-				"properties": {
-					"name": {
-						"description": "Name is the name of the referenced entity.",
-						"type": "string",
-						"default": ""
-					},
-					"namespace": {
-						"description": "Namespace is the namespace of the referenced entity. If empty, the same namespace as the referring resource is implied.",
-						"type": "string"
-					},
-					"uid": {
-						"description": "UID is the UID of the referenced entity.",
-						"type": "string"
-					}
-				},
-				"x-kubernetes-map-type": "atomic"
-			},
 			"com.github.onmetal.onmetal-api.api.core.v1alpha1.ObjectSelector": {
 				"description": "ObjectSelector specifies how to select objects of a certain kind.",
 				"type": "object",
@@ -11687,6 +11664,14 @@
 					"ips"
 				],
 				"properties": {
+					"attributes": {
+						"description": "Attributes are provider-specific attributes for the network interface.",
+						"type": "object",
+						"additionalProperties": {
+							"type": "string",
+							"default": ""
+						}
+					},
 					"ipFamilies": {
 						"description": "IPFamilies defines which IPFamilies this NetworkInterface is supporting",
 						"type": "array",
@@ -11736,6 +11721,10 @@
 							]
 						}
 					},
+					"providerID": {
+						"description": "ProviderID is the provider-internal ID of the network interface.",
+						"type": "string"
+					},
 					"virtualIP": {
 						"description": "VirtualIP specifies the virtual ip that should be assigned to this NetworkInterface.",
 						"allOf": [
@@ -11762,14 +11751,6 @@
 							]
 						}
 					},
-					"lastPhaseTransitionTime": {
-						"description": "LastPhaseTransitionTime is the last time the Phase transitioned from one value to another.",
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Time"
-							}
-						]
-					},
 					"lastStateTransitionTime": {
 						"description": "LastStateTransitionTime is the last time the State transitioned from one value to another.",
 						"allOf": [
@@ -11777,10 +11758,6 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Time"
 							}
 						]
-					},
-					"phase": {
-						"description": "Phase is the NetworkInterfacePhase of the NetworkInterface.",
-						"type": "string"
 					},
 					"prefixes": {
 						"description": "Prefixes represent the prefixes routed to the NetworkInterface.",
@@ -11793,10 +11770,6 @@
 								}
 							]
 						}
-					},
-					"providerID": {
-						"description": "ProviderID is the provider-internal ID of the network interface.",
-						"type": "string"
 					},
 					"state": {
 						"description": "State is the NetworkInterfaceState of the NetworkInterface.",
@@ -11869,13 +11842,52 @@
 						"default": ""
 					},
 					"networkRef": {
-						"description": "NetworkRef is the reference to the network to peer with. If the UID is empty, it will be populated once when the peering is successfully bound. If namespace is empty it is implied that the target network resides in the same network.",
+						"description": "NetworkRef is the reference to the network to peer with. An empty namespace indicates that the target network resides in the same namespace as the source network.",
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.UIDReference"
+								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPeeringNetworkRef"
 							}
 						]
+					}
+				}
+			},
+			"com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPeeringClaimRef": {
+				"type": "object",
+				"required": [
+					"name"
+				],
+				"properties": {
+					"name": {
+						"description": "Name is the name of the referenced entity.",
+						"type": "string",
+						"default": ""
+					},
+					"namespace": {
+						"description": "Namespace is the namespace of the referenced entity. If empty, the same namespace as the referring resource is implied.",
+						"type": "string"
+					},
+					"uid": {
+						"description": "UID is the UID of the referenced entity.",
+						"type": "string"
+					}
+				}
+			},
+			"com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPeeringNetworkRef": {
+				"description": "NetworkPeeringNetworkRef is a reference to a network to peer with.",
+				"type": "object",
+				"required": [
+					"name"
+				],
+				"properties": {
+					"name": {
+						"description": "Name is the name of the referenced entity.",
+						"type": "string",
+						"default": ""
+					},
+					"namespace": {
+						"description": "Namespace is the namespace of the referenced entity. If empty, the same namespace as the referring resource is implied.",
+						"type": "string"
 					}
 				}
 			},
@@ -11886,22 +11898,10 @@
 					"name"
 				],
 				"properties": {
-					"lastPhaseTransitionTime": {
-						"description": "LastPhaseTransitionTime is the last time the Phase transitioned.",
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Time"
-							}
-						]
-					},
 					"name": {
 						"description": "Name is the name of the network peering.",
 						"type": "string",
 						"default": ""
-					},
-					"phase": {
-						"description": "Phase represents the binding phase of a network peering.",
-						"type": "string"
 					}
 				}
 			},
@@ -12228,6 +12228,20 @@
 				"description": "NetworkSpec defines the desired state of Network",
 				"type": "object",
 				"properties": {
+					"incomingPeerings": {
+						"description": "PeeringClaimRefs are the peering claim references of other networks.",
+						"type": "array",
+						"items": {
+							"default": {},
+							"allOf": [
+								{
+									"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPeeringClaimRef"
+								}
+							]
+						},
+						"x-kubernetes-patch-merge-key": "name",
+						"x-kubernetes-patch-strategy": "merge,retainKeys"
+					},
 					"peerings": {
 						"description": "Peerings are the network peerings with this network.",
 						"type": "array",
@@ -12449,18 +12463,6 @@
 						"allOf": [
 							{
 								"$ref": "#/components/schemas/com.github.onmetal.onmetal-api.api.common.v1alpha1.IP"
-							}
-						]
-					},
-					"phase": {
-						"description": "Phase is the VirtualIPPhase of the VirtualIP.",
-						"type": "string"
-					},
-					"phaseLastTransitionTime": {
-						"description": "LastPhaseTransitionTime is the last time the Phase transitioned from one value to another.",
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Time"
 							}
 						]
 					}

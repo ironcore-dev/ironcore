@@ -178,6 +178,18 @@ func ParseIP(s string) (IP, error) {
 	return IP{addr}, nil
 }
 
+func ParseIPs(s ...string) ([]IP, error) {
+	res := make([]IP, len(s))
+	for i, s := range s {
+		ip, err := ParseIP(s)
+		if err != nil {
+			return nil, err
+		}
+		res[i] = ip
+	}
+	return res, nil
+}
+
 func ParseNewIP(s string) (*IP, error) {
 	ip, err := ParseIP(s)
 	if err != nil {
@@ -188,6 +200,14 @@ func ParseNewIP(s string) (*IP, error) {
 
 func MustParseIP(s string) IP {
 	return IP{netip.MustParseAddr(s)}
+}
+
+func MustParseIPs(s ...string) []IP {
+	ips, err := ParseIPs(s...)
+	if err != nil {
+		panic(err)
+	}
+	return ips
 }
 
 func MustParseNewIP(s string) *IP {

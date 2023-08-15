@@ -294,6 +294,26 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
+	if err := s.AddGeneratedConversionFunc((*v1alpha1.NetworkPeeringClaimRef)(nil), (*networking.NetworkPeeringClaimRef)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_NetworkPeeringClaimRef_To_networking_NetworkPeeringClaimRef(a.(*v1alpha1.NetworkPeeringClaimRef), b.(*networking.NetworkPeeringClaimRef), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*networking.NetworkPeeringClaimRef)(nil), (*v1alpha1.NetworkPeeringClaimRef)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_networking_NetworkPeeringClaimRef_To_v1alpha1_NetworkPeeringClaimRef(a.(*networking.NetworkPeeringClaimRef), b.(*v1alpha1.NetworkPeeringClaimRef), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*v1alpha1.NetworkPeeringNetworkRef)(nil), (*networking.NetworkPeeringNetworkRef)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_NetworkPeeringNetworkRef_To_networking_NetworkPeeringNetworkRef(a.(*v1alpha1.NetworkPeeringNetworkRef), b.(*networking.NetworkPeeringNetworkRef), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*networking.NetworkPeeringNetworkRef)(nil), (*v1alpha1.NetworkPeeringNetworkRef)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_networking_NetworkPeeringNetworkRef_To_v1alpha1_NetworkPeeringNetworkRef(a.(*networking.NetworkPeeringNetworkRef), b.(*v1alpha1.NetworkPeeringNetworkRef), scope)
+	}); err != nil {
+		return err
+	}
 	if err := s.AddGeneratedConversionFunc((*v1alpha1.NetworkPeeringStatus)(nil), (*networking.NetworkPeeringStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1alpha1_NetworkPeeringStatus_To_networking_NetworkPeeringStatus(a.(*v1alpha1.NetworkPeeringStatus), b.(*networking.NetworkPeeringStatus), scope)
 	}); err != nil {
@@ -978,12 +998,14 @@ func Convert_networking_NetworkInterfaceList_To_v1alpha1_NetworkInterfaceList(in
 }
 
 func autoConvert_v1alpha1_NetworkInterfaceSpec_To_networking_NetworkInterfaceSpec(in *v1alpha1.NetworkInterfaceSpec, out *networking.NetworkInterfaceSpec, s conversion.Scope) error {
+	out.ProviderID = in.ProviderID
 	out.NetworkRef = in.NetworkRef
 	out.MachineRef = (*commonv1alpha1.LocalUIDReference)(unsafe.Pointer(in.MachineRef))
 	out.IPFamilies = *(*[]v1.IPFamily)(unsafe.Pointer(&in.IPFamilies))
 	out.IPs = *(*[]networking.IPSource)(unsafe.Pointer(&in.IPs))
 	out.Prefixes = *(*[]networking.PrefixSource)(unsafe.Pointer(&in.Prefixes))
 	out.VirtualIP = (*networking.VirtualIPSource)(unsafe.Pointer(in.VirtualIP))
+	out.Attributes = *(*map[string]string)(unsafe.Pointer(&in.Attributes))
 	return nil
 }
 
@@ -993,12 +1015,14 @@ func Convert_v1alpha1_NetworkInterfaceSpec_To_networking_NetworkInterfaceSpec(in
 }
 
 func autoConvert_networking_NetworkInterfaceSpec_To_v1alpha1_NetworkInterfaceSpec(in *networking.NetworkInterfaceSpec, out *v1alpha1.NetworkInterfaceSpec, s conversion.Scope) error {
+	out.ProviderID = in.ProviderID
 	out.NetworkRef = in.NetworkRef
 	out.MachineRef = (*commonv1alpha1.LocalUIDReference)(unsafe.Pointer(in.MachineRef))
 	out.IPFamilies = *(*[]v1.IPFamily)(unsafe.Pointer(&in.IPFamilies))
 	out.IPs = *(*[]v1alpha1.IPSource)(unsafe.Pointer(&in.IPs))
 	out.Prefixes = *(*[]v1alpha1.PrefixSource)(unsafe.Pointer(&in.Prefixes))
 	out.VirtualIP = (*v1alpha1.VirtualIPSource)(unsafe.Pointer(in.VirtualIP))
+	out.Attributes = *(*map[string]string)(unsafe.Pointer(&in.Attributes))
 	return nil
 }
 
@@ -1010,12 +1034,9 @@ func Convert_networking_NetworkInterfaceSpec_To_v1alpha1_NetworkInterfaceSpec(in
 func autoConvert_v1alpha1_NetworkInterfaceStatus_To_networking_NetworkInterfaceStatus(in *v1alpha1.NetworkInterfaceStatus, out *networking.NetworkInterfaceStatus, s conversion.Scope) error {
 	out.State = networking.NetworkInterfaceState(in.State)
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
-	out.ProviderID = in.ProviderID
 	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
 	out.Prefixes = *(*[]commonv1alpha1.IPPrefix)(unsafe.Pointer(&in.Prefixes))
 	out.VirtualIP = (*commonv1alpha1.IP)(unsafe.Pointer(in.VirtualIP))
-	out.Phase = networking.NetworkInterfacePhase(in.Phase)
-	out.LastPhaseTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastPhaseTransitionTime))
 	return nil
 }
 
@@ -1027,12 +1048,9 @@ func Convert_v1alpha1_NetworkInterfaceStatus_To_networking_NetworkInterfaceStatu
 func autoConvert_networking_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStatus(in *networking.NetworkInterfaceStatus, out *v1alpha1.NetworkInterfaceStatus, s conversion.Scope) error {
 	out.State = v1alpha1.NetworkInterfaceState(in.State)
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
-	out.ProviderID = in.ProviderID
 	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
 	out.Prefixes = *(*[]commonv1alpha1.IPPrefix)(unsafe.Pointer(&in.Prefixes))
 	out.VirtualIP = (*commonv1alpha1.IP)(unsafe.Pointer(in.VirtualIP))
-	out.Phase = v1alpha1.NetworkInterfacePhase(in.Phase)
-	out.LastPhaseTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastPhaseTransitionTime))
 	return nil
 }
 
@@ -1091,7 +1109,9 @@ func Convert_networking_NetworkList_To_v1alpha1_NetworkList(in *networking.Netwo
 
 func autoConvert_v1alpha1_NetworkPeering_To_networking_NetworkPeering(in *v1alpha1.NetworkPeering, out *networking.NetworkPeering, s conversion.Scope) error {
 	out.Name = in.Name
-	out.NetworkRef = in.NetworkRef
+	if err := Convert_v1alpha1_NetworkPeeringNetworkRef_To_networking_NetworkPeeringNetworkRef(&in.NetworkRef, &out.NetworkRef, s); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -1102,7 +1122,9 @@ func Convert_v1alpha1_NetworkPeering_To_networking_NetworkPeering(in *v1alpha1.N
 
 func autoConvert_networking_NetworkPeering_To_v1alpha1_NetworkPeering(in *networking.NetworkPeering, out *v1alpha1.NetworkPeering, s conversion.Scope) error {
 	out.Name = in.Name
-	out.NetworkRef = in.NetworkRef
+	if err := Convert_networking_NetworkPeeringNetworkRef_To_v1alpha1_NetworkPeeringNetworkRef(&in.NetworkRef, &out.NetworkRef, s); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -1111,10 +1133,54 @@ func Convert_networking_NetworkPeering_To_v1alpha1_NetworkPeering(in *networking
 	return autoConvert_networking_NetworkPeering_To_v1alpha1_NetworkPeering(in, out, s)
 }
 
+func autoConvert_v1alpha1_NetworkPeeringClaimRef_To_networking_NetworkPeeringClaimRef(in *v1alpha1.NetworkPeeringClaimRef, out *networking.NetworkPeeringClaimRef, s conversion.Scope) error {
+	out.Namespace = in.Namespace
+	out.Name = in.Name
+	out.UID = types.UID(in.UID)
+	return nil
+}
+
+// Convert_v1alpha1_NetworkPeeringClaimRef_To_networking_NetworkPeeringClaimRef is an autogenerated conversion function.
+func Convert_v1alpha1_NetworkPeeringClaimRef_To_networking_NetworkPeeringClaimRef(in *v1alpha1.NetworkPeeringClaimRef, out *networking.NetworkPeeringClaimRef, s conversion.Scope) error {
+	return autoConvert_v1alpha1_NetworkPeeringClaimRef_To_networking_NetworkPeeringClaimRef(in, out, s)
+}
+
+func autoConvert_networking_NetworkPeeringClaimRef_To_v1alpha1_NetworkPeeringClaimRef(in *networking.NetworkPeeringClaimRef, out *v1alpha1.NetworkPeeringClaimRef, s conversion.Scope) error {
+	out.Namespace = in.Namespace
+	out.Name = in.Name
+	out.UID = types.UID(in.UID)
+	return nil
+}
+
+// Convert_networking_NetworkPeeringClaimRef_To_v1alpha1_NetworkPeeringClaimRef is an autogenerated conversion function.
+func Convert_networking_NetworkPeeringClaimRef_To_v1alpha1_NetworkPeeringClaimRef(in *networking.NetworkPeeringClaimRef, out *v1alpha1.NetworkPeeringClaimRef, s conversion.Scope) error {
+	return autoConvert_networking_NetworkPeeringClaimRef_To_v1alpha1_NetworkPeeringClaimRef(in, out, s)
+}
+
+func autoConvert_v1alpha1_NetworkPeeringNetworkRef_To_networking_NetworkPeeringNetworkRef(in *v1alpha1.NetworkPeeringNetworkRef, out *networking.NetworkPeeringNetworkRef, s conversion.Scope) error {
+	out.Namespace = in.Namespace
+	out.Name = in.Name
+	return nil
+}
+
+// Convert_v1alpha1_NetworkPeeringNetworkRef_To_networking_NetworkPeeringNetworkRef is an autogenerated conversion function.
+func Convert_v1alpha1_NetworkPeeringNetworkRef_To_networking_NetworkPeeringNetworkRef(in *v1alpha1.NetworkPeeringNetworkRef, out *networking.NetworkPeeringNetworkRef, s conversion.Scope) error {
+	return autoConvert_v1alpha1_NetworkPeeringNetworkRef_To_networking_NetworkPeeringNetworkRef(in, out, s)
+}
+
+func autoConvert_networking_NetworkPeeringNetworkRef_To_v1alpha1_NetworkPeeringNetworkRef(in *networking.NetworkPeeringNetworkRef, out *v1alpha1.NetworkPeeringNetworkRef, s conversion.Scope) error {
+	out.Namespace = in.Namespace
+	out.Name = in.Name
+	return nil
+}
+
+// Convert_networking_NetworkPeeringNetworkRef_To_v1alpha1_NetworkPeeringNetworkRef is an autogenerated conversion function.
+func Convert_networking_NetworkPeeringNetworkRef_To_v1alpha1_NetworkPeeringNetworkRef(in *networking.NetworkPeeringNetworkRef, out *v1alpha1.NetworkPeeringNetworkRef, s conversion.Scope) error {
+	return autoConvert_networking_NetworkPeeringNetworkRef_To_v1alpha1_NetworkPeeringNetworkRef(in, out, s)
+}
+
 func autoConvert_v1alpha1_NetworkPeeringStatus_To_networking_NetworkPeeringStatus(in *v1alpha1.NetworkPeeringStatus, out *networking.NetworkPeeringStatus, s conversion.Scope) error {
 	out.Name = in.Name
-	out.Phase = networking.NetworkPeeringPhase(in.Phase)
-	out.LastPhaseTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastPhaseTransitionTime))
 	return nil
 }
 
@@ -1125,8 +1191,6 @@ func Convert_v1alpha1_NetworkPeeringStatus_To_networking_NetworkPeeringStatus(in
 
 func autoConvert_networking_NetworkPeeringStatus_To_v1alpha1_NetworkPeeringStatus(in *networking.NetworkPeeringStatus, out *v1alpha1.NetworkPeeringStatus, s conversion.Scope) error {
 	out.Name = in.Name
-	out.Phase = v1alpha1.NetworkPeeringPhase(in.Phase)
-	out.LastPhaseTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastPhaseTransitionTime))
 	return nil
 }
 
@@ -1360,6 +1424,7 @@ func Convert_networking_NetworkPolicyStatus_To_v1alpha1_NetworkPolicyStatus(in *
 func autoConvert_v1alpha1_NetworkSpec_To_networking_NetworkSpec(in *v1alpha1.NetworkSpec, out *networking.NetworkSpec, s conversion.Scope) error {
 	out.ProviderID = in.ProviderID
 	out.Peerings = *(*[]networking.NetworkPeering)(unsafe.Pointer(&in.Peerings))
+	out.PeeringClaimRefs = *(*[]networking.NetworkPeeringClaimRef)(unsafe.Pointer(&in.PeeringClaimRefs))
 	return nil
 }
 
@@ -1371,6 +1436,7 @@ func Convert_v1alpha1_NetworkSpec_To_networking_NetworkSpec(in *v1alpha1.Network
 func autoConvert_networking_NetworkSpec_To_v1alpha1_NetworkSpec(in *networking.NetworkSpec, out *v1alpha1.NetworkSpec, s conversion.Scope) error {
 	out.ProviderID = in.ProviderID
 	out.Peerings = *(*[]v1alpha1.NetworkPeering)(unsafe.Pointer(&in.Peerings))
+	out.PeeringClaimRefs = *(*[]v1alpha1.NetworkPeeringClaimRef)(unsafe.Pointer(&in.PeeringClaimRefs))
 	return nil
 }
 
@@ -1525,8 +1591,6 @@ func Convert_networking_VirtualIPSpec_To_v1alpha1_VirtualIPSpec(in *networking.V
 
 func autoConvert_v1alpha1_VirtualIPStatus_To_networking_VirtualIPStatus(in *v1alpha1.VirtualIPStatus, out *networking.VirtualIPStatus, s conversion.Scope) error {
 	out.IP = (*commonv1alpha1.IP)(unsafe.Pointer(in.IP))
-	out.Phase = networking.VirtualIPPhase(in.Phase)
-	out.LastPhaseTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastPhaseTransitionTime))
 	return nil
 }
 
@@ -1537,8 +1601,6 @@ func Convert_v1alpha1_VirtualIPStatus_To_networking_VirtualIPStatus(in *v1alpha1
 
 func autoConvert_networking_VirtualIPStatus_To_v1alpha1_VirtualIPStatus(in *networking.VirtualIPStatus, out *v1alpha1.VirtualIPStatus, s conversion.Scope) error {
 	out.IP = (*commonv1alpha1.IP)(unsafe.Pointer(in.IP))
-	out.Phase = v1alpha1.VirtualIPPhase(in.Phase)
-	out.LastPhaseTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastPhaseTransitionTime))
 	return nil
 }
 

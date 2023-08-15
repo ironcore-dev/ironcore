@@ -26,5 +26,5 @@ type RuntimeService interface {
 	ExpandVolume(ctx context.Context, request *api.ExpandVolumeRequest) (*api.ExpandVolumeResponse, error)
 	DeleteVolume(context.Context, *api.DeleteVolumeRequest) (*api.DeleteVolumeResponse, error)
 
-	ListVolumeClasses(context.Context, *api.ListVolumeClassesRequest) (*api.ListVolumeClassesResponse, error)
+	Status(context.Context, *api.StatusRequest) (*api.StatusResponse, error)
 }

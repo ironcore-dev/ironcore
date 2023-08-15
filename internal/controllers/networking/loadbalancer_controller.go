@@ -16,16 +16,13 @@ package networking
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
-	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	"github.com/onmetal/onmetal-api/internal/client/networking"
 	clientutils "github.com/onmetal/onmetal-api/utils/client"
-	"golang.org/x/exp/slices"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -50,6 +47,7 @@ type LoadBalancerReconciler struct {
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=loadbalancers/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=loadbalancers/finalizers,verbs=update
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces,verbs=get;list;watch
+//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networks,verbs=get;list;watch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=loadbalancerroutings,verbs=get;list;watch;create;update;patch;delete
 
 func (r *LoadBalancerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -79,105 +77,38 @@ func (r *LoadBalancerReconciler) delete(ctx context.Context, log logr.Logger, lo
 func (r *LoadBalancerReconciler) reconcile(ctx context.Context, log logr.Logger, loadBalancer *networkingv1alpha1.LoadBalancer) (ctrl.Result, error) {
 	log.V(1).Info("Reconcile")
 
-	if loadBalancer.Spec.Type == networkingv1alpha1.LoadBalancerTypeInternal {
-		ips, err := r.applyInternalIPs(ctx, log, loadBalancer)
-		if err != nil {
-			return ctrl.Result{}, fmt.Errorf("error getting / applying internal ip: %w", err)
-		}
-
-		if !slices.Equal(ips, loadBalancer.Status.IPs) {
-			log.V(1).Info("Updating load balancer IPs")
-			if err := r.updateLoadBalancerIPs(ctx, loadBalancer, ips); err != nil {
-				return ctrl.Result{}, err
-			}
-			return ctrl.Result{Requeue: true}, nil
-		}
+	nicSelector := loadBalancer.Spec.NetworkInterfaceSelector
+	if nicSelector == nil {
+		log.V(1).Info("No network interface selector present, assuming external process is managing routing")
+		return ctrl.Result{}, nil
 	}
 
-	nicSelector := loadBalancer.Spec.NetworkInterfaceSelector
-	if nicSelector != nil {
-		log.V(1).Info("Managing load balancer routing")
+	log.V(1).Info("Managing load balancer routing")
 
-		networkName := loadBalancer.Spec.NetworkRef.Name
-		log.V(1).Info("Getting network", "Network", networkName)
-		network, err := r.getNetwork(ctx, loadBalancer)
-		if err != nil {
-			return ctrl.Result{}, err
-		}
-		if network == nil {
-			log.V(1).Info("Network not ready", "Network", networkName)
-			return ctrl.Result{}, nil
-		}
+	networkName := loadBalancer.Spec.NetworkRef.Name
+	log.V(1).Info("Getting network", "Network", networkName)
+	network, err := r.getNetwork(ctx, loadBalancer)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+	if network == nil {
+		log.V(1).Info("Network not ready", "Network", networkName)
+		return ctrl.Result{}, nil
+	}
 
-		log.V(1).Info("Finding destinations")
-		destinations, err := r.findDestinations(ctx, loadBalancer)
-		if err != nil {
-			return ctrl.Result{}, fmt.Errorf("error finding destinations: %w", err)
-		}
+	log.V(1).Info("Finding destinations")
+	destinations, err := r.findDestinations(ctx, loadBalancer)
+	if err != nil {
+		return ctrl.Result{}, fmt.Errorf("error finding destinations: %w", err)
+	}
 
-		log.V(1).Info("Applying routing", "Destinations", destinations, "Network", klog.KObj(network))
-		if err := r.applyRouting(ctx, loadBalancer, destinations, network); err != nil {
-			return ctrl.Result{}, fmt.Errorf("error applying routing: %w", err)
-		}
-	} else {
-		log.V(1).Info("No network interface selector present, assuming external process is managing routing")
+	log.V(1).Info("Applying routing", "Destinations", destinations, "Network", klog.KObj(network))
+	if err := r.applyRouting(ctx, loadBalancer, destinations, network); err != nil {
+		return ctrl.Result{}, fmt.Errorf("error applying routing: %w", err)
 	}
 
 	log.V(1).Info("Reconciled")
 	return ctrl.Result{}, nil
-}
-
-func (r *LoadBalancerReconciler) applyInternalIPs(ctx context.Context, log logr.Logger, loadBalancer *networkingv1alpha1.LoadBalancer) ([]commonv1alpha1.IP, error) {
-	var ips []commonv1alpha1.IP
-	for idx, ipSource := range loadBalancer.Spec.IPs {
-		loadBalancerInternalIP, err := r.applyInternalIP(ctx, log, loadBalancer, ipSource, idx)
-		if err != nil {
-			return nil, fmt.Errorf("[ip %d] %w", idx, err)
-		}
-		ips = append(ips, loadBalancerInternalIP)
-	}
-	return ips, nil
-}
-
-func (r *LoadBalancerReconciler) applyInternalIP(ctx context.Context, log logr.Logger, loadBalancer *networkingv1alpha1.LoadBalancer, ipSource networkingv1alpha1.IPSource, idx int) (commonv1alpha1.IP, error) {
-	switch {
-	case ipSource.Value != nil:
-		return *ipSource.Value, nil
-	case ipSource.Ephemeral != nil:
-		template := ipSource.Ephemeral.PrefixTemplate
-		prefix := &ipamv1alpha1.Prefix{
-			ObjectMeta: metav1.ObjectMeta{
-				Namespace: loadBalancer.Namespace,
-				Name:      networkingv1alpha1.LoadBalancerIPIPAMPrefixName(loadBalancer.Name, idx),
-			},
-		}
-		log.V(1).Info("Applying prefix for load balancer", "ipFamily", template.Spec.IPFamily)
-		if err := clientutils.ControlledCreateOrGet(ctx, r.Client, loadBalancer, prefix, func() error {
-			prefix.Labels = template.Labels
-			prefix.Annotations = template.Annotations
-			prefix.Spec = template.Spec
-			return nil
-		}); err != nil {
-			if !errors.Is(err, clientutils.ErrNotControlled) {
-				return commonv1alpha1.IP{}, fmt.Errorf("error managing ephemeral prefix %s: %w", prefix.Name, err)
-			}
-			return commonv1alpha1.IP{}, fmt.Errorf("prefix %s cannot be managed", prefix.Name)
-		}
-
-		if prefix.Status.Phase != ipamv1alpha1.PrefixPhaseAllocated {
-			return commonv1alpha1.IP{}, fmt.Errorf("prefix %s is not in state %s but %s", prefix.Name, ipamv1alpha1.PrefixPhaseAllocated, prefix.Status.Phase)
-		}
-
-		return prefix.Spec.Prefix.IP(), nil
-	default:
-		return commonv1alpha1.IP{}, fmt.Errorf("unknown ip source %#v", ipSource)
-	}
-}
-
-func (r *LoadBalancerReconciler) updateLoadBalancerIPs(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancer, ips []commonv1alpha1.IP) error {
-	base := loadBalancer.DeepCopy()
-	loadBalancer.Status.IPs = ips
-	return r.Status().Patch(ctx, loadBalancer, client.MergeFrom(base))
 }
 
 func (r *LoadBalancerReconciler) findDestinations(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancer) ([]networkingv1alpha1.LoadBalancerDestination, error) {
@@ -208,7 +139,7 @@ func (r *LoadBalancerReconciler) findDestinations(ctx context.Context, loadBalan
 				TargetRef: &networkingv1alpha1.LoadBalancerTargetRef{
 					UID:        nic.UID,
 					Name:       nic.Name,
-					ProviderID: nic.Status.ProviderID,
+					ProviderID: nic.Spec.ProviderID,
 				},
 			})
 		}
@@ -307,7 +238,7 @@ func (r *LoadBalancerReconciler) enqueueByNetwork() handler.EventHandler {
 			return nil
 		}
 
-		return clientutils.ReconcileRequestsFromObjectSlice(loadBalancerList.Items)
+		return clientutils.ReconcileRequestsFromObjectStructSlice[*networkingv1alpha1.LoadBalancer](loadBalancerList.Items)
 	})
 }
 

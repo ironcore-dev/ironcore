@@ -21,98 +21,100 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/gogo/protobuf/proto"
+	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	"github.com/onmetal/onmetal-api/poollet/machinepoollet/controllers/events"
+	"github.com/onmetal/onmetal-api/utils/claimmanager"
 	utilslices "github.com/onmetal/onmetal-api/utils/slices"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-// isVolumeBoundToMachine checks if the referenced volume is bound to the machine.
-//
-// It is assumed that the caller verified that the machine points to the volume.
-func (r *MachineReconciler) isVolumeBoundToMachine(machine *computev1alpha1.Machine, name string, volume *storagev1alpha1.Volume) bool {
-	if volumePhase := volume.Status.Phase; volumePhase != storagev1alpha1.VolumePhaseBound {
-		r.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady,
-			"Volume %s is in phase %s",
-			volume.Name,
-			volumePhase,
-		)
-		return false
-	}
+type MachineVolumeSelector map[string]computev1alpha1.Volume
 
-	claimRef := volume.Spec.ClaimRef
-	if claimRef == nil {
-		r.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady,
-			"Volume %s does not reference any claimer",
-			volume.Name,
-		)
-		return false
-	}
-
-	if claimRef.Name != machine.Name || claimRef.UID != machine.UID {
-		r.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady,
-			"Volume %s references a different claimer %s (uid %s)",
-			volume.Name,
-			claimRef.Name,
-			claimRef.UID,
-		)
-		return false
-	}
-
-	for _, volumeStatus := range machine.Status.Volumes {
-		if volumeStatus.Name == name {
-			if volumeStatus.Phase == computev1alpha1.VolumePhaseBound {
-				return true
-			}
-
-			r.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady,
-				"Machine volume status is in phase %s",
-				volumeStatus.Phase,
-			)
-			return false
-		}
-	}
-
-	r.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady,
-		"Machine does not yet report volume status",
-	)
-	return false
+func (s MachineVolumeSelector) Match(volume *storagev1alpha1.Volume) bool {
+	_, ok := s[volume.Name]
+	return ok
 }
 
-func (r *MachineReconciler) prepareORIVolumeConnection(
+func (r *MachineReconciler) volumeNameToMachineVolume(machine *computev1alpha1.Machine) map[string]computev1alpha1.Volume {
+	sel := make(map[string]computev1alpha1.Volume)
+	for _, machineVolume := range machine.Spec.Volumes {
+		volumeName := computev1alpha1.MachineVolumeName(machine.Name, machineVolume)
+		if volumeName == "" {
+			// volume name is empty on empty disk volumes.
+			continue
+		}
+		sel[volumeName] = machineVolume
+	}
+	return sel
+}
+
+func (r *MachineReconciler) machineVolumeSelector(machine *computev1alpha1.Machine) claimmanager.Selector[*storagev1alpha1.Volume] {
+	names := sets.New(computev1alpha1.MachineVolumeNames(machine)...)
+	return claimmanager.SelectorFunc[*storagev1alpha1.Volume](func(volume *storagev1alpha1.Volume) bool {
+		return names.Has(volume.Name)
+	})
+}
+
+func (r *MachineReconciler) volumeClaimStrategy() claimmanager.ClaimStrategy[*storagev1alpha1.Volume] {
+	return claimmanager.LocalUIDReferenceClaimStrategy(r.Client,
+		claimmanager.AccessViaLocalUIDReferenceField(func(volume *storagev1alpha1.Volume) **commonv1alpha1.LocalUIDReference {
+			return &volume.Spec.ClaimRef
+		}),
+	)
+}
+
+func (r *MachineReconciler) getVolumesForMachine(ctx context.Context, machine *computev1alpha1.Machine) ([]storagev1alpha1.Volume, error) {
+	volumeList := &storagev1alpha1.VolumeList{}
+	if err := r.List(ctx, volumeList,
+		client.InNamespace(machine.Namespace),
+	); err != nil {
+		return nil, fmt.Errorf("error listing volumes: %w", err)
+	}
+
+	var (
+		sel      = r.machineVolumeSelector(machine)
+		claimMgr = claimmanager.New[*storagev1alpha1.Volume](machine, sel, r.volumeClaimStrategy())
+		volumes  []storagev1alpha1.Volume
+		errs     []error
+	)
+	for _, volume := range volumeList.Items {
+		ok, err := claimMgr.Claim(ctx, &volume)
+		if err != nil {
+			errs = append(errs, err)
+			continue
+		}
+		if !ok {
+			continue
+		}
+
+		if volume.Status.State != storagev1alpha1.VolumeStateAvailable || volume.Status.Access == nil {
+			r.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady, "Volume %s does not access information", volume.Name)
+			continue
+		}
+
+		volumes = append(volumes, volume)
+	}
+	return volumes, errors.Join(errs...)
+}
+
+func (r *MachineReconciler) prepareRemoteORIVolume(
 	ctx context.Context,
 	machine *computev1alpha1.Machine,
 	machineVolume *computev1alpha1.Volume,
-) (*ori.VolumeConnection, bool, error) {
-	volume := &storagev1alpha1.Volume{}
-	volumeKey := client.ObjectKey{Namespace: machine.Namespace, Name: computev1alpha1.MachineVolumeName(machine.Name, *machineVolume)}
-	if err := r.Get(ctx, volumeKey, volume); err != nil {
-		if !apierrors.IsNotFound(err) {
-			return nil, false, fmt.Errorf("error getting volume: %w", err)
-		}
-		r.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady, "Volume %s not found", volumeKey.Name)
-		return nil, false, nil
-	}
-
-	if state := volume.Status.State; state != storagev1alpha1.VolumeStateAvailable {
-		r.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady, "Volume %s is in state %s", volumeKey.Name, state)
-		return nil, false, nil
-	}
-
+	volume *storagev1alpha1.Volume,
+) (*ori.Volume, bool, error) {
 	access := volume.Status.Access
 	if access == nil {
-		r.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady, "Volume %s does not report status access", volumeKey.Name)
-		return nil, false, nil
-	}
-
-	if !r.isVolumeBoundToMachine(machine, machineVolume.Name, volume) {
+		r.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady, "Volume %s does not report status access", volume.Name)
 		return nil, false, nil
 	}
 
@@ -127,7 +129,7 @@ func (r *MachineReconciler) prepareORIVolumeConnection(
 
 			r.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady,
 				"Volume %s access secret %s not found",
-				volumeKey.Name,
+				volume.Name,
 				secretKey.Name,
 			)
 			return nil, false, nil
@@ -136,77 +138,73 @@ func (r *MachineReconciler) prepareORIVolumeConnection(
 		secretData = secret.Data
 	}
 
-	return &ori.VolumeConnection{
-		Driver:     access.Driver,
-		Handle:     access.Handle,
-		Attributes: access.VolumeAttributes,
-		SecretData: secretData,
+	return &ori.Volume{
+		Name:   machineVolume.Name,
+		Device: *machineVolume.Device,
+		Connection: &ori.VolumeConnection{
+			Driver:     access.Driver,
+			Handle:     access.Handle,
+			Attributes: access.VolumeAttributes,
+			SecretData: secretData,
+		},
 	}, true, nil
 }
 
-func (r *MachineReconciler) prepareORIVolume(
-	ctx context.Context,
-	log logr.Logger,
-	machine *computev1alpha1.Machine,
-	machineVolume *computev1alpha1.Volume,
-) (*ori.Volume, bool, error) {
-	name := machineVolume.Name
-	switch {
-	case machineVolume.EmptyDisk != nil:
-		var sizeBytes uint64
-		if sizeLimit := machineVolume.EmptyDisk.SizeLimit; sizeLimit != nil {
-			sizeBytes = sizeLimit.AsDec().UnscaledBig().Uint64()
-		}
-		return &ori.Volume{
-			Name:   name,
-			Device: *machineVolume.Device,
-			EmptyDisk: &ori.EmptyDisk{
-				SizeBytes: sizeBytes,
-			},
-		}, true, nil
-	case machineVolume.VolumeRef != nil || machineVolume.Ephemeral != nil:
-		oriVolumeConnection, ok, err := r.prepareORIVolumeConnection(ctx, machine, machineVolume)
-		if err != nil || !ok {
-			return nil, ok, err
-		}
-
-		return &ori.Volume{
-			Name:       name,
-			Device:     *machineVolume.Device,
-			Connection: oriVolumeConnection,
-		}, true, nil
-	default:
-		return nil, false, fmt.Errorf("unrecognized volume %#v", machineVolume)
+func (r *MachineReconciler) prepareEmptyDiskORIVolume(machineVolume *computev1alpha1.Volume) *ori.Volume {
+	var sizeBytes uint64
+	if sizeLimit := machineVolume.EmptyDisk.SizeLimit; sizeLimit != nil {
+		sizeBytes = sizeLimit.AsDec().UnscaledBig().Uint64()
+	}
+	return &ori.Volume{
+		Name:   machineVolume.Name,
+		Device: *machineVolume.Device,
+		EmptyDisk: &ori.EmptyDisk{
+			SizeBytes: sizeBytes,
+		},
 	}
 }
 
 func (r *MachineReconciler) prepareORIVolumes(
 	ctx context.Context,
-	log logr.Logger,
 	machine *computev1alpha1.Machine,
+	volumes []storagev1alpha1.Volume,
 ) ([]*ori.Volume, bool, error) {
 	var (
-		oriVolumes []*ori.Volume
-		errs       []error
+		volumeNameToMachineVolume = r.volumeNameToMachineVolume(machine)
+		oriVolumes                []*ori.Volume
+		errs                      []error
 	)
+	for _, volume := range volumes {
+		machineVolume := volumeNameToMachineVolume[volume.Name]
+		oriVolume, ok, err := r.prepareRemoteORIVolume(ctx, machine, &machineVolume, &volume)
+		if err != nil {
+			errs = append(errs, err)
+			continue
+		}
+		if !ok {
+			continue
+		}
+
+		oriVolumes = append(oriVolumes, oriVolume)
+	}
+	if err := errors.Join(errs...); err != nil {
+		return nil, false, err
+	}
 
 	for _, machineVolume := range machine.Spec.Volumes {
-		log := log.WithValues("MachineVolume", machineVolume.Name)
-		oriVolume, ok, err := r.prepareORIVolume(ctx, log, machine, &machineVolume)
-		if err != nil {
-			errs = append(errs, fmt.Errorf("[volume %s] %w", machineVolume.Name, err))
+		if machineVolume.EmptyDisk == nil {
 			continue
 		}
-		if ok {
-			oriVolumes = append(oriVolumes, oriVolume)
-			continue
-		}
+
+		oriVolume := r.prepareEmptyDiskORIVolume(&machineVolume)
+		oriVolumes = append(oriVolumes, oriVolume)
 	}
 
-	if len(errs) > 0 {
-		return nil, false, fmt.Errorf("error(s) preparing ori volume volumes: %w", errors.Join(errs...))
-	}
 	if len(oriVolumes) != len(machine.Spec.Volumes) {
+		expectedVolumeNames := utilslices.ToSetFunc(machine.Spec.Volumes, func(v computev1alpha1.Volume) string { return v.Name })
+		actualVolumeNames := utilslices.ToSetFunc(oriVolumes, (*ori.Volume).GetName)
+		missingVolumeNames := sets.List(expectedVolumeNames.Difference(actualVolumeNames))
+		r.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady, "Machine volumes are not ready: %v", missingVolumeNames)
 		return nil, false, nil
 	}
 	return oriVolumes, true, nil
@@ -287,8 +285,9 @@ func (r *MachineReconciler) updateORIVolumes(
 	log logr.Logger,
 	machine *computev1alpha1.Machine,
 	oriMachine *ori.Machine,
+	volumes []storagev1alpha1.Volume,
 ) error {
-	desiredORIVolumes, _, err := r.prepareORIVolumes(ctx, log, machine)
+	desiredORIVolumes, _, err := r.prepareORIVolumes(ctx, machine, volumes)
 	if err != nil {
 		return fmt.Errorf("error preparing ori volumes: %w", err)
 	}

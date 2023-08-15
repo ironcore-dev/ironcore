@@ -254,7 +254,7 @@ func (r *VolumeReconciler) prepareORIVolumeClass(ctx context.Context, volume *st
 		return "", false, fmt.Errorf("error getting ori volume class capabilities: %w", err)
 	}
 
-	class, err := r.VolumeClassMapper.GetVolumeClassFor(ctx, volumeClassName, caps)
+	class, _, err := r.VolumeClassMapper.GetVolumeClassFor(ctx, volumeClassName, caps)
 	if err != nil {
 		return "", false, fmt.Errorf("error getting matching volume class: %w", err)
 	}

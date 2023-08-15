@@ -24,6 +24,8 @@ import (
 
 // NetworkInterfaceSpec defines the desired state of NetworkInterface
 type NetworkInterfaceSpec struct {
+	// ProviderID is the provider-internal ID of the network interface.
+	ProviderID string
 	// NetworkRef is the Network this NetworkInterface is connected to
 	NetworkRef corev1.LocalObjectReference
 	// MachineRef is the Machine this NetworkInterface is used by
@@ -38,6 +40,8 @@ type NetworkInterfaceSpec struct {
 	Prefixes []PrefixSource
 	// VirtualIP specifies the virtual ip that should be assigned to this NetworkInterface.
 	VirtualIP *VirtualIPSource
+	// Attributes are provider-specific attributes for the network interface.
+	Attributes map[string]string
 }
 
 // IPSource is the definition of how to obtain an IP.
@@ -71,19 +75,12 @@ type NetworkInterfaceStatus struct {
 	// LastStateTransitionTime is the last time the State transitioned from one value to another.
 	LastStateTransitionTime *metav1.Time
 
-	// ProviderID is the provider-internal ID of the network interface.
-	ProviderID string
 	// IPs represent the effective IP addresses of the NetworkInterface
 	IPs []commonv1alpha1.IP
 	// Prefixes represent the prefixes routed to the NetworkInterface.
 	Prefixes []commonv1alpha1.IPPrefix
 	// VirtualIP is any virtual ip assigned to the NetworkInterface.
 	VirtualIP *commonv1alpha1.IP
-
-	// Phase is the NetworkInterfacePhase of the NetworkInterface.
-	Phase NetworkInterfacePhase
-	// LastPhaseTransitionTime is the last time the Phase transitioned from one value to another.
-	LastPhaseTransitionTime *metav1.Time
 }
 
 // NetworkInterfaceState is the onmetal-api state of a NetworkInterface.
@@ -96,18 +93,6 @@ const (
 	NetworkInterfaceStateAvailable NetworkInterfaceState = "Available"
 	// NetworkInterfaceStateError is used for any NetworkInterface where any property has an error.
 	NetworkInterfaceStateError NetworkInterfaceState = "Error"
-)
-
-// NetworkInterfacePhase is the binding phase of a NetworkInterface.
-type NetworkInterfacePhase string
-
-const (
-	// NetworkInterfacePhaseUnbound is used for any NetworkInterface that is not bound.
-	NetworkInterfacePhaseUnbound NetworkInterfacePhase = "Unbound"
-	// NetworkInterfacePhasePending is used for any NetworkInterface that is currently awaiting binding.
-	NetworkInterfacePhasePending NetworkInterfacePhase = "Pending"
-	// NetworkInterfacePhaseBound is used for any NetworkInterface that is properly bound.
-	NetworkInterfacePhaseBound NetworkInterfacePhase = "Bound"
 )
 
 // +genclient

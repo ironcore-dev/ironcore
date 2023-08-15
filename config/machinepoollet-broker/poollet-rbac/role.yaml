@@ -102,25 +102,9 @@ rules:
   - patch
   - update
 - apiGroups:
-  - networking.api.onmetal.de
+  - ipam.api.onmetal.de
   resources:
-  - loadbalancerroutings
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - networking.api.onmetal.de
-  resources:
-  - loadbalancers
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - networking.api.onmetal.de
-  resources:
-  - natgateways
+  - prefixes
   verbs:
   - get
   - list
@@ -132,19 +116,13 @@ rules:
   verbs:
   - get
   - list
+  - patch
+  - update
   - watch
 - apiGroups:
   - networking.api.onmetal.de
   resources:
   - networks
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - networking.api.onmetal.de
-  resources:
-  - virtualips
   verbs:
   - get
   - list
@@ -156,4 +134,6 @@ rules:
   verbs:
   - get
   - list
+  - patch
+  - update
   - watch

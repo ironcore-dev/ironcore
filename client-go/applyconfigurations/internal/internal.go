@@ -93,20 +93,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: value
       type:
         scalar: string
-- name: com.github.onmetal.onmetal-api.api.common.v1alpha1.UIDReference
-  map:
-    fields:
-    - name: name
-      type:
-        scalar: string
-      default: ""
-    - name: namespace
-      type:
-        scalar: string
-    - name: uid
-      type:
-        scalar: string
-    elementRelationship: atomic
 - name: com.github.onmetal.onmetal-api.api.compute.v1alpha1.DaemonEndpoint
   map:
     fields:
@@ -408,9 +394,6 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IP
           elementRelationship: atomic
-    - name: lastPhaseTransitionTime
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
     - name: lastStateTransitionTime
       type:
         namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
@@ -418,9 +401,6 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
-    - name: phase
-      type:
-        scalar: string
     - name: state
       type:
         scalar: string
@@ -452,9 +432,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: handle
       type:
         scalar: string
-    - name: lastPhaseTransitionTime
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
     - name: lastStateTransitionTime
       type:
         namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
@@ -462,9 +439,6 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
-    - name: phase
-      type:
-        scalar: string
     - name: state
       type:
         scalar: string
@@ -923,6 +897,11 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkInterfaceSpec
   map:
     fields:
+    - name: attributes
+      type:
+        map:
+          elementType:
+            scalar: string
     - name: ipFamilies
       type:
         list:
@@ -948,6 +927,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: com.github.onmetal.onmetal-api.api.networking.v1alpha1.PrefixSource
           elementRelationship: atomic
+    - name: providerID
+      type:
+        scalar: string
     - name: virtualIP
       type:
         namedType: com.github.onmetal.onmetal-api.api.networking.v1alpha1.VirtualIPSource
@@ -960,24 +942,15 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IP
           elementRelationship: atomic
-    - name: lastPhaseTransitionTime
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
     - name: lastStateTransitionTime
       type:
         namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
-    - name: phase
-      type:
-        scalar: string
     - name: prefixes
       type:
         list:
           elementType:
             namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IPPrefix
           elementRelationship: atomic
-    - name: providerID
-      type:
-        scalar: string
     - name: state
       type:
         scalar: string
@@ -1004,21 +977,38 @@ var schemaYAML = typed.YAMLObject(`types:
       default: ""
     - name: networkRef
       type:
-        namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.UIDReference
+        namedType: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPeeringNetworkRef
       default: {}
-- name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPeeringStatus
+- name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPeeringClaimRef
   map:
     fields:
-    - name: lastPhaseTransitionTime
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
     - name: name
       type:
         scalar: string
       default: ""
-    - name: phase
+    - name: namespace
       type:
         scalar: string
+    - name: uid
+      type:
+        scalar: string
+- name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPeeringNetworkRef
+  map:
+    fields:
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: namespace
+      type:
+        scalar: string
+- name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPeeringStatus
+  map:
+    fields:
+    - name: name
+      type:
+        scalar: string
+      default: ""
 - name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPolicy
   map:
     fields:
@@ -1158,6 +1148,14 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkSpec
   map:
     fields:
+    - name: incomingPeerings
+      type:
+        list:
+          elementType:
+            namedType: com.github.onmetal.onmetal-api.api.networking.v1alpha1.NetworkPeeringClaimRef
+          elementRelationship: associative
+          keys:
+          - name
     - name: peerings
       type:
         list:
@@ -1242,12 +1240,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: ip
       type:
         namedType: com.github.onmetal.onmetal-api.api.common.v1alpha1.IP
-    - name: phase
-      type:
-        scalar: string
-    - name: phaseLastTransitionTime
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
 - name: com.github.onmetal.onmetal-api.api.networking.v1alpha1.VirtualIPTemplateSpec
   map:
     fields:
@@ -1571,7 +1563,7 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: com.github.onmetal.onmetal-api.api.storage.v1alpha1.VolumePoolStatus
   map:
     fields:
-    - name: available
+    - name: allocatable
       type:
         map:
           elementType:
@@ -1582,6 +1574,11 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.api.core.v1.LocalObjectReference
           elementRelationship: atomic
+    - name: capacity
+      type:
+        map:
+          elementType:
+            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
     - name: conditions
       type:
         list:
@@ -1591,11 +1588,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: state
       type:
         scalar: string
-    - name: used
-      type:
-        map:
-          elementType:
-            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
 - name: com.github.onmetal.onmetal-api.api.storage.v1alpha1.VolumeSpec
   map:
     fields:
@@ -1648,15 +1640,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: com.github.onmetal.onmetal-api.api.storage.v1alpha1.VolumeCondition
           elementRelationship: atomic
-    - name: lastPhaseTransitionTime
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
     - name: lastStateTransitionTime
       type:
         namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
-    - name: phase
-      type:
-        scalar: string
     - name: state
       type:
         scalar: string

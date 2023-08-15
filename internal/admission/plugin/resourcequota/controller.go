@@ -193,7 +193,7 @@ func (e *EvaluatorController) checkResourceQuotas(ctx context.Context, quotas []
 		return
 	}
 
-	quotasToCheck := utilslices.Filter(quotas, func(quota corev1alpha1.ResourceQuota) bool {
+	quotasToCheck := utilslices.FilterFunc(quotas, func(quota corev1alpha1.ResourceQuota) bool {
 		return updateFailedQuotaNames.Has(quota.Name)
 	})
 	e.checkResourceQuotas(ctx, quotasToCheck, waiters, retries-1)

@@ -23,21 +23,16 @@ import (
 
 	"github.com/onmetal/controller-utils/buildutils"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	computeclient "github.com/onmetal/onmetal-api/internal/client/compute"
 	ipamclient "github.com/onmetal/onmetal-api/internal/client/ipam"
 	networkingclient "github.com/onmetal/onmetal-api/internal/client/networking"
-	"github.com/onmetal/onmetal-api/internal/controllers/ipam"
 	utilsenvtest "github.com/onmetal/onmetal-api/utils/envtest"
 	"github.com/onmetal/onmetal-api/utils/envtest/apiserver"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
-	"k8s.io/client-go/tools/record"
+	"k8s.io/utils/lru"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
@@ -132,42 +127,21 @@ var _ = BeforeSuite(func() {
 
 	Expect(networkingclient.SetupNetworkInterfaceNetworkNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 	Expect(networkingclient.SetupNetworkInterfaceVirtualIPNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
-	Expect(networkingclient.SetupNetworkInterfaceSpecMachineRefNameField(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 	Expect(networkingclient.SetupLoadBalancerNetworkNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 	Expect(networkingclient.SetupNATGatewayNetworkNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
-	Expect(networkingclient.SetupNetworkPeeringKeysFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
-	Expect(networkingclient.SetupVirtualIPSpecTargetRefNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+	Expect(networkingclient.SetupNetworkInterfacePrefixNamesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+	Expect(networkingclient.SetupLoadBalancerPrefixNamesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 
 	// Register reconcilers
-	err = (&NetworkInterfaceReconciler{
-		EventRecorder: &record.FakeRecorder{},
-		Client:        k8sManager.GetClient(),
-		Scheme:        k8sManager.GetScheme(),
-	}).SetupWithManager(k8sManager)
-	Expect(err).NotTo(HaveOccurred())
+	Expect((&VirtualIPReleaseReconciler{
+		Client:       k8sManager.GetClient(),
+		APIReader:    k8sManager.GetAPIReader(),
+		AbsenceCache: lru.New(100),
+	}).SetupWithManager(k8sManager)).To(Succeed())
 
-	err = (&NetworkInterfaceBindReconciler{
-		EventRecorder: &record.FakeRecorder{},
-		Client:        k8sManager.GetClient(),
-		APIReader:     k8sManager.GetAPIReader(),
-		Scheme:        k8sManager.GetScheme(),
-		BindTimeout:   1 * time.Second,
-	}).SetupWithManager(k8sManager)
-	Expect(err).NotTo(HaveOccurred())
-
-	err = (&VirtualIPReconciler{
-		EventRecorder: &record.FakeRecorder{},
-		Client:        k8sManager.GetClient(),
-		APIReader:     k8sManager.GetAPIReader(),
-		Scheme:        k8sManager.GetScheme(),
-		BindTimeout:   1 * time.Second,
-	}).SetupWithManager(k8sManager)
-	Expect(err).NotTo(HaveOccurred())
-
-	err = (&LoadBalancerReconciler{
+	Expect((&LoadBalancerReconciler{
 		Client: k8sManager.GetClient(),
-	}).SetupWithManager(k8sManager)
-	Expect(err).NotTo(HaveOccurred())
+	}).SetupWithManager(k8sManager)).To(Succeed())
 
 	err = (&NetworkProtectionReconciler{
 		Client: k8sManager.GetClient(),
@@ -175,56 +149,32 @@ var _ = BeforeSuite(func() {
 	}).SetupWithManager(k8sManager)
 	Expect(err).NotTo(HaveOccurred())
 
-	err = (&NetworkBindReconciler{
-		EventRecorder: &record.FakeRecorder{},
-		Client:        k8sManager.GetClient(),
-	}).SetupWithManager(k8sManager)
-	Expect(err).NotTo(HaveOccurred())
+	Expect((&NetworkReleaseReconciler{
+		Client:       k8sManager.GetClient(),
+		APIReader:    k8sManager.GetAPIReader(),
+		AbsenceCache: lru.New(100),
+	}).SetupWithManager(k8sManager)).To(Succeed())
 
-	err = (&ipam.PrefixReconciler{
-		Client:                  k8sManager.GetClient(),
-		APIReader:               k8sManager.GetAPIReader(),
-		Scheme:                  k8sManager.GetScheme(),
-		PrefixAllocationTimeout: 1 * time.Second,
-	}).SetupWithManager(k8sManager)
-	Expect(err).NotTo(HaveOccurred())
+	Expect((&NetworkInterfaceReleaseReconciler{
+		Client:       k8sManager.GetClient(),
+		APIReader:    k8sManager.GetAPIReader(),
+		AbsenceCache: lru.New(100),
+	}).SetupWithManager(k8sManager)).To(Succeed())
+
+	Expect((&LoadBalancerEphemeralPrefixReconciler{
+		Client: k8sManager.GetClient(),
+	}).SetupWithManager(k8sManager)).To(Succeed())
+
+	Expect((&NetworkInterfaceEphemeralPrefixReconciler{
+		Client: k8sManager.GetClient(),
+	}).SetupWithManager(k8sManager)).To(Succeed())
+
+	Expect((&NetworkInterfaceEphemeralVirtualIPReconciler{
+		Client: k8sManager.GetClient(),
+	}).SetupWithManager(k8sManager)).To(Succeed())
 
 	go func() {
 		defer GinkgoRecover()
-		err = k8sManager.Start(ctx)
-		Expect(err).ToNot(HaveOccurred())
+		Expect(k8sManager.Start(ctx)).To(Succeed())
 	}()
 })
-
-func SetupTest() (*corev1.Namespace, *computev1alpha1.MachineClass) {
-	var (
-		ns           = &corev1.Namespace{}
-		machineClass = &computev1alpha1.MachineClass{}
-	)
-
-	BeforeEach(func(ctx SpecContext) {
-		*ns = corev1.Namespace{
-			ObjectMeta: metav1.ObjectMeta{GenerateName: "testns-"},
-		}
-		Expect(k8sClient.Create(ctx, ns)).NotTo(HaveOccurred(), "failed to create test namespace")
-		DeferCleanup(func(ctx context.Context) error {
-			return client.IgnoreNotFound(k8sClient.Delete(ctx, ns))
-		})
-
-		*machineClass = computev1alpha1.MachineClass{
-			ObjectMeta: metav1.ObjectMeta{
-				GenerateName: "machine-class-",
-			},
-			Capabilities: corev1alpha1.ResourceList{
-				corev1alpha1.ResourceCPU:    resource.MustParse("1"),
-				corev1alpha1.ResourceMemory: resource.MustParse("1Gi"),
-			},
-		}
-		Expect(k8sClient.Create(ctx, machineClass)).To(Succeed(), "failed to create test machine class")
-		DeferCleanup(func(ctx context.Context) error {
-			return client.IgnoreNotFound(k8sClient.Delete(ctx, machineClass))
-		})
-	})
-
-	return ns, machineClass
-}

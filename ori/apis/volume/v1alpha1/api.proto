@@ -20,7 +20,7 @@ service VolumeRuntime {
   rpc ExpandVolume(ExpandVolumeRequest) returns (ExpandVolumeResponse) {};
   rpc DeleteVolume(DeleteVolumeRequest) returns (DeleteVolumeResponse) {};
 
-  rpc ListVolumeClasses(ListVolumeClassesRequest) returns (ListVolumeClassesResponse) {};
+  rpc Status(StatusRequest) returns (StatusResponse) {};
 }
 
 message VolumeFilter {
@@ -62,6 +62,11 @@ message VolumeClassCapabilities {
 message VolumeClass {
   string name = 1;
   VolumeClassCapabilities capabilities = 2;
+}
+
+message VolumeClassStatus {
+  VolumeClass volume_class = 1;
+  int64 quantity = 2;
 }
 
 message VolumeAccess {
@@ -108,9 +113,9 @@ message DeleteVolumeRequest {
 message DeleteVolumeResponse {
 }
 
-message ListVolumeClassesRequest {
+message StatusRequest {
 }
 
-message ListVolumeClassesResponse {
-  repeated VolumeClass volume_classes = 1;
+message StatusResponse {
+  repeated VolumeClassStatus volume_class_status = 1;
 }

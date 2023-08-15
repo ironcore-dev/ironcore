@@ -113,6 +113,23 @@ ResourceQuotaStatus
 </tr>
 </tbody>
 </table>
+<h3 id="core.api.onmetal.de/v1alpha1.ClassType">ClassType
+(<code>string</code> alias)</h3>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;machine&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;volume&#34;</p></td>
+<td></td>
+</tr></tbody>
+</table>
 <h3 id="core.api.onmetal.de/v1alpha1.ObjectSelector">ObjectSelector
 </h3>
 <div>

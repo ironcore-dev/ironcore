@@ -21,24 +21,24 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 )
 
-// UIDReferenceApplyConfiguration represents an declarative configuration of the UIDReference type for use
+// NetworkPeeringClaimRefApplyConfiguration represents an declarative configuration of the NetworkPeeringClaimRef type for use
 // with apply.
-type UIDReferenceApplyConfiguration struct {
+type NetworkPeeringClaimRefApplyConfiguration struct {
 	Namespace *string    `json:"namespace,omitempty"`
 	Name      *string    `json:"name,omitempty"`
 	UID       *types.UID `json:"uid,omitempty"`
 }
 
-// UIDReferenceApplyConfiguration constructs an declarative configuration of the UIDReference type for use with
+// NetworkPeeringClaimRefApplyConfiguration constructs an declarative configuration of the NetworkPeeringClaimRef type for use with
 // apply.
-func UIDReference() *UIDReferenceApplyConfiguration {
-	return &UIDReferenceApplyConfiguration{}
+func NetworkPeeringClaimRef() *NetworkPeeringClaimRefApplyConfiguration {
+	return &NetworkPeeringClaimRefApplyConfiguration{}
 }
 
 // WithNamespace sets the Namespace field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Namespace field is set to the value of the last call.
-func (b *UIDReferenceApplyConfiguration) WithNamespace(value string) *UIDReferenceApplyConfiguration {
+func (b *NetworkPeeringClaimRefApplyConfiguration) WithNamespace(value string) *NetworkPeeringClaimRefApplyConfiguration {
 	b.Namespace = &value
 	return b
 }
@@ -46,7 +46,7 @@ func (b *UIDReferenceApplyConfiguration) WithNamespace(value string) *UIDReferen
 // WithName sets the Name field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Name field is set to the value of the last call.
-func (b *UIDReferenceApplyConfiguration) WithName(value string) *UIDReferenceApplyConfiguration {
+func (b *NetworkPeeringClaimRefApplyConfiguration) WithName(value string) *NetworkPeeringClaimRefApplyConfiguration {
 	b.Name = &value
 	return b
 }
@@ -54,7 +54,7 @@ func (b *UIDReferenceApplyConfiguration) WithName(value string) *UIDReferenceApp
 // WithUID sets the UID field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the UID field is set to the value of the last call.
-func (b *UIDReferenceApplyConfiguration) WithUID(value types.UID) *UIDReferenceApplyConfiguration {
+func (b *NetworkPeeringClaimRefApplyConfiguration) WithUID(value types.UID) *NetworkPeeringClaimRefApplyConfiguration {
 	b.UID = &value
 	return b
 }

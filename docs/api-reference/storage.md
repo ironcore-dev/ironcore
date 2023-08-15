@@ -1412,32 +1412,6 @@ This secret is created by user with encryptionKey as Key and base64 encoded 256-
 </tr>
 </tbody>
 </table>
-<h3 id="storage.api.onmetal.de/v1alpha1.VolumePhase">VolumePhase
-(<code>string</code> alias)</h3>
-<p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.VolumeStatus">VolumeStatus</a>)
-</p>
-<div>
-<p>VolumePhase represents the binding phase of a Volume.</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Value</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody><tr><td><p>&#34;Bound&#34;</p></td>
-<td><p>VolumePhaseBound is used for any Volume that is properly bound.</p>
-</td>
-</tr><tr><td><p>&#34;Pending&#34;</p></td>
-<td><p>VolumePhasePending is used for any Volume that is currently awaiting binding.</p>
-</td>
-</tr><tr><td><p>&#34;Unbound&#34;</p></td>
-<td><p>VolumePhaseUnbound is used for any Volume that not bound.</p>
-</td>
-</tr></tbody>
-</table>
 <h3 id="storage.api.onmetal.de/v1alpha1.VolumePoolCondition">VolumePoolCondition
 </h3>
 <p>
@@ -1656,7 +1630,7 @@ VolumePoolState
 </tr>
 <tr>
 <td>
-<code>available</code><br/>
+<code>capacity</code><br/>
 <em>
 <a href="../core/#core.api.onmetal.de/v1alpha1.ResourceList">
 github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
@@ -1664,12 +1638,12 @@ github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
 </em>
 </td>
 <td>
-<p>Available list the available capacity of a VolumePool.</p>
+<p>Capacity represents the total resources of a machine pool.</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>used</code><br/>
+<code>allocatable</code><br/>
 <em>
 <a href="../core/#core.api.onmetal.de/v1alpha1.ResourceList">
 github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
@@ -1677,7 +1651,7 @@ github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
 </em>
 </td>
 <td>
-<p>Used indicates how much capacity has been used in a VolumePool.</p>
+<p>Allocatable represents the resources of a machine pool that are available for scheduling.</p>
 </td>
 </tr>
 </tbody>
@@ -1893,32 +1867,6 @@ Kubernetes meta/v1.Time
 </td>
 <td>
 <p>LastStateTransitionTime is the last time the State transitioned between values.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>phase</code><br/>
-<em>
-<a href="#storage.api.onmetal.de/v1alpha1.VolumePhase">
-VolumePhase
-</a>
-</em>
-</td>
-<td>
-<p>Phase represents the binding phase of a Volume.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>lastPhaseTransitionTime</code><br/>
-<em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#time-v1-meta">
-Kubernetes meta/v1.Time
-</a>
-</em>
-</td>
-<td>
-<p>LastPhaseTransitionTime is the last time the Phase transitioned between values.</p>
 </td>
 </tr>
 <tr>

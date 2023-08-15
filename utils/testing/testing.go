@@ -21,6 +21,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/onmetal/onmetal-api/utils/generic"
 	"github.com/onmetal/onmetal-api/utils/klog"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
@@ -156,17 +157,32 @@ func BeControlledBy(owner client.Object) types.GomegaMatcher {
 
 // SetupNamespace sets up a namespace before each test and tears the namespace down after each test.
 func SetupNamespace(c *client.Client) *corev1.Namespace {
-	ns := &corev1.Namespace{}
-	ginkgo.BeforeEach(func(ctx ginkgo.SpecContext) {
+	return SetupObjectStruct[*corev1.Namespace](c, func(ns *corev1.Namespace) {
 		*ns = corev1.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
-				GenerateName: "test-ns-",
+				GenerateName: "test-ns",
 			},
 		}
-		gomega.Expect((*c).Create(ctx, ns)).To(gomega.Succeed())
-		ginkgo.DeferCleanup(DeleteIfExists(c, ns))
 	})
-	return ns
+}
+
+func SetupObject(c *client.Client, obj client.Object, f func()) {
+	ginkgo.BeforeEach(func(ctx ginkgo.SpecContext) {
+		f()
+		gomega.Expect((*c).Create(ctx, obj)).To(gomega.Succeed())
+		ginkgo.DeferCleanup(DeleteIfExists(c, obj))
+	})
+}
+
+func SetupObjectStruct[O interface {
+	client.Object
+	*OStruct
+}, OStruct any](c *client.Client, f func(obj O)) O {
+	obj := O(generic.ZeroPointer[OStruct]())
+	SetupObject(c, obj, func() {
+		f(obj)
+	})
+	return obj
 }
 
 // DeleteIfExists returns a function to clean up an object if it exists.

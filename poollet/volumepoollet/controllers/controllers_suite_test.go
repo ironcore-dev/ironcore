@@ -23,6 +23,7 @@ import (
 	"github.com/onmetal/controller-utils/modutils"
 	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
+	storageclient "github.com/onmetal/onmetal-api/internal/client/storage"
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
 	"github.com/onmetal/onmetal-api/ori/testing/volume"
 	"github.com/onmetal/onmetal-api/poollet/volumepoollet/controllers"
@@ -34,6 +35,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -173,36 +175,52 @@ func SetupTest() (*corev1.Namespace, *storagev1alpha1.VolumePool, *storagev1alph
 
 		*expandableVc = storagev1alpha1.VolumeClass{
 			ObjectMeta: metav1.ObjectMeta{
-				GenerateName: "test-vc-",
+				GenerateName: "test-vc-expandable-",
 			},
 			ResizePolicy: storagev1alpha1.ResizePolicyExpandOnly,
 			Capabilities: corev1alpha1.ResourceList{
 				corev1alpha1.ResourceTPS:  resource.MustParse("250Mi"),
-				corev1alpha1.ResourceIOPS: resource.MustParse("15000"),
+				corev1alpha1.ResourceIOPS: resource.MustParse("1000"),
 			},
 		}
 		Expect(k8sClient.Create(ctx, expandableVc)).To(Succeed(), "failed to create test volume class")
 		DeferCleanup(k8sClient.Delete, expandableVc)
 
 		*srv = *volume.NewFakeRuntimeService()
-		srv.SetVolumeClasses([]*volume.FakeVolumeClass{
+		srv.SetVolumeClasses([]*volume.FakeVolumeClassStatus{
 			{
-				VolumeClass: ori.VolumeClass{
-					Name: vc.Name,
-					Capabilities: &ori.VolumeClassCapabilities{
-						Tps:  262144000,
-						Iops: 15000,
+				VolumeClassStatus: ori.VolumeClassStatus{
+					VolumeClass: &ori.VolumeClass{
+						Name: vc.Name,
+						Capabilities: &ori.VolumeClassCapabilities{
+							Tps:  262144000,
+							Iops: 15000,
+						},
+					},
+				},
+			},
+			{
+				VolumeClassStatus: ori.VolumeClassStatus{
+					VolumeClass: &ori.VolumeClass{
+						Name: expandableVc.Name,
+						Capabilities: &ori.VolumeClassCapabilities{
+							Tps:  262144000,
+							Iops: 1000,
+						},
 					},
 				},
 			},
 		})
+		DeferCleanup(srv.SetVolumeClasses, []*volume.FakeVolumeClassStatus{})
 
 		k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
 			Scheme:             scheme.Scheme,
-			Host:               "127.0.0.1",
 			MetricsBindAddress: "0",
 		})
 		Expect(err).ToNot(HaveOccurred())
+
+		indexer := k8sManager.GetFieldIndexer()
+		Expect(storageclient.SetupVolumeSpecVolumePoolRefNameFieldIndexer(ctx, indexer)).To(Succeed())
 
 		volumeClassMapper := vcm.NewGeneric(srv, vcm.GenericOptions{
 			RelistPeriod: 2 * time.Second,
@@ -225,13 +243,13 @@ func SetupTest() (*corev1.Namespace, *storagev1alpha1.VolumePool, *storagev1alph
 			Client:            k8sManager.GetClient(),
 			VolumeRuntime:     srv,
 			VolumeClassMapper: volumeClassMapper,
-			VolumePoolName:    TestVolumePool,
+			VolumePoolName:    vp.Name,
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		Expect((&controllers.VolumePoolAnnotatorReconciler{
 			Client:            k8sManager.GetClient(),
 			VolumeClassMapper: volumeClassMapper,
-			VolumePoolName:    TestVolumePool,
+			VolumePoolName:    vp.Name,
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		go func() {
@@ -241,4 +259,9 @@ func SetupTest() (*corev1.Namespace, *storagev1alpha1.VolumePool, *storagev1alph
 	})
 
 	return ns, vp, vc, expandableVc, srv
+}
+
+func expectVolumeDeleted(ctx context.Context, volume *storagev1alpha1.Volume) {
+	Expect(k8sClient.Delete(ctx, volume)).Should(Succeed())
+	Eventually(Get(volume)).Should(Satisfy(errors.IsNotFound))
 }

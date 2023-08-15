@@ -50,7 +50,19 @@ func ToMapByKey[S ~[]V, K comparable, V any](s S, f func(v V) K) map[K]V {
 	})
 }
 
-func Filter[S ~[]E, E any](s S, f func(e E) bool) []E {
+func FilterNot[S ~[]E, E comparable](s S, e E) []E {
+	return FilterFunc(s, func(it E) bool {
+		return e != it
+	})
+}
+
+func Filter[S ~[]E, E comparable](s S, e E) []E {
+	return FilterFunc(s, func(it E) bool {
+		return e == it
+	})
+}
+
+func FilterFunc[S ~[]E, E any](s S, f func(e E) bool) []E {
 	var res []E
 	for i := range s {
 		if f(s[i]) {

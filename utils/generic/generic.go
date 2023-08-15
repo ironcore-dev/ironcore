@@ -17,6 +17,7 @@ package generic
 import (
 	"fmt"
 	"reflect"
+	"strings"
 )
 
 // Identity is a function that returns its given parameters.
@@ -55,6 +56,12 @@ func Pointer[E any](e E) *E {
 	return &e
 }
 
+// ZeroPointer returns a pointer to a zero value of type E.
+func ZeroPointer[E any]() *E {
+	var zero E
+	return &zero
+}
+
 // DerefFunc returns the value e points to if it's non-nil. Otherwise, it returns the result of calling defaultFunc.
 func DerefFunc[E any](e *E, defaultFunc func() E) E {
 	if e != nil {
@@ -70,9 +77,34 @@ func Deref[E any](e *E, defaultValue E) E {
 	})
 }
 
+// DerefZero returns the value e points to if it's non-nil. Otherwise, it returns the zero value for type E.
+func DerefZero[E any](e *E) E {
+	if e != nil {
+		return *e
+	}
+	var zero E
+	return zero
+}
+
 func PipeMap[E any](e E, fs ...func(E) E) E {
 	for _, f := range fs {
 		e = f(e)
 	}
 	return e
+}
+
+// TODO is a function to create holes when stubbing out more complex mechanisms.
+//
+// By default, it will panic with 'TODO: provide a value of type <type>' where <type> is the type of V.
+// The panic message can be altered by passing in additional args that will be printed as
+// 'TODO: <args separated by space>'
+func TODO[V any](args ...any) V {
+	var sb strings.Builder
+	sb.WriteString("TODO: ")
+	if len(args) > 0 {
+		_, _ = fmt.Fprintln(&sb, args...)
+	} else {
+		_, _ = fmt.Fprintf(&sb, "provide a value of type %T", Zero[V]())
+	}
+	panic(sb.String())
 }

@@ -213,7 +213,7 @@ func (r *ResourceQuotaReconciler) enqueueResourceQuotasByNamespace() handler.Eve
 			}
 		}()
 
-		return onmetalapiclient.ReconcileRequestsFromObjectSlice(resourceQuotaList.Items)
+		return onmetalapiclient.ReconcileRequestsFromObjectStructSlice(resourceQuotaList.Items)
 	})
 }
 
