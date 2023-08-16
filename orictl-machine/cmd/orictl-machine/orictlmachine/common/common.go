@@ -259,7 +259,6 @@ func (o *OutputOptions) RendererOrNil() (renderer.Renderer, error) {
 
 var (
 	MachineAliases          = []string{"machines", "mach", "machs"}
-	MachineClassAliases     = []string{"machineclasses", "mc", "mcs"}
 	VolumeAliases           = []string{"volumes", "vol", "vols"}
 	NetworkInterfaceAliases = []string{"networkinterfaces", "nic", "nics"}
 )
