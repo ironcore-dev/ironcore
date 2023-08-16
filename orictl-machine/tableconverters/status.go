@@ -26,25 +26,27 @@ var (
 		{Name: "Name"},
 		{Name: "CPU"},
 		{Name: "Memory"},
+		{Name: "Quantity"},
 	}
 
-	MachineClass = tableconverter.Funcs[*ori.MachineClass]{
+	MachineClassStatus = tableconverter.Funcs[*ori.MachineClassStatus]{
 		Headers: tableconverter.Headers(machineClassHeaders),
-		Rows: tableconverter.SingleRowFrom(func(class *ori.MachineClass) (api.Row, error) {
+		Rows: tableconverter.SingleRowFrom(func(status *ori.MachineClassStatus) (api.Row, error) {
 			return api.Row{
-				class.Name,
-				resource.NewMilliQuantity(class.Capabilities.CpuMillis, resource.DecimalSI).String(),
-				resource.NewQuantity(int64(class.Capabilities.MemoryBytes), resource.DecimalSI).String(),
+				status.MachineClass.Name,
+				resource.NewMilliQuantity(status.MachineClass.Capabilities.CpuMillis, resource.DecimalSI).String(),
+				resource.NewQuantity(int64(status.MachineClass.Capabilities.MemoryBytes), resource.DecimalSI).String(),
+				resource.NewQuantity(status.Quantity, resource.DecimalSI).String(),
 			}, nil
 		}),
 	}
 
-	MachineClassSlice = tableconverter.SliceFuncs[*ori.MachineClass](MachineClass)
+	MachineClassStatusSlice = tableconverter.SliceFuncs[*ori.MachineClassStatus](MachineClassStatus)
 )
 
 func init() {
 	RegistryBuilder.Register(
-		tableconverter.ToTagAndTypedAny[*ori.MachineClass](MachineClass),
-		tableconverter.ToTagAndTypedAny[[]*ori.MachineClass](MachineClassSlice),
+		tableconverter.ToTagAndTypedAny[*ori.MachineClassStatus](MachineClassStatus),
+		tableconverter.ToTagAndTypedAny[[]*ori.MachineClassStatus](MachineClassStatusSlice),
 	)
 }

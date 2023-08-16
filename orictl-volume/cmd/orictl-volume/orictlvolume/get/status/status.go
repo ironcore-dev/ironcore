@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package volumeclass
+package status
 
 import (
 	"context"
@@ -32,8 +32,7 @@ func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cob
 	)
 
 	cmd := &cobra.Command{
-		Use:     "volumeclass",
-		Aliases: common.VolumeClassAliases,
+		Use: "status",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
 			log := ctrl.LoggerFrom(ctx)
@@ -65,13 +64,8 @@ func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cob
 func Run(ctx context.Context, streams clicommon.Streams, client ori.VolumeRuntimeClient, render renderer.Renderer) error {
 	res, err := client.Status(ctx, &ori.StatusRequest{})
 	if err != nil {
-		return fmt.Errorf("error listing volume classes: %w", err)
+		return fmt.Errorf("error getting status: %w", err)
 	}
 
-	var volumeClasses []*ori.VolumeClass
-	for _, status := range res.VolumeClassStatus {
-		volumeClasses = append(volumeClasses, status.GetVolumeClass())
-	}
-
-	return render.Render(volumeClasses, streams.Out)
+	return render.Render(res.VolumeClassStatus, streams.Out)
 }

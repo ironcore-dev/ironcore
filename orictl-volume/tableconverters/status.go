@@ -18,6 +18,7 @@ import (
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
 	"github.com/onmetal/onmetal-api/orictl/api"
 	"github.com/onmetal/onmetal-api/orictl/tableconverter"
+	"k8s.io/apimachinery/pkg/api/resource"
 )
 
 var (
@@ -25,26 +26,28 @@ var (
 		{Name: "Name"},
 		{Name: "TPS"},
 		{Name: "IOPS"},
+		{Name: "Quantity"},
 	}
 )
 
 var (
-	VolumeClass = tableconverter.Funcs[*ori.VolumeClass]{
+	VolumeClassStatus = tableconverter.Funcs[*ori.VolumeClassStatus]{
 		Headers: tableconverter.Headers(volumeClassHeaders),
-		Rows: tableconverter.SingleRowFrom(func(class *ori.VolumeClass) (api.Row, error) {
+		Rows: tableconverter.SingleRowFrom(func(status *ori.VolumeClassStatus) (api.Row, error) {
 			return api.Row{
-				class.Name,
-				class.Capabilities.Tps,
-				class.Capabilities.Iops,
+				status.VolumeClass.Name,
+				resource.NewQuantity(status.VolumeClass.Capabilities.Tps, resource.BinarySI).String(),
+				resource.NewQuantity(status.VolumeClass.Capabilities.Iops, resource.DecimalSI).String(),
+				resource.NewQuantity(status.Quantity, resource.BinarySI).String(),
 			}, nil
 		}),
 	}
-	VolumeClassSlice = tableconverter.SliceFuncs[*ori.VolumeClass](VolumeClass)
+	VolumeClassStatusSlice = tableconverter.SliceFuncs[*ori.VolumeClassStatus](VolumeClassStatus)
 )
 
 func init() {
 	RegistryBuilder.Register(
-		tableconverter.ToTagAndTypedAny[*ori.VolumeClass](VolumeClass),
-		tableconverter.ToTagAndTypedAny[[]*ori.VolumeClass](VolumeClassSlice),
+		tableconverter.ToTagAndTypedAny[*ori.VolumeClassStatus](VolumeClassStatus),
+		tableconverter.ToTagAndTypedAny[[]*ori.VolumeClassStatus](VolumeClassStatusSlice),
 	)
 }

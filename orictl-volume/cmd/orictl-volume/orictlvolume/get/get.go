@@ -16,8 +16,8 @@ package get
 
 import (
 	"github.com/onmetal/onmetal-api/orictl-volume/cmd/orictl-volume/orictlvolume/common"
+	"github.com/onmetal/onmetal-api/orictl-volume/cmd/orictl-volume/orictlvolume/get/status"
 	"github.com/onmetal/onmetal-api/orictl-volume/cmd/orictl-volume/orictlvolume/get/volume"
-	"github.com/onmetal/onmetal-api/orictl-volume/cmd/orictl-volume/orictlvolume/get/volumeclass"
 	clicommon "github.com/onmetal/onmetal-api/orictl/cmd"
 	"github.com/spf13/cobra"
 )
@@ -29,7 +29,7 @@ func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cob
 
 	cmd.AddCommand(
 		volume.Command(streams, clientFactory),
-		volumeclass.Command(streams, clientFactory),
+		status.Command(streams, clientFactory),
 	)
 
 	return cmd

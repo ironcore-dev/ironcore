@@ -32,8 +32,7 @@ func Command(streams clicommon.Streams, clientFactory common.Factory) *cobra.Com
 	)
 
 	cmd := &cobra.Command{
-		Use:     "status",
-		Aliases: common.MachineClassAliases,
+		Use: "status",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
 			log := ctrl.LoggerFrom(ctx)
@@ -65,13 +64,8 @@ func Command(streams clicommon.Streams, clientFactory common.Factory) *cobra.Com
 func Run(ctx context.Context, streams clicommon.Streams, client ori.MachineRuntimeClient, render renderer.Renderer) error {
 	res, err := client.Status(ctx, &ori.StatusRequest{})
 	if err != nil {
-		return fmt.Errorf("error listing machine classes: %w", err)
+		return fmt.Errorf("error getting status: %w", err)
 	}
 
-	var machineClasses []*ori.MachineClass
-	for _, status := range res.MachineClassStatus {
-		machineClasses = append(machineClasses, status.GetMachineClass())
-	}
-
-	return render.Render(machineClasses, streams.Out)
+	return render.Render(res.MachineClassStatus, streams.Out)
 }

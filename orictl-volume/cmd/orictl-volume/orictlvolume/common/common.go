@@ -69,6 +69,5 @@ func NewOutputOptions() *clicommon.OutputOptions {
 }
 
 var (
-	VolumeAliases      = []string{"volumes", "vol", "vols"}
-	VolumeClassAliases = []string{"volumechineclasses", "vc", "vcs"}
+	VolumeAliases = []string{"volumes", "vol", "vols"}
 )
