@@ -3390,6 +3390,13 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkInterfaceSpec(ref common.
 				Description: "NetworkInterfaceSpec defines the desired state of NetworkInterface",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
+					"providerID": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ProviderID is the provider-internal ID of the network interface.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 					"networkRef": {
 						SchemaProps: spec.SchemaProps{
 							Description: "NetworkRef is the Network this NetworkInterface is connected to",
@@ -3452,6 +3459,22 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkInterfaceSpec(ref common.
 							Ref:         ref("github.com/onmetal/onmetal-api/api/networking/v1alpha1.VirtualIPSource"),
 						},
 					},
+					"attributes": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Attributes are provider-specific attributes for the network interface.",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
 				},
 				Required: []string{"networkRef", "ipFamilies", "ips"},
 			},
@@ -3479,13 +3502,6 @@ func schema_onmetal_api_api_networking_v1alpha1_NetworkInterfaceStatus(ref commo
 						SchemaProps: spec.SchemaProps{
 							Description: "LastStateTransitionTime is the last time the State transitioned from one value to another.",
 							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
-						},
-					},
-					"providerID": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ProviderID is the provider-internal ID of the network interface.",
-							Type:        []string{"string"},
-							Format:      "",
 						},
 					},
 					"ips": {

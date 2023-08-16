@@ -22,6 +22,7 @@ import (
 	"github.com/onmetal/onmetal-api/utils/annotations"
 	errors2 "k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	controllerruntime "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -75,6 +76,32 @@ func ReconcileRequestsFromObjectStructSlice[O Object[OStruct], S ~[]OStruct, OSt
 		}
 	}
 	return res
+}
+
+func IterateObjectsInObjectStructSlice[O Object[OStruct], S ~[]OStruct, OStruct any](s S, yield func(O) bool) bool {
+	for i := range s {
+		obj := O(&s[i])
+		if !yield(obj) {
+			return false
+		}
+	}
+	return true
+}
+
+func ForEachObjectInObjectStructSlice[O Object[OStruct], S ~[]OStruct, OStruct any](s S, f func(O)) {
+	for i := range s {
+		obj := O(&s[i])
+		f(obj)
+	}
+}
+
+func ObjectStructSliceToObjectByUIDMap[O Object[OStruct], S ~[]OStruct, OStruct any](s S) map[types.UID]O {
+	m := make(map[types.UID]O)
+	for i := range s {
+		obj := O(&s[i])
+		m[obj.GetUID()] = obj
+	}
+	return m
 }
 
 func ByObjectCreationTimestamp[OP Object[O], O any](obj1, obj2 O) bool {

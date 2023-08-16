@@ -11664,6 +11664,14 @@
 					"ips"
 				],
 				"properties": {
+					"attributes": {
+						"description": "Attributes are provider-specific attributes for the network interface.",
+						"type": "object",
+						"additionalProperties": {
+							"type": "string",
+							"default": ""
+						}
+					},
 					"ipFamilies": {
 						"description": "IPFamilies defines which IPFamilies this NetworkInterface is supporting",
 						"type": "array",
@@ -11713,6 +11721,10 @@
 							]
 						}
 					},
+					"providerID": {
+						"description": "ProviderID is the provider-internal ID of the network interface.",
+						"type": "string"
+					},
 					"virtualIP": {
 						"description": "VirtualIP specifies the virtual ip that should be assigned to this NetworkInterface.",
 						"allOf": [
@@ -11758,10 +11770,6 @@
 								}
 							]
 						}
-					},
-					"providerID": {
-						"description": "ProviderID is the provider-internal ID of the network interface.",
-						"type": "string"
 					},
 					"state": {
 						"description": "State is the NetworkInterfaceState of the NetworkInterface.",

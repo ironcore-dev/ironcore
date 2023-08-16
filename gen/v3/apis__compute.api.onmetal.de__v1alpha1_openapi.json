@@ -4509,7 +4509,12 @@
 						"description": "Allocatable represents the resources of a machine pool that are available for scheduling.",
 						"type": "object",
 						"additionalProperties": {
-							"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
+							"default": {},
+							"allOf": [
+								{
+									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
+								}
+							]
 						}
 					},
 					"availableMachineClasses": {
@@ -4527,7 +4532,12 @@
 						"description": "Capacity represents the total resources of a machine pool.",
 						"type": "object",
 						"additionalProperties": {
-							"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
+							"default": {},
+							"allOf": [
+								{
+									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
+								}
+							]
 						}
 					},
 					"conditions": {
@@ -4997,6 +5007,14 @@
 					"ips"
 				],
 				"properties": {
+					"attributes": {
+						"description": "Attributes are provider-specific attributes for the network interface.",
+						"type": "object",
+						"additionalProperties": {
+							"type": "string",
+							"default": ""
+						}
+					},
 					"ipFamilies": {
 						"description": "IPFamilies defines which IPFamilies this NetworkInterface is supporting",
 						"type": "array",
@@ -5045,6 +5063,10 @@
 								}
 							]
 						}
+					},
+					"providerID": {
+						"description": "ProviderID is the provider-internal ID of the network interface.",
+						"type": "string"
 					},
 					"virtualIP": {
 						"description": "VirtualIP specifies the virtual ip that should be assigned to this NetworkInterface.",

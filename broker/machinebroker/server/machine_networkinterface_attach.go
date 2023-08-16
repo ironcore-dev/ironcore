@@ -34,9 +34,10 @@ import (
 )
 
 type OnmetalNetworkInterfaceConfig struct {
-	Name      string
-	NetworkID string
-	IPs       []commonv1alpha1.IP
+	Name       string
+	NetworkID  string
+	IPs        []commonv1alpha1.IP
+	Attributes map[string]string
 }
 
 func (s *Server) getOnmetalNetworkInterfaceConfig(nic *ori.NetworkInterface) (*OnmetalNetworkInterfaceConfig, error) {
@@ -46,9 +47,10 @@ func (s *Server) getOnmetalNetworkInterfaceConfig(nic *ori.NetworkInterface) (*O
 	}
 
 	return &OnmetalNetworkInterfaceConfig{
-		Name:      nic.Name,
-		NetworkID: nic.NetworkId,
-		IPs:       ips,
+		Name:       nic.Name,
+		NetworkID:  nic.NetworkId,
+		IPs:        ips,
+		Attributes: nic.Attributes,
 	}, nil
 }
 
@@ -82,6 +84,7 @@ func (s *Server) createOnmetalNetworkInterface(
 			MachineRef: s.optionalLocalUIDReference(optOnmetalMachine),
 			IPFamilies: s.getOnmetalIPsIPFamilies(cfg.IPs),
 			IPs:        s.onmetalIPsToOnmetalIPSources(cfg.IPs),
+			Attributes: cfg.Attributes,
 		},
 	}
 	log.V(1).Info("Creating onmetal network interface")

@@ -81,6 +81,7 @@ message NetworkInterface {
   string name = 1;
   string network_id = 2;
   repeated string ips = 3;
+  map<string, string> attributes = 4;
 }
 
 enum Power {

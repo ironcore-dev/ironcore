@@ -546,6 +546,17 @@ NetworkInterfaceSpec
 <table>
 <tr>
 <td>
+<code>providerID</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>ProviderID is the provider-internal ID of the network interface.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>networkRef</code><br/>
 <em>
 <a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
@@ -622,6 +633,17 @@ VirtualIPSource
 </td>
 <td>
 <p>VirtualIP specifies the virtual ip that should be assigned to this NetworkInterface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>attributes</code><br/>
+<em>
+map[string]string
+</em>
+</td>
+<td>
+<p>Attributes are provider-specific attributes for the network interface.</p>
 </td>
 </tr>
 </table>
@@ -1486,6 +1508,17 @@ Has to be a power of 2. If empty, 2048 (DefaultPortsPerNetworkInterface) is the 
 <tbody>
 <tr>
 <td>
+<code>providerID</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>ProviderID is the provider-internal ID of the network interface.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>networkRef</code><br/>
 <em>
 <a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
@@ -1564,6 +1597,17 @@ VirtualIPSource
 <p>VirtualIP specifies the virtual ip that should be assigned to this NetworkInterface.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>attributes</code><br/>
+<em>
+map[string]string
+</em>
+</td>
+<td>
+<p>Attributes are provider-specific attributes for the network interface.</p>
+</td>
+</tr>
 </tbody>
 </table>
 <h3 id="networking.api.onmetal.de/v1alpha1.NetworkInterfaceState">NetworkInterfaceState
@@ -1632,17 +1676,6 @@ Kubernetes meta/v1.Time
 </td>
 <td>
 <p>LastStateTransitionTime is the last time the State transitioned from one value to another.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>providerID</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>ProviderID is the provider-internal ID of the network interface.</p>
 </td>
 </tr>
 <tr>
@@ -1728,6 +1761,17 @@ NetworkInterfaceSpec
 <table>
 <tr>
 <td>
+<code>providerID</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>ProviderID is the provider-internal ID of the network interface.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>networkRef</code><br/>
 <em>
 <a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
@@ -1804,6 +1848,17 @@ VirtualIPSource
 </td>
 <td>
 <p>VirtualIP specifies the virtual ip that should be assigned to this NetworkInterface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>attributes</code><br/>
+<em>
+map[string]string
+</em>
+</td>
+<td>
+<p>Attributes are provider-specific attributes for the network interface.</p>
 </td>
 </tr>
 </table>

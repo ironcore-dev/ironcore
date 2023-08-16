@@ -156,6 +156,8 @@ var _ = Describe("MachineController", func() {
 
 		By("setting the network interface id in the machine status")
 		oriMachine = &testingmachine.FakeMachine{Machine: *proto.Clone(&oriMachine.Machine).(*ori.Machine)}
+		oriMachine.Metadata.Generation = 1
+		oriMachine.Status.ObservedGeneration = 1
 		oriMachine.Status.NetworkInterfaces = []*ori.NetworkInterfaceStatus{
 			{
 				Name:   "primary",
@@ -166,6 +168,7 @@ var _ = Describe("MachineController", func() {
 		srv.SetMachines([]*testingmachine.FakeMachine{oriMachine})
 
 		By("waiting for the onmetal network interface to have a provider id set")
+		Eventually(Object(nic)).Should(HaveField("Spec.ProviderID", "primary-handle"))
 		Eventually(Object(machine)).Should(HaveField("Status.NetworkInterfaces", ConsistOf(MatchFields(IgnoreExtras, Fields{
 			"Name":   Equal("primary"),
 			"Handle": Equal("primary-handle"),
