@@ -29,7 +29,7 @@ import (
 	networkingclient "github.com/onmetal/onmetal-api/internal/client/networking"
 	storageclient "github.com/onmetal/onmetal-api/internal/client/storage"
 	computecontrollers "github.com/onmetal/onmetal-api/internal/controllers/compute"
-	"github.com/onmetal/onmetal-api/internal/controllers/compute/scheduler"
+	computescheduler "github.com/onmetal/onmetal-api/internal/controllers/compute/scheduler"
 	corecontrollers "github.com/onmetal/onmetal-api/internal/controllers/core"
 	certificateonmetal "github.com/onmetal/onmetal-api/internal/controllers/core/certificate/onmetal"
 	quotacontrollergeneric "github.com/onmetal/onmetal-api/internal/controllers/core/quota/generic"
@@ -37,6 +37,7 @@ import (
 	ipamcontrollers "github.com/onmetal/onmetal-api/internal/controllers/ipam"
 	networkingcontrollers "github.com/onmetal/onmetal-api/internal/controllers/networking"
 	storagecontrollers "github.com/onmetal/onmetal-api/internal/controllers/storage"
+	storagescheduler "github.com/onmetal/onmetal-api/internal/controllers/storage/scheduler"
 	quotaevaluatoronmetal "github.com/onmetal/onmetal-api/internal/quota/evaluator/onmetal"
 	"github.com/onmetal/onmetal-api/utils/quota"
 	"k8s.io/utils/lru"
@@ -73,11 +74,11 @@ const (
 	machineClassController                     = "machineclass"
 
 	// storage controllers
-	bucketScheduler         = "bucketscheduler"
-	bucketClassController   = "bucketclass"
-	volumeReleaseController = "volumerelease"
-	volumeScheduler         = "volumescheduler"
-	volumeClassController   = "volumeclass"
+	bucketScheduler           = "bucketscheduler"
+	bucketClassController     = "bucketclass"
+	volumeReleaseController   = "volumerelease"
+	volumeSchedulerController = "volumescheduler"
+	volumeClassController     = "volumeclass"
 
 	// ipam controllers
 	prefixController          = "prefix"
@@ -137,7 +138,7 @@ func main() {
 		bucketScheduler,
 		bucketClassController,
 		volumeReleaseController,
-		volumeScheduler,
+		volumeSchedulerController,
 		volumeClassController,
 
 		// ipam controllers
@@ -211,7 +212,7 @@ func main() {
 	}
 
 	if controllers.Enabled(machineSchedulerController) {
-		schedulerCache := scheduler.NewCache(mgr.GetLogger(), scheduler.DefaultCacheStrategy)
+		schedulerCache := computescheduler.NewCache(mgr.GetLogger(), computescheduler.DefaultCacheStrategy)
 		if err := mgr.Add(schedulerCache); err != nil {
 			setupLog.Error(err, "unable to create cache", "controller", "MachineSchedulerCache")
 			os.Exit(1)
@@ -220,7 +221,7 @@ func main() {
 		if err := (&computecontrollers.MachineScheduler{
 			Client:        mgr.GetClient(),
 			EventRecorder: mgr.GetEventRecorderFor("machine-scheduler"),
-			Cache:         scheduler.NewCache(logger, scheduler.DefaultCacheStrategy),
+			Cache:         schedulerCache,
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "MachineScheduler")
 			os.Exit(1)
@@ -270,10 +271,17 @@ func main() {
 		}
 	}
 
-	if controllers.Enabled(volumeScheduler) {
+	if controllers.Enabled(volumeSchedulerController) {
+		schedulerCache := storagescheduler.NewCache(mgr.GetLogger(), storagescheduler.DefaultCacheStrategy)
+		if err := mgr.Add(schedulerCache); err != nil {
+			setupLog.Error(err, "unable to create cache", "controller", "VolumeSchedulerCache")
+			os.Exit(1)
+		}
+
 		if err := (&storagecontrollers.VolumeScheduler{
 			EventRecorder: mgr.GetEventRecorderFor("volume-scheduler"),
 			Client:        mgr.GetClient(),
+			Cache:         schedulerCache,
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "VolumeScheduler")
 			os.Exit(1)
@@ -578,14 +586,14 @@ func main() {
 		}
 	}
 
-	if controllers.AnyEnabled(volumeScheduler) {
+	if controllers.AnyEnabled(volumeSchedulerController) {
 		if err := storageclient.SetupVolumeSpecVolumePoolRefNameFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
 			setupLog.Error(err, "unable to setup field indexer", "field", storageclient.VolumeSpecVolumePoolRefNameField)
 			os.Exit(1)
 		}
 	}
 
-	if controllers.AnyEnabled(volumeScheduler) {
+	if controllers.AnyEnabled(volumeSchedulerController) {
 		if err := storageclient.SetupVolumePoolAvailableVolumeClassesFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
 			setupLog.Error(err, "unable to setup field indexer", "field", storageclient.VolumePoolAvailableVolumeClassesField)
 			os.Exit(1)
