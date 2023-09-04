@@ -52,12 +52,6 @@ func readAPIServiceFiles(options *APIServiceInstallOptions) error {
 
 // renderAPIServices iterate through options.Paths and extract all APIService files.
 func renderAPIServices(options *APIServiceInstallOptions) ([]*apiregistrationv1.APIService, error) {
-	var (
-		err   error
-		info  os.FileInfo
-		files []os.FileInfo
-	)
-
 	type GVKN struct {
 		GVK  schema.GroupVersionKind
 		Name string
@@ -66,7 +60,12 @@ func renderAPIServices(options *APIServiceInstallOptions) ([]*apiregistrationv1.
 	apiServices := make(map[GVKN]*apiregistrationv1.APIService)
 
 	for _, path := range options.Paths {
-		var filePath = path
+		var (
+			filePath = path
+			err      error
+			info     os.FileInfo
+			files    []os.FileInfo
+		)
 
 		// Return the error if ErrorIfPathMissing exists
 		if info, err = os.Stat(path); os.IsNotExist(err) {
