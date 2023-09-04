@@ -22,6 +22,7 @@ import (
 
 	"go4.org/netipx"
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 )
@@ -76,6 +77,20 @@ type LocalUIDReference struct {
 	Name string `json:"name"`
 	// UID is the UID of the referenced entity.
 	UID types.UID `json:"uid"`
+}
+
+func LocalObjUIDRef(obj metav1.Object) LocalUIDReference {
+	return LocalUIDReference{
+		Name: obj.GetName(),
+		UID:  obj.GetUID(),
+	}
+}
+
+func NewLocalObjUIDRef(obj metav1.Object) *LocalUIDReference {
+	return &LocalUIDReference{
+		Name: obj.GetName(),
+		UID:  obj.GetUID(),
+	}
 }
 
 // UIDReference is a reference to another entity in a potentially different namespace including its UID.

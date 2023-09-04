@@ -18,9 +18,6 @@ import (
 	"context"
 	"fmt"
 
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
-	utilslices "github.com/onmetal/onmetal-api/utils/slices"
-	"golang.org/x/exp/slices"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -29,166 +26,112 @@ import (
 type ClaimState uint8
 
 const (
-	ClaimStateFree ClaimState = iota
+	ClaimStateInvalid ClaimState = iota
+	ClaimStateFree
 	ClaimStateClaimed
 	ClaimStateTaken
 )
 
-type Selector[O client.Object] interface {
-	Match(obj O) bool
+type Selector interface {
+	Match(obj client.Object) bool
 }
 
-type SelectorFunc[O client.Object] func(O) bool
+type SelectorFunc func(obj client.Object) bool
 
-func (f SelectorFunc[O]) Match(obj O) bool {
+func (f SelectorFunc) Match(obj client.Object) bool {
 	return f(obj)
 }
 
-type MatchingLabelSelector[O client.Object] struct {
-	Selector labels.Selector
-}
+type everythingSelector struct{}
 
-func (s MatchingLabelSelector[O]) Match(obj O) bool {
-	return s.Selector.Matches(labels.Set(obj.GetLabels()))
-}
-
-func MatchingLabels[O client.Object](lbls map[string]string) MatchingLabelSelector[O] {
-	return MatchingLabelSelector[O]{Selector: labels.SelectorFromSet(lbls)}
-}
-
-type ClaimStrategy[O client.Object] interface {
-	ClaimState(claimer client.Object, obj O) ClaimState
-	Adopt(ctx context.Context, claimer client.Object, obj O) error
-	Release(ctx context.Context, claimer client.Object, obj O) error
-}
-
-type LocalUIDReferenceAccessor interface {
-	IsTaken(otherRefs []commonv1alpha1.LocalUIDReference) bool
-	GetLocalUIDReferences() []commonv1alpha1.LocalUIDReference
-	SetLocalUIDReferences(refs []commonv1alpha1.LocalUIDReference)
-}
-
-type LocalUIDAccessorFor[O client.Object] func(obj O) LocalUIDReferenceAccessor
-
-type localUIDReferenceClaimStrategy[O client.Object] struct {
-	client      client.Client
-	accessorFor LocalUIDAccessorFor[O]
-}
-
-func (l *localUIDReferenceClaimStrategy[O]) ClaimState(claimer client.Object, obj O) ClaimState {
-	acc := l.accessorFor(obj)
-	refs := acc.GetLocalUIDReferences()
-	if len(refs) == 0 {
-		return ClaimStateFree
-	}
-	var otherRefs []commonv1alpha1.LocalUIDReference
-	for _, ref := range refs {
-		if ref.UID == claimer.GetUID() {
-			return ClaimStateClaimed
-		}
-		otherRefs = append(otherRefs, ref)
-	}
-	if acc.IsTaken(otherRefs) {
-		return ClaimStateTaken
-	}
-	return ClaimStateFree
-}
-
-func (l *localUIDReferenceClaimStrategy[O]) Adopt(ctx context.Context, claimer client.Object, obj O) error {
-	acc := l.accessorFor(obj)
-	refs := slices.Clone(acc.GetLocalUIDReferences())
-
-	base := obj.DeepCopyObject().(O)
-	refs = append(refs, commonv1alpha1.LocalUIDReference{
-		Name: claimer.GetName(),
-		UID:  claimer.GetUID(),
-	})
-	acc.SetLocalUIDReferences(refs)
-	return l.client.Patch(ctx, obj, client.MergeFromWithOptions(base, client.MergeFromWithOptimisticLock{}))
-}
-
-func (l *localUIDReferenceClaimStrategy[O]) Release(ctx context.Context, claimer client.Object, obj O) error {
-	acc := l.accessorFor(obj)
-	refs := slices.Clone(acc.GetLocalUIDReferences())
-
-	base := obj.DeepCopyObject().(O)
-	refs = utilslices.FilterNot(refs, commonv1alpha1.LocalUIDReference{
-		Name: claimer.GetName(),
-		UID:  claimer.GetUID(),
-	})
-	acc.SetLocalUIDReferences(refs)
-	return l.client.Patch(ctx, obj, client.MergeFromWithOptions(base, client.MergeFromWithOptimisticLock{}))
-}
-
-type LocalUIDReferencePointerAccessor struct {
-	LocalUIDReferenceField **commonv1alpha1.LocalUIDReference
-}
-
-func (l *LocalUIDReferencePointerAccessor) IsTaken([]commonv1alpha1.LocalUIDReference) bool {
+func (everythingSelector) Match(client.Object) bool {
 	return true
 }
 
-func (l *LocalUIDReferencePointerAccessor) GetLocalUIDReferences() []commonv1alpha1.LocalUIDReference {
-	ref := *l.LocalUIDReferenceField
-	if ref == nil {
-		return nil
-	}
-	return []commonv1alpha1.LocalUIDReference{*ref}
+var sharedEverythingSelector Selector = everythingSelector{}
+
+func EverythingSelector() Selector {
+	return sharedEverythingSelector
 }
 
-func (l *LocalUIDReferencePointerAccessor) SetLocalUIDReferences(refs []commonv1alpha1.LocalUIDReference) {
-	if len(refs) > 1 {
-		panic(fmt.Sprintf("cannot set more than one local uid reference (got %d): %v", len(refs), refs))
-	}
+type nothingSelector struct{}
 
-	if len(refs) == 1 {
-		ref := refs[0]
-		*l.LocalUIDReferenceField = &ref
-		return
-	}
-
-	*l.LocalUIDReferenceField = nil
+func (nothingSelector) Match(client.Object) bool {
+	return false
 }
 
-func AccessViaLocalUIDReferenceField[O client.Object](f func(obj O) **commonv1alpha1.LocalUIDReference) LocalUIDAccessorFor[O] {
-	return func(obj O) LocalUIDReferenceAccessor {
-		return &LocalUIDReferencePointerAccessor{
-			LocalUIDReferenceField: f(obj),
-		}
-	}
+var sharedNothingSelector Selector = nothingSelector{}
+
+func NothingSelector() Selector {
+	return sharedNothingSelector
 }
 
-func LocalUIDReferenceClaimStrategy[O client.Object](
-	c client.Client,
-	accessorFor LocalUIDAccessorFor[O],
-) ClaimStrategy[O] {
-	return &localUIDReferenceClaimStrategy[O]{
-		client:      c,
-		accessorFor: accessorFor,
-	}
+type MatchingLabelSelector struct {
+	Selector labels.Selector
 }
 
-type ClaimManager[O client.Object] struct {
+func (s MatchingLabelSelector) Match(obj client.Object) bool {
+	return s.Selector.Matches(labels.Set(obj.GetLabels()))
+}
+
+func MatchingLabels(lbls map[string]string) MatchingLabelSelector {
+	return MatchingLabelSelector{Selector: labels.SelectorFromSet(lbls)}
+}
+
+type ClaimStrategy interface {
+	ClaimState(claimer client.Object, obj client.Object) ClaimState
+	Adopt(ctx context.Context, claimer client.Object, obj client.Object) error
+	Release(ctx context.Context, claimer client.Object, obj client.Object) error
+}
+
+type ClaimStrategyFuncs struct {
+	ClaimStateFunc func(claimer client.Object, obj client.Object) ClaimState
+	AdoptFunc      func(ctx context.Context, claimer client.Object, obj client.Object) error
+	ReleaseFunc    func(ctx context.Context, claimer client.Object, obj client.Object) error
+}
+
+func (f ClaimStrategyFuncs) ClaimState(claimer client.Object, obj client.Object) ClaimState {
+	if f.ClaimStateFunc != nil {
+		return f.ClaimStateFunc(claimer, obj)
+	}
+	return ClaimStateInvalid
+}
+
+func (f ClaimStrategyFuncs) Adopt(ctx context.Context, claimer client.Object, obj client.Object) error {
+	if f.AdoptFunc != nil {
+		return f.AdoptFunc(ctx, claimer, obj)
+	}
+	return nil
+}
+
+func (f ClaimStrategyFuncs) Release(ctx context.Context, claimer client.Object, obj client.Object) error {
+	if f.ReleaseFunc != nil {
+		return f.ReleaseFunc(ctx, claimer, obj)
+	}
+	return nil
+}
+
+type ClaimManager struct {
 	claimer  client.Object
-	selector Selector[O]
-	strategy ClaimStrategy[O]
+	selector Selector
+	strategy ClaimStrategy
 }
 
-func New[O client.Object](
+func New(
 	claimer client.Object,
-	selector Selector[O],
-	strategy ClaimStrategy[O],
-) *ClaimManager[O] {
-	return &ClaimManager[O]{
+	selector Selector,
+	strategy ClaimStrategy,
+) *ClaimManager {
+	return &ClaimManager{
 		claimer:  claimer,
 		selector: selector,
 		strategy: strategy,
 	}
 }
 
-func (r *ClaimManager[O]) Claim(
+func (r *ClaimManager) Claim(
 	ctx context.Context,
-	obj O,
+	obj client.Object,
 ) (bool, error) {
 	switch claimState := r.strategy.ClaimState(r.claimer, obj); claimState {
 	case ClaimStateTaken:

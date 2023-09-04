@@ -39,6 +39,37 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
+type networkInterfaceClaimStrategy struct {
+	client.Client
+}
+
+func (s *networkInterfaceClaimStrategy) ClaimState(claimer client.Object, obj client.Object) claimmanager.ClaimState {
+	nic := obj.(*networkingv1alpha1.NetworkInterface)
+	if machineRef := nic.Spec.MachineRef; machineRef != nil {
+		if machineRef.UID == claimer.GetUID() {
+			return claimmanager.ClaimStateClaimed
+		}
+		return claimmanager.ClaimStateTaken
+	}
+	return claimmanager.ClaimStateFree
+}
+
+func (s *networkInterfaceClaimStrategy) Adopt(ctx context.Context, claimer client.Object, obj client.Object) error {
+	nic := obj.(*networkingv1alpha1.NetworkInterface)
+	base := nic.DeepCopy()
+	nic.Spec.MachineRef = commonv1alpha1.NewLocalObjUIDRef(claimer)
+	nic.Spec.ProviderID = ""
+	return s.Patch(ctx, nic, client.StrategicMergeFrom(base))
+}
+
+func (s *networkInterfaceClaimStrategy) Release(ctx context.Context, claimer client.Object, obj client.Object) error {
+	nic := obj.(*networkingv1alpha1.NetworkInterface)
+	base := nic.DeepCopy()
+	nic.Spec.ProviderID = ""
+	nic.Spec.MachineRef = nil
+	return s.Patch(ctx, nic, client.StrategicMergeFrom(base))
+}
+
 func (r *MachineReconciler) networkInterfaceNameToMachineNetworkInterfaceName(machine *computev1alpha1.Machine) map[string]string {
 	sel := make(map[string]string)
 	for _, machineNic := range machine.Spec.NetworkInterfaces {
@@ -48,35 +79,12 @@ func (r *MachineReconciler) networkInterfaceNameToMachineNetworkInterfaceName(ma
 	return sel
 }
 
-func (r *MachineReconciler) machineNetworkInterfaceSelector(machine *computev1alpha1.Machine) claimmanager.Selector[*networkingv1alpha1.NetworkInterface] {
+func (r *MachineReconciler) machineNetworkInterfaceSelector(machine *computev1alpha1.Machine) claimmanager.Selector {
 	names := sets.New(computev1alpha1.MachineNetworkInterfaceNames(machine)...)
-	return claimmanager.SelectorFunc[*networkingv1alpha1.NetworkInterface](func(nic *networkingv1alpha1.NetworkInterface) bool {
+	return claimmanager.SelectorFunc(func(obj client.Object) bool {
+		nic := obj.(*networkingv1alpha1.NetworkInterface)
 		return names.Has(nic.Name)
 	})
-}
-
-type networkInterfaceClaimStrategy struct {
-	client client.Client
-	claimmanager.ClaimStrategy[*networkingv1alpha1.NetworkInterface]
-}
-
-// Release overrides base release to also release provider ID.
-func (s networkInterfaceClaimStrategy) Release(ctx context.Context, _ client.Object, nic *networkingv1alpha1.NetworkInterface) error {
-	base := nic.DeepCopy()
-	nic.Spec.ProviderID = ""
-	nic.Spec.MachineRef = nil
-	return s.client.Patch(ctx, nic, client.StrategicMergeFrom(base))
-}
-
-func (r *MachineReconciler) networkInterfaceClaimStrategy() claimmanager.ClaimStrategy[*networkingv1alpha1.NetworkInterface] {
-	return networkInterfaceClaimStrategy{
-		client: r.Client,
-		ClaimStrategy: claimmanager.LocalUIDReferenceClaimStrategy(r.Client,
-			claimmanager.AccessViaLocalUIDReferenceField(func(nic *networkingv1alpha1.NetworkInterface) **commonv1alpha1.LocalUIDReference {
-				return &nic.Spec.MachineRef
-			}),
-		),
-	}
 }
 
 func (r *MachineReconciler) getNetworkInterfacesForMachine(ctx context.Context, machine *computev1alpha1.Machine) ([]networkingv1alpha1.NetworkInterface, error) {
@@ -89,7 +97,7 @@ func (r *MachineReconciler) getNetworkInterfacesForMachine(ctx context.Context, 
 
 	var (
 		sel      = r.machineNetworkInterfaceSelector(machine)
-		claimMgr = claimmanager.New[*networkingv1alpha1.NetworkInterface](machine, sel, r.networkInterfaceClaimStrategy())
+		claimMgr = claimmanager.New(machine, sel, &networkInterfaceClaimStrategy{r.Client})
 		nics     []networkingv1alpha1.NetworkInterface
 		errs     []error
 	)

@@ -37,11 +37,33 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-type MachineVolumeSelector map[string]computev1alpha1.Volume
+type volumeClaimStrategy struct {
+	client.Client
+}
 
-func (s MachineVolumeSelector) Match(volume *storagev1alpha1.Volume) bool {
-	_, ok := s[volume.Name]
-	return ok
+func (s *volumeClaimStrategy) ClaimState(claimer client.Object, obj client.Object) claimmanager.ClaimState {
+	volume := obj.(*storagev1alpha1.Volume)
+	if claimRef := volume.Spec.ClaimRef; claimRef != nil {
+		if claimRef.UID == claimer.GetUID() {
+			return claimmanager.ClaimStateClaimed
+		}
+		return claimmanager.ClaimStateTaken
+	}
+	return claimmanager.ClaimStateFree
+}
+
+func (s *volumeClaimStrategy) Adopt(ctx context.Context, claimer client.Object, obj client.Object) error {
+	volume := obj.(*storagev1alpha1.Volume)
+	base := volume.DeepCopy()
+	volume.Spec.ClaimRef = commonv1alpha1.NewLocalObjUIDRef(claimer)
+	return s.Patch(ctx, volume, client.StrategicMergeFrom(base))
+}
+
+func (s *volumeClaimStrategy) Release(ctx context.Context, claimer client.Object, obj client.Object) error {
+	volume := obj.(*storagev1alpha1.Volume)
+	base := volume.DeepCopy()
+	volume.Spec.ClaimRef = nil
+	return s.Patch(ctx, volume, client.StrategicMergeFrom(base))
 }
 
 func (r *MachineReconciler) volumeNameToMachineVolume(machine *computev1alpha1.Machine) map[string]computev1alpha1.Volume {
@@ -57,19 +79,12 @@ func (r *MachineReconciler) volumeNameToMachineVolume(machine *computev1alpha1.M
 	return sel
 }
 
-func (r *MachineReconciler) machineVolumeSelector(machine *computev1alpha1.Machine) claimmanager.Selector[*storagev1alpha1.Volume] {
+func (r *MachineReconciler) machineVolumeSelector(machine *computev1alpha1.Machine) claimmanager.Selector {
 	names := sets.New(computev1alpha1.MachineVolumeNames(machine)...)
-	return claimmanager.SelectorFunc[*storagev1alpha1.Volume](func(volume *storagev1alpha1.Volume) bool {
+	return claimmanager.SelectorFunc(func(obj client.Object) bool {
+		volume := obj.(*storagev1alpha1.Volume)
 		return names.Has(volume.Name)
 	})
-}
-
-func (r *MachineReconciler) volumeClaimStrategy() claimmanager.ClaimStrategy[*storagev1alpha1.Volume] {
-	return claimmanager.LocalUIDReferenceClaimStrategy(r.Client,
-		claimmanager.AccessViaLocalUIDReferenceField(func(volume *storagev1alpha1.Volume) **commonv1alpha1.LocalUIDReference {
-			return &volume.Spec.ClaimRef
-		}),
-	)
 }
 
 func (r *MachineReconciler) getVolumesForMachine(ctx context.Context, machine *computev1alpha1.Machine) ([]storagev1alpha1.Volume, error) {
@@ -82,7 +97,7 @@ func (r *MachineReconciler) getVolumesForMachine(ctx context.Context, machine *c
 
 	var (
 		sel      = r.machineVolumeSelector(machine)
-		claimMgr = claimmanager.New[*storagev1alpha1.Volume](machine, sel, r.volumeClaimStrategy())
+		claimMgr = claimmanager.New(machine, sel, &volumeClaimStrategy{r.Client})
 		volumes  []storagev1alpha1.Volume
 		errs     []error
 	)
