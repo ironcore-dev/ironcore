@@ -38,20 +38,22 @@ func init() {
 }
 
 // readAPIServiceFiles reads the directories of APIService in options.Paths and adds the APIService structs to options.APIServices.
-func readAPIServiceFiles(options *APIServiceInstallOptions) error {
-	if len(options.Paths) > 0 {
-		apiServiceList, err := renderAPIServices(options)
-		if err != nil {
-			return err
-		}
-
-		options.APIServices = append(options.APIServices, apiServiceList...)
+func readAPIServiceFiles(options *APIServerInstallOptions) error {
+	if len(options.Paths) == 0 {
+		return nil
 	}
+
+	apiServiceList, err := renderAPIServices(options)
+	if err != nil {
+		return err
+	}
+
+	options.APIServices = append(options.APIServices, apiServiceList...)
 	return nil
 }
 
 // renderAPIServices iterate through options.Paths and extract all APIService files.
-func renderAPIServices(options *APIServiceInstallOptions) ([]*apiregistrationv1.APIService, error) {
+func renderAPIServices(options *APIServerInstallOptions) ([]*apiregistrationv1.APIService, error) {
 	type GVKN struct {
 		GVK  schema.GroupVersionKind
 		Name string

@@ -47,11 +47,43 @@ const (
 )
 
 type APIServiceInstallOptions struct {
-	Paths              []string
-	ErrorIfPathMissing bool
-
 	ClientCertDir string
 	ClientCAData  []byte
+
+	APIServerInstallOptions
+
+	APIServers []APIServerInstallOptions
+}
+
+func (o *APIServiceInstallOptions) clientCertPath() string {
+	return filepath.Join(o.ClientCertDir, "client.crt")
+}
+
+func (o *APIServiceInstallOptions) clientKeyPath() string {
+	return filepath.Join(o.ClientCertDir, "client.key")
+}
+
+func (o *APIServiceInstallOptions) clientCACertPath() string {
+	return filepath.Join(o.ClientCertDir, "client-ca.crt")
+}
+
+func (o *APIServiceInstallOptions) AllAPIServerInstallOptions() []*APIServerInstallOptions {
+	opts := make([]*APIServerInstallOptions, 0, 1+len(o.APIServers))
+	opts = append(opts, &o.APIServerInstallOptions)
+	for i := range o.APIServers {
+		opts = append(opts, &o.APIServers[i])
+	}
+	return opts
+}
+
+func (o *APIServiceInstallOptions) AddAPIServerInstallOptions(opts APIServerInstallOptions) *APIServerInstallOptions {
+	o.APIServers = append(o.APIServers, opts)
+	return &o.APIServers[len(o.APIServers)-1]
+}
+
+type APIServerInstallOptions struct {
+	Paths              []string
+	ErrorIfPathMissing bool
 
 	// LocalServingCertDir is the allocated directory for serving certificates.
 	// it will be automatically populated by the local temp dir
@@ -69,31 +101,19 @@ type APIServiceInstallOptions struct {
 	ServiceName      string
 }
 
-func (o *APIServiceInstallOptions) tlsCertPath() string {
+func (o *APIServerInstallOptions) tlsCertPath() string {
 	return filepath.Join(o.LocalServingCertDir, "tls.crt")
 }
 
-func (o *APIServiceInstallOptions) tlsKeyPath() string {
+func (o *APIServerInstallOptions) tlsKeyPath() string {
 	return filepath.Join(o.LocalServingCertDir, "tls.key")
 }
 
-func (o *APIServiceInstallOptions) caCertPath() string {
+func (o *APIServerInstallOptions) caCertPath() string {
 	return filepath.Join(o.LocalServingCertDir, "ca.crt")
 }
 
-func (o *APIServiceInstallOptions) clientCertPath() string {
-	return filepath.Join(o.ClientCertDir, "client.crt")
-}
-
-func (o *APIServiceInstallOptions) clientKeyPath() string {
-	return filepath.Join(o.ClientCertDir, "client.key")
-}
-
-func (o *APIServiceInstallOptions) clientCACertPath() string {
-	return filepath.Join(o.ClientCertDir, "client-ca.crt")
-}
-
-func (o *APIServiceInstallOptions) setupCA() error {
+func (o *APIServerInstallOptions) setupCA() error {
 	apiServiceCA, err := certs.NewTinyCA()
 	if err != nil {
 		return fmt.Errorf("unable to set up api service CA: %v", err)
@@ -130,7 +150,7 @@ func (o *APIServiceInstallOptions) setupCA() error {
 	return err
 }
 
-func (o *APIServiceInstallOptions) generateHostPort() (string, int, error) {
+func (o *APIServerInstallOptions) generateHostPort() (string, int, error) {
 	if o.LocalServingPort == 0 {
 		port, host, err := addr.Suggest(o.LocalServingHost)
 		if err != nil {
@@ -146,7 +166,7 @@ func (o *APIServiceInstallOptions) generateHostPort() (string, int, error) {
 	return host, o.LocalServingPort, nil
 }
 
-func (o *APIServiceInstallOptions) generateService(cfg *rest.Config) (namespace, name string, err error) {
+func (o *APIServerInstallOptions) generateService(cfg *rest.Config) (namespace, name string, err error) {
 	ctx := context.TODO()
 	c, err := client.New(cfg, client.Options{})
 	if err != nil {
@@ -194,7 +214,7 @@ func (o *APIServiceInstallOptions) generateService(cfg *rest.Config) (namespace,
 // ModifyAPIServiceDefinitions modifies APIService definitions by:
 // - applying CABundle based on the provided tinyca
 // - applying service based on the created service
-func (o *APIServiceInstallOptions) ModifyAPIServiceDefinitions(cfg *rest.Config) error {
+func (o *APIServerInstallOptions) ModifyAPIServiceDefinitions(cfg *rest.Config) error {
 	// generate host port.
 	_, port, err := o.generateHostPort()
 	if err != nil {
@@ -256,7 +276,7 @@ func (o *APIServiceInstallOptions) SetupClientCA() error {
 	return err
 }
 
-func (o *APIServiceInstallOptions) PrepWithoutInstalling(cfg *rest.Config) error {
+func (o *APIServerInstallOptions) PrepWithoutInstalling(cfg *rest.Config) error {
 	if err := o.setupCA(); err != nil {
 		return fmt.Errorf("error setting up ca: %w", err)
 	}
@@ -279,16 +299,18 @@ func (o *APIServiceInstallOptions) PrepWithoutInstalling(cfg *rest.Config) error
 }
 
 func (o *APIServiceInstallOptions) Install(cfg *rest.Config) error {
-	if err := readAPIServiceFiles(o); err != nil {
-		return fmt.Errorf("error reading api services: %w", err)
-	}
+	for _, srv := range o.AllAPIServerInstallOptions() {
+		if err := readAPIServiceFiles(srv); err != nil {
+			return fmt.Errorf("error reading api services: %w", err)
+		}
 
-	if err := o.PrepWithoutInstalling(cfg); err != nil {
-		return fmt.Errorf("[aggregated api server] error preparing: %w", err)
-	}
+		if err := srv.PrepWithoutInstalling(cfg); err != nil {
+			return fmt.Errorf("[aggregated api server] error preparing: %w", err)
+		}
 
-	if err := o.ApplyAPIServices(cfg); err != nil {
-		return fmt.Errorf("[aggregated api server] error installing: %w", err)
+		if err := srv.ApplyAPIServices(cfg); err != nil {
+			return fmt.Errorf("[aggregated api server] error installing: %w", err)
+		}
 	}
 
 	return nil
@@ -300,7 +322,7 @@ func (o *APIServiceInstallOptions) Stop() error {
 
 const fieldOwner = client.FieldOwner("envtest.onmetal-api.onmetal.de")
 
-func (o *APIServiceInstallOptions) ApplyAPIServices(cfg *rest.Config) error {
+func (o *APIServerInstallOptions) ApplyAPIServices(cfg *rest.Config) error {
 	ctx := context.TODO()
 	c, err := client.New(cfg, client.Options{})
 	if err != nil {
@@ -342,6 +364,10 @@ type EnvironmentExtensions struct {
 	ErrorIfAPIServicePathIsMissing bool
 
 	AdditionalServices []AdditionalService
+}
+
+func (e *EnvironmentExtensions) AddAPIServerInstallOptions(opts APIServerInstallOptions) *APIServerInstallOptions {
+	return e.APIServiceInstallOptions.AddAPIServerInstallOptions(opts)
 }
 
 func (e *EnvironmentExtensions) GetAdditionalServiceHost(name string) string {
@@ -576,7 +602,10 @@ func WaitUntilGroupVersionsDiscoverableWithTimeout(timeout time.Duration, c clie
 }
 
 func WaitUntilAPIServicesReady(ctx context.Context, ext *EnvironmentExtensions, c client.Client, scheme *runtime.Scheme) error {
-	apiServices := ext.APIServiceInstallOptions.APIServices
+	var apiServices []*apiregistrationv1.APIService
+	for _, srv := range ext.APIServiceInstallOptions.AllAPIServerInstallOptions() {
+		apiServices = append(apiServices, srv.APIServices...)
+	}
 
 	if err := WaitUntilAPIServicesAvailable(ctx, c, apiServices...); err != nil {
 		return fmt.Errorf("error waiting for api services to be available: %w", err)
