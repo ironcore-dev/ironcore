@@ -85,7 +85,7 @@ jobs:
         endpoint: builders # self-hosted
     - name: Login to GHCR
       if: github.event_name != 'pull_request'
-      uses: docker/login-action@v2
+      uses: docker/login-action@v3
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
