@@ -32,6 +32,7 @@ import (
 
 type StorageProvider struct {
 	MachinePoolletClientConfig machinepoolletclient.MachinePoolletClientConfig
+	GroupsToShowPoolResources  []string
 }
 
 func (p StorageProvider) GroupName() string {
@@ -62,7 +63,7 @@ func (p StorageProvider) v1alpha1Storage(restOptionsGetter generic.RESTOptionsGe
 
 	storageMap["machineclasses"] = machineClassStorage.MachineClass
 
-	machinePoolStorage, err := machinepoolstorage.NewStorage(restOptionsGetter, p.MachinePoolletClientConfig)
+	machinePoolStorage, err := machinepoolstorage.NewStorage(restOptionsGetter, p.MachinePoolletClientConfig, p.GroupsToShowPoolResources)
 	if err != nil {
 		return storageMap, err
 	}

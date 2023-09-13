@@ -16,7 +16,11 @@ package storage
 
 import (
 	"context"
+	"errors"
 	"fmt"
+
+	"github.com/onmetal/onmetal-api/internal/rbac"
+	metainternalversion "k8s.io/apimachinery/pkg/apis/meta/internalversion"
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	"github.com/onmetal/onmetal-api/internal/apis/compute"
@@ -33,6 +37,48 @@ import (
 
 type REST struct {
 	*genericregistry.Store
+	groupsToShowPoolResources []string
+}
+
+func (e *REST) Get(ctx context.Context, name string, options *metav1.GetOptions) (runtime.Object, error) {
+	obj, err := e.Store.Get(ctx, name, options)
+	if err != nil {
+		return nil, err
+	}
+
+	if rbac.UserIsMemberOf(ctx, e.groupsToShowPoolResources) {
+		return obj, nil
+	}
+
+	pool, ok := obj.(*compute.MachinePool)
+	if !ok {
+		return nil, errors.New("failed to ")
+	}
+	pool.Status.Allocatable = nil
+	pool.Status.Capacity = nil
+
+	return pool, nil
+}
+
+func (e *REST) List(ctx context.Context, options *metainternalversion.ListOptions) (runtime.Object, error) {
+	println("list")
+	objList, err := e.Store.List(ctx, options)
+
+	if rbac.UserIsMemberOf(ctx, e.groupsToShowPoolResources) {
+		return objList, err
+	}
+
+	pools, ok := objList.(*compute.MachinePoolList)
+	if !ok {
+		return nil, err
+	}
+
+	for index := range pools.Items {
+		pools.Items[index].Status.Allocatable = nil
+		pools.Items[index].Status.Capacity = nil
+	}
+
+	return pools, nil
 }
 
 type MachinePoolStorage struct {
@@ -41,7 +87,7 @@ type MachinePoolStorage struct {
 	MachinePoolletConnectionInfo client.ConnectionInfoGetter
 }
 
-func NewStorage(optsGetter generic.RESTOptionsGetter, machinePoolletClientConfig client.MachinePoolletClientConfig) (MachinePoolStorage, error) {
+func NewStorage(optsGetter generic.RESTOptionsGetter, machinePoolletClientConfig client.MachinePoolletClientConfig, groupsToShowPoolResources []string) (MachinePoolStorage, error) {
 	store := &genericregistry.Store{
 		NewFunc: func() runtime.Object {
 			return &compute.MachinePool{}
@@ -69,7 +115,10 @@ func NewStorage(optsGetter generic.RESTOptionsGetter, machinePoolletClientConfig
 	statusStore.UpdateStrategy = machinepool.StatusStrategy
 	statusStore.ResetFieldsStrategy = machinepool.StatusStrategy
 
-	machinePoolRest := &REST{store}
+	machinePoolRest := &REST{
+		Store:                     store,
+		groupsToShowPoolResources: groupsToShowPoolResources,
+	}
 	statusRest := &StatusREST{&statusStore}
 
 	// Build a MachinePoolGetter that looks up nodes using the REST handler

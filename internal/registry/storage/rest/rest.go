@@ -33,7 +33,9 @@ import (
 	serverstorage "k8s.io/apiserver/pkg/server/storage"
 )
 
-type StorageProvider struct{}
+type StorageProvider struct {
+	GroupsToShowPoolResources []string
+}
 
 func (p StorageProvider) GroupName() string {
 	return storage.SchemeGroupVersion.Group
@@ -63,7 +65,7 @@ func (p StorageProvider) v1alpha1Storage(restOptionsGetter generic.RESTOptionsGe
 
 	storageMap["volumeclasses"] = volumeClassStorage.VolumeClass
 
-	volumePoolStorage, err := volumepoolstorage.NewStorage(restOptionsGetter)
+	volumePoolStorage, err := volumepoolstorage.NewStorage(restOptionsGetter, p.GroupsToShowPoolResources)
 	if err != nil {
 		return storageMap, err
 	}

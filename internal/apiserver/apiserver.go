@@ -38,6 +38,9 @@ var (
 type ExtraConfig struct {
 	APIResourceConfigSource serverstorage.APIResourceConfigSource
 	MachinePoolletConfig    client.MachinePoolletClientConfig
+
+	//GroupsToShowPoolResources define the group membership to show the pool resources
+	GroupsToShowPoolResources []string
 }
 
 // Config defines the config for the apiserver
@@ -98,9 +101,12 @@ func (c completedConfig) New() (*OnmetalAPIServer, error) {
 		corerest.StorageProvider{},
 		computerest.StorageProvider{
 			MachinePoolletClientConfig: c.ExtraConfig.MachinePoolletConfig,
+			GroupsToShowPoolResources:  c.ExtraConfig.GroupsToShowPoolResources,
 		},
 		networkingrest.StorageProvider{},
-		storagerest.StorageProvider{},
+		storagerest.StorageProvider{
+			GroupsToShowPoolResources: c.ExtraConfig.GroupsToShowPoolResources,
+		},
 	}
 
 	var apiGroupsInfos []*genericapiserver.APIGroupInfo

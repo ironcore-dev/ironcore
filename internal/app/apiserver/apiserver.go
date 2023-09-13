@@ -80,6 +80,8 @@ type OnmetalAPIServerOptions struct {
 	MachinePoolletConfig client.MachinePoolletClientConfig
 
 	SharedInformerFactory informers.SharedInformerFactory
+
+	GroupsToShowPoolResources []string
 }
 
 func (o *OnmetalAPIServerOptions) AddFlags(fs *pflag.FlagSet) {
@@ -100,6 +102,9 @@ func (o *OnmetalAPIServerOptions) AddFlags(fs *pflag.FlagSet) {
 
 	fs.StringVar(&o.MachinePoolletConfig.CAFile, "machinepoollet-certificate-authority", o.MachinePoolletConfig.CAFile,
 		"Path to a cert file for the certificate authority.")
+
+	fs.StringSliceVar(&o.GroupsToShowPoolResources, "pool-status-view-allowed-groups", o.GroupsToShowPoolResources,
+		"Groups needed to show pool resources.")
 }
 
 func NewOnmetalAPIServerOptions() *OnmetalAPIServerOptions {
@@ -237,8 +242,9 @@ func (o *OnmetalAPIServerOptions) Config() (*apiserver.Config, error) {
 	config := &apiserver.Config{
 		GenericConfig: serverConfig,
 		ExtraConfig: apiserver.ExtraConfig{
-			APIResourceConfigSource: apiResourceConfig,
-			MachinePoolletConfig:    o.MachinePoolletConfig,
+			APIResourceConfigSource:   apiResourceConfig,
+			MachinePoolletConfig:      o.MachinePoolletConfig,
+			GroupsToShowPoolResources: o.GroupsToShowPoolResources,
 		},
 	}
 

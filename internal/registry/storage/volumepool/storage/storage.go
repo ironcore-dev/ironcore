@@ -18,7 +18,9 @@ import (
 	"context"
 
 	"github.com/onmetal/onmetal-api/internal/apis/storage"
+	"github.com/onmetal/onmetal-api/internal/rbac"
 	"github.com/onmetal/onmetal-api/internal/registry/storage/volumepool"
+	metainternalversion "k8s.io/apimachinery/pkg/apis/meta/internalversion"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apiserver/pkg/registry/generic"
@@ -29,6 +31,47 @@ import (
 
 type REST struct {
 	*genericregistry.Store
+	groupsToShowPoolResources []string
+}
+
+func (e *REST) Get(ctx context.Context, name string, options *metav1.GetOptions) (runtime.Object, error) {
+	obj, err := e.Store.Get(ctx, name, options)
+	if err != nil {
+		return nil, err
+	}
+
+	if rbac.UserIsMemberOf(ctx, e.groupsToShowPoolResources) {
+		return obj, err
+	}
+
+	pool, ok := obj.(*storage.VolumePool)
+	if !ok {
+		return nil, err
+	}
+	pool.Status.Allocatable = nil
+	pool.Status.Capacity = nil
+
+	return pool, nil
+}
+
+func (e *REST) List(ctx context.Context, options *metainternalversion.ListOptions) (runtime.Object, error) {
+	objList, err := e.Store.List(ctx, options)
+
+	if rbac.UserIsMemberOf(ctx, e.groupsToShowPoolResources) {
+		return objList, err
+	}
+
+	pools, ok := objList.(*storage.VolumePoolList)
+	if !ok {
+		return nil, err
+	}
+
+	for index := range pools.Items {
+		pools.Items[index].Status.Allocatable = nil
+		pools.Items[index].Status.Capacity = nil
+	}
+
+	return pools, nil
 }
 
 type VolumePoolStorage struct {
@@ -36,7 +79,7 @@ type VolumePoolStorage struct {
 	Status     *StatusREST
 }
 
-func NewStorage(optsGetter generic.RESTOptionsGetter) (VolumePoolStorage, error) {
+func NewStorage(optsGetter generic.RESTOptionsGetter, groupsToShowPoolResources []string) (VolumePoolStorage, error) {
 	store := &genericregistry.Store{
 		NewFunc: func() runtime.Object {
 			return &storage.VolumePool{}
@@ -65,8 +108,11 @@ func NewStorage(optsGetter generic.RESTOptionsGetter) (VolumePoolStorage, error)
 	statusStore.ResetFieldsStrategy = volumepool.StatusStrategy
 
 	return VolumePoolStorage{
-		VolumePool: &REST{store},
-		Status:     &StatusREST{&statusStore},
+		VolumePool: &REST{
+			Store:                     store,
+			groupsToShowPoolResources: groupsToShowPoolResources,
+		},
+		Status: &StatusREST{&statusStore},
 	}, nil
 }
 

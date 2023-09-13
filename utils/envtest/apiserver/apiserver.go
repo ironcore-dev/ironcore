@@ -93,10 +93,12 @@ type Options struct {
 
 	HealthTimeout time.Duration
 	WaitTimeout   time.Duration
+
+	GroupsToShowPoolResources []string
 }
 
 func MergeArgs(customArgs, defaultArgs ProcessArgs) ProcessArgs {
-	res := make(ProcessArgs)
+	res := EmptyProcessArgs()
 	for key, value := range defaultArgs {
 		res[key] = value
 	}
@@ -127,7 +129,11 @@ func setAPIServerOptionsDefaults(opts *Options) {
 		opts.Stderr = os.Stderr
 	}
 	if opts.Args == nil {
-		opts.Args = make(ProcessArgs)
+		opts.Args = EmptyProcessArgs()
+	}
+
+	if opts.GroupsToShowPoolResources != nil {
+		opts.Args.Set("pool-status-view-allowed-groups", opts.GroupsToShowPoolResources...)
 	}
 }
 
