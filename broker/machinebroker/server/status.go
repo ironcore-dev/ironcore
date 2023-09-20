@@ -131,7 +131,12 @@ func (s *Server) Status(ctx context.Context, req *ori.StatusRequest) (*ori.Statu
 	availableOnmetalMachineClasses := s.filterOnmetalMachineClasses(availableOnmetalMachineClassNames, onmetalMachineClassList.Items)
 	machineClassStatus := make([]*ori.MachineClassStatus, 0, len(availableOnmetalMachineClasses))
 	for _, onmetalMachineClass := range availableOnmetalMachineClasses {
-		machineClass, err := s.convertOnmetalMachineClassStatus(&onmetalMachineClass, machineClassQuantity[onmetalMachineClass.Name])
+		quantity, ok := machineClassQuantity[onmetalMachineClass.Name]
+		if !ok {
+			continue
+		}
+
+		machineClass, err := s.convertOnmetalMachineClassStatus(&onmetalMachineClass, quantity)
 		if err != nil {
 			return nil, fmt.Errorf("error converting onmetal machine class %s: %w", onmetalMachineClass.Name, err)
 		}

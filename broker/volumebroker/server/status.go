@@ -130,7 +130,12 @@ func (s *Server) Status(ctx context.Context, req *ori.StatusRequest) (*ori.Statu
 	availableOnmetalVolumeClasses := s.filterOnmetalVolumeClasses(availableOnmetalVolumeClassNames, onmetalVolumeClassList.Items)
 	volumeClassStatus := make([]*ori.VolumeClassStatus, 0, len(availableOnmetalVolumeClasses))
 	for _, onmetalVolumeClass := range availableOnmetalVolumeClasses {
-		volumeClass, err := s.convertOnmetalVolumeClassStatus(&onmetalVolumeClass, volumeClassQuantity[onmetalVolumeClass.Name])
+		quantity, ok := volumeClassQuantity[onmetalVolumeClass.Name]
+		if !ok {
+			continue
+		}
+
+		volumeClass, err := s.convertOnmetalVolumeClassStatus(&onmetalVolumeClass, quantity)
 		if err != nil {
 			return nil, fmt.Errorf("error converting onmetal volume class %s: %w", onmetalVolumeClass.Name, err)
 		}
