@@ -36,6 +36,7 @@ import (
 	"k8s.io/utils/lru"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/envtest/komega"
+	metricserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
 
@@ -126,8 +127,10 @@ var _ = BeforeSuite(func() {
 	DeferCleanup(cancel)
 
 	k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
-		Scheme:             scheme.Scheme,
-		MetricsBindAddress: "0",
+		Scheme: scheme.Scheme,
+		Metrics: metricserver.Options{
+			BindAddress: "0",
+		},
 	})
 	Expect(err).ToNot(HaveOccurred())
 
