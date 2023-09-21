@@ -38,7 +38,7 @@ type MachineEphemeralNetworkInterfaceReconciler struct {
 }
 
 //+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machines,verbs=get;list;watch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces,verbs=get;list;watch;delete
+//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces,verbs=get;list;watch;create;update;delete
 
 func (r *MachineEphemeralNetworkInterfaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
