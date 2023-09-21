@@ -25,6 +25,7 @@ import (
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
+	storageclient "github.com/onmetal/onmetal-api/internal/client/storage"
 	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
 	oriremotevolume "github.com/onmetal/onmetal-api/ori/remote/volume"
 	"github.com/onmetal/onmetal-api/poollet/orievent"
@@ -203,6 +204,11 @@ func Run(ctx context.Context, opts Options) error {
 	}
 	if err := mgr.AddHealthzCheck("volume-events", volumeEvents.Check); err != nil {
 		return fmt.Errorf("error adding volume event generator healthz check: %w", err)
+	}
+
+	indexer := mgr.GetFieldIndexer()
+	if err := storageclient.SetupVolumeSpecVolumePoolRefNameFieldIndexer(ctx, indexer); err != nil {
+		return fmt.Errorf("error setting up %s indexer with manager: %w", storageclient.VolumeSpecVolumePoolRefNameField, err)
 	}
 
 	onInitialized := func(ctx context.Context) error {
