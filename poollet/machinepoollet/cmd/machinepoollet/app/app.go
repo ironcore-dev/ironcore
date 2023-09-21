@@ -27,6 +27,7 @@ import (
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
+	computeclient "github.com/onmetal/onmetal-api/internal/client/compute"
 	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
 	oriremotemachine "github.com/onmetal/onmetal-api/ori/remote/machine"
 	"github.com/onmetal/onmetal-api/poollet/machinepoollet/addresses"
@@ -288,6 +289,10 @@ func Run(ctx context.Context, opts Options) error {
 	}
 	if err := machinepoolletclient.SetupMachineSpecVolumeNamesField(ctx, indexer, opts.MachinePoolName); err != nil {
 		return fmt.Errorf("error setting up %s indexer with manager: %w", machinepoolletclient.MachineSpecVolumeNamesField, err)
+	}
+
+	if err := computeclient.SetupMachineSpecMachinePoolRefNameFieldIndexer(ctx, indexer); err != nil {
+		return fmt.Errorf("error setting up %s indexer with manager: %w", computeclient.MachineSpecMachinePoolRefNameField, err)
 	}
 
 	onInitialized := func(ctx context.Context) error {
