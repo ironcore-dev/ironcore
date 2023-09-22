@@ -134,7 +134,7 @@ func (s *Server) Status(ctx context.Context, req *ori.StatusRequest) (*ori.Statu
 	availableOnmetalMachineClasses := s.filterOnmetalMachineClasses(availableOnmetalMachineClassNames, onmetalMachineClassList.Items)
 	machineClassStatus := make([]*ori.MachineClassStatus, 0, len(availableOnmetalMachineClasses))
 	for _, onmetalMachineClass := range availableOnmetalMachineClasses {
-		quantity, ok := machineClassQuantity[onmetalMachineClass.Name]
+		quantity, ok := machineClassQuantity[string(corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, onmetalMachineClass.Name))]
 		if !ok {
 			continue
 		}
