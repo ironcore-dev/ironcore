@@ -100,7 +100,7 @@ func (s *Server) convertOnmetalVolumeClassStatus(volumeClass *storagev1alpha1.Vo
 				Iops: iops.Value(),
 			},
 		},
-		Quantity: quantity.AsDec().UnscaledBig().Int64(),
+		Quantity: quantity.Value(),
 	}, nil
 }
 
@@ -133,7 +133,7 @@ func (s *Server) Status(ctx context.Context, req *ori.StatusRequest) (*ori.Statu
 	availableOnmetalVolumeClasses := s.filterOnmetalVolumeClasses(availableOnmetalVolumeClassNames, onmetalVolumeClassList.Items)
 	volumeClassStatus := make([]*ori.VolumeClassStatus, 0, len(availableOnmetalVolumeClasses))
 	for _, onmetalVolumeClass := range availableOnmetalVolumeClasses {
-		quantity, ok := volumeClassQuantity[onmetalVolumeClass.Name]
+		quantity, ok := volumeClassQuantity[string(corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeVolumeClass, onmetalVolumeClass.Name))]
 		if !ok {
 			continue
 		}
