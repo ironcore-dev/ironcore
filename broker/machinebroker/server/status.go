@@ -64,6 +64,9 @@ func (s *Server) gatherMachineClassQuantity(onmetalMachinePools []computev1alpha
 	for _, onmetalMachinePool := range onmetalMachinePools {
 		for resourceName, resourceQuantity := range onmetalMachinePool.Status.Capacity {
 			if corev1alpha1.IsClassCountResource(resourceName) {
+				if _, ok := res[string(resourceName)]; !ok {
+					res[string(resourceName)] = resource.NewQuantity(0, resource.DecimalSI)
+				}
 				res[string(resourceName)].Add(resourceQuantity)
 			}
 		}
