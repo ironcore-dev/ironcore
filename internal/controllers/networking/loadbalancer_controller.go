@@ -26,6 +26,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
@@ -188,40 +189,73 @@ func (r *LoadBalancerReconciler) applyRouting(
 }
 
 func (r *LoadBalancerReconciler) enqueueByNetworkInterface() handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
-		nic := obj.(*networkingv1alpha1.NetworkInterface)
-		log := ctrl.LoggerFrom(ctx, "NetworkInterfaceKey", client.ObjectKeyFromObject(nic))
-
+	getEnqueueFunc := func(ctx context.Context, nic *networkingv1alpha1.NetworkInterface) func(nics []*networkingv1alpha1.NetworkInterface, queue workqueue.RateLimitingInterface) {
+		log := ctrl.LoggerFrom(ctx)
 		loadBalancerList := &networkingv1alpha1.LoadBalancerList{}
 		if err := r.List(ctx, loadBalancerList,
 			client.InNamespace(nic.Namespace),
 			client.MatchingFields{networking.LoadBalancerNetworkNameField: nic.Spec.NetworkRef.Name},
 		); err != nil {
-			log.Error(err, "Error listing loadbalancers for network")
+			log.Error(err, "Error listing network interfaces")
 			return nil
 		}
 
-		var res []ctrl.Request
-		for _, loadBalancer := range loadBalancerList.Items {
-			loadBalancerKey := client.ObjectKeyFromObject(&loadBalancer)
-			log := log.WithValues("LoadBalancerKey", loadBalancerKey)
-			nicSelector := loadBalancer.Spec.NetworkInterfaceSelector
-			if nicSelector == nil {
-				return nil
-			}
+		return func(nics []*networkingv1alpha1.NetworkInterface, queue workqueue.RateLimitingInterface) {
+			for _, loadBalancer := range loadBalancerList.Items {
+				loadBalancerKey := client.ObjectKeyFromObject(&loadBalancer)
+				log := log.WithValues("LoadBalancerKey", loadBalancerKey)
+				nicSelector := loadBalancer.Spec.NetworkInterfaceSelector
+				if nicSelector == nil {
+					return
+				}
 
-			sel, err := metav1.LabelSelectorAsSelector(nicSelector)
-			if err != nil {
-				log.Error(err, "Invalid network interface selector")
-				continue
-			}
+				sel, err := metav1.LabelSelectorAsSelector(nicSelector)
+				if err != nil {
+					log.Error(err, "Invalid network interface selector")
+					continue
+				}
 
-			if sel.Matches(labels.Set(nic.Labels)) {
-				res = append(res, ctrl.Request{NamespacedName: loadBalancerKey})
+				for _, nic := range nics {
+					if sel.Matches(labels.Set(nic.Labels)) {
+						queue.Add(ctrl.Request{NamespacedName: loadBalancerKey})
+						break
+					}
+				}
 			}
 		}
-		return res
-	})
+	}
+
+	return handler.Funcs{
+		CreateFunc: func(ctx context.Context, evt event.CreateEvent, queue workqueue.RateLimitingInterface) {
+			nic := evt.Object.(*networkingv1alpha1.NetworkInterface)
+			enqueueFunc := getEnqueueFunc(ctx, nic)
+			if enqueueFunc != nil {
+				enqueueFunc([]*networkingv1alpha1.NetworkInterface{nic}, queue)
+			}
+		},
+		UpdateFunc: func(ctx context.Context, evt event.UpdateEvent, queue workqueue.RateLimitingInterface) {
+			newNic := evt.ObjectNew.(*networkingv1alpha1.NetworkInterface)
+			oldNic := evt.ObjectOld.(*networkingv1alpha1.NetworkInterface)
+			enqueueFunc := getEnqueueFunc(ctx, newNic)
+			if enqueueFunc != nil {
+				enqueueFunc([]*networkingv1alpha1.NetworkInterface{newNic, oldNic}, queue)
+			}
+		},
+		DeleteFunc: func(ctx context.Context, evt event.DeleteEvent, queue workqueue.RateLimitingInterface) {
+			nic := evt.Object.(*networkingv1alpha1.NetworkInterface)
+			enqueueFunc := getEnqueueFunc(ctx, nic)
+			if enqueueFunc != nil {
+				enqueueFunc([]*networkingv1alpha1.NetworkInterface{nic}, queue)
+			}
+		},
+		GenericFunc: func(ctx context.Context, evt event.GenericEvent, queue workqueue.RateLimitingInterface) {
+			nic := evt.Object.(*networkingv1alpha1.NetworkInterface)
+			enqueueFunc := getEnqueueFunc(ctx, nic)
+			if enqueueFunc != nil {
+				enqueueFunc([]*networkingv1alpha1.NetworkInterface{nic}, queue)
+			}
+		},
+	}
 }
 
 func (r *LoadBalancerReconciler) enqueueByNetwork() handler.EventHandler {

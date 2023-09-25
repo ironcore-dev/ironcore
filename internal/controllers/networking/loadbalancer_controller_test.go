@@ -123,5 +123,19 @@ var _ = Describe("LoadBalancerReconciler", func() {
 				},
 			}),
 		))
+
+		By("removing the labels from the network interface")
+		Eventually(Update(nic, func() {
+			nic.Labels = nil
+		})).Should(Succeed())
+
+		By("waiting for the load balancer routing to be updated")
+		Eventually(Object(loadBalancerRouting)).Should(SatisfyAll(
+			HaveField("NetworkRef", commonv1alpha1.LocalUIDReference{
+				Name: network.Name,
+				UID:  network.UID,
+			}),
+			HaveField("Destinations", BeEmpty()),
+		))
 	})
 })
