@@ -76,7 +76,7 @@ var _ = Describe("VolumeController", func() {
 		Expect(oriVolume.Spec.Image).To(Equal(""))
 		Expect(oriVolume.Spec.Class).To(Equal(vc.Name))
 		Expect(oriVolume.Spec.Encryption).To(BeNil())
-		Expect(oriVolume.Spec.Resources.StorageBytes).To(Equal(uint64(size.Value())))
+		Expect(oriVolume.Spec.Resources.StorageBytes).To(Equal(size.Value()))
 
 		oriVolume.Status.Access = &ori.VolumeAccess{
 			Driver: volumeDriver,
@@ -161,7 +161,7 @@ var _ = Describe("VolumeController", func() {
 
 		Expect(oriVolume.Spec.Image).To(Equal(""))
 		Expect(oriVolume.Spec.Class).To(Equal(vc.Name))
-		Expect(oriVolume.Spec.Resources.StorageBytes).To(Equal(uint64(size.Value())))
+		Expect(oriVolume.Spec.Resources.StorageBytes).To(Equal(size.Value()))
 		Expect(oriVolume.Spec.Encryption.SecretData).NotTo(HaveKeyWithValue(encryptionDataKey, encryptionData))
 
 	})
@@ -196,7 +196,7 @@ var _ = Describe("VolumeController", func() {
 
 		Expect(oriVolume.Spec.Image).To(Equal(""))
 		Expect(oriVolume.Spec.Class).To(Equal(expandableVc.Name))
-		Expect(oriVolume.Spec.Resources.StorageBytes).To(Equal(uint64(size.Value())))
+		Expect(oriVolume.Spec.Resources.StorageBytes).To(Equal(size.Value()))
 
 		By("update increasing the storage resource")
 		baseVolume := volume.DeepCopy()
@@ -210,10 +210,10 @@ var _ = Describe("VolumeController", func() {
 			HaveField("Volumes", HaveLen(1)),
 		))
 
-		Eventually(func() uint64 {
+		Eventually(func() int64 {
 			_, oriVolume = GetSingleMapEntry(srv.Volumes)
 			return oriVolume.Spec.Resources.StorageBytes
-		}).Should(Equal(uint64(newSize.Value())))
+		}).Should(Equal(newSize.Value()))
 	})
 
 })

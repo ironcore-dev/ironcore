@@ -285,7 +285,7 @@ func (r *VolumeReconciler) prepareORIVolumeEncryption(ctx context.Context, volum
 }
 
 func (r *VolumeReconciler) prepareORIVolumeResources(_ context.Context, _ *storagev1alpha1.Volume, resources corev1alpha1.ResourceList) (*ori.VolumeResources, bool, error) {
-	storageBytes := resources.Storage().AsDec().UnscaledBig().Uint64()
+	storageBytes := resources.Storage().Value()
 
 	return &ori.VolumeResources{
 		StorageBytes: storageBytes,
@@ -435,7 +435,7 @@ func (r *VolumeReconciler) create(ctx context.Context, log logr.Logger, volume *
 }
 
 func (r *VolumeReconciler) update(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume, oriVolume *ori.Volume) error {
-	storageBytes := volume.Spec.Resources.Storage().AsDec().UnscaledBig().Uint64()
+	storageBytes := volume.Spec.Resources.Storage().Value()
 	oldStorageBytes := oriVolume.Spec.Resources.StorageBytes
 	if storageBytes != oldStorageBytes {
 		log.V(1).Info("Expanding volume", "StorageBytes", storageBytes, "OldStorageBytes", oldStorageBytes)
