@@ -135,6 +135,7 @@ func (s *Server) Status(ctx context.Context, req *ori.StatusRequest) (*ori.Statu
 	for _, onmetalVolumeClass := range availableOnmetalVolumeClasses {
 		quantity, ok := volumeClassQuantity[string(corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeVolumeClass, onmetalVolumeClass.Name))]
 		if !ok {
+			log.V(1).Info("Ignored class - missing quantity", "VolumeClass", onmetalVolumeClass.Name)
 			continue
 		}
 

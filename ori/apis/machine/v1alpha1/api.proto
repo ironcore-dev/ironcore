@@ -46,7 +46,7 @@ message MachineFilter {
 
 message MachineClassCapabilities {
   int64 cpu_millis = 1;
-  uint64 memory_bytes = 2;
+  int64 memory_bytes = 2;
 }
 
 message Machine {
@@ -60,7 +60,7 @@ message ImageSpec {
 }
 
 message EmptyDisk {
-  uint64 size_bytes = 1;
+  int64 size_bytes = 1;
 }
 
 message VolumeConnection {

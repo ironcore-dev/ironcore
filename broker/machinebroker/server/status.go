@@ -98,7 +98,7 @@ func (s *Server) convertOnmetalMachineClassStatus(machineClass *computev1alpha1.
 			Name: machineClass.Name,
 			Capabilities: &ori.MachineClassCapabilities{
 				CpuMillis:   cpu.MilliValue(),
-				MemoryBytes: uint64(memory.Value()),
+				MemoryBytes: memory.Value(),
 			},
 		},
 		Quantity: quantity.Value(),
@@ -136,6 +136,7 @@ func (s *Server) Status(ctx context.Context, req *ori.StatusRequest) (*ori.Statu
 	for _, onmetalMachineClass := range availableOnmetalMachineClasses {
 		quantity, ok := machineClassQuantity[string(corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, onmetalMachineClass.Name))]
 		if !ok {
+			log.V(1).Info("Ignored class - missing quantity", "MachineClass", onmetalMachineClass.Name)
 			continue
 		}
 

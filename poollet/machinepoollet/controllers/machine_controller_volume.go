@@ -166,9 +166,9 @@ func (r *MachineReconciler) prepareRemoteORIVolume(
 }
 
 func (r *MachineReconciler) prepareEmptyDiskORIVolume(machineVolume *computev1alpha1.Volume) *ori.Volume {
-	var sizeBytes uint64
+	var sizeBytes int64
 	if sizeLimit := machineVolume.EmptyDisk.SizeLimit; sizeLimit != nil {
-		sizeBytes = sizeLimit.AsDec().UnscaledBig().Uint64()
+		sizeBytes = sizeLimit.Value()
 	}
 	return &ori.Volume{
 		Name:   machineVolume.Name,

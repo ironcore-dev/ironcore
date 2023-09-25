@@ -79,7 +79,7 @@ func (s *Server) convertOnmetalVolumeResources(resources corev1alpha1.ResourceLi
 	}
 
 	return &ori.VolumeResources{
-		StorageBytes: storage.AsDec().UnscaledBig().Uint64(),
+		StorageBytes: storage.Value(),
 	}, nil
 }
 

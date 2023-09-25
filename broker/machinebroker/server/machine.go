@@ -132,9 +132,9 @@ func (s *Server) convertOnmetalVolume(
 			}
 		}
 	case onmetalMachineVolume.EmptyDisk != nil:
-		var sizeBytes uint64
+		var sizeBytes int64
 		if sizeLimit := onmetalMachineVolume.EmptyDisk.SizeLimit; sizeLimit != nil {
-			sizeBytes = sizeLimit.AsDec().UnscaledBig().Uint64()
+			sizeBytes = sizeLimit.Value()
 		}
 		emptyDisk = &ori.EmptyDisk{
 			SizeBytes: sizeBytes,

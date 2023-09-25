@@ -86,7 +86,7 @@ func (n *ContainerInfo) MaxAllocatable(className string) int64 {
 		return 0
 	}
 
-	return class.AsDec().UnscaledBig().Int64() - assigned
+	return class.Value() - assigned
 }
 
 func (n *ContainerInfo) NumInstances() int {

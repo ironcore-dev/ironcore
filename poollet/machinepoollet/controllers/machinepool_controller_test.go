@@ -56,7 +56,7 @@ var _ = Describe("MachinePoolController", func() {
 						Name: machineClass.Name,
 						Capabilities: &ori.MachineClassCapabilities{
 							CpuMillis:   machineClass.Capabilities.CPU().MilliValue(),
-							MemoryBytes: machineClass.Capabilities.Memory().AsDec().UnscaledBig().Uint64(),
+							MemoryBytes: machineClass.Capabilities.Memory().Value(),
 						},
 					},
 					Quantity: machineClassCapacity,
@@ -68,7 +68,7 @@ var _ = Describe("MachinePoolController", func() {
 						Name: machineClass2.Name,
 						Capabilities: &ori.MachineClassCapabilities{
 							CpuMillis:   machineClass2.Capabilities.CPU().MilliValue(),
-							MemoryBytes: machineClass2.Capabilities.Memory().AsDec().UnscaledBig().Uint64(),
+							MemoryBytes: machineClass2.Capabilities.Memory().Value(),
 						},
 					},
 					Quantity: machineClass2Capacity,
@@ -163,7 +163,7 @@ var _ = Describe("MachinePoolController", func() {
 						Name: machineClass.Name,
 						Capabilities: &ori.MachineClassCapabilities{
 							CpuMillis:   machineClass.Capabilities.CPU().MilliValue(),
-							MemoryBytes: machineClass.Capabilities.Memory().AsDec().UnscaledBig().Uint64(),
+							MemoryBytes: machineClass.Capabilities.Memory().Value(),
 						},
 					},
 				},
@@ -202,7 +202,7 @@ var _ = Describe("MachinePoolController", func() {
 						Name: machineClass.Name,
 						Capabilities: &ori.MachineClassCapabilities{
 							CpuMillis:   machineClass.Capabilities.CPU().MilliValue(),
-							MemoryBytes: machineClass.Capabilities.Memory().AsDec().UnscaledBig().Uint64(),
+							MemoryBytes: machineClass.Capabilities.Memory().Value(),
 						},
 					},
 				},
@@ -213,7 +213,7 @@ var _ = Describe("MachinePoolController", func() {
 						Name: machineClass2.Name,
 						Capabilities: &ori.MachineClassCapabilities{
 							CpuMillis:   machineClass2.Capabilities.CPU().MilliValue(),
-							MemoryBytes: machineClass2.Capabilities.Memory().AsDec().UnscaledBig().Uint64(),
+							MemoryBytes: machineClass2.Capabilities.Memory().Value(),
 						},
 					},
 				},

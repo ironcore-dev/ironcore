@@ -33,7 +33,7 @@ import (
 
 type capabilities struct {
 	cpuMillis   int64
-	memoryBytes uint64
+	memoryBytes int64
 }
 
 func getCapabilities(oriCaps *ori.MachineClassCapabilities) capabilities {
