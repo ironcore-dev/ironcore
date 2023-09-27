@@ -18,6 +18,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"maps"
+
+	"github.com/onmetal/onmetal-api/utils/annotations"
 
 	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
@@ -77,22 +80,23 @@ func (r *NetworkInterfaceEphemeralVirtualIPReconciler) ephemeralNetworkInterface
 			Namespace:   nic.Namespace,
 			Name:        virtualIPName,
 			Labels:      ephemeral.VirtualIPTemplate.Labels,
-			Annotations: ephemeral.VirtualIPTemplate.Annotations,
+			Annotations: maps.Clone(ephemeral.VirtualIPTemplate.Annotations),
 		},
 		Spec: ephemeral.VirtualIPTemplate.Spec,
 	}
+	annotations.SetDefaultEphemeralManagedBy(virtualIP)
+	_ = ctrl.SetControllerReference(nic, virtualIP, r.Scheme())
 	virtualIP.Spec.TargetRef = &commonv1alpha1.LocalUIDReference{
 		Name: nic.Name,
 		UID:  nic.UID,
 	}
-	_ = ctrl.SetControllerReference(nic, virtualIP, r.Scheme())
 	res[virtualIPName] = virtualIP
 
 	return res
 }
 
 func (r *NetworkInterfaceEphemeralVirtualIPReconciler) handleExistingVirtualIP(ctx context.Context, log logr.Logger, nic *networkingv1alpha1.NetworkInterface, shouldManage bool, virtualIP *networkingv1alpha1.VirtualIP) error {
-	if metav1.IsControlledBy(virtualIP, nic) {
+	if annotations.IsDefaultEphemeralControlledBy(virtualIP, nic) {
 		if shouldManage {
 			log.V(1).Info("Ephemeral virtual IP is present and controlled by network interface")
 			return nil
@@ -111,9 +115,8 @@ func (r *NetworkInterfaceEphemeralVirtualIPReconciler) handleExistingVirtualIP(c
 	}
 
 	if shouldManage {
-		return fmt.Errorf("virtual IP %s was not created for network interface %s (network interface is not owner)", virtualIP.Name, nic.Name)
+		log.V(1).Info("Won't adopt unmanaged virtual IP")
 	}
-	// VirtualIP is not desired but also not controlled by the networkInterface.
 	return nil
 }
 

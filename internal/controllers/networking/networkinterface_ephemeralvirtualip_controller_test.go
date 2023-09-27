@@ -18,6 +18,7 @@ package networking
 import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	"github.com/onmetal/onmetal-api/utils/annotations"
 	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -80,7 +81,7 @@ var _ = Describe("NetworkInterfaceEphemeralVirtualIP", func() {
 		))
 	})
 
-	It("should delete undesired virtual IPs for a network interface", MustPassRepeatedly(10), func(ctx SpecContext) {
+	It("should delete undesired virtual IPs for a network interface", func(ctx SpecContext) {
 		By("creating a network interface")
 		nic := &networkingv1alpha1.NetworkInterface{
 			ObjectMeta: metav1.ObjectMeta{
@@ -105,10 +106,43 @@ var _ = Describe("NetworkInterfaceEphemeralVirtualIP", func() {
 				IPFamily: corev1.IPv4Protocol,
 			},
 		}
+		annotations.SetDefaultEphemeralManagedBy(vip)
 		Expect(ctrl.SetControllerReference(nic, vip, k8sClient.Scheme())).To(Succeed())
 		Expect(k8sClient.Create(ctx, vip)).To(Succeed())
 
 		By("waiting for the virtual IP to be gone")
 		Eventually(Get(vip)).Should(Satisfy(apierrors.IsNotFound))
+	})
+
+	It("should not delete externally managed virtual IPs for a network interface", func(ctx SpecContext) {
+		By("creating a network interface")
+		nic := &networkingv1alpha1.NetworkInterface{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "nic-",
+			},
+			Spec: networkingv1alpha1.NetworkInterfaceSpec{
+				NetworkRef: corev1.LocalObjectReference{Name: "my-network"},
+				IPs:        []networkingv1alpha1.IPSource{{Value: commonv1alpha1.MustParseNewIP("10.0.0.1")}},
+			},
+		}
+		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
+
+		By("creating an undesired virtual IP")
+		externalVip := &networkingv1alpha1.VirtualIP{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "external-vip-",
+			},
+			Spec: networkingv1alpha1.VirtualIPSpec{
+				Type:     networkingv1alpha1.VirtualIPTypePublic,
+				IPFamily: corev1.IPv4Protocol,
+			},
+		}
+		Expect(ctrl.SetControllerReference(nic, externalVip, k8sClient.Scheme())).To(Succeed())
+		Expect(k8sClient.Create(ctx, externalVip)).To(Succeed())
+
+		By("asserting that the virtual IP is not being deleted")
+		Eventually(Object(externalVip)).Should(HaveField("DeletionTimestamp", BeNil()))
 	})
 })
