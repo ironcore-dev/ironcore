@@ -1,6 +1,6 @@
 module github.com/onmetal/onmetal-api
 
-go 1.20
+go 1.21
 
 require (
 	github.com/bits-and-blooms/bitset v1.9.0
