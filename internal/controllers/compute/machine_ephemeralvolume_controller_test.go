@@ -17,6 +17,7 @@ package compute
 import (
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
+	"github.com/onmetal/onmetal-api/utils/annotations"
 	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -80,6 +81,7 @@ var _ = Describe("MachineEphemeralVolumeController", func() {
 			},
 			Spec: storagev1alpha1.VolumeSpec{},
 		}
+		annotations.SetDefaultEphemeralManagedBy(undesiredControlledVolume)
 		_ = ctrl.SetControllerReference(machine, undesiredControlledVolume, k8sClient.Scheme())
 		Expect(k8sClient.Create(ctx, undesiredControlledVolume)).To(Succeed())
 
@@ -97,5 +99,33 @@ var _ = Describe("MachineEphemeralVolumeController", func() {
 
 		By("waiting for the undesired controlled volume to be gone")
 		Eventually(Get(undesiredControlledVolume)).Should(Satisfy(apierrors.IsNotFound))
+	})
+
+	It("should not delete externally managed volumes for a machine", func(ctx SpecContext) {
+		By("creating a machine")
+		machine := &computev1alpha1.Machine{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "machine-",
+			},
+			Spec: computev1alpha1.MachineSpec{
+				MachineClassRef: corev1.LocalObjectReference{Name: machineClass.Name},
+			},
+		}
+		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+
+		By("creating an undesired controlled volume")
+		externalVolume := &storagev1alpha1.Volume{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "external-volume-",
+			},
+			Spec: storagev1alpha1.VolumeSpec{},
+		}
+		_ = ctrl.SetControllerReference(machine, externalVolume, k8sClient.Scheme())
+		Expect(k8sClient.Create(ctx, externalVolume)).To(Succeed())
+
+		By("asserting that the external volume is not being deleted")
+		Consistently(Object(externalVolume)).Should(HaveField("DeletionTimestamp", BeNil()))
 	})
 })

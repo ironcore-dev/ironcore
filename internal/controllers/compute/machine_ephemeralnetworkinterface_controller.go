@@ -19,6 +19,9 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/onmetal/onmetal-api/utils/annotations"
+	"golang.org/x/exp/maps"
+
 	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
@@ -73,22 +76,23 @@ func (r *MachineEphemeralNetworkInterfaceReconciler) ephemeralNetworkInterfaceBy
 				Namespace:   machine.Namespace,
 				Name:        nicName,
 				Labels:      ephemeral.NetworkInterfaceTemplate.Labels,
-				Annotations: ephemeral.NetworkInterfaceTemplate.Annotations,
+				Annotations: maps.Clone(ephemeral.NetworkInterfaceTemplate.Annotations),
 			},
 			Spec: ephemeral.NetworkInterfaceTemplate.Spec,
 		}
+		annotations.SetDefaultEphemeralManagedBy(nic)
+		_ = ctrl.SetControllerReference(machine, nic, r.Scheme())
 		nic.Spec.MachineRef = &commonv1alpha1.LocalUIDReference{
 			Name: machine.Name,
 			UID:  machine.UID,
 		}
-		_ = ctrl.SetControllerReference(machine, nic, r.Scheme())
 		res[nicName] = nic
 	}
 	return res
 }
 
 func (r *MachineEphemeralNetworkInterfaceReconciler) handleExistingNetworkInterface(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine, shouldManage bool, nic *networkingv1alpha1.NetworkInterface) error {
-	if metav1.IsControlledBy(nic, machine) {
+	if annotations.IsDefaultEphemeralControlledBy(nic, machine) {
 		if shouldManage {
 			log.V(1).Info("Ephemeral network interface is present and controlled by machine")
 			return nil
@@ -107,9 +111,8 @@ func (r *MachineEphemeralNetworkInterfaceReconciler) handleExistingNetworkInterf
 	}
 
 	if shouldManage {
-		return fmt.Errorf("network interface %s was not created for machine %s (machine is not owner)", nic.Name, machine.Name)
+		log.V(1).Info("Won't adopt unmanaged network interface")
 	}
-	// Network interface is not desired but also not controlled by the machine.
 	return nil
 }
 

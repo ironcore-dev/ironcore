@@ -19,6 +19,7 @@ import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	"github.com/onmetal/onmetal-api/utils/annotations"
 	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -73,7 +74,7 @@ var _ = Describe("NetworkInterfaceEphemeralPrefix", func() {
 		))
 	})
 
-	It("should delete undesired prefixes for a network interface", MustPassRepeatedly(10), func(ctx SpecContext) {
+	It("should delete undesired prefixes for a network interface", func(ctx SpecContext) {
 		By("creating a network interface")
 		nic := &networkingv1alpha1.NetworkInterface{
 			ObjectMeta: metav1.ObjectMeta{
@@ -98,10 +99,43 @@ var _ = Describe("NetworkInterfaceEphemeralPrefix", func() {
 				Prefix:   commonv1alpha1.MustParseNewIPPrefix("10.0.0.1/32"),
 			},
 		}
+		annotations.SetDefaultEphemeralManagedBy(prefix)
 		Expect(ctrl.SetControllerReference(nic, prefix, k8sClient.Scheme())).To(Succeed())
 		Expect(k8sClient.Create(ctx, prefix)).To(Succeed())
 
 		By("waiting for the prefix to be marked for deletion")
 		Eventually(Get(prefix)).Should(Satisfy(apierrors.IsNotFound))
+	})
+
+	It("should not delete externally managed prefix for a network interface", func(ctx SpecContext) {
+		By("creating a network interface")
+		nic := &networkingv1alpha1.NetworkInterface{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "nic-",
+			},
+			Spec: networkingv1alpha1.NetworkInterfaceSpec{
+				NetworkRef: corev1.LocalObjectReference{Name: "my-network"},
+				IPs:        []networkingv1alpha1.IPSource{{Value: commonv1alpha1.MustParseNewIP("10.0.0.1")}},
+			},
+		}
+		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
+
+		By("creating an undesired prefix")
+		externalPrefix := &ipamv1alpha1.Prefix{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "external-prefix-",
+			},
+			Spec: ipamv1alpha1.PrefixSpec{
+				IPFamily: corev1.IPv4Protocol,
+				Prefix:   commonv1alpha1.MustParseNewIPPrefix("10.0.0.1/32"),
+			},
+		}
+		Expect(ctrl.SetControllerReference(nic, externalPrefix, k8sClient.Scheme())).To(Succeed())
+		Expect(k8sClient.Create(ctx, externalPrefix)).To(Succeed())
+
+		By("asserting that the prefix is not being deleted")
+		Eventually(Object(externalPrefix)).Should(HaveField("DeletionTimestamp", BeNil()))
 	})
 })

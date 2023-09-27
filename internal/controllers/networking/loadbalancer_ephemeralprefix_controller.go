@@ -18,6 +18,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"maps"
+
+	"github.com/onmetal/onmetal-api/utils/annotations"
 
 	"github.com/go-logr/logr"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
@@ -74,10 +77,11 @@ func (r *LoadBalancerEphemeralPrefixReconciler) ephemeralLoadBalancerPrefixByNam
 				Namespace:   loadBalancer.Namespace,
 				Name:        prefixName,
 				Labels:      ephemeral.PrefixTemplate.Labels,
-				Annotations: ephemeral.PrefixTemplate.Annotations,
+				Annotations: maps.Clone(ephemeral.PrefixTemplate.Annotations),
 			},
 			Spec: ephemeral.PrefixTemplate.Spec,
 		}
+		annotations.SetDefaultEphemeralManagedBy(prefix)
 		_ = ctrl.SetControllerReference(loadBalancer, prefix, r.Scheme())
 		res[prefixName] = prefix
 	}
@@ -86,7 +90,7 @@ func (r *LoadBalancerEphemeralPrefixReconciler) ephemeralLoadBalancerPrefixByNam
 }
 
 func (r *LoadBalancerEphemeralPrefixReconciler) handleExistingPrefix(ctx context.Context, log logr.Logger, loadBalancer *networkingv1alpha1.LoadBalancer, shouldManage bool, prefix *ipamv1alpha1.Prefix) error {
-	if metav1.IsControlledBy(prefix, loadBalancer) {
+	if annotations.IsDefaultEphemeralControlledBy(prefix, loadBalancer) {
 		if shouldManage {
 			log.V(1).Info("Ephemeral prefix is present and controlled by load balancer")
 			return nil
@@ -105,9 +109,8 @@ func (r *LoadBalancerEphemeralPrefixReconciler) handleExistingPrefix(ctx context
 	}
 
 	if shouldManage {
-		return fmt.Errorf("prefix %s was not created for load balancer %s (load balancer is not owner)", prefix.Name, loadBalancer.Name)
+		log.V(1).Info("Won't adopt unmanaged prefix")
 	}
-	// Prefix is not desired but also not controlled by the load balancer.
 	return nil
 }
 

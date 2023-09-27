@@ -19,6 +19,7 @@ import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	"github.com/onmetal/onmetal-api/utils/annotations"
 	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -100,10 +101,44 @@ var _ = Describe("LoadBalancerEphemeralPrefix", func() {
 				Prefix:   commonv1alpha1.MustParseNewIPPrefix("10.0.0.1/32"),
 			},
 		}
+		annotations.SetDefaultEphemeralManagedBy(prefix)
 		Expect(ctrl.SetControllerReference(loadBalancer, prefix, k8sClient.Scheme())).To(Succeed())
 		Expect(k8sClient.Create(ctx, prefix)).To(Succeed())
 
 		By("waiting for the prefix to be marked for deletion")
 		Eventually(Get(prefix)).Should(Satisfy(apierrors.IsNotFound))
+	})
+
+	It("should not delete externally managed prefix for a load balancer", MustPassRepeatedly(10), func(ctx SpecContext) {
+		By("creating a load balancer")
+		loadBalancer := &networkingv1alpha1.LoadBalancer{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "load-balancer-",
+			},
+			Spec: networkingv1alpha1.LoadBalancerSpec{
+				Type:       networkingv1alpha1.LoadBalancerTypeInternal,
+				NetworkRef: corev1.LocalObjectReference{Name: "my-network"},
+				IPs:        []networkingv1alpha1.IPSource{{Value: commonv1alpha1.MustParseNewIP("10.0.0.1")}},
+			},
+		}
+		Expect(k8sClient.Create(ctx, loadBalancer)).To(Succeed())
+
+		By("creating an undesired prefix")
+		externalPrefix := &ipamv1alpha1.Prefix{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "external-prefix-",
+			},
+			Spec: ipamv1alpha1.PrefixSpec{
+				IPFamily: corev1.IPv4Protocol,
+				Prefix:   commonv1alpha1.MustParseNewIPPrefix("10.0.0.1/32"),
+			},
+		}
+		Expect(ctrl.SetControllerReference(loadBalancer, externalPrefix, k8sClient.Scheme())).To(Succeed())
+		Expect(k8sClient.Create(ctx, externalPrefix)).To(Succeed())
+
+		By("asserting that the external prefix is not being deleted")
+		Eventually(Object(externalPrefix)).Should(HaveField("DeletionTimestamp", BeNil()))
 	})
 })
