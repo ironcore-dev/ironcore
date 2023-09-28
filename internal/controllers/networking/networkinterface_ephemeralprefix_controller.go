@@ -18,6 +18,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"maps"
+
+	"github.com/onmetal/onmetal-api/utils/annotations"
 
 	"github.com/go-logr/logr"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
@@ -74,10 +77,11 @@ func (r *NetworkInterfaceEphemeralPrefixReconciler) ephemeralNetworkInterfacePre
 				Namespace:   nic.Namespace,
 				Name:        prefixName,
 				Labels:      ephemeral.PrefixTemplate.Labels,
-				Annotations: ephemeral.PrefixTemplate.Annotations,
+				Annotations: maps.Clone(ephemeral.PrefixTemplate.Annotations),
 			},
 			Spec: ephemeral.PrefixTemplate.Spec,
 		}
+		annotations.SetDefaultEphemeralManagedBy(prefix)
 		_ = ctrl.SetControllerReference(nic, prefix, r.Scheme())
 		res[prefixName] = prefix
 	}
@@ -106,7 +110,7 @@ func (r *NetworkInterfaceEphemeralPrefixReconciler) ephemeralNetworkInterfacePre
 }
 
 func (r *NetworkInterfaceEphemeralPrefixReconciler) handleExistingPrefix(ctx context.Context, log logr.Logger, nic *networkingv1alpha1.NetworkInterface, shouldManage bool, prefix *ipamv1alpha1.Prefix) error {
-	if metav1.IsControlledBy(prefix, nic) {
+	if annotations.IsDefaultEphemeralControlledBy(prefix, nic) {
 		if shouldManage {
 			log.V(1).Info("Ephemeral prefix is present and controlled by network interface")
 			return nil
@@ -125,9 +129,8 @@ func (r *NetworkInterfaceEphemeralPrefixReconciler) handleExistingPrefix(ctx con
 	}
 
 	if shouldManage {
-		return fmt.Errorf("prefix %s was not created for network interface %s (network interface is not owner)", prefix.Name, nic.Name)
+		log.V(1).Info("Won't adopt unmanaged prefix")
 	}
-	// Prefix is not desired but also not controlled by the networkInterface.
 	return nil
 }
 

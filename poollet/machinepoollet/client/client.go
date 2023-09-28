@@ -18,7 +18,6 @@ import (
 	"context"
 
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -80,20 +79,6 @@ func SetupMachineSpecSecretNamesField(ctx context.Context, indexer client.FieldI
 			}
 
 			return computev1alpha1.MachineSecretNames(machine)
-		},
-	)
-}
-
-const LoadBalancerRoutingNetworkRefNameField = "loadbalancerrouting-networkref-name"
-
-func SetupLoadBalancerRoutingNetworkRefNameField(ctx context.Context, indexer client.FieldIndexer) error {
-	return indexer.IndexField(
-		ctx,
-		&networkingv1alpha1.LoadBalancerRouting{},
-		LoadBalancerRoutingNetworkRefNameField,
-		func(object client.Object) []string {
-			loadBalancerRouting := object.(*networkingv1alpha1.LoadBalancerRouting)
-			return []string{loadBalancerRouting.NetworkRef.Name}
 		},
 	)
 }

@@ -38,6 +38,19 @@ func IsExternallyManaged(o metav1.Object) bool {
 	return metautils.HasAnnotation(o, commonv1alpha1.ManagedByAnnotation)
 }
 
+func IsEphemeralManagedBy(o metav1.Object, manager string) bool {
+	actual, ok := o.GetAnnotations()[commonv1alpha1.EphemeralManagedByAnnotation]
+	return ok && actual == manager
+}
+
+func IsDefaultEphemeralControlledBy(o metav1.Object, owner metav1.Object) bool {
+	return metav1.IsControlledBy(o, owner) && IsEphemeralManagedBy(o, commonv1alpha1.DefaultEphemeralManager)
+}
+
+func SetDefaultEphemeralManagedBy(o metav1.Object) {
+	metautils.SetAnnotation(o, commonv1alpha1.EphemeralManagedByAnnotation, commonv1alpha1.DefaultEphemeralManager)
+}
+
 func SetExternallyMangedBy(o metav1.Object, manager string) {
 	metautils.SetAnnotation(o, commonv1alpha1.ManagedByAnnotation, manager)
 }

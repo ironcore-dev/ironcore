@@ -16,6 +16,7 @@ package envtest
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -488,7 +489,7 @@ func waitUntilGVKsDiscoverable(ctx context.Context, c client.Client, gvks map[sc
 		for gvk := range gvks {
 			mappings, err := c.RESTMapper().RESTMappings(gvk.GroupKind(), gvk.Version)
 			if err != nil {
-				if !meta.IsNoMatchError(err) {
+				if !meta.IsNoMatchError(err) && !errors.As(err, new(*apiutil.ErrResourceDiscoveryFailed)) {
 					return false, fmt.Errorf("error getting rest mappings for %s: %w", gvk, err)
 				}
 				continue

@@ -40,6 +40,13 @@ const (
 	// ManagedByAnnotation is an annotation that can be applied to resources to signify that
 	// some external system is managing the resource.
 	ManagedByAnnotation = "common.api.onmetal.de/managed-by"
+
+	// EphemeralManagedByAnnotation is an annotation that can be applied to resources to signify that
+	// some ephemeral controller is managing the resource.
+	EphemeralManagedByAnnotation = "common.api.onmetal.de/ephemeral-managed-by"
+
+	// DefaultEphemeralManager is the default onmetal-api ephemeral manager.
+	DefaultEphemeralManager = "ephemeral-manager"
 )
 
 // ConfigMapKeySelector is a reference to a specific 'key' within a ConfigMap resource.

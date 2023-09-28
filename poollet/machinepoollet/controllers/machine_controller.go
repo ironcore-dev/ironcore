@@ -729,7 +729,7 @@ func getORIMachineClassCapabilities(machineClass *computev1alpha1.MachineClass) 
 
 	return &ori.MachineClassCapabilities{
 		CpuMillis:   cpu.MilliValue(),
-		MemoryBytes: uint64(memory.Value()),
+		MemoryBytes: memory.Value(),
 	}, nil
 }
 

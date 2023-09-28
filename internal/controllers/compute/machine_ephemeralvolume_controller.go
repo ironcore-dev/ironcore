@@ -18,6 +18,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"maps"
+
+	"github.com/onmetal/onmetal-api/utils/annotations"
 
 	"github.com/go-logr/logr"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
@@ -33,12 +36,16 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
 
+const (
+	MachineEphemeralVolumeManager = "machine-ephemeral-volume"
+)
+
 type MachineEphemeralVolumeReconciler struct {
 	client.Client
 }
 
 //+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machines,verbs=get;list;watch
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes,verbs=get;list;watch;delete
+//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes,verbs=get;list;watch;create;update;delete
 
 func (r *MachineEphemeralVolumeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
@@ -73,10 +80,11 @@ func (r *MachineEphemeralVolumeReconciler) ephemeralMachineVolumeByName(machine 
 				Namespace:   machine.Namespace,
 				Name:        volumeName,
 				Labels:      ephemeral.VolumeTemplate.Labels,
-				Annotations: ephemeral.VolumeTemplate.Annotations,
+				Annotations: maps.Clone(ephemeral.VolumeTemplate.Annotations),
 			},
 			Spec: ephemeral.VolumeTemplate.Spec,
 		}
+		annotations.SetDefaultEphemeralManagedBy(volume)
 		_ = ctrl.SetControllerReference(machine, volume, r.Scheme())
 		res[volumeName] = volume
 	}
@@ -84,7 +92,7 @@ func (r *MachineEphemeralVolumeReconciler) ephemeralMachineVolumeByName(machine 
 }
 
 func (r *MachineEphemeralVolumeReconciler) handleExistingVolume(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine, shouldManage bool, volume *storagev1alpha1.Volume) error {
-	if metav1.IsControlledBy(volume, machine) {
+	if annotations.IsDefaultEphemeralControlledBy(volume, machine) {
 		if shouldManage {
 			log.V(1).Info("Ephemeral volume is present and controlled by machine")
 			return nil
@@ -103,9 +111,8 @@ func (r *MachineEphemeralVolumeReconciler) handleExistingVolume(ctx context.Cont
 	}
 
 	if shouldManage {
-		return fmt.Errorf("volume %s was not created for machine %s (machine is not owner)", volume.Name, machine.Name)
+		log.V(1).Info("Won't adopt unmanaged volume")
 	}
-	// Volume is not desired but also not controlled by the machine.
 	return nil
 }
 

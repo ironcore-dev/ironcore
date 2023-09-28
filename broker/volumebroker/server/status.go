@@ -63,6 +63,9 @@ func (s *Server) gatherVolumeClassQuantity(onmetalVolumePools []storagev1alpha1.
 	for _, onmetalVolumePool := range onmetalVolumePools {
 		for resourceName, resourceQuantity := range onmetalVolumePool.Status.Capacity {
 			if corev1alpha1.IsClassCountResource(resourceName) {
+				if _, ok := res[string(resourceName)]; !ok {
+					res[string(resourceName)] = resource.NewQuantity(0, resource.BinarySI)
+				}
 				res[string(resourceName)].Add(resourceQuantity)
 			}
 		}
@@ -97,7 +100,7 @@ func (s *Server) convertOnmetalVolumeClassStatus(volumeClass *storagev1alpha1.Vo
 				Iops: iops.Value(),
 			},
 		},
-		Quantity: quantity.AsDec().UnscaledBig().Int64(),
+		Quantity: quantity.Value(),
 	}, nil
 }
 
@@ -130,7 +133,13 @@ func (s *Server) Status(ctx context.Context, req *ori.StatusRequest) (*ori.Statu
 	availableOnmetalVolumeClasses := s.filterOnmetalVolumeClasses(availableOnmetalVolumeClassNames, onmetalVolumeClassList.Items)
 	volumeClassStatus := make([]*ori.VolumeClassStatus, 0, len(availableOnmetalVolumeClasses))
 	for _, onmetalVolumeClass := range availableOnmetalVolumeClasses {
-		volumeClass, err := s.convertOnmetalVolumeClassStatus(&onmetalVolumeClass, volumeClassQuantity[onmetalVolumeClass.Name])
+		quantity, ok := volumeClassQuantity[string(corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeVolumeClass, onmetalVolumeClass.Name))]
+		if !ok {
+			log.V(1).Info("Ignored class - missing quantity", "VolumeClass", onmetalVolumeClass.Name)
+			continue
+		}
+
+		volumeClass, err := s.convertOnmetalVolumeClassStatus(&onmetalVolumeClass, quantity)
 		if err != nil {
 			return nil, fmt.Errorf("error converting onmetal volume class %s: %w", onmetalVolumeClass.Name, err)
 		}

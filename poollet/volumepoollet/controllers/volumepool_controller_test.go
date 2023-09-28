@@ -214,7 +214,7 @@ var _ = Describe("VolumePoolController", func() {
 							Iops: 15000,
 						},
 					},
-					Quantity: volumeClassCapacity.AsDec().UnscaledBig().Int64(),
+					Quantity: volumeClassCapacity.Value(),
 				},
 			},
 			{
@@ -226,7 +226,7 @@ var _ = Describe("VolumePoolController", func() {
 							Iops: 1000,
 						},
 					},
-					Quantity: expandableVolumeClassCapacity.AsDec().UnscaledBig().Int64(),
+					Quantity: expandableVolumeClassCapacity.Value(),
 				},
 			},
 		})

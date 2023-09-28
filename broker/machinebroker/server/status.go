@@ -64,6 +64,9 @@ func (s *Server) gatherMachineClassQuantity(onmetalMachinePools []computev1alpha
 	for _, onmetalMachinePool := range onmetalMachinePools {
 		for resourceName, resourceQuantity := range onmetalMachinePool.Status.Capacity {
 			if corev1alpha1.IsClassCountResource(resourceName) {
+				if _, ok := res[string(resourceName)]; !ok {
+					res[string(resourceName)] = resource.NewQuantity(0, resource.DecimalSI)
+				}
 				res[string(resourceName)].Add(resourceQuantity)
 			}
 		}
@@ -95,10 +98,10 @@ func (s *Server) convertOnmetalMachineClassStatus(machineClass *computev1alpha1.
 			Name: machineClass.Name,
 			Capabilities: &ori.MachineClassCapabilities{
 				CpuMillis:   cpu.MilliValue(),
-				MemoryBytes: uint64(memory.Value()),
+				MemoryBytes: memory.Value(),
 			},
 		},
-		Quantity: quantity.AsDec().UnscaledBig().Int64(),
+		Quantity: quantity.Value(),
 	}, nil
 }
 
@@ -131,7 +134,13 @@ func (s *Server) Status(ctx context.Context, req *ori.StatusRequest) (*ori.Statu
 	availableOnmetalMachineClasses := s.filterOnmetalMachineClasses(availableOnmetalMachineClassNames, onmetalMachineClassList.Items)
 	machineClassStatus := make([]*ori.MachineClassStatus, 0, len(availableOnmetalMachineClasses))
 	for _, onmetalMachineClass := range availableOnmetalMachineClasses {
-		machineClass, err := s.convertOnmetalMachineClassStatus(&onmetalMachineClass, machineClassQuantity[onmetalMachineClass.Name])
+		quantity, ok := machineClassQuantity[string(corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, onmetalMachineClass.Name))]
+		if !ok {
+			log.V(1).Info("Ignored class - missing quantity", "MachineClass", onmetalMachineClass.Name)
+			continue
+		}
+
+		machineClass, err := s.convertOnmetalMachineClassStatus(&onmetalMachineClass, quantity)
 		if err != nil {
 			return nil, fmt.Errorf("error converting onmetal machine class %s: %w", onmetalMachineClass.Name, err)
 		}

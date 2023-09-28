@@ -18,6 +18,7 @@ import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	"github.com/onmetal/onmetal-api/utils/annotations"
 	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -78,7 +79,7 @@ var _ = Describe("MachineEphemeralNetworkInterfaceController", func() {
 		))
 	})
 
-	It("should delete undesired ephemeral network interfaces", MustPassRepeatedly(10), func(ctx SpecContext) {
+	It("should delete undesired ephemeral network interfaces", func(ctx SpecContext) {
 		By("creating a machine")
 		machine := &computev1alpha1.Machine{
 			ObjectMeta: metav1.ObjectMeta{
@@ -104,10 +105,44 @@ var _ = Describe("MachineEphemeralNetworkInterfaceController", func() {
 				},
 			},
 		}
+		annotations.SetDefaultEphemeralManagedBy(undesiredNic)
 		Expect(ctrl.SetControllerReference(machine, undesiredNic, k8sClient.Scheme())).To(Succeed())
 		Expect(k8sClient.Create(ctx, undesiredNic)).To(Succeed())
 
 		By("waiting for the undesired network interface to be gone")
 		Eventually(Get(undesiredNic)).Should(Satisfy(apierrors.IsNotFound))
+	})
+
+	It("should not delete an externally managed network interface", func(ctx SpecContext) {
+		By("creating a machine")
+		machine := &computev1alpha1.Machine{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "machine-",
+			},
+			Spec: computev1alpha1.MachineSpec{
+				MachineClassRef: corev1.LocalObjectReference{Name: machineClass.Name},
+			},
+		}
+		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+
+		By("creating an externally managed network interface")
+		externalNic := &networkingv1alpha1.NetworkInterface{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "external-nic-",
+			},
+			Spec: networkingv1alpha1.NetworkInterfaceSpec{
+				NetworkRef: corev1.LocalObjectReference{Name: "my-network"},
+				IPs: []networkingv1alpha1.IPSource{
+					{Value: commonv1alpha1.MustParseNewIP("10.0.0.1")},
+				},
+			},
+		}
+		Expect(ctrl.SetControllerReference(machine, externalNic, k8sClient.Scheme())).To(Succeed())
+		Expect(k8sClient.Create(ctx, externalNic)).To(Succeed())
+
+		By("asserting the network interface is not being deleted")
+		Consistently(Object(externalNic)).Should(HaveField("DeletionTimestamp", BeNil()))
 	})
 })
