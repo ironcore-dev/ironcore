@@ -105,7 +105,7 @@ func (s *MachineScheduler) fitsPool(ctx context.Context, pool *scheduler.Contain
 		return false
 	}
 
-	return allocatable.Cmp(*resource.NewQuantity(1, resource.DecimalSI)) > 0
+	return allocatable.Cmp(*resource.NewQuantity(1, resource.DecimalSI)) >= 0
 }
 
 func (s *MachineScheduler) reconcileExists(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) (ctrl.Result, error) {

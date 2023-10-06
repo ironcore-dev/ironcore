@@ -111,7 +111,7 @@ func (s *VolumeScheduler) fitsPool(ctx context.Context, pool *scheduler.Containe
 		return false
 	}
 
-	return allocatable.Cmp(*volume.Spec.Resources.Storage()) > 0
+	return allocatable.Cmp(*volume.Spec.Resources.Storage()) >= 0
 }
 
 func (s *VolumeScheduler) updateSnapshot() {
