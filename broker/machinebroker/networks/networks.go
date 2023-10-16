@@ -227,6 +227,9 @@ func (e *Manager) emit(providerID string, network *networkingv1alpha1.Network, e
 	w.network = network
 	w.error = err
 	close(w.done)
+	// Remove providerID from waiters map once the emit call finishes. Otherwise, we won't be able to recreate
+	// the network if it has been deleted (e.g. via GC when the network has been released due to the lack of consumers).
+	delete(e.waitersByProviderID, providerID)
 }
 
 func (e *Manager) GetNetwork(ctx context.Context, providerID string) (*networkingv1alpha1.Network, error) {
