@@ -94,4 +94,97 @@ var _ = Describe("AttachNetworkInterface", func() {
 			State: networkingv1alpha1.NetworkStateAvailable,
 		}))
 	})
+
+	It("should correctly re-create a network in case it has been removed", func(ctx SpecContext) {
+		By("creating a machine")
+		createMachineRes, err := srv.CreateMachine(ctx, &ori.CreateMachineRequest{
+			Machine: &ori.Machine{
+				Spec: &ori.MachineSpec{
+					Power: ori.Power_POWER_ON,
+					Image: &ori.ImageSpec{
+						Image: "example.org/foo:latest",
+					},
+					Class: machineClass.Name,
+				},
+			},
+		})
+		Expect(err).NotTo(HaveOccurred())
+		machineID := createMachineRes.Machine.Metadata.Id
+
+		By("attaching a network interface")
+		Expect(srv.AttachNetworkInterface(ctx, &ori.AttachNetworkInterfaceRequest{
+			MachineId: machineID,
+			NetworkInterface: &ori.NetworkInterface{
+				Name:      "my-nic",
+				NetworkId: "network-id",
+				Ips:       []string{"10.0.0.1"},
+			},
+		})).Error().NotTo(HaveOccurred())
+
+		By("getting the onmetal machine")
+		onmetalMachine := &computev1alpha1.Machine{}
+		onmetalMachineKey := client.ObjectKey{Namespace: ns.Name, Name: machineID}
+		Expect(k8sClient.Get(ctx, onmetalMachineKey, onmetalMachine)).To(Succeed())
+
+		By("inspecting the onmetal machine's network interfaces")
+		Expect(onmetalMachine.Spec.NetworkInterfaces).To(ConsistOf(MatchAllFields(Fields{
+			"Name": Equal("my-nic"),
+			"NetworkInterfaceSource": MatchFields(IgnoreExtras, Fields{
+				"NetworkInterfaceRef": PointTo(MatchAllFields(Fields{
+					"Name": Not(BeEmpty()),
+				})),
+			}),
+		})))
+
+		By("getting the corresponding onmetal network interface")
+		nic := &networkingv1alpha1.NetworkInterface{}
+		nicName := onmetalMachine.Spec.NetworkInterfaces[0].NetworkInterfaceRef.Name
+		nicKey := client.ObjectKey{Namespace: ns.Name, Name: nicName}
+		Expect(k8sClient.Get(ctx, nicKey, nic)).To(Succeed())
+
+		By("inspecting the onmetal network interface")
+		Expect(nic.Spec.IPs).To(Equal([]networkingv1alpha1.IPSource{
+			{Value: commonv1alpha1.MustParseNewIP("10.0.0.1")},
+		}))
+
+		By("getting the referenced onmetal network")
+		network := &networkingv1alpha1.Network{}
+		networkKey := client.ObjectKey{Namespace: ns.Name, Name: nic.Spec.NetworkRef.Name}
+		Expect(k8sClient.Get(ctx, networkKey, network)).To(Succeed())
+
+		By("inspecting the onmetal network")
+		Expect(network.Spec).To(Equal(networkingv1alpha1.NetworkSpec{
+			ProviderID: "network-id",
+		}))
+		Expect(network.Status).To(Equal(networkingv1alpha1.NetworkStatus{
+			State: networkingv1alpha1.NetworkStateAvailable,
+		}))
+
+		By("detaching the network interface")
+		Expect(srv.DetachNetworkInterface(ctx, &ori.DetachNetworkInterfaceRequest{
+			MachineId: machineID,
+			Name:      "my-nic",
+		})).Error().NotTo(HaveOccurred())
+
+		By("deleting the network")
+		Expect(k8sClient.Delete(ctx, network)).To(Succeed())
+
+		By("re-attaching a network interface")
+		Expect(srv.AttachNetworkInterface(ctx, &ori.AttachNetworkInterfaceRequest{
+			MachineId: machineID,
+			NetworkInterface: &ori.NetworkInterface{
+				Name:      "my-nic",
+				NetworkId: "network-id",
+				Ips:       []string{"10.0.0.1"},
+			},
+		})).Error().NotTo(HaveOccurred())
+
+		By("inspecting the onmetal network again")
+		Expect(network.Spec).To(Equal(networkingv1alpha1.NetworkSpec{
+			ProviderID: "network-id",
+		}))
+		Expect(network.Status).To(Equal(networkingv1alpha1.NetworkStatus{
+			State: networkingv1alpha1.NetworkStateAvailable,
+		}))
+	})
 })
