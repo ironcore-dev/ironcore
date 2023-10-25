@@ -31,7 +31,7 @@ require (
 	k8s.io/utils v0.0.0-20230505201702-9f6742963106
 	sigs.k8s.io/controller-runtime v0.16.3
 	sigs.k8s.io/structured-merge-diff/v4 v4.3.0
-	sigs.k8s.io/yaml v1.3.0
+	sigs.k8s.io/yaml v1.4.0
 )
 
 require (
