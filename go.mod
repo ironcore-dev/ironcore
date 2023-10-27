@@ -6,7 +6,7 @@ require (
 	github.com/bits-and-blooms/bitset v1.10.0
 	github.com/blang/semver/v4 v4.0.0
 	github.com/go-chi/chi/v5 v5.0.10
-	github.com/go-logr/logr v1.2.4
+	github.com/go-logr/logr v1.3.0
 	github.com/gogo/protobuf v1.3.2
 	github.com/google/go-cmp v0.6.0
 	github.com/onmetal/controller-utils v0.8.2
