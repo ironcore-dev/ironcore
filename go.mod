@@ -17,7 +17,7 @@ require (
 	go4.org/netipx v0.0.0-20220812043211-3cc044ffd68d
 	golang.org/x/exp v0.0.0-20221212164502-fae10dda9338
 	golang.org/x/sync v0.5.0
-	golang.org/x/sys v0.13.0
+	golang.org/x/sys v0.14.0
 	google.golang.org/grpc v1.59.0
 	k8s.io/api v0.28.3
 	k8s.io/apimachinery v0.28.3
