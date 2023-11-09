@@ -49,8 +49,10 @@ const (
 )
 
 var (
-	cfg        *rest.Config
-	k8sClient  client.Client
+	cfg               *rest.Config
+	k8sClient         client.Client
+	elevatedK8sClient client.Client
+
 	testEnv    *envtest.Environment
 	testEnvExt *utilsenvtest.EnvironmentExtensions
 )
@@ -95,13 +97,16 @@ var _ = BeforeSuite(func() {
 
 	komega.SetClient(k8sClient)
 
+	const showResourcesGroup = "test-resource-group"
 	apiSrv, err := apiserver.New(cfg, apiserver.Options{
-		MainPath:     "github.com/onmetal/onmetal-api/cmd/onmetal-apiserver",
-		BuildOptions: []buildutils.BuildOption{buildutils.ModModeMod},
-		ETCDServers:  []string{testEnv.ControlPlane.Etcd.URL.String()},
-		Host:         testEnvExt.APIServiceInstallOptions.LocalServingHost,
-		Port:         testEnvExt.APIServiceInstallOptions.LocalServingPort,
-		CertDir:      testEnvExt.APIServiceInstallOptions.LocalServingCertDir,
+		MainPath:                  "github.com/onmetal/onmetal-api/cmd/onmetal-apiserver",
+		BuildOptions:              []buildutils.BuildOption{buildutils.ModModeMod},
+		ETCDServers:               []string{testEnv.ControlPlane.Etcd.URL.String()},
+		Host:                      testEnvExt.APIServiceInstallOptions.LocalServingHost,
+		Port:                      testEnvExt.APIServiceInstallOptions.LocalServingPort,
+		CertDir:                   testEnvExt.APIServiceInstallOptions.LocalServingCertDir,
+		AttachOutput:              true,
+		GroupsToShowPoolResources: []string{showResourcesGroup},
 	})
 	Expect(err).NotTo(HaveOccurred())
 
@@ -109,6 +114,19 @@ var _ = BeforeSuite(func() {
 	DeferCleanup(apiSrv.Stop)
 
 	err = utilsenvtest.WaitUntilAPIServicesReadyWithTimeout(apiServiceTimeout, testEnvExt, k8sClient, scheme.Scheme)
+	Expect(err).NotTo(HaveOccurred())
+
+	usr, err := testEnv.AddUser(envtest.User{
+		Name: "elevated-user",
+		Groups: []string{
+			"system:masters",
+			"system:authenticated",
+			showResourcesGroup,
+		},
+	}, nil)
+	Expect(err).NotTo(HaveOccurred())
+
+	elevatedK8sClient, err = client.New(usr.Config(), client.Options{Scheme: scheme.Scheme})
 	Expect(err).NotTo(HaveOccurred())
 })
 

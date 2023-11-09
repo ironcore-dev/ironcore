@@ -25,6 +25,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 )
 
 var _ = Describe("Compute", func() {
@@ -302,6 +303,64 @@ var _ = Describe("Compute", func() {
 
 			By("inspecting the retrieved list to only have the machine with the correct machine class")
 			Expect(machineList.Items).To(ConsistOf(HaveField("UID", machine2.UID)))
+		})
+	})
+
+	Context("MachinePool resources", func() {
+		It("should be masked", func() {
+			By("creating a new machine pool")
+			machinePool := &computev1alpha1.MachinePool{
+				ObjectMeta: metav1.ObjectMeta{
+					GenerateName: "machine-pool-",
+				},
+				Spec: computev1alpha1.MachinePoolSpec{
+					ProviderID: "test",
+				},
+			}
+			Expect(k8sClient.Create(ctx, machinePool)).To(Succeed())
+
+			By("patching the status")
+			Eventually(UpdateStatus(machinePool, func() {
+				machinePool.Status.Capacity = corev1alpha1.ResourceList{
+					corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, "test-class"): resource.MustParse("10"),
+				}
+				machinePool.Status.Allocatable = corev1alpha1.ResourceList{
+					corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, "test-class"): resource.MustParse("5"),
+				}
+			})).Should(Succeed())
+
+			By("checking that the resources are hidden by using GET")
+			Expect(k8sClient.Get(ctx, client.ObjectKeyFromObject(machinePool), machinePool)).To(Succeed())
+			Expect(machinePool.Status.Allocatable).To(BeNil())
+			Expect(machinePool.Status.Capacity).To(BeNil())
+
+			By("checking that the resources are hidden by using LIST")
+			machinePools := &computev1alpha1.MachinePoolList{}
+			Expect(k8sClient.List(ctx, machinePools)).To(Succeed())
+			Expect(machinePools.Items).To(ContainElement(SatisfyAll(
+				HaveField("Status.Allocatable", BeNil()),
+				HaveField("Status.Capacity", BeNil()),
+			)))
+
+			By("checking that the resources are shown using elevated user by using GET")
+			Expect(elevatedK8sClient.Get(ctx, client.ObjectKeyFromObject(machinePool), machinePool)).To(Succeed())
+			Expect(machinePool.Status.Capacity).To(Equal(corev1alpha1.ResourceList{
+				corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, "test-class"): resource.MustParse("10"),
+			}))
+			Expect(machinePool.Status.Allocatable).To(Equal(corev1alpha1.ResourceList{
+				corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, "test-class"): resource.MustParse("5"),
+			}))
+
+			By("checking that the resources are shown using elevated user by using LIST")
+			Expect(elevatedK8sClient.List(ctx, machinePools)).To(Succeed())
+			Expect(machinePools.Items).To(ContainElement(SatisfyAll(
+				HaveField("Status.Capacity", Equal(corev1alpha1.ResourceList{
+					corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, "test-class"): resource.MustParse("10"),
+				})),
+				HaveField("Status.Allocatable", Equal(corev1alpha1.ResourceList{
+					corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, "test-class"): resource.MustParse("5"),
+				})),
+			)))
 		})
 	})
 })

@@ -24,6 +24,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 )
 
 var _ = Describe("Storage", func() {
@@ -205,6 +206,64 @@ var _ = Describe("Storage", func() {
 
 			By("inspecting the retrieved list to only have the volume with the correct volume class")
 			Expect(volumeList.Items).To(ConsistOf(HaveField("UID", volume2.UID)))
+		})
+	})
+
+	Context("VolumePool resources", func() {
+		It("should be masked", func() {
+			By("creating a new volume pool")
+			volumePool := &storagev1alpha1.VolumePool{
+				ObjectMeta: metav1.ObjectMeta{
+					GenerateName: "volume-pool-",
+				},
+				Spec: storagev1alpha1.VolumePoolSpec{
+					ProviderID: "test",
+				},
+			}
+			Expect(k8sClient.Create(ctx, volumePool)).To(Succeed())
+
+			By("patching the status")
+			Eventually(UpdateStatus(volumePool, func() {
+				volumePool.Status.Capacity = corev1alpha1.ResourceList{
+					corev1alpha1.ResourceStorage: resource.MustParse("10Gi"),
+				}
+				volumePool.Status.Allocatable = corev1alpha1.ResourceList{
+					corev1alpha1.ResourceStorage: resource.MustParse("5Gi"),
+				}
+			})).Should(Succeed())
+
+			By("checking that the resources are hidden by using GET")
+			Expect(k8sClient.Get(ctx, client.ObjectKeyFromObject(volumePool), volumePool)).To(Succeed())
+			Expect(volumePool.Status.Allocatable).To(BeNil())
+			Expect(volumePool.Status.Capacity).To(BeNil())
+
+			By("checking that the resources are hidden by using LIST")
+			volumePools := &storagev1alpha1.VolumePoolList{}
+			Expect(k8sClient.List(ctx, volumePools)).To(Succeed())
+			Expect(volumePools.Items).To(ContainElement(SatisfyAll(
+				HaveField("Status.Allocatable", BeNil()),
+				HaveField("Status.Capacity", BeNil()),
+			)))
+
+			By("checking that the resources are shown using elevated user by using GET")
+			Expect(elevatedK8sClient.Get(ctx, client.ObjectKeyFromObject(volumePool), volumePool)).To(Succeed())
+			Expect(volumePool.Status.Capacity).To(Equal(corev1alpha1.ResourceList{
+				corev1alpha1.ResourceStorage: resource.MustParse("10Gi"),
+			}))
+			Expect(volumePool.Status.Allocatable).To(Equal(corev1alpha1.ResourceList{
+				corev1alpha1.ResourceStorage: resource.MustParse("5Gi"),
+			}))
+
+			By("checking that the resources are shown using elevated user by using LIST")
+			Expect(elevatedK8sClient.List(ctx, volumePools)).To(Succeed())
+			Expect(volumePools.Items).To(ContainElement(SatisfyAll(
+				HaveField("Status.Capacity", Equal(corev1alpha1.ResourceList{
+					corev1alpha1.ResourceStorage: resource.MustParse("10Gi"),
+				})),
+				HaveField("Status.Allocatable", Equal(corev1alpha1.ResourceList{
+					corev1alpha1.ResourceStorage: resource.MustParse("5Gi"),
+				})),
+			)))
 		})
 	})
 
