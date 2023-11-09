@@ -56,7 +56,7 @@ OPENAPI_GEN="$OPENAPI_GEN"
 APPLYCONFIGURATION_GEN="$APPLYCONFIGURATION_GEN"
 
 VIRTUAL_GOPATH="$(mktemp -d)"
-trap 'rm -rf "$GOPATH"' EXIT
+trap 'rm -rf "$VIRTUAL_GOPATH"' EXIT
 
 # Setup virtual GOPATH so the codegen tools work as expected.
 (cd "$SCRIPT_DIR/.."; go mod download && "$VGOPATH" -o "$VIRTUAL_GOPATH")

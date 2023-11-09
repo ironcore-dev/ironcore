@@ -14,8 +14,8 @@ normal="$(tput sgr0)"
 VGOPATH="$VGOPATH"
 PROTOC_GEN_GOGO="$PROTOC_GEN_GOGO"
 
-TGOPATH="$(mktemp -d)"
-trap 'rm -rf "$TGOPATH"' EXIT
+VIRTUAL_GOPATH="$(mktemp -d)"
+trap 'rm -rf "$VIRTUAL_GOPATH"' EXIT
 
 # Setup virtual GOPATH so the codegen tools work as expected.
 (
