@@ -155,11 +155,11 @@ var _ = BeforeSuite(func() {
 
 	Expect((&MachineEphemeralNetworkInterfaceReconciler{
 		Client: k8sManager.GetClient(),
-	}).SetupWithManager(k8sManager))
+	}).SetupWithManager(k8sManager)).To(Succeed())
 
 	Expect((&MachineEphemeralVolumeReconciler{
 		Client: k8sManager.GetClient(),
-	}).SetupWithManager(k8sManager))
+	}).SetupWithManager(k8sManager)).To(Succeed())
 
 	Expect((&MachineClassReconciler{
 		Client:    k8sManager.GetClient(),

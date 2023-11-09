@@ -222,7 +222,7 @@ var _ = Describe("Compute", func() {
 			Expect(k8sClient.List(ctx, machinesOnMachinePool1List,
 				client.InNamespace(ns.Name),
 				client.MatchingFields{computev1alpha1.MachineMachinePoolRefNameField: machinePool1},
-			))
+			)).To(Succeed())
 
 			By("inspecting the items")
 			Expect(machinesOnMachinePool1List.Items).To(ConsistOf(*machine1))
@@ -232,7 +232,7 @@ var _ = Describe("Compute", func() {
 			Expect(k8sClient.List(ctx, machinesOnMachinePool2List,
 				client.InNamespace(ns.Name),
 				client.MatchingFields{computev1alpha1.MachineMachinePoolRefNameField: machinePool2},
-			))
+			)).To(Succeed())
 
 			By("inspecting the items")
 			Expect(machinesOnMachinePool2List.Items).To(ConsistOf(*machine2))
@@ -242,7 +242,7 @@ var _ = Describe("Compute", func() {
 			Expect(k8sClient.List(ctx, machinesOnNoMachinePoolList,
 				client.InNamespace(ns.Name),
 				client.MatchingFields{computev1alpha1.MachineMachinePoolRefNameField: ""},
-			))
+			)).To(Succeed())
 
 			By("inspecting the items")
 			Expect(machinesOnNoMachinePoolList.Items).To(ConsistOf(*machine3))

@@ -29,7 +29,7 @@ var _ = Describe("Context", func() {
 			ctx := FromStopChannel(stopChan)
 
 			Expect(ctx.Done()).NotTo(BeClosed())
-			Expect(ctx.Err()).To(BeNil())
+			Expect(ctx.Err()).To(Succeed())
 
 			close(stopChan)
 

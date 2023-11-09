@@ -119,7 +119,7 @@ var _ = Describe("Storage", func() {
 			Expect(k8sClient.List(ctx, volumesOnVolumePool1List,
 				client.InNamespace(ns.Name),
 				client.MatchingFields{storagev1alpha1.VolumeVolumePoolRefNameField: volumePool1},
-			))
+			)).To(Succeed())
 
 			By("inspecting the items")
 			Expect(volumesOnVolumePool1List.Items).To(ConsistOf(*volume1))
@@ -129,7 +129,7 @@ var _ = Describe("Storage", func() {
 			Expect(k8sClient.List(ctx, volumesOnVolumePool2List,
 				client.InNamespace(ns.Name),
 				client.MatchingFields{storagev1alpha1.VolumeVolumePoolRefNameField: volumePool2},
-			))
+			)).To(Succeed())
 
 			By("inspecting the items")
 			Expect(volumesOnVolumePool2List.Items).To(ConsistOf(*volume2))
@@ -139,7 +139,7 @@ var _ = Describe("Storage", func() {
 			Expect(k8sClient.List(ctx, volumesOnNoVolumePoolList,
 				client.InNamespace(ns.Name),
 				client.MatchingFields{storagev1alpha1.VolumeVolumePoolRefNameField: ""},
-			))
+			)).To(Succeed())
 
 			By("inspecting the items")
 			Expect(volumesOnNoVolumePoolList.Items).To(ConsistOf(*volume3))
@@ -258,7 +258,7 @@ var _ = Describe("Storage", func() {
 			Expect(k8sClient.List(ctx, bucketsOnBucketPool1List,
 				client.InNamespace(ns.Name),
 				client.MatchingFields{storagev1alpha1.BucketBucketPoolRefNameField: bucketPool1},
-			))
+			)).To(Succeed())
 
 			By("inspecting the items")
 			Expect(bucketsOnBucketPool1List.Items).To(ConsistOf(*bucket1))
@@ -268,7 +268,7 @@ var _ = Describe("Storage", func() {
 			Expect(k8sClient.List(ctx, bucketsOnBucketPool2List,
 				client.InNamespace(ns.Name),
 				client.MatchingFields{storagev1alpha1.BucketBucketPoolRefNameField: bucketPool2},
-			))
+			)).To(Succeed())
 
 			By("inspecting the items")
 			Expect(bucketsOnBucketPool2List.Items).To(ConsistOf(*bucket2))
@@ -278,7 +278,7 @@ var _ = Describe("Storage", func() {
 			Expect(k8sClient.List(ctx, bucketsOnNoBucketPoolList,
 				client.InNamespace(ns.Name),
 				client.MatchingFields{storagev1alpha1.BucketBucketPoolRefNameField: ""},
-			))
+			)).To(Succeed())
 
 			By("inspecting the items")
 			Expect(bucketsOnNoBucketPoolList.Items).To(ConsistOf(*bucket3))
