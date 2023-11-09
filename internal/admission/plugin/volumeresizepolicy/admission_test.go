@@ -91,7 +91,7 @@ var _ = Describe("Admission", func() {
 		By("patching the Volume to increase the Volume size")
 		volumeBase := volume.DeepCopy()
 		volume.Spec.Resources[corev1alpha1.ResourceStorage] = resource.MustParse("2Gi")
-		Expect(k8sClient.Patch(ctx, volume, client.MergeFrom(volumeBase)))
+		Expect(k8sClient.Patch(ctx, volume, client.MergeFrom(volumeBase))).To(Succeed())
 
 		By("ensuring that Volume has been resized")
 		Consistently(Object(volume)).Should(SatisfyAll(

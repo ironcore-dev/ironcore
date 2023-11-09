@@ -119,7 +119,7 @@ var _ = BeforeSuite(func() {
 	Expect(err).ToNot(HaveOccurred())
 
 	registry := quota.NewRegistry(scheme.Scheme)
-	Expect(quota.AddAllToRegistry(registry, quotaevaluatoronmetal.NewEvaluatorsForControllers(k8sManager.GetClient())))
+	Expect(quota.AddAllToRegistry(registry, quotaevaluatoronmetal.NewEvaluatorsForControllers(k8sManager.GetClient()))).To(Succeed())
 
 	replenishReconcilers, err := quotacontrolleronmetal.NewReplenishReconcilers(k8sManager.GetClient(), registry)
 	Expect(err).NotTo(HaveOccurred())

@@ -89,7 +89,7 @@ var _ = Describe("NetworkProtectionReconciler", func() {
 		By("ensuring that the network has been deleted")
 		Eventually(func(g Gomega) {
 			err := k8sClient.Get(ctx, networkKey, network)
-			Expect(client.IgnoreNotFound(err)).To(BeNil())
+			Expect(client.IgnoreNotFound(err)).To(Succeed())
 		}).Should(Succeed())
 	})
 
@@ -146,7 +146,7 @@ var _ = Describe("NetworkProtectionReconciler", func() {
 		By("ensuring that the network has been deleted")
 		Eventually(func(g Gomega) {
 			err := k8sClient.Get(ctx, networkKey, network)
-			Expect(client.IgnoreNotFound(err)).To(BeNil())
+			Expect(client.IgnoreNotFound(err)).To(Succeed())
 		}).Should(Succeed())
 	})
 
@@ -232,7 +232,7 @@ var _ = Describe("NetworkProtectionReconciler", func() {
 		}
 		Eventually(func(g Gomega) {
 			err := k8sClient.Get(ctx, networkKey, network)
-			Expect(client.IgnoreNotFound(err)).To(BeNil())
+			Expect(client.IgnoreNotFound(err)).To(Succeed())
 		}).Should(Succeed())
 	})
 })
