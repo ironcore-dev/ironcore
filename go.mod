@@ -21,7 +21,7 @@ require (
 	google.golang.org/grpc v1.59.0
 	k8s.io/api v0.28.4
 	k8s.io/apimachinery v0.28.4
-	k8s.io/apiserver v0.28.3
+	k8s.io/apiserver v0.28.4
 	k8s.io/client-go v0.28.4
 	k8s.io/component-base v0.28.4
 	k8s.io/klog/v2 v2.110.1
@@ -116,7 +116,7 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/apiextensions-apiserver v0.28.3 // indirect
-	k8s.io/kms v0.28.3 // indirect
+	k8s.io/kms v0.28.4 // indirect
 	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.1.2 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 )
