@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
 package server_test
 
 import (
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
@@ -65,13 +65,13 @@ var _ = Describe("AttachVolume", func() {
 			},
 		})).Error().ShouldNot(HaveOccurred())
 
-		By("getting the onmetal machine")
-		onmetalMachine := &computev1alpha1.Machine{}
-		onmetalMachineKey := client.ObjectKey{Namespace: ns.Name, Name: machineID}
-		Expect(k8sClient.Get(ctx, onmetalMachineKey, onmetalMachine)).To(Succeed())
+		By("getting the ironcore machine")
+		ironcoreMachine := &computev1alpha1.Machine{}
+		ironcoreMachineKey := client.ObjectKey{Namespace: ns.Name, Name: machineID}
+		Expect(k8sClient.Get(ctx, ironcoreMachineKey, ironcoreMachine)).To(Succeed())
 
-		By("inspecting the onmetal machine's volumes")
-		Expect(onmetalMachine.Spec.Volumes).To(ConsistOf(MatchAllFields(Fields{
+		By("inspecting the ironcore machine's volumes")
+		Expect(ironcoreMachine.Spec.Volumes).To(ConsistOf(MatchAllFields(Fields{
 			"Name":   Equal("my-volume"),
 			"Device": PointTo(Equal("oda")),
 			"VolumeSource": MatchFields(IgnoreExtras, Fields{
@@ -81,13 +81,13 @@ var _ = Describe("AttachVolume", func() {
 			}),
 		})))
 
-		By("getting the corresponding onmetal volume")
+		By("getting the corresponding ironcore volume")
 		volume := &storagev1alpha1.Volume{}
-		volumeName := onmetalMachine.Spec.Volumes[0].VolumeRef.Name
+		volumeName := ironcoreMachine.Spec.Volumes[0].VolumeRef.Name
 		volumeKey := client.ObjectKey{Namespace: ns.Name, Name: volumeName}
 		Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed())
 
-		By("inspecting the onmetal volume")
+		By("inspecting the ironcore volume")
 		Expect(volume.Status.Access).To(PointTo(MatchAllFields(Fields{
 			"SecretRef": PointTo(MatchAllFields(Fields{
 				"Name": Not(BeEmpty()),
@@ -99,13 +99,13 @@ var _ = Describe("AttachVolume", func() {
 			}),
 		})))
 
-		By("fetching the corresponding onmetal volume access secret")
+		By("fetching the corresponding ironcore volume access secret")
 		secret := &corev1.Secret{}
 		secretName := volume.Status.Access.SecretRef.Name
 		secretKey := client.ObjectKey{Namespace: ns.Name, Name: secretName}
 		Expect(k8sClient.Get(ctx, secretKey, secret)).To(Succeed())
 
-		By("inspecting the onmetal volume access secret")
+		By("inspecting the ironcore volume access secret")
 		Expect(metav1.IsControlledBy(secret, volume)).To(BeTrue(), "secret should be controlled by volume")
 		Expect(secret.Type).To(Equal(storagev1alpha1.SecretTypeVolumeAuth))
 		Expect(secret.Data).To(Equal(map[string][]byte{"key": []byte("supersecret")}))

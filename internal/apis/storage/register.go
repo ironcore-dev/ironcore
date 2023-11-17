@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 by the OnMetal authors.
+ * Copyright (c) 2021 by the IronCore authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 
 // Package storage contains API Schema definitions for the storage internal API group
-// +groupName=storage.api.onmetal.de
+// +groupName=storage.ironcore.dev
 package storage
 
 import (
@@ -25,7 +25,7 @@ import (
 
 var (
 	// SchemeGroupVersion is group version used to register these objects
-	SchemeGroupVersion = schema.GroupVersion{Group: "storage.api.onmetal.de", Version: runtime.APIVersionInternal}
+	SchemeGroupVersion = schema.GroupVersion{Group: "storage.ironcore.dev", Version: runtime.APIVersionInternal}
 
 	// SchemeBuilder is used to add go types to the GroupVersionKind scheme
 	SchemeBuilder = runtime.NewSchemeBuilder(addKnownTypes)

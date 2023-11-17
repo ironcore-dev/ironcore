@@ -1,4 +1,4 @@
-// Copyright 2021 OnMetal authors
+// Copyright 2021 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	"github.com/onmetal/onmetal-api/api/common/v1alpha1"
-	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	storageclient "github.com/onmetal/onmetal-api/internal/client/storage"
-	"github.com/onmetal/onmetal-api/internal/controllers/storage/scheduler"
+	"github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	storageclient "github.com/ironcore-dev/ironcore/internal/client/storage"
+	"github.com/ironcore-dev/ironcore/internal/controllers/storage/scheduler"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/record"
@@ -51,9 +51,9 @@ type VolumeScheduler struct {
 }
 
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumepools,verbs=get;list;watch
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumes,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumes/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumepools,verbs=get;list;watch
 
 // Reconcile reconciles the desired with the actual state.
 func (s *VolumeScheduler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {

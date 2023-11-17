@@ -1,9 +1,9 @@
 apiVersion: apiregistration.k8s.io/v1
 kind: APIService
 metadata:
-  name: v1alpha1.storage.api.onmetal.de
+  name: v1alpha1.storage.ironcore.dev
 spec:
-  group: storage.api.onmetal.de
+  group: storage.ironcore.dev
   version: v1alpha1
   service:
     namespace: system

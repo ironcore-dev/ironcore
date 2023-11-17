@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 package compute
 
 import (
-	"github.com/onmetal/onmetal-api/internal/apis/networking"
-	"github.com/onmetal/onmetal-api/internal/apis/storage"
+	"github.com/ironcore-dev/ironcore/internal/apis/networking"
+	"github.com/ironcore-dev/ironcore/internal/apis/storage"
 )
 
 const (
@@ -24,10 +24,10 @@ const (
 	MachineMachineClassRefNameField = "spec.machineClassRef.name"
 
 	// MachinePoolsGroup is the system rbac group all machine pools are in.
-	MachinePoolsGroup = "compute.api.onmetal.de:system:machinepools"
+	MachinePoolsGroup = "compute.ironcore.dev:system:machinepools"
 
 	// MachinePoolUserNamePrefix is the prefix all machine pool users should have.
-	MachinePoolUserNamePrefix = "compute.api.onmetal.de:system:machinepool:"
+	MachinePoolUserNamePrefix = "compute.ironcore.dev:system:machinepool:"
 )
 
 // MachinePoolCommonName constructs the common name for a certificate of a machine pool user.

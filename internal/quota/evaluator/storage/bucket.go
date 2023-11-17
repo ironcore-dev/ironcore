@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,12 +18,12 @@ import (
 	"context"
 	"fmt"
 
-	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	"github.com/onmetal/onmetal-api/internal/apis/storage"
-	internalstoragev1alpha1 "github.com/onmetal/onmetal-api/internal/apis/storage/v1alpha1"
-	"github.com/onmetal/onmetal-api/internal/quota/evaluator/generic"
-	"github.com/onmetal/onmetal-api/utils/quota"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	"github.com/ironcore-dev/ironcore/internal/apis/storage"
+	internalstoragev1alpha1 "github.com/ironcore-dev/ironcore/internal/apis/storage/v1alpha1"
+	"github.com/ironcore-dev/ironcore/internal/quota/evaluator/generic"
+	"github.com/ironcore-dev/ironcore/utils/quota"
 	"golang.org/x/exp/slices"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/sets"

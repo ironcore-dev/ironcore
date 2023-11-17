@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// +k8s:conversion-gen=github.com/onmetal/onmetal-api/internal/apis/networking
-// +k8s:conversion-gen-external-types=github.com/onmetal/onmetal-api/api/networking/v1alpha1
+// +k8s:conversion-gen=github.com/ironcore-dev/ironcore/internal/apis/networking
+// +k8s:conversion-gen-external-types=github.com/ironcore-dev/ironcore/api/networking/v1alpha1
 // +k8s:defaulter-gen=TypeMeta
-// +k8s:defaulter-gen-input=github.com/onmetal/onmetal-api/api/networking/v1alpha1
+// +k8s:defaulter-gen-input=github.com/ironcore-dev/ironcore/api/networking/v1alpha1
 
 // Package v1alpha1 is the v1alpha1 version of the API.
-package v1alpha1 // import "github.com/onmetal/onmetal-api/internal/apis/networking/v1alpha1"
+package v1alpha1 // import "github.com/ironcore-dev/ironcore/internal/apis/networking/v1alpha1"

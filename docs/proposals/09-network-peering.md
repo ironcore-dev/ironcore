@@ -34,14 +34,14 @@ reviewers:
 Network peering is a technique used to interleave two isolated networks, allowing
 members of both networks to communicate with each other as if they were in the same
 networking domain. This proposal describes how to introduce network peering to
-`onmetal-api`, building upon the existing concepts that were proposed in the
+`ironcore`, building upon the existing concepts that were proposed in the
 [Networking Integration OEP](01-networking-integration.md).
 
 ## Motivation
 
 Network peering allows members of two networks to communicate with each other
 without exposing them publicly and without a single point of failure. The
-networking fabric underneath is used to enable the actual routing. `onmetal`'s
+networking fabric underneath is used to enable the actual routing. `ironcore`'s
 `networking` API should offer a way to define such a peering.
 
 ### Goals
@@ -62,7 +62,7 @@ networking fabric underneath is used to enable the actual routing. `onmetal`'s
 
 ## Proposal
 
-Extend the `networking.api.onmetal.de.Network` resource with a `spec.peerings`
+Extend the `networking.ironcore.dev.Network` resource with a `spec.peerings`
 field that specifies the desired network peerings and a `status.peerings` that
 reflects the status of these peerings.
 
@@ -87,7 +87,7 @@ if necessary.
 Example Manifests:
 
 ```yaml
-apiVersion: networking.api.onmetal.de/v1alpha1
+apiVersion: networking.ironcore.dev/v1alpha1
 kind: Network
 metadata:
   name: my-network-1
@@ -108,7 +108,7 @@ status:
     phase: Bound
     lastPhaseTransitionTime: "2023-02-16T15:06:58Z"
 ---
-apiVersion: networking.api.onmetal.de/v1alpha1
+apiVersion: networking.ironcore.dev/v1alpha1
 kind: Network
 metadata:
   name: my-network-2
@@ -136,7 +136,7 @@ namespace correctly, otherwise the peering will stay in `phase: Pending` indefin
 Example Manifests:
 
 ```yaml
-apiVersion: networking.api.onmetal.de/v1alpha1
+apiVersion: networking.ironcore.dev/v1alpha1
 kind: Network
 metadata:
   namespace: ns-1
@@ -148,7 +148,7 @@ spec:
       namespace: ns-2
       name: my-network-2
 ---
-apiVersion: networking.api.onmetal.de/v1alpha1
+apiVersion: networking.ironcore.dev/v1alpha1
 kind: Network
 metadata:
   namespace: ns-2

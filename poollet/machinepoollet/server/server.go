@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,9 +30,9 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-logr/logr"
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	orimachine "github.com/onmetal/onmetal-api/ori/apis/machine"
-	utilshttp "github.com/onmetal/onmetal-api/utils/http"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	orimachine "github.com/ironcore-dev/ironcore/ori/apis/machine"
+	utilshttp "github.com/ironcore-dev/ironcore/utils/http"
 	"k8s.io/apiserver/pkg/authentication/authenticator"
 	"k8s.io/apiserver/pkg/authentication/authenticatorfactory"
 	"k8s.io/apiserver/pkg/authentication/user"
@@ -68,7 +68,7 @@ type Options struct {
 
 	// CertDir is the directory that contains the server key and certificate.
 	// If not set, the server would look up the key and certificate in
-	// {TempDir}/onmetal-api-machinepool-server/serving-certs. The key and certificate
+	// {TempDir}/ironcore-machinepool-server/serving-certs. The key and certificate
 	// must be named tls.key and tls.crt, respectively.
 	// If the files don't exist, a self-signed certificate is generated.
 	CertDir string
@@ -324,7 +324,7 @@ func (s *Server) router() http.Handler {
 	r.Use(utilshttp.InjectLogger(s.log))
 	r.Use(utilshttp.LogRequest)
 
-	r.Route("/apis/compute.api.onmetal.de", func(r chi.Router) {
+	r.Route("/apis/compute.ironcore.dev", func(r chi.Router) {
 		if s.auth != nil {
 			r.Use(s.authMiddleware)
 		}

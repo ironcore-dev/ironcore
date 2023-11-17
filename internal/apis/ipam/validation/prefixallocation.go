@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@ package validation
 import (
 	"fmt"
 
-	onmetalapivalidation "github.com/onmetal/onmetal-api/internal/api/validation"
-	commonvalidation "github.com/onmetal/onmetal-api/internal/apis/common/validation"
-	"github.com/onmetal/onmetal-api/internal/apis/ipam"
-	"github.com/onmetal/onmetal-api/utils/equality"
+	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
+	commonvalidation "github.com/ironcore-dev/ironcore/internal/apis/common/validation"
+	"github.com/ironcore-dev/ironcore/internal/apis/ipam"
+	"github.com/ironcore-dev/ironcore/utils/equality"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1validation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -91,7 +91,7 @@ func validatePrefixAllocationSpecUpdate(newSpec, oldSpec *ipam.PrefixAllocationS
 		oldSpecCopy.PrefixRef = newSpecCopy.PrefixRef
 	}
 
-	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableFieldWithDiff(newSpecCopy, oldSpecCopy, fldPath)...)
+	allErrs = append(allErrs, ironcorevalidation.ValidateImmutableFieldWithDiff(newSpecCopy, oldSpecCopy, fldPath)...)
 
 	return allErrs
 }

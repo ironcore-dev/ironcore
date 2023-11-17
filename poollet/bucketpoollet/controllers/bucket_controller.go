@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,15 +21,15 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	"github.com/onmetal/controller-utils/clientutils"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	ori "github.com/onmetal/onmetal-api/ori/apis/bucket/v1alpha1"
-	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
-	bucketpoolletv1alpha1 "github.com/onmetal/onmetal-api/poollet/bucketpoollet/api/v1alpha1"
-	"github.com/onmetal/onmetal-api/poollet/bucketpoollet/bcm"
-	"github.com/onmetal/onmetal-api/poollet/bucketpoollet/controllers/events"
-	onmetalapiclient "github.com/onmetal/onmetal-api/utils/client"
-	"github.com/onmetal/onmetal-api/utils/predicates"
+	"github.com/ironcore-dev/controller-utils/clientutils"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/bucket/v1alpha1"
+	orimeta "github.com/ironcore-dev/ironcore/ori/apis/meta/v1alpha1"
+	bucketpoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/bucketpoollet/api/v1alpha1"
+	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/bcm"
+	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/controllers/events"
+	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
+	"github.com/ironcore-dev/ironcore/utils/predicates"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
@@ -102,9 +102,9 @@ func (r *BucketReconciler) listORIBucketsByUID(ctx context.Context, bucketUID ty
 
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 //+kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=buckets,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=buckets/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=buckets/finalizers,verbs=update
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=buckets,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=buckets/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=buckets/finalizers,verbs=update
 
 func (r *BucketReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
@@ -307,7 +307,7 @@ func (r *BucketReconciler) reconcile(ctx context.Context, log logr.Logger, bucke
 	log.V(1).Info("Finalizer is present")
 
 	log.V(1).Info("Ensuring no reconcile annotation")
-	modified, err = onmetalapiclient.PatchEnsureNoReconcileAnnotation(ctx, r.Client, bucket)
+	modified, err = ironcoreclient.PatchEnsureNoReconcileAnnotation(ctx, r.Client, bucket)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error ensuring no reconcile annotation: %w", err)
 	}

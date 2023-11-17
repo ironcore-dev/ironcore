@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,11 +22,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/onmetal/onmetal-api/client-go/informers"
-	corev1alpha1listers "github.com/onmetal/onmetal-api/client-go/listers/core/v1alpha1"
-	"github.com/onmetal/onmetal-api/client-go/onmetalapi"
-	utilcontext "github.com/onmetal/onmetal-api/utils/context"
-	"github.com/onmetal/onmetal-api/utils/quota"
+	"github.com/ironcore-dev/ironcore/client-go/informers"
+	"github.com/ironcore-dev/ironcore/client-go/ironcore"
+	corev1alpha1listers "github.com/ironcore-dev/ironcore/client-go/listers/core/v1alpha1"
+	utilcontext "github.com/ironcore-dev/ironcore/utils/context"
+	"github.com/ironcore-dev/ironcore/utils/quota"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apiserver/pkg/admission"
@@ -46,7 +46,7 @@ type ResourceQuota struct {
 
 	ctx context.Context
 
-	client   onmetalapi.Interface
+	client   ironcore.Interface
 	lister   corev1alpha1listers.ResourceQuotaLister
 	registry quota.Registry
 
@@ -63,11 +63,11 @@ func (r *ResourceQuota) SetQuotaRegistry(registry quota.Registry) {
 	r.registry = registry
 }
 
-func (r *ResourceQuota) SetExternalOnmetalClientSet(client onmetalapi.Interface) {
+func (r *ResourceQuota) SetExternalIronCoreClientSet(client ironcore.Interface) {
 	r.client = client
 }
 
-func (r *ResourceQuota) SetExternalOnmetalInformerFactory(f informers.SharedInformerFactory) {
+func (r *ResourceQuota) SetExternalIronCoreInformerFactory(f informers.SharedInformerFactory) {
 	r.lister = f.Core().V1alpha1().ResourceQuotas().Lister()
 }
 

@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,8 +28,8 @@ const (
 	// MaxIndex is the maximum index usable for Name / returned by ParseName.
 	MaxIndex = numLetters*numLetters + numLetters - 1
 
-	// OnmetalPrefix is the device prefix used by onmetal devices.
-	OnmetalPrefix = "od"
+	// IronCorePrefix is the device prefix used by ironcore devices.
+	IronCorePrefix = "od"
 )
 
 var (

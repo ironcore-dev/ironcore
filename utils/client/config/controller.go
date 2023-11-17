@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	"github.com/onmetal/onmetal-api/utils/certificate"
-	utilrest "github.com/onmetal/onmetal-api/utils/rest"
+	"github.com/ironcore-dev/ironcore/utils/certificate"
+	utilrest "github.com/ironcore-dev/ironcore/utils/rest"
 	certificatesv1 "k8s.io/api/certificates/v1"
 	utilnet "k8s.io/apimachinery/pkg/util/net"
 	"k8s.io/apiserver/pkg/server/healthz"

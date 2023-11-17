@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/onmetal/onmetal-api/broker/common/idgen"
-	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
+	"github.com/ironcore-dev/ironcore/broker/common/idgen"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/volume/v1alpha1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

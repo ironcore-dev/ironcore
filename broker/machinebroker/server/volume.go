@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,60 +18,60 @@ import (
 	"context"
 	"fmt"
 
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	"github.com/onmetal/onmetal-api/utils/generic"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	"github.com/ironcore-dev/ironcore/utils/generic"
 	"golang.org/x/exp/slices"
 	corev1 "k8s.io/api/core/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func onmetalMachineVolumeIndex(onmetalMachine *computev1alpha1.Machine, name string) int {
+func ironcoreMachineVolumeIndex(ironcoreMachine *computev1alpha1.Machine, name string) int {
 	return slices.IndexFunc(
-		onmetalMachine.Spec.Volumes,
+		ironcoreMachine.Spec.Volumes,
 		func(volume computev1alpha1.Volume) bool {
 			return volume.Name == name
 		},
 	)
 }
 
-func (s *Server) bindOnmetalMachineVolume(
+func (s *Server) bindIronCoreMachineVolume(
 	ctx context.Context,
-	onmetalMachine *computev1alpha1.Machine,
-	onmetalVolume *storagev1alpha1.Volume,
+	ironcoreMachine *computev1alpha1.Machine,
+	ironcoreVolume *storagev1alpha1.Volume,
 ) error {
-	baseOnmetalVolume := onmetalVolume.DeepCopy()
-	if err := ctrl.SetControllerReference(onmetalMachine, onmetalVolume, s.cluster.Scheme()); err != nil {
+	baseIronCoreVolume := ironcoreVolume.DeepCopy()
+	if err := ctrl.SetControllerReference(ironcoreMachine, ironcoreVolume, s.cluster.Scheme()); err != nil {
 		return err
 	}
-	onmetalVolume.Spec.ClaimRef = generic.Pointer(s.localObjectReferenceTo(onmetalMachine))
-	return s.cluster.Client().Patch(ctx, onmetalVolume, client.StrategicMergeFrom(baseOnmetalVolume))
+	ironcoreVolume.Spec.ClaimRef = generic.Pointer(s.localObjectReferenceTo(ironcoreMachine))
+	return s.cluster.Client().Patch(ctx, ironcoreVolume, client.StrategicMergeFrom(baseIronCoreVolume))
 }
 
-func (s *Server) aggregateOnmetalVolume(
+func (s *Server) aggregateIronCoreVolume(
 	ctx context.Context,
 	rd client.Reader,
-	onmetalVolume *storagev1alpha1.Volume,
-) (*AggregateOnmetalVolume, error) {
-	access := onmetalVolume.Status.Access
+	ironcoreVolume *storagev1alpha1.Volume,
+) (*AggregateIronCoreVolume, error) {
+	access := ironcoreVolume.Status.Access
 	if access == nil {
 		return nil, fmt.Errorf("volume does not specify access")
 	}
 
-	var onmetalVolumeAccessSecret *corev1.Secret
-	if onmetalVolumeSecretRef := access.SecretRef; onmetalVolumeSecretRef != nil {
+	var ironcoreVolumeAccessSecret *corev1.Secret
+	if ironcoreVolumeSecretRef := access.SecretRef; ironcoreVolumeSecretRef != nil {
 		secret := &corev1.Secret{}
-		secretKey := client.ObjectKey{Namespace: s.cluster.Namespace(), Name: onmetalVolumeSecretRef.Name}
+		secretKey := client.ObjectKey{Namespace: s.cluster.Namespace(), Name: ironcoreVolumeSecretRef.Name}
 		if err := rd.Get(ctx, secretKey, secret); err != nil {
-			return nil, fmt.Errorf("error access secret %s: %w", onmetalVolumeSecretRef.Name, err)
+			return nil, fmt.Errorf("error access secret %s: %w", ironcoreVolumeSecretRef.Name, err)
 		}
 
-		onmetalVolumeAccessSecret = secret
+		ironcoreVolumeAccessSecret = secret
 	}
 
-	return &AggregateOnmetalVolume{
-		Volume:       onmetalVolume,
-		AccessSecret: onmetalVolumeAccessSecret,
+	return &AggregateIronCoreVolume{
+		Volume:       ironcoreVolume,
+		AccessSecret: ironcoreVolumeAccessSecret,
 	}, nil
 }

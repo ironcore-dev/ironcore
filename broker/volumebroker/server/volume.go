@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,29 +17,29 @@ package server
 import (
 	"fmt"
 
-	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	"github.com/onmetal/onmetal-api/broker/volumebroker/apiutils"
-	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	"github.com/ironcore-dev/ironcore/broker/volumebroker/apiutils"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/volume/v1alpha1"
 )
 
-func (s *Server) convertAggregateOnmetalVolume(volume *AggregateOnmetalVolume) (*ori.Volume, error) {
+func (s *Server) convertAggregateIronCoreVolume(volume *AggregateIronCoreVolume) (*ori.Volume, error) {
 	metadata, err := apiutils.GetObjectMetadata(volume.Volume)
 	if err != nil {
 		return nil, err
 	}
 
-	resources, err := s.convertOnmetalVolumeResources(volume.Volume.Spec.Resources)
+	resources, err := s.convertIronCoreVolumeResources(volume.Volume.Spec.Resources)
 	if err != nil {
 		return nil, err
 	}
 
-	state, err := s.convertOnmetalVolumeState(volume.Volume.Status.State)
+	state, err := s.convertIronCoreVolumeState(volume.Volume.Status.State)
 	if err != nil {
 		return nil, err
 	}
 
-	access, err := s.convertOnmetalVolumeAccess(volume)
+	access, err := s.convertIronCoreVolumeAccess(volume)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func (s *Server) convertAggregateOnmetalVolume(volume *AggregateOnmetalVolume) (
 			Image:      volume.Volume.Spec.Image,
 			Class:      volume.Volume.Spec.VolumeClassRef.Name,
 			Resources:  resources,
-			Encryption: s.convertOnmetalVolumeEncryption(volume),
+			Encryption: s.convertIronCoreVolumeEncryption(volume),
 		},
 		Status: &ori.VolumeStatus{
 			State:  state,
@@ -59,20 +59,20 @@ func (s *Server) convertAggregateOnmetalVolume(volume *AggregateOnmetalVolume) (
 	}, nil
 }
 
-var onmetalVolumeStateToORIState = map[storagev1alpha1.VolumeState]ori.VolumeState{
+var ironcoreVolumeStateToORIState = map[storagev1alpha1.VolumeState]ori.VolumeState{
 	storagev1alpha1.VolumeStatePending:   ori.VolumeState_VOLUME_PENDING,
 	storagev1alpha1.VolumeStateAvailable: ori.VolumeState_VOLUME_AVAILABLE,
 	storagev1alpha1.VolumeStateError:     ori.VolumeState_VOLUME_ERROR,
 }
 
-func (s *Server) convertOnmetalVolumeState(state storagev1alpha1.VolumeState) (ori.VolumeState, error) {
-	if state, ok := onmetalVolumeStateToORIState[state]; ok {
+func (s *Server) convertIronCoreVolumeState(state storagev1alpha1.VolumeState) (ori.VolumeState, error) {
+	if state, ok := ironcoreVolumeStateToORIState[state]; ok {
 		return state, nil
 	}
-	return 0, fmt.Errorf("unknown onmetal volume state %q", state)
+	return 0, fmt.Errorf("unknown ironcore volume state %q", state)
 }
 
-func (s *Server) convertOnmetalVolumeResources(resources corev1alpha1.ResourceList) (*ori.VolumeResources, error) {
+func (s *Server) convertIronCoreVolumeResources(resources corev1alpha1.ResourceList) (*ori.VolumeResources, error) {
 	storage := resources.Storage()
 	if storage.IsZero() {
 		return nil, fmt.Errorf("volume does not specify storage resource")
@@ -83,7 +83,7 @@ func (s *Server) convertOnmetalVolumeResources(resources corev1alpha1.ResourceLi
 	}, nil
 }
 
-func (s *Server) convertOnmetalVolumeEncryption(volume *AggregateOnmetalVolume) *ori.EncryptionSpec {
+func (s *Server) convertIronCoreVolumeEncryption(volume *AggregateIronCoreVolume) *ori.EncryptionSpec {
 	if volume.EncryptionSecret == nil {
 		return nil
 	}
@@ -93,7 +93,7 @@ func (s *Server) convertOnmetalVolumeEncryption(volume *AggregateOnmetalVolume) 
 	}
 }
 
-func (s *Server) convertOnmetalVolumeAccess(volume *AggregateOnmetalVolume) (*ori.VolumeAccess, error) {
+func (s *Server) convertIronCoreVolumeAccess(volume *AggregateIronCoreVolume) (*ori.VolumeAccess, error) {
 	if volume.Volume.Status.State != storagev1alpha1.VolumeStateAvailable {
 		return nil, nil
 	}
@@ -106,7 +106,7 @@ func (s *Server) convertOnmetalVolumeAccess(volume *AggregateOnmetalVolume) (*or
 	var secretData map[string][]byte
 	if secretRef := access.SecretRef; secretRef != nil {
 		if volume.AccessSecret == nil {
-			return nil, fmt.Errorf("access secret specified but not contained in aggregate onmetal volume")
+			return nil, fmt.Errorf("access secret specified but not contained in aggregate ironcore volume")
 		}
 		secretData = volume.AccessSecret.Data
 	}

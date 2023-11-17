@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@ package controllers_test
 import (
 	"fmt"
 
-	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
-	onmetalapiclient "github.com/onmetal/onmetal-api/utils/client"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/volume/v1alpha1"
+	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -92,7 +92,7 @@ var _ = Describe("VolumeController", func() {
 		}
 		oriVolume.Status.State = ori.VolumeState_VOLUME_AVAILABLE
 
-		Expect(onmetalapiclient.PatchAddReconcileAnnotation(ctx, k8sClient, volume)).Should(Succeed())
+		Expect(ironcoreclient.PatchAddReconcileAnnotation(ctx, k8sClient, volume)).Should(Succeed())
 
 		Eventually(Object(volume)).Should(SatisfyAll(
 			HaveField("Status.State", storagev1alpha1.VolumeStateAvailable),

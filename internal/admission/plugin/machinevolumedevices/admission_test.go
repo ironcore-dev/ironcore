@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@ package machinevolumedevices_test
 import (
 	"context"
 
-	. "github.com/onmetal/onmetal-api/internal/admission/plugin/machinevolumedevices"
-	"github.com/onmetal/onmetal-api/internal/apis/compute"
-	"github.com/onmetal/onmetal-api/internal/apis/storage"
+	. "github.com/ironcore-dev/ironcore/internal/admission/plugin/machinevolumedevices"
+	"github.com/ironcore-dev/ironcore/internal/apis/compute"
+	"github.com/ironcore-dev/ironcore/internal/apis/storage"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

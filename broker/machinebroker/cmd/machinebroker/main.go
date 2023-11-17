@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/onmetal/onmetal-api/broker/machinebroker/cmd/machinebroker/app"
+	"github.com/ironcore-dev/ironcore/broker/machinebroker/cmd/machinebroker/app"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 

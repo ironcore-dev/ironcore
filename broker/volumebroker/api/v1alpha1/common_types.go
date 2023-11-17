@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,13 +15,13 @@
 package v1alpha1
 
 const (
-	LabelsAnnotation = "volumebroker.api.onmetal.de/labels"
+	LabelsAnnotation = "volumebroker.ironcore.dev/labels"
 
-	AnnotationsAnnotation = "volumebroker.api.onmetal.de/annotations"
+	AnnotationsAnnotation = "volumebroker.ironcore.dev/annotations"
 
-	CreatedLabel = "volumebroker.api.onmetal.de/created"
+	CreatedLabel = "volumebroker.ironcore.dev/created"
 
-	PurposeLabel = "machinebroker.api.onmetal.de/purpose"
+	PurposeLabel = "machinebroker.ironcore.dev/purpose"
 )
 
 const (
@@ -29,7 +29,7 @@ const (
 )
 
 const (
-	ManagerLabel = "volumebroker.api.onmetal.de/manager"
+	ManagerLabel = "volumebroker.ironcore.dev/manager"
 )
 
 const (

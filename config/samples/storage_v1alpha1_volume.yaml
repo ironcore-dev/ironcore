@@ -1,4 +1,4 @@
-apiVersion: storage.api.onmetal.de/v1alpha1
+apiVersion: storage.ironcore.dev/v1alpha1
 kind: Volume
 metadata:
   name: volume-sample

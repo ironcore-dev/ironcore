@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ import (
 	"context"
 	"fmt"
 
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -26,22 +26,22 @@ func (s *Server) UpdateMachinePower(ctx context.Context, req *ori.UpdateMachineP
 	machineID := req.MachineId
 	log := s.loggerFrom(ctx, "MachineID", machineID)
 
-	log.V(1).Info("Getting onmetal machine")
-	aggOnmetalMachine, err := s.getAggregateOnmetalMachine(ctx, machineID)
+	log.V(1).Info("Getting ironcore machine")
+	aggIronCoreMachine, err := s.getAggregateIronCoreMachine(ctx, machineID)
 	if err != nil {
 		return nil, err
 	}
 
-	power, err := s.prepareOnmetalMachinePower(req.Power)
+	power, err := s.prepareIronCoreMachinePower(req.Power)
 	if err != nil {
 		return nil, err
 	}
 
-	base := aggOnmetalMachine.Machine.DeepCopy()
-	aggOnmetalMachine.Machine.Spec.Power = power
-	log.V(1).Info("Patching onmetal machine power")
-	if err := s.cluster.Client().Patch(ctx, aggOnmetalMachine.Machine, client.MergeFrom(base)); err != nil {
-		return nil, fmt.Errorf("error patching onmetal machine power: %w", err)
+	base := aggIronCoreMachine.Machine.DeepCopy()
+	aggIronCoreMachine.Machine.Spec.Power = power
+	log.V(1).Info("Patching ironcore machine power")
+	if err := s.cluster.Client().Patch(ctx, aggIronCoreMachine.Machine, client.MergeFrom(base)); err != nil {
+		return nil, fmt.Errorf("error patching ironcore machine power: %w", err)
 	}
 
 	return &ori.UpdateMachinePowerResponse{}, nil

@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import (
 	"net/http"
 	"sync"
 
-	utilrest "github.com/onmetal/onmetal-api/utils/rest"
+	utilrest "github.com/ironcore-dev/ironcore/utils/rest"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/rest"
 )

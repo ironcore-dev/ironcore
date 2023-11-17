@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@ package main
 import (
 	"os"
 
-	"github.com/onmetal/onmetal-api/orictl-machine/cmd/orictl-machine/orictlmachine"
-	clicommon "github.com/onmetal/onmetal-api/orictl/cmd"
+	"github.com/ironcore-dev/ironcore/orictl-machine/cmd/orictl-machine/orictlmachine"
+	clicommon "github.com/ironcore-dev/ironcore/orictl/cmd"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 

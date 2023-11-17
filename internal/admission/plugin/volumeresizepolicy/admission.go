@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	"github.com/onmetal/onmetal-api/client-go/onmetalapi"
-	"github.com/onmetal/onmetal-api/internal/apis/core"
-	"github.com/onmetal/onmetal-api/internal/apis/storage"
+	"github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	"github.com/ironcore-dev/ironcore/client-go/ironcore"
+	"github.com/ironcore-dev/ironcore/internal/apis/core"
+	"github.com/ironcore-dev/ironcore/internal/apis/storage"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apiserver/pkg/admission"
@@ -37,7 +37,7 @@ func Register(plugins *admission.Plugins) {
 }
 
 type VolumeExpansion struct {
-	client onmetalapi.Interface
+	client ironcore.Interface
 	*admission.Handler
 }
 
@@ -98,7 +98,7 @@ func (v *VolumeExpansion) Validate(ctx context.Context, a admission.Attributes, 
 	return nil
 }
 
-func (v *VolumeExpansion) SetExternalOnmetalClientSet(client onmetalapi.Interface) {
+func (v *VolumeExpansion) SetExternalIronCoreClientSet(client ironcore.Interface) {
 	v.client = client
 }
 

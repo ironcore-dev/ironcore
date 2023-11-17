@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
 package get
 
 import (
-	"github.com/onmetal/onmetal-api/orictl-bucket/cmd/orictl-bucket/orictlbucket/common"
-	"github.com/onmetal/onmetal-api/orictl-bucket/cmd/orictl-bucket/orictlbucket/get/bucket"
-	"github.com/onmetal/onmetal-api/orictl-bucket/cmd/orictl-bucket/orictlbucket/get/bucketclass"
-	orictlcmd "github.com/onmetal/onmetal-api/orictl/cmd"
+	"github.com/ironcore-dev/ironcore/orictl-bucket/cmd/orictl-bucket/orictlbucket/common"
+	"github.com/ironcore-dev/ironcore/orictl-bucket/cmd/orictl-bucket/orictlbucket/get/bucket"
+	"github.com/ironcore-dev/ironcore/orictl-bucket/cmd/orictl-bucket/orictlbucket/get/bucketclass"
+	orictlcmd "github.com/ironcore-dev/ironcore/orictl/cmd"
 	"github.com/spf13/cobra"
 )
 

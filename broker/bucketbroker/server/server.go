@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,14 +22,14 @@ import (
 	"strconv"
 
 	"github.com/go-logr/logr"
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	bucketbrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/bucketbroker/api/v1alpha1"
-	"github.com/onmetal/onmetal-api/broker/bucketbroker/apiutils"
-	"github.com/onmetal/onmetal-api/broker/common/cleaner"
-	ori "github.com/onmetal/onmetal-api/ori/apis/bucket/v1alpha1"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	bucketbrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/bucketbroker/api/v1alpha1"
+	"github.com/ironcore-dev/ironcore/broker/bucketbroker/apiutils"
+	"github.com/ironcore-dev/ironcore/broker/common/cleaner"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/bucket/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -114,7 +114,7 @@ func setOptionsDefaults(o *Options) {
 var _ ori.BucketRuntimeServer = (*Server)(nil)
 
 //+kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=buckets,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=buckets,verbs=get;list;watch;create;update;patch;delete
 
 func New(cfg *rest.Config, opts Options) (*Server, error) {
 	setOptionsDefaults(&opts)

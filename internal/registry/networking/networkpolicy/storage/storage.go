@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 by the OnMetal authors.
+ * Copyright (c) 2022 by the IronCore authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ package storage
 import (
 	"context"
 
-	"github.com/onmetal/onmetal-api/internal/apis/networking"
-	"github.com/onmetal/onmetal-api/internal/registry/networking/networkpolicy"
+	"github.com/ironcore-dev/ironcore/internal/apis/networking"
+	"github.com/ironcore-dev/ironcore/internal/registry/networking/networkpolicy"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apiserver/pkg/registry/generic"

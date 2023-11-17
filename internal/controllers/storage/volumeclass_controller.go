@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 by the OnMetal authors.
+ * Copyright (c) 2021 by the IronCore authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,10 @@ import (
 	"sort"
 
 	"github.com/go-logr/logr"
-	"github.com/onmetal/controller-utils/clientutils"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	storageclient "github.com/onmetal/onmetal-api/internal/client/storage"
-	"github.com/onmetal/onmetal-api/utils/slices"
+	"github.com/ironcore-dev/controller-utils/clientutils"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	storageclient "github.com/ironcore-dev/ironcore/internal/client/storage"
+	"github.com/ironcore-dev/ironcore/utils/slices"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/util/workqueue"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -41,10 +41,10 @@ type VolumeClassReconciler struct {
 	APIReader client.Reader
 }
 
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumeclasses,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumeclasses/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumeclasses/finalizers,verbs=update
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes,verbs=get;list;watch
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumeclasses,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumeclasses/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumeclasses/finalizers,verbs=update
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumes,verbs=get;list;watch
 
 // Reconcile moves the current state of the cluster closer to the desired state.
 func (r *VolumeClassReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {

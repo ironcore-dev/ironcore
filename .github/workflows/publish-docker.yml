@@ -24,27 +24,27 @@ jobs:
     strategy:
       matrix:
         image:
-        - name: onmetal-api-controller-manager
+        - name: ironcore-controller-manager
           target: manager
-        - name: onmetal-api-apiserver
+        - name: ironcore-apiserver
           target: apiserver
-        - name: onmetal-api-machinepoollet
+        - name: ironcore-machinepoollet
           target: machinepoollet
-        - name: onmetal-api-machinebroker
+        - name: ironcore-machinebroker
           target: machinebroker
-        - name: onmetal-api-orictl-machine
+        - name: ironcore-orictl-machine
           target: orictl-machine
-        - name: onmetal-api-volumepoollet
+        - name: ironcore-volumepoollet
           target: volumepoollet
-        - name: onmetal-api-volumebroker
+        - name: ironcore-volumebroker
           target: volumebroker
-        - name: onmetal-api-orictl-volume
+        - name: ironcore-orictl-volume
           target: orictl-volume
-        - name: onmetal-api-bucketpoollet
+        - name: ironcore-bucketpoollet
           target: bucketpoollet
-        - name: onmetal-api-bucketbroker
+        - name: ironcore-bucketbroker
           target: bucketbroker
-        - name: onmetal-api-orictl-bucket
+        - name: ironcore-orictl-bucket
           target: orictl-bucket
     permissions:
       contents: read

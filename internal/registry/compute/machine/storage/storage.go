@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/onmetal/onmetal-api/internal/apis/compute"
-	"github.com/onmetal/onmetal-api/internal/machinepoollet/client"
-	"github.com/onmetal/onmetal-api/internal/registry/compute/machine"
+	"github.com/ironcore-dev/ironcore/internal/apis/compute"
+	"github.com/ironcore-dev/ironcore/internal/machinepoollet/client"
+	"github.com/ironcore-dev/ironcore/internal/registry/compute/machine"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/proxy"

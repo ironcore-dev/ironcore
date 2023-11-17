@@ -15,7 +15,7 @@ import (
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
 	github_com_gogo_protobuf_sortkeys "github.com/gogo/protobuf/sortkeys"
-	v1alpha1 "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
+	v1alpha1 "github.com/ironcore-dev/ironcore/ori/apis/meta/v1alpha1"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"

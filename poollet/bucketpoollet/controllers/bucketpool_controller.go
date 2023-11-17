@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	ori "github.com/onmetal/onmetal-api/ori/apis/bucket/v1alpha1"
-	"github.com/onmetal/onmetal-api/poollet/bucketpoollet/bcm"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/bucket/v1alpha1"
+	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/bcm"
 	corev1 "k8s.io/api/core/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
@@ -38,9 +38,9 @@ type BucketPoolReconciler struct {
 	BucketClassMapper bcm.BucketClassMapper
 }
 
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=bucketpools,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=bucketpools/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=bucketclasses,verbs=get;list;watch
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=bucketpools,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=bucketpools/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=bucketclasses,verbs=get;list;watch
 
 func (r *BucketPoolReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)

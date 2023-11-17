@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 by the OnMetal authors.
+ * Copyright (c) 2022 by the IronCore authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package v1alpha1
 
 import (
-	"github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	"github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"

@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,18 +24,18 @@ const (
 	BucketBucketClassRefNameField = "spec.bucketClassRef.name"
 
 	// VolumePoolsGroup is the system rbac group all volume pools are in.
-	VolumePoolsGroup = "storage.api.onmetal.de:system:volumepools"
+	VolumePoolsGroup = "storage.ironcore.dev:system:volumepools"
 
 	// VolumePoolUserNamePrefix is the prefix all volume pool users should have.
-	VolumePoolUserNamePrefix = "storage.api.onmetal.de:system:volumepool:"
+	VolumePoolUserNamePrefix = "storage.ironcore.dev:system:volumepool:"
 
 	// BucketPoolsGroup is the system rbac group all bucket pools are in.
-	BucketPoolsGroup = "storage.api.onmetal.de:system:bucketpools"
+	BucketPoolsGroup = "storage.ironcore.dev:system:bucketpools"
 
 	// BucketPoolUserNamePrefix is the prefix all bucket pool users should have.
-	BucketPoolUserNamePrefix = "storage.api.onmetal.de:system:bucketpool:"
+	BucketPoolUserNamePrefix = "storage.ironcore.dev:system:bucketpool:"
 
-	SecretTypeVolumeAuth = corev1.SecretType("storage.api.onmetal.de/volume-auth")
+	SecretTypeVolumeAuth = corev1.SecretType("storage.ironcore.dev/volume-auth")
 )
 
 // VolumePoolCommonName constructs the common name for a certificate of a volume pool user.

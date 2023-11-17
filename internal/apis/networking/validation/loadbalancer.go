@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 by the OnMetal authors.
+ * Copyright (c) 2022 by the IronCore authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ package validation
 import (
 	"fmt"
 
-	onmetalapivalidation "github.com/onmetal/onmetal-api/internal/api/validation"
-	"github.com/onmetal/onmetal-api/internal/apis/networking"
+	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
+	"github.com/ironcore-dev/ironcore/internal/apis/networking"
 	corev1 "k8s.io/api/core/v1"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -45,7 +45,7 @@ func validateLoadBalancerSpec(spec *networking.LoadBalancerSpec, lbMeta *metav1.
 
 	allErrs = append(allErrs, validateLoadBalancerType(spec.Type, fldPath.Child("type"))...)
 
-	allErrs = append(allErrs, onmetalapivalidation.ValidateIPFamilies(spec.IPFamilies, fldPath.Child("ipFamilies"))...)
+	allErrs = append(allErrs, ironcorevalidation.ValidateIPFamilies(spec.IPFamilies, fldPath.Child("ipFamilies"))...)
 
 	allErrs = append(allErrs, validateNetworkInterfaceIPSources(spec.IPs, spec.IPFamilies, lbMeta, fldPath.Child("ips"))...)
 
@@ -101,14 +101,14 @@ var supportedLoadBalancerTypes = sets.New(
 )
 
 func validateLoadBalancerType(loadBalancerType networking.LoadBalancerType, fldPath *field.Path) field.ErrorList {
-	return onmetalapivalidation.ValidateEnum(supportedLoadBalancerTypes, loadBalancerType, fldPath, "must specify type")
+	return ironcorevalidation.ValidateEnum(supportedLoadBalancerTypes, loadBalancerType, fldPath, "must specify type")
 }
 
 func validateLoadBalancerPort(port networking.LoadBalancerPort, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
 	if port.Protocol != nil {
-		allErrs = append(allErrs, onmetalapivalidation.ValidateProtocol(*port.Protocol, fldPath.Child("protocol"))...)
+		allErrs = append(allErrs, ironcorevalidation.ValidateProtocol(*port.Protocol, fldPath.Child("protocol"))...)
 	}
 
 	for _, msg := range validation.IsValidPortNum(int(port.Port)) {
@@ -142,7 +142,7 @@ func ValidateLoadBalancerUpdate(newLoadBalancer, oldLoadBalancer *networking.Loa
 func validateLoadBalancerSpecUpdate(newSpec, oldSpec *networking.LoadBalancerSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableField(newSpec.NetworkRef, oldSpec.NetworkRef, fldPath.Child("networkRef"))...)
+	allErrs = append(allErrs, ironcorevalidation.ValidateImmutableField(newSpec.NetworkRef, oldSpec.NetworkRef, fldPath.Child("networkRef"))...)
 
 	return allErrs
 }

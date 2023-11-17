@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,12 +19,12 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
-	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
-	"github.com/onmetal/onmetal-api/poollet/orievent"
-	volumepoolletv1alpha1 "github.com/onmetal/onmetal-api/poollet/volumepoollet/api/v1alpha1"
-	onmetalapiclient "github.com/onmetal/onmetal-api/utils/client"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	orimeta "github.com/ironcore-dev/ironcore/ori/apis/meta/v1alpha1"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/volume/v1alpha1"
+	"github.com/ironcore-dev/ironcore/poollet/orievent"
+	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
+	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -49,7 +49,7 @@ func (r *VolumeAnnotatorReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 		},
 	}
 
-	if err := onmetalapiclient.PatchAddReconcileAnnotation(ctx, r.Client, volume); client.IgnoreNotFound(err) != nil {
+	if err := ironcoreclient.PatchAddReconcileAnnotation(ctx, r.Client, volume); client.IgnoreNotFound(err) != nil {
 		return ctrl.Result{}, fmt.Errorf("error patching volume: %w", err)
 	}
 	return ctrl.Result{}, nil

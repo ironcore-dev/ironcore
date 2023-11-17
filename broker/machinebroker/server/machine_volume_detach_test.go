@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
 package server_test
 
 import (
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
@@ -67,22 +67,22 @@ var _ = Describe("DetachVolume", func() {
 			Name:      "my-volume",
 		})).Error().NotTo(HaveOccurred())
 
-		By("getting the onmetal machine")
-		onmetalMachine := &computev1alpha1.Machine{}
-		onmetalMachineKey := client.ObjectKey{Namespace: ns.Name, Name: machineID}
-		Expect(k8sClient.Get(ctx, onmetalMachineKey, onmetalMachine)).To(Succeed())
+		By("getting the ironcore machine")
+		ironcoreMachine := &computev1alpha1.Machine{}
+		ironcoreMachineKey := client.ObjectKey{Namespace: ns.Name, Name: machineID}
+		Expect(k8sClient.Get(ctx, ironcoreMachineKey, ironcoreMachine)).To(Succeed())
 
-		By("inspecting the onmetal machine's volumes")
-		Expect(onmetalMachine.Spec.Volumes).To(BeEmpty())
+		By("inspecting the ironcore machine's volumes")
+		Expect(ironcoreMachine.Spec.Volumes).To(BeEmpty())
 
-		By("listing for any onmetal volume in the namespace")
+		By("listing for any ironcore volume in the namespace")
 		volumeList := &storagev1alpha1.VolumeList{}
 		Expect(k8sClient.List(ctx, volumeList, client.InNamespace(ns.Name))).To(Succeed())
 
 		By("asserting the list to be empty")
 		Expect(volumeList.Items).To(BeEmpty())
 
-		By("listing for any onmetal secret in the namespace")
+		By("listing for any ironcore secret in the namespace")
 		secretList := &corev1.SecretList{}
 		Expect(k8sClient.List(ctx, secretList,
 			client.InNamespace(ns.Name),

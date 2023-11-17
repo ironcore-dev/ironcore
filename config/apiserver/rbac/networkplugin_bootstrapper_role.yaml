@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: networking.api.onmetal.de:system:networkplugins-bootstrapper
+  name: networking.ironcore.dev:system:networkplugins-bootstrapper
 rules:
   - apiGroups:
       - certificates.k8s.io

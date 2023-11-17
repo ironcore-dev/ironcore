@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package volume
 import (
 	"context"
 
-	api "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
+	api "github.com/ironcore-dev/ironcore/ori/apis/volume/v1alpha1"
 )
 
 type RuntimeService interface {

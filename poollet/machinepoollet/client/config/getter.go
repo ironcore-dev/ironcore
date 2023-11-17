@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@ import (
 	"crypto/x509/pkix"
 	"os"
 
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	utilcertificate "github.com/onmetal/onmetal-api/utils/certificate"
-	"github.com/onmetal/onmetal-api/utils/client/config"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	utilcertificate "github.com/ironcore-dev/ironcore/utils/certificate"
+	"github.com/ironcore-dev/ironcore/utils/client/config"
 	certificatesv1 "k8s.io/api/certificates/v1"
 	"k8s.io/apiserver/pkg/server/egressselector"
 	ctrl "sigs.k8s.io/controller-runtime"

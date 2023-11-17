@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,14 +20,14 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
-	computeclient "github.com/onmetal/onmetal-api/internal/client/compute"
-	"github.com/onmetal/onmetal-api/ori/apis/machine"
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	"github.com/onmetal/onmetal-api/poollet/machinepoollet/mcm"
-	onmetalapiclient "github.com/onmetal/onmetal-api/utils/client"
-	"github.com/onmetal/onmetal-api/utils/quota"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	computeclient "github.com/ironcore-dev/ironcore/internal/client/compute"
+	"github.com/ironcore-dev/ironcore/ori/apis/machine"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
+	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/mcm"
+	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
+	"github.com/ironcore-dev/ironcore/utils/quota"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -51,9 +51,9 @@ type MachinePoolReconciler struct {
 	MachineClassMapper mcm.MachineClassMapper
 }
 
-//+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machinepools,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machinepools/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machineclasses,verbs=get;list;watch
+//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machinepools,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machinepools/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machineclasses,verbs=get;list;watch
 
 func (r *MachinePoolReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
@@ -156,7 +156,7 @@ func (r *MachinePoolReconciler) reconcile(ctx context.Context, log logr.Logger, 
 	log.V(1).Info("Reconcile")
 
 	log.V(1).Info("Ensuring no reconcile annotation")
-	modified, err := onmetalapiclient.PatchEnsureNoReconcileAnnotation(ctx, r.Client, machinePool)
+	modified, err := ironcoreclient.PatchEnsureNoReconcileAnnotation(ctx, r.Client, machinePool)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error ensuring no reconcile annotation: %w", err)
 	}

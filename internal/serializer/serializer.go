@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ func SubsetNegotiatedSerializer(codecs serializer.CodecFactory, accepts ...func(
 	return subsetNegotiatedSerializer{accepts, codecs}
 }
 
-// DefaultSubsetNegotiatedSerializer is the default onmetal serializer that does not use protobuf.
+// DefaultSubsetNegotiatedSerializer is the default ironcore serializer that does not use protobuf.
 // Since our types *don't* implement protobuf encoding, and without removing the protobuf support,
 // namespace deletion would fail (see issue https://github.com/kubernetes/kubernetes/issues/86666). As such,
 // until we either enhance content type negotiation or implement protobuf for our types, we have to make

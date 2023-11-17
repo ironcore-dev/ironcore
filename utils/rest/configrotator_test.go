@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	"github.com/onmetal/onmetal-api/utils/certificate"
-	certificatetesting "github.com/onmetal/onmetal-api/utils/certificate/testing"
-	. "github.com/onmetal/onmetal-api/utils/rest"
+	"github.com/ironcore-dev/ironcore/utils/certificate"
+	certificatetesting "github.com/ironcore-dev/ironcore/utils/certificate/testing"
+	. "github.com/ironcore-dev/ironcore/utils/rest"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	v1 "k8s.io/api/authorization/v1"
@@ -72,7 +72,7 @@ var _ = Describe("ConfigRotator", func() {
 
 		By("creating a rotator")
 		template := &x509.CertificateRequest{}
-		signerName := "rotator-signer.api.onmetal.de"
+		signerName := "rotator-signer.ironcore.dev"
 		requestedDuration := pointer.Duration(1 * time.Hour)
 		rotatorName := "rotator"
 		r, err := NewConfigRotator(nil, bootstrapUser.Config(), ConfigRotatorOptions{
@@ -175,7 +175,7 @@ var _ = Describe("ConfigRotator", func() {
 
 		By("creating a rotator")
 		template := &x509.CertificateRequest{}
-		signerName := "rotator-signer.api.onmetal.de"
+		signerName := "rotator-signer.ironcore.dev"
 		requestedDuration := pointer.Duration(1 * time.Hour)
 		rotatorName := "rotator"
 

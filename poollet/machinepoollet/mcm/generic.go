@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/gogo/protobuf/proto"
-	"github.com/onmetal/onmetal-api/ori/apis/machine"
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	"github.com/onmetal/onmetal-api/poollet/orievent"
+	"github.com/ironcore-dev/ironcore/ori/apis/machine"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
+	"github.com/ironcore-dev/ironcore/poollet/orievent"
 	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"

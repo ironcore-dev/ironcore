@@ -2,17 +2,17 @@
 
 ## Contributing 
 
-The Gardener on Metal project uses Github to manage reviews of pull requests.
+The IronCore project uses Github to manage reviews of pull requests.
 
 * If you are looking to make your first contribution, follow [Steps to Contribute](#steps-to-contribute)
 
 * If you have a trivial fix or improvement, go ahead and create a pull request and
 address (with @...) a suitable maintainer of this repository 
-(see [CODEOWNERS](https://raw.githubusercontent.com/onmetal/onmetal-api/main/CODEOWNERS) 
+(see [CODEOWNERS](https://raw.githubusercontent.com/ironcore-dev/ironcore/main/CODEOWNERS) 
 of this repository) in the description of the pull request.
 
 * If you plan to do something more involved, first discuss your ideas by creating an 
-[issue](https://github.com/onmetal/onmetal-api/issues) for this repository. This will avoid unnecessary work and surely give you 
+[issue](https://github.com/ironcore-dev/ironcore/issues) for this repository. This will avoid unnecessary work and surely give you 
 and us a good deal of inspiration.
 
 !!! note 
@@ -35,7 +35,7 @@ We kindly ask you to follow the [Pull Request Checklist](#pull-request-checklist
 
 ## Contributing Code
 
-You are welcome to contribute code to the Gardener on Metal project in order to fix a bug or to implement a new feature.
+You are welcome to contribute code to the IronCore project in order to fix a bug or to implement a new feature.
 
 The following rules govern code contributions:
 
@@ -44,7 +44,7 @@ The following rules govern code contributions:
 
 ## Contributing Documentation
 
-You are welcome to contribute documentation to the Gardener on Metal project.
+You are welcome to contribute documentation to the IronCore project.
 
 The following rules govern documentation contributions:
 
@@ -54,7 +54,7 @@ The following rules govern documentation contributions:
 ## Developer Certificate of Origin
 
 Due to legal reasons, contributors will be asked to accept a Developer Certificate of Origin (DCO) before they submit 
-the first pull request to the Gardener on Metal project, this happens in an automated fashion during the submission 
+the first pull request to the IronCore project, this happens in an automated fashion during the submission 
 process. We use [the standard DCO text of the Linux Foundation](https://developercertificate.org/).
 
 ## Pull Request Checklist
@@ -62,8 +62,8 @@ process. We use [the standard DCO text of the Linux Foundation](https://develope
 * Fork and clone the repository to you local machine.
 
 ```shell
-git clone git@github.com:YOUR_GITHUB_USER/onmetal-api.git
-cd onmetal-api
+git clone git@github.com:YOUR_GITHUB_USER/ironcore.git
+cd ironcore
 ```
 
 * Create a branch from the `main`  using 'git checkout' command. 
@@ -109,8 +109,8 @@ for a review in the pull request or a comment.
 ## Issues and Planning
 
 We use GitHub issues to track bugs and enhancement requests. Please provide as much context as possible when you open  an issue. The information you provide must be comprehensive enough to understand, reproduce the behavior and find related reports of  that issue for the assignee. 
-Therefore, contributors may use but aren't restricted to the issue template provided by the Gardener on Metal maintainers.
+Therefore, contributors may use but aren't restricted to the issue template provided by the IronCore maintainers.
 
-Issues and pull requests are tracked in the [backlog](https://github.com/onmetal/onmetal-api/projects/1) for this project.
+Issues and pull requests are tracked in the [backlog](https://github.com/ironcore-dev/ironcore/projects/1) for this project.
 
 --8<-- "hack/docs/abbreviations.md"

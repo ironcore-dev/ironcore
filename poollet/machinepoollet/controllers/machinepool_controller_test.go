@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
 package controllers_test
 
 import (
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	"github.com/onmetal/onmetal-api/ori/testing/machine"
-	testingmachine "github.com/onmetal/onmetal-api/ori/testing/machine"
-	"github.com/onmetal/onmetal-api/utils/quota"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
+	"github.com/ironcore-dev/ironcore/ori/testing/machine"
+	testingmachine "github.com/ironcore-dev/ironcore/ori/testing/machine"
+	"github.com/ironcore-dev/ironcore/utils/quota"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"

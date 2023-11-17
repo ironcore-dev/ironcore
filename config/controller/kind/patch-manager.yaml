@@ -1,8 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: onmetal-system
-  name: onmetal-controller-manager
+  namespace: ironcore-system
+  name: ironcore-controller-manager
 spec:
   template:
     spec:

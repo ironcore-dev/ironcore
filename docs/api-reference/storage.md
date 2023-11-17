@@ -1,28 +1,28 @@
 <p>Packages:</p>
 <ul>
 <li>
-<a href="#storage.api.onmetal.de%2fv1alpha1">storage.api.onmetal.de/v1alpha1</a>
+<a href="#storage.ironcore.dev%2fv1alpha1">storage.ironcore.dev/v1alpha1</a>
 </li>
 </ul>
-<h2 id="storage.api.onmetal.de/v1alpha1">storage.api.onmetal.de/v1alpha1</h2>
+<h2 id="storage.ironcore.dev/v1alpha1">storage.ironcore.dev/v1alpha1</h2>
 <div>
 <p>Package v1alpha1 is the v1alpha1 version of the API.</p>
 </div>
 Resource Types:
 <ul><li>
-<a href="#storage.api.onmetal.de/v1alpha1.Bucket">Bucket</a>
+<a href="#storage.ironcore.dev/v1alpha1.Bucket">Bucket</a>
 </li><li>
-<a href="#storage.api.onmetal.de/v1alpha1.BucketClass">BucketClass</a>
+<a href="#storage.ironcore.dev/v1alpha1.BucketClass">BucketClass</a>
 </li><li>
-<a href="#storage.api.onmetal.de/v1alpha1.BucketPool">BucketPool</a>
+<a href="#storage.ironcore.dev/v1alpha1.BucketPool">BucketPool</a>
 </li><li>
-<a href="#storage.api.onmetal.de/v1alpha1.Volume">Volume</a>
+<a href="#storage.ironcore.dev/v1alpha1.Volume">Volume</a>
 </li><li>
-<a href="#storage.api.onmetal.de/v1alpha1.VolumeClass">VolumeClass</a>
+<a href="#storage.ironcore.dev/v1alpha1.VolumeClass">VolumeClass</a>
 </li><li>
-<a href="#storage.api.onmetal.de/v1alpha1.VolumePool">VolumePool</a>
+<a href="#storage.ironcore.dev/v1alpha1.VolumePool">VolumePool</a>
 </li></ul>
-<h3 id="storage.api.onmetal.de/v1alpha1.Bucket">Bucket
+<h3 id="storage.ironcore.dev/v1alpha1.Bucket">Bucket
 </h3>
 <div>
 <p>Bucket is the Schema for the buckets API</p>
@@ -41,7 +41,7 @@ Resource Types:
 string</td>
 <td>
 <code>
-storage.api.onmetal.de/v1alpha1
+storage.ironcore.dev/v1alpha1
 </code>
 </td>
 </tr>
@@ -70,7 +70,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#storage.api.onmetal.de/v1alpha1.BucketSpec">
+<a href="#storage.ironcore.dev/v1alpha1.BucketSpec">
 BucketSpec
 </a>
 </em>
@@ -122,8 +122,8 @@ If unset, the scheduler will figure out a suitable BucketPoolRef.</p>
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.Toleration">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
+<a href="../common/#common.ironcore.dev/v1alpha1.Toleration">
+[]github.com/ironcore-dev/ironcore/api/common/v1alpha1.Toleration
 </a>
 </em>
 </td>
@@ -139,7 +139,7 @@ covered by Tolerations will be considered to host the Bucket.</p>
 <td>
 <code>status</code><br/>
 <em>
-<a href="#storage.api.onmetal.de/v1alpha1.BucketStatus">
+<a href="#storage.ironcore.dev/v1alpha1.BucketStatus">
 BucketStatus
 </a>
 </em>
@@ -149,7 +149,7 @@ BucketStatus
 </tr>
 </tbody>
 </table>
-<h3 id="storage.api.onmetal.de/v1alpha1.BucketClass">BucketClass
+<h3 id="storage.ironcore.dev/v1alpha1.BucketClass">BucketClass
 </h3>
 <div>
 <p>BucketClass is the Schema for the bucketclasses API</p>
@@ -168,7 +168,7 @@ BucketStatus
 string</td>
 <td>
 <code>
-storage.api.onmetal.de/v1alpha1
+storage.ironcore.dev/v1alpha1
 </code>
 </td>
 </tr>
@@ -197,8 +197,8 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>capabilities</code><br/>
 <em>
-<a href="../core/#core.api.onmetal.de/v1alpha1.ResourceList">
-github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
+<a href="../core/#core.ironcore.dev/v1alpha1.ResourceList">
+github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceList
 </a>
 </em>
 </td>
@@ -208,7 +208,7 @@ github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
 </tr>
 </tbody>
 </table>
-<h3 id="storage.api.onmetal.de/v1alpha1.BucketPool">BucketPool
+<h3 id="storage.ironcore.dev/v1alpha1.BucketPool">BucketPool
 </h3>
 <div>
 <p>BucketPool is the Schema for the bucketpools API</p>
@@ -227,7 +227,7 @@ github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
 string</td>
 <td>
 <code>
-storage.api.onmetal.de/v1alpha1
+storage.ironcore.dev/v1alpha1
 </code>
 </td>
 </tr>
@@ -256,7 +256,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#storage.api.onmetal.de/v1alpha1.BucketPoolSpec">
+<a href="#storage.ironcore.dev/v1alpha1.BucketPoolSpec">
 BucketPoolSpec
 </a>
 </em>
@@ -280,8 +280,8 @@ string
 <td>
 <code>taints</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.Taint">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Taint
+<a href="../common/#common.ironcore.dev/v1alpha1.Taint">
+[]github.com/ironcore-dev/ironcore/api/common/v1alpha1.Taint
 </a>
 </em>
 </td>
@@ -297,7 +297,7 @@ will land in the BucketPool.</p>
 <td>
 <code>status</code><br/>
 <em>
-<a href="#storage.api.onmetal.de/v1alpha1.BucketPoolStatus">
+<a href="#storage.ironcore.dev/v1alpha1.BucketPoolStatus">
 BucketPoolStatus
 </a>
 </em>
@@ -307,7 +307,7 @@ BucketPoolStatus
 </tr>
 </tbody>
 </table>
-<h3 id="storage.api.onmetal.de/v1alpha1.Volume">Volume
+<h3 id="storage.ironcore.dev/v1alpha1.Volume">Volume
 </h3>
 <div>
 <p>Volume is the Schema for the volumes API</p>
@@ -326,7 +326,7 @@ BucketPoolStatus
 string</td>
 <td>
 <code>
-storage.api.onmetal.de/v1alpha1
+storage.ironcore.dev/v1alpha1
 </code>
 </td>
 </tr>
@@ -355,7 +355,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#storage.api.onmetal.de/v1alpha1.VolumeSpec">
+<a href="#storage.ironcore.dev/v1alpha1.VolumeSpec">
 VolumeSpec
 </a>
 </em>
@@ -407,8 +407,8 @@ If unset, the scheduler will figure out a suitable VolumePoolRef.</p>
 <td>
 <code>claimRef</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
+<a href="../common/#common.ironcore.dev/v1alpha1.LocalUIDReference">
+github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
 </td>
@@ -420,8 +420,8 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 <td>
 <code>resources</code><br/>
 <em>
-<a href="../core/#core.api.onmetal.de/v1alpha1.ResourceList">
-github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
+<a href="../core/#core.ironcore.dev/v1alpha1.ResourceList">
+github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceList
 </a>
 </em>
 </td>
@@ -468,8 +468,8 @@ bool
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.Toleration">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
+<a href="../common/#common.ironcore.dev/v1alpha1.Toleration">
+[]github.com/ironcore-dev/ironcore/api/common/v1alpha1.Toleration
 </a>
 </em>
 </td>
@@ -482,7 +482,7 @@ covered by Tolerations will be considered to host the Volume.</p>
 <td>
 <code>encryption</code><br/>
 <em>
-<a href="#storage.api.onmetal.de/v1alpha1.VolumeEncryption">
+<a href="#storage.ironcore.dev/v1alpha1.VolumeEncryption">
 VolumeEncryption
 </a>
 </em>
@@ -498,7 +498,7 @@ VolumeEncryption
 <td>
 <code>status</code><br/>
 <em>
-<a href="#storage.api.onmetal.de/v1alpha1.VolumeStatus">
+<a href="#storage.ironcore.dev/v1alpha1.VolumeStatus">
 VolumeStatus
 </a>
 </em>
@@ -508,7 +508,7 @@ VolumeStatus
 </tr>
 </tbody>
 </table>
-<h3 id="storage.api.onmetal.de/v1alpha1.VolumeClass">VolumeClass
+<h3 id="storage.ironcore.dev/v1alpha1.VolumeClass">VolumeClass
 </h3>
 <div>
 <p>VolumeClass is the Schema for the volumeclasses API</p>
@@ -527,7 +527,7 @@ VolumeStatus
 string</td>
 <td>
 <code>
-storage.api.onmetal.de/v1alpha1
+storage.ironcore.dev/v1alpha1
 </code>
 </td>
 </tr>
@@ -556,8 +556,8 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>capabilities</code><br/>
 <em>
-<a href="../core/#core.api.onmetal.de/v1alpha1.ResourceList">
-github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
+<a href="../core/#core.ironcore.dev/v1alpha1.ResourceList">
+github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceList
 </a>
 </em>
 </td>
@@ -569,7 +569,7 @@ github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
 <td>
 <code>resizePolicy</code><br/>
 <em>
-<a href="#storage.api.onmetal.de/v1alpha1.ResizePolicy">
+<a href="#storage.ironcore.dev/v1alpha1.ResizePolicy">
 ResizePolicy
 </a>
 </em>
@@ -581,7 +581,7 @@ If not set default to Static expansion policy.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="storage.api.onmetal.de/v1alpha1.VolumePool">VolumePool
+<h3 id="storage.ironcore.dev/v1alpha1.VolumePool">VolumePool
 </h3>
 <div>
 <p>VolumePool is the Schema for the volumepools API</p>
@@ -600,7 +600,7 @@ If not set default to Static expansion policy.</p>
 string</td>
 <td>
 <code>
-storage.api.onmetal.de/v1alpha1
+storage.ironcore.dev/v1alpha1
 </code>
 </td>
 </tr>
@@ -629,7 +629,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#storage.api.onmetal.de/v1alpha1.VolumePoolSpec">
+<a href="#storage.ironcore.dev/v1alpha1.VolumePoolSpec">
 VolumePoolSpec
 </a>
 </em>
@@ -653,8 +653,8 @@ string
 <td>
 <code>taints</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.Taint">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Taint
+<a href="../common/#common.ironcore.dev/v1alpha1.Taint">
+[]github.com/ironcore-dev/ironcore/api/common/v1alpha1.Taint
 </a>
 </em>
 </td>
@@ -670,7 +670,7 @@ will land in the VolumePool.</p>
 <td>
 <code>status</code><br/>
 <em>
-<a href="#storage.api.onmetal.de/v1alpha1.VolumePoolStatus">
+<a href="#storage.ironcore.dev/v1alpha1.VolumePoolStatus">
 VolumePoolStatus
 </a>
 </em>
@@ -680,10 +680,10 @@ VolumePoolStatus
 </tr>
 </tbody>
 </table>
-<h3 id="storage.api.onmetal.de/v1alpha1.BucketAccess">BucketAccess
+<h3 id="storage.ironcore.dev/v1alpha1.BucketAccess">BucketAccess
 </h3>
 <p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.BucketStatus">BucketStatus</a>)
+(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.BucketStatus">BucketStatus</a>)
 </p>
 <div>
 <p>BucketAccess represents information on how to access a bucket.</p>
@@ -722,10 +722,10 @@ string
 </tr>
 </tbody>
 </table>
-<h3 id="storage.api.onmetal.de/v1alpha1.BucketCondition">BucketCondition
+<h3 id="storage.ironcore.dev/v1alpha1.BucketCondition">BucketCondition
 </h3>
 <p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.BucketStatus">BucketStatus</a>)
+(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.BucketStatus">BucketStatus</a>)
 </p>
 <div>
 <p>BucketCondition is one of the conditions of a bucket.</p>
@@ -742,7 +742,7 @@ string
 <td>
 <code>type</code><br/>
 <em>
-<a href="#storage.api.onmetal.de/v1alpha1.BucketConditionType">
+<a href="#storage.ironcore.dev/v1alpha1.BucketConditionType">
 BucketConditionType
 </a>
 </em>
@@ -812,18 +812,18 @@ Kubernetes meta/v1.Time
 </tr>
 </tbody>
 </table>
-<h3 id="storage.api.onmetal.de/v1alpha1.BucketConditionType">BucketConditionType
+<h3 id="storage.ironcore.dev/v1alpha1.BucketConditionType">BucketConditionType
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.BucketCondition">BucketCondition</a>)
+(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.BucketCondition">BucketCondition</a>)
 </p>
 <div>
 <p>BucketConditionType is a type a BucketCondition can have.</p>
 </div>
-<h3 id="storage.api.onmetal.de/v1alpha1.BucketPoolSpec">BucketPoolSpec
+<h3 id="storage.ironcore.dev/v1alpha1.BucketPoolSpec">BucketPoolSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.BucketPool">BucketPool</a>)
+(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.BucketPool">BucketPool</a>)
 </p>
 <div>
 <p>BucketPoolSpec defines the desired state of BucketPool</p>
@@ -851,8 +851,8 @@ string
 <td>
 <code>taints</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.Taint">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Taint
+<a href="../common/#common.ironcore.dev/v1alpha1.Taint">
+[]github.com/ironcore-dev/ironcore/api/common/v1alpha1.Taint
 </a>
 </em>
 </td>
@@ -863,10 +863,10 @@ will land in the BucketPool.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="storage.api.onmetal.de/v1alpha1.BucketPoolState">BucketPoolState
+<h3 id="storage.ironcore.dev/v1alpha1.BucketPoolState">BucketPoolState
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.BucketPoolStatus">BucketPoolStatus</a>)
+(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.BucketPoolStatus">BucketPoolStatus</a>)
 </p>
 <div>
 </div>
@@ -885,10 +885,10 @@ will land in the BucketPool.</p>
 <td></td>
 </tr></tbody>
 </table>
-<h3 id="storage.api.onmetal.de/v1alpha1.BucketPoolStatus">BucketPoolStatus
+<h3 id="storage.ironcore.dev/v1alpha1.BucketPoolStatus">BucketPoolStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.BucketPool">BucketPool</a>)
+(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.BucketPool">BucketPool</a>)
 </p>
 <div>
 <p>BucketPoolStatus defines the observed state of BucketPool</p>
@@ -905,7 +905,7 @@ will land in the BucketPool.</p>
 <td>
 <code>state</code><br/>
 <em>
-<a href="#storage.api.onmetal.de/v1alpha1.BucketPoolState">
+<a href="#storage.ironcore.dev/v1alpha1.BucketPoolState">
 BucketPoolState
 </a>
 </em>
@@ -929,10 +929,10 @@ BucketPoolState
 </tr>
 </tbody>
 </table>
-<h3 id="storage.api.onmetal.de/v1alpha1.BucketSpec">BucketSpec
+<h3 id="storage.ironcore.dev/v1alpha1.BucketSpec">BucketSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.Bucket">Bucket</a>, <a href="#storage.api.onmetal.de/v1alpha1.BucketTemplateSpec">BucketTemplateSpec</a>)
+(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.Bucket">Bucket</a>, <a href="#storage.ironcore.dev/v1alpha1.BucketTemplateSpec">BucketTemplateSpec</a>)
 </p>
 <div>
 <p>BucketSpec defines the desired state of Bucket</p>
@@ -988,8 +988,8 @@ If unset, the scheduler will figure out a suitable BucketPoolRef.</p>
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.Toleration">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
+<a href="../common/#common.ironcore.dev/v1alpha1.Toleration">
+[]github.com/ironcore-dev/ironcore/api/common/v1alpha1.Toleration
 </a>
 </em>
 </td>
@@ -1000,10 +1000,10 @@ covered by Tolerations will be considered to host the Bucket.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="storage.api.onmetal.de/v1alpha1.BucketState">BucketState
+<h3 id="storage.ironcore.dev/v1alpha1.BucketState">BucketState
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.BucketStatus">BucketStatus</a>)
+(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.BucketStatus">BucketStatus</a>)
 </p>
 <div>
 <p>BucketState represents the infrastructure state of a Bucket.</p>
@@ -1026,10 +1026,10 @@ covered by Tolerations will be considered to host the Bucket.</p>
 </td>
 </tr></tbody>
 </table>
-<h3 id="storage.api.onmetal.de/v1alpha1.BucketStatus">BucketStatus
+<h3 id="storage.ironcore.dev/v1alpha1.BucketStatus">BucketStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.Bucket">Bucket</a>)
+(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.Bucket">Bucket</a>)
 </p>
 <div>
 <p>BucketStatus defines the observed state of Bucket</p>
@@ -1046,7 +1046,7 @@ covered by Tolerations will be considered to host the Bucket.</p>
 <td>
 <code>state</code><br/>
 <em>
-<a href="#storage.api.onmetal.de/v1alpha1.BucketState">
+<a href="#storage.ironcore.dev/v1alpha1.BucketState">
 BucketState
 </a>
 </em>
@@ -1072,7 +1072,7 @@ Kubernetes meta/v1.Time
 <td>
 <code>access</code><br/>
 <em>
-<a href="#storage.api.onmetal.de/v1alpha1.BucketAccess">
+<a href="#storage.ironcore.dev/v1alpha1.BucketAccess">
 BucketAccess
 </a>
 </em>
@@ -1086,7 +1086,7 @@ This is set by the bucket provider when the bucket is provisioned.</p>
 <td>
 <code>conditions</code><br/>
 <em>
-<a href="#storage.api.onmetal.de/v1alpha1.BucketCondition">
+<a href="#storage.ironcore.dev/v1alpha1.BucketCondition">
 []BucketCondition
 </a>
 </em>
@@ -1097,7 +1097,7 @@ This is set by the bucket provider when the bucket is provisioned.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="storage.api.onmetal.de/v1alpha1.BucketTemplateSpec">BucketTemplateSpec
+<h3 id="storage.ironcore.dev/v1alpha1.BucketTemplateSpec">BucketTemplateSpec
 </h3>
 <div>
 <p>BucketTemplateSpec is the specification of a Bucket template.</p>
@@ -1128,7 +1128,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#storage.api.onmetal.de/v1alpha1.BucketSpec">
+<a href="#storage.ironcore.dev/v1alpha1.BucketSpec">
 BucketSpec
 </a>
 </em>
@@ -1180,8 +1180,8 @@ If unset, the scheduler will figure out a suitable BucketPoolRef.</p>
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.Toleration">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
+<a href="../common/#common.ironcore.dev/v1alpha1.Toleration">
+[]github.com/ironcore-dev/ironcore/api/common/v1alpha1.Toleration
 </a>
 </em>
 </td>
@@ -1195,10 +1195,10 @@ covered by Tolerations will be considered to host the Bucket.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="storage.api.onmetal.de/v1alpha1.ResizePolicy">ResizePolicy
+<h3 id="storage.ironcore.dev/v1alpha1.ResizePolicy">ResizePolicy
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.VolumeClass">VolumeClass</a>)
+(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.VolumeClass">VolumeClass</a>)
 </p>
 <div>
 <p>ResizePolicy is a type of policy.</p>
@@ -1218,10 +1218,10 @@ covered by Tolerations will be considered to host the Bucket.</p>
 </td>
 </tr></tbody>
 </table>
-<h3 id="storage.api.onmetal.de/v1alpha1.VolumeAccess">VolumeAccess
+<h3 id="storage.ironcore.dev/v1alpha1.VolumeAccess">VolumeAccess
 </h3>
 <p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.VolumeStatus">VolumeStatus</a>)
+(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.VolumeStatus">VolumeStatus</a>)
 </p>
 <div>
 <p>VolumeAccess represents information on how to access a volume.</p>
@@ -1282,10 +1282,10 @@ map[string]string
 </tr>
 </tbody>
 </table>
-<h3 id="storage.api.onmetal.de/v1alpha1.VolumeCondition">VolumeCondition
+<h3 id="storage.ironcore.dev/v1alpha1.VolumeCondition">VolumeCondition
 </h3>
 <p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.VolumeStatus">VolumeStatus</a>)
+(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.VolumeStatus">VolumeStatus</a>)
 </p>
 <div>
 <p>VolumeCondition is one of the conditions of a volume.</p>
@@ -1302,7 +1302,7 @@ map[string]string
 <td>
 <code>type</code><br/>
 <em>
-<a href="#storage.api.onmetal.de/v1alpha1.VolumeConditionType">
+<a href="#storage.ironcore.dev/v1alpha1.VolumeConditionType">
 VolumeConditionType
 </a>
 </em>
@@ -1372,18 +1372,18 @@ Kubernetes meta/v1.Time
 </tr>
 </tbody>
 </table>
-<h3 id="storage.api.onmetal.de/v1alpha1.VolumeConditionType">VolumeConditionType
+<h3 id="storage.ironcore.dev/v1alpha1.VolumeConditionType">VolumeConditionType
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.VolumeCondition">VolumeCondition</a>)
+(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.VolumeCondition">VolumeCondition</a>)
 </p>
 <div>
 <p>VolumeConditionType is a type a VolumeCondition can have.</p>
 </div>
-<h3 id="storage.api.onmetal.de/v1alpha1.VolumeEncryption">VolumeEncryption
+<h3 id="storage.ironcore.dev/v1alpha1.VolumeEncryption">VolumeEncryption
 </h3>
 <p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.VolumeSpec">VolumeSpec</a>)
+(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.VolumeSpec">VolumeSpec</a>)
 </p>
 <div>
 <p>VolumeEncryption represents information to encrypt a volume.</p>
@@ -1412,10 +1412,10 @@ This secret is created by user with encryptionKey as Key and base64 encoded 256-
 </tr>
 </tbody>
 </table>
-<h3 id="storage.api.onmetal.de/v1alpha1.VolumePoolCondition">VolumePoolCondition
+<h3 id="storage.ironcore.dev/v1alpha1.VolumePoolCondition">VolumePoolCondition
 </h3>
 <p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.VolumePoolStatus">VolumePoolStatus</a>)
+(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.VolumePoolStatus">VolumePoolStatus</a>)
 </p>
 <div>
 <p>VolumePoolCondition is one of the conditions of a volume.</p>
@@ -1432,7 +1432,7 @@ This secret is created by user with encryptionKey as Key and base64 encoded 256-
 <td>
 <code>type</code><br/>
 <em>
-<a href="#storage.api.onmetal.de/v1alpha1.VolumePoolConditionType">
+<a href="#storage.ironcore.dev/v1alpha1.VolumePoolConditionType">
 VolumePoolConditionType
 </a>
 </em>
@@ -1502,18 +1502,18 @@ Kubernetes meta/v1.Time
 </tr>
 </tbody>
 </table>
-<h3 id="storage.api.onmetal.de/v1alpha1.VolumePoolConditionType">VolumePoolConditionType
+<h3 id="storage.ironcore.dev/v1alpha1.VolumePoolConditionType">VolumePoolConditionType
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.VolumePoolCondition">VolumePoolCondition</a>)
+(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.VolumePoolCondition">VolumePoolCondition</a>)
 </p>
 <div>
 <p>VolumePoolConditionType is a type a VolumePoolCondition can have.</p>
 </div>
-<h3 id="storage.api.onmetal.de/v1alpha1.VolumePoolSpec">VolumePoolSpec
+<h3 id="storage.ironcore.dev/v1alpha1.VolumePoolSpec">VolumePoolSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.VolumePool">VolumePool</a>)
+(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.VolumePool">VolumePool</a>)
 </p>
 <div>
 <p>VolumePoolSpec defines the desired state of VolumePool</p>
@@ -1541,8 +1541,8 @@ string
 <td>
 <code>taints</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.Taint">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Taint
+<a href="../common/#common.ironcore.dev/v1alpha1.Taint">
+[]github.com/ironcore-dev/ironcore/api/common/v1alpha1.Taint
 </a>
 </em>
 </td>
@@ -1553,10 +1553,10 @@ will land in the VolumePool.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="storage.api.onmetal.de/v1alpha1.VolumePoolState">VolumePoolState
+<h3 id="storage.ironcore.dev/v1alpha1.VolumePoolState">VolumePoolState
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.VolumePoolStatus">VolumePoolStatus</a>)
+(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.VolumePoolStatus">VolumePoolStatus</a>)
 </p>
 <div>
 </div>
@@ -1575,10 +1575,10 @@ will land in the VolumePool.</p>
 <td></td>
 </tr></tbody>
 </table>
-<h3 id="storage.api.onmetal.de/v1alpha1.VolumePoolStatus">VolumePoolStatus
+<h3 id="storage.ironcore.dev/v1alpha1.VolumePoolStatus">VolumePoolStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.VolumePool">VolumePool</a>)
+(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.VolumePool">VolumePool</a>)
 </p>
 <div>
 <p>VolumePoolStatus defines the observed state of VolumePool</p>
@@ -1595,7 +1595,7 @@ will land in the VolumePool.</p>
 <td>
 <code>state</code><br/>
 <em>
-<a href="#storage.api.onmetal.de/v1alpha1.VolumePoolState">
+<a href="#storage.ironcore.dev/v1alpha1.VolumePoolState">
 VolumePoolState
 </a>
 </em>
@@ -1607,7 +1607,7 @@ VolumePoolState
 <td>
 <code>conditions</code><br/>
 <em>
-<a href="#storage.api.onmetal.de/v1alpha1.VolumePoolCondition">
+<a href="#storage.ironcore.dev/v1alpha1.VolumePoolCondition">
 []VolumePoolCondition
 </a>
 </em>
@@ -1632,8 +1632,8 @@ VolumePoolState
 <td>
 <code>capacity</code><br/>
 <em>
-<a href="../core/#core.api.onmetal.de/v1alpha1.ResourceList">
-github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
+<a href="../core/#core.ironcore.dev/v1alpha1.ResourceList">
+github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceList
 </a>
 </em>
 </td>
@@ -1645,8 +1645,8 @@ github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
 <td>
 <code>allocatable</code><br/>
 <em>
-<a href="../core/#core.api.onmetal.de/v1alpha1.ResourceList">
-github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
+<a href="../core/#core.ironcore.dev/v1alpha1.ResourceList">
+github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceList
 </a>
 </em>
 </td>
@@ -1656,10 +1656,10 @@ github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
 </tr>
 </tbody>
 </table>
-<h3 id="storage.api.onmetal.de/v1alpha1.VolumeSpec">VolumeSpec
+<h3 id="storage.ironcore.dev/v1alpha1.VolumeSpec">VolumeSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.Volume">Volume</a>, <a href="#storage.api.onmetal.de/v1alpha1.VolumeTemplateSpec">VolumeTemplateSpec</a>)
+(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.Volume">Volume</a>, <a href="#storage.ironcore.dev/v1alpha1.VolumeTemplateSpec">VolumeTemplateSpec</a>)
 </p>
 <div>
 <p>VolumeSpec defines the desired state of Volume</p>
@@ -1715,8 +1715,8 @@ If unset, the scheduler will figure out a suitable VolumePoolRef.</p>
 <td>
 <code>claimRef</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
+<a href="../common/#common.ironcore.dev/v1alpha1.LocalUIDReference">
+github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
 </td>
@@ -1728,8 +1728,8 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 <td>
 <code>resources</code><br/>
 <em>
-<a href="../core/#core.api.onmetal.de/v1alpha1.ResourceList">
-github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
+<a href="../core/#core.ironcore.dev/v1alpha1.ResourceList">
+github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceList
 </a>
 </em>
 </td>
@@ -1776,8 +1776,8 @@ bool
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.Toleration">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
+<a href="../common/#common.ironcore.dev/v1alpha1.Toleration">
+[]github.com/ironcore-dev/ironcore/api/common/v1alpha1.Toleration
 </a>
 </em>
 </td>
@@ -1790,7 +1790,7 @@ covered by Tolerations will be considered to host the Volume.</p>
 <td>
 <code>encryption</code><br/>
 <em>
-<a href="#storage.api.onmetal.de/v1alpha1.VolumeEncryption">
+<a href="#storage.ironcore.dev/v1alpha1.VolumeEncryption">
 VolumeEncryption
 </a>
 </em>
@@ -1801,10 +1801,10 @@ VolumeEncryption
 </tr>
 </tbody>
 </table>
-<h3 id="storage.api.onmetal.de/v1alpha1.VolumeState">VolumeState
+<h3 id="storage.ironcore.dev/v1alpha1.VolumeState">VolumeState
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.VolumeStatus">VolumeStatus</a>)
+(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.VolumeStatus">VolumeStatus</a>)
 </p>
 <div>
 <p>VolumeState represents the infrastructure state of a Volume.</p>
@@ -1827,10 +1827,10 @@ VolumeEncryption
 </td>
 </tr></tbody>
 </table>
-<h3 id="storage.api.onmetal.de/v1alpha1.VolumeStatus">VolumeStatus
+<h3 id="storage.ironcore.dev/v1alpha1.VolumeStatus">VolumeStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#storage.api.onmetal.de/v1alpha1.Volume">Volume</a>)
+(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.Volume">Volume</a>)
 </p>
 <div>
 <p>VolumeStatus defines the observed state of Volume</p>
@@ -1847,7 +1847,7 @@ VolumeEncryption
 <td>
 <code>state</code><br/>
 <em>
-<a href="#storage.api.onmetal.de/v1alpha1.VolumeState">
+<a href="#storage.ironcore.dev/v1alpha1.VolumeState">
 VolumeState
 </a>
 </em>
@@ -1873,7 +1873,7 @@ Kubernetes meta/v1.Time
 <td>
 <code>access</code><br/>
 <em>
-<a href="#storage.api.onmetal.de/v1alpha1.VolumeAccess">
+<a href="#storage.ironcore.dev/v1alpha1.VolumeAccess">
 VolumeAccess
 </a>
 </em>
@@ -1887,7 +1887,7 @@ This is set by the volume provider when the volume is provisioned.</p>
 <td>
 <code>conditions</code><br/>
 <em>
-<a href="#storage.api.onmetal.de/v1alpha1.VolumeCondition">
+<a href="#storage.ironcore.dev/v1alpha1.VolumeCondition">
 []VolumeCondition
 </a>
 </em>
@@ -1898,7 +1898,7 @@ This is set by the volume provider when the volume is provisioned.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="storage.api.onmetal.de/v1alpha1.VolumeTemplateSpec">VolumeTemplateSpec
+<h3 id="storage.ironcore.dev/v1alpha1.VolumeTemplateSpec">VolumeTemplateSpec
 </h3>
 <div>
 <p>VolumeTemplateSpec is the specification of a Volume template.</p>
@@ -1929,7 +1929,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#storage.api.onmetal.de/v1alpha1.VolumeSpec">
+<a href="#storage.ironcore.dev/v1alpha1.VolumeSpec">
 VolumeSpec
 </a>
 </em>
@@ -1981,8 +1981,8 @@ If unset, the scheduler will figure out a suitable VolumePoolRef.</p>
 <td>
 <code>claimRef</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
+<a href="../common/#common.ironcore.dev/v1alpha1.LocalUIDReference">
+github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
 </td>
@@ -1994,8 +1994,8 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 <td>
 <code>resources</code><br/>
 <em>
-<a href="../core/#core.api.onmetal.de/v1alpha1.ResourceList">
-github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
+<a href="../core/#core.ironcore.dev/v1alpha1.ResourceList">
+github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceList
 </a>
 </em>
 </td>
@@ -2042,8 +2042,8 @@ bool
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.Toleration">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
+<a href="../common/#common.ironcore.dev/v1alpha1.Toleration">
+[]github.com/ironcore-dev/ironcore/api/common/v1alpha1.Toleration
 </a>
 </em>
 </td>
@@ -2056,7 +2056,7 @@ covered by Tolerations will be considered to host the Volume.</p>
 <td>
 <code>encryption</code><br/>
 <em>
-<a href="#storage.api.onmetal.de/v1alpha1.VolumeEncryption">
+<a href="#storage.ironcore.dev/v1alpha1.VolumeEncryption">
 VolumeEncryption
 </a>
 </em>

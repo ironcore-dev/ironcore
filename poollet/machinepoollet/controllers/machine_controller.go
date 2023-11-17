@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,22 +21,22 @@ import (
 	"strconv"
 
 	"github.com/go-logr/logr"
-	"github.com/onmetal/controller-utils/clientutils"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	orimachine "github.com/onmetal/onmetal-api/ori/apis/machine"
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
-	"github.com/onmetal/onmetal-api/poollet/machinepoollet/api/v1alpha1"
-	machinepoolletclient "github.com/onmetal/onmetal-api/poollet/machinepoollet/client"
-	"github.com/onmetal/onmetal-api/poollet/machinepoollet/controllers/events"
-	machinepoolletmachine "github.com/onmetal/onmetal-api/poollet/machinepoollet/machine"
-	"github.com/onmetal/onmetal-api/poollet/machinepoollet/mcm"
-	utilclient "github.com/onmetal/onmetal-api/utils/client"
-	utilmaps "github.com/onmetal/onmetal-api/utils/maps"
-	"github.com/onmetal/onmetal-api/utils/predicates"
+	"github.com/ironcore-dev/controller-utils/clientutils"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	orimachine "github.com/ironcore-dev/ironcore/ori/apis/machine"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
+	orimeta "github.com/ironcore-dev/ironcore/ori/apis/meta/v1alpha1"
+	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
+	machinepoolletclient "github.com/ironcore-dev/ironcore/poollet/machinepoollet/client"
+	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers/events"
+	machinepoolletmachine "github.com/ironcore-dev/ironcore/poollet/machinepoollet/machine"
+	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/mcm"
+	utilclient "github.com/ironcore-dev/ironcore/utils/client"
+	utilmaps "github.com/ironcore-dev/ironcore/utils/maps"
+	"github.com/ironcore-dev/ironcore/utils/predicates"
 	"golang.org/x/exp/maps"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -87,13 +87,13 @@ func (r *MachineReconciler) machineUIDLabelSelector(machineUID types.UID) map[st
 
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 //+kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch
-//+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machines,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machines/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machines/finalizers,verbs=update
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networks,verbs=get;list;watch
-//+kubebuilder:rbac:groups=ipam.api.onmetal.de,resources=prefixes,verbs=get;list;watch
+//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machines,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machines/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machines/finalizers,verbs=update
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumes,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=networkinterfaces,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=networks,verbs=get;list;watch
+//+kubebuilder:rbac:groups=ipam.ironcore.dev,resources=prefixes,verbs=get;list;watch
 
 func (r *MachineReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)

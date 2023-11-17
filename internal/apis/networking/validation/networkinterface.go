@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 by the OnMetal authors.
+ * Copyright (c) 2022 by the IronCore authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@ package validation
 import (
 	"fmt"
 
-	onmetalapivalidation "github.com/onmetal/onmetal-api/internal/api/validation"
-	"github.com/onmetal/onmetal-api/internal/apis/ipam"
-	ipamvalidation "github.com/onmetal/onmetal-api/internal/apis/ipam/validation"
-	"github.com/onmetal/onmetal-api/internal/apis/networking"
+	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
+	"github.com/ironcore-dev/ironcore/internal/apis/ipam"
+	ipamvalidation "github.com/ironcore-dev/ironcore/internal/apis/ipam/validation"
+	"github.com/ironcore-dev/ironcore/internal/apis/networking"
 	corev1 "k8s.io/api/core/v1"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -67,7 +67,7 @@ func validateNetworkInterfaceSpec(spec *networking.NetworkInterfaceSpec, nicMeta
 		}
 	}
 
-	allErrs = append(allErrs, onmetalapivalidation.ValidateIPFamilies(spec.IPFamilies, fldPath.Child("ipFamilies"))...)
+	allErrs = append(allErrs, ironcorevalidation.ValidateIPFamilies(spec.IPFamilies, fldPath.Child("ipFamilies"))...)
 
 	if len(spec.IPFamilies) != len(spec.IPs) {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("ips"), spec.IPFamilies, "ip families must match ips"))
@@ -219,7 +219,7 @@ func validateNetworkInterfaceSpecUpdate(newSpec, oldSpec *networking.NetworkInte
 	oldSpecCopy.Prefixes = newSpec.Prefixes
 	oldSpecCopy.MachineRef = newSpec.MachineRef
 	oldSpecCopy.VirtualIP = newSpec.VirtualIP
-	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableFieldWithDiff(newSpecCopy, oldSpecCopy, fldPath)...)
+	allErrs = append(allErrs, ironcorevalidation.ValidateImmutableFieldWithDiff(newSpecCopy, oldSpecCopy, fldPath)...)
 
 	return allErrs
 }

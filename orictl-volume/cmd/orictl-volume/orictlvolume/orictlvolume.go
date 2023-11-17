@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,11 +17,11 @@ package orictlvolume
 import (
 	goflag "flag"
 
-	"github.com/onmetal/onmetal-api/orictl-volume/cmd/orictl-volume/orictlvolume/common"
-	"github.com/onmetal/onmetal-api/orictl-volume/cmd/orictl-volume/orictlvolume/create"
-	delete2 "github.com/onmetal/onmetal-api/orictl-volume/cmd/orictl-volume/orictlvolume/delete"
-	"github.com/onmetal/onmetal-api/orictl-volume/cmd/orictl-volume/orictlvolume/get"
-	clicommon "github.com/onmetal/onmetal-api/orictl/cmd"
+	"github.com/ironcore-dev/ironcore/orictl-volume/cmd/orictl-volume/orictlvolume/common"
+	"github.com/ironcore-dev/ironcore/orictl-volume/cmd/orictl-volume/orictlvolume/create"
+	delete2 "github.com/ironcore-dev/ironcore/orictl-volume/cmd/orictl-volume/orictlvolume/delete"
+	"github.com/ironcore-dev/ironcore/orictl-volume/cmd/orictl-volume/orictlvolume/get"
+	clicommon "github.com/ironcore-dev/ironcore/orictl/cmd"
 	"github.com/spf13/cobra"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"

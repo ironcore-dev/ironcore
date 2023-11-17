@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,10 +22,10 @@ import (
 	"sync"
 	"time"
 
-	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
-	"github.com/onmetal/onmetal-api/utils/quota"
-	onmetalutilruntime "github.com/onmetal/onmetal-api/utils/runtime"
-	utilslices "github.com/onmetal/onmetal-api/utils/slices"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore/utils/quota"
+	ironcoreutilruntime "github.com/ironcore-dev/ironcore/utils/runtime"
+	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apiserver/pkg/admission"
@@ -113,7 +113,7 @@ func (e *EvaluatorController) check(ctx context.Context, ns string, waiters []*a
 }
 
 func (e *EvaluatorController) checkResourceQuotas(ctx context.Context, quotas []corev1alpha1.ResourceQuota, waiters []*admissionWaiter, retries int) {
-	originalQuotas := onmetalutilruntime.DeepCopySliceRefs(quotas)
+	originalQuotas := ironcoreutilruntime.DeepCopySliceRefs(quotas)
 
 	var atLeastOneChanged bool
 	for _, waiter := range waiters {
@@ -374,7 +374,7 @@ func (e *EvaluatorController) checkRequest(ctx context.Context, quotas []corev1a
 		return quotas, nil
 	}
 
-	outQuotas := onmetalutilruntime.DeepCopySliceRefs(quotas)
+	outQuotas := ironcoreutilruntime.DeepCopySliceRefs(quotas)
 	for _, i := range indexes {
 		resourceQuota := outQuotas[i]
 

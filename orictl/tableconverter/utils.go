@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@ package tableconverter
 import (
 	"sort"
 
-	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
-	"github.com/onmetal/onmetal-api/orictl/api"
+	orimeta "github.com/ironcore-dev/ironcore/ori/apis/meta/v1alpha1"
+	"github.com/ironcore-dev/ironcore/orictl/api"
 )
 
 func WellKnownLabels[E orimeta.Object](labels map[string]string) Funcs[E] {

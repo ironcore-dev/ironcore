@@ -1,6 +1,6 @@
 FROM squidfunk/mkdocs-material:latest
 
-LABEL project=onmetal_api_documentation
+LABEL project=ironcore_documentation
 
 WORKDIR /docs
 

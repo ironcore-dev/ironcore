@@ -13,13 +13,13 @@ rules:
       - list
       - watch
   - apiGroups:
-      - compute.api.onmetal.de
+      - compute.ironcore.dev
     resources:
       - machinepools/proxy
     verbs:
       - '*'
   - apiGroups:
-      - compute.api.onmetal.de
+      - compute.ironcore.dev
     resources:
       - machinepools
     verbs:

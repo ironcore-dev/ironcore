@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,8 +30,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/onmetal/controller-utils/buildutils"
-	"github.com/onmetal/onmetal-api/utils/envtest/internal/testing/controlplane"
+	"github.com/ironcore-dev/controller-utils/buildutils"
+	"github.com/ironcore-dev/ironcore/utils/envtest/internal/testing/controlplane"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/rest"

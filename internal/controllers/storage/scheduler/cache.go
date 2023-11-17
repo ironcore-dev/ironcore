@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
-	"github.com/onmetal/onmetal-api/api/storage/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/types"

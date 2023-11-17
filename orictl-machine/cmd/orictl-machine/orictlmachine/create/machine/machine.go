@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@ import (
 	"fmt"
 	"os"
 
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	"github.com/onmetal/onmetal-api/orictl-machine/cmd/orictl-machine/orictlmachine/common"
-	clicommon "github.com/onmetal/onmetal-api/orictl/cmd"
-	"github.com/onmetal/onmetal-api/orictl/decoder"
-	"github.com/onmetal/onmetal-api/orictl/renderer"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
+	"github.com/ironcore-dev/ironcore/orictl-machine/cmd/orictl-machine/orictlmachine/common"
+	clicommon "github.com/ironcore-dev/ironcore/orictl/cmd"
+	"github.com/ironcore-dev/ironcore/orictl/decoder"
+	"github.com/ironcore-dev/ironcore/orictl/renderer"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	ctrl "sigs.k8s.io/controller-runtime"

@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ import (
 	"context"
 	"fmt"
 
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
 	"golang.org/x/exp/slices"
 	"google.golang.org/grpc/codes"
 	grpcstatus "google.golang.org/grpc/status"
@@ -32,44 +32,44 @@ func (s *Server) DetachVolume(ctx context.Context, req *ori.DetachVolumeRequest)
 	volumeName := req.Name
 	log := s.loggerFrom(ctx, "MachineID", machineID, "VolumeName", volumeName)
 
-	log.V(1).Info("Getting onmetal machine")
-	onmetalMachine, err := s.getOnmetalMachine(ctx, machineID)
+	log.V(1).Info("Getting ironcore machine")
+	ironcoreMachine, err := s.getIronCoreMachine(ctx, machineID)
 	if err != nil {
 		return nil, err
 	}
 
-	idx := onmetalMachineVolumeIndex(onmetalMachine, volumeName)
+	idx := ironcoreMachineVolumeIndex(ironcoreMachine, volumeName)
 	if idx < 0 {
 		return nil, grpcstatus.Errorf(codes.NotFound, "machine %s volume %s not found", machineID, volumeName)
 	}
 
-	onmetalMachineVolume := onmetalMachine.Spec.Volumes[idx]
+	ironcoreMachineVolume := ironcoreMachine.Spec.Volumes[idx]
 
-	log.V(1).Info("Patching onmetal machine volumes")
-	baseOnmetalMachine := onmetalMachine.DeepCopy()
-	onmetalMachine.Spec.Volumes = slices.Delete(onmetalMachine.Spec.Volumes, idx, idx+1)
-	if err := s.cluster.Client().Patch(ctx, onmetalMachine, client.StrategicMergeFrom(baseOnmetalMachine)); err != nil {
-		return nil, fmt.Errorf("error patching onmetal machine volumes: %w", err)
+	log.V(1).Info("Patching ironcore machine volumes")
+	baseIronCoreMachine := ironcoreMachine.DeepCopy()
+	ironcoreMachine.Spec.Volumes = slices.Delete(ironcoreMachine.Spec.Volumes, idx, idx+1)
+	if err := s.cluster.Client().Patch(ctx, ironcoreMachine, client.StrategicMergeFrom(baseIronCoreMachine)); err != nil {
+		return nil, fmt.Errorf("error patching ironcore machine volumes: %w", err)
 	}
 
 	switch {
-	case onmetalMachineVolume.VolumeRef != nil:
-		onmetalVolumeName := onmetalMachineVolume.VolumeRef.Name
-		log = log.WithValues("OnmetalVolumeName", onmetalVolumeName)
-		onmetalVolume := &storagev1alpha1.Volume{
+	case ironcoreMachineVolume.VolumeRef != nil:
+		ironcoreVolumeName := ironcoreMachineVolume.VolumeRef.Name
+		log = log.WithValues("IronCoreVolumeName", ironcoreVolumeName)
+		ironcoreVolume := &storagev1alpha1.Volume{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: s.cluster.Namespace(),
-				Name:      onmetalVolumeName,
+				Name:      ironcoreVolumeName,
 			},
 		}
-		log.V(1).Info("Deleting onmetal volume")
-		if err := s.cluster.Client().Delete(ctx, onmetalVolume); client.IgnoreNotFound(err) != nil {
-			return nil, fmt.Errorf("error deleting onmetal volume %s: %w", onmetalVolumeName, err)
+		log.V(1).Info("Deleting ironcore volume")
+		if err := s.cluster.Client().Delete(ctx, ironcoreVolume); client.IgnoreNotFound(err) != nil {
+			return nil, fmt.Errorf("error deleting ironcore volume %s: %w", ironcoreVolumeName, err)
 		}
-	case onmetalMachineVolume.EmptyDisk != nil:
+	case ironcoreMachineVolume.EmptyDisk != nil:
 		log.V(1).Info("No need to cleanujp empty disk")
 	default:
-		return nil, fmt.Errorf("unrecognized onmetal machine volume %#v", onmetalMachineVolume)
+		return nil, fmt.Errorf("unrecognized ironcore machine volume %#v", ironcoreMachineVolume)
 	}
 
 	return &ori.DetachVolumeResponse{}, nil

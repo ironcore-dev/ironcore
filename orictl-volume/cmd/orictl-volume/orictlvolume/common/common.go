@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@ import (
 	"fmt"
 	"time"
 
-	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
-	oriremotevolume "github.com/onmetal/onmetal-api/ori/remote/volume"
-	"github.com/onmetal/onmetal-api/orictl-volume/renderers"
-	clicommon "github.com/onmetal/onmetal-api/orictl/cmd"
-	"github.com/onmetal/onmetal-api/orictl/renderer"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/volume/v1alpha1"
+	oriremotevolume "github.com/ironcore-dev/ironcore/ori/remote/volume"
+	"github.com/ironcore-dev/ironcore/orictl-volume/renderers"
+	clicommon "github.com/ironcore-dev/ironcore/orictl/cmd"
+	"github.com/ironcore-dev/ironcore/orictl/renderer"
 	"github.com/spf13/pflag"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

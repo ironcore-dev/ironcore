@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ import (
 	"context"
 	"errors"
 
-	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
-	"github.com/onmetal/onmetal-api/poollet/orievent"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/volume/v1alpha1"
+	"github.com/ironcore-dev/ironcore/poollet/orievent"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 )

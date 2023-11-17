@@ -1,4 +1,4 @@
-apiVersion: networking.api.onmetal.de/v1alpha1
+apiVersion: networking.ironcore.dev/v1alpha1
 kind: VirtualIP
 metadata:
   name: virtualip-sample

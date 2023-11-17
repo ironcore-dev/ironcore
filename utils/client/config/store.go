@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"sync"
 
-	clientcmdutil "github.com/onmetal/onmetal-api/utils/clientcmd"
+	clientcmdutil "github.com/ironcore-dev/ironcore/utils/clientcmd"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/rest"
@@ -163,7 +163,7 @@ type WithOverrides clientcmd.ConfigOverrides
 
 const (
 	DefaultSecretKubeconfigField            = "kubeconfig"
-	DefaultSecretConfigReadWriterFieldOwner = client.FieldOwner("api.onmetal.de/config-read-writer")
+	DefaultSecretConfigReadWriterFieldOwner = client.FieldOwner("ironcore.dev/config-read-writer")
 )
 
 func setSecretConfigReadWriterOptionsDefaults(o *SecretStoreOptions) {

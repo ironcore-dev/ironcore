@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 by the OnMetal authors.
+ * Copyright (c) 2022 by the IronCore authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 package validation
 
 import (
-	onmetalapivalidation "github.com/onmetal/onmetal-api/internal/api/validation"
-	"github.com/onmetal/onmetal-api/internal/apis/compute"
-	"github.com/onmetal/onmetal-api/internal/apis/core"
+	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
+	"github.com/ironcore-dev/ironcore/internal/apis/compute"
+	"github.com/ironcore-dev/ironcore/internal/apis/core"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
@@ -39,10 +39,10 @@ func validateMachineClassCapabilities(capabilities core.ResourceList, fldPath *f
 	var allErrs field.ErrorList
 
 	cpu := capabilities.CPU()
-	allErrs = append(allErrs, onmetalapivalidation.ValidatePositiveQuantity(*cpu, fldPath.Key(string(core.ResourceCPU)))...)
+	allErrs = append(allErrs, ironcorevalidation.ValidatePositiveQuantity(*cpu, fldPath.Key(string(core.ResourceCPU)))...)
 
 	memory := capabilities.Memory()
-	allErrs = append(allErrs, onmetalapivalidation.ValidatePositiveQuantity(*memory, fldPath.Key(string(core.ResourceMemory)))...)
+	allErrs = append(allErrs, ironcorevalidation.ValidatePositiveQuantity(*memory, fldPath.Key(string(core.ResourceMemory)))...)
 
 	return allErrs
 }
@@ -52,7 +52,7 @@ func ValidateMachineClassUpdate(newMachineClass, oldMachineClass *compute.Machin
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessorUpdate(newMachineClass, oldMachineClass, field.NewPath("metadata"))...)
-	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableField(newMachineClass.Capabilities, oldMachineClass.Capabilities, field.NewPath("capabilities"))...)
+	allErrs = append(allErrs, ironcorevalidation.ValidateImmutableField(newMachineClass.Capabilities, oldMachineClass.Capabilities, field.NewPath("capabilities"))...)
 	allErrs = append(allErrs, ValidateMachineClass(newMachineClass)...)
 
 	return allErrs

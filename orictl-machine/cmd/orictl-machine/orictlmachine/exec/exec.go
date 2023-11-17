@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@ import (
 	"os"
 	"time"
 
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	"github.com/onmetal/onmetal-api/orictl-machine/cmd/orictl-machine/orictlmachine/common"
-	clicommon "github.com/onmetal/onmetal-api/orictl/cmd"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
+	"github.com/ironcore-dev/ironcore/orictl-machine/cmd/orictl-machine/orictlmachine/common"
+	clicommon "github.com/ironcore-dev/ironcore/orictl/cmd"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/util/httpstream/spdy"
 	"k8s.io/client-go/tools/remotecommand"

@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	orimachine "github.com/onmetal/onmetal-api/ori/apis/machine"
+	orimachine "github.com/ironcore-dev/ironcore/ori/apis/machine"
 	"github.com/spf13/pflag"
 )
 

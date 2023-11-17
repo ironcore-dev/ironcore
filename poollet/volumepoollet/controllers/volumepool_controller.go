@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,16 +19,16 @@ import (
 	"errors"
 	"fmt"
 
-	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
-	storageclient "github.com/onmetal/onmetal-api/internal/client/storage"
-	"github.com/onmetal/onmetal-api/utils/quota"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	storageclient "github.com/ironcore-dev/ironcore/internal/client/storage"
+	"github.com/ironcore-dev/ironcore/utils/quota"
 	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/go-logr/logr"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
-	"github.com/onmetal/onmetal-api/poollet/volumepoollet/vcm"
-	onmetalapiclient "github.com/onmetal/onmetal-api/utils/client"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/volume/v1alpha1"
+	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
+	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	corev1 "k8s.io/api/core/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
@@ -44,9 +44,9 @@ type VolumePoolReconciler struct {
 	VolumeClassMapper vcm.VolumeClassMapper
 }
 
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumepools,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumepools/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumeclasses,verbs=get;list;watch
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumepools,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumepools/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumeclasses,verbs=get;list;watch
 
 func (r *VolumePoolReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
@@ -147,7 +147,7 @@ func (r *VolumePoolReconciler) reconcile(ctx context.Context, log logr.Logger, v
 	log.V(1).Info("Reconcile")
 
 	log.V(1).Info("Ensuring no reconcile annotation")
-	modified, err := onmetalapiclient.PatchEnsureNoReconcileAnnotation(ctx, r.Client, volumePool)
+	modified, err := ironcoreclient.PatchEnsureNoReconcileAnnotation(ctx, r.Client, volumePool)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error ensuring no reconcile annotation: %w", err)
 	}

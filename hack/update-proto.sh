@@ -33,10 +33,10 @@ function generate() {
   export PATH="$PATH:$(dirname "$PROTOC_GEN_GOGO")"
   echo "Generating ${blue}$package${normal}"
   protoc \
-    --proto_path "./github.com/onmetal/onmetal-api/$package" \
+    --proto_path "./github.com/ironcore-dev/ironcore/$package" \
     --proto_path "$TGOPATH/src" \
     --gogo_out=plugins=grpc:"$TGOPATH/src" \
-    "./github.com/onmetal/onmetal-api/$package/api.proto"
+    "./github.com/ironcore-dev/ironcore/$package/api.proto"
   )
 }
 

@@ -32,13 +32,13 @@ FROM builder as apiserver-builder
 
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/onmetal-apiserver ./cmd/onmetal-apiserver
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/ironcore-apiserver ./cmd/ironcore-apiserver
 
 FROM builder as manager-builder
 
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/onmetal-controller-manager ./cmd/onmetal-controller-manager
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/ironcore-controller-manager ./cmd/ironcore-controller-manager
 
 FROM builder as machinepoollet-builder
 
@@ -106,17 +106,17 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
 FROM gcr.io/distroless/static:nonroot as manager
 WORKDIR /
-COPY --from=manager-builder /workspace/bin/onmetal-controller-manager .
+COPY --from=manager-builder /workspace/bin/ironcore-controller-manager .
 USER 65532:65532
 
-ENTRYPOINT ["/onmetal-controller-manager"]
+ENTRYPOINT ["/ironcore-controller-manager"]
 
 FROM gcr.io/distroless/static:nonroot as apiserver
 WORKDIR /
-COPY --from=apiserver-builder /workspace/bin/onmetal-apiserver .
+COPY --from=apiserver-builder /workspace/bin/ironcore-apiserver .
 USER 65532:65532
 
-ENTRYPOINT ["/onmetal-apiserver"]
+ENTRYPOINT ["/ironcore-apiserver"]
 
 FROM gcr.io/distroless/static:nonroot as machinepoollet
 WORKDIR /

@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@ package tableconverters
 import (
 	"time"
 
-	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
-	"github.com/onmetal/onmetal-api/orictl/api"
-	"github.com/onmetal/onmetal-api/orictl/tableconverter"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/volume/v1alpha1"
+	"github.com/ironcore-dev/ironcore/orictl/api"
+	"github.com/ironcore-dev/ironcore/orictl/tableconverter"
 	"k8s.io/apimachinery/pkg/util/duration"
 )
 

@@ -1,4 +1,4 @@
-apiVersion: ipam.api.onmetal.de/v1alpha1
+apiVersion: ipam.ironcore.dev/v1alpha1
 kind: Prefix
 metadata:
   name: root
@@ -7,7 +7,7 @@ metadata:
 spec:
   prefix: 10.0.0.0/8
 ---
-apiVersion: ipam.api.onmetal.de/v1alpha1
+apiVersion: ipam.ironcore.dev/v1alpha1
 kind: Prefix
 metadata:
   name: root-2
@@ -16,7 +16,7 @@ metadata:
 spec:
   prefix: 11.0.0.0/8
 ---
-apiVersion: ipam.api.onmetal.de/v1alpha1
+apiVersion: ipam.ironcore.dev/v1alpha1
 kind: Prefix
 metadata:
   name: customer-subnet-1
@@ -27,7 +27,7 @@ spec:
     matchLabels:
       subnet-type: public
 ---
-apiVersion: ipam.api.onmetal.de/v1alpha1
+apiVersion: ipam.ironcore.dev/v1alpha1
 kind: Prefix
 metadata:
   name: customer-subnet-2
@@ -38,7 +38,7 @@ spec:
     matchLabels:
       subnet-type: public
 ---
-apiVersion: ipam.api.onmetal.de/v1alpha1
+apiVersion: ipam.ironcore.dev/v1alpha1
 kind: Prefix
 metadata:
   name: customer-subnet-3

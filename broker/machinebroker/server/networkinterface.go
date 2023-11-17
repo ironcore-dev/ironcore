@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,49 +18,49 @@ import (
 	"context"
 	"fmt"
 
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	"github.com/onmetal/onmetal-api/utils/generic"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	"github.com/ironcore-dev/ironcore/utils/generic"
 	"golang.org/x/exp/slices"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func onmetalMachineNetworkInterfaceIndex(onmetalMachine *computev1alpha1.Machine, name string) int {
+func ironcoreMachineNetworkInterfaceIndex(ironcoreMachine *computev1alpha1.Machine, name string) int {
 	return slices.IndexFunc(
-		onmetalMachine.Spec.NetworkInterfaces,
+		ironcoreMachine.Spec.NetworkInterfaces,
 		func(nic computev1alpha1.NetworkInterface) bool {
 			return nic.Name == name
 		},
 	)
 }
 
-func (s *Server) bindOnmetalMachineNetworkInterface(
+func (s *Server) bindIronCoreMachineNetworkInterface(
 	ctx context.Context,
-	onmetalMachine *computev1alpha1.Machine,
-	onmetalNetworkInterface *networkingv1alpha1.NetworkInterface,
+	ironcoreMachine *computev1alpha1.Machine,
+	ironcoreNetworkInterface *networkingv1alpha1.NetworkInterface,
 ) error {
-	baseOnmetalNetworkInterface := onmetalNetworkInterface.DeepCopy()
-	if err := ctrl.SetControllerReference(onmetalMachine, onmetalNetworkInterface, s.cluster.Scheme()); err != nil {
+	baseIronCoreNetworkInterface := ironcoreNetworkInterface.DeepCopy()
+	if err := ctrl.SetControllerReference(ironcoreMachine, ironcoreNetworkInterface, s.cluster.Scheme()); err != nil {
 		return err
 	}
-	onmetalNetworkInterface.Spec.MachineRef = generic.Pointer(s.localObjectReferenceTo(onmetalMachine))
-	return s.cluster.Client().Patch(ctx, onmetalNetworkInterface, client.StrategicMergeFrom(baseOnmetalNetworkInterface))
+	ironcoreNetworkInterface.Spec.MachineRef = generic.Pointer(s.localObjectReferenceTo(ironcoreMachine))
+	return s.cluster.Client().Patch(ctx, ironcoreNetworkInterface, client.StrategicMergeFrom(baseIronCoreNetworkInterface))
 }
 
-func (s *Server) aggregateOnmetalNetworkInterface(
+func (s *Server) aggregateIronCoreNetworkInterface(
 	ctx context.Context,
 	rd client.Reader,
-	onmetalNic *networkingv1alpha1.NetworkInterface,
-) (*AggregateOnmetalNetworkInterface, error) {
-	onmetalNetwork := &networkingv1alpha1.Network{}
-	onmetalNetworkKey := client.ObjectKey{Namespace: s.cluster.Namespace(), Name: onmetalNic.Spec.NetworkRef.Name}
-	if err := rd.Get(ctx, onmetalNetworkKey, onmetalNetwork); err != nil {
-		return nil, fmt.Errorf("error getting onmetal network %s: %w", onmetalNic.Name, err)
+	ironcoreNic *networkingv1alpha1.NetworkInterface,
+) (*AggregateIronCoreNetworkInterface, error) {
+	ironcoreNetwork := &networkingv1alpha1.Network{}
+	ironcoreNetworkKey := client.ObjectKey{Namespace: s.cluster.Namespace(), Name: ironcoreNic.Spec.NetworkRef.Name}
+	if err := rd.Get(ctx, ironcoreNetworkKey, ironcoreNetwork); err != nil {
+		return nil, fmt.Errorf("error getting ironcore network %s: %w", ironcoreNic.Name, err)
 	}
 
-	return &AggregateOnmetalNetworkInterface{
-		Network:          onmetalNetwork,
-		NetworkInterface: onmetalNic,
+	return &AggregateIronCoreNetworkInterface{
+		Network:          ironcoreNetwork,
+		NetworkInterface: ironcoreNic,
 	}, nil
 }

@@ -7,32 +7,32 @@ updates:
       interval: "daily"
     open-pull-requests-limit: 10
     reviewers:
-      - "onmetal/onmetal-api-maintainers"
+      - "ironcore-dev/core"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "daily"
     open-pull-requests-limit: 10
     reviewers:
-      - "onmetal/onmetal-api-maintainers"
+      - "ironcore-dev/core"
   - package-ecosystem: "pip"
     directory: "/docs"
     schedule:
       interval: "daily"
     open-pull-requests-limit: 10
     reviewers:
-      - "onmetal/onmetal-api-maintainers"
+      - "ironcore-dev/core"
   - package-ecosystem: "docker"
     directory: "/docs"
     schedule:
       interval: "daily"
     open-pull-requests-limit: 10
     reviewers:
-      - "onmetal/onmetal-api-maintainers"
+      - "ironcore-dev/core"
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
       interval: "daily"
     open-pull-requests-limit: 10
     reviewers:
-      - "onmetal/onmetal-api-maintainers"
+      - "ironcore-dev/core"

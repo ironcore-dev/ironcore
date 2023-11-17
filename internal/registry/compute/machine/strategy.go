@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,10 +21,10 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/onmetal/onmetal-api/internal/api"
-	"github.com/onmetal/onmetal-api/internal/apis/compute"
-	"github.com/onmetal/onmetal-api/internal/apis/compute/validation"
-	"github.com/onmetal/onmetal-api/internal/machinepoollet/client"
+	"github.com/ironcore-dev/ironcore/internal/api"
+	"github.com/ironcore-dev/ironcore/internal/apis/compute"
+	"github.com/ironcore-dev/ironcore/internal/apis/compute/validation"
+	"github.com/ironcore-dev/ironcore/internal/machinepoollet/client"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
@@ -146,7 +146,7 @@ var StatusStrategy = machineStatusStrategy{Strategy}
 
 func (machineStatusStrategy) GetResetFields() map[fieldpath.APIVersion]*fieldpath.Set {
 	return map[fieldpath.APIVersion]*fieldpath.Set{
-		"compute.api.onmetal.de/v1alpha1": fieldpath.NewSet(
+		"compute.ironcore.dev/v1alpha1": fieldpath.NewSet(
 			fieldpath.MakePathOrDie("spec"),
 		),
 	}
@@ -198,7 +198,7 @@ func ExecLocation(
 	loc := &url.URL{
 		Scheme: machinePoolInfo.Scheme,
 		Host:   net.JoinHostPort(machinePoolInfo.Hostname, machinePoolInfo.Port),
-		Path:   fmt.Sprintf("/apis/compute.api.onmetal.de/namespaces/%s/machines/%s/exec", machine.Namespace, machine.Name),
+		Path:   fmt.Sprintf("/apis/compute.ironcore.dev/namespaces/%s/machines/%s/exec", machine.Namespace, machine.Name),
 	}
 	transport := machinePoolInfo.Transport
 	if opts.InsecureSkipTLSVerifyBackend {

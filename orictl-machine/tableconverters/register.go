@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 package tableconverters
 
 import (
-	"github.com/onmetal/onmetal-api/orictl/tableconverter"
+	"github.com/ironcore-dev/ironcore/orictl/tableconverter"
 )
 
 var (

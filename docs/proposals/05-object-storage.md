@@ -34,13 +34,13 @@ reviewers:
 Object storage builds the basis for many cloud applications. An Object Storage provides a simplified object 
 model for files, but has a reduced set of security and access features (non-posix). This functionality is built on top 
 of the HTTP protocol. The current market standard is [S3](https://docs.aws.amazon.com/AmazonS3/latest/API/Type_API_Reference.html). 
-This document describes how to integrate simplified S3 buckets into the OnMetal API without taking too many details of 
+This document describes how to integrate simplified S3 buckets into the IronCore API without taking too many details of 
 the S3 feature completeness itself.
 
 ## Motivation
-Object Storage is demanded by cloud native applications, therefore, OnMetal needs to provide it for a complete solution.
-The Object Storage service should be integrated into OnMetal and is not designed 
-to be _just_ a service on top of OnMetal. The used protocol is called [S3](https://docs.aws.amazon.com/AmazonS3/latest/API/Type_API_Reference.html)
+Object Storage is demanded by cloud native applications, therefore, IronCore needs to provide it for a complete solution.
+The Object Storage service should be integrated into IronCore and is not designed 
+to be _just_ a service on top of IronCore. The used protocol is called [S3](https://docs.aws.amazon.com/AmazonS3/latest/API/Type_API_Reference.html)
 which introduces a storage entity called bucket. For the beginning only the bucket creation and removal is covered.
 
 ### Goals
@@ -76,7 +76,7 @@ through the `secretRef`. The `state` indicates if the `Bucket` is `Available`, `
 
 [//]: # (@formatter:off)
 ```yaml
-apiVersion: storage.api.onmetal.de/v1alpha1
+apiVersion: storage.ironcore.dev/v1alpha1
 kind: Bucket
 metadata:
   name: bucket-1
@@ -105,7 +105,7 @@ performance the `Bucket` will offer (like I/O operations or throughput) is defin
 
 [//]: # (@formatter:off)
 ```yaml
-apiVersion: storage.api.onmetal.de/v1alpha1
+apiVersion: storage.ironcore.dev/v1alpha1
 kind: BucketClass
 metadata:
   name: slow
@@ -125,7 +125,7 @@ indicates if the pool is `Available`, `Pending` or `Unavailable`.
 
 [//]: # (@formatter:off)
 ```yaml
-apiVersion: storage.api.onmetal.de/v1alpha1
+apiVersion: storage.ironcore.dev/v1alpha1
 kind: BucketPool
 metadata:
   name: ceph-object-store

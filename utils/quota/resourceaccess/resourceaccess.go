@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,22 +18,22 @@ import (
 	"context"
 	"time"
 
-	onmetalutilruntime "github.com/onmetal/onmetal-api/utils/runtime"
+	ironcoreutilruntime "github.com/ironcore-dev/ironcore/utils/runtime"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/utils/lru"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-type liveLookupEntry[T onmetalutilruntime.DeepCopier[T]] struct {
+type liveLookupEntry[T ironcoreutilruntime.DeepCopier[T]] struct {
 	expiry time.Time
 	item   T
 }
 
-type Getter[T onmetalutilruntime.DeepCopier[T], K any] interface {
+type Getter[T ironcoreutilruntime.DeepCopier[T], K any] interface {
 	Get(ctx context.Context, key K) (T, error)
 }
 
-type liveCachedGetter[T onmetalutilruntime.DeepCopier[T], K any] struct {
+type liveCachedGetter[T ironcoreutilruntime.DeepCopier[T], K any] struct {
 	getLive   func(ctx context.Context, key K) (T, error)
 	getCached func(ctx context.Context, key K) (T, error)
 
@@ -41,7 +41,7 @@ type liveCachedGetter[T onmetalutilruntime.DeepCopier[T], K any] struct {
 	liveTTL         time.Duration
 }
 
-func NewPrimeLRUGetter[T onmetalutilruntime.DeepCopier[T], K any](
+func NewPrimeLRUGetter[T ironcoreutilruntime.DeepCopier[T], K any](
 	getLive func(ctx context.Context, key K) (T, error),
 	getCached func(ctx context.Context, key K) (T, error),
 ) Getter[T, K] {
@@ -88,7 +88,7 @@ func (g *liveCachedGetter[T, K]) Get(ctx context.Context, key K) (T, error) {
 
 type Object[T any] interface {
 	client.Object
-	onmetalutilruntime.DeepCopier[T]
+	ironcoreutilruntime.DeepCopier[T]
 }
 
 type clientGetter[T Object[T]] struct {

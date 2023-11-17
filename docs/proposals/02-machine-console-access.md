@@ -32,7 +32,7 @@ reviewers:
 
 ## Summary
 
-A user of the onmetal-api should be able to access the serial console of their machine
+A user of the ironcoreshould be able to access the serial console of their machine
 to access / debug / run imperative commands on it. For this, an endpoint + client-side
 tooling has to be created as well as the server-side machinery.
 
@@ -51,13 +51,13 @@ our minimum viable product.
 ### Non-Goals
 
 * Due to the imperative nature of consoles, no declarative interface to consoles should be defined.
-* Have consoles as a building piece of other parts of the onmetal-api.
+* Have consoles as a building piece of other parts of the ironcore.
 
 ## Proposal
 
 ### User-facing API
 
-The `compute.api.onmetal.de/Machine` resource is extended with an `exec` subresource. When connecting
+The `compute.ironcore.dev/Machine` resource is extended with an `exec` subresource. When connecting
 to that subresource, a websocket connection to the backing machine console should be opened.
 Supported HTTP methods for the `exec` call are `POST` and `GET` (in order to be able to do this from a browser
 as well).
@@ -65,7 +65,7 @@ as well).
 Example call to the Kubernetes API server hosting the aggregated API:
 
 ```http request
-GET https://<address>/apis/compute.api.onmetal.de/v1alpha1/namespaces/<namespace>/machines/<machine-name>/exec
+GET https://<address>/apis/compute.ironcore.dev/v1alpha1/namespaces/<namespace>/machines/<machine-name>/exec
 ```
 
 ### Server-Side API
@@ -74,7 +74,7 @@ Once the server receives such a request, it gets the `Machine` and looks up the 
 is running on. If the `Machine` does not exist or is not scheduled onto a `MachinePool`, an error is returned.
 
 After identifying the responsible `MachinePool`, it is retrieved and its `.status.addresses` field is inspected
-for an address to call. The `.status.addresses` field does not exist yet and has to be updated in the onmetal-api.
+for an address to call. The `.status.addresses` field does not exist yet and has to be updated in the ironcore.
 It is the responsibility of the `MachinePool` implementor to report its endpoints in the `status`.
 
 For reference on the address type, see
@@ -84,7 +84,7 @@ which will be used as reference for designing the address type.
 Example manifest:
 
 ```yaml
-apiVersion: compute.api.onmetal.de/v1alpha1
+apiVersion: compute.ironcore.dev/v1alpha1
 kind: MachinePool
 metadata:
   name: my-machine-pool
@@ -98,12 +98,12 @@ status:
       type: ExternalDNS
 ```
 
-Once an address has been identified, the onmetal API server calls the endpoint of the `MachinePool` provider
-with an `exec` request for the `Machine`. The resulting websocket connection is proxied through the onmetal API
+Once an address has been identified, the ironcore API server calls the endpoint of the `MachinePool` provider
+with an `exec` request for the `Machine`. The resulting websocket connection is proxied through the ironcore API
 server to the user.
 
 ```http request
-GET https://<machine-pool-adddress>/apis/compute.api.onmetal.de/namespaces/<namespace>/machines/<machine>/exec
+GET https://<machine-pool-adddress>/apis/compute.ironcore.dev/namespaces/<namespace>/machines/<machine>/exec
 ```
 
 > Caution: This proposal does *not* include anything on authentication mechanisms yet. Implementors can already

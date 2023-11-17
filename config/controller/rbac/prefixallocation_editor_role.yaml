@@ -5,7 +5,7 @@ metadata:
   name: prefixallocation-editor-role
 rules:
   - apiGroups:
-      - ipam.api.onmetal.de
+      - ipam.ironcore.dev
     resources:
       - prefixallocations
     verbs:
@@ -17,7 +17,7 @@ rules:
       - update
       - watch
   - apiGroups:
-      - ipam.api.onmetal.de
+      - ipam.ironcore.dev
     resources:
       - prefixallocations/status
     verbs:

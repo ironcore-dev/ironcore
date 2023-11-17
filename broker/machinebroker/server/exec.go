@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,11 +20,11 @@ import (
 	"net/http"
 
 	"github.com/go-logr/logr"
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	"github.com/onmetal/onmetal-api/client-go/onmetalapi"
-	onmetalapiclientgoscheme "github.com/onmetal/onmetal-api/client-go/onmetalapi/scheme"
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	remotecommandserver "github.com/onmetal/onmetal-api/poollet/machinepoollet/ori/streaming/remotecommand"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	"github.com/ironcore-dev/ironcore/client-go/ironcore"
+	ironcoreclientgoscheme "github.com/ironcore-dev/ironcore/client-go/ironcore/scheme"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
+	remotecommandserver "github.com/ironcore-dev/ironcore/poollet/machinepoollet/ori/streaming/remotecommand"
 	"k8s.io/client-go/tools/remotecommand"
 )
 
@@ -55,21 +55,21 @@ func (s *Server) ServeExec(w http.ResponseWriter, req *http.Request, token strin
 		return
 	}
 
-	onmetalClientset, err := onmetalapi.NewForConfig(s.cluster.Config())
+	ironcoreClientset, err := ironcore.NewForConfig(s.cluster.Config())
 	if err != nil {
-		log.Error(err, "Error getting onmetal api clientset for config")
+		log.Error(err, "Error getting ironcore api clientset for config")
 		code := http.StatusInternalServerError
 		http.Error(w, http.StatusText(code), code)
 		return
 	}
 
-	reqURL := onmetalClientset.ComputeV1alpha1().RESTClient().
+	reqURL := ironcoreClientset.ComputeV1alpha1().RESTClient().
 		Post().
 		Namespace(s.cluster.Namespace()).
 		Resource("machines").
 		Name(request.MachineId).
 		SubResource("exec").
-		VersionedParams(&computev1alpha1.MachineExecOptions{}, onmetalapiclientgoscheme.ParameterCodec).
+		VersionedParams(&computev1alpha1.MachineExecOptions{}, ironcoreclientgoscheme.ParameterCodec).
 		URL()
 
 	executor, err := remotecommand.NewSPDYExecutor(s.cluster.Config(), http.MethodGet, reqURL)

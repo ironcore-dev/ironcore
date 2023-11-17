@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,14 +19,14 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/onmetal/onmetal-api/utils/annotations"
+	"github.com/ironcore-dev/ironcore/utils/annotations"
 	"golang.org/x/exp/maps"
 
 	"github.com/go-logr/logr"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	computeclient "github.com/onmetal/onmetal-api/internal/client/compute"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	computeclient "github.com/ironcore-dev/ironcore/internal/client/compute"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -40,8 +40,8 @@ type MachineEphemeralNetworkInterfaceReconciler struct {
 	client.Client
 }
 
-//+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machines,verbs=get;list;watch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces,verbs=get;list;watch;create;update;delete
+//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machines,verbs=get;list;watch
+//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=networkinterfaces,verbs=get;list;watch;create;update;delete
 
 func (r *MachineEphemeralNetworkInterfaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)

@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,14 +17,14 @@ package compute
 import (
 	"context"
 
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
-	"github.com/onmetal/onmetal-api/client-go/informers"
-	"github.com/onmetal/onmetal-api/client-go/onmetalapi"
-	"github.com/onmetal/onmetal-api/internal/quota/evaluator/generic"
-	utilsgeneric "github.com/onmetal/onmetal-api/utils/generic"
-	"github.com/onmetal/onmetal-api/utils/quota"
-	"github.com/onmetal/onmetal-api/utils/quota/resourceaccess"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore/client-go/informers"
+	"github.com/ironcore-dev/ironcore/client-go/ironcore"
+	"github.com/ironcore-dev/ironcore/internal/quota/evaluator/generic"
+	utilsgeneric "github.com/ironcore-dev/ironcore/utils/generic"
+	"github.com/ironcore-dev/ironcore/utils/quota"
+	"github.com/ironcore-dev/ironcore/utils/quota/resourceaccess"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -47,7 +47,7 @@ func NewClientMachineCapabilitiesReader(c client.Client) generic.CapabilitiesRea
 	)
 }
 
-func NewPrimeLRUMachineClassCapabilitiesReader(c onmetalapi.Interface, f informers.SharedInformerFactory) generic.CapabilitiesReader {
+func NewPrimeLRUMachineClassCapabilitiesReader(c ironcore.Interface, f informers.SharedInformerFactory) generic.CapabilitiesReader {
 	getter := resourceaccess.NewPrimeLRUGetter[*computev1alpha1.MachineClass, string](
 		func(ctx context.Context, className string) (*computev1alpha1.MachineClass, error) {
 			return c.ComputeV1alpha1().MachineClasses().Get(ctx, className, metav1.GetOptions{})

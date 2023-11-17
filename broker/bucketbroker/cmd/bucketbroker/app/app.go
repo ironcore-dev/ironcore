@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,10 +20,10 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/onmetal/controller-utils/configutils"
-	"github.com/onmetal/onmetal-api/broker/bucketbroker/server"
-	"github.com/onmetal/onmetal-api/broker/common"
-	ori "github.com/onmetal/onmetal-api/ori/apis/bucket/v1alpha1"
+	"github.com/ironcore-dev/controller-utils/configutils"
+	"github.com/ironcore-dev/ironcore/broker/bucketbroker/server"
+	"github.com/ironcore-dev/ironcore/broker/common"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/bucket/v1alpha1"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"google.golang.org/grpc"

@@ -6,7 +6,7 @@ metadata:
   name: broker-role
 rules:
   - apiGroups:
-      - storage.api.onmetal.de
+      - storage.ironcore.dev
     resources:
       - volumeclasses
     verbs:
@@ -14,7 +14,7 @@ rules:
       - list
       - watch
   - apiGroups:
-      - storage.api.onmetal.de
+      - storage.ironcore.dev
     resources:
       - volumepools
     verbs:

@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,14 +18,14 @@ import (
 	"fmt"
 
 	"github.com/gogo/protobuf/proto"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	testingmachine "github.com/onmetal/onmetal-api/ori/testing/machine"
-	machinepoolletv1alpha1 "github.com/onmetal/onmetal-api/poollet/machinepoollet/api/v1alpha1"
-	machinepoolletmachine "github.com/onmetal/onmetal-api/poollet/machinepoollet/machine"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
+	testingmachine "github.com/ironcore-dev/ironcore/ori/testing/machine"
+	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
+	machinepoolletmachine "github.com/ironcore-dev/ironcore/poollet/machinepoollet/machine"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
@@ -147,7 +147,7 @@ var _ = Describe("MachineController", func() {
 			Ips:       []string{"10.0.0.1"},
 		}))
 
-		By("waiting for the onmetal machine status to be up-to-date")
+		By("waiting for the ironcore machine status to be up-to-date")
 		expectedMachineID := machinepoolletmachine.MakeID(testingmachine.FakeRuntimeName, oriMachine.Metadata.Id)
 		Eventually(Object(machine)).Should(SatisfyAll(
 			HaveField("Status.MachineID", expectedMachineID.String()),
@@ -167,7 +167,7 @@ var _ = Describe("MachineController", func() {
 		}
 		srv.SetMachines([]*testingmachine.FakeMachine{oriMachine})
 
-		By("waiting for the onmetal network interface to have a provider id set")
+		By("waiting for the ironcore network interface to have a provider id set")
 		Eventually(Object(nic)).Should(HaveField("Spec.ProviderID", "primary-handle"))
 		Eventually(Object(machine)).Should(HaveField("Status.NetworkInterfaces", ConsistOf(MatchFields(IgnoreExtras, Fields{
 			"Name":   Equal("primary"),

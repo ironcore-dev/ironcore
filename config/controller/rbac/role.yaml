@@ -52,7 +52,7 @@ rules:
   verbs:
   - approve
 - apiGroups:
-  - compute.api.onmetal.de
+  - compute.ironcore.dev
   resources:
   - machineclasses
   verbs:
@@ -64,13 +64,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - compute.api.onmetal.de
+  - compute.ironcore.dev
   resources:
   - machineclasses/finalizers
   verbs:
   - update
 - apiGroups:
-  - compute.api.onmetal.de
+  - compute.ironcore.dev
   resources:
   - machineclasses/status
   verbs:
@@ -78,7 +78,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - compute.api.onmetal.de
+  - compute.ironcore.dev
   resources:
   - machinepools
   verbs:
@@ -86,7 +86,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - compute.api.onmetal.de
+  - compute.ironcore.dev
   resources:
   - machines
   verbs:
@@ -96,7 +96,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - compute.api.onmetal.de
+  - compute.ironcore.dev
   resources:
   - machines/status
   verbs:
@@ -104,7 +104,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - core.api.onmetal.de
+  - core.ironcore.dev
   resources:
   - resourcequotas
   verbs:
@@ -116,13 +116,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - core.api.onmetal.de
+  - core.ironcore.dev
   resources:
   - resourcequotas/finalizers
   verbs:
   - update
 - apiGroups:
-  - core.api.onmetal.de
+  - core.ironcore.dev
   resources:
   - resourcequotas/status
   verbs:
@@ -130,7 +130,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - ipam.api.onmetal.de
+  - ipam.ironcore.dev
   resources:
   - prefixallocations
   verbs:
@@ -142,7 +142,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - ipam.api.onmetal.de
+  - ipam.ironcore.dev
   resources:
   - prefixallocations/status
   verbs:
@@ -150,7 +150,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - ipam.api.onmetal.de
+  - ipam.ironcore.dev
   resources:
   - prefixes
   verbs:
@@ -162,13 +162,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - ipam.api.onmetal.de
+  - ipam.ironcore.dev
   resources:
   - prefixes/finalizers
   verbs:
   - update
 - apiGroups:
-  - ipam.api.onmetal.de
+  - ipam.ironcore.dev
   resources:
   - prefixes/status
   verbs:
@@ -176,7 +176,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - loadbalancerroutings
   verbs:
@@ -188,7 +188,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - loadbalancers
   verbs:
@@ -200,13 +200,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - loadbalancers/finalizers
   verbs:
   - update
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - loadbalancers/status
   verbs:
@@ -214,7 +214,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - natgateways
   verbs:
@@ -222,7 +222,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - networkinterfaces
   verbs:
@@ -234,7 +234,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - networks
   verbs:
@@ -246,13 +246,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - networks/finalizers
   verbs:
   - update
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - networks/status
   verbs:
@@ -260,7 +260,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - virtualips
   verbs:
@@ -272,7 +272,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - storage.api.onmetal.de
+  - storage.ironcore.dev
   resources:
   - bucketclasses
   verbs:
@@ -284,13 +284,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - storage.api.onmetal.de
+  - storage.ironcore.dev
   resources:
   - bucketclasses/finalizers
   verbs:
   - update
 - apiGroups:
-  - storage.api.onmetal.de
+  - storage.ironcore.dev
   resources:
   - bucketclasses/status
   verbs:
@@ -298,7 +298,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - storage.api.onmetal.de
+  - storage.ironcore.dev
   resources:
   - bucketpools
   verbs:
@@ -306,7 +306,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - storage.api.onmetal.de
+  - storage.ironcore.dev
   resources:
   - buckets
   verbs:
@@ -316,7 +316,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - storage.api.onmetal.de
+  - storage.ironcore.dev
   resources:
   - buckets/status
   verbs:
@@ -324,7 +324,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - storage.api.onmetal.de
+  - storage.ironcore.dev
   resources:
   - volumeclasses
   verbs:
@@ -336,13 +336,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - storage.api.onmetal.de
+  - storage.ironcore.dev
   resources:
   - volumeclasses/finalizers
   verbs:
   - update
 - apiGroups:
-  - storage.api.onmetal.de
+  - storage.ironcore.dev
   resources:
   - volumeclasses/status
   verbs:
@@ -350,7 +350,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - storage.api.onmetal.de
+  - storage.ironcore.dev
   resources:
   - volumepools
   verbs:
@@ -358,7 +358,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - storage.api.onmetal.de
+  - storage.ironcore.dev
   resources:
   - volumes
   verbs:
@@ -370,7 +370,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - storage.api.onmetal.de
+  - storage.ironcore.dev
   resources:
   - volumes/status
   verbs:

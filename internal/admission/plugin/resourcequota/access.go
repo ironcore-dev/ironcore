@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@ import (
 	"strings"
 	"time"
 
-	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
-	corev1alpha1listers "github.com/onmetal/onmetal-api/client-go/listers/core/v1alpha1"
-	"github.com/onmetal/onmetal-api/client-go/onmetalapi"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore/client-go/ironcore"
+	corev1alpha1listers "github.com/ironcore-dev/ironcore/client-go/listers/core/v1alpha1"
 	"golang.org/x/exp/slices"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -36,7 +36,7 @@ type QuotaAccessor interface {
 }
 
 type quotaAccessor struct {
-	client onmetalapi.Interface
+	client ironcore.Interface
 
 	lister corev1alpha1listers.ResourceQuotaLister
 
@@ -47,7 +47,7 @@ type quotaAccessor struct {
 }
 
 func NewQuotaAccessor(
-	client onmetalapi.Interface,
+	client ironcore.Interface,
 	lister corev1alpha1listers.ResourceQuotaLister,
 ) (QuotaAccessor, error) {
 	if client == nil {

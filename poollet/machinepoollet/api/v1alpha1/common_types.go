@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,20 +22,20 @@ import (
 )
 
 const (
-	MachineUIDLabel       = "machinepoollet.api.onmetal.de/machine-uid"
-	MachineNamespaceLabel = "machinepoollet.api.onmetal.de/machine-namespace"
-	MachineNameLabel      = "machinepoollet.api.onmetal.de/machine-name"
+	MachineUIDLabel       = "machinepoollet.ironcore.dev/machine-uid"
+	MachineNamespaceLabel = "machinepoollet.ironcore.dev/machine-namespace"
+	MachineNameLabel      = "machinepoollet.ironcore.dev/machine-name"
 
-	MachineGenerationAnnotation    = "machinepoollet.api.onmetal.de/machine-generation"
-	ORIMachineGenerationAnnotation = "machinepoollet.api.onmetal.de/orimachine-generation"
+	MachineGenerationAnnotation    = "machinepoollet.ironcore.dev/machine-generation"
+	ORIMachineGenerationAnnotation = "machinepoollet.ironcore.dev/orimachine-generation"
 
-	NetworkInterfaceMappingAnnotation = "machinepoollet.api.onmetal.de/networkinterfacemapping"
+	NetworkInterfaceMappingAnnotation = "machinepoollet.ironcore.dev/networkinterfacemapping"
 
-	FieldOwner       = "machinepoollet.api.onmetal.de/field-owner"
-	MachineFinalizer = "machinepoollet.api.onmetal.de/machine"
+	FieldOwner       = "machinepoollet.ironcore.dev/field-owner"
+	MachineFinalizer = "machinepoollet.ironcore.dev/machine"
 
 	// DownwardAPIPrefix is the prefix for any downward label.
-	DownwardAPIPrefix = "downward-api.machinepoollet.api.onmetal.de/"
+	DownwardAPIPrefix = "downward-api.machinepoollet.ironcore.dev/"
 )
 
 // DownwardAPILabel makes a downward api label name from the given name.

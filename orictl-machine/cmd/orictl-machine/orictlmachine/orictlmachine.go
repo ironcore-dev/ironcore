@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,15 +17,15 @@ package orictlmachine
 import (
 	goflag "flag"
 
-	"github.com/onmetal/onmetal-api/orictl-machine/cmd/orictl-machine/orictlmachine/attach"
-	"github.com/onmetal/onmetal-api/orictl-machine/cmd/orictl-machine/orictlmachine/common"
-	"github.com/onmetal/onmetal-api/orictl-machine/cmd/orictl-machine/orictlmachine/create"
-	"github.com/onmetal/onmetal-api/orictl-machine/cmd/orictl-machine/orictlmachine/delete"
-	"github.com/onmetal/onmetal-api/orictl-machine/cmd/orictl-machine/orictlmachine/detach"
-	"github.com/onmetal/onmetal-api/orictl-machine/cmd/orictl-machine/orictlmachine/exec"
-	"github.com/onmetal/onmetal-api/orictl-machine/cmd/orictl-machine/orictlmachine/get"
-	"github.com/onmetal/onmetal-api/orictl-machine/cmd/orictl-machine/orictlmachine/update"
-	clicommon "github.com/onmetal/onmetal-api/orictl/cmd"
+	"github.com/ironcore-dev/ironcore/orictl-machine/cmd/orictl-machine/orictlmachine/attach"
+	"github.com/ironcore-dev/ironcore/orictl-machine/cmd/orictl-machine/orictlmachine/common"
+	"github.com/ironcore-dev/ironcore/orictl-machine/cmd/orictl-machine/orictlmachine/create"
+	"github.com/ironcore-dev/ironcore/orictl-machine/cmd/orictl-machine/orictlmachine/delete"
+	"github.com/ironcore-dev/ironcore/orictl-machine/cmd/orictl-machine/orictlmachine/detach"
+	"github.com/ironcore-dev/ironcore/orictl-machine/cmd/orictl-machine/orictlmachine/exec"
+	"github.com/ironcore-dev/ironcore/orictl-machine/cmd/orictl-machine/orictlmachine/get"
+	"github.com/ironcore-dev/ironcore/orictl-machine/cmd/orictl-machine/orictlmachine/update"
+	clicommon "github.com/ironcore-dev/ironcore/orictl/cmd"
 	"github.com/spf13/cobra"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"

@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,12 +20,12 @@ import (
 	"fmt"
 	"maps"
 
-	"github.com/onmetal/onmetal-api/utils/annotations"
+	"github.com/ironcore-dev/ironcore/utils/annotations"
 
 	"github.com/go-logr/logr"
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	computeclient "github.com/onmetal/onmetal-api/internal/client/compute"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	computeclient "github.com/ironcore-dev/ironcore/internal/client/compute"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/klog/v2"
@@ -44,8 +44,8 @@ type MachineEphemeralVolumeReconciler struct {
 	client.Client
 }
 
-//+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machines,verbs=get;list;watch
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes,verbs=get;list;watch;create;update;delete
+//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machines,verbs=get;list;watch
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumes,verbs=get;list;watch;create;update;delete
 
 func (r *MachineEphemeralVolumeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)

@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@ import (
 	"context"
 	"fmt"
 
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
-	"github.com/onmetal/onmetal-api/broker/machinebroker/apiutils"
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	clientutils "github.com/onmetal/onmetal-api/utils/client"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	machinebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/machinebroker/api/v1alpha1"
+	"github.com/ironcore-dev/ironcore/broker/machinebroker/apiutils"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
+	clientutils "github.com/ironcore-dev/ironcore/utils/client"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
@@ -33,16 +33,16 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func (s *Server) listAggregateOnmetalMachines(ctx context.Context) ([]AggregateOnmetalMachine, error) {
-	onmetalMachineList := &computev1alpha1.MachineList{}
-	if err := s.cluster.Client().List(ctx, onmetalMachineList,
+func (s *Server) listAggregateIronCoreMachines(ctx context.Context) ([]AggregateIronCoreMachine, error) {
+	ironcoreMachineList := &computev1alpha1.MachineList{}
+	if err := s.cluster.Client().List(ctx, ironcoreMachineList,
 		client.InNamespace(s.cluster.Namespace()),
 		client.MatchingLabels{
 			machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
 			machinebrokerv1alpha1.CreatedLabel: "true",
 		},
 	); err != nil {
-		return nil, fmt.Errorf("error listing onmetal machines: %w", err)
+		return nil, fmt.Errorf("error listing ironcore machines: %w", err)
 	}
 
 	listOpts := []client.ListOption{
@@ -59,114 +59,114 @@ func (s *Server) listAggregateOnmetalMachines(ctx context.Context) ([]AggregateO
 		return nil, fmt.Errorf("error building caching reader: %w", err)
 	}
 
-	var res []AggregateOnmetalMachine
-	for i := range onmetalMachineList.Items {
-		onmetalMachine := &onmetalMachineList.Items[i]
-		aggregateOnmetalMachine, err := s.aggregateOnmetalMachine(ctx, rd, onmetalMachine)
+	var res []AggregateIronCoreMachine
+	for i := range ironcoreMachineList.Items {
+		ironcoreMachine := &ironcoreMachineList.Items[i]
+		aggregateIronCoreMachine, err := s.aggregateIronCoreMachine(ctx, rd, ironcoreMachine)
 		if err != nil {
-			return nil, fmt.Errorf("error aggregating onmetal machine %s: %w", onmetalMachine.Name, err)
+			return nil, fmt.Errorf("error aggregating ironcore machine %s: %w", ironcoreMachine.Name, err)
 		}
 
-		res = append(res, *aggregateOnmetalMachine)
+		res = append(res, *aggregateIronCoreMachine)
 	}
 	return res, nil
 }
 
-func (s *Server) aggregateOnmetalMachine(
+func (s *Server) aggregateIronCoreMachine(
 	ctx context.Context,
 	rd client.Reader,
-	onmetalMachine *computev1alpha1.Machine,
-) (*AggregateOnmetalMachine, error) {
+	ironcoreMachine *computev1alpha1.Machine,
+) (*AggregateIronCoreMachine, error) {
 	var ignitionSecret *corev1.Secret
-	if ignitionRef := onmetalMachine.Spec.IgnitionRef; ignitionRef != nil {
+	if ignitionRef := ironcoreMachine.Spec.IgnitionRef; ignitionRef != nil {
 		secret := &corev1.Secret{}
 		secretKey := client.ObjectKey{Namespace: s.cluster.Namespace(), Name: ignitionRef.Name}
 		if err := rd.Get(ctx, secretKey, secret); err != nil {
-			return nil, fmt.Errorf("error getting onmetal ignition secret: %w", err)
+			return nil, fmt.Errorf("error getting ironcore ignition secret: %w", err)
 		}
 
 		ignitionSecret = secret
 	}
 
-	aggOnmetalNics := make(map[string]*AggregateOnmetalNetworkInterface)
-	for _, machineNic := range onmetalMachine.Spec.NetworkInterfaces {
+	aggIronCoreNics := make(map[string]*AggregateIronCoreNetworkInterface)
+	for _, machineNic := range ironcoreMachine.Spec.NetworkInterfaces {
 		switch {
 		case machineNic.NetworkInterfaceRef != nil:
-			onmetalNic := &networkingv1alpha1.NetworkInterface{}
-			onmetalNicKey := client.ObjectKey{Namespace: s.cluster.Namespace(), Name: machineNic.NetworkInterfaceRef.Name}
-			if err := rd.Get(ctx, onmetalNicKey, onmetalNic); err != nil {
-				return nil, fmt.Errorf("error getting onmetal network interface: %w", err)
+			ironcoreNic := &networkingv1alpha1.NetworkInterface{}
+			ironcoreNicKey := client.ObjectKey{Namespace: s.cluster.Namespace(), Name: machineNic.NetworkInterfaceRef.Name}
+			if err := rd.Get(ctx, ironcoreNicKey, ironcoreNic); err != nil {
+				return nil, fmt.Errorf("error getting ironcore network interface: %w", err)
 			}
 
-			aggOnmetalNic, err := s.aggregateOnmetalNetworkInterface(ctx, rd, onmetalNic)
+			aggIronCoreNic, err := s.aggregateIronCoreNetworkInterface(ctx, rd, ironcoreNic)
 			if err != nil {
 				return nil, fmt.Errorf("error aggregating network interface: %w", err)
 			}
 
-			aggOnmetalNics[machineNic.Name] = aggOnmetalNic
+			aggIronCoreNics[machineNic.Name] = aggIronCoreNic
 		}
 	}
 
-	aggOnmetalVolumes := make(map[string]*AggregateOnmetalVolume)
-	for _, machineVolume := range onmetalMachine.Spec.Volumes {
+	aggIronCoreVolumes := make(map[string]*AggregateIronCoreVolume)
+	for _, machineVolume := range ironcoreMachine.Spec.Volumes {
 		switch {
 		case machineVolume.VolumeRef != nil:
-			onmetalVolume := &storagev1alpha1.Volume{}
-			onmetalVolumeKey := client.ObjectKey{Namespace: s.cluster.Namespace(), Name: machineVolume.VolumeRef.Name}
-			if err := rd.Get(ctx, onmetalVolumeKey, onmetalVolume); err != nil {
-				return nil, fmt.Errorf("error getting onmetal volume: %w", err)
+			ironcoreVolume := &storagev1alpha1.Volume{}
+			ironcoreVolumeKey := client.ObjectKey{Namespace: s.cluster.Namespace(), Name: machineVolume.VolumeRef.Name}
+			if err := rd.Get(ctx, ironcoreVolumeKey, ironcoreVolume); err != nil {
+				return nil, fmt.Errorf("error getting ironcore volume: %w", err)
 			}
 
-			aggOnmetalVolume, err := s.aggregateOnmetalVolume(ctx, rd, onmetalVolume)
+			aggIronCoreVolume, err := s.aggregateIronCoreVolume(ctx, rd, ironcoreVolume)
 			if err != nil {
 				return nil, fmt.Errorf("error aggregating volume: %w", err)
 			}
 
-			aggOnmetalVolumes[machineVolume.Name] = aggOnmetalVolume
+			aggIronCoreVolumes[machineVolume.Name] = aggIronCoreVolume
 		}
 	}
 
-	return &AggregateOnmetalMachine{
+	return &AggregateIronCoreMachine{
 		IgnitionSecret:    ignitionSecret,
-		Machine:           onmetalMachine,
-		NetworkInterfaces: aggOnmetalNics,
-		Volumes:           aggOnmetalVolumes,
+		Machine:           ironcoreMachine,
+		NetworkInterfaces: aggIronCoreNics,
+		Volumes:           aggIronCoreVolumes,
 	}, nil
 }
 
-func (s *Server) getOnmetalMachine(ctx context.Context, id string) (*computev1alpha1.Machine, error) {
-	onmetalMachine := &computev1alpha1.Machine{}
-	onmetalMachineKey := client.ObjectKey{Namespace: s.cluster.Namespace(), Name: id}
-	if err := s.cluster.Client().Get(ctx, onmetalMachineKey, onmetalMachine); err != nil {
+func (s *Server) getIronCoreMachine(ctx context.Context, id string) (*computev1alpha1.Machine, error) {
+	ironcoreMachine := &computev1alpha1.Machine{}
+	ironcoreMachineKey := client.ObjectKey{Namespace: s.cluster.Namespace(), Name: id}
+	if err := s.cluster.Client().Get(ctx, ironcoreMachineKey, ironcoreMachine); err != nil {
 		if !apierrors.IsNotFound(err) {
-			return nil, fmt.Errorf("error getting onmetal machine %s: %w", id, err)
+			return nil, fmt.Errorf("error getting ironcore machine %s: %w", id, err)
 		}
 		return nil, status.Errorf(codes.NotFound, "machine %s not found", id)
 	}
-	if !apiutils.IsManagedBy(onmetalMachine, machinebrokerv1alpha1.MachineBrokerManager) || !apiutils.IsCreated(onmetalMachine) {
+	if !apiutils.IsManagedBy(ironcoreMachine, machinebrokerv1alpha1.MachineBrokerManager) || !apiutils.IsCreated(ironcoreMachine) {
 		return nil, status.Errorf(codes.NotFound, "machine %s not found", id)
 	}
-	return onmetalMachine, nil
+	return ironcoreMachine, nil
 }
 
-func (s *Server) getAggregateOnmetalMachine(ctx context.Context, id string) (*AggregateOnmetalMachine, error) {
-	onmetalMachine, err := s.getOnmetalMachine(ctx, id)
+func (s *Server) getAggregateIronCoreMachine(ctx context.Context, id string) (*AggregateIronCoreMachine, error) {
+	ironcoreMachine, err := s.getIronCoreMachine(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	return s.aggregateOnmetalMachine(ctx, s.cluster.Client(), onmetalMachine)
+	return s.aggregateIronCoreMachine(ctx, s.cluster.Client(), ironcoreMachine)
 }
 
 func (s *Server) listMachines(ctx context.Context) ([]*ori.Machine, error) {
-	onmetalMachines, err := s.listAggregateOnmetalMachines(ctx)
+	ironcoreMachines, err := s.listAggregateIronCoreMachines(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error listing machines: %w", err)
 	}
 
 	var res []*ori.Machine
-	for _, onmetalMachine := range onmetalMachines {
-		machine, err := s.convertAggregateOnmetalMachine(&onmetalMachine)
+	for _, ironcoreMachine := range ironcoreMachines {
+		machine, err := s.convertAggregateIronCoreMachine(&ironcoreMachine)
 		if err != nil {
 			return nil, err
 		}
@@ -196,12 +196,12 @@ func (s *Server) filterMachines(machines []*ori.Machine, filter *ori.MachineFilt
 }
 
 func (s *Server) getMachine(ctx context.Context, id string) (*ori.Machine, error) {
-	aggregateOnmetalMachine, err := s.getAggregateOnmetalMachine(ctx, id)
+	aggregateIronCoreMachine, err := s.getAggregateIronCoreMachine(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	return s.convertAggregateOnmetalMachine(aggregateOnmetalMachine)
+	return s.convertAggregateIronCoreMachine(aggregateIronCoreMachine)
 }
 
 func (s *Server) ListMachines(ctx context.Context, req *ori.ListMachinesRequest) (*ori.ListMachinesResponse, error) {

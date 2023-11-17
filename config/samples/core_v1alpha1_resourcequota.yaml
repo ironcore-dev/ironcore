@@ -1,4 +1,4 @@
-apiVersion: core.api.onmetal.de/v1alpha1
+apiVersion: core.ironcore.dev/v1alpha1
 kind: ResourceQuota
 metadata:
   name: resource-quota-sample

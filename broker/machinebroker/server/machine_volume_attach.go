@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,41 +19,41 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	"github.com/onmetal/onmetal-api/broker/common/cleaner"
-	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	metautils "github.com/onmetal/onmetal-api/utils/meta"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	"github.com/ironcore-dev/ironcore/broker/common/cleaner"
+	machinebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/machinebroker/api/v1alpha1"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
+	metautils "github.com/ironcore-dev/ironcore/utils/meta"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-type OnmetalVolumeConfig struct {
+type IronCoreVolumeConfig struct {
 	Name      string
 	Device    string
-	EmptyDisk *OnmetalVolumeEmptyDiskConfig
-	Remote    *OnmetalVolumeRemoteConfig
+	EmptyDisk *IronCoreVolumeEmptyDiskConfig
+	Remote    *IronCoreVolumeRemoteConfig
 }
 
-type OnmetalVolumeEmptyDiskConfig struct {
+type IronCoreVolumeEmptyDiskConfig struct {
 	SizeLimit *resource.Quantity
 }
 
-type OnmetalVolumeRemoteConfig struct {
+type IronCoreVolumeRemoteConfig struct {
 	Driver     string
 	Handle     string
 	Attributes map[string]string
 	SecretData map[string][]byte
 }
 
-func (s *Server) getOnmetalVolumeConfig(volume *ori.Volume) (*OnmetalVolumeConfig, error) {
+func (s *Server) getIronCoreVolumeConfig(volume *ori.Volume) (*IronCoreVolumeConfig, error) {
 	var (
-		emptyDisk *OnmetalVolumeEmptyDiskConfig
-		remote    *OnmetalVolumeRemoteConfig
+		emptyDisk *IronCoreVolumeEmptyDiskConfig
+		remote    *IronCoreVolumeRemoteConfig
 	)
 	switch {
 	case volume.EmptyDisk != nil:
@@ -61,11 +61,11 @@ func (s *Server) getOnmetalVolumeConfig(volume *ori.Volume) (*OnmetalVolumeConfi
 		if sizeBytes := volume.EmptyDisk.SizeBytes; sizeBytes > 0 {
 			sizeLimit = resource.NewQuantity(int64(sizeBytes), resource.DecimalSI)
 		}
-		emptyDisk = &OnmetalVolumeEmptyDiskConfig{
+		emptyDisk = &IronCoreVolumeEmptyDiskConfig{
 			SizeLimit: sizeLimit,
 		}
 	case volume.Connection != nil:
-		remote = &OnmetalVolumeRemoteConfig{
+		remote = &IronCoreVolumeRemoteConfig{
 			Driver:     volume.Connection.Driver,
 			Handle:     volume.Connection.Handle,
 			Attributes: volume.Connection.Attributes,
@@ -75,7 +75,7 @@ func (s *Server) getOnmetalVolumeConfig(volume *ori.Volume) (*OnmetalVolumeConfi
 		return nil, fmt.Errorf("unrecognized volume %#v", volume)
 	}
 
-	return &OnmetalVolumeConfig{
+	return &IronCoreVolumeConfig{
 		Name:      volume.Name,
 		Device:    volume.Device,
 		EmptyDisk: emptyDisk,
@@ -83,23 +83,23 @@ func (s *Server) getOnmetalVolumeConfig(volume *ori.Volume) (*OnmetalVolumeConfi
 	}, nil
 }
 
-func (s *Server) createOnmetalVolume(
+func (s *Server) createIronCoreVolume(
 	ctx context.Context,
 	log logr.Logger,
 	c *cleaner.Cleaner,
-	optOnmetalMachine client.Object,
-	cfg *OnmetalVolumeConfig,
-) (onmetalMachineVolume *computev1alpha1.Volume, aggOnmetalVolume *AggregateOnmetalVolume, retErr error) {
-	var onmetalVolumeSrc computev1alpha1.VolumeSource
+	optIronCoreMachine client.Object,
+	cfg *IronCoreVolumeConfig,
+) (ironcoreMachineVolume *computev1alpha1.Volume, aggIronCoreVolume *AggregateIronCoreVolume, retErr error) {
+	var ironcoreVolumeSrc computev1alpha1.VolumeSource
 	switch {
 	case cfg.Remote != nil:
-		log.V(1).Info("Creating onmetal volume")
+		log.V(1).Info("Creating ironcore volume")
 		remote := cfg.Remote
-		onmetalVolume := &storagev1alpha1.Volume{
+		ironcoreVolume := &storagev1alpha1.Volume{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:       s.cluster.Namespace(),
 				Name:            s.cluster.IDGen().Generate(),
-				OwnerReferences: s.optionalOwnerReferences(onmetalMachineGVK, optOnmetalMachine),
+				OwnerReferences: s.optionalOwnerReferences(ironcoreMachineGVK, optIronCoreMachine),
 				Annotations: map[string]string{
 					commonv1alpha1.ManagedByAnnotation: machinebrokerv1alpha1.MachineBrokerManager,
 				},
@@ -108,20 +108,20 @@ func (s *Server) createOnmetalVolume(
 				},
 			},
 			Spec: storagev1alpha1.VolumeSpec{
-				ClaimRef: s.optionalLocalUIDReference(optOnmetalMachine),
+				ClaimRef: s.optionalLocalUIDReference(optIronCoreMachine),
 			},
 		}
-		if err := s.cluster.Client().Create(ctx, onmetalVolume); err != nil {
-			return nil, nil, fmt.Errorf("error creating onmetal volume: %w", err)
+		if err := s.cluster.Client().Create(ctx, ironcoreVolume); err != nil {
+			return nil, nil, fmt.Errorf("error creating ironcore volume: %w", err)
 		}
-		c.Add(cleaner.CleanupObject(s.cluster.Client(), onmetalVolume))
+		c.Add(cleaner.CleanupObject(s.cluster.Client(), ironcoreVolume))
 
 		var (
 			secretRef    *corev1.LocalObjectReference
 			accessSecret *corev1.Secret
 		)
 		if secretData := remote.SecretData; secretData != nil {
-			log.V(1).Info("Creating onmetal volume secret")
+			log.V(1).Info("Creating ironcore volume secret")
 			accessSecret = &corev1.Secret{
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: s.cluster.Namespace(),
@@ -129,7 +129,7 @@ func (s *Server) createOnmetalVolume(
 					OwnerReferences: []metav1.OwnerReference{
 						metautils.MakeControllerRef(
 							storagev1alpha1.SchemeGroupVersion.WithKind("Volume"),
-							onmetalVolume,
+							ironcoreVolume,
 						),
 					},
 					Labels: map[string]string{
@@ -140,52 +140,52 @@ func (s *Server) createOnmetalVolume(
 				Data: secretData,
 			}
 			if err := s.cluster.Client().Create(ctx, accessSecret); err != nil {
-				return nil, nil, fmt.Errorf("error creating onmetal volume secret: %w", err)
+				return nil, nil, fmt.Errorf("error creating ironcore volume secret: %w", err)
 			}
 			c.Add(cleaner.CleanupObject(s.cluster.Client(), accessSecret))
 			secretRef = &corev1.LocalObjectReference{Name: accessSecret.Name}
 		}
 
-		log.V(1).Info("Patching onmetal volume status")
-		baseOnmetalVolume := onmetalVolume.DeepCopy()
-		onmetalVolume.Status.State = storagev1alpha1.VolumeStateAvailable
-		onmetalVolume.Status.Access = &storagev1alpha1.VolumeAccess{
+		log.V(1).Info("Patching ironcore volume status")
+		baseIronCoreVolume := ironcoreVolume.DeepCopy()
+		ironcoreVolume.Status.State = storagev1alpha1.VolumeStateAvailable
+		ironcoreVolume.Status.Access = &storagev1alpha1.VolumeAccess{
 			SecretRef:        secretRef,
 			Driver:           remote.Driver,
 			Handle:           remote.Handle,
 			VolumeAttributes: remote.Attributes,
 		}
-		if err := s.cluster.Client().Status().Patch(ctx, onmetalVolume, client.MergeFrom(baseOnmetalVolume)); err != nil {
-			return nil, nil, fmt.Errorf("error patching onmetal volume status: %w", err)
+		if err := s.cluster.Client().Status().Patch(ctx, ironcoreVolume, client.MergeFrom(baseIronCoreVolume)); err != nil {
+			return nil, nil, fmt.Errorf("error patching ironcore volume status: %w", err)
 		}
 
-		aggOnmetalVolume = &AggregateOnmetalVolume{
-			Volume:       onmetalVolume,
+		aggIronCoreVolume = &AggregateIronCoreVolume{
+			Volume:       ironcoreVolume,
 			AccessSecret: accessSecret,
 		}
-		onmetalVolumeSrc.VolumeRef = &corev1.LocalObjectReference{Name: onmetalVolume.Name}
+		ironcoreVolumeSrc.VolumeRef = &corev1.LocalObjectReference{Name: ironcoreVolume.Name}
 	case cfg.EmptyDisk != nil:
-		onmetalVolumeSrc.EmptyDisk = &computev1alpha1.EmptyDiskVolumeSource{
+		ironcoreVolumeSrc.EmptyDisk = &computev1alpha1.EmptyDiskVolumeSource{
 			SizeLimit: cfg.EmptyDisk.SizeLimit,
 		}
 	}
 	return &computev1alpha1.Volume{
 		Name:         cfg.Name,
 		Device:       &cfg.Device,
-		VolumeSource: onmetalVolumeSrc,
-	}, aggOnmetalVolume, nil
+		VolumeSource: ironcoreVolumeSrc,
+	}, aggIronCoreVolume, nil
 }
 
-func (s *Server) attachOnmetalVolume(
+func (s *Server) attachIronCoreVolume(
 	ctx context.Context,
 	log logr.Logger,
-	onmetalMachine *computev1alpha1.Machine,
-	onmetalMachineVolume *computev1alpha1.Volume,
+	ironcoreMachine *computev1alpha1.Machine,
+	ironcoreMachineVolume *computev1alpha1.Volume,
 ) error {
-	baseOnmetalMachine := onmetalMachine.DeepCopy()
-	onmetalMachine.Spec.Volumes = append(onmetalMachine.Spec.Volumes, *onmetalMachineVolume)
-	if err := s.cluster.Client().Patch(ctx, onmetalMachine, client.StrategicMergeFrom(baseOnmetalMachine)); err != nil {
-		return fmt.Errorf("error patching onmetal machine volumes: %w", err)
+	baseIronCoreMachine := ironcoreMachine.DeepCopy()
+	ironcoreMachine.Spec.Volumes = append(ironcoreMachine.Spec.Volumes, *ironcoreMachineVolume)
+	if err := s.cluster.Client().Patch(ctx, ironcoreMachine, client.StrategicMergeFrom(baseIronCoreMachine)); err != nil {
+		return fmt.Errorf("error patching ironcore machine volumes: %w", err)
 	}
 	return nil
 }
@@ -195,14 +195,14 @@ func (s *Server) AttachVolume(ctx context.Context, req *ori.AttachVolumeRequest)
 	volumeName := req.Volume.Name
 	log := s.loggerFrom(ctx, "MachineID", machineID, "VolumeName", volumeName)
 
-	log.V(1).Info("Getting onmetal machine")
-	onmetalMachine, err := s.getOnmetalMachine(ctx, machineID)
+	log.V(1).Info("Getting ironcore machine")
+	ironcoreMachine, err := s.getIronCoreMachine(ctx, machineID)
 	if err != nil {
 		return nil, err
 	}
 
-	log.V(1).Info("Getting onmetal volume config")
-	cfg, err := s.getOnmetalVolumeConfig(req.Volume)
+	log.V(1).Info("Getting ironcore volume config")
+	cfg, err := s.getIronCoreVolumeConfig(req.Volume)
 	if err != nil {
 		return nil, err
 	}
@@ -210,14 +210,14 @@ func (s *Server) AttachVolume(ctx context.Context, req *ori.AttachVolumeRequest)
 	c, cleanup := s.setupCleaner(ctx, log, &retErr)
 	defer cleanup()
 
-	log.V(1).Info("Creating onmetal volume")
-	onmetalMachineVolume, _, err := s.createOnmetalVolume(ctx, log, c, onmetalMachine, cfg)
+	log.V(1).Info("Creating ironcore volume")
+	ironcoreMachineVolume, _, err := s.createIronCoreVolume(ctx, log, c, ironcoreMachine, cfg)
 	if err != nil {
 		return nil, err
 	}
 
-	log.V(1).Info("Attaching onmetal volume")
-	if err := s.attachOnmetalVolume(ctx, log, onmetalMachine, onmetalMachineVolume); err != nil {
+	log.V(1).Info("Attaching ironcore volume")
+	if err := s.attachIronCoreVolume(ctx, log, ironcoreMachine, ironcoreMachineVolume); err != nil {
 		return nil, err
 	}
 

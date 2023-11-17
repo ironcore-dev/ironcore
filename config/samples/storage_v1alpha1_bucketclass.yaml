@@ -1,8 +1,7 @@
-apiVersion: storage.api.onmetal.de/v1alpha1
+apiVersion: storage.ironcore.dev/v1alpha1
 kind: BucketClass
 metadata:
   name: bucketclass-sample
 capabilities:
   tps: 100Mi
   iops: 100
-

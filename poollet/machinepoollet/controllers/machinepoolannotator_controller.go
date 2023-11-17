@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	"github.com/onmetal/onmetal-api/poollet/machinepoollet/mcm"
-	"github.com/onmetal/onmetal-api/poollet/orievent"
-	onmetalapiclient "github.com/onmetal/onmetal-api/utils/client"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/mcm"
+	"github.com/ironcore-dev/ironcore/poollet/orievent"
+	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -47,7 +47,7 @@ func (r *MachinePoolAnnotatorReconciler) Reconcile(ctx context.Context, req ctrl
 		},
 	}
 
-	if err := onmetalapiclient.PatchAddReconcileAnnotation(ctx, r.Client, machinePool); client.IgnoreNotFound(err) != nil {
+	if err := ironcoreclient.PatchAddReconcileAnnotation(ctx, r.Client, machinePool); client.IgnoreNotFound(err) != nil {
 		return ctrl.Result{}, fmt.Errorf("error patching machine pool: %w", err)
 	}
 	return ctrl.Result{}, nil

@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,18 +21,18 @@ import (
 	"os"
 	"time"
 
-	"github.com/onmetal/controller-utils/configutils"
-	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	storageclient "github.com/onmetal/onmetal-api/internal/client/storage"
-	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
-	oriremotevolume "github.com/onmetal/onmetal-api/ori/remote/volume"
-	"github.com/onmetal/onmetal-api/poollet/orievent"
-	volumepoolletconfig "github.com/onmetal/onmetal-api/poollet/volumepoollet/client/config"
-	"github.com/onmetal/onmetal-api/poollet/volumepoollet/controllers"
-	"github.com/onmetal/onmetal-api/poollet/volumepoollet/vcm"
-	"github.com/onmetal/onmetal-api/utils/client/config"
+	"github.com/ironcore-dev/controller-utils/configutils"
+	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	storageclient "github.com/ironcore-dev/ironcore/internal/client/storage"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/volume/v1alpha1"
+	oriremotevolume "github.com/ironcore-dev/ironcore/ori/remote/volume"
+	"github.com/ironcore-dev/ironcore/poollet/orievent"
+	volumepoolletconfig "github.com/ironcore-dev/ironcore/poollet/volumepoollet/client/config"
+	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers"
+	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
+	"github.com/ironcore-dev/ironcore/utils/client/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"google.golang.org/grpc"
@@ -176,7 +176,7 @@ func Run(ctx context.Context, opts Options) error {
 		Metrics:                 metricsserver.Options{BindAddress: opts.MetricsAddr},
 		HealthProbeBindAddress:  opts.ProbeAddr,
 		LeaderElection:          opts.EnableLeaderElection,
-		LeaderElectionID:        "dfffbeaa.api.onmetal.de",
+		LeaderElectionID:        "dfffbeaa.ironcore.dev",
 		LeaderElectionNamespace: opts.LeaderElectionNamespace,
 		LeaderElectionConfig:    leaderElectionCfg,
 	})

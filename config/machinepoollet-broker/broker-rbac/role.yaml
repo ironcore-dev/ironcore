@@ -17,7 +17,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - compute.api.onmetal.de
+  - compute.ironcore.dev
   resources:
   - machines
   verbs:
@@ -29,14 +29,14 @@ rules:
   - update
   - watch
 - apiGroups:
-  - compute.api.onmetal.de
+  - compute.ironcore.dev
   resources:
   - machines/exec
   verbs:
   - create
   - get
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - loadbalancerroutings
   verbs:
@@ -48,7 +48,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - loadbalancers
   verbs:
@@ -60,7 +60,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - loadbalancers/status
   verbs:
@@ -68,7 +68,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - natgateways
   verbs:
@@ -80,7 +80,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - natgateways/status
   verbs:
@@ -88,7 +88,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - networkinterfaces
   verbs:
@@ -100,7 +100,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - networks
   verbs:
@@ -112,7 +112,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - networks/status
   verbs:
@@ -120,7 +120,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - virtualips
   verbs:
@@ -132,7 +132,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - virtualips/status
   verbs:
@@ -140,7 +140,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - storage.api.onmetal.de
+  - storage.ironcore.dev
   resources:
   - volumes
   verbs:
@@ -152,7 +152,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - storage.api.onmetal.de
+  - storage.ironcore.dev
   resources:
   - volumes/status
   verbs:

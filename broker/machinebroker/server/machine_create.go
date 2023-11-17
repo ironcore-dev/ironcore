@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,37 +19,37 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	"github.com/onmetal/onmetal-api/broker/common/cleaner"
-	machinebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/machinebroker/api/v1alpha1"
-	"github.com/onmetal/onmetal-api/broker/machinebroker/apiutils"
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	machinepoolletv1alpha1 "github.com/onmetal/onmetal-api/poollet/machinepoollet/api/v1alpha1"
-	"github.com/onmetal/onmetal-api/utils/maps"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	"github.com/ironcore-dev/ironcore/broker/common/cleaner"
+	machinebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/machinebroker/api/v1alpha1"
+	"github.com/ironcore-dev/ironcore/broker/machinebroker/apiutils"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
+	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
+	"github.com/ironcore-dev/ironcore/utils/maps"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-type OnmetalMachineConfig struct {
+type IronCoreMachineConfig struct {
 	Labels                  map[string]string
 	Annotations             map[string]string
 	Power                   computev1alpha1.Power
 	MachineClassName        string
 	Image                   string
 	IgnitionData            []byte
-	NetworkInterfaceConfigs []*OnmetalNetworkInterfaceConfig
-	VolumeConfigs           []*OnmetalVolumeConfig
+	NetworkInterfaceConfigs []*IronCoreNetworkInterfaceConfig
+	VolumeConfigs           []*IronCoreVolumeConfig
 }
 
-func (s *Server) onmetalMachinePoolRef() *corev1.LocalObjectReference {
+func (s *Server) ironcoreMachinePoolRef() *corev1.LocalObjectReference {
 	if s.cluster.MachinePoolName() == "" {
 		return nil
 	}
 	return &corev1.LocalObjectReference{Name: s.cluster.MachinePoolName()}
 }
 
-func (s *Server) prepareOnmetalMachinePower(power ori.Power) (computev1alpha1.Power, error) {
+func (s *Server) prepareIronCoreMachinePower(power ori.Power) (computev1alpha1.Power, error) {
 	switch power {
 	case ori.Power_POWER_ON:
 		return computev1alpha1.PowerOn, nil
@@ -60,7 +60,7 @@ func (s *Server) prepareOnmetalMachinePower(power ori.Power) (computev1alpha1.Po
 	}
 }
 
-func (s *Server) prepareOnmetalMachineLabels(machine *ori.Machine) (map[string]string, error) {
+func (s *Server) prepareIronCoreMachineLabels(machine *ori.Machine) (map[string]string, error) {
 	labels := make(map[string]string)
 
 	for downwardAPILabelName, defaultLabelName := range s.brokerDownwardAPILabels {
@@ -76,7 +76,7 @@ func (s *Server) prepareOnmetalMachineLabels(machine *ori.Machine) (map[string]s
 	return labels, nil
 }
 
-func (s *Server) prepareOnmetalMachineAnnotations(machine *ori.Machine) (map[string]string, error) {
+func (s *Server) prepareIronCoreMachineAnnotations(machine *ori.Machine) (map[string]string, error) {
 	annotationsValue, err := apiutils.EncodeAnnotationsAnnotation(machine.GetMetadata().GetAnnotations())
 	if err != nil {
 		return nil, fmt.Errorf("error encoding annotations: %w", err)
@@ -93,64 +93,64 @@ func (s *Server) prepareOnmetalMachineAnnotations(machine *ori.Machine) (map[str
 	}, nil
 }
 
-func (s *Server) getOnmetalMachineConfig(machine *ori.Machine) (*OnmetalMachineConfig, error) {
-	onmetalPower, err := s.prepareOnmetalMachinePower(machine.Spec.Power)
+func (s *Server) getIronCoreMachineConfig(machine *ori.Machine) (*IronCoreMachineConfig, error) {
+	ironcorePower, err := s.prepareIronCoreMachinePower(machine.Spec.Power)
 	if err != nil {
 		return nil, err
 	}
 
-	var onmetalImage string
+	var ironcoreImage string
 	if image := machine.Spec.Image; image != nil {
-		onmetalImage = image.Image
+		ironcoreImage = image.Image
 	}
 
-	onmetalNicCfgs := make([]*OnmetalNetworkInterfaceConfig, len(machine.Spec.NetworkInterfaces))
+	ironcoreNicCfgs := make([]*IronCoreNetworkInterfaceConfig, len(machine.Spec.NetworkInterfaces))
 	for i, nic := range machine.Spec.NetworkInterfaces {
-		onmetalNicCfg, err := s.getOnmetalNetworkInterfaceConfig(nic)
+		ironcoreNicCfg, err := s.getIronCoreNetworkInterfaceConfig(nic)
 		if err != nil {
 			return nil, fmt.Errorf("[network interface %s] %w", nic.Name, err)
 		}
 
-		onmetalNicCfgs[i] = onmetalNicCfg
+		ironcoreNicCfgs[i] = ironcoreNicCfg
 	}
 
-	onmetalVolumeCfgs := make([]*OnmetalVolumeConfig, len(machine.Spec.Volumes))
+	ironcoreVolumeCfgs := make([]*IronCoreVolumeConfig, len(machine.Spec.Volumes))
 	for i, volume := range machine.Spec.Volumes {
-		onmetalVolumeCfg, err := s.getOnmetalVolumeConfig(volume)
+		ironcoreVolumeCfg, err := s.getIronCoreVolumeConfig(volume)
 		if err != nil {
 			return nil, fmt.Errorf("[volume %s]: %w", volume.Name, err)
 		}
 
-		onmetalVolumeCfgs[i] = onmetalVolumeCfg
+		ironcoreVolumeCfgs[i] = ironcoreVolumeCfg
 	}
 
-	labels, err := s.prepareOnmetalMachineLabels(machine)
+	labels, err := s.prepareIronCoreMachineLabels(machine)
 	if err != nil {
-		return nil, fmt.Errorf("error preparing onmetal machine labels: %w", err)
+		return nil, fmt.Errorf("error preparing ironcore machine labels: %w", err)
 	}
 
-	annotations, err := s.prepareOnmetalMachineAnnotations(machine)
+	annotations, err := s.prepareIronCoreMachineAnnotations(machine)
 	if err != nil {
-		return nil, fmt.Errorf("error preparing onmetal machine annotations: %w", err)
+		return nil, fmt.Errorf("error preparing ironcore machine annotations: %w", err)
 	}
 
-	return &OnmetalMachineConfig{
+	return &IronCoreMachineConfig{
 		Labels:                  labels,
 		Annotations:             annotations,
-		Power:                   onmetalPower,
+		Power:                   ironcorePower,
 		MachineClassName:        machine.Spec.Class,
-		Image:                   onmetalImage,
+		Image:                   ironcoreImage,
 		IgnitionData:            machine.Spec.IgnitionData,
-		NetworkInterfaceConfigs: onmetalNicCfgs,
-		VolumeConfigs:           onmetalVolumeCfgs,
+		NetworkInterfaceConfigs: ironcoreNicCfgs,
+		VolumeConfigs:           ironcoreVolumeCfgs,
 	}, nil
 }
 
-func (s *Server) createOnmetalMachine(
+func (s *Server) createIronCoreMachine(
 	ctx context.Context,
 	log logr.Logger,
-	cfg *OnmetalMachineConfig,
-) (res *AggregateOnmetalMachine, retErr error) {
+	cfg *IronCoreMachineConfig,
+) (res *AggregateIronCoreMachine, retErr error) {
 	c, cleanup := s.setupCleaner(ctx, log, &retErr)
 	defer cleanup()
 
@@ -159,7 +159,7 @@ func (s *Server) createOnmetalMachine(
 		ignitionSecret *corev1.Secret
 	)
 	if ignitionData := cfg.IgnitionData; len(ignitionData) > 0 {
-		log.V(1).Info("Creating onmetal ignition secret")
+		log.V(1).Info("Creating ironcore ignition secret")
 		ignitionSecret = &corev1.Secret{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: s.cluster.Namespace(),
@@ -171,7 +171,7 @@ func (s *Server) createOnmetalMachine(
 			},
 		}
 		if err := s.cluster.Client().Create(ctx, ignitionSecret); err != nil {
-			return nil, fmt.Errorf("error creating onmetal ignition secret: %w", err)
+			return nil, fmt.Errorf("error creating ironcore ignition secret: %w", err)
 		}
 		c.Add(cleaner.CleanupObject(s.cluster.Client(), ignitionSecret))
 
@@ -179,36 +179,36 @@ func (s *Server) createOnmetalMachine(
 	}
 
 	var (
-		onmetalMachineNics []computev1alpha1.NetworkInterface
-		aggOnmetalNics     = make(map[string]*AggregateOnmetalNetworkInterface)
+		ironcoreMachineNics []computev1alpha1.NetworkInterface
+		aggIronCoreNics     = make(map[string]*AggregateIronCoreNetworkInterface)
 	)
 	for _, nicCfg := range cfg.NetworkInterfaceConfigs {
-		onmetalMachineNic, aggOnmetalNic, err := s.createOnmetalNetworkInterface(ctx, log, c, nil, nicCfg)
+		ironcoreMachineNic, aggIronCoreNic, err := s.createIronCoreNetworkInterface(ctx, log, c, nil, nicCfg)
 		if err != nil {
 			return nil, fmt.Errorf("[network interface %s] error creating: %w", nicCfg.Name, err)
 		}
 
-		onmetalMachineNics = append(onmetalMachineNics, *onmetalMachineNic)
-		aggOnmetalNics[nicCfg.Name] = aggOnmetalNic
+		ironcoreMachineNics = append(ironcoreMachineNics, *ironcoreMachineNic)
+		aggIronCoreNics[nicCfg.Name] = aggIronCoreNic
 	}
 
 	var (
-		onmetalMachineVolumes []computev1alpha1.Volume
-		aggOnmetalVolumes     = make(map[string]*AggregateOnmetalVolume)
+		ironcoreMachineVolumes []computev1alpha1.Volume
+		aggIronCoreVolumes     = make(map[string]*AggregateIronCoreVolume)
 	)
 	for _, volumeCfg := range cfg.VolumeConfigs {
-		onmetalMachineVolume, aggOnmetalVolume, err := s.createOnmetalVolume(ctx, log, c, nil, volumeCfg)
+		ironcoreMachineVolume, aggIronCoreVolume, err := s.createIronCoreVolume(ctx, log, c, nil, volumeCfg)
 		if err != nil {
 			return nil, fmt.Errorf("[volume %s] error creating: %w", volumeCfg.Name, err)
 		}
 
-		onmetalMachineVolumes = append(onmetalMachineVolumes, *onmetalMachineVolume)
-		if aggOnmetalVolume != nil {
-			aggOnmetalVolumes[volumeCfg.Name] = aggOnmetalVolume
+		ironcoreMachineVolumes = append(ironcoreMachineVolumes, *ironcoreMachineVolume)
+		if aggIronCoreVolume != nil {
+			aggIronCoreVolumes[volumeCfg.Name] = aggIronCoreVolume
 		}
 	}
 
-	onmetalMachine := &computev1alpha1.Machine{
+	ironcoreMachine := &computev1alpha1.Machine{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace:   s.cluster.Namespace(),
 			Name:        s.cluster.IDGen().Generate(),
@@ -220,69 +220,69 @@ func (s *Server) createOnmetalMachine(
 		Spec: computev1alpha1.MachineSpec{
 			MachineClassRef:     corev1.LocalObjectReference{Name: cfg.MachineClassName},
 			MachinePoolSelector: s.cluster.MachinePoolSelector(),
-			MachinePoolRef:      s.onmetalMachinePoolRef(),
+			MachinePoolRef:      s.ironcoreMachinePoolRef(),
 			Power:               cfg.Power,
 			Image:               cfg.Image,
 			ImagePullSecretRef:  nil, // TODO: Specify as soon as available.
-			NetworkInterfaces:   onmetalMachineNics,
-			Volumes:             onmetalMachineVolumes,
+			NetworkInterfaces:   ironcoreMachineNics,
+			Volumes:             ironcoreMachineVolumes,
 			IgnitionRef:         ignitionRef,
 		},
 	}
-	log.V(1).Info("Creating onmetal machine")
-	if err := s.cluster.Client().Create(ctx, onmetalMachine); err != nil {
-		return nil, fmt.Errorf("error creating onmetal machine: %w", err)
+	log.V(1).Info("Creating ironcore machine")
+	if err := s.cluster.Client().Create(ctx, ironcoreMachine); err != nil {
+		return nil, fmt.Errorf("error creating ironcore machine: %w", err)
 	}
-	c.Add(cleaner.CleanupObject(s.cluster.Client(), onmetalMachine))
+	c.Add(cleaner.CleanupObject(s.cluster.Client(), ironcoreMachine))
 
 	if ignitionSecret != nil {
-		log.V(1).Info("Patching ignition secret to be controlled by onmetal machine")
-		if err := apiutils.PatchControlledBy(ctx, s.cluster.Client(), onmetalMachine, ignitionSecret); err != nil {
-			return nil, fmt.Errorf("error patching ignition secret to be controlled by onmetal machine: %w", err)
+		log.V(1).Info("Patching ignition secret to be controlled by ironcore machine")
+		if err := apiutils.PatchControlledBy(ctx, s.cluster.Client(), ironcoreMachine, ignitionSecret); err != nil {
+			return nil, fmt.Errorf("error patching ignition secret to be controlled by ironcore machine: %w", err)
 		}
 	}
-	for _, aggOnmetalNic := range aggOnmetalNics {
-		if err := s.bindOnmetalMachineNetworkInterface(ctx, onmetalMachine, aggOnmetalNic.NetworkInterface); err != nil {
-			return nil, fmt.Errorf("error binding onmetal network interface to onmetal machine: %w", err)
+	for _, aggIronCoreNic := range aggIronCoreNics {
+		if err := s.bindIronCoreMachineNetworkInterface(ctx, ironcoreMachine, aggIronCoreNic.NetworkInterface); err != nil {
+			return nil, fmt.Errorf("error binding ironcore network interface to ironcore machine: %w", err)
 		}
 	}
-	for _, aggOnmetalVolume := range aggOnmetalVolumes {
-		if err := s.bindOnmetalMachineVolume(ctx, onmetalMachine, aggOnmetalVolume.Volume); err != nil {
-			return nil, fmt.Errorf("error binding onmetal volume to onmetal machine: %w", err)
+	for _, aggIronCoreVolume := range aggIronCoreVolumes {
+		if err := s.bindIronCoreMachineVolume(ctx, ironcoreMachine, aggIronCoreVolume.Volume); err != nil {
+			return nil, fmt.Errorf("error binding ironcore volume to ironcore machine: %w", err)
 		}
 	}
 
-	log.V(1).Info("Patching onmetal machine as created")
-	if err := apiutils.PatchCreated(ctx, s.cluster.Client(), onmetalMachine); err != nil {
-		return nil, fmt.Errorf("error patching onmetal machine as created: %w", err)
+	log.V(1).Info("Patching ironcore machine as created")
+	if err := apiutils.PatchCreated(ctx, s.cluster.Client(), ironcoreMachine); err != nil {
+		return nil, fmt.Errorf("error patching ironcore machine as created: %w", err)
 	}
 
-	return &AggregateOnmetalMachine{
+	return &AggregateIronCoreMachine{
 		IgnitionSecret:    ignitionSecret,
-		Machine:           onmetalMachine,
-		NetworkInterfaces: aggOnmetalNics,
-		Volumes:           aggOnmetalVolumes,
+		Machine:           ironcoreMachine,
+		NetworkInterfaces: aggIronCoreNics,
+		Volumes:           aggIronCoreVolumes,
 	}, nil
 }
 
 func (s *Server) CreateMachine(ctx context.Context, req *ori.CreateMachineRequest) (res *ori.CreateMachineResponse, retErr error) {
 	log := s.loggerFrom(ctx)
 
-	log.V(1).Info("Getting onmetal machine config")
-	cfg, err := s.getOnmetalMachineConfig(req.Machine)
+	log.V(1).Info("Getting ironcore machine config")
+	cfg, err := s.getIronCoreMachineConfig(req.Machine)
 	if err != nil {
-		return nil, fmt.Errorf("error getting onmetal machine config: %w", err)
+		return nil, fmt.Errorf("error getting ironcore machine config: %w", err)
 	}
 
-	log.V(1).Info("Creating onmetal machine")
-	onmetalMachine, err := s.createOnmetalMachine(ctx, log, cfg)
+	log.V(1).Info("Creating ironcore machine")
+	ironcoreMachine, err := s.createIronCoreMachine(ctx, log, cfg)
 	if err != nil {
-		return nil, fmt.Errorf("error creating onmetal machine: %w", err)
+		return nil, fmt.Errorf("error creating ironcore machine: %w", err)
 	}
 
-	m, err := s.convertAggregateOnmetalMachine(onmetalMachine)
+	m, err := s.convertAggregateIronCoreMachine(ironcoreMachine)
 	if err != nil {
-		return nil, fmt.Errorf("error converting onmetal machine: %w", err)
+		return nil, fmt.Errorf("error converting ironcore machine: %w", err)
 	}
 
 	return &ori.CreateMachineResponse{

@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,13 +19,13 @@ import (
 	"text/template"
 	"time"
 
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	oriremotemachine "github.com/onmetal/onmetal-api/ori/remote/machine"
-	"github.com/onmetal/onmetal-api/orictl-machine/clientcmd"
-	"github.com/onmetal/onmetal-api/orictl-machine/tableconverters"
-	"github.com/onmetal/onmetal-api/orictl/renderer"
-	"github.com/onmetal/onmetal-api/orictl/tableconverter"
-	"github.com/onmetal/onmetal-api/utils/generic"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
+	oriremotemachine "github.com/ironcore-dev/ironcore/ori/remote/machine"
+	"github.com/ironcore-dev/ironcore/orictl-machine/clientcmd"
+	"github.com/ironcore-dev/ironcore/orictl-machine/tableconverters"
+	"github.com/ironcore-dev/ironcore/orictl/renderer"
+	"github.com/ironcore-dev/ironcore/orictl/tableconverter"
+	"github.com/ironcore-dev/ironcore/utils/generic"
 	"github.com/spf13/pflag"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

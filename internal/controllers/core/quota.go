@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,12 +19,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/onmetal/controller-utils/metautils"
+	"github.com/ironcore-dev/controller-utils/metautils"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
 
-const ReplenishResourceQuotaAnnotation = "core.api.onmetal.de/replenish-resourcequota"
+const ReplenishResourceQuotaAnnotation = "core.ironcore.dev/replenish-resourcequota"
 
 func HasReplenishResourceQuotaAnnotation(obj client.Object) bool {
 	return metautils.HasAnnotation(obj, ReplenishResourceQuotaAnnotation)

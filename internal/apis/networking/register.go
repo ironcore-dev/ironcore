@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 by the OnMetal authors.
+ * Copyright (c) 2021 by the IronCore authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 
 // Package networking contains API Schema definitions for the networking internal API group
-// +groupName=networking.api.onmetal.de
+// +groupName=networking.ironcore.dev
 package networking
 
 import (
@@ -25,7 +25,7 @@ import (
 
 var (
 	// SchemeGroupVersion is group version used to register these objects
-	SchemeGroupVersion = schema.GroupVersion{Group: "networking.api.onmetal.de", Version: runtime.APIVersionInternal}
+	SchemeGroupVersion = schema.GroupVersion{Group: "networking.ironcore.dev", Version: runtime.APIVersionInternal}
 
 	// SchemeBuilder is used to add go types to the GroupVersionKind scheme
 	SchemeBuilder = runtime.NewSchemeBuilder(addKnownTypes)

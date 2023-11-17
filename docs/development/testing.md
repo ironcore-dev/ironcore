@@ -193,7 +193,7 @@ Running static Ginkgo/Gomega tests in Golang should work out of the box. However
 run from within your IDE you need to expose the following environment variable inside your 'Test Run Configuration'
 
 ```shell
-KUBEBUILDER_ASSETS=/PATH_TO_MY_WORKSPACE/onmetal/onmetal-api/testbin/bin
+KUBEBUILDER_ASSETS=/PATH_TO_MY_WORKSPACE/ironcore-dev/ironcore/testbin/bin
 ```
 
 This is typically the location of the Kubernetes control plane binaries on your machine.

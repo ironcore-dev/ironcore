@@ -1,10 +1,10 @@
-apiVersion: compute.api.onmetal.de/v1alpha1
+apiVersion: compute.ironcore.dev/v1alpha1
 kind: MachinePool
 metadata:
   name: machinepool-sample
   labels:
-    onmetal.de/az: az1
+    ironcore.dev/az: az1
 spec:
-  providerID: onmetal://shared
+  providerID: ironcore://shared
 # status:
 #   state: Available

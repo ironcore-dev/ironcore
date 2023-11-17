@@ -1,54 +1,54 @@
-domain: onmetal.de
+domain: ironcore.dev
 layout:
 - go.kubebuilder.io/v3
 multigroup: true
-projectName: onmetal
-repo: github.com/onmetal/onmetal-api
+projectName: ironcore
+repo: github.com/ironcore-dev/ironcore
 resources:
 - api:
     crdVersion: v1
     namespaced: true
   controller: true
-  domain: onmetal.de
+  domain: ironcore.dev
   group: compute
   kind: MachineClass
-  path: github.com/onmetal/onmetal-api/api/compute/v1alpha1
+  path: github.com/ironcore-dev/ironcore/api/compute/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
     namespaced: true
   controller: true
-  domain: onmetal.de
+  domain: ironcore.dev
   group: compute
   kind: MachinePool
-  path: github.com/onmetal/onmetal-api/api/compute/v1alpha1
+  path: github.com/ironcore-dev/ironcore/api/compute/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
     namespaced: true
   controller: true
-  domain: onmetal.de
+  domain: ironcore.dev
   group: storage
   kind: VolumePool
-  path: github.com/onmetal/onmetal-api/api/storage/v1alpha1
+  path: github.com/ironcore-dev/ironcore/api/storage/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
     namespaced: true
   controller: true
-  domain: onmetal.de
+  domain: ironcore.dev
   group: storage
   kind: VolumeClass
-  path: github.com/onmetal/onmetal-api/api/storage/v1alpha1
+  path: github.com/ironcore-dev/ironcore/api/storage/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
     namespaced: true
   controller: true
-  domain: onmetal.de
+  domain: ironcore.dev
   group: storage
   kind: Volume
-  path: github.com/onmetal/onmetal-api/api/storage/v1alpha1
+  path: github.com/ironcore-dev/ironcore/api/storage/v1alpha1
   version: v1alpha1
   webhooks:
     validation: true
@@ -57,10 +57,10 @@ resources:
     crdVersion: v1
     namespaced: true
   controller: true
-  domain: onmetal.de
+  domain: ironcore.dev
   group: compute
   kind: Machine
-  path: github.com/onmetal/onmetal-api/api/compute/v1alpha1
+  path: github.com/ironcore-dev/ironcore/api/compute/v1alpha1
   version: v1alpha1
   webhooks:
     validation: true
@@ -69,17 +69,17 @@ resources:
     crdVersion: v1
     namespaced: true
   controller: true
-  domain: api.onmetal.de
+  domain: ironcore.dev
   group: ipam
   kind: Prefix
-  path: github.com/onmetal/onmetal-api/api/ipam/v1alpha1
+  path: github.com/ironcore-dev/ironcore/api/ipam/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
     namespaced: true
-  domain: api.onmetal.de
+  domain: ironcore.dev
   group: ipam
   kind: PrefixAllocation
-  path: github.com/onmetal/onmetal-api/api/ipam/v1alpha1
+  path: github.com/ironcore-dev/ironcore/api/ipam/v1alpha1
   version: v1alpha1
 version: "3"

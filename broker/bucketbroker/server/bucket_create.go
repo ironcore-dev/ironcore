@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,28 +19,28 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	bucketbrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/bucketbroker/api/v1alpha1"
-	"github.com/onmetal/onmetal-api/broker/bucketbroker/apiutils"
-	ori "github.com/onmetal/onmetal-api/ori/apis/bucket/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	bucketbrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/bucketbroker/api/v1alpha1"
+	"github.com/ironcore-dev/ironcore/broker/bucketbroker/apiutils"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/bucket/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-type AggregateOnmetalBucket struct {
+type AggregateIronCoreBucket struct {
 	Bucket       *storagev1alpha1.Bucket
 	AccessSecret *corev1.Secret
 }
 
-func (s *Server) getOnmetalBucketConfig(_ context.Context, bucket *ori.Bucket) (*AggregateOnmetalBucket, error) {
+func (s *Server) getIronCoreBucketConfig(_ context.Context, bucket *ori.Bucket) (*AggregateIronCoreBucket, error) {
 	var bucketPoolRef *corev1.LocalObjectReference
 	if s.bucketPoolName != "" {
 		bucketPoolRef = &corev1.LocalObjectReference{
 			Name: s.bucketPoolName,
 		}
 	}
-	onmetalBucket := &storagev1alpha1.Bucket{
+	ironcoreBucket := &storagev1alpha1.Bucket{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: s.namespace,
 			Name:      s.generateID(),
@@ -51,40 +51,40 @@ func (s *Server) getOnmetalBucketConfig(_ context.Context, bucket *ori.Bucket) (
 			BucketPoolSelector: s.bucketPoolSelector,
 		},
 	}
-	if err := apiutils.SetObjectMetadata(onmetalBucket, bucket.Metadata); err != nil {
+	if err := apiutils.SetObjectMetadata(ironcoreBucket, bucket.Metadata); err != nil {
 		return nil, err
 	}
-	apiutils.SetBucketManagerLabel(onmetalBucket, bucketbrokerv1alpha1.BucketBrokerManager)
+	apiutils.SetBucketManagerLabel(ironcoreBucket, bucketbrokerv1alpha1.BucketBrokerManager)
 
-	return &AggregateOnmetalBucket{
-		Bucket: onmetalBucket,
+	return &AggregateIronCoreBucket{
+		Bucket: ironcoreBucket,
 	}, nil
 }
 
-func (s *Server) createOnmetalBucket(ctx context.Context, log logr.Logger, bucket *AggregateOnmetalBucket) (retErr error) {
+func (s *Server) createIronCoreBucket(ctx context.Context, log logr.Logger, bucket *AggregateIronCoreBucket) (retErr error) {
 	c, cleanup := s.setupCleaner(ctx, log, &retErr)
 	defer cleanup()
 
-	log.V(1).Info("Creating onmetal bucket")
+	log.V(1).Info("Creating ironcore bucket")
 	if err := s.client.Create(ctx, bucket.Bucket); err != nil {
-		return fmt.Errorf("error creating onmetal bucket: %w", err)
+		return fmt.Errorf("error creating ironcore bucket: %w", err)
 	}
 	c.Add(func(ctx context.Context) error {
 		if err := s.client.Delete(ctx, bucket.Bucket); client.IgnoreNotFound(err) != nil {
-			return fmt.Errorf("error deleting onmetal bucket: %w", err)
+			return fmt.Errorf("error deleting ironcore bucket: %w", err)
 		}
 		return nil
 	})
 
-	log.V(1).Info("Patching onmetal bucket as created")
+	log.V(1).Info("Patching ironcore bucket as created")
 	if err := apiutils.PatchCreated(ctx, s.client, bucket.Bucket); err != nil {
-		return fmt.Errorf("error patching onmetal machine as created: %w", err)
+		return fmt.Errorf("error patching ironcore machine as created: %w", err)
 	}
 
 	// Reset cleaner since everything from now on operates on a consistent bucket
 	c.Reset()
 
-	accessSecret, err := s.getOnmetalBucketAccessSecretIfRequired(bucket.Bucket, s.clientGetSecretFunc(ctx))
+	accessSecret, err := s.getIronCoreBucketAccessSecretIfRequired(bucket.Bucket, s.clientGetSecretFunc(ctx))
 	if err != nil {
 		return err
 	}
@@ -97,16 +97,16 @@ func (s *Server) CreateBucket(ctx context.Context, req *ori.CreateBucketRequest)
 	log := s.loggerFrom(ctx)
 
 	log.V(1).Info("Getting bucket configuration")
-	cfg, err := s.getOnmetalBucketConfig(ctx, req.Bucket)
+	cfg, err := s.getIronCoreBucketConfig(ctx, req.Bucket)
 	if err != nil {
-		return nil, fmt.Errorf("error getting onmetal bucket config: %w", err)
+		return nil, fmt.Errorf("error getting ironcore bucket config: %w", err)
 	}
 
-	if err := s.createOnmetalBucket(ctx, log, cfg); err != nil {
-		return nil, fmt.Errorf("error creating onmetal bucket: %w", err)
+	if err := s.createIronCoreBucket(ctx, log, cfg); err != nil {
+		return nil, fmt.Errorf("error creating ironcore bucket: %w", err)
 	}
 
-	v, err := s.convertAggregateOnmetalBucket(cfg)
+	v, err := s.convertAggregateIronCoreBucket(cfg)
 	if err != nil {
 		return nil, err
 	}

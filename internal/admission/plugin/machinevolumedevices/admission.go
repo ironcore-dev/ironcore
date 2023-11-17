@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/onmetal/onmetal-api/internal/admission/plugin/machinevolumedevices/device"
-	"github.com/onmetal/onmetal-api/internal/apis/compute"
+	"github.com/ironcore-dev/ironcore/internal/admission/plugin/machinevolumedevices/device"
+	"github.com/ironcore-dev/ironcore/internal/apis/compute"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apiserver/pkg/admission"
 )
@@ -66,7 +66,7 @@ func (d *MachineVolumeDevices) Admit(ctx context.Context, a admission.Attributes
 			continue
 		}
 
-		newDevice, err := namer.Generate(device.OnmetalPrefix) // TODO: We should have a better way for a device prefix.
+		newDevice, err := namer.Generate(device.IronCorePrefix) // TODO: We should have a better way for a device prefix.
 		if err != nil {
 			return apierrors.NewBadRequest("No device names left for machine")
 		}

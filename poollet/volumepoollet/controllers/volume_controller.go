@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,16 +21,16 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	"github.com/onmetal/controller-utils/clientutils"
-	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
-	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
-	volumepoolletv1alpha1 "github.com/onmetal/onmetal-api/poollet/volumepoollet/api/v1alpha1"
-	"github.com/onmetal/onmetal-api/poollet/volumepoollet/controllers/events"
-	"github.com/onmetal/onmetal-api/poollet/volumepoollet/vcm"
-	onmetalapiclient "github.com/onmetal/onmetal-api/utils/client"
-	"github.com/onmetal/onmetal-api/utils/predicates"
+	"github.com/ironcore-dev/controller-utils/clientutils"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	orimeta "github.com/ironcore-dev/ironcore/ori/apis/meta/v1alpha1"
+	ori "github.com/ironcore-dev/ironcore/ori/apis/volume/v1alpha1"
+	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
+	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers/events"
+	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
+	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
+	"github.com/ironcore-dev/ironcore/utils/predicates"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
@@ -103,9 +103,9 @@ func (r *VolumeReconciler) listORIVolumesByUID(ctx context.Context, volumeUID ty
 
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 //+kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes/finalizers,verbs=update
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumes,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumes/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumes/finalizers,verbs=update
 
 func (r *VolumeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
@@ -359,7 +359,7 @@ func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volum
 	log.V(1).Info("Finalizer is present")
 
 	log.V(1).Info("Ensuring no reconcile annotation")
-	modified, err = onmetalapiclient.PatchEnsureNoReconcileAnnotation(ctx, r.Client, volume)
+	modified, err = ironcoreclient.PatchEnsureNoReconcileAnnotation(ctx, r.Client, volume)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error ensuring no reconcile annotation: %w", err)
 	}

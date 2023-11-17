@@ -1,12 +1,12 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: compute.api.onmetal.de:system:machinepools
+  name: compute.ironcore.dev:system:machinepools
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: compute.api.onmetal.de:system:machinepools
+  name: compute.ironcore.dev:system:machinepools
 subjects:
   - kind: Group
-    name: compute.api.onmetal.de:system:machinepools
+    name: compute.ironcore.dev:system:machinepools
     apiGroup: rbac.authorization.k8s.io

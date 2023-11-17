@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	"github.com/onmetal/onmetal-api/broker/common/cleaner"
-	metautils "github.com/onmetal/onmetal-api/utils/meta"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	"github.com/ironcore-dev/ironcore/broker/common/cleaner"
+	metautils "github.com/ironcore-dev/ironcore/utils/meta"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -31,7 +31,7 @@ import (
 )
 
 var (
-	onmetalMachineGVK = computev1alpha1.SchemeGroupVersion.WithKind("Machine")
+	ironcoreMachineGVK = computev1alpha1.SchemeGroupVersion.WithKind("Machine")
 )
 
 func (s *Server) loggerFrom(ctx context.Context, keysWithValues ...interface{}) logr.Logger {
@@ -56,7 +56,7 @@ func (s *Server) setupCleaner(ctx context.Context, log logr.Logger, retErr *erro
 	return c, cleanup
 }
 
-func (s *Server) convertOnmetalIPSourcesToIPs(ipSources []networkingv1alpha1.IPSource) ([]string, error) {
+func (s *Server) convertIronCoreIPSourcesToIPs(ipSources []networkingv1alpha1.IPSource) ([]string, error) {
 	res := make([]string, len(ipSources))
 	for i, ipSource := range ipSources {
 		if ipSource.Value == nil {
@@ -67,7 +67,7 @@ func (s *Server) convertOnmetalIPSourcesToIPs(ipSources []networkingv1alpha1.IPS
 	return res, nil
 }
 
-func (s *Server) getOnmetalIPsIPFamilies(ips []commonv1alpha1.IP) []corev1.IPFamily {
+func (s *Server) getIronCoreIPsIPFamilies(ips []commonv1alpha1.IP) []corev1.IPFamily {
 	res := make([]corev1.IPFamily, len(ips))
 	for i, ip := range ips {
 		res[i] = ip.Family()
@@ -75,7 +75,7 @@ func (s *Server) getOnmetalIPsIPFamilies(ips []commonv1alpha1.IP) []corev1.IPFam
 	return res
 }
 
-func (s *Server) onmetalIPsToOnmetalIPSources(ips []commonv1alpha1.IP) []networkingv1alpha1.IPSource {
+func (s *Server) ironcoreIPsToIronCoreIPSources(ips []commonv1alpha1.IP) []networkingv1alpha1.IPSource {
 	res := make([]networkingv1alpha1.IPSource, len(ips))
 	for i := range ips {
 		res[i] = networkingv1alpha1.IPSource{

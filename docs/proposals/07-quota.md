@@ -41,9 +41,9 @@ Quotas also can ensure that each requesting entity can exercise its right to a f
 [Kubernetes Resource Quotas](https://kubernetes.io/docs/concepts/policy/resource-quotas/) are a great way to limit
 resource consumption for core Kubernetes types (allowing to manage things like overall CPU consumption) and resource
 count for all types. However, when it comes to limiting resource usage for custom types (in this special case, the
-`onmetal-api` types), the Kubernetes Quota system falls short of providing means to do so.
+`ironcore` types), the Kubernetes Quota system falls short of providing means to do so.
 
-For `onmetal-api` it should be possible to limit the actual requested resources like
+For `ironcore` it should be possible to limit the actual requested resources like
 the total number of used CPUs, storage and memory as well as limit the count of resources
 by a given dimension (e.g. number of `Machine`s for a given `MachineClass`).
 
@@ -72,7 +72,7 @@ with the HTTP status code `403 Forbidden`.
 
 ### Compute Resource Quota
 
-For the `onmetal-api` `compute` group, the following resources can be limited:
+For the `ironcore` `compute` group, the following resources can be limited:
 
 | Resource Name   | Description                                                                           |
 |-----------------|---------------------------------------------------------------------------------------|
@@ -81,7 +81,7 @@ For the `onmetal-api` `compute` group, the following resources can be limited:
 
 ### Storage Resource Quota
 
-For the `onmetal-api` `storage` group, the following
+For the `ironcore` `storage` group, the following
 
 | Resource Name    | Description                                                                           |
 |------------------|---------------------------------------------------------------------------------------|
@@ -91,8 +91,8 @@ For the `onmetal-api` `storage` group, the following
 
 Similar to Kubernetes' object count quota, it is possible to limit the number of resources
 per types using the following syntax: `count/<resource>.<group>`. For example,
-`count/machines.compute.api.onmetal.de` would limit the number of machines from the
-`onmetal-api` `compute.api.onmetal.de` group.
+`count/machines.compute.ironcore.dev` would limit the number of machines from the
+`ironcore` `compute.ironcore.dev` group.
 
 ### Quota Scopes
 
@@ -115,7 +115,7 @@ and `Volume`s:
 
 [//]: # (@formatter:off)
 ```yaml
-apiVersion: core.api.onmetal.de/v1alpha1
+apiVersion: core.ironcore.dev/v1alpha1
 kind: ResourceQuota
 metadata:
   name: limit-accumulated-usage
@@ -131,13 +131,13 @@ Limit the number of machines for a given machine class:
 
 [//]: # (@formatter:off)
 ```yaml
-apiVersion: core.api.onmetal.de/v1alpha1
+apiVersion: core.ironcore.dev/v1alpha1
 kind: ResourceQuota
 metadata:
   name: limit-large-machines
 spec:
   hard:
-    count/machines.compute.api.onmetal.de: 10
+    count/machines.compute.ironcore.dev: 10
   scopeSelector:
     matchExpressions:
     - scopeName: MachineClass
