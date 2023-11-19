@@ -18,8 +18,8 @@ import (
 	"context"
 	"errors"
 
-	ori "github.com/ironcore-dev/ironcore/ori/apis/volume/v1alpha1"
-	"github.com/ironcore-dev/ironcore/poollet/orievent"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
+	"github.com/ironcore-dev/ironcore/poollet/irievent"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 )
@@ -31,8 +31,8 @@ var (
 
 type VolumeClassMapper interface {
 	manager.Runnable
-	GetVolumeClassFor(ctx context.Context, name string, capabilities *ori.VolumeClassCapabilities) (*ori.VolumeClass, *resource.Quantity, error)
+	GetVolumeClassFor(ctx context.Context, name string, capabilities *iri.VolumeClassCapabilities) (*iri.VolumeClass, *resource.Quantity, error)
 	WaitForSync(ctx context.Context) error
-	AddListener(listener orievent.Listener) (orievent.ListenerRegistration, error)
-	RemoveListener(reg orievent.ListenerRegistration) error
+	AddListener(listener irievent.Listener) (irievent.ListenerRegistration, error)
+	RemoveListener(reg irievent.ListenerRegistration) error
 }

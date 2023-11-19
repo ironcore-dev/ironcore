@@ -18,13 +18,13 @@ import (
 	"context"
 	"fmt"
 
-	ori "github.com/ironcore-dev/ironcore/ori/apis/volume/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
-func (s *Server) DeleteVolume(ctx context.Context, req *ori.DeleteVolumeRequest) (*ori.DeleteVolumeResponse, error) {
+func (s *Server) DeleteVolume(ctx context.Context, req *iri.DeleteVolumeRequest) (*iri.DeleteVolumeResponse, error) {
 	volumeID := req.VolumeId
 	log := s.loggerFrom(ctx, "VolumeID", volumeID)
 
@@ -41,5 +41,5 @@ func (s *Server) DeleteVolume(ctx context.Context, req *ori.DeleteVolumeRequest)
 		return nil, status.Errorf(codes.NotFound, "volume %s not found", volumeID)
 	}
 
-	return &ori.DeleteVolumeResponse{}, nil
+	return &iri.DeleteVolumeResponse{}, nil
 }

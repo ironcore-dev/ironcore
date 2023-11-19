@@ -31,7 +31,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-logr/logr"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	orimachine "github.com/ironcore-dev/ironcore/ori/apis/machine"
+	irimachine "github.com/ironcore-dev/ironcore/iri/apis/machine"
 	utilshttp "github.com/ironcore-dev/ironcore/utils/http"
 	"k8s.io/apiserver/pkg/authentication/authenticator"
 	"k8s.io/apiserver/pkg/authentication/authenticatorfactory"
@@ -52,8 +52,8 @@ import (
 var log = logf.Log.WithName("machinepoollet").WithName("server")
 
 type Options struct {
-	// MachineRuntime is the ori-machine runtime service.
-	MachineRuntime orimachine.RuntimeService
+	// MachineRuntime is the iri-machine runtime service.
+	MachineRuntime irimachine.RuntimeService
 
 	// Log is the logger to use in the server.
 	// If unset, a package-global router will be used.
@@ -107,7 +107,7 @@ type Server struct {
 
 	auth Auth
 
-	machineRuntime orimachine.RuntimeService
+	machineRuntime irimachine.RuntimeService
 
 	cacheTTL time.Duration
 

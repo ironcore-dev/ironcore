@@ -18,13 +18,13 @@ import (
 	"context"
 	"fmt"
 
-	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
-func (s *Server) DeleteMachine(ctx context.Context, req *ori.DeleteMachineRequest) (*ori.DeleteMachineResponse, error) {
+func (s *Server) DeleteMachine(ctx context.Context, req *iri.DeleteMachineRequest) (*iri.DeleteMachineResponse, error) {
 	machineID := req.MachineId
 	log := s.loggerFrom(ctx, "MachineID", machineID)
 
@@ -41,5 +41,5 @@ func (s *Server) DeleteMachine(ctx context.Context, req *ori.DeleteMachineReques
 		return nil, status.Errorf(codes.NotFound, "machine %s not found", machineID)
 	}
 
-	return &ori.DeleteMachineResponse{}, nil
+	return &iri.DeleteMachineResponse{}, nil
 }

@@ -21,7 +21,7 @@ import (
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	bucketbrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/bucketbroker/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/common"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/bucket/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
@@ -135,13 +135,13 @@ func (s *Server) getAggregateIronCoreBucket(ctx context.Context, id string) (*Ag
 	return s.aggregateIronCoreBucket(ironcoreBucket, s.clientGetSecretFunc(ctx))
 }
 
-func (s *Server) listBuckets(ctx context.Context) ([]*ori.Bucket, error) {
+func (s *Server) listBuckets(ctx context.Context) ([]*iri.Bucket, error) {
 	ironcoreBuckets, err := s.listAggregateIronCoreBuckets(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error listing buckets: %w", err)
 	}
 
-	var res []*ori.Bucket
+	var res []*iri.Bucket
 	for _, ironcoreBucket := range ironcoreBuckets {
 		bucket, err := s.convertAggregateIronCoreBucket(&ironcoreBucket)
 		if err != nil {
@@ -153,26 +153,26 @@ func (s *Server) listBuckets(ctx context.Context) ([]*ori.Bucket, error) {
 	return res, nil
 }
 
-func (s *Server) filterBuckets(buckets []*ori.Bucket, filter *ori.BucketFilter) []*ori.Bucket {
+func (s *Server) filterBuckets(buckets []*iri.Bucket, filter *iri.BucketFilter) []*iri.Bucket {
 	if filter == nil {
 		return buckets
 	}
 
 	var (
-		res []*ori.Bucket
+		res []*iri.Bucket
 		sel = labels.SelectorFromSet(filter.LabelSelector)
 	)
-	for _, oriBucket := range buckets {
-		if !sel.Matches(labels.Set(oriBucket.Metadata.Labels)) {
+	for _, iriBucket := range buckets {
+		if !sel.Matches(labels.Set(iriBucket.Metadata.Labels)) {
 			continue
 		}
 
-		res = append(res, oriBucket)
+		res = append(res, iriBucket)
 	}
 	return res
 }
 
-func (s *Server) getBucket(ctx context.Context, id string) (*ori.Bucket, error) {
+func (s *Server) getBucket(ctx context.Context, id string) (*iri.Bucket, error) {
 	ironcoreBucket, err := s.getAggregateIronCoreBucket(ctx, id)
 	if err != nil {
 		return nil, err
@@ -181,20 +181,20 @@ func (s *Server) getBucket(ctx context.Context, id string) (*ori.Bucket, error) 
 	return s.convertAggregateIronCoreBucket(ironcoreBucket)
 }
 
-func (s *Server) ListBuckets(ctx context.Context, req *ori.ListBucketsRequest) (*ori.ListBucketsResponse, error) {
+func (s *Server) ListBuckets(ctx context.Context, req *iri.ListBucketsRequest) (*iri.ListBucketsResponse, error) {
 	if filter := req.Filter; filter != nil && filter.Id != "" {
 		bucket, err := s.getBucket(ctx, filter.Id)
 		if err != nil {
 			if status.Code(err) != codes.NotFound {
 				return nil, err
 			}
-			return &ori.ListBucketsResponse{
-				Buckets: []*ori.Bucket{},
+			return &iri.ListBucketsResponse{
+				Buckets: []*iri.Bucket{},
 			}, nil
 		}
 
-		return &ori.ListBucketsResponse{
-			Buckets: []*ori.Bucket{bucket},
+		return &iri.ListBucketsResponse{
+			Buckets: []*iri.Bucket{bucket},
 		}, nil
 	}
 
@@ -205,7 +205,7 @@ func (s *Server) ListBuckets(ctx context.Context, req *ori.ListBucketsRequest) (
 
 	buckets = s.filterBuckets(buckets, req.Filter)
 
-	return &ori.ListBucketsResponse{
+	return &iri.ListBucketsResponse{
 		Buckets: buckets,
 	}, nil
 }

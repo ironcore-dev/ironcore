@@ -8,9 +8,9 @@ introduced to ease the implementation of a `poollet` and `pool provider`.
 A `poollet` does not have any knowledge how the resources are materialized and where the `pool provider` runs.
 The responsibility of the `poollet` is to collect and resolve the needed dependencies to materialize a resource.
 
-A `pool provider` implements the ORI, where the ORI defines the correct creation and management of resources 
-handled by a `pool provider`. A `pool provider` of the ORI should follow the interface defined in the
-[ORI APIs](https://github.com/ironcore-dev/ironcore/tree/main/ori/apis). 
+A `pool provider` implements the IRI, where the IRI defines the correct creation and management of resources 
+handled by a `pool provider`. A `pool provider` of the IRI should follow the interface defined in the
+[IRI APIs](https://github.com/ironcore-dev/ironcore/tree/main/iri/apis). 
 
 ```mermaid
 graph LR
@@ -34,9 +34,9 @@ Based on the implementation of a `pool provider` it can serve multiple use-cases
 The IRI defines several interface methods categIRIzed into Compute, Storage,
 and Bucket.
 
-- [Compute Methods](https://github.com/ironcore-dev/ironcore/tree/main/ori/apis/machine)
-- [Storage Methods](https://github.com/ironcore-dev/ironcore/tree/main/ori/apis/volume)
-- [Bucket Methods](https://github.com/ironcore-dev/ironcore/tree/main/ori/apis/bucket)
+- [Compute Methods](https://github.com/ironcore-dev/ironcore/tree/main/iri/apis/machine)
+- [Storage Methods](https://github.com/ironcore-dev/ironcore/tree/main/iri/apis/volume)
+- [Bucket Methods](https://github.com/ironcore-dev/ironcore/tree/main/iri/apis/bucket)
 
 The IRI definition can be extended in the future with new resource groups.
 

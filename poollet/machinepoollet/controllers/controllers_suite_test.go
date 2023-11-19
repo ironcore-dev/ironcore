@@ -28,12 +28,12 @@ import (
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	computeclient "github.com/ironcore-dev/ironcore/internal/client/compute"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
-	"github.com/ironcore-dev/ironcore/ori/testing/machine"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
+	"github.com/ironcore-dev/ironcore/iri/testing/machine"
+	"github.com/ironcore-dev/ironcore/poollet/irievent"
 	machinepoolletclient "github.com/ironcore-dev/ironcore/poollet/machinepoollet/client"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/mcm"
-	"github.com/ironcore-dev/ironcore/poollet/orievent"
 	utilsenvtest "github.com/ironcore-dev/ironcore/utils/envtest"
 	"github.com/ironcore-dev/ironcore/utils/envtest/apiserver"
 	"github.com/ironcore-dev/ironcore/utils/envtest/controllermanager"
@@ -187,10 +187,10 @@ func SetupTest() (*corev1.Namespace, *computev1alpha1.MachinePool, *computev1alp
 		*srv = *machine.NewFakeRuntimeService()
 		srv.SetMachineClasses([]*machine.FakeMachineClassStatus{
 			{
-				MachineClassStatus: ori.MachineClassStatus{
-					MachineClass: &ori.MachineClass{
+				MachineClassStatus: iri.MachineClassStatus{
+					MachineClass: &iri.MachineClass{
 						Name: mc.Name,
-						Capabilities: &ori.MachineClassCapabilities{
+						Capabilities: &iri.MachineClassCapabilities{
 							CpuMillis:   mc.Capabilities.CPU().MilliValue(),
 							MemoryBytes: mc.Capabilities.Memory().Value(),
 						},
@@ -234,13 +234,13 @@ func SetupTest() (*corev1.Namespace, *computev1alpha1.MachinePool, *computev1alp
 			},
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
-		machineEvents := orievent.NewGenerator(func(ctx context.Context) ([]*ori.Machine, error) {
-			res, err := srv.ListMachines(ctx, &ori.ListMachinesRequest{})
+		machineEvents := irievent.NewGenerator(func(ctx context.Context) ([]*iri.Machine, error) {
+			res, err := srv.ListMachines(ctx, &iri.ListMachinesRequest{})
 			if err != nil {
 				return nil, err
 			}
 			return res.Machines, nil
-		}, orievent.GeneratorOptions{})
+		}, irievent.GeneratorOptions{})
 
 		Expect(k8sManager.Add(machineEvents)).To(Succeed())
 

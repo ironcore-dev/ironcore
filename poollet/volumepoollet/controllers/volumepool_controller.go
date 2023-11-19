@@ -26,7 +26,7 @@ import (
 
 	"github.com/go-logr/logr"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/volume/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	corev1 "k8s.io/api/core/v1"
@@ -40,7 +40,7 @@ import (
 type VolumePoolReconciler struct {
 	client.Client
 	VolumePoolName    string
-	VolumeRuntime     ori.VolumeRuntimeClient
+	VolumeRuntime     iri.VolumeRuntimeClient
 	VolumeClassMapper vcm.VolumeClassMapper
 }
 
@@ -71,13 +71,13 @@ func (r *VolumePoolReconciler) delete(ctx context.Context, log logr.Logger, volu
 	return ctrl.Result{}, nil
 }
 
-func (r *VolumePoolReconciler) supportsVolumeClass(ctx context.Context, log logr.Logger, volumeClass *storagev1alpha1.VolumeClass) (*ori.VolumeClass, *resource.Quantity, error) {
-	oriCapabilities, err := getORIVolumeClassCapabilities(volumeClass)
+func (r *VolumePoolReconciler) supportsVolumeClass(ctx context.Context, log logr.Logger, volumeClass *storagev1alpha1.VolumeClass) (*iri.VolumeClass, *resource.Quantity, error) {
+	iriCapabilities, err := getIRIVolumeClassCapabilities(volumeClass)
 	if err != nil {
-		return nil, nil, fmt.Errorf("error getting ori mahchine class capabilities: %w", err)
+		return nil, nil, fmt.Errorf("error getting iri mahchine class capabilities: %w", err)
 	}
 
-	class, quantity, err := r.VolumeClassMapper.GetVolumeClassFor(ctx, volumeClass.Name, oriCapabilities)
+	class, quantity, err := r.VolumeClassMapper.GetVolumeClassFor(ctx, volumeClass.Name, iriCapabilities)
 	if err != nil {
 		if !errors.Is(err, vcm.ErrNoMatchingVolumeClass) && !errors.Is(err, vcm.ErrAmbiguousMatchingVolumeClass) {
 			return nil, nil, fmt.Errorf("error getting volume class for %s: %w", volumeClass.Name, err)

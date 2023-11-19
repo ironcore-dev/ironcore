@@ -22,7 +22,7 @@ import (
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	bucketbrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/bucketbroker/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/bucketbroker/apiutils"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/bucket/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -33,7 +33,7 @@ type AggregateIronCoreBucket struct {
 	AccessSecret *corev1.Secret
 }
 
-func (s *Server) getIronCoreBucketConfig(_ context.Context, bucket *ori.Bucket) (*AggregateIronCoreBucket, error) {
+func (s *Server) getIronCoreBucketConfig(_ context.Context, bucket *iri.Bucket) (*AggregateIronCoreBucket, error) {
 	var bucketPoolRef *corev1.LocalObjectReference
 	if s.bucketPoolName != "" {
 		bucketPoolRef = &corev1.LocalObjectReference{
@@ -93,7 +93,7 @@ func (s *Server) createIronCoreBucket(ctx context.Context, log logr.Logger, buck
 	return nil
 }
 
-func (s *Server) CreateBucket(ctx context.Context, req *ori.CreateBucketRequest) (res *ori.CreateBucketResponse, retErr error) {
+func (s *Server) CreateBucket(ctx context.Context, req *iri.CreateBucketRequest) (res *iri.CreateBucketResponse, retErr error) {
 	log := s.loggerFrom(ctx)
 
 	log.V(1).Info("Getting bucket configuration")
@@ -111,7 +111,7 @@ func (s *Server) CreateBucket(ctx context.Context, req *ori.CreateBucketRequest)
 		return nil, err
 	}
 
-	return &ori.CreateBucketResponse{
+	return &iri.CreateBucketResponse{
 		Bucket: v,
 	}, nil
 }

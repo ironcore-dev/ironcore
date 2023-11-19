@@ -6,7 +6,7 @@ The following parties are involved in implementing `exec`:
 
 * `ironcore-apiserver`
 * `machinepollet`
-* `ori-machine` implementor
+* `iri-machine` implementor
 
 The connection flow between those components looks like the following:
 
@@ -15,7 +15,7 @@ sequenceDiagram
     participant User as user
     participant OA as ironcore-apiserver
     participant MP as machinepoollet
-    participant OM as ori-machine implementor
+    participant OM as iri-machine implementor
 
     User->>OA: exec request with machine name
     Note over OA: Get machine by name
@@ -26,7 +26,7 @@ sequenceDiagram
     Note over MP: Check authentication & authorization
     MP->>OM: Call Exec method
     Note over OM: Provide functioning Exec implementation
-    Note over OM: ori-machine implementor generates unique token
+    Note over OM: iri-machine implementor generates unique token
     Note over OM: Token-associated URL is called
     Note over OM: Calls exec on its target
     Note over OM: Proxies response from the ironcore-apiserver to the requester
@@ -70,7 +70,7 @@ resulting response to the original requester.
 ## `machinepoollet`
 
 The `machinepoollet` provides the HTTP server wrapping the
-`ori-machine` implementor. This HTTP server also provides the
+`iri-machine` implementor. This HTTP server also provides the
 aforementioned route to serve `exec` for a machine.
 
 When the `machinepoollet` gets a request to that URL it first
@@ -80,16 +80,16 @@ delegated authenticator / authorizer against the `kube-apiserver`
 the `ironcore-apiserver` is connected to.
 
 Once successfully authenticated & authorized, the `machinepoollet`
-calls the `Exec` method of the `ori-machine` implementor. This
+calls the `Exec` method of the `iri-machine` implementor. This
 `Exec` method returns a URL where the `exec` session for the target
 machine will be hosted at.
 
 It then makes an HTTP request to that URL and proxies the resulting
 response to the `ironcore-apiserver`.
 
-## `ori-machine` Implementor
+## `iri-machine` Implementor
 
-The `ori-machine` implementor has to provide a functioning `Exec`
+The `iri-machine` implementor has to provide a functioning `Exec`
 implementation that returns the URL where the actual `exec` session
 of the machine is hosted at.
 

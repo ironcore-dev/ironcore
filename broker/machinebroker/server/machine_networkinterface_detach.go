@@ -19,7 +19,7 @@ import (
 	"fmt"
 
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	"golang.org/x/exp/slices"
 	"google.golang.org/grpc/codes"
 	grpcstatus "google.golang.org/grpc/status"
@@ -29,8 +29,8 @@ import (
 
 func (s *Server) DetachNetworkInterface(
 	ctx context.Context,
-	req *ori.DetachNetworkInterfaceRequest,
-) (*ori.DetachNetworkInterfaceResponse, error) {
+	req *iri.DetachNetworkInterfaceRequest,
+) (*iri.DetachNetworkInterfaceResponse, error) {
 	machineID := req.MachineId
 	nicName := req.Name
 	log := s.loggerFrom(ctx, "MachineID", machineID, "NetworkInterfaceName", nicName)
@@ -74,5 +74,5 @@ func (s *Server) DetachNetworkInterface(
 	}
 
 	log.V(1).Info("Detached ironcore network interface")
-	return &ori.DetachNetworkInterfaceResponse{}, nil
+	return &iri.DetachNetworkInterfaceResponse{}, nil
 }

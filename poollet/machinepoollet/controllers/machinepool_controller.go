@@ -23,8 +23,8 @@ import (
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	computeclient "github.com/ironcore-dev/ironcore/internal/client/compute"
-	"github.com/ironcore-dev/ironcore/ori/apis/machine"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
+	"github.com/ironcore-dev/ironcore/iri/apis/machine"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/mcm"
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	"github.com/ironcore-dev/ironcore/utils/quota"
@@ -78,13 +78,13 @@ func (r *MachinePoolReconciler) delete(ctx context.Context, log logr.Logger, mac
 	return ctrl.Result{}, nil
 }
 
-func (r *MachinePoolReconciler) supportsMachineClass(ctx context.Context, log logr.Logger, machineClass *computev1alpha1.MachineClass) (*ori.MachineClass, int64, error) {
-	oriCapabilities, err := getORIMachineClassCapabilities(machineClass)
+func (r *MachinePoolReconciler) supportsMachineClass(ctx context.Context, log logr.Logger, machineClass *computev1alpha1.MachineClass) (*iri.MachineClass, int64, error) {
+	iriCapabilities, err := getIRIMachineClassCapabilities(machineClass)
 	if err != nil {
-		return nil, 0, fmt.Errorf("error getting ori mahchine class capabilities: %w", err)
+		return nil, 0, fmt.Errorf("error getting iri mahchine class capabilities: %w", err)
 	}
 
-	class, quantity, err := r.MachineClassMapper.GetMachineClassFor(ctx, machineClass.Name, oriCapabilities)
+	class, quantity, err := r.MachineClassMapper.GetMachineClassFor(ctx, machineClass.Name, iriCapabilities)
 	if err != nil {
 		if !errors.Is(err, mcm.ErrNoMatchingMachineClass) && !errors.Is(err, mcm.ErrAmbiguousMatchingMachineClass) {
 			return nil, 0, fmt.Errorf("error getting machine class for %s: %w", machineClass.Name, err)

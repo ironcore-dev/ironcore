@@ -19,7 +19,7 @@ import (
 	"fmt"
 
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	"golang.org/x/exp/slices"
 	"google.golang.org/grpc/codes"
 	grpcstatus "google.golang.org/grpc/status"
@@ -27,7 +27,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func (s *Server) DetachVolume(ctx context.Context, req *ori.DetachVolumeRequest) (*ori.DetachVolumeResponse, error) {
+func (s *Server) DetachVolume(ctx context.Context, req *iri.DetachVolumeRequest) (*iri.DetachVolumeResponse, error) {
 	machineID := req.MachineId
 	volumeName := req.Name
 	log := s.loggerFrom(ctx, "MachineID", machineID, "VolumeName", volumeName)
@@ -72,5 +72,5 @@ func (s *Server) DetachVolume(ctx context.Context, req *ori.DetachVolumeRequest)
 		return nil, fmt.Errorf("unrecognized ironcore machine volume %#v", ironcoreMachineVolume)
 	}
 
-	return &ori.DetachVolumeResponse{}, nil
+	return &iri.DetachVolumeResponse{}, nil
 }

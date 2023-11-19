@@ -19,7 +19,7 @@ import (
 	"fmt"
 
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/bucket/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -71,20 +71,20 @@ func (s *Server) filterIronCoreBucketClasses(
 	return filtered
 }
 
-func (s *Server) convertIronCoreBucketClass(bucketClass *storagev1alpha1.BucketClass) (*ori.BucketClass, error) {
+func (s *Server) convertIronCoreBucketClass(bucketClass *storagev1alpha1.BucketClass) (*iri.BucketClass, error) {
 	tps := bucketClass.Capabilities.TPS()
 	iops := bucketClass.Capabilities.IOPS()
 
-	return &ori.BucketClass{
+	return &iri.BucketClass{
 		Name: bucketClass.Name,
-		Capabilities: &ori.BucketClassCapabilities{
+		Capabilities: &iri.BucketClassCapabilities{
 			Tps:  tps.Value(),
 			Iops: iops.Value(),
 		},
 	}, nil
 }
 
-func (s *Server) ListBucketClasses(ctx context.Context, req *ori.ListBucketClassesRequest) (*ori.ListBucketClassesResponse, error) {
+func (s *Server) ListBucketClasses(ctx context.Context, req *iri.ListBucketClassesRequest) (*iri.ListBucketClassesResponse, error) {
 	log := s.loggerFrom(ctx)
 
 	log.V(1).Info("Getting target ironcore bucket pools")
@@ -98,7 +98,7 @@ func (s *Server) ListBucketClasses(ctx context.Context, req *ori.ListBucketClass
 
 	if len(availableIronCoreBucketClassNames) == 0 {
 		log.V(1).Info("No available bucket classes")
-		return &ori.ListBucketClassesResponse{BucketClasses: []*ori.BucketClass{}}, nil
+		return &iri.ListBucketClassesResponse{BucketClasses: []*iri.BucketClass{}}, nil
 	}
 
 	log.V(1).Info("Listing ironcore bucket classes")
@@ -108,7 +108,7 @@ func (s *Server) ListBucketClasses(ctx context.Context, req *ori.ListBucketClass
 	}
 
 	availableIronCoreBucketClasses := s.filterIronCoreBucketClasses(availableIronCoreBucketClassNames, ironcoreBucketClassList.Items)
-	bucketClasses := make([]*ori.BucketClass, 0, len(availableIronCoreBucketClasses))
+	bucketClasses := make([]*iri.BucketClass, 0, len(availableIronCoreBucketClasses))
 	for _, ironcoreBucketClass := range availableIronCoreBucketClasses {
 		bucketClass, err := s.convertIronCoreBucketClass(&ironcoreBucketClass)
 		if err != nil {
@@ -119,7 +119,7 @@ func (s *Server) ListBucketClasses(ctx context.Context, req *ori.ListBucketClass
 	}
 
 	log.V(1).Info("Returning bucket classes")
-	return &ori.ListBucketClassesResponse{
+	return &iri.ListBucketClassesResponse{
 		BucketClasses: bucketClasses,
 	}, nil
 }

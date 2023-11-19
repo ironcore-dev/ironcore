@@ -20,10 +20,10 @@ import (
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/volumebroker/apiutils"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/volume/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 )
 
-func (s *Server) convertAggregateIronCoreVolume(volume *AggregateIronCoreVolume) (*ori.Volume, error) {
+func (s *Server) convertAggregateIronCoreVolume(volume *AggregateIronCoreVolume) (*iri.Volume, error) {
 	metadata, err := apiutils.GetObjectMetadata(volume.Volume)
 	if err != nil {
 		return nil, err
@@ -44,56 +44,56 @@ func (s *Server) convertAggregateIronCoreVolume(volume *AggregateIronCoreVolume)
 		return nil, err
 	}
 
-	return &ori.Volume{
+	return &iri.Volume{
 		Metadata: metadata,
-		Spec: &ori.VolumeSpec{
+		Spec: &iri.VolumeSpec{
 			Image:      volume.Volume.Spec.Image,
 			Class:      volume.Volume.Spec.VolumeClassRef.Name,
 			Resources:  resources,
 			Encryption: s.convertIronCoreVolumeEncryption(volume),
 		},
-		Status: &ori.VolumeStatus{
+		Status: &iri.VolumeStatus{
 			State:  state,
 			Access: access,
 		},
 	}, nil
 }
 
-var ironcoreVolumeStateToORIState = map[storagev1alpha1.VolumeState]ori.VolumeState{
-	storagev1alpha1.VolumeStatePending:   ori.VolumeState_VOLUME_PENDING,
-	storagev1alpha1.VolumeStateAvailable: ori.VolumeState_VOLUME_AVAILABLE,
-	storagev1alpha1.VolumeStateError:     ori.VolumeState_VOLUME_ERROR,
+var ironcoreVolumeStateToIRIState = map[storagev1alpha1.VolumeState]iri.VolumeState{
+	storagev1alpha1.VolumeStatePending:   iri.VolumeState_VOLUME_PENDING,
+	storagev1alpha1.VolumeStateAvailable: iri.VolumeState_VOLUME_AVAILABLE,
+	storagev1alpha1.VolumeStateError:     iri.VolumeState_VOLUME_ERROR,
 }
 
-func (s *Server) convertIronCoreVolumeState(state storagev1alpha1.VolumeState) (ori.VolumeState, error) {
-	if state, ok := ironcoreVolumeStateToORIState[state]; ok {
+func (s *Server) convertIronCoreVolumeState(state storagev1alpha1.VolumeState) (iri.VolumeState, error) {
+	if state, ok := ironcoreVolumeStateToIRIState[state]; ok {
 		return state, nil
 	}
 	return 0, fmt.Errorf("unknown ironcore volume state %q", state)
 }
 
-func (s *Server) convertIronCoreVolumeResources(resources corev1alpha1.ResourceList) (*ori.VolumeResources, error) {
+func (s *Server) convertIronCoreVolumeResources(resources corev1alpha1.ResourceList) (*iri.VolumeResources, error) {
 	storage := resources.Storage()
 	if storage.IsZero() {
 		return nil, fmt.Errorf("volume does not specify storage resource")
 	}
 
-	return &ori.VolumeResources{
+	return &iri.VolumeResources{
 		StorageBytes: storage.Value(),
 	}, nil
 }
 
-func (s *Server) convertIronCoreVolumeEncryption(volume *AggregateIronCoreVolume) *ori.EncryptionSpec {
+func (s *Server) convertIronCoreVolumeEncryption(volume *AggregateIronCoreVolume) *iri.EncryptionSpec {
 	if volume.EncryptionSecret == nil {
 		return nil
 	}
 
-	return &ori.EncryptionSpec{
+	return &iri.EncryptionSpec{
 		SecretData: volume.EncryptionSecret.Data,
 	}
 }
 
-func (s *Server) convertIronCoreVolumeAccess(volume *AggregateIronCoreVolume) (*ori.VolumeAccess, error) {
+func (s *Server) convertIronCoreVolumeAccess(volume *AggregateIronCoreVolume) (*iri.VolumeAccess, error) {
 	if volume.Volume.Status.State != storagev1alpha1.VolumeStateAvailable {
 		return nil, nil
 	}
@@ -111,7 +111,7 @@ func (s *Server) convertIronCoreVolumeAccess(volume *AggregateIronCoreVolume) (*
 		secretData = volume.AccessSecret.Data
 	}
 
-	return &ori.VolumeAccess{
+	return &iri.VolumeAccess{
 		Driver:     access.Driver,
 		Handle:     access.Handle,
 		Attributes: access.VolumeAttributes,

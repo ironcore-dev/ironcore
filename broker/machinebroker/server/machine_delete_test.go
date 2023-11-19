@@ -18,8 +18,8 @@ import (
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
-	orimeta "github.com/ironcore-dev/ironcore/ori/apis/meta/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
+	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -33,31 +33,31 @@ var _ = Describe("DeleteMachine", func() {
 
 	It("should correctly delete a machine", func(ctx SpecContext) {
 		By("creating a machine")
-		res, err := srv.CreateMachine(ctx, &ori.CreateMachineRequest{
-			Machine: &ori.Machine{
-				Metadata: &orimeta.ObjectMetadata{
+		res, err := srv.CreateMachine(ctx, &iri.CreateMachineRequest{
+			Machine: &iri.Machine{
+				Metadata: &irimeta.ObjectMetadata{
 					Labels: map[string]string{
 						machinepoolletv1alpha1.MachineUIDLabel: "foobar",
 					},
 				},
-				Spec: &ori.MachineSpec{
-					Power: ori.Power_POWER_ON,
-					Image: &ori.ImageSpec{
+				Spec: &iri.MachineSpec{
+					Power: iri.Power_POWER_ON,
+					Image: &iri.ImageSpec{
 						Image: "example.org/foo:latest",
 					},
 					Class: machineClass.Name,
-					NetworkInterfaces: []*ori.NetworkInterface{
+					NetworkInterfaces: []*iri.NetworkInterface{
 						{
 							Name:      "primary-nic",
 							NetworkId: "network-id",
 							Ips:       []string{"10.0.0.1"},
 						},
 					},
-					Volumes: []*ori.Volume{
+					Volumes: []*iri.Volume{
 						{
 							Name:   "primary-volume",
 							Device: "oda",
-							Connection: &ori.VolumeConnection{
+							Connection: &iri.VolumeConnection{
 								Driver:     "ceph",
 								Handle:     "ceph-volume",
 								Attributes: map[string]string{"foo": "bar"},
@@ -73,7 +73,7 @@ var _ = Describe("DeleteMachine", func() {
 
 		By("deleting the machine")
 		machineID := res.Machine.Metadata.Id
-		Expect(srv.DeleteMachine(ctx, &ori.DeleteMachineRequest{
+		Expect(srv.DeleteMachine(ctx, &iri.DeleteMachineRequest{
 			MachineId: machineID,
 		})).Error().NotTo(HaveOccurred())
 

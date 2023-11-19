@@ -3,9 +3,9 @@ resources:
 - service.yaml
 
 configMapGenerator:
-- name: orictl-machine-config
+- name: irictl-machine-config
   files:
-  - config=orictl-machine-config.yaml
+  - config=irictl-machine-config.yaml
 
 generatorOptions:
   disableNameSuffixHash: true

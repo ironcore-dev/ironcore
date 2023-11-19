@@ -25,12 +25,12 @@ import (
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/bucket/v1alpha1"
-	oriremotebucket "github.com/ironcore-dev/ironcore/ori/remote/bucket"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
+	iriremotebucket "github.com/ironcore-dev/ironcore/iri/remote/bucket"
 	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/bcm"
 	bucketpoolletconfig "github.com/ironcore-dev/ironcore/poollet/bucketpoollet/client/config"
 	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/controllers"
-	"github.com/ironcore-dev/ironcore/poollet/orievent"
+	"github.com/ironcore-dev/ironcore/poollet/irievent"
 	"github.com/ironcore-dev/ironcore/utils/client/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -139,7 +139,7 @@ func Run(ctx context.Context, opts Options) error {
 		os.Exit(1)
 	}
 
-	endpoint, err := oriremotebucket.GetAddressWithTimeout(opts.BucketRuntimeSocketDiscoveryTimeout, opts.BucketRuntimeEndpoint)
+	endpoint, err := iriremotebucket.GetAddressWithTimeout(opts.BucketRuntimeSocketDiscoveryTimeout, opts.BucketRuntimeEndpoint)
 	if err != nil {
 		return fmt.Errorf("error detecting bucket runtime endpoint: %w", err)
 	}
@@ -156,7 +156,7 @@ func Run(ctx context.Context, opts Options) error {
 		}
 	}()
 
-	bucketRuntime := ori.NewBucketRuntimeClient(conn)
+	bucketRuntime := iri.NewBucketRuntimeClient(conn)
 
 	cfg, configCtrl, err := getter.GetConfig(ctx, &opts.GetConfigOptions)
 	if err != nil {
@@ -192,13 +192,13 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error adding bucket class mapper: %w", err)
 	}
 
-	bucketEvents := orievent.NewGenerator(func(ctx context.Context) ([]*ori.Bucket, error) {
-		res, err := bucketRuntime.ListBuckets(ctx, &ori.ListBucketsRequest{})
+	bucketEvents := irievent.NewGenerator(func(ctx context.Context) ([]*iri.Bucket, error) {
+		res, err := bucketRuntime.ListBuckets(ctx, &iri.ListBucketsRequest{})
 		if err != nil {
 			return nil, err
 		}
 		return res.Buckets, nil
-	}, orievent.GeneratorOptions{})
+	}, irievent.GeneratorOptions{})
 	if err := mgr.Add(bucketEvents); err != nil {
 		return fmt.Errorf("error adding bucket event generator: %w", err)
 	}

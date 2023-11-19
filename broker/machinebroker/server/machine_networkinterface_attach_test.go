@@ -18,7 +18,7 @@ import (
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
@@ -31,11 +31,11 @@ var _ = Describe("AttachNetworkInterface", func() {
 
 	It("should correctly attach a network interface", func(ctx SpecContext) {
 		By("creating a machine")
-		createMachineRes, err := srv.CreateMachine(ctx, &ori.CreateMachineRequest{
-			Machine: &ori.Machine{
-				Spec: &ori.MachineSpec{
-					Power: ori.Power_POWER_ON,
-					Image: &ori.ImageSpec{
+		createMachineRes, err := srv.CreateMachine(ctx, &iri.CreateMachineRequest{
+			Machine: &iri.Machine{
+				Spec: &iri.MachineSpec{
+					Power: iri.Power_POWER_ON,
+					Image: &iri.ImageSpec{
 						Image: "example.org/foo:latest",
 					},
 					Class: machineClass.Name,
@@ -46,9 +46,9 @@ var _ = Describe("AttachNetworkInterface", func() {
 		machineID := createMachineRes.Machine.Metadata.Id
 
 		By("attaching a network interface")
-		Expect(srv.AttachNetworkInterface(ctx, &ori.AttachNetworkInterfaceRequest{
+		Expect(srv.AttachNetworkInterface(ctx, &iri.AttachNetworkInterfaceRequest{
 			MachineId: machineID,
-			NetworkInterface: &ori.NetworkInterface{
+			NetworkInterface: &iri.NetworkInterface{
 				Name:      "my-nic",
 				NetworkId: "network-id",
 				Ips:       []string{"10.0.0.1"},
@@ -97,11 +97,11 @@ var _ = Describe("AttachNetworkInterface", func() {
 
 	It("should correctly re-create a network in case it has been removed", func(ctx SpecContext) {
 		By("creating a machine")
-		createMachineRes, err := srv.CreateMachine(ctx, &ori.CreateMachineRequest{
-			Machine: &ori.Machine{
-				Spec: &ori.MachineSpec{
-					Power: ori.Power_POWER_ON,
-					Image: &ori.ImageSpec{
+		createMachineRes, err := srv.CreateMachine(ctx, &iri.CreateMachineRequest{
+			Machine: &iri.Machine{
+				Spec: &iri.MachineSpec{
+					Power: iri.Power_POWER_ON,
+					Image: &iri.ImageSpec{
 						Image: "example.org/foo:latest",
 					},
 					Class: machineClass.Name,
@@ -112,9 +112,9 @@ var _ = Describe("AttachNetworkInterface", func() {
 		machineID := createMachineRes.Machine.Metadata.Id
 
 		By("attaching a network interface")
-		Expect(srv.AttachNetworkInterface(ctx, &ori.AttachNetworkInterfaceRequest{
+		Expect(srv.AttachNetworkInterface(ctx, &iri.AttachNetworkInterfaceRequest{
 			MachineId: machineID,
-			NetworkInterface: &ori.NetworkInterface{
+			NetworkInterface: &iri.NetworkInterface{
 				Name:      "my-nic",
 				NetworkId: "network-id",
 				Ips:       []string{"10.0.0.1"},
@@ -161,7 +161,7 @@ var _ = Describe("AttachNetworkInterface", func() {
 		}))
 
 		By("detaching the network interface")
-		Expect(srv.DetachNetworkInterface(ctx, &ori.DetachNetworkInterfaceRequest{
+		Expect(srv.DetachNetworkInterface(ctx, &iri.DetachNetworkInterfaceRequest{
 			MachineId: machineID,
 			Name:      "my-nic",
 		})).Error().NotTo(HaveOccurred())
@@ -170,9 +170,9 @@ var _ = Describe("AttachNetworkInterface", func() {
 		Expect(k8sClient.Delete(ctx, network)).To(Succeed())
 
 		By("re-attaching a network interface")
-		Expect(srv.AttachNetworkInterface(ctx, &ori.AttachNetworkInterfaceRequest{
+		Expect(srv.AttachNetworkInterface(ctx, &iri.AttachNetworkInterfaceRequest{
 			MachineId: machineID,
-			NetworkInterface: &ori.NetworkInterface{
+			NetworkInterface: &iri.NetworkInterface{
 				Name:      "my-nic",
 				NetworkId: "network-id",
 				Ips:       []string{"10.0.0.1"},

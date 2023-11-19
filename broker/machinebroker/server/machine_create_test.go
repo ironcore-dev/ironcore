@@ -18,8 +18,8 @@ import (
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	machinebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/machinebroker/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/machinebroker/apiutils"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
-	orimeta "github.com/ironcore-dev/ironcore/ori/apis/meta/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
+	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -32,16 +32,16 @@ var _ = Describe("CreateMachine", func() {
 
 	It("should correctly create a machine", func(ctx SpecContext) {
 		By("creating a machine")
-		res, err := srv.CreateMachine(ctx, &ori.CreateMachineRequest{
-			Machine: &ori.Machine{
-				Metadata: &orimeta.ObjectMetadata{
+		res, err := srv.CreateMachine(ctx, &iri.CreateMachineRequest{
+			Machine: &iri.Machine{
+				Metadata: &irimeta.ObjectMetadata{
 					Labels: map[string]string{
 						machinepoolletv1alpha1.MachineUIDLabel: "foobar",
 					},
 				},
-				Spec: &ori.MachineSpec{
-					Power: ori.Power_POWER_ON,
-					Image: &ori.ImageSpec{
+				Spec: &iri.MachineSpec{
+					Power: iri.Power_POWER_ON,
+					Image: &iri.ImageSpec{
 						Image: "example.org/foo:latest",
 					},
 					Class: machineClass.Name,
@@ -62,15 +62,15 @@ var _ = Describe("CreateMachine", func() {
 			machinebrokerv1alpha1.CreatedLabel:                          "true",
 			machinebrokerv1alpha1.ManagerLabel:                          machinebrokerv1alpha1.MachineBrokerManager,
 		}))
-		encodedORIAnnotations, err := apiutils.EncodeAnnotationsAnnotation(nil)
+		encodedIRIAnnotations, err := apiutils.EncodeAnnotationsAnnotation(nil)
 		Expect(err).NotTo(HaveOccurred())
-		encodedORILabels, err := apiutils.EncodeLabelsAnnotation(map[string]string{
+		encodedIRILabels, err := apiutils.EncodeLabelsAnnotation(map[string]string{
 			machinepoolletv1alpha1.MachineUIDLabel: "foobar",
 		})
 		Expect(err).NotTo(HaveOccurred())
 		Expect(ironcoreMachine.Annotations).To(Equal(map[string]string{
-			machinebrokerv1alpha1.AnnotationsAnnotation: encodedORIAnnotations,
-			machinebrokerv1alpha1.LabelsAnnotation:      encodedORILabels,
+			machinebrokerv1alpha1.AnnotationsAnnotation: encodedIRIAnnotations,
+			machinebrokerv1alpha1.LabelsAnnotation:      encodedIRILabels,
 		}))
 		Expect(ironcoreMachine.Spec.Power).To(Equal(computev1alpha1.PowerOn))
 		Expect(ironcoreMachine.Spec.Image).To(Equal("example.org/foo:latest"))

@@ -28,15 +28,15 @@ import (
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	computeclient "github.com/ironcore-dev/ironcore/internal/client/compute"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
-	oriremotemachine "github.com/ironcore-dev/ironcore/ori/remote/machine"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
+	iriremotemachine "github.com/ironcore-dev/ironcore/iri/remote/machine"
+	"github.com/ironcore-dev/ironcore/poollet/irievent"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/addresses"
 	machinepoolletclient "github.com/ironcore-dev/ironcore/poollet/machinepoollet/client"
 	machinepoolletconfig "github.com/ironcore-dev/ironcore/poollet/machinepoollet/client/config"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/mcm"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/server"
-	"github.com/ironcore-dev/ironcore/poollet/orievent"
 	"github.com/ironcore-dev/ironcore/utils/client/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -100,8 +100,8 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.LeaderElectionKubeconfig, "leader-election-kubeconfig", "", "Path pointing to a kubeconfig to use for leader election.")
 
 	fs.StringVar(&o.MachinePoolName, "machine-pool-name", o.MachinePoolName, "Name of the machine pool to announce / watch")
-	fs.StringToStringVar(&o.MachineDownwardAPILabels, "machine-downward-api-label", o.MachineDownwardAPILabels, "Downward-API labels to set on the ori machine.")
-	fs.StringToStringVar(&o.MachineDownwardAPIAnnotations, "machine-downward-api-annotation", o.MachineDownwardAPIAnnotations, "Downward-API annotations to set on the ori machine.")
+	fs.StringToStringVar(&o.MachineDownwardAPILabels, "machine-downward-api-label", o.MachineDownwardAPILabels, "Downward-API labels to set on the iri machine.")
+	fs.StringToStringVar(&o.MachineDownwardAPIAnnotations, "machine-downward-api-annotation", o.MachineDownwardAPIAnnotations, "Downward-API annotations to set on the iri machine.")
 	fs.StringVar(&o.ProviderID, "provider-id", "", "Provider id to announce on the machine pool.")
 	fs.StringVar(&o.MachineRuntimeEndpoint, "machine-runtime-endpoint", o.MachineRuntimeEndpoint, "Endpoint of the remote machine runtime service.")
 	fs.DurationVar(&o.MachineRuntimeSocketDiscoveryTimeout, "machine-runtime-socket-discovery-timeout", 20*time.Second, "Timeout for discovering the machine runtime socket.")
@@ -186,7 +186,7 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error creating new getter: %w", err)
 	}
 
-	endpoint, err := oriremotemachine.GetAddressWithTimeout(opts.MachineRuntimeSocketDiscoveryTimeout, opts.MachineRuntimeEndpoint)
+	endpoint, err := iriremotemachine.GetAddressWithTimeout(opts.MachineRuntimeSocketDiscoveryTimeout, opts.MachineRuntimeEndpoint)
 	if err != nil {
 		return fmt.Errorf("error detecting machine runtime endpoint: %w", err)
 	}
@@ -198,7 +198,7 @@ func Run(ctx context.Context, opts Options) error {
 
 	setupLog.V(1).Info("Discovered addresses to report", "MachinePoolAddresses", machinePoolAddresses)
 
-	machineRuntime, err := oriremotemachine.NewRemoteRuntime(endpoint)
+	machineRuntime, err := iriremotemachine.NewRemoteRuntime(endpoint)
 	if err != nil {
 		return fmt.Errorf("error creating remote machine runtime: %w", err)
 	}
@@ -242,7 +242,7 @@ func Run(ctx context.Context, opts Options) error {
 		return err
 	}
 
-	version, err := machineRuntime.Version(ctx, &ori.VersionRequest{})
+	version, err := machineRuntime.Version(ctx, &iri.VersionRequest{})
 	if err != nil {
 		return fmt.Errorf("error getting machine runtime version: %w", err)
 	}
@@ -266,13 +266,13 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error adding machine class mapper: %w", err)
 	}
 
-	machineEvents := orievent.NewGenerator(func(ctx context.Context) ([]*ori.Machine, error) {
-		res, err := machineRuntime.ListMachines(ctx, &ori.ListMachinesRequest{})
+	machineEvents := irievent.NewGenerator(func(ctx context.Context) ([]*iri.Machine, error) {
+		res, err := machineRuntime.ListMachines(ctx, &iri.ListMachinesRequest{})
 		if err != nil {
 			return nil, err
 		}
 		return res.Machines, nil
-	}, orievent.GeneratorOptions{})
+	}, irievent.GeneratorOptions{})
 	if err := mgr.Add(machineEvents); err != nil {
 		return fmt.Errorf("error adding machine event generator: %w", err)
 	}

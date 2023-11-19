@@ -19,10 +19,10 @@ import (
 
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/bucketbroker/apiutils"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/bucket/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
 )
 
-func (s *Server) convertAggregateIronCoreBucket(bucket *AggregateIronCoreBucket) (*ori.Bucket, error) {
+func (s *Server) convertAggregateIronCoreBucket(bucket *AggregateIronCoreBucket) (*iri.Bucket, error) {
 	metadata, err := apiutils.GetObjectMetadata(bucket.Bucket)
 	if err != nil {
 		return nil, err
@@ -38,32 +38,32 @@ func (s *Server) convertAggregateIronCoreBucket(bucket *AggregateIronCoreBucket)
 		return nil, err
 	}
 
-	return &ori.Bucket{
+	return &iri.Bucket{
 		Metadata: metadata,
-		Spec: &ori.BucketSpec{
+		Spec: &iri.BucketSpec{
 			Class: bucket.Bucket.Spec.BucketClassRef.Name,
 		},
-		Status: &ori.BucketStatus{
+		Status: &iri.BucketStatus{
 			State:  state,
 			Access: access,
 		},
 	}, nil
 }
 
-var ironcoreBucketStateToORIState = map[storagev1alpha1.BucketState]ori.BucketState{
-	storagev1alpha1.BucketStatePending:   ori.BucketState_BUCKET_PENDING,
-	storagev1alpha1.BucketStateAvailable: ori.BucketState_BUCKET_AVAILABLE,
-	storagev1alpha1.BucketStateError:     ori.BucketState_BUCKET_ERROR,
+var ironcoreBucketStateToIRIState = map[storagev1alpha1.BucketState]iri.BucketState{
+	storagev1alpha1.BucketStatePending:   iri.BucketState_BUCKET_PENDING,
+	storagev1alpha1.BucketStateAvailable: iri.BucketState_BUCKET_AVAILABLE,
+	storagev1alpha1.BucketStateError:     iri.BucketState_BUCKET_ERROR,
 }
 
-func (s *Server) convertIronCoreBucketState(state storagev1alpha1.BucketState) (ori.BucketState, error) {
-	if state, ok := ironcoreBucketStateToORIState[state]; ok {
+func (s *Server) convertIronCoreBucketState(state storagev1alpha1.BucketState) (iri.BucketState, error) {
+	if state, ok := ironcoreBucketStateToIRIState[state]; ok {
 		return state, nil
 	}
 	return 0, fmt.Errorf("unknown ironcore bucket state %q", state)
 }
 
-func (s *Server) convertIronCoreBucketAccess(bucket *AggregateIronCoreBucket) (*ori.BucketAccess, error) {
+func (s *Server) convertIronCoreBucketAccess(bucket *AggregateIronCoreBucket) (*iri.BucketAccess, error) {
 	if bucket.Bucket.Status.State != storagev1alpha1.BucketStateAvailable {
 		return nil, nil
 	}
@@ -81,7 +81,7 @@ func (s *Server) convertIronCoreBucketAccess(bucket *AggregateIronCoreBucket) (*
 		secretData = bucket.AccessSecret.Data
 	}
 
-	return &ori.BucketAccess{
+	return &iri.BucketAccess{
 		Endpoint:   access.Endpoint,
 		SecretData: secretData,
 	}, nil

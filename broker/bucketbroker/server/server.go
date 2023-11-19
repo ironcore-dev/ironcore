@@ -29,7 +29,7 @@ import (
 	bucketbrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/bucketbroker/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/bucketbroker/apiutils"
 	"github.com/ironcore-dev/ironcore/broker/common/cleaner"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/bucket/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -111,7 +111,7 @@ func setOptionsDefaults(o *Options) {
 	}
 }
 
-var _ ori.BucketRuntimeServer = (*Server)(nil)
+var _ iri.BucketRuntimeServer = (*Server)(nil)
 
 //+kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=storage.ironcore.dev,resources=buckets,verbs=get;list;watch;create;update;patch;delete

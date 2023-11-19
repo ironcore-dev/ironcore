@@ -21,7 +21,7 @@ import (
 
 	"github.com/go-logr/logr"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/bucket/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/bcm"
 	corev1 "k8s.io/api/core/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -34,7 +34,7 @@ import (
 type BucketPoolReconciler struct {
 	client.Client
 	BucketPoolName    string
-	BucketRuntime     ori.BucketRuntimeClient
+	BucketRuntime     iri.BucketRuntimeClient
 	BucketClassMapper bcm.BucketClassMapper
 }
 
@@ -66,12 +66,12 @@ func (r *BucketPoolReconciler) delete(ctx context.Context, log logr.Logger, buck
 }
 
 func (r *BucketPoolReconciler) supportsBucketClass(ctx context.Context, log logr.Logger, bucketClass *storagev1alpha1.BucketClass) (bool, error) {
-	oriCapabilities, err := getORIBucketClassCapabilities(bucketClass)
+	iriCapabilities, err := getIRIBucketClassCapabilities(bucketClass)
 	if err != nil {
-		return false, fmt.Errorf("error getting ori mahchine class capabilities: %w", err)
+		return false, fmt.Errorf("error getting iri mahchine class capabilities: %w", err)
 	}
 
-	_, err = r.BucketClassMapper.GetBucketClassFor(ctx, bucketClass.Name, oriCapabilities)
+	_, err = r.BucketClassMapper.GetBucketClassFor(ctx, bucketClass.Name, iriCapabilities)
 	if err != nil {
 		if !errors.Is(err, bcm.ErrNoMatchingBucketClass) && !errors.Is(err, bcm.ErrAmbiguousMatchingBucketClass) {
 			return false, fmt.Errorf("error getting bucket class for %s: %w", bucketClass.Name, err)

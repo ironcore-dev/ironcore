@@ -18,11 +18,11 @@ import (
 	"context"
 	"fmt"
 
-	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func (s *Server) UpdateMachinePower(ctx context.Context, req *ori.UpdateMachinePowerRequest) (*ori.UpdateMachinePowerResponse, error) {
+func (s *Server) UpdateMachinePower(ctx context.Context, req *iri.UpdateMachinePowerRequest) (*iri.UpdateMachinePowerResponse, error) {
 	machineID := req.MachineId
 	log := s.loggerFrom(ctx, "MachineID", machineID)
 
@@ -44,5 +44,5 @@ func (s *Server) UpdateMachinePower(ctx context.Context, req *ori.UpdateMachineP
 		return nil, fmt.Errorf("error patching ironcore machine power: %w", err)
 	}
 
-	return &ori.UpdateMachinePowerResponse{}, nil
+	return &iri.UpdateMachinePowerResponse{}, nil
 }

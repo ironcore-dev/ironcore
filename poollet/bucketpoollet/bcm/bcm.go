@@ -18,7 +18,7 @@ import (
 	"context"
 	"errors"
 
-	ori "github.com/ironcore-dev/ironcore/ori/apis/bucket/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 )
 
@@ -29,6 +29,6 @@ var (
 
 type BucketClassMapper interface {
 	manager.Runnable
-	GetBucketClassFor(ctx context.Context, name string, capabilities *ori.BucketClassCapabilities) (*ori.BucketClass, error)
+	GetBucketClassFor(ctx context.Context, name string, capabilities *iri.BucketClassCapabilities) (*iri.BucketClass, error)
 	WaitForSync(ctx context.Context) error
 }

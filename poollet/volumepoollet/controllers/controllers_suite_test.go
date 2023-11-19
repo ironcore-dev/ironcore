@@ -24,8 +24,8 @@ import (
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	storageclient "github.com/ironcore-dev/ironcore/internal/client/storage"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/volume/v1alpha1"
-	"github.com/ironcore-dev/ironcore/ori/testing/volume"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
+	"github.com/ironcore-dev/ironcore/iri/testing/volume"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
 	utilsenvtest "github.com/ironcore-dev/ironcore/utils/envtest"
@@ -190,10 +190,10 @@ func SetupTest() (*corev1.Namespace, *storagev1alpha1.VolumePool, *storagev1alph
 		*srv = *volume.NewFakeRuntimeService()
 		srv.SetVolumeClasses([]*volume.FakeVolumeClassStatus{
 			{
-				VolumeClassStatus: ori.VolumeClassStatus{
-					VolumeClass: &ori.VolumeClass{
+				VolumeClassStatus: iri.VolumeClassStatus{
+					VolumeClass: &iri.VolumeClass{
 						Name: vc.Name,
-						Capabilities: &ori.VolumeClassCapabilities{
+						Capabilities: &iri.VolumeClassCapabilities{
 							Tps:  262144000,
 							Iops: 15000,
 						},
@@ -201,10 +201,10 @@ func SetupTest() (*corev1.Namespace, *storagev1alpha1.VolumePool, *storagev1alph
 				},
 			},
 			{
-				VolumeClassStatus: ori.VolumeClassStatus{
-					VolumeClass: &ori.VolumeClass{
+				VolumeClassStatus: iri.VolumeClassStatus{
+					VolumeClass: &iri.VolumeClass{
 						Name: expandableVc.Name,
-						Capabilities: &ori.VolumeClassCapabilities{
+						Capabilities: &iri.VolumeClassCapabilities{
 							Tps:  262144000,
 							Iops: 1000,
 						},

@@ -20,7 +20,7 @@ import (
 
 	"github.com/go-logr/logr"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	"github.com/ironcore-dev/ironcore/poollet/orievent"
+	"github.com/ironcore-dev/ironcore/poollet/irievent"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -61,7 +61,7 @@ func (r *VolumePoolAnnotatorReconciler) SetupWithManager(mgr ctrl.Manager) error
 		return err
 	}
 
-	src, err := r.oriClassEventSource(mgr)
+	src, err := r.iriClassEventSource(mgr)
 	if err != nil {
 		return err
 	}
@@ -75,7 +75,7 @@ func (r *VolumePoolAnnotatorReconciler) SetupWithManager(mgr ctrl.Manager) error
 	return nil
 }
 
-func (r *VolumePoolAnnotatorReconciler) volumePoolAnnotatorEventHandler(log logr.Logger, c chan<- event.GenericEvent) orievent.EnqueueFunc {
+func (r *VolumePoolAnnotatorReconciler) volumePoolAnnotatorEventHandler(log logr.Logger, c chan<- event.GenericEvent) irievent.EnqueueFunc {
 	handleEvent := func() {
 		select {
 		case c <- event.GenericEvent{Object: &storagev1alpha1.VolumePool{ObjectMeta: metav1.ObjectMeta{
@@ -87,22 +87,22 @@ func (r *VolumePoolAnnotatorReconciler) volumePoolAnnotatorEventHandler(log logr
 		}
 	}
 
-	return orievent.EnqueueFunc{EnqueueFunc: handleEvent}
+	return irievent.EnqueueFunc{EnqueueFunc: handleEvent}
 }
 
-func (r *VolumePoolAnnotatorReconciler) oriClassEventSource(mgr ctrl.Manager) (source.Source, error) {
+func (r *VolumePoolAnnotatorReconciler) iriClassEventSource(mgr ctrl.Manager) (source.Source, error) {
 	ch := make(chan event.GenericEvent, 1024)
 
 	if err := mgr.Add(manager.RunnableFunc(func(ctx context.Context) error {
-		log := ctrl.LoggerFrom(ctx).WithName("volumepool").WithName("orieventhandlers")
+		log := ctrl.LoggerFrom(ctx).WithName("volumepool").WithName("irieventhandlers")
 
-		notifierFuncs := []func() (orievent.ListenerRegistration, error){
-			func() (orievent.ListenerRegistration, error) {
+		notifierFuncs := []func() (irievent.ListenerRegistration, error){
+			func() (irievent.ListenerRegistration, error) {
 				return r.VolumeClassMapper.AddListener(r.volumePoolAnnotatorEventHandler(log, ch))
 			},
 		}
 
-		var notifier []orievent.ListenerRegistration
+		var notifier []irievent.ListenerRegistration
 		defer func() {
 			log.V(1).Info("Removing notifier")
 			for _, n := range notifier {

@@ -18,7 +18,7 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	orimachine "github.com/ironcore-dev/ironcore/ori/apis/machine"
+	irimachine "github.com/ironcore-dev/ironcore/iri/apis/machine"
 	"github.com/spf13/pflag"
 )
 
@@ -80,7 +80,7 @@ func (o *ServingFlags) BindFlags(fs *pflag.FlagSet) {
 }
 
 // ServerOptions produces server.Options.
-func (o *ServingFlags) ServerOptions(machineRuntime orimachine.RuntimeService, log logr.Logger, authOpts AuthOptions) Options {
+func (o *ServingFlags) ServerOptions(machineRuntime irimachine.RuntimeService, log logr.Logger, authOpts AuthOptions) Options {
 	return Options{
 		MachineRuntime:        machineRuntime,
 		Log:                   log,
@@ -115,6 +115,6 @@ func (o *Flags) BindFlags(fs *pflag.FlagSet) {
 }
 
 // ServerOptions produces server.Options.
-func (o *Flags) ServerOptions(machinePoolName string, machineRuntime orimachine.RuntimeService, log logr.Logger) Options {
+func (o *Flags) ServerOptions(machinePoolName string, machineRuntime irimachine.RuntimeService, log logr.Logger) Options {
 	return o.Serving.ServerOptions(machineRuntime, log, o.Auth.AuthOptions(machinePoolName))
 }

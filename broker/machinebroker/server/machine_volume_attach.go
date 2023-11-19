@@ -24,7 +24,7 @@ import (
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/common/cleaner"
 	machinebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/machinebroker/api/v1alpha1"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	metautils "github.com/ironcore-dev/ironcore/utils/meta"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -50,7 +50,7 @@ type IronCoreVolumeRemoteConfig struct {
 	SecretData map[string][]byte
 }
 
-func (s *Server) getIronCoreVolumeConfig(volume *ori.Volume) (*IronCoreVolumeConfig, error) {
+func (s *Server) getIronCoreVolumeConfig(volume *iri.Volume) (*IronCoreVolumeConfig, error) {
 	var (
 		emptyDisk *IronCoreVolumeEmptyDiskConfig
 		remote    *IronCoreVolumeRemoteConfig
@@ -190,7 +190,7 @@ func (s *Server) attachIronCoreVolume(
 	return nil
 }
 
-func (s *Server) AttachVolume(ctx context.Context, req *ori.AttachVolumeRequest) (res *ori.AttachVolumeResponse, retErr error) {
+func (s *Server) AttachVolume(ctx context.Context, req *iri.AttachVolumeRequest) (res *iri.AttachVolumeResponse, retErr error) {
 	machineID := req.MachineId
 	volumeName := req.Volume.Name
 	log := s.loggerFrom(ctx, "MachineID", machineID, "VolumeName", volumeName)
@@ -221,5 +221,5 @@ func (s *Server) AttachVolume(ctx context.Context, req *ori.AttachVolumeRequest)
 		return nil, err
 	}
 
-	return &ori.AttachVolumeResponse{}, nil
+	return &iri.AttachVolumeResponse{}, nil
 }

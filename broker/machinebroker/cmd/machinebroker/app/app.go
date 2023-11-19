@@ -29,7 +29,7 @@ import (
 	commongrpc "github.com/ironcore-dev/ironcore/broker/common/grpc"
 	machinebrokerhttp "github.com/ironcore-dev/ironcore/broker/machinebroker/http"
 	"github.com/ironcore-dev/ironcore/broker/machinebroker/server"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"golang.org/x/sync/errgroup"
@@ -52,7 +52,7 @@ type Options struct {
 
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.Kubeconfig, "kubeconfig", o.Kubeconfig, "Path pointing to a kubeconfig file to use.")
-	fs.StringVar(&o.Address, "address", "/var/run/ori-machinebroker.sock", "Address to listen on.")
+	fs.StringVar(&o.Address, "address", "/var/run/iri-machinebroker.sock", "Address to listen on.")
 	fs.StringVar(&o.StreamingAddress, "streaming-address", "127.0.0.1:20251", "Address to run the streaming server on")
 	fs.StringVar(&o.BaseURL, "base-url", "", "The base url to construct urls for streaming from. If empty it will be "+
 		"constructed from the streaming-address")
@@ -165,7 +165,7 @@ func runGRPCServer(ctx context.Context, setupLog logr.Logger, log logr.Logger, s
 			commongrpc.LogRequest,
 		),
 	)
-	ori.RegisterMachineRuntimeServer(grpcSrv, srv)
+	iri.RegisterMachineRuntimeServer(grpcSrv, srv)
 
 	log.V(1).Info("Start listening on unix socket", "Address", opts.Address)
 	l, err := net.Listen("unix", opts.Address)

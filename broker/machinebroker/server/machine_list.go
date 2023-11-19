@@ -23,7 +23,7 @@ import (
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	machinebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/machinebroker/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/machinebroker/apiutils"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	clientutils "github.com/ironcore-dev/ironcore/utils/client"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -158,13 +158,13 @@ func (s *Server) getAggregateIronCoreMachine(ctx context.Context, id string) (*A
 	return s.aggregateIronCoreMachine(ctx, s.cluster.Client(), ironcoreMachine)
 }
 
-func (s *Server) listMachines(ctx context.Context) ([]*ori.Machine, error) {
+func (s *Server) listMachines(ctx context.Context) ([]*iri.Machine, error) {
 	ironcoreMachines, err := s.listAggregateIronCoreMachines(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error listing machines: %w", err)
 	}
 
-	var res []*ori.Machine
+	var res []*iri.Machine
 	for _, ironcoreMachine := range ironcoreMachines {
 		machine, err := s.convertAggregateIronCoreMachine(&ironcoreMachine)
 		if err != nil {
@@ -176,26 +176,26 @@ func (s *Server) listMachines(ctx context.Context) ([]*ori.Machine, error) {
 	return res, nil
 }
 
-func (s *Server) filterMachines(machines []*ori.Machine, filter *ori.MachineFilter) []*ori.Machine {
+func (s *Server) filterMachines(machines []*iri.Machine, filter *iri.MachineFilter) []*iri.Machine {
 	if filter == nil {
 		return machines
 	}
 
 	var (
-		res []*ori.Machine
+		res []*iri.Machine
 		sel = labels.SelectorFromSet(filter.LabelSelector)
 	)
-	for _, oriMachine := range machines {
-		if !sel.Matches(labels.Set(oriMachine.Metadata.Labels)) {
+	for _, iriMachine := range machines {
+		if !sel.Matches(labels.Set(iriMachine.Metadata.Labels)) {
 			continue
 		}
 
-		res = append(res, oriMachine)
+		res = append(res, iriMachine)
 	}
 	return res
 }
 
-func (s *Server) getMachine(ctx context.Context, id string) (*ori.Machine, error) {
+func (s *Server) getMachine(ctx context.Context, id string) (*iri.Machine, error) {
 	aggregateIronCoreMachine, err := s.getAggregateIronCoreMachine(ctx, id)
 	if err != nil {
 		return nil, err
@@ -204,20 +204,20 @@ func (s *Server) getMachine(ctx context.Context, id string) (*ori.Machine, error
 	return s.convertAggregateIronCoreMachine(aggregateIronCoreMachine)
 }
 
-func (s *Server) ListMachines(ctx context.Context, req *ori.ListMachinesRequest) (*ori.ListMachinesResponse, error) {
+func (s *Server) ListMachines(ctx context.Context, req *iri.ListMachinesRequest) (*iri.ListMachinesResponse, error) {
 	if filter := req.Filter; filter != nil && filter.Id != "" {
 		machine, err := s.getMachine(ctx, filter.Id)
 		if err != nil {
 			if status.Code(err) != codes.NotFound {
 				return nil, err
 			}
-			return &ori.ListMachinesResponse{
-				Machines: []*ori.Machine{},
+			return &iri.ListMachinesResponse{
+				Machines: []*iri.Machine{},
 			}, nil
 		}
 
-		return &ori.ListMachinesResponse{
-			Machines: []*ori.Machine{machine},
+		return &iri.ListMachinesResponse{
+			Machines: []*iri.Machine{machine},
 		}, nil
 	}
 
@@ -228,7 +228,7 @@ func (s *Server) ListMachines(ctx context.Context, req *ori.ListMachinesRequest)
 
 	machines = s.filterMachines(machines, req.Filter)
 
-	return &ori.ListMachinesResponse{
+	return &iri.ListMachinesResponse{
 		Machines: machines,
 	}, nil
 }

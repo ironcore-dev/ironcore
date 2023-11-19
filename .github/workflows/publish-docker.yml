@@ -32,20 +32,20 @@ jobs:
           target: machinepoollet
         - name: ironcore-machinebroker
           target: machinebroker
-        - name: ironcore-orictl-machine
-          target: orictl-machine
+        - name: ironcore-irictl-machine
+          target: irictl-machine
         - name: ironcore-volumepoollet
           target: volumepoollet
         - name: ironcore-volumebroker
           target: volumebroker
-        - name: ironcore-orictl-volume
-          target: orictl-volume
+        - name: ironcore-irictl-volume
+          target: irictl-volume
         - name: ironcore-bucketpoollet
           target: bucketpoollet
         - name: ironcore-bucketbroker
           target: bucketbroker
-        - name: ironcore-orictl-bucket
-          target: orictl-bucket
+        - name: ironcore-irictl-bucket
+          target: irictl-bucket
     permissions:
       contents: read
       packages: write

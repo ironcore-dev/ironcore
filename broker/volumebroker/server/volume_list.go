@@ -21,7 +21,7 @@ import (
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/common"
 	volumebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/volumebroker/api/v1alpha1"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/volume/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
@@ -154,13 +154,13 @@ func (s *Server) getAggregateIronCoreVolume(ctx context.Context, id string) (*Ag
 	return s.aggregateIronCoreVolume(ironcoreVolume, s.clientGetSecretFunc(ctx))
 }
 
-func (s *Server) listVolumes(ctx context.Context) ([]*ori.Volume, error) {
+func (s *Server) listVolumes(ctx context.Context) ([]*iri.Volume, error) {
 	ironcoreVolumes, err := s.listAggregateIronCoreVolumes(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error listing volumes: %w", err)
 	}
 
-	var res []*ori.Volume
+	var res []*iri.Volume
 	for _, ironcoreVolume := range ironcoreVolumes {
 		volume, err := s.convertAggregateIronCoreVolume(&ironcoreVolume)
 		if err != nil {
@@ -172,26 +172,26 @@ func (s *Server) listVolumes(ctx context.Context) ([]*ori.Volume, error) {
 	return res, nil
 }
 
-func (s *Server) filterVolumes(volumes []*ori.Volume, filter *ori.VolumeFilter) []*ori.Volume {
+func (s *Server) filterVolumes(volumes []*iri.Volume, filter *iri.VolumeFilter) []*iri.Volume {
 	if filter == nil {
 		return volumes
 	}
 
 	var (
-		res []*ori.Volume
+		res []*iri.Volume
 		sel = labels.SelectorFromSet(filter.LabelSelector)
 	)
-	for _, oriVolume := range volumes {
-		if !sel.Matches(labels.Set(oriVolume.Metadata.Labels)) {
+	for _, iriVolume := range volumes {
+		if !sel.Matches(labels.Set(iriVolume.Metadata.Labels)) {
 			continue
 		}
 
-		res = append(res, oriVolume)
+		res = append(res, iriVolume)
 	}
 	return res
 }
 
-func (s *Server) getVolume(ctx context.Context, id string) (*ori.Volume, error) {
+func (s *Server) getVolume(ctx context.Context, id string) (*iri.Volume, error) {
 	ironcoreVolume, err := s.getAggregateIronCoreVolume(ctx, id)
 	if err != nil {
 		return nil, err
@@ -200,20 +200,20 @@ func (s *Server) getVolume(ctx context.Context, id string) (*ori.Volume, error) 
 	return s.convertAggregateIronCoreVolume(ironcoreVolume)
 }
 
-func (s *Server) ListVolumes(ctx context.Context, req *ori.ListVolumesRequest) (*ori.ListVolumesResponse, error) {
+func (s *Server) ListVolumes(ctx context.Context, req *iri.ListVolumesRequest) (*iri.ListVolumesResponse, error) {
 	if filter := req.Filter; filter != nil && filter.Id != "" {
 		volume, err := s.getVolume(ctx, filter.Id)
 		if err != nil {
 			if status.Code(err) != codes.NotFound {
 				return nil, err
 			}
-			return &ori.ListVolumesResponse{
-				Volumes: []*ori.Volume{},
+			return &iri.ListVolumesResponse{
+				Volumes: []*iri.Volume{},
 			}, nil
 		}
 
-		return &ori.ListVolumesResponse{
-			Volumes: []*ori.Volume{volume},
+		return &iri.ListVolumesResponse{
+			Volumes: []*iri.Volume{volume},
 		}, nil
 	}
 
@@ -224,7 +224,7 @@ func (s *Server) ListVolumes(ctx context.Context, req *ori.ListVolumesRequest) (
 
 	volumes = s.filterVolumes(volumes, req.Filter)
 
-	return &ori.ListVolumesResponse{
+	return &iri.ListVolumesResponse{
 		Volumes: volumes,
 	}, nil
 }

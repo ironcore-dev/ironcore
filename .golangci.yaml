@@ -19,6 +19,7 @@ linters-settings:
   misspell:
     ignore-words:
       - strat
+      - iritable
   revive:
     severity: error
     rules:

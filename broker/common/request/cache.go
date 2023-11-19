@@ -29,10 +29,10 @@ import (
 )
 
 const (
-	DefaultCacheTTL           time.Duration = 1 * time.Minute
-	DefaultCacheTokenMaxTries int           = 10
-	DefaultCacheTokenLen      int           = 8
-	DefaultCacheMaxInFlight   int           = 1000
+	DefaultCacheTTL               = 1 * time.Minute
+	DefaultCacheTokenMaxTries int = 10
+	DefaultCacheTokenLen      int = 8
+	DefaultCacheMaxInFlight   int = 1000
 )
 
 type cache[E any] struct {

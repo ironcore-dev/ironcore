@@ -19,7 +19,7 @@ import (
 
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/volume/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -71,14 +71,14 @@ var _ = Describe("VolumeController", func() {
 			HaveField("Volumes", HaveLen(1)),
 		))
 
-		_, oriVolume := GetSingleMapEntry(srv.Volumes)
+		_, iriVolume := GetSingleMapEntry(srv.Volumes)
 
-		Expect(oriVolume.Spec.Image).To(Equal(""))
-		Expect(oriVolume.Spec.Class).To(Equal(vc.Name))
-		Expect(oriVolume.Spec.Encryption).To(BeNil())
-		Expect(oriVolume.Spec.Resources.StorageBytes).To(Equal(size.Value()))
+		Expect(iriVolume.Spec.Image).To(Equal(""))
+		Expect(iriVolume.Spec.Class).To(Equal(vc.Name))
+		Expect(iriVolume.Spec.Encryption).To(BeNil())
+		Expect(iriVolume.Spec.Resources.StorageBytes).To(Equal(size.Value()))
 
-		oriVolume.Status.Access = &ori.VolumeAccess{
+		iriVolume.Status.Access = &iri.VolumeAccess{
 			Driver: volumeDriver,
 			Handle: volumeHandle,
 			Attributes: map[string]string{
@@ -90,7 +90,7 @@ var _ = Describe("VolumeController", func() {
 				UserKeyKey: []byte(volumeUser),
 			},
 		}
-		oriVolume.Status.State = ori.VolumeState_VOLUME_AVAILABLE
+		iriVolume.Status.State = iri.VolumeState_VOLUME_AVAILABLE
 
 		Expect(ironcoreclient.PatchAddReconcileAnnotation(ctx, k8sClient, volume)).Should(Succeed())
 
@@ -157,12 +157,12 @@ var _ = Describe("VolumeController", func() {
 			HaveField("Volumes", HaveLen(1)),
 		))
 
-		_, oriVolume := GetSingleMapEntry(srv.Volumes)
+		_, iriVolume := GetSingleMapEntry(srv.Volumes)
 
-		Expect(oriVolume.Spec.Image).To(Equal(""))
-		Expect(oriVolume.Spec.Class).To(Equal(vc.Name))
-		Expect(oriVolume.Spec.Resources.StorageBytes).To(Equal(size.Value()))
-		Expect(oriVolume.Spec.Encryption.SecretData).NotTo(HaveKeyWithValue(encryptionDataKey, encryptionData))
+		Expect(iriVolume.Spec.Image).To(Equal(""))
+		Expect(iriVolume.Spec.Class).To(Equal(vc.Name))
+		Expect(iriVolume.Spec.Resources.StorageBytes).To(Equal(size.Value()))
+		Expect(iriVolume.Spec.Encryption.SecretData).NotTo(HaveKeyWithValue(encryptionDataKey, encryptionData))
 
 	})
 
@@ -192,11 +192,11 @@ var _ = Describe("VolumeController", func() {
 			HaveField("Volumes", HaveLen(1)),
 		))
 
-		_, oriVolume := GetSingleMapEntry(srv.Volumes)
+		_, iriVolume := GetSingleMapEntry(srv.Volumes)
 
-		Expect(oriVolume.Spec.Image).To(Equal(""))
-		Expect(oriVolume.Spec.Class).To(Equal(expandableVc.Name))
-		Expect(oriVolume.Spec.Resources.StorageBytes).To(Equal(size.Value()))
+		Expect(iriVolume.Spec.Image).To(Equal(""))
+		Expect(iriVolume.Spec.Class).To(Equal(expandableVc.Name))
+		Expect(iriVolume.Spec.Resources.StorageBytes).To(Equal(size.Value()))
 
 		By("update increasing the storage resource")
 		baseVolume := volume.DeepCopy()
@@ -211,8 +211,8 @@ var _ = Describe("VolumeController", func() {
 		))
 
 		Eventually(func() int64 {
-			_, oriVolume = GetSingleMapEntry(srv.Volumes)
-			return oriVolume.Spec.Resources.StorageBytes
+			_, iriVolume = GetSingleMapEntry(srv.Volumes)
+			return iriVolume.Spec.Resources.StorageBytes
 		}).Should(Equal(newSize.Value()))
 	})
 

@@ -18,13 +18,13 @@ import (
 	"context"
 	"fmt"
 
-	ori "github.com/ironcore-dev/ironcore/ori/apis/bucket/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
-func (s *Server) DeleteBucket(ctx context.Context, req *ori.DeleteBucketRequest) (*ori.DeleteBucketResponse, error) {
+func (s *Server) DeleteBucket(ctx context.Context, req *iri.DeleteBucketRequest) (*iri.DeleteBucketResponse, error) {
 	bucketID := req.BucketId
 	log := s.loggerFrom(ctx, "BucketID", bucketID)
 
@@ -41,5 +41,5 @@ func (s *Server) DeleteBucket(ctx context.Context, req *ori.DeleteBucketRequest)
 		return nil, status.Errorf(codes.NotFound, "bucket %s not found", bucketID)
 	}
 
-	return &ori.DeleteBucketResponse{}, nil
+	return &iri.DeleteBucketResponse{}, nil
 }

@@ -24,7 +24,7 @@ import (
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers/events"
 	"github.com/ironcore-dev/ironcore/utils/claimmanager"
 	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
@@ -121,12 +121,12 @@ func (r *MachineReconciler) getVolumesForMachine(ctx context.Context, machine *c
 	return volumes, errors.Join(errs...)
 }
 
-func (r *MachineReconciler) prepareRemoteORIVolume(
+func (r *MachineReconciler) prepareRemoteIRIVolume(
 	ctx context.Context,
 	machine *computev1alpha1.Machine,
 	machineVolume *computev1alpha1.Volume,
 	volume *storagev1alpha1.Volume,
-) (*ori.Volume, bool, error) {
+) (*iri.Volume, bool, error) {
 	access := volume.Status.Access
 	if access == nil {
 		r.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady, "Volume %s does not report status access", volume.Name)
@@ -153,10 +153,10 @@ func (r *MachineReconciler) prepareRemoteORIVolume(
 		secretData = secret.Data
 	}
 
-	return &ori.Volume{
+	return &iri.Volume{
 		Name:   machineVolume.Name,
 		Device: *machineVolume.Device,
-		Connection: &ori.VolumeConnection{
+		Connection: &iri.VolumeConnection{
 			Driver:     access.Driver,
 			Handle:     access.Handle,
 			Attributes: access.VolumeAttributes,
@@ -165,33 +165,33 @@ func (r *MachineReconciler) prepareRemoteORIVolume(
 	}, true, nil
 }
 
-func (r *MachineReconciler) prepareEmptyDiskORIVolume(machineVolume *computev1alpha1.Volume) *ori.Volume {
+func (r *MachineReconciler) prepareEmptyDiskIRIVolume(machineVolume *computev1alpha1.Volume) *iri.Volume {
 	var sizeBytes int64
 	if sizeLimit := machineVolume.EmptyDisk.SizeLimit; sizeLimit != nil {
 		sizeBytes = sizeLimit.Value()
 	}
-	return &ori.Volume{
+	return &iri.Volume{
 		Name:   machineVolume.Name,
 		Device: *machineVolume.Device,
-		EmptyDisk: &ori.EmptyDisk{
+		EmptyDisk: &iri.EmptyDisk{
 			SizeBytes: sizeBytes,
 		},
 	}
 }
 
-func (r *MachineReconciler) prepareORIVolumes(
+func (r *MachineReconciler) prepareIRIVolumes(
 	ctx context.Context,
 	machine *computev1alpha1.Machine,
 	volumes []storagev1alpha1.Volume,
-) ([]*ori.Volume, bool, error) {
+) ([]*iri.Volume, bool, error) {
 	var (
 		volumeNameToMachineVolume = r.volumeNameToMachineVolume(machine)
-		oriVolumes                []*ori.Volume
+		iriVolumes                []*iri.Volume
 		errs                      []error
 	)
 	for _, volume := range volumes {
 		machineVolume := volumeNameToMachineVolume[volume.Name]
-		oriVolume, ok, err := r.prepareRemoteORIVolume(ctx, machine, &machineVolume, &volume)
+		iriVolume, ok, err := r.prepareRemoteIRIVolume(ctx, machine, &machineVolume, &volume)
 		if err != nil {
 			errs = append(errs, err)
 			continue
@@ -200,7 +200,7 @@ func (r *MachineReconciler) prepareORIVolumes(
 			continue
 		}
 
-		oriVolumes = append(oriVolumes, oriVolume)
+		iriVolumes = append(iriVolumes, iriVolume)
 	}
 	if err := errors.Join(errs...); err != nil {
 		return nil, false, err
@@ -211,50 +211,50 @@ func (r *MachineReconciler) prepareORIVolumes(
 			continue
 		}
 
-		oriVolume := r.prepareEmptyDiskORIVolume(&machineVolume)
-		oriVolumes = append(oriVolumes, oriVolume)
+		iriVolume := r.prepareEmptyDiskIRIVolume(&machineVolume)
+		iriVolumes = append(iriVolumes, iriVolume)
 	}
 
-	if len(oriVolumes) != len(machine.Spec.Volumes) {
+	if len(iriVolumes) != len(machine.Spec.Volumes) {
 		expectedVolumeNames := utilslices.ToSetFunc(machine.Spec.Volumes, func(v computev1alpha1.Volume) string { return v.Name })
-		actualVolumeNames := utilslices.ToSetFunc(oriVolumes, (*ori.Volume).GetName)
+		actualVolumeNames := utilslices.ToSetFunc(iriVolumes, (*iri.Volume).GetName)
 		missingVolumeNames := sets.List(expectedVolumeNames.Difference(actualVolumeNames))
 		r.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady, "Machine volumes are not ready: %v", missingVolumeNames)
 		return nil, false, nil
 	}
-	return oriVolumes, true, nil
+	return iriVolumes, true, nil
 }
 
-func (r *MachineReconciler) getExistingORIVolumesForMachine(
+func (r *MachineReconciler) getExistingIRIVolumesForMachine(
 	ctx context.Context,
 	log logr.Logger,
-	oriMachine *ori.Machine,
-	desiredORIVolumes []*ori.Volume,
-) ([]*ori.Volume, error) {
+	iriMachine *iri.Machine,
+	desiredIRIVolumes []*iri.Volume,
+) ([]*iri.Volume, error) {
 	var (
-		oriVolumes              []*ori.Volume
-		desiredORIVolumesByName = utilslices.ToMapByKey(desiredORIVolumes, (*ori.Volume).GetName)
+		iriVolumes              []*iri.Volume
+		desiredIRIVolumesByName = utilslices.ToMapByKey(desiredIRIVolumes, (*iri.Volume).GetName)
 		errs                    []error
 	)
 
-	for _, oriVolume := range oriMachine.Spec.Volumes {
-		log := log.WithValues("Volume", oriVolume.Name)
+	for _, iriVolume := range iriMachine.Spec.Volumes {
+		log := log.WithValues("Volume", iriVolume.Name)
 
-		desiredORIVolume, ok := desiredORIVolumesByName[oriVolume.Name]
-		if ok && proto.Equal(desiredORIVolume, oriVolume) {
-			log.V(1).Info("Existing ORI volume is up-to-date")
-			oriVolumes = append(oriVolumes, oriVolume)
+		desiredIRIVolume, ok := desiredIRIVolumesByName[iriVolume.Name]
+		if ok && proto.Equal(desiredIRIVolume, iriVolume) {
+			log.V(1).Info("Existing IRI volume is up-to-date")
+			iriVolumes = append(iriVolumes, iriVolume)
 			continue
 		}
 
-		log.V(1).Info("Detaching outdated ORI volume")
-		_, err := r.MachineRuntime.DetachVolume(ctx, &ori.DetachVolumeRequest{
-			MachineId: oriMachine.Metadata.Id,
-			Name:      oriVolume.Name,
+		log.V(1).Info("Detaching outdated IRI volume")
+		_, err := r.MachineRuntime.DetachVolume(ctx, &iri.DetachVolumeRequest{
+			MachineId: iriMachine.Metadata.Id,
+			Name:      iriVolume.Name,
 		})
 		if err != nil {
 			if status.Code(err) != codes.NotFound {
-				errs = append(errs, fmt.Errorf("[volume %s] %w", oriVolume.Name, err))
+				errs = append(errs, fmt.Errorf("[volume %s] %w", iriVolume.Name, err))
 				continue
 			}
 		}
@@ -262,59 +262,59 @@ func (r *MachineReconciler) getExistingORIVolumesForMachine(
 	if len(errs) > 0 {
 		return nil, errors.Join(errs...)
 	}
-	return oriVolumes, nil
+	return iriVolumes, nil
 }
 
-func (r *MachineReconciler) getNewORIVolumesForMachine(
+func (r *MachineReconciler) getNewIRIVolumesForMachine(
 	ctx context.Context,
 	log logr.Logger,
-	oriMachine *ori.Machine,
-	desiredORIVolumes, existingORIVolumes []*ori.Volume,
-) ([]*ori.Volume, error) {
+	iriMachine *iri.Machine,
+	desiredIRIVolumes, existingIRIVolumes []*iri.Volume,
+) ([]*iri.Volume, error) {
 	var (
-		desiredNewORIVolumes = FindNewORIVolumes(desiredORIVolumes, existingORIVolumes)
-		oriVolumes           []*ori.Volume
+		desiredNewIRIVolumes = FindNewIRIVolumes(desiredIRIVolumes, existingIRIVolumes)
+		iriVolumes           []*iri.Volume
 		errs                 []error
 	)
-	for _, newORIVolume := range desiredNewORIVolumes {
-		log := log.WithValues("Volume", newORIVolume.Name)
+	for _, newIRIVolume := range desiredNewIRIVolumes {
+		log := log.WithValues("Volume", newIRIVolume.Name)
 		log.V(1).Info("Attaching new volume")
-		if _, err := r.MachineRuntime.AttachVolume(ctx, &ori.AttachVolumeRequest{
-			MachineId: oriMachine.Metadata.Id,
-			Volume:    newORIVolume,
+		if _, err := r.MachineRuntime.AttachVolume(ctx, &iri.AttachVolumeRequest{
+			MachineId: iriMachine.Metadata.Id,
+			Volume:    newIRIVolume,
 		}); err != nil {
-			errs = append(errs, fmt.Errorf("[volume %s] %w", newORIVolume.Name, err))
+			errs = append(errs, fmt.Errorf("[volume %s] %w", newIRIVolume.Name, err))
 			continue
 		}
 
-		oriVolumes = append(oriVolumes, newORIVolume)
+		iriVolumes = append(iriVolumes, newIRIVolume)
 	}
 	if len(errs) > 0 {
 		return nil, errors.Join(errs...)
 	}
-	return oriVolumes, nil
+	return iriVolumes, nil
 }
 
-func (r *MachineReconciler) updateORIVolumes(
+func (r *MachineReconciler) updateIRIVolumes(
 	ctx context.Context,
 	log logr.Logger,
 	machine *computev1alpha1.Machine,
-	oriMachine *ori.Machine,
+	iriMachine *iri.Machine,
 	volumes []storagev1alpha1.Volume,
 ) error {
-	desiredORIVolumes, _, err := r.prepareORIVolumes(ctx, machine, volumes)
+	desiredIRIVolumes, _, err := r.prepareIRIVolumes(ctx, machine, volumes)
 	if err != nil {
-		return fmt.Errorf("error preparing ori volumes: %w", err)
+		return fmt.Errorf("error preparing iri volumes: %w", err)
 	}
 
-	extistingORIVolumes, err := r.getExistingORIVolumesForMachine(ctx, log, oriMachine, desiredORIVolumes)
+	extistingIRIVolumes, err := r.getExistingIRIVolumesForMachine(ctx, log, iriMachine, desiredIRIVolumes)
 	if err != nil {
-		return fmt.Errorf("error getting existing ori volumes for machine: %w", err)
+		return fmt.Errorf("error getting existing iri volumes for machine: %w", err)
 	}
 
-	_, err = r.getNewORIVolumesForMachine(ctx, log, oriMachine, desiredORIVolumes, extistingORIVolumes)
+	_, err = r.getNewIRIVolumesForMachine(ctx, log, iriMachine, desiredIRIVolumes, extistingIRIVolumes)
 	if err != nil {
-		return fmt.Errorf("error getting new ori volumes for machine: %w", err)
+		return fmt.Errorf("error getting new iri volumes for machine: %w", err)
 	}
 
 	return nil
@@ -322,11 +322,11 @@ func (r *MachineReconciler) updateORIVolumes(
 
 func (r *MachineReconciler) getVolumeStatusesForMachine(
 	machine *computev1alpha1.Machine,
-	oriMachine *ori.Machine,
+	iriMachine *iri.Machine,
 	now metav1.Time,
 ) ([]computev1alpha1.VolumeStatus, error) {
 	var (
-		oriVolumeStatusByName        = utilslices.ToMapByKey(oriMachine.Status.Volumes, (*ori.VolumeStatus).GetName)
+		iriVolumeStatusByName        = utilslices.ToMapByKey(iriMachine.Status.Volumes, (*iri.VolumeStatus).GetName)
 		existingVolumeStatusesByName = utilslices.ToMapByKey(machine.Status.Volumes, func(status computev1alpha1.VolumeStatus) string { return status.Name })
 		volumeStatuses               []computev1alpha1.VolumeStatus
 		errs                         []error
@@ -334,12 +334,12 @@ func (r *MachineReconciler) getVolumeStatusesForMachine(
 
 	for _, machineVolume := range machine.Spec.Volumes {
 		var (
-			oriVolumeStatus, ok = oriVolumeStatusByName[machineVolume.Name]
+			iriVolumeStatus, ok = iriVolumeStatusByName[machineVolume.Name]
 			volumeStatusValues  computev1alpha1.VolumeStatus
 		)
 		if ok {
 			var err error
-			volumeStatusValues, err = r.convertORIVolumeStatus(oriVolumeStatus)
+			volumeStatusValues, err = r.convertIRIVolumeStatus(iriVolumeStatus)
 			if err != nil {
 				return nil, fmt.Errorf("[volume %s] %w", machineVolume.Name, err)
 			}
@@ -360,27 +360,27 @@ func (r *MachineReconciler) getVolumeStatusesForMachine(
 	return volumeStatuses, nil
 }
 
-var oriVolumeStateToVolumeState = map[ori.VolumeState]computev1alpha1.VolumeState{
-	ori.VolumeState_VOLUME_ATTACHED: computev1alpha1.VolumeStateAttached,
-	ori.VolumeState_VOLUME_PENDING:  computev1alpha1.VolumeStatePending,
+var iriVolumeStateToVolumeState = map[iri.VolumeState]computev1alpha1.VolumeState{
+	iri.VolumeState_VOLUME_ATTACHED: computev1alpha1.VolumeStateAttached,
+	iri.VolumeState_VOLUME_PENDING:  computev1alpha1.VolumeStatePending,
 }
 
-func (r *MachineReconciler) convertORIVolumeState(oriState ori.VolumeState) (computev1alpha1.VolumeState, error) {
-	if res, ok := oriVolumeStateToVolumeState[oriState]; ok {
+func (r *MachineReconciler) convertIRIVolumeState(iriState iri.VolumeState) (computev1alpha1.VolumeState, error) {
+	if res, ok := iriVolumeStateToVolumeState[iriState]; ok {
 		return res, nil
 	}
-	return "", fmt.Errorf("unknown ori volume state %v", oriState)
+	return "", fmt.Errorf("unknown iri volume state %v", iriState)
 }
 
-func (r *MachineReconciler) convertORIVolumeStatus(oriVolumeStatus *ori.VolumeStatus) (computev1alpha1.VolumeStatus, error) {
-	state, err := r.convertORIVolumeState(oriVolumeStatus.State)
+func (r *MachineReconciler) convertIRIVolumeStatus(iriVolumeStatus *iri.VolumeStatus) (computev1alpha1.VolumeStatus, error) {
+	state, err := r.convertIRIVolumeState(iriVolumeStatus.State)
 	if err != nil {
 		return computev1alpha1.VolumeStatus{}, err
 	}
 
 	return computev1alpha1.VolumeStatus{
-		Name:   oriVolumeStatus.Name,
-		Handle: oriVolumeStatus.Handle,
+		Name:   iriVolumeStatus.Name,
+		Handle: iriVolumeStatus.Handle,
 		State:  state,
 	}, nil
 }

@@ -23,11 +23,11 @@ import (
 	"github.com/ironcore-dev/ironcore/broker/common/request"
 	"github.com/ironcore-dev/ironcore/broker/machinebroker/cluster"
 	"github.com/ironcore-dev/ironcore/broker/machinebroker/networks"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	"k8s.io/client-go/rest"
 )
 
-var _ ori.MachineRuntimeServer = (*Server)(nil)
+var _ iri.MachineRuntimeServer = (*Server)(nil)
 
 //+kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machines,verbs=get;list;watch;create;update;patch;delete
@@ -59,7 +59,7 @@ type Server struct {
 
 	networks *networks.Manager
 
-	execRequestCache request.Cache[*ori.ExecRequest]
+	execRequestCache request.Cache[*iri.ExecRequest]
 }
 
 type Options struct {
@@ -93,7 +93,7 @@ func New(cfg *rest.Config, namespace string, opts Options) (*Server, error) {
 		brokerDownwardAPILabels: opts.BrokerDownwardAPILabels,
 		cluster:                 c,
 		networks:                networks.NewManager(c),
-		execRequestCache:        request.NewCache[*ori.ExecRequest](),
+		execRequestCache:        request.NewCache[*iri.ExecRequest](),
 	}, nil
 }
 

@@ -23,7 +23,7 @@ import (
 	"github.com/ironcore-dev/controller-utils/configutils"
 	"github.com/ironcore-dev/ironcore/broker/bucketbroker/server"
 	"github.com/ironcore-dev/ironcore/broker/common"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/bucket/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"google.golang.org/grpc"
@@ -42,7 +42,7 @@ type Options struct {
 
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.Kubeconfig, "kubeconfig", o.Kubeconfig, "Path pointing to a kubeconfig file to use.")
-	fs.StringVar(&o.Address, "address", "/var/run/ori-bucketbroker.sock", "Address to listen on.")
+	fs.StringVar(&o.Address, "address", "/var/run/iri-bucketbroker.sock", "Address to listen on.")
 
 	fs.StringVar(&o.Namespace, "namespace", o.Namespace, "Target Kubernetes namespace to use.")
 	fs.StringVar(&o.BucketPoolName, "bucket-pool-name", o.BucketPoolName, "Name of the target bucket pool to pin buckets to, if any.")
@@ -122,7 +122,7 @@ func Run(ctx context.Context, opts Options) error {
 			return resp, err
 		}),
 	)
-	ori.RegisterBucketRuntimeServer(grpcSrv, srv)
+	iri.RegisterBucketRuntimeServer(grpcSrv, srv)
 
 	setupLog.Info("Starting server", "Address", l.Addr().String())
 	go func() {

@@ -103,13 +103,13 @@ spec:
         volumeMounts:
         - name: var-run
           mountPath: /var/run
-        - name: orictl-machine-config
-          mountPath: /.orictl-machine
+        - name: irictl-machine-config
+          mountPath: /.irictl-machine
       serviceAccountName: controller-manager
       terminationGracePeriodSeconds: 10
       volumes:
       - name: var-run
         emptyDir: { }
-      - name: orictl-machine-config
+      - name: irictl-machine-config
         configMap:
-          name: orictl-machine-config
+          name: irictl-machine-config

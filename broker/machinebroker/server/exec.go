@@ -23,12 +23,12 @@ import (
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	"github.com/ironcore-dev/ironcore/client-go/ironcore"
 	ironcoreclientgoscheme "github.com/ironcore-dev/ironcore/client-go/ironcore/scheme"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
-	remotecommandserver "github.com/ironcore-dev/ironcore/poollet/machinepoollet/ori/streaming/remotecommand"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
+	remotecommandserver "github.com/ironcore-dev/ironcore/poollet/machinepoollet/iri/streaming/remotecommand"
 	"k8s.io/client-go/tools/remotecommand"
 )
 
-func (s *Server) Exec(ctx context.Context, req *ori.ExecRequest) (*ori.ExecResponse, error) {
+func (s *Server) Exec(ctx context.Context, req *iri.ExecRequest) (*iri.ExecResponse, error) {
 	machineID := req.MachineId
 	log := s.loggerFrom(ctx, "MachineID", machineID)
 
@@ -39,7 +39,7 @@ func (s *Server) Exec(ctx context.Context, req *ori.ExecRequest) (*ori.ExecRespo
 	}
 
 	log.V(1).Info("Returning url with token")
-	return &ori.ExecResponse{
+	return &iri.ExecResponse{
 		Url: s.buildURL("exec", token),
 	}, nil
 }

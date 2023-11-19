@@ -27,7 +27,7 @@ import (
 	"github.com/ironcore-dev/ironcore/broker/common/idgen"
 	volumebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/volumebroker/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/volumebroker/apiutils"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/volume/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -97,7 +97,7 @@ func setOptionsDefaults(o *Options) {
 	}
 }
 
-var _ ori.VolumeRuntimeServer = (*Server)(nil)
+var _ iri.VolumeRuntimeServer = (*Server)(nil)
 
 //+kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumes,verbs=get;list;watch;create;update;patch;delete

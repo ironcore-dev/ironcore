@@ -26,9 +26,9 @@ import (
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	storageclient "github.com/ironcore-dev/ironcore/internal/client/storage"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/volume/v1alpha1"
-	oriremotevolume "github.com/ironcore-dev/ironcore/ori/remote/volume"
-	"github.com/ironcore-dev/ironcore/poollet/orievent"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
+	iriremotevolume "github.com/ironcore-dev/ironcore/iri/remote/volume"
+	"github.com/ironcore-dev/ironcore/poollet/irievent"
 	volumepoolletconfig "github.com/ironcore-dev/ironcore/poollet/volumepoollet/client/config"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
@@ -139,7 +139,7 @@ func Run(ctx context.Context, opts Options) error {
 		os.Exit(1)
 	}
 
-	endpoint, err := oriremotevolume.GetAddressWithTimeout(opts.VolumeRuntimeSocketDiscoveryTimeout, opts.VolumeRuntimeEndpoint)
+	endpoint, err := iriremotevolume.GetAddressWithTimeout(opts.VolumeRuntimeSocketDiscoveryTimeout, opts.VolumeRuntimeEndpoint)
 	if err != nil {
 		return fmt.Errorf("error detecting volume runtime endpoint: %w", err)
 	}
@@ -156,7 +156,7 @@ func Run(ctx context.Context, opts Options) error {
 		}
 	}()
 
-	volumeRuntime := ori.NewVolumeRuntimeClient(conn)
+	volumeRuntime := iri.NewVolumeRuntimeClient(conn)
 
 	cfg, configCtrl, err := getter.GetConfig(ctx, &opts.GetConfigOptions)
 	if err != nil {
@@ -192,13 +192,13 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error adding volume class mapper: %w", err)
 	}
 
-	volumeEvents := orievent.NewGenerator(func(ctx context.Context) ([]*ori.Volume, error) {
-		res, err := volumeRuntime.ListVolumes(ctx, &ori.ListVolumesRequest{})
+	volumeEvents := irievent.NewGenerator(func(ctx context.Context) ([]*iri.Volume, error) {
+		res, err := volumeRuntime.ListVolumes(ctx, &iri.ListVolumesRequest{})
 		if err != nil {
 			return nil, err
 		}
 		return res.Volumes, nil
-	}, orievent.GeneratorOptions{})
+	}, irievent.GeneratorOptions{})
 	if err := mgr.Add(volumeEvents); err != nil {
 		return fmt.Errorf("error adding volume event generator: %w", err)
 	}

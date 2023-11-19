@@ -24,7 +24,7 @@ import (
 	"github.com/ironcore-dev/ironcore/broker/common/cleaner"
 	machinebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/machinebroker/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/machinebroker/apiutils"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/utils/maps"
 	corev1 "k8s.io/api/core/v1"
@@ -49,18 +49,18 @@ func (s *Server) ironcoreMachinePoolRef() *corev1.LocalObjectReference {
 	return &corev1.LocalObjectReference{Name: s.cluster.MachinePoolName()}
 }
 
-func (s *Server) prepareIronCoreMachinePower(power ori.Power) (computev1alpha1.Power, error) {
+func (s *Server) prepareIronCoreMachinePower(power iri.Power) (computev1alpha1.Power, error) {
 	switch power {
-	case ori.Power_POWER_ON:
+	case iri.Power_POWER_ON:
 		return computev1alpha1.PowerOn, nil
-	case ori.Power_POWER_OFF:
+	case iri.Power_POWER_OFF:
 		return computev1alpha1.PowerOff, nil
 	default:
 		return "", fmt.Errorf("unknown power state %v", power)
 	}
 }
 
-func (s *Server) prepareIronCoreMachineLabels(machine *ori.Machine) (map[string]string, error) {
+func (s *Server) prepareIronCoreMachineLabels(machine *iri.Machine) (map[string]string, error) {
 	labels := make(map[string]string)
 
 	for downwardAPILabelName, defaultLabelName := range s.brokerDownwardAPILabels {
@@ -76,7 +76,7 @@ func (s *Server) prepareIronCoreMachineLabels(machine *ori.Machine) (map[string]
 	return labels, nil
 }
 
-func (s *Server) prepareIronCoreMachineAnnotations(machine *ori.Machine) (map[string]string, error) {
+func (s *Server) prepareIronCoreMachineAnnotations(machine *iri.Machine) (map[string]string, error) {
 	annotationsValue, err := apiutils.EncodeAnnotationsAnnotation(machine.GetMetadata().GetAnnotations())
 	if err != nil {
 		return nil, fmt.Errorf("error encoding annotations: %w", err)
@@ -93,7 +93,7 @@ func (s *Server) prepareIronCoreMachineAnnotations(machine *ori.Machine) (map[st
 	}, nil
 }
 
-func (s *Server) getIronCoreMachineConfig(machine *ori.Machine) (*IronCoreMachineConfig, error) {
+func (s *Server) getIronCoreMachineConfig(machine *iri.Machine) (*IronCoreMachineConfig, error) {
 	ironcorePower, err := s.prepareIronCoreMachinePower(machine.Spec.Power)
 	if err != nil {
 		return nil, err
@@ -265,7 +265,7 @@ func (s *Server) createIronCoreMachine(
 	}, nil
 }
 
-func (s *Server) CreateMachine(ctx context.Context, req *ori.CreateMachineRequest) (res *ori.CreateMachineResponse, retErr error) {
+func (s *Server) CreateMachine(ctx context.Context, req *iri.CreateMachineRequest) (res *iri.CreateMachineResponse, retErr error) {
 	log := s.loggerFrom(ctx)
 
 	log.V(1).Info("Getting ironcore machine config")
@@ -285,7 +285,7 @@ func (s *Server) CreateMachine(ctx context.Context, req *ori.CreateMachineReques
 		return nil, fmt.Errorf("error converting ironcore machine: %w", err)
 	}
 
-	return &ori.CreateMachineResponse{
+	return &iri.CreateMachineResponse{
 		Machine: m,
 	}, nil
 }

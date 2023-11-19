@@ -22,7 +22,7 @@ import (
 
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -89,14 +89,14 @@ func (s *Server) filterIronCoreMachineClasses(
 	return filtered
 }
 
-func (s *Server) convertIronCoreMachineClassStatus(machineClass *computev1alpha1.MachineClass, quantity *resource.Quantity) (*ori.MachineClassStatus, error) {
+func (s *Server) convertIronCoreMachineClassStatus(machineClass *computev1alpha1.MachineClass, quantity *resource.Quantity) (*iri.MachineClassStatus, error) {
 	cpu := machineClass.Capabilities.CPU()
 	memory := machineClass.Capabilities.Memory()
 
-	return &ori.MachineClassStatus{
-		MachineClass: &ori.MachineClass{
+	return &iri.MachineClassStatus{
+		MachineClass: &iri.MachineClass{
 			Name: machineClass.Name,
-			Capabilities: &ori.MachineClassCapabilities{
+			Capabilities: &iri.MachineClassCapabilities{
 				CpuMillis:   cpu.MilliValue(),
 				MemoryBytes: memory.Value(),
 			},
@@ -105,7 +105,7 @@ func (s *Server) convertIronCoreMachineClassStatus(machineClass *computev1alpha1
 	}, nil
 }
 
-func (s *Server) Status(ctx context.Context, req *ori.StatusRequest) (*ori.StatusResponse, error) {
+func (s *Server) Status(ctx context.Context, req *iri.StatusRequest) (*iri.StatusResponse, error) {
 	log := s.loggerFrom(ctx)
 
 	log.V(1).Info("Getting target ironcore machine pools")
@@ -119,7 +119,7 @@ func (s *Server) Status(ctx context.Context, req *ori.StatusRequest) (*ori.Statu
 
 	if len(availableIronCoreMachineClassNames) == 0 {
 		log.V(1).Info("No available machine classes")
-		return &ori.StatusResponse{MachineClassStatus: []*ori.MachineClassStatus{}}, nil
+		return &iri.StatusResponse{MachineClassStatus: []*iri.MachineClassStatus{}}, nil
 	}
 
 	log.V(1).Info("Gathering machine class quantity")
@@ -132,7 +132,7 @@ func (s *Server) Status(ctx context.Context, req *ori.StatusRequest) (*ori.Statu
 	}
 
 	availableIronCoreMachineClasses := s.filterIronCoreMachineClasses(availableIronCoreMachineClassNames, ironcoreMachineClassList.Items)
-	machineClassStatus := make([]*ori.MachineClassStatus, 0, len(availableIronCoreMachineClasses))
+	machineClassStatus := make([]*iri.MachineClassStatus, 0, len(availableIronCoreMachineClasses))
 	for _, ironcoreMachineClass := range availableIronCoreMachineClasses {
 		quantity, ok := machineClassQuantity[string(corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, ironcoreMachineClass.Name))]
 		if !ok {
@@ -149,7 +149,7 @@ func (s *Server) Status(ctx context.Context, req *ori.StatusRequest) (*ori.Statu
 	}
 
 	log.V(1).Info("Returning machine classes")
-	return &ori.StatusResponse{
+	return &iri.StatusResponse{
 		MachineClassStatus: machineClassStatus,
 	}, nil
 }

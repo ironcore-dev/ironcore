@@ -17,7 +17,7 @@ package server_test
 import (
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
@@ -31,19 +31,19 @@ var _ = Describe("DetachVolume", func() {
 
 	It("should correctly detach a volume", func(ctx SpecContext) {
 		By("creating a machine with a volume")
-		createMachineRes, err := srv.CreateMachine(ctx, &ori.CreateMachineRequest{
-			Machine: &ori.Machine{
-				Spec: &ori.MachineSpec{
-					Power: ori.Power_POWER_ON,
-					Image: &ori.ImageSpec{
+		createMachineRes, err := srv.CreateMachine(ctx, &iri.CreateMachineRequest{
+			Machine: &iri.Machine{
+				Spec: &iri.MachineSpec{
+					Power: iri.Power_POWER_ON,
+					Image: &iri.ImageSpec{
 						Image: "example.org/foo:latest",
 					},
 					Class: machineClass.Name,
-					Volumes: []*ori.Volume{
+					Volumes: []*iri.Volume{
 						{
 							Name:   "my-volume",
 							Device: "oda",
-							Connection: &ori.VolumeConnection{
+							Connection: &iri.VolumeConnection{
 								Driver: "ceph",
 								Handle: "mycephvolume",
 								Attributes: map[string]string{
@@ -62,7 +62,7 @@ var _ = Describe("DetachVolume", func() {
 		machineID := createMachineRes.Machine.Metadata.Id
 
 		By("detaching the volume")
-		Expect(srv.DetachVolume(ctx, &ori.DetachVolumeRequest{
+		Expect(srv.DetachVolume(ctx, &iri.DetachVolumeRequest{
 			MachineId: machineID,
 			Name:      "my-volume",
 		})).Error().NotTo(HaveOccurred())

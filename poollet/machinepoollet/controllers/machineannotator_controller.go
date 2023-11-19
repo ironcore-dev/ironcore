@@ -20,10 +20,10 @@ import (
 
 	"github.com/go-logr/logr"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
-	orimeta "github.com/ironcore-dev/ironcore/ori/apis/meta/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
+	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
+	"github.com/ironcore-dev/ironcore/poollet/irievent"
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
-	"github.com/ironcore-dev/ironcore/poollet/orievent"
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -38,7 +38,7 @@ import (
 type MachineAnnotatorReconciler struct {
 	client.Client
 
-	MachineEvents orievent.Source[*ori.Machine]
+	MachineEvents irievent.Source[*iri.Machine]
 }
 
 func (r *MachineAnnotatorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -55,8 +55,8 @@ func (r *MachineAnnotatorReconciler) Reconcile(ctx context.Context, req ctrl.Req
 	return ctrl.Result{}, nil
 }
 
-func machineAnnotatorEventHandler[O orimeta.Object](log logr.Logger, c chan<- event.GenericEvent) orievent.HandlerFuncs[O] {
-	handleEvent := func(obj orimeta.Object) {
+func machineAnnotatorEventHandler[O irimeta.Object](log logr.Logger, c chan<- event.GenericEvent) irievent.HandlerFuncs[O] {
+	handleEvent := func(obj irimeta.Object) {
 		namespace, ok := obj.GetMetadata().Labels[machinepoolletv1alpha1.MachineNamespaceLabel]
 		if !ok {
 			return
@@ -81,17 +81,17 @@ func machineAnnotatorEventHandler[O orimeta.Object](log logr.Logger, c chan<- ev
 		}
 	}
 
-	return orievent.HandlerFuncs[O]{
-		CreateFunc: func(event orievent.CreateEvent[O]) {
+	return irievent.HandlerFuncs[O]{
+		CreateFunc: func(event irievent.CreateEvent[O]) {
 			handleEvent(event.Object)
 		},
-		UpdateFunc: func(event orievent.UpdateEvent[O]) {
+		UpdateFunc: func(event irievent.UpdateEvent[O]) {
 			handleEvent(event.ObjectNew)
 		},
-		DeleteFunc: func(event orievent.DeleteEvent[O]) {
+		DeleteFunc: func(event irievent.DeleteEvent[O]) {
 			handleEvent(event.Object)
 		},
-		GenericFunc: func(event orievent.GenericEvent[O]) {
+		GenericFunc: func(event irievent.GenericEvent[O]) {
 			handleEvent(event.Object)
 		},
 	}
@@ -105,7 +105,7 @@ func (r *MachineAnnotatorReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		return err
 	}
 
-	src, err := r.oriMachineEventSource(mgr)
+	src, err := r.iriMachineEventSource(mgr)
 	if err != nil {
 		return err
 	}
@@ -117,19 +117,19 @@ func (r *MachineAnnotatorReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return nil
 }
 
-func (r *MachineAnnotatorReconciler) oriMachineEventSource(mgr ctrl.Manager) (source.Source, error) {
+func (r *MachineAnnotatorReconciler) iriMachineEventSource(mgr ctrl.Manager) (source.Source, error) {
 	ch := make(chan event.GenericEvent, 1024)
 
 	if err := mgr.Add(manager.RunnableFunc(func(ctx context.Context) error {
-		log := ctrl.LoggerFrom(ctx).WithName("machineannotator").WithName("orieventhandlers")
+		log := ctrl.LoggerFrom(ctx).WithName("machineannotator").WithName("irieventhandlers")
 
-		registrationFuncs := []func() (orievent.HandlerRegistration, error){
-			func() (orievent.HandlerRegistration, error) {
-				return r.MachineEvents.AddHandler(machineAnnotatorEventHandler[*ori.Machine](log, ch))
+		registrationFuncs := []func() (irievent.HandlerRegistration, error){
+			func() (irievent.HandlerRegistration, error) {
+				return r.MachineEvents.AddHandler(machineAnnotatorEventHandler[*iri.Machine](log, ch))
 			},
 		}
 
-		var handles []orievent.HandlerRegistration
+		var handles []irievent.HandlerRegistration
 		defer func() {
 			log.V(1).Info("Removing handles")
 			for _, handle := range handles {

@@ -22,9 +22,9 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/gogo/protobuf/proto"
-	"github.com/ironcore-dev/ironcore/ori/apis/machine"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
-	"github.com/ironcore-dev/ironcore/poollet/orievent"
+	"github.com/ironcore-dev/ironcore/iri/apis/machine"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
+	"github.com/ironcore-dev/ironcore/poollet/irievent"
 	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -36,10 +36,10 @@ type capabilities struct {
 	memoryBytes int64
 }
 
-func getCapabilities(oriCaps *ori.MachineClassCapabilities) capabilities {
+func getCapabilities(iriCaps *iri.MachineClassCapabilities) capabilities {
 	return capabilities{
-		cpuMillis:   oriCaps.CpuMillis,
-		memoryBytes: oriCaps.MemoryBytes,
+		cpuMillis:   iriCaps.CpuMillis,
+		memoryBytes: iriCaps.MemoryBytes,
 	}
 }
 
@@ -51,15 +51,15 @@ type Generic struct {
 
 	listener sets.Set[*listener]
 
-	machineClassByName         map[string]*ori.MachineClassStatus
-	machineClassByCapabilities map[capabilities][]*ori.MachineClassStatus
+	machineClassByName         map[string]*iri.MachineClassStatus
+	machineClassByCapabilities map[capabilities][]*iri.MachineClassStatus
 
 	machineRuntime machine.RuntimeService
 
 	relistPeriod time.Duration
 }
 
-func (g *Generic) AddListener(handler orievent.Listener) (orievent.ListenerRegistration, error) {
+func (g *Generic) AddListener(handler irievent.Listener) (irievent.ListenerRegistration, error) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 
@@ -72,7 +72,7 @@ func (g *Generic) AddListener(handler orievent.Listener) (orievent.ListenerRegis
 	}, nil
 }
 
-func (g *Generic) RemoveListener(listener orievent.ListenerRegistration) error {
+func (g *Generic) RemoveListener(listener irievent.ListenerRegistration) error {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 
@@ -86,7 +86,7 @@ func (g *Generic) RemoveListener(listener orievent.ListenerRegistration) error {
 	return nil
 }
 
-func shouldNotify(oldMachineClassByName map[string]*ori.MachineClassStatus, class *ori.MachineClassStatus) bool {
+func shouldNotify(oldMachineClassByName map[string]*iri.MachineClassStatus, class *iri.MachineClassStatus) bool {
 	oldMachineClass, ok := oldMachineClassByName[class.MachineClass.Name]
 	if !ok {
 		return true
@@ -97,7 +97,7 @@ func shouldNotify(oldMachineClassByName map[string]*ori.MachineClassStatus, clas
 
 func (g *Generic) relist(ctx context.Context, log logr.Logger) error {
 	log.V(1).Info("Relisting machine classes")
-	res, err := g.machineRuntime.Status(ctx, &ori.StatusRequest{})
+	res, err := g.machineRuntime.Status(ctx, &iri.StatusRequest{})
 	if err != nil {
 		return fmt.Errorf("error listing machine classes: %w", err)
 	}
@@ -158,7 +158,7 @@ func (g *Generic) Start(ctx context.Context) error {
 	return nil
 }
 
-func (g *Generic) GetMachineClassFor(ctx context.Context, name string, caps *ori.MachineClassCapabilities) (*ori.MachineClass, int64, error) {
+func (g *Generic) GetMachineClassFor(ctx context.Context, name string, caps *iri.MachineClassCapabilities) (*iri.MachineClass, int64, error) {
 	g.mu.RLock()
 	defer g.mu.RUnlock()
 
@@ -205,8 +205,8 @@ func NewGeneric(runtime machine.RuntimeService, opts GenericOptions) MachineClas
 	setGenericOptionsDefaults(&opts)
 	return &Generic{
 		synced:                     make(chan struct{}),
-		machineClassByName:         map[string]*ori.MachineClassStatus{},
-		machineClassByCapabilities: map[capabilities][]*ori.MachineClassStatus{},
+		machineClassByName:         map[string]*iri.MachineClassStatus{},
+		machineClassByCapabilities: map[capabilities][]*iri.MachineClassStatus{},
 		listener:                   sets.New[*listener](),
 		machineRuntime:             runtime,
 		relistPeriod:               opts.RelistPeriod,
@@ -214,7 +214,7 @@ func NewGeneric(runtime machine.RuntimeService, opts GenericOptions) MachineClas
 }
 
 type listener struct {
-	orievent.Listener
+	irievent.Listener
 }
 
 type listenerRegistration struct {

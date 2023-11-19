@@ -21,14 +21,14 @@ import (
 
 	"github.com/ironcore-dev/controller-utils/metautils"
 	machinebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/machinebroker/api/v1alpha1"
-	orimeta "github.com/ironcore-dev/ironcore/ori/apis/meta/v1alpha1"
+	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
-func GetObjectMetadata(o metav1.Object) (*orimeta.ObjectMetadata, error) {
+func GetObjectMetadata(o metav1.Object) (*irimeta.ObjectMetadata, error) {
 	annotations, err := GetAnnotationsAnnotation(o)
 	if err != nil {
 		return nil, err
@@ -44,7 +44,7 @@ func GetObjectMetadata(o metav1.Object) (*orimeta.ObjectMetadata, error) {
 		deletedAt = o.GetDeletionTimestamp().UnixNano()
 	}
 
-	return &orimeta.ObjectMetadata{
+	return &irimeta.ObjectMetadata{
 		Id:          o.GetName(),
 		Annotations: annotations,
 		Labels:      labels,
@@ -54,7 +54,7 @@ func GetObjectMetadata(o metav1.Object) (*orimeta.ObjectMetadata, error) {
 	}, nil
 }
 
-func SetObjectMetadata(o metav1.Object, metadata *orimeta.ObjectMetadata) error {
+func SetObjectMetadata(o metav1.Object, metadata *irimeta.ObjectMetadata) error {
 	if err := SetAnnotationsAnnotation(o, metadata.Annotations); err != nil {
 		return err
 	}

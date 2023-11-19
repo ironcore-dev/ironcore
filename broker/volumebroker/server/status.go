@@ -20,7 +20,7 @@ import (
 
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/volume/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -88,14 +88,14 @@ func (s *Server) filterIronCoreVolumeClasses(
 	return filtered
 }
 
-func (s *Server) convertIronCoreVolumeClassStatus(volumeClass *storagev1alpha1.VolumeClass, quantity *resource.Quantity) (*ori.VolumeClassStatus, error) {
+func (s *Server) convertIronCoreVolumeClassStatus(volumeClass *storagev1alpha1.VolumeClass, quantity *resource.Quantity) (*iri.VolumeClassStatus, error) {
 	tps := volumeClass.Capabilities.TPS()
 	iops := volumeClass.Capabilities.IOPS()
 
-	return &ori.VolumeClassStatus{
-		VolumeClass: &ori.VolumeClass{
+	return &iri.VolumeClassStatus{
+		VolumeClass: &iri.VolumeClass{
 			Name: volumeClass.Name,
-			Capabilities: &ori.VolumeClassCapabilities{
+			Capabilities: &iri.VolumeClassCapabilities{
 				Tps:  tps.Value(),
 				Iops: iops.Value(),
 			},
@@ -104,7 +104,7 @@ func (s *Server) convertIronCoreVolumeClassStatus(volumeClass *storagev1alpha1.V
 	}, nil
 }
 
-func (s *Server) Status(ctx context.Context, req *ori.StatusRequest) (*ori.StatusResponse, error) {
+func (s *Server) Status(ctx context.Context, req *iri.StatusRequest) (*iri.StatusResponse, error) {
 	log := s.loggerFrom(ctx)
 
 	log.V(1).Info("Getting target ironcore volume pools")
@@ -118,7 +118,7 @@ func (s *Server) Status(ctx context.Context, req *ori.StatusRequest) (*ori.Statu
 
 	if len(availableIronCoreVolumeClassNames) == 0 {
 		log.V(1).Info("No available volume classes")
-		return &ori.StatusResponse{VolumeClassStatus: []*ori.VolumeClassStatus{}}, nil
+		return &iri.StatusResponse{VolumeClassStatus: []*iri.VolumeClassStatus{}}, nil
 	}
 
 	log.V(1).Info("Gathering volume class quantity")
@@ -131,7 +131,7 @@ func (s *Server) Status(ctx context.Context, req *ori.StatusRequest) (*ori.Statu
 	}
 
 	availableIronCoreVolumeClasses := s.filterIronCoreVolumeClasses(availableIronCoreVolumeClassNames, ironcoreVolumeClassList.Items)
-	volumeClassStatus := make([]*ori.VolumeClassStatus, 0, len(availableIronCoreVolumeClasses))
+	volumeClassStatus := make([]*iri.VolumeClassStatus, 0, len(availableIronCoreVolumeClasses))
 	for _, ironcoreVolumeClass := range availableIronCoreVolumeClasses {
 		quantity, ok := volumeClassQuantity[string(corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeVolumeClass, ironcoreVolumeClass.Name))]
 		if !ok {
@@ -148,7 +148,7 @@ func (s *Server) Status(ctx context.Context, req *ori.StatusRequest) (*ori.Statu
 	}
 
 	log.V(1).Info("Returning volume classes")
-	return &ori.StatusResponse{
+	return &iri.StatusResponse{
 		VolumeClassStatus: volumeClassStatus,
 	}, nil
 }

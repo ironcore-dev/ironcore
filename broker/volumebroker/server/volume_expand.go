@@ -20,7 +20,7 @@ import (
 
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/volume/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -36,7 +36,7 @@ func (s *Server) setIronCoreVolumeResources(ctx context.Context, ironcoreVolume 
 	return nil
 }
 
-func (s *Server) ExpandVolume(ctx context.Context, req *ori.ExpandVolumeRequest) (*ori.ExpandVolumeResponse, error) {
+func (s *Server) ExpandVolume(ctx context.Context, req *iri.ExpandVolumeRequest) (*iri.ExpandVolumeResponse, error) {
 	volumeID := req.VolumeId
 	log := s.loggerFrom(ctx, "VolumeID", volumeID)
 
@@ -52,5 +52,5 @@ func (s *Server) ExpandVolume(ctx context.Context, req *ori.ExpandVolumeRequest)
 		return nil, fmt.Errorf("failed to expand volume: %w", err)
 	}
 
-	return &ori.ExpandVolumeResponse{}, nil
+	return &iri.ExpandVolumeResponse{}, nil
 }

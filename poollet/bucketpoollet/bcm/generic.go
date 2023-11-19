@@ -21,7 +21,7 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/bucket/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
 	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/util/wait"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -32,10 +32,10 @@ type capabilities struct {
 	iops int64
 }
 
-func getCapabilities(oriCaps *ori.BucketClassCapabilities) capabilities {
+func getCapabilities(iriCaps *iri.BucketClassCapabilities) capabilities {
 	return capabilities{
-		tps:  oriCaps.Tps,
-		iops: oriCaps.Iops,
+		tps:  iriCaps.Tps,
+		iops: iriCaps.Iops,
 	}
 }
 
@@ -45,17 +45,17 @@ type Generic struct {
 	sync   bool
 	synced chan struct{}
 
-	bucketClassByName         map[string]*ori.BucketClass
-	bucketClassByCapabilities map[capabilities][]*ori.BucketClass
+	bucketClassByName         map[string]*iri.BucketClass
+	bucketClassByCapabilities map[capabilities][]*iri.BucketClass
 
-	bucketRuntime ori.BucketRuntimeClient
+	bucketRuntime iri.BucketRuntimeClient
 
 	relistPeriod time.Duration
 }
 
 func (g *Generic) relist(ctx context.Context, log logr.Logger) error {
 	log.V(1).Info("Relisting bucket classes")
-	res, err := g.bucketRuntime.ListBucketClasses(ctx, &ori.ListBucketClassesRequest{})
+	res, err := g.bucketRuntime.ListBucketClasses(ctx, &iri.ListBucketClassesRequest{})
 	if err != nil {
 		return fmt.Errorf("error listing bucket classes: %w", err)
 	}
@@ -90,7 +90,7 @@ func (g *Generic) Start(ctx context.Context) error {
 	return nil
 }
 
-func (g *Generic) GetBucketClassFor(ctx context.Context, name string, caps *ori.BucketClassCapabilities) (*ori.BucketClass, error) {
+func (g *Generic) GetBucketClassFor(ctx context.Context, name string, caps *iri.BucketClassCapabilities) (*iri.BucketClass, error) {
 	g.mu.RLock()
 	defer g.mu.RUnlock()
 
@@ -133,12 +133,12 @@ func setGenericOptionsDefaults(o *GenericOptions) {
 	}
 }
 
-func NewGeneric(runtime ori.BucketRuntimeClient, opts GenericOptions) BucketClassMapper {
+func NewGeneric(runtime iri.BucketRuntimeClient, opts GenericOptions) BucketClassMapper {
 	setGenericOptionsDefaults(&opts)
 	return &Generic{
 		synced:                    make(chan struct{}),
-		bucketClassByName:         map[string]*ori.BucketClass{},
-		bucketClassByCapabilities: map[capabilities][]*ori.BucketClass{},
+		bucketClassByName:         map[string]*iri.BucketClass{},
+		bucketClassByCapabilities: map[capabilities][]*iri.BucketClass{},
 		bucketRuntime:             runtime,
 		relistPeriod:              opts.RelistPeriod,
 	}

@@ -24,8 +24,8 @@ import (
 	"github.com/ironcore-dev/controller-utils/clientutils"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	orimeta "github.com/ironcore-dev/ironcore/ori/apis/meta/v1alpha1"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/volume/v1alpha1"
+	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers/events"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
@@ -51,7 +51,7 @@ type VolumeReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
 
-	VolumeRuntime ori.VolumeRuntimeClient
+	VolumeRuntime iri.VolumeRuntimeClient
 
 	VolumeClassMapper vcm.VolumeClassMapper
 
@@ -59,7 +59,7 @@ type VolumeReconciler struct {
 	WatchFilterValue string
 }
 
-func (r *VolumeReconciler) oriVolumeLabels(volume *storagev1alpha1.Volume) map[string]string {
+func (r *VolumeReconciler) iriVolumeLabels(volume *storagev1alpha1.Volume) map[string]string {
 	return map[string]string{
 		volumepoolletv1alpha1.VolumeUIDLabel:       string(volume.UID),
 		volumepoolletv1alpha1.VolumeNamespaceLabel: volume.Namespace,
@@ -67,13 +67,13 @@ func (r *VolumeReconciler) oriVolumeLabels(volume *storagev1alpha1.Volume) map[s
 	}
 }
 
-func (r *VolumeReconciler) oriVolumeAnnotations(_ *storagev1alpha1.Volume) map[string]string {
+func (r *VolumeReconciler) iriVolumeAnnotations(_ *storagev1alpha1.Volume) map[string]string {
 	return map[string]string{}
 }
 
-func (r *VolumeReconciler) listORIVolumesByKey(ctx context.Context, volumeKey client.ObjectKey) ([]*ori.Volume, error) {
-	res, err := r.VolumeRuntime.ListVolumes(ctx, &ori.ListVolumesRequest{
-		Filter: &ori.VolumeFilter{
+func (r *VolumeReconciler) listIRIVolumesByKey(ctx context.Context, volumeKey client.ObjectKey) ([]*iri.Volume, error) {
+	res, err := r.VolumeRuntime.ListVolumes(ctx, &iri.ListVolumesRequest{
+		Filter: &iri.VolumeFilter{
 			LabelSelector: map[string]string{
 				volumepoolletv1alpha1.VolumeNamespaceLabel: volumeKey.Namespace,
 				volumepoolletv1alpha1.VolumeNameLabel:      volumeKey.Name,
@@ -87,9 +87,9 @@ func (r *VolumeReconciler) listORIVolumesByKey(ctx context.Context, volumeKey cl
 	return volumes, nil
 }
 
-func (r *VolumeReconciler) listORIVolumesByUID(ctx context.Context, volumeUID types.UID) ([]*ori.Volume, error) {
-	res, err := r.VolumeRuntime.ListVolumes(ctx, &ori.ListVolumesRequest{
-		Filter: &ori.VolumeFilter{
+func (r *VolumeReconciler) listIRIVolumesByUID(ctx context.Context, volumeUID types.UID) ([]*iri.Volume, error) {
+	res, err := r.VolumeRuntime.ListVolumes(ctx, &iri.ListVolumesRequest{
+		Filter: &iri.VolumeFilter{
 			LabelSelector: map[string]string{
 				volumepoolletv1alpha1.VolumeUIDLabel: string(volumeUID),
 			},
@@ -122,18 +122,18 @@ func (r *VolumeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 func (r *VolumeReconciler) deleteGone(ctx context.Context, log logr.Logger, volumeKey client.ObjectKey) (ctrl.Result, error) {
 	log.V(1).Info("Delete gone")
 
-	log.V(1).Info("Listing ori volumes by key")
-	volumes, err := r.listORIVolumesByKey(ctx, volumeKey)
+	log.V(1).Info("Listing iri volumes by key")
+	volumes, err := r.listIRIVolumesByKey(ctx, volumeKey)
 	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("error listing ori volumes by key: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error listing iri volumes by key: %w", err)
 	}
 
-	ok, err := r.deleteORIVolumes(ctx, log, volumes)
+	ok, err := r.deleteIRIVolumes(ctx, log, volumes)
 	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("error deleting ori volumes: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error deleting iri volumes: %w", err)
 	}
 	if !ok {
-		log.V(1).Info("Not all ori volumes are gone, requeueing")
+		log.V(1).Info("Not all iri volumes are gone, requeueing")
 		return ctrl.Result{Requeue: true}, nil
 	}
 
@@ -141,39 +141,39 @@ func (r *VolumeReconciler) deleteGone(ctx context.Context, log logr.Logger, volu
 	return ctrl.Result{}, nil
 }
 
-func (r *VolumeReconciler) deleteORIVolumes(ctx context.Context, log logr.Logger, volumes []*ori.Volume) (bool, error) {
+func (r *VolumeReconciler) deleteIRIVolumes(ctx context.Context, log logr.Logger, volumes []*iri.Volume) (bool, error) {
 	var (
 		errs                 []error
-		deletingORIVolumeIDs []string
+		deletingIRIVolumeIDs []string
 	)
 
 	for _, volume := range volumes {
-		oriVolumeID := volume.Metadata.Id
-		log := log.WithValues("ORIVolumeID", oriVolumeID)
-		log.V(1).Info("Deleting ori volume")
-		_, err := r.VolumeRuntime.DeleteVolume(ctx, &ori.DeleteVolumeRequest{
-			VolumeId: oriVolumeID,
+		iriVolumeID := volume.Metadata.Id
+		log := log.WithValues("IRIVolumeID", iriVolumeID)
+		log.V(1).Info("Deleting iri volume")
+		_, err := r.VolumeRuntime.DeleteVolume(ctx, &iri.DeleteVolumeRequest{
+			VolumeId: iriVolumeID,
 		})
 		if err != nil {
 			if status.Code(err) != codes.NotFound {
-				errs = append(errs, fmt.Errorf("error deleting ori volume %s: %w", oriVolumeID, err))
+				errs = append(errs, fmt.Errorf("error deleting iri volume %s: %w", iriVolumeID, err))
 			} else {
-				log.V(1).Info("ORI Volume is already gone")
+				log.V(1).Info("IRI Volume is already gone")
 			}
 		} else {
-			log.V(1).Info("Issued ori volume deletion")
-			deletingORIVolumeIDs = append(deletingORIVolumeIDs, oriVolumeID)
+			log.V(1).Info("Issued iri volume deletion")
+			deletingIRIVolumeIDs = append(deletingIRIVolumeIDs, iriVolumeID)
 		}
 	}
 
 	switch {
 	case len(errs) > 0:
-		return false, fmt.Errorf("error(s) deleting ori volume(s): %v", errs)
-	case len(deletingORIVolumeIDs) > 0:
-		log.V(1).Info("Volumes are in deletion", "DeletingORIVolumeIDs", deletingORIVolumeIDs)
+		return false, fmt.Errorf("error(s) deleting iri volume(s): %v", errs)
+	case len(deletingIRIVolumeIDs) > 0:
+		log.V(1).Info("Volumes are in deletion", "DeletingIRIVolumeIDs", deletingIRIVolumeIDs)
 		return false, nil
 	default:
-		log.V(1).Info("No ori volumes present")
+		log.V(1).Info("No iri volumes present")
 		return true, nil
 	}
 }
@@ -196,21 +196,21 @@ func (r *VolumeReconciler) delete(ctx context.Context, log logr.Logger, volume *
 	log.V(1).Info("Finalizer present")
 
 	log.V(1).Info("Listing volumes")
-	volumes, err := r.listORIVolumesByUID(ctx, volume.UID)
+	volumes, err := r.listIRIVolumesByUID(ctx, volume.UID)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error listing volumes by uid: %w", err)
 	}
 
-	ok, err := r.deleteORIVolumes(ctx, log, volumes)
+	ok, err := r.deleteIRIVolumes(ctx, log, volumes)
 	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("error deleting ori volumes: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error deleting iri volumes: %w", err)
 	}
 	if !ok {
-		log.V(1).Info("Not all ori volumes are gone, requeueing")
+		log.V(1).Info("Not all iri volumes are gone, requeueing")
 		return ctrl.Result{Requeue: true}, nil
 	}
 
-	log.V(1).Info("Deleted all ori volumes, removing finalizer")
+	log.V(1).Info("Deleted all iri volumes, removing finalizer")
 	if err := clientutils.PatchRemoveFinalizer(ctx, r.Client, volume, volumepoolletv1alpha1.VolumeFinalizer); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error removing finalizer: %w", err)
 	}
@@ -219,24 +219,24 @@ func (r *VolumeReconciler) delete(ctx context.Context, log logr.Logger, volume *
 	return ctrl.Result{}, nil
 }
 
-func getORIVolumeClassCapabilities(volumeClass *storagev1alpha1.VolumeClass) (*ori.VolumeClassCapabilities, error) {
+func getIRIVolumeClassCapabilities(volumeClass *storagev1alpha1.VolumeClass) (*iri.VolumeClassCapabilities, error) {
 	tps := volumeClass.Capabilities.TPS()
 	iops := volumeClass.Capabilities.IOPS()
 
-	return &ori.VolumeClassCapabilities{
+	return &iri.VolumeClassCapabilities{
 		Tps:  tps.Value(),
 		Iops: iops.Value(),
 	}, nil
 }
 
-func (r *VolumeReconciler) prepareORIVolumeMetadata(volume *storagev1alpha1.Volume) *orimeta.ObjectMetadata {
-	return &orimeta.ObjectMetadata{
-		Labels:      r.oriVolumeLabels(volume),
-		Annotations: r.oriVolumeAnnotations(volume),
+func (r *VolumeReconciler) prepareIRIVolumeMetadata(volume *storagev1alpha1.Volume) *irimeta.ObjectMetadata {
+	return &irimeta.ObjectMetadata{
+		Labels:      r.iriVolumeLabels(volume),
+		Annotations: r.iriVolumeAnnotations(volume),
 	}
 }
 
-func (r *VolumeReconciler) prepareORIVolumeClass(ctx context.Context, volume *storagev1alpha1.Volume, volumeClassName string) (string, bool, error) {
+func (r *VolumeReconciler) prepareIRIVolumeClass(ctx context.Context, volume *storagev1alpha1.Volume, volumeClassName string) (string, bool, error) {
 	volumeClass := &storagev1alpha1.VolumeClass{}
 	volumeClassKey := client.ObjectKey{Name: volumeClassName}
 	if err := r.Get(ctx, volumeClassKey, volumeClass); err != nil {
@@ -249,9 +249,9 @@ func (r *VolumeReconciler) prepareORIVolumeClass(ctx context.Context, volume *st
 		return "", false, nil
 	}
 
-	caps, err := getORIVolumeClassCapabilities(volumeClass)
+	caps, err := getIRIVolumeClassCapabilities(volumeClass)
 	if err != nil {
-		return "", false, fmt.Errorf("error getting ori volume class capabilities: %w", err)
+		return "", false, fmt.Errorf("error getting iri volume class capabilities: %w", err)
 	}
 
 	class, _, err := r.VolumeClassMapper.GetVolumeClassFor(ctx, volumeClassName, caps)
@@ -261,7 +261,7 @@ func (r *VolumeReconciler) prepareORIVolumeClass(ctx context.Context, volume *st
 	return class.Name, true, nil
 }
 
-func (r *VolumeReconciler) prepareORIVolumeEncryption(ctx context.Context, volume *storagev1alpha1.Volume) (*ori.EncryptionSpec, bool, error) {
+func (r *VolumeReconciler) prepareIRIVolumeEncryption(ctx context.Context, volume *storagev1alpha1.Volume) (*iri.EncryptionSpec, bool, error) {
 	encryption := volume.Spec.Encryption
 	if encryption == nil {
 		return nil, true, nil
@@ -279,63 +279,63 @@ func (r *VolumeReconciler) prepareORIVolumeEncryption(ctx context.Context, volum
 		return nil, false, nil
 	}
 
-	return &ori.EncryptionSpec{
+	return &iri.EncryptionSpec{
 		SecretData: encryptionSecret.Data,
 	}, true, nil
 }
 
-func (r *VolumeReconciler) prepareORIVolumeResources(_ context.Context, _ *storagev1alpha1.Volume, resources corev1alpha1.ResourceList) (*ori.VolumeResources, bool, error) {
+func (r *VolumeReconciler) prepareIRIVolumeResources(_ context.Context, _ *storagev1alpha1.Volume, resources corev1alpha1.ResourceList) (*iri.VolumeResources, bool, error) {
 	storageBytes := resources.Storage().Value()
 
-	return &ori.VolumeResources{
+	return &iri.VolumeResources{
 		StorageBytes: storageBytes,
 	}, true, nil
 }
 
-func (r *VolumeReconciler) prepareORIVolume(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume) (*ori.Volume, bool, error) {
+func (r *VolumeReconciler) prepareIRIVolume(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume) (*iri.Volume, bool, error) {
 	var (
 		ok   = true
 		errs []error
 	)
 
 	log.V(1).Info("Getting volume class")
-	class, classOK, err := r.prepareORIVolumeClass(ctx, volume, volume.Spec.VolumeClassRef.Name)
+	class, classOK, err := r.prepareIRIVolumeClass(ctx, volume, volume.Spec.VolumeClassRef.Name)
 	switch {
 	case err != nil:
-		errs = append(errs, fmt.Errorf("error preparing ori volume class: %w", err))
+		errs = append(errs, fmt.Errorf("error preparing iri volume class: %w", err))
 	case !classOK:
 		ok = false
 	}
 
 	log.V(1).Info("Getting encryption secret")
-	encryption, encryptionOK, err := r.prepareORIVolumeEncryption(ctx, volume)
+	encryption, encryptionOK, err := r.prepareIRIVolumeEncryption(ctx, volume)
 	switch {
 	case err != nil:
-		errs = append(errs, fmt.Errorf("error preparing ori volume class: %w", err))
+		errs = append(errs, fmt.Errorf("error preparing iri volume class: %w", err))
 	case !encryptionOK:
 		ok = false
 	}
 
-	resources, resourcesOK, err := r.prepareORIVolumeResources(ctx, volume, volume.Spec.Resources)
+	resources, resourcesOK, err := r.prepareIRIVolumeResources(ctx, volume, volume.Spec.Resources)
 	switch {
 	case err != nil:
-		errs = append(errs, fmt.Errorf("error preparing ori volume resources: %w", err))
+		errs = append(errs, fmt.Errorf("error preparing iri volume resources: %w", err))
 	case !resourcesOK:
 		ok = false
 	}
 
-	metadata := r.prepareORIVolumeMetadata(volume)
+	metadata := r.prepareIRIVolumeMetadata(volume)
 
 	if len(errs) > 0 {
-		return nil, false, fmt.Errorf("error(s) preparing ori volume: %v", errs)
+		return nil, false, fmt.Errorf("error(s) preparing iri volume: %v", errs)
 	}
 	if !ok {
 		return nil, false, nil
 	}
 
-	return &ori.Volume{
+	return &iri.Volume{
 		Metadata: metadata,
-		Spec: &ori.VolumeSpec{
+		Spec: &iri.VolumeSpec{
 			Image:      volume.Spec.Image,
 			Class:      class,
 			Resources:  resources,
@@ -369,8 +369,8 @@ func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volum
 	}
 
 	log.V(1).Info("Listing volumes")
-	res, err := r.VolumeRuntime.ListVolumes(ctx, &ori.ListVolumesRequest{
-		Filter: &ori.VolumeFilter{
+	res, err := r.VolumeRuntime.ListVolumes(ctx, &iri.ListVolumesRequest{
+		Filter: &iri.VolumeFilter{
 			LabelSelector: map[string]string{
 				volumepoolletv1alpha1.VolumeUIDLabel: string(volume.UID),
 			},
@@ -384,12 +384,12 @@ func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volum
 	case 0:
 		return r.create(ctx, log, volume)
 	case 1:
-		oriVolume := res.Volumes[0]
-		if err := r.update(ctx, log, volume, oriVolume); err != nil {
+		iriVolume := res.Volumes[0]
+		if err := r.update(ctx, log, volume, iriVolume); err != nil {
 			return ctrl.Result{}, fmt.Errorf("error updating volume: %w", err)
 		}
 
-		if err := r.updateStatus(ctx, log, volume, oriVolume); err != nil {
+		if err := r.updateStatus(ctx, log, volume, iriVolume); err != nil {
 			return ctrl.Result{}, fmt.Errorf("error updating volume status: %w", err)
 		}
 		return ctrl.Result{}, nil
@@ -401,32 +401,32 @@ func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volum
 func (r *VolumeReconciler) create(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume) (ctrl.Result, error) {
 	log.V(1).Info("Create")
 
-	log.V(1).Info("Preparing ori volume")
-	oriVolume, ok, err := r.prepareORIVolume(ctx, log, volume)
+	log.V(1).Info("Preparing iri volume")
+	iriVolume, ok, err := r.prepareIRIVolume(ctx, log, volume)
 	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("error preparing ori volume: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error preparing iri volume: %w", err)
 	}
 	if !ok {
-		log.V(1).Info("ORI volume is not yet ready to be prepared")
+		log.V(1).Info("IRI volume is not yet ready to be prepared")
 		return ctrl.Result{}, nil
 	}
 
 	log.V(1).Info("Creating volume")
-	res, err := r.VolumeRuntime.CreateVolume(ctx, &ori.CreateVolumeRequest{
-		Volume: oriVolume,
+	res, err := r.VolumeRuntime.CreateVolume(ctx, &iri.CreateVolumeRequest{
+		Volume: iriVolume,
 	})
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error creating volume: %w", err)
 	}
 
-	oriVolume = res.Volume
+	iriVolume = res.Volume
 
-	volumeID := oriVolume.Metadata.Id
+	volumeID := iriVolume.Metadata.Id
 	log = log.WithValues("VolumeID", volumeID)
 	log.V(1).Info("Created")
 
 	log.V(1).Info("Updating status")
-	if err := r.updateStatus(ctx, log, volume, oriVolume); err != nil {
+	if err := r.updateStatus(ctx, log, volume, iriVolume); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error updating volume status: %w", err)
 	}
 
@@ -434,14 +434,14 @@ func (r *VolumeReconciler) create(ctx context.Context, log logr.Logger, volume *
 	return ctrl.Result{}, nil
 }
 
-func (r *VolumeReconciler) update(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume, oriVolume *ori.Volume) error {
+func (r *VolumeReconciler) update(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume, iriVolume *iri.Volume) error {
 	storageBytes := volume.Spec.Resources.Storage().Value()
-	oldStorageBytes := oriVolume.Spec.Resources.StorageBytes
+	oldStorageBytes := iriVolume.Spec.Resources.StorageBytes
 	if storageBytes != oldStorageBytes {
 		log.V(1).Info("Expanding volume", "StorageBytes", storageBytes, "OldStorageBytes", oldStorageBytes)
-		if _, err := r.VolumeRuntime.ExpandVolume(ctx, &ori.ExpandVolumeRequest{
-			VolumeId: oriVolume.Metadata.Id,
-			Resources: &ori.VolumeResources{
+		if _, err := r.VolumeRuntime.ExpandVolume(ctx, &iri.ExpandVolumeRequest{
+			VolumeId: iriVolume.Metadata.Id,
+			Resources: &iri.VolumeResources{
 				StorageBytes: storageBytes,
 			},
 		}); err != nil {
@@ -457,27 +457,27 @@ func (r *VolumeReconciler) volumeSecretName(volumeName string, volumeHandle stri
 	return hex.EncodeToString(sum[:])[:63]
 }
 
-var oriVolumeStateToVolumeState = map[ori.VolumeState]storagev1alpha1.VolumeState{
-	ori.VolumeState_VOLUME_PENDING:   storagev1alpha1.VolumeStatePending,
-	ori.VolumeState_VOLUME_AVAILABLE: storagev1alpha1.VolumeStateAvailable,
-	ori.VolumeState_VOLUME_ERROR:     storagev1alpha1.VolumeStateError,
+var iriVolumeStateToVolumeState = map[iri.VolumeState]storagev1alpha1.VolumeState{
+	iri.VolumeState_VOLUME_PENDING:   storagev1alpha1.VolumeStatePending,
+	iri.VolumeState_VOLUME_AVAILABLE: storagev1alpha1.VolumeStateAvailable,
+	iri.VolumeState_VOLUME_ERROR:     storagev1alpha1.VolumeStateError,
 }
 
-func (r *VolumeReconciler) convertORIVolumeState(oriState ori.VolumeState) (storagev1alpha1.VolumeState, error) {
-	if res, ok := oriVolumeStateToVolumeState[oriState]; ok {
+func (r *VolumeReconciler) convertIRIVolumeState(iriState iri.VolumeState) (storagev1alpha1.VolumeState, error) {
+	if res, ok := iriVolumeStateToVolumeState[iriState]; ok {
 		return res, nil
 	}
-	return "", fmt.Errorf("unknown volume state %v", oriState)
+	return "", fmt.Errorf("unknown volume state %v", iriState)
 }
 
-func (r *VolumeReconciler) updateStatus(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume, oriVolume *ori.Volume) error {
+func (r *VolumeReconciler) updateStatus(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume, iriVolume *iri.Volume) error {
 	var access *storagev1alpha1.VolumeAccess
 
-	if oriVolume.Status.State == ori.VolumeState_VOLUME_AVAILABLE {
-		if oriAccess := oriVolume.Status.Access; oriAccess != nil {
+	if iriVolume.Status.State == iri.VolumeState_VOLUME_AVAILABLE {
+		if iriAccess := iriVolume.Status.Access; iriAccess != nil {
 			var secretRef *corev1.LocalObjectReference
 
-			if oriAccess.SecretData != nil {
+			if iriAccess.SecretData != nil {
 				log.V(1).Info("Applying volume secret")
 				volumeSecret := &corev1.Secret{
 					TypeMeta: metav1.TypeMeta{
@@ -486,12 +486,12 @@ func (r *VolumeReconciler) updateStatus(ctx context.Context, log logr.Logger, vo
 					},
 					ObjectMeta: metav1.ObjectMeta{
 						Namespace: volume.Namespace,
-						Name:      r.volumeSecretName(volume.Name, oriAccess.Handle),
+						Name:      r.volumeSecretName(volume.Name, iriAccess.Handle),
 						Labels: map[string]string{
 							volumepoolletv1alpha1.VolumeUIDLabel: string(volume.UID),
 						},
 					},
-					Data: oriAccess.SecretData,
+					Data: iriAccess.SecretData,
 				}
 				_ = ctrl.SetControllerReference(volume, volumeSecret, r.Scheme)
 				if err := r.Patch(ctx, volumeSecret, client.Apply, client.FieldOwner(volumepoolletv1alpha1.FieldOwner)); err != nil {
@@ -512,9 +512,9 @@ func (r *VolumeReconciler) updateStatus(ctx context.Context, log logr.Logger, vo
 
 			access = &storagev1alpha1.VolumeAccess{
 				SecretRef:        secretRef,
-				Driver:           oriAccess.Driver,
-				Handle:           oriAccess.Handle,
-				VolumeAttributes: oriAccess.Attributes,
+				Driver:           iriAccess.Driver,
+				Handle:           iriAccess.Handle,
+				VolumeAttributes: iriAccess.Attributes,
 			}
 		}
 
@@ -524,7 +524,7 @@ func (r *VolumeReconciler) updateStatus(ctx context.Context, log logr.Logger, vo
 	now := metav1.Now()
 
 	volume.Status.Access = access
-	newState, err := r.convertORIVolumeState(oriVolume.Status.State)
+	newState, err := r.convertIRIVolumeState(iriVolume.Status.State)
 	if err != nil {
 		return err
 	}

@@ -19,10 +19,10 @@ import (
 
 	"github.com/blang/semver/v4"
 	"github.com/ironcore-dev/ironcore/broker/machinebroker/version"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 )
 
-func (s *Server) Version(ctx context.Context, req *ori.VersionRequest) (*ori.VersionResponse, error) {
+func (s *Server) Version(ctx context.Context, req *iri.VersionRequest) (*iri.VersionResponse, error) {
 	var runtimeVersion string
 	switch {
 	case version.Version != "":
@@ -38,7 +38,7 @@ func (s *Server) Version(ctx context.Context, req *ori.VersionRequest) (*ori.Ver
 		runtimeVersion = "0.0.0"
 	}
 
-	return &ori.VersionResponse{
+	return &iri.VersionResponse{
 		RuntimeName:    version.RuntimeName,
 		RuntimeVersion: runtimeVersion,
 	}, nil

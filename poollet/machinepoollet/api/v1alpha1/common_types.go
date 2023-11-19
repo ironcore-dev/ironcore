@@ -27,7 +27,7 @@ const (
 	MachineNameLabel      = "machinepoollet.ironcore.dev/machine-name"
 
 	MachineGenerationAnnotation    = "machinepoollet.ironcore.dev/machine-generation"
-	ORIMachineGenerationAnnotation = "machinepoollet.ironcore.dev/orimachine-generation"
+	IRIMachineGenerationAnnotation = "machinepoollet.ironcore.dev/irimachine-generation"
 
 	NetworkInterfaceMappingAnnotation = "machinepoollet.ironcore.dev/networkinterfacemapping"
 

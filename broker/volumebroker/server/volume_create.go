@@ -23,7 +23,7 @@ import (
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	volumebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/volumebroker/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/volumebroker/apiutils"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/volume/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -36,7 +36,7 @@ type AggregateIronCoreVolume struct {
 	AccessSecret     *corev1.Secret
 }
 
-func (s *Server) getIronCoreVolumeConfig(_ context.Context, volume *ori.Volume) (*AggregateIronCoreVolume, error) {
+func (s *Server) getIronCoreVolumeConfig(_ context.Context, volume *iri.Volume) (*AggregateIronCoreVolume, error) {
 	var volumePoolRef *corev1.LocalObjectReference
 	if s.volumePoolName != "" {
 		volumePoolRef = &corev1.LocalObjectReference{
@@ -146,7 +146,7 @@ func (s *Server) createIronCoreVolume(ctx context.Context, log logr.Logger, volu
 	return nil
 }
 
-func (s *Server) CreateVolume(ctx context.Context, req *ori.CreateVolumeRequest) (res *ori.CreateVolumeResponse, retErr error) {
+func (s *Server) CreateVolume(ctx context.Context, req *iri.CreateVolumeRequest) (res *iri.CreateVolumeResponse, retErr error) {
 	log := s.loggerFrom(ctx)
 
 	log.V(1).Info("Getting volume configuration")
@@ -164,7 +164,7 @@ func (s *Server) CreateVolume(ctx context.Context, req *ori.CreateVolumeRequest)
 		return nil, err
 	}
 
-	return &ori.CreateVolumeResponse{
+	return &iri.CreateVolumeResponse{
 		Volume: v,
 	}, nil
 }

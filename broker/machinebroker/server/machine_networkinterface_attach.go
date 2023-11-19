@@ -25,7 +25,7 @@ import (
 	"github.com/ironcore-dev/ironcore/broker/common/cleaner"
 	machinebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/machinebroker/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/machinebroker/apiutils"
-	ori "github.com/ironcore-dev/ironcore/ori/apis/machine/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	"google.golang.org/grpc/codes"
 	grpcstatus "google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
@@ -40,7 +40,7 @@ type IronCoreNetworkInterfaceConfig struct {
 	Attributes map[string]string
 }
 
-func (s *Server) getIronCoreNetworkInterfaceConfig(nic *ori.NetworkInterface) (*IronCoreNetworkInterfaceConfig, error) {
+func (s *Server) getIronCoreNetworkInterfaceConfig(nic *iri.NetworkInterface) (*IronCoreNetworkInterfaceConfig, error) {
 	ips, err := s.parseIPs(nic.Ips)
 	if err != nil {
 		return nil, err
@@ -123,7 +123,7 @@ func (s *Server) attachIronCoreNetworkInterface(
 	return nil
 }
 
-func (s *Server) AttachNetworkInterface(ctx context.Context, req *ori.AttachNetworkInterfaceRequest) (res *ori.AttachNetworkInterfaceResponse, retErr error) {
+func (s *Server) AttachNetworkInterface(ctx context.Context, req *iri.AttachNetworkInterfaceRequest) (res *iri.AttachNetworkInterfaceResponse, retErr error) {
 	machineID := req.MachineId
 	networkInterfaceName := req.NetworkInterface.Name
 	log := s.loggerFrom(ctx, "MachineID", machineID, "NetworkInterfaceName", networkInterfaceName)
@@ -156,5 +156,5 @@ func (s *Server) AttachNetworkInterface(ctx context.Context, req *ori.AttachNetw
 		return nil, fmt.Errorf("error creating ironcore network interface: %w", err)
 	}
 
-	return &ori.AttachNetworkInterfaceResponse{}, nil
+	return &iri.AttachNetworkInterfaceResponse{}, nil
 }
