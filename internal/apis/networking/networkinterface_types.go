@@ -83,7 +83,7 @@ type NetworkInterfaceStatus struct {
 	VirtualIP *commonv1alpha1.IP
 }
 
-// NetworkInterfaceState is the ironcorestate of a NetworkInterface.
+// NetworkInterfaceState is the ironcore state of a NetworkInterface.
 type NetworkInterfaceState string
 
 const (

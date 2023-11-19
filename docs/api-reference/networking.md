@@ -1616,7 +1616,7 @@ map[string]string
 (<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.NetworkInterfaceStatus">NetworkInterfaceStatus</a>)
 </p>
 <div>
-<p>NetworkInterfaceState is the ironcorestate of a NetworkInterface.</p>
+<p>NetworkInterfaceState is the ironcore state of a NetworkInterface.</p>
 </div>
 <table>
 <thead>
