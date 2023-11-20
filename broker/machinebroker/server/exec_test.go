@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package server_test
 import (
 	"net/url"
 
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -27,7 +27,7 @@ var _ = Describe("Exec", func() {
 
 	It("should return an exec-url with a token", func(ctx SpecContext) {
 		By("issuing exec for an arbitrary machine id")
-		res, err := srv.Exec(ctx, &ori.ExecRequest{MachineId: "my-machine"})
+		res, err := srv.Exec(ctx, &iri.ExecRequest{MachineId: "my-machine"})
 		Expect(err).NotTo(HaveOccurred())
 
 		By("inspecting the result")

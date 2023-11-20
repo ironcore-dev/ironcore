@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	"github.com/onmetal/onmetal-api/poollet/orievent"
-	"github.com/onmetal/onmetal-api/poollet/volumepoollet/vcm"
-	onmetalapiclient "github.com/onmetal/onmetal-api/utils/client"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	"github.com/ironcore-dev/ironcore/poollet/irievent"
+	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
+	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -47,7 +47,7 @@ func (r *VolumePoolAnnotatorReconciler) Reconcile(ctx context.Context, req ctrl.
 		},
 	}
 
-	if err := onmetalapiclient.PatchAddReconcileAnnotation(ctx, r.Client, volumePool); client.IgnoreNotFound(err) != nil {
+	if err := ironcoreclient.PatchAddReconcileAnnotation(ctx, r.Client, volumePool); client.IgnoreNotFound(err) != nil {
 		return ctrl.Result{}, fmt.Errorf("error patching volume pool: %w", err)
 	}
 	return ctrl.Result{}, nil
@@ -61,7 +61,7 @@ func (r *VolumePoolAnnotatorReconciler) SetupWithManager(mgr ctrl.Manager) error
 		return err
 	}
 
-	src, err := r.oriClassEventSource(mgr)
+	src, err := r.iriClassEventSource(mgr)
 	if err != nil {
 		return err
 	}
@@ -75,7 +75,7 @@ func (r *VolumePoolAnnotatorReconciler) SetupWithManager(mgr ctrl.Manager) error
 	return nil
 }
 
-func (r *VolumePoolAnnotatorReconciler) volumePoolAnnotatorEventHandler(log logr.Logger, c chan<- event.GenericEvent) orievent.EnqueueFunc {
+func (r *VolumePoolAnnotatorReconciler) volumePoolAnnotatorEventHandler(log logr.Logger, c chan<- event.GenericEvent) irievent.EnqueueFunc {
 	handleEvent := func() {
 		select {
 		case c <- event.GenericEvent{Object: &storagev1alpha1.VolumePool{ObjectMeta: metav1.ObjectMeta{
@@ -87,22 +87,22 @@ func (r *VolumePoolAnnotatorReconciler) volumePoolAnnotatorEventHandler(log logr
 		}
 	}
 
-	return orievent.EnqueueFunc{EnqueueFunc: handleEvent}
+	return irievent.EnqueueFunc{EnqueueFunc: handleEvent}
 }
 
-func (r *VolumePoolAnnotatorReconciler) oriClassEventSource(mgr ctrl.Manager) (source.Source, error) {
+func (r *VolumePoolAnnotatorReconciler) iriClassEventSource(mgr ctrl.Manager) (source.Source, error) {
 	ch := make(chan event.GenericEvent, 1024)
 
 	if err := mgr.Add(manager.RunnableFunc(func(ctx context.Context) error {
-		log := ctrl.LoggerFrom(ctx).WithName("volumepool").WithName("orieventhandlers")
+		log := ctrl.LoggerFrom(ctx).WithName("volumepool").WithName("irieventhandlers")
 
-		notifierFuncs := []func() (orievent.ListenerRegistration, error){
-			func() (orievent.ListenerRegistration, error) {
+		notifierFuncs := []func() (irievent.ListenerRegistration, error){
+			func() (irievent.ListenerRegistration, error) {
 				return r.VolumeClassMapper.AddListener(r.volumePoolAnnotatorEventHandler(log, ch))
 			},
 		}
 
-		var notifier []orievent.ListenerRegistration
+		var notifier []irievent.ListenerRegistration
 		defer func() {
 			log.V(1).Info("Removing notifier")
 			for _, n := range notifier {

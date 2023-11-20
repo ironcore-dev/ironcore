@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 by the OnMetal authors.
+ * Copyright (c) 2022 by the IronCore authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 package validation
 
 import (
-	onmetalapivalidation "github.com/onmetal/onmetal-api/internal/api/validation"
-	"github.com/onmetal/onmetal-api/internal/apis/networking"
+	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
+	"github.com/ironcore-dev/ironcore/internal/apis/networking"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -50,14 +50,14 @@ var supportedVirtualIPTypes = sets.New(
 )
 
 func validateVirtualIPType(virtualIPType networking.VirtualIPType, fldPath *field.Path) field.ErrorList {
-	return onmetalapivalidation.ValidateEnum(supportedVirtualIPTypes, virtualIPType, fldPath, "must specify type")
+	return ironcorevalidation.ValidateEnum(supportedVirtualIPTypes, virtualIPType, fldPath, "must specify type")
 }
 
 func validateVirtualIPSpec(spec *networking.VirtualIPSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, validateVirtualIPType(spec.Type, fldPath.Child("type"))...)
-	allErrs = append(allErrs, onmetalapivalidation.ValidateIPFamily(spec.IPFamily, fldPath.Child("ipFamily"))...)
+	allErrs = append(allErrs, ironcorevalidation.ValidateIPFamily(spec.IPFamily, fldPath.Child("ipFamily"))...)
 
 	if targetRef := spec.TargetRef; targetRef != nil {
 		for _, msg := range apivalidation.NameIsDNSLabel(targetRef.Name, false) {
@@ -76,7 +76,7 @@ func validateVirtualIPSpecUpdate(newSpec, oldSpec *networking.VirtualIPSpec, fld
 	oldSpecCopy := oldSpec.DeepCopy()
 
 	oldSpecCopy.TargetRef = newSpec.TargetRef
-	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableFieldWithDiff(newSpecCopy, oldSpecCopy, fldPath)...)
+	allErrs = append(allErrs, ironcorevalidation.ValidateImmutableFieldWithDiff(newSpecCopy, oldSpecCopy, fldPath)...)
 
 	return allErrs
 }

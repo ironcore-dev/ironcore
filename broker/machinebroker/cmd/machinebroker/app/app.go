@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,12 +24,12 @@ import (
 	"net/url"
 
 	"github.com/go-logr/logr"
-	"github.com/onmetal/controller-utils/configutils"
-	"github.com/onmetal/onmetal-api/broker/common"
-	commongrpc "github.com/onmetal/onmetal-api/broker/common/grpc"
-	machinebrokerhttp "github.com/onmetal/onmetal-api/broker/machinebroker/http"
-	"github.com/onmetal/onmetal-api/broker/machinebroker/server"
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	"github.com/ironcore-dev/controller-utils/configutils"
+	"github.com/ironcore-dev/ironcore/broker/common"
+	commongrpc "github.com/ironcore-dev/ironcore/broker/common/grpc"
+	machinebrokerhttp "github.com/ironcore-dev/ironcore/broker/machinebroker/http"
+	"github.com/ironcore-dev/ironcore/broker/machinebroker/server"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"golang.org/x/sync/errgroup"
@@ -52,12 +52,12 @@ type Options struct {
 
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.Kubeconfig, "kubeconfig", o.Kubeconfig, "Path pointing to a kubeconfig file to use.")
-	fs.StringVar(&o.Address, "address", "/var/run/ori-machinebroker.sock", "Address to listen on.")
+	fs.StringVar(&o.Address, "address", "/var/run/iri-machinebroker.sock", "Address to listen on.")
 	fs.StringVar(&o.StreamingAddress, "streaming-address", "127.0.0.1:20251", "Address to run the streaming server on")
 	fs.StringVar(&o.BaseURL, "base-url", "", "The base url to construct urls for streaming from. If empty it will be "+
 		"constructed from the streaming-address")
 	fs.StringToStringVar(&o.BrokerDownwardAPILabels, "broker-downward-api-label", nil, "The labels to broker via downward API. "+
-		"Example is for instance to broker \"root-machine-uid\" initially obtained via \"machinepoollet.api.onmetal.de/machine-uid\".")
+		"Example is for instance to broker \"root-machine-uid\" initially obtained via \"machinepoollet.ironcore.dev/machine-uid\".")
 
 	fs.StringVar(&o.Namespace, "namespace", o.Namespace, "Target Kubernetes namespace to use.")
 	fs.StringVar(&o.MachinePoolName, "machine-pool-name", o.MachinePoolName, "Name of the target machine pool to pin machines to, if any.")
@@ -165,7 +165,7 @@ func runGRPCServer(ctx context.Context, setupLog logr.Logger, log logr.Logger, s
 			commongrpc.LogRequest,
 		),
 	)
-	ori.RegisterMachineRuntimeServer(grpcSrv, srv)
+	iri.RegisterMachineRuntimeServer(grpcSrv, srv)
 
 	log.V(1).Info("Start listening on unix socket", "Address", opts.Address)
 	l, err := net.Listen("unix", opts.Address)

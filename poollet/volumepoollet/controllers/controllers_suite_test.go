@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,19 +19,19 @@ import (
 	"testing"
 	"time"
 
-	"github.com/onmetal/controller-utils/buildutils"
-	"github.com/onmetal/controller-utils/modutils"
-	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	storageclient "github.com/onmetal/onmetal-api/internal/client/storage"
-	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
-	"github.com/onmetal/onmetal-api/ori/testing/volume"
-	"github.com/onmetal/onmetal-api/poollet/volumepoollet/controllers"
-	"github.com/onmetal/onmetal-api/poollet/volumepoollet/vcm"
-	utilsenvtest "github.com/onmetal/onmetal-api/utils/envtest"
-	"github.com/onmetal/onmetal-api/utils/envtest/apiserver"
-	"github.com/onmetal/onmetal-api/utils/envtest/controllermanager"
-	"github.com/onmetal/onmetal-api/utils/envtest/process"
+	"github.com/ironcore-dev/controller-utils/buildutils"
+	"github.com/ironcore-dev/controller-utils/modutils"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	storageclient "github.com/ironcore-dev/ironcore/internal/client/storage"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
+	"github.com/ironcore-dev/ironcore/iri/testing/volume"
+	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers"
+	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
+	utilsenvtest "github.com/ironcore-dev/ironcore/utils/envtest"
+	"github.com/ironcore-dev/ironcore/utils/envtest/apiserver"
+	"github.com/ironcore-dev/ironcore/utils/envtest/controllermanager"
+	"github.com/ironcore-dev/ironcore/utils/envtest/process"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -84,7 +84,7 @@ var _ = BeforeSuite(func() {
 	testEnv = &envtest.Environment{}
 	testEnvExt = &utilsenvtest.EnvironmentExtensions{
 		APIServiceDirectoryPaths: []string{
-			modutils.Dir("github.com/onmetal/onmetal-api", "config", "apiserver", "apiservice", "bases"),
+			modutils.Dir("github.com/ironcore-dev/ironcore", "config", "apiserver", "apiservice", "bases"),
 		},
 		ErrorIfAPIServicePathIsMissing: true,
 		AdditionalServices: []utilsenvtest.AdditionalService{
@@ -109,7 +109,7 @@ var _ = BeforeSuite(func() {
 	SetClient(k8sClient)
 
 	apiSrv, err := apiserver.New(cfg, apiserver.Options{
-		MainPath:     "github.com/onmetal/onmetal-api/cmd/onmetal-apiserver",
+		MainPath:     "github.com/ironcore-dev/ironcore/cmd/ironcore-apiserver",
 		BuildOptions: []buildutils.BuildOption{buildutils.ModModeMod},
 		ETCDServers:  []string{testEnv.ControlPlane.Etcd.URL.String()},
 		Host:         testEnvExt.APIServiceInstallOptions.LocalServingHost,
@@ -125,7 +125,7 @@ var _ = BeforeSuite(func() {
 
 	ctrlMgr, err := controllermanager.New(cfg, controllermanager.Options{
 		Args:         process.EmptyArgs().Set("controllers", "*"),
-		MainPath:     "github.com/onmetal/onmetal-api/cmd/onmetal-controller-manager",
+		MainPath:     "github.com/ironcore-dev/ironcore/cmd/ironcore-controller-manager",
 		BuildOptions: []buildutils.BuildOption{buildutils.ModModeMod},
 		Host:         testEnvExt.GetAdditionalServiceHost(controllerManagerService),
 		Port:         testEnvExt.GetAdditionalServicePort(controllerManagerService),
@@ -190,10 +190,10 @@ func SetupTest() (*corev1.Namespace, *storagev1alpha1.VolumePool, *storagev1alph
 		*srv = *volume.NewFakeRuntimeService()
 		srv.SetVolumeClasses([]*volume.FakeVolumeClassStatus{
 			{
-				VolumeClassStatus: ori.VolumeClassStatus{
-					VolumeClass: &ori.VolumeClass{
+				VolumeClassStatus: iri.VolumeClassStatus{
+					VolumeClass: &iri.VolumeClass{
 						Name: vc.Name,
-						Capabilities: &ori.VolumeClassCapabilities{
+						Capabilities: &iri.VolumeClassCapabilities{
 							Tps:  262144000,
 							Iops: 15000,
 						},
@@ -201,10 +201,10 @@ func SetupTest() (*corev1.Namespace, *storagev1alpha1.VolumePool, *storagev1alph
 				},
 			},
 			{
-				VolumeClassStatus: ori.VolumeClassStatus{
-					VolumeClass: &ori.VolumeClass{
+				VolumeClassStatus: iri.VolumeClassStatus{
+					VolumeClass: &iri.VolumeClass{
 						Name: expandableVc.Name,
-						Capabilities: &ori.VolumeClassCapabilities{
+						Capabilities: &iri.VolumeClassCapabilities{
 							Tps:  262144000,
 							Iops: 1000,
 						},

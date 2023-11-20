@@ -1,0 +1,11 @@
+tableConfig:
+  prependMachineColumns:
+  - name: RNamespace
+    template: >-
+      {{ with index .metadata.labels "downward-api.machinepoollet.ironcore.dev/root-machine-namespace" }}{{.}}{{ else }}{{ index .metadata.labels "machinepoollet.ironcore.dev/machine-namespace" }}{{ end }}
+  - name: RName
+    template: >-
+      {{ with index .metadata.labels "downward-api.machinepoollet.ironcore.dev/root-machine-name" }}{{.}}{{ else }}{{ index .metadata.labels "machinepoollet.ironcore.dev/machine-name" }}{{ end }}
+  - name: RUID
+    template: >-
+      {{ with index .metadata.labels "downward-api.machinepoollet.ironcore.dev/root-machine-uid" }}{{.}}{{ else }}{{ index .metadata.labels "machinepoollet.ironcore.dev/machine-uid" }}{{ end }}

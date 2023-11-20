@@ -1,18 +1,18 @@
 <p>Packages:</p>
 <ul>
 <li>
-<a href="#core.api.onmetal.de%2fv1alpha1">core.api.onmetal.de/v1alpha1</a>
+<a href="#core.ironcore.dev%2fv1alpha1">core.ironcore.dev/v1alpha1</a>
 </li>
 </ul>
-<h2 id="core.api.onmetal.de/v1alpha1">core.api.onmetal.de/v1alpha1</h2>
+<h2 id="core.ironcore.dev/v1alpha1">core.ironcore.dev/v1alpha1</h2>
 <div>
 <p>Package v1alpha1 is the v1alpha1 version of the API.</p>
 </div>
 Resource Types:
 <ul><li>
-<a href="#core.api.onmetal.de/v1alpha1.ResourceQuota">ResourceQuota</a>
+<a href="#core.ironcore.dev/v1alpha1.ResourceQuota">ResourceQuota</a>
 </li></ul>
-<h3 id="core.api.onmetal.de/v1alpha1.ResourceQuota">ResourceQuota
+<h3 id="core.ironcore.dev/v1alpha1.ResourceQuota">ResourceQuota
 </h3>
 <div>
 <p>ResourceQuota is the Schema for the resourcequotas API</p>
@@ -31,7 +31,7 @@ Resource Types:
 string</td>
 <td>
 <code>
-core.api.onmetal.de/v1alpha1
+core.ironcore.dev/v1alpha1
 </code>
 </td>
 </tr>
@@ -60,7 +60,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#core.api.onmetal.de/v1alpha1.ResourceQuotaSpec">
+<a href="#core.ironcore.dev/v1alpha1.ResourceQuotaSpec">
 ResourceQuotaSpec
 </a>
 </em>
@@ -73,7 +73,7 @@ ResourceQuotaSpec
 <td>
 <code>hard</code><br/>
 <em>
-<a href="#core.api.onmetal.de/v1alpha1.ResourceList">
+<a href="#core.ironcore.dev/v1alpha1.ResourceList">
 ResourceList
 </a>
 </em>
@@ -86,7 +86,7 @@ ResourceList
 <td>
 <code>scopeSelector</code><br/>
 <em>
-<a href="#core.api.onmetal.de/v1alpha1.ResourceScopeSelector">
+<a href="#core.ironcore.dev/v1alpha1.ResourceScopeSelector">
 ResourceScopeSelector
 </a>
 </em>
@@ -103,7 +103,7 @@ Note: By using certain ScopeSelectors, only certain resources may be tracked.</p
 <td>
 <code>status</code><br/>
 <em>
-<a href="#core.api.onmetal.de/v1alpha1.ResourceQuotaStatus">
+<a href="#core.ironcore.dev/v1alpha1.ResourceQuotaStatus">
 ResourceQuotaStatus
 </a>
 </em>
@@ -113,7 +113,7 @@ ResourceQuotaStatus
 </tr>
 </tbody>
 </table>
-<h3 id="core.api.onmetal.de/v1alpha1.ClassType">ClassType
+<h3 id="core.ironcore.dev/v1alpha1.ClassType">ClassType
 (<code>string</code> alias)</h3>
 <div>
 </div>
@@ -130,7 +130,7 @@ ResourceQuotaStatus
 <td></td>
 </tr></tbody>
 </table>
-<h3 id="core.api.onmetal.de/v1alpha1.ObjectSelector">ObjectSelector
+<h3 id="core.ironcore.dev/v1alpha1.ObjectSelector">ObjectSelector
 </h3>
 <div>
 <p>ObjectSelector specifies how to select objects of a certain kind.</p>
@@ -172,7 +172,7 @@ Kubernetes meta/v1.LabelSelector
 </tr>
 </tbody>
 </table>
-<h3 id="core.api.onmetal.de/v1alpha1.ResourceName">ResourceName
+<h3 id="core.ironcore.dev/v1alpha1.ResourceName">ResourceName
 (<code>string</code> alias)</h3>
 <div>
 <p>ResourceName is the name of a resource, most often used alongside a resource.Quantity.</p>
@@ -210,10 +210,10 @@ Kubernetes meta/v1.LabelSelector
 </td>
 </tr></tbody>
 </table>
-<h3 id="core.api.onmetal.de/v1alpha1.ResourceQuotaSpec">ResourceQuotaSpec
+<h3 id="core.ironcore.dev/v1alpha1.ResourceQuotaSpec">ResourceQuotaSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#core.api.onmetal.de/v1alpha1.ResourceQuota">ResourceQuota</a>)
+(<em>Appears on:</em><a href="#core.ironcore.dev/v1alpha1.ResourceQuota">ResourceQuota</a>)
 </p>
 <div>
 <p>ResourceQuotaSpec defines the desired state of ResourceQuotaSpec</p>
@@ -230,7 +230,7 @@ Kubernetes meta/v1.LabelSelector
 <td>
 <code>hard</code><br/>
 <em>
-<a href="#core.api.onmetal.de/v1alpha1.ResourceList">
+<a href="#core.ironcore.dev/v1alpha1.ResourceList">
 ResourceList
 </a>
 </em>
@@ -243,7 +243,7 @@ ResourceList
 <td>
 <code>scopeSelector</code><br/>
 <em>
-<a href="#core.api.onmetal.de/v1alpha1.ResourceScopeSelector">
+<a href="#core.ironcore.dev/v1alpha1.ResourceScopeSelector">
 ResourceScopeSelector
 </a>
 </em>
@@ -255,10 +255,10 @@ Note: By using certain ScopeSelectors, only certain resources may be tracked.</p
 </tr>
 </tbody>
 </table>
-<h3 id="core.api.onmetal.de/v1alpha1.ResourceQuotaStatus">ResourceQuotaStatus
+<h3 id="core.ironcore.dev/v1alpha1.ResourceQuotaStatus">ResourceQuotaStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#core.api.onmetal.de/v1alpha1.ResourceQuota">ResourceQuota</a>)
+(<em>Appears on:</em><a href="#core.ironcore.dev/v1alpha1.ResourceQuota">ResourceQuota</a>)
 </p>
 <div>
 <p>ResourceQuotaStatus is the status of a ResourceQuota.</p>
@@ -275,7 +275,7 @@ Note: By using certain ScopeSelectors, only certain resources may be tracked.</p
 <td>
 <code>hard</code><br/>
 <em>
-<a href="#core.api.onmetal.de/v1alpha1.ResourceList">
+<a href="#core.ironcore.dev/v1alpha1.ResourceList">
 ResourceList
 </a>
 </em>
@@ -289,7 +289,7 @@ case the limits were introduced / updated after more than allowed resources were
 <td>
 <code>used</code><br/>
 <em>
-<a href="#core.api.onmetal.de/v1alpha1.ResourceList">
+<a href="#core.ironcore.dev/v1alpha1.ResourceList">
 ResourceList
 </a>
 </em>
@@ -300,10 +300,10 @@ ResourceList
 </tr>
 </tbody>
 </table>
-<h3 id="core.api.onmetal.de/v1alpha1.ResourceScope">ResourceScope
+<h3 id="core.ironcore.dev/v1alpha1.ResourceScope">ResourceScope
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#core.api.onmetal.de/v1alpha1.ResourceScopeSelectorRequirement">ResourceScopeSelectorRequirement</a>)
+(<em>Appears on:</em><a href="#core.ironcore.dev/v1alpha1.ResourceScopeSelectorRequirement">ResourceScopeSelectorRequirement</a>)
 </p>
 <div>
 <p>ResourceScope is a scope of a resource.</p>
@@ -326,10 +326,10 @@ ResourceList
 </td>
 </tr></tbody>
 </table>
-<h3 id="core.api.onmetal.de/v1alpha1.ResourceScopeSelector">ResourceScopeSelector
+<h3 id="core.ironcore.dev/v1alpha1.ResourceScopeSelector">ResourceScopeSelector
 </h3>
 <p>
-(<em>Appears on:</em><a href="#core.api.onmetal.de/v1alpha1.ResourceQuotaSpec">ResourceQuotaSpec</a>)
+(<em>Appears on:</em><a href="#core.ironcore.dev/v1alpha1.ResourceQuotaSpec">ResourceQuotaSpec</a>)
 </p>
 <div>
 <p>ResourceScopeSelector selects</p>
@@ -346,7 +346,7 @@ ResourceList
 <td>
 <code>matchExpressions</code><br/>
 <em>
-<a href="#core.api.onmetal.de/v1alpha1.ResourceScopeSelectorRequirement">
+<a href="#core.ironcore.dev/v1alpha1.ResourceScopeSelectorRequirement">
 []ResourceScopeSelectorRequirement
 </a>
 </em>
@@ -357,10 +357,10 @@ ResourceList
 </tr>
 </tbody>
 </table>
-<h3 id="core.api.onmetal.de/v1alpha1.ResourceScopeSelectorOperator">ResourceScopeSelectorOperator
+<h3 id="core.ironcore.dev/v1alpha1.ResourceScopeSelectorOperator">ResourceScopeSelectorOperator
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#core.api.onmetal.de/v1alpha1.ResourceScopeSelectorRequirement">ResourceScopeSelectorRequirement</a>)
+(<em>Appears on:</em><a href="#core.ironcore.dev/v1alpha1.ResourceScopeSelectorRequirement">ResourceScopeSelectorRequirement</a>)
 </p>
 <div>
 <p>ResourceScopeSelectorOperator is an operator to compare a ResourceScope with values.</p>
@@ -382,10 +382,10 @@ ResourceList
 <td></td>
 </tr></tbody>
 </table>
-<h3 id="core.api.onmetal.de/v1alpha1.ResourceScopeSelectorRequirement">ResourceScopeSelectorRequirement
+<h3 id="core.ironcore.dev/v1alpha1.ResourceScopeSelectorRequirement">ResourceScopeSelectorRequirement
 </h3>
 <p>
-(<em>Appears on:</em><a href="#core.api.onmetal.de/v1alpha1.ResourceScopeSelector">ResourceScopeSelector</a>)
+(<em>Appears on:</em><a href="#core.ironcore.dev/v1alpha1.ResourceScopeSelector">ResourceScopeSelector</a>)
 </p>
 <div>
 <p>ResourceScopeSelectorRequirement is a requirement for a resource using a ResourceScope alongside
@@ -403,7 +403,7 @@ a ResourceScopeSelectorOperator with Values (depending on the ResourceScopeSelec
 <td>
 <code>scopeName</code><br/>
 <em>
-<a href="#core.api.onmetal.de/v1alpha1.ResourceScope">
+<a href="#core.ironcore.dev/v1alpha1.ResourceScope">
 ResourceScope
 </a>
 </em>
@@ -416,7 +416,7 @@ ResourceScope
 <td>
 <code>operator</code><br/>
 <em>
-<a href="#core.api.onmetal.de/v1alpha1.ResourceScopeSelectorOperator">
+<a href="#core.ironcore.dev/v1alpha1.ResourceScopeSelectorOperator">
 ResourceScopeSelectorOperator
 </a>
 </em>

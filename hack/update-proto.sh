@@ -20,27 +20,27 @@ trap 'rm -rf "$VIRTUAL_GOPATH"' EXIT
 # Setup virtual GOPATH so the codegen tools work as expected.
 (
 cd "$REPO_ROOT"
-"$VGOPATH" -o "$TGOPATH"
+"$VGOPATH" -o "$VIRTUAL_GOPATH"
 )
 
-export GOPATH="$TGOPATH"
+export GOPATH="$VIRTUAL_GOPATH"
 export GO111MODULE=off
 
 function generate() {
   package="$1"
   (
-  cd "$TGOPATH/src"
+  cd "$VIRTUAL_GOPATH/src"
   export PATH="$PATH:$(dirname "$PROTOC_GEN_GOGO")"
   echo "Generating ${blue}$package${normal}"
   protoc \
-    --proto_path "./github.com/onmetal/onmetal-api/$package" \
-    --proto_path "$TGOPATH/src" \
-    --gogo_out=plugins=grpc:"$TGOPATH/src" \
-    "./github.com/onmetal/onmetal-api/$package/api.proto"
+    --proto_path "./github.com/ironcore-dev/ironcore/$package" \
+    --proto_path "$VIRTUAL_GOPATH/src" \
+    --gogo_out=plugins=grpc:"$VIRTUAL_GOPATH/src" \
+    "./github.com/ironcore-dev/ironcore/$package/api.proto"
   )
 }
 
-generate "ori/apis/meta/v1alpha1"
-generate "ori/apis/machine/v1alpha1"
-generate "ori/apis/volume/v1alpha1"
-generate "ori/apis/bucket/v1alpha1"
+generate "iri/apis/meta/v1alpha1"
+generate "iri/apis/machine/v1alpha1"
+generate "iri/apis/volume/v1alpha1"
+generate "iri/apis/bucket/v1alpha1"

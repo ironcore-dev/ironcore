@@ -1,22 +1,22 @@
 <p>Packages:</p>
 <ul>
 <li>
-<a href="#compute.api.onmetal.de%2fv1alpha1">compute.api.onmetal.de/v1alpha1</a>
+<a href="#compute.ironcore.dev%2fv1alpha1">compute.ironcore.dev/v1alpha1</a>
 </li>
 </ul>
-<h2 id="compute.api.onmetal.de/v1alpha1">compute.api.onmetal.de/v1alpha1</h2>
+<h2 id="compute.ironcore.dev/v1alpha1">compute.ironcore.dev/v1alpha1</h2>
 <div>
 <p>Package v1alpha1 is the v1alpha1 version of the API.</p>
 </div>
 Resource Types:
 <ul><li>
-<a href="#compute.api.onmetal.de/v1alpha1.Machine">Machine</a>
+<a href="#compute.ironcore.dev/v1alpha1.Machine">Machine</a>
 </li><li>
-<a href="#compute.api.onmetal.de/v1alpha1.MachineClass">MachineClass</a>
+<a href="#compute.ironcore.dev/v1alpha1.MachineClass">MachineClass</a>
 </li><li>
-<a href="#compute.api.onmetal.de/v1alpha1.MachinePool">MachinePool</a>
+<a href="#compute.ironcore.dev/v1alpha1.MachinePool">MachinePool</a>
 </li></ul>
-<h3 id="compute.api.onmetal.de/v1alpha1.Machine">Machine
+<h3 id="compute.ironcore.dev/v1alpha1.Machine">Machine
 </h3>
 <div>
 <p>Machine is the Schema for the machines API</p>
@@ -35,7 +35,7 @@ Resource Types:
 string</td>
 <td>
 <code>
-compute.api.onmetal.de/v1alpha1
+compute.ironcore.dev/v1alpha1
 </code>
 </td>
 </tr>
@@ -64,7 +64,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.MachineSpec">
+<a href="#compute.ironcore.dev/v1alpha1.MachineSpec">
 MachineSpec
 </a>
 </em>
@@ -115,7 +115,7 @@ If empty, a scheduler will figure out an appropriate pool to run the machine in.
 <td>
 <code>power</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.Power">
+<a href="#compute.ironcore.dev/v1alpha1.Power">
 Power
 </a>
 </em>
@@ -154,7 +154,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>networkInterfaces</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.NetworkInterface">
+<a href="#compute.ironcore.dev/v1alpha1.NetworkInterface">
 []NetworkInterface
 </a>
 </em>
@@ -168,7 +168,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>volumes</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.Volume">
+<a href="#compute.ironcore.dev/v1alpha1.Volume">
 []Volume
 </a>
 </em>
@@ -182,8 +182,8 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>ignitionRef</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.SecretKeySelector">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.SecretKeySelector
+<a href="../common/#common.ironcore.dev/v1alpha1.SecretKeySelector">
+github.com/ironcore-dev/ironcore/api/common/v1alpha1.SecretKeySelector
 </a>
 </em>
 </td>
@@ -196,7 +196,7 @@ If key is empty, DefaultIgnitionKey will be used as fallback.</p>
 <td>
 <code>efiVars</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.EFIVar">
+<a href="#compute.ironcore.dev/v1alpha1.EFIVar">
 []EFIVar
 </a>
 </em>
@@ -210,8 +210,8 @@ If key is empty, DefaultIgnitionKey will be used as fallback.</p>
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.Toleration">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
+<a href="../common/#common.ironcore.dev/v1alpha1.Toleration">
+[]github.com/ironcore-dev/ironcore/api/common/v1alpha1.Toleration
 </a>
 </em>
 </td>
@@ -227,7 +227,7 @@ covered by Tolerations will be considered to run the Machine.</p>
 <td>
 <code>status</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.MachineStatus">
+<a href="#compute.ironcore.dev/v1alpha1.MachineStatus">
 MachineStatus
 </a>
 </em>
@@ -237,7 +237,7 @@ MachineStatus
 </tr>
 </tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.MachineClass">MachineClass
+<h3 id="compute.ironcore.dev/v1alpha1.MachineClass">MachineClass
 </h3>
 <div>
 <p>MachineClass is the Schema for the machineclasses API</p>
@@ -256,7 +256,7 @@ MachineStatus
 string</td>
 <td>
 <code>
-compute.api.onmetal.de/v1alpha1
+compute.ironcore.dev/v1alpha1
 </code>
 </td>
 </tr>
@@ -285,8 +285,8 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>capabilities</code><br/>
 <em>
-<a href="../core/#core.api.onmetal.de/v1alpha1.ResourceList">
-github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
+<a href="../core/#core.ironcore.dev/v1alpha1.ResourceList">
+github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceList
 </a>
 </em>
 </td>
@@ -295,7 +295,7 @@ github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
 </tr>
 </tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.MachinePool">MachinePool
+<h3 id="compute.ironcore.dev/v1alpha1.MachinePool">MachinePool
 </h3>
 <div>
 <p>MachinePool is the Schema for the machinepools API</p>
@@ -314,7 +314,7 @@ github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
 string</td>
 <td>
 <code>
-compute.api.onmetal.de/v1alpha1
+compute.ironcore.dev/v1alpha1
 </code>
 </td>
 </tr>
@@ -343,7 +343,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.MachinePoolSpec">
+<a href="#compute.ironcore.dev/v1alpha1.MachinePoolSpec">
 MachinePoolSpec
 </a>
 </em>
@@ -367,8 +367,8 @@ string
 <td>
 <code>taints</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.Taint">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Taint
+<a href="../common/#common.ironcore.dev/v1alpha1.Taint">
+[]github.com/ironcore-dev/ironcore/api/common/v1alpha1.Taint
 </a>
 </em>
 </td>
@@ -384,7 +384,7 @@ will land in the MachinePool.</p>
 <td>
 <code>status</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.MachinePoolStatus">
+<a href="#compute.ironcore.dev/v1alpha1.MachinePoolStatus">
 MachinePoolStatus
 </a>
 </em>
@@ -394,10 +394,10 @@ MachinePoolStatus
 </tr>
 </tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.DaemonEndpoint">DaemonEndpoint
+<h3 id="compute.ironcore.dev/v1alpha1.DaemonEndpoint">DaemonEndpoint
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachinePoolDaemonEndpoints">MachinePoolDaemonEndpoints</a>)
+(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.MachinePoolDaemonEndpoints">MachinePoolDaemonEndpoints</a>)
 </p>
 <div>
 <p>DaemonEndpoint contains information about a single Daemon endpoint.</p>
@@ -423,10 +423,10 @@ int32
 </tr>
 </tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.EFIVar">EFIVar
+<h3 id="compute.ironcore.dev/v1alpha1.EFIVar">EFIVar
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachineSpec">MachineSpec</a>)
+(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.MachineSpec">MachineSpec</a>)
 </p>
 <div>
 <p>EFIVar is a variable to pass to EFI while booting up.</p>
@@ -474,10 +474,10 @@ string
 </tr>
 </tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.EmptyDiskVolumeSource">EmptyDiskVolumeSource
+<h3 id="compute.ironcore.dev/v1alpha1.EmptyDiskVolumeSource">EmptyDiskVolumeSource
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.VolumeSource">VolumeSource</a>)
+(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.VolumeSource">VolumeSource</a>)
 </p>
 <div>
 <p>EmptyDiskVolumeSource is a volume that&rsquo;s offered by the machine pool provider.
@@ -508,10 +508,10 @@ The default is nil which means that the limit is undefined.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.EphemeralNetworkInterfaceSource">EphemeralNetworkInterfaceSource
+<h3 id="compute.ironcore.dev/v1alpha1.EphemeralNetworkInterfaceSource">EphemeralNetworkInterfaceSource
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.NetworkInterfaceSource">NetworkInterfaceSource</a>)
+(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.NetworkInterfaceSource">NetworkInterfaceSource</a>)
 </p>
 <div>
 <p>EphemeralNetworkInterfaceSource is a definition for an ephemeral (i.e. coupled to the lifetime of the surrounding
@@ -529,8 +529,8 @@ object) networking.NetworkInterface.</p>
 <td>
 <code>networkInterfaceTemplate</code><br/>
 <em>
-<a href="../networking/#networking.api.onmetal.de/v1alpha1.NetworkInterfaceTemplateSpec">
-github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkInterfaceTemplateSpec
+<a href="../networking/#networking.ironcore.dev/v1alpha1.NetworkInterfaceTemplateSpec">
+github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkInterfaceTemplateSpec
 </a>
 </em>
 </td>
@@ -540,10 +540,10 @@ github.com/onmetal/onmetal-api/api/networking/v1alpha1.NetworkInterfaceTemplateS
 </tr>
 </tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.EphemeralVolumeSource">EphemeralVolumeSource
+<h3 id="compute.ironcore.dev/v1alpha1.EphemeralVolumeSource">EphemeralVolumeSource
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.VolumeSource">VolumeSource</a>)
+(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.VolumeSource">VolumeSource</a>)
 </p>
 <div>
 <p>EphemeralVolumeSource is a definition for an ephemeral (i.e. coupled to the lifetime of the surrounding object)
@@ -561,8 +561,8 @@ storage.Volume.</p>
 <td>
 <code>volumeTemplate</code><br/>
 <em>
-<a href="../storage/#storage.api.onmetal.de/v1alpha1.VolumeTemplateSpec">
-github.com/onmetal/onmetal-api/api/storage/v1alpha1.VolumeTemplateSpec
+<a href="../storage/#storage.ironcore.dev/v1alpha1.VolumeTemplateSpec">
+github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeTemplateSpec
 </a>
 </em>
 </td>
@@ -572,7 +572,7 @@ github.com/onmetal/onmetal-api/api/storage/v1alpha1.VolumeTemplateSpec
 </tr>
 </tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.MachineExecOptions">MachineExecOptions
+<h3 id="compute.ironcore.dev/v1alpha1.MachineExecOptions">MachineExecOptions
 </h3>
 <div>
 <p>MachineExecOptions is the query options to a Machine&rsquo;s remote exec call</p>
@@ -597,10 +597,10 @@ bool
 </tr>
 </tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.MachinePoolAddress">MachinePoolAddress
+<h3 id="compute.ironcore.dev/v1alpha1.MachinePoolAddress">MachinePoolAddress
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachinePoolStatus">MachinePoolStatus</a>)
+(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.MachinePoolStatus">MachinePoolStatus</a>)
 </p>
 <div>
 </div>
@@ -616,7 +616,7 @@ bool
 <td>
 <code>type</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.MachinePoolAddressType">
+<a href="#compute.ironcore.dev/v1alpha1.MachinePoolAddressType">
 MachinePoolAddressType
 </a>
 </em>
@@ -636,10 +636,10 @@ string
 </tr>
 </tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.MachinePoolAddressType">MachinePoolAddressType
+<h3 id="compute.ironcore.dev/v1alpha1.MachinePoolAddressType">MachinePoolAddressType
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachinePoolAddress">MachinePoolAddress</a>)
+(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.MachinePoolAddress">MachinePoolAddress</a>)
 </p>
 <div>
 </div>
@@ -670,7 +670,7 @@ be a listed MachinePoolInternalIP address.</p>
 </td>
 </tr><tr><td><p>&#34;InternalIP&#34;</p></td>
 <td><p>MachinePoolInternalIP identifies an IP address which may not be visible to hosts outside the cluster.
-By default, it is assumed that onmetal-api-apiserver can reach machine pool internal IPs, though it is possible
+By default, it is assumed that ironcore-apiserver can reach machine pool internal IPs, though it is possible
 to configure clusters where this is not the case.</p>
 <p>MachinePoolInternalIP is the default type of machine pool IP, and does not necessarily imply
 that the IP is ONLY reachable internally. If a machine pool has multiple internal IPs,
@@ -678,10 +678,10 @@ no specific semantics are assigned to the additional IPs.</p>
 </td>
 </tr></tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.MachinePoolCondition">MachinePoolCondition
+<h3 id="compute.ironcore.dev/v1alpha1.MachinePoolCondition">MachinePoolCondition
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachinePoolStatus">MachinePoolStatus</a>)
+(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.MachinePoolStatus">MachinePoolStatus</a>)
 </p>
 <div>
 <p>MachinePoolCondition is one of the conditions of a volume.</p>
@@ -698,7 +698,7 @@ no specific semantics are assigned to the additional IPs.</p>
 <td>
 <code>type</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.MachinePoolConditionType">
+<a href="#compute.ironcore.dev/v1alpha1.MachinePoolConditionType">
 MachinePoolConditionType
 </a>
 </em>
@@ -768,18 +768,18 @@ Kubernetes meta/v1.Time
 </tr>
 </tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.MachinePoolConditionType">MachinePoolConditionType
+<h3 id="compute.ironcore.dev/v1alpha1.MachinePoolConditionType">MachinePoolConditionType
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachinePoolCondition">MachinePoolCondition</a>)
+(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.MachinePoolCondition">MachinePoolCondition</a>)
 </p>
 <div>
 <p>MachinePoolConditionType is a type a MachinePoolCondition can have.</p>
 </div>
-<h3 id="compute.api.onmetal.de/v1alpha1.MachinePoolDaemonEndpoints">MachinePoolDaemonEndpoints
+<h3 id="compute.ironcore.dev/v1alpha1.MachinePoolDaemonEndpoints">MachinePoolDaemonEndpoints
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachinePoolStatus">MachinePoolStatus</a>)
+(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.MachinePoolStatus">MachinePoolStatus</a>)
 </p>
 <div>
 <p>MachinePoolDaemonEndpoints lists ports opened by daemons running on the MachinePool.</p>
@@ -796,7 +796,7 @@ Kubernetes meta/v1.Time
 <td>
 <code>machinepoolletEndpoint</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.DaemonEndpoint">
+<a href="#compute.ironcore.dev/v1alpha1.DaemonEndpoint">
 DaemonEndpoint
 </a>
 </em>
@@ -808,10 +808,10 @@ DaemonEndpoint
 </tr>
 </tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.MachinePoolSpec">MachinePoolSpec
+<h3 id="compute.ironcore.dev/v1alpha1.MachinePoolSpec">MachinePoolSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachinePool">MachinePool</a>)
+(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.MachinePool">MachinePool</a>)
 </p>
 <div>
 <p>MachinePoolSpec defines the desired state of MachinePool</p>
@@ -839,8 +839,8 @@ string
 <td>
 <code>taints</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.Taint">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Taint
+<a href="../common/#common.ironcore.dev/v1alpha1.Taint">
+[]github.com/ironcore-dev/ironcore/api/common/v1alpha1.Taint
 </a>
 </em>
 </td>
@@ -851,10 +851,10 @@ will land in the MachinePool.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.MachinePoolState">MachinePoolState
+<h3 id="compute.ironcore.dev/v1alpha1.MachinePoolState">MachinePoolState
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachinePoolStatus">MachinePoolStatus</a>)
+(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.MachinePoolStatus">MachinePoolStatus</a>)
 </p>
 <div>
 <p>MachinePoolState is a state a MachinePool can be in.</p>
@@ -880,10 +880,10 @@ will land in the MachinePool.</p>
 </td>
 </tr></tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.MachinePoolStatus">MachinePoolStatus
+<h3 id="compute.ironcore.dev/v1alpha1.MachinePoolStatus">MachinePoolStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachinePool">MachinePool</a>)
+(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.MachinePool">MachinePool</a>)
 </p>
 <div>
 <p>MachinePoolStatus defines the observed state of MachinePool</p>
@@ -900,7 +900,7 @@ will land in the MachinePool.</p>
 <td>
 <code>state</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.MachinePoolState">
+<a href="#compute.ironcore.dev/v1alpha1.MachinePoolState">
 MachinePoolState
 </a>
 </em>
@@ -912,7 +912,7 @@ MachinePoolState
 <td>
 <code>conditions</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.MachinePoolCondition">
+<a href="#compute.ironcore.dev/v1alpha1.MachinePoolCondition">
 []MachinePoolCondition
 </a>
 </em>
@@ -936,7 +936,7 @@ MachinePoolState
 <td>
 <code>addresses</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.MachinePoolAddress">
+<a href="#compute.ironcore.dev/v1alpha1.MachinePoolAddress">
 []MachinePoolAddress
 </a>
 </em>
@@ -948,7 +948,7 @@ MachinePoolState
 <td>
 <code>daemonEndpoints</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.MachinePoolDaemonEndpoints">
+<a href="#compute.ironcore.dev/v1alpha1.MachinePoolDaemonEndpoints">
 MachinePoolDaemonEndpoints
 </a>
 </em>
@@ -960,8 +960,8 @@ MachinePoolDaemonEndpoints
 <td>
 <code>capacity</code><br/>
 <em>
-<a href="../core/#core.api.onmetal.de/v1alpha1.ResourceList">
-github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
+<a href="../core/#core.ironcore.dev/v1alpha1.ResourceList">
+github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceList
 </a>
 </em>
 </td>
@@ -973,8 +973,8 @@ github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
 <td>
 <code>allocatable</code><br/>
 <em>
-<a href="../core/#core.api.onmetal.de/v1alpha1.ResourceList">
-github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
+<a href="../core/#core.ironcore.dev/v1alpha1.ResourceList">
+github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceList
 </a>
 </em>
 </td>
@@ -984,10 +984,10 @@ github.com/onmetal/onmetal-api/api/core/v1alpha1.ResourceList
 </tr>
 </tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.MachineSpec">MachineSpec
+<h3 id="compute.ironcore.dev/v1alpha1.MachineSpec">MachineSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.Machine">Machine</a>)
+(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.Machine">Machine</a>)
 </p>
 <div>
 <p>MachineSpec defines the desired state of Machine</p>
@@ -1042,7 +1042,7 @@ If empty, a scheduler will figure out an appropriate pool to run the machine in.
 <td>
 <code>power</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.Power">
+<a href="#compute.ironcore.dev/v1alpha1.Power">
 Power
 </a>
 </em>
@@ -1081,7 +1081,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>networkInterfaces</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.NetworkInterface">
+<a href="#compute.ironcore.dev/v1alpha1.NetworkInterface">
 []NetworkInterface
 </a>
 </em>
@@ -1095,7 +1095,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>volumes</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.Volume">
+<a href="#compute.ironcore.dev/v1alpha1.Volume">
 []Volume
 </a>
 </em>
@@ -1109,8 +1109,8 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>ignitionRef</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.SecretKeySelector">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.SecretKeySelector
+<a href="../common/#common.ironcore.dev/v1alpha1.SecretKeySelector">
+github.com/ironcore-dev/ironcore/api/common/v1alpha1.SecretKeySelector
 </a>
 </em>
 </td>
@@ -1123,7 +1123,7 @@ If key is empty, DefaultIgnitionKey will be used as fallback.</p>
 <td>
 <code>efiVars</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.EFIVar">
+<a href="#compute.ironcore.dev/v1alpha1.EFIVar">
 []EFIVar
 </a>
 </em>
@@ -1137,8 +1137,8 @@ If key is empty, DefaultIgnitionKey will be used as fallback.</p>
 <td>
 <code>tolerations</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.Toleration">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.Toleration
+<a href="../common/#common.ironcore.dev/v1alpha1.Toleration">
+[]github.com/ironcore-dev/ironcore/api/common/v1alpha1.Toleration
 </a>
 </em>
 </td>
@@ -1149,10 +1149,10 @@ covered by Tolerations will be considered to run the Machine.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.MachineState">MachineState
+<h3 id="compute.ironcore.dev/v1alpha1.MachineState">MachineState
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachineStatus">MachineStatus</a>)
+(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.MachineStatus">MachineStatus</a>)
 </p>
 <div>
 <p>MachineState is the state of a machine.</p>
@@ -1180,10 +1180,10 @@ MachinePool.</p>
 </td>
 </tr></tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.MachineStatus">MachineStatus
+<h3 id="compute.ironcore.dev/v1alpha1.MachineStatus">MachineStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.Machine">Machine</a>)
+(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.Machine">Machine</a>)
 </p>
 <div>
 <p>MachineStatus defines the observed state of Machine</p>
@@ -1222,7 +1222,7 @@ int64
 <td>
 <code>state</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.MachineState">
+<a href="#compute.ironcore.dev/v1alpha1.MachineState">
 MachineState
 </a>
 </em>
@@ -1235,7 +1235,7 @@ MachineState
 <td>
 <code>networkInterfaces</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.NetworkInterfaceStatus">
+<a href="#compute.ironcore.dev/v1alpha1.NetworkInterfaceStatus">
 []NetworkInterfaceStatus
 </a>
 </em>
@@ -1248,7 +1248,7 @@ MachineState
 <td>
 <code>volumes</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.VolumeStatus">
+<a href="#compute.ironcore.dev/v1alpha1.VolumeStatus">
 []VolumeStatus
 </a>
 </em>
@@ -1259,10 +1259,10 @@ MachineState
 </tr>
 </tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.NetworkInterface">NetworkInterface
+<h3 id="compute.ironcore.dev/v1alpha1.NetworkInterface">NetworkInterface
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachineSpec">MachineSpec</a>)
+(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.MachineSpec">MachineSpec</a>)
 </p>
 <div>
 <p>NetworkInterface is the definition of a single interface</p>
@@ -1290,7 +1290,7 @@ string
 <td>
 <code>NetworkInterfaceSource</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.NetworkInterfaceSource">
+<a href="#compute.ironcore.dev/v1alpha1.NetworkInterfaceSource">
 NetworkInterfaceSource
 </a>
 </em>
@@ -1304,10 +1304,10 @@ NetworkInterfaceSource
 </tr>
 </tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.NetworkInterfaceSource">NetworkInterfaceSource
+<h3 id="compute.ironcore.dev/v1alpha1.NetworkInterfaceSource">NetworkInterfaceSource
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.NetworkInterface">NetworkInterface</a>)
+(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.NetworkInterface">NetworkInterface</a>)
 </p>
 <div>
 </div>
@@ -1336,7 +1336,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>ephemeral</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.EphemeralNetworkInterfaceSource">
+<a href="#compute.ironcore.dev/v1alpha1.EphemeralNetworkInterfaceSource">
 EphemeralNetworkInterfaceSource
 </a>
 </em>
@@ -1348,10 +1348,10 @@ NetworkInterface to use.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.NetworkInterfaceState">NetworkInterfaceState
+<h3 id="compute.ironcore.dev/v1alpha1.NetworkInterfaceState">NetworkInterfaceState
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.NetworkInterfaceStatus">NetworkInterfaceStatus</a>)
+(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.NetworkInterfaceStatus">NetworkInterfaceStatus</a>)
 </p>
 <div>
 <p>NetworkInterfaceState is the infrastructure attachment state a NetworkInterface can be in.</p>
@@ -1371,10 +1371,10 @@ NetworkInterface to use.</p>
 </td>
 </tr></tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.NetworkInterfaceStatus">NetworkInterfaceStatus
+<h3 id="compute.ironcore.dev/v1alpha1.NetworkInterfaceStatus">NetworkInterfaceStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachineStatus">MachineStatus</a>)
+(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.MachineStatus">MachineStatus</a>)
 </p>
 <div>
 <p>NetworkInterfaceStatus reports the status of an NetworkInterfaceSource.</p>
@@ -1413,8 +1413,8 @@ string
 <td>
 <code>ips</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
+<a href="../common/#common.ironcore.dev/v1alpha1.IP">
+[]github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP
 </a>
 </em>
 </td>
@@ -1426,8 +1426,8 @@ string
 <td>
 <code>virtualIP</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
+<a href="../common/#common.ironcore.dev/v1alpha1.IP">
+github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP
 </a>
 </em>
 </td>
@@ -1439,7 +1439,7 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 <td>
 <code>state</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.NetworkInterfaceState">
+<a href="#compute.ironcore.dev/v1alpha1.NetworkInterfaceState">
 NetworkInterfaceState
 </a>
 </em>
@@ -1463,10 +1463,10 @@ Kubernetes meta/v1.Time
 </tr>
 </tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.Power">Power
+<h3 id="compute.ironcore.dev/v1alpha1.Power">Power
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachineSpec">MachineSpec</a>)
+(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.MachineSpec">MachineSpec</a>)
 </p>
 <div>
 <p>Power is the desired power state of a Machine.</p>
@@ -1486,10 +1486,10 @@ Kubernetes meta/v1.Time
 </td>
 </tr></tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.Volume">Volume
+<h3 id="compute.ironcore.dev/v1alpha1.Volume">Volume
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachineSpec">MachineSpec</a>)
+(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.MachineSpec">MachineSpec</a>)
 </p>
 <div>
 <p>Volume defines a volume attachment of a machine</p>
@@ -1530,7 +1530,7 @@ If empty, an unused device name will be determined if possible.</p>
 <td>
 <code>VolumeSource</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.VolumeSource">
+<a href="#compute.ironcore.dev/v1alpha1.VolumeSource">
 VolumeSource
 </a>
 </em>
@@ -1544,10 +1544,10 @@ VolumeSource
 </tr>
 </tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.VolumeSource">VolumeSource
+<h3 id="compute.ironcore.dev/v1alpha1.VolumeSource">VolumeSource
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.Volume">Volume</a>)
+(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.Volume">Volume</a>)
 </p>
 <div>
 <p>VolumeSource specifies the source to use for a Volume.</p>
@@ -1577,7 +1577,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>emptyDisk</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.EmptyDiskVolumeSource">
+<a href="#compute.ironcore.dev/v1alpha1.EmptyDiskVolumeSource">
 EmptyDiskVolumeSource
 </a>
 </em>
@@ -1590,7 +1590,7 @@ EmptyDiskVolumeSource
 <td>
 <code>ephemeral</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.EphemeralVolumeSource">
+<a href="#compute.ironcore.dev/v1alpha1.EphemeralVolumeSource">
 EphemeralVolumeSource
 </a>
 </em>
@@ -1602,10 +1602,10 @@ Volume to use.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.VolumeState">VolumeState
+<h3 id="compute.ironcore.dev/v1alpha1.VolumeState">VolumeState
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.VolumeStatus">VolumeStatus</a>)
+(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.VolumeStatus">VolumeStatus</a>)
 </p>
 <div>
 <p>VolumeState is the infrastructure attachment state a Volume can be in.</p>
@@ -1625,10 +1625,10 @@ Volume to use.</p>
 </td>
 </tr></tbody>
 </table>
-<h3 id="compute.api.onmetal.de/v1alpha1.VolumeStatus">VolumeStatus
+<h3 id="compute.ironcore.dev/v1alpha1.VolumeStatus">VolumeStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#compute.api.onmetal.de/v1alpha1.MachineStatus">MachineStatus</a>)
+(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.MachineStatus">MachineStatus</a>)
 </p>
 <div>
 <p>VolumeStatus is the status of a Volume.</p>
@@ -1667,7 +1667,7 @@ string
 <td>
 <code>state</code><br/>
 <em>
-<a href="#compute.api.onmetal.de/v1alpha1.VolumeState">
+<a href="#compute.ironcore.dev/v1alpha1.VolumeState">
 VolumeState
 </a>
 </em>

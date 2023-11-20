@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 by the OnMetal authors.
+ * Copyright (c) 2021 by the IronCore authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 // +k8s:openapi-gen=true
 // +k8s:defaulter-gen=TypeMeta
 // +k8s:protobuf-gen=package
-// +groupName=compute.api.onmetal.de
+// +groupName=compute.ironcore.dev
 
 // Package compute is the internal version of the API.
-package compute // import "github.com/onmetal/onmetal-api/internal/apis/compute"
+package compute // import "github.com/ironcore-dev/ironcore/internal/apis/compute"

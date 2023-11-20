@@ -40,15 +40,15 @@ outside world. Orchestrating traffic, auditing it and gaining visibility of what
 network architecture.
 
 Key of this OEP is to define the user-facing network API as well as its implications on any other type and the overall
-structure of `onmetal`.
+structure of `ironcore`.
 
 ## Motivation
 
 Without networking, any machine / process running inside a datacenter cannot interact / affect the outside world.
-Networking is a crucial component that has to be implemented for onmetal to have business value. In a full-fledged
+Networking is a crucial component that has to be implemented for ironcore to have business value. In a full-fledged
 state, networking also enables security to the outside world and within a datacenter itself.
 
-The basic use case we want to implement with onmetal is a machine that can access the internet and can be reached from
+The basic use case we want to implement with ironcore is a machine that can access the internet and can be reached from
 the internet.
 
 ### Goals
@@ -75,7 +75,7 @@ the internet.
 
 ### Preface
 
-As onmetal is Kubernetes-API, it should integrate nicely within the existing ecosystem. Some API design choices are made
+As ironcore is Kubernetes-API, it should integrate nicely within the existing ecosystem. Some API design choices are made
 in that regard. For further information about Kubernetes, see
 [the Kubernetes reference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#ephemeralvolumesource-v1-core)
 .
@@ -122,7 +122,7 @@ Example manifests:
 
 [//]: # (@formatter:off)
 ```yaml
-apiVersion: ipam.api.onmetal.de/v1alpha1
+apiVersion: ipam.ironcore.dev/v1alpha1
 kind: Prefix
 metadata:
   namespace: default
@@ -132,7 +132,7 @@ spec:
 status:
   phase: Allocated
 ---
-apiVersion: ipam.api.onmetal.de/v1alpha1
+apiVersion: ipam.ironcore.dev/v1alpha1
 kind: Prefix
 metadata:
   namespace: default
@@ -162,7 +162,7 @@ regulated with a field / policy of some kind.
 Example manifest:
 
 ```yaml
-apiVersion: networking.api.onmetal.de/v1alpha1
+apiVersion: networking.ironcore.dev/v1alpha1
 kind: Network
 metadata:
   namespace: default
@@ -195,7 +195,7 @@ Example usage:
 
 [//]: # (@formatter:off)
 ```yaml
-apiVersion: networking.api.onmetal.de/v1alpha1
+apiVersion: networking.ironcore.dev/v1alpha1
 kind: NetworkInterface
 metadata:
   namespace: default
@@ -224,7 +224,7 @@ status:
     - 10.0.0.1
     - 2607:f0d0:1002:51::4
 ---
-apiVersion: compute.api.onmetal.de/v1alpha1
+apiVersion: compute.ironcore.dev/v1alpha1
 kind: Machine
 metadata:
   namespace: default
@@ -256,7 +256,7 @@ Sample manifest:
 
 [//]: # (@formatter:off)
 ```yaml
-apiVersion: compute.api.onmetal.de/v1alpha1
+apiVersion: compute.ironcore.dev/v1alpha1
 kind: Machine
 spec:
   interfaces:
@@ -295,7 +295,7 @@ Example manifest:
 
 [//]: # (@formatter:off)
 ```yaml
-apiVersion: networking.api.onmetal.de/v1alpha1
+apiVersion: networking.ironcore.dev/v1alpha1
 kind: AliasPrefix
 metadata:
   namespace: default
@@ -324,7 +324,7 @@ This could manifest in the following `AliasPrefixRouting`:
 
 [//]: # (@formatter:off)
 ```yaml
-apiVersion: networking.api.onmetal.de/v1alpha1
+apiVersion: networking.ironcore.dev/v1alpha1
 kind: AliasPrefixRouting
 metadata:
   namespace: default
@@ -348,7 +348,7 @@ It will also automatically be set in the same network and only target the hostin
 
 [//]: # (@formatter:off)
 ```yaml
-apiVersion: networking.api.onmetal.de/v1alpha1
+apiVersion: networking.ironcore.dev/v1alpha1
 kind: NetworkInterface
 metadata:
   namespace: default
@@ -385,7 +385,7 @@ Example manifest:
 
 [//]: # (@formatter:off)
 ```yaml
-apiVersion: networking.api.onmetal.de
+apiVersion: networking.ironcore.dev
 kind: VirtualIP
 metadata:
   namespace: default
@@ -409,7 +409,7 @@ A `networkInterfaceRef` in the `spec` thus cannot be specified.
 
 [//]: # (@formatter:off)
 ```yaml
-apiVersion: networking.api.onmetal.de/v1alpha1
+apiVersion: networking.ironcore.dev/v1alpha1
 kind: NetworkInterface
 metadata:
   namespace: default
@@ -426,7 +426,7 @@ spec:
 
 ## Scenarios
 
-### Kubernetes (Gardener) integration on top of onmetal
+### Kubernetes (Gardener) integration on top of ironcore
 
 For a Kubernetes integration, multiple worker nodes should be created in the same network. For each worker node, a
 separate pod prefix should be allocated. For internet-facing requests, each node should get a distinct
@@ -441,7 +441,7 @@ These are the required manifests:
 ```yaml
 # IPAM Setup:
 # Create a root prefix and a pod / node sub-prefix.
-apiVersion: ipam.api.onmetal.de/v1alpha1
+apiVersion: ipam.ironcore.dev/v1alpha1
 kind: Prefix
 metadata:
   namespace: default
@@ -449,7 +449,7 @@ metadata:
 spec:
   prefix: 10.0.0.0/8
 ---
-apiVersion: ipam.api.onmetal.de/v1alpha1
+apiVersion: ipam.ironcore.dev/v1alpha1
 kind: Prefix
 metadata:
   namespace: default
@@ -459,7 +459,7 @@ spec:
   parentRef:
     name: root
 ---
-apiVersion: ipam.api.onmetal.de/v1alpha1
+apiVersion: ipam.ironcore.dev/v1alpha1
 kind: Prefix
 metadata:
   namespace: default
@@ -471,14 +471,14 @@ spec:
 ---
 # Once IPAM is done, the concrete networking is defined
 # The Network is the bracket around all resources
-apiVersion: networking.api.onmetal.de/v1alpha1
+apiVersion: networking.ironcore.dev/v1alpha1
 kind: Network
 metadata:
   namespace: default
   name: k8s
 ---
 # Create one prefix that should be shared across all machines
-apiVersion: networking.api.onmetal.de/v1alpha1
+apiVersion: networking.ironcore.dev/v1alpha1
 kind: AliasPrefix
 metadata:
   namespace: default
@@ -498,7 +498,7 @@ spec:
           prefixLength: 16
 ---
 # Create the actual machine
-apiVersion: compute.api.onmetal.de/v1alpha1
+apiVersion: compute.ironcore.dev/v1alpha1
 kind: Machine
 metadata:
   namespace: default

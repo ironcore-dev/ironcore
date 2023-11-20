@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	"github.com/onmetal/controller-utils/metautils"
-	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
-	onmetalapiclient "github.com/onmetal/onmetal-api/utils/client"
-	"github.com/onmetal/onmetal-api/utils/quota"
+	"github.com/ironcore-dev/controller-utils/metautils"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
+	"github.com/ironcore-dev/ironcore/utils/quota"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -42,16 +42,16 @@ type ResourceQuotaReconciler struct {
 	Registry  quota.Registry
 }
 
-//+kubebuilder:rbac:groups=core.api.onmetal.de,resources=resourcequotas,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=core.api.onmetal.de,resources=resourcequotas/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=core.api.onmetal.de,resources=resourcequotas/finalizers,verbs=update
+//+kubebuilder:rbac:groups=core.ironcore.dev,resources=resourcequotas,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=core.ironcore.dev,resources=resourcequotas/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=core.ironcore.dev,resources=resourcequotas/finalizers,verbs=update
 
 //+kubebuilder:rbac:groups="",resources=namespaces,verbs=get;list;watch;update;patch
 
-//+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machines,verbs=get;list;watch
-//+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machineclasses,verbs=get;list;watch
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes,verbs=get;list;watch
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumeclasses,verbs=get;list;watch
+//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machines,verbs=get;list;watch
+//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machineclasses,verbs=get;list;watch
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumes,verbs=get;list;watch
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumeclasses,verbs=get;list;watch
 
 func (r *ResourceQuotaReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
@@ -213,7 +213,7 @@ func (r *ResourceQuotaReconciler) enqueueResourceQuotasByNamespace() handler.Eve
 			}
 		}()
 
-		return onmetalapiclient.ReconcileRequestsFromObjectStructSlice(resourceQuotaList.Items)
+		return ironcoreclient.ReconcileRequestsFromObjectStructSlice(resourceQuotaList.Items)
 	})
 }
 

@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@ package validation
 import (
 	"fmt"
 
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
-	onmetalapivalidation "github.com/onmetal/onmetal-api/internal/api/validation"
-	commonvalidation "github.com/onmetal/onmetal-api/internal/apis/common/validation"
-	"github.com/onmetal/onmetal-api/internal/apis/ipam"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
+	commonvalidation "github.com/ironcore-dev/ironcore/internal/apis/common/validation"
+	"github.com/ironcore-dev/ironcore/internal/apis/ipam"
 	"go4.org/netipx"
 	corev1 "k8s.io/api/core/v1"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
@@ -41,7 +41,7 @@ func ValidatePrefix(prefix *ipam.Prefix) field.ErrorList {
 func validateIPFamilyAndOptionalPrefixAndLength(ipFamily corev1.IPFamily, prefix *commonv1alpha1.IPPrefix, prefixLength int32, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, onmetalapivalidation.ValidateIPFamily(ipFamily, fldPath.Child("ipFamily"))...)
+	allErrs = append(allErrs, ironcorevalidation.ValidateIPFamily(ipFamily, fldPath.Child("ipFamily"))...)
 
 	if prefix != nil {
 		allErrs = append(allErrs, commonvalidation.ValidateIPPrefix(ipFamily, *prefix, fldPath.Child("prefix"))...)
@@ -137,7 +137,7 @@ func validatePrefixSpecUpdate(newSpec, oldSpec *ipam.PrefixSpec, fldPath *field.
 		oldSpecCopy.ParentRef = newSpecCopy.ParentRef
 	}
 
-	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableFieldWithDiff(newSpecCopy, oldSpecCopy, fldPath)...)
+	allErrs = append(allErrs, ironcorevalidation.ValidateImmutableFieldWithDiff(newSpecCopy, oldSpecCopy, fldPath)...)
 
 	return allErrs
 }

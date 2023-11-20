@@ -1,30 +1,30 @@
 <p>Packages:</p>
 <ul>
 <li>
-<a href="#networking.api.onmetal.de%2fv1alpha1">networking.api.onmetal.de/v1alpha1</a>
+<a href="#networking.ironcore.dev%2fv1alpha1">networking.ironcore.dev/v1alpha1</a>
 </li>
 </ul>
-<h2 id="networking.api.onmetal.de/v1alpha1">networking.api.onmetal.de/v1alpha1</h2>
+<h2 id="networking.ironcore.dev/v1alpha1">networking.ironcore.dev/v1alpha1</h2>
 <div>
 <p>Package v1alpha1 is the v1alpha1 version of the API.</p>
 </div>
 Resource Types:
 <ul><li>
-<a href="#networking.api.onmetal.de/v1alpha1.LoadBalancer">LoadBalancer</a>
+<a href="#networking.ironcore.dev/v1alpha1.LoadBalancer">LoadBalancer</a>
 </li><li>
-<a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerRouting">LoadBalancerRouting</a>
+<a href="#networking.ironcore.dev/v1alpha1.LoadBalancerRouting">LoadBalancerRouting</a>
 </li><li>
-<a href="#networking.api.onmetal.de/v1alpha1.NATGateway">NATGateway</a>
+<a href="#networking.ironcore.dev/v1alpha1.NATGateway">NATGateway</a>
 </li><li>
-<a href="#networking.api.onmetal.de/v1alpha1.Network">Network</a>
+<a href="#networking.ironcore.dev/v1alpha1.Network">Network</a>
 </li><li>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkInterface">NetworkInterface</a>
+<a href="#networking.ironcore.dev/v1alpha1.NetworkInterface">NetworkInterface</a>
 </li><li>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicy">NetworkPolicy</a>
+<a href="#networking.ironcore.dev/v1alpha1.NetworkPolicy">NetworkPolicy</a>
 </li><li>
-<a href="#networking.api.onmetal.de/v1alpha1.VirtualIP">VirtualIP</a>
+<a href="#networking.ironcore.dev/v1alpha1.VirtualIP">VirtualIP</a>
 </li></ul>
-<h3 id="networking.api.onmetal.de/v1alpha1.LoadBalancer">LoadBalancer
+<h3 id="networking.ironcore.dev/v1alpha1.LoadBalancer">LoadBalancer
 </h3>
 <div>
 <p>LoadBalancer is the Schema for the LoadBalancer API</p>
@@ -43,7 +43,7 @@ Resource Types:
 string</td>
 <td>
 <code>
-networking.api.onmetal.de/v1alpha1
+networking.ironcore.dev/v1alpha1
 </code>
 </td>
 </tr>
@@ -72,7 +72,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerSpec">
+<a href="#networking.ironcore.dev/v1alpha1.LoadBalancerSpec">
 LoadBalancerSpec
 </a>
 </em>
@@ -85,7 +85,7 @@ LoadBalancerSpec
 <td>
 <code>type</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerType">
+<a href="#networking.ironcore.dev/v1alpha1.LoadBalancerType">
 LoadBalancerType
 </a>
 </em>
@@ -111,7 +111,7 @@ LoadBalancerType
 <td>
 <code>ips</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.IPSource">
+<a href="#networking.ironcore.dev/v1alpha1.IPSource">
 []IPSource
 </a>
 </em>
@@ -151,7 +151,7 @@ for which this LoadBalancer should be applied</p>
 <td>
 <code>ports</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerPort">
+<a href="#networking.ironcore.dev/v1alpha1.LoadBalancerPort">
 []LoadBalancerPort
 </a>
 </em>
@@ -167,7 +167,7 @@ for which this LoadBalancer should be applied</p>
 <td>
 <code>status</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerStatus">
+<a href="#networking.ironcore.dev/v1alpha1.LoadBalancerStatus">
 LoadBalancerStatus
 </a>
 </em>
@@ -177,7 +177,7 @@ LoadBalancerStatus
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.LoadBalancerRouting">LoadBalancerRouting
+<h3 id="networking.ironcore.dev/v1alpha1.LoadBalancerRouting">LoadBalancerRouting
 </h3>
 <div>
 <p>LoadBalancerRouting is the Schema for the loadbalancerroutings API</p>
@@ -196,7 +196,7 @@ LoadBalancerStatus
 string</td>
 <td>
 <code>
-networking.api.onmetal.de/v1alpha1
+networking.ironcore.dev/v1alpha1
 </code>
 </td>
 </tr>
@@ -225,8 +225,8 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>networkRef</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
+<a href="../common/#common.ironcore.dev/v1alpha1.LocalUIDReference">
+github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
 </td>
@@ -238,7 +238,7 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 <td>
 <code>destinations</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerDestination">
+<a href="#networking.ironcore.dev/v1alpha1.LoadBalancerDestination">
 []LoadBalancerDestination
 </a>
 </em>
@@ -249,7 +249,7 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.NATGateway">NATGateway
+<h3 id="networking.ironcore.dev/v1alpha1.NATGateway">NATGateway
 </h3>
 <div>
 <p>NATGateway is the Schema for the NATGateway API</p>
@@ -268,7 +268,7 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 string</td>
 <td>
 <code>
-networking.api.onmetal.de/v1alpha1
+networking.ironcore.dev/v1alpha1
 </code>
 </td>
 </tr>
@@ -297,7 +297,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.NATGatewaySpec">
+<a href="#networking.ironcore.dev/v1alpha1.NATGatewaySpec">
 NATGatewaySpec
 </a>
 </em>
@@ -310,7 +310,7 @@ NATGatewaySpec
 <td>
 <code>type</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.NATGatewayType">
+<a href="#networking.ironcore.dev/v1alpha1.NATGatewayType">
 NATGatewayType
 </a>
 </em>
@@ -364,7 +364,7 @@ Has to be a power of 2. If empty, 2048 (DefaultPortsPerNetworkInterface) is the 
 <td>
 <code>status</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.NATGatewayStatus">
+<a href="#networking.ironcore.dev/v1alpha1.NATGatewayStatus">
 NATGatewayStatus
 </a>
 </em>
@@ -374,7 +374,7 @@ NATGatewayStatus
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.Network">Network
+<h3 id="networking.ironcore.dev/v1alpha1.Network">Network
 </h3>
 <div>
 <p>Network is the Schema for the network API</p>
@@ -393,7 +393,7 @@ NATGatewayStatus
 string</td>
 <td>
 <code>
-networking.api.onmetal.de/v1alpha1
+networking.ironcore.dev/v1alpha1
 </code>
 </td>
 </tr>
@@ -422,7 +422,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkSpec">
+<a href="#networking.ironcore.dev/v1alpha1.NetworkSpec">
 NetworkSpec
 </a>
 </em>
@@ -446,7 +446,7 @@ string
 <td>
 <code>peerings</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkPeering">
+<a href="#networking.ironcore.dev/v1alpha1.NetworkPeering">
 []NetworkPeering
 </a>
 </em>
@@ -460,7 +460,7 @@ string
 <td>
 <code>incomingPeerings</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkPeeringClaimRef">
+<a href="#networking.ironcore.dev/v1alpha1.NetworkPeeringClaimRef">
 []NetworkPeeringClaimRef
 </a>
 </em>
@@ -477,7 +477,7 @@ string
 <td>
 <code>status</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkStatus">
+<a href="#networking.ironcore.dev/v1alpha1.NetworkStatus">
 NetworkStatus
 </a>
 </em>
@@ -487,7 +487,7 @@ NetworkStatus
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.NetworkInterface">NetworkInterface
+<h3 id="networking.ironcore.dev/v1alpha1.NetworkInterface">NetworkInterface
 </h3>
 <div>
 <p>NetworkInterface is the Schema for the networkinterfaces API</p>
@@ -506,7 +506,7 @@ NetworkStatus
 string</td>
 <td>
 <code>
-networking.api.onmetal.de/v1alpha1
+networking.ironcore.dev/v1alpha1
 </code>
 </td>
 </tr>
@@ -535,7 +535,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceSpec">
+<a href="#networking.ironcore.dev/v1alpha1.NetworkInterfaceSpec">
 NetworkInterfaceSpec
 </a>
 </em>
@@ -572,8 +572,8 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>machineRef</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
+<a href="../common/#common.ironcore.dev/v1alpha1.LocalUIDReference">
+github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
 </td>
@@ -598,7 +598,7 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 <td>
 <code>ips</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.IPSource">
+<a href="#networking.ironcore.dev/v1alpha1.IPSource">
 []IPSource
 </a>
 </em>
@@ -612,7 +612,7 @@ this NetworkInterface.</p>
 <td>
 <code>prefixes</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.PrefixSource">
+<a href="#networking.ironcore.dev/v1alpha1.PrefixSource">
 []PrefixSource
 </a>
 </em>
@@ -626,7 +626,7 @@ this NetworkInterface.</p>
 <td>
 <code>virtualIP</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPSource">
+<a href="#networking.ironcore.dev/v1alpha1.VirtualIPSource">
 VirtualIPSource
 </a>
 </em>
@@ -653,7 +653,7 @@ map[string]string
 <td>
 <code>status</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceStatus">
+<a href="#networking.ironcore.dev/v1alpha1.NetworkInterfaceStatus">
 NetworkInterfaceStatus
 </a>
 </em>
@@ -663,7 +663,7 @@ NetworkInterfaceStatus
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.NetworkPolicy">NetworkPolicy
+<h3 id="networking.ironcore.dev/v1alpha1.NetworkPolicy">NetworkPolicy
 </h3>
 <div>
 <p>NetworkPolicy is the Schema for the networkpolicies API</p>
@@ -682,7 +682,7 @@ NetworkInterfaceStatus
 string</td>
 <td>
 <code>
-networking.api.onmetal.de/v1alpha1
+networking.ironcore.dev/v1alpha1
 </code>
 </td>
 </tr>
@@ -711,7 +711,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicySpec">
+<a href="#networking.ironcore.dev/v1alpha1.NetworkPolicySpec">
 NetworkPolicySpec
 </a>
 </em>
@@ -750,7 +750,7 @@ Kubernetes meta/v1.LabelSelector
 <td>
 <code>ingress</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyIngressRule">
+<a href="#networking.ironcore.dev/v1alpha1.NetworkPolicyIngressRule">
 []NetworkPolicyIngressRule
 </a>
 </em>
@@ -763,7 +763,7 @@ Kubernetes meta/v1.LabelSelector
 <td>
 <code>egress</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyEgressRule">
+<a href="#networking.ironcore.dev/v1alpha1.NetworkPolicyEgressRule">
 []NetworkPolicyEgressRule
 </a>
 </em>
@@ -776,7 +776,7 @@ Kubernetes meta/v1.LabelSelector
 <td>
 <code>policyTypes</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.PolicyType">
+<a href="#networking.ironcore.dev/v1alpha1.PolicyType">
 []PolicyType
 </a>
 </em>
@@ -792,7 +792,7 @@ Kubernetes meta/v1.LabelSelector
 <td>
 <code>status</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyStatus">
+<a href="#networking.ironcore.dev/v1alpha1.NetworkPolicyStatus">
 NetworkPolicyStatus
 </a>
 </em>
@@ -802,7 +802,7 @@ NetworkPolicyStatus
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.VirtualIP">VirtualIP
+<h3 id="networking.ironcore.dev/v1alpha1.VirtualIP">VirtualIP
 </h3>
 <div>
 <p>VirtualIP is the Schema for the virtualips API</p>
@@ -821,7 +821,7 @@ NetworkPolicyStatus
 string</td>
 <td>
 <code>
-networking.api.onmetal.de/v1alpha1
+networking.ironcore.dev/v1alpha1
 </code>
 </td>
 </tr>
@@ -850,7 +850,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPSpec">
+<a href="#networking.ironcore.dev/v1alpha1.VirtualIPSpec">
 VirtualIPSpec
 </a>
 </em>
@@ -863,7 +863,7 @@ VirtualIPSpec
 <td>
 <code>type</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPType">
+<a href="#networking.ironcore.dev/v1alpha1.VirtualIPType">
 VirtualIPType
 </a>
 </em>
@@ -889,8 +889,8 @@ Kubernetes core/v1.IPFamily
 <td>
 <code>targetRef</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
+<a href="../common/#common.ironcore.dev/v1alpha1.LocalUIDReference">
+github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
 </td>
@@ -905,7 +905,7 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 <td>
 <code>status</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPStatus">
+<a href="#networking.ironcore.dev/v1alpha1.VirtualIPStatus">
 VirtualIPStatus
 </a>
 </em>
@@ -915,10 +915,10 @@ VirtualIPStatus
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.EphemeralPrefixSource">EphemeralPrefixSource
+<h3 id="networking.ironcore.dev/v1alpha1.EphemeralPrefixSource">EphemeralPrefixSource
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.IPSource">IPSource</a>, <a href="#networking.api.onmetal.de/v1alpha1.PrefixSource">PrefixSource</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.IPSource">IPSource</a>, <a href="#networking.ironcore.dev/v1alpha1.PrefixSource">PrefixSource</a>)
 </p>
 <div>
 <p>EphemeralPrefixSource contains the definition to create an ephemeral (i.e. coupled to the lifetime of the
@@ -936,8 +936,8 @@ surrounding object) Prefix.</p>
 <td>
 <code>prefixTemplate</code><br/>
 <em>
-<a href="../ipam/#ipam.api.onmetal.de/v1alpha1.PrefixTemplateSpec">
-github.com/onmetal/onmetal-api/api/ipam/v1alpha1.PrefixTemplateSpec
+<a href="../ipam/#ipam.ironcore.dev/v1alpha1.PrefixTemplateSpec">
+github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixTemplateSpec
 </a>
 </em>
 </td>
@@ -947,10 +947,10 @@ github.com/onmetal/onmetal-api/api/ipam/v1alpha1.PrefixTemplateSpec
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.EphemeralVirtualIPSource">EphemeralVirtualIPSource
+<h3 id="networking.ironcore.dev/v1alpha1.EphemeralVirtualIPSource">EphemeralVirtualIPSource
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.VirtualIPSource">VirtualIPSource</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.VirtualIPSource">VirtualIPSource</a>)
 </p>
 <div>
 <p>EphemeralVirtualIPSource contains the definition to create an ephemeral (i.e. coupled to the lifetime of the
@@ -968,7 +968,7 @@ surrounding object) VirtualIP.</p>
 <td>
 <code>virtualIPTemplate</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPTemplateSpec">
+<a href="#networking.ironcore.dev/v1alpha1.VirtualIPTemplateSpec">
 VirtualIPTemplateSpec
 </a>
 </em>
@@ -979,10 +979,10 @@ VirtualIPTemplateSpec
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.IPBlock">IPBlock
+<h3 id="networking.ironcore.dev/v1alpha1.IPBlock">IPBlock
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyPeer">NetworkPolicyPeer</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.NetworkPolicyPeer">NetworkPolicyPeer</a>)
 </p>
 <div>
 <p>IPBlock specifies an ip block with optional exceptions.</p>
@@ -999,8 +999,8 @@ VirtualIPTemplateSpec
 <td>
 <code>cidr</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
+<a href="../common/#common.ironcore.dev/v1alpha1.IPPrefix">
+github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix
 </a>
 </em>
 </td>
@@ -1012,8 +1012,8 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
 <td>
 <code>except</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
+<a href="../common/#common.ironcore.dev/v1alpha1.IPPrefix">
+[]github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix
 </a>
 </em>
 </td>
@@ -1024,10 +1024,10 @@ Values will be rejected if they are outside CIDR.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.IPSource">IPSource
+<h3 id="networking.ironcore.dev/v1alpha1.IPSource">IPSource
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerSpec">LoadBalancerSpec</a>, <a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceSpec">NetworkInterfaceSpec</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.LoadBalancerSpec">LoadBalancerSpec</a>, <a href="#networking.ironcore.dev/v1alpha1.NetworkInterfaceSpec">NetworkInterfaceSpec</a>)
 </p>
 <div>
 <p>IPSource is the definition of how to obtain an IP.</p>
@@ -1044,8 +1044,8 @@ Values will be rejected if they are outside CIDR.</p>
 <td>
 <code>value</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
+<a href="../common/#common.ironcore.dev/v1alpha1.IP">
+github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP
 </a>
 </em>
 </td>
@@ -1057,7 +1057,7 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 <td>
 <code>ephemeral</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.EphemeralPrefixSource">
+<a href="#networking.ironcore.dev/v1alpha1.EphemeralPrefixSource">
 EphemeralPrefixSource
 </a>
 </em>
@@ -1068,10 +1068,10 @@ EphemeralPrefixSource
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.LoadBalancerDestination">LoadBalancerDestination
+<h3 id="networking.ironcore.dev/v1alpha1.LoadBalancerDestination">LoadBalancerDestination
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerRouting">LoadBalancerRouting</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.LoadBalancerRouting">LoadBalancerRouting</a>)
 </p>
 <div>
 <p>LoadBalancerDestination is the destination of the load balancer.</p>
@@ -1088,8 +1088,8 @@ EphemeralPrefixSource
 <td>
 <code>ip</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
+<a href="../common/#common.ironcore.dev/v1alpha1.IP">
+github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP
 </a>
 </em>
 </td>
@@ -1101,7 +1101,7 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 <td>
 <code>targetRef</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerTargetRef">
+<a href="#networking.ironcore.dev/v1alpha1.LoadBalancerTargetRef">
 LoadBalancerTargetRef
 </a>
 </em>
@@ -1112,10 +1112,10 @@ LoadBalancerTargetRef
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.LoadBalancerPort">LoadBalancerPort
+<h3 id="networking.ironcore.dev/v1alpha1.LoadBalancerPort">LoadBalancerPort
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerSpec">LoadBalancerSpec</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.LoadBalancerSpec">LoadBalancerSpec</a>)
 </p>
 <div>
 </div>
@@ -1166,10 +1166,10 @@ If unspecified, only a single port, Port, will be allowed.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.LoadBalancerSpec">LoadBalancerSpec
+<h3 id="networking.ironcore.dev/v1alpha1.LoadBalancerSpec">LoadBalancerSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.LoadBalancer">LoadBalancer</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.LoadBalancer">LoadBalancer</a>)
 </p>
 <div>
 <p>LoadBalancerSpec defines the desired state of LoadBalancer</p>
@@ -1186,7 +1186,7 @@ If unspecified, only a single port, Port, will be allowed.</p>
 <td>
 <code>type</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerType">
+<a href="#networking.ironcore.dev/v1alpha1.LoadBalancerType">
 LoadBalancerType
 </a>
 </em>
@@ -1212,7 +1212,7 @@ LoadBalancerType
 <td>
 <code>ips</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.IPSource">
+<a href="#networking.ironcore.dev/v1alpha1.IPSource">
 []IPSource
 </a>
 </em>
@@ -1252,7 +1252,7 @@ for which this LoadBalancer should be applied</p>
 <td>
 <code>ports</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerPort">
+<a href="#networking.ironcore.dev/v1alpha1.LoadBalancerPort">
 []LoadBalancerPort
 </a>
 </em>
@@ -1263,10 +1263,10 @@ for which this LoadBalancer should be applied</p>
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.LoadBalancerStatus">LoadBalancerStatus
+<h3 id="networking.ironcore.dev/v1alpha1.LoadBalancerStatus">LoadBalancerStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.LoadBalancer">LoadBalancer</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.LoadBalancer">LoadBalancer</a>)
 </p>
 <div>
 <p>LoadBalancerStatus defines the observed state of LoadBalancer</p>
@@ -1283,8 +1283,8 @@ for which this LoadBalancer should be applied</p>
 <td>
 <code>ips</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
+<a href="../common/#common.ironcore.dev/v1alpha1.IP">
+[]github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP
 </a>
 </em>
 </td>
@@ -1294,10 +1294,10 @@ for which this LoadBalancer should be applied</p>
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.LoadBalancerTargetRef">LoadBalancerTargetRef
+<h3 id="networking.ironcore.dev/v1alpha1.LoadBalancerTargetRef">LoadBalancerTargetRef
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerDestination">LoadBalancerDestination</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.LoadBalancerDestination">LoadBalancerDestination</a>)
 </p>
 <div>
 <p>LoadBalancerTargetRef is a load balancer target.</p>
@@ -1347,10 +1347,10 @@ string
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.LoadBalancerType">LoadBalancerType
+<h3 id="networking.ironcore.dev/v1alpha1.LoadBalancerType">LoadBalancerType
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.LoadBalancerSpec">LoadBalancerSpec</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.LoadBalancerSpec">LoadBalancerSpec</a>)
 </p>
 <div>
 <p>LoadBalancerType is a type of LoadBalancer.</p>
@@ -1370,10 +1370,10 @@ string
 </td>
 </tr></tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.NATGatewaySpec">NATGatewaySpec
+<h3 id="networking.ironcore.dev/v1alpha1.NATGatewaySpec">NATGatewaySpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NATGateway">NATGateway</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.NATGateway">NATGateway</a>)
 </p>
 <div>
 <p>NATGatewaySpec defines the desired state of NATGateway</p>
@@ -1390,7 +1390,7 @@ string
 <td>
 <code>type</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.NATGatewayType">
+<a href="#networking.ironcore.dev/v1alpha1.NATGatewayType">
 NATGatewayType
 </a>
 </em>
@@ -1439,10 +1439,10 @@ Has to be a power of 2. If empty, 2048 (DefaultPortsPerNetworkInterface) is the 
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.NATGatewayStatus">NATGatewayStatus
+<h3 id="networking.ironcore.dev/v1alpha1.NATGatewayStatus">NATGatewayStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NATGateway">NATGateway</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.NATGateway">NATGateway</a>)
 </p>
 <div>
 <p>NATGatewayStatus defines the observed state of NATGateway</p>
@@ -1459,8 +1459,8 @@ Has to be a power of 2. If empty, 2048 (DefaultPortsPerNetworkInterface) is the 
 <td>
 <code>ips</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
+<a href="../common/#common.ironcore.dev/v1alpha1.IP">
+[]github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP
 </a>
 </em>
 </td>
@@ -1470,10 +1470,10 @@ Has to be a power of 2. If empty, 2048 (DefaultPortsPerNetworkInterface) is the 
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.NATGatewayType">NATGatewayType
+<h3 id="networking.ironcore.dev/v1alpha1.NATGatewayType">NATGatewayType
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NATGatewaySpec">NATGatewaySpec</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.NATGatewaySpec">NATGatewaySpec</a>)
 </p>
 <div>
 <p>NATGatewayType is a type of NATGateway.</p>
@@ -1490,10 +1490,10 @@ Has to be a power of 2. If empty, 2048 (DefaultPortsPerNetworkInterface) is the 
 </td>
 </tr></tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.NetworkInterfaceSpec">NetworkInterfaceSpec
+<h3 id="networking.ironcore.dev/v1alpha1.NetworkInterfaceSpec">NetworkInterfaceSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkInterface">NetworkInterface</a>, <a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceTemplateSpec">NetworkInterfaceTemplateSpec</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.NetworkInterface">NetworkInterface</a>, <a href="#networking.ironcore.dev/v1alpha1.NetworkInterfaceTemplateSpec">NetworkInterfaceTemplateSpec</a>)
 </p>
 <div>
 <p>NetworkInterfaceSpec defines the desired state of NetworkInterface</p>
@@ -1534,8 +1534,8 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>machineRef</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
+<a href="../common/#common.ironcore.dev/v1alpha1.LocalUIDReference">
+github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
 </td>
@@ -1560,7 +1560,7 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 <td>
 <code>ips</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.IPSource">
+<a href="#networking.ironcore.dev/v1alpha1.IPSource">
 []IPSource
 </a>
 </em>
@@ -1574,7 +1574,7 @@ this NetworkInterface.</p>
 <td>
 <code>prefixes</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.PrefixSource">
+<a href="#networking.ironcore.dev/v1alpha1.PrefixSource">
 []PrefixSource
 </a>
 </em>
@@ -1588,7 +1588,7 @@ this NetworkInterface.</p>
 <td>
 <code>virtualIP</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPSource">
+<a href="#networking.ironcore.dev/v1alpha1.VirtualIPSource">
 VirtualIPSource
 </a>
 </em>
@@ -1610,13 +1610,13 @@ map[string]string
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.NetworkInterfaceState">NetworkInterfaceState
+<h3 id="networking.ironcore.dev/v1alpha1.NetworkInterfaceState">NetworkInterfaceState
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceStatus">NetworkInterfaceStatus</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.NetworkInterfaceStatus">NetworkInterfaceStatus</a>)
 </p>
 <div>
-<p>NetworkInterfaceState is the onmetal-api state of a NetworkInterface.</p>
+<p>NetworkInterfaceState is the ironcore state of a NetworkInterface.</p>
 </div>
 <table>
 <thead>
@@ -1636,10 +1636,10 @@ map[string]string
 </td>
 </tr></tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.NetworkInterfaceStatus">NetworkInterfaceStatus
+<h3 id="networking.ironcore.dev/v1alpha1.NetworkInterfaceStatus">NetworkInterfaceStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkInterface">NetworkInterface</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.NetworkInterface">NetworkInterface</a>)
 </p>
 <div>
 <p>NetworkInterfaceStatus defines the observed state of NetworkInterface</p>
@@ -1656,7 +1656,7 @@ map[string]string
 <td>
 <code>state</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceState">
+<a href="#networking.ironcore.dev/v1alpha1.NetworkInterfaceState">
 NetworkInterfaceState
 </a>
 </em>
@@ -1682,8 +1682,8 @@ Kubernetes meta/v1.Time
 <td>
 <code>ips</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
+<a href="../common/#common.ironcore.dev/v1alpha1.IP">
+[]github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP
 </a>
 </em>
 </td>
@@ -1695,8 +1695,8 @@ Kubernetes meta/v1.Time
 <td>
 <code>prefixes</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
+<a href="../common/#common.ironcore.dev/v1alpha1.IPPrefix">
+[]github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix
 </a>
 </em>
 </td>
@@ -1708,8 +1708,8 @@ Kubernetes meta/v1.Time
 <td>
 <code>virtualIP</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
+<a href="../common/#common.ironcore.dev/v1alpha1.IP">
+github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP
 </a>
 </em>
 </td>
@@ -1719,7 +1719,7 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.NetworkInterfaceTemplateSpec">NetworkInterfaceTemplateSpec
+<h3 id="networking.ironcore.dev/v1alpha1.NetworkInterfaceTemplateSpec">NetworkInterfaceTemplateSpec
 </h3>
 <div>
 <p>NetworkInterfaceTemplateSpec is the specification of a NetworkInterface template.</p>
@@ -1750,7 +1750,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceSpec">
+<a href="#networking.ironcore.dev/v1alpha1.NetworkInterfaceSpec">
 NetworkInterfaceSpec
 </a>
 </em>
@@ -1787,8 +1787,8 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>machineRef</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
+<a href="../common/#common.ironcore.dev/v1alpha1.LocalUIDReference">
+github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
 </td>
@@ -1813,7 +1813,7 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 <td>
 <code>ips</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.IPSource">
+<a href="#networking.ironcore.dev/v1alpha1.IPSource">
 []IPSource
 </a>
 </em>
@@ -1827,7 +1827,7 @@ this NetworkInterface.</p>
 <td>
 <code>prefixes</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.PrefixSource">
+<a href="#networking.ironcore.dev/v1alpha1.PrefixSource">
 []PrefixSource
 </a>
 </em>
@@ -1841,7 +1841,7 @@ this NetworkInterface.</p>
 <td>
 <code>virtualIP</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPSource">
+<a href="#networking.ironcore.dev/v1alpha1.VirtualIPSource">
 VirtualIPSource
 </a>
 </em>
@@ -1866,10 +1866,10 @@ map[string]string
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.NetworkPeering">NetworkPeering
+<h3 id="networking.ironcore.dev/v1alpha1.NetworkPeering">NetworkPeering
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkSpec">NetworkSpec</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.NetworkSpec">NetworkSpec</a>)
 </p>
 <div>
 <p>NetworkPeering defines a network peering with another network.</p>
@@ -1897,7 +1897,7 @@ string
 <td>
 <code>networkRef</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkPeeringNetworkRef">
+<a href="#networking.ironcore.dev/v1alpha1.NetworkPeeringNetworkRef">
 NetworkPeeringNetworkRef
 </a>
 </em>
@@ -1909,10 +1909,10 @@ An empty namespace indicates that the target network resides in the same namespa
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.NetworkPeeringClaimRef">NetworkPeeringClaimRef
+<h3 id="networking.ironcore.dev/v1alpha1.NetworkPeeringClaimRef">NetworkPeeringClaimRef
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkSpec">NetworkSpec</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.NetworkSpec">NetworkSpec</a>)
 </p>
 <div>
 </div>
@@ -1962,10 +1962,10 @@ k8s.io/apimachinery/pkg/types.UID
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.NetworkPeeringNetworkRef">NetworkPeeringNetworkRef
+<h3 id="networking.ironcore.dev/v1alpha1.NetworkPeeringNetworkRef">NetworkPeeringNetworkRef
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkPeering">NetworkPeering</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.NetworkPeering">NetworkPeering</a>)
 </p>
 <div>
 <p>NetworkPeeringNetworkRef is a reference to a network to peer with.</p>
@@ -2003,10 +2003,10 @@ string
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.NetworkPeeringStatus">NetworkPeeringStatus
+<h3 id="networking.ironcore.dev/v1alpha1.NetworkPeeringStatus">NetworkPeeringStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkStatus">NetworkStatus</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.NetworkStatus">NetworkStatus</a>)
 </p>
 <div>
 <p>NetworkPeeringStatus is the status of a network peering.</p>
@@ -2032,10 +2032,10 @@ string
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.NetworkPolicyCondition">NetworkPolicyCondition
+<h3 id="networking.ironcore.dev/v1alpha1.NetworkPolicyCondition">NetworkPolicyCondition
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyStatus">NetworkPolicyStatus</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.NetworkPolicyStatus">NetworkPolicyStatus</a>)
 </p>
 <div>
 <p>NetworkPolicyCondition is one of the conditions of a network policy.</p>
@@ -2052,7 +2052,7 @@ string
 <td>
 <code>type</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyConditionType">
+<a href="#networking.ironcore.dev/v1alpha1.NetworkPolicyConditionType">
 NetworkPolicyConditionType
 </a>
 </em>
@@ -2122,18 +2122,18 @@ Kubernetes meta/v1.Time
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.NetworkPolicyConditionType">NetworkPolicyConditionType
+<h3 id="networking.ironcore.dev/v1alpha1.NetworkPolicyConditionType">NetworkPolicyConditionType
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyCondition">NetworkPolicyCondition</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.NetworkPolicyCondition">NetworkPolicyCondition</a>)
 </p>
 <div>
 <p>NetworkPolicyConditionType is a type a NetworkPolicyCondition can have.</p>
 </div>
-<h3 id="networking.api.onmetal.de/v1alpha1.NetworkPolicyEgressRule">NetworkPolicyEgressRule
+<h3 id="networking.ironcore.dev/v1alpha1.NetworkPolicyEgressRule">NetworkPolicyEgressRule
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicySpec">NetworkPolicySpec</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.NetworkPolicySpec">NetworkPolicySpec</a>)
 </p>
 <div>
 <p>NetworkPolicyEgressRule describes a rule to regulate egress traffic with.</p>
@@ -2150,7 +2150,7 @@ Kubernetes meta/v1.Time
 <td>
 <code>ports</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyPort">
+<a href="#networking.ironcore.dev/v1alpha1.NetworkPolicyPort">
 []NetworkPolicyPort
 </a>
 </em>
@@ -2165,7 +2165,7 @@ As soon as a single item is present, only these ports are allowed.</p>
 <td>
 <code>to</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyPeer">
+<a href="#networking.ironcore.dev/v1alpha1.NetworkPolicyPeer">
 []NetworkPolicyPeer
 </a>
 </em>
@@ -2178,10 +2178,10 @@ As soon as a single item is present, only these peers are allowed.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.NetworkPolicyIngressRule">NetworkPolicyIngressRule
+<h3 id="networking.ironcore.dev/v1alpha1.NetworkPolicyIngressRule">NetworkPolicyIngressRule
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicySpec">NetworkPolicySpec</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.NetworkPolicySpec">NetworkPolicySpec</a>)
 </p>
 <div>
 <p>NetworkPolicyIngressRule describes a rule to regulate ingress traffic with.</p>
@@ -2198,7 +2198,7 @@ As soon as a single item is present, only these peers are allowed.</p>
 <td>
 <code>ports</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyPort">
+<a href="#networking.ironcore.dev/v1alpha1.NetworkPolicyPort">
 []NetworkPolicyPort
 </a>
 </em>
@@ -2213,7 +2213,7 @@ As soon as a single item is present, only these ports are allowed.</p>
 <td>
 <code>from</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyPeer">
+<a href="#networking.ironcore.dev/v1alpha1.NetworkPolicyPeer">
 []NetworkPolicyPeer
 </a>
 </em>
@@ -2226,10 +2226,10 @@ As soon as a single item is present, only these peers are allowed.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.NetworkPolicyPeer">NetworkPolicyPeer
+<h3 id="networking.ironcore.dev/v1alpha1.NetworkPolicyPeer">NetworkPolicyPeer
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyEgressRule">NetworkPolicyEgressRule</a>, <a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyIngressRule">NetworkPolicyIngressRule</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.NetworkPolicyEgressRule">NetworkPolicyEgressRule</a>, <a href="#networking.ironcore.dev/v1alpha1.NetworkPolicyIngressRule">NetworkPolicyIngressRule</a>)
 </p>
 <div>
 <p>NetworkPolicyPeer describes a peer to allow traffic to / from.</p>
@@ -2246,8 +2246,8 @@ As soon as a single item is present, only these peers are allowed.</p>
 <td>
 <code>objectSelector</code><br/>
 <em>
-<a href="../core/#core.api.onmetal.de/v1alpha1.ObjectSelector">
-github.com/onmetal/onmetal-api/api/core/v1alpha1.ObjectSelector
+<a href="../core/#core.ironcore.dev/v1alpha1.ObjectSelector">
+github.com/ironcore-dev/ironcore/api/core/v1alpha1.ObjectSelector
 </a>
 </em>
 </td>
@@ -2260,7 +2260,7 @@ Exclusive with other peer specifiers.</p>
 <td>
 <code>ipBlock</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.IPBlock">
+<a href="#networking.ironcore.dev/v1alpha1.IPBlock">
 IPBlock
 </a>
 </em>
@@ -2271,10 +2271,10 @@ IPBlock
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.NetworkPolicyPort">NetworkPolicyPort
+<h3 id="networking.ironcore.dev/v1alpha1.NetworkPolicyPort">NetworkPolicyPort
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyEgressRule">NetworkPolicyEgressRule</a>, <a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyIngressRule">NetworkPolicyIngressRule</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.NetworkPolicyEgressRule">NetworkPolicyEgressRule</a>, <a href="#networking.ironcore.dev/v1alpha1.NetworkPolicyIngressRule">NetworkPolicyIngressRule</a>)
 </p>
 <div>
 <p>NetworkPolicyPort describes a port to allow traffic on</p>
@@ -2329,10 +2329,10 @@ is not defined. The endPort must be equal or greater than port.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.NetworkPolicySpec">NetworkPolicySpec
+<h3 id="networking.ironcore.dev/v1alpha1.NetworkPolicySpec">NetworkPolicySpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicy">NetworkPolicy</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.NetworkPolicy">NetworkPolicy</a>)
 </p>
 <div>
 <p>NetworkPolicySpec defines the desired state of NetworkPolicy.</p>
@@ -2375,7 +2375,7 @@ Kubernetes meta/v1.LabelSelector
 <td>
 <code>ingress</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyIngressRule">
+<a href="#networking.ironcore.dev/v1alpha1.NetworkPolicyIngressRule">
 []NetworkPolicyIngressRule
 </a>
 </em>
@@ -2388,7 +2388,7 @@ Kubernetes meta/v1.LabelSelector
 <td>
 <code>egress</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyEgressRule">
+<a href="#networking.ironcore.dev/v1alpha1.NetworkPolicyEgressRule">
 []NetworkPolicyEgressRule
 </a>
 </em>
@@ -2401,7 +2401,7 @@ Kubernetes meta/v1.LabelSelector
 <td>
 <code>policyTypes</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.PolicyType">
+<a href="#networking.ironcore.dev/v1alpha1.PolicyType">
 []PolicyType
 </a>
 </em>
@@ -2412,10 +2412,10 @@ Kubernetes meta/v1.LabelSelector
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.NetworkPolicyStatus">NetworkPolicyStatus
+<h3 id="networking.ironcore.dev/v1alpha1.NetworkPolicyStatus">NetworkPolicyStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicy">NetworkPolicy</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.NetworkPolicy">NetworkPolicy</a>)
 </p>
 <div>
 <p>NetworkPolicyStatus defines the observed state of NetworkPolicy.</p>
@@ -2432,7 +2432,7 @@ Kubernetes meta/v1.LabelSelector
 <td>
 <code>conditions</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicyCondition">
+<a href="#networking.ironcore.dev/v1alpha1.NetworkPolicyCondition">
 []NetworkPolicyCondition
 </a>
 </em>
@@ -2443,10 +2443,10 @@ Kubernetes meta/v1.LabelSelector
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.NetworkSpec">NetworkSpec
+<h3 id="networking.ironcore.dev/v1alpha1.NetworkSpec">NetworkSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.Network">Network</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.Network">Network</a>)
 </p>
 <div>
 <p>NetworkSpec defines the desired state of Network</p>
@@ -2474,7 +2474,7 @@ string
 <td>
 <code>peerings</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkPeering">
+<a href="#networking.ironcore.dev/v1alpha1.NetworkPeering">
 []NetworkPeering
 </a>
 </em>
@@ -2488,7 +2488,7 @@ string
 <td>
 <code>incomingPeerings</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkPeeringClaimRef">
+<a href="#networking.ironcore.dev/v1alpha1.NetworkPeeringClaimRef">
 []NetworkPeeringClaimRef
 </a>
 </em>
@@ -2500,10 +2500,10 @@ string
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.NetworkState">NetworkState
+<h3 id="networking.ironcore.dev/v1alpha1.NetworkState">NetworkState
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkStatus">NetworkStatus</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.NetworkStatus">NetworkStatus</a>)
 </p>
 <div>
 <p>NetworkState is the state of a network.</p>
@@ -2526,10 +2526,10 @@ string
 </td>
 </tr></tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.NetworkStatus">NetworkStatus
+<h3 id="networking.ironcore.dev/v1alpha1.NetworkStatus">NetworkStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.Network">Network</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.Network">Network</a>)
 </p>
 <div>
 <p>NetworkStatus defines the observed state of Network</p>
@@ -2546,7 +2546,7 @@ string
 <td>
 <code>state</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkState">
+<a href="#networking.ironcore.dev/v1alpha1.NetworkState">
 NetworkState
 </a>
 </em>
@@ -2559,7 +2559,7 @@ NetworkState
 <td>
 <code>peerings</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.NetworkPeeringStatus">
+<a href="#networking.ironcore.dev/v1alpha1.NetworkPeeringStatus">
 []NetworkPeeringStatus
 </a>
 </em>
@@ -2571,10 +2571,10 @@ NetworkState
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.PolicyType">PolicyType
+<h3 id="networking.ironcore.dev/v1alpha1.PolicyType">PolicyType
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkPolicySpec">NetworkPolicySpec</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.NetworkPolicySpec">NetworkPolicySpec</a>)
 </p>
 <div>
 <p>PolicyType is a type of policy.</p>
@@ -2594,10 +2594,10 @@ NetworkState
 </td>
 </tr></tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.PrefixSource">PrefixSource
+<h3 id="networking.ironcore.dev/v1alpha1.PrefixSource">PrefixSource
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceSpec">NetworkInterfaceSpec</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.NetworkInterfaceSpec">NetworkInterfaceSpec</a>)
 </p>
 <div>
 </div>
@@ -2613,8 +2613,8 @@ NetworkState
 <td>
 <code>value</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
+<a href="../common/#common.ironcore.dev/v1alpha1.IPPrefix">
+github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix
 </a>
 </em>
 </td>
@@ -2626,7 +2626,7 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
 <td>
 <code>ephemeral</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.EphemeralPrefixSource">
+<a href="#networking.ironcore.dev/v1alpha1.EphemeralPrefixSource">
 EphemeralPrefixSource
 </a>
 </em>
@@ -2637,10 +2637,10 @@ EphemeralPrefixSource
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.VirtualIPSource">VirtualIPSource
+<h3 id="networking.ironcore.dev/v1alpha1.VirtualIPSource">VirtualIPSource
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.NetworkInterfaceSpec">NetworkInterfaceSpec</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.NetworkInterfaceSpec">NetworkInterfaceSpec</a>)
 </p>
 <div>
 <p>VirtualIPSource is the definition of how to obtain a VirtualIP.</p>
@@ -2670,7 +2670,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>ephemeral</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.EphemeralVirtualIPSource">
+<a href="#networking.ironcore.dev/v1alpha1.EphemeralVirtualIPSource">
 EphemeralVirtualIPSource
 </a>
 </em>
@@ -2682,10 +2682,10 @@ VirtualIP.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.VirtualIPSpec">VirtualIPSpec
+<h3 id="networking.ironcore.dev/v1alpha1.VirtualIPSpec">VirtualIPSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.VirtualIP">VirtualIP</a>, <a href="#networking.api.onmetal.de/v1alpha1.VirtualIPTemplateSpec">VirtualIPTemplateSpec</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.VirtualIP">VirtualIP</a>, <a href="#networking.ironcore.dev/v1alpha1.VirtualIPTemplateSpec">VirtualIPTemplateSpec</a>)
 </p>
 <div>
 <p>VirtualIPSpec defines the desired state of VirtualIP</p>
@@ -2702,7 +2702,7 @@ VirtualIP.</p>
 <td>
 <code>type</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPType">
+<a href="#networking.ironcore.dev/v1alpha1.VirtualIPType">
 VirtualIPType
 </a>
 </em>
@@ -2728,8 +2728,8 @@ Kubernetes core/v1.IPFamily
 <td>
 <code>targetRef</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
+<a href="../common/#common.ironcore.dev/v1alpha1.LocalUIDReference">
+github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
 </td>
@@ -2739,10 +2739,10 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.VirtualIPStatus">VirtualIPStatus
+<h3 id="networking.ironcore.dev/v1alpha1.VirtualIPStatus">VirtualIPStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.VirtualIP">VirtualIP</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.VirtualIP">VirtualIP</a>)
 </p>
 <div>
 <p>VirtualIPStatus defines the observed state of VirtualIP</p>
@@ -2759,8 +2759,8 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 <td>
 <code>ip</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IP">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
+<a href="../common/#common.ironcore.dev/v1alpha1.IP">
+github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP
 </a>
 </em>
 </td>
@@ -2770,10 +2770,10 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.IP
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.VirtualIPTemplateSpec">VirtualIPTemplateSpec
+<h3 id="networking.ironcore.dev/v1alpha1.VirtualIPTemplateSpec">VirtualIPTemplateSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.EphemeralVirtualIPSource">EphemeralVirtualIPSource</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.EphemeralVirtualIPSource">EphemeralVirtualIPSource</a>)
 </p>
 <div>
 <p>VirtualIPTemplateSpec is the specification of a VirtualIP template.</p>
@@ -2804,7 +2804,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPSpec">
+<a href="#networking.ironcore.dev/v1alpha1.VirtualIPSpec">
 VirtualIPSpec
 </a>
 </em>
@@ -2817,7 +2817,7 @@ VirtualIPSpec
 <td>
 <code>type</code><br/>
 <em>
-<a href="#networking.api.onmetal.de/v1alpha1.VirtualIPType">
+<a href="#networking.ironcore.dev/v1alpha1.VirtualIPType">
 VirtualIPType
 </a>
 </em>
@@ -2843,8 +2843,8 @@ Kubernetes core/v1.IPFamily
 <td>
 <code>targetRef</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.LocalUIDReference">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
+<a href="../common/#common.ironcore.dev/v1alpha1.LocalUIDReference">
+github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference
 </a>
 </em>
 </td>
@@ -2857,10 +2857,10 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.LocalUIDReference
 </tr>
 </tbody>
 </table>
-<h3 id="networking.api.onmetal.de/v1alpha1.VirtualIPType">VirtualIPType
+<h3 id="networking.ironcore.dev/v1alpha1.VirtualIPType">VirtualIPType
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#networking.api.onmetal.de/v1alpha1.VirtualIPSpec">VirtualIPSpec</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.VirtualIPSpec">VirtualIPSpec</a>)
 </p>
 <div>
 <p>VirtualIPType is a type of VirtualIP.</p>

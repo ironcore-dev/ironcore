@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
 package validation
 
 import (
-	onmetalapivalidation "github.com/onmetal/onmetal-api/internal/api/validation"
-	"github.com/onmetal/onmetal-api/internal/apis/core"
-	"github.com/onmetal/onmetal-api/internal/apis/storage"
+	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
+	"github.com/ironcore-dev/ironcore/internal/apis/core"
+	"github.com/ironcore-dev/ironcore/internal/apis/storage"
 	"k8s.io/apimachinery/pkg/api/resource"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -38,7 +38,7 @@ func ValidateVolumeClass(volumeClass *storage.VolumeClass) field.ErrorList {
 func validateVolumeClassResizePolicy(policy storage.ResizePolicy, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, onmetalapivalidation.ValidateResizePolicy(policy, fldPath)...)
+	allErrs = append(allErrs, ironcorevalidation.ValidateResizePolicy(policy, fldPath)...)
 
 	return allErrs
 }
@@ -47,10 +47,10 @@ func validateVolumeClassCapabilities(capabilities core.ResourceList, fldPath *fi
 	var allErrs field.ErrorList
 
 	tps := capabilities.Name(core.ResourceTPS, resource.DecimalSI)
-	allErrs = append(allErrs, onmetalapivalidation.ValidatePositiveQuantity(*tps, fldPath.Key(string(core.ResourceTPS)))...)
+	allErrs = append(allErrs, ironcorevalidation.ValidatePositiveQuantity(*tps, fldPath.Key(string(core.ResourceTPS)))...)
 
 	iops := capabilities.Name(core.ResourceIOPS, resource.DecimalSI)
-	allErrs = append(allErrs, onmetalapivalidation.ValidatePositiveQuantity(*iops, fldPath.Key(string(core.ResourceIOPS)))...)
+	allErrs = append(allErrs, ironcorevalidation.ValidatePositiveQuantity(*iops, fldPath.Key(string(core.ResourceIOPS)))...)
 
 	return allErrs
 }
@@ -59,7 +59,7 @@ func ValidateVolumeClassUpdate(newVolumeClass, oldVolumeClass *storage.VolumeCla
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessorUpdate(newVolumeClass, oldVolumeClass, field.NewPath("metadata"))...)
-	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableField(newVolumeClass.Capabilities, oldVolumeClass.Capabilities, field.NewPath("capabilities"))...)
+	allErrs = append(allErrs, ironcorevalidation.ValidateImmutableField(newVolumeClass.Capabilities, oldVolumeClass.Capabilities, field.NewPath("capabilities"))...)
 	allErrs = append(allErrs, ValidateVolumeClass(newVolumeClass)...)
 
 	return allErrs

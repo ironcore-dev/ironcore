@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,16 +15,16 @@
 package rest
 
 import (
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	"github.com/onmetal/onmetal-api/internal/api"
-	"github.com/onmetal/onmetal-api/internal/apis/storage"
-	bucketstorage "github.com/onmetal/onmetal-api/internal/registry/storage/bucket/storage"
-	bucketclassstore "github.com/onmetal/onmetal-api/internal/registry/storage/bucketclass/storage"
-	bucketpoolstorage "github.com/onmetal/onmetal-api/internal/registry/storage/bucketpool/storage"
-	volumestorage "github.com/onmetal/onmetal-api/internal/registry/storage/volume/storage"
-	volumeclassstore "github.com/onmetal/onmetal-api/internal/registry/storage/volumeclass/storage"
-	volumepoolstorage "github.com/onmetal/onmetal-api/internal/registry/storage/volumepool/storage"
-	onmetalapiserializer "github.com/onmetal/onmetal-api/internal/serializer"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	"github.com/ironcore-dev/ironcore/internal/api"
+	"github.com/ironcore-dev/ironcore/internal/apis/storage"
+	bucketstorage "github.com/ironcore-dev/ironcore/internal/registry/storage/bucket/storage"
+	bucketclassstore "github.com/ironcore-dev/ironcore/internal/registry/storage/bucketclass/storage"
+	bucketpoolstorage "github.com/ironcore-dev/ironcore/internal/registry/storage/bucketpool/storage"
+	volumestorage "github.com/ironcore-dev/ironcore/internal/registry/storage/volume/storage"
+	volumeclassstore "github.com/ironcore-dev/ironcore/internal/registry/storage/volumeclass/storage"
+	volumepoolstorage "github.com/ironcore-dev/ironcore/internal/registry/storage/volumepool/storage"
+	ironcoreserializer "github.com/ironcore-dev/ironcore/internal/serializer"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apiserver/pkg/registry/generic"
 	"k8s.io/apiserver/pkg/registry/rest"
@@ -41,7 +41,7 @@ func (p StorageProvider) GroupName() string {
 
 func (p StorageProvider) NewRESTStorage(apiResourceConfigSource serverstorage.APIResourceConfigSource, restOptionsGetter generic.RESTOptionsGetter) (genericapiserver.APIGroupInfo, bool, error) {
 	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(p.GroupName(), api.Scheme, metav1.ParameterCodec, api.Codecs)
-	apiGroupInfo.NegotiatedSerializer = onmetalapiserializer.DefaultSubsetNegotiatedSerializer(api.Codecs)
+	apiGroupInfo.NegotiatedSerializer = ironcoreserializer.DefaultSubsetNegotiatedSerializer(api.Codecs)
 
 	storageMap, err := p.v1alpha1Storage(restOptionsGetter)
 	if err != nil {

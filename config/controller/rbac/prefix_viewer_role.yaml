@@ -5,7 +5,7 @@ metadata:
   name: prefix-viewer-role
 rules:
   - apiGroups:
-      - ipam.api.onmetal.de
+      - ipam.ironcore.dev
     resources:
       - prefixes
     verbs:
@@ -13,7 +13,7 @@ rules:
       - list
       - watch
   - apiGroups:
-      - ipam.api.onmetal.de
+      - ipam.ironcore.dev
     resources:
       - prefixes/status
     verbs:

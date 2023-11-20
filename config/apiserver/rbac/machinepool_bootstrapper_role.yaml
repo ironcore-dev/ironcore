@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: compute.api.onmetal.de:system:machinepools-bootstrapper
+  name: compute.ironcore.dev:system:machinepools-bootstrapper
 rules:
   - apiGroups:
       - certificates.k8s.io

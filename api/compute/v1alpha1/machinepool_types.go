@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 by the OnMetal authors.
+ * Copyright (c) 2021 by the IronCore authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,11 @@
 package v1alpha1
 
 import (
-	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 )
 
 // MachinePoolSpec defines the desired state of MachinePool
@@ -68,7 +68,7 @@ const (
 	MachinePoolHostName MachinePoolAddressType = "Hostname"
 
 	// MachinePoolInternalIP identifies an IP address which may not be visible to hosts outside the cluster.
-	// By default, it is assumed that onmetal-api-apiserver can reach machine pool internal IPs, though it is possible
+	// By default, it is assumed that ironcore-apiserver can reach machine pool internal IPs, though it is possible
 	// to configure clusters where this is not the case.
 	//
 	// MachinePoolInternalIP is the default type of machine pool IP, and does not necessarily imply

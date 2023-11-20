@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@ package validation
 import (
 	"fmt"
 
-	onmetalapivalidation "github.com/onmetal/onmetal-api/internal/api/validation"
-	"github.com/onmetal/onmetal-api/internal/apis/core"
-	"github.com/onmetal/onmetal-api/internal/apis/networking"
+	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
+	"github.com/ironcore-dev/ironcore/internal/apis/core"
+	"github.com/ironcore-dev/ironcore/internal/apis/networking"
 	"go4.org/netipx"
 	corev1 "k8s.io/api/core/v1"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
@@ -142,7 +142,7 @@ func validateNetworkPolicyPort(port *networking.NetworkPolicyPort, fldPath *fiel
 	}
 
 	if protocol := port.Protocol; protocol != nil {
-		allErrs = append(allErrs, onmetalapivalidation.ValidateProtocol(*protocol, fldPath.Child("protocol"))...)
+		allErrs = append(allErrs, ironcorevalidation.ValidateProtocol(*protocol, fldPath.Child("protocol"))...)
 	}
 
 	return allErrs
@@ -177,7 +177,7 @@ func validateNetworkPolicyPeer(peer *networking.NetworkPolicyPeer, supportedObje
 func validateNetworkPolicyPeerObjectSelector(sel *core.ObjectSelector, allowedKinds sets.Set[string], fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, onmetalapivalidation.ValidateEnum(allowedKinds, sel.Kind, fldPath.Child("kind"), "must specify kind")...)
+	allErrs = append(allErrs, ironcorevalidation.ValidateEnum(allowedKinds, sel.Kind, fldPath.Child("kind"), "must specify kind")...)
 	allErrs = append(allErrs, metav1validation.ValidateLabelSelector(&sel.LabelSelector, metav1validation.LabelSelectorValidationOptions{}, fldPath)...)
 
 	return allErrs
@@ -217,7 +217,7 @@ var supportedPolicyTypes = sets.New(
 )
 
 func validatePolicyType(policyType networking.PolicyType, fldPath *field.Path) field.ErrorList {
-	return onmetalapivalidation.ValidateEnum(supportedPolicyTypes, policyType, fldPath, "must specify type")
+	return ironcorevalidation.ValidateEnum(supportedPolicyTypes, policyType, fldPath, "must specify type")
 }
 
 func validatePolicyTypes(policyTypes []networking.PolicyType, fldPath *field.Path) field.ErrorList {
@@ -254,7 +254,7 @@ func ValidateNetworkPolicyUpdate(newNetworkPolicy, oldNetworkPolicy *networking.
 func validateNetworkPolicySpecUpdate(newSpec, oldSpec *networking.NetworkPolicySpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableField(newSpec.NetworkRef, oldSpec.NetworkRef, fldPath.Child("networkRef"))...)
+	allErrs = append(allErrs, ironcorevalidation.ValidateImmutableField(newSpec.NetworkRef, oldSpec.NetworkRef, fldPath.Child("networkRef"))...)
 
 	return allErrs
 }

@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@ import (
 	"crypto/x509"
 
 	"github.com/go-logr/logr"
-	utilcertificate "github.com/onmetal/onmetal-api/utils/certificate"
-	"github.com/onmetal/onmetal-api/utils/client/config"
-	utilrest "github.com/onmetal/onmetal-api/utils/rest"
-	utilresttesting "github.com/onmetal/onmetal-api/utils/rest/testing"
+	utilcertificate "github.com/ironcore-dev/ironcore/utils/certificate"
+	"github.com/ironcore-dev/ironcore/utils/client/config"
+	utilrest "github.com/ironcore-dev/ironcore/utils/rest"
+	utilresttesting "github.com/ironcore-dev/ironcore/utils/rest/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"k8s.io/client-go/rest"

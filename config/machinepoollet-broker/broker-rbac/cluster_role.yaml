@@ -6,7 +6,7 @@ metadata:
   name: broker-role
 rules:
 - apiGroups:
-  - compute.api.onmetal.de
+  - compute.ironcore.dev
   resources:
   - machineclasses
   verbs:
@@ -14,7 +14,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - compute.api.onmetal.de
+  - compute.ironcore.dev
   resources:
   - machinepools
   verbs:
@@ -22,7 +22,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - compute.api.onmetal.de
+  - compute.ironcore.dev
   resources:
   - machinepools/proxy
   verbs:

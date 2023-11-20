@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 package validation
 
 import (
-	onmetalapivalidation "github.com/onmetal/onmetal-api/internal/api/validation"
-	"github.com/onmetal/onmetal-api/internal/apis/storage"
+	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
+	"github.com/ironcore-dev/ironcore/internal/apis/storage"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1validation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -77,8 +77,8 @@ func ValidateBucketUpdate(newBucket, oldBucket *storage.Bucket) field.ErrorList 
 func validateBucketSpecUpdate(newSpec, oldSpec *storage.BucketSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableField(newSpec.BucketClassRef, oldSpec.BucketClassRef, fldPath.Child("bucketClassRef"))...)
-	allErrs = append(allErrs, onmetalapivalidation.ValidateSetOnceField(newSpec.BucketPoolRef, oldSpec.BucketPoolRef, fldPath.Child("bucketPoolRef"))...)
+	allErrs = append(allErrs, ironcorevalidation.ValidateImmutableField(newSpec.BucketClassRef, oldSpec.BucketClassRef, fldPath.Child("bucketClassRef"))...)
+	allErrs = append(allErrs, ironcorevalidation.ValidateSetOnceField(newSpec.BucketPoolRef, oldSpec.BucketPoolRef, fldPath.Child("bucketPoolRef"))...)
 
 	return allErrs
 }

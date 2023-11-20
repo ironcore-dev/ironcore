@@ -44,7 +44,7 @@ traffic inside a network building upon the existing concepts that were proposed 
 
 Currently, there is no way to describe which members of a network should be able
 to communicate with each other. Same applies to traffic coming from the public
-internet / going to the public internet. The `onmetal-api` should be extended
+internet / going to the public internet. The `ironcore` should be extended
 with traffic control mechanisms, allowing to limit / deny traffic on a
 per-instance basis. Of course, the mechanisms should align well with existing
 proposals / concepts in the Kubernetes world.
@@ -79,7 +79,7 @@ they want to enforce.
 Example manifest:
 
 ```yaml
-apiVersion: networking.api.onmetal.de/v1alpha1
+apiVersion: networking.ironcore.dev/v1alpha1
 kind: NetworkPolicy
 metadata:
   namespace: default

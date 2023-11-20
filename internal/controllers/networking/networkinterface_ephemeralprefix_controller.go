@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,13 +20,13 @@ import (
 	"fmt"
 	"maps"
 
-	"github.com/onmetal/onmetal-api/utils/annotations"
+	"github.com/ironcore-dev/ironcore/utils/annotations"
 
 	"github.com/go-logr/logr"
-	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	networkingclient "github.com/onmetal/onmetal-api/internal/client/networking"
-	klogutils "github.com/onmetal/onmetal-api/utils/klog"
+	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	networkingclient "github.com/ironcore-dev/ironcore/internal/client/networking"
+	klogutils "github.com/ironcore-dev/ironcore/utils/klog"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/klog/v2"
@@ -41,8 +41,8 @@ type NetworkInterfaceEphemeralPrefixReconciler struct {
 	client.Client
 }
 
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces,verbs=get;list;watch
-//+kubebuilder:rbac:groups=ipam.api.onmetal.de,resources=prefixes,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=networkinterfaces,verbs=get;list;watch
+//+kubebuilder:rbac:groups=ipam.ironcore.dev,resources=prefixes,verbs=get;list;watch;create;update;patch;delete
 
 func (r *NetworkInterfaceEphemeralPrefixReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)

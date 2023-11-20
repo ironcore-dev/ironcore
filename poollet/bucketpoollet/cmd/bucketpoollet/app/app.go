@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,17 +21,17 @@ import (
 	"os"
 	"time"
 
-	"github.com/onmetal/controller-utils/configutils"
-	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	ori "github.com/onmetal/onmetal-api/ori/apis/bucket/v1alpha1"
-	oriremotebucket "github.com/onmetal/onmetal-api/ori/remote/bucket"
-	"github.com/onmetal/onmetal-api/poollet/bucketpoollet/bcm"
-	bucketpoolletconfig "github.com/onmetal/onmetal-api/poollet/bucketpoollet/client/config"
-	"github.com/onmetal/onmetal-api/poollet/bucketpoollet/controllers"
-	"github.com/onmetal/onmetal-api/poollet/orievent"
-	"github.com/onmetal/onmetal-api/utils/client/config"
+	"github.com/ironcore-dev/controller-utils/configutils"
+	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
+	iriremotebucket "github.com/ironcore-dev/ironcore/iri/remote/bucket"
+	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/bcm"
+	bucketpoolletconfig "github.com/ironcore-dev/ironcore/poollet/bucketpoollet/client/config"
+	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/controllers"
+	"github.com/ironcore-dev/ironcore/poollet/irievent"
+	"github.com/ironcore-dev/ironcore/utils/client/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"google.golang.org/grpc"
@@ -139,7 +139,7 @@ func Run(ctx context.Context, opts Options) error {
 		os.Exit(1)
 	}
 
-	endpoint, err := oriremotebucket.GetAddressWithTimeout(opts.BucketRuntimeSocketDiscoveryTimeout, opts.BucketRuntimeEndpoint)
+	endpoint, err := iriremotebucket.GetAddressWithTimeout(opts.BucketRuntimeSocketDiscoveryTimeout, opts.BucketRuntimeEndpoint)
 	if err != nil {
 		return fmt.Errorf("error detecting bucket runtime endpoint: %w", err)
 	}
@@ -156,7 +156,7 @@ func Run(ctx context.Context, opts Options) error {
 		}
 	}()
 
-	bucketRuntime := ori.NewBucketRuntimeClient(conn)
+	bucketRuntime := iri.NewBucketRuntimeClient(conn)
 
 	cfg, configCtrl, err := getter.GetConfig(ctx, &opts.GetConfigOptions)
 	if err != nil {
@@ -176,7 +176,7 @@ func Run(ctx context.Context, opts Options) error {
 		Metrics:                 metricsserver.Options{BindAddress: opts.MetricsAddr},
 		HealthProbeBindAddress:  opts.ProbeAddr,
 		LeaderElection:          opts.EnableLeaderElection,
-		LeaderElectionID:        "dwfepysc.api.onmetal.de",
+		LeaderElectionID:        "dwfepysc.ironcore.dev",
 		LeaderElectionNamespace: opts.LeaderElectionNamespace,
 		LeaderElectionConfig:    leaderElectionCfg,
 	})
@@ -192,13 +192,13 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error adding bucket class mapper: %w", err)
 	}
 
-	bucketEvents := orievent.NewGenerator(func(ctx context.Context) ([]*ori.Bucket, error) {
-		res, err := bucketRuntime.ListBuckets(ctx, &ori.ListBucketsRequest{})
+	bucketEvents := irievent.NewGenerator(func(ctx context.Context) ([]*iri.Bucket, error) {
+		res, err := bucketRuntime.ListBuckets(ctx, &iri.ListBucketsRequest{})
 		if err != nil {
 			return nil, err
 		}
 		return res.Buckets, nil
-	}, orievent.GeneratorOptions{})
+	}, irievent.GeneratorOptions{})
 	if err := mgr.Add(bucketEvents); err != nil {
 		return fmt.Errorf("error adding bucket event generator: %w", err)
 	}

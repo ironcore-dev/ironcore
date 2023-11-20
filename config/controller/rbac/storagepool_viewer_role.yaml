@@ -5,7 +5,7 @@ metadata:
   name: volumepool-viewer-role
 rules:
   - apiGroups:
-      - storage.api.onmetal.de
+      - storage.ironcore.dev
     resources:
       - volumepools
     verbs:
@@ -13,7 +13,7 @@ rules:
       - list
       - watch
   - apiGroups:
-      - storage.api.onmetal.de
+      - storage.ironcore.dev
     resources:
       - volumepools/status
     verbs:

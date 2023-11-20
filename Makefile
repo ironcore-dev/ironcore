@@ -3,19 +3,19 @@ CONTROLLER_IMG ?= controller:latest
 APISERVER_IMG ?= apiserver:latest
 MACHINEPOOLLET_IMG ?= machinepoollet:latest
 MACHINEBROKER_IMG ?= machinebroker:latest
-ORICTL_MACHINE_IMG ?= orictl-machine:latest
+IRICTL_MACHINE_IMG ?= irictl-machine:latest
 VOLUMEPOOLLET_IMG ?= volumepoollet:latest
 VOLUMEBROKER_IMG ?= volumebroker:latest
-ORICTL_VOLUME_IMG ?= orictl-volume:latest
+IRICTL_VOLUME_IMG ?= irictl-volume:latest
 BUCKETPOOLLET_IMG ?= bucketpoollet:latest
 BUCKETBROKER_IMG ?= bucketbroker:latest
-ORICTL_BUCKET_IMG ?= orictl-bucket:latest
+IRICTL_BUCKET_IMG ?= irictl-bucket:latest
 
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
 ENVTEST_K8S_VERSION = 1.28.0
 
 # Docker image name for the mkdocs based local development setup
-IMAGE=onmetal-api/documentation
+IMAGE=ironcore/documentation
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
@@ -55,7 +55,7 @@ help: ## Display this help.
 .PHONY: manifests
 FILE="config/machinepoollet-broker/broker-rbac/role.yaml"
 manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
-	# onmetal-controller-manager
+	# ironcore-controller-manager
 	$(CONTROLLER_GEN) rbac:roleName=manager-role webhook paths="./internal/controllers/...;./api/..." output:rbac:artifacts:config=config/controller/rbac
 
 	# machinepoollet-broker
@@ -75,11 +75,11 @@ manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and Cust
 
 	# poollet system roles
 	cp config/machinepoollet-broker/poollet-rbac/role.yaml config/apiserver/rbac/machinepool_role.yaml
-	./hack/replace.sh config/apiserver/rbac/machinepool_role.yaml 's/manager-role/compute.api.onmetal.de:system:machinepools/g'
+	./hack/replace.sh config/apiserver/rbac/machinepool_role.yaml 's/manager-role/compute.ironcore.dev:system:machinepools/g'
 	cp config/volumepoollet-broker/poollet-rbac/role.yaml config/apiserver/rbac/volumepool_role.yaml
-	./hack/replace.sh config/apiserver/rbac/volumepool_role.yaml 's/manager-role/storage.api.onmetal.de:system:volumepools/g'
+	./hack/replace.sh config/apiserver/rbac/volumepool_role.yaml 's/manager-role/storage.ironcore.dev:system:volumepools/g'
 	cp config/bucketpoollet-broker/poollet-rbac/role.yaml config/apiserver/rbac/bucketpool_role.yaml
-	./hack/replace.sh config/apiserver/rbac/bucketpool_role.yaml 's/manager-role/storage.api.onmetal.de:system:bucketpools/g'
+	./hack/replace.sh config/apiserver/rbac/bucketpool_role.yaml 's/manager-role/storage.ironcore.dev:system:bucketpools/g'
 
 .PHONY: generate
 generate: vgopath models-schema deepcopy-gen client-gen lister-gen informer-gen defaulter-gen conversion-gen openapi-gen applyconfiguration-gen
@@ -100,7 +100,7 @@ proto: goimports vgopath protoc-gen-gogo
 	VGOPATH=$(VGOPATH) \
 	PROTOC_GEN_GOGO=$(PROTOC_GEN_GOGO) \
 	./hack/update-proto.sh
-	$(GOIMPORTS) -w ./ori
+	$(GOIMPORTS) -w ./iri
 
 .PHONY: fmt
 fmt: goimports ## Run goimports against code.
@@ -119,16 +119,16 @@ clean: ## Clean any artifacts that can be regenerated.
 	rm -rf client-go/applyconfigurations
 	rm -rf client-go/informers
 	rm -rf client-go/listers
-	rm -rf client-go/onmetalapi
+	rm -rf client-go/ironcore
 	rm -rf client-go/openapi
 
 .PHONY: add-license
 add-license: addlicense ## Add license headers to all go files.
-	find . -name '*.go' -exec $(ADDLICENSE) -c 'OnMetal authors' {} +
+	find . -name '*.go' -exec $(ADDLICENSE) -c 'IronCore authors' {} +
 
 .PHONY: check-license
 check-license: addlicense ## Check that every file has a license header present.
-	find . -name '*.go' -exec $(ADDLICENSE) -check -c 'OnMetal authors' {} +
+	find . -name '*.go' -exec $(ADDLICENSE) -check -c 'IronCore authors' {} +
 
 .PHONY: check
 check: generate manifests add-license fmt lint test # Generate manifests, code, lint, add licenses, test
@@ -149,7 +149,7 @@ start-docs: ## Start the local mkdocs based development environment.
 
 .PHONY: clean-docs
 clean-docs: ## Remove all local mkdocs Docker images (cleanup).
-	docker container prune --force --filter "label=project=onmetal_api_documentation"
+	docker container prune --force --filter "label=project=ironcore_documentation"
 
 .PHONY: test
 test: manifests generate fmt vet test-only ## Run tests.
@@ -161,7 +161,7 @@ test-only: envtest ## Run *only* the tests - no generation, linting etc.
 .PHONY: openapi-extractor
 extract-openapi: envtest openapi-extractor
 	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" $(OPENAPI_EXTRACTOR) \
-		--apiserver-package="github.com/onmetal/onmetal-api/cmd/onmetal-apiserver" \
+		--apiserver-package="github.com/ironcore-dev/ironcore/cmd/ironcore-apiserver" \
 		--apiserver-build-opts=mod \
 		--apiservices="./config/apiserver/apiservice/bases" \
 		--output="./gen"
@@ -170,25 +170,25 @@ extract-openapi: envtest openapi-extractor
 
 .PHONY: build
 build: generate fmt vet ## Build manager binary.
-	go build -o bin/manager ./cmd/onmetal-controller-manager
+	go build -o bin/manager ./cmd/ironcore-controller-manager
 
 .PHONY: run
 run: manifests generate fmt vet ## Run a controller from your host.
-	go run ./cmd/onmetal-controller-manager
+	go run ./cmd/ironcore-controller-manager
 
 .PHONY: docker-build
 docker-build: \
-	docker-build-onmetal-apiserver docker-build-onmetal-controller-manager \
-	docker-build-machinepoollet docker-build-machinebroker docker-build-orictl-machine \
-	docker-build-volumepoollet docker-build-volumebroker docker-build-orictl-volume \
-	docker-build-bucketpoollet docker-build-bucketbroker docker-build-orictl-bucket ## Build docker image with the manager.
+	docker-build-ironcore-apiserver docker-build-ironcore-controller-manager \
+	docker-build-machinepoollet docker-build-machinebroker docker-build-irictl-machine \
+	docker-build-volumepoollet docker-build-volumebroker docker-build-irictl-volume \
+	docker-build-bucketpoollet docker-build-bucketbroker docker-build-irictl-bucket ## Build docker image with the manager.
 
-.PHONY: docker-build-onmetal-apiserver
-docker-build-onmetal-apiserver: ## Build onmetal-apiserver.
+.PHONY: docker-build-ironcore-apiserver
+docker-build-ironcore-apiserver: ## Build ironcore-apiserver.
 	docker build --target apiserver -t ${APISERVER_IMG} .
 
-.PHONY: docker-build-onmetal-controller-manager
-docker-build-onmetal-controller-manager: ## Build onmetal-controller-manager.
+.PHONY: docker-build-ironcore-controller-manager
+docker-build-ironcore-controller-manager: ## Build ironcore-controller-manager.
 	docker build --target manager -t ${CONTROLLER_IMG} .
 
 .PHONY: docker-build-machinepoollet
@@ -199,9 +199,9 @@ docker-build-machinepoollet: ## Build machinepoollet image.
 docker-build-machinebroker: ## Build machinebroker image.
 	docker build --target machinebroker -t ${MACHINEBROKER_IMG} .
 
-.PHONY: docker-build-orictl-machine
-docker-build-orictl-machine: ## Build orictl-machine image.
-	docker build --target orictl-machine -t ${ORICTL_MACHINE_IMG} .
+.PHONY: docker-build-irictl-machine
+docker-build-irictl-machine: ## Build irictl-machine image.
+	docker build --target irictl-machine -t ${IRICTL_MACHINE_IMG} .
 
 .PHONY: docker-build-volumepoollet
 docker-build-volumepoollet: ## Build volumepoollet image.
@@ -211,9 +211,9 @@ docker-build-volumepoollet: ## Build volumepoollet image.
 docker-build-volumebroker: ## Build volumebroker image.
 	docker build --target volumebroker -t ${VOLUMEBROKER_IMG} .
 
-.PHONY: docker-build-orictl-volume
-docker-build-orictl-volume: ## Build orictl-volume image.
-	docker build --target orictl-volume -t ${ORICTL_VOLUME_IMG} .
+.PHONY: docker-build-irictl-volume
+docker-build-irictl-volume: ## Build irictl-volume image.
+	docker build --target irictl-volume -t ${IRICTL_VOLUME_IMG} .
 
 .PHONY: docker-build-bucketpoollet
 docker-build-bucketpoollet: ## Build bucketpoollet image.
@@ -223,9 +223,9 @@ docker-build-bucketpoollet: ## Build bucketpoollet image.
 docker-build-bucketbroker: ## Build bucketbroker image.
 	docker build --target bucketbroker -t ${BUCKETBROKER_IMG} .
 
-.PHONY: docker-build-orictl-bucket
-docker-build-orictl-bucket: ## Build orictl-bucket image.
-	docker build --target orictl-bucket -t ${ORICTL_BUCKET_IMG} .
+.PHONY: docker-build-irictl-bucket
+docker-build-irictl-bucket: ## Build irictl-bucket image.
+	docker build --target irictl-bucket -t ${IRICTL_BUCKET_IMG} .
 
 .PHONY: docker-push
 docker-push: ## Push docker image with the manager.
@@ -302,11 +302,11 @@ kind-load: kind-load-apiserver kind-load-controller ## Load the apiserver and co
 
 .PHONY: kind-restart-apiserver
 kind-restart-apiserver: ## Restart the apiserver in kind. Useless if the manifests are not in place (deployed e.g. via kind-apply / kind-deploy).
-	kubectl -n onmetal-system delete rs -l control-plane=apiserver
+	kubectl -n ironcore-system delete rs -l control-plane=apiserver
 
 .PHONY: kind-restart-controller
 kind-restart-controller: ## Restart the controller in kind. Useless if the manifests are not in place (deployed e.g. via kind-apply / kind-deploy).
-	kubectl -n onmetal-system delete rs -l control-plane=controller-manager
+	kubectl -n ironcore-system delete rs -l control-plane=controller-manager
 
 .PHONY: kind-restart
 kind-restart: kind-restart-apiserver kind-restart-controller ## Restart the apiserver and controller in kind. Restart is useless if the manifests are not in place (deployed e.g. via kind-apply / kind-deploy).
@@ -373,7 +373,7 @@ GOLANGCI_LINT ?= $(LOCALBIN)/golangci-lint
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v5.1.1
 CODE_GENERATOR_VERSION ?= v0.28.2
-VGOPATH_VERSION ?= v0.1.1
+VGOPATH_VERSION ?= v0.1.3
 CONTROLLER_TOOLS_VERSION ?= v0.13.0
 GEN_CRD_API_REFERENCE_DOCS_VERSION ?= v0.3.0
 ADDLICENSE_VERSION ?= v1.1.1
@@ -445,7 +445,7 @@ $(VGOPATH): $(LOCALBIN)
 		echo "$(LOCALBIN)/vgopath version is not expected $(VGOPATH_VERSION). Removing it before installing."; \
 		rm -rf $(LOCALBIN)/vgopath; \
 	fi
-	test -s $(LOCALBIN)/vgopath || GOBIN=$(LOCALBIN) go install github.com/onmetal/vgopath@$(VGOPATH_VERSION)
+	test -s $(LOCALBIN)/vgopath || GOBIN=$(LOCALBIN) go install github.com/ironcore-dev/vgopath@$(VGOPATH_VERSION)
 
 .PHONY: envtest
 envtest: $(ENVTEST) ## Download envtest-setup locally if necessary.
@@ -475,7 +475,7 @@ $(PROTOC_GEN_GOGO): $(LOCALBIN)
 .PHONY: models-schema
 models-schema: $(MODELS_SCHEMA) ## Install models-schema locally if necessary.
 $(MODELS_SCHEMA): $(LOCALBIN)
-	test -s $(LOCALBIN)/models-schema || GOBIN=$(LOCALBIN) go install github.com/onmetal/onmetal-api/models-schema
+	test -s $(LOCALBIN)/models-schema || GOBIN=$(LOCALBIN) go install github.com/ironcore-dev/ironcore/models-schema
 
 .PHONY: goimports
 goimports: $(GOIMPORTS) ## Download goimports locally if necessary.

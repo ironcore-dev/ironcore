@@ -1,20 +1,20 @@
 <p>Packages:</p>
 <ul>
 <li>
-<a href="#ipam.api.onmetal.de%2fv1alpha1">ipam.api.onmetal.de/v1alpha1</a>
+<a href="#ipam.ironcore.dev%2fv1alpha1">ipam.ironcore.dev/v1alpha1</a>
 </li>
 </ul>
-<h2 id="ipam.api.onmetal.de/v1alpha1">ipam.api.onmetal.de/v1alpha1</h2>
+<h2 id="ipam.ironcore.dev/v1alpha1">ipam.ironcore.dev/v1alpha1</h2>
 <div>
 <p>Package v1alpha1 is the v1alpha1 version of the API.</p>
 </div>
 Resource Types:
 <ul><li>
-<a href="#ipam.api.onmetal.de/v1alpha1.Prefix">Prefix</a>
+<a href="#ipam.ironcore.dev/v1alpha1.Prefix">Prefix</a>
 </li><li>
-<a href="#ipam.api.onmetal.de/v1alpha1.PrefixAllocation">PrefixAllocation</a>
+<a href="#ipam.ironcore.dev/v1alpha1.PrefixAllocation">PrefixAllocation</a>
 </li></ul>
-<h3 id="ipam.api.onmetal.de/v1alpha1.Prefix">Prefix
+<h3 id="ipam.ironcore.dev/v1alpha1.Prefix">Prefix
 </h3>
 <div>
 <p>Prefix is the Schema for the prefixes API</p>
@@ -33,7 +33,7 @@ Resource Types:
 string</td>
 <td>
 <code>
-ipam.api.onmetal.de/v1alpha1
+ipam.ironcore.dev/v1alpha1
 </code>
 </td>
 </tr>
@@ -62,7 +62,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#ipam.api.onmetal.de/v1alpha1.PrefixSpec">
+<a href="#ipam.ironcore.dev/v1alpha1.PrefixSpec">
 PrefixSpec
 </a>
 </em>
@@ -89,8 +89,8 @@ If unset but Prefix is set, this can be inferred.</p>
 <td>
 <code>prefix</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
+<a href="../common/#common.ironcore.dev/v1alpha1.IPPrefix">
+github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix
 </a>
 </em>
 </td>
@@ -144,7 +144,7 @@ Kubernetes meta/v1.LabelSelector
 <td>
 <code>status</code><br/>
 <em>
-<a href="#ipam.api.onmetal.de/v1alpha1.PrefixStatus">
+<a href="#ipam.ironcore.dev/v1alpha1.PrefixStatus">
 PrefixStatus
 </a>
 </em>
@@ -154,7 +154,7 @@ PrefixStatus
 </tr>
 </tbody>
 </table>
-<h3 id="ipam.api.onmetal.de/v1alpha1.PrefixAllocation">PrefixAllocation
+<h3 id="ipam.ironcore.dev/v1alpha1.PrefixAllocation">PrefixAllocation
 </h3>
 <div>
 <p>PrefixAllocation is the Schema for the prefixallocations API</p>
@@ -173,7 +173,7 @@ PrefixStatus
 string</td>
 <td>
 <code>
-ipam.api.onmetal.de/v1alpha1
+ipam.ironcore.dev/v1alpha1
 </code>
 </td>
 </tr>
@@ -202,7 +202,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#ipam.api.onmetal.de/v1alpha1.PrefixAllocationSpec">
+<a href="#ipam.ironcore.dev/v1alpha1.PrefixAllocationSpec">
 PrefixAllocationSpec
 </a>
 </em>
@@ -229,8 +229,8 @@ If unset but Prefix is set, this can be inferred.</p>
 <td>
 <code>prefix</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
+<a href="../common/#common.ironcore.dev/v1alpha1.IPPrefix">
+github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix
 </a>
 </em>
 </td>
@@ -282,7 +282,7 @@ Kubernetes meta/v1.LabelSelector
 <td>
 <code>status</code><br/>
 <em>
-<a href="#ipam.api.onmetal.de/v1alpha1.PrefixAllocationStatus">
+<a href="#ipam.ironcore.dev/v1alpha1.PrefixAllocationStatus">
 PrefixAllocationStatus
 </a>
 </em>
@@ -292,10 +292,10 @@ PrefixAllocationStatus
 </tr>
 </tbody>
 </table>
-<h3 id="ipam.api.onmetal.de/v1alpha1.PrefixAllocationPhase">PrefixAllocationPhase
+<h3 id="ipam.ironcore.dev/v1alpha1.PrefixAllocationPhase">PrefixAllocationPhase
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.PrefixAllocationStatus">PrefixAllocationStatus</a>)
+(<em>Appears on:</em><a href="#ipam.ironcore.dev/v1alpha1.PrefixAllocationStatus">PrefixAllocationStatus</a>)
 </p>
 <div>
 <p>PrefixAllocationPhase is a phase a PrefixAllocation can be in.</p>
@@ -318,10 +318,10 @@ PrefixAllocationStatus
 </td>
 </tr></tbody>
 </table>
-<h3 id="ipam.api.onmetal.de/v1alpha1.PrefixAllocationSpec">PrefixAllocationSpec
+<h3 id="ipam.ironcore.dev/v1alpha1.PrefixAllocationSpec">PrefixAllocationSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.PrefixAllocation">PrefixAllocation</a>)
+(<em>Appears on:</em><a href="#ipam.ironcore.dev/v1alpha1.PrefixAllocation">PrefixAllocation</a>)
 </p>
 <div>
 <p>PrefixAllocationSpec defines the desired state of PrefixAllocation</p>
@@ -352,8 +352,8 @@ If unset but Prefix is set, this can be inferred.</p>
 <td>
 <code>prefix</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
+<a href="../common/#common.ironcore.dev/v1alpha1.IPPrefix">
+github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix
 </a>
 </em>
 </td>
@@ -400,10 +400,10 @@ Kubernetes meta/v1.LabelSelector
 </tr>
 </tbody>
 </table>
-<h3 id="ipam.api.onmetal.de/v1alpha1.PrefixAllocationStatus">PrefixAllocationStatus
+<h3 id="ipam.ironcore.dev/v1alpha1.PrefixAllocationStatus">PrefixAllocationStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.PrefixAllocation">PrefixAllocation</a>)
+(<em>Appears on:</em><a href="#ipam.ironcore.dev/v1alpha1.PrefixAllocation">PrefixAllocation</a>)
 </p>
 <div>
 <p>PrefixAllocationStatus is the status of a PrefixAllocation.</p>
@@ -420,8 +420,8 @@ Kubernetes meta/v1.LabelSelector
 <td>
 <code>prefix</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
+<a href="../common/#common.ironcore.dev/v1alpha1.IPPrefix">
+github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix
 </a>
 </em>
 </td>
@@ -433,7 +433,7 @@ github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
 <td>
 <code>phase</code><br/>
 <em>
-<a href="#ipam.api.onmetal.de/v1alpha1.PrefixAllocationPhase">
+<a href="#ipam.ironcore.dev/v1alpha1.PrefixAllocationPhase">
 PrefixAllocationPhase
 </a>
 </em>
@@ -457,10 +457,10 @@ Kubernetes meta/v1.Time
 </tr>
 </tbody>
 </table>
-<h3 id="ipam.api.onmetal.de/v1alpha1.PrefixPhase">PrefixPhase
+<h3 id="ipam.ironcore.dev/v1alpha1.PrefixPhase">PrefixPhase
 (<code>string</code> alias)</h3>
 <p>
-(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.PrefixStatus">PrefixStatus</a>)
+(<em>Appears on:</em><a href="#ipam.ironcore.dev/v1alpha1.PrefixStatus">PrefixStatus</a>)
 </p>
 <div>
 <p>PrefixPhase is a phase a Prefix can be in.</p>
@@ -480,10 +480,10 @@ Kubernetes meta/v1.Time
 </td>
 </tr></tbody>
 </table>
-<h3 id="ipam.api.onmetal.de/v1alpha1.PrefixSpec">PrefixSpec
+<h3 id="ipam.ironcore.dev/v1alpha1.PrefixSpec">PrefixSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.Prefix">Prefix</a>, <a href="#ipam.api.onmetal.de/v1alpha1.PrefixTemplateSpec">PrefixTemplateSpec</a>)
+(<em>Appears on:</em><a href="#ipam.ironcore.dev/v1alpha1.Prefix">Prefix</a>, <a href="#ipam.ironcore.dev/v1alpha1.PrefixTemplateSpec">PrefixTemplateSpec</a>)
 </p>
 <div>
 <p>PrefixSpec defines the desired state of Prefix</p>
@@ -514,8 +514,8 @@ If unset but Prefix is set, this can be inferred.</p>
 <td>
 <code>prefix</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
+<a href="../common/#common.ironcore.dev/v1alpha1.IPPrefix">
+github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix
 </a>
 </em>
 </td>
@@ -564,10 +564,10 @@ Kubernetes meta/v1.LabelSelector
 </tr>
 </tbody>
 </table>
-<h3 id="ipam.api.onmetal.de/v1alpha1.PrefixStatus">PrefixStatus
+<h3 id="ipam.ironcore.dev/v1alpha1.PrefixStatus">PrefixStatus
 </h3>
 <p>
-(<em>Appears on:</em><a href="#ipam.api.onmetal.de/v1alpha1.Prefix">Prefix</a>)
+(<em>Appears on:</em><a href="#ipam.ironcore.dev/v1alpha1.Prefix">Prefix</a>)
 </p>
 <div>
 <p>PrefixStatus defines the observed state of Prefix</p>
@@ -584,7 +584,7 @@ Kubernetes meta/v1.LabelSelector
 <td>
 <code>phase</code><br/>
 <em>
-<a href="#ipam.api.onmetal.de/v1alpha1.PrefixPhase">
+<a href="#ipam.ironcore.dev/v1alpha1.PrefixPhase">
 PrefixPhase
 </a>
 </em>
@@ -610,8 +610,8 @@ Kubernetes meta/v1.Time
 <td>
 <code>used</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
-[]github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
+<a href="../common/#common.ironcore.dev/v1alpha1.IPPrefix">
+[]github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix
 </a>
 </em>
 </td>
@@ -621,7 +621,7 @@ Kubernetes meta/v1.Time
 </tr>
 </tbody>
 </table>
-<h3 id="ipam.api.onmetal.de/v1alpha1.PrefixTemplateSpec">PrefixTemplateSpec
+<h3 id="ipam.ironcore.dev/v1alpha1.PrefixTemplateSpec">PrefixTemplateSpec
 </h3>
 <div>
 </div>
@@ -651,7 +651,7 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#ipam.api.onmetal.de/v1alpha1.PrefixSpec">
+<a href="#ipam.ironcore.dev/v1alpha1.PrefixSpec">
 PrefixSpec
 </a>
 </em>
@@ -678,8 +678,8 @@ If unset but Prefix is set, this can be inferred.</p>
 <td>
 <code>prefix</code><br/>
 <em>
-<a href="../common/#common.api.onmetal.de/v1alpha1.IPPrefix">
-github.com/onmetal/onmetal-api/api/common/v1alpha1.IPPrefix
+<a href="../common/#common.ironcore.dev/v1alpha1.IPPrefix">
+github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix
 </a>
 </em>
 </td>

@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,39 +18,39 @@ import (
 	"context"
 	"fmt"
 
-	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func (s *Server) setOnmetalVolumeResources(ctx context.Context, onmetalVolume *storagev1alpha1.Volume, resources corev1alpha1.ResourceList) error {
-	baseOnmetalVolume := onmetalVolume.DeepCopy()
-	onmetalVolume.Spec.Resources = resources
+func (s *Server) setIronCoreVolumeResources(ctx context.Context, ironcoreVolume *storagev1alpha1.Volume, resources corev1alpha1.ResourceList) error {
+	baseIronCoreVolume := ironcoreVolume.DeepCopy()
+	ironcoreVolume.Spec.Resources = resources
 
-	if err := s.client.Patch(ctx, onmetalVolume, client.MergeFrom(baseOnmetalVolume)); err != nil {
+	if err := s.client.Patch(ctx, ironcoreVolume, client.MergeFrom(baseIronCoreVolume)); err != nil {
 		return fmt.Errorf("error setting resources: %w", err)
 	}
 
 	return nil
 }
 
-func (s *Server) ExpandVolume(ctx context.Context, req *ori.ExpandVolumeRequest) (*ori.ExpandVolumeResponse, error) {
+func (s *Server) ExpandVolume(ctx context.Context, req *iri.ExpandVolumeRequest) (*iri.ExpandVolumeResponse, error) {
 	volumeID := req.VolumeId
 	log := s.loggerFrom(ctx, "VolumeID", volumeID)
 
-	onmetalVolume, err := s.getAggregateOnmetalVolume(ctx, req.VolumeId)
+	ironcoreVolume, err := s.getAggregateIronCoreVolume(ctx, req.VolumeId)
 	if err != nil {
 		return nil, err
 	}
 
 	log.V(1).Info("Expanding volume")
-	if err := s.setOnmetalVolumeResources(ctx, onmetalVolume.Volume, corev1alpha1.ResourceList{
+	if err := s.setIronCoreVolumeResources(ctx, ironcoreVolume.Volume, corev1alpha1.ResourceList{
 		corev1alpha1.ResourceStorage: *resource.NewQuantity(int64(req.Resources.StorageBytes), resource.DecimalSI),
 	}); err != nil {
 		return nil, fmt.Errorf("failed to expand volume: %w", err)
 	}
 
-	return &ori.ExpandVolumeResponse{}, nil
+	return &iri.ExpandVolumeResponse{}, nil
 }

@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,12 +17,12 @@ package apiserver
 import (
 	"fmt"
 
-	"github.com/onmetal/onmetal-api/internal/machinepoollet/client"
-	computerest "github.com/onmetal/onmetal-api/internal/registry/compute/rest"
-	corerest "github.com/onmetal/onmetal-api/internal/registry/core/rest"
-	ipamrest "github.com/onmetal/onmetal-api/internal/registry/ipam/rest"
-	networkingrest "github.com/onmetal/onmetal-api/internal/registry/networking/rest"
-	storagerest "github.com/onmetal/onmetal-api/internal/registry/storage/rest"
+	"github.com/ironcore-dev/ironcore/internal/machinepoollet/client"
+	computerest "github.com/ironcore-dev/ironcore/internal/registry/compute/rest"
+	corerest "github.com/ironcore-dev/ironcore/internal/registry/core/rest"
+	ipamrest "github.com/ironcore-dev/ironcore/internal/registry/ipam/rest"
+	networkingrest "github.com/ironcore-dev/ironcore/internal/registry/networking/rest"
+	storagerest "github.com/ironcore-dev/ironcore/internal/registry/storage/rest"
 	"k8s.io/apimachinery/pkg/version"
 	"k8s.io/apiserver/pkg/registry/generic"
 	genericapiserver "k8s.io/apiserver/pkg/server"
@@ -46,8 +46,8 @@ type Config struct {
 	ExtraConfig   ExtraConfig
 }
 
-// OnmetalAPIServer contains state for a Kubernetes cluster master/api server.
-type OnmetalAPIServer struct {
+// IronCoreAPIServer contains state for a Kubernetes cluster master/api server.
+type IronCoreAPIServer struct {
 	GenericAPIServer *genericapiserver.GenericAPIServer
 }
 
@@ -81,14 +81,14 @@ type RESTStorageProvider interface {
 	NewRESTStorage(apiResourceConfigSource serverstorage.APIResourceConfigSource, restOptionsGetter generic.RESTOptionsGetter) (genericapiserver.APIGroupInfo, bool, error)
 }
 
-// New returns a new instance of OnmetalAPIServer from the given config.
-func (c completedConfig) New() (*OnmetalAPIServer, error) {
+// New returns a new instance of IronCoreAPIServer from the given config.
+func (c completedConfig) New() (*IronCoreAPIServer, error) {
 	genericServer, err := c.GenericConfig.New("sample-apiserver", genericapiserver.NewEmptyDelegate())
 	if err != nil {
 		return nil, err
 	}
 
-	s := &OnmetalAPIServer{
+	s := &IronCoreAPIServer{
 		GenericAPIServer: genericServer,
 	}
 

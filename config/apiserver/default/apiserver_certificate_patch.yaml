@@ -13,7 +13,7 @@ spec:
               name: cert
               readOnly: true
           args:
-            - --etcd-servers=http://$(ONMETAL_API_APISERVER_ETCD_SERVICE_NAME):2379
+            - --etcd-servers=http://$(IRONCORE_APISERVER_ETCD_SERVICE_NAME):2379
             - --secure-port=8443
             - --audit-log-path=-
             - --feature-gates=APIPriorityAndFairness=false

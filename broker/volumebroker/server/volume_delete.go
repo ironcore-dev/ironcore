@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,28 +18,28 @@ import (
 	"context"
 	"fmt"
 
-	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
-func (s *Server) DeleteVolume(ctx context.Context, req *ori.DeleteVolumeRequest) (*ori.DeleteVolumeResponse, error) {
+func (s *Server) DeleteVolume(ctx context.Context, req *iri.DeleteVolumeRequest) (*iri.DeleteVolumeResponse, error) {
 	volumeID := req.VolumeId
 	log := s.loggerFrom(ctx, "VolumeID", volumeID)
 
-	onmetalVolume, err := s.getAggregateOnmetalVolume(ctx, req.VolumeId)
+	ironcoreVolume, err := s.getAggregateIronCoreVolume(ctx, req.VolumeId)
 	if err != nil {
 		return nil, err
 	}
 
 	log.V(1).Info("Deleting volume")
-	if err := s.client.Delete(ctx, onmetalVolume.Volume); err != nil {
+	if err := s.client.Delete(ctx, ironcoreVolume.Volume); err != nil {
 		if !apierrors.IsNotFound(err) {
-			return nil, fmt.Errorf("error deleting onmetal volume: %w", err)
+			return nil, fmt.Errorf("error deleting ironcore volume: %w", err)
 		}
 		return nil, status.Errorf(codes.NotFound, "volume %s not found", volumeID)
 	}
 
-	return &ori.DeleteVolumeResponse{}, nil
+	return &iri.DeleteVolumeResponse{}, nil
 }

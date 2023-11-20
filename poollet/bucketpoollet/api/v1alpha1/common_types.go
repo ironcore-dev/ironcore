@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
 package v1alpha1
 
 const (
-	BucketUIDLabel       = "bucketpoollet.api.onmetal.de/bucket-uid"
-	BucketNamespaceLabel = "bucketpoollet.api.onmetal.de/bucket-namespace"
-	BucketNameLabel      = "bucketpoollet.api.onmetal.de/bucket-name"
+	BucketUIDLabel       = "bucketpoollet.ironcore.dev/bucket-uid"
+	BucketNamespaceLabel = "bucketpoollet.ironcore.dev/bucket-namespace"
+	BucketNameLabel      = "bucketpoollet.ironcore.dev/bucket-name"
 
-	FieldOwner      = "bucketpoollet.api.onmetal.de/field-owner"
-	BucketFinalizer = "bucketpoollet.api.onmetal.de/bucket"
+	FieldOwner      = "bucketpoollet.ironcore.dev/field-owner"
+	BucketFinalizer = "bucketpoollet.ironcore.dev/bucket"
 )

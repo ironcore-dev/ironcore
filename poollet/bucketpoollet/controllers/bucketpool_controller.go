@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	ori "github.com/onmetal/onmetal-api/ori/apis/bucket/v1alpha1"
-	"github.com/onmetal/onmetal-api/poollet/bucketpoollet/bcm"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
+	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/bcm"
 	corev1 "k8s.io/api/core/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
@@ -34,13 +34,13 @@ import (
 type BucketPoolReconciler struct {
 	client.Client
 	BucketPoolName    string
-	BucketRuntime     ori.BucketRuntimeClient
+	BucketRuntime     iri.BucketRuntimeClient
 	BucketClassMapper bcm.BucketClassMapper
 }
 
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=bucketpools,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=bucketpools/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=bucketclasses,verbs=get;list;watch
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=bucketpools,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=bucketpools/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=bucketclasses,verbs=get;list;watch
 
 func (r *BucketPoolReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
@@ -66,12 +66,12 @@ func (r *BucketPoolReconciler) delete(ctx context.Context, log logr.Logger, buck
 }
 
 func (r *BucketPoolReconciler) supportsBucketClass(ctx context.Context, log logr.Logger, bucketClass *storagev1alpha1.BucketClass) (bool, error) {
-	oriCapabilities, err := getORIBucketClassCapabilities(bucketClass)
+	iriCapabilities, err := getIRIBucketClassCapabilities(bucketClass)
 	if err != nil {
-		return false, fmt.Errorf("error getting ori mahchine class capabilities: %w", err)
+		return false, fmt.Errorf("error getting iri mahchine class capabilities: %w", err)
 	}
 
-	_, err = r.BucketClassMapper.GetBucketClassFor(ctx, bucketClass.Name, oriCapabilities)
+	_, err = r.BucketClassMapper.GetBucketClassFor(ctx, bucketClass.Name, iriCapabilities)
 	if err != nil {
 		if !errors.Is(err, bcm.ErrNoMatchingBucketClass) && !errors.Is(err, bcm.ErrAmbiguousMatchingBucketClass) {
 			return false, fmt.Errorf("error getting bucket class for %s: %w", bucketClass.Name, err)

@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ import (
 	"strings"
 
 	"github.com/go-logr/logr"
-	"github.com/onmetal/onmetal-api/utils/annotations"
-	"github.com/onmetal/onmetal-api/utils/labels"
+	"github.com/ironcore-dev/ironcore/utils/annotations"
+	"github.com/ironcore-dev/ironcore/utils/labels"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"

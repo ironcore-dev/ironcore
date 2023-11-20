@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,39 +18,39 @@ import (
 	"fmt"
 	"strconv"
 
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	"github.com/onmetal/onmetal-api/utils/generic"
-	utilslices "github.com/onmetal/onmetal-api/utils/slices"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
+	"github.com/ironcore-dev/ironcore/utils/generic"
+	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
 )
 
-func FindNewORINetworkInterfaces(desiredORINics, existingORINics []*ori.NetworkInterface) []*ori.NetworkInterface {
+func FindNewIRINetworkInterfaces(desiredIRINics, existingIRINics []*iri.NetworkInterface) []*iri.NetworkInterface {
 	var (
-		existingORINicNames = utilslices.ToSetFunc(existingORINics, (*ori.NetworkInterface).GetName)
-		newORINics          []*ori.NetworkInterface
+		existingIRINicNames = utilslices.ToSetFunc(existingIRINics, (*iri.NetworkInterface).GetName)
+		newIRINics          []*iri.NetworkInterface
 	)
-	for _, desiredORINic := range desiredORINics {
-		if existingORINicNames.Has(desiredORINic.Name) {
+	for _, desiredIRINic := range desiredIRINics {
+		if existingIRINicNames.Has(desiredIRINic.Name) {
 			continue
 		}
 
-		newORINics = append(newORINics, desiredORINic)
+		newIRINics = append(newIRINics, desiredIRINic)
 	}
-	return newORINics
+	return newIRINics
 }
 
-func FindNewORIVolumes(desiredORIVolumes, existingORIVolumes []*ori.Volume) []*ori.Volume {
+func FindNewIRIVolumes(desiredIRIVolumes, existingIRIVolumes []*iri.Volume) []*iri.Volume {
 	var (
-		existingORIVolumeNames = utilslices.ToSetFunc(existingORIVolumes, (*ori.Volume).GetName)
-		newORIVolumes          []*ori.Volume
+		existingIRIVolumeNames = utilslices.ToSetFunc(existingIRIVolumes, (*iri.Volume).GetName)
+		newIRIVolumes          []*iri.Volume
 	)
-	for _, desiredORIVolume := range desiredORIVolumes {
-		if existingORIVolumeNames.Has(desiredORIVolume.Name) {
+	for _, desiredIRIVolume := range desiredIRIVolumes {
+		if existingIRIVolumeNames.Has(desiredIRIVolume.Name) {
 			continue
 		}
 
-		newORIVolumes = append(newORIVolumes, desiredORIVolume)
+		newIRIVolumes = append(newIRIVolumes, desiredIRIVolume)
 	}
-	return newORIVolumes
+	return newIRIVolumes
 }
 
 func parseInt64(s string) (int64, error) {

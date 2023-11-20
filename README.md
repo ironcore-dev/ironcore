@@ -1,19 +1,19 @@
-# onmetal-api
+# IronCore
 
-[![GitHub License](https://img.shields.io/static/v1?label=License&message=Apache-2.0&color=blue&style=flat-square)](LICENSE)
-[![Go Report Card](https://goreportcard.com/badge/github.com/onmetal/onmetal-api?style=flat-square)](https://goreportcard.com/report/github.com/onmetal/onmetal-api)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://makeapullrequest.com)
+[![GitHub License](https://img.shields.io/static/v1?label=License&message=Apache-2.0&color=blue)](LICENSE)
+[![Go Report Card](https://goreportcard.com/badge/github.com/ironcore-dev/ironcore)](https://goreportcard.com/report/github.com/ironcore-dev/ironcore)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://makeapullrequest.com)
 
-<img src="docs/assets/logo.svg" alt="onmetal Logo" width="200" />
+<img src="docs/assets/logo.svg" alt="IronCore Logo" width="200" />
 
-onmetal-api is an open source system for managing compute and storage workloads across multiple
+IronCore is an open source system for managing compute and storage workloads across multiple
 providers.
 
-The onmetal-api API is a declarative API, built on top of Kubernetes' API Machinery as an
+The IronCore API is a declarative API, built on top of Kubernetes' API Machinery as an
 aggregated API server. The API does not have any tight coupling to Kubernetes core
 container workloads.
 
-## To start developing onmetal-api
+## To start developing IronCore
 
 > ⚠️ Before contributing, make sure you read the [contribution guidelines](docs/development/contribution.md)
 

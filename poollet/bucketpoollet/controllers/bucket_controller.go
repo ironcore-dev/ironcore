@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,15 +21,15 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	"github.com/onmetal/controller-utils/clientutils"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	ori "github.com/onmetal/onmetal-api/ori/apis/bucket/v1alpha1"
-	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
-	bucketpoolletv1alpha1 "github.com/onmetal/onmetal-api/poollet/bucketpoollet/api/v1alpha1"
-	"github.com/onmetal/onmetal-api/poollet/bucketpoollet/bcm"
-	"github.com/onmetal/onmetal-api/poollet/bucketpoollet/controllers/events"
-	onmetalapiclient "github.com/onmetal/onmetal-api/utils/client"
-	"github.com/onmetal/onmetal-api/utils/predicates"
+	"github.com/ironcore-dev/controller-utils/clientutils"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
+	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
+	bucketpoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/bucketpoollet/api/v1alpha1"
+	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/bcm"
+	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/controllers/events"
+	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
+	"github.com/ironcore-dev/ironcore/utils/predicates"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
@@ -50,7 +50,7 @@ type BucketReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
 
-	BucketRuntime ori.BucketRuntimeClient
+	BucketRuntime iri.BucketRuntimeClient
 
 	BucketClassMapper bcm.BucketClassMapper
 
@@ -58,7 +58,7 @@ type BucketReconciler struct {
 	WatchFilterValue string
 }
 
-func (r *BucketReconciler) oriBucketLabels(bucket *storagev1alpha1.Bucket) map[string]string {
+func (r *BucketReconciler) iriBucketLabels(bucket *storagev1alpha1.Bucket) map[string]string {
 	return map[string]string{
 		bucketpoolletv1alpha1.BucketUIDLabel:       string(bucket.UID),
 		bucketpoolletv1alpha1.BucketNamespaceLabel: bucket.Namespace,
@@ -66,13 +66,13 @@ func (r *BucketReconciler) oriBucketLabels(bucket *storagev1alpha1.Bucket) map[s
 	}
 }
 
-func (r *BucketReconciler) oriBucketAnnotations(_ *storagev1alpha1.Bucket) map[string]string {
+func (r *BucketReconciler) iriBucketAnnotations(_ *storagev1alpha1.Bucket) map[string]string {
 	return map[string]string{}
 }
 
-func (r *BucketReconciler) listORIBucketsByKey(ctx context.Context, bucketKey client.ObjectKey) ([]*ori.Bucket, error) {
-	res, err := r.BucketRuntime.ListBuckets(ctx, &ori.ListBucketsRequest{
-		Filter: &ori.BucketFilter{
+func (r *BucketReconciler) listIRIBucketsByKey(ctx context.Context, bucketKey client.ObjectKey) ([]*iri.Bucket, error) {
+	res, err := r.BucketRuntime.ListBuckets(ctx, &iri.ListBucketsRequest{
+		Filter: &iri.BucketFilter{
 			LabelSelector: map[string]string{
 				bucketpoolletv1alpha1.BucketNamespaceLabel: bucketKey.Namespace,
 				bucketpoolletv1alpha1.BucketNameLabel:      bucketKey.Name,
@@ -86,9 +86,9 @@ func (r *BucketReconciler) listORIBucketsByKey(ctx context.Context, bucketKey cl
 	return buckets, nil
 }
 
-func (r *BucketReconciler) listORIBucketsByUID(ctx context.Context, bucketUID types.UID) ([]*ori.Bucket, error) {
-	res, err := r.BucketRuntime.ListBuckets(ctx, &ori.ListBucketsRequest{
-		Filter: &ori.BucketFilter{
+func (r *BucketReconciler) listIRIBucketsByUID(ctx context.Context, bucketUID types.UID) ([]*iri.Bucket, error) {
+	res, err := r.BucketRuntime.ListBuckets(ctx, &iri.ListBucketsRequest{
+		Filter: &iri.BucketFilter{
 			LabelSelector: map[string]string{
 				bucketpoolletv1alpha1.BucketUIDLabel: string(bucketUID),
 			},
@@ -102,9 +102,9 @@ func (r *BucketReconciler) listORIBucketsByUID(ctx context.Context, bucketUID ty
 
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 //+kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=buckets,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=buckets/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=buckets/finalizers,verbs=update
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=buckets,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=buckets/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=buckets/finalizers,verbs=update
 
 func (r *BucketReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
@@ -121,18 +121,18 @@ func (r *BucketReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 func (r *BucketReconciler) deleteGone(ctx context.Context, log logr.Logger, bucketKey client.ObjectKey) (ctrl.Result, error) {
 	log.V(1).Info("Delete gone")
 
-	log.V(1).Info("Listing ori buckets by key")
-	buckets, err := r.listORIBucketsByKey(ctx, bucketKey)
+	log.V(1).Info("Listing iri buckets by key")
+	buckets, err := r.listIRIBucketsByKey(ctx, bucketKey)
 	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("error listing ori buckets by key: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error listing iri buckets by key: %w", err)
 	}
 
-	ok, err := r.deleteORIBuckets(ctx, log, buckets)
+	ok, err := r.deleteIRIBuckets(ctx, log, buckets)
 	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("error deleting ori buckets: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error deleting iri buckets: %w", err)
 	}
 	if !ok {
-		log.V(1).Info("Not all ori buckets are gone, requeueing")
+		log.V(1).Info("Not all iri buckets are gone, requeueing")
 		return ctrl.Result{Requeue: true}, nil
 	}
 
@@ -140,39 +140,39 @@ func (r *BucketReconciler) deleteGone(ctx context.Context, log logr.Logger, buck
 	return ctrl.Result{}, nil
 }
 
-func (r *BucketReconciler) deleteORIBuckets(ctx context.Context, log logr.Logger, buckets []*ori.Bucket) (bool, error) {
+func (r *BucketReconciler) deleteIRIBuckets(ctx context.Context, log logr.Logger, buckets []*iri.Bucket) (bool, error) {
 	var (
 		errs                 []error
-		deletingORIBucketIDs []string
+		deletingIRIBucketIDs []string
 	)
 
 	for _, bucket := range buckets {
-		oriBucketID := bucket.Metadata.Id
-		log := log.WithValues("ORIBucketID", oriBucketID)
-		log.V(1).Info("Deleting ori bucket")
-		_, err := r.BucketRuntime.DeleteBucket(ctx, &ori.DeleteBucketRequest{
-			BucketId: oriBucketID,
+		iriBucketID := bucket.Metadata.Id
+		log := log.WithValues("IRIBucketID", iriBucketID)
+		log.V(1).Info("Deleting iri bucket")
+		_, err := r.BucketRuntime.DeleteBucket(ctx, &iri.DeleteBucketRequest{
+			BucketId: iriBucketID,
 		})
 		if err != nil {
 			if status.Code(err) != codes.NotFound {
-				errs = append(errs, fmt.Errorf("error deleting ori bucket %s: %w", oriBucketID, err))
+				errs = append(errs, fmt.Errorf("error deleting iri bucket %s: %w", iriBucketID, err))
 			} else {
-				log.V(1).Info("ORI Bucket is already gone")
+				log.V(1).Info("IRI Bucket is already gone")
 			}
 		} else {
-			log.V(1).Info("Issued ori bucket deletion")
-			deletingORIBucketIDs = append(deletingORIBucketIDs, oriBucketID)
+			log.V(1).Info("Issued iri bucket deletion")
+			deletingIRIBucketIDs = append(deletingIRIBucketIDs, iriBucketID)
 		}
 	}
 
 	switch {
 	case len(errs) > 0:
-		return false, fmt.Errorf("error(s) deleting ori bucket(s): %v", errs)
-	case len(deletingORIBucketIDs) > 0:
-		log.V(1).Info("Buckets are in deletion", "DeletingORIBucketIDs", deletingORIBucketIDs)
+		return false, fmt.Errorf("error(s) deleting iri bucket(s): %v", errs)
+	case len(deletingIRIBucketIDs) > 0:
+		log.V(1).Info("Buckets are in deletion", "DeletingIRIBucketIDs", deletingIRIBucketIDs)
 		return false, nil
 	default:
-		log.V(1).Info("No ori buckets present")
+		log.V(1).Info("No iri buckets present")
 		return true, nil
 	}
 }
@@ -195,21 +195,21 @@ func (r *BucketReconciler) delete(ctx context.Context, log logr.Logger, bucket *
 	log.V(1).Info("Finalizer present")
 
 	log.V(1).Info("Listing buckets")
-	buckets, err := r.listORIBucketsByUID(ctx, bucket.UID)
+	buckets, err := r.listIRIBucketsByUID(ctx, bucket.UID)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error listing buckets by uid: %w", err)
 	}
 
-	ok, err := r.deleteORIBuckets(ctx, log, buckets)
+	ok, err := r.deleteIRIBuckets(ctx, log, buckets)
 	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("error deleting ori buckets: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error deleting iri buckets: %w", err)
 	}
 	if !ok {
-		log.V(1).Info("Not all ori buckets are gone, requeueing")
+		log.V(1).Info("Not all iri buckets are gone, requeueing")
 		return ctrl.Result{Requeue: true}, nil
 	}
 
-	log.V(1).Info("Deleted all ori buckets, removing finalizer")
+	log.V(1).Info("Deleted all iri buckets, removing finalizer")
 	if err := clientutils.PatchRemoveFinalizer(ctx, r.Client, bucket, bucketpoolletv1alpha1.BucketFinalizer); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error removing finalizer: %w", err)
 	}
@@ -218,24 +218,24 @@ func (r *BucketReconciler) delete(ctx context.Context, log logr.Logger, bucket *
 	return ctrl.Result{}, nil
 }
 
-func getORIBucketClassCapabilities(bucketClass *storagev1alpha1.BucketClass) (*ori.BucketClassCapabilities, error) {
+func getIRIBucketClassCapabilities(bucketClass *storagev1alpha1.BucketClass) (*iri.BucketClassCapabilities, error) {
 	tps := bucketClass.Capabilities.TPS()
 	iops := bucketClass.Capabilities.IOPS()
 
-	return &ori.BucketClassCapabilities{
+	return &iri.BucketClassCapabilities{
 		Tps:  tps.Value(),
 		Iops: iops.Value(),
 	}, nil
 }
 
-func (r *BucketReconciler) prepareORIBucketMetadata(bucket *storagev1alpha1.Bucket) *orimeta.ObjectMetadata {
-	return &orimeta.ObjectMetadata{
-		Labels:      r.oriBucketLabels(bucket),
-		Annotations: r.oriBucketAnnotations(bucket),
+func (r *BucketReconciler) prepareIRIBucketMetadata(bucket *storagev1alpha1.Bucket) *irimeta.ObjectMetadata {
+	return &irimeta.ObjectMetadata{
+		Labels:      r.iriBucketLabels(bucket),
+		Annotations: r.iriBucketAnnotations(bucket),
 	}
 }
 
-func (r *BucketReconciler) prepareORIBucketClass(ctx context.Context, bucket *storagev1alpha1.Bucket, bucketClassName string) (string, bool, error) {
+func (r *BucketReconciler) prepareIRIBucketClass(ctx context.Context, bucket *storagev1alpha1.Bucket, bucketClassName string) (string, bool, error) {
 	bucketClass := &storagev1alpha1.BucketClass{}
 	bucketClassKey := client.ObjectKey{Name: bucketClassName}
 	if err := r.Get(ctx, bucketClassKey, bucketClass); err != nil {
@@ -248,9 +248,9 @@ func (r *BucketReconciler) prepareORIBucketClass(ctx context.Context, bucket *st
 		return "", false, nil
 	}
 
-	caps, err := getORIBucketClassCapabilities(bucketClass)
+	caps, err := getIRIBucketClassCapabilities(bucketClass)
 	if err != nil {
-		return "", false, fmt.Errorf("error getting ori bucket class capabilities: %w", err)
+		return "", false, fmt.Errorf("error getting iri bucket class capabilities: %w", err)
 	}
 
 	class, err := r.BucketClassMapper.GetBucketClassFor(ctx, bucketClassName, caps)
@@ -260,33 +260,33 @@ func (r *BucketReconciler) prepareORIBucketClass(ctx context.Context, bucket *st
 	return class.Name, true, nil
 }
 
-func (r *BucketReconciler) prepareORIBucket(ctx context.Context, log logr.Logger, bucket *storagev1alpha1.Bucket) (*ori.Bucket, bool, error) {
+func (r *BucketReconciler) prepareIRIBucket(ctx context.Context, log logr.Logger, bucket *storagev1alpha1.Bucket) (*iri.Bucket, bool, error) {
 	var (
 		ok   = true
 		errs []error
 	)
 
 	log.V(1).Info("Getting bucket class")
-	class, classOK, err := r.prepareORIBucketClass(ctx, bucket, bucket.Spec.BucketClassRef.Name)
+	class, classOK, err := r.prepareIRIBucketClass(ctx, bucket, bucket.Spec.BucketClassRef.Name)
 	switch {
 	case err != nil:
-		errs = append(errs, fmt.Errorf("error preparing ori bucket class: %w", err))
+		errs = append(errs, fmt.Errorf("error preparing iri bucket class: %w", err))
 	case !classOK:
 		ok = false
 	}
 
-	metadata := r.prepareORIBucketMetadata(bucket)
+	metadata := r.prepareIRIBucketMetadata(bucket)
 
 	if len(errs) > 0 {
-		return nil, false, fmt.Errorf("error(s) preparing ori bucket: %v", errs)
+		return nil, false, fmt.Errorf("error(s) preparing iri bucket: %v", errs)
 	}
 	if !ok {
 		return nil, false, nil
 	}
 
-	return &ori.Bucket{
+	return &iri.Bucket{
 		Metadata: metadata,
-		Spec: &ori.BucketSpec{
+		Spec: &iri.BucketSpec{
 			Class: class,
 		},
 	}, true, nil
@@ -307,7 +307,7 @@ func (r *BucketReconciler) reconcile(ctx context.Context, log logr.Logger, bucke
 	log.V(1).Info("Finalizer is present")
 
 	log.V(1).Info("Ensuring no reconcile annotation")
-	modified, err = onmetalapiclient.PatchEnsureNoReconcileAnnotation(ctx, r.Client, bucket)
+	modified, err = ironcoreclient.PatchEnsureNoReconcileAnnotation(ctx, r.Client, bucket)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error ensuring no reconcile annotation: %w", err)
 	}
@@ -317,8 +317,8 @@ func (r *BucketReconciler) reconcile(ctx context.Context, log logr.Logger, bucke
 	}
 
 	log.V(1).Info("Listing buckets")
-	res, err := r.BucketRuntime.ListBuckets(ctx, &ori.ListBucketsRequest{
-		Filter: &ori.BucketFilter{
+	res, err := r.BucketRuntime.ListBuckets(ctx, &iri.ListBucketsRequest{
+		Filter: &iri.BucketFilter{
 			LabelSelector: map[string]string{
 				bucketpoolletv1alpha1.BucketUIDLabel: string(bucket.UID),
 			},
@@ -332,8 +332,8 @@ func (r *BucketReconciler) reconcile(ctx context.Context, log logr.Logger, bucke
 	case 0:
 		return r.create(ctx, log, bucket)
 	case 1:
-		oriBucket := res.Buckets[0]
-		if err := r.updateStatus(ctx, log, bucket, oriBucket); err != nil {
+		iriBucket := res.Buckets[0]
+		if err := r.updateStatus(ctx, log, bucket, iriBucket); err != nil {
 			return ctrl.Result{}, fmt.Errorf("error updating bucket status: %w", err)
 		}
 		return ctrl.Result{}, nil
@@ -345,32 +345,32 @@ func (r *BucketReconciler) reconcile(ctx context.Context, log logr.Logger, bucke
 func (r *BucketReconciler) create(ctx context.Context, log logr.Logger, bucket *storagev1alpha1.Bucket) (ctrl.Result, error) {
 	log.V(1).Info("Create")
 
-	log.V(1).Info("Preparing ori bucket")
-	oriBucket, ok, err := r.prepareORIBucket(ctx, log, bucket)
+	log.V(1).Info("Preparing iri bucket")
+	iriBucket, ok, err := r.prepareIRIBucket(ctx, log, bucket)
 	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("error preparing ori bucket: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error preparing iri bucket: %w", err)
 	}
 	if !ok {
-		log.V(1).Info("ORI bucket is not yet ready to be prepared")
+		log.V(1).Info("IRI bucket is not yet ready to be prepared")
 		return ctrl.Result{}, nil
 	}
 
 	log.V(1).Info("Creating bucket")
-	res, err := r.BucketRuntime.CreateBucket(ctx, &ori.CreateBucketRequest{
-		Bucket: oriBucket,
+	res, err := r.BucketRuntime.CreateBucket(ctx, &iri.CreateBucketRequest{
+		Bucket: iriBucket,
 	})
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error creating bucket: %w", err)
 	}
 
-	oriBucket = res.Bucket
+	iriBucket = res.Bucket
 
-	bucketID := oriBucket.Metadata.Id
+	bucketID := iriBucket.Metadata.Id
 	log = log.WithValues("BucketID", bucketID)
 	log.V(1).Info("Created")
 
 	log.V(1).Info("Updating status")
-	if err := r.updateStatus(ctx, log, bucket, oriBucket); err != nil {
+	if err := r.updateStatus(ctx, log, bucket, iriBucket); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error updating bucket status: %w", err)
 	}
 
@@ -383,27 +383,27 @@ func (r *BucketReconciler) bucketSecretName(bucketName string) string {
 	return hex.EncodeToString(sum[:])[:63]
 }
 
-var oriBucketStateToBucketState = map[ori.BucketState]storagev1alpha1.BucketState{
-	ori.BucketState_BUCKET_PENDING:   storagev1alpha1.BucketStatePending,
-	ori.BucketState_BUCKET_AVAILABLE: storagev1alpha1.BucketStateAvailable,
-	ori.BucketState_BUCKET_ERROR:     storagev1alpha1.BucketStateError,
+var iriBucketStateToBucketState = map[iri.BucketState]storagev1alpha1.BucketState{
+	iri.BucketState_BUCKET_PENDING:   storagev1alpha1.BucketStatePending,
+	iri.BucketState_BUCKET_AVAILABLE: storagev1alpha1.BucketStateAvailable,
+	iri.BucketState_BUCKET_ERROR:     storagev1alpha1.BucketStateError,
 }
 
-func (r *BucketReconciler) convertORIBucketState(oriState ori.BucketState) (storagev1alpha1.BucketState, error) {
-	if res, ok := oriBucketStateToBucketState[oriState]; ok {
+func (r *BucketReconciler) convertIRIBucketState(iriState iri.BucketState) (storagev1alpha1.BucketState, error) {
+	if res, ok := iriBucketStateToBucketState[iriState]; ok {
 		return res, nil
 	}
-	return "", fmt.Errorf("unknown bucket state %v", oriState)
+	return "", fmt.Errorf("unknown bucket state %v", iriState)
 }
 
-func (r *BucketReconciler) updateStatus(ctx context.Context, log logr.Logger, bucket *storagev1alpha1.Bucket, oriBucket *ori.Bucket) error {
+func (r *BucketReconciler) updateStatus(ctx context.Context, log logr.Logger, bucket *storagev1alpha1.Bucket, iriBucket *iri.Bucket) error {
 	var access *storagev1alpha1.BucketAccess
 
-	if oriBucket.Status.State == ori.BucketState_BUCKET_AVAILABLE {
-		if oriAccess := oriBucket.Status.Access; oriAccess != nil {
+	if iriBucket.Status.State == iri.BucketState_BUCKET_AVAILABLE {
+		if iriAccess := iriBucket.Status.Access; iriAccess != nil {
 			var secretRef *corev1.LocalObjectReference
 
-			if oriAccess.SecretData != nil {
+			if iriAccess.SecretData != nil {
 				log.V(1).Info("Applying bucket secret")
 				bucketSecret := &corev1.Secret{
 					TypeMeta: metav1.TypeMeta{
@@ -417,7 +417,7 @@ func (r *BucketReconciler) updateStatus(ctx context.Context, log logr.Logger, bu
 							bucketpoolletv1alpha1.BucketUIDLabel: string(bucket.UID),
 						},
 					},
-					Data: oriAccess.SecretData,
+					Data: iriAccess.SecretData,
 				}
 				_ = ctrl.SetControllerReference(bucket, bucketSecret, r.Scheme)
 				if err := r.Patch(ctx, bucketSecret, client.Apply, client.FieldOwner(bucketpoolletv1alpha1.FieldOwner)); err != nil {
@@ -438,7 +438,7 @@ func (r *BucketReconciler) updateStatus(ctx context.Context, log logr.Logger, bu
 
 			access = &storagev1alpha1.BucketAccess{
 				SecretRef: secretRef,
-				Endpoint:  oriAccess.Endpoint,
+				Endpoint:  iriAccess.Endpoint,
 			}
 		}
 
@@ -448,7 +448,7 @@ func (r *BucketReconciler) updateStatus(ctx context.Context, log logr.Logger, bu
 	now := metav1.Now()
 
 	bucket.Status.Access = access
-	newState, err := r.convertORIBucketState(oriBucket.Status.State)
+	newState, err := r.convertIRIBucketState(iriBucket.Status.State)
 	if err != nil {
 		return err
 	}

@@ -75,57 +75,57 @@ echo "Generating ${blue}deepcopy${normal}"
 "$DEEPCOPY_GEN" \
   --output-base "$GOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gvs "github.com/onmetal/onmetal-api/api" "$ALL_VERSION_GROUPS")" \
+  --input-dirs "$(qualify-gvs "github.com/ironcore-dev/ironcore/api" "$ALL_VERSION_GROUPS")" \
   -O zz_generated.deepcopy
 
 echo "Generating ${blue}openapi${normal}"
 "$OPENAPI_GEN" \
   --output-base "$GOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gvs "github.com/onmetal/onmetal-api/api" "$ALL_VERSION_GROUPS")" \
+  --input-dirs "$(qualify-gvs "github.com/ironcore-dev/ironcore/api" "$ALL_VERSION_GROUPS")" \
   --input-dirs "k8s.io/apimachinery/pkg/apis/meta/v1,k8s.io/apimachinery/pkg/runtime,k8s.io/apimachinery/pkg/version" \
   --input-dirs "k8s.io/api/core/v1" \
   --input-dirs "k8s.io/apimachinery/pkg/api/resource" \
-  --output-package "github.com/onmetal/onmetal-api/client-go/openapi" \
+  --output-package "github.com/ironcore-dev/ironcore/client-go/openapi" \
   -O zz_generated.openapi \
   --report-filename "$SCRIPT_DIR/../client-go/openapi/api_violations.report"
 
 echo "Generating ${blue}applyconfiguration${normal}"
 applyconfigurationgen_external_apis+=("k8s.io/apimachinery/pkg/apis/meta/v1")
-applyconfigurationgen_external_apis+=("$(qualify-gvs "github.com/onmetal/onmetal-api/api" "$ALL_VERSION_GROUPS")")
+applyconfigurationgen_external_apis+=("$(qualify-gvs "github.com/ironcore-dev/ironcore/api" "$ALL_VERSION_GROUPS")")
 applyconfigurationgen_external_apis_csv=$(IFS=,; echo "${applyconfigurationgen_external_apis[*]}")
 "$APPLYCONFIGURATION_GEN" \
   --output-base "$GOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
   --input-dirs "${applyconfigurationgen_external_apis_csv}" \
-  --openapi-schema <("$MODELS_SCHEMA" --openapi-package "github.com/onmetal/onmetal-api/client-go/openapi" --openapi-title "onmetal-api") \
-  --output-package "github.com/onmetal/onmetal-api/client-go/applyconfigurations"
+  --openapi-schema <("$MODELS_SCHEMA" --openapi-package "github.com/ironcore-dev/ironcore/client-go/openapi" --openapi-title "ironcore") \
+  --output-package "github.com/ironcore-dev/ironcore/client-go/applyconfigurations"
 
 echo "Generating ${blue}client${normal}"
 "$CLIENT_GEN" \
   --output-base "$GOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input "$(qualify-gvs "github.com/onmetal/onmetal-api/api" "$CLIENT_VERSION_GROUPS")" \
-  --output-package "github.com/onmetal/onmetal-api/client-go" \
-  --apply-configuration-package "github.com/onmetal/onmetal-api/client-go/applyconfigurations" \
-  --clientset-name "onmetalapi" \
+  --input "$(qualify-gvs "github.com/ironcore-dev/ironcore/api" "$CLIENT_VERSION_GROUPS")" \
+  --output-package "github.com/ironcore-dev/ironcore/client-go" \
+  --apply-configuration-package "github.com/ironcore-dev/ironcore/client-go/applyconfigurations" \
+  --clientset-name "ironcore" \
   --input-base ""
 
 echo "Generating ${blue}lister${normal}"
 "$LISTER_GEN" \
   --output-base "$GOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gvs "github.com/onmetal/onmetal-api/api" "$CLIENT_VERSION_GROUPS")" \
-  --output-package "github.com/onmetal/onmetal-api/client-go/listers"
+  --input-dirs "$(qualify-gvs "github.com/ironcore-dev/ironcore/api" "$CLIENT_VERSION_GROUPS")" \
+  --output-package "github.com/ironcore-dev/ironcore/client-go/listers"
 
 echo "Generating ${blue}informer${normal}"
 "$INFORMER_GEN" \
   --output-base "$GOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gvs "github.com/onmetal/onmetal-api/api" "$CLIENT_VERSION_GROUPS")" \
-  --versioned-clientset-package "github.com/onmetal/onmetal-api/client-go/onmetalapi" \
-  --listers-package "github.com/onmetal/onmetal-api/client-go/listers" \
-  --output-package "github.com/onmetal/onmetal-api/client-go/informers" \
+  --input-dirs "$(qualify-gvs "github.com/ironcore-dev/ironcore/api" "$CLIENT_VERSION_GROUPS")" \
+  --versioned-clientset-package "github.com/ironcore-dev/ironcore/client-go/ironcore" \
+  --listers-package "github.com/ironcore-dev/ironcore/client-go/listers" \
+  --output-package "github.com/ironcore-dev/ironcore/client-go/informers" \
   --single-directory
 
 echo "${bold}Internal types${normal}"
@@ -134,20 +134,20 @@ echo "Generating ${blue}deepcopy${normal}"
 "$DEEPCOPY_GEN" \
   --output-base "$GOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gs "github.com/onmetal/onmetal-api/internal/apis" "$CLIENT_GROUPS")" \
+  --input-dirs "$(qualify-gs "github.com/ironcore-dev/ironcore/internal/apis" "$CLIENT_GROUPS")" \
   -O zz_generated.deepcopy
 
 echo "Generating ${blue}defaulter${normal}"
 "$DEFAULTER_GEN" \
   --output-base "$GOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gvs "github.com/onmetal/onmetal-api/internal/apis" "$CLIENT_VERSION_GROUPS")" \
+  --input-dirs "$(qualify-gvs "github.com/ironcore-dev/ironcore/internal/apis" "$CLIENT_VERSION_GROUPS")" \
   -O zz_generated.defaults
 
 echo "Generating ${blue}conversion${normal}"
 "$CONVERSION_GEN" \
   --output-base "$GOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gs "github.com/onmetal/onmetal-api/internal/apis" "$CLIENT_GROUPS")" \
-  --input-dirs "$(qualify-gvs "github.com/onmetal/onmetal-api/internal/apis" "$CLIENT_VERSION_GROUPS")" \
+  --input-dirs "$(qualify-gs "github.com/ironcore-dev/ironcore/internal/apis" "$CLIENT_GROUPS")" \
+  --input-dirs "$(qualify-gvs "github.com/ironcore-dev/ironcore/internal/apis" "$CLIENT_VERSION_GROUPS")" \
   -O zz_generated.conversion

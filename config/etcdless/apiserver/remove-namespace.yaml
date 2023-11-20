@@ -2,4 +2,4 @@ $patch: delete
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: onmetal-system
+  name: ironcore-system

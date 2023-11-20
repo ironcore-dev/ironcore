@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
 package v1alpha1
 
 const (
-	VolumeUIDLabel       = "volumepoollet.api.onmetal.de/volume-uid"
-	VolumeNamespaceLabel = "volumepoollet.api.onmetal.de/volume-namespace"
-	VolumeNameLabel      = "volumepoollet.api.onmetal.de/volume-name"
+	VolumeUIDLabel       = "volumepoollet.ironcore.dev/volume-uid"
+	VolumeNamespaceLabel = "volumepoollet.ironcore.dev/volume-namespace"
+	VolumeNameLabel      = "volumepoollet.ironcore.dev/volume-name"
 
-	FieldOwner      = "volumepoollet.api.onmetal.de/field-owner"
-	VolumeFinalizer = "volumepoollet.api.onmetal.de/volume"
+	FieldOwner      = "volumepoollet.ironcore.dev/field-owner"
+	VolumeFinalizer = "volumepoollet.ironcore.dev/volume"
 )

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 by the OnMetal authors.
+ * Copyright (c) 2022 by the IronCore authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,15 @@
 package v1alpha1
 
 import (
-	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
+	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 )
 
 const (
 	// NetworkPluginsGroup is the system rbac group all network plugins are in.
-	NetworkPluginsGroup = "networking.api.onmetal.de:system:networkplugins"
+	NetworkPluginsGroup = "networking.ironcore.dev:system:networkplugins"
 
 	// NetworkPluginUserNamePrefix is the prefix all network plugin users should have.
-	NetworkPluginUserNamePrefix = "networking.api.onmetal.de:system:networkplugin:"
+	NetworkPluginUserNamePrefix = "networking.ironcore.dev:system:networkplugin:"
 )
 
 // NetworkPluginCommonName constructs the common name for a certificate of a network plugin user.

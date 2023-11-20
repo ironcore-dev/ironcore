@@ -1,4 +1,4 @@
-// Copyright 2021 OnMetal authors
+// Copyright 2021 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 // +k8s:openapi-gen=true
 // +k8s:defaulter-gen=TypeMeta
 // +k8s:protobuf-gen=package
-// +groupName=ipam.api.onmetal.de
+// +groupName=ipam.ironcore.dev
 
 // Package ipam is the internal version of the API.
-package ipam // import "github.com/onmetal/onmetal-api/internal/ipam"
+package ipam // import "github.com/ironcore-dev/ironcore/internal/ipam"

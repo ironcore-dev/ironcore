@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 by the OnMetal authors.
+ * Copyright (c) 2021 by the IronCore authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 // +k8s:deepcopy-gen=package
 // +k8s:openapi-gen=true
 // +k8s:protobuf-gen=package
-// +groupName=storage.api.onmetal.de
+// +groupName=storage.ironcore.dev
 
 // Package v1alpha1 is the v1alpha1 version of the API.
-package v1alpha1 // import "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
+package v1alpha1 // import "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"

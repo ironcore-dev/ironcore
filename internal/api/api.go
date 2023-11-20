@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
 package api
 
 import (
-	computeinstall "github.com/onmetal/onmetal-api/internal/apis/compute/install"
-	coreinstall "github.com/onmetal/onmetal-api/internal/apis/core/install"
-	ipaminstall "github.com/onmetal/onmetal-api/internal/apis/ipam/install"
-	networkinginstall "github.com/onmetal/onmetal-api/internal/apis/networking/install"
-	storageinstall "github.com/onmetal/onmetal-api/internal/apis/storage/install"
+	computeinstall "github.com/ironcore-dev/ironcore/internal/apis/compute/install"
+	coreinstall "github.com/ironcore-dev/ironcore/internal/apis/core/install"
+	ipaminstall "github.com/ironcore-dev/ironcore/internal/apis/ipam/install"
+	networkinginstall "github.com/ironcore-dev/ironcore/internal/apis/networking/install"
+	storageinstall "github.com/ironcore-dev/ironcore/internal/apis/storage/install"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"

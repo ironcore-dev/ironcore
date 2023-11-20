@@ -8,4 +8,4 @@ webhook:
   port: 9443
 leaderElection:
   leaderElect: true
-  resourceName: d0ae00be.onmetal.de
+  resourceName: d0ae00be.ironcore.dev

@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
 package validation_test
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
-	"github.com/onmetal/onmetal-api/internal/apis/ipam"
-	. "github.com/onmetal/onmetal-api/internal/apis/ipam/validation"
-	. "github.com/onmetal/onmetal-api/internal/testutils/validation"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	"github.com/ironcore-dev/ironcore/internal/apis/ipam"
+	. "github.com/ironcore-dev/ironcore/internal/apis/ipam/validation"
+	. "github.com/ironcore-dev/ironcore/internal/testutils/validation"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"

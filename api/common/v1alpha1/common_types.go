@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 by the OnMetal authors.
+ * Copyright (c) 2021 by the IronCore authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,24 +28,24 @@ import (
 )
 
 const (
-	// WatchLabel is a label that can be applied to any onmetal resource.
+	// WatchLabel is a label that can be applied to any ironcore resource.
 	//
 	// Provider controllers that allow for selective reconciliation may check this label and proceed
 	// with reconciliation of the object only if this label and a configured value are present.
-	WatchLabel = "common.api.onmetal.de/watch-filter"
+	WatchLabel = "common.ironcore.dev/watch-filter"
 
 	// ReconcileRequestAnnotation is an annotation that requested a reconciliation at a specific time.
-	ReconcileRequestAnnotation = "reconcile.common.api.onmetal.de/requested-at"
+	ReconcileRequestAnnotation = "reconcile.common.ironcore.dev/requested-at"
 
 	// ManagedByAnnotation is an annotation that can be applied to resources to signify that
 	// some external system is managing the resource.
-	ManagedByAnnotation = "common.api.onmetal.de/managed-by"
+	ManagedByAnnotation = "common.ironcore.dev/managed-by"
 
 	// EphemeralManagedByAnnotation is an annotation that can be applied to resources to signify that
 	// some ephemeral controller is managing the resource.
-	EphemeralManagedByAnnotation = "common.api.onmetal.de/ephemeral-managed-by"
+	EphemeralManagedByAnnotation = "common.ironcore.dev/ephemeral-managed-by"
 
-	// DefaultEphemeralManager is the default onmetal-api ephemeral manager.
+	// DefaultEphemeralManager is the default ironcoreephemeral manager.
 	DefaultEphemeralManager = "ephemeral-manager"
 )
 

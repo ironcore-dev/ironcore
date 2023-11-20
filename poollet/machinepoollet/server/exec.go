@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ import (
 	"net/url"
 	"strconv"
 
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	machinepoolletv1alpha1 "github.com/onmetal/onmetal-api/poollet/machinepoollet/api/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
+	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	"google.golang.org/grpc/codes"
 	grpcstatus "google.golang.org/grpc/status"
 	"k8s.io/apimachinery/pkg/util/proxy"
@@ -31,8 +31,8 @@ func (s *Server) serveExec(w http.ResponseWriter, req *http.Request, namespace, 
 	ctx := req.Context()
 	log := ctrl.LoggerFrom(ctx)
 
-	listMachinesRes, err := s.machineRuntime.ListMachines(ctx, &ori.ListMachinesRequest{
-		Filter: &ori.MachineFilter{
+	listMachinesRes, err := s.machineRuntime.ListMachines(ctx, &iri.ListMachinesRequest{
+		Filter: &iri.MachineFilter{
 			LabelSelector: map[string]string{
 				machinepoolletv1alpha1.MachineNamespaceLabel: namespace,
 				machinepoolletv1alpha1.MachineNameLabel:      name,
@@ -50,7 +50,7 @@ func (s *Server) serveExec(w http.ResponseWriter, req *http.Request, namespace, 
 	}
 
 	machine := listMachinesRes.Machines[0]
-	execRes, err := s.machineRuntime.Exec(ctx, &ori.ExecRequest{
+	execRes, err := s.machineRuntime.Exec(ctx, &iri.ExecRequest{
 		MachineId: machine.Metadata.Id,
 	})
 	if err != nil {

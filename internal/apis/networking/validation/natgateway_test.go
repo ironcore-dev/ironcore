@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 by the OnMetal authors.
+ * Copyright (c) 2022 by the IronCore authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 package validation
 
 import (
-	"github.com/onmetal/onmetal-api/internal/apis/networking"
-	. "github.com/onmetal/onmetal-api/internal/testutils/validation"
+	"github.com/ironcore-dev/ironcore/internal/apis/networking"
+	. "github.com/ironcore-dev/ironcore/internal/testutils/validation"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"

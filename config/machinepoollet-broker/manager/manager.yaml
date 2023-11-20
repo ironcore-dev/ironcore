@@ -31,9 +31,9 @@ spec:
         - /machinepoollet
         args:
         - --leader-elect
-        - --machine-downward-api-label=root-machine-namespace=metadata.labels['downward-api.machinepoollet.api.onmetal.de/root-machine-namespace']
-        - --machine-downward-api-label=root-machine-name=metadata.labels['downward-api.machinepoollet.api.onmetal.de/root-machine-name']
-        - --machine-downward-api-label=root-machine-uid=metadata.labels['downward-api.machinepoollet.api.onmetal.de/root-machine-uid']
+        - --machine-downward-api-label=root-machine-namespace=metadata.labels['downward-api.machinepoollet.ironcore.dev/root-machine-namespace']
+        - --machine-downward-api-label=root-machine-name=metadata.labels['downward-api.machinepoollet.ironcore.dev/root-machine-name']
+        - --machine-downward-api-label=root-machine-uid=metadata.labels['downward-api.machinepoollet.ironcore.dev/root-machine-uid']
         image: machinepoollet:latest
         env:
         - name: KUBERNETES_SERVICE_NAME
@@ -76,9 +76,9 @@ spec:
         image: machinebroker:latest
         name: broker
         args:
-        - --broker-downward-api-label=root-machine-namespace=machinepoollet.api.onmetal.de/machine-namespace
-        - --broker-downward-api-label=root-machine-name=machinepoollet.api.onmetal.de/machine-name
-        - --broker-downward-api-label=root-machine-uid=machinepoollet.api.onmetal.de/machine-uid
+        - --broker-downward-api-label=root-machine-namespace=machinepoollet.ironcore.dev/machine-namespace
+        - --broker-downward-api-label=root-machine-name=machinepoollet.ironcore.dev/machine-name
+        - --broker-downward-api-label=root-machine-uid=machinepoollet.ironcore.dev/machine-uid
         securityContext:
           allowPrivilegeEscalation: false
         livenessProbe:
@@ -103,13 +103,13 @@ spec:
         volumeMounts:
         - name: var-run
           mountPath: /var/run
-        - name: orictl-machine-config
-          mountPath: /.orictl-machine
+        - name: irictl-machine-config
+          mountPath: /.irictl-machine
       serviceAccountName: controller-manager
       terminationGracePeriodSeconds: 10
       volumes:
       - name: var-run
         emptyDir: { }
-      - name: orictl-machine-config
+      - name: irictl-machine-config
         configMap:
-          name: orictl-machine-config
+          name: irictl-machine-config

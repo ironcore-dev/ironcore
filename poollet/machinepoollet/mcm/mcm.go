@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ import (
 	"context"
 	"errors"
 
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	"github.com/onmetal/onmetal-api/poollet/orievent"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
+	"github.com/ironcore-dev/ironcore/poollet/irievent"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 )
 
@@ -30,8 +30,8 @@ var (
 
 type MachineClassMapper interface {
 	manager.Runnable
-	GetMachineClassFor(ctx context.Context, name string, capabilities *ori.MachineClassCapabilities) (*ori.MachineClass, int64, error)
+	GetMachineClassFor(ctx context.Context, name string, capabilities *iri.MachineClassCapabilities) (*iri.MachineClass, int64, error)
 	WaitForSync(ctx context.Context) error
-	AddListener(listener orievent.Listener) (orievent.ListenerRegistration, error)
-	RemoveListener(reg orievent.ListenerRegistration) error
+	AddListener(listener irievent.Listener) (irievent.ListenerRegistration, error)
+	RemoveListener(reg irievent.ListenerRegistration) error
 }

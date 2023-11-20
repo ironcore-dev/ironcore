@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@ package validation
 import (
 	"fmt"
 
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
-	onmetalapivalidation "github.com/onmetal/onmetal-api/internal/api/validation"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
@@ -29,7 +29,7 @@ func ValidateIPPrefix(ipFamily corev1.IPFamily, ipPrefix commonv1alpha1.IPPrefix
 	if !ipPrefix.IsValid() {
 		allErrs = append(allErrs, field.Invalid(fldPath, ipPrefix, "must specify a valid prefix"))
 	} else {
-		if !onmetalapivalidation.IsSupportedIPFamily(ipFamily) {
+		if !ironcorevalidation.IsSupportedIPFamily(ipFamily) {
 			allErrs = append(allErrs, field.Invalid(fldPath, ipPrefix, "cannot determine ip family for prefix"))
 		} else if ipFamily != ipPrefix.IP().Family() {
 			allErrs = append(allErrs, field.Invalid(fldPath, ipPrefix, fmt.Sprintf("expected ip family %s but got %s", ipFamily, ipPrefix.IP().Family())))
@@ -45,7 +45,7 @@ func ValidateIP(ipFamily corev1.IPFamily, ip commonv1alpha1.IP, fldPath *field.P
 	if !ip.IsValid() {
 		allErrs = append(allErrs, field.Invalid(fldPath, ip, "must specify a valid ip"))
 	} else {
-		if !onmetalapivalidation.IsSupportedIPFamily(ipFamily) {
+		if !ironcorevalidation.IsSupportedIPFamily(ipFamily) {
 			allErrs = append(allErrs, field.Invalid(fldPath, ip, "cannot determine ip family for ipo"))
 		} else if ipFamily != ip.Family() {
 			allErrs = append(allErrs, field.Invalid(fldPath, ip, fmt.Sprintf("expected ip family %s but got %s", ipFamily, ip.Family())))

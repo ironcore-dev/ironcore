@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,12 +19,12 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
-	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
-	"github.com/onmetal/onmetal-api/poollet/orievent"
-	volumepoolletv1alpha1 "github.com/onmetal/onmetal-api/poollet/volumepoollet/api/v1alpha1"
-	onmetalapiclient "github.com/onmetal/onmetal-api/utils/client"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
+	"github.com/ironcore-dev/ironcore/poollet/irievent"
+	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
+	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -38,7 +38,7 @@ import (
 type VolumeAnnotatorReconciler struct {
 	client.Client
 
-	VolumeEvents orievent.Source[*ori.Volume]
+	VolumeEvents irievent.Source[*iri.Volume]
 }
 
 func (r *VolumeAnnotatorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -49,14 +49,14 @@ func (r *VolumeAnnotatorReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 		},
 	}
 
-	if err := onmetalapiclient.PatchAddReconcileAnnotation(ctx, r.Client, volume); client.IgnoreNotFound(err) != nil {
+	if err := ironcoreclient.PatchAddReconcileAnnotation(ctx, r.Client, volume); client.IgnoreNotFound(err) != nil {
 		return ctrl.Result{}, fmt.Errorf("error patching volume: %w", err)
 	}
 	return ctrl.Result{}, nil
 }
 
-func volumeAnnotatorEventHandler[O orimeta.Object](log logr.Logger, c chan<- event.GenericEvent) orievent.HandlerFuncs[O] {
-	handleEvent := func(obj orimeta.Object) {
+func volumeAnnotatorEventHandler[O irimeta.Object](log logr.Logger, c chan<- event.GenericEvent) irievent.HandlerFuncs[O] {
+	handleEvent := func(obj irimeta.Object) {
 		namespace, ok := obj.GetMetadata().Labels[volumepoolletv1alpha1.VolumeNamespaceLabel]
 		if !ok {
 			return
@@ -81,17 +81,17 @@ func volumeAnnotatorEventHandler[O orimeta.Object](log logr.Logger, c chan<- eve
 		}
 	}
 
-	return orievent.HandlerFuncs[O]{
-		CreateFunc: func(event orievent.CreateEvent[O]) {
+	return irievent.HandlerFuncs[O]{
+		CreateFunc: func(event irievent.CreateEvent[O]) {
 			handleEvent(event.Object)
 		},
-		UpdateFunc: func(event orievent.UpdateEvent[O]) {
+		UpdateFunc: func(event irievent.UpdateEvent[O]) {
 			handleEvent(event.ObjectNew)
 		},
-		DeleteFunc: func(event orievent.DeleteEvent[O]) {
+		DeleteFunc: func(event irievent.DeleteEvent[O]) {
 			handleEvent(event.Object)
 		},
-		GenericFunc: func(event orievent.GenericEvent[O]) {
+		GenericFunc: func(event irievent.GenericEvent[O]) {
 			handleEvent(event.Object)
 		},
 	}
@@ -105,7 +105,7 @@ func (r *VolumeAnnotatorReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		return err
 	}
 
-	src, err := r.oriVolumeEventSource(mgr)
+	src, err := r.iriVolumeEventSource(mgr)
 	if err != nil {
 		return err
 	}
@@ -117,19 +117,19 @@ func (r *VolumeAnnotatorReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return nil
 }
 
-func (r *VolumeAnnotatorReconciler) oriVolumeEventSource(mgr ctrl.Manager) (source.Source, error) {
+func (r *VolumeAnnotatorReconciler) iriVolumeEventSource(mgr ctrl.Manager) (source.Source, error) {
 	ch := make(chan event.GenericEvent, 1024)
 
 	if err := mgr.Add(manager.RunnableFunc(func(ctx context.Context) error {
-		log := ctrl.LoggerFrom(ctx).WithName("volumeannotator").WithName("orieventhandlers")
+		log := ctrl.LoggerFrom(ctx).WithName("volumeannotator").WithName("irieventhandlers")
 
-		registrationFuncs := []func() (orievent.HandlerRegistration, error){
-			func() (orievent.HandlerRegistration, error) {
-				return r.VolumeEvents.AddHandler(volumeAnnotatorEventHandler[*ori.Volume](log, ch))
+		registrationFuncs := []func() (irievent.HandlerRegistration, error){
+			func() (irievent.HandlerRegistration, error) {
+				return r.VolumeEvents.AddHandler(volumeAnnotatorEventHandler[*iri.Volume](log, ch))
 			},
 		}
 
-		var handles []orievent.HandlerRegistration
+		var handles []irievent.HandlerRegistration
 		defer func() {
 			log.V(1).Info("Removing handles")
 			for _, handle := range handles {

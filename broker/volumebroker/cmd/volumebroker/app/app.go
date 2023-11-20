@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,10 +20,10 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/onmetal/controller-utils/configutils"
-	"github.com/onmetal/onmetal-api/broker/common"
-	"github.com/onmetal/onmetal-api/broker/volumebroker/server"
-	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
+	"github.com/ironcore-dev/controller-utils/configutils"
+	"github.com/ironcore-dev/ironcore/broker/common"
+	"github.com/ironcore-dev/ironcore/broker/volumebroker/server"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"google.golang.org/grpc"
@@ -42,7 +42,7 @@ type Options struct {
 
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.Kubeconfig, "kubeconfig", o.Kubeconfig, "Path pointing to a kubeconfig file to use.")
-	fs.StringVar(&o.Address, "address", "/var/run/ori-volumebroker.sock", "Address to listen on.")
+	fs.StringVar(&o.Address, "address", "/var/run/iri-volumebroker.sock", "Address to listen on.")
 
 	fs.StringVar(&o.Namespace, "namespace", o.Namespace, "Target Kubernetes namespace to use.")
 	fs.StringVar(&o.VolumePoolName, "volume-pool-name", o.VolumePoolName, "Name of the target volume pool to pin volumes to, if any.")
@@ -122,7 +122,7 @@ func Run(ctx context.Context, opts Options) error {
 			return resp, err
 		}),
 	)
-	ori.RegisterVolumeRuntimeServer(grpcSrv, srv)
+	iri.RegisterVolumeRuntimeServer(grpcSrv, srv)
 
 	setupLog.Info("Starting server", "Address", l.Addr().String())
 	go func() {

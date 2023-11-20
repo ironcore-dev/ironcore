@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,15 +21,15 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/gogo/protobuf/proto"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	v1alpha1 "github.com/onmetal/onmetal-api/poollet/machinepoollet/api/v1alpha1"
-	"github.com/onmetal/onmetal-api/poollet/machinepoollet/controllers/events"
-	"github.com/onmetal/onmetal-api/utils/claimmanager"
-	utilslices "github.com/onmetal/onmetal-api/utils/slices"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
+	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
+	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers/events"
+	"github.com/ironcore-dev/ironcore/utils/claimmanager"
+	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
@@ -116,42 +116,42 @@ func (r *MachineReconciler) getNetworkInterfacesForMachine(ctx context.Context, 
 	return nics, errors.Join(errs...)
 }
 
-func (r *MachineReconciler) prepareORINetworkInterfacesForMachine(
+func (r *MachineReconciler) prepareIRINetworkInterfacesForMachine(
 	ctx context.Context,
 	machine *computev1alpha1.Machine,
 	nics []networkingv1alpha1.NetworkInterface,
-) ([]*ori.NetworkInterface, map[string]v1alpha1.ObjectUIDRef, bool, error) {
-	oriNics, mapping, err := r.getORINetworkInterfacesForMachine(ctx, machine, nics)
+) ([]*iri.NetworkInterface, map[string]v1alpha1.ObjectUIDRef, bool, error) {
+	iriNics, mapping, err := r.getIRINetworkInterfacesForMachine(ctx, machine, nics)
 	if err != nil {
 		return nil, nil, false, err
 	}
 
-	if len(oriNics) != len(machine.Spec.Volumes) {
+	if len(iriNics) != len(machine.Spec.Volumes) {
 		expectedNicNames := utilslices.ToSetFunc(machine.Spec.NetworkInterfaces, func(v computev1alpha1.NetworkInterface) string { return v.Name })
-		actualNicNames := utilslices.ToSetFunc(oriNics, (*ori.NetworkInterface).GetName)
+		actualNicNames := utilslices.ToSetFunc(iriNics, (*iri.NetworkInterface).GetName)
 		missingNicNames := sets.List(expectedNicNames.Difference(actualNicNames))
 		r.Eventf(machine, corev1.EventTypeNormal, events.NetworkInterfaceNotReady, "Machine network interfaces are not ready: %v", missingNicNames)
 		return nil, nil, false, nil
 	}
 
-	return oriNics, mapping, true, err
+	return iriNics, mapping, true, err
 }
 
-func (r *MachineReconciler) getORINetworkInterfacesForMachine(
+func (r *MachineReconciler) getIRINetworkInterfacesForMachine(
 	ctx context.Context,
 	machine *computev1alpha1.Machine,
 	nics []networkingv1alpha1.NetworkInterface,
-) ([]*ori.NetworkInterface, map[string]v1alpha1.ObjectUIDRef, error) {
+) ([]*iri.NetworkInterface, map[string]v1alpha1.ObjectUIDRef, error) {
 	var (
 		nicNameToMachineNicName = r.networkInterfaceNameToMachineNetworkInterfaceName(machine)
 
-		oriNics                []*ori.NetworkInterface
+		iriNics                []*iri.NetworkInterface
 		machineNicNameToUIDRef = make(map[string]v1alpha1.ObjectUIDRef)
 		errs                   []error
 	)
 	for _, nic := range nics {
 		machineNicName := nicNameToMachineNicName[nic.Name]
-		oriNic, ok, err := r.prepareORINetworkInterface(ctx, machine, &nic, machineNicName)
+		iriNic, ok, err := r.prepareIRINetworkInterface(ctx, machine, &nic, machineNicName)
 		if err != nil {
 			errs = append(errs, fmt.Errorf("[network interface %s] error preparing: %w", machineNicName, err))
 			continue
@@ -160,13 +160,13 @@ func (r *MachineReconciler) getORINetworkInterfacesForMachine(
 			continue
 		}
 
-		oriNics = append(oriNics, oriNic)
+		iriNics = append(iriNics, iriNic)
 		machineNicNameToUIDRef[machineNicName] = v1alpha1.ObjUID(&nic)
 	}
 	if err := errors.Join(errs...); err != nil {
 		return nil, nil, err
 	}
-	return oriNics, machineNicNameToUIDRef, nil
+	return iriNics, machineNicNameToUIDRef, nil
 }
 
 func (r *MachineReconciler) getNetworkInterfaceIP(
@@ -225,12 +225,12 @@ func (r *MachineReconciler) getNetworkInterfaceIPs(
 	return ips, true, nil
 }
 
-func (r *MachineReconciler) prepareORINetworkInterface(
+func (r *MachineReconciler) prepareIRINetworkInterface(
 	ctx context.Context,
 	machine *computev1alpha1.Machine,
 	nic *networkingv1alpha1.NetworkInterface,
 	machineNicName string,
-) (*ori.NetworkInterface, bool, error) {
+) (*iri.NetworkInterface, bool, error) {
 	network := &networkingv1alpha1.Network{}
 	networkKey := client.ObjectKey{Namespace: nic.Namespace, Name: nic.Spec.NetworkRef.Name}
 	if err := r.Get(ctx, networkKey, network); err != nil {
@@ -246,7 +246,7 @@ func (r *MachineReconciler) prepareORINetworkInterface(
 		return nil, false, err
 	}
 
-	return &ori.NetworkInterface{
+	return &iri.NetworkInterface{
 		Name:       machineNicName,
 		NetworkId:  network.Spec.ProviderID,
 		Ips:        utilslices.Map(ips, commonv1alpha1.IP.String),
@@ -254,36 +254,36 @@ func (r *MachineReconciler) prepareORINetworkInterface(
 	}, true, nil
 }
 
-func (r *MachineReconciler) getExistingORINetworkInterfacesForMachine(
+func (r *MachineReconciler) getExistingIRINetworkInterfacesForMachine(
 	ctx context.Context,
 	log logr.Logger,
-	oriMachine *ori.Machine,
-	desiredORINics []*ori.NetworkInterface,
-) ([]*ori.NetworkInterface, error) {
+	iriMachine *iri.Machine,
+	desiredIRINics []*iri.NetworkInterface,
+) ([]*iri.NetworkInterface, error) {
 	var (
-		oriNics              []*ori.NetworkInterface
-		desiredORINicsByName = utilslices.ToMapByKey(desiredORINics, (*ori.NetworkInterface).GetName)
+		iriNics              []*iri.NetworkInterface
+		desiredIRINicsByName = utilslices.ToMapByKey(desiredIRINics, (*iri.NetworkInterface).GetName)
 		errs                 []error
 	)
 
-	for _, oriNic := range oriMachine.Spec.NetworkInterfaces {
-		log := log.WithValues("NetworkInterface", oriNic.Name)
+	for _, iriNic := range iriMachine.Spec.NetworkInterfaces {
+		log := log.WithValues("NetworkInterface", iriNic.Name)
 
-		desiredORINic, desiredNicPresent := desiredORINicsByName[oriNic.Name]
-		if desiredNicPresent && proto.Equal(desiredORINic, oriNic) {
-			log.V(1).Info("Existing ORI network interface is up-to-date")
-			oriNics = append(oriNics, oriNic)
+		desiredIRINic, desiredNicPresent := desiredIRINicsByName[iriNic.Name]
+		if desiredNicPresent && proto.Equal(desiredIRINic, iriNic) {
+			log.V(1).Info("Existing IRI network interface is up-to-date")
+			iriNics = append(iriNics, iriNic)
 			continue
 		}
 
-		log.V(1).Info("Detaching outdated ORI network interface")
-		_, err := r.MachineRuntime.DetachNetworkInterface(ctx, &ori.DetachNetworkInterfaceRequest{
-			MachineId: oriMachine.Metadata.Id,
-			Name:      oriNic.Name,
+		log.V(1).Info("Detaching outdated IRI network interface")
+		_, err := r.MachineRuntime.DetachNetworkInterface(ctx, &iri.DetachNetworkInterfaceRequest{
+			MachineId: iriMachine.Metadata.Id,
+			Name:      iriNic.Name,
 		})
 		if err != nil {
 			if status.Code(err) != codes.NotFound {
-				errs = append(errs, fmt.Errorf("[network interface %s] %w", oriNic.Name, err))
+				errs = append(errs, fmt.Errorf("[network interface %s] %w", iriNic.Name, err))
 				continue
 			}
 		}
@@ -291,68 +291,68 @@ func (r *MachineReconciler) getExistingORINetworkInterfacesForMachine(
 	if len(errs) > 0 {
 		return nil, errors.Join(errs...)
 	}
-	return oriNics, nil
+	return iriNics, nil
 }
 
-func (r *MachineReconciler) getNewAttachORINetworkInterfaces(
+func (r *MachineReconciler) getNewAttachIRINetworkInterfaces(
 	ctx context.Context,
 	log logr.Logger,
-	oriMachine *ori.Machine,
-	desiredORINics, existingORINics []*ori.NetworkInterface,
-) ([]*ori.NetworkInterface, error) {
+	iriMachine *iri.Machine,
+	desiredIRINics, existingIRINics []*iri.NetworkInterface,
+) ([]*iri.NetworkInterface, error) {
 	var (
-		desiredNewORINics = FindNewORINetworkInterfaces(desiredORINics, existingORINics)
-		oriNics           []*ori.NetworkInterface
+		desiredNewIRINics = FindNewIRINetworkInterfaces(desiredIRINics, existingIRINics)
+		iriNics           []*iri.NetworkInterface
 		errs              []error
 	)
-	for _, newORINic := range desiredNewORINics {
-		log := log.WithValues("NetworkInterface", newORINic.Name)
+	for _, newIRINic := range desiredNewIRINics {
+		log := log.WithValues("NetworkInterface", newIRINic.Name)
 		log.V(1).Info("Attaching new network interface")
-		if _, err := r.MachineRuntime.AttachNetworkInterface(ctx, &ori.AttachNetworkInterfaceRequest{
-			MachineId:        oriMachine.Metadata.Id,
-			NetworkInterface: newORINic,
+		if _, err := r.MachineRuntime.AttachNetworkInterface(ctx, &iri.AttachNetworkInterfaceRequest{
+			MachineId:        iriMachine.Metadata.Id,
+			NetworkInterface: newIRINic,
 		}); err != nil {
-			errs = append(errs, fmt.Errorf("[network interface %s] %w", newORINic.Name, err))
+			errs = append(errs, fmt.Errorf("[network interface %s] %w", newIRINic.Name, err))
 			continue
 		}
 
-		oriNics = append(oriNics, newORINic)
+		iriNics = append(iriNics, newIRINic)
 	}
 	if len(errs) > 0 {
 		return nil, errors.Join(errs...)
 	}
-	return oriNics, nil
+	return iriNics, nil
 }
 
-func (r *MachineReconciler) updateORINetworkInterfaces(
+func (r *MachineReconciler) updateIRINetworkInterfaces(
 	ctx context.Context,
 	log logr.Logger,
 	machine *computev1alpha1.Machine,
-	oriMachine *ori.Machine,
+	iriMachine *iri.Machine,
 	nics []networkingv1alpha1.NetworkInterface,
-) ([]*ori.NetworkInterface, error) {
-	desiredORINics, _, err := r.getORINetworkInterfacesForMachine(ctx, machine, nics)
+) ([]*iri.NetworkInterface, error) {
+	desiredIRINics, _, err := r.getIRINetworkInterfacesForMachine(ctx, machine, nics)
 	if err != nil {
-		return nil, fmt.Errorf("error preparing ori network interfaces: %w", err)
+		return nil, fmt.Errorf("error preparing iri network interfaces: %w", err)
 	}
 
-	existingORINics, err := r.getExistingORINetworkInterfacesForMachine(ctx, log, oriMachine, desiredORINics)
+	existingIRINics, err := r.getExistingIRINetworkInterfacesForMachine(ctx, log, iriMachine, desiredIRINics)
 	if err != nil {
-		return nil, fmt.Errorf("error getting existing ori network interfaces for machine: %w", err)
+		return nil, fmt.Errorf("error getting existing iri network interfaces for machine: %w", err)
 	}
 
-	_, err = r.getNewAttachORINetworkInterfaces(ctx, log, oriMachine, desiredORINics, existingORINics)
+	_, err = r.getNewAttachIRINetworkInterfaces(ctx, log, iriMachine, desiredIRINics, existingIRINics)
 	if err != nil {
-		return nil, fmt.Errorf("error getting new ori network interfaces for machine: %w", err)
+		return nil, fmt.Errorf("error getting new iri network interfaces for machine: %w", err)
 	}
 
-	return desiredORINics, nil
+	return desiredIRINics, nil
 }
 
 func (r *MachineReconciler) computeNetworkInterfaceMapping(
 	machine *computev1alpha1.Machine,
 	nics []networkingv1alpha1.NetworkInterface,
-	oriNics []*ori.NetworkInterface,
+	iriNics []*iri.NetworkInterface,
 ) map[string]v1alpha1.ObjectUIDRef {
 	nicByName := utilslices.ToMapByKey(nics,
 		func(nic networkingv1alpha1.NetworkInterface) string { return nic.Name },
@@ -364,30 +364,30 @@ func (r *MachineReconciler) computeNetworkInterfaceMapping(
 		machineNicNameToNicName[machineNic.Name] = nicName
 	}
 
-	nicMapping := make(map[string]v1alpha1.ObjectUIDRef, len(oriNics))
-	for _, oriNic := range oriNics {
-		nicName := machineNicNameToNicName[oriNic.Name]
+	nicMapping := make(map[string]v1alpha1.ObjectUIDRef, len(iriNics))
+	for _, iriNic := range iriNics {
+		nicName := machineNicNameToNicName[iriNic.Name]
 		nic := nicByName[nicName]
 
-		nicMapping[oriNic.Name] = v1alpha1.ObjUID(&nic)
+		nicMapping[iriNic.Name] = v1alpha1.ObjUID(&nic)
 	}
 	return nicMapping
 }
 
-var oriNetworkInterfaceStateToNetworkInterfaceState = map[ori.NetworkInterfaceState]computev1alpha1.NetworkInterfaceState{
-	ori.NetworkInterfaceState_NETWORK_INTERFACE_PENDING:  computev1alpha1.NetworkInterfaceStatePending,
-	ori.NetworkInterfaceState_NETWORK_INTERFACE_ATTACHED: computev1alpha1.NetworkInterfaceStateAttached,
+var iriNetworkInterfaceStateToNetworkInterfaceState = map[iri.NetworkInterfaceState]computev1alpha1.NetworkInterfaceState{
+	iri.NetworkInterfaceState_NETWORK_INTERFACE_PENDING:  computev1alpha1.NetworkInterfaceStatePending,
+	iri.NetworkInterfaceState_NETWORK_INTERFACE_ATTACHED: computev1alpha1.NetworkInterfaceStateAttached,
 }
 
-func (r *MachineReconciler) convertORINetworkInterfaceState(state ori.NetworkInterfaceState) (computev1alpha1.NetworkInterfaceState, error) {
-	if res, ok := oriNetworkInterfaceStateToNetworkInterfaceState[state]; ok {
+func (r *MachineReconciler) convertIRINetworkInterfaceState(state iri.NetworkInterfaceState) (computev1alpha1.NetworkInterfaceState, error) {
+	if res, ok := iriNetworkInterfaceStateToNetworkInterfaceState[state]; ok {
 		return res, nil
 	}
 	return "", fmt.Errorf("unknown network interface attachment state %v", state)
 }
 
-func (r *MachineReconciler) convertORINetworkInterfaceStatus(status *ori.NetworkInterfaceStatus) (computev1alpha1.NetworkInterfaceStatus, error) {
-	state, err := r.convertORINetworkInterfaceState(status.State)
+func (r *MachineReconciler) convertIRINetworkInterfaceStatus(status *iri.NetworkInterfaceStatus) (computev1alpha1.NetworkInterfaceStatus, error) {
+	state, err := r.convertIRINetworkInterfaceState(status.State)
 	if err != nil {
 		return computev1alpha1.NetworkInterfaceStatus{}, err
 	}
@@ -410,11 +410,11 @@ func (r *MachineReconciler) addNetworkInterfaceStatusValues(now metav1.Time, exi
 
 func (r *MachineReconciler) getNetworkInterfaceStatusesForMachine(
 	machine *computev1alpha1.Machine,
-	oriMachine *ori.Machine,
+	iriMachine *iri.Machine,
 	now metav1.Time,
 ) ([]computev1alpha1.NetworkInterfaceStatus, error) {
 	var (
-		oriNicStatusByName        = utilslices.ToMapByKey(oriMachine.Status.NetworkInterfaces, (*ori.NetworkInterfaceStatus).GetName)
+		iriNicStatusByName        = utilslices.ToMapByKey(iriMachine.Status.NetworkInterfaces, (*iri.NetworkInterfaceStatus).GetName)
 		existingNicStatusesByName = utilslices.ToMapByKey(machine.Status.NetworkInterfaces, func(status computev1alpha1.NetworkInterfaceStatus) string { return status.Name })
 		nicStatuses               []computev1alpha1.NetworkInterfaceStatus
 		errs                      []error
@@ -422,12 +422,12 @@ func (r *MachineReconciler) getNetworkInterfaceStatusesForMachine(
 
 	for _, machineNic := range machine.Spec.NetworkInterfaces {
 		var (
-			oriNicStatus, ok = oriNicStatusByName[machineNic.Name]
+			iriNicStatus, ok = iriNicStatusByName[machineNic.Name]
 			nicStatusValues  computev1alpha1.NetworkInterfaceStatus
 		)
 		if ok {
 			var err error
-			nicStatusValues, err = r.convertORINetworkInterfaceStatus(oriNicStatus)
+			nicStatusValues, err = r.convertIRINetworkInterfaceStatus(iriNicStatus)
 			if err != nil {
 				return nil, fmt.Errorf("[network interface %s] %w", machineNic.Name, err)
 			}

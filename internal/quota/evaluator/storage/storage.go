@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,14 +17,14 @@ package storage
 import (
 	"context"
 
-	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	"github.com/onmetal/onmetal-api/client-go/informers"
-	"github.com/onmetal/onmetal-api/client-go/onmetalapi"
-	"github.com/onmetal/onmetal-api/internal/quota/evaluator/generic"
-	utilsgeneric "github.com/onmetal/onmetal-api/utils/generic"
-	"github.com/onmetal/onmetal-api/utils/quota"
-	"github.com/onmetal/onmetal-api/utils/quota/resourceaccess"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	"github.com/ironcore-dev/ironcore/client-go/informers"
+	"github.com/ironcore-dev/ironcore/client-go/ironcore"
+	"github.com/ironcore-dev/ironcore/internal/quota/evaluator/generic"
+	utilsgeneric "github.com/ironcore-dev/ironcore/utils/generic"
+	"github.com/ironcore-dev/ironcore/utils/quota"
+	"github.com/ironcore-dev/ironcore/utils/quota/resourceaccess"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -48,7 +48,7 @@ func NewClientVolumeCapabilitiesReader(c client.Client) generic.CapabilitiesRead
 	)
 }
 
-func NewPrimeLRUVolumeClassCapabilitiesReader(c onmetalapi.Interface, f informers.SharedInformerFactory) generic.CapabilitiesReader {
+func NewPrimeLRUVolumeClassCapabilitiesReader(c ironcore.Interface, f informers.SharedInformerFactory) generic.CapabilitiesReader {
 	getter := resourceaccess.NewPrimeLRUGetter[*storagev1alpha1.VolumeClass, string](
 		func(ctx context.Context, className string) (*storagev1alpha1.VolumeClass, error) {
 			return c.StorageV1alpha1().VolumeClasses().Get(ctx, className, metav1.GetOptions{})
@@ -72,7 +72,7 @@ func NewClientBucketCapabilitiesReader(c client.Client) generic.CapabilitiesRead
 	)
 }
 
-func NewPrimeLRUBucketClassCapabilitiesReader(c onmetalapi.Interface, f informers.SharedInformerFactory) generic.CapabilitiesReader {
+func NewPrimeLRUBucketClassCapabilitiesReader(c ironcore.Interface, f informers.SharedInformerFactory) generic.CapabilitiesReader {
 	getter := resourceaccess.NewPrimeLRUGetter[*storagev1alpha1.BucketClass, string](
 		func(ctx context.Context, className string) (*storagev1alpha1.BucketClass, error) {
 			return c.StorageV1alpha1().BucketClasses().Get(ctx, className, metav1.GetOptions{})

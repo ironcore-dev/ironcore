@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 by the OnMetal authors.
+ * Copyright (c) 2022 by the IronCore authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@ package validation
 import (
 	"fmt"
 
-	"github.com/onmetal/onmetal-api/internal/admission/plugin/machinevolumedevices/device"
-	onmetalapivalidation "github.com/onmetal/onmetal-api/internal/api/validation"
-	"github.com/onmetal/onmetal-api/internal/apis/compute"
-	"github.com/onmetal/onmetal-api/internal/apis/storage"
-	storagevalidation "github.com/onmetal/onmetal-api/internal/apis/storage/validation"
+	"github.com/ironcore-dev/ironcore/internal/admission/plugin/machinevolumedevices/device"
+	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
+	"github.com/ironcore-dev/ironcore/internal/apis/compute"
+	"github.com/ironcore-dev/ironcore/internal/apis/storage"
+	storagevalidation "github.com/ironcore-dev/ironcore/internal/apis/storage/validation"
 	corev1 "k8s.io/api/core/v1"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1validation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
@@ -58,7 +58,7 @@ var supportedMachinePowers = sets.New(
 )
 
 func validateMachinePower(power compute.Power, fldPath *field.Path) field.ErrorList {
-	return onmetalapivalidation.ValidateEnum(supportedMachinePowers, power, fldPath, "must specify machine power")
+	return ironcorevalidation.ValidateEnum(supportedMachinePowers, power, fldPath, "must specify machine power")
 }
 
 // validateMachineSpec validates the spec of a Machine object.
@@ -167,7 +167,7 @@ func validateEmptyDiskVolumeSource(source *compute.EmptyDiskVolumeSource, fldPat
 	var allErrs field.ErrorList
 
 	if sizeLimit := source.SizeLimit; sizeLimit != nil {
-		allErrs = append(allErrs, onmetalapivalidation.ValidateNonNegativeQuantity(*sizeLimit, fldPath.Child("sizeLimit"))...)
+		allErrs = append(allErrs, ironcorevalidation.ValidateNonNegativeQuantity(*sizeLimit, fldPath.Child("sizeLimit"))...)
 	}
 
 	return allErrs
@@ -208,9 +208,9 @@ func validateVolumeTemplateSpecForMachine(template *storage.VolumeTemplateSpec, 
 func validateMachineSpecUpdate(new, old *compute.MachineSpec, deletionTimestampSet bool, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableField(new.Image, old.Image, fldPath.Child("image"))...)
-	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableField(new.MachineClassRef, old.MachineClassRef, fldPath.Child("machineClassRef"))...)
-	allErrs = append(allErrs, onmetalapivalidation.ValidateSetOnceField(new.MachinePoolRef, old.MachinePoolRef, fldPath.Child("machinePoolRef"))...)
+	allErrs = append(allErrs, ironcorevalidation.ValidateImmutableField(new.Image, old.Image, fldPath.Child("image"))...)
+	allErrs = append(allErrs, ironcorevalidation.ValidateImmutableField(new.MachineClassRef, old.MachineClassRef, fldPath.Child("machineClassRef"))...)
+	allErrs = append(allErrs, ironcorevalidation.ValidateSetOnceField(new.MachinePoolRef, old.MachinePoolRef, fldPath.Child("machinePoolRef"))...)
 
 	return allErrs
 }

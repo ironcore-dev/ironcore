@@ -26,7 +26,7 @@ import (
 	"strings"
 	"time"
 
-	flock2 "github.com/onmetal/onmetal-api/utils/envtest/internal/testing/flock"
+	flock2 "github.com/ironcore-dev/ironcore/utils/envtest/internal/testing/flock"
 )
 
 // TODO(directxman12): interface / release functionality for external port managers

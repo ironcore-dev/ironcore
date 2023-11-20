@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,17 +22,17 @@ import (
 	"sync"
 	"time"
 
-	"github.com/onmetal/onmetal-api/utils/container/list"
-	"github.com/onmetal/onmetal-api/utils/generic"
+	"github.com/ironcore-dev/ironcore/utils/container/list"
+	"github.com/ironcore-dev/ironcore/utils/generic"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 const (
-	DefaultCacheTTL           time.Duration = 1 * time.Minute
-	DefaultCacheTokenMaxTries int           = 10
-	DefaultCacheTokenLen      int           = 8
-	DefaultCacheMaxInFlight   int           = 1000
+	DefaultCacheTTL               = 1 * time.Minute
+	DefaultCacheTokenMaxTries int = 10
+	DefaultCacheTokenLen      int = 8
+	DefaultCacheMaxInFlight   int = 1000
 )
 
 type cache[E any] struct {

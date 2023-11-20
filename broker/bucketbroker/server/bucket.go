@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,53 +17,53 @@ package server
 import (
 	"fmt"
 
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	"github.com/onmetal/onmetal-api/broker/bucketbroker/apiutils"
-	ori "github.com/onmetal/onmetal-api/ori/apis/bucket/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	"github.com/ironcore-dev/ironcore/broker/bucketbroker/apiutils"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
 )
 
-func (s *Server) convertAggregateOnmetalBucket(bucket *AggregateOnmetalBucket) (*ori.Bucket, error) {
+func (s *Server) convertAggregateIronCoreBucket(bucket *AggregateIronCoreBucket) (*iri.Bucket, error) {
 	metadata, err := apiutils.GetObjectMetadata(bucket.Bucket)
 	if err != nil {
 		return nil, err
 	}
 
-	state, err := s.convertOnmetalBucketState(bucket.Bucket.Status.State)
+	state, err := s.convertIronCoreBucketState(bucket.Bucket.Status.State)
 	if err != nil {
 		return nil, err
 	}
 
-	access, err := s.convertOnmetalBucketAccess(bucket)
+	access, err := s.convertIronCoreBucketAccess(bucket)
 	if err != nil {
 		return nil, err
 	}
 
-	return &ori.Bucket{
+	return &iri.Bucket{
 		Metadata: metadata,
-		Spec: &ori.BucketSpec{
+		Spec: &iri.BucketSpec{
 			Class: bucket.Bucket.Spec.BucketClassRef.Name,
 		},
-		Status: &ori.BucketStatus{
+		Status: &iri.BucketStatus{
 			State:  state,
 			Access: access,
 		},
 	}, nil
 }
 
-var onmetalBucketStateToORIState = map[storagev1alpha1.BucketState]ori.BucketState{
-	storagev1alpha1.BucketStatePending:   ori.BucketState_BUCKET_PENDING,
-	storagev1alpha1.BucketStateAvailable: ori.BucketState_BUCKET_AVAILABLE,
-	storagev1alpha1.BucketStateError:     ori.BucketState_BUCKET_ERROR,
+var ironcoreBucketStateToIRIState = map[storagev1alpha1.BucketState]iri.BucketState{
+	storagev1alpha1.BucketStatePending:   iri.BucketState_BUCKET_PENDING,
+	storagev1alpha1.BucketStateAvailable: iri.BucketState_BUCKET_AVAILABLE,
+	storagev1alpha1.BucketStateError:     iri.BucketState_BUCKET_ERROR,
 }
 
-func (s *Server) convertOnmetalBucketState(state storagev1alpha1.BucketState) (ori.BucketState, error) {
-	if state, ok := onmetalBucketStateToORIState[state]; ok {
+func (s *Server) convertIronCoreBucketState(state storagev1alpha1.BucketState) (iri.BucketState, error) {
+	if state, ok := ironcoreBucketStateToIRIState[state]; ok {
 		return state, nil
 	}
-	return 0, fmt.Errorf("unknown onmetal bucket state %q", state)
+	return 0, fmt.Errorf("unknown ironcore bucket state %q", state)
 }
 
-func (s *Server) convertOnmetalBucketAccess(bucket *AggregateOnmetalBucket) (*ori.BucketAccess, error) {
+func (s *Server) convertIronCoreBucketAccess(bucket *AggregateIronCoreBucket) (*iri.BucketAccess, error) {
 	if bucket.Bucket.Status.State != storagev1alpha1.BucketStateAvailable {
 		return nil, nil
 	}
@@ -76,12 +76,12 @@ func (s *Server) convertOnmetalBucketAccess(bucket *AggregateOnmetalBucket) (*or
 	var secretData map[string][]byte
 	if secretRef := access.SecretRef; secretRef != nil {
 		if bucket.AccessSecret == nil {
-			return nil, fmt.Errorf("access secret specified but not contained in aggregate onmetal bucket")
+			return nil, fmt.Errorf("access secret specified but not contained in aggregate ironcore bucket")
 		}
 		secretData = bucket.AccessSecret.Data
 	}
 
-	return &ori.BucketAccess{
+	return &iri.BucketAccess{
 		Endpoint:   access.Endpoint,
 		SecretData: secretData,
 	}, nil

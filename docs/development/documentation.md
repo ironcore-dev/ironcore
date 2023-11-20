@@ -1,6 +1,6 @@
 # Documentation Setup
 
-The documentation of the [onmetal-api](https://github.com/onmetal/onmetal-api) project is written primarily using Markdown.
+The documentation of the [ironcore](https://github.com/ironcore-dev/ironcore) project is written primarily using Markdown.
 All documentation related content can be found in the `/docs` folder. New content also should be added there.
 [MkDocs](https://www.mkdocs.org/) and [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) are then used to render the contents of the `/docs` folder to have a more user-friendly experience when browsing the projects' documentation.
 
@@ -47,7 +47,7 @@ Please include the statement `--8<-- "hack/docs/abbreviations.md"` at the end of
 
 ## API Reference Documentation
 
-The [API reference documentation](/api-reference/overview/) contains auto-generated description from the CRD definition of the [onmetal-api](https://github.com/onmetal/onmetal-api) project.
+The [API reference documentation](/api-reference/overview/) contains auto-generated description from the CRD definition of the [ironcore](https://github.com/ironcore-dev/ironcore) project.
 We are using the [gen-crd-api-reference-docs](https://github.com/ahmetb/gen-crd-api-reference-docs) project to generate the content. Under the hood we are using `go generate` instructions defined in each version type `doc.go`.
 The needed instructions to generate documentation for the `core/v1alpha1` types are in the example below:
 

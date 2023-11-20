@@ -37,7 +37,7 @@ difference of not exposing the selected service to the public internet.
 
 ## Motivation
 
-In `onmetal-api`, we need to be able to make services highly available internally. Currently,
+In `ironcore`, we need to be able to make services highly available internally. Currently,
 we can only allocate IP addresses for `NetworkInterface`s and target them, however, as soon as the
 backing `Machine` fails, the service would become unavailable.
 
@@ -73,7 +73,7 @@ flexibility with internal IPs as we have already with the `NetworkInterface` typ
 Example manifest:
 
 ```yaml
-apiVersion: networking.api.onmetal.de/v1alpha1
+apiVersion: networking.ironcore.dev/v1alpha1
 kind: LoadBalancer
 metadata:
   name: my-loadbalancer
@@ -111,4 +111,3 @@ status:
 * Create `Machine`(s) that e.g. run `HAProxy` to target your services with. This comes with the
   drawback of having to manage the `Machine`s / having multiple IPs for the load balancing machines
   to choose from (see alternative 1).
-

@@ -19,6 +19,7 @@ linters-settings:
   misspell:
     ignore-words:
       - strat
+      - iritable
   revive:
     severity: error
     rules:
@@ -29,11 +30,11 @@ linters-settings:
         disabled: true
   importas:
     alias:
-      - pkg: github.com/onmetal/onmetal-api/api/(\w+)/(v[\w\d]+)
+      - pkg: github.com/ironcore-dev/ironcore/api/(\w+)/(v[\w\d]+)
         alias: $1$2
-      - pkg: github.com/onmetal/onmetal-api/internal/apis/(\w+)
+      - pkg: github.com/ironcore-dev/ironcore/internal/apis/(\w+)
         alias: $1
-      - pkg: github.com/onmetal/onmetal-api/internal/client/(\w+)
+      - pkg: github.com/ironcore-dev/ironcore/internal/client/(\w+)
         alias: ${1}client
 
 issues:

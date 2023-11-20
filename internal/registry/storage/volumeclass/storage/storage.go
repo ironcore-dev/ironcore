@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 package storage
 
 import (
-	"github.com/onmetal/onmetal-api/internal/apis/storage"
-	registryvolumeclass "github.com/onmetal/onmetal-api/internal/registry/storage/volumeclass"
+	"github.com/ironcore-dev/ironcore/internal/apis/storage"
+	registryvolumeclass "github.com/ironcore-dev/ironcore/internal/registry/storage/volumeclass"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apiserver/pkg/registry/generic"
 	genericregistry "k8s.io/apiserver/pkg/registry/generic/registry"

@@ -17,7 +17,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - storage.api.onmetal.de
+  - storage.ironcore.dev
   resources:
   - buckets
   verbs:

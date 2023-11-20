@@ -1,12 +1,12 @@
 # Adds namespace to all resources.
-namespace: onmetal-system
+namespace: ironcore-system
 
 # Value of this field is prepended to the
 # names of all resources, e.g. a deployment named
 # "wordpress" becomes "alices-wordpress".
 # Note that it should also match with the prefix (text before '-') of the namespace
 # field above.
-namePrefix: onmetal-
+namePrefix: ironcore-
 
 # Labels to add to all resources and selectors.
 #commonLabels:
@@ -95,7 +95,7 @@ vars: # We unfortunately have to use vars here as
   # Monitor the following issue(s) and switch to replacements as soon as implemented:
   # * https://github.com/kubernetes-sigs/kustomize/issues/4080
   # * https://github.com/kubernetes-sigs/kustomize/pull/4558
-  - name: ONMETAL_API_APISERVER_ETCD_SERVICE_NAME
+  - name: IRONCORE_APISERVER_ETCD_SERVICE_NAME
     objref:
       kind: Service
       name: etcd

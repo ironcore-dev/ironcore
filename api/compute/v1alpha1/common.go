@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 package v1alpha1
 
 import (
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -25,12 +25,12 @@ const (
 	MachineMachineClassRefNameField = "spec.machineClassRef.name"
 
 	// MachinePoolsGroup is the system rbac group all machine pools are in.
-	MachinePoolsGroup = "compute.api.onmetal.de:system:machinepools"
+	MachinePoolsGroup = "compute.ironcore.dev:system:machinepools"
 
 	// MachinePoolUserNamePrefix is the prefix all machine pool users should have.
-	MachinePoolUserNamePrefix = "compute.api.onmetal.de:system:machinepool:"
+	MachinePoolUserNamePrefix = "compute.ironcore.dev:system:machinepool:"
 
-	SecretTypeIgnition = corev1.SecretType("compute.api.onmetal.de/ignition")
+	SecretTypeIgnition = corev1.SecretType("compute.ironcore.dev/ignition")
 )
 
 // MachinePoolCommonName constructs the common name for a certificate of a machine pool user.

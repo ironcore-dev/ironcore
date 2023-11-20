@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/onmetal/onmetal-api/internal/api"
-	"github.com/onmetal/onmetal-api/internal/apis/networking"
-	"github.com/onmetal/onmetal-api/internal/apis/networking/validation"
-	"github.com/onmetal/onmetal-api/utils/equality"
+	"github.com/ironcore-dev/ironcore/internal/api"
+	"github.com/ironcore-dev/ironcore/internal/apis/networking"
+	"github.com/ironcore-dev/ironcore/internal/apis/networking/validation"
+	"github.com/ironcore-dev/ironcore/utils/equality"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -115,7 +115,7 @@ var StatusStrategy = networkStatusStrategy{Strategy}
 
 func (networkStatusStrategy) GetResetFields() map[fieldpath.APIVersion]*fieldpath.Set {
 	return map[fieldpath.APIVersion]*fieldpath.Set{
-		"networking.api.onmetal.de/v1alpha1": fieldpath.NewSet(
+		"networking.ironcore.dev/v1alpha1": fieldpath.NewSet(
 			fieldpath.MakePathOrDie("spec"),
 		),
 	}

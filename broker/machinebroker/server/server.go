@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,30 +20,30 @@ import (
 	"net/url"
 	"path"
 
-	"github.com/onmetal/onmetal-api/broker/common/request"
-	"github.com/onmetal/onmetal-api/broker/machinebroker/cluster"
-	"github.com/onmetal/onmetal-api/broker/machinebroker/networks"
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	"github.com/ironcore-dev/ironcore/broker/common/request"
+	"github.com/ironcore-dev/ironcore/broker/machinebroker/cluster"
+	"github.com/ironcore-dev/ironcore/broker/machinebroker/networks"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	"k8s.io/client-go/rest"
 )
 
-var _ ori.MachineRuntimeServer = (*Server)(nil)
+var _ iri.MachineRuntimeServer = (*Server)(nil)
 
 //+kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machines,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=compute.api.onmetal.de,resources=machines/exec,verbs=get;create
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=storage.api.onmetal.de,resources=volumes/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networks,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networks/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=virtualips,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=virtualips/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=loadbalancers,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=loadbalancers/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=loadbalancerroutings,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=natgateways,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=natgateways/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machines,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machines/exec,verbs=get;create
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumes,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumes/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=networkinterfaces,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=networks,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=networks/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=virtualips,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=virtualips/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=loadbalancers,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=loadbalancers/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=loadbalancerroutings,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=natgateways,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=natgateways/status,verbs=get;update;patch
 
 type BrokerLabel struct {
 	DefaultLabel     string
@@ -59,7 +59,7 @@ type Server struct {
 
 	networks *networks.Manager
 
-	execRequestCache request.Cache[*ori.ExecRequest]
+	execRequestCache request.Cache[*iri.ExecRequest]
 }
 
 type Options struct {
@@ -68,7 +68,7 @@ type Options struct {
 	// BrokerDownwardAPILabels specifies which labels to broker via downward API and what the default
 	// label name is to obtain the value in case there is no value for the downward API.
 	// Example usage is e.g. to broker the root UID (map "root-machine-uid" to machinepoollet's
-	// "machinepoollet.api.onmetal.de/machine-uid")
+	// "machinepoollet.ironcore.dev/machine-uid")
 	BrokerDownwardAPILabels map[string]string
 	MachinePoolName         string
 	MachinePoolSelector     map[string]string
@@ -93,7 +93,7 @@ func New(cfg *rest.Config, namespace string, opts Options) (*Server, error) {
 		brokerDownwardAPILabels: opts.BrokerDownwardAPILabels,
 		cluster:                 c,
 		networks:                networks.NewManager(c),
-		execRequestCache:        request.NewCache[*ori.ExecRequest](),
+		execRequestCache:        request.NewCache[*iri.ExecRequest](),
 	}, nil
 }
 

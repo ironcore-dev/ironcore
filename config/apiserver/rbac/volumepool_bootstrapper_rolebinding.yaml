@@ -1,14 +1,14 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: storage.api.onmetal.de:system:volumepools-bootstrapper
+  name: storage.ironcore.dev:system:volumepools-bootstrapper
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: storage.api.onmetal.de:system:volumepools-bootstrapper
+  name: storage.ironcore.dev:system:volumepools-bootstrapper
 subjects:
   - kind: Group
     # Group name has to match bootstrap group pattern \Asystem:bootstrappers:[a-z0-9:-]{0,255}[a-z0-9]\
     # See https://github.com/kubernetes/kubernetes/blob/e8662a46dd27db774ec953dae15f93ae2d1a68c8/staging/src/k8s.io/cluster-bootstrap/token/api/types.go#L96
-    name: system:bootstrappers:storage-api-onmetal-de:volumepools
+    name: system:bootstrappers:storage-ironcore-dev:volumepools
     apiGroup: rbac.authorization.k8s.io

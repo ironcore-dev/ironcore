@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,14 +18,14 @@ import (
 	"fmt"
 
 	"github.com/gogo/protobuf/proto"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	testingmachine "github.com/onmetal/onmetal-api/ori/testing/machine"
-	machinepoolletv1alpha1 "github.com/onmetal/onmetal-api/poollet/machinepoollet/api/v1alpha1"
-	machinepoolletmachine "github.com/onmetal/onmetal-api/poollet/machinepoollet/machine"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
+	testingmachine "github.com/ironcore-dev/ironcore/iri/testing/machine"
+	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
+	machinepoolletmachine "github.com/ironcore-dev/ironcore/poollet/machinepoollet/machine"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
@@ -127,47 +127,47 @@ var _ = Describe("MachineController", func() {
 		Eventually(srv).Should(SatisfyAll(
 			HaveField("Machines", HaveLen(1)),
 		))
-		_, oriMachine := GetSingleMapEntry(srv.Machines)
+		_, iriMachine := GetSingleMapEntry(srv.Machines)
 
-		By("inspecting the ori machine")
-		Expect(oriMachine.Metadata.Labels).To(HaveKeyWithValue(machinepoolletv1alpha1.DownwardAPILabel(fooDownwardAPILabel), fooAnnotationValue))
-		Expect(oriMachine.Spec.Class).To(Equal(mc.Name))
-		Expect(oriMachine.Spec.Power).To(Equal(ori.Power_POWER_ON))
-		Expect(oriMachine.Spec.Volumes).To(ConsistOf(&ori.Volume{
+		By("inspecting the iri machine")
+		Expect(iriMachine.Metadata.Labels).To(HaveKeyWithValue(machinepoolletv1alpha1.DownwardAPILabel(fooDownwardAPILabel), fooAnnotationValue))
+		Expect(iriMachine.Spec.Class).To(Equal(mc.Name))
+		Expect(iriMachine.Spec.Power).To(Equal(iri.Power_POWER_ON))
+		Expect(iriMachine.Spec.Volumes).To(ConsistOf(&iri.Volume{
 			Name:   "primary",
 			Device: "oda",
-			Connection: &ori.VolumeConnection{
+			Connection: &iri.VolumeConnection{
 				Driver: "test",
 				Handle: "testhandle",
 			},
 		}))
-		Expect(oriMachine.Spec.NetworkInterfaces).To(ConsistOf(&ori.NetworkInterface{
+		Expect(iriMachine.Spec.NetworkInterfaces).To(ConsistOf(&iri.NetworkInterface{
 			Name:      "primary",
 			NetworkId: "foo",
 			Ips:       []string{"10.0.0.1"},
 		}))
 
-		By("waiting for the onmetal machine status to be up-to-date")
-		expectedMachineID := machinepoolletmachine.MakeID(testingmachine.FakeRuntimeName, oriMachine.Metadata.Id)
+		By("waiting for the ironcore machine status to be up-to-date")
+		expectedMachineID := machinepoolletmachine.MakeID(testingmachine.FakeRuntimeName, iriMachine.Metadata.Id)
 		Eventually(Object(machine)).Should(SatisfyAll(
 			HaveField("Status.MachineID", expectedMachineID.String()),
 			HaveField("Status.ObservedGeneration", machine.Generation),
 		))
 
 		By("setting the network interface id in the machine status")
-		oriMachine = &testingmachine.FakeMachine{Machine: *proto.Clone(&oriMachine.Machine).(*ori.Machine)}
-		oriMachine.Metadata.Generation = 1
-		oriMachine.Status.ObservedGeneration = 1
-		oriMachine.Status.NetworkInterfaces = []*ori.NetworkInterfaceStatus{
+		iriMachine = &testingmachine.FakeMachine{Machine: *proto.Clone(&iriMachine.Machine).(*iri.Machine)}
+		iriMachine.Metadata.Generation = 1
+		iriMachine.Status.ObservedGeneration = 1
+		iriMachine.Status.NetworkInterfaces = []*iri.NetworkInterfaceStatus{
 			{
 				Name:   "primary",
 				Handle: "primary-handle",
-				State:  ori.NetworkInterfaceState_NETWORK_INTERFACE_ATTACHED,
+				State:  iri.NetworkInterfaceState_NETWORK_INTERFACE_ATTACHED,
 			},
 		}
-		srv.SetMachines([]*testingmachine.FakeMachine{oriMachine})
+		srv.SetMachines([]*testingmachine.FakeMachine{iriMachine})
 
-		By("waiting for the onmetal network interface to have a provider id set")
+		By("waiting for the ironcore network interface to have a provider id set")
 		Eventually(Object(nic)).Should(HaveField("Spec.ProviderID", "primary-handle"))
 		Eventually(Object(machine)).Should(HaveField("Status.NetworkInterfaces", ConsistOf(MatchFields(IgnoreExtras, Fields{
 			"Name":   Equal("primary"),
@@ -194,16 +194,16 @@ var _ = Describe("MachineController", func() {
 		Eventually(srv).Should(HaveField("Machines", HaveLen(1)))
 
 		By("inspecting the machine")
-		_, oriMachine := GetSingleMapEntry(srv.Machines)
-		Expect(oriMachine.Spec.Power).To(Equal(ori.Power_POWER_ON))
+		_, iriMachine := GetSingleMapEntry(srv.Machines)
+		Expect(iriMachine.Spec.Power).To(Equal(iri.Power_POWER_ON))
 
 		By("updating the machine power")
 		base := machine.DeepCopy()
 		machine.Spec.Power = computev1alpha1.PowerOff
 		Expect(k8sClient.Patch(ctx, machine, client.MergeFrom(base))).To(Succeed())
 
-		By("waiting for the ori machine to be updated")
-		Eventually(oriMachine).Should(HaveField("Spec.Power", Equal(ori.Power_POWER_OFF)))
+		By("waiting for the iri machine to be updated")
+		Eventually(iriMachine).Should(HaveField("Spec.Power", Equal(iri.Power_POWER_OFF)))
 	})
 })
 

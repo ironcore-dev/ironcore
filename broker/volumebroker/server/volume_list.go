@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@ import (
 	"context"
 	"fmt"
 
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	"github.com/onmetal/onmetal-api/broker/common"
-	volumebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/volumebroker/api/v1alpha1"
-	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	"github.com/ironcore-dev/ironcore/broker/common"
+	volumebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/volumebroker/api/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
@@ -40,10 +40,10 @@ func (s *Server) listManagedAndCreated(ctx context.Context, list client.ObjectLi
 	)
 }
 
-func (s *Server) listAggregateOnmetalVolumes(ctx context.Context) ([]AggregateOnmetalVolume, error) {
-	onmetalVolumeList := &storagev1alpha1.VolumeList{}
-	if err := s.listManagedAndCreated(ctx, onmetalVolumeList); err != nil {
-		return nil, fmt.Errorf("error listing onmetal volumes: %w", err)
+func (s *Server) listAggregateIronCoreVolumes(ctx context.Context) ([]AggregateIronCoreVolume, error) {
+	ironcoreVolumeList := &storagev1alpha1.VolumeList{}
+	if err := s.listManagedAndCreated(ctx, ironcoreVolumeList); err != nil {
+		return nil, fmt.Errorf("error listing ironcore volumes: %w", err)
 	}
 
 	secretList := &corev1.SecretList{}
@@ -62,16 +62,16 @@ func (s *Server) listAggregateOnmetalVolumes(ctx context.Context) ([]AggregateOn
 		return nil, fmt.Errorf("error constructing secret getter: %w", err)
 	}
 
-	var res []AggregateOnmetalVolume
-	for i := range onmetalVolumeList.Items {
-		onmetalVolume := &onmetalVolumeList.Items[i]
+	var res []AggregateIronCoreVolume
+	for i := range ironcoreVolumeList.Items {
+		ironcoreVolume := &ironcoreVolumeList.Items[i]
 
-		aggregateOnmetalVolume, err := s.aggregateOnmetalVolume(onmetalVolume, secretByNameGetter.Get)
+		aggregateIronCoreVolume, err := s.aggregateIronCoreVolume(ironcoreVolume, secretByNameGetter.Get)
 		if err != nil {
-			return nil, fmt.Errorf("error aggregating onmetal volume %s: %w", onmetalVolume.Name, err)
+			return nil, fmt.Errorf("error aggregating ironcore volume %s: %w", ironcoreVolume.Name, err)
 		}
 
-		res = append(res, *aggregateOnmetalVolume)
+		res = append(res, *aggregateIronCoreVolume)
 	}
 
 	return res, nil
@@ -87,15 +87,15 @@ func (s *Server) clientGetSecretFunc(ctx context.Context) func(string) (*corev1.
 	}
 }
 
-func (s *Server) getOnmetalVolumeAccessSecretIfRequired(
-	onmetalVolume *storagev1alpha1.Volume,
+func (s *Server) getIronCoreVolumeAccessSecretIfRequired(
+	ironcoreVolume *storagev1alpha1.Volume,
 	getSecret func(string) (*corev1.Secret, error),
 ) (*corev1.Secret, error) {
-	if onmetalVolume.Status.State != storagev1alpha1.VolumeStateAvailable {
+	if ironcoreVolume.Status.State != storagev1alpha1.VolumeStateAvailable {
 		return nil, nil
 	}
 
-	access := onmetalVolume.Status.Access
+	access := ironcoreVolume.Status.Access
 	if access == nil {
 		return nil, nil
 	}
@@ -109,60 +109,60 @@ func (s *Server) getOnmetalVolumeAccessSecretIfRequired(
 	return getSecret(secretName)
 }
 
-func (s *Server) getOnmetalVolumeEncryptionSecretIfRequired(
-	onmetalVolume *storagev1alpha1.Volume,
+func (s *Server) getIronCoreVolumeEncryptionSecretIfRequired(
+	ironcoreVolume *storagev1alpha1.Volume,
 	getSecret func(string) (*corev1.Secret, error),
 ) (*corev1.Secret, error) {
-	if onmetalVolume.Spec.Encryption == nil {
+	if ironcoreVolume.Spec.Encryption == nil {
 		return nil, nil
 	}
 
-	secretName := onmetalVolume.Spec.Encryption.SecretRef.Name
+	secretName := ironcoreVolume.Spec.Encryption.SecretRef.Name
 	return getSecret(secretName)
 }
 
-func (s *Server) aggregateOnmetalVolume(
-	onmetalVolume *storagev1alpha1.Volume,
+func (s *Server) aggregateIronCoreVolume(
+	ironcoreVolume *storagev1alpha1.Volume,
 	getSecret func(string) (*corev1.Secret, error),
-) (*AggregateOnmetalVolume, error) {
-	accessSecret, err := s.getOnmetalVolumeAccessSecretIfRequired(onmetalVolume, getSecret)
+) (*AggregateIronCoreVolume, error) {
+	accessSecret, err := s.getIronCoreVolumeAccessSecretIfRequired(ironcoreVolume, getSecret)
 	if err != nil {
-		return nil, fmt.Errorf("error getting onmetal volume access secret: %w", err)
+		return nil, fmt.Errorf("error getting ironcore volume access secret: %w", err)
 	}
 
-	encryptionSecret, err := s.getOnmetalVolumeEncryptionSecretIfRequired(onmetalVolume, getSecret)
+	encryptionSecret, err := s.getIronCoreVolumeEncryptionSecretIfRequired(ironcoreVolume, getSecret)
 	if err != nil {
-		return nil, fmt.Errorf("error getting onmetal volume access secret: %w", err)
+		return nil, fmt.Errorf("error getting ironcore volume access secret: %w", err)
 	}
 
-	return &AggregateOnmetalVolume{
-		Volume:           onmetalVolume,
+	return &AggregateIronCoreVolume{
+		Volume:           ironcoreVolume,
 		EncryptionSecret: encryptionSecret,
 		AccessSecret:     accessSecret,
 	}, nil
 }
 
-func (s *Server) getAggregateOnmetalVolume(ctx context.Context, id string) (*AggregateOnmetalVolume, error) {
-	onmetalVolume := &storagev1alpha1.Volume{}
-	if err := s.getManagedAndCreated(ctx, id, onmetalVolume); err != nil {
+func (s *Server) getAggregateIronCoreVolume(ctx context.Context, id string) (*AggregateIronCoreVolume, error) {
+	ironcoreVolume := &storagev1alpha1.Volume{}
+	if err := s.getManagedAndCreated(ctx, id, ironcoreVolume); err != nil {
 		if !apierrors.IsNotFound(err) {
-			return nil, fmt.Errorf("error getting onmetal volume %s: %w", id, err)
+			return nil, fmt.Errorf("error getting ironcore volume %s: %w", id, err)
 		}
 		return nil, status.Errorf(codes.NotFound, "volume %s not found", id)
 	}
 
-	return s.aggregateOnmetalVolume(onmetalVolume, s.clientGetSecretFunc(ctx))
+	return s.aggregateIronCoreVolume(ironcoreVolume, s.clientGetSecretFunc(ctx))
 }
 
-func (s *Server) listVolumes(ctx context.Context) ([]*ori.Volume, error) {
-	onmetalVolumes, err := s.listAggregateOnmetalVolumes(ctx)
+func (s *Server) listVolumes(ctx context.Context) ([]*iri.Volume, error) {
+	ironcoreVolumes, err := s.listAggregateIronCoreVolumes(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error listing volumes: %w", err)
 	}
 
-	var res []*ori.Volume
-	for _, onmetalVolume := range onmetalVolumes {
-		volume, err := s.convertAggregateOnmetalVolume(&onmetalVolume)
+	var res []*iri.Volume
+	for _, ironcoreVolume := range ironcoreVolumes {
+		volume, err := s.convertAggregateIronCoreVolume(&ironcoreVolume)
 		if err != nil {
 			return nil, err
 		}
@@ -172,48 +172,48 @@ func (s *Server) listVolumes(ctx context.Context) ([]*ori.Volume, error) {
 	return res, nil
 }
 
-func (s *Server) filterVolumes(volumes []*ori.Volume, filter *ori.VolumeFilter) []*ori.Volume {
+func (s *Server) filterVolumes(volumes []*iri.Volume, filter *iri.VolumeFilter) []*iri.Volume {
 	if filter == nil {
 		return volumes
 	}
 
 	var (
-		res []*ori.Volume
+		res []*iri.Volume
 		sel = labels.SelectorFromSet(filter.LabelSelector)
 	)
-	for _, oriVolume := range volumes {
-		if !sel.Matches(labels.Set(oriVolume.Metadata.Labels)) {
+	for _, iriVolume := range volumes {
+		if !sel.Matches(labels.Set(iriVolume.Metadata.Labels)) {
 			continue
 		}
 
-		res = append(res, oriVolume)
+		res = append(res, iriVolume)
 	}
 	return res
 }
 
-func (s *Server) getVolume(ctx context.Context, id string) (*ori.Volume, error) {
-	onmetalVolume, err := s.getAggregateOnmetalVolume(ctx, id)
+func (s *Server) getVolume(ctx context.Context, id string) (*iri.Volume, error) {
+	ironcoreVolume, err := s.getAggregateIronCoreVolume(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	return s.convertAggregateOnmetalVolume(onmetalVolume)
+	return s.convertAggregateIronCoreVolume(ironcoreVolume)
 }
 
-func (s *Server) ListVolumes(ctx context.Context, req *ori.ListVolumesRequest) (*ori.ListVolumesResponse, error) {
+func (s *Server) ListVolumes(ctx context.Context, req *iri.ListVolumesRequest) (*iri.ListVolumesResponse, error) {
 	if filter := req.Filter; filter != nil && filter.Id != "" {
 		volume, err := s.getVolume(ctx, filter.Id)
 		if err != nil {
 			if status.Code(err) != codes.NotFound {
 				return nil, err
 			}
-			return &ori.ListVolumesResponse{
-				Volumes: []*ori.Volume{},
+			return &iri.ListVolumesResponse{
+				Volumes: []*iri.Volume{},
 			}, nil
 		}
 
-		return &ori.ListVolumesResponse{
-			Volumes: []*ori.Volume{volume},
+		return &iri.ListVolumesResponse{
+			Volumes: []*iri.Volume{volume},
 		}, nil
 	}
 
@@ -224,7 +224,7 @@ func (s *Server) ListVolumes(ctx context.Context, req *ori.ListVolumesRequest) (
 
 	volumes = s.filterVolumes(volumes, req.Filter)
 
-	return &ori.ListVolumesResponse{
+	return &iri.ListVolumesResponse{
 		Volumes: volumes,
 	}, nil
 }

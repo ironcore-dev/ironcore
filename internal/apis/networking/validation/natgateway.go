@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 by the OnMetal authors.
+ * Copyright (c) 2022 by the IronCore authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 package validation
 
 import (
-	onmetalapivalidation "github.com/onmetal/onmetal-api/internal/api/validation"
-	"github.com/onmetal/onmetal-api/internal/apis/networking"
+	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
+	"github.com/ironcore-dev/ironcore/internal/apis/networking"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -39,14 +39,14 @@ func validateNATGatewaySpec(spec *networking.NATGatewaySpec, fldPath *field.Path
 
 	allErrs = append(allErrs, validateNATGatewayType(spec.Type, fldPath.Child("type"))...)
 
-	allErrs = append(allErrs, onmetalapivalidation.ValidateIPFamily(spec.IPFamily, fldPath.Child("ipFamily"))...)
+	allErrs = append(allErrs, ironcorevalidation.ValidateIPFamily(spec.IPFamily, fldPath.Child("ipFamily"))...)
 
 	for _, msg := range apivalidation.NameIsDNSLabel(spec.NetworkRef.Name, false) {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("networkRef").Child("name"), spec.NetworkRef.Name, msg))
 	}
 
 	if spec.PortsPerNetworkInterface != nil {
-		allErrs = append(allErrs, onmetalapivalidation.ValidatePowerOfTwo(int64(*spec.PortsPerNetworkInterface), fldPath.Child("portsPerNetworkInterface"))...)
+		allErrs = append(allErrs, ironcorevalidation.ValidatePowerOfTwo(int64(*spec.PortsPerNetworkInterface), fldPath.Child("portsPerNetworkInterface"))...)
 	}
 
 	return allErrs
@@ -57,7 +57,7 @@ var supportedNATGatewayTypes = sets.New(
 )
 
 func validateNATGatewayType(natGatewayType networking.NATGatewayType, fldPath *field.Path) field.ErrorList {
-	return onmetalapivalidation.ValidateEnum(supportedNATGatewayTypes, natGatewayType, fldPath, "must specify type")
+	return ironcorevalidation.ValidateEnum(supportedNATGatewayTypes, natGatewayType, fldPath, "must specify type")
 }
 
 // ValidateNATGatewayUpdate validates a NATGateway object before an update.
@@ -75,7 +75,7 @@ func ValidateNATGatewayUpdate(newNATGateway, oldNATGateway *networking.NATGatewa
 func validateNATGatewaySpecPrefixUpdate(newSpec, oldSpec *networking.NATGatewaySpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, onmetalapivalidation.ValidateImmutableField(newSpec.NetworkRef, oldSpec.NetworkRef, fldPath.Child("networkRef"))...)
+	allErrs = append(allErrs, ironcorevalidation.ValidateImmutableField(newSpec.NetworkRef, oldSpec.NetworkRef, fldPath.Child("networkRef"))...)
 
 	return allErrs
 }

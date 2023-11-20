@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/onmetal/onmetal-api/internal/api"
-	"github.com/onmetal/onmetal-api/internal/apis/ipam"
-	"github.com/onmetal/onmetal-api/internal/apis/ipam/validation"
+	"github.com/ironcore-dev/ironcore/internal/api"
+	"github.com/ironcore-dev/ironcore/internal/apis/ipam"
+	"github.com/ironcore-dev/ironcore/internal/apis/ipam/validation"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -106,7 +106,7 @@ var StatusStrategy = prefixStatusStrategy{Strategy}
 
 func (prefixStatusStrategy) GetResetFields() map[fieldpath.APIVersion]*fieldpath.Set {
 	return map[fieldpath.APIVersion]*fieldpath.Set{
-		"ipam.api.onmetal.de/v1alpha1": fieldpath.NewSet(
+		"ipam.ironcore.dev/v1alpha1": fieldpath.NewSet(
 			fieldpath.MakePathOrDie("spec"),
 		),
 	}

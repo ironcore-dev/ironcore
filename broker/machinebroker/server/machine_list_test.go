@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
 package server_test
 
 import (
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
-	orimeta "github.com/onmetal/onmetal-api/ori/apis/meta/v1alpha1"
-	machinepoolletv1alpha1 "github.com/onmetal/onmetal-api/poollet/machinepoollet/api/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
+	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
+	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -32,31 +32,31 @@ var _ = Describe("ListMachines", func() {
 
 		machines := make([]any, noOfMachines)
 		for i := 0; i < noOfMachines; i++ {
-			res, err := srv.CreateMachine(ctx, &ori.CreateMachineRequest{
-				Machine: &ori.Machine{
-					Metadata: &orimeta.ObjectMetadata{
+			res, err := srv.CreateMachine(ctx, &iri.CreateMachineRequest{
+				Machine: &iri.Machine{
+					Metadata: &irimeta.ObjectMetadata{
 						Labels: map[string]string{
 							machinepoolletv1alpha1.MachineUIDLabel: "foobar",
 						},
 					},
-					Spec: &ori.MachineSpec{
-						Power: ori.Power_POWER_ON,
-						Image: &ori.ImageSpec{
+					Spec: &iri.MachineSpec{
+						Power: iri.Power_POWER_ON,
+						Image: &iri.ImageSpec{
 							Image: "example.org/foo:latest",
 						},
 						Class: machineClass.Name,
-						NetworkInterfaces: []*ori.NetworkInterface{
+						NetworkInterfaces: []*iri.NetworkInterface{
 							{
 								Name:      "primary-nic",
 								NetworkId: "network-id",
 								Ips:       []string{"10.0.0.1"},
 							},
 						},
-						Volumes: []*ori.Volume{
+						Volumes: []*iri.Volume{
 							{
 								Name:   "primary-volume",
 								Device: "oda",
-								Connection: &ori.VolumeConnection{
+								Connection: &iri.VolumeConnection{
 									Driver:     "ceph",
 									Handle:     "ceph-volume",
 									Attributes: map[string]string{"foo": "bar"},
@@ -73,6 +73,6 @@ var _ = Describe("ListMachines", func() {
 		}
 
 		By("listing the machines")
-		Expect(srv.ListMachines(ctx, &ori.ListMachinesRequest{})).To(HaveField("Machines", ConsistOf(machines...)))
+		Expect(srv.ListMachines(ctx, &iri.ListMachinesRequest{})).To(HaveField("Machines", ConsistOf(machines...)))
 	})
 })

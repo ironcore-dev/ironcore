@@ -31,10 +31,10 @@ reviewers:
 - [Proposal](#proposal)
 
 ## Summary
-One of the important feature of Cloud Native IaaS is to provide secure storage. This proposal focuses on providing option to enable encryption for individual onmetal Volume.
+One of the important feature of Cloud Native IaaS is to provide secure storage. This proposal focuses on providing option to enable encryption for individual ironcore Volume.
 
 ## Motivation
-As part of Storage encryption feature Onmetal API supports option to enable encryption of Volumes. Volume level encryption helps protect users from data theft or accidental loss, by rendering data stored on hard drives unreadable when an unauthorized user tries to gain access. The loss of encryption keys is a major concern, as it can render any encrypted data useless. 
+As part of Storage encryption feature the IronCore API supports option to enable encryption of Volumes. Volume level encryption helps protect users from data theft or accidental loss, by rendering data stored on hard drives unreadable when an unauthorized user tries to gain access. The loss of encryption keys is a major concern, as it can render any encrypted data useless. 
 
 ### Goals
   - Allow user to enable volume encryption by providing encryption key via secret reference
@@ -46,8 +46,8 @@ As part of Storage encryption feature Onmetal API supports option to enable encr
 ## Proposal
  - The proposal introduces a new field `encryption` with currently the single attribute `secretRef`, referencing a secret to use for encryption, in existing `Volume` type. 
  - `encryption` is an optional field.
- - If `encryption` field is not provided by user, then onmetal `Volume` remains unencrypted
- - To encrypt onmetal `Volume`, user has to first create kubernetes secret of Opaque type with key-value pair as below:
+ - If `encryption` field is not provided by user, then ironcore `Volume` remains unencrypted
+ - To encrypt ironcore `Volume`, user has to first create kubernetes secret of Opaque type with key-value pair as below:
     - key = `encryptionKey` 
     - value = base64-encoded 256 bit encryption key
  - Then provide this secret name to `encryption.secretRef` attribute of `Volume` type.
@@ -71,7 +71,7 @@ Volume with encryption key secret reference:
 
 [//]: # (@formatter:off)
 ```yaml
-apiVersion: storage.api.onmetal.de/v1alpha1
+apiVersion: storage.ironcore.dev/v1alpha1
 kind: Volume
 metadata:
   name: sample-volume

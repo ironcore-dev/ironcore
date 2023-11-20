@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 by the OnMetal authors.
+ * Copyright (c) 2021 by the IronCore authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,17 @@
  */
 
 // Package v1alpha1 contains API Schema definitions for the storage v1alpha1 API group
-// +groupName=storage.api.onmetal.de
+// +groupName=storage.ironcore.dev
 package v1alpha1
 
 import (
-	"github.com/onmetal/onmetal-api/api/storage/v1alpha1"
+	"github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 var (
 	// SchemeGroupVersion is group version used to register these objects
-	SchemeGroupVersion = schema.GroupVersion{Group: "storage.api.onmetal.de", Version: "v1alpha1"}
+	SchemeGroupVersion = schema.GroupVersion{Group: "storage.ironcore.dev", Version: "v1alpha1"}
 
 	localSchemeBuilder = &v1alpha1.SchemeBuilder
 

@@ -1,4 +1,4 @@
-apiVersion: storage.api.onmetal.de/v1alpha1
+apiVersion: storage.ironcore.dev/v1alpha1
 kind: Bucket
 metadata:
   name: bucket-sample
@@ -7,4 +7,3 @@ spec:
     name: bucketclass-sample
   # bucketPoolRef:
   #   name: bucketpool-sample
-

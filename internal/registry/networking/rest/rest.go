@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,17 +15,17 @@
 package rest
 
 import (
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	"github.com/onmetal/onmetal-api/internal/api"
-	"github.com/onmetal/onmetal-api/internal/apis/networking"
-	loadbalancerstorage "github.com/onmetal/onmetal-api/internal/registry/networking/loadbalancer/storage"
-	loadbalancerroutingstorage "github.com/onmetal/onmetal-api/internal/registry/networking/loadbalancerrouting/storage"
-	natgatewaystorage "github.com/onmetal/onmetal-api/internal/registry/networking/natgateway/storage"
-	networkstorage "github.com/onmetal/onmetal-api/internal/registry/networking/network/storage"
-	networkinterfacestorage "github.com/onmetal/onmetal-api/internal/registry/networking/networkinterface/storage"
-	networkpolicystorage "github.com/onmetal/onmetal-api/internal/registry/networking/networkpolicy/storage"
-	virtualipstorage "github.com/onmetal/onmetal-api/internal/registry/networking/virtualip/storage"
-	onmetalapiserializer "github.com/onmetal/onmetal-api/internal/serializer"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	"github.com/ironcore-dev/ironcore/internal/api"
+	"github.com/ironcore-dev/ironcore/internal/apis/networking"
+	loadbalancerstorage "github.com/ironcore-dev/ironcore/internal/registry/networking/loadbalancer/storage"
+	loadbalancerroutingstorage "github.com/ironcore-dev/ironcore/internal/registry/networking/loadbalancerrouting/storage"
+	natgatewaystorage "github.com/ironcore-dev/ironcore/internal/registry/networking/natgateway/storage"
+	networkstorage "github.com/ironcore-dev/ironcore/internal/registry/networking/network/storage"
+	networkinterfacestorage "github.com/ironcore-dev/ironcore/internal/registry/networking/networkinterface/storage"
+	networkpolicystorage "github.com/ironcore-dev/ironcore/internal/registry/networking/networkpolicy/storage"
+	virtualipstorage "github.com/ironcore-dev/ironcore/internal/registry/networking/virtualip/storage"
+	ironcoreserializer "github.com/ironcore-dev/ironcore/internal/serializer"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/registry/generic"
@@ -44,7 +44,7 @@ func (p StorageProvider) GroupName() string {
 func (p StorageProvider) NewRESTStorage(apiResourceConfigSource storage.APIResourceConfigSource, restOptionsGetter generic.RESTOptionsGetter) (genericapiserver.APIGroupInfo, bool, error) {
 	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(p.GroupName(), api.Scheme, metav1.ParameterCodec, api.Codecs)
 	apiGroupInfo.PrioritizedVersions = []schema.GroupVersion{networkingv1alpha1.SchemeGroupVersion}
-	apiGroupInfo.NegotiatedSerializer = onmetalapiserializer.DefaultSubsetNegotiatedSerializer(api.Codecs)
+	apiGroupInfo.NegotiatedSerializer = ironcoreserializer.DefaultSubsetNegotiatedSerializer(api.Codecs)
 
 	storageMap, err := p.v1alpha1Storage(restOptionsGetter)
 	if err != nil {

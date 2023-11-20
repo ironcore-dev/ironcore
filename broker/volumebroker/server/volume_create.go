@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,24 +19,24 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	volumebrokerv1alpha1 "github.com/onmetal/onmetal-api/broker/volumebroker/api/v1alpha1"
-	"github.com/onmetal/onmetal-api/broker/volumebroker/apiutils"
-	ori "github.com/onmetal/onmetal-api/ori/apis/volume/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	volumebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/volumebroker/api/v1alpha1"
+	"github.com/ironcore-dev/ironcore/broker/volumebroker/apiutils"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-type AggregateOnmetalVolume struct {
+type AggregateIronCoreVolume struct {
 	Volume           *storagev1alpha1.Volume
 	EncryptionSecret *corev1.Secret
 	AccessSecret     *corev1.Secret
 }
 
-func (s *Server) getOnmetalVolumeConfig(_ context.Context, volume *ori.Volume) (*AggregateOnmetalVolume, error) {
+func (s *Server) getIronCoreVolumeConfig(_ context.Context, volume *iri.Volume) (*AggregateIronCoreVolume, error) {
 	var volumePoolRef *corev1.LocalObjectReference
 	if s.volumePoolName != "" {
 		volumePoolRef = &corev1.LocalObjectReference{
@@ -66,7 +66,7 @@ func (s *Server) getOnmetalVolumeConfig(_ context.Context, volume *ori.Volume) (
 		}
 	}
 
-	onmetalVolume := &storagev1alpha1.Volume{
+	ironcoreVolume := &storagev1alpha1.Volume{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: s.namespace,
 			Name:      s.idGen.Generate(),
@@ -83,61 +83,61 @@ func (s *Server) getOnmetalVolumeConfig(_ context.Context, volume *ori.Volume) (
 			Encryption:         encryption,
 		},
 	}
-	if err := apiutils.SetObjectMetadata(onmetalVolume, volume.Metadata); err != nil {
+	if err := apiutils.SetObjectMetadata(ironcoreVolume, volume.Metadata); err != nil {
 		return nil, err
 	}
-	apiutils.SetVolumeManagerLabel(onmetalVolume, volumebrokerv1alpha1.VolumeBrokerManager)
+	apiutils.SetVolumeManagerLabel(ironcoreVolume, volumebrokerv1alpha1.VolumeBrokerManager)
 
-	return &AggregateOnmetalVolume{
-		Volume:           onmetalVolume,
+	return &AggregateIronCoreVolume{
+		Volume:           ironcoreVolume,
 		EncryptionSecret: encryptionSecret,
 	}, nil
 }
 
-func (s *Server) createOnmetalVolume(ctx context.Context, log logr.Logger, volume *AggregateOnmetalVolume) (retErr error) {
+func (s *Server) createIronCoreVolume(ctx context.Context, log logr.Logger, volume *AggregateIronCoreVolume) (retErr error) {
 	c, cleanup := s.setupCleaner(ctx, log, &retErr)
 	defer cleanup()
 
 	if volume.EncryptionSecret != nil {
-		log.V(1).Info("Creating onmetal encryption secret")
+		log.V(1).Info("Creating ironcore encryption secret")
 		if err := s.client.Create(ctx, volume.EncryptionSecret); err != nil {
-			return fmt.Errorf("error creating onmetal encryption secret: %w", err)
+			return fmt.Errorf("error creating ironcore encryption secret: %w", err)
 		}
 		c.Add(func(ctx context.Context) error {
 			if err := s.client.Delete(ctx, volume.EncryptionSecret); client.IgnoreNotFound(err) != nil {
-				return fmt.Errorf("error deleting onmetal encryption secret: %w", err)
+				return fmt.Errorf("error deleting ironcore encryption secret: %w", err)
 			}
 			return nil
 		})
 	}
 
-	log.V(1).Info("Creating onmetal volume")
+	log.V(1).Info("Creating ironcore volume")
 	if err := s.client.Create(ctx, volume.Volume); err != nil {
-		return fmt.Errorf("error creating onmetal volume: %w", err)
+		return fmt.Errorf("error creating ironcore volume: %w", err)
 	}
 	c.Add(func(ctx context.Context) error {
 		if err := s.client.Delete(ctx, volume.Volume); client.IgnoreNotFound(err) != nil {
-			return fmt.Errorf("error deleting onmetal volume: %w", err)
+			return fmt.Errorf("error deleting ironcore volume: %w", err)
 		}
 		return nil
 	})
 
 	if volume.EncryptionSecret != nil {
-		log.V(1).Info("Patching encryption secret to be controlled by onmetal volume")
+		log.V(1).Info("Patching encryption secret to be controlled by ironcore volume")
 		if err := apiutils.PatchControlledBy(ctx, s.client, volume.Volume, volume.EncryptionSecret); err != nil {
-			return fmt.Errorf("error patching encryption secret to be controlled by onmetal volume: %w", err)
+			return fmt.Errorf("error patching encryption secret to be controlled by ironcore volume: %w", err)
 		}
 	}
 
-	log.V(1).Info("Patching onmetal volume as created")
+	log.V(1).Info("Patching ironcore volume as created")
 	if err := apiutils.PatchCreated(ctx, s.client, volume.Volume); err != nil {
-		return fmt.Errorf("error patching onmetal volume as created: %w", err)
+		return fmt.Errorf("error patching ironcore volume as created: %w", err)
 	}
 
 	// Reset cleaner since everything from now on operates on a consistent volume
 	c.Reset()
 
-	accessSecret, err := s.getOnmetalVolumeAccessSecretIfRequired(volume.Volume, s.clientGetSecretFunc(ctx))
+	accessSecret, err := s.getIronCoreVolumeAccessSecretIfRequired(volume.Volume, s.clientGetSecretFunc(ctx))
 	if err != nil {
 		return err
 	}
@@ -146,25 +146,25 @@ func (s *Server) createOnmetalVolume(ctx context.Context, log logr.Logger, volum
 	return nil
 }
 
-func (s *Server) CreateVolume(ctx context.Context, req *ori.CreateVolumeRequest) (res *ori.CreateVolumeResponse, retErr error) {
+func (s *Server) CreateVolume(ctx context.Context, req *iri.CreateVolumeRequest) (res *iri.CreateVolumeResponse, retErr error) {
 	log := s.loggerFrom(ctx)
 
 	log.V(1).Info("Getting volume configuration")
-	cfg, err := s.getOnmetalVolumeConfig(ctx, req.Volume)
+	cfg, err := s.getIronCoreVolumeConfig(ctx, req.Volume)
 	if err != nil {
-		return nil, fmt.Errorf("error getting onmetal volume config: %w", err)
+		return nil, fmt.Errorf("error getting ironcore volume config: %w", err)
 	}
 
-	if err := s.createOnmetalVolume(ctx, log, cfg); err != nil {
-		return nil, fmt.Errorf("error creating onmetal volume: %w", err)
+	if err := s.createIronCoreVolume(ctx, log, cfg); err != nil {
+		return nil, fmt.Errorf("error creating ironcore volume: %w", err)
 	}
 
-	v, err := s.convertAggregateOnmetalVolume(cfg)
+	v, err := s.convertAggregateIronCoreVolume(cfg)
 	if err != nil {
 		return nil, err
 	}
 
-	return &ori.CreateVolumeResponse{
+	return &iri.CreateVolumeResponse{
 		Volume: v,
 	}, nil
 }

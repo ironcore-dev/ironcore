@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 by the OnMetal authors.
+ * Copyright (c) 2021 by the IronCore authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 
 // Package ipam contains API Schema definitions for the ipam internal API group
-// +groupName=ipam.api.onmetal.de
+// +groupName=ipam.ironcore.dev
 package ipam
 
 import (
@@ -25,7 +25,7 @@ import (
 
 var (
 	// SchemeGroupVersion is group version used to register these objects
-	SchemeGroupVersion = schema.GroupVersion{Group: "ipam.api.onmetal.de", Version: runtime.APIVersionInternal}
+	SchemeGroupVersion = schema.GroupVersion{Group: "ipam.ironcore.dev", Version: runtime.APIVersionInternal}
 
 	// SchemeBuilder is used to add go types to the GroupVersionKind scheme
 	SchemeBuilder = runtime.NewSchemeBuilder(addKnownTypes)

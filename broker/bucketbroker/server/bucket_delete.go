@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,28 +18,28 @@ import (
 	"context"
 	"fmt"
 
-	ori "github.com/onmetal/onmetal-api/ori/apis/bucket/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
-func (s *Server) DeleteBucket(ctx context.Context, req *ori.DeleteBucketRequest) (*ori.DeleteBucketResponse, error) {
+func (s *Server) DeleteBucket(ctx context.Context, req *iri.DeleteBucketRequest) (*iri.DeleteBucketResponse, error) {
 	bucketID := req.BucketId
 	log := s.loggerFrom(ctx, "BucketID", bucketID)
 
-	onmetalBucket, err := s.getAggregateOnmetalBucket(ctx, req.BucketId)
+	ironcoreBucket, err := s.getAggregateIronCoreBucket(ctx, req.BucketId)
 	if err != nil {
 		return nil, err
 	}
 
 	log.V(1).Info("Deleting bucket")
-	if err := s.client.Delete(ctx, onmetalBucket.Bucket); err != nil {
+	if err := s.client.Delete(ctx, ironcoreBucket.Bucket); err != nil {
 		if !apierrors.IsNotFound(err) {
-			return nil, fmt.Errorf("error deleting onmetal bucket: %w", err)
+			return nil, fmt.Errorf("error deleting ironcore bucket: %w", err)
 		}
 		return nil, status.Errorf(codes.NotFound, "bucket %s not found", bucketID)
 	}
 
-	return &ori.DeleteBucketResponse{}, nil
+	return &iri.DeleteBucketResponse{}, nil
 }

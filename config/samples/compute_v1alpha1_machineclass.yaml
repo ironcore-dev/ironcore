@@ -1,4 +1,4 @@
-apiVersion: compute.api.onmetal.de/v1alpha1
+apiVersion: compute.ironcore.dev/v1alpha1
 kind: MachineClass
 metadata:
   name: machineclass-sample

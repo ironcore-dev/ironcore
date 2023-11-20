@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@ package generic
 import (
 	"context"
 
-	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
-	"github.com/onmetal/onmetal-api/utils/quota"
-	"github.com/onmetal/onmetal-api/utils/quota/resourceaccess"
-	onmetalutilruntime "github.com/onmetal/onmetal-api/utils/runtime"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore/utils/quota"
+	"github.com/ironcore-dev/ironcore/utils/quota/resourceaccess"
+	ironcoreutilruntime "github.com/ironcore-dev/ironcore/utils/runtime"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -64,7 +64,7 @@ type CapabilitiesReader interface {
 	Get(ctx context.Context, className string) (corev1alpha1.ResourceList, bool)
 }
 
-type getterCapabilitiesReader[T onmetalutilruntime.DeepCopier[T], K any] struct {
+type getterCapabilitiesReader[T ironcoreutilruntime.DeepCopier[T], K any] struct {
 	getter              resourceaccess.Getter[T, K]
 	extractCapabilities func(T) corev1alpha1.ResourceList
 	makeKey             func(string) K
@@ -79,7 +79,7 @@ func (g *getterCapabilitiesReader[T, K]) Get(ctx context.Context, className stri
 	return g.extractCapabilities(obj), true
 }
 
-func NewGetterCapabilitiesReader[T onmetalutilruntime.DeepCopier[T], K any](
+func NewGetterCapabilitiesReader[T ironcoreutilruntime.DeepCopier[T], K any](
 	getter resourceaccess.Getter[T, K],
 	extractCapabilities func(T) corev1alpha1.ResourceList,
 	makeKey func(className string) K,

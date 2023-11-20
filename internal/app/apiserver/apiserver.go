@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,26 +20,25 @@ import (
 	"net"
 	"time"
 
-	"github.com/onmetal/onmetal-api/internal/admission/plugin/volumeresizepolicy"
-
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	corev1alpha1 "github.com/onmetal/onmetal-api/api/core/v1alpha1"
-	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	storagev1alpha1 "github.com/onmetal/onmetal-api/api/storage/v1alpha1"
-	"github.com/onmetal/onmetal-api/client-go/informers"
-	clientset "github.com/onmetal/onmetal-api/client-go/onmetalapi"
-	onmetalopenapi "github.com/onmetal/onmetal-api/client-go/openapi"
-	onmetalapiinitializer "github.com/onmetal/onmetal-api/internal/admission/initializer"
-	"github.com/onmetal/onmetal-api/internal/admission/plugin/machinevolumedevices"
-	"github.com/onmetal/onmetal-api/internal/admission/plugin/resourcequota"
-	"github.com/onmetal/onmetal-api/internal/api"
-	"github.com/onmetal/onmetal-api/internal/apis/compute"
-	"github.com/onmetal/onmetal-api/internal/apiserver"
-	"github.com/onmetal/onmetal-api/internal/machinepoollet/client"
-	"github.com/onmetal/onmetal-api/internal/quota/evaluator/onmetal"
-	apiequality "github.com/onmetal/onmetal-api/utils/equality"
-	"github.com/onmetal/onmetal-api/utils/quota"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	"github.com/ironcore-dev/ironcore/client-go/informers"
+	clientset "github.com/ironcore-dev/ironcore/client-go/ironcore"
+	ironcoreopenapi "github.com/ironcore-dev/ironcore/client-go/openapi"
+	ironcoreinitializer "github.com/ironcore-dev/ironcore/internal/admission/initializer"
+	"github.com/ironcore-dev/ironcore/internal/admission/plugin/machinevolumedevices"
+	"github.com/ironcore-dev/ironcore/internal/admission/plugin/resourcequota"
+	"github.com/ironcore-dev/ironcore/internal/admission/plugin/volumeresizepolicy"
+	"github.com/ironcore-dev/ironcore/internal/api"
+	"github.com/ironcore-dev/ironcore/internal/apis/compute"
+	"github.com/ironcore-dev/ironcore/internal/apiserver"
+	"github.com/ironcore-dev/ironcore/internal/machinepoollet/client"
+	"github.com/ironcore-dev/ironcore/internal/quota/evaluator/ironcore"
+	apiequality "github.com/ironcore-dev/ironcore/utils/equality"
+	"github.com/ironcore-dev/ironcore/utils/quota"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"k8s.io/apimachinery/pkg/api/equality"
@@ -57,7 +56,7 @@ import (
 	netutils "k8s.io/utils/net"
 )
 
-const defaultEtcdPathPrefix = "/registry/onmetal.de"
+const defaultEtcdPathPrefix = "/registry/ironcore.dev"
 
 func init() {
 	utilruntime.Must(apiequality.AddFuncs(equality.Semantic))
@@ -75,14 +74,14 @@ func NewResourceConfig() *serverstorage.ResourceConfig {
 	return cfg
 }
 
-type OnmetalAPIServerOptions struct {
+type IronCoreAPIServerOptions struct {
 	RecommendedOptions   *genericoptions.RecommendedOptions
 	MachinePoolletConfig client.MachinePoolletClientConfig
 
 	SharedInformerFactory informers.SharedInformerFactory
 }
 
-func (o *OnmetalAPIServerOptions) AddFlags(fs *pflag.FlagSet) {
+func (o *IronCoreAPIServerOptions) AddFlags(fs *pflag.FlagSet) {
 	o.RecommendedOptions.AddFlags(fs)
 
 	// machinepoollet related flags:
@@ -102,8 +101,8 @@ func (o *OnmetalAPIServerOptions) AddFlags(fs *pflag.FlagSet) {
 		"Path to a cert file for the certificate authority.")
 }
 
-func NewOnmetalAPIServerOptions() *OnmetalAPIServerOptions {
-	o := &OnmetalAPIServerOptions{
+func NewIronCoreAPIServerOptions() *IronCoreAPIServerOptions {
+	o := &IronCoreAPIServerOptions{
 		RecommendedOptions: genericoptions.NewRecommendedOptions(
 			defaultEtcdPathPrefix,
 			api.Codecs.LegacyCodec(
@@ -142,11 +141,11 @@ func NewOnmetalAPIServerOptions() *OnmetalAPIServerOptions {
 	return o
 }
 
-func NewCommandStartOnmetalAPIServer(ctx context.Context, defaults *OnmetalAPIServerOptions) *cobra.Command {
+func NewCommandStartIronCoreAPIServer(ctx context.Context, defaults *IronCoreAPIServerOptions) *cobra.Command {
 	o := *defaults
 	cmd := &cobra.Command{
-		Short: "Launch an onmetal-api API server",
-		Long:  "Launch an onmetal-api API server",
+		Short: "Launch an ironcoreAPI server",
+		Long:  "Launch an ironcoreAPI server",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := o.Complete(); err != nil {
 				return err
@@ -167,13 +166,13 @@ func NewCommandStartOnmetalAPIServer(ctx context.Context, defaults *OnmetalAPISe
 	return cmd
 }
 
-func (o *OnmetalAPIServerOptions) Validate(args []string) error {
+func (o *IronCoreAPIServerOptions) Validate(args []string) error {
 	var errors []error
 	errors = append(errors, o.RecommendedOptions.Validate()...)
 	return utilerrors.NewAggregate(errors)
 }
 
-func (o *OnmetalAPIServerOptions) Complete() error {
+func (o *IronCoreAPIServerOptions) Complete() error {
 	machinevolumedevices.Register(o.RecommendedOptions.Admission.Plugins)
 	resourcequota.Register(o.RecommendedOptions.Admission.Plugins)
 	volumeresizepolicy.Register(o.RecommendedOptions.Admission.Plugins)
@@ -188,7 +187,7 @@ func (o *OnmetalAPIServerOptions) Complete() error {
 	return nil
 }
 
-func (o *OnmetalAPIServerOptions) Config() (*apiserver.Config, error) {
+func (o *IronCoreAPIServerOptions) Config() (*apiserver.Config, error) {
 	if err := o.RecommendedOptions.SecureServing.MaybeDefaultWithSelfSignedCerts("localhost", nil, []net.IP{netutils.ParseIPSloppy("127.0.0.1")}); err != nil {
 		return nil, fmt.Errorf("error creating self-signed certificates: %w", err)
 	}
@@ -196,20 +195,20 @@ func (o *OnmetalAPIServerOptions) Config() (*apiserver.Config, error) {
 	o.RecommendedOptions.Etcd.StorageConfig.Paging = utilfeature.DefaultFeatureGate.Enabled(features.APIListChunking)
 
 	o.RecommendedOptions.ExtraAdmissionInitializers = func(c *genericapiserver.RecommendedConfig) ([]admission.PluginInitializer, error) {
-		onmetalClient, err := clientset.NewForConfig(c.LoopbackClientConfig)
+		ironcoreClient, err := clientset.NewForConfig(c.LoopbackClientConfig)
 		if err != nil {
 			return nil, err
 		}
 
-		informerFactory := informers.NewSharedInformerFactory(onmetalClient, c.LoopbackClientConfig.Timeout)
+		informerFactory := informers.NewSharedInformerFactory(ironcoreClient, c.LoopbackClientConfig.Timeout)
 		o.SharedInformerFactory = informerFactory
 
 		quotaRegistry := quota.NewRegistry(api.Scheme)
-		if err := quota.AddAllToRegistry(quotaRegistry, onmetal.NewEvaluatorsForAdmission(onmetalClient, informerFactory)); err != nil {
+		if err := quota.AddAllToRegistry(quotaRegistry, ironcore.NewEvaluatorsForAdmission(ironcoreClient, informerFactory)); err != nil {
 			return nil, fmt.Errorf("error initializing quota registry: %w", err)
 		}
 
-		genericInitializer := onmetalapiinitializer.New(onmetalClient, informerFactory, quotaRegistry)
+		genericInitializer := ironcoreinitializer.New(ironcoreClient, informerFactory, quotaRegistry)
 
 		return []admission.PluginInitializer{
 			genericInitializer,
@@ -218,13 +217,13 @@ func (o *OnmetalAPIServerOptions) Config() (*apiserver.Config, error) {
 
 	serverConfig := genericapiserver.NewRecommendedConfig(api.Codecs)
 
-	serverConfig.OpenAPIConfig = genericapiserver.DefaultOpenAPIConfig(onmetalopenapi.GetOpenAPIDefinitions, openapi.NewDefinitionNamer(api.Scheme))
-	serverConfig.OpenAPIConfig.Info.Title = "onmetal-api"
+	serverConfig.OpenAPIConfig = genericapiserver.DefaultOpenAPIConfig(ironcoreopenapi.GetOpenAPIDefinitions, openapi.NewDefinitionNamer(api.Scheme))
+	serverConfig.OpenAPIConfig.Info.Title = "ironcore-api"
 	serverConfig.OpenAPIConfig.Info.Version = "0.1"
 
 	if utilfeature.DefaultFeatureGate.Enabled(features.OpenAPIV3) {
-		serverConfig.OpenAPIV3Config = genericapiserver.DefaultOpenAPIV3Config(onmetalopenapi.GetOpenAPIDefinitions, openapi.NewDefinitionNamer(api.Scheme))
-		serverConfig.OpenAPIV3Config.Info.Title = "onmetal-api"
+		serverConfig.OpenAPIV3Config = genericapiserver.DefaultOpenAPIV3Config(ironcoreopenapi.GetOpenAPIDefinitions, openapi.NewDefinitionNamer(api.Scheme))
+		serverConfig.OpenAPIV3Config.Info.Title = "ironcore-api"
 		serverConfig.OpenAPIV3Config.Info.Version = "0.1"
 	}
 
@@ -250,7 +249,7 @@ func (o *OnmetalAPIServerOptions) Config() (*apiserver.Config, error) {
 	return config, nil
 }
 
-func (o *OnmetalAPIServerOptions) Run(ctx context.Context) error {
+func (o *IronCoreAPIServerOptions) Run(ctx context.Context) error {
 	config, err := o.Config()
 	if err != nil {
 		return err
@@ -261,7 +260,7 @@ func (o *OnmetalAPIServerOptions) Run(ctx context.Context) error {
 		return err
 	}
 
-	server.GenericAPIServer.AddPostStartHookOrDie("start-onmetal-api-server-informers", func(context genericapiserver.PostStartHookContext) error {
+	server.GenericAPIServer.AddPostStartHookOrDie("start-ironcore-api-server-informers", func(context genericapiserver.PostStartHookContext) error {
 		config.GenericConfig.SharedInformerFactory.Start(context.StopCh)
 		o.SharedInformerFactory.Start(context.StopCh)
 		return nil

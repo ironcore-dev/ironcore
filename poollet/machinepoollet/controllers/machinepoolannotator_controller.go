@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	computev1alpha1 "github.com/onmetal/onmetal-api/api/compute/v1alpha1"
-	"github.com/onmetal/onmetal-api/poollet/machinepoollet/mcm"
-	"github.com/onmetal/onmetal-api/poollet/orievent"
-	onmetalapiclient "github.com/onmetal/onmetal-api/utils/client"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	"github.com/ironcore-dev/ironcore/poollet/irievent"
+	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/mcm"
+	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -47,7 +47,7 @@ func (r *MachinePoolAnnotatorReconciler) Reconcile(ctx context.Context, req ctrl
 		},
 	}
 
-	if err := onmetalapiclient.PatchAddReconcileAnnotation(ctx, r.Client, machinePool); client.IgnoreNotFound(err) != nil {
+	if err := ironcoreclient.PatchAddReconcileAnnotation(ctx, r.Client, machinePool); client.IgnoreNotFound(err) != nil {
 		return ctrl.Result{}, fmt.Errorf("error patching machine pool: %w", err)
 	}
 	return ctrl.Result{}, nil
@@ -61,7 +61,7 @@ func (r *MachinePoolAnnotatorReconciler) SetupWithManager(mgr ctrl.Manager) erro
 		return err
 	}
 
-	src, err := r.oriClassEventSource(mgr)
+	src, err := r.iriClassEventSource(mgr)
 	if err != nil {
 		return err
 	}
@@ -75,7 +75,7 @@ func (r *MachinePoolAnnotatorReconciler) SetupWithManager(mgr ctrl.Manager) erro
 	return nil
 }
 
-func (r *MachinePoolAnnotatorReconciler) machinePoolAnnotatorEventHandler(log logr.Logger, c chan<- event.GenericEvent) orievent.EnqueueFunc {
+func (r *MachinePoolAnnotatorReconciler) machinePoolAnnotatorEventHandler(log logr.Logger, c chan<- event.GenericEvent) irievent.EnqueueFunc {
 	handleEvent := func() {
 		select {
 		case c <- event.GenericEvent{Object: &computev1alpha1.MachinePool{ObjectMeta: metav1.ObjectMeta{
@@ -87,22 +87,22 @@ func (r *MachinePoolAnnotatorReconciler) machinePoolAnnotatorEventHandler(log lo
 		}
 	}
 
-	return orievent.EnqueueFunc{EnqueueFunc: handleEvent}
+	return irievent.EnqueueFunc{EnqueueFunc: handleEvent}
 }
 
-func (r *MachinePoolAnnotatorReconciler) oriClassEventSource(mgr ctrl.Manager) (source.Source, error) {
+func (r *MachinePoolAnnotatorReconciler) iriClassEventSource(mgr ctrl.Manager) (source.Source, error) {
 	ch := make(chan event.GenericEvent, 1024)
 
 	if err := mgr.Add(manager.RunnableFunc(func(ctx context.Context) error {
-		log := ctrl.LoggerFrom(ctx).WithName("machinepool").WithName("orieventhandlers")
+		log := ctrl.LoggerFrom(ctx).WithName("machinepool").WithName("irieventhandlers")
 
-		notifierFuncs := []func() (orievent.ListenerRegistration, error){
-			func() (orievent.ListenerRegistration, error) {
+		notifierFuncs := []func() (irievent.ListenerRegistration, error){
+			func() (irievent.ListenerRegistration, error) {
 				return r.MachineClassMapper.AddListener(r.machinePoolAnnotatorEventHandler(log, ch))
 			},
 		}
 
-		var notifier []orievent.ListenerRegistration
+		var notifier []irievent.ListenerRegistration
 		defer func() {
 			log.V(1).Info("Removing notifier")
 			for _, n := range notifier {

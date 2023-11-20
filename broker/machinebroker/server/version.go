@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@ import (
 	"context"
 
 	"github.com/blang/semver/v4"
-	"github.com/onmetal/onmetal-api/broker/machinebroker/version"
-	ori "github.com/onmetal/onmetal-api/ori/apis/machine/v1alpha1"
+	"github.com/ironcore-dev/ironcore/broker/machinebroker/version"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 )
 
-func (s *Server) Version(ctx context.Context, req *ori.VersionRequest) (*ori.VersionResponse, error) {
+func (s *Server) Version(ctx context.Context, req *iri.VersionRequest) (*iri.VersionResponse, error) {
 	var runtimeVersion string
 	switch {
 	case version.Version != "":
@@ -38,7 +38,7 @@ func (s *Server) Version(ctx context.Context, req *ori.VersionRequest) (*ori.Ver
 		runtimeVersion = "0.0.0"
 	}
 
-	return &ori.VersionResponse{
+	return &iri.VersionResponse{
 		RuntimeName:    version.RuntimeName,
 		RuntimeVersion: runtimeVersion,
 	}, nil
