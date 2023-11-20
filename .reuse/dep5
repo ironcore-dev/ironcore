@@ -1,0 +1,65 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: ironcore
+Upstream-Contact: IronCore authors <ospo@sap.com>
+Source: https://github.com/ironcore-dev/ironcore
+
+# --------------------------------------------------
+# source code
+
+Files:
+  .github/*
+  .gitignore
+  .golangci.yaml
+  CODEOWNERS
+  Dockerfile
+  Makefile
+  PROJECT
+  client-go/openapi/api_violations.report
+  config/*
+  gen/*
+  go.mod
+  go.sum
+  hack/*
+  iri/apis/bucket/v1alpha1/api.pb.go
+  iri/apis/bucket/v1alpha1/api.proto
+  iri/apis/machine/v1alpha1/api.pb.go
+  iri/apis/machine/v1alpha1/api.proto
+  iri/apis/meta/v1alpha1/api.pb.go
+  iri/apis/meta/v1alpha1/api.proto
+  iri/apis/volume/v1alpha1/api.pb.go
+  iri/apis/volume/v1alpha1/api.proto
+  irictl-machine/config/samples/*
+  irictl-volume/config/samples/*
+  mkdocs.yml
+  models-schema/main.go.tmpl
+  poollet/machinepoollet/addresses/testdata/addresses.yaml
+Copyright: 2023 SAP SE or an SAP affiliate company and IronCore contributors
+License: Apache-2.0
+
+# --------------------------------------------------
+# documentation
+
+Files:
+  docs/*
+  README.md
+Copyright: 2023 SAP SE or an SAP affiliate company and IronCore contributors
+License: Apache-2.0
+
+# --------------------------------------------------
+# source dependencies
+
+Files: poollet/machinepoollet/iri/streaming/remotecommand/*
+Copyright: 2016 The Kubernetes Authors.
+License: Apache-2.0
+
+Files: third_party/kubernetes/pkg/util/flock/*
+Copyright: 2021 The Kubernetes Authors.
+License: Apache-2.0
+
+Files: utils/envtest/internal/testing/addr/addr.go
+Copyright: 2021 The Kubernetes Authors.
+License: Apache-2.0
+
+Files: utils/envtest/internal/testing/certs/certs.go
+Copyright: 2021 The Kubernetes Authors.
+License: Apache-2.0
