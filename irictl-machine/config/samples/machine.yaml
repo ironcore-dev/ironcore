@@ -6,4 +6,4 @@ metadata:
 spec:
   class: small
   image:
-    image: ghcr.io/hardikdr/onmetal-image/gardenlinux:ign-test8
+    image: ghcr.io/ironcore-dev/ironcore-image/gardenlinux:latest
