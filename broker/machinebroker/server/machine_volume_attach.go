@@ -33,10 +33,11 @@ type IronCoreVolumeEmptyDiskConfig struct {
 }
 
 type IronCoreVolumeRemoteConfig struct {
-	Driver     string
-	Handle     string
-	Attributes map[string]string
-	SecretData map[string][]byte
+	Driver         string
+	Handle         string
+	Attributes     map[string]string
+	SecretData     map[string][]byte
+	EncryptionData map[string][]byte
 }
 
 func (s *Server) getIronCoreVolumeConfig(volume *iri.Volume) (*IronCoreVolumeConfig, error) {
@@ -55,10 +56,11 @@ func (s *Server) getIronCoreVolumeConfig(volume *iri.Volume) (*IronCoreVolumeCon
 		}
 	case volume.Connection != nil:
 		remote = &IronCoreVolumeRemoteConfig{
-			Driver:     volume.Connection.Driver,
-			Handle:     volume.Connection.Handle,
-			Attributes: volume.Connection.Attributes,
-			SecretData: volume.Connection.SecretData,
+			Driver:         volume.Connection.Driver,
+			Handle:         volume.Connection.Handle,
+			Attributes:     volume.Connection.Attributes,
+			SecretData:     volume.Connection.SecretData,
+			EncryptionData: volume.Connection.EncryptionData,
 		}
 	default:
 		return nil, fmt.Errorf("unrecognized volume %#v", volume)
@@ -82,8 +84,32 @@ func (s *Server) createIronCoreVolume(
 	var ironcoreVolumeSrc computev1alpha1.VolumeSource
 	switch {
 	case cfg.Remote != nil:
-		log.V(1).Info("Creating ironcore volume")
+
+		log.V(1).Info("Creating ironcore encryption secret")
 		remote := cfg.Remote
+		var (
+			encryptionSecret *corev1.Secret
+		)
+		if encryptionData := remote.EncryptionData; encryptionData != nil {
+			log.V(1).Info("Creating ironcore encryption secret")
+			encryptionSecret = &corev1.Secret{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: s.cluster.Namespace(),
+					Name:      s.cluster.IDGen().Generate(),
+					Labels: map[string]string{
+						machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
+					},
+				},
+				Type: storagev1alpha1.SecretTypeVolumeEncryption,
+				Data: encryptionData,
+			}
+			if err := s.cluster.Client().Create(ctx, encryptionSecret); err != nil {
+				return nil, nil, fmt.Errorf("error creating ironcore encryption secret: %w", err)
+			}
+			c.Add(cleaner.CleanupObject(s.cluster.Client(), encryptionSecret))
+		}
+
+		log.V(1).Info("Creating ironcore volume")
 		ironcoreVolume := &storagev1alpha1.Volume{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:       s.cluster.Namespace(),
@@ -100,10 +126,29 @@ func (s *Server) createIronCoreVolume(
 				ClaimRef: s.optionalLocalUIDReference(optIronCoreMachine),
 			},
 		}
+		if encryptionSecret != nil {
+			ironcoreVolume.Spec.Encryption = &storagev1alpha1.VolumeEncryption{
+				SecretRef: corev1.LocalObjectReference{Name: encryptionSecret.Name},
+			}
+		}
 		if err := s.cluster.Client().Create(ctx, ironcoreVolume); err != nil {
 			return nil, nil, fmt.Errorf("error creating ironcore volume: %w", err)
 		}
 		c.Add(cleaner.CleanupObject(s.cluster.Client(), ironcoreVolume))
+
+		if encryptionSecret != nil {
+			log.V(1).Info("Patching owner ref of ironcore encryption secret")
+			baseEncryptionSecret := encryptionSecret.DeepCopy()
+			encryptionSecret.ObjectMeta.OwnerReferences = []metav1.OwnerReference{
+				metautils.MakeControllerRef(
+					storagev1alpha1.SchemeGroupVersion.WithKind("Volume"),
+					ironcoreVolume,
+				),
+			}
+			if err := s.cluster.Client().Patch(ctx, encryptionSecret, client.MergeFrom(baseEncryptionSecret)); err != nil {
+				return nil, nil, fmt.Errorf("error patching ironcore volume status: %w", err)
+			}
+		}
 
 		var (
 			secretRef    *corev1.LocalObjectReference

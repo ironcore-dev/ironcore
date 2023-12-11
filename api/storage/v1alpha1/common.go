@@ -24,7 +24,8 @@ const (
 	// BucketPoolUserNamePrefix is the prefix all bucket pool users should have.
 	BucketPoolUserNamePrefix = "storage.ironcore.dev:system:bucketpool:"
 
-	SecretTypeVolumeAuth = corev1.SecretType("storage.ironcore.dev/volume-auth")
+	SecretTypeVolumeAuth       = corev1.SecretType("storage.ironcore.dev/volume-auth")
+	SecretTypeVolumeEncryption = corev1.SecretType("storage.ironcore.dev/volume-encryption")
 )
 
 // VolumePoolCommonName constructs the common name for a certificate of a volume pool user.
