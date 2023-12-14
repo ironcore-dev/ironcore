@@ -142,14 +142,35 @@ func (r *MachineReconciler) prepareRemoteIRIVolume(
 		secretData = secret.Data
 	}
 
+	var encryptionData map[string][]byte
+	if encryption := volume.Spec.Encryption; encryption != nil {
+		secret := &corev1.Secret{}
+		secretKey := client.ObjectKey{Namespace: volume.Namespace, Name: encryption.SecretRef.Name}
+		if err := r.Get(ctx, secretKey, secret); err != nil {
+			if !apierrors.IsNotFound(err) {
+				return nil, false, fmt.Errorf("error getting volume encryption secret %s: %w", secretKey.Name, err)
+			}
+
+			r.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady,
+				"Volume %s encryption secret %s not found",
+				volume.Name,
+				secretKey.Name,
+			)
+			return nil, false, nil
+		}
+
+		encryptionData = secret.Data
+	}
+
 	return &iri.Volume{
 		Name:   machineVolume.Name,
 		Device: *machineVolume.Device,
 		Connection: &iri.VolumeConnection{
-			Driver:     access.Driver,
-			Handle:     access.Handle,
-			Attributes: access.VolumeAttributes,
-			SecretData: secretData,
+			Driver:         access.Driver,
+			Handle:         access.Handle,
+			Attributes:     access.VolumeAttributes,
+			SecretData:     secretData,
+			EncryptionData: encryptionData,
 		},
 	}, true, nil
 }
