@@ -3,7 +3,7 @@ module github.com/ironcore-dev/ironcore
 go 1.21
 
 require (
-	github.com/bits-and-blooms/bitset v1.12.0
+	github.com/bits-and-blooms/bitset v1.13.0
 	github.com/blang/semver/v4 v4.0.0
 	github.com/go-chi/chi/v5 v5.0.11
 	github.com/go-logr/logr v1.4.1
