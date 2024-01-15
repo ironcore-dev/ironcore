@@ -23,7 +23,8 @@ var (
 		{Name: "Name", Type: "string", Format: "name", Description: objectMetaSwaggerDoc["name"]},
 		{Name: "Network", Type: "string", Description: "The network this network interface is connected to"},
 		{Name: "Machine", Type: "string", Description: "The machine this network interface is used by"},
-		{Name: "IPs", Type: "string", Description: "List of effective IPs of the network interface"},
+		{Name: "IPs", Type: "string", Description: "The list of effective IPs of the network interface"},
+		{Name: "Prefixes", Type: "string", Description: "The list of effective prefixes assigned to this network interface"},
 		{Name: "VirtualIP", Type: "string", Description: "The virtual IP assigned to this interface, if any"},
 		{Name: "State", Type: "string", Description: "The state of the network interface"},
 		{Name: "Age", Type: "string", Format: "date", Description: objectMetaSwaggerDoc["creationTimestamp"]},
@@ -65,6 +66,15 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 				eIPs = append(eIPs, ip.String())
 			}
 			cells = append(cells, strings.Join(eIPs, ","))
+		} else {
+			cells = append(cells, "<none>")
+		}
+		if effectivePrefixes := networkInterface.Status.Prefixes; len(effectivePrefixes) > 0 {
+			var ePrefixes []string
+			for _, prefix := range effectivePrefixes {
+				ePrefixes = append(ePrefixes, prefix.String())
+			}
+			cells = append(cells, strings.Join(ePrefixes, ","))
 		} else {
 			cells = append(cells, "<none>")
 		}
