@@ -381,7 +381,7 @@ ADDLICENSE_VERSION ?= v1.1.1
 PROTOC_GEN_GOGO_VERSION ?= v1.3.2
 GOIMPORTS_VERSION ?= v0.13.0
 GOLANGCI_LINT_VERSION ?= v1.55.2
-OPENAPI_EXTRACTOR_VERSION ?= v0.1.3
+OPENAPI_EXTRACTOR_VERSION ?= v0.1.4
 
 KUSTOMIZE_INSTALL_SCRIPT ?= "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
 .PHONY: kustomize

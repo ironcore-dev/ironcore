@@ -201,7 +201,8 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketClass"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -410,7 +411,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -491,7 +492,8 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketClass"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -690,7 +692,8 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -745,7 +748,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -923,7 +926,8 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -1132,7 +1136,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -1213,7 +1217,8 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -1412,7 +1417,8 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -1467,7 +1473,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -1548,7 +1554,8 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -1655,7 +1662,8 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -1710,7 +1718,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -1803,7 +1811,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -2026,7 +2034,8 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -2245,7 +2254,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -2326,7 +2335,8 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -2525,7 +2535,8 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -2590,7 +2601,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -2671,7 +2682,8 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -2778,7 +2790,8 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -2843,7 +2856,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -3021,7 +3034,8 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -3240,7 +3254,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -3321,7 +3335,8 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -3520,7 +3535,8 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -3585,7 +3601,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -3666,7 +3682,8 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -3773,7 +3790,8 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -3838,7 +3856,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -4016,7 +4034,8 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeClass"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -4225,7 +4244,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -4306,7 +4325,8 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeClass"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -4505,7 +4525,8 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -4560,7 +4581,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -4738,7 +4759,8 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -4947,7 +4969,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -5028,7 +5050,8 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -5227,7 +5250,8 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -5282,7 +5306,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -5363,7 +5387,8 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -5470,7 +5495,8 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -5525,7 +5551,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -5618,7 +5644,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -5756,7 +5782,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -5904,7 +5930,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -6042,7 +6068,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -6190,7 +6216,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -6328,7 +6354,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -6476,7 +6502,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -6634,7 +6660,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -6782,7 +6808,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -6940,7 +6966,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -7078,7 +7104,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -7226,7 +7252,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -7364,7 +7390,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -7512,7 +7538,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -7650,7 +7676,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -7852,12 +7878,7 @@
 						"description": "Capabilities describes the capabilities of a BucketClass.",
 						"type": "object",
 						"additionalProperties": {
-							"default": {},
-							"allOf": [
-								{
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
-								}
-							]
+							"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
 						}
 					},
 					"kind": {
@@ -7934,7 +7955,6 @@
 				"properties": {
 					"lastTransitionTime": {
 						"description": "LastTransitionTime is the last time the status of a condition has transitioned from one state to another.",
-						"default": {},
 						"allOf": [
 							{
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Time"
@@ -8318,12 +8338,7 @@
 						"description": "Capabilities describes the capabilities of a VolumeClass.",
 						"type": "object",
 						"additionalProperties": {
-							"default": {},
-							"allOf": [
-								{
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
-								}
-							]
+							"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
 						}
 					},
 					"kind": {
@@ -8404,7 +8419,6 @@
 				"properties": {
 					"lastTransitionTime": {
 						"description": "LastTransitionTime is the last time the status of a condition has transitioned from one state to another.",
-						"default": {},
 						"allOf": [
 							{
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Time"
@@ -8554,7 +8568,6 @@
 				"properties": {
 					"lastTransitionTime": {
 						"description": "LastTransitionTime is the last time the status of a condition has transitioned from one state to another.",
-						"default": {},
 						"allOf": [
 							{
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Time"
@@ -8665,12 +8678,7 @@
 						"description": "Allocatable represents the resources of a machine pool that are available for scheduling.",
 						"type": "object",
 						"additionalProperties": {
-							"default": {},
-							"allOf": [
-								{
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
-								}
-							]
+							"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
 						}
 					},
 					"availableVolumeClasses": {
@@ -8689,12 +8697,7 @@
 						"description": "Capacity represents the total resources of a machine pool.",
 						"type": "object",
 						"additionalProperties": {
-							"default": {},
-							"allOf": [
-								{
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
-								}
-							]
+							"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
 						}
 					},
 					"conditions": {
@@ -8749,12 +8752,7 @@
 						"description": "Resources is a description of the volume's resources and capacity.",
 						"type": "object",
 						"additionalProperties": {
-							"default": {},
-							"allOf": [
-								{
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
-								}
-							]
+							"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
 						}
 					},
 					"tolerations": {
@@ -9133,7 +9131,6 @@
 					},
 					"creationTimestamp": {
 						"description": "CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC.\n\nPopulated by the system. Read-only. Null for lists. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
-						"default": {},
 						"allOf": [
 							{
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Time"
@@ -9413,7 +9410,6 @@
 				"properties": {
 					"object": {
 						"description": "Object is:\n * If Type is Added or Modified: the new state of the object.\n * If Type is Deleted: the state of the object immediately before deletion.\n * If Type is Error: *Status is recommended; other types may make sense\n   depending on context.",
-						"default": {},
 						"allOf": [
 							{
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.runtime.RawExtension"

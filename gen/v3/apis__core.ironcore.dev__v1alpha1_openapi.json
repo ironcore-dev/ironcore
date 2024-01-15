@@ -201,7 +201,8 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -420,7 +421,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -501,7 +502,8 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -700,7 +702,8 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -765,7 +768,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -846,7 +849,8 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -953,7 +957,8 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -1018,7 +1023,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -1111,7 +1116,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -1259,7 +1264,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -1417,7 +1422,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -1555,7 +1560,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -1707,12 +1712,7 @@
 						"description": "Hard is a ResourceList of the strictly enforced amount of resources.",
 						"type": "object",
 						"additionalProperties": {
-							"default": {},
-							"allOf": [
-								{
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
-								}
-							]
+							"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
 						}
 					},
 					"scopeSelector": {
@@ -1733,24 +1733,14 @@
 						"description": "Hard are the currently enforced hard resource limits. Hard may be less than used in case the limits were introduced / updated after more than allowed resources were already present.",
 						"type": "object",
 						"additionalProperties": {
-							"default": {},
-							"allOf": [
-								{
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
-								}
-							]
+							"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
 						}
 					},
 					"used": {
 						"description": "Used is the amount of currently used resources.",
 						"type": "object",
 						"additionalProperties": {
-							"default": {},
-							"allOf": [
-								{
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
-								}
-							]
+							"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
 						}
 					}
 				}
@@ -2086,7 +2076,6 @@
 					},
 					"creationTimestamp": {
 						"description": "CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC.\n\nPopulated by the system. Read-only. Null for lists. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
-						"default": {},
 						"allOf": [
 							{
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Time"
@@ -2366,7 +2355,6 @@
 				"properties": {
 					"object": {
 						"description": "Object is:\n * If Type is Added or Modified: the new state of the object.\n * If Type is Deleted: the state of the object immediately before deletion.\n * If Type is Error: *Status is recommended; other types may make sense\n   depending on context.",
-						"default": {},
 						"allOf": [
 							{
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.runtime.RawExtension"

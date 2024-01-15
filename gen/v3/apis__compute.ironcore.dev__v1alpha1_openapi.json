@@ -201,7 +201,8 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineClass"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -410,7 +411,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -491,7 +492,8 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineClass"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -690,7 +692,8 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -745,7 +748,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -923,7 +926,8 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -1132,7 +1136,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -1213,7 +1217,8 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -1412,7 +1417,8 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -1467,7 +1473,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -1548,7 +1554,8 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -1655,7 +1662,8 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -1710,7 +1718,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -1803,7 +1811,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -2026,7 +2034,8 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -2245,7 +2254,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -2326,7 +2335,8 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -2525,7 +2535,8 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -2590,7 +2601,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -2753,7 +2764,8 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -2860,7 +2872,8 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
@@ -2925,7 +2938,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -3018,7 +3031,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -3166,7 +3179,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -3304,7 +3317,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -3452,7 +3465,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -3590,7 +3603,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -3738,7 +3751,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -3896,7 +3909,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -4183,12 +4196,7 @@
 					"capabilities": {
 						"type": "object",
 						"additionalProperties": {
-							"default": {},
-							"allOf": [
-								{
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
-								}
-							]
+							"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
 						}
 					},
 					"kind": {
@@ -4372,7 +4380,6 @@
 				"properties": {
 					"lastTransitionTime": {
 						"description": "LastTransitionTime is the last time the status of a condition has transitioned from one state to another.",
-						"default": {},
 						"allOf": [
 							{
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Time"
@@ -4509,12 +4516,7 @@
 						"description": "Allocatable represents the resources of a machine pool that are available for scheduling.",
 						"type": "object",
 						"additionalProperties": {
-							"default": {},
-							"allOf": [
-								{
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
-								}
-							]
+							"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
 						}
 					},
 					"availableMachineClasses": {
@@ -4532,12 +4534,7 @@
 						"description": "Capacity represents the total resources of a machine pool.",
 						"type": "object",
 						"additionalProperties": {
-							"default": {},
-							"allOf": [
-								{
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
-								}
-							]
+							"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
 						}
 					},
 					"conditions": {
@@ -4777,12 +4774,7 @@
 						"description": "IPs are the ips allocated for the network interface.",
 						"type": "array",
 						"items": {
-							"default": {},
-							"allOf": [
-								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.IP"
-								}
-							]
+							"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.IP"
 						}
 					},
 					"lastStateTransitionTime": {
@@ -4889,9 +4881,10 @@
 				"type": "object",
 				"properties": {
 					"ipFamily": {
-						"description": "IPFamily is the IPFamily of the prefix. If unset but Prefix is set, this can be inferred.\n\nPossible enum values:\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
+						"description": "IPFamily is the IPFamily of the prefix. If unset but Prefix is set, this can be inferred.\n\nPossible enum values:\n - `\"\"` indicates that this IP is unknown protocol\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
 						"type": "string",
 						"enum": [
+							"",
 							"IPv4",
 							"IPv6"
 						]
@@ -5152,10 +5145,11 @@
 				],
 				"properties": {
 					"ipFamily": {
-						"description": "IPFamily is the ip family of the VirtualIP.\n\nPossible enum values:\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
+						"description": "IPFamily is the ip family of the VirtualIP.\n\nPossible enum values:\n - `\"\"` indicates that this IP is unknown protocol\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
 						"type": "string",
 						"default": "",
 						"enum": [
+							"",
 							"IPv4",
 							"IPv6"
 						]
@@ -5251,12 +5245,7 @@
 						"description": "Resources is a description of the volume's resources and capacity.",
 						"type": "object",
 						"additionalProperties": {
-							"default": {},
-							"allOf": [
-								{
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
-								}
-							]
+							"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
 						}
 					},
 					"tolerations": {
@@ -5674,7 +5663,6 @@
 					},
 					"creationTimestamp": {
 						"description": "CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC.\n\nPopulated by the system. Read-only. Null for lists. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
-						"default": {},
 						"allOf": [
 							{
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Time"
@@ -5954,7 +5942,6 @@
 				"properties": {
 					"object": {
 						"description": "Object is:\n * If Type is Added or Modified: the new state of the object.\n * If Type is Deleted: the state of the object immediately before deletion.\n * If Type is Error: *Status is recommended; other types may make sense\n   depending on context.",
-						"default": {},
 						"allOf": [
 							{
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.runtime.RawExtension"
