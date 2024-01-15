@@ -11,7 +11,7 @@ import (
 	"github.com/onsi/gomega/types"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 )
 
 var _ = Describe("LoadBalancer", func() {
@@ -70,11 +70,11 @@ var _ = Describe("LoadBalancer", func() {
 					Ports: []networking.LoadBalancerPort{
 						{
 							Port:    1,
-							EndPort: pointer.Int32(3),
+							EndPort: ptr.To[int32](3),
 						},
 						{
 							Port:    2,
-							EndPort: pointer.Int32(4),
+							EndPort: ptr.To[int32](4),
 						},
 					},
 				},
@@ -87,12 +87,12 @@ var _ = Describe("LoadBalancer", func() {
 					Ports: []networking.LoadBalancerPort{
 						{
 							Port:    1,
-							EndPort: pointer.Int32(3),
+							EndPort: ptr.To[int32](3),
 						},
 						{
 							Protocol: ProtocolPtr(corev1.ProtocolUDP),
 							Port:     2,
-							EndPort:  pointer.Int32(4),
+							EndPort:  ptr.To[int32](4),
 						},
 					},
 				},

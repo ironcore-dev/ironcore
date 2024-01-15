@@ -8,7 +8,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 )
 
 var (
@@ -85,6 +85,6 @@ func SetDefaults_NetworkInterfaceStatus(status *v1alpha1.NetworkInterfaceStatus)
 
 func SetDefaults_NATGatewaySpec(spec *v1alpha1.NATGatewaySpec) {
 	if spec.PortsPerNetworkInterface == nil {
-		spec.PortsPerNetworkInterface = pointer.Int32(v1alpha1.DefaultPortsPerNetworkInterface)
+		spec.PortsPerNetworkInterface = ptr.To[int32](v1alpha1.DefaultPortsPerNetworkInterface)
 	}
 }

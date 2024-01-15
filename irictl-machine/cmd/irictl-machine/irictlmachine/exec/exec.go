@@ -82,11 +82,15 @@ func Run(ctx context.Context, streams clicommon.Streams, client iri.MachineRunti
 		sizeQueue = tty.MonitorSize(&sizePlusOne, size)
 	}
 
-	roundTripper := spdy.NewRoundTripperWithConfig(spdy.RoundTripperConfig{
+	roundTripper, err := spdy.NewRoundTripperWithConfig(spdy.RoundTripperConfig{
 		TLS:        http.DefaultTransport.(*http.Transport).TLSClientConfig,
 		Proxier:    http.ProxyFromEnvironment,
 		PingPeriod: 5 * time.Second,
 	})
+	if err != nil {
+		return err
+	}
+
 	exec, err := remotecommand.NewSPDYExecutorForTransports(roundTripper, roundTripper, http.MethodGet, u)
 	if err != nil {
 		return fmt.Errorf("error creating remote command executor: %w", err)

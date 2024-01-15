@@ -11,7 +11,7 @@ import (
 	"github.com/onsi/gomega/types"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 )
 
 var _ = Describe("NATGateway", func() {
@@ -51,7 +51,7 @@ var _ = Describe("NATGateway", func() {
 		Entry("ports per nic not power of 2",
 			&networking.NATGateway{
 				Spec: networking.NATGatewaySpec{
-					PortsPerNetworkInterface: pointer.Int32(3),
+					PortsPerNetworkInterface: ptr.To[int32](3),
 				},
 			},
 			ContainElement(InvalidField("spec.portsPerNetworkInterface")),

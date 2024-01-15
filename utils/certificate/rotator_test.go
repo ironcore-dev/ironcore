@@ -23,7 +23,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	certutil "k8s.io/client-go/util/cert"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -38,7 +38,7 @@ var _ = Describe("Rotator", func() {
 			},
 			SignerName:        signerName,
 			Template:          &x509.CertificateRequest{},
-			RequestedDuration: pointer.Duration(3 * time.Hour),
+			RequestedDuration: ptr.To(3 * time.Hour),
 			GetUsages: func(privateKey interface{}) []certificatesv1.KeyUsage {
 				return []certificatesv1.KeyUsage{
 					certificatesv1.UsageKeyEncipherment,

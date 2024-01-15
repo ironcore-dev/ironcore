@@ -171,6 +171,7 @@ extract-openapi: envtest openapi-extractor
 .PHONY: build
 build: generate fmt vet ## Build manager binary.
 	go build -o bin/manager ./cmd/ironcore-controller-manager
+	go build -o bin/apiserver ./cmd/ironcore-apiserver
 
 .PHONY: run
 run: manifests generate fmt vet ## Run a controller from your host.
@@ -372,7 +373,7 @@ GOLANGCI_LINT ?= $(LOCALBIN)/golangci-lint
 
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v5.1.1
-CODE_GENERATOR_VERSION ?= v0.28.2
+CODE_GENERATOR_VERSION ?= v0.29.0
 VGOPATH_VERSION ?= v0.1.3
 CONTROLLER_TOOLS_VERSION ?= v0.13.0
 GEN_CRD_API_REFERENCE_DOCS_VERSION ?= v0.3.0
@@ -380,6 +381,7 @@ ADDLICENSE_VERSION ?= v1.1.1
 PROTOC_GEN_GOGO_VERSION ?= v1.3.2
 GOIMPORTS_VERSION ?= v0.13.0
 GOLANGCI_LINT_VERSION ?= v1.55.2
+OPENAPI_EXTRACTOR_VERSION ?= v0.1.3
 
 KUSTOMIZE_INSTALL_SCRIPT ?= "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
 .PHONY: kustomize
@@ -455,7 +457,7 @@ $(ENVTEST): $(LOCALBIN)
 .PHONY: openapi-extractor
 openapi-extractor: $(OPENAPI_EXTRACTOR) ## Download openapi-extractor locally if necessary.
 $(OPENAPI_EXTRACTOR): $(LOCALBIN)
-	test -s $(LOCALBIN)/openapi-extractor || GOBIN=$(LOCALBIN) go install github.com/ironcore-dev/openapi-extractor/cmd/openapi-extractor@latest
+	test -s $(LOCALBIN)/openapi-extractor || GOBIN=$(LOCALBIN) go install github.com/ironcore-dev/openapi-extractor/cmd/openapi-extractor@$(OPENAPI_EXTRACTOR_VERSION)
 
 .PHONY: gen-crd-api-reference-docs
 gen-crd-api-reference-docs: $(GEN_CRD_API_REFERENCE_DOCS) ## Download gen-crd-api-reference-docs locally if necessary.
