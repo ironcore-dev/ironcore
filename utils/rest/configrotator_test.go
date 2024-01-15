@@ -23,7 +23,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 )
@@ -62,7 +62,7 @@ var _ = Describe("ConfigRotator", func() {
 		By("creating a rotator")
 		template := &x509.CertificateRequest{}
 		signerName := "rotator-signer.ironcore.dev"
-		requestedDuration := pointer.Duration(1 * time.Hour)
+		requestedDuration := ptr.To(1 * time.Hour)
 		rotatorName := "rotator"
 		r, err := NewConfigRotator(nil, bootstrapUser.Config(), ConfigRotatorOptions{
 			Name:              rotatorName,
@@ -165,7 +165,7 @@ var _ = Describe("ConfigRotator", func() {
 		By("creating a rotator")
 		template := &x509.CertificateRequest{}
 		signerName := "rotator-signer.ironcore.dev"
-		requestedDuration := pointer.Duration(1 * time.Hour)
+		requestedDuration := ptr.To(1 * time.Hour)
 		rotatorName := "rotator"
 
 		var newClient func(*tls.Certificate) (client.WithWatch, error)

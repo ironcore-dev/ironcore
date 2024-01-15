@@ -303,18 +303,18 @@ func (a *APIServer) setupTempDir() (string, error) {
 func (a *APIServer) createCmd() *exec.Cmd {
 	kubeconfig := filepath.Join(a.dir, "kubeconfig")
 	defaultArgs := ProcessArgs{
-		"etcd-servers":              a.etcdServers,
-		"kubeconfig":                []string{kubeconfig},
-		"authentication-kubeconfig": []string{kubeconfig},
-		"authorization-kubeconfig":  []string{kubeconfig},
-		"bind-address":              []string{a.host},
-		"secure-port":               []string{strconv.Itoa(a.port)},
-		"feature-gates":             []string{"APIPriorityAndFairness=false"},
-		"audit-log-path":            []string{"-"},
-		"audit-log-maxage":          []string{"0"},
-		"audit-log-maxbackup":       []string{"0"},
-		"tls-cert-file":             []string{path.Join(a.certDir, "tls.crt")},
-		"tls-private-key-file":      []string{path.Join(a.certDir, "tls.key")},
+		"etcd-servers":                 a.etcdServers,
+		"kubeconfig":                   []string{kubeconfig},
+		"authentication-kubeconfig":    []string{kubeconfig},
+		"authorization-kubeconfig":     []string{kubeconfig},
+		"bind-address":                 []string{a.host},
+		"secure-port":                  []string{strconv.Itoa(a.port)},
+		"enable-priority-and-fairness": []string{"false"},
+		"audit-log-path":               []string{"-"},
+		"audit-log-maxage":             []string{"0"},
+		"audit-log-maxbackup":          []string{"0"},
+		"tls-cert-file":                []string{path.Join(a.certDir, "tls.crt")},
+		"tls-private-key-file":         []string{path.Join(a.certDir, "tls.key")},
 	}
 	args := a.mergeArgs(a.args, defaultArgs)
 

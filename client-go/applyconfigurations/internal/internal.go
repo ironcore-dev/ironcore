@@ -198,7 +198,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: lastTransitionTime
       type:
         namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
-      default: {}
     - name: message
       type:
         scalar: string
@@ -653,7 +652,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: cidr
       type:
         namedType: com.github.ironcore-dev.ironcore.api.common.v1alpha1.IPPrefix
-      default: {}
     - name: except
       type:
         list:
@@ -696,7 +694,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: ip
       type:
         namedType: com.github.ironcore-dev.ironcore.api.common.v1alpha1.IP
-      default: {}
     - name: targetRef
       type:
         namedType: com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerTargetRef
@@ -1024,7 +1021,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: lastTransitionTime
       type:
         namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
-      default: {}
     - name: message
       type:
         scalar: string
@@ -1294,7 +1290,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: lastTransitionTime
       type:
         namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
-      default: {}
     - name: message
       type:
         scalar: string
@@ -1463,7 +1458,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: lastTransitionTime
       type:
         namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
-      default: {}
     - name: message
       type:
         scalar: string
@@ -1515,7 +1509,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: lastTransitionTime
       type:
         namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
-      default: {}
     - name: message
       type:
         scalar: string
@@ -1733,7 +1726,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: creationTimestamp
       type:
         namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
-      default: {}
     - name: deletionGracePeriodSeconds
       type:
         scalar: numeric
