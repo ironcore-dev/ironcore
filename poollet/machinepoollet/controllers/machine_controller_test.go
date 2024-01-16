@@ -152,17 +152,34 @@ var _ = Describe("MachineController", func() {
 				Name:   "primary",
 				Handle: "primary-handle",
 				State:  iri.NetworkInterfaceState_NETWORK_INTERFACE_ATTACHED,
+				Ips:    []string{"10.0.0.1"},
 			},
 		}
 		srv.SetMachines([]*testingmachine.FakeMachine{iriMachine})
 
 		By("waiting for the ironcore network interface to have a provider id set")
-		Eventually(Object(nic)).Should(HaveField("Spec.ProviderID", "primary-handle"))
+		Eventually(Object(nic)).Should(And(
+			HaveField("Spec.ProviderID", Equal("primary-handle")),
+			HaveField("Status", MatchFields(IgnoreExtras, Fields{
+				"State": Equal(networkingv1alpha1.NetworkInterfaceStateAvailable),
+				"IPs":   ContainElement(commonv1alpha1.MustParseIP("10.0.0.1")),
+			})),
+		))
 		Eventually(Object(machine)).Should(HaveField("Status.NetworkInterfaces", ConsistOf(MatchFields(IgnoreExtras, Fields{
 			"Name":   Equal("primary"),
 			"Handle": Equal("primary-handle"),
 			"State":  Equal(computev1alpha1.NetworkInterfaceStateAttached),
 		}))))
+
+		By("removing the network interface from the machine")
+		Eventually(Update(machine, func() {
+			machine.Spec.NetworkInterfaces = []computev1alpha1.NetworkInterface{}
+		})).Should(Succeed())
+
+		By("ensuring that the network interface has been removed from the iri machine")
+		Eventually(srv.Machines[iriMachine.Metadata.Id]).Should(SatisfyAll(
+			HaveField("Spec.NetworkInterfaces", BeEmpty()),
+		))
 	})
 
 	It("should correctly manage the power state of a machine", func(ctx SpecContext) {
