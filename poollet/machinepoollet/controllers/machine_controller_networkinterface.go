@@ -270,6 +270,7 @@ func (r *MachineReconciler) getExistingIRINetworkInterfacesForMachine(
 			MachineId: iriMachine.Metadata.Id,
 			Name:      iriNic.Name,
 		})
+
 		if err != nil {
 			if status.Code(err) != codes.NotFound {
 				errs = append(errs, fmt.Errorf("[network interface %s] %w", iriNic.Name, err))
@@ -363,13 +364,13 @@ func (r *MachineReconciler) computeNetworkInterfaceMapping(
 	return nicMapping
 }
 
-var iriNetworkInterfaceStateToNetworkInterfaceState = map[iri.NetworkInterfaceState]computev1alpha1.NetworkInterfaceState{
+var iriNetworkInterfaceStateToMachineNetworkInterfaceState = map[iri.NetworkInterfaceState]computev1alpha1.NetworkInterfaceState{
 	iri.NetworkInterfaceState_NETWORK_INTERFACE_PENDING:  computev1alpha1.NetworkInterfaceStatePending,
 	iri.NetworkInterfaceState_NETWORK_INTERFACE_ATTACHED: computev1alpha1.NetworkInterfaceStateAttached,
 }
 
 func (r *MachineReconciler) convertIRINetworkInterfaceState(state iri.NetworkInterfaceState) (computev1alpha1.NetworkInterfaceState, error) {
-	if res, ok := iriNetworkInterfaceStateToNetworkInterfaceState[state]; ok {
+	if res, ok := iriNetworkInterfaceStateToMachineNetworkInterfaceState[state]; ok {
 		return res, nil
 	}
 	return "", fmt.Errorf("unknown network interface attachment state %v", state)
