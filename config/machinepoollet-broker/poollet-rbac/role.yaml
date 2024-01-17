@@ -121,6 +121,14 @@ rules:
 - apiGroups:
   - networking.ironcore.dev
   resources:
+  - networkinterfaces/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - networking.ironcore.dev
+  resources:
   - networks
   verbs:
   - get
