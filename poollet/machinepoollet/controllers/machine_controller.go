@@ -82,6 +82,7 @@ func (r *MachineReconciler) machineUIDLabelSelector(machineUID types.UID) map[st
 //+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machines/finalizers,verbs=update
 //+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumes,verbs=get;list;watch;update;patch
 //+kubebuilder:rbac:groups=networking.ironcore.dev,resources=networkinterfaces,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=networkinterfaces/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=networking.ironcore.dev,resources=networks,verbs=get;list;watch
 //+kubebuilder:rbac:groups=ipam.ironcore.dev,resources=prefixes,verbs=get;list;watch
 
