@@ -115,7 +115,7 @@ func (r *MachineReconciler) prepareIRINetworkInterfacesForMachine(
 		return nil, nil, false, err
 	}
 
-	if len(iriNics) != len(machine.Spec.Volumes) {
+	if len(iriNics) != len(machine.Spec.NetworkInterfaces) {
 		expectedNicNames := utilslices.ToSetFunc(machine.Spec.NetworkInterfaces, func(v computev1alpha1.NetworkInterface) string { return v.Name })
 		actualNicNames := utilslices.ToSetFunc(iriNics, (*iri.NetworkInterface).GetName)
 		missingNicNames := sets.List(expectedNicNames.Difference(actualNicNames))
