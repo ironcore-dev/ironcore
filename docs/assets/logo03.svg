@@ -1,7 +1,7 @@
 
 <svg width="400px" height="400px" viewBox="0 0 400 400" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <defs>
-        <rect id="path-1he0h8_xwz-1" x="0" y="0" width="390" height="390" rx="8"></rect>
+        <rect id="path-ksnyk8u5rn-1" x="0" y="0" width="390" height="390" rx="8"></rect>
     </defs>
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="ironcore">
@@ -11,11 +11,11 @@
                     <rect id="path-3ulh_37f8a-1" x="0" y="0" width="390" height="390" rx="8"></rect>
                 </g>
                 <g id="Clipped">
-                    <mask id="mask-1he0h8_xwz-2" fill="white">
-                        <use xlink:href="#path-1he0h8_xwz-1"></use>
+                    <mask id="mask-ksnyk8u5rn-2" fill="white">
+                        <use xlink:href="#path-ksnyk8u5rn-1"></use>
                     </mask>
                     <g id="path-3ulh_37f8a-1"></g>
-                    <polygon id="Path" fill="#004A82" fill-rule="nonzero" mask="url(#mask-1he0h8_xwz-2)" points="96.8292542 105.037109 96.8292542 199.713211 240.832532 199.713211 240.832532 250.638977 295.866455 250.638977 117.089996 390 0 390 0 181.018555"></polygon>
+                    <polygon id="Path" fill="#004A82" fill-rule="nonzero" mask="url(#mask-ksnyk8u5rn-2)" points="96.8292542 105.037109 96.8292542 199.713211 240.832532 199.713211 240.832532 250.638977 295.866455 250.638977 117.089996 390 0 390 0 181.018555"></polygon>
                 </g>
             </g>
             <g id="Group" transform="translate(16.781250, 28.583984)">
@@ -42,7 +42,7 @@
                 </g>
                 <text id="IronCore" font-family="Helvetica-Bold, Helvetica" font-size="36" font-weight="bold">
                     <tspan x="0" y="314.15625" fill="#FFFFFF">Iron</tspan>
-                    <tspan x="67.9921875" y="314.15625" fill="#0077BA" fill-opacity="0.800945149">Core</tspan>
+                    <tspan x="67.9921875" y="314.15625" font-family="Helvetica-Light, Helvetica" font-weight="300" fill="#CCCCCC">Core</tspan>
                 </text>
             </g>
         </g>
