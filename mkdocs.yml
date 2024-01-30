@@ -11,8 +11,8 @@ theme:
   - navigation.indexes
   - navigation.top
   name: material
-  logo: assets/logo.png
-  favicon: assets/favicon.png
+  logo: assets/logo.svg
+  favicon: assets/logo.png
   palette:
   - media: "(prefers-color-scheme: light)"
     scheme: default
