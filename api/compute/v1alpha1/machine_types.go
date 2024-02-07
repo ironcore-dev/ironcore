@@ -199,6 +199,8 @@ const (
 	MachineStateShutdown MachineState = "Shutdown"
 	// MachineStateTerminated means the machine has been permanently stopped and cannot be started.
 	MachineStateTerminated MachineState = "Terminated"
+	// MachineStateTerminating means the machine that is terminating.
+	MachineStateTerminating MachineState = "Terminating"
 )
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

@@ -34,10 +34,11 @@ type AggregateIronCoreNetworkInterface struct {
 }
 
 var ironcoreMachineStateToMachineState = map[computev1alpha1.MachineState]iri.MachineState{
-	computev1alpha1.MachineStatePending:    iri.MachineState_MACHINE_PENDING,
-	computev1alpha1.MachineStateRunning:    iri.MachineState_MACHINE_RUNNING,
-	computev1alpha1.MachineStateShutdown:   iri.MachineState_MACHINE_SUSPENDED,
-	computev1alpha1.MachineStateTerminated: iri.MachineState_MACHINE_TERMINATED,
+	computev1alpha1.MachineStatePending:     iri.MachineState_MACHINE_PENDING,
+	computev1alpha1.MachineStateRunning:     iri.MachineState_MACHINE_RUNNING,
+	computev1alpha1.MachineStateShutdown:    iri.MachineState_MACHINE_SUSPENDED,
+	computev1alpha1.MachineStateTerminated:  iri.MachineState_MACHINE_TERMINATED,
+	computev1alpha1.MachineStateTerminating: iri.MachineState_MACHINE_TERMINATING,
 }
 
 func (s *Server) convertIronCoreMachineState(state computev1alpha1.MachineState) (iri.MachineState, error) {
