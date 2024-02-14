@@ -211,6 +211,42 @@ var _ = Describe("MachineController", func() {
 		By("waiting for the iri machine to be updated")
 		Eventually(iriMachine).Should(HaveField("Spec.Power", Equal(iri.Power_POWER_OFF)))
 	})
+
+	It("should correctly manage state of a machine", func(ctx SpecContext) {
+		By("creating a machine")
+		machine := &computev1alpha1.Machine{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "machine-",
+			},
+			Spec: computev1alpha1.MachineSpec{
+				MachineClassRef: corev1.LocalObjectReference{Name: mc.Name},
+				MachinePoolRef:  &corev1.LocalObjectReference{Name: mp.Name},
+			},
+		}
+		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+
+		By("waiting for the machine to be created")
+		Eventually(srv).Should(HaveField("Machines", HaveLen(1)))
+
+		By("inspecting the machine to be running")
+		_, iriMachine := GetSingleMapEntry(srv.Machines)
+		iriMachine = &testingmachine.FakeMachine{Machine: *proto.Clone(&iriMachine.Machine).(*iri.Machine)}
+		iriMachine.Metadata.Generation = 1
+		iriMachine.Status.ObservedGeneration = 1
+		iriMachine.Status.State = iri.MachineState_MACHINE_RUNNING
+		srv.SetMachines([]*testingmachine.FakeMachine{iriMachine})
+		Eventually(Object(machine)).Should(HaveField("Status.State", Equal(computev1alpha1.MachineStateRunning)))
+
+		By("inspecting the machine to be terminating")
+		_, iriMachine = GetSingleMapEntry(srv.Machines)
+		iriMachine = &testingmachine.FakeMachine{Machine: *proto.Clone(&iriMachine.Machine).(*iri.Machine)}
+		iriMachine.Metadata.Generation = 2
+		iriMachine.Status.ObservedGeneration = 2
+		iriMachine.Status.State = iri.MachineState_MACHINE_TERMINATING
+		srv.SetMachines([]*testingmachine.FakeMachine{iriMachine})
+		Eventually(Object(machine)).Should(HaveField("Status.State", Equal(computev1alpha1.MachineStateTerminating)))
+	})
 })
 
 func GetSingleMapEntry[K comparable, V any](m map[K]V) (K, V) {
