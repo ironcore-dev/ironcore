@@ -9,7 +9,7 @@ require (
 	github.com/go-logr/logr v1.4.1
 	github.com/gogo/protobuf v1.3.2
 	github.com/google/go-cmp v0.6.0
-	github.com/ironcore-dev/controller-utils v0.9.1
+	github.com/ironcore-dev/controller-utils v0.9.2
 	github.com/onsi/ginkgo/v2 v2.15.0
 	github.com/onsi/gomega v1.31.1
 	github.com/spf13/cobra v1.8.0
@@ -117,7 +117,7 @@ require (
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/apiextensions-apiserver v0.29.0 // indirect
+	k8s.io/apiextensions-apiserver v0.29.1 // indirect
 	k8s.io/cli-runtime v0.29.2 // indirect
 	k8s.io/kms v0.29.2 // indirect
 	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.28.0 // indirect
