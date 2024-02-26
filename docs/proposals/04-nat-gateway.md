@@ -1,7 +1,7 @@
 ---
 title: NAT Gateway
 
-oep-number: 4
+iep-number: 4
 
 creation-date: 2022-18-10
 
@@ -21,15 +21,17 @@ reviewers:
 
 ---
 
-# OEP-4: Cloud Nate Gateway
+# IEP-4: Cloud Nate Gateway
 
 ## Table of Contents
 
-- [Summary](#summary)
-- [Motivation](#motivation)
+- [IEP-4: Cloud Nate Gateway](#IEP-4-cloud-nate-gateway)
+  - [Table of Contents](#table-of-contents)
+  - [Summary](#summary)
+  - [Motivation](#motivation)
     - [Goals](#goals)
     - [Non-Goals](#non-goals)
-- [Proposal](#proposal)
+  - [Proposal](#proposal)
 
 ## Summary
 

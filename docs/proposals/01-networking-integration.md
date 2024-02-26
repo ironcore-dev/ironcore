@@ -1,7 +1,7 @@
 ---
 title: Networking Integration
 
-oep-number: 1
+iep-number: 1
 
 creation-date: 2022-17-03
 
@@ -22,7 +22,7 @@ reviewers:
 
 ---
 
-# OEP-1: Networking Integration
+# IEP-1: Networking Integration
 
 ## Table of Contents
 
