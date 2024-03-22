@@ -1,7 +1,7 @@
 ---
 title: Storage Encryption
 
-oep-number: 6
+iep-number: 6
 
 creation-date: 2023-01-03
 
@@ -20,15 +20,17 @@ reviewers:
 
 ---
 
-# OEP-6: Storage Encryption
+# IEP-6: Storage Encryption
 
 ## Table of Contents
 
-- [Summary](#summary)
-- [Motivation](#motivation)
+- [IEP-6: Storage Encryption](#IEP-6-storage-encryption)
+  - [Table of Contents](#table-of-contents)
+  - [Summary](#summary)
+  - [Motivation](#motivation)
     - [Goals](#goals)
-    - [Non-Goals](#Non-Goals)
-- [Proposal](#proposal)
+    - [Non-Goals](#non-goals)
+  - [Proposal](#proposal)
 
 ## Summary
 One of the important feature of Cloud Native IaaS is to provide secure storage. This proposal focuses on providing option to enable encryption for individual ironcore Volume.
