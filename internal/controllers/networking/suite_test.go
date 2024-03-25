@@ -139,6 +139,11 @@ var _ = BeforeSuite(func() {
 	}).SetupWithManager(k8sManager)
 	Expect(err).NotTo(HaveOccurred())
 
+	err = (&NetworkPeeringReconciler{
+		Client: k8sManager.GetClient(),
+	}).SetupWithManager(k8sManager)
+	Expect(err).NotTo(HaveOccurred())
+
 	Expect((&NetworkReleaseReconciler{
 		Client:       k8sManager.GetClient(),
 		APIReader:    k8sManager.GetAPIReader(),
