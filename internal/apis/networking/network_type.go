@@ -68,10 +68,22 @@ type NetworkStatus struct {
 // +enum
 type NetworkState string
 
+// NetworkPeeringState is the state a NetworkPeering can be in.
+type NetworkPeeringState string
+
+const (
+	// NetworkPeeringStateInitial signals that the network peering is not applied.
+	NetworkPeeringStateInitial NetworkPeeringState = "Initial"
+	// NetworkPeeringStateApplied signals that the network peering is applied.
+	NetworkPeeringStateApplied NetworkPeeringState = "Applied"
+)
+
 // NetworkPeeringStatus is the status of a network peering.
 type NetworkPeeringStatus struct {
 	// Name is the name of the network peering.
 	Name string
+	// State represents the network peering state
+	State NetworkPeeringState
 }
 
 const (
