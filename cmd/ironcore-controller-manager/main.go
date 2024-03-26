@@ -76,6 +76,7 @@ const (
 	loadBalancerController                       = "loadbalancer"
 	loadBalancerEphemeralPrefixController        = "loadbalancerephemeralprefix"
 	networkProtectionController                  = "networkprotection"
+	networkPeeringController                     = "networkpeering"
 	networkReleaseController                     = "networkrelease"
 	networkInterfaceEphemeralPrefixController    = "networkinterfaceephemeralprefix"
 	networkInterfaceEphemeralVirtualIPController = "networkinterfaceephemeralvirtualip"
@@ -337,6 +338,15 @@ func main() {
 			Scheme: mgr.GetScheme(),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "NetworkProtection")
+			os.Exit(1)
+		}
+	}
+
+	if controllers.Enabled(networkPeeringController) {
+		if err := (&networkingcontrollers.NetworkPeeringReconciler{
+			Client: mgr.GetClient(),
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "NetworkPeering")
 			os.Exit(1)
 		}
 	}

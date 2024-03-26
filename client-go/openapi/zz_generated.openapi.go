@@ -3708,6 +3708,13 @@ func schema_ironcore_api_networking_v1alpha1_NetworkPeeringStatus(ref common.Ref
 							Format:      "",
 						},
 					},
+					"state": {
+						SchemaProps: spec.SchemaProps{
+							Description: "State represents the network peering state",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 				},
 				Required: []string{"name"},
 			},

@@ -994,6 +994,9 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
+    - name: state
+      type:
+        scalar: string
 - name: com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy
   map:
     fields:

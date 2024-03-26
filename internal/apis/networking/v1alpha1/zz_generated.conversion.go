@@ -1169,6 +1169,7 @@ func Convert_networking_NetworkPeeringNetworkRef_To_v1alpha1_NetworkPeeringNetwo
 
 func autoConvert_v1alpha1_NetworkPeeringStatus_To_networking_NetworkPeeringStatus(in *v1alpha1.NetworkPeeringStatus, out *networking.NetworkPeeringStatus, s conversion.Scope) error {
 	out.Name = in.Name
+	out.State = networking.NetworkPeeringState(in.State)
 	return nil
 }
 
@@ -1179,6 +1180,7 @@ func Convert_v1alpha1_NetworkPeeringStatus_To_networking_NetworkPeeringStatus(in
 
 func autoConvert_networking_NetworkPeeringStatus_To_v1alpha1_NetworkPeeringStatus(in *networking.NetworkPeeringStatus, out *v1alpha1.NetworkPeeringStatus, s conversion.Scope) error {
 	out.Name = in.Name
+	out.State = v1alpha1.NetworkPeeringState(in.State)
 	return nil
 }
 
