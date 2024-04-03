@@ -533,6 +533,13 @@ func main() {
 		}
 	}
 
+	if controllers.AnyEnabled(networkProtectionController) {
+		if err := networkingclient.SetupNetworkSpecPeeringClaimRefNamesFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
+			setupLog.Error(err, "unable to setup field indexer", "field", networkingclient.NetworkSpecPeeringClaimRefNamesField)
+			os.Exit(1)
+		}
+	}
+
 	if controllers.AnyEnabled(networkInterfaceEphemeralPrefixController) {
 		if err := networkingclient.SetupNetworkInterfacePrefixNamesFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
 			setupLog.Error(err, "unable to setup field indexer", "field", networkingclient.NetworkInterfacePrefixNamesField)

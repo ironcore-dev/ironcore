@@ -119,6 +119,7 @@ var _ = BeforeSuite(func() {
 	Expect(networkingclient.SetupNetworkInterfaceVirtualIPNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 	Expect(networkingclient.SetupLoadBalancerNetworkNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 	Expect(networkingclient.SetupNATGatewayNetworkNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+	Expect(networkingclient.SetupNetworkSpecPeeringClaimRefNamesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 	Expect(networkingclient.SetupNetworkInterfacePrefixNamesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 	Expect(networkingclient.SetupLoadBalancerPrefixNamesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 
