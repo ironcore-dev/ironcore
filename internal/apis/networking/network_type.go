@@ -72,8 +72,8 @@ type NetworkState string
 type NetworkPeeringState string
 
 const (
-	// NetworkPeeringStateInitial signals that the network peering is not applied.
-	NetworkPeeringStateInitial NetworkPeeringState = "Initial"
+	// NetworkPeeringStatePending signals that the network peering is not applied.
+	NetworkPeeringStatePending NetworkPeeringState = "Pending"
 	// NetworkPeeringStateApplied signals that the network peering is applied.
 	NetworkPeeringStateApplied NetworkPeeringState = "Applied"
 )

@@ -148,13 +148,13 @@ var _ = Describe("NetworkPeeringController", func() {
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
 				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
 					Name:  network1.Spec.Peerings[0].Name,
-					State: networkingv1alpha1.NetworkPeeringStateInitial,
+					State: networkingv1alpha1.NetworkPeeringStatePending,
 				}, networkingv1alpha1.NetworkPeeringStatus{
 					Name:  network1.Spec.Peerings[1].Name,
-					State: networkingv1alpha1.NetworkPeeringStateInitial,
+					State: networkingv1alpha1.NetworkPeeringStatePending,
 				}, networkingv1alpha1.NetworkPeeringStatus{
 					Name:  network1.Spec.Peerings[2].Name,
-					State: networkingv1alpha1.NetworkPeeringStateInitial,
+					State: networkingv1alpha1.NetworkPeeringStatePending,
 				})),
 			))
 
@@ -168,7 +168,7 @@ var _ = Describe("NetworkPeeringController", func() {
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
 				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
 					Name:  network2.Spec.Peerings[0].Name,
-					State: networkingv1alpha1.NetworkPeeringStateInitial,
+					State: networkingv1alpha1.NetworkPeeringStatePending,
 				})),
 			))
 
@@ -182,7 +182,7 @@ var _ = Describe("NetworkPeeringController", func() {
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
 				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
 					Name:  network3.Spec.Peerings[0].Name,
-					State: networkingv1alpha1.NetworkPeeringStateInitial,
+					State: networkingv1alpha1.NetworkPeeringStatePending,
 				})),
 			))
 
@@ -196,7 +196,7 @@ var _ = Describe("NetworkPeeringController", func() {
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
 				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
 					Name:  network4.Spec.Peerings[0].Name,
-					State: networkingv1alpha1.NetworkPeeringStateInitial,
+					State: networkingv1alpha1.NetworkPeeringStatePending,
 				})),
 			))
 
@@ -274,7 +274,7 @@ var _ = Describe("NetworkPeeringController", func() {
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
 				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
 					Name:  network1.Spec.Peerings[0].Name,
-					State: networkingv1alpha1.NetworkPeeringStateInitial,
+					State: networkingv1alpha1.NetworkPeeringStatePending,
 				})),
 			))
 
@@ -288,7 +288,7 @@ var _ = Describe("NetworkPeeringController", func() {
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
 				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
 					Name:  network2.Spec.Peerings[0].Name,
-					State: networkingv1alpha1.NetworkPeeringStateInitial,
+					State: networkingv1alpha1.NetworkPeeringStatePending,
 				})),
 			))
 
@@ -358,7 +358,7 @@ var _ = Describe("NetworkPeeringController", func() {
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
 				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
 					Name:  network1.Spec.Peerings[0].Name,
-					State: networkingv1alpha1.NetworkPeeringStateInitial,
+					State: networkingv1alpha1.NetworkPeeringStatePending,
 				})),
 			))
 
@@ -368,7 +368,7 @@ var _ = Describe("NetworkPeeringController", func() {
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
 				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
 					Name:  network2.Spec.Peerings[0].Name,
-					State: networkingv1alpha1.NetworkPeeringStateInitial,
+					State: networkingv1alpha1.NetworkPeeringStatePending,
 				})),
 			))
 
@@ -491,10 +491,10 @@ var _ = Describe("NetworkPeeringController", func() {
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
 				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
 					Name:  network1.Spec.Peerings[0].Name,
-					State: networkingv1alpha1.NetworkPeeringStateInitial,
+					State: networkingv1alpha1.NetworkPeeringStatePending,
 				}, networkingv1alpha1.NetworkPeeringStatus{
 					Name:  network1.Spec.Peerings[1].Name,
-					State: networkingv1alpha1.NetworkPeeringStateInitial,
+					State: networkingv1alpha1.NetworkPeeringStatePending,
 				})),
 			))
 
@@ -512,10 +512,10 @@ var _ = Describe("NetworkPeeringController", func() {
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
 				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
 					Name:  network2.Spec.Peerings[0].Name,
-					State: networkingv1alpha1.NetworkPeeringStateInitial,
+					State: networkingv1alpha1.NetworkPeeringStatePending,
 				}, networkingv1alpha1.NetworkPeeringStatus{
 					Name:  network2.Spec.Peerings[1].Name,
-					State: networkingv1alpha1.NetworkPeeringStateInitial,
+					State: networkingv1alpha1.NetworkPeeringStatePending,
 				})),
 			))
 
@@ -533,10 +533,10 @@ var _ = Describe("NetworkPeeringController", func() {
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
 				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
 					Name:  network3.Spec.Peerings[0].Name,
-					State: networkingv1alpha1.NetworkPeeringStateInitial,
+					State: networkingv1alpha1.NetworkPeeringStatePending,
 				}, networkingv1alpha1.NetworkPeeringStatus{
 					Name:  network3.Spec.Peerings[1].Name,
-					State: networkingv1alpha1.NetworkPeeringStateInitial,
+					State: networkingv1alpha1.NetworkPeeringStatePending,
 				})),
 			))
 

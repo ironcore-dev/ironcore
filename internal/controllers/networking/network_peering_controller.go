@@ -94,7 +94,7 @@ func (r *NetworkPeeringReconciler) updateStatus(
 	for _, name := range peeringNames {
 		newStatusPeerings = append(newStatusPeerings, networkingv1alpha1.NetworkPeeringStatus{
 			Name:  name,
-			State: networkingv1alpha1.NetworkPeeringStateInitial,
+			State: networkingv1alpha1.NetworkPeeringStatePending,
 		})
 	}
 	network.Status.Peerings = newStatusPeerings
