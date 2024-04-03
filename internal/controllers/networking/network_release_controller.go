@@ -54,7 +54,7 @@ func (r *NetworkReleaseReconciler) filterExistingNetworkPeeringClaimRefs(
 ) ([]networkingv1alpha1.NetworkPeeringClaimRef, error) {
 	var filtered []networkingv1alpha1.NetworkPeeringClaimRef
 	for _, peeringClaimRef := range network.Spec.PeeringClaimRefs {
-		ok, err := r.networkPeeringClaimExists(ctx, network, peeringClaimRef)
+		ok, err := r.networkPeeringClaimExists(ctx, peeringClaimRef)
 		if err != nil {
 			return nil, err
 		}
@@ -68,7 +68,6 @@ func (r *NetworkReleaseReconciler) filterExistingNetworkPeeringClaimRefs(
 
 func (r *NetworkReleaseReconciler) networkPeeringClaimExists(
 	ctx context.Context,
-	network *networkingv1alpha1.Network,
 	peeringClaimRef networkingv1alpha1.NetworkPeeringClaimRef,
 ) (bool, error) {
 	if _, ok := r.AbsenceCache.Get(peeringClaimRef.UID); ok {
@@ -81,7 +80,7 @@ func (r *NetworkReleaseReconciler) networkPeeringClaimExists(
 			Kind:       "Network",
 		},
 	}
-	claimerKey := client.ObjectKey{Namespace: network.Namespace, Name: peeringClaimRef.Name}
+	claimerKey := client.ObjectKey{Namespace: peeringClaimRef.Namespace, Name: peeringClaimRef.Name}
 	if err := r.APIReader.Get(ctx, claimerKey, claimer); err != nil {
 		if !apierrors.IsNotFound(err) {
 			return false, fmt.Errorf("error getting claiming network %s: %w", peeringClaimRef.Name, err)
