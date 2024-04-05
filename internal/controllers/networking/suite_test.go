@@ -119,6 +119,7 @@ var _ = BeforeSuite(func() {
 	Expect(networkingclient.SetupNetworkInterfaceVirtualIPNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 	Expect(networkingclient.SetupLoadBalancerNetworkNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 	Expect(networkingclient.SetupNATGatewayNetworkNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+	Expect(networkingclient.SetupNetworkSpecPeeringClaimRefNamesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 	Expect(networkingclient.SetupNetworkInterfacePrefixNamesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 	Expect(networkingclient.SetupLoadBalancerPrefixNamesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 
@@ -136,6 +137,11 @@ var _ = BeforeSuite(func() {
 	err = (&NetworkProtectionReconciler{
 		Client: k8sManager.GetClient(),
 		Scheme: k8sManager.GetScheme(),
+	}).SetupWithManager(k8sManager)
+	Expect(err).NotTo(HaveOccurred())
+
+	err = (&NetworkPeeringReconciler{
+		Client: k8sManager.GetClient(),
 	}).SetupWithManager(k8sManager)
 	Expect(err).NotTo(HaveOccurred())
 

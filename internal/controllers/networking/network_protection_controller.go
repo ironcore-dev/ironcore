@@ -141,6 +141,10 @@ func (r *NetworkProtectionReconciler) isNetworkInUse(ctx context.Context, log lo
 			Type:  &networkingv1alpha1.NATGateway{},
 			Field: networking.NATGatewayNetworkNameField,
 		},
+		{
+			Type:  &networkingv1alpha1.Network{},
+			Field: networking.NetworkSpecPeeringClaimRefNamesField,
+		},
 	}
 
 	for _, typeAndField := range typesAndFields {
@@ -148,7 +152,7 @@ func (r *NetworkProtectionReconciler) isNetworkInUse(ctx context.Context, log lo
 		if err != nil {
 			return false, fmt.Errorf("error checking if network is in use by %T: %w", typeAndField.Type, err)
 		}
-		if err != nil || ok {
+		if ok {
 			return ok, err
 		}
 	}
@@ -171,6 +175,10 @@ func (r *NetworkProtectionReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Watches(
 			&networkingv1alpha1.NATGateway{},
 			r.enqueueByNATGateway(),
+		).
+		Watches(
+			&networkingv1alpha1.Network{},
+			r.enqueueByPeeredNetwork(),
 		).
 		Complete(r)
 }
@@ -215,6 +223,40 @@ func (r *NetworkProtectionReconciler) enqueueByNATGateway() handler.EventHandler
 			Name:      natGateway.Spec.NetworkRef.Name,
 		}
 		res = append(res, ctrl.Request{NamespacedName: networkKey})
+
+		return res
+	})
+}
+
+func (r *NetworkProtectionReconciler) enqueueByPeeredNetwork() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
+		network := obj.(*networkingv1alpha1.Network)
+		log := ctrl.LoggerFrom(ctx)
+
+		networkList := &networkingv1alpha1.NetworkList{}
+		if err := r.List(ctx, networkList); err != nil {
+			log.Error(err, "Error listing networks")
+			return nil
+		}
+
+		var res []ctrl.Request
+		for _, targetNetwork := range networkList.Items {
+			var found bool
+			for _, claimRef := range targetNetwork.Spec.PeeringClaimRefs {
+				if claimRef.UID == network.UID {
+					networkKey := types.NamespacedName{
+						Namespace: claimRef.Namespace,
+						Name:      claimRef.Name,
+					}
+					res = append(res, ctrl.Request{NamespacedName: networkKey})
+					found = true
+					break
+				}
+			}
+			if found {
+				break
+			}
+		}
 
 		return res
 	})

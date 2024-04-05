@@ -76,6 +76,7 @@ const (
 	loadBalancerController                       = "loadbalancer"
 	loadBalancerEphemeralPrefixController        = "loadbalancerephemeralprefix"
 	networkProtectionController                  = "networkprotection"
+	networkPeeringController                     = "networkpeering"
 	networkReleaseController                     = "networkrelease"
 	networkInterfaceEphemeralPrefixController    = "networkinterfaceephemeralprefix"
 	networkInterfaceEphemeralVirtualIPController = "networkinterfaceephemeralvirtualip"
@@ -341,6 +342,15 @@ func main() {
 		}
 	}
 
+	if controllers.Enabled(networkPeeringController) {
+		if err := (&networkingcontrollers.NetworkPeeringReconciler{
+			Client: mgr.GetClient(),
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "NetworkPeering")
+			os.Exit(1)
+		}
+	}
+
 	if controllers.Enabled(networkReleaseController) {
 		if err := (&networkingcontrollers.NetworkReleaseReconciler{
 			Client:       mgr.GetClient(),
@@ -519,6 +529,13 @@ func main() {
 	if controllers.AnyEnabled(networkProtectionController) {
 		if err := networkingclient.SetupNATGatewayNetworkNameFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
 			setupLog.Error(err, "unable to setup field indexer", "field", networkingclient.NATGatewayNetworkNameField)
+			os.Exit(1)
+		}
+	}
+
+	if controllers.AnyEnabled(networkProtectionController) {
+		if err := networkingclient.SetupNetworkSpecPeeringClaimRefNamesFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
+			setupLog.Error(err, "unable to setup field indexer", "field", networkingclient.NetworkSpecPeeringClaimRefNamesField)
 			os.Exit(1)
 		}
 	}
