@@ -23,6 +23,7 @@ GOBIN=$(shell go env GOPATH)/bin
 else
 GOBIN=$(shell go env GOBIN)
 endif
+BUILDARGS ?=
 
 # Setting SHELL to bash allows bash commands to be executed by recipes.
 # This is a requirement for 'setup-envtest.sh' in the test target.
@@ -186,47 +187,47 @@ docker-build: \
 
 .PHONY: docker-build-ironcore-apiserver
 docker-build-ironcore-apiserver: ## Build ironcore-apiserver.
-	docker build --target apiserver -t ${APISERVER_IMG} .
+	docker build $(BUILDARGS) --target apiserver -t ${APISERVER_IMG} . --load
 
 .PHONY: docker-build-ironcore-controller-manager
 docker-build-ironcore-controller-manager: ## Build ironcore-controller-manager.
-	docker build --target manager -t ${CONTROLLER_IMG} .
+	docker build $(BUILDARGS) --target manager -t ${CONTROLLER_IMG} . --load
 
 .PHONY: docker-build-machinepoollet
 docker-build-machinepoollet: ## Build machinepoollet image.
-	docker build --target machinepoollet -t ${MACHINEPOOLLET_IMG} .
+	docker build $(BUILDARGS) --target machinepoollet -t ${MACHINEPOOLLET_IMG} . --load
 
 .PHONY: docker-build-machinebroker
 docker-build-machinebroker: ## Build machinebroker image.
-	docker build --target machinebroker -t ${MACHINEBROKER_IMG} .
+	docker build $(BUILDARGS) --target machinebroker -t ${MACHINEBROKER_IMG} . --load
 
 .PHONY: docker-build-irictl-machine
 docker-build-irictl-machine: ## Build irictl-machine image.
-	docker build --target irictl-machine -t ${IRICTL_MACHINE_IMG} .
+	docker build $(BUILDARGS) --target irictl-machine -t ${IRICTL_MACHINE_IMG} . --load
 
 .PHONY: docker-build-volumepoollet
 docker-build-volumepoollet: ## Build volumepoollet image.
-	docker build --target volumepoollet -t ${VOLUMEPOOLLET_IMG} .
+	docker build $(BUILDARGS) --target volumepoollet -t ${VOLUMEPOOLLET_IMG} . --load
 
 .PHONY: docker-build-volumebroker
 docker-build-volumebroker: ## Build volumebroker image.
-	docker build --target volumebroker -t ${VOLUMEBROKER_IMG} .
+	docker build $(BUILDARGS) --target volumebroker -t ${VOLUMEBROKER_IMG} . --load
 
 .PHONY: docker-build-irictl-volume
 docker-build-irictl-volume: ## Build irictl-volume image.
-	docker build --target irictl-volume -t ${IRICTL_VOLUME_IMG} .
+	docker build $(BUILDARGS) --target irictl-volume -t ${IRICTL_VOLUME_IMG} . --load
 
 .PHONY: docker-build-bucketpoollet
 docker-build-bucketpoollet: ## Build bucketpoollet image.
-	docker build --target bucketpoollet -t ${BUCKETPOOLLET_IMG} .
+	docker build $(BUILDARGS) --target bucketpoollet -t ${BUCKETPOOLLET_IMG} . --load
 
 .PHONY: docker-build-bucketbroker
 docker-build-bucketbroker: ## Build bucketbroker image.
-	docker build --target bucketbroker -t ${BUCKETBROKER_IMG} .
+	docker build $(BUILDARGS) --target bucketbroker -t ${BUCKETBROKER_IMG} . --load
 
 .PHONY: docker-build-irictl-bucket
 docker-build-irictl-bucket: ## Build irictl-bucket image.
-	docker build --target irictl-bucket -t ${IRICTL_BUCKET_IMG} .
+	docker build $(BUILDARGS) --target irictl-bucket -t ${IRICTL_BUCKET_IMG} . --load
 
 .PHONY: docker-push
 docker-push: ## Push docker image with the manager.
@@ -257,11 +258,11 @@ undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/confi
 
 .PHONY: kind-build-apiserver
 kind-build-apiserver: ## Build the apiserver for usage in kind.
-	docker build --target apiserver -t apiserver .
+	docker build $(BUILDARGS) --target apiserver -t apiserver .
 
 .PHONY: kind-build-controller
 kind-build-controller: ## Build the controller for usage in kind.
-	docker build --target manager -t controller .
+	docker build $(BUILDARGS) --target manager -t controller .
 
 .PHONY: kind-build
 kind-build: kind-build-apiserver kind-build-controller ## Build the apiserver and controller for usage in kind.
