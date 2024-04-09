@@ -12,6 +12,10 @@ import (
 type NetworkSpec struct {
 	// ProviderID is the provider-internal ID of the network.
 	ProviderID string `json:"providerID,omitempty"`
+
+	// InternetGateway is a flag that indicates whether the network has an internet gateway.
+	InternetGateway bool `json:"internetGateway,omitempty"`
+
 	// Peerings are the network peerings with this network.
 	// +optional
 	// +patchMergeKey=name

@@ -1143,6 +1143,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementRelationship: associative
           keys:
           - name
+    - name: internetGateway
+      type:
+        scalar: boolean
     - name: peerings
       type:
         list:

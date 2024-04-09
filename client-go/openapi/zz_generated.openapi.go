@@ -4143,6 +4143,13 @@ func schema_ironcore_api_networking_v1alpha1_NetworkSpec(ref common.ReferenceCal
 							Format:      "",
 						},
 					},
+					"internetGateway": {
+						SchemaProps: spec.SchemaProps{
+							Description: "InternetGateway is a flag that indicates whether the network has an internet gateway.",
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
 					"peerings": {
 						VendorExtensible: spec.VendorExtensible{
 							Extensions: spec.Extensions{

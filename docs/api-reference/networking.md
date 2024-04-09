@@ -444,6 +444,17 @@ string
 </tr>
 <tr>
 <td>
+<code>internetGateway</code><br/>
+<em>
+bool
+</em>
+</td>
+<td>
+<p>InternetGateway is a flag that indicates whether the network has an internet gateway.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>peerings</code><br/>
 <em>
 <a href="#networking.ironcore.dev/v1alpha1.NetworkPeering">
@@ -2003,6 +2014,29 @@ string
 </tr>
 </tbody>
 </table>
+<h3 id="networking.ironcore.dev/v1alpha1.NetworkPeeringState">NetworkPeeringState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.NetworkPeeringStatus">NetworkPeeringStatus</a>)
+</p>
+<div>
+<p>NetworkPeeringState is the state a NetworkPeering can be in</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Applied&#34;</p></td>
+<td><p>NetworkPeeringStateApplied signals that the network peering is applied.</p>
+</td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>NetworkPeeringStatePending signals that the network peering is not applied.</p>
+</td>
+</tr></tbody>
+</table>
 <h3 id="networking.ironcore.dev/v1alpha1.NetworkPeeringStatus">NetworkPeeringStatus
 </h3>
 <p>
@@ -2028,6 +2062,19 @@ string
 </td>
 <td>
 <p>Name is the name of the network peering.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>state</code><br/>
+<em>
+<a href="#networking.ironcore.dev/v1alpha1.NetworkPeeringState">
+NetworkPeeringState
+</a>
+</em>
+</td>
+<td>
+<p>State represents the network peering state</p>
 </td>
 </tr>
 </tbody>
@@ -2468,6 +2515,17 @@ string
 </td>
 <td>
 <p>ProviderID is the provider-internal ID of the network.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>internetGateway</code><br/>
+<em>
+bool
+</em>
+</td>
+<td>
+<p>InternetGateway is a flag that indicates whether the network has an internet gateway.</p>
 </td>
 </tr>
 <tr>

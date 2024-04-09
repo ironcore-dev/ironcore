@@ -9,6 +9,7 @@ package v1alpha1
 // with apply.
 type NetworkSpecApplyConfiguration struct {
 	ProviderID       *string                                    `json:"providerID,omitempty"`
+	InternetGateway  *bool                                      `json:"internetGateway,omitempty"`
 	Peerings         []NetworkPeeringApplyConfiguration         `json:"peerings,omitempty"`
 	PeeringClaimRefs []NetworkPeeringClaimRefApplyConfiguration `json:"incomingPeerings,omitempty"`
 }
@@ -24,6 +25,14 @@ func NetworkSpec() *NetworkSpecApplyConfiguration {
 // If called multiple times, the ProviderID field is set to the value of the last call.
 func (b *NetworkSpecApplyConfiguration) WithProviderID(value string) *NetworkSpecApplyConfiguration {
 	b.ProviderID = &value
+	return b
+}
+
+// WithInternetGateway sets the InternetGateway field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the InternetGateway field is set to the value of the last call.
+func (b *NetworkSpecApplyConfiguration) WithInternetGateway(value bool) *NetworkSpecApplyConfiguration {
+	b.InternetGateway = &value
 	return b
 }
 
