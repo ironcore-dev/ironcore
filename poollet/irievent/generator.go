@@ -130,7 +130,7 @@ type GeneratorOptions struct {
 
 func setGeneratorOptionsDefaults(o *GeneratorOptions) {
 	if o.ChannelCapacity == 0 {
-		o.ChannelCapacity = 1024
+		o.ChannelCapacity = 8192
 	}
 	if o.RelistPeriod <= 0 {
 		o.RelistPeriod = 1 * time.Second
