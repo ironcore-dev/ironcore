@@ -66,6 +66,8 @@ func (s *Server) aggregateIronCoreMachine(
 	rd client.Reader,
 	ironcoreMachine *computev1alpha1.Machine,
 ) (*AggregateIronCoreMachine, error) {
+	log := s.loggerFrom(ctx)
+
 	var ignitionSecret *corev1.Secret
 	if ignitionRef := ironcoreMachine.Spec.IgnitionRef; ignitionRef != nil {
 		secret := &corev1.Secret{}
@@ -89,10 +91,12 @@ func (s *Server) aggregateIronCoreMachine(
 
 			aggIronCoreNic, err := s.aggregateIronCoreNetworkInterface(ctx, rd, ironcoreNic)
 			if err != nil {
-				return nil, fmt.Errorf("error aggregating network interface: %w", err)
+				log.Error(err, fmt.Sprintf("error aggregating network interface %s", ironcoreNic.Name))
 			}
 
-			aggIronCoreNics[machineNic.Name] = aggIronCoreNic
+			if aggIronCoreNic != nil {
+				aggIronCoreNics[machineNic.Name] = aggIronCoreNic
+			}
 		}
 	}
 
