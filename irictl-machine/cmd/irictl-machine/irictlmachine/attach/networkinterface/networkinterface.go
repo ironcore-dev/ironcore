@@ -70,7 +70,10 @@ func Run(ctx context.Context, streams clicommon.Streams, client iri.MachineRunti
 		return err
 	}
 
-	if _, err := client.AttachNetworkInterface(ctx, &iri.AttachNetworkInterfaceRequest{NetworkInterface: networkInterface}); err != nil {
+	if _, err := client.AttachNetworkInterface(ctx, &iri.AttachNetworkInterfaceRequest{
+		MachineId:        opts.MachineID,
+		NetworkInterface: networkInterface,
+	}); err != nil {
 		return err
 	}
 
