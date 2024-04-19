@@ -110,8 +110,8 @@ var _ = Describe("Admission", func() {
 		By("patching the Volume to increase the Volume size")
 		volumeBase := volume.DeepCopy()
 		volume.Spec.Resources[corev1alpha1.ResourceStorage] = resource.MustParse("2Gi")
-		Expect(k8sClient.Patch(ctx, volume, client.MergeFrom(volumeBase))).Should(
-			MatchError(apierrors.NewBadRequest("VolumeClass ResizePolicy does not allow resizing")))
+		Expect(k8sClient.Patch(ctx, volume, client.MergeFrom(volumeBase))).To(
+			MatchError(apierrors.NewBadRequest("VolumeClass ResizePolicy does not allow resizing").Error()))
 
 		By("ensuring that Volume has been resized")
 		Consistently(Object(volume)).Should(SatisfyAll(
@@ -141,8 +141,8 @@ var _ = Describe("Admission", func() {
 		By("patching the Volume to decrease the Volume size")
 		volumeBase := volume.DeepCopy()
 		volume.Spec.Resources[corev1alpha1.ResourceStorage] = resource.MustParse("1Gi")
-		Expect(k8sClient.Patch(ctx, volume, client.MergeFrom(volumeBase))).Should(
-			MatchError(apierrors.NewBadRequest("VolumeClass ResizePolicy does not allow shrinking")))
+		Expect(k8sClient.Patch(ctx, volume, client.MergeFrom(volumeBase))).To(
+			MatchError(apierrors.NewBadRequest("VolumeClass ResizePolicy does not allow shrinking").Error()))
 
 		By("ensuring that Volume has been resized")
 		Consistently(Object(volume)).Should(SatisfyAll(

@@ -1,6 +1,6 @@
 module github.com/ironcore-dev/ironcore
 
-go 1.21
+go 1.22.2
 
 require (
 	github.com/bits-and-blooms/bitset v1.13.0
