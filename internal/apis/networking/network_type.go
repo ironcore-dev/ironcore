@@ -74,8 +74,10 @@ type NetworkPeeringState string
 const (
 	// NetworkPeeringStatePending signals that the network peering is not applied.
 	NetworkPeeringStatePending NetworkPeeringState = "Pending"
-	// NetworkPeeringStateApplied signals that the network peering is applied.
-	NetworkPeeringStateApplied NetworkPeeringState = "Applied"
+	// NetworkPeeringStateReady signals that the network peering is ready.
+	NetworkPeeringStateReady NetworkPeeringState = "Ready"
+	// NetworkPeeringStateError signals that the network peering is in error state.
+	NetworkPeeringStateError NetworkPeeringState = "Error"
 )
 
 // NetworkPeeringStatus is the status of a network peering.
