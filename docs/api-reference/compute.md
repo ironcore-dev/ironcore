@@ -1178,6 +1178,9 @@ MachinePool.</p>
 </tr><tr><td><p>&#34;Terminated&#34;</p></td>
 <td><p>MachineStateTerminated means the machine has been permanently stopped and cannot be started.</p>
 </td>
+</tr><tr><td><p>&#34;Terminating&#34;</p></td>
+<td><p>MachineStateTerminating means the machine that is terminating.</p>
+</td>
 </tr></tbody>
 </table>
 <h3 id="compute.ironcore.dev/v1alpha1.MachineStatus">MachineStatus
