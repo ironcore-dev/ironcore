@@ -551,7 +551,7 @@ var _ = Describe("NetworkPeeringController", func() {
 		Eventually(Get(network3)).Should(Satisfy(apierrors.IsNotFound))
 	})
 
-	It("should skip network peering for that network only if network does not exist referencing a single parent network", func(ctx SpecContext) {
+	It("should skip network peering for a non-existing network", func(ctx SpecContext) {
 		By("creating a network network-1")
 		network1 := &networkingv1alpha1.Network{
 			ObjectMeta: metav1.ObjectMeta{
