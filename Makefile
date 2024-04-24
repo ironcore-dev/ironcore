@@ -158,7 +158,7 @@ test: manifests generate fmt vet test-only ## Run tests.
 test-only: envtest ## Run *only* the tests - no generation, linting etc.
 	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" go test ./... -coverprofile cover.out
 
-.PHONY: openapi-extractor
+.PHONY: extract-openapi
 extract-openapi: envtest openapi-extractor
 	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" $(OPENAPI_EXTRACTOR) \
 		--apiserver-package="github.com/ironcore-dev/ironcore/cmd/ironcore-apiserver" \
