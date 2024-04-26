@@ -11910,6 +11910,10 @@
 						"description": "Name is the name of the network peering.",
 						"type": "string",
 						"default": ""
+					},
+					"state": {
+						"description": "State represents the network peering state",
+						"type": "string"
 					}
 				}
 			},

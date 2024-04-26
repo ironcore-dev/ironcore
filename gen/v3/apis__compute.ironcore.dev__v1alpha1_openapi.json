@@ -4706,13 +4706,14 @@
 						"format": "int64"
 					},
 					"state": {
-						"description": "State is the infrastructure state of the machine.\n\nPossible enum values:\n - `\"Pending\"` means the Machine has been accepted by the system, but not yet completely started. This includes time before being bound to a MachinePool, as well as time spent setting up the Machine on that MachinePool.\n - `\"Running\"` means the machine is running on a MachinePool.\n - `\"Shutdown\"` means the machine is shut down.\n - `\"Terminated\"` means the machine has been permanently stopped and cannot be started.",
+						"description": "State is the infrastructure state of the machine.\n\nPossible enum values:\n - `\"Pending\"` means the Machine has been accepted by the system, but not yet completely started. This includes time before being bound to a MachinePool, as well as time spent setting up the Machine on that MachinePool.\n - `\"Running\"` means the machine is running on a MachinePool.\n - `\"Shutdown\"` means the machine is shut down.\n - `\"Terminated\"` means the machine has been permanently stopped and cannot be started.\n - `\"Terminating\"` means the machine that is terminating.",
 						"type": "string",
 						"enum": [
 							"Pending",
 							"Running",
 							"Shutdown",
-							"Terminated"
+							"Terminated",
+							"Terminating"
 						]
 					},
 					"volumes": {
