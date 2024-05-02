@@ -62,6 +62,8 @@ type Options struct {
 	VolumeRuntimeSocketDiscoveryTimeout time.Duration
 	VolumeClassMapperSyncTimeout        time.Duration
 
+	ChannelCapacity int
+
 	WatchFilterValue string
 }
 
@@ -81,6 +83,9 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.DurationVar(&o.DialTimeout, "dial-timeout", 1*time.Second, "Timeout for dialing to the volume runtime endpoint.")
 	fs.DurationVar(&o.VolumeRuntimeSocketDiscoveryTimeout, "volume-runtime-discovery-timeout", 20*time.Second, "Timeout for discovering the volume runtime socket.")
 	fs.DurationVar(&o.VolumeClassMapperSyncTimeout, "vcm-sync-timeout", 10*time.Second, "Timeout waiting for the volume class mapper to sync.")
+
+	fs.IntVar(&o.ChannelCapacity, "channel-capacity", 1024, "channel capacity for the volume event generator")
+
 	fs.StringVar(&o.WatchFilterValue, "watch-filter", "", "Value to filter for while watching.")
 }
 
@@ -187,7 +192,9 @@ func Run(ctx context.Context, opts Options) error {
 			return nil, err
 		}
 		return res.Volumes, nil
-	}, irievent.GeneratorOptions{})
+	}, irievent.GeneratorOptions{
+		ChannelCapacity: opts.ChannelCapacity,
+	})
 	if err := mgr.Add(volumeEvents); err != nil {
 		return fmt.Errorf("error adding volume event generator: %w", err)
 	}
