@@ -61,6 +61,8 @@ type Options struct {
 	BucketRuntimeSocketDiscoveryTimeout time.Duration
 	BucketClassMapperSyncTimeout        time.Duration
 
+	ChannelCapacity int
+
 	WatchFilterValue string
 }
 
@@ -80,6 +82,8 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.DurationVar(&o.DialTimeout, "dial-timeout", 1*time.Second, "Timeout for dialing to the bucket runtime endpoint.")
 	fs.DurationVar(&o.BucketRuntimeSocketDiscoveryTimeout, "bucket-runtime-discovery-timeout", 20*time.Second, "Timeout for discovering the bucket runtime socket.")
 	fs.DurationVar(&o.BucketClassMapperSyncTimeout, "bcm-sync-timeout", 10*time.Second, "Timeout waiting for the bucket class mapper to sync.")
+
+	fs.IntVar(&o.ChannelCapacity, "channel-capacity", 1024, "channel capacity for the bucket event generator")
 
 	fs.StringVar(&o.WatchFilterValue, "watch-filter", "", "Value to filter for while watching.")
 }
@@ -187,7 +191,9 @@ func Run(ctx context.Context, opts Options) error {
 			return nil, err
 		}
 		return res.Buckets, nil
-	}, irievent.GeneratorOptions{})
+	}, irievent.GeneratorOptions{
+		ChannelCapacity: opts.ChannelCapacity,
+	})
 	if err := mgr.Add(bucketEvents); err != nil {
 		return fmt.Errorf("error adding bucket event generator: %w", err)
 	}

@@ -71,6 +71,8 @@ type Options struct {
 	DialTimeout                          time.Duration
 	MachineClassMapperSyncTimeout        time.Duration
 
+	ChannelCapacity int
+
 	ServerFlags server.Flags
 
 	AddressesOptions addresses.GetOptions
@@ -96,6 +98,8 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.DurationVar(&o.MachineRuntimeSocketDiscoveryTimeout, "machine-runtime-socket-discovery-timeout", 20*time.Second, "Timeout for discovering the machine runtime socket.")
 	fs.DurationVar(&o.DialTimeout, "dial-timeout", 1*time.Second, "Timeout for dialing to the machine runtime endpoint.")
 	fs.DurationVar(&o.MachineClassMapperSyncTimeout, "mcm-sync-timeout", 10*time.Second, "Timeout waiting for the machine class mapper to sync.")
+
+	fs.IntVar(&o.ChannelCapacity, "channel-capacity", 1024, "channel capacity for the machine event generator")
 
 	o.ServerFlags.BindFlags(fs)
 
@@ -261,7 +265,9 @@ func Run(ctx context.Context, opts Options) error {
 			return nil, err
 		}
 		return res.Machines, nil
-	}, irievent.GeneratorOptions{})
+	}, irievent.GeneratorOptions{
+		ChannelCapacity: opts.ChannelCapacity,
+	})
 	if err := mgr.Add(machineEvents); err != nil {
 		return fmt.Errorf("error adding machine event generator: %w", err)
 	}
