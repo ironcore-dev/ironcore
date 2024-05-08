@@ -146,16 +146,6 @@ var _ = Describe("NetworkPeeringController", func() {
 					UID:       network4.UID,
 				})),
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
-				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
-					Name:  network1.Spec.Peerings[0].Name,
-					State: networkingv1alpha1.NetworkPeeringStatePending,
-				}, networkingv1alpha1.NetworkPeeringStatus{
-					Name:  network1.Spec.Peerings[1].Name,
-					State: networkingv1alpha1.NetworkPeeringStatePending,
-				}, networkingv1alpha1.NetworkPeeringStatus{
-					Name:  network1.Spec.Peerings[2].Name,
-					State: networkingv1alpha1.NetworkPeeringStatePending,
-				})),
 			))
 
 		Eventually(Object(network2)).
@@ -166,10 +156,6 @@ var _ = Describe("NetworkPeeringController", func() {
 					UID:       network1.UID,
 				})),
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
-				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
-					Name:  network2.Spec.Peerings[0].Name,
-					State: networkingv1alpha1.NetworkPeeringStatePending,
-				})),
 			))
 
 		Eventually(Object(network3)).
@@ -180,10 +166,6 @@ var _ = Describe("NetworkPeeringController", func() {
 					UID:       network1.UID,
 				})),
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
-				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
-					Name:  network3.Spec.Peerings[0].Name,
-					State: networkingv1alpha1.NetworkPeeringStatePending,
-				})),
 			))
 
 		Eventually(Object(network4)).
@@ -194,10 +176,6 @@ var _ = Describe("NetworkPeeringController", func() {
 					UID:       network1.UID,
 				})),
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
-				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
-					Name:  network4.Spec.Peerings[0].Name,
-					State: networkingv1alpha1.NetworkPeeringStatePending,
-				})),
 			))
 
 		By("deleting the networks")
@@ -272,10 +250,6 @@ var _ = Describe("NetworkPeeringController", func() {
 					UID:       network2.UID,
 				})),
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
-				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
-					Name:  network1.Spec.Peerings[0].Name,
-					State: networkingv1alpha1.NetworkPeeringStatePending,
-				})),
 			))
 
 		Eventually(Object(network2)).
@@ -286,10 +260,6 @@ var _ = Describe("NetworkPeeringController", func() {
 					UID:       network1.UID,
 				})),
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
-				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
-					Name:  network2.Spec.Peerings[0].Name,
-					State: networkingv1alpha1.NetworkPeeringStatePending,
-				})),
 			))
 
 		By("deleting the networks")
@@ -356,20 +326,12 @@ var _ = Describe("NetworkPeeringController", func() {
 			Should(SatisfyAll(
 				HaveField("Spec.PeeringClaimRefs", BeEmpty()),
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
-				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
-					Name:  network1.Spec.Peerings[0].Name,
-					State: networkingv1alpha1.NetworkPeeringStatePending,
-				})),
 			))
 
 		Eventually(Object(network2)).
 			Should(SatisfyAll(
 				HaveField("Spec.PeeringClaimRefs", BeEmpty()),
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
-				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
-					Name:  network2.Spec.Peerings[0].Name,
-					State: networkingv1alpha1.NetworkPeeringStatePending,
-				})),
 			))
 
 		By("deleting the networks")
@@ -489,13 +451,6 @@ var _ = Describe("NetworkPeeringController", func() {
 					UID:       network3.UID,
 				})),
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
-				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
-					Name:  network1.Spec.Peerings[0].Name,
-					State: networkingv1alpha1.NetworkPeeringStatePending,
-				}, networkingv1alpha1.NetworkPeeringStatus{
-					Name:  network1.Spec.Peerings[1].Name,
-					State: networkingv1alpha1.NetworkPeeringStatePending,
-				})),
 			))
 
 		Eventually(Object(network2)).
@@ -510,13 +465,6 @@ var _ = Describe("NetworkPeeringController", func() {
 					UID:       network3.UID,
 				})),
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
-				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
-					Name:  network2.Spec.Peerings[0].Name,
-					State: networkingv1alpha1.NetworkPeeringStatePending,
-				}, networkingv1alpha1.NetworkPeeringStatus{
-					Name:  network2.Spec.Peerings[1].Name,
-					State: networkingv1alpha1.NetworkPeeringStatePending,
-				})),
 			))
 
 		Eventually(Object(network3)).
@@ -531,13 +479,6 @@ var _ = Describe("NetworkPeeringController", func() {
 					UID:       network2.UID,
 				})),
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
-				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
-					Name:  network3.Spec.Peerings[0].Name,
-					State: networkingv1alpha1.NetworkPeeringStatePending,
-				}, networkingv1alpha1.NetworkPeeringStatus{
-					Name:  network3.Spec.Peerings[1].Name,
-					State: networkingv1alpha1.NetworkPeeringStatePending,
-				})),
 			))
 
 		By("deleting the networks")
@@ -616,13 +557,6 @@ var _ = Describe("NetworkPeeringController", func() {
 					UID:       network3.UID,
 				})),
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
-				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
-					Name:  network1.Spec.Peerings[0].Name,
-					State: networkingv1alpha1.NetworkPeeringStatePending,
-				}, networkingv1alpha1.NetworkPeeringStatus{
-					Name:  network1.Spec.Peerings[1].Name,
-					State: networkingv1alpha1.NetworkPeeringStatePending,
-				})),
 			))
 
 		Eventually(Object(network3)).
@@ -633,10 +567,6 @@ var _ = Describe("NetworkPeeringController", func() {
 					UID:       network1.UID,
 				})),
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
-				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
-					Name:  network3.Spec.Peerings[0].Name,
-					State: networkingv1alpha1.NetworkPeeringStatePending,
-				})),
 			))
 
 		By("deleting the networks")

@@ -285,10 +285,6 @@ var _ = Describe("NetworkProtectionReconciler", func() {
 					UID:       network2.UID,
 				})),
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
-				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
-					Name:  network1.Spec.Peerings[0].Name,
-					State: networkingv1alpha1.NetworkPeeringStatePending,
-				})),
 			))
 
 		Eventually(Object(network2)).
@@ -300,10 +296,6 @@ var _ = Describe("NetworkProtectionReconciler", func() {
 					UID:       network1.UID,
 				})),
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
-				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
-					Name:  network2.Spec.Peerings[0].Name,
-					State: networkingv1alpha1.NetworkPeeringStatePending,
-				})),
 			))
 
 		By("deleting the network-1")

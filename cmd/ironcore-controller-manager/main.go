@@ -138,6 +138,7 @@ func main() {
 		loadBalancerController,
 		loadBalancerEphemeralPrefixController,
 		networkProtectionController,
+		networkPeeringController,
 		networkReleaseController,
 		networkInterfaceEphemeralPrefixController,
 		networkInterfaceEphemeralVirtualIPController,
