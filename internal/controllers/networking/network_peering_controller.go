@@ -47,7 +47,6 @@ func (r *NetworkPeeringReconciler) reconcile(ctx context.Context, log logr.Logge
 	log.V(1).Info("Reconcile")
 
 	var peeringClaimRefs []networkingv1alpha1.NetworkPeeringClaimRef
-	var peeringNames []string
 
 	for _, peering := range network.Spec.Peerings {
 		peeringClaimRef, err := r.reconcilePeering(ctx, log, network, peering)
@@ -59,10 +58,6 @@ func (r *NetworkPeeringReconciler) reconcile(ctx context.Context, log logr.Logge
 		if peeringClaimRef != (networkingv1alpha1.NetworkPeeringClaimRef{}) {
 			peeringClaimRefs = append(peeringClaimRefs, peeringClaimRef)
 		}
-
-		if peering.Name != "" {
-			peeringNames = append(peeringNames, peering.Name)
-		}
 	}
 
 	if len(peeringClaimRefs) > 0 {
@@ -72,40 +67,8 @@ func (r *NetworkPeeringReconciler) reconcile(ctx context.Context, log logr.Logge
 		}
 	}
 
-	if len(peeringNames) > 0 {
-		log.V(1).Info("Network peering status require network status update")
-		if err := r.updateStatus(ctx, log, network, peeringNames); err != nil {
-			return ctrl.Result{}, fmt.Errorf("error updating network status: %w", err)
-		}
-	}
-
 	log.V(1).Info("Reconciled")
 	return ctrl.Result{}, nil
-}
-
-func (r *NetworkPeeringReconciler) updateStatus(
-	ctx context.Context,
-	log logr.Logger,
-	network *networkingv1alpha1.Network,
-	peeringNames []string,
-) error {
-	base := network.DeepCopy()
-	newStatusPeerings := make([]networkingv1alpha1.NetworkPeeringStatus, 0, len(peeringNames))
-	for _, name := range peeringNames {
-		newStatusPeerings = append(newStatusPeerings, networkingv1alpha1.NetworkPeeringStatus{
-			Name:  name,
-			State: networkingv1alpha1.NetworkPeeringStatePending,
-		})
-	}
-	network.Status.Peerings = newStatusPeerings
-
-	log.V(1).Info("Updating network status peerings", "", network.Status.Peerings)
-	if err := r.Status().Patch(ctx, network, client.StrategicMergeFrom(base)); err != nil {
-		return fmt.Errorf("error updating network status peerings: %w", err)
-	}
-	log.V(1).Info("Updated network status peerings")
-
-	return nil
 }
 
 func (r *NetworkPeeringReconciler) updateSpec(
