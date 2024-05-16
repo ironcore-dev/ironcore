@@ -1,4 +1,4 @@
-# IronCore
+# Project IronCore
 
 [![REUSE status](https://api.reuse.software/badge/github.com/ironcore-dev/ironcore)](https://api.reuse.software/info/github.com/ironcore-dev/ironcore)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ironcore-dev/ironcore)](https://goreportcard.com/report/github.com/ironcore-dev/ironcore)
@@ -7,14 +7,15 @@
 
 <img src="docs/assets/logo.svg" alt="IronCore Logo" width="200" />
 
-IronCore is an open source system for managing compute and storage workloads across multiple
-providers.
+Project IronCore is an open source system for managing compute and storage workloads across multiple providers.
 
-The IronCore API is a declarative API, built on top of Kubernetes' API Machinery as an
-aggregated API server. The API does not have any tight coupling to Kubernetes core
-container workloads.
+The Project IronCore API is a declarative API, built on top of Kubernetes' API Machinery as an aggregated API server. 
+The API does not have any tight coupling to Kubernetes core container workloads.
 
-## To start developing IronCore
+“Project IronCore” is focused on a Kubernetes driven IaaS and is neither affiliated or sponsored by “IronCore Labs” nor 
+related to its GitHub page, nor its content under https://github.com/IronCoreLabs.
+
+## To start developing Project IronCore
 
 > ⚠️ Before contributing, make sure you read the [contribution guidelines](docs/development/contribution.md)
 
