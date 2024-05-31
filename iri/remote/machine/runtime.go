@@ -18,7 +18,7 @@ type remoteRuntime struct {
 }
 
 func NewRemoteRuntime(endpoint string) (machine.RuntimeService, error) {
-	conn, err := grpc.Dial(endpoint,
+	conn, err := grpc.NewClient(endpoint,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {

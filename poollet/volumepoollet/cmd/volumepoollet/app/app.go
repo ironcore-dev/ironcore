@@ -138,7 +138,7 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error detecting volume runtime endpoint: %w", err)
 	}
 
-	conn, err := grpc.Dial(endpoint,
+	conn, err := grpc.NewClient(endpoint,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
