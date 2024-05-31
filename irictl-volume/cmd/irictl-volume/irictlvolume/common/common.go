@@ -43,7 +43,7 @@ func (o *ClientOptions) New() (iri.VolumeRuntimeClient, func() error, error) {
 		return nil, nil, err
 	}
 
-	conn, err := grpc.Dial(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, nil, fmt.Errorf("error dialing: %w", err)
 	}
