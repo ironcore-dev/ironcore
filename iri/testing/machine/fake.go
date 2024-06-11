@@ -70,6 +70,15 @@ type FakeRuntimeService struct {
 	GetExecURL         func(req *iri.ExecRequest) string
 }
 
+// ListEvents implements machine.RuntimeService.
+func (r *FakeRuntimeService) ListEvents(ctx context.Context, req *iri.ListEventsRequest) (*iri.ListEventsResponse, error) {
+	r.Lock()
+	defer r.Unlock()
+
+	var res []*iri.MachineEvents
+	return &iri.ListEventsResponse{MachineEvents: res}, nil
+}
+
 func NewFakeRuntimeService() *FakeRuntimeService {
 	return &FakeRuntimeService{
 		Machines:           make(map[string]*FakeMachine),

@@ -34,6 +34,10 @@ func (r *remoteRuntime) Version(ctx context.Context, req *iri.VersionRequest) (*
 	return r.client.Version(ctx, req)
 }
 
+func (r *remoteRuntime) ListEvents(ctx context.Context, req *iri.ListEventsRequest) (*iri.ListEventsResponse, error) {
+	return r.client.ListEvents(ctx, req)
+}
+
 func (r *remoteRuntime) ListMachines(ctx context.Context, req *iri.ListMachinesRequest) (*iri.ListMachinesResponse, error) {
 	return r.client.ListMachines(ctx, req)
 }

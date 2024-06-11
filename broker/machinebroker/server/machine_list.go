@@ -23,14 +23,8 @@ import (
 )
 
 func (s *Server) listAggregateIronCoreMachines(ctx context.Context) ([]AggregateIronCoreMachine, error) {
-	ironcoreMachineList := &computev1alpha1.MachineList{}
-	if err := s.cluster.Client().List(ctx, ironcoreMachineList,
-		client.InNamespace(s.cluster.Namespace()),
-		client.MatchingLabels{
-			machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
-			machinebrokerv1alpha1.CreatedLabel: "true",
-		},
-	); err != nil {
+	ironcoreMachineList, err := s.listIroncoreMachine(ctx)
+	if err != nil {
 		return nil, fmt.Errorf("error listing ironcore machines: %w", err)
 	}
 
@@ -59,6 +53,20 @@ func (s *Server) listAggregateIronCoreMachines(ctx context.Context) ([]Aggregate
 		res = append(res, *aggregateIronCoreMachine)
 	}
 	return res, nil
+}
+
+func (s *Server) listIroncoreMachine(ctx context.Context) (*computev1alpha1.MachineList, error) {
+	ironcoreMachineList := &computev1alpha1.MachineList{}
+	if err := s.cluster.Client().List(ctx, ironcoreMachineList,
+		client.InNamespace(s.cluster.Namespace()),
+		client.MatchingLabels{
+			machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
+			machinebrokerv1alpha1.CreatedLabel: "true",
+		},
+	); err != nil {
+		return nil, err
+	}
+	return ironcoreMachineList, nil
 }
 
 func (s *Server) aggregateIronCoreMachine(
