@@ -964,6 +964,12 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPeeringNetworkRef
       default: {}
+    - name: prefixes
+      type:
+        list:
+          elementType:
+            namedType: com.github.ironcore-dev.ironcore.api.networking.v1alpha1.PeeringPrefix
+          elementRelationship: atomic
 - name: com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPeeringClaimRef
   map:
     fields:
@@ -994,6 +1000,12 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
+    - name: prefixes
+      type:
+        list:
+          elementType:
+            namedType: com.github.ironcore-dev.ironcore.api.networking.v1alpha1.PeeringPrefixStatus
+          elementRelationship: atomic
     - name: state
       type:
         scalar: string
@@ -1168,6 +1180,40 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: state
       type:
         scalar: string
+- name: com.github.ironcore-dev.ironcore.api.networking.v1alpha1.PeeringPrefix
+  map:
+    fields:
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: prefix
+      type:
+        namedType: com.github.ironcore-dev.ironcore.api.common.v1alpha1.IPPrefix
+    - name: prefixRef
+      type:
+        namedType: com.github.ironcore-dev.ironcore.api.networking.v1alpha1.PeeringPrefixRef
+      default: {}
+- name: com.github.ironcore-dev.ironcore.api.networking.v1alpha1.PeeringPrefixRef
+  map:
+    fields:
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: namespace
+      type:
+        scalar: string
+- name: com.github.ironcore-dev.ironcore.api.networking.v1alpha1.PeeringPrefixStatus
+  map:
+    fields:
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: prefix
+      type:
+        namedType: com.github.ironcore-dev.ironcore.api.common.v1alpha1.IPPrefix
 - name: com.github.ironcore-dev.ironcore.api.networking.v1alpha1.PrefixSource
   map:
     fields:

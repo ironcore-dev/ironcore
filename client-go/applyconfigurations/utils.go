@@ -192,6 +192,12 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &applyconfigurationsnetworkingv1alpha1.NetworkSpecApplyConfiguration{}
 	case networkingv1alpha1.SchemeGroupVersion.WithKind("NetworkStatus"):
 		return &applyconfigurationsnetworkingv1alpha1.NetworkStatusApplyConfiguration{}
+	case networkingv1alpha1.SchemeGroupVersion.WithKind("PeeringPrefix"):
+		return &applyconfigurationsnetworkingv1alpha1.PeeringPrefixApplyConfiguration{}
+	case networkingv1alpha1.SchemeGroupVersion.WithKind("PeeringPrefixRef"):
+		return &applyconfigurationsnetworkingv1alpha1.PeeringPrefixRefApplyConfiguration{}
+	case networkingv1alpha1.SchemeGroupVersion.WithKind("PeeringPrefixStatus"):
+		return &applyconfigurationsnetworkingv1alpha1.PeeringPrefixStatusApplyConfiguration{}
 	case networkingv1alpha1.SchemeGroupVersion.WithKind("PrefixSource"):
 		return &applyconfigurationsnetworkingv1alpha1.PrefixSourceApplyConfiguration{}
 	case networkingv1alpha1.SchemeGroupVersion.WithKind("VirtualIP"):

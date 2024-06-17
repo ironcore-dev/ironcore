@@ -1907,6 +1907,20 @@ NetworkPeeringNetworkRef
 An empty namespace indicates that the target network resides in the same namespace as the source network.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>prefixes</code><br/>
+<em>
+<a href="#networking.ironcore.dev/v1alpha1.PeeringPrefix">
+[]PeeringPrefix
+</a>
+</em>
+</td>
+<td>
+<p>Prefixes is a list of prefixes that we want only to be exposed
+to the peered network, if no prefixes are specified no filtering will be done.</p>
+</td>
+</tr>
 </tbody>
 </table>
 <h3 id="networking.ironcore.dev/v1alpha1.NetworkPeeringClaimRef">NetworkPeeringClaimRef
@@ -2067,6 +2081,19 @@ NetworkPeeringState
 </td>
 <td>
 <p>State represents the network peering state</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>prefixes</code><br/>
+<em>
+<a href="#networking.ironcore.dev/v1alpha1.PeeringPrefixStatus">
+[]PeeringPrefixStatus
+</a>
+</em>
+</td>
+<td>
+<p>Prefixes contains the prefixes exposed to the peered network</p>
 </td>
 </tr>
 </tbody>
@@ -2606,6 +2633,144 @@ NetworkState
 <td>
 <em>(Optional)</em>
 <p>Peerings contains the states of the network peerings for the network.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.ironcore.dev/v1alpha1.PeeringPrefix">PeeringPrefix
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.NetworkPeering">NetworkPeering</a>)
+</p>
+<div>
+<p>PeeringPrefixes defines prefixes to be exposed to the peered network</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the semantical name of the peering prefixes</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>prefix</code><br/>
+<em>
+<a href="../common/#common.ironcore.dev/v1alpha1.IPPrefix">
+github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix
+</a>
+</em>
+</td>
+<td>
+<p>CIDR to be exposed to the peered network</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>prefixRef</code><br/>
+<em>
+<a href="#networking.ironcore.dev/v1alpha1.PeeringPrefixRef">
+PeeringPrefixRef
+</a>
+</em>
+</td>
+<td>
+<p>PrefixRef is the reference to the prefix to be exposed to peered network
+An empty namespace indicates that the prefix resides in the same namespace as the source network.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.ironcore.dev/v1alpha1.PeeringPrefixRef">PeeringPrefixRef
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.PeeringPrefix">PeeringPrefix</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>namespace</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Namespace is the namespace of the referenced entity. If empty,
+the same namespace as the referring resource is implied.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the referenced entity.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.ironcore.dev/v1alpha1.PeeringPrefixStatus">PeeringPrefixStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.NetworkPeeringStatus">NetworkPeeringStatus</a>)
+</p>
+<div>
+<p>PeeringPrefixStatus lists prefixes exposed to peered network</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the peering prefix</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>prefix</code><br/>
+<em>
+<a href="../common/#common.ironcore.dev/v1alpha1.IPPrefix">
+github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix
+</a>
+</em>
+</td>
+<td>
+<p>CIDR exposed to the peered network</p>
 </td>
 </tr>
 </tbody>
