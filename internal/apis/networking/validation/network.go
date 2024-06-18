@@ -4,7 +4,6 @@
 package validation
 
 import (
-	"github.com/gofrs/uuid"
 	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
 	"github.com/ironcore-dev/ironcore/internal/apis/networking"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
@@ -118,16 +117,7 @@ func validatePeeringClaimRef(peeringClaimRef networking.NetworkPeeringClaimRef, 
 		}
 	}
 
-	if peeringClaimRef.UID != "" && !isValidUID(string(peeringClaimRef.UID)) {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("uid"), peeringClaimRef.UID, "invalid uid"))
-	}
-
 	return allErrs
-}
-
-func isValidUID(u string) bool {
-	_, err := uuid.FromString(u)
-	return err == nil
 }
 
 // ValidateNetworkUpdate validates a Network object before an update.

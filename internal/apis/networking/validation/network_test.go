@@ -114,16 +114,6 @@ var _ = Describe("Network", func() {
 			ContainElements(InvalidField("spec.incomingPeerings[0].namespace"),
 				RequiredField("spec.incomingPeerings[0].name")),
 		),
-		Entry("invalid peering claim ref uid",
-			&networking.Network{
-				Spec: networking.NetworkSpec{
-					PeeringClaimRefs: []networking.NetworkPeeringClaimRef{
-						{UID: "978978-dsfdff"},
-					},
-				},
-			},
-			ContainElements(InvalidField("spec.incomingPeerings[0].uid")),
-		),
 	)
 
 	DescribeTable("ValidateNetworkUpdate",
