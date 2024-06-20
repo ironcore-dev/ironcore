@@ -54,6 +54,29 @@ func validateNetworkSpec(namespace, name string, spec *networking.NetworkSpec, f
 		allErrs = append(allErrs, validateNetworkPeering(peering, fldPath)...)
 	}
 
+	seenPeeringClaimRefKeys := sets.New[client.ObjectKey]()
+
+	for i, peeringClaimRef := range spec.PeeringClaimRefs {
+		fldPath := fldPath.Child("incomingPeerings").Index(i)
+
+		peeringClaimRefNamespace := peeringClaimRef.Namespace
+		if peeringClaimRefNamespace == "" {
+			peeringClaimRefNamespace = namespace
+		}
+
+		peeringClaimRefkKey := client.ObjectKey{Namespace: peeringClaimRefNamespace, Name: peeringClaimRef.Name}
+
+		if name != "" && (client.ObjectKey{Namespace: namespace, Name: name}) == peeringClaimRefkKey {
+			allErrs = append(allErrs, field.Forbidden(fldPath, "cannot claim itself"))
+		} else if seenPeeringClaimRefKeys.Has(peeringClaimRefkKey) {
+			allErrs = append(allErrs, field.Duplicate(fldPath, peeringClaimRef))
+		} else {
+			seenPeeringClaimRefKeys.Insert(peeringClaimRefkKey)
+		}
+
+		allErrs = append(allErrs, validatePeeringClaimRef(peeringClaimRef, fldPath)...)
+	}
+
 	return allErrs
 }
 
@@ -72,6 +95,26 @@ func validateNetworkPeering(peering networking.NetworkPeering, fldPath *field.Pa
 	}
 	for _, msg := range apivalidation.NameIsDNSLabel(networkRef.Name, false) {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("networkRef", "name"), networkRef.Name, msg))
+	}
+
+	return allErrs
+}
+
+func validatePeeringClaimRef(peeringClaimRef networking.NetworkPeeringClaimRef, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	if len(peeringClaimRef.Name) == 0 {
+		allErrs = append(allErrs, field.Required(fldPath.Child("name"), "name is required"))
+	} else {
+		for _, msg := range apivalidation.NameIsDNSLabel(peeringClaimRef.Name, false) {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), peeringClaimRef.Name, msg))
+		}
+	}
+
+	if peeringClaimRef.Namespace != "" {
+		for _, msg := range apivalidation.NameIsDNSLabel(peeringClaimRef.Namespace, false) {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("namespace"), peeringClaimRef.Namespace, msg))
+		}
 	}
 
 	return allErrs
