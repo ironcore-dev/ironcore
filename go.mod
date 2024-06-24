@@ -5,7 +5,7 @@ go 1.22.2
 require (
 	github.com/bits-and-blooms/bitset v1.13.0
 	github.com/blang/semver/v4 v4.0.0
-	github.com/go-chi/chi/v5 v5.0.12
+	github.com/go-chi/chi/v5 v5.0.14
 	github.com/go-logr/logr v1.4.2
 	github.com/gogo/protobuf v1.3.2
 	github.com/google/go-cmp v0.6.0
