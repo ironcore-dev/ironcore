@@ -7,14 +7,15 @@ package v1alpha1
 
 import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	v1 "k8s.io/api/core/v1"
 )
 
 // PeeringPrefixApplyConfiguration represents an declarative configuration of the PeeringPrefix type for use
 // with apply.
 type PeeringPrefixApplyConfiguration struct {
-	Name      *string                             `json:"name,omitempty"`
-	Prefix    *v1alpha1.IPPrefix                  `json:"prefix,omitempty"`
-	PrefixRef *PeeringPrefixRefApplyConfiguration `json:"prefixRef,omitempty"`
+	Name      *string                  `json:"name,omitempty"`
+	Prefix    *v1alpha1.IPPrefix       `json:"prefix,omitempty"`
+	PrefixRef *v1.LocalObjectReference `json:"prefixRef,omitempty"`
 }
 
 // PeeringPrefixApplyConfiguration constructs an declarative configuration of the PeeringPrefix type for use with
@@ -42,7 +43,7 @@ func (b *PeeringPrefixApplyConfiguration) WithPrefix(value v1alpha1.IPPrefix) *P
 // WithPrefixRef sets the PrefixRef field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the PrefixRef field is set to the value of the last call.
-func (b *PeeringPrefixApplyConfiguration) WithPrefixRef(value *PeeringPrefixRefApplyConfiguration) *PeeringPrefixApplyConfiguration {
-	b.PrefixRef = value
+func (b *PeeringPrefixApplyConfiguration) WithPrefixRef(value v1.LocalObjectReference) *PeeringPrefixApplyConfiguration {
+	b.PrefixRef = &value
 	return b
 }

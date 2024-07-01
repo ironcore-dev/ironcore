@@ -10,6 +10,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -145,8 +146,8 @@ var _ = Describe("Network", func() {
 				Spec: networking.NetworkSpec{
 					Peerings: []networking.NetworkPeering{{
 						Prefixes: []networking.PeeringPrefix{
-							{PrefixRef: networking.PeeringPrefixRef{Name: "foo"}},
-							{PrefixRef: networking.PeeringPrefixRef{Name: "foo"}},
+							{PrefixRef: corev1.LocalObjectReference{Name: "foo"}},
+							{PrefixRef: corev1.LocalObjectReference{Name: "foo"}},
 						}},
 					},
 				},

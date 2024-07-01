@@ -1192,18 +1192,8 @@ var schemaYAML = typed.YAMLObject(`types:
         namedType: com.github.ironcore-dev.ironcore.api.common.v1alpha1.IPPrefix
     - name: prefixRef
       type:
-        namedType: com.github.ironcore-dev.ironcore.api.networking.v1alpha1.PeeringPrefixRef
+        namedType: io.k8s.api.core.v1.LocalObjectReference
       default: {}
-- name: com.github.ironcore-dev.ironcore.api.networking.v1alpha1.PeeringPrefixRef
-  map:
-    fields:
-    - name: name
-      type:
-        scalar: string
-      default: ""
-    - name: namespace
-      type:
-        scalar: string
 - name: com.github.ironcore-dev.ironcore.api.networking.v1alpha1.PeeringPrefixStatus
   map:
     fields:

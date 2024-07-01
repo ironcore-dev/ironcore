@@ -2681,54 +2681,14 @@ github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix
 <td>
 <code>prefixRef</code><br/>
 <em>
-<a href="#networking.ironcore.dev/v1alpha1.PeeringPrefixRef">
-PeeringPrefixRef
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
 </td>
 <td>
 <p>PrefixRef is the reference to the prefix to be exposed to peered network
 An empty namespace indicates that the prefix resides in the same namespace as the source network.</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="networking.ironcore.dev/v1alpha1.PeeringPrefixRef">PeeringPrefixRef
-</h3>
-<p>
-(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.PeeringPrefix">PeeringPrefix</a>)
-</p>
-<div>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>namespace</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Namespace is the namespace of the referenced entity. If empty,
-the same namespace as the referring resource is implied.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>name</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Name is the name of the referenced entity.</p>
 </td>
 </tr>
 </tbody>

@@ -69,12 +69,7 @@ func validateNetworkSpec(namespace, name string, spec *networking.NetworkSpec, f
 				}
 			}
 
-			peeringPrefixNamespace := prefix.PrefixRef.Namespace
-			if peeringPrefixNamespace == "" {
-				peeringPrefixNamespace = namespace
-			}
-
-			peeringPrefixKey := client.ObjectKey{Namespace: peeringPrefixNamespace, Name: prefix.PrefixRef.Name}
+			peeringPrefixKey := client.ObjectKey{Namespace: namespace, Name: prefix.PrefixRef.Name}
 
 			if seenPeeringPrefixKeys.Has(peeringPrefixKey) {
 				allErrs = append(allErrs, field.Duplicate(fldPath.Child("prefixRef"), prefix.PrefixRef))
@@ -161,11 +156,6 @@ func validatePeeringPrefix(prefix networking.PeeringPrefix, fldPath *field.Path)
 	}
 
 	prefixRef := prefix.PrefixRef
-	if prefixRef.Namespace != "" {
-		for _, msg := range apivalidation.NameIsDNSLabel(prefixRef.Namespace, false) {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("prefixRef", "namespace"), prefixRef.Namespace, msg))
-		}
-	}
 	for _, msg := range apivalidation.NameIsDNSLabel(prefixRef.Name, false) {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("prefixRef", "name"), prefixRef.Name, msg))
 	}

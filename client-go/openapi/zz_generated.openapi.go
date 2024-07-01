@@ -110,7 +110,6 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkSpec":                  schema_ironcore_api_networking_v1alpha1_NetworkSpec(ref),
 		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkStatus":                schema_ironcore_api_networking_v1alpha1_NetworkStatus(ref),
 		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.PeeringPrefix":                schema_ironcore_api_networking_v1alpha1_PeeringPrefix(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.PeeringPrefixRef":             schema_ironcore_api_networking_v1alpha1_PeeringPrefixRef(ref),
 		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.PeeringPrefixStatus":          schema_ironcore_api_networking_v1alpha1_PeeringPrefixStatus(ref),
 		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.PrefixSource":                 schema_ironcore_api_networking_v1alpha1_PrefixSource(ref),
 		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.VirtualIP":                    schema_ironcore_api_networking_v1alpha1_VirtualIP(ref),
@@ -4292,7 +4291,7 @@ func schema_ironcore_api_networking_v1alpha1_PeeringPrefix(ref common.ReferenceC
 						SchemaProps: spec.SchemaProps{
 							Description: "PrefixRef is the reference to the prefix to be exposed to peered network An empty namespace indicates that the prefix resides in the same namespace as the source network.",
 							Default:     map[string]interface{}{},
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.PeeringPrefixRef"),
+							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
 						},
 					},
 				},
@@ -4300,35 +4299,7 @@ func schema_ironcore_api_networking_v1alpha1_PeeringPrefix(ref common.ReferenceC
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix", "github.com/ironcore-dev/ironcore/api/networking/v1alpha1.PeeringPrefixRef"},
-	}
-}
-
-func schema_ironcore_api_networking_v1alpha1_PeeringPrefixRef(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"namespace": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Namespace is the namespace of the referenced entity. If empty, the same namespace as the referring resource is implied.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"name": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Name is the name of the referenced entity.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-				Required: []string{"name"},
-			},
-		},
+			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix", "k8s.io/api/core/v1.LocalObjectReference"},
 	}
 }
 

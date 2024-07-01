@@ -5,6 +5,7 @@ package networking
 
 import (
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 )
@@ -65,15 +66,7 @@ type PeeringPrefix struct {
 	Prefix *commonv1alpha1.IPPrefix
 	// PrefixRef is the reference to the prefix to be exposed to peered network
 	// An empty namespace indicates that the prefix resides in the same namespace as the source network.
-	PrefixRef PeeringPrefixRef
-}
-
-type PeeringPrefixRef struct {
-	// Namespace is the namespace of the referenced entity. If empty,
-	// the same namespace as the referring resource is implied.
-	Namespace string
-	// Name is the name of the referenced entity.
-	Name string
+	PrefixRef corev1.LocalObjectReference
 }
 
 // NetworkStatus defines the observed state of Network
