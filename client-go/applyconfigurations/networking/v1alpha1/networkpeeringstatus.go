@@ -12,8 +12,9 @@ import (
 // NetworkPeeringStatusApplyConfiguration represents an declarative configuration of the NetworkPeeringStatus type for use
 // with apply.
 type NetworkPeeringStatusApplyConfiguration struct {
-	Name  *string                       `json:"name,omitempty"`
-	State *v1alpha1.NetworkPeeringState `json:"state,omitempty"`
+	Name     *string                                 `json:"name,omitempty"`
+	State    *v1alpha1.NetworkPeeringState           `json:"state,omitempty"`
+	Prefixes []PeeringPrefixStatusApplyConfiguration `json:"prefixes,omitempty"`
 }
 
 // NetworkPeeringStatusApplyConfiguration constructs an declarative configuration of the NetworkPeeringStatus type for use with
@@ -35,5 +36,18 @@ func (b *NetworkPeeringStatusApplyConfiguration) WithName(value string) *Network
 // If called multiple times, the State field is set to the value of the last call.
 func (b *NetworkPeeringStatusApplyConfiguration) WithState(value v1alpha1.NetworkPeeringState) *NetworkPeeringStatusApplyConfiguration {
 	b.State = &value
+	return b
+}
+
+// WithPrefixes adds the given value to the Prefixes field in the declarative configuration
+// and returns the receiver, so that objects can be build by chaining "With" function invocations.
+// If called multiple times, values provided by each call will be appended to the Prefixes field.
+func (b *NetworkPeeringStatusApplyConfiguration) WithPrefixes(values ...*PeeringPrefixStatusApplyConfiguration) *NetworkPeeringStatusApplyConfiguration {
+	for i := range values {
+		if values[i] == nil {
+			panic("nil value passed to WithPrefixes")
+		}
+		b.Prefixes = append(b.Prefixes, *values[i])
+	}
 	return b
 }

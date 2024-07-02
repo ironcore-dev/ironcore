@@ -4,6 +4,8 @@
 package networking
 
 import (
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 )
@@ -51,6 +53,20 @@ type NetworkPeering struct {
 	// NetworkRef is the reference to the network to peer with.
 	// An empty namespace indicates that the target network resides in the same namespace as the source network.
 	NetworkRef NetworkPeeringNetworkRef
+	// Prefixes is a list of prefixes that we want only to be exposed
+	// to the peered network, if no prefixes are specified no filtering will be done.
+	Prefixes []PeeringPrefix
+}
+
+// PeeringPrefixes defines prefixes to be exposed to the peered network
+type PeeringPrefix struct {
+	// Name is the semantical name of the peering prefixes
+	Name string
+	// CIDR to be exposed to the peered network
+	Prefix *commonv1alpha1.IPPrefix
+	// PrefixRef is the reference to the prefix to be exposed to peered network
+	// An empty namespace indicates that the prefix resides in the same namespace as the source network.
+	PrefixRef corev1.LocalObjectReference
 }
 
 // NetworkStatus defines the observed state of Network
@@ -86,6 +102,16 @@ type NetworkPeeringStatus struct {
 	Name string
 	// State represents the network peering state
 	State NetworkPeeringState
+	// Prefixes contains the prefixes exposed to the peered network
+	Prefixes []PeeringPrefixStatus
+}
+
+// PeeringPrefixStatus lists prefixes exposed to peered network
+type PeeringPrefixStatus struct {
+	// Name is the name of the peering prefix
+	Name string
+	// CIDR exposed to the peered network
+	Prefix *commonv1alpha1.IPPrefix
 }
 
 const (

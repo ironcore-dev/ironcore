@@ -4,6 +4,8 @@
 package v1alpha1
 
 import (
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 )
@@ -51,6 +53,20 @@ type NetworkPeering struct {
 	// NetworkRef is the reference to the network to peer with.
 	// An empty namespace indicates that the target network resides in the same namespace as the source network.
 	NetworkRef NetworkPeeringNetworkRef `json:"networkRef"`
+	// Prefixes is a list of prefixes that we want only to be exposed
+	// to the peered network, if no prefixes are specified no filtering will be done.
+	Prefixes []PeeringPrefix `json:"prefixes,omitempty"`
+}
+
+// PeeringPrefixes defines prefixes to be exposed to the peered network
+type PeeringPrefix struct {
+	// Name is the semantical name of the peering prefixes
+	Name string `json:"name"`
+	// CIDR to be exposed to the peered network
+	Prefix *commonv1alpha1.IPPrefix `json:"prefix,omitempty"`
+	// PrefixRef is the reference to the prefix to be exposed to peered network
+	// An empty namespace indicates that the prefix resides in the same namespace as the source network.
+	PrefixRef corev1.LocalObjectReference `json:"prefixRef,omitempty"`
 }
 
 // NetworkStatus defines the observed state of Network
@@ -86,6 +102,16 @@ type NetworkPeeringStatus struct {
 	Name string `json:"name"`
 	// State represents the network peering state
 	State NetworkPeeringState `json:"state,omitempty"`
+	// Prefixes contains the prefixes exposed to the peered network
+	Prefixes []PeeringPrefixStatus `json:"prefixes,omitempty"`
+}
+
+// PeeringPrefixStatus lists prefixes exposed to peered network
+type PeeringPrefixStatus struct {
+	// Name is the name of the peering prefix
+	Name string `json:"name"`
+	// CIDR exposed to the peered network
+	Prefix *commonv1alpha1.IPPrefix `json:"prefix,omitempty"`
 }
 
 const (

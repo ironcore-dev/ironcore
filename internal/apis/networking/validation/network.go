@@ -28,6 +28,9 @@ func validateNetworkSpec(namespace, name string, spec *networking.NetworkSpec, f
 	seenNames := sets.New[string]()
 	seenPeeringNetworkKeys := sets.New[client.ObjectKey]()
 
+	seenPrefixNames := sets.New[string]()
+	seenPeeringPrefixKeys := sets.New[client.ObjectKey]()
+
 	for i, peering := range spec.Peerings {
 		fldPath := fldPath.Child("peerings").Index(i)
 		if seenNames.Has(peering.Name) {
@@ -49,6 +52,32 @@ func validateNetworkSpec(namespace, name string, spec *networking.NetworkSpec, f
 			allErrs = append(allErrs, field.Duplicate(fldPath.Child("networkRef"), peering.NetworkRef))
 		} else {
 			seenPeeringNetworkKeys.Insert(peeringNetworkKey)
+		}
+
+		for j, prefix := range peering.Prefixes {
+			fldPath := fldPath.Child("prefixes").Index(j)
+
+			if seenPrefixNames.Has(prefix.Name) {
+				allErrs = append(allErrs, field.Duplicate(fldPath.Child("name"), prefix.Name))
+			} else {
+				seenPrefixNames.Insert(prefix.Name)
+			}
+
+			if peeringPrefix := prefix.Prefix; peeringPrefix != nil {
+				if !peeringPrefix.IsSingleIP() {
+					allErrs = append(allErrs, field.Forbidden(fldPath.Child("prefix"), "must be a single IP"))
+				}
+			}
+
+			peeringPrefixKey := client.ObjectKey{Namespace: namespace, Name: prefix.PrefixRef.Name}
+
+			if seenPeeringPrefixKeys.Has(peeringPrefixKey) {
+				allErrs = append(allErrs, field.Duplicate(fldPath.Child("prefixRef"), prefix.PrefixRef))
+			} else {
+				seenPeeringPrefixKeys.Insert(peeringPrefixKey)
+			}
+
+			allErrs = append(allErrs, validatePeeringPrefix(prefix, fldPath)...)
 		}
 
 		allErrs = append(allErrs, validateNetworkPeering(peering, fldPath)...)
@@ -115,6 +144,20 @@ func validatePeeringClaimRef(peeringClaimRef networking.NetworkPeeringClaimRef, 
 		for _, msg := range apivalidation.NameIsDNSLabel(peeringClaimRef.Namespace, false) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("namespace"), peeringClaimRef.Namespace, msg))
 		}
+	}
+	return allErrs
+}
+
+func validatePeeringPrefix(prefix networking.PeeringPrefix, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	for _, msg := range apivalidation.NameIsDNSLabel(prefix.Name, false) {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), prefix.Name, msg))
+	}
+
+	prefixRef := prefix.PrefixRef
+	for _, msg := range apivalidation.NameIsDNSLabel(prefixRef.Name, false) {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("prefixRef", "name"), prefixRef.Name, msg))
 	}
 
 	return allErrs
