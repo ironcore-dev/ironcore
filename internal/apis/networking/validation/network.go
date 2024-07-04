@@ -156,8 +156,10 @@ func validatePeeringPrefix(prefix networking.PeeringPrefix, fldPath *field.Path)
 	}
 
 	prefixRef := prefix.PrefixRef
-	for _, msg := range apivalidation.NameIsDNSLabel(prefixRef.Name, false) {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("prefixRef", "name"), prefixRef.Name, msg))
+	if prefixRef.Name != "" {
+		for _, msg := range apivalidation.NameIsDNSLabel(prefixRef.Name, false) {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("prefixRef", "name"), prefixRef.Name, msg))
+		}
 	}
 
 	return allErrs
