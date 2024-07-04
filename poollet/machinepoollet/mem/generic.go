@@ -33,20 +33,19 @@ type Generic struct {
 	sync   bool
 	synced chan struct{}
 
-	machineEventsByName map[string]*iri.MachineEvents
+	machineEventsByID map[string]*iri.MachineEvents
 
 	machineRuntime machine.RuntimeService
 
 	relistPeriod time.Duration
 }
 
-func isNewEventsPresent(oldMachineEventsByID map[string]*iri.MachineEvents, machineEvent *iri.MachineEvents) bool {
-	oldMachineEvent, ok := oldMachineEventsByID[machineEvent.InvolvedObjectMeta.Id]
+func isNewEventsPresent(oldMachineEventsByID map[string]*iri.MachineEvents, machineEvent *iri.MachineEvents, machineID string) bool {
+	oldMachineEvent, ok := oldMachineEventsByID[machineID]
 	if !ok {
 		return true
 	}
-
-	return proto.Equal(machineEvent, oldMachineEvent)
+	return !proto.Equal(machineEvent, oldMachineEvent)
 }
 
 func (g *Generic) relist(ctx context.Context, log logr.Logger) error {
@@ -63,23 +62,21 @@ func (g *Generic) relist(ctx context.Context, log logr.Logger) error {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 
-	oldMachineEventsByID := maps.Clone(g.machineEventsByName)
+	oldMachineEventsByID := maps.Clone(g.machineEventsByID)
 
-	maps.Clear(g.machineEventsByName)
+	maps.Clear(g.machineEventsByID)
 
-	var newEventPresent bool
+	var shouldPublishEvents bool
 	for _, machineEvent := range res.MachineEvents {
-		newEventPresent = isNewEventsPresent(oldMachineEventsByID, machineEvent)
-		if newEventPresent {
-			if machine, err := g.getMachine(ctx, machineEvent.InvolvedObjectMeta.Id, machineEvent.InvolvedObjectMeta.GetLabels()); err != nil {
-				continue
-			} else {
+		if machine, err := g.getMachine(ctx, machineEvent.InvolvedObjectMeta.GetLabels()); err == nil {
+			shouldPublishEvents = isNewEventsPresent(oldMachineEventsByID, machineEvent, string(machine.GetUID()))
+			if shouldPublishEvents {
 				for _, event := range machineEvent.Events {
 					g.Eventf(machine, event.Spec.Type, event.Spec.Reason, event.Spec.Message)
 				}
 			}
+			g.machineEventsByID[string(machine.GetUID())] = machineEvent
 		}
-		g.machineEventsByName[machineEvent.InvolvedObjectMeta.Id] = machineEvent
 	}
 
 	if !g.sync {
@@ -90,14 +87,14 @@ func (g *Generic) relist(ctx context.Context, log logr.Logger) error {
 	return nil
 }
 
-func (g *Generic) getMachine(ctx context.Context, id string, labels map[string]string) (*computev1alpha1.Machine, error) {
+func (g *Generic) getMachine(ctx context.Context, labels map[string]string) (*computev1alpha1.Machine, error) {
 	ironcoreMachine := &computev1alpha1.Machine{}
-	ironcoreMachineKey := client.ObjectKey{Namespace: labels[v1alpha1.MachineNamespaceLabel], Name: id}
+	ironcoreMachineKey := client.ObjectKey{Namespace: labels[v1alpha1.MachineNamespaceLabel], Name: labels[v1alpha1.MachineNameLabel]}
 	if err := g.Client.Get(ctx, ironcoreMachineKey, ironcoreMachine); err != nil {
 		if !apierrors.IsNotFound(err) {
 			return nil, fmt.Errorf("error getting ironcore machine: %w", err)
 		}
-		return nil, status.Errorf(codes.NotFound, "machine %s not found", id)
+		return nil, status.Errorf(codes.NotFound, "machine %s not found", ironcoreMachineKey.Name)
 	}
 	return ironcoreMachine, nil
 }
@@ -112,14 +109,13 @@ func (g *Generic) Start(ctx context.Context) error {
 	return nil
 }
 
-func (g *Generic) GetMachineEventFor(ctx context.Context, machineName string) ([]*iri.Event, error) {
+func (g *Generic) GetMachineEventFor(ctx context.Context, machineID string) ([]*iri.Event, error) {
 	g.mu.RLock()
 	defer g.mu.RUnlock()
 
-	if byName, ok := g.machineEventsByName[machineName]; ok {
+	if byName, ok := g.machineEventsByID[machineID]; ok {
 		return byName.Events, nil
 	}
-
 	return nil, ErrNoMatchingMachineEvents
 }
 
@@ -145,11 +141,11 @@ func setGenericOptionsDefaults(o *GenericOptions) {
 func NewGeneric(client client.Client, runtime machine.RuntimeService, recorder record.EventRecorder, opts GenericOptions) MachineEventMapper {
 	setGenericOptionsDefaults(&opts)
 	return &Generic{
-		synced:              make(chan struct{}),
-		machineEventsByName: map[string]*iri.MachineEvents{},
-		Client:              client,
-		machineRuntime:      runtime,
-		relistPeriod:        opts.RelistPeriod,
-		EventRecorder:       recorder,
+		synced:            make(chan struct{}),
+		machineEventsByID: map[string]*iri.MachineEvents{},
+		Client:            client,
+		machineRuntime:    runtime,
+		relistPeriod:      opts.RelistPeriod,
+		EventRecorder:     recorder,
 	}
 }

@@ -12,6 +12,7 @@ import (
 	"time"
 
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
+	"github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"k8s.io/apimachinery/pkg/labels"
@@ -74,9 +75,26 @@ type FakeRuntimeService struct {
 func (r *FakeRuntimeService) ListEvents(ctx context.Context, req *iri.ListEventsRequest) (*iri.ListEventsResponse, error) {
 	r.Lock()
 	defer r.Unlock()
+	machineEvents := []*iri.MachineEvents{}
 
-	var res []*iri.MachineEvents
-	return &iri.ListEventsResponse{MachineEvents: res}, nil
+	for _, m := range r.Machines {
+		machineEvent := &iri.MachineEvents{
+			InvolvedObjectMeta: &v1alpha1.ObjectMetadata{
+				Id:     m.Metadata.Id,
+				Labels: m.Metadata.Labels,
+			},
+			Events: []*iri.Event{{
+				Spec: &iri.EventSpec{
+					Reason:    "testing",
+					Message:   "this is test event",
+					Type:      "Normal",
+					EventTime: time.Now().Unix(),
+				}}},
+		}
+		machineEvents = append(machineEvents, machineEvent)
+	}
+
+	return &iri.ListEventsResponse{MachineEvents: machineEvents}, nil
 }
 
 func NewFakeRuntimeService() *FakeRuntimeService {
