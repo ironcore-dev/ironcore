@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
+	"github.com/ironcore-dev/ironcore/iri/apis/bucket"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
 	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -37,7 +38,7 @@ type Generic struct {
 	bucketClassByName         map[string]*iri.BucketClass
 	bucketClassByCapabilities map[capabilities][]*iri.BucketClass
 
-	bucketRuntime iri.BucketRuntimeClient
+	bucketRuntime bucket.RuntimeService
 
 	relistPeriod time.Duration
 }
@@ -122,7 +123,7 @@ func setGenericOptionsDefaults(o *GenericOptions) {
 	}
 }
 
-func NewGeneric(runtime iri.BucketRuntimeClient, opts GenericOptions) BucketClassMapper {
+func NewGeneric(runtime bucket.RuntimeService, opts GenericOptions) BucketClassMapper {
 	setGenericOptionsDefaults(&opts)
 	return &Generic{
 		synced:                    make(chan struct{}),
