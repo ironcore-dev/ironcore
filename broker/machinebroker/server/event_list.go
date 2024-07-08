@@ -16,10 +16,12 @@ import (
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 )
 
+const InvolvedObjectName = "involvedObject.name"
+
 func (s *Server) listEvents(ctx context.Context, machineID string) ([]*iri.Event, error) {
 	machineEventList := &v1.EventList{}
 	selectorField := fields.Set{}
-	selectorField["involvedObject.name"] = machineID
+	selectorField[InvolvedObjectName] = machineID
 
 	if err := s.cluster.Client().List(ctx, machineEventList,
 		client.InNamespace(s.cluster.Namespace()), client.MatchingFieldsSelector{Selector: selectorField.AsSelector()},
@@ -29,22 +31,13 @@ func (s *Server) listEvents(ctx context.Context, machineID string) ([]*iri.Event
 
 	iriEvents := []*iri.Event{}
 	for _, machineEvent := range machineEventList.Items {
-		eventSeries := &iri.EventSeries{}
-		if machineEvent.Series != nil {
-			eventSeries = &iri.EventSeries{
-				Count:            int64(machineEvent.Series.Count),
-				LastObservedTime: machineEvent.Series.LastObservedTime.Unix(),
-			}
-		}
-
 		iriEvent := &iri.Event{
 			Metadata: apiutils.GetIRIObjectMetadata(&machineEvent.ObjectMeta),
 			Spec: &iri.EventSpec{
-				Reason:      machineEvent.Reason,
-				Message:     machineEvent.Message,
-				Type:        machineEvent.Type,
-				EventTime:   machineEvent.FirstTimestamp.Unix(),
-				EventSeries: eventSeries,
+				Reason:    machineEvent.Reason,
+				Message:   machineEvent.Message,
+				Type:      machineEvent.Type,
+				EventTime: machineEvent.FirstTimestamp.Unix(),
 			},
 		}
 		iriEvents = append(iriEvents, iriEvent)

@@ -117,12 +117,6 @@ message EventSpec {
   string message = 2;
   string type = 3;
   int64 event_time = 4;
-  EventSeries event_series = 5;
-}
-
-message EventSeries {
-  int64 count = 1;
-  int64 lastObservedTime = 2;
 }
 
 message MachineStatus {
