@@ -16,7 +16,7 @@ import (
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 )
 
-func (s *Server) listEvenents(ctx context.Context, machineID string) ([]*iri.Event, error) {
+func (s *Server) listEvents(ctx context.Context, machineID string) ([]*iri.Event, error) {
 	machineEventList := &v1.EventList{}
 	selectorField := fields.Set{}
 	selectorField["involvedObject.name"] = machineID
@@ -81,7 +81,7 @@ func (s *Server) ListEvents(ctx context.Context, req *iri.ListEventsRequest) (*i
 	machineEvents := []*iri.MachineEvents{}
 	for i := range ironcoreMachineList.Items {
 		ironcoreMachine := &ironcoreMachineList.Items[i]
-		iriEvents, err := s.listEvenents(ctx, ironcoreMachine.Name)
+		iriEvents, err := s.listEvents(ctx, ironcoreMachine.Name)
 		if err != nil {
 			return nil, err
 		}
