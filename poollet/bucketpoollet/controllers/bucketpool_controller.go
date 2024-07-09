@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-logr/logr"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
+	iriBucket "github.com/ironcore-dev/ironcore/iri/apis/bucket"
 	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/bcm"
 	corev1 "k8s.io/api/core/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -23,7 +23,7 @@ import (
 type BucketPoolReconciler struct {
 	client.Client
 	BucketPoolName    string
-	BucketRuntime     iri.BucketRuntimeClient
+	BucketRuntime     iriBucket.RuntimeService
 	BucketClassMapper bcm.BucketClassMapper
 }
 

@@ -15,6 +15,7 @@ import (
 
 	"github.com/go-logr/logr"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	"github.com/ironcore-dev/ironcore/iri/apis/volume"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
@@ -29,7 +30,7 @@ import (
 type VolumePoolReconciler struct {
 	client.Client
 	VolumePoolName    string
-	VolumeRuntime     iri.VolumeRuntimeClient
+	VolumeRuntime     volume.RuntimeService
 	VolumeClassMapper vcm.VolumeClassMapper
 }
 

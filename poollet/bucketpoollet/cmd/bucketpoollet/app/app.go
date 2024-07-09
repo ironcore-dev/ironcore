@@ -23,8 +23,6 @@ import (
 	"github.com/ironcore-dev/ironcore/utils/client/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -137,19 +135,10 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error detecting bucket runtime endpoint: %w", err)
 	}
 
-	conn, err := grpc.NewClient(endpoint,
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
+	bucketRuntime, err := iriremotebucket.NewRemoteRuntime(endpoint)
 	if err != nil {
-		return fmt.Errorf("error dialing: %w", err)
+		return fmt.Errorf("error creating remote bucket runtime: %w", err)
 	}
-	defer func() {
-		if err := conn.Close(); err != nil {
-			setupLog.Error(err, "Error closing bucket runtime connection")
-		}
-	}()
-
-	bucketRuntime := iri.NewBucketRuntimeClient(conn)
 
 	cfg, configCtrl, err := getter.GetConfig(ctx, &opts.GetConfigOptions)
 	if err != nil {
