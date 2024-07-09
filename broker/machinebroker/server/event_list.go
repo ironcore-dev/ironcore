@@ -67,7 +67,7 @@ func (s *Server) filterEvents(events []*iri.Event, filter *iri.EventFilter) []*i
 }
 
 func (s *Server) ListEvents(ctx context.Context, req *iri.ListEventsRequest) (*iri.ListEventsResponse, error) {
-	ironcoreMachineList, err := s.listIroncoreMachine(ctx)
+	ironcoreMachineList, err := s.listIroncoreMachines(ctx)
 	if err != nil {
 		return nil, err
 	}

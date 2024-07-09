@@ -12,7 +12,6 @@ import (
 	"time"
 
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
-	"github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"k8s.io/apimachinery/pkg/labels"
@@ -63,12 +62,17 @@ type FakeMachineClassStatus struct {
 	iri.MachineClassStatus
 }
 
+type FakeMachineEvents struct {
+	iri.MachineEvents
+}
+
 type FakeRuntimeService struct {
 	sync.Mutex
 
 	Machines           map[string]*FakeMachine
 	MachineClassStatus map[string]*FakeMachineClassStatus
 	GetExecURL         func(req *iri.ExecRequest) string
+	MachineEvents      map[string]*FakeMachineEvents
 }
 
 // ListEvents implements machine.RuntimeService.
@@ -77,21 +81,8 @@ func (r *FakeRuntimeService) ListEvents(ctx context.Context, req *iri.ListEvents
 	defer r.Unlock()
 	machineEvents := []*iri.MachineEvents{}
 
-	for _, m := range r.Machines {
-		machineEvent := &iri.MachineEvents{
-			InvolvedObjectMeta: &v1alpha1.ObjectMetadata{
-				Id:     m.Metadata.Id,
-				Labels: m.Metadata.Labels,
-			},
-			Events: []*iri.Event{{
-				Spec: &iri.EventSpec{
-					Reason:    "testing",
-					Message:   "this is test event",
-					Type:      "Normal",
-					EventTime: time.Now().Unix(),
-				}}},
-		}
-		machineEvents = append(machineEvents, machineEvent)
+	for _, m := range r.MachineEvents {
+		machineEvents = append(machineEvents, &m.MachineEvents)
 	}
 
 	return &iri.ListEventsResponse{MachineEvents: machineEvents}, nil
@@ -101,6 +92,7 @@ func NewFakeRuntimeService() *FakeRuntimeService {
 	return &FakeRuntimeService{
 		Machines:           make(map[string]*FakeMachine),
 		MachineClassStatus: make(map[string]*FakeMachineClassStatus),
+		MachineEvents:      make(map[string]*FakeMachineEvents),
 	}
 }
 
@@ -129,6 +121,13 @@ func (r *FakeRuntimeService) SetGetExecURL(f func(req *iri.ExecRequest) string) 
 	defer r.Unlock()
 
 	r.GetExecURL = f
+}
+
+func (r *FakeRuntimeService) SetEvents(machineId string, events *FakeMachineEvents) {
+	r.Lock()
+	defer r.Unlock()
+
+	r.MachineEvents[machineId] = events
 }
 
 func (r *FakeRuntimeService) Version(ctx context.Context, req *iri.VersionRequest) (*iri.VersionResponse, error) {

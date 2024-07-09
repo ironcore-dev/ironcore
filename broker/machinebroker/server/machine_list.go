@@ -23,7 +23,7 @@ import (
 )
 
 func (s *Server) listAggregateIronCoreMachines(ctx context.Context) ([]AggregateIronCoreMachine, error) {
-	ironcoreMachineList, err := s.listIroncoreMachine(ctx)
+	ironcoreMachineList, err := s.listIroncoreMachines(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error listing ironcore machines: %w", err)
 	}
@@ -55,7 +55,7 @@ func (s *Server) listAggregateIronCoreMachines(ctx context.Context) ([]Aggregate
 	return res, nil
 }
 
-func (s *Server) listIroncoreMachine(ctx context.Context) (*computev1alpha1.MachineList, error) {
+func (s *Server) listIroncoreMachines(ctx context.Context) (*computev1alpha1.MachineList, error) {
 	ironcoreMachineList := &computev1alpha1.MachineList{}
 	if err := s.cluster.Client().List(ctx, ironcoreMachineList,
 		client.InNamespace(s.cluster.Namespace()),

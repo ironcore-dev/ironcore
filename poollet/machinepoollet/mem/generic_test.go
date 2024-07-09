@@ -10,7 +10,8 @@ import (
 
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
-	"github.com/ironcore-dev/ironcore/iri/testing/machine"
+	"github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
+	fakemachine "github.com/ironcore-dev/ironcore/iri/testing/machine"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/mcm"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/mem"
@@ -18,20 +19,22 @@ import (
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	metricserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 )
 
 var _ = Describe("MachineController", func() {
-	var srv = &machine.FakeRuntimeService{}
+	var srv = &fakemachine.FakeRuntimeService{}
 	var machineEventMapper mem.MachineEventMapper
 	ns, mp, mc := SetupTest()
 
 	BeforeEach(func(ctx SpecContext) {
-		*srv = *machine.NewFakeRuntimeService()
-		srv.SetMachineClasses([]*machine.FakeMachineClassStatus{
+		*srv = *fakemachine.NewFakeRuntimeService()
+		srv.SetMachineClasses([]*fakemachine.FakeMachineClassStatus{
 			{
 				MachineClassStatus: iri.MachineClassStatus{
 					MachineClass: &iri.MachineClass{
@@ -58,7 +61,7 @@ var _ = Describe("MachineController", func() {
 		})
 		Expect(k8sManager.Add(machineClassMapper)).To(Succeed())
 
-		machineEventMapper = mem.NewGeneric(k8sManager.GetClient(), srv, &record.FakeRecorder{}, mem.GenericOptions{
+		machineEventMapper = mem.NewGeneric(k8sManager.GetClient(), srv, k8sManager.GetEventRecorderFor("test"), mem.GenericOptions{
 			RelistPeriod: 2 * time.Second,
 		})
 		Expect(k8sManager.Add(machineEventMapper)).To(Succeed())
@@ -67,8 +70,8 @@ var _ = Describe("MachineController", func() {
 			EventRecorder:         &record.FakeRecorder{},
 			Client:                k8sManager.GetClient(),
 			MachineRuntime:        srv,
-			MachineRuntimeName:    machine.FakeRuntimeName,
-			MachineRuntimeVersion: machine.FakeVersion,
+			MachineRuntimeName:    fakemachine.FakeRuntimeName,
+			MachineRuntimeVersion: fakemachine.FakeVersion,
 			MachineClassMapper:    machineClassMapper,
 			MachinePoolName:       mp.Name,
 			DownwardAPILabels: map[string]string{
@@ -107,17 +110,49 @@ var _ = Describe("MachineController", func() {
 			HaveField("Machines", HaveLen(1)),
 		))
 
-		By("getting mchine events")
-		Eventually(func(g Gomega) []*iri.Event {
-			resp, err := machineEventMapper.GetMachineEventFor(ctx, string(machine.GetUID()))
+		By("setting an event for iri machine")
+		_, iriMachine := GetSingleMapEntry(srv.Machines)
+		machineEvent := &fakemachine.FakeMachineEvents{
+			MachineEvents: iri.MachineEvents{
+				InvolvedObjectMeta: &v1alpha1.ObjectMetadata{
+					Id:     iriMachine.Metadata.Id,
+					Labels: iriMachine.Metadata.Labels,
+				},
+				Events: []*iri.Event{{
+					Spec: &iri.EventSpec{
+						Reason:    "testing",
+						Message:   "this is test event",
+						Type:      "Normal",
+						EventTime: time.Now().Unix(),
+					}}},
+			},
+		}
+		srv.SetEvents(iriMachine.Metadata.Id, machineEvent)
+
+		By("validating event has been emitted for correct mchine")
+		machineEventList := &corev1.EventList{}
+		selectorField := fields.Set{}
+		selectorField["involvedObject.name"] = machine.GetName()
+		Eventually(func(g Gomega) []corev1.Event {
+			err := k8sClient.List(ctx, machineEventList,
+				client.InNamespace(ns.Name), client.MatchingFieldsSelector{Selector: selectorField.AsSelector()},
+			)
 			g.Expect(err).NotTo(HaveOccurred())
-			return resp
-		}).Should(ConsistOf(SatisfyAll(
-			HaveField("Spec", SatisfyAll(
-				HaveField("Reason", Equal("testing")),
-				HaveField("Message", Equal("this is test event")),
-				HaveField("Type", Equal(corev1.EventTypeNormal)),
-			)),
+			return machineEventList.Items
+		}).Should(ContainElement(SatisfyAll(
+			HaveField("Reason", Equal("testing")),
+			HaveField("Message", Equal("this is test event")),
+			HaveField("Type", Equal(corev1.EventTypeNormal)),
 		)))
 	})
 })
+
+func GetSingleMapEntry[K comparable, V any](m map[K]V) (K, V) {
+	if n := len(m); n != 1 {
+		Fail(fmt.Sprintf("Expected for map to have a single entry but got %d", n), 1)
+	}
+	for k, v := range m {
+		return k, v
+	}
+	panic("unreachable")
+}
