@@ -14,7 +14,9 @@ import (
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
+	iriVolume "github.com/ironcore-dev/ironcore/iri/apis/volume"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
+
 	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers/events"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
@@ -40,7 +42,7 @@ type VolumeReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
 
-	VolumeRuntime iri.VolumeRuntimeClient
+	VolumeRuntime iriVolume.RuntimeService
 
 	VolumeClassMapper vcm.VolumeClassMapper
 

@@ -12,7 +12,9 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/controller-utils/clientutils"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	iriBucket "github.com/ironcore-dev/ironcore/iri/apis/bucket"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
+
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	bucketpoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/bucketpoollet/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/bcm"
@@ -39,7 +41,7 @@ type BucketReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
 
-	BucketRuntime iri.BucketRuntimeClient
+	BucketRuntime iriBucket.RuntimeService
 
 	BucketClassMapper bcm.BucketClassMapper
 

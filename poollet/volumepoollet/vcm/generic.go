@@ -11,6 +11,7 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/gogo/protobuf/proto"
+	"github.com/ironcore-dev/ironcore/iri/apis/volume"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/irievent"
 	"golang.org/x/exp/maps"
@@ -43,7 +44,7 @@ type Generic struct {
 	volumeClassByName         map[string]*iri.VolumeClassStatus
 	volumeClassByCapabilities map[capabilities][]*iri.VolumeClassStatus
 
-	volumeRuntime iri.VolumeRuntimeClient
+	volumeRuntime volume.RuntimeService
 
 	relistPeriod time.Duration
 }
@@ -177,7 +178,7 @@ func setGenericOptionsDefaults(o *GenericOptions) {
 	}
 }
 
-func NewGeneric(runtime iri.VolumeRuntimeClient, opts GenericOptions) VolumeClassMapper {
+func NewGeneric(runtime volume.RuntimeService, opts GenericOptions) VolumeClassMapper {
 	setGenericOptionsDefaults(&opts)
 	return &Generic{
 		synced:                    make(chan struct{}),

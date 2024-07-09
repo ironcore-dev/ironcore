@@ -10,7 +10,6 @@ import (
 
 	"github.com/ironcore-dev/ironcore/broker/common/idgen"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"k8s.io/apimachinery/pkg/labels"
@@ -66,7 +65,7 @@ func (r *FakeRuntimeService) SetVolumeClasses(volumeClassStatus []*FakeVolumeCla
 	}
 }
 
-func (r *FakeRuntimeService) ListVolumes(ctx context.Context, req *iri.ListVolumesRequest, opts ...grpc.CallOption) (*iri.ListVolumesResponse, error) {
+func (r *FakeRuntimeService) ListVolumes(ctx context.Context, req *iri.ListVolumesRequest) (*iri.ListVolumesResponse, error) {
 	r.Lock()
 	defer r.Unlock()
 
@@ -89,7 +88,7 @@ func (r *FakeRuntimeService) ListVolumes(ctx context.Context, req *iri.ListVolum
 	return &iri.ListVolumesResponse{Volumes: res}, nil
 }
 
-func (r *FakeRuntimeService) CreateVolume(ctx context.Context, req *iri.CreateVolumeRequest, opts ...grpc.CallOption) (*iri.CreateVolumeResponse, error) {
+func (r *FakeRuntimeService) CreateVolume(ctx context.Context, req *iri.CreateVolumeRequest) (*iri.CreateVolumeResponse, error) {
 	r.Lock()
 	defer r.Unlock()
 
@@ -107,7 +106,7 @@ func (r *FakeRuntimeService) CreateVolume(ctx context.Context, req *iri.CreateVo
 	}, nil
 }
 
-func (r *FakeRuntimeService) ExpandVolume(ctx context.Context, req *iri.ExpandVolumeRequest, opts ...grpc.CallOption) (*iri.ExpandVolumeResponse, error) {
+func (r *FakeRuntimeService) ExpandVolume(ctx context.Context, req *iri.ExpandVolumeRequest) (*iri.ExpandVolumeResponse, error) {
 	r.Lock()
 	defer r.Unlock()
 
@@ -121,7 +120,7 @@ func (r *FakeRuntimeService) ExpandVolume(ctx context.Context, req *iri.ExpandVo
 	return &iri.ExpandVolumeResponse{}, nil
 }
 
-func (r *FakeRuntimeService) DeleteVolume(ctx context.Context, req *iri.DeleteVolumeRequest, opts ...grpc.CallOption) (*iri.DeleteVolumeResponse, error) {
+func (r *FakeRuntimeService) DeleteVolume(ctx context.Context, req *iri.DeleteVolumeRequest) (*iri.DeleteVolumeResponse, error) {
 	r.Lock()
 	defer r.Unlock()
 
@@ -134,7 +133,7 @@ func (r *FakeRuntimeService) DeleteVolume(ctx context.Context, req *iri.DeleteVo
 	return &iri.DeleteVolumeResponse{}, nil
 }
 
-func (r *FakeRuntimeService) Status(ctx context.Context, req *iri.StatusRequest, opts ...grpc.CallOption) (*iri.StatusResponse, error) {
+func (r *FakeRuntimeService) Status(ctx context.Context, req *iri.StatusRequest) (*iri.StatusResponse, error) {
 	r.Lock()
 	defer r.Unlock()
 
