@@ -27,9 +27,8 @@ import (
 	metricserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 )
 
-var _ = Describe("MachineController", func() {
+var _ = Describe("MachineEventMapper", func() {
 	var srv = &fakemachine.FakeRuntimeService{}
-	var machineEventMapper mem.MachineEventMapper
 	ns, mp, mc := SetupTest()
 
 	BeforeEach(func(ctx SpecContext) {
@@ -61,7 +60,7 @@ var _ = Describe("MachineController", func() {
 		})
 		Expect(k8sManager.Add(machineClassMapper)).To(Succeed())
 
-		machineEventMapper = mem.NewGeneric(k8sManager.GetClient(), srv, k8sManager.GetEventRecorderFor("test"), mem.GenericOptions{
+		machineEventMapper := mem.NewMachineEventMapper(k8sManager.GetClient(), srv, k8sManager.GetEventRecorderFor("test"), mem.MachineEventMapperOptions{
 			RelistPeriod: 2 * time.Second,
 		})
 		Expect(k8sManager.Add(machineEventMapper)).To(Succeed())

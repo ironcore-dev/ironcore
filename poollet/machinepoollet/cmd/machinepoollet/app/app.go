@@ -71,7 +71,6 @@ type Options struct {
 	MachineRuntimeSocketDiscoveryTimeout time.Duration
 	DialTimeout                          time.Duration
 	MachineClassMapperSyncTimeout        time.Duration
-	MachineEventMapperSyncTimeout        time.Duration
 
 	ChannelCapacity int
 
@@ -100,7 +99,6 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.DurationVar(&o.MachineRuntimeSocketDiscoveryTimeout, "machine-runtime-socket-discovery-timeout", 20*time.Second, "Timeout for discovering the machine runtime socket.")
 	fs.DurationVar(&o.DialTimeout, "dial-timeout", 1*time.Second, "Timeout for dialing to the machine runtime endpoint.")
 	fs.DurationVar(&o.MachineClassMapperSyncTimeout, "mcm-sync-timeout", 10*time.Second, "Timeout waiting for the machine class mapper to sync.")
-	fs.DurationVar(&o.MachineEventMapperSyncTimeout, "mem-sync-timeout", 10*time.Second, "Timeout waiting for the machine event mapper to sync.")
 
 	fs.IntVar(&o.ChannelCapacity, "channel-capacity", 1024, "channel capacity for the machine event generator")
 
@@ -262,7 +260,7 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error adding machine class mapper: %w", err)
 	}
 
-	machineEventMapper := mem.NewGeneric(mgr.GetClient(), machineRuntime, mgr.GetEventRecorderFor("machine-cluster-events"), mem.GenericOptions{})
+	machineEventMapper := mem.NewMachineEventMapper(mgr.GetClient(), machineRuntime, mgr.GetEventRecorderFor("machine-cluster-events"), mem.MachineEventMapperOptions{})
 	if err := mgr.Add(machineEventMapper); err != nil {
 		return fmt.Errorf("error adding machine event mapper: %w", err)
 	}
@@ -304,13 +302,6 @@ func Run(ctx context.Context, opts Options) error {
 
 		if err := machineClassMapper.WaitForSync(machineClassMapperSyncCtx); err != nil {
 			return fmt.Errorf("error waiting for machine class mapper to sync: %w", err)
-		}
-
-		machineEventMapperSyncCtx, cancel := context.WithTimeout(ctx, opts.MachineEventMapperSyncTimeout)
-		defer cancel()
-
-		if err := machineEventMapper.WaitForSync(machineEventMapperSyncCtx); err != nil {
-			return fmt.Errorf("error waiting for machine event mapper to sync: %w", err)
 		}
 
 		if err := (&controllers.MachineReconciler{
