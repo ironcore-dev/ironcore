@@ -79,7 +79,7 @@ type FakeRuntimeService struct {
 func (r *FakeRuntimeService) ListEvents(ctx context.Context, req *iri.ListEventsRequest) (*iri.ListEventsResponse, error) {
 	r.Lock()
 	defer r.Unlock()
-	machineEvents := []*iri.MachineEvents{}
+	var machineEvents []*iri.MachineEvents
 
 	for _, m := range r.MachineEvents {
 		machineEvents = append(machineEvents, &m.MachineEvents)

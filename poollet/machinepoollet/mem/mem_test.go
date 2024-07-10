@@ -128,7 +128,7 @@ var _ = Describe("MachineEventMapper", func() {
 		}
 		srv.SetEvents(iriMachine.Metadata.Id, machineEvent)
 
-		By("validating event has been emitted for correct mchine")
+		By("validating event has been emitted for correct machine")
 		machineEventList := &corev1.EventList{}
 		selectorField := fields.Set{}
 		selectorField["involvedObject.name"] = machine.GetName()

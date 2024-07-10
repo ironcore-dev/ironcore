@@ -29,7 +29,7 @@ func (s *Server) listEvents(ctx context.Context, machineID string) ([]*iri.Event
 		return nil, fmt.Errorf("error listing machine events: %w", err)
 	}
 
-	iriEvents := []*iri.Event{}
+	var iriEvents []*iri.Event
 	for _, machineEvent := range machineEventList.Items {
 		iriEvent := &iri.Event{
 			Metadata: apiutils.GetIRIObjectMetadata(&machineEvent.ObjectMeta),
@@ -71,7 +71,7 @@ func (s *Server) ListEvents(ctx context.Context, req *iri.ListEventsRequest) (*i
 	if err != nil {
 		return nil, err
 	}
-	machineEvents := []*iri.MachineEvents{}
+	var machineEvents []*iri.MachineEvents
 	for i := range ironcoreMachineList.Items {
 		ironcoreMachine := &ironcoreMachineList.Items[i]
 		iriEvents, err := s.listEvents(ctx, ironcoreMachine.Name)

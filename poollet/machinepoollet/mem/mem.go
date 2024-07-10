@@ -34,22 +34,22 @@ type MachineEventMapper struct {
 	lastFetched  time.Time
 }
 
-func (g *MachineEventMapper) relist(ctx context.Context, log logr.Logger) error {
+func (m *MachineEventMapper) relist(ctx context.Context, log logr.Logger) error {
 	log.V(1).Info("Relisting machine cluster events")
 	toEventFilterTime := time.Now()
-	res, err := g.machineRuntime.ListEvents(ctx, &iri.ListEventsRequest{
-		Filter: &iri.EventFilter{EventsFromTime: g.lastFetched.Unix(), EventsToTime: toEventFilterTime.Unix()},
+	res, err := m.machineRuntime.ListEvents(ctx, &iri.ListEventsRequest{
+		Filter: &iri.EventFilter{EventsFromTime: m.lastFetched.Unix(), EventsToTime: toEventFilterTime.Unix()},
 	})
 	if err != nil {
 		return fmt.Errorf("error listing machine cluster events: %w", err)
 	}
 
-	g.lastFetched = toEventFilterTime
+	m.lastFetched = toEventFilterTime
 
 	for _, machineEvent := range res.MachineEvents {
-		if machine, err := g.getMachine(ctx, machineEvent.InvolvedObjectMeta.GetLabels()); err == nil {
+		if involvedMachine, err := m.getMachine(ctx, machineEvent.InvolvedObjectMeta.GetLabels()); err == nil {
 			for _, event := range machineEvent.Events {
-				g.Eventf(machine, event.Spec.Type, event.Spec.Reason, event.Spec.Message)
+				m.Eventf(involvedMachine, event.Spec.Type, event.Spec.Reason, event.Spec.Message)
 			}
 		}
 	}
@@ -57,10 +57,10 @@ func (g *MachineEventMapper) relist(ctx context.Context, log logr.Logger) error 
 	return nil
 }
 
-func (g *MachineEventMapper) getMachine(ctx context.Context, labels map[string]string) (*computev1alpha1.Machine, error) {
+func (m *MachineEventMapper) getMachine(ctx context.Context, labels map[string]string) (*computev1alpha1.Machine, error) {
 	ironcoreMachine := &computev1alpha1.Machine{}
 	ironcoreMachineKey := client.ObjectKey{Namespace: labels[v1alpha1.MachineNamespaceLabel], Name: labels[v1alpha1.MachineNameLabel]}
-	if err := g.Client.Get(ctx, ironcoreMachineKey, ironcoreMachine); err != nil {
+	if err := m.Client.Get(ctx, ironcoreMachineKey, ironcoreMachine); err != nil {
 		if !apierrors.IsNotFound(err) {
 			return nil, fmt.Errorf("error getting ironcore machine: %w", err)
 		}
@@ -69,14 +69,14 @@ func (g *MachineEventMapper) getMachine(ctx context.Context, labels map[string]s
 	return ironcoreMachine, nil
 }
 
-func (g *MachineEventMapper) Start(ctx context.Context) error {
+func (m *MachineEventMapper) Start(ctx context.Context) error {
 	log := ctrl.LoggerFrom(ctx).WithName("mem")
-	g.lastFetched = time.Now()
+	m.lastFetched = time.Now()
 	wait.UntilWithContext(ctx, func(ctx context.Context) {
-		if err := g.relist(ctx, log); err != nil {
+		if err := m.relist(ctx, log); err != nil {
 			log.Error(err, "Error relisting")
 		}
-	}, g.relistPeriod)
+	}, m.relistPeriod)
 	return nil
 }
 
