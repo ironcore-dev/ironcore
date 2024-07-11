@@ -11,6 +11,7 @@ import (
 
 type RuntimeService interface {
 	Version(context.Context, *api.VersionRequest) (*api.VersionResponse, error)
+	ListEvents(context.Context, *api.ListEventsRequest) (*api.ListEventsResponse, error)
 	ListMachines(context.Context, *api.ListMachinesRequest) (*api.ListMachinesResponse, error)
 	CreateMachine(context.Context, *api.CreateMachineRequest) (*api.CreateMachineResponse, error)
 	DeleteMachine(context.Context, *api.DeleteMachineRequest) (*api.DeleteMachineResponse, error)

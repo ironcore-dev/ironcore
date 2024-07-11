@@ -62,18 +62,37 @@ type FakeMachineClassStatus struct {
 	iri.MachineClassStatus
 }
 
+type FakeMachineEvents struct {
+	iri.MachineEvents
+}
+
 type FakeRuntimeService struct {
 	sync.Mutex
 
 	Machines           map[string]*FakeMachine
 	MachineClassStatus map[string]*FakeMachineClassStatus
 	GetExecURL         func(req *iri.ExecRequest) string
+	MachineEvents      map[string]*FakeMachineEvents
+}
+
+// ListEvents implements machine.RuntimeService.
+func (r *FakeRuntimeService) ListEvents(ctx context.Context, req *iri.ListEventsRequest) (*iri.ListEventsResponse, error) {
+	r.Lock()
+	defer r.Unlock()
+	var machineEvents []*iri.MachineEvents
+
+	for _, m := range r.MachineEvents {
+		machineEvents = append(machineEvents, &m.MachineEvents)
+	}
+
+	return &iri.ListEventsResponse{MachineEvents: machineEvents}, nil
 }
 
 func NewFakeRuntimeService() *FakeRuntimeService {
 	return &FakeRuntimeService{
 		Machines:           make(map[string]*FakeMachine),
 		MachineClassStatus: make(map[string]*FakeMachineClassStatus),
+		MachineEvents:      make(map[string]*FakeMachineEvents),
 	}
 }
 
@@ -102,6 +121,13 @@ func (r *FakeRuntimeService) SetGetExecURL(f func(req *iri.ExecRequest) string) 
 	defer r.Unlock()
 
 	r.GetExecURL = f
+}
+
+func (r *FakeRuntimeService) SetEvents(machineId string, events *FakeMachineEvents) {
+	r.Lock()
+	defer r.Unlock()
+
+	r.MachineEvents[machineId] = events
 }
 
 func (r *FakeRuntimeService) Version(ctx context.Context, req *iri.VersionRequest) (*iri.VersionResponse, error) {

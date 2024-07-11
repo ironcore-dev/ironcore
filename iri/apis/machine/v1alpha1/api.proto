@@ -16,6 +16,7 @@ option (gogoproto.goproto_unrecognized_all) = false;
 
 service MachineRuntime {
   rpc Version(VersionRequest) returns (VersionResponse) {};
+  rpc ListEvents(ListEventsRequest) returns (ListEventsResponse) {};
 
   rpc ListMachines(ListMachinesRequest) returns (ListMachinesResponse) {};
   rpc CreateMachine(CreateMachineRequest) returns (CreateMachineResponse) {};
@@ -42,6 +43,13 @@ message VolumeSpec {
 message MachineFilter {
   string id = 1;
   map<string, string> label_selector = 2;
+}
+
+message EventFilter {
+  string id = 1;
+  map<string, string> label_selector = 2;
+  int64 events_from_time = 3;
+  int64 events_to_time = 4;
 }
 
 message MachineClassCapabilities {
@@ -97,6 +105,18 @@ message MachineSpec {
   bytes ignition_data = 4;
   repeated Volume volumes = 5;
   repeated NetworkInterface network_interfaces = 6;
+}
+
+message Event {
+  meta.v1alpha1.ObjectMetadata metadata = 1;
+  EventSpec spec = 2;
+}
+
+message EventSpec {
+  string reason = 1;
+  string message = 2;
+  string type = 3;
+  int64 event_time = 4;
 }
 
 message MachineStatus {
@@ -166,6 +186,19 @@ message ListMachinesRequest {
 
 message ListMachinesResponse {
   repeated Machine machines = 1;
+}
+
+message ListEventsRequest {
+  EventFilter filter = 1;
+}
+
+message ListEventsResponse {
+  repeated MachineEvents machine_events = 1;
+}
+
+message MachineEvents {
+  meta.v1alpha1.ObjectMetadata involved_object_meta = 1;
+  repeated Event events = 2;
 }
 
 message CreateMachineRequest {

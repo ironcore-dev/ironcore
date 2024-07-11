@@ -212,7 +212,6 @@ func (s *Server) createIronCoreVolume(
 
 func (s *Server) attachIronCoreVolume(
 	ctx context.Context,
-	log logr.Logger,
 	ironcoreMachine *computev1alpha1.Machine,
 	ironcoreMachineVolume *computev1alpha1.Volume,
 ) error {
@@ -251,7 +250,7 @@ func (s *Server) AttachVolume(ctx context.Context, req *iri.AttachVolumeRequest)
 	}
 
 	log.V(1).Info("Attaching ironcore volume")
-	if err := s.attachIronCoreVolume(ctx, log, ironcoreMachine, ironcoreMachineVolume); err != nil {
+	if err := s.attachIronCoreVolume(ctx, ironcoreMachine, ironcoreMachineVolume); err != nil {
 		return nil, err
 	}
 

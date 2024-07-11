@@ -100,7 +100,6 @@ func (s *Server) createIronCoreNetworkInterface(
 
 func (s *Server) attachIronCoreNetworkInterface(
 	ctx context.Context,
-	log logr.Logger,
 	ironcoreMachine *computev1alpha1.Machine,
 	ironcoreMachineNic *computev1alpha1.NetworkInterface,
 ) error {
@@ -141,7 +140,7 @@ func (s *Server) AttachNetworkInterface(ctx context.Context, req *iri.AttachNetw
 		return nil, err
 	}
 
-	if err := s.attachIronCoreNetworkInterface(ctx, log, ironcoreMachine, ironcoreMachineNic); err != nil {
+	if err := s.attachIronCoreNetworkInterface(ctx, ironcoreMachine, ironcoreMachineNic); err != nil {
 		return nil, fmt.Errorf("error creating ironcore network interface: %w", err)
 	}
 

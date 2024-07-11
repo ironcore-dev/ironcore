@@ -25,6 +25,7 @@ import (
 	machinepoolletconfig "github.com/ironcore-dev/ironcore/poollet/machinepoollet/client/config"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/mcm"
+	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/mem"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/server"
 	"github.com/ironcore-dev/ironcore/utils/client/config"
 	"github.com/spf13/cobra"
@@ -257,6 +258,11 @@ func Run(ctx context.Context, opts Options) error {
 	machineClassMapper := mcm.NewGeneric(machineRuntime, mcm.GenericOptions{})
 	if err := mgr.Add(machineClassMapper); err != nil {
 		return fmt.Errorf("error adding machine class mapper: %w", err)
+	}
+
+	machineEventMapper := mem.NewMachineEventMapper(mgr.GetClient(), machineRuntime, mgr.GetEventRecorderFor("machine-cluster-events"), mem.MachineEventMapperOptions{})
+	if err := mgr.Add(machineEventMapper); err != nil {
+		return fmt.Errorf("error adding machine event mapper: %w", err)
 	}
 
 	machineEvents := irievent.NewGenerator(func(ctx context.Context) ([]*iri.Machine, error) {
