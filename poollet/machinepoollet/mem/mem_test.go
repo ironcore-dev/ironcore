@@ -108,25 +108,22 @@ var _ = Describe("MachineEventMapper", func() {
 		Eventually(srv).Should(SatisfyAll(
 			HaveField("Machines", HaveLen(1)),
 		))
-
-		By("setting an event for iri machine")
 		_, iriMachine := GetSingleMapEntry(srv.Machines)
-		machineEvent := &fakemachine.FakeMachineEvents{
-			MachineEvents: iri.MachineEvents{
-				InvolvedObjectMeta: &v1alpha1.ObjectMetadata{
-					Id:     iriMachine.Metadata.Id,
-					Labels: iriMachine.Metadata.Labels,
-				},
-				Events: []*iri.Event{{
-					Spec: &iri.EventSpec{
-						Reason:    "testing",
-						Message:   "this is test event",
-						Type:      "Normal",
-						EventTime: time.Now().Unix(),
-					}}},
-			},
+		By("setting an event for iri machine")
+		eventList := []*fakemachine.FakeEvent{{
+			Event: iri.Event{
+				Spec: &iri.EventSpec{
+					InvolvedObjectMeta: &v1alpha1.ObjectMetadata{
+						Labels: iriMachine.Metadata.Labels,
+					},
+					Reason:    "testing",
+					Message:   "this is test event",
+					Type:      "Normal",
+					EventTime: time.Now().Unix(),
+				}},
+		},
 		}
-		srv.SetEvents(iriMachine.Metadata.Id, machineEvent)
+		srv.SetEvents(eventList)
 
 		By("validating event has been emitted for correct machine")
 		machineEventList := &corev1.EventList{}

@@ -167,19 +167,3 @@ func IsManagedBy(o metav1.Object, manager string) bool {
 	actual, ok := o.GetLabels()[machinebrokerv1alpha1.ManagerLabel]
 	return ok && actual == manager
 }
-
-func GetIRIObjectMetadata(o metav1.Object) *irimeta.ObjectMetadata {
-	var deletedAt int64
-	if !o.GetDeletionTimestamp().IsZero() {
-		deletedAt = o.GetDeletionTimestamp().UnixNano()
-	}
-
-	return &irimeta.ObjectMetadata{
-		Id:          o.GetName(),
-		Annotations: o.GetAnnotations(),
-		Labels:      o.GetLabels(),
-		Generation:  o.GetGeneration(),
-		CreatedAt:   o.GetCreationTimestamp().UnixNano(),
-		DeletedAt:   deletedAt,
-	}
-}

@@ -108,15 +108,15 @@ message MachineSpec {
 }
 
 message Event {
-  meta.v1alpha1.ObjectMetadata metadata = 1;
   EventSpec spec = 2;
 }
 
 message EventSpec {
-  string reason = 1;
-  string message = 2;
-  string type = 3;
-  int64 event_time = 4;
+  meta.v1alpha1.ObjectMetadata involved_object_meta = 1;
+  string reason = 2;
+  string message = 3;
+  string type = 4;
+  int64 event_time = 5;
 }
 
 message MachineStatus {
@@ -193,12 +193,7 @@ message ListEventsRequest {
 }
 
 message ListEventsResponse {
-  repeated MachineEvents machine_events = 1;
-}
-
-message MachineEvents {
-  meta.v1alpha1.ObjectMetadata involved_object_meta = 1;
-  repeated Event events = 2;
+  repeated Event events = 1;
 }
 
 message CreateMachineRequest {

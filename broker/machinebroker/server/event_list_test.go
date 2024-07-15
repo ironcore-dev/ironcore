@@ -72,15 +72,14 @@ var _ = Describe("ListEvents", func() {
 
 		Expect(err).NotTo(HaveOccurred())
 
-		Expect(resp.MachineEvents).To(ConsistOf(SatisfyAll(
-			HaveField("InvolvedObjectMeta.Id", Equal(ironcoreMachine.Name)),
-			HaveField("Events", ConsistOf(SatisfyAll(
-				HaveField("Spec", SatisfyAll(
-					HaveField("Reason", Equal("testing")),
-					HaveField("Message", Equal("this is test event")),
-					HaveField("Type", Equal(corev1.EventTypeNormal)),
-				)),
-			))),
-		)))
+		Expect(resp.Events).To(ConsistOf(
+			HaveField("Spec", SatisfyAll(
+				HaveField("InvolvedObjectMeta.Id", Equal(ironcoreMachine.Name)),
+				HaveField("Reason", Equal("testing")),
+				HaveField("Message", Equal("this is test event")),
+				HaveField("Type", Equal(corev1.EventTypeNormal)),
+			)),
+		),
+		)
 	})
 })
