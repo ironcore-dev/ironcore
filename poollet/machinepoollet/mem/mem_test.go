@@ -9,6 +9,7 @@ import (
 	"time"
 
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	irievent "github.com/ironcore-dev/ironcore/iri/apis/event/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	"github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	fakemachine "github.com/ironcore-dev/ironcore/iri/testing/machine"
@@ -108,25 +109,22 @@ var _ = Describe("MachineEventMapper", func() {
 		Eventually(srv).Should(SatisfyAll(
 			HaveField("Machines", HaveLen(1)),
 		))
-
-		By("setting an event for iri machine")
 		_, iriMachine := GetSingleMapEntry(srv.Machines)
-		machineEvent := &fakemachine.FakeMachineEvents{
-			MachineEvents: iri.MachineEvents{
-				InvolvedObjectMeta: &v1alpha1.ObjectMetadata{
-					Id:     iriMachine.Metadata.Id,
-					Labels: iriMachine.Metadata.Labels,
-				},
-				Events: []*iri.Event{{
-					Spec: &iri.EventSpec{
-						Reason:    "testing",
-						Message:   "this is test event",
-						Type:      "Normal",
-						EventTime: time.Now().Unix(),
-					}}},
-			},
+		By("setting an event for iri machine")
+		eventList := []*fakemachine.FakeEvent{{
+			Event: irievent.Event{
+				Spec: &irievent.EventSpec{
+					InvolvedObjectMeta: &v1alpha1.ObjectMetadata{
+						Labels: iriMachine.Metadata.Labels,
+					},
+					Reason:    "testing",
+					Message:   "this is test event",
+					Type:      "Normal",
+					EventTime: time.Now().Unix(),
+				}},
+		},
 		}
-		srv.SetEvents(iriMachine.Metadata.Id, machineEvent)
+		srv.SetEvents(eventList)
 
 		By("validating event has been emitted for correct machine")
 		machineEventList := &corev1.EventList{}

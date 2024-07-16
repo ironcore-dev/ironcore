@@ -13,9 +13,7 @@ import (
 	"github.com/ironcore-dev/ironcore/iri/apis/machine"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -45,28 +43,19 @@ func (m *MachineEventMapper) relist(ctx context.Context, log logr.Logger) error 
 	}
 
 	m.lastFetched = toEventFilterTime
-
-	for _, machineEvent := range res.MachineEvents {
-		if involvedMachine, err := m.getMachine(ctx, machineEvent.InvolvedObjectMeta.GetLabels()); err == nil {
-			for _, event := range machineEvent.Events {
-				m.Eventf(involvedMachine, event.Spec.Type, event.Spec.Reason, event.Spec.Message)
+	for _, machineEvent := range res.Events {
+		if machineEvent.Spec.InvolvedObjectMeta.Labels != nil {
+			involvedMachine := &computev1alpha1.Machine{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      machineEvent.Spec.InvolvedObjectMeta.Labels[v1alpha1.MachineNameLabel],
+					Namespace: machineEvent.Spec.InvolvedObjectMeta.Labels[v1alpha1.MachineNamespaceLabel],
+				},
 			}
+			m.Eventf(involvedMachine, machineEvent.Spec.Type, machineEvent.Spec.Reason, machineEvent.Spec.Message)
 		}
 	}
 
 	return nil
-}
-
-func (m *MachineEventMapper) getMachine(ctx context.Context, labels map[string]string) (*computev1alpha1.Machine, error) {
-	ironcoreMachine := &computev1alpha1.Machine{}
-	ironcoreMachineKey := client.ObjectKey{Namespace: labels[v1alpha1.MachineNamespaceLabel], Name: labels[v1alpha1.MachineNameLabel]}
-	if err := m.Client.Get(ctx, ironcoreMachineKey, ironcoreMachine); err != nil {
-		if !apierrors.IsNotFound(err) {
-			return nil, fmt.Errorf("error getting ironcore machine: %w", err)
-		}
-		return nil, status.Errorf(codes.NotFound, "machine %s not found", ironcoreMachineKey.Name)
-	}
-	return ironcoreMachine, nil
 }
 
 func (m *MachineEventMapper) Start(ctx context.Context) error {

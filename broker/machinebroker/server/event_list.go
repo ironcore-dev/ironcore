@@ -10,34 +10,52 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/machinebroker/apiutils"
+	irievent "github.com/ironcore-dev/ironcore/iri/apis/event/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 )
 
-const InvolvedObjectName = "involvedObject.name"
+const (
+	InvolvedObjectKind               = "Machine"
+	InvolvedObjectKindSelector       = "involvedObject.kind"
+	InvolvedObjectAPIVersionSelector = "involvedObject.apiVersion"
+)
 
-func (s *Server) listEvents(ctx context.Context, machineID string) ([]*iri.Event, error) {
+func (s *Server) listEvents(ctx context.Context) ([]*irievent.Event, error) {
+	log := ctrl.LoggerFrom(ctx)
 	machineEventList := &v1.EventList{}
-	selectorField := fields.Set{}
-	selectorField[InvolvedObjectName] = machineID
-
+	selectorField := fields.Set{
+		InvolvedObjectKindSelector:       InvolvedObjectKind,
+		InvolvedObjectAPIVersionSelector: computev1alpha1.SchemeGroupVersion.String(),
+	}
 	if err := s.cluster.Client().List(ctx, machineEventList,
 		client.InNamespace(s.cluster.Namespace()), client.MatchingFieldsSelector{Selector: selectorField.AsSelector()},
 	); err != nil {
-		return nil, fmt.Errorf("error listing machine events: %w", err)
+		return nil, err
 	}
 
-	var iriEvents []*iri.Event
+	var iriEvents []*irievent.Event
 	for _, machineEvent := range machineEventList.Items {
-		iriEvent := &iri.Event{
-			Metadata: apiutils.GetIRIObjectMetadata(&machineEvent.ObjectMeta),
-			Spec: &iri.EventSpec{
-				Reason:    machineEvent.Reason,
-				Message:   machineEvent.Message,
-				Type:      machineEvent.Type,
-				EventTime: machineEvent.FirstTimestamp.Unix(),
+		ironcoreMachine, err := s.getIronCoreMachine(ctx, machineEvent.InvolvedObject.Name)
+		if err != nil {
+			log.V(1).Info("Unable to get ironcore machine", "MachineName", machineEvent.InvolvedObject.Name)
+			continue
+		}
+		machineObjectMetadata, err := apiutils.GetObjectMetadata(&ironcoreMachine.ObjectMeta)
+		if err != nil {
+			continue
+		}
+		iriEvent := &irievent.Event{
+			Spec: &irievent.EventSpec{
+				InvolvedObjectMeta: machineObjectMetadata,
+				Reason:             machineEvent.Reason,
+				Message:            machineEvent.Message,
+				Type:               machineEvent.Type,
+				EventTime:          machineEvent.LastTimestamp.Unix(),
 			},
 		}
 		iriEvents = append(iriEvents, iriEvent)
@@ -45,49 +63,40 @@ func (s *Server) listEvents(ctx context.Context, machineID string) ([]*iri.Event
 	return iriEvents, nil
 }
 
-func (s *Server) filterEvents(events []*iri.Event, filter *iri.EventFilter) []*iri.Event {
+func (s *Server) filterEvents(events []*irievent.Event, filter *iri.EventFilter) []*irievent.Event {
 	if filter == nil {
 		return events
 	}
 
 	var (
-		res []*iri.Event
+		res []*irievent.Event
 		sel = labels.SelectorFromSet(filter.LabelSelector)
 	)
 	for _, iriEvent := range events {
-		if !sel.Matches(labels.Set(iriEvent.Metadata.Labels)) {
+		if !sel.Matches(labels.Set(iriEvent.Spec.InvolvedObjectMeta.Labels)) {
 			continue
 		}
-		if (filter.EventsFromTime >= 0 && iriEvent.Spec.EventTime >= filter.EventsFromTime) && (filter.EventsToTime >= 0 && iriEvent.Spec.EventTime <= filter.EventsToTime) {
-			res = append(res, iriEvent)
+
+		if filter.EventsFromTime > 0 && filter.EventsToTime > 0 {
+			if iriEvent.Spec.EventTime < filter.EventsFromTime || iriEvent.Spec.EventTime > filter.EventsToTime {
+				continue
+			}
 		}
 
+		res = append(res, iriEvent)
 	}
 	return res
 }
 
 func (s *Server) ListEvents(ctx context.Context, req *iri.ListEventsRequest) (*iri.ListEventsResponse, error) {
-	ironcoreMachineList, err := s.listIroncoreMachines(ctx)
+	iriEvents, err := s.listEvents(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error listing machine events : %w", err)
 	}
-	var machineEvents []*iri.MachineEvents
-	for i := range ironcoreMachineList.Items {
-		ironcoreMachine := &ironcoreMachineList.Items[i]
-		iriEvents, err := s.listEvents(ctx, ironcoreMachine.Name)
-		if err != nil {
-			return nil, err
-		}
 
-		iriEvents = s.filterEvents(iriEvents, req.Filter)
-		ironcoreMachineMeta, err := apiutils.GetObjectMetadata(&ironcoreMachine.ObjectMeta)
-		if err != nil {
-			return nil, fmt.Errorf("error listing machine events: %w", err)
-		}
-		machineEvents = append(machineEvents, &iri.MachineEvents{InvolvedObjectMeta: ironcoreMachineMeta, Events: iriEvents})
-	}
+	iriEvents = s.filterEvents(iriEvents, req.Filter)
 
 	return &iri.ListEventsResponse{
-		MachineEvents: machineEvents,
+		Events: iriEvents,
 	}, nil
 }

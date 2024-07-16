@@ -22,6 +22,8 @@ Files:
   hack/*
   iri/apis/bucket/v1alpha1/api.pb.go
   iri/apis/bucket/v1alpha1/api.proto
+  iri/apis/event/v1alpha1/api.pb.go
+  iri/apis/event/v1alpha1/api.proto
   iri/apis/machine/v1alpha1/api.pb.go
   iri/apis/machine/v1alpha1/api.proto
   iri/apis/meta/v1alpha1/api.pb.go

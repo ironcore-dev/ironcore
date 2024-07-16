@@ -5,6 +5,7 @@ option go_package = "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1/api.proto";
+import "github.com/ironcore-dev/ironcore/iri/apis/event/v1alpha1/api.proto";
 
 option (gogoproto.goproto_stringer_all) = false;
 option (gogoproto.stringer_all) = true;
@@ -107,18 +108,6 @@ message MachineSpec {
   repeated NetworkInterface network_interfaces = 6;
 }
 
-message Event {
-  meta.v1alpha1.ObjectMetadata metadata = 1;
-  EventSpec spec = 2;
-}
-
-message EventSpec {
-  string reason = 1;
-  string message = 2;
-  string type = 3;
-  int64 event_time = 4;
-}
-
 message MachineStatus {
   int64 observed_generation = 1;
   MachineState state = 2;
@@ -193,12 +182,7 @@ message ListEventsRequest {
 }
 
 message ListEventsResponse {
-  repeated MachineEvents machine_events = 1;
-}
-
-message MachineEvents {
-  meta.v1alpha1.ObjectMetadata involved_object_meta = 1;
-  repeated Event events = 2;
+  repeated event.v1alpha1.Event events = 1;
 }
 
 message CreateMachineRequest {

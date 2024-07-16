@@ -5,6 +5,7 @@ package get
 
 import (
 	"github.com/ironcore-dev/ironcore/irictl-machine/cmd/irictl-machine/irictlmachine/common"
+	"github.com/ironcore-dev/ironcore/irictl-machine/cmd/irictl-machine/irictlmachine/get/event"
 	"github.com/ironcore-dev/ironcore/irictl-machine/cmd/irictl-machine/irictlmachine/get/machine"
 	"github.com/ironcore-dev/ironcore/irictl-machine/cmd/irictl-machine/irictlmachine/get/status"
 	clicommon "github.com/ironcore-dev/ironcore/irictl/cmd"
@@ -19,6 +20,7 @@ func Command(streams clicommon.Streams, clientFactory common.Factory) *cobra.Com
 	cmd.AddCommand(
 		machine.Command(streams, clientFactory),
 		status.Command(streams, clientFactory),
+		event.Command(streams, clientFactory),
 	)
 
 	return cmd

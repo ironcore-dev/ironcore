@@ -41,6 +41,7 @@ function generate() {
 }
 
 generate "iri/apis/meta/v1alpha1"
+generate "iri/apis/event/v1alpha1"
 generate "iri/apis/machine/v1alpha1"
 generate "iri/apis/volume/v1alpha1"
 generate "iri/apis/bucket/v1alpha1"
