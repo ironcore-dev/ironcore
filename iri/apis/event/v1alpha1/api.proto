@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package event.v1alpha1;
+option go_package = "github.com/ironcore-dev/ironcore/iri/apis/event/v1alpha1";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1/api.proto";
+
+option (gogoproto.goproto_stringer_all) = false;
+option (gogoproto.stringer_all) = true;
+option (gogoproto.goproto_getters_all) = true;
+option (gogoproto.marshaler_all) = true;
+option (gogoproto.sizer_all) = true;
+option (gogoproto.unmarshaler_all) = true;
+option (gogoproto.goproto_unrecognized_all) = false;
+
+message Event {
+  EventSpec spec = 2;
+}
+
+message EventSpec {
+  meta.v1alpha1.ObjectMetadata involved_object_meta = 1;
+  string reason = 2;
+  string message = 3;
+  string type = 4;
+  int64 event_time = 5;
+}

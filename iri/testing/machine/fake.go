@@ -11,6 +11,7 @@ import (
 	"sync"
 	"time"
 
+	irievent "github.com/ironcore-dev/ironcore/iri/apis/event/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -63,7 +64,7 @@ type FakeMachineClassStatus struct {
 }
 
 type FakeEvent struct {
-	iri.Event
+	irievent.Event
 }
 
 type FakeRuntimeService struct {
@@ -80,7 +81,7 @@ func (r *FakeRuntimeService) ListEvents(ctx context.Context, req *iri.ListEvents
 	r.Lock()
 	defer r.Unlock()
 
-	var res []*iri.Event
+	var res []*irievent.Event
 	for _, e := range r.Events {
 		event := e.Event
 		res = append(res, &event)

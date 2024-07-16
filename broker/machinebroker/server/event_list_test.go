@@ -68,7 +68,9 @@ var _ = Describe("ListEvents", func() {
 		eventRecorder.Event(ironcoreMachine, corev1.EventTypeNormal, "testing", "this is test event")
 
 		By("listing the machine events")
-		resp, err := srv.ListEvents(ctx, &iri.ListEventsRequest{})
+		resp, err := srv.ListEvents(ctx, &iri.ListEventsRequest{Filter: &iri.EventFilter{
+			LabelSelector: map[string]string{machinepoolletv1alpha1.MachineUIDLabel: "foobar"},
+		}})
 
 		Expect(err).NotTo(HaveOccurred())
 

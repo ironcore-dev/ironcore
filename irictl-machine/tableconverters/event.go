@@ -4,7 +4,7 @@
 package tableconverters
 
 import (
-	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/event/v1alpha1"
 	"github.com/ironcore-dev/ironcore/irictl/api"
 	"github.com/ironcore-dev/ironcore/irictl/tableconverter"
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"

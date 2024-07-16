@@ -9,6 +9,7 @@ import (
 	"time"
 
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	irievent "github.com/ironcore-dev/ironcore/iri/apis/event/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	"github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	fakemachine "github.com/ironcore-dev/ironcore/iri/testing/machine"
@@ -111,8 +112,8 @@ var _ = Describe("MachineEventMapper", func() {
 		_, iriMachine := GetSingleMapEntry(srv.Machines)
 		By("setting an event for iri machine")
 		eventList := []*fakemachine.FakeEvent{{
-			Event: iri.Event{
-				Spec: &iri.EventSpec{
+			Event: irievent.Event{
+				Spec: &irievent.EventSpec{
 					InvolvedObjectMeta: &v1alpha1.ObjectMetadata{
 						Labels: iriMachine.Metadata.Labels,
 					},
