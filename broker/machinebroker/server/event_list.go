@@ -22,7 +22,7 @@ import (
 const (
 	InvolvedObjectKind               = "Machine"
 	InvolvedObjectKindSelector       = "involvedObject.kind"
-	InvolvedObjectAPIversionSelector = "involvedObject.apiVersion"
+	InvolvedObjectAPIVersionSelector = "involvedObject.apiVersion"
 )
 
 func (s *Server) listEvents(ctx context.Context) ([]*irievent.Event, error) {
@@ -30,7 +30,7 @@ func (s *Server) listEvents(ctx context.Context) ([]*irievent.Event, error) {
 	machineEventList := &v1.EventList{}
 	selectorField := fields.Set{
 		InvolvedObjectKindSelector:       InvolvedObjectKind,
-		InvolvedObjectAPIversionSelector: computev1alpha1.SchemeGroupVersion.String(),
+		InvolvedObjectAPIVersionSelector: computev1alpha1.SchemeGroupVersion.String(),
 	}
 	if err := s.cluster.Client().List(ctx, machineEventList,
 		client.InNamespace(s.cluster.Namespace()), client.MatchingFieldsSelector{Selector: selectorField.AsSelector()},
@@ -73,15 +73,17 @@ func (s *Server) filterEvents(events []*irievent.Event, filter *iri.EventFilter)
 		sel = labels.SelectorFromSet(filter.LabelSelector)
 	)
 	for _, iriEvent := range events {
-		if sel.Matches(labels.Set(iriEvent.Spec.InvolvedObjectMeta.Labels)) {
-			if filter.EventsFromTime > 0 && filter.EventsToTime > 0 {
-				if iriEvent.Spec.EventTime >= filter.EventsFromTime && iriEvent.Spec.EventTime <= filter.EventsToTime {
-					res = append(res, iriEvent)
-				}
+		if !sel.Matches(labels.Set(iriEvent.Spec.InvolvedObjectMeta.Labels)) {
+			continue
+		}
+
+		if filter.EventsFromTime > 0 && filter.EventsToTime > 0 {
+			if iriEvent.Spec.EventTime < filter.EventsFromTime || iriEvent.Spec.EventTime > filter.EventsToTime {
 				continue
 			}
-			res = append(res, iriEvent)
 		}
+
+		res = append(res, iriEvent)
 	}
 	return res
 }
