@@ -14,6 +14,7 @@ import (
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -47,6 +48,7 @@ func (m *MachineEventMapper) relist(ctx context.Context, log logr.Logger) error 
 		if machineEvent.Spec.InvolvedObjectMeta.Labels != nil {
 			involvedMachine := &computev1alpha1.Machine{
 				ObjectMeta: metav1.ObjectMeta{
+					UID:       types.UID(machineEvent.Spec.InvolvedObjectMeta.Labels[v1alpha1.MachineUIDLabel]),
 					Name:      machineEvent.Spec.InvolvedObjectMeta.Labels[v1alpha1.MachineNameLabel],
 					Namespace: machineEvent.Spec.InvolvedObjectMeta.Labels[v1alpha1.MachineNamespaceLabel],
 				},
