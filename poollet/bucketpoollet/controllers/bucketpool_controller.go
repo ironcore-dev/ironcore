@@ -57,7 +57,7 @@ func (r *BucketPoolReconciler) delete(ctx context.Context, log logr.Logger, buck
 func (r *BucketPoolReconciler) supportsBucketClass(ctx context.Context, log logr.Logger, bucketClass *storagev1alpha1.BucketClass) (bool, error) {
 	iriCapabilities, err := getIRIBucketClassCapabilities(bucketClass)
 	if err != nil {
-		return false, fmt.Errorf("error getting iri mahchine class capabilities: %w", err)
+		return false, fmt.Errorf("error getting iri bucket class capabilities: %w", err)
 	}
 
 	_, err = r.BucketClassMapper.GetBucketClassFor(ctx, bucketClass.Name, iriCapabilities)
@@ -97,7 +97,7 @@ func (r *BucketPoolReconciler) reconcile(ctx context.Context, log logr.Logger, b
 	base := bucketPool.DeepCopy()
 	bucketPool.Status.AvailableBucketClasses = supported
 	if err := r.Status().Patch(ctx, bucketPool, client.MergeFrom(base)); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error patchign bucket pool status: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error patching bucket pool status: %w", err)
 	}
 
 	log.V(1).Info("Reconciled")

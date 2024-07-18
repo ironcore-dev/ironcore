@@ -30,6 +30,10 @@ func NewRemoteRuntime(endpoint string) (bucket.RuntimeService, error) {
 	}, nil
 }
 
+func (r *remoteRuntime) ListEvents(ctx context.Context, req *iri.ListEventsRequest) (*iri.ListEventsResponse, error) {
+	return r.client.ListEvents(ctx, req)
+}
+
 func (r *remoteRuntime) ListBuckets(ctx context.Context, request *iri.ListBucketsRequest) (*iri.ListBucketsResponse, error) {
 	return r.client.ListBuckets(ctx, request)
 }

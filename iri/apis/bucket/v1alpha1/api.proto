@@ -5,6 +5,7 @@ option go_package = "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1/api.proto";
+import "github.com/ironcore-dev/ironcore/iri/apis/event/v1alpha1/api.proto";
 
 option (gogoproto.goproto_stringer_all) = false;
 option (gogoproto.stringer_all) = true;
@@ -15,11 +16,19 @@ option (gogoproto.unmarshaler_all) = true;
 option (gogoproto.goproto_unrecognized_all) = false;
 
 service BucketRuntime {
+  rpc ListEvents(ListEventsRequest) returns (ListEventsResponse) {};
   rpc ListBuckets(ListBucketsRequest) returns (ListBucketsResponse) {};
   rpc CreateBucket(CreateBucketRequest) returns (CreateBucketResponse) {};
   rpc DeleteBucket(DeleteBucketRequest) returns (DeleteBucketResponse) {};
 
   rpc ListBucketClasses(ListBucketClassesRequest) returns (ListBucketClassesResponse) {};
+}
+
+message EventFilter {
+  string id = 1;
+  map<string, string> label_selector = 2;
+  int64 events_from_time = 3;
+  int64 events_to_time = 4;
 }
 
 message BucketFilter {
@@ -61,6 +70,14 @@ enum BucketState {
   BUCKET_PENDING = 0;
   BUCKET_AVAILABLE = 1;
   BUCKET_ERROR = 2;
+}
+
+message ListEventsRequest {
+  EventFilter filter = 1;
+}
+
+message ListEventsResponse {
+  repeated event.v1alpha1.Event events = 1;
 }
 
 message ListBucketsRequest {

@@ -102,6 +102,7 @@ func setOptionsDefaults(o *Options) {
 
 var _ iri.BucketRuntimeServer = (*Server)(nil)
 
+//+kubebuilder:rbac:groups="",resources=events,verbs=get;list;watch
 //+kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=storage.ironcore.dev,resources=buckets,verbs=get;list;watch;create;update;patch;delete
 
