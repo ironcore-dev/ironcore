@@ -5,6 +5,7 @@ package get
 
 import (
 	"github.com/ironcore-dev/ironcore/irictl-volume/cmd/irictl-volume/irictlvolume/common"
+	"github.com/ironcore-dev/ironcore/irictl-volume/cmd/irictl-volume/irictlvolume/get/event"
 	"github.com/ironcore-dev/ironcore/irictl-volume/cmd/irictl-volume/irictlvolume/get/status"
 	"github.com/ironcore-dev/ironcore/irictl-volume/cmd/irictl-volume/irictlvolume/get/volume"
 	clicommon "github.com/ironcore-dev/ironcore/irictl/cmd"
@@ -19,6 +20,7 @@ func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cob
 	cmd.AddCommand(
 		volume.Command(streams, clientFactory),
 		status.Command(streams, clientFactory),
+		event.Command(streams, clientFactory),
 	)
 
 	return cmd

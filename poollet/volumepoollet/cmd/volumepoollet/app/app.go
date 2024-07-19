@@ -21,6 +21,8 @@ import (
 	volumepoolletconfig "github.com/ironcore-dev/ironcore/poollet/volumepoollet/client/config"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
+	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vem"
+
 	"github.com/ironcore-dev/ironcore/utils/client/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -172,6 +174,10 @@ func Run(ctx context.Context, opts Options) error {
 	volumeClassMapper := vcm.NewGeneric(volumeRuntime, vcm.GenericOptions{})
 	if err := mgr.Add(volumeClassMapper); err != nil {
 		return fmt.Errorf("error adding volume class mapper: %w", err)
+	}
+	volumeEventMapper := vem.NewVolumeEventMapper(mgr.GetClient(), volumeRuntime, mgr.GetEventRecorderFor("volume-cluster-events"), vem.VolumeEventMapperOptions{})
+	if err := mgr.Add(volumeEventMapper); err != nil {
+		return fmt.Errorf("error adding volume event mapper: %w", err)
 	}
 
 	volumeEvents := irievent.NewGenerator(func(ctx context.Context) ([]*iri.Volume, error) {

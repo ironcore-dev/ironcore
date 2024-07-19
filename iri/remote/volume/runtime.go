@@ -30,6 +30,9 @@ func NewRemoteRuntime(endpoint string) (volume.RuntimeService, error) {
 	}, nil
 }
 
+func (r *remoteRuntime) ListEvents(ctx context.Context, req *iri.ListEventsRequest) (*iri.ListEventsResponse, error) {
+	return r.client.ListEvents(ctx, req)
+}
 func (r *remoteRuntime) ListVolumes(ctx context.Context, request *iri.ListVolumesRequest) (*iri.ListVolumesResponse, error) {
 	return r.client.ListVolumes(ctx, request)
 }
