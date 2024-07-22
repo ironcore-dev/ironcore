@@ -6,6 +6,7 @@ package event
 import (
 	"context"
 	"fmt"
+	"time"
 
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	"github.com/ironcore-dev/ironcore/irictl-machine/cmd/irictl-machine/irictlmachine/common"
@@ -17,11 +18,15 @@ import (
 )
 
 type Options struct {
-	Labels map[string]string
+	Labels         map[string]string
+	EventsFromTime string
+	EventsToTime   string
 }
 
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringToStringVarP(&o.Labels, "labels", "l", o.Labels, "Labels to filter the events by.")
+	fs.StringVarP(&o.EventsFromTime, "eventsFromTime", "f", o.EventsFromTime, fmt.Sprintf("Events From Time to filter the events by. In the format of %s", time.DateTime))
+	fs.StringVarP(&o.EventsToTime, "eventsToTime", "t", o.EventsToTime, fmt.Sprintf("Events To Time to filter the events by. In the format of %s", time.DateTime))
 }
 
 func Command(streams clicommon.Streams, clientFactory common.Factory) *cobra.Command {
@@ -68,11 +73,24 @@ func Run(
 	render renderer.Renderer,
 	opts Options,
 ) error {
-	var filter *iri.EventFilter
+	var filter *iri.EventFilter = &iri.EventFilter{}
 	if opts.Labels != nil {
-		filter = &iri.EventFilter{
-			LabelSelector: opts.Labels,
+		filter.LabelSelector = opts.Labels
+	}
+	if opts.EventsFromTime != "" {
+		fromDate, err := time.Parse(time.DateTime, opts.EventsFromTime)
+		if err != nil {
+			return fmt.Errorf("error parsing eventsFromTime: %w", err)
 		}
+		filter.EventsFromTime = fromDate.Unix()
+	}
+
+	if opts.EventsToTime != "" {
+		toDate, err := time.Parse(time.DateTime, opts.EventsToTime)
+		if err != nil {
+			return fmt.Errorf("error parsing eventsToTime: %w", err)
+		}
+		filter.EventsToTime = toDate.Unix()
 	}
 
 	res, err := client.ListEvents(ctx, &iri.ListEventsRequest{Filter: filter})
