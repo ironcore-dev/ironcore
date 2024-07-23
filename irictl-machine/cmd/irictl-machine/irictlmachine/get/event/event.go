@@ -21,12 +21,12 @@ const DefaultDuration = 60 * time.Minute
 
 type Options struct {
 	Labels   map[string]string
-	Duration string
+	Duration time.Duration
 }
 
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringToStringVarP(&o.Labels, "labels", "l", o.Labels, "Labels to filter the events by.")
-	fs.StringVarP(&o.Duration, "duration", "d", o.Duration, "Duration to filter the events by.")
+	fs.DurationVarP(&o.Duration, "duration", "d", o.Duration, "Duration to filter the events by.")
 }
 
 func Command(streams clicommon.Streams, clientFactory common.Factory) *cobra.Command {
@@ -81,12 +81,8 @@ func Run(
 		filter.LabelSelector = opts.Labels
 	}
 
-	if opts.Duration != "" {
-		duration, err := time.ParseDuration(opts.Duration)
-		if err != nil {
-			return fmt.Errorf("error parsing Duration: %w", err)
-		}
-		filter.EventsFromTime = time.Now().Add(-1 * duration).Unix()
+	if opts.Duration > 0 {
+		filter.EventsFromTime = time.Now().Add(-1 * opts.Duration).Unix()
 	}
 
 	res, err := client.ListEvents(ctx, &iri.ListEventsRequest{Filter: filter})
