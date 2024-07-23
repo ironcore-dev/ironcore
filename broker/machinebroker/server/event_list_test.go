@@ -8,6 +8,7 @@ import (
 
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	irievent "github.com/ironcore-dev/ironcore/iri/apis/event/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
@@ -71,11 +72,11 @@ var _ = Describe("ListEvents", func() {
 		eventRecorder.Event(ironcoreMachine, corev1.EventTypeNormal, "testing", "this is test event")
 
 		By("listing the machine events with no filters")
-		resp, err := srv.ListEvents(ctx, &iri.ListEventsRequest{})
-
-		Expect(err).NotTo(HaveOccurred())
-
-		Expect(resp.Events).To(ConsistOf(
+		Eventually(func(g Gomega) []*irievent.Event {
+			resp, err := srv.ListEvents(ctx, &iri.ListEventsRequest{})
+			g.Expect(err).NotTo(HaveOccurred())
+			return resp.Events
+		}).Should(ConsistOf(
 			HaveField("Spec", SatisfyAll(
 				HaveField("InvolvedObjectMeta.Id", Equal(ironcoreMachine.Name)),
 				HaveField("Reason", Equal("testing")),
@@ -86,7 +87,7 @@ var _ = Describe("ListEvents", func() {
 		)
 
 		By("listing the machine events with matching label and time filters")
-		resp, err = srv.ListEvents(ctx, &iri.ListEventsRequest{Filter: &iri.EventFilter{
+		resp, err := srv.ListEvents(ctx, &iri.ListEventsRequest{Filter: &iri.EventFilter{
 			LabelSelector:  map[string]string{machinepoolletv1alpha1.MachineUIDLabel: "foobar"},
 			EventsFromTime: eventGeneratedTime.Unix(),
 			EventsToTime:   time.Now().Unix(),
