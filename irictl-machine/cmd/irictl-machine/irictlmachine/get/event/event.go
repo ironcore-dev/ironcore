@@ -17,8 +17,6 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
-const DefaultDuration = 60 * time.Minute
-
 type Options struct {
 	Labels   map[string]string
 	Duration time.Duration
@@ -26,7 +24,7 @@ type Options struct {
 
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringToStringVarP(&o.Labels, "labels", "l", o.Labels, "Labels to filter the events by.")
-	fs.DurationVarP(&o.Duration, "duration", "d", o.Duration, "Duration to filter the events by.")
+	fs.DurationVarP(&o.Duration, "duration", "d", 60*time.Minute, "Duration to filter the events by.")
 }
 
 func Command(streams clicommon.Streams, clientFactory common.Factory) *cobra.Command {
@@ -74,15 +72,9 @@ func Run(
 	opts Options,
 ) error {
 	var filter *iri.EventFilter = &iri.EventFilter{
-		EventsFromTime: time.Now().Add(-1 * DefaultDuration).Unix(),
+		LabelSelector:  opts.Labels,
+		EventsFromTime: time.Now().Add(-1 * opts.Duration).Unix(),
 		EventsToTime:   time.Now().Unix(),
-	}
-	if opts.Labels != nil {
-		filter.LabelSelector = opts.Labels
-	}
-
-	if opts.Duration > 0 {
-		filter.EventsFromTime = time.Now().Add(-1 * opts.Duration).Unix()
 	}
 
 	res, err := client.ListEvents(ctx, &iri.ListEventsRequest{Filter: filter})
