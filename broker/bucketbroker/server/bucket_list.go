@@ -9,6 +9,7 @@ import (
 
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	bucketbrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/bucketbroker/api/v1alpha1"
+	"github.com/ironcore-dev/ironcore/broker/bucketbroker/apiutils"
 	"github.com/ironcore-dev/ironcore/broker/common"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
 	"google.golang.org/grpc/codes"
@@ -110,6 +111,21 @@ func (s *Server) aggregateIronCoreBucket(
 		Bucket:       ironcoreBucket,
 		AccessSecret: accessSecret,
 	}, nil
+}
+
+func (s *Server) getIronCoreBucket(ctx context.Context, id string) (*storagev1alpha1.Bucket, error) {
+	ironcoreBucket := &storagev1alpha1.Bucket{}
+	ironcoreBucketKey := client.ObjectKey{Namespace: s.namespace, Name: id}
+	if err := s.client.Get(ctx, ironcoreBucketKey, ironcoreBucket); err != nil {
+		if !apierrors.IsNotFound(err) {
+			return nil, fmt.Errorf("error getting ironcore bucket %s: %w", id, err)
+		}
+		return nil, status.Errorf(codes.NotFound, "bucket %s not found", id)
+	}
+	if !apiutils.IsManagedBy(ironcoreBucket, bucketbrokerv1alpha1.BucketBrokerManager) || !apiutils.IsCreated(ironcoreBucket) {
+		return nil, status.Errorf(codes.NotFound, "bucket %s not found", id)
+	}
+	return ironcoreBucket, nil
 }
 
 func (s *Server) getAggregateIronCoreBucket(ctx context.Context, id string) (*AggregateIronCoreBucket, error) {

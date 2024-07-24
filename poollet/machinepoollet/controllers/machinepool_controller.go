@@ -70,7 +70,7 @@ func (r *MachinePoolReconciler) delete(ctx context.Context, log logr.Logger, mac
 func (r *MachinePoolReconciler) supportsMachineClass(ctx context.Context, log logr.Logger, machineClass *computev1alpha1.MachineClass) (*iri.MachineClass, int64, error) {
 	iriCapabilities, err := getIRIMachineClassCapabilities(machineClass)
 	if err != nil {
-		return nil, 0, fmt.Errorf("error getting iri mahchine class capabilities: %w", err)
+		return nil, 0, fmt.Errorf("error getting iri machine class capabilities: %w", err)
 	}
 
 	class, quantity, err := r.MachineClassMapper.GetMachineClassFor(ctx, machineClass.Name, iriCapabilities)

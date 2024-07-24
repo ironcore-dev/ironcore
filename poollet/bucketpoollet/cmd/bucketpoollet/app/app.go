@@ -17,6 +17,7 @@ import (
 	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
 	iriremotebucket "github.com/ironcore-dev/ironcore/iri/remote/bucket"
 	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/bcm"
+	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/bem"
 	bucketpoolletconfig "github.com/ironcore-dev/ironcore/poollet/bucketpoollet/client/config"
 	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/controllers"
 	"github.com/ironcore-dev/ironcore/poollet/irievent"
@@ -172,6 +173,11 @@ func Run(ctx context.Context, opts Options) error {
 	bucketClassMapper := bcm.NewGeneric(bucketRuntime, bcm.GenericOptions{})
 	if err := mgr.Add(bucketClassMapper); err != nil {
 		return fmt.Errorf("error adding bucket class mapper: %w", err)
+	}
+
+	bucketEventMapper := bem.NewBucketEventMapper(mgr.GetClient(), bucketRuntime, mgr.GetEventRecorderFor("bucket-cluster-events"), bem.BucketEventMapperOptions{})
+	if err := mgr.Add(bucketEventMapper); err != nil {
+		return fmt.Errorf("error adding bucket event mapper: %w", err)
 	}
 
 	bucketEvents := irievent.NewGenerator(func(ctx context.Context) ([]*iri.Bucket, error) {

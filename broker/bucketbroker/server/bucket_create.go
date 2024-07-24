@@ -67,7 +67,7 @@ func (s *Server) createIronCoreBucket(ctx context.Context, log logr.Logger, buck
 
 	log.V(1).Info("Patching ironcore bucket as created")
 	if err := apiutils.PatchCreated(ctx, s.client, bucket.Bucket); err != nil {
-		return fmt.Errorf("error patching ironcore machine as created: %w", err)
+		return fmt.Errorf("error patching ironcore bucket as created: %w", err)
 	}
 
 	// Reset cleaner since everything from now on operates on a consistent bucket
