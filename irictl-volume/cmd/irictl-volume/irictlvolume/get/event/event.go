@@ -6,6 +6,7 @@ package event
 import (
 	"context"
 	"fmt"
+	"time"
 
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	"github.com/ironcore-dev/ironcore/irictl-volume/cmd/irictl-volume/irictlvolume/common"
@@ -17,11 +18,13 @@ import (
 )
 
 type Options struct {
-	Labels map[string]string
+	Labels   map[string]string
+	Duration time.Duration
 }
 
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringToStringVarP(&o.Labels, "labels", "l", o.Labels, "Labels to filter the events by.")
+	fs.DurationVarP(&o.Duration, "duration", "d", 60*time.Minute, "Duration to filter the events by.")
 }
 
 func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cobra.Command {
@@ -68,11 +71,10 @@ func Run(
 	render renderer.Renderer,
 	opts Options,
 ) error {
-	var filter *iri.EventFilter
-	if opts.Labels != nil {
-		filter = &iri.EventFilter{
-			LabelSelector: opts.Labels,
-		}
+	var filter *iri.EventFilter = &iri.EventFilter{
+		LabelSelector:  opts.Labels,
+		EventsFromTime: time.Now().Add(-1 * opts.Duration).Unix(),
+		EventsToTime:   time.Now().Unix(),
 	}
 
 	res, err := client.ListEvents(ctx, &iri.ListEventsRequest{Filter: filter})
