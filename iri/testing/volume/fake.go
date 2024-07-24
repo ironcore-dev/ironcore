@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/ironcore-dev/ironcore/broker/common/idgen"
+	irievent "github.com/ironcore-dev/ironcore/iri/apis/event/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -26,6 +27,9 @@ type FakeVolume struct {
 type FakeVolumeClassStatus struct {
 	iri.VolumeClassStatus
 }
+type FakeEvent struct {
+	irievent.Event
+}
 
 type FakeRuntimeService struct {
 	sync.Mutex
@@ -34,6 +38,7 @@ type FakeRuntimeService struct {
 
 	Volumes             map[string]*FakeVolume
 	VolumeClassesStatus map[string]*FakeVolumeClassStatus
+	Events              []*FakeEvent
 }
 
 func NewFakeRuntimeService() *FakeRuntimeService {
@@ -42,6 +47,7 @@ func NewFakeRuntimeService() *FakeRuntimeService {
 
 		Volumes:             make(map[string]*FakeVolume),
 		VolumeClassesStatus: make(map[string]*FakeVolumeClassStatus),
+		Events:              []*FakeEvent{},
 	}
 }
 
@@ -63,6 +69,27 @@ func (r *FakeRuntimeService) SetVolumeClasses(volumeClassStatus []*FakeVolumeCla
 	for _, status := range volumeClassStatus {
 		r.VolumeClassesStatus[status.VolumeClass.Name] = status
 	}
+}
+
+func (r *FakeRuntimeService) SetEvents(events []*FakeEvent) {
+	r.Lock()
+	defer r.Unlock()
+
+	r.Events = events
+}
+
+// ListEvents implements volume.RuntimeService.
+func (r *FakeRuntimeService) ListEvents(ctx context.Context, req *iri.ListEventsRequest) (*iri.ListEventsResponse, error) {
+	r.Lock()
+	defer r.Unlock()
+
+	var res []*irievent.Event
+	for _, e := range r.Events {
+		event := e.Event
+		res = append(res, &event)
+	}
+
+	return &iri.ListEventsResponse{Events: res}, nil
 }
 
 func (r *FakeRuntimeService) ListVolumes(ctx context.Context, req *iri.ListVolumesRequest) (*iri.ListVolumesResponse, error) {

@@ -10,6 +10,7 @@ import (
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/common"
 	volumebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/volumebroker/api/v1alpha1"
+	"github.com/ironcore-dev/ironcore/broker/volumebroker/apiutils"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -129,6 +130,21 @@ func (s *Server) aggregateIronCoreVolume(
 		EncryptionSecret: encryptionSecret,
 		AccessSecret:     accessSecret,
 	}, nil
+}
+
+func (s *Server) getIronCoreVolume(ctx context.Context, id string) (*storagev1alpha1.Volume, error) {
+	ironcoreVolume := &storagev1alpha1.Volume{}
+	ironcoreVolumeKey := client.ObjectKey{Namespace: s.namespace, Name: id}
+	if err := s.client.Get(ctx, ironcoreVolumeKey, ironcoreVolume); err != nil {
+		if !apierrors.IsNotFound(err) {
+			return nil, fmt.Errorf("error getting ironcore volume %s: %w", id, err)
+		}
+		return nil, status.Errorf(codes.NotFound, "volume %s not found", id)
+	}
+	if !apiutils.IsManagedBy(ironcoreVolume, volumebrokerv1alpha1.VolumeBrokerManager) || !apiutils.IsCreated(ironcoreVolume) {
+		return nil, status.Errorf(codes.NotFound, "volume %s not found", id)
+	}
+	return ironcoreVolume, nil
 }
 
 func (s *Server) getAggregateIronCoreVolume(ctx context.Context, id string) (*AggregateIronCoreVolume, error) {
