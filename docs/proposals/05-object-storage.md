@@ -1,7 +1,7 @@
 ---
 title: Object Storage
 
-oep-number: 5
+iep-number: 5
 
 creation-date: 2022-12-19
 
@@ -19,16 +19,21 @@ reviewers:
 
 ---
 
-# OEP-5: Object Storage
+# IEP-5: Object Storage
 
 ## Table of Contents
 
-- [Summary](#summary)
-- [Motivation](#motivation)
+- [IEP-5: Object Storage](#IEP-5-object-storage)
+  - [Table of Contents](#table-of-contents)
+  - [Summary](#summary)
+  - [Motivation](#motivation)
     - [Goals](#goals)
     - [Non-Goals](#non-goals)
-- [Proposal](#proposal)
-- [Alternatives](#alternatives)
+  - [Proposal](#proposal)
+    - [Bucket](#bucket)
+    - [BucketClass](#bucketclass)
+    - [BucketPool](#bucketpool)
+  - [Alternatives](#alternatives)
 
 ## Summary
 Object storage builds the basis for many cloud applications. An Object Storage provides a simplified object 
