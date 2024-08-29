@@ -60,11 +60,9 @@ func (r *NetworkPeeringReconciler) reconcile(ctx context.Context, log logr.Logge
 		}
 	}
 
-	if len(peeringClaimRefs) > 0 {
-		log.V(1).Info("Peering claim refs require network spec update")
-		if err := r.updateSpec(ctx, log, network, peeringClaimRefs); err != nil {
-			return ctrl.Result{}, fmt.Errorf("error updating network spec: %w", err)
-		}
+	log.V(1).Info("Peering claim refs require network spec update")
+	if err := r.updateSpec(ctx, log, network, peeringClaimRefs); err != nil {
+		return ctrl.Result{}, fmt.Errorf("error updating network spec: %w", err)
 	}
 
 	log.V(1).Info("Reconciled")
