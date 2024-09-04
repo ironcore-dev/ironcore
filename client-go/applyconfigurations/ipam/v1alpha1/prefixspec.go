@@ -7,8 +7,8 @@ package v1alpha1
 
 import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
-	metav1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/meta/v1"
 	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
 // PrefixSpecApplyConfiguration represents an declarative configuration of the PrefixSpec type for use
