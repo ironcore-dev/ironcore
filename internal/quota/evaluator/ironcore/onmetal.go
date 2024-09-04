@@ -4,8 +4,8 @@
 package ironcore
 
 import (
-	"github.com/ironcore-dev/ironcore/client-go/informers"
-	"github.com/ironcore-dev/ironcore/client-go/ironcore"
+	informers "github.com/ironcore-dev/ironcore/client-go/informers/externalversions"
+	ironcore "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned"
 	"github.com/ironcore-dev/ironcore/internal/quota/evaluator/compute"
 	"github.com/ironcore-dev/ironcore/internal/quota/evaluator/generic"
 	"github.com/ironcore-dev/ironcore/internal/quota/evaluator/storage"
