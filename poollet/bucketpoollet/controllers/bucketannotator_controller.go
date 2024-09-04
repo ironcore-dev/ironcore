@@ -99,7 +99,7 @@ func (r *BucketAnnotatorReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		return err
 	}
 
-	if err := c.Watch(src, &handler.EnqueueRequestForObject{}); err != nil {
+	if err := c.Watch(src); err != nil {
 		return err
 	}
 
@@ -143,5 +143,6 @@ func (r *BucketAnnotatorReconciler) iriBucketEventSource(mgr ctrl.Manager) (sour
 		return nil, err
 	}
 
-	return &source.Channel{Source: ch}, nil
+	return source.Channel(ch, &handler.EnqueueRequestForObject{}), nil
+
 }

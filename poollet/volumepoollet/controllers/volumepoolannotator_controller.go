@@ -55,9 +55,7 @@ func (r *VolumePoolAnnotatorReconciler) SetupWithManager(mgr ctrl.Manager) error
 		return err
 	}
 
-	if err := c.Watch(src, handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
-		return []ctrl.Request{{NamespacedName: client.ObjectKey{Name: r.VolumePoolName}}}
-	})); err != nil {
+	if err := c.Watch(src); err != nil {
 		return err
 	}
 
@@ -116,5 +114,7 @@ func (r *VolumePoolAnnotatorReconciler) iriClassEventSource(mgr ctrl.Manager) (s
 		return nil, err
 	}
 
-	return &source.Channel{Source: ch}, nil
+	return source.Channel(ch, handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
+		return []ctrl.Request{{NamespacedName: client.ObjectKey{Name: r.VolumePoolName}}}
+	})), nil
 }
