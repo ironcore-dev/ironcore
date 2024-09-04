@@ -9,7 +9,7 @@ import (
 	"io"
 
 	"github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	"github.com/ironcore-dev/ironcore/client-go/ironcore"
+	ironcore "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned"
 	"github.com/ironcore-dev/ironcore/internal/apis/core"
 	"github.com/ironcore-dev/ironcore/internal/apis/storage"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
