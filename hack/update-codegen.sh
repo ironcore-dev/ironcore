@@ -7,14 +7,14 @@ set -o pipefail
 SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 PROJECT_ROOT="$SCRIPT_DIR/.."
 
+CODE_GEN_DIR="${CODE_GEN_DIR:-$(go list -m -f '{{.Dir}}' k8s.io/code-generator)}"
+source "${CODE_GEN_DIR}/kube_codegen.sh"
+
 export TERM="xterm-256color"
 
 bold="$(tput bold)"
 blue="$(tput setaf 4)"
 normal="$(tput sgr0)"
-
-CODE_GEN_DIR=$(go list -m -f '{{.Dir}}' k8s.io/code-generator)
-source "${CODE_GEN_DIR}/kube_codegen.sh"
 
 function qualify-gvs() {
   APIS_PKG="$1"
