@@ -4,6 +4,7 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+THIS_PKG="github.com/ironcore-dev/ironcore"
 SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 PROJECT_ROOT="$SCRIPT_DIR/.."
 
@@ -34,21 +35,6 @@ function qualify-gvs() {
   echo "$res"
 }
 
-function qualify-gs() {
-  APIS_PKG="$1"
-  unset GROUPS
-  IFS=' ' read -ra GROUPS <<< "$2"
-  join_char=""
-  res=""
-
-  for G in "${GROUPS[@]}"; do
-    res="$res$join_char$APIS_PKG/$G"
-    join_char=","
-  done
-
-  echo "$res"
-}
-
 VGOPATH="$VGOPATH"
 MODELS_SCHEMA="$MODELS_SCHEMA"
 OPENAPI_GEN="$OPENAPI_GEN"
@@ -74,10 +60,10 @@ kube::codegen::gen_helpers \
   "$PROJECT_ROOT/api"
 
 echo "Generating ${blue}openapi${normal}"
-input_dirs=($(qualify-gvs "github.com/ironcore-dev/ironcore/api" "$ALL_VERSION_GROUPS"))
+input_dirs=($(qualify-gvs "${THIS_PKG}/api" "$ALL_VERSION_GROUPS"))
 "$OPENAPI_GEN" \
   --output-dir "$PROJECT_ROOT/client-go/openapi" \
-  --output-pkg "github.com/ironcore-dev/ironcore/client-go/openapi" \
+  --output-pkg "${THIS_PKG}/client-go/openapi" \
   --output-file "zz_generated.openapi.go" \
   --report-filename "$PROJECT_ROOT/client-go/openapi/api_violations.report" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
@@ -88,25 +74,24 @@ input_dirs=($(qualify-gvs "github.com/ironcore-dev/ironcore/api" "$ALL_VERSION_G
   "k8s.io/apimachinery/pkg/api/resource" \
   "${input_dirs[@]}"
 
-
 echo "Generating ${blue}client, lister, informer, and applyconfiguration${normal}"
 applyconfigurationgen_external_apis+=("k8s.io/apimachinery/pkg/apis/meta/v1:k8s.io/client-go/applyconfigurations/meta/v1")
 for GV in ${ALL_VERSION_GROUPS}; do
   IFS=: read -r G V <<<"${GV}"
-  applyconfigurationgen_external_apis+=("github.com/ironcore-dev/ironcore/api/${G}/${V}:github.com/ironcore-dev/ironcore/client-go/applyconfigurations/${G}/${V}")
+  applyconfigurationgen_external_apis+=("${THIS_PKG}/api/${G}/${V}:${THIS_PKG}/client-go/applyconfigurations/${G}/${V}")
 done
 applyconfigurationgen_external_apis_csv=$(IFS=,; echo "${applyconfigurationgen_external_apis[*]}")
 kube::codegen::gen_client \
   --with-applyconfig \
   --applyconfig-name "applyconfigurations" \
   --applyconfig-externals "${applyconfigurationgen_external_apis_csv}" \
-  --applyconfig-openapi-schema <("$MODELS_SCHEMA" --openapi-package "github.com/ironcore-dev/ironcore/client-go/openapi" --openapi-title "ironcore") \
+  --applyconfig-openapi-schema <("$MODELS_SCHEMA" --openapi-package "${THIS_PKG}/client-go/openapi" --openapi-title "ironcore") \
   --clientset-name "ironcore" \
   --listers-name "listers" \
   --informers-name "informers" \
   --with-watch \
   --output-dir "$PROJECT_ROOT/client-go" \
-  --output-pkg "github.com/ironcore-dev/ironcore/client-go" \
+  --output-pkg "${THIS_PKG}/client-go" \
   --boilerplate "$SCRIPT_DIR/boilerplate.go.txt" \
   "$PROJECT_ROOT/api"
 
