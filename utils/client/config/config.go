@@ -303,7 +303,7 @@ func (g *Getter) getAndBootstrapConfigIfNecessary(ctx context.Context, o *GetCon
 		return nil, nil, fmt.Errorf("error loading bootstrap kubeconfig: %w", err)
 	}
 	if bootstrapCfg != nil {
-		cfg.Dial = dialFunc
+		bootstrapCfg.Dial = dialFunc
 	}
 
 	if cfg == nil && bootstrapCfg == nil {
