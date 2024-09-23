@@ -150,6 +150,8 @@ type VolumeStatus struct {
 	State VolumeState
 	// LastStateTransitionTime is the last time the State transitioned.
 	LastStateTransitionTime *metav1.Time
+	//VolumeRef reference to the claimed Volume
+	VolumeRef corev1.LocalObjectReference
 }
 
 // VolumeState is the infrastructure attachment state a Volume can be in.

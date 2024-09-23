@@ -353,10 +353,12 @@ func (r *MachineReconciler) getVolumeStatusesForMachine(
 			if err != nil {
 				return nil, fmt.Errorf("[volume %s] %w", machineVolume.Name, err)
 			}
+			volumeStatusValues.VolumeRef = corev1.LocalObjectReference{Name: computev1alpha1.MachineVolumeName(machine.Name, machineVolume)}
 		} else {
 			volumeStatusValues = computev1alpha1.VolumeStatus{
-				Name:  machineVolume.Name,
-				State: computev1alpha1.VolumeStatePending,
+				Name:      machineVolume.Name,
+				State:     computev1alpha1.VolumeStatePending,
+				VolumeRef: corev1.LocalObjectReference{Name: computev1alpha1.MachineVolumeName(machine.Name, machineVolume)},
 			}
 		}
 
@@ -402,4 +404,5 @@ func (r *MachineReconciler) addVolumeStatusValues(now metav1.Time, existing, new
 	existing.Name = newValues.Name
 	existing.State = newValues.State
 	existing.Handle = newValues.Handle
+	existing.VolumeRef = newValues.VolumeRef
 }

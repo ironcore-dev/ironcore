@@ -433,6 +433,10 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: state
       type:
         scalar: string
+    - name: volumeRef
+      type:
+        namedType: io.k8s.api.core.v1.LocalObjectReference
+      default: {}
 - name: com.github.ironcore-dev.ironcore.api.core.v1alpha1.ObjectSelector
   map:
     fields:
