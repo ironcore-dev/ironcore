@@ -1701,6 +1701,13 @@ func schema_ironcore_api_compute_v1alpha1_NetworkInterfaceStatus(ref common.Refe
 							Format:      "",
 						},
 					},
+					"networkInterfaceRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "networkInterfaceRef is the reference to the networkinterface attached to the machine",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
+						},
+					},
 					"lastStateTransitionTime": {
 						SchemaProps: spec.SchemaProps{
 							Description: "LastStateTransitionTime is the last time the State transitioned.",
@@ -1712,7 +1719,7 @@ func schema_ironcore_api_compute_v1alpha1_NetworkInterfaceStatus(ref common.Refe
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
 	}
 }
 

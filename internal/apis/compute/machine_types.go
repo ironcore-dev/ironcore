@@ -124,6 +124,8 @@ type NetworkInterfaceStatus struct {
 	VirtualIP *commonv1alpha1.IP
 	// State represents the attachment state of a NetworkInterface.
 	State NetworkInterfaceState
+	// networkInterfaceRef is the reference to the networkinterface attached to the machine
+	NetworkInterfaceRef corev1.LocalObjectReference `json:"networkInterfaceRef,omitempty"`
 	// LastStateTransitionTime is the last time the State transitioned.
 	LastStateTransitionTime *metav1.Time
 }

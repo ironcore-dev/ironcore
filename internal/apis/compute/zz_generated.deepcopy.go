@@ -594,6 +594,7 @@ func (in *NetworkInterfaceStatus) DeepCopyInto(out *NetworkInterfaceStatus) {
 		in, out := &in.VirtualIP, &out.VirtualIP
 		*out = (*in).DeepCopy()
 	}
+	out.NetworkInterfaceRef = in.NetworkInterfaceRef
 	if in.LastStateTransitionTime != nil {
 		in, out := &in.LastStateTransitionTime, &out.LastStateTransitionTime
 		*out = (*in).DeepCopy()
