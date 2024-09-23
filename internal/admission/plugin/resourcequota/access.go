@@ -10,7 +10,7 @@ import (
 	"time"
 
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
-	"github.com/ironcore-dev/ironcore/client-go/ironcore"
+	ironcore "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned"
 	corev1alpha1listers "github.com/ironcore-dev/ironcore/client-go/listers/core/v1alpha1"
 	"golang.org/x/exp/slices"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

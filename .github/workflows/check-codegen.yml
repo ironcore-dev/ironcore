@@ -14,6 +14,11 @@ jobs:
     - uses: actions/setup-go@v5
       with:
         go-version-file: 'go.mod'
+    - name: Download k8s.io/code-generator
+      run: |
+          CODE_GEN_VERSION=$(go list -m -f '{{.Version}}' k8s.io/code-generator)
+          go get k8s.io/code-generator@$CODE_GEN_VERSION
+          echo "CODE_GEN_DIR=$(go list -m -f '{{.Dir}}' k8s.io/code-generator)" >> $GITHUB_ENV
     - name: Run make generate
       run: make generate
     - name: Compare the expected and actual generated/* directories
