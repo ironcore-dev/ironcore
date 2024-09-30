@@ -376,7 +376,7 @@ func (r *MachineReconciler) convertIRINetworkInterfaceState(state iri.NetworkInt
 	return "", fmt.Errorf("unknown network interface attachment state %v", state)
 }
 
-func (r *MachineReconciler) convertIRINetworkInterfaceStatus(status *iri.NetworkInterfaceStatus, machine *computev1alpha1.Machine, machineNic computev1alpha1.NetworkInterface) (computev1alpha1.NetworkInterfaceStatus, error) {
+func (r *MachineReconciler) convertIRINetworkInterfaceStatus(status *iri.NetworkInterfaceStatus, nicName string) (computev1alpha1.NetworkInterfaceStatus, error) {
 	state, err := r.convertIRINetworkInterfaceState(status.State)
 	if err != nil {
 		return computev1alpha1.NetworkInterfaceStatus{}, err
@@ -386,7 +386,7 @@ func (r *MachineReconciler) convertIRINetworkInterfaceStatus(status *iri.Network
 		Name:                status.Name,
 		Handle:              status.Handle,
 		State:               state,
-		NetworkInterfaceRef: corev1.LocalObjectReference{Name: computev1alpha1.MachineNetworkInterfaceName(machine.Name, machineNic)},
+		NetworkInterfaceRef: corev1.LocalObjectReference{Name: nicName},
 	}, nil
 }
 
@@ -417,9 +417,10 @@ func (r *MachineReconciler) getNetworkInterfaceStatusesForMachine(
 			iriNicStatus, ok = iriNicStatusByName[machineNic.Name]
 			nicStatusValues  computev1alpha1.NetworkInterfaceStatus
 		)
+		nicName := computev1alpha1.MachineNetworkInterfaceName(machine.Name, machineNic)
 		if ok {
 			var err error
-			nicStatusValues, err = r.convertIRINetworkInterfaceStatus(iriNicStatus, machine, machineNic)
+			nicStatusValues, err = r.convertIRINetworkInterfaceStatus(iriNicStatus, nicName)
 			if err != nil {
 				return nil, fmt.Errorf("[network interface %s] %w", machineNic.Name, err)
 			}
@@ -427,7 +428,7 @@ func (r *MachineReconciler) getNetworkInterfaceStatusesForMachine(
 			nicStatusValues = computev1alpha1.NetworkInterfaceStatus{
 				Name:                machineNic.Name,
 				State:               computev1alpha1.NetworkInterfaceStatePending,
-				NetworkInterfaceRef: corev1.LocalObjectReference{Name: computev1alpha1.MachineNetworkInterfaceName(machine.Name, machineNic)},
+				NetworkInterfaceRef: corev1.LocalObjectReference{Name: nicName},
 			}
 		}
 
