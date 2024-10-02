@@ -388,6 +388,10 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
+    - name: networkInterfaceRef
+      type:
+        namedType: io.k8s.api.core.v1.LocalObjectReference
+      default: {}
     - name: state
       type:
         scalar: string

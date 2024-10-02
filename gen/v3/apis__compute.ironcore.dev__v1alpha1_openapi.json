@@ -4791,6 +4791,15 @@
 						"type": "string",
 						"default": ""
 					},
+					"networkInterfaceRef": {
+						"description": "networkInterfaceRef is the reference to the networkinterface attached to the machine",
+						"default": {},
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/io.k8s.api.core.v1.LocalObjectReference"
+							}
+						]
+					},
 					"state": {
 						"description": "State represents the attachment state of a NetworkInterface.",
 						"type": "string"

@@ -27,6 +27,148 @@ import (
 var _ = Describe("MachineController", func() {
 	ns, mp, mc, srv := SetupTest()
 
+	It("Should create a machine with an ephemeral NIC and ensure claimed networkInterfaceRef matches the ephemeral NIC", func(ctx SpecContext) {
+		By("creating a network")
+		network := &networkingv1alpha1.Network{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "network-",
+			},
+			Spec: networkingv1alpha1.NetworkSpec{
+				ProviderID: "foo",
+			},
+		}
+		Expect(k8sClient.Create(ctx, network)).To(Succeed())
+
+		By("patching the network to be available")
+		Eventually(UpdateStatus(network, func() {
+			network.Status.State = networkingv1alpha1.NetworkStateAvailable
+		})).Should(Succeed())
+
+		By("creating a volume")
+		volume := &storagev1alpha1.Volume{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "volume-",
+			},
+			Spec: storagev1alpha1.VolumeSpec{},
+		}
+		Expect(k8sClient.Create(ctx, volume)).To(Succeed())
+
+		By("patching the volume to be available")
+		Eventually(UpdateStatus(volume, func() {
+			volume.Status.State = storagev1alpha1.VolumeStateAvailable
+			volume.Status.Access = &storagev1alpha1.VolumeAccess{
+				Driver: "test",
+				Handle: "testhandle",
+			}
+		})).Should(Succeed())
+
+		By("creating a machine")
+		const fooAnnotationValue = "bar"
+		machine := &computev1alpha1.Machine{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "machine-",
+				Annotations: map[string]string{
+					fooAnnotation: fooAnnotationValue,
+				},
+			},
+			Spec: computev1alpha1.MachineSpec{
+				MachineClassRef: corev1.LocalObjectReference{Name: mc.Name},
+				MachinePoolRef:  &corev1.LocalObjectReference{Name: mp.Name},
+				Volumes: []computev1alpha1.Volume{
+					{
+						Name: "primary",
+						VolumeSource: computev1alpha1.VolumeSource{
+							VolumeRef: &corev1.LocalObjectReference{Name: volume.Name},
+						},
+					},
+				},
+				NetworkInterfaces: []computev1alpha1.NetworkInterface{
+					{
+						Name: "primary",
+						NetworkInterfaceSource: computev1alpha1.NetworkInterfaceSource{
+							Ephemeral: &computev1alpha1.EphemeralNetworkInterfaceSource{
+								NetworkInterfaceTemplate: &networkingv1alpha1.NetworkInterfaceTemplateSpec{
+									Spec: networkingv1alpha1.NetworkInterfaceSpec{
+										NetworkRef: corev1.LocalObjectReference{Name: network.Name},
+										IPs:        []networkingv1alpha1.IPSource{{Value: commonv1alpha1.MustParseNewIP("10.0.0.11")}},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+
+		By("waiting for the runtime to report the machine, volume and network interface")
+		Eventually(srv).Should(SatisfyAll(
+			HaveField("Machines", HaveLen(1)),
+		))
+
+		_, iriMachine := GetSingleMapEntry(srv.Machines)
+
+		By("inspecting the iri machine")
+		Expect(iriMachine.Metadata.Labels).To(HaveKeyWithValue(machinepoolletv1alpha1.DownwardAPILabel(fooDownwardAPILabel), fooAnnotationValue))
+		Expect(iriMachine.Spec.Class).To(Equal(mc.Name))
+		Expect(iriMachine.Spec.Power).To(Equal(iri.Power_POWER_ON))
+		Expect(iriMachine.Spec.Volumes).To(ConsistOf(&iri.Volume{
+			Name:   "primary",
+			Device: "oda",
+			Connection: &iri.VolumeConnection{
+				Driver: "test",
+				Handle: "testhandle",
+			},
+		}))
+		Expect(iriMachine.Spec.NetworkInterfaces).To(ConsistOf(&iri.NetworkInterface{
+			Name:      "primary",
+			NetworkId: "foo",
+			Ips:       []string{"10.0.0.11"},
+		}))
+
+		By("waiting for the ironcore machine status to be up-to-date")
+		expectedMachineID := machinepoolletmachine.MakeID(testingmachine.FakeRuntimeName, iriMachine.Metadata.Id)
+		Eventually(Object(machine)).Should(SatisfyAll(
+			HaveField("Status.MachineID", expectedMachineID.String()),
+			HaveField("Status.ObservedGeneration", machine.Generation),
+		))
+
+		By("setting the network interface id in the machine status")
+		iriMachine = &testingmachine.FakeMachine{Machine: *proto.Clone(&iriMachine.Machine).(*iri.Machine)}
+		iriMachine.Metadata.Generation = 1
+		iriMachine.Status.ObservedGeneration = 1
+		iriMachine.Status.NetworkInterfaces = []*iri.NetworkInterfaceStatus{
+			{
+				Name:   "primary",
+				Handle: "primary-handle",
+				State:  iri.NetworkInterfaceState_NETWORK_INTERFACE_ATTACHED,
+				Ips:    []string{"10.0.0.11"},
+			},
+		}
+		srv.SetMachines([]*testingmachine.FakeMachine{iriMachine})
+
+		By("ensuring the ironcore machine status networkInterfaces to have correct NetworkInterfaceRef")
+		Eventually(Object(machine)).Should(HaveField("Status.NetworkInterfaces", ConsistOf(MatchFields(IgnoreExtras, Fields{
+			"Name":                Equal("primary"),
+			"Handle":              Equal("primary-handle"),
+			"State":               Equal(computev1alpha1.NetworkInterfaceStateAttached),
+			"NetworkInterfaceRef": Equal(corev1.LocalObjectReference{Name: computev1alpha1.MachineEphemeralNetworkInterfaceName(machine.Name, "primary")}),
+		}))))
+
+		By("removing the network interface from the machine")
+		Eventually(Update(machine, func() {
+			machine.Spec.NetworkInterfaces = []computev1alpha1.NetworkInterface{}
+		})).Should(Succeed())
+
+		By("ensuring that the network interface has been removed from the iri machine")
+		Eventually(srv.Machines[iriMachine.Metadata.Id]).Should(SatisfyAll(
+			HaveField("Spec.NetworkInterfaces", BeEmpty()),
+		))
+	})
+
 	It("should create a machine", func(ctx SpecContext) {
 		By("creating a network")
 		network := &networkingv1alpha1.Network{
@@ -165,10 +307,13 @@ var _ = Describe("MachineController", func() {
 				"IPs":   ContainElement(commonv1alpha1.MustParseIP("10.0.0.1")),
 			})),
 		))
+
+		By("ensuring the ironcore machine status networkInterfaces to have correct NetworkInterfaceRef")
 		Eventually(Object(machine)).Should(HaveField("Status.NetworkInterfaces", ConsistOf(MatchFields(IgnoreExtras, Fields{
-			"Name":   Equal("primary"),
-			"Handle": Equal("primary-handle"),
-			"State":  Equal(computev1alpha1.NetworkInterfaceStateAttached),
+			"Name":                Equal("primary"),
+			"Handle":              Equal("primary-handle"),
+			"State":               Equal(computev1alpha1.NetworkInterfaceStateAttached),
+			"NetworkInterfaceRef": Equal(corev1.LocalObjectReference{Name: nic.Name}),
 		}))))
 
 		By("removing the network interface from the machine")
