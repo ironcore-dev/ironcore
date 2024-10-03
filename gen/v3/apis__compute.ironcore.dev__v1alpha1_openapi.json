@@ -4883,6 +4883,15 @@
 					"state": {
 						"description": "State represents the attachment state of a Volume.",
 						"type": "string"
+					},
+					"volumeRef": {
+						"description": "VolumeRef reference to the claimed Volume",
+						"default": {},
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/io.k8s.api.core.v1.LocalObjectReference"
+							}
+						]
 					}
 				}
 			},
