@@ -72,14 +72,14 @@ var _ = Describe("Core", func() {
 			}
 			Expect(k8sClient.Create(ctx, machine)).To(Succeed())
 
-			By("getting the resource quota")
+			By("waiting for the resource quota to be updated")
 			resourceQuotaKey := client.ObjectKeyFromObject(resourceQuota)
-			Expect(k8sClient.Get(ctx, resourceQuotaKey, resourceQuota)).To(Succeed())
-
-			By("inspecting the resource quota")
-			Expect(resourceQuota.Status.Used).To(Equal(corev1alpha1.ResourceList{
-				corev1alpha1.ResourceRequestsCPU: resource.MustParse("1"),
-			}))
+			Eventually(func(g Gomega) {
+				Expect(k8sClient.Get(ctx, resourceQuotaKey, resourceQuota)).To(Succeed())
+				g.Expect(resourceQuota.Status.Used).To(Equal(corev1alpha1.ResourceList{
+					corev1alpha1.ResourceRequestsCPU: resource.MustParse("1"),
+				}))
+			}).Should(Succeed())
 		})
 	})
 })
