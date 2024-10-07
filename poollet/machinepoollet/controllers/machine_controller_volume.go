@@ -347,16 +347,18 @@ func (r *MachineReconciler) getVolumeStatusesForMachine(
 			iriVolumeStatus, ok = iriVolumeStatusByName[machineVolume.Name]
 			volumeStatusValues  computev1alpha1.VolumeStatus
 		)
+		volumeName := computev1alpha1.MachineVolumeName(machine.Name, machineVolume)
 		if ok {
 			var err error
-			volumeStatusValues, err = r.convertIRIVolumeStatus(iriVolumeStatus)
+			volumeStatusValues, err = r.convertIRIVolumeStatus(iriVolumeStatus, volumeName)
 			if err != nil {
 				return nil, fmt.Errorf("[volume %s] %w", machineVolume.Name, err)
 			}
 		} else {
 			volumeStatusValues = computev1alpha1.VolumeStatus{
-				Name:  machineVolume.Name,
-				State: computev1alpha1.VolumeStatePending,
+				Name:      machineVolume.Name,
+				State:     computev1alpha1.VolumeStatePending,
+				VolumeRef: corev1.LocalObjectReference{Name: volumeName},
 			}
 		}
 
@@ -382,16 +384,17 @@ func (r *MachineReconciler) convertIRIVolumeState(iriState iri.VolumeState) (com
 	return "", fmt.Errorf("unknown iri volume state %v", iriState)
 }
 
-func (r *MachineReconciler) convertIRIVolumeStatus(iriVolumeStatus *iri.VolumeStatus) (computev1alpha1.VolumeStatus, error) {
+func (r *MachineReconciler) convertIRIVolumeStatus(iriVolumeStatus *iri.VolumeStatus, volumeName string) (computev1alpha1.VolumeStatus, error) {
 	state, err := r.convertIRIVolumeState(iriVolumeStatus.State)
 	if err != nil {
 		return computev1alpha1.VolumeStatus{}, err
 	}
 
 	return computev1alpha1.VolumeStatus{
-		Name:   iriVolumeStatus.Name,
-		Handle: iriVolumeStatus.Handle,
-		State:  state,
+		Name:      iriVolumeStatus.Name,
+		Handle:    iriVolumeStatus.Handle,
+		State:     state,
+		VolumeRef: corev1.LocalObjectReference{Name: volumeName},
 	}, nil
 }
 
@@ -402,4 +405,5 @@ func (r *MachineReconciler) addVolumeStatusValues(now metav1.Time, existing, new
 	existing.Name = newValues.Name
 	existing.State = newValues.State
 	existing.Handle = newValues.Handle
+	existing.VolumeRef = newValues.VolumeRef
 }

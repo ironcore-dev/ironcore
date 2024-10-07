@@ -970,6 +970,7 @@ func autoConvert_v1alpha1_VolumeStatus_To_compute_VolumeStatus(in *v1alpha1.Volu
 	out.Handle = in.Handle
 	out.State = compute.VolumeState(in.State)
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
+	out.VolumeRef = in.VolumeRef
 	return nil
 }
 
@@ -983,6 +984,7 @@ func autoConvert_compute_VolumeStatus_To_v1alpha1_VolumeStatus(in *compute.Volum
 	out.Handle = in.Handle
 	out.State = v1alpha1.VolumeState(in.State)
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
+	out.VolumeRef = in.VolumeRef
 	return nil
 }
 

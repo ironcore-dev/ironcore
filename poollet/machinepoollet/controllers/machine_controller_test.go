@@ -20,6 +20,7 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 )
@@ -325,6 +326,13 @@ var _ = Describe("MachineController", func() {
 		Eventually(srv.Machines[iriMachine.Metadata.Id]).Should(SatisfyAll(
 			HaveField("Spec.NetworkInterfaces", BeEmpty()),
 		))
+
+		By("Verifying ironcore machine volume status with correct volume reference")
+		Eventually(Object(machine)).Should(HaveField("Status.Volumes", ConsistOf(MatchFields(IgnoreExtras, Fields{
+			"Name":      Equal("primary"),
+			"State":     Equal(computev1alpha1.VolumeStatePending),
+			"VolumeRef": Equal(corev1.LocalObjectReference{Name: volume.Name}),
+		}))))
 	})
 
 	It("should correctly manage the power state of a machine", func(ctx SpecContext) {
@@ -392,6 +400,98 @@ var _ = Describe("MachineController", func() {
 		srv.SetMachines([]*testingmachine.FakeMachine{iriMachine})
 		Eventually(Object(machine)).Should(HaveField("Status.State", Equal(computev1alpha1.MachineStateTerminating)))
 	})
+
+	It("should create a machine and verify claimed volume reference with ephemeral volume", func(ctx SpecContext) {
+		By("creating a machine")
+		const fooAnnotationValue = "bar"
+		machine := &computev1alpha1.Machine{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "machine-",
+				Annotations: map[string]string{
+					fooAnnotation: fooAnnotationValue,
+				},
+			},
+			Spec: computev1alpha1.MachineSpec{
+				MachineClassRef: corev1.LocalObjectReference{Name: mc.Name},
+				MachinePoolRef:  &corev1.LocalObjectReference{Name: mp.Name},
+				Volumes: []computev1alpha1.Volume{
+					{
+						Name: "primary",
+						VolumeSource: computev1alpha1.VolumeSource{
+							Ephemeral: &computev1alpha1.EphemeralVolumeSource{
+								VolumeTemplate: &storagev1alpha1.VolumeTemplateSpec{
+									Spec: storagev1alpha1.VolumeSpec{},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+		By("By getting ephimeral volume")
+		volumeKey := types.NamespacedName{
+			Namespace: ns.Name,
+			Name:      computev1alpha1.MachineEphemeralVolumeName(machine.Name, "primary"),
+		}
+		ephimeralVolume := &storagev1alpha1.Volume{}
+		Eventually(func(g Gomega) {
+			err := k8sClient.Get(ctx, volumeKey, ephimeralVolume)
+			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
+			g.Expect(err).NotTo(HaveOccurred())
+		}).Should(Succeed())
+
+		By("patching the volume to be available")
+		Eventually(UpdateStatus(ephimeralVolume, func() {
+			ephimeralVolume.Status.State = storagev1alpha1.VolumeStateAvailable
+			ephimeralVolume.Status.Access = &storagev1alpha1.VolumeAccess{
+				Driver: "test",
+				Handle: "testhandle",
+			}
+		})).Should(Succeed())
+
+		By("waiting for the runtime to report the machine and volume")
+		Eventually(srv).Should(SatisfyAll(
+			HaveField("Machines", HaveLen(1)),
+		))
+		_, iriMachine := GetSingleMapEntry(srv.Machines)
+
+		By("inspecting the iri machine")
+		Expect(iriMachine.Metadata.Labels).To(HaveKeyWithValue(machinepoolletv1alpha1.DownwardAPILabel(fooDownwardAPILabel), fooAnnotationValue))
+		Expect(iriMachine.Spec.Class).To(Equal(mc.Name))
+		Expect(iriMachine.Spec.Power).To(Equal(iri.Power_POWER_ON))
+		Expect(iriMachine.Spec.Volumes).To(ConsistOf(&iri.Volume{
+			Name:   "primary",
+			Device: "oda",
+			Connection: &iri.VolumeConnection{
+				Driver: "test",
+				Handle: "testhandle",
+			},
+		}))
+
+		By("waiting for the ironcore machine status to be up-to-date")
+		expectedMachineID := machinepoolletmachine.MakeID(testingmachine.FakeRuntimeName, iriMachine.Metadata.Id)
+		Eventually(Object(machine)).Should(SatisfyAll(
+			HaveField("Status.MachineID", expectedMachineID.String()),
+			HaveField("Status.ObservedGeneration", machine.Generation),
+		))
+
+		By("setting the network interface id in the machine status")
+		iriMachine = &testingmachine.FakeMachine{Machine: *proto.Clone(&iriMachine.Machine).(*iri.Machine)}
+		iriMachine.Metadata.Generation = 1
+		iriMachine.Status.ObservedGeneration = 1
+
+		srv.SetMachines([]*testingmachine.FakeMachine{iriMachine})
+
+		By("Verifying ironcore machine volume status with correct volume reference")
+		Eventually(Object(machine)).Should(HaveField("Status.Volumes", ConsistOf(MatchFields(IgnoreExtras, Fields{
+			"Name":      Equal("primary"),
+			"State":     Equal(computev1alpha1.VolumeStatePending),
+			"VolumeRef": Equal(corev1.LocalObjectReference{Name: ephimeralVolume.Name}),
+		}))))
+	})
+
 })
 
 func GetSingleMapEntry[K comparable, V any](m map[K]V) (K, V) {

@@ -160,6 +160,8 @@ type VolumeStatus struct {
 	State VolumeState `json:"state,omitempty"`
 	// LastStateTransitionTime is the last time the State transitioned.
 	LastStateTransitionTime *metav1.Time `json:"lastStateTransitionTime,omitempty"`
+	// VolumeRef reference to the claimed Volume
+	VolumeRef corev1.LocalObjectReference `json:"volumeRef,omitempty"`
 }
 
 // VolumeState is the infrastructure attachment state a Volume can be in.

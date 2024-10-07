@@ -7,16 +7,18 @@ package v1alpha1
 
 import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // VolumeStatusApplyConfiguration represents an declarative configuration of the VolumeStatus type for use
 // with apply.
 type VolumeStatusApplyConfiguration struct {
-	Name                    *string               `json:"name,omitempty"`
-	Handle                  *string               `json:"handle,omitempty"`
-	State                   *v1alpha1.VolumeState `json:"state,omitempty"`
-	LastStateTransitionTime *v1.Time              `json:"lastStateTransitionTime,omitempty"`
+	Name                    *string                      `json:"name,omitempty"`
+	Handle                  *string                      `json:"handle,omitempty"`
+	State                   *v1alpha1.VolumeState        `json:"state,omitempty"`
+	LastStateTransitionTime *v1.Time                     `json:"lastStateTransitionTime,omitempty"`
+	VolumeRef               *corev1.LocalObjectReference `json:"volumeRef,omitempty"`
 }
 
 // VolumeStatusApplyConfiguration constructs an declarative configuration of the VolumeStatus type for use with
@@ -54,5 +56,13 @@ func (b *VolumeStatusApplyConfiguration) WithState(value v1alpha1.VolumeState) *
 // If called multiple times, the LastStateTransitionTime field is set to the value of the last call.
 func (b *VolumeStatusApplyConfiguration) WithLastStateTransitionTime(value v1.Time) *VolumeStatusApplyConfiguration {
 	b.LastStateTransitionTime = &value
+	return b
+}
+
+// WithVolumeRef sets the VolumeRef field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the VolumeRef field is set to the value of the last call.
+func (b *VolumeStatusApplyConfiguration) WithVolumeRef(value corev1.LocalObjectReference) *VolumeStatusApplyConfiguration {
+	b.VolumeRef = &value
 	return b
 }

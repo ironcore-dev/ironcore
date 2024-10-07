@@ -667,6 +667,7 @@ func (in *VolumeStatus) DeepCopyInto(out *VolumeStatus) {
 		in, out := &in.LastStateTransitionTime, &out.LastStateTransitionTime
 		*out = (*in).DeepCopy()
 	}
+	out.VolumeRef = in.VolumeRef
 	return
 }
 
