@@ -1,0 +1,27 @@
+apiVersion: networking.ironcore.dev/v1alpha1
+kind: Network
+metadata:
+  name: network-sample
+---
+apiVersion: networking.ironcore.dev/v1alpha1
+kind: VirtualIP
+metadata:
+  name: virtualip-sample
+spec:
+  type: Public
+  ipFamily: IPv4
+---
+apiVersion: networking.ironcore.dev/v1alpha1
+kind: NetworkInterface
+metadata:
+  name: networkinterface-sample
+spec:
+  networkRef:
+    name: network-sample
+  ipFamilies:
+    - IPv4
+  ips:
+    - value: 10.0.0.1 # internal IP
+  virtualIP:
+    virtualIPRef:
+      name: virtualip-sample
