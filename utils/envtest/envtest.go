@@ -530,7 +530,7 @@ func WaitUntilGroupVersionsDiscoverable(ctx context.Context, c client.Client, sc
 	for _, gv := range gvs {
 		types := scheme.KnownTypes(gv)
 		for _, typ := range types {
-			if reflect.PtrTo(typ).Implements(clientObjectType) {
+			if reflect.PointerTo(typ).Implements(clientObjectType) {
 				obj := reflect.New(typ).Interface().(client.Object)
 				kinds, unversioned, err := scheme.ObjectKinds(obj)
 				if err != nil {
