@@ -2,4 +2,4 @@
 
 butane -d . ignition.yaml | \
   kubectl create secret generic ignition --from-file=ignition.yaml=/dev/stdin --dry-run=client -o yaml \
-  > ignition-secret.yaml
+  > ../ignition/ignition-secret.yaml

@@ -1,9 +1,0 @@
-apiVersion: compute.ironcore.dev/v1alpha1
-kind: Machine
-metadata:
-  name: machine-sample
-spec:
-  machineClassRef:
-    name: new-machineclass-sample  # The new name of the machine class reference
-  machinePoolRef:
-    name: new-machine-pool

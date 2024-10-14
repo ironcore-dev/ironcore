@@ -1,0 +1,6 @@
+resources:
+- network.yaml
+- virtualIP.yaml
+- networkinterface.yaml
+- volume.yaml
+- machine.yaml

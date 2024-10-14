@@ -8,7 +8,7 @@ passwd:
       groups:
         - wheel
       shell: /bin/bash
-      password_hash: : your-pw-hash
+      password_hash: your-pw-hash
 storage:
   directories:
     - path: /home/your-user/.ssh

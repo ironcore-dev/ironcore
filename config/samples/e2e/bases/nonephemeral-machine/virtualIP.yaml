@@ -1,0 +1,7 @@
+apiVersion: networking.ironcore.dev/v1alpha1
+kind: VirtualIP
+metadata:
+  name: virtualip-sample
+spec:
+  type: Public
+  ipFamily: IPv4
