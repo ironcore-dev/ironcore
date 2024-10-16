@@ -1,0 +1,57 @@
+
+variant: fcos
+version: 1.4.0
+passwd:
+  users:
+    - name: your-user
+      home_dir: /home/your-user
+      groups:
+        - wheel
+      shell: /bin/bash
+      password_hash: your-pw-hash
+storage:
+  directories:
+    - path: /home/your-user/.ssh
+      mode: 0700
+      user:
+        name: your-user
+      group:
+        name: your-user
+  files:
+    - path: /etc/systemd/resolved.conf.d/dns.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Resolve]
+          DNS=1.1.1.1
+    - path: /home/your-user/.ssh/authorized_keys
+      mode: 0600
+      user:
+        name: your-user
+      group:
+        name: your-user
+      contents:
+        inline: your-ssh-key
+    - path: /install-nginx.sh
+      mode: 0777
+      contents:
+        local: install-nginx.sh
+    - path: /var/www/html/index.html
+      mode: 0666
+      contents:
+        local: index.html
+systemd:
+  units:
+    - name: ssh.service
+      enabled: true
+    - name: install-nginx.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Install nginx
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        ExecStart=/install-nginx.sh
+        [Install]
+        WantedBy=multi-user.target
