@@ -55,6 +55,7 @@ With `ironcore` a multi-level hierarchy can be built to design availability/fail
 
 For every created `Machine` a resource `Reservation` object will be created. The `poollet` will continue to broker only `Machine`s with a `.spec.machinePoolRef` set. The `Reservation` is a condensed derivation of a `Machine` containing the requested resources like `NetworkInterfaces` and the attached `MachineClass` resource list. The `IRI` will be extended to be able to broker the `Reservation`s. Once the `Reservation` hits a pool provider, the decision can be made if the `Reservation` can be fulfilled or not. In case of accepting the `Reservation`, resources needs to be blocked until a) the reservation is being deleted b) the corresponding `Machine` is being placed on the pool provider. The status of the `Reservation` is being propagated up to the layer where it was created. After some time it contains a list of possible pools where the scheduler can pick one, set the `Machine.spec.machinePoolRef` and the `poollet` will broker the `Machine` to the next level.
 
+`Reservation` resource: 
 ```
 apiVersion: core.ironcore.dev/v1alpha1
 kind: Reservation
@@ -79,6 +80,14 @@ status:
       rating: 2
     - name: poolB
       ratring: 1
+```
+
+Added `IRI` methods:
+
+```protobuf
+rpc ListReservations(ListReservationsRequest) returns (ListReservationsResponse) {};
+rpc CreateReservation(CreateReservationRequest) returns (CreateReservationResponse) {};
+rpc DeleteReservation(DeleteReservationRequest) returns (DeleteReservationResponse) {};
 ```
 
 ### Advantages
