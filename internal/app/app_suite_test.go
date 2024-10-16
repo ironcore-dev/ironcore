@@ -32,7 +32,7 @@ import (
 
 const (
 	pollingInterval      = 50 * time.Millisecond
-	eventuallyTimeout    = 10 * time.Second
+	eventuallyTimeout    = 3 * time.Second
 	consistentlyDuration = 1 * time.Second
 	apiServiceTimeout    = 5 * time.Minute
 )
