@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: test
+
+resources:
+- ../bases/ignition
+- ../bases/ephemeral-machine
+
+patches:
+- path: patch-machine.yaml
