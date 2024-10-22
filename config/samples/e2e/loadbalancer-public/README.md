@@ -15,9 +15,9 @@ The following artifacts will be deployed in your namespace:
 
 ## Usage
 1. Adapt the `namespace` in `kustomization.yaml`
-2. Replace `your-user`, `your-pw-hash` and `your-ssh-key` in the `ignition/ignition.yaml`
+2. Replace `your-user`, `your-pw-hash` and `your-ssh-key`s in the `ignition/ignition.yaml`
 3. Run `ignition/regenerate-ignition.sh`
-4. Create the below `patch-machine.yaml` in `loadbalancer-public` folder with the desired `machineClassRef` and `machinePoolRef` as per your environment
+4. Create the below `patch-machine.yaml` in `loadbalancer-public` folder with the desired `machineClassRef`, `machinePoolRef`, `volumeClassRef`, `volumePoolRef`, `image` etc. as per your environment
 
 ```
 apiVersion: compute.ironcore.dev/v1alpha1
@@ -26,30 +26,27 @@ metadata:
   name: machine-sample
 spec:
   machineClassRef:
-    name: new-machineClass   # The new name of the machine class reference
+    name: new-machineClass
   machinePoolRef:
     name: new-machinePool
+  volumes:
+  - name: root-disk-1
+    ephemeral:
+      volumeTemplate:
+        spec:
+          volumeClassRef:
+            name: new-volumeClass
+          volumePoolRef:
+            name: new-volumePool
+          image: gardenlinux:rootfs-dev-20231025
+          resources:
+            storage: 15Gi
 ```
 
-5. Create the below`patch-volume.yaml`in `loadbalancer-public` folder with the desired `volumeClassRef`and `volumePoolRef` as per your environment
-
-```
-apiVersion: storage.ironcore.dev/v1alpha1
-kind: Volume
-metadata:
-  name: volume-sample
-spec:
-  volumeClassRef:
-    name: new-volumeClass    # The new name of the volume class reference
-  image: new-image:rootfs
-  volumePoolRef:
-    name: new-volumePool
-```
-6. Update the `kustomization.yaml` with below content
+5. Update the `kustomization.yaml` with below content
 ```
 patches:
 - path: patch-machine.yaml
-- path: patch-volume.yaml
 ```
 
-7. Run (`kubectl apply -k ./`)
+6. Run (`kubectl apply -k ./`) 

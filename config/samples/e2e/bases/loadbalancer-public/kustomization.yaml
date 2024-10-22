@@ -1,11 +1,5 @@
 resources:
 - network.yaml
-- virtualIP.yaml
-- virtualIP2.yaml
-- networkinterface.yaml
-- networkinterface2.yaml
-- volume.yaml
-- volume2.yaml
-- machine.yaml
+- machine1.yaml
 - machine2.yaml
 - loadbalancer.yaml

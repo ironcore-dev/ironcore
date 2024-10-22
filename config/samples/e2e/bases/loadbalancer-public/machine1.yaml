@@ -1,7 +1,7 @@
 apiVersion: compute.ironcore.dev/v1alpha1
 kind: Machine
 metadata:
-  name: machine-sample2
+  name: machine-sample1
 spec:
   machineClassRef:
     name: machineclass-sample
@@ -19,7 +19,7 @@ spec:
           ipFamilies:
           - IPv4
           ips:
-          - value: 10.0.0.2
+          - value: 10.0.0.1
           networkRef:
             name: network-sample
           virtualIP:
