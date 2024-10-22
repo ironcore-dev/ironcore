@@ -1,0 +1,10 @@
+apiVersion: storage.ironcore.dev/v1alpha1
+kind: Volume
+metadata:
+  name: volume-sample2
+spec:
+  volumeClassRef:
+    name: volumeclass-sample
+  image: gardenlinux:rootfs-image
+  resources:
+    storage: 10Gi

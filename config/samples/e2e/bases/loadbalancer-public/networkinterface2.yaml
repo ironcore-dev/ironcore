@@ -1,0 +1,16 @@
+apiVersion: networking.ironcore.dev/v1alpha1
+kind: NetworkInterface
+metadata:
+  name: networkinterface-sample2
+  labels:
+    app: web
+spec:
+  networkRef:
+    name: network-sample
+  ipFamilies:
+    - IPv4
+  ips:
+    - value: 10.0.0.2 # internal IP
+  virtualIP:
+    virtualIPRef:
+      name: virtualip-sample2
