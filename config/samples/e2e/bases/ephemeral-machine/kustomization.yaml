@@ -1,0 +1,3 @@
+resources:
+- network.yaml
+- machine.yaml
