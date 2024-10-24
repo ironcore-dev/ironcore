@@ -8,7 +8,7 @@ THIS_PKG="github.com/ironcore-dev/ironcore"
 SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 PROJECT_ROOT="$SCRIPT_DIR/.."
 
-CODE_GEN_DIR="${CODE_GEN_DIR:-$(go list -m -f '{{.Dir}}' k8s.io/code-generator)}"
+CODE_GEN_DIR=$(go list -m -f '{{.Dir}}' k8s.io/code-generator)
 source "${CODE_GEN_DIR}/kube_codegen.sh"
 
 export TERM="xterm-256color"
