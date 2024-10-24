@@ -12,7 +12,7 @@ BUCKETBROKER_IMG ?= bucketbroker:latest
 IRICTL_BUCKET_IMG ?= irictl-bucket:latest
 
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
-ENVTEST_K8S_VERSION = 1.28.0
+ENVTEST_K8S_VERSION = 1.30.3
 
 # Docker image name for the mkdocs based local development setup
 IMAGE=ironcore/documentation
@@ -82,17 +82,10 @@ manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and Cust
 	./hack/replace.sh config/apiserver/rbac/bucketpool_role.yaml 's/manager-role/storage.ironcore.dev:system:bucketpools/g'
 
 .PHONY: generate
-generate: vgopath models-schema deepcopy-gen client-gen lister-gen informer-gen defaulter-gen conversion-gen openapi-gen applyconfiguration-gen
+generate: vgopath models-schema openapi-gen
 	VGOPATH=$(VGOPATH) \
 	MODELS_SCHEMA=$(MODELS_SCHEMA) \
-	DEEPCOPY_GEN=$(DEEPCOPY_GEN) \
-	CLIENT_GEN=$(CLIENT_GEN) \
-	LISTER_GEN=$(LISTER_GEN) \
-	INFORMER_GEN=$(INFORMER_GEN) \
-	DEFAULTER_GEN=$(DEFAULTER_GEN) \
-	CONVERSION_GEN=$(CONVERSION_GEN) \
 	OPENAPI_GEN=$(OPENAPI_GEN) \
-	APPLYCONFIGURATION_GEN=$(APPLYCONFIGURATION_GEN) \
 	./hack/update-codegen.sh
 
 .PHONY: proto
@@ -355,14 +348,7 @@ KUSTOMIZE ?= $(LOCALBIN)/kustomize
 CONTROLLER_GEN ?= $(LOCALBIN)/controller-gen
 ENVTEST ?= $(LOCALBIN)/setup-envtest
 OPENAPI_EXTRACTOR ?= $(LOCALBIN)/openapi-extractor
-DEEPCOPY_GEN ?= $(LOCALBIN)/deepcopy-gen
-CLIENT_GEN ?= $(LOCALBIN)/client-gen
-LISTER_GEN ?= $(LOCALBIN)/lister-gen
-INFORMER_GEN ?= $(LOCALBIN)/informer-gen
-DEFAULTER_GEN ?= $(LOCALBIN)/defaulter-gen
-CONVERSION_GEN ?= $(LOCALBIN)/conversion-gen
 OPENAPI_GEN ?= $(LOCALBIN)/openapi-gen
-APPLYCONFIGURATION_GEN ?= $(LOCALBIN)/applyconfiguration-gen
 VGOPATH ?= $(LOCALBIN)/vgopath
 GEN_CRD_API_REFERENCE_DOCS ?= $(LOCALBIN)/gen-crd-api-reference-docs
 ADDLICENSE ?= $(LOCALBIN)/addlicense
@@ -373,9 +359,8 @@ GOLANGCI_LINT ?= $(LOCALBIN)/golangci-lint
 
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v5.1.1
-CODE_GENERATOR_VERSION ?= v0.29.7
 VGOPATH_VERSION ?= v0.1.3
-CONTROLLER_TOOLS_VERSION ?= v0.14.0
+CONTROLLER_TOOLS_VERSION ?= v0.15.0
 GEN_CRD_API_REFERENCE_DOCS_VERSION ?= v0.3.0
 ADDLICENSE_VERSION ?= v1.1.1
 PROTOC_GEN_GOGO_VERSION ?= v1.3.2
@@ -399,45 +384,12 @@ $(CONTROLLER_GEN): $(LOCALBIN)
 	test -s $(LOCALBIN)/controller-gen && $(LOCALBIN)/controller-gen --version | grep -q $(CONTROLLER_TOOLS_VERSION) || \
 	GOBIN=$(LOCALBIN) go install sigs.k8s.io/controller-tools/cmd/controller-gen@$(CONTROLLER_TOOLS_VERSION)
 
-.PHONY: deepcopy-gen
-deepcopy-gen: $(DEEPCOPY_GEN) ## Download deepcopy-gen locally if necessary.
-$(DEEPCOPY_GEN): $(LOCALBIN)
-	test -s $(LOCALBIN)/deepcopy-gen || GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/deepcopy-gen@$(CODE_GENERATOR_VERSION)
-
-.PHONY: client-gen
-client-gen: $(CLIENT_GEN) ## Download client-gen locally if necessary.
-$(CLIENT_GEN): $(LOCALBIN)
-	test -s $(LOCALBIN)/client-gen || GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/client-gen@$(CODE_GENERATOR_VERSION)
-
-.PHONY: lister-gen
-lister-gen: $(LISTER_GEN) ## Download lister-gen locally if necessary.
-$(LISTER_GEN): $(LOCALBIN)
-	test -s $(LOCALBIN)/lister-gen || GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/lister-gen@$(CODE_GENERATOR_VERSION)
-
-.PHONY: informer-gen
-informer-gen: $(INFORMER_GEN) ## Download informer-gen locally if necessary.
-$(INFORMER_GEN): $(LOCALBIN)
-	test -s $(LOCALBIN)/informer-gen || GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/informer-gen@$(CODE_GENERATOR_VERSION)
-
-.PHONY: defaulter-gen
-defaulter-gen: $(DEFAULTER_GEN) ## Download defaulter-gen locally if necessary.
-$(DEFAULTER_GEN): $(LOCALBIN)
-	test -s $(LOCALBIN)/defaulter-gen || GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/defaulter-gen@$(CODE_GENERATOR_VERSION)
-
-.PHONY: conversion-gen
-conversion-gen: $(CONVERSION_GEN) ## Download conversion-gen locally if necessary.
-$(CONVERSION_GEN): $(LOCALBIN)
-	test -s $(LOCALBIN)/conversion-gen || GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/conversion-gen@$(CODE_GENERATOR_VERSION)
 
 .PHONY: openapi-gen
 openapi-gen: $(OPENAPI_GEN) ## Download openapi-gen locally if necessary.
 $(OPENAPI_GEN): $(LOCALBIN)
-	test -s $(LOCALBIN)/openapi-gen || GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/openapi-gen@$(CODE_GENERATOR_VERSION)
+	test -s $(LOCALBIN)/openapi-gen || GOBIN=$(LOCALBIN) go install k8s.io/kube-openapi/cmd/openapi-gen
 
-.PHONY: applyconfiguration-gen
-applyconfiguration-gen: $(APPLYCONFIGURATION_GEN) ## Download applyconfiguration-gen locally if necessary.
-$(APPLYCONFIGURATION_GEN): $(LOCALBIN)
-	test -s $(LOCALBIN)/applyconfiguration-gen || GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/applyconfiguration-gen@$(CODE_GENERATOR_VERSION)
 
 .PHONY: vgopath
 vgopath: $(VGOPATH) ## Download vgopath locally if necessary.

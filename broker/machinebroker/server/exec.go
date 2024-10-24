@@ -10,8 +10,8 @@ import (
 
 	"github.com/go-logr/logr"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	"github.com/ironcore-dev/ironcore/client-go/ironcore"
-	ironcoreclientgoscheme "github.com/ironcore-dev/ironcore/client-go/ironcore/scheme"
+	ironcore "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned"
+	ironcoreclientgoscheme "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned/scheme"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	remotecommandserver "github.com/ironcore-dev/ironcore/poollet/machinepoollet/iri/streaming/remotecommand"
 	"k8s.io/client-go/tools/remotecommand"
