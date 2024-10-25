@@ -54,17 +54,17 @@ func (c *ReaderCache) CanList(list client.ObjectList) (bool, error) {
 	return ok, nil
 }
 
-func (c *ReaderCache) entryForGVK(gk schema.GroupKind) (*groupKindEntry, error) {
+func (c *ReaderCache) entryForGVK(gk schema.GroupKind) *groupKindEntry {
 	entry, ok := c.groupKinds[gk]
 	if ok {
-		return entry, nil
+		return entry
 	}
 
 	entry = &groupKindEntry{
 		objects: make(map[client.ObjectKey]client.Object),
 	}
 	c.groupKinds[gk] = entry
-	return entry, nil
+	return entry
 }
 
 func (c *ReaderCache) InsertList(list client.ObjectList) error {
@@ -74,10 +74,7 @@ func (c *ReaderCache) InsertList(list client.ObjectList) error {
 	}
 
 	gk := gvk.GroupKind()
-	entry, err := c.entryForGVK(gk)
-	if err != nil {
-		return err
-	}
+	entry := c.entryForGVK(gk)
 
 	if err := meta.EachListItem(list, func(obj runtime.Object) error {
 		cObj := obj.(client.Object)
@@ -97,10 +94,7 @@ func (c *ReaderCache) Insert(obj client.Object) error {
 	}
 
 	gk := gvk.GroupKind()
-	entry, err := c.entryForGVK(gk)
-	if err != nil {
-		return err
-	}
+	entry := c.entryForGVK(gk)
 
 	entry.objects[client.ObjectKeyFromObject(obj)] = obj
 	return nil

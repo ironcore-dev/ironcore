@@ -61,7 +61,7 @@ func (s *Server) filterIronCoreBucketClasses(
 	return filtered
 }
 
-func (s *Server) convertIronCoreBucketClass(bucketClass *storagev1alpha1.BucketClass) (*iri.BucketClass, error) {
+func (s *Server) convertIronCoreBucketClass(bucketClass *storagev1alpha1.BucketClass) *iri.BucketClass {
 	tps := bucketClass.Capabilities.TPS()
 	iops := bucketClass.Capabilities.IOPS()
 
@@ -71,7 +71,7 @@ func (s *Server) convertIronCoreBucketClass(bucketClass *storagev1alpha1.BucketC
 			Tps:  tps.Value(),
 			Iops: iops.Value(),
 		},
-	}, nil
+	}
 }
 
 func (s *Server) ListBucketClasses(ctx context.Context, req *iri.ListBucketClassesRequest) (*iri.ListBucketClassesResponse, error) {
@@ -100,11 +100,7 @@ func (s *Server) ListBucketClasses(ctx context.Context, req *iri.ListBucketClass
 	availableIronCoreBucketClasses := s.filterIronCoreBucketClasses(availableIronCoreBucketClassNames, ironcoreBucketClassList.Items)
 	bucketClasses := make([]*iri.BucketClass, 0, len(availableIronCoreBucketClasses))
 	for _, ironcoreBucketClass := range availableIronCoreBucketClasses {
-		bucketClass, err := s.convertIronCoreBucketClass(&ironcoreBucketClass)
-		if err != nil {
-			return nil, fmt.Errorf("error converting ironcore bucket class %s: %w", ironcoreBucketClass.Name, err)
-		}
-
+		bucketClass := s.convertIronCoreBucketClass(&ironcoreBucketClass)
 		bucketClasses = append(bucketClasses, bucketClass)
 	}
 

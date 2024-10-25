@@ -65,7 +65,7 @@ func (s *Server) getIronCoreVolumeConfig(_ context.Context, volume *iri.Volume) 
 			VolumePoolSelector: s.volumePoolSelector,
 			VolumePoolRef:      volumePoolRef,
 			Resources: corev1alpha1.ResourceList{
-				corev1alpha1.ResourceStorage: *resource.NewQuantity(int64(volume.Spec.Resources.StorageBytes), resource.DecimalSI),
+				corev1alpha1.ResourceStorage: *resource.NewQuantity(volume.Spec.Resources.StorageBytes, resource.DecimalSI),
 			},
 			Image:              volume.Spec.Image,
 			ImagePullSecretRef: nil, // TODO: Fill if necessary

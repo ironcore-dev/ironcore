@@ -11,6 +11,8 @@ import (
 	"sync"
 	"time"
 
+	"google.golang.org/protobuf/proto"
+
 	irievent "github.com/ironcore-dev/ironcore/iri/apis/event/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	"google.golang.org/grpc/codes"
@@ -317,8 +319,8 @@ func (r *FakeRuntimeService) Status(ctx context.Context, req *iri.StatusRequest)
 
 	var res []*iri.MachineClassStatus
 	for _, m := range r.MachineClassStatus {
-		machineClassStatus := m.MachineClassStatus
-		res = append(res, &machineClassStatus)
+		machineClassStatus := proto.Clone(&m.MachineClassStatus).(*iri.MachineClassStatus)
+		res = append(res, machineClassStatus)
 	}
 	return &iri.StatusResponse{MachineClassStatus: res}, nil
 }

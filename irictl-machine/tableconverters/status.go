@@ -24,7 +24,7 @@ var (
 			return api.Row{
 				status.MachineClass.Name,
 				resource.NewMilliQuantity(status.MachineClass.Capabilities.CpuMillis, resource.DecimalSI).String(),
-				resource.NewQuantity(int64(status.MachineClass.Capabilities.MemoryBytes), resource.DecimalSI).String(),
+				resource.NewQuantity(status.MachineClass.Capabilities.MemoryBytes, resource.DecimalSI).String(),
 				resource.NewQuantity(status.Quantity, resource.DecimalSI).String(),
 			}, nil
 		}),

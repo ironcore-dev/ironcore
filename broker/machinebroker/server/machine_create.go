@@ -49,7 +49,7 @@ func (s *Server) prepareIronCoreMachinePower(power iri.Power) (computev1alpha1.P
 	}
 }
 
-func (s *Server) prepareIronCoreMachineLabels(machine *iri.Machine) (map[string]string, error) {
+func (s *Server) prepareIronCoreMachineLabels(machine *iri.Machine) map[string]string {
 	labels := make(map[string]string)
 
 	for downwardAPILabelName, defaultLabelName := range s.brokerDownwardAPILabels {
@@ -62,7 +62,7 @@ func (s *Server) prepareIronCoreMachineLabels(machine *iri.Machine) (map[string]
 		}
 	}
 
-	return labels, nil
+	return labels
 }
 
 func (s *Server) prepareIronCoreMachineAnnotations(machine *iri.Machine) (map[string]string, error) {
@@ -113,11 +113,7 @@ func (s *Server) getIronCoreMachineConfig(machine *iri.Machine) (*IronCoreMachin
 		ironcoreVolumeCfgs[i] = ironcoreVolumeCfg
 	}
 
-	labels, err := s.prepareIronCoreMachineLabels(machine)
-	if err != nil {
-		return nil, fmt.Errorf("error preparing ironcore machine labels: %w", err)
-	}
-
+	labels := s.prepareIronCoreMachineLabels(machine)
 	annotations, err := s.prepareIronCoreMachineAnnotations(machine)
 	if err != nil {
 		return nil, fmt.Errorf("error preparing ironcore machine annotations: %w", err)

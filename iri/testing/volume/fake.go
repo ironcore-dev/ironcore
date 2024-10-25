@@ -8,6 +8,8 @@ import (
 	"sync"
 	"time"
 
+	"google.golang.org/protobuf/proto"
+
 	"github.com/ironcore-dev/ironcore/broker/common/idgen"
 	irievent "github.com/ironcore-dev/ironcore/iri/apis/event/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
@@ -166,8 +168,8 @@ func (r *FakeRuntimeService) Status(ctx context.Context, req *iri.StatusRequest)
 
 	var res []*iri.VolumeClassStatus
 	for _, m := range r.VolumeClassesStatus {
-		volumeClassStatus := m.VolumeClassStatus
-		res = append(res, &volumeClassStatus)
+		volumeClassStatus := proto.Clone(&m.VolumeClassStatus).(*iri.VolumeClassStatus)
+		res = append(res, volumeClassStatus)
 	}
 	return &iri.StatusResponse{VolumeClassStatus: res}, nil
 }

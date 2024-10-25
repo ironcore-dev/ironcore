@@ -3,9 +3,14 @@
 
 package v1alpha1
 
-import "github.com/gogo/protobuf/proto"
+import (
+	"google.golang.org/protobuf/proto"
+)
 
 type Object interface {
 	proto.Message
 	GetMetadata() *ObjectMetadata
+	Reset()
+	String() string
+	ProtoMessage()
 }

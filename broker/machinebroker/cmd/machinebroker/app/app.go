@@ -144,7 +144,7 @@ func Run(ctx context.Context, opts Options) error {
 	return g.Wait()
 }
 
-func runServer(ctx context.Context, setupLog, log logr.Logger, srv *server.Server) error {
+func runServer(ctx context.Context, setupLog, _ logr.Logger, srv *server.Server) error {
 	setupLog.V(1).Info("Starting server loops")
 	if err := srv.Start(ctx); err != nil {
 		return fmt.Errorf("error starting server loops: %w", err)
