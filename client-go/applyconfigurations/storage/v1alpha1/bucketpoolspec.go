@@ -6,14 +6,14 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/common/v1alpha1"
+	v1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 )
 
 // BucketPoolSpecApplyConfiguration represents an declarative configuration of the BucketPoolSpec type for use
 // with apply.
 type BucketPoolSpecApplyConfiguration struct {
-	ProviderID *string                            `json:"providerID,omitempty"`
-	Taints     []v1alpha1.TaintApplyConfiguration `json:"taints,omitempty"`
+	ProviderID *string          `json:"providerID,omitempty"`
+	Taints     []v1alpha1.Taint `json:"taints,omitempty"`
 }
 
 // BucketPoolSpecApplyConfiguration constructs an declarative configuration of the BucketPoolSpec type for use with
@@ -33,12 +33,9 @@ func (b *BucketPoolSpecApplyConfiguration) WithProviderID(value string) *BucketP
 // WithTaints adds the given value to the Taints field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the Taints field.
-func (b *BucketPoolSpecApplyConfiguration) WithTaints(values ...*v1alpha1.TaintApplyConfiguration) *BucketPoolSpecApplyConfiguration {
+func (b *BucketPoolSpecApplyConfiguration) WithTaints(values ...v1alpha1.Taint) *BucketPoolSpecApplyConfiguration {
 	for i := range values {
-		if values[i] == nil {
-			panic("nil value passed to WithTaints")
-		}
-		b.Taints = append(b.Taints, *values[i])
+		b.Taints = append(b.Taints, values[i])
 	}
 	return b
 }

@@ -4,7 +4,26 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+THIS_PKG="github.com/ironcore-dev/ironcore"
 SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+PROJECT_ROOT="$SCRIPT_DIR/.."
+
+VGOPATH="$VGOPATH"
+MODELS_SCHEMA="$MODELS_SCHEMA"
+OPENAPI_GEN="$OPENAPI_GEN"
+
+VIRTUAL_GOPATH="$(mktemp -d)"
+trap 'rm -rf "$VIRTUAL_GOPATH"' EXIT
+
+# Setup virtual GOPATH so the codegen tools work as expected.
+(cd "$PROJECT_ROOT"; go mod download && "$VGOPATH" -o "$VIRTUAL_GOPATH")
+
+export GOROOT="${GOROOT:-"$(go env GOROOT)"}"
+export GOPATH="$VIRTUAL_GOPATH"
+
+CODE_GEN_DIR=$(go list -m -f '{{.Dir}}' k8s.io/code-generator)
+source "${CODE_GEN_DIR}/kube_codegen.sh"
+
 export TERM="xterm-256color"
 
 bold="$(tput bold)"
@@ -22,48 +41,12 @@ function qualify-gvs() {
 
     for V in ${Vs//,/ }; do
       res="$res$join_char$APIS_PKG/$G/$V"
-      join_char=","
+      join_char=" "
     done
   done
 
   echo "$res"
 }
-
-function qualify-gs() {
-  APIS_PKG="$1"
-  unset GROUPS
-  IFS=' ' read -ra GROUPS <<< "$2"
-  join_char=""
-  res=""
-
-  for G in "${GROUPS[@]}"; do
-    res="$res$join_char$APIS_PKG/$G"
-    join_char=","
-  done
-
-  echo "$res"
-}
-
-VGOPATH="$VGOPATH"
-MODELS_SCHEMA="$MODELS_SCHEMA"
-CLIENT_GEN="$CLIENT_GEN"
-DEEPCOPY_GEN="$DEEPCOPY_GEN"
-LISTER_GEN="$LISTER_GEN"
-INFORMER_GEN="$INFORMER_GEN"
-DEFAULTER_GEN="$DEFAULTER_GEN"
-CONVERSION_GEN="$CONVERSION_GEN"
-OPENAPI_GEN="$OPENAPI_GEN"
-APPLYCONFIGURATION_GEN="$APPLYCONFIGURATION_GEN"
-
-VIRTUAL_GOPATH="$(mktemp -d)"
-trap 'rm -rf "$VIRTUAL_GOPATH"' EXIT
-
-# Setup virtual GOPATH so the codegen tools work as expected.
-(cd "$SCRIPT_DIR/.."; go mod download && "$VGOPATH" -o "$VIRTUAL_GOPATH")
-
-export GOROOT="${GOROOT:-"$(go env GOROOT)"}"
-export GOPATH="$VIRTUAL_GOPATH"
-export GO111MODULE=off
 
 CLIENT_GROUPS="core compute ipam networking storage"
 CLIENT_VERSION_GROUPS="core:v1alpha1 compute:v1alpha1 ipam:v1alpha1 networking:v1alpha1 storage:v1alpha1"
@@ -71,83 +54,50 @@ ALL_VERSION_GROUPS="common:v1alpha1 $CLIENT_VERSION_GROUPS"
 
 echo "${bold}Public types${normal}"
 
-echo "Generating ${blue}deepcopy${normal}"
-"$DEEPCOPY_GEN" \
-  --output-base "$GOPATH/src" \
-  --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gvs "github.com/ironcore-dev/ironcore/api" "$ALL_VERSION_GROUPS")" \
-  -O zz_generated.deepcopy
+echo "Generating ${blue}deepcopy, defaulter, and conversion${normal}"
+kube::codegen::gen_helpers \
+  --boilerplate "$SCRIPT_DIR/boilerplate.go.txt" \
+  "$PROJECT_ROOT/api"
 
 echo "Generating ${blue}openapi${normal}"
+input_dirs=($(qualify-gvs "${THIS_PKG}/api" "$ALL_VERSION_GROUPS"))
 "$OPENAPI_GEN" \
-  --output-base "$GOPATH/src" \
+  --output-dir "$PROJECT_ROOT/client-go/openapi" \
+  --output-pkg "${THIS_PKG}/client-go/openapi" \
+  --output-file "zz_generated.openapi.go" \
+  --report-filename "$PROJECT_ROOT/client-go/openapi/api_violations.report" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gvs "github.com/ironcore-dev/ironcore/api" "$ALL_VERSION_GROUPS")" \
-  --input-dirs "k8s.io/apimachinery/pkg/apis/meta/v1,k8s.io/apimachinery/pkg/runtime,k8s.io/apimachinery/pkg/version" \
-  --input-dirs "k8s.io/api/core/v1" \
-  --input-dirs "k8s.io/apimachinery/pkg/api/resource" \
-  --output-package "github.com/ironcore-dev/ironcore/client-go/openapi" \
-  -O zz_generated.openapi \
-  --report-filename "$SCRIPT_DIR/../client-go/openapi/api_violations.report"
+  "k8s.io/apimachinery/pkg/apis/meta/v1" \
+  "k8s.io/apimachinery/pkg/runtime" \
+  "k8s.io/apimachinery/pkg/version" \
+  "k8s.io/api/core/v1" \
+  "k8s.io/apimachinery/pkg/api/resource" \
+  "${input_dirs[@]}"
 
-echo "Generating ${blue}applyconfiguration${normal}"
-applyconfigurationgen_external_apis+=("k8s.io/apimachinery/pkg/apis/meta/v1")
-applyconfigurationgen_external_apis+=("$(qualify-gvs "github.com/ironcore-dev/ironcore/api" "$ALL_VERSION_GROUPS")")
+echo "Generating ${blue}client, lister, informer, and applyconfiguration${normal}"
+applyconfigurationgen_external_apis+=("k8s.io/apimachinery/pkg/apis/meta/v1:k8s.io/client-go/applyconfigurations/meta/v1")
+for GV in ${ALL_VERSION_GROUPS}; do
+  IFS=: read -r G V <<<"${GV}"
+  applyconfigurationgen_external_apis+=("${THIS_PKG}/api/${G}/${V}:${THIS_PKG}/client-go/applyconfigurations/${G}/${V}")
+done
 applyconfigurationgen_external_apis_csv=$(IFS=,; echo "${applyconfigurationgen_external_apis[*]}")
-"$APPLYCONFIGURATION_GEN" \
-  --output-base "$GOPATH/src" \
-  --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "${applyconfigurationgen_external_apis_csv}" \
-  --openapi-schema <("$MODELS_SCHEMA" --openapi-package "github.com/ironcore-dev/ironcore/client-go/openapi" --openapi-title "ironcore") \
-  --output-package "github.com/ironcore-dev/ironcore/client-go/applyconfigurations"
-
-echo "Generating ${blue}client${normal}"
-"$CLIENT_GEN" \
-  --output-base "$GOPATH/src" \
-  --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input "$(qualify-gvs "github.com/ironcore-dev/ironcore/api" "$CLIENT_VERSION_GROUPS")" \
-  --output-package "github.com/ironcore-dev/ironcore/client-go" \
-  --apply-configuration-package "github.com/ironcore-dev/ironcore/client-go/applyconfigurations" \
+kube::codegen::gen_client \
+  --with-applyconfig \
+  --applyconfig-name "applyconfigurations" \
+  --applyconfig-externals "${applyconfigurationgen_external_apis_csv}" \
+  --applyconfig-openapi-schema <("$MODELS_SCHEMA" --openapi-package "${THIS_PKG}/client-go/openapi" --openapi-title "ironcore") \
   --clientset-name "ironcore" \
-  --input-base ""
-
-echo "Generating ${blue}lister${normal}"
-"$LISTER_GEN" \
-  --output-base "$GOPATH/src" \
-  --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gvs "github.com/ironcore-dev/ironcore/api" "$CLIENT_VERSION_GROUPS")" \
-  --output-package "github.com/ironcore-dev/ironcore/client-go/listers"
-
-echo "Generating ${blue}informer${normal}"
-"$INFORMER_GEN" \
-  --output-base "$GOPATH/src" \
-  --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gvs "github.com/ironcore-dev/ironcore/api" "$CLIENT_VERSION_GROUPS")" \
-  --versioned-clientset-package "github.com/ironcore-dev/ironcore/client-go/ironcore" \
-  --listers-package "github.com/ironcore-dev/ironcore/client-go/listers" \
-  --output-package "github.com/ironcore-dev/ironcore/client-go/informers" \
-  --single-directory
+  --listers-name "listers" \
+  --informers-name "informers" \
+  --with-watch \
+  --output-dir "$PROJECT_ROOT/client-go" \
+  --output-pkg "${THIS_PKG}/client-go" \
+  --boilerplate "$SCRIPT_DIR/boilerplate.go.txt" \
+  "$PROJECT_ROOT/api"
 
 echo "${bold}Internal types${normal}"
 
-echo "Generating ${blue}deepcopy${normal}"
-"$DEEPCOPY_GEN" \
-  --output-base "$GOPATH/src" \
-  --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gs "github.com/ironcore-dev/ironcore/internal/apis" "$CLIENT_GROUPS")" \
-  -O zz_generated.deepcopy
-
-echo "Generating ${blue}defaulter${normal}"
-"$DEFAULTER_GEN" \
-  --output-base "$GOPATH/src" \
-  --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gvs "github.com/ironcore-dev/ironcore/internal/apis" "$CLIENT_VERSION_GROUPS")" \
-  -O zz_generated.defaults
-
-echo "Generating ${blue}conversion${normal}"
-"$CONVERSION_GEN" \
-  --output-base "$GOPATH/src" \
-  --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gs "github.com/ironcore-dev/ironcore/internal/apis" "$CLIENT_GROUPS")" \
-  --input-dirs "$(qualify-gvs "github.com/ironcore-dev/ironcore/internal/apis" "$CLIENT_VERSION_GROUPS")" \
-  -O zz_generated.conversion
+echo "Generating ${blue}deepcopy, defaulter, and conversion${normal}"
+kube::codegen::gen_helpers \
+  --boilerplate "$SCRIPT_DIR/boilerplate.go.txt" \
+  "$PROJECT_ROOT/internal/apis"

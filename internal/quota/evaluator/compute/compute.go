@@ -8,8 +8,8 @@ import (
 
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
-	"github.com/ironcore-dev/ironcore/client-go/informers"
-	"github.com/ironcore-dev/ironcore/client-go/ironcore"
+	informers "github.com/ironcore-dev/ironcore/client-go/informers/externalversions"
+	ironcore "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned"
 	"github.com/ironcore-dev/ironcore/internal/quota/evaluator/generic"
 	utilsgeneric "github.com/ironcore-dev/ironcore/utils/generic"
 	"github.com/ironcore-dev/ironcore/utils/quota"

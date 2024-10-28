@@ -4,8 +4,8 @@
 package initializer
 
 import (
-	ironcoreinformers "github.com/ironcore-dev/ironcore/client-go/informers"
-	"github.com/ironcore-dev/ironcore/client-go/ironcore"
+	ironcoreinformers "github.com/ironcore-dev/ironcore/client-go/informers/externalversions"
+	ironcore "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned"
 	"github.com/ironcore-dev/ironcore/utils/quota"
 	"k8s.io/apiserver/pkg/admission"
 )

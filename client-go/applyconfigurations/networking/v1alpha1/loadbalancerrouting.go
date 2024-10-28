@@ -6,13 +6,13 @@
 package v1alpha1
 
 import (
+	v1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	apinetworkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
-	v1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/common/v1alpha1"
 	internal "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/internal"
-	v1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/meta/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	managedfields "k8s.io/apimachinery/pkg/util/managedfields"
+	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
 // LoadBalancerRoutingApplyConfiguration represents an declarative configuration of the LoadBalancerRouting type for use
@@ -20,8 +20,8 @@ import (
 type LoadBalancerRoutingApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	NetworkRef                       *v1alpha1.LocalUIDReferenceApplyConfiguration `json:"networkRef,omitempty"`
-	Destinations                     []LoadBalancerDestinationApplyConfiguration   `json:"destinations,omitempty"`
+	NetworkRef                       *v1alpha1.LocalUIDReference                 `json:"networkRef,omitempty"`
+	Destinations                     []LoadBalancerDestinationApplyConfiguration `json:"destinations,omitempty"`
 }
 
 // LoadBalancerRouting constructs an declarative configuration of the LoadBalancerRouting type for use with
@@ -232,8 +232,8 @@ func (b *LoadBalancerRoutingApplyConfiguration) ensureObjectMetaApplyConfigurati
 // WithNetworkRef sets the NetworkRef field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the NetworkRef field is set to the value of the last call.
-func (b *LoadBalancerRoutingApplyConfiguration) WithNetworkRef(value *v1alpha1.LocalUIDReferenceApplyConfiguration) *LoadBalancerRoutingApplyConfiguration {
-	b.NetworkRef = value
+func (b *LoadBalancerRoutingApplyConfiguration) WithNetworkRef(value v1alpha1.LocalUIDReference) *LoadBalancerRoutingApplyConfiguration {
+	b.NetworkRef = &value
 	return b
 }
 

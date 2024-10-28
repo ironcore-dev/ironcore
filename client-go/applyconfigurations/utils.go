@@ -6,20 +6,16 @@
 package applyconfigurations
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
-	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	v1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	commonv1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/common/v1alpha1"
-	applyconfigurationscomputev1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/compute/v1alpha1"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/compute/v1alpha1"
 	applyconfigurationscorev1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/core/v1alpha1"
 	applyconfigurationsipamv1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/ipam/v1alpha1"
-	metav1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/meta/v1"
 	applyconfigurationsnetworkingv1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/networking/v1alpha1"
 	applyconfigurationsstoragev1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/storage/v1alpha1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 )
 
@@ -27,59 +23,49 @@ import (
 // apply configuration type exists for the given GroupVersionKind.
 func ForKind(kind schema.GroupVersionKind) interface{} {
 	switch kind {
-	// Group=common.ironcore.dev, Version=v1alpha1
-	case v1alpha1.SchemeGroupVersion.WithKind("LocalUIDReference"):
-		return &commonv1alpha1.LocalUIDReferenceApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("SecretKeySelector"):
-		return &commonv1alpha1.SecretKeySelectorApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("Taint"):
-		return &commonv1alpha1.TaintApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("Toleration"):
-		return &commonv1alpha1.TolerationApplyConfiguration{}
-
-		// Group=compute.ironcore.dev, Version=v1alpha1
-	case computev1alpha1.SchemeGroupVersion.WithKind("DaemonEndpoint"):
-		return &applyconfigurationscomputev1alpha1.DaemonEndpointApplyConfiguration{}
-	case computev1alpha1.SchemeGroupVersion.WithKind("EFIVar"):
-		return &applyconfigurationscomputev1alpha1.EFIVarApplyConfiguration{}
-	case computev1alpha1.SchemeGroupVersion.WithKind("EmptyDiskVolumeSource"):
-		return &applyconfigurationscomputev1alpha1.EmptyDiskVolumeSourceApplyConfiguration{}
-	case computev1alpha1.SchemeGroupVersion.WithKind("EphemeralNetworkInterfaceSource"):
-		return &applyconfigurationscomputev1alpha1.EphemeralNetworkInterfaceSourceApplyConfiguration{}
-	case computev1alpha1.SchemeGroupVersion.WithKind("EphemeralVolumeSource"):
-		return &applyconfigurationscomputev1alpha1.EphemeralVolumeSourceApplyConfiguration{}
-	case computev1alpha1.SchemeGroupVersion.WithKind("Machine"):
-		return &applyconfigurationscomputev1alpha1.MachineApplyConfiguration{}
-	case computev1alpha1.SchemeGroupVersion.WithKind("MachineClass"):
-		return &applyconfigurationscomputev1alpha1.MachineClassApplyConfiguration{}
-	case computev1alpha1.SchemeGroupVersion.WithKind("MachinePool"):
-		return &applyconfigurationscomputev1alpha1.MachinePoolApplyConfiguration{}
-	case computev1alpha1.SchemeGroupVersion.WithKind("MachinePoolAddress"):
-		return &applyconfigurationscomputev1alpha1.MachinePoolAddressApplyConfiguration{}
-	case computev1alpha1.SchemeGroupVersion.WithKind("MachinePoolCondition"):
-		return &applyconfigurationscomputev1alpha1.MachinePoolConditionApplyConfiguration{}
-	case computev1alpha1.SchemeGroupVersion.WithKind("MachinePoolDaemonEndpoints"):
-		return &applyconfigurationscomputev1alpha1.MachinePoolDaemonEndpointsApplyConfiguration{}
-	case computev1alpha1.SchemeGroupVersion.WithKind("MachinePoolSpec"):
-		return &applyconfigurationscomputev1alpha1.MachinePoolSpecApplyConfiguration{}
-	case computev1alpha1.SchemeGroupVersion.WithKind("MachinePoolStatus"):
-		return &applyconfigurationscomputev1alpha1.MachinePoolStatusApplyConfiguration{}
-	case computev1alpha1.SchemeGroupVersion.WithKind("MachineSpec"):
-		return &applyconfigurationscomputev1alpha1.MachineSpecApplyConfiguration{}
-	case computev1alpha1.SchemeGroupVersion.WithKind("MachineStatus"):
-		return &applyconfigurationscomputev1alpha1.MachineStatusApplyConfiguration{}
-	case computev1alpha1.SchemeGroupVersion.WithKind("NetworkInterface"):
-		return &applyconfigurationscomputev1alpha1.NetworkInterfaceApplyConfiguration{}
-	case computev1alpha1.SchemeGroupVersion.WithKind("NetworkInterfaceSource"):
-		return &applyconfigurationscomputev1alpha1.NetworkInterfaceSourceApplyConfiguration{}
-	case computev1alpha1.SchemeGroupVersion.WithKind("NetworkInterfaceStatus"):
-		return &applyconfigurationscomputev1alpha1.NetworkInterfaceStatusApplyConfiguration{}
-	case computev1alpha1.SchemeGroupVersion.WithKind("Volume"):
-		return &applyconfigurationscomputev1alpha1.VolumeApplyConfiguration{}
-	case computev1alpha1.SchemeGroupVersion.WithKind("VolumeSource"):
-		return &applyconfigurationscomputev1alpha1.VolumeSourceApplyConfiguration{}
-	case computev1alpha1.SchemeGroupVersion.WithKind("VolumeStatus"):
-		return &applyconfigurationscomputev1alpha1.VolumeStatusApplyConfiguration{}
+	// Group=compute.ironcore.dev, Version=v1alpha1
+	case v1alpha1.SchemeGroupVersion.WithKind("DaemonEndpoint"):
+		return &computev1alpha1.DaemonEndpointApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("EFIVar"):
+		return &computev1alpha1.EFIVarApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("EmptyDiskVolumeSource"):
+		return &computev1alpha1.EmptyDiskVolumeSourceApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("EphemeralNetworkInterfaceSource"):
+		return &computev1alpha1.EphemeralNetworkInterfaceSourceApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("EphemeralVolumeSource"):
+		return &computev1alpha1.EphemeralVolumeSourceApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("Machine"):
+		return &computev1alpha1.MachineApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("MachineClass"):
+		return &computev1alpha1.MachineClassApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("MachinePool"):
+		return &computev1alpha1.MachinePoolApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("MachinePoolAddress"):
+		return &computev1alpha1.MachinePoolAddressApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("MachinePoolCondition"):
+		return &computev1alpha1.MachinePoolConditionApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("MachinePoolDaemonEndpoints"):
+		return &computev1alpha1.MachinePoolDaemonEndpointsApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("MachinePoolSpec"):
+		return &computev1alpha1.MachinePoolSpecApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("MachinePoolStatus"):
+		return &computev1alpha1.MachinePoolStatusApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("MachineSpec"):
+		return &computev1alpha1.MachineSpecApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("MachineStatus"):
+		return &computev1alpha1.MachineStatusApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("NetworkInterface"):
+		return &computev1alpha1.NetworkInterfaceApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("NetworkInterfaceSource"):
+		return &computev1alpha1.NetworkInterfaceSourceApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("NetworkInterfaceStatus"):
+		return &computev1alpha1.NetworkInterfaceStatusApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("Volume"):
+		return &computev1alpha1.VolumeApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("VolumeSource"):
+		return &computev1alpha1.VolumeSourceApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("VolumeStatus"):
+		return &computev1alpha1.VolumeStatusApplyConfiguration{}
 
 		// Group=core.ironcore.dev, Version=v1alpha1
 	case corev1alpha1.SchemeGroupVersion.WithKind("ObjectSelector"):
@@ -110,20 +96,6 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &applyconfigurationsipamv1alpha1.PrefixStatusApplyConfiguration{}
 	case ipamv1alpha1.SchemeGroupVersion.WithKind("PrefixTemplateSpec"):
 		return &applyconfigurationsipamv1alpha1.PrefixTemplateSpecApplyConfiguration{}
-
-		// Group=meta.k8s.io, Version=v1
-	case v1.SchemeGroupVersion.WithKind("LabelSelector"):
-		return &metav1.LabelSelectorApplyConfiguration{}
-	case v1.SchemeGroupVersion.WithKind("LabelSelectorRequirement"):
-		return &metav1.LabelSelectorRequirementApplyConfiguration{}
-	case v1.SchemeGroupVersion.WithKind("ManagedFieldsEntry"):
-		return &metav1.ManagedFieldsEntryApplyConfiguration{}
-	case v1.SchemeGroupVersion.WithKind("ObjectMeta"):
-		return &metav1.ObjectMetaApplyConfiguration{}
-	case v1.SchemeGroupVersion.WithKind("OwnerReference"):
-		return &metav1.OwnerReferenceApplyConfiguration{}
-	case v1.SchemeGroupVersion.WithKind("TypeMeta"):
-		return &metav1.TypeMetaApplyConfiguration{}
 
 		// Group=networking.ironcore.dev, Version=v1alpha1
 	case networkingv1alpha1.SchemeGroupVersion.WithKind("EphemeralPrefixSource"):
