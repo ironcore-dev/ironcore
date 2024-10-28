@@ -94,7 +94,8 @@ func (g *Generic) GetBucketClassFor(ctx context.Context, name string, caps *iri.
 		case 0:
 			return nil, ErrNoMatchingBucketClass
 		case 1:
-			return byCaps[0], nil
+			class := *byCaps[0]
+			return &class, nil
 		default:
 			return nil, ErrAmbiguousMatchingBucketClass
 		}

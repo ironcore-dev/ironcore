@@ -8,7 +8,6 @@ require (
 	github.com/blang/semver/v4 v4.0.0
 	github.com/go-chi/chi/v5 v5.2.1
 	github.com/go-logr/logr v1.4.2
-	github.com/gogo/protobuf v1.3.2
 	github.com/google/go-cmp v0.7.0
 	github.com/ironcore-dev/controller-utils v0.9.9
 	github.com/onsi/ginkgo/v2 v2.23.3
@@ -61,6 +60,7 @@ require (
 	github.com/go-openapi/jsonreference v0.20.2 // indirect
 	github.com/go-openapi/swag v0.23.0 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
+	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/btree v1.1.3 // indirect
 	github.com/google/cel-go v0.22.0 // indirect
