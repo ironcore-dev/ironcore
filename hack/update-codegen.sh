@@ -8,6 +8,19 @@ THIS_PKG="github.com/ironcore-dev/ironcore"
 SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 PROJECT_ROOT="$SCRIPT_DIR/.."
 
+VGOPATH="$VGOPATH"
+MODELS_SCHEMA="$MODELS_SCHEMA"
+OPENAPI_GEN="$OPENAPI_GEN"
+
+VIRTUAL_GOPATH="$(mktemp -d)"
+trap 'rm -rf "$VIRTUAL_GOPATH"' EXIT
+
+# Setup virtual GOPATH so the codegen tools work as expected.
+(cd "$PROJECT_ROOT"; go mod download && "$VGOPATH" -o "$VIRTUAL_GOPATH")
+
+export GOROOT="${GOROOT:-"$(go env GOROOT)"}"
+export GOPATH="$VIRTUAL_GOPATH"
+
 CODE_GEN_DIR=$(go list -m -f '{{.Dir}}' k8s.io/code-generator)
 source "${CODE_GEN_DIR}/kube_codegen.sh"
 
@@ -34,19 +47,6 @@ function qualify-gvs() {
 
   echo "$res"
 }
-
-VGOPATH="$VGOPATH"
-MODELS_SCHEMA="$MODELS_SCHEMA"
-OPENAPI_GEN="$OPENAPI_GEN"
-
-VIRTUAL_GOPATH="$(mktemp -d)"
-trap 'rm -rf "$VIRTUAL_GOPATH"' EXIT
-
-# Setup virtual GOPATH so the codegen tools work as expected.
-(cd "$PROJECT_ROOT"; go mod download && "$VGOPATH" -o "$VIRTUAL_GOPATH")
-
-export GOROOT="${GOROOT:-"$(go env GOROOT)"}"
-export GOPATH="$VIRTUAL_GOPATH"
 
 CLIENT_GROUPS="core compute ipam networking storage"
 CLIENT_VERSION_GROUPS="core:v1alpha1 compute:v1alpha1 ipam:v1alpha1 networking:v1alpha1 storage:v1alpha1"
