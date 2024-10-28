@@ -1,0 +1,14 @@
+apiVersion: networking.ironcore.dev/v1alpha1
+kind: LoadBalancer
+metadata:
+  name: loadbalancer-sample
+spec:
+  type: Public
+  ipFamilies: [IPv4]
+  networkRef:
+    name: network-sample
+  networkInterfaceSelector:
+    matchLabels:
+      app: web
+  ports:
+  - port: 80
