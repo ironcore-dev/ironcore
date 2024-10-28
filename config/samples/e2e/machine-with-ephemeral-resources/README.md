@@ -1,4 +1,4 @@
-# Machine Sample deployement
+# Machine with ephemeral resources
 
 This example deploys a `Machine` with `ephemeral` `volume` and `networkinterface`. 
 The following artifacts will be deployed in your namespace:   
@@ -15,7 +15,7 @@ The following artifacts will be deployed in your namespace:
 1. Adapt the `namespace` in `kustomization.yaml`
 2. Replace `your-user`, `your-pw-hash` and `your-ssh-key`s in the `ignition/ignition.yaml`
 3. Run `ignition/regenerate-ignition.sh`
-4. Create the below `patch-machine.yaml` in `machine-with-ephemeral-resource` folder with the desired `machineClassRef`, `machinePoolRef`, `volumeClassRef`, `volumePoolRef`, `image` etc. as per your environment
+4. Create the below `patch-machine.yaml` in `machine-with-ephemeral-resources` folder with the desired `machineClassRef`, `machinePoolRef`, `volumeClassRef`, `volumePoolRef`, `image` etc. as per your environment
 
 ```
 apiVersion: compute.ironcore.dev/v1alpha1

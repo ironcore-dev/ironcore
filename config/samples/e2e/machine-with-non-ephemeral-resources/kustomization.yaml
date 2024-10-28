@@ -5,4 +5,4 @@ namespace: test
 
 resources:
 - ../bases/ignition
-- ../bases/ephemeral-machine
+- ../bases/machine-with-nonephemeral-resources
