@@ -82,7 +82,6 @@ for GV in ${ALL_VERSION_GROUPS}; do
 done
 applyconfigurationgen_external_apis_csv=$(IFS=,; echo "${applyconfigurationgen_external_apis[*]}")
 
-
 # Do not rely on process substitution / GNU bash
 tmp_schema_file=$(mktemp)
 trap 'rm -f "$tmp_schema_file"' EXIT
