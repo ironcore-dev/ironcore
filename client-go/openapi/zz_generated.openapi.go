@@ -51,6 +51,11 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.NetworkInterface":                schema_ironcore_api_compute_v1alpha1_NetworkInterface(ref),
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.NetworkInterfaceSource":          schema_ironcore_api_compute_v1alpha1_NetworkInterfaceSource(ref),
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.NetworkInterfaceStatus":          schema_ironcore_api_compute_v1alpha1_NetworkInterfaceStatus(ref),
+		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.Reservation":                     schema_ironcore_api_compute_v1alpha1_Reservation(ref),
+		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.ReservationList":                 schema_ironcore_api_compute_v1alpha1_ReservationList(ref),
+		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.ReservationPoolStatus":           schema_ironcore_api_compute_v1alpha1_ReservationPoolStatus(ref),
+		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.ReservationSpec":                 schema_ironcore_api_compute_v1alpha1_ReservationSpec(ref),
+		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.ReservationStatus":               schema_ironcore_api_compute_v1alpha1_ReservationStatus(ref),
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.Volume":                          schema_ironcore_api_compute_v1alpha1_Volume(ref),
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.VolumeSource":                    schema_ironcore_api_compute_v1alpha1_VolumeSource(ref),
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.VolumeStatus":                    schema_ironcore_api_compute_v1alpha1_VolumeStatus(ref),
@@ -1549,10 +1554,10 @@ func schema_ironcore_api_compute_v1alpha1_MachineStatus(ref common.ReferenceCall
 					},
 					"state": {
 						SchemaProps: spec.SchemaProps{
-							Description: "State is the infrastructure state of the machine.\n\nPossible enum values:\n - `\"Pending\"` means the Machine has been accepted by the system, but not yet completely started. This includes time before being bound to a MachinePool, as well as time spent setting up the Machine on that MachinePool.\n - `\"Running\"` means the machine is running on a MachinePool.\n - `\"Shutdown\"` means the machine is shut down.\n - `\"Terminated\"` means the machine has been permanently stopped and cannot be started.\n - `\"Terminating\"` means the machine that is terminating.",
+							Description: "State is the infrastructure state of the machine.\n\nPossible enum values:\n - `\"Accepted\"` means the pool accepted the reservation and reserved the requested resources.\n - `\"Pending\"` means the Machine has been accepted by the system, but not yet completely started. This includes time before being bound to a MachinePool, as well as time spent setting up the Machine on that MachinePool.\n - `\"Pending\"` means the Reservation is beeing reconciled.\n - `\"Rejected\"` means the pool rejected the reservation.\n - `\"Running\"` means the machine is running on a MachinePool.\n - `\"Shutdown\"` means the machine is shut down.\n - `\"Terminated\"` means the machine has been permanently stopped and cannot be started.\n - `\"Terminating\"` means the machine that is terminating.",
 							Type:        []string{"string"},
 							Format:      "",
-							Enum:        []interface{}{"Pending", "Running", "Shutdown", "Terminated", "Terminating"},
+							Enum:        []interface{}{"Accepted", "Pending", "Pending", "Rejected", "Running", "Shutdown", "Terminated", "Terminating"},
 						},
 					},
 					"networkInterfaces": {
@@ -1720,6 +1725,197 @@ func schema_ironcore_api_compute_v1alpha1_NetworkInterfaceStatus(ref common.Refe
 		},
 		Dependencies: []string{
 			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+	}
+}
+
+func schema_ironcore_api_compute_v1alpha1_Reservation(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "Reservation is the Schema for the machines API",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.ReservationSpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.ReservationStatus"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.ReservationSpec", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.ReservationStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_ironcore_api_compute_v1alpha1_ReservationList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ReservationList contains a list of Reservation",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.Reservation"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.Reservation", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_ironcore_api_compute_v1alpha1_ReservationPoolStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"ref": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"state": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+							Enum:   []interface{}{},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func schema_ironcore_api_compute_v1alpha1_ReservationSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ReservationSpec defines the desired state of Reservation",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"pools": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/api/core/v1.LocalObjectReference"),
+									},
+								},
+							},
+						},
+					},
+					"capabilities": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"pools"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/api/resource.Quantity"},
+	}
+}
+
+func schema_ironcore_api_compute_v1alpha1_ReservationStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ReservationStatus defines the observed state of Reservation",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"pools": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.ReservationPoolStatus"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.ReservationPoolStatus"},
 	}
 }
 

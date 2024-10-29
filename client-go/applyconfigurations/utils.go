@@ -74,6 +74,14 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &applyconfigurationscomputev1alpha1.NetworkInterfaceSourceApplyConfiguration{}
 	case computev1alpha1.SchemeGroupVersion.WithKind("NetworkInterfaceStatus"):
 		return &applyconfigurationscomputev1alpha1.NetworkInterfaceStatusApplyConfiguration{}
+	case computev1alpha1.SchemeGroupVersion.WithKind("Reservation"):
+		return &applyconfigurationscomputev1alpha1.ReservationApplyConfiguration{}
+	case computev1alpha1.SchemeGroupVersion.WithKind("ReservationPoolStatus"):
+		return &applyconfigurationscomputev1alpha1.ReservationPoolStatusApplyConfiguration{}
+	case computev1alpha1.SchemeGroupVersion.WithKind("ReservationSpec"):
+		return &applyconfigurationscomputev1alpha1.ReservationSpecApplyConfiguration{}
+	case computev1alpha1.SchemeGroupVersion.WithKind("ReservationStatus"):
+		return &applyconfigurationscomputev1alpha1.ReservationStatusApplyConfiguration{}
 	case computev1alpha1.SchemeGroupVersion.WithKind("Volume"):
 		return &applyconfigurationscomputev1alpha1.VolumeApplyConfiguration{}
 	case computev1alpha1.SchemeGroupVersion.WithKind("VolumeSource"):

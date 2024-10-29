@@ -23,9 +23,22 @@ const (
 	FieldOwner       = "machinepoollet.ironcore.dev/field-owner"
 	MachineFinalizer = "machinepoollet.ironcore.dev/machine"
 
+	ReservationUIDLabel       = "machinepoollet.ironcore.dev/reservation-uid"
+	ReservationNamespaceLabel = "machinepoollet.ironcore.dev/reservation-namespace"
+	ReservationNameLabel      = "machinepoollet.ironcore.dev/reservation-name"
+
+	ReservationFinalizerBase = "machinepoollet.ironcore.dev/reservation-"
+
+	ReservationGenerationAnnotation    = "machinepoollet.ironcore.dev/reservation-generation"
+	IRIReservationGenerationAnnotation = "machinepoollet.ironcore.dev/irireservation-generation"
+
 	// DownwardAPIPrefix is the prefix for any downward label.
 	DownwardAPIPrefix = "downward-api.machinepoollet.ironcore.dev/"
 )
+
+func ReservationFinalizer(poolName string) string {
+	return ReservationFinalizerBase + poolName
+}
 
 // DownwardAPILabel makes a downward api label name from the given name.
 func DownwardAPILabel(name string) string {

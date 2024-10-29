@@ -9,6 +9,8 @@ API rule violation: list_type_missing,github.com/ironcore-dev/ironcore/api/compu
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore/api/compute/v1alpha1,MachineStatus,NetworkInterfaces
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore/api/compute/v1alpha1,MachineStatus,Volumes
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore/api/compute/v1alpha1,NetworkInterfaceStatus,IPs
+API rule violation: list_type_missing,github.com/ironcore-dev/ironcore/api/compute/v1alpha1,ReservationSpec,Pools
+API rule violation: list_type_missing,github.com/ironcore-dev/ironcore/api/compute/v1alpha1,ReservationStatus,Pools
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore/api/core/v1alpha1,ResourceScopeSelector,MatchExpressions
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore/api/core/v1alpha1,ResourceScopeSelectorRequirement,Values
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore/api/ipam/v1alpha1,PrefixStatus,Used
@@ -171,6 +173,8 @@ API rule violation: list_type_missing,k8s.io/apimachinery/pkg/runtime,RawExtensi
 API rule violation: list_type_missing,k8s.io/apimachinery/pkg/runtime,Unknown,Raw
 API rule violation: names_match,github.com/ironcore-dev/ironcore/api/compute/v1alpha1,MachineSpec,ImagePullSecretRef
 API rule violation: names_match,github.com/ironcore-dev/ironcore/api/compute/v1alpha1,NetworkInterfaceStatus,IPs
+API rule violation: names_match,github.com/ironcore-dev/ironcore/api/compute/v1alpha1,ReservationPoolStatus,Name
+API rule violation: names_match,github.com/ironcore-dev/ironcore/api/compute/v1alpha1,ReservationSpec,Resources
 API rule violation: names_match,github.com/ironcore-dev/ironcore/api/networking/v1alpha1,LoadBalancerSpec,IPs
 API rule violation: names_match,github.com/ironcore-dev/ironcore/api/networking/v1alpha1,LoadBalancerStatus,IPs
 API rule violation: names_match,github.com/ironcore-dev/ironcore/api/networking/v1alpha1,NATGatewayStatus,IPs
