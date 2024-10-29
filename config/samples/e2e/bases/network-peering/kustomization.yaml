@@ -1,0 +1,5 @@
+resources:
+- network1.yaml
+- network2.yaml
+- machine1.yaml
+- machine2.yaml
