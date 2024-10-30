@@ -81,11 +81,17 @@ for GV in ${ALL_VERSION_GROUPS}; do
   applyconfigurationgen_external_apis+=("${THIS_PKG}/api/${G}/${V}:${THIS_PKG}/client-go/applyconfigurations/${G}/${V}")
 done
 applyconfigurationgen_external_apis_csv=$(IFS=,; echo "${applyconfigurationgen_external_apis[*]}")
+
+# Do not rely on process substitution / GNU bash
+tmp_schema_file=$(mktemp)
+trap 'rm -f "$tmp_schema_file"' EXIT
+"$MODELS_SCHEMA" --openapi-package "${THIS_PKG}/client-go/openapi" --openapi-title "ironcore" > "$tmp_schema_file"
+
 kube::codegen::gen_client \
   --with-applyconfig \
   --applyconfig-name "applyconfigurations" \
   --applyconfig-externals "${applyconfigurationgen_external_apis_csv}" \
-  --applyconfig-openapi-schema <("$MODELS_SCHEMA" --openapi-package "${THIS_PKG}/client-go/openapi" --openapi-title "ironcore") \
+  --applyconfig-openapi-schema "$tmp_schema_file" \
   --clientset-name "ironcore" \
   --listers-name "listers" \
   --informers-name "informers" \
