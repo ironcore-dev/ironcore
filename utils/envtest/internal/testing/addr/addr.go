@@ -115,7 +115,9 @@ func Suggest(listenHost string) (int, string, error) {
 		if err != nil {
 			return -1, "", err
 		}
-		defer listener.Close()
+		defer func() {
+			_ = listener.Close()
+		}()
 		if ok, err := cache.add(port); ok {
 			return port, resolvedHost, nil
 		} else if err != nil {

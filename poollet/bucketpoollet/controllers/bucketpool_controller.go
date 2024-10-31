@@ -54,13 +54,10 @@ func (r *BucketPoolReconciler) delete(ctx context.Context, log logr.Logger, buck
 	return ctrl.Result{}, nil
 }
 
-func (r *BucketPoolReconciler) supportsBucketClass(ctx context.Context, log logr.Logger, bucketClass *storagev1alpha1.BucketClass) (bool, error) {
-	iriCapabilities, err := getIRIBucketClassCapabilities(bucketClass)
-	if err != nil {
-		return false, fmt.Errorf("error getting iri bucket class capabilities: %w", err)
-	}
+func (r *BucketPoolReconciler) supportsBucketClass(ctx context.Context, bucketClass *storagev1alpha1.BucketClass) (bool, error) {
+	iriCapabilities := getIRIBucketClassCapabilities(bucketClass)
 
-	_, err = r.BucketClassMapper.GetBucketClassFor(ctx, bucketClass.Name, iriCapabilities)
+	_, err := r.BucketClassMapper.GetBucketClassFor(ctx, bucketClass.Name, iriCapabilities)
 	if err != nil {
 		if !errors.Is(err, bcm.ErrNoMatchingBucketClass) && !errors.Is(err, bcm.ErrAmbiguousMatchingBucketClass) {
 			return false, fmt.Errorf("error getting bucket class for %s: %w", bucketClass.Name, err)
@@ -82,7 +79,7 @@ func (r *BucketPoolReconciler) reconcile(ctx context.Context, log logr.Logger, b
 	log.V(1).Info("Determining supported bucket classes")
 	var supported []corev1.LocalObjectReference
 	for _, bucketClass := range bucketClassList.Items {
-		ok, err := r.supportsBucketClass(ctx, log, &bucketClass)
+		ok, err := r.supportsBucketClass(ctx, &bucketClass)
 		if err != nil {
 			return ctrl.Result{}, fmt.Errorf("error checking whether bucket class %s is supported: %w", bucketClass.Name, err)
 		}

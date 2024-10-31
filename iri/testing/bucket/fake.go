@@ -8,6 +8,8 @@ import (
 	"sync"
 	"time"
 
+	"google.golang.org/protobuf/proto"
+
 	irievent "github.com/ironcore-dev/ironcore/iri/apis/event/v1alpha1"
 	"k8s.io/apimachinery/pkg/labels"
 
@@ -149,8 +151,8 @@ func (r *FakeRuntimeService) ListBucketClasses(ctx context.Context, req *iri.Lis
 
 	var res []*iri.BucketClass
 	for _, b := range r.BucketClasses {
-		bucketClass := b.BucketClass
-		res = append(res, &bucketClass)
+		bucketClass := proto.Clone(&b.BucketClass).(*iri.BucketClass)
+		res = append(res, bucketClass)
 	}
 	return &iri.ListBucketClassesResponse{BucketClasses: res}, nil
 }

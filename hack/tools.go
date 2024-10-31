@@ -9,7 +9,5 @@
 package hack
 
 import (
-	// Use gogoproto for protobuf generation.
-	_ "github.com/gogo/protobuf/gogoproto"
 	_ "k8s.io/code-generator"
 )

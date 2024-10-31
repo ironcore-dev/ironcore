@@ -78,7 +78,7 @@ func (s *Server) filterIronCoreMachineClasses(
 	return filtered
 }
 
-func (s *Server) convertIronCoreMachineClassStatus(machineClass *computev1alpha1.MachineClass, quantity *resource.Quantity) (*iri.MachineClassStatus, error) {
+func (s *Server) convertIronCoreMachineClassStatus(machineClass *computev1alpha1.MachineClass, quantity *resource.Quantity) *iri.MachineClassStatus {
 	cpu := machineClass.Capabilities.CPU()
 	memory := machineClass.Capabilities.Memory()
 
@@ -91,7 +91,7 @@ func (s *Server) convertIronCoreMachineClassStatus(machineClass *computev1alpha1
 			},
 		},
 		Quantity: quantity.Value(),
-	}, nil
+	}
 }
 
 func (s *Server) Status(ctx context.Context, req *iri.StatusRequest) (*iri.StatusResponse, error) {
@@ -129,11 +129,7 @@ func (s *Server) Status(ctx context.Context, req *iri.StatusRequest) (*iri.Statu
 			continue
 		}
 
-		machineClass, err := s.convertIronCoreMachineClassStatus(&ironcoreMachineClass, quantity)
-		if err != nil {
-			return nil, fmt.Errorf("error converting ironcore machine class %s: %w", ironcoreMachineClass.Name, err)
-		}
-
+		machineClass := s.convertIronCoreMachineClassStatus(&ironcoreMachineClass, quantity)
 		machineClassStatus = append(machineClassStatus, machineClass)
 	}
 

@@ -40,6 +40,8 @@ func init() {
 }
 
 type Server struct {
+	iri.UnimplementedVolumeRuntimeServer
+
 	client client.Client
 	idGen  idgen.IDGen
 

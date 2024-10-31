@@ -67,11 +67,8 @@ func (r *MachinePoolReconciler) delete(ctx context.Context, log logr.Logger, mac
 	return ctrl.Result{}, nil
 }
 
-func (r *MachinePoolReconciler) supportsMachineClass(ctx context.Context, log logr.Logger, machineClass *computev1alpha1.MachineClass) (*iri.MachineClass, int64, error) {
-	iriCapabilities, err := getIRIMachineClassCapabilities(machineClass)
-	if err != nil {
-		return nil, 0, fmt.Errorf("error getting iri machine class capabilities: %w", err)
-	}
+func (r *MachinePoolReconciler) supportsMachineClass(ctx context.Context, machineClass *computev1alpha1.MachineClass) (*iri.MachineClass, int64, error) {
+	iriCapabilities := getIRIMachineClassCapabilities(machineClass)
 
 	class, quantity, err := r.MachineClassMapper.GetMachineClassFor(ctx, machineClass.Name, iriCapabilities)
 	if err != nil {
@@ -93,7 +90,7 @@ func (r *MachinePoolReconciler) calculateCapacity(
 
 	capacity = corev1alpha1.ResourceList{}
 	for _, machineClass := range machineClassList {
-		class, quantity, err := r.supportsMachineClass(ctx, log, &machineClass)
+		class, quantity, err := r.supportsMachineClass(ctx, &machineClass)
 		if err != nil {
 			return nil, nil, nil, fmt.Errorf("error checking whether machine class %s is supported: %w", machineClass.Name, err)
 		}

@@ -89,10 +89,8 @@ generate: vgopath models-schema openapi-gen
 	./hack/update-codegen.sh
 
 .PHONY: proto
-proto: goimports vgopath protoc-gen-gogo
-	VGOPATH=$(VGOPATH) \
-	PROTOC_GEN_GOGO=$(PROTOC_GEN_GOGO) \
-	./hack/update-proto.sh
+proto: goimports vgopath buf
+	$(BUF) generate --template buf.gen.yaml
 	$(GOIMPORTS) -w ./iri
 
 .PHONY: fmt
@@ -101,7 +99,7 @@ fmt: goimports ## Run goimports against code.
 
 .PHONY: vet
 vet: ## Run go vet against code.
-	go vet ./...
+	go vet -copylocks=false ./...
 
 .PHONY: lint
 lint: golangci-lint ## Run golangci-lint on the code.
@@ -145,7 +143,7 @@ clean-docs: ## Remove all local mkdocs Docker images (cleanup).
 	docker container prune --force --filter "label=project=ironcore_documentation"
 
 .PHONY: test
-test: manifests generate fmt vet test-only ## Run tests.
+test: manifests generate proto fmt vet test-only ## Run tests.
 
 .PHONY: test-only
 test-only: envtest ## Run *only* the tests - no generation, linting etc.
@@ -352,7 +350,7 @@ OPENAPI_GEN ?= $(LOCALBIN)/openapi-gen
 VGOPATH ?= $(LOCALBIN)/vgopath
 GEN_CRD_API_REFERENCE_DOCS ?= $(LOCALBIN)/gen-crd-api-reference-docs
 ADDLICENSE ?= $(LOCALBIN)/addlicense
-PROTOC_GEN_GOGO ?= $(LOCALBIN)/protoc-gen-gogo
+BUF ?= $(LOCALBIN)/buf
 MODELS_SCHEMA ?= $(LOCALBIN)/models-schema
 GOIMPORTS ?= $(LOCALBIN)/goimports
 GOLANGCI_LINT ?= $(LOCALBIN)/golangci-lint
@@ -363,10 +361,10 @@ VGOPATH_VERSION ?= v0.1.3
 CONTROLLER_TOOLS_VERSION ?= v0.15.0
 GEN_CRD_API_REFERENCE_DOCS_VERSION ?= v0.3.0
 ADDLICENSE_VERSION ?= v1.1.1
-PROTOC_GEN_GOGO_VERSION ?= v1.3.2
 GOIMPORTS_VERSION ?= v0.26.0
 GOLANGCI_LINT_VERSION ?= v1.61.0
 OPENAPI_EXTRACTOR_VERSION ?= v0.1.4
+BUF_VERSION ?= v1.45.0
 
 KUSTOMIZE_INSTALL_SCRIPT ?= "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
 .PHONY: kustomize
@@ -421,10 +419,10 @@ addlicense: $(ADDLICENSE) ## Download addlicense locally if necessary.
 $(ADDLICENSE): $(LOCALBIN)
 	test -s $(LOCALBIN)/addlicense || GOBIN=$(LOCALBIN) go install github.com/google/addlicense@$(ADDLICENSE_VERSION)
 
-.PHONY: protoc-gen-gogo
-protoc-gen-gogo: $(PROTOC_GEN_GOGO) ## Download protoc-gen-gogo locally if necessary.
-$(PROTOC_GEN_GOGO): $(LOCALBIN)
-	test -s $(LOCALBIN)/protoc-gen-gogo || GOBIN=$(LOCALBIN) go install github.com/gogo/protobuf/protoc-gen-gogo@$(PROTOC_GEN_GOGO_VERSION)
+.PHONY: buf
+buf: $(BUF) ## Download buf locally if necessary.
+$(BUF): $(LOCALBIN)
+	test -s $(LOCALBIN)/buf || GOBIN=$(LOCALBIN) go install github.com/bufbuild/buf/cmd/buf@$(BUF_VERSION)
 
 .PHONY: models-schema
 models-schema: $(MODELS_SCHEMA) ## Install models-schema locally if necessary.

@@ -43,6 +43,7 @@ func init() {
 
 type Server struct {
 	client client.Client
+	iri.UnimplementedBucketRuntimeServer
 
 	namespace          string
 	bucketPoolName     string

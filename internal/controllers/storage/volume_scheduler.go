@@ -81,18 +81,18 @@ func (s *VolumeScheduler) skipSchedule(log logr.Logger, volume *storagev1alpha1.
 	return isAssumed
 }
 
-func (s *VolumeScheduler) matchesLabels(ctx context.Context, pool *scheduler.ContainerInfo, volume *storagev1alpha1.Volume) bool {
+func (s *VolumeScheduler) matchesLabels(pool *scheduler.ContainerInfo, volume *storagev1alpha1.Volume) bool {
 	nodeLabels := labels.Set(pool.Node().Labels)
 	volumePoolSelector := labels.SelectorFromSet(volume.Spec.VolumePoolSelector)
 
 	return volumePoolSelector.Matches(nodeLabels)
 }
 
-func (s *VolumeScheduler) tolerateTaints(ctx context.Context, pool *scheduler.ContainerInfo, volume *storagev1alpha1.Volume) bool {
+func (s *VolumeScheduler) tolerateTaints(pool *scheduler.ContainerInfo, volume *storagev1alpha1.Volume) bool {
 	return v1alpha1.TolerateTaints(volume.Spec.Tolerations, pool.Node().Spec.Taints)
 }
 
-func (s *VolumeScheduler) fitsPool(ctx context.Context, pool *scheduler.ContainerInfo, volume *storagev1alpha1.Volume) bool {
+func (s *VolumeScheduler) fitsPool(pool *scheduler.ContainerInfo, volume *storagev1alpha1.Volume) bool {
 	volumeClassName := volume.Spec.VolumeClassRef.Name
 
 	allocatable, ok := pool.Node().Status.Allocatable[corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeVolumeClass, volumeClassName)]
@@ -153,15 +153,15 @@ func (s *VolumeScheduler) reconcileExists(ctx context.Context, log logr.Logger, 
 
 	var filteredNodes []*scheduler.ContainerInfo
 	for _, node := range nodes {
-		if !s.tolerateTaints(ctx, node, volume) {
+		if !s.tolerateTaints(node, volume) {
 			log.Info("node filtered", "reason", "taints do not match")
 			continue
 		}
-		if !s.matchesLabels(ctx, node, volume) {
+		if !s.matchesLabels(node, volume) {
 			log.Info("node filtered", "reason", "label do not match")
 			continue
 		}
-		if !s.fitsPool(ctx, node, volume) {
+		if !s.fitsPool(node, volume) {
 			log.Info("node filtered", "reason", "resources do not match")
 			continue
 		}

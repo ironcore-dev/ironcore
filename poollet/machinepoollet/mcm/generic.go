@@ -10,11 +10,11 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	"github.com/gogo/protobuf/proto"
 	"github.com/ironcore-dev/ironcore/iri/apis/machine"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/irievent"
 	"golang.org/x/exp/maps"
+	"google.golang.org/protobuf/proto"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -161,8 +161,7 @@ func (g *Generic) GetMachineClassFor(ctx context.Context, name string, caps *iri
 		case 0:
 			return nil, 0, ErrNoMatchingMachineClass
 		case 1:
-			classStatus := *byCaps[0]
-			return classStatus.MachineClass, classStatus.Quantity, nil
+			return byCaps[0].MachineClass, byCaps[0].Quantity, nil
 		default:
 			return nil, 0, ErrAmbiguousMatchingMachineClass
 		}

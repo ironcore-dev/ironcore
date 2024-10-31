@@ -75,18 +75,18 @@ func (s *MachineScheduler) skipSchedule(log logr.Logger, machine *computev1alpha
 	return isAssumed
 }
 
-func (s *MachineScheduler) matchesLabels(ctx context.Context, pool *scheduler.ContainerInfo, machine *computev1alpha1.Machine) bool {
+func (s *MachineScheduler) matchesLabels(pool *scheduler.ContainerInfo, machine *computev1alpha1.Machine) bool {
 	nodeLabels := labels.Set(pool.Node().Labels)
 	machinePoolSelector := labels.SelectorFromSet(machine.Spec.MachinePoolSelector)
 
 	return machinePoolSelector.Matches(nodeLabels)
 }
 
-func (s *MachineScheduler) tolerateTaints(ctx context.Context, pool *scheduler.ContainerInfo, machine *computev1alpha1.Machine) bool {
+func (s *MachineScheduler) tolerateTaints(pool *scheduler.ContainerInfo, machine *computev1alpha1.Machine) bool {
 	return v1alpha1.TolerateTaints(machine.Spec.Tolerations, pool.Node().Spec.Taints)
 }
 
-func (s *MachineScheduler) fitsPool(ctx context.Context, pool *scheduler.ContainerInfo, machine *computev1alpha1.Machine) bool {
+func (s *MachineScheduler) fitsPool(pool *scheduler.ContainerInfo, machine *computev1alpha1.Machine) bool {
 	machineClassName := machine.Spec.MachineClassRef.Name
 
 	allocatable, ok := pool.Node().Status.Allocatable[corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClassName)]
@@ -108,15 +108,15 @@ func (s *MachineScheduler) reconcileExists(ctx context.Context, log logr.Logger,
 
 	var filteredNodes []*scheduler.ContainerInfo
 	for _, node := range nodes {
-		if !s.tolerateTaints(ctx, node, machine) {
+		if !s.tolerateTaints(node, machine) {
 			log.Info("node filtered", "reason", "taints do not match")
 			continue
 		}
-		if !s.matchesLabels(ctx, node, machine) {
+		if !s.matchesLabels(node, machine) {
 			log.Info("node filtered", "reason", "label do not match")
 			continue
 		}
-		if !s.fitsPool(ctx, node, machine) {
+		if !s.fitsPool(node, machine) {
 			log.Info("node filtered", "reason", "resources do not match")
 			continue
 		}

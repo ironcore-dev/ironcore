@@ -1,15 +1,25 @@
 run:
-  concurrency: 4
   timeout: 10m
+  allow-parallel-runners: true
 
 linters:
+  disable-all: true
   enable:
-    - revive
-    - ginkgolinter
-    - ineffassign
-    - misspell
+    - copyloopvar
+    - errcheck
+    - goconst
+    - gofmt
     - goimports
-    - importas
+    - gosimple
+    - govet
+    - ineffassign
+    - ginkgolinter
+    - misspell
+    - nakedret
+    - staticcheck
+    - typecheck
+    - unconvert
+    - unparam
     - unused
 
 severity:
@@ -38,5 +48,19 @@ linters-settings:
         alias: ${1}client
 
 issues:
+  # exclude copylocks issues in fake servers and unit tests
+  exclude-files:
+    - iri/testing/volume/fake.go
+    - iri/testing/bucket/fake.go
+    - iri/testing/machine/fake.go
+    - poollet/machinepoollet/controllers/machine_controller_test.go
+    # TODO: fis copylocks issues in those files
+    - poollet/volumepoollet/vcm/generic.go
+    - poollet/bucketpoollet/bcm/generic.go
+  # don't skip warning about doc comments
+  # don't exclude the default set of lint
+  exclude-use-default: false
+  # restore some of the defaults
+  # (fill in the rest as needed)
   exclude: # Exclude stutter issues (for now)
     - "exported: type name will be used as (.+) by other packages, and that stutters; consider calling this (.+)"
