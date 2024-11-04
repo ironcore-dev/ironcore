@@ -1554,10 +1554,10 @@ func schema_ironcore_api_compute_v1alpha1_MachineStatus(ref common.ReferenceCall
 					},
 					"state": {
 						SchemaProps: spec.SchemaProps{
-							Description: "State is the infrastructure state of the machine.\n\nPossible enum values:\n - `\"Accepted\"` means the pool accepted the reservation and reserved the requested resources.\n - `\"Pending\"` means the Machine has been accepted by the system, but not yet completely started. This includes time before being bound to a MachinePool, as well as time spent setting up the Machine on that MachinePool.\n - `\"Pending\"` means the Reservation is beeing reconciled.\n - `\"Rejected\"` means the pool rejected the reservation.\n - `\"Running\"` means the machine is running on a MachinePool.\n - `\"Shutdown\"` means the machine is shut down.\n - `\"Terminated\"` means the machine has been permanently stopped and cannot be started.\n - `\"Terminating\"` means the machine that is terminating.",
+							Description: "State is the infrastructure state of the machine.\n\nPossible enum values:\n - `\"Pending\"` means the Machine has been accepted by the system, but not yet completely started. This includes time before being bound to a MachinePool, as well as time spent setting up the Machine on that MachinePool.\n - `\"Running\"` means the machine is running on a MachinePool.\n - `\"Shutdown\"` means the machine is shut down.\n - `\"Terminated\"` means the machine has been permanently stopped and cannot be started.\n - `\"Terminating\"` means the machine that is terminating.",
 							Type:        []string{"string"},
 							Format:      "",
-							Enum:        []interface{}{"Accepted", "Pending", "Pending", "Rejected", "Running", "Shutdown", "Terminated", "Terminating"},
+							Enum:        []interface{}{"Pending", "Running", "Shutdown", "Terminated", "Terminating"},
 						},
 					},
 					"networkInterfaces": {
@@ -1838,9 +1838,10 @@ func schema_ironcore_api_compute_v1alpha1_ReservationPoolStatus(ref common.Refer
 					},
 					"state": {
 						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-							Enum:   []interface{}{},
+							Description: "Possible enum values:\n - `\"Accepted\"` means the pool accepted the reservation and reserved the requested resources.\n - `\"Pending\"` means the Reservation is beeing reconciled.\n - `\"Rejected\"` means the pool rejected the reservation.",
+							Type:        []string{"string"},
+							Format:      "",
+							Enum:        []interface{}{"Accepted", "Pending", "Rejected"},
 						},
 					},
 				},

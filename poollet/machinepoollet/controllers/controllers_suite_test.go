@@ -251,6 +251,18 @@ func SetupTest() (*corev1.Namespace, *computev1alpha1.MachinePool, *computev1alp
 			MachinePoolName:    mp.Name,
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
+		Expect((&controllers.ReservationReconciler{
+			EventRecorder:         &record.FakeRecorder{},
+			Client:                k8sManager.GetClient(),
+			MachineRuntime:        srv,
+			MachineRuntimeName:    machine.FakeRuntimeName,
+			MachineRuntimeVersion: machine.FakeVersion,
+			MachinePoolName:       mp.Name,
+			DownwardAPILabels: map[string]string{
+				fooDownwardAPILabel: fmt.Sprintf("metadata.annotations['%s']", fooAnnotation),
+			},
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
 		go func() {
 			defer GinkgoRecover()
 			Expect(k8sManager.Start(mgrCtx)).To(Succeed(), "failed to start manager")

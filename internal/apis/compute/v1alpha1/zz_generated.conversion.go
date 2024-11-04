@@ -1037,7 +1037,7 @@ func Convert_compute_ReservationPoolStatus_To_v1alpha1_ReservationPoolStatus(in 
 
 func autoConvert_v1alpha1_ReservationSpec_To_compute_ReservationSpec(in *v1alpha1.ReservationSpec, out *compute.ReservationSpec, s conversion.Scope) error {
 	out.Pools = *(*[]v1.LocalObjectReference)(unsafe.Pointer(&in.Pools))
-	out.Resources = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Resources))
+	out.Resources = *(*core.ResourceList)(unsafe.Pointer(&in.Resources))
 	return nil
 }
 

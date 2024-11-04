@@ -1,7 +1,7 @@
 package compute
 
 import (
-	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore/internal/apis/core"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -9,7 +9,7 @@ import (
 // ReservationSpec defines the desired state of Reservation
 type ReservationSpec struct {
 	Pools     []corev1.LocalObjectReference
-	Resources corev1alpha1.ResourceList
+	Resources core.ResourceList
 }
 
 // ReservationStatus defines the observed state of Reservation

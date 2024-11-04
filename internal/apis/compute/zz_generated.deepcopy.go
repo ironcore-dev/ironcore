@@ -10,7 +10,6 @@ package compute
 
 import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
-	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	core "github.com/ironcore-dev/ironcore/internal/apis/core"
 	networking "github.com/ironcore-dev/ironcore/internal/apis/networking"
 	storage "github.com/ironcore-dev/ironcore/internal/apis/storage"
@@ -700,7 +699,7 @@ func (in *ReservationSpec) DeepCopyInto(out *ReservationSpec) {
 	}
 	if in.Resources != nil {
 		in, out := &in.Resources, &out.Resources
-		*out = make(corev1alpha1.ResourceList, len(*in))
+		*out = make(core.ResourceList, len(*in))
 		for key, val := range *in {
 			(*out)[key] = val.DeepCopy()
 		}

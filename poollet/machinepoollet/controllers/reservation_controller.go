@@ -7,19 +7,17 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/controller-utils/clientutils"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	irimachine "github.com/ironcore-dev/ironcore/iri/apis/machine"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	utilclient "github.com/ironcore-dev/ironcore/utils/client"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
-	"golang.org/x/exp/maps"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -31,7 +29,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
-	"strconv"
 )
 
 type ReservationReconciler struct {
@@ -106,21 +103,21 @@ func (r *ReservationReconciler) listReservationsByReservationKey(ctx context.Con
 	return res.Reservations, nil
 }
 
-func (r *ReservationReconciler) getMachineByID(ctx context.Context, id string) (*iri.Machine, error) {
-	res, err := r.MachineRuntime.ListMachines(ctx, &iri.ListMachinesRequest{
-		Filter: &iri.MachineFilter{Id: id},
+func (r *ReservationReconciler) getReservationByID(ctx context.Context, id string) (*iri.Reservation, error) {
+	res, err := r.MachineRuntime.ListReservations(ctx, &iri.ListReservationsRequest{
+		Filter: &iri.ReservationFilter{Id: id},
 	})
 	if err != nil {
 		return nil, fmt.Errorf("error listing machines filtering by id: %w", err)
 	}
 
-	switch len(res.Machines) {
+	switch len(res.Reservations) {
 	case 0:
-		return nil, status.Errorf(codes.NotFound, "machine %s not found", id)
+		return nil, status.Errorf(codes.NotFound, "reservation %s not found", id)
 	case 1:
-		return res.Machines[0], nil
+		return res.Reservations[0], nil
 	default:
-		return nil, fmt.Errorf("multiple machines found for id %s", id)
+		return nil, fmt.Errorf("multiple reservations found for id %s", id)
 	}
 }
 
@@ -325,13 +322,9 @@ func (r *ReservationReconciler) iriReservationLabels(reservation *computev1alpha
 
 func (r *ReservationReconciler) iriReservationAnnotations(
 	reservation *computev1alpha1.Reservation,
-	iriReservationGeneration int64,
 ) (map[string]string, error) {
 
-	annotations := map[string]string{
-		v1alpha1.ReservationGenerationAnnotation:    strconv.FormatInt(reservation.Generation, 10),
-		v1alpha1.IRIReservationGenerationAnnotation: strconv.FormatInt(iriReservationGeneration, 10),
-	}
+	annotations := map[string]string{}
 
 	for name, fieldPath := range r.DownwardAPIAnnotations {
 		value, err := fieldpath.ExtractFieldPathAsString(reservation, fieldPath)
@@ -400,25 +393,7 @@ func (r *ReservationReconciler) updateStatus(
 	reservation *computev1alpha1.Reservation,
 	iriReservation *iri.Reservation,
 ) error {
-	requiredIRIGeneration, err := r.getIRIReservationGeneration(iriReservation)
-	if err != nil {
-		return err
-	}
-
-	iriGeneration := iriReservation.Metadata.Generation
-	observedIRIGeneration := iriReservation.Status.ObservedGeneration
-
-	if observedIRIGeneration < requiredIRIGeneration {
-		log.V(1).Info("IRI reservation was not observed at the latest generation",
-			"IRIGeneration", iriGeneration,
-			"ObservedIRIGeneration", observedIRIGeneration,
-			"RequiredIRIGeneration", requiredIRIGeneration,
-		)
-		return nil
-	}
-
 	var errs []error
-
 	if err := r.updateReservationStatus(ctx, log, reservation, iriReservation); err != nil {
 		errs = append(errs, err)
 	}
@@ -440,10 +415,6 @@ func (r *ReservationReconciler) convertIRIReservationState(state iri.Reservation
 }
 
 func (r *ReservationReconciler) updateReservationStatus(ctx context.Context, log logr.Logger, reservation *computev1alpha1.Reservation, iriReservation *iri.Reservation) error {
-	generation, err := r.getReservationGeneration(iriReservation)
-	if err != nil {
-		return err
-	}
 
 	state, err := r.convertIRIReservationState(iriReservation.Status.State)
 	if err != nil {
@@ -462,6 +433,7 @@ func (r *ReservationReconciler) updateReservationStatus(ctx context.Context, log
 		}
 	}
 
+	base := reservation.DeepCopy()
 	reservation.Status.Pools = availablePools
 
 	if err := r.Status().Patch(ctx, reservation, client.MergeFrom(base)); err != nil {
@@ -473,82 +445,16 @@ func (r *ReservationReconciler) updateReservationStatus(ctx context.Context, log
 func (r *ReservationReconciler) update(
 	ctx context.Context,
 	log logr.Logger,
-	machine *computev1alpha1.Machine,
-	iriMachine *iri.Machine,
-	nics []networkingv1alpha1.NetworkInterface,
-	volumes []storagev1alpha1.Volume,
+	reservation *computev1alpha1.Reservation,
+	iriReservation *iri.Reservation,
 ) (ctrl.Result, error) {
-	log.V(1).Info("Updating existing machine")
 
-	var errs []error
-
-	log.V(1).Info("Updating network interfaces")
-	iriNics, err := r.updateIRINetworkInterfaces(ctx, log, machine, iriMachine, nics)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("error updating network interfaces: %w", err))
-	}
-
-	log.V(1).Info("Updating volumes")
-	if err := r.updateIRIVolumes(ctx, log, machine, iriMachine, volumes); err != nil {
-		errs = append(errs, fmt.Errorf("error updating volumes: %w", err))
-	}
-
-	log.V(1).Info("Updating power state")
-	if err := r.updateIRIPower(ctx, log, machine, iriMachine); err != nil {
-		errs = append(errs, fmt.Errorf("error updating power state: %w", err))
-	}
-
-	if len(errs) > 0 {
-		return ctrl.Result{}, fmt.Errorf("error(s) updating machine: %v", errs)
-	}
-
-	log.V(1).Info("Updating annotations")
-	nicMapping := r.computeNetworkInterfaceMapping(machine, nics, iriNics)
-	if err := r.updateIRIAnnotations(ctx, log, machine, iriMachine, nicMapping); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error updating annotations: %w", err)
-	}
-
-	log.V(1).Info("Getting iri machine")
-	iriMachine, err = r.getMachineByID(ctx, iriMachine.Metadata.Id)
-	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("error getting iri machine: %w", err)
-	}
-
-	log.V(1).Info("Updating machine status")
-	if err := r.updateStatus(ctx, log, machine, iriMachine, nics); err != nil {
+	log.V(1).Info("Updating reservation status")
+	if err := r.updateStatus(ctx, log, reservation, iriReservation); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error updating status: %w", err)
 	}
 
-	log.V(1).Info("Updated existing machine")
 	return ctrl.Result{}, nil
-}
-
-func (r *ReservationReconciler) updateIRIAnnotations(
-	ctx context.Context,
-	log logr.Logger,
-	machine *computev1alpha1.Machine,
-	iriMachine *iri.Machine,
-	nicMapping map[string]v1alpha1.ObjectUIDRef,
-) error {
-	desiredAnnotations, err := r.iriMachineAnnotations(machine, iriMachine.GetMetadata().GetGeneration(), nicMapping)
-	if err != nil {
-		return fmt.Errorf("error getting iri machine annotations: %w", err)
-	}
-
-	actualAnnotations := iriMachine.Metadata.Annotations
-
-	if maps.Equal(desiredAnnotations, actualAnnotations) {
-		log.V(1).Info("Annotations are up-to-date", "Annotations", desiredAnnotations)
-		return nil
-	}
-
-	if _, err := r.MachineRuntime.UpdateMachineAnnotations(ctx, &iri.UpdateMachineAnnotationsRequest{
-		MachineId:   iriMachine.Metadata.Id,
-		Annotations: desiredAnnotations,
-	}); err != nil {
-		return fmt.Errorf("error updating machine annotations: %w", err)
-	}
-	return nil
 }
 
 func (r *ReservationReconciler) prepareIRIReservation(
@@ -564,7 +470,7 @@ func (r *ReservationReconciler) prepareIRIReservation(
 		errs = append(errs, fmt.Errorf("error preparing iri reservation labels: %w", err))
 	}
 
-	annotations, err := r.iriReservationAnnotations(reservation, 1)
+	annotations, err := r.iriReservationAnnotations(reservation)
 	if err != nil {
 		errs = append(errs, fmt.Errorf("error preparing iri reservation annotations: %w", err))
 	}
@@ -623,7 +529,7 @@ func (r *ReservationReconciler) matchingWatchLabel() client.ListOption {
 }
 
 func (r *ReservationReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	log := ctrl.Log.WithName("machinepoollet")
+	log := ctrl.Log.WithName("reservationpoollet")
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(

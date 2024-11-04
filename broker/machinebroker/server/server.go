@@ -52,6 +52,21 @@ type Server struct {
 	execRequestCache request.Cache[*iri.ExecRequest]
 }
 
+func (s *Server) ListReservations(ctx context.Context, reservationsRequest *iri.ListReservationsRequest) (*iri.ListReservationsResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s *Server) CreateReservation(ctx context.Context, reservationRequest *iri.CreateReservationRequest) (*iri.CreateReservationResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s *Server) DeleteReservation(ctx context.Context, reservationRequest *iri.DeleteReservationRequest) (*iri.DeleteReservationResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 type Options struct {
 	// BaseURL is the base URL in form http(s)://host:port/path?query to produce request URLs relative to.
 	BaseURL string

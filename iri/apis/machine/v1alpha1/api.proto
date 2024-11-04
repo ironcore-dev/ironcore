@@ -107,8 +107,7 @@ message ReservationSpec {
 }
 
 message ReservationStatus {
-  int64 observed_generation = 1;
-  ReservationState state = 2;
+  ReservationState state = 1;
 }
 
 enum ReservationState {

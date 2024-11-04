@@ -339,6 +339,16 @@ func (r *FakeRuntimeService) ListReservations(ctx context.Context, req *iri.List
 	return &iri.ListReservationsResponse{Reservations: res}, nil
 }
 
+func (r *FakeRuntimeService) SetReservations(reservations []*FakeReservation) {
+	r.Lock()
+	defer r.Unlock()
+
+	r.Reservations = make(map[string]*FakeReservation)
+	for _, reservation := range reservations {
+		r.Reservations[reservation.Metadata.Id] = reservation
+	}
+}
+
 func (r *FakeRuntimeService) CreateReservation(ctx context.Context, req *iri.CreateReservationRequest) (*iri.CreateReservationResponse, error) {
 	r.Lock()
 	defer r.Unlock()
@@ -347,7 +357,7 @@ func (r *FakeRuntimeService) CreateReservation(ctx context.Context, req *iri.Cre
 	reservation.Metadata.Id = generateID(defaultIDLength)
 	reservation.Metadata.CreatedAt = time.Now().UnixNano()
 	reservation.Status = &iri.ReservationStatus{
-		Pools: []*iri.ReservationPoolStatus{},
+		State: 0,
 	}
 
 	r.Reservations[reservation.Metadata.Id] = &FakeReservation{
