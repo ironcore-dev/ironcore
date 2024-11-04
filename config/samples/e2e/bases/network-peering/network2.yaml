@@ -2,7 +2,6 @@ apiVersion: networking.ironcore.dev/v1alpha1
 kind: Network
 metadata:
   name: network-sample2
-  namespace: dev-team-onmetal-api
 spec:
   peerings:
   - name: peering2

@@ -28,7 +28,7 @@ spec:
   machinePoolRef:
     name: new-machinePool
   volumes:
-  - name: root-disk-1
+  - name: root-disk
     ephemeral:
       volumeTemplate:
         spec:
