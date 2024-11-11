@@ -2,4 +2,4 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-- ../bases/ipam-example-ipv4
+- ../bases/ipam-ipv4
