@@ -1,0 +1,4 @@
+apiVersion: networking.ironcore.dev/v1alpha1
+kind: Network
+metadata:
+  name: network-sample
