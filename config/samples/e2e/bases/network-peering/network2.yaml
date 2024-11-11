@@ -1,0 +1,9 @@
+apiVersion: networking.ironcore.dev/v1alpha1
+kind: Network
+metadata:
+  name: network-sample2
+spec:
+  peerings:
+  - name: peering2
+    networkRef:
+      name: network-sample1
