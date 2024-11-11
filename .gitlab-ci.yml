@@ -1,0 +1,9 @@
+stages:
+  - post-processing
+
+include:
+  - component: 'gitlab.devops.telekom.de/cas-devs/osc/common/pipeline-community/components/mtr/configure-repo@stable'
+    inputs:
+      image-list-type: 'none'
+      version: 'stable'
+      stage: 'post-processing'

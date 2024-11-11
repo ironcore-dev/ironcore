@@ -1,0 +1,24 @@
+team: iaas
+assignees:
+  - "benjamin.alpert"
+  - "kajol.asabe"
+  - "usha.belgur"
+cveLabels:
+  - "type::3-cve"
+  - "stream::onMetal"
+  - "Component: API"
+  - "why::Security"
+  - "squad::API"
+dueDays: 13
+cve:
+  - repository: osc/upstream/ironcore-dev/machinepoollet
+  - repository: osc/upstream/ironcore-dev/machinebroker
+  - repository: osc/upstream/ironcore-dev/irictl-machine
+  - repository: osc/upstream/ironcore-dev/volumepoollet
+  - repository: osc/upstream/ironcore-dev/volumebroker
+  - repository: osc/upstream/ironcore-dev/irictl-volume
+  - repository: osc/upstream/ironcore-dev/bucketpoollet
+  - repository: osc/upstream/ironcore-dev/bucketbroker
+  - repository: osc/upstream/ironcore-dev/irictl-bucket
+  - repository: osc/upstream/ironcore-dev/ironcore-apiserver
+  - repository: osc/upstream/ironcore-dev/ironcore-controller-manager
