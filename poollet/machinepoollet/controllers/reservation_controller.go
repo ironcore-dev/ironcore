@@ -62,14 +62,9 @@ func (r *ReservationReconciler) reservationUIDLabelSelector(reservationUID types
 
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 //+kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch
-//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machines,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machines/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machines/finalizers,verbs=update
-//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumes,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=networkinterfaces,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=networkinterfaces/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=networks,verbs=get;list;watch
-//+kubebuilder:rbac:groups=ipam.ironcore.dev,resources=prefixes,verbs=get;list;watch
+//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=reservations,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=reservations/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=reservations/finalizers,verbs=update
 
 func (r *ReservationReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
@@ -108,7 +103,7 @@ func (r *ReservationReconciler) getReservationByID(ctx context.Context, id strin
 		Filter: &iri.ReservationFilter{Id: id},
 	})
 	if err != nil {
-		return nil, fmt.Errorf("error listing machines filtering by id: %w", err)
+		return nil, fmt.Errorf("error listing reservations filtering by id: %w", err)
 	}
 
 	switch len(res.Reservations) {
@@ -214,7 +209,7 @@ func (r *ReservationReconciler) delete(ctx context.Context, log logr.Logger, res
 }
 
 func (r *ReservationReconciler) deleteReservationsByReservationUID(ctx context.Context, log logr.Logger, reservationUID types.UID) (bool, error) {
-	log.V(1).Info("Listing machines")
+	log.V(1).Info("Listing reservations")
 	res, err := r.MachineRuntime.ListReservations(ctx, &iri.ListReservationsRequest{
 		Filter: &iri.ReservationFilter{
 			LabelSelector: map[string]string{
@@ -226,14 +221,14 @@ func (r *ReservationReconciler) deleteReservationsByReservationUID(ctx context.C
 		return false, fmt.Errorf("error listing reservations: %w", err)
 	}
 
-	log.V(1).Info("Listed reservations", "NoOfMachines", len(res.Reservations))
+	log.V(1).Info("Listed reservations", "NoOfReservations", len(res.Reservations))
 	var (
 		errs                   []error
 		deletingReservationIDs []string
 	)
 	for _, reservation := range res.Reservations {
 		reservationID := reservation.Metadata.Id
-		log := log.WithValues("MachineID", reservationID)
+		log := log.WithValues("ReservationID", reservationID)
 		log.V(1).Info("Deleting reservation")
 		_, err := r.MachineRuntime.DeleteReservation(ctx, &iri.DeleteReservationRequest{
 			ReservationId: reservationID,
@@ -421,14 +416,13 @@ func (r *ReservationReconciler) updateReservationStatus(ctx context.Context, log
 		return err
 	}
 
-	var availablePools []computev1alpha1.ReservationPoolStatus
+	availablePools := []computev1alpha1.ReservationPoolStatus{{
+		Name:  r.MachinePoolName,
+		State: state,
+	}}
+
 	for _, poolState := range reservation.Status.Pools {
-		if poolState.Name == r.MachinePoolName {
-			availablePools = append(availablePools, computev1alpha1.ReservationPoolStatus{
-				Name:  r.MachinePoolName,
-				State: state,
-			})
-		} else {
+		if poolState.Name != r.MachinePoolName {
 			availablePools = append(availablePools, poolState)
 		}
 	}
@@ -478,9 +472,9 @@ func (r *ReservationReconciler) prepareIRIReservation(
 	var resources = map[string][]byte{}
 	for resource, quantity := range reservation.Spec.Resources {
 		if data, err := quantity.Marshal(); err != nil {
-			resources[string(resource)] = data
-		} else {
 			errs = append(errs, fmt.Errorf("error marshaling quantity (%s): %w", resource, err))
+		} else {
+			resources[string(resource)] = data
 		}
 
 	}

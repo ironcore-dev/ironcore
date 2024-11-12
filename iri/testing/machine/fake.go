@@ -98,6 +98,7 @@ func (r *FakeRuntimeService) ListEvents(ctx context.Context, req *iri.ListEvents
 func NewFakeRuntimeService() *FakeRuntimeService {
 	return &FakeRuntimeService{
 		Machines:           make(map[string]*FakeMachine),
+		Reservations:       make(map[string]*FakeReservation),
 		MachineClassStatus: make(map[string]*FakeMachineClassStatus),
 		Events:             []*FakeEvent{},
 	}

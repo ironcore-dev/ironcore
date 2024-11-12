@@ -16,8 +16,8 @@ import (
 
 var _ = Describe("Reservation", func() {
 	DescribeTable("ValidateReservation",
-		func(machine *compute.Reservation, match types.GomegaMatcher) {
-			errList := ValidateReservation(machine)
+		func(reservation *compute.Reservation, match types.GomegaMatcher) {
+			errList := ValidateReservation(reservation)
 			Expect(errList).To(match)
 		},
 		Entry("missing name",
