@@ -1,0 +1,9 @@
+apiVersion: ipam.ironcore.dev/v1alpha1
+kind: Prefix
+metadata:
+  name: root-1
+  labels:
+    subnet-type: public
+spec:
+  prefix: 2000::/8
+

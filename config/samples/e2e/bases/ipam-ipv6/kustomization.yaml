@@ -1,0 +1,3 @@
+resources:
+- parent-prefix.yaml
+- child-prefix.yaml
