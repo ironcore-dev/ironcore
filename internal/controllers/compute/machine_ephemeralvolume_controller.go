@@ -21,6 +21,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
@@ -71,19 +72,29 @@ func (r *MachineEphemeralVolumeReconciler) ephemeralMachineVolumeByName(machine 
 				Labels:      ephemeral.VolumeTemplate.Labels,
 				Annotations: maps.Clone(ephemeral.VolumeTemplate.Annotations),
 			},
-			Spec: ephemeral.VolumeTemplate.Spec,
+			Spec: ephemeral.VolumeTemplate.Spec.VolumeSpec,
 		}
 		annotations.SetDefaultEphemeralManagedBy(volume)
-		_ = ctrl.SetControllerReference(machine, volume, r.Scheme())
+		if machineVolume.Ephemeral.VolumeTemplate.Spec.ReclaimPolicy != storagev1alpha1.Retain {
+			_ = ctrl.SetControllerReference(machine, volume, r.Scheme())
+		}
 		res[volumeName] = volume
 	}
 	return res
 }
 
-func (r *MachineEphemeralVolumeReconciler) handleExistingVolume(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine, shouldManage bool, volume *storagev1alpha1.Volume) error {
-	if annotations.IsDefaultEphemeralControlledBy(volume, machine) {
+func (r *MachineEphemeralVolumeReconciler) handleExistingVolume(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine, shouldManage bool, volume *storagev1alpha1.Volume, ephemVolume *storagev1alpha1.Volume) error {
+	log.WithValues("Volume", klog.KObj(volume), "ShouldManage", shouldManage)
+	if annotations.IsDefaultEphemeralOrControlledBy(volume, machine) {
 		if shouldManage {
-			log.V(1).Info("Ephemeral volume is present and controlled by machine")
+			log.V(1).Info("Ephemeral volume is present")
+			if controllerutil.HasControllerReference(ephemVolume) && !controllerutil.HasControllerReference(volume) {
+				baseVol := volume.DeepCopy()
+				_ = ctrl.SetControllerReference(machine, volume, r.Scheme())
+				if err := r.Patch(ctx, volume, client.StrategicMergeFrom(baseVol, client.MergeFromWithOptimisticLock{})); err != nil {
+					return fmt.Errorf("error patching volume: %w", err)
+				}
+			}
 			return nil
 		}
 
@@ -123,7 +134,9 @@ func (r *MachineEphemeralVolumeReconciler) handleCreateVolume(ctx context.Contex
 	}
 
 	// Treat a retrieved volume as an existing we should manage.
-	return r.handleExistingVolume(ctx, log, machine, true, volume)
+	ephemVolumeByName := r.ephemeralMachineVolumeByName(machine)
+	ephemVolume, shouldManage := ephemVolumeByName[volume.Name]
+	return r.handleExistingVolume(ctx, log, machine, shouldManage, volume, ephemVolume)
 }
 
 func (r *MachineEphemeralVolumeReconciler) reconcile(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) (ctrl.Result, error) {
@@ -143,10 +156,10 @@ func (r *MachineEphemeralVolumeReconciler) reconcile(ctx context.Context, log lo
 	)
 	for _, volume := range volumeList.Items {
 		volumeName := volume.Name
-		_, shouldManage := ephemVolumeByName[volumeName]
+		ephemVolume, shouldManage := ephemVolumeByName[volumeName]
 		delete(ephemVolumeByName, volumeName)
 		log := log.WithValues("Volume", klog.KObj(&volume), "ShouldManage", shouldManage)
-		if err := r.handleExistingVolume(ctx, log, machine, shouldManage, &volume); err != nil {
+		if err := r.handleExistingVolume(ctx, log, machine, shouldManage, &volume, ephemVolume); err != nil {
 			errs = append(errs, err)
 		}
 	}
