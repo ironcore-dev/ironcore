@@ -1438,6 +1438,49 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: state
       type:
         scalar: string
+- name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.EphemeralVolumeSpec
+  map:
+    fields:
+    - name: claimRef
+      type:
+        namedType: com.github.ironcore-dev.ironcore.api.common.v1alpha1.LocalUIDReference
+    - name: encryption
+      type:
+        namedType: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeEncryption
+    - name: image
+      type:
+        scalar: string
+    - name: imagePullSecretRef
+      type:
+        namedType: io.k8s.api.core.v1.LocalObjectReference
+    - name: reclaimpolicy
+      type:
+        scalar: string
+    - name: resources
+      type:
+        map:
+          elementType:
+            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
+    - name: tolerations
+      type:
+        list:
+          elementType:
+            namedType: com.github.ironcore-dev.ironcore.api.common.v1alpha1.Toleration
+          elementRelationship: atomic
+    - name: unclaimable
+      type:
+        scalar: boolean
+    - name: volumeClassRef
+      type:
+        namedType: io.k8s.api.core.v1.LocalObjectReference
+    - name: volumePoolRef
+      type:
+        namedType: io.k8s.api.core.v1.LocalObjectReference
+    - name: volumePoolSelector
+      type:
+        map:
+          elementType:
+            scalar: string
 - name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume
   map:
     fields:
@@ -1683,7 +1726,7 @@ var schemaYAML = typed.YAMLObject(`types:
       default: {}
     - name: spec
       type:
-        namedType: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSpec
+        namedType: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.EphemeralVolumeSpec
       default: {}
 - name: io.k8s.api.core.v1.LocalObjectReference
   map:

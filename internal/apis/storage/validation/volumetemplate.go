@@ -33,7 +33,7 @@ func ValidateVolumeTemplateSpec(spec *storage.VolumeTemplateSpec, fldPath *field
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, validateVolumeTemplateSpecMetadata(&spec.ObjectMeta, fldPath.Child("metadata"))...)
-	allErrs = append(allErrs, validateVolumeSpec(&spec.Spec, fldPath.Child("spec"))...)
+	allErrs = append(allErrs, validateVolumeSpec(&spec.Spec.VolumeSpec, fldPath.Child("spec"))...)
 
 	return allErrs
 }
