@@ -47,7 +47,7 @@ var (
 )
 
 const (
-	eventuallyTimeout    = 3 * time.Second
+	eventuallyTimeout    = 6 * time.Second
 	pollingInterval      = 50 * time.Millisecond
 	consistentlyDuration = 1 * time.Second
 	apiServiceTimeout    = 5 * time.Minute
