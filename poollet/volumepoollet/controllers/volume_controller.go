@@ -10,20 +10,21 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	"github.com/ironcore-dev/controller-utils/clientutils"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	iriVolume "github.com/ironcore-dev/ironcore/iri/apis/volume"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
-
 	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers/events"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+
+	"github.com/ironcore-dev/controller-utils/clientutils"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -33,6 +34,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
@@ -48,6 +50,8 @@ type VolumeReconciler struct {
 
 	VolumePoolName   string
 	WatchFilterValue string
+
+	MaxConcurrentReconciles int
 }
 
 func (r *VolumeReconciler) iriVolumeLabels(volume *storagev1alpha1.Volume) map[string]string {
@@ -443,7 +447,7 @@ func (r *VolumeReconciler) update(ctx context.Context, log logr.Logger, volume *
 	return nil
 }
 
-func (r *VolumeReconciler) volumeSecretName(volumeName string, volumeHandle string) string {
+func (r *VolumeReconciler) volumeSecretName(volumeName, volumeHandle string) string {
 	sum := sha256.Sum256([]byte(fmt.Sprintf("%s/%s", volumeName, volumeHandle)))
 	return hex.EncodeToString(sum[:])[:63]
 }
@@ -508,7 +512,6 @@ func (r *VolumeReconciler) updateStatus(ctx context.Context, log logr.Logger, vo
 				VolumeAttributes: iriAccess.Attributes,
 			}
 		}
-
 	}
 
 	base := volume.DeepCopy()
@@ -542,6 +545,10 @@ func (r *VolumeReconciler) SetupWithManager(mgr ctrl.Manager) error {
 				predicates.ResourceIsNotExternallyManaged(log),
 			),
 		).
+		WithOptions(
+			controller.Options{
+				MaxConcurrentReconciles: r.MaxConcurrentReconciles,
+			}).
 		Complete(r)
 }
 
