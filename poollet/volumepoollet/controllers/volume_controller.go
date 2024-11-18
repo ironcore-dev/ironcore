@@ -8,22 +8,24 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"time"
 
 	"github.com/go-logr/logr"
-	"github.com/ironcore-dev/controller-utils/clientutils"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	iriVolume "github.com/ironcore-dev/ironcore/iri/apis/volume"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
-
 	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers/events"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+
+	"github.com/ironcore-dev/controller-utils/clientutils"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -125,7 +127,7 @@ func (r *VolumeReconciler) deleteGone(ctx context.Context, log logr.Logger, volu
 	}
 	if !ok {
 		log.V(1).Info("Not all iri volumes are gone, requeueing")
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{Requeue: true, RequeueAfter: 5 * time.Second}, nil
 	}
 
 	log.V(1).Info("Deleted gone")
@@ -198,7 +200,7 @@ func (r *VolumeReconciler) delete(ctx context.Context, log logr.Logger, volume *
 	}
 	if !ok {
 		log.V(1).Info("Not all iri volumes are gone, requeueing")
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{Requeue: true, RequeueAfter: 5 * time.Second}, nil
 	}
 
 	log.V(1).Info("Deleted all iri volumes, removing finalizer")
@@ -443,7 +445,7 @@ func (r *VolumeReconciler) update(ctx context.Context, log logr.Logger, volume *
 	return nil
 }
 
-func (r *VolumeReconciler) volumeSecretName(volumeName string, volumeHandle string) string {
+func (r *VolumeReconciler) volumeSecretName(volumeName, volumeHandle string) string {
 	sum := sha256.Sum256([]byte(fmt.Sprintf("%s/%s", volumeName, volumeHandle)))
 	return hex.EncodeToString(sum[:])[:63]
 }
@@ -508,7 +510,6 @@ func (r *VolumeReconciler) updateStatus(ctx context.Context, log logr.Logger, vo
 				VolumeAttributes: iriAccess.Attributes,
 			}
 		}
-
 	}
 
 	base := volume.DeepCopy()
