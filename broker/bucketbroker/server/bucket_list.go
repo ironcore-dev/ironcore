@@ -7,16 +7,19 @@ import (
 	"context"
 	"fmt"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	bucketbrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/bucketbroker/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/bucketbroker/apiutils"
 	"github.com/ironcore-dev/ironcore/broker/common"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -114,15 +117,22 @@ func (s *Server) aggregateIronCoreBucket(
 }
 
 func (s *Server) getIronCoreBucket(ctx context.Context, id string) (*storagev1alpha1.Bucket, error) {
+	log := ctrl.LoggerFrom(ctx)
+	log.V(1).Info("entered get IronCore Bucket")
 	ironcoreBucket := &storagev1alpha1.Bucket{}
 	ironcoreBucketKey := client.ObjectKey{Namespace: s.namespace, Name: id}
+	log.V(1).Info("get bucket")
 	if err := s.client.Get(ctx, ironcoreBucketKey, ironcoreBucket); err != nil {
 		if !apierrors.IsNotFound(err) {
+			log.V(1).Info("got error during get")
 			return nil, fmt.Errorf("error getting ironcore bucket %s: %w", id, err)
 		}
+		log.V(1).Info("found no bucket")
 		return nil, status.Errorf(codes.NotFound, "bucket %s not found", id)
 	}
+	log.V(1).Info("got bucket")
 	if !apiutils.IsManagedBy(ironcoreBucket, bucketbrokerv1alpha1.BucketBrokerManager) || !apiutils.IsCreated(ironcoreBucket) {
+		log.V(1).Info("not managed")
 		return nil, status.Errorf(codes.NotFound, "bucket %s not found", id)
 	}
 	return ironcoreBucket, nil
