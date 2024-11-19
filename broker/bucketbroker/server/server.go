@@ -11,6 +11,7 @@ import (
 	"strconv"
 
 	"github.com/go-logr/logr"
+
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
@@ -19,6 +20,7 @@ import (
 	"github.com/ironcore-dev/ironcore/broker/bucketbroker/apiutils"
 	"github.com/ironcore-dev/ironcore/broker/common/cleaner"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
+
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -27,6 +29,7 @@ import (
 	kubernetes "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 )
@@ -106,11 +109,33 @@ var _ iri.BucketRuntimeServer = (*Server)(nil)
 //+kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=storage.ironcore.dev,resources=buckets,verbs=get;list;watch;create;update;patch;delete
 
-func New(cfg *rest.Config, opts Options) (*Server, error) {
+func New(ctx context.Context, cfg *rest.Config, opts Options) (*Server, error) {
 	setOptionsDefaults(&opts)
+
+	readCache, err := cache.New(cfg, cache.Options{
+		Scheme: scheme,
+		DefaultNamespaces: map[string]cache.Config{
+			opts.Namespace: {},
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("error creating cache: %w", err)
+	}
+
+	go func() {
+		if err := readCache.Start(ctx); err != nil {
+			fmt.Printf("Error starting cache: %v\n", err)
+		}
+	}()
+	if !readCache.WaitForCacheSync(ctx) {
+		return nil, fmt.Errorf("failed to sync cache")
+	}
 
 	c, err := client.New(cfg, client.Options{
 		Scheme: scheme,
+		Cache: &client.CacheOptions{
+			Reader: readCache,
+		},
 	})
 	if err != nil {
 		return nil, fmt.Errorf("error creating client: %w", err)
