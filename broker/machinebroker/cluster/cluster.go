@@ -13,6 +13,7 @@ import (
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/common/idgen"
 
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	kubernetes "k8s.io/client-go/kubernetes/scheme"
@@ -88,7 +89,8 @@ func New(ctx context.Context, cfg *rest.Config, namespace string, opts Options) 
 	c, err := client.New(cfg, client.Options{
 		Scheme: scheme,
 		Cache: &client.CacheOptions{
-			Reader: readCache,
+			Reader:     readCache,
+			DisableFor: []client.Object{&v1.Event{}},
 		},
 	})
 	if err != nil {

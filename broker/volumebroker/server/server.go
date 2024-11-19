@@ -20,6 +20,7 @@ import (
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 
 	corev1 "k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -120,7 +121,8 @@ func New(ctx context.Context, cfg *rest.Config, opts Options) (*Server, error) {
 	c, err := client.New(cfg, client.Options{
 		Scheme: scheme,
 		Cache: &client.CacheOptions{
-			Reader: readCache,
+			Reader:     readCache,
+			DisableFor: []client.Object{&v1.Event{}},
 		},
 	})
 	if err != nil {
