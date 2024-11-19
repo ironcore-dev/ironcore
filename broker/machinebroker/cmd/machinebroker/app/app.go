@@ -20,7 +20,6 @@ import (
 
 	"github.com/ironcore-dev/ironcore/broker/common"
 	commongrpc "github.com/ironcore-dev/ironcore/broker/common/grpc"
-	mchinebrokerconfig "github.com/ironcore-dev/ironcore/broker/machinebroker/client/config"
 	machinebrokerhttp "github.com/ironcore-dev/ironcore/broker/machinebroker/http"
 	"github.com/ironcore-dev/ironcore/broker/machinebroker/server"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
@@ -121,7 +120,7 @@ func Run(ctx context.Context, opts Options) error {
 		"BrokerDownwardAPILabels", opts.BrokerDownwardAPILabels,
 	)
 
-	srv, err := server.New(cfg, opts.Namespace, server.Options{
+	srv, err := server.New(ctx, cfg, opts.Namespace, server.Options{
 		BaseURL:                 baseURL,
 		BrokerDownwardAPILabels: opts.BrokerDownwardAPILabels,
 		MachinePoolName:         opts.MachinePoolName,

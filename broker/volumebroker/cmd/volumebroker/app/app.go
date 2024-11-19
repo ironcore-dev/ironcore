@@ -13,12 +13,11 @@ import (
 	"github.com/spf13/pflag"
 	"google.golang.org/grpc"
 
-	volumebrokerconfig "github.com/ironcore-dev/ironcore/broker/bucketbroker/client/config"
 	"github.com/ironcore-dev/ironcore/broker/common"
 	"github.com/ironcore-dev/ironcore/broker/volumebroker/server"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
-	"github.com/ironcore-dev/ironcore/utils/client/config"
 
+	"github.com/ironcore-dev/controller-utils/configutils"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
@@ -85,7 +84,7 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error getting config: %w", err)
 	}
 
-	srv, err := server.New(cfg, server.Options{
+	srv, err := server.New(ctx, cfg, server.Options{
 		Namespace:          opts.Namespace,
 		VolumePoolName:     opts.VolumePoolName,
 		VolumePoolSelector: opts.VolumePoolSelector,
