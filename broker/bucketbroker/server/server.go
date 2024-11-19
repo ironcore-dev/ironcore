@@ -127,13 +127,13 @@ func New(ctx context.Context, cfg *rest.Config, opts Options) (*Server, error) {
 	}
 
 	log.Info("start cache")
-	// go func() {
-	if err := readCache.Start(ctx); err != nil {
-		log.Info("error starting cache")
-		fmt.Printf("Error starting cache: %v\n", err)
-	}
-	log.Info("started cache")
-	// }()
+	go func() {
+		if err := readCache.Start(ctx); err != nil {
+			log.Info("error starting cache")
+			fmt.Printf("Error starting cache: %v\n", err)
+		}
+		log.Info("started cache")
+	}()
 
 	log.Info("syncing cache")
 	if !readCache.WaitForCacheSync(ctx) {
