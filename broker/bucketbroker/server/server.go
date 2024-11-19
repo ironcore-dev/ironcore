@@ -33,6 +33,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 var scheme = runtime.NewScheme()
@@ -111,8 +112,10 @@ var _ iri.BucketRuntimeServer = (*Server)(nil)
 //+kubebuilder:rbac:groups=storage.ironcore.dev,resources=buckets,verbs=get;list;watch;create;update;patch;delete
 
 func New(ctx context.Context, cfg *rest.Config, opts Options) (*Server, error) {
+	log := log.FromContext(ctx)
+	log.Info("entered server.New")
 	setOptionsDefaults(&opts)
-
+	log.Info("create cache")
 	readCache, err := cache.New(cfg, cache.Options{
 		Scheme: scheme,
 		DefaultNamespaces: map[string]cache.Config{
@@ -123,15 +126,22 @@ func New(ctx context.Context, cfg *rest.Config, opts Options) (*Server, error) {
 		return nil, fmt.Errorf("error creating cache: %w", err)
 	}
 
-	go func() {
-		if err := readCache.Start(ctx); err != nil {
-			fmt.Printf("Error starting cache: %v\n", err)
-		}
-	}()
+	log.Info("start cache")
+	// go func() {
+	if err := readCache.Start(ctx); err != nil {
+		log.Info("error starting cache")
+		fmt.Printf("Error starting cache: %v\n", err)
+	}
+	log.Info("started cache")
+	// }()
+
+	log.Info("syncing cache")
 	if !readCache.WaitForCacheSync(ctx) {
+		log.Info("timeout waiting for cache sync")
 		return nil, fmt.Errorf("failed to sync cache")
 	}
 
+	log.Info("creating client")
 	c, err := client.New(cfg, client.Options{
 		Scheme: scheme,
 		Cache: &client.CacheOptions{
@@ -143,6 +153,7 @@ func New(ctx context.Context, cfg *rest.Config, opts Options) (*Server, error) {
 		return nil, fmt.Errorf("error creating client: %w", err)
 	}
 
+	log.Info("returning server obj")
 	return &Server{
 		client:             c,
 		namespace:          opts.Namespace,

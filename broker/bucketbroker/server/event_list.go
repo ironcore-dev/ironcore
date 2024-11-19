@@ -27,26 +27,34 @@ const (
 
 func (s *Server) listEvents(ctx context.Context) ([]*irievent.Event, error) {
 	log := ctrl.LoggerFrom(ctx)
+	log.V(1).Info("entered listEvents")
 	bucketEventList := &v1.EventList{}
 	selectorField := fields.Set{
 		InvolvedObjectKindSelector:       InvolvedObjectKind,
 		InvolvedObjectAPIVersionSelector: storagev1alpha1.SchemeGroupVersion.String(),
 	}
+
+	log.V(1).Info("listing bucket events")
 	if err := s.client.List(ctx, bucketEventList,
 		client.InNamespace(s.namespace), client.MatchingFieldsSelector{Selector: selectorField.AsSelector()},
 	); err != nil {
 		return nil, err
 	}
 
+	log.V(1).Info("got events", "amount", len(bucketEventList.Items))
 	var iriEvents []*irievent.Event
 	for _, bucketEvent := range bucketEventList.Items {
+		log.V(1).Info("get ironcore bucket")
 		ironcoreBucket, err := s.getIronCoreBucket(ctx, bucketEvent.InvolvedObject.Name)
 		if err != nil {
+			log.V(1).Info("error occurred getting ironcore bucket")
 			log.Error(err, "Unable to get ironcore bucket", "BucketName", bucketEvent.InvolvedObject.Name)
 			continue
 		}
+		log.V(1).Info("got buckets")
 		bucketObjectMetadata, err := apiutils.GetObjectMetadata(&ironcoreBucket.ObjectMeta)
 		if err != nil {
+			log.V(1).Info("error occurred getting object metadata")
 			continue
 		}
 		iriEvent := &irievent.Event{
@@ -60,6 +68,8 @@ func (s *Server) listEvents(ctx context.Context) ([]*irievent.Event, error) {
 		}
 		iriEvents = append(iriEvents, iriEvent)
 	}
+
+	log.V(1).Info("produced iri events", "amount", len(iriEvents))
 	return iriEvents, nil
 }
 
