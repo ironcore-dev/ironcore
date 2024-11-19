@@ -42,7 +42,7 @@ func (s *Server) listEvents(ctx context.Context) ([]*irievent.Event, error) {
 	for _, volumeEvent := range volumeEventList.Items {
 		ironcoreVolume, err := s.getIronCoreVolume(ctx, volumeEvent.InvolvedObject.Name)
 		if err != nil {
-			log.V(1).Info("Unable to get ironcore volume", "VolumeName", volumeEvent.InvolvedObject.Name)
+			log.Error(err, "Unable to get ironcore volume", "VolumeName", volumeEvent.InvolvedObject.Name)
 			continue
 		}
 		volumeObjectMetadata, err := apiutils.GetObjectMetadata(&ironcoreVolume.ObjectMeta)
