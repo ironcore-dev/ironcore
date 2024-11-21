@@ -56,6 +56,16 @@ type VolumeAccess struct {
 	VolumeAttributes map[string]string `json:"volumeAttributes,omitempty"`
 }
 
+// ReclaimPolicy for a Volume tells what to do with the volume after its managing resource has been deleted
+type ReclaimPolicy string
+
+const (
+	// The Volume resource is not deleted after the managing resource has been deleted
+	Retain ReclaimPolicy = "Retain"
+	// The Volume resource is garbage-collected when the managing resource has been deleted
+	Delete ReclaimPolicy = "Delete"
+)
+
 // VolumeStatus defines the observed state of Volume
 type VolumeStatus struct {
 	// State represents the infrastructure state of a Volume.
@@ -122,16 +132,6 @@ type VolumeList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []Volume `json:"items"`
 }
-
-// ReclaimPolicy for a Volume tells what to do with the volume after its managing resource has been deleted
-type ReclaimPolicy string
-
-const (
-	// The Volume resource is not deleted after the managing resource has been deleted
-	Retain ReclaimPolicy = "Retain"
-	// The Volume resource is garbage-collected when the managing resource has been deleted
-	Delete ReclaimPolicy = "Delete"
-)
 
 type EphemeralVolumeSpec struct {
 	VolumeSpec `json:",inline"`
