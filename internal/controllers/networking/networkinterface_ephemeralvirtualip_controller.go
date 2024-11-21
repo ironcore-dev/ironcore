@@ -135,7 +135,6 @@ func (r *NetworkInterfaceEphemeralVirtualIPReconciler) handleCreateVirtualIP(
 		return nil
 	}
 	if !apierrors.IsAlreadyExists(err) {
-		fmt.Println(virtualIP.Name)
 		return err
 	}
 
@@ -170,7 +169,6 @@ func (r *NetworkInterfaceEphemeralVirtualIPReconciler) reconcile(ctx context.Con
 		errs           []error
 	)
 	for _, virtualIP := range virtualIPList.Items {
-		fmt.Println(">>>>>>>>>>>>>>>>>> ", virtualIP)
 		virtualIPName := virtualIP.Name
 		ephemVip, shouldManage := ephemNicByName[virtualIPName]
 		delete(ephemNicByName, virtualIPName)

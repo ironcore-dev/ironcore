@@ -70,8 +70,7 @@ var _ = Describe("NetworkInterfaceEphemeralVirtualIP", func() {
 				},
 			}),
 		))
-		By("Verifying OwnerRef is set for ephemeral volume")
-		// Eventually(Object(vip)).Should(HaveField("ObjectMeta.OwnerReferences", Not(BeNil())))
+		By("Verifying OwnerRef is set for ephemeral virtualIP")
 		Eventually(Object(vip)).Should(HaveField("ObjectMeta.OwnerReferences", ConsistOf(MatchFields(IgnoreExtras, Fields{
 			"APIVersion": Equal(networkingv1alpha1.SchemeGroupVersion.String()),
 			"Kind":       Equal("NetworkInterface"),
@@ -119,14 +118,14 @@ var _ = Describe("NetworkInterfaceEphemeralVirtualIP", func() {
 			},
 		}
 		Eventually(Get(vip)).Should(Succeed())
-		By("Verifying OwnerRef is not set for ephemeral volume when reclaim policy is retain")
+		By("Verifying OwnerRef is not set for ephemeral virtualIP when reclaim policy is retain")
 		Eventually(Object(vip)).Should(HaveField("ObjectMeta.OwnerReferences", BeEmpty()))
 
 		By("Updating reclaim policy to delete")
 		baseNic := nic.DeepCopy()
 		nic.Spec.VirtualIP.Ephemeral.VirtualIPTemplate.Spec.ReclaimPolicy = networkingv1alpha1.ReclaimPolicyTypeDelete
 		Expect(k8sClient.Patch(ctx, nic, client.MergeFrom(baseNic))).To(Succeed())
-		By("Verifying OwnerRef is updated for ephemeral volume")
+		By("Verifying OwnerRef is updated for ephemeral virtualIP")
 		Eventually(Object(vip)).Should(HaveField("ObjectMeta.OwnerReferences", ConsistOf(MatchFields(IgnoreExtras, Fields{
 			"APIVersion": Equal(networkingv1alpha1.SchemeGroupVersion.String()),
 			"Kind":       Equal("NetworkInterface"),
