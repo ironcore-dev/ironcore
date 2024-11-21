@@ -11,14 +11,14 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// EphemeralVirtualIPSpecApplyConfiguration represents an declarative configuration of the EphemeralVirtualIPSpec type for use
+// EphemeralVirtualIPSpecApplyConfiguration represents a declarative configuration of the EphemeralVirtualIPSpec type for use
 // with apply.
 type EphemeralVirtualIPSpecApplyConfiguration struct {
 	VirtualIPSpecApplyConfiguration `json:",inline"`
 	ReclaimPolicy                   *networkingv1alpha1.ReclaimPolicyType `json:"reclaimPolicy,omitempty"`
 }
 
-// EphemeralVirtualIPSpecApplyConfiguration constructs an declarative configuration of the EphemeralVirtualIPSpec type for use with
+// EphemeralVirtualIPSpecApplyConfiguration constructs a declarative configuration of the EphemeralVirtualIPSpec type for use with
 // apply.
 func EphemeralVirtualIPSpec() *EphemeralVirtualIPSpecApplyConfiguration {
 	return &EphemeralVirtualIPSpecApplyConfiguration{}
