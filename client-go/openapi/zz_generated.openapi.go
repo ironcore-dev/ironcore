@@ -71,6 +71,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixTemplateSpec":                 schema_ironcore_api_ipam_v1alpha1_PrefixTemplateSpec(ref),
 		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.EphemeralPrefixSource":        schema_ironcore_api_networking_v1alpha1_EphemeralPrefixSource(ref),
 		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.EphemeralVirtualIPSource":     schema_ironcore_api_networking_v1alpha1_EphemeralVirtualIPSource(ref),
+		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.EphemeralVirtualIPSpec":       schema_ironcore_api_networking_v1alpha1_EphemeralVirtualIPSpec(ref),
 		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.IPBlock":                      schema_ironcore_api_networking_v1alpha1_IPBlock(ref),
 		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.IPSource":                     schema_ironcore_api_networking_v1alpha1_IPSource(ref),
 		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancer":                 schema_ironcore_api_networking_v1alpha1_LoadBalancer(ref),
@@ -2583,6 +2584,51 @@ func schema_ironcore_api_networking_v1alpha1_EphemeralVirtualIPSource(ref common
 	}
 }
 
+func schema_ironcore_api_networking_v1alpha1_EphemeralVirtualIPSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Type is the type of VirtualIP.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"ipFamily": {
+						SchemaProps: spec.SchemaProps{
+							Description: "IPFamily is the ip family of the VirtualIP.\n\nPossible enum values:\n - `\"\"` indicates that this IP is unknown protocol\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+							Enum:        []interface{}{"", "IPv4", "IPv6"},
+						},
+					},
+					"targetRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "TargetRef references the target for this VirtualIP (currently only NetworkInterface).",
+							Ref:         ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference"),
+						},
+					},
+					"reclaimPolicy": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ReclaimPolicy is the ReclaimPolicyType of virtualIP",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"type", "ipFamily"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference"},
+	}
+}
+
 func schema_ironcore_api_networking_v1alpha1_IPBlock(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -4568,14 +4614,14 @@ func schema_ironcore_api_networking_v1alpha1_VirtualIPTemplateSpec(ref common.Re
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.VirtualIPSpec"),
+							Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.EphemeralVirtualIPSpec"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.VirtualIPSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.EphemeralVirtualIPSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 

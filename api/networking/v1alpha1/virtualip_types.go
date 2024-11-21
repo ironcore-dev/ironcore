@@ -28,6 +28,16 @@ const (
 	VirtualIPTypePublic VirtualIPType = "Public"
 )
 
+// ReclaimPolicyType is the ironcore ReclaimPolicy of a VirtualIP.
+type ReclaimPolicyType string
+
+const (
+	// ReclaimPolicyTypeRetain is used for any VirtualIP that is retained when the claim of VirtualIP is released.
+	ReclaimPolicyTypeRetain ReclaimPolicyType = "Retain"
+	// ReclaimPolicyTypeDelete is used for any VirtualIP that is deleted when the claim of VirtualIP is released.
+	ReclaimPolicyTypeDelete ReclaimPolicyType = "Delete"
+)
+
 // VirtualIPStatus defines the observed state of VirtualIP
 type VirtualIPStatus struct {
 	// IP is the allocated IP, if any.
@@ -55,8 +65,15 @@ type VirtualIPList struct {
 	Items           []VirtualIP `json:"items"`
 }
 
+type EphemeralVirtualIPSpec struct {
+	// VirtualIPSpec defines the desired state of VirtualIP
+	VirtualIPSpec `json:",inline"`
+	// ReclaimPolicy is the ReclaimPolicyType of virtualIP
+	ReclaimPolicy ReclaimPolicyType `json:"reclaimPolicy,omitempty"`
+}
+
 // VirtualIPTemplateSpec is the specification of a VirtualIP template.
 type VirtualIPTemplateSpec struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-	Spec              VirtualIPSpec `json:"spec,omitempty"`
+	Spec              EphemeralVirtualIPSpec `json:"spec,omitempty"`
 }
