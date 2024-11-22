@@ -26,6 +26,7 @@ func (s *Server) getTargetIronCoreVolumePools(ctx context.Context) ([]storagev1a
 			}
 			return nil, nil
 		}
+		return []storagev1alpha1.VolumePool{*ironcoreVolumePool}, nil
 	}
 
 	volumePoolList := &storagev1alpha1.VolumePoolList{}
