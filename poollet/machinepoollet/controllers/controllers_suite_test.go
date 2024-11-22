@@ -54,7 +54,7 @@ var (
 const (
 	eventuallyTimeout    = 3 * time.Second
 	pollingInterval      = 50 * time.Millisecond
-	consistentlyDuration = 1 * time.Second
+	consistentlyDuration = 3 * time.Second
 	apiServiceTimeout    = 5 * time.Minute
 
 	controllerManagerService = "controller-manager"
