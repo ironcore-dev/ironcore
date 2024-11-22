@@ -123,7 +123,9 @@ func SetupTest() (*corev1.Namespace, *storagev1alpha1.BucketPool, *server.Server
 		Expect(k8sClient.Create(ctx, bucketPool)).To(Succeed())
 		DeferCleanup(k8sClient.Delete, bucketPool)
 
-		newSrv, err := server.New(ctx, cfg, server.Options{
+		srvCtx, cancel := context.WithCancel(context.Background())
+		DeferCleanup(cancel)
+		newSrv, err := server.New(srvCtx, cfg, server.Options{
 			Namespace:      ns.Name,
 			BucketPoolName: bucketPool.Name,
 			BucketPoolSelector: map[string]string{
