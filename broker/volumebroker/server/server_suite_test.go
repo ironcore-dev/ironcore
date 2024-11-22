@@ -130,7 +130,9 @@ func SetupTest() (*corev1.Namespace, *server.Server) {
 		Expect(k8sClient.Create(ctx, volumePool)).To(Succeed(), "failed to create test volume pool")
 		DeferCleanup(k8sClient.Delete, volumePool)
 
-		newSrv, err := server.New(ctx, cfg, server.Options{
+		srvCtx, cancel := context.WithCancel(context.Background())
+		DeferCleanup(cancel)
+		newSrv, err := server.New(srvCtx, cfg, server.Options{
 			Namespace:      ns.Name,
 			VolumePoolName: volumePool.Name,
 			VolumePoolSelector: map[string]string{

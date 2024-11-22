@@ -124,15 +124,15 @@ func SetupTest() (*corev1.Namespace, *server.Server) {
 		Expect(k8sClient.Create(ctx, ns)).To(Succeed(), "failed to create test namespace")
 		DeferCleanup(k8sClient.Delete, ns)
 
-		newSrv, err := server.New(ctx, cfg, ns.Name, server.Options{
+		srvCtx, cancel := context.WithCancel(context.Background())
+		DeferCleanup(cancel)
+		newSrv, err := server.New(srvCtx, cfg, ns.Name, server.Options{
 			BaseURL: baseURL,
 			BrokerDownwardAPILabels: map[string]string{
 				"root-machine-uid": machinepoolletv1alpha1.MachineUIDLabel,
 			},
 		})
 		Expect(err).NotTo(HaveOccurred())
-		srvCtx, cancel := context.WithCancel(context.Background())
-		DeferCleanup(cancel)
 		go func() {
 			defer GinkgoRecover()
 			Expect(newSrv.Start(srvCtx)).To(Succeed())

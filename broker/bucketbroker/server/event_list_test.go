@@ -11,21 +11,19 @@ import (
 	"github.com/ironcore-dev/ironcore/iri/apis/event/v1alpha1"
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	bucketpoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/bucketpoollet/api/v1alpha1"
-
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("ListEvents", func() {
 	ns, _, srv := SetupTest()
 	bucketClass := SetupBucketClass("250Mi", "1500")
 
-	FIt("should correctly list events", func(ctx SpecContext) {
+	It("should correctly list events", func(ctx SpecContext) {
 		Expect(storagev1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
 		k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
 			Scheme: scheme.Scheme,
@@ -45,7 +43,6 @@ var _ = Describe("ListEvents", func() {
 				},
 			},
 		})
-
 		Expect(err).NotTo(HaveOccurred())
 		Expect(res).NotTo(BeNil())
 
