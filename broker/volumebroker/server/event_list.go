@@ -7,16 +7,16 @@ import (
 	"context"
 	"fmt"
 
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	"github.com/ironcore-dev/ironcore/broker/volumebroker/apiutils"
+	irievent "github.com/ironcore-dev/ironcore/iri/apis/event/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
+
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	"github.com/ironcore-dev/ironcore/broker/volumebroker/apiutils"
-	irievent "github.com/ironcore-dev/ironcore/iri/apis/event/v1alpha1"
-	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 )
 
 const (
@@ -47,6 +47,7 @@ func (s *Server) listEvents(ctx context.Context) ([]*irievent.Event, error) {
 		}
 		volumeObjectMetadata, err := apiutils.GetObjectMetadata(&ironcoreVolume.ObjectMeta)
 		if err != nil {
+			log.Error(err, "Unable to get ironcore volume object metadata", "VolumeName", volumeEvent.InvolvedObject.Name)
 			continue
 		}
 		iriEvent := &irievent.Event{
