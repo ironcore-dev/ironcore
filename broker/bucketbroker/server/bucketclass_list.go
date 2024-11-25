@@ -24,6 +24,7 @@ func (s *Server) getTargetIronCoreBucketPools(ctx context.Context) ([]storagev1a
 			}
 			return nil, nil
 		}
+		return []storagev1alpha1.BucketPool{*ironcoreBucketPool}, nil
 	}
 
 	bucketPoolList := &storagev1alpha1.BucketPoolList{}
