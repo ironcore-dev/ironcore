@@ -47,6 +47,7 @@ func (s *Server) listEvents(ctx context.Context) ([]*irievent.Event, error) {
 		}
 		machineObjectMetadata, err := apiutils.GetObjectMetadata(&ironcoreMachine.ObjectMeta)
 		if err != nil {
+			log.Error(err, "Unable to get ironcore machine object metadata", "MachineName", machineEvent.InvolvedObject.Name)
 			continue
 		}
 		iriEvent := &irievent.Event{
