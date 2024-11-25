@@ -27,6 +27,7 @@ func (s *Server) getTargetIronCoreMachinePools(ctx context.Context) ([]computev1
 			}
 			return nil, nil
 		}
+		return []computev1alpha1.MachinePool{*ironcoreMachinePool}, nil
 	}
 
 	machinePoolList := &computev1alpha1.MachinePoolList{}

@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 	"strconv"
 	"time"
 
@@ -542,17 +543,20 @@ func (r *MachineReconciler) updateNetworkInterfaceStatusFromIRIStatus(
 		return nil // nothing to do
 	}
 
-	nicBase := nic.DeepCopy()
-	nic.Status.IPs = commonv1alpha1.MustParseIPs(iriNicStatus.Ips...)
-	nic.Status.LastStateTransitionTime = &metav1.Time{Time: time.Now()}
 	nicState, ok := iriNetworkInterfaceStateToNetworkInterfaceState[iriNicStatus.State]
 	if !ok {
 		return fmt.Errorf("encountered unknown network interface state %s", iriNicStatus.State)
 	}
-	nic.Status.State = nicState
 
-	if err := r.Status().Patch(ctx, nic, client.MergeFrom(nicBase)); err != nil {
-		return fmt.Errorf("failed to patch network interface status: %w", err)
+	nicBase := nic.DeepCopy()
+	if nicBase.Status.State != nicState || !slices.Equal(nic.Status.IPs, commonv1alpha1.MustParseIPs(iriNicStatus.Ips...)) {
+		nic.Status.LastStateTransitionTime = &metav1.Time{Time: time.Now()}
+		nic.Status.IPs = commonv1alpha1.MustParseIPs(iriNicStatus.Ips...)
+		nic.Status.State = nicState
+
+		if err := r.Status().Patch(ctx, nic, client.MergeFrom(nicBase)); err != nil {
+			return fmt.Errorf("failed to patch network interface status: %w", err)
+		}
 	}
 
 	return nil

@@ -300,7 +300,6 @@ var _ = Describe("MachineController", func() {
 		}
 		srv.SetMachines([]*testingmachine.FakeMachine{iriMachine})
 
-		By("waiting for the ironcore network interface to have a provider id set")
 		Eventually(Object(nic)).Should(And(
 			HaveField("Spec.ProviderID", Equal("primary-handle")),
 			HaveField("Status", MatchFields(IgnoreExtras, Fields{
@@ -308,6 +307,13 @@ var _ = Describe("MachineController", func() {
 				"IPs":   ContainElement(commonv1alpha1.MustParseIP("10.0.0.1")),
 			})),
 		))
+
+		Consistently(Object(nic)).Should(
+			HaveField("Status", MatchFields(IgnoreExtras, Fields{
+				"State": Equal(networkingv1alpha1.NetworkInterfaceStateAvailable),
+				"IPs":   ContainElement(commonv1alpha1.MustParseIP("10.0.0.1")),
+			})),
+		)
 
 		By("ensuring the ironcore machine status networkInterfaces to have correct NetworkInterfaceRef")
 		Eventually(Object(machine)).Should(HaveField("Status.NetworkInterfaces", ConsistOf(MatchFields(IgnoreExtras, Fields{

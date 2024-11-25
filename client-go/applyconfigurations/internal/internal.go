@@ -1744,6 +1744,7 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: name
       type:
         scalar: string
+      default: ""
     elementRelationship: atomic
 - name: io.k8s.apimachinery.pkg.api.resource.Quantity
   scalar: untyped

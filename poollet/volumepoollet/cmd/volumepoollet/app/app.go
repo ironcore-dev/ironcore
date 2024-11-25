@@ -10,7 +10,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/ironcore-dev/controller-utils/configutils"
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
+
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
@@ -22,10 +24,9 @@ import (
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vem"
-
 	"github.com/ironcore-dev/ironcore/utils/client/config"
-	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
+
+	"github.com/ironcore-dev/controller-utils/configutils"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -35,9 +36,7 @@ import (
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 )
 
-var (
-	scheme = runtime.NewScheme()
-)
+var scheme = runtime.NewScheme()
 
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
@@ -63,6 +62,8 @@ type Options struct {
 	VolumeClassMapperSyncTimeout        time.Duration
 
 	ChannelCapacity int
+	RelistPeriod    time.Duration
+	RelistThreshold time.Duration
 
 	WatchFilterValue string
 }
@@ -84,7 +85,9 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.DurationVar(&o.VolumeRuntimeSocketDiscoveryTimeout, "volume-runtime-discovery-timeout", 20*time.Second, "Timeout for discovering the volume runtime socket.")
 	fs.DurationVar(&o.VolumeClassMapperSyncTimeout, "vcm-sync-timeout", 10*time.Second, "Timeout waiting for the volume class mapper to sync.")
 
-	fs.IntVar(&o.ChannelCapacity, "channel-capacity", 1024, "channel capacity for the volume event generator")
+	fs.IntVar(&o.ChannelCapacity, "channel-capacity", 1024, "channel capacity for the bucket event generator.")
+	fs.DurationVar(&o.RelistPeriod, "relist-period", 5*time.Second, "event channel relisting period.")
+	fs.DurationVar(&o.RelistThreshold, "relist-threshold", 3*time.Minute, "event channel relisting threshold.")
 
 	fs.StringVar(&o.WatchFilterValue, "watch-filter", "", "Value to filter for while watching.")
 }
@@ -147,6 +150,8 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error getting config: %w", err)
 	}
 
+	setupLog.Info("IRI client config", "ChannelCapacity", opts.ChannelCapacity, "RelistPeriod", opts.RelistPeriod, "RelistThreshold", opts.RelistThreshold)
+
 	leaderElectionCfg, err := configutils.GetConfig(
 		configutils.Kubeconfig(opts.LeaderElectionKubeconfig),
 	)
@@ -188,6 +193,8 @@ func Run(ctx context.Context, opts Options) error {
 		return res.Volumes, nil
 	}, irievent.GeneratorOptions{
 		ChannelCapacity: opts.ChannelCapacity,
+		RelistPeriod:    opts.RelistPeriod,
+		RelistThreshold: opts.RelistThreshold,
 	})
 	if err := mgr.Add(volumeEvents); err != nil {
 		return fmt.Errorf("error adding volume event generator: %w", err)

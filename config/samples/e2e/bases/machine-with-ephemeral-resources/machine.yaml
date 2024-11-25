@@ -1,0 +1,37 @@
+apiVersion: compute.ironcore.dev/v1alpha1
+kind: Machine
+metadata:
+  name: machine-sample
+spec:
+  machineClassRef:
+    name: machineclass-sample
+  ignitionRef:
+    name: ignition
+    key: ignition.yaml
+  networkInterfaces:
+  - name: primary
+    ephemeral:
+      networkInterfaceTemplate:
+        spec:
+          ipFamilies:
+          - IPv4
+          ips:
+          - value: 10.0.0.12
+          networkRef:
+            name: network-sample
+          virtualIP:
+            ephemeral:
+              virtualIPTemplate:
+                spec:
+                  type: Public
+                  ipFamily: IPv4
+  volumes:
+  - name: root-disk
+    ephemeral:
+      volumeTemplate:
+        spec:
+          volumeClassRef:
+            name: volumeclass-sample
+          image: gardenlinux:rootfs-image
+          resources:
+            storage: 10Gi
