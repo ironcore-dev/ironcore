@@ -13,7 +13,7 @@ import (
 
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/compute/v1alpha1"
-	scheme "github.com/ironcore-dev/ironcore/client-go/ironcore/scheme"
+	scheme "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"

@@ -1,6 +1,6 @@
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
+kind: ClusterRole
 metadata:
   name: broker-role
 rules:
@@ -43,6 +43,18 @@ rules:
   verbs:
   - create
   - get
+- apiGroups:
+  - compute.ironcore.dev
+  resources:
+  - reservations
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
 - apiGroups:
   - networking.ironcore.dev
   resources:

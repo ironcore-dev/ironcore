@@ -10,8 +10,8 @@ import (
 	time "time"
 
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	internalinterfaces "github.com/ironcore-dev/ironcore/client-go/informers/internalinterfaces"
-	ironcore "github.com/ironcore-dev/ironcore/client-go/ironcore"
+	internalinterfaces "github.com/ironcore-dev/ironcore/client-go/informers/externalversions/internalinterfaces"
+	versioned "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned"
 	v1alpha1 "github.com/ironcore-dev/ironcore/client-go/listers/compute/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
@@ -35,14 +35,14 @@ type reservationInformer struct {
 // NewReservationInformer constructs a new informer for Reservation type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewReservationInformer(client ironcore.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+func NewReservationInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewFilteredReservationInformer(client, namespace, resyncPeriod, indexers, nil)
 }
 
 // NewFilteredReservationInformer constructs a new informer for Reservation type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredReservationInformer(client ironcore.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
+func NewFilteredReservationInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
@@ -64,7 +64,7 @@ func NewFilteredReservationInformer(client ironcore.Interface, namespace string,
 	)
 }
 
-func (f *reservationInformer) defaultInformer(client ironcore.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+func (f *reservationInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
 	return NewFilteredReservationInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
