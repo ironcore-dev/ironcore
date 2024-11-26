@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
+// SPDX-License-Identifier: Apache-2.0
+
 package compute
 
 import (
@@ -22,7 +25,7 @@ type ReservationStatus struct {
 type ReservationState string
 
 const (
-	// ReservationStatePending means the Reservation is beeing reconciled.
+	// ReservationStatePending means the Reservation is being reconciled.
 	ReservationStatePending MachineState = "Pending"
 	// ReservationStateAccepted means the pool accepted the reservation and reserved the requested resources.
 	ReservationStateAccepted MachineState = "Accepted"
