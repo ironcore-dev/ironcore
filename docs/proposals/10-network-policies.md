@@ -1,7 +1,7 @@
 ---
 title: Network Policies
 
-oep-number: 10
+iep-number: 10
 
 creation-date: 2023-04-13
 
@@ -18,16 +18,18 @@ reviewers:
 
 ---
 
-# OEP-10: Network Policies
+# IEP-10: Network Policies
 
 ## Table of Contents
 
-- [Summary](#summary)
-- [Motivation](#motivation)
+- [IEP-10: Network Policies](#IEP-10-network-policies)
+  - [Table of Contents](#table-of-contents)
+  - [Summary](#summary)
+  - [Motivation](#motivation)
     - [Goals](#goals)
     - [Non-Goals](#non-goals)
-- [Proposal](#proposal)
-- [Alternatives](#alternatives)
+  - [Proposal](#proposal)
+  - [Alternatives](#alternatives)
 
 ## Summary
 
