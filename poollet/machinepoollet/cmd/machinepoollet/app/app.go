@@ -81,6 +81,8 @@ type Options struct {
 	AddressesOptions addresses.GetOptions
 
 	WatchFilterValue string
+
+	MaxConcurrentReconciles int
 }
 
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
@@ -111,6 +113,8 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	o.AddressesOptions.BindFlags(fs)
 
 	fs.StringVar(&o.WatchFilterValue, "watch-filter", "", "Value to filter for while watching.")
+
+	fs.IntVar(&o.MaxConcurrentReconciles, "max-concurrent-reconciles", 1, "Maximum number of concurrent reconciles.")
 }
 
 func (o *Options) MarkFlagsRequired(cmd *cobra.Command) {
@@ -206,7 +210,8 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error getting config: %w", err)
 	}
 
-	setupLog.Info("IRI client config", "ChannelCapacity", opts.ChannelCapacity, "RelistPeriod", opts.RelistPeriod, "RelistThreshold", opts.RelistThreshold)
+	setupLog.Info("IRI Client configuration", "ChannelCapacity", opts.ChannelCapacity, "RelistPeriod", opts.RelistPeriod, "RelistThreshold", opts.RelistThreshold)
+	setupLog.Info("Kubernetes Client configuration", "QPS", cfg.QPS, "Burst", cfg.Burst)
 
 	leaderElectionCfg, err := configutils.GetConfig(
 		configutils.Kubeconfig(opts.LeaderElectionKubeconfig),
@@ -313,16 +318,17 @@ func Run(ctx context.Context, opts Options) error {
 		}
 
 		if err := (&controllers.MachineReconciler{
-			EventRecorder:          mgr.GetEventRecorderFor("machines"),
-			Client:                 mgr.GetClient(),
-			MachineRuntime:         machineRuntime,
-			MachineRuntimeName:     version.RuntimeName,
-			MachineRuntimeVersion:  version.RuntimeVersion,
-			MachineClassMapper:     machineClassMapper,
-			MachinePoolName:        opts.MachinePoolName,
-			DownwardAPILabels:      opts.MachineDownwardAPILabels,
-			DownwardAPIAnnotations: opts.MachineDownwardAPIAnnotations,
-			WatchFilterValue:       opts.WatchFilterValue,
+			EventRecorder:           mgr.GetEventRecorderFor("machines"),
+			Client:                  mgr.GetClient(),
+			MachineRuntime:          machineRuntime,
+			MachineRuntimeName:      version.RuntimeName,
+			MachineRuntimeVersion:   version.RuntimeVersion,
+			MachineClassMapper:      machineClassMapper,
+			MachinePoolName:         opts.MachinePoolName,
+			DownwardAPILabels:       opts.MachineDownwardAPILabels,
+			DownwardAPIAnnotations:  opts.MachineDownwardAPIAnnotations,
+			WatchFilterValue:        opts.WatchFilterValue,
+			MaxConcurrentReconciles: opts.MaxConcurrentReconciles,
 		}).SetupWithManager(mgr); err != nil {
 			return fmt.Errorf("error setting up machine reconciler with manager: %w", err)
 		}

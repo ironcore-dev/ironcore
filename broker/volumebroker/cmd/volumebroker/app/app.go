@@ -9,13 +9,16 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/ironcore-dev/controller-utils/configutils"
-	"github.com/ironcore-dev/ironcore/broker/common"
-	"github.com/ironcore-dev/ironcore/broker/volumebroker/server"
-	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"google.golang.org/grpc"
+
+	"github.com/ironcore-dev/ironcore/broker/common"
+	"github.com/ironcore-dev/ironcore/broker/volumebroker/server"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
+	"github.com/ironcore-dev/ironcore/utils/client/config"
+
+	"github.com/ironcore-dev/controller-utils/configutils"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
@@ -23,6 +26,9 @@ import (
 type Options struct {
 	Kubeconfig string
 	Address    string
+
+	QPS   float32
+	Burst int
 
 	Namespace          string
 	VolumePoolName     string
@@ -32,6 +38,9 @@ type Options struct {
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.Kubeconfig, "kubeconfig", o.Kubeconfig, "Path pointing to a kubeconfig file to use.")
 	fs.StringVar(&o.Address, "address", "/var/run/iri-volumebroker.sock", "Address to listen on.")
+
+	fs.Float32Var(&o.QPS, "qps", config.QPS, "Kubernetes client qps.")
+	fs.IntVar(&o.Burst, "burst", config.Burst, "Kubernetes client burst.")
 
 	fs.StringVar(&o.Namespace, "namespace", o.Namespace, "Target Kubernetes namespace to use.")
 	fs.StringVar(&o.VolumePoolName, "volume-pool-name", o.VolumePoolName, "Name of the target volume pool to pin volumes to, if any.")
@@ -73,6 +82,10 @@ func Run(ctx context.Context, opts Options) error {
 	if err != nil {
 		return err
 	}
+
+	cfg.QPS = opts.QPS
+	cfg.Burst = opts.Burst
+	setupLog.Info("Kubernetes Client configuration", "QPS", cfg.QPS, "Burst", cfg.Burst)
 
 	srv, err := server.New(cfg, server.Options{
 		Namespace:          opts.Namespace,
