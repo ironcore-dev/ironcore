@@ -12,7 +12,10 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	"github.com/ironcore-dev/controller-utils/clientutils"
+	"golang.org/x/exp/maps"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
@@ -28,9 +31,8 @@ import (
 	utilclient "github.com/ironcore-dev/ironcore/utils/client"
 	utilmaps "github.com/ironcore-dev/ironcore/utils/maps"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
-	"golang.org/x/exp/maps"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+
+	"github.com/ironcore-dev/controller-utils/clientutils"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -40,6 +42,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
@@ -61,6 +64,8 @@ type MachineReconciler struct {
 	DownwardAPIAnnotations map[string]string
 
 	WatchFilterValue string
+
+	MaxConcurrentReconciles int
 }
 
 func (r *MachineReconciler) machineKeyLabelSelector(machineKey client.ObjectKey) map[string]string {
@@ -989,5 +994,9 @@ func (r *MachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			&storagev1alpha1.Volume{},
 			r.enqueueMachinesReferencingVolume(),
 		).
+		WithOptions(
+			controller.Options{
+				MaxConcurrentReconciles: r.MaxConcurrentReconciles,
+			}).
 		Complete(r)
 }
