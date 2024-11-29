@@ -5,7 +5,6 @@ package server_test
 
 import (
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
@@ -20,20 +19,13 @@ var _ = Describe("DeleteReservation", func() {
 	It("should correctly delete a reservation", func(ctx SpecContext) {
 		By("creating a reservation")
 
-		//corev1alpha1.ResourceCPU:    resource.MustParse("1"),
-		//corev1alpha1.ResourceMemory: resource.MustParse("1Gi"),
 		res, err := srv.CreateReservation(ctx, &iri.CreateReservationRequest{Reservation: &iri.Reservation{
 			Metadata: &irimeta.ObjectMetadata{
 				Labels: map[string]string{
 					machinepoolletv1alpha1.ReservationUIDLabel: "foobar",
 				},
 			},
-			Spec: &iri.ReservationSpec{
-				Resources: map[string][]byte{
-					string(corev1alpha1.ResourceCPU):    nil,
-					string(corev1alpha1.ResourceMemory): nil,
-				},
-			},
+			Spec: &iri.ReservationSpec{},
 		}})
 		Expect(err).NotTo(HaveOccurred())
 		Expect(res).NotTo(BeNil())
