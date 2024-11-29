@@ -10,7 +10,6 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/controller-utils/clientutils"
-	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	irimachine "github.com/ironcore-dev/ironcore/iri/apis/machine"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
@@ -96,24 +95,6 @@ func (r *ReservationReconciler) listReservationsByReservationKey(ctx context.Con
 		return nil, fmt.Errorf("error listing reservations by reservation key: %w", err)
 	}
 	return res.Reservations, nil
-}
-
-func (r *ReservationReconciler) getReservationByID(ctx context.Context, id string) (*iri.Reservation, error) {
-	res, err := r.MachineRuntime.ListReservations(ctx, &iri.ListReservationsRequest{
-		Filter: &iri.ReservationFilter{Id: id},
-	})
-	if err != nil {
-		return nil, fmt.Errorf("error listing reservations filtering by id: %w", err)
-	}
-
-	switch len(res.Reservations) {
-	case 0:
-		return nil, status.Errorf(codes.NotFound, "reservation %s not found", id)
-	case 1:
-		return res.Reservations[0], nil
-	default:
-		return nil, fmt.Errorf("multiple reservations found for id %s", id)
-	}
 }
 
 func (r *ReservationReconciler) deleteReservations(ctx context.Context, log logr.Logger, reservations []*iri.Reservation) (bool, error) {
@@ -368,20 +349,6 @@ func (r *ReservationReconciler) create(
 	return ctrl.Result{}, nil
 }
 
-func (r *ReservationReconciler) getReservationGeneration(iriReservation *iri.Reservation) (int64, error) {
-	return getAndParseFromStringMap(iriReservation.GetMetadata().GetAnnotations(),
-		v1alpha1.ReservationGenerationAnnotation,
-		parseInt64,
-	)
-}
-
-func (r *ReservationReconciler) getIRIReservationGeneration(iriReservation *iri.Reservation) (int64, error) {
-	return getAndParseFromStringMap(iriReservation.GetMetadata().GetAnnotations(),
-		v1alpha1.IRIReservationGenerationAnnotation,
-		parseInt64,
-	)
-}
-
 func (r *ReservationReconciler) updateStatus(
 	ctx context.Context,
 	log logr.Logger,
@@ -510,16 +477,6 @@ func ReservationAssignedToMachinePoolPredicate(machinePoolName string) predicate
 		reservation := object.(*computev1alpha1.Reservation)
 		return ReservationAssignedToMachinePool(reservation, machinePoolName)
 	})
-}
-
-func (r *ReservationReconciler) matchingWatchLabel() client.ListOption {
-	var labels map[string]string
-	if r.WatchFilterValue != "" {
-		labels = map[string]string{
-			commonv1alpha1.WatchLabel: r.WatchFilterValue,
-		}
-	}
-	return client.MatchingLabels(labels)
 }
 
 func (r *ReservationReconciler) SetupWithManager(mgr ctrl.Manager) error {

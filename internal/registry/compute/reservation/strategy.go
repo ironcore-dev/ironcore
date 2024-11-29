@@ -127,16 +127,3 @@ func (reservationStatusStrategy) WarningsOnUpdate(cxt context.Context, obj, old 
 type ResourceGetter interface {
 	Get(ctx context.Context, name string, options *metav1.GetOptions) (runtime.Object, error)
 }
-
-func getReservation(ctx context.Context, getter ResourceGetter, name string) (*compute.Reservation, error) {
-	obj, err := getter.Get(ctx, name, &metav1.GetOptions{})
-	if err != nil {
-		return nil, err
-	}
-
-	machine, ok := obj.(*compute.Reservation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected object type %T", obj)
-	}
-	return machine, nil
-}

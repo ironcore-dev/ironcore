@@ -6,7 +6,6 @@ package server
 import (
 	"context"
 	"fmt"
-	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/go-logr/logr"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
@@ -18,6 +17,7 @@ import (
 	metav1alpha1 "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/utils/maps"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
