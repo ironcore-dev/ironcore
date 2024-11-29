@@ -6,6 +6,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/go-logr/logr"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
@@ -69,6 +70,15 @@ func (s *Server) createIronCoreReservation(
 		return nil, fmt.Errorf("error preparing ironcore reservation annotations: %w", err)
 	}
 
+	var resources = v1alpha1.ResourceList{}
+	for name, quantity := range iriReservation.Spec.Resources {
+		var q resource.Quantity
+		if err := q.Unmarshal(quantity); err != nil {
+			return nil, fmt.Errorf("error unmarshaling resource quantity: %w", err)
+		}
+		resources[v1alpha1.ResourceName(name)] = q
+	}
+
 	c, cleanup := s.setupCleaner(ctx, log, &retErr)
 	defer cleanup()
 
@@ -82,7 +92,7 @@ func (s *Server) createIronCoreReservation(
 			}),
 		},
 		Spec: computev1alpha1.ReservationSpec{
-			Resources: v1alpha1.ResourceList{},
+			Resources: resources,
 		},
 	}
 	log.V(1).Info("Creating ironcore reservation")

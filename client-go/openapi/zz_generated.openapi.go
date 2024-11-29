@@ -1839,7 +1839,7 @@ func schema_ironcore_api_compute_v1alpha1_ReservationPoolStatus(ref common.Refer
 					},
 					"state": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Possible enum values:\n - `\"Accepted\"` means the pool accepted the reservation and reserved the requested resources.\n - `\"Pending\"` means the Reservation is being reconciled.\n - `\"Rejected\"` means the pool rejected the reservation.",
+							Description: "Possible enum values:\n - `\"Accepted\"` means the pool accepted the reservation and reserved the requested resources.\n - `\"Pending\"` means the Reservation is beeing reconciled.\n - `\"Rejected\"` means the pool rejected the reservation.",
 							Type:        []string{"string"},
 							Format:      "",
 							Enum:        []interface{}{"Accepted", "Pending", "Rejected"},

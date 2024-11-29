@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
-// SPDX-License-Identifier: Apache-2.0
-
 package controllers_test
 
 import (
@@ -21,7 +18,7 @@ import (
 	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 )
 
-var _ = FDescribe("MachineController", func() {
+var _ = Describe("MachineController", func() {
 	ns, mp, _, srv := SetupTest()
 
 	It("Should create a reservation on a matching pool", func(ctx SpecContext) {
