@@ -65,6 +65,8 @@ type Options struct {
 	RelistThreshold time.Duration
 
 	WatchFilterValue string
+
+	MaxConcurrentReconciles int
 }
 
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
@@ -89,6 +91,8 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.DurationVar(&o.RelistThreshold, "relist-threshold", 3*time.Minute, "event channel relisting threshold.")
 
 	fs.StringVar(&o.WatchFilterValue, "watch-filter", "", "Value to filter for while watching.")
+
+	fs.IntVar(&o.MaxConcurrentReconciles, "max-concurrent-reconciles", 1, "Maximum number of concurrent reconciles.")
 }
 
 func (o *Options) MarkFlagsRequired(cmd *cobra.Command) {
@@ -150,7 +154,8 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error getting config: %w", err)
 	}
 
-	setupLog.Info("IRI client config", "ChannelCapacity", opts.ChannelCapacity, "RelistPeriod", opts.RelistPeriod, "RelistThreshold", opts.RelistThreshold)
+	setupLog.Info("IRI Client configuration", "ChannelCapacity", opts.ChannelCapacity, "RelistPeriod", opts.RelistPeriod, "RelistThreshold", opts.RelistThreshold)
+	setupLog.Info("Kubernetes Client configuration", "QPS", cfg.QPS, "Burst", cfg.Burst)
 
 	leaderElectionCfg, err := configutils.GetConfig(
 		configutils.Kubeconfig(opts.LeaderElectionKubeconfig),
@@ -213,13 +218,14 @@ func Run(ctx context.Context, opts Options) error {
 		}
 
 		if err := (&controllers.BucketReconciler{
-			EventRecorder:     mgr.GetEventRecorderFor("buckets"),
-			Client:            mgr.GetClient(),
-			Scheme:            scheme,
-			BucketRuntime:     bucketRuntime,
-			BucketClassMapper: bucketClassMapper,
-			BucketPoolName:    opts.BucketPoolName,
-			WatchFilterValue:  opts.WatchFilterValue,
+			EventRecorder:           mgr.GetEventRecorderFor("buckets"),
+			Client:                  mgr.GetClient(),
+			Scheme:                  scheme,
+			BucketRuntime:           bucketRuntime,
+			BucketClassMapper:       bucketClassMapper,
+			BucketPoolName:          opts.BucketPoolName,
+			WatchFilterValue:        opts.WatchFilterValue,
+			MaxConcurrentReconciles: opts.MaxConcurrentReconciles,
 		}).SetupWithManager(mgr); err != nil {
 			return fmt.Errorf("error setting up bucket reconciler with manager: %w", err)
 		}

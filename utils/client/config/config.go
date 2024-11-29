@@ -14,7 +14,9 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
+
 	utilrest "github.com/ironcore-dev/ironcore/utils/rest"
+
 	certificatesv1 "k8s.io/api/certificates/v1"
 	corev1 "k8s.io/api/core/v1"
 	utilnet "k8s.io/apimachinery/pkg/util/net"
@@ -44,11 +46,15 @@ const (
 
 	// EgressSelectorConfigFlagName is the name of the egress-selector-config flag.
 	EgressSelectorConfigFlagName = "egress-selector-config"
+
+	// QPS is the default value for allowed queries per second for a client.
+	QPS float32 = 20.0
+
+	// Burst is the default value for allowed burst rate for a client.
+	Burst int = 30
 )
 
-var (
-	log = ctrl.Log.WithName("client").WithName("config")
-)
+var log = ctrl.Log.WithName("client").WithName("config")
 
 // EgressSelectionName is the name of the egress configuration to use.
 type EgressSelectionName string
@@ -273,6 +279,8 @@ func (g *Getter) getConfig(ctx context.Context, o *GetConfigOptions) (*rest.Conf
 	}
 
 	cfg.Dial = dialFunc
+	cfg.QPS = o.QPS
+	cfg.Burst = o.Burst
 	return cfg, nil, nil
 }
 
