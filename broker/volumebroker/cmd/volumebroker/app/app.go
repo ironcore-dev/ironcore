@@ -12,20 +12,20 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"google.golang.org/grpc"
+	"k8s.io/apiserver/pkg/server/egressselector"
 
 	"github.com/ironcore-dev/ironcore/broker/common"
 	"github.com/ironcore-dev/ironcore/broker/volumebroker/server"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	"github.com/ironcore-dev/ironcore/utils/client/config"
 
-	"github.com/ironcore-dev/controller-utils/configutils"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
 
 type Options struct {
-	Kubeconfig string
-	Address    string
+	GetConfigOptions config.GetConfigOptions
+	Address          string
 
 	QPS   float32
 	Burst int
@@ -36,7 +36,7 @@ type Options struct {
 }
 
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
-	fs.StringVar(&o.Kubeconfig, "kubeconfig", o.Kubeconfig, "Path pointing to a kubeconfig file to use.")
+	o.GetConfigOptions.BindFlags(fs)
 	fs.StringVar(&o.Address, "address", "/var/run/iri-volumebroker.sock", "Address to listen on.")
 
 	fs.Float32Var(&o.QPS, "qps", config.QPS, "Kubernetes client qps.")
@@ -78,14 +78,15 @@ func Run(ctx context.Context, opts Options) error {
 	log := ctrl.LoggerFrom(ctx)
 	setupLog := log.WithName("setup")
 
-	cfg, err := configutils.GetConfig(configutils.Kubeconfig(opts.Kubeconfig))
+	getter, err := newGetter()
 	if err != nil {
-		return err
+		return fmt.Errorf("error creating new getter: %w", err)
 	}
 
-	cfg.QPS = opts.QPS
-	cfg.Burst = opts.Burst
-	setupLog.Info("Kubernetes Client configuration", "QPS", cfg.QPS, "Burst", cfg.Burst)
+	cfg, err := getter.GetConfig(ctx, &opts.GetConfigOptions)
+	if err != nil {
+		return fmt.Errorf("error getting config: %w", err)
+	}
 
 	srv, err := server.New(cfg, server.Options{
 		Namespace:          opts.Namespace,
@@ -139,4 +140,11 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error serving: %w", err)
 	}
 	return nil
+}
+
+func newGetter() (*config.BrokerGetter, error) {
+	return config.NewBrokerGetter(config.GetterOptions{
+		Name:           "volumebroker",
+		NetworkContext: egressselector.ControlPlane.AsNetworkContext(),
+	})
 }
