@@ -12,8 +12,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"google.golang.org/grpc"
-	"k8s.io/apiserver/pkg/server/egressselector"
 
+	bucketbrokerconfig "github.com/ironcore-dev/ironcore/broker/bucketbroker/client/config"
 	"github.com/ironcore-dev/ironcore/broker/bucketbroker/server"
 	"github.com/ironcore-dev/ironcore/broker/common"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
@@ -78,7 +78,7 @@ func Run(ctx context.Context, opts Options) error {
 	log := ctrl.LoggerFrom(ctx)
 	setupLog := log.WithName("setup")
 
-	getter, err := newGetter()
+	getter, err := bucketbrokerconfig.NewGetter()
 	if err != nil {
 		return fmt.Errorf("error creating new getter: %w", err)
 	}
@@ -140,11 +140,4 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error serving: %w", err)
 	}
 	return nil
-}
-
-func newGetter() (*config.BrokerGetter, error) {
-	return config.NewBrokerGetter(config.GetterOptions{
-		Name:           "volumebroker",
-		NetworkContext: egressselector.ControlPlane.AsNetworkContext(),
-	})
 }

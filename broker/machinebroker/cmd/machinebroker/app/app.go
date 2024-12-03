@@ -17,10 +17,10 @@ import (
 	"github.com/spf13/pflag"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
-	"k8s.io/apiserver/pkg/server/egressselector"
 
 	"github.com/ironcore-dev/ironcore/broker/common"
 	commongrpc "github.com/ironcore-dev/ironcore/broker/common/grpc"
+	mchinebrokerconfig "github.com/ironcore-dev/ironcore/broker/machinebroker/client/config"
 	machinebrokerhttp "github.com/ironcore-dev/ironcore/broker/machinebroker/http"
 	"github.com/ironcore-dev/ironcore/broker/machinebroker/server"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
@@ -93,7 +93,7 @@ func Run(ctx context.Context, opts Options) error {
 	log := ctrl.LoggerFrom(ctx)
 	setupLog := log.WithName("setup")
 
-	getter, err := newGetter()
+	getter, err := mchinebrokerconfig.NewGetter()
 	if err != nil {
 		return fmt.Errorf("error creating new getter: %w", err)
 	}
@@ -211,11 +211,4 @@ func runStreamingServer(ctx context.Context, setupLog, log logr.Logger, srv *ser
 		return fmt.Errorf("error listening / serving streaming server: %w", err)
 	}
 	return nil
-}
-
-func newGetter() (*config.BrokerGetter, error) {
-	return config.NewBrokerGetter(config.GetterOptions{
-		Name:           "machinebroker",
-		NetworkContext: egressselector.ControlPlane.AsNetworkContext(),
-	})
 }
