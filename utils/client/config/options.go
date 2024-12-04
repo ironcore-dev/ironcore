@@ -87,8 +87,8 @@ func (o *GetConfigOptions) BindFlags(fs *pflag.FlagSet, opts ...func(*BindFlagOp
 	fs.StringVar(&o.BootstrapKubeconfig, bo.NameFunc(BootstrapKubeconfigFlagName), "", "Path to a bootstrap kubeconfig.")
 	fs.BoolVar(&o.RotateCertificates, bo.NameFunc(RotateCertificatesFlagName), false, "Whether to use automatic certificate / config rotation.")
 	fs.StringVar(&o.EgressSelectorConfig, bo.NameFunc(EgressSelectorConfigFlagName), "", "Path pointing to an egress selector config to use.")
-	fs.Float32Var(&o.QPS, "qps", QPS, "Kubernetes client qps.")
-	fs.IntVar(&o.Burst, "burst", Burst, "Kubernetes client burst.")
+	fs.Float32Var(&o.QPS, bo.NameFunc(QpsConfigFlagName), 0, "Kubernetes client qps.")
+	fs.IntVar(&o.Burst, bo.NameFunc(BurstConfigFlagName), 0, "Kubernetes client burst.")
 }
 
 // ApplyToGetConfig implements GetConfigOption.

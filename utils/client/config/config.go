@@ -47,11 +47,11 @@ const (
 	// EgressSelectorConfigFlagName is the name of the egress-selector-config flag.
 	EgressSelectorConfigFlagName = "egress-selector-config"
 
-	// QPS is the default value for allowed queries per second for a client.
-	QPS float32 = 20.0
+	// QpsConfigFlagName is the name of the qps flag.
+	QpsConfigFlagName = "qps"
 
-	// Burst is the default value for allowed burst rate for a client.
-	Burst int = 30
+	// BurstConfigFlagName is the name of the burst flag.
+	BurstConfigFlagName = "burst"
 )
 
 var log = ctrl.Log.WithName("client").WithName("config")
