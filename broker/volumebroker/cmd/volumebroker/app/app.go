@@ -39,9 +39,6 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	o.GetConfigOptions.BindFlags(fs)
 	fs.StringVar(&o.Address, "address", "/var/run/iri-volumebroker.sock", "Address to listen on.")
 
-	fs.Float32Var(&o.QPS, "qps", config.QPS, "Kubernetes client qps.")
-	fs.IntVar(&o.Burst, "burst", config.Burst, "Kubernetes client burst.")
-
 	fs.StringVar(&o.Namespace, "namespace", o.Namespace, "Target Kubernetes namespace to use.")
 	fs.StringVar(&o.VolumePoolName, "volume-pool-name", o.VolumePoolName, "Name of the target volume pool to pin volumes to, if any.")
 	fs.StringToStringVar(&o.VolumePoolSelector, "volume-pool-selector", o.VolumePoolSelector, "Selector of the target volume pools to pin volumes to, if any.")
