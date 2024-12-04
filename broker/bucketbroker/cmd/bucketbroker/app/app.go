@@ -39,9 +39,6 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	o.GetConfigOptions.BindFlags(fs)
 	fs.StringVar(&o.Address, "address", "/var/run/iri-bucketbroker.sock", "Address to listen on.")
 
-	fs.Float32Var(&o.QPS, "qps", config.QPS, "Kubernetes client qps.")
-	fs.IntVar(&o.Burst, "burst", config.Burst, "Kubernetes client burst.")
-
 	fs.StringVar(&o.Namespace, "namespace", o.Namespace, "Target Kubernetes namespace to use.")
 	fs.StringVar(&o.BucketPoolName, "bucket-pool-name", o.BucketPoolName, "Name of the target bucket pool to pin buckets to, if any.")
 	fs.StringToStringVar(&o.BucketPoolSelector, "bucket-pool-selector", o.BucketPoolSelector, "Selector of the target bucket pools to pin buckets to, if any.")
