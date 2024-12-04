@@ -382,11 +382,17 @@ func (r *MachineReconciler) convertIRINetworkInterfaceStatus(status *iri.Network
 		return computev1alpha1.NetworkInterfaceStatus{}, err
 	}
 
+	ips := make([]commonv1alpha1.IP, len(status.Ips))
+	for i, ip := range status.Ips {
+		ips[i] = commonv1alpha1.MustParseIP(ip)
+	}
+
 	return computev1alpha1.NetworkInterfaceStatus{
 		Name:                status.Name,
 		Handle:              status.Handle,
 		State:               state,
 		NetworkInterfaceRef: corev1.LocalObjectReference{Name: nicName},
+		IPs:                 ips,
 	}, nil
 }
 
@@ -398,6 +404,7 @@ func (r *MachineReconciler) addNetworkInterfaceStatusValues(now metav1.Time, exi
 	existing.NetworkInterfaceRef = newValues.NetworkInterfaceRef
 	existing.State = newValues.State
 	existing.Handle = newValues.Handle
+	existing.IPs = newValues.IPs
 }
 
 func (r *MachineReconciler) getNetworkInterfaceStatusesForMachine(
