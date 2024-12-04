@@ -20,6 +20,7 @@ import (
 
 	"github.com/ironcore-dev/ironcore/broker/common"
 	commongrpc "github.com/ironcore-dev/ironcore/broker/common/grpc"
+	machinebrokerconfig "github.com/ironcore-dev/ironcore/broker/machinebroker/client/config"
 	machinebrokerhttp "github.com/ironcore-dev/ironcore/broker/machinebroker/http"
 	"github.com/ironcore-dev/ironcore/broker/machinebroker/server"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
@@ -89,7 +90,7 @@ func Run(ctx context.Context, opts Options) error {
 	log := ctrl.LoggerFrom(ctx)
 	setupLog := log.WithName("setup")
 
-	getter, err := mchinebrokerconfig.NewGetter()
+	getter, err := machinebrokerconfig.NewGetter()
 	if err != nil {
 		return fmt.Errorf("error creating new getter: %w", err)
 	}
