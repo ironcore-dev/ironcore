@@ -20,3 +20,11 @@ type MachineClassListerExpansion interface{}
 // MachinePoolListerExpansion allows custom methods to be added to
 // MachinePoolLister.
 type MachinePoolListerExpansion interface{}
+
+// ReservationListerExpansion allows custom methods to be added to
+// ReservationLister.
+type ReservationListerExpansion interface{}
+
+// ReservationNamespaceListerExpansion allows custom methods to be added to
+// ReservationNamespaceLister.
+type ReservationNamespaceListerExpansion interface{}

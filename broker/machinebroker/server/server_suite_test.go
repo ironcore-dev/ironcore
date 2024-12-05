@@ -125,7 +125,8 @@ func SetupTest() (*corev1.Namespace, *server.Server) {
 		newSrv, err := server.New(cfg, ns.Name, server.Options{
 			BaseURL: baseURL,
 			BrokerDownwardAPILabels: map[string]string{
-				"root-machine-uid": machinepoolletv1alpha1.MachineUIDLabel,
+				"root-machine-uid":     machinepoolletv1alpha1.MachineUIDLabel,
+				"root-reservation-uid": machinepoolletv1alpha1.ReservationUIDLabel,
 			},
 		})
 		Expect(err).NotTo(HaveOccurred())
