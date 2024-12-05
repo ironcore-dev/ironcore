@@ -15,7 +15,7 @@ import (
 // with apply.
 type VolumeTemplateSpecApplyConfiguration struct {
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Spec                             *VolumeSpecApplyConfiguration `json:"spec,omitempty"`
+	Spec                             *EphemeralVolumeSpecApplyConfiguration `json:"spec,omitempty"`
 }
 
 // VolumeTemplateSpecApplyConfiguration constructs an declarative configuration of the VolumeTemplateSpec type for use with
@@ -169,7 +169,7 @@ func (b *VolumeTemplateSpecApplyConfiguration) ensureObjectMetaApplyConfiguratio
 // WithSpec sets the Spec field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Spec field is set to the value of the last call.
-func (b *VolumeTemplateSpecApplyConfiguration) WithSpec(value *VolumeSpecApplyConfiguration) *VolumeTemplateSpecApplyConfiguration {
+func (b *VolumeTemplateSpecApplyConfiguration) WithSpec(value *EphemeralVolumeSpecApplyConfiguration) *VolumeTemplateSpecApplyConfiguration {
 	b.Spec = value
 	return b
 }
