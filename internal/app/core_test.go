@@ -74,7 +74,7 @@ var _ = Describe("Core", func() {
 
 			By("waiting for the resource quota to be updated")
 			resourceQuotaKey := client.ObjectKeyFromObject(resourceQuota)
-			Eventually(func(g Gomega) {
+			Eventually(ctx, func(g Gomega) {
 				Expect(k8sClient.Get(ctx, resourceQuotaKey, resourceQuota)).To(Succeed())
 				g.Expect(resourceQuota.Status.Used).To(Equal(corev1alpha1.ResourceList{
 					corev1alpha1.ResourceRequestsCPU: resource.MustParse("1"),
