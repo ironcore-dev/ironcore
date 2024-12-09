@@ -398,6 +398,59 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: virtualIP
       type:
         namedType: com.github.ironcore-dev.ironcore.api.common.v1alpha1.IP
+- name: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Reservation
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.ReservationSpec
+      default: {}
+    - name: status
+      type:
+        namedType: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.ReservationStatus
+      default: {}
+- name: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.ReservationPoolStatus
+  map:
+    fields:
+    - name: ref
+      type:
+        scalar: string
+    - name: state
+      type:
+        scalar: string
+- name: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.ReservationSpec
+  map:
+    fields:
+    - name: capabilities
+      type:
+        map:
+          elementType:
+            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
+    - name: pools
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.api.core.v1.LocalObjectReference
+          elementRelationship: atomic
+- name: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.ReservationStatus
+  map:
+    fields:
+    - name: pools
+      type:
+        list:
+          elementType:
+            namedType: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.ReservationPoolStatus
+          elementRelationship: atomic
 - name: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Volume
   map:
     fields:

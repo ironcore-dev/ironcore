@@ -27,6 +27,10 @@ func (c *FakeComputeV1alpha1) MachinePools() v1alpha1.MachinePoolInterface {
 	return &FakeMachinePools{c}
 }
 
+func (c *FakeComputeV1alpha1) Reservations(namespace string) v1alpha1.ReservationInterface {
+	return &FakeReservations{c, namespace}
+}
+
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
 func (c *FakeComputeV1alpha1) RESTClient() rest.Interface {

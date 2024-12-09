@@ -7,6 +7,7 @@ on:
   push:
     branches:
     - main
+    - lukasfrank:feat/reservations
     tags:
     - v*
     paths-ignore:
@@ -84,7 +85,7 @@ jobs:
         version: latest
         endpoint: builders # self-hosted
     - name: Login to GHCR
-      if: github.event_name != 'pull_request'
+#      if: github.event_name != 'pull_request'
       uses: docker/login-action@v3
       with:
         registry: ghcr.io
@@ -96,7 +97,7 @@ jobs:
       with:
         context: .
         platforms: linux/amd64,linux/arm64
-        push: ${{ github.event_name != 'pull_request' }}
+#        push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         target: ${{ matrix.image.target }}
