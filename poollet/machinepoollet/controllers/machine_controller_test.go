@@ -157,6 +157,7 @@ var _ = Describe("MachineController", func() {
 			"Handle":              Equal("primary-handle"),
 			"State":               Equal(computev1alpha1.NetworkInterfaceStateAttached),
 			"NetworkInterfaceRef": Equal(corev1.LocalObjectReference{Name: computev1alpha1.MachineEphemeralNetworkInterfaceName(machine.Name, "primary")}),
+			"IPs":                 Equal([]commonv1alpha1.IP{commonv1alpha1.MustParseIP("10.0.0.11")}),
 		}))))
 
 		By("removing the network interface from the machine")
@@ -321,6 +322,7 @@ var _ = Describe("MachineController", func() {
 			"Handle":              Equal("primary-handle"),
 			"State":               Equal(computev1alpha1.NetworkInterfaceStateAttached),
 			"NetworkInterfaceRef": Equal(corev1.LocalObjectReference{Name: nic.Name}),
+			"IPs":                 Equal([]commonv1alpha1.IP{commonv1alpha1.MustParseIP("10.0.0.1")}),
 		}))))
 
 		By("removing the network interface from the machine")
