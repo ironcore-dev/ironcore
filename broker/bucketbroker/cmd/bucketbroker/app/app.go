@@ -13,19 +13,19 @@ import (
 	"github.com/spf13/pflag"
 	"google.golang.org/grpc"
 
+	bucketbrokerconfig "github.com/ironcore-dev/ironcore/broker/bucketbroker/client/config"
 	"github.com/ironcore-dev/ironcore/broker/bucketbroker/server"
 	"github.com/ironcore-dev/ironcore/broker/common"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
 	"github.com/ironcore-dev/ironcore/utils/client/config"
 
-	"github.com/ironcore-dev/controller-utils/configutils"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
 
 type Options struct {
-	Kubeconfig string
-	Address    string
+	GetConfigOptions config.GetConfigOptions
+	Address          string
 
 	QPS   float32
 	Burst int
@@ -36,11 +36,8 @@ type Options struct {
 }
 
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
-	fs.StringVar(&o.Kubeconfig, "kubeconfig", o.Kubeconfig, "Path pointing to a kubeconfig file to use.")
+	o.GetConfigOptions.BindFlags(fs)
 	fs.StringVar(&o.Address, "address", "/var/run/iri-bucketbroker.sock", "Address to listen on.")
-
-	fs.Float32Var(&o.QPS, "qps", config.QPS, "Kubernetes client qps.")
-	fs.IntVar(&o.Burst, "burst", config.Burst, "Kubernetes client burst.")
 
 	fs.StringVar(&o.Namespace, "namespace", o.Namespace, "Target Kubernetes namespace to use.")
 	fs.StringVar(&o.BucketPoolName, "bucket-pool-name", o.BucketPoolName, "Name of the target bucket pool to pin buckets to, if any.")
@@ -78,14 +75,15 @@ func Run(ctx context.Context, opts Options) error {
 	log := ctrl.LoggerFrom(ctx)
 	setupLog := log.WithName("setup")
 
-	cfg, err := configutils.GetConfig(configutils.Kubeconfig(opts.Kubeconfig))
+	getter, err := bucketbrokerconfig.NewGetter()
 	if err != nil {
-		return err
+		return fmt.Errorf("error creating new getter: %w", err)
 	}
 
-	cfg.QPS = opts.QPS
-	cfg.Burst = opts.Burst
-	setupLog.Info("Kubernetes Client configuration", "QPS", cfg.QPS, "Burst", cfg.Burst)
+	cfg, err := getter.GetConfig(ctx, &opts.GetConfigOptions)
+	if err != nil {
+		return fmt.Errorf("error getting config: %w", err)
+	}
 
 	srv, err := server.New(cfg, server.Options{
 		Namespace:          opts.Namespace,

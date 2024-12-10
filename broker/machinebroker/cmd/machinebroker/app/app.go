@@ -20,18 +20,18 @@ import (
 
 	"github.com/ironcore-dev/ironcore/broker/common"
 	commongrpc "github.com/ironcore-dev/ironcore/broker/common/grpc"
+	mchinebrokerconfig "github.com/ironcore-dev/ironcore/broker/machinebroker/client/config"
 	machinebrokerhttp "github.com/ironcore-dev/ironcore/broker/machinebroker/http"
 	"github.com/ironcore-dev/ironcore/broker/machinebroker/server"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	"github.com/ironcore-dev/ironcore/utils/client/config"
 
-	"github.com/ironcore-dev/controller-utils/configutils"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
 
 type Options struct {
-	Kubeconfig              string
+	GetConfigOptions        config.GetConfigOptions
 	Address                 string
 	StreamingAddress        string
 	BaseURL                 string
@@ -46,16 +46,13 @@ type Options struct {
 }
 
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
-	fs.StringVar(&o.Kubeconfig, "kubeconfig", o.Kubeconfig, "Path pointing to a kubeconfig file to use.")
+	o.GetConfigOptions.BindFlags(fs)
 	fs.StringVar(&o.Address, "address", "/var/run/iri-machinebroker.sock", "Address to listen on.")
 	fs.StringVar(&o.StreamingAddress, "streaming-address", "127.0.0.1:20251", "Address to run the streaming server on")
 	fs.StringVar(&o.BaseURL, "base-url", "", "The base url to construct urls for streaming from. If empty it will be "+
 		"constructed from the streaming-address")
 	fs.StringToStringVar(&o.BrokerDownwardAPILabels, "broker-downward-api-label", nil, "The labels to broker via downward API. "+
 		"Example is for instance to broker \"root-machine-uid\" initially obtained via \"machinepoollet.ironcore.dev/machine-uid\".")
-
-	fs.Float32Var(&o.QPS, "qps", config.QPS, "Kubernetes client qps.")
-	fs.IntVar(&o.Burst, "burst", config.Burst, "Kubernetes client burst.")
 
 	fs.StringVar(&o.Namespace, "namespace", o.Namespace, "Target Kubernetes namespace to use.")
 	fs.StringVar(&o.MachinePoolName, "machine-pool-name", o.MachinePoolName, "Name of the target machine pool to pin machines to, if any.")
@@ -93,9 +90,14 @@ func Run(ctx context.Context, opts Options) error {
 	log := ctrl.LoggerFrom(ctx)
 	setupLog := log.WithName("setup")
 
-	cfg, err := configutils.GetConfig(configutils.Kubeconfig(opts.Kubeconfig))
+	getter, err := mchinebrokerconfig.NewGetter()
 	if err != nil {
-		return err
+		return fmt.Errorf("error creating new getter: %w", err)
+	}
+
+	cfg, err := getter.GetConfig(ctx, &opts.GetConfigOptions)
+	if err != nil {
+		return fmt.Errorf("error getting config: %w", err)
 	}
 
 	if opts.Namespace == "" {
@@ -110,10 +112,6 @@ func Run(ctx context.Context, opts Options) error {
 		}
 		baseURL = u.String()
 	}
-
-	cfg.QPS = opts.QPS
-	cfg.Burst = opts.Burst
-	setupLog.Info("Kubernetes Client configuration", "QPS", cfg.QPS, "Burst", cfg.Burst)
 
 	log.V(1).Info("Creating server",
 		"Namespace", opts.Namespace,
