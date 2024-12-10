@@ -10,3 +10,5 @@ type MachineExpansion interface{}
 type MachineClassExpansion interface{}
 
 type MachinePoolExpansion interface{}
+
+type ReservationExpansion interface{}
