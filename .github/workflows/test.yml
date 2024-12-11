@@ -1,11 +1,9 @@
 name: Pull Request Code test
 
 on:
-  pull_request:
-    types: [ assigned, opened, synchronize, reopened ]
-    paths-ignore:
-    - 'docs/**'
-    - '**/*.md'
+  push:
+    branches:
+    - sporadic_test_fix
 
 jobs:
   checks:

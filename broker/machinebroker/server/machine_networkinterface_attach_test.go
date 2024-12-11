@@ -84,7 +84,7 @@ var _ = Describe("AttachNetworkInterface", func() {
 		}))
 	})
 
-	It("should correctly re-create a network in case it has been removed", func(ctx SpecContext) {
+	FIt("should correctly re-create a network in case it has been removed", func(ctx SpecContext) {
 		By("creating a machine")
 		createMachineRes, err := srv.CreateMachine(ctx, &iri.CreateMachineRequest{
 			Machine: &iri.Machine{

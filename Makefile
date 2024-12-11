@@ -149,7 +149,7 @@ test: manifests generate fmt vet test-only ## Run tests.
 
 .PHONY: test-only
 test-only: envtest ## Run *only* the tests - no generation, linting etc.
-	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" go test ./... -coverprofile cover.out
+	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" go test -v /home/ushab/ironcore/ironcore/broker/machinebroker/server/ -coverprofile cover.out
 
 .PHONY: extract-openapi
 extract-openapi: envtest openapi-extractor

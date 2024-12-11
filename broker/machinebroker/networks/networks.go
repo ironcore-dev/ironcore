@@ -91,6 +91,7 @@ func (e *Manager) getOrCreateNetworkForProviderID(ctx context.Context, log logr.
 		return network, nil
 	}
 
+	fmt.Println("No network found for providerID, creating a new one")
 	log.V(1).Info("No network found for providerID, creating a new one")
 	network = &networkingv1alpha1.Network{
 		ObjectMeta: metav1.ObjectMeta{
