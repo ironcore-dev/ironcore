@@ -129,6 +129,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketSpec":                      schema_ironcore_api_storage_v1alpha1_BucketSpec(ref),
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketStatus":                    schema_ironcore_api_storage_v1alpha1_BucketStatus(ref),
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketTemplateSpec":              schema_ironcore_api_storage_v1alpha1_BucketTemplateSpec(ref),
+		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.EphemeralVolumeSpec":             schema_ironcore_api_storage_v1alpha1_EphemeralVolumeSpec(ref),
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.Volume":                          schema_ironcore_api_storage_v1alpha1_Volume(ref),
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeAccess":                    schema_ironcore_api_storage_v1alpha1_VolumeAccess(ref),
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeClass":                     schema_ironcore_api_storage_v1alpha1_VolumeClass(ref),
@@ -5176,6 +5177,115 @@ func schema_ironcore_api_storage_v1alpha1_BucketTemplateSpec(ref common.Referenc
 	}
 }
 
+func schema_ironcore_api_storage_v1alpha1_EphemeralVolumeSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"volumeClassRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "VolumeClassRef is the VolumeClass of a volume If empty, an external controller has to provision the volume.",
+							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
+						},
+					},
+					"volumePoolSelector": {
+						SchemaProps: spec.SchemaProps{
+							Description: "VolumePoolSelector selects a suitable VolumePoolRef by the given labels.",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"volumePoolRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "VolumePoolRef indicates which VolumePool to use for a volume. If unset, the scheduler will figure out a suitable VolumePoolRef.",
+							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
+						},
+					},
+					"claimRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ClaimRef is the reference to the claiming entity of the Volume.",
+							Ref:         ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference"),
+						},
+					},
+					"resources": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Resources is a description of the volume's resources and capacity.",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
+									},
+								},
+							},
+						},
+					},
+					"image": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Image is an optional image to bootstrap the volume with.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"imagePullSecretRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ImagePullSecretRef is an optional secret for pulling the image of a volume.",
+							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
+						},
+					},
+					"unclaimable": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Unclaimable marks the volume as unclaimable.",
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
+					"tolerations": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Tolerations define tolerations the Volume has. Only any VolumePool whose taints covered by Tolerations will be considered to host the Volume.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.Toleration"),
+									},
+								},
+							},
+						},
+					},
+					"encryption": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Encryption is an optional field which provides attributes to encrypt Volume.",
+							Ref:         ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeEncryption"),
+						},
+					},
+					"reclaimpolicy": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ReclaimPolicy defines the strategy for the corresponding volume resource after its managing resource has been deleted",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference", "github.com/ironcore-dev/ironcore/api/common/v1alpha1.Toleration", "github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeEncryption", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/api/resource.Quantity"},
+	}
+}
+
 func schema_ironcore_api_storage_v1alpha1_Volume(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -5951,14 +6061,14 @@ func schema_ironcore_api_storage_v1alpha1_VolumeTemplateSpec(ref common.Referenc
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSpec"),
+							Ref:     ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.EphemeralVolumeSpec"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.EphemeralVolumeSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 

@@ -36,6 +36,10 @@ func IsDefaultEphemeralControlledBy(o metav1.Object, owner metav1.Object) bool {
 	return metav1.IsControlledBy(o, owner) && IsEphemeralManagedBy(o, commonv1alpha1.DefaultEphemeralManager)
 }
 
+func IsDefaultEphemeralOrControlledBy(o metav1.Object, owner metav1.Object) bool {
+	return metav1.IsControlledBy(o, owner) || IsEphemeralManagedBy(o, commonv1alpha1.DefaultEphemeralManager)
+}
+
 func SetDefaultEphemeralManagedBy(o metav1.Object) {
 	metautils.SetAnnotation(o, commonv1alpha1.EphemeralManagedByAnnotation, commonv1alpha1.DefaultEphemeralManager)
 }
