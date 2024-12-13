@@ -11,7 +11,7 @@ import (
 	metav1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// NetworkPolicySpecApplyConfiguration represents an declarative configuration of the NetworkPolicySpec type for use
+// NetworkPolicySpecApplyConfiguration represents a declarative configuration of the NetworkPolicySpec type for use
 // with apply.
 type NetworkPolicySpecApplyConfiguration struct {
 	NetworkRef               *v1.LocalObjectReference                     `json:"networkRef,omitempty"`
@@ -21,7 +21,7 @@ type NetworkPolicySpecApplyConfiguration struct {
 	PolicyTypes              []networkingv1alpha1.PolicyType              `json:"policyTypes,omitempty"`
 }
 
-// NetworkPolicySpecApplyConfiguration constructs an declarative configuration of the NetworkPolicySpec type for use with
+// NetworkPolicySpecApplyConfiguration constructs a declarative configuration of the NetworkPolicySpec type for use with
 // apply.
 func NetworkPolicySpec() *NetworkPolicySpecApplyConfiguration {
 	return &NetworkPolicySpecApplyConfiguration{}

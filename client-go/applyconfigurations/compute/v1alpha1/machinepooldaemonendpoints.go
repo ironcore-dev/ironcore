@@ -5,13 +5,13 @@
 
 package v1alpha1
 
-// MachinePoolDaemonEndpointsApplyConfiguration represents an declarative configuration of the MachinePoolDaemonEndpoints type for use
+// MachinePoolDaemonEndpointsApplyConfiguration represents a declarative configuration of the MachinePoolDaemonEndpoints type for use
 // with apply.
 type MachinePoolDaemonEndpointsApplyConfiguration struct {
 	MachinepoolletEndpoint *DaemonEndpointApplyConfiguration `json:"machinepoolletEndpoint,omitempty"`
 }
 
-// MachinePoolDaemonEndpointsApplyConfiguration constructs an declarative configuration of the MachinePoolDaemonEndpoints type for use with
+// MachinePoolDaemonEndpointsApplyConfiguration constructs a declarative configuration of the MachinePoolDaemonEndpoints type for use with
 // apply.
 func MachinePoolDaemonEndpoints() *MachinePoolDaemonEndpointsApplyConfiguration {
 	return &MachinePoolDaemonEndpointsApplyConfiguration{}

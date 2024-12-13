@@ -14,7 +14,7 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// BucketApplyConfiguration represents an declarative configuration of the Bucket type for use
+// BucketApplyConfiguration represents a declarative configuration of the Bucket type for use
 // with apply.
 type BucketApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -23,7 +23,7 @@ type BucketApplyConfiguration struct {
 	Status                           *BucketStatusApplyConfiguration `json:"status,omitempty"`
 }
 
-// Bucket constructs an declarative configuration of the Bucket type for use with
+// Bucket constructs a declarative configuration of the Bucket type for use with
 // apply.
 func Bucket(name, namespace string) *BucketApplyConfiguration {
 	b := &BucketApplyConfiguration{}
@@ -242,4 +242,10 @@ func (b *BucketApplyConfiguration) WithSpec(value *BucketSpecApplyConfiguration)
 func (b *BucketApplyConfiguration) WithStatus(value *BucketStatusApplyConfiguration) *BucketApplyConfiguration {
 	b.Status = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *BucketApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

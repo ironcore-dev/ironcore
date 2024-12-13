@@ -10,7 +10,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// NetworkInterfaceSpecApplyConfiguration represents an declarative configuration of the NetworkInterfaceSpec type for use
+// NetworkInterfaceSpecApplyConfiguration represents a declarative configuration of the NetworkInterfaceSpec type for use
 // with apply.
 type NetworkInterfaceSpecApplyConfiguration struct {
 	ProviderID *string                            `json:"providerID,omitempty"`
@@ -23,7 +23,7 @@ type NetworkInterfaceSpecApplyConfiguration struct {
 	Attributes map[string]string                  `json:"attributes,omitempty"`
 }
 
-// NetworkInterfaceSpecApplyConfiguration constructs an declarative configuration of the NetworkInterfaceSpec type for use with
+// NetworkInterfaceSpecApplyConfiguration constructs a declarative configuration of the NetworkInterfaceSpec type for use with
 // apply.
 func NetworkInterfaceSpec() *NetworkInterfaceSpecApplyConfiguration {
 	return &NetworkInterfaceSpecApplyConfiguration{}

@@ -9,7 +9,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// LoadBalancerPortApplyConfiguration represents an declarative configuration of the LoadBalancerPort type for use
+// LoadBalancerPortApplyConfiguration represents a declarative configuration of the LoadBalancerPort type for use
 // with apply.
 type LoadBalancerPortApplyConfiguration struct {
 	Protocol *v1.Protocol `json:"protocol,omitempty"`
@@ -17,7 +17,7 @@ type LoadBalancerPortApplyConfiguration struct {
 	EndPort  *int32       `json:"endPort,omitempty"`
 }
 
-// LoadBalancerPortApplyConfiguration constructs an declarative configuration of the LoadBalancerPort type for use with
+// LoadBalancerPortApplyConfiguration constructs a declarative configuration of the LoadBalancerPort type for use with
 // apply.
 func LoadBalancerPort() *LoadBalancerPortApplyConfiguration {
 	return &LoadBalancerPortApplyConfiguration{}

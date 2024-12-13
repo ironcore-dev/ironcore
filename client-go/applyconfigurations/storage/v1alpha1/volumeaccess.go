@@ -9,7 +9,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// VolumeAccessApplyConfiguration represents an declarative configuration of the VolumeAccess type for use
+// VolumeAccessApplyConfiguration represents a declarative configuration of the VolumeAccess type for use
 // with apply.
 type VolumeAccessApplyConfiguration struct {
 	SecretRef        *v1.LocalObjectReference `json:"secretRef,omitempty"`
@@ -18,7 +18,7 @@ type VolumeAccessApplyConfiguration struct {
 	VolumeAttributes map[string]string        `json:"volumeAttributes,omitempty"`
 }
 
-// VolumeAccessApplyConfiguration constructs an declarative configuration of the VolumeAccess type for use with
+// VolumeAccessApplyConfiguration constructs a declarative configuration of the VolumeAccess type for use with
 // apply.
 func VolumeAccess() *VolumeAccessApplyConfiguration {
 	return &VolumeAccessApplyConfiguration{}

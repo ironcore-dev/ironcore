@@ -30,20 +30,22 @@ var machinepoolsKind = v1alpha1.SchemeGroupVersion.WithKind("MachinePool")
 
 // Get takes name of the machinePool, and returns the corresponding machinePool object, and an error if there is any.
 func (c *FakeMachinePools) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.MachinePool, err error) {
+	emptyResult := &v1alpha1.MachinePool{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootGetAction(machinepoolsResource, name), &v1alpha1.MachinePool{})
+		Invokes(testing.NewRootGetActionWithOptions(machinepoolsResource, name, options), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.MachinePool), err
 }
 
 // List takes label and field selectors, and returns the list of MachinePools that match those selectors.
 func (c *FakeMachinePools) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.MachinePoolList, err error) {
+	emptyResult := &v1alpha1.MachinePoolList{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootListAction(machinepoolsResource, machinepoolsKind, opts), &v1alpha1.MachinePoolList{})
+		Invokes(testing.NewRootListActionWithOptions(machinepoolsResource, machinepoolsKind, opts), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 
 	label, _, _ := testing.ExtractFromListOptions(opts)
@@ -62,36 +64,39 @@ func (c *FakeMachinePools) List(ctx context.Context, opts v1.ListOptions) (resul
 // Watch returns a watch.Interface that watches the requested machinePools.
 func (c *FakeMachinePools) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewRootWatchAction(machinepoolsResource, opts))
+		InvokesWatch(testing.NewRootWatchActionWithOptions(machinepoolsResource, opts))
 }
 
 // Create takes the representation of a machinePool and creates it.  Returns the server's representation of the machinePool, and an error, if there is any.
 func (c *FakeMachinePools) Create(ctx context.Context, machinePool *v1alpha1.MachinePool, opts v1.CreateOptions) (result *v1alpha1.MachinePool, err error) {
+	emptyResult := &v1alpha1.MachinePool{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootCreateAction(machinepoolsResource, machinePool), &v1alpha1.MachinePool{})
+		Invokes(testing.NewRootCreateActionWithOptions(machinepoolsResource, machinePool, opts), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.MachinePool), err
 }
 
 // Update takes the representation of a machinePool and updates it. Returns the server's representation of the machinePool, and an error, if there is any.
 func (c *FakeMachinePools) Update(ctx context.Context, machinePool *v1alpha1.MachinePool, opts v1.UpdateOptions) (result *v1alpha1.MachinePool, err error) {
+	emptyResult := &v1alpha1.MachinePool{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootUpdateAction(machinepoolsResource, machinePool), &v1alpha1.MachinePool{})
+		Invokes(testing.NewRootUpdateActionWithOptions(machinepoolsResource, machinePool, opts), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.MachinePool), err
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeMachinePools) UpdateStatus(ctx context.Context, machinePool *v1alpha1.MachinePool, opts v1.UpdateOptions) (*v1alpha1.MachinePool, error) {
+func (c *FakeMachinePools) UpdateStatus(ctx context.Context, machinePool *v1alpha1.MachinePool, opts v1.UpdateOptions) (result *v1alpha1.MachinePool, err error) {
+	emptyResult := &v1alpha1.MachinePool{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootUpdateSubresourceAction(machinepoolsResource, "status", machinePool), &v1alpha1.MachinePool{})
+		Invokes(testing.NewRootUpdateSubresourceActionWithOptions(machinepoolsResource, "status", machinePool, opts), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.MachinePool), err
 }
@@ -105,7 +110,7 @@ func (c *FakeMachinePools) Delete(ctx context.Context, name string, opts v1.Dele
 
 // DeleteCollection deletes a collection of objects.
 func (c *FakeMachinePools) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewRootDeleteCollectionAction(machinepoolsResource, listOpts)
+	action := testing.NewRootDeleteCollectionActionWithOptions(machinepoolsResource, opts, listOpts)
 
 	_, err := c.Fake.Invokes(action, &v1alpha1.MachinePoolList{})
 	return err
@@ -113,10 +118,11 @@ func (c *FakeMachinePools) DeleteCollection(ctx context.Context, opts v1.DeleteO
 
 // Patch applies the patch and returns the patched machinePool.
 func (c *FakeMachinePools) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.MachinePool, err error) {
+	emptyResult := &v1alpha1.MachinePool{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceAction(machinepoolsResource, name, pt, data, subresources...), &v1alpha1.MachinePool{})
+		Invokes(testing.NewRootPatchSubresourceActionWithOptions(machinepoolsResource, name, pt, data, opts, subresources...), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.MachinePool), err
 }
@@ -134,10 +140,11 @@ func (c *FakeMachinePools) Apply(ctx context.Context, machinePool *computev1alph
 	if name == nil {
 		return nil, fmt.Errorf("machinePool.Name must be provided to Apply")
 	}
+	emptyResult := &v1alpha1.MachinePool{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceAction(machinepoolsResource, *name, types.ApplyPatchType, data), &v1alpha1.MachinePool{})
+		Invokes(testing.NewRootPatchSubresourceActionWithOptions(machinepoolsResource, *name, types.ApplyPatchType, data, opts.ToPatchOptions()), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.MachinePool), err
 }
@@ -156,10 +163,11 @@ func (c *FakeMachinePools) ApplyStatus(ctx context.Context, machinePool *compute
 	if name == nil {
 		return nil, fmt.Errorf("machinePool.Name must be provided to Apply")
 	}
+	emptyResult := &v1alpha1.MachinePool{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceAction(machinepoolsResource, *name, types.ApplyPatchType, data, "status"), &v1alpha1.MachinePool{})
+		Invokes(testing.NewRootPatchSubresourceActionWithOptions(machinepoolsResource, *name, types.ApplyPatchType, data, opts.ToPatchOptions(), "status"), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.MachinePool), err
 }

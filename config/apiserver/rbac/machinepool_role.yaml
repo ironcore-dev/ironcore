@@ -72,6 +72,7 @@ rules:
   - compute.ironcore.dev
   resources:
   - machinepools/status
+  - machines/status
   verbs:
   - get
   - patch
@@ -91,14 +92,6 @@ rules:
   resources:
   - machines/finalizers
   verbs:
-  - update
-- apiGroups:
-  - compute.ironcore.dev
-  resources:
-  - machines/status
-  verbs:
-  - get
-  - patch
   - update
 - apiGroups:
   - ipam.ironcore.dev

@@ -9,14 +9,14 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// ObjectSelectorApplyConfiguration represents an declarative configuration of the ObjectSelector type for use
+// ObjectSelectorApplyConfiguration represents a declarative configuration of the ObjectSelector type for use
 // with apply.
 type ObjectSelectorApplyConfiguration struct {
 	Kind                               *string `json:"kind,omitempty"`
 	v1.LabelSelectorApplyConfiguration `json:",inline"`
 }
 
-// ObjectSelectorApplyConfiguration constructs an declarative configuration of the ObjectSelector type for use with
+// ObjectSelectorApplyConfiguration constructs a declarative configuration of the ObjectSelector type for use with
 // apply.
 func ObjectSelector() *ObjectSelectorApplyConfiguration {
 	return &ObjectSelectorApplyConfiguration{}

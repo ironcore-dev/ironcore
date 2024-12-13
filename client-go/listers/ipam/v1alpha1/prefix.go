@@ -7,8 +7,8 @@ package v1alpha1
 
 import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
-	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/listers"
 	"k8s.io/client-go/tools/cache"
 )
 
@@ -25,25 +25,17 @@ type PrefixLister interface {
 
 // prefixLister implements the PrefixLister interface.
 type prefixLister struct {
-	indexer cache.Indexer
+	listers.ResourceIndexer[*v1alpha1.Prefix]
 }
 
 // NewPrefixLister returns a new PrefixLister.
 func NewPrefixLister(indexer cache.Indexer) PrefixLister {
-	return &prefixLister{indexer: indexer}
-}
-
-// List lists all Prefixes in the indexer.
-func (s *prefixLister) List(selector labels.Selector) (ret []*v1alpha1.Prefix, err error) {
-	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.Prefix))
-	})
-	return ret, err
+	return &prefixLister{listers.New[*v1alpha1.Prefix](indexer, v1alpha1.Resource("prefix"))}
 }
 
 // Prefixes returns an object that can list and get Prefixes.
 func (s *prefixLister) Prefixes(namespace string) PrefixNamespaceLister {
-	return prefixNamespaceLister{indexer: s.indexer, namespace: namespace}
+	return prefixNamespaceLister{listers.NewNamespaced[*v1alpha1.Prefix](s.ResourceIndexer, namespace)}
 }
 
 // PrefixNamespaceLister helps list and get Prefixes.
@@ -61,26 +53,5 @@ type PrefixNamespaceLister interface {
 // prefixNamespaceLister implements the PrefixNamespaceLister
 // interface.
 type prefixNamespaceLister struct {
-	indexer   cache.Indexer
-	namespace string
-}
-
-// List lists all Prefixes in the indexer for a given namespace.
-func (s prefixNamespaceLister) List(selector labels.Selector) (ret []*v1alpha1.Prefix, err error) {
-	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.Prefix))
-	})
-	return ret, err
-}
-
-// Get retrieves the Prefix from the indexer for a given namespace and name.
-func (s prefixNamespaceLister) Get(name string) (*v1alpha1.Prefix, error) {
-	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("prefix"), name)
-	}
-	return obj.(*v1alpha1.Prefix), nil
+	listers.ResourceIndexer[*v1alpha1.Prefix]
 }

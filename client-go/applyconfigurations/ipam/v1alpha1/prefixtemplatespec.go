@@ -11,14 +11,14 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// PrefixTemplateSpecApplyConfiguration represents an declarative configuration of the PrefixTemplateSpec type for use
+// PrefixTemplateSpecApplyConfiguration represents a declarative configuration of the PrefixTemplateSpec type for use
 // with apply.
 type PrefixTemplateSpecApplyConfiguration struct {
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *PrefixSpecApplyConfiguration `json:"spec,omitempty"`
 }
 
-// PrefixTemplateSpecApplyConfiguration constructs an declarative configuration of the PrefixTemplateSpec type for use with
+// PrefixTemplateSpecApplyConfiguration constructs a declarative configuration of the PrefixTemplateSpec type for use with
 // apply.
 func PrefixTemplateSpec() *PrefixTemplateSpecApplyConfiguration {
 	return &PrefixTemplateSpecApplyConfiguration{}
@@ -172,4 +172,10 @@ func (b *PrefixTemplateSpecApplyConfiguration) ensureObjectMetaApplyConfiguratio
 func (b *PrefixTemplateSpecApplyConfiguration) WithSpec(value *PrefixSpecApplyConfiguration) *PrefixTemplateSpecApplyConfiguration {
 	b.Spec = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *PrefixTemplateSpecApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

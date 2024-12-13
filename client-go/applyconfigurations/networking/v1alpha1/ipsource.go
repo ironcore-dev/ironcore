@@ -9,14 +9,14 @@ import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 )
 
-// IPSourceApplyConfiguration represents an declarative configuration of the IPSource type for use
+// IPSourceApplyConfiguration represents a declarative configuration of the IPSource type for use
 // with apply.
 type IPSourceApplyConfiguration struct {
 	Value     *v1alpha1.IP                             `json:"value,omitempty"`
 	Ephemeral *EphemeralPrefixSourceApplyConfiguration `json:"ephemeral,omitempty"`
 }
 
-// IPSourceApplyConfiguration constructs an declarative configuration of the IPSource type for use with
+// IPSourceApplyConfiguration constructs a declarative configuration of the IPSource type for use with
 // apply.
 func IPSource() *IPSourceApplyConfiguration {
 	return &IPSourceApplyConfiguration{}

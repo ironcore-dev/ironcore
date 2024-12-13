@@ -7,8 +7,8 @@ package v1alpha1
 
 import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/listers"
 	"k8s.io/client-go/tools/cache"
 )
 
@@ -26,30 +26,10 @@ type VolumeClassLister interface {
 
 // volumeClassLister implements the VolumeClassLister interface.
 type volumeClassLister struct {
-	indexer cache.Indexer
+	listers.ResourceIndexer[*v1alpha1.VolumeClass]
 }
 
 // NewVolumeClassLister returns a new VolumeClassLister.
 func NewVolumeClassLister(indexer cache.Indexer) VolumeClassLister {
-	return &volumeClassLister{indexer: indexer}
-}
-
-// List lists all VolumeClasses in the indexer.
-func (s *volumeClassLister) List(selector labels.Selector) (ret []*v1alpha1.VolumeClass, err error) {
-	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.VolumeClass))
-	})
-	return ret, err
-}
-
-// Get retrieves the VolumeClass from the index for a given name.
-func (s *volumeClassLister) Get(name string) (*v1alpha1.VolumeClass, error) {
-	obj, exists, err := s.indexer.GetByKey(name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("volumeclass"), name)
-	}
-	return obj.(*v1alpha1.VolumeClass), nil
+	return &volumeClassLister{listers.New[*v1alpha1.VolumeClass](indexer, v1alpha1.Resource("volumeclass"))}
 }

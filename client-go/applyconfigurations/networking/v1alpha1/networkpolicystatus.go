@@ -5,13 +5,13 @@
 
 package v1alpha1
 
-// NetworkPolicyStatusApplyConfiguration represents an declarative configuration of the NetworkPolicyStatus type for use
+// NetworkPolicyStatusApplyConfiguration represents a declarative configuration of the NetworkPolicyStatus type for use
 // with apply.
 type NetworkPolicyStatusApplyConfiguration struct {
 	Conditions []NetworkPolicyConditionApplyConfiguration `json:"conditions,omitempty"`
 }
 
-// NetworkPolicyStatusApplyConfiguration constructs an declarative configuration of the NetworkPolicyStatus type for use with
+// NetworkPolicyStatusApplyConfiguration constructs a declarative configuration of the NetworkPolicyStatus type for use with
 // apply.
 func NetworkPolicyStatus() *NetworkPolicyStatusApplyConfiguration {
 	return &NetworkPolicyStatusApplyConfiguration{}

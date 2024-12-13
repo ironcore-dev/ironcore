@@ -10,7 +10,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// VolumeStatusApplyConfiguration represents an declarative configuration of the VolumeStatus type for use
+// VolumeStatusApplyConfiguration represents a declarative configuration of the VolumeStatus type for use
 // with apply.
 type VolumeStatusApplyConfiguration struct {
 	State                   *v1alpha1.VolumeState               `json:"state,omitempty"`
@@ -19,7 +19,7 @@ type VolumeStatusApplyConfiguration struct {
 	Conditions              []VolumeConditionApplyConfiguration `json:"conditions,omitempty"`
 }
 
-// VolumeStatusApplyConfiguration constructs an declarative configuration of the VolumeStatus type for use with
+// VolumeStatusApplyConfiguration constructs a declarative configuration of the VolumeStatus type for use with
 // apply.
 func VolumeStatus() *VolumeStatusApplyConfiguration {
 	return &VolumeStatusApplyConfiguration{}

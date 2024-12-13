@@ -73,6 +73,7 @@ rules:
   - compute.ironcore.dev
   resources:
   - machineclasses/status
+  - machines/status
   verbs:
   - get
   - patch
@@ -95,14 +96,6 @@ rules:
   - patch
   - update
   - watch
-- apiGroups:
-  - compute.ironcore.dev
-  resources:
-  - machines/status
-  verbs:
-  - get
-  - patch
-  - update
 - apiGroups:
   - core.ironcore.dev
   resources:
@@ -133,25 +126,6 @@ rules:
   - ipam.ironcore.dev
   resources:
   - prefixallocations
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - ipam.ironcore.dev
-  resources:
-  - prefixallocations/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - ipam.ironcore.dev
-  resources:
   - prefixes
   verbs:
   - create
@@ -164,33 +138,26 @@ rules:
 - apiGroups:
   - ipam.ironcore.dev
   resources:
-  - prefixes/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - ipam.ironcore.dev
-  resources:
+  - prefixallocations/status
   - prefixes/status
   verbs:
   - get
   - patch
   - update
 - apiGroups:
-  - networking.ironcore.dev
+  - ipam.ironcore.dev
   resources:
-  - loadbalancerroutings
+  - prefixes/finalizers
   verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
   - update
-  - watch
 - apiGroups:
   - networking.ironcore.dev
   resources:
+  - loadbalancerroutings
   - loadbalancers
+  - networkinterfaces
+  - networks
+  - virtualips
   verbs:
   - create
   - delete
@@ -203,12 +170,14 @@ rules:
   - networking.ironcore.dev
   resources:
   - loadbalancers/finalizers
+  - networks/finalizers
   verbs:
   - update
 - apiGroups:
   - networking.ironcore.dev
   resources:
   - loadbalancers/status
+  - networks/status
   verbs:
   - get
   - patch
@@ -222,59 +191,11 @@ rules:
   - list
   - watch
 - apiGroups:
-  - networking.ironcore.dev
-  resources:
-  - networkinterfaces
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - networking.ironcore.dev
-  resources:
-  - networks
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - networking.ironcore.dev
-  resources:
-  - networks/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - networking.ironcore.dev
-  resources:
-  - networks/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - networking.ironcore.dev
-  resources:
-  - virtualips
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
   - storage.ironcore.dev
   resources:
   - bucketclasses
+  - volumeclasses
+  - volumes
   verbs:
   - create
   - delete
@@ -287,12 +208,16 @@ rules:
   - storage.ironcore.dev
   resources:
   - bucketclasses/finalizers
+  - volumeclasses/finalizers
   verbs:
   - update
 - apiGroups:
   - storage.ironcore.dev
   resources:
   - bucketclasses/status
+  - buckets/status
+  - volumeclasses/status
+  - volumes/status
   verbs:
   - get
   - patch
@@ -301,6 +226,7 @@ rules:
   - storage.ironcore.dev
   resources:
   - bucketpools
+  - volumepools
   verbs:
   - get
   - list
@@ -315,65 +241,3 @@ rules:
   - patch
   - update
   - watch
-- apiGroups:
-  - storage.ironcore.dev
-  resources:
-  - buckets/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - storage.ironcore.dev
-  resources:
-  - volumeclasses
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - storage.ironcore.dev
-  resources:
-  - volumeclasses/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - storage.ironcore.dev
-  resources:
-  - volumeclasses/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - storage.ironcore.dev
-  resources:
-  - volumepools
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - storage.ironcore.dev
-  resources:
-  - volumes
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - storage.ironcore.dev
-  resources:
-  - volumes/status
-  verbs:
-  - get
-  - patch
-  - update

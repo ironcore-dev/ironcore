@@ -9,14 +9,14 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// NetworkInterfaceSourceApplyConfiguration represents an declarative configuration of the NetworkInterfaceSource type for use
+// NetworkInterfaceSourceApplyConfiguration represents a declarative configuration of the NetworkInterfaceSource type for use
 // with apply.
 type NetworkInterfaceSourceApplyConfiguration struct {
 	NetworkInterfaceRef *v1.LocalObjectReference                           `json:"networkInterfaceRef,omitempty"`
 	Ephemeral           *EphemeralNetworkInterfaceSourceApplyConfiguration `json:"ephemeral,omitempty"`
 }
 
-// NetworkInterfaceSourceApplyConfiguration constructs an declarative configuration of the NetworkInterfaceSource type for use with
+// NetworkInterfaceSourceApplyConfiguration constructs a declarative configuration of the NetworkInterfaceSource type for use with
 // apply.
 func NetworkInterfaceSource() *NetworkInterfaceSourceApplyConfiguration {
 	return &NetworkInterfaceSourceApplyConfiguration{}

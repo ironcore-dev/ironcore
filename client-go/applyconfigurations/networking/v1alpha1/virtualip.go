@@ -14,7 +14,7 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// VirtualIPApplyConfiguration represents an declarative configuration of the VirtualIP type for use
+// VirtualIPApplyConfiguration represents a declarative configuration of the VirtualIP type for use
 // with apply.
 type VirtualIPApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -23,7 +23,7 @@ type VirtualIPApplyConfiguration struct {
 	Status                           *VirtualIPStatusApplyConfiguration `json:"status,omitempty"`
 }
 
-// VirtualIP constructs an declarative configuration of the VirtualIP type for use with
+// VirtualIP constructs a declarative configuration of the VirtualIP type for use with
 // apply.
 func VirtualIP(name, namespace string) *VirtualIPApplyConfiguration {
 	b := &VirtualIPApplyConfiguration{}
@@ -242,4 +242,10 @@ func (b *VirtualIPApplyConfiguration) WithSpec(value *VirtualIPSpecApplyConfigur
 func (b *VirtualIPApplyConfiguration) WithStatus(value *VirtualIPStatusApplyConfiguration) *VirtualIPApplyConfiguration {
 	b.Status = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *VirtualIPApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

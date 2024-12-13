@@ -9,14 +9,14 @@ import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 )
 
-// VolumePoolSpecApplyConfiguration represents an declarative configuration of the VolumePoolSpec type for use
+// VolumePoolSpecApplyConfiguration represents a declarative configuration of the VolumePoolSpec type for use
 // with apply.
 type VolumePoolSpecApplyConfiguration struct {
 	ProviderID *string          `json:"providerID,omitempty"`
 	Taints     []v1alpha1.Taint `json:"taints,omitempty"`
 }
 
-// VolumePoolSpecApplyConfiguration constructs an declarative configuration of the VolumePoolSpec type for use with
+// VolumePoolSpecApplyConfiguration constructs a declarative configuration of the VolumePoolSpec type for use with
 // apply.
 func VolumePoolSpec() *VolumePoolSpecApplyConfiguration {
 	return &VolumePoolSpecApplyConfiguration{}

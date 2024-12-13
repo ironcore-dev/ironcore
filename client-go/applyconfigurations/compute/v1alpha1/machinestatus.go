@@ -9,7 +9,7 @@ import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 )
 
-// MachineStatusApplyConfiguration represents an declarative configuration of the MachineStatus type for use
+// MachineStatusApplyConfiguration represents a declarative configuration of the MachineStatus type for use
 // with apply.
 type MachineStatusApplyConfiguration struct {
 	MachineID          *string                                    `json:"machineID,omitempty"`
@@ -19,7 +19,7 @@ type MachineStatusApplyConfiguration struct {
 	Volumes            []VolumeStatusApplyConfiguration           `json:"volumes,omitempty"`
 }
 
-// MachineStatusApplyConfiguration constructs an declarative configuration of the MachineStatus type for use with
+// MachineStatusApplyConfiguration constructs a declarative configuration of the MachineStatus type for use with
 // apply.
 func MachineStatus() *MachineStatusApplyConfiguration {
 	return &MachineStatusApplyConfiguration{}

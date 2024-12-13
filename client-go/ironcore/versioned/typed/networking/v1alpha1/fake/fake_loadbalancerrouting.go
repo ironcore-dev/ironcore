@@ -31,22 +31,24 @@ var loadbalancerroutingsKind = v1alpha1.SchemeGroupVersion.WithKind("LoadBalance
 
 // Get takes name of the loadBalancerRouting, and returns the corresponding loadBalancerRouting object, and an error if there is any.
 func (c *FakeLoadBalancerRoutings) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.LoadBalancerRouting, err error) {
+	emptyResult := &v1alpha1.LoadBalancerRouting{}
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(loadbalancerroutingsResource, c.ns, name), &v1alpha1.LoadBalancerRouting{})
+		Invokes(testing.NewGetActionWithOptions(loadbalancerroutingsResource, c.ns, name, options), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.LoadBalancerRouting), err
 }
 
 // List takes label and field selectors, and returns the list of LoadBalancerRoutings that match those selectors.
 func (c *FakeLoadBalancerRoutings) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.LoadBalancerRoutingList, err error) {
+	emptyResult := &v1alpha1.LoadBalancerRoutingList{}
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(loadbalancerroutingsResource, loadbalancerroutingsKind, c.ns, opts), &v1alpha1.LoadBalancerRoutingList{})
+		Invokes(testing.NewListActionWithOptions(loadbalancerroutingsResource, loadbalancerroutingsKind, c.ns, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 
 	label, _, _ := testing.ExtractFromListOptions(opts)
@@ -65,28 +67,30 @@ func (c *FakeLoadBalancerRoutings) List(ctx context.Context, opts v1.ListOptions
 // Watch returns a watch.Interface that watches the requested loadBalancerRoutings.
 func (c *FakeLoadBalancerRoutings) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewWatchAction(loadbalancerroutingsResource, c.ns, opts))
+		InvokesWatch(testing.NewWatchActionWithOptions(loadbalancerroutingsResource, c.ns, opts))
 
 }
 
 // Create takes the representation of a loadBalancerRouting and creates it.  Returns the server's representation of the loadBalancerRouting, and an error, if there is any.
 func (c *FakeLoadBalancerRoutings) Create(ctx context.Context, loadBalancerRouting *v1alpha1.LoadBalancerRouting, opts v1.CreateOptions) (result *v1alpha1.LoadBalancerRouting, err error) {
+	emptyResult := &v1alpha1.LoadBalancerRouting{}
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(loadbalancerroutingsResource, c.ns, loadBalancerRouting), &v1alpha1.LoadBalancerRouting{})
+		Invokes(testing.NewCreateActionWithOptions(loadbalancerroutingsResource, c.ns, loadBalancerRouting, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.LoadBalancerRouting), err
 }
 
 // Update takes the representation of a loadBalancerRouting and updates it. Returns the server's representation of the loadBalancerRouting, and an error, if there is any.
 func (c *FakeLoadBalancerRoutings) Update(ctx context.Context, loadBalancerRouting *v1alpha1.LoadBalancerRouting, opts v1.UpdateOptions) (result *v1alpha1.LoadBalancerRouting, err error) {
+	emptyResult := &v1alpha1.LoadBalancerRouting{}
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(loadbalancerroutingsResource, c.ns, loadBalancerRouting), &v1alpha1.LoadBalancerRouting{})
+		Invokes(testing.NewUpdateActionWithOptions(loadbalancerroutingsResource, c.ns, loadBalancerRouting, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.LoadBalancerRouting), err
 }
@@ -101,7 +105,7 @@ func (c *FakeLoadBalancerRoutings) Delete(ctx context.Context, name string, opts
 
 // DeleteCollection deletes a collection of objects.
 func (c *FakeLoadBalancerRoutings) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(loadbalancerroutingsResource, c.ns, listOpts)
+	action := testing.NewDeleteCollectionActionWithOptions(loadbalancerroutingsResource, c.ns, opts, listOpts)
 
 	_, err := c.Fake.Invokes(action, &v1alpha1.LoadBalancerRoutingList{})
 	return err
@@ -109,11 +113,12 @@ func (c *FakeLoadBalancerRoutings) DeleteCollection(ctx context.Context, opts v1
 
 // Patch applies the patch and returns the patched loadBalancerRouting.
 func (c *FakeLoadBalancerRoutings) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.LoadBalancerRouting, err error) {
+	emptyResult := &v1alpha1.LoadBalancerRouting{}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(loadbalancerroutingsResource, c.ns, name, pt, data, subresources...), &v1alpha1.LoadBalancerRouting{})
+		Invokes(testing.NewPatchSubresourceActionWithOptions(loadbalancerroutingsResource, c.ns, name, pt, data, opts, subresources...), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.LoadBalancerRouting), err
 }
@@ -131,11 +136,12 @@ func (c *FakeLoadBalancerRoutings) Apply(ctx context.Context, loadBalancerRoutin
 	if name == nil {
 		return nil, fmt.Errorf("loadBalancerRouting.Name must be provided to Apply")
 	}
+	emptyResult := &v1alpha1.LoadBalancerRouting{}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(loadbalancerroutingsResource, c.ns, *name, types.ApplyPatchType, data), &v1alpha1.LoadBalancerRouting{})
+		Invokes(testing.NewPatchSubresourceActionWithOptions(loadbalancerroutingsResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions()), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.LoadBalancerRouting), err
 }

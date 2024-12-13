@@ -9,13 +9,13 @@ import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 )
 
-// NATGatewayStatusApplyConfiguration represents an declarative configuration of the NATGatewayStatus type for use
+// NATGatewayStatusApplyConfiguration represents a declarative configuration of the NATGatewayStatus type for use
 // with apply.
 type NATGatewayStatusApplyConfiguration struct {
 	IPs []v1alpha1.IP `json:"ips,omitempty"`
 }
 
-// NATGatewayStatusApplyConfiguration constructs an declarative configuration of the NATGatewayStatus type for use with
+// NATGatewayStatusApplyConfiguration constructs a declarative configuration of the NATGatewayStatus type for use with
 // apply.
 func NATGatewayStatus() *NATGatewayStatusApplyConfiguration {
 	return &NATGatewayStatusApplyConfiguration{}

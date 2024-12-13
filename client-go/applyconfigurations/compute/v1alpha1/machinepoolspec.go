@@ -9,14 +9,14 @@ import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 )
 
-// MachinePoolSpecApplyConfiguration represents an declarative configuration of the MachinePoolSpec type for use
+// MachinePoolSpecApplyConfiguration represents a declarative configuration of the MachinePoolSpec type for use
 // with apply.
 type MachinePoolSpecApplyConfiguration struct {
 	ProviderID *string          `json:"providerID,omitempty"`
 	Taints     []v1alpha1.Taint `json:"taints,omitempty"`
 }
 
-// MachinePoolSpecApplyConfiguration constructs an declarative configuration of the MachinePoolSpec type for use with
+// MachinePoolSpecApplyConfiguration constructs a declarative configuration of the MachinePoolSpec type for use with
 // apply.
 func MachinePoolSpec() *MachinePoolSpecApplyConfiguration {
 	return &MachinePoolSpecApplyConfiguration{}

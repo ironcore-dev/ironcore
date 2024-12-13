@@ -11,7 +11,7 @@ import (
 	metav1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// PrefixSpecApplyConfiguration represents an declarative configuration of the PrefixSpec type for use
+// PrefixSpecApplyConfiguration represents a declarative configuration of the PrefixSpec type for use
 // with apply.
 type PrefixSpecApplyConfiguration struct {
 	IPFamily       *v1.IPFamily                            `json:"ipFamily,omitempty"`
@@ -21,7 +21,7 @@ type PrefixSpecApplyConfiguration struct {
 	ParentSelector *metav1.LabelSelectorApplyConfiguration `json:"parentSelector,omitempty"`
 }
 
-// PrefixSpecApplyConfiguration constructs an declarative configuration of the PrefixSpec type for use with
+// PrefixSpecApplyConfiguration constructs a declarative configuration of the PrefixSpec type for use with
 // apply.
 func PrefixSpec() *PrefixSpecApplyConfiguration {
 	return &PrefixSpecApplyConfiguration{}
