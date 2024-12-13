@@ -12,7 +12,6 @@ import (
 	ipamrest "github.com/ironcore-dev/ironcore/internal/registry/ipam/rest"
 	networkingrest "github.com/ironcore-dev/ironcore/internal/registry/networking/rest"
 	storagerest "github.com/ironcore-dev/ironcore/internal/registry/storage/rest"
-	"k8s.io/apimachinery/pkg/version"
 	"k8s.io/apiserver/pkg/registry/generic"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	serverstorage "k8s.io/apiserver/pkg/server/storage"
@@ -56,12 +55,6 @@ func (cfg *Config) Complete() CompletedConfig {
 		cfg.GenericConfig.Complete(),
 		&cfg.ExtraConfig,
 	}
-
-	c.GenericConfig.Version = &version.Info{
-		Major: "1",
-		Minor: "0",
-	}
-
 	return CompletedConfig{&c}
 }
 

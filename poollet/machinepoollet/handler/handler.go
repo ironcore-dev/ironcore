@@ -13,26 +13,26 @@ import (
 // EnqueueRequestForName enqueues a reconcile.Request for a name without namespace.
 type EnqueueRequestForName string
 
-func (e EnqueueRequestForName) enqueue(queue workqueue.RateLimitingInterface) {
+func (e EnqueueRequestForName) enqueue(queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 	queue.Add(reconcile.Request{NamespacedName: client.ObjectKey{Name: string(e)}})
 }
 
 // Create implements handler.EventHandler.
-func (e EnqueueRequestForName) Create(_ event.CreateEvent, queue workqueue.RateLimitingInterface) {
+func (e EnqueueRequestForName) Create(_ event.CreateEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 	e.enqueue(queue)
 }
 
 // Update implements handler.EventHandler.
-func (e EnqueueRequestForName) Update(_ event.UpdateEvent, queue workqueue.RateLimitingInterface) {
+func (e EnqueueRequestForName) Update(_ event.UpdateEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 	e.enqueue(queue)
 }
 
 // Delete implements handler.EventHandler.
-func (e EnqueueRequestForName) Delete(_ event.DeleteEvent, queue workqueue.RateLimitingInterface) {
+func (e EnqueueRequestForName) Delete(_ event.DeleteEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 	e.enqueue(queue)
 }
 
 // Generic implements handler.EventHandler.
-func (e EnqueueRequestForName) Generic(_ event.GenericEvent, queue workqueue.RateLimitingInterface) {
+func (e EnqueueRequestForName) Generic(_ event.GenericEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 	e.enqueue(queue)
 }

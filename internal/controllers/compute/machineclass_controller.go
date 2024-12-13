@@ -20,6 +20,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
 // MachineClassReconciler reconciles a MachineClassRef object
@@ -124,7 +125,7 @@ func (r *MachineClassReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Watches(
 			&computev1alpha1.Machine{},
 			handler.Funcs{
-				DeleteFunc: func(ctx context.Context, event event.DeleteEvent, queue workqueue.RateLimitingInterface) {
+				DeleteFunc: func(ctx context.Context, event event.DeleteEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 					machine := event.Object.(*computev1alpha1.Machine)
 					queue.Add(ctrl.Request{NamespacedName: types.NamespacedName{Name: machine.Spec.MachineClassRef.Name}})
 				},

@@ -41,6 +41,7 @@ import (
 	genericoptions "k8s.io/apiserver/pkg/server/options"
 	serverstorage "k8s.io/apiserver/pkg/server/storage"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
+	utilversion "k8s.io/apiserver/pkg/util/version"
 	netutils "k8s.io/utils/net"
 )
 
@@ -203,6 +204,8 @@ func (o *IronCoreAPIServerOptions) Config() (*apiserver.Config, error) {
 
 	serverConfig := genericapiserver.NewRecommendedConfig(api.Codecs)
 
+	serverConfig.EffectiveVersion = utilversion.NewEffectiveVersion("1.0")
+
 	serverConfig.OpenAPIConfig = genericapiserver.DefaultOpenAPIConfig(ironcoreopenapi.GetOpenAPIDefinitions, openapi.NewDefinitionNamer(api.Scheme))
 	serverConfig.OpenAPIConfig.Info.Title = "ironcore-api"
 	serverConfig.OpenAPIConfig.Info.Version = "0.1"
@@ -244,11 +247,11 @@ func (o *IronCoreAPIServerOptions) Run(ctx context.Context) error {
 		return err
 	}
 
-	server.GenericAPIServer.AddPostStartHookOrDie("start-ironcore-api-server-informers", func(context genericapiserver.PostStartHookContext) error {
-		config.GenericConfig.SharedInformerFactory.Start(context.StopCh)
-		o.SharedInformerFactory.Start(context.StopCh)
+	server.GenericAPIServer.AddPostStartHookOrDie("start-ironcore-api-server-informers", func(hookContext genericapiserver.PostStartHookContext) error {
+		config.GenericConfig.SharedInformerFactory.Start(hookContext.Context.Done())
+		o.SharedInformerFactory.Start(hookContext.Context.Done())
 		return nil
 	})
 
-	return server.GenericAPIServer.PrepareRun().Run(ctx.Done())
+	return server.GenericAPIServer.PrepareRun().RunWithContext(ctx)
 }

@@ -12,6 +12,7 @@ import (
 	"github.com/ironcore-dev/controller-utils/buildutils"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	computeclient "github.com/ironcore-dev/ironcore/internal/client/compute"
 	storageclient "github.com/ironcore-dev/ironcore/internal/client/storage"
 	"github.com/ironcore-dev/ironcore/internal/controllers/storage/scheduler"
@@ -21,11 +22,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/utils/lru"
+	"k8s.io/utils/ptr"
 	ctrl "sigs.k8s.io/controller-runtime"
+	ctrlconfig "sigs.k8s.io/controller-runtime/pkg/config"
 	"sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 	metricserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
-
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 
 	. "github.com/ironcore-dev/ironcore/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
@@ -118,6 +119,7 @@ var _ = BeforeSuite(func() {
 		Metrics: metricserver.Options{
 			BindAddress: "0",
 		},
+		Controller: ctrlconfig.Controller{SkipNameValidation: ptr.To(true)},
 	})
 	Expect(err).ToNot(HaveOccurred())
 
