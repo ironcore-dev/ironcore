@@ -1,0 +1,22 @@
+apiVersion: networking.ironcore.dev/v1alpha1
+kind: NetworkPolicy
+metadata:
+  name: my-networkpolicy
+spec:
+  networkRef:
+    name: network-sample
+  networkInterfaceSelector:
+    matchLabels:
+      nic: machine-sample2
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - objectSelector:
+        kind: NetworkInterface
+        matchLabels:
+          nic: machine-sample1
+    ports:
+    - endPort: 22
+      port: 22
+      protocol: TCP
