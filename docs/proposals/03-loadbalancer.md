@@ -1,7 +1,7 @@
 ---
 title: Network Loadbalancer
 
-oep-number: 3
+iep-number: 3
 
 creation-date: 2022-10-18
 
@@ -21,7 +21,7 @@ reviewers:
 
 ---
 
-# OEP-3: Network Loadbalancer
+# IEP-3: Network Loadbalancer
 
 ## Table of Contents
 
@@ -43,7 +43,7 @@ load balancers, since they can be used as a foundation for the higher level load
 
 ## Motivation
 
-A `VirtualIP` ([OEP-1](01-networking-integration.md#the-virtualip-type)) allows to expose a `NetworkInterface`
+A `VirtualIP` ([IEP-1](01-networking-integration.md#the-virtualip-type)) allows to expose a `NetworkInterface`
 with a stable public IP. Services running on a `Machine` using that `NetworkInterface` can be consumed this way.
 However, if the `Machine` or the service running on that `Machine` crashes, the service will have an outage.
 To be more resilient and to scale beyond single `NetworkInterface`s, a `LoadBalancer` allows targeting multiple
@@ -55,7 +55,7 @@ To be more resilient and to scale beyond single `NetworkInterface`s, a `LoadBala
 - Load balancers should allow specifying their IP stack (`IPv4` / `IPv6` / dual stack). Public IP addresses
   should be allocated according to the specified IP stack.
 - Load balancers should support multiple target `NetworkInterface`s (
-  see ([OEP-1](01-networking-integration.md#the-networkinterface-type))
+  see ([IEP-1](01-networking-integration.md#the-networkinterface-type))
 - The load balancer should dynamically watch for target `NetworkInterface`s.
 - All target `NetworkInterface`s must be in the same `Network`.
 - The load balancer should be able to filter unwanted traffic. The filtering must not alter the packages.
@@ -87,7 +87,7 @@ its `status.ips`.
 `ports` defines an allow list of which traffic should be handled by a `LoadBalancer`. A `port` consists of
 a `protocol`, `port` and an optional `portEnd` to support port range filtering.
 `networkRef` defines the target `Network` a `NetworkInterface` has to be in in order to be an eligible target
-for traffic forwarding (see [OEP-1](01-networking-integration.md#the-networkinterface-type)).
+for traffic forwarding (see [IEP-1](01-networking-integration.md#the-networkinterface-type)).
 
 [//]: # (@formatter:off)
 ```yaml

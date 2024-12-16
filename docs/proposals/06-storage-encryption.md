@@ -1,7 +1,7 @@
 ---
 title: Storage Encryption
 
-oep-number: 6
+iep-number: 6
 
 creation-date: 2023-01-03
 
@@ -20,7 +20,7 @@ reviewers:
 
 ---
 
-# OEP-6: Storage Encryption
+# IEP-6: Storage Encryption
 
 ## Table of Contents
 

@@ -1,7 +1,7 @@
 ---
 title: Machine Console Access
 
-oep-number: 2
+iep-number: 2
 
 creation-date: 2022-12-05
 
@@ -19,7 +19,7 @@ reviewers:
 
 ---
 
-# OEP-02: Machine Console Access
+# IEP-02: Machine Console Access
 
 ## Table of Contents
 

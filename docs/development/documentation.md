@@ -5,7 +5,7 @@ All documentation related content can be found in the `/docs` folder. New conten
 [MkDocs](https://www.mkdocs.org/) and [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) are then used to render the contents of the `/docs` folder to have a more user-friendly experience when browsing the projects' documentation.
 
 !!! note
-    One exception to the [common contribution process](/development/contribution/#steps-to-contribute) builds the `docs/api-reference` folder. The folder contains auto-generated CRD reference documentation of the project, no manual contributions should be applied as they will be overwritten in the next generation step.
+    One exception to the [common contribution process](contribution.md#steps-to-contribute) builds the `docs/api-reference` folder. The folder contains auto-generated CRD reference documentation of the project, no manual contributions should be applied as they will be overwritten in the next generation step.
     To read more: [Updating API Reference Documentation](#api-reference-documentation)  section.
 
 ## Requirements:
@@ -41,13 +41,9 @@ make clean-docs
 
 ## Writing Content
 
-### Abbreviations
-Abbreviations are defined centrally in the following file `/hack/docs/abbreviations.md`. In case you introduce any new abbreviation to your content, please make sure to add a corresponding entry there.
-Please include the statement `--8<-- "hack/docs/abbreviations.md"` at the end of each Markdown file. This will ensure that the abbreviation highlighting will work correctly.
-
 ## API Reference Documentation
 
-The [API reference documentation](/api-reference/overview/) contains auto-generated description from the CRD definition of the [ironcore](https://github.com/ironcore-dev/ironcore) project.
+The [API reference documentation](../api-reference/overview.md) contains auto-generated description from the CRD definition of the [ironcore](https://github.com/ironcore-dev/ironcore) project.
 We are using the [gen-crd-api-reference-docs](https://github.com/ahmetb/gen-crd-api-reference-docs) project to generate the content. Under the hood we are using `go generate` instructions defined in each version type `doc.go`.
 The needed instructions to generate documentation for the `core/v1alpha1` types are in the example below:
 
@@ -63,5 +59,3 @@ make docs
 
 !!! note
     The generated output should be part of your pull request.
-
---8<-- "hack/docs/abbreviations.md"

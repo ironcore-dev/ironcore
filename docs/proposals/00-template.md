@@ -1,7 +1,7 @@
 ---
-title: OEP Title
+title: IEP Title
 
-oep-number: NNNN
+iep-number: NNNN
 
 creation-date: 20XX-XX-XX
 
@@ -19,7 +19,7 @@ reviewers:
 
 ---
 
-# OEP-NNNN: Your short, descriptive title
+# IEP-NNNN: Your short, descriptive title
 
 ## Table of Contents
 
