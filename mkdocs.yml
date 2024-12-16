@@ -7,7 +7,6 @@ theme:
   features:
   - navigation.instant
   - navigation.tracking
-  - navigation.expand
   - navigation.indexes
   - navigation.top
   name: material
@@ -42,23 +41,52 @@ markdown_extensions:
 - pymdownx.snippets
 - codehilite
 - admonition
-- abbr
 - toc:
     permalink: true
 
 nav:
 - Home: README.md
+
+- Architecture:
+  - Overview: architecture/overview.md
+  - Runtime Interface: architecture/iri.md
+
 - Concepts:
-    - IronCore Runtime Interface: concepts/iri.md
-    - Machine Exec: concepts/machine-exec-flow.md
-- Architecture: README.md
-- Usage: README.md
+  - Machine Exec: concepts/machine-exec-flow.md
+
+- Usage:
+  - Installation: usage/installation.md
+  - Compute:
+    - MachinePool: usage/compute/machinepool.md
+    - MachineClass: usage/compute/machineclass.md
+    - Machine: usage/compute/machine.md
+  - Storage:
+    - VolumePool: usage/storage/volumepool.md
+    - VolumeClass: usage/storage/volumeclass.md
+    - Volume: usage/storage/volume.md
+    - BucketPool: usage/storage/bucketpool.md
+    - BucketClass: usage/storage/bucketclass.md
+    - Bucket: usage/storage/bucket.md
+  - Networking:
+      - Network: usage/networking/network.md
+      - NetworkInterface: usage/networking/networkinterface.md
+      - NATGateway: usage/networking/natgateway.md
+      - LoadBalancer: usage/networking/loadbalancer.md
+      - VirtualIP: usage/networking/virtualip.md
+      - NetworkPolicy: usage/networking/networkpolicy.md
+  - IPAM:
+      - Prefix: usage/ipam/prefix.md
+  - Core:
+      - ResourceQuota: usage/core/resourcequota.md
+
 - Developer Guide:
   - Local Setup: development/setup.md
   - Documentation: development/documentation.md
   - Testing: development/testing.md
   - Contribution Guide: development/contribution.md
+
 - Proposals: proposals/README.md
+
 - API Reference:
   - Overview: api-reference/overview.md
   - IPAM: api-reference/ipam.md

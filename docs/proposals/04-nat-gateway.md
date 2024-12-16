@@ -1,7 +1,7 @@
 ---
 title: NAT Gateway
 
-oep-number: 4
+iep-number: 4
 
 creation-date: 2022-18-10
 
@@ -21,7 +21,7 @@ reviewers:
 
 ---
 
-# OEP-4: Cloud Nate Gateway
+# IEP-4: Cloud Nate Gateway
 
 ## Table of Contents
 

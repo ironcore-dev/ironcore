@@ -101,5 +101,3 @@ To remove the APIs from your cluster, simply run
 ```shell
 make uninstall
 ```
-
---8<-- "hack/docs/abbreviations.md"

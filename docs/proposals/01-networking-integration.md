@@ -1,7 +1,7 @@
 ---
 title: Networking Integration
 
-oep-number: 1
+iep-number: 1
 
 creation-date: 2022-17-03
 
@@ -22,7 +22,7 @@ reviewers:
 
 ---
 
-# OEP-1: Networking Integration
+# IEP-1: Networking Integration
 
 ## Table of Contents
 
@@ -39,7 +39,7 @@ Networking is a crucial part in a modern cloud system: It enables systems to com
 outside world. Orchestrating traffic, auditing it and gaining visibility of what is the desired state is key to a modern
 network architecture.
 
-Key of this OEP is to define the user-facing network API as well as its implications on any other type and the overall
+Key of this IEP is to define the user-facing network API as well as its implications on any other type and the overall
 structure of `ironcore`.
 
 ## Motivation
