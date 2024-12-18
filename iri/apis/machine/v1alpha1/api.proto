@@ -131,7 +131,6 @@ message NetworkInterfaceStatus {
   string name = 1;
   string handle = 2;
   NetworkInterfaceState state = 3;
-  repeated string ips = 4;
 }
 
 enum NetworkInterfaceState {

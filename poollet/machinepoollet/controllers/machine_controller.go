@@ -7,9 +7,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"slices"
 	"strconv"
-	"time"
 
 	"github.com/go-logr/logr"
 	"golang.org/x/exp/maps"
@@ -517,10 +515,6 @@ func (r *MachineReconciler) updateNetworkInterfaceStatus(
 				errs = append(errs, err)
 			}
 		}
-
-		if err := r.updateNetworkInterfaceStatusFromIRIStatus(ctx, nic, iriNicStatus); err != nil {
-			errs = append(errs, err)
-		}
 	}
 
 	for _, nic := range unhandledNicByUID {
@@ -532,39 +526,6 @@ func (r *MachineReconciler) updateNetworkInterfaceStatus(
 	}
 
 	return errors.Join(errs...)
-}
-
-var iriNetworkInterfaceStateToNetworkInterfaceState = map[iri.NetworkInterfaceState]networkingv1alpha1.NetworkInterfaceState{
-	iri.NetworkInterfaceState_NETWORK_INTERFACE_PENDING:  networkingv1alpha1.NetworkInterfaceStatePending,
-	iri.NetworkInterfaceState_NETWORK_INTERFACE_ATTACHED: networkingv1alpha1.NetworkInterfaceStateAvailable,
-}
-
-func (r *MachineReconciler) updateNetworkInterfaceStatusFromIRIStatus(
-	ctx context.Context,
-	nic *networkingv1alpha1.NetworkInterface,
-	iriNicStatus *iri.NetworkInterfaceStatus,
-) error {
-	if iriNicStatus == nil {
-		return nil // nothing to do
-	}
-
-	nicState, ok := iriNetworkInterfaceStateToNetworkInterfaceState[iriNicStatus.State]
-	if !ok {
-		return fmt.Errorf("encountered unknown network interface state %s", iriNicStatus.State)
-	}
-
-	nicBase := nic.DeepCopy()
-	if nicBase.Status.State != nicState || !slices.Equal(nic.Status.IPs, commonv1alpha1.MustParseIPs(iriNicStatus.Ips...)) {
-		nic.Status.LastStateTransitionTime = &metav1.Time{Time: time.Now()}
-		nic.Status.IPs = commonv1alpha1.MustParseIPs(iriNicStatus.Ips...)
-		nic.Status.State = nicState
-
-		if err := r.Status().Patch(ctx, nic, client.MergeFrom(nicBase)); err != nil {
-			return fmt.Errorf("failed to patch network interface status: %w", err)
-		}
-	}
-
-	return nil
 }
 
 func (r *MachineReconciler) updateMachineStatus(ctx context.Context, machine *computev1alpha1.Machine, iriMachine *iri.Machine) error {
