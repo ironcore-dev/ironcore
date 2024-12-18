@@ -1414,32 +1414,6 @@ string
 </tr>
 <tr>
 <td>
-<code>ips</code><br/>
-<em>
-<a href="../common/#common.ironcore.dev/v1alpha1.IP">
-[]github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP
-</a>
-</em>
-</td>
-<td>
-<p>IPs are the ips allocated for the network interface.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>virtualIP</code><br/>
-<em>
-<a href="../common/#common.ironcore.dev/v1alpha1.IP">
-github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP
-</a>
-</em>
-</td>
-<td>
-<p>VirtualIP is the virtual ip allocated for the network interface.</p>
-</td>
-</tr>
-<tr>
-<td>
 <code>state</code><br/>
 <em>
 <a href="#compute.ironcore.dev/v1alpha1.NetworkInterfaceState">
@@ -1449,6 +1423,19 @@ NetworkInterfaceState
 </td>
 <td>
 <p>State represents the attachment state of a NetworkInterface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkInterfaceRef</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>networkInterfaceRef is the reference to the networkinterface attached to the machine</p>
 </td>
 </tr>
 <tr>
@@ -1690,6 +1677,19 @@ Kubernetes meta/v1.Time
 </td>
 <td>
 <p>LastStateTransitionTime is the last time the State transitioned.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>volumeRef</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>VolumeRef reference to the claimed Volume</p>
 </td>
 </tr>
 </tbody>

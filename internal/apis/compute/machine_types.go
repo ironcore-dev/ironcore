@@ -118,10 +118,6 @@ type NetworkInterfaceStatus struct {
 	Name string
 	// Handle is the MachinePool internal handle of the NetworkInterface.
 	Handle string
-	// IPs are the ips allocated for the network interface.
-	IPs []commonv1alpha1.IP
-	// VirtualIP is the virtual ip allocated for the network interface.
-	VirtualIP *commonv1alpha1.IP
 	// State represents the attachment state of a NetworkInterface.
 	State NetworkInterfaceState
 	// networkInterfaceRef is the reference to the networkinterface attached to the machine
