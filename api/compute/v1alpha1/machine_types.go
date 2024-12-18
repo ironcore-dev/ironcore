@@ -128,10 +128,6 @@ type NetworkInterfaceStatus struct {
 	Name string `json:"name"`
 	// Handle is the MachinePool internal handle of the NetworkInterface.
 	Handle string `json:"handle,omitempty"`
-	// IPs are the ips allocated for the network interface.
-	IPs []commonv1alpha1.IP `json:"ips,omitempty"`
-	// VirtualIP is the virtual ip allocated for the network interface.
-	VirtualIP *commonv1alpha1.IP `json:"virtualIP,omitempty"`
 	// State represents the attachment state of a NetworkInterface.
 	State NetworkInterfaceState `json:"state,omitempty"`
 	// networkInterfaceRef is the reference to the networkinterface attached to the machine
