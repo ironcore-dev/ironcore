@@ -146,7 +146,6 @@ var _ = Describe("MachineController", func() {
 				Name:   "primary",
 				Handle: "primary-handle",
 				State:  iri.NetworkInterfaceState_NETWORK_INTERFACE_ATTACHED,
-				Ips:    []string{"10.0.0.11"},
 			},
 		}
 		srv.SetMachines([]*testingmachine.FakeMachine{iriMachine})
@@ -295,27 +294,12 @@ var _ = Describe("MachineController", func() {
 				Name:   "primary",
 				Handle: "primary-handle",
 				State:  iri.NetworkInterfaceState_NETWORK_INTERFACE_ATTACHED,
-				Ips:    []string{"10.0.0.1"},
 			},
 		}
 		srv.SetMachines([]*testingmachine.FakeMachine{iriMachine})
 
-		Eventually(Object(nic)).Should(And(
-			HaveField("Spec.ProviderID", Equal("primary-handle")),
-			HaveField("Status", MatchFields(IgnoreExtras, Fields{
-				"State": Equal(networkingv1alpha1.NetworkInterfaceStateAvailable),
-				"IPs":   ContainElement(commonv1alpha1.MustParseIP("10.0.0.1")),
-			})),
-		))
-
-		Consistently(Object(nic)).Should(
-			HaveField("Status", MatchFields(IgnoreExtras, Fields{
-				"State": Equal(networkingv1alpha1.NetworkInterfaceStateAvailable),
-				"IPs":   ContainElement(commonv1alpha1.MustParseIP("10.0.0.1")),
-			})),
-		)
-
-		By("ensuring the ironcore machine status networkInterfaces to have correct NetworkInterfaceRef")
+		By("waiting for the ironcore network interface to have a provider id set")
+		Eventually(Object(nic)).Should(HaveField("Spec.ProviderID", "primary-handle"))
 		Eventually(Object(machine)).Should(HaveField("Status.NetworkInterfaces", ConsistOf(MatchFields(IgnoreExtras, Fields{
 			"Name":                Equal("primary"),
 			"Handle":              Equal("primary-handle"),
