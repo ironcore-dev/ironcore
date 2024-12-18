@@ -1676,25 +1676,6 @@ func schema_ironcore_api_compute_v1alpha1_NetworkInterfaceStatus(ref common.Refe
 							Format:      "",
 						},
 					},
-					"ips": {
-						SchemaProps: spec.SchemaProps{
-							Description: "IPs are the ips allocated for the network interface.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP"),
-									},
-								},
-							},
-						},
-					},
-					"virtualIP": {
-						SchemaProps: spec.SchemaProps{
-							Description: "VirtualIP is the virtual ip allocated for the network interface.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP"),
-						},
-					},
 					"state": {
 						SchemaProps: spec.SchemaProps{
 							Description: "State represents the attachment state of a NetworkInterface.",
@@ -1720,7 +1701,7 @@ func schema_ironcore_api_compute_v1alpha1_NetworkInterfaceStatus(ref common.Refe
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+			"k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
 	}
 }
 

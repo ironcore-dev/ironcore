@@ -10906,7 +10906,8 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelectorRequirement"
 								}
 							]
-						}
+						},
+						"x-kubernetes-list-type": "atomic"
 					},
 					"matchLabels": {
 						"description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
@@ -11309,7 +11310,12 @@
 						"type": "array",
 						"items": {
 							"type": "string",
-							"default": ""
+							"default": "",
+							"enum": [
+								"",
+								"IPv4",
+								"IPv6"
+							]
 						}
 					},
 					"ips": {
@@ -11695,7 +11701,12 @@
 						"type": "array",
 						"items": {
 							"type": "string",
-							"default": ""
+							"default": "",
+							"enum": [
+								"",
+								"IPv4",
+								"IPv6"
+							]
 						}
 					},
 					"ips": {
@@ -12584,8 +12595,9 @@
 				"type": "object",
 				"properties": {
 					"name": {
-						"description": "Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
-						"type": "string"
+						"description": "Name of the referent. This field is effectively required, but due to backwards compatibility is allowed to be empty. Instances of this type with an empty value here are almost certainly wrong. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
+						"type": "string",
+						"default": ""
 					}
 				},
 				"x-kubernetes-map-type": "atomic"
@@ -12607,7 +12619,8 @@
 						"items": {
 							"type": "string",
 							"default": ""
-						}
+						},
+						"x-kubernetes-list-type": "atomic"
 					},
 					"group": {
 						"description": "group is the preferred group of the resource.  Empty implies the group of the containing resource list. For subresources, this may have a different value, for example: Scale\".",
@@ -12634,7 +12647,8 @@
 						"items": {
 							"type": "string",
 							"default": ""
-						}
+						},
+						"x-kubernetes-list-type": "atomic"
 					},
 					"singularName": {
 						"description": "singularName is the singular name of the resource.  This allows clients to handle plural and singular opaquely. The singularName is more correct for reporting status on a single item and both singular and plural are allowed from the kubectl CLI interface.",
@@ -12690,7 +12704,8 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.APIResource"
 								}
 							]
-						}
+						},
+						"x-kubernetes-list-type": "atomic"
 					}
 				},
 				"x-kubernetes-group-version-kind": [
@@ -12715,7 +12730,8 @@
 						"items": {
 							"type": "string",
 							"default": ""
-						}
+						},
+						"x-kubernetes-list-type": "atomic"
 					},
 					"gracePeriodSeconds": {
 						"description": "The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately.",
@@ -12799,7 +12815,8 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelectorRequirement"
 								}
 							]
-						}
+						},
+						"x-kubernetes-list-type": "atomic"
 					},
 					"matchLabels": {
 						"description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
@@ -12836,7 +12853,8 @@
 						"items": {
 							"type": "string",
 							"default": ""
-						}
+						},
+						"x-kubernetes-list-type": "atomic"
 					}
 				}
 			},
@@ -12945,6 +12963,7 @@
 							"type": "string",
 							"default": ""
 						},
+						"x-kubernetes-list-type": "set",
 						"x-kubernetes-patch-strategy": "merge"
 					},
 					"generateName": {
@@ -12974,7 +12993,8 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ManagedFieldsEntry"
 								}
 							]
-						}
+						},
+						"x-kubernetes-list-type": "atomic"
 					},
 					"name": {
 						"description": "Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names",
@@ -12995,6 +13015,10 @@
 								}
 							]
 						},
+						"x-kubernetes-list-map-keys": [
+							"uid"
+						],
+						"x-kubernetes-list-type": "map",
 						"x-kubernetes-patch-merge-key": "uid",
 						"x-kubernetes-patch-strategy": "merge"
 					},
@@ -13090,7 +13114,8 @@
 							{
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.StatusDetails"
 							}
-						]
+						],
+						"x-kubernetes-list-type": "atomic"
 					},
 					"kind": {
 						"description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
@@ -13158,7 +13183,8 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.StatusCause"
 								}
 							]
-						}
+						},
+						"x-kubernetes-list-type": "atomic"
 					},
 					"group": {
 						"description": "The group attribute of the resource associated with the status StatusReason.",
