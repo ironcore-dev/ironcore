@@ -65,7 +65,7 @@ type controller struct {
 	logConstructor func() logr.Logger
 	store          Store
 
-	queue workqueue.RateLimitingInterface
+	queue workqueue.TypedRateLimitingInterface[string]
 
 	configRotator utilrest.ConfigRotator
 }
@@ -181,7 +181,7 @@ func (c *controller) Start(ctx context.Context) error {
 		return fmt.Errorf("controller was already started")
 	}
 
-	c.queue = workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
+	c.queue = workqueue.NewTypedRateLimitingQueue(workqueue.DefaultTypedControllerRateLimiter[string]())
 	go func() {
 		<-ctx.Done()
 		c.queue.ShutDown()

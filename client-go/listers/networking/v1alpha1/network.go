@@ -7,8 +7,8 @@ package v1alpha1
 
 import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
-	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/listers"
 	"k8s.io/client-go/tools/cache"
 )
 
@@ -25,25 +25,17 @@ type NetworkLister interface {
 
 // networkLister implements the NetworkLister interface.
 type networkLister struct {
-	indexer cache.Indexer
+	listers.ResourceIndexer[*v1alpha1.Network]
 }
 
 // NewNetworkLister returns a new NetworkLister.
 func NewNetworkLister(indexer cache.Indexer) NetworkLister {
-	return &networkLister{indexer: indexer}
-}
-
-// List lists all Networks in the indexer.
-func (s *networkLister) List(selector labels.Selector) (ret []*v1alpha1.Network, err error) {
-	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.Network))
-	})
-	return ret, err
+	return &networkLister{listers.New[*v1alpha1.Network](indexer, v1alpha1.Resource("network"))}
 }
 
 // Networks returns an object that can list and get Networks.
 func (s *networkLister) Networks(namespace string) NetworkNamespaceLister {
-	return networkNamespaceLister{indexer: s.indexer, namespace: namespace}
+	return networkNamespaceLister{listers.NewNamespaced[*v1alpha1.Network](s.ResourceIndexer, namespace)}
 }
 
 // NetworkNamespaceLister helps list and get Networks.
@@ -61,26 +53,5 @@ type NetworkNamespaceLister interface {
 // networkNamespaceLister implements the NetworkNamespaceLister
 // interface.
 type networkNamespaceLister struct {
-	indexer   cache.Indexer
-	namespace string
-}
-
-// List lists all Networks in the indexer for a given namespace.
-func (s networkNamespaceLister) List(selector labels.Selector) (ret []*v1alpha1.Network, err error) {
-	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.Network))
-	})
-	return ret, err
-}
-
-// Get retrieves the Network from the indexer for a given namespace and name.
-func (s networkNamespaceLister) Get(name string) (*v1alpha1.Network, error) {
-	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("network"), name)
-	}
-	return obj.(*v1alpha1.Network), nil
+	listers.ResourceIndexer[*v1alpha1.Network]
 }

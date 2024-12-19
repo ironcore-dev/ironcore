@@ -20,6 +20,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
 // BucketClassReconciler reconciles a BucketClass object
@@ -123,7 +124,7 @@ func (r *BucketClassReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Watches(
 			&storagev1alpha1.Bucket{},
 			handler.Funcs{
-				DeleteFunc: func(ctx context.Context, event event.DeleteEvent, queue workqueue.RateLimitingInterface) {
+				DeleteFunc: func(ctx context.Context, event event.DeleteEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 					bucket := event.Object.(*storagev1alpha1.Bucket)
 					bucketClassRef := bucket.Spec.BucketClassRef
 					if bucketClassRef == nil {

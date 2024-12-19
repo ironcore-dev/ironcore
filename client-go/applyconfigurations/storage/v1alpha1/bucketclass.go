@@ -15,7 +15,7 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// BucketClassApplyConfiguration represents an declarative configuration of the BucketClass type for use
+// BucketClassApplyConfiguration represents a declarative configuration of the BucketClass type for use
 // with apply.
 type BucketClassApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -23,7 +23,7 @@ type BucketClassApplyConfiguration struct {
 	Capabilities                     *v1alpha1.ResourceList `json:"capabilities,omitempty"`
 }
 
-// BucketClass constructs an declarative configuration of the BucketClass type for use with
+// BucketClass constructs a declarative configuration of the BucketClass type for use with
 // apply.
 func BucketClass(name string) *BucketClassApplyConfiguration {
 	b := &BucketClassApplyConfiguration{}
@@ -232,4 +232,10 @@ func (b *BucketClassApplyConfiguration) ensureObjectMetaApplyConfigurationExists
 func (b *BucketClassApplyConfiguration) WithCapabilities(value v1alpha1.ResourceList) *BucketClassApplyConfiguration {
 	b.Capabilities = &value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *BucketClassApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

@@ -7,8 +7,8 @@ package v1alpha1
 
 import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/listers"
 	"k8s.io/client-go/tools/cache"
 )
 
@@ -26,30 +26,10 @@ type MachineClassLister interface {
 
 // machineClassLister implements the MachineClassLister interface.
 type machineClassLister struct {
-	indexer cache.Indexer
+	listers.ResourceIndexer[*v1alpha1.MachineClass]
 }
 
 // NewMachineClassLister returns a new MachineClassLister.
 func NewMachineClassLister(indexer cache.Indexer) MachineClassLister {
-	return &machineClassLister{indexer: indexer}
-}
-
-// List lists all MachineClasses in the indexer.
-func (s *machineClassLister) List(selector labels.Selector) (ret []*v1alpha1.MachineClass, err error) {
-	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.MachineClass))
-	})
-	return ret, err
-}
-
-// Get retrieves the MachineClass from the index for a given name.
-func (s *machineClassLister) Get(name string) (*v1alpha1.MachineClass, error) {
-	obj, exists, err := s.indexer.GetByKey(name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("machineclass"), name)
-	}
-	return obj.(*v1alpha1.MachineClass), nil
+	return &machineClassLister{listers.New[*v1alpha1.MachineClass](indexer, v1alpha1.Resource("machineclass"))}
 }

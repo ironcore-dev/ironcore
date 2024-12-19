@@ -31,22 +31,24 @@ var prefixesKind = v1alpha1.SchemeGroupVersion.WithKind("Prefix")
 
 // Get takes name of the prefix, and returns the corresponding prefix object, and an error if there is any.
 func (c *FakePrefixes) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.Prefix, err error) {
+	emptyResult := &v1alpha1.Prefix{}
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(prefixesResource, c.ns, name), &v1alpha1.Prefix{})
+		Invokes(testing.NewGetActionWithOptions(prefixesResource, c.ns, name, options), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.Prefix), err
 }
 
 // List takes label and field selectors, and returns the list of Prefixes that match those selectors.
 func (c *FakePrefixes) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.PrefixList, err error) {
+	emptyResult := &v1alpha1.PrefixList{}
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(prefixesResource, prefixesKind, c.ns, opts), &v1alpha1.PrefixList{})
+		Invokes(testing.NewListActionWithOptions(prefixesResource, prefixesKind, c.ns, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 
 	label, _, _ := testing.ExtractFromListOptions(opts)
@@ -65,40 +67,43 @@ func (c *FakePrefixes) List(ctx context.Context, opts v1.ListOptions) (result *v
 // Watch returns a watch.Interface that watches the requested prefixes.
 func (c *FakePrefixes) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewWatchAction(prefixesResource, c.ns, opts))
+		InvokesWatch(testing.NewWatchActionWithOptions(prefixesResource, c.ns, opts))
 
 }
 
 // Create takes the representation of a prefix and creates it.  Returns the server's representation of the prefix, and an error, if there is any.
 func (c *FakePrefixes) Create(ctx context.Context, prefix *v1alpha1.Prefix, opts v1.CreateOptions) (result *v1alpha1.Prefix, err error) {
+	emptyResult := &v1alpha1.Prefix{}
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(prefixesResource, c.ns, prefix), &v1alpha1.Prefix{})
+		Invokes(testing.NewCreateActionWithOptions(prefixesResource, c.ns, prefix, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.Prefix), err
 }
 
 // Update takes the representation of a prefix and updates it. Returns the server's representation of the prefix, and an error, if there is any.
 func (c *FakePrefixes) Update(ctx context.Context, prefix *v1alpha1.Prefix, opts v1.UpdateOptions) (result *v1alpha1.Prefix, err error) {
+	emptyResult := &v1alpha1.Prefix{}
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(prefixesResource, c.ns, prefix), &v1alpha1.Prefix{})
+		Invokes(testing.NewUpdateActionWithOptions(prefixesResource, c.ns, prefix, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.Prefix), err
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakePrefixes) UpdateStatus(ctx context.Context, prefix *v1alpha1.Prefix, opts v1.UpdateOptions) (*v1alpha1.Prefix, error) {
+func (c *FakePrefixes) UpdateStatus(ctx context.Context, prefix *v1alpha1.Prefix, opts v1.UpdateOptions) (result *v1alpha1.Prefix, err error) {
+	emptyResult := &v1alpha1.Prefix{}
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceAction(prefixesResource, "status", c.ns, prefix), &v1alpha1.Prefix{})
+		Invokes(testing.NewUpdateSubresourceActionWithOptions(prefixesResource, "status", c.ns, prefix, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.Prefix), err
 }
@@ -113,7 +118,7 @@ func (c *FakePrefixes) Delete(ctx context.Context, name string, opts v1.DeleteOp
 
 // DeleteCollection deletes a collection of objects.
 func (c *FakePrefixes) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(prefixesResource, c.ns, listOpts)
+	action := testing.NewDeleteCollectionActionWithOptions(prefixesResource, c.ns, opts, listOpts)
 
 	_, err := c.Fake.Invokes(action, &v1alpha1.PrefixList{})
 	return err
@@ -121,11 +126,12 @@ func (c *FakePrefixes) DeleteCollection(ctx context.Context, opts v1.DeleteOptio
 
 // Patch applies the patch and returns the patched prefix.
 func (c *FakePrefixes) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.Prefix, err error) {
+	emptyResult := &v1alpha1.Prefix{}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(prefixesResource, c.ns, name, pt, data, subresources...), &v1alpha1.Prefix{})
+		Invokes(testing.NewPatchSubresourceActionWithOptions(prefixesResource, c.ns, name, pt, data, opts, subresources...), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.Prefix), err
 }
@@ -143,11 +149,12 @@ func (c *FakePrefixes) Apply(ctx context.Context, prefix *ipamv1alpha1.PrefixApp
 	if name == nil {
 		return nil, fmt.Errorf("prefix.Name must be provided to Apply")
 	}
+	emptyResult := &v1alpha1.Prefix{}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(prefixesResource, c.ns, *name, types.ApplyPatchType, data), &v1alpha1.Prefix{})
+		Invokes(testing.NewPatchSubresourceActionWithOptions(prefixesResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions()), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.Prefix), err
 }
@@ -166,11 +173,12 @@ func (c *FakePrefixes) ApplyStatus(ctx context.Context, prefix *ipamv1alpha1.Pre
 	if name == nil {
 		return nil, fmt.Errorf("prefix.Name must be provided to Apply")
 	}
+	emptyResult := &v1alpha1.Prefix{}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(prefixesResource, c.ns, *name, types.ApplyPatchType, data, "status"), &v1alpha1.Prefix{})
+		Invokes(testing.NewPatchSubresourceActionWithOptions(prefixesResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions(), "status"), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.Prefix), err
 }

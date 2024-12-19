@@ -10,14 +10,14 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// BucketPoolStatusApplyConfiguration represents an declarative configuration of the BucketPoolStatus type for use
+// BucketPoolStatusApplyConfiguration represents a declarative configuration of the BucketPoolStatus type for use
 // with apply.
 type BucketPoolStatusApplyConfiguration struct {
 	State                  *v1alpha1.BucketPoolState `json:"state,omitempty"`
 	AvailableBucketClasses []v1.LocalObjectReference `json:"availableBucketClasses,omitempty"`
 }
 
-// BucketPoolStatusApplyConfiguration constructs an declarative configuration of the BucketPoolStatus type for use with
+// BucketPoolStatusApplyConfiguration constructs a declarative configuration of the BucketPoolStatus type for use with
 // apply.
 func BucketPoolStatus() *BucketPoolStatusApplyConfiguration {
 	return &BucketPoolStatusApplyConfiguration{}

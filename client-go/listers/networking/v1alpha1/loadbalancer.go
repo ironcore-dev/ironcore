@@ -7,8 +7,8 @@ package v1alpha1
 
 import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
-	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/listers"
 	"k8s.io/client-go/tools/cache"
 )
 
@@ -25,25 +25,17 @@ type LoadBalancerLister interface {
 
 // loadBalancerLister implements the LoadBalancerLister interface.
 type loadBalancerLister struct {
-	indexer cache.Indexer
+	listers.ResourceIndexer[*v1alpha1.LoadBalancer]
 }
 
 // NewLoadBalancerLister returns a new LoadBalancerLister.
 func NewLoadBalancerLister(indexer cache.Indexer) LoadBalancerLister {
-	return &loadBalancerLister{indexer: indexer}
-}
-
-// List lists all LoadBalancers in the indexer.
-func (s *loadBalancerLister) List(selector labels.Selector) (ret []*v1alpha1.LoadBalancer, err error) {
-	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.LoadBalancer))
-	})
-	return ret, err
+	return &loadBalancerLister{listers.New[*v1alpha1.LoadBalancer](indexer, v1alpha1.Resource("loadbalancer"))}
 }
 
 // LoadBalancers returns an object that can list and get LoadBalancers.
 func (s *loadBalancerLister) LoadBalancers(namespace string) LoadBalancerNamespaceLister {
-	return loadBalancerNamespaceLister{indexer: s.indexer, namespace: namespace}
+	return loadBalancerNamespaceLister{listers.NewNamespaced[*v1alpha1.LoadBalancer](s.ResourceIndexer, namespace)}
 }
 
 // LoadBalancerNamespaceLister helps list and get LoadBalancers.
@@ -61,26 +53,5 @@ type LoadBalancerNamespaceLister interface {
 // loadBalancerNamespaceLister implements the LoadBalancerNamespaceLister
 // interface.
 type loadBalancerNamespaceLister struct {
-	indexer   cache.Indexer
-	namespace string
-}
-
-// List lists all LoadBalancers in the indexer for a given namespace.
-func (s loadBalancerNamespaceLister) List(selector labels.Selector) (ret []*v1alpha1.LoadBalancer, err error) {
-	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.LoadBalancer))
-	})
-	return ret, err
-}
-
-// Get retrieves the LoadBalancer from the indexer for a given namespace and name.
-func (s loadBalancerNamespaceLister) Get(name string) (*v1alpha1.LoadBalancer, error) {
-	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("loadbalancer"), name)
-	}
-	return obj.(*v1alpha1.LoadBalancer), nil
+	listers.ResourceIndexer[*v1alpha1.LoadBalancer]
 }

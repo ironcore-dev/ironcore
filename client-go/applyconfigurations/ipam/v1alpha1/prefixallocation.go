@@ -14,7 +14,7 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// PrefixAllocationApplyConfiguration represents an declarative configuration of the PrefixAllocation type for use
+// PrefixAllocationApplyConfiguration represents a declarative configuration of the PrefixAllocation type for use
 // with apply.
 type PrefixAllocationApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -23,7 +23,7 @@ type PrefixAllocationApplyConfiguration struct {
 	Status                           *PrefixAllocationStatusApplyConfiguration `json:"status,omitempty"`
 }
 
-// PrefixAllocation constructs an declarative configuration of the PrefixAllocation type for use with
+// PrefixAllocation constructs a declarative configuration of the PrefixAllocation type for use with
 // apply.
 func PrefixAllocation(name, namespace string) *PrefixAllocationApplyConfiguration {
 	b := &PrefixAllocationApplyConfiguration{}
@@ -242,4 +242,10 @@ func (b *PrefixAllocationApplyConfiguration) WithSpec(value *PrefixAllocationSpe
 func (b *PrefixAllocationApplyConfiguration) WithStatus(value *PrefixAllocationStatusApplyConfiguration) *PrefixAllocationApplyConfiguration {
 	b.Status = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *PrefixAllocationApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

@@ -9,13 +9,13 @@ import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/networking/v1alpha1"
 )
 
-// EphemeralNetworkInterfaceSourceApplyConfiguration represents an declarative configuration of the EphemeralNetworkInterfaceSource type for use
+// EphemeralNetworkInterfaceSourceApplyConfiguration represents a declarative configuration of the EphemeralNetworkInterfaceSource type for use
 // with apply.
 type EphemeralNetworkInterfaceSourceApplyConfiguration struct {
 	NetworkInterfaceTemplate *v1alpha1.NetworkInterfaceTemplateSpecApplyConfiguration `json:"networkInterfaceTemplate,omitempty"`
 }
 
-// EphemeralNetworkInterfaceSourceApplyConfiguration constructs an declarative configuration of the EphemeralNetworkInterfaceSource type for use with
+// EphemeralNetworkInterfaceSourceApplyConfiguration constructs a declarative configuration of the EphemeralNetworkInterfaceSource type for use with
 // apply.
 func EphemeralNetworkInterfaceSource() *EphemeralNetworkInterfaceSourceApplyConfiguration {
 	return &EphemeralNetworkInterfaceSourceApplyConfiguration{}

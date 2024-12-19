@@ -9,14 +9,14 @@ import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/core/v1alpha1"
 )
 
-// NetworkPolicyPeerApplyConfiguration represents an declarative configuration of the NetworkPolicyPeer type for use
+// NetworkPolicyPeerApplyConfiguration represents a declarative configuration of the NetworkPolicyPeer type for use
 // with apply.
 type NetworkPolicyPeerApplyConfiguration struct {
 	ObjectSelector *v1alpha1.ObjectSelectorApplyConfiguration `json:"objectSelector,omitempty"`
 	IPBlock        *IPBlockApplyConfiguration                 `json:"ipBlock,omitempty"`
 }
 
-// NetworkPolicyPeerApplyConfiguration constructs an declarative configuration of the NetworkPolicyPeer type for use with
+// NetworkPolicyPeerApplyConfiguration constructs a declarative configuration of the NetworkPolicyPeer type for use with
 // apply.
 func NetworkPolicyPeer() *NetworkPolicyPeerApplyConfiguration {
 	return &NetworkPolicyPeerApplyConfiguration{}

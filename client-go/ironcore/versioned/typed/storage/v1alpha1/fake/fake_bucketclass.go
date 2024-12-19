@@ -30,20 +30,22 @@ var bucketclassesKind = v1alpha1.SchemeGroupVersion.WithKind("BucketClass")
 
 // Get takes name of the bucketClass, and returns the corresponding bucketClass object, and an error if there is any.
 func (c *FakeBucketClasses) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.BucketClass, err error) {
+	emptyResult := &v1alpha1.BucketClass{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootGetAction(bucketclassesResource, name), &v1alpha1.BucketClass{})
+		Invokes(testing.NewRootGetActionWithOptions(bucketclassesResource, name, options), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.BucketClass), err
 }
 
 // List takes label and field selectors, and returns the list of BucketClasses that match those selectors.
 func (c *FakeBucketClasses) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.BucketClassList, err error) {
+	emptyResult := &v1alpha1.BucketClassList{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootListAction(bucketclassesResource, bucketclassesKind, opts), &v1alpha1.BucketClassList{})
+		Invokes(testing.NewRootListActionWithOptions(bucketclassesResource, bucketclassesKind, opts), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 
 	label, _, _ := testing.ExtractFromListOptions(opts)
@@ -62,25 +64,27 @@ func (c *FakeBucketClasses) List(ctx context.Context, opts v1.ListOptions) (resu
 // Watch returns a watch.Interface that watches the requested bucketClasses.
 func (c *FakeBucketClasses) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewRootWatchAction(bucketclassesResource, opts))
+		InvokesWatch(testing.NewRootWatchActionWithOptions(bucketclassesResource, opts))
 }
 
 // Create takes the representation of a bucketClass and creates it.  Returns the server's representation of the bucketClass, and an error, if there is any.
 func (c *FakeBucketClasses) Create(ctx context.Context, bucketClass *v1alpha1.BucketClass, opts v1.CreateOptions) (result *v1alpha1.BucketClass, err error) {
+	emptyResult := &v1alpha1.BucketClass{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootCreateAction(bucketclassesResource, bucketClass), &v1alpha1.BucketClass{})
+		Invokes(testing.NewRootCreateActionWithOptions(bucketclassesResource, bucketClass, opts), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.BucketClass), err
 }
 
 // Update takes the representation of a bucketClass and updates it. Returns the server's representation of the bucketClass, and an error, if there is any.
 func (c *FakeBucketClasses) Update(ctx context.Context, bucketClass *v1alpha1.BucketClass, opts v1.UpdateOptions) (result *v1alpha1.BucketClass, err error) {
+	emptyResult := &v1alpha1.BucketClass{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootUpdateAction(bucketclassesResource, bucketClass), &v1alpha1.BucketClass{})
+		Invokes(testing.NewRootUpdateActionWithOptions(bucketclassesResource, bucketClass, opts), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.BucketClass), err
 }
@@ -94,7 +98,7 @@ func (c *FakeBucketClasses) Delete(ctx context.Context, name string, opts v1.Del
 
 // DeleteCollection deletes a collection of objects.
 func (c *FakeBucketClasses) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewRootDeleteCollectionAction(bucketclassesResource, listOpts)
+	action := testing.NewRootDeleteCollectionActionWithOptions(bucketclassesResource, opts, listOpts)
 
 	_, err := c.Fake.Invokes(action, &v1alpha1.BucketClassList{})
 	return err
@@ -102,10 +106,11 @@ func (c *FakeBucketClasses) DeleteCollection(ctx context.Context, opts v1.Delete
 
 // Patch applies the patch and returns the patched bucketClass.
 func (c *FakeBucketClasses) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.BucketClass, err error) {
+	emptyResult := &v1alpha1.BucketClass{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceAction(bucketclassesResource, name, pt, data, subresources...), &v1alpha1.BucketClass{})
+		Invokes(testing.NewRootPatchSubresourceActionWithOptions(bucketclassesResource, name, pt, data, opts, subresources...), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.BucketClass), err
 }
@@ -123,10 +128,11 @@ func (c *FakeBucketClasses) Apply(ctx context.Context, bucketClass *storagev1alp
 	if name == nil {
 		return nil, fmt.Errorf("bucketClass.Name must be provided to Apply")
 	}
+	emptyResult := &v1alpha1.BucketClass{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceAction(bucketclassesResource, *name, types.ApplyPatchType, data), &v1alpha1.BucketClass{})
+		Invokes(testing.NewRootPatchSubresourceActionWithOptions(bucketclassesResource, *name, types.ApplyPatchType, data, opts.ToPatchOptions()), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.BucketClass), err
 }

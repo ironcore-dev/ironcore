@@ -9,13 +9,13 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// VolumeEncryptionApplyConfiguration represents an declarative configuration of the VolumeEncryption type for use
+// VolumeEncryptionApplyConfiguration represents a declarative configuration of the VolumeEncryption type for use
 // with apply.
 type VolumeEncryptionApplyConfiguration struct {
 	SecretRef *v1.LocalObjectReference `json:"secretRef,omitempty"`
 }
 
-// VolumeEncryptionApplyConfiguration constructs an declarative configuration of the VolumeEncryption type for use with
+// VolumeEncryptionApplyConfiguration constructs a declarative configuration of the VolumeEncryption type for use with
 // apply.
 func VolumeEncryption() *VolumeEncryptionApplyConfiguration {
 	return &VolumeEncryptionApplyConfiguration{}

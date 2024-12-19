@@ -9,14 +9,14 @@ import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 )
 
-// LoadBalancerDestinationApplyConfiguration represents an declarative configuration of the LoadBalancerDestination type for use
+// LoadBalancerDestinationApplyConfiguration represents a declarative configuration of the LoadBalancerDestination type for use
 // with apply.
 type LoadBalancerDestinationApplyConfiguration struct {
 	IP        *v1alpha1.IP                             `json:"ip,omitempty"`
 	TargetRef *LoadBalancerTargetRefApplyConfiguration `json:"targetRef,omitempty"`
 }
 
-// LoadBalancerDestinationApplyConfiguration constructs an declarative configuration of the LoadBalancerDestination type for use with
+// LoadBalancerDestinationApplyConfiguration constructs a declarative configuration of the LoadBalancerDestination type for use with
 // apply.
 func LoadBalancerDestination() *LoadBalancerDestinationApplyConfiguration {
 	return &LoadBalancerDestinationApplyConfiguration{}

@@ -20,6 +20,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
 // VolumeClassReconciler reconciles a VolumeClass object
@@ -123,7 +124,7 @@ func (r *VolumeClassReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Watches(
 			&storagev1alpha1.Volume{},
 			handler.Funcs{
-				DeleteFunc: func(ctx context.Context, event event.DeleteEvent, queue workqueue.RateLimitingInterface) {
+				DeleteFunc: func(ctx context.Context, event event.DeleteEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 					volume := event.Object.(*storagev1alpha1.Volume)
 					volumeClassRef := volume.Spec.VolumeClassRef
 					if volumeClassRef == nil {

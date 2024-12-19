@@ -5,14 +5,14 @@
 
 package v1alpha1
 
-// NetworkPeeringNetworkRefApplyConfiguration represents an declarative configuration of the NetworkPeeringNetworkRef type for use
+// NetworkPeeringNetworkRefApplyConfiguration represents a declarative configuration of the NetworkPeeringNetworkRef type for use
 // with apply.
 type NetworkPeeringNetworkRefApplyConfiguration struct {
 	Namespace *string `json:"namespace,omitempty"`
 	Name      *string `json:"name,omitempty"`
 }
 
-// NetworkPeeringNetworkRefApplyConfiguration constructs an declarative configuration of the NetworkPeeringNetworkRef type for use with
+// NetworkPeeringNetworkRefApplyConfiguration constructs a declarative configuration of the NetworkPeeringNetworkRef type for use with
 // apply.
 func NetworkPeeringNetworkRef() *NetworkPeeringNetworkRefApplyConfiguration {
 	return &NetworkPeeringNetworkRefApplyConfiguration{}

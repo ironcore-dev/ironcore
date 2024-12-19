@@ -11,14 +11,14 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// VirtualIPTemplateSpecApplyConfiguration represents an declarative configuration of the VirtualIPTemplateSpec type for use
+// VirtualIPTemplateSpecApplyConfiguration represents a declarative configuration of the VirtualIPTemplateSpec type for use
 // with apply.
 type VirtualIPTemplateSpecApplyConfiguration struct {
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *VirtualIPSpecApplyConfiguration `json:"spec,omitempty"`
 }
 
-// VirtualIPTemplateSpecApplyConfiguration constructs an declarative configuration of the VirtualIPTemplateSpec type for use with
+// VirtualIPTemplateSpecApplyConfiguration constructs a declarative configuration of the VirtualIPTemplateSpec type for use with
 // apply.
 func VirtualIPTemplateSpec() *VirtualIPTemplateSpecApplyConfiguration {
 	return &VirtualIPTemplateSpecApplyConfiguration{}
@@ -172,4 +172,10 @@ func (b *VirtualIPTemplateSpecApplyConfiguration) ensureObjectMetaApplyConfigura
 func (b *VirtualIPTemplateSpecApplyConfiguration) WithSpec(value *VirtualIPSpecApplyConfiguration) *VirtualIPTemplateSpecApplyConfiguration {
 	b.Spec = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *VirtualIPTemplateSpecApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

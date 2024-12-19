@@ -9,14 +9,14 @@ import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 )
 
-// ResourceQuotaSpecApplyConfiguration represents an declarative configuration of the ResourceQuotaSpec type for use
+// ResourceQuotaSpecApplyConfiguration represents a declarative configuration of the ResourceQuotaSpec type for use
 // with apply.
 type ResourceQuotaSpecApplyConfiguration struct {
 	Hard          *v1alpha1.ResourceList                   `json:"hard,omitempty"`
 	ScopeSelector *ResourceScopeSelectorApplyConfiguration `json:"scopeSelector,omitempty"`
 }
 
-// ResourceQuotaSpecApplyConfiguration constructs an declarative configuration of the ResourceQuotaSpec type for use with
+// ResourceQuotaSpecApplyConfiguration constructs a declarative configuration of the ResourceQuotaSpec type for use with
 // apply.
 func ResourceQuotaSpec() *ResourceQuotaSpecApplyConfiguration {
 	return &ResourceQuotaSpecApplyConfiguration{}

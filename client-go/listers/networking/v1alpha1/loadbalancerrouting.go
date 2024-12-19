@@ -7,8 +7,8 @@ package v1alpha1
 
 import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
-	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/listers"
 	"k8s.io/client-go/tools/cache"
 )
 
@@ -25,25 +25,17 @@ type LoadBalancerRoutingLister interface {
 
 // loadBalancerRoutingLister implements the LoadBalancerRoutingLister interface.
 type loadBalancerRoutingLister struct {
-	indexer cache.Indexer
+	listers.ResourceIndexer[*v1alpha1.LoadBalancerRouting]
 }
 
 // NewLoadBalancerRoutingLister returns a new LoadBalancerRoutingLister.
 func NewLoadBalancerRoutingLister(indexer cache.Indexer) LoadBalancerRoutingLister {
-	return &loadBalancerRoutingLister{indexer: indexer}
-}
-
-// List lists all LoadBalancerRoutings in the indexer.
-func (s *loadBalancerRoutingLister) List(selector labels.Selector) (ret []*v1alpha1.LoadBalancerRouting, err error) {
-	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.LoadBalancerRouting))
-	})
-	return ret, err
+	return &loadBalancerRoutingLister{listers.New[*v1alpha1.LoadBalancerRouting](indexer, v1alpha1.Resource("loadbalancerrouting"))}
 }
 
 // LoadBalancerRoutings returns an object that can list and get LoadBalancerRoutings.
 func (s *loadBalancerRoutingLister) LoadBalancerRoutings(namespace string) LoadBalancerRoutingNamespaceLister {
-	return loadBalancerRoutingNamespaceLister{indexer: s.indexer, namespace: namespace}
+	return loadBalancerRoutingNamespaceLister{listers.NewNamespaced[*v1alpha1.LoadBalancerRouting](s.ResourceIndexer, namespace)}
 }
 
 // LoadBalancerRoutingNamespaceLister helps list and get LoadBalancerRoutings.
@@ -61,26 +53,5 @@ type LoadBalancerRoutingNamespaceLister interface {
 // loadBalancerRoutingNamespaceLister implements the LoadBalancerRoutingNamespaceLister
 // interface.
 type loadBalancerRoutingNamespaceLister struct {
-	indexer   cache.Indexer
-	namespace string
-}
-
-// List lists all LoadBalancerRoutings in the indexer for a given namespace.
-func (s loadBalancerRoutingNamespaceLister) List(selector labels.Selector) (ret []*v1alpha1.LoadBalancerRouting, err error) {
-	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.LoadBalancerRouting))
-	})
-	return ret, err
-}
-
-// Get retrieves the LoadBalancerRouting from the indexer for a given namespace and name.
-func (s loadBalancerRoutingNamespaceLister) Get(name string) (*v1alpha1.LoadBalancerRouting, error) {
-	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("loadbalancerrouting"), name)
-	}
-	return obj.(*v1alpha1.LoadBalancerRouting), nil
+	listers.ResourceIndexer[*v1alpha1.LoadBalancerRouting]
 }

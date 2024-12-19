@@ -5,13 +5,13 @@
 
 package v1alpha1
 
-// DaemonEndpointApplyConfiguration represents an declarative configuration of the DaemonEndpoint type for use
+// DaemonEndpointApplyConfiguration represents a declarative configuration of the DaemonEndpoint type for use
 // with apply.
 type DaemonEndpointApplyConfiguration struct {
 	Port *int32 `json:"port,omitempty"`
 }
 
-// DaemonEndpointApplyConfiguration constructs an declarative configuration of the DaemonEndpoint type for use with
+// DaemonEndpointApplyConfiguration constructs a declarative configuration of the DaemonEndpoint type for use with
 // apply.
 func DaemonEndpoint() *DaemonEndpointApplyConfiguration {
 	return &DaemonEndpointApplyConfiguration{}

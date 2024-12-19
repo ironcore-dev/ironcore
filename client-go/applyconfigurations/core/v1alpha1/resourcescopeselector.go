@@ -5,13 +5,13 @@
 
 package v1alpha1
 
-// ResourceScopeSelectorApplyConfiguration represents an declarative configuration of the ResourceScopeSelector type for use
+// ResourceScopeSelectorApplyConfiguration represents a declarative configuration of the ResourceScopeSelector type for use
 // with apply.
 type ResourceScopeSelectorApplyConfiguration struct {
 	MatchExpressions []ResourceScopeSelectorRequirementApplyConfiguration `json:"matchExpressions,omitempty"`
 }
 
-// ResourceScopeSelectorApplyConfiguration constructs an declarative configuration of the ResourceScopeSelector type for use with
+// ResourceScopeSelectorApplyConfiguration constructs a declarative configuration of the ResourceScopeSelector type for use with
 // apply.
 func ResourceScopeSelector() *ResourceScopeSelectorApplyConfiguration {
 	return &ResourceScopeSelectorApplyConfiguration{}

@@ -11,7 +11,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// MachinePoolStatusApplyConfiguration represents an declarative configuration of the MachinePoolStatus type for use
+// MachinePoolStatusApplyConfiguration represents a declarative configuration of the MachinePoolStatus type for use
 // with apply.
 type MachinePoolStatusApplyConfiguration struct {
 	State                   *v1alpha1.MachinePoolState                    `json:"state,omitempty"`
@@ -23,7 +23,7 @@ type MachinePoolStatusApplyConfiguration struct {
 	Allocatable             *corev1alpha1.ResourceList                    `json:"allocatable,omitempty"`
 }
 
-// MachinePoolStatusApplyConfiguration constructs an declarative configuration of the MachinePoolStatus type for use with
+// MachinePoolStatusApplyConfiguration constructs a declarative configuration of the MachinePoolStatus type for use with
 // apply.
 func MachinePoolStatus() *MachinePoolStatusApplyConfiguration {
 	return &MachinePoolStatusApplyConfiguration{}

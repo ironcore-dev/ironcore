@@ -7,9 +7,6 @@ package v1alpha1
 
 import (
 	"context"
-	json "encoding/json"
-	"fmt"
-	"time"
 
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/networking/v1alpha1"
@@ -17,7 +14,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
-	rest "k8s.io/client-go/rest"
+	gentype "k8s.io/client-go/gentype"
 )
 
 // LoadBalancersGetter has a method to return a LoadBalancerInterface.
@@ -30,6 +27,7 @@ type LoadBalancersGetter interface {
 type LoadBalancerInterface interface {
 	Create(ctx context.Context, loadBalancer *v1alpha1.LoadBalancer, opts v1.CreateOptions) (*v1alpha1.LoadBalancer, error)
 	Update(ctx context.Context, loadBalancer *v1alpha1.LoadBalancer, opts v1.UpdateOptions) (*v1alpha1.LoadBalancer, error)
+	// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
 	UpdateStatus(ctx context.Context, loadBalancer *v1alpha1.LoadBalancer, opts v1.UpdateOptions) (*v1alpha1.LoadBalancer, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
@@ -38,206 +36,25 @@ type LoadBalancerInterface interface {
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.LoadBalancer, err error)
 	Apply(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancerApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.LoadBalancer, err error)
+	// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
 	ApplyStatus(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancerApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.LoadBalancer, err error)
 	LoadBalancerExpansion
 }
 
 // loadBalancers implements LoadBalancerInterface
 type loadBalancers struct {
-	client rest.Interface
-	ns     string
+	*gentype.ClientWithListAndApply[*v1alpha1.LoadBalancer, *v1alpha1.LoadBalancerList, *networkingv1alpha1.LoadBalancerApplyConfiguration]
 }
 
 // newLoadBalancers returns a LoadBalancers
 func newLoadBalancers(c *NetworkingV1alpha1Client, namespace string) *loadBalancers {
 	return &loadBalancers{
-		client: c.RESTClient(),
-		ns:     namespace,
+		gentype.NewClientWithListAndApply[*v1alpha1.LoadBalancer, *v1alpha1.LoadBalancerList, *networkingv1alpha1.LoadBalancerApplyConfiguration](
+			"loadbalancers",
+			c.RESTClient(),
+			scheme.ParameterCodec,
+			namespace,
+			func() *v1alpha1.LoadBalancer { return &v1alpha1.LoadBalancer{} },
+			func() *v1alpha1.LoadBalancerList { return &v1alpha1.LoadBalancerList{} }),
 	}
-}
-
-// Get takes name of the loadBalancer, and returns the corresponding loadBalancer object, and an error if there is any.
-func (c *loadBalancers) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.LoadBalancer, err error) {
-	result = &v1alpha1.LoadBalancer{}
-	err = c.client.Get().
-		Namespace(c.ns).
-		Resource("loadbalancers").
-		Name(name).
-		VersionedParams(&options, scheme.ParameterCodec).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// List takes label and field selectors, and returns the list of LoadBalancers that match those selectors.
-func (c *loadBalancers) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.LoadBalancerList, err error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
-	result = &v1alpha1.LoadBalancerList{}
-	err = c.client.Get().
-		Namespace(c.ns).
-		Resource("loadbalancers").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Timeout(timeout).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// Watch returns a watch.Interface that watches the requested loadBalancers.
-func (c *loadBalancers) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
-	opts.Watch = true
-	return c.client.Get().
-		Namespace(c.ns).
-		Resource("loadbalancers").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Timeout(timeout).
-		Watch(ctx)
-}
-
-// Create takes the representation of a loadBalancer and creates it.  Returns the server's representation of the loadBalancer, and an error, if there is any.
-func (c *loadBalancers) Create(ctx context.Context, loadBalancer *v1alpha1.LoadBalancer, opts v1.CreateOptions) (result *v1alpha1.LoadBalancer, err error) {
-	result = &v1alpha1.LoadBalancer{}
-	err = c.client.Post().
-		Namespace(c.ns).
-		Resource("loadbalancers").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(loadBalancer).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// Update takes the representation of a loadBalancer and updates it. Returns the server's representation of the loadBalancer, and an error, if there is any.
-func (c *loadBalancers) Update(ctx context.Context, loadBalancer *v1alpha1.LoadBalancer, opts v1.UpdateOptions) (result *v1alpha1.LoadBalancer, err error) {
-	result = &v1alpha1.LoadBalancer{}
-	err = c.client.Put().
-		Namespace(c.ns).
-		Resource("loadbalancers").
-		Name(loadBalancer.Name).
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(loadBalancer).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// UpdateStatus was generated because the type contains a Status member.
-// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *loadBalancers) UpdateStatus(ctx context.Context, loadBalancer *v1alpha1.LoadBalancer, opts v1.UpdateOptions) (result *v1alpha1.LoadBalancer, err error) {
-	result = &v1alpha1.LoadBalancer{}
-	err = c.client.Put().
-		Namespace(c.ns).
-		Resource("loadbalancers").
-		Name(loadBalancer.Name).
-		SubResource("status").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(loadBalancer).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// Delete takes name of the loadBalancer and deletes it. Returns an error if one occurs.
-func (c *loadBalancers) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
-	return c.client.Delete().
-		Namespace(c.ns).
-		Resource("loadbalancers").
-		Name(name).
-		Body(&opts).
-		Do(ctx).
-		Error()
-}
-
-// DeleteCollection deletes a collection of objects.
-func (c *loadBalancers) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	var timeout time.Duration
-	if listOpts.TimeoutSeconds != nil {
-		timeout = time.Duration(*listOpts.TimeoutSeconds) * time.Second
-	}
-	return c.client.Delete().
-		Namespace(c.ns).
-		Resource("loadbalancers").
-		VersionedParams(&listOpts, scheme.ParameterCodec).
-		Timeout(timeout).
-		Body(&opts).
-		Do(ctx).
-		Error()
-}
-
-// Patch applies the patch and returns the patched loadBalancer.
-func (c *loadBalancers) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.LoadBalancer, err error) {
-	result = &v1alpha1.LoadBalancer{}
-	err = c.client.Patch(pt).
-		Namespace(c.ns).
-		Resource("loadbalancers").
-		Name(name).
-		SubResource(subresources...).
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(data).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// Apply takes the given apply declarative configuration, applies it and returns the applied loadBalancer.
-func (c *loadBalancers) Apply(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancerApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.LoadBalancer, err error) {
-	if loadBalancer == nil {
-		return nil, fmt.Errorf("loadBalancer provided to Apply must not be nil")
-	}
-	patchOpts := opts.ToPatchOptions()
-	data, err := json.Marshal(loadBalancer)
-	if err != nil {
-		return nil, err
-	}
-	name := loadBalancer.Name
-	if name == nil {
-		return nil, fmt.Errorf("loadBalancer.Name must be provided to Apply")
-	}
-	result = &v1alpha1.LoadBalancer{}
-	err = c.client.Patch(types.ApplyPatchType).
-		Namespace(c.ns).
-		Resource("loadbalancers").
-		Name(*name).
-		VersionedParams(&patchOpts, scheme.ParameterCodec).
-		Body(data).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// ApplyStatus was generated because the type contains a Status member.
-// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-func (c *loadBalancers) ApplyStatus(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancerApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.LoadBalancer, err error) {
-	if loadBalancer == nil {
-		return nil, fmt.Errorf("loadBalancer provided to Apply must not be nil")
-	}
-	patchOpts := opts.ToPatchOptions()
-	data, err := json.Marshal(loadBalancer)
-	if err != nil {
-		return nil, err
-	}
-
-	name := loadBalancer.Name
-	if name == nil {
-		return nil, fmt.Errorf("loadBalancer.Name must be provided to Apply")
-	}
-
-	result = &v1alpha1.LoadBalancer{}
-	err = c.client.Patch(types.ApplyPatchType).
-		Namespace(c.ns).
-		Resource("loadbalancers").
-		Name(*name).
-		SubResource("status").
-		VersionedParams(&patchOpts, scheme.ParameterCodec).
-		Body(data).
-		Do(ctx).
-		Into(result)
-	return
 }

@@ -9,7 +9,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// NetworkPolicyPortApplyConfiguration represents an declarative configuration of the NetworkPolicyPort type for use
+// NetworkPolicyPortApplyConfiguration represents a declarative configuration of the NetworkPolicyPort type for use
 // with apply.
 type NetworkPolicyPortApplyConfiguration struct {
 	Protocol *v1.Protocol `json:"protocol,omitempty"`
@@ -17,7 +17,7 @@ type NetworkPolicyPortApplyConfiguration struct {
 	EndPort  *int32       `json:"endPort,omitempty"`
 }
 
-// NetworkPolicyPortApplyConfiguration constructs an declarative configuration of the NetworkPolicyPort type for use with
+// NetworkPolicyPortApplyConfiguration constructs a declarative configuration of the NetworkPolicyPort type for use with
 // apply.
 func NetworkPolicyPort() *NetworkPolicyPortApplyConfiguration {
 	return &NetworkPolicyPortApplyConfiguration{}

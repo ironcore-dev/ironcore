@@ -9,7 +9,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// VolumeApplyConfiguration represents an declarative configuration of the Volume type for use
+// VolumeApplyConfiguration represents a declarative configuration of the Volume type for use
 // with apply.
 type VolumeApplyConfiguration struct {
 	Name                           *string `json:"name,omitempty"`
@@ -17,7 +17,7 @@ type VolumeApplyConfiguration struct {
 	VolumeSourceApplyConfiguration `json:",inline"`
 }
 
-// VolumeApplyConfiguration constructs an declarative configuration of the Volume type for use with
+// VolumeApplyConfiguration constructs a declarative configuration of the Volume type for use with
 // apply.
 func Volume() *VolumeApplyConfiguration {
 	return &VolumeApplyConfiguration{}

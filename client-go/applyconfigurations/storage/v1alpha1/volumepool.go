@@ -14,7 +14,7 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// VolumePoolApplyConfiguration represents an declarative configuration of the VolumePool type for use
+// VolumePoolApplyConfiguration represents a declarative configuration of the VolumePool type for use
 // with apply.
 type VolumePoolApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -23,7 +23,7 @@ type VolumePoolApplyConfiguration struct {
 	Status                           *VolumePoolStatusApplyConfiguration `json:"status,omitempty"`
 }
 
-// VolumePool constructs an declarative configuration of the VolumePool type for use with
+// VolumePool constructs a declarative configuration of the VolumePool type for use with
 // apply.
 func VolumePool(name string) *VolumePoolApplyConfiguration {
 	b := &VolumePoolApplyConfiguration{}
@@ -240,4 +240,10 @@ func (b *VolumePoolApplyConfiguration) WithSpec(value *VolumePoolSpecApplyConfig
 func (b *VolumePoolApplyConfiguration) WithStatus(value *VolumePoolStatusApplyConfiguration) *VolumePoolApplyConfiguration {
 	b.Status = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *VolumePoolApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

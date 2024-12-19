@@ -14,7 +14,7 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// NetworkPolicyApplyConfiguration represents an declarative configuration of the NetworkPolicy type for use
+// NetworkPolicyApplyConfiguration represents a declarative configuration of the NetworkPolicy type for use
 // with apply.
 type NetworkPolicyApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -23,7 +23,7 @@ type NetworkPolicyApplyConfiguration struct {
 	Status                           *NetworkPolicyStatusApplyConfiguration `json:"status,omitempty"`
 }
 
-// NetworkPolicy constructs an declarative configuration of the NetworkPolicy type for use with
+// NetworkPolicy constructs a declarative configuration of the NetworkPolicy type for use with
 // apply.
 func NetworkPolicy(name, namespace string) *NetworkPolicyApplyConfiguration {
 	b := &NetworkPolicyApplyConfiguration{}
@@ -242,4 +242,10 @@ func (b *NetworkPolicyApplyConfiguration) WithSpec(value *NetworkPolicySpecApply
 func (b *NetworkPolicyApplyConfiguration) WithStatus(value *NetworkPolicyStatusApplyConfiguration) *NetworkPolicyApplyConfiguration {
 	b.Status = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *NetworkPolicyApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

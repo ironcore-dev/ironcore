@@ -9,14 +9,14 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// VirtualIPSourceApplyConfiguration represents an declarative configuration of the VirtualIPSource type for use
+// VirtualIPSourceApplyConfiguration represents a declarative configuration of the VirtualIPSource type for use
 // with apply.
 type VirtualIPSourceApplyConfiguration struct {
 	VirtualIPRef *v1.LocalObjectReference                    `json:"virtualIPRef,omitempty"`
 	Ephemeral    *EphemeralVirtualIPSourceApplyConfiguration `json:"ephemeral,omitempty"`
 }
 
-// VirtualIPSourceApplyConfiguration constructs an declarative configuration of the VirtualIPSource type for use with
+// VirtualIPSourceApplyConfiguration constructs a declarative configuration of the VirtualIPSource type for use with
 // apply.
 func VirtualIPSource() *VirtualIPSourceApplyConfiguration {
 	return &VirtualIPSourceApplyConfiguration{}

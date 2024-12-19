@@ -11,7 +11,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// VolumePoolConditionApplyConfiguration represents an declarative configuration of the VolumePoolCondition type for use
+// VolumePoolConditionApplyConfiguration represents a declarative configuration of the VolumePoolCondition type for use
 // with apply.
 type VolumePoolConditionApplyConfiguration struct {
 	Type               *v1alpha1.VolumePoolConditionType `json:"type,omitempty"`
@@ -22,7 +22,7 @@ type VolumePoolConditionApplyConfiguration struct {
 	LastTransitionTime *metav1.Time                      `json:"lastTransitionTime,omitempty"`
 }
 
-// VolumePoolConditionApplyConfiguration constructs an declarative configuration of the VolumePoolCondition type for use with
+// VolumePoolConditionApplyConfiguration constructs a declarative configuration of the VolumePoolCondition type for use with
 // apply.
 func VolumePoolCondition() *VolumePoolConditionApplyConfiguration {
 	return &VolumePoolConditionApplyConfiguration{}

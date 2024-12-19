@@ -9,14 +9,14 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// BucketAccessApplyConfiguration represents an declarative configuration of the BucketAccess type for use
+// BucketAccessApplyConfiguration represents a declarative configuration of the BucketAccess type for use
 // with apply.
 type BucketAccessApplyConfiguration struct {
 	SecretRef *v1.LocalObjectReference `json:"secretRef,omitempty"`
 	Endpoint  *string                  `json:"endpoint,omitempty"`
 }
 
-// BucketAccessApplyConfiguration constructs an declarative configuration of the BucketAccess type for use with
+// BucketAccessApplyConfiguration constructs a declarative configuration of the BucketAccess type for use with
 // apply.
 func BucketAccess() *BucketAccessApplyConfiguration {
 	return &BucketAccessApplyConfiguration{}

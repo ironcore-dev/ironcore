@@ -11,7 +11,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// NetworkInterfaceStatusApplyConfiguration represents an declarative configuration of the NetworkInterfaceStatus type for use
+// NetworkInterfaceStatusApplyConfiguration represents a declarative configuration of the NetworkInterfaceStatus type for use
 // with apply.
 type NetworkInterfaceStatusApplyConfiguration struct {
 	State                   *v1alpha1.NetworkInterfaceState `json:"state,omitempty"`
@@ -21,7 +21,7 @@ type NetworkInterfaceStatusApplyConfiguration struct {
 	VirtualIP               *commonv1alpha1.IP              `json:"virtualIP,omitempty"`
 }
 
-// NetworkInterfaceStatusApplyConfiguration constructs an declarative configuration of the NetworkInterfaceStatus type for use with
+// NetworkInterfaceStatusApplyConfiguration constructs a declarative configuration of the NetworkInterfaceStatus type for use with
 // apply.
 func NetworkInterfaceStatus() *NetworkInterfaceStatusApplyConfiguration {
 	return &NetworkInterfaceStatusApplyConfiguration{}
