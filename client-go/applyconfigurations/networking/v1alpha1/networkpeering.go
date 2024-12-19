@@ -5,7 +5,7 @@
 
 package v1alpha1
 
-// NetworkPeeringApplyConfiguration represents an declarative configuration of the NetworkPeering type for use
+// NetworkPeeringApplyConfiguration represents a declarative configuration of the NetworkPeering type for use
 // with apply.
 type NetworkPeeringApplyConfiguration struct {
 	Name       *string                                     `json:"name,omitempty"`
@@ -13,7 +13,7 @@ type NetworkPeeringApplyConfiguration struct {
 	Prefixes   []PeeringPrefixApplyConfiguration           `json:"prefixes,omitempty"`
 }
 
-// NetworkPeeringApplyConfiguration constructs an declarative configuration of the NetworkPeering type for use with
+// NetworkPeeringApplyConfiguration constructs a declarative configuration of the NetworkPeering type for use with
 // apply.
 func NetworkPeering() *NetworkPeeringApplyConfiguration {
 	return &NetworkPeeringApplyConfiguration{}

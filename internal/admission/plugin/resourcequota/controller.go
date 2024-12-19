@@ -32,7 +32,7 @@ type EvaluatorController struct {
 	quotaAccessor QuotaAccessor
 	registry      quota.Registry
 
-	queue      workqueue.Interface
+	queue      workqueue.TypedInterface[string]
 	inProgress sets.Set[string]
 	work       map[string][]*admissionWaiter
 	dirtyWork  map[string][]*admissionWaiter
@@ -42,7 +42,7 @@ func NewEvaluatorController(quotaAccessor QuotaAccessor, registry quota.Registry
 	return &EvaluatorController{
 		quotaAccessor: quotaAccessor,
 		registry:      registry,
-		queue:         workqueue.NewNamed("quota_admission_evaluator"),
+		queue:         workqueue.NewTypedWithConfig[string](workqueue.TypedQueueConfig[string]{Name: "quota_admission_evaluator"}),
 		inProgress:    sets.New[string](),
 		work:          make(map[string][]*admissionWaiter),
 		dirtyWork:     make(map[string][]*admissionWaiter),
@@ -214,11 +214,10 @@ func (e *EvaluatorController) completeWork(ns string) {
 }
 
 func (e *EvaluatorController) getWork() (string, []*admissionWaiter, bool) {
-	uncastNS, shutdown := e.queue.Get()
+	ns, shutdown := e.queue.Get()
 	if shutdown {
 		return "", nil, true
 	}
-	ns := uncastNS.(string)
 
 	e.workLock.Lock()
 	defer e.workLock.Unlock()

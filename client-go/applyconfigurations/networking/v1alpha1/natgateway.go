@@ -14,7 +14,7 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// NATGatewayApplyConfiguration represents an declarative configuration of the NATGateway type for use
+// NATGatewayApplyConfiguration represents a declarative configuration of the NATGateway type for use
 // with apply.
 type NATGatewayApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -23,7 +23,7 @@ type NATGatewayApplyConfiguration struct {
 	Status                           *NATGatewayStatusApplyConfiguration `json:"status,omitempty"`
 }
 
-// NATGateway constructs an declarative configuration of the NATGateway type for use with
+// NATGateway constructs a declarative configuration of the NATGateway type for use with
 // apply.
 func NATGateway(name, namespace string) *NATGatewayApplyConfiguration {
 	b := &NATGatewayApplyConfiguration{}
@@ -242,4 +242,10 @@ func (b *NATGatewayApplyConfiguration) WithSpec(value *NATGatewaySpecApplyConfig
 func (b *NATGatewayApplyConfiguration) WithStatus(value *NATGatewayStatusApplyConfiguration) *NATGatewayApplyConfiguration {
 	b.Status = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *NATGatewayApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

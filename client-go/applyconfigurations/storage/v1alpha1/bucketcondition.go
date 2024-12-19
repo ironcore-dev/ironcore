@@ -11,7 +11,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// BucketConditionApplyConfiguration represents an declarative configuration of the BucketCondition type for use
+// BucketConditionApplyConfiguration represents a declarative configuration of the BucketCondition type for use
 // with apply.
 type BucketConditionApplyConfiguration struct {
 	Type               *v1alpha1.BucketConditionType `json:"type,omitempty"`
@@ -22,7 +22,7 @@ type BucketConditionApplyConfiguration struct {
 	LastTransitionTime *metav1.Time                  `json:"lastTransitionTime,omitempty"`
 }
 
-// BucketConditionApplyConfiguration constructs an declarative configuration of the BucketCondition type for use with
+// BucketConditionApplyConfiguration constructs a declarative configuration of the BucketCondition type for use with
 // apply.
 func BucketCondition() *BucketConditionApplyConfiguration {
 	return &BucketConditionApplyConfiguration{}

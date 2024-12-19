@@ -11,7 +11,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// NetworkInterfaceStatusApplyConfiguration represents an declarative configuration of the NetworkInterfaceStatus type for use
+// NetworkInterfaceStatusApplyConfiguration represents a declarative configuration of the NetworkInterfaceStatus type for use
 // with apply.
 type NetworkInterfaceStatusApplyConfiguration struct {
 	Name                    *string                         `json:"name,omitempty"`
@@ -21,7 +21,7 @@ type NetworkInterfaceStatusApplyConfiguration struct {
 	LastStateTransitionTime *metav1.Time                    `json:"lastStateTransitionTime,omitempty"`
 }
 
-// NetworkInterfaceStatusApplyConfiguration constructs an declarative configuration of the NetworkInterfaceStatus type for use with
+// NetworkInterfaceStatusApplyConfiguration constructs a declarative configuration of the NetworkInterfaceStatus type for use with
 // apply.
 func NetworkInterfaceStatus() *NetworkInterfaceStatusApplyConfiguration {
 	return &NetworkInterfaceStatusApplyConfiguration{}

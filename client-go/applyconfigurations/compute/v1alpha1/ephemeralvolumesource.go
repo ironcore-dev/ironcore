@@ -9,13 +9,13 @@ import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/storage/v1alpha1"
 )
 
-// EphemeralVolumeSourceApplyConfiguration represents an declarative configuration of the EphemeralVolumeSource type for use
+// EphemeralVolumeSourceApplyConfiguration represents a declarative configuration of the EphemeralVolumeSource type for use
 // with apply.
 type EphemeralVolumeSourceApplyConfiguration struct {
 	VolumeTemplate *v1alpha1.VolumeTemplateSpecApplyConfiguration `json:"volumeTemplate,omitempty"`
 }
 
-// EphemeralVolumeSourceApplyConfiguration constructs an declarative configuration of the EphemeralVolumeSource type for use with
+// EphemeralVolumeSourceApplyConfiguration constructs a declarative configuration of the EphemeralVolumeSource type for use with
 // apply.
 func EphemeralVolumeSource() *EphemeralVolumeSourceApplyConfiguration {
 	return &EphemeralVolumeSourceApplyConfiguration{}

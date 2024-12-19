@@ -9,13 +9,13 @@ import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/ipam/v1alpha1"
 )
 
-// EphemeralPrefixSourceApplyConfiguration represents an declarative configuration of the EphemeralPrefixSource type for use
+// EphemeralPrefixSourceApplyConfiguration represents a declarative configuration of the EphemeralPrefixSource type for use
 // with apply.
 type EphemeralPrefixSourceApplyConfiguration struct {
 	PrefixTemplate *v1alpha1.PrefixTemplateSpecApplyConfiguration `json:"prefixTemplate,omitempty"`
 }
 
-// EphemeralPrefixSourceApplyConfiguration constructs an declarative configuration of the EphemeralPrefixSource type for use with
+// EphemeralPrefixSourceApplyConfiguration constructs a declarative configuration of the EphemeralPrefixSource type for use with
 // apply.
 func EphemeralPrefixSource() *EphemeralPrefixSourceApplyConfiguration {
 	return &EphemeralPrefixSourceApplyConfiguration{}

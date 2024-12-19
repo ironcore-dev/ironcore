@@ -15,7 +15,7 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// MachineClassApplyConfiguration represents an declarative configuration of the MachineClass type for use
+// MachineClassApplyConfiguration represents a declarative configuration of the MachineClass type for use
 // with apply.
 type MachineClassApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -23,7 +23,7 @@ type MachineClassApplyConfiguration struct {
 	Capabilities                     *v1alpha1.ResourceList `json:"capabilities,omitempty"`
 }
 
-// MachineClass constructs an declarative configuration of the MachineClass type for use with
+// MachineClass constructs a declarative configuration of the MachineClass type for use with
 // apply.
 func MachineClass(name string) *MachineClassApplyConfiguration {
 	b := &MachineClassApplyConfiguration{}
@@ -232,4 +232,10 @@ func (b *MachineClassApplyConfiguration) ensureObjectMetaApplyConfigurationExist
 func (b *MachineClassApplyConfiguration) WithCapabilities(value v1alpha1.ResourceList) *MachineClassApplyConfiguration {
 	b.Capabilities = &value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *MachineClassApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

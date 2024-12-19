@@ -11,7 +11,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// VirtualIPSpecApplyConfiguration represents an declarative configuration of the VirtualIPSpec type for use
+// VirtualIPSpecApplyConfiguration represents a declarative configuration of the VirtualIPSpec type for use
 // with apply.
 type VirtualIPSpecApplyConfiguration struct {
 	Type      *v1alpha1.VirtualIPType           `json:"type,omitempty"`
@@ -19,7 +19,7 @@ type VirtualIPSpecApplyConfiguration struct {
 	TargetRef *commonv1alpha1.LocalUIDReference `json:"targetRef,omitempty"`
 }
 
-// VirtualIPSpecApplyConfiguration constructs an declarative configuration of the VirtualIPSpec type for use with
+// VirtualIPSpecApplyConfiguration constructs a declarative configuration of the VirtualIPSpec type for use with
 // apply.
 func VirtualIPSpec() *VirtualIPSpecApplyConfiguration {
 	return &VirtualIPSpecApplyConfiguration{}

@@ -11,14 +11,14 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// NetworkInterfaceTemplateSpecApplyConfiguration represents an declarative configuration of the NetworkInterfaceTemplateSpec type for use
+// NetworkInterfaceTemplateSpecApplyConfiguration represents a declarative configuration of the NetworkInterfaceTemplateSpec type for use
 // with apply.
 type NetworkInterfaceTemplateSpecApplyConfiguration struct {
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *NetworkInterfaceSpecApplyConfiguration `json:"spec,omitempty"`
 }
 
-// NetworkInterfaceTemplateSpecApplyConfiguration constructs an declarative configuration of the NetworkInterfaceTemplateSpec type for use with
+// NetworkInterfaceTemplateSpecApplyConfiguration constructs a declarative configuration of the NetworkInterfaceTemplateSpec type for use with
 // apply.
 func NetworkInterfaceTemplateSpec() *NetworkInterfaceTemplateSpecApplyConfiguration {
 	return &NetworkInterfaceTemplateSpecApplyConfiguration{}
@@ -172,4 +172,10 @@ func (b *NetworkInterfaceTemplateSpecApplyConfiguration) ensureObjectMetaApplyCo
 func (b *NetworkInterfaceTemplateSpecApplyConfiguration) WithSpec(value *NetworkInterfaceSpecApplyConfiguration) *NetworkInterfaceTemplateSpecApplyConfiguration {
 	b.Spec = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *NetworkInterfaceTemplateSpecApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

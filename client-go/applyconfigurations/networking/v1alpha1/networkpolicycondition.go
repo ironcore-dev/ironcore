@@ -11,7 +11,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// NetworkPolicyConditionApplyConfiguration represents an declarative configuration of the NetworkPolicyCondition type for use
+// NetworkPolicyConditionApplyConfiguration represents a declarative configuration of the NetworkPolicyCondition type for use
 // with apply.
 type NetworkPolicyConditionApplyConfiguration struct {
 	Type               *v1alpha1.NetworkPolicyConditionType `json:"type,omitempty"`
@@ -22,7 +22,7 @@ type NetworkPolicyConditionApplyConfiguration struct {
 	LastTransitionTime *metav1.Time                         `json:"lastTransitionTime,omitempty"`
 }
 
-// NetworkPolicyConditionApplyConfiguration constructs an declarative configuration of the NetworkPolicyCondition type for use with
+// NetworkPolicyConditionApplyConfiguration constructs a declarative configuration of the NetworkPolicyCondition type for use with
 // apply.
 func NetworkPolicyCondition() *NetworkPolicyConditionApplyConfiguration {
 	return &NetworkPolicyConditionApplyConfiguration{}

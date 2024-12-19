@@ -7,8 +7,8 @@ package v1alpha1
 
 import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
-	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/listers"
 	"k8s.io/client-go/tools/cache"
 )
 
@@ -25,25 +25,17 @@ type NATGatewayLister interface {
 
 // nATGatewayLister implements the NATGatewayLister interface.
 type nATGatewayLister struct {
-	indexer cache.Indexer
+	listers.ResourceIndexer[*v1alpha1.NATGateway]
 }
 
 // NewNATGatewayLister returns a new NATGatewayLister.
 func NewNATGatewayLister(indexer cache.Indexer) NATGatewayLister {
-	return &nATGatewayLister{indexer: indexer}
-}
-
-// List lists all NATGateways in the indexer.
-func (s *nATGatewayLister) List(selector labels.Selector) (ret []*v1alpha1.NATGateway, err error) {
-	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.NATGateway))
-	})
-	return ret, err
+	return &nATGatewayLister{listers.New[*v1alpha1.NATGateway](indexer, v1alpha1.Resource("natgateway"))}
 }
 
 // NATGateways returns an object that can list and get NATGateways.
 func (s *nATGatewayLister) NATGateways(namespace string) NATGatewayNamespaceLister {
-	return nATGatewayNamespaceLister{indexer: s.indexer, namespace: namespace}
+	return nATGatewayNamespaceLister{listers.NewNamespaced[*v1alpha1.NATGateway](s.ResourceIndexer, namespace)}
 }
 
 // NATGatewayNamespaceLister helps list and get NATGateways.
@@ -61,26 +53,5 @@ type NATGatewayNamespaceLister interface {
 // nATGatewayNamespaceLister implements the NATGatewayNamespaceLister
 // interface.
 type nATGatewayNamespaceLister struct {
-	indexer   cache.Indexer
-	namespace string
-}
-
-// List lists all NATGateways in the indexer for a given namespace.
-func (s nATGatewayNamespaceLister) List(selector labels.Selector) (ret []*v1alpha1.NATGateway, err error) {
-	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.NATGateway))
-	})
-	return ret, err
-}
-
-// Get retrieves the NATGateway from the indexer for a given namespace and name.
-func (s nATGatewayNamespaceLister) Get(name string) (*v1alpha1.NATGateway, error) {
-	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("natgateway"), name)
-	}
-	return obj.(*v1alpha1.NATGateway), nil
+	listers.ResourceIndexer[*v1alpha1.NATGateway]
 }

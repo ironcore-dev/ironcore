@@ -11,7 +11,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// VolumeConditionApplyConfiguration represents an declarative configuration of the VolumeCondition type for use
+// VolumeConditionApplyConfiguration represents a declarative configuration of the VolumeCondition type for use
 // with apply.
 type VolumeConditionApplyConfiguration struct {
 	Type               *v1alpha1.VolumeConditionType `json:"type,omitempty"`
@@ -22,7 +22,7 @@ type VolumeConditionApplyConfiguration struct {
 	LastTransitionTime *metav1.Time                  `json:"lastTransitionTime,omitempty"`
 }
 
-// VolumeConditionApplyConfiguration constructs an declarative configuration of the VolumeCondition type for use with
+// VolumeConditionApplyConfiguration constructs a declarative configuration of the VolumeCondition type for use with
 // apply.
 func VolumeCondition() *VolumeConditionApplyConfiguration {
 	return &VolumeConditionApplyConfiguration{}

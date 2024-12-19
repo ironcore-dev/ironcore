@@ -9,13 +9,13 @@ import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 )
 
-// VirtualIPStatusApplyConfiguration represents an declarative configuration of the VirtualIPStatus type for use
+// VirtualIPStatusApplyConfiguration represents a declarative configuration of the VirtualIPStatus type for use
 // with apply.
 type VirtualIPStatusApplyConfiguration struct {
 	IP *v1alpha1.IP `json:"ip,omitempty"`
 }
 
-// VirtualIPStatusApplyConfiguration constructs an declarative configuration of the VirtualIPStatus type for use with
+// VirtualIPStatusApplyConfiguration constructs a declarative configuration of the VirtualIPStatus type for use with
 // apply.
 func VirtualIPStatus() *VirtualIPStatusApplyConfiguration {
 	return &VirtualIPStatusApplyConfiguration{}

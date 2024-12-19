@@ -9,14 +9,14 @@ import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 )
 
-// PeeringPrefixStatusApplyConfiguration represents an declarative configuration of the PeeringPrefixStatus type for use
+// PeeringPrefixStatusApplyConfiguration represents a declarative configuration of the PeeringPrefixStatus type for use
 // with apply.
 type PeeringPrefixStatusApplyConfiguration struct {
 	Name   *string            `json:"name,omitempty"`
 	Prefix *v1alpha1.IPPrefix `json:"prefix,omitempty"`
 }
 
-// PeeringPrefixStatusApplyConfiguration constructs an declarative configuration of the PeeringPrefixStatus type for use with
+// PeeringPrefixStatusApplyConfiguration constructs a declarative configuration of the PeeringPrefixStatus type for use with
 // apply.
 func PeeringPrefixStatus() *PeeringPrefixStatusApplyConfiguration {
 	return &PeeringPrefixStatusApplyConfiguration{}

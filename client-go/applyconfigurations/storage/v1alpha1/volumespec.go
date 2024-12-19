@@ -11,7 +11,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// VolumeSpecApplyConfiguration represents an declarative configuration of the VolumeSpec type for use
+// VolumeSpecApplyConfiguration represents a declarative configuration of the VolumeSpec type for use
 // with apply.
 type VolumeSpecApplyConfiguration struct {
 	VolumeClassRef     *v1.LocalObjectReference            `json:"volumeClassRef,omitempty"`
@@ -26,7 +26,7 @@ type VolumeSpecApplyConfiguration struct {
 	Encryption         *VolumeEncryptionApplyConfiguration `json:"encryption,omitempty"`
 }
 
-// VolumeSpecApplyConfiguration constructs an declarative configuration of the VolumeSpec type for use with
+// VolumeSpecApplyConfiguration constructs a declarative configuration of the VolumeSpec type for use with
 // apply.
 func VolumeSpec() *VolumeSpecApplyConfiguration {
 	return &VolumeSpecApplyConfiguration{}

@@ -11,7 +11,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// PrefixAllocationStatusApplyConfiguration represents an declarative configuration of the PrefixAllocationStatus type for use
+// PrefixAllocationStatusApplyConfiguration represents a declarative configuration of the PrefixAllocationStatus type for use
 // with apply.
 type PrefixAllocationStatusApplyConfiguration struct {
 	Prefix                  *v1alpha1.IPPrefix                  `json:"prefix,omitempty"`
@@ -19,7 +19,7 @@ type PrefixAllocationStatusApplyConfiguration struct {
 	LastPhaseTransitionTime *v1.Time                            `json:"lastPhaseTransitionTime,omitempty"`
 }
 
-// PrefixAllocationStatusApplyConfiguration constructs an declarative configuration of the PrefixAllocationStatus type for use with
+// PrefixAllocationStatusApplyConfiguration constructs a declarative configuration of the PrefixAllocationStatus type for use with
 // apply.
 func PrefixAllocationStatus() *PrefixAllocationStatusApplyConfiguration {
 	return &PrefixAllocationStatusApplyConfiguration{}

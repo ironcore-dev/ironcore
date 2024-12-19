@@ -9,14 +9,14 @@ import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 )
 
-// PrefixSourceApplyConfiguration represents an declarative configuration of the PrefixSource type for use
+// PrefixSourceApplyConfiguration represents a declarative configuration of the PrefixSource type for use
 // with apply.
 type PrefixSourceApplyConfiguration struct {
 	Value     *v1alpha1.IPPrefix                       `json:"value,omitempty"`
 	Ephemeral *EphemeralPrefixSourceApplyConfiguration `json:"ephemeral,omitempty"`
 }
 
-// PrefixSourceApplyConfiguration constructs an declarative configuration of the PrefixSource type for use with
+// PrefixSourceApplyConfiguration constructs a declarative configuration of the PrefixSource type for use with
 // apply.
 func PrefixSource() *PrefixSourceApplyConfiguration {
 	return &PrefixSourceApplyConfiguration{}

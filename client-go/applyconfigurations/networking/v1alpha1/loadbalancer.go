@@ -14,7 +14,7 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// LoadBalancerApplyConfiguration represents an declarative configuration of the LoadBalancer type for use
+// LoadBalancerApplyConfiguration represents a declarative configuration of the LoadBalancer type for use
 // with apply.
 type LoadBalancerApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -23,7 +23,7 @@ type LoadBalancerApplyConfiguration struct {
 	Status                           *LoadBalancerStatusApplyConfiguration `json:"status,omitempty"`
 }
 
-// LoadBalancer constructs an declarative configuration of the LoadBalancer type for use with
+// LoadBalancer constructs a declarative configuration of the LoadBalancer type for use with
 // apply.
 func LoadBalancer(name, namespace string) *LoadBalancerApplyConfiguration {
 	b := &LoadBalancerApplyConfiguration{}
@@ -242,4 +242,10 @@ func (b *LoadBalancerApplyConfiguration) WithSpec(value *LoadBalancerSpecApplyCo
 func (b *LoadBalancerApplyConfiguration) WithStatus(value *LoadBalancerStatusApplyConfiguration) *LoadBalancerApplyConfiguration {
 	b.Status = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *LoadBalancerApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

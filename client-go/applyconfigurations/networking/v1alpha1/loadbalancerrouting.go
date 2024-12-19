@@ -15,7 +15,7 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// LoadBalancerRoutingApplyConfiguration represents an declarative configuration of the LoadBalancerRouting type for use
+// LoadBalancerRoutingApplyConfiguration represents a declarative configuration of the LoadBalancerRouting type for use
 // with apply.
 type LoadBalancerRoutingApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -24,7 +24,7 @@ type LoadBalancerRoutingApplyConfiguration struct {
 	Destinations                     []LoadBalancerDestinationApplyConfiguration `json:"destinations,omitempty"`
 }
 
-// LoadBalancerRouting constructs an declarative configuration of the LoadBalancerRouting type for use with
+// LoadBalancerRouting constructs a declarative configuration of the LoadBalancerRouting type for use with
 // apply.
 func LoadBalancerRouting(name, namespace string) *LoadBalancerRoutingApplyConfiguration {
 	b := &LoadBalancerRoutingApplyConfiguration{}
@@ -248,4 +248,10 @@ func (b *LoadBalancerRoutingApplyConfiguration) WithDestinations(values ...*Load
 		b.Destinations = append(b.Destinations, *values[i])
 	}
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *LoadBalancerRoutingApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

@@ -11,7 +11,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// VolumeStatusApplyConfiguration represents an declarative configuration of the VolumeStatus type for use
+// VolumeStatusApplyConfiguration represents a declarative configuration of the VolumeStatus type for use
 // with apply.
 type VolumeStatusApplyConfiguration struct {
 	Name                    *string                      `json:"name,omitempty"`
@@ -21,7 +21,7 @@ type VolumeStatusApplyConfiguration struct {
 	VolumeRef               *corev1.LocalObjectReference `json:"volumeRef,omitempty"`
 }
 
-// VolumeStatusApplyConfiguration constructs an declarative configuration of the VolumeStatus type for use with
+// VolumeStatusApplyConfiguration constructs a declarative configuration of the VolumeStatus type for use with
 // apply.
 func VolumeStatus() *VolumeStatusApplyConfiguration {
 	return &VolumeStatusApplyConfiguration{}

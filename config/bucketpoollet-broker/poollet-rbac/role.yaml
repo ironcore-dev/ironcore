@@ -60,6 +60,7 @@ rules:
   - storage.ironcore.dev
   resources:
   - bucketpools/status
+  - buckets/status
   verbs:
   - get
   - patch
@@ -79,12 +80,4 @@ rules:
   resources:
   - buckets/finalizers
   verbs:
-  - update
-- apiGroups:
-  - storage.ironcore.dev
-  resources:
-  - buckets/status
-  verbs:
-  - get
-  - patch
   - update

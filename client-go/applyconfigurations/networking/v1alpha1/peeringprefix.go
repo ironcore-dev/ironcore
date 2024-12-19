@@ -10,7 +10,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// PeeringPrefixApplyConfiguration represents an declarative configuration of the PeeringPrefix type for use
+// PeeringPrefixApplyConfiguration represents a declarative configuration of the PeeringPrefix type for use
 // with apply.
 type PeeringPrefixApplyConfiguration struct {
 	Name      *string                  `json:"name,omitempty"`
@@ -18,7 +18,7 @@ type PeeringPrefixApplyConfiguration struct {
 	PrefixRef *v1.LocalObjectReference `json:"prefixRef,omitempty"`
 }
 
-// PeeringPrefixApplyConfiguration constructs an declarative configuration of the PeeringPrefix type for use with
+// PeeringPrefixApplyConfiguration constructs a declarative configuration of the PeeringPrefix type for use with
 // apply.
 func PeeringPrefix() *PeeringPrefixApplyConfiguration {
 	return &PeeringPrefixApplyConfiguration{}

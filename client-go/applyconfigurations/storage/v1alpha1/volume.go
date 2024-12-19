@@ -14,7 +14,7 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// VolumeApplyConfiguration represents an declarative configuration of the Volume type for use
+// VolumeApplyConfiguration represents a declarative configuration of the Volume type for use
 // with apply.
 type VolumeApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -23,7 +23,7 @@ type VolumeApplyConfiguration struct {
 	Status                           *VolumeStatusApplyConfiguration `json:"status,omitempty"`
 }
 
-// Volume constructs an declarative configuration of the Volume type for use with
+// Volume constructs a declarative configuration of the Volume type for use with
 // apply.
 func Volume(name, namespace string) *VolumeApplyConfiguration {
 	b := &VolumeApplyConfiguration{}
@@ -242,4 +242,10 @@ func (b *VolumeApplyConfiguration) WithSpec(value *VolumeSpecApplyConfiguration)
 func (b *VolumeApplyConfiguration) WithStatus(value *VolumeStatusApplyConfiguration) *VolumeApplyConfiguration {
 	b.Status = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *VolumeApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

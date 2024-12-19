@@ -7,8 +7,8 @@ package v1alpha1
 
 import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/listers"
 	"k8s.io/client-go/tools/cache"
 )
 
@@ -25,25 +25,17 @@ type VolumeLister interface {
 
 // volumeLister implements the VolumeLister interface.
 type volumeLister struct {
-	indexer cache.Indexer
+	listers.ResourceIndexer[*v1alpha1.Volume]
 }
 
 // NewVolumeLister returns a new VolumeLister.
 func NewVolumeLister(indexer cache.Indexer) VolumeLister {
-	return &volumeLister{indexer: indexer}
-}
-
-// List lists all Volumes in the indexer.
-func (s *volumeLister) List(selector labels.Selector) (ret []*v1alpha1.Volume, err error) {
-	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.Volume))
-	})
-	return ret, err
+	return &volumeLister{listers.New[*v1alpha1.Volume](indexer, v1alpha1.Resource("volume"))}
 }
 
 // Volumes returns an object that can list and get Volumes.
 func (s *volumeLister) Volumes(namespace string) VolumeNamespaceLister {
-	return volumeNamespaceLister{indexer: s.indexer, namespace: namespace}
+	return volumeNamespaceLister{listers.NewNamespaced[*v1alpha1.Volume](s.ResourceIndexer, namespace)}
 }
 
 // VolumeNamespaceLister helps list and get Volumes.
@@ -61,26 +53,5 @@ type VolumeNamespaceLister interface {
 // volumeNamespaceLister implements the VolumeNamespaceLister
 // interface.
 type volumeNamespaceLister struct {
-	indexer   cache.Indexer
-	namespace string
-}
-
-// List lists all Volumes in the indexer for a given namespace.
-func (s volumeNamespaceLister) List(selector labels.Selector) (ret []*v1alpha1.Volume, err error) {
-	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.Volume))
-	})
-	return ret, err
-}
-
-// Get retrieves the Volume from the indexer for a given namespace and name.
-func (s volumeNamespaceLister) Get(name string) (*v1alpha1.Volume, error) {
-	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("volume"), name)
-	}
-	return obj.(*v1alpha1.Volume), nil
+	listers.ResourceIndexer[*v1alpha1.Volume]
 }

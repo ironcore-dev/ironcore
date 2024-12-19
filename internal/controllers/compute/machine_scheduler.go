@@ -26,6 +26,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
 const (
@@ -75,18 +76,18 @@ func (s *MachineScheduler) skipSchedule(log logr.Logger, machine *computev1alpha
 	return isAssumed
 }
 
-func (s *MachineScheduler) matchesLabels(ctx context.Context, pool *scheduler.ContainerInfo, machine *computev1alpha1.Machine) bool {
+func (s *MachineScheduler) matchesLabels(_ context.Context, pool *scheduler.ContainerInfo, machine *computev1alpha1.Machine) bool {
 	nodeLabels := labels.Set(pool.Node().Labels)
 	machinePoolSelector := labels.SelectorFromSet(machine.Spec.MachinePoolSelector)
 
 	return machinePoolSelector.Matches(nodeLabels)
 }
 
-func (s *MachineScheduler) tolerateTaints(ctx context.Context, pool *scheduler.ContainerInfo, machine *computev1alpha1.Machine) bool {
+func (s *MachineScheduler) tolerateTaints(_ context.Context, pool *scheduler.ContainerInfo, machine *computev1alpha1.Machine) bool {
 	return v1alpha1.TolerateTaints(machine.Spec.Tolerations, pool.Node().Spec.Taints)
 }
 
-func (s *MachineScheduler) fitsPool(ctx context.Context, pool *scheduler.ContainerInfo, machine *computev1alpha1.Machine) bool {
+func (s *MachineScheduler) fitsPool(_ context.Context, pool *scheduler.ContainerInfo, machine *computev1alpha1.Machine) bool {
 	machineClassName := machine.Spec.MachineClassRef.Name
 
 	allocatable, ok := pool.Node().Status.Allocatable[corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClassName)]
@@ -192,7 +193,7 @@ func (s *MachineScheduler) bind(ctx context.Context, log logr.Logger, assumed *c
 	return nil
 }
 
-func (s *MachineScheduler) enqueueUnscheduledMachines(ctx context.Context, queue workqueue.RateLimitingInterface) {
+func (s *MachineScheduler) enqueueUnscheduledMachines(ctx context.Context, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 	log := ctrl.LoggerFrom(ctx)
 	machineList := &computev1alpha1.MachineList{}
 	if err := s.List(ctx, machineList, client.MatchingFields{computeclient.MachineSpecMachinePoolRefNameField: ""}); err != nil {
@@ -227,7 +228,7 @@ func (s *MachineScheduler) isMachineNotAssigned() predicate.Predicate {
 
 func (s *MachineScheduler) handleMachine() handler.EventHandler {
 	return handler.Funcs{
-		CreateFunc: func(ctx context.Context, evt event.CreateEvent, queue workqueue.RateLimitingInterface) {
+		CreateFunc: func(ctx context.Context, evt event.CreateEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			machine := evt.Object.(*computev1alpha1.Machine)
 			log := ctrl.LoggerFrom(ctx)
 
@@ -235,7 +236,7 @@ func (s *MachineScheduler) handleMachine() handler.EventHandler {
 				log.Error(err, "Error adding machine to cache")
 			}
 		},
-		UpdateFunc: func(ctx context.Context, evt event.UpdateEvent, queue workqueue.RateLimitingInterface) {
+		UpdateFunc: func(ctx context.Context, evt event.UpdateEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			log := ctrl.LoggerFrom(ctx)
 
 			oldInstance := evt.ObjectOld.(*computev1alpha1.Machine)
@@ -244,7 +245,7 @@ func (s *MachineScheduler) handleMachine() handler.EventHandler {
 				log.Error(err, "Error updating machine in cache")
 			}
 		},
-		DeleteFunc: func(ctx context.Context, evt event.DeleteEvent, queue workqueue.RateLimitingInterface) {
+		DeleteFunc: func(ctx context.Context, evt event.DeleteEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			log := ctrl.LoggerFrom(ctx)
 
 			instance := evt.Object.(*computev1alpha1.Machine)
@@ -257,18 +258,18 @@ func (s *MachineScheduler) handleMachine() handler.EventHandler {
 
 func (s *MachineScheduler) handleMachinePool() handler.EventHandler {
 	return handler.Funcs{
-		CreateFunc: func(ctx context.Context, evt event.CreateEvent, queue workqueue.RateLimitingInterface) {
+		CreateFunc: func(ctx context.Context, evt event.CreateEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			pool := evt.Object.(*computev1alpha1.MachinePool)
 			s.Cache.AddContainer(pool)
 			s.enqueueUnscheduledMachines(ctx, queue)
 		},
-		UpdateFunc: func(ctx context.Context, evt event.UpdateEvent, queue workqueue.RateLimitingInterface) {
+		UpdateFunc: func(ctx context.Context, evt event.UpdateEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			oldPool := evt.ObjectOld.(*computev1alpha1.MachinePool)
 			newPool := evt.ObjectNew.(*computev1alpha1.MachinePool)
 			s.Cache.UpdateContainer(oldPool, newPool)
 			s.enqueueUnscheduledMachines(ctx, queue)
 		},
-		DeleteFunc: func(ctx context.Context, evt event.DeleteEvent, queue workqueue.RateLimitingInterface) {
+		DeleteFunc: func(ctx context.Context, evt event.DeleteEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			log := ctrl.LoggerFrom(ctx)
 
 			pool := evt.Object.(*computev1alpha1.MachinePool)

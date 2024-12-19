@@ -10,7 +10,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// BucketSpecApplyConfiguration represents an declarative configuration of the BucketSpec type for use
+// BucketSpecApplyConfiguration represents a declarative configuration of the BucketSpec type for use
 // with apply.
 type BucketSpecApplyConfiguration struct {
 	BucketClassRef     *v1.LocalObjectReference `json:"bucketClassRef,omitempty"`
@@ -19,7 +19,7 @@ type BucketSpecApplyConfiguration struct {
 	Tolerations        []v1alpha1.Toleration    `json:"tolerations,omitempty"`
 }
 
-// BucketSpecApplyConfiguration constructs an declarative configuration of the BucketSpec type for use with
+// BucketSpecApplyConfiguration constructs a declarative configuration of the BucketSpec type for use with
 // apply.
 func BucketSpec() *BucketSpecApplyConfiguration {
 	return &BucketSpecApplyConfiguration{}

@@ -27,8 +27,10 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/record"
+	"k8s.io/utils/ptr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	ctrlconfig "sigs.k8s.io/controller-runtime/pkg/config"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	"sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -118,6 +120,7 @@ var _ = BeforeSuite(func() {
 		Metrics: metricserver.Options{
 			BindAddress: "0",
 		},
+		Controller: ctrlconfig.Controller{SkipNameValidation: ptr.To(true)},
 	})
 	Expect(err).ToNot(HaveOccurred())
 

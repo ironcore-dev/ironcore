@@ -11,7 +11,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// PrefixStatusApplyConfiguration represents an declarative configuration of the PrefixStatus type for use
+// PrefixStatusApplyConfiguration represents a declarative configuration of the PrefixStatus type for use
 // with apply.
 type PrefixStatusApplyConfiguration struct {
 	Phase                   *v1alpha1.PrefixPhase     `json:"phase,omitempty"`
@@ -19,7 +19,7 @@ type PrefixStatusApplyConfiguration struct {
 	Used                    []commonv1alpha1.IPPrefix `json:"used,omitempty"`
 }
 
-// PrefixStatusApplyConfiguration constructs an declarative configuration of the PrefixStatus type for use with
+// PrefixStatusApplyConfiguration constructs a declarative configuration of the PrefixStatus type for use with
 // apply.
 func PrefixStatus() *PrefixStatusApplyConfiguration {
 	return &PrefixStatusApplyConfiguration{}
