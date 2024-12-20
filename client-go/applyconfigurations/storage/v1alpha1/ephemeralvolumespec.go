@@ -12,14 +12,14 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// EphemeralVolumeSpecApplyConfiguration represents an declarative configuration of the EphemeralVolumeSpec type for use
+// EphemeralVolumeSpecApplyConfiguration represents a declarative configuration of the EphemeralVolumeSpec type for use
 // with apply.
 type EphemeralVolumeSpecApplyConfiguration struct {
 	VolumeSpecApplyConfiguration `json:",inline"`
 	ReclaimPolicy                *storagev1alpha1.ReclaimPolicy `json:"reclaimpolicy,omitempty"`
 }
 
-// EphemeralVolumeSpecApplyConfiguration constructs an declarative configuration of the EphemeralVolumeSpec type for use with
+// EphemeralVolumeSpecApplyConfiguration constructs a declarative configuration of the EphemeralVolumeSpec type for use with
 // apply.
 func EphemeralVolumeSpec() *EphemeralVolumeSpecApplyConfiguration {
 	return &EphemeralVolumeSpecApplyConfiguration{}
