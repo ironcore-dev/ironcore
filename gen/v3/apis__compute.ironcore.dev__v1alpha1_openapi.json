@@ -5200,26 +5200,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeEncryption": {
-				"description": "VolumeEncryption represents information to encrypt a volume.",
-				"type": "object",
-				"required": [
-					"secretRef"
-				],
-				"properties": {
-					"secretRef": {
-						"description": "SecretRef references the Secret containing the encryption key to encrypt a Volume. This secret is created by user with encryptionKey as Key and base64 encoded 256-bit encryption key as Value.",
-						"default": {},
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/io.k8s.api.core.v1.LocalObjectReference"
-							}
-						]
-					}
-				}
-			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSpec": {
-				"description": "VolumeSpec defines the desired state of Volume",
+			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.EphemeralVolumeSpec": {
 				"type": "object",
 				"properties": {
 					"claimRef": {
@@ -5249,6 +5230,10 @@
 								"$ref": "#/components/schemas/io.k8s.api.core.v1.LocalObjectReference"
 							}
 						]
+					},
+					"reclaimpolicy": {
+						"description": "ReclaimPolicy defines the strategy for the corresponding volume resource after its managing resource has been deleted",
+						"type": "string"
 					},
 					"resources": {
 						"description": "Resources is a description of the volume's resources and capacity.",
@@ -5299,6 +5284,24 @@
 					}
 				}
 			},
+			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeEncryption": {
+				"description": "VolumeEncryption represents information to encrypt a volume.",
+				"type": "object",
+				"required": [
+					"secretRef"
+				],
+				"properties": {
+					"secretRef": {
+						"description": "SecretRef references the Secret containing the encryption key to encrypt a Volume. This secret is created by user with encryptionKey as Key and base64 encoded 256-bit encryption key as Value.",
+						"default": {},
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/io.k8s.api.core.v1.LocalObjectReference"
+							}
+						]
+					}
+				}
+			},
 			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeTemplateSpec": {
 				"description": "VolumeTemplateSpec is the specification of a Volume template.",
 				"type": "object",
@@ -5315,7 +5318,7 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSpec"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.EphemeralVolumeSpec"
 							}
 						]
 					}
