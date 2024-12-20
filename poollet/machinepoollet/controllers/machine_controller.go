@@ -198,6 +198,11 @@ func (r *MachineReconciler) deleteGone(ctx context.Context, log logr.Logger, mac
 
 func (r *MachineReconciler) reconcileExists(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) (ctrl.Result, error) {
 	if !machine.DeletionTimestamp.IsZero() {
+		log.V(1).Info("Machine is deleting, handle ephemeral volumes")
+		if err := r.handleEphemeralVolume(ctx, machine); err != nil {
+			return ctrl.Result{}, err
+		}
+
 		return r.delete(ctx, log, machine)
 	}
 	return r.reconcile(ctx, log, machine)

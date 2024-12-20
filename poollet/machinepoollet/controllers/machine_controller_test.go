@@ -411,7 +411,9 @@ var _ = Describe("MachineController", func() {
 						VolumeSource: computev1alpha1.VolumeSource{
 							Ephemeral: &computev1alpha1.EphemeralVolumeSource{
 								VolumeTemplate: &storagev1alpha1.VolumeTemplateSpec{
-									Spec: storagev1alpha1.EphemeralVolumeSpec{},
+									Spec: storagev1alpha1.EphemeralVolumeSpec{
+										ReclaimPolicy: storagev1alpha1.Retain,
+									},
 								},
 							},
 						},
@@ -480,8 +482,17 @@ var _ = Describe("MachineController", func() {
 			"State":     Equal(computev1alpha1.VolumeStatePending),
 			"VolumeRef": Equal(corev1.LocalObjectReference{Name: ephimeralVolume.Name}),
 		}))))
-	})
 
+		Expect(k8sClient.Delete(ctx, machine)).To(Succeed())
+
+		Eventually(Object(ephimeralVolume)).Should(SatisfyAll(
+			HaveField("ObjectMeta.OwnerReferences", BeEmpty()),
+			HaveField("DeletionTimestamp", BeZero())))
+
+		Consistently(Object(ephimeralVolume)).Should(SatisfyAll(
+			HaveField("DeletionTimestamp", BeZero())))
+
+	})
 })
 
 func GetSingleMapEntry[K comparable, V any](m map[K]V) (K, V) {
