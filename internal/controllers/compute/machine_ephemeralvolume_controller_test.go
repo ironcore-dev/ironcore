@@ -91,16 +91,6 @@ var _ = Describe("MachineEphemeralVolumeController", func() {
 	})
 
 	It("should not delete externally managed volumes for a machine", func(ctx SpecContext) {
-		By("creating an undesired controlled volume")
-		externalVolume := &storagev1alpha1.Volume{
-			ObjectMeta: metav1.ObjectMeta{
-				Namespace:    ns.Name,
-				GenerateName: "external-volume-",
-			},
-			Spec: storagev1alpha1.VolumeSpec{},
-		}
-		Expect(k8sClient.Create(ctx, externalVolume)).To(Succeed())
-
 		By("creating a machine")
 		machine := &computev1alpha1.Machine{
 			ObjectMeta: metav1.ObjectMeta{
@@ -109,17 +99,20 @@ var _ = Describe("MachineEphemeralVolumeController", func() {
 			},
 			Spec: computev1alpha1.MachineSpec{
 				MachineClassRef: corev1.LocalObjectReference{Name: machineClass.Name},
-				Volumes: []computev1alpha1.Volume{
-					{
-						Name: "primary",
-						VolumeSource: computev1alpha1.VolumeSource{
-							VolumeRef: &corev1.LocalObjectReference{Name: externalVolume.Name},
-						},
-					},
-				},
 			},
 		}
 		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+
+		By("creating an undesired controlled volume")
+		externalVolume := &storagev1alpha1.Volume{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "external-volume-",
+			},
+			Spec: storagev1alpha1.VolumeSpec{},
+		}
+		_ = ctrl.SetControllerReference(machine, externalVolume, k8sClient.Scheme())
+		Expect(k8sClient.Create(ctx, externalVolume)).To(Succeed())
 
 		By("asserting that the external volume is not being deleted")
 		Consistently(Object(externalVolume)).Should(HaveField("DeletionTimestamp", BeNil()))
