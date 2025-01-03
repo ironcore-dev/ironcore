@@ -52,7 +52,7 @@ var _ = Describe("MachineEphemeralVolumeController", func() {
 						VolumeSource: computev1alpha1.VolumeSource{
 							Ephemeral: &computev1alpha1.EphemeralVolumeSource{
 								VolumeTemplate: &storagev1alpha1.VolumeTemplateSpec{
-									Spec: storagev1alpha1.VolumeSpec{},
+									Spec: storagev1alpha1.EphemeralVolumeSpec{},
 								},
 							},
 						},

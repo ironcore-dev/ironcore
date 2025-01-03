@@ -71,7 +71,7 @@ func (r *MachineEphemeralVolumeReconciler) ephemeralMachineVolumeByName(machine 
 				Labels:      ephemeral.VolumeTemplate.Labels,
 				Annotations: maps.Clone(ephemeral.VolumeTemplate.Annotations),
 			},
-			Spec: ephemeral.VolumeTemplate.Spec,
+			Spec: ephemeral.VolumeTemplate.Spec.VolumeSpec,
 		}
 		annotations.SetDefaultEphemeralManagedBy(volume)
 		_ = ctrl.SetControllerReference(machine, volume, r.Scheme())

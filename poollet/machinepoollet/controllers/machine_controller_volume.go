@@ -24,6 +24,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
 type volumeClaimStrategy struct {
@@ -406,4 +407,26 @@ func (r *MachineReconciler) addVolumeStatusValues(now metav1.Time, existing, new
 	existing.State = newValues.State
 	existing.Handle = newValues.Handle
 	existing.VolumeRef = newValues.VolumeRef
+}
+
+func (r *MachineReconciler) handleEphemeralVolume(ctx context.Context, machine *computev1alpha1.Machine) error {
+	for _, machineVolume := range machine.Spec.Volumes {
+		ephemeral := machineVolume.Ephemeral
+		if ephemeral == nil {
+			continue
+		}
+		if machineVolume.Ephemeral.VolumeTemplate.Spec.ReclaimPolicy == storagev1alpha1.Retain {
+			volumeName := computev1alpha1.MachineEphemeralVolumeName(machine.Name, machineVolume.Name)
+			volume := &storagev1alpha1.Volume{}
+			if err := r.Get(ctx, client.ObjectKey{Namespace: machine.GetNamespace(), Name: volumeName}, volume); err != nil {
+				return fmt.Errorf("error getting volume %s: %w", volume.Name, err)
+			}
+			baseVol := volume.DeepCopy()
+			_ = controllerutil.RemoveControllerReference(machine, volume, r.Scheme())
+			if err := r.Patch(ctx, volume, client.StrategicMergeFrom(baseVol, client.MergeFromWithOptimisticLock{})); err != nil {
+				return fmt.Errorf("error patching volume: %w", err)
+			}
+		}
+	}
+	return nil
 }
