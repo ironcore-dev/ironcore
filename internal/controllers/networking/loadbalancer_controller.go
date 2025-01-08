@@ -23,6 +23,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
 var (
@@ -178,7 +179,7 @@ func (r *LoadBalancerReconciler) applyRouting(
 }
 
 func (r *LoadBalancerReconciler) enqueueByNetworkInterface() handler.EventHandler {
-	getEnqueueFunc := func(ctx context.Context, nic *networkingv1alpha1.NetworkInterface) func(nics []*networkingv1alpha1.NetworkInterface, queue workqueue.RateLimitingInterface) {
+	getEnqueueFunc := func(ctx context.Context, nic *networkingv1alpha1.NetworkInterface) func(nics []*networkingv1alpha1.NetworkInterface, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 		log := ctrl.LoggerFrom(ctx)
 		loadBalancerList := &networkingv1alpha1.LoadBalancerList{}
 		if err := r.List(ctx, loadBalancerList,
@@ -189,7 +190,7 @@ func (r *LoadBalancerReconciler) enqueueByNetworkInterface() handler.EventHandle
 			return nil
 		}
 
-		return func(nics []*networkingv1alpha1.NetworkInterface, queue workqueue.RateLimitingInterface) {
+		return func(nics []*networkingv1alpha1.NetworkInterface, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			for _, loadBalancer := range loadBalancerList.Items {
 				loadBalancerKey := client.ObjectKeyFromObject(&loadBalancer)
 				log := log.WithValues("LoadBalancerKey", loadBalancerKey)
@@ -215,14 +216,14 @@ func (r *LoadBalancerReconciler) enqueueByNetworkInterface() handler.EventHandle
 	}
 
 	return handler.Funcs{
-		CreateFunc: func(ctx context.Context, evt event.CreateEvent, queue workqueue.RateLimitingInterface) {
+		CreateFunc: func(ctx context.Context, evt event.CreateEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			nic := evt.Object.(*networkingv1alpha1.NetworkInterface)
 			enqueueFunc := getEnqueueFunc(ctx, nic)
 			if enqueueFunc != nil {
 				enqueueFunc([]*networkingv1alpha1.NetworkInterface{nic}, queue)
 			}
 		},
-		UpdateFunc: func(ctx context.Context, evt event.UpdateEvent, queue workqueue.RateLimitingInterface) {
+		UpdateFunc: func(ctx context.Context, evt event.UpdateEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			newNic := evt.ObjectNew.(*networkingv1alpha1.NetworkInterface)
 			oldNic := evt.ObjectOld.(*networkingv1alpha1.NetworkInterface)
 			enqueueFunc := getEnqueueFunc(ctx, newNic)
@@ -230,14 +231,14 @@ func (r *LoadBalancerReconciler) enqueueByNetworkInterface() handler.EventHandle
 				enqueueFunc([]*networkingv1alpha1.NetworkInterface{newNic, oldNic}, queue)
 			}
 		},
-		DeleteFunc: func(ctx context.Context, evt event.DeleteEvent, queue workqueue.RateLimitingInterface) {
+		DeleteFunc: func(ctx context.Context, evt event.DeleteEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			nic := evt.Object.(*networkingv1alpha1.NetworkInterface)
 			enqueueFunc := getEnqueueFunc(ctx, nic)
 			if enqueueFunc != nil {
 				enqueueFunc([]*networkingv1alpha1.NetworkInterface{nic}, queue)
 			}
 		},
-		GenericFunc: func(ctx context.Context, evt event.GenericEvent, queue workqueue.RateLimitingInterface) {
+		GenericFunc: func(ctx context.Context, evt event.GenericEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			nic := evt.Object.(*networkingv1alpha1.NetworkInterface)
 			enqueueFunc := getEnqueueFunc(ctx, nic)
 			if enqueueFunc != nil {

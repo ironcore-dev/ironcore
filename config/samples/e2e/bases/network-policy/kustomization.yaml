@@ -1,0 +1,5 @@
+resources:
+- network.yaml
+- machine1.yaml
+- machine2.yaml
+- network-policy.yaml

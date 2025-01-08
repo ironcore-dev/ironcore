@@ -27,7 +27,7 @@ type Manager struct {
 
 	cluster cluster.Cluster
 
-	queue workqueue.RateLimitingInterface
+	queue workqueue.TypedRateLimitingInterface[string]
 
 	waitersByProviderIDMu sync.Mutex
 	waitersByProviderID   map[string]*waiter
@@ -36,7 +36,7 @@ type Manager struct {
 func NewManager(cluster cluster.Cluster) *Manager {
 	return &Manager{
 		cluster:             cluster,
-		queue:               workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter()),
+		queue:               workqueue.NewTypedRateLimitingQueue(workqueue.DefaultTypedControllerRateLimiter[string]()),
 		waitersByProviderID: make(map[string]*waiter),
 	}
 }
@@ -144,13 +144,12 @@ func (e *Manager) doWork(ctx context.Context, providerID string) (*networkingv1a
 }
 
 func (e *Manager) processNextWorkItem(ctx context.Context) bool {
-	uncastProviderID, quit := e.queue.Get()
+	providerID, quit := e.queue.Get()
 	if quit {
 		return false
 	}
-	defer e.queue.Done(uncastProviderID)
+	defer e.queue.Done(providerID)
 
-	providerID := uncastProviderID.(string)
 	network, err := e.doWork(ctx, providerID)
 	e.emit(providerID, network, err)
 	e.queue.Forget(providerID)

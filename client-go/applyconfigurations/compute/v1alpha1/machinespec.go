@@ -11,7 +11,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// MachineSpecApplyConfiguration represents an declarative configuration of the MachineSpec type for use
+// MachineSpecApplyConfiguration represents a declarative configuration of the MachineSpec type for use
 // with apply.
 type MachineSpecApplyConfiguration struct {
 	MachineClassRef     *v1.LocalObjectReference             `json:"machineClassRef,omitempty"`
@@ -27,7 +27,7 @@ type MachineSpecApplyConfiguration struct {
 	Tolerations         []commonv1alpha1.Toleration          `json:"tolerations,omitempty"`
 }
 
-// MachineSpecApplyConfiguration constructs an declarative configuration of the MachineSpec type for use with
+// MachineSpecApplyConfiguration constructs a declarative configuration of the MachineSpec type for use with
 // apply.
 func MachineSpec() *MachineSpecApplyConfiguration {
 	return &MachineSpecApplyConfiguration{}

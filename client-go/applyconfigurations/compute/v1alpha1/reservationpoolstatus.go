@@ -9,14 +9,14 @@ import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 )
 
-// ReservationPoolStatusApplyConfiguration represents an declarative configuration of the ReservationPoolStatus type for use
+// ReservationPoolStatusApplyConfiguration represents a declarative configuration of the ReservationPoolStatus type for use
 // with apply.
 type ReservationPoolStatusApplyConfiguration struct {
 	Name  *string                    `json:"ref,omitempty"`
 	State *v1alpha1.ReservationState `json:"state,omitempty"`
 }
 
-// ReservationPoolStatusApplyConfiguration constructs an declarative configuration of the ReservationPoolStatus type for use with
+// ReservationPoolStatusApplyConfiguration constructs a declarative configuration of the ReservationPoolStatus type for use with
 // apply.
 func ReservationPoolStatus() *ReservationPoolStatusApplyConfiguration {
 	return &ReservationPoolStatusApplyConfiguration{}

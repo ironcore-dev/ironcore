@@ -9,14 +9,14 @@ import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 )
 
-// MachinePoolAddressApplyConfiguration represents an declarative configuration of the MachinePoolAddress type for use
+// MachinePoolAddressApplyConfiguration represents a declarative configuration of the MachinePoolAddress type for use
 // with apply.
 type MachinePoolAddressApplyConfiguration struct {
 	Type    *v1alpha1.MachinePoolAddressType `json:"type,omitempty"`
 	Address *string                          `json:"address,omitempty"`
 }
 
-// MachinePoolAddressApplyConfiguration constructs an declarative configuration of the MachinePoolAddress type for use with
+// MachinePoolAddressApplyConfiguration constructs a declarative configuration of the MachinePoolAddress type for use with
 // apply.
 func MachinePoolAddress() *MachinePoolAddressApplyConfiguration {
 	return &MachinePoolAddressApplyConfiguration{}

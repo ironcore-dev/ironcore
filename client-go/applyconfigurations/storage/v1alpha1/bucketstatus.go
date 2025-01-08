@@ -10,7 +10,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// BucketStatusApplyConfiguration represents an declarative configuration of the BucketStatus type for use
+// BucketStatusApplyConfiguration represents a declarative configuration of the BucketStatus type for use
 // with apply.
 type BucketStatusApplyConfiguration struct {
 	State                   *v1alpha1.BucketState               `json:"state,omitempty"`
@@ -19,7 +19,7 @@ type BucketStatusApplyConfiguration struct {
 	Conditions              []BucketConditionApplyConfiguration `json:"conditions,omitempty"`
 }
 
-// BucketStatusApplyConfiguration constructs an declarative configuration of the BucketStatus type for use with
+// BucketStatusApplyConfiguration constructs a declarative configuration of the BucketStatus type for use with
 // apply.
 func BucketStatus() *BucketStatusApplyConfiguration {
 	return &BucketStatusApplyConfiguration{}

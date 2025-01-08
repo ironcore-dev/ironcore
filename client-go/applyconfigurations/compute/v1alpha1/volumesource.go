@@ -9,7 +9,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// VolumeSourceApplyConfiguration represents an declarative configuration of the VolumeSource type for use
+// VolumeSourceApplyConfiguration represents a declarative configuration of the VolumeSource type for use
 // with apply.
 type VolumeSourceApplyConfiguration struct {
 	VolumeRef *v1.LocalObjectReference                 `json:"volumeRef,omitempty"`
@@ -17,7 +17,7 @@ type VolumeSourceApplyConfiguration struct {
 	Ephemeral *EphemeralVolumeSourceApplyConfiguration `json:"ephemeral,omitempty"`
 }
 
-// VolumeSourceApplyConfiguration constructs an declarative configuration of the VolumeSource type for use with
+// VolumeSourceApplyConfiguration constructs a declarative configuration of the VolumeSource type for use with
 // apply.
 func VolumeSource() *VolumeSourceApplyConfiguration {
 	return &VolumeSourceApplyConfiguration{}

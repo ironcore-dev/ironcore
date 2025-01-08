@@ -25,6 +25,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
 const (
@@ -81,18 +82,18 @@ func (s *VolumeScheduler) skipSchedule(log logr.Logger, volume *storagev1alpha1.
 	return isAssumed
 }
 
-func (s *VolumeScheduler) matchesLabels(ctx context.Context, pool *scheduler.ContainerInfo, volume *storagev1alpha1.Volume) bool {
+func (s *VolumeScheduler) matchesLabels(_ context.Context, pool *scheduler.ContainerInfo, volume *storagev1alpha1.Volume) bool {
 	nodeLabels := labels.Set(pool.Node().Labels)
 	volumePoolSelector := labels.SelectorFromSet(volume.Spec.VolumePoolSelector)
 
 	return volumePoolSelector.Matches(nodeLabels)
 }
 
-func (s *VolumeScheduler) tolerateTaints(ctx context.Context, pool *scheduler.ContainerInfo, volume *storagev1alpha1.Volume) bool {
+func (s *VolumeScheduler) tolerateTaints(_ context.Context, pool *scheduler.ContainerInfo, volume *storagev1alpha1.Volume) bool {
 	return v1alpha1.TolerateTaints(volume.Spec.Tolerations, pool.Node().Spec.Taints)
 }
 
-func (s *VolumeScheduler) fitsPool(ctx context.Context, pool *scheduler.ContainerInfo, volume *storagev1alpha1.Volume) bool {
+func (s *VolumeScheduler) fitsPool(_ context.Context, pool *scheduler.ContainerInfo, volume *storagev1alpha1.Volume) bool {
 	volumeClassName := volume.Spec.VolumeClassRef.Name
 
 	allocatable, ok := pool.Node().Status.Allocatable[corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeVolumeClass, volumeClassName)]
@@ -199,7 +200,7 @@ func (s *VolumeScheduler) reconcileExists(ctx context.Context, log logr.Logger, 
 	return ctrl.Result{}, nil
 }
 
-func (s *VolumeScheduler) enqueueUnscheduledVolumes(ctx context.Context, queue workqueue.RateLimitingInterface) {
+func (s *VolumeScheduler) enqueueUnscheduledVolumes(ctx context.Context, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 	log := ctrl.LoggerFrom(ctx)
 	volumeList := &storagev1alpha1.VolumeList{}
 	if err := s.List(ctx, volumeList, client.MatchingFields{storageclient.VolumeSpecVolumePoolRefNameField: ""}); err != nil {
@@ -234,7 +235,7 @@ func (s *VolumeScheduler) isVolumeNotAssigned() predicate.Predicate {
 
 func (s *VolumeScheduler) handleVolume() handler.EventHandler {
 	return handler.Funcs{
-		CreateFunc: func(ctx context.Context, evt event.CreateEvent, queue workqueue.RateLimitingInterface) {
+		CreateFunc: func(ctx context.Context, evt event.CreateEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			volume := evt.Object.(*storagev1alpha1.Volume)
 			log := ctrl.LoggerFrom(ctx)
 
@@ -242,7 +243,7 @@ func (s *VolumeScheduler) handleVolume() handler.EventHandler {
 				log.Error(err, "Error adding volume to cache")
 			}
 		},
-		UpdateFunc: func(ctx context.Context, evt event.UpdateEvent, queue workqueue.RateLimitingInterface) {
+		UpdateFunc: func(ctx context.Context, evt event.UpdateEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			log := ctrl.LoggerFrom(ctx)
 
 			oldInstance := evt.ObjectOld.(*storagev1alpha1.Volume)
@@ -251,7 +252,7 @@ func (s *VolumeScheduler) handleVolume() handler.EventHandler {
 				log.Error(err, "Error updating volume in cache")
 			}
 		},
-		DeleteFunc: func(ctx context.Context, evt event.DeleteEvent, queue workqueue.RateLimitingInterface) {
+		DeleteFunc: func(ctx context.Context, evt event.DeleteEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			log := ctrl.LoggerFrom(ctx)
 
 			instance := evt.Object.(*storagev1alpha1.Volume)
@@ -264,18 +265,18 @@ func (s *VolumeScheduler) handleVolume() handler.EventHandler {
 
 func (s *VolumeScheduler) handleVolumePool() handler.EventHandler {
 	return handler.Funcs{
-		CreateFunc: func(ctx context.Context, evt event.CreateEvent, queue workqueue.RateLimitingInterface) {
+		CreateFunc: func(ctx context.Context, evt event.CreateEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			pool := evt.Object.(*storagev1alpha1.VolumePool)
 			s.Cache.AddContainer(pool)
 			s.enqueueUnscheduledVolumes(ctx, queue)
 		},
-		UpdateFunc: func(ctx context.Context, evt event.UpdateEvent, queue workqueue.RateLimitingInterface) {
+		UpdateFunc: func(ctx context.Context, evt event.UpdateEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			oldPool := evt.ObjectOld.(*storagev1alpha1.VolumePool)
 			newPool := evt.ObjectNew.(*storagev1alpha1.VolumePool)
 			s.Cache.UpdateContainer(oldPool, newPool)
 			s.enqueueUnscheduledVolumes(ctx, queue)
 		},
-		DeleteFunc: func(ctx context.Context, evt event.DeleteEvent, queue workqueue.RateLimitingInterface) {
+		DeleteFunc: func(ctx context.Context, evt event.DeleteEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			log := ctrl.LoggerFrom(ctx)
 
 			pool := evt.Object.(*storagev1alpha1.VolumePool)

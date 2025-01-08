@@ -1,7 +1,7 @@
 ---
 title: Object Storage
 
-oep-number: 5
+iep-number: 5
 
 creation-date: 2022-12-19
 
@@ -19,7 +19,7 @@ reviewers:
 
 ---
 
-# OEP-5: Object Storage
+# IEP-5: Object Storage
 
 ## Table of Contents
 

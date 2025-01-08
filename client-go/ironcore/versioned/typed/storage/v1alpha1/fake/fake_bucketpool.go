@@ -30,20 +30,22 @@ var bucketpoolsKind = v1alpha1.SchemeGroupVersion.WithKind("BucketPool")
 
 // Get takes name of the bucketPool, and returns the corresponding bucketPool object, and an error if there is any.
 func (c *FakeBucketPools) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.BucketPool, err error) {
+	emptyResult := &v1alpha1.BucketPool{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootGetAction(bucketpoolsResource, name), &v1alpha1.BucketPool{})
+		Invokes(testing.NewRootGetActionWithOptions(bucketpoolsResource, name, options), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.BucketPool), err
 }
 
 // List takes label and field selectors, and returns the list of BucketPools that match those selectors.
 func (c *FakeBucketPools) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.BucketPoolList, err error) {
+	emptyResult := &v1alpha1.BucketPoolList{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootListAction(bucketpoolsResource, bucketpoolsKind, opts), &v1alpha1.BucketPoolList{})
+		Invokes(testing.NewRootListActionWithOptions(bucketpoolsResource, bucketpoolsKind, opts), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 
 	label, _, _ := testing.ExtractFromListOptions(opts)
@@ -62,36 +64,39 @@ func (c *FakeBucketPools) List(ctx context.Context, opts v1.ListOptions) (result
 // Watch returns a watch.Interface that watches the requested bucketPools.
 func (c *FakeBucketPools) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewRootWatchAction(bucketpoolsResource, opts))
+		InvokesWatch(testing.NewRootWatchActionWithOptions(bucketpoolsResource, opts))
 }
 
 // Create takes the representation of a bucketPool and creates it.  Returns the server's representation of the bucketPool, and an error, if there is any.
 func (c *FakeBucketPools) Create(ctx context.Context, bucketPool *v1alpha1.BucketPool, opts v1.CreateOptions) (result *v1alpha1.BucketPool, err error) {
+	emptyResult := &v1alpha1.BucketPool{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootCreateAction(bucketpoolsResource, bucketPool), &v1alpha1.BucketPool{})
+		Invokes(testing.NewRootCreateActionWithOptions(bucketpoolsResource, bucketPool, opts), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.BucketPool), err
 }
 
 // Update takes the representation of a bucketPool and updates it. Returns the server's representation of the bucketPool, and an error, if there is any.
 func (c *FakeBucketPools) Update(ctx context.Context, bucketPool *v1alpha1.BucketPool, opts v1.UpdateOptions) (result *v1alpha1.BucketPool, err error) {
+	emptyResult := &v1alpha1.BucketPool{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootUpdateAction(bucketpoolsResource, bucketPool), &v1alpha1.BucketPool{})
+		Invokes(testing.NewRootUpdateActionWithOptions(bucketpoolsResource, bucketPool, opts), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.BucketPool), err
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeBucketPools) UpdateStatus(ctx context.Context, bucketPool *v1alpha1.BucketPool, opts v1.UpdateOptions) (*v1alpha1.BucketPool, error) {
+func (c *FakeBucketPools) UpdateStatus(ctx context.Context, bucketPool *v1alpha1.BucketPool, opts v1.UpdateOptions) (result *v1alpha1.BucketPool, err error) {
+	emptyResult := &v1alpha1.BucketPool{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootUpdateSubresourceAction(bucketpoolsResource, "status", bucketPool), &v1alpha1.BucketPool{})
+		Invokes(testing.NewRootUpdateSubresourceActionWithOptions(bucketpoolsResource, "status", bucketPool, opts), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.BucketPool), err
 }
@@ -105,7 +110,7 @@ func (c *FakeBucketPools) Delete(ctx context.Context, name string, opts v1.Delet
 
 // DeleteCollection deletes a collection of objects.
 func (c *FakeBucketPools) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewRootDeleteCollectionAction(bucketpoolsResource, listOpts)
+	action := testing.NewRootDeleteCollectionActionWithOptions(bucketpoolsResource, opts, listOpts)
 
 	_, err := c.Fake.Invokes(action, &v1alpha1.BucketPoolList{})
 	return err
@@ -113,10 +118,11 @@ func (c *FakeBucketPools) DeleteCollection(ctx context.Context, opts v1.DeleteOp
 
 // Patch applies the patch and returns the patched bucketPool.
 func (c *FakeBucketPools) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.BucketPool, err error) {
+	emptyResult := &v1alpha1.BucketPool{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceAction(bucketpoolsResource, name, pt, data, subresources...), &v1alpha1.BucketPool{})
+		Invokes(testing.NewRootPatchSubresourceActionWithOptions(bucketpoolsResource, name, pt, data, opts, subresources...), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.BucketPool), err
 }
@@ -134,10 +140,11 @@ func (c *FakeBucketPools) Apply(ctx context.Context, bucketPool *storagev1alpha1
 	if name == nil {
 		return nil, fmt.Errorf("bucketPool.Name must be provided to Apply")
 	}
+	emptyResult := &v1alpha1.BucketPool{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceAction(bucketpoolsResource, *name, types.ApplyPatchType, data), &v1alpha1.BucketPool{})
+		Invokes(testing.NewRootPatchSubresourceActionWithOptions(bucketpoolsResource, *name, types.ApplyPatchType, data, opts.ToPatchOptions()), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.BucketPool), err
 }
@@ -156,10 +163,11 @@ func (c *FakeBucketPools) ApplyStatus(ctx context.Context, bucketPool *storagev1
 	if name == nil {
 		return nil, fmt.Errorf("bucketPool.Name must be provided to Apply")
 	}
+	emptyResult := &v1alpha1.BucketPool{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceAction(bucketpoolsResource, *name, types.ApplyPatchType, data, "status"), &v1alpha1.BucketPool{})
+		Invokes(testing.NewRootPatchSubresourceActionWithOptions(bucketpoolsResource, *name, types.ApplyPatchType, data, opts.ToPatchOptions(), "status"), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.BucketPool), err
 }

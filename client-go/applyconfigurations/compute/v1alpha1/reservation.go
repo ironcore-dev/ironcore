@@ -14,7 +14,7 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// ReservationApplyConfiguration represents an declarative configuration of the Reservation type for use
+// ReservationApplyConfiguration represents a declarative configuration of the Reservation type for use
 // with apply.
 type ReservationApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -23,7 +23,7 @@ type ReservationApplyConfiguration struct {
 	Status                           *ReservationStatusApplyConfiguration `json:"status,omitempty"`
 }
 
-// Reservation constructs an declarative configuration of the Reservation type for use with
+// Reservation constructs a declarative configuration of the Reservation type for use with
 // apply.
 func Reservation(name, namespace string) *ReservationApplyConfiguration {
 	b := &ReservationApplyConfiguration{}
@@ -242,4 +242,10 @@ func (b *ReservationApplyConfiguration) WithSpec(value *ReservationSpecApplyConf
 func (b *ReservationApplyConfiguration) WithStatus(value *ReservationStatusApplyConfiguration) *ReservationApplyConfiguration {
 	b.Status = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *ReservationApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

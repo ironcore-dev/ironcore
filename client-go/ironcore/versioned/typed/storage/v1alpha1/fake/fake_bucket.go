@@ -31,22 +31,24 @@ var bucketsKind = v1alpha1.SchemeGroupVersion.WithKind("Bucket")
 
 // Get takes name of the bucket, and returns the corresponding bucket object, and an error if there is any.
 func (c *FakeBuckets) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.Bucket, err error) {
+	emptyResult := &v1alpha1.Bucket{}
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(bucketsResource, c.ns, name), &v1alpha1.Bucket{})
+		Invokes(testing.NewGetActionWithOptions(bucketsResource, c.ns, name, options), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.Bucket), err
 }
 
 // List takes label and field selectors, and returns the list of Buckets that match those selectors.
 func (c *FakeBuckets) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.BucketList, err error) {
+	emptyResult := &v1alpha1.BucketList{}
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(bucketsResource, bucketsKind, c.ns, opts), &v1alpha1.BucketList{})
+		Invokes(testing.NewListActionWithOptions(bucketsResource, bucketsKind, c.ns, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 
 	label, _, _ := testing.ExtractFromListOptions(opts)
@@ -65,40 +67,43 @@ func (c *FakeBuckets) List(ctx context.Context, opts v1.ListOptions) (result *v1
 // Watch returns a watch.Interface that watches the requested buckets.
 func (c *FakeBuckets) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewWatchAction(bucketsResource, c.ns, opts))
+		InvokesWatch(testing.NewWatchActionWithOptions(bucketsResource, c.ns, opts))
 
 }
 
 // Create takes the representation of a bucket and creates it.  Returns the server's representation of the bucket, and an error, if there is any.
 func (c *FakeBuckets) Create(ctx context.Context, bucket *v1alpha1.Bucket, opts v1.CreateOptions) (result *v1alpha1.Bucket, err error) {
+	emptyResult := &v1alpha1.Bucket{}
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(bucketsResource, c.ns, bucket), &v1alpha1.Bucket{})
+		Invokes(testing.NewCreateActionWithOptions(bucketsResource, c.ns, bucket, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.Bucket), err
 }
 
 // Update takes the representation of a bucket and updates it. Returns the server's representation of the bucket, and an error, if there is any.
 func (c *FakeBuckets) Update(ctx context.Context, bucket *v1alpha1.Bucket, opts v1.UpdateOptions) (result *v1alpha1.Bucket, err error) {
+	emptyResult := &v1alpha1.Bucket{}
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(bucketsResource, c.ns, bucket), &v1alpha1.Bucket{})
+		Invokes(testing.NewUpdateActionWithOptions(bucketsResource, c.ns, bucket, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.Bucket), err
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeBuckets) UpdateStatus(ctx context.Context, bucket *v1alpha1.Bucket, opts v1.UpdateOptions) (*v1alpha1.Bucket, error) {
+func (c *FakeBuckets) UpdateStatus(ctx context.Context, bucket *v1alpha1.Bucket, opts v1.UpdateOptions) (result *v1alpha1.Bucket, err error) {
+	emptyResult := &v1alpha1.Bucket{}
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceAction(bucketsResource, "status", c.ns, bucket), &v1alpha1.Bucket{})
+		Invokes(testing.NewUpdateSubresourceActionWithOptions(bucketsResource, "status", c.ns, bucket, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.Bucket), err
 }
@@ -113,7 +118,7 @@ func (c *FakeBuckets) Delete(ctx context.Context, name string, opts v1.DeleteOpt
 
 // DeleteCollection deletes a collection of objects.
 func (c *FakeBuckets) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(bucketsResource, c.ns, listOpts)
+	action := testing.NewDeleteCollectionActionWithOptions(bucketsResource, c.ns, opts, listOpts)
 
 	_, err := c.Fake.Invokes(action, &v1alpha1.BucketList{})
 	return err
@@ -121,11 +126,12 @@ func (c *FakeBuckets) DeleteCollection(ctx context.Context, opts v1.DeleteOption
 
 // Patch applies the patch and returns the patched bucket.
 func (c *FakeBuckets) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.Bucket, err error) {
+	emptyResult := &v1alpha1.Bucket{}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(bucketsResource, c.ns, name, pt, data, subresources...), &v1alpha1.Bucket{})
+		Invokes(testing.NewPatchSubresourceActionWithOptions(bucketsResource, c.ns, name, pt, data, opts, subresources...), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.Bucket), err
 }
@@ -143,11 +149,12 @@ func (c *FakeBuckets) Apply(ctx context.Context, bucket *storagev1alpha1.BucketA
 	if name == nil {
 		return nil, fmt.Errorf("bucket.Name must be provided to Apply")
 	}
+	emptyResult := &v1alpha1.Bucket{}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(bucketsResource, c.ns, *name, types.ApplyPatchType, data), &v1alpha1.Bucket{})
+		Invokes(testing.NewPatchSubresourceActionWithOptions(bucketsResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions()), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.Bucket), err
 }
@@ -166,11 +173,12 @@ func (c *FakeBuckets) ApplyStatus(ctx context.Context, bucket *storagev1alpha1.B
 	if name == nil {
 		return nil, fmt.Errorf("bucket.Name must be provided to Apply")
 	}
+	emptyResult := &v1alpha1.Bucket{}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(bucketsResource, c.ns, *name, types.ApplyPatchType, data, "status"), &v1alpha1.Bucket{})
+		Invokes(testing.NewPatchSubresourceActionWithOptions(bucketsResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions(), "status"), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.Bucket), err
 }

@@ -65,7 +65,7 @@ type configRotator struct {
 
 	certRotator certificate.Rotator
 
-	queue workqueue.RateLimitingInterface
+	queue workqueue.TypedRateLimitingInterface[string]
 
 	closeConns      func()
 	baseConfig      *rest.Config
@@ -270,7 +270,7 @@ func (r *configRotator) Start(ctx context.Context) error {
 		return fmt.Errorf("configRotator already started")
 	}
 
-	r.queue = workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
+	r.queue = workqueue.NewTypedRateLimitingQueue(workqueue.DefaultTypedControllerRateLimiter[string]())
 	go func() {
 		<-ctx.Done()
 		r.queue.ShutDown()

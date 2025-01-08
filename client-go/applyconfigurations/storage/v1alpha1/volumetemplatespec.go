@@ -11,14 +11,14 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// VolumeTemplateSpecApplyConfiguration represents an declarative configuration of the VolumeTemplateSpec type for use
+// VolumeTemplateSpecApplyConfiguration represents a declarative configuration of the VolumeTemplateSpec type for use
 // with apply.
 type VolumeTemplateSpecApplyConfiguration struct {
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *VolumeSpecApplyConfiguration `json:"spec,omitempty"`
 }
 
-// VolumeTemplateSpecApplyConfiguration constructs an declarative configuration of the VolumeTemplateSpec type for use with
+// VolumeTemplateSpecApplyConfiguration constructs a declarative configuration of the VolumeTemplateSpec type for use with
 // apply.
 func VolumeTemplateSpec() *VolumeTemplateSpecApplyConfiguration {
 	return &VolumeTemplateSpecApplyConfiguration{}
@@ -172,4 +172,10 @@ func (b *VolumeTemplateSpecApplyConfiguration) ensureObjectMetaApplyConfiguratio
 func (b *VolumeTemplateSpecApplyConfiguration) WithSpec(value *VolumeSpecApplyConfiguration) *VolumeTemplateSpecApplyConfiguration {
 	b.Spec = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *VolumeTemplateSpecApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

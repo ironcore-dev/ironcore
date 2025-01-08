@@ -10,14 +10,14 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// ReservationSpecApplyConfiguration represents an declarative configuration of the ReservationSpec type for use
+// ReservationSpecApplyConfiguration represents a declarative configuration of the ReservationSpec type for use
 // with apply.
 type ReservationSpecApplyConfiguration struct {
 	Pools     []v1.LocalObjectReference `json:"pools,omitempty"`
 	Resources *v1alpha1.ResourceList    `json:"capabilities,omitempty"`
 }
 
-// ReservationSpecApplyConfiguration constructs an declarative configuration of the ReservationSpec type for use with
+// ReservationSpecApplyConfiguration constructs a declarative configuration of the ReservationSpec type for use with
 // apply.
 func ReservationSpec() *ReservationSpecApplyConfiguration {
 	return &ReservationSpecApplyConfiguration{}

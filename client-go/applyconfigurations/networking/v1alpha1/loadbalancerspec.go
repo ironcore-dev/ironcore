@@ -11,7 +11,7 @@ import (
 	metav1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// LoadBalancerSpecApplyConfiguration represents an declarative configuration of the LoadBalancerSpec type for use
+// LoadBalancerSpecApplyConfiguration represents a declarative configuration of the LoadBalancerSpec type for use
 // with apply.
 type LoadBalancerSpecApplyConfiguration struct {
 	Type                     *v1alpha1.LoadBalancerType              `json:"type,omitempty"`
@@ -22,7 +22,7 @@ type LoadBalancerSpecApplyConfiguration struct {
 	Ports                    []LoadBalancerPortApplyConfiguration    `json:"ports,omitempty"`
 }
 
-// LoadBalancerSpecApplyConfiguration constructs an declarative configuration of the LoadBalancerSpec type for use with
+// LoadBalancerSpecApplyConfiguration constructs a declarative configuration of the LoadBalancerSpec type for use with
 // apply.
 func LoadBalancerSpec() *LoadBalancerSpecApplyConfiguration {
 	return &LoadBalancerSpecApplyConfiguration{}

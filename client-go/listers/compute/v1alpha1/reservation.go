@@ -7,8 +7,8 @@ package v1alpha1
 
 import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/listers"
 	"k8s.io/client-go/tools/cache"
 )
 
@@ -25,25 +25,17 @@ type ReservationLister interface {
 
 // reservationLister implements the ReservationLister interface.
 type reservationLister struct {
-	indexer cache.Indexer
+	listers.ResourceIndexer[*v1alpha1.Reservation]
 }
 
 // NewReservationLister returns a new ReservationLister.
 func NewReservationLister(indexer cache.Indexer) ReservationLister {
-	return &reservationLister{indexer: indexer}
-}
-
-// List lists all Reservations in the indexer.
-func (s *reservationLister) List(selector labels.Selector) (ret []*v1alpha1.Reservation, err error) {
-	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.Reservation))
-	})
-	return ret, err
+	return &reservationLister{listers.New[*v1alpha1.Reservation](indexer, v1alpha1.Resource("reservation"))}
 }
 
 // Reservations returns an object that can list and get Reservations.
 func (s *reservationLister) Reservations(namespace string) ReservationNamespaceLister {
-	return reservationNamespaceLister{indexer: s.indexer, namespace: namespace}
+	return reservationNamespaceLister{listers.NewNamespaced[*v1alpha1.Reservation](s.ResourceIndexer, namespace)}
 }
 
 // ReservationNamespaceLister helps list and get Reservations.
@@ -61,26 +53,5 @@ type ReservationNamespaceLister interface {
 // reservationNamespaceLister implements the ReservationNamespaceLister
 // interface.
 type reservationNamespaceLister struct {
-	indexer   cache.Indexer
-	namespace string
-}
-
-// List lists all Reservations in the indexer for a given namespace.
-func (s reservationNamespaceLister) List(selector labels.Selector) (ret []*v1alpha1.Reservation, err error) {
-	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.Reservation))
-	})
-	return ret, err
-}
-
-// Get retrieves the Reservation from the indexer for a given namespace and name.
-func (s reservationNamespaceLister) Get(name string) (*v1alpha1.Reservation, error) {
-	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("reservation"), name)
-	}
-	return obj.(*v1alpha1.Reservation), nil
+	listers.ResourceIndexer[*v1alpha1.Reservation]
 }

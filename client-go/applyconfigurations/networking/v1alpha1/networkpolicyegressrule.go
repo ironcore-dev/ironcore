@@ -5,14 +5,14 @@
 
 package v1alpha1
 
-// NetworkPolicyEgressRuleApplyConfiguration represents an declarative configuration of the NetworkPolicyEgressRule type for use
+// NetworkPolicyEgressRuleApplyConfiguration represents a declarative configuration of the NetworkPolicyEgressRule type for use
 // with apply.
 type NetworkPolicyEgressRuleApplyConfiguration struct {
 	Ports []NetworkPolicyPortApplyConfiguration `json:"ports,omitempty"`
 	To    []NetworkPolicyPeerApplyConfiguration `json:"to,omitempty"`
 }
 
-// NetworkPolicyEgressRuleApplyConfiguration constructs an declarative configuration of the NetworkPolicyEgressRule type for use with
+// NetworkPolicyEgressRuleApplyConfiguration constructs a declarative configuration of the NetworkPolicyEgressRule type for use with
 // apply.
 func NetworkPolicyEgressRule() *NetworkPolicyEgressRuleApplyConfiguration {
 	return &NetworkPolicyEgressRuleApplyConfiguration{}

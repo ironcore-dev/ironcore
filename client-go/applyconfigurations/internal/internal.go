@@ -375,12 +375,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: handle
       type:
         scalar: string
-    - name: ips
-      type:
-        list:
-          elementType:
-            namedType: com.github.ironcore-dev.ironcore.api.common.v1alpha1.IP
-          elementRelationship: atomic
     - name: lastStateTransitionTime
       type:
         namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
@@ -395,9 +389,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: state
       type:
         scalar: string
-    - name: virtualIP
-      type:
-        namedType: com.github.ironcore-dev.ironcore.api.common.v1alpha1.IP
 - name: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Reservation
   map:
     fields:

@@ -15,7 +15,7 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// VolumeClassApplyConfiguration represents an declarative configuration of the VolumeClass type for use
+// VolumeClassApplyConfiguration represents a declarative configuration of the VolumeClass type for use
 // with apply.
 type VolumeClassApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -24,7 +24,7 @@ type VolumeClassApplyConfiguration struct {
 	ResizePolicy                     *storagev1alpha1.ResizePolicy `json:"resizePolicy,omitempty"`
 }
 
-// VolumeClass constructs an declarative configuration of the VolumeClass type for use with
+// VolumeClass constructs a declarative configuration of the VolumeClass type for use with
 // apply.
 func VolumeClass(name string) *VolumeClassApplyConfiguration {
 	b := &VolumeClassApplyConfiguration{}
@@ -241,4 +241,10 @@ func (b *VolumeClassApplyConfiguration) WithCapabilities(value v1alpha1.Resource
 func (b *VolumeClassApplyConfiguration) WithResizePolicy(value storagev1alpha1.ResizePolicy) *VolumeClassApplyConfiguration {
 	b.ResizePolicy = &value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *VolumeClassApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

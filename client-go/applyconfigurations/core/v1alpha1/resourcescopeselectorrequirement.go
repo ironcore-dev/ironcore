@@ -9,7 +9,7 @@ import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 )
 
-// ResourceScopeSelectorRequirementApplyConfiguration represents an declarative configuration of the ResourceScopeSelectorRequirement type for use
+// ResourceScopeSelectorRequirementApplyConfiguration represents a declarative configuration of the ResourceScopeSelectorRequirement type for use
 // with apply.
 type ResourceScopeSelectorRequirementApplyConfiguration struct {
 	ScopeName *v1alpha1.ResourceScope                 `json:"scopeName,omitempty"`
@@ -17,7 +17,7 @@ type ResourceScopeSelectorRequirementApplyConfiguration struct {
 	Values    []string                                `json:"values,omitempty"`
 }
 
-// ResourceScopeSelectorRequirementApplyConfiguration constructs an declarative configuration of the ResourceScopeSelectorRequirement type for use with
+// ResourceScopeSelectorRequirementApplyConfiguration constructs a declarative configuration of the ResourceScopeSelectorRequirement type for use with
 // apply.
 func ResourceScopeSelectorRequirement() *ResourceScopeSelectorRequirementApplyConfiguration {
 	return &ResourceScopeSelectorRequirementApplyConfiguration{}

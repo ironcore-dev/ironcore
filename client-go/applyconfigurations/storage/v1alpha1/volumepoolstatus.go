@@ -11,7 +11,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// VolumePoolStatusApplyConfiguration represents an declarative configuration of the VolumePoolStatus type for use
+// VolumePoolStatusApplyConfiguration represents a declarative configuration of the VolumePoolStatus type for use
 // with apply.
 type VolumePoolStatusApplyConfiguration struct {
 	State                  *v1alpha1.VolumePoolState               `json:"state,omitempty"`
@@ -21,7 +21,7 @@ type VolumePoolStatusApplyConfiguration struct {
 	Allocatable            *corev1alpha1.ResourceList              `json:"allocatable,omitempty"`
 }
 
-// VolumePoolStatusApplyConfiguration constructs an declarative configuration of the VolumePoolStatus type for use with
+// VolumePoolStatusApplyConfiguration constructs a declarative configuration of the VolumePoolStatus type for use with
 // apply.
 func VolumePoolStatus() *VolumePoolStatusApplyConfiguration {
 	return &VolumePoolStatusApplyConfiguration{}

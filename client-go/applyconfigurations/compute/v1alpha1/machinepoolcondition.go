@@ -11,7 +11,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// MachinePoolConditionApplyConfiguration represents an declarative configuration of the MachinePoolCondition type for use
+// MachinePoolConditionApplyConfiguration represents a declarative configuration of the MachinePoolCondition type for use
 // with apply.
 type MachinePoolConditionApplyConfiguration struct {
 	Type               *v1alpha1.MachinePoolConditionType `json:"type,omitempty"`
@@ -22,7 +22,7 @@ type MachinePoolConditionApplyConfiguration struct {
 	LastTransitionTime *metav1.Time                       `json:"lastTransitionTime,omitempty"`
 }
 
-// MachinePoolConditionApplyConfiguration constructs an declarative configuration of the MachinePoolCondition type for use with
+// MachinePoolConditionApplyConfiguration constructs a declarative configuration of the MachinePoolCondition type for use with
 // apply.
 func MachinePoolCondition() *MachinePoolConditionApplyConfiguration {
 	return &MachinePoolConditionApplyConfiguration{}

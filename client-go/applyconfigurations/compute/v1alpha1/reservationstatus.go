@@ -5,13 +5,13 @@
 
 package v1alpha1
 
-// ReservationStatusApplyConfiguration represents an declarative configuration of the ReservationStatus type for use
+// ReservationStatusApplyConfiguration represents a declarative configuration of the ReservationStatus type for use
 // with apply.
 type ReservationStatusApplyConfiguration struct {
 	Pools []ReservationPoolStatusApplyConfiguration `json:"pools,omitempty"`
 }
 
-// ReservationStatusApplyConfiguration constructs an declarative configuration of the ReservationStatus type for use with
+// ReservationStatusApplyConfiguration constructs a declarative configuration of the ReservationStatus type for use with
 // apply.
 func ReservationStatus() *ReservationStatusApplyConfiguration {
 	return &ReservationStatusApplyConfiguration{}

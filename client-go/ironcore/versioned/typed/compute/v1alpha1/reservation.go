@@ -7,9 +7,6 @@ package v1alpha1
 
 import (
 	"context"
-	json "encoding/json"
-	"fmt"
-	"time"
 
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/compute/v1alpha1"
@@ -17,7 +14,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
-	rest "k8s.io/client-go/rest"
+	gentype "k8s.io/client-go/gentype"
 )
 
 // ReservationsGetter has a method to return a ReservationInterface.
@@ -30,6 +27,7 @@ type ReservationsGetter interface {
 type ReservationInterface interface {
 	Create(ctx context.Context, reservation *v1alpha1.Reservation, opts v1.CreateOptions) (*v1alpha1.Reservation, error)
 	Update(ctx context.Context, reservation *v1alpha1.Reservation, opts v1.UpdateOptions) (*v1alpha1.Reservation, error)
+	// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
 	UpdateStatus(ctx context.Context, reservation *v1alpha1.Reservation, opts v1.UpdateOptions) (*v1alpha1.Reservation, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
@@ -38,206 +36,25 @@ type ReservationInterface interface {
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.Reservation, err error)
 	Apply(ctx context.Context, reservation *computev1alpha1.ReservationApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.Reservation, err error)
+	// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
 	ApplyStatus(ctx context.Context, reservation *computev1alpha1.ReservationApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.Reservation, err error)
 	ReservationExpansion
 }
 
 // reservations implements ReservationInterface
 type reservations struct {
-	client rest.Interface
-	ns     string
+	*gentype.ClientWithListAndApply[*v1alpha1.Reservation, *v1alpha1.ReservationList, *computev1alpha1.ReservationApplyConfiguration]
 }
 
 // newReservations returns a Reservations
 func newReservations(c *ComputeV1alpha1Client, namespace string) *reservations {
 	return &reservations{
-		client: c.RESTClient(),
-		ns:     namespace,
+		gentype.NewClientWithListAndApply[*v1alpha1.Reservation, *v1alpha1.ReservationList, *computev1alpha1.ReservationApplyConfiguration](
+			"reservations",
+			c.RESTClient(),
+			scheme.ParameterCodec,
+			namespace,
+			func() *v1alpha1.Reservation { return &v1alpha1.Reservation{} },
+			func() *v1alpha1.ReservationList { return &v1alpha1.ReservationList{} }),
 	}
-}
-
-// Get takes name of the reservation, and returns the corresponding reservation object, and an error if there is any.
-func (c *reservations) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.Reservation, err error) {
-	result = &v1alpha1.Reservation{}
-	err = c.client.Get().
-		Namespace(c.ns).
-		Resource("reservations").
-		Name(name).
-		VersionedParams(&options, scheme.ParameterCodec).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// List takes label and field selectors, and returns the list of Reservations that match those selectors.
-func (c *reservations) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.ReservationList, err error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
-	result = &v1alpha1.ReservationList{}
-	err = c.client.Get().
-		Namespace(c.ns).
-		Resource("reservations").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Timeout(timeout).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// Watch returns a watch.Interface that watches the requested reservations.
-func (c *reservations) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
-	opts.Watch = true
-	return c.client.Get().
-		Namespace(c.ns).
-		Resource("reservations").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Timeout(timeout).
-		Watch(ctx)
-}
-
-// Create takes the representation of a reservation and creates it.  Returns the server's representation of the reservation, and an error, if there is any.
-func (c *reservations) Create(ctx context.Context, reservation *v1alpha1.Reservation, opts v1.CreateOptions) (result *v1alpha1.Reservation, err error) {
-	result = &v1alpha1.Reservation{}
-	err = c.client.Post().
-		Namespace(c.ns).
-		Resource("reservations").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(reservation).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// Update takes the representation of a reservation and updates it. Returns the server's representation of the reservation, and an error, if there is any.
-func (c *reservations) Update(ctx context.Context, reservation *v1alpha1.Reservation, opts v1.UpdateOptions) (result *v1alpha1.Reservation, err error) {
-	result = &v1alpha1.Reservation{}
-	err = c.client.Put().
-		Namespace(c.ns).
-		Resource("reservations").
-		Name(reservation.Name).
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(reservation).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// UpdateStatus was generated because the type contains a Status member.
-// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *reservations) UpdateStatus(ctx context.Context, reservation *v1alpha1.Reservation, opts v1.UpdateOptions) (result *v1alpha1.Reservation, err error) {
-	result = &v1alpha1.Reservation{}
-	err = c.client.Put().
-		Namespace(c.ns).
-		Resource("reservations").
-		Name(reservation.Name).
-		SubResource("status").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(reservation).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// Delete takes name of the reservation and deletes it. Returns an error if one occurs.
-func (c *reservations) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
-	return c.client.Delete().
-		Namespace(c.ns).
-		Resource("reservations").
-		Name(name).
-		Body(&opts).
-		Do(ctx).
-		Error()
-}
-
-// DeleteCollection deletes a collection of objects.
-func (c *reservations) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	var timeout time.Duration
-	if listOpts.TimeoutSeconds != nil {
-		timeout = time.Duration(*listOpts.TimeoutSeconds) * time.Second
-	}
-	return c.client.Delete().
-		Namespace(c.ns).
-		Resource("reservations").
-		VersionedParams(&listOpts, scheme.ParameterCodec).
-		Timeout(timeout).
-		Body(&opts).
-		Do(ctx).
-		Error()
-}
-
-// Patch applies the patch and returns the patched reservation.
-func (c *reservations) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.Reservation, err error) {
-	result = &v1alpha1.Reservation{}
-	err = c.client.Patch(pt).
-		Namespace(c.ns).
-		Resource("reservations").
-		Name(name).
-		SubResource(subresources...).
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(data).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// Apply takes the given apply declarative configuration, applies it and returns the applied reservation.
-func (c *reservations) Apply(ctx context.Context, reservation *computev1alpha1.ReservationApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.Reservation, err error) {
-	if reservation == nil {
-		return nil, fmt.Errorf("reservation provided to Apply must not be nil")
-	}
-	patchOpts := opts.ToPatchOptions()
-	data, err := json.Marshal(reservation)
-	if err != nil {
-		return nil, err
-	}
-	name := reservation.Name
-	if name == nil {
-		return nil, fmt.Errorf("reservation.Name must be provided to Apply")
-	}
-	result = &v1alpha1.Reservation{}
-	err = c.client.Patch(types.ApplyPatchType).
-		Namespace(c.ns).
-		Resource("reservations").
-		Name(*name).
-		VersionedParams(&patchOpts, scheme.ParameterCodec).
-		Body(data).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// ApplyStatus was generated because the type contains a Status member.
-// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-func (c *reservations) ApplyStatus(ctx context.Context, reservation *computev1alpha1.ReservationApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.Reservation, err error) {
-	if reservation == nil {
-		return nil, fmt.Errorf("reservation provided to Apply must not be nil")
-	}
-	patchOpts := opts.ToPatchOptions()
-	data, err := json.Marshal(reservation)
-	if err != nil {
-		return nil, err
-	}
-
-	name := reservation.Name
-	if name == nil {
-		return nil, fmt.Errorf("reservation.Name must be provided to Apply")
-	}
-
-	result = &v1alpha1.Reservation{}
-	err = c.client.Patch(types.ApplyPatchType).
-		Namespace(c.ns).
-		Resource("reservations").
-		Name(*name).
-		SubResource("status").
-		VersionedParams(&patchOpts, scheme.ParameterCodec).
-		Body(data).
-		Do(ctx).
-		Into(result)
-	return
 }
