@@ -5,7 +5,7 @@ assignees:
   - "usha.belgur"
 cveLabels:
   - "type::3-cve"
-  - "stream::onMetal"
+  - "stream::infra-development "
   - "Component: API"
   - "why::Security"
   - "squad::API"
