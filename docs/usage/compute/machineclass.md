@@ -1,10 +1,10 @@
 # MachineClass
 
-A `MachineClass` is a `IronCore` resource used to represent a class/flavor of a Machine. It serves as a means to define an amount of resources a `Machine` object can have as capabilities(For eg, CPU, memory) if associated with particular class. The `MachineClassController` reconciler leverages this information create `MachineClass`.
+A `MachineClass` is an `IronCore` resource used to represent a class/flavor of a Machine. It serves as a means to define the number of resources a `Machine` object can have as capabilities(For eg, CPU, memory) associated with a particular class. The `MachineClassController` reconciler leverages this information to create `MachineClass`.
 
 ## Example Machine Resource
 
-An example of how to define an MachineClass resource:
+An example of how to define a MachineClass resource:
 
 ```yaml
 apiVersion: compute.ironcore.dev/v1alpha1
@@ -18,11 +18,11 @@ capabilities:
 
 **Key Fields**:
 
-- capabilities (`ResourceList`): capabilities is used to define a list of resources a Machine can have along with its capacity.
+- capabilities (`ResourceList`): capabilities are used to define a list of resources a Machine can have along with its capacity.
 
 
 ## Reconciliation Process
 
 - **MachineClass Creation**: The `MachineClassController` uses the `capabilities` field in the MachineClass resource to create a flavor of MachineClass resource.
-- **MachineClass Deletion**: Before deleting any MachineClass its been ensured that it is not in use by any `Machine` and then only deleted.
+- **MachineClass Deletion**: Before deleting any MachineClass it's been ensured that it is not in use by any `Machine` and then only deleted.
 

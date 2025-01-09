@@ -4,7 +4,7 @@ A `MachinePool` is a resource in `IronCore` that represents a pool of compute re
 
 ## Example MachinePool Resource
 
-An example of how to define an MachinePool resource:
+An example of how to define a MachinePool resource:
 
 ```yaml
 apiVersion: compute.ironcore.dev/v1alpha1
@@ -24,8 +24,8 @@ For example `ironcore://shared`
 
 ## Reconciliation Process
 
-- **Machine Type Discovery**: It constantly checks what kinds of machine (MachineClasses) are available in the `Ironcore` Infrastructure
-- **Compatibility Check**: Evaluating whether the MachinePool can manage available machine class based on its capabilities. 
+- **Machine Type Discovery**: It constantly checks what kinds of MachineClasses are available in the `Ironcore` Infrastructure
+- **Compatibility Check**: Evaluating whether the MachinePool can manage available machine classes based on its capabilities. 
 - **Status Update**: Updating the MachinePool's status to indicate the supported `MachineClasses` with available capacity and allocatable.
 - **Event Handling**: Watches for changes in MachineClass resources and ensures the associated MachinePool is reconciled when relevant changes occur.
 
