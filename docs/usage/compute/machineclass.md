@@ -1,6 +1,6 @@
 # MachineClass
 
-A `MachineClass` is an `IronCore` resource used to represent a class/flavor of a Machine. It serves as a means to define the number of resources a `Machine` object can have as capabilities(For eg, CPU, memory) associated with a particular class. The `MachineClassController` reconciler leverages this information to create `MachineClass`.
+A `MachineClass` is an `Ironcore` resource used to represent a class/flavor of a Machine. It serves as a means to define the number of resources a `Machine` object can have as capabilities(For eg, CPU, memory) associated with a particular class. The `MachineClassController` reconciler leverages this information to create `MachineClass`.
 
 ## Example Machine Resource
 
