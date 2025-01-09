@@ -1,7 +1,8 @@
 # VolumePool
-A `VolumePool` is a resource in `IronCore` that represents a pool of storage volume managed collectively. It defines the infrastructure's storage configuration used to provision and manage volumes, ensuring resource availability and compatibility with associated `VolumeClasses`.
+A `VolumePool` is a resource in `Ironcore` that represents a pool of storage volume managed collectively. It defines the infrastructure's storage configuration used to provision and manage volumes, ensuring resource availability and compatibility with associated `VolumeClasses`.
 
-# Example Volume Resource
+# Example VolumePool Resource
+An example of how to define a `VolumePool` resource in `Ironcore`
 
 ```
 apiVersion: storage.ironcore.dev/v1alpha1
@@ -18,7 +19,7 @@ spec:
 ```
 
 # Key Fields:
-- `ProviderID`(`string`):  The `providerId` helps the controller identify and communicate with the correct  storage system within the specific backened storage porvider.
+- `providerID`(`string`): The `providerId` helps the controller identify and communicate with the correct storage system within the specific backened storage porvider.
 
     for example `ironcore://shared`
 

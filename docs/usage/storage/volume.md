@@ -1,9 +1,9 @@
 # Volume
-The `IronCore` `Volume` is a storage abstraction provided by the `IronCore Runtime Interface` `(IRI)` service, designed to integrate with external storage backend for managing persistent storage. It acts as a managed storage unit, ensuring consistency, scalability, and compatibility with Kubernetes workloads.
-By integrating IronCore Volumes with Kubernetes, users benefit from seamless storage management, automation, and advanced features such as encryption and scalability, making it suitable for modern cloud-native and hybrid applications.
+The `Ironcore` `Volume` is a storage abstraction provided by the `Ironcore Runtime Interface` `(IRI)` service, designed to integrate with external storage backend for managing persistent storage. It acts as a managed storage unit, ensuring consistency, scalability, and compatibility with Kubernetes workloads.
+By integrating Ironcore Volumes with Kubernetes, users benefit from seamless storage management, automation, and advanced features such as encryption and scalability, making it suitable for modern cloud-native and hybrid applications.
 
 # Example Volume Resource
-An example of how to define a `volume` resource in `ironcore`
+An example of how to define a `Volume` resource in `Ironcore`
 
 ```
 apiVersion: storage.ironcore.dev/v1alpha1
@@ -21,11 +21,11 @@ spec:
 
 # Key Fields:
 
-- `volumeClassRef`(`string`): `volumeClassRef` refers to the name of an ironcore `volumeclass`( for eg: `slow`, `fast`, `super-fast` etc.) to create a volume,
+- `volumeClassRef`(`string`): `volumeClassRef` refers to the name of an Ironcore `volumeClass`( for eg: `slow`, `fast`, `super-fast` etc.) to create a volume,
 
 - `volumePoolRef` (`string`): 	`VolumePoolRef` indicates which VolumePool to use for a volume. If unset, the scheduler will figure out a suitable `VolumePoolRef`.
 
-- `resources`: Resources is a description of the volume's resources and capacity.
+- `resources`: `Resources` is a description of the volume's resources and capacity.
 
 # Reconciliation Process:
 
@@ -36,7 +36,7 @@ spec:
 - **Check IRI Volumes**: List and identify `IRI` volumes linked to the `Volume` resource.
 
 - **Create or Update Volume**:
-  - Create a new IRI volume if none exist.
+  - Create a new IRI volume if none exists.
   - Update existing IRI volumes if attributes like size or encryption need adjustments.
 
 - **Sync Status**: Reflect the IRI volume's state (e.g., Pending, Available) in the Kubernetes Volume resource's status.

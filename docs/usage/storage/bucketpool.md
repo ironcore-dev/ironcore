@@ -1,7 +1,8 @@
 # BucketPool
-A `BucketPool` is a resource in `IronCore` that represents a pool of storage buckets managed collectively. It defines the infrastructure's storage configuration used to provision and manage buckets, ensuring resource availability and compatibility with associated `BucketClasses`.
+A `BucketPool` is a resource in `Ironcore` that represents a pool of storage buckets managed collectively. It defines the infrastructure's storage configuration used to provision and manage buckets, ensuring resource availability and compatibility with associated BucketClasses.
 
 # Example BucketPool Resource
+An example of how to define a `BucketPool` resource in `Ironcore`
 
 ```
 apiVersion: storage.ironcore.dev/v1alpha1
