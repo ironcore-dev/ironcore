@@ -15,12 +15,9 @@ metadata:
 spec:
   machineClassRef:
     name: machineclass-sample
-  #  machinePoolRef:
-  #    name: default
   image: my-image
   volumes:
     - name: rootdisk # first disk is the root disk
-      # priority: 0 # optional
       volumeRef:
         name: my-volume
   networkInterfaces:
