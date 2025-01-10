@@ -26,8 +26,11 @@ spec:
 
 # Reconciliation Process:
 
-- **Network creation**: `ironcore-net` which is the network provider for Ironcore realizes the `Network` resource and updates 
-providerID in the spec. Once resource is in available state status is marked to `Available`.
+- **Network creation**: `ironcore-net` which is the network provider for Ironcore realizes the `Network` resource via `apinetlet` controllers. When an Ironcore `Network` is created, a corresponding `core.apinet.ironcore.dev/Network` is created in the apinet cluster. The name of the Network in the apinet cluster is the uid of the Network in the Ironcore cluster.
+
+  Once created and with an allocated ID, the Ironcore Network will be patched with the corresponding provider ID of the apinet Network and set to state: Available. The provider ID format & parsing can be found in provider.go.
+  Once resource is in available state status is marked to `Available`. The format of a network provider ID is as follows:
+  `ironcore-net://<namespace>/<name>/<id>/<uid>`
 
 - **Network peering process**: Network peering is a technique used to interleave two isolated networks, allowing members of both networks to communicate with each 
 other as if they were in the same networking domain,  `NetworkPeeringController` facilitates this process.

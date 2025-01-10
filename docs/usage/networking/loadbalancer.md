@@ -20,9 +20,6 @@ spec:
       app: web
   ports:
   - port: 80
-#status:
-#  ips:
-#  - 10.0.0.1 # The publicly available IP of the load balancer
 
 ```
 (`Note`: Refer to <a href="https://github.com/ironcore-dev/ironcore/tree/main/config/samples/e2e/loadbalancer-public">E2E Examples</a> for more detailed examples.)
@@ -64,3 +61,4 @@ destinations:
   - name: my-machine-interface-2
     uid: 2020dcf9-e030-427e-b0fc-4fec2016e73d
 ```
+**LoadBalancer status update**: The `LoadBalancerController` in ironcore-net takes care of allocating IPs for defined `ipFamilies` in the spec and updates them in its `status.ips`.
