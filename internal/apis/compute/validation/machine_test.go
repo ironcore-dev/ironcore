@@ -6,6 +6,8 @@ package validation
 import (
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	"github.com/ironcore-dev/ironcore/internal/apis/compute"
+	"github.com/ironcore-dev/ironcore/internal/apis/ipam"
+	"github.com/ironcore-dev/ironcore/internal/apis/networking"
 	. "github.com/ironcore-dev/ironcore/internal/testutils/validation"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -185,6 +187,100 @@ var _ = Describe("Machine", func() {
 				},
 			},
 			ContainElement(InvalidField("spec.imagePullSecretRef.name")),
+		),
+		Entry("invalid networkInterface name",
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					NetworkInterfaces: []compute.NetworkInterface{{Name: "bar*"}},
+				},
+			},
+			ContainElement(InvalidField("spec.networkInterface[0].name")),
+		),
+		Entry("duplicate networkInterface name",
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					NetworkInterfaces: []compute.NetworkInterface{
+						{Name: "foo"},
+						{Name: "foo"},
+					},
+				},
+			},
+			ContainElement(DuplicateField("spec.networkInterface[1].name")),
+		),
+		Entry("invalid networkInterfaceRef name",
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					NetworkInterfaces: []compute.NetworkInterface{
+						{
+							Name: "bar",
+							NetworkInterfaceSource: compute.NetworkInterfaceSource{
+								NetworkInterfaceRef: &corev1.LocalObjectReference{Name: "foo*"},
+							},
+						},
+					},
+				},
+			},
+			ContainElement(InvalidField("spec.networkInterface[0].networkInterfaceRef.name")),
+		),
+		Entry("invalid networkInterface prefix length for IPv4 IPSource",
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					NetworkInterfaces: []compute.NetworkInterface{
+						{
+							Name: "foo",
+							NetworkInterfaceSource: compute.NetworkInterfaceSource{
+								Ephemeral: &compute.EphemeralNetworkInterfaceSource{
+									NetworkInterfaceTemplate: &networking.NetworkInterfaceTemplateSpec{
+										Spec: networking.NetworkInterfaceSpec{
+											NetworkRef: corev1.LocalObjectReference{Name: "bar"},
+											IPs: []networking.IPSource{{
+												Ephemeral: &networking.EphemeralPrefixSource{
+													PrefixTemplate: &ipam.PrefixTemplateSpec{
+														Spec: ipam.PrefixSpec{
+															IPFamily: corev1.IPv4Protocol,
+															Prefix:   commonv1alpha1.MustParseNewIPPrefix("10.0.0.0/24"),
+														},
+													}},
+											}},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			ContainElement(ForbiddenField("spec.networkInterface[0].ephemeral.networkInterfaceTemplate.ips[0].ephemeral.prefixTemplate.spec.prefix")),
+		),
+		Entry("invalid ephemral networkInterface prefix length for IPv6 IPSource",
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					NetworkInterfaces: []compute.NetworkInterface{
+						{
+							Name: "foo",
+							NetworkInterfaceSource: compute.NetworkInterfaceSource{
+								Ephemeral: &compute.EphemeralNetworkInterfaceSource{
+									NetworkInterfaceTemplate: &networking.NetworkInterfaceTemplateSpec{
+										Spec: networking.NetworkInterfaceSpec{
+											NetworkRef: corev1.LocalObjectReference{Name: "bar"},
+											IPs: []networking.IPSource{{
+												Ephemeral: &networking.EphemeralPrefixSource{
+													PrefixTemplate: &ipam.PrefixTemplateSpec{
+														Spec: ipam.PrefixSpec{
+															IPFamily: corev1.IPv6Protocol,
+															Prefix:   commonv1alpha1.MustParseNewIPPrefix("2001:db8::/64"),
+														},
+													}},
+											}},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			ContainElement(ForbiddenField("spec.networkInterface[0].ephemeral.networkInterfaceTemplate.ips[0].ephemeral.prefixTemplate.spec.prefix")),
 		),
 	)
 
