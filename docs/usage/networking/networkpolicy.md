@@ -64,7 +64,11 @@ https://github.com/ironcore-dev/ironcore/tree/main/config/samples/e2e/network-po
 
 - `policyTypes`(`list`): There are two supported policyTypes `Ingress` and `Egress`.
 
-- `ingress`(`list`): ingress defines the list of `NetworkPolicyIngressRules`. Each NetworkPolicy may include a list of allowed `ingress` rules. Each rule allows traffic that matches both the `from` and `ports` sections. The example policy contains a single rule, which matches traffic on a single port, from one of three sources, the first specified via an ipBlock, the second and third via different objectSelector.
+- `ingress`(`list`): An Ingress section in a `NetworkPolicy` defines a list of `NetworkPolicyIngressRules` that specify which incoming traffic is allowed. Each `NetworkPolicy` can have multiple ingress rules, and each rule allows traffic that satisfies both the from and ports criteria.
+
+  For example, a `NetworkPolicy` with a single ingress rule may permit traffic on a specific port and only from one of the following sources:
+  - An IP range, defined using an ipBlock.
+  - A set of resources identified by an objectSelector.
 
 - `egress`(`list`): egress defines the list of `NetworkPolicyEgressRules`. Each NetworkPolicy may include a list of allowed egress rules. Each rule allows traffic that matches both `to` and `ports` sections. The example policy contains a single rule, which matches traffic on a single port to any destination in 10.0.0.0/24.
 

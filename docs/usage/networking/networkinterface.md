@@ -22,16 +22,16 @@ spec:
     virtualIPRef:
       name: virtualip-sample
 ```
-**Note**: For a detailed end-to-end example to understand the ephemeral and non `NetworkInterface`, please refer <a href="https://github.com/ironcore-dev/ironcore/tree/main/config/samples/e2e">E2E Examples</a>
+**Note**: For a detailed end-to-end example to understand the ephemeral and non-ephemeral `NetworkInterface` resource, please refer <a href="https://github.com/ironcore-dev/ironcore/tree/main/config/samples/e2e">E2E Examples</a>
 
 # Key Fields 
-- **networkRef**: `NetworkRef` is the Network this NetworkInterface is connected to
+- `networkRef`(`string`): `NetworkRef` is the Network this NetworkInterface is connected to
 
-- **ipFamilies**: `IPFamilies` defines the list of IPFamilies this `NetworkInterface` supports. For eg: `IPV4` and `IPV6`
+- `ipFamilies`(`list`): `IPFamilies` defines the list of IPFamilies this `NetworkInterface` supports. Supported values for IPFamily are `IPv4` and `IPv6`.
 
-- **ips**: `IPs` are the list of provided internal IPs which should be assigned to this NetworkInterface
+- `ips`(`list`): `IPs` are the list of provided internal IPs which should be assigned to this NetworkInterface
 
-- **virtualIP**: `VirtualIP` specifies the public ip that should be assigned to this NetworkInterface.
+- `virtualIP`: `VirtualIP` specifies the public ip that should be assigned to this NetworkInterface.
 
 # Reconciliation Process:
 
@@ -43,7 +43,7 @@ If the Machine is marked for deletion (indicated by a non-zero DeletionTimestamp
 Analyze the Machine's specification to identify the desired ephemeral NetworkInterface resources.
 Construct a map detailing these desired NetworkInterfaces, including their configurations and expected states.
 
-- **Fetch Existing Network Interfaces**:
+- **Fetch Existing NetworkInterfaces**:
 List all existing NetworkInterface resources within the same namespace as the Machine.
 
 - **Compare and Reconcile**:

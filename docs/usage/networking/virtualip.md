@@ -11,14 +11,12 @@ metadata:
 spec:
   type: Public
   ipFamily: IPv4
-#status:
-#  ip: 10.0.0.1 # This will be populated by the corresponding controller.
 ```
 
 # Key Fields
-- **type**(`string`):  Currently supported type is `public`, which allocates and routes a stable public IP.
+- `type`(`string`):  Currently supported type is `public`, which allocates and routes a stable public IP.
 
-- **ipFamily**(`string`): `IPFamily` is the ip family of the VirtualIP. Supported values for IPFamily are `IPv4` or `IPv6`.
+- `ipFamily`(`string`): `IPFamily` is the ip family of the VirtualIP. Supported values for IPFamily are `IPv4` and `IPv6`.
 
 
 # Reconciliation Process:
@@ -39,6 +37,11 @@ Requeue the reconciliation to retry the operation.
 Update the VirtualIP status to reflect the actual state of the APINet IP.
 If successfully allocated, update the status with the assigned IP address.
 
+  for example:
+  ```
+  #status:
+  #  ip: 10.0.0.1 # This will be populated by the corresponding controller.
+  ```
 - **Networking Configuration**: 
     - VM Integration: The allocated VirtualIP is associated with the VM through network configuration mechanisms
     - Load Balancer Integration: If a load balancer is used, the virtualIP is configured as the frontend IP to route requests to the VM.
