@@ -1,6 +1,6 @@
 # MachinePool
 
-A `MachinePool` is a resource in `Ironcore` that represents a pool of compute resources managed collectively. It defines the infrastructure's compute configuration used to provision and manage `Machines`, ensuring resource availability and compatibility with associated `MachineClasses`.
+A `MachinePool` is a resource in `Ironcore` that represents a pool of compute resources managed collectively. It defines the infrastructure's compute configuration used to provision and manage `Machines`, ensuring resource availability and compatibility with associated `MachineClasses`. (`Note`: One `machinepoollet` is responsible for one `MachinePool`)
 
 ## Example MachinePool Resource
 

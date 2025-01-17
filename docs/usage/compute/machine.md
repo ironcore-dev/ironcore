@@ -49,15 +49,19 @@ The `MachineScheduler` controller continuously watches for `Machines` without an
   - **Update Cache**: The scheduler updates the cache with recalculated allocatable `machineClass` quantities.
   - **Assign MachinePoolRef**: The scheduler assigns the selected `machinePoolRef` to the machine object.
 
-2. **IRI Machine creation**: Once the Machine is allocated to a particular pool, the `MachineController` processes the `Machine` resource and it extracts the `ignitionData`, `networkInterfaces` and `volumes` information from the `spec` and prepares IRI machine resource.
-
-3. **Machine Brokering**: Once IRIMachine object is prepared create/update the machine request is sent to a broker via the IRI interface(via GRPC call). An actual VM is created when the request reaches the compute provider. Once the response is received from IRI call Machine status is updated with the status recieved.
+2. **IRI Machine Creation and Brokering**: 
+  - The Machine is allocated to a particular pool via the scheduler. 
+  - The `machinepoollet` responsible for this pool picks up the `Machine` resource and extracts the `ignitionData`, `networkInterfaces` and `volumes` information from the `spec` and prepares the IRI machine object. 
+  - Once the IRIMachine object is prepared the machine create/update request is sent to a broker via the IRI interface(via GRPC call) either against a broker (to copy the resource into another cluster) OR a provider implementation e.g. libvirt-provider which creates a corresponding machine against libvirt/QEMU. 
+  - Once the response is received from IRI call Machine status is updated with the status received.
 
 4. **Network Interface handling**: `MachineControllerNetworkinterface` takes care of attaching/detaching Network interfaces defined for the machine. Once the attachment is successful status is updated from `Pending` to `Attached`.
 
 5. **Volume handling**: `MachineControllerVolume` takes care of attach/detach of Volumes(Storage) defined for machine. Once the attachment is successful status is updated from `Pending` to `Attached`.
 
-6. **Ephemeral resource handling**: If `NetworkIntreface` or `Volume` is defined as ephemeral(i.e. coupled to the lifetime of the machine object) in the machine spec, `MachineEphemeralControllers` takes care of creating and destroying respective objects on creation/deletion of the machine. 
+6. **Ephemeral resource handling**: 
+  - The `Volume` and `NetworkIntreface` can be bound with the lifecycle of the Machine by creating them as ephemeral resources. (`Note`: For more details on how to create ephemeral resources refer to <a href="https://github.com/ironcore-dev/ironcore/tree/main/config/samples/e2e/machine-with-ephemeral-resources">Machine with ephemeral resources</a>)
+  - If `NetworkIntreface` or `Volume` is defined as ephemeral `MachineEphemeralControllers` takes care of creating and destroying respective objects on creation/deletion of the machine. 
 
 ## Lifecycle and States
 
