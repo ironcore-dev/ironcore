@@ -188,6 +188,13 @@ var _ = Describe("Machine", func() {
 			},
 			ContainElement(InvalidField("spec.imagePullSecretRef.name")),
 		),
+	)
+
+	DescribeTable("ValidateMachineNetworkInterface",
+		func(machine *compute.Machine, match types.GomegaMatcher) {
+			errList := ValidateMachine(machine)
+			Expect(errList).To(match)
+		},
 		Entry("invalid networkInterface name",
 			&compute.Machine{
 				Spec: compute.MachineSpec{
@@ -281,6 +288,149 @@ var _ = Describe("Machine", func() {
 				},
 			},
 			ContainElement(ForbiddenField("spec.networkInterface[0].ephemeral.networkInterfaceTemplate.ips[0].ephemeral.prefixTemplate.spec.prefix")),
+		),
+		Entry("invalid networkInterface prefix length derived from parent prefix for IPv4 IPSource",
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					NetworkInterfaces: []compute.NetworkInterface{
+						{
+							Name: "foo",
+							NetworkInterfaceSource: compute.NetworkInterfaceSource{
+								Ephemeral: &compute.EphemeralNetworkInterfaceSource{
+									NetworkInterfaceTemplate: &networking.NetworkInterfaceTemplateSpec{
+										Spec: networking.NetworkInterfaceSpec{
+											NetworkRef: corev1.LocalObjectReference{Name: "bar"},
+											IPFamilies: []corev1.IPFamily{"IPv4"},
+											IPs: []networking.IPSource{{
+												Ephemeral: &networking.EphemeralPrefixSource{
+													PrefixTemplate: &ipam.PrefixTemplateSpec{
+														Spec: ipam.PrefixSpec{
+															IPFamily: corev1.IPv4Protocol,
+															ParentSelector: &metav1.LabelSelector{
+																MatchLabels: map[string]string{"foo": "bar"},
+															},
+															PrefixLength: 40,
+														},
+													}},
+											}},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			ContainElement(ForbiddenField("spec.networkInterface[0].ephemeral.networkInterfaceTemplate.ips[0].ephemeral.prefixTemplate.spec.prefixLength")),
+		),
+		Entry("invalid ephemral networkInterface prefix length for IPv6 IPSource",
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					NetworkInterfaces: []compute.NetworkInterface{
+						{
+							Name: "foo",
+							NetworkInterfaceSource: compute.NetworkInterfaceSource{
+								Ephemeral: &compute.EphemeralNetworkInterfaceSource{
+									NetworkInterfaceTemplate: &networking.NetworkInterfaceTemplateSpec{
+										Spec: networking.NetworkInterfaceSpec{
+											NetworkRef: corev1.LocalObjectReference{Name: "bar"},
+											IPFamilies: []corev1.IPFamily{"IPv6"},
+											IPs: []networking.IPSource{{
+												Ephemeral: &networking.EphemeralPrefixSource{
+													PrefixTemplate: &ipam.PrefixTemplateSpec{
+														Spec: ipam.PrefixSpec{
+															IPFamily: corev1.IPv6Protocol,
+															ParentSelector: &metav1.LabelSelector{
+																MatchLabels: map[string]string{"foo": "bar"},
+															},
+															PrefixLength: 132,
+														},
+													}},
+											}},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			ContainElement(ForbiddenField("spec.networkInterface[0].ephemeral.networkInterfaceTemplate.ips[0].ephemeral.prefixTemplate.spec.prefixLength")),
+		),
+	)
+
+	DescribeTable("ValidateMachineNetworkInterface prefix length derived from parent prefix",
+		func(machine *compute.Machine, match types.GomegaMatcher) {
+			errList := ValidateMachine(machine)
+			Expect(errList).To(match)
+		},
+		Entry("valid networkInterface prefix length derived from parent prefix for IPv4 IPSource",
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					NetworkInterfaces: []compute.NetworkInterface{
+						{
+							Name: "foo",
+							NetworkInterfaceSource: compute.NetworkInterfaceSource{
+								Ephemeral: &compute.EphemeralNetworkInterfaceSource{
+									NetworkInterfaceTemplate: &networking.NetworkInterfaceTemplateSpec{
+										Spec: networking.NetworkInterfaceSpec{
+											NetworkRef: corev1.LocalObjectReference{Name: "bar"},
+											IPFamilies: []corev1.IPFamily{"IPv4"},
+											IPs: []networking.IPSource{{
+												Ephemeral: &networking.EphemeralPrefixSource{
+													PrefixTemplate: &ipam.PrefixTemplateSpec{
+														Spec: ipam.PrefixSpec{
+															IPFamily: corev1.IPv4Protocol,
+															ParentRef: &corev1.LocalObjectReference{
+																Name: "root",
+															},
+															PrefixLength: 32,
+														},
+													}},
+											}},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			Not(ContainElement(ForbiddenField("spec.networkInterface[0].ephemeral.networkInterfaceTemplate.ips[0].ephemeral.prefixTemplate.spec.prefixLength"))),
+		),
+		Entry("valid ephemral networkInterface prefix length derived from parent prefix for IPv6 IPSource",
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					NetworkInterfaces: []compute.NetworkInterface{
+						{
+							Name: "foo",
+							NetworkInterfaceSource: compute.NetworkInterfaceSource{
+								Ephemeral: &compute.EphemeralNetworkInterfaceSource{
+									NetworkInterfaceTemplate: &networking.NetworkInterfaceTemplateSpec{
+										Spec: networking.NetworkInterfaceSpec{
+											NetworkRef: corev1.LocalObjectReference{Name: "bar"},
+											IPFamilies: []corev1.IPFamily{"IPv6"},
+											IPs: []networking.IPSource{{
+												Ephemeral: &networking.EphemeralPrefixSource{
+													PrefixTemplate: &ipam.PrefixTemplateSpec{
+														Spec: ipam.PrefixSpec{
+															IPFamily: corev1.IPv6Protocol,
+															ParentRef: &corev1.LocalObjectReference{
+																Name: "root",
+															},
+															PrefixLength: 128,
+														},
+													}},
+											}},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			Not(ContainElement(ForbiddenField("spec.networkInterface[0].ephemeral.networkInterfaceTemplate.ips[0].ephemeral.prefixTemplate.spec.prefixLength"))),
 		),
 	)
 
