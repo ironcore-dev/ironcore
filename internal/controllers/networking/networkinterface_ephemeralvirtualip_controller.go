@@ -77,10 +77,10 @@ func (r *NetworkInterfaceEphemeralVirtualIPReconciler) ephemeralNetworkInterface
 	annotations.SetDefaultEphemeralManagedBy(virtualIP)
 	if ephemeral.VirtualIPTemplate.Spec.ReclaimPolicy != networkingv1alpha1.ReclaimPolicyTypeRetain {
 		_ = ctrl.SetControllerReference(nic, virtualIP, r.Scheme())
-		virtualIP.Spec.TargetRef = &commonv1alpha1.LocalUIDReference{
-			Name: nic.Name,
-			UID:  nic.UID,
-		}
+	}
+	virtualIP.Spec.TargetRef = &commonv1alpha1.LocalUIDReference{
+		Name: nic.Name,
+		UID:  nic.UID,
 	}
 	res[virtualIPName] = virtualIP
 	return res

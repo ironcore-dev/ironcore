@@ -78,7 +78,73 @@ var _ = Describe("NetworkInterfaceEphemeralVirtualIP", func() {
 		})),
 		))
 	})
-	It("should verify ownerRef is set for ephemeral virtual IPs based on ReclaimPolicy", func(ctx SpecContext) {
+	It("should verify ownerRef is updated based on ReclaimPolicyType for ephemeral virtualIP", func(ctx SpecContext) {
+		By("creating a network interface with an ephemeral virtual IP having ReclaimPolicyType Retain")
+		vipSrc := networkingv1alpha1.VirtualIPSource{
+			Ephemeral: &networkingv1alpha1.EphemeralVirtualIPSource{
+				VirtualIPTemplate: &networkingv1alpha1.VirtualIPTemplateSpec{
+					Spec: networkingv1alpha1.EphemeralVirtualIPSpec{
+						ReclaimPolicy: networkingv1alpha1.ReclaimPolicyTypeRetain,
+						VirtualIPSpec: networkingv1alpha1.VirtualIPSpec{
+							Type:     networkingv1alpha1.VirtualIPTypePublic,
+							IPFamily: corev1.IPv4Protocol,
+						},
+					},
+				},
+			},
+		}
+		nic := &networkingv1alpha1.NetworkInterface{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "nic-",
+			},
+			Spec: networkingv1alpha1.NetworkInterfaceSpec{
+				NetworkRef: corev1.LocalObjectReference{Name: "my-network"},
+				IPs: []networkingv1alpha1.IPSource{
+					{
+						Value: commonv1alpha1.MustParseNewIP("10.0.0.1"),
+					},
+				},
+				VirtualIP: &vipSrc,
+			},
+		}
+		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
+
+		By("waiting for the virtual IP to exist with empty OwnerRef")
+		vip := &networkingv1alpha1.VirtualIP{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: ns.Name,
+				Name:      networkingv1alpha1.NetworkInterfaceVirtualIPName(nic.Name, vipSrc),
+			},
+		}
+		Eventually(Object(vip)).Should(SatisfyAll(
+			HaveField("ObjectMeta.OwnerReferences", BeEmpty()),
+			HaveField("Spec", networkingv1alpha1.VirtualIPSpec{
+				Type:     networkingv1alpha1.VirtualIPTypePublic,
+				IPFamily: corev1.IPv4Protocol,
+				TargetRef: &commonv1alpha1.LocalUIDReference{
+					Name: nic.Name,
+					UID:  nic.UID,
+				},
+			}),
+		))
+
+		By("Updating reclaim policy to Delete")
+		baseNic := nic.DeepCopy()
+		nic.Spec.VirtualIP.Ephemeral.VirtualIPTemplate.Spec.ReclaimPolicy = networkingv1alpha1.ReclaimPolicyTypeDelete
+		Expect(k8sClient.Patch(ctx, nic, client.MergeFrom(baseNic))).To(Succeed())
+
+		By("Verifying ephemeral virtualIP is updated with OwnerRef after updating the ReclaimPolicyTypeDelete")
+		Eventually(Object(vip)).Should(HaveField("ObjectMeta.OwnerReferences", ConsistOf(MatchFields(IgnoreExtras, Fields{
+			"APIVersion": Equal(networkingv1alpha1.SchemeGroupVersion.String()),
+			"Kind":       Equal("NetworkInterface"),
+			"Name":       Equal(nic.Name),
+		})),
+		))
+
+	})
+
+	It("should verify ephemeral virutalIP is not deleted having ReclaimPolicyType Retain with nic deletion", func(ctx SpecContext) {
 		By("creating a network interface with an ephemeral virtual IP")
 		vipSrc := networkingv1alpha1.VirtualIPSource{
 			Ephemeral: &networkingv1alpha1.EphemeralVirtualIPSource{
@@ -117,21 +183,30 @@ var _ = Describe("NetworkInterfaceEphemeralVirtualIP", func() {
 				Name:      networkingv1alpha1.NetworkInterfaceVirtualIPName(nic.Name, vipSrc),
 			},
 		}
-		Eventually(Get(vip)).Should(Succeed())
-		By("Verifying OwnerRef is not set for ephemeral virtualIP when reclaim policy is retain")
-		Eventually(Object(vip)).Should(HaveField("ObjectMeta.OwnerReferences", BeEmpty()))
-
-		By("Updating reclaim policy to delete")
-		baseNic := nic.DeepCopy()
-		nic.Spec.VirtualIP.Ephemeral.VirtualIPTemplate.Spec.ReclaimPolicy = networkingv1alpha1.ReclaimPolicyTypeDelete
-		Expect(k8sClient.Patch(ctx, nic, client.MergeFrom(baseNic))).To(Succeed())
-		By("Verifying OwnerRef is updated for ephemeral virtualIP")
-		Eventually(Object(vip)).Should(HaveField("ObjectMeta.OwnerReferences", ConsistOf(MatchFields(IgnoreExtras, Fields{
-			"APIVersion": Equal(networkingv1alpha1.SchemeGroupVersion.String()),
-			"Kind":       Equal("NetworkInterface"),
-			"Name":       Equal(nic.Name),
-		})),
+		Eventually(Object(vip)).Should(SatisfyAll(
+			HaveField("ObjectMeta.OwnerReferences", BeEmpty()),
+			HaveField("Spec", networkingv1alpha1.VirtualIPSpec{
+				Type:     networkingv1alpha1.VirtualIPTypePublic,
+				IPFamily: corev1.IPv4Protocol,
+				TargetRef: &commonv1alpha1.LocalUIDReference{
+					Name: nic.Name,
+					UID:  nic.UID,
+				},
+			}),
 		))
+
+		By("deleting nic")
+		Expect(k8sClient.Delete(ctx, nic)).To(Succeed())
+
+		By("ensuring the nic is deleted")
+		nicKey := client.ObjectKey{Namespace: ns.Name, Name: nic.Name}
+		err := k8sClient.Get(ctx, nicKey, nic)
+		Expect(apierrors.IsNotFound(err)).To(BeTrue())
+
+		By("ensuring the virtualIP still exists after the nic is deleted")
+		vipKey := client.ObjectKey{Namespace: ns.Name, Name: vip.Name}
+		Expect(k8sClient.Get(ctx, vipKey, vip)).To(Succeed())
+
 	})
 
 	It("should delete undesired virtual IPs for a network interface", func(ctx SpecContext) {
