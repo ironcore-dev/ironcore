@@ -1,5 +1,5 @@
 # Prefix
-A `Prefix` resource provides fully integrated IP address management(IPAM) solution for `Ironcore`. It serves as a means to define IP prefix along with prefix size to reserved range of IP addresses. It is also possible to define child subnets with the specified prefix length referring to the parent prefix.
+A `Prefix` resource provides a fully integrated IP address management(IPAM) solution for `Ironcore`. It serves as a means to define IP prefixes along with prefix length to a reserved range of IP addresses. It is also possible to define child subnets with the specified prefix length referring to the parent prefix.
 
 # Example Volume Resource
 An example of how to define a root `Prefix` resource in `Ironcore`
@@ -12,7 +12,7 @@ metadata:
   labels:
     subnet-type: public
 spec:
-  prefix: 10.0.0.0/8
+  prefix: 10.0.0.0/24
 
 ```
 An example of how to define a child `Prefix` resource in `Ironcore`
@@ -47,10 +47,21 @@ spec:
 
 # Reconciliation Process:
 
-- **Allocate root prefix**: If `parentRef` and `parentSelector` is empty, the PrefixController reconciler consideres it as a root prefix and allocates by itself and the status is updated as `Allocated`.
+- **Allocate root prefix**: If `parentRef` and `parentSelector` is empty, the PrefixController reconciler considers it as a root prefix and allocates by itself and the status is updated as `Allocated`.
 
-- **Allocating sub-prefix**: If `parentRef` or `parentSelector` is set PrefixController lists all the previouslly allocated prefix allocations by parent prefix. Finds all the active allocations and prunes outdated ones. If no existing PrefixAllocation object is found new `PrefixAllocation` object is created for the new prefix to allocate. If prefix allocation is successful status is update to `Allocated` otherwise to `Failed` in PrefixAllocation.
+- **Allocating sub-prefix**: If `parentRef` or `parentSelector` is set PrefixController lists all the previously allocated prefix allocations by parent prefix. Finds all the active allocations and prunes outdated ones. If no existing PrefixAllocation object is found new `PrefixAllocation` object is created for the new prefix to allocate. If prefix allocation is successful status is updated to `Allocated` otherwise to `Failed`.
 
-- **Prefix allocation scheduler**: PrefixAllocationScheduler continously watches for Prefix resource and tries to schedule all PrefixAllocation objects for which prefix is not yet allocated. PrefixAllocationScheduler determins suitable prefix for allocation by listing available prefixes based on label filter, namespace and desired IP family. Once suitable prefix is found PrefixAllocation spec.parentRef is updated with selected prefix reference.
+- **Prefix allocation scheduler**: `PrefixAllocationScheduler` continuously watches for Prefix resource and tries to schedule all PrefixAllocation objects for which prefix is not yet allocated. PrefixAllocationScheduler determines suitable prefix for allocation by listing available prefixes based on label filter, namespace and desired IP family. Once a suitable prefix is found PrefixAllocation spec.parentRef is updated with the selected prefix reference.
 
-Once prefix allocation is successfull for sub-prefix, parent Prefix's status is updated with used prefix IP list.
+- **Status update**: Once prefix allocation is successful status is updated to `Allocated`. In the case of sub-prefixes once the prefix is allocated `PrefixController` updates the parent Prefix's status with the used prefix IPs list.
+
+Below is the sample `Prefix.status` :
+
+```
+status:
+  lastPhaseTransitionTime: "2024-10-21T20:56:24Z"
+  phase: Allocated
+  used:
+  - 10.0.0.1/32
+  - 10.0.0.2/32
+```
