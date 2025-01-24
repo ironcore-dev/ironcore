@@ -11,6 +11,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -157,6 +158,12 @@ var _ = Describe("AttachNetworkInterface", func() {
 
 		By("deleting the network")
 		Expect(k8sClient.Delete(ctx, network)).To(Succeed())
+
+		By("ensuring the network is deleted, before re-attaching the nic")
+		Eventually(func() bool {
+			err := k8sClient.Get(ctx, networkKey, network)
+			return apierrors.IsNotFound(err)
+		}).Should(BeTrue())
 
 		By("re-attaching a network interface")
 		Expect(srv.AttachNetworkInterface(ctx, &iri.AttachNetworkInterfaceRequest{
