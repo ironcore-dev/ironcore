@@ -39,8 +39,8 @@ If successfully allocated, update the status with the assigned IP address.
 
   for example:
   ```
-  #status:
-  #  ip: 10.0.0.1 # This will be populated by the corresponding controller.
+  status:
+    ip: 10.0.0.1 # This will be populated by the corresponding controller.
   ```
 - **Networking Configuration**: 
     - VM Integration: The allocated VirtualIP is associated with the VM through network configuration mechanisms

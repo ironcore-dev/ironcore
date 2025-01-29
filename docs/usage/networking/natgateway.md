@@ -51,8 +51,8 @@ Imagine you have a private server in a private subnet without a public IP. It ne
 After reconciling all `NATGateways`, log the successful reconciliation and update the `NATGateways` status with the corresponding values for `ips`as shown below.
 
 ```
-#status:
-#  ips:
-#  - name: ip1
-#    ip: 10.0.0.1
+status:
+  ips:
+  - name: ip1
+    ip: 10.0.0.1
 ```
