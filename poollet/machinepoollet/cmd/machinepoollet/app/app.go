@@ -5,6 +5,7 @@ package app
 
 import (
 	"context"
+	"crypto/tls"
 	goflag "flag"
 	"fmt"
 	"net"
@@ -42,6 +43,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	"sigs.k8s.io/controller-runtime/pkg/metrics/filters"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 )
 
@@ -58,6 +60,8 @@ func init() {
 type Options struct {
 	GetConfigOptions         config.GetConfigOptions
 	MetricsAddr              string
+	SecureMetrics            bool
+	EnableHTTP2              bool
 	EnableLeaderElection     bool
 	LeaderElectionNamespace  string
 	LeaderElectionKubeconfig string
@@ -87,7 +91,12 @@ type Options struct {
 
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	o.GetConfigOptions.BindFlags(fs)
-	fs.StringVar(&o.MetricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
+	fs.StringVar(&o.MetricsAddr, "metrics-bind-address", "0", "The address the metrics endpoint binds to. "+
+		"Use :8443 for HTTPS or :8080 for HTTP, or leave as 0 to disable the metrics service.")
+	fs.BoolVar(&o.SecureMetrics, "metrics-secure", true,
+		"If set, the metrics endpoint is served securely via HTTPS. Use --metrics-secure=false to use HTTP instead.")
+	fs.BoolVar(&o.EnableHTTP2, "enable-http2", false,
+		"If set, HTTP/2 will be enabled for the metrics and webhook servers")
 	fs.StringVar(&o.ProbeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	fs.BoolVar(&o.EnableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
@@ -220,10 +229,44 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error creating leader election kubeconfig: %w", err)
 	}
 
+	// if the enable-http2 flag is false (the default), http/2 should be disabled
+	// due to its vulnerabilities. More specifically, disabling http/2 will
+	// prevent from being vulnerable to the HTTP/2 Stream Cancellation and
+	// Rapid Reset CVEs. For more information see:
+	// - https://github.com/advisories/GHSA-qppj-fm5r-hxr3
+	// - https://github.com/advisories/GHSA-4374-p667-p6c8
+	var tlsOpts []func(*tls.Config)
+	disableHTTP2 := func(c *tls.Config) {
+		setupLog.Info("disabling http/2")
+		c.NextProtos = []string{"http/1.1"}
+	}
+	if !opts.EnableHTTP2 {
+		tlsOpts = append(tlsOpts, disableHTTP2)
+	}
+	// Metrics endpoint is enabled in 'config/default/kustomization.yaml'. The Metrics options configure the server.
+	// More info:
+	// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.19.1/pkg/metrics/server
+	// - https://book.kubebuilder.io/reference/metrics.html
+	metricsServerOptions := metricsserver.Options{
+		BindAddress:   opts.MetricsAddr,
+		SecureServing: opts.SecureMetrics,
+		TLSOpts:       tlsOpts,
+	}
+	if opts.SecureMetrics {
+		// FilterProvider is used to protect the metrics endpoint with authn/authz.
+		// These configurations ensure that only authorized users and service accounts
+		// can access the metrics endpoint. The RBAC are configured in 'config/machinepoollet-broker/broker-rbac/kustomization.yaml'. More info:
+		// https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.19.1/pkg/metrics/filters#WithAuthenticationAndAuthorization
+		metricsServerOptions.FilterProvider = filters.WithAuthenticationAndAuthorization
+		// TODO(user): If CertDir, CertName, and KeyName are not specified, controller-runtime will automatically
+		// generate self-signed certificates for the metrics server. While convenient for development and testing,
+		// this setup is not recommended for production.
+	}
+
 	mgr, err := ctrl.NewManager(cfg, ctrl.Options{
 		Logger:                  logger,
 		Scheme:                  scheme,
-		Metrics:                 metricsserver.Options{BindAddress: opts.MetricsAddr},
+		Metrics:                 metricsServerOptions,
 		HealthProbeBindAddress:  opts.ProbeAddr,
 		LeaderElection:          opts.EnableLeaderElection,
 		LeaderElectionID:        "bfafcebe.ironcore.dev",

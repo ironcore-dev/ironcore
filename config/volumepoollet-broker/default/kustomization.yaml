@@ -21,7 +21,7 @@ resources:
 #- ../prometheus
 
 patchesStrategicMerge:
-  - manager_auth_proxy_patch.yaml
+  - manager_metrics_patch.yaml
   
   # Mount the controller config file for loading manager configurations
   # through a ComponentConfig type
