@@ -1,5 +1,5 @@
 # Prefix
-A `Prefix` resource provides a fully integrated IP address management(IPAM) solution for `Ironcore`. It serves as a means to define IP prefixes along with prefix length to a reserved range of IP addresses. It is also possible to define child subnets with the specified prefix length referring to the parent prefix.
+A `Prefix` resource provides a fully integrated IP address management(IPAM) solution for `Ironcore`. It serves as a means to define IP prefixes along with prefix length to a reserved range of IP addresses. It is also possible to define child prefixes with the specified prefix length referring to the parent prefix.
 
 # Example Volume Resource
 An example of how to define a root `Prefix` resource in `Ironcore`
@@ -10,7 +10,7 @@ kind: Prefix
 metadata:
   name: root
   labels:
-    subnet-type: public
+    root-prefix: customer-1
 spec:
   prefix: 10.0.0.0/24
 
@@ -21,13 +21,13 @@ An example of how to define a child `Prefix` resource in `Ironcore`
 apiVersion: ipam.ironcore.dev/v1alpha1
 kind: Prefix
 metadata:
-  name: customer-subnet-1
+  name: child-prefix
 spec:
   ipFamily: IPv4
   prefixLength: 9
   parentSelector:
     matchLabels:
-      subnet-type: public
+      root-prefix: customer-1
 
 ```
 (`Note`: Refer to <a href="https://github.com/ironcore-dev/ironcore/tree/main/config/samples/e2e/">E2E Examples</a> for more detailed example on IPAM to understant e2e flow)
