@@ -15,7 +15,8 @@ const (
 )
 
 const (
-	MachineBrokerManager = "machinebroker"
+	MachineBrokerManager     = "machinebroker"
+	ReservationBrokerManager = "reservationbroker"
 
 	VolumeAccessPurpose = "volume-access"
 )

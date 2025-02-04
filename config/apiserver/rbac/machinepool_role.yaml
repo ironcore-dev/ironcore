@@ -94,6 +94,30 @@ rules:
   verbs:
   - update
 - apiGroups:
+  - compute.ironcore.dev
+  resources:
+  - reservations
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - compute.ironcore.dev
+  resources:
+  - reservations/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - compute.ironcore.dev
+  resources:
+  - reservations/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
   - ipam.ironcore.dev
   resources:
   - prefixes
