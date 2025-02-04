@@ -1,18 +1,4 @@
-# This patch modifies the controller manager deployment to enable the metrics endpoint over HTTPS.
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: controller-manager
-  namespace: system
-spec:
-  template:
-    spec:
-      containers:
-      - name: manager
-        args:
-        - "--health-probe-bind-address=:8081"
-        - "--metrics-bind-address=:8443"
-        - "--leader-elect"
-        - "--machine-downward-api-label=root-machine-namespace=metadata.labels['downward-api.machinepoollet.ironcore.dev/root-machine-namespace']"
-        - "--machine-downward-api-label=root-machine-name=metadata.labels['downward-api.machinepoollet.ironcore.dev/root-machine-name']"
-        - "--machine-downward-api-label=root-machine-uid=metadata.labels['downward-api.machinepoollet.ironcore.dev/root-machine-uid']"
+# This patch adds an argument to the manager container to enable the metrics endpoint over HTTPS.
+- op: add
+  path: /spec/template/spec/containers/0/args/0
+  value: --metrics-bind-address=:8443

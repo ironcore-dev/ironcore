@@ -9,6 +9,8 @@ import (
 	goflag "flag"
 	"fmt"
 	"net"
+	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 
@@ -40,6 +42,7 @@ import (
 	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
+	"sigs.k8s.io/controller-runtime/pkg/certwatcher"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
@@ -61,6 +64,9 @@ type Options struct {
 	GetConfigOptions         config.GetConfigOptions
 	MetricsAddr              string
 	SecureMetrics            bool
+	MetricsCertPath          string
+	MetricsCertName          string
+	MetricsCertKey           string
 	EnableHTTP2              bool
 	EnableLeaderElection     bool
 	LeaderElectionNamespace  string
@@ -95,8 +101,12 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 		"Use :8443 for HTTPS or :8080 for HTTP, or leave as 0 to disable the metrics service.")
 	fs.BoolVar(&o.SecureMetrics, "metrics-secure", true,
 		"If set, the metrics endpoint is served securely via HTTPS. Use --metrics-secure=false to use HTTP instead.")
+	fs.StringVar(&o.MetricsCertPath, "metrics-cert-path", "",
+		"The directory that contains the metrics server certificate.")
+	fs.StringVar(&o.MetricsCertName, "metrics-cert-name", "tls.crt", "The name of the metrics server certificate file.")
+	fs.StringVar(&o.MetricsCertKey, "metrics-cert-key", "tls.key", "The name of the metrics server key file.")
 	fs.BoolVar(&o.EnableHTTP2, "enable-http2", false,
-		"If set, HTTP/2 will be enabled for the metrics and webhook servers")
+		"If set, HTTP/2 will be enabled for the metrics server")
 	fs.StringVar(&o.ProbeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	fs.BoolVar(&o.EnableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
@@ -243,7 +253,7 @@ func Run(ctx context.Context, opts Options) error {
 	if !opts.EnableHTTP2 {
 		tlsOpts = append(tlsOpts, disableHTTP2)
 	}
-	// Metrics endpoint is enabled in 'config/default/kustomization.yaml'. The Metrics options configure the server.
+	// Metrics endpoint is enabled in 'config/machinepoollet-broker/default/kustomization.yaml'. The Metrics options configure the server.
 	// More info:
 	// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.19.1/pkg/metrics/server
 	// - https://book.kubebuilder.io/reference/metrics.html
@@ -258,9 +268,37 @@ func Run(ctx context.Context, opts Options) error {
 		// can access the metrics endpoint. The RBAC are configured in 'config/machinepoollet-broker/broker-rbac/kustomization.yaml'. More info:
 		// https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.19.1/pkg/metrics/filters#WithAuthenticationAndAuthorization
 		metricsServerOptions.FilterProvider = filters.WithAuthenticationAndAuthorization
-		// TODO(user): If CertDir, CertName, and KeyName are not specified, controller-runtime will automatically
-		// generate self-signed certificates for the metrics server. While convenient for development and testing,
-		// this setup is not recommended for production.
+	}
+
+	// If the certificate is not specified, controller-runtime will automatically
+	// generate self-signed certificates for the metrics server. While convenient for development and testing,
+	// this setup is not recommended for production.
+	//
+	// TODO(user): If you enable certManager, uncomment the following lines:
+	// - [METRICS-WITH-CERTS] at config/machinepoollet-broker/default/kustomization.yaml to generate and use certificates
+	// managed by cert-manager for the metrics server.
+	// - [PROMETHEUS-WITH-CERTS] at config/machinepoollet-broker/prometheus/kustomization.yaml for TLS certification.
+
+	// Create watchers for metrics certificates
+	var metricsCertWatcher *certwatcher.CertWatcher
+
+	if len(opts.MetricsCertPath) > 0 {
+		setupLog.Info("Initializing metrics certificate watcher using provided certificates",
+			"metrics-cert-path", opts.MetricsCertPath, "metrics-cert-name", opts.MetricsCertName, "metrics-cert-key", opts.MetricsCertKey)
+
+		var err error
+		metricsCertWatcher, err = certwatcher.New(
+			filepath.Join(opts.MetricsCertPath, opts.MetricsCertName),
+			filepath.Join(opts.MetricsCertPath, opts.MetricsCertKey),
+		)
+		if err != nil {
+			setupLog.Error(err, "to initialize metrics certificate watcher", "error", err)
+			os.Exit(1)
+		}
+
+		metricsServerOptions.TLSOpts = append(metricsServerOptions.TLSOpts, func(config *tls.Config) {
+			config.GetCertificate = metricsCertWatcher.GetCertificate
+		})
 	}
 
 	mgr, err := ctrl.NewManager(cfg, ctrl.Options{
@@ -288,6 +326,14 @@ func Run(ctx context.Context, opts Options) error {
 	}
 	if err := config.SetupControllerWithManager(mgr, configCtrl); err != nil {
 		return err
+	}
+
+	if metricsCertWatcher != nil {
+		setupLog.Info("Adding metrics certificate watcher to manager")
+		if err := mgr.Add(metricsCertWatcher); err != nil {
+			setupLog.Error(err, "unable to add metrics certificate watcher to manager")
+			os.Exit(1)
+		}
 	}
 
 	version, err := machineRuntime.Version(ctx, &iri.VersionRequest{})
