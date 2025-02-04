@@ -1,0 +1,29 @@
+# This patch adds the args, volumes, and ports to allow the manager to use the metrics-server certs.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: controller-manager
+  namespace: system
+spec:
+  template:
+    spec:
+      containers:
+        - name: manager
+          volumeMounts:
+            - mountPath: /tmp/k8s-metrics-server/metrics-certs
+              name: metrics-certs
+              readOnly: true
+          args:
+            - "--metrics-cert-path=/tmp/k8s-metrics-server/metrics-certs"
+      volumes:
+        - name: metrics-certs
+          secret:
+            secretName: metrics-server-cert
+            optional: false
+            items:
+              - key: ca.crt
+                path: ca.crt
+              - key: tls.crt
+                path: tls.crt
+              - key: tls.key
+                path: tls.key

@@ -13,101 +13,147 @@ namePrefix: ironcore-
 #  someName: someValue
 
 resources:
-  - ../rbac
-  - ../manager
-  - ../webhook
-  - ../certmanager
+- ../rbac
+- ../manager
+- ../webhook
+# [CERTMANAGER] To enable cert-manager, uncomment all sections with 'CERTMANAGER'. 'WEBHOOK' components are required.
+- ../certmanager
 # [PROMETHEUS] To enable prometheus monitor, uncomment all sections with 'PROMETHEUS'.
-#- ../prometheus
+# - ../prometheus
 
 patchesStrategicMerge:
-  - manager_auth_proxy_patch.yaml
+# [METRICS] The following patch will enable the metrics endpoint using HTTPS and the port :8443.
+# More info: https://book.kubebuilder.io/reference/metrics
+- manager_metrics_patch.yaml
 
-  # Mount the controller config file for loading manager configurations
-  # through a ComponentConfig type
-  #- manager_config_patch.yaml
+# Uncomment the patches line if you enable Metrics and CertManager
+# [METRICS-WITH-CERTS] To enable metrics protected with certManager, uncomment the following line.
+# This patch will protect the metrics with certManager self-signed certs.
+# - cert_metrics_manager_patch.yaml
 
-  - manager_webhook_patch.yaml
-  #  - webhookcainjection_patch.yaml
+# Mount the controller config file for loading manager configurations
+# through a ComponentConfig type
+#- manager_config_patch.yaml
 
+- manager_webhook_patch.yaml
+#  - webhookcainjection_patch.yaml
+
+# [CERTMANAGER] To enable cert-manager, uncomment all sections with 'CERTMANAGER' prefix.
+# Uncomment the following replacements to add the cert-manager CA injection annotations
 replacements:
-  - source:
-      kind: Certificate
-      group: cert-manager.io
-      version: v1
-      name: serving-cert
-      fieldPath: .metadata.namespace
-    targets:
-      - select:
-          kind: ValidatingWebhookConfiguration
-        fieldPaths:
-          - .metadata.annotations.[cert-manager.io/inject-ca-from]
-        options:
-          delimiter: '/'
-          index: 0
-          create: true
-      - select:
-          kind: MutatingWebhookConfiguration
-        fieldPaths:
-          - .metadata.annotations.[cert-manager.io/inject-ca-from]
-        options:
-          delimiter: '/'
-          index: 0
-          create: true
-  - source:
-      kind: Certificate
-      group: cert-manager.io
-      version: v1
-      name: serving-cert
-      fieldPath: .metadata.name
-    targets:
-      - select:
-          kind: ValidatingWebhookConfiguration
-        fieldPaths:
-          - .metadata.annotations.[cert-manager.io/inject-ca-from]
-        options:
-          delimiter: '/'
-          index: 1
-          create: true
-      - select:
-          kind: MutatingWebhookConfiguration
-        fieldPaths:
-          - .metadata.annotations.[cert-manager.io/inject-ca-from]
-        options:
-          delimiter: '/'
-          index: 1
-          create: true
-  - source:
-      kind: Service
-      version: v1
-      name: webhook-service
-      fieldPath: .metadata.name
-    targets:
-      - select:
-          kind: Certificate
-          group: cert-manager.io
-          version: v1
-        fieldPaths:
-          - .spec.dnsNames.0
-          - .spec.dnsNames.1
-        options:
-          delimiter: '.'
-          index: 0
-          create: true
-  - source:
-      kind: Service
-      version: v1
-      name: webhook-service
-      fieldPath: .metadata.namespace
-    targets:
-      - select:
-          kind: Certificate
-          group: cert-manager.io
-          version: v1
-        fieldPaths:
-          - .spec.dnsNames.0
-          - .spec.dnsNames.1
-        options:
-          delimiter: '.'
-          index: 1
-          create: true
+# - source: # Uncomment the following block to enable certificates for metrics
+#     kind: Service
+#     version: v1
+#     name: controller-manager-metrics-service
+#     fieldPath: metadata.name
+#   targets:
+#     - select:
+#         kind: Certificate
+#         group: cert-manager.io
+#         version: v1
+#         name: metrics-certs
+#       fieldPaths:
+#         - spec.dnsNames.0
+#         - spec.dnsNames.1
+#       options:
+#         delimiter: '.'
+#         index: 0
+#         create: true
+# - source:
+#     kind: Service
+#     version: v1
+#     name: controller-manager-metrics-service
+#     fieldPath: metadata.namespace
+#   targets:
+#     - select:
+#         kind: Certificate
+#         group: cert-manager.io
+#         version: v1
+#         name: metrics-certs
+#       fieldPaths:
+#         - spec.dnsNames.0
+#         - spec.dnsNames.1
+#       options:
+#         delimiter: '.'
+#         index: 1
+#         create: true
+- source:
+    kind: Certificate
+    group: cert-manager.io
+    version: v1
+    name: serving-cert
+    fieldPath: .metadata.namespace
+  targets:
+    - select:
+        kind: ValidatingWebhookConfiguration
+      fieldPaths:
+        - .metadata.annotations.[cert-manager.io/inject-ca-from]
+      options:
+        delimiter: '/'
+        index: 0
+        create: true
+    - select:
+        kind: MutatingWebhookConfiguration
+      fieldPaths:
+        - .metadata.annotations.[cert-manager.io/inject-ca-from]
+      options:
+        delimiter: '/'
+        index: 0
+        create: true
+- source:
+    kind: Certificate
+    group: cert-manager.io
+    version: v1
+    name: serving-cert
+    fieldPath: .metadata.name
+  targets:
+    - select:
+        kind: ValidatingWebhookConfiguration
+      fieldPaths:
+        - .metadata.annotations.[cert-manager.io/inject-ca-from]
+      options:
+        delimiter: '/'
+        index: 1
+        create: true
+    - select:
+        kind: MutatingWebhookConfiguration
+      fieldPaths:
+        - .metadata.annotations.[cert-manager.io/inject-ca-from]
+      options:
+        delimiter: '/'
+        index: 1
+        create: true
+- source:
+    kind: Service
+    version: v1
+    name: webhook-service
+    fieldPath: .metadata.name
+  targets:
+    - select:
+        kind: Certificate
+        group: cert-manager.io
+        version: v1
+      fieldPaths:
+        - .spec.dnsNames.0
+        - .spec.dnsNames.1
+      options:
+        delimiter: '.'
+        index: 0
+        create: true
+- source:
+    kind: Service
+    version: v1
+    name: webhook-service
+    fieldPath: .metadata.namespace
+  targets:
+    - select:
+        kind: Certificate
+        group: cert-manager.io
+        version: v1
+      fieldPaths:
+        - .spec.dnsNames.0
+        - .spec.dnsNames.1
+      options:
+        delimiter: '.'
+        index: 1
+        create: true
