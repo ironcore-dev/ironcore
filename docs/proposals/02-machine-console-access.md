@@ -9,13 +9,13 @@ status: implementable|implemented
 
 authors:
 
-- @adracus
+- "@adracus"
 
 reviewers:
 
-- @gehoern
-- @afritzler
-- @Gchbg
+- "@gehoern"
+- "@afritzler"
+- "@Gchbg"
 
 ---
 
