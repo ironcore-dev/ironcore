@@ -21,7 +21,7 @@ func ValidateNetworkInterface(networkInterface *networking.NetworkInterface) fie
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(networkInterface, true, apivalidation.NameIsDNSLabel, field.NewPath("metadata"))...)
-	allErrs = append(allErrs, validateNetworkInterfaceSpec(&networkInterface.Spec, &networkInterface.ObjectMeta, field.NewPath("spec"))...)
+	allErrs = append(allErrs, ValidateNetworkInterfaceSpec(&networkInterface.Spec, &networkInterface.ObjectMeta, field.NewPath("spec"))...)
 
 	return allErrs
 }
@@ -37,7 +37,7 @@ func ValidateNetworkInterfaceUpdate(newNetworkInterface, oldNetworkInterface *ne
 	return allErrs
 }
 
-func validateNetworkInterfaceSpec(spec *networking.NetworkInterfaceSpec, nicMeta *metav1.ObjectMeta, fldPath *field.Path) field.ErrorList {
+func ValidateNetworkInterfaceSpec(spec *networking.NetworkInterfaceSpec, nicMeta *metav1.ObjectMeta, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
 	if spec.NetworkRef == (corev1.LocalObjectReference{}) {

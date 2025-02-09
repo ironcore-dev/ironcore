@@ -9,6 +9,8 @@ import (
 	"github.com/ironcore-dev/ironcore/internal/admission/plugin/machinevolumedevices/device"
 	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
 	"github.com/ironcore-dev/ironcore/internal/apis/compute"
+	"github.com/ironcore-dev/ironcore/internal/apis/networking"
+	networkvalidation "github.com/ironcore-dev/ironcore/internal/apis/networking/validation"
 	"github.com/ironcore-dev/ironcore/internal/apis/storage"
 	storagevalidation "github.com/ironcore-dev/ironcore/internal/apis/storage/validation"
 	corev1 "k8s.io/api/core/v1"
@@ -97,6 +99,75 @@ func validateMachineSpec(machineSpec *compute.MachineSpec, fldPath *field.Path) 
 	}
 
 	allErrs = append(allErrs, metav1validation.ValidateLabels(machineSpec.MachinePoolSelector, fldPath.Child("machinePoolSelector"))...)
+
+	seenNwiNames := sets.NewString()
+	for i, nwi := range machineSpec.NetworkInterfaces {
+		if seenNwiNames.Has(nwi.Name) {
+			allErrs = append(allErrs, field.Duplicate(fldPath.Child("networkInterface").Index(i).Child("name"), nwi.Name))
+		} else {
+			seenNwiNames.Insert(nwi.Name)
+		}
+		allErrs = append(allErrs, validateNetworkInterface(&nwi, fldPath.Child("networkInterface").Index(i))...)
+	}
+
+	return allErrs
+}
+
+func validateNetworkInterface(networkInterface *compute.NetworkInterface, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	for _, msg := range apivalidation.NameIsDNSLabel(networkInterface.Name, false) {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), networkInterface.Name, msg))
+	}
+
+	allErrs = append(allErrs, validateNetworkInterfaceSource(&networkInterface.NetworkInterfaceSource, fldPath)...)
+
+	return allErrs
+}
+
+func validateNetworkInterfaceSource(source *compute.NetworkInterfaceSource, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+	var numDefs int
+	if source.NetworkInterfaceRef != nil {
+		numDefs++
+		for _, msg := range apivalidation.NameIsDNSLabel(source.NetworkInterfaceRef.Name, false) {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("networkInterfaceRef").Child("name"), source.NetworkInterfaceRef.Name, msg))
+		}
+	}
+	if source.Ephemeral != nil {
+		if numDefs > 0 {
+			allErrs = append(allErrs, field.Forbidden(fldPath.Child("ephemeral"), "must only specify one networkInterface source"))
+		} else {
+			numDefs++
+			allErrs = append(allErrs, validateEphemeralNetworkInterface(source.Ephemeral, fldPath.Child("ephemeral"))...)
+		}
+	}
+	if numDefs == 0 {
+		allErrs = append(allErrs, field.Invalid(fldPath, source, "must specify at least one networkInterface source"))
+	}
+	return allErrs
+}
+
+func validateEphemeralNetworkInterface(source *compute.EphemeralNetworkInterfaceSource, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	if source.NetworkInterfaceTemplate == nil {
+		allErrs = append(allErrs, field.Required(fldPath.Child("NetworkInterfaceTemplate"), "must specify networkInterface template "))
+	} else {
+		allErrs = append(allErrs, validateNetworkInterfaceTemplateSpecForMachine(source.NetworkInterfaceTemplate, fldPath.Child("networkInterfaceTemplate"))...)
+	}
+
+	return allErrs
+}
+
+func validateNetworkInterfaceTemplateSpecForMachine(template *networking.NetworkInterfaceTemplateSpec, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	if template == nil {
+		allErrs = append(allErrs, field.Required(fldPath, ""))
+	} else {
+		allErrs = append(allErrs, networkvalidation.ValidateNetworkInterfaceSpec(&template.Spec, &template.ObjectMeta, fldPath)...)
+	}
 
 	return allErrs
 }
