@@ -230,7 +230,7 @@ func (r *MachineReconciler) prepareIRIVolumes(
 		actualVolumeNames := utilslices.ToSetFunc(iriVolumes, (*iri.Volume).GetName)
 		missingVolumeNames := sets.List(expectedVolumeNames.Difference(actualVolumeNames))
 		r.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady, "Machine volumes are not ready: %v", missingVolumeNames)
-		return nil, false, nil
+		return iriVolumes, false, nil
 	}
 	return iriVolumes, true, nil
 }
