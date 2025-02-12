@@ -15,7 +15,7 @@ import (
 // with apply.
 type VirtualIPTemplateSpecApplyConfiguration struct {
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Spec                             *VirtualIPSpecApplyConfiguration `json:"spec,omitempty"`
+	Spec                             *EphemeralVirtualIPSpecApplyConfiguration `json:"spec,omitempty"`
 }
 
 // VirtualIPTemplateSpecApplyConfiguration constructs a declarative configuration of the VirtualIPTemplateSpec type for use with
@@ -169,7 +169,7 @@ func (b *VirtualIPTemplateSpecApplyConfiguration) ensureObjectMetaApplyConfigura
 // WithSpec sets the Spec field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Spec field is set to the value of the last call.
-func (b *VirtualIPTemplateSpecApplyConfiguration) WithSpec(value *VirtualIPSpecApplyConfiguration) *VirtualIPTemplateSpecApplyConfiguration {
+func (b *VirtualIPTemplateSpecApplyConfiguration) WithSpec(value *EphemeralVirtualIPSpecApplyConfiguration) *VirtualIPTemplateSpecApplyConfiguration {
 	b.Spec = value
 	return b
 }

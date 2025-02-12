@@ -33,7 +33,7 @@ func ValidateVirtualIPTemplateSpec(spec *networking.VirtualIPTemplateSpec, fldPa
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, validateVirtualIPTemplateSpecMetadata(&spec.ObjectMeta, fldPath.Child("metadata"))...)
-	allErrs = append(allErrs, validateVirtualIPSpec(&spec.Spec, fldPath.Child("spec"))...)
+	allErrs = append(allErrs, validateVirtualIPSpec(&spec.Spec.VirtualIPSpec, fldPath.Child("spec"))...)
 
 	return allErrs
 }
