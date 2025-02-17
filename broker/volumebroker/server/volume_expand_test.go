@@ -9,12 +9,11 @@ import (
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("ExpandVolume", func() {
@@ -32,7 +31,6 @@ var _ = Describe("ExpandVolume", func() {
 			},
 			ResizePolicy: storagev1alpha1.ResizePolicyExpandOnly,
 		}
-
 		Expect(k8sClient.Create(ctx, volumeClass)).To(Succeed(), "failed to create test volume class")
 		DeferCleanup(k8sClient.Delete, volumeClass)
 
