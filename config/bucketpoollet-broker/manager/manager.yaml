@@ -30,6 +30,7 @@ spec:
         - command:
             - /bucketpoollet
           args:
+            - --health-probe-bind-address=:8081
             - --leader-elect
           image: bucketpoollet:latest
           name: manager
