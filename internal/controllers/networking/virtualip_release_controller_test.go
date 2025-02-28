@@ -19,10 +19,10 @@ var _ = Describe("VirtualIPReleaseReconciler", func() {
 
 	It("should release virtual IPs whose owner is gone", func(ctx SpecContext) {
 		By("creating a virtual IP referencing an owner that does not exist")
-		nic := &networkingv1alpha1.VirtualIP{
+		vip := &networkingv1alpha1.VirtualIP{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
-				GenerateName: "nic-",
+				GenerateName: "vip-",
 			},
 			Spec: networkingv1alpha1.VirtualIPSpec{
 				Type:     networkingv1alpha1.VirtualIPTypePublic,
@@ -33,9 +33,9 @@ var _ = Describe("VirtualIPReleaseReconciler", func() {
 				},
 			},
 		}
-		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
+		Expect(k8sClient.Create(ctx, vip)).To(Succeed())
 
 		By("waiting for the virtual IP to be released")
-		Eventually(Object(nic)).Should(HaveField("Spec.TargetRef", BeNil()))
+		Eventually(Object(vip)).Should(HaveField("Spec.TargetRef", BeNil()))
 	})
 })
