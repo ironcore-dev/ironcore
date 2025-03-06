@@ -6,15 +6,15 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 )
 
 // ResourceScopeSelectorRequirementApplyConfiguration represents a declarative configuration of the ResourceScopeSelectorRequirement type for use
 // with apply.
 type ResourceScopeSelectorRequirementApplyConfiguration struct {
-	ScopeName *v1alpha1.ResourceScope                 `json:"scopeName,omitempty"`
-	Operator  *v1alpha1.ResourceScopeSelectorOperator `json:"operator,omitempty"`
-	Values    []string                                `json:"values,omitempty"`
+	ScopeName *corev1alpha1.ResourceScope                 `json:"scopeName,omitempty"`
+	Operator  *corev1alpha1.ResourceScopeSelectorOperator `json:"operator,omitempty"`
+	Values    []string                                    `json:"values,omitempty"`
 }
 
 // ResourceScopeSelectorRequirementApplyConfiguration constructs a declarative configuration of the ResourceScopeSelectorRequirement type for use with
@@ -26,7 +26,7 @@ func ResourceScopeSelectorRequirement() *ResourceScopeSelectorRequirementApplyCo
 // WithScopeName sets the ScopeName field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the ScopeName field is set to the value of the last call.
-func (b *ResourceScopeSelectorRequirementApplyConfiguration) WithScopeName(value v1alpha1.ResourceScope) *ResourceScopeSelectorRequirementApplyConfiguration {
+func (b *ResourceScopeSelectorRequirementApplyConfiguration) WithScopeName(value corev1alpha1.ResourceScope) *ResourceScopeSelectorRequirementApplyConfiguration {
 	b.ScopeName = &value
 	return b
 }
@@ -34,7 +34,7 @@ func (b *ResourceScopeSelectorRequirementApplyConfiguration) WithScopeName(value
 // WithOperator sets the Operator field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Operator field is set to the value of the last call.
-func (b *ResourceScopeSelectorRequirementApplyConfiguration) WithOperator(value v1alpha1.ResourceScopeSelectorOperator) *ResourceScopeSelectorRequirementApplyConfiguration {
+func (b *ResourceScopeSelectorRequirementApplyConfiguration) WithOperator(value corev1alpha1.ResourceScopeSelectorOperator) *ResourceScopeSelectorRequirementApplyConfiguration {
 	b.Operator = &value
 	return b
 }

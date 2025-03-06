@@ -6,13 +6,13 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
-	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
+	apiipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	internalinterfaces "github.com/ironcore-dev/ironcore/client-go/informers/externalversions/internalinterfaces"
 	versioned "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned"
-	v1alpha1 "github.com/ironcore-dev/ironcore/client-go/listers/ipam/v1alpha1"
+	ipamv1alpha1 "github.com/ironcore-dev/ironcore/client-go/listers/ipam/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
@@ -23,7 +23,7 @@ import (
 // Prefixes.
 type PrefixInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.PrefixLister
+	Lister() ipamv1alpha1.PrefixLister
 }
 
 type prefixInformer struct {
@@ -58,7 +58,7 @@ func NewFilteredPrefixInformer(client versioned.Interface, namespace string, res
 				return client.IpamV1alpha1().Prefixes(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&ipamv1alpha1.Prefix{},
+		&apiipamv1alpha1.Prefix{},
 		resyncPeriod,
 		indexers,
 	)
@@ -69,9 +69,9 @@ func (f *prefixInformer) defaultInformer(client versioned.Interface, resyncPerio
 }
 
 func (f *prefixInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&ipamv1alpha1.Prefix{}, f.defaultInformer)
+	return f.factory.InformerFor(&apiipamv1alpha1.Prefix{}, f.defaultInformer)
 }
 
-func (f *prefixInformer) Lister() v1alpha1.PrefixLister {
-	return v1alpha1.NewPrefixLister(f.Informer().GetIndexer())
+func (f *prefixInformer) Lister() ipamv1alpha1.PrefixLister {
+	return ipamv1alpha1.NewPrefixLister(f.Informer().GetIndexer())
 }

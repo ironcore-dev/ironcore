@@ -6,17 +6,17 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 )
 
 // NATGatewaySpecApplyConfiguration represents a declarative configuration of the NATGatewaySpec type for use
 // with apply.
 type NATGatewaySpecApplyConfiguration struct {
-	Type                     *v1alpha1.NATGatewayType `json:"type,omitempty"`
-	IPFamily                 *v1.IPFamily             `json:"ipFamily,omitempty"`
-	NetworkRef               *v1.LocalObjectReference `json:"networkRef,omitempty"`
-	PortsPerNetworkInterface *int32                   `json:"portsPerNetworkInterface,omitempty"`
+	Type                     *networkingv1alpha1.NATGatewayType `json:"type,omitempty"`
+	IPFamily                 *v1.IPFamily                       `json:"ipFamily,omitempty"`
+	NetworkRef               *v1.LocalObjectReference           `json:"networkRef,omitempty"`
+	PortsPerNetworkInterface *int32                             `json:"portsPerNetworkInterface,omitempty"`
 }
 
 // NATGatewaySpecApplyConfiguration constructs a declarative configuration of the NATGatewaySpec type for use with
@@ -28,7 +28,7 @@ func NATGatewaySpec() *NATGatewaySpecApplyConfiguration {
 // WithType sets the Type field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Type field is set to the value of the last call.
-func (b *NATGatewaySpecApplyConfiguration) WithType(value v1alpha1.NATGatewayType) *NATGatewaySpecApplyConfiguration {
+func (b *NATGatewaySpecApplyConfiguration) WithType(value networkingv1alpha1.NATGatewayType) *NATGatewaySpecApplyConfiguration {
 	b.Type = &value
 	return b
 }

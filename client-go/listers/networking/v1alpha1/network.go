@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/client-go/listers"
-	"k8s.io/client-go/tools/cache"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	labels "k8s.io/apimachinery/pkg/labels"
+	listers "k8s.io/client-go/listers"
+	cache "k8s.io/client-go/tools/cache"
 )
 
 // NetworkLister helps list Networks.
@@ -17,7 +17,7 @@ import (
 type NetworkLister interface {
 	// List lists all Networks in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.Network, err error)
+	List(selector labels.Selector) (ret []*networkingv1alpha1.Network, err error)
 	// Networks returns an object that can list and get Networks.
 	Networks(namespace string) NetworkNamespaceLister
 	NetworkListerExpansion
@@ -25,17 +25,17 @@ type NetworkLister interface {
 
 // networkLister implements the NetworkLister interface.
 type networkLister struct {
-	listers.ResourceIndexer[*v1alpha1.Network]
+	listers.ResourceIndexer[*networkingv1alpha1.Network]
 }
 
 // NewNetworkLister returns a new NetworkLister.
 func NewNetworkLister(indexer cache.Indexer) NetworkLister {
-	return &networkLister{listers.New[*v1alpha1.Network](indexer, v1alpha1.Resource("network"))}
+	return &networkLister{listers.New[*networkingv1alpha1.Network](indexer, networkingv1alpha1.Resource("network"))}
 }
 
 // Networks returns an object that can list and get Networks.
 func (s *networkLister) Networks(namespace string) NetworkNamespaceLister {
-	return networkNamespaceLister{listers.NewNamespaced[*v1alpha1.Network](s.ResourceIndexer, namespace)}
+	return networkNamespaceLister{listers.NewNamespaced[*networkingv1alpha1.Network](s.ResourceIndexer, namespace)}
 }
 
 // NetworkNamespaceLister helps list and get Networks.
@@ -43,15 +43,15 @@ func (s *networkLister) Networks(namespace string) NetworkNamespaceLister {
 type NetworkNamespaceLister interface {
 	// List lists all Networks in the indexer for a given namespace.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.Network, err error)
+	List(selector labels.Selector) (ret []*networkingv1alpha1.Network, err error)
 	// Get retrieves the Network from the indexer for a given namespace and name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.Network, error)
+	Get(name string) (*networkingv1alpha1.Network, error)
 	NetworkNamespaceListerExpansion
 }
 
 // networkNamespaceLister implements the NetworkNamespaceLister
 // interface.
 type networkNamespaceLister struct {
-	listers.ResourceIndexer[*v1alpha1.Network]
+	listers.ResourceIndexer[*networkingv1alpha1.Network]
 }

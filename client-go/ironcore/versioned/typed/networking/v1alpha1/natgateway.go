@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
-	networkingv1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/networking/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	applyconfigurationsnetworkingv1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/networking/v1alpha1"
 	scheme "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -25,36 +25,37 @@ type NATGatewaysGetter interface {
 
 // NATGatewayInterface has methods to work with NATGateway resources.
 type NATGatewayInterface interface {
-	Create(ctx context.Context, nATGateway *v1alpha1.NATGateway, opts v1.CreateOptions) (*v1alpha1.NATGateway, error)
-	Update(ctx context.Context, nATGateway *v1alpha1.NATGateway, opts v1.UpdateOptions) (*v1alpha1.NATGateway, error)
+	Create(ctx context.Context, nATGateway *networkingv1alpha1.NATGateway, opts v1.CreateOptions) (*networkingv1alpha1.NATGateway, error)
+	Update(ctx context.Context, nATGateway *networkingv1alpha1.NATGateway, opts v1.UpdateOptions) (*networkingv1alpha1.NATGateway, error)
 	// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-	UpdateStatus(ctx context.Context, nATGateway *v1alpha1.NATGateway, opts v1.UpdateOptions) (*v1alpha1.NATGateway, error)
+	UpdateStatus(ctx context.Context, nATGateway *networkingv1alpha1.NATGateway, opts v1.UpdateOptions) (*networkingv1alpha1.NATGateway, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
-	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.NATGateway, error)
-	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.NATGatewayList, error)
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*networkingv1alpha1.NATGateway, error)
+	List(ctx context.Context, opts v1.ListOptions) (*networkingv1alpha1.NATGatewayList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
-	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.NATGateway, err error)
-	Apply(ctx context.Context, nATGateway *networkingv1alpha1.NATGatewayApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.NATGateway, err error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *networkingv1alpha1.NATGateway, err error)
+	Apply(ctx context.Context, nATGateway *applyconfigurationsnetworkingv1alpha1.NATGatewayApplyConfiguration, opts v1.ApplyOptions) (result *networkingv1alpha1.NATGateway, err error)
 	// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-	ApplyStatus(ctx context.Context, nATGateway *networkingv1alpha1.NATGatewayApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.NATGateway, err error)
+	ApplyStatus(ctx context.Context, nATGateway *applyconfigurationsnetworkingv1alpha1.NATGatewayApplyConfiguration, opts v1.ApplyOptions) (result *networkingv1alpha1.NATGateway, err error)
 	NATGatewayExpansion
 }
 
 // nATGateways implements NATGatewayInterface
 type nATGateways struct {
-	*gentype.ClientWithListAndApply[*v1alpha1.NATGateway, *v1alpha1.NATGatewayList, *networkingv1alpha1.NATGatewayApplyConfiguration]
+	*gentype.ClientWithListAndApply[*networkingv1alpha1.NATGateway, *networkingv1alpha1.NATGatewayList, *applyconfigurationsnetworkingv1alpha1.NATGatewayApplyConfiguration]
 }
 
 // newNATGateways returns a NATGateways
 func newNATGateways(c *NetworkingV1alpha1Client, namespace string) *nATGateways {
 	return &nATGateways{
-		gentype.NewClientWithListAndApply[*v1alpha1.NATGateway, *v1alpha1.NATGatewayList, *networkingv1alpha1.NATGatewayApplyConfiguration](
+		gentype.NewClientWithListAndApply[*networkingv1alpha1.NATGateway, *networkingv1alpha1.NATGatewayList, *applyconfigurationsnetworkingv1alpha1.NATGatewayApplyConfiguration](
 			"natgateways",
 			c.RESTClient(),
 			scheme.ParameterCodec,
 			namespace,
-			func() *v1alpha1.NATGateway { return &v1alpha1.NATGateway{} },
-			func() *v1alpha1.NATGatewayList { return &v1alpha1.NATGatewayList{} }),
+			func() *networkingv1alpha1.NATGateway { return &networkingv1alpha1.NATGateway{} },
+			func() *networkingv1alpha1.NATGatewayList { return &networkingv1alpha1.NATGatewayList{} },
+		),
 	}
 }

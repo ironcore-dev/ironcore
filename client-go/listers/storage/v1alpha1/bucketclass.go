@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/client-go/listers"
-	"k8s.io/client-go/tools/cache"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	labels "k8s.io/apimachinery/pkg/labels"
+	listers "k8s.io/client-go/listers"
+	cache "k8s.io/client-go/tools/cache"
 )
 
 // BucketClassLister helps list BucketClasses.
@@ -17,19 +17,19 @@ import (
 type BucketClassLister interface {
 	// List lists all BucketClasses in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.BucketClass, err error)
+	List(selector labels.Selector) (ret []*storagev1alpha1.BucketClass, err error)
 	// Get retrieves the BucketClass from the index for a given name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.BucketClass, error)
+	Get(name string) (*storagev1alpha1.BucketClass, error)
 	BucketClassListerExpansion
 }
 
 // bucketClassLister implements the BucketClassLister interface.
 type bucketClassLister struct {
-	listers.ResourceIndexer[*v1alpha1.BucketClass]
+	listers.ResourceIndexer[*storagev1alpha1.BucketClass]
 }
 
 // NewBucketClassLister returns a new BucketClassLister.
 func NewBucketClassLister(indexer cache.Indexer) BucketClassLister {
-	return &bucketClassLister{listers.New[*v1alpha1.BucketClass](indexer, v1alpha1.Resource("bucketclass"))}
+	return &bucketClassLister{listers.New[*storagev1alpha1.BucketClass](indexer, storagev1alpha1.Resource("bucketclass"))}
 }

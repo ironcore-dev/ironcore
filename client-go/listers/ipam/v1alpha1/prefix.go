@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/client-go/listers"
-	"k8s.io/client-go/tools/cache"
+	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
+	labels "k8s.io/apimachinery/pkg/labels"
+	listers "k8s.io/client-go/listers"
+	cache "k8s.io/client-go/tools/cache"
 )
 
 // PrefixLister helps list Prefixes.
@@ -17,7 +17,7 @@ import (
 type PrefixLister interface {
 	// List lists all Prefixes in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.Prefix, err error)
+	List(selector labels.Selector) (ret []*ipamv1alpha1.Prefix, err error)
 	// Prefixes returns an object that can list and get Prefixes.
 	Prefixes(namespace string) PrefixNamespaceLister
 	PrefixListerExpansion
@@ -25,17 +25,17 @@ type PrefixLister interface {
 
 // prefixLister implements the PrefixLister interface.
 type prefixLister struct {
-	listers.ResourceIndexer[*v1alpha1.Prefix]
+	listers.ResourceIndexer[*ipamv1alpha1.Prefix]
 }
 
 // NewPrefixLister returns a new PrefixLister.
 func NewPrefixLister(indexer cache.Indexer) PrefixLister {
-	return &prefixLister{listers.New[*v1alpha1.Prefix](indexer, v1alpha1.Resource("prefix"))}
+	return &prefixLister{listers.New[*ipamv1alpha1.Prefix](indexer, ipamv1alpha1.Resource("prefix"))}
 }
 
 // Prefixes returns an object that can list and get Prefixes.
 func (s *prefixLister) Prefixes(namespace string) PrefixNamespaceLister {
-	return prefixNamespaceLister{listers.NewNamespaced[*v1alpha1.Prefix](s.ResourceIndexer, namespace)}
+	return prefixNamespaceLister{listers.NewNamespaced[*ipamv1alpha1.Prefix](s.ResourceIndexer, namespace)}
 }
 
 // PrefixNamespaceLister helps list and get Prefixes.
@@ -43,15 +43,15 @@ func (s *prefixLister) Prefixes(namespace string) PrefixNamespaceLister {
 type PrefixNamespaceLister interface {
 	// List lists all Prefixes in the indexer for a given namespace.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.Prefix, err error)
+	List(selector labels.Selector) (ret []*ipamv1alpha1.Prefix, err error)
 	// Get retrieves the Prefix from the indexer for a given namespace and name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.Prefix, error)
+	Get(name string) (*ipamv1alpha1.Prefix, error)
 	PrefixNamespaceListerExpansion
 }
 
 // prefixNamespaceLister implements the PrefixNamespaceLister
 // interface.
 type prefixNamespaceLister struct {
-	listers.ResourceIndexer[*v1alpha1.Prefix]
+	listers.ResourceIndexer[*ipamv1alpha1.Prefix]
 }

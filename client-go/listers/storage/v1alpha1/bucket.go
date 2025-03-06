@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/client-go/listers"
-	"k8s.io/client-go/tools/cache"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	labels "k8s.io/apimachinery/pkg/labels"
+	listers "k8s.io/client-go/listers"
+	cache "k8s.io/client-go/tools/cache"
 )
 
 // BucketLister helps list Buckets.
@@ -17,7 +17,7 @@ import (
 type BucketLister interface {
 	// List lists all Buckets in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.Bucket, err error)
+	List(selector labels.Selector) (ret []*storagev1alpha1.Bucket, err error)
 	// Buckets returns an object that can list and get Buckets.
 	Buckets(namespace string) BucketNamespaceLister
 	BucketListerExpansion
@@ -25,17 +25,17 @@ type BucketLister interface {
 
 // bucketLister implements the BucketLister interface.
 type bucketLister struct {
-	listers.ResourceIndexer[*v1alpha1.Bucket]
+	listers.ResourceIndexer[*storagev1alpha1.Bucket]
 }
 
 // NewBucketLister returns a new BucketLister.
 func NewBucketLister(indexer cache.Indexer) BucketLister {
-	return &bucketLister{listers.New[*v1alpha1.Bucket](indexer, v1alpha1.Resource("bucket"))}
+	return &bucketLister{listers.New[*storagev1alpha1.Bucket](indexer, storagev1alpha1.Resource("bucket"))}
 }
 
 // Buckets returns an object that can list and get Buckets.
 func (s *bucketLister) Buckets(namespace string) BucketNamespaceLister {
-	return bucketNamespaceLister{listers.NewNamespaced[*v1alpha1.Bucket](s.ResourceIndexer, namespace)}
+	return bucketNamespaceLister{listers.NewNamespaced[*storagev1alpha1.Bucket](s.ResourceIndexer, namespace)}
 }
 
 // BucketNamespaceLister helps list and get Buckets.
@@ -43,15 +43,15 @@ func (s *bucketLister) Buckets(namespace string) BucketNamespaceLister {
 type BucketNamespaceLister interface {
 	// List lists all Buckets in the indexer for a given namespace.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.Bucket, err error)
+	List(selector labels.Selector) (ret []*storagev1alpha1.Bucket, err error)
 	// Get retrieves the Bucket from the indexer for a given namespace and name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.Bucket, error)
+	Get(name string) (*storagev1alpha1.Bucket, error)
 	BucketNamespaceListerExpansion
 }
 
 // bucketNamespaceLister implements the BucketNamespaceLister
 // interface.
 type bucketNamespaceLister struct {
-	listers.ResourceIndexer[*v1alpha1.Bucket]
+	listers.ResourceIndexer[*storagev1alpha1.Bucket]
 }

@@ -16,11 +16,11 @@ type FakeIpamV1alpha1 struct {
 }
 
 func (c *FakeIpamV1alpha1) Prefixes(namespace string) v1alpha1.PrefixInterface {
-	return &FakePrefixes{c, namespace}
+	return newFakePrefixes(c, namespace)
 }
 
 func (c *FakeIpamV1alpha1) PrefixAllocations(namespace string) v1alpha1.PrefixAllocationInterface {
-	return &FakePrefixAllocations{c, namespace}
+	return newFakePrefixAllocations(c, namespace)
 }
 
 // RESTClient returns a RESTClient that is used to communicate

@@ -6,13 +6,13 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
-	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	apicomputev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	internalinterfaces "github.com/ironcore-dev/ironcore/client-go/informers/externalversions/internalinterfaces"
 	versioned "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned"
-	v1alpha1 "github.com/ironcore-dev/ironcore/client-go/listers/compute/v1alpha1"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/client-go/listers/compute/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
@@ -23,7 +23,7 @@ import (
 // Machines.
 type MachineInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.MachineLister
+	Lister() computev1alpha1.MachineLister
 }
 
 type machineInformer struct {
@@ -58,7 +58,7 @@ func NewFilteredMachineInformer(client versioned.Interface, namespace string, re
 				return client.ComputeV1alpha1().Machines(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&computev1alpha1.Machine{},
+		&apicomputev1alpha1.Machine{},
 		resyncPeriod,
 		indexers,
 	)
@@ -69,9 +69,9 @@ func (f *machineInformer) defaultInformer(client versioned.Interface, resyncPeri
 }
 
 func (f *machineInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&computev1alpha1.Machine{}, f.defaultInformer)
+	return f.factory.InformerFor(&apicomputev1alpha1.Machine{}, f.defaultInformer)
 }
 
-func (f *machineInformer) Lister() v1alpha1.MachineLister {
-	return v1alpha1.NewMachineLister(f.Informer().GetIndexer())
+func (f *machineInformer) Lister() computev1alpha1.MachineLister {
+	return computev1alpha1.NewMachineLister(f.Informer().GetIndexer())
 }

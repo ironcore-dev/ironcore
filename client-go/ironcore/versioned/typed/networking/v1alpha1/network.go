@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
-	networkingv1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/networking/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	applyconfigurationsnetworkingv1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/networking/v1alpha1"
 	scheme "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -25,36 +25,37 @@ type NetworksGetter interface {
 
 // NetworkInterface has methods to work with Network resources.
 type NetworkInterface interface {
-	Create(ctx context.Context, network *v1alpha1.Network, opts v1.CreateOptions) (*v1alpha1.Network, error)
-	Update(ctx context.Context, network *v1alpha1.Network, opts v1.UpdateOptions) (*v1alpha1.Network, error)
+	Create(ctx context.Context, network *networkingv1alpha1.Network, opts v1.CreateOptions) (*networkingv1alpha1.Network, error)
+	Update(ctx context.Context, network *networkingv1alpha1.Network, opts v1.UpdateOptions) (*networkingv1alpha1.Network, error)
 	// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-	UpdateStatus(ctx context.Context, network *v1alpha1.Network, opts v1.UpdateOptions) (*v1alpha1.Network, error)
+	UpdateStatus(ctx context.Context, network *networkingv1alpha1.Network, opts v1.UpdateOptions) (*networkingv1alpha1.Network, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
-	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.Network, error)
-	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.NetworkList, error)
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*networkingv1alpha1.Network, error)
+	List(ctx context.Context, opts v1.ListOptions) (*networkingv1alpha1.NetworkList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
-	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.Network, err error)
-	Apply(ctx context.Context, network *networkingv1alpha1.NetworkApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.Network, err error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *networkingv1alpha1.Network, err error)
+	Apply(ctx context.Context, network *applyconfigurationsnetworkingv1alpha1.NetworkApplyConfiguration, opts v1.ApplyOptions) (result *networkingv1alpha1.Network, err error)
 	// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-	ApplyStatus(ctx context.Context, network *networkingv1alpha1.NetworkApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.Network, err error)
+	ApplyStatus(ctx context.Context, network *applyconfigurationsnetworkingv1alpha1.NetworkApplyConfiguration, opts v1.ApplyOptions) (result *networkingv1alpha1.Network, err error)
 	NetworkExpansion
 }
 
 // networks implements NetworkInterface
 type networks struct {
-	*gentype.ClientWithListAndApply[*v1alpha1.Network, *v1alpha1.NetworkList, *networkingv1alpha1.NetworkApplyConfiguration]
+	*gentype.ClientWithListAndApply[*networkingv1alpha1.Network, *networkingv1alpha1.NetworkList, *applyconfigurationsnetworkingv1alpha1.NetworkApplyConfiguration]
 }
 
 // newNetworks returns a Networks
 func newNetworks(c *NetworkingV1alpha1Client, namespace string) *networks {
 	return &networks{
-		gentype.NewClientWithListAndApply[*v1alpha1.Network, *v1alpha1.NetworkList, *networkingv1alpha1.NetworkApplyConfiguration](
+		gentype.NewClientWithListAndApply[*networkingv1alpha1.Network, *networkingv1alpha1.NetworkList, *applyconfigurationsnetworkingv1alpha1.NetworkApplyConfiguration](
 			"networks",
 			c.RESTClient(),
 			scheme.ParameterCodec,
 			namespace,
-			func() *v1alpha1.Network { return &v1alpha1.Network{} },
-			func() *v1alpha1.NetworkList { return &v1alpha1.NetworkList{} }),
+			func() *networkingv1alpha1.Network { return &networkingv1alpha1.Network{} },
+			func() *networkingv1alpha1.NetworkList { return &networkingv1alpha1.NetworkList{} },
+		),
 	}
 }

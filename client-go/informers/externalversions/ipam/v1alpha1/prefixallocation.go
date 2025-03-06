@@ -6,13 +6,13 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
-	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
+	apiipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	internalinterfaces "github.com/ironcore-dev/ironcore/client-go/informers/externalversions/internalinterfaces"
 	versioned "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned"
-	v1alpha1 "github.com/ironcore-dev/ironcore/client-go/listers/ipam/v1alpha1"
+	ipamv1alpha1 "github.com/ironcore-dev/ironcore/client-go/listers/ipam/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
@@ -23,7 +23,7 @@ import (
 // PrefixAllocations.
 type PrefixAllocationInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.PrefixAllocationLister
+	Lister() ipamv1alpha1.PrefixAllocationLister
 }
 
 type prefixAllocationInformer struct {
@@ -58,7 +58,7 @@ func NewFilteredPrefixAllocationInformer(client versioned.Interface, namespace s
 				return client.IpamV1alpha1().PrefixAllocations(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&ipamv1alpha1.PrefixAllocation{},
+		&apiipamv1alpha1.PrefixAllocation{},
 		resyncPeriod,
 		indexers,
 	)
@@ -69,9 +69,9 @@ func (f *prefixAllocationInformer) defaultInformer(client versioned.Interface, r
 }
 
 func (f *prefixAllocationInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&ipamv1alpha1.PrefixAllocation{}, f.defaultInformer)
+	return f.factory.InformerFor(&apiipamv1alpha1.PrefixAllocation{}, f.defaultInformer)
 }
 
-func (f *prefixAllocationInformer) Lister() v1alpha1.PrefixAllocationLister {
-	return v1alpha1.NewPrefixAllocationLister(f.Informer().GetIndexer())
+func (f *prefixAllocationInformer) Lister() ipamv1alpha1.PrefixAllocationLister {
+	return ipamv1alpha1.NewPrefixAllocationLister(f.Informer().GetIndexer())
 }
