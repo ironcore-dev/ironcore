@@ -41,7 +41,7 @@ var (
 
 const (
 	eventuallyTimeout = 3 * time.Second
-	apiServiceTimeout = 10 * time.Minute
+	apiServiceTimeout = 5 * time.Minute
 
 	controllerManagerService = "controller-manager"
 
