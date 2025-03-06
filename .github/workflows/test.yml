@@ -17,4 +17,4 @@ jobs:
       with:
         go-version-file: 'go.mod'
     - name: Run make test
-      run: make test
+      run: make test-only

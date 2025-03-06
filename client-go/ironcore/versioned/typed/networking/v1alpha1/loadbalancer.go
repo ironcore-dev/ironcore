@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
-	networkingv1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/networking/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	applyconfigurationsnetworkingv1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/networking/v1alpha1"
 	scheme "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -25,36 +25,37 @@ type LoadBalancersGetter interface {
 
 // LoadBalancerInterface has methods to work with LoadBalancer resources.
 type LoadBalancerInterface interface {
-	Create(ctx context.Context, loadBalancer *v1alpha1.LoadBalancer, opts v1.CreateOptions) (*v1alpha1.LoadBalancer, error)
-	Update(ctx context.Context, loadBalancer *v1alpha1.LoadBalancer, opts v1.UpdateOptions) (*v1alpha1.LoadBalancer, error)
+	Create(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancer, opts v1.CreateOptions) (*networkingv1alpha1.LoadBalancer, error)
+	Update(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancer, opts v1.UpdateOptions) (*networkingv1alpha1.LoadBalancer, error)
 	// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-	UpdateStatus(ctx context.Context, loadBalancer *v1alpha1.LoadBalancer, opts v1.UpdateOptions) (*v1alpha1.LoadBalancer, error)
+	UpdateStatus(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancer, opts v1.UpdateOptions) (*networkingv1alpha1.LoadBalancer, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
-	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.LoadBalancer, error)
-	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.LoadBalancerList, error)
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*networkingv1alpha1.LoadBalancer, error)
+	List(ctx context.Context, opts v1.ListOptions) (*networkingv1alpha1.LoadBalancerList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
-	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.LoadBalancer, err error)
-	Apply(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancerApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.LoadBalancer, err error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *networkingv1alpha1.LoadBalancer, err error)
+	Apply(ctx context.Context, loadBalancer *applyconfigurationsnetworkingv1alpha1.LoadBalancerApplyConfiguration, opts v1.ApplyOptions) (result *networkingv1alpha1.LoadBalancer, err error)
 	// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-	ApplyStatus(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancerApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.LoadBalancer, err error)
+	ApplyStatus(ctx context.Context, loadBalancer *applyconfigurationsnetworkingv1alpha1.LoadBalancerApplyConfiguration, opts v1.ApplyOptions) (result *networkingv1alpha1.LoadBalancer, err error)
 	LoadBalancerExpansion
 }
 
 // loadBalancers implements LoadBalancerInterface
 type loadBalancers struct {
-	*gentype.ClientWithListAndApply[*v1alpha1.LoadBalancer, *v1alpha1.LoadBalancerList, *networkingv1alpha1.LoadBalancerApplyConfiguration]
+	*gentype.ClientWithListAndApply[*networkingv1alpha1.LoadBalancer, *networkingv1alpha1.LoadBalancerList, *applyconfigurationsnetworkingv1alpha1.LoadBalancerApplyConfiguration]
 }
 
 // newLoadBalancers returns a LoadBalancers
 func newLoadBalancers(c *NetworkingV1alpha1Client, namespace string) *loadBalancers {
 	return &loadBalancers{
-		gentype.NewClientWithListAndApply[*v1alpha1.LoadBalancer, *v1alpha1.LoadBalancerList, *networkingv1alpha1.LoadBalancerApplyConfiguration](
+		gentype.NewClientWithListAndApply[*networkingv1alpha1.LoadBalancer, *networkingv1alpha1.LoadBalancerList, *applyconfigurationsnetworkingv1alpha1.LoadBalancerApplyConfiguration](
 			"loadbalancers",
 			c.RESTClient(),
 			scheme.ParameterCodec,
 			namespace,
-			func() *v1alpha1.LoadBalancer { return &v1alpha1.LoadBalancer{} },
-			func() *v1alpha1.LoadBalancerList { return &v1alpha1.LoadBalancerList{} }),
+			func() *networkingv1alpha1.LoadBalancer { return &networkingv1alpha1.LoadBalancer{} },
+			func() *networkingv1alpha1.LoadBalancerList { return &networkingv1alpha1.LoadBalancerList{} },
+		),
 	}
 }

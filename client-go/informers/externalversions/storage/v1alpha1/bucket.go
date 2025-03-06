@@ -6,13 +6,13 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	apistoragev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	internalinterfaces "github.com/ironcore-dev/ironcore/client-go/informers/externalversions/internalinterfaces"
 	versioned "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned"
-	v1alpha1 "github.com/ironcore-dev/ironcore/client-go/listers/storage/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/client-go/listers/storage/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
@@ -23,7 +23,7 @@ import (
 // Buckets.
 type BucketInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.BucketLister
+	Lister() storagev1alpha1.BucketLister
 }
 
 type bucketInformer struct {
@@ -58,7 +58,7 @@ func NewFilteredBucketInformer(client versioned.Interface, namespace string, res
 				return client.StorageV1alpha1().Buckets(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&storagev1alpha1.Bucket{},
+		&apistoragev1alpha1.Bucket{},
 		resyncPeriod,
 		indexers,
 	)
@@ -69,9 +69,9 @@ func (f *bucketInformer) defaultInformer(client versioned.Interface, resyncPerio
 }
 
 func (f *bucketInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&storagev1alpha1.Bucket{}, f.defaultInformer)
+	return f.factory.InformerFor(&apistoragev1alpha1.Bucket{}, f.defaultInformer)
 }
 
-func (f *bucketInformer) Lister() v1alpha1.BucketLister {
-	return v1alpha1.NewBucketLister(f.Informer().GetIndexer())
+func (f *bucketInformer) Lister() storagev1alpha1.BucketLister {
+	return storagev1alpha1.NewBucketLister(f.Informer().GetIndexer())
 }

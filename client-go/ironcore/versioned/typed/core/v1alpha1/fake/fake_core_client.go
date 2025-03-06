@@ -16,7 +16,7 @@ type FakeCoreV1alpha1 struct {
 }
 
 func (c *FakeCoreV1alpha1) ResourceQuotas(namespace string) v1alpha1.ResourceQuotaInterface {
-	return &FakeResourceQuotas{c, namespace}
+	return newFakeResourceQuotas(c, namespace)
 }
 
 // RESTClient returns a RESTClient that is used to communicate

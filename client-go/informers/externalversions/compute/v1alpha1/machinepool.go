@@ -6,13 +6,13 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
-	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	apicomputev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	internalinterfaces "github.com/ironcore-dev/ironcore/client-go/informers/externalversions/internalinterfaces"
 	versioned "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned"
-	v1alpha1 "github.com/ironcore-dev/ironcore/client-go/listers/compute/v1alpha1"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/client-go/listers/compute/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
@@ -23,7 +23,7 @@ import (
 // MachinePools.
 type MachinePoolInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.MachinePoolLister
+	Lister() computev1alpha1.MachinePoolLister
 }
 
 type machinePoolInformer struct {
@@ -57,7 +57,7 @@ func NewFilteredMachinePoolInformer(client versioned.Interface, resyncPeriod tim
 				return client.ComputeV1alpha1().MachinePools().Watch(context.TODO(), options)
 			},
 		},
-		&computev1alpha1.MachinePool{},
+		&apicomputev1alpha1.MachinePool{},
 		resyncPeriod,
 		indexers,
 	)
@@ -68,9 +68,9 @@ func (f *machinePoolInformer) defaultInformer(client versioned.Interface, resync
 }
 
 func (f *machinePoolInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&computev1alpha1.MachinePool{}, f.defaultInformer)
+	return f.factory.InformerFor(&apicomputev1alpha1.MachinePool{}, f.defaultInformer)
 }
 
-func (f *machinePoolInformer) Lister() v1alpha1.MachinePoolLister {
-	return v1alpha1.NewMachinePoolLister(f.Informer().GetIndexer())
+func (f *machinePoolInformer) Lister() computev1alpha1.MachinePoolLister {
+	return computev1alpha1.NewMachinePoolLister(f.Informer().GetIndexer())
 }
