@@ -6,13 +6,13 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 )
 
 // PrefixSourceApplyConfiguration represents a declarative configuration of the PrefixSource type for use
 // with apply.
 type PrefixSourceApplyConfiguration struct {
-	Value     *v1alpha1.IPPrefix                       `json:"value,omitempty"`
+	Value     *commonv1alpha1.IPPrefix                 `json:"value,omitempty"`
 	Ephemeral *EphemeralPrefixSourceApplyConfiguration `json:"ephemeral,omitempty"`
 }
 
@@ -25,7 +25,7 @@ func PrefixSource() *PrefixSourceApplyConfiguration {
 // WithValue sets the Value field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Value field is set to the value of the last call.
-func (b *PrefixSourceApplyConfiguration) WithValue(value v1alpha1.IPPrefix) *PrefixSourceApplyConfiguration {
+func (b *PrefixSourceApplyConfiguration) WithValue(value commonv1alpha1.IPPrefix) *PrefixSourceApplyConfiguration {
 	b.Value = &value
 	return b
 }

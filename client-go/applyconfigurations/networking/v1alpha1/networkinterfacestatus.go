@@ -7,18 +7,18 @@ package v1alpha1
 
 import (
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // NetworkInterfaceStatusApplyConfiguration represents a declarative configuration of the NetworkInterfaceStatus type for use
 // with apply.
 type NetworkInterfaceStatusApplyConfiguration struct {
-	State                   *v1alpha1.NetworkInterfaceState `json:"state,omitempty"`
-	LastStateTransitionTime *v1.Time                        `json:"lastStateTransitionTime,omitempty"`
-	IPs                     []commonv1alpha1.IP             `json:"ips,omitempty"`
-	Prefixes                []commonv1alpha1.IPPrefix       `json:"prefixes,omitempty"`
-	VirtualIP               *commonv1alpha1.IP              `json:"virtualIP,omitempty"`
+	State                   *networkingv1alpha1.NetworkInterfaceState `json:"state,omitempty"`
+	LastStateTransitionTime *v1.Time                                  `json:"lastStateTransitionTime,omitempty"`
+	IPs                     []commonv1alpha1.IP                       `json:"ips,omitempty"`
+	Prefixes                []commonv1alpha1.IPPrefix                 `json:"prefixes,omitempty"`
+	VirtualIP               *commonv1alpha1.IP                        `json:"virtualIP,omitempty"`
 }
 
 // NetworkInterfaceStatusApplyConfiguration constructs a declarative configuration of the NetworkInterfaceStatus type for use with
@@ -30,7 +30,7 @@ func NetworkInterfaceStatus() *NetworkInterfaceStatusApplyConfiguration {
 // WithState sets the State field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the State field is set to the value of the last call.
-func (b *NetworkInterfaceStatusApplyConfiguration) WithState(value v1alpha1.NetworkInterfaceState) *NetworkInterfaceStatusApplyConfiguration {
+func (b *NetworkInterfaceStatusApplyConfiguration) WithState(value networkingv1alpha1.NetworkInterfaceState) *NetworkInterfaceStatusApplyConfiguration {
 	b.State = &value
 	return b
 }

@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
-	networkingv1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/networking/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	applyconfigurationsnetworkingv1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/networking/v1alpha1"
 	scheme "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -25,36 +25,37 @@ type NetworkPoliciesGetter interface {
 
 // NetworkPolicyInterface has methods to work with NetworkPolicy resources.
 type NetworkPolicyInterface interface {
-	Create(ctx context.Context, networkPolicy *v1alpha1.NetworkPolicy, opts v1.CreateOptions) (*v1alpha1.NetworkPolicy, error)
-	Update(ctx context.Context, networkPolicy *v1alpha1.NetworkPolicy, opts v1.UpdateOptions) (*v1alpha1.NetworkPolicy, error)
+	Create(ctx context.Context, networkPolicy *networkingv1alpha1.NetworkPolicy, opts v1.CreateOptions) (*networkingv1alpha1.NetworkPolicy, error)
+	Update(ctx context.Context, networkPolicy *networkingv1alpha1.NetworkPolicy, opts v1.UpdateOptions) (*networkingv1alpha1.NetworkPolicy, error)
 	// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-	UpdateStatus(ctx context.Context, networkPolicy *v1alpha1.NetworkPolicy, opts v1.UpdateOptions) (*v1alpha1.NetworkPolicy, error)
+	UpdateStatus(ctx context.Context, networkPolicy *networkingv1alpha1.NetworkPolicy, opts v1.UpdateOptions) (*networkingv1alpha1.NetworkPolicy, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
-	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.NetworkPolicy, error)
-	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.NetworkPolicyList, error)
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*networkingv1alpha1.NetworkPolicy, error)
+	List(ctx context.Context, opts v1.ListOptions) (*networkingv1alpha1.NetworkPolicyList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
-	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.NetworkPolicy, err error)
-	Apply(ctx context.Context, networkPolicy *networkingv1alpha1.NetworkPolicyApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.NetworkPolicy, err error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *networkingv1alpha1.NetworkPolicy, err error)
+	Apply(ctx context.Context, networkPolicy *applyconfigurationsnetworkingv1alpha1.NetworkPolicyApplyConfiguration, opts v1.ApplyOptions) (result *networkingv1alpha1.NetworkPolicy, err error)
 	// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-	ApplyStatus(ctx context.Context, networkPolicy *networkingv1alpha1.NetworkPolicyApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.NetworkPolicy, err error)
+	ApplyStatus(ctx context.Context, networkPolicy *applyconfigurationsnetworkingv1alpha1.NetworkPolicyApplyConfiguration, opts v1.ApplyOptions) (result *networkingv1alpha1.NetworkPolicy, err error)
 	NetworkPolicyExpansion
 }
 
 // networkPolicies implements NetworkPolicyInterface
 type networkPolicies struct {
-	*gentype.ClientWithListAndApply[*v1alpha1.NetworkPolicy, *v1alpha1.NetworkPolicyList, *networkingv1alpha1.NetworkPolicyApplyConfiguration]
+	*gentype.ClientWithListAndApply[*networkingv1alpha1.NetworkPolicy, *networkingv1alpha1.NetworkPolicyList, *applyconfigurationsnetworkingv1alpha1.NetworkPolicyApplyConfiguration]
 }
 
 // newNetworkPolicies returns a NetworkPolicies
 func newNetworkPolicies(c *NetworkingV1alpha1Client, namespace string) *networkPolicies {
 	return &networkPolicies{
-		gentype.NewClientWithListAndApply[*v1alpha1.NetworkPolicy, *v1alpha1.NetworkPolicyList, *networkingv1alpha1.NetworkPolicyApplyConfiguration](
+		gentype.NewClientWithListAndApply[*networkingv1alpha1.NetworkPolicy, *networkingv1alpha1.NetworkPolicyList, *applyconfigurationsnetworkingv1alpha1.NetworkPolicyApplyConfiguration](
 			"networkpolicies",
 			c.RESTClient(),
 			scheme.ParameterCodec,
 			namespace,
-			func() *v1alpha1.NetworkPolicy { return &v1alpha1.NetworkPolicy{} },
-			func() *v1alpha1.NetworkPolicyList { return &v1alpha1.NetworkPolicyList{} }),
+			func() *networkingv1alpha1.NetworkPolicy { return &networkingv1alpha1.NetworkPolicy{} },
+			func() *networkingv1alpha1.NetworkPolicyList { return &networkingv1alpha1.NetworkPolicyList{} },
+		),
 	}
 }
