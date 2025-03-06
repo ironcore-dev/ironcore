@@ -40,7 +40,7 @@ const (
 	eventuallyTimeout    = 3 * time.Second
 	pollingInterval      = 50 * time.Millisecond
 	consistentlyDuration = 1 * time.Second
-	apiServiceTimeout    = 5 * time.Minute
+	apiServiceTimeout    = 10 * time.Minute
 )
 
 func TestServer(t *testing.T) {

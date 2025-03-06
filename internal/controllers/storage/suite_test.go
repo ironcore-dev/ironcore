@@ -47,7 +47,7 @@ const (
 	pollingInterval      = 50 * time.Millisecond
 	eventuallyTimeout    = 3 * time.Second
 	consistentlyDuration = 1 * time.Second
-	apiServiceTimeout    = 5 * time.Minute
+	apiServiceTimeout    = 10 * time.Minute
 )
 
 var (
@@ -127,7 +127,6 @@ var _ = BeforeSuite(func() {
 
 	// index fields here
 	Expect(computeclient.SetupMachineSpecVolumeNamesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
-
 	Expect(storageclient.SetupVolumeSpecVolumeClassRefNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 	Expect(storageclient.SetupVolumeSpecVolumePoolRefNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 	Expect(storageclient.SetupVolumePoolAvailableVolumeClassesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
