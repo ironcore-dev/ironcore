@@ -6,7 +6,7 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -14,12 +14,12 @@ import (
 // NetworkPolicyConditionApplyConfiguration represents a declarative configuration of the NetworkPolicyCondition type for use
 // with apply.
 type NetworkPolicyConditionApplyConfiguration struct {
-	Type               *v1alpha1.NetworkPolicyConditionType `json:"type,omitempty"`
-	Status             *v1.ConditionStatus                  `json:"status,omitempty"`
-	Reason             *string                              `json:"reason,omitempty"`
-	Message            *string                              `json:"message,omitempty"`
-	ObservedGeneration *int64                               `json:"observedGeneration,omitempty"`
-	LastTransitionTime *metav1.Time                         `json:"lastTransitionTime,omitempty"`
+	Type               *networkingv1alpha1.NetworkPolicyConditionType `json:"type,omitempty"`
+	Status             *v1.ConditionStatus                            `json:"status,omitempty"`
+	Reason             *string                                        `json:"reason,omitempty"`
+	Message            *string                                        `json:"message,omitempty"`
+	ObservedGeneration *int64                                         `json:"observedGeneration,omitempty"`
+	LastTransitionTime *metav1.Time                                   `json:"lastTransitionTime,omitempty"`
 }
 
 // NetworkPolicyConditionApplyConfiguration constructs a declarative configuration of the NetworkPolicyCondition type for use with
@@ -31,7 +31,7 @@ func NetworkPolicyCondition() *NetworkPolicyConditionApplyConfiguration {
 // WithType sets the Type field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Type field is set to the value of the last call.
-func (b *NetworkPolicyConditionApplyConfiguration) WithType(value v1alpha1.NetworkPolicyConditionType) *NetworkPolicyConditionApplyConfiguration {
+func (b *NetworkPolicyConditionApplyConfiguration) WithType(value networkingv1alpha1.NetworkPolicyConditionType) *NetworkPolicyConditionApplyConfiguration {
 	b.Type = &value
 	return b
 }

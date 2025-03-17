@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	computev1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/compute/v1alpha1"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	applyconfigurationscomputev1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/compute/v1alpha1"
 	scheme "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -25,32 +25,33 @@ type MachineClassesGetter interface {
 
 // MachineClassInterface has methods to work with MachineClass resources.
 type MachineClassInterface interface {
-	Create(ctx context.Context, machineClass *v1alpha1.MachineClass, opts v1.CreateOptions) (*v1alpha1.MachineClass, error)
-	Update(ctx context.Context, machineClass *v1alpha1.MachineClass, opts v1.UpdateOptions) (*v1alpha1.MachineClass, error)
+	Create(ctx context.Context, machineClass *computev1alpha1.MachineClass, opts v1.CreateOptions) (*computev1alpha1.MachineClass, error)
+	Update(ctx context.Context, machineClass *computev1alpha1.MachineClass, opts v1.UpdateOptions) (*computev1alpha1.MachineClass, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
-	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.MachineClass, error)
-	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.MachineClassList, error)
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*computev1alpha1.MachineClass, error)
+	List(ctx context.Context, opts v1.ListOptions) (*computev1alpha1.MachineClassList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
-	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.MachineClass, err error)
-	Apply(ctx context.Context, machineClass *computev1alpha1.MachineClassApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.MachineClass, err error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *computev1alpha1.MachineClass, err error)
+	Apply(ctx context.Context, machineClass *applyconfigurationscomputev1alpha1.MachineClassApplyConfiguration, opts v1.ApplyOptions) (result *computev1alpha1.MachineClass, err error)
 	MachineClassExpansion
 }
 
 // machineClasses implements MachineClassInterface
 type machineClasses struct {
-	*gentype.ClientWithListAndApply[*v1alpha1.MachineClass, *v1alpha1.MachineClassList, *computev1alpha1.MachineClassApplyConfiguration]
+	*gentype.ClientWithListAndApply[*computev1alpha1.MachineClass, *computev1alpha1.MachineClassList, *applyconfigurationscomputev1alpha1.MachineClassApplyConfiguration]
 }
 
 // newMachineClasses returns a MachineClasses
 func newMachineClasses(c *ComputeV1alpha1Client) *machineClasses {
 	return &machineClasses{
-		gentype.NewClientWithListAndApply[*v1alpha1.MachineClass, *v1alpha1.MachineClassList, *computev1alpha1.MachineClassApplyConfiguration](
+		gentype.NewClientWithListAndApply[*computev1alpha1.MachineClass, *computev1alpha1.MachineClassList, *applyconfigurationscomputev1alpha1.MachineClassApplyConfiguration](
 			"machineclasses",
 			c.RESTClient(),
 			scheme.ParameterCodec,
 			"",
-			func() *v1alpha1.MachineClass { return &v1alpha1.MachineClass{} },
-			func() *v1alpha1.MachineClassList { return &v1alpha1.MachineClassList{} }),
+			func() *computev1alpha1.MachineClass { return &computev1alpha1.MachineClass{} },
+			func() *computev1alpha1.MachineClassList { return &computev1alpha1.MachineClassList{} },
+		),
 	}
 }

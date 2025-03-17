@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/storage/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	applyconfigurationsstoragev1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/storage/v1alpha1"
 	scheme "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -25,36 +25,37 @@ type BucketsGetter interface {
 
 // BucketInterface has methods to work with Bucket resources.
 type BucketInterface interface {
-	Create(ctx context.Context, bucket *v1alpha1.Bucket, opts v1.CreateOptions) (*v1alpha1.Bucket, error)
-	Update(ctx context.Context, bucket *v1alpha1.Bucket, opts v1.UpdateOptions) (*v1alpha1.Bucket, error)
+	Create(ctx context.Context, bucket *storagev1alpha1.Bucket, opts v1.CreateOptions) (*storagev1alpha1.Bucket, error)
+	Update(ctx context.Context, bucket *storagev1alpha1.Bucket, opts v1.UpdateOptions) (*storagev1alpha1.Bucket, error)
 	// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-	UpdateStatus(ctx context.Context, bucket *v1alpha1.Bucket, opts v1.UpdateOptions) (*v1alpha1.Bucket, error)
+	UpdateStatus(ctx context.Context, bucket *storagev1alpha1.Bucket, opts v1.UpdateOptions) (*storagev1alpha1.Bucket, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
-	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.Bucket, error)
-	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.BucketList, error)
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*storagev1alpha1.Bucket, error)
+	List(ctx context.Context, opts v1.ListOptions) (*storagev1alpha1.BucketList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
-	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.Bucket, err error)
-	Apply(ctx context.Context, bucket *storagev1alpha1.BucketApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.Bucket, err error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *storagev1alpha1.Bucket, err error)
+	Apply(ctx context.Context, bucket *applyconfigurationsstoragev1alpha1.BucketApplyConfiguration, opts v1.ApplyOptions) (result *storagev1alpha1.Bucket, err error)
 	// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-	ApplyStatus(ctx context.Context, bucket *storagev1alpha1.BucketApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.Bucket, err error)
+	ApplyStatus(ctx context.Context, bucket *applyconfigurationsstoragev1alpha1.BucketApplyConfiguration, opts v1.ApplyOptions) (result *storagev1alpha1.Bucket, err error)
 	BucketExpansion
 }
 
 // buckets implements BucketInterface
 type buckets struct {
-	*gentype.ClientWithListAndApply[*v1alpha1.Bucket, *v1alpha1.BucketList, *storagev1alpha1.BucketApplyConfiguration]
+	*gentype.ClientWithListAndApply[*storagev1alpha1.Bucket, *storagev1alpha1.BucketList, *applyconfigurationsstoragev1alpha1.BucketApplyConfiguration]
 }
 
 // newBuckets returns a Buckets
 func newBuckets(c *StorageV1alpha1Client, namespace string) *buckets {
 	return &buckets{
-		gentype.NewClientWithListAndApply[*v1alpha1.Bucket, *v1alpha1.BucketList, *storagev1alpha1.BucketApplyConfiguration](
+		gentype.NewClientWithListAndApply[*storagev1alpha1.Bucket, *storagev1alpha1.BucketList, *applyconfigurationsstoragev1alpha1.BucketApplyConfiguration](
 			"buckets",
 			c.RESTClient(),
 			scheme.ParameterCodec,
 			namespace,
-			func() *v1alpha1.Bucket { return &v1alpha1.Bucket{} },
-			func() *v1alpha1.BucketList { return &v1alpha1.BucketList{} }),
+			func() *storagev1alpha1.Bucket { return &storagev1alpha1.Bucket{} },
+			func() *storagev1alpha1.BucketList { return &storagev1alpha1.BucketList{} },
+		),
 	}
 }

@@ -16,31 +16,31 @@ type FakeNetworkingV1alpha1 struct {
 }
 
 func (c *FakeNetworkingV1alpha1) LoadBalancers(namespace string) v1alpha1.LoadBalancerInterface {
-	return &FakeLoadBalancers{c, namespace}
+	return newFakeLoadBalancers(c, namespace)
 }
 
 func (c *FakeNetworkingV1alpha1) LoadBalancerRoutings(namespace string) v1alpha1.LoadBalancerRoutingInterface {
-	return &FakeLoadBalancerRoutings{c, namespace}
+	return newFakeLoadBalancerRoutings(c, namespace)
 }
 
 func (c *FakeNetworkingV1alpha1) NATGateways(namespace string) v1alpha1.NATGatewayInterface {
-	return &FakeNATGateways{c, namespace}
+	return newFakeNATGateways(c, namespace)
 }
 
 func (c *FakeNetworkingV1alpha1) Networks(namespace string) v1alpha1.NetworkInterface {
-	return &FakeNetworks{c, namespace}
+	return newFakeNetworks(c, namespace)
 }
 
 func (c *FakeNetworkingV1alpha1) NetworkInterfaces(namespace string) v1alpha1.NetworkInterfaceInterface {
-	return &FakeNetworkInterfaces{c, namespace}
+	return newFakeNetworkInterfaces(c, namespace)
 }
 
 func (c *FakeNetworkingV1alpha1) NetworkPolicies(namespace string) v1alpha1.NetworkPolicyInterface {
-	return &FakeNetworkPolicies{c, namespace}
+	return newFakeNetworkPolicies(c, namespace)
 }
 
 func (c *FakeNetworkingV1alpha1) VirtualIPs(namespace string) v1alpha1.VirtualIPInterface {
-	return &FakeVirtualIPs{c, namespace}
+	return newFakeVirtualIPs(c, namespace)
 }
 
 // RESTClient returns a RESTClient that is used to communicate

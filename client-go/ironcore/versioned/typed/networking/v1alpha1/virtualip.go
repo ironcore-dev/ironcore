@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
-	networkingv1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/networking/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	applyconfigurationsnetworkingv1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/networking/v1alpha1"
 	scheme "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -25,36 +25,37 @@ type VirtualIPsGetter interface {
 
 // VirtualIPInterface has methods to work with VirtualIP resources.
 type VirtualIPInterface interface {
-	Create(ctx context.Context, virtualIP *v1alpha1.VirtualIP, opts v1.CreateOptions) (*v1alpha1.VirtualIP, error)
-	Update(ctx context.Context, virtualIP *v1alpha1.VirtualIP, opts v1.UpdateOptions) (*v1alpha1.VirtualIP, error)
+	Create(ctx context.Context, virtualIP *networkingv1alpha1.VirtualIP, opts v1.CreateOptions) (*networkingv1alpha1.VirtualIP, error)
+	Update(ctx context.Context, virtualIP *networkingv1alpha1.VirtualIP, opts v1.UpdateOptions) (*networkingv1alpha1.VirtualIP, error)
 	// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-	UpdateStatus(ctx context.Context, virtualIP *v1alpha1.VirtualIP, opts v1.UpdateOptions) (*v1alpha1.VirtualIP, error)
+	UpdateStatus(ctx context.Context, virtualIP *networkingv1alpha1.VirtualIP, opts v1.UpdateOptions) (*networkingv1alpha1.VirtualIP, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
-	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.VirtualIP, error)
-	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.VirtualIPList, error)
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*networkingv1alpha1.VirtualIP, error)
+	List(ctx context.Context, opts v1.ListOptions) (*networkingv1alpha1.VirtualIPList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
-	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.VirtualIP, err error)
-	Apply(ctx context.Context, virtualIP *networkingv1alpha1.VirtualIPApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.VirtualIP, err error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *networkingv1alpha1.VirtualIP, err error)
+	Apply(ctx context.Context, virtualIP *applyconfigurationsnetworkingv1alpha1.VirtualIPApplyConfiguration, opts v1.ApplyOptions) (result *networkingv1alpha1.VirtualIP, err error)
 	// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-	ApplyStatus(ctx context.Context, virtualIP *networkingv1alpha1.VirtualIPApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.VirtualIP, err error)
+	ApplyStatus(ctx context.Context, virtualIP *applyconfigurationsnetworkingv1alpha1.VirtualIPApplyConfiguration, opts v1.ApplyOptions) (result *networkingv1alpha1.VirtualIP, err error)
 	VirtualIPExpansion
 }
 
 // virtualIPs implements VirtualIPInterface
 type virtualIPs struct {
-	*gentype.ClientWithListAndApply[*v1alpha1.VirtualIP, *v1alpha1.VirtualIPList, *networkingv1alpha1.VirtualIPApplyConfiguration]
+	*gentype.ClientWithListAndApply[*networkingv1alpha1.VirtualIP, *networkingv1alpha1.VirtualIPList, *applyconfigurationsnetworkingv1alpha1.VirtualIPApplyConfiguration]
 }
 
 // newVirtualIPs returns a VirtualIPs
 func newVirtualIPs(c *NetworkingV1alpha1Client, namespace string) *virtualIPs {
 	return &virtualIPs{
-		gentype.NewClientWithListAndApply[*v1alpha1.VirtualIP, *v1alpha1.VirtualIPList, *networkingv1alpha1.VirtualIPApplyConfiguration](
+		gentype.NewClientWithListAndApply[*networkingv1alpha1.VirtualIP, *networkingv1alpha1.VirtualIPList, *applyconfigurationsnetworkingv1alpha1.VirtualIPApplyConfiguration](
 			"virtualips",
 			c.RESTClient(),
 			scheme.ParameterCodec,
 			namespace,
-			func() *v1alpha1.VirtualIP { return &v1alpha1.VirtualIP{} },
-			func() *v1alpha1.VirtualIPList { return &v1alpha1.VirtualIPList{} }),
+			func() *networkingv1alpha1.VirtualIP { return &networkingv1alpha1.VirtualIP{} },
+			func() *networkingv1alpha1.VirtualIPList { return &networkingv1alpha1.VirtualIPList{} },
+		),
 	}
 }

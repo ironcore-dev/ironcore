@@ -9,7 +9,7 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/internal/apis/ipam/v1alpha1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
@@ -18,18 +18,22 @@ import (
 // Public to allow building arbitrary schemes.
 // All generated defaulters are covering - they call all nested defaulters.
 func RegisterDefaults(scheme *runtime.Scheme) error {
-	scheme.AddTypeDefaultingFunc(&v1alpha1.LoadBalancer{}, func(obj interface{}) { SetObjectDefaults_LoadBalancer(obj.(*v1alpha1.LoadBalancer)) })
-	scheme.AddTypeDefaultingFunc(&v1alpha1.LoadBalancerList{}, func(obj interface{}) { SetObjectDefaults_LoadBalancerList(obj.(*v1alpha1.LoadBalancerList)) })
-	scheme.AddTypeDefaultingFunc(&v1alpha1.NATGateway{}, func(obj interface{}) { SetObjectDefaults_NATGateway(obj.(*v1alpha1.NATGateway)) })
-	scheme.AddTypeDefaultingFunc(&v1alpha1.NATGatewayList{}, func(obj interface{}) { SetObjectDefaults_NATGatewayList(obj.(*v1alpha1.NATGatewayList)) })
-	scheme.AddTypeDefaultingFunc(&v1alpha1.NetworkInterface{}, func(obj interface{}) { SetObjectDefaults_NetworkInterface(obj.(*v1alpha1.NetworkInterface)) })
-	scheme.AddTypeDefaultingFunc(&v1alpha1.NetworkInterfaceList{}, func(obj interface{}) { SetObjectDefaults_NetworkInterfaceList(obj.(*v1alpha1.NetworkInterfaceList)) })
-	scheme.AddTypeDefaultingFunc(&v1alpha1.NetworkPolicy{}, func(obj interface{}) { SetObjectDefaults_NetworkPolicy(obj.(*v1alpha1.NetworkPolicy)) })
-	scheme.AddTypeDefaultingFunc(&v1alpha1.NetworkPolicyList{}, func(obj interface{}) { SetObjectDefaults_NetworkPolicyList(obj.(*v1alpha1.NetworkPolicyList)) })
+	scheme.AddTypeDefaultingFunc(&networkingv1alpha1.LoadBalancer{}, func(obj interface{}) { SetObjectDefaults_LoadBalancer(obj.(*networkingv1alpha1.LoadBalancer)) })
+	scheme.AddTypeDefaultingFunc(&networkingv1alpha1.LoadBalancerList{}, func(obj interface{}) { SetObjectDefaults_LoadBalancerList(obj.(*networkingv1alpha1.LoadBalancerList)) })
+	scheme.AddTypeDefaultingFunc(&networkingv1alpha1.NATGateway{}, func(obj interface{}) { SetObjectDefaults_NATGateway(obj.(*networkingv1alpha1.NATGateway)) })
+	scheme.AddTypeDefaultingFunc(&networkingv1alpha1.NATGatewayList{}, func(obj interface{}) { SetObjectDefaults_NATGatewayList(obj.(*networkingv1alpha1.NATGatewayList)) })
+	scheme.AddTypeDefaultingFunc(&networkingv1alpha1.NetworkInterface{}, func(obj interface{}) { SetObjectDefaults_NetworkInterface(obj.(*networkingv1alpha1.NetworkInterface)) })
+	scheme.AddTypeDefaultingFunc(&networkingv1alpha1.NetworkInterfaceList{}, func(obj interface{}) {
+		SetObjectDefaults_NetworkInterfaceList(obj.(*networkingv1alpha1.NetworkInterfaceList))
+	})
+	scheme.AddTypeDefaultingFunc(&networkingv1alpha1.NetworkPolicy{}, func(obj interface{}) { SetObjectDefaults_NetworkPolicy(obj.(*networkingv1alpha1.NetworkPolicy)) })
+	scheme.AddTypeDefaultingFunc(&networkingv1alpha1.NetworkPolicyList{}, func(obj interface{}) {
+		SetObjectDefaults_NetworkPolicyList(obj.(*networkingv1alpha1.NetworkPolicyList))
+	})
 	return nil
 }
 
-func SetObjectDefaults_LoadBalancer(in *v1alpha1.LoadBalancer) {
+func SetObjectDefaults_LoadBalancer(in *networkingv1alpha1.LoadBalancer) {
 	SetDefaults_LoadBalancerSpec(&in.Spec)
 	for i := range in.Spec.IPs {
 		a := &in.Spec.IPs[i]
@@ -41,25 +45,25 @@ func SetObjectDefaults_LoadBalancer(in *v1alpha1.LoadBalancer) {
 	}
 }
 
-func SetObjectDefaults_LoadBalancerList(in *v1alpha1.LoadBalancerList) {
+func SetObjectDefaults_LoadBalancerList(in *networkingv1alpha1.LoadBalancerList) {
 	for i := range in.Items {
 		a := &in.Items[i]
 		SetObjectDefaults_LoadBalancer(a)
 	}
 }
 
-func SetObjectDefaults_NATGateway(in *v1alpha1.NATGateway) {
+func SetObjectDefaults_NATGateway(in *networkingv1alpha1.NATGateway) {
 	SetDefaults_NATGatewaySpec(&in.Spec)
 }
 
-func SetObjectDefaults_NATGatewayList(in *v1alpha1.NATGatewayList) {
+func SetObjectDefaults_NATGatewayList(in *networkingv1alpha1.NATGatewayList) {
 	for i := range in.Items {
 		a := &in.Items[i]
 		SetObjectDefaults_NATGateway(a)
 	}
 }
 
-func SetObjectDefaults_NetworkInterface(in *v1alpha1.NetworkInterface) {
+func SetObjectDefaults_NetworkInterface(in *networkingv1alpha1.NetworkInterface) {
 	SetDefaults_NetworkInterfaceSpec(&in.Spec)
 	for i := range in.Spec.IPs {
 		a := &in.Spec.IPs[i]
@@ -80,18 +84,18 @@ func SetObjectDefaults_NetworkInterface(in *v1alpha1.NetworkInterface) {
 	SetDefaults_NetworkInterfaceStatus(&in.Status)
 }
 
-func SetObjectDefaults_NetworkInterfaceList(in *v1alpha1.NetworkInterfaceList) {
+func SetObjectDefaults_NetworkInterfaceList(in *networkingv1alpha1.NetworkInterfaceList) {
 	for i := range in.Items {
 		a := &in.Items[i]
 		SetObjectDefaults_NetworkInterface(a)
 	}
 }
 
-func SetObjectDefaults_NetworkPolicy(in *v1alpha1.NetworkPolicy) {
+func SetObjectDefaults_NetworkPolicy(in *networkingv1alpha1.NetworkPolicy) {
 	SetDefaults_NetworkPolicySpec(&in.Spec)
 }
 
-func SetObjectDefaults_NetworkPolicyList(in *v1alpha1.NetworkPolicyList) {
+func SetObjectDefaults_NetworkPolicyList(in *networkingv1alpha1.NetworkPolicyList) {
 	for i := range in.Items {
 		a := &in.Items[i]
 		SetObjectDefaults_NetworkPolicy(a)

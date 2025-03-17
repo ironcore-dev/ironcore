@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/client-go/listers"
-	"k8s.io/client-go/tools/cache"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	labels "k8s.io/apimachinery/pkg/labels"
+	listers "k8s.io/client-go/listers"
+	cache "k8s.io/client-go/tools/cache"
 )
 
 // NATGatewayLister helps list NATGateways.
@@ -17,7 +17,7 @@ import (
 type NATGatewayLister interface {
 	// List lists all NATGateways in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.NATGateway, err error)
+	List(selector labels.Selector) (ret []*networkingv1alpha1.NATGateway, err error)
 	// NATGateways returns an object that can list and get NATGateways.
 	NATGateways(namespace string) NATGatewayNamespaceLister
 	NATGatewayListerExpansion
@@ -25,17 +25,17 @@ type NATGatewayLister interface {
 
 // nATGatewayLister implements the NATGatewayLister interface.
 type nATGatewayLister struct {
-	listers.ResourceIndexer[*v1alpha1.NATGateway]
+	listers.ResourceIndexer[*networkingv1alpha1.NATGateway]
 }
 
 // NewNATGatewayLister returns a new NATGatewayLister.
 func NewNATGatewayLister(indexer cache.Indexer) NATGatewayLister {
-	return &nATGatewayLister{listers.New[*v1alpha1.NATGateway](indexer, v1alpha1.Resource("natgateway"))}
+	return &nATGatewayLister{listers.New[*networkingv1alpha1.NATGateway](indexer, networkingv1alpha1.Resource("natgateway"))}
 }
 
 // NATGateways returns an object that can list and get NATGateways.
 func (s *nATGatewayLister) NATGateways(namespace string) NATGatewayNamespaceLister {
-	return nATGatewayNamespaceLister{listers.NewNamespaced[*v1alpha1.NATGateway](s.ResourceIndexer, namespace)}
+	return nATGatewayNamespaceLister{listers.NewNamespaced[*networkingv1alpha1.NATGateway](s.ResourceIndexer, namespace)}
 }
 
 // NATGatewayNamespaceLister helps list and get NATGateways.
@@ -43,15 +43,15 @@ func (s *nATGatewayLister) NATGateways(namespace string) NATGatewayNamespaceList
 type NATGatewayNamespaceLister interface {
 	// List lists all NATGateways in the indexer for a given namespace.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.NATGateway, err error)
+	List(selector labels.Selector) (ret []*networkingv1alpha1.NATGateway, err error)
 	// Get retrieves the NATGateway from the indexer for a given namespace and name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.NATGateway, error)
+	Get(name string) (*networkingv1alpha1.NATGateway, error)
 	NATGatewayNamespaceListerExpansion
 }
 
 // nATGatewayNamespaceLister implements the NATGatewayNamespaceLister
 // interface.
 type nATGatewayNamespaceLister struct {
-	listers.ResourceIndexer[*v1alpha1.NATGateway]
+	listers.ResourceIndexer[*networkingv1alpha1.NATGateway]
 }
