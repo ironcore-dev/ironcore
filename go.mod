@@ -1,9 +1,9 @@
 module github.com/ironcore-dev/ironcore
 
-go 1.24.0
+go 1.23.0
 
 require (
-	github.com/bits-and-blooms/bitset v1.21.0
+	github.com/bits-and-blooms/bitset v1.22.0
 	github.com/blang/semver/v4 v4.0.0
 	github.com/go-chi/chi/v5 v5.2.1
 	github.com/go-logr/logr v1.4.2
@@ -19,19 +19,19 @@ require (
 	golang.org/x/sync v0.12.0
 	golang.org/x/sys v0.31.0
 	google.golang.org/grpc v1.71.0
-	k8s.io/api v0.32.2
-	k8s.io/apimachinery v0.32.2
-	k8s.io/apiserver v0.32.2
-	k8s.io/client-go v0.32.2
-	k8s.io/code-generator v0.32.2
-	k8s.io/component-base v0.32.2
+	k8s.io/api v0.32.3
+	k8s.io/apimachinery v0.32.3
+	k8s.io/apiserver v0.32.3
+	k8s.io/client-go v0.32.3
+	k8s.io/code-generator v0.32.3
+	k8s.io/component-base v0.32.3
 	k8s.io/klog/v2 v2.130.1
-	k8s.io/kube-aggregator v0.32.2
+	k8s.io/kube-aggregator v0.32.3
 	k8s.io/kube-openapi v0.0.0-20241212222426-2c72e554b1e7
-	k8s.io/kubectl v0.32.2
+	k8s.io/kubectl v0.32.3
 	k8s.io/utils v0.0.0-20241104100929-3ea5e8cea738
-	sigs.k8s.io/controller-runtime v0.20.2
-	sigs.k8s.io/structured-merge-diff/v4 v4.6.0
+	sigs.k8s.io/controller-runtime v0.20.3
+	sigs.k8s.io/structured-merge-diff/v4 v4.4.2
 	sigs.k8s.io/yaml v1.4.0
 )
 
@@ -121,9 +121,9 @@ require (
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/apiextensions-apiserver v0.32.2 // indirect
-	k8s.io/cli-runtime v0.32.2 // indirect
+	k8s.io/cli-runtime v0.32.3 // indirect
 	k8s.io/gengo/v2 v2.0.0-20240911193312-2b36238f13e9 // indirect
-	k8s.io/kms v0.32.2 // indirect
+	k8s.io/kms v0.32.3 // indirect
 	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.31.0 // indirect
 	sigs.k8s.io/json v0.0.0-20241010143419-9aa6b5e7a4b3 // indirect
 )
