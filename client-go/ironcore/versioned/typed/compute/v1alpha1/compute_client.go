@@ -18,6 +18,7 @@ type ComputeV1alpha1Interface interface {
 	MachinesGetter
 	MachineClassesGetter
 	MachinePoolsGetter
+	ReservationsGetter
 }
 
 // ComputeV1alpha1Client is used to interact with features provided by the compute.ironcore.dev group.
@@ -35,6 +36,10 @@ func (c *ComputeV1alpha1Client) MachineClasses() MachineClassInterface {
 
 func (c *ComputeV1alpha1Client) MachinePools() MachinePoolInterface {
 	return newMachinePools(c)
+}
+
+func (c *ComputeV1alpha1Client) Reservations(namespace string) ReservationInterface {
+	return newReservations(c, namespace)
 }
 
 // NewForConfig creates a new ComputeV1alpha1Client for the given config.

@@ -44,6 +44,18 @@ rules:
   - create
   - get
 - apiGroups:
+  - compute.ironcore.dev
+  resources:
+  - reservations
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
   - networking.ironcore.dev
   resources:
   - loadbalancerroutings
