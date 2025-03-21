@@ -1,23 +1,33 @@
 name: Publish docs via GitHub Pages
 on:
   push:
-    branches: [ main ]
-
+    branches:
+      - main
+permissions:
+  contents: write
 jobs:
-  build:
+  deploy:
     name: Deploy docs
     runs-on: ubuntu-latest
     steps:
       - name: Checkout main
         uses: actions/checkout@v4
+      - name: Configure Git Credentials
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
       - uses: actions/setup-python@v5
         with:
-          python-version: 'pypy3.9'
+          python-version: 3.x
+      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV 
       - uses: actions/cache@v4
         with:
-          key: ${{ github.ref }}
-          path: .cache
-      - name: Deploy docs
-        uses: afritzler/mkdocs-gh-pages-action@main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          key: mkdocs-material-${{ env.cache_id }}
+          path: .cache 
+          restore-keys: |
+            mkdocs-material-
+      - run: pip install mkdocs-material 
+      - name: Deploy docs 
+        run: mkdocs gh-deploy --force
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
