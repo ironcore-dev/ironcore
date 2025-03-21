@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - main
-      - enh/use_bot_account_for_publish_doc
+      - enh/test_doc_publish_job
 permissions:
   contents: write
 jobs:
