@@ -20,7 +20,7 @@ import (
 func ValidateNetworkInterface(networkInterface *networking.NetworkInterface) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(networkInterface, true, apivalidation.NameIsDNSLabel, field.NewPath("metadata"))...)
+	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(networkInterface, true, apivalidation.NameIsDNSSubdomain, field.NewPath("metadata"))...)
 	allErrs = append(allErrs, ValidateNetworkInterfaceSpec(&networkInterface.Spec, &networkInterface.ObjectMeta, field.NewPath("spec"))...)
 
 	return allErrs
