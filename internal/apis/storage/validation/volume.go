@@ -19,7 +19,7 @@ import (
 func ValidateVolume(volume *storage.Volume) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(volume, true, apivalidation.NameIsDNSLabel, field.NewPath("metadata"))...)
+	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(volume, true, apivalidation.NameIsDNSSubdomain, field.NewPath("metadata"))...)
 	allErrs = append(allErrs, validateVolumeSpec(&volume.Spec, field.NewPath("spec"))...)
 
 	return allErrs
