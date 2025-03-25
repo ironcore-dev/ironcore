@@ -6,7 +6,7 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -16,7 +16,7 @@ import (
 type VolumeStatusApplyConfiguration struct {
 	Name                    *string                      `json:"name,omitempty"`
 	Handle                  *string                      `json:"handle,omitempty"`
-	State                   *v1alpha1.VolumeState        `json:"state,omitempty"`
+	State                   *computev1alpha1.VolumeState `json:"state,omitempty"`
 	LastStateTransitionTime *v1.Time                     `json:"lastStateTransitionTime,omitempty"`
 	VolumeRef               *corev1.LocalObjectReference `json:"volumeRef,omitempty"`
 }
@@ -46,7 +46,7 @@ func (b *VolumeStatusApplyConfiguration) WithHandle(value string) *VolumeStatusA
 // WithState sets the State field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the State field is set to the value of the last call.
-func (b *VolumeStatusApplyConfiguration) WithState(value v1alpha1.VolumeState) *VolumeStatusApplyConfiguration {
+func (b *VolumeStatusApplyConfiguration) WithState(value computev1alpha1.VolumeState) *VolumeStatusApplyConfiguration {
 	b.State = &value
 	return b
 }

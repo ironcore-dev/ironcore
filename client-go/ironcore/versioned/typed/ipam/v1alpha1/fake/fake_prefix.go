@@ -6,179 +6,33 @@
 package fake
 
 import (
-	"context"
-	json "encoding/json"
-	"fmt"
-
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/ipam/v1alpha1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	labels "k8s.io/apimachinery/pkg/labels"
-	types "k8s.io/apimachinery/pkg/types"
-	watch "k8s.io/apimachinery/pkg/watch"
-	testing "k8s.io/client-go/testing"
+	typedipamv1alpha1 "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned/typed/ipam/v1alpha1"
+	gentype "k8s.io/client-go/gentype"
 )
 
-// FakePrefixes implements PrefixInterface
-type FakePrefixes struct {
+// fakePrefixes implements PrefixInterface
+type fakePrefixes struct {
+	*gentype.FakeClientWithListAndApply[*v1alpha1.Prefix, *v1alpha1.PrefixList, *ipamv1alpha1.PrefixApplyConfiguration]
 	Fake *FakeIpamV1alpha1
-	ns   string
 }
 
-var prefixesResource = v1alpha1.SchemeGroupVersion.WithResource("prefixes")
-
-var prefixesKind = v1alpha1.SchemeGroupVersion.WithKind("Prefix")
-
-// Get takes name of the prefix, and returns the corresponding prefix object, and an error if there is any.
-func (c *FakePrefixes) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.Prefix, err error) {
-	emptyResult := &v1alpha1.Prefix{}
-	obj, err := c.Fake.
-		Invokes(testing.NewGetActionWithOptions(prefixesResource, c.ns, name, options), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
+func newFakePrefixes(fake *FakeIpamV1alpha1, namespace string) typedipamv1alpha1.PrefixInterface {
+	return &fakePrefixes{
+		gentype.NewFakeClientWithListAndApply[*v1alpha1.Prefix, *v1alpha1.PrefixList, *ipamv1alpha1.PrefixApplyConfiguration](
+			fake.Fake,
+			namespace,
+			v1alpha1.SchemeGroupVersion.WithResource("prefixes"),
+			v1alpha1.SchemeGroupVersion.WithKind("Prefix"),
+			func() *v1alpha1.Prefix { return &v1alpha1.Prefix{} },
+			func() *v1alpha1.PrefixList { return &v1alpha1.PrefixList{} },
+			func(dst, src *v1alpha1.PrefixList) { dst.ListMeta = src.ListMeta },
+			func(list *v1alpha1.PrefixList) []*v1alpha1.Prefix { return gentype.ToPointerSlice(list.Items) },
+			func(list *v1alpha1.PrefixList, items []*v1alpha1.Prefix) {
+				list.Items = gentype.FromPointerSlice(items)
+			},
+		),
+		fake,
 	}
-	return obj.(*v1alpha1.Prefix), err
-}
-
-// List takes label and field selectors, and returns the list of Prefixes that match those selectors.
-func (c *FakePrefixes) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.PrefixList, err error) {
-	emptyResult := &v1alpha1.PrefixList{}
-	obj, err := c.Fake.
-		Invokes(testing.NewListActionWithOptions(prefixesResource, prefixesKind, c.ns, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-
-	label, _, _ := testing.ExtractFromListOptions(opts)
-	if label == nil {
-		label = labels.Everything()
-	}
-	list := &v1alpha1.PrefixList{ListMeta: obj.(*v1alpha1.PrefixList).ListMeta}
-	for _, item := range obj.(*v1alpha1.PrefixList).Items {
-		if label.Matches(labels.Set(item.Labels)) {
-			list.Items = append(list.Items, item)
-		}
-	}
-	return list, err
-}
-
-// Watch returns a watch.Interface that watches the requested prefixes.
-func (c *FakePrefixes) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
-	return c.Fake.
-		InvokesWatch(testing.NewWatchActionWithOptions(prefixesResource, c.ns, opts))
-
-}
-
-// Create takes the representation of a prefix and creates it.  Returns the server's representation of the prefix, and an error, if there is any.
-func (c *FakePrefixes) Create(ctx context.Context, prefix *v1alpha1.Prefix, opts v1.CreateOptions) (result *v1alpha1.Prefix, err error) {
-	emptyResult := &v1alpha1.Prefix{}
-	obj, err := c.Fake.
-		Invokes(testing.NewCreateActionWithOptions(prefixesResource, c.ns, prefix, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.Prefix), err
-}
-
-// Update takes the representation of a prefix and updates it. Returns the server's representation of the prefix, and an error, if there is any.
-func (c *FakePrefixes) Update(ctx context.Context, prefix *v1alpha1.Prefix, opts v1.UpdateOptions) (result *v1alpha1.Prefix, err error) {
-	emptyResult := &v1alpha1.Prefix{}
-	obj, err := c.Fake.
-		Invokes(testing.NewUpdateActionWithOptions(prefixesResource, c.ns, prefix, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.Prefix), err
-}
-
-// UpdateStatus was generated because the type contains a Status member.
-// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakePrefixes) UpdateStatus(ctx context.Context, prefix *v1alpha1.Prefix, opts v1.UpdateOptions) (result *v1alpha1.Prefix, err error) {
-	emptyResult := &v1alpha1.Prefix{}
-	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceActionWithOptions(prefixesResource, "status", c.ns, prefix, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.Prefix), err
-}
-
-// Delete takes name of the prefix and deletes it. Returns an error if one occurs.
-func (c *FakePrefixes) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
-	_, err := c.Fake.
-		Invokes(testing.NewDeleteActionWithOptions(prefixesResource, c.ns, name, opts), &v1alpha1.Prefix{})
-
-	return err
-}
-
-// DeleteCollection deletes a collection of objects.
-func (c *FakePrefixes) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionActionWithOptions(prefixesResource, c.ns, opts, listOpts)
-
-	_, err := c.Fake.Invokes(action, &v1alpha1.PrefixList{})
-	return err
-}
-
-// Patch applies the patch and returns the patched prefix.
-func (c *FakePrefixes) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.Prefix, err error) {
-	emptyResult := &v1alpha1.Prefix{}
-	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceActionWithOptions(prefixesResource, c.ns, name, pt, data, opts, subresources...), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.Prefix), err
-}
-
-// Apply takes the given apply declarative configuration, applies it and returns the applied prefix.
-func (c *FakePrefixes) Apply(ctx context.Context, prefix *ipamv1alpha1.PrefixApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.Prefix, err error) {
-	if prefix == nil {
-		return nil, fmt.Errorf("prefix provided to Apply must not be nil")
-	}
-	data, err := json.Marshal(prefix)
-	if err != nil {
-		return nil, err
-	}
-	name := prefix.Name
-	if name == nil {
-		return nil, fmt.Errorf("prefix.Name must be provided to Apply")
-	}
-	emptyResult := &v1alpha1.Prefix{}
-	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceActionWithOptions(prefixesResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions()), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.Prefix), err
-}
-
-// ApplyStatus was generated because the type contains a Status member.
-// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-func (c *FakePrefixes) ApplyStatus(ctx context.Context, prefix *ipamv1alpha1.PrefixApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.Prefix, err error) {
-	if prefix == nil {
-		return nil, fmt.Errorf("prefix provided to Apply must not be nil")
-	}
-	data, err := json.Marshal(prefix)
-	if err != nil {
-		return nil, err
-	}
-	name := prefix.Name
-	if name == nil {
-		return nil, fmt.Errorf("prefix.Name must be provided to Apply")
-	}
-	emptyResult := &v1alpha1.Prefix{}
-	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceActionWithOptions(prefixesResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions(), "status"), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.Prefix), err
 }

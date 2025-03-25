@@ -9,7 +9,7 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
+	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -17,31 +17,33 @@ import (
 // Public to allow building arbitrary schemes.
 // All generated defaulters are covering - they call all nested defaulters.
 func RegisterDefaults(scheme *runtime.Scheme) error {
-	scheme.AddTypeDefaultingFunc(&v1alpha1.Prefix{}, func(obj interface{}) { SetObjectDefaults_Prefix(obj.(*v1alpha1.Prefix)) })
-	scheme.AddTypeDefaultingFunc(&v1alpha1.PrefixAllocation{}, func(obj interface{}) { SetObjectDefaults_PrefixAllocation(obj.(*v1alpha1.PrefixAllocation)) })
-	scheme.AddTypeDefaultingFunc(&v1alpha1.PrefixAllocationList{}, func(obj interface{}) { SetObjectDefaults_PrefixAllocationList(obj.(*v1alpha1.PrefixAllocationList)) })
-	scheme.AddTypeDefaultingFunc(&v1alpha1.PrefixList{}, func(obj interface{}) { SetObjectDefaults_PrefixList(obj.(*v1alpha1.PrefixList)) })
+	scheme.AddTypeDefaultingFunc(&ipamv1alpha1.Prefix{}, func(obj interface{}) { SetObjectDefaults_Prefix(obj.(*ipamv1alpha1.Prefix)) })
+	scheme.AddTypeDefaultingFunc(&ipamv1alpha1.PrefixAllocation{}, func(obj interface{}) { SetObjectDefaults_PrefixAllocation(obj.(*ipamv1alpha1.PrefixAllocation)) })
+	scheme.AddTypeDefaultingFunc(&ipamv1alpha1.PrefixAllocationList{}, func(obj interface{}) {
+		SetObjectDefaults_PrefixAllocationList(obj.(*ipamv1alpha1.PrefixAllocationList))
+	})
+	scheme.AddTypeDefaultingFunc(&ipamv1alpha1.PrefixList{}, func(obj interface{}) { SetObjectDefaults_PrefixList(obj.(*ipamv1alpha1.PrefixList)) })
 	return nil
 }
 
-func SetObjectDefaults_Prefix(in *v1alpha1.Prefix) {
+func SetObjectDefaults_Prefix(in *ipamv1alpha1.Prefix) {
 	SetDefaults_PrefixSpec(&in.Spec)
 	SetDefaults_PrefixStatus(&in.Status)
 }
 
-func SetObjectDefaults_PrefixAllocation(in *v1alpha1.PrefixAllocation) {
+func SetObjectDefaults_PrefixAllocation(in *ipamv1alpha1.PrefixAllocation) {
 	SetDefaults_PrefixAllocationSpec(&in.Spec)
 	SetDefaults_PrefixAllocationStatus(&in.Status)
 }
 
-func SetObjectDefaults_PrefixAllocationList(in *v1alpha1.PrefixAllocationList) {
+func SetObjectDefaults_PrefixAllocationList(in *ipamv1alpha1.PrefixAllocationList) {
 	for i := range in.Items {
 		a := &in.Items[i]
 		SetObjectDefaults_PrefixAllocation(a)
 	}
 }
 
-func SetObjectDefaults_PrefixList(in *v1alpha1.PrefixList) {
+func SetObjectDefaults_PrefixList(in *ipamv1alpha1.PrefixList) {
 	for i := range in.Items {
 		a := &in.Items[i]
 		SetObjectDefaults_Prefix(a)

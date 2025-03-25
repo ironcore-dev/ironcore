@@ -6,133 +6,35 @@
 package fake
 
 import (
-	"context"
-	json "encoding/json"
-	"fmt"
-
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/storage/v1alpha1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	labels "k8s.io/apimachinery/pkg/labels"
-	types "k8s.io/apimachinery/pkg/types"
-	watch "k8s.io/apimachinery/pkg/watch"
-	testing "k8s.io/client-go/testing"
+	typedstoragev1alpha1 "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned/typed/storage/v1alpha1"
+	gentype "k8s.io/client-go/gentype"
 )
 
-// FakeVolumeClasses implements VolumeClassInterface
-type FakeVolumeClasses struct {
+// fakeVolumeClasses implements VolumeClassInterface
+type fakeVolumeClasses struct {
+	*gentype.FakeClientWithListAndApply[*v1alpha1.VolumeClass, *v1alpha1.VolumeClassList, *storagev1alpha1.VolumeClassApplyConfiguration]
 	Fake *FakeStorageV1alpha1
 }
 
-var volumeclassesResource = v1alpha1.SchemeGroupVersion.WithResource("volumeclasses")
-
-var volumeclassesKind = v1alpha1.SchemeGroupVersion.WithKind("VolumeClass")
-
-// Get takes name of the volumeClass, and returns the corresponding volumeClass object, and an error if there is any.
-func (c *FakeVolumeClasses) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.VolumeClass, err error) {
-	emptyResult := &v1alpha1.VolumeClass{}
-	obj, err := c.Fake.
-		Invokes(testing.NewRootGetActionWithOptions(volumeclassesResource, name, options), emptyResult)
-	if obj == nil {
-		return emptyResult, err
+func newFakeVolumeClasses(fake *FakeStorageV1alpha1) typedstoragev1alpha1.VolumeClassInterface {
+	return &fakeVolumeClasses{
+		gentype.NewFakeClientWithListAndApply[*v1alpha1.VolumeClass, *v1alpha1.VolumeClassList, *storagev1alpha1.VolumeClassApplyConfiguration](
+			fake.Fake,
+			"",
+			v1alpha1.SchemeGroupVersion.WithResource("volumeclasses"),
+			v1alpha1.SchemeGroupVersion.WithKind("VolumeClass"),
+			func() *v1alpha1.VolumeClass { return &v1alpha1.VolumeClass{} },
+			func() *v1alpha1.VolumeClassList { return &v1alpha1.VolumeClassList{} },
+			func(dst, src *v1alpha1.VolumeClassList) { dst.ListMeta = src.ListMeta },
+			func(list *v1alpha1.VolumeClassList) []*v1alpha1.VolumeClass {
+				return gentype.ToPointerSlice(list.Items)
+			},
+			func(list *v1alpha1.VolumeClassList, items []*v1alpha1.VolumeClass) {
+				list.Items = gentype.FromPointerSlice(items)
+			},
+		),
+		fake,
 	}
-	return obj.(*v1alpha1.VolumeClass), err
-}
-
-// List takes label and field selectors, and returns the list of VolumeClasses that match those selectors.
-func (c *FakeVolumeClasses) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.VolumeClassList, err error) {
-	emptyResult := &v1alpha1.VolumeClassList{}
-	obj, err := c.Fake.
-		Invokes(testing.NewRootListActionWithOptions(volumeclassesResource, volumeclassesKind, opts), emptyResult)
-	if obj == nil {
-		return emptyResult, err
-	}
-
-	label, _, _ := testing.ExtractFromListOptions(opts)
-	if label == nil {
-		label = labels.Everything()
-	}
-	list := &v1alpha1.VolumeClassList{ListMeta: obj.(*v1alpha1.VolumeClassList).ListMeta}
-	for _, item := range obj.(*v1alpha1.VolumeClassList).Items {
-		if label.Matches(labels.Set(item.Labels)) {
-			list.Items = append(list.Items, item)
-		}
-	}
-	return list, err
-}
-
-// Watch returns a watch.Interface that watches the requested volumeClasses.
-func (c *FakeVolumeClasses) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
-	return c.Fake.
-		InvokesWatch(testing.NewRootWatchActionWithOptions(volumeclassesResource, opts))
-}
-
-// Create takes the representation of a volumeClass and creates it.  Returns the server's representation of the volumeClass, and an error, if there is any.
-func (c *FakeVolumeClasses) Create(ctx context.Context, volumeClass *v1alpha1.VolumeClass, opts v1.CreateOptions) (result *v1alpha1.VolumeClass, err error) {
-	emptyResult := &v1alpha1.VolumeClass{}
-	obj, err := c.Fake.
-		Invokes(testing.NewRootCreateActionWithOptions(volumeclassesResource, volumeClass, opts), emptyResult)
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.VolumeClass), err
-}
-
-// Update takes the representation of a volumeClass and updates it. Returns the server's representation of the volumeClass, and an error, if there is any.
-func (c *FakeVolumeClasses) Update(ctx context.Context, volumeClass *v1alpha1.VolumeClass, opts v1.UpdateOptions) (result *v1alpha1.VolumeClass, err error) {
-	emptyResult := &v1alpha1.VolumeClass{}
-	obj, err := c.Fake.
-		Invokes(testing.NewRootUpdateActionWithOptions(volumeclassesResource, volumeClass, opts), emptyResult)
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.VolumeClass), err
-}
-
-// Delete takes name of the volumeClass and deletes it. Returns an error if one occurs.
-func (c *FakeVolumeClasses) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
-	_, err := c.Fake.
-		Invokes(testing.NewRootDeleteActionWithOptions(volumeclassesResource, name, opts), &v1alpha1.VolumeClass{})
-	return err
-}
-
-// DeleteCollection deletes a collection of objects.
-func (c *FakeVolumeClasses) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewRootDeleteCollectionActionWithOptions(volumeclassesResource, opts, listOpts)
-
-	_, err := c.Fake.Invokes(action, &v1alpha1.VolumeClassList{})
-	return err
-}
-
-// Patch applies the patch and returns the patched volumeClass.
-func (c *FakeVolumeClasses) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.VolumeClass, err error) {
-	emptyResult := &v1alpha1.VolumeClass{}
-	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceActionWithOptions(volumeclassesResource, name, pt, data, opts, subresources...), emptyResult)
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.VolumeClass), err
-}
-
-// Apply takes the given apply declarative configuration, applies it and returns the applied volumeClass.
-func (c *FakeVolumeClasses) Apply(ctx context.Context, volumeClass *storagev1alpha1.VolumeClassApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.VolumeClass, err error) {
-	if volumeClass == nil {
-		return nil, fmt.Errorf("volumeClass provided to Apply must not be nil")
-	}
-	data, err := json.Marshal(volumeClass)
-	if err != nil {
-		return nil, err
-	}
-	name := volumeClass.Name
-	if name == nil {
-		return nil, fmt.Errorf("volumeClass.Name must be provided to Apply")
-	}
-	emptyResult := &v1alpha1.VolumeClass{}
-	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceActionWithOptions(volumeclassesResource, *name, types.ApplyPatchType, data, opts.ToPatchOptions()), emptyResult)
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.VolumeClass), err
 }

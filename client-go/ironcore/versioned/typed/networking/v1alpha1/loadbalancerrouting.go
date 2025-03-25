@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
-	networkingv1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/networking/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	applyconfigurationsnetworkingv1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/networking/v1alpha1"
 	scheme "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -25,32 +25,35 @@ type LoadBalancerRoutingsGetter interface {
 
 // LoadBalancerRoutingInterface has methods to work with LoadBalancerRouting resources.
 type LoadBalancerRoutingInterface interface {
-	Create(ctx context.Context, loadBalancerRouting *v1alpha1.LoadBalancerRouting, opts v1.CreateOptions) (*v1alpha1.LoadBalancerRouting, error)
-	Update(ctx context.Context, loadBalancerRouting *v1alpha1.LoadBalancerRouting, opts v1.UpdateOptions) (*v1alpha1.LoadBalancerRouting, error)
+	Create(ctx context.Context, loadBalancerRouting *networkingv1alpha1.LoadBalancerRouting, opts v1.CreateOptions) (*networkingv1alpha1.LoadBalancerRouting, error)
+	Update(ctx context.Context, loadBalancerRouting *networkingv1alpha1.LoadBalancerRouting, opts v1.UpdateOptions) (*networkingv1alpha1.LoadBalancerRouting, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
-	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.LoadBalancerRouting, error)
-	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.LoadBalancerRoutingList, error)
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*networkingv1alpha1.LoadBalancerRouting, error)
+	List(ctx context.Context, opts v1.ListOptions) (*networkingv1alpha1.LoadBalancerRoutingList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
-	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.LoadBalancerRouting, err error)
-	Apply(ctx context.Context, loadBalancerRouting *networkingv1alpha1.LoadBalancerRoutingApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.LoadBalancerRouting, err error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *networkingv1alpha1.LoadBalancerRouting, err error)
+	Apply(ctx context.Context, loadBalancerRouting *applyconfigurationsnetworkingv1alpha1.LoadBalancerRoutingApplyConfiguration, opts v1.ApplyOptions) (result *networkingv1alpha1.LoadBalancerRouting, err error)
 	LoadBalancerRoutingExpansion
 }
 
 // loadBalancerRoutings implements LoadBalancerRoutingInterface
 type loadBalancerRoutings struct {
-	*gentype.ClientWithListAndApply[*v1alpha1.LoadBalancerRouting, *v1alpha1.LoadBalancerRoutingList, *networkingv1alpha1.LoadBalancerRoutingApplyConfiguration]
+	*gentype.ClientWithListAndApply[*networkingv1alpha1.LoadBalancerRouting, *networkingv1alpha1.LoadBalancerRoutingList, *applyconfigurationsnetworkingv1alpha1.LoadBalancerRoutingApplyConfiguration]
 }
 
 // newLoadBalancerRoutings returns a LoadBalancerRoutings
 func newLoadBalancerRoutings(c *NetworkingV1alpha1Client, namespace string) *loadBalancerRoutings {
 	return &loadBalancerRoutings{
-		gentype.NewClientWithListAndApply[*v1alpha1.LoadBalancerRouting, *v1alpha1.LoadBalancerRoutingList, *networkingv1alpha1.LoadBalancerRoutingApplyConfiguration](
+		gentype.NewClientWithListAndApply[*networkingv1alpha1.LoadBalancerRouting, *networkingv1alpha1.LoadBalancerRoutingList, *applyconfigurationsnetworkingv1alpha1.LoadBalancerRoutingApplyConfiguration](
 			"loadbalancerroutings",
 			c.RESTClient(),
 			scheme.ParameterCodec,
 			namespace,
-			func() *v1alpha1.LoadBalancerRouting { return &v1alpha1.LoadBalancerRouting{} },
-			func() *v1alpha1.LoadBalancerRoutingList { return &v1alpha1.LoadBalancerRoutingList{} }),
+			func() *networkingv1alpha1.LoadBalancerRouting { return &networkingv1alpha1.LoadBalancerRouting{} },
+			func() *networkingv1alpha1.LoadBalancerRoutingList {
+				return &networkingv1alpha1.LoadBalancerRoutingList{}
+			},
+		),
 	}
 }

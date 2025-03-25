@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/client-go/listers"
-	"k8s.io/client-go/tools/cache"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	labels "k8s.io/apimachinery/pkg/labels"
+	listers "k8s.io/client-go/listers"
+	cache "k8s.io/client-go/tools/cache"
 )
 
 // VolumeLister helps list Volumes.
@@ -17,7 +17,7 @@ import (
 type VolumeLister interface {
 	// List lists all Volumes in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.Volume, err error)
+	List(selector labels.Selector) (ret []*storagev1alpha1.Volume, err error)
 	// Volumes returns an object that can list and get Volumes.
 	Volumes(namespace string) VolumeNamespaceLister
 	VolumeListerExpansion
@@ -25,17 +25,17 @@ type VolumeLister interface {
 
 // volumeLister implements the VolumeLister interface.
 type volumeLister struct {
-	listers.ResourceIndexer[*v1alpha1.Volume]
+	listers.ResourceIndexer[*storagev1alpha1.Volume]
 }
 
 // NewVolumeLister returns a new VolumeLister.
 func NewVolumeLister(indexer cache.Indexer) VolumeLister {
-	return &volumeLister{listers.New[*v1alpha1.Volume](indexer, v1alpha1.Resource("volume"))}
+	return &volumeLister{listers.New[*storagev1alpha1.Volume](indexer, storagev1alpha1.Resource("volume"))}
 }
 
 // Volumes returns an object that can list and get Volumes.
 func (s *volumeLister) Volumes(namespace string) VolumeNamespaceLister {
-	return volumeNamespaceLister{listers.NewNamespaced[*v1alpha1.Volume](s.ResourceIndexer, namespace)}
+	return volumeNamespaceLister{listers.NewNamespaced[*storagev1alpha1.Volume](s.ResourceIndexer, namespace)}
 }
 
 // VolumeNamespaceLister helps list and get Volumes.
@@ -43,15 +43,15 @@ func (s *volumeLister) Volumes(namespace string) VolumeNamespaceLister {
 type VolumeNamespaceLister interface {
 	// List lists all Volumes in the indexer for a given namespace.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.Volume, err error)
+	List(selector labels.Selector) (ret []*storagev1alpha1.Volume, err error)
 	// Get retrieves the Volume from the indexer for a given namespace and name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.Volume, error)
+	Get(name string) (*storagev1alpha1.Volume, error)
 	VolumeNamespaceListerExpansion
 }
 
 // volumeNamespaceLister implements the VolumeNamespaceLister
 // interface.
 type volumeNamespaceLister struct {
-	listers.ResourceIndexer[*v1alpha1.Volume]
+	listers.ResourceIndexer[*storagev1alpha1.Volume]
 }

@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
-	ipamv1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/ipam/v1alpha1"
+	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
+	applyconfigurationsipamv1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/ipam/v1alpha1"
 	scheme "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -25,36 +25,37 @@ type PrefixesGetter interface {
 
 // PrefixInterface has methods to work with Prefix resources.
 type PrefixInterface interface {
-	Create(ctx context.Context, prefix *v1alpha1.Prefix, opts v1.CreateOptions) (*v1alpha1.Prefix, error)
-	Update(ctx context.Context, prefix *v1alpha1.Prefix, opts v1.UpdateOptions) (*v1alpha1.Prefix, error)
+	Create(ctx context.Context, prefix *ipamv1alpha1.Prefix, opts v1.CreateOptions) (*ipamv1alpha1.Prefix, error)
+	Update(ctx context.Context, prefix *ipamv1alpha1.Prefix, opts v1.UpdateOptions) (*ipamv1alpha1.Prefix, error)
 	// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-	UpdateStatus(ctx context.Context, prefix *v1alpha1.Prefix, opts v1.UpdateOptions) (*v1alpha1.Prefix, error)
+	UpdateStatus(ctx context.Context, prefix *ipamv1alpha1.Prefix, opts v1.UpdateOptions) (*ipamv1alpha1.Prefix, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
-	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.Prefix, error)
-	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.PrefixList, error)
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*ipamv1alpha1.Prefix, error)
+	List(ctx context.Context, opts v1.ListOptions) (*ipamv1alpha1.PrefixList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
-	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.Prefix, err error)
-	Apply(ctx context.Context, prefix *ipamv1alpha1.PrefixApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.Prefix, err error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *ipamv1alpha1.Prefix, err error)
+	Apply(ctx context.Context, prefix *applyconfigurationsipamv1alpha1.PrefixApplyConfiguration, opts v1.ApplyOptions) (result *ipamv1alpha1.Prefix, err error)
 	// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-	ApplyStatus(ctx context.Context, prefix *ipamv1alpha1.PrefixApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.Prefix, err error)
+	ApplyStatus(ctx context.Context, prefix *applyconfigurationsipamv1alpha1.PrefixApplyConfiguration, opts v1.ApplyOptions) (result *ipamv1alpha1.Prefix, err error)
 	PrefixExpansion
 }
 
 // prefixes implements PrefixInterface
 type prefixes struct {
-	*gentype.ClientWithListAndApply[*v1alpha1.Prefix, *v1alpha1.PrefixList, *ipamv1alpha1.PrefixApplyConfiguration]
+	*gentype.ClientWithListAndApply[*ipamv1alpha1.Prefix, *ipamv1alpha1.PrefixList, *applyconfigurationsipamv1alpha1.PrefixApplyConfiguration]
 }
 
 // newPrefixes returns a Prefixes
 func newPrefixes(c *IpamV1alpha1Client, namespace string) *prefixes {
 	return &prefixes{
-		gentype.NewClientWithListAndApply[*v1alpha1.Prefix, *v1alpha1.PrefixList, *ipamv1alpha1.PrefixApplyConfiguration](
+		gentype.NewClientWithListAndApply[*ipamv1alpha1.Prefix, *ipamv1alpha1.PrefixList, *applyconfigurationsipamv1alpha1.PrefixApplyConfiguration](
 			"prefixes",
 			c.RESTClient(),
 			scheme.ParameterCodec,
 			namespace,
-			func() *v1alpha1.Prefix { return &v1alpha1.Prefix{} },
-			func() *v1alpha1.PrefixList { return &v1alpha1.PrefixList{} }),
+			func() *ipamv1alpha1.Prefix { return &ipamv1alpha1.Prefix{} },
+			func() *ipamv1alpha1.PrefixList { return &ipamv1alpha1.PrefixList{} },
+		),
 	}
 }

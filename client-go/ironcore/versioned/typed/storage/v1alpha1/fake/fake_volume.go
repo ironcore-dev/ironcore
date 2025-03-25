@@ -6,179 +6,33 @@
 package fake
 
 import (
-	"context"
-	json "encoding/json"
-	"fmt"
-
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/storage/v1alpha1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	labels "k8s.io/apimachinery/pkg/labels"
-	types "k8s.io/apimachinery/pkg/types"
-	watch "k8s.io/apimachinery/pkg/watch"
-	testing "k8s.io/client-go/testing"
+	typedstoragev1alpha1 "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned/typed/storage/v1alpha1"
+	gentype "k8s.io/client-go/gentype"
 )
 
-// FakeVolumes implements VolumeInterface
-type FakeVolumes struct {
+// fakeVolumes implements VolumeInterface
+type fakeVolumes struct {
+	*gentype.FakeClientWithListAndApply[*v1alpha1.Volume, *v1alpha1.VolumeList, *storagev1alpha1.VolumeApplyConfiguration]
 	Fake *FakeStorageV1alpha1
-	ns   string
 }
 
-var volumesResource = v1alpha1.SchemeGroupVersion.WithResource("volumes")
-
-var volumesKind = v1alpha1.SchemeGroupVersion.WithKind("Volume")
-
-// Get takes name of the volume, and returns the corresponding volume object, and an error if there is any.
-func (c *FakeVolumes) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.Volume, err error) {
-	emptyResult := &v1alpha1.Volume{}
-	obj, err := c.Fake.
-		Invokes(testing.NewGetActionWithOptions(volumesResource, c.ns, name, options), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
+func newFakeVolumes(fake *FakeStorageV1alpha1, namespace string) typedstoragev1alpha1.VolumeInterface {
+	return &fakeVolumes{
+		gentype.NewFakeClientWithListAndApply[*v1alpha1.Volume, *v1alpha1.VolumeList, *storagev1alpha1.VolumeApplyConfiguration](
+			fake.Fake,
+			namespace,
+			v1alpha1.SchemeGroupVersion.WithResource("volumes"),
+			v1alpha1.SchemeGroupVersion.WithKind("Volume"),
+			func() *v1alpha1.Volume { return &v1alpha1.Volume{} },
+			func() *v1alpha1.VolumeList { return &v1alpha1.VolumeList{} },
+			func(dst, src *v1alpha1.VolumeList) { dst.ListMeta = src.ListMeta },
+			func(list *v1alpha1.VolumeList) []*v1alpha1.Volume { return gentype.ToPointerSlice(list.Items) },
+			func(list *v1alpha1.VolumeList, items []*v1alpha1.Volume) {
+				list.Items = gentype.FromPointerSlice(items)
+			},
+		),
+		fake,
 	}
-	return obj.(*v1alpha1.Volume), err
-}
-
-// List takes label and field selectors, and returns the list of Volumes that match those selectors.
-func (c *FakeVolumes) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.VolumeList, err error) {
-	emptyResult := &v1alpha1.VolumeList{}
-	obj, err := c.Fake.
-		Invokes(testing.NewListActionWithOptions(volumesResource, volumesKind, c.ns, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-
-	label, _, _ := testing.ExtractFromListOptions(opts)
-	if label == nil {
-		label = labels.Everything()
-	}
-	list := &v1alpha1.VolumeList{ListMeta: obj.(*v1alpha1.VolumeList).ListMeta}
-	for _, item := range obj.(*v1alpha1.VolumeList).Items {
-		if label.Matches(labels.Set(item.Labels)) {
-			list.Items = append(list.Items, item)
-		}
-	}
-	return list, err
-}
-
-// Watch returns a watch.Interface that watches the requested volumes.
-func (c *FakeVolumes) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
-	return c.Fake.
-		InvokesWatch(testing.NewWatchActionWithOptions(volumesResource, c.ns, opts))
-
-}
-
-// Create takes the representation of a volume and creates it.  Returns the server's representation of the volume, and an error, if there is any.
-func (c *FakeVolumes) Create(ctx context.Context, volume *v1alpha1.Volume, opts v1.CreateOptions) (result *v1alpha1.Volume, err error) {
-	emptyResult := &v1alpha1.Volume{}
-	obj, err := c.Fake.
-		Invokes(testing.NewCreateActionWithOptions(volumesResource, c.ns, volume, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.Volume), err
-}
-
-// Update takes the representation of a volume and updates it. Returns the server's representation of the volume, and an error, if there is any.
-func (c *FakeVolumes) Update(ctx context.Context, volume *v1alpha1.Volume, opts v1.UpdateOptions) (result *v1alpha1.Volume, err error) {
-	emptyResult := &v1alpha1.Volume{}
-	obj, err := c.Fake.
-		Invokes(testing.NewUpdateActionWithOptions(volumesResource, c.ns, volume, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.Volume), err
-}
-
-// UpdateStatus was generated because the type contains a Status member.
-// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeVolumes) UpdateStatus(ctx context.Context, volume *v1alpha1.Volume, opts v1.UpdateOptions) (result *v1alpha1.Volume, err error) {
-	emptyResult := &v1alpha1.Volume{}
-	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceActionWithOptions(volumesResource, "status", c.ns, volume, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.Volume), err
-}
-
-// Delete takes name of the volume and deletes it. Returns an error if one occurs.
-func (c *FakeVolumes) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
-	_, err := c.Fake.
-		Invokes(testing.NewDeleteActionWithOptions(volumesResource, c.ns, name, opts), &v1alpha1.Volume{})
-
-	return err
-}
-
-// DeleteCollection deletes a collection of objects.
-func (c *FakeVolumes) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionActionWithOptions(volumesResource, c.ns, opts, listOpts)
-
-	_, err := c.Fake.Invokes(action, &v1alpha1.VolumeList{})
-	return err
-}
-
-// Patch applies the patch and returns the patched volume.
-func (c *FakeVolumes) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.Volume, err error) {
-	emptyResult := &v1alpha1.Volume{}
-	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceActionWithOptions(volumesResource, c.ns, name, pt, data, opts, subresources...), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.Volume), err
-}
-
-// Apply takes the given apply declarative configuration, applies it and returns the applied volume.
-func (c *FakeVolumes) Apply(ctx context.Context, volume *storagev1alpha1.VolumeApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.Volume, err error) {
-	if volume == nil {
-		return nil, fmt.Errorf("volume provided to Apply must not be nil")
-	}
-	data, err := json.Marshal(volume)
-	if err != nil {
-		return nil, err
-	}
-	name := volume.Name
-	if name == nil {
-		return nil, fmt.Errorf("volume.Name must be provided to Apply")
-	}
-	emptyResult := &v1alpha1.Volume{}
-	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceActionWithOptions(volumesResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions()), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.Volume), err
-}
-
-// ApplyStatus was generated because the type contains a Status member.
-// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-func (c *FakeVolumes) ApplyStatus(ctx context.Context, volume *storagev1alpha1.VolumeApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.Volume, err error) {
-	if volume == nil {
-		return nil, fmt.Errorf("volume provided to Apply must not be nil")
-	}
-	data, err := json.Marshal(volume)
-	if err != nil {
-		return nil, err
-	}
-	name := volume.Name
-	if name == nil {
-		return nil, fmt.Errorf("volume.Name must be provided to Apply")
-	}
-	emptyResult := &v1alpha1.Volume{}
-	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceActionWithOptions(volumesResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions(), "status"), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.Volume), err
 }

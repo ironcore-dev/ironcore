@@ -7,14 +7,14 @@ package v1alpha1
 
 import (
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 )
 
 // VirtualIPSpecApplyConfiguration represents a declarative configuration of the VirtualIPSpec type for use
 // with apply.
 type VirtualIPSpecApplyConfiguration struct {
-	Type      *v1alpha1.VirtualIPType           `json:"type,omitempty"`
+	Type      *networkingv1alpha1.VirtualIPType `json:"type,omitempty"`
 	IPFamily  *v1.IPFamily                      `json:"ipFamily,omitempty"`
 	TargetRef *commonv1alpha1.LocalUIDReference `json:"targetRef,omitempty"`
 }
@@ -28,7 +28,7 @@ func VirtualIPSpec() *VirtualIPSpecApplyConfiguration {
 // WithType sets the Type field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Type field is set to the value of the last call.
-func (b *VirtualIPSpecApplyConfiguration) WithType(value v1alpha1.VirtualIPType) *VirtualIPSpecApplyConfiguration {
+func (b *VirtualIPSpecApplyConfiguration) WithType(value networkingv1alpha1.VirtualIPType) *VirtualIPSpecApplyConfiguration {
 	b.Type = &value
 	return b
 }
