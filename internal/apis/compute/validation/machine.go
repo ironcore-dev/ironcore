@@ -116,7 +116,7 @@ func validateMachineSpec(machineSpec *compute.MachineSpec, fldPath *field.Path) 
 func validateNetworkInterface(networkInterface *compute.NetworkInterface, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	for _, msg := range apivalidation.NameIsDNSLabel(networkInterface.Name, false) {
+	for _, msg := range apivalidation.NameIsDNSSubdomain(networkInterface.Name, false) {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), networkInterface.Name, msg))
 	}
 
@@ -130,7 +130,7 @@ func validateNetworkInterfaceSource(source *compute.NetworkInterfaceSource, fldP
 	var numDefs int
 	if source.NetworkInterfaceRef != nil {
 		numDefs++
-		for _, msg := range apivalidation.NameIsDNSLabel(source.NetworkInterfaceRef.Name, false) {
+		for _, msg := range apivalidation.NameIsDNSSubdomain(source.NetworkInterfaceRef.Name, false) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("networkInterfaceRef").Child("name"), source.NetworkInterfaceRef.Name, msg))
 		}
 	}
@@ -175,7 +175,7 @@ func validateNetworkInterfaceTemplateSpecForMachine(template *networking.Network
 func validateVolume(volume *compute.Volume, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	for _, msg := range apivalidation.NameIsDNSLabel(volume.Name, false) {
+	for _, msg := range apivalidation.NameIsDNSSubdomain(volume.Name, false) {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), volume.Name, msg))
 	}
 
@@ -194,7 +194,7 @@ func validateVolumeSource(source *compute.VolumeSource, fldPath *field.Path) fie
 	var numDefs int
 	if source.VolumeRef != nil {
 		numDefs++
-		for _, msg := range apivalidation.NameIsDNSLabel(source.VolumeRef.Name, false) {
+		for _, msg := range apivalidation.NameIsDNSSubdomain(source.VolumeRef.Name, false) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("volumeRef").Child("name"), source.VolumeRef.Name, msg))
 		}
 	}
