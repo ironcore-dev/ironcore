@@ -227,7 +227,7 @@ var prefixAllocationPhaseValue = map[ipamv1alpha1.PrefixAllocationPhase]int{
 // and then, if both phases are the same, prefers the older object.
 func (r *PrefixReconciler) prefixAllocationLess(allocation, other *ipamv1alpha1.PrefixAllocation) bool {
 	return prefixAllocationPhaseValue[allocation.Status.Phase] < prefixAllocationPhaseValue[other.Status.Phase] ||
-		allocation.GetCreationTimestamp().Time.After(other.GetCreationTimestamp().Time)
+		allocation.GetCreationTimestamp().After(other.GetCreationTimestamp().Time)
 }
 
 func (r *PrefixReconciler) newAllocationForPrefix(prefix *ipamv1alpha1.Prefix) (*ipamv1alpha1.PrefixAllocation, error) {
@@ -305,12 +305,12 @@ func (r *PrefixReconciler) allocateSubPrefix(ctx context.Context, log logr.Logge
 	}
 
 	allocationPhase := r.adjustedAllocationPhase(active)
-	switch {
-	case allocationPhase == ipamv1alpha1.PrefixAllocationPhaseAllocated:
+	switch allocationPhase {
+	case ipamv1alpha1.PrefixAllocationPhaseAllocated:
 		log.V(1).Info("Allocation is allocated")
 		r.forgetAllocationBackoffFor(client.ObjectKeyFromObject(prefix))
 		return active, 0, nil
-	case allocationPhase == ipamv1alpha1.PrefixAllocationPhaseFailed:
+	case ipamv1alpha1.PrefixAllocationPhaseFailed:
 		log.V(1).Info("Allocation is failed")
 		retry, err := r.canRetryAllocation(ctx, prefix, active)
 		if err != nil || !retry {

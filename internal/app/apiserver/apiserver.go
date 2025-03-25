@@ -248,8 +248,8 @@ func (o *IronCoreAPIServerOptions) Run(ctx context.Context) error {
 	}
 
 	server.GenericAPIServer.AddPostStartHookOrDie("start-ironcore-api-server-informers", func(hookContext genericapiserver.PostStartHookContext) error {
-		config.GenericConfig.SharedInformerFactory.Start(hookContext.Context.Done())
-		o.SharedInformerFactory.Start(hookContext.Context.Done())
+		config.GenericConfig.SharedInformerFactory.Start(hookContext.Done())
+		o.SharedInformerFactory.Start(hookContext.Done())
 		return nil
 	})
 
