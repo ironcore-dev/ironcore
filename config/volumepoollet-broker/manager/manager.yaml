@@ -30,6 +30,7 @@ spec:
         - command:
             - /volumepoollet
           args:
+            - --health-probe-bind-address=:8081
             - --leader-elect
           image: volumepoollet:latest
           name: manager
