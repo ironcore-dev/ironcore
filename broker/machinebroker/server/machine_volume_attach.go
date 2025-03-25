@@ -139,7 +139,7 @@ func (s *Server) createIronCoreVolume(
 		if encryptionSecret != nil {
 			log.V(1).Info("Patching owner ref of ironcore encryption secret")
 			baseEncryptionSecret := encryptionSecret.DeepCopy()
-			encryptionSecret.ObjectMeta.OwnerReferences = []metav1.OwnerReference{
+			encryptionSecret.OwnerReferences = []metav1.OwnerReference{
 				metautils.MakeControllerRef(
 					storagev1alpha1.SchemeGroupVersion.WithKind("Volume"),
 					ironcoreVolume,

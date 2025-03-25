@@ -149,7 +149,7 @@ func (i IP) ToUnstructured() interface{} {
 	if i.IsZero() {
 		return nil
 	}
-	return i.Addr.String()
+	return i.String()
 }
 
 func (i *IP) IsValid() bool {
@@ -171,9 +171,9 @@ func (i IP) Family() corev1.IPFamily {
 	}
 }
 
-func (_ IP) OpenAPISchemaType() []string { return []string{"string"} }
+func (i IP) OpenAPISchemaType() []string { return []string{"string"} }
 
-func (_ IP) OpenAPISchemaFormat() string { return "ip" }
+func (i IP) OpenAPISchemaFormat() string { return "ip" }
 
 func NewIP(ip netip.Addr) IP {
 	return IP{ip}
@@ -325,7 +325,7 @@ func (i IPPrefix) GomegaString() string {
 }
 
 func (i IPPrefix) IP() IP {
-	return IP{i.Prefix.Addr()}
+	return IP{i.Addr()}
 }
 
 func (i *IPPrefix) UnmarshalJSON(b []byte) error {
@@ -380,9 +380,9 @@ func (in *IPPrefix) IsZero() bool {
 	return in == nil || !in.Prefix.IsValid()
 }
 
-func (_ IPPrefix) OpenAPISchemaType() []string { return []string{"string"} }
+func (in IPPrefix) OpenAPISchemaType() []string { return []string{"string"} }
 
-func (_ IPPrefix) OpenAPISchemaFormat() string { return "ip-prefix" }
+func (in IPPrefix) OpenAPISchemaFormat() string { return "ip-prefix" }
 
 func NewIPPrefix(prefix netip.Prefix) *IPPrefix {
 	return &IPPrefix{Prefix: prefix}
