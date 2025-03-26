@@ -136,49 +136,6 @@ Kubernetes API which you can access via the `k8sClient` to create or modify your
 More information on the envtest setup you can find in the CRD testing section
 here: [Kubebuilder](https://book.kubebuilder.io/reference/envtest.html)
 
-## Webhook Tests
-
-Webhook tests are located under `pkg/webhooks/{Type}`. The `suite_test` for Webhooks is slighly different than the
-controller suite.
-
-```go
-// Register admission types
-err = admissionv1beta1.AddToScheme(scheme)
-...
-// Start webhook server using Manager
-webhookInstallOptions := &testEnv.WebhookInstallOptions
-mgr, err := manager.NewManager(cfg, ctrl.Options{
-Scheme:             scheme,
-Host:               webhookInstallOptions.LocalServingHost,
-Port:               webhookInstallOptions.LocalServingPort,
-CertDir:            webhookInstallOptions.LocalServingCertDir,
-LeaderElection:     false,
-MetricsBindAddress: "0",
-})
-...
-// Setup webhook with manager
-err = (&FooWebhook{}).SetupWebhookWithManager(mgr)
-...
-// Wait for the webhook server to get ready
-dialer := &net.Dialer{Timeout: time.Second}
-addrPort := fmt.Sprintf("%s:%d", webhookInstallOptions.LocalServingHost,
-webhookInstallOptions.LocalServingPort)
-Eventually(func () error {
-conn, err := tls.DialWithDialer(dialer, "tcp", addrPort,
-&tls.Config{InsecureSkipVerify: true})
-if err != nil {
-return err
-}
-conn.Close()
-return nil
-}).Should(Succeed())
-```
-
-Test cases are written in a similar fashion as tests for controllers.
-
-!!! note MutatingWebhooks (`Defaulter`) can not change `Status` fields. Keep this in mind if you write your Webhook
-tests.
-
 ## Running Tests
 
 Test run can be executed via:

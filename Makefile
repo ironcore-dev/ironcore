@@ -54,9 +54,9 @@ help: ## Display this help.
 
 .PHONY: manifests
 FILE="config/machinepoollet-broker/broker-rbac/role.yaml"
-manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
+manifests: controller-gen ## Generate ClusterRole and CustomResourceDefinition objects.
 	# ironcore-controller-manager
-	$(CONTROLLER_GEN) rbac:roleName=manager-role webhook paths="./internal/controllers/...;./api/..." output:rbac:artifacts:config=config/controller/rbac
+	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./internal/controllers/...;./api/..." output:rbac:artifacts:config=config/controller/rbac
 
 	# machinepoollet-broker
 	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./poollet/machinepoollet/controllers/..." output:rbac:artifacts:config=config/machinepoollet-broker/poollet-rbac
