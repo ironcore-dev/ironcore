@@ -10,7 +10,6 @@ import (
 	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	bucketpoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/bucketpoollet/api/v1alpha1"
-
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
@@ -35,7 +34,6 @@ var _ = Describe("CreateBucket", func() {
 				},
 			},
 		})
-
 		Expect(err).NotTo(HaveOccurred())
 		Expect(res).NotTo(BeNil())
 
