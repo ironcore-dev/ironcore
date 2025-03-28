@@ -48,7 +48,10 @@ func (m *bucketEvaluator) MatchesResourceName(name corev1alpha1.ResourceName) bo
 }
 
 func (m *bucketEvaluator) MatchesResourceScopeSelectorRequirement(item client.Object, req corev1alpha1.ResourceScopeSelectorRequirement) (bool, error) {
-	bucket := item.(*storagev1alpha1.Bucket)
+	bucket, err := toExternalBucketOrError(item)
+	if err != nil {
+		return false, err
+	}
 
 	switch req.ScopeName {
 	case corev1alpha1.ResourceScopeBucketClass:

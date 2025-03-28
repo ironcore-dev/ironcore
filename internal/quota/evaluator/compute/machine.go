@@ -50,7 +50,10 @@ func (m *machineEvaluator) MatchesResourceName(name corev1alpha1.ResourceName) b
 }
 
 func (m *machineEvaluator) MatchesResourceScopeSelectorRequirement(item client.Object, req corev1alpha1.ResourceScopeSelectorRequirement) (bool, error) {
-	machine := item.(*computev1alpha1.Machine)
+	machine, err := toExternalMachineOrError(item)
+	if err != nil {
+		return false, err
+	}
 
 	switch req.ScopeName {
 	case corev1alpha1.ResourceScopeMachineClass:
