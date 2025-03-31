@@ -6,13 +6,13 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 )
 
 // LoadBalancerStatusApplyConfiguration represents a declarative configuration of the LoadBalancerStatus type for use
 // with apply.
 type LoadBalancerStatusApplyConfiguration struct {
-	IPs []v1alpha1.IP `json:"ips,omitempty"`
+	IPs []commonv1alpha1.IP `json:"ips,omitempty"`
 }
 
 // LoadBalancerStatusApplyConfiguration constructs a declarative configuration of the LoadBalancerStatus type for use with
@@ -24,7 +24,7 @@ func LoadBalancerStatus() *LoadBalancerStatusApplyConfiguration {
 // WithIPs adds the given value to the IPs field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the IPs field.
-func (b *LoadBalancerStatusApplyConfiguration) WithIPs(values ...v1alpha1.IP) *LoadBalancerStatusApplyConfiguration {
+func (b *LoadBalancerStatusApplyConfiguration) WithIPs(values ...commonv1alpha1.IP) *LoadBalancerStatusApplyConfiguration {
 	for i := range values {
 		b.IPs = append(b.IPs, values[i])
 	}

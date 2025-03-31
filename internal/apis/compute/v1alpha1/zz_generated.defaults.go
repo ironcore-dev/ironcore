@@ -9,7 +9,7 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/internal/apis/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/internal/apis/networking/v1alpha1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
@@ -19,12 +19,12 @@ import (
 // Public to allow building arbitrary schemes.
 // All generated defaulters are covering - they call all nested defaulters.
 func RegisterDefaults(scheme *runtime.Scheme) error {
-	scheme.AddTypeDefaultingFunc(&v1alpha1.Machine{}, func(obj interface{}) { SetObjectDefaults_Machine(obj.(*v1alpha1.Machine)) })
-	scheme.AddTypeDefaultingFunc(&v1alpha1.MachineList{}, func(obj interface{}) { SetObjectDefaults_MachineList(obj.(*v1alpha1.MachineList)) })
+	scheme.AddTypeDefaultingFunc(&computev1alpha1.Machine{}, func(obj interface{}) { SetObjectDefaults_Machine(obj.(*computev1alpha1.Machine)) })
+	scheme.AddTypeDefaultingFunc(&computev1alpha1.MachineList{}, func(obj interface{}) { SetObjectDefaults_MachineList(obj.(*computev1alpha1.MachineList)) })
 	return nil
 }
 
-func SetObjectDefaults_Machine(in *v1alpha1.Machine) {
+func SetObjectDefaults_Machine(in *computev1alpha1.Machine) {
 	SetDefaults_MachineSpec(&in.Spec)
 	for i := range in.Spec.NetworkInterfaces {
 		a := &in.Spec.NetworkInterfaces[i]
@@ -61,7 +61,7 @@ func SetObjectDefaults_Machine(in *v1alpha1.Machine) {
 	}
 }
 
-func SetObjectDefaults_MachineList(in *v1alpha1.MachineList) {
+func SetObjectDefaults_MachineList(in *computev1alpha1.MachineList) {
 	for i := range in.Items {
 		a := &in.Items[i]
 		SetObjectDefaults_Machine(a)

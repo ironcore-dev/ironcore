@@ -6,14 +6,14 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 )
 
 // MachinePoolSpecApplyConfiguration represents a declarative configuration of the MachinePoolSpec type for use
 // with apply.
 type MachinePoolSpecApplyConfiguration struct {
-	ProviderID *string          `json:"providerID,omitempty"`
-	Taints     []v1alpha1.Taint `json:"taints,omitempty"`
+	ProviderID *string                `json:"providerID,omitempty"`
+	Taints     []commonv1alpha1.Taint `json:"taints,omitempty"`
 }
 
 // MachinePoolSpecApplyConfiguration constructs a declarative configuration of the MachinePoolSpec type for use with
@@ -33,7 +33,7 @@ func (b *MachinePoolSpecApplyConfiguration) WithProviderID(value string) *Machin
 // WithTaints adds the given value to the Taints field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the Taints field.
-func (b *MachinePoolSpecApplyConfiguration) WithTaints(values ...v1alpha1.Taint) *MachinePoolSpecApplyConfiguration {
+func (b *MachinePoolSpecApplyConfiguration) WithTaints(values ...commonv1alpha1.Taint) *MachinePoolSpecApplyConfiguration {
 	for i := range values {
 		b.Taints = append(b.Taints, values[i])
 	}

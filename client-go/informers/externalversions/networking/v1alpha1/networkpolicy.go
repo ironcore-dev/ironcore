@@ -6,13 +6,13 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
-	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	apinetworkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	internalinterfaces "github.com/ironcore-dev/ironcore/client-go/informers/externalversions/internalinterfaces"
 	versioned "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned"
-	v1alpha1 "github.com/ironcore-dev/ironcore/client-go/listers/networking/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/client-go/listers/networking/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
@@ -23,7 +23,7 @@ import (
 // NetworkPolicies.
 type NetworkPolicyInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.NetworkPolicyLister
+	Lister() networkingv1alpha1.NetworkPolicyLister
 }
 
 type networkPolicyInformer struct {
@@ -58,7 +58,7 @@ func NewFilteredNetworkPolicyInformer(client versioned.Interface, namespace stri
 				return client.NetworkingV1alpha1().NetworkPolicies(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&networkingv1alpha1.NetworkPolicy{},
+		&apinetworkingv1alpha1.NetworkPolicy{},
 		resyncPeriod,
 		indexers,
 	)
@@ -69,9 +69,9 @@ func (f *networkPolicyInformer) defaultInformer(client versioned.Interface, resy
 }
 
 func (f *networkPolicyInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&networkingv1alpha1.NetworkPolicy{}, f.defaultInformer)
+	return f.factory.InformerFor(&apinetworkingv1alpha1.NetworkPolicy{}, f.defaultInformer)
 }
 
-func (f *networkPolicyInformer) Lister() v1alpha1.NetworkPolicyLister {
-	return v1alpha1.NewNetworkPolicyLister(f.Informer().GetIndexer())
+func (f *networkPolicyInformer) Lister() networkingv1alpha1.NetworkPolicyLister {
+	return networkingv1alpha1.NewNetworkPolicyLister(f.Informer().GetIndexer())
 }

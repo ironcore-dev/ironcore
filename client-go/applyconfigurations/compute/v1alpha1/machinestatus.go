@@ -6,7 +6,7 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 )
 
 // MachineStatusApplyConfiguration represents a declarative configuration of the MachineStatus type for use
@@ -14,7 +14,7 @@ import (
 type MachineStatusApplyConfiguration struct {
 	MachineID          *string                                    `json:"machineID,omitempty"`
 	ObservedGeneration *int64                                     `json:"observedGeneration,omitempty"`
-	State              *v1alpha1.MachineState                     `json:"state,omitempty"`
+	State              *computev1alpha1.MachineState              `json:"state,omitempty"`
 	NetworkInterfaces  []NetworkInterfaceStatusApplyConfiguration `json:"networkInterfaces,omitempty"`
 	Volumes            []VolumeStatusApplyConfiguration           `json:"volumes,omitempty"`
 }
@@ -44,7 +44,7 @@ func (b *MachineStatusApplyConfiguration) WithObservedGeneration(value int64) *M
 // WithState sets the State field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the State field is set to the value of the last call.
-func (b *MachineStatusApplyConfiguration) WithState(value v1alpha1.MachineState) *MachineStatusApplyConfiguration {
+func (b *MachineStatusApplyConfiguration) WithState(value computev1alpha1.MachineState) *MachineStatusApplyConfiguration {
 	b.State = &value
 	return b
 }

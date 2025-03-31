@@ -6,7 +6,7 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -14,12 +14,12 @@ import (
 // BucketConditionApplyConfiguration represents a declarative configuration of the BucketCondition type for use
 // with apply.
 type BucketConditionApplyConfiguration struct {
-	Type               *v1alpha1.BucketConditionType `json:"type,omitempty"`
-	Status             *v1.ConditionStatus           `json:"status,omitempty"`
-	Reason             *string                       `json:"reason,omitempty"`
-	Message            *string                       `json:"message,omitempty"`
-	ObservedGeneration *int64                        `json:"observedGeneration,omitempty"`
-	LastTransitionTime *metav1.Time                  `json:"lastTransitionTime,omitempty"`
+	Type               *storagev1alpha1.BucketConditionType `json:"type,omitempty"`
+	Status             *v1.ConditionStatus                  `json:"status,omitempty"`
+	Reason             *string                              `json:"reason,omitempty"`
+	Message            *string                              `json:"message,omitempty"`
+	ObservedGeneration *int64                               `json:"observedGeneration,omitempty"`
+	LastTransitionTime *metav1.Time                         `json:"lastTransitionTime,omitempty"`
 }
 
 // BucketConditionApplyConfiguration constructs a declarative configuration of the BucketCondition type for use with
@@ -31,7 +31,7 @@ func BucketCondition() *BucketConditionApplyConfiguration {
 // WithType sets the Type field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Type field is set to the value of the last call.
-func (b *BucketConditionApplyConfiguration) WithType(value v1alpha1.BucketConditionType) *BucketConditionApplyConfiguration {
+func (b *BucketConditionApplyConfiguration) WithType(value storagev1alpha1.BucketConditionType) *BucketConditionApplyConfiguration {
 	b.Type = &value
 	return b
 }

@@ -6,13 +6,13 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
-	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	apicorev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	internalinterfaces "github.com/ironcore-dev/ironcore/client-go/informers/externalversions/internalinterfaces"
 	versioned "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned"
-	v1alpha1 "github.com/ironcore-dev/ironcore/client-go/listers/core/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/client-go/listers/core/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
@@ -23,7 +23,7 @@ import (
 // ResourceQuotas.
 type ResourceQuotaInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.ResourceQuotaLister
+	Lister() corev1alpha1.ResourceQuotaLister
 }
 
 type resourceQuotaInformer struct {
@@ -58,7 +58,7 @@ func NewFilteredResourceQuotaInformer(client versioned.Interface, namespace stri
 				return client.CoreV1alpha1().ResourceQuotas(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&corev1alpha1.ResourceQuota{},
+		&apicorev1alpha1.ResourceQuota{},
 		resyncPeriod,
 		indexers,
 	)
@@ -69,9 +69,9 @@ func (f *resourceQuotaInformer) defaultInformer(client versioned.Interface, resy
 }
 
 func (f *resourceQuotaInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&corev1alpha1.ResourceQuota{}, f.defaultInformer)
+	return f.factory.InformerFor(&apicorev1alpha1.ResourceQuota{}, f.defaultInformer)
 }
 
-func (f *resourceQuotaInformer) Lister() v1alpha1.ResourceQuotaLister {
-	return v1alpha1.NewResourceQuotaLister(f.Informer().GetIndexer())
+func (f *resourceQuotaInformer) Lister() corev1alpha1.ResourceQuotaLister {
+	return corev1alpha1.NewResourceQuotaLister(f.Informer().GetIndexer())
 }

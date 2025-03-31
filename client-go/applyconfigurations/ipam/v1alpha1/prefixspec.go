@@ -6,7 +6,7 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
@@ -15,7 +15,7 @@ import (
 // with apply.
 type PrefixSpecApplyConfiguration struct {
 	IPFamily       *v1.IPFamily                            `json:"ipFamily,omitempty"`
-	Prefix         *v1alpha1.IPPrefix                      `json:"prefix,omitempty"`
+	Prefix         *commonv1alpha1.IPPrefix                `json:"prefix,omitempty"`
 	PrefixLength   *int32                                  `json:"prefixLength,omitempty"`
 	ParentRef      *v1.LocalObjectReference                `json:"parentRef,omitempty"`
 	ParentSelector *metav1.LabelSelectorApplyConfiguration `json:"parentSelector,omitempty"`
@@ -38,7 +38,7 @@ func (b *PrefixSpecApplyConfiguration) WithIPFamily(value v1.IPFamily) *PrefixSp
 // WithPrefix sets the Prefix field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Prefix field is set to the value of the last call.
-func (b *PrefixSpecApplyConfiguration) WithPrefix(value v1alpha1.IPPrefix) *PrefixSpecApplyConfiguration {
+func (b *PrefixSpecApplyConfiguration) WithPrefix(value commonv1alpha1.IPPrefix) *PrefixSpecApplyConfiguration {
 	b.Prefix = &value
 	return b
 }

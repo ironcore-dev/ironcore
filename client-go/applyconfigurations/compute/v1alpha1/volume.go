@@ -43,7 +43,7 @@ func (b *VolumeApplyConfiguration) WithDevice(value string) *VolumeApplyConfigur
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the VolumeRef field is set to the value of the last call.
 func (b *VolumeApplyConfiguration) WithVolumeRef(value v1.LocalObjectReference) *VolumeApplyConfiguration {
-	b.VolumeRef = &value
+	b.VolumeSourceApplyConfiguration.VolumeRef = &value
 	return b
 }
 
@@ -51,7 +51,7 @@ func (b *VolumeApplyConfiguration) WithVolumeRef(value v1.LocalObjectReference) 
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the EmptyDisk field is set to the value of the last call.
 func (b *VolumeApplyConfiguration) WithEmptyDisk(value *EmptyDiskVolumeSourceApplyConfiguration) *VolumeApplyConfiguration {
-	b.EmptyDisk = value
+	b.VolumeSourceApplyConfiguration.EmptyDisk = value
 	return b
 }
 
@@ -59,6 +59,6 @@ func (b *VolumeApplyConfiguration) WithEmptyDisk(value *EmptyDiskVolumeSourceApp
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Ephemeral field is set to the value of the last call.
 func (b *VolumeApplyConfiguration) WithEphemeral(value *EphemeralVolumeSourceApplyConfiguration) *VolumeApplyConfiguration {
-	b.Ephemeral = value
+	b.VolumeSourceApplyConfiguration.Ephemeral = value
 	return b
 }

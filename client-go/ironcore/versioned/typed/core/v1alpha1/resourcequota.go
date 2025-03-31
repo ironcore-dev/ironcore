@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
-	corev1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/core/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	applyconfigurationscorev1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/core/v1alpha1"
 	scheme "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -25,36 +25,37 @@ type ResourceQuotasGetter interface {
 
 // ResourceQuotaInterface has methods to work with ResourceQuota resources.
 type ResourceQuotaInterface interface {
-	Create(ctx context.Context, resourceQuota *v1alpha1.ResourceQuota, opts v1.CreateOptions) (*v1alpha1.ResourceQuota, error)
-	Update(ctx context.Context, resourceQuota *v1alpha1.ResourceQuota, opts v1.UpdateOptions) (*v1alpha1.ResourceQuota, error)
+	Create(ctx context.Context, resourceQuota *corev1alpha1.ResourceQuota, opts v1.CreateOptions) (*corev1alpha1.ResourceQuota, error)
+	Update(ctx context.Context, resourceQuota *corev1alpha1.ResourceQuota, opts v1.UpdateOptions) (*corev1alpha1.ResourceQuota, error)
 	// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-	UpdateStatus(ctx context.Context, resourceQuota *v1alpha1.ResourceQuota, opts v1.UpdateOptions) (*v1alpha1.ResourceQuota, error)
+	UpdateStatus(ctx context.Context, resourceQuota *corev1alpha1.ResourceQuota, opts v1.UpdateOptions) (*corev1alpha1.ResourceQuota, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
-	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.ResourceQuota, error)
-	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.ResourceQuotaList, error)
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*corev1alpha1.ResourceQuota, error)
+	List(ctx context.Context, opts v1.ListOptions) (*corev1alpha1.ResourceQuotaList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
-	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.ResourceQuota, err error)
-	Apply(ctx context.Context, resourceQuota *corev1alpha1.ResourceQuotaApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.ResourceQuota, err error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *corev1alpha1.ResourceQuota, err error)
+	Apply(ctx context.Context, resourceQuota *applyconfigurationscorev1alpha1.ResourceQuotaApplyConfiguration, opts v1.ApplyOptions) (result *corev1alpha1.ResourceQuota, err error)
 	// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-	ApplyStatus(ctx context.Context, resourceQuota *corev1alpha1.ResourceQuotaApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.ResourceQuota, err error)
+	ApplyStatus(ctx context.Context, resourceQuota *applyconfigurationscorev1alpha1.ResourceQuotaApplyConfiguration, opts v1.ApplyOptions) (result *corev1alpha1.ResourceQuota, err error)
 	ResourceQuotaExpansion
 }
 
 // resourceQuotas implements ResourceQuotaInterface
 type resourceQuotas struct {
-	*gentype.ClientWithListAndApply[*v1alpha1.ResourceQuota, *v1alpha1.ResourceQuotaList, *corev1alpha1.ResourceQuotaApplyConfiguration]
+	*gentype.ClientWithListAndApply[*corev1alpha1.ResourceQuota, *corev1alpha1.ResourceQuotaList, *applyconfigurationscorev1alpha1.ResourceQuotaApplyConfiguration]
 }
 
 // newResourceQuotas returns a ResourceQuotas
 func newResourceQuotas(c *CoreV1alpha1Client, namespace string) *resourceQuotas {
 	return &resourceQuotas{
-		gentype.NewClientWithListAndApply[*v1alpha1.ResourceQuota, *v1alpha1.ResourceQuotaList, *corev1alpha1.ResourceQuotaApplyConfiguration](
+		gentype.NewClientWithListAndApply[*corev1alpha1.ResourceQuota, *corev1alpha1.ResourceQuotaList, *applyconfigurationscorev1alpha1.ResourceQuotaApplyConfiguration](
 			"resourcequotas",
 			c.RESTClient(),
 			scheme.ParameterCodec,
 			namespace,
-			func() *v1alpha1.ResourceQuota { return &v1alpha1.ResourceQuota{} },
-			func() *v1alpha1.ResourceQuotaList { return &v1alpha1.ResourceQuotaList{} }),
+			func() *corev1alpha1.ResourceQuota { return &corev1alpha1.ResourceQuota{} },
+			func() *corev1alpha1.ResourceQuotaList { return &corev1alpha1.ResourceQuotaList{} },
+		),
 	}
 }

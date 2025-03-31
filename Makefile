@@ -12,7 +12,7 @@ BUCKETBROKER_IMG ?= bucketbroker:latest
 IRICTL_BUCKET_IMG ?= irictl-bucket:latest
 
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
-ENVTEST_K8S_VERSION = 1.31
+ENVTEST_K8S_VERSION = 1.32.0
 
 # Docker image name for the mkdocs based local development setup
 IMAGE=ironcore/documentation
@@ -149,7 +149,7 @@ test: generate manifests fmt vet test-only ## Run tests.
 
 .PHONY: test-only
 test-only: envtest ## Run *only* the tests - no generation, linting etc.
-	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" go test ./... -coverprofile cover.out
+	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) --bin-dir $(LOCALBIN) -p path)" go test ./... -coverprofile cover.out
 
 .PHONY: extract-openapi
 extract-openapi: envtest openapi-extractor
@@ -360,14 +360,14 @@ GOLANGCI_LINT ?= $(LOCALBIN)/golangci-lint
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v5.1.1
 VGOPATH_VERSION ?= v0.1.3
-CONTROLLER_TOOLS_VERSION ?= v0.16.0
+CONTROLLER_TOOLS_VERSION ?= v0.17.2
 GEN_CRD_API_REFERENCE_DOCS_VERSION ?= v0.3.0
 ADDLICENSE_VERSION ?= v1.1.1
 PROTOC_GEN_GOGO_VERSION ?= v1.3.2
-GOIMPORTS_VERSION ?= v0.26.0
+GOIMPORTS_VERSION ?= v0.31.0
 GOLANGCI_LINT_VERSION ?= v2.0
 OPENAPI_EXTRACTOR_VERSION ?= v0.1.9
-SETUP_ENVTEST_VERSION ?= release-0.19
+SETUP_ENVTEST_VERSION ?= release-0.20
 
 KUSTOMIZE_INSTALL_SCRIPT ?= "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
 .PHONY: kustomize
