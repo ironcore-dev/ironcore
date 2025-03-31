@@ -34,7 +34,7 @@ func (b *NetworkInterfaceApplyConfiguration) WithName(value string) *NetworkInte
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the NetworkInterfaceRef field is set to the value of the last call.
 func (b *NetworkInterfaceApplyConfiguration) WithNetworkInterfaceRef(value v1.LocalObjectReference) *NetworkInterfaceApplyConfiguration {
-	b.NetworkInterfaceRef = &value
+	b.NetworkInterfaceSourceApplyConfiguration.NetworkInterfaceRef = &value
 	return b
 }
 
@@ -42,6 +42,6 @@ func (b *NetworkInterfaceApplyConfiguration) WithNetworkInterfaceRef(value v1.Lo
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Ephemeral field is set to the value of the last call.
 func (b *NetworkInterfaceApplyConfiguration) WithEphemeral(value *EphemeralNetworkInterfaceSourceApplyConfiguration) *NetworkInterfaceApplyConfiguration {
-	b.Ephemeral = value
+	b.NetworkInterfaceSourceApplyConfiguration.Ephemeral = value
 	return b
 }

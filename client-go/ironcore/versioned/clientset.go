@@ -6,8 +6,8 @@
 package versioned
 
 import (
-	"fmt"
-	"net/http"
+	fmt "fmt"
+	http "net/http"
 
 	computev1alpha1 "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned/typed/compute/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned/typed/core/v1alpha1"

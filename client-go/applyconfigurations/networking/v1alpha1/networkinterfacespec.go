@@ -6,7 +6,7 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 )
 
@@ -15,7 +15,7 @@ import (
 type NetworkInterfaceSpecApplyConfiguration struct {
 	ProviderID *string                            `json:"providerID,omitempty"`
 	NetworkRef *v1.LocalObjectReference           `json:"networkRef,omitempty"`
-	MachineRef *v1alpha1.LocalUIDReference        `json:"machineRef,omitempty"`
+	MachineRef *commonv1alpha1.LocalUIDReference  `json:"machineRef,omitempty"`
 	IPFamilies []v1.IPFamily                      `json:"ipFamilies,omitempty"`
 	IPs        []IPSourceApplyConfiguration       `json:"ips,omitempty"`
 	Prefixes   []PrefixSourceApplyConfiguration   `json:"prefixes,omitempty"`
@@ -48,7 +48,7 @@ func (b *NetworkInterfaceSpecApplyConfiguration) WithNetworkRef(value v1.LocalOb
 // WithMachineRef sets the MachineRef field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the MachineRef field is set to the value of the last call.
-func (b *NetworkInterfaceSpecApplyConfiguration) WithMachineRef(value v1alpha1.LocalUIDReference) *NetworkInterfaceSpecApplyConfiguration {
+func (b *NetworkInterfaceSpecApplyConfiguration) WithMachineRef(value commonv1alpha1.LocalUIDReference) *NetworkInterfaceSpecApplyConfiguration {
 	b.MachineRef = &value
 	return b
 }

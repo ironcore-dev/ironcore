@@ -6,14 +6,14 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 )
 
 // VolumePoolSpecApplyConfiguration represents a declarative configuration of the VolumePoolSpec type for use
 // with apply.
 type VolumePoolSpecApplyConfiguration struct {
-	ProviderID *string          `json:"providerID,omitempty"`
-	Taints     []v1alpha1.Taint `json:"taints,omitempty"`
+	ProviderID *string                `json:"providerID,omitempty"`
+	Taints     []commonv1alpha1.Taint `json:"taints,omitempty"`
 }
 
 // VolumePoolSpecApplyConfiguration constructs a declarative configuration of the VolumePoolSpec type for use with
@@ -33,7 +33,7 @@ func (b *VolumePoolSpecApplyConfiguration) WithProviderID(value string) *VolumeP
 // WithTaints adds the given value to the Taints field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the Taints field.
-func (b *VolumePoolSpecApplyConfiguration) WithTaints(values ...v1alpha1.Taint) *VolumePoolSpecApplyConfiguration {
+func (b *VolumePoolSpecApplyConfiguration) WithTaints(values ...commonv1alpha1.Taint) *VolumePoolSpecApplyConfiguration {
 	for i := range values {
 		b.Taints = append(b.Taints, values[i])
 	}

@@ -6,13 +6,13 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
-	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	apinetworkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	internalinterfaces "github.com/ironcore-dev/ironcore/client-go/informers/externalversions/internalinterfaces"
 	versioned "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned"
-	v1alpha1 "github.com/ironcore-dev/ironcore/client-go/listers/networking/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/client-go/listers/networking/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
@@ -23,7 +23,7 @@ import (
 // LoadBalancerRoutings.
 type LoadBalancerRoutingInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.LoadBalancerRoutingLister
+	Lister() networkingv1alpha1.LoadBalancerRoutingLister
 }
 
 type loadBalancerRoutingInformer struct {
@@ -58,7 +58,7 @@ func NewFilteredLoadBalancerRoutingInformer(client versioned.Interface, namespac
 				return client.NetworkingV1alpha1().LoadBalancerRoutings(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&networkingv1alpha1.LoadBalancerRouting{},
+		&apinetworkingv1alpha1.LoadBalancerRouting{},
 		resyncPeriod,
 		indexers,
 	)
@@ -69,9 +69,9 @@ func (f *loadBalancerRoutingInformer) defaultInformer(client versioned.Interface
 }
 
 func (f *loadBalancerRoutingInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&networkingv1alpha1.LoadBalancerRouting{}, f.defaultInformer)
+	return f.factory.InformerFor(&apinetworkingv1alpha1.LoadBalancerRouting{}, f.defaultInformer)
 }
 
-func (f *loadBalancerRoutingInformer) Lister() v1alpha1.LoadBalancerRoutingLister {
-	return v1alpha1.NewLoadBalancerRoutingLister(f.Informer().GetIndexer())
+func (f *loadBalancerRoutingInformer) Lister() networkingv1alpha1.LoadBalancerRoutingLister {
+	return networkingv1alpha1.NewLoadBalancerRoutingLister(f.Informer().GetIndexer())
 }

@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/storage/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	applyconfigurationsstoragev1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/storage/v1alpha1"
 	scheme "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -25,36 +25,37 @@ type BucketPoolsGetter interface {
 
 // BucketPoolInterface has methods to work with BucketPool resources.
 type BucketPoolInterface interface {
-	Create(ctx context.Context, bucketPool *v1alpha1.BucketPool, opts v1.CreateOptions) (*v1alpha1.BucketPool, error)
-	Update(ctx context.Context, bucketPool *v1alpha1.BucketPool, opts v1.UpdateOptions) (*v1alpha1.BucketPool, error)
+	Create(ctx context.Context, bucketPool *storagev1alpha1.BucketPool, opts v1.CreateOptions) (*storagev1alpha1.BucketPool, error)
+	Update(ctx context.Context, bucketPool *storagev1alpha1.BucketPool, opts v1.UpdateOptions) (*storagev1alpha1.BucketPool, error)
 	// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-	UpdateStatus(ctx context.Context, bucketPool *v1alpha1.BucketPool, opts v1.UpdateOptions) (*v1alpha1.BucketPool, error)
+	UpdateStatus(ctx context.Context, bucketPool *storagev1alpha1.BucketPool, opts v1.UpdateOptions) (*storagev1alpha1.BucketPool, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
-	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.BucketPool, error)
-	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.BucketPoolList, error)
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*storagev1alpha1.BucketPool, error)
+	List(ctx context.Context, opts v1.ListOptions) (*storagev1alpha1.BucketPoolList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
-	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.BucketPool, err error)
-	Apply(ctx context.Context, bucketPool *storagev1alpha1.BucketPoolApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.BucketPool, err error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *storagev1alpha1.BucketPool, err error)
+	Apply(ctx context.Context, bucketPool *applyconfigurationsstoragev1alpha1.BucketPoolApplyConfiguration, opts v1.ApplyOptions) (result *storagev1alpha1.BucketPool, err error)
 	// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-	ApplyStatus(ctx context.Context, bucketPool *storagev1alpha1.BucketPoolApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.BucketPool, err error)
+	ApplyStatus(ctx context.Context, bucketPool *applyconfigurationsstoragev1alpha1.BucketPoolApplyConfiguration, opts v1.ApplyOptions) (result *storagev1alpha1.BucketPool, err error)
 	BucketPoolExpansion
 }
 
 // bucketPools implements BucketPoolInterface
 type bucketPools struct {
-	*gentype.ClientWithListAndApply[*v1alpha1.BucketPool, *v1alpha1.BucketPoolList, *storagev1alpha1.BucketPoolApplyConfiguration]
+	*gentype.ClientWithListAndApply[*storagev1alpha1.BucketPool, *storagev1alpha1.BucketPoolList, *applyconfigurationsstoragev1alpha1.BucketPoolApplyConfiguration]
 }
 
 // newBucketPools returns a BucketPools
 func newBucketPools(c *StorageV1alpha1Client) *bucketPools {
 	return &bucketPools{
-		gentype.NewClientWithListAndApply[*v1alpha1.BucketPool, *v1alpha1.BucketPoolList, *storagev1alpha1.BucketPoolApplyConfiguration](
+		gentype.NewClientWithListAndApply[*storagev1alpha1.BucketPool, *storagev1alpha1.BucketPoolList, *applyconfigurationsstoragev1alpha1.BucketPoolApplyConfiguration](
 			"bucketpools",
 			c.RESTClient(),
 			scheme.ParameterCodec,
 			"",
-			func() *v1alpha1.BucketPool { return &v1alpha1.BucketPool{} },
-			func() *v1alpha1.BucketPoolList { return &v1alpha1.BucketPoolList{} }),
+			func() *storagev1alpha1.BucketPool { return &storagev1alpha1.BucketPool{} },
+			func() *storagev1alpha1.BucketPoolList { return &storagev1alpha1.BucketPoolList{} },
+		),
 	}
 }

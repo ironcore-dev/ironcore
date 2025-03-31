@@ -6,13 +6,13 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/ipam/v1alpha1"
+	ipamv1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/ipam/v1alpha1"
 )
 
 // EphemeralPrefixSourceApplyConfiguration represents a declarative configuration of the EphemeralPrefixSource type for use
 // with apply.
 type EphemeralPrefixSourceApplyConfiguration struct {
-	PrefixTemplate *v1alpha1.PrefixTemplateSpecApplyConfiguration `json:"prefixTemplate,omitempty"`
+	PrefixTemplate *ipamv1alpha1.PrefixTemplateSpecApplyConfiguration `json:"prefixTemplate,omitempty"`
 }
 
 // EphemeralPrefixSourceApplyConfiguration constructs a declarative configuration of the EphemeralPrefixSource type for use with
@@ -24,7 +24,7 @@ func EphemeralPrefixSource() *EphemeralPrefixSourceApplyConfiguration {
 // WithPrefixTemplate sets the PrefixTemplate field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the PrefixTemplate field is set to the value of the last call.
-func (b *EphemeralPrefixSourceApplyConfiguration) WithPrefixTemplate(value *v1alpha1.PrefixTemplateSpecApplyConfiguration) *EphemeralPrefixSourceApplyConfiguration {
+func (b *EphemeralPrefixSourceApplyConfiguration) WithPrefixTemplate(value *ipamv1alpha1.PrefixTemplateSpecApplyConfiguration) *EphemeralPrefixSourceApplyConfiguration {
 	b.PrefixTemplate = value
 	return b
 }
