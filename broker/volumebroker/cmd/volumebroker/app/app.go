@@ -85,7 +85,7 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error getting config: %w", err)
 	}
 
-	srv, err := server.New(cfg, server.Options{
+	srv, err := server.New(ctx, cfg, server.Options{
 		Namespace:          opts.Namespace,
 		VolumePoolName:     opts.VolumePoolName,
 		VolumePoolSelector: opts.VolumePoolSelector,

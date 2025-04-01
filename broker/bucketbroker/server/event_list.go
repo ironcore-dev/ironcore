@@ -7,16 +7,16 @@ import (
 	"context"
 	"fmt"
 
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	"github.com/ironcore-dev/ironcore/broker/bucketbroker/apiutils"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
+	irievent "github.com/ironcore-dev/ironcore/iri/apis/event/v1alpha1"
+
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	"github.com/ironcore-dev/ironcore/broker/bucketbroker/apiutils"
-	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
-	irievent "github.com/ironcore-dev/ironcore/iri/apis/event/v1alpha1"
 )
 
 const (
@@ -32,6 +32,7 @@ func (s *Server) listEvents(ctx context.Context) ([]*irievent.Event, error) {
 		InvolvedObjectKindSelector:       InvolvedObjectKind,
 		InvolvedObjectAPIVersionSelector: storagev1alpha1.SchemeGroupVersion.String(),
 	}
+
 	if err := s.client.List(ctx, bucketEventList,
 		client.InNamespace(s.namespace), client.MatchingFieldsSelector{Selector: selectorField.AsSelector()},
 	); err != nil {
@@ -42,11 +43,12 @@ func (s *Server) listEvents(ctx context.Context) ([]*irievent.Event, error) {
 	for _, bucketEvent := range bucketEventList.Items {
 		ironcoreBucket, err := s.getIronCoreBucket(ctx, bucketEvent.InvolvedObject.Name)
 		if err != nil {
-			log.V(1).Info("Unable to get ironcore bucket", "BucketName", bucketEvent.InvolvedObject.Name)
+			log.Error(err, "Unable to get ironcore bucket", "BucketName", bucketEvent.InvolvedObject.Name)
 			continue
 		}
 		bucketObjectMetadata, err := apiutils.GetObjectMetadata(&ironcoreBucket.ObjectMeta)
 		if err != nil {
+			log.Error(err, "Unable to get ironcore bucket object metadata", "BucketName", bucketEvent.InvolvedObject.Name)
 			continue
 		}
 		iriEvent := &irievent.Event{

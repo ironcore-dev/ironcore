@@ -8,11 +8,10 @@ import (
 	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	bucketpoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/bucketpoollet/api/v1alpha1"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 var _ = Describe("DeleteBucket", func() {
@@ -33,7 +32,6 @@ var _ = Describe("DeleteBucket", func() {
 				},
 			},
 		})
-
 		Expect(err).NotTo(HaveOccurred())
 		Expect(createRes).NotTo(BeNil())
 
