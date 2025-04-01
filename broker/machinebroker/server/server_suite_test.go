@@ -11,8 +11,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ironcore-dev/controller-utils/buildutils"
-	"github.com/ironcore-dev/controller-utils/modutils"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
@@ -22,8 +20,9 @@ import (
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	utilsenvtest "github.com/ironcore-dev/ironcore/utils/envtest"
 	"github.com/ironcore-dev/ironcore/utils/envtest/apiserver"
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
+
+	"github.com/ironcore-dev/controller-utils/buildutils"
+	"github.com/ironcore-dev/controller-utils/modutils"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -31,9 +30,12 @@ import (
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
-	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 )
 
 var (
@@ -133,15 +135,15 @@ func SetupTest() (*corev1.Namespace, *server.Server) {
 		Expect(k8sClient.Create(ctx, ns)).To(Succeed(), "failed to create test namespace")
 		DeferCleanup(k8sClient.Delete, ns)
 
-		newSrv, err := server.New(cfg, ns.Name, server.Options{
+		srvCtx, cancel := context.WithCancel(context.Background())
+		DeferCleanup(cancel)
+		newSrv, err := server.New(srvCtx, cfg, ns.Name, server.Options{
 			BaseURL: baseURL,
 			BrokerDownwardAPILabels: map[string]string{
 				"root-machine-uid": machinepoolletv1alpha1.MachineUIDLabel,
 			},
 		})
 		Expect(err).NotTo(HaveOccurred())
-		srvCtx, cancel := context.WithCancel(context.Background())
-		DeferCleanup(cancel)
 		go func() {
 			defer GinkgoRecover()
 			Expect(newSrv.Start(srvCtx)).To(Succeed())

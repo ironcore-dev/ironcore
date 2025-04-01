@@ -11,15 +11,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ironcore-dev/controller-utils/buildutils"
-	"github.com/ironcore-dev/controller-utils/modutils"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/bucketbroker/server"
 	utilsenvtest "github.com/ironcore-dev/ironcore/utils/envtest"
 	"github.com/ironcore-dev/ironcore/utils/envtest/apiserver"
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
+
+	"github.com/ironcore-dev/controller-utils/buildutils"
+	"github.com/ironcore-dev/controller-utils/modutils"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -27,9 +26,12 @@ import (
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
-	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 )
 
 var (
@@ -132,7 +134,9 @@ func SetupTest() (*corev1.Namespace, *storagev1alpha1.BucketPool, *server.Server
 		Expect(k8sClient.Create(ctx, bucketPool)).To(Succeed())
 		DeferCleanup(k8sClient.Delete, bucketPool)
 
-		newSrv, err := server.New(cfg, server.Options{
+		srvCtx, cancel := context.WithCancel(context.Background())
+		DeferCleanup(cancel)
+		newSrv, err := server.New(srvCtx, cfg, server.Options{
 			Namespace:      ns.Name,
 			BucketPoolName: bucketPool.Name,
 			BucketPoolSelector: map[string]string{

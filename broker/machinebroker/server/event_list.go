@@ -7,16 +7,16 @@ import (
 	"context"
 	"fmt"
 
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	"github.com/ironcore-dev/ironcore/broker/machinebroker/apiutils"
+	irievent "github.com/ironcore-dev/ironcore/iri/apis/event/v1alpha1"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
+
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-
-	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	"github.com/ironcore-dev/ironcore/broker/machinebroker/apiutils"
-	irievent "github.com/ironcore-dev/ironcore/iri/apis/event/v1alpha1"
-	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 )
 
 const (
@@ -42,11 +42,12 @@ func (s *Server) listEvents(ctx context.Context) ([]*irievent.Event, error) {
 	for _, machineEvent := range machineEventList.Items {
 		ironcoreMachine, err := s.getIronCoreMachine(ctx, machineEvent.InvolvedObject.Name)
 		if err != nil {
-			log.V(1).Info("Unable to get ironcore machine", "MachineName", machineEvent.InvolvedObject.Name)
+			log.Error(err, "Unable to get ironcore machine", "MachineName", machineEvent.InvolvedObject.Name)
 			continue
 		}
 		machineObjectMetadata, err := apiutils.GetObjectMetadata(&ironcoreMachine.ObjectMeta)
 		if err != nil {
+			log.Error(err, "Unable to get ironcore machine object metadata", "MachineName", machineEvent.InvolvedObject.Name)
 			continue
 		}
 		iriEvent := &irievent.Event{
