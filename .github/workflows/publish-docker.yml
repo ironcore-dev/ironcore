@@ -13,11 +13,10 @@ on:
     - 'docs/**'
     - '**/*.md'
   pull_request:
-    types:
-    - labeled
     paths-ignore:
     - 'docs/**'
     - '**/*.md'
+    types: [labeled, unlabeled, opened, synchronize, reopened]
 
 jobs:
   buildAndPush:
@@ -49,8 +48,8 @@ jobs:
     permissions:
       contents: read
       packages: write
-    if: ${{ github.event.label.name == 'ok-to-image' }} || ${{ github.event.label.name == 'ok-to-🐳' }} || ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.labels.*.name, 'ok-to-image')
     steps:
     - uses: actions/checkout@v4
     - uses: docker/metadata-action@v5
