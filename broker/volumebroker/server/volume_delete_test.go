@@ -8,10 +8,11 @@ import (
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("DeleteVolume", func() {
@@ -35,6 +36,7 @@ var _ = Describe("DeleteVolume", func() {
 				},
 			},
 		})
+
 		Expect(err).NotTo(HaveOccurred())
 		Expect(createRes).NotTo(BeNil())
 

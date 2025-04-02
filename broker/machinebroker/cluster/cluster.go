@@ -4,7 +4,6 @@
 package cluster
 
 import (
-	"context"
 	"fmt"
 
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
@@ -12,13 +11,10 @@ import (
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/common/idgen"
-
-	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	kubernetes "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
-	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -64,34 +60,11 @@ func setOptionsDefaults(o *Options) {
 	}
 }
 
-func New(ctx context.Context, cfg *rest.Config, namespace string, opts Options) (Cluster, error) {
+func New(cfg *rest.Config, namespace string, opts Options) (Cluster, error) {
 	setOptionsDefaults(&opts)
-
-	readCache, err := cache.New(cfg, cache.Options{
-		Scheme: scheme,
-		DefaultNamespaces: map[string]cache.Config{
-			namespace: {},
-		},
-	})
-	if err != nil {
-		return nil, fmt.Errorf("error creating cache: %w", err)
-	}
-
-	go func() {
-		if err := readCache.Start(ctx); err != nil {
-			fmt.Printf("Error starting cache: %v\n", err)
-		}
-	}()
-	if !readCache.WaitForCacheSync(ctx) {
-		return nil, fmt.Errorf("failed to sync cache")
-	}
 
 	c, err := client.New(cfg, client.Options{
 		Scheme: scheme,
-		Cache: &client.CacheOptions{
-			Reader:     readCache,
-			DisableFor: []client.Object{&v1.Event{}},
-		},
 	})
 	if err != nil {
 		return nil, fmt.Errorf("error creating client: %w", err)

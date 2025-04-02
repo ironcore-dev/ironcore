@@ -14,6 +14,7 @@ import (
 	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -48,6 +49,7 @@ var _ = Describe("ListEvents", func() {
 				},
 			},
 		})
+
 		Expect(err).NotTo(HaveOccurred())
 		Expect(res).NotTo(BeNil())
 
