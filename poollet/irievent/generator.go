@@ -52,6 +52,7 @@ func (m oldNewMap[O]) setCurrent(current []O) {
 	}
 
 	for _, item := range current {
+		item := item
 		id := m.id(item)
 		if r, ok := m[id]; ok {
 			r.Current = &item
