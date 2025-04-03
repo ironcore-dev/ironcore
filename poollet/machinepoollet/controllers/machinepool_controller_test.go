@@ -90,7 +90,6 @@ var _ = Describe("MachinePoolController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, machine)).To(Succeed(), "failed to create machine")
-		DeferCleanup(k8sClient.Delete, machine)
 
 		By("checking if the allocatable resources are correct")
 		Eventually(Object(machinePool)).Should(SatisfyAll(
@@ -118,7 +117,6 @@ var _ = Describe("MachinePoolController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, machine2)).To(Succeed(), "failed to create test machine class")
-		DeferCleanup(k8sClient.Delete, machine2)
 
 		By("checking if the allocatable resources are correct")
 		Eventually(Object(machinePool)).Should(SatisfyAll(

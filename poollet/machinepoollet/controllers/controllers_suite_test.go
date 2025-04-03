@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/ironcore-dev/controller-utils/buildutils"
-	"github.com/ironcore-dev/controller-utils/modutils"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
@@ -88,13 +87,11 @@ var _ = BeforeSuite(func() {
 		// default path defined in controller-runtime which is /usr/local/kubebuilder/.
 		// Note that you must have the required binaries setup under the bin directory to perform
 		// the tests directly. When we run make test it will be setup and used automatically.
-		BinaryAssetsDirectory: filepath.Join("..", "..", "bin", "k8s",
+		BinaryAssetsDirectory: filepath.Join("..", "..", "..", "bin", "k8s",
 			fmt.Sprintf("1.32.0-%s-%s", runtime.GOOS, runtime.GOARCH)),
 	}
 	testEnvExt = &utilsenvtest.EnvironmentExtensions{
-		APIServiceDirectoryPaths: []string{
-			modutils.Dir("github.com/ironcore-dev/ironcore", "config", "apiserver", "apiservice", "bases"),
-		},
+		APIServiceDirectoryPaths:       []string{filepath.Join("..", "..", "..", "config", "apiserver", "apiservice", "bases")},
 		ErrorIfAPIServicePathIsMissing: true,
 		AdditionalServices: []utilsenvtest.AdditionalService{
 			{
@@ -127,6 +124,8 @@ var _ = BeforeSuite(func() {
 		Host:         testEnvExt.APIServiceInstallOptions.LocalServingHost,
 		Port:         testEnvExt.APIServiceInstallOptions.LocalServingPort,
 		CertDir:      testEnvExt.APIServiceInstallOptions.LocalServingCertDir,
+		Stderr:       GinkgoWriter,
+		Stdout:       GinkgoWriter,
 	})
 	Expect(err).NotTo(HaveOccurred())
 
