@@ -283,7 +283,8 @@ func main() {
 
 	if controllers.Enabled(machineEphemeralVolumeController) {
 		if err := (&computecontrollers.MachineEphemeralVolumeReconciler{
-			Client: mgr.GetClient(),
+			EventRecorder: mgr.GetEventRecorderFor("machine-ephemeral-volume"),
+			Client:        mgr.GetClient(),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "MachineEphemeralVolume")
 			os.Exit(1)
