@@ -366,6 +366,7 @@ GOIMPORTS_VERSION ?= v0.31.0
 GOLANGCI_LINT_VERSION ?= v2.0
 OPENAPI_EXTRACTOR_VERSION ?= v0.1.9
 SETUP_ENVTEST_VERSION ?= release-0.20
+BUF_VERSION ?= v1.51.0
 
 KUSTOMIZE_INSTALL_SCRIPT ?= "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
 .PHONY: kustomize
