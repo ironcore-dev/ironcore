@@ -1,4 +1,7 @@
 version: v2
+deps:
+  - buf.build/google/googleapis
+  - buf.build/grpc/grpc
 modules:
   - path: iri/apis
 lint:

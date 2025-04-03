@@ -89,7 +89,7 @@ generate: vgopath models-schema openapi-gen
 	./hack/update-codegen.sh
 
 .PHONY: proto
-proto: goimports vgopath buf
+proto: goimports vgopath buf protoc-gen-go protoc-gen-go-grpc
 	$(BUF) generate --template buf.gen.yaml
 	$(GOIMPORTS) -w ./iri
 
@@ -354,6 +354,8 @@ BUF ?= $(LOCALBIN)/buf
 MODELS_SCHEMA ?= $(LOCALBIN)/models-schema
 GOIMPORTS ?= $(LOCALBIN)/goimports
 GOLANGCI_LINT ?= $(LOCALBIN)/golangci-lint
+PROTOC_GEN_GO ?= $(LOCALBIN)/protoc-gen-go
+PROTOC_GEN_GO_GRPC ?= $(LOCALBIN)/protoc-gen-go-grpc
 
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v5.1.1
@@ -361,7 +363,8 @@ VGOPATH_VERSION ?= v0.1.3
 CONTROLLER_TOOLS_VERSION ?= v0.17.2
 GEN_CRD_API_REFERENCE_DOCS_VERSION ?= v0.3.0
 ADDLICENSE_VERSION ?= v1.1.1
-PROTOC_GEN_GOGO_VERSION ?= v1.3.2
+PROTOC_GEN_GO_VERSION ?= v1.36.6
+PROTOC_GEN_GO_GRPC_VERSION ?= v1.5.1
 GOIMPORTS_VERSION ?= v0.31.0
 GOLANGCI_LINT_VERSION ?= v2.0
 OPENAPI_EXTRACTOR_VERSION ?= v0.1.9
@@ -420,6 +423,16 @@ $(GEN_CRD_API_REFERENCE_DOCS): $(LOCALBIN)
 addlicense: $(ADDLICENSE) ## Download addlicense locally if necessary.
 $(ADDLICENSE): $(LOCALBIN)
 	test -s $(LOCALBIN)/addlicense || GOBIN=$(LOCALBIN) go install github.com/google/addlicense@$(ADDLICENSE_VERSION)
+
+.PHONY: protoc-gen-go
+protoc-gen-go: $(PROTOC_GEN_GO) ## Download protoc-gen-go locally if necessary.
+$(PROTOC_GEN_GO): $(LOCALBIN)
+	test -s $(LOCALBIN)/protoc-gen-gogo || GOBIN=$(LOCALBIN) go install google.golang.org/protobuf/cmd/protoc-gen-go@$(PROTOC_GEN_GO_VERSION)
+
+.PHONY: protoc-gen-go-grpc
+protoc-gen-go-grpc: $(PROTOC_GEN_GO_GRPC) ## Download protoc-gen-go-grpc locally if necessary.
+$(PROTOC_GEN_GO_GRPC): $(LOCALBIN)
+	test -s $(LOCALBIN)/protoc-gen-go-grpc || GOBIN=$(LOCALBIN) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@$(PROTOC_GEN_GO_GRPC_VERSION)
 
 .PHONY: buf
 buf: $(BUF) ## Download buf locally if necessary.
