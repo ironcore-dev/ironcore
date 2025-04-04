@@ -99,7 +99,7 @@ fmt: goimports ## Run goimports against code.
 
 .PHONY: vet
 vet: ## Run go vet against code.
-	go vet -copylocks=false ./...
+	go vet ./...
 
 .PHONY: lint
 lint: golangci-lint ## Run golangci-lint on the code.

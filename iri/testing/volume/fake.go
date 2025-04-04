@@ -21,7 +21,7 @@ func filterInLabels(labelSelector, lbls map[string]string) bool {
 }
 
 type FakeVolume struct {
-	iri.Volume
+	*iri.Volume
 }
 
 type FakeVolumeClassStatus struct {
@@ -85,8 +85,7 @@ func (r *FakeRuntimeService) ListEvents(ctx context.Context, req *iri.ListEvents
 
 	var res []*irievent.Event
 	for _, e := range r.Events {
-		event := e.Event
-		res = append(res, &event)
+		res = append(res, &e.Event)
 	}
 
 	return &iri.ListEventsResponse{Events: res}, nil
@@ -110,7 +109,7 @@ func (r *FakeRuntimeService) ListVolumes(ctx context.Context, req *iri.ListVolum
 		}
 
 		volume := v.Volume
-		res = append(res, &volume)
+		res = append(res, volume)
 	}
 	return &iri.ListVolumesResponse{Volumes: res}, nil
 }
@@ -119,7 +118,7 @@ func (r *FakeRuntimeService) CreateVolume(ctx context.Context, req *iri.CreateVo
 	r.Lock()
 	defer r.Unlock()
 
-	volume := *req.Volume
+	volume := req.Volume
 	volume.Metadata.Id = r.idGen.Generate()
 	volume.Metadata.CreatedAt = time.Now().UnixNano()
 	volume.Status = &iri.VolumeStatus{}
@@ -129,7 +128,7 @@ func (r *FakeRuntimeService) CreateVolume(ctx context.Context, req *iri.CreateVo
 	}
 
 	return &iri.CreateVolumeResponse{
-		Volume: &volume,
+		Volume: volume,
 	}, nil
 }
 
@@ -166,8 +165,7 @@ func (r *FakeRuntimeService) Status(ctx context.Context, req *iri.StatusRequest)
 
 	var res []*iri.VolumeClassStatus
 	for _, m := range r.VolumeClassesStatus {
-		volumeClassStatus := m.VolumeClassStatus
-		res = append(res, &volumeClassStatus)
+		res = append(res, &m.VolumeClassStatus)
 	}
 	return &iri.StatusResponse{VolumeClassStatus: res}, nil
 }

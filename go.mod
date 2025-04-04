@@ -3,7 +3,7 @@ module github.com/ironcore-dev/ironcore
 go 1.24.0
 
 require (
-	github.com/afritzler/protoequal v0.1.5
+	github.com/afritzler/protoequal v0.1.7
 	github.com/bits-and-blooms/bitset v1.22.0
 	github.com/blang/semver/v4 v4.0.0
 	github.com/go-chi/chi/v5 v5.2.1

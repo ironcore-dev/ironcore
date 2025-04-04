@@ -161,9 +161,7 @@ func (g *Generic) GetMachineClassFor(ctx context.Context, name string, caps *iri
 		case 0:
 			return nil, 0, ErrNoMatchingMachineClass
 		case 1:
-
-			classStatus := *byCaps[0]
-			return classStatus.MachineClass, classStatus.Quantity, nil
+			return byCaps[0].MachineClass, byCaps[0].Quantity, nil
 		default:
 			return nil, 0, ErrAmbiguousMatchingMachineClass
 		}

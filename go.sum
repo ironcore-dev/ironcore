@@ -4,8 +4,8 @@ github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161 h1:L/gRVlceqvL25
 github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161/go.mod h1:xomTg63KZ2rFqZQzSB4Vz2SUXa1BpHTVz9L5PTmPC4E=
 github.com/NYTimes/gziphandler v1.1.1 h1:ZUDjpQae29j0ryrS0u/B8HZfJBtBQHjqw2rQ2cqUQ3I=
 github.com/NYTimes/gziphandler v1.1.1/go.mod h1:n/CVRwUEOgIxrgPvAQhUUr9oeUtvrhMomdKFjzJNB0c=
-github.com/afritzler/protoequal v0.1.5 h1:4j2/eSLSJgeSCIQB/ENk17PPN0DAa32bP10eC08MOQ8=
-github.com/afritzler/protoequal v0.1.5/go.mod h1:aEtrs1++JrjYxhJbdrI/mko47YC5TsEgepycIat0ykI=
+github.com/afritzler/protoequal v0.1.7 h1:zprwiq1XBV6aWzEjn6HM+C6nPbUj4k/CL3Kt3roKmMQ=
+github.com/afritzler/protoequal v0.1.7/go.mod h1:aEtrs1++JrjYxhJbdrI/mko47YC5TsEgepycIat0ykI=
 github.com/antlr4-go/antlr/v4 v4.13.0 h1:lxCg3LAv+EUK6t1i0y1V6/SLeUi0eKEKdhQAlS8TVTI=
 github.com/antlr4-go/antlr/v4 v4.13.0/go.mod h1:pfChB/xh/Unjila75QW7+VU4TSnWnnk9UTnmpPaOR2g=
 github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5 h1:0CwZNZbxp69SHPdPJAN/hZIm0C4OItdklCFmMRWYpio=

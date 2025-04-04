@@ -149,8 +149,7 @@ func (g *Generic) GetVolumeClassFor(ctx context.Context, name string, caps *iri.
 		case 0:
 			return nil, nil, ErrNoMatchingVolumeClass
 		case 1:
-			classStatus := *byCaps[0]
-			return classStatus.VolumeClass, resource.NewQuantity(classStatus.Quantity, resource.BinarySI), nil
+			return byCaps[0].VolumeClass, resource.NewQuantity(byCaps[0].Quantity, resource.BinarySI), nil
 		default:
 			return nil, nil, ErrAmbiguousMatchingVolumeClass
 		}

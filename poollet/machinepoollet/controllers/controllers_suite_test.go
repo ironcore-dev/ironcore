@@ -124,8 +124,6 @@ var _ = BeforeSuite(func() {
 		Host:         testEnvExt.APIServiceInstallOptions.LocalServingHost,
 		Port:         testEnvExt.APIServiceInstallOptions.LocalServingPort,
 		CertDir:      testEnvExt.APIServiceInstallOptions.LocalServingCertDir,
-		Stderr:       GinkgoWriter,
-		Stdout:       GinkgoWriter,
 	})
 	Expect(err).NotTo(HaveOccurred())
 

@@ -139,7 +139,7 @@ var _ = Describe("MachineController", func() {
 		))
 
 		By("setting the network interface id in the machine status")
-		iriMachine = &testingmachine.FakeMachine{Machine: *proto.Clone(&iriMachine.Machine).(*iri.Machine)}
+		iriMachine = &testingmachine.FakeMachine{Machine: proto.Clone(iriMachine.Machine).(*iri.Machine)}
 		iriMachine.Metadata.Generation = 1
 		iriMachine.Status.ObservedGeneration = 1
 		iriMachine.Status.NetworkInterfaces = []*iri.NetworkInterfaceStatus{
@@ -287,7 +287,7 @@ var _ = Describe("MachineController", func() {
 		))
 
 		By("setting the network interface id in the machine status")
-		iriMachine = &testingmachine.FakeMachine{Machine: *proto.Clone(&iriMachine.Machine).(*iri.Machine)}
+		iriMachine = &testingmachine.FakeMachine{Machine: proto.Clone(iriMachine.Machine).(*iri.Machine)}
 		iriMachine.Metadata.Generation = 1
 		iriMachine.Status.ObservedGeneration = 1
 		iriMachine.Status.NetworkInterfaces = []*iri.NetworkInterfaceStatus{
@@ -375,7 +375,7 @@ var _ = Describe("MachineController", func() {
 
 		By("inspecting the machine to be running")
 		_, iriMachine := GetSingleMapEntry(srv.Machines)
-		iriMachine = &testingmachine.FakeMachine{Machine: *proto.Clone(&iriMachine.Machine).(*iri.Machine)}
+		iriMachine = &testingmachine.FakeMachine{Machine: proto.Clone(iriMachine.Machine).(*iri.Machine)}
 		iriMachine.Metadata.Generation = 1
 		iriMachine.Status.ObservedGeneration = 1
 		iriMachine.Status.State = iri.MachineState_MACHINE_RUNNING
@@ -384,7 +384,7 @@ var _ = Describe("MachineController", func() {
 
 		By("inspecting the machine to be terminating")
 		_, iriMachine = GetSingleMapEntry(srv.Machines)
-		iriMachine = &testingmachine.FakeMachine{Machine: *proto.Clone(&iriMachine.Machine).(*iri.Machine)}
+		iriMachine = &testingmachine.FakeMachine{Machine: proto.Clone(iriMachine.Machine).(*iri.Machine)}
 		iriMachine.Metadata.Generation = 2
 		iriMachine.Status.ObservedGeneration = 2
 		iriMachine.Status.State = iri.MachineState_MACHINE_TERMINATING
@@ -470,7 +470,7 @@ var _ = Describe("MachineController", func() {
 		))
 
 		By("setting the network interface id in the machine status")
-		iriMachine = &testingmachine.FakeMachine{Machine: *proto.Clone(&iriMachine.Machine).(*iri.Machine)}
+		iriMachine = &testingmachine.FakeMachine{Machine: proto.Clone(iriMachine.Machine).(*iri.Machine)}
 		iriMachine.Metadata.Generation = 1
 		iriMachine.Status.ObservedGeneration = 1
 
@@ -600,21 +600,24 @@ var _ = Describe("MachineController", func() {
 		_, iriMachine := GetSingleMapEntry(srv.Machines)
 
 		By("inspecting the iri machine volumes")
-		Expect(iriMachine.Spec.Volumes).To(ConsistOf(&iri.Volume{
-			Name:   "primary",
-			Device: "oda",
-			Connection: &iri.VolumeConnection{
-				Driver: "test",
-				Handle: "testhandle",
+		Expect(iriMachine.Spec.Volumes).To(ProtoConsistOf(
+			&iri.Volume{
+				Name:   "primary",
+				Device: "oda",
+				Connection: &iri.VolumeConnection{
+					Driver: "test",
+					Handle: "testhandle",
+				},
 			},
-		}, &iri.Volume{
-			Name:   "secondary",
-			Device: "odb",
-			Connection: &iri.VolumeConnection{
-				Driver: "test",
-				Handle: "testhandle",
+			&iri.Volume{
+				Name:   "secondary",
+				Device: "odb",
+				Connection: &iri.VolumeConnection{
+					Driver: "test",
+					Handle: "testhandle",
+				},
 			},
-		}))
+		))
 
 		By("patching the secondary volume to be in error state")
 		Eventually(UpdateStatus(secondaryVolume, func() {
@@ -624,14 +627,14 @@ var _ = Describe("MachineController", func() {
 		By("verifying only erroneous volume is detached")
 		Eventually(func() []*iri.Volume {
 			return srv.Machines[iriMachine.Metadata.Id].Spec.Volumes
-		}).Should(SatisfyAll((ConsistOf(&iri.Volume{
+		}).Should(ProtoConsistOf(&iri.Volume{
 			Name:   "primary",
 			Device: "oda",
 			Connection: &iri.VolumeConnection{
 				Driver: "test",
 				Handle: "testhandle",
 			},
-		}))))
+		}))
 	})
 })
 

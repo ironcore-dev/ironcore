@@ -8,9 +8,6 @@ linters:
     - misspell
     - revive
   settings:
-    govet:
-      disable:
-        - copylocks
     importas:
       alias:
         - pkg: github.com/ironcore-dev/ironcore/api/(\w+)/(v[\w\d]+)
