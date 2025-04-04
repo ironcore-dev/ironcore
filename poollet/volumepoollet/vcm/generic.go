@@ -10,11 +10,11 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	"github.com/gogo/protobuf/proto"
 	"github.com/ironcore-dev/ironcore/iri/apis/volume"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/irievent"
 	"golang.org/x/exp/maps"
+	"google.golang.org/protobuf/proto"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -149,8 +149,7 @@ func (g *Generic) GetVolumeClassFor(ctx context.Context, name string, caps *iri.
 		case 0:
 			return nil, nil, ErrNoMatchingVolumeClass
 		case 1:
-			classStatus := *byCaps[0]
-			return classStatus.VolumeClass, resource.NewQuantity(classStatus.Quantity, resource.BinarySI), nil
+			return byCaps[0].VolumeClass, resource.NewQuantity(byCaps[0].Quantity, resource.BinarySI), nil
 		default:
 			return nil, nil, ErrAmbiguousMatchingVolumeClass
 		}

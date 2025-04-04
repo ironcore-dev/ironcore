@@ -78,7 +78,7 @@ func (s *Server) filterIronCoreVolumeClasses(
 	return filtered
 }
 
-func (s *Server) convertIronCoreVolumeClassStatus(volumeClass *storagev1alpha1.VolumeClass, quantity *resource.Quantity) (*iri.VolumeClassStatus, error) {
+func (s *Server) convertIronCoreVolumeClassStatus(volumeClass *storagev1alpha1.VolumeClass, quantity *resource.Quantity) *iri.VolumeClassStatus {
 	tps := volumeClass.Capabilities.TPS()
 	iops := volumeClass.Capabilities.IOPS()
 
@@ -91,7 +91,7 @@ func (s *Server) convertIronCoreVolumeClassStatus(volumeClass *storagev1alpha1.V
 			},
 		},
 		Quantity: quantity.Value(),
-	}, nil
+	}
 }
 
 func (s *Server) Status(ctx context.Context, req *iri.StatusRequest) (*iri.StatusResponse, error) {
@@ -129,11 +129,7 @@ func (s *Server) Status(ctx context.Context, req *iri.StatusRequest) (*iri.Statu
 			continue
 		}
 
-		volumeClass, err := s.convertIronCoreVolumeClassStatus(&ironcoreVolumeClass, quantity)
-		if err != nil {
-			return nil, fmt.Errorf("error converting ironcore volume class %s: %w", ironcoreVolumeClass.Name, err)
-		}
-
+		volumeClass := s.convertIronCoreVolumeClassStatus(&ironcoreVolumeClass, quantity)
 		volumeClassStatus = append(volumeClassStatus, volumeClass)
 	}
 

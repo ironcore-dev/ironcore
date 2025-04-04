@@ -3,16 +3,6 @@ syntax = "proto3";
 package meta.v1alpha1;
 option go_package = "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1";
 
-import "github.com/gogo/protobuf/gogoproto/gogo.proto";
-
-option (gogoproto.goproto_stringer_all) = false;
-option (gogoproto.stringer_all) = true;
-option (gogoproto.goproto_getters_all) = true;
-option (gogoproto.marshaler_all) = true;
-option (gogoproto.sizer_all) = true;
-option (gogoproto.unmarshaler_all) = true;
-option (gogoproto.goproto_unrecognized_all) = false;
-
 message ObjectMetadata {
   string id = 1;
   map<string, string> annotations = 2;

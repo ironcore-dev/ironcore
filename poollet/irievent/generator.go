@@ -14,8 +14,8 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	"github.com/gogo/protobuf/proto"
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
+	"google.golang.org/protobuf/proto"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apiserver/pkg/server/healthz"
 	ctrl "sigs.k8s.io/controller-runtime"

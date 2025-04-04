@@ -36,7 +36,7 @@ func (s *Server) ExpandVolume(ctx context.Context, req *iri.ExpandVolumeRequest)
 
 	log.V(1).Info("Expanding volume")
 	if err := s.setIronCoreVolumeResources(ctx, ironcoreVolume.Volume, corev1alpha1.ResourceList{
-		corev1alpha1.ResourceStorage: *resource.NewQuantity(int64(req.Resources.StorageBytes), resource.DecimalSI),
+		corev1alpha1.ResourceStorage: *resource.NewQuantity(req.Resources.StorageBytes, resource.DecimalSI),
 	}); err != nil {
 		return nil, fmt.Errorf("failed to expand volume: %w", err)
 	}

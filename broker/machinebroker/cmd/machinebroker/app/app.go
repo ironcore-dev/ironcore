@@ -133,7 +133,7 @@ func Run(ctx context.Context, opts Options) error {
 
 	g, ctx := errgroup.WithContext(ctx)
 	g.Go(func() error {
-		return runServer(ctx, setupLog, log, srv)
+		return runServer(ctx, setupLog, srv)
 	})
 	g.Go(func() error {
 		return runGRPCServer(ctx, setupLog, log, srv, opts)
@@ -144,7 +144,7 @@ func Run(ctx context.Context, opts Options) error {
 	return g.Wait()
 }
 
-func runServer(ctx context.Context, setupLog, log logr.Logger, srv *server.Server) error {
+func runServer(ctx context.Context, setupLog logr.Logger, srv *server.Server) error {
 	setupLog.V(1).Info("Starting server loops")
 	if err := srv.Start(ctx); err != nil {
 		return fmt.Errorf("error starting server loops: %w", err)
