@@ -9,7 +9,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// VirtualIPSpec defines the desired state of VirtualIP
+// VirtualIPSpec defines the desired state of a VirtualIP
 type VirtualIPSpec struct {
 	// Type is the type of VirtualIP.
 	Type VirtualIPType `json:"type"`
@@ -66,7 +66,7 @@ type VirtualIPList struct {
 }
 
 type EphemeralVirtualIPSpec struct {
-	// VirtualIPSpec defines the desired state of VirtualIP
+	// VirtualIPSpec defines the desired state of a VirtualIP
 	VirtualIPSpec `json:",inline"`
 	// ReclaimPolicy is the ReclaimPolicyType of virtualIP
 	ReclaimPolicy ReclaimPolicyType `json:"reclaimPolicy,omitempty"`

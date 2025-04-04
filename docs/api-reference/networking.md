@@ -979,6 +979,52 @@ VirtualIPTemplateSpec
 </tr>
 </tbody>
 </table>
+<h3 id="networking.ironcore.dev/v1alpha1.EphemeralVirtualIPSpec">EphemeralVirtualIPSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.VirtualIPTemplateSpec">VirtualIPTemplateSpec</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>VirtualIPSpec</code><br/>
+<em>
+<a href="#networking.ironcore.dev/v1alpha1.VirtualIPSpec">
+VirtualIPSpec
+</a>
+</em>
+</td>
+<td>
+<p>
+(Members of <code>VirtualIPSpec</code> are embedded into this type.)
+</p>
+<p>VirtualIPSpec defines the desired state of a VirtualIP</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>reclaimPolicy</code><br/>
+<em>
+<a href="#networking.ironcore.dev/v1alpha1.ReclaimPolicyType">
+ReclaimPolicyType
+</a>
+</em>
+</td>
+<td>
+<p>ReclaimPolicy is the ReclaimPolicyType of virtualIP</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="networking.ironcore.dev/v1alpha1.IPBlock">IPBlock
 </h3>
 <p>
@@ -2801,6 +2847,29 @@ EphemeralPrefixSource
 </tr>
 </tbody>
 </table>
+<h3 id="networking.ironcore.dev/v1alpha1.ReclaimPolicyType">ReclaimPolicyType
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.EphemeralVirtualIPSpec">EphemeralVirtualIPSpec</a>)
+</p>
+<div>
+<p>ReclaimPolicyType is the ironcore ReclaimPolicy of a VirtualIP.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Delete&#34;</p></td>
+<td><p>ReclaimPolicyTypeDelete is used for any VirtualIP that is deleted when the claim of VirtualIP is released.</p>
+</td>
+</tr><tr><td><p>&#34;Retain&#34;</p></td>
+<td><p>ReclaimPolicyTypeRetain is used for any VirtualIP that is retained when the claim of VirtualIP is released.</p>
+</td>
+</tr></tbody>
+</table>
 <h3 id="networking.ironcore.dev/v1alpha1.VirtualIPSource">VirtualIPSource
 </h3>
 <p>
@@ -2849,10 +2918,10 @@ VirtualIP.</p>
 <h3 id="networking.ironcore.dev/v1alpha1.VirtualIPSpec">VirtualIPSpec
 </h3>
 <p>
-(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.VirtualIP">VirtualIP</a>, <a href="#networking.ironcore.dev/v1alpha1.VirtualIPTemplateSpec">VirtualIPTemplateSpec</a>)
+(<em>Appears on:</em><a href="#networking.ironcore.dev/v1alpha1.VirtualIP">VirtualIP</a>, <a href="#networking.ironcore.dev/v1alpha1.EphemeralVirtualIPSpec">EphemeralVirtualIPSpec</a>)
 </p>
 <div>
-<p>VirtualIPSpec defines the desired state of VirtualIP</p>
+<p>VirtualIPSpec defines the desired state of a VirtualIP</p>
 </div>
 <table>
 <thead>
@@ -2968,8 +3037,8 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code><br/>
 <em>
-<a href="#networking.ironcore.dev/v1alpha1.VirtualIPSpec">
-VirtualIPSpec
+<a href="#networking.ironcore.dev/v1alpha1.EphemeralVirtualIPSpec">
+EphemeralVirtualIPSpec
 </a>
 </em>
 </td>
@@ -2979,41 +3048,31 @@ VirtualIPSpec
 <table>
 <tr>
 <td>
-<code>type</code><br/>
+<code>VirtualIPSpec</code><br/>
 <em>
-<a href="#networking.ironcore.dev/v1alpha1.VirtualIPType">
-VirtualIPType
+<a href="#networking.ironcore.dev/v1alpha1.VirtualIPSpec">
+VirtualIPSpec
 </a>
 </em>
 </td>
 <td>
-<p>Type is the type of VirtualIP.</p>
+<p>
+(Members of <code>VirtualIPSpec</code> are embedded into this type.)
+</p>
+<p>VirtualIPSpec defines the desired state of a VirtualIP</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>ipFamily</code><br/>
+<code>reclaimPolicy</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#ipfamily-v1-core">
-Kubernetes core/v1.IPFamily
+<a href="#networking.ironcore.dev/v1alpha1.ReclaimPolicyType">
+ReclaimPolicyType
 </a>
 </em>
 </td>
 <td>
-<p>IPFamily is the ip family of the VirtualIP.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>targetRef</code><br/>
-<em>
-<a href="../common/#common.ironcore.dev/v1alpha1.LocalUIDReference">
-github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference
-</a>
-</em>
-</td>
-<td>
-<p>TargetRef references the target for this VirtualIP (currently only NetworkInterface).</p>
+<p>ReclaimPolicy is the ReclaimPolicyType of virtualIP</p>
 </td>
 </tr>
 </table>

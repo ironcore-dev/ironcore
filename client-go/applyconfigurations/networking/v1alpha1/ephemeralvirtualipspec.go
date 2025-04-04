@@ -28,7 +28,7 @@ func EphemeralVirtualIPSpec() *EphemeralVirtualIPSpecApplyConfiguration {
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Type field is set to the value of the last call.
 func (b *EphemeralVirtualIPSpecApplyConfiguration) WithType(value networkingv1alpha1.VirtualIPType) *EphemeralVirtualIPSpecApplyConfiguration {
-	b.Type = &value
+	b.VirtualIPSpecApplyConfiguration.Type = &value
 	return b
 }
 
@@ -36,7 +36,7 @@ func (b *EphemeralVirtualIPSpecApplyConfiguration) WithType(value networkingv1al
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the IPFamily field is set to the value of the last call.
 func (b *EphemeralVirtualIPSpecApplyConfiguration) WithIPFamily(value v1.IPFamily) *EphemeralVirtualIPSpecApplyConfiguration {
-	b.IPFamily = &value
+	b.VirtualIPSpecApplyConfiguration.IPFamily = &value
 	return b
 }
 
@@ -44,7 +44,7 @@ func (b *EphemeralVirtualIPSpecApplyConfiguration) WithIPFamily(value v1.IPFamil
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the TargetRef field is set to the value of the last call.
 func (b *EphemeralVirtualIPSpecApplyConfiguration) WithTargetRef(value commonv1alpha1.LocalUIDReference) *EphemeralVirtualIPSpecApplyConfiguration {
-	b.TargetRef = &value
+	b.VirtualIPSpecApplyConfiguration.TargetRef = &value
 	return b
 }
 

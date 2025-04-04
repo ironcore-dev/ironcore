@@ -65791,6 +65791,36 @@
 				}
 			}
 		},
+		"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.EphemeralVirtualIPSpec": {
+			"type": "object",
+			"required": [
+				"type",
+				"ipFamily"
+			],
+			"properties": {
+				"ipFamily": {
+					"description": "IPFamily is the ip family of the VirtualIP.\n\nPossible enum values:\n - `\"\"` indicates that this IP is unknown protocol\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
+					"type": "string",
+					"enum": [
+						"",
+						"IPv4",
+						"IPv6"
+					]
+				},
+				"reclaimPolicy": {
+					"description": "ReclaimPolicy is the ReclaimPolicyType of virtualIP",
+					"type": "string"
+				},
+				"targetRef": {
+					"description": "TargetRef references the target for this VirtualIP (currently only NetworkInterface).",
+					"$ref": "#/definitions/com.github.ironcore-dev.ironcore.api.common.v1alpha1.LocalUIDReference"
+				},
+				"type": {
+					"description": "Type is the type of VirtualIP.",
+					"type": "string"
+				}
+			}
+		},
 		"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.IPBlock": {
 			"description": "IPBlock specifies an ip block with optional exceptions.",
 			"type": "object",
@@ -66926,7 +66956,7 @@
 			}
 		},
 		"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPSpec": {
-			"description": "VirtualIPSpec defines the desired state of VirtualIP",
+			"description": "VirtualIPSpec defines the desired state of a VirtualIP",
 			"type": "object",
 			"required": [
 				"type",
@@ -66970,7 +67000,7 @@
 					"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
 				},
 				"spec": {
-					"$ref": "#/definitions/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPSpec"
+					"$ref": "#/definitions/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.EphemeralVirtualIPSpec"
 				}
 			}
 		},

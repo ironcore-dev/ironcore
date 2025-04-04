@@ -4542,7 +4542,7 @@ func schema_ironcore_api_networking_v1alpha1_VirtualIPSpec(ref common.ReferenceC
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "VirtualIPSpec defines the desired state of VirtualIP",
+				Description: "VirtualIPSpec defines the desired state of a VirtualIP",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"type": {
