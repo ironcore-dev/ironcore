@@ -22,6 +22,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
@@ -71,26 +72,38 @@ func (r *NetworkInterfaceEphemeralVirtualIPReconciler) ephemeralNetworkInterface
 			Labels:      ephemeral.VirtualIPTemplate.Labels,
 			Annotations: maps.Clone(ephemeral.VirtualIPTemplate.Annotations),
 		},
-		Spec: ephemeral.VirtualIPTemplate.Spec,
+		Spec: ephemeral.VirtualIPTemplate.Spec.VirtualIPSpec,
 	}
 	annotations.SetDefaultEphemeralManagedBy(virtualIP)
-	_ = ctrl.SetControllerReference(nic, virtualIP, r.Scheme())
+	if ephemeral.VirtualIPTemplate.Spec.ReclaimPolicy != networkingv1alpha1.ReclaimPolicyTypeRetain {
+		_ = ctrl.SetControllerReference(nic, virtualIP, r.Scheme())
+	}
 	virtualIP.Spec.TargetRef = &commonv1alpha1.LocalUIDReference{
 		Name: nic.Name,
 		UID:  nic.UID,
 	}
 	res[virtualIPName] = virtualIP
-
 	return res
 }
 
-func (r *NetworkInterfaceEphemeralVirtualIPReconciler) handleExistingVirtualIP(ctx context.Context, log logr.Logger, nic *networkingv1alpha1.NetworkInterface, shouldManage bool, virtualIP *networkingv1alpha1.VirtualIP) error {
-	if annotations.IsDefaultEphemeralControlledBy(virtualIP, nic) {
+func (r *NetworkInterfaceEphemeralVirtualIPReconciler) handleExistingVirtualIP(ctx context.Context, log logr.Logger, nic *networkingv1alpha1.NetworkInterface, shouldManage bool, virtualIP *networkingv1alpha1.VirtualIP, ephemeVip *networkingv1alpha1.VirtualIP) error {
+	log.WithValues("VirtualIP", klog.KObj(virtualIP), "ShouldManage", shouldManage)
+	if annotations.IsDefaultEphemeralOrControlledBy(virtualIP, nic) {
 		if shouldManage {
-			log.V(1).Info("Ephemeral virtual IP is present and controlled by network interface")
+			log.V(1).Info("Ephemeral virtual IP is present")
+
+			if controllerutil.HasControllerReference(ephemeVip) && !controllerutil.HasControllerReference(virtualIP) {
+				baseVip := virtualIP.DeepCopy()
+				_ = ctrl.SetControllerReference(nic, virtualIP, r.Scheme())
+				if err := r.Patch(ctx, virtualIP, client.StrategicMergeFrom(baseVip, client.MergeFromWithOptimisticLock{})); err != nil {
+					return fmt.Errorf("error patching virtualIP: %w", err)
+				}
+			}
+
 			return nil
 		}
 
+		// Virtual IP deletion logic if NIC is not managing it anymore
 		if !virtualIP.DeletionTimestamp.IsZero() {
 			log.V(1).Info("Undesired ephemeral virtual IP is already deleting")
 			return nil
@@ -134,7 +147,9 @@ func (r *NetworkInterfaceEphemeralVirtualIPReconciler) handleCreateVirtualIP(
 
 	// Treat a retrieved virtual IP as an existing we should manage.
 	log.V(1).Info("Retrieved virtual IP after already exists conflict")
-	return r.handleExistingVirtualIP(ctx, log, nic, true, virtualIP)
+	ephemeralVipByName := r.ephemeralNetworkInterfaceVirtualIPByName(nic)
+	ephemeVip, shouldManage := ephemeralVipByName[virtualIP.Name]
+	return r.handleExistingVirtualIP(ctx, log, nic, shouldManage, virtualIP, ephemeVip)
 }
 
 func (r *NetworkInterfaceEphemeralVirtualIPReconciler) reconcile(ctx context.Context, log logr.Logger, nic *networkingv1alpha1.NetworkInterface) (ctrl.Result, error) {
@@ -155,10 +170,10 @@ func (r *NetworkInterfaceEphemeralVirtualIPReconciler) reconcile(ctx context.Con
 	)
 	for _, virtualIP := range virtualIPList.Items {
 		virtualIPName := virtualIP.Name
-		_, shouldManage := ephemNicByName[virtualIPName]
+		ephemVip, shouldManage := ephemNicByName[virtualIPName]
 		delete(ephemNicByName, virtualIPName)
 		log := log.WithValues("VirtualIP", klog.KObj(&virtualIP), "ShouldManage", shouldManage)
-		if err := r.handleExistingVirtualIP(ctx, log, nic, shouldManage, &virtualIP); err != nil {
+		if err := r.handleExistingVirtualIP(ctx, log, nic, shouldManage, &virtualIP, ephemVip); err != nil {
 			errs = append(errs, err)
 		}
 	}

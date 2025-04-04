@@ -5027,6 +5027,42 @@
 					}
 				}
 			},
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.EphemeralVirtualIPSpec": {
+				"type": "object",
+				"required": [
+					"type",
+					"ipFamily"
+				],
+				"properties": {
+					"ipFamily": {
+						"description": "IPFamily is the ip family of the VirtualIP.\n\nPossible enum values:\n - `\"\"` indicates that this IP is unknown protocol\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
+						"type": "string",
+						"default": "",
+						"enum": [
+							"",
+							"IPv4",
+							"IPv6"
+						]
+					},
+					"reclaimPolicy": {
+						"description": "ReclaimPolicy is the ReclaimPolicyType of virtualIP",
+						"type": "string"
+					},
+					"targetRef": {
+						"description": "TargetRef references the target for this VirtualIP (currently only NetworkInterface).",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.LocalUIDReference"
+							}
+						]
+					},
+					"type": {
+						"description": "Type is the type of VirtualIP.",
+						"type": "string",
+						"default": ""
+					}
+				}
+			},
 			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.IPSource": {
 				"description": "IPSource is the definition of how to obtain an IP.",
 				"type": "object",
@@ -5199,39 +5235,6 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPSpec": {
-				"description": "VirtualIPSpec defines the desired state of VirtualIP",
-				"type": "object",
-				"required": [
-					"type",
-					"ipFamily"
-				],
-				"properties": {
-					"ipFamily": {
-						"description": "IPFamily is the ip family of the VirtualIP.\n\nPossible enum values:\n - `\"\"` indicates that this IP is unknown protocol\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
-						"type": "string",
-						"default": "",
-						"enum": [
-							"",
-							"IPv4",
-							"IPv6"
-						]
-					},
-					"targetRef": {
-						"description": "TargetRef references the target for this VirtualIP (currently only NetworkInterface).",
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.LocalUIDReference"
-							}
-						]
-					},
-					"type": {
-						"description": "Type is the type of VirtualIP.",
-						"type": "string",
-						"default": ""
-					}
-				}
-			},
 			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPTemplateSpec": {
 				"description": "VirtualIPTemplateSpec is the specification of a VirtualIP template.",
 				"type": "object",
@@ -5248,7 +5251,7 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPSpec"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.EphemeralVirtualIPSpec"
 							}
 						]
 					}
