@@ -4,6 +4,9 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+# TODO: Remove once "Making unsupported type entry" in gengo is fixed
+export GODEBUG="gotypesalias=0"
+
 THIS_PKG="github.com/ironcore-dev/ironcore"
 SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 PROJECT_ROOT="$SCRIPT_DIR/.."

@@ -61,11 +61,8 @@ func (r *VolumePoolReconciler) delete(ctx context.Context, log logr.Logger, volu
 	return ctrl.Result{}, nil
 }
 
-func (r *VolumePoolReconciler) supportsVolumeClass(ctx context.Context, log logr.Logger, volumeClass *storagev1alpha1.VolumeClass) (*iri.VolumeClass, *resource.Quantity, error) {
-	iriCapabilities, err := getIRIVolumeClassCapabilities(volumeClass)
-	if err != nil {
-		return nil, nil, fmt.Errorf("error getting iri volume class capabilities: %w", err)
-	}
+func (r *VolumePoolReconciler) supportsVolumeClass(ctx context.Context, volumeClass *storagev1alpha1.VolumeClass) (*iri.VolumeClass, *resource.Quantity, error) {
+	iriCapabilities := getIRIVolumeClassCapabilities(volumeClass)
 
 	class, quantity, err := r.VolumeClassMapper.GetVolumeClassFor(ctx, volumeClass.Name, iriCapabilities)
 	if err != nil {
@@ -87,7 +84,7 @@ func (r *VolumePoolReconciler) calculateCapacity(
 
 	capacity = corev1alpha1.ResourceList{}
 	for _, volumeClass := range volumeClassList {
-		class, quantity, err := r.supportsVolumeClass(ctx, log, &volumeClass)
+		class, quantity, err := r.supportsVolumeClass(ctx, &volumeClass)
 		if err != nil {
 			return nil, nil, nil, fmt.Errorf("error checking whether volume class %s is supported: %w", volumeClass.Name, err)
 		}

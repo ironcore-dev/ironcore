@@ -35,7 +35,7 @@ func ValidateMachineUpdate(newMachine, oldMachine *compute.Machine) field.ErrorL
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessorUpdate(newMachine, oldMachine, field.NewPath("metadata"))...)
-	allErrs = append(allErrs, validateMachineSpecUpdate(&newMachine.Spec, &oldMachine.Spec, newMachine.DeletionTimestamp != nil, field.NewPath("spec"))...)
+	allErrs = append(allErrs, validateMachineSpecUpdate(&newMachine.Spec, &oldMachine.Spec, field.NewPath("spec"))...)
 	allErrs = append(allErrs, ValidateMachine(newMachine)...)
 
 	return allErrs
@@ -263,7 +263,7 @@ func validateVolumeTemplateSpecForMachine(template *storage.VolumeTemplateSpec, 
 }
 
 // validateMachineSpecUpdate validates the spec of a Machine object before an update.
-func validateMachineSpecUpdate(new, old *compute.MachineSpec, deletionTimestampSet bool, fldPath *field.Path) field.ErrorList {
+func validateMachineSpecUpdate(new, old *compute.MachineSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, ironcorevalidation.ValidateImmutableField(new.Image, old.Image, fldPath.Child("image"))...)

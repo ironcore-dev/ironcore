@@ -58,7 +58,7 @@ func isPrefixAllocatedAndNotDeleting(prefix *ipamv1alpha1.Prefix) bool {
 		prefix.Status.Phase == ipamv1alpha1.PrefixPhaseAllocated
 }
 
-func (s *PrefixAllocationScheduler) prefixForAllocation(ctx context.Context, log logr.Logger, allocation *ipamv1alpha1.PrefixAllocation) (string, error) {
+func (s *PrefixAllocationScheduler) prefixForAllocation(ctx context.Context, allocation *ipamv1alpha1.PrefixAllocation) (string, error) {
 	sel, err := metav1.LabelSelectorAsSelector(allocation.Spec.PrefixSelector)
 	if err != nil {
 		return "", fmt.Errorf("error building label selector: %w", err)
@@ -142,7 +142,7 @@ func (s *PrefixAllocationScheduler) reconcile(ctx context.Context, log logr.Logg
 	}
 
 	log.V(1).Info("Determining suitable prefix for allocation")
-	ref, err := s.prefixForAllocation(ctx, log, allocation)
+	ref, err := s.prefixForAllocation(ctx, allocation)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error finding prefix for allocation: %w", err)
 	}

@@ -1,0 +1,8 @@
+version: v2
+plugins:
+  - local: ./bin/protoc-gen-go
+    out: iri/apis
+    opt: paths=source_relative
+  - local: ./bin/protoc-gen-go-grpc
+    out: iri/apis
+    opt: paths=source_relative

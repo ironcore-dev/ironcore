@@ -707,10 +707,7 @@ func (r *MachineReconciler) prepareIRIMachineClass(ctx context.Context, machine 
 		return "", false, nil
 	}
 
-	caps, err := getIRIMachineClassCapabilities(machineClass)
-	if err != nil {
-		return "", false, fmt.Errorf("error getting iri machine class capabilities: %w", err)
-	}
+	caps := getIRIMachineClassCapabilities(machineClass)
 
 	class, _, err := r.MachineClassMapper.GetMachineClassFor(ctx, machineClassName, caps)
 	if err != nil {
@@ -719,14 +716,14 @@ func (r *MachineReconciler) prepareIRIMachineClass(ctx context.Context, machine 
 	return class.Name, true, nil
 }
 
-func getIRIMachineClassCapabilities(machineClass *computev1alpha1.MachineClass) (*iri.MachineClassCapabilities, error) {
+func getIRIMachineClassCapabilities(machineClass *computev1alpha1.MachineClass) *iri.MachineClassCapabilities {
 	cpu := machineClass.Capabilities.CPU()
 	memory := machineClass.Capabilities.Memory()
 
 	return &iri.MachineClassCapabilities{
 		CpuMillis:   cpu.MilliValue(),
 		MemoryBytes: memory.Value(),
-	}, nil
+	}
 }
 
 func (r *MachineReconciler) prepareIRIIgnitionData(ctx context.Context, machine *computev1alpha1.Machine, ignitionRef *commonv1alpha1.SecretKeySelector) ([]byte, bool, error) {

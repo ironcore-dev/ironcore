@@ -220,5 +220,4 @@ var _ = Describe("MachinePoolController", func() {
 			))),
 		)
 	})
-
 })

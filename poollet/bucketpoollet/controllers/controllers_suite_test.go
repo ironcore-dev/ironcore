@@ -25,7 +25,6 @@ import (
 	"github.com/ironcore-dev/ironcore/utils/envtest/process"
 
 	"github.com/ironcore-dev/controller-utils/buildutils"
-	"github.com/ironcore-dev/controller-utils/modutils"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -84,13 +83,11 @@ var _ = BeforeSuite(func() {
 		// default path defined in controller-runtime which is /usr/local/kubebuilder/.
 		// Note that you must have the required binaries setup under the bin directory to perform
 		// the tests directly. When we run make test it will be setup and used automatically.
-		BinaryAssetsDirectory: filepath.Join("..", "..", "bin", "k8s",
+		BinaryAssetsDirectory: filepath.Join("..", "..", "..", "bin", "k8s",
 			fmt.Sprintf("1.32.0-%s-%s", runtime.GOOS, runtime.GOARCH)),
 	}
 	testEnvExt = &utilsenvtest.EnvironmentExtensions{
-		APIServiceDirectoryPaths: []string{
-			modutils.Dir("github.com/ironcore-dev/ironcore", "config", "apiserver", "apiservice", "bases"),
-		},
+		APIServiceDirectoryPaths:       []string{filepath.Join("..", "..", "..", "config", "apiserver", "apiservice", "bases")},
 		ErrorIfAPIServicePathIsMissing: true,
 		AdditionalServices: []utilsenvtest.AdditionalService{
 			{
