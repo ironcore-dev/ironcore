@@ -42,6 +42,26 @@ var _ = Describe("Resourcequota", func() {
 			},
 			ContainElement(InvalidField("spec.hard[requests.memory]")),
 		),
+		Entry("invalid resource name",
+			&core.ResourceQuota{
+				Spec: core.ResourceQuotaSpec{
+					Hard: core.ResourceList{
+						"count/foo": resource.MustParse("2"),
+					},
+				},
+			},
+			ContainElement(InvalidField("spec.hard[count/foo]")),
+		),
+		Entry("invalid resource name",
+			&core.ResourceQuota{
+				Spec: core.ResourceQuotaSpec{
+					Hard: core.ResourceList{
+						"bar": resource.MustParse("2"),
+					},
+				},
+			},
+			ContainElement(InvalidField("spec.hard[bar]")),
+		),
 	)
 
 	DescribeTable("ValidateResourceQuotaUpdate",
