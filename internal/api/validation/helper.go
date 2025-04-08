@@ -12,6 +12,10 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore/internal/apis/core"
+	computeEvaluator "github.com/ironcore-dev/ironcore/internal/quota/evaluator/compute"
+	storageEvaluator "github.com/ironcore-dev/ironcore/internal/quota/evaluator/storage"
 	"github.com/ironcore-dev/ironcore/utils/equality"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/api/validation"
@@ -22,6 +26,7 @@ import (
 const (
 	isNegativeErrorMsg    = validation.IsNegativeErrorMsg
 	isNotPositiveErrorMsg = `must be greater than zero`
+	isNotValidResourceMsg = `must be a valid resource name`
 )
 
 func ValidatePowerOfTwo(value int64, fldPath *field.Path) field.ErrorList {
@@ -110,5 +115,15 @@ func ValidateFieldAllowList(value interface{}, allowedFields sets.Set[string], e
 		}
 	}
 
+	return allErrs
+}
+
+func ValidateResourceName(name core.ResourceName, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+	if !computeEvaluator.MachineResourceNames.Has(corev1alpha1.ResourceName(name)) &&
+		!storageEvaluator.BucketResourceNames.Has(corev1alpha1.ResourceName(name)) &&
+		!storageEvaluator.VolumeResourceNames.Has(corev1alpha1.ResourceName(name)) {
+		allErrs = append(allErrs, field.Invalid(fldPath, name, isNotValidResourceMsg))
+	}
 	return allErrs
 }

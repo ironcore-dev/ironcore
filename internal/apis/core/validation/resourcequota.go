@@ -4,11 +4,8 @@
 package validation
 
 import (
-	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
 	"github.com/ironcore-dev/ironcore/internal/apis/core"
-	computeEvaluator "github.com/ironcore-dev/ironcore/internal/quota/evaluator/compute"
-	storageEvaluator "github.com/ironcore-dev/ironcore/internal/quota/evaluator/storage"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -28,11 +25,7 @@ func validateResourceQuotaSpec(spec *core.ResourceQuotaSpec, fldPath *field.Path
 	hardResourceNames := sets.KeySet(spec.Hard)
 
 	for name := range hardResourceNames {
-		if !computeEvaluator.MachineResourceNames.Has(corev1alpha1.ResourceName(name)) &&
-			!storageEvaluator.BucketResourceNames.Has(corev1alpha1.ResourceName(name)) &&
-			!storageEvaluator.VolumeResourceNames.Has(corev1alpha1.ResourceName(name)) {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("hard").Key(string(name)), name, "must be a valid resource name"))
-		}
+		allErrs = append(allErrs, ironcorevalidation.ValidateResourceName(name, fldPath.Child("hard").Key(string(name)))...)
 	}
 
 	for name, quantity := range spec.Hard {
