@@ -48,8 +48,12 @@ jobs:
     permissions:
       contents: read
       packages: write
+    # Condition: Run on push to main, published release, OR PR with 'ok-to-image' label
+    if: |
+      github.event_name == 'push' || 
+      (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'ok-to-image')) ||
+      (github.event_name == 'release' && github.event.action == 'published')
     runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.labels.*.name, 'ok-to-image')
     steps:
     - uses: actions/checkout@v4
     - uses: docker/metadata-action@v5
