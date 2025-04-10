@@ -8,13 +8,13 @@ package v1alpha1
 import (
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	internal "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/internal"
-	v1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/meta/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	managedfields "k8s.io/apimachinery/pkg/util/managedfields"
+	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// NATGatewayApplyConfiguration represents an declarative configuration of the NATGateway type for use
+// NATGatewayApplyConfiguration represents a declarative configuration of the NATGateway type for use
 // with apply.
 type NATGatewayApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -23,7 +23,7 @@ type NATGatewayApplyConfiguration struct {
 	Status                           *NATGatewayStatusApplyConfiguration `json:"status,omitempty"`
 }
 
-// NATGateway constructs an declarative configuration of the NATGateway type for use with
+// NATGateway constructs a declarative configuration of the NATGateway type for use with
 // apply.
 func NATGateway(name, namespace string) *NATGatewayApplyConfiguration {
 	b := &NATGatewayApplyConfiguration{}
@@ -74,7 +74,7 @@ func extractNATGateway(nATGateway *networkingv1alpha1.NATGateway, fieldManager s
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Kind field is set to the value of the last call.
 func (b *NATGatewayApplyConfiguration) WithKind(value string) *NATGatewayApplyConfiguration {
-	b.Kind = &value
+	b.TypeMetaApplyConfiguration.Kind = &value
 	return b
 }
 
@@ -82,7 +82,7 @@ func (b *NATGatewayApplyConfiguration) WithKind(value string) *NATGatewayApplyCo
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the APIVersion field is set to the value of the last call.
 func (b *NATGatewayApplyConfiguration) WithAPIVersion(value string) *NATGatewayApplyConfiguration {
-	b.APIVersion = &value
+	b.TypeMetaApplyConfiguration.APIVersion = &value
 	return b
 }
 
@@ -91,7 +91,7 @@ func (b *NATGatewayApplyConfiguration) WithAPIVersion(value string) *NATGatewayA
 // If called multiple times, the Name field is set to the value of the last call.
 func (b *NATGatewayApplyConfiguration) WithName(value string) *NATGatewayApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Name = &value
+	b.ObjectMetaApplyConfiguration.Name = &value
 	return b
 }
 
@@ -100,7 +100,7 @@ func (b *NATGatewayApplyConfiguration) WithName(value string) *NATGatewayApplyCo
 // If called multiple times, the GenerateName field is set to the value of the last call.
 func (b *NATGatewayApplyConfiguration) WithGenerateName(value string) *NATGatewayApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.GenerateName = &value
+	b.ObjectMetaApplyConfiguration.GenerateName = &value
 	return b
 }
 
@@ -109,7 +109,7 @@ func (b *NATGatewayApplyConfiguration) WithGenerateName(value string) *NATGatewa
 // If called multiple times, the Namespace field is set to the value of the last call.
 func (b *NATGatewayApplyConfiguration) WithNamespace(value string) *NATGatewayApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Namespace = &value
+	b.ObjectMetaApplyConfiguration.Namespace = &value
 	return b
 }
 
@@ -118,7 +118,7 @@ func (b *NATGatewayApplyConfiguration) WithNamespace(value string) *NATGatewayAp
 // If called multiple times, the UID field is set to the value of the last call.
 func (b *NATGatewayApplyConfiguration) WithUID(value types.UID) *NATGatewayApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.UID = &value
+	b.ObjectMetaApplyConfiguration.UID = &value
 	return b
 }
 
@@ -127,7 +127,7 @@ func (b *NATGatewayApplyConfiguration) WithUID(value types.UID) *NATGatewayApply
 // If called multiple times, the ResourceVersion field is set to the value of the last call.
 func (b *NATGatewayApplyConfiguration) WithResourceVersion(value string) *NATGatewayApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.ResourceVersion = &value
+	b.ObjectMetaApplyConfiguration.ResourceVersion = &value
 	return b
 }
 
@@ -136,7 +136,7 @@ func (b *NATGatewayApplyConfiguration) WithResourceVersion(value string) *NATGat
 // If called multiple times, the Generation field is set to the value of the last call.
 func (b *NATGatewayApplyConfiguration) WithGeneration(value int64) *NATGatewayApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Generation = &value
+	b.ObjectMetaApplyConfiguration.Generation = &value
 	return b
 }
 
@@ -145,7 +145,7 @@ func (b *NATGatewayApplyConfiguration) WithGeneration(value int64) *NATGatewayAp
 // If called multiple times, the CreationTimestamp field is set to the value of the last call.
 func (b *NATGatewayApplyConfiguration) WithCreationTimestamp(value metav1.Time) *NATGatewayApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.CreationTimestamp = &value
+	b.ObjectMetaApplyConfiguration.CreationTimestamp = &value
 	return b
 }
 
@@ -154,7 +154,7 @@ func (b *NATGatewayApplyConfiguration) WithCreationTimestamp(value metav1.Time) 
 // If called multiple times, the DeletionTimestamp field is set to the value of the last call.
 func (b *NATGatewayApplyConfiguration) WithDeletionTimestamp(value metav1.Time) *NATGatewayApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.DeletionTimestamp = &value
+	b.ObjectMetaApplyConfiguration.DeletionTimestamp = &value
 	return b
 }
 
@@ -163,7 +163,7 @@ func (b *NATGatewayApplyConfiguration) WithDeletionTimestamp(value metav1.Time) 
 // If called multiple times, the DeletionGracePeriodSeconds field is set to the value of the last call.
 func (b *NATGatewayApplyConfiguration) WithDeletionGracePeriodSeconds(value int64) *NATGatewayApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.DeletionGracePeriodSeconds = &value
+	b.ObjectMetaApplyConfiguration.DeletionGracePeriodSeconds = &value
 	return b
 }
 
@@ -173,11 +173,11 @@ func (b *NATGatewayApplyConfiguration) WithDeletionGracePeriodSeconds(value int6
 // overwriting an existing map entries in Labels field with the same key.
 func (b *NATGatewayApplyConfiguration) WithLabels(entries map[string]string) *NATGatewayApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	if b.Labels == nil && len(entries) > 0 {
-		b.Labels = make(map[string]string, len(entries))
+	if b.ObjectMetaApplyConfiguration.Labels == nil && len(entries) > 0 {
+		b.ObjectMetaApplyConfiguration.Labels = make(map[string]string, len(entries))
 	}
 	for k, v := range entries {
-		b.Labels[k] = v
+		b.ObjectMetaApplyConfiguration.Labels[k] = v
 	}
 	return b
 }
@@ -188,11 +188,11 @@ func (b *NATGatewayApplyConfiguration) WithLabels(entries map[string]string) *NA
 // overwriting an existing map entries in Annotations field with the same key.
 func (b *NATGatewayApplyConfiguration) WithAnnotations(entries map[string]string) *NATGatewayApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	if b.Annotations == nil && len(entries) > 0 {
-		b.Annotations = make(map[string]string, len(entries))
+	if b.ObjectMetaApplyConfiguration.Annotations == nil && len(entries) > 0 {
+		b.ObjectMetaApplyConfiguration.Annotations = make(map[string]string, len(entries))
 	}
 	for k, v := range entries {
-		b.Annotations[k] = v
+		b.ObjectMetaApplyConfiguration.Annotations[k] = v
 	}
 	return b
 }
@@ -206,7 +206,7 @@ func (b *NATGatewayApplyConfiguration) WithOwnerReferences(values ...*v1.OwnerRe
 		if values[i] == nil {
 			panic("nil value passed to WithOwnerReferences")
 		}
-		b.OwnerReferences = append(b.OwnerReferences, *values[i])
+		b.ObjectMetaApplyConfiguration.OwnerReferences = append(b.ObjectMetaApplyConfiguration.OwnerReferences, *values[i])
 	}
 	return b
 }
@@ -217,7 +217,7 @@ func (b *NATGatewayApplyConfiguration) WithOwnerReferences(values ...*v1.OwnerRe
 func (b *NATGatewayApplyConfiguration) WithFinalizers(values ...string) *NATGatewayApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	for i := range values {
-		b.Finalizers = append(b.Finalizers, values[i])
+		b.ObjectMetaApplyConfiguration.Finalizers = append(b.ObjectMetaApplyConfiguration.Finalizers, values[i])
 	}
 	return b
 }
@@ -242,4 +242,10 @@ func (b *NATGatewayApplyConfiguration) WithSpec(value *NATGatewaySpecApplyConfig
 func (b *NATGatewayApplyConfiguration) WithStatus(value *NATGatewayStatusApplyConfiguration) *NATGatewayApplyConfiguration {
 	b.Status = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *NATGatewayApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.ObjectMetaApplyConfiguration.Name
 }

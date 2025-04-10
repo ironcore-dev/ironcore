@@ -30,6 +30,7 @@ spec:
       - command:
         - /machinepoollet
         args:
+        - --health-probe-bind-address=:8081
         - --leader-elect
         - --machine-downward-api-label=root-machine-namespace=metadata.labels['downward-api.machinepoollet.ironcore.dev/root-machine-namespace']
         - --machine-downward-api-label=root-machine-name=metadata.labels['downward-api.machinepoollet.ironcore.dev/root-machine-name']

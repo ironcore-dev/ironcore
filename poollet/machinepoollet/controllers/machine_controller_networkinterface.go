@@ -9,7 +9,6 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	"github.com/gogo/protobuf/proto"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
@@ -21,6 +20,7 @@ import (
 	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -376,16 +376,17 @@ func (r *MachineReconciler) convertIRINetworkInterfaceState(state iri.NetworkInt
 	return "", fmt.Errorf("unknown network interface attachment state %v", state)
 }
 
-func (r *MachineReconciler) convertIRINetworkInterfaceStatus(status *iri.NetworkInterfaceStatus) (computev1alpha1.NetworkInterfaceStatus, error) {
+func (r *MachineReconciler) convertIRINetworkInterfaceStatus(status *iri.NetworkInterfaceStatus, nicName string) (computev1alpha1.NetworkInterfaceStatus, error) {
 	state, err := r.convertIRINetworkInterfaceState(status.State)
 	if err != nil {
 		return computev1alpha1.NetworkInterfaceStatus{}, err
 	}
 
 	return computev1alpha1.NetworkInterfaceStatus{
-		Name:   status.Name,
-		Handle: status.Handle,
-		State:  state,
+		Name:                status.Name,
+		Handle:              status.Handle,
+		State:               state,
+		NetworkInterfaceRef: corev1.LocalObjectReference{Name: nicName},
 	}, nil
 }
 
@@ -394,6 +395,7 @@ func (r *MachineReconciler) addNetworkInterfaceStatusValues(now metav1.Time, exi
 		existing.LastStateTransitionTime = &now
 	}
 	existing.Name = newValues.Name
+	existing.NetworkInterfaceRef = newValues.NetworkInterfaceRef
 	existing.State = newValues.State
 	existing.Handle = newValues.Handle
 }
@@ -415,16 +417,18 @@ func (r *MachineReconciler) getNetworkInterfaceStatusesForMachine(
 			iriNicStatus, ok = iriNicStatusByName[machineNic.Name]
 			nicStatusValues  computev1alpha1.NetworkInterfaceStatus
 		)
+		nicName := computev1alpha1.MachineNetworkInterfaceName(machine.Name, machineNic)
 		if ok {
 			var err error
-			nicStatusValues, err = r.convertIRINetworkInterfaceStatus(iriNicStatus)
+			nicStatusValues, err = r.convertIRINetworkInterfaceStatus(iriNicStatus, nicName)
 			if err != nil {
 				return nil, fmt.Errorf("[network interface %s] %w", machineNic.Name, err)
 			}
 		} else {
 			nicStatusValues = computev1alpha1.NetworkInterfaceStatus{
-				Name:  machineNic.Name,
-				State: computev1alpha1.NetworkInterfaceStatePending,
+				Name:                machineNic.Name,
+				State:               computev1alpha1.NetworkInterfaceStatePending,
+				NetworkInterfaceRef: corev1.LocalObjectReference{Name: nicName},
 			}
 		}
 

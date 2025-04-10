@@ -6,17 +6,17 @@
 package v1alpha1
 
 import (
-	v1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/meta/v1"
+	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// ObjectSelectorApplyConfiguration represents an declarative configuration of the ObjectSelector type for use
+// ObjectSelectorApplyConfiguration represents a declarative configuration of the ObjectSelector type for use
 // with apply.
 type ObjectSelectorApplyConfiguration struct {
 	Kind                               *string `json:"kind,omitempty"`
 	v1.LabelSelectorApplyConfiguration `json:",inline"`
 }
 
-// ObjectSelectorApplyConfiguration constructs an declarative configuration of the ObjectSelector type for use with
+// ObjectSelectorApplyConfiguration constructs a declarative configuration of the ObjectSelector type for use with
 // apply.
 func ObjectSelector() *ObjectSelectorApplyConfiguration {
 	return &ObjectSelectorApplyConfiguration{}
@@ -35,11 +35,11 @@ func (b *ObjectSelectorApplyConfiguration) WithKind(value string) *ObjectSelecto
 // If called multiple times, the entries provided by each call will be put on the MatchLabels field,
 // overwriting an existing map entries in MatchLabels field with the same key.
 func (b *ObjectSelectorApplyConfiguration) WithMatchLabels(entries map[string]string) *ObjectSelectorApplyConfiguration {
-	if b.MatchLabels == nil && len(entries) > 0 {
-		b.MatchLabels = make(map[string]string, len(entries))
+	if b.LabelSelectorApplyConfiguration.MatchLabels == nil && len(entries) > 0 {
+		b.LabelSelectorApplyConfiguration.MatchLabels = make(map[string]string, len(entries))
 	}
 	for k, v := range entries {
-		b.MatchLabels[k] = v
+		b.LabelSelectorApplyConfiguration.MatchLabels[k] = v
 	}
 	return b
 }
@@ -52,7 +52,7 @@ func (b *ObjectSelectorApplyConfiguration) WithMatchExpressions(values ...*v1.La
 		if values[i] == nil {
 			panic("nil value passed to WithMatchExpressions")
 		}
-		b.MatchExpressions = append(b.MatchExpressions, *values[i])
+		b.LabelSelectorApplyConfiguration.MatchExpressions = append(b.LabelSelectorApplyConfiguration.MatchExpressions, *values[i])
 	}
 	return b
 }

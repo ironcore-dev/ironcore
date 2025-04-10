@@ -14,7 +14,9 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
+
 	utilrest "github.com/ironcore-dev/ironcore/utils/rest"
+
 	certificatesv1 "k8s.io/api/certificates/v1"
 	corev1 "k8s.io/api/core/v1"
 	utilnet "k8s.io/apimachinery/pkg/util/net"
@@ -44,11 +46,15 @@ const (
 
 	// EgressSelectorConfigFlagName is the name of the egress-selector-config flag.
 	EgressSelectorConfigFlagName = "egress-selector-config"
+
+	// QpsConfigFlagName is the name of the qps flag.
+	QpsConfigFlagName = "qps"
+
+	// BurstConfigFlagName is the name of the burst flag.
+	BurstConfigFlagName = "burst"
 )
 
-var (
-	log = ctrl.Log.WithName("client").WithName("config")
-)
+var log = ctrl.Log.WithName("client").WithName("config")
 
 // EgressSelectionName is the name of the egress configuration to use.
 type EgressSelectionName string
@@ -150,6 +156,20 @@ func NewGetterOrDie(opts GetterOptions) *Getter {
 	return getter
 }
 
+type BrokerGetter struct {
+	name           string
+	logConstructor func() logr.Logger
+	networkContext egressselector.NetworkContext
+}
+
+func NewBrokerGetter(opts GetterOptions) (*BrokerGetter, error) {
+	setGetterOptionsDefaults(&opts)
+	return &BrokerGetter{
+		name:           opts.Name,
+		logConstructor: opts.LogConstructor,
+	}, nil
+}
+
 func StoreFromOptions(o *GetConfigOptions) (Store, error) {
 	switch {
 	case o.Kubeconfig != "" && o.KubeconfigSecretName != "":
@@ -245,14 +265,28 @@ func (g *Getter) GetConfig(ctx context.Context, opts ...GetConfigOption) (*rest.
 		return g.getAndBootstrapConfigIfNecessary(ctx, o)
 	default:
 		g.logConstructor().Info("Getting config")
-		return g.getConfig(ctx, o)
+		restConfig, err := getConfig(ctx, o, g.networkContext)
+		return restConfig, nil, err
 	}
 }
 
-func (g *Getter) getConfig(ctx context.Context, o *GetConfigOptions) (*rest.Config, Controller, error) {
+func (bg *BrokerGetter) GetConfig(ctx context.Context, opts ...GetConfigOption) (*rest.Config, error) {
+	o := &GetConfigOptions{}
+	o.ApplyOptions(opts)
+
+	if o.Kubeconfig != "" && o.KubeconfigSecretName != "" {
+		return nil, fmt.Errorf("cannot specify kubeconfig and kubeconfig-secret-name")
+	}
+
+	bg.logConstructor().Info("Getting config")
+	return getConfig(ctx, o, bg.networkContext)
+
+}
+
+func getConfig(ctx context.Context, o *GetConfigOptions, networkContext egressselector.NetworkContext) (*rest.Config, error) {
 	loader, err := LoaderFromOptions(o)
 	if err != nil {
-		return nil, nil, fmt.Errorf("error getting loader: %w", err)
+		return nil, fmt.Errorf("error getting loader: %w", err)
 	}
 
 	var cfg *rest.Config
@@ -264,16 +298,19 @@ func (g *Getter) getConfig(ctx context.Context, o *GetConfigOptions) (*rest.Conf
 		cfg, err = LoadDefaultConfig(o.Context)
 	}
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	dialFunc, err := GetEgressSelectorDial(g.networkContext, o.EgressSelectorConfig)
+	dialFunc, err := GetEgressSelectorDial(networkContext, o.EgressSelectorConfig)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	cfg.Dial = dialFunc
-	return cfg, nil, nil
+	cfg.QPS = o.QPS
+	cfg.Burst = o.Burst
+
+	return cfg, nil
 }
 
 func (g *Getter) getAndBootstrapConfigIfNecessary(ctx context.Context, o *GetConfigOptions) (*rest.Config, Controller, error) {

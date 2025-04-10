@@ -5,12 +5,16 @@ package app
 
 import (
 	"context"
+	"crypto/tls"
 	goflag "flag"
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 
-	"github.com/ironcore-dev/controller-utils/configutils"
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
+
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
@@ -22,20 +26,20 @@ import (
 	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/controllers"
 	"github.com/ironcore-dev/ironcore/poollet/irievent"
 	"github.com/ironcore-dev/ironcore/utils/client/config"
-	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
+
+	"github.com/ironcore-dev/controller-utils/configutils"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/certwatcher"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	"sigs.k8s.io/controller-runtime/pkg/metrics/filters"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 )
 
-var (
-	scheme = runtime.NewScheme()
-)
+var scheme = runtime.NewScheme()
 
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
@@ -48,6 +52,11 @@ func init() {
 type Options struct {
 	GetConfigOptions         config.GetConfigOptions
 	MetricsAddr              string
+	SecureMetrics            bool
+	MetricsCertPath          string
+	MetricsCertName          string
+	MetricsCertKey           string
+	EnableHTTP2              bool
 	EnableLeaderElection     bool
 	LeaderElectionNamespace  string
 	LeaderElectionKubeconfig string
@@ -61,13 +70,26 @@ type Options struct {
 	BucketClassMapperSyncTimeout        time.Duration
 
 	ChannelCapacity int
+	RelistPeriod    time.Duration
+	RelistThreshold time.Duration
 
 	WatchFilterValue string
+
+	MaxConcurrentReconciles int
 }
 
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	o.GetConfigOptions.BindFlags(fs)
-	fs.StringVar(&o.MetricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
+	fs.StringVar(&o.MetricsAddr, "metrics-bind-address", "0", "The address the metrics endpoint binds to. "+
+		"Use :8443 for HTTPS or :8080 for HTTP, or leave as 0 to disable the metrics service.")
+	fs.BoolVar(&o.SecureMetrics, "metrics-secure", true,
+		"If set, the metrics endpoint is served securely via HTTPS. Use --metrics-secure=false to use HTTP instead.")
+	fs.StringVar(&o.MetricsCertPath, "metrics-cert-path", "",
+		"The directory that contains the metrics server certificate.")
+	fs.StringVar(&o.MetricsCertName, "metrics-cert-name", "tls.crt", "The name of the metrics server certificate file.")
+	fs.StringVar(&o.MetricsCertKey, "metrics-cert-key", "tls.key", "The name of the metrics server key file.")
+	fs.BoolVar(&o.EnableHTTP2, "enable-http2", false,
+		"If set, HTTP/2 will be enabled for the metrics server")
 	fs.StringVar(&o.ProbeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	fs.BoolVar(&o.EnableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
@@ -82,9 +104,13 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.DurationVar(&o.BucketRuntimeSocketDiscoveryTimeout, "bucket-runtime-discovery-timeout", 20*time.Second, "Timeout for discovering the bucket runtime socket.")
 	fs.DurationVar(&o.BucketClassMapperSyncTimeout, "bcm-sync-timeout", 10*time.Second, "Timeout waiting for the bucket class mapper to sync.")
 
-	fs.IntVar(&o.ChannelCapacity, "channel-capacity", 1024, "channel capacity for the bucket event generator")
+	fs.IntVar(&o.ChannelCapacity, "channel-capacity", 1024, "channel capacity for the bucket event generator.")
+	fs.DurationVar(&o.RelistPeriod, "relist-period", 5*time.Second, "event channel relisting period.")
+	fs.DurationVar(&o.RelistThreshold, "relist-threshold", 3*time.Minute, "event channel relisting threshold.")
 
 	fs.StringVar(&o.WatchFilterValue, "watch-filter", "", "Value to filter for while watching.")
+
+	fs.IntVar(&o.MaxConcurrentReconciles, "max-concurrent-reconciles", 1, "Maximum number of concurrent reconciles.")
 }
 
 func (o *Options) MarkFlagsRequired(cmd *cobra.Command) {
@@ -146,6 +172,9 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error getting config: %w", err)
 	}
 
+	setupLog.Info("IRI Client configuration", "ChannelCapacity", opts.ChannelCapacity, "RelistPeriod", opts.RelistPeriod, "RelistThreshold", opts.RelistThreshold)
+	setupLog.Info("Kubernetes Client configuration", "QPS", cfg.QPS, "Burst", cfg.Burst)
+
 	leaderElectionCfg, err := configutils.GetConfig(
 		configutils.Kubeconfig(opts.LeaderElectionKubeconfig),
 	)
@@ -153,10 +182,72 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error creating leader election kubeconfig: %w", err)
 	}
 
+	// if the enable-http2 flag is false (the default), http/2 should be disabled
+	// due to its vulnerabilities. More specifically, disabling http/2 will
+	// prevent from being vulnerable to the HTTP/2 Stream Cancellation and
+	// Rapid Reset CVEs. For more information see:
+	// - https://github.com/advisories/GHSA-qppj-fm5r-hxr3
+	// - https://github.com/advisories/GHSA-4374-p667-p6c8
+	var tlsOpts []func(*tls.Config)
+	disableHTTP2 := func(c *tls.Config) {
+		setupLog.Info("disabling http/2")
+		c.NextProtos = []string{"http/1.1"}
+	}
+	if !opts.EnableHTTP2 {
+		tlsOpts = append(tlsOpts, disableHTTP2)
+	}
+	// Metrics endpoint is enabled in 'config/bucketpoollet-broker/default/kustomization.yaml'. The Metrics options configure the server.
+	// More info:
+	// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.19.1/pkg/metrics/server
+	// - https://book.kubebuilder.io/reference/metrics.html
+	metricsServerOptions := metricsserver.Options{
+		BindAddress:   opts.MetricsAddr,
+		SecureServing: opts.SecureMetrics,
+		TLSOpts:       tlsOpts,
+	}
+	if opts.SecureMetrics {
+		// FilterProvider is used to protect the metrics endpoint with authn/authz.
+		// These configurations ensure that only authorized users and service accounts
+		// can access the metrics endpoint. The RBAC are configured in 'config/bucketpoollet-broker/broker-rbac/kustomization.yaml'. More info:
+		// https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.19.1/pkg/metrics/filters#WithAuthenticationAndAuthorization
+		metricsServerOptions.FilterProvider = filters.WithAuthenticationAndAuthorization
+	}
+
+	// If the certificate is not specified, controller-runtime will automatically
+	// generate self-signed certificates for the metrics server. While convenient for development and testing,
+	// this setup is not recommended for production.
+	//
+	// TODO(user): If you enable certManager, uncomment the following lines:
+	// - [METRICS-WITH-CERTS] at config/bucketpoollet-broker/default/kustomization.yaml to generate and use certificates
+	// managed by cert-manager for the metrics server.
+	// - [PROMETHEUS-WITH-CERTS] at config/bucketpoollet-broker/prometheus/kustomization.yaml for TLS certification.
+
+	// Create watchers for metrics certificates
+	var metricsCertWatcher *certwatcher.CertWatcher
+
+	if len(opts.MetricsCertPath) > 0 {
+		setupLog.Info("Initializing metrics certificate watcher using provided certificates",
+			"metrics-cert-path", opts.MetricsCertPath, "metrics-cert-name", opts.MetricsCertName, "metrics-cert-key", opts.MetricsCertKey)
+
+		var err error
+		metricsCertWatcher, err = certwatcher.New(
+			filepath.Join(opts.MetricsCertPath, opts.MetricsCertName),
+			filepath.Join(opts.MetricsCertPath, opts.MetricsCertKey),
+		)
+		if err != nil {
+			setupLog.Error(err, "to initialize metrics certificate watcher", "error", err)
+			os.Exit(1)
+		}
+
+		metricsServerOptions.TLSOpts = append(metricsServerOptions.TLSOpts, func(config *tls.Config) {
+			config.GetCertificate = metricsCertWatcher.GetCertificate
+		})
+	}
+
 	mgr, err := ctrl.NewManager(cfg, ctrl.Options{
 		Logger:                  logger,
 		Scheme:                  scheme,
-		Metrics:                 metricsserver.Options{BindAddress: opts.MetricsAddr},
+		Metrics:                 metricsServerOptions,
 		HealthProbeBindAddress:  opts.ProbeAddr,
 		LeaderElection:          opts.EnableLeaderElection,
 		LeaderElectionID:        "dwfepysc.ironcore.dev",
@@ -168,6 +259,14 @@ func Run(ctx context.Context, opts Options) error {
 	}
 	if err := config.SetupControllerWithManager(mgr, configCtrl); err != nil {
 		return err
+	}
+
+	if metricsCertWatcher != nil {
+		setupLog.Info("Adding metrics certificate watcher to manager")
+		if err := mgr.Add(metricsCertWatcher); err != nil {
+			setupLog.Error(err, "unable to add metrics certificate watcher to manager")
+			os.Exit(1)
+		}
 	}
 
 	bucketClassMapper := bcm.NewGeneric(bucketRuntime, bcm.GenericOptions{})
@@ -188,6 +287,8 @@ func Run(ctx context.Context, opts Options) error {
 		return res.Buckets, nil
 	}, irievent.GeneratorOptions{
 		ChannelCapacity: opts.ChannelCapacity,
+		RelistPeriod:    opts.RelistPeriod,
+		RelistThreshold: opts.RelistThreshold,
 	})
 	if err := mgr.Add(bucketEvents); err != nil {
 		return fmt.Errorf("error adding bucket event generator: %w", err)
@@ -205,13 +306,14 @@ func Run(ctx context.Context, opts Options) error {
 		}
 
 		if err := (&controllers.BucketReconciler{
-			EventRecorder:     mgr.GetEventRecorderFor("buckets"),
-			Client:            mgr.GetClient(),
-			Scheme:            scheme,
-			BucketRuntime:     bucketRuntime,
-			BucketClassMapper: bucketClassMapper,
-			BucketPoolName:    opts.BucketPoolName,
-			WatchFilterValue:  opts.WatchFilterValue,
+			EventRecorder:           mgr.GetEventRecorderFor("buckets"),
+			Client:                  mgr.GetClient(),
+			Scheme:                  scheme,
+			BucketRuntime:           bucketRuntime,
+			BucketClassMapper:       bucketClassMapper,
+			BucketPoolName:          opts.BucketPoolName,
+			WatchFilterValue:        opts.WatchFilterValue,
+			MaxConcurrentReconciles: opts.MaxConcurrentReconciles,
 		}).SetupWithManager(mgr); err != nil {
 			return fmt.Errorf("error setting up bucket reconciler with manager: %w", err)
 		}

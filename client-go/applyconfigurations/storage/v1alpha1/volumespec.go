@@ -6,27 +6,27 @@
 package v1alpha1
 
 import (
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
-	v1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/common/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 )
 
-// VolumeSpecApplyConfiguration represents an declarative configuration of the VolumeSpec type for use
+// VolumeSpecApplyConfiguration represents a declarative configuration of the VolumeSpec type for use
 // with apply.
 type VolumeSpecApplyConfiguration struct {
-	VolumeClassRef     *v1.LocalObjectReference                      `json:"volumeClassRef,omitempty"`
-	VolumePoolSelector map[string]string                             `json:"volumePoolSelector,omitempty"`
-	VolumePoolRef      *v1.LocalObjectReference                      `json:"volumePoolRef,omitempty"`
-	ClaimRef           *v1alpha1.LocalUIDReferenceApplyConfiguration `json:"claimRef,omitempty"`
-	Resources          *corev1alpha1.ResourceList                    `json:"resources,omitempty"`
-	Image              *string                                       `json:"image,omitempty"`
-	ImagePullSecretRef *v1.LocalObjectReference                      `json:"imagePullSecretRef,omitempty"`
-	Unclaimable        *bool                                         `json:"unclaimable,omitempty"`
-	Tolerations        []v1alpha1.TolerationApplyConfiguration       `json:"tolerations,omitempty"`
-	Encryption         *VolumeEncryptionApplyConfiguration           `json:"encryption,omitempty"`
+	VolumeClassRef     *v1.LocalObjectReference            `json:"volumeClassRef,omitempty"`
+	VolumePoolSelector map[string]string                   `json:"volumePoolSelector,omitempty"`
+	VolumePoolRef      *v1.LocalObjectReference            `json:"volumePoolRef,omitempty"`
+	ClaimRef           *commonv1alpha1.LocalUIDReference   `json:"claimRef,omitempty"`
+	Resources          *corev1alpha1.ResourceList          `json:"resources,omitempty"`
+	Image              *string                             `json:"image,omitempty"`
+	ImagePullSecretRef *v1.LocalObjectReference            `json:"imagePullSecretRef,omitempty"`
+	Unclaimable        *bool                               `json:"unclaimable,omitempty"`
+	Tolerations        []commonv1alpha1.Toleration         `json:"tolerations,omitempty"`
+	Encryption         *VolumeEncryptionApplyConfiguration `json:"encryption,omitempty"`
 }
 
-// VolumeSpecApplyConfiguration constructs an declarative configuration of the VolumeSpec type for use with
+// VolumeSpecApplyConfiguration constructs a declarative configuration of the VolumeSpec type for use with
 // apply.
 func VolumeSpec() *VolumeSpecApplyConfiguration {
 	return &VolumeSpecApplyConfiguration{}
@@ -65,8 +65,8 @@ func (b *VolumeSpecApplyConfiguration) WithVolumePoolRef(value v1.LocalObjectRef
 // WithClaimRef sets the ClaimRef field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the ClaimRef field is set to the value of the last call.
-func (b *VolumeSpecApplyConfiguration) WithClaimRef(value *v1alpha1.LocalUIDReferenceApplyConfiguration) *VolumeSpecApplyConfiguration {
-	b.ClaimRef = value
+func (b *VolumeSpecApplyConfiguration) WithClaimRef(value commonv1alpha1.LocalUIDReference) *VolumeSpecApplyConfiguration {
+	b.ClaimRef = &value
 	return b
 }
 
@@ -105,12 +105,9 @@ func (b *VolumeSpecApplyConfiguration) WithUnclaimable(value bool) *VolumeSpecAp
 // WithTolerations adds the given value to the Tolerations field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the Tolerations field.
-func (b *VolumeSpecApplyConfiguration) WithTolerations(values ...*v1alpha1.TolerationApplyConfiguration) *VolumeSpecApplyConfiguration {
+func (b *VolumeSpecApplyConfiguration) WithTolerations(values ...commonv1alpha1.Toleration) *VolumeSpecApplyConfiguration {
 	for i := range values {
-		if values[i] == nil {
-			panic("nil value passed to WithTolerations")
-		}
-		b.Tolerations = append(b.Tolerations, *values[i])
+		b.Tolerations = append(b.Tolerations, values[i])
 	}
 	return b
 }

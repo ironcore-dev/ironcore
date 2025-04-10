@@ -49,7 +49,7 @@ func (s *Server) getIronCoreVolumeConfig(volume *iri.Volume) (*IronCoreVolumeCon
 	case volume.EmptyDisk != nil:
 		var sizeLimit *resource.Quantity
 		if sizeBytes := volume.EmptyDisk.SizeBytes; sizeBytes > 0 {
-			sizeLimit = resource.NewQuantity(int64(sizeBytes), resource.DecimalSI)
+			sizeLimit = resource.NewQuantity(sizeBytes, resource.DecimalSI)
 		}
 		emptyDisk = &IronCoreVolumeEmptyDiskConfig{
 			SizeLimit: sizeLimit,
@@ -139,7 +139,7 @@ func (s *Server) createIronCoreVolume(
 		if encryptionSecret != nil {
 			log.V(1).Info("Patching owner ref of ironcore encryption secret")
 			baseEncryptionSecret := encryptionSecret.DeepCopy()
-			encryptionSecret.ObjectMeta.OwnerReferences = []metav1.OwnerReference{
+			encryptionSecret.OwnerReferences = []metav1.OwnerReference{
 				metautils.MakeControllerRef(
 					storagev1alpha1.SchemeGroupVersion.WithKind("Volume"),
 					ironcoreVolume,

@@ -14,8 +14,8 @@ import (
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	"github.com/ironcore-dev/ironcore/client-go/informers"
-	clientset "github.com/ironcore-dev/ironcore/client-go/ironcore"
+	informers "github.com/ironcore-dev/ironcore/client-go/informers/externalversions"
+	clientset "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned"
 	ironcoreopenapi "github.com/ironcore-dev/ironcore/client-go/openapi"
 	ironcoreinitializer "github.com/ironcore-dev/ironcore/internal/admission/initializer"
 	"github.com/ironcore-dev/ironcore/internal/admission/plugin/machinevolumedevices"
@@ -41,6 +41,7 @@ import (
 	genericoptions "k8s.io/apiserver/pkg/server/options"
 	serverstorage "k8s.io/apiserver/pkg/server/storage"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
+	"k8s.io/component-base/version"
 	netutils "k8s.io/utils/net"
 )
 
@@ -203,6 +204,8 @@ func (o *IronCoreAPIServerOptions) Config() (*apiserver.Config, error) {
 
 	serverConfig := genericapiserver.NewRecommendedConfig(api.Codecs)
 
+	serverConfig.EffectiveVersion = version.NewEffectiveVersion("1.0")
+
 	serverConfig.OpenAPIConfig = genericapiserver.DefaultOpenAPIConfig(ironcoreopenapi.GetOpenAPIDefinitions, openapi.NewDefinitionNamer(api.Scheme))
 	serverConfig.OpenAPIConfig.Info.Title = "ironcore-api"
 	serverConfig.OpenAPIConfig.Info.Version = "0.1"
@@ -244,11 +247,11 @@ func (o *IronCoreAPIServerOptions) Run(ctx context.Context) error {
 		return err
 	}
 
-	server.GenericAPIServer.AddPostStartHookOrDie("start-ironcore-api-server-informers", func(context genericapiserver.PostStartHookContext) error {
-		config.GenericConfig.SharedInformerFactory.Start(context.StopCh)
-		o.SharedInformerFactory.Start(context.StopCh)
+	server.GenericAPIServer.AddPostStartHookOrDie("start-ironcore-api-server-informers", func(hookContext genericapiserver.PostStartHookContext) error {
+		config.GenericConfig.SharedInformerFactory.Start(hookContext.Done())
+		o.SharedInformerFactory.Start(hookContext.Done())
 		return nil
 	})
 
-	return server.GenericAPIServer.PrepareRun().Run(ctx.Done())
+	return server.GenericAPIServer.PrepareRun().RunWithContext(ctx)
 }

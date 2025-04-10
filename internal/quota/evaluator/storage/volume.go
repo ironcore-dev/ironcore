@@ -48,7 +48,10 @@ func (m *volumeEvaluator) MatchesResourceName(name corev1alpha1.ResourceName) bo
 }
 
 func (m *volumeEvaluator) MatchesResourceScopeSelectorRequirement(item client.Object, req corev1alpha1.ResourceScopeSelectorRequirement) (bool, error) {
-	volume := item.(*storagev1alpha1.Volume)
+	volume, err := toExternalVolumeOrError(item)
+	if err != nil {
+		return false, err
+	}
 
 	switch req.ScopeName {
 	case corev1alpha1.ResourceScopeVolumeClass:

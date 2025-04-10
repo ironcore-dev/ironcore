@@ -6,17 +6,17 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 )
 
-// PeeringPrefixStatusApplyConfiguration represents an declarative configuration of the PeeringPrefixStatus type for use
+// PeeringPrefixStatusApplyConfiguration represents a declarative configuration of the PeeringPrefixStatus type for use
 // with apply.
 type PeeringPrefixStatusApplyConfiguration struct {
-	Name   *string            `json:"name,omitempty"`
-	Prefix *v1alpha1.IPPrefix `json:"prefix,omitempty"`
+	Name   *string                  `json:"name,omitempty"`
+	Prefix *commonv1alpha1.IPPrefix `json:"prefix,omitempty"`
 }
 
-// PeeringPrefixStatusApplyConfiguration constructs an declarative configuration of the PeeringPrefixStatus type for use with
+// PeeringPrefixStatusApplyConfiguration constructs a declarative configuration of the PeeringPrefixStatus type for use with
 // apply.
 func PeeringPrefixStatus() *PeeringPrefixStatusApplyConfiguration {
 	return &PeeringPrefixStatusApplyConfiguration{}
@@ -33,7 +33,7 @@ func (b *PeeringPrefixStatusApplyConfiguration) WithName(value string) *PeeringP
 // WithPrefix sets the Prefix field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Prefix field is set to the value of the last call.
-func (b *PeeringPrefixStatusApplyConfiguration) WithPrefix(value v1alpha1.IPPrefix) *PeeringPrefixStatusApplyConfiguration {
+func (b *PeeringPrefixStatusApplyConfiguration) WithPrefix(value commonv1alpha1.IPPrefix) *PeeringPrefixStatusApplyConfiguration {
 	b.Prefix = &value
 	return b
 }

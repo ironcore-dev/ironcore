@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
-	"k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/client-go/tools/cache"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	labels "k8s.io/apimachinery/pkg/labels"
+	listers "k8s.io/client-go/listers"
+	cache "k8s.io/client-go/tools/cache"
 )
 
 // ResourceQuotaLister helps list ResourceQuotas.
@@ -17,7 +17,7 @@ import (
 type ResourceQuotaLister interface {
 	// List lists all ResourceQuotas in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.ResourceQuota, err error)
+	List(selector labels.Selector) (ret []*corev1alpha1.ResourceQuota, err error)
 	// ResourceQuotas returns an object that can list and get ResourceQuotas.
 	ResourceQuotas(namespace string) ResourceQuotaNamespaceLister
 	ResourceQuotaListerExpansion
@@ -25,25 +25,17 @@ type ResourceQuotaLister interface {
 
 // resourceQuotaLister implements the ResourceQuotaLister interface.
 type resourceQuotaLister struct {
-	indexer cache.Indexer
+	listers.ResourceIndexer[*corev1alpha1.ResourceQuota]
 }
 
 // NewResourceQuotaLister returns a new ResourceQuotaLister.
 func NewResourceQuotaLister(indexer cache.Indexer) ResourceQuotaLister {
-	return &resourceQuotaLister{indexer: indexer}
-}
-
-// List lists all ResourceQuotas in the indexer.
-func (s *resourceQuotaLister) List(selector labels.Selector) (ret []*v1alpha1.ResourceQuota, err error) {
-	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.ResourceQuota))
-	})
-	return ret, err
+	return &resourceQuotaLister{listers.New[*corev1alpha1.ResourceQuota](indexer, corev1alpha1.Resource("resourcequota"))}
 }
 
 // ResourceQuotas returns an object that can list and get ResourceQuotas.
 func (s *resourceQuotaLister) ResourceQuotas(namespace string) ResourceQuotaNamespaceLister {
-	return resourceQuotaNamespaceLister{indexer: s.indexer, namespace: namespace}
+	return resourceQuotaNamespaceLister{listers.NewNamespaced[*corev1alpha1.ResourceQuota](s.ResourceIndexer, namespace)}
 }
 
 // ResourceQuotaNamespaceLister helps list and get ResourceQuotas.
@@ -51,36 +43,15 @@ func (s *resourceQuotaLister) ResourceQuotas(namespace string) ResourceQuotaName
 type ResourceQuotaNamespaceLister interface {
 	// List lists all ResourceQuotas in the indexer for a given namespace.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.ResourceQuota, err error)
+	List(selector labels.Selector) (ret []*corev1alpha1.ResourceQuota, err error)
 	// Get retrieves the ResourceQuota from the indexer for a given namespace and name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.ResourceQuota, error)
+	Get(name string) (*corev1alpha1.ResourceQuota, error)
 	ResourceQuotaNamespaceListerExpansion
 }
 
 // resourceQuotaNamespaceLister implements the ResourceQuotaNamespaceLister
 // interface.
 type resourceQuotaNamespaceLister struct {
-	indexer   cache.Indexer
-	namespace string
-}
-
-// List lists all ResourceQuotas in the indexer for a given namespace.
-func (s resourceQuotaNamespaceLister) List(selector labels.Selector) (ret []*v1alpha1.ResourceQuota, err error) {
-	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.ResourceQuota))
-	})
-	return ret, err
-}
-
-// Get retrieves the ResourceQuota from the indexer for a given namespace and name.
-func (s resourceQuotaNamespaceLister) Get(name string) (*v1alpha1.ResourceQuota, error) {
-	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("resourcequota"), name)
-	}
-	return obj.(*v1alpha1.ResourceQuota), nil
+	listers.ResourceIndexer[*corev1alpha1.ResourceQuota]
 }

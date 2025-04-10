@@ -7,19 +7,19 @@ package v1alpha1
 
 import (
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
+	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// PrefixStatusApplyConfiguration represents an declarative configuration of the PrefixStatus type for use
+// PrefixStatusApplyConfiguration represents a declarative configuration of the PrefixStatus type for use
 // with apply.
 type PrefixStatusApplyConfiguration struct {
-	Phase                   *v1alpha1.PrefixPhase     `json:"phase,omitempty"`
+	Phase                   *ipamv1alpha1.PrefixPhase `json:"phase,omitempty"`
 	LastPhaseTransitionTime *v1.Time                  `json:"lastPhaseTransitionTime,omitempty"`
 	Used                    []commonv1alpha1.IPPrefix `json:"used,omitempty"`
 }
 
-// PrefixStatusApplyConfiguration constructs an declarative configuration of the PrefixStatus type for use with
+// PrefixStatusApplyConfiguration constructs a declarative configuration of the PrefixStatus type for use with
 // apply.
 func PrefixStatus() *PrefixStatusApplyConfiguration {
 	return &PrefixStatusApplyConfiguration{}
@@ -28,7 +28,7 @@ func PrefixStatus() *PrefixStatusApplyConfiguration {
 // WithPhase sets the Phase field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Phase field is set to the value of the last call.
-func (b *PrefixStatusApplyConfiguration) WithPhase(value v1alpha1.PrefixPhase) *PrefixStatusApplyConfiguration {
+func (b *PrefixStatusApplyConfiguration) WithPhase(value ipamv1alpha1.PrefixPhase) *PrefixStatusApplyConfiguration {
 	b.Phase = &value
 	return b
 }

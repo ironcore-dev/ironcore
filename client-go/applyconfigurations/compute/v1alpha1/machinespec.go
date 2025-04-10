@@ -6,28 +6,28 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	commonv1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/common/v1alpha1"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 )
 
-// MachineSpecApplyConfiguration represents an declarative configuration of the MachineSpec type for use
+// MachineSpecApplyConfiguration represents a declarative configuration of the MachineSpec type for use
 // with apply.
 type MachineSpecApplyConfiguration struct {
-	MachineClassRef     *v1.LocalObjectReference                            `json:"machineClassRef,omitempty"`
-	MachinePoolSelector map[string]string                                   `json:"machinePoolSelector,omitempty"`
-	MachinePoolRef      *v1.LocalObjectReference                            `json:"machinePoolRef,omitempty"`
-	Power               *v1alpha1.Power                                     `json:"power,omitempty"`
-	Image               *string                                             `json:"image,omitempty"`
-	ImagePullSecretRef  *v1.LocalObjectReference                            `json:"imagePullSecret,omitempty"`
-	NetworkInterfaces   []NetworkInterfaceApplyConfiguration                `json:"networkInterfaces,omitempty"`
-	Volumes             []VolumeApplyConfiguration                          `json:"volumes,omitempty"`
-	IgnitionRef         *commonv1alpha1.SecretKeySelectorApplyConfiguration `json:"ignitionRef,omitempty"`
-	EFIVars             []EFIVarApplyConfiguration                          `json:"efiVars,omitempty"`
-	Tolerations         []commonv1alpha1.TolerationApplyConfiguration       `json:"tolerations,omitempty"`
+	MachineClassRef     *v1.LocalObjectReference             `json:"machineClassRef,omitempty"`
+	MachinePoolSelector map[string]string                    `json:"machinePoolSelector,omitempty"`
+	MachinePoolRef      *v1.LocalObjectReference             `json:"machinePoolRef,omitempty"`
+	Power               *computev1alpha1.Power               `json:"power,omitempty"`
+	Image               *string                              `json:"image,omitempty"`
+	ImagePullSecretRef  *v1.LocalObjectReference             `json:"imagePullSecret,omitempty"`
+	NetworkInterfaces   []NetworkInterfaceApplyConfiguration `json:"networkInterfaces,omitempty"`
+	Volumes             []VolumeApplyConfiguration           `json:"volumes,omitempty"`
+	IgnitionRef         *commonv1alpha1.SecretKeySelector    `json:"ignitionRef,omitempty"`
+	EFIVars             []EFIVarApplyConfiguration           `json:"efiVars,omitempty"`
+	Tolerations         []commonv1alpha1.Toleration          `json:"tolerations,omitempty"`
 }
 
-// MachineSpecApplyConfiguration constructs an declarative configuration of the MachineSpec type for use with
+// MachineSpecApplyConfiguration constructs a declarative configuration of the MachineSpec type for use with
 // apply.
 func MachineSpec() *MachineSpecApplyConfiguration {
 	return &MachineSpecApplyConfiguration{}
@@ -66,7 +66,7 @@ func (b *MachineSpecApplyConfiguration) WithMachinePoolRef(value v1.LocalObjectR
 // WithPower sets the Power field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Power field is set to the value of the last call.
-func (b *MachineSpecApplyConfiguration) WithPower(value v1alpha1.Power) *MachineSpecApplyConfiguration {
+func (b *MachineSpecApplyConfiguration) WithPower(value computev1alpha1.Power) *MachineSpecApplyConfiguration {
 	b.Power = &value
 	return b
 }
@@ -116,8 +116,8 @@ func (b *MachineSpecApplyConfiguration) WithVolumes(values ...*VolumeApplyConfig
 // WithIgnitionRef sets the IgnitionRef field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the IgnitionRef field is set to the value of the last call.
-func (b *MachineSpecApplyConfiguration) WithIgnitionRef(value *commonv1alpha1.SecretKeySelectorApplyConfiguration) *MachineSpecApplyConfiguration {
-	b.IgnitionRef = value
+func (b *MachineSpecApplyConfiguration) WithIgnitionRef(value commonv1alpha1.SecretKeySelector) *MachineSpecApplyConfiguration {
+	b.IgnitionRef = &value
 	return b
 }
 
@@ -137,12 +137,9 @@ func (b *MachineSpecApplyConfiguration) WithEFIVars(values ...*EFIVarApplyConfig
 // WithTolerations adds the given value to the Tolerations field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the Tolerations field.
-func (b *MachineSpecApplyConfiguration) WithTolerations(values ...*commonv1alpha1.TolerationApplyConfiguration) *MachineSpecApplyConfiguration {
+func (b *MachineSpecApplyConfiguration) WithTolerations(values ...commonv1alpha1.Toleration) *MachineSpecApplyConfiguration {
 	for i := range values {
-		if values[i] == nil {
-			panic("nil value passed to WithTolerations")
-		}
-		b.Tolerations = append(b.Tolerations, *values[i])
+		b.Tolerations = append(b.Tolerations, values[i])
 	}
 	return b
 }

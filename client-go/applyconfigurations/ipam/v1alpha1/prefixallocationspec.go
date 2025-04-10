@@ -6,22 +6,22 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
-	metav1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/meta/v1"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// PrefixAllocationSpecApplyConfiguration represents an declarative configuration of the PrefixAllocationSpec type for use
+// PrefixAllocationSpecApplyConfiguration represents a declarative configuration of the PrefixAllocationSpec type for use
 // with apply.
 type PrefixAllocationSpecApplyConfiguration struct {
 	IPFamily       *v1.IPFamily                            `json:"ipFamily,omitempty"`
-	Prefix         *v1alpha1.IPPrefix                      `json:"prefix,omitempty"`
+	Prefix         *commonv1alpha1.IPPrefix                `json:"prefix,omitempty"`
 	PrefixLength   *int32                                  `json:"prefixLength,omitempty"`
 	PrefixRef      *v1.LocalObjectReference                `json:"prefixRef,omitempty"`
 	PrefixSelector *metav1.LabelSelectorApplyConfiguration `json:"prefixSelector,omitempty"`
 }
 
-// PrefixAllocationSpecApplyConfiguration constructs an declarative configuration of the PrefixAllocationSpec type for use with
+// PrefixAllocationSpecApplyConfiguration constructs a declarative configuration of the PrefixAllocationSpec type for use with
 // apply.
 func PrefixAllocationSpec() *PrefixAllocationSpecApplyConfiguration {
 	return &PrefixAllocationSpecApplyConfiguration{}
@@ -38,7 +38,7 @@ func (b *PrefixAllocationSpecApplyConfiguration) WithIPFamily(value v1.IPFamily)
 // WithPrefix sets the Prefix field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Prefix field is set to the value of the last call.
-func (b *PrefixAllocationSpecApplyConfiguration) WithPrefix(value v1alpha1.IPPrefix) *PrefixAllocationSpecApplyConfiguration {
+func (b *PrefixAllocationSpecApplyConfiguration) WithPrefix(value commonv1alpha1.IPPrefix) *PrefixAllocationSpecApplyConfiguration {
 	b.Prefix = &value
 	return b
 }

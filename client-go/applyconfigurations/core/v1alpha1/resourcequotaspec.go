@@ -6,17 +6,17 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 )
 
-// ResourceQuotaSpecApplyConfiguration represents an declarative configuration of the ResourceQuotaSpec type for use
+// ResourceQuotaSpecApplyConfiguration represents a declarative configuration of the ResourceQuotaSpec type for use
 // with apply.
 type ResourceQuotaSpecApplyConfiguration struct {
-	Hard          *v1alpha1.ResourceList                   `json:"hard,omitempty"`
+	Hard          *corev1alpha1.ResourceList               `json:"hard,omitempty"`
 	ScopeSelector *ResourceScopeSelectorApplyConfiguration `json:"scopeSelector,omitempty"`
 }
 
-// ResourceQuotaSpecApplyConfiguration constructs an declarative configuration of the ResourceQuotaSpec type for use with
+// ResourceQuotaSpecApplyConfiguration constructs a declarative configuration of the ResourceQuotaSpec type for use with
 // apply.
 func ResourceQuotaSpec() *ResourceQuotaSpecApplyConfiguration {
 	return &ResourceQuotaSpecApplyConfiguration{}
@@ -25,7 +25,7 @@ func ResourceQuotaSpec() *ResourceQuotaSpecApplyConfiguration {
 // WithHard sets the Hard field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Hard field is set to the value of the last call.
-func (b *ResourceQuotaSpecApplyConfiguration) WithHard(value v1alpha1.ResourceList) *ResourceQuotaSpecApplyConfiguration {
+func (b *ResourceQuotaSpecApplyConfiguration) WithHard(value corev1alpha1.ResourceList) *ResourceQuotaSpecApplyConfiguration {
 	b.Hard = &value
 	return b
 }

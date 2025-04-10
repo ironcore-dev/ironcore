@@ -5,7 +5,7 @@
 
 package v1alpha1
 
-// EFIVarApplyConfiguration represents an declarative configuration of the EFIVar type for use
+// EFIVarApplyConfiguration represents a declarative configuration of the EFIVar type for use
 // with apply.
 type EFIVarApplyConfiguration struct {
 	Name  *string `json:"name,omitempty"`
@@ -13,7 +13,7 @@ type EFIVarApplyConfiguration struct {
 	Value *string `json:"value,omitempty"`
 }
 
-// EFIVarApplyConfiguration constructs an declarative configuration of the EFIVar type for use with
+// EFIVarApplyConfiguration constructs a declarative configuration of the EFIVar type for use with
 // apply.
 func EFIVar() *EFIVarApplyConfiguration {
 	return &EFIVarApplyConfiguration{}

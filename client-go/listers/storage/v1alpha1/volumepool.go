@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	"k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/client-go/tools/cache"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	labels "k8s.io/apimachinery/pkg/labels"
+	listers "k8s.io/client-go/listers"
+	cache "k8s.io/client-go/tools/cache"
 )
 
 // VolumePoolLister helps list VolumePools.
@@ -17,39 +17,19 @@ import (
 type VolumePoolLister interface {
 	// List lists all VolumePools in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.VolumePool, err error)
+	List(selector labels.Selector) (ret []*storagev1alpha1.VolumePool, err error)
 	// Get retrieves the VolumePool from the index for a given name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.VolumePool, error)
+	Get(name string) (*storagev1alpha1.VolumePool, error)
 	VolumePoolListerExpansion
 }
 
 // volumePoolLister implements the VolumePoolLister interface.
 type volumePoolLister struct {
-	indexer cache.Indexer
+	listers.ResourceIndexer[*storagev1alpha1.VolumePool]
 }
 
 // NewVolumePoolLister returns a new VolumePoolLister.
 func NewVolumePoolLister(indexer cache.Indexer) VolumePoolLister {
-	return &volumePoolLister{indexer: indexer}
-}
-
-// List lists all VolumePools in the indexer.
-func (s *volumePoolLister) List(selector labels.Selector) (ret []*v1alpha1.VolumePool, err error) {
-	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.VolumePool))
-	})
-	return ret, err
-}
-
-// Get retrieves the VolumePool from the index for a given name.
-func (s *volumePoolLister) Get(name string) (*v1alpha1.VolumePool, error) {
-	obj, exists, err := s.indexer.GetByKey(name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("volumepool"), name)
-	}
-	return obj.(*v1alpha1.VolumePool), nil
+	return &volumePoolLister{listers.New[*storagev1alpha1.VolumePool](indexer, storagev1alpha1.Resource("volumepool"))}
 }

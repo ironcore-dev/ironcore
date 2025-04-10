@@ -112,5 +112,3 @@ We use GitHub issues to track bugs and enhancement requests. Please provide as m
 Therefore, contributors may use but aren't restricted to the issue template provided by the IronCore maintainers.
 
 Issues and pull requests are tracked in the [backlog](https://github.com/ironcore-dev/ironcore/projects/1) for this project.
-
---8<-- "hack/docs/abbreviations.md"

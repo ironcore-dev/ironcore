@@ -13,7 +13,7 @@ import (
 
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	core "github.com/ironcore-dev/ironcore/internal/apis/core"
 	storage "github.com/ironcore-dev/ironcore/internal/apis/storage"
 	v1 "k8s.io/api/core/v1"
@@ -29,290 +29,290 @@ func init() {
 // RegisterConversions adds conversion functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterConversions(s *runtime.Scheme) error {
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.Bucket)(nil), (*storage.Bucket)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_Bucket_To_storage_Bucket(a.(*v1alpha1.Bucket), b.(*storage.Bucket), scope)
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.Bucket)(nil), (*storage.Bucket)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_Bucket_To_storage_Bucket(a.(*storagev1alpha1.Bucket), b.(*storage.Bucket), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*storage.Bucket)(nil), (*v1alpha1.Bucket)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_storage_Bucket_To_v1alpha1_Bucket(a.(*storage.Bucket), b.(*v1alpha1.Bucket), scope)
+	if err := s.AddGeneratedConversionFunc((*storage.Bucket)(nil), (*storagev1alpha1.Bucket)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_Bucket_To_v1alpha1_Bucket(a.(*storage.Bucket), b.(*storagev1alpha1.Bucket), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.BucketAccess)(nil), (*storage.BucketAccess)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_BucketAccess_To_storage_BucketAccess(a.(*v1alpha1.BucketAccess), b.(*storage.BucketAccess), scope)
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.BucketAccess)(nil), (*storage.BucketAccess)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_BucketAccess_To_storage_BucketAccess(a.(*storagev1alpha1.BucketAccess), b.(*storage.BucketAccess), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*storage.BucketAccess)(nil), (*v1alpha1.BucketAccess)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_storage_BucketAccess_To_v1alpha1_BucketAccess(a.(*storage.BucketAccess), b.(*v1alpha1.BucketAccess), scope)
+	if err := s.AddGeneratedConversionFunc((*storage.BucketAccess)(nil), (*storagev1alpha1.BucketAccess)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_BucketAccess_To_v1alpha1_BucketAccess(a.(*storage.BucketAccess), b.(*storagev1alpha1.BucketAccess), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.BucketClass)(nil), (*storage.BucketClass)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_BucketClass_To_storage_BucketClass(a.(*v1alpha1.BucketClass), b.(*storage.BucketClass), scope)
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.BucketClass)(nil), (*storage.BucketClass)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_BucketClass_To_storage_BucketClass(a.(*storagev1alpha1.BucketClass), b.(*storage.BucketClass), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*storage.BucketClass)(nil), (*v1alpha1.BucketClass)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_storage_BucketClass_To_v1alpha1_BucketClass(a.(*storage.BucketClass), b.(*v1alpha1.BucketClass), scope)
+	if err := s.AddGeneratedConversionFunc((*storage.BucketClass)(nil), (*storagev1alpha1.BucketClass)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_BucketClass_To_v1alpha1_BucketClass(a.(*storage.BucketClass), b.(*storagev1alpha1.BucketClass), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.BucketClassList)(nil), (*storage.BucketClassList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_BucketClassList_To_storage_BucketClassList(a.(*v1alpha1.BucketClassList), b.(*storage.BucketClassList), scope)
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.BucketClassList)(nil), (*storage.BucketClassList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_BucketClassList_To_storage_BucketClassList(a.(*storagev1alpha1.BucketClassList), b.(*storage.BucketClassList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*storage.BucketClassList)(nil), (*v1alpha1.BucketClassList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_storage_BucketClassList_To_v1alpha1_BucketClassList(a.(*storage.BucketClassList), b.(*v1alpha1.BucketClassList), scope)
+	if err := s.AddGeneratedConversionFunc((*storage.BucketClassList)(nil), (*storagev1alpha1.BucketClassList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_BucketClassList_To_v1alpha1_BucketClassList(a.(*storage.BucketClassList), b.(*storagev1alpha1.BucketClassList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.BucketCondition)(nil), (*storage.BucketCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_BucketCondition_To_storage_BucketCondition(a.(*v1alpha1.BucketCondition), b.(*storage.BucketCondition), scope)
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.BucketCondition)(nil), (*storage.BucketCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_BucketCondition_To_storage_BucketCondition(a.(*storagev1alpha1.BucketCondition), b.(*storage.BucketCondition), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*storage.BucketCondition)(nil), (*v1alpha1.BucketCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_storage_BucketCondition_To_v1alpha1_BucketCondition(a.(*storage.BucketCondition), b.(*v1alpha1.BucketCondition), scope)
+	if err := s.AddGeneratedConversionFunc((*storage.BucketCondition)(nil), (*storagev1alpha1.BucketCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_BucketCondition_To_v1alpha1_BucketCondition(a.(*storage.BucketCondition), b.(*storagev1alpha1.BucketCondition), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.BucketList)(nil), (*storage.BucketList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_BucketList_To_storage_BucketList(a.(*v1alpha1.BucketList), b.(*storage.BucketList), scope)
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.BucketList)(nil), (*storage.BucketList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_BucketList_To_storage_BucketList(a.(*storagev1alpha1.BucketList), b.(*storage.BucketList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*storage.BucketList)(nil), (*v1alpha1.BucketList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_storage_BucketList_To_v1alpha1_BucketList(a.(*storage.BucketList), b.(*v1alpha1.BucketList), scope)
+	if err := s.AddGeneratedConversionFunc((*storage.BucketList)(nil), (*storagev1alpha1.BucketList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_BucketList_To_v1alpha1_BucketList(a.(*storage.BucketList), b.(*storagev1alpha1.BucketList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.BucketPool)(nil), (*storage.BucketPool)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_BucketPool_To_storage_BucketPool(a.(*v1alpha1.BucketPool), b.(*storage.BucketPool), scope)
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.BucketPool)(nil), (*storage.BucketPool)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_BucketPool_To_storage_BucketPool(a.(*storagev1alpha1.BucketPool), b.(*storage.BucketPool), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*storage.BucketPool)(nil), (*v1alpha1.BucketPool)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_storage_BucketPool_To_v1alpha1_BucketPool(a.(*storage.BucketPool), b.(*v1alpha1.BucketPool), scope)
+	if err := s.AddGeneratedConversionFunc((*storage.BucketPool)(nil), (*storagev1alpha1.BucketPool)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_BucketPool_To_v1alpha1_BucketPool(a.(*storage.BucketPool), b.(*storagev1alpha1.BucketPool), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.BucketPoolList)(nil), (*storage.BucketPoolList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_BucketPoolList_To_storage_BucketPoolList(a.(*v1alpha1.BucketPoolList), b.(*storage.BucketPoolList), scope)
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.BucketPoolList)(nil), (*storage.BucketPoolList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_BucketPoolList_To_storage_BucketPoolList(a.(*storagev1alpha1.BucketPoolList), b.(*storage.BucketPoolList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*storage.BucketPoolList)(nil), (*v1alpha1.BucketPoolList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_storage_BucketPoolList_To_v1alpha1_BucketPoolList(a.(*storage.BucketPoolList), b.(*v1alpha1.BucketPoolList), scope)
+	if err := s.AddGeneratedConversionFunc((*storage.BucketPoolList)(nil), (*storagev1alpha1.BucketPoolList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_BucketPoolList_To_v1alpha1_BucketPoolList(a.(*storage.BucketPoolList), b.(*storagev1alpha1.BucketPoolList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.BucketPoolSpec)(nil), (*storage.BucketPoolSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_BucketPoolSpec_To_storage_BucketPoolSpec(a.(*v1alpha1.BucketPoolSpec), b.(*storage.BucketPoolSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.BucketPoolSpec)(nil), (*storage.BucketPoolSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_BucketPoolSpec_To_storage_BucketPoolSpec(a.(*storagev1alpha1.BucketPoolSpec), b.(*storage.BucketPoolSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*storage.BucketPoolSpec)(nil), (*v1alpha1.BucketPoolSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_storage_BucketPoolSpec_To_v1alpha1_BucketPoolSpec(a.(*storage.BucketPoolSpec), b.(*v1alpha1.BucketPoolSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*storage.BucketPoolSpec)(nil), (*storagev1alpha1.BucketPoolSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_BucketPoolSpec_To_v1alpha1_BucketPoolSpec(a.(*storage.BucketPoolSpec), b.(*storagev1alpha1.BucketPoolSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.BucketPoolStatus)(nil), (*storage.BucketPoolStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_BucketPoolStatus_To_storage_BucketPoolStatus(a.(*v1alpha1.BucketPoolStatus), b.(*storage.BucketPoolStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.BucketPoolStatus)(nil), (*storage.BucketPoolStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_BucketPoolStatus_To_storage_BucketPoolStatus(a.(*storagev1alpha1.BucketPoolStatus), b.(*storage.BucketPoolStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*storage.BucketPoolStatus)(nil), (*v1alpha1.BucketPoolStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_storage_BucketPoolStatus_To_v1alpha1_BucketPoolStatus(a.(*storage.BucketPoolStatus), b.(*v1alpha1.BucketPoolStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*storage.BucketPoolStatus)(nil), (*storagev1alpha1.BucketPoolStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_BucketPoolStatus_To_v1alpha1_BucketPoolStatus(a.(*storage.BucketPoolStatus), b.(*storagev1alpha1.BucketPoolStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.BucketSpec)(nil), (*storage.BucketSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_BucketSpec_To_storage_BucketSpec(a.(*v1alpha1.BucketSpec), b.(*storage.BucketSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.BucketSpec)(nil), (*storage.BucketSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_BucketSpec_To_storage_BucketSpec(a.(*storagev1alpha1.BucketSpec), b.(*storage.BucketSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*storage.BucketSpec)(nil), (*v1alpha1.BucketSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_storage_BucketSpec_To_v1alpha1_BucketSpec(a.(*storage.BucketSpec), b.(*v1alpha1.BucketSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*storage.BucketSpec)(nil), (*storagev1alpha1.BucketSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_BucketSpec_To_v1alpha1_BucketSpec(a.(*storage.BucketSpec), b.(*storagev1alpha1.BucketSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.BucketStatus)(nil), (*storage.BucketStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_BucketStatus_To_storage_BucketStatus(a.(*v1alpha1.BucketStatus), b.(*storage.BucketStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.BucketStatus)(nil), (*storage.BucketStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_BucketStatus_To_storage_BucketStatus(a.(*storagev1alpha1.BucketStatus), b.(*storage.BucketStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*storage.BucketStatus)(nil), (*v1alpha1.BucketStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_storage_BucketStatus_To_v1alpha1_BucketStatus(a.(*storage.BucketStatus), b.(*v1alpha1.BucketStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*storage.BucketStatus)(nil), (*storagev1alpha1.BucketStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_BucketStatus_To_v1alpha1_BucketStatus(a.(*storage.BucketStatus), b.(*storagev1alpha1.BucketStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.BucketTemplateSpec)(nil), (*storage.BucketTemplateSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_BucketTemplateSpec_To_storage_BucketTemplateSpec(a.(*v1alpha1.BucketTemplateSpec), b.(*storage.BucketTemplateSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.BucketTemplateSpec)(nil), (*storage.BucketTemplateSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_BucketTemplateSpec_To_storage_BucketTemplateSpec(a.(*storagev1alpha1.BucketTemplateSpec), b.(*storage.BucketTemplateSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*storage.BucketTemplateSpec)(nil), (*v1alpha1.BucketTemplateSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_storage_BucketTemplateSpec_To_v1alpha1_BucketTemplateSpec(a.(*storage.BucketTemplateSpec), b.(*v1alpha1.BucketTemplateSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*storage.BucketTemplateSpec)(nil), (*storagev1alpha1.BucketTemplateSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_BucketTemplateSpec_To_v1alpha1_BucketTemplateSpec(a.(*storage.BucketTemplateSpec), b.(*storagev1alpha1.BucketTemplateSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.Volume)(nil), (*storage.Volume)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_Volume_To_storage_Volume(a.(*v1alpha1.Volume), b.(*storage.Volume), scope)
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.Volume)(nil), (*storage.Volume)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_Volume_To_storage_Volume(a.(*storagev1alpha1.Volume), b.(*storage.Volume), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*storage.Volume)(nil), (*v1alpha1.Volume)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_storage_Volume_To_v1alpha1_Volume(a.(*storage.Volume), b.(*v1alpha1.Volume), scope)
+	if err := s.AddGeneratedConversionFunc((*storage.Volume)(nil), (*storagev1alpha1.Volume)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_Volume_To_v1alpha1_Volume(a.(*storage.Volume), b.(*storagev1alpha1.Volume), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.VolumeAccess)(nil), (*storage.VolumeAccess)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_VolumeAccess_To_storage_VolumeAccess(a.(*v1alpha1.VolumeAccess), b.(*storage.VolumeAccess), scope)
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.VolumeAccess)(nil), (*storage.VolumeAccess)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VolumeAccess_To_storage_VolumeAccess(a.(*storagev1alpha1.VolumeAccess), b.(*storage.VolumeAccess), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*storage.VolumeAccess)(nil), (*v1alpha1.VolumeAccess)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_storage_VolumeAccess_To_v1alpha1_VolumeAccess(a.(*storage.VolumeAccess), b.(*v1alpha1.VolumeAccess), scope)
+	if err := s.AddGeneratedConversionFunc((*storage.VolumeAccess)(nil), (*storagev1alpha1.VolumeAccess)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_VolumeAccess_To_v1alpha1_VolumeAccess(a.(*storage.VolumeAccess), b.(*storagev1alpha1.VolumeAccess), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.VolumeClass)(nil), (*storage.VolumeClass)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_VolumeClass_To_storage_VolumeClass(a.(*v1alpha1.VolumeClass), b.(*storage.VolumeClass), scope)
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.VolumeClass)(nil), (*storage.VolumeClass)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VolumeClass_To_storage_VolumeClass(a.(*storagev1alpha1.VolumeClass), b.(*storage.VolumeClass), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*storage.VolumeClass)(nil), (*v1alpha1.VolumeClass)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_storage_VolumeClass_To_v1alpha1_VolumeClass(a.(*storage.VolumeClass), b.(*v1alpha1.VolumeClass), scope)
+	if err := s.AddGeneratedConversionFunc((*storage.VolumeClass)(nil), (*storagev1alpha1.VolumeClass)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_VolumeClass_To_v1alpha1_VolumeClass(a.(*storage.VolumeClass), b.(*storagev1alpha1.VolumeClass), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.VolumeClassList)(nil), (*storage.VolumeClassList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_VolumeClassList_To_storage_VolumeClassList(a.(*v1alpha1.VolumeClassList), b.(*storage.VolumeClassList), scope)
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.VolumeClassList)(nil), (*storage.VolumeClassList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VolumeClassList_To_storage_VolumeClassList(a.(*storagev1alpha1.VolumeClassList), b.(*storage.VolumeClassList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*storage.VolumeClassList)(nil), (*v1alpha1.VolumeClassList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_storage_VolumeClassList_To_v1alpha1_VolumeClassList(a.(*storage.VolumeClassList), b.(*v1alpha1.VolumeClassList), scope)
+	if err := s.AddGeneratedConversionFunc((*storage.VolumeClassList)(nil), (*storagev1alpha1.VolumeClassList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_VolumeClassList_To_v1alpha1_VolumeClassList(a.(*storage.VolumeClassList), b.(*storagev1alpha1.VolumeClassList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.VolumeCondition)(nil), (*storage.VolumeCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_VolumeCondition_To_storage_VolumeCondition(a.(*v1alpha1.VolumeCondition), b.(*storage.VolumeCondition), scope)
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.VolumeCondition)(nil), (*storage.VolumeCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VolumeCondition_To_storage_VolumeCondition(a.(*storagev1alpha1.VolumeCondition), b.(*storage.VolumeCondition), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*storage.VolumeCondition)(nil), (*v1alpha1.VolumeCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_storage_VolumeCondition_To_v1alpha1_VolumeCondition(a.(*storage.VolumeCondition), b.(*v1alpha1.VolumeCondition), scope)
+	if err := s.AddGeneratedConversionFunc((*storage.VolumeCondition)(nil), (*storagev1alpha1.VolumeCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_VolumeCondition_To_v1alpha1_VolumeCondition(a.(*storage.VolumeCondition), b.(*storagev1alpha1.VolumeCondition), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.VolumeEncryption)(nil), (*storage.VolumeEncryption)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_VolumeEncryption_To_storage_VolumeEncryption(a.(*v1alpha1.VolumeEncryption), b.(*storage.VolumeEncryption), scope)
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.VolumeEncryption)(nil), (*storage.VolumeEncryption)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VolumeEncryption_To_storage_VolumeEncryption(a.(*storagev1alpha1.VolumeEncryption), b.(*storage.VolumeEncryption), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*storage.VolumeEncryption)(nil), (*v1alpha1.VolumeEncryption)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_storage_VolumeEncryption_To_v1alpha1_VolumeEncryption(a.(*storage.VolumeEncryption), b.(*v1alpha1.VolumeEncryption), scope)
+	if err := s.AddGeneratedConversionFunc((*storage.VolumeEncryption)(nil), (*storagev1alpha1.VolumeEncryption)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_VolumeEncryption_To_v1alpha1_VolumeEncryption(a.(*storage.VolumeEncryption), b.(*storagev1alpha1.VolumeEncryption), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.VolumeList)(nil), (*storage.VolumeList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_VolumeList_To_storage_VolumeList(a.(*v1alpha1.VolumeList), b.(*storage.VolumeList), scope)
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.VolumeList)(nil), (*storage.VolumeList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VolumeList_To_storage_VolumeList(a.(*storagev1alpha1.VolumeList), b.(*storage.VolumeList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*storage.VolumeList)(nil), (*v1alpha1.VolumeList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_storage_VolumeList_To_v1alpha1_VolumeList(a.(*storage.VolumeList), b.(*v1alpha1.VolumeList), scope)
+	if err := s.AddGeneratedConversionFunc((*storage.VolumeList)(nil), (*storagev1alpha1.VolumeList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_VolumeList_To_v1alpha1_VolumeList(a.(*storage.VolumeList), b.(*storagev1alpha1.VolumeList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.VolumePool)(nil), (*storage.VolumePool)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_VolumePool_To_storage_VolumePool(a.(*v1alpha1.VolumePool), b.(*storage.VolumePool), scope)
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.VolumePool)(nil), (*storage.VolumePool)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VolumePool_To_storage_VolumePool(a.(*storagev1alpha1.VolumePool), b.(*storage.VolumePool), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*storage.VolumePool)(nil), (*v1alpha1.VolumePool)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_storage_VolumePool_To_v1alpha1_VolumePool(a.(*storage.VolumePool), b.(*v1alpha1.VolumePool), scope)
+	if err := s.AddGeneratedConversionFunc((*storage.VolumePool)(nil), (*storagev1alpha1.VolumePool)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_VolumePool_To_v1alpha1_VolumePool(a.(*storage.VolumePool), b.(*storagev1alpha1.VolumePool), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.VolumePoolCondition)(nil), (*storage.VolumePoolCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_VolumePoolCondition_To_storage_VolumePoolCondition(a.(*v1alpha1.VolumePoolCondition), b.(*storage.VolumePoolCondition), scope)
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.VolumePoolCondition)(nil), (*storage.VolumePoolCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VolumePoolCondition_To_storage_VolumePoolCondition(a.(*storagev1alpha1.VolumePoolCondition), b.(*storage.VolumePoolCondition), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*storage.VolumePoolCondition)(nil), (*v1alpha1.VolumePoolCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_storage_VolumePoolCondition_To_v1alpha1_VolumePoolCondition(a.(*storage.VolumePoolCondition), b.(*v1alpha1.VolumePoolCondition), scope)
+	if err := s.AddGeneratedConversionFunc((*storage.VolumePoolCondition)(nil), (*storagev1alpha1.VolumePoolCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_VolumePoolCondition_To_v1alpha1_VolumePoolCondition(a.(*storage.VolumePoolCondition), b.(*storagev1alpha1.VolumePoolCondition), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.VolumePoolList)(nil), (*storage.VolumePoolList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_VolumePoolList_To_storage_VolumePoolList(a.(*v1alpha1.VolumePoolList), b.(*storage.VolumePoolList), scope)
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.VolumePoolList)(nil), (*storage.VolumePoolList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VolumePoolList_To_storage_VolumePoolList(a.(*storagev1alpha1.VolumePoolList), b.(*storage.VolumePoolList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*storage.VolumePoolList)(nil), (*v1alpha1.VolumePoolList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_storage_VolumePoolList_To_v1alpha1_VolumePoolList(a.(*storage.VolumePoolList), b.(*v1alpha1.VolumePoolList), scope)
+	if err := s.AddGeneratedConversionFunc((*storage.VolumePoolList)(nil), (*storagev1alpha1.VolumePoolList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_VolumePoolList_To_v1alpha1_VolumePoolList(a.(*storage.VolumePoolList), b.(*storagev1alpha1.VolumePoolList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.VolumePoolSpec)(nil), (*storage.VolumePoolSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_VolumePoolSpec_To_storage_VolumePoolSpec(a.(*v1alpha1.VolumePoolSpec), b.(*storage.VolumePoolSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.VolumePoolSpec)(nil), (*storage.VolumePoolSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VolumePoolSpec_To_storage_VolumePoolSpec(a.(*storagev1alpha1.VolumePoolSpec), b.(*storage.VolumePoolSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*storage.VolumePoolSpec)(nil), (*v1alpha1.VolumePoolSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_storage_VolumePoolSpec_To_v1alpha1_VolumePoolSpec(a.(*storage.VolumePoolSpec), b.(*v1alpha1.VolumePoolSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*storage.VolumePoolSpec)(nil), (*storagev1alpha1.VolumePoolSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_VolumePoolSpec_To_v1alpha1_VolumePoolSpec(a.(*storage.VolumePoolSpec), b.(*storagev1alpha1.VolumePoolSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.VolumePoolStatus)(nil), (*storage.VolumePoolStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_VolumePoolStatus_To_storage_VolumePoolStatus(a.(*v1alpha1.VolumePoolStatus), b.(*storage.VolumePoolStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.VolumePoolStatus)(nil), (*storage.VolumePoolStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VolumePoolStatus_To_storage_VolumePoolStatus(a.(*storagev1alpha1.VolumePoolStatus), b.(*storage.VolumePoolStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*storage.VolumePoolStatus)(nil), (*v1alpha1.VolumePoolStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_storage_VolumePoolStatus_To_v1alpha1_VolumePoolStatus(a.(*storage.VolumePoolStatus), b.(*v1alpha1.VolumePoolStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*storage.VolumePoolStatus)(nil), (*storagev1alpha1.VolumePoolStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_VolumePoolStatus_To_v1alpha1_VolumePoolStatus(a.(*storage.VolumePoolStatus), b.(*storagev1alpha1.VolumePoolStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.VolumeSpec)(nil), (*storage.VolumeSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_VolumeSpec_To_storage_VolumeSpec(a.(*v1alpha1.VolumeSpec), b.(*storage.VolumeSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.VolumeSpec)(nil), (*storage.VolumeSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VolumeSpec_To_storage_VolumeSpec(a.(*storagev1alpha1.VolumeSpec), b.(*storage.VolumeSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*storage.VolumeSpec)(nil), (*v1alpha1.VolumeSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_storage_VolumeSpec_To_v1alpha1_VolumeSpec(a.(*storage.VolumeSpec), b.(*v1alpha1.VolumeSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*storage.VolumeSpec)(nil), (*storagev1alpha1.VolumeSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_VolumeSpec_To_v1alpha1_VolumeSpec(a.(*storage.VolumeSpec), b.(*storagev1alpha1.VolumeSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.VolumeStatus)(nil), (*storage.VolumeStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_VolumeStatus_To_storage_VolumeStatus(a.(*v1alpha1.VolumeStatus), b.(*storage.VolumeStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.VolumeStatus)(nil), (*storage.VolumeStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VolumeStatus_To_storage_VolumeStatus(a.(*storagev1alpha1.VolumeStatus), b.(*storage.VolumeStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*storage.VolumeStatus)(nil), (*v1alpha1.VolumeStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_storage_VolumeStatus_To_v1alpha1_VolumeStatus(a.(*storage.VolumeStatus), b.(*v1alpha1.VolumeStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*storage.VolumeStatus)(nil), (*storagev1alpha1.VolumeStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_VolumeStatus_To_v1alpha1_VolumeStatus(a.(*storage.VolumeStatus), b.(*storagev1alpha1.VolumeStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.VolumeTemplateSpec)(nil), (*storage.VolumeTemplateSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_VolumeTemplateSpec_To_storage_VolumeTemplateSpec(a.(*v1alpha1.VolumeTemplateSpec), b.(*storage.VolumeTemplateSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.VolumeTemplateSpec)(nil), (*storage.VolumeTemplateSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VolumeTemplateSpec_To_storage_VolumeTemplateSpec(a.(*storagev1alpha1.VolumeTemplateSpec), b.(*storage.VolumeTemplateSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*storage.VolumeTemplateSpec)(nil), (*v1alpha1.VolumeTemplateSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_storage_VolumeTemplateSpec_To_v1alpha1_VolumeTemplateSpec(a.(*storage.VolumeTemplateSpec), b.(*v1alpha1.VolumeTemplateSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*storage.VolumeTemplateSpec)(nil), (*storagev1alpha1.VolumeTemplateSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_VolumeTemplateSpec_To_v1alpha1_VolumeTemplateSpec(a.(*storage.VolumeTemplateSpec), b.(*storagev1alpha1.VolumeTemplateSpec), scope)
 	}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func autoConvert_v1alpha1_Bucket_To_storage_Bucket(in *v1alpha1.Bucket, out *storage.Bucket, s conversion.Scope) error {
+func autoConvert_v1alpha1_Bucket_To_storage_Bucket(in *storagev1alpha1.Bucket, out *storage.Bucket, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1alpha1_BucketSpec_To_storage_BucketSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -324,11 +324,11 @@ func autoConvert_v1alpha1_Bucket_To_storage_Bucket(in *v1alpha1.Bucket, out *sto
 }
 
 // Convert_v1alpha1_Bucket_To_storage_Bucket is an autogenerated conversion function.
-func Convert_v1alpha1_Bucket_To_storage_Bucket(in *v1alpha1.Bucket, out *storage.Bucket, s conversion.Scope) error {
+func Convert_v1alpha1_Bucket_To_storage_Bucket(in *storagev1alpha1.Bucket, out *storage.Bucket, s conversion.Scope) error {
 	return autoConvert_v1alpha1_Bucket_To_storage_Bucket(in, out, s)
 }
 
-func autoConvert_storage_Bucket_To_v1alpha1_Bucket(in *storage.Bucket, out *v1alpha1.Bucket, s conversion.Scope) error {
+func autoConvert_storage_Bucket_To_v1alpha1_Bucket(in *storage.Bucket, out *storagev1alpha1.Bucket, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_storage_BucketSpec_To_v1alpha1_BucketSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -340,77 +340,77 @@ func autoConvert_storage_Bucket_To_v1alpha1_Bucket(in *storage.Bucket, out *v1al
 }
 
 // Convert_storage_Bucket_To_v1alpha1_Bucket is an autogenerated conversion function.
-func Convert_storage_Bucket_To_v1alpha1_Bucket(in *storage.Bucket, out *v1alpha1.Bucket, s conversion.Scope) error {
+func Convert_storage_Bucket_To_v1alpha1_Bucket(in *storage.Bucket, out *storagev1alpha1.Bucket, s conversion.Scope) error {
 	return autoConvert_storage_Bucket_To_v1alpha1_Bucket(in, out, s)
 }
 
-func autoConvert_v1alpha1_BucketAccess_To_storage_BucketAccess(in *v1alpha1.BucketAccess, out *storage.BucketAccess, s conversion.Scope) error {
+func autoConvert_v1alpha1_BucketAccess_To_storage_BucketAccess(in *storagev1alpha1.BucketAccess, out *storage.BucketAccess, s conversion.Scope) error {
 	out.SecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
 	out.Endpoint = in.Endpoint
 	return nil
 }
 
 // Convert_v1alpha1_BucketAccess_To_storage_BucketAccess is an autogenerated conversion function.
-func Convert_v1alpha1_BucketAccess_To_storage_BucketAccess(in *v1alpha1.BucketAccess, out *storage.BucketAccess, s conversion.Scope) error {
+func Convert_v1alpha1_BucketAccess_To_storage_BucketAccess(in *storagev1alpha1.BucketAccess, out *storage.BucketAccess, s conversion.Scope) error {
 	return autoConvert_v1alpha1_BucketAccess_To_storage_BucketAccess(in, out, s)
 }
 
-func autoConvert_storage_BucketAccess_To_v1alpha1_BucketAccess(in *storage.BucketAccess, out *v1alpha1.BucketAccess, s conversion.Scope) error {
+func autoConvert_storage_BucketAccess_To_v1alpha1_BucketAccess(in *storage.BucketAccess, out *storagev1alpha1.BucketAccess, s conversion.Scope) error {
 	out.SecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
 	out.Endpoint = in.Endpoint
 	return nil
 }
 
 // Convert_storage_BucketAccess_To_v1alpha1_BucketAccess is an autogenerated conversion function.
-func Convert_storage_BucketAccess_To_v1alpha1_BucketAccess(in *storage.BucketAccess, out *v1alpha1.BucketAccess, s conversion.Scope) error {
+func Convert_storage_BucketAccess_To_v1alpha1_BucketAccess(in *storage.BucketAccess, out *storagev1alpha1.BucketAccess, s conversion.Scope) error {
 	return autoConvert_storage_BucketAccess_To_v1alpha1_BucketAccess(in, out, s)
 }
 
-func autoConvert_v1alpha1_BucketClass_To_storage_BucketClass(in *v1alpha1.BucketClass, out *storage.BucketClass, s conversion.Scope) error {
+func autoConvert_v1alpha1_BucketClass_To_storage_BucketClass(in *storagev1alpha1.BucketClass, out *storage.BucketClass, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	out.Capabilities = *(*core.ResourceList)(unsafe.Pointer(&in.Capabilities))
 	return nil
 }
 
 // Convert_v1alpha1_BucketClass_To_storage_BucketClass is an autogenerated conversion function.
-func Convert_v1alpha1_BucketClass_To_storage_BucketClass(in *v1alpha1.BucketClass, out *storage.BucketClass, s conversion.Scope) error {
+func Convert_v1alpha1_BucketClass_To_storage_BucketClass(in *storagev1alpha1.BucketClass, out *storage.BucketClass, s conversion.Scope) error {
 	return autoConvert_v1alpha1_BucketClass_To_storage_BucketClass(in, out, s)
 }
 
-func autoConvert_storage_BucketClass_To_v1alpha1_BucketClass(in *storage.BucketClass, out *v1alpha1.BucketClass, s conversion.Scope) error {
+func autoConvert_storage_BucketClass_To_v1alpha1_BucketClass(in *storage.BucketClass, out *storagev1alpha1.BucketClass, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	out.Capabilities = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Capabilities))
 	return nil
 }
 
 // Convert_storage_BucketClass_To_v1alpha1_BucketClass is an autogenerated conversion function.
-func Convert_storage_BucketClass_To_v1alpha1_BucketClass(in *storage.BucketClass, out *v1alpha1.BucketClass, s conversion.Scope) error {
+func Convert_storage_BucketClass_To_v1alpha1_BucketClass(in *storage.BucketClass, out *storagev1alpha1.BucketClass, s conversion.Scope) error {
 	return autoConvert_storage_BucketClass_To_v1alpha1_BucketClass(in, out, s)
 }
 
-func autoConvert_v1alpha1_BucketClassList_To_storage_BucketClassList(in *v1alpha1.BucketClassList, out *storage.BucketClassList, s conversion.Scope) error {
+func autoConvert_v1alpha1_BucketClassList_To_storage_BucketClassList(in *storagev1alpha1.BucketClassList, out *storage.BucketClassList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	out.Items = *(*[]storage.BucketClass)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_v1alpha1_BucketClassList_To_storage_BucketClassList is an autogenerated conversion function.
-func Convert_v1alpha1_BucketClassList_To_storage_BucketClassList(in *v1alpha1.BucketClassList, out *storage.BucketClassList, s conversion.Scope) error {
+func Convert_v1alpha1_BucketClassList_To_storage_BucketClassList(in *storagev1alpha1.BucketClassList, out *storage.BucketClassList, s conversion.Scope) error {
 	return autoConvert_v1alpha1_BucketClassList_To_storage_BucketClassList(in, out, s)
 }
 
-func autoConvert_storage_BucketClassList_To_v1alpha1_BucketClassList(in *storage.BucketClassList, out *v1alpha1.BucketClassList, s conversion.Scope) error {
+func autoConvert_storage_BucketClassList_To_v1alpha1_BucketClassList(in *storage.BucketClassList, out *storagev1alpha1.BucketClassList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]v1alpha1.BucketClass)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]storagev1alpha1.BucketClass)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_storage_BucketClassList_To_v1alpha1_BucketClassList is an autogenerated conversion function.
-func Convert_storage_BucketClassList_To_v1alpha1_BucketClassList(in *storage.BucketClassList, out *v1alpha1.BucketClassList, s conversion.Scope) error {
+func Convert_storage_BucketClassList_To_v1alpha1_BucketClassList(in *storage.BucketClassList, out *storagev1alpha1.BucketClassList, s conversion.Scope) error {
 	return autoConvert_storage_BucketClassList_To_v1alpha1_BucketClassList(in, out, s)
 }
 
-func autoConvert_v1alpha1_BucketCondition_To_storage_BucketCondition(in *v1alpha1.BucketCondition, out *storage.BucketCondition, s conversion.Scope) error {
+func autoConvert_v1alpha1_BucketCondition_To_storage_BucketCondition(in *storagev1alpha1.BucketCondition, out *storage.BucketCondition, s conversion.Scope) error {
 	out.Type = storage.BucketConditionType(in.Type)
 	out.Status = v1.ConditionStatus(in.Status)
 	out.Reason = in.Reason
@@ -421,12 +421,12 @@ func autoConvert_v1alpha1_BucketCondition_To_storage_BucketCondition(in *v1alpha
 }
 
 // Convert_v1alpha1_BucketCondition_To_storage_BucketCondition is an autogenerated conversion function.
-func Convert_v1alpha1_BucketCondition_To_storage_BucketCondition(in *v1alpha1.BucketCondition, out *storage.BucketCondition, s conversion.Scope) error {
+func Convert_v1alpha1_BucketCondition_To_storage_BucketCondition(in *storagev1alpha1.BucketCondition, out *storage.BucketCondition, s conversion.Scope) error {
 	return autoConvert_v1alpha1_BucketCondition_To_storage_BucketCondition(in, out, s)
 }
 
-func autoConvert_storage_BucketCondition_To_v1alpha1_BucketCondition(in *storage.BucketCondition, out *v1alpha1.BucketCondition, s conversion.Scope) error {
-	out.Type = v1alpha1.BucketConditionType(in.Type)
+func autoConvert_storage_BucketCondition_To_v1alpha1_BucketCondition(in *storage.BucketCondition, out *storagev1alpha1.BucketCondition, s conversion.Scope) error {
+	out.Type = storagev1alpha1.BucketConditionType(in.Type)
 	out.Status = v1.ConditionStatus(in.Status)
 	out.Reason = in.Reason
 	out.Message = in.Message
@@ -436,33 +436,33 @@ func autoConvert_storage_BucketCondition_To_v1alpha1_BucketCondition(in *storage
 }
 
 // Convert_storage_BucketCondition_To_v1alpha1_BucketCondition is an autogenerated conversion function.
-func Convert_storage_BucketCondition_To_v1alpha1_BucketCondition(in *storage.BucketCondition, out *v1alpha1.BucketCondition, s conversion.Scope) error {
+func Convert_storage_BucketCondition_To_v1alpha1_BucketCondition(in *storage.BucketCondition, out *storagev1alpha1.BucketCondition, s conversion.Scope) error {
 	return autoConvert_storage_BucketCondition_To_v1alpha1_BucketCondition(in, out, s)
 }
 
-func autoConvert_v1alpha1_BucketList_To_storage_BucketList(in *v1alpha1.BucketList, out *storage.BucketList, s conversion.Scope) error {
+func autoConvert_v1alpha1_BucketList_To_storage_BucketList(in *storagev1alpha1.BucketList, out *storage.BucketList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	out.Items = *(*[]storage.Bucket)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_v1alpha1_BucketList_To_storage_BucketList is an autogenerated conversion function.
-func Convert_v1alpha1_BucketList_To_storage_BucketList(in *v1alpha1.BucketList, out *storage.BucketList, s conversion.Scope) error {
+func Convert_v1alpha1_BucketList_To_storage_BucketList(in *storagev1alpha1.BucketList, out *storage.BucketList, s conversion.Scope) error {
 	return autoConvert_v1alpha1_BucketList_To_storage_BucketList(in, out, s)
 }
 
-func autoConvert_storage_BucketList_To_v1alpha1_BucketList(in *storage.BucketList, out *v1alpha1.BucketList, s conversion.Scope) error {
+func autoConvert_storage_BucketList_To_v1alpha1_BucketList(in *storage.BucketList, out *storagev1alpha1.BucketList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]v1alpha1.Bucket)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]storagev1alpha1.Bucket)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_storage_BucketList_To_v1alpha1_BucketList is an autogenerated conversion function.
-func Convert_storage_BucketList_To_v1alpha1_BucketList(in *storage.BucketList, out *v1alpha1.BucketList, s conversion.Scope) error {
+func Convert_storage_BucketList_To_v1alpha1_BucketList(in *storage.BucketList, out *storagev1alpha1.BucketList, s conversion.Scope) error {
 	return autoConvert_storage_BucketList_To_v1alpha1_BucketList(in, out, s)
 }
 
-func autoConvert_v1alpha1_BucketPool_To_storage_BucketPool(in *v1alpha1.BucketPool, out *storage.BucketPool, s conversion.Scope) error {
+func autoConvert_v1alpha1_BucketPool_To_storage_BucketPool(in *storagev1alpha1.BucketPool, out *storage.BucketPool, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1alpha1_BucketPoolSpec_To_storage_BucketPoolSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -474,11 +474,11 @@ func autoConvert_v1alpha1_BucketPool_To_storage_BucketPool(in *v1alpha1.BucketPo
 }
 
 // Convert_v1alpha1_BucketPool_To_storage_BucketPool is an autogenerated conversion function.
-func Convert_v1alpha1_BucketPool_To_storage_BucketPool(in *v1alpha1.BucketPool, out *storage.BucketPool, s conversion.Scope) error {
+func Convert_v1alpha1_BucketPool_To_storage_BucketPool(in *storagev1alpha1.BucketPool, out *storage.BucketPool, s conversion.Scope) error {
 	return autoConvert_v1alpha1_BucketPool_To_storage_BucketPool(in, out, s)
 }
 
-func autoConvert_storage_BucketPool_To_v1alpha1_BucketPool(in *storage.BucketPool, out *v1alpha1.BucketPool, s conversion.Scope) error {
+func autoConvert_storage_BucketPool_To_v1alpha1_BucketPool(in *storage.BucketPool, out *storagev1alpha1.BucketPool, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_storage_BucketPoolSpec_To_v1alpha1_BucketPoolSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -490,77 +490,77 @@ func autoConvert_storage_BucketPool_To_v1alpha1_BucketPool(in *storage.BucketPoo
 }
 
 // Convert_storage_BucketPool_To_v1alpha1_BucketPool is an autogenerated conversion function.
-func Convert_storage_BucketPool_To_v1alpha1_BucketPool(in *storage.BucketPool, out *v1alpha1.BucketPool, s conversion.Scope) error {
+func Convert_storage_BucketPool_To_v1alpha1_BucketPool(in *storage.BucketPool, out *storagev1alpha1.BucketPool, s conversion.Scope) error {
 	return autoConvert_storage_BucketPool_To_v1alpha1_BucketPool(in, out, s)
 }
 
-func autoConvert_v1alpha1_BucketPoolList_To_storage_BucketPoolList(in *v1alpha1.BucketPoolList, out *storage.BucketPoolList, s conversion.Scope) error {
+func autoConvert_v1alpha1_BucketPoolList_To_storage_BucketPoolList(in *storagev1alpha1.BucketPoolList, out *storage.BucketPoolList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	out.Items = *(*[]storage.BucketPool)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_v1alpha1_BucketPoolList_To_storage_BucketPoolList is an autogenerated conversion function.
-func Convert_v1alpha1_BucketPoolList_To_storage_BucketPoolList(in *v1alpha1.BucketPoolList, out *storage.BucketPoolList, s conversion.Scope) error {
+func Convert_v1alpha1_BucketPoolList_To_storage_BucketPoolList(in *storagev1alpha1.BucketPoolList, out *storage.BucketPoolList, s conversion.Scope) error {
 	return autoConvert_v1alpha1_BucketPoolList_To_storage_BucketPoolList(in, out, s)
 }
 
-func autoConvert_storage_BucketPoolList_To_v1alpha1_BucketPoolList(in *storage.BucketPoolList, out *v1alpha1.BucketPoolList, s conversion.Scope) error {
+func autoConvert_storage_BucketPoolList_To_v1alpha1_BucketPoolList(in *storage.BucketPoolList, out *storagev1alpha1.BucketPoolList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]v1alpha1.BucketPool)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]storagev1alpha1.BucketPool)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_storage_BucketPoolList_To_v1alpha1_BucketPoolList is an autogenerated conversion function.
-func Convert_storage_BucketPoolList_To_v1alpha1_BucketPoolList(in *storage.BucketPoolList, out *v1alpha1.BucketPoolList, s conversion.Scope) error {
+func Convert_storage_BucketPoolList_To_v1alpha1_BucketPoolList(in *storage.BucketPoolList, out *storagev1alpha1.BucketPoolList, s conversion.Scope) error {
 	return autoConvert_storage_BucketPoolList_To_v1alpha1_BucketPoolList(in, out, s)
 }
 
-func autoConvert_v1alpha1_BucketPoolSpec_To_storage_BucketPoolSpec(in *v1alpha1.BucketPoolSpec, out *storage.BucketPoolSpec, s conversion.Scope) error {
+func autoConvert_v1alpha1_BucketPoolSpec_To_storage_BucketPoolSpec(in *storagev1alpha1.BucketPoolSpec, out *storage.BucketPoolSpec, s conversion.Scope) error {
 	out.ProviderID = in.ProviderID
 	out.Taints = *(*[]commonv1alpha1.Taint)(unsafe.Pointer(&in.Taints))
 	return nil
 }
 
 // Convert_v1alpha1_BucketPoolSpec_To_storage_BucketPoolSpec is an autogenerated conversion function.
-func Convert_v1alpha1_BucketPoolSpec_To_storage_BucketPoolSpec(in *v1alpha1.BucketPoolSpec, out *storage.BucketPoolSpec, s conversion.Scope) error {
+func Convert_v1alpha1_BucketPoolSpec_To_storage_BucketPoolSpec(in *storagev1alpha1.BucketPoolSpec, out *storage.BucketPoolSpec, s conversion.Scope) error {
 	return autoConvert_v1alpha1_BucketPoolSpec_To_storage_BucketPoolSpec(in, out, s)
 }
 
-func autoConvert_storage_BucketPoolSpec_To_v1alpha1_BucketPoolSpec(in *storage.BucketPoolSpec, out *v1alpha1.BucketPoolSpec, s conversion.Scope) error {
+func autoConvert_storage_BucketPoolSpec_To_v1alpha1_BucketPoolSpec(in *storage.BucketPoolSpec, out *storagev1alpha1.BucketPoolSpec, s conversion.Scope) error {
 	out.ProviderID = in.ProviderID
 	out.Taints = *(*[]commonv1alpha1.Taint)(unsafe.Pointer(&in.Taints))
 	return nil
 }
 
 // Convert_storage_BucketPoolSpec_To_v1alpha1_BucketPoolSpec is an autogenerated conversion function.
-func Convert_storage_BucketPoolSpec_To_v1alpha1_BucketPoolSpec(in *storage.BucketPoolSpec, out *v1alpha1.BucketPoolSpec, s conversion.Scope) error {
+func Convert_storage_BucketPoolSpec_To_v1alpha1_BucketPoolSpec(in *storage.BucketPoolSpec, out *storagev1alpha1.BucketPoolSpec, s conversion.Scope) error {
 	return autoConvert_storage_BucketPoolSpec_To_v1alpha1_BucketPoolSpec(in, out, s)
 }
 
-func autoConvert_v1alpha1_BucketPoolStatus_To_storage_BucketPoolStatus(in *v1alpha1.BucketPoolStatus, out *storage.BucketPoolStatus, s conversion.Scope) error {
+func autoConvert_v1alpha1_BucketPoolStatus_To_storage_BucketPoolStatus(in *storagev1alpha1.BucketPoolStatus, out *storage.BucketPoolStatus, s conversion.Scope) error {
 	out.State = storage.BucketPoolState(in.State)
 	out.AvailableBucketClasses = *(*[]v1.LocalObjectReference)(unsafe.Pointer(&in.AvailableBucketClasses))
 	return nil
 }
 
 // Convert_v1alpha1_BucketPoolStatus_To_storage_BucketPoolStatus is an autogenerated conversion function.
-func Convert_v1alpha1_BucketPoolStatus_To_storage_BucketPoolStatus(in *v1alpha1.BucketPoolStatus, out *storage.BucketPoolStatus, s conversion.Scope) error {
+func Convert_v1alpha1_BucketPoolStatus_To_storage_BucketPoolStatus(in *storagev1alpha1.BucketPoolStatus, out *storage.BucketPoolStatus, s conversion.Scope) error {
 	return autoConvert_v1alpha1_BucketPoolStatus_To_storage_BucketPoolStatus(in, out, s)
 }
 
-func autoConvert_storage_BucketPoolStatus_To_v1alpha1_BucketPoolStatus(in *storage.BucketPoolStatus, out *v1alpha1.BucketPoolStatus, s conversion.Scope) error {
-	out.State = v1alpha1.BucketPoolState(in.State)
+func autoConvert_storage_BucketPoolStatus_To_v1alpha1_BucketPoolStatus(in *storage.BucketPoolStatus, out *storagev1alpha1.BucketPoolStatus, s conversion.Scope) error {
+	out.State = storagev1alpha1.BucketPoolState(in.State)
 	out.AvailableBucketClasses = *(*[]v1.LocalObjectReference)(unsafe.Pointer(&in.AvailableBucketClasses))
 	return nil
 }
 
 // Convert_storage_BucketPoolStatus_To_v1alpha1_BucketPoolStatus is an autogenerated conversion function.
-func Convert_storage_BucketPoolStatus_To_v1alpha1_BucketPoolStatus(in *storage.BucketPoolStatus, out *v1alpha1.BucketPoolStatus, s conversion.Scope) error {
+func Convert_storage_BucketPoolStatus_To_v1alpha1_BucketPoolStatus(in *storage.BucketPoolStatus, out *storagev1alpha1.BucketPoolStatus, s conversion.Scope) error {
 	return autoConvert_storage_BucketPoolStatus_To_v1alpha1_BucketPoolStatus(in, out, s)
 }
 
-func autoConvert_v1alpha1_BucketSpec_To_storage_BucketSpec(in *v1alpha1.BucketSpec, out *storage.BucketSpec, s conversion.Scope) error {
+func autoConvert_v1alpha1_BucketSpec_To_storage_BucketSpec(in *storagev1alpha1.BucketSpec, out *storage.BucketSpec, s conversion.Scope) error {
 	out.BucketClassRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.BucketClassRef))
 	out.BucketPoolSelector = *(*map[string]string)(unsafe.Pointer(&in.BucketPoolSelector))
 	out.BucketPoolRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.BucketPoolRef))
@@ -569,11 +569,11 @@ func autoConvert_v1alpha1_BucketSpec_To_storage_BucketSpec(in *v1alpha1.BucketSp
 }
 
 // Convert_v1alpha1_BucketSpec_To_storage_BucketSpec is an autogenerated conversion function.
-func Convert_v1alpha1_BucketSpec_To_storage_BucketSpec(in *v1alpha1.BucketSpec, out *storage.BucketSpec, s conversion.Scope) error {
+func Convert_v1alpha1_BucketSpec_To_storage_BucketSpec(in *storagev1alpha1.BucketSpec, out *storage.BucketSpec, s conversion.Scope) error {
 	return autoConvert_v1alpha1_BucketSpec_To_storage_BucketSpec(in, out, s)
 }
 
-func autoConvert_storage_BucketSpec_To_v1alpha1_BucketSpec(in *storage.BucketSpec, out *v1alpha1.BucketSpec, s conversion.Scope) error {
+func autoConvert_storage_BucketSpec_To_v1alpha1_BucketSpec(in *storage.BucketSpec, out *storagev1alpha1.BucketSpec, s conversion.Scope) error {
 	out.BucketClassRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.BucketClassRef))
 	out.BucketPoolSelector = *(*map[string]string)(unsafe.Pointer(&in.BucketPoolSelector))
 	out.BucketPoolRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.BucketPoolRef))
@@ -582,11 +582,11 @@ func autoConvert_storage_BucketSpec_To_v1alpha1_BucketSpec(in *storage.BucketSpe
 }
 
 // Convert_storage_BucketSpec_To_v1alpha1_BucketSpec is an autogenerated conversion function.
-func Convert_storage_BucketSpec_To_v1alpha1_BucketSpec(in *storage.BucketSpec, out *v1alpha1.BucketSpec, s conversion.Scope) error {
+func Convert_storage_BucketSpec_To_v1alpha1_BucketSpec(in *storage.BucketSpec, out *storagev1alpha1.BucketSpec, s conversion.Scope) error {
 	return autoConvert_storage_BucketSpec_To_v1alpha1_BucketSpec(in, out, s)
 }
 
-func autoConvert_v1alpha1_BucketStatus_To_storage_BucketStatus(in *v1alpha1.BucketStatus, out *storage.BucketStatus, s conversion.Scope) error {
+func autoConvert_v1alpha1_BucketStatus_To_storage_BucketStatus(in *storagev1alpha1.BucketStatus, out *storage.BucketStatus, s conversion.Scope) error {
 	out.State = storage.BucketState(in.State)
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
 	out.Access = (*storage.BucketAccess)(unsafe.Pointer(in.Access))
@@ -595,24 +595,24 @@ func autoConvert_v1alpha1_BucketStatus_To_storage_BucketStatus(in *v1alpha1.Buck
 }
 
 // Convert_v1alpha1_BucketStatus_To_storage_BucketStatus is an autogenerated conversion function.
-func Convert_v1alpha1_BucketStatus_To_storage_BucketStatus(in *v1alpha1.BucketStatus, out *storage.BucketStatus, s conversion.Scope) error {
+func Convert_v1alpha1_BucketStatus_To_storage_BucketStatus(in *storagev1alpha1.BucketStatus, out *storage.BucketStatus, s conversion.Scope) error {
 	return autoConvert_v1alpha1_BucketStatus_To_storage_BucketStatus(in, out, s)
 }
 
-func autoConvert_storage_BucketStatus_To_v1alpha1_BucketStatus(in *storage.BucketStatus, out *v1alpha1.BucketStatus, s conversion.Scope) error {
-	out.State = v1alpha1.BucketState(in.State)
+func autoConvert_storage_BucketStatus_To_v1alpha1_BucketStatus(in *storage.BucketStatus, out *storagev1alpha1.BucketStatus, s conversion.Scope) error {
+	out.State = storagev1alpha1.BucketState(in.State)
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
-	out.Access = (*v1alpha1.BucketAccess)(unsafe.Pointer(in.Access))
-	out.Conditions = *(*[]v1alpha1.BucketCondition)(unsafe.Pointer(&in.Conditions))
+	out.Access = (*storagev1alpha1.BucketAccess)(unsafe.Pointer(in.Access))
+	out.Conditions = *(*[]storagev1alpha1.BucketCondition)(unsafe.Pointer(&in.Conditions))
 	return nil
 }
 
 // Convert_storage_BucketStatus_To_v1alpha1_BucketStatus is an autogenerated conversion function.
-func Convert_storage_BucketStatus_To_v1alpha1_BucketStatus(in *storage.BucketStatus, out *v1alpha1.BucketStatus, s conversion.Scope) error {
+func Convert_storage_BucketStatus_To_v1alpha1_BucketStatus(in *storage.BucketStatus, out *storagev1alpha1.BucketStatus, s conversion.Scope) error {
 	return autoConvert_storage_BucketStatus_To_v1alpha1_BucketStatus(in, out, s)
 }
 
-func autoConvert_v1alpha1_BucketTemplateSpec_To_storage_BucketTemplateSpec(in *v1alpha1.BucketTemplateSpec, out *storage.BucketTemplateSpec, s conversion.Scope) error {
+func autoConvert_v1alpha1_BucketTemplateSpec_To_storage_BucketTemplateSpec(in *storagev1alpha1.BucketTemplateSpec, out *storage.BucketTemplateSpec, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1alpha1_BucketSpec_To_storage_BucketSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -621,11 +621,11 @@ func autoConvert_v1alpha1_BucketTemplateSpec_To_storage_BucketTemplateSpec(in *v
 }
 
 // Convert_v1alpha1_BucketTemplateSpec_To_storage_BucketTemplateSpec is an autogenerated conversion function.
-func Convert_v1alpha1_BucketTemplateSpec_To_storage_BucketTemplateSpec(in *v1alpha1.BucketTemplateSpec, out *storage.BucketTemplateSpec, s conversion.Scope) error {
+func Convert_v1alpha1_BucketTemplateSpec_To_storage_BucketTemplateSpec(in *storagev1alpha1.BucketTemplateSpec, out *storage.BucketTemplateSpec, s conversion.Scope) error {
 	return autoConvert_v1alpha1_BucketTemplateSpec_To_storage_BucketTemplateSpec(in, out, s)
 }
 
-func autoConvert_storage_BucketTemplateSpec_To_v1alpha1_BucketTemplateSpec(in *storage.BucketTemplateSpec, out *v1alpha1.BucketTemplateSpec, s conversion.Scope) error {
+func autoConvert_storage_BucketTemplateSpec_To_v1alpha1_BucketTemplateSpec(in *storage.BucketTemplateSpec, out *storagev1alpha1.BucketTemplateSpec, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_storage_BucketSpec_To_v1alpha1_BucketSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -634,11 +634,11 @@ func autoConvert_storage_BucketTemplateSpec_To_v1alpha1_BucketTemplateSpec(in *s
 }
 
 // Convert_storage_BucketTemplateSpec_To_v1alpha1_BucketTemplateSpec is an autogenerated conversion function.
-func Convert_storage_BucketTemplateSpec_To_v1alpha1_BucketTemplateSpec(in *storage.BucketTemplateSpec, out *v1alpha1.BucketTemplateSpec, s conversion.Scope) error {
+func Convert_storage_BucketTemplateSpec_To_v1alpha1_BucketTemplateSpec(in *storage.BucketTemplateSpec, out *storagev1alpha1.BucketTemplateSpec, s conversion.Scope) error {
 	return autoConvert_storage_BucketTemplateSpec_To_v1alpha1_BucketTemplateSpec(in, out, s)
 }
 
-func autoConvert_v1alpha1_Volume_To_storage_Volume(in *v1alpha1.Volume, out *storage.Volume, s conversion.Scope) error {
+func autoConvert_v1alpha1_Volume_To_storage_Volume(in *storagev1alpha1.Volume, out *storage.Volume, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1alpha1_VolumeSpec_To_storage_VolumeSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -650,11 +650,11 @@ func autoConvert_v1alpha1_Volume_To_storage_Volume(in *v1alpha1.Volume, out *sto
 }
 
 // Convert_v1alpha1_Volume_To_storage_Volume is an autogenerated conversion function.
-func Convert_v1alpha1_Volume_To_storage_Volume(in *v1alpha1.Volume, out *storage.Volume, s conversion.Scope) error {
+func Convert_v1alpha1_Volume_To_storage_Volume(in *storagev1alpha1.Volume, out *storage.Volume, s conversion.Scope) error {
 	return autoConvert_v1alpha1_Volume_To_storage_Volume(in, out, s)
 }
 
-func autoConvert_storage_Volume_To_v1alpha1_Volume(in *storage.Volume, out *v1alpha1.Volume, s conversion.Scope) error {
+func autoConvert_storage_Volume_To_v1alpha1_Volume(in *storage.Volume, out *storagev1alpha1.Volume, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_storage_VolumeSpec_To_v1alpha1_VolumeSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -666,11 +666,11 @@ func autoConvert_storage_Volume_To_v1alpha1_Volume(in *storage.Volume, out *v1al
 }
 
 // Convert_storage_Volume_To_v1alpha1_Volume is an autogenerated conversion function.
-func Convert_storage_Volume_To_v1alpha1_Volume(in *storage.Volume, out *v1alpha1.Volume, s conversion.Scope) error {
+func Convert_storage_Volume_To_v1alpha1_Volume(in *storage.Volume, out *storagev1alpha1.Volume, s conversion.Scope) error {
 	return autoConvert_storage_Volume_To_v1alpha1_Volume(in, out, s)
 }
 
-func autoConvert_v1alpha1_VolumeAccess_To_storage_VolumeAccess(in *v1alpha1.VolumeAccess, out *storage.VolumeAccess, s conversion.Scope) error {
+func autoConvert_v1alpha1_VolumeAccess_To_storage_VolumeAccess(in *storagev1alpha1.VolumeAccess, out *storage.VolumeAccess, s conversion.Scope) error {
 	out.SecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
 	out.Driver = in.Driver
 	out.Handle = in.Handle
@@ -679,11 +679,11 @@ func autoConvert_v1alpha1_VolumeAccess_To_storage_VolumeAccess(in *v1alpha1.Volu
 }
 
 // Convert_v1alpha1_VolumeAccess_To_storage_VolumeAccess is an autogenerated conversion function.
-func Convert_v1alpha1_VolumeAccess_To_storage_VolumeAccess(in *v1alpha1.VolumeAccess, out *storage.VolumeAccess, s conversion.Scope) error {
+func Convert_v1alpha1_VolumeAccess_To_storage_VolumeAccess(in *storagev1alpha1.VolumeAccess, out *storage.VolumeAccess, s conversion.Scope) error {
 	return autoConvert_v1alpha1_VolumeAccess_To_storage_VolumeAccess(in, out, s)
 }
 
-func autoConvert_storage_VolumeAccess_To_v1alpha1_VolumeAccess(in *storage.VolumeAccess, out *v1alpha1.VolumeAccess, s conversion.Scope) error {
+func autoConvert_storage_VolumeAccess_To_v1alpha1_VolumeAccess(in *storage.VolumeAccess, out *storagev1alpha1.VolumeAccess, s conversion.Scope) error {
 	out.SecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
 	out.Driver = in.Driver
 	out.Handle = in.Handle
@@ -692,11 +692,11 @@ func autoConvert_storage_VolumeAccess_To_v1alpha1_VolumeAccess(in *storage.Volum
 }
 
 // Convert_storage_VolumeAccess_To_v1alpha1_VolumeAccess is an autogenerated conversion function.
-func Convert_storage_VolumeAccess_To_v1alpha1_VolumeAccess(in *storage.VolumeAccess, out *v1alpha1.VolumeAccess, s conversion.Scope) error {
+func Convert_storage_VolumeAccess_To_v1alpha1_VolumeAccess(in *storage.VolumeAccess, out *storagev1alpha1.VolumeAccess, s conversion.Scope) error {
 	return autoConvert_storage_VolumeAccess_To_v1alpha1_VolumeAccess(in, out, s)
 }
 
-func autoConvert_v1alpha1_VolumeClass_To_storage_VolumeClass(in *v1alpha1.VolumeClass, out *storage.VolumeClass, s conversion.Scope) error {
+func autoConvert_v1alpha1_VolumeClass_To_storage_VolumeClass(in *storagev1alpha1.VolumeClass, out *storage.VolumeClass, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	out.Capabilities = *(*core.ResourceList)(unsafe.Pointer(&in.Capabilities))
 	out.ResizePolicy = storage.ResizePolicy(in.ResizePolicy)
@@ -704,45 +704,45 @@ func autoConvert_v1alpha1_VolumeClass_To_storage_VolumeClass(in *v1alpha1.Volume
 }
 
 // Convert_v1alpha1_VolumeClass_To_storage_VolumeClass is an autogenerated conversion function.
-func Convert_v1alpha1_VolumeClass_To_storage_VolumeClass(in *v1alpha1.VolumeClass, out *storage.VolumeClass, s conversion.Scope) error {
+func Convert_v1alpha1_VolumeClass_To_storage_VolumeClass(in *storagev1alpha1.VolumeClass, out *storage.VolumeClass, s conversion.Scope) error {
 	return autoConvert_v1alpha1_VolumeClass_To_storage_VolumeClass(in, out, s)
 }
 
-func autoConvert_storage_VolumeClass_To_v1alpha1_VolumeClass(in *storage.VolumeClass, out *v1alpha1.VolumeClass, s conversion.Scope) error {
+func autoConvert_storage_VolumeClass_To_v1alpha1_VolumeClass(in *storage.VolumeClass, out *storagev1alpha1.VolumeClass, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	out.Capabilities = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Capabilities))
-	out.ResizePolicy = v1alpha1.ResizePolicy(in.ResizePolicy)
+	out.ResizePolicy = storagev1alpha1.ResizePolicy(in.ResizePolicy)
 	return nil
 }
 
 // Convert_storage_VolumeClass_To_v1alpha1_VolumeClass is an autogenerated conversion function.
-func Convert_storage_VolumeClass_To_v1alpha1_VolumeClass(in *storage.VolumeClass, out *v1alpha1.VolumeClass, s conversion.Scope) error {
+func Convert_storage_VolumeClass_To_v1alpha1_VolumeClass(in *storage.VolumeClass, out *storagev1alpha1.VolumeClass, s conversion.Scope) error {
 	return autoConvert_storage_VolumeClass_To_v1alpha1_VolumeClass(in, out, s)
 }
 
-func autoConvert_v1alpha1_VolumeClassList_To_storage_VolumeClassList(in *v1alpha1.VolumeClassList, out *storage.VolumeClassList, s conversion.Scope) error {
+func autoConvert_v1alpha1_VolumeClassList_To_storage_VolumeClassList(in *storagev1alpha1.VolumeClassList, out *storage.VolumeClassList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	out.Items = *(*[]storage.VolumeClass)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_v1alpha1_VolumeClassList_To_storage_VolumeClassList is an autogenerated conversion function.
-func Convert_v1alpha1_VolumeClassList_To_storage_VolumeClassList(in *v1alpha1.VolumeClassList, out *storage.VolumeClassList, s conversion.Scope) error {
+func Convert_v1alpha1_VolumeClassList_To_storage_VolumeClassList(in *storagev1alpha1.VolumeClassList, out *storage.VolumeClassList, s conversion.Scope) error {
 	return autoConvert_v1alpha1_VolumeClassList_To_storage_VolumeClassList(in, out, s)
 }
 
-func autoConvert_storage_VolumeClassList_To_v1alpha1_VolumeClassList(in *storage.VolumeClassList, out *v1alpha1.VolumeClassList, s conversion.Scope) error {
+func autoConvert_storage_VolumeClassList_To_v1alpha1_VolumeClassList(in *storage.VolumeClassList, out *storagev1alpha1.VolumeClassList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]v1alpha1.VolumeClass)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]storagev1alpha1.VolumeClass)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_storage_VolumeClassList_To_v1alpha1_VolumeClassList is an autogenerated conversion function.
-func Convert_storage_VolumeClassList_To_v1alpha1_VolumeClassList(in *storage.VolumeClassList, out *v1alpha1.VolumeClassList, s conversion.Scope) error {
+func Convert_storage_VolumeClassList_To_v1alpha1_VolumeClassList(in *storage.VolumeClassList, out *storagev1alpha1.VolumeClassList, s conversion.Scope) error {
 	return autoConvert_storage_VolumeClassList_To_v1alpha1_VolumeClassList(in, out, s)
 }
 
-func autoConvert_v1alpha1_VolumeCondition_To_storage_VolumeCondition(in *v1alpha1.VolumeCondition, out *storage.VolumeCondition, s conversion.Scope) error {
+func autoConvert_v1alpha1_VolumeCondition_To_storage_VolumeCondition(in *storagev1alpha1.VolumeCondition, out *storage.VolumeCondition, s conversion.Scope) error {
 	out.Type = storage.VolumeConditionType(in.Type)
 	out.Status = v1.ConditionStatus(in.Status)
 	out.Reason = in.Reason
@@ -753,12 +753,12 @@ func autoConvert_v1alpha1_VolumeCondition_To_storage_VolumeCondition(in *v1alpha
 }
 
 // Convert_v1alpha1_VolumeCondition_To_storage_VolumeCondition is an autogenerated conversion function.
-func Convert_v1alpha1_VolumeCondition_To_storage_VolumeCondition(in *v1alpha1.VolumeCondition, out *storage.VolumeCondition, s conversion.Scope) error {
+func Convert_v1alpha1_VolumeCondition_To_storage_VolumeCondition(in *storagev1alpha1.VolumeCondition, out *storage.VolumeCondition, s conversion.Scope) error {
 	return autoConvert_v1alpha1_VolumeCondition_To_storage_VolumeCondition(in, out, s)
 }
 
-func autoConvert_storage_VolumeCondition_To_v1alpha1_VolumeCondition(in *storage.VolumeCondition, out *v1alpha1.VolumeCondition, s conversion.Scope) error {
-	out.Type = v1alpha1.VolumeConditionType(in.Type)
+func autoConvert_storage_VolumeCondition_To_v1alpha1_VolumeCondition(in *storage.VolumeCondition, out *storagev1alpha1.VolumeCondition, s conversion.Scope) error {
+	out.Type = storagev1alpha1.VolumeConditionType(in.Type)
 	out.Status = v1.ConditionStatus(in.Status)
 	out.Reason = in.Reason
 	out.Message = in.Message
@@ -768,53 +768,53 @@ func autoConvert_storage_VolumeCondition_To_v1alpha1_VolumeCondition(in *storage
 }
 
 // Convert_storage_VolumeCondition_To_v1alpha1_VolumeCondition is an autogenerated conversion function.
-func Convert_storage_VolumeCondition_To_v1alpha1_VolumeCondition(in *storage.VolumeCondition, out *v1alpha1.VolumeCondition, s conversion.Scope) error {
+func Convert_storage_VolumeCondition_To_v1alpha1_VolumeCondition(in *storage.VolumeCondition, out *storagev1alpha1.VolumeCondition, s conversion.Scope) error {
 	return autoConvert_storage_VolumeCondition_To_v1alpha1_VolumeCondition(in, out, s)
 }
 
-func autoConvert_v1alpha1_VolumeEncryption_To_storage_VolumeEncryption(in *v1alpha1.VolumeEncryption, out *storage.VolumeEncryption, s conversion.Scope) error {
+func autoConvert_v1alpha1_VolumeEncryption_To_storage_VolumeEncryption(in *storagev1alpha1.VolumeEncryption, out *storage.VolumeEncryption, s conversion.Scope) error {
 	out.SecretRef = in.SecretRef
 	return nil
 }
 
 // Convert_v1alpha1_VolumeEncryption_To_storage_VolumeEncryption is an autogenerated conversion function.
-func Convert_v1alpha1_VolumeEncryption_To_storage_VolumeEncryption(in *v1alpha1.VolumeEncryption, out *storage.VolumeEncryption, s conversion.Scope) error {
+func Convert_v1alpha1_VolumeEncryption_To_storage_VolumeEncryption(in *storagev1alpha1.VolumeEncryption, out *storage.VolumeEncryption, s conversion.Scope) error {
 	return autoConvert_v1alpha1_VolumeEncryption_To_storage_VolumeEncryption(in, out, s)
 }
 
-func autoConvert_storage_VolumeEncryption_To_v1alpha1_VolumeEncryption(in *storage.VolumeEncryption, out *v1alpha1.VolumeEncryption, s conversion.Scope) error {
+func autoConvert_storage_VolumeEncryption_To_v1alpha1_VolumeEncryption(in *storage.VolumeEncryption, out *storagev1alpha1.VolumeEncryption, s conversion.Scope) error {
 	out.SecretRef = in.SecretRef
 	return nil
 }
 
 // Convert_storage_VolumeEncryption_To_v1alpha1_VolumeEncryption is an autogenerated conversion function.
-func Convert_storage_VolumeEncryption_To_v1alpha1_VolumeEncryption(in *storage.VolumeEncryption, out *v1alpha1.VolumeEncryption, s conversion.Scope) error {
+func Convert_storage_VolumeEncryption_To_v1alpha1_VolumeEncryption(in *storage.VolumeEncryption, out *storagev1alpha1.VolumeEncryption, s conversion.Scope) error {
 	return autoConvert_storage_VolumeEncryption_To_v1alpha1_VolumeEncryption(in, out, s)
 }
 
-func autoConvert_v1alpha1_VolumeList_To_storage_VolumeList(in *v1alpha1.VolumeList, out *storage.VolumeList, s conversion.Scope) error {
+func autoConvert_v1alpha1_VolumeList_To_storage_VolumeList(in *storagev1alpha1.VolumeList, out *storage.VolumeList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	out.Items = *(*[]storage.Volume)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_v1alpha1_VolumeList_To_storage_VolumeList is an autogenerated conversion function.
-func Convert_v1alpha1_VolumeList_To_storage_VolumeList(in *v1alpha1.VolumeList, out *storage.VolumeList, s conversion.Scope) error {
+func Convert_v1alpha1_VolumeList_To_storage_VolumeList(in *storagev1alpha1.VolumeList, out *storage.VolumeList, s conversion.Scope) error {
 	return autoConvert_v1alpha1_VolumeList_To_storage_VolumeList(in, out, s)
 }
 
-func autoConvert_storage_VolumeList_To_v1alpha1_VolumeList(in *storage.VolumeList, out *v1alpha1.VolumeList, s conversion.Scope) error {
+func autoConvert_storage_VolumeList_To_v1alpha1_VolumeList(in *storage.VolumeList, out *storagev1alpha1.VolumeList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]v1alpha1.Volume)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]storagev1alpha1.Volume)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_storage_VolumeList_To_v1alpha1_VolumeList is an autogenerated conversion function.
-func Convert_storage_VolumeList_To_v1alpha1_VolumeList(in *storage.VolumeList, out *v1alpha1.VolumeList, s conversion.Scope) error {
+func Convert_storage_VolumeList_To_v1alpha1_VolumeList(in *storage.VolumeList, out *storagev1alpha1.VolumeList, s conversion.Scope) error {
 	return autoConvert_storage_VolumeList_To_v1alpha1_VolumeList(in, out, s)
 }
 
-func autoConvert_v1alpha1_VolumePool_To_storage_VolumePool(in *v1alpha1.VolumePool, out *storage.VolumePool, s conversion.Scope) error {
+func autoConvert_v1alpha1_VolumePool_To_storage_VolumePool(in *storagev1alpha1.VolumePool, out *storage.VolumePool, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1alpha1_VolumePoolSpec_To_storage_VolumePoolSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -826,11 +826,11 @@ func autoConvert_v1alpha1_VolumePool_To_storage_VolumePool(in *v1alpha1.VolumePo
 }
 
 // Convert_v1alpha1_VolumePool_To_storage_VolumePool is an autogenerated conversion function.
-func Convert_v1alpha1_VolumePool_To_storage_VolumePool(in *v1alpha1.VolumePool, out *storage.VolumePool, s conversion.Scope) error {
+func Convert_v1alpha1_VolumePool_To_storage_VolumePool(in *storagev1alpha1.VolumePool, out *storage.VolumePool, s conversion.Scope) error {
 	return autoConvert_v1alpha1_VolumePool_To_storage_VolumePool(in, out, s)
 }
 
-func autoConvert_storage_VolumePool_To_v1alpha1_VolumePool(in *storage.VolumePool, out *v1alpha1.VolumePool, s conversion.Scope) error {
+func autoConvert_storage_VolumePool_To_v1alpha1_VolumePool(in *storage.VolumePool, out *storagev1alpha1.VolumePool, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_storage_VolumePoolSpec_To_v1alpha1_VolumePoolSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -842,11 +842,11 @@ func autoConvert_storage_VolumePool_To_v1alpha1_VolumePool(in *storage.VolumePoo
 }
 
 // Convert_storage_VolumePool_To_v1alpha1_VolumePool is an autogenerated conversion function.
-func Convert_storage_VolumePool_To_v1alpha1_VolumePool(in *storage.VolumePool, out *v1alpha1.VolumePool, s conversion.Scope) error {
+func Convert_storage_VolumePool_To_v1alpha1_VolumePool(in *storage.VolumePool, out *storagev1alpha1.VolumePool, s conversion.Scope) error {
 	return autoConvert_storage_VolumePool_To_v1alpha1_VolumePool(in, out, s)
 }
 
-func autoConvert_v1alpha1_VolumePoolCondition_To_storage_VolumePoolCondition(in *v1alpha1.VolumePoolCondition, out *storage.VolumePoolCondition, s conversion.Scope) error {
+func autoConvert_v1alpha1_VolumePoolCondition_To_storage_VolumePoolCondition(in *storagev1alpha1.VolumePoolCondition, out *storage.VolumePoolCondition, s conversion.Scope) error {
 	out.Type = storage.VolumePoolConditionType(in.Type)
 	out.Status = v1.ConditionStatus(in.Status)
 	out.Reason = in.Reason
@@ -857,12 +857,12 @@ func autoConvert_v1alpha1_VolumePoolCondition_To_storage_VolumePoolCondition(in 
 }
 
 // Convert_v1alpha1_VolumePoolCondition_To_storage_VolumePoolCondition is an autogenerated conversion function.
-func Convert_v1alpha1_VolumePoolCondition_To_storage_VolumePoolCondition(in *v1alpha1.VolumePoolCondition, out *storage.VolumePoolCondition, s conversion.Scope) error {
+func Convert_v1alpha1_VolumePoolCondition_To_storage_VolumePoolCondition(in *storagev1alpha1.VolumePoolCondition, out *storage.VolumePoolCondition, s conversion.Scope) error {
 	return autoConvert_v1alpha1_VolumePoolCondition_To_storage_VolumePoolCondition(in, out, s)
 }
 
-func autoConvert_storage_VolumePoolCondition_To_v1alpha1_VolumePoolCondition(in *storage.VolumePoolCondition, out *v1alpha1.VolumePoolCondition, s conversion.Scope) error {
-	out.Type = v1alpha1.VolumePoolConditionType(in.Type)
+func autoConvert_storage_VolumePoolCondition_To_v1alpha1_VolumePoolCondition(in *storage.VolumePoolCondition, out *storagev1alpha1.VolumePoolCondition, s conversion.Scope) error {
+	out.Type = storagev1alpha1.VolumePoolConditionType(in.Type)
 	out.Status = v1.ConditionStatus(in.Status)
 	out.Reason = in.Reason
 	out.Message = in.Message
@@ -872,55 +872,55 @@ func autoConvert_storage_VolumePoolCondition_To_v1alpha1_VolumePoolCondition(in 
 }
 
 // Convert_storage_VolumePoolCondition_To_v1alpha1_VolumePoolCondition is an autogenerated conversion function.
-func Convert_storage_VolumePoolCondition_To_v1alpha1_VolumePoolCondition(in *storage.VolumePoolCondition, out *v1alpha1.VolumePoolCondition, s conversion.Scope) error {
+func Convert_storage_VolumePoolCondition_To_v1alpha1_VolumePoolCondition(in *storage.VolumePoolCondition, out *storagev1alpha1.VolumePoolCondition, s conversion.Scope) error {
 	return autoConvert_storage_VolumePoolCondition_To_v1alpha1_VolumePoolCondition(in, out, s)
 }
 
-func autoConvert_v1alpha1_VolumePoolList_To_storage_VolumePoolList(in *v1alpha1.VolumePoolList, out *storage.VolumePoolList, s conversion.Scope) error {
+func autoConvert_v1alpha1_VolumePoolList_To_storage_VolumePoolList(in *storagev1alpha1.VolumePoolList, out *storage.VolumePoolList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	out.Items = *(*[]storage.VolumePool)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_v1alpha1_VolumePoolList_To_storage_VolumePoolList is an autogenerated conversion function.
-func Convert_v1alpha1_VolumePoolList_To_storage_VolumePoolList(in *v1alpha1.VolumePoolList, out *storage.VolumePoolList, s conversion.Scope) error {
+func Convert_v1alpha1_VolumePoolList_To_storage_VolumePoolList(in *storagev1alpha1.VolumePoolList, out *storage.VolumePoolList, s conversion.Scope) error {
 	return autoConvert_v1alpha1_VolumePoolList_To_storage_VolumePoolList(in, out, s)
 }
 
-func autoConvert_storage_VolumePoolList_To_v1alpha1_VolumePoolList(in *storage.VolumePoolList, out *v1alpha1.VolumePoolList, s conversion.Scope) error {
+func autoConvert_storage_VolumePoolList_To_v1alpha1_VolumePoolList(in *storage.VolumePoolList, out *storagev1alpha1.VolumePoolList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]v1alpha1.VolumePool)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]storagev1alpha1.VolumePool)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_storage_VolumePoolList_To_v1alpha1_VolumePoolList is an autogenerated conversion function.
-func Convert_storage_VolumePoolList_To_v1alpha1_VolumePoolList(in *storage.VolumePoolList, out *v1alpha1.VolumePoolList, s conversion.Scope) error {
+func Convert_storage_VolumePoolList_To_v1alpha1_VolumePoolList(in *storage.VolumePoolList, out *storagev1alpha1.VolumePoolList, s conversion.Scope) error {
 	return autoConvert_storage_VolumePoolList_To_v1alpha1_VolumePoolList(in, out, s)
 }
 
-func autoConvert_v1alpha1_VolumePoolSpec_To_storage_VolumePoolSpec(in *v1alpha1.VolumePoolSpec, out *storage.VolumePoolSpec, s conversion.Scope) error {
+func autoConvert_v1alpha1_VolumePoolSpec_To_storage_VolumePoolSpec(in *storagev1alpha1.VolumePoolSpec, out *storage.VolumePoolSpec, s conversion.Scope) error {
 	out.ProviderID = in.ProviderID
 	out.Taints = *(*[]commonv1alpha1.Taint)(unsafe.Pointer(&in.Taints))
 	return nil
 }
 
 // Convert_v1alpha1_VolumePoolSpec_To_storage_VolumePoolSpec is an autogenerated conversion function.
-func Convert_v1alpha1_VolumePoolSpec_To_storage_VolumePoolSpec(in *v1alpha1.VolumePoolSpec, out *storage.VolumePoolSpec, s conversion.Scope) error {
+func Convert_v1alpha1_VolumePoolSpec_To_storage_VolumePoolSpec(in *storagev1alpha1.VolumePoolSpec, out *storage.VolumePoolSpec, s conversion.Scope) error {
 	return autoConvert_v1alpha1_VolumePoolSpec_To_storage_VolumePoolSpec(in, out, s)
 }
 
-func autoConvert_storage_VolumePoolSpec_To_v1alpha1_VolumePoolSpec(in *storage.VolumePoolSpec, out *v1alpha1.VolumePoolSpec, s conversion.Scope) error {
+func autoConvert_storage_VolumePoolSpec_To_v1alpha1_VolumePoolSpec(in *storage.VolumePoolSpec, out *storagev1alpha1.VolumePoolSpec, s conversion.Scope) error {
 	out.ProviderID = in.ProviderID
 	out.Taints = *(*[]commonv1alpha1.Taint)(unsafe.Pointer(&in.Taints))
 	return nil
 }
 
 // Convert_storage_VolumePoolSpec_To_v1alpha1_VolumePoolSpec is an autogenerated conversion function.
-func Convert_storage_VolumePoolSpec_To_v1alpha1_VolumePoolSpec(in *storage.VolumePoolSpec, out *v1alpha1.VolumePoolSpec, s conversion.Scope) error {
+func Convert_storage_VolumePoolSpec_To_v1alpha1_VolumePoolSpec(in *storage.VolumePoolSpec, out *storagev1alpha1.VolumePoolSpec, s conversion.Scope) error {
 	return autoConvert_storage_VolumePoolSpec_To_v1alpha1_VolumePoolSpec(in, out, s)
 }
 
-func autoConvert_v1alpha1_VolumePoolStatus_To_storage_VolumePoolStatus(in *v1alpha1.VolumePoolStatus, out *storage.VolumePoolStatus, s conversion.Scope) error {
+func autoConvert_v1alpha1_VolumePoolStatus_To_storage_VolumePoolStatus(in *storagev1alpha1.VolumePoolStatus, out *storage.VolumePoolStatus, s conversion.Scope) error {
 	out.State = storage.VolumePoolState(in.State)
 	out.Conditions = *(*[]storage.VolumePoolCondition)(unsafe.Pointer(&in.Conditions))
 	out.AvailableVolumeClasses = *(*[]v1.LocalObjectReference)(unsafe.Pointer(&in.AvailableVolumeClasses))
@@ -930,13 +930,13 @@ func autoConvert_v1alpha1_VolumePoolStatus_To_storage_VolumePoolStatus(in *v1alp
 }
 
 // Convert_v1alpha1_VolumePoolStatus_To_storage_VolumePoolStatus is an autogenerated conversion function.
-func Convert_v1alpha1_VolumePoolStatus_To_storage_VolumePoolStatus(in *v1alpha1.VolumePoolStatus, out *storage.VolumePoolStatus, s conversion.Scope) error {
+func Convert_v1alpha1_VolumePoolStatus_To_storage_VolumePoolStatus(in *storagev1alpha1.VolumePoolStatus, out *storage.VolumePoolStatus, s conversion.Scope) error {
 	return autoConvert_v1alpha1_VolumePoolStatus_To_storage_VolumePoolStatus(in, out, s)
 }
 
-func autoConvert_storage_VolumePoolStatus_To_v1alpha1_VolumePoolStatus(in *storage.VolumePoolStatus, out *v1alpha1.VolumePoolStatus, s conversion.Scope) error {
-	out.State = v1alpha1.VolumePoolState(in.State)
-	out.Conditions = *(*[]v1alpha1.VolumePoolCondition)(unsafe.Pointer(&in.Conditions))
+func autoConvert_storage_VolumePoolStatus_To_v1alpha1_VolumePoolStatus(in *storage.VolumePoolStatus, out *storagev1alpha1.VolumePoolStatus, s conversion.Scope) error {
+	out.State = storagev1alpha1.VolumePoolState(in.State)
+	out.Conditions = *(*[]storagev1alpha1.VolumePoolCondition)(unsafe.Pointer(&in.Conditions))
 	out.AvailableVolumeClasses = *(*[]v1.LocalObjectReference)(unsafe.Pointer(&in.AvailableVolumeClasses))
 	out.Capacity = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Capacity))
 	out.Allocatable = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Allocatable))
@@ -944,11 +944,11 @@ func autoConvert_storage_VolumePoolStatus_To_v1alpha1_VolumePoolStatus(in *stora
 }
 
 // Convert_storage_VolumePoolStatus_To_v1alpha1_VolumePoolStatus is an autogenerated conversion function.
-func Convert_storage_VolumePoolStatus_To_v1alpha1_VolumePoolStatus(in *storage.VolumePoolStatus, out *v1alpha1.VolumePoolStatus, s conversion.Scope) error {
+func Convert_storage_VolumePoolStatus_To_v1alpha1_VolumePoolStatus(in *storage.VolumePoolStatus, out *storagev1alpha1.VolumePoolStatus, s conversion.Scope) error {
 	return autoConvert_storage_VolumePoolStatus_To_v1alpha1_VolumePoolStatus(in, out, s)
 }
 
-func autoConvert_v1alpha1_VolumeSpec_To_storage_VolumeSpec(in *v1alpha1.VolumeSpec, out *storage.VolumeSpec, s conversion.Scope) error {
+func autoConvert_v1alpha1_VolumeSpec_To_storage_VolumeSpec(in *storagev1alpha1.VolumeSpec, out *storage.VolumeSpec, s conversion.Scope) error {
 	out.VolumeClassRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeClassRef))
 	out.VolumePoolSelector = *(*map[string]string)(unsafe.Pointer(&in.VolumePoolSelector))
 	out.VolumePoolRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumePoolRef))
@@ -963,11 +963,11 @@ func autoConvert_v1alpha1_VolumeSpec_To_storage_VolumeSpec(in *v1alpha1.VolumeSp
 }
 
 // Convert_v1alpha1_VolumeSpec_To_storage_VolumeSpec is an autogenerated conversion function.
-func Convert_v1alpha1_VolumeSpec_To_storage_VolumeSpec(in *v1alpha1.VolumeSpec, out *storage.VolumeSpec, s conversion.Scope) error {
+func Convert_v1alpha1_VolumeSpec_To_storage_VolumeSpec(in *storagev1alpha1.VolumeSpec, out *storage.VolumeSpec, s conversion.Scope) error {
 	return autoConvert_v1alpha1_VolumeSpec_To_storage_VolumeSpec(in, out, s)
 }
 
-func autoConvert_storage_VolumeSpec_To_v1alpha1_VolumeSpec(in *storage.VolumeSpec, out *v1alpha1.VolumeSpec, s conversion.Scope) error {
+func autoConvert_storage_VolumeSpec_To_v1alpha1_VolumeSpec(in *storage.VolumeSpec, out *storagev1alpha1.VolumeSpec, s conversion.Scope) error {
 	out.VolumeClassRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeClassRef))
 	out.VolumePoolSelector = *(*map[string]string)(unsafe.Pointer(&in.VolumePoolSelector))
 	out.VolumePoolRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumePoolRef))
@@ -977,16 +977,16 @@ func autoConvert_storage_VolumeSpec_To_v1alpha1_VolumeSpec(in *storage.VolumeSpe
 	out.ImagePullSecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.ImagePullSecretRef))
 	out.Unclaimable = in.Unclaimable
 	out.Tolerations = *(*[]commonv1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
-	out.Encryption = (*v1alpha1.VolumeEncryption)(unsafe.Pointer(in.Encryption))
+	out.Encryption = (*storagev1alpha1.VolumeEncryption)(unsafe.Pointer(in.Encryption))
 	return nil
 }
 
 // Convert_storage_VolumeSpec_To_v1alpha1_VolumeSpec is an autogenerated conversion function.
-func Convert_storage_VolumeSpec_To_v1alpha1_VolumeSpec(in *storage.VolumeSpec, out *v1alpha1.VolumeSpec, s conversion.Scope) error {
+func Convert_storage_VolumeSpec_To_v1alpha1_VolumeSpec(in *storage.VolumeSpec, out *storagev1alpha1.VolumeSpec, s conversion.Scope) error {
 	return autoConvert_storage_VolumeSpec_To_v1alpha1_VolumeSpec(in, out, s)
 }
 
-func autoConvert_v1alpha1_VolumeStatus_To_storage_VolumeStatus(in *v1alpha1.VolumeStatus, out *storage.VolumeStatus, s conversion.Scope) error {
+func autoConvert_v1alpha1_VolumeStatus_To_storage_VolumeStatus(in *storagev1alpha1.VolumeStatus, out *storage.VolumeStatus, s conversion.Scope) error {
 	out.State = storage.VolumeState(in.State)
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
 	out.Access = (*storage.VolumeAccess)(unsafe.Pointer(in.Access))
@@ -995,24 +995,24 @@ func autoConvert_v1alpha1_VolumeStatus_To_storage_VolumeStatus(in *v1alpha1.Volu
 }
 
 // Convert_v1alpha1_VolumeStatus_To_storage_VolumeStatus is an autogenerated conversion function.
-func Convert_v1alpha1_VolumeStatus_To_storage_VolumeStatus(in *v1alpha1.VolumeStatus, out *storage.VolumeStatus, s conversion.Scope) error {
+func Convert_v1alpha1_VolumeStatus_To_storage_VolumeStatus(in *storagev1alpha1.VolumeStatus, out *storage.VolumeStatus, s conversion.Scope) error {
 	return autoConvert_v1alpha1_VolumeStatus_To_storage_VolumeStatus(in, out, s)
 }
 
-func autoConvert_storage_VolumeStatus_To_v1alpha1_VolumeStatus(in *storage.VolumeStatus, out *v1alpha1.VolumeStatus, s conversion.Scope) error {
-	out.State = v1alpha1.VolumeState(in.State)
+func autoConvert_storage_VolumeStatus_To_v1alpha1_VolumeStatus(in *storage.VolumeStatus, out *storagev1alpha1.VolumeStatus, s conversion.Scope) error {
+	out.State = storagev1alpha1.VolumeState(in.State)
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
-	out.Access = (*v1alpha1.VolumeAccess)(unsafe.Pointer(in.Access))
-	out.Conditions = *(*[]v1alpha1.VolumeCondition)(unsafe.Pointer(&in.Conditions))
+	out.Access = (*storagev1alpha1.VolumeAccess)(unsafe.Pointer(in.Access))
+	out.Conditions = *(*[]storagev1alpha1.VolumeCondition)(unsafe.Pointer(&in.Conditions))
 	return nil
 }
 
 // Convert_storage_VolumeStatus_To_v1alpha1_VolumeStatus is an autogenerated conversion function.
-func Convert_storage_VolumeStatus_To_v1alpha1_VolumeStatus(in *storage.VolumeStatus, out *v1alpha1.VolumeStatus, s conversion.Scope) error {
+func Convert_storage_VolumeStatus_To_v1alpha1_VolumeStatus(in *storage.VolumeStatus, out *storagev1alpha1.VolumeStatus, s conversion.Scope) error {
 	return autoConvert_storage_VolumeStatus_To_v1alpha1_VolumeStatus(in, out, s)
 }
 
-func autoConvert_v1alpha1_VolumeTemplateSpec_To_storage_VolumeTemplateSpec(in *v1alpha1.VolumeTemplateSpec, out *storage.VolumeTemplateSpec, s conversion.Scope) error {
+func autoConvert_v1alpha1_VolumeTemplateSpec_To_storage_VolumeTemplateSpec(in *storagev1alpha1.VolumeTemplateSpec, out *storage.VolumeTemplateSpec, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1alpha1_VolumeSpec_To_storage_VolumeSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -1021,11 +1021,11 @@ func autoConvert_v1alpha1_VolumeTemplateSpec_To_storage_VolumeTemplateSpec(in *v
 }
 
 // Convert_v1alpha1_VolumeTemplateSpec_To_storage_VolumeTemplateSpec is an autogenerated conversion function.
-func Convert_v1alpha1_VolumeTemplateSpec_To_storage_VolumeTemplateSpec(in *v1alpha1.VolumeTemplateSpec, out *storage.VolumeTemplateSpec, s conversion.Scope) error {
+func Convert_v1alpha1_VolumeTemplateSpec_To_storage_VolumeTemplateSpec(in *storagev1alpha1.VolumeTemplateSpec, out *storage.VolumeTemplateSpec, s conversion.Scope) error {
 	return autoConvert_v1alpha1_VolumeTemplateSpec_To_storage_VolumeTemplateSpec(in, out, s)
 }
 
-func autoConvert_storage_VolumeTemplateSpec_To_v1alpha1_VolumeTemplateSpec(in *storage.VolumeTemplateSpec, out *v1alpha1.VolumeTemplateSpec, s conversion.Scope) error {
+func autoConvert_storage_VolumeTemplateSpec_To_v1alpha1_VolumeTemplateSpec(in *storage.VolumeTemplateSpec, out *storagev1alpha1.VolumeTemplateSpec, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_storage_VolumeSpec_To_v1alpha1_VolumeSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -1034,6 +1034,6 @@ func autoConvert_storage_VolumeTemplateSpec_To_v1alpha1_VolumeTemplateSpec(in *s
 }
 
 // Convert_storage_VolumeTemplateSpec_To_v1alpha1_VolumeTemplateSpec is an autogenerated conversion function.
-func Convert_storage_VolumeTemplateSpec_To_v1alpha1_VolumeTemplateSpec(in *storage.VolumeTemplateSpec, out *v1alpha1.VolumeTemplateSpec, s conversion.Scope) error {
+func Convert_storage_VolumeTemplateSpec_To_v1alpha1_VolumeTemplateSpec(in *storage.VolumeTemplateSpec, out *storagev1alpha1.VolumeTemplateSpec, s conversion.Scope) error {
 	return autoConvert_storage_VolumeTemplateSpec_To_v1alpha1_VolumeTemplateSpec(in, out, s)
 }

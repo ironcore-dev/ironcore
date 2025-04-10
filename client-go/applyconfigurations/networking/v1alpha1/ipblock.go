@@ -6,17 +6,17 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 )
 
-// IPBlockApplyConfiguration represents an declarative configuration of the IPBlock type for use
+// IPBlockApplyConfiguration represents a declarative configuration of the IPBlock type for use
 // with apply.
 type IPBlockApplyConfiguration struct {
-	CIDR   *v1alpha1.IPPrefix  `json:"cidr,omitempty"`
-	Except []v1alpha1.IPPrefix `json:"except,omitempty"`
+	CIDR   *commonv1alpha1.IPPrefix  `json:"cidr,omitempty"`
+	Except []commonv1alpha1.IPPrefix `json:"except,omitempty"`
 }
 
-// IPBlockApplyConfiguration constructs an declarative configuration of the IPBlock type for use with
+// IPBlockApplyConfiguration constructs a declarative configuration of the IPBlock type for use with
 // apply.
 func IPBlock() *IPBlockApplyConfiguration {
 	return &IPBlockApplyConfiguration{}
@@ -25,7 +25,7 @@ func IPBlock() *IPBlockApplyConfiguration {
 // WithCIDR sets the CIDR field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the CIDR field is set to the value of the last call.
-func (b *IPBlockApplyConfiguration) WithCIDR(value v1alpha1.IPPrefix) *IPBlockApplyConfiguration {
+func (b *IPBlockApplyConfiguration) WithCIDR(value commonv1alpha1.IPPrefix) *IPBlockApplyConfiguration {
 	b.CIDR = &value
 	return b
 }
@@ -33,7 +33,7 @@ func (b *IPBlockApplyConfiguration) WithCIDR(value v1alpha1.IPPrefix) *IPBlockAp
 // WithExcept adds the given value to the Except field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the Except field.
-func (b *IPBlockApplyConfiguration) WithExcept(values ...v1alpha1.IPPrefix) *IPBlockApplyConfiguration {
+func (b *IPBlockApplyConfiguration) WithExcept(values ...commonv1alpha1.IPPrefix) *IPBlockApplyConfiguration {
 	for i := range values {
 		b.Except = append(b.Except, values[i])
 	}

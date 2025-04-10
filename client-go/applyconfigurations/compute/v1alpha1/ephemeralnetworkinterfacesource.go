@@ -6,16 +6,16 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/networking/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/networking/v1alpha1"
 )
 
-// EphemeralNetworkInterfaceSourceApplyConfiguration represents an declarative configuration of the EphemeralNetworkInterfaceSource type for use
+// EphemeralNetworkInterfaceSourceApplyConfiguration represents a declarative configuration of the EphemeralNetworkInterfaceSource type for use
 // with apply.
 type EphemeralNetworkInterfaceSourceApplyConfiguration struct {
-	NetworkInterfaceTemplate *v1alpha1.NetworkInterfaceTemplateSpecApplyConfiguration `json:"networkInterfaceTemplate,omitempty"`
+	NetworkInterfaceTemplate *networkingv1alpha1.NetworkInterfaceTemplateSpecApplyConfiguration `json:"networkInterfaceTemplate,omitempty"`
 }
 
-// EphemeralNetworkInterfaceSourceApplyConfiguration constructs an declarative configuration of the EphemeralNetworkInterfaceSource type for use with
+// EphemeralNetworkInterfaceSourceApplyConfiguration constructs a declarative configuration of the EphemeralNetworkInterfaceSource type for use with
 // apply.
 func EphemeralNetworkInterfaceSource() *EphemeralNetworkInterfaceSourceApplyConfiguration {
 	return &EphemeralNetworkInterfaceSourceApplyConfiguration{}
@@ -24,7 +24,7 @@ func EphemeralNetworkInterfaceSource() *EphemeralNetworkInterfaceSourceApplyConf
 // WithNetworkInterfaceTemplate sets the NetworkInterfaceTemplate field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the NetworkInterfaceTemplate field is set to the value of the last call.
-func (b *EphemeralNetworkInterfaceSourceApplyConfiguration) WithNetworkInterfaceTemplate(value *v1alpha1.NetworkInterfaceTemplateSpecApplyConfiguration) *EphemeralNetworkInterfaceSourceApplyConfiguration {
+func (b *EphemeralNetworkInterfaceSourceApplyConfiguration) WithNetworkInterfaceTemplate(value *networkingv1alpha1.NetworkInterfaceTemplateSpecApplyConfiguration) *EphemeralNetworkInterfaceSourceApplyConfiguration {
 	b.NetworkInterfaceTemplate = value
 	return b
 }

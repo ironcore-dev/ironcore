@@ -13,26 +13,32 @@ import (
 	"net/url"
 
 	"github.com/go-logr/logr"
-	"github.com/ironcore-dev/controller-utils/configutils"
-	"github.com/ironcore-dev/ironcore/broker/common"
-	commongrpc "github.com/ironcore-dev/ironcore/broker/common/grpc"
-	machinebrokerhttp "github.com/ironcore-dev/ironcore/broker/machinebroker/http"
-	"github.com/ironcore-dev/ironcore/broker/machinebroker/server"
-	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
+
+	"github.com/ironcore-dev/ironcore/broker/common"
+	commongrpc "github.com/ironcore-dev/ironcore/broker/common/grpc"
+	mchinebrokerconfig "github.com/ironcore-dev/ironcore/broker/machinebroker/client/config"
+	machinebrokerhttp "github.com/ironcore-dev/ironcore/broker/machinebroker/http"
+	"github.com/ironcore-dev/ironcore/broker/machinebroker/server"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
+	"github.com/ironcore-dev/ironcore/utils/client/config"
+
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
 
 type Options struct {
-	Kubeconfig              string
+	GetConfigOptions        config.GetConfigOptions
 	Address                 string
 	StreamingAddress        string
 	BaseURL                 string
 	BrokerDownwardAPILabels map[string]string
+
+	QPS   float32
+	Burst int
 
 	Namespace           string
 	MachinePoolName     string
@@ -40,7 +46,7 @@ type Options struct {
 }
 
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
-	fs.StringVar(&o.Kubeconfig, "kubeconfig", o.Kubeconfig, "Path pointing to a kubeconfig file to use.")
+	o.GetConfigOptions.BindFlags(fs)
 	fs.StringVar(&o.Address, "address", "/var/run/iri-machinebroker.sock", "Address to listen on.")
 	fs.StringVar(&o.StreamingAddress, "streaming-address", "127.0.0.1:20251", "Address to run the streaming server on")
 	fs.StringVar(&o.BaseURL, "base-url", "", "The base url to construct urls for streaming from. If empty it will be "+
@@ -84,9 +90,14 @@ func Run(ctx context.Context, opts Options) error {
 	log := ctrl.LoggerFrom(ctx)
 	setupLog := log.WithName("setup")
 
-	cfg, err := configutils.GetConfig(configutils.Kubeconfig(opts.Kubeconfig))
+	getter, err := mchinebrokerconfig.NewGetter()
 	if err != nil {
-		return err
+		return fmt.Errorf("error creating new getter: %w", err)
+	}
+
+	cfg, err := getter.GetConfig(ctx, &opts.GetConfigOptions)
+	if err != nil {
+		return fmt.Errorf("error getting config: %w", err)
 	}
 
 	if opts.Namespace == "" {
@@ -122,7 +133,7 @@ func Run(ctx context.Context, opts Options) error {
 
 	g, ctx := errgroup.WithContext(ctx)
 	g.Go(func() error {
-		return runServer(ctx, setupLog, log, srv)
+		return runServer(ctx, setupLog, srv)
 	})
 	g.Go(func() error {
 		return runGRPCServer(ctx, setupLog, log, srv, opts)
@@ -133,7 +144,7 @@ func Run(ctx context.Context, opts Options) error {
 	return g.Wait()
 }
 
-func runServer(ctx context.Context, setupLog, log logr.Logger, srv *server.Server) error {
+func runServer(ctx context.Context, setupLog logr.Logger, srv *server.Server) error {
 	setupLog.V(1).Info("Starting server loops")
 	if err := srv.Start(ctx); err != nil {
 		return fmt.Errorf("error starting server loops: %w", err)
@@ -142,7 +153,7 @@ func runServer(ctx context.Context, setupLog, log logr.Logger, srv *server.Serve
 	return nil
 }
 
-func runGRPCServer(ctx context.Context, setupLog logr.Logger, log logr.Logger, srv *server.Server, opts Options) error {
+func runGRPCServer(ctx context.Context, setupLog, log logr.Logger, srv *server.Server, opts Options) error {
 	log.V(1).Info("Cleaning up any previous socket")
 	if err := common.CleanupSocketIfExists(opts.Address); err != nil {
 		return fmt.Errorf("error cleaning up socket: %w", err)

@@ -23,6 +23,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/rest"
 	apiregistrationv1 "k8s.io/kube-aggregator/pkg/apis/apiregistration/v1"
 	"k8s.io/utils/ptr"
@@ -525,21 +526,69 @@ func WaitUntilTypesDiscoverable(ctx context.Context, c client.Client, objs ...cl
 
 var clientObjectType = reflect.TypeOf((*client.Object)(nil)).Elem()
 
-func WaitUntilGroupVersionsDiscoverable(ctx context.Context, c client.Client, scheme *runtime.Scheme, gvs ...schema.GroupVersion) error {
+func WaitUntilGroupVersionsDiscoverable(ctx context.Context, cfg *rest.Config, c client.Client, scheme *runtime.Scheme, gvs ...schema.GroupVersion) error {
+	discoveryClient, err := discovery.NewDiscoveryClientForConfig(cfg)
+	if err != nil {
+		return fmt.Errorf("failed to create discovery client: %w", err)
+	}
+
+	gvSet := make(map[schema.GroupVersion]struct{})
+	for _, gv := range gvs {
+		gvSet[gv] = struct{}{}
+	}
+
+	err = wait.PollUntilContextCancel(ctx, 50*time.Millisecond, true, func(ctx context.Context) (bool, error) {
+		apiGroupList, err := discoveryClient.ServerGroups()
+		if err != nil {
+			log.Error(err, "Failed to fetch server groups")
+			return false, nil // Continue polling on transient errors
+		}
+
+		// Check if all expected group versions are present
+		for gv := range gvSet {
+			found := false
+			for _, group := range apiGroupList.Groups {
+				if group.Name == gv.Group {
+					for _, version := range group.Versions {
+						if version.Version == gv.Version {
+							found = true
+							break
+						}
+					}
+				}
+				if found {
+					break
+				}
+			}
+			if !found {
+				log.Info("GroupVersion not yet discoverable", "gv", gv.String())
+				return false, nil // Continue polling if any group version is missing
+			}
+		}
+		return true, nil
+	})
+	if err != nil {
+		missingGVs := make([]string, 0, len(gvSet))
+		for gv := range gvSet {
+			missingGVs = append(missingGVs, gv.String())
+		}
+		sort.Strings(missingGVs)
+		return fmt.Errorf("timed out waiting for group versions to be discoverable: %w, missing group versions: %v", err, missingGVs)
+	}
+
 	gvks := make(map[schema.GroupVersionKind]struct{})
 	for _, gv := range gvs {
 		types := scheme.KnownTypes(gv)
 		for _, typ := range types {
-			if reflect.PtrTo(typ).Implements(clientObjectType) {
+			if reflect.PointerTo(typ).Implements(clientObjectType) {
 				obj := reflect.New(typ).Interface().(client.Object)
 				kinds, unversioned, err := scheme.ObjectKinds(obj)
 				if err != nil {
-					return err
+					return fmt.Errorf("error getting object kinds for %T: %w", obj, err)
 				}
 				if unversioned {
 					continue
 				}
-
 				for _, kind := range kinds {
 					gvks[kind] = struct{}{}
 				}
@@ -547,7 +596,12 @@ func WaitUntilGroupVersionsDiscoverable(ctx context.Context, c client.Client, sc
 		}
 	}
 
-	return waitUntilGVKsDiscoverable(ctx, c, gvks)
+	if err := waitUntilGVKsDiscoverable(ctx, c, gvks); err != nil {
+		return fmt.Errorf("error waiting for GVKs to be discoverable: %w", err)
+	}
+
+	log.Info("All group versions and REST mappings are discoverable", "gvs", gvs)
+	return nil
 }
 
 func WaitUntilAPIServicesAvailable(ctx context.Context, c client.Client, services ...*apiregistrationv1.APIService) error {
@@ -584,14 +638,14 @@ func WaitUntilAPIServicesAvailable(ctx context.Context, c client.Client, service
 	return nil
 }
 
-func WaitUntilGroupVersionsDiscoverableWithTimeout(timeout time.Duration, c client.Client, scheme *runtime.Scheme, gvs ...schema.GroupVersion) error {
+func WaitUntilGroupVersionsDiscoverableWithTimeout(timeout time.Duration, cfg *rest.Config, c client.Client, scheme *runtime.Scheme, gvs ...schema.GroupVersion) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	return WaitUntilGroupVersionsDiscoverable(ctx, c, scheme, gvs...)
+	return WaitUntilGroupVersionsDiscoverable(ctx, cfg, c, scheme, gvs...)
 }
 
-func WaitUntilAPIServicesReady(ctx context.Context, ext *EnvironmentExtensions, c client.Client, scheme *runtime.Scheme) error {
+func WaitUntilAPIServicesReady(ctx context.Context, ext *EnvironmentExtensions, cfg *rest.Config, c client.Client, scheme *runtime.Scheme) error {
 	var apiServices []*apiregistrationv1.APIService
 	for _, srv := range ext.APIServiceInstallOptions.AllAPIServerInstallOptions() {
 		apiServices = append(apiServices, srv.APIServices...)
@@ -603,17 +657,22 @@ func WaitUntilAPIServicesReady(ctx context.Context, ext *EnvironmentExtensions, 
 
 	groupVersions := make([]schema.GroupVersion, 0, len(apiServices))
 	for _, apiService := range apiServices {
-		groupVersions = append(groupVersions, schema.GroupVersion{Group: apiService.Spec.Group, Version: apiService.Spec.Version})
+		groupVersions = append(groupVersions, schema.GroupVersion{
+			Group:   apiService.Spec.Group,
+			Version: apiService.Spec.Version,
+		})
 	}
-	if err := WaitUntilGroupVersionsDiscoverable(ctx, c, scheme, groupVersions...); err != nil {
-		return fmt.Errorf("error waiting for group versions to be available: %w", err)
+
+	if err := WaitUntilGroupVersionsDiscoverable(ctx, cfg, c, scheme, groupVersions...); err != nil {
+		return fmt.Errorf("error waiting for group versions to be discoverable: %w", err)
 	}
+
 	return nil
 }
 
-func WaitUntilAPIServicesReadyWithTimeout(timeout time.Duration, ext *EnvironmentExtensions, c client.Client, scheme *runtime.Scheme) error {
+func WaitUntilAPIServicesReadyWithTimeout(timeout time.Duration, ext *EnvironmentExtensions, cfg *rest.Config, c client.Client, scheme *runtime.Scheme) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	return WaitUntilAPIServicesReady(ctx, ext, c, scheme)
+	return WaitUntilAPIServicesReady(ctx, ext, cfg, c, scheme)
 }

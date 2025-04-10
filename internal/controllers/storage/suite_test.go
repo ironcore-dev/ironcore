@@ -5,13 +5,16 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"path/filepath"
+	"runtime"
 	"testing"
 	"time"
 
 	"github.com/ironcore-dev/controller-utils/buildutils"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	computeclient "github.com/ironcore-dev/ironcore/internal/client/compute"
 	storageclient "github.com/ironcore-dev/ironcore/internal/client/storage"
 	"github.com/ironcore-dev/ironcore/internal/controllers/storage/scheduler"
@@ -21,11 +24,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/utils/lru"
+	"k8s.io/utils/ptr"
 	ctrl "sigs.k8s.io/controller-runtime"
+	ctrlconfig "sigs.k8s.io/controller-runtime/pkg/config"
 	"sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 	metricserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
-
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 
 	. "github.com/ironcore-dev/ironcore/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
@@ -73,7 +76,15 @@ var _ = BeforeSuite(func() {
 	var err error
 
 	By("bootstrapping test environment")
-	testEnv = &envtest.Environment{}
+	testEnv = &envtest.Environment{
+		// The BinaryAssetsDirectory is only required if you want to run the tests directly
+		// without call the makefile target test. If not informed it will look for the
+		// default path defined in controller-runtime which is /usr/local/kubebuilder/.
+		// Note that you must have the required binaries setup under the bin directory to perform
+		// the tests directly. When we run make test it will be setup and used automatically.
+		BinaryAssetsDirectory: filepath.Join("..", "..", "bin", "k8s",
+			fmt.Sprintf("1.32.0-%s-%s", runtime.GOOS, runtime.GOARCH)),
+	}
 	testEnvExt = &utilsenvtest.EnvironmentExtensions{
 		APIServiceDirectoryPaths:       []string{filepath.Join("..", "..", "..", "config", "apiserver", "apiservice", "bases")},
 		ErrorIfAPIServicePathIsMissing: true,
@@ -109,7 +120,7 @@ var _ = BeforeSuite(func() {
 	Expect(apiSrv.Start()).To(Succeed())
 	DeferCleanup(apiSrv.Stop)
 
-	Expect(utilsenvtest.WaitUntilAPIServicesReadyWithTimeout(apiServiceTimeout, testEnvExt, k8sClient, scheme.Scheme)).To(Succeed())
+	Expect(utilsenvtest.WaitUntilAPIServicesReadyWithTimeout(apiServiceTimeout, testEnvExt, cfg, k8sClient, scheme.Scheme)).To(Succeed())
 	ctx, cancel := context.WithCancel(context.Background())
 	DeferCleanup(cancel)
 
@@ -118,6 +129,7 @@ var _ = BeforeSuite(func() {
 		Metrics: metricserver.Options{
 			BindAddress: "0",
 		},
+		Controller: ctrlconfig.Controller{SkipNameValidation: ptr.To(true)},
 	})
 	Expect(err).ToNot(HaveOccurred())
 
@@ -125,7 +137,6 @@ var _ = BeforeSuite(func() {
 
 	// index fields here
 	Expect(computeclient.SetupMachineSpecVolumeNamesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
-
 	Expect(storageclient.SetupVolumeSpecVolumeClassRefNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 	Expect(storageclient.SetupVolumeSpecVolumePoolRefNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 	Expect(storageclient.SetupVolumePoolAvailableVolumeClassesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())

@@ -6,17 +6,17 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 )
 
-// MachinePoolAddressApplyConfiguration represents an declarative configuration of the MachinePoolAddress type for use
+// MachinePoolAddressApplyConfiguration represents a declarative configuration of the MachinePoolAddress type for use
 // with apply.
 type MachinePoolAddressApplyConfiguration struct {
-	Type    *v1alpha1.MachinePoolAddressType `json:"type,omitempty"`
-	Address *string                          `json:"address,omitempty"`
+	Type    *computev1alpha1.MachinePoolAddressType `json:"type,omitempty"`
+	Address *string                                 `json:"address,omitempty"`
 }
 
-// MachinePoolAddressApplyConfiguration constructs an declarative configuration of the MachinePoolAddress type for use with
+// MachinePoolAddressApplyConfiguration constructs a declarative configuration of the MachinePoolAddress type for use with
 // apply.
 func MachinePoolAddress() *MachinePoolAddressApplyConfiguration {
 	return &MachinePoolAddressApplyConfiguration{}
@@ -25,7 +25,7 @@ func MachinePoolAddress() *MachinePoolAddressApplyConfiguration {
 // WithType sets the Type field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Type field is set to the value of the last call.
-func (b *MachinePoolAddressApplyConfiguration) WithType(value v1alpha1.MachinePoolAddressType) *MachinePoolAddressApplyConfiguration {
+func (b *MachinePoolAddressApplyConfiguration) WithType(value computev1alpha1.MachinePoolAddressType) *MachinePoolAddressApplyConfiguration {
 	b.Type = &value
 	return b
 }

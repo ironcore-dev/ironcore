@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	"k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/client-go/tools/cache"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	labels "k8s.io/apimachinery/pkg/labels"
+	listers "k8s.io/client-go/listers"
+	cache "k8s.io/client-go/tools/cache"
 )
 
 // VolumeClassLister helps list VolumeClasses.
@@ -17,39 +17,19 @@ import (
 type VolumeClassLister interface {
 	// List lists all VolumeClasses in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.VolumeClass, err error)
+	List(selector labels.Selector) (ret []*storagev1alpha1.VolumeClass, err error)
 	// Get retrieves the VolumeClass from the index for a given name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.VolumeClass, error)
+	Get(name string) (*storagev1alpha1.VolumeClass, error)
 	VolumeClassListerExpansion
 }
 
 // volumeClassLister implements the VolumeClassLister interface.
 type volumeClassLister struct {
-	indexer cache.Indexer
+	listers.ResourceIndexer[*storagev1alpha1.VolumeClass]
 }
 
 // NewVolumeClassLister returns a new VolumeClassLister.
 func NewVolumeClassLister(indexer cache.Indexer) VolumeClassLister {
-	return &volumeClassLister{indexer: indexer}
-}
-
-// List lists all VolumeClasses in the indexer.
-func (s *volumeClassLister) List(selector labels.Selector) (ret []*v1alpha1.VolumeClass, err error) {
-	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.VolumeClass))
-	})
-	return ret, err
-}
-
-// Get retrieves the VolumeClass from the index for a given name.
-func (s *volumeClassLister) Get(name string) (*v1alpha1.VolumeClass, error) {
-	obj, exists, err := s.indexer.GetByKey(name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("volumeclass"), name)
-	}
-	return obj.(*v1alpha1.VolumeClass), nil
+	return &volumeClassLister{listers.New[*storagev1alpha1.VolumeClass](indexer, storagev1alpha1.Resource("volumeclass"))}
 }

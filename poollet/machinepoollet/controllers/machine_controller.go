@@ -8,10 +8,12 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
-	"time"
 
 	"github.com/go-logr/logr"
-	"github.com/ironcore-dev/controller-utils/clientutils"
+	"golang.org/x/exp/maps"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
@@ -27,9 +29,8 @@ import (
 	utilclient "github.com/ironcore-dev/ironcore/utils/client"
 	utilmaps "github.com/ironcore-dev/ironcore/utils/maps"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
-	"golang.org/x/exp/maps"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+
+	"github.com/ironcore-dev/controller-utils/clientutils"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -39,6 +40,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
@@ -60,6 +62,8 @@ type MachineReconciler struct {
 	DownwardAPIAnnotations map[string]string
 
 	WatchFilterValue string
+
+	MaxConcurrentReconciles int
 }
 
 func (r *MachineReconciler) machineKeyLabelSelector(machineKey client.ObjectKey) map[string]string {
@@ -511,10 +515,6 @@ func (r *MachineReconciler) updateNetworkInterfaceStatus(
 				errs = append(errs, err)
 			}
 		}
-
-		if err := r.updateNetworkInterfaceStatusFromIRIStatus(ctx, nic, iriNicStatus); err != nil {
-			errs = append(errs, err)
-		}
 	}
 
 	for _, nic := range unhandledNicByUID {
@@ -526,36 +526,6 @@ func (r *MachineReconciler) updateNetworkInterfaceStatus(
 	}
 
 	return errors.Join(errs...)
-}
-
-var iriNetworkInterfaceStateToNetworkInterfaceState = map[iri.NetworkInterfaceState]networkingv1alpha1.NetworkInterfaceState{
-	iri.NetworkInterfaceState_NETWORK_INTERFACE_PENDING:  networkingv1alpha1.NetworkInterfaceStatePending,
-	iri.NetworkInterfaceState_NETWORK_INTERFACE_ATTACHED: networkingv1alpha1.NetworkInterfaceStateAvailable,
-}
-
-func (r *MachineReconciler) updateNetworkInterfaceStatusFromIRIStatus(
-	ctx context.Context,
-	nic *networkingv1alpha1.NetworkInterface,
-	iriNicStatus *iri.NetworkInterfaceStatus,
-) error {
-	if iriNicStatus == nil {
-		return nil // nothing to do
-	}
-
-	nicBase := nic.DeepCopy()
-	nic.Status.IPs = commonv1alpha1.MustParseIPs(iriNicStatus.Ips...)
-	nic.Status.LastStateTransitionTime = &metav1.Time{Time: time.Now()}
-	nicState, ok := iriNetworkInterfaceStateToNetworkInterfaceState[iriNicStatus.State]
-	if !ok {
-		return fmt.Errorf("encountered unknown network interface state %s", iriNicStatus.State)
-	}
-	nic.Status.State = nicState
-
-	if err := r.Status().Patch(ctx, nic, client.MergeFrom(nicBase)); err != nil {
-		return fmt.Errorf("failed to patch network interface status: %w", err)
-	}
-
-	return nil
 }
 
 func (r *MachineReconciler) updateMachineStatus(ctx context.Context, machine *computev1alpha1.Machine, iriMachine *iri.Machine) error {
@@ -737,10 +707,7 @@ func (r *MachineReconciler) prepareIRIMachineClass(ctx context.Context, machine 
 		return "", false, nil
 	}
 
-	caps, err := getIRIMachineClassCapabilities(machineClass)
-	if err != nil {
-		return "", false, fmt.Errorf("error getting iri machine class capabilities: %w", err)
-	}
+	caps := getIRIMachineClassCapabilities(machineClass)
 
 	class, _, err := r.MachineClassMapper.GetMachineClassFor(ctx, machineClassName, caps)
 	if err != nil {
@@ -749,14 +716,14 @@ func (r *MachineReconciler) prepareIRIMachineClass(ctx context.Context, machine 
 	return class.Name, true, nil
 }
 
-func getIRIMachineClassCapabilities(machineClass *computev1alpha1.MachineClass) (*iri.MachineClassCapabilities, error) {
+func getIRIMachineClassCapabilities(machineClass *computev1alpha1.MachineClass) *iri.MachineClassCapabilities {
 	cpu := machineClass.Capabilities.CPU()
 	memory := machineClass.Capabilities.Memory()
 
 	return &iri.MachineClassCapabilities{
 		CpuMillis:   cpu.MilliValue(),
 		MemoryBytes: memory.Value(),
-	}, nil
+	}
 }
 
 func (r *MachineReconciler) prepareIRIIgnitionData(ctx context.Context, machine *computev1alpha1.Machine, ignitionRef *commonv1alpha1.SecretKeySelector) ([]byte, bool, error) {
@@ -985,5 +952,9 @@ func (r *MachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			&storagev1alpha1.Volume{},
 			r.enqueueMachinesReferencingVolume(),
 		).
+		WithOptions(
+			controller.Options{
+				MaxConcurrentReconciles: r.MaxConcurrentReconciles,
+			}).
 		Complete(r)
 }

@@ -8,13 +8,13 @@ package v1alpha1
 import (
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	internal "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/internal"
-	v1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/meta/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	managedfields "k8s.io/apimachinery/pkg/util/managedfields"
+	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// BucketApplyConfiguration represents an declarative configuration of the Bucket type for use
+// BucketApplyConfiguration represents a declarative configuration of the Bucket type for use
 // with apply.
 type BucketApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -23,7 +23,7 @@ type BucketApplyConfiguration struct {
 	Status                           *BucketStatusApplyConfiguration `json:"status,omitempty"`
 }
 
-// Bucket constructs an declarative configuration of the Bucket type for use with
+// Bucket constructs a declarative configuration of the Bucket type for use with
 // apply.
 func Bucket(name, namespace string) *BucketApplyConfiguration {
 	b := &BucketApplyConfiguration{}
@@ -74,7 +74,7 @@ func extractBucket(bucket *storagev1alpha1.Bucket, fieldManager string, subresou
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Kind field is set to the value of the last call.
 func (b *BucketApplyConfiguration) WithKind(value string) *BucketApplyConfiguration {
-	b.Kind = &value
+	b.TypeMetaApplyConfiguration.Kind = &value
 	return b
 }
 
@@ -82,7 +82,7 @@ func (b *BucketApplyConfiguration) WithKind(value string) *BucketApplyConfigurat
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the APIVersion field is set to the value of the last call.
 func (b *BucketApplyConfiguration) WithAPIVersion(value string) *BucketApplyConfiguration {
-	b.APIVersion = &value
+	b.TypeMetaApplyConfiguration.APIVersion = &value
 	return b
 }
 
@@ -91,7 +91,7 @@ func (b *BucketApplyConfiguration) WithAPIVersion(value string) *BucketApplyConf
 // If called multiple times, the Name field is set to the value of the last call.
 func (b *BucketApplyConfiguration) WithName(value string) *BucketApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Name = &value
+	b.ObjectMetaApplyConfiguration.Name = &value
 	return b
 }
 
@@ -100,7 +100,7 @@ func (b *BucketApplyConfiguration) WithName(value string) *BucketApplyConfigurat
 // If called multiple times, the GenerateName field is set to the value of the last call.
 func (b *BucketApplyConfiguration) WithGenerateName(value string) *BucketApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.GenerateName = &value
+	b.ObjectMetaApplyConfiguration.GenerateName = &value
 	return b
 }
 
@@ -109,7 +109,7 @@ func (b *BucketApplyConfiguration) WithGenerateName(value string) *BucketApplyCo
 // If called multiple times, the Namespace field is set to the value of the last call.
 func (b *BucketApplyConfiguration) WithNamespace(value string) *BucketApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Namespace = &value
+	b.ObjectMetaApplyConfiguration.Namespace = &value
 	return b
 }
 
@@ -118,7 +118,7 @@ func (b *BucketApplyConfiguration) WithNamespace(value string) *BucketApplyConfi
 // If called multiple times, the UID field is set to the value of the last call.
 func (b *BucketApplyConfiguration) WithUID(value types.UID) *BucketApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.UID = &value
+	b.ObjectMetaApplyConfiguration.UID = &value
 	return b
 }
 
@@ -127,7 +127,7 @@ func (b *BucketApplyConfiguration) WithUID(value types.UID) *BucketApplyConfigur
 // If called multiple times, the ResourceVersion field is set to the value of the last call.
 func (b *BucketApplyConfiguration) WithResourceVersion(value string) *BucketApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.ResourceVersion = &value
+	b.ObjectMetaApplyConfiguration.ResourceVersion = &value
 	return b
 }
 
@@ -136,7 +136,7 @@ func (b *BucketApplyConfiguration) WithResourceVersion(value string) *BucketAppl
 // If called multiple times, the Generation field is set to the value of the last call.
 func (b *BucketApplyConfiguration) WithGeneration(value int64) *BucketApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Generation = &value
+	b.ObjectMetaApplyConfiguration.Generation = &value
 	return b
 }
 
@@ -145,7 +145,7 @@ func (b *BucketApplyConfiguration) WithGeneration(value int64) *BucketApplyConfi
 // If called multiple times, the CreationTimestamp field is set to the value of the last call.
 func (b *BucketApplyConfiguration) WithCreationTimestamp(value metav1.Time) *BucketApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.CreationTimestamp = &value
+	b.ObjectMetaApplyConfiguration.CreationTimestamp = &value
 	return b
 }
 
@@ -154,7 +154,7 @@ func (b *BucketApplyConfiguration) WithCreationTimestamp(value metav1.Time) *Buc
 // If called multiple times, the DeletionTimestamp field is set to the value of the last call.
 func (b *BucketApplyConfiguration) WithDeletionTimestamp(value metav1.Time) *BucketApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.DeletionTimestamp = &value
+	b.ObjectMetaApplyConfiguration.DeletionTimestamp = &value
 	return b
 }
 
@@ -163,7 +163,7 @@ func (b *BucketApplyConfiguration) WithDeletionTimestamp(value metav1.Time) *Buc
 // If called multiple times, the DeletionGracePeriodSeconds field is set to the value of the last call.
 func (b *BucketApplyConfiguration) WithDeletionGracePeriodSeconds(value int64) *BucketApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.DeletionGracePeriodSeconds = &value
+	b.ObjectMetaApplyConfiguration.DeletionGracePeriodSeconds = &value
 	return b
 }
 
@@ -173,11 +173,11 @@ func (b *BucketApplyConfiguration) WithDeletionGracePeriodSeconds(value int64) *
 // overwriting an existing map entries in Labels field with the same key.
 func (b *BucketApplyConfiguration) WithLabels(entries map[string]string) *BucketApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	if b.Labels == nil && len(entries) > 0 {
-		b.Labels = make(map[string]string, len(entries))
+	if b.ObjectMetaApplyConfiguration.Labels == nil && len(entries) > 0 {
+		b.ObjectMetaApplyConfiguration.Labels = make(map[string]string, len(entries))
 	}
 	for k, v := range entries {
-		b.Labels[k] = v
+		b.ObjectMetaApplyConfiguration.Labels[k] = v
 	}
 	return b
 }
@@ -188,11 +188,11 @@ func (b *BucketApplyConfiguration) WithLabels(entries map[string]string) *Bucket
 // overwriting an existing map entries in Annotations field with the same key.
 func (b *BucketApplyConfiguration) WithAnnotations(entries map[string]string) *BucketApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	if b.Annotations == nil && len(entries) > 0 {
-		b.Annotations = make(map[string]string, len(entries))
+	if b.ObjectMetaApplyConfiguration.Annotations == nil && len(entries) > 0 {
+		b.ObjectMetaApplyConfiguration.Annotations = make(map[string]string, len(entries))
 	}
 	for k, v := range entries {
-		b.Annotations[k] = v
+		b.ObjectMetaApplyConfiguration.Annotations[k] = v
 	}
 	return b
 }
@@ -206,7 +206,7 @@ func (b *BucketApplyConfiguration) WithOwnerReferences(values ...*v1.OwnerRefere
 		if values[i] == nil {
 			panic("nil value passed to WithOwnerReferences")
 		}
-		b.OwnerReferences = append(b.OwnerReferences, *values[i])
+		b.ObjectMetaApplyConfiguration.OwnerReferences = append(b.ObjectMetaApplyConfiguration.OwnerReferences, *values[i])
 	}
 	return b
 }
@@ -217,7 +217,7 @@ func (b *BucketApplyConfiguration) WithOwnerReferences(values ...*v1.OwnerRefere
 func (b *BucketApplyConfiguration) WithFinalizers(values ...string) *BucketApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	for i := range values {
-		b.Finalizers = append(b.Finalizers, values[i])
+		b.ObjectMetaApplyConfiguration.Finalizers = append(b.ObjectMetaApplyConfiguration.Finalizers, values[i])
 	}
 	return b
 }
@@ -242,4 +242,10 @@ func (b *BucketApplyConfiguration) WithSpec(value *BucketSpecApplyConfiguration)
 func (b *BucketApplyConfiguration) WithStatus(value *BucketStatusApplyConfiguration) *BucketApplyConfiguration {
 	b.Status = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *BucketApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.ObjectMetaApplyConfiguration.Name
 }

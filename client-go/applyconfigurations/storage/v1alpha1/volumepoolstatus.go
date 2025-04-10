@@ -7,21 +7,21 @@ package v1alpha1
 
 import (
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 )
 
-// VolumePoolStatusApplyConfiguration represents an declarative configuration of the VolumePoolStatus type for use
+// VolumePoolStatusApplyConfiguration represents a declarative configuration of the VolumePoolStatus type for use
 // with apply.
 type VolumePoolStatusApplyConfiguration struct {
-	State                  *v1alpha1.VolumePoolState               `json:"state,omitempty"`
+	State                  *storagev1alpha1.VolumePoolState        `json:"state,omitempty"`
 	Conditions             []VolumePoolConditionApplyConfiguration `json:"conditions,omitempty"`
 	AvailableVolumeClasses []v1.LocalObjectReference               `json:"availableVolumeClasses,omitempty"`
 	Capacity               *corev1alpha1.ResourceList              `json:"capacity,omitempty"`
 	Allocatable            *corev1alpha1.ResourceList              `json:"allocatable,omitempty"`
 }
 
-// VolumePoolStatusApplyConfiguration constructs an declarative configuration of the VolumePoolStatus type for use with
+// VolumePoolStatusApplyConfiguration constructs a declarative configuration of the VolumePoolStatus type for use with
 // apply.
 func VolumePoolStatus() *VolumePoolStatusApplyConfiguration {
 	return &VolumePoolStatusApplyConfiguration{}
@@ -30,7 +30,7 @@ func VolumePoolStatus() *VolumePoolStatusApplyConfiguration {
 // WithState sets the State field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the State field is set to the value of the last call.
-func (b *VolumePoolStatusApplyConfiguration) WithState(value v1alpha1.VolumePoolState) *VolumePoolStatusApplyConfiguration {
+func (b *VolumePoolStatusApplyConfiguration) WithState(value storagev1alpha1.VolumePoolState) *VolumePoolStatusApplyConfiguration {
 	b.State = &value
 	return b
 }

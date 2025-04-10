@@ -1,0 +1,22 @@
+apiVersion: ipam.ironcore.dev/v1alpha1
+kind: Prefix
+metadata:
+  name: customer-subnet-1
+spec:
+  ipFamily: IPv6
+  prefixLength: 9
+  parentSelector:
+    matchLabels:
+      subnet-type: public
+---
+apiVersion: ipam.ironcore.dev/v1alpha1
+kind: Prefix
+metadata:
+  name: customer-subnet-2
+spec:
+  ipFamily: IPv6
+  prefixLength: 9
+  parentSelector:
+    matchLabels:
+      subnet-type: public
+

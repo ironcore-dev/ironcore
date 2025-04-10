@@ -27,6 +27,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
 const (
@@ -79,13 +80,13 @@ type PrefixReconciler struct {
 	Scheme                  *runtime.Scheme
 	PrefixAllocationTimeout time.Duration
 
-	allocationLimiter workqueue.RateLimiter
+	allocationLimiter workqueue.TypedRateLimiter[reconcile.Request]
 	waitTimeByKey     sync.Map
 }
 
 func (r *PrefixReconciler) allocationBackoffFor(key client.ObjectKey) time.Duration {
 	now := time.Now()
-	waitTimeIface, _ := r.waitTimeByKey.LoadOrStore(key, now.Add(r.allocationLimiter.When(key)))
+	waitTimeIface, _ := r.waitTimeByKey.LoadOrStore(key, now.Add(r.allocationLimiter.When(reconcile.Request{NamespacedName: key})))
 	waitTime := waitTimeIface.(time.Time)
 	if now.After(waitTime) {
 		return 0
@@ -95,7 +96,7 @@ func (r *PrefixReconciler) allocationBackoffFor(key client.ObjectKey) time.Durat
 
 func (r *PrefixReconciler) forgetAllocationBackoffFor(key client.ObjectKey) {
 	r.waitTimeByKey.Delete(key)
-	r.allocationLimiter.Forget(key)
+	r.allocationLimiter.Forget(reconcile.Request{NamespacedName: key})
 }
 
 //+kubebuilder:rbac:groups=ipam.ironcore.dev,resources=prefixes,verbs=get;list;watch;create;update;patch;delete
@@ -226,7 +227,7 @@ var prefixAllocationPhaseValue = map[ipamv1alpha1.PrefixAllocationPhase]int{
 // and then, if both phases are the same, prefers the older object.
 func (r *PrefixReconciler) prefixAllocationLess(allocation, other *ipamv1alpha1.PrefixAllocation) bool {
 	return prefixAllocationPhaseValue[allocation.Status.Phase] < prefixAllocationPhaseValue[other.Status.Phase] ||
-		allocation.GetCreationTimestamp().Time.After(other.GetCreationTimestamp().Time)
+		allocation.GetCreationTimestamp().After(other.GetCreationTimestamp().Time)
 }
 
 func (r *PrefixReconciler) newAllocationForPrefix(prefix *ipamv1alpha1.Prefix) (*ipamv1alpha1.PrefixAllocation, error) {
@@ -304,12 +305,12 @@ func (r *PrefixReconciler) allocateSubPrefix(ctx context.Context, log logr.Logge
 	}
 
 	allocationPhase := r.adjustedAllocationPhase(active)
-	switch {
-	case allocationPhase == ipamv1alpha1.PrefixAllocationPhaseAllocated:
+	switch allocationPhase {
+	case ipamv1alpha1.PrefixAllocationPhaseAllocated:
 		log.V(1).Info("Allocation is allocated")
 		r.forgetAllocationBackoffFor(client.ObjectKeyFromObject(prefix))
 		return active, 0, nil
-	case allocationPhase == ipamv1alpha1.PrefixAllocationPhaseFailed:
+	case ipamv1alpha1.PrefixAllocationPhaseFailed:
 		log.V(1).Info("Allocation is failed")
 		retry, err := r.canRetryAllocation(ctx, prefix, active)
 		if err != nil || !retry {
@@ -594,7 +595,7 @@ func (r *PrefixReconciler) reconcile(ctx context.Context, log logr.Logger, prefi
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *PrefixReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	r.allocationLimiter = workqueue.NewItemExponentialFailureRateLimiter(5*time.Millisecond, 1000*time.Second)
+	r.allocationLimiter = workqueue.NewTypedItemExponentialFailureRateLimiter[reconcile.Request](5*time.Millisecond, 1000*time.Second)
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&ipamv1alpha1.Prefix{}).

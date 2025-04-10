@@ -6,18 +6,18 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 )
 
-// BucketPoolStatusApplyConfiguration represents an declarative configuration of the BucketPoolStatus type for use
+// BucketPoolStatusApplyConfiguration represents a declarative configuration of the BucketPoolStatus type for use
 // with apply.
 type BucketPoolStatusApplyConfiguration struct {
-	State                  *v1alpha1.BucketPoolState `json:"state,omitempty"`
-	AvailableBucketClasses []v1.LocalObjectReference `json:"availableBucketClasses,omitempty"`
+	State                  *storagev1alpha1.BucketPoolState `json:"state,omitempty"`
+	AvailableBucketClasses []v1.LocalObjectReference        `json:"availableBucketClasses,omitempty"`
 }
 
-// BucketPoolStatusApplyConfiguration constructs an declarative configuration of the BucketPoolStatus type for use with
+// BucketPoolStatusApplyConfiguration constructs a declarative configuration of the BucketPoolStatus type for use with
 // apply.
 func BucketPoolStatus() *BucketPoolStatusApplyConfiguration {
 	return &BucketPoolStatusApplyConfiguration{}
@@ -26,7 +26,7 @@ func BucketPoolStatus() *BucketPoolStatusApplyConfiguration {
 // WithState sets the State field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the State field is set to the value of the last call.
-func (b *BucketPoolStatusApplyConfiguration) WithState(value v1alpha1.BucketPoolState) *BucketPoolStatusApplyConfiguration {
+func (b *BucketPoolStatusApplyConfiguration) WithState(value storagev1alpha1.BucketPoolState) *BucketPoolStatusApplyConfiguration {
 	b.State = &value
 	return b
 }

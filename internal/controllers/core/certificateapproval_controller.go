@@ -96,7 +96,7 @@ func (r *CertificateApprovalReconciler) authorize(ctx context.Context, csr *cert
 			ResourceAttributes: &attrs,
 		},
 	}
-	if err := r.Client.Create(ctx, sar); err != nil {
+	if err := r.Create(ctx, sar); err != nil {
 		return false, fmt.Errorf("error creating subject access review: %w", err)
 	}
 	return sar.Status.Allowed, nil

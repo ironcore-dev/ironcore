@@ -6,17 +6,17 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 )
 
-// IPSourceApplyConfiguration represents an declarative configuration of the IPSource type for use
+// IPSourceApplyConfiguration represents a declarative configuration of the IPSource type for use
 // with apply.
 type IPSourceApplyConfiguration struct {
-	Value     *v1alpha1.IP                             `json:"value,omitempty"`
+	Value     *commonv1alpha1.IP                       `json:"value,omitempty"`
 	Ephemeral *EphemeralPrefixSourceApplyConfiguration `json:"ephemeral,omitempty"`
 }
 
-// IPSourceApplyConfiguration constructs an declarative configuration of the IPSource type for use with
+// IPSourceApplyConfiguration constructs a declarative configuration of the IPSource type for use with
 // apply.
 func IPSource() *IPSourceApplyConfiguration {
 	return &IPSourceApplyConfiguration{}
@@ -25,7 +25,7 @@ func IPSource() *IPSourceApplyConfiguration {
 // WithValue sets the Value field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Value field is set to the value of the last call.
-func (b *IPSourceApplyConfiguration) WithValue(value v1alpha1.IP) *IPSourceApplyConfiguration {
+func (b *IPSourceApplyConfiguration) WithValue(value commonv1alpha1.IP) *IPSourceApplyConfiguration {
 	b.Value = &value
 	return b
 }

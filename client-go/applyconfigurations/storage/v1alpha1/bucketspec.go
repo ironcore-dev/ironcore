@@ -6,20 +6,20 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/common/v1alpha1"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 )
 
-// BucketSpecApplyConfiguration represents an declarative configuration of the BucketSpec type for use
+// BucketSpecApplyConfiguration represents a declarative configuration of the BucketSpec type for use
 // with apply.
 type BucketSpecApplyConfiguration struct {
-	BucketClassRef     *v1.LocalObjectReference                `json:"bucketClassRef,omitempty"`
-	BucketPoolSelector map[string]string                       `json:"bucketPoolSelector,omitempty"`
-	BucketPoolRef      *v1.LocalObjectReference                `json:"bucketPoolRef,omitempty"`
-	Tolerations        []v1alpha1.TolerationApplyConfiguration `json:"tolerations,omitempty"`
+	BucketClassRef     *v1.LocalObjectReference    `json:"bucketClassRef,omitempty"`
+	BucketPoolSelector map[string]string           `json:"bucketPoolSelector,omitempty"`
+	BucketPoolRef      *v1.LocalObjectReference    `json:"bucketPoolRef,omitempty"`
+	Tolerations        []commonv1alpha1.Toleration `json:"tolerations,omitempty"`
 }
 
-// BucketSpecApplyConfiguration constructs an declarative configuration of the BucketSpec type for use with
+// BucketSpecApplyConfiguration constructs a declarative configuration of the BucketSpec type for use with
 // apply.
 func BucketSpec() *BucketSpecApplyConfiguration {
 	return &BucketSpecApplyConfiguration{}
@@ -58,12 +58,9 @@ func (b *BucketSpecApplyConfiguration) WithBucketPoolRef(value v1.LocalObjectRef
 // WithTolerations adds the given value to the Tolerations field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the Tolerations field.
-func (b *BucketSpecApplyConfiguration) WithTolerations(values ...*v1alpha1.TolerationApplyConfiguration) *BucketSpecApplyConfiguration {
+func (b *BucketSpecApplyConfiguration) WithTolerations(values ...commonv1alpha1.Toleration) *BucketSpecApplyConfiguration {
 	for i := range values {
-		if values[i] == nil {
-			panic("nil value passed to WithTolerations")
-		}
-		b.Tolerations = append(b.Tolerations, *values[i])
+		b.Tolerations = append(b.Tolerations, values[i])
 	}
 	return b
 }

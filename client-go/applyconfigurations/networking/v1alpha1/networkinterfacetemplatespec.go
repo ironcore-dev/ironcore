@@ -6,19 +6,19 @@
 package v1alpha1
 
 import (
-	v1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/meta/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
+	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// NetworkInterfaceTemplateSpecApplyConfiguration represents an declarative configuration of the NetworkInterfaceTemplateSpec type for use
+// NetworkInterfaceTemplateSpecApplyConfiguration represents a declarative configuration of the NetworkInterfaceTemplateSpec type for use
 // with apply.
 type NetworkInterfaceTemplateSpecApplyConfiguration struct {
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *NetworkInterfaceSpecApplyConfiguration `json:"spec,omitempty"`
 }
 
-// NetworkInterfaceTemplateSpecApplyConfiguration constructs an declarative configuration of the NetworkInterfaceTemplateSpec type for use with
+// NetworkInterfaceTemplateSpecApplyConfiguration constructs a declarative configuration of the NetworkInterfaceTemplateSpec type for use with
 // apply.
 func NetworkInterfaceTemplateSpec() *NetworkInterfaceTemplateSpecApplyConfiguration {
 	return &NetworkInterfaceTemplateSpecApplyConfiguration{}
@@ -29,7 +29,7 @@ func NetworkInterfaceTemplateSpec() *NetworkInterfaceTemplateSpecApplyConfigurat
 // If called multiple times, the Name field is set to the value of the last call.
 func (b *NetworkInterfaceTemplateSpecApplyConfiguration) WithName(value string) *NetworkInterfaceTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Name = &value
+	b.ObjectMetaApplyConfiguration.Name = &value
 	return b
 }
 
@@ -38,7 +38,7 @@ func (b *NetworkInterfaceTemplateSpecApplyConfiguration) WithName(value string) 
 // If called multiple times, the GenerateName field is set to the value of the last call.
 func (b *NetworkInterfaceTemplateSpecApplyConfiguration) WithGenerateName(value string) *NetworkInterfaceTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.GenerateName = &value
+	b.ObjectMetaApplyConfiguration.GenerateName = &value
 	return b
 }
 
@@ -47,7 +47,7 @@ func (b *NetworkInterfaceTemplateSpecApplyConfiguration) WithGenerateName(value 
 // If called multiple times, the Namespace field is set to the value of the last call.
 func (b *NetworkInterfaceTemplateSpecApplyConfiguration) WithNamespace(value string) *NetworkInterfaceTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Namespace = &value
+	b.ObjectMetaApplyConfiguration.Namespace = &value
 	return b
 }
 
@@ -56,7 +56,7 @@ func (b *NetworkInterfaceTemplateSpecApplyConfiguration) WithNamespace(value str
 // If called multiple times, the UID field is set to the value of the last call.
 func (b *NetworkInterfaceTemplateSpecApplyConfiguration) WithUID(value types.UID) *NetworkInterfaceTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.UID = &value
+	b.ObjectMetaApplyConfiguration.UID = &value
 	return b
 }
 
@@ -65,7 +65,7 @@ func (b *NetworkInterfaceTemplateSpecApplyConfiguration) WithUID(value types.UID
 // If called multiple times, the ResourceVersion field is set to the value of the last call.
 func (b *NetworkInterfaceTemplateSpecApplyConfiguration) WithResourceVersion(value string) *NetworkInterfaceTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.ResourceVersion = &value
+	b.ObjectMetaApplyConfiguration.ResourceVersion = &value
 	return b
 }
 
@@ -74,7 +74,7 @@ func (b *NetworkInterfaceTemplateSpecApplyConfiguration) WithResourceVersion(val
 // If called multiple times, the Generation field is set to the value of the last call.
 func (b *NetworkInterfaceTemplateSpecApplyConfiguration) WithGeneration(value int64) *NetworkInterfaceTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Generation = &value
+	b.ObjectMetaApplyConfiguration.Generation = &value
 	return b
 }
 
@@ -83,7 +83,7 @@ func (b *NetworkInterfaceTemplateSpecApplyConfiguration) WithGeneration(value in
 // If called multiple times, the CreationTimestamp field is set to the value of the last call.
 func (b *NetworkInterfaceTemplateSpecApplyConfiguration) WithCreationTimestamp(value metav1.Time) *NetworkInterfaceTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.CreationTimestamp = &value
+	b.ObjectMetaApplyConfiguration.CreationTimestamp = &value
 	return b
 }
 
@@ -92,7 +92,7 @@ func (b *NetworkInterfaceTemplateSpecApplyConfiguration) WithCreationTimestamp(v
 // If called multiple times, the DeletionTimestamp field is set to the value of the last call.
 func (b *NetworkInterfaceTemplateSpecApplyConfiguration) WithDeletionTimestamp(value metav1.Time) *NetworkInterfaceTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.DeletionTimestamp = &value
+	b.ObjectMetaApplyConfiguration.DeletionTimestamp = &value
 	return b
 }
 
@@ -101,7 +101,7 @@ func (b *NetworkInterfaceTemplateSpecApplyConfiguration) WithDeletionTimestamp(v
 // If called multiple times, the DeletionGracePeriodSeconds field is set to the value of the last call.
 func (b *NetworkInterfaceTemplateSpecApplyConfiguration) WithDeletionGracePeriodSeconds(value int64) *NetworkInterfaceTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.DeletionGracePeriodSeconds = &value
+	b.ObjectMetaApplyConfiguration.DeletionGracePeriodSeconds = &value
 	return b
 }
 
@@ -111,11 +111,11 @@ func (b *NetworkInterfaceTemplateSpecApplyConfiguration) WithDeletionGracePeriod
 // overwriting an existing map entries in Labels field with the same key.
 func (b *NetworkInterfaceTemplateSpecApplyConfiguration) WithLabels(entries map[string]string) *NetworkInterfaceTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	if b.Labels == nil && len(entries) > 0 {
-		b.Labels = make(map[string]string, len(entries))
+	if b.ObjectMetaApplyConfiguration.Labels == nil && len(entries) > 0 {
+		b.ObjectMetaApplyConfiguration.Labels = make(map[string]string, len(entries))
 	}
 	for k, v := range entries {
-		b.Labels[k] = v
+		b.ObjectMetaApplyConfiguration.Labels[k] = v
 	}
 	return b
 }
@@ -126,11 +126,11 @@ func (b *NetworkInterfaceTemplateSpecApplyConfiguration) WithLabels(entries map[
 // overwriting an existing map entries in Annotations field with the same key.
 func (b *NetworkInterfaceTemplateSpecApplyConfiguration) WithAnnotations(entries map[string]string) *NetworkInterfaceTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	if b.Annotations == nil && len(entries) > 0 {
-		b.Annotations = make(map[string]string, len(entries))
+	if b.ObjectMetaApplyConfiguration.Annotations == nil && len(entries) > 0 {
+		b.ObjectMetaApplyConfiguration.Annotations = make(map[string]string, len(entries))
 	}
 	for k, v := range entries {
-		b.Annotations[k] = v
+		b.ObjectMetaApplyConfiguration.Annotations[k] = v
 	}
 	return b
 }
@@ -144,7 +144,7 @@ func (b *NetworkInterfaceTemplateSpecApplyConfiguration) WithOwnerReferences(val
 		if values[i] == nil {
 			panic("nil value passed to WithOwnerReferences")
 		}
-		b.OwnerReferences = append(b.OwnerReferences, *values[i])
+		b.ObjectMetaApplyConfiguration.OwnerReferences = append(b.ObjectMetaApplyConfiguration.OwnerReferences, *values[i])
 	}
 	return b
 }
@@ -155,7 +155,7 @@ func (b *NetworkInterfaceTemplateSpecApplyConfiguration) WithOwnerReferences(val
 func (b *NetworkInterfaceTemplateSpecApplyConfiguration) WithFinalizers(values ...string) *NetworkInterfaceTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	for i := range values {
-		b.Finalizers = append(b.Finalizers, values[i])
+		b.ObjectMetaApplyConfiguration.Finalizers = append(b.ObjectMetaApplyConfiguration.Finalizers, values[i])
 	}
 	return b
 }
@@ -172,4 +172,10 @@ func (b *NetworkInterfaceTemplateSpecApplyConfiguration) ensureObjectMetaApplyCo
 func (b *NetworkInterfaceTemplateSpecApplyConfiguration) WithSpec(value *NetworkInterfaceSpecApplyConfiguration) *NetworkInterfaceTemplateSpecApplyConfiguration {
 	b.Spec = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *NetworkInterfaceTemplateSpecApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.ObjectMetaApplyConfiguration.Name
 }

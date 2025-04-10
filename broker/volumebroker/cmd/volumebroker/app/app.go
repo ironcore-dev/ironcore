@@ -9,20 +9,26 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/ironcore-dev/controller-utils/configutils"
-	"github.com/ironcore-dev/ironcore/broker/common"
-	"github.com/ironcore-dev/ironcore/broker/volumebroker/server"
-	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"google.golang.org/grpc"
+
+	volumebrokerconfig "github.com/ironcore-dev/ironcore/broker/bucketbroker/client/config"
+	"github.com/ironcore-dev/ironcore/broker/common"
+	"github.com/ironcore-dev/ironcore/broker/volumebroker/server"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
+	"github.com/ironcore-dev/ironcore/utils/client/config"
+
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
 
 type Options struct {
-	Kubeconfig string
-	Address    string
+	GetConfigOptions config.GetConfigOptions
+	Address          string
+
+	QPS   float32
+	Burst int
 
 	Namespace          string
 	VolumePoolName     string
@@ -30,7 +36,7 @@ type Options struct {
 }
 
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
-	fs.StringVar(&o.Kubeconfig, "kubeconfig", o.Kubeconfig, "Path pointing to a kubeconfig file to use.")
+	o.GetConfigOptions.BindFlags(fs)
 	fs.StringVar(&o.Address, "address", "/var/run/iri-volumebroker.sock", "Address to listen on.")
 
 	fs.StringVar(&o.Namespace, "namespace", o.Namespace, "Target Kubernetes namespace to use.")
@@ -69,9 +75,14 @@ func Run(ctx context.Context, opts Options) error {
 	log := ctrl.LoggerFrom(ctx)
 	setupLog := log.WithName("setup")
 
-	cfg, err := configutils.GetConfig(configutils.Kubeconfig(opts.Kubeconfig))
+	getter, err := volumebrokerconfig.NewGetter()
 	if err != nil {
-		return err
+		return fmt.Errorf("error creating new getter: %w", err)
+	}
+
+	cfg, err := getter.GetConfig(ctx, &opts.GetConfigOptions)
+	if err != nil {
+		return fmt.Errorf("error getting config: %w", err)
 	}
 
 	srv, err := server.New(cfg, server.Options{

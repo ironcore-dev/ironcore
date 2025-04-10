@@ -118,12 +118,10 @@ type NetworkInterfaceStatus struct {
 	Name string
 	// Handle is the MachinePool internal handle of the NetworkInterface.
 	Handle string
-	// IPs are the ips allocated for the network interface.
-	IPs []commonv1alpha1.IP
-	// VirtualIP is the virtual ip allocated for the network interface.
-	VirtualIP *commonv1alpha1.IP
 	// State represents the attachment state of a NetworkInterface.
 	State NetworkInterfaceState
+	// networkInterfaceRef is the reference to the networkinterface attached to the machine
+	NetworkInterfaceRef corev1.LocalObjectReference `json:"networkInterfaceRef,omitempty"`
 	// LastStateTransitionTime is the last time the State transitioned.
 	LastStateTransitionTime *metav1.Time
 }
@@ -148,6 +146,8 @@ type VolumeStatus struct {
 	State VolumeState
 	// LastStateTransitionTime is the last time the State transitioned.
 	LastStateTransitionTime *metav1.Time
+	//VolumeRef reference to the claimed Volume
+	VolumeRef corev1.LocalObjectReference
 }
 
 // VolumeState is the infrastructure attachment state a Volume can be in.

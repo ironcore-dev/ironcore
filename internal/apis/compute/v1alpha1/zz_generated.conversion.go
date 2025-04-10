@@ -13,7 +13,7 @@ import (
 	unsafe "unsafe"
 
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
@@ -35,285 +35,285 @@ func init() {
 // RegisterConversions adds conversion functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterConversions(s *runtime.Scheme) error {
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.DaemonEndpoint)(nil), (*compute.DaemonEndpoint)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_DaemonEndpoint_To_compute_DaemonEndpoint(a.(*v1alpha1.DaemonEndpoint), b.(*compute.DaemonEndpoint), scope)
+	if err := s.AddGeneratedConversionFunc((*computev1alpha1.DaemonEndpoint)(nil), (*compute.DaemonEndpoint)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_DaemonEndpoint_To_compute_DaemonEndpoint(a.(*computev1alpha1.DaemonEndpoint), b.(*compute.DaemonEndpoint), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*compute.DaemonEndpoint)(nil), (*v1alpha1.DaemonEndpoint)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_DaemonEndpoint_To_v1alpha1_DaemonEndpoint(a.(*compute.DaemonEndpoint), b.(*v1alpha1.DaemonEndpoint), scope)
+	if err := s.AddGeneratedConversionFunc((*compute.DaemonEndpoint)(nil), (*computev1alpha1.DaemonEndpoint)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_DaemonEndpoint_To_v1alpha1_DaemonEndpoint(a.(*compute.DaemonEndpoint), b.(*computev1alpha1.DaemonEndpoint), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.EFIVar)(nil), (*compute.EFIVar)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_EFIVar_To_compute_EFIVar(a.(*v1alpha1.EFIVar), b.(*compute.EFIVar), scope)
+	if err := s.AddGeneratedConversionFunc((*computev1alpha1.EFIVar)(nil), (*compute.EFIVar)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_EFIVar_To_compute_EFIVar(a.(*computev1alpha1.EFIVar), b.(*compute.EFIVar), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*compute.EFIVar)(nil), (*v1alpha1.EFIVar)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_EFIVar_To_v1alpha1_EFIVar(a.(*compute.EFIVar), b.(*v1alpha1.EFIVar), scope)
+	if err := s.AddGeneratedConversionFunc((*compute.EFIVar)(nil), (*computev1alpha1.EFIVar)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_EFIVar_To_v1alpha1_EFIVar(a.(*compute.EFIVar), b.(*computev1alpha1.EFIVar), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.EmptyDiskVolumeSource)(nil), (*compute.EmptyDiskVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_EmptyDiskVolumeSource_To_compute_EmptyDiskVolumeSource(a.(*v1alpha1.EmptyDiskVolumeSource), b.(*compute.EmptyDiskVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*computev1alpha1.EmptyDiskVolumeSource)(nil), (*compute.EmptyDiskVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_EmptyDiskVolumeSource_To_compute_EmptyDiskVolumeSource(a.(*computev1alpha1.EmptyDiskVolumeSource), b.(*compute.EmptyDiskVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*compute.EmptyDiskVolumeSource)(nil), (*v1alpha1.EmptyDiskVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_EmptyDiskVolumeSource_To_v1alpha1_EmptyDiskVolumeSource(a.(*compute.EmptyDiskVolumeSource), b.(*v1alpha1.EmptyDiskVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*compute.EmptyDiskVolumeSource)(nil), (*computev1alpha1.EmptyDiskVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_EmptyDiskVolumeSource_To_v1alpha1_EmptyDiskVolumeSource(a.(*compute.EmptyDiskVolumeSource), b.(*computev1alpha1.EmptyDiskVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.EphemeralNetworkInterfaceSource)(nil), (*compute.EphemeralNetworkInterfaceSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_EphemeralNetworkInterfaceSource_To_compute_EphemeralNetworkInterfaceSource(a.(*v1alpha1.EphemeralNetworkInterfaceSource), b.(*compute.EphemeralNetworkInterfaceSource), scope)
+	if err := s.AddGeneratedConversionFunc((*computev1alpha1.EphemeralNetworkInterfaceSource)(nil), (*compute.EphemeralNetworkInterfaceSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_EphemeralNetworkInterfaceSource_To_compute_EphemeralNetworkInterfaceSource(a.(*computev1alpha1.EphemeralNetworkInterfaceSource), b.(*compute.EphemeralNetworkInterfaceSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*compute.EphemeralNetworkInterfaceSource)(nil), (*v1alpha1.EphemeralNetworkInterfaceSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_EphemeralNetworkInterfaceSource_To_v1alpha1_EphemeralNetworkInterfaceSource(a.(*compute.EphemeralNetworkInterfaceSource), b.(*v1alpha1.EphemeralNetworkInterfaceSource), scope)
+	if err := s.AddGeneratedConversionFunc((*compute.EphemeralNetworkInterfaceSource)(nil), (*computev1alpha1.EphemeralNetworkInterfaceSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_EphemeralNetworkInterfaceSource_To_v1alpha1_EphemeralNetworkInterfaceSource(a.(*compute.EphemeralNetworkInterfaceSource), b.(*computev1alpha1.EphemeralNetworkInterfaceSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.EphemeralVolumeSource)(nil), (*compute.EphemeralVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_EphemeralVolumeSource_To_compute_EphemeralVolumeSource(a.(*v1alpha1.EphemeralVolumeSource), b.(*compute.EphemeralVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*computev1alpha1.EphemeralVolumeSource)(nil), (*compute.EphemeralVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_EphemeralVolumeSource_To_compute_EphemeralVolumeSource(a.(*computev1alpha1.EphemeralVolumeSource), b.(*compute.EphemeralVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*compute.EphemeralVolumeSource)(nil), (*v1alpha1.EphemeralVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_EphemeralVolumeSource_To_v1alpha1_EphemeralVolumeSource(a.(*compute.EphemeralVolumeSource), b.(*v1alpha1.EphemeralVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*compute.EphemeralVolumeSource)(nil), (*computev1alpha1.EphemeralVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_EphemeralVolumeSource_To_v1alpha1_EphemeralVolumeSource(a.(*compute.EphemeralVolumeSource), b.(*computev1alpha1.EphemeralVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.Machine)(nil), (*compute.Machine)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_Machine_To_compute_Machine(a.(*v1alpha1.Machine), b.(*compute.Machine), scope)
+	if err := s.AddGeneratedConversionFunc((*computev1alpha1.Machine)(nil), (*compute.Machine)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_Machine_To_compute_Machine(a.(*computev1alpha1.Machine), b.(*compute.Machine), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*compute.Machine)(nil), (*v1alpha1.Machine)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_Machine_To_v1alpha1_Machine(a.(*compute.Machine), b.(*v1alpha1.Machine), scope)
+	if err := s.AddGeneratedConversionFunc((*compute.Machine)(nil), (*computev1alpha1.Machine)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_Machine_To_v1alpha1_Machine(a.(*compute.Machine), b.(*computev1alpha1.Machine), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.MachineClass)(nil), (*compute.MachineClass)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_MachineClass_To_compute_MachineClass(a.(*v1alpha1.MachineClass), b.(*compute.MachineClass), scope)
+	if err := s.AddGeneratedConversionFunc((*computev1alpha1.MachineClass)(nil), (*compute.MachineClass)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_MachineClass_To_compute_MachineClass(a.(*computev1alpha1.MachineClass), b.(*compute.MachineClass), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*compute.MachineClass)(nil), (*v1alpha1.MachineClass)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_MachineClass_To_v1alpha1_MachineClass(a.(*compute.MachineClass), b.(*v1alpha1.MachineClass), scope)
+	if err := s.AddGeneratedConversionFunc((*compute.MachineClass)(nil), (*computev1alpha1.MachineClass)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_MachineClass_To_v1alpha1_MachineClass(a.(*compute.MachineClass), b.(*computev1alpha1.MachineClass), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.MachineClassList)(nil), (*compute.MachineClassList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_MachineClassList_To_compute_MachineClassList(a.(*v1alpha1.MachineClassList), b.(*compute.MachineClassList), scope)
+	if err := s.AddGeneratedConversionFunc((*computev1alpha1.MachineClassList)(nil), (*compute.MachineClassList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_MachineClassList_To_compute_MachineClassList(a.(*computev1alpha1.MachineClassList), b.(*compute.MachineClassList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*compute.MachineClassList)(nil), (*v1alpha1.MachineClassList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_MachineClassList_To_v1alpha1_MachineClassList(a.(*compute.MachineClassList), b.(*v1alpha1.MachineClassList), scope)
+	if err := s.AddGeneratedConversionFunc((*compute.MachineClassList)(nil), (*computev1alpha1.MachineClassList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_MachineClassList_To_v1alpha1_MachineClassList(a.(*compute.MachineClassList), b.(*computev1alpha1.MachineClassList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.MachineExecOptions)(nil), (*compute.MachineExecOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_MachineExecOptions_To_compute_MachineExecOptions(a.(*v1alpha1.MachineExecOptions), b.(*compute.MachineExecOptions), scope)
+	if err := s.AddGeneratedConversionFunc((*computev1alpha1.MachineExecOptions)(nil), (*compute.MachineExecOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_MachineExecOptions_To_compute_MachineExecOptions(a.(*computev1alpha1.MachineExecOptions), b.(*compute.MachineExecOptions), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*compute.MachineExecOptions)(nil), (*v1alpha1.MachineExecOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_MachineExecOptions_To_v1alpha1_MachineExecOptions(a.(*compute.MachineExecOptions), b.(*v1alpha1.MachineExecOptions), scope)
+	if err := s.AddGeneratedConversionFunc((*compute.MachineExecOptions)(nil), (*computev1alpha1.MachineExecOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_MachineExecOptions_To_v1alpha1_MachineExecOptions(a.(*compute.MachineExecOptions), b.(*computev1alpha1.MachineExecOptions), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.MachineList)(nil), (*compute.MachineList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_MachineList_To_compute_MachineList(a.(*v1alpha1.MachineList), b.(*compute.MachineList), scope)
+	if err := s.AddGeneratedConversionFunc((*computev1alpha1.MachineList)(nil), (*compute.MachineList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_MachineList_To_compute_MachineList(a.(*computev1alpha1.MachineList), b.(*compute.MachineList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*compute.MachineList)(nil), (*v1alpha1.MachineList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_MachineList_To_v1alpha1_MachineList(a.(*compute.MachineList), b.(*v1alpha1.MachineList), scope)
+	if err := s.AddGeneratedConversionFunc((*compute.MachineList)(nil), (*computev1alpha1.MachineList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_MachineList_To_v1alpha1_MachineList(a.(*compute.MachineList), b.(*computev1alpha1.MachineList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.MachinePool)(nil), (*compute.MachinePool)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_MachinePool_To_compute_MachinePool(a.(*v1alpha1.MachinePool), b.(*compute.MachinePool), scope)
+	if err := s.AddGeneratedConversionFunc((*computev1alpha1.MachinePool)(nil), (*compute.MachinePool)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_MachinePool_To_compute_MachinePool(a.(*computev1alpha1.MachinePool), b.(*compute.MachinePool), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*compute.MachinePool)(nil), (*v1alpha1.MachinePool)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_MachinePool_To_v1alpha1_MachinePool(a.(*compute.MachinePool), b.(*v1alpha1.MachinePool), scope)
+	if err := s.AddGeneratedConversionFunc((*compute.MachinePool)(nil), (*computev1alpha1.MachinePool)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_MachinePool_To_v1alpha1_MachinePool(a.(*compute.MachinePool), b.(*computev1alpha1.MachinePool), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.MachinePoolAddress)(nil), (*compute.MachinePoolAddress)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_MachinePoolAddress_To_compute_MachinePoolAddress(a.(*v1alpha1.MachinePoolAddress), b.(*compute.MachinePoolAddress), scope)
+	if err := s.AddGeneratedConversionFunc((*computev1alpha1.MachinePoolAddress)(nil), (*compute.MachinePoolAddress)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_MachinePoolAddress_To_compute_MachinePoolAddress(a.(*computev1alpha1.MachinePoolAddress), b.(*compute.MachinePoolAddress), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*compute.MachinePoolAddress)(nil), (*v1alpha1.MachinePoolAddress)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_MachinePoolAddress_To_v1alpha1_MachinePoolAddress(a.(*compute.MachinePoolAddress), b.(*v1alpha1.MachinePoolAddress), scope)
+	if err := s.AddGeneratedConversionFunc((*compute.MachinePoolAddress)(nil), (*computev1alpha1.MachinePoolAddress)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_MachinePoolAddress_To_v1alpha1_MachinePoolAddress(a.(*compute.MachinePoolAddress), b.(*computev1alpha1.MachinePoolAddress), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.MachinePoolCondition)(nil), (*compute.MachinePoolCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_MachinePoolCondition_To_compute_MachinePoolCondition(a.(*v1alpha1.MachinePoolCondition), b.(*compute.MachinePoolCondition), scope)
+	if err := s.AddGeneratedConversionFunc((*computev1alpha1.MachinePoolCondition)(nil), (*compute.MachinePoolCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_MachinePoolCondition_To_compute_MachinePoolCondition(a.(*computev1alpha1.MachinePoolCondition), b.(*compute.MachinePoolCondition), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*compute.MachinePoolCondition)(nil), (*v1alpha1.MachinePoolCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_MachinePoolCondition_To_v1alpha1_MachinePoolCondition(a.(*compute.MachinePoolCondition), b.(*v1alpha1.MachinePoolCondition), scope)
+	if err := s.AddGeneratedConversionFunc((*compute.MachinePoolCondition)(nil), (*computev1alpha1.MachinePoolCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_MachinePoolCondition_To_v1alpha1_MachinePoolCondition(a.(*compute.MachinePoolCondition), b.(*computev1alpha1.MachinePoolCondition), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.MachinePoolDaemonEndpoints)(nil), (*compute.MachinePoolDaemonEndpoints)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_MachinePoolDaemonEndpoints_To_compute_MachinePoolDaemonEndpoints(a.(*v1alpha1.MachinePoolDaemonEndpoints), b.(*compute.MachinePoolDaemonEndpoints), scope)
+	if err := s.AddGeneratedConversionFunc((*computev1alpha1.MachinePoolDaemonEndpoints)(nil), (*compute.MachinePoolDaemonEndpoints)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_MachinePoolDaemonEndpoints_To_compute_MachinePoolDaemonEndpoints(a.(*computev1alpha1.MachinePoolDaemonEndpoints), b.(*compute.MachinePoolDaemonEndpoints), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*compute.MachinePoolDaemonEndpoints)(nil), (*v1alpha1.MachinePoolDaemonEndpoints)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_MachinePoolDaemonEndpoints_To_v1alpha1_MachinePoolDaemonEndpoints(a.(*compute.MachinePoolDaemonEndpoints), b.(*v1alpha1.MachinePoolDaemonEndpoints), scope)
+	if err := s.AddGeneratedConversionFunc((*compute.MachinePoolDaemonEndpoints)(nil), (*computev1alpha1.MachinePoolDaemonEndpoints)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_MachinePoolDaemonEndpoints_To_v1alpha1_MachinePoolDaemonEndpoints(a.(*compute.MachinePoolDaemonEndpoints), b.(*computev1alpha1.MachinePoolDaemonEndpoints), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.MachinePoolList)(nil), (*compute.MachinePoolList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_MachinePoolList_To_compute_MachinePoolList(a.(*v1alpha1.MachinePoolList), b.(*compute.MachinePoolList), scope)
+	if err := s.AddGeneratedConversionFunc((*computev1alpha1.MachinePoolList)(nil), (*compute.MachinePoolList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_MachinePoolList_To_compute_MachinePoolList(a.(*computev1alpha1.MachinePoolList), b.(*compute.MachinePoolList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*compute.MachinePoolList)(nil), (*v1alpha1.MachinePoolList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_MachinePoolList_To_v1alpha1_MachinePoolList(a.(*compute.MachinePoolList), b.(*v1alpha1.MachinePoolList), scope)
+	if err := s.AddGeneratedConversionFunc((*compute.MachinePoolList)(nil), (*computev1alpha1.MachinePoolList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_MachinePoolList_To_v1alpha1_MachinePoolList(a.(*compute.MachinePoolList), b.(*computev1alpha1.MachinePoolList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.MachinePoolSpec)(nil), (*compute.MachinePoolSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_MachinePoolSpec_To_compute_MachinePoolSpec(a.(*v1alpha1.MachinePoolSpec), b.(*compute.MachinePoolSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*computev1alpha1.MachinePoolSpec)(nil), (*compute.MachinePoolSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_MachinePoolSpec_To_compute_MachinePoolSpec(a.(*computev1alpha1.MachinePoolSpec), b.(*compute.MachinePoolSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*compute.MachinePoolSpec)(nil), (*v1alpha1.MachinePoolSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_MachinePoolSpec_To_v1alpha1_MachinePoolSpec(a.(*compute.MachinePoolSpec), b.(*v1alpha1.MachinePoolSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*compute.MachinePoolSpec)(nil), (*computev1alpha1.MachinePoolSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_MachinePoolSpec_To_v1alpha1_MachinePoolSpec(a.(*compute.MachinePoolSpec), b.(*computev1alpha1.MachinePoolSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.MachinePoolStatus)(nil), (*compute.MachinePoolStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_MachinePoolStatus_To_compute_MachinePoolStatus(a.(*v1alpha1.MachinePoolStatus), b.(*compute.MachinePoolStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*computev1alpha1.MachinePoolStatus)(nil), (*compute.MachinePoolStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_MachinePoolStatus_To_compute_MachinePoolStatus(a.(*computev1alpha1.MachinePoolStatus), b.(*compute.MachinePoolStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*compute.MachinePoolStatus)(nil), (*v1alpha1.MachinePoolStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_MachinePoolStatus_To_v1alpha1_MachinePoolStatus(a.(*compute.MachinePoolStatus), b.(*v1alpha1.MachinePoolStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*compute.MachinePoolStatus)(nil), (*computev1alpha1.MachinePoolStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_MachinePoolStatus_To_v1alpha1_MachinePoolStatus(a.(*compute.MachinePoolStatus), b.(*computev1alpha1.MachinePoolStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.MachineSpec)(nil), (*compute.MachineSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_MachineSpec_To_compute_MachineSpec(a.(*v1alpha1.MachineSpec), b.(*compute.MachineSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*computev1alpha1.MachineSpec)(nil), (*compute.MachineSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_MachineSpec_To_compute_MachineSpec(a.(*computev1alpha1.MachineSpec), b.(*compute.MachineSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*compute.MachineSpec)(nil), (*v1alpha1.MachineSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_MachineSpec_To_v1alpha1_MachineSpec(a.(*compute.MachineSpec), b.(*v1alpha1.MachineSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*compute.MachineSpec)(nil), (*computev1alpha1.MachineSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_MachineSpec_To_v1alpha1_MachineSpec(a.(*compute.MachineSpec), b.(*computev1alpha1.MachineSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.MachineStatus)(nil), (*compute.MachineStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_MachineStatus_To_compute_MachineStatus(a.(*v1alpha1.MachineStatus), b.(*compute.MachineStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*computev1alpha1.MachineStatus)(nil), (*compute.MachineStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_MachineStatus_To_compute_MachineStatus(a.(*computev1alpha1.MachineStatus), b.(*compute.MachineStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*compute.MachineStatus)(nil), (*v1alpha1.MachineStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_MachineStatus_To_v1alpha1_MachineStatus(a.(*compute.MachineStatus), b.(*v1alpha1.MachineStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*compute.MachineStatus)(nil), (*computev1alpha1.MachineStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_MachineStatus_To_v1alpha1_MachineStatus(a.(*compute.MachineStatus), b.(*computev1alpha1.MachineStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.NetworkInterface)(nil), (*compute.NetworkInterface)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_NetworkInterface_To_compute_NetworkInterface(a.(*v1alpha1.NetworkInterface), b.(*compute.NetworkInterface), scope)
+	if err := s.AddGeneratedConversionFunc((*computev1alpha1.NetworkInterface)(nil), (*compute.NetworkInterface)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_NetworkInterface_To_compute_NetworkInterface(a.(*computev1alpha1.NetworkInterface), b.(*compute.NetworkInterface), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*compute.NetworkInterface)(nil), (*v1alpha1.NetworkInterface)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_NetworkInterface_To_v1alpha1_NetworkInterface(a.(*compute.NetworkInterface), b.(*v1alpha1.NetworkInterface), scope)
+	if err := s.AddGeneratedConversionFunc((*compute.NetworkInterface)(nil), (*computev1alpha1.NetworkInterface)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_NetworkInterface_To_v1alpha1_NetworkInterface(a.(*compute.NetworkInterface), b.(*computev1alpha1.NetworkInterface), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.NetworkInterfaceSource)(nil), (*compute.NetworkInterfaceSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_NetworkInterfaceSource_To_compute_NetworkInterfaceSource(a.(*v1alpha1.NetworkInterfaceSource), b.(*compute.NetworkInterfaceSource), scope)
+	if err := s.AddGeneratedConversionFunc((*computev1alpha1.NetworkInterfaceSource)(nil), (*compute.NetworkInterfaceSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_NetworkInterfaceSource_To_compute_NetworkInterfaceSource(a.(*computev1alpha1.NetworkInterfaceSource), b.(*compute.NetworkInterfaceSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*compute.NetworkInterfaceSource)(nil), (*v1alpha1.NetworkInterfaceSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_NetworkInterfaceSource_To_v1alpha1_NetworkInterfaceSource(a.(*compute.NetworkInterfaceSource), b.(*v1alpha1.NetworkInterfaceSource), scope)
+	if err := s.AddGeneratedConversionFunc((*compute.NetworkInterfaceSource)(nil), (*computev1alpha1.NetworkInterfaceSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_NetworkInterfaceSource_To_v1alpha1_NetworkInterfaceSource(a.(*compute.NetworkInterfaceSource), b.(*computev1alpha1.NetworkInterfaceSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.NetworkInterfaceStatus)(nil), (*compute.NetworkInterfaceStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_NetworkInterfaceStatus_To_compute_NetworkInterfaceStatus(a.(*v1alpha1.NetworkInterfaceStatus), b.(*compute.NetworkInterfaceStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*computev1alpha1.NetworkInterfaceStatus)(nil), (*compute.NetworkInterfaceStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_NetworkInterfaceStatus_To_compute_NetworkInterfaceStatus(a.(*computev1alpha1.NetworkInterfaceStatus), b.(*compute.NetworkInterfaceStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*compute.NetworkInterfaceStatus)(nil), (*v1alpha1.NetworkInterfaceStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStatus(a.(*compute.NetworkInterfaceStatus), b.(*v1alpha1.NetworkInterfaceStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*compute.NetworkInterfaceStatus)(nil), (*computev1alpha1.NetworkInterfaceStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStatus(a.(*compute.NetworkInterfaceStatus), b.(*computev1alpha1.NetworkInterfaceStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.Volume)(nil), (*compute.Volume)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_Volume_To_compute_Volume(a.(*v1alpha1.Volume), b.(*compute.Volume), scope)
+	if err := s.AddGeneratedConversionFunc((*computev1alpha1.Volume)(nil), (*compute.Volume)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_Volume_To_compute_Volume(a.(*computev1alpha1.Volume), b.(*compute.Volume), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*compute.Volume)(nil), (*v1alpha1.Volume)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_Volume_To_v1alpha1_Volume(a.(*compute.Volume), b.(*v1alpha1.Volume), scope)
+	if err := s.AddGeneratedConversionFunc((*compute.Volume)(nil), (*computev1alpha1.Volume)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_Volume_To_v1alpha1_Volume(a.(*compute.Volume), b.(*computev1alpha1.Volume), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.VolumeSource)(nil), (*compute.VolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_VolumeSource_To_compute_VolumeSource(a.(*v1alpha1.VolumeSource), b.(*compute.VolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*computev1alpha1.VolumeSource)(nil), (*compute.VolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VolumeSource_To_compute_VolumeSource(a.(*computev1alpha1.VolumeSource), b.(*compute.VolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*compute.VolumeSource)(nil), (*v1alpha1.VolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_VolumeSource_To_v1alpha1_VolumeSource(a.(*compute.VolumeSource), b.(*v1alpha1.VolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*compute.VolumeSource)(nil), (*computev1alpha1.VolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_VolumeSource_To_v1alpha1_VolumeSource(a.(*compute.VolumeSource), b.(*computev1alpha1.VolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.VolumeStatus)(nil), (*compute.VolumeStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_VolumeStatus_To_compute_VolumeStatus(a.(*v1alpha1.VolumeStatus), b.(*compute.VolumeStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*computev1alpha1.VolumeStatus)(nil), (*compute.VolumeStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VolumeStatus_To_compute_VolumeStatus(a.(*computev1alpha1.VolumeStatus), b.(*compute.VolumeStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*compute.VolumeStatus)(nil), (*v1alpha1.VolumeStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_compute_VolumeStatus_To_v1alpha1_VolumeStatus(a.(*compute.VolumeStatus), b.(*v1alpha1.VolumeStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*compute.VolumeStatus)(nil), (*computev1alpha1.VolumeStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_compute_VolumeStatus_To_v1alpha1_VolumeStatus(a.(*compute.VolumeStatus), b.(*computev1alpha1.VolumeStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*url.Values)(nil), (*v1alpha1.MachineExecOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_url_Values_To_v1alpha1_MachineExecOptions(a.(*url.Values), b.(*v1alpha1.MachineExecOptions), scope)
+	if err := s.AddGeneratedConversionFunc((*url.Values)(nil), (*computev1alpha1.MachineExecOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_url_Values_To_v1alpha1_MachineExecOptions(a.(*url.Values), b.(*computev1alpha1.MachineExecOptions), scope)
 	}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func autoConvert_v1alpha1_DaemonEndpoint_To_compute_DaemonEndpoint(in *v1alpha1.DaemonEndpoint, out *compute.DaemonEndpoint, s conversion.Scope) error {
+func autoConvert_v1alpha1_DaemonEndpoint_To_compute_DaemonEndpoint(in *computev1alpha1.DaemonEndpoint, out *compute.DaemonEndpoint, s conversion.Scope) error {
 	out.Port = in.Port
 	return nil
 }
 
 // Convert_v1alpha1_DaemonEndpoint_To_compute_DaemonEndpoint is an autogenerated conversion function.
-func Convert_v1alpha1_DaemonEndpoint_To_compute_DaemonEndpoint(in *v1alpha1.DaemonEndpoint, out *compute.DaemonEndpoint, s conversion.Scope) error {
+func Convert_v1alpha1_DaemonEndpoint_To_compute_DaemonEndpoint(in *computev1alpha1.DaemonEndpoint, out *compute.DaemonEndpoint, s conversion.Scope) error {
 	return autoConvert_v1alpha1_DaemonEndpoint_To_compute_DaemonEndpoint(in, out, s)
 }
 
-func autoConvert_compute_DaemonEndpoint_To_v1alpha1_DaemonEndpoint(in *compute.DaemonEndpoint, out *v1alpha1.DaemonEndpoint, s conversion.Scope) error {
+func autoConvert_compute_DaemonEndpoint_To_v1alpha1_DaemonEndpoint(in *compute.DaemonEndpoint, out *computev1alpha1.DaemonEndpoint, s conversion.Scope) error {
 	out.Port = in.Port
 	return nil
 }
 
 // Convert_compute_DaemonEndpoint_To_v1alpha1_DaemonEndpoint is an autogenerated conversion function.
-func Convert_compute_DaemonEndpoint_To_v1alpha1_DaemonEndpoint(in *compute.DaemonEndpoint, out *v1alpha1.DaemonEndpoint, s conversion.Scope) error {
+func Convert_compute_DaemonEndpoint_To_v1alpha1_DaemonEndpoint(in *compute.DaemonEndpoint, out *computev1alpha1.DaemonEndpoint, s conversion.Scope) error {
 	return autoConvert_compute_DaemonEndpoint_To_v1alpha1_DaemonEndpoint(in, out, s)
 }
 
-func autoConvert_v1alpha1_EFIVar_To_compute_EFIVar(in *v1alpha1.EFIVar, out *compute.EFIVar, s conversion.Scope) error {
+func autoConvert_v1alpha1_EFIVar_To_compute_EFIVar(in *computev1alpha1.EFIVar, out *compute.EFIVar, s conversion.Scope) error {
 	out.Name = in.Name
 	out.UUID = in.UUID
 	out.Value = in.Value
@@ -321,11 +321,11 @@ func autoConvert_v1alpha1_EFIVar_To_compute_EFIVar(in *v1alpha1.EFIVar, out *com
 }
 
 // Convert_v1alpha1_EFIVar_To_compute_EFIVar is an autogenerated conversion function.
-func Convert_v1alpha1_EFIVar_To_compute_EFIVar(in *v1alpha1.EFIVar, out *compute.EFIVar, s conversion.Scope) error {
+func Convert_v1alpha1_EFIVar_To_compute_EFIVar(in *computev1alpha1.EFIVar, out *compute.EFIVar, s conversion.Scope) error {
 	return autoConvert_v1alpha1_EFIVar_To_compute_EFIVar(in, out, s)
 }
 
-func autoConvert_compute_EFIVar_To_v1alpha1_EFIVar(in *compute.EFIVar, out *v1alpha1.EFIVar, s conversion.Scope) error {
+func autoConvert_compute_EFIVar_To_v1alpha1_EFIVar(in *compute.EFIVar, out *computev1alpha1.EFIVar, s conversion.Scope) error {
 	out.Name = in.Name
 	out.UUID = in.UUID
 	out.Value = in.Value
@@ -333,71 +333,71 @@ func autoConvert_compute_EFIVar_To_v1alpha1_EFIVar(in *compute.EFIVar, out *v1al
 }
 
 // Convert_compute_EFIVar_To_v1alpha1_EFIVar is an autogenerated conversion function.
-func Convert_compute_EFIVar_To_v1alpha1_EFIVar(in *compute.EFIVar, out *v1alpha1.EFIVar, s conversion.Scope) error {
+func Convert_compute_EFIVar_To_v1alpha1_EFIVar(in *compute.EFIVar, out *computev1alpha1.EFIVar, s conversion.Scope) error {
 	return autoConvert_compute_EFIVar_To_v1alpha1_EFIVar(in, out, s)
 }
 
-func autoConvert_v1alpha1_EmptyDiskVolumeSource_To_compute_EmptyDiskVolumeSource(in *v1alpha1.EmptyDiskVolumeSource, out *compute.EmptyDiskVolumeSource, s conversion.Scope) error {
+func autoConvert_v1alpha1_EmptyDiskVolumeSource_To_compute_EmptyDiskVolumeSource(in *computev1alpha1.EmptyDiskVolumeSource, out *compute.EmptyDiskVolumeSource, s conversion.Scope) error {
 	out.SizeLimit = (*resource.Quantity)(unsafe.Pointer(in.SizeLimit))
 	return nil
 }
 
 // Convert_v1alpha1_EmptyDiskVolumeSource_To_compute_EmptyDiskVolumeSource is an autogenerated conversion function.
-func Convert_v1alpha1_EmptyDiskVolumeSource_To_compute_EmptyDiskVolumeSource(in *v1alpha1.EmptyDiskVolumeSource, out *compute.EmptyDiskVolumeSource, s conversion.Scope) error {
+func Convert_v1alpha1_EmptyDiskVolumeSource_To_compute_EmptyDiskVolumeSource(in *computev1alpha1.EmptyDiskVolumeSource, out *compute.EmptyDiskVolumeSource, s conversion.Scope) error {
 	return autoConvert_v1alpha1_EmptyDiskVolumeSource_To_compute_EmptyDiskVolumeSource(in, out, s)
 }
 
-func autoConvert_compute_EmptyDiskVolumeSource_To_v1alpha1_EmptyDiskVolumeSource(in *compute.EmptyDiskVolumeSource, out *v1alpha1.EmptyDiskVolumeSource, s conversion.Scope) error {
+func autoConvert_compute_EmptyDiskVolumeSource_To_v1alpha1_EmptyDiskVolumeSource(in *compute.EmptyDiskVolumeSource, out *computev1alpha1.EmptyDiskVolumeSource, s conversion.Scope) error {
 	out.SizeLimit = (*resource.Quantity)(unsafe.Pointer(in.SizeLimit))
 	return nil
 }
 
 // Convert_compute_EmptyDiskVolumeSource_To_v1alpha1_EmptyDiskVolumeSource is an autogenerated conversion function.
-func Convert_compute_EmptyDiskVolumeSource_To_v1alpha1_EmptyDiskVolumeSource(in *compute.EmptyDiskVolumeSource, out *v1alpha1.EmptyDiskVolumeSource, s conversion.Scope) error {
+func Convert_compute_EmptyDiskVolumeSource_To_v1alpha1_EmptyDiskVolumeSource(in *compute.EmptyDiskVolumeSource, out *computev1alpha1.EmptyDiskVolumeSource, s conversion.Scope) error {
 	return autoConvert_compute_EmptyDiskVolumeSource_To_v1alpha1_EmptyDiskVolumeSource(in, out, s)
 }
 
-func autoConvert_v1alpha1_EphemeralNetworkInterfaceSource_To_compute_EphemeralNetworkInterfaceSource(in *v1alpha1.EphemeralNetworkInterfaceSource, out *compute.EphemeralNetworkInterfaceSource, s conversion.Scope) error {
+func autoConvert_v1alpha1_EphemeralNetworkInterfaceSource_To_compute_EphemeralNetworkInterfaceSource(in *computev1alpha1.EphemeralNetworkInterfaceSource, out *compute.EphemeralNetworkInterfaceSource, s conversion.Scope) error {
 	out.NetworkInterfaceTemplate = (*networking.NetworkInterfaceTemplateSpec)(unsafe.Pointer(in.NetworkInterfaceTemplate))
 	return nil
 }
 
 // Convert_v1alpha1_EphemeralNetworkInterfaceSource_To_compute_EphemeralNetworkInterfaceSource is an autogenerated conversion function.
-func Convert_v1alpha1_EphemeralNetworkInterfaceSource_To_compute_EphemeralNetworkInterfaceSource(in *v1alpha1.EphemeralNetworkInterfaceSource, out *compute.EphemeralNetworkInterfaceSource, s conversion.Scope) error {
+func Convert_v1alpha1_EphemeralNetworkInterfaceSource_To_compute_EphemeralNetworkInterfaceSource(in *computev1alpha1.EphemeralNetworkInterfaceSource, out *compute.EphemeralNetworkInterfaceSource, s conversion.Scope) error {
 	return autoConvert_v1alpha1_EphemeralNetworkInterfaceSource_To_compute_EphemeralNetworkInterfaceSource(in, out, s)
 }
 
-func autoConvert_compute_EphemeralNetworkInterfaceSource_To_v1alpha1_EphemeralNetworkInterfaceSource(in *compute.EphemeralNetworkInterfaceSource, out *v1alpha1.EphemeralNetworkInterfaceSource, s conversion.Scope) error {
+func autoConvert_compute_EphemeralNetworkInterfaceSource_To_v1alpha1_EphemeralNetworkInterfaceSource(in *compute.EphemeralNetworkInterfaceSource, out *computev1alpha1.EphemeralNetworkInterfaceSource, s conversion.Scope) error {
 	out.NetworkInterfaceTemplate = (*networkingv1alpha1.NetworkInterfaceTemplateSpec)(unsafe.Pointer(in.NetworkInterfaceTemplate))
 	return nil
 }
 
 // Convert_compute_EphemeralNetworkInterfaceSource_To_v1alpha1_EphemeralNetworkInterfaceSource is an autogenerated conversion function.
-func Convert_compute_EphemeralNetworkInterfaceSource_To_v1alpha1_EphemeralNetworkInterfaceSource(in *compute.EphemeralNetworkInterfaceSource, out *v1alpha1.EphemeralNetworkInterfaceSource, s conversion.Scope) error {
+func Convert_compute_EphemeralNetworkInterfaceSource_To_v1alpha1_EphemeralNetworkInterfaceSource(in *compute.EphemeralNetworkInterfaceSource, out *computev1alpha1.EphemeralNetworkInterfaceSource, s conversion.Scope) error {
 	return autoConvert_compute_EphemeralNetworkInterfaceSource_To_v1alpha1_EphemeralNetworkInterfaceSource(in, out, s)
 }
 
-func autoConvert_v1alpha1_EphemeralVolumeSource_To_compute_EphemeralVolumeSource(in *v1alpha1.EphemeralVolumeSource, out *compute.EphemeralVolumeSource, s conversion.Scope) error {
+func autoConvert_v1alpha1_EphemeralVolumeSource_To_compute_EphemeralVolumeSource(in *computev1alpha1.EphemeralVolumeSource, out *compute.EphemeralVolumeSource, s conversion.Scope) error {
 	out.VolumeTemplate = (*storage.VolumeTemplateSpec)(unsafe.Pointer(in.VolumeTemplate))
 	return nil
 }
 
 // Convert_v1alpha1_EphemeralVolumeSource_To_compute_EphemeralVolumeSource is an autogenerated conversion function.
-func Convert_v1alpha1_EphemeralVolumeSource_To_compute_EphemeralVolumeSource(in *v1alpha1.EphemeralVolumeSource, out *compute.EphemeralVolumeSource, s conversion.Scope) error {
+func Convert_v1alpha1_EphemeralVolumeSource_To_compute_EphemeralVolumeSource(in *computev1alpha1.EphemeralVolumeSource, out *compute.EphemeralVolumeSource, s conversion.Scope) error {
 	return autoConvert_v1alpha1_EphemeralVolumeSource_To_compute_EphemeralVolumeSource(in, out, s)
 }
 
-func autoConvert_compute_EphemeralVolumeSource_To_v1alpha1_EphemeralVolumeSource(in *compute.EphemeralVolumeSource, out *v1alpha1.EphemeralVolumeSource, s conversion.Scope) error {
+func autoConvert_compute_EphemeralVolumeSource_To_v1alpha1_EphemeralVolumeSource(in *compute.EphemeralVolumeSource, out *computev1alpha1.EphemeralVolumeSource, s conversion.Scope) error {
 	out.VolumeTemplate = (*storagev1alpha1.VolumeTemplateSpec)(unsafe.Pointer(in.VolumeTemplate))
 	return nil
 }
 
 // Convert_compute_EphemeralVolumeSource_To_v1alpha1_EphemeralVolumeSource is an autogenerated conversion function.
-func Convert_compute_EphemeralVolumeSource_To_v1alpha1_EphemeralVolumeSource(in *compute.EphemeralVolumeSource, out *v1alpha1.EphemeralVolumeSource, s conversion.Scope) error {
+func Convert_compute_EphemeralVolumeSource_To_v1alpha1_EphemeralVolumeSource(in *compute.EphemeralVolumeSource, out *computev1alpha1.EphemeralVolumeSource, s conversion.Scope) error {
 	return autoConvert_compute_EphemeralVolumeSource_To_v1alpha1_EphemeralVolumeSource(in, out, s)
 }
 
-func autoConvert_v1alpha1_Machine_To_compute_Machine(in *v1alpha1.Machine, out *compute.Machine, s conversion.Scope) error {
+func autoConvert_v1alpha1_Machine_To_compute_Machine(in *computev1alpha1.Machine, out *compute.Machine, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1alpha1_MachineSpec_To_compute_MachineSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -409,11 +409,11 @@ func autoConvert_v1alpha1_Machine_To_compute_Machine(in *v1alpha1.Machine, out *
 }
 
 // Convert_v1alpha1_Machine_To_compute_Machine is an autogenerated conversion function.
-func Convert_v1alpha1_Machine_To_compute_Machine(in *v1alpha1.Machine, out *compute.Machine, s conversion.Scope) error {
+func Convert_v1alpha1_Machine_To_compute_Machine(in *computev1alpha1.Machine, out *compute.Machine, s conversion.Scope) error {
 	return autoConvert_v1alpha1_Machine_To_compute_Machine(in, out, s)
 }
 
-func autoConvert_compute_Machine_To_v1alpha1_Machine(in *compute.Machine, out *v1alpha1.Machine, s conversion.Scope) error {
+func autoConvert_compute_Machine_To_v1alpha1_Machine(in *compute.Machine, out *computev1alpha1.Machine, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_compute_MachineSpec_To_v1alpha1_MachineSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -425,75 +425,75 @@ func autoConvert_compute_Machine_To_v1alpha1_Machine(in *compute.Machine, out *v
 }
 
 // Convert_compute_Machine_To_v1alpha1_Machine is an autogenerated conversion function.
-func Convert_compute_Machine_To_v1alpha1_Machine(in *compute.Machine, out *v1alpha1.Machine, s conversion.Scope) error {
+func Convert_compute_Machine_To_v1alpha1_Machine(in *compute.Machine, out *computev1alpha1.Machine, s conversion.Scope) error {
 	return autoConvert_compute_Machine_To_v1alpha1_Machine(in, out, s)
 }
 
-func autoConvert_v1alpha1_MachineClass_To_compute_MachineClass(in *v1alpha1.MachineClass, out *compute.MachineClass, s conversion.Scope) error {
+func autoConvert_v1alpha1_MachineClass_To_compute_MachineClass(in *computev1alpha1.MachineClass, out *compute.MachineClass, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	out.Capabilities = *(*core.ResourceList)(unsafe.Pointer(&in.Capabilities))
 	return nil
 }
 
 // Convert_v1alpha1_MachineClass_To_compute_MachineClass is an autogenerated conversion function.
-func Convert_v1alpha1_MachineClass_To_compute_MachineClass(in *v1alpha1.MachineClass, out *compute.MachineClass, s conversion.Scope) error {
+func Convert_v1alpha1_MachineClass_To_compute_MachineClass(in *computev1alpha1.MachineClass, out *compute.MachineClass, s conversion.Scope) error {
 	return autoConvert_v1alpha1_MachineClass_To_compute_MachineClass(in, out, s)
 }
 
-func autoConvert_compute_MachineClass_To_v1alpha1_MachineClass(in *compute.MachineClass, out *v1alpha1.MachineClass, s conversion.Scope) error {
+func autoConvert_compute_MachineClass_To_v1alpha1_MachineClass(in *compute.MachineClass, out *computev1alpha1.MachineClass, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	out.Capabilities = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Capabilities))
 	return nil
 }
 
 // Convert_compute_MachineClass_To_v1alpha1_MachineClass is an autogenerated conversion function.
-func Convert_compute_MachineClass_To_v1alpha1_MachineClass(in *compute.MachineClass, out *v1alpha1.MachineClass, s conversion.Scope) error {
+func Convert_compute_MachineClass_To_v1alpha1_MachineClass(in *compute.MachineClass, out *computev1alpha1.MachineClass, s conversion.Scope) error {
 	return autoConvert_compute_MachineClass_To_v1alpha1_MachineClass(in, out, s)
 }
 
-func autoConvert_v1alpha1_MachineClassList_To_compute_MachineClassList(in *v1alpha1.MachineClassList, out *compute.MachineClassList, s conversion.Scope) error {
+func autoConvert_v1alpha1_MachineClassList_To_compute_MachineClassList(in *computev1alpha1.MachineClassList, out *compute.MachineClassList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	out.Items = *(*[]compute.MachineClass)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_v1alpha1_MachineClassList_To_compute_MachineClassList is an autogenerated conversion function.
-func Convert_v1alpha1_MachineClassList_To_compute_MachineClassList(in *v1alpha1.MachineClassList, out *compute.MachineClassList, s conversion.Scope) error {
+func Convert_v1alpha1_MachineClassList_To_compute_MachineClassList(in *computev1alpha1.MachineClassList, out *compute.MachineClassList, s conversion.Scope) error {
 	return autoConvert_v1alpha1_MachineClassList_To_compute_MachineClassList(in, out, s)
 }
 
-func autoConvert_compute_MachineClassList_To_v1alpha1_MachineClassList(in *compute.MachineClassList, out *v1alpha1.MachineClassList, s conversion.Scope) error {
+func autoConvert_compute_MachineClassList_To_v1alpha1_MachineClassList(in *compute.MachineClassList, out *computev1alpha1.MachineClassList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]v1alpha1.MachineClass)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]computev1alpha1.MachineClass)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_compute_MachineClassList_To_v1alpha1_MachineClassList is an autogenerated conversion function.
-func Convert_compute_MachineClassList_To_v1alpha1_MachineClassList(in *compute.MachineClassList, out *v1alpha1.MachineClassList, s conversion.Scope) error {
+func Convert_compute_MachineClassList_To_v1alpha1_MachineClassList(in *compute.MachineClassList, out *computev1alpha1.MachineClassList, s conversion.Scope) error {
 	return autoConvert_compute_MachineClassList_To_v1alpha1_MachineClassList(in, out, s)
 }
 
-func autoConvert_v1alpha1_MachineExecOptions_To_compute_MachineExecOptions(in *v1alpha1.MachineExecOptions, out *compute.MachineExecOptions, s conversion.Scope) error {
+func autoConvert_v1alpha1_MachineExecOptions_To_compute_MachineExecOptions(in *computev1alpha1.MachineExecOptions, out *compute.MachineExecOptions, s conversion.Scope) error {
 	out.InsecureSkipTLSVerifyBackend = in.InsecureSkipTLSVerifyBackend
 	return nil
 }
 
 // Convert_v1alpha1_MachineExecOptions_To_compute_MachineExecOptions is an autogenerated conversion function.
-func Convert_v1alpha1_MachineExecOptions_To_compute_MachineExecOptions(in *v1alpha1.MachineExecOptions, out *compute.MachineExecOptions, s conversion.Scope) error {
+func Convert_v1alpha1_MachineExecOptions_To_compute_MachineExecOptions(in *computev1alpha1.MachineExecOptions, out *compute.MachineExecOptions, s conversion.Scope) error {
 	return autoConvert_v1alpha1_MachineExecOptions_To_compute_MachineExecOptions(in, out, s)
 }
 
-func autoConvert_compute_MachineExecOptions_To_v1alpha1_MachineExecOptions(in *compute.MachineExecOptions, out *v1alpha1.MachineExecOptions, s conversion.Scope) error {
+func autoConvert_compute_MachineExecOptions_To_v1alpha1_MachineExecOptions(in *compute.MachineExecOptions, out *computev1alpha1.MachineExecOptions, s conversion.Scope) error {
 	out.InsecureSkipTLSVerifyBackend = in.InsecureSkipTLSVerifyBackend
 	return nil
 }
 
 // Convert_compute_MachineExecOptions_To_v1alpha1_MachineExecOptions is an autogenerated conversion function.
-func Convert_compute_MachineExecOptions_To_v1alpha1_MachineExecOptions(in *compute.MachineExecOptions, out *v1alpha1.MachineExecOptions, s conversion.Scope) error {
+func Convert_compute_MachineExecOptions_To_v1alpha1_MachineExecOptions(in *compute.MachineExecOptions, out *computev1alpha1.MachineExecOptions, s conversion.Scope) error {
 	return autoConvert_compute_MachineExecOptions_To_v1alpha1_MachineExecOptions(in, out, s)
 }
 
-func autoConvert_url_Values_To_v1alpha1_MachineExecOptions(in *url.Values, out *v1alpha1.MachineExecOptions, s conversion.Scope) error {
+func autoConvert_url_Values_To_v1alpha1_MachineExecOptions(in *url.Values, out *computev1alpha1.MachineExecOptions, s conversion.Scope) error {
 	// WARNING: Field TypeMeta does not have json tag, skipping.
 
 	if values, ok := map[string][]string(*in)["insecureSkipTLSVerifyBackend"]; ok && len(values) > 0 {
@@ -507,11 +507,11 @@ func autoConvert_url_Values_To_v1alpha1_MachineExecOptions(in *url.Values, out *
 }
 
 // Convert_url_Values_To_v1alpha1_MachineExecOptions is an autogenerated conversion function.
-func Convert_url_Values_To_v1alpha1_MachineExecOptions(in *url.Values, out *v1alpha1.MachineExecOptions, s conversion.Scope) error {
+func Convert_url_Values_To_v1alpha1_MachineExecOptions(in *url.Values, out *computev1alpha1.MachineExecOptions, s conversion.Scope) error {
 	return autoConvert_url_Values_To_v1alpha1_MachineExecOptions(in, out, s)
 }
 
-func autoConvert_v1alpha1_MachineList_To_compute_MachineList(in *v1alpha1.MachineList, out *compute.MachineList, s conversion.Scope) error {
+func autoConvert_v1alpha1_MachineList_To_compute_MachineList(in *computev1alpha1.MachineList, out *compute.MachineList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
@@ -528,15 +528,15 @@ func autoConvert_v1alpha1_MachineList_To_compute_MachineList(in *v1alpha1.Machin
 }
 
 // Convert_v1alpha1_MachineList_To_compute_MachineList is an autogenerated conversion function.
-func Convert_v1alpha1_MachineList_To_compute_MachineList(in *v1alpha1.MachineList, out *compute.MachineList, s conversion.Scope) error {
+func Convert_v1alpha1_MachineList_To_compute_MachineList(in *computev1alpha1.MachineList, out *compute.MachineList, s conversion.Scope) error {
 	return autoConvert_v1alpha1_MachineList_To_compute_MachineList(in, out, s)
 }
 
-func autoConvert_compute_MachineList_To_v1alpha1_MachineList(in *compute.MachineList, out *v1alpha1.MachineList, s conversion.Scope) error {
+func autoConvert_compute_MachineList_To_v1alpha1_MachineList(in *compute.MachineList, out *computev1alpha1.MachineList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]v1alpha1.Machine, len(*in))
+		*out = make([]computev1alpha1.Machine, len(*in))
 		for i := range *in {
 			if err := Convert_compute_Machine_To_v1alpha1_Machine(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -549,11 +549,11 @@ func autoConvert_compute_MachineList_To_v1alpha1_MachineList(in *compute.Machine
 }
 
 // Convert_compute_MachineList_To_v1alpha1_MachineList is an autogenerated conversion function.
-func Convert_compute_MachineList_To_v1alpha1_MachineList(in *compute.MachineList, out *v1alpha1.MachineList, s conversion.Scope) error {
+func Convert_compute_MachineList_To_v1alpha1_MachineList(in *compute.MachineList, out *computev1alpha1.MachineList, s conversion.Scope) error {
 	return autoConvert_compute_MachineList_To_v1alpha1_MachineList(in, out, s)
 }
 
-func autoConvert_v1alpha1_MachinePool_To_compute_MachinePool(in *v1alpha1.MachinePool, out *compute.MachinePool, s conversion.Scope) error {
+func autoConvert_v1alpha1_MachinePool_To_compute_MachinePool(in *computev1alpha1.MachinePool, out *compute.MachinePool, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1alpha1_MachinePoolSpec_To_compute_MachinePoolSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -565,11 +565,11 @@ func autoConvert_v1alpha1_MachinePool_To_compute_MachinePool(in *v1alpha1.Machin
 }
 
 // Convert_v1alpha1_MachinePool_To_compute_MachinePool is an autogenerated conversion function.
-func Convert_v1alpha1_MachinePool_To_compute_MachinePool(in *v1alpha1.MachinePool, out *compute.MachinePool, s conversion.Scope) error {
+func Convert_v1alpha1_MachinePool_To_compute_MachinePool(in *computev1alpha1.MachinePool, out *compute.MachinePool, s conversion.Scope) error {
 	return autoConvert_v1alpha1_MachinePool_To_compute_MachinePool(in, out, s)
 }
 
-func autoConvert_compute_MachinePool_To_v1alpha1_MachinePool(in *compute.MachinePool, out *v1alpha1.MachinePool, s conversion.Scope) error {
+func autoConvert_compute_MachinePool_To_v1alpha1_MachinePool(in *compute.MachinePool, out *computev1alpha1.MachinePool, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_compute_MachinePoolSpec_To_v1alpha1_MachinePoolSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -581,33 +581,33 @@ func autoConvert_compute_MachinePool_To_v1alpha1_MachinePool(in *compute.Machine
 }
 
 // Convert_compute_MachinePool_To_v1alpha1_MachinePool is an autogenerated conversion function.
-func Convert_compute_MachinePool_To_v1alpha1_MachinePool(in *compute.MachinePool, out *v1alpha1.MachinePool, s conversion.Scope) error {
+func Convert_compute_MachinePool_To_v1alpha1_MachinePool(in *compute.MachinePool, out *computev1alpha1.MachinePool, s conversion.Scope) error {
 	return autoConvert_compute_MachinePool_To_v1alpha1_MachinePool(in, out, s)
 }
 
-func autoConvert_v1alpha1_MachinePoolAddress_To_compute_MachinePoolAddress(in *v1alpha1.MachinePoolAddress, out *compute.MachinePoolAddress, s conversion.Scope) error {
+func autoConvert_v1alpha1_MachinePoolAddress_To_compute_MachinePoolAddress(in *computev1alpha1.MachinePoolAddress, out *compute.MachinePoolAddress, s conversion.Scope) error {
 	out.Type = compute.MachinePoolAddressType(in.Type)
 	out.Address = in.Address
 	return nil
 }
 
 // Convert_v1alpha1_MachinePoolAddress_To_compute_MachinePoolAddress is an autogenerated conversion function.
-func Convert_v1alpha1_MachinePoolAddress_To_compute_MachinePoolAddress(in *v1alpha1.MachinePoolAddress, out *compute.MachinePoolAddress, s conversion.Scope) error {
+func Convert_v1alpha1_MachinePoolAddress_To_compute_MachinePoolAddress(in *computev1alpha1.MachinePoolAddress, out *compute.MachinePoolAddress, s conversion.Scope) error {
 	return autoConvert_v1alpha1_MachinePoolAddress_To_compute_MachinePoolAddress(in, out, s)
 }
 
-func autoConvert_compute_MachinePoolAddress_To_v1alpha1_MachinePoolAddress(in *compute.MachinePoolAddress, out *v1alpha1.MachinePoolAddress, s conversion.Scope) error {
-	out.Type = v1alpha1.MachinePoolAddressType(in.Type)
+func autoConvert_compute_MachinePoolAddress_To_v1alpha1_MachinePoolAddress(in *compute.MachinePoolAddress, out *computev1alpha1.MachinePoolAddress, s conversion.Scope) error {
+	out.Type = computev1alpha1.MachinePoolAddressType(in.Type)
 	out.Address = in.Address
 	return nil
 }
 
 // Convert_compute_MachinePoolAddress_To_v1alpha1_MachinePoolAddress is an autogenerated conversion function.
-func Convert_compute_MachinePoolAddress_To_v1alpha1_MachinePoolAddress(in *compute.MachinePoolAddress, out *v1alpha1.MachinePoolAddress, s conversion.Scope) error {
+func Convert_compute_MachinePoolAddress_To_v1alpha1_MachinePoolAddress(in *compute.MachinePoolAddress, out *computev1alpha1.MachinePoolAddress, s conversion.Scope) error {
 	return autoConvert_compute_MachinePoolAddress_To_v1alpha1_MachinePoolAddress(in, out, s)
 }
 
-func autoConvert_v1alpha1_MachinePoolCondition_To_compute_MachinePoolCondition(in *v1alpha1.MachinePoolCondition, out *compute.MachinePoolCondition, s conversion.Scope) error {
+func autoConvert_v1alpha1_MachinePoolCondition_To_compute_MachinePoolCondition(in *computev1alpha1.MachinePoolCondition, out *compute.MachinePoolCondition, s conversion.Scope) error {
 	out.Type = compute.MachinePoolConditionType(in.Type)
 	out.Status = v1.ConditionStatus(in.Status)
 	out.Reason = in.Reason
@@ -618,12 +618,12 @@ func autoConvert_v1alpha1_MachinePoolCondition_To_compute_MachinePoolCondition(i
 }
 
 // Convert_v1alpha1_MachinePoolCondition_To_compute_MachinePoolCondition is an autogenerated conversion function.
-func Convert_v1alpha1_MachinePoolCondition_To_compute_MachinePoolCondition(in *v1alpha1.MachinePoolCondition, out *compute.MachinePoolCondition, s conversion.Scope) error {
+func Convert_v1alpha1_MachinePoolCondition_To_compute_MachinePoolCondition(in *computev1alpha1.MachinePoolCondition, out *compute.MachinePoolCondition, s conversion.Scope) error {
 	return autoConvert_v1alpha1_MachinePoolCondition_To_compute_MachinePoolCondition(in, out, s)
 }
 
-func autoConvert_compute_MachinePoolCondition_To_v1alpha1_MachinePoolCondition(in *compute.MachinePoolCondition, out *v1alpha1.MachinePoolCondition, s conversion.Scope) error {
-	out.Type = v1alpha1.MachinePoolConditionType(in.Type)
+func autoConvert_compute_MachinePoolCondition_To_v1alpha1_MachinePoolCondition(in *compute.MachinePoolCondition, out *computev1alpha1.MachinePoolCondition, s conversion.Scope) error {
+	out.Type = computev1alpha1.MachinePoolConditionType(in.Type)
 	out.Status = v1.ConditionStatus(in.Status)
 	out.Reason = in.Reason
 	out.Message = in.Message
@@ -633,11 +633,11 @@ func autoConvert_compute_MachinePoolCondition_To_v1alpha1_MachinePoolCondition(i
 }
 
 // Convert_compute_MachinePoolCondition_To_v1alpha1_MachinePoolCondition is an autogenerated conversion function.
-func Convert_compute_MachinePoolCondition_To_v1alpha1_MachinePoolCondition(in *compute.MachinePoolCondition, out *v1alpha1.MachinePoolCondition, s conversion.Scope) error {
+func Convert_compute_MachinePoolCondition_To_v1alpha1_MachinePoolCondition(in *compute.MachinePoolCondition, out *computev1alpha1.MachinePoolCondition, s conversion.Scope) error {
 	return autoConvert_compute_MachinePoolCondition_To_v1alpha1_MachinePoolCondition(in, out, s)
 }
 
-func autoConvert_v1alpha1_MachinePoolDaemonEndpoints_To_compute_MachinePoolDaemonEndpoints(in *v1alpha1.MachinePoolDaemonEndpoints, out *compute.MachinePoolDaemonEndpoints, s conversion.Scope) error {
+func autoConvert_v1alpha1_MachinePoolDaemonEndpoints_To_compute_MachinePoolDaemonEndpoints(in *computev1alpha1.MachinePoolDaemonEndpoints, out *compute.MachinePoolDaemonEndpoints, s conversion.Scope) error {
 	if err := Convert_v1alpha1_DaemonEndpoint_To_compute_DaemonEndpoint(&in.MachinepoolletEndpoint, &out.MachinepoolletEndpoint, s); err != nil {
 		return err
 	}
@@ -645,11 +645,11 @@ func autoConvert_v1alpha1_MachinePoolDaemonEndpoints_To_compute_MachinePoolDaemo
 }
 
 // Convert_v1alpha1_MachinePoolDaemonEndpoints_To_compute_MachinePoolDaemonEndpoints is an autogenerated conversion function.
-func Convert_v1alpha1_MachinePoolDaemonEndpoints_To_compute_MachinePoolDaemonEndpoints(in *v1alpha1.MachinePoolDaemonEndpoints, out *compute.MachinePoolDaemonEndpoints, s conversion.Scope) error {
+func Convert_v1alpha1_MachinePoolDaemonEndpoints_To_compute_MachinePoolDaemonEndpoints(in *computev1alpha1.MachinePoolDaemonEndpoints, out *compute.MachinePoolDaemonEndpoints, s conversion.Scope) error {
 	return autoConvert_v1alpha1_MachinePoolDaemonEndpoints_To_compute_MachinePoolDaemonEndpoints(in, out, s)
 }
 
-func autoConvert_compute_MachinePoolDaemonEndpoints_To_v1alpha1_MachinePoolDaemonEndpoints(in *compute.MachinePoolDaemonEndpoints, out *v1alpha1.MachinePoolDaemonEndpoints, s conversion.Scope) error {
+func autoConvert_compute_MachinePoolDaemonEndpoints_To_v1alpha1_MachinePoolDaemonEndpoints(in *compute.MachinePoolDaemonEndpoints, out *computev1alpha1.MachinePoolDaemonEndpoints, s conversion.Scope) error {
 	if err := Convert_compute_DaemonEndpoint_To_v1alpha1_DaemonEndpoint(&in.MachinepoolletEndpoint, &out.MachinepoolletEndpoint, s); err != nil {
 		return err
 	}
@@ -657,55 +657,55 @@ func autoConvert_compute_MachinePoolDaemonEndpoints_To_v1alpha1_MachinePoolDaemo
 }
 
 // Convert_compute_MachinePoolDaemonEndpoints_To_v1alpha1_MachinePoolDaemonEndpoints is an autogenerated conversion function.
-func Convert_compute_MachinePoolDaemonEndpoints_To_v1alpha1_MachinePoolDaemonEndpoints(in *compute.MachinePoolDaemonEndpoints, out *v1alpha1.MachinePoolDaemonEndpoints, s conversion.Scope) error {
+func Convert_compute_MachinePoolDaemonEndpoints_To_v1alpha1_MachinePoolDaemonEndpoints(in *compute.MachinePoolDaemonEndpoints, out *computev1alpha1.MachinePoolDaemonEndpoints, s conversion.Scope) error {
 	return autoConvert_compute_MachinePoolDaemonEndpoints_To_v1alpha1_MachinePoolDaemonEndpoints(in, out, s)
 }
 
-func autoConvert_v1alpha1_MachinePoolList_To_compute_MachinePoolList(in *v1alpha1.MachinePoolList, out *compute.MachinePoolList, s conversion.Scope) error {
+func autoConvert_v1alpha1_MachinePoolList_To_compute_MachinePoolList(in *computev1alpha1.MachinePoolList, out *compute.MachinePoolList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	out.Items = *(*[]compute.MachinePool)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_v1alpha1_MachinePoolList_To_compute_MachinePoolList is an autogenerated conversion function.
-func Convert_v1alpha1_MachinePoolList_To_compute_MachinePoolList(in *v1alpha1.MachinePoolList, out *compute.MachinePoolList, s conversion.Scope) error {
+func Convert_v1alpha1_MachinePoolList_To_compute_MachinePoolList(in *computev1alpha1.MachinePoolList, out *compute.MachinePoolList, s conversion.Scope) error {
 	return autoConvert_v1alpha1_MachinePoolList_To_compute_MachinePoolList(in, out, s)
 }
 
-func autoConvert_compute_MachinePoolList_To_v1alpha1_MachinePoolList(in *compute.MachinePoolList, out *v1alpha1.MachinePoolList, s conversion.Scope) error {
+func autoConvert_compute_MachinePoolList_To_v1alpha1_MachinePoolList(in *compute.MachinePoolList, out *computev1alpha1.MachinePoolList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]v1alpha1.MachinePool)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]computev1alpha1.MachinePool)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_compute_MachinePoolList_To_v1alpha1_MachinePoolList is an autogenerated conversion function.
-func Convert_compute_MachinePoolList_To_v1alpha1_MachinePoolList(in *compute.MachinePoolList, out *v1alpha1.MachinePoolList, s conversion.Scope) error {
+func Convert_compute_MachinePoolList_To_v1alpha1_MachinePoolList(in *compute.MachinePoolList, out *computev1alpha1.MachinePoolList, s conversion.Scope) error {
 	return autoConvert_compute_MachinePoolList_To_v1alpha1_MachinePoolList(in, out, s)
 }
 
-func autoConvert_v1alpha1_MachinePoolSpec_To_compute_MachinePoolSpec(in *v1alpha1.MachinePoolSpec, out *compute.MachinePoolSpec, s conversion.Scope) error {
+func autoConvert_v1alpha1_MachinePoolSpec_To_compute_MachinePoolSpec(in *computev1alpha1.MachinePoolSpec, out *compute.MachinePoolSpec, s conversion.Scope) error {
 	out.ProviderID = in.ProviderID
 	out.Taints = *(*[]commonv1alpha1.Taint)(unsafe.Pointer(&in.Taints))
 	return nil
 }
 
 // Convert_v1alpha1_MachinePoolSpec_To_compute_MachinePoolSpec is an autogenerated conversion function.
-func Convert_v1alpha1_MachinePoolSpec_To_compute_MachinePoolSpec(in *v1alpha1.MachinePoolSpec, out *compute.MachinePoolSpec, s conversion.Scope) error {
+func Convert_v1alpha1_MachinePoolSpec_To_compute_MachinePoolSpec(in *computev1alpha1.MachinePoolSpec, out *compute.MachinePoolSpec, s conversion.Scope) error {
 	return autoConvert_v1alpha1_MachinePoolSpec_To_compute_MachinePoolSpec(in, out, s)
 }
 
-func autoConvert_compute_MachinePoolSpec_To_v1alpha1_MachinePoolSpec(in *compute.MachinePoolSpec, out *v1alpha1.MachinePoolSpec, s conversion.Scope) error {
+func autoConvert_compute_MachinePoolSpec_To_v1alpha1_MachinePoolSpec(in *compute.MachinePoolSpec, out *computev1alpha1.MachinePoolSpec, s conversion.Scope) error {
 	out.ProviderID = in.ProviderID
 	out.Taints = *(*[]commonv1alpha1.Taint)(unsafe.Pointer(&in.Taints))
 	return nil
 }
 
 // Convert_compute_MachinePoolSpec_To_v1alpha1_MachinePoolSpec is an autogenerated conversion function.
-func Convert_compute_MachinePoolSpec_To_v1alpha1_MachinePoolSpec(in *compute.MachinePoolSpec, out *v1alpha1.MachinePoolSpec, s conversion.Scope) error {
+func Convert_compute_MachinePoolSpec_To_v1alpha1_MachinePoolSpec(in *compute.MachinePoolSpec, out *computev1alpha1.MachinePoolSpec, s conversion.Scope) error {
 	return autoConvert_compute_MachinePoolSpec_To_v1alpha1_MachinePoolSpec(in, out, s)
 }
 
-func autoConvert_v1alpha1_MachinePoolStatus_To_compute_MachinePoolStatus(in *v1alpha1.MachinePoolStatus, out *compute.MachinePoolStatus, s conversion.Scope) error {
+func autoConvert_v1alpha1_MachinePoolStatus_To_compute_MachinePoolStatus(in *computev1alpha1.MachinePoolStatus, out *compute.MachinePoolStatus, s conversion.Scope) error {
 	out.State = compute.MachinePoolState(in.State)
 	out.Conditions = *(*[]compute.MachinePoolCondition)(unsafe.Pointer(&in.Conditions))
 	out.AvailableMachineClasses = *(*[]v1.LocalObjectReference)(unsafe.Pointer(&in.AvailableMachineClasses))
@@ -719,15 +719,15 @@ func autoConvert_v1alpha1_MachinePoolStatus_To_compute_MachinePoolStatus(in *v1a
 }
 
 // Convert_v1alpha1_MachinePoolStatus_To_compute_MachinePoolStatus is an autogenerated conversion function.
-func Convert_v1alpha1_MachinePoolStatus_To_compute_MachinePoolStatus(in *v1alpha1.MachinePoolStatus, out *compute.MachinePoolStatus, s conversion.Scope) error {
+func Convert_v1alpha1_MachinePoolStatus_To_compute_MachinePoolStatus(in *computev1alpha1.MachinePoolStatus, out *compute.MachinePoolStatus, s conversion.Scope) error {
 	return autoConvert_v1alpha1_MachinePoolStatus_To_compute_MachinePoolStatus(in, out, s)
 }
 
-func autoConvert_compute_MachinePoolStatus_To_v1alpha1_MachinePoolStatus(in *compute.MachinePoolStatus, out *v1alpha1.MachinePoolStatus, s conversion.Scope) error {
-	out.State = v1alpha1.MachinePoolState(in.State)
-	out.Conditions = *(*[]v1alpha1.MachinePoolCondition)(unsafe.Pointer(&in.Conditions))
+func autoConvert_compute_MachinePoolStatus_To_v1alpha1_MachinePoolStatus(in *compute.MachinePoolStatus, out *computev1alpha1.MachinePoolStatus, s conversion.Scope) error {
+	out.State = computev1alpha1.MachinePoolState(in.State)
+	out.Conditions = *(*[]computev1alpha1.MachinePoolCondition)(unsafe.Pointer(&in.Conditions))
 	out.AvailableMachineClasses = *(*[]v1.LocalObjectReference)(unsafe.Pointer(&in.AvailableMachineClasses))
-	out.Addresses = *(*[]v1alpha1.MachinePoolAddress)(unsafe.Pointer(&in.Addresses))
+	out.Addresses = *(*[]computev1alpha1.MachinePoolAddress)(unsafe.Pointer(&in.Addresses))
 	if err := Convert_compute_MachinePoolDaemonEndpoints_To_v1alpha1_MachinePoolDaemonEndpoints(&in.DaemonEndpoints, &out.DaemonEndpoints, s); err != nil {
 		return err
 	}
@@ -737,11 +737,11 @@ func autoConvert_compute_MachinePoolStatus_To_v1alpha1_MachinePoolStatus(in *com
 }
 
 // Convert_compute_MachinePoolStatus_To_v1alpha1_MachinePoolStatus is an autogenerated conversion function.
-func Convert_compute_MachinePoolStatus_To_v1alpha1_MachinePoolStatus(in *compute.MachinePoolStatus, out *v1alpha1.MachinePoolStatus, s conversion.Scope) error {
+func Convert_compute_MachinePoolStatus_To_v1alpha1_MachinePoolStatus(in *compute.MachinePoolStatus, out *computev1alpha1.MachinePoolStatus, s conversion.Scope) error {
 	return autoConvert_compute_MachinePoolStatus_To_v1alpha1_MachinePoolStatus(in, out, s)
 }
 
-func autoConvert_v1alpha1_MachineSpec_To_compute_MachineSpec(in *v1alpha1.MachineSpec, out *compute.MachineSpec, s conversion.Scope) error {
+func autoConvert_v1alpha1_MachineSpec_To_compute_MachineSpec(in *computev1alpha1.MachineSpec, out *compute.MachineSpec, s conversion.Scope) error {
 	out.MachineClassRef = in.MachineClassRef
 	out.MachinePoolSelector = *(*map[string]string)(unsafe.Pointer(&in.MachinePoolSelector))
 	out.MachinePoolRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.MachinePoolRef))
@@ -767,21 +767,21 @@ func autoConvert_v1alpha1_MachineSpec_To_compute_MachineSpec(in *v1alpha1.Machin
 }
 
 // Convert_v1alpha1_MachineSpec_To_compute_MachineSpec is an autogenerated conversion function.
-func Convert_v1alpha1_MachineSpec_To_compute_MachineSpec(in *v1alpha1.MachineSpec, out *compute.MachineSpec, s conversion.Scope) error {
+func Convert_v1alpha1_MachineSpec_To_compute_MachineSpec(in *computev1alpha1.MachineSpec, out *compute.MachineSpec, s conversion.Scope) error {
 	return autoConvert_v1alpha1_MachineSpec_To_compute_MachineSpec(in, out, s)
 }
 
-func autoConvert_compute_MachineSpec_To_v1alpha1_MachineSpec(in *compute.MachineSpec, out *v1alpha1.MachineSpec, s conversion.Scope) error {
+func autoConvert_compute_MachineSpec_To_v1alpha1_MachineSpec(in *compute.MachineSpec, out *computev1alpha1.MachineSpec, s conversion.Scope) error {
 	out.MachineClassRef = in.MachineClassRef
 	out.MachinePoolSelector = *(*map[string]string)(unsafe.Pointer(&in.MachinePoolSelector))
 	out.MachinePoolRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.MachinePoolRef))
-	out.Power = v1alpha1.Power(in.Power)
+	out.Power = computev1alpha1.Power(in.Power)
 	out.Image = in.Image
 	out.ImagePullSecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.ImagePullSecretRef))
-	out.NetworkInterfaces = *(*[]v1alpha1.NetworkInterface)(unsafe.Pointer(&in.NetworkInterfaces))
+	out.NetworkInterfaces = *(*[]computev1alpha1.NetworkInterface)(unsafe.Pointer(&in.NetworkInterfaces))
 	if in.Volumes != nil {
 		in, out := &in.Volumes, &out.Volumes
-		*out = make([]v1alpha1.Volume, len(*in))
+		*out = make([]computev1alpha1.Volume, len(*in))
 		for i := range *in {
 			if err := Convert_compute_Volume_To_v1alpha1_Volume(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -791,17 +791,17 @@ func autoConvert_compute_MachineSpec_To_v1alpha1_MachineSpec(in *compute.Machine
 		out.Volumes = nil
 	}
 	out.IgnitionRef = (*commonv1alpha1.SecretKeySelector)(unsafe.Pointer(in.IgnitionRef))
-	out.EFIVars = *(*[]v1alpha1.EFIVar)(unsafe.Pointer(&in.EFIVars))
+	out.EFIVars = *(*[]computev1alpha1.EFIVar)(unsafe.Pointer(&in.EFIVars))
 	out.Tolerations = *(*[]commonv1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
 	return nil
 }
 
 // Convert_compute_MachineSpec_To_v1alpha1_MachineSpec is an autogenerated conversion function.
-func Convert_compute_MachineSpec_To_v1alpha1_MachineSpec(in *compute.MachineSpec, out *v1alpha1.MachineSpec, s conversion.Scope) error {
+func Convert_compute_MachineSpec_To_v1alpha1_MachineSpec(in *compute.MachineSpec, out *computev1alpha1.MachineSpec, s conversion.Scope) error {
 	return autoConvert_compute_MachineSpec_To_v1alpha1_MachineSpec(in, out, s)
 }
 
-func autoConvert_v1alpha1_MachineStatus_To_compute_MachineStatus(in *v1alpha1.MachineStatus, out *compute.MachineStatus, s conversion.Scope) error {
+func autoConvert_v1alpha1_MachineStatus_To_compute_MachineStatus(in *computev1alpha1.MachineStatus, out *compute.MachineStatus, s conversion.Scope) error {
 	out.MachineID = in.MachineID
 	out.ObservedGeneration = in.ObservedGeneration
 	out.State = compute.MachineState(in.State)
@@ -811,25 +811,25 @@ func autoConvert_v1alpha1_MachineStatus_To_compute_MachineStatus(in *v1alpha1.Ma
 }
 
 // Convert_v1alpha1_MachineStatus_To_compute_MachineStatus is an autogenerated conversion function.
-func Convert_v1alpha1_MachineStatus_To_compute_MachineStatus(in *v1alpha1.MachineStatus, out *compute.MachineStatus, s conversion.Scope) error {
+func Convert_v1alpha1_MachineStatus_To_compute_MachineStatus(in *computev1alpha1.MachineStatus, out *compute.MachineStatus, s conversion.Scope) error {
 	return autoConvert_v1alpha1_MachineStatus_To_compute_MachineStatus(in, out, s)
 }
 
-func autoConvert_compute_MachineStatus_To_v1alpha1_MachineStatus(in *compute.MachineStatus, out *v1alpha1.MachineStatus, s conversion.Scope) error {
+func autoConvert_compute_MachineStatus_To_v1alpha1_MachineStatus(in *compute.MachineStatus, out *computev1alpha1.MachineStatus, s conversion.Scope) error {
 	out.MachineID = in.MachineID
 	out.ObservedGeneration = in.ObservedGeneration
-	out.State = v1alpha1.MachineState(in.State)
-	out.NetworkInterfaces = *(*[]v1alpha1.NetworkInterfaceStatus)(unsafe.Pointer(&in.NetworkInterfaces))
-	out.Volumes = *(*[]v1alpha1.VolumeStatus)(unsafe.Pointer(&in.Volumes))
+	out.State = computev1alpha1.MachineState(in.State)
+	out.NetworkInterfaces = *(*[]computev1alpha1.NetworkInterfaceStatus)(unsafe.Pointer(&in.NetworkInterfaces))
+	out.Volumes = *(*[]computev1alpha1.VolumeStatus)(unsafe.Pointer(&in.Volumes))
 	return nil
 }
 
 // Convert_compute_MachineStatus_To_v1alpha1_MachineStatus is an autogenerated conversion function.
-func Convert_compute_MachineStatus_To_v1alpha1_MachineStatus(in *compute.MachineStatus, out *v1alpha1.MachineStatus, s conversion.Scope) error {
+func Convert_compute_MachineStatus_To_v1alpha1_MachineStatus(in *compute.MachineStatus, out *computev1alpha1.MachineStatus, s conversion.Scope) error {
 	return autoConvert_compute_MachineStatus_To_v1alpha1_MachineStatus(in, out, s)
 }
 
-func autoConvert_v1alpha1_NetworkInterface_To_compute_NetworkInterface(in *v1alpha1.NetworkInterface, out *compute.NetworkInterface, s conversion.Scope) error {
+func autoConvert_v1alpha1_NetworkInterface_To_compute_NetworkInterface(in *computev1alpha1.NetworkInterface, out *compute.NetworkInterface, s conversion.Scope) error {
 	out.Name = in.Name
 	if err := Convert_v1alpha1_NetworkInterfaceSource_To_compute_NetworkInterfaceSource(&in.NetworkInterfaceSource, &out.NetworkInterfaceSource, s); err != nil {
 		return err
@@ -838,11 +838,11 @@ func autoConvert_v1alpha1_NetworkInterface_To_compute_NetworkInterface(in *v1alp
 }
 
 // Convert_v1alpha1_NetworkInterface_To_compute_NetworkInterface is an autogenerated conversion function.
-func Convert_v1alpha1_NetworkInterface_To_compute_NetworkInterface(in *v1alpha1.NetworkInterface, out *compute.NetworkInterface, s conversion.Scope) error {
+func Convert_v1alpha1_NetworkInterface_To_compute_NetworkInterface(in *computev1alpha1.NetworkInterface, out *compute.NetworkInterface, s conversion.Scope) error {
 	return autoConvert_v1alpha1_NetworkInterface_To_compute_NetworkInterface(in, out, s)
 }
 
-func autoConvert_compute_NetworkInterface_To_v1alpha1_NetworkInterface(in *compute.NetworkInterface, out *v1alpha1.NetworkInterface, s conversion.Scope) error {
+func autoConvert_compute_NetworkInterface_To_v1alpha1_NetworkInterface(in *compute.NetworkInterface, out *computev1alpha1.NetworkInterface, s conversion.Scope) error {
 	out.Name = in.Name
 	if err := Convert_compute_NetworkInterfaceSource_To_v1alpha1_NetworkInterfaceSource(&in.NetworkInterfaceSource, &out.NetworkInterfaceSource, s); err != nil {
 		return err
@@ -851,63 +851,61 @@ func autoConvert_compute_NetworkInterface_To_v1alpha1_NetworkInterface(in *compu
 }
 
 // Convert_compute_NetworkInterface_To_v1alpha1_NetworkInterface is an autogenerated conversion function.
-func Convert_compute_NetworkInterface_To_v1alpha1_NetworkInterface(in *compute.NetworkInterface, out *v1alpha1.NetworkInterface, s conversion.Scope) error {
+func Convert_compute_NetworkInterface_To_v1alpha1_NetworkInterface(in *compute.NetworkInterface, out *computev1alpha1.NetworkInterface, s conversion.Scope) error {
 	return autoConvert_compute_NetworkInterface_To_v1alpha1_NetworkInterface(in, out, s)
 }
 
-func autoConvert_v1alpha1_NetworkInterfaceSource_To_compute_NetworkInterfaceSource(in *v1alpha1.NetworkInterfaceSource, out *compute.NetworkInterfaceSource, s conversion.Scope) error {
+func autoConvert_v1alpha1_NetworkInterfaceSource_To_compute_NetworkInterfaceSource(in *computev1alpha1.NetworkInterfaceSource, out *compute.NetworkInterfaceSource, s conversion.Scope) error {
 	out.NetworkInterfaceRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.NetworkInterfaceRef))
 	out.Ephemeral = (*compute.EphemeralNetworkInterfaceSource)(unsafe.Pointer(in.Ephemeral))
 	return nil
 }
 
 // Convert_v1alpha1_NetworkInterfaceSource_To_compute_NetworkInterfaceSource is an autogenerated conversion function.
-func Convert_v1alpha1_NetworkInterfaceSource_To_compute_NetworkInterfaceSource(in *v1alpha1.NetworkInterfaceSource, out *compute.NetworkInterfaceSource, s conversion.Scope) error {
+func Convert_v1alpha1_NetworkInterfaceSource_To_compute_NetworkInterfaceSource(in *computev1alpha1.NetworkInterfaceSource, out *compute.NetworkInterfaceSource, s conversion.Scope) error {
 	return autoConvert_v1alpha1_NetworkInterfaceSource_To_compute_NetworkInterfaceSource(in, out, s)
 }
 
-func autoConvert_compute_NetworkInterfaceSource_To_v1alpha1_NetworkInterfaceSource(in *compute.NetworkInterfaceSource, out *v1alpha1.NetworkInterfaceSource, s conversion.Scope) error {
+func autoConvert_compute_NetworkInterfaceSource_To_v1alpha1_NetworkInterfaceSource(in *compute.NetworkInterfaceSource, out *computev1alpha1.NetworkInterfaceSource, s conversion.Scope) error {
 	out.NetworkInterfaceRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.NetworkInterfaceRef))
-	out.Ephemeral = (*v1alpha1.EphemeralNetworkInterfaceSource)(unsafe.Pointer(in.Ephemeral))
+	out.Ephemeral = (*computev1alpha1.EphemeralNetworkInterfaceSource)(unsafe.Pointer(in.Ephemeral))
 	return nil
 }
 
 // Convert_compute_NetworkInterfaceSource_To_v1alpha1_NetworkInterfaceSource is an autogenerated conversion function.
-func Convert_compute_NetworkInterfaceSource_To_v1alpha1_NetworkInterfaceSource(in *compute.NetworkInterfaceSource, out *v1alpha1.NetworkInterfaceSource, s conversion.Scope) error {
+func Convert_compute_NetworkInterfaceSource_To_v1alpha1_NetworkInterfaceSource(in *compute.NetworkInterfaceSource, out *computev1alpha1.NetworkInterfaceSource, s conversion.Scope) error {
 	return autoConvert_compute_NetworkInterfaceSource_To_v1alpha1_NetworkInterfaceSource(in, out, s)
 }
 
-func autoConvert_v1alpha1_NetworkInterfaceStatus_To_compute_NetworkInterfaceStatus(in *v1alpha1.NetworkInterfaceStatus, out *compute.NetworkInterfaceStatus, s conversion.Scope) error {
+func autoConvert_v1alpha1_NetworkInterfaceStatus_To_compute_NetworkInterfaceStatus(in *computev1alpha1.NetworkInterfaceStatus, out *compute.NetworkInterfaceStatus, s conversion.Scope) error {
 	out.Name = in.Name
 	out.Handle = in.Handle
-	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
-	out.VirtualIP = (*commonv1alpha1.IP)(unsafe.Pointer(in.VirtualIP))
 	out.State = compute.NetworkInterfaceState(in.State)
+	out.NetworkInterfaceRef = in.NetworkInterfaceRef
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
 	return nil
 }
 
 // Convert_v1alpha1_NetworkInterfaceStatus_To_compute_NetworkInterfaceStatus is an autogenerated conversion function.
-func Convert_v1alpha1_NetworkInterfaceStatus_To_compute_NetworkInterfaceStatus(in *v1alpha1.NetworkInterfaceStatus, out *compute.NetworkInterfaceStatus, s conversion.Scope) error {
+func Convert_v1alpha1_NetworkInterfaceStatus_To_compute_NetworkInterfaceStatus(in *computev1alpha1.NetworkInterfaceStatus, out *compute.NetworkInterfaceStatus, s conversion.Scope) error {
 	return autoConvert_v1alpha1_NetworkInterfaceStatus_To_compute_NetworkInterfaceStatus(in, out, s)
 }
 
-func autoConvert_compute_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStatus(in *compute.NetworkInterfaceStatus, out *v1alpha1.NetworkInterfaceStatus, s conversion.Scope) error {
+func autoConvert_compute_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStatus(in *compute.NetworkInterfaceStatus, out *computev1alpha1.NetworkInterfaceStatus, s conversion.Scope) error {
 	out.Name = in.Name
 	out.Handle = in.Handle
-	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
-	out.VirtualIP = (*commonv1alpha1.IP)(unsafe.Pointer(in.VirtualIP))
-	out.State = v1alpha1.NetworkInterfaceState(in.State)
+	out.State = computev1alpha1.NetworkInterfaceState(in.State)
+	out.NetworkInterfaceRef = in.NetworkInterfaceRef
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
 	return nil
 }
 
 // Convert_compute_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStatus is an autogenerated conversion function.
-func Convert_compute_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStatus(in *compute.NetworkInterfaceStatus, out *v1alpha1.NetworkInterfaceStatus, s conversion.Scope) error {
+func Convert_compute_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStatus(in *compute.NetworkInterfaceStatus, out *computev1alpha1.NetworkInterfaceStatus, s conversion.Scope) error {
 	return autoConvert_compute_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStatus(in, out, s)
 }
 
-func autoConvert_v1alpha1_Volume_To_compute_Volume(in *v1alpha1.Volume, out *compute.Volume, s conversion.Scope) error {
+func autoConvert_v1alpha1_Volume_To_compute_Volume(in *computev1alpha1.Volume, out *compute.Volume, s conversion.Scope) error {
 	out.Name = in.Name
 	if err := metav1.Convert_Pointer_string_To_string(&in.Device, &out.Device, s); err != nil {
 		return err
@@ -919,11 +917,11 @@ func autoConvert_v1alpha1_Volume_To_compute_Volume(in *v1alpha1.Volume, out *com
 }
 
 // Convert_v1alpha1_Volume_To_compute_Volume is an autogenerated conversion function.
-func Convert_v1alpha1_Volume_To_compute_Volume(in *v1alpha1.Volume, out *compute.Volume, s conversion.Scope) error {
+func Convert_v1alpha1_Volume_To_compute_Volume(in *computev1alpha1.Volume, out *compute.Volume, s conversion.Scope) error {
 	return autoConvert_v1alpha1_Volume_To_compute_Volume(in, out, s)
 }
 
-func autoConvert_compute_Volume_To_v1alpha1_Volume(in *compute.Volume, out *v1alpha1.Volume, s conversion.Scope) error {
+func autoConvert_compute_Volume_To_v1alpha1_Volume(in *compute.Volume, out *computev1alpha1.Volume, s conversion.Scope) error {
 	out.Name = in.Name
 	if err := metav1.Convert_string_To_Pointer_string(&in.Device, &out.Device, s); err != nil {
 		return err
@@ -935,11 +933,11 @@ func autoConvert_compute_Volume_To_v1alpha1_Volume(in *compute.Volume, out *v1al
 }
 
 // Convert_compute_Volume_To_v1alpha1_Volume is an autogenerated conversion function.
-func Convert_compute_Volume_To_v1alpha1_Volume(in *compute.Volume, out *v1alpha1.Volume, s conversion.Scope) error {
+func Convert_compute_Volume_To_v1alpha1_Volume(in *compute.Volume, out *computev1alpha1.Volume, s conversion.Scope) error {
 	return autoConvert_compute_Volume_To_v1alpha1_Volume(in, out, s)
 }
 
-func autoConvert_v1alpha1_VolumeSource_To_compute_VolumeSource(in *v1alpha1.VolumeSource, out *compute.VolumeSource, s conversion.Scope) error {
+func autoConvert_v1alpha1_VolumeSource_To_compute_VolumeSource(in *computev1alpha1.VolumeSource, out *compute.VolumeSource, s conversion.Scope) error {
 	out.VolumeRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeRef))
 	out.EmptyDisk = (*compute.EmptyDiskVolumeSource)(unsafe.Pointer(in.EmptyDisk))
 	out.Ephemeral = (*compute.EphemeralVolumeSource)(unsafe.Pointer(in.Ephemeral))
@@ -947,44 +945,46 @@ func autoConvert_v1alpha1_VolumeSource_To_compute_VolumeSource(in *v1alpha1.Volu
 }
 
 // Convert_v1alpha1_VolumeSource_To_compute_VolumeSource is an autogenerated conversion function.
-func Convert_v1alpha1_VolumeSource_To_compute_VolumeSource(in *v1alpha1.VolumeSource, out *compute.VolumeSource, s conversion.Scope) error {
+func Convert_v1alpha1_VolumeSource_To_compute_VolumeSource(in *computev1alpha1.VolumeSource, out *compute.VolumeSource, s conversion.Scope) error {
 	return autoConvert_v1alpha1_VolumeSource_To_compute_VolumeSource(in, out, s)
 }
 
-func autoConvert_compute_VolumeSource_To_v1alpha1_VolumeSource(in *compute.VolumeSource, out *v1alpha1.VolumeSource, s conversion.Scope) error {
+func autoConvert_compute_VolumeSource_To_v1alpha1_VolumeSource(in *compute.VolumeSource, out *computev1alpha1.VolumeSource, s conversion.Scope) error {
 	out.VolumeRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeRef))
-	out.EmptyDisk = (*v1alpha1.EmptyDiskVolumeSource)(unsafe.Pointer(in.EmptyDisk))
-	out.Ephemeral = (*v1alpha1.EphemeralVolumeSource)(unsafe.Pointer(in.Ephemeral))
+	out.EmptyDisk = (*computev1alpha1.EmptyDiskVolumeSource)(unsafe.Pointer(in.EmptyDisk))
+	out.Ephemeral = (*computev1alpha1.EphemeralVolumeSource)(unsafe.Pointer(in.Ephemeral))
 	return nil
 }
 
 // Convert_compute_VolumeSource_To_v1alpha1_VolumeSource is an autogenerated conversion function.
-func Convert_compute_VolumeSource_To_v1alpha1_VolumeSource(in *compute.VolumeSource, out *v1alpha1.VolumeSource, s conversion.Scope) error {
+func Convert_compute_VolumeSource_To_v1alpha1_VolumeSource(in *compute.VolumeSource, out *computev1alpha1.VolumeSource, s conversion.Scope) error {
 	return autoConvert_compute_VolumeSource_To_v1alpha1_VolumeSource(in, out, s)
 }
 
-func autoConvert_v1alpha1_VolumeStatus_To_compute_VolumeStatus(in *v1alpha1.VolumeStatus, out *compute.VolumeStatus, s conversion.Scope) error {
+func autoConvert_v1alpha1_VolumeStatus_To_compute_VolumeStatus(in *computev1alpha1.VolumeStatus, out *compute.VolumeStatus, s conversion.Scope) error {
 	out.Name = in.Name
 	out.Handle = in.Handle
 	out.State = compute.VolumeState(in.State)
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
+	out.VolumeRef = in.VolumeRef
 	return nil
 }
 
 // Convert_v1alpha1_VolumeStatus_To_compute_VolumeStatus is an autogenerated conversion function.
-func Convert_v1alpha1_VolumeStatus_To_compute_VolumeStatus(in *v1alpha1.VolumeStatus, out *compute.VolumeStatus, s conversion.Scope) error {
+func Convert_v1alpha1_VolumeStatus_To_compute_VolumeStatus(in *computev1alpha1.VolumeStatus, out *compute.VolumeStatus, s conversion.Scope) error {
 	return autoConvert_v1alpha1_VolumeStatus_To_compute_VolumeStatus(in, out, s)
 }
 
-func autoConvert_compute_VolumeStatus_To_v1alpha1_VolumeStatus(in *compute.VolumeStatus, out *v1alpha1.VolumeStatus, s conversion.Scope) error {
+func autoConvert_compute_VolumeStatus_To_v1alpha1_VolumeStatus(in *compute.VolumeStatus, out *computev1alpha1.VolumeStatus, s conversion.Scope) error {
 	out.Name = in.Name
 	out.Handle = in.Handle
-	out.State = v1alpha1.VolumeState(in.State)
+	out.State = computev1alpha1.VolumeState(in.State)
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
+	out.VolumeRef = in.VolumeRef
 	return nil
 }
 
 // Convert_compute_VolumeStatus_To_v1alpha1_VolumeStatus is an autogenerated conversion function.
-func Convert_compute_VolumeStatus_To_v1alpha1_VolumeStatus(in *compute.VolumeStatus, out *v1alpha1.VolumeStatus, s conversion.Scope) error {
+func Convert_compute_VolumeStatus_To_v1alpha1_VolumeStatus(in *compute.VolumeStatus, out *computev1alpha1.VolumeStatus, s conversion.Scope) error {
 	return autoConvert_compute_VolumeStatus_To_v1alpha1_VolumeStatus(in, out, s)
 }

@@ -18,6 +18,7 @@ updates:
       - dependency-name: "k8s.io/kube-aggregator"
       - dependency-name: "k8s.io/kubectl"
       - dependency-name: "sigs.k8s.io/controller-runtime"
+      - dependency-name: "k8s.io/code-generator"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

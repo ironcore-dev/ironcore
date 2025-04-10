@@ -9,7 +9,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// VirtualIPSpec defines the desired state of VirtualIP
+// VirtualIPSpec defines the desired state of a VirtualIP
 type VirtualIPSpec struct {
 	// Type is the type of VirtualIP.
 	Type VirtualIPType `json:"type"`
@@ -26,6 +26,16 @@ type VirtualIPType string
 const (
 	// VirtualIPTypePublic is a VirtualIP that allocates and routes a stable public IP.
 	VirtualIPTypePublic VirtualIPType = "Public"
+)
+
+// ReclaimPolicyType is the ironcore ReclaimPolicy of a VirtualIP.
+type ReclaimPolicyType string
+
+const (
+	// ReclaimPolicyTypeRetain is used for any VirtualIP that is retained when the claim of VirtualIP is released.
+	ReclaimPolicyTypeRetain ReclaimPolicyType = "Retain"
+	// ReclaimPolicyTypeDelete is used for any VirtualIP that is deleted when the claim of VirtualIP is released.
+	ReclaimPolicyTypeDelete ReclaimPolicyType = "Delete"
 )
 
 // VirtualIPStatus defines the observed state of VirtualIP
@@ -55,8 +65,15 @@ type VirtualIPList struct {
 	Items           []VirtualIP `json:"items"`
 }
 
+type EphemeralVirtualIPSpec struct {
+	// VirtualIPSpec defines the desired state of a VirtualIP
+	VirtualIPSpec `json:",inline"`
+	// ReclaimPolicy is the ReclaimPolicyType of virtualIP
+	ReclaimPolicy ReclaimPolicyType `json:"reclaimPolicy,omitempty"`
+}
+
 // VirtualIPTemplateSpec is the specification of a VirtualIP template.
 type VirtualIPTemplateSpec struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-	Spec              VirtualIPSpec `json:"spec,omitempty"`
+	Spec              EphemeralVirtualIPSpec `json:"spec,omitempty"`
 }

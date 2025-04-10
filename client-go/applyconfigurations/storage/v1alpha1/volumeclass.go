@@ -6,25 +6,25 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	internal "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/internal"
-	v1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/meta/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	managedfields "k8s.io/apimachinery/pkg/util/managedfields"
+	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// VolumeClassApplyConfiguration represents an declarative configuration of the VolumeClass type for use
+// VolumeClassApplyConfiguration represents a declarative configuration of the VolumeClass type for use
 // with apply.
 type VolumeClassApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Capabilities                     *v1alpha1.ResourceList        `json:"capabilities,omitempty"`
+	Capabilities                     *corev1alpha1.ResourceList    `json:"capabilities,omitempty"`
 	ResizePolicy                     *storagev1alpha1.ResizePolicy `json:"resizePolicy,omitempty"`
 }
 
-// VolumeClass constructs an declarative configuration of the VolumeClass type for use with
+// VolumeClass constructs a declarative configuration of the VolumeClass type for use with
 // apply.
 func VolumeClass(name string) *VolumeClassApplyConfiguration {
 	b := &VolumeClassApplyConfiguration{}
@@ -73,7 +73,7 @@ func extractVolumeClass(volumeClass *storagev1alpha1.VolumeClass, fieldManager s
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Kind field is set to the value of the last call.
 func (b *VolumeClassApplyConfiguration) WithKind(value string) *VolumeClassApplyConfiguration {
-	b.Kind = &value
+	b.TypeMetaApplyConfiguration.Kind = &value
 	return b
 }
 
@@ -81,7 +81,7 @@ func (b *VolumeClassApplyConfiguration) WithKind(value string) *VolumeClassApply
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the APIVersion field is set to the value of the last call.
 func (b *VolumeClassApplyConfiguration) WithAPIVersion(value string) *VolumeClassApplyConfiguration {
-	b.APIVersion = &value
+	b.TypeMetaApplyConfiguration.APIVersion = &value
 	return b
 }
 
@@ -90,7 +90,7 @@ func (b *VolumeClassApplyConfiguration) WithAPIVersion(value string) *VolumeClas
 // If called multiple times, the Name field is set to the value of the last call.
 func (b *VolumeClassApplyConfiguration) WithName(value string) *VolumeClassApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Name = &value
+	b.ObjectMetaApplyConfiguration.Name = &value
 	return b
 }
 
@@ -99,7 +99,7 @@ func (b *VolumeClassApplyConfiguration) WithName(value string) *VolumeClassApply
 // If called multiple times, the GenerateName field is set to the value of the last call.
 func (b *VolumeClassApplyConfiguration) WithGenerateName(value string) *VolumeClassApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.GenerateName = &value
+	b.ObjectMetaApplyConfiguration.GenerateName = &value
 	return b
 }
 
@@ -108,7 +108,7 @@ func (b *VolumeClassApplyConfiguration) WithGenerateName(value string) *VolumeCl
 // If called multiple times, the Namespace field is set to the value of the last call.
 func (b *VolumeClassApplyConfiguration) WithNamespace(value string) *VolumeClassApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Namespace = &value
+	b.ObjectMetaApplyConfiguration.Namespace = &value
 	return b
 }
 
@@ -117,7 +117,7 @@ func (b *VolumeClassApplyConfiguration) WithNamespace(value string) *VolumeClass
 // If called multiple times, the UID field is set to the value of the last call.
 func (b *VolumeClassApplyConfiguration) WithUID(value types.UID) *VolumeClassApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.UID = &value
+	b.ObjectMetaApplyConfiguration.UID = &value
 	return b
 }
 
@@ -126,7 +126,7 @@ func (b *VolumeClassApplyConfiguration) WithUID(value types.UID) *VolumeClassApp
 // If called multiple times, the ResourceVersion field is set to the value of the last call.
 func (b *VolumeClassApplyConfiguration) WithResourceVersion(value string) *VolumeClassApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.ResourceVersion = &value
+	b.ObjectMetaApplyConfiguration.ResourceVersion = &value
 	return b
 }
 
@@ -135,7 +135,7 @@ func (b *VolumeClassApplyConfiguration) WithResourceVersion(value string) *Volum
 // If called multiple times, the Generation field is set to the value of the last call.
 func (b *VolumeClassApplyConfiguration) WithGeneration(value int64) *VolumeClassApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Generation = &value
+	b.ObjectMetaApplyConfiguration.Generation = &value
 	return b
 }
 
@@ -144,7 +144,7 @@ func (b *VolumeClassApplyConfiguration) WithGeneration(value int64) *VolumeClass
 // If called multiple times, the CreationTimestamp field is set to the value of the last call.
 func (b *VolumeClassApplyConfiguration) WithCreationTimestamp(value metav1.Time) *VolumeClassApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.CreationTimestamp = &value
+	b.ObjectMetaApplyConfiguration.CreationTimestamp = &value
 	return b
 }
 
@@ -153,7 +153,7 @@ func (b *VolumeClassApplyConfiguration) WithCreationTimestamp(value metav1.Time)
 // If called multiple times, the DeletionTimestamp field is set to the value of the last call.
 func (b *VolumeClassApplyConfiguration) WithDeletionTimestamp(value metav1.Time) *VolumeClassApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.DeletionTimestamp = &value
+	b.ObjectMetaApplyConfiguration.DeletionTimestamp = &value
 	return b
 }
 
@@ -162,7 +162,7 @@ func (b *VolumeClassApplyConfiguration) WithDeletionTimestamp(value metav1.Time)
 // If called multiple times, the DeletionGracePeriodSeconds field is set to the value of the last call.
 func (b *VolumeClassApplyConfiguration) WithDeletionGracePeriodSeconds(value int64) *VolumeClassApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.DeletionGracePeriodSeconds = &value
+	b.ObjectMetaApplyConfiguration.DeletionGracePeriodSeconds = &value
 	return b
 }
 
@@ -172,11 +172,11 @@ func (b *VolumeClassApplyConfiguration) WithDeletionGracePeriodSeconds(value int
 // overwriting an existing map entries in Labels field with the same key.
 func (b *VolumeClassApplyConfiguration) WithLabels(entries map[string]string) *VolumeClassApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	if b.Labels == nil && len(entries) > 0 {
-		b.Labels = make(map[string]string, len(entries))
+	if b.ObjectMetaApplyConfiguration.Labels == nil && len(entries) > 0 {
+		b.ObjectMetaApplyConfiguration.Labels = make(map[string]string, len(entries))
 	}
 	for k, v := range entries {
-		b.Labels[k] = v
+		b.ObjectMetaApplyConfiguration.Labels[k] = v
 	}
 	return b
 }
@@ -187,11 +187,11 @@ func (b *VolumeClassApplyConfiguration) WithLabels(entries map[string]string) *V
 // overwriting an existing map entries in Annotations field with the same key.
 func (b *VolumeClassApplyConfiguration) WithAnnotations(entries map[string]string) *VolumeClassApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	if b.Annotations == nil && len(entries) > 0 {
-		b.Annotations = make(map[string]string, len(entries))
+	if b.ObjectMetaApplyConfiguration.Annotations == nil && len(entries) > 0 {
+		b.ObjectMetaApplyConfiguration.Annotations = make(map[string]string, len(entries))
 	}
 	for k, v := range entries {
-		b.Annotations[k] = v
+		b.ObjectMetaApplyConfiguration.Annotations[k] = v
 	}
 	return b
 }
@@ -205,7 +205,7 @@ func (b *VolumeClassApplyConfiguration) WithOwnerReferences(values ...*v1.OwnerR
 		if values[i] == nil {
 			panic("nil value passed to WithOwnerReferences")
 		}
-		b.OwnerReferences = append(b.OwnerReferences, *values[i])
+		b.ObjectMetaApplyConfiguration.OwnerReferences = append(b.ObjectMetaApplyConfiguration.OwnerReferences, *values[i])
 	}
 	return b
 }
@@ -216,7 +216,7 @@ func (b *VolumeClassApplyConfiguration) WithOwnerReferences(values ...*v1.OwnerR
 func (b *VolumeClassApplyConfiguration) WithFinalizers(values ...string) *VolumeClassApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	for i := range values {
-		b.Finalizers = append(b.Finalizers, values[i])
+		b.ObjectMetaApplyConfiguration.Finalizers = append(b.ObjectMetaApplyConfiguration.Finalizers, values[i])
 	}
 	return b
 }
@@ -230,7 +230,7 @@ func (b *VolumeClassApplyConfiguration) ensureObjectMetaApplyConfigurationExists
 // WithCapabilities sets the Capabilities field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Capabilities field is set to the value of the last call.
-func (b *VolumeClassApplyConfiguration) WithCapabilities(value v1alpha1.ResourceList) *VolumeClassApplyConfiguration {
+func (b *VolumeClassApplyConfiguration) WithCapabilities(value corev1alpha1.ResourceList) *VolumeClassApplyConfiguration {
 	b.Capabilities = &value
 	return b
 }
@@ -241,4 +241,10 @@ func (b *VolumeClassApplyConfiguration) WithCapabilities(value v1alpha1.Resource
 func (b *VolumeClassApplyConfiguration) WithResizePolicy(value storagev1alpha1.ResizePolicy) *VolumeClassApplyConfiguration {
 	b.ResizePolicy = &value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *VolumeClassApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.ObjectMetaApplyConfiguration.Name
 }

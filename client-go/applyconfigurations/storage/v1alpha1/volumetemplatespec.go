@@ -6,19 +6,19 @@
 package v1alpha1
 
 import (
-	v1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/meta/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
+	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// VolumeTemplateSpecApplyConfiguration represents an declarative configuration of the VolumeTemplateSpec type for use
+// VolumeTemplateSpecApplyConfiguration represents a declarative configuration of the VolumeTemplateSpec type for use
 // with apply.
 type VolumeTemplateSpecApplyConfiguration struct {
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *VolumeSpecApplyConfiguration `json:"spec,omitempty"`
 }
 
-// VolumeTemplateSpecApplyConfiguration constructs an declarative configuration of the VolumeTemplateSpec type for use with
+// VolumeTemplateSpecApplyConfiguration constructs a declarative configuration of the VolumeTemplateSpec type for use with
 // apply.
 func VolumeTemplateSpec() *VolumeTemplateSpecApplyConfiguration {
 	return &VolumeTemplateSpecApplyConfiguration{}
@@ -29,7 +29,7 @@ func VolumeTemplateSpec() *VolumeTemplateSpecApplyConfiguration {
 // If called multiple times, the Name field is set to the value of the last call.
 func (b *VolumeTemplateSpecApplyConfiguration) WithName(value string) *VolumeTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Name = &value
+	b.ObjectMetaApplyConfiguration.Name = &value
 	return b
 }
 
@@ -38,7 +38,7 @@ func (b *VolumeTemplateSpecApplyConfiguration) WithName(value string) *VolumeTem
 // If called multiple times, the GenerateName field is set to the value of the last call.
 func (b *VolumeTemplateSpecApplyConfiguration) WithGenerateName(value string) *VolumeTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.GenerateName = &value
+	b.ObjectMetaApplyConfiguration.GenerateName = &value
 	return b
 }
 
@@ -47,7 +47,7 @@ func (b *VolumeTemplateSpecApplyConfiguration) WithGenerateName(value string) *V
 // If called multiple times, the Namespace field is set to the value of the last call.
 func (b *VolumeTemplateSpecApplyConfiguration) WithNamespace(value string) *VolumeTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Namespace = &value
+	b.ObjectMetaApplyConfiguration.Namespace = &value
 	return b
 }
 
@@ -56,7 +56,7 @@ func (b *VolumeTemplateSpecApplyConfiguration) WithNamespace(value string) *Volu
 // If called multiple times, the UID field is set to the value of the last call.
 func (b *VolumeTemplateSpecApplyConfiguration) WithUID(value types.UID) *VolumeTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.UID = &value
+	b.ObjectMetaApplyConfiguration.UID = &value
 	return b
 }
 
@@ -65,7 +65,7 @@ func (b *VolumeTemplateSpecApplyConfiguration) WithUID(value types.UID) *VolumeT
 // If called multiple times, the ResourceVersion field is set to the value of the last call.
 func (b *VolumeTemplateSpecApplyConfiguration) WithResourceVersion(value string) *VolumeTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.ResourceVersion = &value
+	b.ObjectMetaApplyConfiguration.ResourceVersion = &value
 	return b
 }
 
@@ -74,7 +74,7 @@ func (b *VolumeTemplateSpecApplyConfiguration) WithResourceVersion(value string)
 // If called multiple times, the Generation field is set to the value of the last call.
 func (b *VolumeTemplateSpecApplyConfiguration) WithGeneration(value int64) *VolumeTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Generation = &value
+	b.ObjectMetaApplyConfiguration.Generation = &value
 	return b
 }
 
@@ -83,7 +83,7 @@ func (b *VolumeTemplateSpecApplyConfiguration) WithGeneration(value int64) *Volu
 // If called multiple times, the CreationTimestamp field is set to the value of the last call.
 func (b *VolumeTemplateSpecApplyConfiguration) WithCreationTimestamp(value metav1.Time) *VolumeTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.CreationTimestamp = &value
+	b.ObjectMetaApplyConfiguration.CreationTimestamp = &value
 	return b
 }
 
@@ -92,7 +92,7 @@ func (b *VolumeTemplateSpecApplyConfiguration) WithCreationTimestamp(value metav
 // If called multiple times, the DeletionTimestamp field is set to the value of the last call.
 func (b *VolumeTemplateSpecApplyConfiguration) WithDeletionTimestamp(value metav1.Time) *VolumeTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.DeletionTimestamp = &value
+	b.ObjectMetaApplyConfiguration.DeletionTimestamp = &value
 	return b
 }
 
@@ -101,7 +101,7 @@ func (b *VolumeTemplateSpecApplyConfiguration) WithDeletionTimestamp(value metav
 // If called multiple times, the DeletionGracePeriodSeconds field is set to the value of the last call.
 func (b *VolumeTemplateSpecApplyConfiguration) WithDeletionGracePeriodSeconds(value int64) *VolumeTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.DeletionGracePeriodSeconds = &value
+	b.ObjectMetaApplyConfiguration.DeletionGracePeriodSeconds = &value
 	return b
 }
 
@@ -111,11 +111,11 @@ func (b *VolumeTemplateSpecApplyConfiguration) WithDeletionGracePeriodSeconds(va
 // overwriting an existing map entries in Labels field with the same key.
 func (b *VolumeTemplateSpecApplyConfiguration) WithLabels(entries map[string]string) *VolumeTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	if b.Labels == nil && len(entries) > 0 {
-		b.Labels = make(map[string]string, len(entries))
+	if b.ObjectMetaApplyConfiguration.Labels == nil && len(entries) > 0 {
+		b.ObjectMetaApplyConfiguration.Labels = make(map[string]string, len(entries))
 	}
 	for k, v := range entries {
-		b.Labels[k] = v
+		b.ObjectMetaApplyConfiguration.Labels[k] = v
 	}
 	return b
 }
@@ -126,11 +126,11 @@ func (b *VolumeTemplateSpecApplyConfiguration) WithLabels(entries map[string]str
 // overwriting an existing map entries in Annotations field with the same key.
 func (b *VolumeTemplateSpecApplyConfiguration) WithAnnotations(entries map[string]string) *VolumeTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	if b.Annotations == nil && len(entries) > 0 {
-		b.Annotations = make(map[string]string, len(entries))
+	if b.ObjectMetaApplyConfiguration.Annotations == nil && len(entries) > 0 {
+		b.ObjectMetaApplyConfiguration.Annotations = make(map[string]string, len(entries))
 	}
 	for k, v := range entries {
-		b.Annotations[k] = v
+		b.ObjectMetaApplyConfiguration.Annotations[k] = v
 	}
 	return b
 }
@@ -144,7 +144,7 @@ func (b *VolumeTemplateSpecApplyConfiguration) WithOwnerReferences(values ...*v1
 		if values[i] == nil {
 			panic("nil value passed to WithOwnerReferences")
 		}
-		b.OwnerReferences = append(b.OwnerReferences, *values[i])
+		b.ObjectMetaApplyConfiguration.OwnerReferences = append(b.ObjectMetaApplyConfiguration.OwnerReferences, *values[i])
 	}
 	return b
 }
@@ -155,7 +155,7 @@ func (b *VolumeTemplateSpecApplyConfiguration) WithOwnerReferences(values ...*v1
 func (b *VolumeTemplateSpecApplyConfiguration) WithFinalizers(values ...string) *VolumeTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	for i := range values {
-		b.Finalizers = append(b.Finalizers, values[i])
+		b.ObjectMetaApplyConfiguration.Finalizers = append(b.ObjectMetaApplyConfiguration.Finalizers, values[i])
 	}
 	return b
 }
@@ -172,4 +172,10 @@ func (b *VolumeTemplateSpecApplyConfiguration) ensureObjectMetaApplyConfiguratio
 func (b *VolumeTemplateSpecApplyConfiguration) WithSpec(value *VolumeSpecApplyConfiguration) *VolumeTemplateSpecApplyConfiguration {
 	b.Spec = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *VolumeTemplateSpecApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.ObjectMetaApplyConfiguration.Name
 }

@@ -5,13 +5,13 @@
 
 package v1alpha1
 
-// EphemeralVirtualIPSourceApplyConfiguration represents an declarative configuration of the EphemeralVirtualIPSource type for use
+// EphemeralVirtualIPSourceApplyConfiguration represents a declarative configuration of the EphemeralVirtualIPSource type for use
 // with apply.
 type EphemeralVirtualIPSourceApplyConfiguration struct {
 	VirtualIPTemplate *VirtualIPTemplateSpecApplyConfiguration `json:"virtualIPTemplate,omitempty"`
 }
 
-// EphemeralVirtualIPSourceApplyConfiguration constructs an declarative configuration of the EphemeralVirtualIPSource type for use with
+// EphemeralVirtualIPSourceApplyConfiguration constructs a declarative configuration of the EphemeralVirtualIPSource type for use with
 // apply.
 func EphemeralVirtualIPSource() *EphemeralVirtualIPSourceApplyConfiguration {
 	return &EphemeralVirtualIPSourceApplyConfiguration{}

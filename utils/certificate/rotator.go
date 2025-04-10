@@ -57,7 +57,7 @@ type rotator struct {
 	forceInitial bool
 	certificate  atomic.Pointer[tls.Certificate]
 
-	queue workqueue.RateLimitingInterface
+	queue workqueue.TypedRateLimitingInterface[string]
 }
 
 type Rotator interface {
@@ -278,7 +278,7 @@ func (r *rotator) rotate(ctx context.Context) error {
 	return nil
 }
 
-func (r *rotator) enqueue(key interface{}) {
+func (r *rotator) enqueue(key string) {
 	// If we want a forced initial rotation, respect it / reset it afterwards.
 	force := r.forceInitial
 	if force {
@@ -349,7 +349,7 @@ func (r *rotator) Start(ctx context.Context) error {
 	}
 
 	r.started = true
-	r.queue = workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
+	r.queue = workqueue.NewTypedRateLimitingQueue(workqueue.DefaultTypedControllerRateLimiter[string]())
 	r.startedMu.Unlock()
 
 	var wg sync.WaitGroup

@@ -6,8 +6,8 @@
 package internal
 
 import (
-	"fmt"
-	"sync"
+	fmt "fmt"
+	sync "sync"
 
 	typed "sigs.k8s.io/structured-merge-diff/v4/typed"
 )
@@ -375,12 +375,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: handle
       type:
         scalar: string
-    - name: ips
-      type:
-        list:
-          elementType:
-            namedType: com.github.ironcore-dev.ironcore.api.common.v1alpha1.IP
-          elementRelationship: atomic
     - name: lastStateTransitionTime
       type:
         namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
@@ -388,12 +382,13 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
+    - name: networkInterfaceRef
+      type:
+        namedType: io.k8s.api.core.v1.LocalObjectReference
+      default: {}
     - name: state
       type:
         scalar: string
-    - name: virtualIP
-      type:
-        namedType: com.github.ironcore-dev.ironcore.api.common.v1alpha1.IP
 - name: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Volume
   map:
     fields:
@@ -429,6 +424,10 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: state
       type:
         scalar: string
+    - name: volumeRef
+      type:
+        namedType: io.k8s.api.core.v1.LocalObjectReference
+      default: {}
 - name: com.github.ironcore-dev.ironcore.api.core.v1alpha1.ObjectSelector
   map:
     fields:
@@ -646,6 +645,23 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: virtualIPTemplate
       type:
         namedType: com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPTemplateSpec
+- name: com.github.ironcore-dev.ironcore.api.networking.v1alpha1.EphemeralVirtualIPSpec
+  map:
+    fields:
+    - name: ipFamily
+      type:
+        scalar: string
+      default: ""
+    - name: reclaimPolicy
+      type:
+        scalar: string
+    - name: targetRef
+      type:
+        namedType: com.github.ironcore-dev.ironcore.api.common.v1alpha1.LocalUIDReference
+    - name: type
+      type:
+        scalar: string
+      default: ""
 - name: com.github.ironcore-dev.ironcore.api.networking.v1alpha1.IPBlock
   map:
     fields:
@@ -1272,7 +1288,7 @@ var schemaYAML = typed.YAMLObject(`types:
       default: {}
     - name: spec
       type:
-        namedType: com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPSpec
+        namedType: com.github.ironcore-dev.ironcore.api.networking.v1alpha1.EphemeralVirtualIPSpec
       default: {}
 - name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket
   map:
@@ -1683,6 +1699,7 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: name
       type:
         scalar: string
+      default: ""
     elementRelationship: atomic
 - name: io.k8s.apimachinery.pkg.api.resource.Quantity
   scalar: untyped

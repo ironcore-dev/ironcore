@@ -6,8 +6,9 @@ package config
 import (
 	"fmt"
 
-	"github.com/ironcore-dev/ironcore/utils/generic"
 	"github.com/spf13/pflag"
+
+	"github.com/ironcore-dev/ironcore/utils/generic"
 )
 
 // GetConfigOptions are options to supply for a GetConfig call.
@@ -38,6 +39,12 @@ type GetConfigOptions struct {
 
 	// EgressSelectorConfig is the path to an egress selector config to load.
 	EgressSelectorConfig string
+
+	// QPS specifies the queries per second allowed for the client.
+	QPS float32
+
+	// Burst specified the burst rate allowed for the client.
+	Burst int
 }
 
 // BindFlagOptions are options for GetConfigOptions.BindFlags.
@@ -80,6 +87,8 @@ func (o *GetConfigOptions) BindFlags(fs *pflag.FlagSet, opts ...func(*BindFlagOp
 	fs.StringVar(&o.BootstrapKubeconfig, bo.NameFunc(BootstrapKubeconfigFlagName), "", "Path to a bootstrap kubeconfig.")
 	fs.BoolVar(&o.RotateCertificates, bo.NameFunc(RotateCertificatesFlagName), false, "Whether to use automatic certificate / config rotation.")
 	fs.StringVar(&o.EgressSelectorConfig, bo.NameFunc(EgressSelectorConfigFlagName), "", "Path pointing to an egress selector config to use.")
+	fs.Float32Var(&o.QPS, bo.NameFunc(QpsConfigFlagName), 0, "Kubernetes client qps.")
+	fs.IntVar(&o.Burst, bo.NameFunc(BurstConfigFlagName), 0, "Kubernetes client burst.")
 }
 
 // ApplyToGetConfig implements GetConfigOption.
@@ -104,6 +113,12 @@ func (o *GetConfigOptions) ApplyToGetConfig(o2 *GetConfigOptions) {
 	}
 	if o.EgressSelectorConfig != "" {
 		o2.EgressSelectorConfig = o.EgressSelectorConfig
+	}
+	if o.QPS != 0 {
+		o2.QPS = o.QPS
+	}
+	if o.Burst != 0 {
+		o2.Burst = o.Burst
 	}
 }
 
@@ -146,3 +161,19 @@ func (w WithRotate) ApplyToGetConfig(o *GetConfigOptions) {
 
 // RotateCertificates enables certificate rotation.
 var RotateCertificates = WithRotate(true)
+
+// WithQPS sets GetConfigOptions.QPS to the specified value.
+type WithQPS float32
+
+// ApplyToGetConfig implements GetConfigOption.
+func (c WithQPS) ApplyToGetConfig(o *GetConfigOptions) {
+	o.QPS = float32(c)
+}
+
+// WithBurst sets GetConfigOptions.Burst to the specified value.
+type WithBurst int
+
+// ApplyToGetConfig implements GetConfigOption.
+func (c WithBurst) ApplyToGetConfig(o *GetConfigOptions) {
+	o.Burst = int(c)
+}

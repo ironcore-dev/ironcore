@@ -6,20 +6,20 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// VolumeStatusApplyConfiguration represents an declarative configuration of the VolumeStatus type for use
+// VolumeStatusApplyConfiguration represents a declarative configuration of the VolumeStatus type for use
 // with apply.
 type VolumeStatusApplyConfiguration struct {
-	State                   *v1alpha1.VolumeState               `json:"state,omitempty"`
+	State                   *storagev1alpha1.VolumeState        `json:"state,omitempty"`
 	LastStateTransitionTime *v1.Time                            `json:"lastStateTransitionTime,omitempty"`
 	Access                  *VolumeAccessApplyConfiguration     `json:"access,omitempty"`
 	Conditions              []VolumeConditionApplyConfiguration `json:"conditions,omitempty"`
 }
 
-// VolumeStatusApplyConfiguration constructs an declarative configuration of the VolumeStatus type for use with
+// VolumeStatusApplyConfiguration constructs a declarative configuration of the VolumeStatus type for use with
 // apply.
 func VolumeStatus() *VolumeStatusApplyConfiguration {
 	return &VolumeStatusApplyConfiguration{}
@@ -28,7 +28,7 @@ func VolumeStatus() *VolumeStatusApplyConfiguration {
 // WithState sets the State field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the State field is set to the value of the last call.
-func (b *VolumeStatusApplyConfiguration) WithState(value v1alpha1.VolumeState) *VolumeStatusApplyConfiguration {
+func (b *VolumeStatusApplyConfiguration) WithState(value storagev1alpha1.VolumeState) *VolumeStatusApplyConfiguration {
 	b.State = &value
 	return b
 }

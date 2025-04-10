@@ -9,7 +9,7 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 )
 
-// NetworkPeeringClaimRefApplyConfiguration represents an declarative configuration of the NetworkPeeringClaimRef type for use
+// NetworkPeeringClaimRefApplyConfiguration represents a declarative configuration of the NetworkPeeringClaimRef type for use
 // with apply.
 type NetworkPeeringClaimRefApplyConfiguration struct {
 	Namespace *string    `json:"namespace,omitempty"`
@@ -17,7 +17,7 @@ type NetworkPeeringClaimRefApplyConfiguration struct {
 	UID       *types.UID `json:"uid,omitempty"`
 }
 
-// NetworkPeeringClaimRefApplyConfiguration constructs an declarative configuration of the NetworkPeeringClaimRef type for use with
+// NetworkPeeringClaimRefApplyConfiguration constructs a declarative configuration of the NetworkPeeringClaimRef type for use with
 // apply.
 func NetworkPeeringClaimRef() *NetworkPeeringClaimRefApplyConfiguration {
 	return &NetworkPeeringClaimRefApplyConfiguration{}

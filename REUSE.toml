@@ -1,0 +1,75 @@
+version = 1
+SPDX-PackageName = "ironcore"
+SPDX-PackageSupplier = "IronCore authors <ospo@sap.com>"
+SPDX-PackageDownloadLocation = "https://github.com/ironcore-dev/ironcore"
+
+[[annotations]]
+path = [
+    ".github/**",
+    ".gitignore",
+    ".golangci.yml",
+    "CODEOWNERS",
+    "Dockerfile",
+    "Makefile",
+    "PROJECT",
+    "client-go/openapi/api_violations.report",
+    "config/**",
+    "gen/**",
+    "go.mod",
+    "go.sum",
+    "hack/**",
+    "buf.gen.yaml",
+    "buf.yaml",
+    "iri/apis/bucket/v1alpha1/api_grpc.pb.go",
+    "iri/apis/machine/v1alpha1/api_grpc.pb.go",
+    "iri/apis/volume/v1alpha1/api_grpc.pb.go",
+    "iri/apis/bucket/v1alpha1/api.proto",
+    "iri/apis/bucket/v1alpha1/api.pb.go",
+    "iri/apis/event/v1alpha1/api.pb.go",
+    "iri/apis/event/v1alpha1/api.proto",
+    "iri/apis/machine/v1alpha1/api.pb.go",
+    "iri/apis/machine/v1alpha1/api.proto",
+    "iri/apis/meta/v1alpha1/api.pb.go",
+    "iri/apis/meta/v1alpha1/api.proto",
+    "iri/apis/volume/v1alpha1/api.pb.go",
+    "iri/apis/volume/v1alpha1/api.proto",
+    "irictl-machine/config/samples/**",
+    "irictl-volume/config/samples/**",
+    "mkdocs.yml",
+    "models-schema/main.go.tmpl",
+    "poollet/machinepoollet/addresses/testdata/addresses.yaml",
+    "REUSE.toml"
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2023 SAP SE or an SAP affiliate company and IronCore contributors"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = ["docs/**", "README.md"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2023 SAP SE or an SAP affiliate company and IronCore contributors"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = "poollet/machinepoollet/iri/streaming/remotecommand/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2016 The Kubernetes Authors."
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = "third_party/kubernetes/pkg/util/flock/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2021 The Kubernetes Authors."
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = "utils/envtest/internal/testing/addr/addr.go"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2021 The Kubernetes Authors."
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = "utils/envtest/internal/testing/certs/certs.go"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2021 The Kubernetes Authors."
+SPDX-License-Identifier = "Apache-2.0"

@@ -12,7 +12,6 @@ import (
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	irievent "github.com/ironcore-dev/ironcore/iri/apis/event/v1alpha1"
 	"github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
-
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	fakevolume "github.com/ironcore-dev/ironcore/iri/testing/volume"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers"
@@ -26,8 +25,10 @@ import (
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/tools/record"
+	"k8s.io/utils/ptr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	ctrlconfig "sigs.k8s.io/controller-runtime/pkg/config"
 	metricserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 )
 
@@ -56,6 +57,7 @@ var _ = Describe("VolumeEventMapper", func() {
 			Metrics: metricserver.Options{
 				BindAddress: "0",
 			},
+			Controller: ctrlconfig.Controller{SkipNameValidation: ptr.To(true)},
 		})
 		Expect(err).ToNot(HaveOccurred())
 

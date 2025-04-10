@@ -5,7 +5,7 @@
 
 package v1alpha1
 
-// NetworkSpecApplyConfiguration represents an declarative configuration of the NetworkSpec type for use
+// NetworkSpecApplyConfiguration represents a declarative configuration of the NetworkSpec type for use
 // with apply.
 type NetworkSpecApplyConfiguration struct {
 	ProviderID       *string                                    `json:"providerID,omitempty"`
@@ -13,7 +13,7 @@ type NetworkSpecApplyConfiguration struct {
 	PeeringClaimRefs []NetworkPeeringClaimRefApplyConfiguration `json:"incomingPeerings,omitempty"`
 }
 
-// NetworkSpecApplyConfiguration constructs an declarative configuration of the NetworkSpec type for use with
+// NetworkSpecApplyConfiguration constructs a declarative configuration of the NetworkSpec type for use with
 // apply.
 func NetworkSpec() *NetworkSpecApplyConfiguration {
 	return &NetworkSpecApplyConfiguration{}

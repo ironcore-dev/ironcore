@@ -10,19 +10,20 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	"github.com/ironcore-dev/controller-utils/clientutils"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	iriBucket "github.com/ironcore-dev/ironcore/iri/apis/bucket"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
-
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	bucketpoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/bucketpoollet/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/bcm"
 	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/controllers/events"
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+
+	"github.com/ironcore-dev/controller-utils/clientutils"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -32,6 +33,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
@@ -47,6 +49,8 @@ type BucketReconciler struct {
 
 	BucketPoolName   string
 	WatchFilterValue string
+
+	MaxConcurrentReconciles int
 }
 
 func (r *BucketReconciler) iriBucketLabels(bucket *storagev1alpha1.Bucket) map[string]string {
@@ -209,14 +213,14 @@ func (r *BucketReconciler) delete(ctx context.Context, log logr.Logger, bucket *
 	return ctrl.Result{}, nil
 }
 
-func getIRIBucketClassCapabilities(bucketClass *storagev1alpha1.BucketClass) (*iri.BucketClassCapabilities, error) {
+func getIRIBucketClassCapabilities(bucketClass *storagev1alpha1.BucketClass) *iri.BucketClassCapabilities {
 	tps := bucketClass.Capabilities.TPS()
 	iops := bucketClass.Capabilities.IOPS()
 
 	return &iri.BucketClassCapabilities{
 		Tps:  tps.Value(),
 		Iops: iops.Value(),
-	}, nil
+	}
 }
 
 func (r *BucketReconciler) prepareIRIBucketMetadata(bucket *storagev1alpha1.Bucket) *irimeta.ObjectMetadata {
@@ -239,10 +243,7 @@ func (r *BucketReconciler) prepareIRIBucketClass(ctx context.Context, bucket *st
 		return "", false, nil
 	}
 
-	caps, err := getIRIBucketClassCapabilities(bucketClass)
-	if err != nil {
-		return "", false, fmt.Errorf("error getting iri bucket class capabilities: %w", err)
-	}
+	caps := getIRIBucketClassCapabilities(bucketClass)
 
 	class, err := r.BucketClassMapper.GetBucketClassFor(ctx, bucketClassName, caps)
 	if err != nil {
@@ -432,7 +433,6 @@ func (r *BucketReconciler) updateStatus(ctx context.Context, log logr.Logger, bu
 				Endpoint:  iriAccess.Endpoint,
 			}
 		}
-
 	}
 
 	base := bucket.DeepCopy()
@@ -466,6 +466,10 @@ func (r *BucketReconciler) SetupWithManager(mgr ctrl.Manager) error {
 				predicates.ResourceIsNotExternallyManaged(log),
 			),
 		).
+		WithOptions(
+			controller.Options{
+				MaxConcurrentReconciles: r.MaxConcurrentReconciles,
+			}).
 		Complete(r)
 }
 

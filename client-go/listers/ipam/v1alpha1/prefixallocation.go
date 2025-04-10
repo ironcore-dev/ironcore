@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
-	"k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/client-go/tools/cache"
+	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
+	labels "k8s.io/apimachinery/pkg/labels"
+	listers "k8s.io/client-go/listers"
+	cache "k8s.io/client-go/tools/cache"
 )
 
 // PrefixAllocationLister helps list PrefixAllocations.
@@ -17,7 +17,7 @@ import (
 type PrefixAllocationLister interface {
 	// List lists all PrefixAllocations in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.PrefixAllocation, err error)
+	List(selector labels.Selector) (ret []*ipamv1alpha1.PrefixAllocation, err error)
 	// PrefixAllocations returns an object that can list and get PrefixAllocations.
 	PrefixAllocations(namespace string) PrefixAllocationNamespaceLister
 	PrefixAllocationListerExpansion
@@ -25,25 +25,17 @@ type PrefixAllocationLister interface {
 
 // prefixAllocationLister implements the PrefixAllocationLister interface.
 type prefixAllocationLister struct {
-	indexer cache.Indexer
+	listers.ResourceIndexer[*ipamv1alpha1.PrefixAllocation]
 }
 
 // NewPrefixAllocationLister returns a new PrefixAllocationLister.
 func NewPrefixAllocationLister(indexer cache.Indexer) PrefixAllocationLister {
-	return &prefixAllocationLister{indexer: indexer}
-}
-
-// List lists all PrefixAllocations in the indexer.
-func (s *prefixAllocationLister) List(selector labels.Selector) (ret []*v1alpha1.PrefixAllocation, err error) {
-	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.PrefixAllocation))
-	})
-	return ret, err
+	return &prefixAllocationLister{listers.New[*ipamv1alpha1.PrefixAllocation](indexer, ipamv1alpha1.Resource("prefixallocation"))}
 }
 
 // PrefixAllocations returns an object that can list and get PrefixAllocations.
 func (s *prefixAllocationLister) PrefixAllocations(namespace string) PrefixAllocationNamespaceLister {
-	return prefixAllocationNamespaceLister{indexer: s.indexer, namespace: namespace}
+	return prefixAllocationNamespaceLister{listers.NewNamespaced[*ipamv1alpha1.PrefixAllocation](s.ResourceIndexer, namespace)}
 }
 
 // PrefixAllocationNamespaceLister helps list and get PrefixAllocations.
@@ -51,36 +43,15 @@ func (s *prefixAllocationLister) PrefixAllocations(namespace string) PrefixAlloc
 type PrefixAllocationNamespaceLister interface {
 	// List lists all PrefixAllocations in the indexer for a given namespace.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.PrefixAllocation, err error)
+	List(selector labels.Selector) (ret []*ipamv1alpha1.PrefixAllocation, err error)
 	// Get retrieves the PrefixAllocation from the indexer for a given namespace and name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.PrefixAllocation, error)
+	Get(name string) (*ipamv1alpha1.PrefixAllocation, error)
 	PrefixAllocationNamespaceListerExpansion
 }
 
 // prefixAllocationNamespaceLister implements the PrefixAllocationNamespaceLister
 // interface.
 type prefixAllocationNamespaceLister struct {
-	indexer   cache.Indexer
-	namespace string
-}
-
-// List lists all PrefixAllocations in the indexer for a given namespace.
-func (s prefixAllocationNamespaceLister) List(selector labels.Selector) (ret []*v1alpha1.PrefixAllocation, err error) {
-	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.PrefixAllocation))
-	})
-	return ret, err
-}
-
-// Get retrieves the PrefixAllocation from the indexer for a given namespace and name.
-func (s prefixAllocationNamespaceLister) Get(name string) (*v1alpha1.PrefixAllocation, error) {
-	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("prefixallocation"), name)
-	}
-	return obj.(*v1alpha1.PrefixAllocation), nil
+	listers.ResourceIndexer[*ipamv1alpha1.PrefixAllocation]
 }

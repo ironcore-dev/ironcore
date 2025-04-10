@@ -10,20 +10,21 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	"github.com/ironcore-dev/controller-utils/clientutils"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	iriVolume "github.com/ironcore-dev/ironcore/iri/apis/volume"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
-
 	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers/events"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+
+	"github.com/ironcore-dev/controller-utils/clientutils"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -33,6 +34,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
@@ -48,6 +50,8 @@ type VolumeReconciler struct {
 
 	VolumePoolName   string
 	WatchFilterValue string
+
+	MaxConcurrentReconciles int
 }
 
 func (r *VolumeReconciler) iriVolumeLabels(volume *storagev1alpha1.Volume) map[string]string {
@@ -210,14 +214,14 @@ func (r *VolumeReconciler) delete(ctx context.Context, log logr.Logger, volume *
 	return ctrl.Result{}, nil
 }
 
-func getIRIVolumeClassCapabilities(volumeClass *storagev1alpha1.VolumeClass) (*iri.VolumeClassCapabilities, error) {
+func getIRIVolumeClassCapabilities(volumeClass *storagev1alpha1.VolumeClass) *iri.VolumeClassCapabilities {
 	tps := volumeClass.Capabilities.TPS()
 	iops := volumeClass.Capabilities.IOPS()
 
 	return &iri.VolumeClassCapabilities{
 		Tps:  tps.Value(),
 		Iops: iops.Value(),
-	}, nil
+	}
 }
 
 func (r *VolumeReconciler) prepareIRIVolumeMetadata(volume *storagev1alpha1.Volume) *irimeta.ObjectMetadata {
@@ -240,10 +244,7 @@ func (r *VolumeReconciler) prepareIRIVolumeClass(ctx context.Context, volume *st
 		return "", false, nil
 	}
 
-	caps, err := getIRIVolumeClassCapabilities(volumeClass)
-	if err != nil {
-		return "", false, fmt.Errorf("error getting iri volume class capabilities: %w", err)
-	}
+	caps := getIRIVolumeClassCapabilities(volumeClass)
 
 	class, _, err := r.VolumeClassMapper.GetVolumeClassFor(ctx, volumeClassName, caps)
 	if err != nil {
@@ -275,12 +276,12 @@ func (r *VolumeReconciler) prepareIRIVolumeEncryption(ctx context.Context, volum
 	}, true, nil
 }
 
-func (r *VolumeReconciler) prepareIRIVolumeResources(_ context.Context, _ *storagev1alpha1.Volume, resources corev1alpha1.ResourceList) (*iri.VolumeResources, bool, error) {
+func (r *VolumeReconciler) prepareIRIVolumeResources(resources corev1alpha1.ResourceList) *iri.VolumeResources {
 	storageBytes := resources.Storage().Value()
 
 	return &iri.VolumeResources{
 		StorageBytes: storageBytes,
-	}, true, nil
+	}
 }
 
 func (r *VolumeReconciler) prepareIRIVolume(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume) (*iri.Volume, bool, error) {
@@ -307,14 +308,7 @@ func (r *VolumeReconciler) prepareIRIVolume(ctx context.Context, log logr.Logger
 		ok = false
 	}
 
-	resources, resourcesOK, err := r.prepareIRIVolumeResources(ctx, volume, volume.Spec.Resources)
-	switch {
-	case err != nil:
-		errs = append(errs, fmt.Errorf("error preparing iri volume resources: %w", err))
-	case !resourcesOK:
-		ok = false
-	}
-
+	resources := r.prepareIRIVolumeResources(volume.Spec.Resources)
 	metadata := r.prepareIRIVolumeMetadata(volume)
 
 	if len(errs) > 0 {
@@ -443,7 +437,7 @@ func (r *VolumeReconciler) update(ctx context.Context, log logr.Logger, volume *
 	return nil
 }
 
-func (r *VolumeReconciler) volumeSecretName(volumeName string, volumeHandle string) string {
+func (r *VolumeReconciler) volumeSecretName(volumeName, volumeHandle string) string {
 	sum := sha256.Sum256([]byte(fmt.Sprintf("%s/%s", volumeName, volumeHandle)))
 	return hex.EncodeToString(sum[:])[:63]
 }
@@ -508,7 +502,6 @@ func (r *VolumeReconciler) updateStatus(ctx context.Context, log logr.Logger, vo
 				VolumeAttributes: iriAccess.Attributes,
 			}
 		}
-
 	}
 
 	base := volume.DeepCopy()
@@ -542,6 +535,10 @@ func (r *VolumeReconciler) SetupWithManager(mgr ctrl.Manager) error {
 				predicates.ResourceIsNotExternallyManaged(log),
 			),
 		).
+		WithOptions(
+			controller.Options{
+				MaxConcurrentReconciles: r.MaxConcurrentReconciles,
+			}).
 		Complete(r)
 }
 

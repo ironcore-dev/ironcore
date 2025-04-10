@@ -6,23 +6,23 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// MachinePoolConditionApplyConfiguration represents an declarative configuration of the MachinePoolCondition type for use
+// MachinePoolConditionApplyConfiguration represents a declarative configuration of the MachinePoolCondition type for use
 // with apply.
 type MachinePoolConditionApplyConfiguration struct {
-	Type               *v1alpha1.MachinePoolConditionType `json:"type,omitempty"`
-	Status             *v1.ConditionStatus                `json:"status,omitempty"`
-	Reason             *string                            `json:"reason,omitempty"`
-	Message            *string                            `json:"message,omitempty"`
-	ObservedGeneration *int64                             `json:"observedGeneration,omitempty"`
-	LastTransitionTime *metav1.Time                       `json:"lastTransitionTime,omitempty"`
+	Type               *computev1alpha1.MachinePoolConditionType `json:"type,omitempty"`
+	Status             *v1.ConditionStatus                       `json:"status,omitempty"`
+	Reason             *string                                   `json:"reason,omitempty"`
+	Message            *string                                   `json:"message,omitempty"`
+	ObservedGeneration *int64                                    `json:"observedGeneration,omitempty"`
+	LastTransitionTime *metav1.Time                              `json:"lastTransitionTime,omitempty"`
 }
 
-// MachinePoolConditionApplyConfiguration constructs an declarative configuration of the MachinePoolCondition type for use with
+// MachinePoolConditionApplyConfiguration constructs a declarative configuration of the MachinePoolCondition type for use with
 // apply.
 func MachinePoolCondition() *MachinePoolConditionApplyConfiguration {
 	return &MachinePoolConditionApplyConfiguration{}
@@ -31,7 +31,7 @@ func MachinePoolCondition() *MachinePoolConditionApplyConfiguration {
 // WithType sets the Type field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Type field is set to the value of the last call.
-func (b *MachinePoolConditionApplyConfiguration) WithType(value v1alpha1.MachinePoolConditionType) *MachinePoolConditionApplyConfiguration {
+func (b *MachinePoolConditionApplyConfiguration) WithType(value computev1alpha1.MachinePoolConditionType) *MachinePoolConditionApplyConfiguration {
 	b.Type = &value
 	return b
 }

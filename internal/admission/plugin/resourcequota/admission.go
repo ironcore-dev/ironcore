@@ -11,8 +11,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ironcore-dev/ironcore/client-go/informers"
-	"github.com/ironcore-dev/ironcore/client-go/ironcore"
+	informers "github.com/ironcore-dev/ironcore/client-go/informers/externalversions"
+	ironcore "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned"
 	corev1alpha1listers "github.com/ironcore-dev/ironcore/client-go/listers/core/v1alpha1"
 	utilcontext "github.com/ironcore-dev/ironcore/utils/context"
 	"github.com/ironcore-dev/ironcore/utils/quota"
