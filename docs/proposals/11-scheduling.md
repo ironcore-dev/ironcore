@@ -1,5 +1,5 @@
 ---
-title: Multi-Level Scheduling
+title: Reservation-Based Scheduling
 
 oep-number: 11
 
@@ -15,10 +15,11 @@ authors:
 reviewers:
 
 - "@afritzler"
+- "@balpert89"
 
 ---
 
-# OEP-11: Multi-Level Scheduling
+# OEP-11: Reservation-Based Scheduling
 
 ## Table of Contents
 
@@ -78,8 +79,10 @@ status:
   pools: 
     - name: poolA
       rating: 2
+      state: accepting
     - name: poolB
       ratring: 1
+      state: rejecting
 ```
 
 Added `IRI` methods:
@@ -89,6 +92,19 @@ rpc ListReservations(ListReservationsRequest) returns (ListReservationsResponse)
 rpc CreateReservation(CreateReservationRequest) returns (CreateReservationResponse) {};
 rpc DeleteReservation(DeleteReservationRequest) returns (DeleteReservationResponse) {};
 ```
+
+
+### Detailed flow
+1. If `.spec.machinePoolRef` is not set, the scheduler creates a `Reservation` that includes the required resources.
+2. `poollet`s which match `.spec.pools` of `Reservation` pick it up and broker it one layer down
+3. `poriver` evaluates the `Reservation` and sets its state to `accepting` or `rejecting`, which is then propagated up the hierarchy.
+4. The scheduler will pick a `pool` on every layer and update the `.spec.machinePoolRef` of the related `Machine`
+5. Once a `Machine` reaches a `provider` with a relating `Reservation`, the `Reservation` will be replaced through 
+   the `Machine`. Deletion process of `Reservation` is initiated through setting state to `releasing`, which is 
+   propagated up.
+6. Scheduler will delete top `Reservation` which triggers deletion of all brokered `Reservation`s 
+
+
 
 ### Advantages
 - `Reservation`s can also be used to block resources for a specific use-case
@@ -111,4 +127,7 @@ If a `Machine` is created, a controller creates a related `Machine` in the centr
 
 ### Disadvantages
 - Resources are populated to central place and consistency needs to be guaranteed
+  - Updates are harder (failure of provider, overbooking)
+- Bookkeeping of resources needs to happen twice: in provider and central place 
+- Layered structure of hierarchy needs to be duplicated at central place
 - If central cluster is not reachable, no `Machine` can be placed
