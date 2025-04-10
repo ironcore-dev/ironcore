@@ -1,7 +1,7 @@
 ---
 title: Network Policies
 
-oep-number: 10
+iep-number: 10
 
 creation-date: 2023-04-13
 
@@ -18,7 +18,7 @@ reviewers:
 
 ---
 
-# OEP-10: Network Policies
+# IEP-10: Network Policies
 
 ## Table of Contents
 
@@ -38,7 +38,7 @@ communicate with the public internet (if connected). This imposes a big security
 risk which has to be properly addressed in each modern infrastructure.
 This proposal describes how to introduce network policies as a means to regulate
 traffic inside a network building upon the existing concepts that were proposed in the
-[Networking Integration OEP](01-networking-integration.md).
+[Networking Integration IEP](01-networking-integration.md).
 
 ## Motivation
 

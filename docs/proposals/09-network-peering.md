@@ -1,7 +1,7 @@
 ---
 title: Network Peering
 
-oep-number: 9
+iep-number: 9
 
 creation-date: 2023-03-17
 
@@ -18,7 +18,7 @@ reviewers:
 
 ---
 
-# OEP-9: Network Peering
+# IEP-9: Network Peering
 
 ## Table of Contents
 
@@ -35,7 +35,7 @@ Network peering is a technique used to interleave two isolated networks, allowin
 members of both networks to communicate with each other as if they were in the same
 networking domain. This proposal describes how to introduce network peering to
 `ironcore`, building upon the existing concepts that were proposed in the
-[Networking Integration OEP](01-networking-integration.md).
+[Networking Integration IEP](01-networking-integration.md).
 
 ## Motivation
 
