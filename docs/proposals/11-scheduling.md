@@ -68,8 +68,8 @@ condensed derivation of a `Machine` containing the requested resources like `Net
 `MachineClass` resource list. The `IRI` will be extended to be able to manage the `Reservation`s. Once the 
 `Reservation` hits a pool provider (e.g. `libvirt-provider`), the decision can be made if the `Reservation` can be 
 fulfilled or not. In case of accepting the `Reservation`, resources needs to be blocked until: 
-1. the reservation is being deleted 
-2. the corresponding `Machine` is being placed on the pool provider.
+1. the corresponding `Machine` is being placed on the pool provider.
+2. the reservation is being deleted 
 
 The status of the `Reservation` is being propagated up to the layer where it was created. As soon as the root 
 reservation has a populated status which contains a list of possible pools, the scheduler can pick one, set the 
@@ -117,7 +117,8 @@ The flow to assign a `Machine` to a `Pool` consists of 3 Phases:
 
 #### 1. Reservation Flow
 1. If `.spec.machinePoolRef` is not set, the scheduler creates a `Reservation` that includes the required resources.
-2. `poollet`s which match `.spec.pools` of `Reservation` pick it up and broker it one layer down
+2. `poollet`s which match `.spec.pools` of `Reservation` pick it up and broker it one layer down. If the `.spec.
+pools` is empty, it is considered as a wildcard for all pools.
 3. `provider` evaluates the `Reservation` and sets its state to `Accepted` or `Rejected`, which is then 
    propagated up the hierarchy.
 
@@ -159,4 +160,4 @@ If a `Machine` is created, a controller creates a related `Machine` in the centr
 - Bookkeeping of resources needs to happen twice: in provider and central place 
 - Layered structure of hierarchy needs to be duplicated at central place
 - If central cluster is not reachable, no `Machine` can be placed
-- No easy way to dynamicallt change pool hirarchy.
+- No easy way to dynamically change pool hierarchy.
