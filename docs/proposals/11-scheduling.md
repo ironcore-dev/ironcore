@@ -102,6 +102,12 @@ status:
       state: Rejected
 ```
 
+`Reservation` states:
+- **Accepted**: The `Reservation` can be materialized on this `pool`.
+- **Rejected**: The `Reservation` can *not* be materialized on this `pool`.
+- **Bound**: The corresponding `Machine` replaced the `Reservation` which indicates that the `Reservation` can be 
+  cleaned up.
+
 Added `IRI` methods:
 
 ```protobuf
@@ -161,3 +167,4 @@ If a `Machine` is created, a controller creates a related `Machine` in the centr
 - Layered structure of hierarchy needs to be duplicated at central place
 - If central cluster is not reachable, no `Machine` can be placed
 - No easy way to dynamically change pool hierarchy.
+- Leaf `poollet` configuration/behaviour will differ from other `poollet`s 
