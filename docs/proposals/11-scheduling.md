@@ -43,7 +43,8 @@ on every layer, which are subsequently scheduled on `MachinePool`s  in the hiera
 layer should assign a `Machine` on a `MachinePool` which can fulfill it.  This proposal addresses the known 
 limitations of the current implementation:
 - API changes needed to extend the scheduling if further resources should be considered
-- Available resources are attached to `Pools` and aggregated. In higher levels a correct decision can't be made.
+- Available resources are attached to `Pools` and aggregated. In higher levels a correct decision can't be made 
+  which means that `Machine`s are assigned to saturated `Pool`s.
 
 ### Goals
 
@@ -111,21 +112,32 @@ rpc DeleteReservation(DeleteReservationRequest) returns (DeleteReservationRespon
 
 
 ### Detailed flow
+
+The flow to assign a `Machine` to a `Pool` consists of 3 Phases:  
+
+#### 1. Reservation Flow
 1. If `.spec.machinePoolRef` is not set, the scheduler creates a `Reservation` that includes the required resources.
 2. `poollet`s which match `.spec.pools` of `Reservation` pick it up and broker it one layer down
-3. `poriver` evaluates the `Reservation` and sets its state to `accepting` or `rejecting`, which is then propagated up the hierarchy.
-4. The scheduler will pick a `pool` on every layer and update the `.spec.machinePoolRef` of the related `Machine`
-5. Once a `Machine` reaches a `provider` with a relating `Reservation`, the `Reservation` will be replaced through 
-   the `Machine`. Deletion process of `Reservation` is initiated through setting state to `releasing`, which is 
-   propagated up.
-6. Scheduler will delete top `Reservation` which triggers deletion of all brokered `Reservation`s 
+3. `provider` evaluates the `Reservation` and sets its state to `Accepted` or `Rejected`, which is then 
+   propagated up the hierarchy.
 
+#### 2. Scheduling Flow
+1. On every layer, the scheduler uses a `Reservation` corresponding to a `Machine` to select a `MachinePool`. It 
+   will pick one of the `Accepted` pools of the `Reservation.status.pools` and updates the `Machine.spec.
+   machinePoolRef`.
+2. `poollet` picks up the `Machine` since `.spec.machinePoolRef` is set
+3. Once a `Machine` reaches a `provider` with a relating `Reservation`, the `Reservation` will be replaced through
+   the `Machine`. `Reservation` status will be updated to `Bound` and `poollet`s pulls the status up until to the 
+   root `Reservation`.
 
+#### 3.  Cleanup Flow
+1. The scheduler deletes root `Reservation` if `Machine` has `.spec.machinePoolRef` and if `Reservation` has a 
+   `Bound` state.
 
 ### Advantages
-- `Reservation`s can also be used to block resources for a specific use-case
 - In case of a partial outage/network issues `Machine`s can be placed on other `Pool`s
 - `Pool`s do not leak resource information, owner of resources decides if `Reservation` can be fulfilled (less complexity for over provisioning)
+- `Reservation`s can be used to block resources without creating a `Machine`
 
 ### Disadvantages
 - Increases complexity in the scheduling by introducing a new resource (Reservation) and the scheduler flow has to be extended.
