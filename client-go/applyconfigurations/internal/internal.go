@@ -1665,6 +1665,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: state
       type:
         scalar: string
+    - name: volumeID
+      type:
+        scalar: string
 - name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeTemplateSpec
   map:
     fields:
