@@ -13,6 +13,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/ironcore-dev/controller-utils/clientutils"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
@@ -21,10 +22,10 @@ import (
 	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers/events"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
+	volumepoolletvolume "github.com/ironcore-dev/ironcore/poollet/volumepoollet/volume"
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
 
-	"github.com/ironcore-dev/controller-utils/clientutils"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -45,6 +46,7 @@ type VolumeReconciler struct {
 	Scheme *runtime.Scheme
 
 	VolumeRuntime iriVolume.RuntimeService
+	VolumeRuntimeName string
 
 	VolumeClassMapper vcm.VolumeClassMapper
 
@@ -504,6 +506,8 @@ func (r *VolumeReconciler) updateStatus(ctx context.Context, log logr.Logger, vo
 		}
 	}
 
+	volumeID := volumepoolletvolume.MakeID(r.VolumeRuntimeName, iriVolume.Metadata.Id)
+
 	base := volume.DeepCopy()
 	now := metav1.Now()
 
@@ -516,6 +520,7 @@ func (r *VolumeReconciler) updateStatus(ctx context.Context, log logr.Logger, vo
 		volume.Status.LastStateTransitionTime = &now
 	}
 	volume.Status.State = newState
+	volume.Status.VolumeID = volumeID.String()
 
 	if err := r.Status().Patch(ctx, volume, client.MergeFrom(base)); err != nil {
 		return fmt.Errorf("error patching volume status: %w", err)

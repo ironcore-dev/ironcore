@@ -5928,6 +5928,13 @@ func schema_ironcore_api_storage_v1alpha1_VolumeStatus(ref common.ReferenceCallb
 				Description: "VolumeStatus defines the observed state of Volume",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
+					"volumeID": {
+						SchemaProps: spec.SchemaProps{
+							Description: "MachineID is the provider specific volume ID in the format '<type>://<volume_id>'.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 					"state": {
 						SchemaProps: spec.SchemaProps{
 							Description: "State represents the infrastructure state of a Volume.",
@@ -14860,7 +14867,7 @@ func schema_k8sio_api_core_v1_PodSpec(ref common.ReferenceCallback) common.OpenA
 					},
 					"setHostnameAsFQDN": {
 						SchemaProps: spec.SchemaProps{
-							Description: "If true the pod's hostname will be configured as the pod's FQDN, rather than the leaf name (the default). In Linux containers, this means setting the FQDN in the hostname field of the kernel (the nodename field of struct utsname). In Windows containers, this means setting the registry value of hostname for the registry key HKEY_LOCAL_MACHINE\\\\SYSTEM\\\\CurrentControlSet\\\\Services\\\\Tcpip\\\\Parameters to FQDN. If a pod does not have FQDN, this has no effect. Default to false.",
+							Description: "If true the pod's hostname will be configured as the pod's FQDN, rather than the leaf name (the default). In Linux containers, this means setting the FQDN in the hostname field of the kernel (the nodename field of struct utsname). In Windows containers, this means setting the registry value of hostname for the registry key HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters to FQDN. If a pod does not have FQDN, this has no effect. Default to false.",
 							Type:        []string{"boolean"},
 							Format:      "",
 						},
