@@ -6,168 +6,33 @@
 package fake
 
 import (
-	"context"
-	json "encoding/json"
-	"fmt"
-
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/storage/v1alpha1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	labels "k8s.io/apimachinery/pkg/labels"
-	types "k8s.io/apimachinery/pkg/types"
-	watch "k8s.io/apimachinery/pkg/watch"
-	testing "k8s.io/client-go/testing"
+	typedstoragev1alpha1 "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned/typed/storage/v1alpha1"
+	gentype "k8s.io/client-go/gentype"
 )
 
-// FakeVolumePools implements VolumePoolInterface
-type FakeVolumePools struct {
+// fakeVolumePools implements VolumePoolInterface
+type fakeVolumePools struct {
+	*gentype.FakeClientWithListAndApply[*v1alpha1.VolumePool, *v1alpha1.VolumePoolList, *storagev1alpha1.VolumePoolApplyConfiguration]
 	Fake *FakeStorageV1alpha1
 }
 
-var volumepoolsResource = v1alpha1.SchemeGroupVersion.WithResource("volumepools")
-
-var volumepoolsKind = v1alpha1.SchemeGroupVersion.WithKind("VolumePool")
-
-// Get takes name of the volumePool, and returns the corresponding volumePool object, and an error if there is any.
-func (c *FakeVolumePools) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.VolumePool, err error) {
-	emptyResult := &v1alpha1.VolumePool{}
-	obj, err := c.Fake.
-		Invokes(testing.NewRootGetActionWithOptions(volumepoolsResource, name, options), emptyResult)
-	if obj == nil {
-		return emptyResult, err
+func newFakeVolumePools(fake *FakeStorageV1alpha1) typedstoragev1alpha1.VolumePoolInterface {
+	return &fakeVolumePools{
+		gentype.NewFakeClientWithListAndApply[*v1alpha1.VolumePool, *v1alpha1.VolumePoolList, *storagev1alpha1.VolumePoolApplyConfiguration](
+			fake.Fake,
+			"",
+			v1alpha1.SchemeGroupVersion.WithResource("volumepools"),
+			v1alpha1.SchemeGroupVersion.WithKind("VolumePool"),
+			func() *v1alpha1.VolumePool { return &v1alpha1.VolumePool{} },
+			func() *v1alpha1.VolumePoolList { return &v1alpha1.VolumePoolList{} },
+			func(dst, src *v1alpha1.VolumePoolList) { dst.ListMeta = src.ListMeta },
+			func(list *v1alpha1.VolumePoolList) []*v1alpha1.VolumePool { return gentype.ToPointerSlice(list.Items) },
+			func(list *v1alpha1.VolumePoolList, items []*v1alpha1.VolumePool) {
+				list.Items = gentype.FromPointerSlice(items)
+			},
+		),
+		fake,
 	}
-	return obj.(*v1alpha1.VolumePool), err
-}
-
-// List takes label and field selectors, and returns the list of VolumePools that match those selectors.
-func (c *FakeVolumePools) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.VolumePoolList, err error) {
-	emptyResult := &v1alpha1.VolumePoolList{}
-	obj, err := c.Fake.
-		Invokes(testing.NewRootListActionWithOptions(volumepoolsResource, volumepoolsKind, opts), emptyResult)
-	if obj == nil {
-		return emptyResult, err
-	}
-
-	label, _, _ := testing.ExtractFromListOptions(opts)
-	if label == nil {
-		label = labels.Everything()
-	}
-	list := &v1alpha1.VolumePoolList{ListMeta: obj.(*v1alpha1.VolumePoolList).ListMeta}
-	for _, item := range obj.(*v1alpha1.VolumePoolList).Items {
-		if label.Matches(labels.Set(item.Labels)) {
-			list.Items = append(list.Items, item)
-		}
-	}
-	return list, err
-}
-
-// Watch returns a watch.Interface that watches the requested volumePools.
-func (c *FakeVolumePools) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
-	return c.Fake.
-		InvokesWatch(testing.NewRootWatchActionWithOptions(volumepoolsResource, opts))
-}
-
-// Create takes the representation of a volumePool and creates it.  Returns the server's representation of the volumePool, and an error, if there is any.
-func (c *FakeVolumePools) Create(ctx context.Context, volumePool *v1alpha1.VolumePool, opts v1.CreateOptions) (result *v1alpha1.VolumePool, err error) {
-	emptyResult := &v1alpha1.VolumePool{}
-	obj, err := c.Fake.
-		Invokes(testing.NewRootCreateActionWithOptions(volumepoolsResource, volumePool, opts), emptyResult)
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.VolumePool), err
-}
-
-// Update takes the representation of a volumePool and updates it. Returns the server's representation of the volumePool, and an error, if there is any.
-func (c *FakeVolumePools) Update(ctx context.Context, volumePool *v1alpha1.VolumePool, opts v1.UpdateOptions) (result *v1alpha1.VolumePool, err error) {
-	emptyResult := &v1alpha1.VolumePool{}
-	obj, err := c.Fake.
-		Invokes(testing.NewRootUpdateActionWithOptions(volumepoolsResource, volumePool, opts), emptyResult)
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.VolumePool), err
-}
-
-// UpdateStatus was generated because the type contains a Status member.
-// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeVolumePools) UpdateStatus(ctx context.Context, volumePool *v1alpha1.VolumePool, opts v1.UpdateOptions) (result *v1alpha1.VolumePool, err error) {
-	emptyResult := &v1alpha1.VolumePool{}
-	obj, err := c.Fake.
-		Invokes(testing.NewRootUpdateSubresourceActionWithOptions(volumepoolsResource, "status", volumePool, opts), emptyResult)
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.VolumePool), err
-}
-
-// Delete takes name of the volumePool and deletes it. Returns an error if one occurs.
-func (c *FakeVolumePools) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
-	_, err := c.Fake.
-		Invokes(testing.NewRootDeleteActionWithOptions(volumepoolsResource, name, opts), &v1alpha1.VolumePool{})
-	return err
-}
-
-// DeleteCollection deletes a collection of objects.
-func (c *FakeVolumePools) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewRootDeleteCollectionActionWithOptions(volumepoolsResource, opts, listOpts)
-
-	_, err := c.Fake.Invokes(action, &v1alpha1.VolumePoolList{})
-	return err
-}
-
-// Patch applies the patch and returns the patched volumePool.
-func (c *FakeVolumePools) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.VolumePool, err error) {
-	emptyResult := &v1alpha1.VolumePool{}
-	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceActionWithOptions(volumepoolsResource, name, pt, data, opts, subresources...), emptyResult)
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.VolumePool), err
-}
-
-// Apply takes the given apply declarative configuration, applies it and returns the applied volumePool.
-func (c *FakeVolumePools) Apply(ctx context.Context, volumePool *storagev1alpha1.VolumePoolApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.VolumePool, err error) {
-	if volumePool == nil {
-		return nil, fmt.Errorf("volumePool provided to Apply must not be nil")
-	}
-	data, err := json.Marshal(volumePool)
-	if err != nil {
-		return nil, err
-	}
-	name := volumePool.Name
-	if name == nil {
-		return nil, fmt.Errorf("volumePool.Name must be provided to Apply")
-	}
-	emptyResult := &v1alpha1.VolumePool{}
-	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceActionWithOptions(volumepoolsResource, *name, types.ApplyPatchType, data, opts.ToPatchOptions()), emptyResult)
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.VolumePool), err
-}
-
-// ApplyStatus was generated because the type contains a Status member.
-// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-func (c *FakeVolumePools) ApplyStatus(ctx context.Context, volumePool *storagev1alpha1.VolumePoolApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.VolumePool, err error) {
-	if volumePool == nil {
-		return nil, fmt.Errorf("volumePool provided to Apply must not be nil")
-	}
-	data, err := json.Marshal(volumePool)
-	if err != nil {
-		return nil, err
-	}
-	name := volumePool.Name
-	if name == nil {
-		return nil, fmt.Errorf("volumePool.Name must be provided to Apply")
-	}
-	emptyResult := &v1alpha1.VolumePool{}
-	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceActionWithOptions(volumepoolsResource, *name, types.ApplyPatchType, data, opts.ToPatchOptions(), "status"), emptyResult)
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.VolumePool), err
 }

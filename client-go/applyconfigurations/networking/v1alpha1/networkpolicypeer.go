@@ -6,14 +6,14 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/core/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/core/v1alpha1"
 )
 
 // NetworkPolicyPeerApplyConfiguration represents a declarative configuration of the NetworkPolicyPeer type for use
 // with apply.
 type NetworkPolicyPeerApplyConfiguration struct {
-	ObjectSelector *v1alpha1.ObjectSelectorApplyConfiguration `json:"objectSelector,omitempty"`
-	IPBlock        *IPBlockApplyConfiguration                 `json:"ipBlock,omitempty"`
+	ObjectSelector *corev1alpha1.ObjectSelectorApplyConfiguration `json:"objectSelector,omitempty"`
+	IPBlock        *IPBlockApplyConfiguration                     `json:"ipBlock,omitempty"`
 }
 
 // NetworkPolicyPeerApplyConfiguration constructs a declarative configuration of the NetworkPolicyPeer type for use with
@@ -25,7 +25,7 @@ func NetworkPolicyPeer() *NetworkPolicyPeerApplyConfiguration {
 // WithObjectSelector sets the ObjectSelector field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the ObjectSelector field is set to the value of the last call.
-func (b *NetworkPolicyPeerApplyConfiguration) WithObjectSelector(value *v1alpha1.ObjectSelectorApplyConfiguration) *NetworkPolicyPeerApplyConfiguration {
+func (b *NetworkPolicyPeerApplyConfiguration) WithObjectSelector(value *corev1alpha1.ObjectSelectorApplyConfiguration) *NetworkPolicyPeerApplyConfiguration {
 	b.ObjectSelector = value
 	return b
 }

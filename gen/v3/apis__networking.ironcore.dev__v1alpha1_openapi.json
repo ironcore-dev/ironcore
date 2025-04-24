@@ -578,6 +578,15 @@
 						}
 					},
 					{
+						"name": "ignoreStoreReadErrorWithClusterBreakingPotential",
+						"in": "query",
+						"description": "if set to true, it will trigger an unsafe deletion of the resource in case the normal deletion flow fails with a corrupt object error. A resource is considered corrupt if it can not be retrieved from the underlying storage successfully because of a) its data can not be transformed e.g. decryption failure, or b) it fails to decode into an object. NOTE: unsafe deletion ignores finalizer constraints, skips precondition checks, and removes the object from the storage. WARNING: This may potentially break the cluster if the workload associated with the resource being unsafe-deleted relies on normal deletion flow. Use only if you REALLY know what you are doing. The default value is false, and the user must opt in to enable it",
+						"schema": {
+							"type": "boolean",
+							"uniqueItems": true
+						}
+					},
+					{
 						"name": "labelSelector",
 						"in": "query",
 						"description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
@@ -842,6 +851,15 @@
 						"description": "The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately.",
 						"schema": {
 							"type": "integer",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "ignoreStoreReadErrorWithClusterBreakingPotential",
+						"in": "query",
+						"description": "if set to true, it will trigger an unsafe deletion of the resource in case the normal deletion flow fails with a corrupt object error. A resource is considered corrupt if it can not be retrieved from the underlying storage successfully because of a) its data can not be transformed e.g. decryption failure, or b) it fails to decode into an object. NOTE: unsafe deletion ignores finalizer constraints, skips precondition checks, and removes the object from the storage. WARNING: This may potentially break the cluster if the workload associated with the resource being unsafe-deleted relies on normal deletion flow. Use only if you REALLY know what you are doing. The default value is false, and the user must opt in to enable it",
+						"schema": {
+							"type": "boolean",
 							"uniqueItems": true
 						}
 					},
@@ -1323,6 +1341,15 @@
 						}
 					},
 					{
+						"name": "ignoreStoreReadErrorWithClusterBreakingPotential",
+						"in": "query",
+						"description": "if set to true, it will trigger an unsafe deletion of the resource in case the normal deletion flow fails with a corrupt object error. A resource is considered corrupt if it can not be retrieved from the underlying storage successfully because of a) its data can not be transformed e.g. decryption failure, or b) it fails to decode into an object. NOTE: unsafe deletion ignores finalizer constraints, skips precondition checks, and removes the object from the storage. WARNING: This may potentially break the cluster if the workload associated with the resource being unsafe-deleted relies on normal deletion flow. Use only if you REALLY know what you are doing. The default value is false, and the user must opt in to enable it",
+						"schema": {
+							"type": "boolean",
+							"uniqueItems": true
+						}
+					},
+					{
 						"name": "labelSelector",
 						"in": "query",
 						"description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
@@ -1587,6 +1614,15 @@
 						"description": "The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately.",
 						"schema": {
 							"type": "integer",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "ignoreStoreReadErrorWithClusterBreakingPotential",
+						"in": "query",
+						"description": "if set to true, it will trigger an unsafe deletion of the resource in case the normal deletion flow fails with a corrupt object error. A resource is considered corrupt if it can not be retrieved from the underlying storage successfully because of a) its data can not be transformed e.g. decryption failure, or b) it fails to decode into an object. NOTE: unsafe deletion ignores finalizer constraints, skips precondition checks, and removes the object from the storage. WARNING: This may potentially break the cluster if the workload associated with the resource being unsafe-deleted relies on normal deletion flow. Use only if you REALLY know what you are doing. The default value is false, and the user must opt in to enable it",
+						"schema": {
+							"type": "boolean",
 							"uniqueItems": true
 						}
 					},
@@ -2323,6 +2359,15 @@
 						}
 					},
 					{
+						"name": "ignoreStoreReadErrorWithClusterBreakingPotential",
+						"in": "query",
+						"description": "if set to true, it will trigger an unsafe deletion of the resource in case the normal deletion flow fails with a corrupt object error. A resource is considered corrupt if it can not be retrieved from the underlying storage successfully because of a) its data can not be transformed e.g. decryption failure, or b) it fails to decode into an object. NOTE: unsafe deletion ignores finalizer constraints, skips precondition checks, and removes the object from the storage. WARNING: This may potentially break the cluster if the workload associated with the resource being unsafe-deleted relies on normal deletion flow. Use only if you REALLY know what you are doing. The default value is false, and the user must opt in to enable it",
+						"schema": {
+							"type": "boolean",
+							"uniqueItems": true
+						}
+					},
+					{
 						"name": "labelSelector",
 						"in": "query",
 						"description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
@@ -2587,6 +2632,15 @@
 						"description": "The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately.",
 						"schema": {
 							"type": "integer",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "ignoreStoreReadErrorWithClusterBreakingPotential",
+						"in": "query",
+						"description": "if set to true, it will trigger an unsafe deletion of the resource in case the normal deletion flow fails with a corrupt object error. A resource is considered corrupt if it can not be retrieved from the underlying storage successfully because of a) its data can not be transformed e.g. decryption failure, or b) it fails to decode into an object. NOTE: unsafe deletion ignores finalizer constraints, skips precondition checks, and removes the object from the storage. WARNING: This may potentially break the cluster if the workload associated with the resource being unsafe-deleted relies on normal deletion flow. Use only if you REALLY know what you are doing. The default value is false, and the user must opt in to enable it",
+						"schema": {
+							"type": "boolean",
 							"uniqueItems": true
 						}
 					},
@@ -3323,6 +3377,15 @@
 						}
 					},
 					{
+						"name": "ignoreStoreReadErrorWithClusterBreakingPotential",
+						"in": "query",
+						"description": "if set to true, it will trigger an unsafe deletion of the resource in case the normal deletion flow fails with a corrupt object error. A resource is considered corrupt if it can not be retrieved from the underlying storage successfully because of a) its data can not be transformed e.g. decryption failure, or b) it fails to decode into an object. NOTE: unsafe deletion ignores finalizer constraints, skips precondition checks, and removes the object from the storage. WARNING: This may potentially break the cluster if the workload associated with the resource being unsafe-deleted relies on normal deletion flow. Use only if you REALLY know what you are doing. The default value is false, and the user must opt in to enable it",
+						"schema": {
+							"type": "boolean",
+							"uniqueItems": true
+						}
+					},
+					{
 						"name": "labelSelector",
 						"in": "query",
 						"description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
@@ -3587,6 +3650,15 @@
 						"description": "The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately.",
 						"schema": {
 							"type": "integer",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "ignoreStoreReadErrorWithClusterBreakingPotential",
+						"in": "query",
+						"description": "if set to true, it will trigger an unsafe deletion of the resource in case the normal deletion flow fails with a corrupt object error. A resource is considered corrupt if it can not be retrieved from the underlying storage successfully because of a) its data can not be transformed e.g. decryption failure, or b) it fails to decode into an object. NOTE: unsafe deletion ignores finalizer constraints, skips precondition checks, and removes the object from the storage. WARNING: This may potentially break the cluster if the workload associated with the resource being unsafe-deleted relies on normal deletion flow. Use only if you REALLY know what you are doing. The default value is false, and the user must opt in to enable it",
+						"schema": {
+							"type": "boolean",
 							"uniqueItems": true
 						}
 					},
@@ -4323,6 +4395,15 @@
 						}
 					},
 					{
+						"name": "ignoreStoreReadErrorWithClusterBreakingPotential",
+						"in": "query",
+						"description": "if set to true, it will trigger an unsafe deletion of the resource in case the normal deletion flow fails with a corrupt object error. A resource is considered corrupt if it can not be retrieved from the underlying storage successfully because of a) its data can not be transformed e.g. decryption failure, or b) it fails to decode into an object. NOTE: unsafe deletion ignores finalizer constraints, skips precondition checks, and removes the object from the storage. WARNING: This may potentially break the cluster if the workload associated with the resource being unsafe-deleted relies on normal deletion flow. Use only if you REALLY know what you are doing. The default value is false, and the user must opt in to enable it",
+						"schema": {
+							"type": "boolean",
+							"uniqueItems": true
+						}
+					},
+					{
 						"name": "labelSelector",
 						"in": "query",
 						"description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
@@ -4587,6 +4668,15 @@
 						"description": "The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately.",
 						"schema": {
 							"type": "integer",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "ignoreStoreReadErrorWithClusterBreakingPotential",
+						"in": "query",
+						"description": "if set to true, it will trigger an unsafe deletion of the resource in case the normal deletion flow fails with a corrupt object error. A resource is considered corrupt if it can not be retrieved from the underlying storage successfully because of a) its data can not be transformed e.g. decryption failure, or b) it fails to decode into an object. NOTE: unsafe deletion ignores finalizer constraints, skips precondition checks, and removes the object from the storage. WARNING: This may potentially break the cluster if the workload associated with the resource being unsafe-deleted relies on normal deletion flow. Use only if you REALLY know what you are doing. The default value is false, and the user must opt in to enable it",
+						"schema": {
+							"type": "boolean",
 							"uniqueItems": true
 						}
 					},
@@ -5323,6 +5413,15 @@
 						}
 					},
 					{
+						"name": "ignoreStoreReadErrorWithClusterBreakingPotential",
+						"in": "query",
+						"description": "if set to true, it will trigger an unsafe deletion of the resource in case the normal deletion flow fails with a corrupt object error. A resource is considered corrupt if it can not be retrieved from the underlying storage successfully because of a) its data can not be transformed e.g. decryption failure, or b) it fails to decode into an object. NOTE: unsafe deletion ignores finalizer constraints, skips precondition checks, and removes the object from the storage. WARNING: This may potentially break the cluster if the workload associated with the resource being unsafe-deleted relies on normal deletion flow. Use only if you REALLY know what you are doing. The default value is false, and the user must opt in to enable it",
+						"schema": {
+							"type": "boolean",
+							"uniqueItems": true
+						}
+					},
+					{
 						"name": "labelSelector",
 						"in": "query",
 						"description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
@@ -5587,6 +5686,15 @@
 						"description": "The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately.",
 						"schema": {
 							"type": "integer",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "ignoreStoreReadErrorWithClusterBreakingPotential",
+						"in": "query",
+						"description": "if set to true, it will trigger an unsafe deletion of the resource in case the normal deletion flow fails with a corrupt object error. A resource is considered corrupt if it can not be retrieved from the underlying storage successfully because of a) its data can not be transformed e.g. decryption failure, or b) it fails to decode into an object. NOTE: unsafe deletion ignores finalizer constraints, skips precondition checks, and removes the object from the storage. WARNING: This may potentially break the cluster if the workload associated with the resource being unsafe-deleted relies on normal deletion flow. Use only if you REALLY know what you are doing. The default value is false, and the user must opt in to enable it",
+						"schema": {
+							"type": "boolean",
 							"uniqueItems": true
 						}
 					},
@@ -6323,6 +6431,15 @@
 						}
 					},
 					{
+						"name": "ignoreStoreReadErrorWithClusterBreakingPotential",
+						"in": "query",
+						"description": "if set to true, it will trigger an unsafe deletion of the resource in case the normal deletion flow fails with a corrupt object error. A resource is considered corrupt if it can not be retrieved from the underlying storage successfully because of a) its data can not be transformed e.g. decryption failure, or b) it fails to decode into an object. NOTE: unsafe deletion ignores finalizer constraints, skips precondition checks, and removes the object from the storage. WARNING: This may potentially break the cluster if the workload associated with the resource being unsafe-deleted relies on normal deletion flow. Use only if you REALLY know what you are doing. The default value is false, and the user must opt in to enable it",
+						"schema": {
+							"type": "boolean",
+							"uniqueItems": true
+						}
+					},
+					{
 						"name": "labelSelector",
 						"in": "query",
 						"description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
@@ -6587,6 +6704,15 @@
 						"description": "The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately.",
 						"schema": {
 							"type": "integer",
+							"uniqueItems": true
+						}
+					},
+					{
+						"name": "ignoreStoreReadErrorWithClusterBreakingPotential",
+						"in": "query",
+						"description": "if set to true, it will trigger an unsafe deletion of the resource in case the normal deletion flow fails with a corrupt object error. A resource is considered corrupt if it can not be retrieved from the underlying storage successfully because of a) its data can not be transformed e.g. decryption failure, or b) it fails to decode into an object. NOTE: unsafe deletion ignores finalizer constraints, skips precondition checks, and removes the object from the storage. WARNING: This may potentially break the cluster if the workload associated with the resource being unsafe-deleted relies on normal deletion flow. Use only if you REALLY know what you are doing. The default value is false, and the user must opt in to enable it",
+						"schema": {
+							"type": "boolean",
 							"uniqueItems": true
 						}
 					},
@@ -11012,6 +11138,42 @@
 					}
 				}
 			},
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.EphemeralVirtualIPSpec": {
+				"type": "object",
+				"required": [
+					"type",
+					"ipFamily"
+				],
+				"properties": {
+					"ipFamily": {
+						"description": "IPFamily is the ip family of the VirtualIP.\n\nPossible enum values:\n - `\"\"` indicates that this IP is unknown protocol\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
+						"type": "string",
+						"default": "",
+						"enum": [
+							"",
+							"IPv4",
+							"IPv6"
+						]
+					},
+					"reclaimPolicy": {
+						"description": "ReclaimPolicy is the ReclaimPolicyType of virtualIP",
+						"type": "string"
+					},
+					"targetRef": {
+						"description": "TargetRef references the target for this VirtualIP (currently only NetworkInterface).",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.LocalUIDReference"
+							}
+						]
+					},
+					"type": {
+						"description": "Type is the type of VirtualIP.",
+						"type": "string",
+						"default": ""
+					}
+				}
+			},
 			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.IPBlock": {
 				"description": "IPBlock specifies an ip block with optional exceptions.",
 				"type": "object",
@@ -12522,7 +12684,7 @@
 				}
 			},
 			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPSpec": {
-				"description": "VirtualIPSpec defines the desired state of VirtualIP",
+				"description": "VirtualIPSpec defines the desired state of a VirtualIP",
 				"type": "object",
 				"required": [
 					"type",
@@ -12584,7 +12746,7 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPSpec"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.EphemeralVirtualIPSpec"
 							}
 						]
 					}
@@ -12737,6 +12899,10 @@
 						"description": "The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately.",
 						"type": "integer",
 						"format": "int64"
+					},
+					"ignoreStoreReadErrorWithClusterBreakingPotential": {
+						"description": "if set to true, it will trigger an unsafe deletion of the resource in case the normal deletion flow fails with a corrupt object error. A resource is considered corrupt if it can not be retrieved from the underlying storage successfully because of a) its data can not be transformed e.g. decryption failure, or b) it fails to decode into an object. NOTE: unsafe deletion ignores finalizer constraints, skips precondition checks, and removes the object from the storage. WARNING: This may potentially break the cluster if the workload associated with the resource being unsafe-deleted relies on normal deletion flow. Use only if you REALLY know what you are doing. The default value is false, and the user must opt in to enable it",
+						"type": "boolean"
 					},
 					"kind": {
 						"description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",

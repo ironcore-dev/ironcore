@@ -9,13 +9,13 @@ status: implementable
 
 authors:
 
-- @lukasfrank
-- @gehoern
+- "@lukasfrank"
+- "@gehoern"
 
 reviewers:
 
-- @adracus
-- @MalteJ
+- "@adracus"
+- "@MalteJ"
 
 ---
 

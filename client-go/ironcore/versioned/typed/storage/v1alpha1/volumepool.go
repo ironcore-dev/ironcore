@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/storage/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	applyconfigurationsstoragev1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/storage/v1alpha1"
 	scheme "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -25,36 +25,37 @@ type VolumePoolsGetter interface {
 
 // VolumePoolInterface has methods to work with VolumePool resources.
 type VolumePoolInterface interface {
-	Create(ctx context.Context, volumePool *v1alpha1.VolumePool, opts v1.CreateOptions) (*v1alpha1.VolumePool, error)
-	Update(ctx context.Context, volumePool *v1alpha1.VolumePool, opts v1.UpdateOptions) (*v1alpha1.VolumePool, error)
+	Create(ctx context.Context, volumePool *storagev1alpha1.VolumePool, opts v1.CreateOptions) (*storagev1alpha1.VolumePool, error)
+	Update(ctx context.Context, volumePool *storagev1alpha1.VolumePool, opts v1.UpdateOptions) (*storagev1alpha1.VolumePool, error)
 	// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-	UpdateStatus(ctx context.Context, volumePool *v1alpha1.VolumePool, opts v1.UpdateOptions) (*v1alpha1.VolumePool, error)
+	UpdateStatus(ctx context.Context, volumePool *storagev1alpha1.VolumePool, opts v1.UpdateOptions) (*storagev1alpha1.VolumePool, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
-	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.VolumePool, error)
-	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.VolumePoolList, error)
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*storagev1alpha1.VolumePool, error)
+	List(ctx context.Context, opts v1.ListOptions) (*storagev1alpha1.VolumePoolList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
-	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.VolumePool, err error)
-	Apply(ctx context.Context, volumePool *storagev1alpha1.VolumePoolApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.VolumePool, err error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *storagev1alpha1.VolumePool, err error)
+	Apply(ctx context.Context, volumePool *applyconfigurationsstoragev1alpha1.VolumePoolApplyConfiguration, opts v1.ApplyOptions) (result *storagev1alpha1.VolumePool, err error)
 	// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-	ApplyStatus(ctx context.Context, volumePool *storagev1alpha1.VolumePoolApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.VolumePool, err error)
+	ApplyStatus(ctx context.Context, volumePool *applyconfigurationsstoragev1alpha1.VolumePoolApplyConfiguration, opts v1.ApplyOptions) (result *storagev1alpha1.VolumePool, err error)
 	VolumePoolExpansion
 }
 
 // volumePools implements VolumePoolInterface
 type volumePools struct {
-	*gentype.ClientWithListAndApply[*v1alpha1.VolumePool, *v1alpha1.VolumePoolList, *storagev1alpha1.VolumePoolApplyConfiguration]
+	*gentype.ClientWithListAndApply[*storagev1alpha1.VolumePool, *storagev1alpha1.VolumePoolList, *applyconfigurationsstoragev1alpha1.VolumePoolApplyConfiguration]
 }
 
 // newVolumePools returns a VolumePools
 func newVolumePools(c *StorageV1alpha1Client) *volumePools {
 	return &volumePools{
-		gentype.NewClientWithListAndApply[*v1alpha1.VolumePool, *v1alpha1.VolumePoolList, *storagev1alpha1.VolumePoolApplyConfiguration](
+		gentype.NewClientWithListAndApply[*storagev1alpha1.VolumePool, *storagev1alpha1.VolumePoolList, *applyconfigurationsstoragev1alpha1.VolumePoolApplyConfiguration](
 			"volumepools",
 			c.RESTClient(),
 			scheme.ParameterCodec,
 			"",
-			func() *v1alpha1.VolumePool { return &v1alpha1.VolumePool{} },
-			func() *v1alpha1.VolumePoolList { return &v1alpha1.VolumePoolList{} }),
+			func() *storagev1alpha1.VolumePool { return &storagev1alpha1.VolumePool{} },
+			func() *storagev1alpha1.VolumePoolList { return &storagev1alpha1.VolumePoolList{} },
+		),
 	}
 }

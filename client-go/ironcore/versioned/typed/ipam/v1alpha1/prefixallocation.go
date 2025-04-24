@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
-	ipamv1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/ipam/v1alpha1"
+	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
+	applyconfigurationsipamv1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/ipam/v1alpha1"
 	scheme "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -25,36 +25,37 @@ type PrefixAllocationsGetter interface {
 
 // PrefixAllocationInterface has methods to work with PrefixAllocation resources.
 type PrefixAllocationInterface interface {
-	Create(ctx context.Context, prefixAllocation *v1alpha1.PrefixAllocation, opts v1.CreateOptions) (*v1alpha1.PrefixAllocation, error)
-	Update(ctx context.Context, prefixAllocation *v1alpha1.PrefixAllocation, opts v1.UpdateOptions) (*v1alpha1.PrefixAllocation, error)
+	Create(ctx context.Context, prefixAllocation *ipamv1alpha1.PrefixAllocation, opts v1.CreateOptions) (*ipamv1alpha1.PrefixAllocation, error)
+	Update(ctx context.Context, prefixAllocation *ipamv1alpha1.PrefixAllocation, opts v1.UpdateOptions) (*ipamv1alpha1.PrefixAllocation, error)
 	// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-	UpdateStatus(ctx context.Context, prefixAllocation *v1alpha1.PrefixAllocation, opts v1.UpdateOptions) (*v1alpha1.PrefixAllocation, error)
+	UpdateStatus(ctx context.Context, prefixAllocation *ipamv1alpha1.PrefixAllocation, opts v1.UpdateOptions) (*ipamv1alpha1.PrefixAllocation, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
-	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.PrefixAllocation, error)
-	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.PrefixAllocationList, error)
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*ipamv1alpha1.PrefixAllocation, error)
+	List(ctx context.Context, opts v1.ListOptions) (*ipamv1alpha1.PrefixAllocationList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
-	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.PrefixAllocation, err error)
-	Apply(ctx context.Context, prefixAllocation *ipamv1alpha1.PrefixAllocationApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.PrefixAllocation, err error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *ipamv1alpha1.PrefixAllocation, err error)
+	Apply(ctx context.Context, prefixAllocation *applyconfigurationsipamv1alpha1.PrefixAllocationApplyConfiguration, opts v1.ApplyOptions) (result *ipamv1alpha1.PrefixAllocation, err error)
 	// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-	ApplyStatus(ctx context.Context, prefixAllocation *ipamv1alpha1.PrefixAllocationApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.PrefixAllocation, err error)
+	ApplyStatus(ctx context.Context, prefixAllocation *applyconfigurationsipamv1alpha1.PrefixAllocationApplyConfiguration, opts v1.ApplyOptions) (result *ipamv1alpha1.PrefixAllocation, err error)
 	PrefixAllocationExpansion
 }
 
 // prefixAllocations implements PrefixAllocationInterface
 type prefixAllocations struct {
-	*gentype.ClientWithListAndApply[*v1alpha1.PrefixAllocation, *v1alpha1.PrefixAllocationList, *ipamv1alpha1.PrefixAllocationApplyConfiguration]
+	*gentype.ClientWithListAndApply[*ipamv1alpha1.PrefixAllocation, *ipamv1alpha1.PrefixAllocationList, *applyconfigurationsipamv1alpha1.PrefixAllocationApplyConfiguration]
 }
 
 // newPrefixAllocations returns a PrefixAllocations
 func newPrefixAllocations(c *IpamV1alpha1Client, namespace string) *prefixAllocations {
 	return &prefixAllocations{
-		gentype.NewClientWithListAndApply[*v1alpha1.PrefixAllocation, *v1alpha1.PrefixAllocationList, *ipamv1alpha1.PrefixAllocationApplyConfiguration](
+		gentype.NewClientWithListAndApply[*ipamv1alpha1.PrefixAllocation, *ipamv1alpha1.PrefixAllocationList, *applyconfigurationsipamv1alpha1.PrefixAllocationApplyConfiguration](
 			"prefixallocations",
 			c.RESTClient(),
 			scheme.ParameterCodec,
 			namespace,
-			func() *v1alpha1.PrefixAllocation { return &v1alpha1.PrefixAllocation{} },
-			func() *v1alpha1.PrefixAllocationList { return &v1alpha1.PrefixAllocationList{} }),
+			func() *ipamv1alpha1.PrefixAllocation { return &ipamv1alpha1.PrefixAllocation{} },
+			func() *ipamv1alpha1.PrefixAllocationList { return &ipamv1alpha1.PrefixAllocationList{} },
+		),
 	}
 }

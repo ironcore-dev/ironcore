@@ -63,7 +63,7 @@ func setExecHandlerOptionsDefaults(o *ExecHandlerOptions) {
 		o.SupportedStreamProtocols = remotecommandconsts.SupportedStreamingProtocols
 	}
 	if o.StreamIdleTimeout == 0 {
-		o.StreamCreationTimeout = 4 * time.Hour
+		o.StreamIdleTimeout = 4 * time.Hour
 	}
 	if o.StreamCreationTimeout == 0 {
 		o.StreamCreationTimeout = remotecommandconsts.DefaultStreamCreationTimeout

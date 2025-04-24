@@ -9,15 +9,15 @@ status: implementable
 
 authors:
 
-- @gehoern
-- @adracus
+- "@gehoern"
+- "@adracus"
 
 reviewers:
 
-- @MalteJ
-- @adracus
-- @afritzler
-- @guvenc
+- "@MalteJ"
+- "@adracus"
+- "@afritzler"
+- "@guvenc"
 
 ---
 

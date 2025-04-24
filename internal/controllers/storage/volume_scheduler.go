@@ -148,7 +148,7 @@ func (s *VolumeScheduler) reconcileExists(ctx context.Context, log logr.Logger, 
 
 	nodes := s.snapshot.ListNodes()
 	if len(nodes) == 0 {
-		s.EventRecorder.Event(volume, corev1.EventTypeNormal, outOfCapacity, "No nodes available to schedule volume on")
+		s.Event(volume, corev1.EventTypeNormal, outOfCapacity, "No nodes available to schedule volume on")
 		return ctrl.Result{}, nil
 	}
 
@@ -171,7 +171,7 @@ func (s *VolumeScheduler) reconcileExists(ctx context.Context, log logr.Logger, 
 	}
 
 	if len(filteredNodes) == 0 {
-		s.EventRecorder.Event(volume, corev1.EventTypeNormal, outOfCapacity, "No nodes available after filtering to schedule volume on")
+		s.Event(volume, corev1.EventTypeNormal, outOfCapacity, "No nodes available after filtering to schedule volume on")
 		return ctrl.Result{}, nil
 	}
 

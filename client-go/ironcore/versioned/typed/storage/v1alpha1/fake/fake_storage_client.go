@@ -16,27 +16,27 @@ type FakeStorageV1alpha1 struct {
 }
 
 func (c *FakeStorageV1alpha1) Buckets(namespace string) v1alpha1.BucketInterface {
-	return &FakeBuckets{c, namespace}
+	return newFakeBuckets(c, namespace)
 }
 
 func (c *FakeStorageV1alpha1) BucketClasses() v1alpha1.BucketClassInterface {
-	return &FakeBucketClasses{c}
+	return newFakeBucketClasses(c)
 }
 
 func (c *FakeStorageV1alpha1) BucketPools() v1alpha1.BucketPoolInterface {
-	return &FakeBucketPools{c}
+	return newFakeBucketPools(c)
 }
 
 func (c *FakeStorageV1alpha1) Volumes(namespace string) v1alpha1.VolumeInterface {
-	return &FakeVolumes{c, namespace}
+	return newFakeVolumes(c, namespace)
 }
 
 func (c *FakeStorageV1alpha1) VolumeClasses() v1alpha1.VolumeClassInterface {
-	return &FakeVolumeClasses{c}
+	return newFakeVolumeClasses(c)
 }
 
 func (c *FakeStorageV1alpha1) VolumePools() v1alpha1.VolumePoolInterface {
-	return &FakeVolumePools{c}
+	return newFakeVolumePools(c)
 }
 
 // RESTClient returns a RESTClient that is used to communicate

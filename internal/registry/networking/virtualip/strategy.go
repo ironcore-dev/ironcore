@@ -83,6 +83,19 @@ func (virtualIPStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Ob
 	return validation.ValidateVirtualIPUpdate(newVirtualIP, oldVirtualIP)
 }
 
+func (virtualIPStrategy) ValidateDelete(ctx context.Context, obj runtime.Object) field.ErrorList {
+	virtualIP := obj.(*networking.VirtualIP)
+	var allerr field.ErrorList
+	// Check if the VirtualIP has a TargetRef set
+	if virtualIP.Spec.TargetRef != nil {
+		// Return a validation error preventing deletion
+		err := field.Forbidden(field.NewPath("spec", "targetRef"), "deletion is not allowed while TargetRef is set")
+		allerr = append(allerr, err)
+	}
+	return allerr
+
+}
+
 func (virtualIPStrategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {
 	return nil
 }

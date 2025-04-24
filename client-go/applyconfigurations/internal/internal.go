@@ -6,8 +6,8 @@
 package internal
 
 import (
-	"fmt"
-	"sync"
+	fmt "fmt"
+	sync "sync"
 
 	typed "sigs.k8s.io/structured-merge-diff/v4/typed"
 )
@@ -698,6 +698,23 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: virtualIPTemplate
       type:
         namedType: com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPTemplateSpec
+- name: com.github.ironcore-dev.ironcore.api.networking.v1alpha1.EphemeralVirtualIPSpec
+  map:
+    fields:
+    - name: ipFamily
+      type:
+        scalar: string
+      default: ""
+    - name: reclaimPolicy
+      type:
+        scalar: string
+    - name: targetRef
+      type:
+        namedType: com.github.ironcore-dev.ironcore.api.common.v1alpha1.LocalUIDReference
+    - name: type
+      type:
+        scalar: string
+      default: ""
 - name: com.github.ironcore-dev.ironcore.api.networking.v1alpha1.IPBlock
   map:
     fields:
@@ -1324,7 +1341,7 @@ var schemaYAML = typed.YAMLObject(`types:
       default: {}
     - name: spec
       type:
-        namedType: com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPSpec
+        namedType: com.github.ironcore-dev.ironcore.api.networking.v1alpha1.EphemeralVirtualIPSpec
       default: {}
 - name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket
   map:

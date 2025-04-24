@@ -6,13 +6,13 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	apistoragev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	internalinterfaces "github.com/ironcore-dev/ironcore/client-go/informers/externalversions/internalinterfaces"
 	versioned "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned"
-	v1alpha1 "github.com/ironcore-dev/ironcore/client-go/listers/storage/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/client-go/listers/storage/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
@@ -23,7 +23,7 @@ import (
 // VolumeClasses.
 type VolumeClassInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.VolumeClassLister
+	Lister() storagev1alpha1.VolumeClassLister
 }
 
 type volumeClassInformer struct {
@@ -57,7 +57,7 @@ func NewFilteredVolumeClassInformer(client versioned.Interface, resyncPeriod tim
 				return client.StorageV1alpha1().VolumeClasses().Watch(context.TODO(), options)
 			},
 		},
-		&storagev1alpha1.VolumeClass{},
+		&apistoragev1alpha1.VolumeClass{},
 		resyncPeriod,
 		indexers,
 	)
@@ -68,9 +68,9 @@ func (f *volumeClassInformer) defaultInformer(client versioned.Interface, resync
 }
 
 func (f *volumeClassInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&storagev1alpha1.VolumeClass{}, f.defaultInformer)
+	return f.factory.InformerFor(&apistoragev1alpha1.VolumeClass{}, f.defaultInformer)
 }
 
-func (f *volumeClassInformer) Lister() v1alpha1.VolumeClassLister {
-	return v1alpha1.NewVolumeClassLister(f.Informer().GetIndexer())
+func (f *volumeClassInformer) Lister() storagev1alpha1.VolumeClassLister {
+	return storagev1alpha1.NewVolumeClassLister(f.Informer().GetIndexer())
 }

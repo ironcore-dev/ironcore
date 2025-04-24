@@ -42,6 +42,8 @@ type BrokerLabel struct {
 }
 
 type Server struct {
+	iri.UnimplementedMachineRuntimeServer
+
 	baseURL *url.URL
 
 	brokerDownwardAPILabels map[string]string

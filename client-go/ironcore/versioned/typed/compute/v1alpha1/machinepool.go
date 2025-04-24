@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	computev1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/compute/v1alpha1"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	applyconfigurationscomputev1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/compute/v1alpha1"
 	scheme "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -25,36 +25,37 @@ type MachinePoolsGetter interface {
 
 // MachinePoolInterface has methods to work with MachinePool resources.
 type MachinePoolInterface interface {
-	Create(ctx context.Context, machinePool *v1alpha1.MachinePool, opts v1.CreateOptions) (*v1alpha1.MachinePool, error)
-	Update(ctx context.Context, machinePool *v1alpha1.MachinePool, opts v1.UpdateOptions) (*v1alpha1.MachinePool, error)
+	Create(ctx context.Context, machinePool *computev1alpha1.MachinePool, opts v1.CreateOptions) (*computev1alpha1.MachinePool, error)
+	Update(ctx context.Context, machinePool *computev1alpha1.MachinePool, opts v1.UpdateOptions) (*computev1alpha1.MachinePool, error)
 	// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-	UpdateStatus(ctx context.Context, machinePool *v1alpha1.MachinePool, opts v1.UpdateOptions) (*v1alpha1.MachinePool, error)
+	UpdateStatus(ctx context.Context, machinePool *computev1alpha1.MachinePool, opts v1.UpdateOptions) (*computev1alpha1.MachinePool, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
-	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.MachinePool, error)
-	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.MachinePoolList, error)
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*computev1alpha1.MachinePool, error)
+	List(ctx context.Context, opts v1.ListOptions) (*computev1alpha1.MachinePoolList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
-	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.MachinePool, err error)
-	Apply(ctx context.Context, machinePool *computev1alpha1.MachinePoolApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.MachinePool, err error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *computev1alpha1.MachinePool, err error)
+	Apply(ctx context.Context, machinePool *applyconfigurationscomputev1alpha1.MachinePoolApplyConfiguration, opts v1.ApplyOptions) (result *computev1alpha1.MachinePool, err error)
 	// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-	ApplyStatus(ctx context.Context, machinePool *computev1alpha1.MachinePoolApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.MachinePool, err error)
+	ApplyStatus(ctx context.Context, machinePool *applyconfigurationscomputev1alpha1.MachinePoolApplyConfiguration, opts v1.ApplyOptions) (result *computev1alpha1.MachinePool, err error)
 	MachinePoolExpansion
 }
 
 // machinePools implements MachinePoolInterface
 type machinePools struct {
-	*gentype.ClientWithListAndApply[*v1alpha1.MachinePool, *v1alpha1.MachinePoolList, *computev1alpha1.MachinePoolApplyConfiguration]
+	*gentype.ClientWithListAndApply[*computev1alpha1.MachinePool, *computev1alpha1.MachinePoolList, *applyconfigurationscomputev1alpha1.MachinePoolApplyConfiguration]
 }
 
 // newMachinePools returns a MachinePools
 func newMachinePools(c *ComputeV1alpha1Client) *machinePools {
 	return &machinePools{
-		gentype.NewClientWithListAndApply[*v1alpha1.MachinePool, *v1alpha1.MachinePoolList, *computev1alpha1.MachinePoolApplyConfiguration](
+		gentype.NewClientWithListAndApply[*computev1alpha1.MachinePool, *computev1alpha1.MachinePoolList, *applyconfigurationscomputev1alpha1.MachinePoolApplyConfiguration](
 			"machinepools",
 			c.RESTClient(),
 			scheme.ParameterCodec,
 			"",
-			func() *v1alpha1.MachinePool { return &v1alpha1.MachinePool{} },
-			func() *v1alpha1.MachinePoolList { return &v1alpha1.MachinePoolList{} }),
+			func() *computev1alpha1.MachinePool { return &computev1alpha1.MachinePool{} },
+			func() *computev1alpha1.MachinePoolList { return &computev1alpha1.MachinePoolList{} },
+		),
 	}
 }

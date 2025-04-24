@@ -103,7 +103,7 @@ func (s *MachineScheduler) reconcileExists(ctx context.Context, log logr.Logger,
 
 	nodes := s.snapshot.ListNodes()
 	if len(nodes) == 0 {
-		s.EventRecorder.Event(machine, corev1.EventTypeNormal, outOfCapacity, "No nodes available to schedule machine on")
+		s.Event(machine, corev1.EventTypeNormal, outOfCapacity, "No nodes available to schedule machine on")
 		return ctrl.Result{}, nil
 	}
 
@@ -126,7 +126,7 @@ func (s *MachineScheduler) reconcileExists(ctx context.Context, log logr.Logger,
 	}
 
 	if len(filteredNodes) == 0 {
-		s.EventRecorder.Event(machine, corev1.EventTypeNormal, outOfCapacity, "No nodes available after filtering to schedule machine on")
+		s.Event(machine, corev1.EventTypeNormal, outOfCapacity, "No nodes available after filtering to schedule machine on")
 		return ctrl.Result{}, nil
 	}
 

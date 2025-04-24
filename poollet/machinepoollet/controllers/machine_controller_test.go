@@ -6,7 +6,7 @@ package controllers_test
 import (
 	"fmt"
 
-	"github.com/gogo/protobuf/proto"
+	. "github.com/afritzler/protoequal"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
@@ -18,6 +18,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
+	"google.golang.org/protobuf/proto"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -116,19 +117,19 @@ var _ = Describe("MachineController", func() {
 		Expect(iriMachine.Metadata.Labels).To(HaveKeyWithValue(machinepoolletv1alpha1.DownwardAPILabel(fooDownwardAPILabel), fooAnnotationValue))
 		Expect(iriMachine.Spec.Class).To(Equal(mc.Name))
 		Expect(iriMachine.Spec.Power).To(Equal(iri.Power_POWER_ON))
-		Expect(iriMachine.Spec.Volumes).To(ConsistOf(&iri.Volume{
+		Expect(iriMachine.Spec.Volumes).To(ConsistOf(ProtoEqual(&iri.Volume{
 			Name:   "primary",
 			Device: "oda",
 			Connection: &iri.VolumeConnection{
 				Driver: "test",
 				Handle: "testhandle",
 			},
-		}))
-		Expect(iriMachine.Spec.NetworkInterfaces).To(ConsistOf(&iri.NetworkInterface{
+		})))
+		Expect(iriMachine.Spec.NetworkInterfaces).To(ConsistOf(ProtoEqual(&iri.NetworkInterface{
 			Name:      "primary",
 			NetworkId: "foo",
 			Ips:       []string{"10.0.0.11"},
-		}))
+		})))
 
 		By("waiting for the ironcore machine status to be up-to-date")
 		expectedMachineID := machinepoolletmachine.MakeID(testingmachine.FakeRuntimeName, iriMachine.Metadata.Id)
@@ -138,7 +139,7 @@ var _ = Describe("MachineController", func() {
 		))
 
 		By("setting the network interface id in the machine status")
-		iriMachine = &testingmachine.FakeMachine{Machine: *proto.Clone(&iriMachine.Machine).(*iri.Machine)}
+		iriMachine = &testingmachine.FakeMachine{Machine: proto.Clone(iriMachine.Machine).(*iri.Machine)}
 		iriMachine.Metadata.Generation = 1
 		iriMachine.Status.ObservedGeneration = 1
 		iriMachine.Status.NetworkInterfaces = []*iri.NetworkInterfaceStatus{
@@ -264,19 +265,19 @@ var _ = Describe("MachineController", func() {
 		Expect(iriMachine.Metadata.Labels).To(HaveKeyWithValue(machinepoolletv1alpha1.DownwardAPILabel(fooDownwardAPILabel), fooAnnotationValue))
 		Expect(iriMachine.Spec.Class).To(Equal(mc.Name))
 		Expect(iriMachine.Spec.Power).To(Equal(iri.Power_POWER_ON))
-		Expect(iriMachine.Spec.Volumes).To(ConsistOf(&iri.Volume{
+		Expect(iriMachine.Spec.Volumes).To(ConsistOf(ProtoEqual(&iri.Volume{
 			Name:   "primary",
 			Device: "oda",
 			Connection: &iri.VolumeConnection{
 				Driver: "test",
 				Handle: "testhandle",
 			},
-		}))
-		Expect(iriMachine.Spec.NetworkInterfaces).To(ConsistOf(&iri.NetworkInterface{
+		})))
+		Expect(iriMachine.Spec.NetworkInterfaces).To(ConsistOf(ProtoEqual(&iri.NetworkInterface{
 			Name:      "primary",
 			NetworkId: "foo",
 			Ips:       []string{"10.0.0.1"},
-		}))
+		})))
 
 		By("waiting for the ironcore machine status to be up-to-date")
 		expectedMachineID := machinepoolletmachine.MakeID(testingmachine.FakeRuntimeName, iriMachine.Metadata.Id)
@@ -286,7 +287,7 @@ var _ = Describe("MachineController", func() {
 		))
 
 		By("setting the network interface id in the machine status")
-		iriMachine = &testingmachine.FakeMachine{Machine: *proto.Clone(&iriMachine.Machine).(*iri.Machine)}
+		iriMachine = &testingmachine.FakeMachine{Machine: proto.Clone(iriMachine.Machine).(*iri.Machine)}
 		iriMachine.Metadata.Generation = 1
 		iriMachine.Status.ObservedGeneration = 1
 		iriMachine.Status.NetworkInterfaces = []*iri.NetworkInterfaceStatus{
@@ -374,7 +375,7 @@ var _ = Describe("MachineController", func() {
 
 		By("inspecting the machine to be running")
 		_, iriMachine := GetSingleMapEntry(srv.Machines)
-		iriMachine = &testingmachine.FakeMachine{Machine: *proto.Clone(&iriMachine.Machine).(*iri.Machine)}
+		iriMachine = &testingmachine.FakeMachine{Machine: proto.Clone(iriMachine.Machine).(*iri.Machine)}
 		iriMachine.Metadata.Generation = 1
 		iriMachine.Status.ObservedGeneration = 1
 		iriMachine.Status.State = iri.MachineState_MACHINE_RUNNING
@@ -383,7 +384,7 @@ var _ = Describe("MachineController", func() {
 
 		By("inspecting the machine to be terminating")
 		_, iriMachine = GetSingleMapEntry(srv.Machines)
-		iriMachine = &testingmachine.FakeMachine{Machine: *proto.Clone(&iriMachine.Machine).(*iri.Machine)}
+		iriMachine = &testingmachine.FakeMachine{Machine: proto.Clone(iriMachine.Machine).(*iri.Machine)}
 		iriMachine.Metadata.Generation = 2
 		iriMachine.Status.ObservedGeneration = 2
 		iriMachine.Status.State = iri.MachineState_MACHINE_TERMINATING
@@ -420,6 +421,7 @@ var _ = Describe("MachineController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+
 		By("By getting ephimeral volume")
 		volumeKey := types.NamespacedName{
 			Namespace: ns.Name,
@@ -451,14 +453,14 @@ var _ = Describe("MachineController", func() {
 		Expect(iriMachine.Metadata.Labels).To(HaveKeyWithValue(machinepoolletv1alpha1.DownwardAPILabel(fooDownwardAPILabel), fooAnnotationValue))
 		Expect(iriMachine.Spec.Class).To(Equal(mc.Name))
 		Expect(iriMachine.Spec.Power).To(Equal(iri.Power_POWER_ON))
-		Expect(iriMachine.Spec.Volumes).To(ConsistOf(&iri.Volume{
+		Expect(iriMachine.Spec.Volumes).To(ConsistOf(ProtoEqual(&iri.Volume{
 			Name:   "primary",
 			Device: "oda",
 			Connection: &iri.VolumeConnection{
 				Driver: "test",
 				Handle: "testhandle",
 			},
-		}))
+		})))
 
 		By("waiting for the ironcore machine status to be up-to-date")
 		expectedMachineID := machinepoolletmachine.MakeID(testingmachine.FakeRuntimeName, iriMachine.Metadata.Id)
@@ -468,7 +470,7 @@ var _ = Describe("MachineController", func() {
 		))
 
 		By("setting the network interface id in the machine status")
-		iriMachine = &testingmachine.FakeMachine{Machine: *proto.Clone(&iriMachine.Machine).(*iri.Machine)}
+		iriMachine = &testingmachine.FakeMachine{Machine: proto.Clone(iriMachine.Machine).(*iri.Machine)}
 		iriMachine.Metadata.Generation = 1
 		iriMachine.Status.ObservedGeneration = 1
 
@@ -482,6 +484,158 @@ var _ = Describe("MachineController", func() {
 		}))))
 	})
 
+	It("should validate IRI volume update for machine", func(ctx SpecContext) {
+		By("creating a network")
+		network := &networkingv1alpha1.Network{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "network-",
+			},
+			Spec: networkingv1alpha1.NetworkSpec{
+				ProviderID: "foo",
+			},
+		}
+		Expect(k8sClient.Create(ctx, network)).To(Succeed())
+
+		By("patching the network to be available")
+		Eventually(UpdateStatus(network, func() {
+			network.Status.State = networkingv1alpha1.NetworkStateAvailable
+		})).Should(Succeed())
+
+		By("creating a network interface")
+		nic := &networkingv1alpha1.NetworkInterface{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "nic-",
+			},
+			Spec: networkingv1alpha1.NetworkInterfaceSpec{
+				NetworkRef: corev1.LocalObjectReference{Name: network.Name},
+				IPs: []networkingv1alpha1.IPSource{
+					{Value: commonv1alpha1.MustParseNewIP("10.0.0.1")},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
+
+		By("creating a volume")
+		volume := &storagev1alpha1.Volume{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "volume-",
+			},
+			Spec: storagev1alpha1.VolumeSpec{},
+		}
+		Expect(k8sClient.Create(ctx, volume)).To(Succeed())
+
+		By("patching the volume to be available")
+		Eventually(UpdateStatus(volume, func() {
+			volume.Status.State = storagev1alpha1.VolumeStateAvailable
+			volume.Status.Access = &storagev1alpha1.VolumeAccess{
+				Driver: "test",
+				Handle: "testhandle",
+			}
+		})).Should(Succeed())
+
+		secondaryVolume := &storagev1alpha1.Volume{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "volume-",
+			},
+			Spec: storagev1alpha1.VolumeSpec{},
+		}
+		Expect(k8sClient.Create(ctx, secondaryVolume)).To(Succeed())
+
+		By("patching the secondary volume to be available")
+		Eventually(UpdateStatus(secondaryVolume, func() {
+			secondaryVolume.Status.State = storagev1alpha1.VolumeStateAvailable
+			secondaryVolume.Status.Access = &storagev1alpha1.VolumeAccess{
+				Driver: "test",
+				Handle: "testhandle",
+			}
+		})).Should(Succeed())
+
+		By("creating a machine")
+		const fooAnnotationValue = "bar"
+		machine := &computev1alpha1.Machine{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "machine-",
+				Annotations: map[string]string{
+					fooAnnotation: fooAnnotationValue,
+				},
+			},
+			Spec: computev1alpha1.MachineSpec{
+				MachineClassRef: corev1.LocalObjectReference{Name: mc.Name},
+				MachinePoolRef:  &corev1.LocalObjectReference{Name: mp.Name},
+				Volumes: []computev1alpha1.Volume{
+					{
+						Name: "primary",
+						VolumeSource: computev1alpha1.VolumeSource{
+							VolumeRef: &corev1.LocalObjectReference{Name: volume.Name},
+						},
+					},
+					{
+						Name: "secondary",
+						VolumeSource: computev1alpha1.VolumeSource{
+							VolumeRef: &corev1.LocalObjectReference{Name: secondaryVolume.Name},
+						},
+					},
+				},
+				NetworkInterfaces: []computev1alpha1.NetworkInterface{
+					{
+						Name: "primary",
+						NetworkInterfaceSource: computev1alpha1.NetworkInterfaceSource{
+							NetworkInterfaceRef: &corev1.LocalObjectReference{Name: nic.Name},
+						},
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+
+		By("waiting for the runtime to report the machine, volume and network interface")
+		Eventually(srv).Should(SatisfyAll(
+			HaveField("Machines", HaveLen(1)),
+		))
+		_, iriMachine := GetSingleMapEntry(srv.Machines)
+
+		By("inspecting the iri machine volumes")
+		Expect(iriMachine.Spec.Volumes).To(ProtoConsistOf(
+			&iri.Volume{
+				Name:   "primary",
+				Device: "oda",
+				Connection: &iri.VolumeConnection{
+					Driver: "test",
+					Handle: "testhandle",
+				},
+			},
+			&iri.Volume{
+				Name:   "secondary",
+				Device: "odb",
+				Connection: &iri.VolumeConnection{
+					Driver: "test",
+					Handle: "testhandle",
+				},
+			},
+		))
+
+		By("patching the secondary volume to be in error state")
+		Eventually(UpdateStatus(secondaryVolume, func() {
+			secondaryVolume.Status.State = storagev1alpha1.VolumeStateError
+		})).Should(Succeed())
+
+		By("verifying only erroneous volume is detached")
+		Eventually(func() []*iri.Volume {
+			return srv.Machines[iriMachine.Metadata.Id].Spec.Volumes
+		}).Should(ProtoConsistOf(&iri.Volume{
+			Name:   "primary",
+			Device: "oda",
+			Connection: &iri.VolumeConnection{
+				Driver: "test",
+				Handle: "testhandle",
+			},
+		}))
+	})
 })
 
 func GetSingleMapEntry[K comparable, V any](m map[K]V) (K, V) {

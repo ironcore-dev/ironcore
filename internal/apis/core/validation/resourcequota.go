@@ -7,6 +7,7 @@ import (
 	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
 	"github.com/ironcore-dev/ironcore/internal/apis/core"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
@@ -21,6 +22,11 @@ func ValidateResourceQuota(resourceQuota *core.ResourceQuota) field.ErrorList {
 
 func validateResourceQuotaSpec(spec *core.ResourceQuotaSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
+	hardResourceNames := sets.KeySet(spec.Hard)
+
+	for name := range hardResourceNames {
+		allErrs = append(allErrs, ironcorevalidation.ValidateResourceName(name, fldPath.Child("hard").Key(string(name)))...)
+	}
 
 	for name, quantity := range spec.Hard {
 		allErrs = append(allErrs, ironcorevalidation.ValidateNonNegativeQuantity(quantity, fldPath.Child("hard").Key(string(name)))...)

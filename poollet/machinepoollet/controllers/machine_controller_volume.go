@@ -9,7 +9,6 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	"github.com/gogo/protobuf/proto"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
@@ -19,6 +18,7 @@ import (
 	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -230,7 +230,7 @@ func (r *MachineReconciler) prepareIRIVolumes(
 		actualVolumeNames := utilslices.ToSetFunc(iriVolumes, (*iri.Volume).GetName)
 		missingVolumeNames := sets.List(expectedVolumeNames.Difference(actualVolumeNames))
 		r.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady, "Machine volumes are not ready: %v", missingVolumeNames)
-		return nil, false, nil
+		return iriVolumes, false, nil
 	}
 	return iriVolumes, true, nil
 }

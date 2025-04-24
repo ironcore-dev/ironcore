@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/storage/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	applyconfigurationsstoragev1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/storage/v1alpha1"
 	scheme "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -25,32 +25,33 @@ type BucketClassesGetter interface {
 
 // BucketClassInterface has methods to work with BucketClass resources.
 type BucketClassInterface interface {
-	Create(ctx context.Context, bucketClass *v1alpha1.BucketClass, opts v1.CreateOptions) (*v1alpha1.BucketClass, error)
-	Update(ctx context.Context, bucketClass *v1alpha1.BucketClass, opts v1.UpdateOptions) (*v1alpha1.BucketClass, error)
+	Create(ctx context.Context, bucketClass *storagev1alpha1.BucketClass, opts v1.CreateOptions) (*storagev1alpha1.BucketClass, error)
+	Update(ctx context.Context, bucketClass *storagev1alpha1.BucketClass, opts v1.UpdateOptions) (*storagev1alpha1.BucketClass, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
-	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.BucketClass, error)
-	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.BucketClassList, error)
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*storagev1alpha1.BucketClass, error)
+	List(ctx context.Context, opts v1.ListOptions) (*storagev1alpha1.BucketClassList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
-	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.BucketClass, err error)
-	Apply(ctx context.Context, bucketClass *storagev1alpha1.BucketClassApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.BucketClass, err error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *storagev1alpha1.BucketClass, err error)
+	Apply(ctx context.Context, bucketClass *applyconfigurationsstoragev1alpha1.BucketClassApplyConfiguration, opts v1.ApplyOptions) (result *storagev1alpha1.BucketClass, err error)
 	BucketClassExpansion
 }
 
 // bucketClasses implements BucketClassInterface
 type bucketClasses struct {
-	*gentype.ClientWithListAndApply[*v1alpha1.BucketClass, *v1alpha1.BucketClassList, *storagev1alpha1.BucketClassApplyConfiguration]
+	*gentype.ClientWithListAndApply[*storagev1alpha1.BucketClass, *storagev1alpha1.BucketClassList, *applyconfigurationsstoragev1alpha1.BucketClassApplyConfiguration]
 }
 
 // newBucketClasses returns a BucketClasses
 func newBucketClasses(c *StorageV1alpha1Client) *bucketClasses {
 	return &bucketClasses{
-		gentype.NewClientWithListAndApply[*v1alpha1.BucketClass, *v1alpha1.BucketClassList, *storagev1alpha1.BucketClassApplyConfiguration](
+		gentype.NewClientWithListAndApply[*storagev1alpha1.BucketClass, *storagev1alpha1.BucketClassList, *applyconfigurationsstoragev1alpha1.BucketClassApplyConfiguration](
 			"bucketclasses",
 			c.RESTClient(),
 			scheme.ParameterCodec,
 			"",
-			func() *v1alpha1.BucketClass { return &v1alpha1.BucketClass{} },
-			func() *v1alpha1.BucketClassList { return &v1alpha1.BucketClassList{} }),
+			func() *storagev1alpha1.BucketClass { return &storagev1alpha1.BucketClass{} },
+			func() *storagev1alpha1.BucketClassList { return &storagev1alpha1.BucketClassList{} },
+		),
 	}
 }

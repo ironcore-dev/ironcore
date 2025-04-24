@@ -113,6 +113,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &applyconfigurationsnetworkingv1alpha1.EphemeralPrefixSourceApplyConfiguration{}
 	case networkingv1alpha1.SchemeGroupVersion.WithKind("EphemeralVirtualIPSource"):
 		return &applyconfigurationsnetworkingv1alpha1.EphemeralVirtualIPSourceApplyConfiguration{}
+	case networkingv1alpha1.SchemeGroupVersion.WithKind("EphemeralVirtualIPSpec"):
+		return &applyconfigurationsnetworkingv1alpha1.EphemeralVirtualIPSpecApplyConfiguration{}
 	case networkingv1alpha1.SchemeGroupVersion.WithKind("IPBlock"):
 		return &applyconfigurationsnetworkingv1alpha1.IPBlockApplyConfiguration{}
 	case networkingv1alpha1.SchemeGroupVersion.WithKind("IPSource"):

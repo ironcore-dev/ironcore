@@ -71,7 +71,7 @@ func Run(
 	render renderer.Renderer,
 	opts Options,
 ) error {
-	var filter *iri.EventFilter = &iri.EventFilter{
+	var filter = &iri.EventFilter{
 		LabelSelector:  opts.Labels,
 		EventsFromTime: time.Now().Add(-1 * opts.Duration).Unix(),
 		EventsToTime:   time.Now().Unix(),

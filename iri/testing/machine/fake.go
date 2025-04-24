@@ -48,7 +48,7 @@ func generateID(length int) string {
 }
 
 type FakeMachine struct {
-	iri.Machine
+	*iri.Machine
 }
 
 type FakeReservation struct {
@@ -88,8 +88,7 @@ func (r *FakeRuntimeService) ListEvents(ctx context.Context, req *iri.ListEvents
 
 	var res []*irievent.Event
 	for _, e := range r.Events {
-		event := e.Event
-		res = append(res, &event)
+		res = append(res, &e.Event)
 	}
 
 	return &iri.ListEventsResponse{Events: res}, nil
@@ -119,8 +118,8 @@ func (r *FakeRuntimeService) SetMachineClasses(machineClassStatus []*FakeMachine
 	defer r.Unlock()
 
 	r.MachineClassStatus = make(map[string]*FakeMachineClassStatus)
-	for _, status := range machineClassStatus {
-		r.MachineClassStatus[status.MachineClass.Name] = status
+	for _, mcStatus := range machineClassStatus {
+		r.MachineClassStatus[mcStatus.MachineClass.Name] = mcStatus
 	}
 }
 
@@ -162,8 +161,7 @@ func (r *FakeRuntimeService) ListMachines(ctx context.Context, req *iri.ListMach
 			}
 		}
 
-		machine := m.Machine
-		res = append(res, &machine)
+		res = append(res, m.Machine)
 	}
 	return &iri.ListMachinesResponse{Machines: res}, nil
 }
@@ -172,7 +170,7 @@ func (r *FakeRuntimeService) CreateMachine(ctx context.Context, req *iri.CreateM
 	r.Lock()
 	defer r.Unlock()
 
-	machine := *req.Machine
+	machine := req.Machine
 	machine.Metadata.Id = generateID(defaultIDLength)
 	machine.Metadata.CreatedAt = time.Now().UnixNano()
 	machine.Status = &iri.MachineStatus{
@@ -184,7 +182,7 @@ func (r *FakeRuntimeService) CreateMachine(ctx context.Context, req *iri.CreateM
 	}
 
 	return &iri.CreateMachineResponse{
-		Machine: &machine,
+		Machine: machine,
 	}, nil
 }
 
@@ -389,8 +387,7 @@ func (r *FakeRuntimeService) Status(ctx context.Context, req *iri.StatusRequest)
 
 	var res []*iri.MachineClassStatus
 	for _, m := range r.MachineClassStatus {
-		machineClassStatus := m.MachineClassStatus
-		res = append(res, &machineClassStatus)
+		res = append(res, &m.MachineClassStatus)
 	}
 	return &iri.StatusResponse{MachineClassStatus: res}, nil
 }

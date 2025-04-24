@@ -7,7 +7,6 @@ import (
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
-	"github.com/ironcore-dev/ironcore/iri/testing/machine"
 	testingmachine "github.com/ironcore-dev/ironcore/iri/testing/machine"
 	"github.com/ironcore-dev/ironcore/utils/quota"
 	. "github.com/onsi/ginkgo/v2"
@@ -131,7 +130,7 @@ var _ = Describe("MachinePoolController", func() {
 	})
 
 	It("should add machine classes to pool", func(ctx SpecContext) {
-		srv.SetMachineClasses([]*machine.FakeMachineClassStatus{})
+		srv.SetMachineClasses([]*testingmachine.FakeMachineClassStatus{})
 
 		By("creating a machine class")
 		machineClass := &computev1alpha1.MachineClass{
@@ -145,7 +144,7 @@ var _ = Describe("MachinePoolController", func() {
 		}
 		Expect(k8sClient.Create(ctx, machineClass)).To(Succeed(), "failed to create test machine class")
 
-		srv.SetMachineClasses([]*machine.FakeMachineClassStatus{
+		srv.SetMachineClasses([]*testingmachine.FakeMachineClassStatus{
 			{
 				MachineClassStatus: iri.MachineClassStatus{
 					MachineClass: &iri.MachineClass{
@@ -184,7 +183,7 @@ var _ = Describe("MachinePoolController", func() {
 			HaveField("Status.AvailableMachineClasses", HaveLen(1))),
 		)
 
-		srv.SetMachineClasses([]*machine.FakeMachineClassStatus{
+		srv.SetMachineClasses([]*testingmachine.FakeMachineClassStatus{
 			{
 				MachineClassStatus: iri.MachineClassStatus{
 					MachineClass: &iri.MachineClass{
@@ -221,5 +220,4 @@ var _ = Describe("MachinePoolController", func() {
 			))),
 		)
 	})
-
 })

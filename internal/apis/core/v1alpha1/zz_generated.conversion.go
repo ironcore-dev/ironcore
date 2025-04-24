@@ -11,7 +11,7 @@ package v1alpha1
 import (
 	unsafe "unsafe"
 
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	core "github.com/ironcore-dev/ironcore/internal/apis/core"
 	conversion "k8s.io/apimachinery/pkg/conversion"
 	runtime "k8s.io/apimachinery/pkg/runtime"
@@ -24,102 +24,102 @@ func init() {
 // RegisterConversions adds conversion functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterConversions(s *runtime.Scheme) error {
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.ObjectSelector)(nil), (*core.ObjectSelector)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_ObjectSelector_To_core_ObjectSelector(a.(*v1alpha1.ObjectSelector), b.(*core.ObjectSelector), scope)
+	if err := s.AddGeneratedConversionFunc((*corev1alpha1.ObjectSelector)(nil), (*core.ObjectSelector)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_ObjectSelector_To_core_ObjectSelector(a.(*corev1alpha1.ObjectSelector), b.(*core.ObjectSelector), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ObjectSelector)(nil), (*v1alpha1.ObjectSelector)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ObjectSelector_To_v1alpha1_ObjectSelector(a.(*core.ObjectSelector), b.(*v1alpha1.ObjectSelector), scope)
+	if err := s.AddGeneratedConversionFunc((*core.ObjectSelector)(nil), (*corev1alpha1.ObjectSelector)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_core_ObjectSelector_To_v1alpha1_ObjectSelector(a.(*core.ObjectSelector), b.(*corev1alpha1.ObjectSelector), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.ResourceQuota)(nil), (*core.ResourceQuota)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_ResourceQuota_To_core_ResourceQuota(a.(*v1alpha1.ResourceQuota), b.(*core.ResourceQuota), scope)
+	if err := s.AddGeneratedConversionFunc((*corev1alpha1.ResourceQuota)(nil), (*core.ResourceQuota)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_ResourceQuota_To_core_ResourceQuota(a.(*corev1alpha1.ResourceQuota), b.(*core.ResourceQuota), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ResourceQuota)(nil), (*v1alpha1.ResourceQuota)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ResourceQuota_To_v1alpha1_ResourceQuota(a.(*core.ResourceQuota), b.(*v1alpha1.ResourceQuota), scope)
+	if err := s.AddGeneratedConversionFunc((*core.ResourceQuota)(nil), (*corev1alpha1.ResourceQuota)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_core_ResourceQuota_To_v1alpha1_ResourceQuota(a.(*core.ResourceQuota), b.(*corev1alpha1.ResourceQuota), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.ResourceQuotaList)(nil), (*core.ResourceQuotaList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_ResourceQuotaList_To_core_ResourceQuotaList(a.(*v1alpha1.ResourceQuotaList), b.(*core.ResourceQuotaList), scope)
+	if err := s.AddGeneratedConversionFunc((*corev1alpha1.ResourceQuotaList)(nil), (*core.ResourceQuotaList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_ResourceQuotaList_To_core_ResourceQuotaList(a.(*corev1alpha1.ResourceQuotaList), b.(*core.ResourceQuotaList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ResourceQuotaList)(nil), (*v1alpha1.ResourceQuotaList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ResourceQuotaList_To_v1alpha1_ResourceQuotaList(a.(*core.ResourceQuotaList), b.(*v1alpha1.ResourceQuotaList), scope)
+	if err := s.AddGeneratedConversionFunc((*core.ResourceQuotaList)(nil), (*corev1alpha1.ResourceQuotaList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_core_ResourceQuotaList_To_v1alpha1_ResourceQuotaList(a.(*core.ResourceQuotaList), b.(*corev1alpha1.ResourceQuotaList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.ResourceQuotaSpec)(nil), (*core.ResourceQuotaSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_ResourceQuotaSpec_To_core_ResourceQuotaSpec(a.(*v1alpha1.ResourceQuotaSpec), b.(*core.ResourceQuotaSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*corev1alpha1.ResourceQuotaSpec)(nil), (*core.ResourceQuotaSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_ResourceQuotaSpec_To_core_ResourceQuotaSpec(a.(*corev1alpha1.ResourceQuotaSpec), b.(*core.ResourceQuotaSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ResourceQuotaSpec)(nil), (*v1alpha1.ResourceQuotaSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ResourceQuotaSpec_To_v1alpha1_ResourceQuotaSpec(a.(*core.ResourceQuotaSpec), b.(*v1alpha1.ResourceQuotaSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*core.ResourceQuotaSpec)(nil), (*corev1alpha1.ResourceQuotaSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_core_ResourceQuotaSpec_To_v1alpha1_ResourceQuotaSpec(a.(*core.ResourceQuotaSpec), b.(*corev1alpha1.ResourceQuotaSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.ResourceQuotaStatus)(nil), (*core.ResourceQuotaStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_ResourceQuotaStatus_To_core_ResourceQuotaStatus(a.(*v1alpha1.ResourceQuotaStatus), b.(*core.ResourceQuotaStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*corev1alpha1.ResourceQuotaStatus)(nil), (*core.ResourceQuotaStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_ResourceQuotaStatus_To_core_ResourceQuotaStatus(a.(*corev1alpha1.ResourceQuotaStatus), b.(*core.ResourceQuotaStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ResourceQuotaStatus)(nil), (*v1alpha1.ResourceQuotaStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ResourceQuotaStatus_To_v1alpha1_ResourceQuotaStatus(a.(*core.ResourceQuotaStatus), b.(*v1alpha1.ResourceQuotaStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*core.ResourceQuotaStatus)(nil), (*corev1alpha1.ResourceQuotaStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_core_ResourceQuotaStatus_To_v1alpha1_ResourceQuotaStatus(a.(*core.ResourceQuotaStatus), b.(*corev1alpha1.ResourceQuotaStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.ResourceScopeSelector)(nil), (*core.ResourceScopeSelector)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_ResourceScopeSelector_To_core_ResourceScopeSelector(a.(*v1alpha1.ResourceScopeSelector), b.(*core.ResourceScopeSelector), scope)
+	if err := s.AddGeneratedConversionFunc((*corev1alpha1.ResourceScopeSelector)(nil), (*core.ResourceScopeSelector)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_ResourceScopeSelector_To_core_ResourceScopeSelector(a.(*corev1alpha1.ResourceScopeSelector), b.(*core.ResourceScopeSelector), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ResourceScopeSelector)(nil), (*v1alpha1.ResourceScopeSelector)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ResourceScopeSelector_To_v1alpha1_ResourceScopeSelector(a.(*core.ResourceScopeSelector), b.(*v1alpha1.ResourceScopeSelector), scope)
+	if err := s.AddGeneratedConversionFunc((*core.ResourceScopeSelector)(nil), (*corev1alpha1.ResourceScopeSelector)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_core_ResourceScopeSelector_To_v1alpha1_ResourceScopeSelector(a.(*core.ResourceScopeSelector), b.(*corev1alpha1.ResourceScopeSelector), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.ResourceScopeSelectorRequirement)(nil), (*core.ResourceScopeSelectorRequirement)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_ResourceScopeSelectorRequirement_To_core_ResourceScopeSelectorRequirement(a.(*v1alpha1.ResourceScopeSelectorRequirement), b.(*core.ResourceScopeSelectorRequirement), scope)
+	if err := s.AddGeneratedConversionFunc((*corev1alpha1.ResourceScopeSelectorRequirement)(nil), (*core.ResourceScopeSelectorRequirement)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_ResourceScopeSelectorRequirement_To_core_ResourceScopeSelectorRequirement(a.(*corev1alpha1.ResourceScopeSelectorRequirement), b.(*core.ResourceScopeSelectorRequirement), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ResourceScopeSelectorRequirement)(nil), (*v1alpha1.ResourceScopeSelectorRequirement)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ResourceScopeSelectorRequirement_To_v1alpha1_ResourceScopeSelectorRequirement(a.(*core.ResourceScopeSelectorRequirement), b.(*v1alpha1.ResourceScopeSelectorRequirement), scope)
+	if err := s.AddGeneratedConversionFunc((*core.ResourceScopeSelectorRequirement)(nil), (*corev1alpha1.ResourceScopeSelectorRequirement)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_core_ResourceScopeSelectorRequirement_To_v1alpha1_ResourceScopeSelectorRequirement(a.(*core.ResourceScopeSelectorRequirement), b.(*corev1alpha1.ResourceScopeSelectorRequirement), scope)
 	}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func autoConvert_v1alpha1_ObjectSelector_To_core_ObjectSelector(in *v1alpha1.ObjectSelector, out *core.ObjectSelector, s conversion.Scope) error {
+func autoConvert_v1alpha1_ObjectSelector_To_core_ObjectSelector(in *corev1alpha1.ObjectSelector, out *core.ObjectSelector, s conversion.Scope) error {
 	out.Kind = in.Kind
 	out.LabelSelector = in.LabelSelector
 	return nil
 }
 
 // Convert_v1alpha1_ObjectSelector_To_core_ObjectSelector is an autogenerated conversion function.
-func Convert_v1alpha1_ObjectSelector_To_core_ObjectSelector(in *v1alpha1.ObjectSelector, out *core.ObjectSelector, s conversion.Scope) error {
+func Convert_v1alpha1_ObjectSelector_To_core_ObjectSelector(in *corev1alpha1.ObjectSelector, out *core.ObjectSelector, s conversion.Scope) error {
 	return autoConvert_v1alpha1_ObjectSelector_To_core_ObjectSelector(in, out, s)
 }
 
-func autoConvert_core_ObjectSelector_To_v1alpha1_ObjectSelector(in *core.ObjectSelector, out *v1alpha1.ObjectSelector, s conversion.Scope) error {
+func autoConvert_core_ObjectSelector_To_v1alpha1_ObjectSelector(in *core.ObjectSelector, out *corev1alpha1.ObjectSelector, s conversion.Scope) error {
 	out.Kind = in.Kind
 	out.LabelSelector = in.LabelSelector
 	return nil
 }
 
 // Convert_core_ObjectSelector_To_v1alpha1_ObjectSelector is an autogenerated conversion function.
-func Convert_core_ObjectSelector_To_v1alpha1_ObjectSelector(in *core.ObjectSelector, out *v1alpha1.ObjectSelector, s conversion.Scope) error {
+func Convert_core_ObjectSelector_To_v1alpha1_ObjectSelector(in *core.ObjectSelector, out *corev1alpha1.ObjectSelector, s conversion.Scope) error {
 	return autoConvert_core_ObjectSelector_To_v1alpha1_ObjectSelector(in, out, s)
 }
 
-func autoConvert_v1alpha1_ResourceQuota_To_core_ResourceQuota(in *v1alpha1.ResourceQuota, out *core.ResourceQuota, s conversion.Scope) error {
+func autoConvert_v1alpha1_ResourceQuota_To_core_ResourceQuota(in *corev1alpha1.ResourceQuota, out *core.ResourceQuota, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1alpha1_ResourceQuotaSpec_To_core_ResourceQuotaSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -131,11 +131,11 @@ func autoConvert_v1alpha1_ResourceQuota_To_core_ResourceQuota(in *v1alpha1.Resou
 }
 
 // Convert_v1alpha1_ResourceQuota_To_core_ResourceQuota is an autogenerated conversion function.
-func Convert_v1alpha1_ResourceQuota_To_core_ResourceQuota(in *v1alpha1.ResourceQuota, out *core.ResourceQuota, s conversion.Scope) error {
+func Convert_v1alpha1_ResourceQuota_To_core_ResourceQuota(in *corev1alpha1.ResourceQuota, out *core.ResourceQuota, s conversion.Scope) error {
 	return autoConvert_v1alpha1_ResourceQuota_To_core_ResourceQuota(in, out, s)
 }
 
-func autoConvert_core_ResourceQuota_To_v1alpha1_ResourceQuota(in *core.ResourceQuota, out *v1alpha1.ResourceQuota, s conversion.Scope) error {
+func autoConvert_core_ResourceQuota_To_v1alpha1_ResourceQuota(in *core.ResourceQuota, out *corev1alpha1.ResourceQuota, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_core_ResourceQuotaSpec_To_v1alpha1_ResourceQuotaSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -147,97 +147,97 @@ func autoConvert_core_ResourceQuota_To_v1alpha1_ResourceQuota(in *core.ResourceQ
 }
 
 // Convert_core_ResourceQuota_To_v1alpha1_ResourceQuota is an autogenerated conversion function.
-func Convert_core_ResourceQuota_To_v1alpha1_ResourceQuota(in *core.ResourceQuota, out *v1alpha1.ResourceQuota, s conversion.Scope) error {
+func Convert_core_ResourceQuota_To_v1alpha1_ResourceQuota(in *core.ResourceQuota, out *corev1alpha1.ResourceQuota, s conversion.Scope) error {
 	return autoConvert_core_ResourceQuota_To_v1alpha1_ResourceQuota(in, out, s)
 }
 
-func autoConvert_v1alpha1_ResourceQuotaList_To_core_ResourceQuotaList(in *v1alpha1.ResourceQuotaList, out *core.ResourceQuotaList, s conversion.Scope) error {
+func autoConvert_v1alpha1_ResourceQuotaList_To_core_ResourceQuotaList(in *corev1alpha1.ResourceQuotaList, out *core.ResourceQuotaList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	out.Items = *(*[]core.ResourceQuota)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_v1alpha1_ResourceQuotaList_To_core_ResourceQuotaList is an autogenerated conversion function.
-func Convert_v1alpha1_ResourceQuotaList_To_core_ResourceQuotaList(in *v1alpha1.ResourceQuotaList, out *core.ResourceQuotaList, s conversion.Scope) error {
+func Convert_v1alpha1_ResourceQuotaList_To_core_ResourceQuotaList(in *corev1alpha1.ResourceQuotaList, out *core.ResourceQuotaList, s conversion.Scope) error {
 	return autoConvert_v1alpha1_ResourceQuotaList_To_core_ResourceQuotaList(in, out, s)
 }
 
-func autoConvert_core_ResourceQuotaList_To_v1alpha1_ResourceQuotaList(in *core.ResourceQuotaList, out *v1alpha1.ResourceQuotaList, s conversion.Scope) error {
+func autoConvert_core_ResourceQuotaList_To_v1alpha1_ResourceQuotaList(in *core.ResourceQuotaList, out *corev1alpha1.ResourceQuotaList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]v1alpha1.ResourceQuota)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]corev1alpha1.ResourceQuota)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_core_ResourceQuotaList_To_v1alpha1_ResourceQuotaList is an autogenerated conversion function.
-func Convert_core_ResourceQuotaList_To_v1alpha1_ResourceQuotaList(in *core.ResourceQuotaList, out *v1alpha1.ResourceQuotaList, s conversion.Scope) error {
+func Convert_core_ResourceQuotaList_To_v1alpha1_ResourceQuotaList(in *core.ResourceQuotaList, out *corev1alpha1.ResourceQuotaList, s conversion.Scope) error {
 	return autoConvert_core_ResourceQuotaList_To_v1alpha1_ResourceQuotaList(in, out, s)
 }
 
-func autoConvert_v1alpha1_ResourceQuotaSpec_To_core_ResourceQuotaSpec(in *v1alpha1.ResourceQuotaSpec, out *core.ResourceQuotaSpec, s conversion.Scope) error {
+func autoConvert_v1alpha1_ResourceQuotaSpec_To_core_ResourceQuotaSpec(in *corev1alpha1.ResourceQuotaSpec, out *core.ResourceQuotaSpec, s conversion.Scope) error {
 	out.Hard = *(*core.ResourceList)(unsafe.Pointer(&in.Hard))
 	out.ScopeSelector = (*core.ResourceScopeSelector)(unsafe.Pointer(in.ScopeSelector))
 	return nil
 }
 
 // Convert_v1alpha1_ResourceQuotaSpec_To_core_ResourceQuotaSpec is an autogenerated conversion function.
-func Convert_v1alpha1_ResourceQuotaSpec_To_core_ResourceQuotaSpec(in *v1alpha1.ResourceQuotaSpec, out *core.ResourceQuotaSpec, s conversion.Scope) error {
+func Convert_v1alpha1_ResourceQuotaSpec_To_core_ResourceQuotaSpec(in *corev1alpha1.ResourceQuotaSpec, out *core.ResourceQuotaSpec, s conversion.Scope) error {
 	return autoConvert_v1alpha1_ResourceQuotaSpec_To_core_ResourceQuotaSpec(in, out, s)
 }
 
-func autoConvert_core_ResourceQuotaSpec_To_v1alpha1_ResourceQuotaSpec(in *core.ResourceQuotaSpec, out *v1alpha1.ResourceQuotaSpec, s conversion.Scope) error {
-	out.Hard = *(*v1alpha1.ResourceList)(unsafe.Pointer(&in.Hard))
-	out.ScopeSelector = (*v1alpha1.ResourceScopeSelector)(unsafe.Pointer(in.ScopeSelector))
+func autoConvert_core_ResourceQuotaSpec_To_v1alpha1_ResourceQuotaSpec(in *core.ResourceQuotaSpec, out *corev1alpha1.ResourceQuotaSpec, s conversion.Scope) error {
+	out.Hard = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Hard))
+	out.ScopeSelector = (*corev1alpha1.ResourceScopeSelector)(unsafe.Pointer(in.ScopeSelector))
 	return nil
 }
 
 // Convert_core_ResourceQuotaSpec_To_v1alpha1_ResourceQuotaSpec is an autogenerated conversion function.
-func Convert_core_ResourceQuotaSpec_To_v1alpha1_ResourceQuotaSpec(in *core.ResourceQuotaSpec, out *v1alpha1.ResourceQuotaSpec, s conversion.Scope) error {
+func Convert_core_ResourceQuotaSpec_To_v1alpha1_ResourceQuotaSpec(in *core.ResourceQuotaSpec, out *corev1alpha1.ResourceQuotaSpec, s conversion.Scope) error {
 	return autoConvert_core_ResourceQuotaSpec_To_v1alpha1_ResourceQuotaSpec(in, out, s)
 }
 
-func autoConvert_v1alpha1_ResourceQuotaStatus_To_core_ResourceQuotaStatus(in *v1alpha1.ResourceQuotaStatus, out *core.ResourceQuotaStatus, s conversion.Scope) error {
+func autoConvert_v1alpha1_ResourceQuotaStatus_To_core_ResourceQuotaStatus(in *corev1alpha1.ResourceQuotaStatus, out *core.ResourceQuotaStatus, s conversion.Scope) error {
 	out.Hard = *(*core.ResourceList)(unsafe.Pointer(&in.Hard))
 	out.Used = *(*core.ResourceList)(unsafe.Pointer(&in.Used))
 	return nil
 }
 
 // Convert_v1alpha1_ResourceQuotaStatus_To_core_ResourceQuotaStatus is an autogenerated conversion function.
-func Convert_v1alpha1_ResourceQuotaStatus_To_core_ResourceQuotaStatus(in *v1alpha1.ResourceQuotaStatus, out *core.ResourceQuotaStatus, s conversion.Scope) error {
+func Convert_v1alpha1_ResourceQuotaStatus_To_core_ResourceQuotaStatus(in *corev1alpha1.ResourceQuotaStatus, out *core.ResourceQuotaStatus, s conversion.Scope) error {
 	return autoConvert_v1alpha1_ResourceQuotaStatus_To_core_ResourceQuotaStatus(in, out, s)
 }
 
-func autoConvert_core_ResourceQuotaStatus_To_v1alpha1_ResourceQuotaStatus(in *core.ResourceQuotaStatus, out *v1alpha1.ResourceQuotaStatus, s conversion.Scope) error {
-	out.Hard = *(*v1alpha1.ResourceList)(unsafe.Pointer(&in.Hard))
-	out.Used = *(*v1alpha1.ResourceList)(unsafe.Pointer(&in.Used))
+func autoConvert_core_ResourceQuotaStatus_To_v1alpha1_ResourceQuotaStatus(in *core.ResourceQuotaStatus, out *corev1alpha1.ResourceQuotaStatus, s conversion.Scope) error {
+	out.Hard = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Hard))
+	out.Used = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Used))
 	return nil
 }
 
 // Convert_core_ResourceQuotaStatus_To_v1alpha1_ResourceQuotaStatus is an autogenerated conversion function.
-func Convert_core_ResourceQuotaStatus_To_v1alpha1_ResourceQuotaStatus(in *core.ResourceQuotaStatus, out *v1alpha1.ResourceQuotaStatus, s conversion.Scope) error {
+func Convert_core_ResourceQuotaStatus_To_v1alpha1_ResourceQuotaStatus(in *core.ResourceQuotaStatus, out *corev1alpha1.ResourceQuotaStatus, s conversion.Scope) error {
 	return autoConvert_core_ResourceQuotaStatus_To_v1alpha1_ResourceQuotaStatus(in, out, s)
 }
 
-func autoConvert_v1alpha1_ResourceScopeSelector_To_core_ResourceScopeSelector(in *v1alpha1.ResourceScopeSelector, out *core.ResourceScopeSelector, s conversion.Scope) error {
+func autoConvert_v1alpha1_ResourceScopeSelector_To_core_ResourceScopeSelector(in *corev1alpha1.ResourceScopeSelector, out *core.ResourceScopeSelector, s conversion.Scope) error {
 	out.MatchExpressions = *(*[]core.ResourceScopeSelectorRequirement)(unsafe.Pointer(&in.MatchExpressions))
 	return nil
 }
 
 // Convert_v1alpha1_ResourceScopeSelector_To_core_ResourceScopeSelector is an autogenerated conversion function.
-func Convert_v1alpha1_ResourceScopeSelector_To_core_ResourceScopeSelector(in *v1alpha1.ResourceScopeSelector, out *core.ResourceScopeSelector, s conversion.Scope) error {
+func Convert_v1alpha1_ResourceScopeSelector_To_core_ResourceScopeSelector(in *corev1alpha1.ResourceScopeSelector, out *core.ResourceScopeSelector, s conversion.Scope) error {
 	return autoConvert_v1alpha1_ResourceScopeSelector_To_core_ResourceScopeSelector(in, out, s)
 }
 
-func autoConvert_core_ResourceScopeSelector_To_v1alpha1_ResourceScopeSelector(in *core.ResourceScopeSelector, out *v1alpha1.ResourceScopeSelector, s conversion.Scope) error {
-	out.MatchExpressions = *(*[]v1alpha1.ResourceScopeSelectorRequirement)(unsafe.Pointer(&in.MatchExpressions))
+func autoConvert_core_ResourceScopeSelector_To_v1alpha1_ResourceScopeSelector(in *core.ResourceScopeSelector, out *corev1alpha1.ResourceScopeSelector, s conversion.Scope) error {
+	out.MatchExpressions = *(*[]corev1alpha1.ResourceScopeSelectorRequirement)(unsafe.Pointer(&in.MatchExpressions))
 	return nil
 }
 
 // Convert_core_ResourceScopeSelector_To_v1alpha1_ResourceScopeSelector is an autogenerated conversion function.
-func Convert_core_ResourceScopeSelector_To_v1alpha1_ResourceScopeSelector(in *core.ResourceScopeSelector, out *v1alpha1.ResourceScopeSelector, s conversion.Scope) error {
+func Convert_core_ResourceScopeSelector_To_v1alpha1_ResourceScopeSelector(in *core.ResourceScopeSelector, out *corev1alpha1.ResourceScopeSelector, s conversion.Scope) error {
 	return autoConvert_core_ResourceScopeSelector_To_v1alpha1_ResourceScopeSelector(in, out, s)
 }
 
-func autoConvert_v1alpha1_ResourceScopeSelectorRequirement_To_core_ResourceScopeSelectorRequirement(in *v1alpha1.ResourceScopeSelectorRequirement, out *core.ResourceScopeSelectorRequirement, s conversion.Scope) error {
+func autoConvert_v1alpha1_ResourceScopeSelectorRequirement_To_core_ResourceScopeSelectorRequirement(in *corev1alpha1.ResourceScopeSelectorRequirement, out *core.ResourceScopeSelectorRequirement, s conversion.Scope) error {
 	out.ScopeName = core.ResourceScope(in.ScopeName)
 	out.Operator = core.ResourceScopeSelectorOperator(in.Operator)
 	out.Values = *(*[]string)(unsafe.Pointer(&in.Values))
@@ -245,18 +245,18 @@ func autoConvert_v1alpha1_ResourceScopeSelectorRequirement_To_core_ResourceScope
 }
 
 // Convert_v1alpha1_ResourceScopeSelectorRequirement_To_core_ResourceScopeSelectorRequirement is an autogenerated conversion function.
-func Convert_v1alpha1_ResourceScopeSelectorRequirement_To_core_ResourceScopeSelectorRequirement(in *v1alpha1.ResourceScopeSelectorRequirement, out *core.ResourceScopeSelectorRequirement, s conversion.Scope) error {
+func Convert_v1alpha1_ResourceScopeSelectorRequirement_To_core_ResourceScopeSelectorRequirement(in *corev1alpha1.ResourceScopeSelectorRequirement, out *core.ResourceScopeSelectorRequirement, s conversion.Scope) error {
 	return autoConvert_v1alpha1_ResourceScopeSelectorRequirement_To_core_ResourceScopeSelectorRequirement(in, out, s)
 }
 
-func autoConvert_core_ResourceScopeSelectorRequirement_To_v1alpha1_ResourceScopeSelectorRequirement(in *core.ResourceScopeSelectorRequirement, out *v1alpha1.ResourceScopeSelectorRequirement, s conversion.Scope) error {
-	out.ScopeName = v1alpha1.ResourceScope(in.ScopeName)
-	out.Operator = v1alpha1.ResourceScopeSelectorOperator(in.Operator)
+func autoConvert_core_ResourceScopeSelectorRequirement_To_v1alpha1_ResourceScopeSelectorRequirement(in *core.ResourceScopeSelectorRequirement, out *corev1alpha1.ResourceScopeSelectorRequirement, s conversion.Scope) error {
+	out.ScopeName = corev1alpha1.ResourceScope(in.ScopeName)
+	out.Operator = corev1alpha1.ResourceScopeSelectorOperator(in.Operator)
 	out.Values = *(*[]string)(unsafe.Pointer(&in.Values))
 	return nil
 }
 
 // Convert_core_ResourceScopeSelectorRequirement_To_v1alpha1_ResourceScopeSelectorRequirement is an autogenerated conversion function.
-func Convert_core_ResourceScopeSelectorRequirement_To_v1alpha1_ResourceScopeSelectorRequirement(in *core.ResourceScopeSelectorRequirement, out *v1alpha1.ResourceScopeSelectorRequirement, s conversion.Scope) error {
+func Convert_core_ResourceScopeSelectorRequirement_To_v1alpha1_ResourceScopeSelectorRequirement(in *core.ResourceScopeSelectorRequirement, out *corev1alpha1.ResourceScopeSelectorRequirement, s conversion.Scope) error {
 	return autoConvert_core_ResourceScopeSelectorRequirement_To_v1alpha1_ResourceScopeSelectorRequirement(in, out, s)
 }

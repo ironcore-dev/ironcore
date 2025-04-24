@@ -6,179 +6,35 @@
 package fake
 
 import (
-	"context"
-	json "encoding/json"
-	"fmt"
-
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/networking/v1alpha1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	labels "k8s.io/apimachinery/pkg/labels"
-	types "k8s.io/apimachinery/pkg/types"
-	watch "k8s.io/apimachinery/pkg/watch"
-	testing "k8s.io/client-go/testing"
+	typednetworkingv1alpha1 "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned/typed/networking/v1alpha1"
+	gentype "k8s.io/client-go/gentype"
 )
 
-// FakeLoadBalancers implements LoadBalancerInterface
-type FakeLoadBalancers struct {
+// fakeLoadBalancers implements LoadBalancerInterface
+type fakeLoadBalancers struct {
+	*gentype.FakeClientWithListAndApply[*v1alpha1.LoadBalancer, *v1alpha1.LoadBalancerList, *networkingv1alpha1.LoadBalancerApplyConfiguration]
 	Fake *FakeNetworkingV1alpha1
-	ns   string
 }
 
-var loadbalancersResource = v1alpha1.SchemeGroupVersion.WithResource("loadbalancers")
-
-var loadbalancersKind = v1alpha1.SchemeGroupVersion.WithKind("LoadBalancer")
-
-// Get takes name of the loadBalancer, and returns the corresponding loadBalancer object, and an error if there is any.
-func (c *FakeLoadBalancers) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.LoadBalancer, err error) {
-	emptyResult := &v1alpha1.LoadBalancer{}
-	obj, err := c.Fake.
-		Invokes(testing.NewGetActionWithOptions(loadbalancersResource, c.ns, name, options), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
+func newFakeLoadBalancers(fake *FakeNetworkingV1alpha1, namespace string) typednetworkingv1alpha1.LoadBalancerInterface {
+	return &fakeLoadBalancers{
+		gentype.NewFakeClientWithListAndApply[*v1alpha1.LoadBalancer, *v1alpha1.LoadBalancerList, *networkingv1alpha1.LoadBalancerApplyConfiguration](
+			fake.Fake,
+			namespace,
+			v1alpha1.SchemeGroupVersion.WithResource("loadbalancers"),
+			v1alpha1.SchemeGroupVersion.WithKind("LoadBalancer"),
+			func() *v1alpha1.LoadBalancer { return &v1alpha1.LoadBalancer{} },
+			func() *v1alpha1.LoadBalancerList { return &v1alpha1.LoadBalancerList{} },
+			func(dst, src *v1alpha1.LoadBalancerList) { dst.ListMeta = src.ListMeta },
+			func(list *v1alpha1.LoadBalancerList) []*v1alpha1.LoadBalancer {
+				return gentype.ToPointerSlice(list.Items)
+			},
+			func(list *v1alpha1.LoadBalancerList, items []*v1alpha1.LoadBalancer) {
+				list.Items = gentype.FromPointerSlice(items)
+			},
+		),
+		fake,
 	}
-	return obj.(*v1alpha1.LoadBalancer), err
-}
-
-// List takes label and field selectors, and returns the list of LoadBalancers that match those selectors.
-func (c *FakeLoadBalancers) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.LoadBalancerList, err error) {
-	emptyResult := &v1alpha1.LoadBalancerList{}
-	obj, err := c.Fake.
-		Invokes(testing.NewListActionWithOptions(loadbalancersResource, loadbalancersKind, c.ns, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-
-	label, _, _ := testing.ExtractFromListOptions(opts)
-	if label == nil {
-		label = labels.Everything()
-	}
-	list := &v1alpha1.LoadBalancerList{ListMeta: obj.(*v1alpha1.LoadBalancerList).ListMeta}
-	for _, item := range obj.(*v1alpha1.LoadBalancerList).Items {
-		if label.Matches(labels.Set(item.Labels)) {
-			list.Items = append(list.Items, item)
-		}
-	}
-	return list, err
-}
-
-// Watch returns a watch.Interface that watches the requested loadBalancers.
-func (c *FakeLoadBalancers) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
-	return c.Fake.
-		InvokesWatch(testing.NewWatchActionWithOptions(loadbalancersResource, c.ns, opts))
-
-}
-
-// Create takes the representation of a loadBalancer and creates it.  Returns the server's representation of the loadBalancer, and an error, if there is any.
-func (c *FakeLoadBalancers) Create(ctx context.Context, loadBalancer *v1alpha1.LoadBalancer, opts v1.CreateOptions) (result *v1alpha1.LoadBalancer, err error) {
-	emptyResult := &v1alpha1.LoadBalancer{}
-	obj, err := c.Fake.
-		Invokes(testing.NewCreateActionWithOptions(loadbalancersResource, c.ns, loadBalancer, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.LoadBalancer), err
-}
-
-// Update takes the representation of a loadBalancer and updates it. Returns the server's representation of the loadBalancer, and an error, if there is any.
-func (c *FakeLoadBalancers) Update(ctx context.Context, loadBalancer *v1alpha1.LoadBalancer, opts v1.UpdateOptions) (result *v1alpha1.LoadBalancer, err error) {
-	emptyResult := &v1alpha1.LoadBalancer{}
-	obj, err := c.Fake.
-		Invokes(testing.NewUpdateActionWithOptions(loadbalancersResource, c.ns, loadBalancer, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.LoadBalancer), err
-}
-
-// UpdateStatus was generated because the type contains a Status member.
-// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeLoadBalancers) UpdateStatus(ctx context.Context, loadBalancer *v1alpha1.LoadBalancer, opts v1.UpdateOptions) (result *v1alpha1.LoadBalancer, err error) {
-	emptyResult := &v1alpha1.LoadBalancer{}
-	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceActionWithOptions(loadbalancersResource, "status", c.ns, loadBalancer, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.LoadBalancer), err
-}
-
-// Delete takes name of the loadBalancer and deletes it. Returns an error if one occurs.
-func (c *FakeLoadBalancers) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
-	_, err := c.Fake.
-		Invokes(testing.NewDeleteActionWithOptions(loadbalancersResource, c.ns, name, opts), &v1alpha1.LoadBalancer{})
-
-	return err
-}
-
-// DeleteCollection deletes a collection of objects.
-func (c *FakeLoadBalancers) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionActionWithOptions(loadbalancersResource, c.ns, opts, listOpts)
-
-	_, err := c.Fake.Invokes(action, &v1alpha1.LoadBalancerList{})
-	return err
-}
-
-// Patch applies the patch and returns the patched loadBalancer.
-func (c *FakeLoadBalancers) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.LoadBalancer, err error) {
-	emptyResult := &v1alpha1.LoadBalancer{}
-	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceActionWithOptions(loadbalancersResource, c.ns, name, pt, data, opts, subresources...), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.LoadBalancer), err
-}
-
-// Apply takes the given apply declarative configuration, applies it and returns the applied loadBalancer.
-func (c *FakeLoadBalancers) Apply(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancerApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.LoadBalancer, err error) {
-	if loadBalancer == nil {
-		return nil, fmt.Errorf("loadBalancer provided to Apply must not be nil")
-	}
-	data, err := json.Marshal(loadBalancer)
-	if err != nil {
-		return nil, err
-	}
-	name := loadBalancer.Name
-	if name == nil {
-		return nil, fmt.Errorf("loadBalancer.Name must be provided to Apply")
-	}
-	emptyResult := &v1alpha1.LoadBalancer{}
-	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceActionWithOptions(loadbalancersResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions()), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.LoadBalancer), err
-}
-
-// ApplyStatus was generated because the type contains a Status member.
-// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-func (c *FakeLoadBalancers) ApplyStatus(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancerApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.LoadBalancer, err error) {
-	if loadBalancer == nil {
-		return nil, fmt.Errorf("loadBalancer provided to Apply must not be nil")
-	}
-	data, err := json.Marshal(loadBalancer)
-	if err != nil {
-		return nil, err
-	}
-	name := loadBalancer.Name
-	if name == nil {
-		return nil, fmt.Errorf("loadBalancer.Name must be provided to Apply")
-	}
-	emptyResult := &v1alpha1.LoadBalancer{}
-	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceActionWithOptions(loadbalancersResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions(), "status"), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.LoadBalancer), err
 }

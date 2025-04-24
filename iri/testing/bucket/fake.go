@@ -18,7 +18,7 @@ import (
 )
 
 type FakeBucket struct {
-	iri.Bucket
+	*iri.Bucket
 }
 
 type FakeBucketClass struct {
@@ -82,8 +82,7 @@ func (r *FakeRuntimeService) ListEvents(ctx context.Context, req *iri.ListEvents
 
 	var res []*irievent.Event
 	for _, e := range r.Events {
-		event := e.Event
-		res = append(res, &event)
+		res = append(res, &e.Event)
 	}
 
 	return &iri.ListEventsResponse{Events: res}, nil
@@ -106,8 +105,7 @@ func (r *FakeRuntimeService) ListBuckets(ctx context.Context, req *iri.ListBucke
 			}
 		}
 
-		bucket := v.Bucket
-		res = append(res, &bucket)
+		res = append(res, v.Bucket)
 	}
 	return &iri.ListBucketsResponse{Buckets: res}, nil
 }
@@ -116,7 +114,7 @@ func (r *FakeRuntimeService) CreateBucket(ctx context.Context, req *iri.CreateBu
 	r.Lock()
 	defer r.Unlock()
 
-	bucket := *req.Bucket
+	bucket := req.Bucket
 	bucket.Metadata.Id = r.idGen.Generate()
 	bucket.Metadata.CreatedAt = time.Now().UnixNano()
 	bucket.Status = &iri.BucketStatus{}
@@ -126,7 +124,7 @@ func (r *FakeRuntimeService) CreateBucket(ctx context.Context, req *iri.CreateBu
 	}
 
 	return &iri.CreateBucketResponse{
-		Bucket: &bucket,
+		Bucket: bucket,
 	}, nil
 }
 
@@ -149,8 +147,7 @@ func (r *FakeRuntimeService) ListBucketClasses(ctx context.Context, req *iri.Lis
 
 	var res []*iri.BucketClass
 	for _, b := range r.BucketClasses {
-		bucketClass := b.BucketClass
-		res = append(res, &bucketClass)
+		res = append(res, &b.BucketClass)
 	}
 	return &iri.ListBucketClassesResponse{BucketClasses: res}, nil
 }

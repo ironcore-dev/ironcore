@@ -16,15 +16,15 @@ type FakeComputeV1alpha1 struct {
 }
 
 func (c *FakeComputeV1alpha1) Machines(namespace string) v1alpha1.MachineInterface {
-	return &FakeMachines{c, namespace}
+	return newFakeMachines(c, namespace)
 }
 
 func (c *FakeComputeV1alpha1) MachineClasses() v1alpha1.MachineClassInterface {
-	return &FakeMachineClasses{c}
+	return newFakeMachineClasses(c)
 }
 
 func (c *FakeComputeV1alpha1) MachinePools() v1alpha1.MachinePoolInterface {
-	return &FakeMachinePools{c}
+	return newFakeMachinePools(c)
 }
 
 func (c *FakeComputeV1alpha1) Reservations(namespace string) v1alpha1.ReservationInterface {

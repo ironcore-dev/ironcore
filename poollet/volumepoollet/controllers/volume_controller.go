@@ -214,14 +214,14 @@ func (r *VolumeReconciler) delete(ctx context.Context, log logr.Logger, volume *
 	return ctrl.Result{}, nil
 }
 
-func getIRIVolumeClassCapabilities(volumeClass *storagev1alpha1.VolumeClass) (*iri.VolumeClassCapabilities, error) {
+func getIRIVolumeClassCapabilities(volumeClass *storagev1alpha1.VolumeClass) *iri.VolumeClassCapabilities {
 	tps := volumeClass.Capabilities.TPS()
 	iops := volumeClass.Capabilities.IOPS()
 
 	return &iri.VolumeClassCapabilities{
 		Tps:  tps.Value(),
 		Iops: iops.Value(),
-	}, nil
+	}
 }
 
 func (r *VolumeReconciler) prepareIRIVolumeMetadata(volume *storagev1alpha1.Volume) *irimeta.ObjectMetadata {
@@ -244,10 +244,7 @@ func (r *VolumeReconciler) prepareIRIVolumeClass(ctx context.Context, volume *st
 		return "", false, nil
 	}
 
-	caps, err := getIRIVolumeClassCapabilities(volumeClass)
-	if err != nil {
-		return "", false, fmt.Errorf("error getting iri volume class capabilities: %w", err)
-	}
+	caps := getIRIVolumeClassCapabilities(volumeClass)
 
 	class, _, err := r.VolumeClassMapper.GetVolumeClassFor(ctx, volumeClassName, caps)
 	if err != nil {
@@ -279,12 +276,12 @@ func (r *VolumeReconciler) prepareIRIVolumeEncryption(ctx context.Context, volum
 	}, true, nil
 }
 
-func (r *VolumeReconciler) prepareIRIVolumeResources(_ context.Context, _ *storagev1alpha1.Volume, resources corev1alpha1.ResourceList) (*iri.VolumeResources, bool, error) {
+func (r *VolumeReconciler) prepareIRIVolumeResources(resources corev1alpha1.ResourceList) *iri.VolumeResources {
 	storageBytes := resources.Storage().Value()
 
 	return &iri.VolumeResources{
 		StorageBytes: storageBytes,
-	}, true, nil
+	}
 }
 
 func (r *VolumeReconciler) prepareIRIVolume(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume) (*iri.Volume, bool, error) {
@@ -311,14 +308,7 @@ func (r *VolumeReconciler) prepareIRIVolume(ctx context.Context, log logr.Logger
 		ok = false
 	}
 
-	resources, resourcesOK, err := r.prepareIRIVolumeResources(ctx, volume, volume.Spec.Resources)
-	switch {
-	case err != nil:
-		errs = append(errs, fmt.Errorf("error preparing iri volume resources: %w", err))
-	case !resourcesOK:
-		ok = false
-	}
-
+	resources := r.prepareIRIVolumeResources(volume.Spec.Resources)
 	metadata := r.prepareIRIVolumeMetadata(volume)
 
 	if len(errs) > 0 {

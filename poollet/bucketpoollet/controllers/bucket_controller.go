@@ -213,14 +213,14 @@ func (r *BucketReconciler) delete(ctx context.Context, log logr.Logger, bucket *
 	return ctrl.Result{}, nil
 }
 
-func getIRIBucketClassCapabilities(bucketClass *storagev1alpha1.BucketClass) (*iri.BucketClassCapabilities, error) {
+func getIRIBucketClassCapabilities(bucketClass *storagev1alpha1.BucketClass) *iri.BucketClassCapabilities {
 	tps := bucketClass.Capabilities.TPS()
 	iops := bucketClass.Capabilities.IOPS()
 
 	return &iri.BucketClassCapabilities{
 		Tps:  tps.Value(),
 		Iops: iops.Value(),
-	}, nil
+	}
 }
 
 func (r *BucketReconciler) prepareIRIBucketMetadata(bucket *storagev1alpha1.Bucket) *irimeta.ObjectMetadata {
@@ -243,10 +243,7 @@ func (r *BucketReconciler) prepareIRIBucketClass(ctx context.Context, bucket *st
 		return "", false, nil
 	}
 
-	caps, err := getIRIBucketClassCapabilities(bucketClass)
-	if err != nil {
-		return "", false, fmt.Errorf("error getting iri bucket class capabilities: %w", err)
-	}
+	caps := getIRIBucketClassCapabilities(bucketClass)
 
 	class, err := r.BucketClassMapper.GetBucketClassFor(ctx, bucketClassName, caps)
 	if err != nil {

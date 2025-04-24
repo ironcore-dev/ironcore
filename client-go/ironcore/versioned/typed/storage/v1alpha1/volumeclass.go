@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/storage/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	applyconfigurationsstoragev1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/storage/v1alpha1"
 	scheme "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -25,32 +25,33 @@ type VolumeClassesGetter interface {
 
 // VolumeClassInterface has methods to work with VolumeClass resources.
 type VolumeClassInterface interface {
-	Create(ctx context.Context, volumeClass *v1alpha1.VolumeClass, opts v1.CreateOptions) (*v1alpha1.VolumeClass, error)
-	Update(ctx context.Context, volumeClass *v1alpha1.VolumeClass, opts v1.UpdateOptions) (*v1alpha1.VolumeClass, error)
+	Create(ctx context.Context, volumeClass *storagev1alpha1.VolumeClass, opts v1.CreateOptions) (*storagev1alpha1.VolumeClass, error)
+	Update(ctx context.Context, volumeClass *storagev1alpha1.VolumeClass, opts v1.UpdateOptions) (*storagev1alpha1.VolumeClass, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
-	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.VolumeClass, error)
-	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.VolumeClassList, error)
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*storagev1alpha1.VolumeClass, error)
+	List(ctx context.Context, opts v1.ListOptions) (*storagev1alpha1.VolumeClassList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
-	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.VolumeClass, err error)
-	Apply(ctx context.Context, volumeClass *storagev1alpha1.VolumeClassApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.VolumeClass, err error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *storagev1alpha1.VolumeClass, err error)
+	Apply(ctx context.Context, volumeClass *applyconfigurationsstoragev1alpha1.VolumeClassApplyConfiguration, opts v1.ApplyOptions) (result *storagev1alpha1.VolumeClass, err error)
 	VolumeClassExpansion
 }
 
 // volumeClasses implements VolumeClassInterface
 type volumeClasses struct {
-	*gentype.ClientWithListAndApply[*v1alpha1.VolumeClass, *v1alpha1.VolumeClassList, *storagev1alpha1.VolumeClassApplyConfiguration]
+	*gentype.ClientWithListAndApply[*storagev1alpha1.VolumeClass, *storagev1alpha1.VolumeClassList, *applyconfigurationsstoragev1alpha1.VolumeClassApplyConfiguration]
 }
 
 // newVolumeClasses returns a VolumeClasses
 func newVolumeClasses(c *StorageV1alpha1Client) *volumeClasses {
 	return &volumeClasses{
-		gentype.NewClientWithListAndApply[*v1alpha1.VolumeClass, *v1alpha1.VolumeClassList, *storagev1alpha1.VolumeClassApplyConfiguration](
+		gentype.NewClientWithListAndApply[*storagev1alpha1.VolumeClass, *storagev1alpha1.VolumeClassList, *applyconfigurationsstoragev1alpha1.VolumeClassApplyConfiguration](
 			"volumeclasses",
 			c.RESTClient(),
 			scheme.ParameterCodec,
 			"",
-			func() *v1alpha1.VolumeClass { return &v1alpha1.VolumeClass{} },
-			func() *v1alpha1.VolumeClassList { return &v1alpha1.VolumeClassList{} }),
+			func() *storagev1alpha1.VolumeClass { return &storagev1alpha1.VolumeClass{} },
+			func() *storagev1alpha1.VolumeClassList { return &storagev1alpha1.VolumeClassList{} },
+		),
 	}
 }

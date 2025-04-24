@@ -15,7 +15,7 @@ import (
 // with apply.
 type VirtualIPTemplateSpecApplyConfiguration struct {
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Spec                             *VirtualIPSpecApplyConfiguration `json:"spec,omitempty"`
+	Spec                             *EphemeralVirtualIPSpecApplyConfiguration `json:"spec,omitempty"`
 }
 
 // VirtualIPTemplateSpecApplyConfiguration constructs a declarative configuration of the VirtualIPTemplateSpec type for use with
@@ -29,7 +29,7 @@ func VirtualIPTemplateSpec() *VirtualIPTemplateSpecApplyConfiguration {
 // If called multiple times, the Name field is set to the value of the last call.
 func (b *VirtualIPTemplateSpecApplyConfiguration) WithName(value string) *VirtualIPTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Name = &value
+	b.ObjectMetaApplyConfiguration.Name = &value
 	return b
 }
 
@@ -38,7 +38,7 @@ func (b *VirtualIPTemplateSpecApplyConfiguration) WithName(value string) *Virtua
 // If called multiple times, the GenerateName field is set to the value of the last call.
 func (b *VirtualIPTemplateSpecApplyConfiguration) WithGenerateName(value string) *VirtualIPTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.GenerateName = &value
+	b.ObjectMetaApplyConfiguration.GenerateName = &value
 	return b
 }
 
@@ -47,7 +47,7 @@ func (b *VirtualIPTemplateSpecApplyConfiguration) WithGenerateName(value string)
 // If called multiple times, the Namespace field is set to the value of the last call.
 func (b *VirtualIPTemplateSpecApplyConfiguration) WithNamespace(value string) *VirtualIPTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Namespace = &value
+	b.ObjectMetaApplyConfiguration.Namespace = &value
 	return b
 }
 
@@ -56,7 +56,7 @@ func (b *VirtualIPTemplateSpecApplyConfiguration) WithNamespace(value string) *V
 // If called multiple times, the UID field is set to the value of the last call.
 func (b *VirtualIPTemplateSpecApplyConfiguration) WithUID(value types.UID) *VirtualIPTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.UID = &value
+	b.ObjectMetaApplyConfiguration.UID = &value
 	return b
 }
 
@@ -65,7 +65,7 @@ func (b *VirtualIPTemplateSpecApplyConfiguration) WithUID(value types.UID) *Virt
 // If called multiple times, the ResourceVersion field is set to the value of the last call.
 func (b *VirtualIPTemplateSpecApplyConfiguration) WithResourceVersion(value string) *VirtualIPTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.ResourceVersion = &value
+	b.ObjectMetaApplyConfiguration.ResourceVersion = &value
 	return b
 }
 
@@ -74,7 +74,7 @@ func (b *VirtualIPTemplateSpecApplyConfiguration) WithResourceVersion(value stri
 // If called multiple times, the Generation field is set to the value of the last call.
 func (b *VirtualIPTemplateSpecApplyConfiguration) WithGeneration(value int64) *VirtualIPTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Generation = &value
+	b.ObjectMetaApplyConfiguration.Generation = &value
 	return b
 }
 
@@ -83,7 +83,7 @@ func (b *VirtualIPTemplateSpecApplyConfiguration) WithGeneration(value int64) *V
 // If called multiple times, the CreationTimestamp field is set to the value of the last call.
 func (b *VirtualIPTemplateSpecApplyConfiguration) WithCreationTimestamp(value metav1.Time) *VirtualIPTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.CreationTimestamp = &value
+	b.ObjectMetaApplyConfiguration.CreationTimestamp = &value
 	return b
 }
 
@@ -92,7 +92,7 @@ func (b *VirtualIPTemplateSpecApplyConfiguration) WithCreationTimestamp(value me
 // If called multiple times, the DeletionTimestamp field is set to the value of the last call.
 func (b *VirtualIPTemplateSpecApplyConfiguration) WithDeletionTimestamp(value metav1.Time) *VirtualIPTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.DeletionTimestamp = &value
+	b.ObjectMetaApplyConfiguration.DeletionTimestamp = &value
 	return b
 }
 
@@ -101,7 +101,7 @@ func (b *VirtualIPTemplateSpecApplyConfiguration) WithDeletionTimestamp(value me
 // If called multiple times, the DeletionGracePeriodSeconds field is set to the value of the last call.
 func (b *VirtualIPTemplateSpecApplyConfiguration) WithDeletionGracePeriodSeconds(value int64) *VirtualIPTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.DeletionGracePeriodSeconds = &value
+	b.ObjectMetaApplyConfiguration.DeletionGracePeriodSeconds = &value
 	return b
 }
 
@@ -111,11 +111,11 @@ func (b *VirtualIPTemplateSpecApplyConfiguration) WithDeletionGracePeriodSeconds
 // overwriting an existing map entries in Labels field with the same key.
 func (b *VirtualIPTemplateSpecApplyConfiguration) WithLabels(entries map[string]string) *VirtualIPTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	if b.Labels == nil && len(entries) > 0 {
-		b.Labels = make(map[string]string, len(entries))
+	if b.ObjectMetaApplyConfiguration.Labels == nil && len(entries) > 0 {
+		b.ObjectMetaApplyConfiguration.Labels = make(map[string]string, len(entries))
 	}
 	for k, v := range entries {
-		b.Labels[k] = v
+		b.ObjectMetaApplyConfiguration.Labels[k] = v
 	}
 	return b
 }
@@ -126,11 +126,11 @@ func (b *VirtualIPTemplateSpecApplyConfiguration) WithLabels(entries map[string]
 // overwriting an existing map entries in Annotations field with the same key.
 func (b *VirtualIPTemplateSpecApplyConfiguration) WithAnnotations(entries map[string]string) *VirtualIPTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	if b.Annotations == nil && len(entries) > 0 {
-		b.Annotations = make(map[string]string, len(entries))
+	if b.ObjectMetaApplyConfiguration.Annotations == nil && len(entries) > 0 {
+		b.ObjectMetaApplyConfiguration.Annotations = make(map[string]string, len(entries))
 	}
 	for k, v := range entries {
-		b.Annotations[k] = v
+		b.ObjectMetaApplyConfiguration.Annotations[k] = v
 	}
 	return b
 }
@@ -144,7 +144,7 @@ func (b *VirtualIPTemplateSpecApplyConfiguration) WithOwnerReferences(values ...
 		if values[i] == nil {
 			panic("nil value passed to WithOwnerReferences")
 		}
-		b.OwnerReferences = append(b.OwnerReferences, *values[i])
+		b.ObjectMetaApplyConfiguration.OwnerReferences = append(b.ObjectMetaApplyConfiguration.OwnerReferences, *values[i])
 	}
 	return b
 }
@@ -155,7 +155,7 @@ func (b *VirtualIPTemplateSpecApplyConfiguration) WithOwnerReferences(values ...
 func (b *VirtualIPTemplateSpecApplyConfiguration) WithFinalizers(values ...string) *VirtualIPTemplateSpecApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	for i := range values {
-		b.Finalizers = append(b.Finalizers, values[i])
+		b.ObjectMetaApplyConfiguration.Finalizers = append(b.ObjectMetaApplyConfiguration.Finalizers, values[i])
 	}
 	return b
 }
@@ -169,7 +169,7 @@ func (b *VirtualIPTemplateSpecApplyConfiguration) ensureObjectMetaApplyConfigura
 // WithSpec sets the Spec field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Spec field is set to the value of the last call.
-func (b *VirtualIPTemplateSpecApplyConfiguration) WithSpec(value *VirtualIPSpecApplyConfiguration) *VirtualIPTemplateSpecApplyConfiguration {
+func (b *VirtualIPTemplateSpecApplyConfiguration) WithSpec(value *EphemeralVirtualIPSpecApplyConfiguration) *VirtualIPTemplateSpecApplyConfiguration {
 	b.Spec = value
 	return b
 }
@@ -177,5 +177,5 @@ func (b *VirtualIPTemplateSpecApplyConfiguration) WithSpec(value *VirtualIPSpecA
 // GetName retrieves the value of the Name field in the declarative configuration.
 func (b *VirtualIPTemplateSpecApplyConfiguration) GetName() *string {
 	b.ensureObjectMetaApplyConfigurationExists()
-	return b.Name
+	return b.ObjectMetaApplyConfiguration.Name
 }

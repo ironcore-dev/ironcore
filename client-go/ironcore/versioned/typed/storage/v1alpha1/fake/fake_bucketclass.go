@@ -6,133 +6,35 @@
 package fake
 
 import (
-	"context"
-	json "encoding/json"
-	"fmt"
-
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/storage/v1alpha1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	labels "k8s.io/apimachinery/pkg/labels"
-	types "k8s.io/apimachinery/pkg/types"
-	watch "k8s.io/apimachinery/pkg/watch"
-	testing "k8s.io/client-go/testing"
+	typedstoragev1alpha1 "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned/typed/storage/v1alpha1"
+	gentype "k8s.io/client-go/gentype"
 )
 
-// FakeBucketClasses implements BucketClassInterface
-type FakeBucketClasses struct {
+// fakeBucketClasses implements BucketClassInterface
+type fakeBucketClasses struct {
+	*gentype.FakeClientWithListAndApply[*v1alpha1.BucketClass, *v1alpha1.BucketClassList, *storagev1alpha1.BucketClassApplyConfiguration]
 	Fake *FakeStorageV1alpha1
 }
 
-var bucketclassesResource = v1alpha1.SchemeGroupVersion.WithResource("bucketclasses")
-
-var bucketclassesKind = v1alpha1.SchemeGroupVersion.WithKind("BucketClass")
-
-// Get takes name of the bucketClass, and returns the corresponding bucketClass object, and an error if there is any.
-func (c *FakeBucketClasses) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.BucketClass, err error) {
-	emptyResult := &v1alpha1.BucketClass{}
-	obj, err := c.Fake.
-		Invokes(testing.NewRootGetActionWithOptions(bucketclassesResource, name, options), emptyResult)
-	if obj == nil {
-		return emptyResult, err
+func newFakeBucketClasses(fake *FakeStorageV1alpha1) typedstoragev1alpha1.BucketClassInterface {
+	return &fakeBucketClasses{
+		gentype.NewFakeClientWithListAndApply[*v1alpha1.BucketClass, *v1alpha1.BucketClassList, *storagev1alpha1.BucketClassApplyConfiguration](
+			fake.Fake,
+			"",
+			v1alpha1.SchemeGroupVersion.WithResource("bucketclasses"),
+			v1alpha1.SchemeGroupVersion.WithKind("BucketClass"),
+			func() *v1alpha1.BucketClass { return &v1alpha1.BucketClass{} },
+			func() *v1alpha1.BucketClassList { return &v1alpha1.BucketClassList{} },
+			func(dst, src *v1alpha1.BucketClassList) { dst.ListMeta = src.ListMeta },
+			func(list *v1alpha1.BucketClassList) []*v1alpha1.BucketClass {
+				return gentype.ToPointerSlice(list.Items)
+			},
+			func(list *v1alpha1.BucketClassList, items []*v1alpha1.BucketClass) {
+				list.Items = gentype.FromPointerSlice(items)
+			},
+		),
+		fake,
 	}
-	return obj.(*v1alpha1.BucketClass), err
-}
-
-// List takes label and field selectors, and returns the list of BucketClasses that match those selectors.
-func (c *FakeBucketClasses) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.BucketClassList, err error) {
-	emptyResult := &v1alpha1.BucketClassList{}
-	obj, err := c.Fake.
-		Invokes(testing.NewRootListActionWithOptions(bucketclassesResource, bucketclassesKind, opts), emptyResult)
-	if obj == nil {
-		return emptyResult, err
-	}
-
-	label, _, _ := testing.ExtractFromListOptions(opts)
-	if label == nil {
-		label = labels.Everything()
-	}
-	list := &v1alpha1.BucketClassList{ListMeta: obj.(*v1alpha1.BucketClassList).ListMeta}
-	for _, item := range obj.(*v1alpha1.BucketClassList).Items {
-		if label.Matches(labels.Set(item.Labels)) {
-			list.Items = append(list.Items, item)
-		}
-	}
-	return list, err
-}
-
-// Watch returns a watch.Interface that watches the requested bucketClasses.
-func (c *FakeBucketClasses) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
-	return c.Fake.
-		InvokesWatch(testing.NewRootWatchActionWithOptions(bucketclassesResource, opts))
-}
-
-// Create takes the representation of a bucketClass and creates it.  Returns the server's representation of the bucketClass, and an error, if there is any.
-func (c *FakeBucketClasses) Create(ctx context.Context, bucketClass *v1alpha1.BucketClass, opts v1.CreateOptions) (result *v1alpha1.BucketClass, err error) {
-	emptyResult := &v1alpha1.BucketClass{}
-	obj, err := c.Fake.
-		Invokes(testing.NewRootCreateActionWithOptions(bucketclassesResource, bucketClass, opts), emptyResult)
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.BucketClass), err
-}
-
-// Update takes the representation of a bucketClass and updates it. Returns the server's representation of the bucketClass, and an error, if there is any.
-func (c *FakeBucketClasses) Update(ctx context.Context, bucketClass *v1alpha1.BucketClass, opts v1.UpdateOptions) (result *v1alpha1.BucketClass, err error) {
-	emptyResult := &v1alpha1.BucketClass{}
-	obj, err := c.Fake.
-		Invokes(testing.NewRootUpdateActionWithOptions(bucketclassesResource, bucketClass, opts), emptyResult)
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.BucketClass), err
-}
-
-// Delete takes name of the bucketClass and deletes it. Returns an error if one occurs.
-func (c *FakeBucketClasses) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
-	_, err := c.Fake.
-		Invokes(testing.NewRootDeleteActionWithOptions(bucketclassesResource, name, opts), &v1alpha1.BucketClass{})
-	return err
-}
-
-// DeleteCollection deletes a collection of objects.
-func (c *FakeBucketClasses) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewRootDeleteCollectionActionWithOptions(bucketclassesResource, opts, listOpts)
-
-	_, err := c.Fake.Invokes(action, &v1alpha1.BucketClassList{})
-	return err
-}
-
-// Patch applies the patch and returns the patched bucketClass.
-func (c *FakeBucketClasses) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.BucketClass, err error) {
-	emptyResult := &v1alpha1.BucketClass{}
-	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceActionWithOptions(bucketclassesResource, name, pt, data, opts, subresources...), emptyResult)
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.BucketClass), err
-}
-
-// Apply takes the given apply declarative configuration, applies it and returns the applied bucketClass.
-func (c *FakeBucketClasses) Apply(ctx context.Context, bucketClass *storagev1alpha1.BucketClassApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.BucketClass, err error) {
-	if bucketClass == nil {
-		return nil, fmt.Errorf("bucketClass provided to Apply must not be nil")
-	}
-	data, err := json.Marshal(bucketClass)
-	if err != nil {
-		return nil, err
-	}
-	name := bucketClass.Name
-	if name == nil {
-		return nil, fmt.Errorf("bucketClass.Name must be provided to Apply")
-	}
-	emptyResult := &v1alpha1.BucketClass{}
-	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceActionWithOptions(bucketclassesResource, *name, types.ApplyPatchType, data, opts.ToPatchOptions()), emptyResult)
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.BucketClass), err
 }
