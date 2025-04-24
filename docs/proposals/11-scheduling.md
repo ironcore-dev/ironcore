@@ -1,11 +1,11 @@
 ---
-title: Reservation-Based Scheduling
+title: Reservation-Based Scheduling for Machines
 
 iep-number: 11
 
 creation-date: 2024-09-30
 
-status: draft
+status: implementable
 
 authors:
 
@@ -19,7 +19,7 @@ reviewers:
 
 ---
 
-# IEP-11: Reservation-Based Scheduling
+# IEP-11: Reservation-Based Scheduling for `Machine`s
 
 ## Table of Contents
 
