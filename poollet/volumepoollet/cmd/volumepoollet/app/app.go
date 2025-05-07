@@ -15,6 +15,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
+	"github.com/ironcore-dev/controller-utils/configutils"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
@@ -28,7 +29,6 @@ import (
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vem"
 	"github.com/ironcore-dev/ironcore/utils/client/config"
 
-	"github.com/ironcore-dev/controller-utils/configutils"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -310,10 +310,13 @@ func Run(ctx context.Context, opts Options) error {
 		}
 
 		if err := (&controllers.VolumeReconciler{
-			EventRecorder:           mgr.GetEventRecorderFor("volumes"),
-			Client:                  mgr.GetClient(),
-			Scheme:                  scheme,
-			VolumeRuntime:           volumeRuntime,
+			EventRecorder: mgr.GetEventRecorderFor("volumes"),
+			Client:        mgr.GetClient(),
+			Scheme:        scheme,
+			VolumeRuntime: volumeRuntime,
+			// TODO(balpert): need to extend volume runtime interface to provide the runtime name.
+			// see machinereconciler implementation for reference.
+			VolumeRuntimeName:       "",
 			VolumeClassMapper:       volumeClassMapper,
 			VolumePoolName:          opts.VolumePoolName,
 			WatchFilterValue:        opts.WatchFilterValue,

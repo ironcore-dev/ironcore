@@ -13,6 +13,7 @@ import (
 // VolumeStatusApplyConfiguration represents a declarative configuration of the VolumeStatus type for use
 // with apply.
 type VolumeStatusApplyConfiguration struct {
+	VolumeID                *string                             `json:"volumeID,omitempty"`
 	State                   *storagev1alpha1.VolumeState        `json:"state,omitempty"`
 	LastStateTransitionTime *v1.Time                            `json:"lastStateTransitionTime,omitempty"`
 	Access                  *VolumeAccessApplyConfiguration     `json:"access,omitempty"`
@@ -23,6 +24,14 @@ type VolumeStatusApplyConfiguration struct {
 // apply.
 func VolumeStatus() *VolumeStatusApplyConfiguration {
 	return &VolumeStatusApplyConfiguration{}
+}
+
+// WithVolumeID sets the VolumeID field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the VolumeID field is set to the value of the last call.
+func (b *VolumeStatusApplyConfiguration) WithVolumeID(value string) *VolumeStatusApplyConfiguration {
+	b.VolumeID = &value
+	return b
 }
 
 // WithState sets the State field in the declarative configuration to the given value

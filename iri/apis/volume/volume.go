@@ -10,6 +10,7 @@ import (
 )
 
 type RuntimeService interface {
+	// Version(context.Context, *api.VersionRequest) (*api.VersionResponse, error)
 	ListEvents(context.Context, *api.ListEventsRequest) (*api.ListEventsResponse, error)
 	ListVolumes(context.Context, *api.ListVolumesRequest) (*api.ListVolumesResponse, error)
 	CreateVolume(context.Context, *api.CreateVolumeRequest) (*api.CreateVolumeResponse, error)
