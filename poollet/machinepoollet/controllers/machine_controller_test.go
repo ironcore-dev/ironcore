@@ -14,7 +14,7 @@ import (
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	testingmachine "github.com/ironcore-dev/ironcore/iri/testing/machine"
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
-	machinepoolletmachine "github.com/ironcore-dev/ironcore/poollet/machinepoollet/machine"
+	poolletproviderid "github.com/ironcore-dev/ironcore/utils/poollet"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
@@ -132,7 +132,7 @@ var _ = Describe("MachineController", func() {
 		})))
 
 		By("waiting for the ironcore machine status to be up-to-date")
-		expectedMachineID := machinepoolletmachine.MakeID(testingmachine.FakeRuntimeName, iriMachine.Metadata.Id)
+		expectedMachineID := poolletproviderid.MakeID(testingmachine.FakeRuntimeName, iriMachine.Metadata.Id)
 		Eventually(Object(machine)).Should(SatisfyAll(
 			HaveField("Status.MachineID", expectedMachineID.String()),
 			HaveField("Status.ObservedGeneration", machine.Generation),
@@ -280,7 +280,7 @@ var _ = Describe("MachineController", func() {
 		})))
 
 		By("waiting for the ironcore machine status to be up-to-date")
-		expectedMachineID := machinepoolletmachine.MakeID(testingmachine.FakeRuntimeName, iriMachine.Metadata.Id)
+		expectedMachineID := poolletproviderid.MakeID(testingmachine.FakeRuntimeName, iriMachine.Metadata.Id)
 		Eventually(Object(machine)).Should(SatisfyAll(
 			HaveField("Status.MachineID", expectedMachineID.String()),
 			HaveField("Status.ObservedGeneration", machine.Generation),
@@ -463,7 +463,7 @@ var _ = Describe("MachineController", func() {
 		})))
 
 		By("waiting for the ironcore machine status to be up-to-date")
-		expectedMachineID := machinepoolletmachine.MakeID(testingmachine.FakeRuntimeName, iriMachine.Metadata.Id)
+		expectedMachineID := poolletproviderid.MakeID(testingmachine.FakeRuntimeName, iriMachine.Metadata.Id)
 		Eventually(Object(machine)).Should(SatisfyAll(
 			HaveField("Status.MachineID", expectedMachineID.String()),
 			HaveField("Status.ObservedGeneration", machine.Generation),

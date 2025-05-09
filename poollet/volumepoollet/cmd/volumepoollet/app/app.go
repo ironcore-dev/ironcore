@@ -269,6 +269,10 @@ func Run(ctx context.Context, opts Options) error {
 		}
 	}
 
+	version, err := volumeRuntime.Version(ctx, &iri.VersionRequest{})
+	if err != nil {
+		return fmt.Errorf("error getting volume runtime version: %w", err)
+	}
 	volumeClassMapper := vcm.NewGeneric(volumeRuntime, vcm.GenericOptions{})
 	if err := mgr.Add(volumeClassMapper); err != nil {
 		return fmt.Errorf("error adding volume class mapper: %w", err)
@@ -314,6 +318,7 @@ func Run(ctx context.Context, opts Options) error {
 			Client:                  mgr.GetClient(),
 			Scheme:                  scheme,
 			VolumeRuntime:           volumeRuntime,
+			VolumeRuntimeName:       version.RuntimeName,
 			VolumeClassMapper:       volumeClassMapper,
 			VolumePoolName:          opts.VolumePoolName,
 			WatchFilterValue:        opts.WatchFilterValue,

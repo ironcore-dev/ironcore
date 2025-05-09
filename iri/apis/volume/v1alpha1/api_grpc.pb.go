@@ -20,6 +20,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
+	VolumeRuntime_Version_FullMethodName      = "/volume.v1alpha1.VolumeRuntime/Version"
 	VolumeRuntime_ListEvents_FullMethodName   = "/volume.v1alpha1.VolumeRuntime/ListEvents"
 	VolumeRuntime_ListVolumes_FullMethodName  = "/volume.v1alpha1.VolumeRuntime/ListVolumes"
 	VolumeRuntime_CreateVolume_FullMethodName = "/volume.v1alpha1.VolumeRuntime/CreateVolume"
@@ -32,6 +33,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type VolumeRuntimeClient interface {
+	Version(ctx context.Context, in *VersionRequest, opts ...grpc.CallOption) (*VersionResponse, error)
 	ListEvents(ctx context.Context, in *ListEventsRequest, opts ...grpc.CallOption) (*ListEventsResponse, error)
 	ListVolumes(ctx context.Context, in *ListVolumesRequest, opts ...grpc.CallOption) (*ListVolumesResponse, error)
 	CreateVolume(ctx context.Context, in *CreateVolumeRequest, opts ...grpc.CallOption) (*CreateVolumeResponse, error)
@@ -46,6 +48,16 @@ type volumeRuntimeClient struct {
 
 func NewVolumeRuntimeClient(cc grpc.ClientConnInterface) VolumeRuntimeClient {
 	return &volumeRuntimeClient{cc}
+}
+
+func (c *volumeRuntimeClient) Version(ctx context.Context, in *VersionRequest, opts ...grpc.CallOption) (*VersionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(VersionResponse)
+	err := c.cc.Invoke(ctx, VolumeRuntime_Version_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *volumeRuntimeClient) ListEvents(ctx context.Context, in *ListEventsRequest, opts ...grpc.CallOption) (*ListEventsResponse, error) {
@@ -112,6 +124,7 @@ func (c *volumeRuntimeClient) Status(ctx context.Context, in *StatusRequest, opt
 // All implementations must embed UnimplementedVolumeRuntimeServer
 // for forward compatibility.
 type VolumeRuntimeServer interface {
+	Version(context.Context, *VersionRequest) (*VersionResponse, error)
 	ListEvents(context.Context, *ListEventsRequest) (*ListEventsResponse, error)
 	ListVolumes(context.Context, *ListVolumesRequest) (*ListVolumesResponse, error)
 	CreateVolume(context.Context, *CreateVolumeRequest) (*CreateVolumeResponse, error)
@@ -128,6 +141,9 @@ type VolumeRuntimeServer interface {
 // pointer dereference when methods are called.
 type UnimplementedVolumeRuntimeServer struct{}
 
+func (UnimplementedVolumeRuntimeServer) Version(context.Context, *VersionRequest) (*VersionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Version not implemented")
+}
 func (UnimplementedVolumeRuntimeServer) ListEvents(context.Context, *ListEventsRequest) (*ListEventsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListEvents not implemented")
 }
@@ -165,6 +181,24 @@ func RegisterVolumeRuntimeServer(s grpc.ServiceRegistrar, srv VolumeRuntimeServe
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&VolumeRuntime_ServiceDesc, srv)
+}
+
+func _VolumeRuntime_Version_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VersionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VolumeRuntimeServer).Version(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VolumeRuntime_Version_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VolumeRuntimeServer).Version(ctx, req.(*VersionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _VolumeRuntime_ListEvents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -282,6 +316,10 @@ var VolumeRuntime_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "volume.v1alpha1.VolumeRuntime",
 	HandlerType: (*VolumeRuntimeServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Version",
+			Handler:    _VolumeRuntime_Version_Handler,
+		},
 		{
 			MethodName: "ListEvents",
 			Handler:    _VolumeRuntime_ListEvents_Handler,

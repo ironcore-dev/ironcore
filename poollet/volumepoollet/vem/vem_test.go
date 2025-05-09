@@ -75,6 +75,7 @@ var _ = Describe("VolumeEventMapper", func() {
 			EventRecorder:     &record.FakeRecorder{},
 			Client:            k8sManager.GetClient(),
 			VolumeRuntime:     srv,
+			VolumeRuntimeName: fakevolume.FakeRuntimeName,
 			VolumeClassMapper: volumeClassMapper,
 			VolumePoolName:    vp.Name,
 		}).SetupWithManager(k8sManager)).To(Succeed())
