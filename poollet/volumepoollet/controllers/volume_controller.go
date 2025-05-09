@@ -21,6 +21,7 @@ import (
 	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers/events"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
+	volumepoolletvolume "github.com/ironcore-dev/ironcore/poollet/volumepoollet/volume"
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
 
@@ -44,7 +45,8 @@ type VolumeReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
 
-	VolumeRuntime iriVolume.RuntimeService
+	VolumeRuntime     iriVolume.RuntimeService
+	VolumeRuntimeName string
 
 	VolumeClassMapper vcm.VolumeClassMapper
 
@@ -507,6 +509,8 @@ func (r *VolumeReconciler) updateStatus(ctx context.Context, log logr.Logger, vo
 	base := volume.DeepCopy()
 	now := metav1.Now()
 
+	volumeID := volumepoolletvolume.MakeID(r.VolumeRuntimeName, iriVolume.Metadata.Id)
+
 	volume.Status.Access = access
 	newState, err := r.convertIRIVolumeState(iriVolume.Status.State)
 	if err != nil {
@@ -516,6 +520,7 @@ func (r *VolumeReconciler) updateStatus(ctx context.Context, log logr.Logger, vo
 		volume.Status.LastStateTransitionTime = &now
 	}
 	volume.Status.State = newState
+	volume.Status.VolumeID = volumeID.String()
 
 	if err := r.Status().Patch(ctx, volume, client.MergeFrom(base)); err != nil {
 		return fmt.Errorf("error patching volume status: %w", err)

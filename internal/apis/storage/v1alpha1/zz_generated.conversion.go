@@ -987,6 +987,7 @@ func Convert_storage_VolumeSpec_To_v1alpha1_VolumeSpec(in *storage.VolumeSpec, o
 }
 
 func autoConvert_v1alpha1_VolumeStatus_To_storage_VolumeStatus(in *storagev1alpha1.VolumeStatus, out *storage.VolumeStatus, s conversion.Scope) error {
+	out.VolumeID = in.VolumeID
 	out.State = storage.VolumeState(in.State)
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
 	out.Access = (*storage.VolumeAccess)(unsafe.Pointer(in.Access))
@@ -1000,6 +1001,7 @@ func Convert_v1alpha1_VolumeStatus_To_storage_VolumeStatus(in *storagev1alpha1.V
 }
 
 func autoConvert_storage_VolumeStatus_To_v1alpha1_VolumeStatus(in *storage.VolumeStatus, out *storagev1alpha1.VolumeStatus, s conversion.Scope) error {
+	out.VolumeID = in.VolumeID
 	out.State = storagev1alpha1.VolumeState(in.State)
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
 	out.Access = (*storagev1alpha1.VolumeAccess)(unsafe.Pointer(in.Access))
