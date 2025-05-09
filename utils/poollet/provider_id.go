@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
-package volume
+package poollet
 
 import (
 	"fmt"
@@ -26,7 +26,7 @@ func (i *ID) UnmarshalText(data []byte) error {
 	// Trim the quotes and split the type and ID.
 	parts := strings.Split(strings.Trim(s, "\""), "://")
 	if len(parts) != 2 {
-		return fmt.Errorf("invalid volume ID: %q", s)
+		return fmt.Errorf("invalid ID: %q", s)
 	}
 	i.Type, i.ID = parts[0], parts[1]
 	return nil

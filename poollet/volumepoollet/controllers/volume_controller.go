@@ -21,7 +21,8 @@ import (
 	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers/events"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
-	volumepoolletvolume "github.com/ironcore-dev/ironcore/poollet/volumepoollet/volume"
+	poolletproviderid "github.com/ironcore-dev/ironcore/utils/poollet"
+
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
 
@@ -509,7 +510,7 @@ func (r *VolumeReconciler) updateStatus(ctx context.Context, log logr.Logger, vo
 	base := volume.DeepCopy()
 	now := metav1.Now()
 
-	volumeID := volumepoolletvolume.MakeID(r.VolumeRuntimeName, iriVolume.Metadata.Id)
+	volumeID := poolletproviderid.MakeID(r.VolumeRuntimeName, iriVolume.Metadata.Id)
 
 	volume.Status.Access = access
 	newState, err := r.convertIRIVolumeState(iriVolume.Status.State)

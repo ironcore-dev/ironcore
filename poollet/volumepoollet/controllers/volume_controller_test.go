@@ -10,8 +10,8 @@ import (
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	testingvolume "github.com/ironcore-dev/ironcore/iri/testing/volume"
-	volumepoolletvolume "github.com/ironcore-dev/ironcore/poollet/volumepoollet/volume"
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
+	poolletproviderid "github.com/ironcore-dev/ironcore/utils/poollet"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -84,8 +84,9 @@ var _ = Describe("VolumeController", func() {
 		iriVolume.Status.State = iri.VolumeState_VOLUME_AVAILABLE
 
 		Expect(ironcoreclient.PatchAddReconcileAnnotation(ctx, k8sClient, volume)).Should(Succeed())
-		expectedVolumeID := volumepoolletvolume.MakeID(testingvolume.FakeRuntimeName, iriVolume.Metadata.Id)
 
+		By("Waiting for the ironcore volume Status to be up-to-date")
+		expectedVolumeID := poolletproviderid.MakeID(testingvolume.FakeRuntimeName, iriVolume.Metadata.Id)
 		Eventually(Object(volume)).Should(SatisfyAll(
 			HaveField("Status.State", storagev1alpha1.VolumeStateAvailable),
 			HaveField("Status.VolumeID", expectedVolumeID.String()),
