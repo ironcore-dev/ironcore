@@ -1434,6 +1434,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: access
       type:
         namedType: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketAccess
+    - name: bucketID
+      type:
+        scalar: string
     - name: conditions
       type:
         list:
