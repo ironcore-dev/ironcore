@@ -24,10 +24,10 @@ import (
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	machinepoolletclient "github.com/ironcore-dev/ironcore/poollet/machinepoollet/client"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers/events"
-	machinepoolletmachine "github.com/ironcore-dev/ironcore/poollet/machinepoollet/machine"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/mcm"
 	utilclient "github.com/ironcore-dev/ironcore/utils/client"
 	utilmaps "github.com/ironcore-dev/ironcore/utils/maps"
+	poolletproviderid "github.com/ironcore-dev/ironcore/utils/poollet"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
 
 	"github.com/ironcore-dev/controller-utils/clientutils"
@@ -536,7 +536,7 @@ func (r *MachineReconciler) updateMachineStatus(ctx context.Context, machine *co
 		return err
 	}
 
-	machineID := machinepoolletmachine.MakeID(r.MachineRuntimeName, iriMachine.Metadata.Id)
+	machineID := poolletproviderid.MakeID(r.MachineRuntimeName, iriMachine.Metadata.Id)
 
 	state, err := r.convertIRIMachineState(iriMachine.Status.State)
 	if err != nil {
