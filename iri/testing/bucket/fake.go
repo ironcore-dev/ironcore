@@ -17,6 +17,14 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+var (
+	// FakeVersion is the version of the fake runtime.
+	FakeVersion = "0.1.0"
+
+	// FakeRuntimeName is the name of the fake runtime.
+	FakeRuntimeName = "fakeRuntime"
+)
+
 type FakeBucket struct {
 	*iri.Bucket
 }
@@ -86,6 +94,13 @@ func (r *FakeRuntimeService) ListEvents(ctx context.Context, req *iri.ListEvents
 	}
 
 	return &iri.ListEventsResponse{Events: res}, nil
+}
+
+func (r *FakeRuntimeService) Version(ctx context.Context, req *iri.VersionRequest) (*iri.VersionResponse, error) {
+	return &iri.VersionResponse{
+		RuntimeName:    FakeRuntimeName,
+		RuntimeVersion: FakeVersion,
+	}, nil
 }
 
 func (r *FakeRuntimeService) ListBuckets(ctx context.Context, req *iri.ListBucketsRequest) (*iri.ListBucketsResponse, error) {

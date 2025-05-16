@@ -214,6 +214,7 @@ func SetupTest() (*corev1.Namespace, *storagev1alpha1.BucketPool, *storagev1alph
 			Client:            k8sManager.GetClient(),
 			Scheme:            scheme.Scheme,
 			BucketRuntime:     srv,
+			BucketRuntimeName: bucket.FakeRuntimeName,
 			BucketClassMapper: bucketClassMapper,
 			BucketPoolName:    bp.Name,
 		}).SetupWithManager(k8sManager)).To(Succeed())

@@ -20,6 +20,8 @@ import (
 	bucketpoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/bucketpoollet/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/bcm"
 	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/controllers/events"
+	poolletproviderid "github.com/ironcore-dev/ironcore/utils/poollet"
+
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
 
@@ -43,7 +45,8 @@ type BucketReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
 
-	BucketRuntime iriBucket.RuntimeService
+	BucketRuntime     iriBucket.RuntimeService
+	BucketRuntimeName string
 
 	BucketClassMapper bcm.BucketClassMapper
 
@@ -438,6 +441,8 @@ func (r *BucketReconciler) updateStatus(ctx context.Context, log logr.Logger, bu
 	base := bucket.DeepCopy()
 	now := metav1.Now()
 
+	bucketID := poolletproviderid.MakeID(r.BucketRuntimeName, iriBucket.Metadata.Id)
+
 	bucket.Status.Access = access
 	newState, err := r.convertIRIBucketState(iriBucket.Status.State)
 	if err != nil {
@@ -447,6 +452,7 @@ func (r *BucketReconciler) updateStatus(ctx context.Context, log logr.Logger, bu
 		bucket.Status.LastStateTransitionTime = &now
 	}
 	bucket.Status.State = newState
+	bucket.Status.BucketID = bucketID.String()
 
 	if err := r.Status().Patch(ctx, bucket, client.MergeFrom(base)); err != nil {
 		return fmt.Errorf("error patching bucket status: %w", err)

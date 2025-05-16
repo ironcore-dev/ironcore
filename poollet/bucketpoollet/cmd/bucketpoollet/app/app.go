@@ -269,6 +269,10 @@ func Run(ctx context.Context, opts Options) error {
 		}
 	}
 
+	version, err := bucketRuntime.Version(ctx, &iri.VersionRequest{})
+	if err != nil {
+		return fmt.Errorf("error getting bucket runtime version: %w", err)
+	}
 	bucketClassMapper := bcm.NewGeneric(bucketRuntime, bcm.GenericOptions{})
 	if err := mgr.Add(bucketClassMapper); err != nil {
 		return fmt.Errorf("error adding bucket class mapper: %w", err)
@@ -310,6 +314,7 @@ func Run(ctx context.Context, opts Options) error {
 			Client:                  mgr.GetClient(),
 			Scheme:                  scheme,
 			BucketRuntime:           bucketRuntime,
+			BucketRuntimeName:       version.RuntimeName,
 			BucketClassMapper:       bucketClassMapper,
 			BucketPoolName:          opts.BucketPoolName,
 			WatchFilterValue:        opts.WatchFilterValue,

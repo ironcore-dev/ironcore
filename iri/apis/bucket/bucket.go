@@ -10,6 +10,7 @@ import (
 )
 
 type RuntimeService interface {
+	Version(context.Context, *api.VersionRequest) (*api.VersionResponse, error)
 	ListEvents(context.Context, *api.ListEventsRequest) (*api.ListEventsResponse, error)
 	ListBuckets(context.Context, *api.ListBucketsRequest) (*api.ListBucketsResponse, error)
 	CreateBucket(context.Context, *api.CreateBucketRequest) (*api.CreateBucketResponse, error)
