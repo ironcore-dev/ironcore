@@ -5142,6 +5142,13 @@ func schema_ironcore_api_storage_v1alpha1_BucketStatus(ref common.ReferenceCallb
 				Description: "BucketStatus defines the observed state of Bucket",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
+					"bucketID": {
+						SchemaProps: spec.SchemaProps{
+							Description: "BucketID is the provider specific bucket ID in the format '<type>://<bucket_id>'.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 					"state": {
 						SchemaProps: spec.SchemaProps{
 							Description: "State represents the infrastructure state of a Bucket.",

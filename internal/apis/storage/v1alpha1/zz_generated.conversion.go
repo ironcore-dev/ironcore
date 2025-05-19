@@ -587,6 +587,7 @@ func Convert_storage_BucketSpec_To_v1alpha1_BucketSpec(in *storage.BucketSpec, o
 }
 
 func autoConvert_v1alpha1_BucketStatus_To_storage_BucketStatus(in *storagev1alpha1.BucketStatus, out *storage.BucketStatus, s conversion.Scope) error {
+	out.BucketID = in.BucketID
 	out.State = storage.BucketState(in.State)
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
 	out.Access = (*storage.BucketAccess)(unsafe.Pointer(in.Access))
@@ -600,6 +601,7 @@ func Convert_v1alpha1_BucketStatus_To_storage_BucketStatus(in *storagev1alpha1.B
 }
 
 func autoConvert_storage_BucketStatus_To_v1alpha1_BucketStatus(in *storage.BucketStatus, out *storagev1alpha1.BucketStatus, s conversion.Scope) error {
+	out.BucketID = in.BucketID
 	out.State = storagev1alpha1.BucketState(in.State)
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
 	out.Access = (*storagev1alpha1.BucketAccess)(unsafe.Pointer(in.Access))

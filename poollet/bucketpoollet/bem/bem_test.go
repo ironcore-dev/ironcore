@@ -71,6 +71,7 @@ var _ = Describe("BucketEventMapper", func() {
 			EventRecorder:     &record.FakeRecorder{},
 			Client:            k8sManager.GetClient(),
 			BucketRuntime:     srv,
+			BucketRuntimeName: fakebucket.FakeRuntimeName,
 			BucketClassMapper: bucketClassMapper,
 			BucketPoolName:    bp.Name,
 		}).SetupWithManager(k8sManager)).To(Succeed())

@@ -20,6 +20,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
+	BucketRuntime_Version_FullMethodName           = "/bucket.v1alpha1.BucketRuntime/Version"
 	BucketRuntime_ListEvents_FullMethodName        = "/bucket.v1alpha1.BucketRuntime/ListEvents"
 	BucketRuntime_ListBuckets_FullMethodName       = "/bucket.v1alpha1.BucketRuntime/ListBuckets"
 	BucketRuntime_CreateBucket_FullMethodName      = "/bucket.v1alpha1.BucketRuntime/CreateBucket"
@@ -31,6 +32,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BucketRuntimeClient interface {
+	Version(ctx context.Context, in *VersionRequest, opts ...grpc.CallOption) (*VersionResponse, error)
 	ListEvents(ctx context.Context, in *ListEventsRequest, opts ...grpc.CallOption) (*ListEventsResponse, error)
 	ListBuckets(ctx context.Context, in *ListBucketsRequest, opts ...grpc.CallOption) (*ListBucketsResponse, error)
 	CreateBucket(ctx context.Context, in *CreateBucketRequest, opts ...grpc.CallOption) (*CreateBucketResponse, error)
@@ -44,6 +46,16 @@ type bucketRuntimeClient struct {
 
 func NewBucketRuntimeClient(cc grpc.ClientConnInterface) BucketRuntimeClient {
 	return &bucketRuntimeClient{cc}
+}
+
+func (c *bucketRuntimeClient) Version(ctx context.Context, in *VersionRequest, opts ...grpc.CallOption) (*VersionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(VersionResponse)
+	err := c.cc.Invoke(ctx, BucketRuntime_Version_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *bucketRuntimeClient) ListEvents(ctx context.Context, in *ListEventsRequest, opts ...grpc.CallOption) (*ListEventsResponse, error) {
@@ -100,6 +112,7 @@ func (c *bucketRuntimeClient) ListBucketClasses(ctx context.Context, in *ListBuc
 // All implementations must embed UnimplementedBucketRuntimeServer
 // for forward compatibility.
 type BucketRuntimeServer interface {
+	Version(context.Context, *VersionRequest) (*VersionResponse, error)
 	ListEvents(context.Context, *ListEventsRequest) (*ListEventsResponse, error)
 	ListBuckets(context.Context, *ListBucketsRequest) (*ListBucketsResponse, error)
 	CreateBucket(context.Context, *CreateBucketRequest) (*CreateBucketResponse, error)
@@ -115,6 +128,9 @@ type BucketRuntimeServer interface {
 // pointer dereference when methods are called.
 type UnimplementedBucketRuntimeServer struct{}
 
+func (UnimplementedBucketRuntimeServer) Version(context.Context, *VersionRequest) (*VersionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Version not implemented")
+}
 func (UnimplementedBucketRuntimeServer) ListEvents(context.Context, *ListEventsRequest) (*ListEventsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListEvents not implemented")
 }
@@ -149,6 +165,24 @@ func RegisterBucketRuntimeServer(s grpc.ServiceRegistrar, srv BucketRuntimeServe
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&BucketRuntime_ServiceDesc, srv)
+}
+
+func _BucketRuntime_Version_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VersionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BucketRuntimeServer).Version(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BucketRuntime_Version_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BucketRuntimeServer).Version(ctx, req.(*VersionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _BucketRuntime_ListEvents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -248,6 +282,10 @@ var BucketRuntime_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "bucket.v1alpha1.BucketRuntime",
 	HandlerType: (*BucketRuntimeServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Version",
+			Handler:    _BucketRuntime_Version_Handler,
+		},
 		{
 			MethodName: "ListEvents",
 			Handler:    _BucketRuntime_ListEvents_Handler,
