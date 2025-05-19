@@ -6,14 +6,14 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 )
 
 // ReservationPoolStatusApplyConfiguration represents a declarative configuration of the ReservationPoolStatus type for use
 // with apply.
 type ReservationPoolStatusApplyConfiguration struct {
-	Name  *string                    `json:"ref,omitempty"`
-	State *v1alpha1.ReservationState `json:"state,omitempty"`
+	Name  *string                           `json:"ref,omitempty"`
+	State *computev1alpha1.ReservationState `json:"state,omitempty"`
 }
 
 // ReservationPoolStatusApplyConfiguration constructs a declarative configuration of the ReservationPoolStatus type for use with
@@ -33,7 +33,7 @@ func (b *ReservationPoolStatusApplyConfiguration) WithName(value string) *Reserv
 // WithState sets the State field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the State field is set to the value of the last call.
-func (b *ReservationPoolStatusApplyConfiguration) WithState(value v1alpha1.ReservationState) *ReservationPoolStatusApplyConfiguration {
+func (b *ReservationPoolStatusApplyConfiguration) WithState(value computev1alpha1.ReservationState) *ReservationPoolStatusApplyConfiguration {
 	b.State = &value
 	return b
 }

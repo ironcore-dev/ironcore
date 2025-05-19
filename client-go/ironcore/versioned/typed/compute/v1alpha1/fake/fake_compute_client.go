@@ -28,7 +28,7 @@ func (c *FakeComputeV1alpha1) MachinePools() v1alpha1.MachinePoolInterface {
 }
 
 func (c *FakeComputeV1alpha1) Reservations(namespace string) v1alpha1.ReservationInterface {
-	return &FakeReservations{c, namespace}
+	return newFakeReservations(c, namespace)
 }
 
 // RESTClient returns a RESTClient that is used to communicate

@@ -6,15 +6,15 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 )
 
 // ReservationSpecApplyConfiguration represents a declarative configuration of the ReservationSpec type for use
 // with apply.
 type ReservationSpecApplyConfiguration struct {
-	Pools     []v1.LocalObjectReference `json:"pools,omitempty"`
-	Resources *v1alpha1.ResourceList    `json:"capabilities,omitempty"`
+	Pools     []v1.LocalObjectReference  `json:"pools,omitempty"`
+	Resources *corev1alpha1.ResourceList `json:"capabilities,omitempty"`
 }
 
 // ReservationSpecApplyConfiguration constructs a declarative configuration of the ReservationSpec type for use with
@@ -36,7 +36,7 @@ func (b *ReservationSpecApplyConfiguration) WithPools(values ...v1.LocalObjectRe
 // WithResources sets the Resources field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Resources field is set to the value of the last call.
-func (b *ReservationSpecApplyConfiguration) WithResources(value v1alpha1.ResourceList) *ReservationSpecApplyConfiguration {
+func (b *ReservationSpecApplyConfiguration) WithResources(value corev1alpha1.ResourceList) *ReservationSpecApplyConfiguration {
 	b.Resources = &value
 	return b
 }

@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 
-	v1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	computev1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/compute/v1alpha1"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	applyconfigurationscomputev1alpha1 "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/compute/v1alpha1"
 	scheme "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -25,36 +25,37 @@ type ReservationsGetter interface {
 
 // ReservationInterface has methods to work with Reservation resources.
 type ReservationInterface interface {
-	Create(ctx context.Context, reservation *v1alpha1.Reservation, opts v1.CreateOptions) (*v1alpha1.Reservation, error)
-	Update(ctx context.Context, reservation *v1alpha1.Reservation, opts v1.UpdateOptions) (*v1alpha1.Reservation, error)
+	Create(ctx context.Context, reservation *computev1alpha1.Reservation, opts v1.CreateOptions) (*computev1alpha1.Reservation, error)
+	Update(ctx context.Context, reservation *computev1alpha1.Reservation, opts v1.UpdateOptions) (*computev1alpha1.Reservation, error)
 	// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-	UpdateStatus(ctx context.Context, reservation *v1alpha1.Reservation, opts v1.UpdateOptions) (*v1alpha1.Reservation, error)
+	UpdateStatus(ctx context.Context, reservation *computev1alpha1.Reservation, opts v1.UpdateOptions) (*computev1alpha1.Reservation, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
-	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.Reservation, error)
-	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.ReservationList, error)
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*computev1alpha1.Reservation, error)
+	List(ctx context.Context, opts v1.ListOptions) (*computev1alpha1.ReservationList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
-	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.Reservation, err error)
-	Apply(ctx context.Context, reservation *computev1alpha1.ReservationApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.Reservation, err error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *computev1alpha1.Reservation, err error)
+	Apply(ctx context.Context, reservation *applyconfigurationscomputev1alpha1.ReservationApplyConfiguration, opts v1.ApplyOptions) (result *computev1alpha1.Reservation, err error)
 	// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-	ApplyStatus(ctx context.Context, reservation *computev1alpha1.ReservationApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.Reservation, err error)
+	ApplyStatus(ctx context.Context, reservation *applyconfigurationscomputev1alpha1.ReservationApplyConfiguration, opts v1.ApplyOptions) (result *computev1alpha1.Reservation, err error)
 	ReservationExpansion
 }
 
 // reservations implements ReservationInterface
 type reservations struct {
-	*gentype.ClientWithListAndApply[*v1alpha1.Reservation, *v1alpha1.ReservationList, *computev1alpha1.ReservationApplyConfiguration]
+	*gentype.ClientWithListAndApply[*computev1alpha1.Reservation, *computev1alpha1.ReservationList, *applyconfigurationscomputev1alpha1.ReservationApplyConfiguration]
 }
 
 // newReservations returns a Reservations
 func newReservations(c *ComputeV1alpha1Client, namespace string) *reservations {
 	return &reservations{
-		gentype.NewClientWithListAndApply[*v1alpha1.Reservation, *v1alpha1.ReservationList, *computev1alpha1.ReservationApplyConfiguration](
+		gentype.NewClientWithListAndApply[*computev1alpha1.Reservation, *computev1alpha1.ReservationList, *applyconfigurationscomputev1alpha1.ReservationApplyConfiguration](
 			"reservations",
 			c.RESTClient(),
 			scheme.ParameterCodec,
 			namespace,
-			func() *v1alpha1.Reservation { return &v1alpha1.Reservation{} },
-			func() *v1alpha1.ReservationList { return &v1alpha1.ReservationList{} }),
+			func() *computev1alpha1.Reservation { return &computev1alpha1.Reservation{} },
+			func() *computev1alpha1.ReservationList { return &computev1alpha1.ReservationList{} },
+		),
 	}
 }

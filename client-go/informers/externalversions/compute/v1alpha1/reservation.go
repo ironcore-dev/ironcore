@@ -6,13 +6,13 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
-	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	apicomputev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	internalinterfaces "github.com/ironcore-dev/ironcore/client-go/informers/externalversions/internalinterfaces"
 	versioned "github.com/ironcore-dev/ironcore/client-go/ironcore/versioned"
-	v1alpha1 "github.com/ironcore-dev/ironcore/client-go/listers/compute/v1alpha1"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/client-go/listers/compute/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
@@ -23,7 +23,7 @@ import (
 // Reservations.
 type ReservationInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.ReservationLister
+	Lister() computev1alpha1.ReservationLister
 }
 
 type reservationInformer struct {
@@ -58,7 +58,7 @@ func NewFilteredReservationInformer(client versioned.Interface, namespace string
 				return client.ComputeV1alpha1().Reservations(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&computev1alpha1.Reservation{},
+		&apicomputev1alpha1.Reservation{},
 		resyncPeriod,
 		indexers,
 	)
@@ -69,9 +69,9 @@ func (f *reservationInformer) defaultInformer(client versioned.Interface, resync
 }
 
 func (f *reservationInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&computev1alpha1.Reservation{}, f.defaultInformer)
+	return f.factory.InformerFor(&apicomputev1alpha1.Reservation{}, f.defaultInformer)
 }
 
-func (f *reservationInformer) Lister() v1alpha1.ReservationLister {
-	return v1alpha1.NewReservationLister(f.Informer().GetIndexer())
+func (f *reservationInformer) Lister() computev1alpha1.ReservationLister {
+	return computev1alpha1.NewReservationLister(f.Informer().GetIndexer())
 }
