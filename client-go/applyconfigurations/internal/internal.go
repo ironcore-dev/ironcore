@@ -1487,6 +1487,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: access
       type:
         namedType: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketAccess
+    - name: bucketID
+      type:
+        scalar: string
     - name: conditions
       type:
         list:
@@ -1733,6 +1736,9 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
     - name: state
+      type:
+        scalar: string
+    - name: volumeID
       type:
         scalar: string
 - name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeTemplateSpec

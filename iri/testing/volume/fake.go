@@ -16,6 +16,14 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 )
 
+var (
+	// FakeVersion is the version of the fake runtime.
+	FakeVersion = "0.1.0"
+
+	// FakeRuntimeName is the name of the fake runtime.
+	FakeRuntimeName = "fakeRuntime"
+)
+
 func filterInLabels(labelSelector, lbls map[string]string) bool {
 	return labels.SelectorFromSet(labelSelector).Matches(labels.Set(lbls))
 }
@@ -89,6 +97,12 @@ func (r *FakeRuntimeService) ListEvents(ctx context.Context, req *iri.ListEvents
 	}
 
 	return &iri.ListEventsResponse{Events: res}, nil
+}
+func (r *FakeRuntimeService) Version(ctx context.Context, req *iri.VersionRequest) (*iri.VersionResponse, error) {
+	return &iri.VersionResponse{
+		RuntimeName:    FakeRuntimeName,
+		RuntimeVersion: FakeVersion,
+	}, nil
 }
 
 func (r *FakeRuntimeService) ListVolumes(ctx context.Context, req *iri.ListVolumesRequest) (*iri.ListVolumesResponse, error) {
