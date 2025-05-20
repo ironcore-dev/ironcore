@@ -14,7 +14,6 @@ import (
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	_ "k8s.io/api/core/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -64,7 +63,7 @@ var _ = Describe("MachineController", func() {
 		Expect(iriReservation.Metadata.Labels).To(HaveKeyWithValue(machinepoolletv1alpha1.DownwardAPILabel(fooDownwardAPILabel), fooAnnotationValue))
 
 		By("setting the reservation state to accepted")
-		iriReservation = &testingmachine.FakeReservation{Reservation: *proto.Clone(&iriReservation.Reservation).(*iri.Reservation)}
+		iriReservation = &testingmachine.FakeReservation{Reservation: proto.Clone(iriReservation.Reservation).(*iri.Reservation)}
 		iriReservation.Status.State = iri.ReservationState_RESERVATION_STATE_ACCEPTED
 		srv.SetReservations([]*testingmachine.FakeReservation{iriReservation})
 

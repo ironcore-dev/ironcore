@@ -52,7 +52,7 @@ type FakeMachine struct {
 }
 
 type FakeReservation struct {
-	iri.Reservation
+	*iri.Reservation
 }
 
 type FakeVolume struct {
@@ -332,8 +332,7 @@ func (r *FakeRuntimeService) ListReservations(ctx context.Context, req *iri.List
 			}
 		}
 
-		reservation := m.Reservation
-		res = append(res, &reservation)
+		res = append(res, m.Reservation)
 	}
 	return &iri.ListReservationsResponse{Reservations: res}, nil
 }
@@ -352,7 +351,7 @@ func (r *FakeRuntimeService) CreateReservation(ctx context.Context, req *iri.Cre
 	r.Lock()
 	defer r.Unlock()
 
-	reservation := *req.Reservation
+	reservation := req.Reservation
 	reservation.Metadata.Id = generateID(defaultIDLength)
 	reservation.Metadata.CreatedAt = time.Now().UnixNano()
 	reservation.Status = &iri.ReservationStatus{
@@ -364,7 +363,7 @@ func (r *FakeRuntimeService) CreateReservation(ctx context.Context, req *iri.Cre
 	}
 
 	return &iri.CreateReservationResponse{
-		Reservation: &reservation,
+		Reservation: reservation,
 	}, nil
 }
 

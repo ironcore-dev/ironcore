@@ -28,6 +28,7 @@ rules:
   - compute.ironcore.dev
   resources:
   - machines
+  - reservations
   verbs:
   - create
   - delete
@@ -43,18 +44,6 @@ rules:
   verbs:
   - create
   - get
-- apiGroups:
-  - compute.ironcore.dev
-  resources:
-  - reservations
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
 - apiGroups:
   - networking.ironcore.dev
   resources:
