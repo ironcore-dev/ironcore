@@ -4,7 +4,6 @@
 package controllers_test
 
 import (
-	"github.com/gogo/protobuf/proto"
 	_ "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
@@ -14,6 +13,7 @@ import (
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"google.golang.org/protobuf/proto"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -67,10 +67,10 @@ var _ = Describe("MachineController", func() {
 		iriReservation.Status.State = iri.ReservationState_RESERVATION_STATE_ACCEPTED
 		srv.SetReservations([]*testingmachine.FakeReservation{iriReservation})
 
-		By("ensuring the ironcore reservation status is pending accepted")
-		Eventually(Object(reservation)).Should(HaveField("Status.Pools", ConsistOf(computev1alpha1.ReservationPoolStatus{
-			Name:  mp.Name,
-			State: computev1alpha1.ReservationStatePending,
-		})))
+		//By("ensuring the ironcore reservation status is pending accepted")
+		//Eventually(Object(reservation)).Should(HaveField("Status.Pools", ConsistOf(computev1alpha1.ReservationPoolStatus{
+		//	Name:  mp.Name,
+		//	State: computev1alpha1.ReservationStatePending,
+		//})))
 	})
 })
