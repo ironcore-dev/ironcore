@@ -353,6 +353,7 @@ type VolumeStatus struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	State         VolumeState            `protobuf:"varint,1,opt,name=state,proto3,enum=volume.v1alpha1.VolumeState" json:"state,omitempty"`
 	Access        *VolumeAccess          `protobuf:"bytes,2,opt,name=access,proto3" json:"access,omitempty"`
+	Resources     *VolumeResources       `protobuf:"bytes,3,opt,name=resources,proto3" json:"resources,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -397,6 +398,13 @@ func (x *VolumeStatus) GetState() VolumeState {
 func (x *VolumeStatus) GetAccess() *VolumeAccess {
 	if x != nil {
 		return x.Access
+	}
+	return nil
+}
+
+func (x *VolumeStatus) GetResources() *VolumeResources {
+	if x != nil {
+		return x.Resources
 	}
 	return nil
 }
@@ -1330,10 +1338,11 @@ const file_volume_v1alpha1_api_proto_rawDesc = "" +
 	"\tresources\x18\x03 \x01(\v2 .volume.v1alpha1.VolumeResourcesR\tresources\x12?\n" +
 	"\n" +
 	"encryption\x18\x04 \x01(\v2\x1f.volume.v1alpha1.EncryptionSpecR\n" +
-	"encryption\"y\n" +
+	"encryption\"\xb9\x01\n" +
 	"\fVolumeStatus\x122\n" +
 	"\x05state\x18\x01 \x01(\x0e2\x1c.volume.v1alpha1.VolumeStateR\x05state\x125\n" +
-	"\x06access\x18\x02 \x01(\v2\x1d.volume.v1alpha1.VolumeAccessR\x06access\"\xab\x01\n" +
+	"\x06access\x18\x02 \x01(\v2\x1d.volume.v1alpha1.VolumeAccessR\x06access\x12>\n" +
+	"\tresources\x18\x03 \x01(\v2 .volume.v1alpha1.VolumeResourcesR\tresources\"\xab\x01\n" +
 	"\x06Volume\x129\n" +
 	"\bmetadata\x18\x01 \x01(\v2\x1d.meta.v1alpha1.ObjectMetadataR\bmetadata\x12/\n" +
 	"\x04spec\x18\x02 \x01(\v2\x1b.volume.v1alpha1.VolumeSpecR\x04spec\x125\n" +
@@ -1459,40 +1468,41 @@ var file_volume_v1alpha1_api_proto_depIdxs = []int32{
 	4,  // 4: volume.v1alpha1.VolumeSpec.encryption:type_name -> volume.v1alpha1.EncryptionSpec
 	0,  // 5: volume.v1alpha1.VolumeStatus.state:type_name -> volume.v1alpha1.VolumeState
 	11, // 6: volume.v1alpha1.VolumeStatus.access:type_name -> volume.v1alpha1.VolumeAccess
-	31, // 7: volume.v1alpha1.Volume.metadata:type_name -> meta.v1alpha1.ObjectMetadata
-	5,  // 8: volume.v1alpha1.Volume.spec:type_name -> volume.v1alpha1.VolumeSpec
-	6,  // 9: volume.v1alpha1.Volume.status:type_name -> volume.v1alpha1.VolumeStatus
-	8,  // 10: volume.v1alpha1.VolumeClass.capabilities:type_name -> volume.v1alpha1.VolumeClassCapabilities
-	9,  // 11: volume.v1alpha1.VolumeClassStatus.volume_class:type_name -> volume.v1alpha1.VolumeClass
-	29, // 12: volume.v1alpha1.VolumeAccess.attributes:type_name -> volume.v1alpha1.VolumeAccess.AttributesEntry
-	30, // 13: volume.v1alpha1.VolumeAccess.secret_data:type_name -> volume.v1alpha1.VolumeAccess.SecretDataEntry
-	2,  // 14: volume.v1alpha1.ListEventsRequest.filter:type_name -> volume.v1alpha1.EventFilter
-	32, // 15: volume.v1alpha1.ListEventsResponse.events:type_name -> event.v1alpha1.Event
-	1,  // 16: volume.v1alpha1.ListVolumesRequest.filter:type_name -> volume.v1alpha1.VolumeFilter
-	7,  // 17: volume.v1alpha1.ListVolumesResponse.volumes:type_name -> volume.v1alpha1.Volume
-	7,  // 18: volume.v1alpha1.CreateVolumeRequest.volume:type_name -> volume.v1alpha1.Volume
-	3,  // 19: volume.v1alpha1.ExpandVolumeRequest.resources:type_name -> volume.v1alpha1.VolumeResources
-	7,  // 20: volume.v1alpha1.CreateVolumeResponse.volume:type_name -> volume.v1alpha1.Volume
-	10, // 21: volume.v1alpha1.StatusResponse.volume_class_status:type_name -> volume.v1alpha1.VolumeClassStatus
-	14, // 22: volume.v1alpha1.VolumeRuntime.Version:input_type -> volume.v1alpha1.VersionRequest
-	12, // 23: volume.v1alpha1.VolumeRuntime.ListEvents:input_type -> volume.v1alpha1.ListEventsRequest
-	16, // 24: volume.v1alpha1.VolumeRuntime.ListVolumes:input_type -> volume.v1alpha1.ListVolumesRequest
-	18, // 25: volume.v1alpha1.VolumeRuntime.CreateVolume:input_type -> volume.v1alpha1.CreateVolumeRequest
-	19, // 26: volume.v1alpha1.VolumeRuntime.ExpandVolume:input_type -> volume.v1alpha1.ExpandVolumeRequest
-	22, // 27: volume.v1alpha1.VolumeRuntime.DeleteVolume:input_type -> volume.v1alpha1.DeleteVolumeRequest
-	24, // 28: volume.v1alpha1.VolumeRuntime.Status:input_type -> volume.v1alpha1.StatusRequest
-	15, // 29: volume.v1alpha1.VolumeRuntime.Version:output_type -> volume.v1alpha1.VersionResponse
-	13, // 30: volume.v1alpha1.VolumeRuntime.ListEvents:output_type -> volume.v1alpha1.ListEventsResponse
-	17, // 31: volume.v1alpha1.VolumeRuntime.ListVolumes:output_type -> volume.v1alpha1.ListVolumesResponse
-	20, // 32: volume.v1alpha1.VolumeRuntime.CreateVolume:output_type -> volume.v1alpha1.CreateVolumeResponse
-	21, // 33: volume.v1alpha1.VolumeRuntime.ExpandVolume:output_type -> volume.v1alpha1.ExpandVolumeResponse
-	23, // 34: volume.v1alpha1.VolumeRuntime.DeleteVolume:output_type -> volume.v1alpha1.DeleteVolumeResponse
-	25, // 35: volume.v1alpha1.VolumeRuntime.Status:output_type -> volume.v1alpha1.StatusResponse
-	29, // [29:36] is the sub-list for method output_type
-	22, // [22:29] is the sub-list for method input_type
-	22, // [22:22] is the sub-list for extension type_name
-	22, // [22:22] is the sub-list for extension extendee
-	0,  // [0:22] is the sub-list for field type_name
+	3,  // 7: volume.v1alpha1.VolumeStatus.resources:type_name -> volume.v1alpha1.VolumeResources
+	31, // 8: volume.v1alpha1.Volume.metadata:type_name -> meta.v1alpha1.ObjectMetadata
+	5,  // 9: volume.v1alpha1.Volume.spec:type_name -> volume.v1alpha1.VolumeSpec
+	6,  // 10: volume.v1alpha1.Volume.status:type_name -> volume.v1alpha1.VolumeStatus
+	8,  // 11: volume.v1alpha1.VolumeClass.capabilities:type_name -> volume.v1alpha1.VolumeClassCapabilities
+	9,  // 12: volume.v1alpha1.VolumeClassStatus.volume_class:type_name -> volume.v1alpha1.VolumeClass
+	29, // 13: volume.v1alpha1.VolumeAccess.attributes:type_name -> volume.v1alpha1.VolumeAccess.AttributesEntry
+	30, // 14: volume.v1alpha1.VolumeAccess.secret_data:type_name -> volume.v1alpha1.VolumeAccess.SecretDataEntry
+	2,  // 15: volume.v1alpha1.ListEventsRequest.filter:type_name -> volume.v1alpha1.EventFilter
+	32, // 16: volume.v1alpha1.ListEventsResponse.events:type_name -> event.v1alpha1.Event
+	1,  // 17: volume.v1alpha1.ListVolumesRequest.filter:type_name -> volume.v1alpha1.VolumeFilter
+	7,  // 18: volume.v1alpha1.ListVolumesResponse.volumes:type_name -> volume.v1alpha1.Volume
+	7,  // 19: volume.v1alpha1.CreateVolumeRequest.volume:type_name -> volume.v1alpha1.Volume
+	3,  // 20: volume.v1alpha1.ExpandVolumeRequest.resources:type_name -> volume.v1alpha1.VolumeResources
+	7,  // 21: volume.v1alpha1.CreateVolumeResponse.volume:type_name -> volume.v1alpha1.Volume
+	10, // 22: volume.v1alpha1.StatusResponse.volume_class_status:type_name -> volume.v1alpha1.VolumeClassStatus
+	14, // 23: volume.v1alpha1.VolumeRuntime.Version:input_type -> volume.v1alpha1.VersionRequest
+	12, // 24: volume.v1alpha1.VolumeRuntime.ListEvents:input_type -> volume.v1alpha1.ListEventsRequest
+	16, // 25: volume.v1alpha1.VolumeRuntime.ListVolumes:input_type -> volume.v1alpha1.ListVolumesRequest
+	18, // 26: volume.v1alpha1.VolumeRuntime.CreateVolume:input_type -> volume.v1alpha1.CreateVolumeRequest
+	19, // 27: volume.v1alpha1.VolumeRuntime.ExpandVolume:input_type -> volume.v1alpha1.ExpandVolumeRequest
+	22, // 28: volume.v1alpha1.VolumeRuntime.DeleteVolume:input_type -> volume.v1alpha1.DeleteVolumeRequest
+	24, // 29: volume.v1alpha1.VolumeRuntime.Status:input_type -> volume.v1alpha1.StatusRequest
+	15, // 30: volume.v1alpha1.VolumeRuntime.Version:output_type -> volume.v1alpha1.VersionResponse
+	13, // 31: volume.v1alpha1.VolumeRuntime.ListEvents:output_type -> volume.v1alpha1.ListEventsResponse
+	17, // 32: volume.v1alpha1.VolumeRuntime.ListVolumes:output_type -> volume.v1alpha1.ListVolumesResponse
+	20, // 33: volume.v1alpha1.VolumeRuntime.CreateVolume:output_type -> volume.v1alpha1.CreateVolumeResponse
+	21, // 34: volume.v1alpha1.VolumeRuntime.ExpandVolume:output_type -> volume.v1alpha1.ExpandVolumeResponse
+	23, // 35: volume.v1alpha1.VolumeRuntime.DeleteVolume:output_type -> volume.v1alpha1.DeleteVolumeResponse
+	25, // 36: volume.v1alpha1.VolumeRuntime.Status:output_type -> volume.v1alpha1.StatusResponse
+	30, // [30:37] is the sub-list for method output_type
+	23, // [23:30] is the sub-list for method input_type
+	23, // [23:23] is the sub-list for extension type_name
+	23, // [23:23] is the sub-list for extension extendee
+	0,  // [0:23] is the sub-list for field type_name
 }
 
 func init() { file_volume_v1alpha1_api_proto_init() }
