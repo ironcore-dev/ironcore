@@ -22,12 +22,14 @@ reviewers:
 
 ## Table of Contents
 
-- [Summary](#summary)
-- [Motivation](#motivation)
+- [IEP-9: Network Peering](#IEP-9-network-peering)
+  - [Table of Contents](#table-of-contents)
+  - [Summary](#summary)
+  - [Motivation](#motivation)
     - [Goals](#goals)
     - [Non-Goals](#non-goals)
-- [Proposal](#proposal)
-- [Alternatives](#alternatives)
+  - [Proposal](#proposal)
+  - [Alternatives](#alternatives)
 
 ## Summary
 
