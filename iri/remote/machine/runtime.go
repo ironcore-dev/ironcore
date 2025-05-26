@@ -74,6 +74,18 @@ func (r *remoteRuntime) DetachNetworkInterface(ctx context.Context, req *iri.Det
 	return r.client.DetachNetworkInterface(ctx, req)
 }
 
+func (r *remoteRuntime) ListReservations(ctx context.Context, req *iri.ListReservationsRequest) (*iri.ListReservationsResponse, error) {
+	return r.client.ListReservations(ctx, req)
+}
+
+func (r *remoteRuntime) CreateReservation(ctx context.Context, req *iri.CreateReservationRequest) (*iri.CreateReservationResponse, error) {
+	return r.client.CreateReservation(ctx, req)
+}
+
+func (r *remoteRuntime) DeleteReservation(ctx context.Context, req *iri.DeleteReservationRequest) (*iri.DeleteReservationResponse, error) {
+	return r.client.DeleteReservation(ctx, req)
+}
+
 func (r *remoteRuntime) Status(ctx context.Context, req *iri.StatusRequest) (*iri.StatusResponse, error) {
 	return r.client.Status(ctx, req)
 }
