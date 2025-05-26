@@ -157,6 +157,10 @@ func (r *FakeRuntimeService) ExpandVolume(ctx context.Context, req *iri.ExpandVo
 
 	volume.Spec.Resources.StorageBytes = req.Resources.StorageBytes
 
+	volume.Status.Resources = &iri.VolumeResources{
+		StorageBytes: req.Resources.StorageBytes,
+	}
+
 	return &iri.ExpandVolumeResponse{}, nil
 }
 

@@ -67319,6 +67319,10 @@
 					"description": "Access specifies how to access a Bucket. This is set by the bucket provider when the bucket is provisioned.",
 					"$ref": "#/definitions/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketAccess"
 				},
+				"bucketID": {
+					"description": "BucketID is the provider specific bucket ID in the format '<type>://<bucket_id>'.",
+					"type": "string"
+				},
 				"conditions": {
 					"description": "Conditions are the conditions of a bucket.",
 					"type": "array",
@@ -67774,8 +67778,19 @@
 					"description": "LastStateTransitionTime is the last time the State transitioned between values.",
 					"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Time"
 				},
+				"resources": {
+					"description": "Resources is a effective volume's resources.",
+					"type": "object",
+					"additionalProperties": {
+						"$ref": "#/definitions/io.k8s.apimachinery.pkg.api.resource.Quantity"
+					}
+				},
 				"state": {
 					"description": "State represents the infrastructure state of a Volume.",
+					"type": "string"
+				},
+				"volumeID": {
+					"description": "VolumeID is the provider specific volume ID in the format '<type>://<volume_id>'.",
 					"type": "string"
 				}
 			}

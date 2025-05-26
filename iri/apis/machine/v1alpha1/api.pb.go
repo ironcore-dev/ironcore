@@ -682,13 +682,14 @@ func (x *VolumeConnection) GetEncryptionData() map[string][]byte {
 }
 
 type Volume struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Device        string                 `protobuf:"bytes,2,opt,name=device,proto3" json:"device,omitempty"`
-	EmptyDisk     *EmptyDisk             `protobuf:"bytes,4,opt,name=empty_disk,json=emptyDisk,proto3" json:"empty_disk,omitempty"`
-	Connection    *VolumeConnection      `protobuf:"bytes,5,opt,name=connection,proto3" json:"connection,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                 protoimpl.MessageState `protogen:"open.v1"`
+	Name                  string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Device                string                 `protobuf:"bytes,2,opt,name=device,proto3" json:"device,omitempty"`
+	EmptyDisk             *EmptyDisk             `protobuf:"bytes,4,opt,name=empty_disk,json=emptyDisk,proto3" json:"empty_disk,omitempty"`
+	Connection            *VolumeConnection      `protobuf:"bytes,5,opt,name=connection,proto3" json:"connection,omitempty"`
+	EffectiveStorageBytes int64                  `protobuf:"varint,6,opt,name=effective_storage_bytes,json=effectiveStorageBytes,proto3" json:"effective_storage_bytes,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *Volume) Reset() {
@@ -747,6 +748,13 @@ func (x *Volume) GetConnection() *VolumeConnection {
 		return x.Connection
 	}
 	return nil
+}
+
+func (x *Volume) GetEffectiveStorageBytes() int64 {
+	if x != nil {
+		return x.EffectiveStorageBytes
+	}
+	return 0
 }
 
 type NetworkInterface struct {
@@ -2404,7 +2412,7 @@ const file_machine_v1alpha1_api_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\fR\x05value:\x028\x01\x1aA\n" +
 	"\x13EncryptionDataEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\fR\x05value:\x028\x01\"\xb4\x01\n" +
+	"\x05value\x18\x02 \x01(\fR\x05value:\x028\x01\"\xec\x01\n" +
 	"\x06Volume\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x16\n" +
 	"\x06device\x18\x02 \x01(\tR\x06device\x12:\n" +
@@ -2412,7 +2420,8 @@ const file_machine_v1alpha1_api_proto_rawDesc = "" +
 	"empty_disk\x18\x04 \x01(\v2\x1b.machine.v1alpha1.EmptyDiskR\temptyDisk\x12B\n" +
 	"\n" +
 	"connection\x18\x05 \x01(\v2\".machine.v1alpha1.VolumeConnectionR\n" +
-	"connection\"\xea\x01\n" +
+	"connection\x126\n" +
+	"\x17effective_storage_bytes\x18\x06 \x01(\x03R\x15effectiveStorageBytes\"\xea\x01\n" +
 	"\x10NetworkInterface\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1d\n" +
 	"\n" +

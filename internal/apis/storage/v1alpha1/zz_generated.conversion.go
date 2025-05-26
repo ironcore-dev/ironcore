@@ -994,6 +994,7 @@ func autoConvert_v1alpha1_VolumeStatus_To_storage_VolumeStatus(in *storagev1alph
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
 	out.Access = (*storage.VolumeAccess)(unsafe.Pointer(in.Access))
 	out.Conditions = *(*[]storage.VolumeCondition)(unsafe.Pointer(&in.Conditions))
+	out.Resources = *(*core.ResourceList)(unsafe.Pointer(&in.Resources))
 	return nil
 }
 
@@ -1008,6 +1009,7 @@ func autoConvert_storage_VolumeStatus_To_v1alpha1_VolumeStatus(in *storage.Volum
 	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
 	out.Access = (*storagev1alpha1.VolumeAccess)(unsafe.Pointer(in.Access))
 	out.Conditions = *(*[]storagev1alpha1.VolumeCondition)(unsafe.Pointer(&in.Conditions))
+	out.Resources = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Resources))
 	return nil
 }
 

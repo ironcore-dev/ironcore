@@ -7,6 +7,7 @@ import (
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	"github.com/ironcore-dev/ironcore/internal/apis/core"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -70,6 +71,14 @@ type VolumeStatus struct {
 
 	// Conditions are the conditions of a volume.
 	Conditions []VolumeCondition
+
+	// Resources is a effective volume's resources.
+	Resources core.ResourceList
+}
+
+type Effective struct {
+	//Effective size of the volume.
+	Size resource.Quantity
 }
 
 // VolumeConditionType is a type a VolumeCondition can have.

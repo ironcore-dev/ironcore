@@ -76,6 +76,7 @@ message Volume {
   string device = 2;
   EmptyDisk empty_disk = 4;
   VolumeConnection connection = 5;
+  int64 effective_storage_bytes=6;
 }
 
 message NetworkInterface {

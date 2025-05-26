@@ -103,8 +103,9 @@ func (s *Server) convertIronCoreVolume(
 	ironcoreVolume *AggregateIronCoreVolume,
 ) (*iri.Volume, error) {
 	var (
-		connection *iri.VolumeConnection
-		emptyDisk  *iri.EmptyDisk
+		connection            *iri.VolumeConnection
+		emptyDisk             *iri.EmptyDisk
+		effectiveStorageBytes int64
 	)
 	switch {
 	case ironcoreMachineVolume.VolumeRef != nil:
@@ -121,6 +122,10 @@ func (s *Server) convertIronCoreVolume(
 				SecretData: secretData,
 			}
 		}
+		effectiveStorageBytes = ironcoreVolume.Volume.Spec.Resources.Storage().Value()
+		if ironcoreVolume.Volume.Status.Resources != nil {
+			effectiveStorageBytes = ironcoreVolume.Volume.Status.Resources.Storage().Value()
+		}
 	case ironcoreMachineVolume.EmptyDisk != nil:
 		var sizeBytes int64
 		if sizeLimit := ironcoreMachineVolume.EmptyDisk.SizeLimit; sizeLimit != nil {
@@ -134,10 +139,11 @@ func (s *Server) convertIronCoreVolume(
 	}
 
 	return &iri.Volume{
-		Name:       ironcoreMachineVolume.Name,
-		Device:     *ironcoreMachineVolume.Device,
-		EmptyDisk:  emptyDisk,
-		Connection: connection,
+		Name:                  ironcoreMachineVolume.Name,
+		Device:                *ironcoreMachineVolume.Device,
+		EmptyDisk:             emptyDisk,
+		Connection:            connection,
+		EffectiveStorageBytes: effectiveStorageBytes,
 	}, nil
 }
 

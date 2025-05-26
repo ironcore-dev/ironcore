@@ -162,6 +162,11 @@ func (r *MachineReconciler) prepareRemoteIRIVolume(
 		encryptionData = secret.Data
 	}
 
+	effectiveSize := volume.Spec.Resources.Storage().Value()
+	if resources := volume.Status.Resources; resources != nil {
+		effectiveSize = resources.Storage().Value()
+	}
+
 	return &iri.Volume{
 		Name:   machineVolume.Name,
 		Device: *machineVolume.Device,
@@ -172,6 +177,7 @@ func (r *MachineReconciler) prepareRemoteIRIVolume(
 			SecretData:     secretData,
 			EncryptionData: encryptionData,
 		},
+		EffectiveStorageBytes: effectiveSize,
 	}, true, nil
 }
 
