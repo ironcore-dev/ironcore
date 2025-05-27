@@ -1682,6 +1682,11 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: lastStateTransitionTime
       type:
         namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
+    - name: resources
+      type:
+        map:
+          elementType:
+            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
     - name: state
       type:
         scalar: string

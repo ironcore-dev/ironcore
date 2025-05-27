@@ -82,6 +82,7 @@ var _ = Describe("VolumeController", func() {
 			},
 		}
 		iriVolume.Status.State = iri.VolumeState_VOLUME_AVAILABLE
+		iriVolume.Status.Resources = iriVolume.Spec.Resources
 
 		Expect(ironcoreclient.PatchAddReconcileAnnotation(ctx, k8sClient, volume)).Should(Succeed())
 
@@ -95,6 +96,8 @@ var _ = Describe("VolumeController", func() {
 			HaveField("Status.Access.VolumeAttributes", HaveKeyWithValue(MonitorsKey, volumeMonitors)),
 			HaveField("Status.Access.VolumeAttributes", HaveKeyWithValue(ImageKey, volumeImage)),
 		))
+
+		Expect(volume.Status.Resources.Storage().Value()).Should(Equal(size.Value()))
 
 		accessSecret := &corev1.Secret{
 			ObjectMeta: metav1.ObjectMeta{
@@ -208,6 +211,16 @@ var _ = Describe("VolumeController", func() {
 			_, iriVolume = GetSingleMapEntry(srv.Volumes)
 			return iriVolume.Spec.Resources.StorageBytes
 		}).Should(Equal(newSize.Value()))
+
+		By("inspecting the effective storage resource is set for volume")
+		Eventually(func() int64 {
+			return iriVolume.Status.Resources.StorageBytes
+		}).Should(Equal(newSize.Value()))
+
+		Eventually(Object(volume)).Should(SatisfyAll(
+			HaveField("Status.Resources", Not(BeNil())),
+		))
+		Expect(volume.Status.Resources.Storage().Value()).Should(Equal(newSize.Value()))
 	})
 
 })

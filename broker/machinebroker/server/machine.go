@@ -108,6 +108,10 @@ func (s *Server) convertIronCoreVolume(
 	)
 	switch {
 	case ironcoreMachineVolume.VolumeRef != nil:
+		effectiveStorageBytes := ironcoreVolume.Volume.Spec.Resources.Storage().Value()
+		if ironcoreVolume.Volume.Status.Resources != nil {
+			effectiveStorageBytes = ironcoreVolume.Volume.Status.Resources.Storage().Value()
+		}
 		if access := ironcoreVolume.Volume.Status.Access; access != nil {
 			var secretData map[string][]byte
 			if access.SecretRef != nil {
@@ -115,10 +119,11 @@ func (s *Server) convertIronCoreVolume(
 			}
 
 			connection = &iri.VolumeConnection{
-				Driver:     access.Driver,
-				Handle:     access.Handle,
-				Attributes: access.VolumeAttributes,
-				SecretData: secretData,
+				Driver:                access.Driver,
+				Handle:                access.Handle,
+				Attributes:            access.VolumeAttributes,
+				SecretData:            secretData,
+				EffectiveStorageBytes: effectiveStorageBytes,
 			}
 		}
 	case ironcoreMachineVolume.EmptyDisk != nil:

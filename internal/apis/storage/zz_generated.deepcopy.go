@@ -780,6 +780,13 @@ func (in *VolumeStatus) DeepCopyInto(out *VolumeStatus) {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
+	if in.Resources != nil {
+		in, out := &in.Resources, &out.Resources
+		*out = make(core.ResourceList, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val.DeepCopy()
+		}
+	}
 	return
 }
 

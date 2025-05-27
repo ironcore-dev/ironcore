@@ -33,6 +33,11 @@ func (s *Server) convertAggregateIronCoreVolume(volume *AggregateIronCoreVolume)
 		return nil, err
 	}
 
+	storageBytes := volume.Volume.Spec.Resources.Storage().Value()
+	if volume.Volume.Status.Resources != nil {
+		storageBytes = volume.Volume.Status.Resources.Storage().Value()
+	}
+
 	return &iri.Volume{
 		Metadata: metadata,
 		Spec: &iri.VolumeSpec{
@@ -44,6 +49,9 @@ func (s *Server) convertAggregateIronCoreVolume(volume *AggregateIronCoreVolume)
 		Status: &iri.VolumeStatus{
 			State:  state,
 			Access: access,
+			Resources: &iri.VolumeResources{
+				StorageBytes: storageBytes,
+			},
 		},
 	}, nil
 }
