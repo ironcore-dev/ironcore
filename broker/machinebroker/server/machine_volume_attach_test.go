@@ -51,8 +51,8 @@ var _ = Describe("AttachVolume", func() {
 					SecretData: map[string][]byte{
 						"key": []byte("supersecret"),
 					},
+					EffectiveStorageBytes: 2000,
 				},
-				EffectiveStorageBytes: 2000,
 			},
 		})).Error().ShouldNot(HaveOccurred())
 

@@ -171,13 +171,13 @@ func (r *MachineReconciler) prepareRemoteIRIVolume(
 		Name:   machineVolume.Name,
 		Device: *machineVolume.Device,
 		Connection: &iri.VolumeConnection{
-			Driver:         access.Driver,
-			Handle:         access.Handle,
-			Attributes:     access.VolumeAttributes,
-			SecretData:     secretData,
-			EncryptionData: encryptionData,
+			Driver:                access.Driver,
+			Handle:                access.Handle,
+			Attributes:            access.VolumeAttributes,
+			SecretData:            secretData,
+			EncryptionData:        encryptionData,
+			EffectiveStorageBytes: effectiveSize,
 		},
-		EffectiveStorageBytes: effectiveSize,
 	}, true, nil
 }
 

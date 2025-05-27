@@ -63,7 +63,7 @@ func (s *Server) getIronCoreVolumeConfig(volume *iri.Volume) (*IronCoreVolumeCon
 			Attributes:            volume.Connection.Attributes,
 			SecretData:            volume.Connection.SecretData,
 			EncryptionData:        volume.Connection.EncryptionData,
-			EffectiveStorageBytes: volume.EffectiveStorageBytes,
+			EffectiveStorageBytes: volume.Connection.EffectiveStorageBytes,
 		}
 	default:
 		return nil, fmt.Errorf("unrecognized volume %#v", volume)
