@@ -69,6 +69,7 @@ message VolumeConnection {
   map<string, string> attributes = 3;
   map<string, bytes> secret_data = 4;
   map<string, bytes> encryption_data = 5;
+  int64 effective_storage_bytes=6;
 }
 
 message Volume {

@@ -71,6 +71,9 @@ type VolumeStatus struct {
 
 	// Conditions are the conditions of a volume.
 	Conditions []VolumeCondition `json:"conditions,omitempty"`
+
+	// Resources is a effective volume's resources.
+	Resources corev1alpha1.ResourceList `json:"resources,omitempty"`
 }
 
 // VolumeConditionType is a type a VolumeCondition can have.

@@ -8327,6 +8327,10 @@
 							}
 						]
 					},
+					"bucketID": {
+						"description": "BucketID is the provider specific bucket ID in the format '\u003ctype\u003e://\u003cbucket_id\u003e'.",
+						"type": "string"
+					},
 					"conditions": {
 						"description": "Conditions are the conditions of a bucket.",
 						"type": "array",
@@ -8937,8 +8941,19 @@
 							}
 						]
 					},
+					"resources": {
+						"description": "Resources is a effective volume's resources.",
+						"type": "object",
+						"additionalProperties": {
+							"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
+						}
+					},
 					"state": {
 						"description": "State represents the infrastructure state of a Volume.",
+						"type": "string"
+					},
+					"volumeID": {
+						"description": "VolumeID is the provider specific volume ID in the format '\u003ctype\u003e://\u003cvolume_id\u003e'.",
 						"type": "string"
 					}
 				}

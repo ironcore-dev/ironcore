@@ -51,6 +51,7 @@ var _ = Describe("AttachVolume", func() {
 					SecretData: map[string][]byte{
 						"key": []byte("supersecret"),
 					},
+					EffectiveStorageBytes: 2000,
 				},
 			},
 		})).Error().ShouldNot(HaveOccurred())
@@ -88,6 +89,9 @@ var _ = Describe("AttachVolume", func() {
 				"foo": "bar",
 			}),
 		})))
+
+		By("inspecting the effective storage resource is set for volume")
+		Expect(volume.Status.Resources.Storage().String()).Should(Equal("2k"))
 
 		By("fetching the corresponding ironcore volume access secret")
 		secret := &corev1.Secret{}

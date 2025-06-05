@@ -70,6 +70,9 @@ type VolumeStatus struct {
 
 	// Conditions are the conditions of a volume.
 	Conditions []VolumeCondition
+
+	// Resources is a effective volume's resources.
+	Resources core.ResourceList
 }
 
 // VolumeConditionType is a type a VolumeCondition can have.

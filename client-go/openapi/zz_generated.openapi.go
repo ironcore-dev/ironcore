@@ -5975,11 +5975,25 @@ func schema_ironcore_api_storage_v1alpha1_VolumeStatus(ref common.ReferenceCallb
 							},
 						},
 					},
+					"resources": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Resources is a effective volume's resources.",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
+									},
+								},
+							},
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeAccess", "github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeCondition", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeAccess", "github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeCondition", "k8s.io/apimachinery/pkg/api/resource.Quantity", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
 	}
 }
 

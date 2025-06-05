@@ -606,14 +606,15 @@ func (x *EmptyDisk) GetSizeBytes() int64 {
 }
 
 type VolumeConnection struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	Driver         string                 `protobuf:"bytes,1,opt,name=driver,proto3" json:"driver,omitempty"`
-	Handle         string                 `protobuf:"bytes,2,opt,name=handle,proto3" json:"handle,omitempty"`
-	Attributes     map[string]string      `protobuf:"bytes,3,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	SecretData     map[string][]byte      `protobuf:"bytes,4,rep,name=secret_data,json=secretData,proto3" json:"secret_data,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	EncryptionData map[string][]byte      `protobuf:"bytes,5,rep,name=encryption_data,json=encryptionData,proto3" json:"encryption_data,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	state                 protoimpl.MessageState `protogen:"open.v1"`
+	Driver                string                 `protobuf:"bytes,1,opt,name=driver,proto3" json:"driver,omitempty"`
+	Handle                string                 `protobuf:"bytes,2,opt,name=handle,proto3" json:"handle,omitempty"`
+	Attributes            map[string]string      `protobuf:"bytes,3,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	SecretData            map[string][]byte      `protobuf:"bytes,4,rep,name=secret_data,json=secretData,proto3" json:"secret_data,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	EncryptionData        map[string][]byte      `protobuf:"bytes,5,rep,name=encryption_data,json=encryptionData,proto3" json:"encryption_data,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	EffectiveStorageBytes int64                  `protobuf:"varint,6,opt,name=effective_storage_bytes,json=effectiveStorageBytes,proto3" json:"effective_storage_bytes,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *VolumeConnection) Reset() {
@@ -679,6 +680,13 @@ func (x *VolumeConnection) GetEncryptionData() map[string][]byte {
 		return x.EncryptionData
 	}
 	return nil
+}
+
+func (x *VolumeConnection) GetEffectiveStorageBytes() int64 {
+	if x != nil {
+		return x.EffectiveStorageBytes
+	}
+	return 0
 }
 
 type Volume struct {
@@ -2386,7 +2394,7 @@ const file_machine_v1alpha1_api_proto_rawDesc = "" +
 	"\x05image\x18\x01 \x01(\tR\x05image\"*\n" +
 	"\tEmptyDisk\x12\x1d\n" +
 	"\n" +
-	"size_bytes\x18\x01 \x01(\x03R\tsizeBytes\"\x8d\x04\n" +
+	"size_bytes\x18\x01 \x01(\x03R\tsizeBytes\"\xc5\x04\n" +
 	"\x10VolumeConnection\x12\x16\n" +
 	"\x06driver\x18\x01 \x01(\tR\x06driver\x12\x16\n" +
 	"\x06handle\x18\x02 \x01(\tR\x06handle\x12R\n" +
@@ -2395,7 +2403,8 @@ const file_machine_v1alpha1_api_proto_rawDesc = "" +
 	"attributes\x12S\n" +
 	"\vsecret_data\x18\x04 \x03(\v22.machine.v1alpha1.VolumeConnection.SecretDataEntryR\n" +
 	"secretData\x12_\n" +
-	"\x0fencryption_data\x18\x05 \x03(\v26.machine.v1alpha1.VolumeConnection.EncryptionDataEntryR\x0eencryptionData\x1a=\n" +
+	"\x0fencryption_data\x18\x05 \x03(\v26.machine.v1alpha1.VolumeConnection.EncryptionDataEntryR\x0eencryptionData\x126\n" +
+	"\x17effective_storage_bytes\x18\x06 \x01(\x03R\x15effectiveStorageBytes\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a=\n" +
