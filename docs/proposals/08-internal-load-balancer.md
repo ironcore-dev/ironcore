@@ -18,12 +18,14 @@ authors:
 
 ## Table of Contents
 
-- [Summary](#summary)
-- [Motivation](#motivation)
-  - [Goals](#goals)
-  - [Non-Goals](#non-goals)
-- [Proposal](#proposal)
-- [Alternatives](#alternatives)
+- [IEP-8: Internal Load Balancers](#IEP-8-internal-load-balancers)
+  - [Table of Contents](#table-of-contents)
+  - [Summary](#summary)
+  - [Motivation](#motivation)
+    - [Goals](#goals)
+    - [Non-Goals](#non-goals)
+  - [Proposal](#proposal)
+  - [Alternatives](#alternatives)
 
 ## Summary
 
