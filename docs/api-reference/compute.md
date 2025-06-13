@@ -1207,7 +1207,7 @@ string
 </em>
 </td>
 <td>
-<p>MachineID is the provider specific machine ID in the format &lsquo;<type>://<machine_id>&rsquo;.</p>
+<p>MachineID is the provider specific machine ID in the format &lsquo;TYPE://MACHINE_ID&rsquo;.</p>
 </td>
 </tr>
 <tr>

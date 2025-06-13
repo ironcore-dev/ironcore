@@ -1044,6 +1044,17 @@ covered by Tolerations will be considered to host the Bucket.</p>
 <tbody>
 <tr>
 <td>
+<code>bucketID</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>BucketID is the provider specific bucket ID in the format &lsquo;<type>://<bucket_id>&rsquo;.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>state</code><br/>
 <em>
 <a href="#storage.ironcore.dev/v1alpha1.BucketState">
@@ -1845,6 +1856,17 @@ VolumeEncryption
 <tbody>
 <tr>
 <td>
+<code>volumeID</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>VolumeID is the provider specific volume ID in the format &lsquo;<type>://<volume_id>&rsquo;.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>state</code><br/>
 <em>
 <a href="#storage.ironcore.dev/v1alpha1.VolumeState">
@@ -1894,6 +1916,19 @@ This is set by the volume provider when the volume is provisioned.</p>
 </td>
 <td>
 <p>Conditions are the conditions of a volume.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>resources</code><br/>
+<em>
+<a href="../core/#core.ironcore.dev/v1alpha1.ResourceList">
+github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceList
+</a>
+</em>
+</td>
+<td>
+<p>Resources is a effective volume&rsquo;s resources.</p>
 </td>
 </tr>
 </tbody>

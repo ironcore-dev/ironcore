@@ -4090,7 +4090,7 @@
 				}
 			},
 			"com.github.ironcore-dev.ironcore.api.common.v1alpha1.Toleration": {
-				"description": "The resource this Toleration is attached to tolerates any taint that matches the triple \u003ckey,value,effect\u003e using the matching operator \u003coperator\u003e.",
+				"description": "Toleration is attached to tolerate any taint that matches the triple {key,value,effect} using the matching operator.",
 				"type": "object",
 				"properties": {
 					"effect": {
@@ -4739,7 +4739,7 @@
 				"type": "object",
 				"properties": {
 					"machineID": {
-						"description": "MachineID is the provider specific machine ID in the format '\u003ctype\u003e://\u003cmachine_id\u003e'.",
+						"description": "MachineID is the provider specific machine ID in the format 'TYPE://MACHINE_ID'.",
 						"type": "string"
 					},
 					"networkInterfaces": {

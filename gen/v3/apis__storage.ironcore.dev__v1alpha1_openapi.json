@@ -7886,7 +7886,7 @@
 				}
 			},
 			"com.github.ironcore-dev.ironcore.api.common.v1alpha1.Toleration": {
-				"description": "The resource this Toleration is attached to tolerates any taint that matches the triple \u003ckey,value,effect\u003e using the matching operator \u003coperator\u003e.",
+				"description": "Toleration is attached to tolerate any taint that matches the triple {key,value,effect} using the matching operator.",
 				"type": "object",
 				"properties": {
 					"effect": {

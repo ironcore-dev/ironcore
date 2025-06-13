@@ -623,7 +623,7 @@ func schema_ironcore_api_common_v1alpha1_Toleration(ref common.ReferenceCallback
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "The resource this Toleration is attached to tolerates any taint that matches the triple <key,value,effect> using the matching operator <operator>.",
+				Description: "Toleration is attached to tolerate any taint that matches the triple {key,value,effect} using the matching operator.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"key": {
@@ -1544,7 +1544,7 @@ func schema_ironcore_api_compute_v1alpha1_MachineStatus(ref common.ReferenceCall
 				Properties: map[string]spec.Schema{
 					"machineID": {
 						SchemaProps: spec.SchemaProps{
-							Description: "MachineID is the provider specific machine ID in the format '<type>://<machine_id>'.",
+							Description: "MachineID is the provider specific machine ID in the format 'TYPE://MACHINE_ID'.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
