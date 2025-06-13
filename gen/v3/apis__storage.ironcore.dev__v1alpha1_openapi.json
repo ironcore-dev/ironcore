@@ -8328,7 +8328,7 @@
 						]
 					},
 					"bucketID": {
-						"description": "BucketID is the provider specific bucket ID in the format '\u003ctype\u003e://\u003cbucket_id\u003e'.",
+						"description": "BucketID is the provider-specific bucket ID in the format 'TYPE://BUCKET_ID'.",
 						"type": "string"
 					},
 					"conditions": {
