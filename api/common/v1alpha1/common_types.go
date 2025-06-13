@@ -438,14 +438,13 @@ type Taint struct {
 type TaintEffect string
 
 const (
-	// Do not allow new resources to schedule onto the resource pool unless they tolerate the taint,
-	// but allow all already-running resources to continue running.
-	// Enforced by the scheduler.
+	// TaintEffectNoSchedule is not allowing new resources to be scheduled onto the resource pool unless they tolerate
+	// the taint, but allow all already-running resources to continue running. This is enforced by the scheduler.
 	TaintEffectNoSchedule TaintEffect = "NoSchedule"
 )
 
-// The resource this Toleration is attached to tolerates any taint that matches
-// the triple <key,value,effect> using the matching operator <operator>.
+// Toleration is attached to tolerate any taint that matches the triple {key,value,effect} using
+// the matching operator.
 type Toleration struct {
 	// Key is the taint key that the toleration applies to. Empty means match all taint keys.
 	// If the key is empty, operator must be Exists; this combination means to match all values and all keys.
@@ -494,7 +493,7 @@ func (t *Toleration) ToleratesTaint(taint *Taint) bool {
 	}
 }
 
-// A toleration operator is the set of operators that can be used in a toleration.
+// TolerationOperator is the set of operators that can be used in toleration.
 type TolerationOperator string
 
 const (
