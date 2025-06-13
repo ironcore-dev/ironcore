@@ -1050,7 +1050,7 @@ string
 </em>
 </td>
 <td>
-<p>BucketID is the provider specific bucket ID in the format &lsquo;<type>://<bucket_id>&rsquo;.</p>
+<p>BucketID is the provider-specific bucket ID in the format &lsquo;TYPE://BUCKET_ID&rsquo;.</p>
 </td>
 </tr>
 <tr>

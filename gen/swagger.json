@@ -67320,7 +67320,7 @@
 					"$ref": "#/definitions/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketAccess"
 				},
 				"bucketID": {
-					"description": "BucketID is the provider specific bucket ID in the format '<type>://<bucket_id>'.",
+					"description": "BucketID is the provider-specific bucket ID in the format 'TYPE://BUCKET_ID'.",
 					"type": "string"
 				},
 				"conditions": {
