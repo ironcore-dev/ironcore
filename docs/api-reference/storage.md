@@ -1862,7 +1862,7 @@ string
 </em>
 </td>
 <td>
-<p>VolumeID is the provider specific volume ID in the format &lsquo;<type>://<volume_id>&rsquo;.</p>
+<p>VolumeID is the provider-specific volume ID in the format &lsquo;TYPE://VOLUME_ID&rsquo;.</p>
 </td>
 </tr>
 <tr>

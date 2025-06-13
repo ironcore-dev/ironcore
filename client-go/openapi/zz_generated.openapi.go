@@ -5937,7 +5937,7 @@ func schema_ironcore_api_storage_v1alpha1_VolumeStatus(ref common.ReferenceCallb
 				Properties: map[string]spec.Schema{
 					"volumeID": {
 						SchemaProps: spec.SchemaProps{
-							Description: "VolumeID is the provider specific volume ID in the format '<type>://<volume_id>'.",
+							Description: "VolumeID is the provider-specific volume ID in the format 'TYPE://VOLUME_ID'.",
 							Type:        []string{"string"},
 							Format:      "",
 						},

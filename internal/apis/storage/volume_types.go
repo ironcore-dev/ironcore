@@ -57,7 +57,7 @@ type VolumeAccess struct {
 
 // VolumeStatus defines the observed state of Volume
 type VolumeStatus struct {
-	// VolumeID is the provider specific volume ID in the format '<type>://<volume_id>'.
+	// VolumeID is the provider-specific volume ID in the format 'TYPE://VOLUME_ID'.
 	VolumeID string
 	// State represents the infrastructure state of a Volume.
 	State VolumeState
