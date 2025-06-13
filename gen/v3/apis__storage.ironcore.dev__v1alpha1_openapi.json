@@ -8953,7 +8953,7 @@
 						"type": "string"
 					},
 					"volumeID": {
-						"description": "VolumeID is the provider specific volume ID in the format '\u003ctype\u003e://\u003cvolume_id\u003e'.",
+						"description": "VolumeID is the provider-specific volume ID in the format 'TYPE://VOLUME_ID'.",
 						"type": "string"
 					}
 				}

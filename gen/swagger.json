@@ -67790,7 +67790,7 @@
 					"type": "string"
 				},
 				"volumeID": {
-					"description": "VolumeID is the provider specific volume ID in the format '<type>://<volume_id>'.",
+					"description": "VolumeID is the provider-specific volume ID in the format 'TYPE://VOLUME_ID'.",
 					"type": "string"
 				}
 			}
