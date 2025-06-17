@@ -18,7 +18,7 @@ func (s *Server) UpdateMachinePower(ctx context.Context, req *iri.UpdateMachineP
 	log.V(1).Info("Getting ironcore machine")
 	aggIronCoreMachine, err := s.getAggregateIronCoreMachine(ctx, machineID)
 	if err != nil {
-		return nil, err
+		return nil, convertInternalErrorToGRPC(err)
 	}
 
 	power, err := s.prepareIronCoreMachinePower(req.Power)

@@ -24,7 +24,7 @@ func (s *Server) DetachVolume(ctx context.Context, req *iri.DetachVolumeRequest)
 	log.V(1).Info("Getting ironcore machine")
 	ironcoreMachine, err := s.getIronCoreMachine(ctx, machineID)
 	if err != nil {
-		return nil, err
+		return nil, convertInternalErrorToGRPC(err)
 	}
 
 	idx := ironcoreMachineVolumeIndex(ironcoreMachine, volumeName)

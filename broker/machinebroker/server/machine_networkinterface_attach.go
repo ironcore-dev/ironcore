@@ -119,7 +119,7 @@ func (s *Server) AttachNetworkInterface(ctx context.Context, req *iri.AttachNetw
 	log.V(1).Info("Getting aggregate ironcore machine")
 	ironcoreMachine, err := s.getIronCoreMachine(ctx, req.MachineId)
 	if err != nil {
-		return nil, err
+		return nil, convertInternalErrorToGRPC(err)
 	}
 
 	idx := ironcoreMachineNetworkInterfaceIndex(ironcoreMachine, networkInterfaceName)

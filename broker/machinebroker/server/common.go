@@ -5,6 +5,7 @@ package server
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/go-logr/logr"
@@ -13,6 +14,8 @@ import (
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/common/cleaner"
 	metautils "github.com/ironcore-dev/ironcore/utils/meta"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -21,6 +24,9 @@ import (
 
 var (
 	ironcoreMachineGVK = computev1alpha1.SchemeGroupVersion.WithKind("Machine")
+
+	ErrMachineNotFound    = errors.New("machine not found")
+	ErrMachineIsntManaged = errors.New("machine isn't managed")
 )
 
 func (s *Server) loggerFrom(ctx context.Context, keysWithValues ...interface{}) logr.Logger {
@@ -115,4 +121,22 @@ func (s *Server) localObjectReferenceTo(obj metav1.Object) commonv1alpha1.LocalU
 		Name: obj.GetName(),
 		UID:  obj.GetUID(),
 	}
+}
+
+func convertInternalErrorToGRPC(err error) error {
+	_, ok := status.FromError(err)
+	if ok {
+		return err
+	}
+
+	code := codes.Internal
+
+	switch {
+	case errors.Is(err, ErrMachineNotFound):
+		code = codes.NotFound
+	case errors.Is(err, ErrMachineIsntManaged):
+		code = codes.InvalidArgument
+	}
+
+	return status.Error(code, err.Error())
 }

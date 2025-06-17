@@ -238,7 +238,7 @@ func (s *Server) AttachVolume(ctx context.Context, req *iri.AttachVolumeRequest)
 	log.V(1).Info("Getting ironcore machine")
 	ironcoreMachine, err := s.getIronCoreMachine(ctx, machineID)
 	if err != nil {
-		return nil, err
+		return nil, convertInternalErrorToGRPC(err)
 	}
 
 	log.V(1).Info("Getting ironcore volume config")
