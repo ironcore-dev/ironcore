@@ -12,7 +12,7 @@ BUCKETBROKER_IMG ?= bucketbroker:latest
 IRICTL_BUCKET_IMG ?= irictl-bucket:latest
 
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
-ENVTEST_K8S_VERSION = 1.32.0
+ENVTEST_K8S_VERSION = 1.33.0
 
 # Docker image name for the mkdocs based local development setup
 IMAGE=ironcore/documentation
@@ -360,7 +360,7 @@ PROTOC_GEN_GO_GRPC ?= $(LOCALBIN)/protoc-gen-go-grpc
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v5.1.1
 VGOPATH_VERSION ?= v0.1.3
-CONTROLLER_TOOLS_VERSION ?= v0.17.2
+CONTROLLER_TOOLS_VERSION ?= v0.18.0
 GEN_CRD_API_REFERENCE_DOCS_VERSION ?= v0.3.0
 ADDLICENSE_VERSION ?= v1.1.1
 PROTOC_GEN_GO_VERSION ?= v1.36.6
@@ -368,7 +368,7 @@ PROTOC_GEN_GO_GRPC_VERSION ?= v1.5.1
 GOIMPORTS_VERSION ?= v0.31.0
 GOLANGCI_LINT_VERSION ?= v2.1
 OPENAPI_EXTRACTOR_VERSION ?= v0.1.9
-SETUP_ENVTEST_VERSION ?= release-0.20
+SETUP_ENVTEST_VERSION ?= release-0.21
 BUF_VERSION ?= v1.51.0
 
 KUSTOMIZE_INSTALL_SCRIPT ?= "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
@@ -387,12 +387,10 @@ $(CONTROLLER_GEN): $(LOCALBIN)
 	test -s $(LOCALBIN)/controller-gen && $(LOCALBIN)/controller-gen --version | grep -q $(CONTROLLER_TOOLS_VERSION) || \
 	GOBIN=$(LOCALBIN) go install sigs.k8s.io/controller-tools/cmd/controller-gen@$(CONTROLLER_TOOLS_VERSION)
 
-
 .PHONY: openapi-gen
 openapi-gen: $(OPENAPI_GEN) ## Download openapi-gen locally if necessary.
 $(OPENAPI_GEN): $(LOCALBIN)
 	test -s $(LOCALBIN)/openapi-gen || GOBIN=$(LOCALBIN) go install k8s.io/kube-openapi/cmd/openapi-gen
-
 
 .PHONY: vgopath
 vgopath: $(VGOPATH) ## Download vgopath locally if necessary.

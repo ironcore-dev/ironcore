@@ -48,13 +48,25 @@ func NewFilteredVolumePoolInformer(client versioned.Interface, resyncPeriod time
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.StorageV1alpha1().VolumePools().List(context.TODO(), options)
+				return client.StorageV1alpha1().VolumePools().List(context.Background(), options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.StorageV1alpha1().VolumePools().Watch(context.TODO(), options)
+				return client.StorageV1alpha1().VolumePools().Watch(context.Background(), options)
+			},
+			ListWithContextFunc: func(ctx context.Context, options v1.ListOptions) (runtime.Object, error) {
+				if tweakListOptions != nil {
+					tweakListOptions(&options)
+				}
+				return client.StorageV1alpha1().VolumePools().List(ctx, options)
+			},
+			WatchFuncWithContext: func(ctx context.Context, options v1.ListOptions) (watch.Interface, error) {
+				if tweakListOptions != nil {
+					tweakListOptions(&options)
+				}
+				return client.StorageV1alpha1().VolumePools().Watch(ctx, options)
 			},
 		},
 		&apistoragev1alpha1.VolumePool{},
