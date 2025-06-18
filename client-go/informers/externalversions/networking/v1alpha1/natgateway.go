@@ -49,13 +49,25 @@ func NewFilteredNATGatewayInformer(client versioned.Interface, namespace string,
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.NetworkingV1alpha1().NATGateways(namespace).List(context.TODO(), options)
+				return client.NetworkingV1alpha1().NATGateways(namespace).List(context.Background(), options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.NetworkingV1alpha1().NATGateways(namespace).Watch(context.TODO(), options)
+				return client.NetworkingV1alpha1().NATGateways(namespace).Watch(context.Background(), options)
+			},
+			ListWithContextFunc: func(ctx context.Context, options v1.ListOptions) (runtime.Object, error) {
+				if tweakListOptions != nil {
+					tweakListOptions(&options)
+				}
+				return client.NetworkingV1alpha1().NATGateways(namespace).List(ctx, options)
+			},
+			WatchFuncWithContext: func(ctx context.Context, options v1.ListOptions) (watch.Interface, error) {
+				if tweakListOptions != nil {
+					tweakListOptions(&options)
+				}
+				return client.NetworkingV1alpha1().NATGateways(namespace).Watch(ctx, options)
 			},
 		},
 		&apinetworkingv1alpha1.NATGateway{},
