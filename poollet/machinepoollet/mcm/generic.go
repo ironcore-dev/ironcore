@@ -6,6 +6,7 @@ package mcm
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"sync"
 	"time"
 
@@ -20,16 +21,33 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
-type capabilities struct {
-	cpuMillis   int64
-	memoryBytes int64
+const (
+	CpuMillis   = "cpuMillis"
+	MemoryBytes = "memoryBytes"
+)
+
+type capabilities map[string]int64
+
+func getAllCapabilities(iriCaps *iri.MachineClassCapabilities) capabilities {
+
+	capabilities := capabilities{
+		CpuMillis:   iriCaps.CpuMillis,
+		MemoryBytes: iriCaps.MemoryBytes,
+	}
+
+	maps.Copy(capabilities, iriCaps.AdditionalResources)
+
+	return capabilities
 }
 
-func getCapabilities(iriCaps *iri.MachineClassCapabilities) capabilities {
-	return capabilities{
-		cpuMillis:   iriCaps.CpuMillis,
-		memoryBytes: iriCaps.MemoryBytes,
+func getMachineClassByCapabilities(machineClassByCapabilities map[*iri.MachineClassStatus]capabilities, capabilities capabilities) []*iri.MachineClassStatus {
+	matchingMachineClasses := []*iri.MachineClassStatus{}
+	for machineClass, machineClassCapabilities := range machineClassByCapabilities {
+		if reflect.DeepEqual(machineClassCapabilities, capabilities) {
+			matchingMachineClasses = append(matchingMachineClasses, machineClass)
+		}
 	}
+	return matchingMachineClasses
 }
 
 type Generic struct {
@@ -41,7 +59,7 @@ type Generic struct {
 	listener sets.Set[*listener]
 
 	machineClassByName         map[string]*iri.MachineClassStatus
-	machineClassByCapabilities map[capabilities][]*iri.MachineClassStatus
+	machineClassByCapabilities map[*iri.MachineClassStatus]capabilities
 
 	machineRuntime machine.RuntimeService
 
@@ -104,12 +122,8 @@ func (g *Generic) relist(ctx context.Context, log logr.Logger) error {
 		machineClass := machineClassStatus.GetMachineClass()
 		notify = notify || shouldNotify(oldMachineClassByName, machineClassStatus)
 
-		caps := capabilities{
-			cpuMillis:   machineClass.Capabilities.CpuMillis,
-			memoryBytes: machineClass.Capabilities.MemoryBytes,
-		}
 		g.machineClassByName[machineClass.Name] = machineClassStatus
-		g.machineClassByCapabilities[caps] = append(g.machineClassByCapabilities[caps], machineClassStatus)
+		g.machineClassByCapabilities[machineClassStatus] = getAllCapabilities(machineClass.Capabilities)
 	}
 
 	if notify {
@@ -121,12 +135,8 @@ func (g *Generic) relist(ctx context.Context, log logr.Logger) error {
 
 	for _, machineClassStatus := range res.MachineClassStatus {
 		machineClass := machineClassStatus.GetMachineClass()
-		caps := capabilities{
-			cpuMillis:   machineClass.Capabilities.CpuMillis,
-			memoryBytes: machineClass.Capabilities.MemoryBytes,
-		}
 		g.machineClassByName[machineClass.Name] = machineClassStatus
-		g.machineClassByCapabilities[caps] = append(g.machineClassByCapabilities[caps], machineClassStatus)
+		g.machineClassByCapabilities[machineClassStatus] = getAllCapabilities(machineClass.Capabilities)
 	}
 
 	if !g.sync {
@@ -151,23 +161,21 @@ func (g *Generic) GetMachineClassFor(ctx context.Context, name string, caps *iri
 	g.mu.RLock()
 	defer g.mu.RUnlock()
 
-	expected := getCapabilities(caps)
-	if byName, ok := g.machineClassByName[name]; ok && getCapabilities(byName.MachineClass.Capabilities) == expected {
+	expected := getAllCapabilities(caps)
+	if byName, ok := g.machineClassByName[name]; ok && reflect.DeepEqual(getAllCapabilities(byName.MachineClass.Capabilities), expected) {
 		return byName.MachineClass, byName.Quantity, nil
 	}
 
-	if byCaps, ok := g.machineClassByCapabilities[expected]; ok {
-		switch len(byCaps) {
-		case 0:
-			return nil, 0, ErrNoMatchingMachineClass
-		case 1:
-			return byCaps[0].MachineClass, byCaps[0].Quantity, nil
-		default:
-			return nil, 0, ErrAmbiguousMatchingMachineClass
-		}
+	byCaps := getMachineClassByCapabilities(g.machineClassByCapabilities, expected)
+	switch len(byCaps) {
+	case 0:
+		return nil, 0, ErrNoMatchingMachineClass
+	case 1:
+		return byCaps[0].MachineClass, byCaps[0].Quantity, nil
+	default:
+		return nil, 0, ErrAmbiguousMatchingMachineClass
 	}
 
-	return nil, 0, ErrNoMatchingMachineClass
 }
 
 func (g *Generic) WaitForSync(ctx context.Context) error {
@@ -194,7 +202,7 @@ func NewGeneric(runtime machine.RuntimeService, opts GenericOptions) MachineClas
 	return &Generic{
 		synced:                     make(chan struct{}),
 		machineClassByName:         map[string]*iri.MachineClassStatus{},
-		machineClassByCapabilities: map[capabilities][]*iri.MachineClassStatus{},
+		machineClassByCapabilities: map[*iri.MachineClassStatus]capabilities{},
 		listener:                   sets.New[*listener](),
 		machineRuntime:             runtime,
 		relistPeriod:               opts.RelistPeriod,

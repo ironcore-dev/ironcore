@@ -140,6 +140,7 @@ var _ = Describe("MachinePoolController", func() {
 			Capabilities: corev1alpha1.ResourceList{
 				corev1alpha1.ResourceCPU:    resource.MustParse("2"),
 				corev1alpha1.ResourceMemory: resource.MustParse("2Gi"),
+				"type-a.vendor.com/gpu":     resource.MustParse("1"),
 			},
 		}
 		Expect(k8sClient.Create(ctx, machineClass)).To(Succeed(), "failed to create test machine class")
@@ -152,6 +153,9 @@ var _ = Describe("MachinePoolController", func() {
 						Capabilities: &iri.MachineClassCapabilities{
 							CpuMillis:   machineClass.Capabilities.CPU().MilliValue(),
 							MemoryBytes: machineClass.Capabilities.Memory().Value(),
+							AdditionalResources: map[string]int64{
+								"type-a.vendor.com/gpu": 1,
+							},
 						},
 					},
 				},
@@ -191,6 +195,9 @@ var _ = Describe("MachinePoolController", func() {
 						Capabilities: &iri.MachineClassCapabilities{
 							CpuMillis:   machineClass.Capabilities.CPU().MilliValue(),
 							MemoryBytes: machineClass.Capabilities.Memory().Value(),
+							AdditionalResources: map[string]int64{
+								"type-a.vendor.com/gpu": 1,
+							},
 						},
 					},
 				},
