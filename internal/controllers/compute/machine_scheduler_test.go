@@ -417,7 +417,7 @@ var _ = Describe("MachineScheduler", func() {
 		}
 		Expect(k8sClient.Create(ctx, machine)).To(Succeed(), "failed to create the machine")
 
-		By("checking that the machine is scheduled onto the machine pool")
+		By("checking that the machine isn't scheduled onto the machine pool")
 		Consistently(Object(machine)).Should(SatisfyAll(
 			HaveField("Spec.MachinePoolRef", BeNil()),
 		))
