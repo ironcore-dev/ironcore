@@ -24,6 +24,10 @@ type REST struct {
 	*genericregistry.Store
 }
 
+func (r *REST) Get(ctx context.Context, name string, options *metav1.GetOptions) (runtime.Object, error) {
+	return r.Store.Get(ctx, name, options)
+}
+
 type MachinePoolStorage struct {
 	MachinePool                  *REST
 	Status                       *StatusREST
@@ -59,7 +63,6 @@ func NewStorage(optsGetter generic.RESTOptionsGetter, machinePoolletClientConfig
 	statusStore.ResetFieldsStrategy = machinepool.StatusStrategy
 
 	machinePoolRest := &REST{store}
-	statusRest := &StatusREST{&statusStore}
 
 	// Build a MachinePoolGetter that looks up nodes using the REST handler
 	machinePoolGetter := client.MachinePoolGetterFunc(func(ctx context.Context, machinePoolName string, options metav1.GetOptions) (*computev1alpha1.MachinePool, error) {
@@ -85,7 +88,7 @@ func NewStorage(optsGetter generic.RESTOptionsGetter, machinePoolletClientConfig
 
 	return MachinePoolStorage{
 		MachinePool:                  machinePoolRest,
-		Status:                       statusRest,
+		Status:                       &StatusREST{&statusStore},
 		MachinePoolletConnectionInfo: connectionInfoGetter,
 	}, nil
 }
