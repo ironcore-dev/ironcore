@@ -9,6 +9,7 @@ import (
 	. "github.com/afritzler/protoequal"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
@@ -20,8 +21,10 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 	"google.golang.org/protobuf/proto"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 )
@@ -636,6 +639,92 @@ var _ = Describe("MachineController", func() {
 			},
 		}))
 	})
+
+	It("should correctly update volume size", func(ctx SpecContext) {
+		By("creating a volume")
+		volume := &storagev1alpha1.Volume{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "volume-",
+			},
+			Spec: storagev1alpha1.VolumeSpec{},
+		}
+		Expect(k8sClient.Create(ctx, volume)).To(Succeed())
+
+		By("patching the volume to be available")
+		Eventually(UpdateStatus(volume, func() {
+			volume.Status.State = storagev1alpha1.VolumeStateAvailable
+			volume.Status.Access = &storagev1alpha1.VolumeAccess{
+				Driver: "test",
+				Handle: "testhandle",
+			}
+			volume.Status.Resources = corev1alpha1.ResourceList{
+				corev1alpha1.ResourceStorage: resource.MustParse("1Gi"),
+			}
+		})).Should(Succeed())
+
+		By("creating a machine with the volume")
+		machine := &computev1alpha1.Machine{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "machine-",
+			},
+			Spec: computev1alpha1.MachineSpec{
+				MachineClassRef: corev1.LocalObjectReference{Name: mc.Name},
+				MachinePoolRef:  &corev1.LocalObjectReference{Name: mp.Name},
+				Volumes: []computev1alpha1.Volume{
+					{
+						Name:   "primary",
+						Device: ptr.To("oda"),
+						VolumeSource: computev1alpha1.VolumeSource{
+							VolumeRef: &corev1.LocalObjectReference{Name: volume.Name},
+						},
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+
+		By("waiting for the runtime to report the machine with volume")
+		Eventually(srv).Should(SatisfyAll(
+			HaveField("Machines", HaveLen(1)),
+		))
+
+		_, iriMachine := GetSingleMapEntry(srv.Machines)
+
+		By("inspecting the initial iri machine volume")
+		Expect(iriMachine.Spec.Volumes).To(ConsistOf(ProtoEqual(&iri.Volume{
+			Name:   "primary",
+			Device: "oda",
+			Connection: &iri.VolumeConnection{
+				Driver:                "test",
+				Handle:                "testhandle",
+				EffectiveStorageBytes: resource.NewQuantity(1*1024*1024*1024, resource.BinarySI).Value(),
+			},
+		})))
+
+		By("updating the volume status with new size")
+		Eventually(UpdateStatus(volume, func() {
+			volume.Status.Resources = corev1alpha1.ResourceList{
+				corev1alpha1.ResourceStorage: resource.MustParse("2Gi"),
+			}
+		})).Should(Succeed())
+
+		By("waiting for the volume size change to propagate and verifying the updated volume")
+		Eventually(func() []*iri.Volume {
+			_, iriMachine := GetSingleMapEntry(srv.Machines)
+			return iriMachine.Spec.Volumes
+		}).Should(ConsistOf(ProtoEqual(&iri.Volume{
+			Name:   "primary",
+			Device: "oda",
+			Connection: &iri.VolumeConnection{
+				Driver:                "test",
+				Handle:                "testhandle",
+				EffectiveStorageBytes: resource.NewQuantity(2*1024*1024*1024, resource.BinarySI).Value(),
+			},
+		})))
+	})
+
 })
 
 func GetSingleMapEntry[K comparable, V any](m map[K]V) (K, V) {

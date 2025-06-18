@@ -257,12 +257,30 @@ func (r *MachineReconciler) getExistingIRIVolumesForMachine(
 		log := log.WithValues("Volume", iriVolume.Name)
 
 		desiredIRIVolume, ok := desiredIRIVolumesByName[iriVolume.Name]
+
+		// Volume is up-to-date, keep it as is
 		if ok && proto.Equal(desiredIRIVolume, iriVolume) {
 			log.V(1).Info("Existing IRI volume is up-to-date")
 			iriVolumes = append(iriVolumes, iriVolume)
 			continue
 		}
 
+		// Volume exists but needs updates, update it in-place
+		if ok && r.shouldUpdateVolume(iriVolume, desiredIRIVolume) {
+			log.V(1).Info("Updating volume")
+			_, err := r.MachineRuntime.UpdateVolume(ctx, &iri.UpdateVolumeRequest{
+				MachineId: iriMachine.Metadata.Id,
+				Volume:    desiredIRIVolume,
+			})
+			if err != nil {
+				errs = append(errs, fmt.Errorf("[volume %s] %w", iriVolume.Name, err))
+				continue
+			}
+			iriVolumes = append(iriVolumes, desiredIRIVolume)
+			continue
+		}
+
+		// Detach volume if not desired or has other changes
 		log.V(1).Info("Detaching outdated IRI volume")
 		_, err := r.MachineRuntime.DetachVolume(ctx, &iri.DetachVolumeRequest{
 			MachineId: iriMachine.Metadata.Id,
@@ -279,6 +297,28 @@ func (r *MachineReconciler) getExistingIRIVolumesForMachine(
 		return nil, errors.Join(errs...)
 	}
 	return iriVolumes, nil
+}
+
+func (r *MachineReconciler) shouldUpdateVolume(iriVolume, desiredIRIVolume *iri.Volume) bool {
+	if iriVolume.Connection == nil || desiredIRIVolume.Connection == nil {
+		return false
+	}
+
+	if iriVolume.Connection.Driver != desiredIRIVolume.Connection.Driver ||
+		iriVolume.Connection.Handle != desiredIRIVolume.Connection.Handle {
+		return false
+	}
+
+	if iriVolume.Connection.EffectiveStorageBytes != desiredIRIVolume.Connection.EffectiveStorageBytes {
+		return true
+	}
+
+	// TODO: Add support for credential rotation
+	// if !reflect.DeepEqual(iriVolume.Connection.SecretData, desiredIRIVolume.Connection.SecretData) {
+	//     return true
+	// }
+
+	return false
 }
 
 func (r *MachineReconciler) getNewIRIVolumesForMachine(
@@ -323,12 +363,12 @@ func (r *MachineReconciler) updateIRIVolumes(
 		return fmt.Errorf("error preparing iri volumes: %w", err)
 	}
 
-	extistingIRIVolumes, err := r.getExistingIRIVolumesForMachine(ctx, log, iriMachine, desiredIRIVolumes)
+	existingIRIVolumes, err := r.getExistingIRIVolumesForMachine(ctx, log, iriMachine, desiredIRIVolumes)
 	if err != nil {
 		return fmt.Errorf("error getting existing iri volumes for machine: %w", err)
 	}
 
-	_, err = r.getNewIRIVolumesForMachine(ctx, log, iriMachine, desiredIRIVolumes, extistingIRIVolumes)
+	_, err = r.getNewIRIVolumesForMachine(ctx, log, iriMachine, desiredIRIVolumes, existingIRIVolumes)
 	if err != nil {
 		return fmt.Errorf("error getting new iri volumes for machine: %w", err)
 	}

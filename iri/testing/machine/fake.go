@@ -245,15 +245,23 @@ func (r *FakeRuntimeService) DetachVolume(ctx context.Context, req *iri.DetachVo
 		return nil, status.Errorf(codes.NotFound, "machine %q not found", machineID)
 	}
 
-	volumeName := req.Name
-	var volumes []*iri.Volume
-	for _, volume := range machine.Spec.Volumes {
-		if volume.Name != volumeName {
-			volumes = append(volumes, volume)
+	var (
+		filtered []*iri.Volume
+		found    bool
+	)
+	for _, attachment := range machine.Spec.Volumes {
+		if attachment.Name == req.Name {
+			found = true
+			continue
 		}
-	}
-	machine.Spec.Volumes = volumes
 
+		filtered = append(filtered, attachment)
+	}
+	if !found {
+		return nil, status.Errorf(codes.NotFound, "machine %q volume attachment %q not found", machineID, req.Name)
+	}
+
+	machine.Spec.Volumes = filtered
 	return &iri.DetachVolumeResponse{}, nil
 }
 
