@@ -19,7 +19,7 @@ func (s *Server) UpdateMachineAnnotations(ctx context.Context, req *iri.UpdateMa
 	log.V(1).Info("Getting ironcore machine")
 	aggIronCoreMachine, err := s.getAggregateIronCoreMachine(ctx, machineID)
 	if err != nil {
-		return nil, err
+		return nil, convertInternalErrorToGRPC(err)
 	}
 
 	base := aggIronCoreMachine.Machine.DeepCopy()
