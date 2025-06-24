@@ -297,17 +297,16 @@ Valid effects are NoSchedule, PreferNoSchedule and NoExecute.</p>
 </tr>
 </thead>
 <tbody><tr><td><p>&#34;NoSchedule&#34;</p></td>
-<td><p>Do not allow new resources to schedule onto the resource pool unless they tolerate the taint,
-but allow all already-running resources to continue running.
-Enforced by the scheduler.</p>
+<td><p>TaintEffectNoSchedule is not allowing new resources to be scheduled onto the resource pool unless they tolerate
+the taint, but allow all already-running resources to continue running. This is enforced by the scheduler.</p>
 </td>
 </tr></tbody>
 </table>
 <h3 id="common.ironcore.dev/v1alpha1.Toleration">Toleration
 </h3>
 <div>
-<p>The resource this Toleration is attached to tolerates any taint that matches
-the triple <key,value,effect> using the matching operator <operator>.</p>
+<p>Toleration is attached to tolerate any taint that matches the triple {key,value,effect} using
+the matching operator.</p>
 </div>
 <table>
 <thead>
@@ -379,7 +378,7 @@ When specified, allowed values are NoSchedule.</p>
 (<em>Appears on:</em><a href="#common.ironcore.dev/v1alpha1.Toleration">Toleration</a>)
 </p>
 <div>
-<p>A toleration operator is the set of operators that can be used in a toleration.</p>
+<p>TolerationOperator is the set of operators that can be used in toleration.</p>
 </div>
 <table>
 <thead>

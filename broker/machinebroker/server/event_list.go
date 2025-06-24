@@ -5,11 +5,13 @@ package server
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/util/sets"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -23,6 +25,7 @@ const (
 	InvolvedObjectKind               = "Machine"
 	InvolvedObjectKindSelector       = "involvedObject.kind"
 	InvolvedObjectAPIVersionSelector = "involvedObject.apiVersion"
+	LogKeyMachineName                = "MachineName"
 )
 
 func (s *Server) listEvents(ctx context.Context) ([]*irievent.Event, error) {
@@ -38,11 +41,21 @@ func (s *Server) listEvents(ctx context.Context) ([]*irievent.Event, error) {
 		return nil, err
 	}
 
+	unmanagedMachines := sets.Set[string]{}
 	var iriEvents []*irievent.Event
 	for _, machineEvent := range machineEventList.Items {
+		if unmanagedMachines.Has(machineEvent.InvolvedObject.Name) {
+			log.V(2).Info("skipping unmanaged machine", LogKeyMachineName, machineEvent.InvolvedObject.Name)
+			continue
+		}
+
 		ironcoreMachine, err := s.getIronCoreMachine(ctx, machineEvent.InvolvedObject.Name)
 		if err != nil {
-			log.V(1).Info("Unable to get ironcore machine", "MachineName", machineEvent.InvolvedObject.Name)
+			if errors.Is(err, ErrMachineIsntManaged) || errors.Is(err, ErrMachineNotFound) {
+				unmanagedMachines.Insert(machineEvent.InvolvedObject.Name)
+				continue
+			}
+			log.V(1).Info("Unable to get ironcore machine", LogKeyMachineName, machineEvent.InvolvedObject.Name, "error", err.Error())
 			continue
 		}
 		machineObjectMetadata, err := apiutils.GetObjectMetadata(&ironcoreMachine.ObjectMeta)

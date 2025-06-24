@@ -10,6 +10,7 @@ import (
 	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/common/cleaner"
 	machinebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/machinebroker/api/v1alpha1"
@@ -33,11 +34,12 @@ type IronCoreVolumeEmptyDiskConfig struct {
 }
 
 type IronCoreVolumeRemoteConfig struct {
-	Driver         string
-	Handle         string
-	Attributes     map[string]string
-	SecretData     map[string][]byte
-	EncryptionData map[string][]byte
+	Driver                string
+	Handle                string
+	Attributes            map[string]string
+	SecretData            map[string][]byte
+	EncryptionData        map[string][]byte
+	EffectiveStorageBytes int64
 }
 
 func (s *Server) getIronCoreVolumeConfig(volume *iri.Volume) (*IronCoreVolumeConfig, error) {
@@ -56,11 +58,12 @@ func (s *Server) getIronCoreVolumeConfig(volume *iri.Volume) (*IronCoreVolumeCon
 		}
 	case volume.Connection != nil:
 		remote = &IronCoreVolumeRemoteConfig{
-			Driver:         volume.Connection.Driver,
-			Handle:         volume.Connection.Handle,
-			Attributes:     volume.Connection.Attributes,
-			SecretData:     volume.Connection.SecretData,
-			EncryptionData: volume.Connection.EncryptionData,
+			Driver:                volume.Connection.Driver,
+			Handle:                volume.Connection.Handle,
+			Attributes:            volume.Connection.Attributes,
+			SecretData:            volume.Connection.SecretData,
+			EncryptionData:        volume.Connection.EncryptionData,
+			EffectiveStorageBytes: volume.Connection.EffectiveStorageBytes,
 		}
 	default:
 		return nil, fmt.Errorf("unrecognized volume %#v", volume)
@@ -189,6 +192,10 @@ func (s *Server) createIronCoreVolume(
 			Handle:           remote.Handle,
 			VolumeAttributes: remote.Attributes,
 		}
+		ironcoreVolume.Status.Resources = corev1alpha1.ResourceList{
+			corev1alpha1.ResourceStorage: *resource.NewQuantity(remote.EffectiveStorageBytes, resource.DecimalSI),
+		}
+
 		if err := s.cluster.Client().Status().Patch(ctx, ironcoreVolume, client.MergeFrom(baseIronCoreVolume)); err != nil {
 			return nil, nil, fmt.Errorf("error patching ironcore volume status: %w", err)
 		}
@@ -231,7 +238,7 @@ func (s *Server) AttachVolume(ctx context.Context, req *iri.AttachVolumeRequest)
 	log.V(1).Info("Getting ironcore machine")
 	ironcoreMachine, err := s.getIronCoreMachine(ctx, machineID)
 	if err != nil {
-		return nil, err
+		return nil, convertInternalErrorToGRPC(err)
 	}
 
 	log.V(1).Info("Getting ironcore volume config")

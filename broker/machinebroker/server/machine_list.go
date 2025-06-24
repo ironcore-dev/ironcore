@@ -5,6 +5,7 @@ package server
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
@@ -14,8 +15,6 @@ import (
 	"github.com/ironcore-dev/ironcore/broker/machinebroker/apiutils"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	clientutils "github.com/ironcore-dev/ironcore/utils/client"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
@@ -138,10 +137,10 @@ func (s *Server) getIronCoreMachine(ctx context.Context, id string) (*computev1a
 		if !apierrors.IsNotFound(err) {
 			return nil, fmt.Errorf("error getting ironcore machine %s: %w", id, err)
 		}
-		return nil, status.Errorf(codes.NotFound, "machine %s not found", id)
+		return nil, fmt.Errorf("failed to get machine %s: %w", id, ErrMachineNotFound)
 	}
 	if !apiutils.IsManagedBy(ironcoreMachine, machinebrokerv1alpha1.MachineBrokerManager) || !apiutils.IsCreated(ironcoreMachine) {
-		return nil, status.Errorf(codes.NotFound, "machine %s not found", id)
+		return nil, fmt.Errorf("missing manage label for %s: %w", machinebrokerv1alpha1.MachineBrokerManager, ErrMachineIsntManaged)
 	}
 	return ironcoreMachine, nil
 }
@@ -205,7 +204,7 @@ func (s *Server) ListMachines(ctx context.Context, req *iri.ListMachinesRequest)
 	if filter := req.Filter; filter != nil && filter.Id != "" {
 		machine, err := s.getMachine(ctx, filter.Id)
 		if err != nil {
-			if status.Code(err) != codes.NotFound {
+			if !errors.Is(err, ErrMachineNotFound) {
 				return nil, err
 			}
 			return &iri.ListMachinesResponse{
@@ -220,7 +219,7 @@ func (s *Server) ListMachines(ctx context.Context, req *iri.ListMachinesRequest)
 
 	machines, err := s.listMachines(ctx)
 	if err != nil {
-		return nil, err
+		return nil, convertInternalErrorToGRPC(err)
 	}
 
 	machines = s.filterMachines(machines, req.Filter)

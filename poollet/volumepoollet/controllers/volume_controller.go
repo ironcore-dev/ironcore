@@ -29,6 +29,7 @@ import (
 	"github.com/ironcore-dev/controller-utils/clientutils"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
@@ -522,6 +523,11 @@ func (r *VolumeReconciler) updateStatus(ctx context.Context, log logr.Logger, vo
 	}
 	volume.Status.State = newState
 	volume.Status.VolumeID = volumeID.String()
+	if iriVolume.Status.Resources != nil {
+		volume.Status.Resources = corev1alpha1.ResourceList{
+			corev1alpha1.ResourceStorage: *resource.NewQuantity(iriVolume.Status.Resources.StorageBytes, resource.DecimalSI),
+		}
+	}
 
 	if err := r.Status().Patch(ctx, volume, client.MergeFrom(base)); err != nil {
 		return fmt.Errorf("error patching volume status: %w", err)

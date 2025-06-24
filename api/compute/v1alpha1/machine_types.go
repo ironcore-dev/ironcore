@@ -172,7 +172,7 @@ const (
 
 // MachineStatus defines the observed state of Machine
 type MachineStatus struct {
-	// MachineID is the provider specific machine ID in the format '<type>://<machine_id>'.
+	// MachineID is the provider specific machine ID in the format 'TYPE://MACHINE_ID'.
 	MachineID string `json:"machineID,omitempty"`
 	// ObservedGeneration is the last generation the MachinePool observed of the Machine.
 	ObservedGeneration int64 `json:"observedGeneration,omitempty"`

@@ -19,7 +19,7 @@ func (s *Server) DeleteMachine(ctx context.Context, req *iri.DeleteMachineReques
 
 	ironcoreMachine, err := s.getAggregateIronCoreMachine(ctx, machineID)
 	if err != nil {
-		return nil, err
+		return nil, convertInternalErrorToGRPC(err)
 	}
 
 	log.V(1).Info("Deleting ironcore machine")

@@ -58,7 +58,7 @@ type VolumeAccess struct {
 
 // VolumeStatus defines the observed state of Volume
 type VolumeStatus struct {
-	// VolumeID is the provider specific volume ID in the format '<type>://<volume_id>'.
+	// VolumeID is the provider-specific volume ID in the format 'TYPE://VOLUME_ID'.
 	VolumeID string `json:"volumeID,omitempty"`
 	// State represents the infrastructure state of a Volume.
 	State VolumeState `json:"state,omitempty"`
@@ -71,6 +71,9 @@ type VolumeStatus struct {
 
 	// Conditions are the conditions of a volume.
 	Conditions []VolumeCondition `json:"conditions,omitempty"`
+
+	// Resources is a effective volume's resources.
+	Resources corev1alpha1.ResourceList `json:"resources,omitempty"`
 }
 
 // VolumeConditionType is a type a VolumeCondition can have.

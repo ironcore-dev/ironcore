@@ -34,7 +34,7 @@ type BucketAccess struct {
 
 // BucketStatus defines the observed state of Bucket
 type BucketStatus struct {
-	// BucketID is the provider specific bucket ID in the format '<type>://<bucket_id>'.
+	// BucketID is the provider specific bucket ID in the format 'TYPE://BUCKET_ID'.
 	BucketID string
 	// State represents the infrastructure state of a Bucket.
 	State BucketState

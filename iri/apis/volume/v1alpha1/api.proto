@@ -47,6 +47,7 @@ message VolumeSpec {
 message VolumeStatus {
   VolumeState state = 1;
   VolumeAccess access = 2;
+  VolumeResources resources = 3;
 }
 
 message Volume {

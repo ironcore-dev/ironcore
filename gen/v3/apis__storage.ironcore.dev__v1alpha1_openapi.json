@@ -7886,7 +7886,7 @@
 				}
 			},
 			"com.github.ironcore-dev.ironcore.api.common.v1alpha1.Toleration": {
-				"description": "The resource this Toleration is attached to tolerates any taint that matches the triple \u003ckey,value,effect\u003e using the matching operator \u003coperator\u003e.",
+				"description": "Toleration is attached to tolerate any taint that matches the triple {key,value,effect} using the matching operator.",
 				"type": "object",
 				"properties": {
 					"effect": {
@@ -8326,6 +8326,10 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketAccess"
 							}
 						]
+					},
+					"bucketID": {
+						"description": "BucketID is the provider-specific bucket ID in the format 'TYPE://BUCKET_ID'.",
+						"type": "string"
 					},
 					"conditions": {
 						"description": "Conditions are the conditions of a bucket.",
@@ -8937,8 +8941,19 @@
 							}
 						]
 					},
+					"resources": {
+						"description": "Resources is a effective volume's resources.",
+						"type": "object",
+						"additionalProperties": {
+							"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
+						}
+					},
 					"state": {
 						"description": "State represents the infrastructure state of a Volume.",
+						"type": "string"
+					},
+					"volumeID": {
+						"description": "VolumeID is the provider-specific volume ID in the format 'TYPE://VOLUME_ID'.",
 						"type": "string"
 					}
 				}

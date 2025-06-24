@@ -64733,7 +64733,7 @@
 			}
 		},
 		"com.github.ironcore-dev.ironcore.api.common.v1alpha1.Toleration": {
-			"description": "The resource this Toleration is attached to tolerates any taint that matches the triple <key,value,effect> using the matching operator <operator>.",
+			"description": "Toleration is attached to tolerate any taint that matches the triple {key,value,effect} using the matching operator.",
 			"type": "object",
 			"properties": {
 				"effect": {
@@ -65222,7 +65222,7 @@
 			"type": "object",
 			"properties": {
 				"machineID": {
-					"description": "MachineID is the provider specific machine ID in the format '<type>://<machine_id>'.",
+					"description": "MachineID is the provider specific machine ID in the format 'TYPE://MACHINE_ID'.",
 					"type": "string"
 				},
 				"networkInterfaces": {
@@ -67319,6 +67319,10 @@
 					"description": "Access specifies how to access a Bucket. This is set by the bucket provider when the bucket is provisioned.",
 					"$ref": "#/definitions/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketAccess"
 				},
+				"bucketID": {
+					"description": "BucketID is the provider-specific bucket ID in the format 'TYPE://BUCKET_ID'.",
+					"type": "string"
+				},
 				"conditions": {
 					"description": "Conditions are the conditions of a bucket.",
 					"type": "array",
@@ -67774,8 +67778,19 @@
 					"description": "LastStateTransitionTime is the last time the State transitioned between values.",
 					"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Time"
 				},
+				"resources": {
+					"description": "Resources is a effective volume's resources.",
+					"type": "object",
+					"additionalProperties": {
+						"$ref": "#/definitions/io.k8s.apimachinery.pkg.api.resource.Quantity"
+					}
+				},
 				"state": {
 					"description": "State represents the infrastructure state of a Volume.",
+					"type": "string"
+				},
+				"volumeID": {
+					"description": "VolumeID is the provider-specific volume ID in the format 'TYPE://VOLUME_ID'.",
 					"type": "string"
 				}
 			}
