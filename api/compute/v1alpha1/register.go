@@ -35,6 +35,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&MachineClassList{},
 		&MachinePool{},
 		&MachinePoolList{},
+		&Reservation{},
+		&ReservationList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
