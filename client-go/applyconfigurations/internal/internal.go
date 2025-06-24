@@ -410,6 +410,31 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.ReservationStatus
       default: {}
+- name: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.ReservationCondition
+  map:
+    fields:
+    - name: lastTransitionTime
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
+    - name: message
+      type:
+        scalar: string
+      default: ""
+    - name: observedGeneration
+      type:
+        scalar: numeric
+    - name: reason
+      type:
+        scalar: string
+      default: ""
+    - name: status
+      type:
+        scalar: string
+      default: ""
+    - name: type
+      type:
+        scalar: string
+      default: ""
 - name: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.ReservationPoolStatus
   map:
     fields:
@@ -422,20 +447,26 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.ReservationSpec
   map:
     fields:
-    - name: capabilities
-      type:
-        map:
-          elementType:
-            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
     - name: pools
       type:
         list:
           elementType:
             namedType: io.k8s.api.core.v1.LocalObjectReference
           elementRelationship: atomic
+    - name: resources
+      type:
+        map:
+          elementType:
+            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
 - name: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.ReservationStatus
   map:
     fields:
+    - name: conditions
+      type:
+        list:
+          elementType:
+            namedType: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.ReservationCondition
+          elementRelationship: atomic
     - name: pools
       type:
         list:

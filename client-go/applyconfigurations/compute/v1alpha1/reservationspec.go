@@ -14,7 +14,7 @@ import (
 // with apply.
 type ReservationSpecApplyConfiguration struct {
 	Pools     []v1.LocalObjectReference  `json:"pools,omitempty"`
-	Resources *corev1alpha1.ResourceList `json:"capabilities,omitempty"`
+	Resources *corev1alpha1.ResourceList `json:"resources,omitempty"`
 }
 
 // ReservationSpecApplyConfiguration constructs a declarative configuration of the ReservationSpec type for use with

@@ -65,6 +65,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &computev1alpha1.NetworkInterfaceStatusApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("Reservation"):
 		return &computev1alpha1.ReservationApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("ReservationCondition"):
+		return &computev1alpha1.ReservationConditionApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("ReservationPoolStatus"):
 		return &computev1alpha1.ReservationPoolStatusApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("ReservationSpec"):

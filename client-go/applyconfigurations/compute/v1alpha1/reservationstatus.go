@@ -8,7 +8,8 @@ package v1alpha1
 // ReservationStatusApplyConfiguration represents a declarative configuration of the ReservationStatus type for use
 // with apply.
 type ReservationStatusApplyConfiguration struct {
-	Pools []ReservationPoolStatusApplyConfiguration `json:"pools,omitempty"`
+	Pools      []ReservationPoolStatusApplyConfiguration `json:"pools,omitempty"`
+	Conditions []ReservationConditionApplyConfiguration  `json:"conditions,omitempty"`
 }
 
 // ReservationStatusApplyConfiguration constructs a declarative configuration of the ReservationStatus type for use with
@@ -26,6 +27,19 @@ func (b *ReservationStatusApplyConfiguration) WithPools(values ...*ReservationPo
 			panic("nil value passed to WithPools")
 		}
 		b.Pools = append(b.Pools, *values[i])
+	}
+	return b
+}
+
+// WithConditions adds the given value to the Conditions field in the declarative configuration
+// and returns the receiver, so that objects can be build by chaining "With" function invocations.
+// If called multiple times, values provided by each call will be appended to the Conditions field.
+func (b *ReservationStatusApplyConfiguration) WithConditions(values ...*ReservationConditionApplyConfiguration) *ReservationStatusApplyConfiguration {
+	for i := range values {
+		if values[i] == nil {
+			panic("nil value passed to WithConditions")
+		}
+		b.Conditions = append(b.Conditions, *values[i])
 	}
 	return b
 }

@@ -12,12 +12,13 @@ import (
 // ReservationSpec defines the desired state of Reservation
 type ReservationSpec struct {
 	Pools     []corev1.LocalObjectReference `json:"pools"`
-	Resources corev1alpha1.ResourceList     `json:"capabilities,omitempty"`
+	Resources corev1alpha1.ResourceList     `json:"resources,omitempty"`
 }
 
 // ReservationStatus defines the observed state of Reservation
 type ReservationStatus struct {
-	Pools []ReservationPoolStatus `json:"pools,omitempty"`
+	Pools      []ReservationPoolStatus `json:"pools,omitempty"`
+	Conditions []ReservationCondition  `json:"conditions,omitempty"`
 }
 
 // ReservationState is the state of a Reservation.
@@ -32,6 +33,25 @@ const (
 	// ReservationStateRejected means the pool rejected the reservation.
 	ReservationStateRejected ReservationState = "Rejected"
 )
+
+// ReservationConditionType is a type a ReservationCondition can have.
+type ReservationConditionType string
+
+// ReservationCondition is one of the conditions of a volume.
+type ReservationCondition struct {
+	// Type is the type of the condition.
+	Type ReservationConditionType `json:"type"`
+	// Status is the status of the condition.
+	Status corev1.ConditionStatus `json:"status"`
+	// Reason is a machine-readable indication of why the condition is in a certain state.
+	Reason string `json:"reason"`
+	// Message is a human-readable explanation of why the condition has a certain reason / state.
+	Message string `json:"message"`
+	// ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
+	// LastTransitionTime is the last time the status of a condition has transitioned from one state to another.
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
+}
 
 type ReservationPoolStatus struct {
 	Name  string           `json:"ref,omitempty"`

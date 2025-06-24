@@ -51,6 +51,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.NetworkInterfaceSource":          schema_ironcore_api_compute_v1alpha1_NetworkInterfaceSource(ref),
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.NetworkInterfaceStatus":          schema_ironcore_api_compute_v1alpha1_NetworkInterfaceStatus(ref),
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.Reservation":                     schema_ironcore_api_compute_v1alpha1_Reservation(ref),
+		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.ReservationCondition":            schema_ironcore_api_compute_v1alpha1_ReservationCondition(ref),
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.ReservationList":                 schema_ironcore_api_compute_v1alpha1_ReservationList(ref),
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.ReservationPoolStatus":           schema_ironcore_api_compute_v1alpha1_ReservationPoolStatus(ref),
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.ReservationSpec":                 schema_ironcore_api_compute_v1alpha1_ReservationSpec(ref),
@@ -1765,6 +1766,67 @@ func schema_ironcore_api_compute_v1alpha1_Reservation(ref common.ReferenceCallba
 	}
 }
 
+func schema_ironcore_api_compute_v1alpha1_ReservationCondition(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ReservationCondition is one of the conditions of a volume.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Type is the type of the condition.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Status is the status of the condition.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"reason": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Reason is a machine-readable indication of why the condition is in a certain state.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"message": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Message is a human-readable explanation of why the condition has a certain reason / state.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"observedGeneration": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ObservedGeneration represents the .metadata.generation that the condition was set based upon.",
+							Type:        []string{"integer"},
+							Format:      "int64",
+						},
+					},
+					"lastTransitionTime": {
+						SchemaProps: spec.SchemaProps{
+							Description: "LastTransitionTime is the last time the status of a condition has transitioned from one state to another.",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
+						},
+					},
+				},
+				Required: []string{"type", "status", "reason", "message"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+	}
+}
+
 func schema_ironcore_api_compute_v1alpha1_ReservationList(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -1860,7 +1922,7 @@ func schema_ironcore_api_compute_v1alpha1_ReservationSpec(ref common.ReferenceCa
 							},
 						},
 					},
-					"capabilities": {
+					"resources": {
 						SchemaProps: spec.SchemaProps{
 							Type: []string{"object"},
 							AdditionalProperties: &spec.SchemaOrBool{
@@ -1902,11 +1964,24 @@ func schema_ironcore_api_compute_v1alpha1_ReservationStatus(ref common.Reference
 							},
 						},
 					},
+					"conditions": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.ReservationCondition"),
+									},
+								},
+							},
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.ReservationPoolStatus"},
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.ReservationCondition", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.ReservationPoolStatus"},
 	}
 }
 

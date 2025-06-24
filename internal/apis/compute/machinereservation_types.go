@@ -17,7 +17,8 @@ type ReservationSpec struct {
 
 // ReservationStatus defines the observed state of Reservation
 type ReservationStatus struct {
-	Pools []ReservationPoolStatus
+	Pools      []ReservationPoolStatus
+	Conditions []ReservationCondition
 }
 
 // ReservationState is the state of a Reservation.
@@ -36,6 +37,25 @@ const (
 type ReservationPoolStatus struct {
 	Name  string
 	State ReservationState
+}
+
+// ReservationConditionType is a type a ReservationCondition can have.
+type ReservationConditionType string
+
+// ReservationCondition is one of the conditions of a volume.
+type ReservationCondition struct {
+	// Type is the type of the condition.
+	Type ReservationConditionType
+	// Status is the status of the condition.
+	Status corev1.ConditionStatus
+	// Reason is a machine-readable indication of why the condition is in a certain state.
+	Reason string
+	// Message is a human-readable explanation of why the condition has a certain reason / state.
+	Message string
+	// ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+	ObservedGeneration int64
+	// LastTransitionTime is the last time the status of a condition has transitioned from one state to another.
+	LastTransitionTime metav1.Time
 }
 
 // +genclient
