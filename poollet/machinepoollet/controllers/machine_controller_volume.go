@@ -314,9 +314,6 @@ func (r *MachineReconciler) shouldUpdateVolume(iriVolume, desiredIRIVolume *iri.
 	}
 
 	// TODO: Add support for credential rotation
-	// if !reflect.DeepEqual(iriVolume.Connection.SecretData, desiredIRIVolume.Connection.SecretData) {
-	//     return true
-	// }
 
 	return false
 }
