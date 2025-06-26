@@ -265,6 +265,27 @@ func (r *FakeRuntimeService) DetachVolume(ctx context.Context, req *iri.DetachVo
 	return &iri.DetachVolumeResponse{}, nil
 }
 
+func (r *FakeRuntimeService) UpdateVolume(ctx context.Context, req *iri.UpdateVolumeRequest) (*iri.UpdateVolumeResponse, error) {
+	r.Lock()
+	defer r.Unlock()
+
+	machineID := req.MachineId
+	machine, ok := r.Machines[machineID]
+	if !ok {
+		return nil, status.Errorf(codes.NotFound, "machine %q not found", machineID)
+	}
+
+	volume := req.Volume
+	for i, existingVolume := range machine.Spec.Volumes {
+		if existingVolume.Name == volume.Name {
+			machine.Spec.Volumes[i] = volume
+			return &iri.UpdateVolumeResponse{}, nil
+		}
+	}
+
+	return nil, status.Errorf(codes.NotFound, "volume %q not found in machine %q", volume.Name, machineID)
+}
+
 func (r *FakeRuntimeService) AttachNetworkInterface(ctx context.Context, req *iri.AttachNetworkInterfaceRequest) (*iri.AttachNetworkInterfaceResponse, error) {
 	r.Lock()
 	defer r.Unlock()

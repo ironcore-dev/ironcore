@@ -19,6 +19,7 @@ type RuntimeService interface {
 	UpdateMachinePower(context.Context, *api.UpdateMachinePowerRequest) (*api.UpdateMachinePowerResponse, error)
 	AttachVolume(context.Context, *api.AttachVolumeRequest) (*api.AttachVolumeResponse, error)
 	DetachVolume(context.Context, *api.DetachVolumeRequest) (*api.DetachVolumeResponse, error)
+	UpdateVolume(context.Context, *api.UpdateVolumeRequest) (*api.UpdateVolumeResponse, error)
 	AttachNetworkInterface(context.Context, *api.AttachNetworkInterfaceRequest) (*api.AttachNetworkInterfaceResponse, error)
 	DetachNetworkInterface(context.Context, *api.DetachNetworkInterfaceRequest) (*api.DetachNetworkInterfaceResponse, error)
 	Status(context.Context, *api.StatusRequest) (*api.StatusResponse, error)
