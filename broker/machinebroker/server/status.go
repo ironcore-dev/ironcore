@@ -80,25 +80,18 @@ func (s *Server) filterIronCoreMachineClasses(
 }
 
 func (s *Server) convertIronCoreMachineClassStatus(machineClass *computev1alpha1.MachineClass, quantity *resource.Quantity) *iri.MachineClassStatus {
-	cpu := machineClass.Capabilities.CPU()
-	memory := machineClass.Capabilities.Memory()
-
-	additionalResources := map[string]int64{}
+	resources := map[string]int64{}
 	resourceList := machineClass.Capabilities
 
 	for resource, quantity := range resourceList {
-		if string(resource) != string(corev1alpha1.ResourceCPU) && string(resource) != string(corev1alpha1.ResourceMemory) {
-			additionalResources[string(resource)] = quantity.Value()
-		}
+		resources[string(resource)] = quantity.Value()
 	}
 
 	return &iri.MachineClassStatus{
 		MachineClass: &iri.MachineClass{
 			Name: machineClass.Name,
 			Capabilities: &iri.MachineClassCapabilities{
-				CpuMillis:           cpu.MilliValue(),
-				MemoryBytes:         memory.Value(),
-				AdditionalResources: additionalResources,
+				Resources: resources,
 			},
 		},
 		Quantity: quantity.Value(),

@@ -21,24 +21,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
-const (
-	CpuMillis   = "cpuMillis"
-	MemoryBytes = "memoryBytes"
-)
-
 type capabilities map[string]int64
-
-func getAllCapabilities(iriCaps *iri.MachineClassCapabilities) capabilities {
-
-	capabilities := capabilities{
-		CpuMillis:   iriCaps.CpuMillis,
-		MemoryBytes: iriCaps.MemoryBytes,
-	}
-
-	maps.Copy(capabilities, iriCaps.AdditionalResources)
-
-	return capabilities
-}
 
 func getMachineClassByCapabilities(machineClassByCapabilities map[*iri.MachineClassStatus]capabilities, capabilities capabilities) []*iri.MachineClassStatus {
 	matchingMachineClasses := []*iri.MachineClassStatus{}
@@ -123,7 +106,7 @@ func (g *Generic) relist(ctx context.Context, log logr.Logger) error {
 		notify = notify || shouldNotify(oldMachineClassByName, machineClassStatus)
 
 		g.machineClassByName[machineClass.Name] = machineClassStatus
-		g.machineClassByCapabilities[machineClassStatus] = getAllCapabilities(machineClass.Capabilities)
+		g.machineClassByCapabilities[machineClassStatus] = machineClass.Capabilities.Resources
 	}
 
 	if notify {
@@ -136,7 +119,7 @@ func (g *Generic) relist(ctx context.Context, log logr.Logger) error {
 	for _, machineClassStatus := range res.MachineClassStatus {
 		machineClass := machineClassStatus.GetMachineClass()
 		g.machineClassByName[machineClass.Name] = machineClassStatus
-		g.machineClassByCapabilities[machineClassStatus] = getAllCapabilities(machineClass.Capabilities)
+		g.machineClassByCapabilities[machineClassStatus] = machineClass.Capabilities.Resources
 	}
 
 	if !g.sync {
@@ -161,8 +144,8 @@ func (g *Generic) GetMachineClassFor(ctx context.Context, name string, caps *iri
 	g.mu.RLock()
 	defer g.mu.RUnlock()
 
-	expected := getAllCapabilities(caps)
-	if byName, ok := g.machineClassByName[name]; ok && reflect.DeepEqual(getAllCapabilities(byName.MachineClass.Capabilities), expected) {
+	expected := caps.Resources
+	if byName, ok := g.machineClassByName[name]; ok && reflect.DeepEqual(byName.MachineClass.Capabilities.Resources, expected) {
 		return byName.MachineClass, byName.Quantity, nil
 	}
 

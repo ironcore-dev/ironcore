@@ -16,7 +16,6 @@ import (
 
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	irimachine "github.com/ironcore-dev/ironcore/iri/apis/machine"
@@ -718,22 +717,15 @@ func (r *MachineReconciler) prepareIRIMachineClass(ctx context.Context, machine 
 }
 
 func getIRIMachineClassCapabilities(machineClass *computev1alpha1.MachineClass) *iri.MachineClassCapabilities {
-	cpu := machineClass.Capabilities.CPU()
-	memory := machineClass.Capabilities.Memory()
-
-	additionalResources := map[string]int64{}
+	resources := map[string]int64{}
 	resourceList := machineClass.Capabilities
 
 	for resource, quantity := range resourceList {
-		if string(resource) != string(corev1alpha1.ResourceCPU) && string(resource) != string(corev1alpha1.ResourceMemory) {
-			additionalResources[string(resource)] = quantity.Value()
-		}
+		resources[string(resource)] = quantity.Value()
 	}
 
 	return &iri.MachineClassCapabilities{
-		CpuMillis:           cpu.MilliValue(),
-		MemoryBytes:         memory.Value(),
-		AdditionalResources: additionalResources,
+		Resources: resources,
 	}
 }
 

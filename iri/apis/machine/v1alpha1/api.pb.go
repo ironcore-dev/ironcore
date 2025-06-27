@@ -406,12 +406,10 @@ func (x *EventFilter) GetEventsToTime() int64 {
 }
 
 type MachineClassCapabilities struct {
-	state               protoimpl.MessageState `protogen:"open.v1"`
-	CpuMillis           int64                  `protobuf:"varint,1,opt,name=cpu_millis,json=cpuMillis,proto3" json:"cpu_millis,omitempty"`
-	MemoryBytes         int64                  `protobuf:"varint,2,opt,name=memory_bytes,json=memoryBytes,proto3" json:"memory_bytes,omitempty"`
-	AdditionalResources map[string]int64       `protobuf:"bytes,3,rep,name=additional_resources,json=additionalResources,proto3" json:"additional_resources,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Resources     map[string]int64       `protobuf:"bytes,1,rep,name=resources,proto3" json:"resources,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *MachineClassCapabilities) Reset() {
@@ -444,23 +442,9 @@ func (*MachineClassCapabilities) Descriptor() ([]byte, []int) {
 	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *MachineClassCapabilities) GetCpuMillis() int64 {
+func (x *MachineClassCapabilities) GetResources() map[string]int64 {
 	if x != nil {
-		return x.CpuMillis
-	}
-	return 0
-}
-
-func (x *MachineClassCapabilities) GetMemoryBytes() int64 {
-	if x != nil {
-		return x.MemoryBytes
-	}
-	return 0
-}
-
-func (x *MachineClassCapabilities) GetAdditionalResources() map[string]int64 {
-	if x != nil {
-		return x.AdditionalResources
+		return x.Resources
 	}
 	return nil
 }
@@ -2477,13 +2461,10 @@ const file_machine_v1alpha1_api_proto_rawDesc = "" +
 	"\x0eevents_to_time\x18\x04 \x01(\x03R\feventsToTime\x1a@\n" +
 	"\x12LabelSelectorEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x9c\x02\n" +
-	"\x18MachineClassCapabilities\x12\x1d\n" +
-	"\n" +
-	"cpu_millis\x18\x01 \x01(\x03R\tcpuMillis\x12!\n" +
-	"\fmemory_bytes\x18\x02 \x01(\x03R\vmemoryBytes\x12v\n" +
-	"\x14additional_resources\x18\x03 \x03(\v2C.machine.v1alpha1.MachineClassCapabilities.AdditionalResourcesEntryR\x13additionalResources\x1aF\n" +
-	"\x18AdditionalResourcesEntry\x12\x10\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xb1\x01\n" +
+	"\x18MachineClassCapabilities\x12W\n" +
+	"\tresources\x18\x01 \x03(\v29.machine.v1alpha1.MachineClassCapabilities.ResourcesEntryR\tresources\x1a<\n" +
+	"\x0eResourcesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\x03R\x05value:\x028\x01\"\xb0\x01\n" +
 	"\aMachine\x129\n" +
@@ -2726,7 +2707,7 @@ var file_machine_v1alpha1_api_proto_goTypes = []any{
 	nil,                                      // 49: machine.v1alpha1.VolumeSpec.SecretDataEntry
 	nil,                                      // 50: machine.v1alpha1.MachineFilter.LabelSelectorEntry
 	nil,                                      // 51: machine.v1alpha1.EventFilter.LabelSelectorEntry
-	nil,                                      // 52: machine.v1alpha1.MachineClassCapabilities.AdditionalResourcesEntry
+	nil,                                      // 52: machine.v1alpha1.MachineClassCapabilities.ResourcesEntry
 	nil,                                      // 53: machine.v1alpha1.VolumeConnection.AttributesEntry
 	nil,                                      // 54: machine.v1alpha1.VolumeConnection.SecretDataEntry
 	nil,                                      // 55: machine.v1alpha1.VolumeConnection.EncryptionDataEntry
@@ -2740,7 +2721,7 @@ var file_machine_v1alpha1_api_proto_depIdxs = []int32{
 	49, // 1: machine.v1alpha1.VolumeSpec.secret_data:type_name -> machine.v1alpha1.VolumeSpec.SecretDataEntry
 	50, // 2: machine.v1alpha1.MachineFilter.label_selector:type_name -> machine.v1alpha1.MachineFilter.LabelSelectorEntry
 	51, // 3: machine.v1alpha1.EventFilter.label_selector:type_name -> machine.v1alpha1.EventFilter.LabelSelectorEntry
-	52, // 4: machine.v1alpha1.MachineClassCapabilities.additional_resources:type_name -> machine.v1alpha1.MachineClassCapabilities.AdditionalResourcesEntry
+	52, // 4: machine.v1alpha1.MachineClassCapabilities.resources:type_name -> machine.v1alpha1.MachineClassCapabilities.ResourcesEntry
 	58, // 5: machine.v1alpha1.Machine.metadata:type_name -> meta.v1alpha1.ObjectMetadata
 	14, // 6: machine.v1alpha1.Machine.spec:type_name -> machine.v1alpha1.MachineSpec
 	15, // 7: machine.v1alpha1.Machine.status:type_name -> machine.v1alpha1.MachineStatus
