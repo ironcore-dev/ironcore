@@ -4,6 +4,7 @@
 package tableconverters
 
 import (
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	"github.com/ironcore-dev/ironcore/irictl/api"
 	"github.com/ironcore-dev/ironcore/irictl/tableconverter"
@@ -23,8 +24,8 @@ var (
 		Rows: tableconverter.SingleRowFrom(func(status *iri.MachineClassStatus) (api.Row, error) {
 			return api.Row{
 				status.MachineClass.Name,
-				resource.NewMilliQuantity(status.MachineClass.Capabilities.CpuMillis, resource.DecimalSI).String(),
-				resource.NewQuantity(status.MachineClass.Capabilities.MemoryBytes, resource.DecimalSI).String(),
+				resource.NewMilliQuantity(status.MachineClass.Capabilities.Resources[string(corev1alpha1.ResourceCPU)], resource.DecimalSI).String(),
+				resource.NewQuantity(status.MachineClass.Capabilities.Resources[string(corev1alpha1.ResourceMemory)], resource.DecimalSI).String(),
 				resource.NewQuantity(status.Quantity, resource.DecimalSI).String(),
 			}, nil
 		}),
