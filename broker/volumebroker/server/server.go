@@ -45,6 +45,8 @@ type Server struct {
 	client client.Client
 	idGen  idgen.IDGen
 
+	brokerDownwardAPILabels map[string]string
+
 	namespace          string
 	volumePoolName     string
 	volumePoolSelector map[string]string
@@ -73,10 +75,15 @@ func (s *Server) setupCleaner(ctx context.Context, log logr.Logger, retErr *erro
 }
 
 type Options struct {
-	Namespace          string
-	VolumePoolName     string
-	VolumePoolSelector map[string]string
-	IDGen              idgen.IDGen
+	// BrokerDownwardAPILabels specifies which labels to broker via downward API and what the default
+	// label name is to obtain the value in case there is no value for the downward API.
+	// Example usage is e.g. to broker the root UID (map "root-volume-uid" to volumepoollet's
+	// "volumepoollet.ironcore.dev/volume-uid")
+	BrokerDownwardAPILabels map[string]string
+	Namespace               string
+	VolumePoolName          string
+	VolumePoolSelector      map[string]string
+	IDGen                   idgen.IDGen
 }
 
 func setOptionsDefaults(o *Options) {
@@ -105,11 +112,12 @@ func New(cfg *rest.Config, opts Options) (*Server, error) {
 	}
 
 	return &Server{
-		client:             c,
-		idGen:              opts.IDGen,
-		namespace:          opts.Namespace,
-		volumePoolName:     opts.VolumePoolName,
-		volumePoolSelector: opts.VolumePoolSelector,
+		brokerDownwardAPILabels: opts.BrokerDownwardAPILabels,
+		client:                  c,
+		idGen:                   opts.IDGen,
+		namespace:               opts.Namespace,
+		volumePoolName:          opts.VolumePoolName,
+		volumePoolSelector:      opts.VolumePoolSelector,
 	}, nil
 }
 

@@ -23,19 +23,9 @@ const (
 	FieldOwner       = "machinepoollet.ironcore.dev/field-owner"
 	MachineFinalizer = "machinepoollet.ironcore.dev/machine"
 
-	// DownwardAPIPrefix is the prefix for any downward label.
-	DownwardAPIPrefix = "downward-api.machinepoollet.ironcore.dev/"
+	// MachineDownwardAPIPrefix is the prefix for any downward label.
+	MachineDownwardAPIPrefix = "downward-api.machinepoollet.ironcore.dev/"
 )
-
-// DownwardAPILabel makes a downward api label name from the given name.
-func DownwardAPILabel(name string) string {
-	return DownwardAPIPrefix + name
-}
-
-// DownwardAPIAnnotation makes a downward api annotation name from the given name.
-func DownwardAPIAnnotation(name string) string {
-	return DownwardAPIPrefix + name
-}
 
 // EncodeNetworkInterfaceMapping encodes the given network interface mapping to be used as an annotation.
 func EncodeNetworkInterfaceMapping(nicMapping map[string]ObjectUIDRef) (string, error) {
