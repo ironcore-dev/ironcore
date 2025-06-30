@@ -23,14 +23,19 @@ import (
 
 type capabilities map[string]int64
 
-func getMachineClassByCapabilities(machineClassByCapabilities map[*iri.MachineClassStatus]capabilities, capabilities capabilities) []*iri.MachineClassStatus {
-	matchingMachineClasses := []*iri.MachineClassStatus{}
-	for machineClass, machineClassCapabilities := range machineClassByCapabilities {
+type machineClassQuantity struct {
+	*iri.MachineClass
+	quantity int64
+}
+
+func getMachineClassByCapabilities(machineClassByCapabilities map[machineClassQuantity]capabilities, capabilities capabilities) []machineClassQuantity {
+	matchingMachineClassStatus := []machineClassQuantity{}
+	for machineClassStatus, machineClassCapabilities := range machineClassByCapabilities {
 		if reflect.DeepEqual(machineClassCapabilities, capabilities) {
-			matchingMachineClasses = append(matchingMachineClasses, machineClass)
+			matchingMachineClassStatus = append(matchingMachineClassStatus, machineClassStatus)
 		}
 	}
-	return matchingMachineClasses
+	return matchingMachineClassStatus
 }
 
 type Generic struct {
@@ -41,8 +46,8 @@ type Generic struct {
 
 	listener sets.Set[*listener]
 
-	machineClassByName         map[string]*iri.MachineClassStatus
-	machineClassByCapabilities map[*iri.MachineClassStatus]capabilities
+	machineClassByName       map[string]*iri.MachineClassStatus
+	machineClassCapabilities map[machineClassQuantity]capabilities
 
 	machineRuntime machine.RuntimeService
 
@@ -98,7 +103,7 @@ func (g *Generic) relist(ctx context.Context, log logr.Logger) error {
 	oldMachineClassByName := maps.Clone(g.machineClassByName)
 
 	maps.Clear(g.machineClassByName)
-	maps.Clear(g.machineClassByCapabilities)
+	maps.Clear(g.machineClassCapabilities)
 
 	var notify bool
 	for _, machineClassStatus := range res.MachineClassStatus {
@@ -106,7 +111,11 @@ func (g *Generic) relist(ctx context.Context, log logr.Logger) error {
 		notify = notify || shouldNotify(oldMachineClassByName, machineClassStatus)
 
 		g.machineClassByName[machineClass.Name] = machineClassStatus
-		g.machineClassByCapabilities[machineClassStatus] = machineClass.Capabilities.Resources
+		machineClassWithQuantity := machineClassQuantity{
+			MachineClass: machineClass,
+			quantity:     machineClassStatus.Quantity,
+		}
+		g.machineClassCapabilities[machineClassWithQuantity] = machineClass.Capabilities.Resources
 	}
 
 	if notify {
@@ -119,7 +128,11 @@ func (g *Generic) relist(ctx context.Context, log logr.Logger) error {
 	for _, machineClassStatus := range res.MachineClassStatus {
 		machineClass := machineClassStatus.GetMachineClass()
 		g.machineClassByName[machineClass.Name] = machineClassStatus
-		g.machineClassByCapabilities[machineClassStatus] = machineClass.Capabilities.Resources
+		machineClassWithQuantity := machineClassQuantity{
+			MachineClass: machineClass,
+			quantity:     machineClassStatus.Quantity,
+		}
+		g.machineClassCapabilities[machineClassWithQuantity] = machineClass.Capabilities.Resources
 	}
 
 	if !g.sync {
@@ -149,12 +162,12 @@ func (g *Generic) GetMachineClassFor(ctx context.Context, name string, caps *iri
 		return byName.MachineClass, byName.Quantity, nil
 	}
 
-	byCaps := getMachineClassByCapabilities(g.machineClassByCapabilities, expected)
+	byCaps := getMachineClassByCapabilities(g.machineClassCapabilities, expected)
 	switch len(byCaps) {
 	case 0:
 		return nil, 0, ErrNoMatchingMachineClass
 	case 1:
-		return byCaps[0].MachineClass, byCaps[0].Quantity, nil
+		return byCaps[0].MachineClass, byCaps[0].quantity, nil
 	default:
 		return nil, 0, ErrAmbiguousMatchingMachineClass
 	}
@@ -183,12 +196,12 @@ func setGenericOptionsDefaults(o *GenericOptions) {
 func NewGeneric(runtime machine.RuntimeService, opts GenericOptions) MachineClassMapper {
 	setGenericOptionsDefaults(&opts)
 	return &Generic{
-		synced:                     make(chan struct{}),
-		machineClassByName:         map[string]*iri.MachineClassStatus{},
-		machineClassByCapabilities: map[*iri.MachineClassStatus]capabilities{},
-		listener:                   sets.New[*listener](),
-		machineRuntime:             runtime,
-		relistPeriod:               opts.RelistPeriod,
+		synced:                   make(chan struct{}),
+		machineClassByName:       map[string]*iri.MachineClassStatus{},
+		machineClassCapabilities: map[machineClassQuantity]capabilities{},
+		listener:                 sets.New[*listener](),
+		machineRuntime:           runtime,
+		relistPeriod:             opts.RelistPeriod,
 	}
 }
 
