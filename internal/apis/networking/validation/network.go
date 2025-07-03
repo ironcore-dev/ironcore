@@ -63,6 +63,12 @@ func validateNetworkSpec(namespace, name string, spec *networking.NetworkSpec, f
 				seenPrefixNames.Insert(prefix.Name)
 			}
 
+			if peeringPrefix := prefix.Prefix; peeringPrefix != nil {
+				if !peeringPrefix.IsZero() {
+					allErrs = append(allErrs, field.Forbidden(fldPath.Child("prefix"), "must be a valid IP range"))
+				}
+			}
+
 			peeringPrefixKey := client.ObjectKey{Namespace: namespace, Name: prefix.PrefixRef.Name}
 
 			if seenPeeringPrefixKeys.Has(peeringPrefixKey) {
