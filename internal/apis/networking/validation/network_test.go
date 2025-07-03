@@ -4,8 +4,6 @@
 package validation
 
 import (
-	"net/netip"
-
 	"github.com/onsi/gomega/types"
 
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
