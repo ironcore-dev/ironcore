@@ -717,12 +717,15 @@ func (r *MachineReconciler) prepareIRIMachineClass(ctx context.Context, machine 
 }
 
 func getIRIMachineClassCapabilities(machineClass *computev1alpha1.MachineClass) *iri.MachineClassCapabilities {
-	cpu := machineClass.Capabilities.CPU()
-	memory := machineClass.Capabilities.Memory()
+	resources := map[string]int64{}
+	resourceList := machineClass.Capabilities
+
+	for resource, quantity := range resourceList {
+		resources[string(resource)] = quantity.Value()
+	}
 
 	return &iri.MachineClassCapabilities{
-		CpuMillis:   cpu.MilliValue(),
-		MemoryBytes: memory.Value(),
+		Resources: resources,
 	}
 }
 
